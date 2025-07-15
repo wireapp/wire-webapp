@@ -29,7 +29,8 @@ const members = Array.from({length: 2}, () => getUser());
 const teamName = 'Conversation Management';
 const conversationName = 'Test Conversation';
 
-test('Conversation Management', {tag: ['@TC-8636', '@crit-flow-web']}, async ({pages, api}) => {
+test('Conversation Management', {tag: ['@TC-8636', '@crit-flow-web']}, async ({pm, api}) => {
+  const {pages, modals} = pm.webapp;
   test.setTimeout(300000); // Set test timeout to 5 minutes
 
   await test.step('Preconditions: Team owner created a team with 5 members', async () => {
@@ -40,71 +41,69 @@ test('Conversation Management', {tag: ['@TC-8636', '@crit-flow-web']}, async ({p
   });
 
   await test.step('Team owner signed in to the application', async () => {
-    await pages.openMainPage();
-    await loginUser(owner, pages);
-    await pages.dataShareConsentModal.clickDecline();
+    await pm.openMainPage();
+    await loginUser(owner, pm);
+    await modals.dataShareConsent().clickDecline();
   });
 
   await test.step('Team owner creates a group with all the five members', async () => {
-    await pages.conversationListPage.clickCreateGroup();
-    await pages.groupCreationPage.setGroupName(conversationName);
-    await pages.startUIPage.selectUsers(members.map(member => member.username));
-    await pages.groupCreationPage.clickCreateGroupButton();
-    expect(await pages.conversationListPage.isConversationItemVisible(conversationName)).toBeTruthy();
+    await pages.conversationList().clickCreateGroup();
+    await pages.groupCreation().setGroupName(conversationName);
+    await pages.startUI().selectUsers(members.map(member => member.username));
+    await pages.groupCreation().clickCreateGroupButton();
+    expect(await pages.conversationList().isConversationItemVisible(conversationName)).toBeTruthy();
     // TODO: Bug [WPB-18226], remove this when fixed
-    await pages.refreshPage({waitUntil: 'load'});
+    await pm.refreshPage({waitUntil: 'load'});
   });
 
   await test.step('Team owner sends a message in the conversation', async () => {
-    await sendTextMessageToConversation(pages, conversationName, 'Hello team! Admin here.');
+    await sendTextMessageToConversation(pm, conversationName, 'Hello team! Admin here.');
   });
 
   await test.step('Team owner logs out from the application', async () => {
-    await logOutUser(pages);
+    await logOutUser(pm);
   });
 
   await test.step('Team members sign in, send messages, and log out', async () => {
     for (const member of members) {
-      await loginUser(member, pages);
-      await pages.dataShareConsentModal.clickDecline();
-      await sendTextMessageToConversation(pages, conversationName, `Hello team! ${member.firstName} here.`);
-      await logOutUser(pages);
+      await loginUser(member, pm);
+      await modals.dataShareConsent().clickDecline();
+      await sendTextMessageToConversation(pm, conversationName, `Hello team! ${member.firstName} here.`);
+      await logOutUser(pm);
     }
   });
 
   await test.step('Team owner signed in to the application and verify messages', async () => {
-    await loginUser(owner, pages);
-    await pages.conversationListPage.openConversation(conversationName);
+    await loginUser(owner, pm);
+    await pages.conversationList().openConversation(conversationName);
     for (const member of members) {
-      expect(await pages.conversationPage.isMessageVisible(`Hello team! ${member.firstName} here.`)).toBeTruthy();
+      expect(await pages.conversation().isMessageVisible(`Hello team! ${member.firstName} here.`)).toBeTruthy();
     }
   });
 
   await test.step('Team owner send self-destructing messages', async () => {
-    await pages.conversationPage.enableAutoDeleteMessages();
-    await pages.conversationPage.sendMessage('This message will self-destruct in 10 seconds.');
-    expect(
-      await pages.conversationPage.isMessageVisible('This message will self-destruct in 10 seconds.'),
-    ).toBeTruthy();
+    await pages.conversation().enableAutoDeleteMessages();
+    await pages.conversation().sendMessage('This message will self-destruct in 10 seconds.');
+    expect(await pages.conversation().isMessageVisible('This message will self-destruct in 10 seconds.')).toBeTruthy();
     // Wait for more than 10 seconds to ensure the message is deleted
-    await pages.conversationPage.page.waitForTimeout(11000);
-    expect(await pages.conversationPage.isMessageVisible('This message will self-destruct in 10 seconds.')).toBeFalsy();
+    await pages.conversation().page.waitForTimeout(11000);
+    expect(await pages.conversation().isMessageVisible('This message will self-destruct in 10 seconds.')).toBeFalsy();
   });
 
   await test.step('Team owner open searched conversation', async () => {
-    await pages.conversationListPage.searchConversation(conversationName);
-    await pages.conversationListPage.openConversation(conversationName);
-    expect(await pages.conversationListPage.isConversationItemVisible(conversationName)).toBeTruthy();
-    await pages.conversationListPage.openConversation(conversationName);
+    await pages.conversationList().searchConversation(conversationName);
+    await pages.conversationList().openConversation(conversationName);
+    expect(await pages.conversationList().isConversationItemVisible(conversationName)).toBeTruthy();
+    await pages.conversationList().openConversation(conversationName);
   });
 
   await test.step('Team owner leave conversation with clear history', async () => {
-    await pages.conversationListPage.openContextMenu(conversationName);
-    await pages.conversationListPage.leaveConversation();
-    await pages.leaveConversationModal.toggleCheckbox();
-    await pages.leaveConversationModal.clickConfirm();
-    await pages.conversationPage.isConversationReadonly();
-    expect(await pages.conversationPage.isMessageInputVisible()).toBeFalsy();
+    await pages.conversationList().openContextMenu(conversationName);
+    await pages.conversationList().leaveConversation();
+    await modals.leaveConversation().toggleCheckbox();
+    await modals.leaveConversation().clickConfirm();
+    await pages.conversation().isConversationReadonly();
+    expect(await pages.conversation().isMessageInputVisible()).toBeFalsy();
   });
 });
 

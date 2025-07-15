@@ -42,7 +42,7 @@ export const addCreatedTeam = (user: User, teamId: string) => {
 
 export const removeCreatedTeam = async (api: ApiManagerE2E, user: User) => {
   if (!user.id) {
-    throw new Error('User must have an ID to remove from createdTeams');
+    return; // No team to remove if user ID is not set
   }
   const teamId = createdTeams.get(user);
   if (!teamId) {
@@ -54,7 +54,7 @@ export const removeCreatedTeam = async (api: ApiManagerE2E, user: User) => {
 
 export const removeCreatedUser = async (api: ApiManagerE2E, user: User) => {
   if (!user.id) {
-    throw new Error('User must have an ID to remove from createdUsers');
+    return; // No user to remove if user ID is not set
   }
   const token = user.token ?? (await api.auth.loginUser(user)).data.access_token;
   if (!token) {

@@ -26,7 +26,8 @@ import {addCreatedUser, removeCreatedUser} from '../../utils/tearDownUtil';
 const userB = getUser();
 const userA = getUser();
 
-test('Personal Account Lifecycle', {tag: ['@TC-8638', '@crit-flow-web']}, async ({pages, api}) => {
+test('Personal Account Lifecycle', {tag: ['@TC-8638', '@crit-flow-web']}, async ({pm, api}) => {
+  const {pages, modals, components} = pm.webapp;
   test.setTimeout(150_000); // Increasing test timeout to 150 seconds to accommodate the full flow
 
   await test.step('Preconditions: Creating preconditions for the test via API', async () => {
@@ -37,63 +38,63 @@ test('Personal Account Lifecycle', {tag: ['@TC-8638', '@crit-flow-web']}, async 
 
   // Test steps
   await test.step('User A opens the application and registers personal account', async () => {
-    await pages.openMainPage();
-    await pages.singleSignOnPage.enterEmailOnSSOPage(userA.email);
-    await pages.welcomePage.clickCreateAccountButton();
-    await pages.welcomePage.clickCreatePersonalAccountButton();
-    expect(await pages.registrationPage.isPasswordPolicyInfoVisible());
+    await pm.openMainPage();
+    await pages.singleSignOn().enterEmailOnSSOPage(userA.email);
+    await pages.welcome().clickCreateAccountButton();
+    await pages.welcome().clickCreatePersonalAccountButton();
+    expect(await pages.registration().isPasswordPolicyInfoVisible());
 
-    await pages.registrationPage.fillInUserInfo(userA);
-    expect(await pages.registrationPage.isSubmitButtonEnabled()).toBeFalsy();
+    await pages.registration().fillInUserInfo(userA);
+    expect(await pages.registration().isSubmitButtonEnabled()).toBeFalsy();
 
-    await pages.registrationPage.toggleTermsCheckbox();
-    expect(await pages.registrationPage.isSubmitButtonEnabled()).toBeTruthy();
+    await pages.registration().toggleTermsCheckbox();
+    expect(await pages.registration().isSubmitButtonEnabled()).toBeTruthy();
 
-    await pages.registrationPage.clickSubmitButton();
+    await pages.registration().clickSubmitButton();
     const verificationCode = await api.inbucket.getVerificationCode(userA.email);
-    await pages.verificationPage.enterVerificationCode(verificationCode);
-    await pages.marketingConsentModal.clickConfirmButton();
+    await pm.tm.pages.emailVerification().enterVerificationCode(verificationCode);
+    await pm.tm.modals.marketingConsent().clickConfirmButton();
   });
 
   await test.step('Personal user A sets user name', async () => {
-    await pages.setUsernamePage.setUsername(userA.username);
-    await pages.setUsernamePage.clickNextButton();
-    await pages.registerSuccessPage.clickOpenWireWebButton();
+    await pm.tm.pages.setUsername().setUsername(userA.username);
+    await pm.tm.pages.setUsername().clickNextButton();
+    await pm.tm.pages.registerSuccess().clickOpenWireWebButton();
   });
 
   await test.step('Personal user A declines sending anonymous usage data', async () => {
-    await pages.dataShareConsentModal.isModalPresent();
-    await pages.dataShareConsentModal.clickDecline();
+    await modals.dataShareConsent().isModalPresent();
+    await modals.dataShareConsent().clickDecline();
   });
 
   await test.step('Personal user A checks that username was set correctly', async () => {
-    expect(await pages.conversationSidebar.getPersonalStatusName()).toBe(`${userA.firstName} ${userA.lastName}`);
-    expect(await pages.conversationSidebar.getPersonalUserName()).toContain(userA.username);
-    expect(await pages.conversationPage.isWatermarkVisible());
+    expect(await components.conversationSidebar().getPersonalStatusName()).toBe(`${userA.firstName} ${userA.lastName}`);
+    expect(await components.conversationSidebar().getPersonalUserName()).toContain(userA.username);
+    expect(await pages.conversation().isWatermarkVisible());
   });
 
   await test.step('Personal user A searches for other personal user B', async () => {
-    await pages.conversationSidebar.clickConnectButton();
-    await pages.startUIPage.selectUser(userB.username);
-    expect(await pages.userProfileModal.isVisible());
+    await components.conversationSidebar().clickConnectButton();
+    await pages.startUI().selectUser(userB.username);
+    expect(await modals.userProfile().isVisible());
   });
 
   await test.step('Personal user A sends a connection request to personal user B', async () => {
-    await pages.userProfileModal.clickConnectButton();
-    await pages.conversationListPage.openConversation(userB.fullName);
-    expect(await pages.outgoingConnectionPage.getOutgoingConnectionUsername()).toContain(userB.username);
-    expect(await pages.outgoingConnectionPage.isPendingIconVisible(userB.fullName));
+    await modals.userProfile().clickConnectButton();
+    await pages.conversationList().openConversation(userB.fullName);
+    expect(await pages.outgoingConnection().getOutgoingConnectionUsername()).toContain(userB.username);
+    expect(await pages.outgoingConnection().isPendingIconVisible(userB.fullName));
   });
 
   await test.step('Personal user B accepts request', async () => {
     await api.acceptConnectionRequest(userB);
-    expect(await pages.outgoingConnectionPage.isPendingIconHidden(userB.fullName));
+    expect(await pages.outgoingConnection().isPendingIconHidden(userB.fullName));
   });
 
   await test.step('Personal user A and personal user B exchange some messages', async () => {
     // TODO: Conversation sometimes closes after connection request was approved, so we need to reopen it
-    await pages.conversationListPage.openConversation(userB.fullName);
-    expect(await pages.conversationPage.isConversationOpen(userB.fullName));
+    await pages.conversationList().openConversation(userB.fullName);
+    expect(await pages.conversation().isConversationOpen(userB.fullName));
 
     // TODO: Bug [WPB-18226] Message is not visible in the conversation after sending it
     // await pages.conversationPage.sendMessage('Hello there');
@@ -104,16 +105,16 @@ test('Personal Account Lifecycle', {tag: ['@TC-8638', '@crit-flow-web']}, async 
   });
 
   await test.step('Personal user A blocks personal user B', async () => {
-    await pages.conversationListPage.clickConversationOptions(userB.fullName);
-    await pages.conversationListPage.clickBlockConversation();
-    expect(await pages.blockWarningModal.isModalPresent());
-    expect(await pages.blockWarningModal.getModalTitle()).toContain(`Block ${userB.fullName}`);
-    expect(await pages.blockWarningModal.getModalText()).toContain(
+    await pages.conversationList().clickConversationOptions(userB.fullName);
+    await pages.conversationList().clickBlockConversation();
+    expect(await modals.blockWarning().isModalPresent());
+    expect(await modals.blockWarning().getModalTitle()).toContain(`Block ${userB.fullName}`);
+    expect(await modals.blockWarning().getModalText()).toContain(
       `${userB.fullName} won’t be able to contact you or add you to group conversations.`,
     );
 
-    await pages.blockWarningModal.clickBlock();
-    expect(await pages.conversationListPage.isConversationBlocked(userB.fullName));
+    await modals.blockWarning().clickBlock();
+    expect(await pages.conversationList().isConversationBlocked(userB.fullName));
 
     // [WPB-18093] Backend not returning the blocked 1:1 in conversations list
     // When User <Contact> sends message "See this?" to personal MLS conversation <Name>
@@ -121,7 +122,7 @@ test('Personal Account Lifecycle', {tag: ['@TC-8638', '@crit-flow-web']}, async 
   });
 
   await test.step('Personal user A opens settings', async () => {
-    await pages.conversationSidebar.clickPreferencesButton();
+    await components.conversationSidebar().clickPreferencesButton();
   });
 
   // Uncomment when [WPB-18496] is fixed

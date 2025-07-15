@@ -19,34 +19,35 @@
 
 import {Page, Locator} from '@playwright/test';
 
-import {selectByDataAttribute, selectByLabel} from '../utils/useSelector';
+import {selectByDataAttribute} from 'test/e2e_tests/utils/useSelector';
 
-export class ConfirmLogoutModal {
+export class UserProfileModal {
   readonly page: Page;
 
   readonly modal: Locator;
-  readonly modalCheckbox: Locator;
-  readonly cancelButton: Locator;
-  readonly confirmButton: Locator;
+  readonly connectButton: Locator;
+  readonly startConversationButton: Locator;
 
   constructor(page: Page) {
     this.page = page;
-
-    this.modal = page.locator(`${selectByDataAttribute('modal-template-option')}`);
-    this.modalCheckbox = this.modal.locator(`${selectByLabel('clear-data-checkbox')}`);
-    this.cancelButton = this.modal.locator(`${selectByDataAttribute('do-secondary')}`);
-    this.confirmButton = this.modal.locator(`${selectByDataAttribute('do-action')}`);
+    this.modal = page.locator(`${selectByDataAttribute('modal-user-profile')}`);
+    this.connectButton = page.locator(
+      `${selectByDataAttribute('modal-user-profile')} ${selectByDataAttribute('do-send-request')}`,
+    );
+    this.startConversationButton = page.locator(
+      `${selectByDataAttribute('modal-user-profile')} ${selectByDataAttribute('start-conversation')}`,
+    );
   }
 
-  async toggleModalCheck() {
-    await this.modalCheckbox.click();
+  async isVisible() {
+    await this.modal.isVisible();
   }
 
-  async clickCancel() {
-    await this.cancelButton.click();
+  async clickConnectButton() {
+    await this.connectButton.click();
   }
 
-  async clickConfirm() {
-    await this.confirmButton.click();
+  async clickStartConversation() {
+    await this.startConversationButton.click();
   }
 }

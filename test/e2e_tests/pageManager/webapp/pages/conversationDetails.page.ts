@@ -19,7 +19,7 @@
 
 import {Locator, Page} from '@playwright/test';
 
-import {selectByClass, selectByDataAttribute, selectById} from '../utils/useSelector';
+import {selectByClass, selectByDataAttribute, selectById} from 'test/e2e_tests/utils/useSelector';
 
 export class ConversationDetailsPage {
   readonly page: Page;

@@ -30,8 +30,11 @@ const teamName = 'Critical';
 const conversationName = 'Tracking';
 const appLockPassphrase = generateSecurePassword();
 
-test('Account Management', {tag: ['@TC-8639', '@crit-flow-web']}, async ({pages, api}) => {
+test('Account Management', {tag: ['@TC-8639', '@crit-flow-web']}, async ({pm, api}) => {
   test.slow(); // Increasing test timeout to 90 seconds to accommodate the full flow
+
+  const {refreshPage} = pm;
+  const {pages, modals, components} = pm.webapp;
 
   // Creating preconditions for the test via API
   await test.step('Preconditions: Creating preconditions for the test via API', async () => {
@@ -53,35 +56,35 @@ test('Account Management', {tag: ['@TC-8639', '@crit-flow-web']}, async ({pages,
 
   // Test steps
   await test.step('Members logs in into the application', async () => {
-    await pages.openMainPage();
-    await loginUser(member, pages);
-    await pages.dataShareConsentModal.clickDecline();
+    await pm.openMainPage();
+    await loginUser(member, pm);
+    await modals.dataShareConsent().clickDecline();
   });
 
   await test.step('Member opens settings', async () => {
-    await pages.conversationSidebar.clickPreferencesButton();
+    await components.conversationSidebar().clickPreferencesButton();
   });
 
   await test.step('Member enables logging in settings', async () => {
-    await pages.accountPage.toggleSendUsageData();
+    await pages.account().toggleSendUsageData();
   });
 
   await test.step('Member enables applock and sets their password', async () => {
-    await pages.accountPage.toggleAppLock();
-    await pages.appLockModal.setPasscode(appLockPassphrase);
-    await pages.conversationSidebar.clickAllConversationsButton();
-    expect(await pages.conversationListPage.isConversationItemVisible(conversationName));
+    await pages.account().toggleAppLock();
+    await modals.appLock().setPasscode(appLockPassphrase);
+    await components.conversationSidebar().clickAllConversationsButton();
+    expect(await pages.conversationList().isConversationItemVisible(conversationName));
   });
 
   await test.step('Member verifies if applock is working', async () => {
-    await pages.refreshPage();
-    expect(await pages.appLockModal.isVisible());
-    expect(await pages.appLockModal.getAppLockModalHeader()).toContain('Enter passcode to unlock');
-    expect(await pages.appLockModal.getAppLockModalText()).toContain('Passcode');
+    await refreshPage();
+    expect(await modals.appLock().isVisible());
+    expect(await modals.appLock().getAppLockModalHeader()).toContain('Enter passcode to unlock');
+    expect(await modals.appLock().getAppLockModalText()).toContain('Passcode');
 
-    await pages.appLockModal.unlockAppWithPasscode(appLockPassphrase);
-    expect(await pages.appLockModal.isHidden());
-    expect(await pages.conversationListPage.isConversationItemVisible(conversationName));
+    await modals.appLock().unlockAppWithPasscode(appLockPassphrase);
+    expect(await modals.appLock().isHidden());
+    expect(await pages.conversationList().isConversationItemVisible(conversationName));
   });
 
   // TODO: Missing test steps for TC-8639 from testiny:

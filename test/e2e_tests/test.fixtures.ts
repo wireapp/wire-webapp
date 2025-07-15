@@ -20,12 +20,12 @@
 import {test as baseTest} from '@playwright/test';
 
 import {ApiManagerE2E} from './backend/apiManager.e2e';
-import {PageManager} from './pages/pageManager';
+import {PageManager} from './pageManager';
 
 // Define custom test type with axios fixture
 type Fixtures = {
   api: ApiManagerE2E;
-  pages: PageManager;
+  pm: PageManager;
 };
 
 export const test = baseTest.extend<Fixtures>({
@@ -33,7 +33,7 @@ export const test = baseTest.extend<Fixtures>({
     // Create a new instance of ApiManager for each test
     await use(new ApiManagerE2E());
   },
-  pages: async ({page}, use) => {
+  pm: async ({page}, use) => {
     // Create a new instance of PageManager for each test
     await use(new PageManager(page));
   },

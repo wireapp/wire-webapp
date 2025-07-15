@@ -30,8 +30,10 @@ const member2 = getUser();
 const teamName = 'Critical';
 const conversationName = 'Crits';
 
-test('Team owner adds whole team to an all team chat', {tag: ['@TC-8631', '@crit-flow-web']}, async ({pages, api}) => {
+test('Team owner adds whole team to an all team chat', {tag: ['@TC-8631', '@crit-flow-web']}, async ({pm, api}) => {
   test.slow(); // Increasing test timeout to 90 seconds to accommodate the full flow
+
+  const {pages, modals} = pm.webapp;
 
   await test.step('Preconditions: Creating preconditions for the test via API', async () => {
     await api.createTeamOwner(owner, teamName);
@@ -48,9 +50,9 @@ test('Team owner adds whole team to an all team chat', {tag: ['@TC-8631', '@crit
   });
 
   await test.step('Team owner logs in into a client and creates group conversation', async () => {
-    await pages.openMainPage();
-    await loginUser(owner, pages);
-    await pages.dataShareConsentModal.clickDecline();
+    await pm.openMainPage();
+    await loginUser(owner, pm);
+    await modals.dataShareConsent().clickDecline();
   });
 
   await test.step('Team owner adds a service to newly created group', async () => {
@@ -58,11 +60,11 @@ test('Team owner adds whole team to an all team chat', {tag: ['@TC-8631', '@crit
   });
 
   await test.step('Team owner adds team members to a group', async () => {
-    await pages.conversationListPage.clickCreateGroup();
-    await pages.groupCreationPage.setGroupName(conversationName);
-    await pages.startUIPage.selectUsers([member1.username, member2.username]);
-    await pages.groupCreationPage.clickCreateGroupButton();
-    expect(await pages.conversationListPage.isConversationItemVisible(conversationName)).toBeTruthy();
+    await pages.conversationList().clickCreateGroup();
+    await pages.groupCreation().setGroupName(conversationName);
+    await pages.startUI().selectUsers([member1.username, member2.username]);
+    await pages.groupCreation().clickCreateGroupButton();
+    expect(await pages.conversationList().isConversationItemVisible(conversationName)).toBeTruthy();
   });
 
   // Steps below require [WPB-18075] and [WPB-17547]
