@@ -25,6 +25,8 @@ export class ConfirmLogoutModal {
   readonly page: Page;
 
   readonly modal: Locator;
+  readonly title: Locator;
+  readonly modalCustomCheckbox: Locator;
   readonly modalCheckbox: Locator;
   readonly cancelButton: Locator;
   readonly confirmButton: Locator;
@@ -33,13 +35,20 @@ export class ConfirmLogoutModal {
     this.page = page;
 
     this.modal = page.locator(`${selectByDataAttribute('modal-template-option')}`);
-    this.modalCheckbox = this.modal.locator(`${selectByLabel('clear-data-checkbox')}`);
+    this.title = this.modal.locator(selectByDataAttribute('status-modal-title'));
+    this.modalCheckbox = this.modal.locator(`${selectByDataAttribute('modal-option-checkbox')}`);
+    this.modalCustomCheckbox = this.modal.locator(`${selectByLabel('clear-data-checkbox')}`);
     this.cancelButton = this.modal.locator(`${selectByDataAttribute('do-secondary')}`);
     this.confirmButton = this.modal.locator(`${selectByDataAttribute('do-action')}`);
   }
 
+  async isVisible() {
+    await this.modal.waitFor({state: 'visible'});
+    return await this.modal.isVisible();
+  }
+
   async toggleModalCheck() {
-    await this.modalCheckbox.click();
+    await this.modalCustomCheckbox.click();
   }
 
   async clickCancel() {

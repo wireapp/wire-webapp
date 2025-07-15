@@ -30,6 +30,7 @@ import {BlockWarningModal} from './webapp/modals/blockWarning.modal';
 import {ConfirmLogoutModal} from './webapp/modals/confirmLogout.modal';
 import {DataShareConsentModal} from './webapp/modals/dataShareConsent.modal';
 import {DeleteAccountModal} from './webapp/modals/deleteAccount.modal';
+import {ExportBackupModal} from './webapp/modals/exportBackup.modal';
 import {LeaveConversationModal} from './webapp/modals/leaveConversation.modal';
 import {UserProfileModal} from './webapp/modals/userProfile.modal';
 import {AccountPage} from './webapp/pages/account.page';
@@ -40,6 +41,8 @@ import {ConversationSidebar} from './webapp/pages/conversationSidebar.page';
 import {DeleteAccountPage} from './webapp/pages/deleteAccount.page';
 import {EmailVerificationPage} from './webapp/pages/emailVerification.page';
 import {GroupCreationPage} from './webapp/pages/groupCreation.page';
+import {HistoryExportPage} from './webapp/pages/historyExport.page';
+import {HistoryImportPage} from './webapp/pages/historyImport.page';
 import {HistoryInfoPage} from './webapp/pages/infoHistory.page';
 import {LoginPage} from './webapp/pages/login.page';
 import {OutgoingConnectionPage} from './webapp/pages/outgoingConnection.page';
@@ -114,6 +117,8 @@ export class PageManager {
       deleteAccount: () => this.getOrCreate('webapp.pages.deleteAccount', () => new DeleteAccountPage(this.page)),
       groupCreation: () => this.getOrCreate('webapp.pages.groupCreation', () => new GroupCreationPage(this.page)),
       historyInfo: () => this.getOrCreate('webapp.pages.infoHostory', () => new HistoryInfoPage(this.page)),
+      historyExport: () => this.getOrCreate('webapp.pages.historyExport', () => new HistoryExportPage(this.page)),
+      historyImport: () => this.getOrCreate('webapp.pages.historyImport', () => new HistoryImportPage(this.page)),
     },
     modals: {
       dataShareConsent: () =>
@@ -125,6 +130,7 @@ export class PageManager {
       confirmLogout: () => this.getOrCreate('webapp.modals.confirmLogout', () => new ConfirmLogoutModal(this.page)),
       leaveConversation: () =>
         this.getOrCreate('webapp.modals.leaveConversation', () => new LeaveConversationModal(this.page)),
+      exportBackup: () => this.getOrCreate('webapp.modals.exportBackup', () => new ExportBackupModal(this.page)),
     },
     components: {
       conversationSidebar: () =>

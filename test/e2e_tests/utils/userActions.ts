@@ -56,10 +56,15 @@ export const inviteMembers = async (members: User[], owner: User, api: ApiManage
   );
 };
 
-export const logOutUser = async (pm: PageManager) => {
+export const logOutUser = async (pm: PageManager, shouldDeleteClient = false) => {
   const {pages, components, modals} = pm.webapp;
   await components.conversationSidebar().clickPreferencesButton();
   await pages.account().clickLogoutButton();
+  expect(modals.confirmLogout().isVisible()).toBeTruthy();
+  if (shouldDeleteClient) {
+    await modals.confirmLogout().toggleModalCheck();
+    expect(modals.confirmLogout().modalCheckbox.isChecked()).toBeTruthy();
+  }
   await modals.confirmLogout().clickConfirm();
 };
 
