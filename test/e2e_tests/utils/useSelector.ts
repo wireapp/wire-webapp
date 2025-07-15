@@ -17,8 +17,7 @@
  *
  */
 
-export const selectByDataAttribute = (selector: string, combinator?: string) =>
-  `[data-uie-name="${selector}"]${combinator ?? ''}`;
+export const selectByDataAttribute = (selector: string) => `[data-uie-name="${selector}"]'`;
 export const selectById = (selector: string) => `#${selector}`;
 export const selectByClass = (selector: string) => `.${selector}`;
 export const selectByLabel = (selector: string) => `label[for="${selector}"]`;
