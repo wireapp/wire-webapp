@@ -48,7 +48,9 @@ test('Team owner adds whole team to an all team chat', {tag: ['@TC-8631', '@crit
   });
 
   await test.step('Team owner logs in into a client and creates group conversation', async () => {
+    await pages.openMainPage();
     await loginUser(owner, pages);
+    await pages.dataShareConsentModal.clickDecline();
   });
 
   await test.step('Team owner adds a service to newly created group', async () => {

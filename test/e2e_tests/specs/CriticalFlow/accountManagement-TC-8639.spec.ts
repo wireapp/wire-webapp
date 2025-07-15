@@ -53,7 +53,9 @@ test('Account Management', {tag: ['@TC-8639', '@crit-flow-web']}, async ({pages,
 
   // Test steps
   await test.step('Members logs in into the application', async () => {
+    await pages.openMainPage();
     await loginUser(member, pages);
+    await pages.dataShareConsentModal.clickDecline();
   });
 
   await test.step('Member opens settings', async () => {

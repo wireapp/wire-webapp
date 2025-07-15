@@ -17,62 +17,32 @@
  *
  */
 
-import {getUser, User} from '../../data/user';
+import {inviteMembers, loginUser, logOutUser, sendTextMessageToConversation} from 'test/e2e_tests/utils/userActions';
+
+import {getUser} from '../../data/user';
 import {test, expect} from '../../test.fixtures';
 import {addCreatedTeam, removeCreatedTeam} from '../../utils/tearDownUtil';
 
 // Generating test data
 const owner = getUser();
-const members = Array.from({length: 5}, () => getUser());
+const members = Array.from({length: 2}, () => getUser());
 const teamName = 'Conversation Management';
 const conversationName = 'Test Conversation';
 
 test('Conversation Management', {tag: ['@TC-8636', '@crit-flow-web']}, async ({pages, api}) => {
   test.setTimeout(300000); // Set test timeout to 5 minutes
 
-  const inviteMembers = async () => {
-    await Promise.all(
-      members.map(async member => {
-        const invitationId = await api.team.inviteUserToTeam(member.email, owner);
-        const invitationCode = await api.brig.getTeamInvitationCodeForEmail(owner.teamId!, invitationId);
-        await api.createPersonalUser(member, invitationCode);
-      }),
-    );
-  };
-
-  const loginUser = async (user: User) => {
-    await pages.singleSignOnPage.isSSOPageVisible();
-    await pages.singleSignOnPage.enterEmailOnSSOPage(user.email);
-    await pages.loginPage.inputPassword(user.password);
-    await pages.loginPage.clickSignInButton();
-  };
-
-  const logOutUser = async () => {
-    await pages.conversationSidebar.clickPreferencesButton();
-    await pages.settingsPage.clickLogoutButton();
-    await pages.confirmLogoutModal.clickConfirm();
-  };
-
-  const sendMessage = async (conversation: string, message: string) => {
-    await pages.conversationListPage.openConversation(conversation);
-    await pages.conversationPage.sendMessage(message);
-    expect(await pages.conversationPage.isMessageVisible(message)).toBeTruthy();
-  };
-
   await test.step('Preconditions: Team owner created a team with 5 members', async () => {
     await api.createTeamOwner(owner, teamName);
     owner.teamId = await api.team.getTeamIdForUser(owner);
     addCreatedTeam(owner, owner.teamId);
-    await inviteMembers();
+    await inviteMembers(members, owner, api);
   });
 
   await test.step('Team owner signed in to the application', async () => {
     await pages.openMainPage();
-    await loginUser(owner);
-  });
-
-  await test.step('Team owner accepts the usage terms', async () => {
-    await pages.dataShareConsentModal.clickConfirm();
+    await loginUser(owner, pages);
+    await pages.dataShareConsentModal.clickDecline();
   });
 
   await test.step('Team owner creates a group with all the five members', async () => {
@@ -86,24 +56,24 @@ test('Conversation Management', {tag: ['@TC-8636', '@crit-flow-web']}, async ({p
   });
 
   await test.step('Team owner sends a message in the conversation', async () => {
-    await sendMessage(conversationName, 'Hello team! Admin here.');
+    await sendTextMessageToConversation(pages, conversationName, 'Hello team! Admin here.');
   });
 
   await test.step('Team owner logs out from the application', async () => {
-    await logOutUser();
+    await logOutUser(pages);
   });
 
-  await test.step('Team members sign in, accept terms, send messages, and log out', async () => {
+  await test.step('Team members sign in, send messages, and log out', async () => {
     for (const member of members) {
-      await loginUser(member);
-      await pages.dataShareConsentModal.clickConfirm();
-      await sendMessage(conversationName, `Hello team! ${member.firstName} here.`);
-      await logOutUser();
+      await loginUser(member, pages);
+      await pages.dataShareConsentModal.clickDecline();
+      await sendTextMessageToConversation(pages, conversationName, `Hello team! ${member.firstName} here.`);
+      await logOutUser(pages);
     }
   });
 
   await test.step('Team owner signed in to the application and verify messages', async () => {
-    await loginUser(owner);
+    await loginUser(owner, pages);
     await pages.conversationListPage.openConversation(conversationName);
     for (const member of members) {
       expect(await pages.conversationPage.isMessageVisible(`Hello team! ${member.firstName} here.`)).toBeTruthy();

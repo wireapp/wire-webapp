@@ -20,7 +20,7 @@
 import {getUser} from 'test/e2e_tests/data/user';
 import {PageManager} from 'test/e2e_tests/pages/pageManager';
 import {addCreatedTeam, removeCreatedTeam} from 'test/e2e_tests/utils/tearDownUtil';
-import {loginUser, sendMessageFromAtoB} from 'test/e2e_tests/utils/userActions';
+import {loginUser, sendTextMessageToUser} from 'test/e2e_tests/utils/userActions';
 
 import {test, expect} from '../../test.fixtures';
 
@@ -87,11 +87,15 @@ test(
     });
 
     await test.step('A logs in', async () => {
+      await pages.openMainPage();
       await loginUser(memberA, pages);
+      await pages.dataShareConsentModal.clickDecline();
     });
 
     await test.step('Owner logs in', async () => {
+      await pages.openMainPage();
       await loginUser(owner, adminPages);
+      await pages.dataShareConsentModal.clickDecline();
     });
 
     await test.step('A searches for Team Owner', async () => {
@@ -102,12 +106,12 @@ test(
     });
 
     await test.step('A sends text to Team Owner', async () => {
-      await sendMessageFromAtoB(pages, owner, textFromAToOwner);
+      await sendTextMessageToUser(pages, owner, textFromAToOwner);
     });
 
     await test.step('Team owner receives text of A and sends a text to A', async () => {
       await expect(pages.conversationPage.page.getByText(textFromAToOwner)).toBeVisible({timeout: 10000});
-      await sendMessageFromAtoB(adminPages, memberA, textFromOwnerToA);
+      await sendTextMessageToUser(adminPages, memberA, textFromOwnerToA);
     });
 
     await test.step('A receives Text of Team Owner', async () => {
