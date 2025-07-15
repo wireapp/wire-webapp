@@ -92,7 +92,8 @@ export const loaderIconStyles: CSSObject = {
 export const actionButtonsStyles: CSSObject = {
   display: 'flex',
   alignItems: 'center',
-  gap: '8px',
+  justifyContent: 'center',
+  flexShrink: '0',
   marginRight: '8px',
 };
 
