@@ -19,6 +19,8 @@
 
 import {Locator, Page} from '@playwright/test';
 
+import {selectByDataAttribute} from '../utils/useSelector';
+
 export class HistoryExportPage {
   readonly page: Page;
 
@@ -29,9 +31,9 @@ export class HistoryExportPage {
   constructor(page: Page) {
     this.page = page;
 
-    this.exportSuccessHeadline = page.locator('[data-uie-name="status-history-export-success-headline"]');
-    this.saveFileButton = page.locator('[data-uie-name="do-save-history-export"]');
-    this.cancelButton = page.locator('[data-uie-name="do-cancel-history-export"]');
+    this.exportSuccessHeadline = page.locator(selectByDataAttribute('status-history-export-success-headline'));
+    this.saveFileButton = page.locator(selectByDataAttribute('do-save-history-export'));
+    this.cancelButton = page.locator(selectByDataAttribute('do-cancel-history-export'));
   }
 
   async isVisible() {

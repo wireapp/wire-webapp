@@ -19,29 +19,27 @@
 
 import {Locator, Page} from '@playwright/test';
 
+import {selectByDataAttribute} from '../utils/useSelector';
+
 export class PrimaryModal {
   readonly page: Page;
 
   readonly primaryModal: Locator;
   readonly title: Locator;
-  readonly passwordInput: Locator;
   readonly primaryButton: Locator;
   readonly secondaryButton: Locator;
   readonly checkbox: Locator;
   readonly customCheckbox: Locator;
-  readonly optionModal: Locator;
 
   constructor(page: Page) {
     this.page = page;
 
-    this.primaryModal = page.locator('[data-uie-name="primary-modals-container"]');
-    this.title = this.primaryModal.locator('[data-uie-name="status-modal-title"]');
-    this.optionModal = this.primaryModal.locator('[data-uie-name="modal-template-option"]');
-    this.passwordInput = this.primaryModal.locator('[data-uie-name="backup-password"]');
-    this.primaryButton = this.primaryModal.locator('[data-uie-name="do-action"]');
-    this.secondaryButton = this.primaryModal.locator('[data-uie-name="do-secondary"]');
-    this.checkbox = this.primaryModal.locator('[data-uie-name="modal-option-checkbox"]');
-    this.customCheckbox = this.primaryModal.locator('[data-uie-name="modal-option-checkbox"]+label');
+    this.primaryModal = page.locator(selectByDataAttribute('primary-modals-container'));
+    this.title = this.primaryModal.locator(selectByDataAttribute('status-modal-title'));
+    this.primaryButton = this.primaryModal.locator(selectByDataAttribute('do-action'));
+    this.secondaryButton = this.primaryModal.locator(selectByDataAttribute('do-secondary'));
+    this.checkbox = this.primaryModal.locator(selectByDataAttribute('modal-option-checkbox'));
+    this.customCheckbox = this.primaryModal.locator(selectByDataAttribute('modal-option-checkbox', '+label'));
   }
 
   async isTitleVisible() {
@@ -50,10 +48,6 @@ export class PrimaryModal {
 
   async isTitleHidden() {
     await this.title.waitFor({state: 'hidden'});
-  }
-
-  async enterPassword(password: string) {
-    await this.passwordInput.fill(password);
   }
 
   async clickPrimaryButton() {

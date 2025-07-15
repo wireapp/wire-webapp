@@ -19,6 +19,8 @@
 
 import {Locator, Page} from '@playwright/test';
 
+import {selectByDataAttribute} from '../utils/useSelector';
+
 export class HistoryImportPage {
   readonly page: Page;
 
@@ -27,7 +29,7 @@ export class HistoryImportPage {
   constructor(page: Page) {
     this.page = page;
 
-    this.importSuccessHeadline = page.locator('[data-uie-name="status-history-import-success"]');
+    this.importSuccessHeadline = page.locator(selectByDataAttribute('status-history-import-success'));
   }
 
   async isVisible() {

@@ -52,9 +52,14 @@ export const inviteMembers = async (members: User[], owner: User, api: ApiManage
   );
 };
 
-export const logOutUser = async (pages: PageManager) => {
+export const logOutUser = async (pages: PageManager, shouldDeleteClient = false) => {
   await pages.conversationSidebar.clickPreferencesButton();
   await pages.accountPage.clickLogoutButton();
+  expect(pages.confirmLogoutModal.isVisible()).toBeTruthy();
+  if (shouldDeleteClient) {
+    await pages.confirmLogoutModal.toggleModalCheck();
+    expect(pages.confirmLogoutModal.modalCheckbox.isChecked()).toBeTruthy();
+  }
   await pages.confirmLogoutModal.clickConfirm();
 };
 

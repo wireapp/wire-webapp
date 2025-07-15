@@ -32,10 +32,6 @@ export class SingleSignOnPage {
     this.ssoSignInButton = page.locator('[data-uie-name="do-sso-sign-in"]');
   }
 
-  async isVisible(): Promise<boolean> {
-    return this.ssoCodeEmailInput.isVisible();
-  }
-
   async enterEmailOnSSOPage(email: string) {
     await this.ssoCodeEmailInput.fill(email);
     await this.ssoSignInButton.click();

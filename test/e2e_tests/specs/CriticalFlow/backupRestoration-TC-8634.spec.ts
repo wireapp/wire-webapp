@@ -17,7 +17,7 @@
  *
  */
 
-import {loginUser} from 'test/e2e_tests/utils/userActions';
+import {loginUser, logOutUser} from 'test/e2e_tests/utils/userActions';
 
 import {getUser} from '../../data/user';
 import {test, expect} from '../../test.fixtures';
@@ -37,10 +37,12 @@ test('Setting up new device with a backup', {tag: ['@TC-8634', '@crit-flow']}, a
 
   // Test steps
   await test.step('User logs in', async () => {
+    await pages.openMainPage();
     await loginUser(user, pages);
+    await pages.dataShareConsentModal.clickDecline();
   });
 
-  await test.step('User generates data', async () => {});
+  // await test.step('User generates data', async () => {});
 
   await test.step('User creates and saves a backup', async () => {
     await pages.conversationSidebar.clickPreferencesButton();
@@ -58,19 +60,11 @@ test('Setting up new device with a backup', {tag: ['@TC-8634', '@crit-flow']}, a
   });
 
   await test.step('User logs out and clears all data', async () => {
-    await pages.conversationSidebar.clickPreferencesButton();
-    await pages.accountPage.clickLogoutButton();
-    expect(pages.primaryModal.isTitleVisible()).toBeTruthy();
-    await pages.primaryModal.toggleCheckbox();
-    expect(pages.primaryModal.checkbox.isChecked()).toBeTruthy();
-    await pages.primaryModal.clickPrimaryButton();
+    await logOutUser(pages, true);
   });
 
   await test.step('User logs back in', async () => {
-    expect(pages.singleSignOnPage.isVisible()).toBeTruthy();
-    await pages.singleSignOnPage.enterEmailOnSSOPage(user.email);
-    await pages.loginPage.inputPassword(user.password);
-    await pages.loginPage.clickSignInButton();
+    await loginUser(user, pages);
     await pages.historyInfoPage.clickConfirmButton();
   });
 
