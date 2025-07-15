@@ -30,7 +30,7 @@ const teamName = 'Conversation Management';
 const conversationName = 'Test Conversation';
 
 test('Conversation Management', {tag: ['@TC-8636', '@crit-flow-web']}, async ({pages, api}) => {
-  test.setTimeout(300000); // Set test timeout to 5 minutes
+  test.setTimeout(120000); // Set test timeout to 2 minutes
 
   await test.step('Preconditions: Team owner created a team with 5 members', async () => {
     await api.createTeamOwner(owner, teamName);
