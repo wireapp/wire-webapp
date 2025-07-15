@@ -27,7 +27,7 @@ import {removeCreatedUser} from '../../utils/tearDownUtil';
 const user = getUser();
 let fileName: string;
 
-test('Setting up new device with a backup', {tag: ['@TC-8634', '@crit-flow']}, async ({pages, api}) => {
+test('Setting up new device with a backup', {tag: ['@TC-8634', '@crit-flow-web']}, async ({pages, api}) => {
   test.slow(); // Increasing test timeout to 90 seconds to accommodate the full flow
 
   // Creating preconditions for the test via API
