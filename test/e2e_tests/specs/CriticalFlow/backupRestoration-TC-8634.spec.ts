@@ -48,9 +48,9 @@ test('Setting up new device with a backup', {tag: ['@TC-8634', '@crit-flow-web']
   await test.step('User creates and saves a backup', async () => {
     await pages.conversationSidebar.clickPreferencesButton();
     await pages.accountPage.clickBackUpButton();
-    expect(pages.primaryModal.isTitleVisible()).toBeTruthy();
-    await pages.primaryModal.clickPrimaryButton();
-    expect(pages.primaryModal.isTitleHidden()).toBeTruthy();
+    expect(pages.exportBackupModal.isTitleVisible()).toBeTruthy();
+    await pages.exportBackupModal.clickPrimaryButton();
+    expect(pages.exportBackupModal.isTitleHidden()).toBeTruthy();
     expect(pages.historyExportPage.isVisible()).toBeTruthy();
     const [download] = await Promise.all([
       pages.historyExportPage.page.waitForEvent('download'),

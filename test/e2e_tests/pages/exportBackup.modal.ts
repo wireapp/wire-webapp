@@ -21,25 +21,21 @@ import {Locator, Page} from '@playwright/test';
 
 import {selectByDataAttribute} from '../utils/useSelector';
 
-export class PrimaryModal {
+export class ExportBackupModal {
   readonly page: Page;
 
-  readonly primaryModal: Locator;
+  readonly exportBackupModal: Locator;
   readonly title: Locator;
   readonly primaryButton: Locator;
   readonly secondaryButton: Locator;
-  readonly checkbox: Locator;
-  readonly customCheckbox: Locator;
 
   constructor(page: Page) {
     this.page = page;
 
-    this.primaryModal = page.locator(selectByDataAttribute('primary-modals-container'));
-    this.title = this.primaryModal.locator(selectByDataAttribute('status-modal-title'));
-    this.primaryButton = this.primaryModal.locator(selectByDataAttribute('do-action'));
-    this.secondaryButton = this.primaryModal.locator(selectByDataAttribute('do-secondary'));
-    this.checkbox = this.primaryModal.locator(selectByDataAttribute('modal-option-checkbox'));
-    this.customCheckbox = this.primaryModal.locator(selectByDataAttribute('modal-option-checkbox', '+label'));
+    this.exportBackupModal = page.locator(selectByDataAttribute('primary-modals-container'));
+    this.title = this.exportBackupModal.locator(selectByDataAttribute('status-modal-title'));
+    this.primaryButton = this.exportBackupModal.locator(selectByDataAttribute('do-action'));
+    this.secondaryButton = this.exportBackupModal.locator(selectByDataAttribute('do-secondary'));
   }
 
   async isTitleVisible() {
@@ -56,9 +52,5 @@ export class PrimaryModal {
 
   async clickSecondaryButton() {
     await this.secondaryButton.click();
-  }
-
-  async toggleCheckbox() {
-    await this.customCheckbox.click();
   }
 }

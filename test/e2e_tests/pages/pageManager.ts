@@ -31,6 +31,7 @@ import {DataShareConsentModal} from './dataShareConsent.modal';
 import {DeleteAccountModal} from './deleteAccount.modal';
 import {DeleteAccountPage} from './deleteAccount.page';
 import {EmailVerificationPage} from './emailVerification.page';
+import {ExportBackupModal} from './exportBackup.modal';
 import {GroupCreationPage} from './groupCreation.page';
 import {HistoryExportPage} from './historyExport.page';
 import {HistoryImportPage} from './historyImport.page';
@@ -39,7 +40,6 @@ import {LeaveConversationModal} from './leaveConversation.modal';
 import {LoginPage} from './login.page';
 import {MarketingConsentModal} from './marketingConsent.modal';
 import {OutgoingConnectionPage} from './outgoingConnection.page';
-import {PrimaryModal} from './primary.modal';
 import {RegisterSuccessPage} from './registerSuccess.page';
 import {RegistrationPage} from './registration.page';
 import {SetUsernamePage} from './setUsername.page';
@@ -332,12 +332,12 @@ export class PageManager {
     return this._leaveConversationModal;
   }
 
-  private _primaryModal!: PrimaryModal;
-  get primaryModal(): PrimaryModal {
-    if (!this._primaryModal) {
-      this._primaryModal = new PrimaryModal(this.page);
+  private _exportBackupModal!: ExportBackupModal;
+  get exportBackupModal(): ExportBackupModal {
+    if (!this._exportBackupModal) {
+      this._exportBackupModal = new ExportBackupModal(this.page);
     }
-    return this._primaryModal;
+    return this._exportBackupModal;
   }
 
   private _historyExportPage!: HistoryExportPage;
