@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [5.4.3](https://github.com/wireapp/wire-web-packages/compare/@wireapp/commons@5.4.2...@wireapp/commons@5.4.3) (2025-07-15)
+
+### Bug Fixes
+
+* **commons:** redact Bearer tokens from strings and Authorization headers ([#7101](https://github.com/wireapp/wire-web-packages/issues/7101)) ([91635d7](https://github.com/wireapp/wire-web-packages/commit/91635d73cef0f9340143abac8a32c90809f9792a))
+
 ## [5.4.2](https://github.com/wireapp/wire-web-packages/compare/@wireapp/commons@5.4.1...@wireapp/commons@5.4.2) (2025-03-03)
 
 ### Bug Fixes
