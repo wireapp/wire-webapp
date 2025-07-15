@@ -30,7 +30,6 @@ export const headerStyles: CSSObject = {
   lineHeight: 'var(--line-height-sm)',
   borderBottom: '1px solid var(--border-color)',
   backgroundColor: 'var(--app-bg)',
-  paddingRight: '8px',
 };
 
 export const closeButtonStyles: CSSObject = {
@@ -94,6 +93,7 @@ export const actionButtonsStyles: CSSObject = {
   display: 'flex',
   alignItems: 'center',
   gap: '8px',
+  marginRight: '8px',
 };
 
 export const downloadButtonStyles: CSSObject = {
