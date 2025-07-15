@@ -42,7 +42,8 @@ test('Setting up new device with a backup', {tag: ['@TC-8634', '@crit-flow']}, a
     await pages.dataShareConsentModal.clickDecline();
   });
 
-  // await test.step('User generates data', async () => {});
+  //TODO generate a conversation to restore
+  await test.step('User generates data', async () => {});
 
   await test.step('User creates and saves a backup', async () => {
     await pages.conversationSidebar.clickPreferencesButton();
