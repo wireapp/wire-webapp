@@ -31,7 +31,10 @@ import {DataShareConsentModal} from './dataShareConsent.modal';
 import {DeleteAccountModal} from './deleteAccount.modal';
 import {DeleteAccountPage} from './deleteAccount.page';
 import {EmailVerificationPage} from './emailVerification.page';
+import {ExportBackupModal} from './exportBackup.modal';
 import {GroupCreationPage} from './groupCreation.page';
+import {HistoryExportPage} from './historyExport.page';
+import {HistoryImportPage} from './historyImport.page';
 import {HistoryInfoPage} from './infoHistory.page';
 import {LeaveConversationModal} from './leaveConversation.modal';
 import {LoginPage} from './login.page';
@@ -327,5 +330,29 @@ export class PageManager {
       this._leaveConversationModal = new LeaveConversationModal(this.page);
     }
     return this._leaveConversationModal;
+  }
+
+  private _exportBackupModal!: ExportBackupModal;
+  get exportBackupModal(): ExportBackupModal {
+    if (!this._exportBackupModal) {
+      this._exportBackupModal = new ExportBackupModal(this.page);
+    }
+    return this._exportBackupModal;
+  }
+
+  private _historyExportPage!: HistoryExportPage;
+  get historyExportPage(): HistoryExportPage {
+    if (!this._historyExportPage) {
+      this._historyExportPage = new HistoryExportPage(this.page);
+    }
+    return this._historyExportPage;
+  }
+
+  private _historyImportPage!: HistoryImportPage;
+  get historyImportPage(): HistoryImportPage {
+    if (!this._historyImportPage) {
+      this._historyImportPage = new HistoryImportPage(this.page);
+    }
+    return this._historyImportPage;
   }
 }

@@ -27,19 +27,33 @@ export class AccountPage {
   readonly sendUsageDataCheckbox: Locator;
   readonly appLockCheckbox: Locator;
   readonly deleteAccountButton: Locator;
-  private readonly logoutButton: Locator;
+  readonly backUpButton: Locator;
+  readonly backupFileInput: Locator;
+  readonly restoreBackupButton: Locator;
+  readonly logoutButton: Locator;
 
   constructor(page: Page) {
     this.page = page;
 
     this.sendUsageDataCheckbox = page.locator("[data-uie-name='status-preference-telemetry']+label");
     this.appLockCheckbox = page.locator("[data-uie-name='status-preference-applock']+label");
-    this.deleteAccountButton = page.locator("[data-uie-name='go-delete-account']");
-    this.logoutButton = this.page.locator(selectByDataAttribute('do-logout'));
+    this.deleteAccountButton = page.locator(selectByDataAttribute('do-delete-account'));
+    this.backUpButton = page.locator(selectByDataAttribute('do-backup-export'));
+    this.backupFileInput = page.locator(selectByDataAttribute('input-import-file'));
+    this.restoreBackupButton = page.locator("[data-uie-name='do-backup-import']+button");
+    this.logoutButton = page.locator(selectByDataAttribute('do-logout'));
+  }
+
+  async clickBackUpButton() {
+    await this.backUpButton.click();
   }
 
   async clickDeleteAccountButton() {
     await this.deleteAccountButton.click();
+  }
+
+  async clickRestoreBackupButton() {
+    await this.restoreBackupButton.click();
   }
 
   async toggleSendUsageData() {
