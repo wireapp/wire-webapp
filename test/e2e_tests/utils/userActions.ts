@@ -17,21 +17,22 @@
  *
  */
 
+import {ApiManagerE2E} from '../backend/apiManager.e2e';
 import {User} from '../data/user';
+import {PageManager} from '../pages/pageManager';
 import {expect} from '../test.fixtures';
 
-export const loginUser = async (user: User, pages: any) => {
-  await pages.openMainPage();
+export const loginUser = async (user: User, pages: PageManager) => {
+  await pages.singleSignOnPage.isSSOPageVisible();
   await pages.singleSignOnPage.enterEmailOnSSOPage(user.email);
   await pages.loginPage.inputPassword(user.password);
   await pages.loginPage.clickSignInButton();
-  await pages.dataShareConsentModal.clickDecline();
 };
 
-export const sendMessageFromAtoB = async (pages: any, receipient: User, text: string) => {
+export const sendTextMessageToUser = async (pages: PageManager, recipient: User, text: string) => {
   // Team owner opens conversation with A
-  await pages.conversationListPage.openConversation(receipient.fullName);
-  expect(await pages.conversationPage.isConversationOpen(receipient.fullName));
+  await pages.conversationListPage.openConversation(recipient.fullName);
+  expect(await pages.conversationPage.isConversationOpen(recipient.fullName));
 
   // Team owner sends a text to A
   await pages.conversationPage.sendMessage(text);
@@ -39,4 +40,26 @@ export const sendMessageFromAtoB = async (pages: any, receipient: User, text: st
   // TODO: Bug [WPB-18226] Message is not visible in the conversation after sending it
   await pages.refreshPage({waitUntil: 'domcontentloaded'});
   await expect(pages.conversationPage.page.getByText(text)).toBeVisible({timeout: 10000});
+};
+
+export const inviteMembers = async (members: User[], owner: User, api: ApiManagerE2E) => {
+  await Promise.all(
+    members.map(async member => {
+      const invitationId = await api.team.inviteUserToTeam(member.email, owner);
+      const invitationCode = await api.brig.getTeamInvitationCodeForEmail(owner.teamId!, invitationId);
+      await api.createPersonalUser(member, invitationCode);
+    }),
+  );
+};
+
+export const logOutUser = async (pages: PageManager) => {
+  await pages.conversationSidebar.clickPreferencesButton();
+  await pages.accountPage.clickLogoutButton();
+  await pages.confirmLogoutModal.clickConfirm();
+};
+
+export const sendTextMessageToConversation = async (pages: PageManager, conversation: string, message: string) => {
+  await pages.conversationListPage.openConversation(conversation);
+  await pages.conversationPage.sendMessage(message);
+  expect(await pages.conversationPage.isMessageVisible(message)).toBeTruthy();
 };

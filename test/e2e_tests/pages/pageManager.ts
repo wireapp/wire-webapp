@@ -22,6 +22,7 @@ import {Page} from '@playwright/test';
 import {AccountPage} from './account.page';
 import {AppLockModal} from './appLock.modal';
 import {BlockWarningModal} from './blockWarning.modal';
+import {ConfirmLogoutModal} from './confirmLogout.modal';
 import {ConversationPage} from './conversation.page';
 import {ConversationDetailsPage} from './conversationDetails.page';
 import {ConversationListPage} from './conversationList.page';
@@ -31,6 +32,8 @@ import {DeleteAccountModal} from './deleteAccount.modal';
 import {DeleteAccountPage} from './deleteAccount.page';
 import {EmailVerificationPage} from './emailVerification.page';
 import {GroupCreationPage} from './groupCreation.page';
+import {HistoryInfoPage} from './infoHistory.page';
+import {LeaveConversationModal} from './leaveConversation.modal';
 import {LoginPage} from './login.page';
 import {MarketingConsentModal} from './marketingConsent.modal';
 import {OutgoingConnectionPage} from './outgoingConnection.page';
@@ -300,5 +303,29 @@ export class PageManager {
       this._teamDataShareConsentModal = new TeamDataShareConsentModal(this.page);
     }
     return this._teamDataShareConsentModal;
+  }
+
+  private _historyInfoPage!: HistoryInfoPage;
+  get historyInfoPage(): HistoryInfoPage {
+    if (!this._historyInfoPage) {
+      this._historyInfoPage = new HistoryInfoPage(this.page);
+    }
+    return this._historyInfoPage;
+  }
+
+  private _confirmLogoutModal!: ConfirmLogoutModal;
+  get confirmLogoutModal(): ConfirmLogoutModal {
+    if (!this._confirmLogoutModal) {
+      this._confirmLogoutModal = new ConfirmLogoutModal(this.page);
+    }
+    return this._confirmLogoutModal;
+  }
+
+  private _leaveConversationModal!: LeaveConversationModal;
+  get leaveConversationModal(): LeaveConversationModal {
+    if (!this._leaveConversationModal) {
+      this._leaveConversationModal = new LeaveConversationModal(this.page);
+    }
+    return this._leaveConversationModal;
   }
 }

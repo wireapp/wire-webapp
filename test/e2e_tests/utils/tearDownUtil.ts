@@ -24,9 +24,6 @@ import {User} from '../data/user';
 const createdUsers: Map<User['id'], User> = new Map();
 const createdTeams: Map<User, string> = new Map();
 
-export const getCreatedUsers = () => createdUsers;
-export const getCreatedTeams = () => createdTeams;
-
 // Utility functions to manage created personal users for cleanup
 export const addCreatedUser = (user: User) => {
   if (!user.id) {

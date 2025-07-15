@@ -47,7 +47,9 @@ test('Verify you can sign in by email', {tag: ['@TC-3461', '@regression']}, asyn
   // Adding created user to the list for later cleanup
   addCreatedUser(user);
 
+  await pages.openMainPage();
   await loginUser(user, pages);
+  await pages.dataShareConsentModal.clickDecline();
 
   expect(await pages.conversationSidebar.getPersonalStatusName()).toBe(`${user.firstName} ${user.lastName}`);
   expect(await pages.conversationSidebar.getPersonalUserName()).toContain(user.username);
