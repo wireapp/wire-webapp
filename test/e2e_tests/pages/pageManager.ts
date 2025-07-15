@@ -24,6 +24,7 @@ import {AppLockModal} from './appLock.modal';
 import {BlockWarningModal} from './blockWarning.modal';
 import {CallingPage} from './calling.page';
 import {ConversationPage} from './conversation.page';
+import {ConversationDetailsPage} from './conversationDetails.page';
 import {ConversationListPage} from './conversationList.page';
 import {ConversationSidebar} from './conversationSidebar.page';
 import {DataShareConsentModal} from './dataShareConsent.modal';
@@ -82,10 +83,8 @@ export class PageManager {
     });
   }
 
-  public refreshPage() {
-    return this.page.reload({
-      waitUntil: 'networkidle',
-    });
+  public refreshPage(options: {waitUntil?: 'load' | 'domcontentloaded' | 'networkidle'} = {waitUntil: 'networkidle'}) {
+    return this.page.reload(options);
   }
 
   private _singleSignOnPage!: SingleSignOnPage;
@@ -246,6 +245,14 @@ export class PageManager {
       this._conversationPage = new ConversationPage(this.page);
     }
     return this._conversationPage;
+  }
+
+  private _conversationDetailsPage!: ConversationDetailsPage;
+  get conversationDetailsPage(): ConversationDetailsPage {
+    if (!this._conversationDetailsPage) {
+      this._conversationDetailsPage = new ConversationDetailsPage(this.page);
+    }
+    return this._conversationDetailsPage;
   }
 
   private _deleteAccountPage!: DeleteAccountPage;

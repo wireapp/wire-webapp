@@ -49,7 +49,7 @@ export class BrigRepositoryE2E extends BackendClientE2E {
 
   public async unlockConferenceCallingFeature(teamId: string) {
     await this.axiosInstance.put(
-      `/i/teams/${teamId}/features/conferenceCalling/unlocked`,
+      `i/teams/${teamId}/features/conferenceCalling/unlocked`,
       {},
       {
         headers: {
@@ -61,7 +61,7 @@ export class BrigRepositoryE2E extends BackendClientE2E {
 
   public async enableConferenceCallingBackdoorViaBackdoorTeam(teamId: string) {
     await this.axiosInstance.patch(
-      `/i/teams/${teamId}/features/conferenceCalling`,
+      `i/teams/${teamId}/features/conferenceCalling`,
       {
         status: 'enabled',
       },

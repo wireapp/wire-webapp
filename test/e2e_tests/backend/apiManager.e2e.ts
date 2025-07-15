@@ -22,7 +22,7 @@ import {AxiosResponse} from 'axios';
 import {AuthRepositoryE2E} from './authRepository.e2e';
 import {BrigRepositoryE2E} from './brigRepository.e2e';
 import {ConnectionRepositoryE2E} from './connectionRepository.e2e';
-import {ConversationRepositoryE2E} from './conversationRepository.e2e';
+import {ConversationRepositoryE2E} from './ConversationRepository';
 import {FeatureConfigRepositoryE2E} from './featureConfigRepository.e2e';
 import {InbucketClientE2E} from './inbucketClient.e2e';
 import {TeamRepositoryE2E} from './teamRepository.e2e';
@@ -122,6 +122,11 @@ export class ApiManagerE2E {
     const token = user.token ?? (await this.auth.loginUser(user)).data.access_token;
     const listOfConnections = await this.connection.getConnectionsList(token);
     await this.connection.acceptConnectionRequest(token, listOfConnections.data.connections[0].to);
+  }
+
+  async enableConferenceCallingFeature(teamId: string) {
+    await this.brig.unlockConferenceCallingFeature(teamId);
+    await this.brig.enableConferenceCallingBackdoorViaBackdoorTeam(teamId);
   }
 
   private extractCookieFromRegisterResponse(registerResponse: AxiosResponse): string {
