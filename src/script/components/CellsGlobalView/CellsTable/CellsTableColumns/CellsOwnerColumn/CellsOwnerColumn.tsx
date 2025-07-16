@@ -38,7 +38,7 @@ export const CellsTableOwnerColumn = ({owner, user}: CellsTableOwnerColumnProps)
       <div css={avatarWrapperStyles}>
         <Avatar participant={user} avatarSize={AVATAR_SIZE.XXX_SMALL} />
       </div>
-      <span css={textStyles}>{owner}</span>
+      <span css={textStyles}>{user.name()}</span>
     </button>
   );
 };
