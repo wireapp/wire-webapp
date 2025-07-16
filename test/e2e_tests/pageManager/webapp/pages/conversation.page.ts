@@ -34,6 +34,13 @@ export class ConversationPage {
   readonly timerMessageButton: Locator;
   readonly timerTenSecondsButton: Locator;
   readonly openGroupInformationViaName: Locator;
+  readonly membersList: Locator;
+  readonly adminsList: Locator;
+  readonly leaveConversationButton: Locator;
+  readonly makeAdminToggle: Locator;
+  readonly removeUserButton: Locator;
+  readonly addMemberButton: Locator;
+  readonly systemMessages: Locator;
 
   constructor(page: Page) {
     this.page = page;
@@ -48,6 +55,15 @@ export class ConversationPage {
     this.openGroupInformationViaName = page.locator(selectByDataAttribute('status-conversation-title-bar-label'));
     this.timerMessageButton = page.locator(selectByDataAttribute('do-set-ephemeral-timer'));
     this.timerTenSecondsButton = page.locator(selectById('btn-10-seconds'));
+    this.membersList = page.locator(selectByDataAttribute('list-members'));
+    this.adminsList = page.locator(selectByDataAttribute('list-admins'));
+    this.leaveConversationButton = page.locator(selectByDataAttribute('do-leave-item-text'));
+    this.makeAdminToggle = page.locator(selectByDataAttribute('do-allow-admin'));
+    this.removeUserButton = page.locator(selectByDataAttribute('do-remove-item-text'));
+    this.addMemberButton = page.locator(selectByDataAttribute('go-add-people'));
+    this.systemMessages = page.locator(
+      `${selectByDataAttribute('item-message')}${selectByClass('system-message')} ${selectByClass('message-header')}`,
+    );
   }
 
   async isConversationOpen(conversationName: string) {
@@ -116,6 +132,27 @@ export class ConversationPage {
     return false;
   }
 
+  async isSystemMessageVisible(messageText: string) {
+    // Trying multiple times for the message to appear
+    for (let i = 0; i < 10; i++) {
+      // Wait for at least one matching element to appear (optional timeout can be set)
+      await this.systemMessages.first().waitFor({state: 'visible'});
+
+      // Then get all matching elements
+      const messages = await this.systemMessages.all();
+      for (const message of messages) {
+        const messageTextContent = await message.textContent();
+        if (messageTextContent?.includes(messageText)) {
+          continue;
+        }
+        return true;
+      }
+      await this.page.waitForTimeout(500); // Wait for 0.5 second before next attempt
+    }
+
+    return false;
+  }
+
   async isConversationReadonly() {
     await this.messageInput.waitFor({state: 'detached'});
   }
@@ -124,7 +161,41 @@ export class ConversationPage {
     return await this.messageInput.isVisible();
   }
 
-  async openGroupInformation() {
+  async toggleGroupInformation() {
     await this.openGroupInformationViaName.click();
+  }
+
+  async isUserGroupMember(name: string) {
+    return this.membersList.locator(`${selectByDataAttribute('item-user')}[data-uie-value="${name}"]`).isVisible();
+  }
+
+  async isUserGroupAdmin(name: string) {
+    await this.adminsList
+      .locator(`${selectByDataAttribute('item-user')}[data-uie-value="${name}"]`)
+      .waitFor({state: 'visible'});
+    return true;
+  }
+
+  async makeUserAdmin(name: string) {
+    await this.membersList.locator(`[data-uie-value="${name}"]`).click();
+    return this.makeAdminToggle.click();
+  }
+
+  async removeMemberFromGroup(name: string) {
+    await this.membersList.locator(`[data-uie-value="${name}"]`).click();
+    return this.removeUserButton.click();
+  }
+
+  async removeAdminFromGroup(name: string) {
+    await this.adminsList.locator(`[data-uie-value="${name}"]`).click();
+    return this.removeUserButton.click();
+  }
+
+  async leaveConversation() {
+    await this.leaveConversationButton.click();
+  }
+
+  async clickAddMemberButton() {
+    await this.addMemberButton.click();
   }
 }
