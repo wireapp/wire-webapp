@@ -124,11 +124,6 @@ export class ApiManagerE2E {
     await this.connection.acceptConnectionRequest(token, listOfConnections.data.connections[0].to);
   }
 
-  async enableConferenceCallingFeature(teamId: string) {
-    await this.brig.unlockConferenceCallingFeature(teamId);
-    await this.brig.enableConferenceCallingBackdoorViaBackdoorTeam(teamId);
-  }
-
   private extractCookieFromRegisterResponse(registerResponse: AxiosResponse): string {
     try {
       return registerResponse.headers['set-cookie']!.find((cookieStr: string) => cookieStr.startsWith('zuid='))!;
