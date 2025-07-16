@@ -17,7 +17,20 @@
  *
  */
 
-export const selectByDataAttribute = (selector: string) => `[data-uie-name="${selector}"]`;
-export const selectById = (selector: string) => `#${selector}`;
-export const selectByClass = (selector: string) => `.${selector}`;
-export const selectByLabel = (selector: string) => `label[for="${selector}"]`;
+import {Locator, Page} from '@playwright/test';
+
+import {selectByDataAttribute} from 'test/e2e_tests/utils/useSelector';
+
+export class HistoryInfoPage {
+  readonly page: Page;
+  private readonly continueButton: Locator;
+
+  constructor(page: Page) {
+    this.page = page;
+    this.continueButton = this.page.locator(selectByDataAttribute('do-history-confirm'));
+  }
+
+  async clickConfirmButton() {
+    await this.continueButton.click();
+  }
+}

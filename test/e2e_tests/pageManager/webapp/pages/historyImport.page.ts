@@ -17,7 +17,23 @@
  *
  */
 
-export const selectByDataAttribute = (selector: string) => `[data-uie-name="${selector}"]`;
-export const selectById = (selector: string) => `#${selector}`;
-export const selectByClass = (selector: string) => `.${selector}`;
-export const selectByLabel = (selector: string) => `label[for="${selector}"]`;
+import {Locator, Page} from '@playwright/test';
+
+import {selectByDataAttribute} from 'test/e2e_tests/utils/useSelector';
+
+export class HistoryImportPage {
+  readonly page: Page;
+
+  readonly importSuccessHeadline: Locator;
+
+  constructor(page: Page) {
+    this.page = page;
+
+    this.importSuccessHeadline = page.locator(selectByDataAttribute('status-history-import-success'));
+  }
+
+  async isVisible() {
+    await this.importSuccessHeadline.waitFor({state: 'visible'});
+    return await this.importSuccessHeadline.isVisible();
+  }
+}
