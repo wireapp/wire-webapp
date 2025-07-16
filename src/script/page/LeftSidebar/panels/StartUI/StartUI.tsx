@@ -91,8 +91,8 @@ const StartUI: React.FC<StartUIProps> = ({
   const actions = mainViewModel.actions;
   const isTeam = teamState.isTeam();
   const defaultProtocol = teamState.teamFeatures()?.mls?.config.defaultProtocol;
-  const isProtocolWithServices = defaultProtocol !== ConversationProtocol.MLS;
-  const showServiceTab = isTeam && canChatWithServices() && isProtocolWithServices;
+  const areServicesSupportedByProtocol = defaultProtocol !== ConversationProtocol.MLS;
+  const showServiceTab = isTeam && canChatWithServices() && areServicesSupportedByProtocol;
 
   const [searchQuery, setSearchQuery] = useState('');
   const [activeTab, setActiveTab] = useState(Tabs.PEOPLE);
