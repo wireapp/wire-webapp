@@ -32,15 +32,15 @@ const teamName = 'Critical';
 const conversationName = 'Crits';
 const textFromAToOwner = 'Hello Team Owner!';
 const textFromOwnerToA = 'Keep up the good work!';
-let adminPM: PageManager;
+let adminPageManager: PageManager;
 
 test(
   'New person joins team and setups up device',
   {tag: ['@TC-8635', '@crit-flow-web']},
-  async ({pm, api, browser}) => {
+  async ({pageManager, api, browser}) => {
     test.slow(); // Increasing test timeout to 90 seconds to accommodate the full flow
 
-    const {pages, components, modals} = pm.webapp;
+    const {pages, components, modals} = pageManager.webapp;
 
     await test.step('Preconditions: Creating preconditions for the test via API', async () => {
       // Precondition: Team owner exists in a team with 1 team member
@@ -85,19 +85,19 @@ test(
       // Create Admin context for team owner
       const adminContext = await browser.newContext();
       const adminPage = await adminContext.newPage();
-      adminPM = new PageManager(adminPage);
+      adminPageManager = new PageManager(adminPage);
     });
 
     await test.step('A logs in', async () => {
-      await pm.openMainPage();
-      await loginUser(memberA, pm);
+      await pageManager.openMainPage();
+      await loginUser(memberA, pageManager);
       await modals.dataShareConsent().clickDecline();
     });
 
     await test.step('Owner logs in', async () => {
-      await adminPM.openMainPage();
-      await loginUser(owner, adminPM);
-      await adminPM.webapp.modals.dataShareConsent().clickDecline();
+      await adminPageManager.openMainPage();
+      await loginUser(owner, adminPageManager);
+      await adminPageManager.webapp.modals.dataShareConsent().clickDecline();
     });
 
     await test.step('A searches for Team Owner', async () => {
@@ -108,12 +108,12 @@ test(
     });
 
     await test.step('A sends text to Team Owner', async () => {
-      await sendTextMessageToUser(pm, owner, textFromAToOwner);
+      await sendTextMessageToUser(pageManager, owner, textFromAToOwner);
     });
 
     await test.step('Team owner receives text of A and sends a text to A', async () => {
       await expect(pages.conversation().page.getByText(textFromAToOwner)).toBeVisible({timeout: 10000});
-      await sendTextMessageToUser(adminPM, memberA, textFromOwnerToA);
+      await sendTextMessageToUser(adminPageManager, memberA, textFromOwnerToA);
     });
 
     await test.step('A receives Text of Team Owner', async () => {
@@ -121,7 +121,7 @@ test(
     });
 
     await test.step('Team owner adds A to chat', async () => {
-      const adminPages = adminPM.webapp.pages;
+      const adminPages = adminPageManager.webapp.pages;
 
       // Team owner opens the group chat
       await adminPages.conversationList().openConversation(conversationName);
@@ -142,11 +142,11 @@ test(
 
     await test.step('A sees the chat', async () => {
       await pages.conversationList().openConversation(conversationName);
-      expect(await adminPM.webapp.pages.conversation().isConversationOpen(conversationName));
+      expect(await adminPageManager.webapp.pages.conversation().isConversationOpen(conversationName));
     });
 
     await test.step('Team owner mentions A', async () => {
-      await adminPM.webapp.pages.conversation().sendMention(memberA.qualifiedId!.id);
+      await adminPageManager.webapp.pages.conversation().sendMention(memberA.qualifiedId!.id);
     });
 
     await test.step('A sees the mention in the chat', async () => {

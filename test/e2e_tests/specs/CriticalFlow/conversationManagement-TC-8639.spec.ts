@@ -29,8 +29,8 @@ const members = Array.from({length: 2}, () => getUser());
 const teamName = 'Conversation Management';
 const conversationName = 'Test Conversation';
 
-test('Conversation Management', {tag: ['@TC-8636', '@crit-flow-web']}, async ({pm, api}) => {
-  const {pages, modals} = pm.webapp;
+test('Conversation Management', {tag: ['@TC-8636', '@crit-flow-web']}, async ({pageManager, api}) => {
+  const {pages, modals} = pageManager.webapp;
   test.setTimeout(120000); // Set test timeout to 5 minutes
 
   await test.step('Preconditions: Team owner created a team with 5 members', async () => {
@@ -41,8 +41,8 @@ test('Conversation Management', {tag: ['@TC-8636', '@crit-flow-web']}, async ({p
   });
 
   await test.step('Team owner signed in to the application', async () => {
-    await pm.openMainPage();
-    await loginUser(owner, pm);
+    await pageManager.openMainPage();
+    await loginUser(owner, pageManager);
     await modals.dataShareConsent().clickDecline();
   });
 
@@ -53,28 +53,28 @@ test('Conversation Management', {tag: ['@TC-8636', '@crit-flow-web']}, async ({p
     await pages.groupCreation().clickCreateGroupButton();
     expect(await pages.conversationList().isConversationItemVisible(conversationName)).toBeTruthy();
     // TODO: Bug [WPB-18226], remove this when fixed
-    await pm.refreshPage({waitUntil: 'load'});
+    await pageManager.refreshPage({waitUntil: 'load'});
   });
 
   await test.step('Team owner sends a message in the conversation', async () => {
-    await sendTextMessageToConversation(pm, conversationName, 'Hello team! Admin here.');
+    await sendTextMessageToConversation(pageManager, conversationName, 'Hello team! Admin here.');
   });
 
   await test.step('Team owner logs out from the application', async () => {
-    await logOutUser(pm);
+    await logOutUser(pageManager);
   });
 
   await test.step('Team members sign in, send messages, and log out', async () => {
     for (const member of members) {
-      await loginUser(member, pm);
+      await loginUser(member, pageManager);
       await modals.dataShareConsent().clickDecline();
-      await sendTextMessageToConversation(pm, conversationName, `Hello team! ${member.firstName} here.`);
-      await logOutUser(pm);
+      await sendTextMessageToConversation(pageManager, conversationName, `Hello team! ${member.firstName} here.`);
+      await logOutUser(pageManager);
     }
   });
 
   await test.step('Team owner signed in to the application and verify messages', async () => {
-    await loginUser(owner, pm);
+    await loginUser(owner, pageManager);
     await pages.conversationList().openConversation(conversationName);
     for (const member of members) {
       expect(await pages.conversation().isMessageVisible(`Hello team! ${member.firstName} here.`)).toBeTruthy();

@@ -30,11 +30,10 @@ const teamName = 'Critical';
 const conversationName = 'Tracking';
 const appLockPassphrase = generateSecurePassword();
 
-test('Account Management', {tag: ['@TC-8639', '@crit-flow-web']}, async ({pm, api}) => {
+test('Account Management', {tag: ['@TC-8639', '@crit-flow-web']}, async ({pageManager, api}) => {
   test.slow(); // Increasing test timeout to 90 seconds to accommodate the full flow
 
-  const {refreshPage} = pm;
-  const {pages, modals, components} = pm.webapp;
+  const {pages, modals, components} = pageManager.webapp;
 
   // Creating preconditions for the test via API
   await test.step('Preconditions: Creating preconditions for the test via API', async () => {
@@ -56,8 +55,8 @@ test('Account Management', {tag: ['@TC-8639', '@crit-flow-web']}, async ({pm, ap
 
   // Test steps
   await test.step('Members logs in into the application', async () => {
-    await pm.openMainPage();
-    await loginUser(member, pm);
+    await pageManager.openMainPage();
+    await loginUser(member, pageManager);
     await modals.dataShareConsent().clickDecline();
   });
 
@@ -77,7 +76,7 @@ test('Account Management', {tag: ['@TC-8639', '@crit-flow-web']}, async ({pm, ap
   });
 
   await test.step('Member verifies if applock is working', async () => {
-    await refreshPage();
+    await pageManager.refreshPage();
     expect(await modals.appLock().isVisible());
     expect(await modals.appLock().getAppLockModalHeader()).toContain('Enter passcode to unlock');
     expect(await modals.appLock().getAppLockModalText()).toContain('Passcode');

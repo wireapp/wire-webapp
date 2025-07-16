@@ -26,8 +26,8 @@ import {addCreatedUser, removeCreatedUser} from '../../utils/tearDownUtil';
 const userB = getUser();
 const userA = getUser();
 
-test('Personal Account Lifecycle', {tag: ['@TC-8638', '@crit-flow-web']}, async ({pm, api}) => {
-  const {pages, modals, components} = pm.webapp;
+test('Personal Account Lifecycle', {tag: ['@TC-8638', '@crit-flow-web']}, async ({pageManager, api}) => {
+  const {pages, modals, components} = pageManager.webapp;
   test.setTimeout(150_000); // Increasing test timeout to 150 seconds to accommodate the full flow
 
   await test.step('Preconditions: Creating preconditions for the test via API', async () => {
@@ -38,7 +38,7 @@ test('Personal Account Lifecycle', {tag: ['@TC-8638', '@crit-flow-web']}, async 
 
   // Test steps
   await test.step('User A opens the application and registers personal account', async () => {
-    await pm.openMainPage();
+    await pageManager.openMainPage();
     await pages.singleSignOn().enterEmailOnSSOPage(userA.email);
     await pages.welcome().clickCreateAccountButton();
     await pages.welcome().clickCreatePersonalAccountButton();
@@ -52,14 +52,14 @@ test('Personal Account Lifecycle', {tag: ['@TC-8638', '@crit-flow-web']}, async 
 
     await pages.registration().clickSubmitButton();
     const verificationCode = await api.inbucket.getVerificationCode(userA.email);
-    await pm.tm.pages.emailVerification().enterVerificationCode(verificationCode);
-    await pm.tm.modals.marketingConsent().clickConfirmButton();
+    await pageManager.tm.pages.emailVerification().enterVerificationCode(verificationCode);
+    await pageManager.tm.modals.marketingConsent().clickConfirmButton();
   });
 
   await test.step('Personal user A sets user name', async () => {
-    await pm.tm.pages.setUsername().setUsername(userA.username);
-    await pm.tm.pages.setUsername().clickNextButton();
-    await pm.tm.pages.registerSuccess().clickOpenWireWebButton();
+    await pageManager.tm.pages.setUsername().setUsername(userA.username);
+    await pageManager.tm.pages.setUsername().clickNextButton();
+    await pageManager.tm.pages.registerSuccess().clickOpenWireWebButton();
   });
 
   await test.step('Personal user A declines sending anonymous usage data', async () => {

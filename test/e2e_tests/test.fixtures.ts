@@ -25,15 +25,15 @@ import {PageManager} from './pageManager';
 // Define custom test type with axios fixture
 type Fixtures = {
   api: ApiManagerE2E;
-  pm: PageManager;
+  pageManager: PageManager;
 };
 
 export const test = baseTest.extend<Fixtures>({
-  api: async ({request}, use) => {
+  api: async ({}, use) => {
     // Create a new instance of ApiManager for each test
     await use(new ApiManagerE2E());
   },
-  pm: async ({page}, use) => {
+  pageManager: async ({page}, use) => {
     // Create a new instance of PageManager for each test
     await use(new PageManager(page));
   },

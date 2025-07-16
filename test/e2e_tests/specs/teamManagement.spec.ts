@@ -31,8 +31,8 @@ const errorMessage = 'Please verify your details and try again.';
 test(
   'Verify I can log in to admin panel only with valid hidden or shown password',
   {tag: ['@crit-flow-tm', '@TC-2157', '@TC-2158', '@TC-2159', '@TC-2156', '@TC-2155', '@teamManagement-regression']},
-  async ({api, pm}) => {
-    const pages = pm.tm.pages;
+  async ({api, pageManager}) => {
+    const pages = pageManager.tm.pages;
 
     await test.step('Preconditions: Creating preconditions for the test via API', async () => {
       await api.createTeamOwner(teamOwner, teamName);
@@ -40,7 +40,7 @@ test(
     });
 
     await test.step('Team owner opens team management page', async () => {
-      await pm.openTeamManagementPage();
+      await pageManager.openTeamManagementPage();
       await pages.teamLogin().inputEmail(teamOwner.email);
     });
 
@@ -72,9 +72,9 @@ test(
   {
     tag: ['@crit-flow-tm', '@TC-2166', '@TC-2173', '@TC-2176', '@TC-2177', '@teamManagement-regression'],
   },
-  async ({api, pm}) => {
+  async ({api, pageManager}) => {
     test.slow();
-    const {pages, modals} = pm.tm;
+    const {pages, modals} = pageManager.tm;
 
     // Creating test data
     const teamOwner = getUser();
@@ -82,7 +82,7 @@ test(
     const teamName = 'Kickers';
 
     await test.step('Team owner opens team settings page', async () => {
-      await pm.openTeamManagementPage();
+      await pageManager.openTeamManagementPage();
     });
 
     await test.step('Team owner opens team sign up page', async () => {

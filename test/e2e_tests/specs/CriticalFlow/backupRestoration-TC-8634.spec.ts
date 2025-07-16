@@ -27,10 +27,10 @@ import {removeCreatedUser} from '../../utils/tearDownUtil';
 const user = getUser();
 let fileName: string;
 
-test('Setting up new device with a backup', {tag: ['@TC-8634', '@crit-flow-web']}, async ({pm, api}) => {
+test('Setting up new device with a backup', {tag: ['@TC-8634', '@crit-flow-web']}, async ({pageManager, api}) => {
   test.slow(); // Increasing test timeout to 90 seconds to accommodate the full flow
 
-  const {pages, modals, components} = pm.webapp;
+  const {pages, modals, components} = pageManager.webapp;
 
   // Creating preconditions for the test via API
   await test.step('Preconditions: Creating preconditions for the test via API', async () => {
@@ -39,8 +39,8 @@ test('Setting up new device with a backup', {tag: ['@TC-8634', '@crit-flow-web']
 
   // Test steps
   await test.step('User logs in', async () => {
-    await pm.openMainPage();
-    await loginUser(user, pm);
+    await pageManager.openMainPage();
+    await loginUser(user, pageManager);
     await modals.dataShareConsent().clickDecline();
   });
 
@@ -63,11 +63,11 @@ test('Setting up new device with a backup', {tag: ['@TC-8634', '@crit-flow-web']
   });
 
   await test.step('User logs out and clears all data', async () => {
-    await logOutUser(pm, true);
+    await logOutUser(pageManager, true);
   });
 
   await test.step('User logs back in', async () => {
-    await loginUser(user, pm);
+    await loginUser(user, pageManager);
     await pages.historyInfo().clickConfirmButton();
   });
 

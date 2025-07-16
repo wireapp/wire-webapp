@@ -35,7 +35,7 @@ const teamBName = 'Critical B';
 
 let memberBPM: PageManager;
 
-test('Messages in 1:1', {tag: ['@TC-8750', '@crit-flow-web']}, async ({pm, api, browser}) => {
+test('Messages in 1:1', {tag: ['@TC-8750', '@crit-flow-web']}, async ({pageManager, api, browser}) => {
   test.slow(); // Increasing test timeout to 90 seconds to accommodate the full flow
 
   // Step 0: Preconditions
@@ -80,8 +80,8 @@ test('Messages in 1:1', {tag: ['@TC-8750', '@crit-flow-web']}, async ({pm, api, 
 
   // Step 1: Log in as the users and open the 1:1
   await test.step('Log in as the users and open the 1:1', async () => {
-    await loginUser(memberA, pm);
-    await pm.webapp.pages.conversationList().openConversation(memberB.fullName);
+    await loginUser(memberA, pageManager);
+    await pageManager.webapp.pages.conversationList().openConversation(memberB.fullName);
 
     await loginUser(memberB, memberBPM);
   });
