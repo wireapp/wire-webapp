@@ -52,17 +52,17 @@ export class CallingPage {
     this.participantNameLocator = page.locator('[data-uie-name="call-participant-name"]');
   }
 
-  // Visibility and Waits
+  // ─── Visibility and Waits ───────────────────────────────────────────────
 
-  async isCellVisible(): Promise<boolean> {
+  isCellVisible(): Promise<boolean> {
     return this.cell.isVisible();
   }
 
-  async waitForCell(): Promise<void> {
-    await this.cell.waitFor({state: 'visible', timeout: 5000});
+  waitForCell(): Promise<void> {
+    return this.cell.waitFor({state: 'visible', timeout: 5000});
   }
 
-  async isFullScreenVisible(): Promise<boolean> {
+  isFullScreenVisible(): Promise<boolean> {
     return this.fullScreen.isVisible();
   }
 
@@ -70,64 +70,70 @@ export class CallingPage {
     return this.goFullScreen.waitFor({state: 'visible', timeout: 10000});
   }
 
-  async waitForSelfVideoThumbnail(): Promise<void> {
-    await this.selfVideoThumbnail.waitFor({state: 'visible', timeout: 10000});
+  waitForSelfVideoThumbnail(): Promise<void> {
+    return this.selfVideoThumbnail.waitFor({state: 'visible', timeout: 10000});
   }
 
   selfVideoThumbnailVisible(): Promise<boolean> {
     return this.selfVideoThumbnail.isVisible();
   }
 
-  // Fullscreen Controls
+  // ─── Fullscreen Controls ────────────────────────────────────────────────
 
-  async maximizeCell(): Promise<void> {
-    await this.goFullScreen.click();
+  maximizeCell(): Promise<void> {
+    return this.goFullScreen.click();
   }
 
-  async pickUpIncomingCall(): Promise<void> {
-    await this.pickUpIncomingCallButton.click();
+  pickUpIncomingCall(): Promise<void> {
+    return this.pickUpIncomingCallButton.click();
   }
 
-  // Mute Controls
+  // ─── Mute Controls ──────────────────────────────────────────────────────
 
   async isSelfUserMutedInFullScreen(): Promise<boolean> {
     const state = await this.fullScreenMuteButton.getAttribute('data-uie-value');
     return state === 'active';
   }
 
-  async muteSelfInFullScreen(): Promise<void> {
-    await this.fullScreenMuteButton.click();
+  muteSelfInFullScreen(): Promise<void> {
+    return this.fullScreenMuteButton.click();
   }
 
-  async unmuteSelfInFullScreen(): Promise<void> {
-    await this.fullScreenMuteButton.click();
+  unmuteSelfInFullScreen(): Promise<void> {
+    return this.fullScreenMuteButton.click();
   }
 
-  async isFullScreenMuteButtonVisible(): Promise<boolean> {
+  isFullScreenMuteButtonVisible(): Promise<boolean> {
     return this.fullScreenMuteButton.isVisible();
   }
 
-  // Participant Verification
+  // ─── Participant Verification ───────────────────────────────────────────
 
   async waitForParticipantNameToBeVisible(userId?: string): Promise<void> {
     if (!userId) {
       throw new Error('User ID is required to verify participant visibility.');
     }
 
-    await this.page
-      .locator(`[data-uie-name="call-participant-name"][data-uie-value="${userId}"]`)
-      .waitFor({state: 'visible', timeout: 20000});
+    await this.page.locator(CallingPage.selectorForParticipantName(userId)).waitFor({state: 'visible', timeout: 20000});
   }
 
-  // Mute State for Other Users
+  // ─── Mute State for Other Users ─────────────────────────────────────────
 
-  async waitForGridTileMuteIconToBeVisibleForUser(userId: string): Promise<void> {
-    await this.page
-      .locator(`[data-uie-name="mic-icon-off"][data-uie-user-id="${userId}"]`)
-      .waitFor({state: 'visible', timeout: 10000});
+  waitForGridTileMuteIconToBeVisibleForUser(userId: string): Promise<void> {
+    return this.page.locator(CallingPage.selectorForMuteIcon(userId)).waitFor({state: 'visible', timeout: 10000});
   }
 
-  async isGridTileMuteIconVisibleForUser(userId: string): Promise<boolean> {
-    return this.page.locator(`[data-uie-name="mic-icon-off"][data-uie-user-id="${userId}"]`).isVisible();
+  isGridTileMuteIconVisibleForUser(userId: string): Promise<boolean> {
+    return this.page.locator(CallingPage.selectorForMuteIcon(userId)).isVisible();
+  }
+
+  // ─── Dynamic Selector Generators ─────────────────────────────────────────
+
+  static selectorForParticipantName(userId: string): string {
+    return `[data-uie-name="call-participant-name"][data-uie-value="${userId}"]`;
+  }
+
+  static selectorForMuteIcon(userId: string): string {
+    return `[data-uie-name="mic-icon-off"][data-uie-user-id="${userId}"]`;
   }
 }
