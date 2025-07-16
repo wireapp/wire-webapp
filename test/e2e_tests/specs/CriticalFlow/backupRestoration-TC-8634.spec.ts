@@ -27,8 +27,10 @@ import {removeCreatedUser} from '../../utils/tearDownUtil';
 const user = getUser();
 let fileName: string;
 
-test('Setting up new device with a backup', {tag: ['@TC-8634', '@crit-flow-web']}, async ({pages, api}) => {
+test('Setting up new device with a backup', {tag: ['@TC-8634', '@crit-flow-web']}, async ({pageManager, api}) => {
   test.slow(); // Increasing test timeout to 90 seconds to accommodate the full flow
+
+  const {pages, modals, components} = pageManager.webapp;
 
   // Creating preconditions for the test via API
   await test.step('Preconditions: Creating preconditions for the test via API', async () => {
@@ -37,42 +39,42 @@ test('Setting up new device with a backup', {tag: ['@TC-8634', '@crit-flow-web']
 
   // Test steps
   await test.step('User logs in', async () => {
-    await pages.openMainPage();
-    await loginUser(user, pages);
-    await pages.dataShareConsentModal.clickDecline();
+    await pageManager.openMainPage();
+    await loginUser(user, pageManager);
+    await modals.dataShareConsent().clickDecline();
   });
 
   //TODO generate a conversation to restore
   await test.step('User generates data', async () => {});
 
   await test.step('User creates and saves a backup', async () => {
-    await pages.conversationSidebar.clickPreferencesButton();
-    await pages.accountPage.clickBackUpButton();
-    expect(pages.exportBackupModal.isTitleVisible()).toBeTruthy();
-    await pages.exportBackupModal.clickPrimaryButton();
-    expect(pages.exportBackupModal.isTitleHidden()).toBeTruthy();
-    expect(pages.historyExportPage.isVisible()).toBeTruthy();
+    await components.conversationSidebar().clickPreferencesButton();
+    await pages.account().clickBackUpButton();
+    expect(modals.exportBackup().isTitleVisible()).toBeTruthy();
+    await modals.exportBackup().clickPrimaryButton();
+    expect(modals.exportBackup().isTitleHidden()).toBeTruthy();
+    expect(pages.historyExport().isVisible()).toBeTruthy();
     const [download] = await Promise.all([
-      pages.historyExportPage.page.waitForEvent('download'),
-      pages.historyExportPage.clickSaveFileButton(),
+      pages.historyExport().page.waitForEvent('download'),
+      pages.historyExport().clickSaveFileButton(),
     ]);
     fileName = `./test-results/downloads/${download.suggestedFilename()}`;
     await download.saveAs(fileName);
   });
 
   await test.step('User logs out and clears all data', async () => {
-    await logOutUser(pages, true);
+    await logOutUser(pageManager, true);
   });
 
   await test.step('User logs back in', async () => {
-    await loginUser(user, pages);
-    await pages.historyInfoPage.clickConfirmButton();
+    await loginUser(user, pageManager);
+    await pages.historyInfo().clickConfirmButton();
   });
 
   await test.step('User restores the previously created backup', async () => {
-    await pages.conversationSidebar.clickPreferencesButton();
-    await pages.accountPage.backupFileInput.setInputFiles(fileName);
-    expect(pages.historyImportPage.importSuccessHeadline.isVisible()).toBeTruthy();
+    await components.conversationSidebar().clickPreferencesButton();
+    await pages.account().backupFileInput.setInputFiles(fileName);
+    expect(pages.historyImport().importSuccessHeadline.isVisible()).toBeTruthy();
   });
 });
 

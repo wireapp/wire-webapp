@@ -19,7 +19,7 @@
 
 import {Page, Locator} from '@playwright/test';
 
-import {selectByDataAttribute} from '../utils/useSelector';
+import {selectByDataAttribute} from 'test/e2e_tests/utils/useSelector';
 
 export class UserProfileModal {
   readonly page: Page;

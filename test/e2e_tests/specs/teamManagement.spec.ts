@@ -31,36 +31,38 @@ const errorMessage = 'Please verify your details and try again.';
 test(
   'Verify I can log in to admin panel only with valid hidden or shown password',
   {tag: ['@crit-flow-tm', '@TC-2157', '@TC-2158', '@TC-2159', '@TC-2156', '@TC-2155', '@teamManagement-regression']},
-  async ({api, pages}) => {
+  async ({api, pageManager}) => {
+    const pages = pageManager.tm.pages;
+
     await test.step('Preconditions: Creating preconditions for the test via API', async () => {
       await api.createTeamOwner(teamOwner, teamName);
       addCreatedTeam(teamOwner, teamOwner.teamId!);
     });
 
     await test.step('Team owner opens team management page', async () => {
-      await pages.openTeamManagementPage();
-      await pages.teamLoginPage.inputEmail(teamOwner.email);
+      await pageManager.openTeamManagementPage();
+      await pages.teamLogin().inputEmail(teamOwner.email);
     });
 
     await test.step('Team owner should not be able to login to team management with invalid hidden password', async () => {
-      await pages.teamLoginPage.inputPassword(invalidPassword);
-      await pages.teamLoginPage.clickLoginButton();
-      expect(await pages.teamLoginPage.getErrorMessage()).toBe(errorMessage);
+      await pages.teamLogin().inputPassword(invalidPassword);
+      await pages.teamLogin().clickLoginButton();
+      expect(await pages.teamLogin().getErrorMessage()).toBe(errorMessage);
     });
 
     await test.step('Team owner should not be able to login to team management with invalid shown password', async () => {
-      await pages.teamLoginPage.toggleShowPassword();
-      expect(await pages.teamLoginPage.isPasswordHidden()).toBe(false);
+      await pages.teamLogin().toggleShowPassword();
+      expect(await pages.teamLogin().isPasswordHidden()).toBe(false);
 
-      await pages.teamLoginPage.clickLoginButton();
-      expect(await pages.teamLoginPage.getErrorMessage()).toBe(errorMessage);
+      await pages.teamLogin().clickLoginButton();
+      expect(await pages.teamLogin().getErrorMessage()).toBe(errorMessage);
     });
 
     await test.step('Team owner logs in to team management with the correct hidden password', async () => {
-      await pages.teamLoginPage.toggleHidePassword();
-      await pages.teamLoginPage.inputPassword(teamOwner.password);
-      await pages.teamLoginPage.clickLoginButton();
-      expect(await pages.teamsPage.isProfileIconVisible());
+      await pages.teamLogin().toggleHidePassword();
+      await pages.teamLogin().inputPassword(teamOwner.password);
+      await pages.teamLogin().clickLoginButton();
+      expect(await pages.teams().isProfileIconVisible());
     });
   },
 );
@@ -70,43 +72,45 @@ test(
   {
     tag: ['@crit-flow-tm', '@TC-2166', '@TC-2173', '@TC-2176', '@TC-2177', '@teamManagement-regression'],
   },
-  async ({api, pages}) => {
+  async ({api, pageManager}) => {
     test.slow();
+    const {pages, modals} = pageManager.tm;
+
     // Creating test data
     const teamOwner = getUser();
     const member = getUser();
     const teamName = 'Kickers';
 
     await test.step('Team owner opens team settings page', async () => {
-      await pages.openTeamManagementPage();
+      await pageManager.openTeamManagementPage();
     });
 
     await test.step('Team owner opens team sign up page', async () => {
-      await pages.teamLoginPage.clickTeamCreateButton();
+      await pages.teamLogin().clickTeamCreateButton();
     });
 
     await test.step('Team owner provides team info, credentials, and accept the terms on the team sign up page', async () => {
-      await pages.teamSignUpPage.inputEmail(teamOwner.email);
-      await pages.teamSignUpPage.inputProfileName(teamOwner.fullName);
-      await pages.teamSignUpPage.inputTeamName(teamName);
-      await pages.teamSignUpPage.inputPassword(teamOwner.password);
-      await pages.teamSignUpPage.inputConfirmPassword(teamOwner.password);
-      await pages.teamSignUpPage.selectCompanySize('51 - 100');
-      await pages.teamSignUpPage.toggleTermsCheckbox();
-      await pages.teamSignUpPage.togglePrivacyPolicyCheckbox();
-      await pages.teamSignUpPage.clickContinueButton();
+      await pages.teamSignUp().inputEmail(teamOwner.email);
+      await pages.teamSignUp().inputProfileName(teamOwner.fullName);
+      await pages.teamSignUp().inputTeamName(teamName);
+      await pages.teamSignUp().inputPassword(teamOwner.password);
+      await pages.teamSignUp().inputConfirmPassword(teamOwner.password);
+      await pages.teamSignUp().selectCompanySize('51 - 100');
+      await pages.teamSignUp().toggleTermsCheckbox();
+      await pages.teamSignUp().togglePrivacyPolicyCheckbox();
+      await pages.teamSignUp().clickContinueButton();
     });
 
     await test.step('Team owner completes email verification step of the team sign up process', async () => {
       const code = await api.inbucket.getVerificationCode(teamOwner.email);
-      await pages.emailVerificationPage.enterVerificationCode(code);
+      await pages.emailVerification().enterVerificationCode(code);
     });
 
     await test.step('Team owner adds team members on the team sign up page', async () => {
-      expect(await pages.teamSignUpPage.isContinueButtonEnabled()).toBeFalsy();
+      expect(await pages.teamSignUp().isContinueButtonEnabled()).toBeFalsy();
 
-      await pages.teamSignUpPage.inputInviteEmail(member.email);
-      await pages.teamSignUpPage.clickContinueButton();
+      await pages.teamSignUp().inputInviteEmail(member.email);
+      await pages.teamSignUp().clickContinueButton();
     });
 
     await test.step('Invited user receives team invitation email', async () => {
@@ -114,20 +118,20 @@ test(
     });
 
     await test.step('TC-2176 - Team owner sees congratulations step after successful sign up', async () => {
-      expect(await pages.registerSuccessPage.isTeamSignUpSuccessMessageVisible());
+      expect(await pages.registerSuccess().isTeamSignUpSuccessMessageVisible());
     });
 
     await test.step('TC-2177 - Team owner can go to team settings on congratulations step of sign up form', async () => {
-      await pages.registerSuccessPage.clickManageTeamButton();
-      await pages.teamDataShareConsentModal.clickAgree();
-      await pages.marketingConsentModal.clickConfirmButton();
-      expect(await pages.teamsPage.isProfileIconVisible());
+      await pages.registerSuccess().clickManageTeamButton();
+      await modals.dataShareConsent().clickAgree();
+      await modals.marketingConsent().clickConfirmButton();
+      expect(await pages.teams().isProfileIconVisible());
     });
 
     await test.step('Team owner can see team info in team management', async () => {
-      await pages.teamsPage.clickPeopleButton();
-      expect(await pages.teamsPage.isUserVisibleAsSelf(teamOwner.fullName));
-      expect(await pages.teamsPage.getUserRole(teamOwner.fullName)).toContain('Owner');
+      await pages.teams().clickPeopleButton();
+      expect(await pages.teams().isUserVisibleAsSelf(teamOwner.fullName));
+      expect(await pages.teams().getUserRole(teamOwner.fullName)).toContain('Owner');
     });
   },
 );

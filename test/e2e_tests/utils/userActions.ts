@@ -19,27 +19,31 @@
 
 import {ApiManagerE2E} from '../backend/apiManager.e2e';
 import {User} from '../data/user';
-import {PageManager} from '../pages/pageManager';
+import {PageManager} from '../pageManager';
 import {expect} from '../test.fixtures';
 
-export const loginUser = async (user: User, pages: PageManager) => {
-  await pages.singleSignOnPage.isSSOPageVisible();
-  await pages.singleSignOnPage.enterEmailOnSSOPage(user.email);
-  await pages.loginPage.inputPassword(user.password);
-  await pages.loginPage.clickSignInButton();
+export const loginUser = async (user: User, pageManager: PageManager) => {
+  const {pages} = pageManager.webapp;
+  await pages.singleSignOn().isSSOPageVisible();
+  await pages.singleSignOn().enterEmailOnSSOPage(user.email);
+  await pages.login().inputPassword(user.password);
+  await pages.login().clickSignInButton();
 };
 
-export const sendTextMessageToUser = async (pages: PageManager, recipient: User, text: string) => {
-  // Team owner opens conversation with A
-  await pages.conversationListPage.openConversation(recipient.fullName);
-  expect(await pages.conversationPage.isConversationOpen(recipient.fullName));
+export const sendTextMessageToUser = async (pageManager: PageManager, recipient: User, text: string) => {
+  const {pages} = pageManager.webapp;
 
-  // Team owner sends a text to A
-  await pages.conversationPage.sendMessage(text);
-  await pages.conversationPage.page.waitForTimeout(1000); // Wait for the message to be sent
+  await pages.conversationList().openConversation(recipient.fullName);
+  expect(await pages.conversation().isConversationOpen(recipient.fullName));
+
+  await pages.conversation().sendMessage(text);
+
   // TODO: Bug [WPB-18226] Message is not visible in the conversation after sending it
-  await pages.refreshPage({waitUntil: 'domcontentloaded'});
-  await expect(pages.conversationPage.page.getByText(text)).toBeVisible({timeout: 10000});
+  await pages.conversation().page.waitForTimeout(3000); // Wait for the message to be sent
+  await pageManager.refreshPage({waitUntil: 'domcontentloaded'});
+  // End of TODO: Bug [WPB-18226]
+
+  await expect(pages.conversation().page.getByText(text)).toBeVisible({timeout: 10000});
 };
 
 export const inviteMembers = async (members: User[], owner: User, api: ApiManagerE2E) => {
@@ -52,19 +56,25 @@ export const inviteMembers = async (members: User[], owner: User, api: ApiManage
   );
 };
 
-export const logOutUser = async (pages: PageManager, shouldDeleteClient = false) => {
-  await pages.conversationSidebar.clickPreferencesButton();
-  await pages.accountPage.clickLogoutButton();
-  expect(pages.confirmLogoutModal.isVisible()).toBeTruthy();
+export const logOutUser = async (pageManager: PageManager, shouldDeleteClient = false) => {
+  const {pages, components, modals} = pageManager.webapp;
+  await components.conversationSidebar().clickPreferencesButton();
+  await pages.account().clickLogoutButton();
+  expect(modals.confirmLogout().isVisible()).toBeTruthy();
   if (shouldDeleteClient) {
-    await pages.confirmLogoutModal.toggleModalCheck();
-    expect(pages.confirmLogoutModal.modalCheckbox.isChecked()).toBeTruthy();
+    await modals.confirmLogout().toggleModalCheck();
+    expect(modals.confirmLogout().modalCheckbox.isChecked()).toBeTruthy();
   }
-  await pages.confirmLogoutModal.clickConfirm();
+  await modals.confirmLogout().clickConfirm();
 };
 
-export const sendTextMessageToConversation = async (pages: PageManager, conversation: string, message: string) => {
-  await pages.conversationListPage.openConversation(conversation);
-  await pages.conversationPage.sendMessage(message);
-  expect(await pages.conversationPage.isMessageVisible(message)).toBeTruthy();
+export const sendTextMessageToConversation = async (
+  pageManager: PageManager,
+  conversation: string,
+  message: string,
+) => {
+  const {pages} = pageManager.webapp;
+  await pages.conversationList().openConversation(conversation);
+  await pages.conversation().sendMessage(message);
+  expect(await pages.conversation().isMessageVisible(message)).toBeTruthy();
 };

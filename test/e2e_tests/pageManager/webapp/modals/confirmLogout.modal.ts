@@ -19,7 +19,7 @@
 
 import {Page, Locator} from '@playwright/test';
 
-import {selectByDataAttribute, selectByLabel} from '../utils/useSelector';
+import {selectByDataAttribute, selectByLabel} from 'test/e2e_tests/utils/useSelector';
 
 export class ConfirmLogoutModal {
   readonly page: Page;
