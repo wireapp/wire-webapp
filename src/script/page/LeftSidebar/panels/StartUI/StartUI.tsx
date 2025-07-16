@@ -150,7 +150,7 @@ const StartUI: React.FC<StartUIProps> = ({
           forceDark
         />
       </div>
-      {isTeam && canChatWithServices() && defaultProtocol != ConversationProtocol.MLS && (
+      {isTeam && canChatWithServices() && defaultProtocol !== ConversationProtocol.MLS && (
         <ul className="start-ui-list-tabs">
           <li className={`start-ui-list-tab ${activeTab === Tabs.PEOPLE ? 'active' : ''}`}>
             <button
