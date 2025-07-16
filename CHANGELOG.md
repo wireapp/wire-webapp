@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [27.69.2](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@27.69.1...@wireapp/api-client@27.69.2) (2025-07-16)
+
+### Bug Fixes
+
+* **api-client/cells:** s3 fresh access token [WPB-18596] ([#7100](https://github.com/wireapp/wire-web-packages/issues/7100)) ([cca16f2](https://github.com/wireapp/wire-web-packages/commit/cca16f22f60bc8b194ce9e61cc626c4ab6dc381d))
+
 ## [27.69.1](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@27.69.0...@wireapp/api-client@27.69.1) (2025-07-15)
 
 **Note:** Version bump only for package @wireapp/api-client
