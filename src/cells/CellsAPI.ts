@@ -95,7 +95,11 @@ export class CellsAPI {
     const http = httpClient || this.getHttpClient({cellsConfig});
 
     this.storageService =
-      storageService || new S3Service({config: cellsConfig.s3, getAccessToken: this.accessTokenStore.getAccessToken});
+      storageService ||
+      new S3Service({
+        config: cellsConfig.s3,
+        accessTokenStore: this.accessTokenStore,
+      });
     this.client = new NodeServiceApi(undefined, undefined, http.client);
   }
 

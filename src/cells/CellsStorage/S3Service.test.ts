@@ -23,6 +23,8 @@ import {Upload} from '@aws-sdk/lib-storage';
 import {CellsStorageError} from './CellsStorage';
 import {MAX_QUEUE_SIZE, PART_SIZE, S3Service} from './S3Service';
 
+import {AccessTokenStore} from '../../auth/AccessTokenStore';
+
 jest.mock('@aws-sdk/client-s3');
 jest.mock('@aws-sdk/lib-storage');
 
@@ -40,7 +42,13 @@ describe('S3Service', () => {
 
     (S3Client as jest.Mock).mockImplementation(() => mockS3Client);
 
-    service = new S3Service({config: testConfig, getAccessToken: jest.fn()});
+    service = new S3Service({
+      config: testConfig,
+      accessTokenStore: {
+        getAccessToken: jest.fn().mockReturnValue('test-access-token'),
+        tokenExpirationDate: Date.now() + 1000,
+      } as unknown as AccessTokenStore,
+    });
   });
 
   it('creates an S3Client with the correct configuration', () => {

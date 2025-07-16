@@ -119,7 +119,7 @@ describe('CellsAPI', () => {
     api.initialize({cellsConfig: cellsConfigMock, httpClient: mockHttpClient});
 
     expect(S3Service).toHaveBeenCalledTimes(1);
-    expect(S3Service).toHaveBeenCalledWith({config: cellsConfigMock.s3});
+    expect(S3Service).toHaveBeenCalledWith({config: cellsConfigMock.s3, accessTokenStore: {} as AccessTokenStore});
   });
 
   describe('uploadNodeDraft', () => {
