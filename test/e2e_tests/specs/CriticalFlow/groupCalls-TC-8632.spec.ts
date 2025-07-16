@@ -60,6 +60,7 @@ test(
 
       await api.createPersonalUser(member, invitationCode);
       await api.enableConferenceCallingFeature(teamId);
+      await api.waitForConferenceCallingFeatureEnabled(owner.token);
     });
 
     await test.step('Login: Owner and member sign in', async () => {

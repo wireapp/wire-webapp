@@ -94,10 +94,35 @@ export class ApiManagerE2E {
   }
 
   async enableConferenceCallingFeature(teamId: string) {
-    // Wait until stripe/ibis has set free account restrictions after team creation.
-    await new Promise(resolve => setTimeout(resolve, 3000));
     await this.brig.unlockConferenceCallingFeature(teamId);
     await this.brig.enableConferenceCallingBackdoorViaBackdoorTeam(teamId);
+  }
+
+  /**
+   * Long polling to see if a conference calling feature is available for a given team.
+   * This is to wait until stripe/ibis has set free account restrictions after team creation.
+   *
+   * @param token - The access token of the user.
+   * @returns A promise that resolves to true if the feature is enabled, false otherwise.
+   */
+  async waitForConferenceCallingFeatureEnabled(token?: string): Promise<boolean> {
+    if (!token) {
+      throw new Error('Token is required to check for conference calling feature');
+    }
+
+    const timeout = 60000;
+    const interval = 1000;
+    const startTime = Date.now();
+
+    while (Date.now() - startTime < timeout) {
+      const isEnabled = await this.featureConfig.isConferenceCallingEnabled(token);
+      if (isEnabled) {
+        return true;
+      }
+      await new Promise(resolve => setTimeout(resolve, interval));
+    }
+
+    throw new Error(`Conference calling feature is not enabled after waiting for ${timeout / 1000} seconds`);
   }
 
   async createTeamOwner(user: User, teamName: string) {
