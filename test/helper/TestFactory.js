@@ -29,7 +29,7 @@ import ko from 'knockout';
 import {container} from 'tsyringe';
 
 import {AssetRepository} from 'Repositories/assets/AssetRepository';
-import {CallingRepository} from 'src/script/calling/CallingRepository';
+import {CallingRepository} from 'Repositories/calling/CallingRepository';
 import {ClientEntity} from 'src/script/client/ClientEntity';
 import {ClientRepository} from 'src/script/client/ClientRepository';
 import {ClientService} from 'src/script/client/ClientService';

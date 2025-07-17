@@ -27,10 +27,10 @@ import {Call} from './Call';
 import {CallingRepository} from './CallingRepository';
 import {Participant} from './Participant';
 
-import {TestFactory} from '../../../test/helper/TestFactory';
-import {Conversation} from '../entity/Conversation';
-import {User} from '../entity/User';
-import {MediaDevicesHandler} from '../media/MediaDevicesHandler';
+import {TestFactory} from '../../../../test/helper/TestFactory';
+import {Conversation} from '../../entity/Conversation';
+import {User} from '../../entity/User';
+import {MediaDevicesHandler} from '../../media/MediaDevicesHandler';
 
 const createSelfParticipant = () => {
   const selfUser = new User();

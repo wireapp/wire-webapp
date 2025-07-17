@@ -19,9 +19,9 @@
 
 import {container} from 'tsyringe';
 
-import {Call} from 'src/script/calling/Call';
-import {CallingRepository} from 'src/script/calling/CallingRepository';
-import {CallState, CallingViewMode, DesktopScreenShareMenu} from 'src/script/calling/CallState';
+import {Call} from 'Repositories/calling/Call';
+import {CallingRepository} from 'Repositories/calling/CallingRepository';
+import {CallState, CallingViewMode, DesktopScreenShareMenu} from 'Repositories/calling/CallState';
 import {MediaRepository} from 'src/script/media/MediaRepository';
 import {PropertiesRepository} from 'src/script/properties/PropertiesRepository';
 import {UserState} from 'src/script/user/UserState';

@@ -21,9 +21,9 @@ import type {QualifiedUserClients} from '@wireapp/api-client/lib/conversation';
 import type {QualifiedId} from '@wireapp/api-client/lib/user';
 import {InCallEmojiType} from '@wireapp/core/lib/conversation';
 
-import {CALL} from './Client';
+import {CALL_MESSAGE_TYPE} from 'Repositories/calling/enum/CallMessageType';
 
-import {CALL_MESSAGE_TYPE} from '../calling/enum/CallMessageType';
+import {CALL} from './Client';
 
 interface CallingRemoteMuteEventContentData {
   targets: QualifiedUserClients;

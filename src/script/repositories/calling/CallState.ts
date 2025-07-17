@@ -29,11 +29,11 @@ import {matchQualifiedIds} from 'Util/QualifiedId';
 
 import {Call} from './Call';
 
-import {Config} from '../Config';
-import type {ElectronDesktopCapturerSource} from '../media/MediaDevicesHandler';
-import {EventName} from '../tracking/EventName';
-import {Segmentation} from '../tracking/Segmentation';
-import {CallViewTab} from '../view_model/CallingViewModel';
+import {Config} from '../../Config';
+import type {ElectronDesktopCapturerSource} from '../../media/MediaDevicesHandler';
+import {EventName} from '../../tracking/EventName';
+import {Segmentation} from '../../tracking/Segmentation';
+import {CallViewTab} from '../../view_model/CallingViewModel';
 
 export enum MuteState {
   NOT_MUTED,

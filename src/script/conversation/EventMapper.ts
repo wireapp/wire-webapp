@@ -24,6 +24,7 @@ import {LinkPreview, Mention} from '@wireapp/protocol-messaging';
 
 import {AssetRemoteData} from 'Repositories/assets/AssetRemoteData';
 import {AssetTransferState} from 'Repositories/assets/AssetTransferState';
+import {TERMINATION_REASON} from 'Repositories/calling/enum/TerminationReason';
 import {t} from 'Util/LocalizerUtil';
 import {getLogger, Logger} from 'Util/Logger';
 import {userReactionMapToReactionMap} from 'Util/ReactionUtil';
@@ -43,7 +44,6 @@ import {
   MultipartMessageAddEvent,
 } from './EventBuilder';
 
-import {TERMINATION_REASON} from '../calling/enum/TerminationReason';
 import {AssetData} from '../cryptography/CryptographyMapper';
 import type {Conversation} from '../entity/Conversation';
 import {Button} from '../entity/message/Button';

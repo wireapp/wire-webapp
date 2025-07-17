@@ -23,7 +23,8 @@ import {amplify} from 'amplify';
 
 import {WebAppEvents} from '@wireapp/webapp-events';
 
-import type {CallingRepository} from '../../../../calling/CallingRepository';
+import type {CallingRepository} from 'Repositories/calling/CallingRepository';
+
 import {EventName} from '../../../../tracking/EventName';
 
 export const useCameraReloadOnCallEnd = (callingRepository: CallingRepository) => {

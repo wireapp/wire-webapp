@@ -34,7 +34,8 @@ import {useDebouncedCallback} from 'use-debounce';
 import {WIDTH} from '@wireapp/react-ui-kit';
 
 import {ConversationListCell} from 'Components/ConversationListCell';
-import {Call} from 'src/script/calling/Call';
+import {Call} from 'Repositories/calling/Call';
+import {CallState} from 'Repositories/calling/CallState';
 import {ConversationLabel, ConversationLabelRepository} from 'src/script/conversation/ConversationLabelRepository';
 import {User} from 'src/script/entity/User';
 import {SidebarTabs, useSidebarStore} from 'src/script/page/LeftSidebar/panels/Conversations/useSidebarStore';
@@ -48,7 +49,6 @@ import {ConnectionRequests} from './ConnectionRequests';
 import {conversationsList, headingTitle, noResultsMessage, virtualizationStyles} from './ConversationsList.styles';
 import {conversationSearchFilter, getConversationsWithHeadings} from './helpers';
 
-import {CallState} from '../../../../calling/CallState';
 import {ConversationState} from '../../../../conversation/ConversationState';
 import {Conversation} from '../../../../entity/Conversation';
 import {generateConversationUrl} from '../../../../router/routeGenerator';

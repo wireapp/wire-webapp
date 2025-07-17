@@ -23,13 +23,13 @@ import {Runtime} from '@wireapp/commons';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {RatingListLabel} from 'Components/Modals/QualityFeedbackModal/typings';
+import {Call} from 'Repositories/calling/Call';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 
 import {ConversationType, UserType, PlatformType} from './attribute';
 import {EventName} from './EventName';
 import {Segmentation} from './Segmentation';
 
-import {Call} from '../calling/Call';
 import {Conversation} from '../entity/Conversation';
 import type {User} from '../entity/User';
 

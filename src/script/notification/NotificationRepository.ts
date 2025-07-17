@@ -30,7 +30,9 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 import {AssetRepository} from 'Repositories/assets/AssetRepository';
 import {AudioRepository} from 'Repositories/audio/AudioRepository';
 import {AudioType} from 'Repositories/audio/AudioType';
-import {CallingRepository} from 'src/script/calling/CallingRepository';
+import {CallingRepository} from 'Repositories/calling/CallingRepository';
+import {CallingViewMode, CallState} from 'Repositories/calling/CallState';
+import {TERMINATION_REASON} from 'Repositories/calling/enum/TerminationReason';
 import {Declension, t, getUserName} from 'Util/LocalizerUtil';
 import {getLogger, Logger} from 'Util/Logger';
 import {getRenderedTextContent} from 'Util/messageRenderer';
@@ -40,8 +42,6 @@ import {ValidationUtilError} from 'Util/ValidationUtil';
 
 import {PermissionState} from './PermissionState';
 
-import {CallingViewMode, CallState} from '../calling/CallState';
-import {TERMINATION_REASON} from '../calling/enum/TerminationReason';
 import type {ConnectionEntity} from '../connection/ConnectionEntity';
 import {ConversationEphemeralHandler} from '../conversation/ConversationEphemeralHandler';
 import type {ConversationRepository} from '../conversation/ConversationRepository';

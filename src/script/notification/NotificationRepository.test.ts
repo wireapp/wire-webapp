@@ -29,8 +29,9 @@ import {Availability} from '@wireapp/protocol-messaging';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {AudioRepository} from 'Repositories/audio/AudioRepository';
-import {CallingRepository} from 'src/script/calling/CallingRepository';
-import {TERMINATION_REASON} from 'src/script/calling/enum/TerminationReason';
+import {CallingRepository} from 'Repositories/calling/CallingRepository';
+import {CallingViewMode, CallState} from 'Repositories/calling/CallState';
+import {TERMINATION_REASON} from 'Repositories/calling/enum/TerminationReason';
 import {ConnectionMapper} from 'src/script/connection/ConnectionMapper';
 import {ConversationMapper} from 'src/script/conversation/ConversationMapper';
 import {NOTIFICATION_STATE} from 'src/script/conversation/NotificationSetting';
@@ -61,7 +62,6 @@ import {createUuid} from 'Util/uuid';
 
 import {NotificationRepository} from './NotificationRepository';
 
-import {CallingViewMode, CallState} from '../calling/CallState';
 import {ConnectionEntity} from '../connection/ConnectionEntity';
 import {ConversationState} from '../conversation/ConversationState';
 import {Message} from '../entity/message/Message';
