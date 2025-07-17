@@ -38,11 +38,11 @@ import {loadValue} from 'Util/StorageUtil';
 import type {PropertiesService} from './PropertiesService';
 import {PROPERTIES_TYPE, UserConsentStatus} from './PropertiesType';
 
-import type {SelfService} from '../self/SelfService';
-import {StorageKey} from '../storage';
-import {isTelemetryEnabledAtCurrentEnvironment} from '../tracking/Telemetry.helpers';
-import {ConsentValue} from '../user/ConsentValue';
-import {CONVERSATION_TYPING_INDICATOR_MODE} from '../user/TypingIndicatorMode';
+import type {SelfService} from '../../self/SelfService';
+import {StorageKey} from '../../storage';
+import {isTelemetryEnabledAtCurrentEnvironment} from '../../tracking/Telemetry.helpers';
+import {ConsentValue} from '../../user/ConsentValue';
+import {CONVERSATION_TYPING_INDICATOR_MODE} from '../../user/TypingIndicatorMode';
 
 export class PropertiesRepository {
   // Value names are specified by the protocol but key names can be changed.

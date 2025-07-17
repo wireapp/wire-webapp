@@ -25,7 +25,7 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {ClientEntity} from 'Repositories/client/ClientEntity';
 import {User} from 'Repositories/entity/User';
-import {PropertiesRepository} from 'src/script/properties/PropertiesRepository';
+import {PropertiesRepository} from 'Repositories/properties/PropertiesRepository';
 import {createUuid} from 'Util/uuid';
 
 import {Notification, PreferenceNotificationRepository} from './PreferenceNotificationRepository';

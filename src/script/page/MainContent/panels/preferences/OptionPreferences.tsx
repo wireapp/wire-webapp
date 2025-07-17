@@ -27,7 +27,10 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {Theme} from 'Components/AppContainer/hooks/useTheme';
 import {RadioGroup} from 'Components/Radio';
+import {RootFontSize, useRootFontSize} from 'Hooks/useRootFontSize';
 import {User} from 'Repositories/entity/User';
+import {PropertiesRepository} from 'Repositories/properties/PropertiesRepository';
+import {PROPERTIES_TYPE} from 'Repositories/properties/PropertiesType';
 import {Config} from 'src/script/Config';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
@@ -35,9 +38,6 @@ import {t} from 'Util/LocalizerUtil';
 import {PreferencesPage} from './components/PreferencesPage';
 import {PreferencesSection} from './components/PreferencesSection';
 
-import {RootFontSize, useRootFontSize} from '../../../../hooks/useRootFontSize';
-import {PropertiesRepository} from '../../../../properties/PropertiesRepository';
-import {PROPERTIES_TYPE} from '../../../../properties/PropertiesType';
 interface OptionPreferencesProps {
   propertiesRepository: PropertiesRepository;
   selfUser: User;

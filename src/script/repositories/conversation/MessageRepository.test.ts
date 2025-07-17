@@ -38,6 +38,7 @@ import {Text} from 'Repositories/entity/message/Text';
 import {User} from 'Repositories/entity/User';
 import {EventRepository} from 'Repositories/event/EventRepository';
 import {EventService} from 'Repositories/event/EventService';
+import {PropertiesRepository} from 'Repositories/properties/PropertiesRepository';
 import {ConversationError} from 'src/script/error/ConversationError';
 import {generateQualifiedId} from 'test/helper/UserGenerator';
 import {createUuid} from 'Util/uuid';
@@ -47,7 +48,6 @@ import {ConversationState} from './ConversationState';
 import {MessageRepository} from './MessageRepository';
 
 import {StatusType} from '../../message/StatusType';
-import {PropertiesRepository} from '../../properties/PropertiesRepository';
 import {ReactionMap} from '../../storage';
 import {TeamState} from '../../team/TeamState';
 import {ServerTimeHandler, serverTimeHandler} from '../../time/serverTimeHandler';

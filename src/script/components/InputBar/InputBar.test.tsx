@@ -28,14 +28,14 @@ import {MessageRepository} from 'Repositories/conversation/MessageRepository';
 import {Conversation} from 'Repositories/entity/Conversation';
 import {User} from 'Repositories/entity/User';
 import {EventRepository} from 'Repositories/event/EventRepository';
+import {PropertiesRepository} from 'Repositories/properties/PropertiesRepository';
+import {PropertiesService} from 'Repositories/properties/PropertiesService';
 import {withTheme} from 'src/script/auth/util/test/TestUtil';
 import {Config} from 'src/script/Config';
-import {PropertiesService} from 'src/script/properties/PropertiesService';
 import {SelfService} from 'src/script/self/SelfService';
 import {createUuid} from 'Util/uuid';
 
 import {TestFactory} from '../../../../test/helper/TestFactory';
-import {PropertiesRepository} from '../../properties/PropertiesRepository';
 import {SearchRepository} from '../../search/SearchRepository';
 import {StorageRepository} from '../../storage';
 import {TeamState} from '../../team/TeamState';

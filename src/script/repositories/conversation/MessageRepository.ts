@@ -67,6 +67,8 @@ import {EventRepository} from 'Repositories/event/EventRepository';
 import {EventService} from 'Repositories/event/EventService';
 import {EventTypeHandling} from 'Repositories/event/EventTypeHandling';
 import {NOTIFICATION_HANDLING_STATE} from 'Repositories/event/NotificationHandlingState';
+import {PropertiesRepository} from 'Repositories/properties/PropertiesRepository';
+import {PROPERTIES_TYPE} from 'Repositories/properties/PropertiesType';
 import {
   cancelSendingLinkPreview,
   clearLinkPreviewSendingState,
@@ -98,8 +100,6 @@ import {showLegalHoldWarningModal} from '../../legal-hold/LegalHoldWarning';
 import {MentionEntity} from '../../message/MentionEntity';
 import {QuoteEntity} from '../../message/QuoteEntity';
 import {StatusType} from '../../message/StatusType';
-import {PropertiesRepository} from '../../properties/PropertiesRepository';
-import {PROPERTIES_TYPE} from '../../properties/PropertiesType';
 import {Core} from '../../service/CoreSingleton';
 import type {EventRecord, ReactionMap} from '../../storage';
 import {TeamState} from '../../team/TeamState';

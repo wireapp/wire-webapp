@@ -43,13 +43,13 @@ import type {ElectronDesktopCapturerSource, MediaDevicesHandler} from 'Repositor
 import type {MediaStreamHandler} from 'Repositories/media/MediaStreamHandler';
 import type {PermissionRepository} from 'Repositories/permission/PermissionRepository';
 import {PermissionStatusState} from 'Repositories/permission/PermissionStatusState';
+import {PropertiesRepository} from 'Repositories/properties/PropertiesRepository';
+import {PROPERTIES_TYPE} from 'Repositories/properties/PropertiesType';
 import {replaceLink, t} from 'Util/LocalizerUtil';
 import {matchQualifiedIds} from 'Util/QualifiedId';
 import {safeWindowOpen} from 'Util/SanitizationUtil';
 
 import {Config} from '../Config';
-import {PropertiesRepository} from '../properties/PropertiesRepository';
-import {PROPERTIES_TYPE} from '../properties/PropertiesType';
 import type {TeamRepository} from '../team/TeamRepository';
 import {TeamState} from '../team/TeamState';
 import {ROLE} from '../user/UserPermission';

@@ -29,7 +29,7 @@ import {LEAVE_CALL_REASON} from 'Repositories/calling/enum/LeaveCallReason';
 import {Participant} from 'Repositories/calling/Participant';
 import {useVideoGrid} from 'Repositories/calling/videoGridHandler';
 import {MediaRepository} from 'Repositories/media/MediaRepository';
-import {PropertiesRepository} from 'src/script/properties/PropertiesRepository';
+import {PropertiesRepository} from 'Repositories/properties/PropertiesRepository';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 
 import {ChooseScreen} from './ChooseScreen';

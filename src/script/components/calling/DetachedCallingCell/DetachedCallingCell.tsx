@@ -23,7 +23,7 @@ import {Call} from 'Repositories/calling/Call';
 import {CallingRepository} from 'Repositories/calling/CallingRepository';
 import {CallState, CallingViewMode, DesktopScreenShareMenu} from 'Repositories/calling/CallState';
 import {MediaRepository} from 'Repositories/media/MediaRepository';
-import {PropertiesRepository} from 'src/script/properties/PropertiesRepository';
+import {PropertiesRepository} from 'Repositories/properties/PropertiesRepository';
 import {UserState} from 'src/script/user/UserState';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 

@@ -24,11 +24,11 @@ import {container} from 'tsyringe';
 
 import {Checkbox, CheckboxLabel} from '@wireapp/react-ui-kit';
 
+import {PropertiesRepository} from 'Repositories/properties/PropertiesRepository';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 import {formatDurationCaption} from 'Util/TimeUtil';
 
-import {PropertiesRepository} from '../../../../../properties/PropertiesRepository';
 import {AppLockRepository} from '../../../../../user/AppLockRepository';
 import {AppLockState} from '../../../../../user/AppLockState';
 import {CONVERSATION_TYPING_INDICATOR_MODE} from '../../../../../user/TypingIndicatorMode';

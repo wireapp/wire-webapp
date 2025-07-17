@@ -28,9 +28,9 @@ import {Grid} from 'Repositories/calling/videoGridHandler';
 import {Conversation} from 'Repositories/entity/Conversation';
 import {User} from 'Repositories/entity/User';
 import {MediaDevicesHandler} from 'Repositories/media/MediaDevicesHandler';
+import {PropertiesRepository} from 'Repositories/properties/PropertiesRepository';
+import {PropertiesService} from 'Repositories/properties/PropertiesService';
 import {withTheme} from 'src/script/auth/util/test/TestUtil';
-import {PropertiesRepository} from 'src/script/properties/PropertiesRepository';
-import {PropertiesService} from 'src/script/properties/PropertiesService';
 import {SelfService} from 'src/script/self/SelfService';
 
 import {FullscreenVideoCall, FullscreenVideoCallProps} from './FullscreenVideoCall';

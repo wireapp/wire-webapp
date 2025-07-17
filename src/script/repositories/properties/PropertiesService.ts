@@ -19,7 +19,7 @@
 
 import {container} from 'tsyringe';
 
-import {APIClient} from '../service/APIClientSingleton';
+import {APIClient} from '../../service/APIClientSingleton';
 
 export class PropertiesService {
   constructor(private readonly apiClient = container.resolve(APIClient)) {}

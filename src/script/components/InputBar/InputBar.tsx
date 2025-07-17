@@ -36,8 +36,9 @@ import {MessageRepository} from 'Repositories/conversation/MessageRepository';
 import {Conversation} from 'Repositories/entity/Conversation';
 import {User} from 'Repositories/entity/User';
 import {EventRepository} from 'Repositories/event/EventRepository';
+import {PropertiesRepository} from 'Repositories/properties/PropertiesRepository';
+import {PROPERTIES_TYPE} from 'Repositories/properties/PropertiesType';
 import {useUserPropertyValue} from 'src/script/hooks/useUserProperty';
-import {PROPERTIES_TYPE} from 'src/script/properties/PropertiesType';
 import {EventName} from 'src/script/tracking/EventName';
 import {CONVERSATION_TYPING_INDICATOR_MODE} from 'src/script/user/TypingIndicatorMode';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
@@ -61,7 +62,6 @@ import {usePing} from './usePing/usePing';
 import {useTypingIndicator} from './useTypingIndicator/useTypingIndicator';
 
 import {Config} from '../../Config';
-import {PropertiesRepository} from '../../properties/PropertiesRepository';
 import {SearchRepository} from '../../search/SearchRepository';
 import {StorageRepository} from '../../storage';
 import {TeamState} from '../../team/TeamState';

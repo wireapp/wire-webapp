@@ -30,6 +30,7 @@ import type {ConversationRepository} from 'Repositories/conversation/Conversatio
 import {ConversationState} from 'Repositories/conversation/ConversationState';
 import type {Conversation} from 'Repositories/entity/Conversation';
 import type {User} from 'Repositories/entity/User';
+import {PropertiesRepository} from 'Repositories/properties/PropertiesRepository';
 import {iterateItem} from 'Util/ArrayUtil';
 import {isEscapeKey} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
@@ -44,7 +45,6 @@ import {SidebarTabs, useSidebarStore} from '../page/LeftSidebar/panels/Conversat
 import {PanelState} from '../page/RightSidebar';
 import {useAppMainState} from '../page/state';
 import {ContentState, ListState, useAppState} from '../page/useAppState';
-import {PropertiesRepository} from '../properties/PropertiesRepository';
 import {SearchRepository} from '../search/SearchRepository';
 import type {TeamRepository} from '../team/TeamRepository';
 import {TeamState} from '../team/TeamState';

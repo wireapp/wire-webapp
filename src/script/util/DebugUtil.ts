@@ -53,6 +53,8 @@ import type {MessageRepository} from 'Repositories/conversation/MessageRepositor
 import {Conversation} from 'Repositories/entity/Conversation';
 import {User} from 'Repositories/entity/User';
 import {EventRepository} from 'Repositories/event/EventRepository';
+import {PropertiesRepository} from 'Repositories/properties/PropertiesRepository';
+import {PROPERTIES_TYPE} from 'Repositories/properties/PropertiesType';
 import {getStorage} from 'Util/localStorage';
 import {getLogger, Logger} from 'Util/Logger';
 
@@ -61,8 +63,6 @@ import {createUuid} from './uuid';
 
 import {E2EIHandler} from '../E2EIdentity';
 import {checkVersion} from '../lifecycle/newVersionHandler';
-import {PropertiesRepository} from '../properties/PropertiesRepository';
-import {PROPERTIES_TYPE} from '../properties/PropertiesType';
 import {APIClient} from '../service/APIClientSingleton';
 import {Core} from '../service/CoreSingleton';
 import {EventRecord, StorageRepository, StorageSchemata} from '../storage';
