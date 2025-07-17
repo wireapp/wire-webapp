@@ -26,6 +26,7 @@ import {UserVerificationBadges} from 'Components/Badge';
 import {ErrorFallback} from 'Components/ErrorFallback';
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {useEnrichedFields} from 'Components/panel/EnrichedFields';
+import {ClientRepository} from 'Repositories/client';
 import {ConversationState} from 'src/script/conversation/ConversationState';
 import {TeamCreationAccountHeader} from 'src/script/page/LeftSidebar/panels/Conversations/ConversationTabs/TeamCreation/TeamCreationAccountHeader';
 import {ContentState} from 'src/script/page/useAppState';
@@ -49,7 +50,6 @@ import {UsernameInput} from './accountPreferences/UsernameInput';
 import {PreferencesPage} from './components/PreferencesPage';
 import {PreferencesSection} from './components/PreferencesSection';
 
-import {ClientRepository} from '../../../../client';
 import {Config} from '../../../../Config';
 import {ConversationRepository} from '../../../../conversation/ConversationRepository';
 import {User} from '../../../../entity/User';

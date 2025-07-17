@@ -29,12 +29,12 @@ import {ModalComponent} from 'Components/Modals/ModalComponent';
 import {UserDevicesState, UserDevices} from 'Components/UserDevices';
 import {UserSearchableList} from 'Components/UserSearchableList';
 import {useUserDevicesHistory} from 'Hooks/useUserDevicesHistory';
+import {ClientRepository} from 'Repositories/client';
 import {handleEnterDown} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
 
 import {useLegalHoldModalState} from './LegalHoldModal.state';
 
-import {ClientRepository} from '../../../client';
 import {ConversationRepository} from '../../../conversation/ConversationRepository';
 import {MessageRepository} from '../../../conversation/MessageRepository';
 import {CryptographyRepository} from '../../../cryptography/CryptographyRepository';

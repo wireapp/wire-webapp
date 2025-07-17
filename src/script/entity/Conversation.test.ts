@@ -22,7 +22,7 @@
 import {ConnectionStatus} from '@wireapp/api-client/lib/connection/';
 import {CONVERSATION_TYPE} from '@wireapp/api-client/lib/conversation/';
 
-import {ClientEntity} from 'src/script/client/ClientEntity';
+import {ClientEntity} from 'Repositories/client/ClientEntity';
 import {ConnectionMapper} from 'src/script/connection/ConnectionMapper';
 import {ConversationMapper} from 'src/script/conversation/ConversationMapper';
 import {NOTIFICATION_STATE} from 'src/script/conversation/NotificationSetting';

@@ -26,10 +26,10 @@ import {groupBy} from 'underscore';
 
 import {WebAppEvents} from '@wireapp/webapp-events';
 
+import type {ClientEntity} from 'Repositories/client/ClientEntity';
 import {matchQualifiedIds} from 'Util/QualifiedId';
 import {loadValue, resetStoreValue, storeValue} from 'Util/StorageUtil';
 
-import type {ClientEntity} from '../client/ClientEntity';
 import type {User} from '../entity/User';
 import {PropertiesRepository} from '../properties/PropertiesRepository';
 

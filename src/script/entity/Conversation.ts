@@ -39,6 +39,7 @@ import {LegalHoldStatus} from '@wireapp/protocol-messaging';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {useLegalHoldModalState} from 'Components/Modals/LegalHoldModal/LegalHoldModal.state';
+import {ClientRepository} from 'Repositories/client';
 import {t} from 'Util/LocalizerUtil';
 import {getLogger, Logger} from 'Util/Logger';
 import {matchQualifiedIds} from 'Util/QualifiedId';
@@ -50,7 +51,6 @@ import type {Message} from './message/Message';
 import {PingMessage} from './message/PingMessage';
 import type {User} from './User';
 
-import {ClientRepository} from '../client';
 import {Config} from '../Config';
 import {ConnectionEntity} from '../connection/ConnectionEntity';
 import {ACCESS_STATE} from '../conversation/AccessState';

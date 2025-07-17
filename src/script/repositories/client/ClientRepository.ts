@@ -41,14 +41,14 @@ import type {ClientService} from './ClientService';
 import {ClientState} from './ClientState';
 import {isClientMLSCapable, wasClientActiveWithinLast4Weeks} from './ClientUtils';
 
-import {SIGN_OUT_REASON} from '../auth/SignOutReason';
-import {PrimaryModal} from '../components/Modals/PrimaryModal';
-import type {CryptographyRepository} from '../cryptography/CryptographyRepository';
-import type {User} from '../entity/User';
-import {ClientError} from '../error/ClientError';
-import {Core} from '../service/CoreSingleton';
-import {ClientRecord} from '../storage';
-import {StorageKey} from '../storage/StorageKey';
+import {SIGN_OUT_REASON} from '../../auth/SignOutReason';
+import {PrimaryModal} from '../../components/Modals/PrimaryModal';
+import type {CryptographyRepository} from '../../cryptography/CryptographyRepository';
+import type {User} from '../../entity/User';
+import {ClientError} from '../../error/ClientError';
+import {Core} from '../../service/CoreSingleton';
+import {ClientRecord} from '../../storage';
+import {StorageKey} from '../../storage/StorageKey';
 
 export type UserClientEntityMap = {[userId: string]: ClientEntity[]};
 export type QualifiedUserClientEntityMap = {[domain: string]: UserClientEntityMap};

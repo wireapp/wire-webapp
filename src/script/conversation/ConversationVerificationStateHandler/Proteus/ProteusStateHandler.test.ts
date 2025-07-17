@@ -17,7 +17,7 @@
  *
  */
 
-import {ClientEntity} from 'src/script/client/ClientEntity';
+import {ClientEntity} from 'Repositories/client/ClientEntity';
 import {ConversationVerificationState} from 'src/script/conversation/ConversationVerificationState';
 import {EventBuilder} from 'src/script/conversation/EventBuilder';
 import {Conversation} from 'src/script/entity/Conversation';

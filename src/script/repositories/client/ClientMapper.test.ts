@@ -23,7 +23,7 @@ import {entities, payload} from 'test/api/payloads';
 
 import {ClientMapper} from './ClientMapper';
 
-import {ClientRecord} from '../storage';
+import {ClientRecord} from '../../storage';
 
 describe('ClientMapper', () => {
   describe('mapClient', () => {
