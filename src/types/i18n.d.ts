@@ -393,6 +393,7 @@ declare module 'I18n/en-US.json' {
     'cells.folderBreadcrumbCombained': `Show more`;
     'cells.heading': `All Files`;
     'cells.imageFullScreenModal.closeButton': `Close`;
+    'cells.imageFullScreenModal.downloadButton': `Download`;
     'cells.modal.closeButton': `Close`;
     'cells.moveNodeModal.cancelButton': `Cancel`;
     'cells.moveNodeModal.createFolder.hintButton': `Create a new folder`;
@@ -486,17 +487,17 @@ declare module 'I18n/en-US.json' {
     'cells.tableRow.shared.truthyValue': `Yes`;
     'cells.tableRow.size': `Size`;
     'cells.tableRow.tags': `Tags`;
+    'cells.tagsModal.apiError': `Something went wrong`;
     'cells.tagsModal.cancelButton': `Cancel`;
     'cells.tagsModal.createOptionLabel': `Create tag "{name}"`;
     'cells.tagsModal.description': `All members of your team can see and use those tags.`;
-    'cells.tagsModal.apiError': `Something went wrong`;
-    'cells.tagsModal.validationError.comma': `Tag names cannot contain commas`;
     'cells.tagsModal.label': `Tags`;
     'cells.tagsModal.loading': `Loading tags...`;
     'cells.tagsModal.noTagsFound': `No tags created yet. Type to add a tag.`;
     'cells.tagsModal.placeholder': `Enter or select a tag`;
     'cells.tagsModal.saveButton': `Save`;
     'cells.tagsModal.title': `Add or Remove Tags`;
+    'cells.tagsModal.validationError.comma': `Tag names cannot contain commas`;
     'cells.unavailableFile': `File not available`;
     'cells.unavailableFilePreview': `Couldn\'t generate preview`;
     'cellsMoveToRecycleBinModal.file.headline': `Delete file?`;
