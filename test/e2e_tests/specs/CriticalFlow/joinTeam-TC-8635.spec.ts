@@ -18,9 +18,9 @@
  */
 
 import {getUser} from 'test/e2e_tests/data/user';
-import {PageManager} from 'test/e2e_tests/pages/pageManager';
+import {PageManager} from 'test/e2e_tests/pageManager';
 import {addCreatedTeam, removeCreatedTeam} from 'test/e2e_tests/utils/tearDownUtil';
-import {loginUser, sendMessageFromAtoB} from 'test/e2e_tests/utils/userActions';
+import {loginUser, sendTextMessageToUser} from 'test/e2e_tests/utils/userActions';
 
 import {test, expect} from '../../test.fixtures';
 
@@ -32,13 +32,15 @@ const teamName = 'Critical';
 const conversationName = 'Crits';
 const textFromAToOwner = 'Hello Team Owner!';
 const textFromOwnerToA = 'Keep up the good work!';
-let adminPages: PageManager;
+let adminPageManager: PageManager;
 
 test(
   'New person joins team and setups up device',
   {tag: ['@TC-8635', '@crit-flow-web']},
-  async ({pages, api, browser}) => {
+  async ({pageManager, api, browser}) => {
     test.slow(); // Increasing test timeout to 90 seconds to accommodate the full flow
+
+    const {pages, components, modals} = pageManager.webapp;
 
     await test.step('Preconditions: Creating preconditions for the test via API', async () => {
       // Precondition: Team owner exists in a team with 1 team member
@@ -83,66 +85,72 @@ test(
       // Create Admin context for team owner
       const adminContext = await browser.newContext();
       const adminPage = await adminContext.newPage();
-      adminPages = new PageManager(adminPage);
+      adminPageManager = new PageManager(adminPage);
     });
 
     await test.step('A logs in', async () => {
-      await loginUser(memberA, pages);
+      await pageManager.openMainPage();
+      await loginUser(memberA, pageManager);
+      await modals.dataShareConsent().clickDecline();
     });
 
     await test.step('Owner logs in', async () => {
-      await loginUser(owner, adminPages);
+      await adminPageManager.openMainPage();
+      await loginUser(owner, adminPageManager);
+      await adminPageManager.webapp.modals.dataShareConsent().clickDecline();
     });
 
     await test.step('A searches for Team Owner', async () => {
-      await pages.conversationSidebar.clickConnectButton();
-      await pages.startUIPage.selectUser(owner.username);
-      expect(await pages.userProfileModal.isVisible());
-      await pages.userProfileModal.clickStartConversation();
+      await components.conversationSidebar().clickConnectButton();
+      await pages.startUI().selectUser(owner.username);
+      expect(await modals.userProfile().isVisible());
+      await modals.userProfile().clickStartConversation();
     });
 
     await test.step('A sends text to Team Owner', async () => {
-      await sendMessageFromAtoB(pages, owner, textFromAToOwner);
+      await sendTextMessageToUser(pageManager, owner, textFromAToOwner);
     });
 
     await test.step('Team owner receives text of A and sends a text to A', async () => {
-      await expect(pages.conversationPage.page.getByText(textFromAToOwner)).toBeVisible({timeout: 10000});
-      await sendMessageFromAtoB(adminPages, memberA, textFromOwnerToA);
+      await expect(pages.conversation().page.getByText(textFromAToOwner)).toBeVisible({timeout: 10000});
+      await sendTextMessageToUser(adminPageManager, memberA, textFromOwnerToA);
     });
 
     await test.step('A receives Text of Team Owner', async () => {
-      await expect(pages.conversationPage.page.getByText(textFromOwnerToA)).toBeVisible({timeout: 10000});
+      await expect(pages.conversation().page.getByText(textFromOwnerToA)).toBeVisible({timeout: 10000});
     });
 
     await test.step('Team owner adds A to chat', async () => {
+      const adminPages = adminPageManager.webapp.pages;
+
       // Team owner opens the group chat
-      await adminPages.conversationListPage.openConversation(conversationName);
-      expect(await adminPages.conversationPage.isConversationOpen(conversationName));
+      await adminPages.conversationList().openConversation(conversationName);
+      expect(await adminPages.conversation().isConversationOpen(conversationName));
 
       // Team owner opens group information and adds A to the group
-      await adminPages.conversationPage.openGroupInformation();
-      expect(await adminPages.conversationDetailsPage.isOpen(conversationName)).toBeTruthy();
-      await adminPages.conversationDetailsPage.clickAddPeopleButton();
-      await adminPages.conversationDetailsPage.addUsersToConversation([memberA.fullName]);
+      await adminPages.conversation().openGroupInformation();
+      expect(await adminPages.conversationDetails().isOpen(conversationName)).toBeTruthy();
+      await adminPages.conversationDetails().clickAddPeopleButton();
+      await adminPages.conversationDetails().addUsersToConversation([memberA.fullName]);
 
       // Team owner confirms the addition of A to the group
-      expect(await adminPages.conversationDetailsPage.isUserPartOfConversationAsMember(memberA.fullName));
+      expect(await adminPages.conversationDetails().isUserPartOfConversationAsMember(memberA.fullName));
       await expect(
-        adminPages.conversationPage.page.getByText(`You added ${memberA.fullName} to the conversation`),
+        adminPages.conversation().page.getByText(`You added ${memberA.fullName} to the conversation`),
       ).toBeVisible({timeout: 10000});
     });
 
     await test.step('A sees the chat', async () => {
-      await pages.conversationListPage.openConversation(conversationName);
-      expect(await adminPages.conversationPage.isConversationOpen(conversationName));
+      await pages.conversationList().openConversation(conversationName);
+      expect(await adminPageManager.webapp.pages.conversation().isConversationOpen(conversationName));
     });
 
     await test.step('Team owner mentions A', async () => {
-      await adminPages.conversationPage.sendMention(memberA.qualifiedId!.id);
+      await adminPageManager.webapp.pages.conversation().sendMention(memberA.qualifiedId!.id);
     });
 
     await test.step('A sees the mention in the chat', async () => {
-      await expect(pages.conversationPage.page.getByText(`@${memberA.fullName}`)).toBeVisible({timeout: 10000});
+      await expect(pages.conversation().page.getByText(`@${memberA.fullName}`)).toBeVisible({timeout: 10000});
     });
   },
 );

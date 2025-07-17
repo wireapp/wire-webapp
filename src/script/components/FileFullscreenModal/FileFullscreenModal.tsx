@@ -59,6 +59,7 @@ export const FileFullscreenModal = ({
       <FileHeader
         onClose={onClose}
         fileName={fileName}
+        filePreviewUrl={filePreviewUrl}
         fileExtension={fileExtension}
         senderName={senderName}
         timestamp={timestamp}

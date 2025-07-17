@@ -19,7 +19,7 @@
 
 import {Locator, Page} from '@playwright/test';
 
-import {escapeHtml} from '../utils/userDataProcessor';
+import {escapeHtml} from 'test/e2e_tests/utils/userDataProcessor';
 
 export class OutgoingConnectionPage {
   readonly page: Page;

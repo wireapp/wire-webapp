@@ -132,6 +132,8 @@ const MultipartAsset = ({
           size={size}
           isLoading={isLoading}
           isError={isError}
+          senderName={senderName}
+          timestamp={timestamp}
         />
       </li>
     );

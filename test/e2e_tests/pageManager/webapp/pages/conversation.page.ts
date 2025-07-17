@@ -19,7 +19,7 @@
 
 import {Locator, Page} from '@playwright/test';
 
-import {selectByDataAttribute} from '../utils/useSelector';
+import {selectByDataAttribute, selectById, selectByClass} from 'test/e2e_tests/utils/useSelector';
 
 export class ConversationPage {
   readonly page: Page;
@@ -31,6 +31,8 @@ export class ConversationPage {
   readonly messageInput: Locator;
   readonly sendMessageButton: Locator;
   readonly watermark: Locator;
+  readonly timerMessageButton: Locator;
+  readonly timerTenSecondsButton: Locator;
   readonly openGroupInformationViaName: Locator;
 
   constructor(page: Page) {
@@ -44,6 +46,8 @@ export class ConversationPage {
     this.watermark = page.locator(`${selectByDataAttribute('no-conversation')} svg`);
     this.sendMessageButton = page.locator(selectByDataAttribute('do-send-message'));
     this.openGroupInformationViaName = page.locator(selectByDataAttribute('status-conversation-title-bar-label'));
+    this.timerMessageButton = page.locator(selectByDataAttribute('do-set-ephemeral-timer'));
+    this.timerTenSecondsButton = page.locator(selectById('btn-10-seconds'));
   }
 
   async isConversationOpen(conversationName: string) {
@@ -62,6 +66,17 @@ export class ConversationPage {
     await this.messageInput.press('Enter');
   }
 
+  async createGroup(groupName: string) {
+    await this.createGroupButton.click();
+    await this.createGroupNameInput.fill(groupName);
+    await this.createGroupSubmitButton.click();
+  }
+
+  async enableAutoDeleteMessages() {
+    await this.timerMessageButton.click();
+    await this.timerTenSecondsButton.click();
+  }
+
   async sendMention(memberId: string) {
     await this.messageInput.fill(`@`);
     await this.page
@@ -74,7 +89,16 @@ export class ConversationPage {
   async isMessageVisible(messageText: string) {
     // Trying multiple times for the message to appear
     for (let i = 0; i < 10; i++) {
-      const messages = await this.page.locator(`${selectByDataAttribute('item-message')} .message-body`).all();
+      const locator = this.page.locator(
+        `${selectByDataAttribute('item-message')} ${selectByClass('message-body')}:not(:has(p${selectByClass('text-foreground')}))`,
+      );
+
+      // Wait for at least one matching element to appear (optional timeout can be set)
+      await locator.first().waitFor({state: 'visible'});
+
+      // Then get all matching elements
+      const messages = await locator.all();
+
       if (messages.length === 0) {
         continue;
       }
@@ -90,6 +114,14 @@ export class ConversationPage {
     }
 
     return false;
+  }
+
+  async isConversationReadonly() {
+    await this.messageInput.waitFor({state: 'detached'});
+  }
+
+  async isMessageInputVisible() {
+    return await this.messageInput.isVisible();
   }
 
   async openGroupInformation() {

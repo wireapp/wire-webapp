@@ -76,7 +76,7 @@ export const FileAssetWithPreview = ({
         <FileCard.Icon type={isError ? 'unavailable' : 'file'} />
         {!isError && <FileCard.Type />}
         <FileCard.Name variant={isError ? 'secondary' : 'primary'} />
-        <FileAssetOptions onOpen={() => setIsOpen(true)} />
+        <FileAssetOptions src={src} name={name} extension={extension} onOpen={() => setIsOpen(true)} />
       </FileCard.Header>
       <FileCard.Content>
         <button

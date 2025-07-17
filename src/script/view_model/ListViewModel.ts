@@ -448,6 +448,7 @@ export class ListViewModel {
       entries.push({
         click: () => this.clickToLeave(conversationEntity),
         label: conversationEntity.isChannel() ? t('channelsPopoverLeave') : t('groupsPopoverLeave'),
+        identifier: 'conversation-leave',
       });
     }
 
