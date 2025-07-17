@@ -30,7 +30,7 @@ import {Avatar, AVATAR_SIZE} from 'Components/Avatar';
 import {ConversationClassifiedBar} from 'Components/ClassifiedBar/ClassifiedBar';
 import {useFileUploadState} from 'Components/Conversation/useFilesUploadState/useFilesUploadState';
 import {EmojiPicker} from 'Components/EmojiPicker/EmojiPicker';
-import {CellsRepository} from 'src/script/cells/CellsRepository';
+import {CellsRepository} from 'Repositories/cells/CellsRepository';
 import {useUserPropertyValue} from 'src/script/hooks/useUserProperty';
 import {PROPERTIES_TYPE} from 'src/script/properties/PropertiesType';
 import {EventName} from 'src/script/tracking/EventName';

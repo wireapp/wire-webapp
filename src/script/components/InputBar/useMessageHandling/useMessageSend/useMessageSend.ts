@@ -27,7 +27,7 @@ import {useFileUploadState} from 'Components/Conversation/useFilesUploadState/us
 import {MessageContent} from 'Components/InputBar/common/messageContent/messageContent';
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {showWarningModal} from 'Components/Modals/utils/showWarningModal';
-import {CellsRepository} from 'src/script/cells/CellsRepository';
+import {CellsRepository} from 'Repositories/cells/CellsRepository';
 import {Config} from 'src/script/Config';
 import {ConversationRepository} from 'src/script/conversation/ConversationRepository';
 import {ConversationVerificationState} from 'src/script/conversation/ConversationVerificationState';

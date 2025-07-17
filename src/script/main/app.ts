@@ -43,6 +43,7 @@ import {BackupRepository} from 'Repositories/backup/BackupRepository';
 import {BackupService} from 'Repositories/backup/BackupService';
 import {CacheRepository} from 'Repositories/cache/CacheRepository';
 import {CallingRepository} from 'Repositories/calling/CallingRepository';
+import {CellsRepository} from 'Repositories/cells/CellsRepository';
 import {initializeDataDog} from 'Util/DataDog';
 import {DebugUtil} from 'Util/DebugUtil';
 import {Environment} from 'Util/Environment';
@@ -56,7 +57,6 @@ import {AppInitializationStep, checkIndexedDb, InitializationEventLogger} from '
 import '../../style/default.less';
 import {SIGN_OUT_REASON} from '../auth/SignOutReason';
 import {URLParameter} from '../auth/URLParameter';
-import {CellsRepository} from '../cells/CellsRepository';
 import {ClientRepository, ClientService} from '../client';
 import {getClientMLSConfig} from '../client/clientMLSConfig';
 import {Config, Configuration} from '../Config';
