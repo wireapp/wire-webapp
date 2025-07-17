@@ -30,6 +30,7 @@ import {UserBlockedBadge} from 'Components/Badge';
 import {CellDescription} from 'Components/ConversationListCell/components/CellDescription';
 import {UserInfo} from 'Components/UserInfo';
 import type {Conversation} from 'Repositories/entity/Conversation';
+import {MediaType} from 'Repositories/media/MediaType';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {isKey, isOneOfKeys, KEY} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
@@ -37,8 +38,6 @@ import {useChannelsFeatureFlag} from 'Util/useChannelsFeatureFlag';
 import {noop, setContextMenuPosition} from 'Util/util';
 
 import {StatusIcon} from './components/StatusIcon';
-
-import {MediaType} from '../../media/MediaType';
 
 export interface ConversationListCellProps {
   conversation: Conversation;

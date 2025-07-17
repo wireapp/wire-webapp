@@ -39,13 +39,13 @@ import {ConversationState} from 'Repositories/conversation/ConversationState';
 import {ConversationVerificationState} from 'Repositories/conversation/ConversationVerificationState';
 import type {Conversation} from 'Repositories/entity/Conversation';
 import type {User} from 'Repositories/entity/User';
+import type {ElectronDesktopCapturerSource, MediaDevicesHandler} from 'Repositories/media/MediaDevicesHandler';
+import type {MediaStreamHandler} from 'Repositories/media/MediaStreamHandler';
 import {replaceLink, t} from 'Util/LocalizerUtil';
 import {matchQualifiedIds} from 'Util/QualifiedId';
 import {safeWindowOpen} from 'Util/SanitizationUtil';
 
 import {Config} from '../Config';
-import type {ElectronDesktopCapturerSource, MediaDevicesHandler} from '../media/MediaDevicesHandler';
-import type {MediaStreamHandler} from '../media/MediaStreamHandler';
 import type {PermissionRepository} from '../permission/PermissionRepository';
 import {PermissionStatusState} from '../permission/PermissionStatusState';
 import {PropertiesRepository} from '../properties/PropertiesRepository';

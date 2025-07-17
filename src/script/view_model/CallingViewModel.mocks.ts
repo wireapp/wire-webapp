@@ -26,10 +26,10 @@ import {Call} from 'Repositories/calling/Call';
 import {CallingRepository} from 'Repositories/calling/CallingRepository';
 import {CallState} from 'Repositories/calling/CallState';
 import {Conversation} from 'Repositories/entity/Conversation';
+import {MediaDevicesHandler} from 'Repositories/media/MediaDevicesHandler';
 
 import {CallingViewModel} from './CallingViewModel';
 
-import {MediaDevicesHandler} from '../media/MediaDevicesHandler';
 import {Core} from '../service/CoreSingleton';
 
 export const mockCallingRepository = {

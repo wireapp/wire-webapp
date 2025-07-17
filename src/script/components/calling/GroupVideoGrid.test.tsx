@@ -26,7 +26,7 @@ import {Call} from 'Repositories/calling/Call';
 import {Participant} from 'Repositories/calling/Participant';
 import {Conversation} from 'Repositories/entity/Conversation';
 import {User} from 'Repositories/entity/User';
-import {MediaDevicesHandler} from 'src/script/media/MediaDevicesHandler';
+import {MediaDevicesHandler} from 'Repositories/media/MediaDevicesHandler';
 
 import {GroupVideoGrid, GroupVideoGripProps} from './GroupVideoGrid';
 

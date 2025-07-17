@@ -25,7 +25,7 @@ import {createUuid} from 'Util/uuid';
 import {MediaConstraintsHandler, ScreensharingMethods} from './MediaConstraintsHandler';
 import {CurrentAvailableDeviceId} from './MediaDevicesHandler';
 
-import {UserState} from '../user/UserState';
+import {UserState} from '../../user/UserState';
 
 describe('MediaConstraintsHandler', () => {
   const createAvailableDevices = (deviceId?: string): CurrentAvailableDeviceId => ({

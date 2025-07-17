@@ -19,7 +19,8 @@
 
 import {useInitializeMediaDevices} from 'Hooks/useInitializeMediaDevices';
 import type {CallingRepository} from 'Repositories/calling/CallingRepository';
-import {MediaDeviceType} from 'src/script/media/MediaDeviceType';
+import {MediaDeviceType} from 'Repositories/media/MediaDeviceType';
+import type {MediaRepository} from 'Repositories/media/MediaRepository';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 
@@ -31,7 +32,6 @@ import {SaveCallLogs} from './avPreferences/SaveCallLogs';
 import {PreferencesPage} from './components/PreferencesPage';
 import {useCameraReloadOnCallEnd} from './useCameraReloadOnCallEnd';
 
-import type {MediaRepository} from '../../../../media/MediaRepository';
 import type {PropertiesRepository} from '../../../../properties/PropertiesRepository';
 
 interface AVPreferencesProps {

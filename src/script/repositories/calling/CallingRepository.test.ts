@@ -34,7 +34,7 @@ import {User} from 'Repositories/entity/User';
 import {CallingEvent} from 'Repositories/event/CallingEvent';
 import {CALL} from 'Repositories/event/Client';
 import {EventRepository} from 'Repositories/event/EventRepository';
-import {MediaType} from 'src/script/media/MediaType';
+import {MediaType} from 'Repositories/media/MediaType';
 import {serverTimeHandler} from 'src/script/time/serverTimeHandler';
 import {TestFactory} from 'test/helper/TestFactory';
 import {createUuid} from 'Util/uuid';

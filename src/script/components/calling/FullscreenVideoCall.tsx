@@ -46,6 +46,7 @@ import {CallingViewMode, CallState, MuteState} from 'Repositories/calling/CallSt
 import {Participant} from 'Repositories/calling/Participant';
 import type {Grid} from 'Repositories/calling/videoGridHandler';
 import type {Conversation} from 'Repositories/entity/Conversation';
+import {MediaDevicesHandler} from 'Repositories/media/MediaDevicesHandler';
 import {useActiveWindowMatchMedia} from 'src/script/hooks/useActiveWindowMatchMedia';
 import {useToggleState} from 'src/script/hooks/useToggleState';
 import {PropertiesRepository} from 'src/script/properties/PropertiesRepository';
@@ -71,7 +72,6 @@ import {GroupVideoGrid} from './GroupVideoGrid';
 import {Pagination} from './Pagination/Pagination';
 import {VideoControls} from './VideoControls/VideoControls';
 
-import {MediaDevicesHandler} from '../../media/MediaDevicesHandler';
 import {TeamState} from '../../team/TeamState';
 import {useWarningsState} from '../../view_model/WarningsContainer/WarningsState';
 import {CONFIG, TYPE} from '../../view_model/WarningsContainer/WarningsTypes';
