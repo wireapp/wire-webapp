@@ -54,6 +54,7 @@ import {ConversationVerificationState} from 'Repositories/conversation/Conversat
 import {OnConversationE2EIVerificationStateChange} from 'Repositories/conversation/ConversationVerificationStateHandler/shared';
 import {EventBuilder} from 'Repositories/conversation/EventBuilder';
 import {MessageRepository} from 'Repositories/conversation/MessageRepository';
+import {CryptographyRepository} from 'Repositories/cryptography/CryptographyRepository';
 import {initializeDataDog} from 'Util/DataDog';
 import {DebugUtil} from 'Util/DebugUtil';
 import {Environment} from 'Util/Environment';
@@ -68,7 +69,6 @@ import '../../style/default.less';
 import {SIGN_OUT_REASON} from '../auth/SignOutReason';
 import {URLParameter} from '../auth/URLParameter';
 import {Config, Configuration} from '../Config';
-import {CryptographyRepository} from '../cryptography/CryptographyRepository';
 import {E2EIHandler} from '../E2EIdentity';
 import {getModalOptions, ModalType} from '../E2EIdentity/Modals';
 import {User} from '../entity/User';

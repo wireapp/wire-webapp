@@ -38,13 +38,13 @@ import {
   Text,
 } from '@wireapp/protocol-messaging';
 
-import {PROTO_MESSAGE_TYPE} from 'src/script/cryptography/ProtoMessageType';
 import {CryptographyError} from 'src/script/error/CryptographyError';
 import {ClientEvent} from 'src/script/event/Client';
 import {arrayToBase64} from 'Util/util';
 import {createUuid} from 'Util/uuid';
 
 import {CryptographyMapper} from './CryptographyMapper';
+import {PROTO_MESSAGE_TYPE} from './ProtoMessageType';
 
 describe('CryptographyMapper', () => {
   const coreMock = {

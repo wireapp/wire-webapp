@@ -28,13 +28,13 @@ import type {ClientRepository} from 'Repositories/client';
 import type {ConnectionRepository} from 'Repositories/connection/ConnectionRepository';
 import type {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
 import type {MessageRepository} from 'Repositories/conversation/MessageRepository';
+import type {CryptographyRepository} from 'Repositories/cryptography/CryptographyRepository';
 
 import {ActionsViewModel} from './ActionsViewModel';
 import {CallingViewModel} from './CallingViewModel';
 import {ContentViewModel} from './ContentViewModel';
 import {ListViewModel} from './ListViewModel';
 
-import type {CryptographyRepository} from '../cryptography/CryptographyRepository';
 import type {EventRepository} from '../event/EventRepository';
 import type {GiphyRepository} from '../extension/GiphyRepository';
 import type {IntegrationRepository} from '../integration/IntegrationRepository';

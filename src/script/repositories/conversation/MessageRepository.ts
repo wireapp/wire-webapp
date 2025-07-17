@@ -55,6 +55,8 @@ import {AssetTransferState} from 'Repositories/assets/AssetTransferState';
 import {AudioRepository} from 'Repositories/audio/AudioRepository';
 import {AudioType} from 'Repositories/audio/AudioType';
 import {ClientState} from 'Repositories/client/ClientState';
+import {CryptographyRepository} from 'Repositories/cryptography/CryptographyRepository';
+import {PROTO_MESSAGE_TYPE} from 'Repositories/cryptography/ProtoMessageType';
 import {
   cancelSendingLinkPreview,
   clearLinkPreviewSendingState,
@@ -81,8 +83,6 @@ import {EventBuilder} from './EventBuilder';
 import {EventMapper} from './EventMapper';
 import {getLinkPreviewFromString} from './linkPreviews';
 
-import {CryptographyRepository} from '../../cryptography/CryptographyRepository';
-import {PROTO_MESSAGE_TYPE} from '../../cryptography/ProtoMessageType';
 import {Conversation} from '../../entity/Conversation';
 import {CompositeMessage} from '../../entity/message/CompositeMessage';
 import {ContentMessage} from '../../entity/message/ContentMessage';

@@ -25,7 +25,7 @@ import {getLogger, Logger} from 'Util/Logger';
 
 import {CryptographyMapper} from './CryptographyMapper';
 
-import {Core} from '../service/CoreSingleton';
+import {Core} from '../../service/CoreSingleton';
 
 export interface SignalingKeys {
   enckey: string;
