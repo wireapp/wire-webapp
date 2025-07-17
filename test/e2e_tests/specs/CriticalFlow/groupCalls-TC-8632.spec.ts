@@ -28,6 +28,10 @@ import {test, expect} from '../../test.fixtures';
 import {addCreatedTeam, removeCreatedTeam} from '../../utils/tearDownUtil';
 
 const owner = getUser();
+owner.firstName = 'integrationtest';
+owner.lastName = 'integrationtest';
+owner.fullName = 'integrationtest';
+
 let memberContext: BrowserContext | undefined;
 
 test(
@@ -61,7 +65,7 @@ test(
 
       await api.createPersonalUser(member, invitationCode);
       await api.enableConferenceCallingFeature(teamId);
-      await api.waitForFeatureToBeEnabled(FEATURE_KEY.CONFERENCE_CALLING, owner.token);
+      await api.waitForFeatureToBeEnabled(FEATURE_KEY.CONFERENCE_CALLING, owner.teamId!, owner.token);
     });
 
     await test.step('Login: Owner and member sign in', async () => {
