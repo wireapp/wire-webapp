@@ -34,13 +34,13 @@ import {NOTIFICATION_STATE} from 'Repositories/conversation/NotificationSetting'
 import type {Conversation} from 'Repositories/entity/Conversation';
 import type {Message} from 'Repositories/entity/message/Message';
 import type {User} from 'Repositories/entity/User';
+import type {IntegrationRepository} from 'Repositories/integration/IntegrationRepository';
+import type {ServiceEntity} from 'Repositories/integration/ServiceEntity';
 import {t} from 'Util/LocalizerUtil';
 import {isBackendError} from 'Util/TypePredicateUtil';
 
 import type {MainViewModel} from './MainViewModel';
 
-import type {IntegrationRepository} from '../integration/IntegrationRepository';
-import type {ServiceEntity} from '../integration/ServiceEntity';
 import {SelfRepository} from '../self/SelfRepository';
 import {UserState} from '../user/UserState';
 

@@ -20,7 +20,7 @@
 import type {Provider, Service} from '@wireapp/api-client/lib/team/service/';
 import {container} from 'tsyringe';
 
-import {APIClient} from '../service/APIClientSingleton';
+import {APIClient} from '../../service/APIClientSingleton';
 
 export class IntegrationService {
   constructor(private readonly apiClient = container.resolve(APIClient)) {}

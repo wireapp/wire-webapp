@@ -42,6 +42,8 @@ import {AssetRepository} from 'Repositories/assets/AssetRepository';
 import {User} from 'Repositories/entity/User';
 import {EventSource} from 'Repositories/event/EventSource';
 import {NOTIFICATION_HANDLING_STATE} from 'Repositories/event/NotificationHandlingState';
+import {IntegrationMapper} from 'Repositories/integration/IntegrationMapper';
+import {ServiceEntity} from 'Repositories/integration/ServiceEntity';
 import {Config} from 'src/script/Config';
 import {Environment} from 'Util/Environment';
 import {replaceLink, t} from 'Util/LocalizerUtil';
@@ -55,8 +57,6 @@ import {TeamMemberEntity} from './TeamMemberEntity';
 import {TeamService} from './TeamService';
 import {TeamState} from './TeamState';
 
-import {IntegrationMapper} from '../integration/IntegrationMapper';
-import {ServiceEntity} from '../integration/ServiceEntity';
 import {scheduleRecurringTask, updateRemoteConfigLogger} from '../lifecycle/updateRemoteConfigs';
 import {getMLSMigrationStatus, MLSMigrationStatus} from '../mls/MLSMigration/migrationStatus';
 import {APIClient} from '../service/APIClientSingleton';

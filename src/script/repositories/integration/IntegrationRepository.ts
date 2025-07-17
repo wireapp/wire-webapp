@@ -34,8 +34,8 @@ import type {IntegrationService} from './IntegrationService';
 import {ProviderEntity} from './ProviderEntity';
 import {ServiceEntity} from './ServiceEntity';
 
-import type {TeamRepository} from '../team/TeamRepository';
-import {TeamState} from '../team/TeamState';
+import type {TeamRepository} from '../../team/TeamRepository';
+import {TeamState} from '../../team/TeamState';
 
 export class IntegrationRepository {
   private readonly logger: Logger;

@@ -29,6 +29,7 @@ import {ConversationState} from 'Repositories/conversation/ConversationState';
 import {Conversation} from 'Repositories/entity/Conversation';
 import {Message} from 'Repositories/entity/message/Message';
 import {User} from 'Repositories/entity/User';
+import {ServiceEntity} from 'Repositories/integration/ServiceEntity';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 
 import {Access} from './Access/Access';
@@ -47,7 +48,6 @@ import {TimedMessages} from './TimedMessages';
 import {isReadableMessage} from '../../guards/Message';
 import {isUserEntity, isUserServiceEntity} from '../../guards/Panel';
 import {isServiceEntity} from '../../guards/Service';
-import {ServiceEntity} from '../../integration/ServiceEntity';
 import {Core} from '../../service/CoreSingleton';
 import {TeamState} from '../../team/TeamState';
 import {UserState} from '../../user/UserState';

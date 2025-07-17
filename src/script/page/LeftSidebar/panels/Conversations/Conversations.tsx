@@ -33,7 +33,7 @@ import {ConversationRepository} from 'Repositories/conversation/ConversationRepo
 import {ConversationState} from 'Repositories/conversation/ConversationState';
 import type {Conversation} from 'Repositories/entity/Conversation';
 import {User} from 'Repositories/entity/User';
-import {IntegrationRepository} from 'src/script/integration/IntegrationRepository';
+import {IntegrationRepository} from 'Repositories/integration/IntegrationRepository';
 import {Preferences} from 'src/script/page/LeftSidebar/panels/Preferences';
 import {ANIMATED_PAGE_TRANSITION_DURATION} from 'src/script/page/MainContent';
 import {useAppMainState, ViewType} from 'src/script/page/state';

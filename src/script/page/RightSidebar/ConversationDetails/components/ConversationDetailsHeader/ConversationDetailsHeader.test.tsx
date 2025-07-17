@@ -22,7 +22,7 @@ import {CONVERSATION_TYPE} from '@wireapp/api-client/lib/conversation';
 
 import {Conversation} from 'Repositories/entity/Conversation';
 import {User} from 'Repositories/entity/User';
-import {ServiceEntity} from 'src/script/integration/ServiceEntity';
+import {ServiceEntity} from 'Repositories/integration/ServiceEntity';
 import {createUuid} from 'Util/uuid';
 
 import {ConversationDetailsHeader} from './ConversationDetailsHeader';

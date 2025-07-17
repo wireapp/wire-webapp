@@ -25,7 +25,7 @@ import {UserBlockedBadge, UserVerificationBadges} from 'Components/Badge';
 import * as Icon from 'Components/Icon';
 import {UserInfo} from 'Components/UserInfo';
 import {User} from 'Repositories/entity/User';
-import {ServiceEntity} from 'src/script/integration/ServiceEntity';
+import {ServiceEntity} from 'Repositories/integration/ServiceEntity';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 
 import {

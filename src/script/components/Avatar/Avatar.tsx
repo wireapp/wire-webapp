@@ -20,6 +20,7 @@
 import {HTMLProps, MouseEvent as ReactMouseEvent, KeyboardEvent as ReactKeyBoardEvent} from 'react';
 
 import {User} from 'Repositories/entity/User';
+import {ServiceEntity} from 'Repositories/integration/ServiceEntity';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {handleKeyDown, isKeyboardEvent, KEY} from 'Util/KeyboardUtil';
 
@@ -29,7 +30,6 @@ import {TemporaryGuestAvatar} from './TemporaryGuestAvatar';
 import {UserAvatar} from './UserAvatar';
 
 import {isServiceEntity} from '../../guards/Service';
-import {ServiceEntity} from '../../integration/ServiceEntity';
 
 export enum AVATAR_SIZE {
   LARGE = 'avatar-l',

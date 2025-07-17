@@ -40,6 +40,7 @@ import {DecryptErrorMessage} from 'Repositories/entity/message/DecryptErrorMessa
 import {MemberMessage} from 'Repositories/entity/message/MemberMessage';
 import {Message} from 'Repositories/entity/message/Message';
 import {User} from 'Repositories/entity/User';
+import {ServiceEntity} from 'Repositories/integration/ServiceEntity';
 import {Config} from 'src/script/Config';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {isLastReceivedMessage} from 'Util/conversationMessages';
@@ -63,7 +64,6 @@ import {checkFileSharingPermission} from './utils/checkFileSharingPermission';
 import {UserError} from '../../error/UserError';
 import {isMouseRightClickEvent, isAuxRightClickEvent} from '../../guards/Mouse';
 import {isServiceEntity} from '../../guards/Service';
-import {ServiceEntity} from '../../integration/ServiceEntity';
 import {MotionDuration} from '../../motion/MotionDuration';
 import {RightSidebarParams} from '../../page/AppMain';
 import {PanelState} from '../../page/RightSidebar';

@@ -67,6 +67,8 @@ import {ServiceMiddleware} from 'Repositories/event/preprocessor/ServiceMiddlewa
 import {FederationEventProcessor} from 'Repositories/event/processor/FederationEventProcessor';
 import {GiphyRepository} from 'Repositories/extension/GiphyRepository';
 import {GiphyService} from 'Repositories/extension/GiphyService';
+import {IntegrationRepository} from 'Repositories/integration/IntegrationRepository';
+import {IntegrationService} from 'Repositories/integration/IntegrationService';
 import {initializeDataDog} from 'Util/DataDog';
 import {DebugUtil} from 'Util/DebugUtil';
 import {Environment} from 'Util/Environment';
@@ -89,8 +91,6 @@ import {BaseError} from '../error/BaseError';
 import {CLIENT_ERROR_TYPE, ClientError} from '../error/ClientError';
 import {TeamError} from '../error/TeamError';
 import {externalUrl} from '../externalRoute';
-import {IntegrationRepository} from '../integration/IntegrationRepository';
-import {IntegrationService} from '../integration/IntegrationService';
 import {startNewVersionPolling} from '../lifecycle/newVersionHandler';
 import {scheduleApiVersionUpdate, updateApiVersion} from '../lifecycle/updateRemoteConfigs';
 import {MediaRepository} from '../media/MediaRepository';

@@ -30,7 +30,7 @@ import type {DecryptErrorMessage} from 'Repositories/entity/message/DecryptError
 import type {MemberMessage as MemberMessageEntity} from 'Repositories/entity/message/MemberMessage';
 import {Message as BaseMessage} from 'Repositories/entity/message/Message';
 import type {User} from 'Repositories/entity/User';
-import {ServiceEntity} from 'src/script/integration/ServiceEntity';
+import {ServiceEntity} from 'Repositories/integration/ServiceEntity';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {getAllFocusableElements, setElementsTabIndex} from 'Util/focusUtil';
 import {isTabKey} from 'Util/KeyboardUtil';

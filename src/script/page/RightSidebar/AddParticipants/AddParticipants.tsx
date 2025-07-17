@@ -32,6 +32,8 @@ import {UserSearchableList} from 'Components/UserSearchableList';
 import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
 import {Conversation} from 'Repositories/entity/Conversation';
 import {User} from 'Repositories/entity/User';
+import {IntegrationRepository} from 'Repositories/integration/IntegrationRepository';
+import {ServiceEntity} from 'Repositories/integration/ServiceEntity';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {handleKeyDown, KEY} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
@@ -39,8 +41,6 @@ import {safeWindowOpen} from 'Util/SanitizationUtil';
 import {sortUsersByPriority} from 'Util/StringUtil';
 
 import {getManageServicesUrl} from '../../../externalRoute';
-import {IntegrationRepository} from '../../../integration/IntegrationRepository';
-import {ServiceEntity} from '../../../integration/ServiceEntity';
 import {SearchRepository} from '../../../search/SearchRepository';
 import {TeamRepository} from '../../../team/TeamRepository';
 import {TeamState} from '../../../team/TeamState';
