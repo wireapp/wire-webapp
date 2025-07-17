@@ -18,6 +18,7 @@
  */
 
 import {BrowserContext} from '@playwright/test';
+import {FEATURE_KEY} from '@wireapp/api-client/lib/team/feature';
 
 import {PageManager} from 'test/e2e_tests/pageManager';
 import {loginUser} from 'test/e2e_tests/utils/userActions';
@@ -60,7 +61,7 @@ test(
 
       await api.createPersonalUser(member, invitationCode);
       await api.enableConferenceCallingFeature(teamId);
-      await api.waitForConferenceCallingFeatureEnabled(owner.token);
+      await api.waitForFeatureToBeEnabled(FEATURE_KEY.CONFERENCE_CALLING, owner.token);
     });
 
     await test.step('Login: Owner and member sign in', async () => {

@@ -17,19 +17,12 @@
  *
  */
 
+import {FEATURE_KEY} from '@wireapp/api-client/lib/team/feature';
+
 import {BackendClientE2E} from './backendClient.e2e';
 export class FeatureConfigRepositoryE2E extends BackendClientE2E {
-  async isMlsEnabled(token: string): Promise<boolean> {
-    const response = await this.axiosInstance.get('feature-configs/mls', {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
-    return response.data.status === 'enabled';
-  }
-
-  async isConferenceCallingEnabled(token: string): Promise<boolean> {
-    const response = await this.axiosInstance.get('feature-configs/conferenceCalling', {
+  async isFeatureEnabled(token: string, featureKey: FEATURE_KEY): Promise<boolean> {
+    const response = await this.axiosInstance.get(`feature-configs/${featureKey}`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
