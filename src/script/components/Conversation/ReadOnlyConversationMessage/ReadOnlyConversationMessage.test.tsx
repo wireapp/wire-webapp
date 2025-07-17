@@ -22,8 +22,8 @@ import {ConnectionStatus} from '@wireapp/api-client/lib/connection';
 import {CONVERSATION_TYPE} from '@wireapp/api-client/lib/conversation';
 
 import {ConnectionEntity} from 'Repositories/connection/ConnectionEntity';
+import {CONVERSATION_READONLY_STATE} from 'Repositories/conversation/ConversationRepository';
 import {withTheme} from 'src/script/auth/util/test/TestUtil';
-import {CONVERSATION_READONLY_STATE} from 'src/script/conversation/ConversationRepository';
 import {Conversation} from 'src/script/entity/Conversation';
 import {User} from 'src/script/entity/User';
 

@@ -22,7 +22,7 @@ import {container} from 'tsyringe';
 import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
 
 import {CellsRepository} from 'Repositories/cells/CellsRepository';
-import {ConversationRepository} from 'src/script/conversation/ConversationRepository';
+import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
 import {UserRepository} from 'src/script/user/UserRepository';
 import {t} from 'Util/LocalizerUtil';
 

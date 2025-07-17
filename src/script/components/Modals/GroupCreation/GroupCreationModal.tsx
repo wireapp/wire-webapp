@@ -36,6 +36,13 @@ import {SearchInput} from 'Components/SearchInput';
 import {TextInput} from 'Components/TextInput';
 import {InfoToggle} from 'Components/toggle/InfoToggle';
 import {UserSearchableList} from 'Components/UserSearchableList';
+import {ACCESS_STATE} from 'Repositories/conversation/AccessState';
+import {
+  ACCESS_TYPES,
+  teamPermissionsForAccessState,
+  toggleFeature,
+} from 'Repositories/conversation/ConversationAccessPermission';
+import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
 import {SidebarTabs, useSidebarStore} from 'src/script/page/LeftSidebar/panels/Conversations/useSidebarStore';
 import {generateConversationUrl} from 'src/script/router/routeGenerator';
 import {createNavigate, createNavigateKeyboard} from 'src/script/router/routerBindings';
@@ -45,13 +52,6 @@ import {replaceLink, t} from 'Util/LocalizerUtil';
 import {sortUsersByPriority} from 'Util/StringUtil';
 
 import {Config} from '../../../Config';
-import {ACCESS_STATE} from '../../../conversation/AccessState';
-import {
-  ACCESS_TYPES,
-  teamPermissionsForAccessState,
-  toggleFeature,
-} from '../../../conversation/ConversationAccessPermission';
-import {ConversationRepository} from '../../../conversation/ConversationRepository';
 import {User} from '../../../entity/User';
 import {isProtocolOption, ProtocolOption} from '../../../guards/Protocol';
 import {RootContext} from '../../../page/RootProvider';

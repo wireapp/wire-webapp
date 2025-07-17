@@ -22,8 +22,8 @@ import React from 'react';
 import {act, render} from '@testing-library/react';
 import {observable} from 'knockout';
 
+import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
 import {withTheme} from 'src/script/auth/util/test/TestUtil';
-import {ConversationRepository} from 'src/script/conversation/ConversationRepository';
 import {User} from 'src/script/entity/User';
 import {ListState} from 'src/script/page/useAppState';
 import {SearchRepository} from 'src/script/search/SearchRepository';

@@ -17,7 +17,7 @@
  *
  */
 
-import {MessageAddEvent} from 'src/script/conversation/EventBuilder';
+import {MessageAddEvent} from 'Repositories/conversation/EventBuilder';
 import {EventError} from 'src/script/error/EventError';
 import {StoredEvent} from 'src/script/storage';
 

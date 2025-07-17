@@ -36,7 +36,8 @@ import {WIDTH} from '@wireapp/react-ui-kit';
 import {ConversationListCell} from 'Components/ConversationListCell';
 import {Call} from 'Repositories/calling/Call';
 import {CallState} from 'Repositories/calling/CallState';
-import {ConversationLabel, ConversationLabelRepository} from 'src/script/conversation/ConversationLabelRepository';
+import {ConversationLabel, ConversationLabelRepository} from 'Repositories/conversation/ConversationLabelRepository';
+import {ConversationState} from 'Repositories/conversation/ConversationState';
 import {User} from 'src/script/entity/User';
 import {SidebarTabs, useSidebarStore} from 'src/script/page/LeftSidebar/panels/Conversations/useSidebarStore';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
@@ -49,7 +50,6 @@ import {ConnectionRequests} from './ConnectionRequests';
 import {conversationsList, headingTitle, noResultsMessage, virtualizationStyles} from './ConversationsList.styles';
 import {conversationSearchFilter, getConversationsWithHeadings} from './helpers';
 
-import {ConversationState} from '../../../../conversation/ConversationState';
 import {Conversation} from '../../../../entity/Conversation';
 import {generateConversationUrl} from '../../../../router/routeGenerator';
 import {createNavigate, createNavigateKeyboard} from '../../../../router/routerBindings';

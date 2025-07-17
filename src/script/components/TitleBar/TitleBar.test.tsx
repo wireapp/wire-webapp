@@ -29,11 +29,11 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 import {TitleBar} from 'Components/TitleBar';
 import {CallingRepository} from 'Repositories/calling/CallingRepository';
 import {CallState} from 'Repositories/calling/CallState';
+import {ConversationVerificationState} from 'Repositories/conversation/ConversationVerificationState';
 import {withTheme} from 'src/script/auth/util/test/TestUtil';
 import {ContentState} from 'src/script/page/useAppState';
 
 import {TestFactory} from '../../../../test/helper/TestFactory';
-import {ConversationVerificationState} from '../../conversation/ConversationVerificationState';
 import {Conversation} from '../../entity/Conversation';
 import {User} from '../../entity/User';
 import {PanelState} from '../../page/RightSidebar/RightSidebar';

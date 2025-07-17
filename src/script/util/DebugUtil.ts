@@ -46,16 +46,16 @@ import {Participant} from 'Repositories/calling/Participant';
 import {ClientRepository} from 'Repositories/client';
 import {ClientState} from 'Repositories/client/ClientState';
 import {ConnectionRepository} from 'Repositories/connection/ConnectionRepository';
+import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
+import {isMLSCapableConversation} from 'Repositories/conversation/ConversationSelectors';
+import {ConversationState} from 'Repositories/conversation/ConversationState';
+import type {MessageRepository} from 'Repositories/conversation/MessageRepository';
 import {getStorage} from 'Util/localStorage';
 import {getLogger, Logger} from 'Util/Logger';
 
 import {TIME_IN_MILLIS} from './TimeUtil';
 import {createUuid} from './uuid';
 
-import {ConversationRepository} from '../conversation/ConversationRepository';
-import {isMLSCapableConversation} from '../conversation/ConversationSelectors';
-import {ConversationState} from '../conversation/ConversationState';
-import type {MessageRepository} from '../conversation/MessageRepository';
 import {E2EIHandler} from '../E2EIdentity';
 import {Conversation} from '../entity/Conversation';
 import {User} from '../entity/User';

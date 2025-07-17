@@ -28,10 +28,10 @@ import {MessageContent} from 'Components/InputBar/common/messageContent/messageC
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {showWarningModal} from 'Components/Modals/utils/showWarningModal';
 import {CellsRepository} from 'Repositories/cells/CellsRepository';
+import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
+import {ConversationVerificationState} from 'Repositories/conversation/ConversationVerificationState';
+import {MessageRepository, OutgoingQuote} from 'Repositories/conversation/MessageRepository';
 import {Config} from 'src/script/Config';
-import {ConversationRepository} from 'src/script/conversation/ConversationRepository';
-import {ConversationVerificationState} from 'src/script/conversation/ConversationVerificationState';
-import {MessageRepository, OutgoingQuote} from 'src/script/conversation/MessageRepository';
 import {Conversation} from 'src/script/entity/Conversation';
 import {ContentMessage} from 'src/script/entity/message/ContentMessage';
 import {ConversationError} from 'src/script/error/ConversationError';

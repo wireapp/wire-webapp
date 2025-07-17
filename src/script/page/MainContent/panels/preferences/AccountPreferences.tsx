@@ -27,7 +27,8 @@ import {ErrorFallback} from 'Components/ErrorFallback';
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {useEnrichedFields} from 'Components/panel/EnrichedFields';
 import {ClientRepository} from 'Repositories/client';
-import {ConversationState} from 'src/script/conversation/ConversationState';
+import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
+import {ConversationState} from 'Repositories/conversation/ConversationState';
 import {TeamCreationAccountHeader} from 'src/script/page/LeftSidebar/panels/Conversations/ConversationTabs/TeamCreation/TeamCreationAccountHeader';
 import {ContentState} from 'src/script/page/useAppState';
 import {Core} from 'src/script/service/CoreSingleton';
@@ -51,7 +52,6 @@ import {PreferencesPage} from './components/PreferencesPage';
 import {PreferencesSection} from './components/PreferencesSection';
 
 import {Config} from '../../../../Config';
-import {ConversationRepository} from '../../../../conversation/ConversationRepository';
 import {User} from '../../../../entity/User';
 import {PropertiesRepository} from '../../../../properties/PropertiesRepository';
 import {TeamState} from '../../../../team/TeamState';

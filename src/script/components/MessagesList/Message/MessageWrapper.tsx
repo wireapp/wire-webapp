@@ -28,7 +28,7 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {E2EIVerificationMessage} from 'Components/MessagesList/Message/E2EIVerificationMessage';
 import {AssetRepository} from 'Repositories/assets/AssetRepository';
-import {OutgoingQuote} from 'src/script/conversation/MessageRepository';
+import {OutgoingQuote} from 'Repositories/conversation/MessageRepository';
 import {ContentMessage} from 'src/script/entity/message/ContentMessage';
 import {Text} from 'src/script/entity/message/Text';
 import {QuoteEntity} from 'src/script/message/QuoteEntity';

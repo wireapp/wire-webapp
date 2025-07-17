@@ -29,7 +29,8 @@ import {
   isTeamConversation,
   MLSCapableConversation,
   MLSConversation,
-} from '../conversation/ConversationSelectors';
+} from 'Repositories/conversation/ConversationSelectors';
+
 import {Conversation} from '../entity/Conversation';
 import {User} from '../entity/User';
 

@@ -21,6 +21,9 @@ import {act, render} from '@testing-library/react';
 import {CONVERSATION_TYPE} from '@wireapp/api-client/lib/conversation';
 
 import {ConnectionRepository} from 'Repositories/connection/ConnectionRepository';
+import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
+import {ConversationRoleRepository} from 'Repositories/conversation/ConversationRoleRepository';
+import {MessageRepository} from 'Repositories/conversation/MessageRepository';
 import {Conversation} from 'src/script/entity/Conversation';
 import 'src/script/util/test/mock/LocalStorageMock';
 import {createUuid} from 'Util/uuid';
@@ -28,9 +31,6 @@ import {createUuid} from 'Util/uuid';
 import {ConversationDetails} from './ConversationDetails';
 
 import {TestFactory} from '../../../../../test/helper/TestFactory';
-import {ConversationRepository} from '../../../conversation/ConversationRepository';
-import {ConversationRoleRepository} from '../../../conversation/ConversationRoleRepository';
-import {MessageRepository} from '../../../conversation/MessageRepository';
 import {User} from '../../../entity/User';
 import {IntegrationRepository} from '../../../integration/IntegrationRepository';
 import {SearchRepository} from '../../../search/SearchRepository';

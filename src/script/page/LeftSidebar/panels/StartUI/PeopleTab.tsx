@@ -26,6 +26,8 @@ import {useDebouncedCallback} from 'use-debounce';
 
 import * as Icon from 'Components/Icon';
 import {UserList, UserlistMode} from 'Components/UserList';
+import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
+import {ConversationState} from 'Repositories/conversation/ConversationState';
 import {UserRepository} from 'src/script/user/UserRepository';
 import {t} from 'Util/LocalizerUtil';
 import {getLogger} from 'Util/Logger';
@@ -35,8 +37,6 @@ import {isBackendError} from 'Util/TypePredicateUtil';
 
 import {TopPeople} from './components/TopPeople';
 
-import {ConversationRepository} from '../../../../conversation/ConversationRepository';
-import {ConversationState} from '../../../../conversation/ConversationState';
 import {User} from '../../../../entity/User';
 import {getManageTeamUrl} from '../../../../externalRoute';
 import {SearchRepository} from '../../../../search/SearchRepository';

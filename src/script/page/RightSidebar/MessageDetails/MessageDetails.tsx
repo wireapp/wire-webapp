@@ -24,13 +24,13 @@ import cx from 'classnames';
 import {FadingScrollbar} from 'Components/FadingScrollbar';
 import * as Icon from 'Components/Icon';
 import {UserList} from 'Components/UserList';
+import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 import {formatLocale} from 'Util/TimeUtil';
 
 import {UsersReactions} from './UserReactions';
 
-import {ConversationRepository} from '../../../conversation/ConversationRepository';
 import {Conversation} from '../../../entity/Conversation';
 import {ContentMessage} from '../../../entity/message/ContentMessage';
 import {User} from '../../../entity/User';

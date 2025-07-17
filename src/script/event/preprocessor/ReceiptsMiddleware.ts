@@ -19,11 +19,11 @@
 
 import {RECEIPT_MODE} from '@wireapp/api-client/lib/conversation/data';
 
-import {ConfirmationEvent} from 'src/script/conversation/EventBuilder';
+import type {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
+import {ConfirmationEvent} from 'Repositories/conversation/EventBuilder';
 import {User} from 'src/script/entity/User';
 import {getLogger, Logger} from 'Util/Logger';
 
-import type {ConversationRepository} from '../../conversation/ConversationRepository';
 import {StatusType} from '../../message/StatusType';
 import type {EventRecord} from '../../storage/record/EventRecord';
 import {ClientEvent} from '../Client';

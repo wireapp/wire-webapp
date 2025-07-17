@@ -24,8 +24,8 @@ import {CONVERSATION_TYPE} from '@wireapp/api-client/lib/conversation/';
 
 import {ClientEntity} from 'Repositories/client/ClientEntity';
 import {ConnectionMapper} from 'Repositories/connection/ConnectionMapper';
-import {ConversationMapper} from 'src/script/conversation/ConversationMapper';
-import {NOTIFICATION_STATE} from 'src/script/conversation/NotificationSetting';
+import {ConversationMapper} from 'Repositories/conversation/ConversationMapper';
+import {NOTIFICATION_STATE} from 'Repositories/conversation/NotificationSetting';
 import 'src/script/localization/Localizer';
 import {StatusType} from 'src/script/message/StatusType';
 import {createUuid} from 'Util/uuid';

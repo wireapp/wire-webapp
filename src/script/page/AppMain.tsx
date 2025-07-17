@@ -39,6 +39,7 @@ import {showUserModal, UserModal} from 'Components/Modals/UserModal';
 import {useActiveWindow} from 'Hooks/useActiveWindow';
 import {useInitializeRootFontSize} from 'Hooks/useRootFontSize';
 import {CallingViewMode, CallState, DesktopScreenShareMenu} from 'Repositories/calling/CallState';
+import {ConversationState} from 'Repositories/conversation/ConversationState';
 import {isUUID} from 'src/script/auth/util/stringUtil';
 import {Config} from 'src/script/Config';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
@@ -56,7 +57,6 @@ import {RootProvider} from './RootProvider';
 import {useAppMainState, ViewType} from './state';
 import {useAppState, ContentState} from './useAppState';
 
-import {ConversationState} from '../conversation/ConversationState';
 import {User} from '../entity/User';
 import {App} from '../main/app';
 import {initialiseMLSMigrationFlow} from '../mls/MLSMigration';

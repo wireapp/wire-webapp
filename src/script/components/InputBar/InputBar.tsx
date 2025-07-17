@@ -31,6 +31,8 @@ import {ConversationClassifiedBar} from 'Components/ClassifiedBar/ClassifiedBar'
 import {useFileUploadState} from 'Components/Conversation/useFilesUploadState/useFilesUploadState';
 import {EmojiPicker} from 'Components/EmojiPicker/EmojiPicker';
 import {CellsRepository} from 'Repositories/cells/CellsRepository';
+import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
+import {MessageRepository} from 'Repositories/conversation/MessageRepository';
 import {useUserPropertyValue} from 'src/script/hooks/useUserProperty';
 import {PROPERTIES_TYPE} from 'src/script/properties/PropertiesType';
 import {EventName} from 'src/script/tracking/EventName';
@@ -56,8 +58,6 @@ import {usePing} from './usePing/usePing';
 import {useTypingIndicator} from './useTypingIndicator/useTypingIndicator';
 
 import {Config} from '../../Config';
-import {ConversationRepository} from '../../conversation/ConversationRepository';
-import {MessageRepository} from '../../conversation/MessageRepository';
 import {Conversation} from '../../entity/Conversation';
 import {User} from '../../entity/User';
 import {EventRepository} from '../../event/EventRepository';

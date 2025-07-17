@@ -19,9 +19,9 @@
 
 import {CONVERSATION_EVENT, ConversationEvent} from '@wireapp/api-client/lib/event';
 
-import {ClientEvent} from './Client';
+import {ClientConversationEvent} from 'Repositories/conversation/EventBuilder';
 
-import {ClientConversationEvent} from '../conversation/EventBuilder';
+import {ClientEvent} from './Client';
 
 export function eventShouldBeStored(event: {type: any}): event is ClientConversationEvent | ConversationEvent {
   return EventTypeHandling.STORE.includes(event.type);

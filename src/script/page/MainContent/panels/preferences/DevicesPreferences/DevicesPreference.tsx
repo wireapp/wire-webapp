@@ -24,6 +24,7 @@ import {container} from 'tsyringe';
 
 import {ClientEntity} from 'Repositories/client/ClientEntity';
 import {ClientState} from 'Repositories/client/ClientState';
+import {ConversationState} from 'Repositories/conversation/ConversationState';
 import {CryptographyRepository} from 'src/script/cryptography/CryptographyRepository';
 import {Conversation} from 'src/script/entity/Conversation';
 import {User} from 'src/script/entity/User';
@@ -35,7 +36,6 @@ import {DetailedDevice} from './components/DetailedDevice';
 import {Device} from './components/Device';
 import {DeviceDetailsPreferences} from './components/DeviceDetailsPreferences';
 
-import {ConversationState} from '../../../../../conversation/ConversationState';
 import {PreferencesPage} from '../components/PreferencesPage';
 
 interface DevicesPreferencesProps {

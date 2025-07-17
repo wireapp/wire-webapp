@@ -33,6 +33,7 @@ import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {showWarningModal} from 'Components/Modals/utils/showWarningModal';
 import {TitleBar} from 'Components/TitleBar';
 import {CallState} from 'Repositories/calling/CallState';
+import {ConversationState} from 'Repositories/conversation/ConversationState';
 import {Config} from 'src/script/Config';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {isLastReceivedMessage} from 'Util/conversationMessages';
@@ -53,7 +54,6 @@ import {ReadOnlyConversationMessage} from './ReadOnlyConversationMessage';
 import {useFilesUploadDropzone} from './useFilesUploadDropzone/useFilesUploadDropzone';
 import {checkFileSharingPermission} from './utils/checkFileSharingPermission';
 
-import {ConversationState} from '../../conversation/ConversationState';
 import {Conversation as ConversationEntity} from '../../entity/Conversation';
 import {ContentMessage} from '../../entity/message/ContentMessage';
 import {DecryptErrorMessage} from '../../entity/message/DecryptErrorMessage';

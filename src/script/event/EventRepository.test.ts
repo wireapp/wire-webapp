@@ -19,6 +19,7 @@
 
 import {BackendEvent, CONVERSATION_EVENT, USER_EVENT} from '@wireapp/api-client/lib/event/';
 
+import {ClientConversationEvent} from 'Repositories/conversation/EventBuilder';
 import {ClientEvent} from 'src/script/event/Client';
 import {EventRepository} from 'src/script/event/EventRepository';
 import {NOTIFICATION_HANDLING_STATE} from 'src/script/event/NotificationHandlingState';
@@ -26,7 +27,6 @@ import {NOTIFICATION_HANDLING_STATE} from 'src/script/event/NotificationHandling
 import {EventSource} from './EventSource';
 
 import {TestFactory} from '../../../test/helper/TestFactory';
-import {ClientConversationEvent} from '../conversation/EventBuilder';
 
 const testFactory = new TestFactory();
 

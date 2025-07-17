@@ -24,8 +24,8 @@ import {ConversationProtocol, CONVERSATION_TYPE} from '@wireapp/api-client/lib/c
 import ko from 'knockout';
 
 import {CallState} from 'Repositories/calling/CallState';
-import {ConversationLabel, ConversationLabelRepository} from 'src/script/conversation/ConversationLabelRepository';
-import {ConversationState} from 'src/script/conversation/ConversationState';
+import {ConversationLabel, ConversationLabelRepository} from 'Repositories/conversation/ConversationLabelRepository';
+import {ConversationState} from 'Repositories/conversation/ConversationState';
 import {Conversation} from 'src/script/entity/Conversation';
 import {User} from 'src/script/entity/User';
 import {ListViewModel} from 'src/script/view_model/ListViewModel';

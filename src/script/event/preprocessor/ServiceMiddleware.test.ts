@@ -17,8 +17,8 @@
  *
  */
 
-import {ConversationRepository} from 'src/script/conversation/ConversationRepository';
-import {EventBuilder} from 'src/script/conversation/EventBuilder';
+import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
+import {EventBuilder} from 'Repositories/conversation/EventBuilder';
 import {Conversation} from 'src/script/entity/Conversation';
 import {User} from 'src/script/entity/User';
 import {UserRepository} from 'src/script/user/UserRepository';

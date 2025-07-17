@@ -31,6 +31,7 @@ import {HistoryImport} from 'Components/HistoryImport';
 import * as Icon from 'Components/Icon';
 import {useLegalHoldModalState} from 'Components/Modals/LegalHoldModal/LegalHoldModal.state';
 import {ClientState} from 'Repositories/client/ClientState';
+import {ConversationState} from 'Repositories/conversation/ConversationState';
 import {User} from 'src/script/entity/User';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
@@ -43,7 +44,6 @@ import {AVPreferences} from './panels/preferences/AVPreferences';
 import {DevicesPreferences} from './panels/preferences/DevicesPreferences';
 import {OptionPreferences} from './panels/preferences/OptionPreferences';
 
-import {ConversationState} from '../../conversation/ConversationState';
 import {TeamState} from '../../team/TeamState';
 import {UserState} from '../../user/UserState';
 import {RightSidebarParams} from '../AppMain';

@@ -17,7 +17,7 @@
  *
  */
 
-import {DeleteEvent, MessageAddEvent} from 'src/script/conversation/EventBuilder';
+import {DeleteEvent, MessageAddEvent} from 'Repositories/conversation/EventBuilder';
 import {getLogger, Logger} from 'Util/Logger';
 
 import {QuoteEntity} from '../../message/QuoteEntity';

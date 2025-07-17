@@ -30,6 +30,9 @@ import {ConversationProtocolDetails} from 'Components/panel/ConversationProtocol
 import {EnrichedFields} from 'Components/panel/EnrichedFields';
 import {ServiceDetails} from 'Components/panel/ServiceDetails';
 import {UserDetails} from 'Components/panel/UserDetails';
+import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
+import {ConversationVerificationState} from 'Repositories/conversation/ConversationVerificationState';
+import {getNotificationText} from 'Repositories/conversation/NotificationSetting';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 import {sortUsersByPriority} from 'Util/StringUtil';
@@ -39,9 +42,6 @@ import {ConversationDetailsHeader} from './components/ConversationDetailsHeader'
 import {ConversationDetailsOptions} from './components/ConversationDetailsOptions';
 import {ConversationDetailsParticipants} from './components/ConversationDetailsParticipants';
 
-import {ConversationRepository} from '../../../conversation/ConversationRepository';
-import {ConversationVerificationState} from '../../../conversation/ConversationVerificationState';
-import {getNotificationText} from '../../../conversation/NotificationSetting';
 import {Conversation} from '../../../entity/Conversation';
 import {User} from '../../../entity/User';
 import {isServiceEntity} from '../../../guards/Service';

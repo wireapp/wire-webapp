@@ -32,7 +32,7 @@ import {
 } from '@wireapp/react-ui-kit';
 
 import * as Icon from 'Components/Icon';
-import {ConversationRepository} from 'src/script/conversation/ConversationRepository';
+import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
 import {User} from 'src/script/entity/User';
 import {getManageTeamUrl} from 'src/script/externalRoute';
 import {ConversationFolderTab} from 'src/script/page/LeftSidebar/panels/Conversations/ConversationTab/ConversationFolderTab';

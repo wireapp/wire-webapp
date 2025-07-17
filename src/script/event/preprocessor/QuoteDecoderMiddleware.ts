@@ -19,7 +19,7 @@
 
 import {Quote} from '@wireapp/protocol-messaging';
 
-import {MessageAddEvent} from 'src/script/conversation/EventBuilder';
+import {MessageAddEvent} from 'Repositories/conversation/EventBuilder';
 import {getLogger, Logger} from 'Util/Logger';
 import {base64ToArray} from 'Util/util';
 

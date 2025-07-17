@@ -24,12 +24,12 @@ import {container} from 'tsyringe';
 import {useDebouncedCallback} from 'use-debounce';
 
 import {UserList} from 'Components/UserList';
+import {ConversationState} from 'Repositories/conversation/ConversationState';
 import {partition} from 'Util/ArrayUtil';
 import {t} from 'Util/LocalizerUtil';
 import {matchQualifiedIds} from 'Util/QualifiedId';
 import {sortByPriority} from 'Util/StringUtil';
 
-import {ConversationState} from '../../conversation/ConversationState';
 import type {User} from '../../entity/User';
 import {SearchRepository} from '../../search/SearchRepository';
 import type {TeamRepository} from '../../team/TeamRepository';
