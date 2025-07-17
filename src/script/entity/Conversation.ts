@@ -40,6 +40,7 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {useLegalHoldModalState} from 'Components/Modals/LegalHoldModal/LegalHoldModal.state';
 import {ClientRepository} from 'Repositories/client';
+import {ConnectionEntity} from 'Repositories/connection/ConnectionEntity';
 import {t} from 'Util/LocalizerUtil';
 import {getLogger, Logger} from 'Util/Logger';
 import {matchQualifiedIds} from 'Util/QualifiedId';
@@ -52,7 +53,6 @@ import {PingMessage} from './message/PingMessage';
 import type {User} from './User';
 
 import {Config} from '../Config';
-import {ConnectionEntity} from '../connection/ConnectionEntity';
 import {ACCESS_STATE} from '../conversation/AccessState';
 import {ConversationRepository, CONVERSATION_READONLY_STATE} from '../conversation/ConversationRepository';
 import {isProteusTeam1to1Conversation, isSelfConversation} from '../conversation/ConversationSelectors';

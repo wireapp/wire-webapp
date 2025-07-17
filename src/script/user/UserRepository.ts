@@ -50,6 +50,7 @@ import {AssetRepository} from 'Repositories/assets/AssetRepository';
 import type {ClientRepository, QualifiedUserClientEntityMap} from 'Repositories/client';
 import {ClientEntity} from 'Repositories/client/ClientEntity';
 import {ClientMapper} from 'Repositories/client/ClientMapper';
+import type {ConnectionEntity} from 'Repositories/connection/ConnectionEntity';
 import {chunk, partition} from 'Util/ArrayUtil';
 import {t} from 'Util/LocalizerUtil';
 import {getLogger, Logger} from 'Util/Logger';
@@ -65,7 +66,6 @@ import {UserState} from './UserState';
 
 import {SIGN_OUT_REASON} from '../auth/SignOutReason';
 import {Config} from '../Config';
-import type {ConnectionEntity} from '../connection/ConnectionEntity';
 import {flattenUserClientsQualifiedIds} from '../conversation/userClientsUtils';
 import {Conversation} from '../entity/Conversation';
 import {User} from '../entity/User';

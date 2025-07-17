@@ -25,13 +25,13 @@ import type {BackupRepository} from 'Repositories/backup/BackupRepository';
 import type {CallingRepository} from 'Repositories/calling/CallingRepository';
 import {CellsRepository} from 'Repositories/cells/CellsRepository';
 import type {ClientRepository} from 'Repositories/client';
+import type {ConnectionRepository} from 'Repositories/connection/ConnectionRepository';
 
 import {ActionsViewModel} from './ActionsViewModel';
 import {CallingViewModel} from './CallingViewModel';
 import {ContentViewModel} from './ContentViewModel';
 import {ListViewModel} from './ListViewModel';
 
-import type {ConnectionRepository} from '../connection/ConnectionRepository';
 import type {ConversationRepository} from '../conversation/ConversationRepository';
 import type {MessageRepository} from '../conversation/MessageRepository';
 import type {CryptographyRepository} from '../cryptography/CryptographyRepository';

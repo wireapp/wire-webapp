@@ -27,6 +27,7 @@ import {container} from 'tsyringe';
 
 import {WebAppEvents} from '@wireapp/webapp-events';
 
+import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {SelfService} from 'src/script/self/SelfService';
 import {TeamService} from 'src/script/team/TeamService';
 import {UserState} from 'src/script/user/UserState';
@@ -40,15 +41,14 @@ import {ConnectionMapper} from './ConnectionMapper';
 import type {ConnectionService} from './ConnectionService';
 import {ConnectionState} from './ConnectionState';
 
-import {PrimaryModal} from '../components/Modals/PrimaryModal';
-import {Config} from '../Config';
-import type {Conversation} from '../entity/Conversation';
-import {MemberMessage} from '../entity/message/MemberMessage';
-import type {User} from '../entity/User';
-import {EventRepository} from '../event/EventRepository';
-import type {EventSource} from '../event/EventSource';
-import {SystemMessageType} from '../message/SystemMessageType';
-import type {UserRepository} from '../user/UserRepository';
+import {Config} from '../../Config';
+import type {Conversation} from '../../entity/Conversation';
+import {MemberMessage} from '../../entity/message/MemberMessage';
+import type {User} from '../../entity/User';
+import {EventRepository} from '../../event/EventRepository';
+import type {EventSource} from '../../event/EventSource';
+import {SystemMessageType} from '../../message/SystemMessageType';
+import type {UserRepository} from '../../user/UserRepository';
 
 export class ConnectionRepository {
   private readonly connectionService: ConnectionService;

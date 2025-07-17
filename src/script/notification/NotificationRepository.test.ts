@@ -32,7 +32,8 @@ import {AudioRepository} from 'Repositories/audio/AudioRepository';
 import {CallingRepository} from 'Repositories/calling/CallingRepository';
 import {CallingViewMode, CallState} from 'Repositories/calling/CallState';
 import {TERMINATION_REASON} from 'Repositories/calling/enum/TerminationReason';
-import {ConnectionMapper} from 'src/script/connection/ConnectionMapper';
+import {ConnectionEntity} from 'Repositories/connection/ConnectionEntity';
+import {ConnectionMapper} from 'Repositories/connection/ConnectionMapper';
 import {ConversationMapper} from 'src/script/conversation/ConversationMapper';
 import {NOTIFICATION_STATE} from 'src/script/conversation/NotificationSetting';
 import {Conversation} from 'src/script/entity/Conversation';
@@ -62,7 +63,6 @@ import {createUuid} from 'Util/uuid';
 
 import {NotificationRepository} from './NotificationRepository';
 
-import {ConnectionEntity} from '../connection/ConnectionEntity';
 import {ConversationState} from '../conversation/ConversationState';
 import {Message} from '../entity/message/Message';
 import {PermissionRepository} from '../permission/PermissionRepository';
