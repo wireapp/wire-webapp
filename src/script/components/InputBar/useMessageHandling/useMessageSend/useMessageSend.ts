@@ -33,9 +33,9 @@ import {ConversationVerificationState} from 'Repositories/conversation/Conversat
 import {MessageRepository, OutgoingQuote} from 'Repositories/conversation/MessageRepository';
 import {Conversation} from 'Repositories/entity/Conversation';
 import {ContentMessage} from 'Repositories/entity/message/ContentMessage';
+import {EventRepository} from 'Repositories/event/EventRepository';
 import {Config} from 'src/script/Config';
 import {ConversationError} from 'src/script/error/ConversationError';
-import {EventRepository} from 'src/script/event/EventRepository';
 import {MentionEntity} from 'src/script/message/MentionEntity';
 import {MessageHasher} from 'src/script/message/MessageHasher';
 import {QuoteEntity} from 'src/script/message/QuoteEntity';

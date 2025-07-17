@@ -19,7 +19,7 @@
 
 import Dexie from 'dexie';
 
-import {ClientEvent} from 'src/script/event/Client';
+import {ClientEvent} from 'Repositories/event/Client';
 import {getLogger} from 'Util/Logger';
 
 import {CPBackupImporter, BackupPeekResult, isCreatedBySameUser, BackupQualifiedId} from './CPB.library';

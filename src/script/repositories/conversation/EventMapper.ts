@@ -59,6 +59,7 @@ import {RenameMessage} from 'Repositories/entity/message/RenameMessage';
 import {Text} from 'Repositories/entity/message/Text';
 import type {Text as TextAsset} from 'Repositories/entity/message/Text';
 import {VerificationMessage} from 'Repositories/entity/message/VerificationMessage';
+import {ClientEvent} from 'Repositories/event/Client';
 import {t} from 'Util/LocalizerUtil';
 import {getLogger, Logger} from 'Util/Logger';
 import {userReactionMapToReactionMap} from 'Util/ReactionUtil';
@@ -79,7 +80,6 @@ import {
 } from './EventBuilder';
 
 import {ConversationError} from '../../error/ConversationError';
-import {ClientEvent} from '../../event/Client';
 import {isContentMessage} from '../../guards/Message';
 import {CALL_MESSAGE_TYPE} from '../../message/CallMessageType';
 import {MentionEntity} from '../../message/MentionEntity';

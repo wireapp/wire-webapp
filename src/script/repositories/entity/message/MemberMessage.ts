@@ -22,13 +22,13 @@ import {CONVERSATION_EVENT} from '@wireapp/api-client/lib/event/';
 import type {QualifiedId} from '@wireapp/api-client/lib/user/';
 import ko from 'knockout';
 
+import {ClientEvent} from 'Repositories/event/Client';
 import {Declension, getUserName, t} from 'Util/LocalizerUtil';
 import {matchQualifiedIds} from 'Util/QualifiedId';
 import {capitalizeFirstChar} from 'Util/StringUtil';
 
 import {SystemMessage} from './SystemMessage';
 
-import {ClientEvent} from '../../../event/Client';
 import {SuperType} from '../../../message/SuperType';
 import {SystemMessageType} from '../../../message/SystemMessageType';
 import {User} from '../User';

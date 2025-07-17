@@ -35,11 +35,11 @@ import {ConversationRoleRepository} from 'Repositories/conversation/Conversation
 import {MemberLeaveEvent, TeamMemberLeaveEvent} from 'Repositories/conversation/EventBuilder';
 import {Conversation} from 'Repositories/entity/Conversation';
 import {User} from 'Repositories/entity/User';
+import {ClientEvent} from 'Repositories/event/Client';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {handleKeyDown, KEY} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
 
-import {ClientEvent} from '../../../event/Client';
 import {TeamRepository} from '../../../team/TeamRepository';
 import {TeamState} from '../../../team/TeamState';
 import {ActionsViewModel} from '../../../view_model/ActionsViewModel';

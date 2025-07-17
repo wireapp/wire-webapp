@@ -40,6 +40,8 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {AssetRepository} from 'Repositories/assets/AssetRepository';
 import {User} from 'Repositories/entity/User';
+import {EventSource} from 'Repositories/event/EventSource';
+import {NOTIFICATION_HANDLING_STATE} from 'Repositories/event/NotificationHandlingState';
 import {Config} from 'src/script/Config';
 import {Environment} from 'Util/Environment';
 import {replaceLink, t} from 'Util/LocalizerUtil';
@@ -53,8 +55,6 @@ import {TeamMemberEntity} from './TeamMemberEntity';
 import {TeamService} from './TeamService';
 import {TeamState} from './TeamState';
 
-import {EventSource} from '../event/EventSource';
-import {NOTIFICATION_HANDLING_STATE} from '../event/NotificationHandlingState';
 import {IntegrationMapper} from '../integration/IntegrationMapper';
 import {ServiceEntity} from '../integration/ServiceEntity';
 import {scheduleRecurringTask, updateRemoteConfigLogger} from '../lifecycle/updateRemoteConfigs';

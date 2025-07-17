@@ -24,8 +24,8 @@ import {ConfirmationEvent} from 'Repositories/conversation/EventBuilder';
 import {User} from 'Repositories/entity/User';
 import {getLogger, Logger} from 'Util/Logger';
 
-import {StatusType} from '../../message/StatusType';
-import type {EventRecord} from '../../storage/record/EventRecord';
+import {StatusType} from '../../../message/StatusType';
+import type {EventRecord} from '../../../storage/record/EventRecord';
 import {ClientEvent} from '../Client';
 import {EventMiddleware, IncomingEvent} from '../EventProcessor';
 import type {EventService} from '../EventService';

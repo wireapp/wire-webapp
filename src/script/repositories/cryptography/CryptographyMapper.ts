@@ -58,6 +58,7 @@ import {AssetTransferState} from 'Repositories/assets/AssetTransferState';
 import {CALL_MESSAGE_TYPE} from 'Repositories/calling/enum/CallMessageType';
 import {ConversationEphemeralHandler} from 'Repositories/conversation/ConversationEphemeralHandler';
 import {MessageAddEvent} from 'Repositories/conversation/EventBuilder';
+import {ClientEvent, CONVERSATION} from 'Repositories/event/Client';
 import {getLogger, Logger} from 'Util/Logger';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 import {base64ToArray, arrayToBase64} from 'Util/util';
@@ -65,7 +66,6 @@ import {base64ToArray, arrayToBase64} from 'Util/util';
 import {PROTO_MESSAGE_TYPE} from './ProtoMessageType';
 
 import {CryptographyError} from '../../error/CryptographyError';
-import {ClientEvent, CONVERSATION} from '../../event/Client';
 import {StatusType} from '../../message/StatusType';
 import {Core} from '../../service/CoreSingleton';
 

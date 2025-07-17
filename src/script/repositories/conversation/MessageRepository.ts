@@ -63,6 +63,10 @@ import {ContentMessage} from 'Repositories/entity/message/ContentMessage';
 import {FileAsset} from 'Repositories/entity/message/FileAsset';
 import {Message} from 'Repositories/entity/message/Message';
 import {User} from 'Repositories/entity/User';
+import {EventRepository} from 'Repositories/event/EventRepository';
+import {EventService} from 'Repositories/event/EventService';
+import {EventTypeHandling} from 'Repositories/event/EventTypeHandling';
+import {NOTIFICATION_HANDLING_STATE} from 'Repositories/event/NotificationHandlingState';
 import {
   cancelSendingLinkPreview,
   clearLinkPreviewSendingState,
@@ -90,10 +94,6 @@ import {EventMapper} from './EventMapper';
 import {getLinkPreviewFromString} from './linkPreviews';
 
 import {ConversationError} from '../../error/ConversationError';
-import {EventRepository} from '../../event/EventRepository';
-import {EventService} from '../../event/EventService';
-import {EventTypeHandling} from '../../event/EventTypeHandling';
-import {NOTIFICATION_HANDLING_STATE} from '../../event/NotificationHandlingState';
 import {showLegalHoldWarningModal} from '../../legal-hold/LegalHoldWarning';
 import {MentionEntity} from '../../message/MentionEntity';
 import {QuoteEntity} from '../../message/QuoteEntity';

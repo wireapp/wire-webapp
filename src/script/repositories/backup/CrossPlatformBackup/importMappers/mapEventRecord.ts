@@ -17,7 +17,7 @@
  *
  */
 
-import {ClientEvent} from 'src/script/event/Client';
+import {ClientEvent} from 'Repositories/event/Client';
 import {MessageCategory} from 'src/script/message/MessageCategory';
 import {EventRecord} from 'src/script/storage';
 

@@ -22,6 +22,7 @@ import {container} from 'tsyringe';
 import {omit} from 'underscore';
 
 import {User} from 'Repositories/entity/User';
+import {ClientEvent} from 'Repositories/event/Client';
 import {generateConversation} from 'test/helper/ConversationGenerator';
 import {TestFactory} from 'test/helper/TestFactory';
 import {generateAPIUser} from 'test/helper/UserGenerator';
@@ -37,7 +38,6 @@ import {CancelError, DifferentAccountError, IncompatiblePlatformError} from './E
 import {createMetaData} from './LegacyBackup.helper';
 import {handleZipEvent} from './zipWorker';
 
-import {ClientEvent} from '../../event/Client';
 import {DatabaseTypes, createStorageEngine} from '../../service/StoreEngineProvider';
 import {StorageService} from '../../storage';
 import {StorageSchemata} from '../../storage/StorageSchemata';

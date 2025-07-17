@@ -50,7 +50,7 @@ import {PingMessage} from 'Repositories/entity/message/PingMessage';
 import {RenameMessage} from 'Repositories/entity/message/RenameMessage';
 import {Text} from 'Repositories/entity/message/Text';
 import {User} from 'Repositories/entity/User';
-import {NOTIFICATION_HANDLING_STATE} from 'src/script/event/NotificationHandlingState';
+import {NOTIFICATION_HANDLING_STATE} from 'Repositories/event/NotificationHandlingState';
 import 'src/script/localization/Localizer';
 import {CALL_MESSAGE_TYPE} from 'src/script/message/CallMessageType';
 import {MentionEntity} from 'src/script/message/MentionEntity';

@@ -36,9 +36,9 @@ import {AssetTransferState} from 'Repositories/assets/AssetTransferState';
 import type {Conversation} from 'Repositories/entity/Conversation';
 import type {Message} from 'Repositories/entity/message/Message';
 import type {User} from 'Repositories/entity/User';
+import {ClientEvent, CONVERSATION} from 'Repositories/event/Client';
 import {createUuid} from 'Util/uuid';
 
-import {ClientEvent, CONVERSATION} from '../../event/Client';
 import {E2EIVerificationMessageType} from '../../message/E2EIVerificationMessageType';
 import {StatusType} from '../../message/StatusType';
 import {VerificationMessageType} from '../../message/VerificationMessageType';

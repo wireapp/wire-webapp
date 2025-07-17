@@ -19,13 +19,13 @@
 
 import {Conversation} from 'Repositories/entity/Conversation';
 import {User} from 'Repositories/entity/User';
-import {ClientEvent} from 'src/script/event/Client';
 import {QuoteEntity} from 'src/script/message/QuoteEntity';
 import {createMessageAddEvent, toSavedEvent} from 'test/helper/EventGenerator';
 import {createUuid} from 'Util/uuid';
 
 import {RepliesUpdaterMiddleware} from './RepliesUpdaterMiddleware';
 
+import {ClientEvent} from '../Client';
 import {EventService} from '../EventService';
 
 function buildRepliesUpdaterMiddleware() {

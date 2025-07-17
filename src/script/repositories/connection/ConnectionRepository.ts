@@ -31,6 +31,8 @@ import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import type {Conversation} from 'Repositories/entity/Conversation';
 import {MemberMessage} from 'Repositories/entity/message/MemberMessage';
 import type {User} from 'Repositories/entity/User';
+import {EventRepository} from 'Repositories/event/EventRepository';
+import type {EventSource} from 'Repositories/event/EventSource';
 import {SelfService} from 'src/script/self/SelfService';
 import {TeamService} from 'src/script/team/TeamService';
 import {UserState} from 'src/script/user/UserState';
@@ -45,8 +47,6 @@ import type {ConnectionService} from './ConnectionService';
 import {ConnectionState} from './ConnectionState';
 
 import {Config} from '../../Config';
-import {EventRepository} from '../../event/EventRepository';
-import type {EventSource} from '../../event/EventSource';
 import {SystemMessageType} from '../../message/SystemMessageType';
 import type {UserRepository} from '../../user/UserRepository';
 

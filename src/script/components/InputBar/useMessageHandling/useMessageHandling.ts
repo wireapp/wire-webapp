@@ -29,7 +29,7 @@ import {ConversationRepository} from 'Repositories/conversation/ConversationRepo
 import {MessageRepository} from 'Repositories/conversation/MessageRepository';
 import {Conversation} from 'Repositories/entity/Conversation';
 import {ContentMessage} from 'Repositories/entity/message/ContentMessage';
-import {EventRepository} from 'src/script/event/EventRepository';
+import {EventRepository} from 'Repositories/event/EventRepository';
 import {StorageRepository} from 'src/script/storage';
 
 import {useDraftState} from './useDraftState/useDraftState';

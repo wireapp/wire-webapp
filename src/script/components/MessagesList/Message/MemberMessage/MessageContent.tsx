@@ -22,8 +22,8 @@ import {CONVERSATION_EVENT} from '@wireapp/api-client/lib/event/';
 
 import {MemberMessage as MemberMessageEntity} from 'Repositories/entity/message/MemberMessage';
 import {User} from 'Repositories/entity/User';
+import {ClientEvent} from 'Repositories/event/Client';
 import {Config} from 'src/script/Config';
-import {ClientEvent} from 'src/script/event/Client';
 import {SystemMessageType} from 'src/script/message/SystemMessageType';
 import {Declension, joinNames, replaceLink, t} from 'Util/LocalizerUtil';
 import {replaceReactComponents} from 'Util/LocalizerUtil/ReactLocalizerUtil';

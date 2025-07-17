@@ -19,11 +19,12 @@
 
 import {ConfirmationEvent} from 'Repositories/conversation/EventBuilder';
 import {User} from 'Repositories/entity/User';
-import {ClientEvent} from 'src/script/event/Client';
 import {StatusType} from 'src/script/message/StatusType';
 import {createUuid} from 'Util/uuid';
 
 import {ReceiptsMiddleware} from './ReceiptsMiddleware';
+
+import {ClientEvent} from '../Client';
 
 function buildReadReceiptMiddleware() {
   const selfUser = new User(createUuid());

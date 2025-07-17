@@ -31,7 +31,7 @@ import {
   ReactionEvent,
 } from 'Repositories/conversation/EventBuilder';
 import {Conversation} from 'Repositories/entity/Conversation';
-import {CONVERSATION} from 'src/script/event/Client';
+import {CONVERSATION} from 'Repositories/event/Client';
 import {createUuid} from 'Util/uuid';
 
 export function createMessageAddEvent({
