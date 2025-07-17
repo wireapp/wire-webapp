@@ -33,14 +33,14 @@ import type {EventRepository} from 'Repositories/event/EventRepository';
 import type {GiphyRepository} from 'Repositories/extension/GiphyRepository';
 import type {IntegrationRepository} from 'Repositories/integration/IntegrationRepository';
 import type {MediaRepository} from 'Repositories/media/MediaRepository';
+import type {NotificationRepository} from 'Repositories/notification/NotificationRepository';
+import type {PreferenceNotificationRepository} from 'Repositories/notification/PreferenceNotificationRepository';
 
 import {ActionsViewModel} from './ActionsViewModel';
 import {CallingViewModel} from './CallingViewModel';
 import {ContentViewModel} from './ContentViewModel';
 import {ListViewModel} from './ListViewModel';
 
-import type {NotificationRepository} from '../notification/NotificationRepository';
-import type {PreferenceNotificationRepository} from '../notification/PreferenceNotificationRepository';
 import type {PermissionRepository} from '../permission/PermissionRepository';
 import type {PropertiesRepository} from '../properties/PropertiesRepository';
 import type {SearchRepository} from '../search/SearchRepository';

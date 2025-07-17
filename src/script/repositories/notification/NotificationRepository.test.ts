@@ -65,9 +65,9 @@ import {createUuid} from 'Util/uuid';
 
 import {NotificationRepository} from './NotificationRepository';
 
-import {PermissionRepository} from '../permission/PermissionRepository';
-import {UserMapper} from '../user/UserMapper';
-import {UserState} from '../user/UserState';
+import {PermissionRepository} from '../../permission/PermissionRepository';
+import {UserMapper} from '../../user/UserMapper';
+import {UserState} from '../../user/UserState';
 
 function buildNotificationRepository() {
   const userState = container.resolve(UserState);

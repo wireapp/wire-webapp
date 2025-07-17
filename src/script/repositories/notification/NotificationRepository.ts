@@ -56,14 +56,14 @@ import {ValidationUtilError} from 'Util/ValidationUtil';
 
 import {PermissionState} from './PermissionState';
 
-import {SuperType} from '../message/SuperType';
-import {SystemMessageType} from '../message/SystemMessageType';
-import {ContentState, useAppState} from '../page/useAppState';
-import type {PermissionRepository} from '../permission/PermissionRepository';
-import {PermissionStatusState} from '../permission/PermissionStatusState';
-import {PermissionType} from '../permission/PermissionType';
-import {UserState} from '../user/UserState';
-import {Warnings} from '../view_model/WarningsContainer';
+import {SuperType} from '../../message/SuperType';
+import {SystemMessageType} from '../../message/SystemMessageType';
+import {ContentState, useAppState} from '../../page/useAppState';
+import type {PermissionRepository} from '../../permission/PermissionRepository';
+import {PermissionStatusState} from '../../permission/PermissionStatusState';
+import {PermissionType} from '../../permission/PermissionType';
+import {UserState} from '../../user/UserState';
+import {Warnings} from '../../view_model/WarningsContainer';
 
 type NotificationData = {conversationId?: QualifiedId; messageId?: string; messageType: string};
 interface NotificationContent {

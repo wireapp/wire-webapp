@@ -19,12 +19,11 @@
 
 import ko from 'knockout';
 
+import {PermissionState} from 'Repositories/notification/PermissionState';
 import {Logger, getLogger} from 'Util/Logger';
 
 import {PermissionStatusState} from './PermissionStatusState';
 import {PermissionType} from './PermissionType';
-
-import {PermissionState} from '../notification/PermissionState';
 
 interface PermissionStateResult {
   state: PermissionState | PermissionStatusState;

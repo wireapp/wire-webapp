@@ -31,7 +31,7 @@ import type {User} from 'Repositories/entity/User';
 import {matchQualifiedIds} from 'Util/QualifiedId';
 import {loadValue, resetStoreValue, storeValue} from 'Util/StorageUtil';
 
-import {PropertiesRepository} from '../properties/PropertiesRepository';
+import {PropertiesRepository} from '../../properties/PropertiesRepository';
 
 export type ClientNotificationData = {
   domain?: string;

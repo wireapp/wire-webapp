@@ -25,9 +25,10 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {ClientEntity} from 'Repositories/client/ClientEntity';
 import {User} from 'Repositories/entity/User';
-import {Notification, PreferenceNotificationRepository} from 'src/script/notification/PreferenceNotificationRepository';
 import {PropertiesRepository} from 'src/script/properties/PropertiesRepository';
 import {createUuid} from 'Util/uuid';
+
+import {Notification, PreferenceNotificationRepository} from './PreferenceNotificationRepository';
 
 describe('PreferenceNotificationRepository', () => {
   const user = new User(createUuid(), null);
