@@ -133,24 +133,8 @@ export class ConversationPage {
   }
 
   async isSystemMessageVisible(messageText: string) {
-    // Trying multiple times for the message to appear
-    for (let i = 0; i < 10; i++) {
-      // Wait for at least one matching element to appear (optional timeout can be set)
-      await this.systemMessages.first().waitFor({state: 'visible'});
-
-      // Then get all matching elements
-      const messages = await this.systemMessages.all();
-      for (const message of messages) {
-        const messageTextContent = await message.textContent();
-        if (messageTextContent?.includes(messageText)) {
-          continue;
-        }
-        return true;
-      }
-      await this.page.waitForTimeout(500); // Wait for 0.5 second before next attempt
-    }
-
-    return false;
+    await this.systemMessages.filter({hasText: messageText}).first().waitFor({state: 'visible', timeout: 5000});
+    return true;
   }
 
   async isConversationReadonly() {

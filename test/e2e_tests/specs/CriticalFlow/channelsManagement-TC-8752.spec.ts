@@ -45,10 +45,10 @@ test('Channels Management', {tag: ['@TC-8752', '@crit-flow-web']}, async ({pageM
     await inviteMembers([member], owner, api);
 
     // TODO: Remove below line when we have a SQS workaround
-    await pageManager.waitForTimeout(3000);
     await api.brig.enableMLSFeature(owner.teamId);
     await api.brig.unlockChannelFeature(owner.teamId);
     await api.brig.enableChannelsFeature(owner.teamId);
+    await pageManager.waitForTimeout(3000);
     const memberContext = await browser.newContext();
     const memberPage = await memberContext.newPage();
     memberPages = new PageManager(memberPage);
