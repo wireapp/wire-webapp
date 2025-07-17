@@ -23,7 +23,6 @@ import {replaceAccents} from 'Util/StringUtil';
 import {ConversationFilter, SidebarTabs} from './useSidebarStore';
 
 import {Conversation} from '../../../../entity/Conversation';
-import {StorageKey} from '../../../../storage/StorageKey';
 
 interface GetTabConversationsProps {
   currentTab: SidebarTabs;
@@ -182,32 +181,6 @@ export const conversationSearchFilter = (filter: string) => (conversation: Conve
   const conversationDisplayName = replaceAccents(conversation.display_name().toLowerCase());
 
   return conversationDisplayName.includes(filterWord);
-};
-
-export const getConversationsWithDrafts = (conversations: Conversation[]): Conversation[] => {
-  const storageKeyPrefix = `__amplify__${StorageKey.CONVERSATION.INPUT}|`;
-  const conversationsWithDrafts: Conversation[] = [];
-
-  conversations.forEach(conversation => {
-    const storageKey = `${storageKeyPrefix}${conversation.id}`;
-    const draftData = localStorage.getItem(storageKey);
-
-    if (draftData) {
-      try {
-        const amplifyData = JSON.parse(draftData);
-        // Amplify wraps the data in an object with 'data' and 'expires' properties
-        const draft = amplifyData.data || amplifyData;
-        // Check if draft has content (editorState or plainMessage)
-        if (draft && (draft.editorState || draft.plainMessage)) {
-          conversationsWithDrafts.push(conversation);
-        }
-      } catch (error) {
-        // Ignore parsing errors
-      }
-    }
-  });
-
-  return conversationsWithDrafts;
 };
 
 export const scrollToConversation = (conversationId: string) => {

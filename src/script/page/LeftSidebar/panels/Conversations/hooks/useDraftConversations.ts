@@ -22,6 +22,7 @@ import {useEffect, useState, useRef, useCallback} from 'react';
 import {useDebouncedCallback} from 'use-debounce';
 
 import {Conversation} from 'src/script/entity/Conversation';
+import {conversationHasDraft} from 'src/script/page/LeftSidebar/panels/Conversations/utils/draftUtils';
 import {StorageKey} from 'src/script/storage/StorageKey';
 
 export const useDraftConversations = (conversations: Conversation[]): Conversation[] => {
@@ -52,19 +53,8 @@ export const useDraftConversations = (conversations: Conversation[]): Conversati
         hasChanged = true;
       }
 
-      if (draftData) {
-        try {
-          const amplifyData = JSON.parse(draftData);
-          // Amplify wraps the data in an object with 'data' and 'expires' properties
-          const draft = amplifyData.data || amplifyData;
-
-          // Check if draft has content (editorState or plainMessage)
-          if (draft && (draft.editorState || draft.plainMessage)) {
-            conversationsWithDrafts.push(conversation);
-          }
-        } catch (error) {
-          // Ignore parsing errors
-        }
+      if (conversationHasDraft(conversation)) {
+        conversationsWithDrafts.push(conversation);
       }
     });
 
@@ -84,7 +74,7 @@ export const useDraftConversations = (conversations: Conversation[]): Conversati
 
     // Listen for storage changes from other tabs
     const handleStorageChange = (event: StorageEvent) => {
-      if (event.key && event.key.includes(StorageKey.CONVERSATION.INPUT)) {
+      if (event.key?.includes(StorageKey.CONVERSATION.INPUT)) {
         checkForDrafts();
       }
     };
