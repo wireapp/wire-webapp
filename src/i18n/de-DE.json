@@ -389,6 +389,7 @@
   "cells.folderBreadcrumbCombained": "Mehr anzeigen",
   "cells.heading": "All Files",
   "cells.imageFullScreenModal.closeButton": "Schließen",
+  "cells.imageFullScreenModal.downloadButton": "Download",
   "cells.modal.closeButton": "Schließen",
   "cells.moveNodeModal.cancelButton": "Abbrechen",
   "cells.moveNodeModal.createFolder.hintButton": "Neuen Ordner erstellen",
