@@ -24,8 +24,8 @@ import {debounce} from 'underscore';
 import {ConversationState} from 'Repositories/conversation/ConversationState';
 import {ConversationStatus} from 'Repositories/conversation/ConversationStatus';
 import {EventBuilder} from 'Repositories/conversation/EventBuilder';
-import {Conversation} from 'src/script/entity/Conversation';
-import {User} from 'src/script/entity/User';
+import {Conversation} from 'Repositories/entity/Conversation';
+import {User} from 'Repositories/entity/User';
 import {ServerTimeHandler} from 'src/script/time/serverTimeHandler';
 
 import {

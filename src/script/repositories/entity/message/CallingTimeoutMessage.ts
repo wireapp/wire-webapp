@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2020 Wire Swiss GmbH
+ * Copyright (C) 2021 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,19 +17,27 @@
  *
  */
 
+import {REASON as AVS_REASON} from '@wireapp/avs';
+
 import {Message} from './Message';
 
-import {SuperType} from '../../message/SuperType';
+import {SuperType} from '../../../message/SuperType';
 
-export class FileTypeRestrictedMessage extends Message {
+export class CallingTimeoutMessage extends Message {
   constructor(
-    public readonly isIncoming: boolean,
-    public readonly name: string,
-    public readonly fileExt: string,
-    timestamp: number,
+    public reason: AVS_REASON.NOONE_JOINED | AVS_REASON.EVERYONE_LEFT,
+    time: number,
   ) {
     super();
-    this.super_type = SuperType.FILE_TYPE_RESTRICTED;
-    this.timestamp(timestamp);
+    this.super_type = SuperType.CALL_TIME_OUT;
+    this.timestamp(time);
+  }
+
+  get isNoOneJoined(): boolean {
+    return this.reason === AVS_REASON.NOONE_JOINED;
+  }
+
+  get isEveryOneLeft(): boolean {
+    return this.reason === AVS_REASON.EVERYONE_LEFT;
   }
 }

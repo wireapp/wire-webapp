@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2023 Wire Swiss GmbH
+ * Copyright (C) 2018 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,19 +18,22 @@
  */
 
 import {Message} from './Message';
+import {RenameMessage} from './RenameMessage';
 
-import {SuperType} from '../../message/SuperType';
+import {SuperType} from '../../../message/SuperType';
+import {SystemMessageType} from '../../../message/SystemMessageType';
 
-/**
- * Federation stop system message
- */
-export class FederationStopMessage extends Message {
-  constructor(
-    public readonly domains: string[],
-    timestamp: number,
-  ) {
+export class SystemMessage extends Message {
+  public caption?: string;
+  public system_message_type: SystemMessageType;
+
+  constructor() {
     super();
-    this.super_type = SuperType.FEDERATION_STOP;
-    this.timestamp(timestamp);
+    this.super_type = SuperType.SYSTEM;
+    this.system_message_type = SystemMessageType.NORMAL;
+  }
+
+  isConversationRename(): this is RenameMessage {
+    return this.system_message_type === SystemMessageType.CONVERSATION_RENAME;
   }
 }

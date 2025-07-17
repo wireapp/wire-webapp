@@ -21,6 +21,8 @@ import {QualifiedId} from '@wireapp/api-client/lib/user';
 import ko from 'knockout';
 import {container, singleton} from 'tsyringe';
 
+import {Conversation} from 'Repositories/entity/Conversation';
+import {User} from 'Repositories/entity/User';
 import {matchQualifiedIds} from 'Util/QualifiedId';
 import {sortGroupsByLastEvent} from 'Util/util';
 
@@ -34,8 +36,6 @@ import {
   isReadableConversation,
 } from './ConversationSelectors';
 
-import {Conversation} from '../../entity/Conversation';
-import {User} from '../../entity/User';
 import {TeamState} from '../../team/TeamState';
 import {UserState} from '../../user/UserState';
 

@@ -24,13 +24,13 @@ import ko from 'knockout';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
+import type {Conversation} from 'Repositories/entity/Conversation';
 import {SidebarTabs, useSidebarStore} from 'src/script/page/LeftSidebar/panels/Conversations/useSidebarStore';
 import {t} from 'Util/LocalizerUtil';
 import {getLogger, Logger} from 'Util/Logger';
 import {TypedEventTarget} from 'Util/TypedEventTarget';
 import {createUuid} from 'Util/uuid';
 
-import type {Conversation} from '../../entity/Conversation';
 import type {PropertiesService} from '../../properties/PropertiesService';
 
 export enum LabelType {

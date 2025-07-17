@@ -57,6 +57,12 @@ import {AudioType} from 'Repositories/audio/AudioType';
 import {ClientState} from 'Repositories/client/ClientState';
 import {CryptographyRepository} from 'Repositories/cryptography/CryptographyRepository';
 import {PROTO_MESSAGE_TYPE} from 'Repositories/cryptography/ProtoMessageType';
+import {Conversation} from 'Repositories/entity/Conversation';
+import {CompositeMessage} from 'Repositories/entity/message/CompositeMessage';
+import {ContentMessage} from 'Repositories/entity/message/ContentMessage';
+import {FileAsset} from 'Repositories/entity/message/FileAsset';
+import {Message} from 'Repositories/entity/message/Message';
+import {User} from 'Repositories/entity/User';
 import {
   cancelSendingLinkPreview,
   clearLinkPreviewSendingState,
@@ -83,12 +89,6 @@ import {EventBuilder} from './EventBuilder';
 import {EventMapper} from './EventMapper';
 import {getLinkPreviewFromString} from './linkPreviews';
 
-import {Conversation} from '../../entity/Conversation';
-import {CompositeMessage} from '../../entity/message/CompositeMessage';
-import {ContentMessage} from '../../entity/message/ContentMessage';
-import {FileAsset} from '../../entity/message/FileAsset';
-import {Message} from '../../entity/message/Message';
-import {User} from '../../entity/User';
 import {ConversationError} from '../../error/ConversationError';
 import {EventRepository} from '../../event/EventRepository';
 import {EventService} from '../../event/EventService';

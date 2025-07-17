@@ -27,6 +27,7 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {PrimaryModalType} from 'Components/Modals/PrimaryModal/PrimaryModalTypes';
+import type {User} from 'Repositories/entity/User';
 import {Config} from 'src/script/Config';
 import {deepMerge} from 'Util/deepMerge';
 import {Environment} from 'Util/Environment';
@@ -37,7 +38,6 @@ import {loadValue} from 'Util/StorageUtil';
 import type {PropertiesService} from './PropertiesService';
 import {PROPERTIES_TYPE, UserConsentStatus} from './PropertiesType';
 
-import type {User} from '../entity/User';
 import type {SelfService} from '../self/SelfService';
 import {StorageKey} from '../storage';
 import {isTelemetryEnabledAtCurrentEnvironment} from '../tracking/Telemetry.helpers';

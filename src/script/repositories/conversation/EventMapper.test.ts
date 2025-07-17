@@ -20,7 +20,7 @@
 import {Article, LinkPreview, Mention} from '@wireapp/protocol-messaging';
 
 import {AssetType} from 'Repositories/assets/AssetType';
-import {Conversation} from 'src/script/entity/Conversation';
+import {Conversation} from 'Repositories/entity/Conversation';
 import {MentionEntity} from 'src/script/message/MentionEntity';
 import {createMessageAddEvent} from 'test/helper/EventGenerator';
 import {arrayToBase64} from 'Util/util';

@@ -50,6 +50,8 @@ import {ConversationRepository} from 'Repositories/conversation/ConversationRepo
 import {isMLSCapableConversation} from 'Repositories/conversation/ConversationSelectors';
 import {ConversationState} from 'Repositories/conversation/ConversationState';
 import type {MessageRepository} from 'Repositories/conversation/MessageRepository';
+import {Conversation} from 'Repositories/entity/Conversation';
+import {User} from 'Repositories/entity/User';
 import {getStorage} from 'Util/localStorage';
 import {getLogger, Logger} from 'Util/Logger';
 
@@ -57,8 +59,6 @@ import {TIME_IN_MILLIS} from './TimeUtil';
 import {createUuid} from './uuid';
 
 import {E2EIHandler} from '../E2EIdentity';
-import {Conversation} from '../entity/Conversation';
-import {User} from '../entity/User';
 import {EventRepository} from '../event/EventRepository';
 import {checkVersion} from '../lifecycle/newVersionHandler';
 import {PropertiesRepository} from '../properties/PropertiesRepository';

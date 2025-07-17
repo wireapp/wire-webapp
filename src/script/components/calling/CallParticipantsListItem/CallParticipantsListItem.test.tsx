@@ -22,7 +22,7 @@ import {render} from '@testing-library/react';
 import {Availability} from '@wireapp/protocol-messaging';
 
 import {Participant} from 'Repositories/calling/Participant';
-import {User} from 'src/script/entity/User';
+import {User} from 'Repositories/entity/User';
 import {ROLE} from 'src/script/user/UserPermission';
 import {createUuid} from 'Util/uuid';
 

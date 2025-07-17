@@ -20,9 +20,8 @@
 import {useCallback, useEffect, useState} from 'react';
 import type {KeyboardEvent as ReactKeyboardEvent} from 'react';
 
+import {Conversation} from 'Repositories/entity/Conversation';
 import {isKey, isTabKey, KEY} from 'Util/KeyboardUtil';
-
-import {Conversation} from '../entity/Conversation';
 
 function useConversationFocus(conversations: Conversation[]) {
   const [currentFocus, setCurrentFocus] = useState(conversations[0]?.id || '');

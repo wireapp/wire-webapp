@@ -30,7 +30,7 @@ import {
   MessageAddEvent,
   ReactionEvent,
 } from 'Repositories/conversation/EventBuilder';
-import {Conversation} from 'src/script/entity/Conversation';
+import {Conversation} from 'Repositories/entity/Conversation';
 import {CONVERSATION} from 'src/script/event/Client';
 import {createUuid} from 'Util/uuid';
 

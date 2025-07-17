@@ -34,9 +34,9 @@ import {AssetTransferState} from './AssetTransferState';
 import {getAssetUrl, setAssetUrl} from './AssetURLCache';
 import {AssetError} from './AssetError';
 
-import {Conversation} from '../../entity/Conversation';
-import {FileAsset} from '../../entity/message/FileAsset';
-import type {User} from '../../entity/User';
+import {Conversation} from 'Repositories/entity/Conversation';
+import {FileAsset} from 'Repositories/entity/message/FileAsset';
+import type {User} from 'Repositories/entity/User';
 import {Core} from '../../service/CoreSingleton';
 import {TeamState} from '../../team/TeamState';
 

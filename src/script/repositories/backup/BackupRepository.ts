@@ -21,6 +21,8 @@ import {omit} from 'underscore';
 
 import type {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
 import {isReadableConversation} from 'Repositories/conversation/ConversationSelectors';
+import type {Conversation} from 'Repositories/entity/Conversation';
+import {User} from 'Repositories/entity/User';
 import {chunk} from 'Util/ArrayUtil';
 import {Logger, getLogger} from 'Util/Logger';
 import {constructUserPrimaryKey} from 'Util/StorageUtil';
@@ -45,8 +47,6 @@ import {
 import {createMetaData, exportHistory, importLegacyBackupToDatabase} from './LegacyBackup.helper';
 
 import {Config} from '../../Config';
-import type {Conversation} from '../../entity/Conversation';
-import {User} from '../../entity/User';
 import {EventRecord, UserRecord} from '../../storage';
 import {ConversationRecord} from '../../storage/record/ConversationRecord';
 import {StorageSchemata} from '../../storage/StorageSchemata';

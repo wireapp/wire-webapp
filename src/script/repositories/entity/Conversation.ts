@@ -58,13 +58,13 @@ import type {Message} from './message/Message';
 import {PingMessage} from './message/PingMessage';
 import type {User} from './User';
 
-import {Config} from '../Config';
-import {ConversationError} from '../error/ConversationError';
-import {isContentMessage, isDeleteMessage} from '../guards/Message';
-import {StatusType} from '../message/StatusType';
-import {ContentState, useAppState} from '../page/useAppState';
-import {ConversationRecord} from '../storage/record/ConversationRecord';
-import {TeamState} from '../team/TeamState';
+import {Config} from '../../Config';
+import {ConversationError} from '../../error/ConversationError';
+import {isContentMessage, isDeleteMessage} from '../../guards/Message';
+import {StatusType} from '../../message/StatusType';
+import {ContentState, useAppState} from '../../page/useAppState';
+import {ConversationRecord} from '../../storage/record/ConversationRecord';
+import {TeamState} from '../../team/TeamState';
 
 export interface UnreadState {
   allEvents: Message[];

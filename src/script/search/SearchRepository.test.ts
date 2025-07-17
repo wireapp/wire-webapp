@@ -17,7 +17,7 @@
  *
  */
 
-import {User} from 'src/script/entity/User';
+import {User} from 'Repositories/entity/User';
 import {generateUser} from 'test/helper/UserGenerator';
 import {createUuid} from 'Util/uuid';
 

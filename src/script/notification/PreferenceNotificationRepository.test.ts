@@ -24,11 +24,10 @@ import ko from 'knockout';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {ClientEntity} from 'Repositories/client/ClientEntity';
+import {User} from 'Repositories/entity/User';
 import {Notification, PreferenceNotificationRepository} from 'src/script/notification/PreferenceNotificationRepository';
 import {PropertiesRepository} from 'src/script/properties/PropertiesRepository';
 import {createUuid} from 'Util/uuid';
-
-import {User} from '../entity/User';
 
 describe('PreferenceNotificationRepository', () => {
   const user = new User(createUuid(), null);

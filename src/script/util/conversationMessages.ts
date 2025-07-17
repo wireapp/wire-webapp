@@ -18,11 +18,10 @@
  */
 
 import {AssetType} from 'Repositories/assets/AssetType';
-import {Asset} from 'src/script/entity/message/Asset';
-import type {FileAsset as FileAssetType} from 'src/script/entity/message/FileAsset';
-
-import {Conversation} from '../entity/Conversation';
-import type {Message} from '../entity/message/Message';
+import {Conversation} from 'Repositories/entity/Conversation';
+import {Asset} from 'Repositories/entity/message/Asset';
+import type {FileAsset as FileAssetType} from 'Repositories/entity/message/FileAsset';
+import type {Message} from 'Repositories/entity/message/Message';
 
 interface MessageDataType {
   senderName: string;

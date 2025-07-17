@@ -23,7 +23,7 @@ import {container} from 'tsyringe';
 
 import {WebAppEvents} from '@wireapp/webapp-events';
 
-import {Conversation} from 'src/script/entity/Conversation';
+import {Conversation} from 'Repositories/entity/Conversation';
 import {VerificationMessageType} from 'src/script/message/VerificationMessageType';
 import {UserState} from 'src/script/user/UserState';
 import {getLogger, Logger} from 'Util/Logger';

@@ -31,14 +31,14 @@ import type {ConnectionRepository} from 'Repositories/connection/ConnectionRepos
 import type {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
 import type {MessageRepository} from 'Repositories/conversation/MessageRepository';
 import {NOTIFICATION_STATE} from 'Repositories/conversation/NotificationSetting';
+import type {Conversation} from 'Repositories/entity/Conversation';
+import type {Message} from 'Repositories/entity/message/Message';
+import type {User} from 'Repositories/entity/User';
 import {t} from 'Util/LocalizerUtil';
 import {isBackendError} from 'Util/TypePredicateUtil';
 
 import type {MainViewModel} from './MainViewModel';
 
-import type {Conversation} from '../entity/Conversation';
-import type {Message} from '../entity/message/Message';
-import type {User} from '../entity/User';
 import type {IntegrationRepository} from '../integration/IntegrationRepository';
 import type {ServiceEntity} from '../integration/ServiceEntity';
 import {SelfRepository} from '../self/SelfRepository';

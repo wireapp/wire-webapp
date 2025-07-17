@@ -33,6 +33,8 @@ import {UserDetails} from 'Components/panel/UserDetails';
 import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
 import {ConversationVerificationState} from 'Repositories/conversation/ConversationVerificationState';
 import {getNotificationText} from 'Repositories/conversation/NotificationSetting';
+import {Conversation} from 'Repositories/entity/Conversation';
+import {User} from 'Repositories/entity/User';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 import {sortUsersByPriority} from 'Util/StringUtil';
@@ -42,8 +44,6 @@ import {ConversationDetailsHeader} from './components/ConversationDetailsHeader'
 import {ConversationDetailsOptions} from './components/ConversationDetailsOptions';
 import {ConversationDetailsParticipants} from './components/ConversationDetailsParticipants';
 
-import {Conversation} from '../../../entity/Conversation';
-import {User} from '../../../entity/User';
 import {isServiceEntity} from '../../../guards/Service';
 import {IntegrationRepository} from '../../../integration/IntegrationRepository';
 import {ServiceEntity} from '../../../integration/ServiceEntity';

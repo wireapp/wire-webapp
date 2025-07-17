@@ -33,7 +33,8 @@ import {
 
 import * as Icon from 'Components/Icon';
 import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
-import {User} from 'src/script/entity/User';
+import {Conversation} from 'Repositories/entity/Conversation';
+import {User} from 'Repositories/entity/User';
 import {getManageTeamUrl} from 'src/script/externalRoute';
 import {ConversationFolderTab} from 'src/script/page/LeftSidebar/panels/Conversations/ConversationTab/ConversationFolderTab';
 import {SidebarTabs} from 'src/script/page/LeftSidebar/panels/Conversations/useSidebarStore';
@@ -56,7 +57,6 @@ import {FolderIcon} from './FolderIcon';
 import {TeamCreationBanner} from './TeamCreation/TeamCreationBanner';
 
 import {Config} from '../../../../../Config';
-import {Conversation} from '../../../../../entity/Conversation';
 import {ContentState} from '../../../../useAppState';
 import {ConversationTab} from '../ConversationTab';
 

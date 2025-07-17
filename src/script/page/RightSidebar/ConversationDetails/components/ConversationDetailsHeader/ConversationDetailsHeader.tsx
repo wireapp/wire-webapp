@@ -22,13 +22,13 @@ import {ChangeEvent, FC, KeyboardEvent, useEffect, useRef, useState} from 'react
 import {ConversationVerificationBadges} from 'Components/Badge';
 import * as Icon from 'Components/Icon';
 import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
+import {Conversation} from 'Repositories/entity/Conversation';
+import {User} from 'Repositories/entity/User';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {isEnterKey} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
 import {removeLineBreaks} from 'Util/StringUtil';
 
-import {Conversation} from '../../../../../entity/Conversation';
-import {User} from '../../../../../entity/User';
 import {ServiceEntity} from '../../../../../integration/ServiceEntity';
 import {GroupDetails} from '../GroupDetails/GroupDetails';
 

@@ -20,12 +20,12 @@
 import cx from 'classnames';
 
 import type {ClientEntity} from 'Repositories/client/ClientEntity';
+import type {User} from 'Repositories/entity/User';
 import {WireIdentity} from 'src/script/E2EIdentity';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 
 import {Config} from '../../../../Config';
-import type {User} from '../../../../entity/User';
 import {DeviceCard} from '../DeviceCard';
 
 interface DeviceListProps {

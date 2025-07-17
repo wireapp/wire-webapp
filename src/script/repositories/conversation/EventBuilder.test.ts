@@ -19,8 +19,9 @@
 
 import type {QualifiedId} from '@wireapp/api-client/lib/user/';
 
-import {Conversation} from 'src/script/entity/Conversation';
-import {User} from 'src/script/entity/User';
+import {Conversation} from 'Repositories/entity/Conversation';
+import {VerificationMessage} from 'Repositories/entity/message/VerificationMessage';
+import {User} from 'Repositories/entity/User';
 import {ClientEvent} from 'src/script/event/Client';
 import {SuperType} from 'src/script/message/SuperType';
 import {VerificationMessageType} from 'src/script/message/VerificationMessageType';
@@ -28,8 +29,6 @@ import {createUuid} from 'Util/uuid';
 
 import {EventBuilder} from './EventBuilder';
 import {EventMapper} from './EventMapper';
-
-import {VerificationMessage} from '../../entity/message/VerificationMessage';
 
 describe('EventBuilder', () => {
   let event_mapper: EventMapper = undefined;

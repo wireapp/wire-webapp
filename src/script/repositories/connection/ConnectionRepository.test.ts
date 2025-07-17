@@ -25,6 +25,7 @@ import {StatusCodes} from 'http-status-codes';
 
 import {WebAppEvents} from '@wireapp/webapp-events';
 
+import {Conversation} from 'Repositories/entity/Conversation';
 import {SelfService} from 'src/script/self/SelfService';
 import {TeamService} from 'src/script/team/TeamService';
 import {generateUser} from 'test/helper/UserGenerator';
@@ -35,7 +36,6 @@ import {ConnectionRepository} from './ConnectionRepository';
 import {ConnectionService} from './ConnectionService';
 import {ConnectionState} from './ConnectionState';
 
-import {Conversation} from '../../entity/Conversation';
 import {UserRepository} from '../../user/UserRepository';
 
 function buildConnectionRepository() {

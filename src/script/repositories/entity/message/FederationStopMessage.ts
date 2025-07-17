@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2018 Wire Swiss GmbH
+ * Copyright (C) 2023 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,26 +17,20 @@
  *
  */
 
-import {ProteusErrors} from '@wireapp/core/lib/messagingProtocols/proteus';
-
 import {Message} from './Message';
 
-import {SuperType} from '../../message/SuperType';
+import {SuperType} from '../../../message/SuperType';
 
-export class DecryptErrorMessage extends Message {
+/**
+ * Federation stop system message
+ */
+export class FederationStopMessage extends Message {
   constructor(
-    public readonly clientId: string,
-    public readonly code: number,
+    public readonly domains: string[],
+    timestamp: number,
   ) {
     super();
-    this.super_type = SuperType.UNABLE_TO_DECRYPT;
-  }
-
-  get isRecoverable(): boolean {
-    return !this.isIdentityChanged && this.code >= 200 && this.code < 300;
-  }
-
-  get isIdentityChanged(): boolean {
-    return this.code === ProteusErrors.RemoteIdentityChanged;
+    this.super_type = SuperType.FEDERATION_STOP;
+    this.timestamp(timestamp);
   }
 }

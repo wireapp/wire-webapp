@@ -29,8 +29,8 @@ import {container} from 'tsyringe';
 import {CALL_TYPE, CONV_TYPE, REASON, STATE as CALL_STATE, VIDEO_STATE, Wcall} from '@wireapp/avs';
 import {Runtime} from '@wireapp/commons';
 
-import {Conversation} from 'src/script/entity/Conversation';
-import {User} from 'src/script/entity/User';
+import {Conversation} from 'Repositories/entity/Conversation';
+import {User} from 'Repositories/entity/User';
 import {EventRepository} from 'src/script/event/EventRepository';
 import {MediaType} from 'src/script/media/MediaType';
 import {serverTimeHandler} from 'src/script/time/serverTimeHandler';

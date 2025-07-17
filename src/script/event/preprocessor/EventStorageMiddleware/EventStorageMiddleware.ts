@@ -21,7 +21,7 @@ import {CONVERSATION_EVENT} from '@wireapp/api-client/lib/event';
 import {container} from 'tsyringe';
 
 import {ConversationState} from 'Repositories/conversation/ConversationState';
-import {User} from 'src/script/entity/User';
+import {User} from 'Repositories/entity/User';
 import {UserFilter} from 'src/script/user/UserFilter';
 import {matchQualifiedIds} from 'Util/QualifiedId';
 

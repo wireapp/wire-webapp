@@ -25,13 +25,13 @@ import {container} from 'tsyringe';
 
 import {InViewport} from 'Components/InViewport';
 import {AssetRemoteData} from 'Repositories/assets/AssetRemoteData';
+import {MediumImage} from 'Repositories/entity/message/MediumImage';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 
 import {getImageStyle, getWrapperStyles} from './Image.styles';
 import {RestrictedImage} from './RestrictedImage';
 
 import {Config} from '../../Config';
-import {MediumImage} from '../../entity/message/MediumImage';
 import {TeamState} from '../../team/TeamState';
 import {
   AssetUrl,

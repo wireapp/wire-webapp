@@ -18,7 +18,7 @@
  */
 
 import {ConversationEphemeralHandler} from 'Repositories/conversation/ConversationEphemeralHandler';
-import {Conversation} from 'src/script/entity/Conversation';
+import {Conversation} from 'Repositories/entity/Conversation';
 import {EventService} from 'src/script/event/EventService';
 
 const buildConversationEphemeralHandler = () => {

@@ -33,11 +33,11 @@ import type {REASON as AVS_REASON} from '@wireapp/avs';
 import type {Asset, LegalHoldStatus} from '@wireapp/protocol-messaging';
 
 import {AssetTransferState} from 'Repositories/assets/AssetTransferState';
+import type {Conversation} from 'Repositories/entity/Conversation';
+import type {Message} from 'Repositories/entity/message/Message';
+import type {User} from 'Repositories/entity/User';
 import {createUuid} from 'Util/uuid';
 
-import type {Conversation} from '../../entity/Conversation';
-import type {Message} from '../../entity/message/Message';
-import type {User} from '../../entity/User';
 import {ClientEvent, CONVERSATION} from '../../event/Client';
 import {E2EIVerificationMessageType} from '../../message/E2EIVerificationMessageType';
 import {StatusType} from '../../message/StatusType';

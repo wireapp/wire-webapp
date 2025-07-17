@@ -17,8 +17,8 @@
  *
  */
 
-import {Conversation} from 'src/script/entity/Conversation';
-import {User} from 'src/script/entity/User';
+import {Conversation} from 'Repositories/entity/Conversation';
+import {User} from 'Repositories/entity/User';
 import {ClientEvent} from 'src/script/event/Client';
 import {QuoteEntity} from 'src/script/message/QuoteEntity';
 import {createMessageAddEvent, toSavedEvent} from 'test/helper/EventGenerator';

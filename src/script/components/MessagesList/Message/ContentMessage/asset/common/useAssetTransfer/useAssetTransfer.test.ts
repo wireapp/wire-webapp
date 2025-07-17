@@ -22,7 +22,7 @@ import ko from 'knockout';
 
 import {AssetRemoteData} from 'Repositories/assets/AssetRemoteData';
 import {AssetRepository} from 'Repositories/assets/AssetRepository';
-import {ContentMessage} from 'src/script/entity/message/ContentMessage';
+import {ContentMessage} from 'Repositories/entity/message/ContentMessage';
 import {createUuid} from 'Util/uuid';
 
 import {useAssetTransfer} from './useAssetTransfer';

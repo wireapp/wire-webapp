@@ -29,7 +29,7 @@ import {LoadingBar} from 'Components/LoadingBar/LoadingBar';
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {CancelError} from 'Repositories/backup/Error';
 import {ClientState} from 'Repositories/client/ClientState';
-import {User} from 'src/script/entity/User';
+import {User} from 'Repositories/entity/User';
 import {ContentState} from 'src/script/page/useAppState';
 import {EventName} from 'src/script/tracking/EventName';
 import {Segmentation} from 'src/script/tracking/Segmentation';

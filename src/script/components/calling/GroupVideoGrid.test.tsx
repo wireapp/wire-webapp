@@ -24,12 +24,11 @@ import {CALL_TYPE, VIDEO_STATE} from '@wireapp/avs';
 
 import {Call} from 'Repositories/calling/Call';
 import {Participant} from 'Repositories/calling/Participant';
-import {Conversation} from 'src/script/entity/Conversation';
+import {Conversation} from 'Repositories/entity/Conversation';
+import {User} from 'Repositories/entity/User';
 import {MediaDevicesHandler} from 'src/script/media/MediaDevicesHandler';
 
 import {GroupVideoGrid, GroupVideoGripProps} from './GroupVideoGrid';
-
-import {User} from '../../entity/User';
 
 const createMockParticipant = (
   userId: string,

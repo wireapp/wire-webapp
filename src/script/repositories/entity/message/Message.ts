@@ -46,11 +46,11 @@ import type {PingMessage} from './PingMessage';
 import type {SystemMessage} from './SystemMessage';
 import type {VerificationMessage} from './VerificationMessage';
 
-import {EphemeralStatusType} from '../../message/EphemeralStatusType';
-import type {MessageCategory} from '../../message/MessageCategory';
-import {StatusType} from '../../message/StatusType';
-import {SuperType} from '../../message/SuperType';
-import type {ReadReceipt} from '../../storage/record/EventRecord';
+import {EphemeralStatusType} from '../../../message/EphemeralStatusType';
+import type {MessageCategory} from '../../../message/MessageCategory';
+import {StatusType} from '../../../message/StatusType';
+import {SuperType} from '../../../message/SuperType';
+import type {ReadReceipt} from '../../../storage/record/EventRecord';
 import {User} from '../User';
 
 export class Message {

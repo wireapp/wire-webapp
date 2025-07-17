@@ -20,7 +20,7 @@
 import {useMemo} from 'react';
 
 import {AssetTransferState} from 'Repositories/assets/AssetTransferState';
-import type {FileAsset} from 'src/script/entity/message/FileAsset';
+import type {FileAsset} from 'Repositories/entity/message/FileAsset';
 import {t} from 'Util/LocalizerUtil';
 import {formatBytes, getFileExtension, trimFileExtension} from 'Util/util';
 

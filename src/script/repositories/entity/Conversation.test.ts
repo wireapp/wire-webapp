@@ -37,7 +37,7 @@ import {PingMessage} from './message/PingMessage';
 import {Text} from './message/Text';
 import {User} from './User';
 
-import {entities} from '../../../test/api/payloads';
+import {entities} from '../../../../test/api/payloads';
 
 describe('Conversation', () => {
   let conversation_et: Conversation = null;

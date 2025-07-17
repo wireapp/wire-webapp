@@ -17,8 +17,8 @@
  *
  */
 
-import type {Conversation} from '../../entity/Conversation';
-import type {User} from '../../entity/User';
+import type {Conversation} from 'Repositories/entity/Conversation';
+import type {User} from 'Repositories/entity/User';
 
 export class ConversationFilter {
   static isInTeam(conversationEntity: Conversation, userEntity: User): boolean {

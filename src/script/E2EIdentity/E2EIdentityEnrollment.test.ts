@@ -25,6 +25,8 @@ import {container} from 'tsyringe';
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {PrimaryModalType} from 'Components/Modals/PrimaryModal/PrimaryModalTypes';
 import {ConversationState} from 'Repositories/conversation/ConversationState';
+import {Conversation} from 'Repositories/entity/Conversation';
+import {User} from 'Repositories/entity/User';
 import {Core} from 'src/script/service/CoreSingleton';
 import {UserState} from 'src/script/user/UserState';
 import * as util from 'Util/util';
@@ -33,9 +35,6 @@ import {E2EIHandler} from './E2EIdentityEnrollment';
 import * as e2EIdentityVerification from './E2EIdentityVerification';
 import {getEnrollmentStore} from './Enrollment.store';
 import {OIDCServiceStore} from './OIDCService/OIDCServiceStorage';
-
-import {Conversation} from '../entity/Conversation';
-import {User} from '../entity/User';
 
 jest.mock('./OIDCService', () => {
   return {

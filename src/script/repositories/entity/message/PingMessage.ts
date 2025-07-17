@@ -23,8 +23,8 @@ import {t} from 'Util/LocalizerUtil';
 
 import {Message} from './Message';
 
-import {SuperType} from '../../message/SuperType';
-import {ReactionMap} from '../../storage';
+import {SuperType} from '../../../message/SuperType';
+import {ReactionMap} from '../../../storage';
 
 export class PingMessage extends Message {
   public readonly caption: ko.PureComputed<string>;

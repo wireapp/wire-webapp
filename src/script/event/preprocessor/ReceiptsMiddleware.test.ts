@@ -18,7 +18,7 @@
  */
 
 import {ConfirmationEvent} from 'Repositories/conversation/EventBuilder';
-import {User} from 'src/script/entity/User';
+import {User} from 'Repositories/entity/User';
 import {ClientEvent} from 'src/script/event/Client';
 import {StatusType} from 'src/script/message/StatusType';
 import {createUuid} from 'Util/uuid';

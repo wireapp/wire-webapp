@@ -24,8 +24,8 @@ import {t} from 'Util/LocalizerUtil';
 
 import {Message} from './Message';
 
-import {CALL_MESSAGE_TYPE} from '../../message/CallMessageType';
-import {SuperType} from '../../message/SuperType';
+import {CALL_MESSAGE_TYPE} from '../../../message/CallMessageType';
+import {SuperType} from '../../../message/SuperType';
 
 export class CallMessage extends Message {
   private readonly call_message_type: CALL_MESSAGE_TYPE;

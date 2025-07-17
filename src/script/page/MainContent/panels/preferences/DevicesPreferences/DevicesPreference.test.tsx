@@ -27,14 +27,13 @@ import {ClientEntity} from 'Repositories/client/ClientEntity';
 import {ClientState} from 'Repositories/client/ClientState';
 import {ConversationState} from 'Repositories/conversation/ConversationState';
 import {CryptographyRepository} from 'Repositories/cryptography/CryptographyRepository';
+import {Conversation} from 'Repositories/entity/Conversation';
+import {User} from 'Repositories/entity/User';
 import {withTheme} from 'src/script/auth/util/test/TestUtil';
-import {User} from 'src/script/entity/User';
 import {Core} from 'src/script/service/CoreSingleton';
 import {createUuid} from 'Util/uuid';
 
 import {DevicesPreferences} from './DevicesPreference';
-
-import {Conversation} from '../../../../../entity/Conversation';
 
 function createDevice(): ClientEntity {
   const device = new ClientEntity(true, '', createUuid());

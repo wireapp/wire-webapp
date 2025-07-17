@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2023 Wire Swiss GmbH
+ * Copyright (C) 2018 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,22 +17,26 @@
  *
  */
 
-import {QualifiedId} from '@wireapp/api-client/lib/user';
+import {ProteusErrors} from '@wireapp/core/lib/messagingProtocols/proteus';
 
 import {Message} from './Message';
 
-import {E2EIVerificationMessageType} from '../../message/E2EIVerificationMessageType';
-import {SuperType} from '../../message/SuperType';
+import {SuperType} from '../../../message/SuperType';
 
-export class E2EIVerificationMessage extends Message {
-  public messageType: E2EIVerificationMessageType;
-  public userIds?: QualifiedId[];
-
-  constructor(messageType: E2EIVerificationMessageType, userIds?: QualifiedId[]) {
+export class DecryptErrorMessage extends Message {
+  constructor(
+    public readonly clientId: string,
+    public readonly code: number,
+  ) {
     super();
+    this.super_type = SuperType.UNABLE_TO_DECRYPT;
+  }
 
-    this.super_type = SuperType.E2EI_VERIFICATION;
-    this.messageType = messageType;
-    this.userIds = userIds;
+  get isRecoverable(): boolean {
+    return !this.isIdentityChanged && this.code >= 200 && this.code < 300;
+  }
+
+  get isIdentityChanged(): boolean {
+    return this.code === ProteusErrors.RemoteIdentityChanged;
   }
 }

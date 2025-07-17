@@ -25,9 +25,8 @@ import {
 } from '@wireapp/api-client/lib/conversation/';
 import {QualifiedId} from '@wireapp/api-client/lib/user/';
 
+import {Conversation} from 'Repositories/entity/Conversation';
 import {matchQualifiedIds} from 'Util/QualifiedId';
-
-import {Conversation} from '../../entity/Conversation';
 
 export type ProteusConversation = Conversation & {protocol: ConversationProtocol.PROTEUS};
 export type MixedConversation = Conversation & {groupId: string; protocol: ConversationProtocol.MIXED};

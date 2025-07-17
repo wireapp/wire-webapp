@@ -24,11 +24,10 @@ import {randomUUID} from 'crypto';
 import {Account} from '@wireapp/core';
 
 import {MLSConversation} from 'Repositories/conversation/ConversationSelectors';
+import {Conversation} from 'Repositories/entity/Conversation';
+import {User} from 'Repositories/entity/User';
 
 import {initMLSGroupConversations, initialiseSelfAndTeamConversations} from './MLSConversations';
-
-import {Conversation} from '../entity/Conversation';
-import {User} from '../entity/User';
 
 function createMLSConversation(type?: CONVERSATION_TYPE, epoch = 0): MLSConversation {
   const conversation = new Conversation(randomUUID(), '', ConversationProtocol.MLS);

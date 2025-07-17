@@ -33,6 +33,8 @@ import {listCSS} from 'Components/panel/PanelActions/PanelActions.styles';
 import {ACCESS_STATE} from 'Repositories/conversation/AccessState';
 import type {ConversationRoleRepository} from 'Repositories/conversation/ConversationRoleRepository';
 import {ConversationState} from 'Repositories/conversation/ConversationState';
+import {Conversation} from 'Repositories/entity/Conversation';
+import type {User} from 'Repositories/entity/User';
 import {SidebarTabs, useSidebarStore} from 'src/script/page/LeftSidebar/panels/Conversations/useSidebarStore';
 import {TeamState} from 'src/script/team/TeamState';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
@@ -43,8 +45,6 @@ import type {MenuItem} from './PanelActions';
 import {PanelActions} from './PanelActions';
 import {SingleAction} from './SingleAction/SingleAction';
 
-import {Conversation} from '../../entity/Conversation';
-import type {User} from '../../entity/User';
 import type {ActionsViewModel} from '../../view_model/ActionsViewModel';
 
 export enum Actions {

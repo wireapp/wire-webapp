@@ -18,8 +18,8 @@
  */
 
 import {AssetTransferState} from 'Repositories/assets/AssetTransferState';
-import type {ContentMessage} from 'src/script/entity/message/ContentMessage';
-import type {FileAsset} from 'src/script/entity/message/FileAsset';
+import type {ContentMessage} from 'Repositories/entity/message/ContentMessage';
+import type {FileAsset} from 'Repositories/entity/message/FileAsset';
 
 import {AudioAssetCard} from './AudioAssetCard/AudioAssetCard';
 import {AudioAssetPlaceholder} from './AudioAssetPlaceholder/AudioAssetPlaceholder';

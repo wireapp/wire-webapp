@@ -24,8 +24,8 @@ import cx from 'classnames';
 import * as Icons from 'Components/Icon';
 import {createLabel, LabelType} from 'Repositories/conversation/ConversationLabelRepository';
 import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
+import {Conversation} from 'Repositories/entity/Conversation';
 import {Config} from 'src/script/Config';
-import {Conversation} from 'src/script/entity/Conversation';
 import {useFolderStore} from 'src/script/page/LeftSidebar/panels/Conversations/useFoldersStore';
 import {
   SidebarStatus,

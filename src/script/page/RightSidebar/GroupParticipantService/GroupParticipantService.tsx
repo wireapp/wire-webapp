@@ -24,12 +24,12 @@ import {TabIndex} from '@wireapp/react-ui-kit';
 import {FadingScrollbar} from 'Components/FadingScrollbar';
 import * as Icon from 'Components/Icon';
 import {ServiceDetails} from 'Components/panel/ServiceDetails';
+import {Conversation} from 'Repositories/entity/Conversation';
+import {User} from 'Repositories/entity/User';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {handleKeyDown, KEY} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
 
-import {Conversation} from '../../../entity/Conversation';
-import {User} from '../../../entity/User';
 import {IntegrationRepository} from '../../../integration/IntegrationRepository';
 import {ServiceEntity} from '../../../integration/ServiceEntity';
 import {generatePermissionHelpers} from '../../../user/UserPermission';

@@ -25,8 +25,8 @@ import {matchQualifiedIds} from 'Util/QualifiedId';
 
 import {Message} from './Message';
 
-import {SuperType} from '../../message/SuperType';
-import {VerificationMessageType} from '../../message/VerificationMessageType';
+import {SuperType} from '../../../message/SuperType';
+import {VerificationMessageType} from '../../../message/VerificationMessageType';
 import type {User} from '../User';
 
 export class VerificationMessage extends Message {

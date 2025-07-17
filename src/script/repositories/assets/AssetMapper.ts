@@ -23,7 +23,7 @@ import type {UserAsset as APIClientUserAsset} from '@wireapp/api-client/lib/user
 
 import {AssetRemoteData} from './AssetRemoteData';
 
-import type {User} from '../../entity/User';
+import type {User} from 'Repositories/entity/User';
 import type {ServiceEntity} from '../../integration/ServiceEntity';
 
 export type MappedAsset = {[index: string]: AssetRemoteData};

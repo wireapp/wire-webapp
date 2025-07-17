@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2018 Wire Swiss GmbH
+ * Copyright (C) 2023 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,23 +17,19 @@
  *
  */
 
+import {AddUsersFailure} from '@wireapp/core/lib/conversation';
+
 import {Message} from './Message';
-import {RenameMessage} from './RenameMessage';
 
-import {SuperType} from '../../message/SuperType';
-import {SystemMessageType} from '../../message/SystemMessageType';
+import {SuperType} from '../../../message/SuperType';
 
-export class SystemMessage extends Message {
-  public caption?: string;
-  public system_message_type: SystemMessageType;
-
-  constructor() {
+export class FailedToAddUsersMessage extends Message {
+  constructor(
+    public readonly failures: AddUsersFailure[],
+    time: number,
+  ) {
     super();
-    this.super_type = SuperType.SYSTEM;
-    this.system_message_type = SystemMessageType.NORMAL;
-  }
-
-  isConversationRename(): this is RenameMessage {
-    return this.system_message_type === SystemMessageType.CONVERSATION_RENAME;
+    this.super_type = SuperType.FAILED_TO_ADD_USERS;
+    this.timestamp(time);
   }
 }

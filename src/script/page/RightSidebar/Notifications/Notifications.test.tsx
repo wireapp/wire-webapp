@@ -22,7 +22,7 @@ import ko from 'knockout';
 
 import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
 import {NOTIFICATION_STATE} from 'Repositories/conversation/NotificationSetting';
-import {Conversation} from 'src/script/entity/Conversation';
+import {Conversation} from 'Repositories/entity/Conversation';
 import {TestFactory} from 'test/helper/TestFactory';
 
 import {Notifications} from './Notifications';

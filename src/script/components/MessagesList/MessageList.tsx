@@ -29,11 +29,12 @@ import {filterMessages} from 'Components/MessagesList/utils/messagesFilter';
 import {AssetRepository} from 'Repositories/assets/AssetRepository';
 import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
 import {MessageRepository} from 'Repositories/conversation/MessageRepository';
-import {ContentMessage} from 'src/script/entity/message/ContentMessage';
-import {DecryptErrorMessage} from 'src/script/entity/message/DecryptErrorMessage';
-import {MemberMessage} from 'src/script/entity/message/MemberMessage';
-import {Message as MessageEntity} from 'src/script/entity/message/Message';
-import {User} from 'src/script/entity/User';
+import {Conversation} from 'Repositories/entity/Conversation';
+import {ContentMessage} from 'Repositories/entity/message/ContentMessage';
+import {DecryptErrorMessage} from 'Repositories/entity/message/DecryptErrorMessage';
+import {MemberMessage} from 'Repositories/entity/message/MemberMessage';
+import {Message as MessageEntity} from 'Repositories/entity/message/Message';
+import {User} from 'Repositories/entity/User';
 import {useRoveFocus} from 'src/script/hooks/useRoveFocus';
 import {ServiceEntity} from 'src/script/integration/ServiceEntity';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
@@ -47,8 +48,6 @@ import {ScrollToElement} from './Message/types';
 import {UploadAssets} from './UploadAssets';
 import {groupMessagesBySenderAndTime, isMarker} from './utils/messagesGroup';
 import {updateScroll, FocusedElement} from './utils/scrollUpdater';
-
-import {Conversation} from '../../entity/Conversation';
 
 interface MessagesListParams {
   assetRepository: AssetRepository;

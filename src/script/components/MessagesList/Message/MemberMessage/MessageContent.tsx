@@ -20,9 +20,9 @@
 import {MemberLeaveReason} from '@wireapp/api-client/lib/conversation/data/';
 import {CONVERSATION_EVENT} from '@wireapp/api-client/lib/event/';
 
+import {MemberMessage as MemberMessageEntity} from 'Repositories/entity/message/MemberMessage';
+import {User} from 'Repositories/entity/User';
 import {Config} from 'src/script/Config';
-import {MemberMessage as MemberMessageEntity} from 'src/script/entity/message/MemberMessage';
-import {User} from 'src/script/entity/User';
 import {ClientEvent} from 'src/script/event/Client';
 import {SystemMessageType} from 'src/script/message/SystemMessageType';
 import {Declension, joinNames, replaceLink, t} from 'Util/LocalizerUtil';

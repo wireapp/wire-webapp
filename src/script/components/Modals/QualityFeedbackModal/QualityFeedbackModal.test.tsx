@@ -29,7 +29,7 @@ import {CALL_QUALITY_FEEDBACK_KEY} from 'Components/Modals/QualityFeedbackModal/
 import {RatingListLabel} from 'Components/Modals/QualityFeedbackModal/typings';
 import {Call} from 'Repositories/calling/Call';
 import {CallingRepository} from 'Repositories/calling/CallingRepository';
-import {User} from 'src/script/entity/User';
+import {User} from 'Repositories/entity/User';
 import {UserState} from 'src/script/user/UserState';
 import {TestFactory} from 'test/helper/TestFactory';
 import {t} from 'Util/LocalizerUtil';

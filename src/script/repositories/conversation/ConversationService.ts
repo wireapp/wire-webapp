@@ -47,9 +47,10 @@ import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {MLSServiceEvents} from '@wireapp/core/lib/messagingProtocols/mls';
 import {container} from 'tsyringe';
 
+import type {Conversation as ConversationEntity} from 'Repositories/entity/Conversation';
+
 import {MLSCapableConversation} from './ConversationSelectors';
 
-import type {Conversation as ConversationEntity} from '../../entity/Conversation';
 import type {EventService} from '../../event/EventService';
 import {MessageCategory} from '../../message/MessageCategory';
 import {search as fullTextSearch} from '../../search/FullTextSearch';

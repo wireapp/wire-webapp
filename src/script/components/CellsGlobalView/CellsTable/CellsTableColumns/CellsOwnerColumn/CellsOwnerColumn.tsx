@@ -19,7 +19,7 @@
 
 import {Avatar, AVATAR_SIZE} from 'Components/Avatar';
 import {showUserModal} from 'Components/Modals/UserModal';
-import {User} from 'src/script/entity/User';
+import {User} from 'Repositories/entity/User';
 
 import {avatarWrapperStyles, textStyles, wrapperStyles} from './CellsOwnerColumn.styles';
 

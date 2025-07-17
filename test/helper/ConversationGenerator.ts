@@ -34,8 +34,8 @@ import {ConnectionEntity} from 'Repositories/connection/ConnectionEntity';
 import {ConversationDatabaseData, ConversationMapper} from 'Repositories/conversation/ConversationMapper';
 import {ConversationStatus} from 'Repositories/conversation/ConversationStatus';
 import {ConversationVerificationState} from 'Repositories/conversation/ConversationVerificationState';
-import {Conversation} from 'src/script/entity/Conversation';
-import {User} from 'src/script/entity/User';
+import {Conversation} from 'Repositories/entity/Conversation';
+import {User} from 'Repositories/entity/User';
 import {createUuid} from 'Util/uuid';
 
 interface GenerateAPIConversationParams {

@@ -27,6 +27,7 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 import * as Icon from 'Components/Icon';
 import {useCreateConversationModal} from 'Components/Modals/CreateConversation/hooks/useCreateConversationModal';
 import {ConversationLabel} from 'Repositories/conversation/ConversationLabelRepository';
+import {User} from 'Repositories/entity/User';
 import {SidebarTabs} from 'src/script/page/LeftSidebar/panels/Conversations/useSidebarStore';
 import {handleEnterDown, handleEscDown} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
@@ -42,7 +43,6 @@ import {
   searchInputWrapperStyles,
 } from './ConversationHeader.styles';
 
-import {User} from '../../../../../entity/User';
 import {generatePermissionHelpers} from '../../../../../user/UserPermission';
 
 interface ConversationHeaderProps {

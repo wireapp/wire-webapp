@@ -26,6 +26,9 @@ import {container} from 'tsyringe';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {ConversationState} from 'Repositories/conversation/ConversationState';
+import {Conversation} from 'Repositories/entity/Conversation';
+import {Message} from 'Repositories/entity/message/Message';
+import {User} from 'Repositories/entity/User';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 
 import {Access} from './Access/Access';
@@ -41,9 +44,6 @@ import {Notifications} from './Notifications';
 import {ParticipantDevices} from './ParticipantDevices';
 import {TimedMessages} from './TimedMessages';
 
-import {Conversation} from '../../entity/Conversation';
-import {Message} from '../../entity/message/Message';
-import {User} from '../../entity/User';
 import {isReadableMessage} from '../../guards/Message';
 import {isUserEntity, isUserServiceEntity} from '../../guards/Panel';
 import {isServiceEntity} from '../../guards/Service';

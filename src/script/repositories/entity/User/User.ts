@@ -34,8 +34,8 @@ import {clamp} from 'Util/NumberUtil';
 import {getFirstChar} from 'Util/StringUtil';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 
-import {ACCENT_ID} from '../../Config';
-import {ROLE as TEAM_ROLE} from '../../user/UserPermission';
+import {ACCENT_ID} from '../../../Config';
+import {ROLE as TEAM_ROLE} from '../../../user/UserPermission';
 
 export class User {
   private expirationIntervalId?: number;

@@ -17,24 +17,26 @@
  *
  */
 
-import {TEAM_EVENT} from '@wireapp/api-client/lib/event/TeamEvent';
+import {LegalHoldStatus} from '@wireapp/protocol-messaging';
 
-import {t} from 'Util/LocalizerUtil';
+import {Message} from './Message';
 
-import {SystemMessage} from './SystemMessage';
+import {SuperType} from '../../../message/SuperType';
 
-import {SystemMessageType} from '../../message/SystemMessageType';
-import type {Conversation} from '../Conversation';
-
-export class DeleteConversationMessage extends SystemMessage {
-  constructor(conversationEntity: Conversation) {
+/**
+ * Legal hold system message
+ */
+export class LegalHoldMessage extends Message {
+  constructor(
+    public legalHoldStatus: LegalHoldStatus,
+    timestamp: number,
+  ) {
     super();
+    this.super_type = SuperType.LEGALHOLD;
+    this.timestamp(timestamp);
+  }
 
-    this.type = TEAM_EVENT.DELETE;
-    this.system_message_type = SystemMessageType.CONVERSATION_DELETE;
-
-    this.caption = conversationEntity
-      ? t('notificationConversationDeletedNamed', {name: conversationEntity.name()})
-      : t('notificationConversationDeleted');
+  get isActivationMessage(): boolean {
+    return this.legalHoldStatus === LegalHoldStatus.ENABLED;
   }
 }

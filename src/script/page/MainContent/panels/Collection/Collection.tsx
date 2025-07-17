@@ -28,7 +28,9 @@ import {showDetailViewModal} from 'Components/Modals/DetailViewModal';
 import {AssetRepository} from 'Repositories/assets/AssetRepository';
 import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
 import {MessageRepository} from 'Repositories/conversation/MessageRepository';
-import {ContentMessage} from 'src/script/entity/message/ContentMessage';
+import {Conversation} from 'Repositories/entity/Conversation';
+import {ContentMessage} from 'Repositories/entity/message/ContentMessage';
+import {User} from 'Repositories/entity/User';
 import {generateConversationUrl} from 'src/script/router/routeGenerator';
 import {createNavigate} from 'src/script/router/routerBindings';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
@@ -39,8 +41,6 @@ import {CollectionSection} from './CollectionSection';
 import {FullSearch} from './FullSearch';
 import {Category, isOfCategory} from './utils';
 
-import {Conversation} from '../../../../entity/Conversation';
-import {User} from '../../../../entity/User';
 import {MessageCategory} from '../../../../message/MessageCategory';
 
 interface CollectionDetailsProps {

@@ -21,7 +21,7 @@ import {RECEIPT_MODE} from '@wireapp/api-client/lib/conversation/data';
 
 import type {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
 import {ConfirmationEvent} from 'Repositories/conversation/EventBuilder';
-import {User} from 'src/script/entity/User';
+import {User} from 'Repositories/entity/User';
 import {getLogger, Logger} from 'Util/Logger';
 
 import {StatusType} from '../../message/StatusType';

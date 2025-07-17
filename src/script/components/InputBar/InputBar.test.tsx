@@ -25,6 +25,8 @@ import {AssetRepository} from 'Repositories/assets/AssetRepository';
 import {CellsRepository} from 'Repositories/cells/CellsRepository';
 import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
 import {MessageRepository} from 'Repositories/conversation/MessageRepository';
+import {Conversation} from 'Repositories/entity/Conversation';
+import {User} from 'Repositories/entity/User';
 import {withTheme} from 'src/script/auth/util/test/TestUtil';
 import {Config} from 'src/script/Config';
 import {PropertiesService} from 'src/script/properties/PropertiesService';
@@ -32,8 +34,6 @@ import {SelfService} from 'src/script/self/SelfService';
 import {createUuid} from 'Util/uuid';
 
 import {TestFactory} from '../../../../test/helper/TestFactory';
-import {Conversation} from '../../entity/Conversation';
-import {User} from '../../entity/User';
 import {EventRepository} from '../../event/EventRepository';
 import {PropertiesRepository} from '../../properties/PropertiesRepository';
 import {SearchRepository} from '../../search/SearchRepository';

@@ -18,17 +18,17 @@
  */
 
 import {AssetTransferState} from 'Repositories/assets/AssetTransferState';
+import type {Conversation} from 'Repositories/entity/Conversation';
+import type {FileAsset} from 'Repositories/entity/message/FileAsset';
+import type {MemberMessage} from 'Repositories/entity/message/MemberMessage';
+import type {SystemMessage} from 'Repositories/entity/message/SystemMessage';
+import type {Text} from 'Repositories/entity/message/Text';
 import {t} from 'Util/LocalizerUtil';
 import {getRenderedTextContent} from 'Util/messageRenderer';
 import {matchQualifiedIds} from 'Util/QualifiedId';
 
 import {ConversationStatusIcon} from './ConversationStatusIcon';
 
-import type {Conversation} from '../../entity/Conversation';
-import type {FileAsset} from '../../entity/message/FileAsset';
-import type {MemberMessage} from '../../entity/message/MemberMessage';
-import type {SystemMessage} from '../../entity/message/SystemMessage';
-import type {Text} from '../../entity/message/Text';
 import {ConversationError} from '../../error/ConversationError';
 import {E2EIVerificationMessageType} from '../../message/E2EIVerificationMessageType';
 

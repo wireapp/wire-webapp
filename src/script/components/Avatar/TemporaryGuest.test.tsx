@@ -19,9 +19,9 @@
 
 import {render} from '@testing-library/react';
 
-import {TemporaryGuestAvatar} from './TemporaryGuestAvatar';
+import {User} from 'Repositories/entity/User';
 
-import {User} from '../../entity/User';
+import {TemporaryGuestAvatar} from './TemporaryGuestAvatar';
 
 import {AVATAR_SIZE, STATE} from '.';
 

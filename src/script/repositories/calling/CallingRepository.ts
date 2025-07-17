@@ -64,6 +64,8 @@ import {ConversationState} from 'Repositories/conversation/ConversationState';
 import {ConversationVerificationState} from 'Repositories/conversation/ConversationVerificationState';
 import {EventBuilder} from 'Repositories/conversation/EventBuilder';
 import {CONSENT_TYPE, MessageRepository, MessageSendingOptions} from 'Repositories/conversation/MessageRepository';
+import {Conversation} from 'Repositories/entity/Conversation';
+import type {User} from 'Repositories/entity/User';
 import {flatten} from 'Util/ArrayUtil';
 import {calculateChildWindowPosition} from 'Util/DOM/caculateChildWindowPosition';
 import {isDetachedCallingFeatureEnabled} from 'Util/isDetachedCallingFeatureEnabled';
@@ -84,8 +86,6 @@ import {LEAVE_CALL_REASON} from './enum/LeaveCallReason';
 import {ClientId, Participant, UserId} from './Participant';
 
 import {Config} from '../../Config';
-import {Conversation} from '../../entity/Conversation';
-import type {User} from '../../entity/User';
 import {NoAudioInputError} from '../../error/NoAudioInputError';
 import {CallingEvent} from '../../event/CallingEvent';
 import {EventRepository} from '../../event/EventRepository';

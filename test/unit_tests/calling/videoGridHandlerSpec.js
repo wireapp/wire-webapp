@@ -23,7 +23,7 @@ import ko from 'knockout';
 import {Call} from 'Repositories/calling/Call';
 import {Participant} from 'Repositories/calling/Participant';
 import {getGrid} from 'Repositories/calling/videoGridHandler';
-import {User} from 'src/script/entity/User';
+import {User} from 'Repositories/entity/User';
 describe('videoGridHandler', () => {
   let participants;
 

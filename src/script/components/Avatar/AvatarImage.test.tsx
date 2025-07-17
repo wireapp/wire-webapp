@@ -22,10 +22,9 @@ import {render, waitFor} from '@testing-library/react';
 import {AVATAR_SIZE} from 'Components/Avatar';
 import {AssetRemoteData} from 'Repositories/assets/AssetRemoteData';
 import {AssetRepository} from 'Repositories/assets/AssetRepository';
+import {User} from 'Repositories/entity/User';
 
 import {AvatarImage} from './AvatarImage';
-
-import {User} from '../../entity/User';
 
 describe('AvatarImage', () => {
   it('fetches full avatar image for large avatars', async () => {

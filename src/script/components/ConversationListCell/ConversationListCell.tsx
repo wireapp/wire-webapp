@@ -29,6 +29,7 @@ import {ChannelAvatar} from 'Components/Avatar/ChannelAvatar';
 import {UserBlockedBadge} from 'Components/Badge';
 import {CellDescription} from 'Components/ConversationListCell/components/CellDescription';
 import {UserInfo} from 'Components/UserInfo';
+import type {Conversation} from 'Repositories/entity/Conversation';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {isKey, isOneOfKeys, KEY} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
@@ -37,7 +38,6 @@ import {noop, setContextMenuPosition} from 'Util/util';
 
 import {StatusIcon} from './components/StatusIcon';
 
-import type {Conversation} from '../../entity/Conversation';
 import {MediaType} from '../../media/MediaType';
 
 export interface ConversationListCellProps {

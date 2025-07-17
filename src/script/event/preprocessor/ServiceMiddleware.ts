@@ -22,7 +22,7 @@ import type {QualifiedId} from '@wireapp/api-client/lib/user/';
 
 import type {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
 import {MemberJoinEvent, OneToOneCreationEvent} from 'Repositories/conversation/EventBuilder';
-import {User} from 'src/script/entity/User';
+import {User} from 'Repositories/entity/User';
 import {getLogger, Logger} from 'Util/Logger';
 import {matchQualifiedIds} from 'Util/QualifiedId';
 

@@ -52,6 +52,8 @@ import {ClientEntity} from 'Repositories/client/ClientEntity';
 import {ClientMapper} from 'Repositories/client/ClientMapper';
 import type {ConnectionEntity} from 'Repositories/connection/ConnectionEntity';
 import {flattenUserClientsQualifiedIds} from 'Repositories/conversation/userClientsUtils';
+import {Conversation} from 'Repositories/entity/Conversation';
+import {User} from 'Repositories/entity/User';
 import {chunk, partition} from 'Util/ArrayUtil';
 import {t} from 'Util/LocalizerUtil';
 import {getLogger, Logger} from 'Util/Logger';
@@ -67,8 +69,6 @@ import {UserState} from './UserState';
 
 import {SIGN_OUT_REASON} from '../auth/SignOutReason';
 import {Config} from '../Config';
-import {Conversation} from '../entity/Conversation';
-import {User} from '../entity/User';
 import {UserError} from '../error/UserError';
 import {USER} from '../event/Client';
 import {EventRepository} from '../event/EventRepository';

@@ -26,7 +26,7 @@ import {
 import {container} from 'tsyringe';
 
 import {ConversationDatabaseData, ConversationMapper} from 'Repositories/conversation/ConversationMapper';
-import {User} from 'src/script/entity/User';
+import {User} from 'Repositories/entity/User';
 import {Core} from 'src/script/service/CoreSingleton';
 import {createUuid} from 'Util/uuid';
 

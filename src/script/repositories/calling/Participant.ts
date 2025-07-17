@@ -23,9 +23,9 @@ import ko, {computed, observable, pureComputed} from 'knockout';
 import {VIDEO_STATE} from '@wireapp/avs';
 import {AvsDebugger} from '@wireapp/avs-debugger';
 
+import {User} from 'Repositories/entity/User';
 import {matchQualifiedIds} from 'Util/QualifiedId';
 
-import {User} from '../../entity/User';
 import {applyBlur} from '../../media/VideoBackgroundBlur';
 
 export type UserId = string;

@@ -28,6 +28,7 @@ import {FadingScrollbar} from 'Components/FadingScrollbar';
 import * as Icon from 'Components/Icon';
 import {CallingRepository} from 'Repositories/calling/CallingRepository';
 import {Participant} from 'Repositories/calling/Participant';
+import {Conversation} from 'Repositories/entity/Conversation';
 import {t} from 'Util/LocalizerUtil';
 import {sortUsersByPriority} from 'Util/StringUtil';
 
@@ -38,7 +39,6 @@ import {
   participantListWrapperStyles,
 } from './CallingParticipantList.styles';
 
-import {Conversation} from '../../../../entity/Conversation';
 import {ContextMenuEntry, showContextMenu} from '../../../../ui/ContextMenu';
 
 interface CallingParticipantListProps {

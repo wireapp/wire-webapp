@@ -32,9 +32,9 @@ import type {MediumImage} from './MediumImage';
 import {Message} from './Message';
 import {Text as TextAsset} from './Text';
 
-import type {QuoteEntity} from '../../message/QuoteEntity';
-import {SuperType} from '../../message/SuperType';
-import {ReactionMap, ReadReceipt} from '../../storage';
+import type {QuoteEntity} from '../../../message/QuoteEntity';
+import {SuperType} from '../../../message/SuperType';
+import {ReactionMap, ReadReceipt} from '../../../storage';
 
 export class ContentMessage extends Message {
   public readonly assets: ko.ObservableArray<Asset | FileAsset | TextAsset | MediumImage> = ko.observableArray();

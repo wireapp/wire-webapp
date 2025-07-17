@@ -21,7 +21,7 @@ import {render} from '@testing-library/react';
 
 import {Availability} from '@wireapp/protocol-messaging';
 
-import {User} from 'src/script/entity/User';
+import {User} from 'Repositories/entity/User';
 import {TeamState} from 'src/script/team/TeamState';
 
 import {UserAvatar} from './UserAvatar';

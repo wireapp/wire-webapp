@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2023 Wire Swiss GmbH
+ * Copyright (C) 2018 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,19 +17,17 @@
  *
  */
 
-import {AddUsersFailure} from '@wireapp/core/lib/conversation';
-
 import {Message} from './Message';
 
-import {SuperType} from '../../message/SuperType';
+import {SuperType} from '../../../message/SuperType';
 
-export class FailedToAddUsersMessage extends Message {
-  constructor(
-    public readonly failures: AddUsersFailure[],
-    time: number,
-  ) {
+export class DeleteMessage extends Message {
+  public deleted_timestamp: null | number;
+
+  constructor() {
     super();
-    this.super_type = SuperType.FAILED_TO_ADD_USERS;
-    this.timestamp(time);
+
+    this.super_type = SuperType.DELETE;
+    this.deleted_timestamp = null;
   }
 }

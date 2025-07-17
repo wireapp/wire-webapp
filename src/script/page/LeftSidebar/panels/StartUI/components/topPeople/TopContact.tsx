@@ -25,10 +25,9 @@ import {TabIndex} from '@wireapp/react-ui-kit';
 
 import {Avatar, AVATAR_SIZE} from 'Components/Avatar';
 import {AssetRepository} from 'Repositories/assets/AssetRepository';
+import {User} from 'Repositories/entity/User';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {handleKeyDown, KEY} from 'Util/KeyboardUtil';
-
-import {User} from '../../../../../../entity/User';
 
 export interface TopContactProps {
   assetRepository: AssetRepository;

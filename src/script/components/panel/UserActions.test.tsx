@@ -28,9 +28,9 @@ import {PrimaryModalComponent} from 'Components/Modals/PrimaryModal/PrimaryModal
 import {ConnectionEntity} from 'Repositories/connection/ConnectionEntity';
 import {ConversationRoleRepository} from 'Repositories/conversation/ConversationRoleRepository';
 import {ConversationState} from 'Repositories/conversation/ConversationState';
+import {Conversation} from 'Repositories/entity/Conversation';
+import {User} from 'Repositories/entity/User';
 import {withTheme} from 'src/script/auth/util/test/TestUtil';
-import {Conversation} from 'src/script/entity/Conversation';
-import {User} from 'src/script/entity/User';
 import {TeamEntity} from 'src/script/team/TeamEntity';
 import {TeamState} from 'src/script/team/TeamState';
 import {UserState} from 'src/script/user/UserState';

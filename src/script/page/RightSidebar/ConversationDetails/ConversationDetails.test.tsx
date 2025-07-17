@@ -24,14 +24,14 @@ import {ConnectionRepository} from 'Repositories/connection/ConnectionRepository
 import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
 import {ConversationRoleRepository} from 'Repositories/conversation/ConversationRoleRepository';
 import {MessageRepository} from 'Repositories/conversation/MessageRepository';
-import {Conversation} from 'src/script/entity/Conversation';
+import {Conversation} from 'Repositories/entity/Conversation';
+import {User} from 'Repositories/entity/User';
 import 'src/script/util/test/mock/LocalStorageMock';
 import {createUuid} from 'Util/uuid';
 
 import {ConversationDetails} from './ConversationDetails';
 
 import {TestFactory} from '../../../../../test/helper/TestFactory';
-import {User} from '../../../entity/User';
 import {IntegrationRepository} from '../../../integration/IntegrationRepository';
 import {SearchRepository} from '../../../search/SearchRepository';
 import {SelfRepository} from '../../../self/SelfRepository';

@@ -27,8 +27,8 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 import {CellsRepository} from 'Repositories/cells/CellsRepository';
 import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
 import {MessageRepository} from 'Repositories/conversation/MessageRepository';
-import {Conversation} from 'src/script/entity/Conversation';
-import {ContentMessage} from 'src/script/entity/message/ContentMessage';
+import {Conversation} from 'Repositories/entity/Conversation';
+import {ContentMessage} from 'Repositories/entity/message/ContentMessage';
 import {EventRepository} from 'src/script/event/EventRepository';
 import {StorageRepository} from 'src/script/storage';
 

@@ -19,11 +19,12 @@
 
 import {CONVERSATION_TYPE} from '@wireapp/api-client/lib/conversation';
 
-import {Conversation} from 'src/script/entity/Conversation';
-import {ContentMessage} from 'src/script/entity/message/ContentMessage';
-import {PingMessage} from 'src/script/entity/message/PingMessage';
-import {Text} from 'src/script/entity/message/Text';
-import {User} from 'src/script/entity/User';
+import {Conversation} from 'Repositories/entity/Conversation';
+import {CallMessage} from 'Repositories/entity/message/CallMessage';
+import {ContentMessage} from 'Repositories/entity/message/ContentMessage';
+import {PingMessage} from 'Repositories/entity/message/PingMessage';
+import {Text} from 'Repositories/entity/message/Text';
+import {User} from 'Repositories/entity/User';
 import {t} from 'Util/LocalizerUtil';
 import {createUuid} from 'Util/uuid';
 
@@ -31,7 +32,6 @@ import {generateCellState} from './ConversationCellState';
 import {ConversationStatusIcon} from './ConversationStatusIcon';
 import {NOTIFICATION_STATE} from './NotificationSetting';
 
-import {CallMessage} from '../../entity/message/CallMessage';
 import {CALL_MESSAGE_TYPE} from '../../message/CallMessageType';
 
 describe('ConversationCellState', () => {
