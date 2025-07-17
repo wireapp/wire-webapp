@@ -17,26 +17,7 @@
  *
  */
 
-import {test as baseTest} from '@playwright/test';
+import {MINIMUM_API_VERSION} from '@wireapp/api-client/lib/Config';
 
-import {ApiManagerE2E} from './backend/apiManager.e2e';
-import {PageManager} from './pageManager';
-
-// Define custom test type with axios fixture
-type Fixtures = {
-  api: ApiManagerE2E;
-  pageManager: PageManager;
-};
-
-export const test = baseTest.extend<Fixtures>({
-  api: async ({}, use) => {
-    // Create a new instance of ApiManager for each test
-    await use(new ApiManagerE2E());
-  },
-  pageManager: async ({page}, use) => {
-    // Create a new instance of PageManager for each test
-    await use(new PageManager(page));
-  },
-});
-
-export {expect} from '@playwright/test';
+// https://staging-nginz-https.zinfra.io/v9/api/swagger-ui/#/
+export const TEST_API_VERSION = `v${MINIMUM_API_VERSION}`;

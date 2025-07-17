@@ -17,26 +17,5 @@
  *
  */
 
-import {test as baseTest} from '@playwright/test';
-
-import {ApiManagerE2E} from './backend/apiManager.e2e';
-import {PageManager} from './pageManager';
-
-// Define custom test type with axios fixture
-type Fixtures = {
-  api: ApiManagerE2E;
-  pageManager: PageManager;
-};
-
-export const test = baseTest.extend<Fixtures>({
-  api: async ({}, use) => {
-    // Create a new instance of ApiManager for each test
-    await use(new ApiManagerE2E());
-  },
-  pageManager: async ({page}, use) => {
-    // Create a new instance of PageManager for each test
-    await use(new PageManager(page));
-  },
-});
-
-export {expect} from '@playwright/test';
+export * from './conversationRepository.e2e';
+export * from './conversationRepository.mocks';

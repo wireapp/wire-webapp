@@ -17,23 +17,28 @@
  *
  */
 
-import {Locator, Page} from '@playwright/test';
-
-export class SingleSignOnPage {
-  readonly page: Page;
-
-  readonly ssoCodeEmailInput: Locator;
-  readonly ssoSignInButton: Locator;
-
-  constructor(page: Page) {
-    this.page = page;
-
-    this.ssoCodeEmailInput = page.locator('#sso-code-email');
-    this.ssoSignInButton = page.locator('[data-uie-name="do-sso-sign-in"]');
-  }
-
-  async enterEmailOnSSOPage(email: string) {
-    await this.ssoCodeEmailInput.fill(email);
-    await this.ssoSignInButton.click();
-  }
+export interface createGroupConversationDataParams {
+  name: string;
+  protocol: 'proteus' | 'mls';
+  qualifiedUsers: Array<{
+    domain: string;
+    id: string;
+  }>;
+  team: {
+    teamid: string;
+  };
 }
+export const createGroupConversationData = (data: createGroupConversationDataParams) => ({
+  access: ['invite', 'code'],
+  add_permission: 'admins',
+  access_role_v2: ['team_member', 'non_team_member', 'guest', 'service'],
+  conversation_role: 'wire_member',
+  name: data.name,
+  protocol: data.protocol,
+  qualified_users: data.qualifiedUsers,
+  users: data.qualifiedUsers.map(user => user.id),
+  team: {
+    managed: false,
+    teamid: data.team.teamid,
+  },
+});

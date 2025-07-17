@@ -19,30 +19,34 @@
 
 import {Page, Locator} from '@playwright/test';
 
-export class AccountPage {
+import {selectByDataAttribute, selectByLabel} from 'test/e2e_tests/utils/useSelector';
+
+export class LeaveConversationModal {
   readonly page: Page;
 
-  readonly sendUsageDataCheckbox: Locator;
-  readonly appLockCheckbox: Locator;
-  readonly deleteAccountButton: Locator;
+  readonly modal: Locator;
+  readonly modalCheckbox: Locator;
+  readonly cancelButton: Locator;
+  readonly confirmButton: Locator;
 
   constructor(page: Page) {
     this.page = page;
 
-    this.sendUsageDataCheckbox = page.locator("[data-uie-name='status-preference-telemetry']+label");
-    this.appLockCheckbox = page.locator("[data-uie-name='status-preference-applock']+label");
-    this.deleteAccountButton = page.locator("[data-uie-name='go-delete-account']");
+    this.modal = page.locator(selectByDataAttribute('modal-template-option'));
+    this.modalCheckbox = this.modal.locator(selectByLabel('clear-data-checkbox'));
+    this.cancelButton = this.modal.locator(selectByDataAttribute('do-secondary'));
+    this.confirmButton = this.modal.locator(selectByDataAttribute('do-action'));
   }
 
-  async clickDeleteAccountButton() {
-    await this.deleteAccountButton.click();
+  async toggleCheckbox() {
+    await this.modalCheckbox.click();
   }
 
-  async toggleSendUsageData() {
-    await this.sendUsageDataCheckbox.click();
+  async clickCancel() {
+    await this.cancelButton.click();
   }
 
-  async toggleAppLock() {
-    await this.appLockCheckbox.click();
+  async clickConfirm() {
+    await this.confirmButton.click();
   }
 }

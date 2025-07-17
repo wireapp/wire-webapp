@@ -19,18 +19,21 @@
 
 import {getUser} from '../../data/user';
 import {test, expect} from '../../test.fixtures';
-import {addCreatedTeam, tearDown} from '../../utils/tearDownUtil';
+import {addCreatedTeam, removeCreatedTeam} from '../../utils/tearDownUtil';
+import {loginUser} from '../../utils/userActions';
 import {generateSecurePassword} from '../../utils/userDataGenerator';
 
-test('Account Management', {tag: ['@TC-8639', '@crit-flow']}, async ({pages, api}) => {
+// Generating test data
+const owner = getUser();
+const member = getUser();
+const teamName = 'Critical';
+const conversationName = 'Tracking';
+const appLockPassphrase = generateSecurePassword();
+
+test('Account Management', {tag: ['@TC-8639', '@crit-flow-web']}, async ({pageManager, api}) => {
   test.slow(); // Increasing test timeout to 90 seconds to accommodate the full flow
 
-  // Generating test data
-  const owner = getUser();
-  const member = getUser();
-  const teamName = 'Critical';
-  const conversationName = 'Tracking';
-  const appLockPassphrase = generateSecurePassword();
+  const {pages, modals, components} = pageManager.webapp;
 
   // Creating preconditions for the test via API
   await test.step('Preconditions: Creating preconditions for the test via API', async () => {
@@ -52,37 +55,35 @@ test('Account Management', {tag: ['@TC-8639', '@crit-flow']}, async ({pages, api
 
   // Test steps
   await test.step('Members logs in into the application', async () => {
-    await pages.openMainPage();
-    await pages.singleSignOnPage.enterEmailOnSSOPage(owner.email);
-    await pages.loginPage.inputPassword(owner.password);
-    await pages.loginPage.clickSignInButton();
-    await pages.dataShareConsentModal.clickDecline();
+    await pageManager.openMainPage();
+    await loginUser(member, pageManager);
+    await modals.dataShareConsent().clickDecline();
   });
 
   await test.step('Member opens settings', async () => {
-    await pages.conversationSidebar.clickPreferencesButton();
+    await components.conversationSidebar().clickPreferencesButton();
   });
 
   await test.step('Member enables logging in settings', async () => {
-    await pages.accountPage.toggleSendUsageData();
+    await pages.account().toggleSendUsageData();
   });
 
   await test.step('Member enables applock and sets their password', async () => {
-    await pages.accountPage.toggleAppLock();
-    await pages.appLockModal.setPasscode(appLockPassphrase);
-    await pages.conversationSidebar.clickAllConversationsButton();
-    expect(await pages.conversationListPage.isConversationItemVisible(conversationName));
+    await pages.account().toggleAppLock();
+    await modals.appLock().setPasscode(appLockPassphrase);
+    await components.conversationSidebar().clickAllConversationsButton();
+    expect(await pages.conversationList().isConversationItemVisible(conversationName));
   });
 
   await test.step('Member verifies if applock is working', async () => {
-    await pages.refreshPage();
-    expect(await pages.appLockModal.isVisible());
-    expect(await pages.appLockModal.getAppLockModalHeader()).toContain('Enter passcode to unlock');
-    expect(await pages.appLockModal.getAppLockModalText()).toContain('Passcode');
+    await pageManager.refreshPage();
+    expect(await modals.appLock().isVisible());
+    expect(await modals.appLock().getAppLockModalHeader()).toContain('Enter passcode to unlock');
+    expect(await modals.appLock().getAppLockModalText()).toContain('Passcode');
 
-    await pages.appLockModal.unlockAppWithPasscode(appLockPassphrase);
-    expect(await pages.appLockModal.isHidden());
-    expect(await pages.conversationListPage.isConversationItemVisible(conversationName));
+    await modals.appLock().unlockAppWithPasscode(appLockPassphrase);
+    expect(await modals.appLock().isHidden());
+    expect(await pages.conversationList().isConversationItemVisible(conversationName));
   });
 
   // TODO: Missing test steps for TC-8639 from testiny:
@@ -96,5 +97,5 @@ test('Account Management', {tag: ['@TC-8639', '@crit-flow']}, async ({pages, api
 });
 
 test.afterAll(async ({api}) => {
-  await tearDown(api);
+  await removeCreatedTeam(api, owner);
 });
