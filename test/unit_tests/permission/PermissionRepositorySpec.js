@@ -17,9 +17,9 @@
  *
  */
 
-import {PermissionRepository} from 'src/script/permission/PermissionRepository';
-import {PermissionStatusState} from 'src/script/permission/PermissionStatusState';
-import {PermissionType} from 'src/script/permission/PermissionType';
+import {PermissionRepository} from 'Repositories/permission/PermissionRepository';
+import {PermissionStatusState} from 'Repositories/permission/PermissionStatusState';
+import {PermissionType} from 'Repositories/permission/PermissionType';
 
 describe('PermissionRepository', () => {
   describe('constructor', () => {

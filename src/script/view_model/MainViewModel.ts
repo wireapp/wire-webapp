@@ -35,13 +35,13 @@ import type {IntegrationRepository} from 'Repositories/integration/IntegrationRe
 import type {MediaRepository} from 'Repositories/media/MediaRepository';
 import type {NotificationRepository} from 'Repositories/notification/NotificationRepository';
 import type {PreferenceNotificationRepository} from 'Repositories/notification/PreferenceNotificationRepository';
+import type {PermissionRepository} from 'Repositories/permission/PermissionRepository';
 
 import {ActionsViewModel} from './ActionsViewModel';
 import {CallingViewModel} from './CallingViewModel';
 import {ContentViewModel} from './ContentViewModel';
 import {ListViewModel} from './ListViewModel';
 
-import type {PermissionRepository} from '../permission/PermissionRepository';
 import type {PropertiesRepository} from '../properties/PropertiesRepository';
 import type {SearchRepository} from '../search/SearchRepository';
 import type {SelfRepository} from '../self/SelfRepository';

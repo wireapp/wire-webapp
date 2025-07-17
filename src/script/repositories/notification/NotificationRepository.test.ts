@@ -51,13 +51,14 @@ import {RenameMessage} from 'Repositories/entity/message/RenameMessage';
 import {Text} from 'Repositories/entity/message/Text';
 import {User} from 'Repositories/entity/User';
 import {NOTIFICATION_HANDLING_STATE} from 'Repositories/event/NotificationHandlingState';
+import {PermissionRepository} from 'Repositories/permission/PermissionRepository';
+import {PermissionStatusState} from 'Repositories/permission/PermissionStatusState';
 import 'src/script/localization/Localizer';
 import {CALL_MESSAGE_TYPE} from 'src/script/message/CallMessageType';
 import {MentionEntity} from 'src/script/message/MentionEntity';
 import {QuoteEntity} from 'src/script/message/QuoteEntity';
 import {SystemMessageType} from 'src/script/message/SystemMessageType';
 import {ContentState, useAppState} from 'src/script/page/useAppState';
-import {PermissionStatusState} from 'src/script/permission/PermissionStatusState';
 import {entities, payload} from 'test/api/payloads';
 import {t} from 'Util/LocalizerUtil';
 import {truncate} from 'Util/StringUtil';
@@ -65,7 +66,6 @@ import {createUuid} from 'Util/uuid';
 
 import {NotificationRepository} from './NotificationRepository';
 
-import {PermissionRepository} from '../../permission/PermissionRepository';
 import {UserMapper} from '../../user/UserMapper';
 import {UserState} from '../../user/UserState';
 

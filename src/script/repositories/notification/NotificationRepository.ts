@@ -47,6 +47,9 @@ import type {MessageTimerUpdateMessage} from 'Repositories/entity/message/Messag
 import type {RenameMessage} from 'Repositories/entity/message/RenameMessage';
 import type {SystemMessage} from 'Repositories/entity/message/SystemMessage';
 import type {User} from 'Repositories/entity/User';
+import type {PermissionRepository} from 'Repositories/permission/PermissionRepository';
+import {PermissionStatusState} from 'Repositories/permission/PermissionStatusState';
+import {PermissionType} from 'Repositories/permission/PermissionType';
 import {Declension, t, getUserName} from 'Util/LocalizerUtil';
 import {getLogger, Logger} from 'Util/Logger';
 import {getRenderedTextContent} from 'Util/messageRenderer';
@@ -59,9 +62,6 @@ import {PermissionState} from './PermissionState';
 import {SuperType} from '../../message/SuperType';
 import {SystemMessageType} from '../../message/SystemMessageType';
 import {ContentState, useAppState} from '../../page/useAppState';
-import type {PermissionRepository} from '../../permission/PermissionRepository';
-import {PermissionStatusState} from '../../permission/PermissionStatusState';
-import {PermissionType} from '../../permission/PermissionType';
 import {UserState} from '../../user/UserState';
 import {Warnings} from '../../view_model/WarningsContainer';
 

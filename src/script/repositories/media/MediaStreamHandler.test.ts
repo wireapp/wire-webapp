@@ -17,7 +17,7 @@
  *
  */
 
-import {PermissionRepository} from 'src/script/permission/PermissionRepository';
+import {PermissionRepository} from 'Repositories/permission/PermissionRepository';
 
 import {MediaConstraintsHandler} from './MediaConstraintsHandler';
 import {CurrentAvailableDeviceId} from './MediaDevicesHandler';
