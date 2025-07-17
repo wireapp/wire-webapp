@@ -134,6 +134,6 @@ export class CallingPage {
   }
 
   static selectorForMuteIcon(userId: string): string {
-    return `[data-uie-name="mic-icon-off"][data-uie-user-id="${userId}"]`;
+    return `[data-uie-name="mic-icon-off"][data-uie-value="${userId}"]`;
   }
 }

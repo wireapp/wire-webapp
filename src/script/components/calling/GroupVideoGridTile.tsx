@@ -89,7 +89,7 @@ const GroupVideoGridTile: React.FC<GroupVideoGridTileProps> = ({
     'isSwitchingVideoResolution',
   ]);
 
-  const {name, id} = useKoSubscribableChildren(participant?.user, ['name', 'id']);
+  const {name} = useKoSubscribableChildren(participant?.user, ['name']);
 
   const sharesScreen = videoState === VIDEO_STATE.SCREENSHARE;
   const sharesCamera = [VIDEO_STATE.STARTED, VIDEO_STATE.PAUSED].includes(videoState);
@@ -125,7 +125,7 @@ const GroupVideoGridTile: React.FC<GroupVideoGridTileProps> = ({
         }}
       >
         <span
-          data-uie-value={id}
+          data-uie-value={participant?.user.id}
           data-uie-name="call-participant-name"
           css={{
             textOverflow: 'ellipsis',
@@ -215,7 +215,7 @@ const GroupVideoGridTile: React.FC<GroupVideoGridTileProps> = ({
 
       {!minimized && isMuted && (
         <span className="group-video-grid__element__label__icon">
-          <Icon.MicOffIcon data-uie-name="mic-icon-off" data-uie-user-id={id} />
+          <Icon.MicOffIcon data-uie-name="mic-icon-off" data-uie-value={participant?.user.id} />
         </span>
       )}
 
