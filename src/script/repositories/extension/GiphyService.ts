@@ -25,7 +25,7 @@ import type {
 } from '@wireapp/api-client/lib/giphy';
 import {container} from 'tsyringe';
 
-import {APIClient} from '../service/APIClientSingleton';
+import {APIClient} from '../../service/APIClientSingleton';
 
 export class GiphyService {
   constructor(private readonly apiClient = container.resolve(APIClient)) {}

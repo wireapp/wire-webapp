@@ -65,6 +65,8 @@ import {ReceiptsMiddleware} from 'Repositories/event/preprocessor/ReceiptsMiddle
 import {RepliesUpdaterMiddleware} from 'Repositories/event/preprocessor/RepliesUpdaterMiddleware';
 import {ServiceMiddleware} from 'Repositories/event/preprocessor/ServiceMiddleware';
 import {FederationEventProcessor} from 'Repositories/event/processor/FederationEventProcessor';
+import {GiphyRepository} from 'Repositories/extension/GiphyRepository';
+import {GiphyService} from 'Repositories/extension/GiphyService';
 import {initializeDataDog} from 'Util/DataDog';
 import {DebugUtil} from 'Util/DebugUtil';
 import {Environment} from 'Util/Environment';
@@ -86,8 +88,6 @@ import {AuthError} from '../error/AuthError';
 import {BaseError} from '../error/BaseError';
 import {CLIENT_ERROR_TYPE, ClientError} from '../error/ClientError';
 import {TeamError} from '../error/TeamError';
-import {GiphyRepository} from '../extension/GiphyRepository';
-import {GiphyService} from '../extension/GiphyService';
 import {externalUrl} from '../externalRoute';
 import {IntegrationRepository} from '../integration/IntegrationRepository';
 import {IntegrationService} from '../integration/IntegrationService';
