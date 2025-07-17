@@ -587,7 +587,7 @@ export class ConversationRepository {
   /**
    * Get a conversation from the backend.
    */
-  private async fetchConversationById({id: conversationId, domain}: QualifiedId): Promise<Conversation> {
+  public async fetchConversationById({id: conversationId, domain}: QualifiedId): Promise<Conversation> {
     const qualifiedId = {domain, id: conversationId};
     const fetching_conversations: Record<string, FetchPromise[]> = {};
     if (fetching_conversations.hasOwnProperty(conversationId)) {

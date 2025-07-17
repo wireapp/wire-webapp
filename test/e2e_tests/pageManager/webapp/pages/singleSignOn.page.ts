@@ -36,4 +36,8 @@ export class SingleSignOnPage {
     await this.ssoCodeEmailInput.fill(email);
     await this.ssoSignInButton.click();
   }
+
+  async isSSOPageVisible() {
+    return this.ssoCodeEmailInput.waitFor({state: 'visible'});
+  }
 }

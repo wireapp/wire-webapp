@@ -19,30 +19,34 @@
 
 import {Page, Locator} from '@playwright/test';
 
-export class AccountPage {
+export class RegisterSuccessPage {
   readonly page: Page;
 
-  readonly sendUsageDataCheckbox: Locator;
-  readonly appLockCheckbox: Locator;
-  readonly deleteAccountButton: Locator;
+  readonly downloadWireButton: Locator;
+  readonly openWireWebButton: Locator;
+  readonly manageTeamButton: Locator;
+  readonly teamSignUpSuccessMessage: Locator;
 
   constructor(page: Page) {
     this.page = page;
 
-    this.sendUsageDataCheckbox = page.locator("[data-uie-name='status-preference-telemetry']+label");
-    this.appLockCheckbox = page.locator("[data-uie-name='status-preference-applock']+label");
-    this.deleteAccountButton = page.locator("[data-uie-name='go-delete-account']");
+    this.downloadWireButton = page.locator('[data-uie-name="do-download-wire"]');
+    this.openWireWebButton = page.locator('[data-uie-name="do-open-wire-web"]');
+    this.manageTeamButton = page.locator('[data-uie-name="do-manage-team"]');
+    this.teamSignUpSuccessMessage = page.locator(
+      '//span[text()="Your team is now ready to collaborate easily and securely!"]',
+    );
   }
 
-  async clickDeleteAccountButton() {
-    await this.deleteAccountButton.click();
+  async clickOpenWireWebButton() {
+    await this.openWireWebButton.click();
   }
 
-  async toggleSendUsageData() {
-    await this.sendUsageDataCheckbox.click();
+  async clickManageTeamButton() {
+    await this.manageTeamButton.click();
   }
 
-  async toggleAppLock() {
-    await this.appLockCheckbox.click();
+  async isTeamSignUpSuccessMessageVisible() {
+    return await this.teamSignUpSuccessMessage.isVisible();
   }
 }

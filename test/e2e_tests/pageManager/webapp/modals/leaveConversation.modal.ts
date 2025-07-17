@@ -19,20 +19,34 @@
 
 import {Page, Locator} from '@playwright/test';
 
-export class RegisterSuccessPage {
+import {selectByDataAttribute, selectByLabel} from 'test/e2e_tests/utils/useSelector';
+
+export class LeaveConversationModal {
   readonly page: Page;
 
-  readonly downloadWireButton: Locator;
-  readonly openWireWebButton: Locator;
+  readonly modal: Locator;
+  readonly modalCheckbox: Locator;
+  readonly cancelButton: Locator;
+  readonly confirmButton: Locator;
 
   constructor(page: Page) {
     this.page = page;
 
-    this.downloadWireButton = page.locator('[data-uie-name="do-download-wire"]');
-    this.openWireWebButton = page.locator('[data-uie-name="do-open-wire-web"]');
+    this.modal = page.locator(selectByDataAttribute('modal-template-option'));
+    this.modalCheckbox = this.modal.locator(selectByLabel('clear-data-checkbox'));
+    this.cancelButton = this.modal.locator(selectByDataAttribute('do-secondary'));
+    this.confirmButton = this.modal.locator(selectByDataAttribute('do-action'));
   }
 
-  async clickOpenWireWebButton() {
-    await this.openWireWebButton.click();
+  async toggleCheckbox() {
+    await this.modalCheckbox.click();
+  }
+
+  async clickCancel() {
+    await this.cancelButton.click();
+  }
+
+  async clickConfirm() {
+    await this.confirmButton.click();
   }
 }

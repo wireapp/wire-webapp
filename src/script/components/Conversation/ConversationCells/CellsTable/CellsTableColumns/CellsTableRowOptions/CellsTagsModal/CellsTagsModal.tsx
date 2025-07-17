@@ -48,7 +48,8 @@ export const CellsTagsModal = ({
     selectedTags,
     isLoadingAllTags,
     isUpdatingTags,
-    error,
+    apiError,
+    validationError,
     handleCreateOption,
     handleChange,
     handleUpdateTags,
@@ -88,7 +89,8 @@ export const CellsTagsModal = ({
             loadingMessage={t('cells.tagsModal.loading')}
           />
         </div>
-        {error && <ErrorMessage>{t('cells.tagsModal.error')}</ErrorMessage>}
+        {apiError && <ErrorMessage>{t('cells.tagsModal.apiError')}</ErrorMessage>}
+        {validationError && <ErrorMessage>{validationError}</ErrorMessage>}
       </div>
       <CellsModal.Actions>
         <CellsModal.SecondaryButton onClick={onClose}>{t('cells.tagsModal.cancelButton')}</CellsModal.SecondaryButton>
