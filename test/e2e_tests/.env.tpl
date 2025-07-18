@@ -19,7 +19,13 @@
 # Define browsers [chromium, firefox, webkit]
 BROWSERS=chromium
 HEADLESS=true
+
+# Test service
 TEST_SERVICE_URL=http://192.168.2.18:8080
+
+# Calling service
+CALLING_SERVICE_URL=op://Test Automation/CALLINGSERVICE_BASIC_AUTH/website
+CALLING_SERVICE_BASIC_AUTH=cWE6YTh4WFB0ZU5LY0hVNlo3SnFnMmo=
 
 INBUCKET_USERNAME=op://Test Automation/BackendConnection staging/inbucketUsername
 INBUCKET_PASSWORD=op://Test Automation/BackendConnection staging/inbucketPassword

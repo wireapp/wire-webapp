@@ -20,27 +20,36 @@
 import {Page} from '@playwright/test';
 
 import {AccountPage} from './account.page';
+import {AddParticipantsPage} from './addParticipants.page';
 import {AppLockModal} from './appLock.modal';
+import {AudioVideoSettingsPage} from './audioVideoSettings.page';
 import {BlockWarningModal} from './blockWarning.modal';
+import {CallingPage} from './calling.page';
+import {ConnectRequestPage} from './connectRequest.page';
 import {ConversationPage} from './conversation.page';
+import {ConversationDetailsPage} from './conversationDetails.page';
 import {ConversationListPage} from './conversationList.page';
 import {ConversationSidebar} from './conversationSidebar.page';
+import {CopyPasswordModal} from './copyPassword.modal';
+import {CreatGuestLinkModal} from './createGuestLink.modal';
 import {DataShareConsentModal} from './dataShareConsent.modal';
 import {DeleteAccountModal} from './deleteAccount.modal';
 import {DeleteAccountPage} from './deleteAccount.page';
 import {EmailVerificationPage} from './emailVerification.page';
 import {GroupCreationPage} from './groupCreation.page';
+import {GuestOptionsPage} from './guestOptions.page';
 import {LoginPage} from './login.page';
 import {MarketingConsentModal} from './marketingConsent.modal';
 import {OutgoingConnectionPage} from './outgoingConnection.page';
 import {RegisterSuccessPage} from './registerSuccess.page';
 import {RegistrationPage} from './registration.page';
+import {SettingsPage} from './settings.page';
 import {SetUsernamePage} from './setUsername.page';
 import {SingleSignOnPage} from './singleSignOn.page';
 import {StartUIPage} from './startUI.page';
-import {TeamDataShareConsentModal} from './team_management/teamDataShareConsent.modal';
 import {TeamLoginPage} from './team_management/teamLogin.page';
 import {TeamsPage} from './team_management/teams.page';
+import {TeamDataShareConsentModal} from './team_management/teamsDataShareConsent.modal';
 import {TeamSignUpPage} from './team_management/teamSignUp.page';
 import {UserProfileModal} from './userProfile.modal';
 import {WelcomePage} from './welcome.page';
@@ -49,7 +58,7 @@ const webAppPath = process.env.WEBAPP_URL ?? '';
 const teamManagementPath = process.env.TEAM_MANAGEMENT_URL ?? '';
 
 export class PageManager {
-  constructor(private readonly page: Page) {}
+  constructor(readonly page: Page) {}
 
   static from(page: Page): PageManager {
     return new PageManager(page);
@@ -293,5 +302,77 @@ export class PageManager {
       this._teamDataShareConsentModal = new TeamDataShareConsentModal(this.page);
     }
     return this._teamDataShareConsentModal;
+  }
+
+  private _conversationDetailsPage!: ConversationDetailsPage;
+  get conversationDetailsPage(): ConversationDetailsPage {
+    if (!this._conversationDetailsPage) {
+      this._conversationDetailsPage = new ConversationDetailsPage(this.page);
+    }
+    return this._conversationDetailsPage;
+  }
+
+  private _guestOptionsPage!: GuestOptionsPage;
+  get guestOptionsPage(): GuestOptionsPage {
+    if (!this._guestOptionsPage) {
+      this._guestOptionsPage = new GuestOptionsPage(this.page);
+    }
+    return this._guestOptionsPage;
+  }
+
+  private _createGuestLinkModal!: CreatGuestLinkModal;
+  get createGuestLinkModal(): CreatGuestLinkModal {
+    if (!this._createGuestLinkModal) {
+      this._createGuestLinkModal = new CreatGuestLinkModal(this.page);
+    }
+    return this._createGuestLinkModal;
+  }
+
+  private _copyPasswordModal!: CopyPasswordModal;
+  get copyPasswordModal(): CopyPasswordModal {
+    if (!this._copyPasswordModal) {
+      this._copyPasswordModal = new CopyPasswordModal(this.page);
+    }
+    return this._copyPasswordModal;
+  }
+
+  private _connectRequestPage!: ConnectRequestPage;
+  get connectRequestPage(): ConnectRequestPage {
+    if (!this._connectRequestPage) {
+      this._connectRequestPage = new ConnectRequestPage(this.page);
+    }
+    return this._connectRequestPage;
+  }
+
+  private _addParticipantsPage!: AddParticipantsPage;
+  get addParticipantsPage(): AddParticipantsPage {
+    if (!this._addParticipantsPage) {
+      this._addParticipantsPage = new AddParticipantsPage(this.page);
+    }
+    return this._addParticipantsPage;
+  }
+
+  private _callingPage!: CallingPage;
+  get callingPage(): CallingPage {
+    if (!this._callingPage) {
+      this._callingPage = new CallingPage(this.page);
+    }
+    return this._callingPage;
+  }
+
+  private _settingsPage!: SettingsPage;
+  get settingsPage(): SettingsPage {
+    if (!this._settingsPage) {
+      this._settingsPage = new SettingsPage(this.page);
+    }
+    return this._settingsPage;
+  }
+
+  private _audioVideoSettingsButton!: AudioVideoSettingsPage;
+  get audioVideoSettingsPage(): AudioVideoSettingsPage {
+    if (!this._audioVideoSettingsButton) {
+      this._audioVideoSettingsButton = new AudioVideoSettingsPage(this.page);
+    }
+    return this._audioVideoSettingsButton;
   }
 }

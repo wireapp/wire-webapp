@@ -24,7 +24,7 @@ export class ConversationRepositoryE2E extends BackendClientE2E {
     inviteeIds: string | string[],
     inviterToken: string,
     teamId: string,
-    conversationName: string,
+    conversationName?: string,
   ) {
     await this.axiosInstance.post(
       'conversations',
@@ -32,7 +32,7 @@ export class ConversationRepositoryE2E extends BackendClientE2E {
         access: ['invite', 'code'],
         conversation_role: 'wire_member',
         access_role_v2: ['team_member', 'non_team_member', 'guest', 'service'],
-        name: conversationName,
+        ...(conversationName && {name: conversationName}),
         team: {
           managed: false,
           teamid: teamId,

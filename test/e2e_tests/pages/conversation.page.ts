@@ -29,6 +29,10 @@ export class ConversationPage {
   readonly messageInput: Locator;
   readonly sendMessageButton: Locator;
   readonly watermark: Locator;
+  readonly conversationTitle: Locator;
+  readonly conversationInfoButton: Locator;
+  readonly invitePeopleButton: Locator;
+  readonly callButton: Locator;
 
   constructor(page: Page) {
     this.page = page;
@@ -40,13 +44,30 @@ export class ConversationPage {
     this.messageInput = page.locator('[data-uie-name="input-message"]');
     this.watermark = page.locator('[data-uie-name="no-conversation"] svg');
     this.sendMessageButton = page.locator('[data-uie-name="do-send-message"]');
+    this.conversationTitle = page.locator('[data-uie-name="status-conversation-title-bar-label"]');
+    this.invitePeopleButton = page.locator('[data-uie-name="do-invite-people"]');
+    this.conversationInfoButton = page.locator('[data-uie-name="do-open-info"]');
+    this.callButton = page.locator('[data-uie-name="do-call"]');
   }
 
   async isConversationOpen(conversationName: string) {
-    return (
-      (await this.page.locator(`[data-uie-name='status-conversation-title-bar-label']`).textContent()) ===
-      conversationName
-    );
+    return (await this.conversationTitle.textContent()) === conversationName;
+  }
+
+  async clickConversationTitle() {
+    await this.conversationTitle.click();
+  }
+
+  async clickInvitePeopleButton() {
+    await this.invitePeopleButton.click();
+  }
+
+  async clickConversationInfoButton() {
+    await this.conversationInfoButton.click();
+  }
+
+  async clickCallButton() {
+    await this.callButton.click();
   }
 
   async isWatermarkVisible() {

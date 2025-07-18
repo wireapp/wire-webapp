@@ -21,6 +21,7 @@ import {AxiosResponse} from 'axios';
 
 import {AuthRepositoryE2E} from './authRepository.e2e';
 import {BrigRepositoryE2E} from './brigRepository.e2e';
+import {CallingServiceClientE2E} from './callingServiceClient.e2e';
 import {ConnectionRepositoryE2E} from './connectionRepository.e2e';
 import {ConversationRepositoryE2E} from './conversationRepository.e2e';
 import {FeatureConfigRepositoryE2E} from './featureConfigRepository.e2e';
@@ -41,6 +42,7 @@ export class ApiManagerE2E {
   featureConfig: FeatureConfigRepositoryE2E;
   inbucket: InbucketClientE2E;
   connection: ConnectionRepositoryE2E;
+  callingService: CallingServiceClientE2E;
 
   constructor() {
     this.user = new UserRepositoryE2E();
@@ -52,6 +54,7 @@ export class ApiManagerE2E {
     this.featureConfig = new FeatureConfigRepositoryE2E();
     this.inbucket = new InbucketClientE2E();
     this.connection = new ConnectionRepositoryE2E();
+    this.callingService = new CallingServiceClientE2E();
   }
 
   async addDevicesToUser(user: User, numberOfDevices: number) {
@@ -118,6 +121,8 @@ export class ApiManagerE2E {
   }
 
   async enableConferenceCallingFeature(teamId: string) {
+    // Wait until stripe/ibis has set free account restrictions after team creation.
+    await new Promise(resolve => setTimeout(resolve, 3000));
     await this.brig.unlockConferenceCallingFeature(teamId);
     await this.brig.enableConferenceCallingBackdoorViaBackdoorTeam(teamId);
   }

@@ -19,44 +19,44 @@
 
 import {Page, Locator} from '@playwright/test';
 
-export class StartUIPage {
+export class AddParticipantsPage {
   readonly page: Page;
 
+  readonly addParticipantsPage: Locator;
   readonly searchInput: Locator;
-  readonly searchResults: Locator;
+  readonly contactsList: Locator;
+  readonly addButton: Locator;
 
   constructor(page: Page) {
     this.page = page;
-
-    this.searchInput = page.locator('[data-uie-name="enter-users"]');
-    this.searchResults = page.locator('[data-uie-name="item-user"] [data-uie-name="status-username"]');
+    this.addParticipantsPage = page.locator('#add-participants');
+    this.searchInput = this.addParticipantsPage.locator('[data-uie-name="enter-users"]');
+    this.contactsList = this.addParticipantsPage.locator(
+      '[data-uie-name="item-user"] [data-uie-name="status-username"]',
+    );
+    this.addButton = this.addParticipantsPage.locator('[data-uie-name="do-create"]');
   }
 
-  async selectUsers(usernames: string[]) {
-    for (const username of usernames) {
-      await this.selectUser(username);
-    }
-  }
-
-  async selectUser(username: string) {
-    await this.searchForUser(username);
-    await this.clickUserFromSearchResults(username);
-  }
-
-  private async searchForUser(username: string) {
+  async searchForUser(username: string) {
     await this.searchInput.fill(username);
   }
 
-  private async clickUserFromSearchResults(username: string) {
-    await this.searchResults.first().waitFor({state: 'visible'});
+  async selectUser(username: string) {
+    await this.clickUserFromContactsList(username);
+  }
 
+  async clickAddButton() {
+    await this.addButton.click();
+  }
+
+  private async clickUserFromContactsList(username: string) {
     const timeout = 30000;
     const delayBetweenAttempts = 500;
     const maxAttempts = timeout / delayBetweenAttempts;
 
     for (let attempt = 0; attempt < maxAttempts; attempt++) {
-      console.info(`Attempt ${attempt + 1} to find user ${username} in search results`);
-      for (const result of await this.searchResults.all()) {
+      console.info(`Attempt ${attempt + 1} to find user ${username} in contacts list`);
+      for (const result of await this.contactsList.all()) {
         const text = await result.textContent();
         if (text?.includes(username)) {
           await result.click();
@@ -65,6 +65,6 @@ export class StartUIPage {
       }
       await new Promise(resolve => setTimeout(resolve, delayBetweenAttempts));
     }
-    throw new Error(`User ${username} not found in search results`);
+    throw new Error(`User ${username} not found in contacts list`);
   }
 }

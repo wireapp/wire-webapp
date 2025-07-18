@@ -38,6 +38,19 @@ export class ConnectionRepositoryE2E extends BackendClientE2E {
     return response;
   }
 
+  async sendConnectionRequest(token: string, inviteeId: string) {
+    await this.axiosInstance.post(
+      `connections/${domain}/${inviteeId}`,
+      {},
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+      },
+    );
+  }
+
   async acceptConnectionRequest(token: string, connectionId: string) {
     await this.axiosInstance.post(
       `connections/${domain}/${connectionId}`,
