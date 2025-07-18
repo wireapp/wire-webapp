@@ -25,19 +25,22 @@ import {SetUsernamePage} from './team_management/pages/setUsername.page';
 import {TeamLoginPage} from './team_management/pages/teamLogin.page';
 import {TeamsPage} from './team_management/pages/teams.page';
 import {TeamSignUpPage} from './team_management/pages/teamSignUp.page';
+import {ConversationSidebar} from './webapp/components/conversationSidebar.component';
+import {InputBarControls} from './webapp/components/inputBarControls.component';
 import {AppLockModal} from './webapp/modals/appLock.modal';
 import {BlockWarningModal} from './webapp/modals/blockWarning.modal';
 import {ConfirmLogoutModal} from './webapp/modals/confirmLogout.modal';
 import {DataShareConsentModal} from './webapp/modals/dataShareConsent.modal';
 import {DeleteAccountModal} from './webapp/modals/deleteAccount.modal';
+import {DetailViewModal} from './webapp/modals/detailView.modal';
 import {ExportBackupModal} from './webapp/modals/exportBackup.modal';
 import {LeaveConversationModal} from './webapp/modals/leaveConversation.modal';
+import {UnableToOpenConversationModal} from './webapp/modals/unableToOpenConversation.modal';
 import {UserProfileModal} from './webapp/modals/userProfile.modal';
 import {AccountPage} from './webapp/pages/account.page';
 import {ConversationPage} from './webapp/pages/conversation.page';
 import {ConversationDetailsPage} from './webapp/pages/conversationDetails.page';
 import {ConversationListPage} from './webapp/pages/conversationList.page';
-import {ConversationSidebar} from './webapp/pages/conversationSidebar.page';
 import {DeleteAccountPage} from './webapp/pages/deleteAccount.page';
 import {EmailVerificationPage} from './webapp/pages/emailVerification.page';
 import {GroupCreationPage} from './webapp/pages/groupCreation.page';
@@ -131,10 +134,15 @@ export class PageManager {
       leaveConversation: () =>
         this.getOrCreate('webapp.modals.leaveConversation', () => new LeaveConversationModal(this.page)),
       exportBackup: () => this.getOrCreate('webapp.modals.exportBackup', () => new ExportBackupModal(this.page)),
+      unableToOpenConversation: () =>
+        this.getOrCreate('webapp.modals.unableToOpenConversation', () => new UnableToOpenConversationModal(this.page)),
+      detailViewModal: () => this.getOrCreate('webapp.modals.detailView', () => new DetailViewModal(this.page)),
     },
     components: {
       conversationSidebar: () =>
         this.getOrCreate('webapp.components.conversationSidebar', () => new ConversationSidebar(this.page)),
+      inputBarControls: () =>
+        this.getOrCreate('webapp.components.inputBarControls', () => new InputBarControls(this.page)),
     },
   } as const;
 

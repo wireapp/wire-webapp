@@ -17,6 +17,7 @@
  *
  */
 
+import {DownloadFilePath} from 'test/e2e_tests/test.constants';
 import {loginUser, logOutUser} from 'test/e2e_tests/utils/userActions';
 
 import {getUser} from '../../data/user';
@@ -58,7 +59,7 @@ test('Setting up new device with a backup', {tag: ['@TC-8634', '@crit-flow-web']
       pages.historyExport().page.waitForEvent('download'),
       pages.historyExport().clickSaveFileButton(),
     ]);
-    fileName = `./test-results/downloads/${download.suggestedFilename()}`;
+    fileName = `${DownloadFilePath}${download.suggestedFilename()}`;
     await download.saveAs(fileName);
   });
 

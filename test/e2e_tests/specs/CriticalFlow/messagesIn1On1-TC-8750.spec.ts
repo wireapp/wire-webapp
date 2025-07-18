@@ -19,10 +19,16 @@
 
 import {getUser} from 'test/e2e_tests/data/user';
 import {PageManager} from 'test/e2e_tests/pageManager';
+import {getAudioFilePath, getTextFilePath, getVideoFilePath} from 'test/e2e_tests/utils/sendFileHelper';
+import {
+  getImageFilePath,
+  getLocalQRCodeValue,
+  getQRCodeValueFromScreenshot,
+} from 'test/e2e_tests/utils/sendImageHelper';
 import {addCreatedTeam, removeCreatedTeam} from 'test/e2e_tests/utils/tearDownUtil';
 import {loginUser} from 'test/e2e_tests/utils/userActions';
 
-import {test} from '../../test.fixtures';
+import {test, expect} from '../../test.fixtures';
 
 // Generating test data
 const ownerA = getUser();
@@ -33,10 +39,17 @@ const memberB = getUser();
 const teamAName = 'Critical A';
 const teamBName = 'Critical B';
 
+const imageFilePath = getImageFilePath();
+const videoFilePath = getVideoFilePath();
+const audioFilePath = getAudioFilePath();
+const textFilePath = getTextFilePath();
+
 let memberBPM: PageManager;
 
 test('Messages in 1:1', {tag: ['@TC-8750', '@crit-flow-web']}, async ({pageManager, api, browser}) => {
   test.slow(); // Increasing test timeout to 90 seconds to accommodate the full flow
+
+  const {pages, modals, components} = pageManager.webapp;
 
   // Step 0: Preconditions
   await test.step('Preconditions: Creating preconditions for the test via API', async () => {
@@ -79,27 +92,78 @@ test('Messages in 1:1', {tag: ['@TC-8750', '@crit-flow-web']}, async ({pageManag
   });
 
   // Step 1: Log in as the users and open the 1:1
-  await test.step('Log in as the users and open the 1:1', async () => {
+  await test.step('Log in as A/B and open the 1:1', async () => {
+    await pageManager.openMainPage();
     await loginUser(memberA, pageManager);
-    await pageManager.webapp.pages.conversationList().openConversation(memberB.fullName);
+    await modals.dataShareConsent().clickDecline();
 
+    await memberBPM.openMainPage();
     await loginUser(memberB, memberBPM);
+    await memberBPM.webapp.modals.dataShareConsent().clickDecline();
+
+    // ToDo: Workaround for the MLS Bug [WPB-18227]
+    await memberBPM.webapp.modals.unableToOpenConversation().clickAcknowledge();
   });
 
   // Step 2: Images
-  await test.step('User A sends image', async () => {});
-  await test.step('User B can open the image preview and can download the image', async () => {});
+  await test.step('User A sends image', async () => {
+    await pages.conversationList().openConversation(memberB.fullName);
+    await components.inputBarControls().clickShareImage(imageFilePath);
+    expect(pages.conversation().isImageVisible(memberA)).toBeTruthy();
+  });
+  await test.step('User B can see the image in the conversation', async () => {
+    await memberBPM.webapp.pages.conversationList().openConversation(memberA.fullName);
+
+    // TODO: Bug [WPB-18226], remove this when fixed
+    await memberBPM.refreshPage({waitUntil: 'load'});
+
+    // Verify that the image is visible in the conversation
+    expect(await memberBPM.webapp.pages.conversation().isImageVisible(memberA)).toBeTruthy();
+
+    // Verify QR Code in the image
+    const localQRCodeValue = await getLocalQRCodeValue(imageFilePath);
+    const imageScreenshot = await memberBPM.webapp.pages.conversation().getImageScreenshot(memberA);
+    const screenshotQRCodeValue = await getQRCodeValueFromScreenshot(imageScreenshot);
+    expect(screenshotQRCodeValue).toBe(localQRCodeValue);
+  });
+  await test.step('User B can open the image preview and see the image', async () => {
+    // Click on the image to open it in a preview
+    await memberBPM.webapp.pages.conversation().clickImage(memberA);
+
+    // Verify that the detail view modal is visible
+    expect(await memberBPM.webapp.modals.detailViewModal().isVisible()).toBeTruthy();
+    expect(await memberBPM.webapp.modals.detailViewModal().isImageVisible()).toBeTruthy();
+  });
+  await test.step('User B can download the image', async () => {
+    // Click on the download button to download the image
+    const filePath = await memberBPM.webapp.modals.detailViewModal().downloadAsset();
+    const downloadQRCodeValue = await getLocalQRCodeValue(filePath);
+    const localQRCodeValue = await getLocalQRCodeValue(imageFilePath);
+    expect(downloadQRCodeValue).toBe(localQRCodeValue);
+  });
 
   // Step 3: Reactions
-  await test.step('User B reacts to A’s image', async () => {});
-  await test.step('User A can see the reaction', async () => {});
+  await test.step('User B reacts to A’s image', async () => {
+    await memberBPM.webapp.modals.detailViewModal().givePlusOneReaction();
+    await memberBPM.webapp.modals.detailViewModal().closeModal();
+    expect(await memberBPM.webapp.pages.conversation().isPlusOneReactionVisible()).toBeTruthy();
+  });
+  await test.step('User A can see the reaction', async () => {
+    expect(await pages.conversation().isPlusOneReactionVisible()).toBeTruthy();
+  });
 
   // Step 4: Video Files
-  await test.step('User A sends video message', async () => {});
-  await test.step('User B can play the message', async () => {});
+  await test.step('User A sends video message', async () => {
+    await components.inputBarControls().clickShareFile(videoFilePath);
+    expect(await pages.conversation().isVideoMessageVisible()).toBeTruthy();
+  });
+  await test.step('User B can play the video', async () => {});
 
-  // Step 5L Audio Files
-  await test.step('User A sends audio file', async () => {});
+  // Step 5: Audio Files
+  await test.step('User A sends audio file', async () => {
+    await components.inputBarControls().clickShareFile(audioFilePath);
+    expect(await pages.conversation().isAudioMessageVisible()).toBeTruthy();
+  });
   await test.step('User B can play the file', async () => {});
 
   // Step 6: Ephemeral messages
@@ -111,7 +175,10 @@ test('Messages in 1:1', {tag: ['@TC-8750', '@crit-flow-web']}, async ({pageManag
   await test.step('Both users see the message as removed', async () => {});
 
   // Step 8: Asset sharing
-  await test.step('User A sends asset', async () => {});
+  await test.step('User A sends asset', async () => {
+    await components.inputBarControls().clickShareFile(textFilePath);
+    expect(await pages.conversation().isFileMessageVisible()).toBeTruthy();
+  });
   await test.step('User B can download the file', async () => {});
 });
 

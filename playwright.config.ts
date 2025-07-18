@@ -17,25 +17,10 @@
  *
  */
 
-import {defineConfig} from '@playwright/test';
+import {defineConfig, devices} from '@playwright/test';
 import {config} from 'dotenv';
 
 config({path: './test/e2e_tests/.env'});
-
-const browserList = (process.env.BROWSERS ?? 'chromium')
-  .split(',')
-  .map(browser => browser.trim())
-  .filter(browser => ['chromium', 'firefox', 'webkit'].includes(browser)) as ('chromium' | 'firefox' | 'webkit')[];
-
-const isHeadless = process.env.HEADLESS !== 'false';
-
-const projects = browserList.map(browser => ({
-  name: browser,
-  use: {
-    browserName: browser,
-    headless: isHeadless,
-  },
-}));
 
 const numberOfRetriesOnCI = 1;
 const numberOfParallelWorkersOnCI = 1;
@@ -64,5 +49,11 @@ module.exports = defineConfig({
     trace: 'on-first-retry',
     screenshot: 'only-on-failure',
   },
-  projects,
+  projects: [
+    /* Test against branded browsers. */
+    {
+      name: 'Google Chrome',
+      use: {...devices['Desktop Chrome'], channel: 'chrome'}, // or 'chrome-beta'
+    },
+  ],
 });

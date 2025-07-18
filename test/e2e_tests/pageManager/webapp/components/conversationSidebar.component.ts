@@ -19,6 +19,8 @@
 
 import {Page, Locator} from '@playwright/test';
 
+import {selectByDataAttribute} from 'test/e2e_tests/utils/useSelector';
+
 export class ConversationSidebar {
   readonly page: Page;
 
@@ -31,11 +33,11 @@ export class ConversationSidebar {
   constructor(page: Page) {
     this.page = page;
 
-    this.personalStatusName = page.locator('[data-uie-name="status-name"]');
-    this.personalUserName = page.locator('[data-uie-name="user-handle"]');
-    this.preferencesButton = page.locator('[data-uie-name="go-preferences"]');
-    this.allConverationsButton = page.locator('[data-uie-name="go-recent-view"]');
-    this.connectButton = page.locator('button[data-uie-name="go-people"]');
+    this.personalStatusName = page.locator(`${selectByDataAttribute('status-name')}`);
+    this.personalUserName = page.locator(`${selectByDataAttribute('user-handle')}`);
+    this.preferencesButton = page.locator(`${selectByDataAttribute('go-preferences')}`);
+    this.allConverationsButton = page.locator(`${selectByDataAttribute('go-recent-view')}`);
+    this.connectButton = page.locator(`button${selectByDataAttribute('go-people')}`);
   }
 
   async getPersonalStatusName() {

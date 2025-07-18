@@ -19,6 +19,7 @@
 
 import {Locator, Page} from '@playwright/test';
 
+import {User} from 'test/e2e_tests/data/user';
 import {selectByDataAttribute, selectById, selectByClass} from 'test/e2e_tests/utils/useSelector';
 
 export class ConversationPage {
@@ -35,6 +36,8 @@ export class ConversationPage {
   readonly timerTenSecondsButton: Locator;
   readonly openGroupInformationViaName: Locator;
 
+  readonly getImageAltText = (user: User) => `Image from ${user.fullName}`;
+
   constructor(page: Page) {
     this.page = page;
 
@@ -48,6 +51,12 @@ export class ConversationPage {
     this.openGroupInformationViaName = page.locator(selectByDataAttribute('status-conversation-title-bar-label'));
     this.timerMessageButton = page.locator(selectByDataAttribute('do-set-ephemeral-timer'));
     this.timerTenSecondsButton = page.locator(selectById('btn-10-seconds'));
+  }
+
+  private getImageLocator(user: User): Locator {
+    return this.page.locator(
+      `${selectByDataAttribute('item-message')} ${selectByClass('message-body')} ${selectByDataAttribute('image-asset')} ${selectByDataAttribute('image-asset-img')}[alt^="${this.getImageAltText(user)}"]`,
+    );
   }
 
   async isConversationOpen(conversationName: string) {
@@ -88,32 +97,98 @@ export class ConversationPage {
 
   async isMessageVisible(messageText: string) {
     // Trying multiple times for the message to appear
-    for (let i = 0; i < 10; i++) {
-      const locator = this.page.locator(
-        `${selectByDataAttribute('item-message')} ${selectByClass('message-body')}:not(:has(p${selectByClass('text-foreground')}))`,
-      );
 
-      // Wait for at least one matching element to appear (optional timeout can be set)
-      await locator.first().waitFor({state: 'visible'});
+    const locator = this.page.locator(
+      `${selectByDataAttribute('item-message')} ${selectByClass('message-body')}:not(:has(p${selectByClass('text-foreground')}))`,
+    );
 
-      // Then get all matching elements
-      const messages = await locator.all();
+    await locator.last().waitFor({state: 'visible', timeout: 20_000});
 
-      if (messages.length === 0) {
+    // Then get all matching elements
+    const messages = await locator.all();
+
+    for (const message of messages) {
+      const messageTextContent = await message.textContent();
+      if (messageTextContent !== messageText) {
         continue;
       }
-
-      for (const message of messages) {
-        const messageTextContent = await message.textContent();
-        if (messageTextContent !== messageText) {
-          continue;
-        }
-        return true;
-      }
-      await this.page.waitForTimeout(500); // Wait for 0.5 second before next attempt
+      return true;
     }
 
     return false;
+  }
+
+  async isImageVisible(user: User) {
+    // Trying multiple times for the image to appear
+    const locator = this.getImageLocator(user);
+
+    // Wait for at least one matching element to appear (optional timeout can be set)
+    await locator.first().waitFor({state: 'visible', timeout: 10_000});
+
+    return await locator.isVisible();
+  }
+
+  async getImageScreenshot(user: User): Promise<Buffer> {
+    const locator = this.getImageLocator(user);
+
+    // Wait for the image to be visible
+    await locator.waitFor({state: 'visible', timeout: 10000});
+
+    // Take a screenshot of the image
+    return await locator.screenshot();
+  }
+
+  async clickImage(user: User) {
+    const locator = this.getImageLocator(user);
+
+    // Wait for at least one matching element to appear (optional timeout can be set)
+    await locator.first().waitFor({state: 'visible', timeout: 10000});
+    await locator.isVisible();
+    await locator.click();
+  }
+
+  async isPlusOneReactionVisible() {
+    const plusOneReactionIcon = this.page.locator(
+      `${selectByDataAttribute('item-message')} ${selectByDataAttribute('message-reactions')} button${selectByDataAttribute('emoji-pill')}[aria-label="1 reaction, react with +1 emoji"]`,
+    );
+
+    // Wait for at least one matching element to appear (optional timeout can be set)
+    await plusOneReactionIcon.first().waitFor({state: 'visible', timeout: 10000});
+
+    return await plusOneReactionIcon.isVisible();
+  }
+
+  async isVideoMessageVisible() {
+    const videoMessageLocator = this.page.locator(
+      `${selectByDataAttribute('item-message')} ${selectByDataAttribute('video-asset')}`,
+    );
+
+    // Wait for at least one matching element to appear (optional timeout can be set)
+    await videoMessageLocator.first().waitFor({state: 'visible', timeout: 10_000});
+
+    return await videoMessageLocator.isVisible();
+  }
+
+  async isAudioMessageVisible() {
+    const audioMessageLocator = this.page.locator(
+      `${selectByDataAttribute('item-message')} ${selectByDataAttribute('audio-asset')}`,
+    );
+
+    // Wait for at least one matching element to appear (optional timeout can be set)
+    await audioMessageLocator.first().waitFor({state: 'visible', timeout: 10_000});
+
+    return await audioMessageLocator.isVisible();
+  }
+
+  async isFileMessageVisible() {
+    const fileMessageLocator = this.page.locator(
+      `${selectByDataAttribute('item-message')} ${selectByDataAttribute('file-asset')}`,
+    );
+
+    // Wait for at least one matching element to appear (optional timeout can be set)
+    await fileMessageLocator.first().waitFor({state: 'visible', timeout: 10_000});
+
+    return await fileMessageLocator.isVisible();
   }
 
   async isConversationReadonly() {
