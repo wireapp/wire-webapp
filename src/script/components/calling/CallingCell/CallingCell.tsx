@@ -123,6 +123,7 @@ export const CallingCell = ({
 
   const isVideoCall = call.initialType === CALL_TYPE.VIDEO;
   const isDetachedWindow = viewMode === CallingViewMode.DETACHED_WINDOW;
+  const isFullScreen = viewMode === CallingViewMode.FULL_SCREEN;
 
   const isMuted = muteState !== MuteState.NOT_MUTED;
   const isCurrentlyMuted = useCallback(() => muteState === MuteState.SELF_MUTED, [muteState]);
@@ -291,6 +292,10 @@ export const CallingCell = ({
     }
     void callingRepository.setViewModeDetached();
   };
+
+  if (isFullScreen) {
+    return null;
+  }
 
   return (
     <div css={callingContainer}>

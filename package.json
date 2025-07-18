@@ -219,6 +219,7 @@
     "stylelint": "prettier --ignore-path .prettierignore --write \"**/*.less\" && stylelint --ignore-path .gitignore \"**/*.less\"",
     "test": "yarn test:types && yarn test:server && yarn test:app",
     "e2e-test": "playwright test",
+    "e2e-ui": "playwright test --ui",
     "test:app": "jest --forceExit --verbose",
     "test:server": "cd server && yarn test",
     "test:types": "tsc --project tsconfig.build.json --noEmit && cd server && tsc --noEmit",

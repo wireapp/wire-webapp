@@ -256,6 +256,7 @@ const FullscreenVideoCall = ({
 
   return (
     <div
+      data-uie-name="fullscreen-video-call"
       className={cx('video-calling-wrapper', {
         'app--small-offset': hasOffset && isMiniMode,
         'app--large-offset': hasOffset && !isMiniMode,

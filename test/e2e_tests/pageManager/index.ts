@@ -34,6 +34,7 @@ import {ExportBackupModal} from './webapp/modals/exportBackup.modal';
 import {LeaveConversationModal} from './webapp/modals/leaveConversation.modal';
 import {UserProfileModal} from './webapp/modals/userProfile.modal';
 import {AccountPage} from './webapp/pages/account.page';
+import {CallingPage} from './webapp/pages/calling.page';
 import {ConversationPage} from './webapp/pages/conversation.page';
 import {ConversationDetailsPage} from './webapp/pages/conversationDetails.page';
 import {ConversationListPage} from './webapp/pages/conversationList.page';
@@ -135,6 +136,7 @@ export class PageManager {
     components: {
       conversationSidebar: () =>
         this.getOrCreate('webapp.components.conversationSidebar', () => new ConversationSidebar(this.page)),
+      calling: () => this.getOrCreate('webapp.components.calling', () => new CallingPage(this.page)),
     },
   } as const;
 

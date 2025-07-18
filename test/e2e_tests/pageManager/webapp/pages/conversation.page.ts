@@ -116,6 +116,11 @@ export class ConversationPage {
     return false;
   }
 
+  async startCall() {
+    const startCallButton = this.page.locator('[data-uie-name="do-call"]');
+    await startCallButton.click();
+  }
+
   async isConversationReadonly() {
     await this.messageInput.waitFor({state: 'detached'});
   }
