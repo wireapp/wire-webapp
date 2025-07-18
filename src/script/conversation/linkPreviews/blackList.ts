@@ -17,6 +17,8 @@
  *
  */
 
+import {Config} from '../../Config';
+
 const soundCloudStatic = [
   'about',
   'channels',
@@ -38,12 +40,17 @@ const soundCloudStatic = [
   'you',
 ];
 
-const BLACKLIST = [
+const rawConfigBlacklist: string = Config.getConfig().LINK_BLACKLIST;
+const configBlacklist = rawConfigBlacklist ? rawConfigBlacklist.split(',').map(url => url.trim()) : [];
+
+const defaultBlacklist = [
   `soundcloud.com/(?!${soundCloudStatic.join('|')})`,
   'spotify.com/(?!\\w\\w/)',
   'youtu.be',
   'youtube(-nocookie)?.com/(watch|embed)',
   'vimeo.com/(channels/[^/]+/|video/)?[0-9]+',
 ];
+
+const BLACKLIST = [...configBlacklist, ...defaultBlacklist];
 
 export const isBlacklisted = (url: string) => new RegExp(BLACKLIST.join('|')).test(url);

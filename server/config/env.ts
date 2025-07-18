@@ -69,6 +69,9 @@ export type Env = {
   /** Sets the endpoint for the WebSocket connection, e.g. wss://staging-nginz-ssl.zinfra.io */
   BACKEND_WS: string;
 
+  /** Sets additional URLs for link blacklisting */
+  LINK_BLACKLIST: string;
+
   /** Specifies the name of the brand, e.g. Wire */
   BRAND_NAME: string;
 
