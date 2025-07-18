@@ -80,6 +80,7 @@ import {AudioRepository} from '../audio/AudioRepository';
 import {AudioType} from '../audio/AudioType';
 import {ClientState} from '../client/ClientState';
 import {PrimaryModal} from '../components/Modals/PrimaryModal';
+import {Config} from '../Config';
 import {EventBuilder} from '../conversation/EventBuilder';
 import {CryptographyRepository} from '../cryptography/CryptographyRepository';
 import {PROTO_MESSAGE_TYPE} from '../cryptography/ProtoMessageType';
@@ -451,7 +452,10 @@ export class MessageRepository {
 
   private async handleLinkPreview(textPayload: TextMessagePayload & {messageId: string}) {
     // check if the user actually wants to send link previews
-    if (!this.propertyRepository.getPreference(PROPERTIES_TYPE.PREVIEWS.SEND)) {
+    if (
+      !this.propertyRepository.getPreference(PROPERTIES_TYPE.PREVIEWS.SEND) ||
+      Config.getConfig().FEATURE.ALLOW_LINK_PREVIEWS === false
+    ) {
       return;
     }
 
