@@ -186,9 +186,7 @@ const ControlButtons = ({
           <li aria-hidden="true">
             <FormatSeparator />
           </li>
-          <li>
-            <GiphyButton onGifClick={onGifClick} />
-          </li>
+          <GiphyButton onGifClick={onGifClick} />
         </>
       )}
     </>
