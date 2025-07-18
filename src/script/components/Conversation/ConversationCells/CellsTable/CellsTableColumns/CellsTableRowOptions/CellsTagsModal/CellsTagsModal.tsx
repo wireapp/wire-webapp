@@ -20,7 +20,7 @@
 import {ComboboxSelect, ErrorMessage} from '@wireapp/react-ui-kit';
 
 import {CellsModal} from 'Components/Conversation/ConversationCells/common/CellsModal/CellsModal';
-import {CellsRepository} from 'src/script/cells/CellsRepository';
+import {CellsRepository} from 'Repositories/cells/CellsRepository';
 import {t} from 'Util/LocalizerUtil';
 
 import {contentStyles, descriptionStyles, menuListCSS, selectWrapperStyles} from './CellsTagsModal.styles';

@@ -17,8 +17,8 @@
  *
  */
 
-import {Message} from 'src/script/entity/message/Message';
-import {User} from 'src/script/entity/User';
+import {Message} from 'Repositories/entity/message/Message';
+import {User} from 'Repositories/entity/User';
 import {StatusType} from 'src/script/message/StatusType';
 
 import {updateScroll} from './scrollUpdater';

@@ -20,7 +20,7 @@
 import {render} from '@testing-library/react';
 import ko from 'knockout';
 
-import {CompositeMessage} from 'src/script/entity/message/CompositeMessage';
+import {CompositeMessage} from 'Repositories/entity/message/CompositeMessage';
 
 import {MessageButton} from './MessageButton';
 

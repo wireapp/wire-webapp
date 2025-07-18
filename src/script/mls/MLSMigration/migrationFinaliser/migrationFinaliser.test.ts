@@ -20,8 +20,8 @@
 import {ConversationProtocol, CONVERSATION_TYPE} from '@wireapp/api-client/lib/conversation';
 import {FeatureStatus} from '@wireapp/api-client/lib/team';
 
-import {MixedConversation, MLSConversation} from 'src/script/conversation/ConversationSelectors';
-import {Conversation} from 'src/script/entity/Conversation';
+import {MixedConversation, MLSConversation} from 'Repositories/conversation/ConversationSelectors';
+import {Conversation} from 'Repositories/entity/Conversation';
 import {TestFactory} from 'test/helper/TestFactory';
 import {generateUser} from 'test/helper/UserGenerator';
 import {createUuid} from 'Util/uuid';

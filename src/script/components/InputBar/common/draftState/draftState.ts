@@ -17,9 +17,9 @@
  *
  */
 
-import {MessageRepository} from 'src/script/conversation/MessageRepository';
-import {Conversation} from 'src/script/entity/Conversation';
-import {ContentMessage} from 'src/script/entity/message/ContentMessage';
+import {MessageRepository} from 'Repositories/conversation/MessageRepository';
+import {Conversation} from 'Repositories/entity/Conversation';
+import {ContentMessage} from 'Repositories/entity/message/ContentMessage';
 import {StorageKey, StorageRepository} from 'src/script/storage';
 
 export interface DraftState {

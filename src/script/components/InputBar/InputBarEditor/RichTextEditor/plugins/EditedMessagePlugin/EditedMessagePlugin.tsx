@@ -23,7 +23,7 @@ import {$convertFromMarkdownString} from '@lexical/markdown';
 import {useLexicalComposerContext} from '@lexical/react/LexicalComposerContext';
 import {$getRoot, $setSelection} from 'lexical';
 
-import {ContentMessage} from 'src/script/entity/message/ContentMessage';
+import {ContentMessage} from 'Repositories/entity/message/ContentMessage';
 
 import {getMentionMarkdownTransformer} from './getMentionMarkdownTransformer/getMentionMarkdownTransformer';
 import {getMentionNodesFromMessage} from './getMentionNodesFromMessage/getMentionNodesFromMessage';

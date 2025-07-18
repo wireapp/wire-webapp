@@ -19,8 +19,8 @@
 
 import {render} from '@testing-library/react';
 
+import {Conversation} from 'Repositories/entity/Conversation';
 import {withTheme} from 'src/script/auth/util/test/TestUtil';
-import {Conversation} from 'src/script/entity/Conversation';
 
 import {ControlButtons} from './ControlButtons';
 

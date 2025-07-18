@@ -27,10 +27,10 @@ import {TabIndex, Link, LinkVariant} from '@wireapp/react-ui-kit';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
+import {User} from 'Repositories/entity/User';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 
-import {User} from '../../../../../entity/User';
 import {externalUrl, getManageTeamUrl} from '../../../../../externalRoute';
 import {TeamState} from '../../../../../team/TeamState';
 import {AppLockState} from '../../../../../user/AppLockState';

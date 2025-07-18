@@ -19,11 +19,10 @@
 
 import {render} from '@testing-library/react';
 
+import {ServiceEntity} from 'Repositories/integration/ServiceEntity';
 import {createUuid} from 'Util/uuid';
 
 import {ServiceList} from './ServiceList';
-
-import {ServiceEntity} from '../../integration/ServiceEntity';
 
 describe('ServiceList', () => {
   it('lists the services', () => {

@@ -20,7 +20,7 @@
 import {flexRender, getCoreRowModel, useReactTable} from '@tanstack/react-table';
 import {QualifiedId} from '@wireapp/api-client/lib/user/';
 
-import {CellsRepository} from 'src/script/cells/CellsRepository';
+import {CellsRepository} from 'Repositories/cells/CellsRepository';
 
 import {CellsFilePreviewModal} from './CellsFilePreviewModal/CellsFilePreviewModal';
 import {

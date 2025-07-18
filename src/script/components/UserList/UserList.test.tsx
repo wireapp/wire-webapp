@@ -22,11 +22,11 @@ import React from 'react';
 import {fireEvent, render} from '@testing-library/react';
 
 import {UserList} from 'Components/UserList/UserList';
-import {User} from 'src/script/entity/User';
+import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
+import {User} from 'Repositories/entity/User';
 
 import {TestFactory} from '../../../../test/helper/TestFactory';
 import {withTheme} from '../../auth/util/test/TestUtil';
-import {ConversationRepository} from '../../conversation/ConversationRepository';
 
 const testFactory = new TestFactory();
 let conversationRepository: ConversationRepository;

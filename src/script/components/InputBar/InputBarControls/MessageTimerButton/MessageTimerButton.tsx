@@ -23,7 +23,7 @@ import cx from 'classnames';
 import {container} from 'tsyringe';
 
 import * as Icon from 'Components/Icon';
-import {Conversation} from 'src/script/entity/Conversation';
+import {Conversation} from 'Repositories/entity/Conversation';
 import {EphemeralTimings} from 'src/script/ephemeral/EphemeralTimings';
 import {TeamState} from 'src/script/team/TeamState';
 import {showContextMenu} from 'src/script/ui/ContextMenu';

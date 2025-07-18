@@ -21,8 +21,8 @@ import {CSSObject} from '@emotion/react';
 import cx from 'classnames';
 
 import * as Icon from 'Components/Icon';
-import {Conversation} from 'src/script/entity/Conversation';
-import {User} from 'src/script/entity/User';
+import {Conversation} from 'Repositories/entity/Conversation';
+import {User} from 'Repositories/entity/User';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 

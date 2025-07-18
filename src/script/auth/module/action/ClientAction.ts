@@ -22,7 +22,7 @@ import {ClientInfo} from '@wireapp/core/lib/client/';
 
 import {Runtime} from '@wireapp/commons';
 
-import {getClientMLSConfig} from 'src/script/client/clientMLSConfig';
+import {getClientMLSConfig} from 'Repositories/client/clientMLSConfig';
 
 import {ClientActionCreator} from './creator/';
 

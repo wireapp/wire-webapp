@@ -20,7 +20,7 @@
 import {GroupAvatar} from 'Components/Avatar';
 import {ChannelAvatar} from 'Components/Avatar/ChannelAvatar';
 import {openConversation} from 'Components/CellsGlobalView/common/openConversation/openConversation';
-import {Conversation} from 'src/script/entity/Conversation';
+import {Conversation} from 'Repositories/entity/Conversation';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {useChannelsFeatureFlag} from 'Util/useChannelsFeatureFlag';
 

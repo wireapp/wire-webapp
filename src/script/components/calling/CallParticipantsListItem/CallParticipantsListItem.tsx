@@ -24,7 +24,7 @@ import {TabIndex} from '@wireapp/react-ui-kit';
 import {Avatar, AVATAR_SIZE} from 'Components/Avatar';
 import {UserStatusBadges} from 'Components/Badge';
 import {CallParticipantsListItemHandRaiseIcon} from 'Components/calling/CallParticipantsListItem/CallParticipantsListItemHandRaiseIcon';
-import {Participant} from 'src/script/calling/Participant';
+import {Participant} from 'Repositories/calling/Participant';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {handleKeyDown, KEY} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';

@@ -27,11 +27,10 @@ import {ParticipantItemContent} from 'Components/ParticipantItemContent';
 import {listItem, listWrapper} from 'Components/ParticipantItemContent/ParticipantItem.styles';
 import {UserlistMode} from 'Components/UserList';
 import {useUserName} from 'Components/UserName';
+import {User} from 'Repositories/entity/User';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 import {capitalizeFirstChar} from 'Util/StringUtil';
-
-import {User} from '../../../../entity/User';
 
 export interface UserListItemProps {
   groupId?: string;

@@ -19,10 +19,9 @@
 
 import React from 'react';
 
+import type {Location} from 'Repositories/entity/message/Location';
 import {t} from 'Util/LocalizerUtil';
 import {getMapsUrl} from 'Util/LocationUtil';
-
-import type {Location} from '../../../../../entity/message/Location';
 
 export interface LocationAssetProps {
   asset: Location;

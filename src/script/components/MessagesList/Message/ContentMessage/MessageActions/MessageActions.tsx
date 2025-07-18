@@ -24,8 +24,8 @@ import ko from 'knockout';
 
 import {WebAppEvents} from '@wireapp/webapp-events';
 
-import {ContentMessage} from 'src/script/entity/message/ContentMessage';
-import {useClickOutside} from 'src/script/hooks/useClickOutside';
+import {useClickOutside} from 'Hooks/useClickOutside';
+import {ContentMessage} from 'Repositories/entity/message/ContentMessage';
 import {ContextMenuEntry, showContextMenu} from 'src/script/ui/ContextMenu';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {isSpaceOrEnterKey, isTabKey} from 'Util/KeyboardUtil';

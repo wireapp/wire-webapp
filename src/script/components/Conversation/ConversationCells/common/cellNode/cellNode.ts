@@ -17,7 +17,7 @@
  *
  */
 
-import {User} from 'src/script/entity/User';
+import {User} from 'Repositories/entity/User';
 
 export interface CellFile {
   id: string;

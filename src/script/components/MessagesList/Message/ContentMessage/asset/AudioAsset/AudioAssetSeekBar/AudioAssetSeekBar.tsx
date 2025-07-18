@@ -17,7 +17,7 @@
  *
  */
 
-import {FileAsset} from 'src/script/entity/message/FileAsset';
+import {FileAsset} from 'Repositories/entity/message/FileAsset';
 
 import {AudioSeekBarNew} from './AudioSeekBarV2/AudioSeekBarV2';
 

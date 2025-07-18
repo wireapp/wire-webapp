@@ -21,8 +21,9 @@ import {RegisteredClient} from '@wireapp/api-client/lib/client';
 import type {BackendError} from '@wireapp/api-client/lib/http';
 import {AxiosError} from 'axios';
 
-import {Conversation} from '../entity/Conversation';
-import {User} from '../entity/User';
+import {Conversation} from 'Repositories/entity/Conversation';
+import {User} from 'Repositories/entity/User';
+
 import {isObject} from '../guards/common';
 import {ClientRecord} from '../storage/record/ClientRecord';
 

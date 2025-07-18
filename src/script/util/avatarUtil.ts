@@ -17,8 +17,9 @@
  *
  */
 
+import {User} from 'Repositories/entity/User';
+
 import {ACCENT_ID} from '../Config';
-import {User} from '../entity/User';
 
 // calculation of hash code for string based on this doc:
 // https://wearezeta.atlassian.net/wiki/spaces/AR/pages/1696858160/Consistent+Conversation+Colors+A+Hash-Based+Approach+for+Conversation+id

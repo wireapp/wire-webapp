@@ -19,11 +19,11 @@
 
 import {CONVERSATION_EVENT} from '@wireapp/api-client/lib/event/';
 
-import {Message as MessageEntity} from 'src/script/entity/message/Message';
+import {Message as MessageEntity} from 'Repositories/entity/message/Message';
+import {ProtocolUpdateMessage} from 'Repositories/entity/message/ProtocolUpdateMessage';
+import {SystemMessage} from 'Repositories/entity/message/SystemMessage';
+import {ClientEvent} from 'Repositories/event/Client';
 
-import {ProtocolUpdateMessage} from '../../../entity/message/ProtocolUpdateMessage';
-import {SystemMessage} from '../../../entity/message/SystemMessage';
-import {ClientEvent} from '../../../event/Client';
 import {isMemberMessage} from '../../../guards/Message';
 
 /**

@@ -17,10 +17,9 @@
  *
  */
 
+import {User} from 'Repositories/entity/User';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
-
-import {User} from '../../entity/User';
 
 interface UserNameProps {
   user: User;

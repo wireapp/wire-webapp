@@ -21,13 +21,12 @@ import cx from 'classnames';
 
 import {OutlineCheck} from '@wireapp/react-ui-kit';
 
+import {Message} from 'Repositories/entity/message/Message';
+import {PingMessage as PingMessageEntity} from 'Repositories/entity/message/PingMessage';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 
 import {ReadReceiptStatus} from './ReadReceiptStatus';
-
-import {Message} from '../../../entity/message/Message';
-import {PingMessage as PingMessageEntity} from '../../../entity/message/PingMessage';
 
 export interface PingMessageProps {
   message: PingMessageEntity;

@@ -27,7 +27,10 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 
 import * as Icon from 'Components/Icon';
 import {AssetImage} from 'Components/Image';
-import {Text} from 'src/script/entity/message/Text';
+import type {Conversation} from 'Repositories/entity/Conversation';
+import {ContentMessage} from 'Repositories/entity/message/ContentMessage';
+import {Text} from 'Repositories/entity/message/Text';
+import {User} from 'Repositories/entity/User';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {includesOnlyEmojis} from 'Util/EmojiUtil';
 import {t} from 'Util/LocalizerUtil';
@@ -40,9 +43,6 @@ import {TextMessageRenderer} from './asset/TextMessageRenderer';
 import {VideoAsset} from './asset/VideoAsset/VideoAsset';
 
 import {MessageActions} from '..';
-import type {Conversation} from '../../../../entity/Conversation';
-import {ContentMessage} from '../../../../entity/message/ContentMessage';
-import {User} from '../../../../entity/User';
 import {ConversationError} from '../../../../error/ConversationError';
 import {QuoteEntity} from '../../../../message/QuoteEntity';
 import {useMessageFocusedTabIndex} from '../util';

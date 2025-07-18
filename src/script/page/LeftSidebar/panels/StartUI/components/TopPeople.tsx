@@ -21,10 +21,10 @@ import React from 'react';
 
 import {container} from 'tsyringe';
 
-import {TopContact} from './topPeople/TopContact';
+import {AssetRepository} from 'Repositories/assets/AssetRepository';
+import {User} from 'Repositories/entity/User';
 
-import {AssetRepository} from '../../../../../assets/AssetRepository';
-import {User} from '../../../../../entity/User';
+import {TopContact} from './topPeople/TopContact';
 
 interface TopPeopleProps {
   clickOnUser: (user: User, event: React.UIEvent) => void;

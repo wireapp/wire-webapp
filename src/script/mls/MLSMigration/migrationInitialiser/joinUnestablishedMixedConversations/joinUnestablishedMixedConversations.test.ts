@@ -20,9 +20,9 @@
 import {ConversationProtocol, CONVERSATION_TYPE} from '@wireapp/api-client/lib/conversation';
 import {container} from 'tsyringe';
 
-import {MixedConversation} from 'src/script/conversation/ConversationSelectors';
-import {Conversation} from 'src/script/entity/Conversation';
-import {User} from 'src/script/entity/User';
+import {MixedConversation} from 'Repositories/conversation/ConversationSelectors';
+import {Conversation} from 'Repositories/entity/Conversation';
+import {User} from 'Repositories/entity/User';
 import {Core} from 'src/script/service/CoreSingleton';
 import {TestFactory} from 'test/helper/TestFactory';
 import {createUuid} from 'Util/uuid';

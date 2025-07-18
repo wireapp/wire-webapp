@@ -19,8 +19,8 @@
 
 import {render} from '@testing-library/react';
 
-import {Message} from 'src/script/entity/message/Message';
-import {User} from 'src/script/entity/User';
+import {Message} from 'Repositories/entity/message/Message';
+import {User} from 'Repositories/entity/User';
 import * as TimeUtil from 'Util/TimeUtil';
 import {createUuid} from 'Util/uuid';
 

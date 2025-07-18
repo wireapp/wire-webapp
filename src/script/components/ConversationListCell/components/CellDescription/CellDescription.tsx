@@ -24,11 +24,10 @@ import cx from 'classnames';
 import * as Icon from 'Components/Icon';
 import {DraftState, generateConversationInputStorageKey} from 'Components/InputBar/common/draftState/draftState';
 import {useLocalStorage} from 'Hooks/useLocalStorage';
+import {generateCellState} from 'Repositories/conversation/ConversationCellState';
+import {Conversation, UnreadState} from 'Repositories/entity/Conversation';
 
 import {iconStyle} from './CellDescription.style';
-
-import {generateCellState} from '../../../../conversation/ConversationCellState';
-import {Conversation, UnreadState} from '../../../../entity/Conversation';
 
 interface Props {
   conversation: Conversation;

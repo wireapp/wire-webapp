@@ -17,7 +17,7 @@
  *
  */
 
-import type {FileAsset as FileAssetType} from 'src/script/entity/message/FileAsset';
+import type {FileAsset as FileAssetType} from 'Repositories/entity/message/FileAsset';
 import {formatBytes, trimFileExtension} from 'Util/util';
 
 interface GetPdfMetadataParams {

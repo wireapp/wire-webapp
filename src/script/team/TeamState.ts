@@ -22,12 +22,12 @@ import {FeatureList, FeatureStatus, SelfDeletingTimeout} from '@wireapp/api-clie
 import ko from 'knockout';
 import {container, singleton} from 'tsyringe';
 
+import {Conversation} from 'Repositories/entity/Conversation';
+import {User} from 'Repositories/entity/User';
 import {sortUsersByPriority} from 'Util/StringUtil';
 
 import {TeamEntity} from './TeamEntity';
 
-import {Conversation} from '../entity/Conversation';
-import {User} from '../entity/User';
 import {ROLE, roleMap} from '../user/UserPermission';
 import {UserState} from '../user/UserState';
 

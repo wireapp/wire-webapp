@@ -25,7 +25,7 @@ import {container} from 'tsyringe';
 
 import {StyledApp, THEME_ID} from '@wireapp/react-ui-kit';
 
-import {CallState} from 'src/script/calling/CallState';
+import {CallState} from 'Repositories/calling/CallState';
 import {useActiveWindow} from 'src/script/hooks/useActiveWindow';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 

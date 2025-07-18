@@ -17,12 +17,12 @@
  *
  */
 
+import {mapProfileAssets, mapProfileAssetsV1, updateUserEntityAssets} from 'Repositories/assets/AssetMapper';
+import {User} from 'Repositories/entity/User';
 import {getLogger, Logger} from 'Util/Logger';
 
 import {isSelfAPIUser} from './UserGuards';
 
-import {mapProfileAssets, mapProfileAssetsV1, updateUserEntityAssets} from '../assets/AssetMapper';
-import {User} from '../entity/User';
 import {UserRecord} from '../storage';
 import type {ServerTimeHandler} from '../time/serverTimeHandler';
 import '../view_model/bindings/CommonBindings';

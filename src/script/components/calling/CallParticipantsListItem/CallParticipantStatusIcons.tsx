@@ -18,7 +18,7 @@
  */
 
 import * as Icon from 'Components/Icon';
-import {Participant} from 'src/script/calling/Participant';
+import {Participant} from 'Repositories/calling/Participant';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 
 import {

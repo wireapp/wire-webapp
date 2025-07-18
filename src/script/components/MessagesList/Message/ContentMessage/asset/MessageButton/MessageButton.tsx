@@ -19,10 +19,9 @@
 
 import {Button, ButtonVariant, COLOR} from '@wireapp/react-ui-kit';
 
+import type {CompositeMessage} from 'Repositories/entity/message/CompositeMessage';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {noop} from 'Util/util';
-
-import type {CompositeMessage} from '../../../../../../entity/message/CompositeMessage';
 
 export interface MessageButtonProps {
   id: string;

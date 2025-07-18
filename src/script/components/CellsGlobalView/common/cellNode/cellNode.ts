@@ -17,8 +17,8 @@
  *
  */
 
-import {Conversation} from 'src/script/entity/Conversation';
-import {User} from 'src/script/entity/User';
+import {Conversation} from 'Repositories/entity/Conversation';
+import {User} from 'Repositories/entity/User';
 
 export interface CellFile {
   id: string;

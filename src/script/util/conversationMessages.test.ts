@@ -17,9 +17,9 @@
  *
  */
 
-import {getMessageAriaLabel} from './conversationMessages';
+import {Asset} from 'Repositories/entity/message/Asset';
 
-import {Asset} from '../entity/message/Asset';
+import {getMessageAriaLabel} from './conversationMessages';
 
 describe('Conversation messages', () => {
   describe(`Content messages area label by type`, () => {

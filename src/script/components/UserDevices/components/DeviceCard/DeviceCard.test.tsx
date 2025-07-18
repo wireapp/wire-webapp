@@ -21,9 +21,9 @@ import {render} from '@testing-library/react';
 import {ClientClassification} from '@wireapp/api-client/lib/client/';
 import ko from 'knockout';
 
-import {DeviceCard} from './DeviceCard';
+import type {ClientEntity} from 'Repositories/client/ClientEntity';
 
-import type {ClientEntity} from '../../../../client/ClientEntity';
+import {DeviceCard} from './DeviceCard';
 
 function createClientEntity(clientEntity: Partial<ClientEntity>): ClientEntity {
   const device: Partial<ClientEntity> = {

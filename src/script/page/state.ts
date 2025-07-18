@@ -19,10 +19,10 @@
 
 import {create} from 'zustand';
 
-import {PanelEntity, PanelState} from './RightSidebar';
+import {Message} from 'Repositories/entity/message/Message';
+import {User} from 'Repositories/entity/User';
 
-import {Message} from '../entity/message/Message';
-import {User} from '../entity/User';
+import {PanelEntity, PanelState} from './RightSidebar';
 
 export enum ViewType {
   MOBILE_CENTRAL_COLUMN = 0,

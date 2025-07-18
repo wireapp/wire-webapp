@@ -21,7 +21,7 @@ import {Input, Label, Switch} from '@wireapp/react-ui-kit';
 
 import {CopyToClipboardButton} from 'Components/CopyToClipboardButton/CopyToClipboardButton';
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
-import {CellsRepository} from 'src/script/cells/CellsRepository';
+import {CellsRepository} from 'Repositories/cells/CellsRepository';
 import {t} from 'Util/LocalizerUtil';
 
 import {

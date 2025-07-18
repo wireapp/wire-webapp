@@ -21,9 +21,9 @@ import {faker} from '@faker-js/faker';
 import {QualifiedId, UserAssetType} from '@wireapp/api-client/lib/user';
 import type {User as APIClientUser} from '@wireapp/api-client/lib/user';
 
+import type {User} from 'Repositories/entity/User';
 import {createUuid} from 'Util/uuid';
 
-import type {User} from '../../src/script/entity/User';
 import {serverTimeHandler} from '../../src/script/time/serverTimeHandler';
 import {UserMapper} from '../../src/script/user/UserMapper';
 

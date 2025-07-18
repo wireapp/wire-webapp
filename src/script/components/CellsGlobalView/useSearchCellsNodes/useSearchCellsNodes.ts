@@ -21,8 +21,8 @@ import {useCallback, useEffect, useRef, useState} from 'react';
 
 import {useDebouncedCallback} from 'use-debounce';
 
-import {CellsRepository} from 'src/script/cells/CellsRepository';
-import {ConversationRepository} from 'src/script/conversation/ConversationRepository';
+import {CellsRepository} from 'Repositories/cells/CellsRepository';
+import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
 import {UserRepository} from 'src/script/user/UserRepository';
 
 import {getConversationsFromNodes} from './getConversationsFromNodes';

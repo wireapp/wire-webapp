@@ -23,6 +23,8 @@ import {useDebouncedCallback} from 'use-debounce';
 
 import {CloseIcon, Input, InputSubmitCombo, SearchIcon} from '@wireapp/react-ui-kit';
 
+import {ContentMessage} from 'Repositories/entity/message/ContentMessage';
+import type {Message} from 'Repositories/entity/message/Message';
 import {t} from 'Util/LocalizerUtil';
 import {isScrolledBottom} from 'Util/scroll-helpers';
 import {useEffectRef} from 'Util/useEffectRef';
@@ -30,8 +32,6 @@ import {noop} from 'Util/util';
 
 import {FullSearchItem} from './fullSearch/FullSearchItem';
 
-import {ContentMessage} from '../../../../entity/message/ContentMessage';
-import type {Message} from '../../../../entity/message/Message';
 import {getSearchRegex} from '../../../../search/FullTextSearch';
 
 const MAX_VISIBLE_MESSAGES = 30;

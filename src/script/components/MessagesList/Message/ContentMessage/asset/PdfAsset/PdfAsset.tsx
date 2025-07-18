@@ -20,8 +20,8 @@
 import {Suspense, lazy} from 'react';
 
 import {useInView} from 'Hooks/useInView/useInView';
-import type {ContentMessage} from 'src/script/entity/message/ContentMessage';
-import type {FileAsset} from 'src/script/entity/message/FileAsset';
+import type {ContentMessage} from 'Repositories/entity/message/ContentMessage';
+import type {FileAsset} from 'Repositories/entity/message/FileAsset';
 
 import {PdfAssetLoader} from './common/PdfAssetLoader/PdfAssetLoader';
 import {getPdfMetadata} from './getPdfMetadata/getPdfMetadata';

@@ -23,12 +23,12 @@ import cx from 'classnames';
 import {DeviceVerificationBadges} from 'Components/Badge';
 import {LegalHoldDot} from 'Components/LegalHoldDot';
 import {useMessageFocusedTabIndex} from 'Components/MessagesList/Message/util';
+import {type ClientEntity} from 'Repositories/client/ClientEntity';
 import {WireIdentity} from 'src/script/E2EIdentity';
 import {handleKeyDown, KEY} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
 import {splitFingerprint} from 'Util/StringUtil';
 
-import {type ClientEntity} from '../../../../client/ClientEntity';
 import {FormattedId} from '../../../../page/MainContent/panels/preferences/DevicesPreferences/components/FormattedId';
 import * as Icon from '../../../Icon';
 

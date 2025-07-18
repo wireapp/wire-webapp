@@ -21,7 +21,7 @@ import React from 'react';
 
 import cx from 'classnames';
 
-import type {Message} from 'src/script/entity/message/Message';
+import type {Message} from 'Repositories/entity/message/Message';
 import {formatDayMonthNumeral, formatTimeShort} from 'Util/TimeUtil';
 
 export interface AssetHeaderProps extends Partial<HTMLDivElement> {

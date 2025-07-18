@@ -18,12 +18,11 @@
  */
 
 import * as Icon from 'Components/Icon';
+import {Message} from 'Repositories/entity/message/Message';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {formatTimeShort} from 'Util/TimeUtil';
 
 import {ReadIndicatorContainer, ReadIndicatorStyles, ReadReceiptText} from './ReadIndicator.styles';
-
-import {Message} from '../../../../entity/message/Message';
 
 interface ReadIndicatorProps {
   message: Message;

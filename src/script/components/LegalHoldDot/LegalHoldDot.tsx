@@ -23,9 +23,8 @@ import cx from 'classnames';
 
 import * as Icon from 'Components/Icon';
 import {useLegalHoldModalState} from 'Components/Modals/LegalHoldModal/LegalHoldModal.state';
+import type {Conversation} from 'Repositories/entity/Conversation';
 import {t} from 'Util/LocalizerUtil';
-
-import type {Conversation} from '../../entity/Conversation';
 
 export interface LegalHoldDotProps {
   isInteractive?: boolean;

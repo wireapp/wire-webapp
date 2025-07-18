@@ -19,7 +19,7 @@
 
 import React from 'react';
 
-import {ContentMessage} from 'src/script/entity/message/ContentMessage';
+import {ContentMessage} from 'Repositories/entity/message/ContentMessage';
 import {t} from 'Util/LocalizerUtil';
 
 import {CollectionItem} from './CollectionItem';

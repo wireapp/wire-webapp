@@ -24,8 +24,8 @@ import {
   ProteusConversation,
   isMixedConversation,
   isProteusConversation,
-} from 'src/script/conversation/ConversationSelectors';
-import {Conversation} from 'src/script/entity/Conversation';
+} from 'Repositories/conversation/ConversationSelectors';
+import {Conversation} from 'Repositories/entity/Conversation';
 
 import {mlsMigrationLogger} from '../MLSMigrationLogger';
 

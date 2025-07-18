@@ -20,11 +20,10 @@
 import {FC} from 'react';
 
 import {BaseToggle} from 'Components/toggle/BaseToggle';
+import {ACCESS_TYPES} from 'Repositories/conversation/ConversationAccessPermission';
+import {Conversation} from 'Repositories/entity/Conversation';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
-
-import {ACCESS_TYPES} from '../../../../../conversation/ConversationAccessPermission';
-import {Conversation} from '../../../../../entity/Conversation';
 
 interface ServicesOptionsProps {
   activeConversation: Conversation;

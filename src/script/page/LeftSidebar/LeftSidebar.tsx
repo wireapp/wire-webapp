@@ -24,10 +24,11 @@ import cx from 'classnames';
 
 import {WebAppEvents} from '@wireapp/webapp-events';
 
+import {User} from 'Repositories/entity/User';
+
 import {Conversations} from './panels/Conversations';
 import {TemporaryGuestConversations} from './panels/TemporatyGuestConversations';
 
-import {User} from '../../entity/User';
 import {ListViewModel} from '../../view_model/ListViewModel';
 import {useAppState, ListState} from '../useAppState';
 

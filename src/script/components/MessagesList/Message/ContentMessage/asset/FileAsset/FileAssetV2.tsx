@@ -17,8 +17,8 @@
  *
  */
 
-import type {ContentMessage} from 'src/script/entity/message/ContentMessage';
-import type {FileAsset as FileAssetType} from 'src/script/entity/message/FileAsset';
+import type {ContentMessage} from 'Repositories/entity/message/ContentMessage';
+import type {FileAsset as FileAssetType} from 'Repositories/entity/message/FileAsset';
 
 import {useAssetTransfer} from '../common/useAssetTransfer/useAssetTransfer';
 import {FileAssetCard} from '../FileAsset/FileAssetCard/FileAssetCard';

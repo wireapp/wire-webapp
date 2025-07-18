@@ -29,9 +29,9 @@ import {
   isTeamConversation,
   MLSCapableConversation,
   MLSConversation,
-} from '../conversation/ConversationSelectors';
-import {Conversation} from '../entity/Conversation';
-import {User} from '../entity/User';
+} from 'Repositories/conversation/ConversationSelectors';
+import {Conversation} from 'Repositories/entity/Conversation';
+import {User} from 'Repositories/entity/User';
 
 /**
  * Will initialize all the MLS conversations that the user is member of but that are not yet locally established.

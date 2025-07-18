@@ -19,8 +19,8 @@
 
 import {$createParagraphNode, $createTextNode} from 'lexical';
 
-import {ContentMessage} from 'src/script/entity/message/ContentMessage';
-import {Text} from 'src/script/entity/message/Text';
+import {ContentMessage} from 'Repositories/entity/message/ContentMessage';
+import {Text} from 'Repositories/entity/message/Text';
 
 import {$createMentionNode} from '../../../nodes/MentionNode';
 import {createNodes} from '../../../utils/generateNodes';

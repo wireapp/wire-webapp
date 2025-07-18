@@ -20,13 +20,12 @@
 import {render, fireEvent} from '@testing-library/react';
 import {CONVERSATION_TYPE} from '@wireapp/api-client/lib/conversation';
 
-import {User} from 'src/script/entity/User';
-import {ServiceEntity} from 'src/script/integration/ServiceEntity';
+import {Conversation} from 'Repositories/entity/Conversation';
+import {User} from 'Repositories/entity/User';
+import {ServiceEntity} from 'Repositories/integration/ServiceEntity';
 import {createUuid} from 'Util/uuid';
 
 import {ConversationDetailsHeader} from './ConversationDetailsHeader';
-
-import {Conversation} from '../../../../../entity/Conversation';
 
 const participant = new User('id');
 const service = new ServiceEntity({id: 'id'});

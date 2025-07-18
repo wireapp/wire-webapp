@@ -19,7 +19,7 @@
 
 import React, {ReactNode} from 'react';
 
-import {SystemMessage} from 'src/script/entity/message/SystemMessage';
+import {SystemMessage} from 'Repositories/entity/message/SystemMessage';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 
 import {MessageTime} from '../MessageTime';

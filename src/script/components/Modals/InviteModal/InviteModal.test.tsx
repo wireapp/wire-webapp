@@ -19,12 +19,12 @@
 
 import {render, screen, waitFor} from '@testing-library/react';
 
+import {User} from 'Repositories/entity/User';
 import {t} from 'Util/LocalizerUtil';
 
 import {InviteModal} from './InviteModal';
 
 import {Config} from '../../../Config';
-import {User} from '../../../entity/User';
 
 const {BRAND_NAME: brandName} = Config.getConfig();
 
