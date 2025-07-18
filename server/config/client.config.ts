@@ -39,6 +39,7 @@ export function generateConfig(params: ConfigGeneratorParams, env: Env) {
       ALLOWED_FILE_UPLOAD_EXTENSIONS: (env.FEATURE_ALLOWED_FILE_UPLOAD_EXTENSIONS || '*')
         .split(',')
         .map(extension => extension.trim()),
+      ALLOW_LINK_PREVIEWS: env.FEATURE_ALLOW_LINK_PREVIEWS == 'true',
       APPLOCK_SCHEDULED_TIMEOUT: env.FEATURE_APPLOCK_SCHEDULED_TIMEOUT
         ? Number(env.FEATURE_APPLOCK_SCHEDULED_TIMEOUT)
         : null,

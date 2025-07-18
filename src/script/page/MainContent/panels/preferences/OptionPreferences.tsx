@@ -27,6 +27,7 @@ import {Checkbox, CheckboxLabel, IndicatorRangeInput} from '@wireapp/react-ui-ki
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {RadioGroup} from 'Components/Radio';
+import {Config} from 'src/script/Config';
 import {User} from 'src/script/entity/User';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
@@ -126,6 +127,8 @@ const OptionPreferences: React.FC<OptionPreferencesProps> = ({propertiesReposito
     {value: 5, label: RootFontSize.XL},
     {value: 6, label: RootFontSize.XXL, heading: t('preferencesOptionsFontSizeLarge')},
   ];
+
+  const isLinkPreviewsEnabled = Config.getConfig().FEATURE.ALLOW_LINK_PREVIEWS;
 
   return (
     <PreferencesPage title={t('preferencesOptions')}>
@@ -241,24 +244,26 @@ const OptionPreferences: React.FC<OptionPreferencesProps> = ({propertiesReposito
               />
             </div>
 
-            <div className="checkbox-margin">
-              <Checkbox
-                tabIndex={TabIndex.FOCUSABLE}
-                onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-                  saveOptionSendPreviewsPreference(event.target.checked);
-                }}
-                checked={optionSendPreviews}
-                data-uie-name="status-preference-previews-send"
-              >
-                <CheckboxLabel htmlFor="status-preference-previews-send">
-                  {t('preferencesOptionsPreviewsSendCheckbox')}
-                </CheckboxLabel>
-              </Checkbox>
+            {isLinkPreviewsEnabled && (
+              <div className="checkbox-margin">
+                <Checkbox
+                  tabIndex={TabIndex.FOCUSABLE}
+                  onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                    saveOptionSendPreviewsPreference(event.target.checked);
+                  }}
+                  checked={optionSendPreviews}
+                  data-uie-name="status-preference-previews-send"
+                >
+                  <CheckboxLabel htmlFor="status-preference-previews-send">
+                    {t('preferencesOptionsPreviewsSendCheckbox')}
+                  </CheckboxLabel>
+                </Checkbox>
 
-              <p className="preferences-detail preferences-detail-intended">
-                {t('preferencesOptionsPreviewsSendDetail')}
-              </p>
-            </div>
+                <p className="preferences-detail preferences-detail-intended">
+                  {t('preferencesOptionsPreviewsSendDetail')}
+                </p>
+              </div>
+            )}
           </>
         )}
       </PreferencesSection>
