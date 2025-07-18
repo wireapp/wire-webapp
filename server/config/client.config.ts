@@ -28,6 +28,7 @@ export function generateConfig(params: ConfigGeneratorParams, env: Env) {
     APP_NAME: env.APP_NAME ?? 'Wire',
     BACKEND_NAME: env.BACKEND_NAME,
     BACKEND_REST: urls.api ?? '',
+    LINK_BLACKLIST: env.LINK_BLACKLIST,
     BACKEND_WS: urls.ws ?? '',
     BRAND_NAME: env.BRAND_NAME,
     CELLS_TOKEN_SHARED_SECRET: env.CELLS_TOKEN_SHARED_SECRET,
