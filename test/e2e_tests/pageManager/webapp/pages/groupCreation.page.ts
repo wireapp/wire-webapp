@@ -26,6 +26,7 @@ export class GroupCreationPage {
   readonly groupNameInput: Locator;
   readonly nextButton: Locator;
   readonly createGroupButton: Locator;
+  readonly addMembersButton: Locator;
 
   constructor(page: Page) {
     this.page = page;
@@ -34,6 +35,7 @@ export class GroupCreationPage {
     this.groupNameInput = page.locator('[data-uie-name="enter-group-name"]');
     this.nextButton = page.locator('[data-uie-name="go-next"]');
     this.createGroupButton = page.locator('[data-uie-name="do-create-group"]');
+    this.addMembersButton = page.locator('[data-uie-name="do-create"]');
   }
 
   async setGroupName(name: string) {
@@ -41,7 +43,19 @@ export class GroupCreationPage {
     await this.nextButton.click();
   }
 
+  async clickNextButton() {
+    await this.nextButton.click();
+  }
+
   async clickCreateGroupButton() {
     await this.createGroupButton.click();
+  }
+
+  async clickAddMembers() {
+    await this.addMembersButton.click();
+  }
+
+  async waitForModalClose() {
+    await this.groupCreationModal.waitFor({state: 'detached'});
   }
 }

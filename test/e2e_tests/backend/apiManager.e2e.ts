@@ -122,6 +122,11 @@ export class ApiManagerE2E {
     await this.brig.enableConferenceCallingBackdoorViaBackdoorTeam(teamId);
   }
 
+  async enableChannelsFeature(teamId: string) {
+    await this.brig.unlockChannelFeature(teamId);
+    await this.brig.enableChannelsFeature(teamId);
+  }
+
   private extractCookieFromRegisterResponse(registerResponse: AxiosResponse): string {
     try {
       return registerResponse.headers['set-cookie']!.find((cookieStr: string) => cookieStr.startsWith('zuid='))!;
