@@ -77,6 +77,17 @@ switch (stage) {
 
 if (commitId) {
   logger.info(`Got commit ID "${commitId}".`);
+
+  if (stage === DeploymentStage.PRODUCTION || stage === DeploymentStage.STAGING) {
+    // If we're releasing to production, we need to ensure the commitId is part of the master branch.
+    const commitBranch = exec(`git branch --contains ${commitId}`)
+      .split('\n')
+      .map(branch => branch.trim());
+    if (!commitBranch.includes('master')) {
+      logger.error(`Commit ID "${commitId}" is not part of the master branch. Aborting.`);
+      process.exit(1);
+    }
+  }
 } else {
   logger.info(`No commit ID specified. Will use latest commit from branch "${branch}".`);
   commitId = exec(`git rev-parse ${branch}`);
