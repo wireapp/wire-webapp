@@ -83,8 +83,8 @@ if (commitId) {
     const commitBranch = exec(`git branch --contains ${commitId}`)
       .split('\n')
       .map(branch => branch.trim());
-    if (!commitBranch.includes('master')) {
-      logger.error(`Commit ID "${commitId}" is not part of the master branch. Aborting.`);
+    if (!commitBranch.includes(branch)) {
+      logger.error(`Commit ID "${commitId}" is not part of the ${branch} branch. Aborting.`);
       process.exit(1);
     }
   }
