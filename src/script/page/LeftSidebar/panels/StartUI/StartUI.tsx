@@ -91,6 +91,8 @@ const StartUI: React.FC<StartUIProps> = ({
   const actions = mainViewModel.actions;
   const isTeam = teamState.isTeam();
   const defaultProtocol = teamState.teamFeatures()?.mls?.config.defaultProtocol;
+  const areServicesSupportedByProtocol = defaultProtocol !== ConversationProtocol.MLS;
+  const showServiceTab = isTeam && canChatWithServices() && areServicesSupportedByProtocol;
 
   const [searchQuery, setSearchQuery] = useState('');
   const [activeTab, setActiveTab] = useState(Tabs.PEOPLE);
@@ -150,7 +152,7 @@ const StartUI: React.FC<StartUIProps> = ({
           forceDark
         />
       </div>
-      {isTeam && canChatWithServices() && defaultProtocol != ConversationProtocol.MLS && (
+      {showServiceTab && (
         <ul className="start-ui-list-tabs">
           <li className={`start-ui-list-tab ${activeTab === Tabs.PEOPLE ? 'active' : ''}`}>
             <button
