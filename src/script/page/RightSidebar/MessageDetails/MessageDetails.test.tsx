@@ -25,12 +25,12 @@ import {Conversation} from 'Repositories/entity/Conversation';
 import {ContentMessage} from 'Repositories/entity/message/ContentMessage';
 import {User} from 'Repositories/entity/User';
 import {SearchRepository} from 'Repositories/search/SearchRepository';
+import {TeamRepository} from 'Repositories/team/TeamRepository';
 import {createUuid} from 'Util/uuid';
 
 import {MessageDetails} from './MessageDetails';
 
 import {TestFactory} from '../../../../../test/helper/TestFactory';
-import {TeamRepository} from '../../../team/TeamRepository';
 import {UserRepository} from '../../../user/UserRepository';
 
 const testFactory = new TestFactory();

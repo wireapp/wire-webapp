@@ -24,14 +24,14 @@ import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {toggleFeature} from 'Repositories/conversation/ConversationAccessPermission';
 import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
 import {Conversation} from 'Repositories/entity/Conversation';
+import {TeamRepository} from 'Repositories/team/TeamRepository';
+import {TeamState} from 'Repositories/team/TeamState';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 
 import {GuestOptions} from './components/GuestOptions';
 import {ServicesOptions} from './components/ServicesOptions';
 
-import {TeamRepository} from '../../../team/TeamRepository';
-import {TeamState} from '../../../team/TeamState';
 import {PanelHeader} from '../PanelHeader';
 
 interface GuestServicesOptionsProps {

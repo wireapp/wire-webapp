@@ -31,6 +31,7 @@ import type {MemberMessage as MemberMessageEntity} from 'Repositories/entity/mes
 import {Message as BaseMessage} from 'Repositories/entity/message/Message';
 import type {User} from 'Repositories/entity/User';
 import {ServiceEntity} from 'Repositories/integration/ServiceEntity';
+import {TeamState} from 'Repositories/team/TeamState';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {getAllFocusableElements, setElementsTabIndex} from 'Util/focusUtil';
 import {isTabKey} from 'Util/KeyboardUtil';
@@ -39,8 +40,6 @@ import {ElementType, MessageDetails} from './ContentMessage/asset/TextMessageRen
 import {MessageWrapper} from './MessageWrapper';
 import {ScrollToElement} from './types';
 import {useMessageFocusedTabIndex} from './util';
-
-import {TeamState} from '../../../team/TeamState';
 
 export interface MessageActions {
   onClickAvatar: (user: User | ServiceEntity) => void;

@@ -30,6 +30,8 @@ import {ConversationRepository} from 'Repositories/conversation/ConversationRepo
 import {ConversationState} from 'Repositories/conversation/ConversationState';
 import {User} from 'Repositories/entity/User';
 import {SearchRepository} from 'Repositories/search/SearchRepository';
+import {TeamRepository} from 'Repositories/team/TeamRepository';
+import {TeamState} from 'Repositories/team/TeamState';
 import {UserRepository} from 'src/script/user/UserRepository';
 import {t} from 'Util/LocalizerUtil';
 import {getLogger} from 'Util/Logger';
@@ -40,8 +42,6 @@ import {isBackendError} from 'Util/TypePredicateUtil';
 import {TopPeople} from './components/TopPeople';
 
 import {getManageTeamUrl} from '../../../../externalRoute';
-import {TeamRepository} from '../../../../team/TeamRepository';
-import {TeamState} from '../../../../team/TeamState';
 import {UserState} from '../../../../user/UserState';
 
 export type SearchResultsData = {contacts: User[]; others: User[]};

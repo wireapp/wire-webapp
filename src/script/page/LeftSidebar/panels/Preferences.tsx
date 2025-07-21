@@ -32,11 +32,11 @@ import {
   Notification,
   PreferenceNotificationRepository,
 } from 'Repositories/notification/PreferenceNotificationRepository';
+import {TeamRepository} from 'Repositories/team/TeamRepository';
 import {t} from 'Util/LocalizerUtil';
 
 import {ListWrapper} from './ListWrapper';
 
-import {TeamRepository} from '../../../team/TeamRepository';
 import {ContentState, useAppState} from '../../useAppState';
 
 type PreferencesProps = {

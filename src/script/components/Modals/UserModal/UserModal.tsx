@@ -31,6 +31,7 @@ import {EnrichedFields} from 'Components/panel/EnrichedFields';
 import {UserActions} from 'Components/panel/UserActions';
 import {UserDetails} from 'Components/panel/UserDetails';
 import {User} from 'Repositories/entity/User';
+import {TeamState} from 'Repositories/team/TeamState';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {handleKeyDown, KEY} from 'Util/KeyboardUtil';
 import {replaceLink, t} from 'Util/LocalizerUtil';
@@ -41,7 +42,6 @@ import {userModalStyle, userModalWrapperStyle} from './UserModal.styles';
 import {Config} from '../../../Config';
 import {RootContext} from '../../../page/RootProvider';
 import {Core} from '../../../service/CoreSingleton';
-import {TeamState} from '../../../team/TeamState';
 import {UserRepository} from '../../../user/UserRepository';
 
 export interface UserModalProps {

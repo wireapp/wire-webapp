@@ -30,6 +30,8 @@ import {MediaDevicesHandler} from 'Repositories/media/MediaDevicesHandler';
 
 import {GroupVideoGrid, GroupVideoGripProps} from './GroupVideoGrid';
 
+jest.mock('@wireapp/api-client/lib/team');
+
 const createMockParticipant = (
   userId: string,
   clientId: string,

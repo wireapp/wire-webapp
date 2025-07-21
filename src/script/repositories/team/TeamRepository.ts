@@ -57,12 +57,12 @@ import {TeamMemberEntity} from './TeamMemberEntity';
 import {TeamService} from './TeamService';
 import {TeamState} from './TeamState';
 
-import {scheduleRecurringTask, updateRemoteConfigLogger} from '../lifecycle/updateRemoteConfigs';
-import {getMLSMigrationStatus, MLSMigrationStatus} from '../mls/MLSMigration/migrationStatus';
-import {APIClient} from '../service/APIClientSingleton';
-import {ROLE, ROLE as TEAM_ROLE, roleFromTeamPermissions} from '../user/UserPermission';
-import {UserRepository} from '../user/UserRepository';
-import {UserState} from '../user/UserState';
+import {scheduleRecurringTask, updateRemoteConfigLogger} from '../../lifecycle/updateRemoteConfigs';
+import {getMLSMigrationStatus, MLSMigrationStatus} from '../../mls/MLSMigration/migrationStatus';
+import {APIClient} from '../../service/APIClientSingleton';
+import {ROLE, ROLE as TEAM_ROLE, roleFromTeamPermissions} from '../../user/UserPermission';
+import {UserRepository} from '../../user/UserRepository';
+import {UserState} from '../../user/UserState';
 
 export const HAS_PERSISTED_SUPPORTED_PROTOCOLS = 'HAS_PERSISTED_SUPPORTED_PROTOCOLS';
 

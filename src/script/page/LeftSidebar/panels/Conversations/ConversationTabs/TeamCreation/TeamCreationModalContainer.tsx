@@ -20,7 +20,7 @@
 import {useState} from 'react';
 
 import {User} from 'Repositories/entity/User';
-import {TeamRepository} from 'src/script/team/TeamRepository';
+import {TeamRepository} from 'Repositories/team/TeamRepository';
 import {UserRepository} from 'src/script/user/UserRepository';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 

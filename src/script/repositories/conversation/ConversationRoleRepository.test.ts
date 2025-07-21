@@ -21,12 +21,12 @@ import {DefaultConversationRoleName as DefaultRole} from '@wireapp/api-client/li
 
 import {Conversation} from 'Repositories/entity/Conversation';
 import {User} from 'Repositories/entity/User';
+import {TeamEntity} from 'Repositories/team/TeamEntity';
 import {createUuid} from 'Util/uuid';
 
 import {ConversationRoleRepository, Permissions} from './ConversationRoleRepository';
 
 import {TestFactory} from '../../../../test/helper/TestFactory';
-import {TeamEntity} from '../../team/TeamEntity';
 
 describe('ConversationRoleRepository', () => {
   const testFactory = new TestFactory();

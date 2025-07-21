@@ -28,6 +28,11 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {ClientEntity, ClientRepository} from 'Repositories/client';
 import {EventSource} from 'Repositories/event/EventSource';
+import {
+  FeatureUpdateType,
+  detectTeamFeatureUpdate,
+} from 'Repositories/team/TeamFeatureConfigChangeDetector/TeamFeatureConfigChangeDetector';
+import {TeamRepository} from 'Repositories/team/TeamRepository';
 import {Logger, getLogger} from 'Util/Logger';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 
@@ -35,11 +40,6 @@ import {SelfService} from './SelfService';
 import {evaluateSelfSupportedProtocols} from './SelfSupportedProtocols/SelfSupportedProtocols';
 
 import {Core} from '../../service/CoreSingleton';
-import {
-  FeatureUpdateType,
-  detectTeamFeatureUpdate,
-} from '../../team/TeamFeatureConfigChangeDetector/TeamFeatureConfigChangeDetector';
-import {TeamRepository} from '../../team/TeamRepository';
 import {UserRepository} from '../../user/UserRepository';
 import {UserState} from '../../user/UserState';
 

@@ -25,11 +25,11 @@ import ko from 'knockout';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import type {ClientRepository} from 'Repositories/client';
+import {TeamState} from 'Repositories/team/TeamState';
 import {createUuid} from 'Util/uuid';
 
 import {AppLock, APPLOCK_STATE} from './AppLock';
 
-import {TeamState} from '../../team/TeamState';
 import {AppLockRepository} from '../../user/AppLockRepository';
 import {AppLockState} from '../../user/AppLockState';
 import {UserState} from '../../user/UserState';

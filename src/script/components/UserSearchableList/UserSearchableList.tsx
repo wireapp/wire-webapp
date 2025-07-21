@@ -27,13 +27,12 @@ import {UserList} from 'Components/UserList';
 import {ConversationState} from 'Repositories/conversation/ConversationState';
 import type {User} from 'Repositories/entity/User';
 import {SearchRepository} from 'Repositories/search/SearchRepository';
+import type {TeamRepository} from 'Repositories/team/TeamRepository';
+import {TeamState} from 'Repositories/team/TeamState';
 import {partition} from 'Util/ArrayUtil';
 import {t} from 'Util/LocalizerUtil';
 import {matchQualifiedIds} from 'Util/QualifiedId';
 import {sortByPriority} from 'Util/StringUtil';
-
-import type {TeamRepository} from '../../team/TeamRepository';
-import {TeamState} from '../../team/TeamState';
 
 export type UserListProps = React.ComponentProps<typeof UserList> & {
   conversationState?: ConversationState;

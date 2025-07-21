@@ -45,13 +45,13 @@ import type {PermissionRepository} from 'Repositories/permission/PermissionRepos
 import {PermissionStatusState} from 'Repositories/permission/PermissionStatusState';
 import {PropertiesRepository} from 'Repositories/properties/PropertiesRepository';
 import {PROPERTIES_TYPE} from 'Repositories/properties/PropertiesType';
+import type {TeamRepository} from 'Repositories/team/TeamRepository';
+import {TeamState} from 'Repositories/team/TeamState';
 import {replaceLink, t} from 'Util/LocalizerUtil';
 import {matchQualifiedIds} from 'Util/QualifiedId';
 import {safeWindowOpen} from 'Util/SanitizationUtil';
 
 import {Config} from '../Config';
-import type {TeamRepository} from '../team/TeamRepository';
-import {TeamState} from '../team/TeamState';
 import {ROLE} from '../user/UserPermission';
 
 export interface CallActions {

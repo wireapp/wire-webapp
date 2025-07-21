@@ -30,11 +30,13 @@ import {Conversation} from 'Repositories/entity/Conversation';
 import {User} from 'Repositories/entity/User';
 import {MediaDevicesHandler} from 'Repositories/media/MediaDevicesHandler';
 import {PropertiesRepository} from 'Repositories/properties/PropertiesRepository';
-import {TeamState} from 'src/script/team/TeamState';
+import {TeamState} from 'Repositories/team/TeamState';
 import {CallActions} from 'src/script/view_model/CallingViewModel';
 import {createUuid} from 'Util/uuid';
 
 import {CallingCell, CallingCellProps} from './CallingCell';
+
+jest.mock('@wireapp/api-client/lib/team');
 
 jest.mock('Components/InViewport', () => ({
   InViewport: ({onVisible, children}: {onVisible: () => void; children: any}) => {

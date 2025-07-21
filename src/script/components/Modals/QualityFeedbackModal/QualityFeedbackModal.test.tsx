@@ -46,6 +46,8 @@ import {
 import {EventName} from '../../../tracking/EventName';
 import {Segmentation} from '../../../tracking/Segmentation';
 
+jest.mock('@wireapp/api-client/lib/team');
+
 jest.mock('../../../tracking/Telemetry.helpers', () => ({
   isTelemetryEnabledAtCurrentEnvironment: () => true,
 }));

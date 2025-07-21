@@ -84,6 +84,8 @@ import {PropertiesRepository} from 'Repositories/properties/PropertiesRepository
 import {SelfRepository} from 'Repositories/self/SelfRepository';
 import type {EventRecord} from 'Repositories/storage';
 import {ConversationRecord} from 'Repositories/storage';
+import {TeamRepository} from 'Repositories/team/TeamRepository';
+import {TeamState} from 'Repositories/team/TeamState';
 import {getNextItem} from 'Util/ArrayUtil';
 import {allowsAllFiles, getFileExtensionOrName, isAllowedFile} from 'Util/FileTypeUtil';
 import {replaceLink, t} from 'Util/LocalizerUtil';
@@ -159,8 +161,6 @@ import {MessageCategory} from '../../message/MessageCategory';
 import {SystemMessageType} from '../../message/SystemMessageType';
 import {initMLSGroupConversation} from '../../mls';
 import {Core} from '../../service/CoreSingleton';
-import {TeamRepository} from '../../team/TeamRepository';
-import {TeamState} from '../../team/TeamState';
 import {ServerTimeHandler} from '../../time/serverTimeHandler';
 import {UserFilter} from '../../user/UserFilter';
 import {UserRepository} from '../../user/UserRepository';

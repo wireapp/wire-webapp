@@ -22,10 +22,10 @@ import {ConversationProtocol, CONVERSATION_TYPE} from '@wireapp/api-client/lib/c
 import {randomUUID} from 'crypto';
 
 import {Conversation} from 'Repositories/entity/Conversation';
+import {TeamState} from 'Repositories/team/TeamState';
 
 import {ConversationState} from './ConversationState';
 
-import {TeamState} from '../../team/TeamState';
 import {UserState} from '../../user/UserState';
 
 function createConversationState() {

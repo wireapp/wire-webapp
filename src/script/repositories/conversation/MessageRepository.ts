@@ -70,6 +70,7 @@ import {NOTIFICATION_HANDLING_STATE} from 'Repositories/event/NotificationHandli
 import {PropertiesRepository} from 'Repositories/properties/PropertiesRepository';
 import {PROPERTIES_TYPE} from 'Repositories/properties/PropertiesType';
 import type {EventRecord, ReactionMap} from 'Repositories/storage';
+import {TeamState} from 'Repositories/team/TeamState';
 import {
   cancelSendingLinkPreview,
   clearLinkPreviewSendingState,
@@ -103,7 +104,6 @@ import {MentionEntity} from '../../message/MentionEntity';
 import {QuoteEntity} from '../../message/QuoteEntity';
 import {StatusType} from '../../message/StatusType';
 import {Core} from '../../service/CoreSingleton';
-import {TeamState} from '../../team/TeamState';
 import {ServerTimeHandler} from '../../time/serverTimeHandler';
 import {UserType} from '../../tracking/attribute';
 import {EventName} from '../../tracking/EventName';

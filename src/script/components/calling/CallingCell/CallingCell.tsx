@@ -40,6 +40,7 @@ import type {Participant} from 'Repositories/calling/Participant';
 import {useVideoGrid} from 'Repositories/calling/videoGridHandler';
 import {PropertiesRepository} from 'Repositories/properties/PropertiesRepository';
 import {PROPERTIES_TYPE} from 'Repositories/properties/PropertiesType';
+import {TeamState} from 'Repositories/team/TeamState';
 import {Config} from 'src/script/Config';
 import {useUserPropertyValue} from 'src/script/hooks/useUserProperty';
 import {useAppMainState, ViewType} from 'src/script/page/state';
@@ -50,7 +51,6 @@ import {t} from 'Util/LocalizerUtil';
 import {usePressSpaceToUnmute} from './usePressSpaceToUnmute/usePressSpaceToUnmute';
 
 import {generateConversationUrl} from '../../../router/routeGenerator';
-import {TeamState} from '../../../team/TeamState';
 import {CallActions, CallViewTab} from '../../../view_model/CallingViewModel';
 
 interface VideoCallProps {

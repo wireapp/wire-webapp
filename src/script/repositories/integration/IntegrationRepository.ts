@@ -26,6 +26,8 @@ import {ConversationState} from 'Repositories/conversation/ConversationState';
 import {MemberLeaveEvent} from 'Repositories/conversation/EventBuilder';
 import type {Conversation} from 'Repositories/entity/Conversation';
 import type {User} from 'Repositories/entity/User';
+import type {TeamRepository} from 'Repositories/team/TeamRepository';
+import {TeamState} from 'Repositories/team/TeamState';
 import {getLogger, Logger} from 'Util/Logger';
 import {compareTransliteration, sortByPriority} from 'Util/StringUtil';
 
@@ -33,9 +35,6 @@ import {IntegrationMapper} from './IntegrationMapper';
 import type {IntegrationService} from './IntegrationService';
 import {ProviderEntity} from './ProviderEntity';
 import {ServiceEntity} from './ServiceEntity';
-
-import type {TeamRepository} from '../../team/TeamRepository';
-import {TeamState} from '../../team/TeamState';
 
 export class IntegrationRepository {
   private readonly logger: Logger;

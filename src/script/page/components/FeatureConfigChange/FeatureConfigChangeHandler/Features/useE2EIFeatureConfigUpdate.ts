@@ -24,8 +24,8 @@ import {FEATURE_KEY, FeatureList} from '@wireapp/api-client/lib/team';
 import {
   FeatureUpdateType,
   detectTeamFeatureUpdate,
-} from 'src/script/team/TeamFeatureConfigChangeDetector/TeamFeatureConfigChangeDetector';
-import {TeamRepository} from 'src/script/team/TeamRepository';
+} from 'Repositories/team/TeamFeatureConfigChangeDetector/TeamFeatureConfigChangeDetector';
+import {TeamRepository} from 'Repositories/team/TeamRepository';
 
 import {configureE2EI} from './E2EIdentity';
 

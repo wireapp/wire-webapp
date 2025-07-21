@@ -27,7 +27,7 @@ import type {Services} from '@wireapp/api-client/lib/team/service/';
 import type {TeamData} from '@wireapp/api-client/lib/team/team/';
 import {container} from 'tsyringe';
 
-import {APIClient} from '../service/APIClientSingleton';
+import {APIClient} from '../../service/APIClientSingleton';
 
 export class TeamService {
   constructor(private readonly apiClient = container.resolve(APIClient)) {}

@@ -32,12 +32,12 @@ import {CallState} from 'Repositories/calling/CallState';
 import {ConversationVerificationState} from 'Repositories/conversation/ConversationVerificationState';
 import {Conversation} from 'Repositories/entity/Conversation';
 import {User} from 'Repositories/entity/User';
+import {TeamState} from 'Repositories/team/TeamState';
 import {withTheme} from 'src/script/auth/util/test/TestUtil';
 import {ContentState} from 'src/script/page/useAppState';
 
 import {TestFactory} from '../../../../test/helper/TestFactory';
 import {PanelState} from '../../page/RightSidebar/RightSidebar';
-import {TeamState} from '../../team/TeamState';
 import {ViewModelRepositories} from '../../view_model/MainViewModel';
 
 jest.mock('@wireapp/react-ui-kit', () => ({

@@ -64,6 +64,8 @@ import {NOTIFICATION_HANDLING_STATE} from 'Repositories/event/NotificationHandli
 import {SelfRepository} from 'Repositories/self/SelfRepository';
 import {LegacyEventRecord, StorageService} from 'Repositories/storage';
 import {StorageSchemata} from 'Repositories/storage/StorageSchemata';
+import {TeamRepository} from 'Repositories/team/TeamRepository';
+import {TeamState} from 'Repositories/team/TeamState';
 import {Config} from 'src/script/Config';
 import {ConversationError} from 'src/script/error/ConversationError';
 import {
@@ -88,8 +90,6 @@ import {entities, payload} from '../../../../test/api/payloads';
 import {TestFactory} from '../../../../test/helper/TestFactory';
 import {generateUser} from '../../../../test/helper/UserGenerator';
 import {Core} from '../../service/CoreSingleton';
-import {TeamRepository} from '../../team/TeamRepository';
-import {TeamState} from '../../team/TeamState';
 import {UserRepository} from '../../user/UserRepository';
 import {UserState} from '../../user/UserState';
 

@@ -23,6 +23,7 @@ import {container, singleton} from 'tsyringe';
 
 import {Conversation} from 'Repositories/entity/Conversation';
 import {User} from 'Repositories/entity/User';
+import {TeamState} from 'Repositories/team/TeamState';
 import {matchQualifiedIds} from 'Util/QualifiedId';
 import {sortGroupsByLastEvent} from 'Util/util';
 
@@ -36,7 +37,6 @@ import {
   isReadableConversation,
 } from './ConversationSelectors';
 
-import {TeamState} from '../../team/TeamState';
 import {UserState} from '../../user/UserState';
 
 @singleton()

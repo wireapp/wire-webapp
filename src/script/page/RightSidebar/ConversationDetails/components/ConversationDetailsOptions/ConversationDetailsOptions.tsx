@@ -31,6 +31,7 @@ import {ConversationRoleRepository} from 'Repositories/conversation/Conversation
 import {isMLSConversation} from 'Repositories/conversation/ConversationSelectors';
 import {Conversation} from 'Repositories/entity/Conversation';
 import {User} from 'Repositories/entity/User';
+import {TeamState} from 'Repositories/team/TeamState';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 import {replaceReactComponents} from 'Util/LocalizerUtil/ReactLocalizerUtil';
@@ -38,7 +39,6 @@ import {useChannelsFeatureFlag} from 'Util/useChannelsFeatureFlag';
 
 import {ConversationDetailsOption} from './ConversationDetailsOption';
 
-import {TeamState} from '../../../../../team/TeamState';
 import {ActionsViewModel} from '../../../../../view_model/ActionsViewModel';
 import {PanelEntity, PanelState} from '../../../RightSidebar';
 import {getConversationActions} from '../../utils/getConversationActions';

@@ -28,8 +28,8 @@ import {sortUsersByPriority} from 'Util/StringUtil';
 
 import {TeamEntity} from './TeamEntity';
 
-import {ROLE, roleMap} from '../user/UserPermission';
-import {UserState} from '../user/UserState';
+import {ROLE, roleMap} from '../../user/UserPermission';
+import {UserState} from '../../user/UserState';
 
 @singleton()
 export class TeamState {

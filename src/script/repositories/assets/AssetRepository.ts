@@ -24,6 +24,10 @@ import {container, singleton} from 'tsyringe';
 
 import {GenericMessage, LegalHoldStatus} from '@wireapp/protocol-messaging';
 
+import {Conversation} from 'Repositories/entity/Conversation';
+import {FileAsset} from 'Repositories/entity/message/FileAsset';
+import type {User} from 'Repositories/entity/User';
+import {TeamState} from 'Repositories/team/TeamState';
 import {stripImageExifData} from 'Util/ImageUtil';
 import {getLogger, Logger} from 'Util/Logger';
 import {downloadBlob, loadFileBuffer, loadImage} from 'Util/util';
@@ -34,11 +38,7 @@ import {AssetTransferState} from './AssetTransferState';
 import {getAssetUrl, setAssetUrl} from './AssetURLCache';
 import {AssetError} from './AssetError';
 
-import {Conversation} from 'Repositories/entity/Conversation';
-import {FileAsset} from 'Repositories/entity/message/FileAsset';
-import type {User} from 'Repositories/entity/User';
 import {Core} from '../../service/CoreSingleton';
-import {TeamState} from '../../team/TeamState';
 
 interface CompressedImage {
   compressedBytes: Uint8Array;

@@ -36,6 +36,7 @@ import {User} from 'Repositories/entity/User';
 import {EventRepository} from 'Repositories/event/EventRepository';
 import {PropertiesRepository} from 'Repositories/properties/PropertiesRepository';
 import {SelfService} from 'Repositories/self/SelfService';
+import {TeamState} from 'Repositories/team/TeamState';
 import {entities} from 'test/api/payloads';
 import {TestFactory} from 'test/helper/TestFactory';
 import {generateAPIUser} from 'test/helper/UserGenerator';
@@ -46,7 +47,6 @@ import {UserRepository} from './UserRepository';
 import {UserService} from './UserService';
 import {UserState} from './UserState';
 
-import {TeamState} from '../team/TeamState';
 import {serverTimeHandler} from '../time/serverTimeHandler';
 
 const testFactory = new TestFactory();
