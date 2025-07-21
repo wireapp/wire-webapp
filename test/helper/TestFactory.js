@@ -50,7 +50,7 @@ import {MediaRepository} from 'Repositories/media/MediaRepository';
 import {PermissionRepository} from 'Repositories/permission/PermissionRepository';
 import {PropertiesRepository} from 'Repositories/properties/PropertiesRepository';
 import {PropertiesService} from 'Repositories/properties/PropertiesService';
-import {SearchRepository} from 'src/script/search/SearchRepository';
+import {SearchRepository} from 'Repositories/search/SearchRepository';
 import {SelfService} from 'src/script/self/SelfService';
 import {Core} from 'src/script/service/CoreSingleton';
 import {createStorageEngine, DatabaseTypes} from 'src/script/service/StoreEngineProvider';

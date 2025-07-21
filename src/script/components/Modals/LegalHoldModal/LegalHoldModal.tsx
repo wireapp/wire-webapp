@@ -34,12 +34,12 @@ import {ConversationRepository} from 'Repositories/conversation/ConversationRepo
 import {MessageRepository} from 'Repositories/conversation/MessageRepository';
 import {CryptographyRepository} from 'Repositories/cryptography/CryptographyRepository';
 import {User} from 'Repositories/entity/User';
+import {SearchRepository} from 'Repositories/search/SearchRepository';
 import {handleEnterDown} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
 
 import {useLegalHoldModalState} from './LegalHoldModal.state';
 
-import {SearchRepository} from '../../../search/SearchRepository';
 import {TeamRepository} from '../../../team/TeamRepository';
 
 const DISABLE_SUBMIT_TEXT_LENGTH = 1;

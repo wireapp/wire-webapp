@@ -20,7 +20,7 @@
 import {ConversationLabel} from 'Repositories/conversation/ConversationLabelRepository';
 import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
 import {Conversation} from 'Repositories/entity/Conversation';
-import {SearchRepository} from 'src/script/search/SearchRepository';
+import {SearchRepository} from 'Repositories/search/SearchRepository';
 
 import {SidebarTabs} from './useSidebarStore';
 

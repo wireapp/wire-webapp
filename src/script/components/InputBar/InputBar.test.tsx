@@ -30,13 +30,13 @@ import {User} from 'Repositories/entity/User';
 import {EventRepository} from 'Repositories/event/EventRepository';
 import {PropertiesRepository} from 'Repositories/properties/PropertiesRepository';
 import {PropertiesService} from 'Repositories/properties/PropertiesService';
+import {SearchRepository} from 'Repositories/search/SearchRepository';
 import {withTheme} from 'src/script/auth/util/test/TestUtil';
 import {Config} from 'src/script/Config';
 import {SelfService} from 'src/script/self/SelfService';
 import {createUuid} from 'Util/uuid';
 
 import {TestFactory} from '../../../../test/helper/TestFactory';
-import {SearchRepository} from '../../search/SearchRepository';
 import {StorageRepository} from '../../storage';
 import {TeamState} from '../../team/TeamState';
 
