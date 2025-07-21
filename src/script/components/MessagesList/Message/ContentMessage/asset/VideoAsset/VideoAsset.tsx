@@ -33,7 +33,7 @@ import {AssetTransferState} from 'Repositories/assets/AssetTransferState';
 import type {ContentMessage} from 'Repositories/entity/message/ContentMessage';
 import type {FileAsset as FileAssetType} from 'Repositories/entity/message/FileAsset';
 import {TeamState} from 'Repositories/team/TeamState';
-import {EventName} from 'src/script/tracking/EventName';
+import {EventName} from 'Repositories/tracking/EventName';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 import {formatSeconds} from 'Util/TimeUtil';

@@ -57,6 +57,7 @@ import {PropertiesRepository} from 'Repositories/properties/PropertiesRepository
 import {PROPERTIES_TYPE} from 'Repositories/properties/PropertiesType';
 import {EventRecord, StorageRepository, StorageSchemata} from 'Repositories/storage';
 import {TeamState} from 'Repositories/team/TeamState';
+import {disableForcedErrorReporting} from 'Repositories/tracking/Telemetry.helpers';
 import {getStorage} from 'Util/localStorage';
 import {getLogger, Logger} from 'Util/Logger';
 
@@ -67,7 +68,6 @@ import {E2EIHandler} from '../E2EIdentity';
 import {checkVersion} from '../lifecycle/newVersionHandler';
 import {APIClient} from '../service/APIClientSingleton';
 import {Core} from '../service/CoreSingleton';
-import {disableForcedErrorReporting} from '../tracking/Telemetry.helpers';
 import {UserRepository} from '../user/UserRepository';
 import {UserState} from '../user/UserState';
 import {ViewModelRepositories} from '../view_model/MainViewModel';

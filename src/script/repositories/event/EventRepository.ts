@@ -33,6 +33,7 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {ClientConversationEvent, EventBuilder} from 'Repositories/conversation/EventBuilder';
 import {CryptographyMapper} from 'Repositories/cryptography/CryptographyMapper';
+import {EventName} from 'Repositories/tracking/EventName';
 import {getLogger, Logger} from 'Util/Logger';
 import {queue} from 'Util/PromiseQueue';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
@@ -51,7 +52,6 @@ import {EventValidationError} from './preprocessor/EventStorageMiddleware/eventH
 import {CryptographyError} from '../../error/CryptographyError';
 import {EventError} from '../../error/EventError';
 import type {ServerTimeHandler} from '../../time/serverTimeHandler';
-import {EventName} from '../../tracking/EventName';
 import {UserState} from '../../user/UserState';
 import {Warnings} from '../../view_model/WarningsContainer';
 

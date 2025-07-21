@@ -42,9 +42,9 @@ import {
 } from './Telemetry.helpers';
 import {UserData} from './UserData';
 
-import {URLParameter} from '../auth/URLParameter';
-import {Config} from '../Config';
-import {UserState} from '../user/UserState';
+import {URLParameter} from '../../auth/URLParameter';
+import {Config} from '../../Config';
+import {UserState} from '../../user/UserState';
 
 export const TEAM_SIZE_THRESHOLD_VALUE = 6;
 export class EventTrackingRepository {

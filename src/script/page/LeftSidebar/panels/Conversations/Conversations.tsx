@@ -39,11 +39,11 @@ import {PropertiesRepository} from 'Repositories/properties/PropertiesRepository
 import {SearchRepository} from 'Repositories/search/SearchRepository';
 import {TeamRepository} from 'Repositories/team/TeamRepository';
 import {TeamState} from 'Repositories/team/TeamState';
+import {EventName} from 'Repositories/tracking/EventName';
 import {Preferences} from 'src/script/page/LeftSidebar/panels/Preferences';
 import {ANIMATED_PAGE_TRANSITION_DURATION} from 'src/script/page/MainContent';
 import {useAppMainState, ViewType} from 'src/script/page/state';
 import {ContentState, ListState} from 'src/script/page/useAppState';
-import {EventName} from 'src/script/tracking/EventName';
 import {UserRepository} from 'src/script/user/UserRepository';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {useChannelsFeatureFlag} from 'Util/useChannelsFeatureFlag';

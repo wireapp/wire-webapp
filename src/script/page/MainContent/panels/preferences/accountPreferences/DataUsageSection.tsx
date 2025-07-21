@@ -28,7 +28,7 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 import {PropertiesRepository} from 'Repositories/properties/PropertiesRepository';
 import {PROPERTIES_TYPE} from 'Repositories/properties/PropertiesType';
 import {TeamState} from 'Repositories/team/TeamState';
-import {getForcedErrorReportingStatus} from 'src/script/tracking/Telemetry.helpers';
+import {getForcedErrorReportingStatus} from 'Repositories/tracking/Telemetry.helpers';
 import {t} from 'Util/LocalizerUtil';
 
 import {ConsentValue} from '../../../../../user/ConsentValue';

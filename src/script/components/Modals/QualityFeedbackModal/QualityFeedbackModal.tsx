@@ -28,7 +28,7 @@ import {useCallAlertState} from 'Components/calling/useCallAlertState';
 import {ModalComponent} from 'Components/Modals/ModalComponent';
 import {RatingListLabel} from 'Components/Modals/QualityFeedbackModal/typings';
 import {CallingRepository} from 'Repositories/calling/CallingRepository';
-import {trackCallQualityFeedback} from 'src/script/tracking/Helpers';
+import {trackCallQualityFeedback} from 'Repositories/tracking/Helpers';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 import {getLogger} from 'Util/Logger';

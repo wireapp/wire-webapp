@@ -30,6 +30,8 @@ import {RatingListLabel} from 'Components/Modals/QualityFeedbackModal/typings';
 import {Call} from 'Repositories/calling/Call';
 import {CallingRepository} from 'Repositories/calling/CallingRepository';
 import {User} from 'Repositories/entity/User';
+import {EventName} from 'Repositories/tracking/EventName';
+import {Segmentation} from 'Repositories/tracking/Segmentation';
 import {UserState} from 'src/script/user/UserState';
 import {TestFactory} from 'test/helper/TestFactory';
 import {t} from 'Util/LocalizerUtil';
@@ -43,12 +45,10 @@ import {
   withIntl,
   withTheme,
 } from '../../../auth/util/test/TestUtil';
-import {EventName} from '../../../tracking/EventName';
-import {Segmentation} from '../../../tracking/Segmentation';
 
 jest.mock('@wireapp/api-client/lib/team');
 
-jest.mock('../../../tracking/Telemetry.helpers', () => ({
+jest.mock('Repositories/tracking/Telemetry.helpers', () => ({
   isTelemetryEnabledAtCurrentEnvironment: () => true,
 }));
 
