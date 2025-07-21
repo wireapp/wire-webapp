@@ -60,14 +60,15 @@ export const useFilePaste = ({onFilePasted}: UseFilePasteParams) => {
       const files = event.clipboardData?.files;
 
       if (files) {
-        processClipboardFiles(files);
+        const permissionHandler = checkFileSharingPermission(processClipboardFiles);
+        permissionHandler(files);
       }
     },
     [processClipboardFiles],
   );
 
   useEffect(() => {
-    document.addEventListener('paste', checkFileSharingPermission(handlePasteEvent));
-    return () => document.removeEventListener('paste', checkFileSharingPermission(handlePasteEvent));
+    document.addEventListener('paste', handlePasteEvent);
+    return () => document.removeEventListener('paste', handlePasteEvent);
   }, [handlePasteEvent]);
 };

@@ -17,49 +17,51 @@
  *
  */
 
-import {User, getUser} from '../data/user';
+import {getUser} from '../data/user';
 import {test, expect} from '../test.fixtures';
+import {addCreatedUser, removeCreatedUser} from '../utils/tearDownUtil';
+import {loginUser} from '../utils/userActions';
 import {generateSecurePassword} from '../utils/userDataGenerator';
 
-const createdUsers: User[] = [];
+const user = getUser();
 
-test('Verify sign in error appearance in case of wrong credentials', {tag: ['@TC-3465', '@smoke']}, async ({pages}) => {
-  const incorrectEmail = 'blablabla@wire.engineering';
-  const incorrectPassword = generateSecurePassword();
+test(
+  'Verify sign in error appearance in case of wrong credentials',
+  {tag: ['@TC-3465', '@smoke']},
+  async ({pageManager}) => {
+    const incorrectEmail = 'blablabla@wire.engineering';
+    const incorrectPassword = generateSecurePassword();
 
-  await pages.openMainPage();
-  await pages.singleSignOnPage.enterEmailOnSSOPage(incorrectEmail);
-  await pages.loginPage.inputPassword(incorrectPassword);
-  await pages.loginPage.clickSignInButton();
+    const pages = pageManager.webapp.pages;
 
-  const errorMessage = await pages.loginPage.getErrorMessage();
+    await pageManager.openMainPage();
+    await pages.singleSignOn().enterEmailOnSSOPage(incorrectEmail);
+    await pages.login().inputPassword(incorrectPassword);
+    await pages.login().clickSignInButton();
 
-  expect(errorMessage).toBe('Please verify your details and try again');
-});
+    const errorMessage = await pages.login().getErrorMessage();
 
-test('Verify you can sign in by username', {tag: ['@TC-3461', '@regression']}, async ({pages, api}) => {
+    expect(errorMessage).toBe('Please verify your details and try again');
+  },
+);
+
+test('Verify you can sign in by email', {tag: ['@TC-3461', '@regression']}, async ({pageManager, api}) => {
+  const {modals, components} = pageManager.webapp;
+
   // Create user with random password, email, username, lastName, firstName
-  const user = getUser();
   await api.createPersonalUser(user);
 
   // Adding created user to the list for later cleanup
-  createdUsers.push(user);
+  addCreatedUser(user);
 
-  await pages.openMainPage();
-  await pages.singleSignOnPage.enterEmailOnSSOPage(user.email);
-  await pages.loginPage.inputPassword(user.password);
-  await pages.loginPage.clickSignInButton();
-  await pages.dataShareConsentModal.clickDecline();
+  await pageManager.openMainPage();
+  await loginUser(user, pageManager);
+  await modals.dataShareConsent().clickDecline();
 
-  expect(await pages.conversationSidebar.getPersonalStatusName()).toBe(`${user.firstName} ${user.lastName}`);
-  expect(await pages.conversationSidebar.getPersonalUserName()).toContain(user.username);
+  expect(await components.conversationSidebar().getPersonalStatusName()).toBe(`${user.firstName} ${user.lastName}`);
+  expect(await components.conversationSidebar().getPersonalUserName()).toContain(user.username);
 });
 
 test.afterAll(async ({api}) => {
-  for (const user of createdUsers) {
-    if (!user.token) {
-      throw new Error(`User ${user.username} has no token and can't be deleted`);
-    }
-    await api.user.deleteUser(user.password, user.token);
-  }
+  await removeCreatedUser(api, user);
 });
