@@ -125,6 +125,7 @@ const GroupVideoGridTile: React.FC<GroupVideoGridTileProps> = ({
         }}
       >
         <span
+          data-uie-value={participant?.user.id}
           data-uie-name="call-participant-name"
           css={{
             textOverflow: 'ellipsis',
@@ -214,7 +215,7 @@ const GroupVideoGridTile: React.FC<GroupVideoGridTileProps> = ({
 
       {!minimized && isMuted && (
         <span className="group-video-grid__element__label__icon">
-          <Icon.MicOffIcon data-uie-name="mic-icon-off" />
+          <Icon.MicOffIcon data-uie-name="mic-icon-off" data-uie-value={participant?.user.id} />
         </span>
       )}
 
