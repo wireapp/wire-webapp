@@ -19,7 +19,6 @@
 
 import {BrowserContext} from '@playwright/test';
 
-// Define your fake camera devices
 const fakeVideoDevices = [
   {deviceId: 'fake-camera-1', label: 'Fake Camera 1'},
   {deviceId: 'fake-camera-2', label: 'Fake Camera 2'},
