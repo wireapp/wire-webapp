@@ -134,7 +134,7 @@ test(
       await adminPages.conversationDetails().addUsersToConversation([memberA.fullName]);
 
       // Team owner confirms the addition of A to the group
-      expect(await adminPages.conversationDetails().isUserPartOfConversationAsAdmin(memberA.fullName));
+      expect(await adminPages.conversationDetails().isUserPartOfConversationAsMember(memberA.fullName));
       await expect(
         adminPages.conversation().page.getByText(`You added ${memberA.fullName} to the conversation`),
       ).toBeVisible({timeout: 10000});
