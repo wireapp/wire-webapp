@@ -21,10 +21,9 @@ import {render} from '@testing-library/react';
 import ko from 'knockout';
 
 import {PingMessage as PingMessageEntity} from 'Repositories/entity/message/PingMessage';
+import {ReadReceipt} from 'Repositories/storage';
 
 import {PingMessage} from './PingMessage';
-
-import {ReadReceipt} from '../../../storage';
 
 const createPingMessage = (partialPingMessage: Partial<PingMessageEntity>) => {
   const callMessage: Partial<PingMessageEntity> = {

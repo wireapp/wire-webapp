@@ -22,9 +22,8 @@ import DexieBatch from 'dexie-batch';
 import {container} from 'tsyringe';
 
 import {CONVERSATION} from 'Repositories/event/Client';
+import {StorageService} from 'Repositories/storage';
 import {Logger, getLogger} from 'Util/Logger';
-
-import {StorageService} from '../../storage';
 
 export class BackupService {
   private readonly logger: Logger;

@@ -18,8 +18,8 @@
  */
 
 import {ClientEvent} from 'Repositories/event/Client';
+import {EventRecord} from 'Repositories/storage';
 import {MessageCategory} from 'src/script/message/MessageCategory';
-import {EventRecord} from 'src/script/storage';
 
 import {CPBLogger} from '..';
 import {BackupMessageContent, BackupMessage} from '../CPB.library';

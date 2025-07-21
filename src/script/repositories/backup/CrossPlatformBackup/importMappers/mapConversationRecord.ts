@@ -17,7 +17,7 @@
  *
  */
 
-import {ConversationRecord} from 'src/script/storage';
+import {ConversationRecord} from 'Repositories/storage';
 
 import {BackUpConversation} from '../CPB.library';
 

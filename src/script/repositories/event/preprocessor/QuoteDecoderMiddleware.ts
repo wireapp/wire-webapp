@@ -20,11 +20,11 @@
 import {Quote} from '@wireapp/protocol-messaging';
 
 import {MessageAddEvent} from 'Repositories/conversation/EventBuilder';
+import {StoredEvent} from 'Repositories/storage/record/EventRecord';
 import {getLogger, Logger} from 'Util/Logger';
 import {base64ToArray} from 'Util/util';
 
 import {QuoteEntity} from '../../../message/QuoteEntity';
-import {StoredEvent} from '../../../storage/record/EventRecord';
 import {ClientEvent} from '../Client';
 import {EventMiddleware, IncomingEvent} from '../EventProcessor';
 import type {EventService} from '../EventService';

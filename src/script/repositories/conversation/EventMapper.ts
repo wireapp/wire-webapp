@@ -60,6 +60,7 @@ import {Text} from 'Repositories/entity/message/Text';
 import type {Text as TextAsset} from 'Repositories/entity/message/Text';
 import {VerificationMessage} from 'Repositories/entity/message/VerificationMessage';
 import {ClientEvent} from 'Repositories/event/Client';
+import type {EventRecord, LegacyEventRecord} from 'Repositories/storage';
 import {t} from 'Util/LocalizerUtil';
 import {getLogger, Logger} from 'Util/Logger';
 import {userReactionMapToReactionMap} from 'Util/ReactionUtil';
@@ -88,7 +89,6 @@ import {QuoteEntity} from '../../message/QuoteEntity';
 import {StatusType} from '../../message/StatusType';
 import {SystemMessageType} from '../../message/SystemMessageType';
 import {APIClient} from '../../service/APIClientSingleton';
-import type {EventRecord, LegacyEventRecord} from '../../storage';
 
 // Event Mapper to convert all server side JSON events into core entities.
 export class EventMapper {

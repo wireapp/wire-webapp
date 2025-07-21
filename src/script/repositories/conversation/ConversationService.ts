@@ -50,15 +50,15 @@ import {container} from 'tsyringe';
 import type {Conversation as ConversationEntity} from 'Repositories/entity/Conversation';
 import type {EventService} from 'Repositories/event/EventService';
 import {search as fullTextSearch} from 'Repositories/search/FullTextSearch';
+import {StorageService} from 'Repositories/storage';
+import {ConversationRecord} from 'Repositories/storage/record/ConversationRecord';
+import {StorageSchemata} from 'Repositories/storage/StorageSchemata';
 
 import {MLSCapableConversation} from './ConversationSelectors';
 
 import {MessageCategory} from '../../message/MessageCategory';
 import {APIClient} from '../../service/APIClientSingleton';
 import {Core} from '../../service/CoreSingleton';
-import {StorageService} from '../../storage';
-import {ConversationRecord} from '../../storage/record/ConversationRecord';
-import {StorageSchemata} from '../../storage/StorageSchemata';
 
 export class ConversationService {
   private readonly eventService: EventService;

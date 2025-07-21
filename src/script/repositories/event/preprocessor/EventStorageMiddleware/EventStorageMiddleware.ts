@@ -22,6 +22,7 @@ import {container} from 'tsyringe';
 
 import {ConversationState} from 'Repositories/conversation/ConversationState';
 import {User} from 'Repositories/entity/User';
+import type {EventRecord} from 'Repositories/storage';
 import {UserFilter} from 'src/script/user/UserFilter';
 import {matchQualifiedIds} from 'Util/QualifiedId';
 
@@ -30,7 +31,6 @@ import {EventValidationError} from './eventHandlers/EventValidationError';
 import {HandledEvents, DBOperation} from './types';
 
 import {isEventRecordFailed, isEventRecordWithFederationError} from '../../../../message/StatusType';
-import type {EventRecord} from '../../../../storage';
 import {CONVERSATION} from '../../Client';
 import {EventMiddleware, IncomingEvent} from '../../EventProcessor';
 import {EventService} from '../../EventService';

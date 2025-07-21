@@ -39,6 +39,7 @@ import {EventRepository} from 'Repositories/event/EventRepository';
 import {PropertiesRepository} from 'Repositories/properties/PropertiesRepository';
 import {PROPERTIES_TYPE} from 'Repositories/properties/PropertiesType';
 import {SearchRepository} from 'Repositories/search/SearchRepository';
+import {StorageRepository} from 'Repositories/storage';
 import {useUserPropertyValue} from 'src/script/hooks/useUserProperty';
 import {EventName} from 'src/script/tracking/EventName';
 import {CONVERSATION_TYPING_INDICATOR_MODE} from 'src/script/user/TypingIndicatorMode';
@@ -63,7 +64,6 @@ import {usePing} from './usePing/usePing';
 import {useTypingIndicator} from './useTypingIndicator/useTypingIndicator';
 
 import {Config} from '../../Config';
-import {StorageRepository} from '../../storage';
 import {TeamState} from '../../team/TeamState';
 
 const CONFIG = {

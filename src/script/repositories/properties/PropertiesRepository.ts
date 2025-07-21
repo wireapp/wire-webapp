@@ -29,6 +29,7 @@ import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {PrimaryModalType} from 'Components/Modals/PrimaryModal/PrimaryModalTypes';
 import type {User} from 'Repositories/entity/User';
 import type {SelfService} from 'Repositories/self/SelfService';
+import {StorageKey} from 'Repositories/storage';
 import {Config} from 'src/script/Config';
 import {deepMerge} from 'Util/deepMerge';
 import {Environment} from 'Util/Environment';
@@ -39,7 +40,6 @@ import {loadValue} from 'Util/StorageUtil';
 import type {PropertiesService} from './PropertiesService';
 import {PROPERTIES_TYPE, UserConsentStatus} from './PropertiesType';
 
-import {StorageKey} from '../../storage';
 import {isTelemetryEnabledAtCurrentEnvironment} from '../../tracking/Telemetry.helpers';
 import {ConsentValue} from '../../user/ConsentValue';
 import {CONVERSATION_TYPING_INDICATOR_MODE} from '../../user/TypingIndicatorMode';

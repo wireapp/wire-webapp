@@ -78,6 +78,7 @@ import {PropertiesService} from 'Repositories/properties/PropertiesService';
 import {SearchRepository} from 'Repositories/search/SearchRepository';
 import {SelfRepository} from 'Repositories/self/SelfRepository';
 import {SelfService} from 'Repositories/self/SelfService';
+import {StorageKey, StorageRepository, StorageService} from 'Repositories/storage';
 import {initializeDataDog} from 'Util/DataDog';
 import {DebugUtil} from 'Util/DebugUtil';
 import {Environment} from 'Util/Environment';
@@ -108,7 +109,6 @@ import {configureDownloadPath} from '../page/components/FeatureConfigChange/Feat
 import {configureE2EI} from '../page/components/FeatureConfigChange/FeatureConfigChangeHandler/Features/E2EIdentity';
 import {APIClient} from '../service/APIClientSingleton';
 import {Core} from '../service/CoreSingleton';
-import {StorageKey, StorageRepository, StorageService} from '../storage';
 import {TeamRepository} from '../team/TeamRepository';
 import {TeamService} from '../team/TeamService';
 import {AppInitStatisticsValue} from '../telemetry/app_init/AppInitStatisticsValue';

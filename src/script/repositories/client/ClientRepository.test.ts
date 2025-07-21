@@ -23,13 +23,13 @@ import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 import {Runtime} from '@wireapp/commons';
 
 import {User} from 'Repositories/entity/User';
+import {ClientRecord} from 'Repositories/storage/record/ClientRecord';
 import {ClientError} from 'src/script/error/ClientError';
 
 import {ClientRepository, ClientMapper, ClientEntity} from './.';
 
 import {entities} from '../../../../test/api/payloads';
 import {TestFactory} from '../../../../test/helper/TestFactory';
-import {ClientRecord} from '../../storage/record/ClientRecord';
 
 describe('ClientRepository', () => {
   const testFactory = new TestFactory();

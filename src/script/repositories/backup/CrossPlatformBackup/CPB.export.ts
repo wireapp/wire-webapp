@@ -17,7 +17,7 @@
  *
  */
 
-import {ConversationRecord, UserRecord, EventRecord} from 'src/script/storage';
+import {ConversationRecord, UserRecord, EventRecord} from 'Repositories/storage';
 
 import {buildMetaData} from './AssetMetadata';
 import {

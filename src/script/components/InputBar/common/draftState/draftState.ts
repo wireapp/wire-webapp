@@ -20,7 +20,7 @@
 import {MessageRepository} from 'Repositories/conversation/MessageRepository';
 import {Conversation} from 'Repositories/entity/Conversation';
 import {ContentMessage} from 'Repositories/entity/message/ContentMessage';
-import {StorageKey, StorageRepository} from 'src/script/storage';
+import {StorageKey, StorageRepository} from 'Repositories/storage';
 
 export interface DraftState {
   editorState: string | null;

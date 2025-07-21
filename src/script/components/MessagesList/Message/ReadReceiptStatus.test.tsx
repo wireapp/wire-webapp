@@ -21,7 +21,7 @@ import {render, fireEvent} from '@testing-library/react';
 import ko from 'knockout';
 
 import {Message as MessageEntity} from 'Repositories/entity/message/Message';
-import {ReadReceipt} from 'src/script/storage';
+import {ReadReceipt} from 'Repositories/storage';
 import {formatTimeShort} from 'Util/TimeUtil';
 
 import {ReadReceiptStatus} from './ReadReceiptStatus';

@@ -37,12 +37,12 @@ import type {Conversation} from 'Repositories/entity/Conversation';
 import type {Message} from 'Repositories/entity/message/Message';
 import type {User} from 'Repositories/entity/User';
 import {ClientEvent, CONVERSATION} from 'Repositories/event/Client';
+import {ReactionMap, ReadReceipt, UserReactionMap} from 'Repositories/storage';
 import {createUuid} from 'Util/uuid';
 
 import {E2EIVerificationMessageType} from '../../message/E2EIVerificationMessageType';
 import {StatusType} from '../../message/StatusType';
 import {VerificationMessageType} from '../../message/VerificationMessageType';
-import {ReactionMap, ReadReceipt, UserReactionMap} from '../../storage';
 
 export interface BaseEvent {
   conversation: string;

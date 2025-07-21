@@ -20,12 +20,12 @@
 import {ClientClassification, ClientType} from '@wireapp/api-client/lib/client/';
 import ko from 'knockout';
 
+import {ClientRecord} from 'Repositories/storage';
 import {splitFingerprint} from 'Util/StringUtil';
 
 import {ClientMapper} from './ClientMapper';
 
 import {isObject} from '../../guards/common';
-import {ClientRecord} from '../../storage';
 
 export const MLSPublicKeys = {
   ed25519: 'ED25519',

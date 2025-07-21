@@ -39,6 +39,7 @@ import type {PermissionRepository} from 'Repositories/permission/PermissionRepos
 import type {PropertiesRepository} from 'Repositories/properties/PropertiesRepository';
 import type {SearchRepository} from 'Repositories/search/SearchRepository';
 import type {SelfRepository} from 'Repositories/self/SelfRepository';
+import type {StorageRepository} from 'Repositories/storage';
 
 import {ActionsViewModel} from './ActionsViewModel';
 import {CallingViewModel} from './CallingViewModel';
@@ -46,7 +47,6 @@ import {ContentViewModel} from './ContentViewModel';
 import {ListViewModel} from './ListViewModel';
 
 import {Core} from '../service/CoreSingleton';
-import type {StorageRepository} from '../storage';
 import type {TeamRepository} from '../team/TeamRepository';
 import type {ServerTimeHandler} from '../time/serverTimeHandler';
 import type {EventTrackingRepository} from '../tracking/EventTrackingRepository';

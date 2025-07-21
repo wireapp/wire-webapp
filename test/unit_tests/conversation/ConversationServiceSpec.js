@@ -18,7 +18,7 @@
  */
 
 import {ConversationMapper} from 'Repositories/conversation/ConversationMapper';
-import {StorageSchemata} from 'src/script/storage/StorageSchemata';
+import {StorageSchemata} from 'Repositories/storage/StorageSchemata';
 
 import {TestFactory} from '../../helper/TestFactory';
 import sinon from 'sinon';

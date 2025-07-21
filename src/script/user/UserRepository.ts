@@ -60,6 +60,7 @@ import type {EventSource} from 'Repositories/event/EventSource';
 import type {PropertiesRepository} from 'Repositories/properties/PropertiesRepository';
 import {PROPERTIES_TYPE} from 'Repositories/properties/PropertiesType';
 import type {SelfService} from 'Repositories/self/SelfService';
+import {UserRecord} from 'Repositories/storage';
 import {chunk, partition} from 'Util/ArrayUtil';
 import {t} from 'Util/LocalizerUtil';
 import {getLogger, Logger} from 'Util/Logger';
@@ -76,7 +77,6 @@ import {UserState} from './UserState';
 import {SIGN_OUT_REASON} from '../auth/SignOutReason';
 import {Config} from '../Config';
 import {UserError} from '../error/UserError';
-import {UserRecord} from '../storage';
 import {TeamState} from '../team/TeamState';
 import type {ServerTimeHandler} from '../time/serverTimeHandler';
 

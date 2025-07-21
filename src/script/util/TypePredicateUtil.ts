@@ -23,9 +23,9 @@ import {AxiosError} from 'axios';
 
 import {Conversation} from 'Repositories/entity/Conversation';
 import {User} from 'Repositories/entity/User';
+import {ClientRecord} from 'Repositories/storage/record/ClientRecord';
 
 import {isObject} from '../guards/common';
-import {ClientRecord} from '../storage/record/ClientRecord';
 
 export function isAxiosError<T>(errorCandidate: any): errorCandidate is AxiosError<T> {
   return errorCandidate && errorCandidate.isAxiosError === true;

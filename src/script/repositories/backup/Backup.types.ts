@@ -17,7 +17,7 @@
  *
  */
 
-import {UserRecord, EventRecord, ConversationRecord} from '../../storage';
+import {UserRecord, EventRecord, ConversationRecord} from 'Repositories/storage';
 
 export interface Metadata {
   client_id: string;

@@ -19,7 +19,7 @@
 
 import type {Self as SelfAPIUser} from '@wireapp/api-client/lib/self';
 
-import {UserRecord} from '../storage';
+import {UserRecord} from 'Repositories/storage';
 
 export function isSelfAPIUser(payload: Partial<UserRecord>): payload is SelfAPIUser {
   return 'locale' in payload;

@@ -28,7 +28,7 @@ import {
 } from 'Components/MessagesList/Message/ContentMessage/MessageActions/MessageReactions/MessageReactions.styles';
 import {UserList} from 'Components/UserList';
 import {User} from 'Repositories/entity/User';
-import {ReactionMap} from 'src/script/storage';
+import {ReactionMap} from 'Repositories/storage';
 import {getEmojiTitleFromEmojiUnicode, getEmojiUnicode} from 'Util/EmojiUtil';
 import {capitalizeFirstChar} from 'Util/StringUtil';
 

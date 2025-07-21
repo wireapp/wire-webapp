@@ -20,8 +20,8 @@
 import {render, fireEvent, within} from '@testing-library/react';
 
 import {User} from 'Repositories/entity/User';
+import {ReactionMap} from 'Repositories/storage';
 import {withTheme} from 'src/script/auth/util/test/TestUtil';
-import {ReactionMap} from 'src/script/storage';
 import {generateQualifiedId} from 'test/helper/UserGenerator';
 
 import {MessageReactionsList, MessageReactionsListProps} from './MessageReactionsList';

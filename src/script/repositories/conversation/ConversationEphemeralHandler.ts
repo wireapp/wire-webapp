@@ -28,6 +28,7 @@ import {MediumImage} from 'Repositories/entity/message/MediumImage';
 import type {Message} from 'Repositories/entity/message/Message';
 import {Text} from 'Repositories/entity/message/Text';
 import type {EventService} from 'Repositories/event/EventService';
+import type {EventRecord} from 'Repositories/storage';
 import {getLogger, Logger} from 'Util/Logger';
 import {clamp} from 'Util/NumberUtil';
 import {obfuscate} from 'Util/StringUtil';
@@ -39,7 +40,6 @@ import {ConversationMapper} from './ConversationMapper';
 
 import {EphemeralStatusType} from '../../message/EphemeralStatusType';
 import {StatusType} from '../../message/StatusType';
-import type {EventRecord} from '../../storage';
 
 export class ConversationEphemeralHandler extends AbstractConversationEventHandler {
   eventListeners: Record<string, (...args: any[]) => void>;

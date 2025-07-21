@@ -17,7 +17,7 @@
  *
  */
 
-import {UserRecord} from 'src/script/storage';
+import {UserRecord} from 'Repositories/storage';
 
 import {BackupUser} from '../CPB.library';
 
