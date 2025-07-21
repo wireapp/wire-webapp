@@ -152,22 +152,5 @@ pipeline {
             }
         }
     }
-
-        stage('Trigger critical flow tests') {
-          steps {
-            build job: 'Webapp_CritFlow_Chrome', parameters: [string(name: 'TAGS', value: '@flow-web'), string(name: 'GIT_BRANCH', value: 'main'), string(name: 'webappApplicationPath', value: "$webappApplicationPath")]
-          }
-        }
-    }
-
-  // post {
-  //     success {
-  //         wireSend secret: env.WIRE_BOT_SECRET, message: "✅ **Build finished for branch '$env.webappApplicationPath'**"
-  //     }
-  //     failure {
-  //         script {
-  //             wireSend(secret: env.WIRE_BOT_SECRET, message: "❌ **$BRANCH_NAME**\n[$CHANGE_TITLE](${CHANGE_URL})\nBuild aborted or failed! See [Github Actions](${env.GITHUB_ACTION_URL})")
-  //         }
-  //     }
-  // }
+  }
 }
