@@ -28,10 +28,13 @@ export const wrapperStyles: CSSObject = {
 };
 
 export const tableStyles: CSSObject = {
-  minWidth: '1000px',
   width: '100%',
   borderCollapse: 'collapse',
   tableLayout: 'fixed',
+
+  [`@media (min-width: ${styleBreakpoint}px)`]: {
+    minWidth: '1000px',
+  },
 };
 
 export const headerCellStyles: CSSObject = {

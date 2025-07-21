@@ -53,6 +53,8 @@ import {SingleSignOnPage} from './webapp/pages/singleSignOn.page';
 import {StartUIPage} from './webapp/pages/startUI.page';
 import {WelcomePage} from './webapp/pages/welcome.page';
 
+import {RemoveMemberModal} from '../pages/removeMember.modal';
+
 const webAppPath = process.env.WEBAPP_URL ?? '';
 const teamManagementPath = process.env.TEAM_MANAGEMENT_URL ?? '';
 
@@ -88,6 +90,10 @@ export class PageManager {
 
   refreshPage = (options: {waitUntil?: 'load' | 'domcontentloaded' | 'networkidle'} = {waitUntil: 'networkidle'}) => {
     return this.page.reload(options);
+  };
+
+  waitForTimeout = (timeout: number) => {
+    return this.page.waitForTimeout(timeout);
   };
 
   // Helper method to get or create a page or modal instance
@@ -132,6 +138,7 @@ export class PageManager {
       leaveConversation: () =>
         this.getOrCreate('webapp.modals.leaveConversation', () => new LeaveConversationModal(this.page)),
       exportBackup: () => this.getOrCreate('webapp.modals.exportBackup', () => new ExportBackupModal(this.page)),
+      removeMember: () => this.getOrCreate('webapp.modals.removeMember', () => new RemoveMemberModal(this.page)),
     },
     components: {
       conversationSidebar: () =>

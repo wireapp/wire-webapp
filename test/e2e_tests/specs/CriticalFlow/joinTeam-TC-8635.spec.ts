@@ -128,7 +128,7 @@ test(
       expect(await adminPages.conversation().isConversationOpen(conversationName));
 
       // Team owner opens group information and adds A to the group
-      await adminPages.conversation().openGroupInformation();
+      await adminPages.conversation().toggleGroupInformation();
       expect(await adminPages.conversationDetails().isOpen(conversationName)).toBeTruthy();
       await adminPages.conversationDetails().clickAddPeopleButton();
       await adminPages.conversationDetails().addUsersToConversation([memberA.fullName]);

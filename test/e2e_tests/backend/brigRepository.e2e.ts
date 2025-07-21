@@ -72,4 +72,50 @@ export class BrigRepositoryE2E extends BackendClientE2E {
       },
     );
   }
+
+  public async unlockChannelFeature(teamId: string) {
+    await this.axiosInstance.put(
+      `i/teams/${teamId}/features/channels/unlocked`,
+      {},
+      {
+        headers: {
+          Authorization: `Basic ${BASIC_AUTH}`,
+        },
+      },
+    );
+  }
+
+  public async enableChannelsFeature(teamId: string) {
+    await this.axiosInstance.patch(
+      `i/teams/${teamId}/features/channels`,
+      {
+        status: 'enabled',
+      },
+      {
+        headers: {
+          Authorization: `Basic ${BASIC_AUTH}`,
+        },
+      },
+    );
+  }
+  public async enableMLSFeature(teamId: string) {
+    await this.axiosInstance.patch(
+      `i/teams/${teamId}/features/mls`,
+      {
+        status: 'enabled',
+        config: {
+          protocolToggleUsers: [],
+          allowedCipherSuites: [2],
+          defaultProtocol: 'mls',
+          defaultCipherSuite: 2,
+          supportedProtocols: ['mls', 'proteus'],
+        },
+      },
+      {
+        headers: {
+          Authorization: `Basic ${BASIC_AUTH}`,
+        },
+      },
+    );
+  }
 }

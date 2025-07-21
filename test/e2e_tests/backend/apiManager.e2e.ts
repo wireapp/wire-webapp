@@ -94,11 +94,6 @@ export class ApiManagerE2E {
     await this.user.setUniqueUsername(user.username, user.token);
   }
 
-  async enableConferenceCallingFeature(teamId: string) {
-    await this.brig.unlockConferenceCallingFeature(teamId);
-    await this.brig.enableConferenceCallingBackdoorViaBackdoorTeam(teamId);
-  }
-
   /**
    * Long polling to see if a conference calling feature is available for a given team.
    * This is to wait until stripe/ibis has set free account restrictions after team creation.
@@ -148,6 +143,16 @@ export class ApiManagerE2E {
     const token = user.token ?? (await this.auth.loginUser(user)).data.access_token;
     const listOfConnections = await this.connection.getConnectionsList(token);
     await this.connection.acceptConnectionRequest(token, listOfConnections.data.connections[0].to);
+  }
+
+  async enableConferenceCallingFeature(teamId: string) {
+    await this.brig.unlockConferenceCallingFeature(teamId);
+    await this.brig.enableConferenceCallingBackdoorViaBackdoorTeam(teamId);
+  }
+
+  async enableChannelsFeature(teamId: string) {
+    await this.brig.unlockChannelFeature(teamId);
+    await this.brig.enableChannelsFeature(teamId);
   }
 
   private extractCookieFromRegisterResponse(registerResponse: AxiosResponse): string {
