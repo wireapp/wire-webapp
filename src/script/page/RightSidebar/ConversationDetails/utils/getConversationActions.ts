@@ -25,10 +25,10 @@ import * as Icon from 'Components/Icon';
 import {MenuItem} from 'Components/panel/PanelActions';
 import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
 import {Conversation} from 'Repositories/entity/Conversation';
+import * as UserPermission from 'Repositories/user/UserPermission';
 import {t} from 'Util/LocalizerUtil';
 
 import {Config} from '../../../../Config';
-import * as UserPermission from '../../../../user/UserPermission';
 import {ActionsViewModel} from '../../../../view_model/ActionsViewModel';
 
 interface GetConversationActionsParams {

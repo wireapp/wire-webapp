@@ -47,12 +47,12 @@ import {PropertiesRepository} from 'Repositories/properties/PropertiesRepository
 import {PROPERTIES_TYPE} from 'Repositories/properties/PropertiesType';
 import type {TeamRepository} from 'Repositories/team/TeamRepository';
 import {TeamState} from 'Repositories/team/TeamState';
+import {ROLE} from 'Repositories/user/UserPermission';
 import {replaceLink, t} from 'Util/LocalizerUtil';
 import {matchQualifiedIds} from 'Util/QualifiedId';
 import {safeWindowOpen} from 'Util/SanitizationUtil';
 
 import {Config} from '../Config';
-import {ROLE} from '../user/UserPermission';
 
 export interface CallActions {
   answer: (call: Call) => Promise<void>;

@@ -28,8 +28,8 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {PrimaryModal, removeCurrentModal} from 'Components/Modals/PrimaryModal';
 import {ConversationState} from 'Repositories/conversation/ConversationState';
+import {UserState} from 'Repositories/user/UserState';
 import {Core} from 'src/script/service/CoreSingleton';
-import {UserState} from 'src/script/user/UserState';
 import {getLogger} from 'Util/Logger';
 import {formatDelayTime, TIME_IN_MILLIS} from 'Util/TimeUtil';
 import {removeUrlParameters} from 'Util/UrlUtil';

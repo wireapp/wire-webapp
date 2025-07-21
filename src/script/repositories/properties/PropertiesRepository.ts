@@ -31,6 +31,8 @@ import type {User} from 'Repositories/entity/User';
 import type {SelfService} from 'Repositories/self/SelfService';
 import {StorageKey} from 'Repositories/storage';
 import {isTelemetryEnabledAtCurrentEnvironment} from 'Repositories/tracking/Telemetry.helpers';
+import {ConsentValue} from 'Repositories/user/ConsentValue';
+import {CONVERSATION_TYPING_INDICATOR_MODE} from 'Repositories/user/TypingIndicatorMode';
 import {Config} from 'src/script/Config';
 import {deepMerge} from 'Util/deepMerge';
 import {Environment} from 'Util/Environment';
@@ -40,9 +42,6 @@ import {loadValue} from 'Util/StorageUtil';
 
 import type {PropertiesService} from './PropertiesService';
 import {PROPERTIES_TYPE, UserConsentStatus} from './PropertiesType';
-
-import {ConsentValue} from '../../user/ConsentValue';
-import {CONVERSATION_TYPING_INDICATOR_MODE} from '../../user/TypingIndicatorMode';
 
 export class PropertiesRepository {
   // Value names are specified by the protocol but key names can be changed.

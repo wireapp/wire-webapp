@@ -77,6 +77,7 @@ import {EventName} from 'Repositories/tracking/EventName';
 import * as trackingHelpers from 'Repositories/tracking/Helpers';
 import {Segmentation} from 'Repositories/tracking/Segmentation';
 import {isTelemetryEnabledAtCurrentEnvironment} from 'Repositories/tracking/Telemetry.helpers';
+import type {UserRepository} from 'Repositories/user/UserRepository';
 import {flatten} from 'Util/ArrayUtil';
 import {calculateChildWindowPosition} from 'Util/DOM/caculateChildWindowPosition';
 import {isDetachedCallingFeatureEnabled} from 'Util/isDetachedCallingFeatureEnabled';
@@ -101,7 +102,6 @@ import {NoAudioInputError} from '../../error/NoAudioInputError';
 import {APIClient} from '../../service/APIClientSingleton';
 import {Core} from '../../service/CoreSingleton';
 import type {ServerTimeHandler} from '../../time/serverTimeHandler';
-import type {UserRepository} from '../../user/UserRepository';
 import {Warnings} from '../../view_model/WarningsContainer';
 
 const avsLogger = getLogger('avs');

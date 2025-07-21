@@ -44,6 +44,9 @@ import {EventSource} from 'Repositories/event/EventSource';
 import {NOTIFICATION_HANDLING_STATE} from 'Repositories/event/NotificationHandlingState';
 import {IntegrationMapper} from 'Repositories/integration/IntegrationMapper';
 import {ServiceEntity} from 'Repositories/integration/ServiceEntity';
+import {ROLE, ROLE as TEAM_ROLE, roleFromTeamPermissions} from 'Repositories/user/UserPermission';
+import {UserRepository} from 'Repositories/user/UserRepository';
+import {UserState} from 'Repositories/user/UserState';
 import {Config} from 'src/script/Config';
 import {Environment} from 'Util/Environment';
 import {replaceLink, t} from 'Util/LocalizerUtil';
@@ -60,9 +63,6 @@ import {TeamState} from './TeamState';
 import {scheduleRecurringTask, updateRemoteConfigLogger} from '../../lifecycle/updateRemoteConfigs';
 import {getMLSMigrationStatus, MLSMigrationStatus} from '../../mls/MLSMigration/migrationStatus';
 import {APIClient} from '../../service/APIClientSingleton';
-import {ROLE, ROLE as TEAM_ROLE, roleFromTeamPermissions} from '../../user/UserPermission';
-import {UserRepository} from '../../user/UserRepository';
-import {UserState} from '../../user/UserState';
 
 export const HAS_PERSISTED_SUPPORTED_PROTOCOLS = 'HAS_PERSISTED_SUPPORTED_PROTOCOLS';
 

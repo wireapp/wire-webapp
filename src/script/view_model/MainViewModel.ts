@@ -42,6 +42,8 @@ import type {SelfRepository} from 'Repositories/self/SelfRepository';
 import type {StorageRepository} from 'Repositories/storage';
 import type {TeamRepository} from 'Repositories/team/TeamRepository';
 import type {EventTrackingRepository} from 'Repositories/tracking/EventTrackingRepository';
+import type {UserRepository} from 'Repositories/user/UserRepository';
+import {UserState} from 'Repositories/user/UserState';
 
 import {ActionsViewModel} from './ActionsViewModel';
 import {CallingViewModel} from './CallingViewModel';
@@ -50,8 +52,6 @@ import {ListViewModel} from './ListViewModel';
 
 import {Core} from '../service/CoreSingleton';
 import type {ServerTimeHandler} from '../time/serverTimeHandler';
-import type {UserRepository} from '../user/UserRepository';
-import {UserState} from '../user/UserState';
 
 export interface ViewModelRepositories {
   asset: AssetRepository;

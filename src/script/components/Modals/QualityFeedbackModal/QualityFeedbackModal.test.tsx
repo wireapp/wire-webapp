@@ -32,7 +32,7 @@ import {CallingRepository} from 'Repositories/calling/CallingRepository';
 import {User} from 'Repositories/entity/User';
 import {EventName} from 'Repositories/tracking/EventName';
 import {Segmentation} from 'Repositories/tracking/Segmentation';
-import {UserState} from 'src/script/user/UserState';
+import {UserState} from 'Repositories/user/UserState';
 import {TestFactory} from 'test/helper/TestFactory';
 import {t} from 'Util/LocalizerUtil';
 

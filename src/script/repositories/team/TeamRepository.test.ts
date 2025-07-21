@@ -24,16 +24,15 @@ import {randomUUID} from 'crypto';
 
 import {AssetRepository} from 'Repositories/assets/AssetRepository';
 import {User} from 'Repositories/entity/User';
-import {UserState} from 'src/script/user/UserState';
+import {ROLE} from 'Repositories/user/UserPermission';
+import {UserRepository} from 'Repositories/user/UserRepository';
+import {UserState} from 'Repositories/user/UserState';
 
 import {TeamEntity} from './TeamEntity';
 import {TeamMemberEntity} from './TeamMemberEntity';
 import {TeamRepository} from './TeamRepository';
 import {TeamService} from './TeamService';
 import {TeamState} from './TeamState';
-
-import {ROLE} from '../../user/UserPermission';
-import {UserRepository} from '../../user/UserRepository';
 
 function buildConnectionRepository() {
   const team = new TeamEntity(randomUUID());

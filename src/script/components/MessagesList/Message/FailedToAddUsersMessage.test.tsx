@@ -24,8 +24,8 @@ import {AddUsersFailure, AddUsersFailureReasons} from '@wireapp/core/lib/convers
 import en from 'I18n/en-US.json';
 import {FailedToAddUsersMessage as FailedToAddUsersMessageEntity} from 'Repositories/entity/message/FailedToAddUsersMessage';
 import {User} from 'Repositories/entity/User';
+import {UserState} from 'Repositories/user/UserState';
 import {withTheme, generateQualifiedIds} from 'src/script/auth/util/test/TestUtil';
-import {UserState} from 'src/script/user/UserState';
 import {setStrings} from 'Util/LocalizerUtil';
 
 import {FailedToAddUsersMessage} from './FailedToAddUsersMessage';

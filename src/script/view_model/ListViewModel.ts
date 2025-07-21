@@ -34,6 +34,7 @@ import {PropertiesRepository} from 'Repositories/properties/PropertiesRepository
 import {SearchRepository} from 'Repositories/search/SearchRepository';
 import type {TeamRepository} from 'Repositories/team/TeamRepository';
 import {TeamState} from 'Repositories/team/TeamState';
+import {UserState} from 'Repositories/user/UserState';
 import {iterateItem} from 'Util/ArrayUtil';
 import {isEscapeKey} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
@@ -52,7 +53,6 @@ import {showContextMenu} from '../ui/ContextMenu';
 import {showLabelContextMenu} from '../ui/LabelContextMenu';
 import {Shortcut} from '../ui/Shortcut';
 import {ShortcutType} from '../ui/ShortcutType';
-import {UserState} from '../user/UserState';
 
 export class ListViewModel {
   private readonly userState: UserState;

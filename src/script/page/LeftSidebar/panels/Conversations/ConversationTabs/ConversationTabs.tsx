@@ -36,11 +36,11 @@ import {ConversationRepository} from 'Repositories/conversation/ConversationRepo
 import {Conversation} from 'Repositories/entity/Conversation';
 import {User} from 'Repositories/entity/User';
 import {TeamState} from 'Repositories/team/TeamState';
+import {FEATURES, hasAccessToFeature} from 'Repositories/user/UserPermission';
 import {getManageTeamUrl} from 'src/script/externalRoute';
 import {ConversationFolderTab} from 'src/script/page/LeftSidebar/panels/Conversations/ConversationTab/ConversationFolderTab';
 import {SidebarTabs} from 'src/script/page/LeftSidebar/panels/Conversations/useSidebarStore';
 import {Core} from 'src/script/service/CoreSingleton';
-import {FEATURES, hasAccessToFeature} from 'src/script/user/UserPermission';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {isDataDogEnabled} from 'Util/DataDog';
 import {getWebEnvironment} from 'Util/Environment';

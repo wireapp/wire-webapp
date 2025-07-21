@@ -24,12 +24,11 @@ import {container, singleton} from 'tsyringe';
 
 import {Conversation} from 'Repositories/entity/Conversation';
 import {User} from 'Repositories/entity/User';
+import {ROLE, roleMap} from 'Repositories/user/UserPermission';
+import {UserState} from 'Repositories/user/UserState';
 import {sortUsersByPriority} from 'Util/StringUtil';
 
 import {TeamEntity} from './TeamEntity';
-
-import {ROLE, roleMap} from '../../user/UserPermission';
-import {UserState} from '../../user/UserState';
 
 @singleton()
 export class TeamState {

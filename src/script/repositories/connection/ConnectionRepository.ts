@@ -35,7 +35,8 @@ import {EventRepository} from 'Repositories/event/EventRepository';
 import type {EventSource} from 'Repositories/event/EventSource';
 import {SelfService} from 'Repositories/self/SelfService';
 import {TeamService} from 'Repositories/team/TeamService';
-import {UserState} from 'src/script/user/UserState';
+import type {UserRepository} from 'Repositories/user/UserRepository';
+import {UserState} from 'Repositories/user/UserState';
 import {replaceLink, t} from 'Util/LocalizerUtil';
 import {getLogger, Logger} from 'Util/Logger';
 import {matchQualifiedIds} from 'Util/QualifiedId';
@@ -48,7 +49,6 @@ import {ConnectionState} from './ConnectionState';
 
 import {Config} from '../../Config';
 import {SystemMessageType} from '../../message/SystemMessageType';
-import type {UserRepository} from '../../user/UserRepository';
 
 export class ConnectionRepository {
   private readonly connectionService: ConnectionService;

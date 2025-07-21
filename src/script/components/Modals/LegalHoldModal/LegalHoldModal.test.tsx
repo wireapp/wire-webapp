@@ -30,11 +30,11 @@ import {Conversation} from 'Repositories/entity/Conversation';
 import {User} from 'Repositories/entity/User';
 import {SearchRepository} from 'Repositories/search/SearchRepository';
 import {TeamRepository} from 'Repositories/team/TeamRepository';
+import {UserRepository} from 'Repositories/user/UserRepository';
 
 import {LegalHoldModal, LegalHoldModalType} from './LegalHoldModal';
 
 import {TestFactory} from '../../../../../test/helper/TestFactory';
-import {UserRepository} from '../../../user/UserRepository';
 
 const userRepository = {} as UserRepository;
 const testFactory = new TestFactory();

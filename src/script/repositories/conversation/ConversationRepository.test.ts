@@ -66,6 +66,8 @@ import {LegacyEventRecord, StorageService} from 'Repositories/storage';
 import {StorageSchemata} from 'Repositories/storage/StorageSchemata';
 import {TeamRepository} from 'Repositories/team/TeamRepository';
 import {TeamState} from 'Repositories/team/TeamState';
+import {UserRepository} from 'Repositories/user/UserRepository';
+import {UserState} from 'Repositories/user/UserState';
 import {Config} from 'src/script/Config';
 import {ConversationError} from 'src/script/error/ConversationError';
 import {
@@ -90,8 +92,6 @@ import {entities, payload} from '../../../../test/api/payloads';
 import {TestFactory} from '../../../../test/helper/TestFactory';
 import {generateUser} from '../../../../test/helper/UserGenerator';
 import {Core} from '../../service/CoreSingleton';
-import {UserRepository} from '../../user/UserRepository';
-import {UserState} from '../../user/UserState';
 
 function buildConversationRepository() {
   const teamState = new TeamState();

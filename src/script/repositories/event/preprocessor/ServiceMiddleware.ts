@@ -23,10 +23,10 @@ import type {QualifiedId} from '@wireapp/api-client/lib/user/';
 import type {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
 import {MemberJoinEvent, OneToOneCreationEvent} from 'Repositories/conversation/EventBuilder';
 import {User} from 'Repositories/entity/User';
+import type {UserRepository} from 'Repositories/user/UserRepository';
 import {getLogger, Logger} from 'Util/Logger';
 import {matchQualifiedIds} from 'Util/QualifiedId';
 
-import type {UserRepository} from '../../../user/UserRepository';
 import {ClientEvent} from '../Client';
 import {EventMiddleware, IncomingEvent} from '../EventProcessor';
 

@@ -20,7 +20,7 @@
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 
 import {Conversation} from 'Repositories/entity/Conversation';
-import {UserState} from 'src/script/user/UserState';
+import {UserState} from 'Repositories/user/UserState';
 import {Logger} from 'Util/Logger';
 import {matchQualifiedIds} from 'Util/QualifiedId';
 

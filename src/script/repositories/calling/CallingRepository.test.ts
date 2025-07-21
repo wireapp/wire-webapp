@@ -35,6 +35,7 @@ import {CallingEvent} from 'Repositories/event/CallingEvent';
 import {CALL} from 'Repositories/event/Client';
 import {EventRepository} from 'Repositories/event/EventRepository';
 import {MediaType} from 'Repositories/media/MediaType';
+import {UserRepository} from 'Repositories/user/UserRepository';
 import {serverTimeHandler} from 'src/script/time/serverTimeHandler';
 import {TestFactory} from 'test/helper/TestFactory';
 import {createUuid} from 'Util/uuid';
@@ -48,7 +49,6 @@ import {Participant} from './Participant';
 
 import {buildMediaDevicesHandler, createConversation, createSelfParticipant} from '../../auth/util/test/TestUtil';
 import {Core} from '../../service/CoreSingleton';
-import {UserRepository} from '../../user/UserRepository';
 
 describe('CallingRepository', () => {
   const testFactory = new TestFactory();

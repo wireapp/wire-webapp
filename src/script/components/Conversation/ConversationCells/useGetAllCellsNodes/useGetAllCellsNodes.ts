@@ -22,7 +22,7 @@ import {useEffect, useCallback, useState} from 'react';
 import {QualifiedId} from '@wireapp/api-client/lib/user/';
 
 import {CellsRepository} from 'Repositories/cells/CellsRepository';
-import {UserRepository} from 'src/script/user/UserRepository';
+import {UserRepository} from 'Repositories/user/UserRepository';
 
 import {getUsersFromNodes} from './getUsersFromNodes';
 import {transformDataToCellsNodes, transformToCellPagination} from './transformDataToCellsNodes';

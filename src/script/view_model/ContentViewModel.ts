@@ -31,6 +31,8 @@ import {ConversationState} from 'Repositories/conversation/ConversationState';
 import {MessageRepository} from 'Repositories/conversation/MessageRepository';
 import {Conversation} from 'Repositories/entity/Conversation';
 import type {Message} from 'Repositories/entity/message/Message';
+import type {UserRepository} from 'Repositories/user/UserRepository';
+import {UserState} from 'Repositories/user/UserState';
 import {t} from 'Util/LocalizerUtil';
 import {getLogger, Logger} from 'Util/Logger';
 import {isConversationEntity} from 'Util/TypePredicateUtil';
@@ -47,8 +49,6 @@ import {useAppMainState} from '../page/state';
 import {ContentState, useAppState} from '../page/useAppState';
 import {generateConversationUrl} from '../router/routeGenerator';
 import {navigate, setHistoryParam} from '../router/Router';
-import type {UserRepository} from '../user/UserRepository';
-import {UserState} from '../user/UserState';
 
 interface ShowConversationOptions {
   exposeMessage?: Message;

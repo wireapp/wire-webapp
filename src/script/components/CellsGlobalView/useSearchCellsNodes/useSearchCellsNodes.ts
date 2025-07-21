@@ -23,7 +23,7 @@ import {useDebouncedCallback} from 'use-debounce';
 
 import {CellsRepository} from 'Repositories/cells/CellsRepository';
 import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
-import {UserRepository} from 'src/script/user/UserRepository';
+import {UserRepository} from 'Repositories/user/UserRepository';
 
 import {getConversationsFromNodes} from './getConversationsFromNodes';
 import {getUsersFromNodes} from './getUsersFromNodes';

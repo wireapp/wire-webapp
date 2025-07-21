@@ -82,6 +82,8 @@ import {StorageKey, StorageRepository, StorageService} from 'Repositories/storag
 import {TeamRepository} from 'Repositories/team/TeamRepository';
 import {TeamService} from 'Repositories/team/TeamService';
 import {EventTrackingRepository} from 'Repositories/tracking/EventTrackingRepository';
+import {UserRepository} from 'Repositories/user/UserRepository';
+import {UserService} from 'Repositories/user/UserService';
 import {initializeDataDog} from 'Util/DataDog';
 import {DebugUtil} from 'Util/DebugUtil';
 import {Environment} from 'Util/Environment';
@@ -117,8 +119,6 @@ import {AppInitTelemetry} from '../telemetry/app_init/AppInitTelemetry';
 import {AppInitTimingsStep} from '../telemetry/app_init/AppInitTimingsStep';
 import {serverTimeHandler} from '../time/serverTimeHandler';
 import {WindowHandler} from '../ui/WindowHandler';
-import {UserRepository} from '../user/UserRepository';
-import {UserService} from '../user/UserService';
 import {ViewModelRepositories} from '../view_model/MainViewModel';
 import {Warnings} from '../view_model/WarningsContainer';
 

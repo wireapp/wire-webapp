@@ -21,7 +21,7 @@ import {useState} from 'react';
 
 import {User} from 'Repositories/entity/User';
 import {TeamRepository} from 'Repositories/team/TeamRepository';
-import {UserRepository} from 'src/script/user/UserRepository';
+import {UserRepository} from 'Repositories/user/UserRepository';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 
 import {ConfirmLeaveModal} from './ConfirmLeaveModal';

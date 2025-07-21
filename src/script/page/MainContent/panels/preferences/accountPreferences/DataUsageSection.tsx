@@ -29,9 +29,9 @@ import {PropertiesRepository} from 'Repositories/properties/PropertiesRepository
 import {PROPERTIES_TYPE} from 'Repositories/properties/PropertiesType';
 import {TeamState} from 'Repositories/team/TeamState';
 import {getForcedErrorReportingStatus} from 'Repositories/tracking/Telemetry.helpers';
+import {ConsentValue} from 'Repositories/user/ConsentValue';
 import {t} from 'Util/LocalizerUtil';
 
-import {ConsentValue} from '../../../../../user/ConsentValue';
 import {PreferencesSection} from '../components/PreferencesSection';
 
 interface DataUsageSectionProps {

@@ -35,8 +35,10 @@ import {ServiceEntity} from 'Repositories/integration/ServiceEntity';
 import {SearchRepository} from 'Repositories/search/SearchRepository';
 import {TeamRepository} from 'Repositories/team/TeamRepository';
 import {TeamState} from 'Repositories/team/TeamState';
+import {generatePermissionHelpers} from 'Repositories/user/UserPermission';
+import {UserRepository} from 'Repositories/user/UserRepository';
+import {UserState} from 'Repositories/user/UserState';
 import {SidebarTabs, useSidebarStore} from 'src/script/page/LeftSidebar/panels/Conversations/useSidebarStore';
-import {UserRepository} from 'src/script/user/UserRepository';
 import {MainViewModel} from 'src/script/view_model/MainViewModel';
 import {t} from 'Util/LocalizerUtil';
 
@@ -44,8 +46,6 @@ import {PeopleTab, SearchResultsData} from './PeopleTab';
 import {ServicesTab} from './ServicesTab';
 
 import {Config} from '../../../../Config';
-import {generatePermissionHelpers} from '../../../../user/UserPermission';
-import {UserState} from '../../../../user/UserState';
 import {ListWrapper} from '../ListWrapper';
 
 type StartUIProps = {

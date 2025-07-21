@@ -18,6 +18,7 @@
  */
 
 import {User} from 'Repositories/entity/User';
+import {UserRepository} from 'Repositories/user/UserRepository';
 import {generateUser} from 'test/helper/UserGenerator';
 import {createUuid} from 'Util/uuid';
 
@@ -27,7 +28,6 @@ import {randomInt} from '../../auth/util/randomUtil';
 import {generateUsers} from '../../auth/util/test/TestUtil';
 import {APIClient} from '../../service/APIClientSingleton';
 import {Core} from '../../service/CoreSingleton';
-import {UserRepository} from '../../user/UserRepository';
 
 function buildSearchRepository() {
   const userRepository = {getUsersById: jest.fn(() => [])} as unknown as jest.Mocked<UserRepository>;

@@ -23,10 +23,10 @@ import {CredentialType} from '@wireapp/core/lib/messagingProtocols/mls';
 import {container} from 'tsyringe';
 
 import {User} from 'Repositories/entity/User';
+import {UserState} from 'Repositories/user/UserState';
 import {withTheme} from 'src/script/auth/util/test/TestUtil';
 import {E2EIHandler, MLSStatuses, WireIdentity} from 'src/script/E2EIdentity';
 import {Core} from 'src/script/service/CoreSingleton';
-import {UserState} from 'src/script/user/UserState';
 import {generateAPIConversation} from 'test/helper/ConversationGenerator';
 
 import {E2EICertificateDetails} from './E2EICertificateDetails';

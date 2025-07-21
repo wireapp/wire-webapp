@@ -29,13 +29,13 @@ import {UnverifiedUserWarning} from 'Components/Modals/UserModal';
 import {UserName} from 'Components/UserName';
 import {User} from 'Repositories/entity/User';
 import {TeamState} from 'Repositories/team/TeamState';
+import {UserState} from 'Repositories/user/UserState';
 import {SidebarTabs, useSidebarStore} from 'src/script/page/LeftSidebar/panels/Conversations/useSidebarStore';
 import {useAppMainState, ViewType} from 'src/script/page/state';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 
 import {RootContext} from '../../page/RootProvider';
-import {UserState} from '../../user/UserState';
 
 interface ConnectRequestsProps {
   readonly userState: UserState;

@@ -23,10 +23,9 @@ import {randomUUID} from 'crypto';
 
 import {Conversation} from 'Repositories/entity/Conversation';
 import {TeamState} from 'Repositories/team/TeamState';
+import {UserState} from 'Repositories/user/UserState';
 
 import {ConversationState} from './ConversationState';
-
-import {UserState} from '../../user/UserState';
 
 function createConversationState() {
   return new ConversationState(new UserState(), new TeamState());

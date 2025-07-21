@@ -31,10 +31,10 @@ import * as Icon from 'Components/Icon';
 import {ModalComponent} from 'Components/Modals/ModalComponent';
 import {ClientRepository} from 'Repositories/client';
 import {ClientState} from 'Repositories/client/ClientState';
+import {AppLockRepository} from 'Repositories/user/AppLockRepository';
+import {AppLockState} from 'Repositories/user/AppLockState';
 import {SIGN_OUT_REASON} from 'src/script/auth/SignOutReason';
 import {Config} from 'src/script/Config';
-import {AppLockRepository} from 'src/script/user/AppLockRepository';
-import {AppLockState} from 'src/script/user/AppLockState';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 

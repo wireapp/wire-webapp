@@ -29,11 +29,10 @@ import type {Conversation} from 'Repositories/entity/Conversation';
 import type {User} from 'Repositories/entity/User';
 import type {TeamRepository} from 'Repositories/team/TeamRepository';
 import {TeamState} from 'Repositories/team/TeamState';
+import {UserState} from 'Repositories/user/UserState';
 import {Logger, getLogger} from 'Util/Logger';
 
 import type {ConversationService} from './ConversationService';
-
-import {UserState} from '../../user/UserState';
 
 export enum Permissions {
   addParticipants = 'add_conversation_member',

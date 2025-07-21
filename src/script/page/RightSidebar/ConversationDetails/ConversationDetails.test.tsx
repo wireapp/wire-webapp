@@ -32,13 +32,13 @@ import {SelfRepository} from 'Repositories/self/SelfRepository';
 import {TeamEntity} from 'Repositories/team/TeamEntity';
 import {TeamRepository} from 'Repositories/team/TeamRepository';
 import {TeamState} from 'Repositories/team/TeamState';
+import {UserState} from 'Repositories/user/UserState';
 import 'src/script/util/test/mock/LocalStorageMock';
 import {createUuid} from 'Util/uuid';
 
 import {ConversationDetails} from './ConversationDetails';
 
 import {TestFactory} from '../../../../../test/helper/TestFactory';
-import {UserState} from '../../../user/UserState';
 import {ActionsViewModel} from '../../../view_model/ActionsViewModel';
 import {MainViewModel} from '../../../view_model/MainViewModel';
 

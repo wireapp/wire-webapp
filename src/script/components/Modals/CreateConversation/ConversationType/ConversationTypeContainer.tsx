@@ -22,7 +22,7 @@ import {useEffect} from 'react';
 import {container} from 'tsyringe';
 
 import {TeamState} from 'Repositories/team/TeamState';
-import {UserState} from 'src/script/user/UserState';
+import {UserState} from 'Repositories/user/UserState';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 
 import {ConversationFeature} from './ConversationFeature';

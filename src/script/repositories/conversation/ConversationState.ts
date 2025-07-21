@@ -24,6 +24,7 @@ import {container, singleton} from 'tsyringe';
 import {Conversation} from 'Repositories/entity/Conversation';
 import {User} from 'Repositories/entity/User';
 import {TeamState} from 'Repositories/team/TeamState';
+import {UserState} from 'Repositories/user/UserState';
 import {matchQualifiedIds} from 'Util/QualifiedId';
 import {sortGroupsByLastEvent} from 'Util/util';
 
@@ -36,8 +37,6 @@ import {
   isSelfConversation,
   isReadableConversation,
 } from './ConversationSelectors';
-
-import {UserState} from '../../user/UserState';
 
 @singleton()
 export class ConversationState {

@@ -28,6 +28,7 @@ import {ConversationRepository} from 'Repositories/conversation/ConversationRepo
 import {Conversation} from 'Repositories/entity/Conversation';
 import {ContentMessage} from 'Repositories/entity/message/ContentMessage';
 import {User} from 'Repositories/entity/User';
+import {UserRepository} from 'Repositories/user/UserRepository';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 import {formatLocale} from 'Util/TimeUtil';
@@ -35,7 +36,6 @@ import {formatLocale} from 'Util/TimeUtil';
 import {UsersReactions} from './UserReactions';
 
 import {SuperType} from '../../../message/SuperType';
-import {UserRepository} from '../../../user/UserRepository';
 import {PanelHeader} from '../PanelHeader';
 import {PanelEntity, PanelState} from '../RightSidebar';
 

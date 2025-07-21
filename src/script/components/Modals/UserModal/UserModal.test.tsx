@@ -22,8 +22,8 @@ import {QualifiedId} from '@wireapp/api-client/lib/user';
 
 import {User} from 'Repositories/entity/User';
 import {TeamState} from 'Repositories/team/TeamState';
+import {UserRepository} from 'Repositories/user/UserRepository';
 import {Core} from 'src/script/service/CoreSingleton';
-import {UserRepository} from 'src/script/user/UserRepository';
 
 import {UserModal, UserModalProps} from './UserModal';
 import {showUserModal} from './UserModal.state';

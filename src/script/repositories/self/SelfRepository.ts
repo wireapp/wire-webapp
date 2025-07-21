@@ -33,6 +33,8 @@ import {
   detectTeamFeatureUpdate,
 } from 'Repositories/team/TeamFeatureConfigChangeDetector/TeamFeatureConfigChangeDetector';
 import {TeamRepository} from 'Repositories/team/TeamRepository';
+import {UserRepository} from 'Repositories/user/UserRepository';
+import {UserState} from 'Repositories/user/UserState';
 import {Logger, getLogger} from 'Util/Logger';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 
@@ -40,8 +42,6 @@ import {SelfService} from './SelfService';
 import {evaluateSelfSupportedProtocols} from './SelfSupportedProtocols/SelfSupportedProtocols';
 
 import {Core} from '../../service/CoreSingleton';
-import {UserRepository} from '../../user/UserRepository';
-import {UserState} from '../../user/UserState';
 
 type Events = {selfSupportedProtocolsUpdated: ConversationProtocol[]};
 

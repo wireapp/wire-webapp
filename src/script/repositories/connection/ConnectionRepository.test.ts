@@ -28,6 +28,7 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 import {Conversation} from 'Repositories/entity/Conversation';
 import {SelfService} from 'Repositories/self/SelfService';
 import {TeamService} from 'Repositories/team/TeamService';
+import {UserRepository} from 'Repositories/user/UserRepository';
 import {generateUser} from 'test/helper/UserGenerator';
 import {createUuid} from 'Util/uuid';
 
@@ -35,8 +36,6 @@ import {ConnectionEntity} from './ConnectionEntity';
 import {ConnectionRepository} from './ConnectionRepository';
 import {ConnectionService} from './ConnectionService';
 import {ConnectionState} from './ConnectionState';
-
-import {UserRepository} from '../../user/UserRepository';
 
 function buildConnectionRepository() {
   const connectionState = new ConnectionState();

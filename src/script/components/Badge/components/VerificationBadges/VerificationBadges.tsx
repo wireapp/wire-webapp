@@ -34,14 +34,14 @@ import {
   Tooltip,
 } from '@wireapp/react-ui-kit';
 
+import {useUserIdentity} from 'Hooks/useDeviceIdentities';
 import {ClientEntity} from 'Repositories/client';
 import {ConversationVerificationState} from 'Repositories/conversation/ConversationVerificationState';
 import {checkUserHandle} from 'Repositories/conversation/ConversationVerificationStateHandler';
 import {Conversation} from 'Repositories/entity/Conversation';
 import {User} from 'Repositories/entity/User';
+import {UserState} from 'Repositories/user/UserState';
 import {MLSStatuses, WireIdentity} from 'src/script/E2EIdentity/E2EIdentityVerification';
-import {useUserIdentity} from 'src/script/hooks/useDeviceIdentities';
-import {UserState} from 'src/script/user/UserState';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {StringIdentifer, t} from 'Util/LocalizerUtil';
 import {waitFor} from 'Util/waitFor';

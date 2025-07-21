@@ -32,8 +32,8 @@ import {Conversation} from 'Repositories/entity/Conversation';
 import {User} from 'Repositories/entity/User';
 import {TeamEntity} from 'Repositories/team/TeamEntity';
 import {TeamState} from 'Repositories/team/TeamState';
+import {UserState} from 'Repositories/user/UserState';
 import {withTheme} from 'src/script/auth/util/test/TestUtil';
-import {UserState} from 'src/script/user/UserState';
 import {ActionsViewModel} from 'src/script/view_model/ActionsViewModel';
 import {noop} from 'Util/util';
 

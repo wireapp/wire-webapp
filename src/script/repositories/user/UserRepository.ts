@@ -75,10 +75,10 @@ import {UserMapper} from './UserMapper';
 import type {UserService} from './UserService';
 import {UserState} from './UserState';
 
-import {SIGN_OUT_REASON} from '../auth/SignOutReason';
-import {Config} from '../Config';
-import {UserError} from '../error/UserError';
-import type {ServerTimeHandler} from '../time/serverTimeHandler';
+import {SIGN_OUT_REASON} from '../../auth/SignOutReason';
+import {Config} from '../../Config';
+import {UserError} from '../../error/UserError';
+import type {ServerTimeHandler} from '../../time/serverTimeHandler';
 
 type GetUserOptions = {
   /**

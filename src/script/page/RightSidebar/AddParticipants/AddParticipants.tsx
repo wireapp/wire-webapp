@@ -37,6 +37,8 @@ import {ServiceEntity} from 'Repositories/integration/ServiceEntity';
 import {SearchRepository} from 'Repositories/search/SearchRepository';
 import {TeamRepository} from 'Repositories/team/TeamRepository';
 import {TeamState} from 'Repositories/team/TeamState';
+import {generatePermissionHelpers} from 'Repositories/user/UserPermission';
+import {UserState} from 'Repositories/user/UserState';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {handleKeyDown, KEY} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
@@ -44,8 +46,6 @@ import {safeWindowOpen} from 'Util/SanitizationUtil';
 import {sortUsersByPriority} from 'Util/StringUtil';
 
 import {getManageServicesUrl} from '../../../externalRoute';
-import {generatePermissionHelpers} from '../../../user/UserPermission';
-import {UserState} from '../../../user/UserState';
 import {PanelHeader} from '../PanelHeader';
 import {PanelEntity, PanelState} from '../RightSidebar';
 

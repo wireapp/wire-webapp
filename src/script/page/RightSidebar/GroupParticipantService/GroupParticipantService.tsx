@@ -28,11 +28,11 @@ import {Conversation} from 'Repositories/entity/Conversation';
 import {User} from 'Repositories/entity/User';
 import {IntegrationRepository} from 'Repositories/integration/IntegrationRepository';
 import {ServiceEntity} from 'Repositories/integration/ServiceEntity';
+import {generatePermissionHelpers} from 'Repositories/user/UserPermission';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {handleKeyDown, KEY} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
 
-import {generatePermissionHelpers} from '../../../user/UserPermission';
 import {ActionsViewModel} from '../../../view_model/ActionsViewModel';
 import {PanelHeader} from '../PanelHeader';
 

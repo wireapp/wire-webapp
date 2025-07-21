@@ -29,13 +29,13 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {User} from 'Repositories/entity/User';
 import {TeamState} from 'Repositories/team/TeamState';
+import {AppLockState} from 'Repositories/user/AppLockState';
+import {FEATURES, hasAccessToFeature} from 'Repositories/user/UserPermission';
+import {UserRepository} from 'Repositories/user/UserRepository';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 
 import {externalUrl, getManageTeamUrl} from '../../../../../externalRoute';
-import {AppLockState} from '../../../../../user/AppLockState';
-import {FEATURES, hasAccessToFeature} from '../../../../../user/UserPermission';
-import {UserRepository} from '../../../../../user/UserRepository';
 import {PreferencesSection} from '../components/PreferencesSection';
 
 interface AccountSecuritySectionProps {

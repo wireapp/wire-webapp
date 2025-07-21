@@ -53,6 +53,8 @@ import {User} from 'Repositories/entity/User';
 import {NOTIFICATION_HANDLING_STATE} from 'Repositories/event/NotificationHandlingState';
 import {PermissionRepository} from 'Repositories/permission/PermissionRepository';
 import {PermissionStatusState} from 'Repositories/permission/PermissionStatusState';
+import {UserMapper} from 'Repositories/user/UserMapper';
+import {UserState} from 'Repositories/user/UserState';
 import 'src/script/localization/Localizer';
 import {CALL_MESSAGE_TYPE} from 'src/script/message/CallMessageType';
 import {MentionEntity} from 'src/script/message/MentionEntity';
@@ -65,9 +67,6 @@ import {truncate} from 'Util/StringUtil';
 import {createUuid} from 'Util/uuid';
 
 import {NotificationRepository} from './NotificationRepository';
-
-import {UserMapper} from '../../user/UserMapper';
-import {UserState} from '../../user/UserState';
 
 function buildNotificationRepository() {
   const userState = container.resolve(UserState);

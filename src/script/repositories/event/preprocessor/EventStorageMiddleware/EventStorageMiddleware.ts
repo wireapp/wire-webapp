@@ -23,7 +23,7 @@ import {container} from 'tsyringe';
 import {ConversationState} from 'Repositories/conversation/ConversationState';
 import {User} from 'Repositories/entity/User';
 import type {EventRecord} from 'Repositories/storage';
-import {UserFilter} from 'src/script/user/UserFilter';
+import {UserFilter} from 'Repositories/user/UserFilter';
 import {matchQualifiedIds} from 'Util/QualifiedId';
 
 import {handleLinkPreviewEvent, handleEditEvent, handleAssetEvent, handleReactionEvent} from './eventHandlers';

@@ -23,7 +23,7 @@ import {Availability} from '@wireapp/protocol-messaging';
 
 import {Participant} from 'Repositories/calling/Participant';
 import {User} from 'Repositories/entity/User';
-import {ROLE} from 'src/script/user/UserPermission';
+import {ROLE} from 'Repositories/user/UserPermission';
 import {createUuid} from 'Util/uuid';
 
 import {CallParticipantsListItem} from './CallParticipantsListItem';
