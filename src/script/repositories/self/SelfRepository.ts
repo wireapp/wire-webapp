@@ -34,14 +34,14 @@ import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 import {SelfService} from './SelfService';
 import {evaluateSelfSupportedProtocols} from './SelfSupportedProtocols/SelfSupportedProtocols';
 
-import {Core} from '../service/CoreSingleton';
+import {Core} from '../../service/CoreSingleton';
 import {
   FeatureUpdateType,
   detectTeamFeatureUpdate,
-} from '../team/TeamFeatureConfigChangeDetector/TeamFeatureConfigChangeDetector';
-import {TeamRepository} from '../team/TeamRepository';
-import {UserRepository} from '../user/UserRepository';
-import {UserState} from '../user/UserState';
+} from '../../team/TeamFeatureConfigChangeDetector/TeamFeatureConfigChangeDetector';
+import {TeamRepository} from '../../team/TeamRepository';
+import {UserRepository} from '../../user/UserRepository';
+import {UserState} from '../../user/UserState';
 
 type Events = {selfSupportedProtocolsUpdated: ConversationProtocol[]};
 

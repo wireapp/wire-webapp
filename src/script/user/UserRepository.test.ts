@@ -35,6 +35,7 @@ import {ConnectionEntity} from 'Repositories/connection/ConnectionEntity';
 import {User} from 'Repositories/entity/User';
 import {EventRepository} from 'Repositories/event/EventRepository';
 import {PropertiesRepository} from 'Repositories/properties/PropertiesRepository';
+import {SelfService} from 'Repositories/self/SelfService';
 import {entities} from 'test/api/payloads';
 import {TestFactory} from 'test/helper/TestFactory';
 import {generateAPIUser} from 'test/helper/UserGenerator';
@@ -45,7 +46,6 @@ import {UserRepository} from './UserRepository';
 import {UserService} from './UserService';
 import {UserState} from './UserState';
 
-import {SelfService} from '../self/SelfService';
 import {TeamState} from '../team/TeamState';
 import {serverTimeHandler} from '../time/serverTimeHandler';
 
