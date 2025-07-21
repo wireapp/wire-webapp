@@ -135,6 +135,7 @@ const OptionPreferences = ({propertiesRepository, selfUser}: OptionPreferencesPr
   ];
 
   const isMessageFormatButtonsFlagEnabled = Config.getConfig().FEATURE.ENABLE_MESSAGE_FORMAT_BUTTONS;
+  const isLinkPreviewsEnabled = Config.getConfig().FEATURE.ALLOW_LINK_PREVIEWS;
 
   return (
     <PreferencesPage title={t('preferencesOptions')}>
@@ -269,24 +270,26 @@ const OptionPreferences = ({propertiesRepository, selfUser}: OptionPreferencesPr
               </div>
             )}
 
-            <div className="checkbox-margin">
-              <Checkbox
-                tabIndex={TabIndex.FOCUSABLE}
-                onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-                  saveOptionSendPreviewsPreference(event.target.checked);
-                }}
-                checked={optionSendPreviews}
-                data-uie-name="status-preference-previews-send"
-              >
-                <CheckboxLabel htmlFor="status-preference-previews-send">
-                  {t('preferencesOptionsPreviewsSendCheckbox')}
-                </CheckboxLabel>
-              </Checkbox>
+            {isLinkPreviewsEnabled && (
+              <div className="checkbox-margin">
+                <Checkbox
+                  tabIndex={TabIndex.FOCUSABLE}
+                  onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                    saveOptionSendPreviewsPreference(event.target.checked);
+                  }}
+                  checked={optionSendPreviews}
+                  data-uie-name="status-preference-previews-send"
+                >
+                  <CheckboxLabel htmlFor="status-preference-previews-send">
+                    {t('preferencesOptionsPreviewsSendCheckbox')}
+                  </CheckboxLabel>
+                </Checkbox>
 
-              <p className="preferences-detail preferences-detail-intended">
-                {t('preferencesOptionsPreviewsSendDetail')}
-              </p>
-            </div>
+                <p className="preferences-detail preferences-detail-intended">
+                  {t('preferencesOptionsPreviewsSendDetail')}
+                </p>
+              </div>
+            )}
           </>
         )}
       </PreferencesSection>

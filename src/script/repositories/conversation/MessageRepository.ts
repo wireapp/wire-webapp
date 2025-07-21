@@ -95,6 +95,7 @@ import {EventBuilder} from './EventBuilder';
 import {EventMapper} from './EventMapper';
 import {getLinkPreviewFromString} from './linkPreviews';
 
+import {Config} from '../../Config';
 import {ConversationError} from '../../error/ConversationError';
 import {showLegalHoldWarningModal} from '../../legal-hold/LegalHoldWarning';
 import {MentionEntity} from '../../message/MentionEntity';
@@ -451,7 +452,10 @@ export class MessageRepository {
 
   private async handleLinkPreview(textPayload: TextMessagePayload & {messageId: string}) {
     // check if the user actually wants to send link previews
-    if (!this.propertyRepository.getPreference(PROPERTIES_TYPE.PREVIEWS.SEND)) {
+    if (
+      !this.propertyRepository.getPreference(PROPERTIES_TYPE.PREVIEWS.SEND) ||
+      Config.getConfig().FEATURE.ALLOW_LINK_PREVIEWS === false
+    ) {
       return;
     }
 
