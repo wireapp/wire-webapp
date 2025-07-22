@@ -30,7 +30,7 @@ export class ConversationRepositoryE2E extends BackendClientE2E {
     conversationName: string,
   ) {
     await this.axiosInstance.post(
-      'conversations',
+      `${TEST_API_VERSION}/conversations`,
       {
         access: ['invite', 'code'],
         conversation_role: 'wire_member',
@@ -76,7 +76,7 @@ export class ConversationRepositoryE2E extends BackendClientE2E {
 
     for (let attempt = 0; attempt < maxRetries && !mlsConversationId; attempt++) {
       const listIdsResponse = await this.axiosInstance.post(
-        'conversations/list-ids',
+        `${TEST_API_VERSION}/conversations/list-ids`,
         {},
         {
           headers: {

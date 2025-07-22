@@ -24,9 +24,11 @@ import {BackendClientE2E} from './backendClient.e2e';
 
 import {User} from '../data/user';
 
+import {TEST_API_VERSION} from '.';
+
 export class AuthRepositoryE2E extends BackendClientE2E {
   public async registerUser(user: User, invitationCode?: string): Promise<AxiosResponse> {
-    const response = await this.axiosInstance.post('register', {
+    const response = await this.axiosInstance.post(`${TEST_API_VERSION}/register`, {
       password: user.password,
       name: `${user.firstName} ${user.lastName}`,
       email: user.email,
@@ -45,7 +47,7 @@ export class AuthRepositoryE2E extends BackendClientE2E {
     teamName: string,
     activationCode: string,
   ): Promise<AxiosResponse<AuthUser>> {
-    return this.axiosInstance.post('register', {
+    return this.axiosInstance.post(`${TEST_API_VERSION}/register`, {
       password: user.password,
       name: `${user.firstName} ${user.lastName}`,
       email: user.email,
@@ -59,7 +61,7 @@ export class AuthRepositoryE2E extends BackendClientE2E {
   }
 
   public async activateAccount(email: string, code: string) {
-    await this.axiosInstance.post('activate', {
+    await this.axiosInstance.post(`${TEST_API_VERSION}/activate`, {
       code,
       dryrun: false,
       email: email,
@@ -67,14 +69,14 @@ export class AuthRepositoryE2E extends BackendClientE2E {
   }
 
   public async bookEmail(email: string) {
-    await this.axiosInstance.post('activate/send', {
+    await this.axiosInstance.post(`${TEST_API_VERSION}/activate/send`, {
       email: email,
     });
   }
 
   public async loginUser(user: User): Promise<AxiosResponse> {
     const response = await this.axiosInstance.post(
-      'login',
+      `${TEST_API_VERSION}/login`,
       {
         email: user.email,
         password: user.password,
@@ -96,7 +98,7 @@ export class AuthRepositoryE2E extends BackendClientE2E {
 
   public async requestAccessToken(zuidCookie: string): Promise<string> {
     const accessResponse = await this.axiosInstance.post(
-      'access',
+      `${TEST_API_VERSION}/access`,
       {
         withCredentials: true,
       },

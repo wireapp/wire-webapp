@@ -17,6 +17,7 @@
  *
  */
 
+import {FEATURE_KEY} from '@wireapp/api-client/lib/team/feature';
 import {AxiosResponse} from 'axios';
 
 import {AuthRepositoryE2E} from './authRepository.e2e';
@@ -56,7 +57,7 @@ export class ApiManagerE2E {
 
   async addDevicesToUser(user: User, numberOfDevices: number) {
     const token = user.token ?? (await this.auth.loginUser(user)).data.access_token;
-    const isMlsEnabled = await this.featureConfig.isMlsEnabled(token);
+    const isMlsEnabled = await this.featureConfig.isFeatureEnabled(token, FEATURE_KEY.MLS);
     for (let i = 0; i < numberOfDevices; i++) {
       const deviceName = `Device${i + 1}`;
       const response = await this.testService.createInstance(user.password, user.email, deviceName, isMlsEnabled);
