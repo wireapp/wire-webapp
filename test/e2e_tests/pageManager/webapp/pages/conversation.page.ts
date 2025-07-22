@@ -132,6 +132,11 @@ export class ConversationPage {
     return false;
   }
 
+  async startCall() {
+    const startCallButton = this.page.locator('[data-uie-name="do-call"]');
+    await startCallButton.click();
+  }
+
   async isSystemMessageVisible(messageText: string) {
     await this.systemMessages.filter({hasText: messageText}).first().waitFor({state: 'visible', timeout: 5000});
     return true;
