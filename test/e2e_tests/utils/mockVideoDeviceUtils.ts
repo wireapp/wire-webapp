@@ -100,11 +100,11 @@ export async function addMockCamerasToContext(context: BrowserContext): Promise<
         return originalGetUserMedia(constraints);
       }
 
-      const deviceId = extractRequestedDeviceId(videoConstraints as MediaTrackConstraints);
+      const deviceId = extractRequestedDeviceId(videoConstraints);
       const isFakeDevice = deviceId && fakeDevices.some(fake => fake.deviceId === deviceId);
 
       if (isFakeDevice) {
-        const newConstraints = createConstraintsWithoutDeviceId(constraints, videoConstraints as MediaTrackConstraints);
+        const newConstraints = createConstraintsWithoutDeviceId(constraints, videoConstraints);
         return originalGetUserMedia(newConstraints);
       }
 
