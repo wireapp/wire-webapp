@@ -21,11 +21,9 @@ import {FeatureList, FEATURE_KEY, FeatureStatus} from '@wireapp/api-client/lib/t
 
 import {BackendClientE2E} from './backendClient.e2e';
 
-import {TEST_API_VERSION} from '.';
-
 export class FeatureConfigRepositoryE2E extends BackendClientE2E {
   async isFeatureEnabled(token: string, FeatureKey: FEATURE_KEY): Promise<boolean> {
-    const response = await this.axiosInstance.get<FeatureList>(`${TEST_API_VERSION}/feature-configs`, {
+    const response = await this.axiosInstance.get<FeatureList>('feature-configs', {
       headers: {
         Authorization: `Bearer ${token}`,
       },

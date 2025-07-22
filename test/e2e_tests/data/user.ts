@@ -56,5 +56,7 @@ export const getUser = (user: Partial<User> = {}): User => {
     fullName: user.fullName ?? `${firstName} ${lastName}`,
     username: user.username ?? generateUsername(firstName, lastName),
     devices: user.devices ?? [],
+    teamId: user.teamId ?? '',
+    token: user.token ?? '',
   };
 };

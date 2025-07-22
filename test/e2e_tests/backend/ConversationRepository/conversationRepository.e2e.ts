@@ -19,7 +19,6 @@
 
 import {createGroupConversationData, createGroupConversationDataParams} from './conversationRepository.mocks';
 
-import {TEST_API_VERSION} from '../';
 import {BackendClientE2E} from '../backendClient.e2e';
 
 export class ConversationRepositoryE2E extends BackendClientE2E {
@@ -30,7 +29,7 @@ export class ConversationRepositoryE2E extends BackendClientE2E {
     conversationName: string,
   ) {
     await this.axiosInstance.post(
-      `${TEST_API_VERSION}/conversations`,
+      'conversations',
       {
         access: ['invite', 'code'],
         conversation_role: 'wire_member',
@@ -55,7 +54,7 @@ export class ConversationRepositoryE2E extends BackendClientE2E {
   async createGroupConversation(token: string, data: createGroupConversationDataParams) {
     const conversationData = createGroupConversationData(data);
     try {
-      const response = await this.axiosInstance.post(`${TEST_API_VERSION}/conversations`, conversationData, {
+      const response = await this.axiosInstance.post('conversations', conversationData, {
         headers: {
           Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json',
@@ -76,7 +75,7 @@ export class ConversationRepositoryE2E extends BackendClientE2E {
 
     for (let attempt = 0; attempt < maxRetries && !mlsConversationId; attempt++) {
       const listIdsResponse = await this.axiosInstance.post(
-        `${TEST_API_VERSION}/conversations/list-ids`,
+        'conversations/list-ids',
         {},
         {
           headers: {
@@ -92,7 +91,7 @@ export class ConversationRepositoryE2E extends BackendClientE2E {
       }
 
       const response = await this.axiosInstance.post(
-        `${TEST_API_VERSION}/conversations/list`,
+        'conversations/list',
         {
           qualified_ids: qualifiedIds,
         },

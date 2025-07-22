@@ -22,12 +22,10 @@ import {BackendClientE2E} from './backendClient.e2e';
 import {Service} from '../data/serviceInfo';
 import {User} from '../data/user';
 
-import {TEST_API_VERSION} from '.';
-
 export class TeamRepositoryE2E extends BackendClientE2E {
   async inviteUserToTeam(emailOfInvitee: string, teamOwner: User): Promise<string> {
     const response = this.axiosInstance.post(
-      `${TEST_API_VERSION}/teams/${teamOwner.teamId}/invitations`,
+      `teams/${teamOwner.teamId}/invitations`,
       {
         inviterName: `${teamOwner.firstName} ${teamOwner.lastName}`,
         role: 'member',
@@ -46,7 +44,7 @@ export class TeamRepositoryE2E extends BackendClientE2E {
 
   async addServiceToTeamWhitelist(teamId: string, service: Service, token: string) {
     await this.axiosInstance.post(
-      `${TEST_API_VERSION}/teams/${teamId}/services/whitelist`,
+      `teams/${teamId}/services/whitelist`,
       {
         provider: service.providerId,
         id: service.serviceId,
@@ -63,7 +61,7 @@ export class TeamRepositoryE2E extends BackendClientE2E {
 
   async deleteTeam(user: User, teamId: string) {
     await this.axiosInstance.request({
-      url: `${TEST_API_VERSION}/teams/${teamId}`,
+      url: `teams/${teamId}`,
       method: 'DELETE',
       headers: {
         Authorization: `Bearer ${user.token}`,

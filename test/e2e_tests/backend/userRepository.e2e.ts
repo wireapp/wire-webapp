@@ -19,11 +19,9 @@
 
 import {BackendClientE2E} from './backendClient.e2e';
 
-import {TEST_API_VERSION} from '.';
-
 export class UserRepositoryE2E extends BackendClientE2E {
   public async deleteUser(userPassword: string, token: string) {
-    await this.axiosInstance.delete(`${TEST_API_VERSION}/self`, {
+    await this.axiosInstance.delete('self', {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -35,7 +33,7 @@ export class UserRepositoryE2E extends BackendClientE2E {
 
   public async setUniqueUsername(username: string, token: string) {
     await this.axiosInstance.put(
-      `${TEST_API_VERSION}/self/handle`,
+      'self/handle',
       {handle: username},
       {
         headers: {
