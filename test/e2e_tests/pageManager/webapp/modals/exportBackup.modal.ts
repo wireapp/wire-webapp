@@ -26,6 +26,7 @@ export class ExportBackupModal {
 
   readonly exportBackupModal: Locator;
   readonly title: Locator;
+  readonly passwordInput: Locator;
   readonly primaryButton: Locator;
   readonly secondaryButton: Locator;
 
@@ -34,6 +35,7 @@ export class ExportBackupModal {
 
     this.exportBackupModal = page.locator(selectByDataAttribute('primary-modals-container'));
     this.title = this.exportBackupModal.locator(selectByDataAttribute('status-modal-title'));
+    this.passwordInput = this.exportBackupModal.locator(selectByDataAttribute('backup-password'));
     this.primaryButton = this.exportBackupModal.locator(selectByDataAttribute('do-action'));
     this.secondaryButton = this.exportBackupModal.locator(selectByDataAttribute('do-secondary'));
   }
@@ -52,5 +54,9 @@ export class ExportBackupModal {
 
   async clickSecondaryButton() {
     await this.secondaryButton.click();
+  }
+
+  async enterPassword(password: string) {
+    await this.passwordInput.fill(password);
   }
 }

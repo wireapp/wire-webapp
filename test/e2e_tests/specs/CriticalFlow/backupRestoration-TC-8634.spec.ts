@@ -25,12 +25,31 @@ import {removeCreatedUser} from '../../utils/tearDownUtil';
 
 // Generating test data
 const user = getUser();
-let fileName: string;
+let backupName: string;
+let passwordProtectedBackupName: string;
 
 test('Setting up new device with a backup', {tag: ['@TC-8634', '@crit-flow-web']}, async ({pageManager, api}) => {
   test.slow(); // Increasing test timeout to 90 seconds to accommodate the full flow
 
   const {pages, modals, components} = pageManager.webapp;
+
+  const createAndSaveBackup = async (password?: string, filenamePrefix?: string): Promise<string> => {
+    await pages.account().clickBackUpButton();
+    expect(modals.exportBackup().isTitleVisible()).toBeTruthy();
+    if (password) {
+      await modals.exportBackup().enterPassword(password);
+    }
+    await modals.exportBackup().clickPrimaryButton();
+    expect(modals.exportBackup().isTitleHidden()).toBeTruthy();
+    expect(pages.historyExport().isVisible()).toBeTruthy();
+    const [download] = await Promise.all([
+      pages.historyExport().page.waitForEvent('download'),
+      pages.historyExport().clickSaveFileButton(),
+    ]);
+    const backupName = `./test-results/downloads/${filenamePrefix}${download.suggestedFilename()}`;
+    await download.saveAs(backupName);
+    return backupName;
+  };
 
   // Creating preconditions for the test via API
   await test.step('Preconditions: Creating preconditions for the test via API', async () => {
@@ -49,17 +68,11 @@ test('Setting up new device with a backup', {tag: ['@TC-8634', '@crit-flow-web']
 
   await test.step('User creates and saves a backup', async () => {
     await components.conversationSidebar().clickPreferencesButton();
-    await pages.account().clickBackUpButton();
-    expect(modals.exportBackup().isTitleVisible()).toBeTruthy();
-    await modals.exportBackup().clickPrimaryButton();
-    expect(modals.exportBackup().isTitleHidden()).toBeTruthy();
-    expect(pages.historyExport().isVisible()).toBeTruthy();
-    const [download] = await Promise.all([
-      pages.historyExport().page.waitForEvent('download'),
-      pages.historyExport().clickSaveFileButton(),
-    ]);
-    fileName = `./test-results/downloads/${download.suggestedFilename()}`;
-    await download.saveAs(fileName);
+    backupName = await createAndSaveBackup();
+  });
+
+  await test.step('User creates and saves a password backup', async () => {
+    passwordProtectedBackupName = await createAndSaveBackup(user.password, 'password-');
   });
 
   await test.step('User logs out and clears all data', async () => {
@@ -73,8 +86,9 @@ test('Setting up new device with a backup', {tag: ['@TC-8634', '@crit-flow-web']
 
   await test.step('User restores the previously created backup', async () => {
     await components.conversationSidebar().clickPreferencesButton();
-    await pages.account().backupFileInput.setInputFiles(fileName);
+    await pages.account().backupFileInput.setInputFiles(backupName);
     expect(pages.historyImport().importSuccessHeadline.isVisible()).toBeTruthy();
+    await pages.account().backupFileInput.setInputFiles(passwordProtectedBackupName);
   });
 });
 
