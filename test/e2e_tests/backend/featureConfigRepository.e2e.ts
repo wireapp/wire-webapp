@@ -17,18 +17,17 @@
  *
  */
 
-import {FeatureList, FEATURE_KEY, FeatureStatus} from '@wireapp/api-client/lib/team/feature';
+import {FEATURE_KEY, FeatureStatus} from '@wireapp/api-client/lib/team/feature';
 
 import {BackendClientE2E} from './backendClient.e2e';
 
 export class FeatureConfigRepositoryE2E extends BackendClientE2E {
-  async isFeatureEnabled(token: string, FeatureKey: FEATURE_KEY): Promise<boolean> {
-    const response = await this.axiosInstance.get<FeatureList>('feature-configs', {
+  async isFeatureEnabled(token: string, featureKey: FEATURE_KEY, teamId: string): Promise<boolean> {
+    const response = await this.axiosInstance.get(`teams/${teamId}/features/${featureKey}`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
     });
-
-    return response.data[FeatureKey]?.status === FeatureStatus.ENABLED;
+    return response.data.status === FeatureStatus.ENABLED;
   }
 }

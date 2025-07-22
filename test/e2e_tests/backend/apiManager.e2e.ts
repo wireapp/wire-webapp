@@ -57,7 +57,7 @@ export class ApiManagerE2E {
 
   async addDevicesToUser(user: User, numberOfDevices: number) {
     const token = user.token ?? (await this.auth.loginUser(user)).data.access_token;
-    const isMlsEnabled = await this.featureConfig.isFeatureEnabled(token, FEATURE_KEY.MLS);
+    const isMlsEnabled = await this.featureConfig.isFeatureEnabled(token, FEATURE_KEY.MLS, user.teamId);
     for (let i = 0; i < numberOfDevices; i++) {
       const deviceName = `Device${i + 1}`;
       const response = await this.testService.createInstance(user.password, user.email, deviceName, isMlsEnabled);
@@ -94,7 +94,34 @@ export class ApiManagerE2E {
     await this.user.setUniqueUsername(user.username, user.token);
   }
 
-  async createTeamOwner(user: User, teamName: string): Promise<User> {
+  /**
+   * Long polling to see if a conference calling feature is available for a given team.
+   * This is to wait until stripe/ibis has set free account restrictions after team creation.
+   *
+   * @param token - The access token of the user.
+   * @returns A promise that resolves to true if the feature is enabled, false otherwise.
+   */
+  async waitForFeatureToBeEnabled(featureKey: FEATURE_KEY, teamId: string, token?: string): Promise<boolean> {
+    if (!token) {
+      throw new Error('Token is required to check for feature');
+    }
+
+    const timeout = 300000;
+    const interval = 1000;
+    const startTime = Date.now();
+
+    while (Date.now() - startTime < timeout) {
+      const isEnabled = await this.featureConfig.isFeatureEnabled(token, featureKey, teamId);
+      if (isEnabled) {
+        return true;
+      }
+      await new Promise(resolve => setTimeout(resolve, interval));
+    }
+
+    throw new Error(`${featureKey} feature is not enabled after waiting for ${timeout / 1000} seconds`);
+  }
+
+  async createTeamOwner(user: User, teamName: string) {
     // 1. Book email
     await this.auth.bookEmail(user.email);
 
