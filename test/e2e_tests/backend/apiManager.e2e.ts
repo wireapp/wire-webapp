@@ -57,7 +57,7 @@ export class ApiManagerE2E {
 
   async addDevicesToUser(user: User, numberOfDevices: number) {
     const token = user.token ?? (await this.auth.loginUser(user)).data.access_token;
-    const isMlsEnabled = await this.featureConfig.isFeatureEnabled(token, FEATURE_KEY.MLS, user.teamId!);
+    const isMlsEnabled = await this.featureConfig.isMlsEnabled(token);
     for (let i = 0; i < numberOfDevices; i++) {
       const deviceName = `Device${i + 1}`;
       const response = await this.testService.createInstance(user.password, user.email, deviceName, isMlsEnabled);
