@@ -105,8 +105,6 @@ export class CallingServiceClientE2E {
     checkVideoRecv: boolean,
   ) {
     const flowBefore = await this.getFlows(instanceId);
-    // // Wait for a short period to allow the flow data to change
-    // await new Promise(resolve => setTimeout(resolve, 2000));
 
     const timeout = 30_000;
     const delayBetweenChecks = 2000;
