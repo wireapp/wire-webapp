@@ -55,7 +55,6 @@ export class StartUIPage {
     const maxAttempts = timeout / delayBetweenAttempts;
 
     for (let attempt = 0; attempt < maxAttempts; attempt++) {
-      console.info(`Attempt ${attempt + 1} to find user ${username} in search results`);
       for (const result of await this.searchResults.all()) {
         const text = await result.textContent();
         if (text?.includes(username)) {

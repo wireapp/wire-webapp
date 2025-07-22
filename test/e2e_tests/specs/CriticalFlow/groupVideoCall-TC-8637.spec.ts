@@ -29,6 +29,10 @@ import {addCreatedTeam, addCreatedUser, removeCreatedTeam, removeCreatedUser} fr
 const teamName = 'Critical';
 const conversationName = 'CritiCall';
 const teamOwner = getUser();
+teamOwner.firstName = 'integrationtest';
+teamOwner.lastName = 'integrationtest';
+teamOwner.fullName = 'integrationtest';
+
 const teamMember = getUser();
 const guestUser = getUser();
 
@@ -105,14 +109,11 @@ test('Group Video call', {tag: ['@TC-8637', '@crit-flow']}, async ({browser, pag
     await ownerPages.startUI().searchInput.fill(guestUser.username);
     await ownerPages.startUI().selectUser(guestUser.username);
     await ownerModals.userProfile().clickConnectButton();
-
-    // // "Name not available" is visible instead
     expect(await ownerPages.conversationList().isConversationItemVisible(guestUser.fullName));
-    await expect(await guestPageManager.getPage()).toHaveTitle('(1) Wire'); // toHaveTitle was there before
+    await expect(await guestPageManager.getPage()).toHaveTitle('(1) Wire');
 
     await guestPages.conversationList().openPendingConnectionRequest();
     await guestPages.connectRequest().clickConnectButton();
-    expect(await guestPages.conversationList().isConversationItemVisible(teamOwner.fullName));
   });
 
   await test.step('User A invites User C to the group', async () => {

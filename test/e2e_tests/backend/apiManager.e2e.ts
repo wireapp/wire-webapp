@@ -149,8 +149,6 @@ export class ApiManagerE2E {
   }
 
   async enableConferenceCallingFeature(teamId: string) {
-    // Wait until stripe/ibis has set free account restrictions after team creation.
-    await new Promise(resolve => setTimeout(resolve, 3000));
     await this.brig.unlockConferenceCallingFeature(teamId);
     await this.brig.enableConferenceCallingBackdoorViaBackdoorTeam(teamId);
   }
