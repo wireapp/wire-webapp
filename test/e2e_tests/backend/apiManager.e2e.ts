@@ -93,7 +93,7 @@ export class ApiManagerE2E {
     await this.user.setUniqueUsername(user.username, user.token);
   }
 
-  async createTeamOwner(user: User, teamName: string) {
+  async createTeamOwner(user: User, teamName: string): Promise<User> {
     // 1. Book email
     await this.auth.bookEmail(user.email);
 
@@ -109,6 +109,16 @@ export class ApiManagerE2E {
 
     // 5. Set Unique Username (Handle)
     await this.user.setUniqueUsername(user.username, user.token);
+
+    return {
+      ...user,
+      teamId: registerResponse.data.team ?? '',
+      qualifiedId: {
+        domain: '',
+        id: registerResponse.data.id,
+      },
+      id: registerResponse.data.id,
+    };
   }
 
   async acceptConnectionRequest(user: User) {

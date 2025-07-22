@@ -25,7 +25,7 @@ import {test, expect} from '../../test.fixtures';
 import {addCreatedTeam, removeCreatedTeam} from '../../utils/tearDownUtil';
 
 // Generating test data
-const owner = getUser();
+let owner = getUser();
 const member = getUser();
 
 const teamName = 'Channels Management';
@@ -39,8 +39,8 @@ test('Channels Management', {tag: ['@TC-8752', '@crit-flow-web']}, async ({pageM
   test.slow(); // Increasing test timeout to 90 seconds to accommodate the full flow
 
   await test.step('Preconditions: Team owner create a channels enabled team', async () => {
-    await api.createTeamOwner(owner, teamName);
-    owner.teamId = await api.team.getTeamIdForUser(owner);
+    const user = await api.createTeamOwner(owner, teamName);
+    owner = {...owner, ...user};
     addCreatedTeam(owner, owner.teamId);
     await inviteMembers([member], owner, api);
 

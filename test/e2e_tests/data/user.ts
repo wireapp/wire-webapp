@@ -34,8 +34,8 @@ export interface User {
   fullName: string;
   username: string;
   devices: string[];
-  teamId?: string;
-  token?: string;
+  teamId: string;
+  token: string;
   qualifiedId?: {
     domain: string;
     id: string;
