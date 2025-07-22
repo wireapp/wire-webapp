@@ -99,6 +99,8 @@ const GroupCreationModal: React.FC<GroupCreationModalProps> = ({
 
   const initialProtocol = protocolOptions.find(protocol => protocol.value === defaultProtocol)!;
 
+  const areReadReceiptsEnabled = defaultProtocol !== ConversationProtocol.MLS;
+
   const [isShown, setIsShown] = useState<boolean>(false);
   const [selectedContacts, setSelectedContacts] = useState<User[]>([]);
   const [enableReadReceipts, setEnableReadReceipts] = useState<boolean>(false);
@@ -501,15 +503,17 @@ const GroupCreationModal: React.FC<GroupCreationModalProps> = ({
                     toggleId="services"
                   />
                 )}
-                <InfoToggle
-                  className="modal-style"
-                  dataUieName="read-receipts"
-                  info={t('readReceiptsToggleInfo')}
-                  isChecked={enableReadReceipts}
-                  setIsChecked={setEnableReadReceipts}
-                  isDisabled={false}
-                  name={t('readReceiptsToggleName')}
-                />
+                {areReadReceiptsEnabled && (
+                  <InfoToggle
+                    className="modal-style"
+                    dataUieName="read-receipts"
+                    info={t('readReceiptsToggleInfo')}
+                    isChecked={enableReadReceipts}
+                    setIsChecked={setEnableReadReceipts}
+                    isDisabled={false}
+                    name={t('readReceiptsToggleName')}
+                  />
+                )}
                 {enableMLSToggle && (
                   <>
                     <Select
