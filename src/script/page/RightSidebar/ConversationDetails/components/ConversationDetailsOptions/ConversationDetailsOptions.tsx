@@ -119,7 +119,7 @@ const ConversationDetailsOptions = ({
   const showOptionTimedMessages = isActiveGroupParticipant && isSelfDeletingMessagesEnabled;
   const showOptionServices = isActiveGroupParticipant && isTeamConversation && !isMLSConversation(activeConversation);
   const showOptionNotifications1To1 = isMutable && !isGroup;
-  const showOptionReadReceipts = isTeamConversation;
+  const showOptionReadReceipts = isTeamConversation && !isMLSConversation(activeConversation);
 
   const hasReceiptsEnabled = conversationRepository.expectReadReceipt(activeConversation);
 
