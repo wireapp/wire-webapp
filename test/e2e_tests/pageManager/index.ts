@@ -34,6 +34,7 @@ import {ExportBackupModal} from './webapp/modals/exportBackup.modal';
 import {LeaveConversationModal} from './webapp/modals/leaveConversation.modal';
 import {UserProfileModal} from './webapp/modals/userProfile.modal';
 import {AccountPage} from './webapp/pages/account.page';
+import {CallingPage} from './webapp/pages/calling.page';
 import {ConversationPage} from './webapp/pages/conversation.page';
 import {ConversationDetailsPage} from './webapp/pages/conversationDetails.page';
 import {ConversationListPage} from './webapp/pages/conversationList.page';
@@ -51,6 +52,8 @@ import {RegistrationPage} from './webapp/pages/registration.page';
 import {SingleSignOnPage} from './webapp/pages/singleSignOn.page';
 import {StartUIPage} from './webapp/pages/startUI.page';
 import {WelcomePage} from './webapp/pages/welcome.page';
+
+import {RemoveMemberModal} from '../pages/removeMember.modal';
 
 const webAppPath = process.env.WEBAPP_URL ?? '';
 const teamManagementPath = process.env.TEAM_MANAGEMENT_URL ?? '';
@@ -87,6 +90,10 @@ export class PageManager {
 
   refreshPage = (options: {waitUntil?: 'load' | 'domcontentloaded' | 'networkidle'} = {waitUntil: 'networkidle'}) => {
     return this.page.reload(options);
+  };
+
+  waitForTimeout = (timeout: number) => {
+    return this.page.waitForTimeout(timeout);
   };
 
   // Helper method to get or create a page or modal instance
@@ -131,10 +138,12 @@ export class PageManager {
       leaveConversation: () =>
         this.getOrCreate('webapp.modals.leaveConversation', () => new LeaveConversationModal(this.page)),
       exportBackup: () => this.getOrCreate('webapp.modals.exportBackup', () => new ExportBackupModal(this.page)),
+      removeMember: () => this.getOrCreate('webapp.modals.removeMember', () => new RemoveMemberModal(this.page)),
     },
     components: {
       conversationSidebar: () =>
         this.getOrCreate('webapp.components.conversationSidebar', () => new ConversationSidebar(this.page)),
+      calling: () => this.getOrCreate('webapp.components.calling', () => new CallingPage(this.page)),
     },
   } as const;
 

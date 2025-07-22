@@ -57,7 +57,7 @@ export const FileAssetSmall = ({
       <FileCard.Header>
         <FileCard.Icon type={isError ? 'unavailable' : 'file'} />
         {!isError && <FileCard.Type />}
-        <FileAssetOptions onOpen={() => setIsOpen(true)} />
+        <FileAssetOptions src={src} name={name} extension={extension} onOpen={() => setIsOpen(true)} />
       </FileCard.Header>
       <FileCard.Name variant={isError ? 'secondary' : 'primary'} truncateAfterLines={2} />
       <FilePreviewModal

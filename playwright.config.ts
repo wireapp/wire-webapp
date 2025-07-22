@@ -34,6 +34,9 @@ const projects = browserList.map(browser => ({
   use: {
     browserName: browser,
     headless: isHeadless,
+    launchOptions: {
+      args: ['--use-fake-device-for-media-stream', '--use-fake-ui-for-media-stream'],
+    },
   },
 }));
 
@@ -63,6 +66,7 @@ module.exports = defineConfig({
     /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
     trace: 'on-first-retry',
     screenshot: 'only-on-failure',
+    permissions: ['camera', 'microphone'],
   },
   projects,
 });

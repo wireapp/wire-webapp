@@ -393,6 +393,7 @@ declare module 'I18n/en-US.json' {
     'cells.folderBreadcrumbCombained': `Show more`;
     'cells.heading': `All Files`;
     'cells.imageFullScreenModal.closeButton': `Close`;
+    'cells.imageFullScreenModal.downloadButton': `Download`;
     'cells.modal.closeButton': `Close`;
     'cells.moveNodeModal.cancelButton': `Cancel`;
     'cells.moveNodeModal.createFolder.hintButton': `Create a new folder`;

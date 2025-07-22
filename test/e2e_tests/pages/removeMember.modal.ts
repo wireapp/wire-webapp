@@ -17,36 +17,24 @@
  *
  */
 
-import {CSSObject} from '@emotion/react';
+import {Page, Locator} from '@playwright/test';
 
-import {ellipsis} from '@wireapp/react-ui-kit';
+import {selectByDataAttribute} from '../utils/useSelector';
 
-import {styleBreakpoint} from '../../../common/styleBreakpoint/styleBreakpoint';
+export class RemoveMemberModal {
+  readonly page: Page;
 
-export const wrapperStyles: CSSObject = {
-  display: 'inline-flex',
-  alignItems: 'center',
-  gap: '8px',
-  background: 'transparent',
-  border: 'none',
-  padding: 0,
-  cursor: 'pointer',
-  maxWidth: '100%',
-  transform: 'translateY(4px)',
+  readonly modal: Locator;
+  readonly confirmButton: Locator;
 
-  [`@media (min-width: ${styleBreakpoint}px)`]: {
-    display: 'flex',
-    transform: 'translateY(0)',
-  },
-};
+  constructor(page: Page) {
+    this.page = page;
 
-export const avatarWrapperStyles: CSSObject = {
-  flexShrink: 0,
-  width: '16px',
-  height: '16px',
-};
+    this.modal = page.locator(`${selectByDataAttribute('modal-template-confirm')}`);
+    this.confirmButton = this.modal.locator(`${selectByDataAttribute('do-action')}`);
+  }
 
-export const textStyles: CSSObject = {
-  ...ellipsis(),
-  display: 'block',
-};
+  async clickConfirm() {
+    await this.confirmButton.click();
+  }
+}

@@ -88,6 +88,8 @@ export type Env = {
   /** Accepted file extensions for asset upload (e.g. ".txt,.jpg" or "*") */
   FEATURE_ALLOWED_FILE_UPLOAD_EXTENSIONS: string;
 
+  FEATURE_ALLOW_LINK_PREVIEWS: string;
+
   /** will enable the MLS protocol */
   FEATURE_USE_CORE_CRYPTO?: string;
 

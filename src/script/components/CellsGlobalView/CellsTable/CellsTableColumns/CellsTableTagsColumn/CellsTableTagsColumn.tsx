@@ -19,6 +19,8 @@
 
 import {BadgesWithTooltip} from '@wireapp/react-ui-kit';
 
+import {wrapperStyles} from './CellsTableTagsColumn.styles';
+
 interface CellsTableTagsColumnProps {
   tags: string[];
 }
@@ -28,5 +30,9 @@ export const CellsTableTagsColumn = ({tags}: CellsTableTagsColumnProps) => {
     return null;
   }
 
-  return <BadgesWithTooltip items={tags} />;
+  return (
+    <div css={wrapperStyles}>
+      <BadgesWithTooltip items={tags} />
+    </div>
+  );
 };

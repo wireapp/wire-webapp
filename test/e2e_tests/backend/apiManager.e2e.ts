@@ -17,6 +17,7 @@
  *
  */
 
+import {FEATURE_KEY} from '@wireapp/api-client/lib/team/feature';
 import {AxiosResponse} from 'axios';
 
 import {AuthRepositoryE2E} from './authRepository.e2e';
@@ -93,6 +94,33 @@ export class ApiManagerE2E {
     await this.user.setUniqueUsername(user.username, user.token);
   }
 
+  /**
+   * Long polling to see if a conference calling feature is available for a given team.
+   * This is to wait until stripe/ibis has set free account restrictions after team creation.
+   *
+   * @param token - The access token of the user.
+   * @returns A promise that resolves to true if the feature is enabled, false otherwise.
+   */
+  async waitForFeatureToBeEnabled(featureKey: FEATURE_KEY, teamId: string, token?: string): Promise<boolean> {
+    if (!token) {
+      throw new Error('Token is required to check for feature');
+    }
+
+    const timeout = 300000;
+    const interval = 1000;
+    const startTime = Date.now();
+
+    while (Date.now() - startTime < timeout) {
+      const isEnabled = await this.featureConfig.isFeatureEnabled(token, featureKey, teamId);
+      if (isEnabled) {
+        return true;
+      }
+      await new Promise(resolve => setTimeout(resolve, interval));
+    }
+
+    throw new Error(`${featureKey} feature is not enabled after waiting for ${timeout / 1000} seconds`);
+  }
+
   async createTeamOwner(user: User, teamName: string) {
     // 1. Book email
     await this.auth.bookEmail(user.email);
@@ -120,6 +148,11 @@ export class ApiManagerE2E {
   async enableConferenceCallingFeature(teamId: string) {
     await this.brig.unlockConferenceCallingFeature(teamId);
     await this.brig.enableConferenceCallingBackdoorViaBackdoorTeam(teamId);
+  }
+
+  async enableChannelsFeature(teamId: string) {
+    await this.brig.unlockChannelFeature(teamId);
+    await this.brig.enableChannelsFeature(teamId);
   }
 
   private extractCookieFromRegisterResponse(registerResponse: AxiosResponse): string {
