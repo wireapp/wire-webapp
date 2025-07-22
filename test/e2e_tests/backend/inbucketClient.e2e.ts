@@ -41,6 +41,8 @@ export class InbucketClientE2E {
   }
 
   async getVerificationCode(email: string) {
+    console.warn(`process.env.INBUCKET_USERNAME: ${this.inbucketUsername}`);
+    console.warn(`process.env.INBUCKET_PASSWORD: ${this.inbucketPassword}`);
     let verificationCode;
 
     let timeout = 0;
