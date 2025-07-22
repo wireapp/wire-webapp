@@ -80,10 +80,15 @@ test('Messages in 1:1', {tag: ['@TC-8750', '@crit-flow-web']}, async ({pageManag
 
   // Step 1: Log in as the users and open the 1:1
   await test.step('Log in as the users and open the 1:1', async () => {
+    await pageManager.openMainPage();
     await loginUser(memberA, pageManager);
+    await pageManager.webapp.modals.dataShareConsent().clickDecline();
+
     await pageManager.webapp.pages.conversationList().openConversation(memberB.fullName);
 
+    await memberBPM.openMainPage();
     await loginUser(memberB, memberBPM);
+    await memberBPM.webapp.modals.dataShareConsent().clickDecline();
   });
 
   // Step 2: Images
