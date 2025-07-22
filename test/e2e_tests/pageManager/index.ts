@@ -165,6 +165,7 @@ export class PageManager {
     components: {
       conversationSidebar: () =>
         this.getOrCreate('webapp.components.conversationSidebar', () => new ConversationSidebar(this.page)),
+      calling: () => this.getOrCreate('webapp.components.calling', () => new CallingPage(this.page)),
     },
   } as const;
 

@@ -22,21 +22,44 @@ import {Page, Locator} from '@playwright/test';
 export class CallingPage {
   readonly page: Page;
 
+  // Core call UI elements
   readonly callCell: Locator;
+  readonly fullScreen: Locator;
+  readonly goFullScreen: Locator;
+
   readonly acceptCallButton: Locator;
   readonly toggleVideoButton: Locator;
   readonly toggleMuteButton: Locator;
   readonly toggleScreenShareButton: Locator;
   readonly leaveCallButton: Locator;
 
+  // Participant and self state
+  readonly fullScreenMuteButton: Locator;
+  readonly fullScreenGridTileMuteIcon: Locator;
+  readonly selfVideoThumbnail: Locator;
+  readonly participantNameLocator: Locator;
+
   constructor(page: Page) {
     this.page = page;
+
+    // UI Elements
     this.callCell = page.locator('[data-uie-name="item-call"]');
+    this.fullScreen = page.locator('.video-calling-wrapper');
+    this.goFullScreen = page.locator('[data-uie-name="do-maximize-call"]');
     this.acceptCallButton = this.callCell.locator('[data-uie-name="do-call-controls-call-accept"]');
+    this.leaveCallButton = this.callCell.locator('[data-uie-name="do-call-controls-call-leave"]');
+
+    // Mute / Unmute control
+    this.fullScreenMuteButton = page.locator('[data-uie-name="do-call-controls-video-call-mute"]');
+    this.fullScreenGridTileMuteIcon = page.locator('[data-uie-name="mic-icon-off"]');
+
     this.toggleVideoButton = this.callCell.locator('[data-uie-name="do-toggle-video"]');
     this.toggleMuteButton = this.callCell.locator('[data-uie-name="do-toggle-mute"]');
     this.toggleScreenShareButton = this.callCell.locator('[data-uie-name="do-call-controls-toggle-screenshare"]');
-    this.leaveCallButton = this.callCell.locator('[data-uie-name="do-call-controls-call-leave"]');
+
+    // Participant visibility
+    this.selfVideoThumbnail = page.locator('[data-uie-name="self-video-thumbnail-wrapper"]');
+    this.participantNameLocator = page.locator('[data-uie-name="call-participant-name"]');
   }
 
   async clickAcceptCallButton() {
@@ -53,5 +76,86 @@ export class CallingPage {
 
   async clickLeaveCallButton() {
     await this.leaveCallButton.click();
+  }
+
+  // ─── Visibility and Waits ───────────────────────────────────────────────
+
+  isCellVisible(): Promise<boolean> {
+    return this.callCell.isVisible();
+  }
+
+  waitForCell(): Promise<void> {
+    return this.callCell.waitFor({state: 'visible', timeout: 5000});
+  }
+
+  isFullScreenVisible(): Promise<boolean> {
+    return this.fullScreen.isVisible();
+  }
+
+  waitForGoFullScreen(): Promise<void> {
+    return this.goFullScreen.waitFor({state: 'visible', timeout: 10000});
+  }
+
+  waitForSelfVideoThumbnail(): Promise<void> {
+    return this.selfVideoThumbnail.waitFor({state: 'visible', timeout: 10000});
+  }
+
+  selfVideoThumbnailVisible(): Promise<boolean> {
+    return this.selfVideoThumbnail.isVisible();
+  }
+
+  // ─── Fullscreen Controls ────────────────────────────────────────────────
+
+  maximizeCell(): Promise<void> {
+    return this.goFullScreen.click();
+  }
+
+  // ─── Mute Controls ──────────────────────────────────────────────────────
+
+  async isSelfUserMutedInFullScreen(): Promise<boolean> {
+    const state = await this.fullScreenMuteButton.getAttribute('data-uie-value');
+    return state === 'active';
+  }
+
+  muteSelfInFullScreen(): Promise<void> {
+    return this.fullScreenMuteButton.click();
+  }
+
+  unmuteSelfInFullScreen(): Promise<void> {
+    return this.fullScreenMuteButton.click();
+  }
+
+  isFullScreenMuteButtonVisible(): Promise<boolean> {
+    return this.fullScreenMuteButton.isVisible();
+  }
+
+  // ─── Participant Verification ───────────────────────────────────────────
+
+  async waitForParticipantNameToBeVisible(userId?: string): Promise<void> {
+    if (!userId) {
+      throw new Error('User ID is required to verify participant visibility.');
+    }
+
+    await this.page.locator(CallingPage.selectorForParticipantName(userId)).waitFor({state: 'visible', timeout: 20000});
+  }
+
+  // ─── Mute State for Other Users ─────────────────────────────────────────
+
+  waitForGridTileMuteIconToBeVisibleForUser(userId: string): Promise<void> {
+    return this.page.locator(CallingPage.selectorForMuteIcon(userId)).waitFor({state: 'visible', timeout: 10000});
+  }
+
+  isGridTileMuteIconVisibleForUser(userId: string): Promise<boolean> {
+    return this.page.locator(CallingPage.selectorForMuteIcon(userId)).isVisible();
+  }
+
+  // ─── Dynamic Selector Generators ─────────────────────────────────────────
+
+  static selectorForParticipantName(userId: string): string {
+    return `[data-uie-name="call-participant-name"][data-uie-value="${userId}"]`;
+  }
+
+  static selectorForMuteIcon(userId: string): string {
+    return `[data-uie-name="mic-icon-off"][data-uie-value="${userId}"]`;
   }
 }
