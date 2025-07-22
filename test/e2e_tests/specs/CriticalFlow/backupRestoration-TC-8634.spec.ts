@@ -39,7 +39,7 @@ test('Setting up new device with a backup', {tag: ['@TC-8634', '@crit-flow-web']
     if (password) {
       await modals.exportBackup().enterPassword(password);
     }
-    await modals.exportBackup().clickPrimaryButton();
+    await modals.exportBackup().clickBackUpNow();
     expect(modals.exportBackup().isTitleHidden()).toBeTruthy();
     expect(pages.historyExport().isVisible()).toBeTruthy();
     const [download] = await Promise.all([
@@ -88,7 +88,16 @@ test('Setting up new device with a backup', {tag: ['@TC-8634', '@crit-flow-web']
     await components.conversationSidebar().clickPreferencesButton();
     await pages.account().backupFileInput.setInputFiles(backupName);
     expect(pages.historyImport().importSuccessHeadline.isVisible()).toBeTruthy();
+  });
+
+  await test.step('User restores the previously created password protected backup', async () => {
+    await components.conversationSidebar().clickPreferencesButton();
     await pages.account().backupFileInput.setInputFiles(passwordProtectedBackupName);
+    expect(modals.importBackup().isTitleVisible()).toBeTruthy();
+    await modals.importBackup().enterPassword(user.password);
+    await modals.importBackup().clickContinue();
+    expect(modals.importBackup().isTitleHidden()).toBeTruthy();
+    expect(pages.historyImport().importSuccessHeadline.isVisible()).toBeTruthy();
   });
 });
 
