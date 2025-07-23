@@ -17,11 +17,23 @@
  *
  */
 
-import {BackendClientE2E} from './backendClient.e2e';
+import axios, {AxiosInstance} from 'axios';
 
 const BASIC_AUTH = process.env.BASIC_AUTH;
 
-export class BrigRepositoryE2E extends BackendClientE2E {
+export class BrigRepositoryE2E {
+  readonly axiosInstance: AxiosInstance;
+
+  constructor() {
+    this.axiosInstance = axios.create({
+      baseURL: process.env.BACKEND_URL,
+      withCredentials: true,
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+  }
+
   public async getActivationCodeForEmail(email: string): Promise<string> {
     const activationCodeResponse = await this.axiosInstance.get(`/i/users/activation-code`, {
       params: {email: email},
