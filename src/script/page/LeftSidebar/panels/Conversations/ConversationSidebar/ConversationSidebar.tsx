@@ -20,9 +20,10 @@
 import {ChevronIcon, IconButton} from '@wireapp/react-ui-kit';
 
 import {FadingScrollbar} from 'Components/FadingScrollbar';
-import {ConversationRepository} from 'src/script/conversation/ConversationRepository';
-import {ConversationState} from 'src/script/conversation/ConversationState';
-import {Conversation} from 'src/script/entity/Conversation';
+import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
+import {ConversationState} from 'Repositories/conversation/ConversationState';
+import {Conversation} from 'Repositories/entity/Conversation';
+import {User} from 'Repositories/entity/User';
 
 import {
   conversationsSidebarHandleStyles,
@@ -30,7 +31,6 @@ import {
   conversationsSidebarHandleIconStyles,
 } from './ConversationSidebar.styles';
 
-import {User} from '../../../../../entity/User';
 import {ContentState} from '../../../../useAppState';
 import {UserDetails} from '../../../UserDetails';
 import {ConversationTabs} from '../ConversationTabs';

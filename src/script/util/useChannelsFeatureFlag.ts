@@ -21,10 +21,11 @@ import {AccessType, FEATURE_KEY, FeatureStatus, Role} from '@wireapp/api-client/
 import {container} from 'tsyringe';
 
 import {Config} from 'src/script/Config';
-import {TeamState} from 'src/script/team/TeamState';
+import {TeamState} from 'src/script/repositories/team/TeamState';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 
 import {Core} from '../service/CoreSingleton';
+
 const accessTypeRoleMap = {
   [AccessType.ADMINS]: [Role.ADMIN, Role.OWNER],
   [AccessType.TEAM_MEMBERS]: [Role.ADMIN, Role.MEMBER, Role.OWNER],

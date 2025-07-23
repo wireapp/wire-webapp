@@ -20,7 +20,7 @@
 import {ChangeEvent, FormEvent, MouseEvent, useState} from 'react';
 
 import {CellNode} from 'Components/Conversation/ConversationCells/common/cellNode/cellNode';
-import {CellsRepository} from 'src/script/cells/CellsRepository';
+import {CellsRepository} from 'Repositories/cells/CellsRepository';
 import {t} from 'Util/LocalizerUtil';
 import {getFileExtension, trimFileExtension} from 'Util/util';
 

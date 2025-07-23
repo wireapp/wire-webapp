@@ -19,7 +19,7 @@
 
 import {useRef, useState} from 'react';
 
-import {FileAsset} from 'src/script/entity/message/FileAsset';
+import {FileAsset} from 'Repositories/entity/message/FileAsset';
 import {createUuid} from 'Util/uuid';
 
 import {svgStyles, svgStylesDisabled} from './AudioSeekBar.styles';

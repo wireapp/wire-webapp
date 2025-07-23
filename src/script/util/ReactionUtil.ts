@@ -19,9 +19,9 @@
 
 import type {QualifiedId} from '@wireapp/api-client/lib/user';
 
-import {matchQualifiedIds} from './QualifiedId';
+import {ReactionMap, UserReactionMap} from 'Repositories/storage';
 
-import {ReactionMap, UserReactionMap} from '../storage';
+import {matchQualifiedIds} from './QualifiedId';
 
 function isReactionMap(reactions: UserReactionMap | ReactionMap): reactions is ReactionMap {
   return Array.isArray(reactions);
