@@ -21,10 +21,10 @@ import {Locator, Page} from '@playwright/test';
 
 import {selectByDataAttribute} from 'test/e2e_tests/utils/useSelector';
 
-export class ExportBackupModal {
+export class importBackupModal {
   readonly page: Page;
 
-  readonly exportBackupModal: Locator;
+  readonly importBackupModal: Locator;
   readonly title: Locator;
   readonly passwordInput: Locator;
   readonly primaryButton: Locator;
@@ -33,11 +33,11 @@ export class ExportBackupModal {
   constructor(page: Page) {
     this.page = page;
 
-    this.exportBackupModal = page.locator(selectByDataAttribute('primary-modals-container'));
-    this.title = this.exportBackupModal.locator(selectByDataAttribute('status-modal-title'));
-    this.passwordInput = this.exportBackupModal.locator(selectByDataAttribute('backup-password'));
-    this.primaryButton = this.exportBackupModal.locator(selectByDataAttribute('do-action'));
-    this.secondaryButton = this.exportBackupModal.locator(selectByDataAttribute('do-secondary'));
+    this.importBackupModal = page.locator(selectByDataAttribute('primary-modals-container'));
+    this.title = this.importBackupModal.locator(selectByDataAttribute('status-modal-title'));
+    this.passwordInput = this.importBackupModal.locator(selectByDataAttribute('backup-password'));
+    this.primaryButton = this.importBackupModal.locator(selectByDataAttribute('do-action'));
+    this.secondaryButton = this.importBackupModal.locator(selectByDataAttribute('do-secondary'));
   }
 
   async isTitleVisible() {
@@ -48,7 +48,7 @@ export class ExportBackupModal {
     await this.title.waitFor({state: 'hidden'});
   }
 
-  async clickBackUpNow() {
+  async clickContinue() {
     await this.primaryButton.click();
   }
 
