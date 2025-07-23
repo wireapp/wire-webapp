@@ -42,7 +42,7 @@ for (const suite of report.suites) {
       if (!hasPassed) {
         const lastResult = test.results[test.results.length - 1];
 
-        if (lastResult.status !== 'passed') {
+        if (lastResult.status !== 'passed' && lastResult.status !== 'skipped') {
           // Show only the last (final) failure
           let failureInfo = `<details> \n <summary> ❌ ${title} </summary><br> \n\n  Location: **${specLocation}**\n  Duration: **${lastResult.duration}ms**\n`;
 

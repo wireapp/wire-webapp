@@ -98,7 +98,7 @@ test(
       await memberCalling.waitForCell();
       expect(await memberCalling.isCellVisible()).toBeTruthy();
 
-      await memberCalling.pickUpIncomingCall();
+      await memberCalling.clickAcceptCallButton();
       expect(await memberCalling.isCellVisible()).toBeTruthy();
 
       await memberCalling.waitForGoFullScreen();

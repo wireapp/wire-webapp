@@ -23,10 +23,15 @@ export class CallingPage {
   readonly page: Page;
 
   // Core call UI elements
-  readonly cell: Locator;
+  readonly callCell: Locator;
   readonly fullScreen: Locator;
   readonly goFullScreen: Locator;
-  readonly pickUpIncomingCallButton: Locator;
+
+  readonly acceptCallButton: Locator;
+  readonly toggleVideoButton: Locator;
+  readonly toggleMuteButton: Locator;
+  readonly toggleScreenShareButton: Locator;
+  readonly leaveCallButton: Locator;
 
   // Participant and self state
   readonly fullScreenMuteButton: Locator;
@@ -38,28 +43,49 @@ export class CallingPage {
     this.page = page;
 
     // UI Elements
-    this.cell = page.locator('[data-uie-name="item-call"]');
+    this.callCell = page.locator('[data-uie-name="item-call"]');
     this.fullScreen = page.locator('.video-calling-wrapper');
     this.goFullScreen = page.locator('[data-uie-name="do-maximize-call"]');
-    this.pickUpIncomingCallButton = page.locator('[data-uie-name="do-call-controls-call-accept"]');
+    this.acceptCallButton = this.callCell.locator('[data-uie-name="do-call-controls-call-accept"]');
+    this.leaveCallButton = this.callCell.locator('[data-uie-name="do-call-controls-call-leave"]');
 
-    // Mute / Unmute controls
+    // Mute / Unmute control
     this.fullScreenMuteButton = page.locator('[data-uie-name="do-call-controls-video-call-mute"]');
     this.fullScreenGridTileMuteIcon = page.locator('[data-uie-name="mic-icon-off"]');
+
+    this.toggleVideoButton = this.callCell.locator('[data-uie-name="do-toggle-video"]');
+    this.toggleMuteButton = this.callCell.locator('[data-uie-name="do-toggle-mute"]');
+    this.toggleScreenShareButton = this.callCell.locator('[data-uie-name="do-call-controls-toggle-screenshare"]');
 
     // Participant visibility
     this.selfVideoThumbnail = page.locator('[data-uie-name="self-video-thumbnail-wrapper"]');
     this.participantNameLocator = page.locator('[data-uie-name="call-participant-name"]');
   }
 
+  async clickAcceptCallButton() {
+    await this.acceptCallButton.click();
+  }
+
+  async clickToggleVideoButton() {
+    await this.toggleVideoButton.click();
+  }
+
+  async clickToggleScreenShareButton() {
+    await this.toggleScreenShareButton.click();
+  }
+
+  async clickLeaveCallButton() {
+    await this.leaveCallButton.click();
+  }
+
   // ─── Visibility and Waits ───────────────────────────────────────────────
 
   isCellVisible(): Promise<boolean> {
-    return this.cell.isVisible();
+    return this.callCell.isVisible();
   }
 
   waitForCell(): Promise<void> {
-    return this.cell.waitFor({state: 'visible', timeout: 5000});
+    return this.callCell.waitFor({state: 'visible', timeout: 5000});
   }
 
   isFullScreenVisible(): Promise<boolean> {
@@ -82,10 +108,6 @@ export class CallingPage {
 
   maximizeCell(): Promise<void> {
     return this.goFullScreen.click();
-  }
-
-  pickUpIncomingCall(): Promise<void> {
-    return this.pickUpIncomingCallButton.click();
   }
 
   // ─── Mute Controls ──────────────────────────────────────────────────────
