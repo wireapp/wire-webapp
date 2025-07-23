@@ -49,12 +49,20 @@ export class StartUIPage {
 
   private async clickUserFromSearchResults(username: string) {
     await this.searchResults.first().waitFor({state: 'visible'});
-    for (const result of await this.searchResults.all()) {
-      const text = await result.textContent();
-      if (text?.includes(username)) {
-        await result.click();
-        return;
+
+    const timeout = 30000;
+    const delayBetweenAttempts = 500;
+    const maxAttempts = timeout / delayBetweenAttempts;
+
+    for (let attempt = 0; attempt < maxAttempts; attempt++) {
+      for (const result of await this.searchResults.all()) {
+        const text = await result.textContent();
+        if (text?.includes(username)) {
+          await result.click();
+          return;
+        }
       }
+      await new Promise(resolve => setTimeout(resolve, delayBetweenAttempts));
     }
     throw new Error(`User ${username} not found in search results`);
   }
