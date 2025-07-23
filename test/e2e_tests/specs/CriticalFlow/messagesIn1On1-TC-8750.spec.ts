@@ -35,7 +35,8 @@ const teamBName = 'Critical B';
 
 let memberBPM: PageManager;
 
-test('Messages in 1:1', {tag: ['@TC-8750', '@crit-flow-web']}, async ({pageManager, api, browser}) => {
+// Skipping for now. To be finished in the scope of [WPB-18785]
+test.skip('Messages in 1:1', {tag: ['@TC-8750', '@crit-flow-web']}, async ({pageManager, api, browser}) => {
   test.slow(); // Increasing test timeout to 90 seconds to accommodate the full flow
 
   // Step 0: Preconditions

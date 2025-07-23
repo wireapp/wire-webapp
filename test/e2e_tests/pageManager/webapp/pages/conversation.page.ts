@@ -30,6 +30,7 @@ export class ConversationPage {
   readonly createGroupSubmitButton: Locator;
   readonly messageInput: Locator;
   readonly sendMessageButton: Locator;
+  readonly conversationTitle: Locator;
   readonly watermark: Locator;
   readonly timerMessageButton: Locator;
   readonly timerTenSecondsButton: Locator;
@@ -41,6 +42,8 @@ export class ConversationPage {
   readonly removeUserButton: Locator;
   readonly addMemberButton: Locator;
   readonly systemMessages: Locator;
+  readonly callButton: Locator;
+  readonly conversationInfoButton: Locator;
 
   constructor(page: Page) {
     this.page = page;
@@ -52,6 +55,7 @@ export class ConversationPage {
     this.messageInput = page.locator(selectByDataAttribute('input-message'));
     this.watermark = page.locator(`${selectByDataAttribute('no-conversation')} svg`);
     this.sendMessageButton = page.locator(selectByDataAttribute('do-send-message'));
+    this.conversationTitle = page.locator('[data-uie-name="status-conversation-title-bar-label"]');
     this.openGroupInformationViaName = page.locator(selectByDataAttribute('status-conversation-title-bar-label'));
     this.timerMessageButton = page.locator(selectByDataAttribute('do-set-ephemeral-timer'));
     this.timerTenSecondsButton = page.locator(selectById('btn-10-seconds'));
@@ -64,6 +68,8 @@ export class ConversationPage {
     this.systemMessages = page.locator(
       `${selectByDataAttribute('item-message')}${selectByClass('system-message')} ${selectByClass('message-header')}`,
     );
+    this.callButton = page.locator(selectByDataAttribute('do-call'));
+    this.conversationInfoButton = page.locator(selectByDataAttribute('do-open-info'));
   }
 
   async isConversationOpen(conversationName: string) {
@@ -71,6 +77,18 @@ export class ConversationPage {
       (await this.page.locator(selectByDataAttribute('status-conversation-title-bar-label')).textContent()) ===
       conversationName
     );
+  }
+
+  async clickConversationTitle() {
+    await this.conversationTitle.click();
+  }
+
+  async clickConversationInfoButton() {
+    await this.conversationInfoButton.click();
+  }
+
+  async clickCallButton() {
+    await this.callButton.click();
   }
 
   async isWatermarkVisible() {
