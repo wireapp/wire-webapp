@@ -24,7 +24,7 @@ import {loginUser} from '../../utils/userActions';
 import {generateSecurePassword} from '../../utils/userDataGenerator';
 
 // Generating test data
-const owner = getUser();
+let owner = getUser();
 const member = getUser();
 const teamName = 'Critical';
 const conversationName = 'Tracking';
@@ -37,20 +37,20 @@ test('Account Management', {tag: ['@TC-8639', '@crit-flow-web']}, async ({pageMa
 
   // Creating preconditions for the test via API
   await test.step('Preconditions: Creating preconditions for the test via API', async () => {
-    await api.createTeamOwner(owner, teamName);
+    const user = await api.createTeamOwner(owner, teamName);
     if (!owner.token) {
       throw new Error(`Owner ${owner.username} has no token and can't be used for team creation`);
     }
-    const teamId = await api.team.getTeamIdForUser(owner);
-    addCreatedTeam(owner, teamId);
+    owner = {...owner, ...user};
+    addCreatedTeam(owner, owner.teamId);
     const invitationId = await api.team.inviteUserToTeam(member.email, owner);
-    const invitationCode = await api.brig.getTeamInvitationCodeForEmail(teamId, invitationId);
+    const invitationCode = await api.brig.getTeamInvitationCodeForEmail(owner.teamId, invitationId);
 
     await api.createPersonalUser(member, invitationCode);
     if (!member.id) {
       throw new Error(`Member ${member.username} has no ID and can't be invited to the conversation`);
     }
-    await api.conversation.inviteToConversation(member.id, owner.token, teamId, conversationName);
+    await api.conversation.inviteToConversation(member.id, owner.token, owner.teamId, conversationName);
   });
 
   // Test steps

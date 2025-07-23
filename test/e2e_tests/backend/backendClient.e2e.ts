@@ -17,14 +17,16 @@
  *
  */
 
+import {MINIMUM_API_VERSION} from '@wireapp/api-client/lib/Config';
 import axios, {AxiosInstance} from 'axios';
 
+const TEST_API_VERSION = `v${MINIMUM_API_VERSION}`;
 export class BackendClientE2E {
   readonly axiosInstance: AxiosInstance;
 
   constructor() {
     this.axiosInstance = axios.create({
-      baseURL: process.env.BACKEND_URL,
+      baseURL: `${process.env.BACKEND_URL}${TEST_API_VERSION}/`,
       withCredentials: true,
       headers: {
         'Content-Type': 'application/json',
