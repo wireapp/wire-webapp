@@ -28,7 +28,7 @@ CALLING_SERVICE_URL=op://Test Automation/CALLINGSERVICE_BASIC_AUTH/website
 CALLING_SERVICE_BASIC_AUTH=op://Test Automation/CALLINGSERVICE_BASIC_AUTH/basicAuth
 
 INBUCKET_USERNAME=op://Test Automation/BackendConnection staging/inbucketUsername
-INBUCKET_PASSWORD=op://Test Automation/BackendConnection staging/inbucketPassword
+INBUCKET_PASSWORD="{{ op://Test Automation/BackendConnection staging/inbucketPassword }}"
 INBUCKET_URL=op://Test Automation/BackendConnection staging/inbucketUrl
 BACKEND_URL=op://Test Automation/BackendConnection staging/backendUrl
 WEBAPP_URL=op://Test Automation/BackendConnection staging/webappUrl

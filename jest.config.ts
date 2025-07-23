@@ -28,6 +28,7 @@ const config: Config = {
     'Components/(.*)': '<rootDir>/src/script/components/$1',
     'Hooks/(.*)': '<rootDir>/src/script/hooks/$1',
     'I18n/(.*)': '<rootDir>/src/i18n/$1',
+    'Repositories/(.*)': '<rootDir>/src/script/repositories/$1',
     'Resource/(.*)': '<rootDir>/resource/$1',
     'Util/(.*)': '<rootDir>/src/script/util/$1',
     '^react(.*)$': '<rootDir>/node_modules/react$1',

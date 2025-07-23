@@ -26,9 +26,10 @@ import {Button, ButtonVariant, Link, LinkVariant} from '@wireapp/react-ui-kit';
 
 import * as Icon from 'Components/Icon';
 import {getUserName} from 'Components/UserName';
+import {FailedToAddUsersMessage as FailedToAddUsersMessageEntity} from 'Repositories/entity/message/FailedToAddUsersMessage';
+import {User} from 'Repositories/entity/User';
+import {UserState} from 'Repositories/user/UserState';
 import {Config} from 'src/script/Config';
-import {User} from 'src/script/entity/User';
-import {UserState} from 'src/script/user/UserState';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 import {matchQualifiedIds} from 'Util/QualifiedId';
@@ -36,8 +37,6 @@ import {matchQualifiedIds} from 'Util/QualifiedId';
 import {backendErrorLink, warning} from './ContentMessage/Warnings/Warnings.styles';
 import {MessageTime} from './MessageTime';
 import {useMessageFocusedTabIndex} from './util';
-
-import {FailedToAddUsersMessage as FailedToAddUsersMessageEntity} from '../../../entity/message/FailedToAddUsersMessage';
 
 export interface FailedToAddUsersMessageProps {
   isMessageFocused: boolean;

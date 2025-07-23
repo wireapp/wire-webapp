@@ -19,14 +19,13 @@
 
 import type {QualifiedId} from '@wireapp/api-client/lib/user/';
 
-import {ReactionMap} from 'src/script/storage';
+import {User} from 'Repositories/entity/User';
+import {ReactionMap} from 'Repositories/storage';
 import {getEmojiUnicode} from 'Util/EmojiUtil';
 import {matchQualifiedIds} from 'Util/QualifiedId';
 
 import {EmojiPill} from './EmojiPill';
 import {messageReactionWrapper} from './MessageReactions.styles';
-
-import {User} from '../../../../../../entity/User';
 
 export interface MessageReactionsListProps {
   reactions: ReactionMap;
