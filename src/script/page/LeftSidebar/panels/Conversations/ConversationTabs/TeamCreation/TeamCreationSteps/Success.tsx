@@ -22,9 +22,9 @@ import {amplify} from 'amplify';
 import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
+import {EventName} from 'Repositories/tracking/EventName';
+import {Segmentation} from 'Repositories/tracking/Segmentation';
 import {Config} from 'src/script/Config';
-import {EventName} from 'src/script/tracking/EventName';
-import {Segmentation} from 'src/script/tracking/Segmentation';
 import {t} from 'Util/LocalizerUtil';
 import {safeWindowOpen} from 'Util/SanitizationUtil';
 

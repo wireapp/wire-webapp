@@ -25,7 +25,13 @@ import cx from 'classnames';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {ZoomableImage} from 'Components/ZoomableImage';
-import {User} from 'src/script/entity/User';
+import {AssetRepository} from 'Repositories/assets/AssetRepository';
+import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
+import {MessageRepository} from 'Repositories/conversation/MessageRepository';
+import {Conversation} from 'Repositories/entity/Conversation';
+import {ContentMessage} from 'Repositories/entity/message/ContentMessage';
+import {MediumImage} from 'Repositories/entity/message/MediumImage';
+import {User} from 'Repositories/entity/User';
 import {handleKeyDown, KEY} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
 import {renderElement} from 'Util/renderElement';
@@ -35,12 +41,6 @@ import {waitFor} from 'Util/waitFor';
 import {DetailViewModalFooter} from './DetailViewModalFooter';
 import {DetailViewModalHeader} from './DetailViewModalHeader';
 
-import {AssetRepository} from '../../../assets/AssetRepository';
-import {ConversationRepository} from '../../../conversation/ConversationRepository';
-import {MessageRepository} from '../../../conversation/MessageRepository';
-import {Conversation} from '../../../entity/Conversation';
-import {ContentMessage} from '../../../entity/message/ContentMessage';
-import {MediumImage} from '../../../entity/message/MediumImage';
 import {isContentMessage} from '../../../guards/Message';
 import {MessageCategory} from '../../../message/MessageCategory';
 import {isOfCategory} from '../../../page/MainContent/panels/Collection/utils';

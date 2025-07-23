@@ -29,6 +29,7 @@
       "Components/*": ["./src/script/components/*"],
       "Hooks/*": ["./src/script/hooks/*"],
       "I18n/*": ["./src/i18n/*"],
+      "Repositories/*": ["./src/script/repositories/*"],
       "Resource/*": ["./resource/*"],
       "Util/*": ["./src/script/util/*"]
     },

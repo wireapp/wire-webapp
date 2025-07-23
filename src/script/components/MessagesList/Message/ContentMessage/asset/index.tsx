@@ -20,12 +20,16 @@
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 import cx from 'classnames';
 
-import {Asset} from 'src/script/entity/message/Asset';
-import type {FileAsset as FileAssetType} from 'src/script/entity/message/FileAsset';
-import type {Location} from 'src/script/entity/message/Location';
-import type {MediumImage} from 'src/script/entity/message/MediumImage';
-import {Multipart} from 'src/script/entity/message/Multipart';
-import {Text} from 'src/script/entity/message/Text';
+import {AssetType} from 'Repositories/assets/AssetType';
+import {Asset} from 'Repositories/entity/message/Asset';
+import {Button} from 'Repositories/entity/message/Button';
+import {CompositeMessage} from 'Repositories/entity/message/CompositeMessage';
+import {ContentMessage} from 'Repositories/entity/message/ContentMessage';
+import type {FileAsset as FileAssetType} from 'Repositories/entity/message/FileAsset';
+import type {Location} from 'Repositories/entity/message/Location';
+import type {MediumImage} from 'Repositories/entity/message/MediumImage';
+import {Multipart} from 'Repositories/entity/message/Multipart';
+import {Text} from 'Repositories/entity/message/Text';
 import {StatusType} from 'src/script/message/StatusType';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {includesOnlyEmojis} from 'Util/EmojiUtil';
@@ -41,10 +45,6 @@ import {TextMessageRenderer} from './TextMessageRenderer';
 import {VideoAsset} from './VideoAsset/VideoAsset';
 
 import {MessageActions} from '../..';
-import {AssetType} from '../../../../../assets/AssetType';
-import {Button} from '../../../../../entity/message/Button';
-import {CompositeMessage} from '../../../../../entity/message/CompositeMessage';
-import {ContentMessage} from '../../../../../entity/message/ContentMessage';
 import {ReadIndicator} from '../../ReadIndicator';
 
 interface ContentAssetProps {

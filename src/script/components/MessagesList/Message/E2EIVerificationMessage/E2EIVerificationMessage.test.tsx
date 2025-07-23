@@ -19,14 +19,14 @@
 
 import {render} from '@testing-library/react';
 
-import {E2EIVerificationMessage as VerificationMessageEntity} from 'src/script/entity/message/E2EIVerificationMessage';
+import {Conversation} from 'Repositories/entity/Conversation';
+import {E2EIVerificationMessage as VerificationMessageEntity} from 'Repositories/entity/message/E2EIVerificationMessage';
+import {User} from 'Repositories/entity/User';
 import {E2EIVerificationMessageType} from 'src/script/message/E2EIVerificationMessageType';
 
 import {E2EIVerificationMessage} from './E2EIVerificationMessage';
 
 import {withTheme} from '../../../../auth/util/test/TestUtil';
-import {Conversation} from '../../../../entity/Conversation';
-import {User} from '../../../../entity/User';
 
 const createVerificationMessage = (partialVerificationMessage: Partial<VerificationMessageEntity>) => {
   const verificationMessage: Partial<VerificationMessageEntity> = {
