@@ -103,6 +103,7 @@ test(
         const response = await api.callingService.createInstance(ownerB.password, ownerB.email);
         callingServiceInstanceId = response.id;
         await api.callingService.setAcceptNextCall(callingServiceInstanceId);
+        await api.callingService.waitForInstanceToBeActive(callingServiceInstanceId);
 
         await ownerAPages.conversationList().openConversation(ownerB.fullName);
         await ownerAPages.conversation().clickConversationInfoButton();
