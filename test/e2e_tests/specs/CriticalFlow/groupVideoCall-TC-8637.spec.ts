@@ -138,8 +138,8 @@ test('Group Video call', {tag: ['@TC-8637', '@crit-flow']}, async ({browser, pag
     await ownerPages.conversation().clickCallButton();
   });
 
-  await test.step('User B and User C answer call from calling notification', async () => {
-    // User B answers the call automatically with the help of Calling Service
+  await test.step('Team member and guest user answer call from calling notification', async () => {
+    // Team member answers the call automatically with the help of Calling Service
     await guestPages.calling().clickAcceptCallButton();
   });
 
