@@ -17,13 +17,30 @@
  *
  */
 
+import {Locator, Page} from '@playwright/test';
+
+import {readFile} from 'fs';
 import path from 'path';
+
+export const DownloadFilePath = './test-results/downloads/';
 
 const e2eRootDir = path.join(__dirname, '../');
 const fileTransferAssetsDir = path.join(e2eRootDir, 'assets/filetransfer');
 const VideoFileName = 'example.mp4';
 const AudioFileName = 'example.mp3';
 const TextFileName = 'example.txt';
+
+export const readLocalFile = (filePath: string): Promise<Buffer> => {
+  return new Promise<Buffer>((resolve, reject) => {
+    readFile(filePath, (err, data) => {
+      if (err) {
+        reject(err);
+      } else {
+        resolve(data);
+      }
+    });
+  });
+};
 
 export const getVideoFilePath = () => {
   return path.join(fileTransferAssetsDir, VideoFileName);
@@ -35,4 +52,22 @@ export const getAudioFilePath = () => {
 
 export const getTextFilePath = () => {
   return path.join(fileTransferAssetsDir, TextFileName);
+};
+
+export const downloadAssetAndGetFilePath = async (page: Page, downloadButtonLocator: Locator): Promise<string> => {
+  const downloadPromise = page.waitForEvent('download');
+  await downloadButtonLocator.click();
+  const download = await downloadPromise;
+  const filePath = `${DownloadFilePath}${download.suggestedFilename()}`;
+  await download.saveAs(filePath);
+  return filePath;
+};
+
+export const isAssetDownloaded = async (filePath: string): Promise<boolean> => {
+  try {
+    const file = await readLocalFile(filePath);
+    return !!file;
+  } catch (error) {
+    return false;
+  }
 };

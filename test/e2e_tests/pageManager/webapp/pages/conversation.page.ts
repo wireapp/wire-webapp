@@ -20,7 +20,8 @@
 import {Locator, Page} from '@playwright/test';
 
 import {User} from 'test/e2e_tests/data/user';
-import {selectByDataAttribute, selectById, selectByClass} from 'test/e2e_tests/utils/useSelector';
+import {downloadAssetAndGetFilePath} from 'test/e2e_tests/utils/asset.util';
+import {selectById, selectByClass, selectByDataAttribute} from 'test/e2e_tests/utils/selector.util';
 
 export class ConversationPage {
   readonly page: Page;
@@ -73,6 +74,7 @@ export class ConversationPage {
   async sendMessage(message: string) {
     await this.messageInput.fill(message);
     await this.messageInput.press('Enter');
+    await this.page.waitForTimeout(5000); // Wait for the message to be sent
   }
 
   async createGroup(groupName: string) {
@@ -96,8 +98,6 @@ export class ConversationPage {
   }
 
   async isMessageVisible(messageText: string) {
-    // Trying multiple times for the message to appear
-
     const locator = this.page.locator(
       `${selectByDataAttribute('item-message')} ${selectByClass('message-body')}:not(:has(p${selectByClass('text-foreground')}))`,
     );
@@ -109,12 +109,10 @@ export class ConversationPage {
 
     for (const message of messages) {
       const messageTextContent = await message.textContent();
-      if (messageTextContent !== messageText) {
-        continue;
+      if (messageTextContent?.trim() === messageText) {
+        return true;
       }
-      return true;
     }
-
     return false;
   }
 
@@ -169,6 +167,34 @@ export class ConversationPage {
     return await videoMessageLocator.isVisible();
   }
 
+  async playVideo() {
+    const videoPlayButton = this.page.locator(
+      `${selectByDataAttribute('item-message')} ${selectByDataAttribute('video-asset')} ${selectByDataAttribute('do-play-media')}`,
+    );
+
+    await videoPlayButton.click();
+  }
+
+  async playAudio() {
+    const audioPlayButton = this.page.locator(
+      `${selectByDataAttribute('item-message')} ${selectByDataAttribute('audio-asset')} ${selectByDataAttribute('do-play-media')}`,
+    );
+    await audioPlayButton.click();
+  }
+
+  async isAudioPlaying() {
+    const audioTimeLocator = this.page.locator(
+      `${selectByDataAttribute('item-message')} ${selectByDataAttribute('audio-asset')} ${selectByDataAttribute('status-audio-time')}`,
+    );
+
+    const audioTimeText = (await audioTimeLocator.textContent())?.trim();
+    if (!audioTimeText) {
+      throw new Error('Audio time text is empty or undefined');
+    }
+    const seconds = parseInt(audioTimeText.split(':')[1], 10);
+    return seconds > 0;
+  }
+
   async isAudioMessageVisible() {
     const audioMessageLocator = this.page.locator(
       `${selectByDataAttribute('item-message')} ${selectByDataAttribute('audio-asset')}`,
@@ -189,6 +215,15 @@ export class ConversationPage {
     await fileMessageLocator.first().waitFor({state: 'visible', timeout: 10_000});
 
     return await fileMessageLocator.isVisible();
+  }
+
+  async downloadFile() {
+    const downloadButton = this.page.locator(
+      `${selectByDataAttribute('item-message')} ${selectByDataAttribute('file-asset')}`,
+    );
+
+    const filePath = await downloadAssetAndGetFilePath(this.page, downloadButton);
+    return filePath;
   }
 
   async isConversationReadonly() {

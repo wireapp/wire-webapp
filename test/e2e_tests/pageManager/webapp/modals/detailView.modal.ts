@@ -19,8 +19,8 @@
 
 import {Locator, Page} from '@playwright/test';
 
-import {DownloadFilePath} from 'test/e2e_tests/test.constants';
-import {selectByDataAttribute, selectById} from 'test/e2e_tests/utils/useSelector';
+import {downloadAssetAndGetFilePath} from 'test/e2e_tests/utils/asset.util';
+import {selectById, selectByDataAttribute} from 'test/e2e_tests/utils/selector.util';
 
 export class DetailViewModal {
   readonly page: Page;
@@ -64,11 +64,6 @@ export class DetailViewModal {
   }
 
   async downloadAsset() {
-    const downloadPromise = this.page.waitForEvent('download');
-    await this.downloadButton.click();
-    const download = await downloadPromise;
-    const filePath = `${DownloadFilePath}${download.suggestedFilename()}`;
-    await download.saveAs(filePath);
-    return filePath;
+    return await downloadAssetAndGetFilePath(this.page, this.downloadButton);
   }
 }

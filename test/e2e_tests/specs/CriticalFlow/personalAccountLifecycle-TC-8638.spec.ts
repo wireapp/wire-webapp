@@ -17,9 +17,10 @@
  *
  */
 
+import {addCreatedUser, removeCreatedUser} from 'test/e2e_tests/utils/tearDown.util';
+
 import {getUser} from '../../data/user';
 import {test, expect} from '../../test.fixtures';
-import {addCreatedUser, removeCreatedUser} from '../../utils/tearDownUtil';
 
 // Generating test data
 // userB is the contact user, userA is the user who registers

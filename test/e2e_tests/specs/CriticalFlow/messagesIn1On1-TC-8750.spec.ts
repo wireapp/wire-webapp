@@ -19,13 +19,9 @@
 
 import {getUser} from 'test/e2e_tests/data/user';
 import {PageManager} from 'test/e2e_tests/pageManager';
-import {getAudioFilePath, getTextFilePath, getVideoFilePath} from 'test/e2e_tests/utils/sendFileHelper';
-import {
-  getImageFilePath,
-  getLocalQRCodeValue,
-  getQRCodeValueFromScreenshot,
-} from 'test/e2e_tests/utils/sendImageHelper';
-import {addCreatedTeam, removeCreatedTeam} from 'test/e2e_tests/utils/tearDownUtil';
+import {getVideoFilePath, getAudioFilePath, getTextFilePath, isAssetDownloaded} from 'test/e2e_tests/utils/asset.util';
+import {getImageFilePath, getLocalQRCodeValue, getQRCodeValueFromScreenshot} from 'test/e2e_tests/utils/sendImage.util';
+import {addCreatedTeam, removeCreatedTeam} from 'test/e2e_tests/utils/tearDown.util';
 import {loginUser} from 'test/e2e_tests/utils/userActions';
 
 import {test, expect} from '../../test.fixtures';
@@ -45,6 +41,8 @@ const audioFilePath = getAudioFilePath();
 const textFilePath = getTextFilePath();
 
 let memberBPM: PageManager;
+
+const selfDestructMessageText = 'This message will self-destruct in 10 seconds.';
 
 test('Messages in 1:1', {tag: ['@TC-8750', '@crit-flow-web']}, async ({pageManager, api, browser}) => {
   test.slow(); // Increasing test timeout to 90 seconds to accommodate the full flow
@@ -157,29 +155,56 @@ test('Messages in 1:1', {tag: ['@TC-8750', '@crit-flow-web']}, async ({pageManag
     await components.inputBarControls().clickShareFile(videoFilePath);
     expect(await pages.conversation().isVideoMessageVisible()).toBeTruthy();
   });
-  await test.step('User B can play the video', async () => {});
+  await test.step('User B can play the video', async () => {
+    await pages.conversation().playVideo();
+    // Wait for 5 seconds to ensure video starts playing
+    await pages.conversation().page.waitForTimeout(5000);
+    // ToDO: Bug -> Video is not loaded from the server, so we cannot check if it is playing
+  });
 
   // Step 5: Audio Files
   await test.step('User A sends audio file', async () => {
     await components.inputBarControls().clickShareFile(audioFilePath);
     expect(await pages.conversation().isAudioMessageVisible()).toBeTruthy();
   });
-  await test.step('User B can play the file', async () => {});
+  await test.step('User B can play the file', async () => {
+    await pages.conversation().playAudio();
+    // Wait for 5 seconds to ensure audio starts playing
+    await pages.conversation().page.waitForTimeout(5000);
+    expect(await pages.conversation().isAudioPlaying()).toBeTruthy();
+  });
 
   // Step 6: Ephemeral messages
-  await test.step('User A sends a quick (10 sec) self deleting message', async () => {});
-  await test.step('User B sees the message', async () => {});
+  await test.step('User A sends a quick (10 sec) self deleting message', async () => {
+    await components.inputBarControls().setEphemeralTimerTo('10 seconds');
+    await pages.conversation().sendMessage(selfDestructMessageText);
+    expect(await pages.conversation().isMessageVisible(selfDestructMessageText)).toBeTruthy();
+  });
+  await test.step('User B sees the message', async () => {
+    expect(await memberBPM.webapp.pages.conversation().isMessageVisible(selfDestructMessageText)).toBeTruthy();
+  });
 
   // Step 7: Message removal
-  await test.step('User B waits 10 seconds', async () => {});
-  await test.step('Both users see the message as removed', async () => {});
+  await test.step('Wait 11 seconds', async () => {
+    await memberBPM.webapp.pages.conversation().page.waitForTimeout(11_000);
+  });
+  await test.step('Both users see the message as removed', async () => {
+    expect(await memberBPM.webapp.pages.conversation().isMessageVisible(selfDestructMessageText)).toBeFalsy();
+    expect(await pages.conversation().isMessageVisible(selfDestructMessageText)).toBeFalsy();
+
+    // Reset ephemeral timer to 'Off'
+    await components.inputBarControls().setEphemeralTimerTo('Off');
+  });
 
   // Step 8: Asset sharing
   await test.step('User A sends asset', async () => {
     await components.inputBarControls().clickShareFile(textFilePath);
     expect(await pages.conversation().isFileMessageVisible()).toBeTruthy();
   });
-  await test.step('User B can download the file', async () => {});
+  await test.step('User B can download the file', async () => {
+    const filePath = await memberBPM.webapp.pages.conversation().downloadFile();
+    expect(await isAssetDownloaded(filePath)).toBeTruthy();
+  });
 });
 
 test.afterAll(async ({api}) => {

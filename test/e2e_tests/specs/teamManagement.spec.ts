@@ -19,7 +19,7 @@
 
 import {getUser} from '../data/user';
 import {test, expect} from '../test.fixtures';
-import {addCreatedTeam, removeCreatedTeam} from '../utils/tearDownUtil';
+import {addCreatedTeam, removeCreatedTeam} from '../utils/tearDown.util';
 import {generateSecurePassword} from '../utils/userDataGenerator';
 
 // Creating test data

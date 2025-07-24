@@ -20,25 +20,14 @@
 import Jimp from 'jimp';
 import QRCode from 'qrcode-reader';
 
-import {readFile} from 'fs';
 import path from 'path';
+
+import {readLocalFile} from './asset.util';
 
 const e2eRootDir = path.join(__dirname, '../');
 const fileTransferAssetsDir = path.join(e2eRootDir, 'assets/filetransfer');
 
 const ImageQRCodeFileName = 'qrcode.jpg';
-
-const readLocalFile = (imageFilePath: string): Promise<Buffer> => {
-  return new Promise<Buffer>((resolve, reject) => {
-    readFile(imageFilePath, (err, data) => {
-      if (err) {
-        reject(err);
-      } else {
-        resolve(data);
-      }
-    });
-  });
-};
 
 const getQRCodeValue = async (imageBuffer: Buffer) => {
   const image = await Jimp.read(imageBuffer);

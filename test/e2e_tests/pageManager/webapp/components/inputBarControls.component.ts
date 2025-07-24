@@ -19,7 +19,9 @@
 
 import {Page, Locator} from '@playwright/test';
 
-import {selectByDataAttribute} from 'test/e2e_tests/utils/useSelector';
+import {selectByDataAttribute} from 'test/e2e_tests/utils/selector.util';
+
+export const EPHEMERAL_TIMER_CHOICES = ['10 seconds', '5 minutes', '1 hour', 'Off'] as const;
 
 export class InputBarControls {
   readonly page: Page;
@@ -62,8 +64,21 @@ export class InputBarControls {
     await this.ping.click();
   }
 
-  async clickSetEphemeralTimer() {
+  async setEphemeralTimerTo(choice: (typeof EPHEMERAL_TIMER_CHOICES)[number]) {
     await this.setEphemeralTimer.click();
+    const buttons = this.page.locator(selectByDataAttribute('message-timer-menu'));
+    await buttons.last().waitFor({state: 'visible', timeout: 10000});
+
+    // Get all buttons and find the one with the matching title
+    const allButtons = await buttons.all();
+    for (const button of allButtons) {
+      const title = await button.getAttribute('title');
+
+      if (title === choice) {
+        await button.click();
+        return;
+      }
+    }
   }
 
   async clickSendMessage() {

@@ -19,8 +19,8 @@
 
 import {Locator, Page} from '@playwright/test';
 
+import {selectById, selectByDataAttribute} from 'test/e2e_tests/utils/selector.util';
 import {escapeHtml} from 'test/e2e_tests/utils/userDataProcessor';
-import {selectById, selectByDataAttribute} from 'test/e2e_tests/utils/useSelector';
 
 export class ConversationListPage {
   readonly page: Page;

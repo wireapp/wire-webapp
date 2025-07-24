@@ -17,16 +17,15 @@
  *
  */
 
-import {DownloadFilePath} from 'test/e2e_tests/test.constants';
+import {removeCreatedUser} from 'test/e2e_tests/utils/tearDown.util';
 import {loginUser, logOutUser} from 'test/e2e_tests/utils/userActions';
 
 import {getUser} from '../../data/user';
 import {test, expect} from '../../test.fixtures';
-import {removeCreatedUser} from '../../utils/tearDownUtil';
 
 // Generating test data
 const user = getUser();
-let fileName: string;
+let filePath: string;
 
 test('Setting up new device with a backup', {tag: ['@TC-8634', '@crit-flow-web']}, async ({pageManager, api}) => {
   test.slow(); // Increasing test timeout to 90 seconds to accommodate the full flow
@@ -55,12 +54,7 @@ test('Setting up new device with a backup', {tag: ['@TC-8634', '@crit-flow-web']
     await modals.exportBackup().clickPrimaryButton();
     expect(modals.exportBackup().isTitleHidden()).toBeTruthy();
     expect(pages.historyExport().isVisible()).toBeTruthy();
-    const [download] = await Promise.all([
-      pages.historyExport().page.waitForEvent('download'),
-      pages.historyExport().clickSaveFileButton(),
-    ]);
-    fileName = `${DownloadFilePath}${download.suggestedFilename()}`;
-    await download.saveAs(fileName);
+    filePath = await pages.historyExport().downloadFile();
   });
 
   await test.step('User logs out and clears all data', async () => {
@@ -74,7 +68,7 @@ test('Setting up new device with a backup', {tag: ['@TC-8634', '@crit-flow-web']
 
   await test.step('User restores the previously created backup', async () => {
     await components.conversationSidebar().clickPreferencesButton();
-    await pages.account().backupFileInput.setInputFiles(fileName);
+    await pages.account().backupFileInput.setInputFiles(filePath);
     expect(pages.historyImport().importSuccessHeadline.isVisible()).toBeTruthy();
   });
 });
