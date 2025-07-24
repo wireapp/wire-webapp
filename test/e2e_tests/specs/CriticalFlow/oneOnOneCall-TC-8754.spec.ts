@@ -37,7 +37,7 @@ const teamBName = 'Direct Call B';
 
 test(
   '1:1 Video call with device switch and screenshare',
-  {tag: ['@TC-8754', '@crit-flow']},
+  {tag: ['@TC-8754', '@crit-flow-web']},
   async ({browser, pageManager: ownerAPageManager, api}) => {
     test.setTimeout(150_000);
 
