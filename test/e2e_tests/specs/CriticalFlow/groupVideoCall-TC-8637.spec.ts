@@ -28,7 +28,7 @@ import {addCreatedTeam, addCreatedUser, removeCreatedTeam, removeCreatedUser} fr
 // Generate test data
 const teamName = 'Critical';
 const conversationName = 'CritiCall';
-const teamOwner = getUser();
+let teamOwner = getUser();
 teamOwner.firstName = 'integrationtest';
 teamOwner.lastName = 'integrationtest';
 teamOwner.fullName = 'integrationtest';
@@ -61,7 +61,8 @@ test(
     const {pages: guestPages, modals: guestModals} = guestPageManager.webapp;
 
     await test.step('Preconditions: Creating preconditions for the test via API', async () => {
-      await api.createTeamOwner(teamOwner, teamName);
+      const user = await api.createTeamOwner(teamOwner, teamName);
+      teamOwner = {...teamOwner, ...user};
       addCreatedTeam(teamOwner, teamOwner.teamId!);
       await api.enableConferenceCallingFeature(teamOwner.teamId!);
 
