@@ -19,6 +19,7 @@
 
 import {Page, Locator} from '@playwright/test';
 
+import {shareAssetHelper} from 'test/e2e_tests/utils/asset.util';
 import {selectByDataAttribute} from 'test/e2e_tests/utils/selector.util';
 
 export const EPHEMERAL_TIMER_CHOICES = ['10 seconds', '5 minutes', '1 hour', 'Off'] as const;
@@ -42,22 +43,14 @@ export class InputBarControls {
     this.sendMessage = page.locator(`${selectByDataAttribute('do-send-message')}`);
   }
 
-  private shareFileHelper = async (filePath: string) => {
-    const fileChooserPromise = this.page.waitForEvent('filechooser');
-    await this.shareFile.click();
-    const fileChooser = await fileChooserPromise;
-    await fileChooser.setFiles(filePath, {timeout: 10_000});
-  };
-
   async clickShareImage(imageFilePath: string) {
-    const fileChooserPromise = this.page.waitForEvent('filechooser');
-    await this.shareImage.click();
-    const fileChooser = await fileChooserPromise;
-    await fileChooser.setFiles(imageFilePath, {timeout: 10_000});
+    await shareAssetHelper(imageFilePath, this.page, this.shareImage);
+    await this.page.waitForTimeout(3_000); // Wait for the file to be processed
   }
 
   async clickShareFile(filePath: string) {
-    return await this.shareFileHelper(filePath);
+    await shareAssetHelper(filePath, this.page, this.shareFile);
+    await this.page.waitForTimeout(3_000); // Wait for the file to be processed
   }
 
   async clickPing() {

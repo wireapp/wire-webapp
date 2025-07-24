@@ -22,7 +22,7 @@ import {container} from 'tsyringe';
 import {ICellAsset} from '@wireapp/protocol-messaging';
 
 import {useInView} from 'Hooks/useInView/useInView';
-import {CellsRepository} from 'src/script/cells/CellsRepository';
+import {CellsRepository} from 'Repositories/cells/CellsRepository';
 import {formatBytes, getFileExtension, trimFileExtension} from 'Util/util';
 
 import {FileAssetCard} from './FileAssetCard/FileAssetCard';
@@ -132,6 +132,8 @@ const MultipartAsset = ({
           size={size}
           isLoading={isLoading}
           isError={isError}
+          senderName={senderName}
+          timestamp={timestamp}
         />
       </li>
     );

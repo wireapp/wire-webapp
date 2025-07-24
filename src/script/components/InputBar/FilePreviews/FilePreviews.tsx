@@ -22,8 +22,8 @@ import {QualifiedId} from '@wireapp/api-client/lib/user/';
 import {container} from 'tsyringe';
 
 import {FileWithPreview} from 'Components/Conversation/useFilesUploadState/useFilesUploadState';
-import {isAudio, isVideo, isImage} from 'src/script/assets/AssetMetaDataBuilder';
-import {CellsRepository} from 'src/script/cells/CellsRepository';
+import {isAudio, isVideo, isImage} from 'Repositories/assets/AssetMetaDataBuilder';
+import {CellsRepository} from 'Repositories/cells/CellsRepository';
 
 import {AudioPreviewCard} from './AudioPreviewCard/AudioPreviewCard';
 import {FilePreviewCard} from './FilePreviewCard/FilePreviewCard';

@@ -19,14 +19,12 @@
 
 import {BackendClientE2E} from './backendClient.e2e';
 
-import {TEST_API_VERSION} from '.';
-
 const domain = process.env.DOMAIN;
 
 export class ConnectionRepositoryE2E extends BackendClientE2E {
   async getConnectionsList(token: string) {
     const response = await this.axiosInstance.post(
-      `${TEST_API_VERSION}/list-connections`,
+      'list-connections',
       {
         page_state: '',
       },
@@ -42,7 +40,7 @@ export class ConnectionRepositoryE2E extends BackendClientE2E {
 
   async sendConnectionRequest(token: string, inviteeId: string) {
     await this.axiosInstance.post(
-      `${TEST_API_VERSION}/connections/${domain}/${inviteeId}`,
+      `connections/${domain}/${inviteeId}`,
       {},
       {
         headers: {
@@ -55,7 +53,7 @@ export class ConnectionRepositoryE2E extends BackendClientE2E {
 
   async acceptConnectionRequest(token: string, connectionId: string) {
     await this.axiosInstance.post(
-      `${TEST_API_VERSION}/connections/${domain}/${connectionId}`,
+      `connections/${domain}/${connectionId}`,
       {
         status: 'accepted',
       },

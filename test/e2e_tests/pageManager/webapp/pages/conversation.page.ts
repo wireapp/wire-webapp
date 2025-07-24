@@ -32,10 +32,20 @@ export class ConversationPage {
   readonly createGroupSubmitButton: Locator;
   readonly messageInput: Locator;
   readonly sendMessageButton: Locator;
+  readonly conversationTitle: Locator;
   readonly watermark: Locator;
   readonly timerMessageButton: Locator;
   readonly timerTenSecondsButton: Locator;
   readonly openGroupInformationViaName: Locator;
+  readonly membersList: Locator;
+  readonly adminsList: Locator;
+  readonly leaveConversationButton: Locator;
+  readonly makeAdminToggle: Locator;
+  readonly removeUserButton: Locator;
+  readonly addMemberButton: Locator;
+  readonly systemMessages: Locator;
+  readonly callButton: Locator;
+  readonly conversationInfoButton: Locator;
 
   readonly getImageAltText = (user: User) => `Image from ${user.fullName}`;
 
@@ -49,9 +59,21 @@ export class ConversationPage {
     this.messageInput = page.locator(selectByDataAttribute('input-message'));
     this.watermark = page.locator(`${selectByDataAttribute('no-conversation')} svg`);
     this.sendMessageButton = page.locator(selectByDataAttribute('do-send-message'));
+    this.conversationTitle = page.locator('[data-uie-name="status-conversation-title-bar-label"]');
     this.openGroupInformationViaName = page.locator(selectByDataAttribute('status-conversation-title-bar-label'));
     this.timerMessageButton = page.locator(selectByDataAttribute('do-set-ephemeral-timer'));
     this.timerTenSecondsButton = page.locator(selectById('btn-10-seconds'));
+    this.membersList = page.locator(selectByDataAttribute('list-members'));
+    this.adminsList = page.locator(selectByDataAttribute('list-admins'));
+    this.leaveConversationButton = page.locator(selectByDataAttribute('do-leave-item-text'));
+    this.makeAdminToggle = page.locator(selectByDataAttribute('do-allow-admin'));
+    this.removeUserButton = page.locator(selectByDataAttribute('do-remove-item-text'));
+    this.addMemberButton = page.locator(selectByDataAttribute('go-add-people'));
+    this.systemMessages = page.locator(
+      `${selectByDataAttribute('item-message')}${selectByClass('system-message')} ${selectByClass('message-header')}`,
+    );
+    this.callButton = page.locator(selectByDataAttribute('do-call'));
+    this.conversationInfoButton = page.locator(selectByDataAttribute('do-open-info'));
   }
 
   private getImageLocator(user: User): Locator {
@@ -65,6 +87,18 @@ export class ConversationPage {
       (await this.page.locator(selectByDataAttribute('status-conversation-title-bar-label')).textContent()) ===
       conversationName
     );
+  }
+
+  async clickConversationTitle() {
+    await this.conversationTitle.click();
+  }
+
+  async clickConversationInfoButton() {
+    await this.conversationInfoButton.click();
+  }
+
+  async clickCallButton() {
+    await this.callButton.click();
   }
 
   async isWatermarkVisible() {
@@ -81,11 +115,6 @@ export class ConversationPage {
     await this.createGroupButton.click();
     await this.createGroupNameInput.fill(groupName);
     await this.createGroupSubmitButton.click();
-  }
-
-  async enableAutoDeleteMessages() {
-    await this.timerMessageButton.click();
-    await this.timerTenSecondsButton.click();
   }
 
   async sendMention(memberId: string) {
@@ -226,6 +255,16 @@ export class ConversationPage {
     return filePath;
   }
 
+  async startCall() {
+    const startCallButton = this.page.locator('[data-uie-name="do-call"]');
+    await startCallButton.click();
+  }
+
+  async isSystemMessageVisible(messageText: string) {
+    await this.systemMessages.filter({hasText: messageText}).first().waitFor({state: 'visible', timeout: 5000});
+    return true;
+  }
+
   async isConversationReadonly() {
     await this.messageInput.waitFor({state: 'detached'});
   }
@@ -234,7 +273,41 @@ export class ConversationPage {
     return await this.messageInput.isVisible();
   }
 
-  async openGroupInformation() {
+  async toggleGroupInformation() {
     await this.openGroupInformationViaName.click();
+  }
+
+  async isUserGroupMember(name: string) {
+    return this.membersList.locator(`${selectByDataAttribute('item-user')}[data-uie-value="${name}"]`).isVisible();
+  }
+
+  async isUserGroupAdmin(name: string) {
+    await this.adminsList
+      .locator(`${selectByDataAttribute('item-user')}[data-uie-value="${name}"]`)
+      .waitFor({state: 'visible'});
+    return true;
+  }
+
+  async makeUserAdmin(name: string) {
+    await this.membersList.locator(`[data-uie-value="${name}"]`).click();
+    return this.makeAdminToggle.click();
+  }
+
+  async removeMemberFromGroup(name: string) {
+    await this.membersList.locator(`[data-uie-value="${name}"]`).click();
+    return this.removeUserButton.click();
+  }
+
+  async removeAdminFromGroup(name: string) {
+    await this.adminsList.locator(`[data-uie-value="${name}"]`).click();
+    return this.removeUserButton.click();
+  }
+
+  async leaveConversation() {
+    await this.leaveConversationButton.click();
+  }
+
+  async clickAddMemberButton() {
+    await this.addMemberButton.click();
   }
 }

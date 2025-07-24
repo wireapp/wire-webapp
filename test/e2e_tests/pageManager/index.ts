@@ -20,7 +20,7 @@
 import {Page} from '@playwright/test';
 
 import {MarketingConsentModal} from './team_management/modals/marketingConsent.modal';
-import {TeamDataShareConsentModal} from './team_management/modals/teamDataShareConsent.modal';
+import {TeamDataShareConsentModal} from './team_management/modals/teamsDataShareConsent.modal';
 import {SetUsernamePage} from './team_management/pages/setUsername.page';
 import {TeamLoginPage} from './team_management/pages/teamLogin.page';
 import {TeamsPage} from './team_management/pages/teams.page';
@@ -30,20 +30,28 @@ import {InputBarControls} from './webapp/components/inputBarControls.component';
 import {AppLockModal} from './webapp/modals/appLock.modal';
 import {BlockWarningModal} from './webapp/modals/blockWarning.modal';
 import {ConfirmLogoutModal} from './webapp/modals/confirmLogout.modal';
+import {CopyPasswordModal} from './webapp/modals/copyPassword.modal';
+import {CreatGuestLinkModal} from './webapp/modals/createGuestLink.modal';
 import {DataShareConsentModal} from './webapp/modals/dataShareConsent.modal';
 import {DeleteAccountModal} from './webapp/modals/deleteAccount.modal';
 import {DetailViewModal} from './webapp/modals/detailView.modal';
 import {ExportBackupModal} from './webapp/modals/exportBackup.modal';
+import {importBackupModal} from './webapp/modals/importBackup.modal';
 import {LeaveConversationModal} from './webapp/modals/leaveConversation.modal';
+import {RemoveMemberModal} from './webapp/modals/removeMember.modal';
 import {UnableToOpenConversationModal} from './webapp/modals/unableToOpenConversation.modal';
 import {UserProfileModal} from './webapp/modals/userProfile.modal';
 import {AccountPage} from './webapp/pages/account.page';
+import {AudioVideoSettingsPage} from './webapp/pages/audioVideoSettings.page';
+import {CallingPage} from './webapp/pages/calling.page';
+import {ConnectRequestPage} from './webapp/pages/connectRequest.page';
 import {ConversationPage} from './webapp/pages/conversation.page';
 import {ConversationDetailsPage} from './webapp/pages/conversationDetails.page';
 import {ConversationListPage} from './webapp/pages/conversationList.page';
 import {DeleteAccountPage} from './webapp/pages/deleteAccount.page';
 import {EmailVerificationPage} from './webapp/pages/emailVerification.page';
 import {GroupCreationPage} from './webapp/pages/groupCreation.page';
+import {GuestOptionsPage} from './webapp/pages/guestOptions.page';
 import {HistoryExportPage} from './webapp/pages/historyExport.page';
 import {HistoryImportPage} from './webapp/pages/historyImport.page';
 import {HistoryInfoPage} from './webapp/pages/infoHistory.page';
@@ -51,6 +59,7 @@ import {LoginPage} from './webapp/pages/login.page';
 import {OutgoingConnectionPage} from './webapp/pages/outgoingConnection.page';
 import {RegisterSuccessPage} from './webapp/pages/registerSuccess.page';
 import {RegistrationPage} from './webapp/pages/registration.page';
+import {SettingsPage} from './webapp/pages/settings.page';
 import {SingleSignOnPage} from './webapp/pages/singleSignOn.page';
 import {StartUIPage} from './webapp/pages/startUI.page';
 import {WelcomePage} from './webapp/pages/welcome.page';
@@ -92,6 +101,18 @@ export class PageManager {
     return this.page.reload(options);
   };
 
+  waitForTimeout = (timeout: number) => {
+    return this.page.waitForTimeout(timeout);
+  };
+
+  getContext = () => {
+    return this.page.context();
+  };
+
+  getPage = async () => {
+    return await this.page;
+  };
+
   // Helper method to get or create a page or modal instance
   // This method uses a cache to avoid creating multiple instances of the same page/modal
   private getOrCreate<T>(key: string, factory: () => T): T {
@@ -115,8 +136,14 @@ export class PageManager {
       conversationDetails: () =>
         this.getOrCreate('webapp.pages.conversationDetails', () => new ConversationDetailsPage(this.page)),
       conversation: () => this.getOrCreate('webapp.pages.conversation', () => new ConversationPage(this.page)),
+      connectRequest: () => this.getOrCreate('webapp.pages.connectRequest', () => new ConnectRequestPage(this.page)),
+      calling: () => this.getOrCreate('webapp.pages.calling', () => new CallingPage(this.page)),
+      settings: () => this.getOrCreate('webapp.pages.settings', () => new SettingsPage(this.page)),
+      audioVideoSettings: () =>
+        this.getOrCreate('webapp.pages.audioVideoSettings', () => new AudioVideoSettingsPage(this.page)),
       outgoingConnection: () =>
         this.getOrCreate('webapp.pages.outgoingConnection', () => new OutgoingConnectionPage(this.page)),
+      guestOptions: () => this.getOrCreate('webapp.pages.guestOptions', () => new GuestOptionsPage(this.page)),
       deleteAccount: () => this.getOrCreate('webapp.pages.deleteAccount', () => new DeleteAccountPage(this.page)),
       groupCreation: () => this.getOrCreate('webapp.pages.groupCreation', () => new GroupCreationPage(this.page)),
       historyInfo: () => this.getOrCreate('webapp.pages.infoHostory', () => new HistoryInfoPage(this.page)),
@@ -137,12 +164,18 @@ export class PageManager {
       unableToOpenConversation: () =>
         this.getOrCreate('webapp.modals.unableToOpenConversation', () => new UnableToOpenConversationModal(this.page)),
       detailViewModal: () => this.getOrCreate('webapp.modals.detailView', () => new DetailViewModal(this.page)),
+      importBackup: () => this.getOrCreate('webapp.modals.importBackup', () => new importBackupModal(this.page)),
+      removeMember: () => this.getOrCreate('webapp.modals.removeMember', () => new RemoveMemberModal(this.page)),
+      copyPassword: () => this.getOrCreate('webapp.modals.copyPassword', () => new CopyPasswordModal(this.page)),
+      createGuestLink: () =>
+        this.getOrCreate('webapp.modals.createGuestLink', () => new CreatGuestLinkModal(this.page)),
     },
     components: {
       conversationSidebar: () =>
         this.getOrCreate('webapp.components.conversationSidebar', () => new ConversationSidebar(this.page)),
       inputBarControls: () =>
         this.getOrCreate('webapp.components.inputBarControls', () => new InputBarControls(this.page)),
+      calling: () => this.getOrCreate('webapp.components.calling', () => new CallingPage(this.page)),
     },
   } as const;
 

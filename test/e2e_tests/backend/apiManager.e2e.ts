@@ -17,10 +17,12 @@
  *
  */
 
+import {FEATURE_KEY} from '@wireapp/api-client/lib/team/feature';
 import {AxiosResponse} from 'axios';
 
 import {AuthRepositoryE2E} from './authRepository.e2e';
 import {BrigRepositoryE2E} from './brigRepository.e2e';
+import {CallingServiceClientE2E} from './callingServiceClient.e2e';
 import {ConnectionRepositoryE2E} from './connectionRepository.e2e';
 import {ConversationRepositoryE2E} from './ConversationRepository';
 import {FeatureConfigRepositoryE2E} from './featureConfigRepository.e2e';
@@ -41,6 +43,7 @@ export class ApiManagerE2E {
   featureConfig: FeatureConfigRepositoryE2E;
   inbucket: InbucketClientE2E;
   connection: ConnectionRepositoryE2E;
+  callingService: CallingServiceClientE2E;
 
   constructor() {
     this.user = new UserRepositoryE2E();
@@ -52,11 +55,12 @@ export class ApiManagerE2E {
     this.featureConfig = new FeatureConfigRepositoryE2E();
     this.inbucket = new InbucketClientE2E();
     this.connection = new ConnectionRepositoryE2E();
+    this.callingService = new CallingServiceClientE2E();
   }
 
   async addDevicesToUser(user: User, numberOfDevices: number) {
     const token = user.token ?? (await this.auth.loginUser(user)).data.access_token;
-    const isMlsEnabled = await this.featureConfig.isMlsEnabled(token);
+    const isMlsEnabled = await this.featureConfig.isFeatureEnabled(token, FEATURE_KEY.MLS);
     for (let i = 0; i < numberOfDevices; i++) {
       const deviceName = `Device${i + 1}`;
       const response = await this.testService.createInstance(user.password, user.email, deviceName, isMlsEnabled);
@@ -93,6 +97,33 @@ export class ApiManagerE2E {
     await this.user.setUniqueUsername(user.username, user.token);
   }
 
+  /**
+   * Long polling to see if a conference calling feature is available for a given team.
+   * This is to wait until stripe/ibis has set free account restrictions after team creation.
+   *
+   * @param token - The access token of the user.
+   * @returns A promise that resolves to true if the feature is enabled, false otherwise.
+   */
+  async waitForFeatureToBeEnabled(featureKey: FEATURE_KEY, teamId: string, token?: string): Promise<boolean> {
+    if (!token) {
+      throw new Error('Token is required to check for feature');
+    }
+
+    const timeout = 300000;
+    const interval = 1000;
+    const startTime = Date.now();
+
+    while (Date.now() - startTime < timeout) {
+      const isEnabled = await this.featureConfig.isFeatureEnabled(token, featureKey);
+      if (isEnabled) {
+        return true;
+      }
+      await new Promise(resolve => setTimeout(resolve, interval));
+    }
+
+    throw new Error(`${featureKey} feature is not enabled after waiting for ${timeout / 1000} seconds`);
+  }
+
   async createTeamOwner(user: User, teamName: string) {
     // 1. Book email
     await this.auth.bookEmail(user.email);
@@ -109,6 +140,16 @@ export class ApiManagerE2E {
 
     // 5. Set Unique Username (Handle)
     await this.user.setUniqueUsername(user.username, user.token);
+
+    return {
+      ...user,
+      teamId: registerResponse.data.team ?? '',
+      qualifiedId: {
+        domain: '',
+        id: registerResponse.data.id,
+      },
+      id: registerResponse.data.id,
+    };
   }
 
   async acceptConnectionRequest(user: User) {
@@ -120,6 +161,11 @@ export class ApiManagerE2E {
   async enableConferenceCallingFeature(teamId: string) {
     await this.brig.unlockConferenceCallingFeature(teamId);
     await this.brig.enableConferenceCallingBackdoorViaBackdoorTeam(teamId);
+  }
+
+  async enableChannelsFeature(teamId: string) {
+    await this.brig.unlockChannelFeature(teamId);
+    await this.brig.enableChannelsFeature(teamId);
   }
 
   private extractCookieFromRegisterResponse(registerResponse: AxiosResponse): string {

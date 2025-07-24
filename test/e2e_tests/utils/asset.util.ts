@@ -71,3 +71,10 @@ export const isAssetDownloaded = async (filePath: string): Promise<boolean> => {
     return false;
   }
 };
+
+export const shareAssetHelper = async (filePath: string, page: Page, buttonLocator: Locator) => {
+  const fileChooserPromise = page.waitForEvent('filechooser');
+  await buttonLocator.click();
+  const fileChooser = await fileChooserPromise;
+  await fileChooser.setFiles(filePath, {timeout: 10_000});
+};

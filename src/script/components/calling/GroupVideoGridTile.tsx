@@ -26,13 +26,12 @@ import {TabIndex} from '@wireapp/react-ui-kit';
 
 import {Avatar, AVATAR_SIZE} from 'Components/Avatar';
 import * as Icon from 'Components/Icon';
+import type {Participant} from 'Repositories/calling/Participant';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {isEnterKey} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
 
 import {Video} from './Video';
-
-import type {Participant} from '../../calling/Participant';
 
 export interface GroupVideoGridTileProps {
   isMaximized: boolean;
@@ -125,6 +124,7 @@ const GroupVideoGridTile: React.FC<GroupVideoGridTileProps> = ({
         }}
       >
         <span
+          data-uie-value={participant?.user.id}
           data-uie-name="call-participant-name"
           css={{
             textOverflow: 'ellipsis',
@@ -214,7 +214,7 @@ const GroupVideoGridTile: React.FC<GroupVideoGridTileProps> = ({
 
       {!minimized && isMuted && (
         <span className="group-video-grid__element__label__icon">
-          <Icon.MicOffIcon data-uie-name="mic-icon-off" />
+          <Icon.MicOffIcon data-uie-name="mic-icon-off" data-uie-value={participant?.user.id} />
         </span>
       )}
 

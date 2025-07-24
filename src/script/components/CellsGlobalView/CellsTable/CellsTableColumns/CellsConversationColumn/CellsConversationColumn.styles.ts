@@ -21,8 +21,10 @@ import {CSSObject} from '@emotion/react';
 
 import {ellipsis} from '@wireapp/react-ui-kit';
 
+import {styleBreakpoint} from '../../../common/styleBreakpoint/styleBreakpoint';
+
 export const wrapperStyles: CSSObject = {
-  display: 'flex',
+  display: 'inline-flex',
   alignItems: 'center',
   gap: '8px',
   background: 'transparent',
@@ -30,6 +32,12 @@ export const wrapperStyles: CSSObject = {
   padding: 0,
   cursor: 'pointer',
   maxWidth: '100%',
+  transform: 'translateY(4px)',
+
+  [`@media (min-width: ${styleBreakpoint}px)`]: {
+    display: 'flex',
+    transform: 'translateY(0)',
+  },
 };
 
 export const avatarWrapperStyles: CSSObject = {

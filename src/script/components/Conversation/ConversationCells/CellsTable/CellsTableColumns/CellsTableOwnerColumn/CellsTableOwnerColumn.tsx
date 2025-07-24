@@ -19,7 +19,7 @@
 
 import {Avatar, AVATAR_SIZE} from 'Components/Avatar';
 import {showUserModal} from 'Components/Modals/UserModal';
-import {User} from 'src/script/entity/User';
+import {User} from 'Repositories/entity/User';
 
 import {avatarWrapperStyles, textStyles, wrapperStyles} from './CellsTableOwnerColumn.styles';
 
@@ -38,7 +38,7 @@ export const CellsTableOwnerColumn = ({owner, user}: CellsTableOwnerColumnProps)
       <div css={avatarWrapperStyles}>
         <Avatar participant={user} avatarSize={AVATAR_SIZE.XXX_SMALL} />
       </div>
-      <span css={textStyles}>{owner}</span>
+      <span css={textStyles}>{user.name()}</span>
     </button>
   );
 };
