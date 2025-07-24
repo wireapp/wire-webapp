@@ -17,7 +17,7 @@
  *
  */
 
-import {Message} from 'src/script/entity/message/Message';
+import {Message} from 'Repositories/entity/message/Message';
 
 import {GroupedMessage, Marker} from './messagesGroup';
 

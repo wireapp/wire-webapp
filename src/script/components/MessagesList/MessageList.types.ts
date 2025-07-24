@@ -20,17 +20,16 @@
 import React from 'react';
 
 import {MessageActions} from 'Components/MessagesList/Message';
-
-import {AssetRepository} from '../../assets/AssetRepository';
-import {ConversationRepository} from '../../conversation/ConversationRepository';
-import {MessageRepository} from '../../conversation/MessageRepository';
-import {Conversation} from '../../entity/Conversation';
-import {ContentMessage} from '../../entity/message/ContentMessage';
-import {DecryptErrorMessage} from '../../entity/message/DecryptErrorMessage';
-import {MemberMessage} from '../../entity/message/MemberMessage';
-import {Message as MessageEntity} from '../../entity/message/Message';
-import {User} from '../../entity/User';
-import {ServiceEntity} from '../../integration/ServiceEntity';
+import {AssetRepository} from 'Repositories/assets/AssetRepository';
+import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
+import {MessageRepository} from 'Repositories/conversation/MessageRepository';
+import {Conversation} from 'Repositories/entity/Conversation';
+import {ContentMessage} from 'Repositories/entity/message/ContentMessage';
+import {DecryptErrorMessage} from 'Repositories/entity/message/DecryptErrorMessage';
+import {MemberMessage} from 'Repositories/entity/message/MemberMessage';
+import {Message as MessageEntity} from 'Repositories/entity/message/Message';
+import {User} from 'Repositories/entity/User';
+import {ServiceEntity} from 'Repositories/integration/ServiceEntity';
 
 export interface MessagesListParams {
   assetRepository: AssetRepository;

@@ -17,6 +17,6 @@
  *
  */
 
-import {ServiceEntity} from '../integration/ServiceEntity';
+import {ServiceEntity} from 'Repositories/integration/ServiceEntity';
 
 export const isServiceEntity = (entity: any): entity is ServiceEntity => 'isService' in entity && entity.isService;

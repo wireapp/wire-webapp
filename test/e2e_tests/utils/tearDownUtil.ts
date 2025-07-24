@@ -24,9 +24,6 @@ import {User} from '../data/user';
 const createdUsers: Map<User['id'], User> = new Map();
 const createdTeams: Map<User, string> = new Map();
 
-export const getCreatedUsers = () => createdUsers;
-export const getCreatedTeams = () => createdTeams;
-
 // Utility functions to manage created personal users for cleanup
 export const addCreatedUser = (user: User) => {
   if (!user.id) {
@@ -45,7 +42,7 @@ export const addCreatedTeam = (user: User, teamId: string) => {
 
 export const removeCreatedTeam = async (api: ApiManagerE2E, user: User) => {
   if (!user.id) {
-    throw new Error('User must have an ID to remove from createdTeams');
+    throw new Error('User must have an ID to be removed from createdTeams');
   }
   const teamId = createdTeams.get(user);
   if (!teamId) {
@@ -57,7 +54,7 @@ export const removeCreatedTeam = async (api: ApiManagerE2E, user: User) => {
 
 export const removeCreatedUser = async (api: ApiManagerE2E, user: User) => {
   if (!user.id) {
-    throw new Error('User must have an ID to remove from createdUsers');
+    throw new Error('User must have an ID to be removed from createdUsers');
   }
   const token = user.token ?? (await api.auth.loginUser(user)).data.access_token;
   if (!token) {

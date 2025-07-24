@@ -21,7 +21,8 @@ import {MutableRefObject, useEffect, useRef, useState} from 'react';
 
 import {Virtualizer} from '@tanstack/react-virtual';
 
-import {Conversation} from '../../../entity/Conversation';
+import {Conversation} from 'Repositories/entity/Conversation';
+
 import {StatusType} from '../../../message/StatusType';
 import {GroupedMessage, isMarker, Marker} from '../utils/messagesGroup';
 

@@ -22,7 +22,15 @@ import React, {useLayoutEffect, useRef, useEffect} from 'react';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 import cx from 'classnames';
 
-import {ServiceEntity} from 'src/script/integration/ServiceEntity';
+import type {MessageRepository} from 'Repositories/conversation/MessageRepository';
+import type {Conversation} from 'Repositories/entity/Conversation';
+import type {ContentMessage} from 'Repositories/entity/message/ContentMessage';
+import type {DecryptErrorMessage} from 'Repositories/entity/message/DecryptErrorMessage';
+import type {MemberMessage as MemberMessageEntity} from 'Repositories/entity/message/MemberMessage';
+import {Message as BaseMessage} from 'Repositories/entity/message/Message';
+import type {User} from 'Repositories/entity/User';
+import {ServiceEntity} from 'Repositories/integration/ServiceEntity';
+import {TeamState} from 'Repositories/team/TeamState';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {getAllFocusableElements, setElementsTabIndex} from 'Util/focusUtil';
 import {isTabKey} from 'Util/KeyboardUtil';
@@ -30,15 +38,6 @@ import {isTabKey} from 'Util/KeyboardUtil';
 import {ElementType, MessageDetails} from './ContentMessage/asset/TextMessageRenderer';
 import {MessageWrapper} from './MessageWrapper';
 import {useMessageFocusedTabIndex} from './util';
-
-import type {MessageRepository} from '../../../conversation/MessageRepository';
-import type {Conversation} from '../../../entity/Conversation';
-import type {ContentMessage} from '../../../entity/message/ContentMessage';
-import type {DecryptErrorMessage} from '../../../entity/message/DecryptErrorMessage';
-import type {MemberMessage as MemberMessageEntity} from '../../../entity/message/MemberMessage';
-import {Message as BaseMessage} from '../../../entity/message/Message';
-import type {User} from '../../../entity/User';
-import {TeamState} from '../../../team/TeamState';
 
 export interface MessageActions {
   onClickAvatar: (user: User | ServiceEntity) => void;

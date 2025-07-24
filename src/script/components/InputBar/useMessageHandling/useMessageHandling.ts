@@ -24,13 +24,13 @@ import {LexicalEditor} from 'lexical';
 
 import {WebAppEvents} from '@wireapp/webapp-events';
 
-import {CellsRepository} from 'src/script/cells/CellsRepository';
-import {ConversationRepository} from 'src/script/conversation/ConversationRepository';
-import {MessageRepository} from 'src/script/conversation/MessageRepository';
-import {Conversation} from 'src/script/entity/Conversation';
-import {ContentMessage} from 'src/script/entity/message/ContentMessage';
-import {EventRepository} from 'src/script/event/EventRepository';
-import {StorageRepository} from 'src/script/storage';
+import {CellsRepository} from 'Repositories/cells/CellsRepository';
+import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
+import {MessageRepository} from 'Repositories/conversation/MessageRepository';
+import {Conversation} from 'Repositories/entity/Conversation';
+import {ContentMessage} from 'Repositories/entity/message/ContentMessage';
+import {EventRepository} from 'Repositories/event/EventRepository';
+import {StorageRepository} from 'Repositories/storage';
 
 import {useDraftState} from './useDraftState/useDraftState';
 import {useMessageEditing} from './useMessageEditing/useMessageEditing';

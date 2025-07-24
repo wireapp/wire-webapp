@@ -19,9 +19,9 @@
 
 import {MutableRefObject, useEffect} from 'react';
 
-import {ConversationRepository} from '../../../conversation/ConversationRepository';
-import {Conversation} from '../../../entity/Conversation';
-import {Message as MessageEntity} from '../../../entity/message/Message';
+import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
+import {Conversation} from 'Repositories/entity/Conversation';
+import {Message as MessageEntity} from 'Repositories/entity/message/Message';
 
 interface Props {
   conversation: Conversation;

@@ -19,9 +19,9 @@
 
 import {useEffect, useState} from 'react';
 
-import {AssetRemoteData} from 'src/script/assets/AssetRemoteData';
-import {AssetTransferState} from 'src/script/assets/AssetTransferState';
-import type {FileAsset} from 'src/script/entity/message/FileAsset';
+import {AssetRemoteData} from 'Repositories/assets/AssetRemoteData';
+import {AssetTransferState} from 'Repositories/assets/AssetTransferState';
+import type {FileAsset} from 'Repositories/entity/message/FileAsset';
 import {getLogger} from 'Util/Logger';
 import {useEffectRef} from 'Util/useEffectRef';
 

@@ -26,9 +26,11 @@ import ko from 'knockout';
 import {OutlineCheck} from '@wireapp/react-ui-kit';
 
 import {ReadIndicator} from 'Components/MessagesList/Message/ReadIndicator';
-import {Conversation} from 'src/script/entity/Conversation';
-import {CompositeMessage} from 'src/script/entity/message/CompositeMessage';
-import {ContentMessage} from 'src/script/entity/message/ContentMessage';
+import {useClickOutside} from 'Hooks/useClickOutside';
+import {Conversation} from 'Repositories/entity/Conversation';
+import {CompositeMessage} from 'Repositories/entity/message/CompositeMessage';
+import {ContentMessage} from 'Repositories/entity/message/ContentMessage';
+import type {FileAsset as FileAssetType} from 'Repositories/entity/message/FileAsset';
 import {useRelativeTimestamp} from 'src/script/hooks/useRelativeTimestamp';
 import {StatusType} from 'src/script/message/StatusType';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
@@ -45,8 +47,6 @@ import {Quote} from './MessageQuote';
 import {CompleteFailureToSendWarning, PartialFailureToSendWarning} from './Warnings';
 
 import {MessageActions} from '..';
-import type {FileAsset as FileAssetType} from '../../../../entity/message/FileAsset';
-import {useClickOutside} from '../../../../hooks/useClickOutside';
 import {EphemeralStatusType} from '../../../../message/EphemeralStatusType';
 import {ContextMenuEntry} from '../../../../ui/ContextMenu';
 import {EphemeralTimer} from '../EphemeralTimer';

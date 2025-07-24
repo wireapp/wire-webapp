@@ -21,8 +21,8 @@ import {useCallback, useEffect, useLayoutEffect, useRef} from 'react';
 
 import {Virtualizer} from '@tanstack/react-virtual';
 
-import {ConversationRepository} from 'src/script/conversation/ConversationRepository';
-import {Conversation} from 'src/script/entity/Conversation';
+import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
+import {Conversation} from 'Repositories/entity/Conversation';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {isLastReceivedMessage} from 'Util/conversationMessages';
 

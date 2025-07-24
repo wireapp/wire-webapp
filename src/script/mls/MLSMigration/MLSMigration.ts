@@ -23,8 +23,8 @@ import {container} from 'tsyringe';
 
 import {Account} from '@wireapp/core';
 
-import {Conversation} from 'src/script/entity/Conversation';
-import {User} from 'src/script/entity/User';
+import {Conversation} from 'Repositories/entity/Conversation';
+import {User} from 'Repositories/entity/User';
 import {Core as CoreSingleton} from 'src/script/service/CoreSingleton';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 

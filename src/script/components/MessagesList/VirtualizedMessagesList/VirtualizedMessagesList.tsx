@@ -32,10 +32,10 @@ import {groupMessagesBySenderAndTime, isMarker} from 'Components/MessagesList/ut
 import {useLoadMessages} from 'Components/MessagesList/VirtualizedMessagesList/useLoadMessages';
 import {useScrollMessages} from 'Components/MessagesList/VirtualizedMessagesList/useScrollMessages';
 import {useRoveFocus} from 'Hooks/useRoveFocus';
+import {Conversation} from 'Repositories/entity/Conversation';
+import {Message as MessageEntity} from 'Repositories/entity/message/Message';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 
-import {Conversation} from '../../../entity/Conversation';
-import {Message as MessageEntity} from '../../../entity/message/Message';
 import {JumpToLastMessageButton} from '../JumpToLastMessageButton';
 
 const ESTIMATED_ELEMENT_SIZE = 36;
