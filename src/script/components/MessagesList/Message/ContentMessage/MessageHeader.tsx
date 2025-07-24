@@ -23,10 +23,10 @@ import {AVATAR_SIZE, Avatar} from 'Components/Avatar';
 import {UserBlockedBadge} from 'Components/Badge';
 import * as Icon from 'Components/Icon';
 import {UserName} from 'Components/UserName';
-import {ContentMessage} from 'src/script/entity/message/ContentMessage';
-import {DeleteMessage} from 'src/script/entity/message/DeleteMessage';
-import {User} from 'src/script/entity/User';
-import {ServiceEntity} from 'src/script/integration/ServiceEntity';
+import {ContentMessage} from 'Repositories/entity/message/ContentMessage';
+import {DeleteMessage} from 'Repositories/entity/message/DeleteMessage';
+import {User} from 'Repositories/entity/User';
+import {ServiceEntity} from 'Repositories/integration/ServiceEntity';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 

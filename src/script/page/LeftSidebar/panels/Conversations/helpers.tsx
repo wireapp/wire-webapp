@@ -17,12 +17,11 @@
  *
  */
 
+import {Conversation} from 'Repositories/entity/Conversation';
 import {t} from 'Util/LocalizerUtil';
 import {replaceAccents} from 'Util/StringUtil';
 
 import {ConversationFilter, SidebarTabs} from './useSidebarStore';
-
-import {Conversation} from '../../../../entity/Conversation';
 
 interface GetTabConversationsProps {
   currentTab: SidebarTabs;

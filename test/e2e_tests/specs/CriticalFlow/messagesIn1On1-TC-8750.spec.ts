@@ -25,9 +25,9 @@ import {loginUser} from 'test/e2e_tests/utils/userActions';
 import {test} from '../../test.fixtures';
 
 // Generating test data
-const ownerA = getUser();
+let ownerA = getUser();
 const memberA = getUser();
-const ownerB = getUser();
+let ownerB = getUser();
 const memberB = getUser();
 
 const teamAName = 'Critical A';
@@ -35,24 +35,26 @@ const teamBName = 'Critical B';
 
 let memberBPM: PageManager;
 
-test('Messages in 1:1', {tag: ['@TC-8750', '@crit-flow-web']}, async ({pageManager, api, browser}) => {
+// Skipping for now. To be finished in the scope of [WPB-18785]
+test.skip('Messages in 1:1', {tag: ['@TC-8750', '@crit-flow-web']}, async ({pageManager, api, browser}) => {
   test.slow(); // Increasing test timeout to 90 seconds to accommodate the full flow
 
   // Step 0: Preconditions
   await test.step('Preconditions: Creating preconditions for the test via API', async () => {
     // Precondition: Users A and B exist in two separate teams
-    await api.createTeamOwner(ownerA, teamAName);
-    ownerA.teamId = await api.team.getTeamIdForUser(ownerA);
+    const userA = await api.createTeamOwner(ownerA, teamAName);
+    ownerA = {...ownerA, ...userA};
+    addCreatedTeam(ownerA, ownerA.teamId);
     const invitationIdForMemberA = await api.team.inviteUserToTeam(memberA.email, ownerA);
     const invitationCodeForMemberA = await api.brig.getTeamInvitationCodeForEmail(
       ownerA.teamId,
       invitationIdForMemberA,
     );
     await api.createPersonalUser(memberA, invitationCodeForMemberA);
-    addCreatedTeam(ownerA, ownerA.teamId);
 
-    await api.createTeamOwner(ownerB, teamBName);
-    ownerB.teamId = await api.team.getTeamIdForUser(ownerB);
+    const userB = await api.createTeamOwner(ownerB, teamBName);
+    ownerB = {...ownerB, ...userB};
+    addCreatedTeam(ownerB, ownerB.teamId);
 
     const invitationIdForMemberB = await api.team.inviteUserToTeam(memberB.email, ownerB);
     const invitationCodeForMemberB = await api.brig.getTeamInvitationCodeForEmail(
@@ -60,7 +62,6 @@ test('Messages in 1:1', {tag: ['@TC-8750', '@crit-flow-web']}, async ({pageManag
       invitationIdForMemberB,
     );
     await api.createPersonalUser(memberB, invitationCodeForMemberB);
-    addCreatedTeam(ownerB, ownerB.teamId);
 
     // Precondition: Users A and B are connected
     if (!memberA.token) {
@@ -80,10 +81,15 @@ test('Messages in 1:1', {tag: ['@TC-8750', '@crit-flow-web']}, async ({pageManag
 
   // Step 1: Log in as the users and open the 1:1
   await test.step('Log in as the users and open the 1:1', async () => {
+    await pageManager.openMainPage();
     await loginUser(memberA, pageManager);
+    await pageManager.webapp.modals.dataShareConsent().clickDecline();
+
     await pageManager.webapp.pages.conversationList().openConversation(memberB.fullName);
 
+    await memberBPM.openMainPage();
     await loginUser(memberB, memberBPM);
+    await memberBPM.webapp.modals.dataShareConsent().clickDecline();
   });
 
   // Step 2: Images

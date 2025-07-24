@@ -17,11 +17,11 @@
  *
  */
 
-import {AssetTransferState} from 'src/script/assets/AssetTransferState';
+import {AssetTransferState} from 'Repositories/assets/AssetTransferState';
+import {StorageSchemata} from 'Repositories/storage/StorageSchemata';
 import {ConversationError} from 'src/script/error/ConversationError';
 import {StorageError} from 'src/script/error/StorageError';
 import {MessageCategory} from 'src/script/message/MessageCategory';
-import {StorageSchemata} from 'src/script/storage/StorageSchemata';
 import {createUuid} from 'Util/uuid';
 
 import {TestFactory} from '../../helper/TestFactory';

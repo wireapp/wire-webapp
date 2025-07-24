@@ -21,12 +21,11 @@ import React from 'react';
 
 import {act, render, waitFor} from '@testing-library/react';
 
-import {Conversation} from 'src/script/entity/Conversation';
-import {ContentMessage} from 'src/script/entity/message/ContentMessage';
-import {User} from 'src/script/entity/User';
+import {Conversation} from 'Repositories/entity/Conversation';
+import {ContentMessage} from 'Repositories/entity/message/ContentMessage';
+import {Text} from 'Repositories/entity/message/Text';
+import {User} from 'Repositories/entity/User';
 import {createUuid} from 'Util/uuid';
-
-import {Text} from '../../entity/message/Text';
 
 import {MessagesList} from './';
 

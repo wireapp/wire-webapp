@@ -22,6 +22,7 @@ import {AxiosResponse} from 'axios';
 
 import {AuthRepositoryE2E} from './authRepository.e2e';
 import {BrigRepositoryE2E} from './brigRepository.e2e';
+import {CallingServiceClientE2E} from './callingServiceClient.e2e';
 import {ConnectionRepositoryE2E} from './connectionRepository.e2e';
 import {ConversationRepositoryE2E} from './ConversationRepository';
 import {FeatureConfigRepositoryE2E} from './featureConfigRepository.e2e';
@@ -42,6 +43,7 @@ export class ApiManagerE2E {
   featureConfig: FeatureConfigRepositoryE2E;
   inbucket: InbucketClientE2E;
   connection: ConnectionRepositoryE2E;
+  callingService: CallingServiceClientE2E;
 
   constructor() {
     this.user = new UserRepositoryE2E();
@@ -53,11 +55,12 @@ export class ApiManagerE2E {
     this.featureConfig = new FeatureConfigRepositoryE2E();
     this.inbucket = new InbucketClientE2E();
     this.connection = new ConnectionRepositoryE2E();
+    this.callingService = new CallingServiceClientE2E();
   }
 
   async addDevicesToUser(user: User, numberOfDevices: number) {
     const token = user.token ?? (await this.auth.loginUser(user)).data.access_token;
-    const isMlsEnabled = await this.featureConfig.isMlsEnabled(token);
+    const isMlsEnabled = await this.featureConfig.isFeatureEnabled(token, FEATURE_KEY.MLS);
     for (let i = 0; i < numberOfDevices; i++) {
       const deviceName = `Device${i + 1}`;
       const response = await this.testService.createInstance(user.password, user.email, deviceName, isMlsEnabled);
@@ -111,7 +114,7 @@ export class ApiManagerE2E {
     const startTime = Date.now();
 
     while (Date.now() - startTime < timeout) {
-      const isEnabled = await this.featureConfig.isFeatureEnabled(token, featureKey, teamId);
+      const isEnabled = await this.featureConfig.isFeatureEnabled(token, featureKey);
       if (isEnabled) {
         return true;
       }
@@ -137,6 +140,16 @@ export class ApiManagerE2E {
 
     // 5. Set Unique Username (Handle)
     await this.user.setUniqueUsername(user.username, user.token);
+
+    return {
+      ...user,
+      teamId: registerResponse.data.team ?? '',
+      qualifiedId: {
+        domain: '',
+        id: registerResponse.data.id,
+      },
+      id: registerResponse.data.id,
+    };
   }
 
   async acceptConnectionRequest(user: User) {

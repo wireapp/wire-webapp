@@ -25,11 +25,16 @@ export class ConversationDetailsPage {
   readonly page: Page;
 
   readonly addPeopleButton: Locator;
+  readonly conversationDetails: Locator;
+  readonly guestOptionsButton: Locator;
 
   constructor(page: Page) {
     this.page = page;
 
     this.addPeopleButton = page.locator(`${selectByDataAttribute('go-add-people')}`);
+
+    this.conversationDetails = page.locator('#conversation-details');
+    this.guestOptionsButton = this.conversationDetails.locator('[data-uie-name="go-guest-options"]');
   }
 
   async isOpen(conversationName: string) {
@@ -58,17 +63,19 @@ export class ConversationDetailsPage {
     await this.page.locator(`${selectById('add-participants')} ${selectByDataAttribute('do-create')}`).click();
   }
 
-  async isUserPartOfConversationAsMember(fullName: string) {
+  async isUserPartOfConversationAsAdmin(fullName: string) {
     const userLocator = this.page.locator(
       `${selectById('conversation-details')} ${selectByDataAttribute('list-admins')} ${selectByDataAttribute('item-user')}[data-uie-value="${fullName}"]`,
     );
-    return await userLocator.isVisible({timeout: 5000});
+    await userLocator.waitFor({state: 'visible', timeout: 5000});
+    return userLocator.isVisible();
   }
 
-  async isUserPartOfConversationAsAdmin(fullName: string) {
+  async isUserPartOfConversationAsMember(fullName: string) {
     const userLocator = this.page.locator(
       `${selectById('conversation-details')} ${selectByDataAttribute('list-members')} ${selectByDataAttribute('item-user')}[data-uie-value="${fullName}"]`,
     );
-    return await userLocator.isVisible({timeout: 5000});
+    await userLocator.waitFor({state: 'visible', timeout: 5000});
+    return userLocator.isVisible();
   }
 }

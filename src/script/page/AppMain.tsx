@@ -36,6 +36,14 @@ import {GroupCreationModal} from 'Components/Modals/GroupCreation/GroupCreationM
 import {LegalHoldModal} from 'Components/Modals/LegalHoldModal/LegalHoldModal';
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {showUserModal, UserModal} from 'Components/Modals/UserModal';
+import {useActiveWindow} from 'Hooks/useActiveWindow';
+import {useInitializeRootFontSize} from 'Hooks/useRootFontSize';
+import {CallingViewMode, CallState, DesktopScreenShareMenu} from 'Repositories/calling/CallState';
+import {ConversationState} from 'Repositories/conversation/ConversationState';
+import {User} from 'Repositories/entity/User';
+import {TeamState} from 'Repositories/team/TeamState';
+import {showInitialModal} from 'Repositories/user/AvailabilityModal';
+import {UserState} from 'Repositories/user/UserState';
 import {isUUID} from 'src/script/auth/util/stringUtil';
 import {Config} from 'src/script/Config';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
@@ -53,18 +61,10 @@ import {RootProvider} from './RootProvider';
 import {useAppMainState, ViewType} from './state';
 import {useAppState, ContentState} from './useAppState';
 
-import {CallingViewMode, CallState, DesktopScreenShareMenu} from '../calling/CallState';
-import {ConversationState} from '../conversation/ConversationState';
-import {User} from '../entity/User';
-import {useActiveWindow} from '../hooks/useActiveWindow';
-import {useInitializeRootFontSize} from '../hooks/useRootFontSize';
 import {App} from '../main/app';
 import {initialiseMLSMigrationFlow} from '../mls/MLSMigration';
 import {generateConversationUrl} from '../router/routeGenerator';
 import {configureRoutes, navigate} from '../router/Router';
-import {TeamState} from '../team/TeamState';
-import {showInitialModal} from '../user/AvailabilityModal';
-import {UserState} from '../user/UserState';
 import {MainViewModel} from '../view_model/MainViewModel';
 import {WarningsContainer} from '../view_model/WarningsContainer/WarningsContainer';
 

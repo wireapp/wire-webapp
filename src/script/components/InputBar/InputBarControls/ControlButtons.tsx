@@ -20,8 +20,8 @@
 import {MouseEvent} from 'react';
 
 import {FormatSeparator} from 'Components/InputBar/common/FormatSeparator/FormatSeparator';
+import {Conversation} from 'Repositories/entity/Conversation';
 import {Config} from 'src/script/Config';
-import {Conversation} from 'src/script/entity/Conversation';
 
 import {AssetUploadButton} from './AssetUploadButton/AssetUploadButton';
 import {CancelEditButton} from './CancelEditButton/CancelEditButton';

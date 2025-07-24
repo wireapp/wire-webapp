@@ -22,14 +22,13 @@ import React from 'react';
 import ko from 'knockout';
 
 import * as Icon from 'Components/Icon';
+import {ServiceEntity} from 'Repositories/integration/ServiceEntity';
 import {CSS_FILL_PARENT} from 'Util/CSSMixin';
 
 import {AvatarBackground} from './AvatarBackground';
 import {AvatarBorder} from './AvatarBorder';
 import {AvatarImage} from './AvatarImage';
 import {AvatarWrapper} from './AvatarWrapper';
-
-import {ServiceEntity} from '../../integration/ServiceEntity';
 
 import {AVATAR_SIZE} from '.';
 

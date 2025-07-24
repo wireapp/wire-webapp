@@ -19,7 +19,7 @@
 
 import {LexicalEditor, $nodesOfType} from 'lexical';
 
-import {User} from 'src/script/entity/User';
+import {User} from 'Repositories/entity/User';
 import {MentionEntity} from 'src/script/message/MentionEntity';
 
 import {MentionNode} from '../nodes/MentionNode';

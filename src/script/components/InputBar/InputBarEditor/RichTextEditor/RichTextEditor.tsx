@@ -33,8 +33,8 @@ import {LexicalEditor, EditorState} from 'lexical';
 
 import {DraftState} from 'Components/InputBar/common/draftState/draftState';
 import {MessageContent} from 'Components/InputBar/common/messageContent/messageContent';
-import {ContentMessage} from 'src/script/entity/message/ContentMessage';
-import {User} from 'src/script/entity/User';
+import {ContentMessage} from 'Repositories/entity/message/ContentMessage';
+import {User} from 'Repositories/entity/User';
 
 import {editorConfig} from './editorConfig';
 import {FormatToolbar} from './FormatToolbar/FormatToolbar';

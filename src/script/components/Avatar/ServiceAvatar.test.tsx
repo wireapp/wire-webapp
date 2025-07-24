@@ -20,10 +20,9 @@
 import {render} from '@testing-library/react';
 
 import {AVATAR_SIZE} from 'Components/Avatar';
+import {ServiceEntity} from 'Repositories/integration/ServiceEntity';
 
 import {ServiceAvatar} from './ServiceAvatar';
-
-import {ServiceEntity} from '../../integration/ServiceEntity';
 
 describe('ServiceAvatar', () => {
   it('shows a service icon', async () => {

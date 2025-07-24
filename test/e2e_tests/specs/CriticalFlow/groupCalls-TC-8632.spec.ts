@@ -27,7 +27,7 @@ import {getUser} from '../../data/user';
 import {test, expect} from '../../test.fixtures';
 import {addCreatedTeam, removeCreatedTeam} from '../../utils/tearDownUtil';
 
-const owner = getUser();
+let owner = getUser();
 owner.firstName = 'integrationtest';
 owner.lastName = 'integrationtest';
 owner.fullName = 'integrationtest';
@@ -55,16 +55,15 @@ test(
     const memberCalling = memberPageManager.webapp.components.calling();
 
     await test.step('Setup: Create users, invite member, enable calling', async () => {
-      await api.createTeamOwner(owner, teamName);
-      const teamId = await api.team.getTeamIdForUser(owner);
-      owner.teamId = teamId;
-      addCreatedTeam(owner, teamId);
+      const user = await api.createTeamOwner(owner, teamName);
+      owner = {...owner, ...user};
+      addCreatedTeam(owner, owner.teamId!);
 
       const invitationId = await api.team.inviteUserToTeam(member.email, owner);
-      const invitationCode = await api.brig.getTeamInvitationCodeForEmail(teamId, invitationId);
+      const invitationCode = await api.brig.getTeamInvitationCodeForEmail(owner.teamId!, invitationId);
 
       await api.createPersonalUser(member, invitationCode);
-      await api.enableConferenceCallingFeature(teamId);
+      await api.enableConferenceCallingFeature(owner.teamId!);
       await api.waitForFeatureToBeEnabled(FEATURE_KEY.CONFERENCE_CALLING, owner.teamId!, owner.token);
     });
 
@@ -99,7 +98,7 @@ test(
       await memberCalling.waitForCell();
       expect(await memberCalling.isCellVisible()).toBeTruthy();
 
-      await memberCalling.pickUpIncomingCall();
+      await memberCalling.clickAcceptCallButton();
       expect(await memberCalling.isCellVisible()).toBeTruthy();
 
       await memberCalling.waitForGoFullScreen();
