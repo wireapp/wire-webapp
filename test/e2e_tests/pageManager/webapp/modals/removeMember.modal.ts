@@ -19,7 +19,7 @@
 
 import {Page, Locator} from '@playwright/test';
 
-import {selectByDataAttribute} from '../../../utils/useSelector';
+import {selectByDataAttribute} from 'test/e2e_tests/utils/selector.util';
 
 export class RemoveMemberModal {
   readonly page: Page;

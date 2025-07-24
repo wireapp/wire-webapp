@@ -17,11 +17,11 @@
  *
  */
 
+import {removeCreatedUser} from 'test/e2e_tests/utils/tearDown.util';
 import {loginUser, logOutUser} from 'test/e2e_tests/utils/userActions';
 
 import {getUser} from '../../data/user';
 import {test, expect} from '../../test.fixtures';
-import {removeCreatedUser} from '../../utils/tearDownUtil';
 
 // Generating test data
 const user = getUser();

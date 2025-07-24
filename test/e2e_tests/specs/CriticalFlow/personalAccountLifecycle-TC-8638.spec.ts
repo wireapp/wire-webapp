@@ -17,9 +17,10 @@
  *
  */
 
+import {addCreatedUser, removeCreatedUser} from 'test/e2e_tests/utils/tearDown.util';
+
 import {getUser} from '../../data/user';
 import {test, expect} from '../../test.fixtures';
-import {addCreatedUser, removeCreatedUser} from '../../utils/tearDownUtil';
 
 // Generating test data
 // userB is the contact user, userA is the user who registers
@@ -27,13 +28,12 @@ const userB = getUser();
 const userA = getUser();
 
 test('Personal Account Lifecycle', {tag: ['@TC-8638', '@crit-flow-web']}, async ({pageManager, api}) => {
+  test.slow();
   const {pages, modals, components} = pageManager.webapp;
-  test.setTimeout(150_000); // Increasing test timeout to 150 seconds to accommodate the full flow
 
   await test.step('Preconditions: Creating preconditions for the test via API', async () => {
     await api.createPersonalUser(userB);
     addCreatedUser(userB);
-    await api.addDevicesToUser(userB, 1);
   });
 
   // Test steps

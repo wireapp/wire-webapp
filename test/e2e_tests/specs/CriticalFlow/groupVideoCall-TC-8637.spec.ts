@@ -19,16 +19,16 @@
 
 import {getUser} from 'test/e2e_tests/data/user';
 import {PageManager} from 'test/e2e_tests/pageManager';
-import {addMockCamerasToContext} from 'test/e2e_tests/utils/mockVideoDeviceUtils';
+import {addMockCamerasToContext} from 'test/e2e_tests/utils/mockVideoDevice.util';
+import {addCreatedTeam, addCreatedUser, removeCreatedTeam, removeCreatedUser} from 'test/e2e_tests/utils/tearDown.util';
 import {loginUser} from 'test/e2e_tests/utils/userActions';
 
 import {test, expect} from '../../test.fixtures';
-import {addCreatedTeam, addCreatedUser, removeCreatedTeam, removeCreatedUser} from '../../utils/tearDownUtil';
 
 // Generate test data
 const teamName = 'Critical';
 const conversationName = 'CritiCall';
-const teamOwner = getUser();
+let teamOwner = getUser();
 teamOwner.firstName = 'integrationtest';
 teamOwner.lastName = 'integrationtest';
 teamOwner.fullName = 'integrationtest';
@@ -58,13 +58,14 @@ test('Group Video call', {tag: ['@TC-8637', '@crit-flow']}, async ({browser, pag
   const {pages: guestPages, modals: guestModals} = guestPageManager.webapp;
 
   await test.step('Preconditions: Creating preconditions for the test via API', async () => {
-    await api.createTeamOwner(teamOwner, teamName);
-    addCreatedTeam(teamOwner, teamOwner.teamId!);
-    await api.enableConferenceCallingFeature(teamOwner.teamId!);
+    const owner = await api.createTeamOwner(teamOwner, teamName);
+    teamOwner = {...teamOwner, ...owner};
+    addCreatedTeam(teamOwner, teamOwner.teamId);
+    await api.enableConferenceCallingFeature(teamOwner.teamId);
 
     const invitationIdForMember = await api.team.inviteUserToTeam(teamMember.email, teamOwner);
     const invitationCodeForMember = await api.brig.getTeamInvitationCodeForEmail(
-      teamOwner.teamId!,
+      teamOwner.teamId,
       invitationIdForMember,
     );
 

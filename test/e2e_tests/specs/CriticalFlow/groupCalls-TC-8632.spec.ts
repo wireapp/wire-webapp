@@ -21,11 +21,11 @@ import {BrowserContext} from '@playwright/test';
 import {FEATURE_KEY} from '@wireapp/api-client/lib/team/feature';
 
 import {PageManager} from 'test/e2e_tests/pageManager';
+import {addCreatedTeam, removeCreatedTeam} from 'test/e2e_tests/utils/tearDown.util';
 import {loginUser} from 'test/e2e_tests/utils/userActions';
 
 import {getUser} from '../../data/user';
 import {test, expect} from '../../test.fixtures';
-import {addCreatedTeam, removeCreatedTeam} from '../../utils/tearDownUtil';
 
 let owner = getUser();
 owner.firstName = 'integrationtest';

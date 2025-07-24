@@ -19,7 +19,7 @@
 
 import {getUser} from '../data/user';
 import {test, expect} from '../test.fixtures';
-import {addCreatedUser, removeCreatedUser} from '../utils/tearDownUtil';
+import {addCreatedUser, removeCreatedUser} from '../utils/tearDown.util';
 import {loginUser} from '../utils/userActions';
 import {generateSecurePassword} from '../utils/userDataGenerator';
 
@@ -60,8 +60,6 @@ test('Verify you can sign in by email', {tag: ['@TC-3461', '@regression']}, asyn
 
   expect(await components.conversationSidebar().getPersonalStatusName()).toBe(`${user.firstName} ${user.lastName}`);
   expect(await components.conversationSidebar().getPersonalUserName()).toContain(user.username);
-});
 
-test.afterAll(async ({api}) => {
   await removeCreatedUser(api, user);
 });

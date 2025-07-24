@@ -17,20 +17,27 @@
  *
  */
 
-import {Locator, Page} from '@playwright/test';
+declare module 'qrcode-reader' {
+  import {EventEmitter} from 'events';
 
-import {selectByDataAttribute} from 'test/e2e_tests/utils/selector.util';
-
-export class HistoryInfoPage {
-  readonly page: Page;
-  private readonly continueButton: Locator;
-
-  constructor(page: Page) {
-    this.page = page;
-    this.continueButton = this.page.locator(selectByDataAttribute('do-history-confirm'));
+  interface QRCode {
+    result: string;
+    points: Array<{x: number; y: number}>;
   }
 
-  async clickConfirmButton() {
-    await this.continueButton.click();
+  interface DecodeCallback {
+    (err: Error | null, result: QRCode | null): void;
   }
+
+  class QrCode extends EventEmitter {
+    callback: DecodeCallback | null;
+
+    constructor();
+
+    decode(imageData: {width: number; height: number; data: Buffer | Uint8ClampedArray}): void;
+
+    decode(image: any, callback?: DecodeCallback): void;
+  }
+
+  export = QrCode;
 }
