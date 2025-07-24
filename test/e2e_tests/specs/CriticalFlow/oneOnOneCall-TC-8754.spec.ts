@@ -103,8 +103,6 @@ test(
         const response = await api.callingService.createInstance(ownerB.password, ownerB.email);
         callingServiceInstanceId = response.id;
         await api.callingService.setAcceptNextCall(callingServiceInstanceId);
-        await api.callingService.waitForInstanceToBeActive(callingServiceInstanceId);
-
         await ownerAPages.conversationList().openConversation(ownerB.fullName);
         await ownerAPages.conversation().clickConversationInfoButton();
         await ownerAPages.conversation().clickCallButton();
@@ -115,10 +113,10 @@ test(
     });
 
     await test.step('User B answers call from calling notification', async () => {
-      await ownerBPages.calling().waitForCell();
-      expect(await ownerBPages.calling().isCellVisible()).toBeTruthy();
-      // await ownerBPages.calling().clickAcceptCallButton();
-      await ownerBPages.calling().waitForGoFullScreen();
+      // answering happens automatically calling service
+      await ownerAPages.calling().waitForCell();
+      expect(await ownerAPages.calling().isCellVisible()).toBeTruthy();
+      await ownerAPages.calling().waitForGoFullScreen();
     });
 
     await test.step('User A switches audio on and sends audio', async () => {
