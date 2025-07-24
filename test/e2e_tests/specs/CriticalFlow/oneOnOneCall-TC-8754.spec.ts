@@ -28,10 +28,6 @@ import {addCreatedTeam, removeCreatedTeam} from '../../utils/tearDownUtil';
 let ownerA = getUser();
 let ownerB = getUser();
 
-ownerA.firstName = ownerA.lastName = ownerA.fullName = 'integrationtest';
-ownerB.firstName = ownerB.lastName = 'integrationtest';
-ownerB.fullName = ownerA.fullName = 'integrationtest integrationtest';
-
 const teamAName = 'Direct Call A';
 const teamBName = 'Direct Call B';
 
