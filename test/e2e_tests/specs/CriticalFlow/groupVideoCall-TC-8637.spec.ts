@@ -169,7 +169,7 @@ test(
       await ownerPages.audioVideoSettings().selectCamera('Fake Camera 2');
     });
 
-    await test.step('User B is able to "see" and "hear" User A’s new audio and video', async () => {
+    await test.step("User B is able to 'see' and 'hear' User A's new audio and video", async () => {
       await api.callingService.verifyAudioIsBeingReceived(callingServiceInstanceId);
       await api.callingService.verifyVideoIsBeingReceived(callingServiceInstanceId);
     });
@@ -178,7 +178,7 @@ test(
       await ownerPages.calling().clickToggleScreenShareButton();
     });
 
-    await test.step('User B is able to “see” User A’s screen', async () => {
+    await test.step("User B is able to 'see' User A's screen", async () => {
       await api.callingService.verifyVideoIsBeingReceived(callingServiceInstanceId);
     });
 
