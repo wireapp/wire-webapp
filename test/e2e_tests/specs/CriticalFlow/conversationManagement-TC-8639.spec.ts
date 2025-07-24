@@ -17,7 +17,8 @@
  *
  */
 
-import {inviteMembers, loginUser, logOutUser, sendTextMessageToConversation} from 'test/e2e_tests/utils/userActions';
+import {PageManager} from 'test/e2e_tests/pageManager';
+import {inviteMembers, loginUser, sendTextMessageToConversation} from 'test/e2e_tests/utils/userActions';
 
 import {getUser} from '../../data/user';
 import {test, expect} from '../../test.fixtures';
@@ -25,13 +26,13 @@ import {addCreatedTeam, removeCreatedTeam} from '../../utils/tearDownUtil';
 
 // Generating test data
 let owner = getUser();
-const members = Array.from({length: 2}, () => getUser());
+const members = Array.from({length: 5}, () => getUser());
 const teamName = 'Conversation Management';
 const conversationName = 'Test Conversation';
 
-test('Conversation Management', {tag: ['@TC-8636', '@crit-flow-web']}, async ({pageManager, api}) => {
+test('Conversation Management', {tag: ['@TC-8636', '@crit-flow-web']}, async ({pageManager, api, browser}) => {
   const {pages, modals} = pageManager.webapp;
-  test.setTimeout(120000); // Set test timeout to 5 minutes
+  test.slow(); // Increasing test timeout to 90 seconds to accommodate the full flow
 
   await test.step('Preconditions: Team owner created a team with 5 members', async () => {
     const user = await api.createTeamOwner(owner, teamName);
@@ -60,21 +61,21 @@ test('Conversation Management', {tag: ['@TC-8636', '@crit-flow-web']}, async ({p
     await sendTextMessageToConversation(pageManager, conversationName, 'Hello team! Admin here.');
   });
 
-  await test.step('Team owner logs out from the application', async () => {
-    await logOutUser(pageManager);
-  });
-
-  await test.step('Team members sign in, send messages, and log out', async () => {
-    for (const member of members) {
-      await loginUser(member, pageManager);
-      await modals.dataShareConsent().clickDecline();
-      await sendTextMessageToConversation(pageManager, conversationName, `Hello team! ${member.firstName} here.`);
-      await logOutUser(pageManager);
-    }
+  await test.step('Team members sign in and send messages', async () => {
+    await Promise.all(
+      members.map(async member => {
+        const memberContext = await browser.newContext();
+        const memberPage = await memberContext.newPage();
+        const memberPages = new PageManager(memberPage);
+        await memberPages.openMainPage();
+        await loginUser(member, memberPages);
+        await memberPages.webapp.modals.dataShareConsent().clickDecline();
+        await sendTextMessageToConversation(memberPages, conversationName, `Hello team! ${member.firstName} here.`);
+      }),
+    );
   });
 
   await test.step('Team owner signed in to the application and verify messages', async () => {
-    await loginUser(owner, pageManager);
     await pages.conversationList().openConversation(conversationName);
     for (const member of members) {
       expect(await pages.conversation().isMessageVisible(`Hello team! ${member.firstName} here.`)).toBeTruthy();
