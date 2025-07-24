@@ -39,6 +39,8 @@ test(
 
     const {pages: ownerAPages, modals: ownerAModals, components: ownerAComponents} = ownerAPageManager.webapp;
 
+    await addMockCamerasToContext(ownerAPageManager.getContext());
+
     const ownerBContext = await browser.newContext();
     const ownerBPage = await ownerBContext.newPage();
     const ownerBPageManager = PageManager.from(ownerBPage);
@@ -80,9 +82,6 @@ test(
         })(),
       ]);
     });
-
-    // Add fake video devices to the browser context
-    await addMockCamerasToContext(ownerAPageManager.getContext());
 
     // user A finds user B and sends a connection request
     await test.step('User A connects with User B', async () => {
