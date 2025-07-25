@@ -33,6 +33,15 @@ export enum SidebarTabs {
   CELLS,
 }
 
+export enum ConversationFilter {
+  NONE = 'NONE',
+  UNREAD = 'UNREAD',
+  MENTIONS = 'MENTIONS',
+  REPLIES = 'REPLIES',
+  DRAFTS = 'DRAFTS',
+  PINGS = 'PINGS',
+}
+
 export const SidebarStatus = {
   OPEN: 'OPEN',
   CLOSED: 'CLOSED',
@@ -45,6 +54,8 @@ export interface SidebarStore {
   setStatus: (status: SidebarStatus) => void;
   currentTab: SidebarTabs;
   setCurrentTab: (tab: SidebarTabs) => void;
+  conversationFilter: ConversationFilter;
+  setConversationFilter: (filter: ConversationFilter) => void;
 }
 
 const useSidebarStore = create<SidebarStore>()(
@@ -56,6 +67,8 @@ const useSidebarStore = create<SidebarStore>()(
       },
       status: SidebarStatus.OPEN,
       setStatus: status => set({status: status}),
+      conversationFilter: ConversationFilter.NONE,
+      setConversationFilter: (filter: ConversationFilter) => set({conversationFilter: filter}),
     }),
     {
       name: 'sidebar-store',
@@ -65,6 +78,7 @@ const useSidebarStore = create<SidebarStore>()(
         currentTab: [SidebarTabs.PREFERENCES, SidebarTabs.CONNECT, SidebarTabs.CELLS].includes(state.currentTab)
           ? SidebarTabs.RECENT
           : state.currentTab,
+        conversationFilter: state.conversationFilter,
       }),
     },
   ),
