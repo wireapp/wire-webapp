@@ -63,12 +63,14 @@ export class CallingServiceClientE2E {
   async waitForInstanceToBeActive(instanceId: string): Promise<boolean> {
     const {instanceStatus} = await this.getStatus(instanceId);
 
-    if (instanceStatus !== 'ACTIVE') {
+    const isActive = instanceStatus === 'ACTIVE';
+
+    if (!isActive) {
       await new Promise(resolve => setTimeout(resolve, 5000));
       return this.waitForInstanceToBeActive(instanceId);
     }
 
-    return instanceStatus === 'ACTIVE';
+    return isActive;
   }
 
   async getStatus(instanceId: string): Promise<{
