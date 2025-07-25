@@ -58,13 +58,6 @@ test(
       ownerB = {...ownerB, ...userB};
       addCreatedTeam(ownerB, ownerB.teamId!);
       await api.enableConferenceCallingFeature(ownerB.teamId!);
-
-      // if (!ownerA.token || !ownerB.qualifiedId?.id) {
-      //   throw new Error('User A token or User B qualified ID is not set');
-      // }
-
-      // await api.connection.sendConnectionRequest(ownerA.token, ownerB.qualifiedId?.id);
-      // await api.acceptConnectionRequest(ownerB);
     });
 
     await test.step('Users A and B are logged in', async () => {
