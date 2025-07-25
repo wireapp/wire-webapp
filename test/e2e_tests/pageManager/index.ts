@@ -36,6 +36,7 @@ import {ExportBackupModal} from './webapp/modals/exportBackup.modal';
 import {LeaveConversationModal} from './webapp/modals/leaveConversation.modal';
 import {RemoveMemberModal} from './webapp/modals/removeMember.modal';
 import {UserProfileModal} from './webapp/modals/userProfile.modal';
+import {VerifyEmailModal} from './webapp/modals/verifyEmail.modal';
 import {AccountPage} from './webapp/pages/account.page';
 import {AudioVideoSettingsPage} from './webapp/pages/audioVideoSettings.page';
 import {CallingPage} from './webapp/pages/calling.page';
@@ -55,6 +56,8 @@ import {LoginPage} from './webapp/pages/login.page';
 import {OutgoingConnectionPage} from './webapp/pages/outgoingConnection.page';
 import {RegisterSuccessPage} from './webapp/pages/registerSuccess.page';
 import {RegistrationPage} from './webapp/pages/registration.page';
+import {RequestResetPasswordPage} from './webapp/pages/requestResetPassword.page';
+import {ResetPasswordPage} from './webapp/pages/resetPassword.page';
 import {SettingsPage} from './webapp/pages/settings.page';
 import {SingleSignOnPage} from './webapp/pages/singleSignOn.page';
 import {StartUIPage} from './webapp/pages/startUI.page';
@@ -87,6 +90,10 @@ export class PageManager {
 
   openMainPage = () => {
     return this.page.goto(webAppPath, {waitUntil: 'networkidle'});
+  };
+
+  openUrl = (url: string) => {
+    return this.page.goto(url, {waitUntil: 'networkidle'});
   };
 
   openTeamManagementPage = () => {
@@ -145,6 +152,9 @@ export class PageManager {
       historyInfo: () => this.getOrCreate('webapp.pages.infoHostory', () => new HistoryInfoPage(this.page)),
       historyExport: () => this.getOrCreate('webapp.pages.historyExport', () => new HistoryExportPage(this.page)),
       historyImport: () => this.getOrCreate('webapp.pages.historyImport', () => new HistoryImportPage(this.page)),
+      requestResetPassword: () =>
+        this.getOrCreate('webapp.pages.requestResetPassword', () => new RequestResetPasswordPage(this.page)),
+      resetPassword: () => this.getOrCreate('webapp.pages.resetPassword', () => new ResetPasswordPage(this.page)),
     },
     modals: {
       dataShareConsent: () =>
@@ -161,6 +171,7 @@ export class PageManager {
       copyPassword: () => this.getOrCreate('webapp.modals.copyPassword', () => new CopyPasswordModal(this.page)),
       createGuestLink: () =>
         this.getOrCreate('webapp.modals.createGuestLink', () => new CreatGuestLinkModal(this.page)),
+      verifyEmail: () => this.getOrCreate('webapp.modals.verifyEmail', () => new VerifyEmailModal(this.page)),
     },
     components: {
       conversationSidebar: () =>
