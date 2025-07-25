@@ -22,7 +22,7 @@ import {ChangeEvent, FormEvent, MouseEvent, useState} from 'react';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 
 import {CellNode} from 'Components/Conversation/ConversationCells/common/cellNode/cellNode';
-import {CellsRepository} from 'src/script/cells/CellsRepository';
+import {CellsRepository} from 'Repositories/cells/CellsRepository';
 import {t} from 'Util/LocalizerUtil';
 import {isAxiosError} from 'Util/TypePredicateUtil';
 

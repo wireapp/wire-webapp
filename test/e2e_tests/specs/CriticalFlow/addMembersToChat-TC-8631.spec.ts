@@ -24,7 +24,7 @@ import {addCreatedTeam, removeCreatedTeam} from '../../utils/tearDownUtil';
 import {loginUser} from '../../utils/userActions';
 
 // Generating test data
-const owner = getUser();
+let owner = getUser();
 const member1 = getUser();
 const member2 = getUser();
 const teamName = 'Critical';
@@ -39,8 +39,8 @@ test(
     const {pages, modals} = pageManager.webapp;
 
     await test.step('Preconditions: Creating preconditions for the test via API', async () => {
-      await api.createTeamOwner(owner, teamName);
-      owner.teamId = await api.team.getTeamIdForUser(owner);
+      const user = await api.createTeamOwner(owner, teamName);
+      owner = {...owner, ...user};
       addCreatedTeam(owner, owner.teamId);
       const invitationIdForMember1 = await api.team.inviteUserToTeam(member1.email, owner);
       const invitationCodeForMember1 = await api.brig.getTeamInvitationCodeForEmail(

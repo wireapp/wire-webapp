@@ -17,11 +17,10 @@
  *
  */
 
+import {User} from 'Repositories/entity/User';
 import {Declension, LocalizerUtil, t, getSelfName, getUserName} from 'Util/LocalizerUtil';
 
 import {escapeRegex, safeWindowOpen} from './SanitizationUtil';
-
-import {User} from '../entity/User';
 
 describe('SanitizationUtil', () => {
   describe('escapeRegex', () => {

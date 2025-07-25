@@ -23,13 +23,13 @@ import {TabIndex} from '@wireapp/react-ui-kit';
 
 import {DeviceVerificationBadges} from 'Components/Badge';
 import * as Icon from 'Components/Icon';
+import {ClientEntity} from 'Repositories/client';
 import {WireIdentity} from 'src/script/E2EIdentity';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {handleKeyDown, KEY} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
 import {splitFingerprint} from 'Util/StringUtil';
 
-import {ClientEntity} from '../../../../../../../client';
 import {FormattedId} from '../FormattedId';
 
 interface DeviceProps {

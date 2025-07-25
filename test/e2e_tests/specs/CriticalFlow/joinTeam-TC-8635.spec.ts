@@ -25,7 +25,7 @@ import {loginUser, sendTextMessageToUser} from 'test/e2e_tests/utils/userActions
 import {test, expect} from '../../test.fixtures';
 
 // Generating test data
-const owner = getUser();
+let owner = getUser();
 const member1 = getUser();
 const memberA = getUser();
 const teamName = 'Critical';
@@ -44,8 +44,8 @@ test(
 
     await test.step('Preconditions: Creating preconditions for the test via API', async () => {
       // Precondition: Team owner exists in a team with 1 team member
-      await api.createTeamOwner(owner, teamName);
-      owner.teamId = await api.team.getTeamIdForUser(owner);
+      const user = await api.createTeamOwner(owner, teamName);
+      owner = {...owner, ...user};
       addCreatedTeam(owner, owner.teamId);
       const invitationIdForMember1 = await api.team.inviteUserToTeam(member1.email, owner);
       const invitationCodeForMember1 = await api.brig.getTeamInvitationCodeForEmail(

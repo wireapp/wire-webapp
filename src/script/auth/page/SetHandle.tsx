@@ -28,8 +28,8 @@ import {AnyAction, Dispatch} from 'redux';
 import {Runtime} from '@wireapp/commons';
 import {Button, ContainerXS, Form, Input, InputBlock, InputSubmitCombo, Text} from '@wireapp/react-ui-kit';
 
+import {StorageKey} from 'Repositories/storage';
 import {navigate} from 'src/script/router/Router';
-import {StorageKey} from 'src/script/storage';
 import {t} from 'Util/LocalizerUtil';
 import {storeValue} from 'Util/StorageUtil';
 import {isBackendError} from 'Util/TypePredicateUtil';

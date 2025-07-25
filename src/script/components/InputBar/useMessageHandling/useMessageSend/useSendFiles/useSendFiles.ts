@@ -21,7 +21,7 @@ import {useCallback, useState} from 'react';
 
 import {useAppNotification} from 'Components/AppNotification';
 import {FileWithPreview} from 'Components/Conversation/useFilesUploadState/useFilesUploadState';
-import {CellsRepository} from 'src/script/cells/CellsRepository';
+import {CellsRepository} from 'Repositories/cells/CellsRepository';
 import {t} from 'Util/LocalizerUtil';
 
 export type SendFilesStatus = 'idle' | 'loading' | 'success' | 'error';

@@ -21,9 +21,7 @@ import {BackendClientE2E} from './backendClient.e2e';
 
 export class UserRepositoryE2E extends BackendClientE2E {
   public async deleteUser(userPassword: string, token: string) {
-    await this.axiosInstance.request({
-      url: 'self',
-      method: 'DELETE',
+    await this.axiosInstance.delete('self', {
       headers: {
         Authorization: `Bearer ${token}`,
       },

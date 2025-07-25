@@ -22,14 +22,15 @@ import ko from 'knockout';
 
 import {CALL_TYPE, VIDEO_STATE} from '@wireapp/avs';
 
-import {Call} from 'src/script/calling/Call';
-import {Conversation} from 'src/script/entity/Conversation';
-import {MediaDevicesHandler} from 'src/script/media/MediaDevicesHandler';
+import {Call} from 'Repositories/calling/Call';
+import {Participant} from 'Repositories/calling/Participant';
+import {Conversation} from 'Repositories/entity/Conversation';
+import {User} from 'Repositories/entity/User';
+import {MediaDevicesHandler} from 'Repositories/media/MediaDevicesHandler';
 
 import {GroupVideoGrid, GroupVideoGripProps} from './GroupVideoGrid';
 
-import {Participant} from '../../calling/Participant';
-import {User} from '../../entity/User';
+jest.mock('@wireapp/api-client/lib/team');
 
 const createMockParticipant = (
   userId: string,
