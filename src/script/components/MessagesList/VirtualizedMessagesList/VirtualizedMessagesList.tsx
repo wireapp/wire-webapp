@@ -128,13 +128,13 @@ export const VirtualizedMessagesList = ({
     loadingMessages,
     onLoadingMessages: setLoadingMessages,
     itemsLength: groupedMessages.length,
+    initialMessageId,
   });
 
   useScrollMessages(virtualizer, {
     conversation,
     messages: groupedMessages,
     highlightedMessage,
-    setHighlightedMessage,
     userId: selfUser.id,
     conversationLastReadTimestamp,
   });

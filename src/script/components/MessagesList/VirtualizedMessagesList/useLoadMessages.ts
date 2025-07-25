@@ -17,7 +17,7 @@
  *
  */
 
-import {useCallback, useEffect, useLayoutEffect, useRef} from 'react';
+import {useCallback, useEffect} from 'react';
 
 import {Virtualizer} from '@tanstack/react-virtual';
 
@@ -34,32 +34,42 @@ interface Props {
   loadingMessages: boolean;
   onLoadingMessages: (isLoading: boolean) => void;
   itemsLength: number;
+  initialMessageId?: string;
 }
 
 export const useLoadMessages = (
   virtualizer: Virtualizer<HTMLDivElement, Element>,
-  {conversation, conversationRepository, loadingMessages, onLoadingMessages, itemsLength}: Props,
+  {conversation, conversationRepository, loadingMessages, onLoadingMessages, itemsLength, initialMessageId}: Props,
 ) => {
   const {isLoadingMessages, hasAdditionalMessages} = useKoSubscribableChildren(conversation, [
     'isLoadingMessages',
     'hasAdditionalMessages',
   ]);
 
-  // Declared number of messages
-  const nbOfMessages = useRef(0);
-
   const loadPrecedingMessages = useCallback(async () => {
     const shouldPullMessages = !isLoadingMessages && hasAdditionalMessages;
 
     if (shouldPullMessages) {
       onLoadingMessages(true);
-      await conversationRepository.getPrecedingMessages(conversation).then(() => {
+      const newMessages = await conversationRepository.getPrecedingMessages(conversation).then(messages => {
         onLoadingMessages(false);
+        return messages;
       });
 
-      nbOfMessages.current = itemsLength;
+      if (!initialMessageId) {
+        requestAnimationFrame(() => {
+          virtualizer.scrollToIndex(itemsLength - (itemsLength - newMessages.length), {align: 'start'});
+        });
+      }
     }
-  }, [conversation, conversationRepository, hasAdditionalMessages, isLoadingMessages, onLoadingMessages]);
+  }, [
+    conversation,
+    conversationRepository,
+    hasAdditionalMessages,
+    isLoadingMessages,
+    onLoadingMessages,
+    initialMessageId,
+  ]);
 
   const loadFollowingMessages = useCallback(async () => {
     const lastMessage = conversation.getNewestMessage();
@@ -68,31 +78,21 @@ export const useLoadMessages = (
       if (!isLastReceivedMessage(lastMessage, conversation)) {
         onLoadingMessages(true);
         // if the last loaded message is not the last of the conversation, we load the subsequent messages
-        await conversationRepository.getSubsequentMessages(conversation, lastMessage).then(() => {
-          onLoadingMessages(false);
-        });
+        const newMessages = await conversationRepository
+          .getSubsequentMessages(conversation, lastMessage)
+          .then(messages => {
+            onLoadingMessages(false);
+            return messages;
+          });
 
-        nbOfMessages.current = itemsLength;
+        if (!initialMessageId) {
+          requestAnimationFrame(() => {
+            virtualizer.scrollToIndex(itemsLength - (itemsLength - newMessages.length), {align: 'start'});
+          });
+        }
       }
     }
-  }, [conversation, conversationRepository, onLoadingMessages]);
-
-  // This function ensures that after messages are loaded, the UI scrolls to the correct position in a
-  // virtualized list — likely to show newly loaded messages in a chat or feed.
-  // It waits for layout updates to ensure the DOM is in a stable state before scrolling.
-  useLayoutEffect(() => {
-    if (loadingMessages || !nbOfMessages.current) {
-      return;
-    }
-
-    const scrollElement = virtualizer.scrollElement;
-
-    if (!scrollElement) {
-      return;
-    }
-
-    virtualizer.scrollToIndex(itemsLength - nbOfMessages.current, {align: 'start'});
-  }, [itemsLength, loadingMessages, virtualizer]);
+  }, [conversation, conversationRepository, onLoadingMessages, initialMessageId]);
 
   // This function ensures that after user scroll to top or bottom content,
   // the preceding / following messages will be loaded.

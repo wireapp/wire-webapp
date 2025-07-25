@@ -32,12 +32,11 @@ interface Props {
   highlightedMessage?: string;
   userId: string;
   conversationLastReadTimestamp: MutableRefObject<number>;
-  setHighlightedMessage: (messageId: string | undefined) => void;
 }
 
 export const useScrollMessages = (
   virtualizer: Virtualizer<HTMLDivElement, Element>,
-  {conversation, messages, highlightedMessage, userId, conversationLastReadTimestamp, setHighlightedMessage}: Props,
+  {conversation, messages, highlightedMessage, userId, conversationLastReadTimestamp}: Props,
 ) => {
   const hasInitialScrollRef = useRef(false);
   const [hasScrolledToHighlightedMessage, setHasScrolledToHighlightedMessage] = useState(false);
@@ -56,9 +55,7 @@ export const useScrollMessages = (
 
     setHasScrolledToHighlightedMessage(true);
 
-    requestAnimationFrame(() => {
-      virtualizer.scrollToIndex(index, {align: 'center'});
-    });
+    virtualizer.scrollToIndex(index, {align: 'center'});
   }, [highlightedMessage, hasScrolledToHighlightedMessage, messages, virtualizer]);
 
   // This function scroll to currently send message by self user.
@@ -88,19 +85,9 @@ export const useScrollMessages = (
 
   // This function scrolling to the first unread message or bottom to the message list on initialization.
   useEffect(() => {
-    if (hasInitialScrollRef.current) {
-      return;
-    }
+    const shouldSkipInitialScroll = hasInitialScrollRef.current || messages.length === 0 || virtualizer.isScrolling;
 
-    if (messages.length === 0) {
-      return;
-    }
-
-    if (virtualizer.isScrolling) {
-      return;
-    }
-
-    if (highlightedMessage && !hasScrolledToHighlightedMessage) {
+    if (shouldSkipInitialScroll) {
       return;
     }
 
@@ -126,5 +113,26 @@ export const useScrollMessages = (
       virtualizer.scrollToIndex(lastUnreadMessageIndex, {align: 'end'});
       hasInitialScrollRef.current = true;
     });
-  }, [conversation, userId, virtualizer, messages, conversationLastReadTimestamp, highlightedMessage]);
+  }, [conversation, userId, virtualizer, messages, conversationLastReadTimestamp]);
+
+  // If the scroll was at the top and new messages were loaded, scroll in a way that preserves the position.
+  useEffect(() => {
+    if (messages.length === 0) {
+      return;
+    }
+
+    if (highlightedMessage) {
+      return;
+    }
+
+    const virtualItems = virtualizer.getVirtualItems();
+    const lastIndex = messages.length - 1;
+    const isAtBottom = virtualItems.length > 0 && virtualItems[virtualItems.length - 1].index >= lastIndex - 1;
+
+    if (isAtBottom && !virtualizer.isScrolling) {
+      requestAnimationFrame(() => {
+        virtualizer.scrollToIndex(lastIndex, {align: 'end', behavior: 'smooth'});
+      });
+    }
+  }, [virtualizer, messages]);
 };
