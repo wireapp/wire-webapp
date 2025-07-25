@@ -17,23 +17,40 @@
  *
  */
 
+import {PageManager} from 'test/e2e_tests/pageManager';
+import {loginUser, sendTextMessageToUser} from 'test/e2e_tests/utils/userActions';
+
 import {getUser} from '../../data/user';
 import {test, expect} from '../../test.fixtures';
 import {addCreatedUser, removeCreatedUser} from '../../utils/tearDownUtil';
 
 // Generating test data
-// userB is the contact user, userA is the user who registers
-const userB = getUser();
+// otherUsers[0] is the contact user, userA is the user who registers
 const userA = getUser();
+const otherUsers = Array.from({length: 2}, () => getUser());
 
-test('Personal Account Lifecycle', {tag: ['@TC-8638', '@crit-flow-web']}, async ({pageManager, api}) => {
+test('Personal Account Lifecycle', {tag: ['@TC-8638', '@crit-flow-web']}, async ({pageManager, api, browser}) => {
+  const pageManagers = await Promise.all(
+    otherUsers.map(async user => {
+      const memberContext = await browser.newContext();
+      const memberPage = await memberContext.newPage();
+      return new PageManager(memberPage);
+    }),
+  );
+
   const {pages, modals, components} = pageManager.webapp;
-  test.setTimeout(150_000); // Increasing test timeout to 150 seconds to accommodate the full flow
+  test.setTimeout(120_000); // Increasing test timeout to 120 seconds to accommodate the full flow
 
   await test.step('Preconditions: Creating preconditions for the test via API', async () => {
-    await api.createPersonalUser(userB);
-    addCreatedUser(userB);
-    await api.addDevicesToUser(userB, 1);
+    await Promise.all(
+      otherUsers.map(async (user, index) => {
+        await api.createPersonalUser(user);
+        addCreatedUser(user);
+        await pageManagers[index].openMainPage();
+        await loginUser(user, pageManagers[index]);
+        await pageManagers[index].webapp.modals.dataShareConsent().clickDecline();
+      }),
+    );
   });
 
   // Test steps
@@ -51,15 +68,16 @@ test('Personal Account Lifecycle', {tag: ['@TC-8638', '@crit-flow-web']}, async 
     expect(await pages.registration().isSubmitButtonEnabled()).toBeTruthy();
 
     await pages.registration().clickSubmitButton();
-    const verificationCode = await api.inbucket.getVerificationCode(userA.email);
-    await pageManager.tm.pages.emailVerification().enterVerificationCode(verificationCode);
-    await pageManager.tm.modals.marketingConsent().clickConfirmButton();
+    const verificationCode = await api.brig.getActivationCodeForEmail(userA.email);
+    expect(await pages.emailVerification().isEmailVerificationPageVisible()).toBeTruthy();
+    await pages.emailVerification().enterVerificationCode(verificationCode);
+    await modals.marketingConsent().clickConfirmButton();
   });
 
   await test.step('Personal user A sets user name', async () => {
-    await pageManager.tm.pages.setUsername().setUsername(userA.username);
-    await pageManager.tm.pages.setUsername().clickNextButton();
-    await pageManager.tm.pages.registerSuccess().clickOpenWireWebButton();
+    await pages.setUsername().setUsername(userA.username);
+    await pages.setUsername().clickNextButton();
+    await pages.registerSuccess().clickOpenWireWebButton();
   });
 
   await test.step('Personal user A declines sending anonymous usage data', async () => {
@@ -75,54 +93,91 @@ test('Personal Account Lifecycle', {tag: ['@TC-8638', '@crit-flow-web']}, async 
 
   await test.step('Personal user A searches for other personal user B', async () => {
     await components.conversationSidebar().clickConnectButton();
-    await pages.startUI().selectUser(userB.username);
+    await pages.startUI().selectUser(otherUsers[0].username);
     expect(await modals.userProfile().isVisible());
   });
 
   await test.step('Personal user A sends a connection request to personal user B', async () => {
     await modals.userProfile().clickConnectButton();
-    await pages.conversationList().openConversation(userB.fullName);
-    expect(await pages.outgoingConnection().getOutgoingConnectionUsername()).toContain(userB.username);
-    expect(await pages.outgoingConnection().isPendingIconVisible(userB.fullName));
+    await pages.conversationList().openConversation(otherUsers[0].fullName);
+    expect(await pages.outgoingConnection().getOutgoingConnectionUsername()).toContain(otherUsers[0].username);
+    expect(await pages.outgoingConnection().isPendingIconVisible(otherUsers[0].fullName));
   });
 
-  await test.step('Personal user B accepts request', async () => {
-    await api.acceptConnectionRequest(userB);
-    expect(await pages.outgoingConnection().isPendingIconHidden(userB.fullName));
+  await test.step('Personal user B accepts request from A', async () => {
+    await pageManagers[0].webapp.pages.conversationList().openPendingConnectionRequest();
+    await pageManagers[0].webapp.pages.connectRequest().clickConnectButton();
+    await pageManager.waitForTimeout(5000); // Wait for the connection to be established
   });
 
-  await test.step('Personal user A and personal user B exchange some messages', async () => {
-    // TODO: Conversation sometimes closes after connection request was approved, so we need to reopen it
-    await pages.conversationList().openConversation(userB.fullName);
-    expect(await pages.conversation().isConversationOpen(userB.fullName));
+  // await test.step('Personal user A and personal user B exchange some messages', async () => {
+  //   await pages.conversationList().openConversation(otherUsers[0].fullName);
+  //   expect(await pages.conversation().isConversationOpen(otherUsers[0].fullName));
 
-    // TODO: Bug [WPB-18226] Message is not visible in the conversation after sending it
-    // await pages.conversationPage.sendMessage('Hello there');
-    // expect(await pages.conversationPage.isMessageVisible('Hello there')).toBeTruthy();
+  //   // TODO: Bug [WPB-18226] Message is not visible in the conversation after sending it
+  //   // await pages.conversationPage.sendMessage('Hello there');
+  //   // expect(await pages.conversationPage.isMessageVisible('Hello there')).toBeTruthy();
 
-    // await api.sendMessageToPersonalConversation(userB, userA, 'Heya');
-    // expect(await pages.conversationPage.isMessageVisible('Heya')).toBeTruthy();
+  //   // await api.sendMessageToPersonalConversation(otherUsers[0], userA, 'Heya');
+  //   // expect(await pages.conversationPage.isMessageVisible('Heya')).toBeTruthy();
+  // });
+
+  await test.step('Personal user A send message to personal user B', async () => {
+    await sendTextMessageToUser(pageManager, otherUsers[0], `Hello team! ${userA.firstName} here.`);
+  });
+
+  await test.step('Personal user B can see the message from user A', async () => {
+    await pageManagers[0].webapp.pages.conversationList().openConversation(userA.fullName);
+    expect(
+      await pageManagers[0].webapp.pages.conversation().isMessageVisible(`Hello team! ${userA.firstName} here.`),
+    ).toBeTruthy();
   });
 
   await test.step('Personal user A blocks personal user B', async () => {
-    await pages.conversationList().clickConversationOptions(userB.fullName);
+    await pages.conversationList().clickConversationOptions(otherUsers[0].fullName);
     await pages.conversationList().clickBlockConversation();
     expect(await modals.blockWarning().isModalPresent());
-    expect(await modals.blockWarning().getModalTitle()).toContain(`Block ${userB.fullName}`);
+    expect(await modals.blockWarning().getModalTitle()).toContain(`Block ${otherUsers[0].fullName}`);
     expect(await modals.blockWarning().getModalText()).toContain(
-      `${userB.fullName} won’t be able to contact you or add you to group conversations.`,
+      `${otherUsers[0].fullName} won’t be able to contact you or add you to group conversations.`,
     );
 
     await modals.blockWarning().clickBlock();
-    expect(await pages.conversationList().isConversationBlocked(userB.fullName));
+    expect(await pages.conversationList().isConversationBlocked(otherUsers[0].fullName));
 
     // [WPB-18093] Backend not returning the blocked 1:1 in conversations list
     // When User <Contact> sends message "See this?" to personal MLS conversation <Name>
     // Then I do not see text message See this?
   });
 
-  await test.step('Personal user A opens settings', async () => {
-    await components.conversationSidebar().clickPreferencesButton();
+  await test.step('Personal user C sends a connection request to personal user A', async () => {
+    await pageManagers[1].webapp.components.conversationSidebar().clickConnectButton();
+    await pageManagers[1].webapp.pages.startUI().selectUser(userA.username);
+    expect(await pageManagers[1].webapp.modals.userProfile().isVisible());
+    await pageManagers[1].webapp.modals.userProfile().clickConnectButton();
+    await pageManagers[1].webapp.pages.conversationList().openConversation(userA.fullName);
+    expect(await pageManagers[1].webapp.pages.outgoingConnection().getOutgoingConnectionUsername()).toContain(
+      userA.username,
+    );
+    expect(await pageManagers[1].webapp.pages.outgoingConnection().isPendingIconVisible(userA.fullName));
+  });
+
+  await test.step('Personal user A accepts request from C', async () => {
+    await pages.conversationList().openPendingConnectionRequest();
+    await pages.connectRequest().clickConnectButton();
+    await pageManager.waitForTimeout(5000); // Wait for the connection to be established
+  });
+
+  await test.step('Personal user A send message to personal user C', async () => {
+    await sendTextMessageToUser(pageManager, otherUsers[1], `Hello team! ${userA.firstName} here.`);
+  });
+
+  await test.step('Personal user C can see the message from user A', async () => {
+    await pageManagers[1].refreshPage({waitUntil: 'networkidle'});
+    await pageManagers[1].webapp.pages.conversationList().openConversation(userA.fullName);
+    expect(
+      await pageManagers[1].webapp.pages.conversation().isMessageVisible(`Hello team! ${userA.firstName} here.`),
+    ).toBeTruthy();
   });
 
   // Uncomment when [WPB-18496] is fixed
@@ -149,5 +204,5 @@ test('Personal Account Lifecycle', {tag: ['@TC-8638', '@crit-flow-web']}, async 
 });
 
 test.afterAll(async ({api}) => {
-  await removeCreatedUser(api, userB);
+  await removeCreatedUser(api, otherUsers[0]);
 });
