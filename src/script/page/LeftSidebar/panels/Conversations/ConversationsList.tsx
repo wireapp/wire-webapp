@@ -202,7 +202,9 @@ export const ConversationsList = ({
         .filter(conv => isConversationEntity(conv))
         .findIndex(conv => conv.id === clickedFilteredConversationId);
       if (conversationIndex !== -1) {
-        rowVirtualizer.scrollToIndex(conversationIndex, {align: 'auto'});
+        requestAnimationFrame(() => {
+          rowVirtualizer.scrollToIndex(conversationIndex, {align: 'auto'});
+        });
       }
 
       setClickedFilteredConversationId(null);
