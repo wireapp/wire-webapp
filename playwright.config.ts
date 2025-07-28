@@ -61,8 +61,7 @@ module.exports = defineConfig({
       use: {
         ...devices['Desktop Chrome'],
         channel: 'chrome',
-        headless: true,
-        permissions: ['camera', 'microphone'],
+        headless: process.env.HEADLESS !== 'false',
         launchOptions: {
           args: ['--use-fake-device-for-media-stream', '--use-fake-ui-for-media-stream'],
         },
