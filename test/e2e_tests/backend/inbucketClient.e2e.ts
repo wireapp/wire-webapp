@@ -75,8 +75,8 @@ export class InbucketClientE2E {
   }
 
   async getResetPasswordURL(email: string) {
-    const resetPasswordRegex = 'https://[a-zA-Z_0-9.=-]+/reset/\\?key=[a-zA-Z_0-9.\\-\\\\&_=]+';
-    return this.getMatchingURLFromEmailBody(email, resetPasswordRegex);
+    const resetLinkRegex = 'https://[a-zA-Z_0-9.=-]+/reset/\\?key=[a-zA-Z_0-9.\\-\\\\&_=]+';
+    return this.getMatchingURLFromEmailBody(email, resetLinkRegex);
   }
 
   async isTeamInvitationEmailReceived(inviteeEmail: string, inviterEmail: string) {
