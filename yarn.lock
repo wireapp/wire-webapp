@@ -18447,7 +18447,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"qrcode-reader@npm:^1.0.4":
+"qrcode-reader@npm:1.0.4":
   version: 1.0.4
   resolution: "qrcode-reader@npm:1.0.4"
   checksum: 10/973b71da2f2298a283a788dab38bf197cfad827a8c5e84e9c6a1fb9d8d767550cb9cb90b588dafd37d53cc4ba9ae7cc7be8ac61622fb1b55aee644cbf321153e
@@ -22076,7 +22076,7 @@ __metadata:
     prettier: "npm:3.3.2"
     prism-themes: "npm:^1.9.0"
     prismjs: "npm:^1.29.0"
-    qrcode-reader: "npm:^1.0.4"
+    qrcode-reader: "npm:1.0.4"
     raw-loader: "npm:4.0.2"
     react: "npm:18.3.1"
     react-dom: "npm:18.3.1"
