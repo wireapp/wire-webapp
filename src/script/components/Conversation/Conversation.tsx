@@ -106,7 +106,7 @@ export const Conversation = ({
     'isFileSharingSendingEnabled',
   ]);
 
-  const {is1to1, isRequest, isReadOnlyConversation, isSelfUserRemoved} = useKoSubscribableChildren(
+  const {is1to1, isRequest, isReadOnlyConversation, isSelfUserRemoved, cellsState} = useKoSubscribableChildren(
     activeConversation!,
     [
       'is1to1',
@@ -116,6 +116,7 @@ export const Conversation = ({
       'connection',
       'isReadOnlyConversation',
       'isSelfUserRemoved',
+      'cellsState',
     ],
   );
 
@@ -478,8 +479,7 @@ export const Conversation = ({
     isDisabled: isFileTabActive,
   });
 
-  const isCellsEnabled =
-    Config.getConfig().FEATURE.ENABLE_CELLS && activeConversation?.cellsState() !== CONVERSATION_CELLS_STATE.DISABLED;
+  const isCellsEnabled = Config.getConfig().FEATURE.ENABLE_CELLS && cellsState !== CONVERSATION_CELLS_STATE.DISABLED;
 
   return (
     <ConversationFileDropzone
@@ -515,10 +515,11 @@ export const Conversation = ({
               <ConversationTabPanel id="files" isActive={isFileTabActive}>
                 {isFileTabActive && (
                   <ConversationCells
-                    activeConversation={activeConversation}
+                    conversationQualifiedId={activeConversation.qualifiedId}
+                    conversationName={activeConversation.name()}
                     userRepository={repositories.user}
-                    cellsRepository={repositories.cells}
                     conversationRepository={conversationRepository}
+                    cellsState={cellsState}
                   />
                 )}
               </ConversationTabPanel>
