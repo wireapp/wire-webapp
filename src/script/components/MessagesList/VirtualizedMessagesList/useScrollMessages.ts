@@ -94,15 +94,14 @@ export const useScrollMessages = (
     let lastUnreadMessageIndex = messages.length - 1;
 
     const firstUnreadMessage = messages.findIndex(message => {
-      if (!isMarker(message)) {
-        if (message.message.from === userId && message.timestamp >= conversationLastReadTimestamp.current) {
-          return true;
-        }
-
-        return message.timestamp > conversationLastReadTimestamp.current;
+      if (isMarker(message)) {
+        return false;
       }
 
-      return false;
+      const isFromSelf = message.message.from === userId;
+      const isAfterLastRead = message.timestamp > conversationLastReadTimestamp.current;
+
+      return isFromSelf ? message.timestamp >= conversationLastReadTimestamp.current : isAfterLastRead;
     });
 
     if (firstUnreadMessage !== -1) {
@@ -117,11 +116,8 @@ export const useScrollMessages = (
 
   // If the scroll was at the top and new messages were loaded, scroll in a way that preserves the position.
   useEffect(() => {
-    if (messages.length === 0) {
-      return;
-    }
-
-    if (highlightedMessage) {
+    // Skip if there are no messages or a highlighted message is present
+    if (messages.length === 0 || highlightedMessage) {
       return;
     }
 

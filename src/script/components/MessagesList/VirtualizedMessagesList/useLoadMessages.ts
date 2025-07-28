@@ -17,7 +17,7 @@
  *
  */
 
-import {useCallback, useEffect} from 'react';
+import {useCallback, useEffect, useRef} from 'react';
 
 import {Virtualizer} from '@tanstack/react-virtual';
 
@@ -41,6 +41,8 @@ export const useLoadMessages = (
   virtualizer: Virtualizer<HTMLDivElement, Element>,
   {conversation, conversationRepository, loadingMessages, onLoadingMessages, itemsLength, initialMessageId}: Props,
 ) => {
+  const fillContainerByMessagesRef = useRef(false);
+
   const {isLoadingMessages, hasAdditionalMessages} = useKoSubscribableChildren(conversation, [
     'isLoadingMessages',
     'hasAdditionalMessages',
@@ -49,18 +51,24 @@ export const useLoadMessages = (
   const loadPrecedingMessages = useCallback(async () => {
     const shouldPullMessages = !isLoadingMessages && hasAdditionalMessages;
 
-    if (shouldPullMessages) {
+    if (!shouldPullMessages) {
+      return;
+    }
+
+    try {
       onLoadingMessages(true);
-      const newMessages = await conversationRepository.getPrecedingMessages(conversation).then(messages => {
-        onLoadingMessages(false);
-        return messages;
-      });
+      const newMessages = await conversationRepository.getPrecedingMessages(conversation);
 
       if (!initialMessageId) {
         requestAnimationFrame(() => {
-          virtualizer.scrollToIndex(itemsLength - (itemsLength - newMessages.length), {align: 'start'});
+          const newIndex = itemsLength - (itemsLength - newMessages.length);
+          virtualizer.scrollToIndex(newIndex, {align: 'start'});
         });
       }
+    } catch (error) {
+      console.error('Error loading preceding messages:', error);
+    } finally {
+      onLoadingMessages(false);
     }
   }, [
     conversation,
@@ -74,23 +82,29 @@ export const useLoadMessages = (
   const loadFollowingMessages = useCallback(async () => {
     const lastMessage = conversation.getNewestMessage();
 
-    if (lastMessage) {
-      if (!isLastReceivedMessage(lastMessage, conversation)) {
-        onLoadingMessages(true);
-        // if the last loaded message is not the last of the conversation, we load the subsequent messages
-        const newMessages = await conversationRepository
-          .getSubsequentMessages(conversation, lastMessage)
-          .then(messages => {
-            onLoadingMessages(false);
-            return messages;
-          });
+    if (!lastMessage) {
+      return;
+    }
 
-        if (!initialMessageId) {
-          requestAnimationFrame(() => {
-            virtualizer.scrollToIndex(itemsLength - (itemsLength - newMessages.length), {align: 'start'});
-          });
-        }
+    if (isLastReceivedMessage(lastMessage, conversation)) {
+      return;
+    }
+
+    try {
+      onLoadingMessages(true);
+      // if the last loaded message is not the last of the conversation, we load the subsequent messages
+      const newMessages = await conversationRepository.getSubsequentMessages(conversation, lastMessage);
+
+      if (!initialMessageId) {
+        requestAnimationFrame(() => {
+          const newIndex = itemsLength - (itemsLength - newMessages.length);
+          virtualizer.scrollToIndex(newIndex, {align: 'start'});
+        });
       }
+    } catch (error) {
+      console.error('Error loading following messages:', error);
+    } finally {
+      onLoadingMessages(false);
     }
   }, [conversation, conversationRepository, onLoadingMessages, initialMessageId]);
 
@@ -131,4 +145,24 @@ export const useLoadMessages = (
     scrollElement.addEventListener('scroll', onScroll);
     return () => scrollElement.removeEventListener('scroll', onScroll);
   }, [loadingMessages, loadFollowingMessages, loadPrecedingMessages, virtualizer.scrollElement]);
+
+  // Load more messages on mount if the list doesn't fill the viewport
+  useEffect(() => {
+    if (itemsLength === 0 || fillContainerByMessagesRef.current) {
+      return;
+    }
+
+    const frame = requestAnimationFrame(() => {
+      const totalSize = virtualizer.getTotalSize();
+      const containerHeight = virtualizer.scrollElement?.clientHeight ?? 0;
+
+      if (totalSize < containerHeight) {
+        void loadPrecedingMessages();
+      }
+
+      fillContainerByMessagesRef.current = true;
+    });
+
+    return () => cancelAnimationFrame(frame);
+  }, [itemsLength, loadPrecedingMessages, virtualizer]);
 };
