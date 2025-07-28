@@ -26,7 +26,7 @@ import {loginUser} from '../../utils/userActions';
 import {generateSecurePassword, generateWireEmail} from '../../utils/userDataGenerator';
 
 // Generating test data
-const owner = getUser();
+let owner = getUser();
 const newEmail = generateWireEmail(owner.lastName);
 const member = getUser();
 const teamName = 'Critical';
