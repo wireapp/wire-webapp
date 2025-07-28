@@ -54,7 +54,11 @@ module.exports = defineConfig({
     /* Test against branded browsers. */
     {
       name: 'Google Chrome',
-      use: {...devices['Desktop Chrome'], channel: 'chrome'}, // or 'chrome-beta'
+      use: {
+        ...devices['Desktop Chrome'],
+        channel: 'chrome',
+        launchOptions: {args: ['--use-fake-device-for-media-stream', '--use-fake-ui-for-media-stream']},
+      }, // or 'chrome-beta'
     },
   ],
 });
