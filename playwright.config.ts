@@ -49,6 +49,10 @@ module.exports = defineConfig({
     trace: 'on-first-retry',
     screenshot: 'only-on-failure',
     permissions: ['camera', 'microphone'],
+    actionTimeout: 10_000, // 10 seconds
+  },
+  expect: {
+    timeout: 10_000, // 10 seconds
   },
   projects: [
     /* Test against branded browsers. */
@@ -57,7 +61,6 @@ module.exports = defineConfig({
       use: {
         ...devices['Desktop Chrome'],
         channel: 'chrome',
-        launchOptions: {args: ['--use-fake-device-for-media-stream', '--use-fake-ui-for-media-stream']},
       }, // or 'chrome-beta'
     },
   ],

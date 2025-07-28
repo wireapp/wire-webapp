@@ -60,7 +60,7 @@ export class InputBarControls {
   async setEphemeralTimerTo(choice: (typeof EPHEMERAL_TIMER_CHOICES)[number]) {
     await this.setEphemeralTimer.click();
     const buttons = this.page.locator(selectByDataAttribute('message-timer-menu'));
-    await buttons.last().waitFor({state: 'visible', timeout: 10000});
+    await buttons.last().waitFor({state: 'visible'});
 
     // Get all buttons and find the one with the matching title
     const allButtons = await buttons.all();
@@ -75,6 +75,6 @@ export class InputBarControls {
   }
 
   async clickSendMessage() {
-    await this.sendMessage.click({timeout: 10000});
+    await this.sendMessage.click();
   }
 }

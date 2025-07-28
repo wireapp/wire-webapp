@@ -43,7 +43,7 @@ export const sendTextMessageToUser = async (pageManager: PageManager, recipient:
   await pageManager.refreshPage({waitUntil: 'domcontentloaded'});
   // End of TODO: Bug [WPB-18226]
 
-  await expect(pages.conversation().page.getByText(text)).toBeVisible({timeout: 10000});
+  await expect(pages.conversation().page.getByText(text)).toBeVisible();
 };
 
 export const inviteMembers = async (members: User[], owner: User, api: ApiManagerE2E) => {

@@ -44,11 +44,11 @@ export class DetailViewModal {
   }
 
   async isVisible() {
-    return await this.mainWindow.isVisible({timeout: 10_000});
+    return await this.mainWindow.isVisible();
   }
 
   async isImageVisible() {
-    return await this.image.isVisible({timeout: 10_000});
+    return await this.image.isVisible();
   }
 
   async getImageScreenshot() {

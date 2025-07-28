@@ -150,7 +150,7 @@ export class ConversationPage {
     const locator = this.getImageLocator(user);
 
     // Wait for at least one matching element to appear (optional timeout can be set)
-    await locator.first().waitFor({state: 'visible', timeout: 10_000});
+    await locator.first().waitFor({state: 'visible'});
 
     return await locator.isVisible();
   }
@@ -159,7 +159,7 @@ export class ConversationPage {
     const locator = this.getImageLocator(user);
 
     // Wait for the image to be visible
-    await locator.waitFor({state: 'visible', timeout: 10000});
+    await locator.waitFor({state: 'visible'});
 
     // Take a screenshot of the image
     return await locator.screenshot();
@@ -169,7 +169,7 @@ export class ConversationPage {
     const locator = this.getImageLocator(user);
 
     // Wait for at least one matching element to appear (optional timeout can be set)
-    await locator.first().waitFor({state: 'visible', timeout: 10000});
+    await locator.first().waitFor({state: 'visible'});
     await locator.isVisible();
     await locator.click();
   }
@@ -180,7 +180,7 @@ export class ConversationPage {
     );
 
     // Wait for at least one matching element to appear (optional timeout can be set)
-    await plusOneReactionIcon.first().waitFor({state: 'visible', timeout: 10000});
+    await plusOneReactionIcon.first().waitFor({state: 'visible'});
 
     return await plusOneReactionIcon.isVisible();
   }
@@ -191,7 +191,7 @@ export class ConversationPage {
     );
 
     // Wait for at least one matching element to appear (optional timeout can be set)
-    await videoMessageLocator.first().waitFor({state: 'visible', timeout: 10_000});
+    await videoMessageLocator.first().waitFor({state: 'visible'});
 
     return await videoMessageLocator.isVisible();
   }
@@ -230,7 +230,7 @@ export class ConversationPage {
     );
 
     // Wait for at least one matching element to appear (optional timeout can be set)
-    await audioMessageLocator.first().waitFor({state: 'visible', timeout: 10_000});
+    await audioMessageLocator.first().waitFor({state: 'visible'});
 
     return await audioMessageLocator.isVisible();
   }
@@ -241,7 +241,7 @@ export class ConversationPage {
     );
 
     // Wait for at least one matching element to appear (optional timeout can be set)
-    await fileMessageLocator.first().waitFor({state: 'visible', timeout: 10_000});
+    await fileMessageLocator.first().waitFor({state: 'visible'});
 
     return await fileMessageLocator.isVisible();
   }
@@ -261,7 +261,7 @@ export class ConversationPage {
   }
 
   async isSystemMessageVisible(messageText: string) {
-    await this.systemMessages.filter({hasText: messageText}).first().waitFor({state: 'visible', timeout: 5000});
+    await this.systemMessages.filter({hasText: messageText}).first().waitFor({state: 'visible'});
     return true;
   }
 

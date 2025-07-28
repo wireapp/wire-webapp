@@ -45,7 +45,7 @@ export class UnableToOpenConversationModal {
   }
 
   async clickAcknowledge() {
-    await this.acknowledgeButton.isVisible({timeout: 5000});
+    await this.acknowledgeButton.isVisible();
     await this.acknowledgeButton.click();
   }
 }

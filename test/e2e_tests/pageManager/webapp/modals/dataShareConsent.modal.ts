@@ -59,12 +59,12 @@ export class DataShareConsentModal {
   }
 
   async clickDecline() {
-    await this.declineButton.isVisible({timeout: 5000});
+    await this.declineButton.isVisible();
     await this.declineButton.click();
   }
 
   async clickConfirm() {
-    await this.agreeButton.isVisible({timeout: 5000});
+    await this.agreeButton.isVisible();
     await this.agreeButton.click();
   }
 }

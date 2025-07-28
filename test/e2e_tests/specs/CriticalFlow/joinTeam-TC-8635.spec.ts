@@ -112,12 +112,12 @@ test(
     });
 
     await test.step('Team owner receives text of A and sends a text to A', async () => {
-      await expect(pages.conversation().page.getByText(textFromAToOwner)).toBeVisible({timeout: 10000});
+      await expect(pages.conversation().page.getByText(textFromAToOwner)).toBeVisible();
       await sendTextMessageToUser(adminPageManager, memberA, textFromOwnerToA);
     });
 
     await test.step('A receives Text of Team Owner', async () => {
-      await expect(pages.conversation().page.getByText(textFromOwnerToA)).toBeVisible({timeout: 10000});
+      await expect(pages.conversation().page.getByText(textFromOwnerToA)).toBeVisible();
     });
 
     await test.step('Team owner adds A to chat', async () => {
@@ -137,7 +137,7 @@ test(
       expect(await adminPages.conversationDetails().isUserPartOfConversationAsMember(memberA.fullName));
       await expect(
         adminPages.conversation().page.getByText(`You added ${memberA.fullName} to the conversation`),
-      ).toBeVisible({timeout: 10000});
+      ).toBeVisible();
     });
 
     await test.step('A sees the chat', async () => {
@@ -150,7 +150,7 @@ test(
     });
 
     await test.step('A sees the mention in the chat', async () => {
-      await expect(pages.conversation().page.getByText(`@${memberA.fullName}`)).toBeVisible({timeout: 10000});
+      await expect(pages.conversation().page.getByText(`@${memberA.fullName}`)).toBeVisible();
     });
   },
 );

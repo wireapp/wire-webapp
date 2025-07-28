@@ -67,7 +67,7 @@ export class ConversationDetailsPage {
     const userLocator = this.page.locator(
       `${selectById('conversation-details')} ${selectByDataAttribute('list-admins')} ${selectByDataAttribute('item-user')}[data-uie-value="${fullName}"]`,
     );
-    await userLocator.waitFor({state: 'visible', timeout: 5000});
+    await userLocator.waitFor({state: 'visible'});
     return userLocator.isVisible();
   }
 
@@ -75,7 +75,7 @@ export class ConversationDetailsPage {
     const userLocator = this.page.locator(
       `${selectById('conversation-details')} ${selectByDataAttribute('list-members')} ${selectByDataAttribute('item-user')}[data-uie-value="${fullName}"]`,
     );
-    await userLocator.waitFor({state: 'visible', timeout: 5000});
+    await userLocator.waitFor({state: 'visible'});
     return userLocator.isVisible();
   }
 }

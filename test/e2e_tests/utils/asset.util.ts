@@ -76,5 +76,5 @@ export const shareAssetHelper = async (filePath: string, page: Page, buttonLocat
   const fileChooserPromise = page.waitForEvent('filechooser');
   await buttonLocator.click();
   const fileChooser = await fileChooserPromise;
-  await fileChooser.setFiles(filePath, {timeout: 10_000});
+  await fileChooser.setFiles(filePath);
 };
