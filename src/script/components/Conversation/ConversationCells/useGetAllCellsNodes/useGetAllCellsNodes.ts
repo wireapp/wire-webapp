@@ -87,20 +87,15 @@ export const useGetAllCellsNodes = ({
   }, [setNodes, setStatus, setError, id, offset, pageSize, setPagination]);
 
   const handleHashChange = useCallback(() => {
-    if (!enabled) {
-      return;
-    }
     clearAll({conversationId: id});
     setOffset(0);
     void fetchNodes();
-  }, [fetchNodes, setOffset, clearAll, id, enabled]);
+  }, [fetchNodes, setOffset, clearAll, id]);
 
   useEffect(() => {
-    if (!enabled) {
-      return;
+    if (enabled) {
+      void fetchNodes();
     }
-
-    void fetchNodes();
   }, [fetchNodes, enabled]);
 
   useEffect(() => {

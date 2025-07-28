@@ -518,7 +518,6 @@ export const Conversation = ({
                     conversationQualifiedId={activeConversation.qualifiedId}
                     conversationName={activeConversation.name()}
                     userRepository={repositories.user}
-                    conversationRepository={conversationRepository}
                     cellsState={cellsState}
                   />
                 )}

@@ -22,7 +22,6 @@ import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {container} from 'tsyringe';
 
 import {CellsRepository} from 'Repositories/cells/CellsRepository';
-import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
 import {UserRepository} from 'Repositories/user/UserRepository';
 import {t} from 'Util/LocalizerUtil';
 
@@ -37,7 +36,6 @@ import {wrapperStyles} from './ConversationCells.styles';
 import {useCellsPagination} from './useCellsPagination/useCellsPagination';
 import {useGetAllCellsNodes} from './useGetAllCellsNodes/useGetAllCellsNodes';
 import {useOnPresignedUrlExpired} from './useOnPresignedUrlExpired/useOnPresignedUrlExpired';
-import {useRefreshCellsState} from './useRefreshCellsState/useRefreshCellsState';
 
 interface ConversationCellsProps {
   cellsRepository?: CellsRepository;
@@ -45,7 +43,6 @@ interface ConversationCellsProps {
   conversationQualifiedId: QualifiedId;
   conversationName: string;
   cellsState: CONVERSATION_CELLS_STATE;
-  conversationRepository: ConversationRepository;
 }
 
 export const ConversationCells = ({
@@ -53,19 +50,11 @@ export const ConversationCells = ({
   userRepository = container.resolve(UserRepository),
   conversationQualifiedId,
   conversationName,
-  cellsState: initialCellState,
-  conversationRepository,
+  cellsState,
 }: ConversationCellsProps) => {
   const {getNodes, status: nodesStatus, getPagination} = useCellsStore();
 
   const conversationId = conversationQualifiedId.id;
-
-  const {cellsState, isRefreshing} = useRefreshCellsState({
-    initialCellState,
-    conversationRepository,
-    conversationQualifiedId,
-  });
-
   const isCellsStateReady = cellsState === CONVERSATION_CELLS_STATE.READY;
   const isCellsStatePending = cellsState === CONVERSATION_CELLS_STATE.PENDING;
 
@@ -119,14 +108,14 @@ export const ConversationCells = ({
           onRefresh={refresh}
         />
       )}
-      {isCellsStatePending && !isRefreshing && (
+      {isCellsStatePending && (
         <CellsStateInfo heading={t('cells.pending.heading')} description={t('cells.pending.description')} />
       )}
       {isNoNodesVisible && (
         <CellsStateInfo heading={t('cells.noNodes.heading')} description={t('cells.noNodes.description')} />
       )}
       {isEmptyRecycleBin && <CellsStateInfo description={t('cells.emptyRecycleBin.description')} />}
-      {(isLoadingVisible || isRefreshing) && <CellsLoader />}
+      {isLoadingVisible && <CellsLoader />}
       {isError && <CellsStateInfo heading={t('cells.error.heading')} description={t('cells.error.description')} />}
       {isPaginationVisible && <CellsPagination {...getPaginationProps()} goToPage={goToPage} />}
     </div>
