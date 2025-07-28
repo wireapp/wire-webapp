@@ -18,10 +18,10 @@
  */
 
 import {PageManager} from 'test/e2e_tests/pageManager';
+import {addCreatedTeam, removeCreatedTeam} from 'test/e2e_tests/utils/tearDown.util';
 
 import {getUser} from '../../data/user';
 import {test, expect} from '../../test.fixtures';
-import {addCreatedTeam, removeCreatedTeam} from '../../utils/tearDownUtil';
 import {loginUser} from '../../utils/userActions';
 import {generateSecurePassword, generateWireEmail} from '../../utils/userDataGenerator';
 

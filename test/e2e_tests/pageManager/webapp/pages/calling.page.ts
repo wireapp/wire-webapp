@@ -85,7 +85,7 @@ export class CallingPage {
   }
 
   waitForCell(): Promise<void> {
-    return this.callCell.waitFor({state: 'visible', timeout: 5000});
+    return this.callCell.waitFor({state: 'visible'});
   }
 
   isFullScreenVisible(): Promise<boolean> {
@@ -93,11 +93,11 @@ export class CallingPage {
   }
 
   waitForGoFullScreen(): Promise<void> {
-    return this.goFullScreen.waitFor({state: 'visible', timeout: 10000});
+    return this.goFullScreen.waitFor({state: 'visible'});
   }
 
   waitForSelfVideoThumbnail(): Promise<void> {
-    return this.selfVideoThumbnail.waitFor({state: 'visible', timeout: 10000});
+    return this.selfVideoThumbnail.waitFor({state: 'visible'});
   }
 
   selfVideoThumbnailVisible(): Promise<boolean> {
@@ -136,13 +136,15 @@ export class CallingPage {
       throw new Error('User ID is required to verify participant visibility.');
     }
 
-    await this.page.locator(CallingPage.selectorForParticipantName(userId)).waitFor({state: 'visible', timeout: 20000});
+    await this.page
+      .locator(CallingPage.selectorForParticipantName(userId))
+      .waitFor({state: 'visible', timeout: 20_000});
   }
 
   // ─── Mute State for Other Users ─────────────────────────────────────────
 
   waitForGridTileMuteIconToBeVisibleForUser(userId: string): Promise<void> {
-    return this.page.locator(CallingPage.selectorForMuteIcon(userId)).waitFor({state: 'visible', timeout: 10000});
+    return this.page.locator(CallingPage.selectorForMuteIcon(userId)).waitFor({state: 'visible'});
   }
 
   isGridTileMuteIconVisibleForUser(userId: string): Promise<boolean> {

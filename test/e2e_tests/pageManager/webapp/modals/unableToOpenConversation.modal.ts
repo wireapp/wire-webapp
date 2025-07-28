@@ -17,20 +17,35 @@
  *
  */
 
-import {Locator, Page} from '@playwright/test';
+import {Page, Locator} from '@playwright/test';
 
 import {selectByDataAttribute} from 'test/e2e_tests/utils/selector.util';
 
-export class HistoryInfoPage {
+export class UnableToOpenConversationModal {
   readonly page: Page;
-  private readonly continueButton: Locator;
+
+  readonly modal: Locator;
+  readonly acknowledgeButton: Locator;
 
   constructor(page: Page) {
     this.page = page;
-    this.continueButton = this.page.locator(selectByDataAttribute('do-history-confirm'));
+
+    this.modal = page.locator(
+      `${selectByDataAttribute('primary-modals-container')}[aria-label='Wire can’t open this conversation.']`,
+    );
+    this.acknowledgeButton = this.modal.locator(`${selectByDataAttribute('do-action')}`);
   }
 
-  async clickConfirmButton() {
-    await this.continueButton.click();
+  async isModalPresent() {
+    return this.modal.isVisible();
+  }
+
+  async isActionButtonVisible() {
+    return await this.acknowledgeButton.isVisible();
+  }
+
+  async clickAcknowledge() {
+    await this.acknowledgeButton.isVisible();
+    await this.acknowledgeButton.click();
   }
 }
