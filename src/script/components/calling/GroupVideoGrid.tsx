@@ -27,15 +27,14 @@ import {QUERY} from '@wireapp/react-ui-kit';
 import {Avatar, AVATAR_SIZE} from 'Components/Avatar';
 import * as Icon from 'Components/Icon';
 import {useActiveWindowMatchMedia} from 'Hooks/useActiveWindowMatchMedia';
-import {Call} from 'src/script/calling/Call';
+import {Call} from 'Repositories/calling/Call';
+import type {Participant} from 'Repositories/calling/Participant';
+import type {Grid} from 'Repositories/calling/videoGridHandler';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 
 import {GroupVideoGridTile} from './GroupVideoGridTile';
 import {Video} from './Video';
-
-import type {Participant} from '../../calling/Participant';
-import type {Grid} from '../../calling/videoGridHandler';
 
 const PARTICIPANTS_LIMITS = {
   TABLET: {SHORT: 2, MEDIUM: 4, TALL: 8},

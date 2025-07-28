@@ -20,10 +20,10 @@
 import {render} from '@testing-library/react';
 import ko from 'knockout';
 
-import {ContentMessage} from 'src/script/entity/message/ContentMessage';
-import {FileAsset} from 'src/script/entity/message/FileAsset';
+import {ContentMessage} from 'Repositories/entity/message/ContentMessage';
+import {FileAsset} from 'Repositories/entity/message/FileAsset';
+import {TeamState} from 'Repositories/team/TeamState';
 import {StatusType} from 'src/script/message/StatusType';
-import {TeamState} from 'src/script/team/TeamState';
 
 import {FileAsset as FileAssetComponent} from './FileAsset';
 

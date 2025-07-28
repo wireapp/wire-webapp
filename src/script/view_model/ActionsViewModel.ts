@@ -26,23 +26,22 @@ import {container} from 'tsyringe';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {PrimaryModal, removeCurrentModal, usePrimaryModalState} from 'Components/Modals/PrimaryModal';
+import type {ClientEntity} from 'Repositories/client';
+import type {ConnectionRepository} from 'Repositories/connection/ConnectionRepository';
+import type {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
+import type {MessageRepository} from 'Repositories/conversation/MessageRepository';
+import {NOTIFICATION_STATE} from 'Repositories/conversation/NotificationSetting';
+import type {Conversation} from 'Repositories/entity/Conversation';
+import type {Message} from 'Repositories/entity/message/Message';
+import type {User} from 'Repositories/entity/User';
+import type {IntegrationRepository} from 'Repositories/integration/IntegrationRepository';
+import type {ServiceEntity} from 'Repositories/integration/ServiceEntity';
+import {SelfRepository} from 'Repositories/self/SelfRepository';
+import {UserState} from 'Repositories/user/UserState';
 import {t} from 'Util/LocalizerUtil';
 import {isBackendError} from 'Util/TypePredicateUtil';
 
 import type {MainViewModel} from './MainViewModel';
-
-import type {ClientEntity} from '../client';
-import type {ConnectionRepository} from '../connection/ConnectionRepository';
-import type {ConversationRepository} from '../conversation/ConversationRepository';
-import type {MessageRepository} from '../conversation/MessageRepository';
-import {NOTIFICATION_STATE} from '../conversation/NotificationSetting';
-import type {Conversation} from '../entity/Conversation';
-import type {Message} from '../entity/message/Message';
-import type {User} from '../entity/User';
-import type {IntegrationRepository} from '../integration/IntegrationRepository';
-import type {ServiceEntity} from '../integration/ServiceEntity';
-import {SelfRepository} from '../self/SelfRepository';
-import {UserState} from '../user/UserState';
 
 export class ActionsViewModel {
   constructor(

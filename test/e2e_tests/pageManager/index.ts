@@ -33,6 +33,7 @@ import {CreatGuestLinkModal} from './webapp/modals/createGuestLink.modal';
 import {DataShareConsentModal} from './webapp/modals/dataShareConsent.modal';
 import {DeleteAccountModal} from './webapp/modals/deleteAccount.modal';
 import {ExportBackupModal} from './webapp/modals/exportBackup.modal';
+import {importBackupModal} from './webapp/modals/importBackup.modal';
 import {LeaveConversationModal} from './webapp/modals/leaveConversation.modal';
 import {RemoveMemberModal} from './webapp/modals/removeMember.modal';
 import {UserProfileModal} from './webapp/modals/userProfile.modal';
@@ -167,6 +168,7 @@ export class PageManager {
       leaveConversation: () =>
         this.getOrCreate('webapp.modals.leaveConversation', () => new LeaveConversationModal(this.page)),
       exportBackup: () => this.getOrCreate('webapp.modals.exportBackup', () => new ExportBackupModal(this.page)),
+      importBackup: () => this.getOrCreate('webapp.modals.importBackup', () => new importBackupModal(this.page)),
       removeMember: () => this.getOrCreate('webapp.modals.removeMember', () => new RemoveMemberModal(this.page)),
       copyPassword: () => this.getOrCreate('webapp.modals.copyPassword', () => new CopyPasswordModal(this.page)),
       createGuestLink: () =>

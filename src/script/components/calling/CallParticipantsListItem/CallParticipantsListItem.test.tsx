@@ -21,9 +21,9 @@ import {render} from '@testing-library/react';
 
 import {Availability} from '@wireapp/protocol-messaging';
 
-import {Participant} from 'src/script/calling/Participant';
-import {User} from 'src/script/entity/User';
-import {ROLE} from 'src/script/user/UserPermission';
+import {Participant} from 'Repositories/calling/Participant';
+import {User} from 'Repositories/entity/User';
+import {ROLE} from 'Repositories/user/UserPermission';
 import {createUuid} from 'Util/uuid';
 
 import {CallParticipantsListItem} from './CallParticipantsListItem';

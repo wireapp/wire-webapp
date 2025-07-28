@@ -32,14 +32,15 @@ import {
 } from '@wireapp/react-ui-kit';
 
 import * as Icon from 'Components/Icon';
-import {ConversationRepository} from 'src/script/conversation/ConversationRepository';
-import {User} from 'src/script/entity/User';
+import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
+import {Conversation} from 'Repositories/entity/Conversation';
+import {User} from 'Repositories/entity/User';
+import {TeamState} from 'Repositories/team/TeamState';
+import {FEATURES, hasAccessToFeature} from 'Repositories/user/UserPermission';
 import {getManageTeamUrl} from 'src/script/externalRoute';
 import {ConversationFolderTab} from 'src/script/page/LeftSidebar/panels/Conversations/ConversationTab/ConversationFolderTab';
 import {SidebarTabs} from 'src/script/page/LeftSidebar/panels/Conversations/useSidebarStore';
 import {Core} from 'src/script/service/CoreSingleton';
-import {TeamState} from 'src/script/team/TeamState';
-import {FEATURES, hasAccessToFeature} from 'src/script/user/UserPermission';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {isDataDogEnabled} from 'Util/DataDog';
 import {getWebEnvironment} from 'Util/Environment';
@@ -56,7 +57,6 @@ import {FolderIcon} from './FolderIcon';
 import {TeamCreationBanner} from './TeamCreation/TeamCreationBanner';
 
 import {Config} from '../../../../../Config';
-import {Conversation} from '../../../../../entity/Conversation';
 import {ContentState} from '../../../../useAppState';
 import {ConversationTab} from '../ConversationTab';
 

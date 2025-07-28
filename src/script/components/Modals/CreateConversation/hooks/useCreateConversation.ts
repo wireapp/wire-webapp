@@ -27,19 +27,19 @@ import {container} from 'tsyringe';
 
 import {WebAppEvents} from '@wireapp/webapp-events';
 
-import {Config} from 'src/script/Config';
-import {ACCESS_STATE} from 'src/script/conversation/AccessState';
+import {ACCESS_STATE} from 'Repositories/conversation/AccessState';
 import {
   toggleFeature,
   teamPermissionsForAccessState,
   ACCESS_TYPES,
   ACCESS_MODES,
-} from 'src/script/conversation/ConversationAccessPermission';
+} from 'Repositories/conversation/ConversationAccessPermission';
+import {TeamState} from 'Repositories/team/TeamState';
+import {Config} from 'src/script/Config';
 import {useSidebarStore, SidebarTabs} from 'src/script/page/LeftSidebar/panels/Conversations/useSidebarStore';
 import {RootContext} from 'src/script/page/RootProvider';
 import {generateConversationUrl} from 'src/script/router/routeGenerator';
 import {createNavigateKeyboard, createNavigate} from 'src/script/router/routerBindings';
-import {TeamState} from 'src/script/team/TeamState';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {isKeyboardEvent} from 'Util/KeyboardUtil';
 import {replaceLink, t} from 'Util/LocalizerUtil';

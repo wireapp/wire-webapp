@@ -23,23 +23,6 @@ import {Service} from '../data/serviceInfo';
 import {User} from '../data/user';
 
 export class TeamRepositoryE2E extends BackendClientE2E {
-  async getTeamIdForUser(user: User): Promise<string> {
-    const response = await this.axiosInstance.get('teams', {
-      headers: {
-        Authorization: `Bearer ${user.token}`,
-      },
-    });
-
-    if (response.data.teams.length > 0) {
-      // Pick the first team for the user
-      const firstTeam = response.data.teams[0];
-      // Update the user's teamId to the first team's id
-      user.teamId = firstTeam.id;
-      return firstTeam.id;
-    }
-    throw new Error('No teams found for the user');
-  }
-
   async inviteUserToTeam(emailOfInvitee: string, teamOwner: User): Promise<string> {
     const response = this.axiosInstance.post(
       `teams/${teamOwner.teamId}/invitations`,

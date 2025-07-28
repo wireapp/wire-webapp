@@ -27,9 +27,8 @@ import {
   jumpToLastMessageButtonStyles,
   jumpToLastMessageChevronStyles,
 } from 'Components/MessagesList/MessageList.styles';
+import {Conversation} from 'Repositories/entity/Conversation';
 import {t} from 'Util/LocalizerUtil';
-
-import {Conversation} from '../../entity/Conversation';
 
 export interface JumpToLastMessageButtonProps extends HTMLProps<HTMLElement> {
   onGoToLastMessage: () => void;

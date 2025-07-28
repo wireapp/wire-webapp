@@ -27,16 +27,16 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 
 import * as Icon from 'Components/Icon';
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
-import {t} from 'Util/LocalizerUtil';
-
-import {ListWrapper} from './ListWrapper';
-
 import {
   ClientNotificationData,
   Notification,
   PreferenceNotificationRepository,
-} from '../../../notification/PreferenceNotificationRepository';
-import {TeamRepository} from '../../../team/TeamRepository';
+} from 'Repositories/notification/PreferenceNotificationRepository';
+import {TeamRepository} from 'Repositories/team/TeamRepository';
+import {t} from 'Util/LocalizerUtil';
+
+import {ListWrapper} from './ListWrapper';
+
 import {ContentState, useAppState} from '../../useAppState';
 
 type PreferencesProps = {

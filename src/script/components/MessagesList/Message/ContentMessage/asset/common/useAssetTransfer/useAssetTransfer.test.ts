@@ -20,9 +20,9 @@
 import {renderHook} from '@testing-library/react';
 import ko from 'knockout';
 
-import {AssetRemoteData} from 'src/script/assets/AssetRemoteData';
-import {AssetRepository} from 'src/script/assets/AssetRepository';
-import {ContentMessage} from 'src/script/entity/message/ContentMessage';
+import {AssetRemoteData} from 'Repositories/assets/AssetRemoteData';
+import {AssetRepository} from 'Repositories/assets/AssetRepository';
+import {ContentMessage} from 'Repositories/entity/message/ContentMessage';
 import {createUuid} from 'Util/uuid';
 
 import {useAssetTransfer} from './useAssetTransfer';

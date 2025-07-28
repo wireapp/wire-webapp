@@ -19,9 +19,10 @@
 
 import {useCallback, useEffect, useState} from 'react';
 
-import {CallingRepository} from '../calling/CallingRepository';
+import {CallingRepository} from 'Repositories/calling/CallingRepository';
+import {NotificationRepository} from 'Repositories/notification/NotificationRepository';
+
 import {E2EIHandler, E2EIDeviceStatus} from '../E2EIdentity';
-import {NotificationRepository} from '../notification/NotificationRepository';
 
 export function useAppSoftLock(callingRepository: CallingRepository, notificationRepository: NotificationRepository) {
   const [softLockEnabled, setSoftLockEnabled] = useState(false);
