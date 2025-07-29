@@ -35,6 +35,7 @@ export class AccountPage {
   readonly editEmailButton: Locator;
   readonly emailInput: Locator;
   readonly resetPasswordButton: Locator;
+  readonly receiveNewsletterCheckbox: Locator;
 
   constructor(page: Page) {
     this.page = page;
@@ -50,6 +51,7 @@ export class AccountPage {
     this.emailInput = page.locator(selectByDataAttribute('enter-email-input'));
     this.emailDisplay = page.locator(selectByDataAttribute('email-display'));
     this.resetPasswordButton = page.locator(selectByDataAttribute('do-reset-password'));
+    this.receiveNewsletterCheckbox = page.locator("[data-uie-name='status-preference-marketing']+label");
   }
 
   async clickBackUpButton() {
@@ -66,6 +68,18 @@ export class AccountPage {
 
   async toggleSendUsageData() {
     await this.sendUsageDataCheckbox.click();
+  }
+
+  async toggleReceiveNewsletter() {
+    await this.receiveNewsletterCheckbox.click();
+  }
+
+  async isSendUsageDataEnabled() {
+    return this.sendUsageDataCheckbox.isChecked();
+  }
+
+  async isReceiveNewsletterEnabled() {
+    return this.receiveNewsletterCheckbox.isChecked();
   }
 
   async toggleAppLock() {

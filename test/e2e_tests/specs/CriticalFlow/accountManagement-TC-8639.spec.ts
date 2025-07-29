@@ -106,26 +106,24 @@ test('Account Management', {tag: ['@TC-8639', '@crit-flow-web']}, async ({pageMa
   await test.step('Member changes audio device settings', async () => {
     const fakeAudioInput = 'Fake Audio Input 1';
     const fakeAudioOutput = 'Fake Audio Output 1';
+    const fakeCamera = 'Fake Camera 1';
 
     await pages.settings().clickAudioVideoSettingsButton();
     await pages.audioVideoSettings().selectMicrophone(fakeAudioInput);
     await pages.audioVideoSettings().selectSpeaker(fakeAudioOutput);
-
+    await pages.audioVideoSettings().selectCamera(fakeCamera);
     expect(await pages.audioVideoSettings().isMicrophoneSetTo('Fake Audio Input 1'));
     expect(await pages.audioVideoSettings().isSpeakerSetTo('Fake Audio Output 1'));
-  });
-
-  await test.step('Member changes video device setting', async () => {
-    const fakeCamera = 'Fake Camera 1';
-
-    await pages.audioVideoSettings().selectCamera(fakeCamera);
-
     expect(await pages.audioVideoSettings().isCameraSetTo(fakeCamera));
   });
 
-  await test.step('Member resets their password ', async () => {
+  await test.step('Member turns off data consent', async () => {
     await pages.settings().clickAccountButton();
+    await pages.account().toggleReceiveNewsletter();
+    expect(await pages.account().isReceiveNewsletterEnabled()).toBeFalsy();
+  });
 
+  await test.step('Member resets their password ', async () => {
     const [newPage] = await Promise.all([
       pageManager.getContext().waitForEvent('page'), // Wait for the new tab
       pages.account().clickResetPasswordButton(),
