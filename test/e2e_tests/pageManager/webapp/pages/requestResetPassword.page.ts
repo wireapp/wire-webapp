@@ -17,20 +17,30 @@
  *
  */
 
-import {Locator, Page} from '@playwright/test';
+import {Page, Locator} from '@playwright/test';
 
 import {selectByDataAttribute} from 'test/e2e_tests/utils/selector.util';
 
-export class HistoryInfoPage {
+export class RequestResetPasswordPage {
   readonly page: Page;
-  private readonly continueButton: Locator;
+
+  readonly emailInput: Locator;
+  readonly resetPasswordButton: Locator;
+  readonly goBackToLoginButton: Locator;
 
   constructor(page: Page) {
     this.page = page;
-    this.continueButton = this.page.locator(selectByDataAttribute('do-history-confirm'));
+    this.emailInput = page.locator(selectByDataAttribute('enter-email'));
+    this.resetPasswordButton = page.locator(selectByDataAttribute('do-send-password-reset-email'));
+    this.goBackToLoginButton = page.locator(selectByDataAttribute('do-go-back-to-login'));
   }
 
-  async clickConfirmButton() {
-    await this.continueButton.click();
+  async requestPasswordResetForEmail(email: string) {
+    await this.emailInput.fill(email);
+    await this.resetPasswordButton.click();
+  }
+
+  async clickGoBackToLoginButton() {
+    await this.goBackToLoginButton.click();
   }
 }

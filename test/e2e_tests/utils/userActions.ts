@@ -43,7 +43,7 @@ export const sendTextMessageToUser = async (pageManager: PageManager, recipient:
   await pageManager.refreshPage({waitUntil: 'domcontentloaded'});
   // End of TODO: Bug [WPB-18226]
 
-  await expect(pages.conversation().page.getByText(text)).toBeVisible({timeout: 10000});
+  await expect(pages.conversation().page.getByText(text)).toBeVisible();
 };
 
 export const inviteMembers = async (members: User[], owner: User, api: ApiManagerE2E) => {
@@ -76,5 +76,11 @@ export const sendTextMessageToConversation = async (
   const {pages} = pageManager.webapp;
   await pages.conversationList().openConversation(conversation);
   await pages.conversation().sendMessage(message);
+
+  // TODO: Bug [WPB-18226] Message is not visible in the conversation after sending it
+  await pages.conversation().page.waitForTimeout(3000); // Wait for the message to be sent
+  await pageManager.refreshPage({waitUntil: 'domcontentloaded'});
+  // End of TODO: Bug [WPB-18226]
+
   expect(await pages.conversation().isMessageVisible(message)).toBeTruthy();
 };

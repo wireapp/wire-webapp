@@ -21,16 +21,28 @@ import {Locator, Page} from '@playwright/test';
 
 import {selectByDataAttribute} from 'test/e2e_tests/utils/selector.util';
 
-export class HistoryInfoPage {
+export class ResetPasswordPage {
   readonly page: Page;
-  private readonly continueButton: Locator;
+
+  readonly newPasswordInput: Locator;
+  readonly passwordChangeMessage: Locator;
+  readonly setNewPasswordButton: Locator;
 
   constructor(page: Page) {
     this.page = page;
-    this.continueButton = this.page.locator(selectByDataAttribute('do-history-confirm'));
+
+    this.newPasswordInput = page.locator(selectByDataAttribute('enter-new-password'));
+    this.passwordChangeMessage = page.getByText('You can now log in with your new password.');
+    this.setNewPasswordButton = page.locator(selectByDataAttribute('do-set-new-password'));
   }
 
-  async clickConfirmButton() {
-    await this.continueButton.click();
+  async setNewPassword(password: string) {
+    await this.newPasswordInput.fill(password);
+    await this.setNewPasswordButton.click();
+  }
+
+  async isPasswordChangeMessageVisible() {
+    await this.passwordChangeMessage.waitFor({state: 'visible'});
+    return this.passwordChangeMessage.isVisible();
   }
 }
