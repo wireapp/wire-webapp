@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [27.70.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@27.69.2...@wireapp/api-client@27.70.0) (2025-07-29)
+
+### Features
+
+* use published npm pkg for cells-sdk-ts [WPB-18944] ([#7103](https://github.com/wireapp/wire-web-packages/issues/7103)) ([0f8e87c](https://github.com/wireapp/wire-web-packages/commit/0f8e87c1b2bae6aebed41f12867f36d19c9d530f))
+
 ## [27.69.2](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@27.69.1...@wireapp/api-client@27.69.2) (2025-07-16)
 
 ### Bug Fixes
