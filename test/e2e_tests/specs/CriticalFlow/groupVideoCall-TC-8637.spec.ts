@@ -19,11 +19,11 @@
 
 import {getUser} from 'test/e2e_tests/data/user';
 import {PageManager} from 'test/e2e_tests/pageManager';
-import {addMockCamerasToContext} from 'test/e2e_tests/utils/mockVideoDeviceUtils';
+import {addMockCamerasToContext} from 'test/e2e_tests/utils/mockVideoDevice.util';
+import {addCreatedTeam, addCreatedUser, removeCreatedTeam, removeCreatedUser} from 'test/e2e_tests/utils/tearDown.util';
 import {loginUser} from 'test/e2e_tests/utils/userActions';
 
 import {test, expect} from '../../test.fixtures';
-import {addCreatedTeam, addCreatedUser, removeCreatedTeam, removeCreatedUser} from '../../utils/tearDownUtil';
 
 // Generate test data
 const teamName = 'Critical';

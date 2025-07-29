@@ -19,7 +19,9 @@
 
 import {Locator, Page} from '@playwright/test';
 
-import {selectByDataAttribute, selectById, selectByClass} from 'test/e2e_tests/utils/useSelector';
+import {User} from 'test/e2e_tests/data/user';
+import {downloadAssetAndGetFilePath} from 'test/e2e_tests/utils/asset.util';
+import {selectById, selectByClass, selectByDataAttribute} from 'test/e2e_tests/utils/selector.util';
 
 export class ConversationPage {
   readonly page: Page;
@@ -44,6 +46,8 @@ export class ConversationPage {
   readonly systemMessages: Locator;
   readonly callButton: Locator;
   readonly conversationInfoButton: Locator;
+
+  readonly getImageAltText = (user: User) => `Image from ${user.fullName}`;
 
   constructor(page: Page) {
     this.page = page;
@@ -72,6 +76,12 @@ export class ConversationPage {
     this.conversationInfoButton = page.locator(selectByDataAttribute('do-open-info'));
   }
 
+  private getImageLocator(user: User): Locator {
+    return this.page.locator(
+      `${selectByDataAttribute('item-message')} ${selectByClass('message-body')} ${selectByDataAttribute('image-asset')} ${selectByDataAttribute('image-asset-img')}[alt^="${this.getImageAltText(user)}"]`,
+    );
+  }
+
   async isConversationOpen(conversationName: string) {
     return (
       (await this.page.locator(selectByDataAttribute('status-conversation-title-bar-label')).textContent()) ===
@@ -98,17 +108,13 @@ export class ConversationPage {
   async sendMessage(message: string) {
     await this.messageInput.fill(message);
     await this.messageInput.press('Enter');
+    await this.page.waitForTimeout(5000); // Wait for the message to be sent
   }
 
   async createGroup(groupName: string) {
     await this.createGroupButton.click();
     await this.createGroupNameInput.fill(groupName);
     await this.createGroupSubmitButton.click();
-  }
-
-  async enableAutoDeleteMessages() {
-    await this.timerMessageButton.click();
-    await this.timerTenSecondsButton.click();
   }
 
   async sendMention(memberId: string) {
@@ -121,33 +127,132 @@ export class ConversationPage {
   }
 
   async isMessageVisible(messageText: string) {
-    // Trying multiple times for the message to appear
-    for (let i = 0; i < 10; i++) {
-      const locator = this.page.locator(
-        `${selectByDataAttribute('item-message')} ${selectByClass('message-body')}:not(:has(p${selectByClass('text-foreground')}))`,
-      );
+    const locator = this.page.locator(
+      `${selectByDataAttribute('item-message')} ${selectByClass('message-body')}:not(:has(p${selectByClass('text-foreground')}))`,
+    );
 
-      // Wait for at least one matching element to appear (optional timeout can be set)
-      await locator.first().waitFor({state: 'visible'});
+    await locator.last().waitFor({state: 'visible', timeout: 20_000});
 
-      // Then get all matching elements
-      const messages = await locator.all();
+    // Then get all matching elements
+    const messages = await locator.all();
 
-      if (messages.length === 0) {
-        continue;
-      }
-
-      for (const message of messages) {
-        const messageTextContent = await message.textContent();
-        if (messageTextContent !== messageText) {
-          continue;
-        }
+    for (const message of messages) {
+      const messageTextContent = await message.textContent();
+      if (messageTextContent?.trim() === messageText) {
         return true;
       }
-      await this.page.waitForTimeout(500); // Wait for 0.5 second before next attempt
     }
-
     return false;
+  }
+
+  async isImageVisible(user: User) {
+    // Trying multiple times for the image to appear
+    const locator = this.getImageLocator(user);
+
+    // Wait for at least one matching element to appear (optional timeout can be set)
+    await locator.first().waitFor({state: 'visible'});
+
+    return await locator.isVisible();
+  }
+
+  async getImageScreenshot(user: User): Promise<Buffer> {
+    const locator = this.getImageLocator(user);
+
+    // Wait for the image to be visible
+    await locator.waitFor({state: 'visible'});
+
+    // Take a screenshot of the image
+    return await locator.screenshot();
+  }
+
+  async clickImage(user: User) {
+    const locator = this.getImageLocator(user);
+
+    // Wait for at least one matching element to appear (optional timeout can be set)
+    await locator.first().waitFor({state: 'visible'});
+    await locator.isVisible();
+    await locator.click();
+  }
+
+  async isPlusOneReactionVisible() {
+    const plusOneReactionIcon = this.page.locator(
+      `${selectByDataAttribute('item-message')} ${selectByDataAttribute('message-reactions')} button${selectByDataAttribute('emoji-pill')}[aria-label="1 reaction, react with +1 emoji"]`,
+    );
+
+    // Wait for at least one matching element to appear (optional timeout can be set)
+    await plusOneReactionIcon.first().waitFor({state: 'visible'});
+
+    return await plusOneReactionIcon.isVisible();
+  }
+
+  async isVideoMessageVisible() {
+    const videoMessageLocator = this.page.locator(
+      `${selectByDataAttribute('item-message')} ${selectByDataAttribute('video-asset')}`,
+    );
+
+    // Wait for at least one matching element to appear (optional timeout can be set)
+    await videoMessageLocator.first().waitFor({state: 'visible'});
+
+    return await videoMessageLocator.isVisible();
+  }
+
+  async playVideo() {
+    const videoPlayButton = this.page.locator(
+      `${selectByDataAttribute('item-message')} ${selectByDataAttribute('video-asset')} ${selectByDataAttribute('do-play-media')}`,
+    );
+
+    await videoPlayButton.click();
+  }
+
+  async playAudio() {
+    const audioPlayButton = this.page.locator(
+      `${selectByDataAttribute('item-message')} ${selectByDataAttribute('audio-asset')} ${selectByDataAttribute('do-play-media')}`,
+    );
+    await audioPlayButton.click();
+  }
+
+  async isAudioPlaying() {
+    const audioTimeLocator = this.page.locator(
+      `${selectByDataAttribute('item-message')} ${selectByDataAttribute('audio-asset')} ${selectByDataAttribute('status-audio-time')}`,
+    );
+
+    const audioTimeText = (await audioTimeLocator.textContent())?.trim();
+    if (!audioTimeText) {
+      throw new Error('Audio time text is empty or undefined');
+    }
+    const seconds = parseInt(audioTimeText.split(':')[1], 10);
+    return seconds > 0;
+  }
+
+  async isAudioMessageVisible() {
+    const audioMessageLocator = this.page.locator(
+      `${selectByDataAttribute('item-message')} ${selectByDataAttribute('audio-asset')}`,
+    );
+
+    // Wait for at least one matching element to appear (optional timeout can be set)
+    await audioMessageLocator.first().waitFor({state: 'visible'});
+
+    return await audioMessageLocator.isVisible();
+  }
+
+  async isFileMessageVisible() {
+    const fileMessageLocator = this.page.locator(
+      `${selectByDataAttribute('item-message')} ${selectByDataAttribute('file-asset')}`,
+    );
+
+    // Wait for at least one matching element to appear (optional timeout can be set)
+    await fileMessageLocator.first().waitFor({state: 'visible'});
+
+    return await fileMessageLocator.isVisible();
+  }
+
+  async downloadFile() {
+    const downloadButton = this.page.locator(
+      `${selectByDataAttribute('item-message')} ${selectByDataAttribute('file-asset')}`,
+    );
+
+    const filePath = await downloadAssetAndGetFilePath(this.page, downloadButton);
+    return filePath;
   }
 
   async startCall() {
@@ -156,7 +261,7 @@ export class ConversationPage {
   }
 
   async isSystemMessageVisible(messageText: string) {
-    await this.systemMessages.filter({hasText: messageText}).first().waitFor({state: 'visible', timeout: 5000});
+    await this.systemMessages.filter({hasText: messageText}).first().waitFor({state: 'visible'});
     return true;
   }
 

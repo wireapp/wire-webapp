@@ -19,7 +19,7 @@
 
 import {Page, Locator} from '@playwright/test';
 
-import {selectByDataAttribute, selectByLabel} from 'test/e2e_tests/utils/useSelector';
+import {selectByDataAttribute, selectByLabel} from 'test/e2e_tests/utils/selector.util';
 
 export class LeaveConversationModal {
   readonly page: Page;
