@@ -22,6 +22,8 @@ import {Decoder} from 'bazinga64';
 
 import {GenericMessage} from '@wireapp/protocol-messaging';
 
+import {queueProposal} from './IncomingProposalsQueue';
+
 import {HandledEventPayload} from '../../../../../notification';
 import {MLSService, optionalToUint8Array} from '../../../MLSService/MLSService';
 
@@ -57,12 +59,16 @@ export const handleMLSMessageAdd = async ({
 
   // Check if the message includes proposals
   if (typeof commitDelay === 'number') {
-    // we are dealing with a proposal, add a task to process this proposal later on
-    // Those proposals are stored inside of coreCrypto and will be handled after a timeout
-    await mlsService.handlePendingProposals({
-      groupId,
-      delayInMs: commitDelay ?? 0,
-      eventTime: event.time,
+    queueProposal(async () => {
+      // we are dealing with a proposal, add a task to process this proposal later on
+      // Those proposals are stored inside of coreCrypto and will be handled after a timeout
+      await mlsService.handlePendingProposals({
+        groupId,
+        delayInMs: commitDelay ?? 0,
+        eventTime: event.time,
+      });
+    }).catch(error => {
+      console.error('Failed to process proposal:', error);
     });
   }
 

@@ -72,6 +72,10 @@ import {
   getAllConversationsCallback,
   getTokenCallback,
 } from './messagingProtocols/mls/E2EIdentityService/E2EIServiceInternal';
+import {
+  pauseProposalProcessing,
+  resumeProposalProcessing,
+} from './messagingProtocols/mls/EventHandler/events/messageAdd/IncomingProposalsQueue';
 import {CoreCallbacks, SecretCrypto} from './messagingProtocols/mls/types';
 import {NewClient, ProteusService} from './messagingProtocols/proteus';
 import {CryptoClientType} from './messagingProtocols/proteus/ProteusService/CryptoClient';
@@ -690,6 +694,11 @@ export class Account extends TypedEventEmitter<Events> {
     }
 
     this.apiClient.connect(() => {
+      /**
+       * This is to avoid passing proposals too early to core crypto
+       * @See WPB-18995
+       */
+      pauseProposalProcessing();
       pauseMessageSending(); // pause message sending while processing notifications, it will be resumed once the processing is done and we have the marker token
       /**
        * unpause the notification processing queue
@@ -830,6 +839,7 @@ export class Account extends TypedEventEmitter<Events> {
      * if the marker ID matches the current marker ID.
      */
     if (markerId === currentMarkerId) {
+      resumeProposalProcessing();
       resumeMessageSending();
       onConnectionStateChanged(ConnectionState.LIVE);
     }
@@ -914,6 +924,7 @@ export class Account extends TypedEventEmitter<Events> {
     onConnectionStateChanged: (state: ConnectionState) => void;
   }) => {
     return async () => {
+      pauseProposalProcessing();
       pauseMessageSending();
       // We want to avoid triggering rejoins of out-of-sync MLS conversations while we are processing the notification stream
       pauseRejoiningMLSConversations();
@@ -932,6 +943,7 @@ export class Account extends TypedEventEmitter<Events> {
       // We need to wait for the notification stream to be fully handled before releasing the message sending queue.
       // This is due to the nature of how message are encrypted, any change in mls epoch needs to happen before we start encrypting any kind of messages
       this.logger.info(`Resuming message sending. ${getQueueLength()} messages to be sent`);
+      resumeProposalProcessing();
       resumeMessageSending();
       resumeRejoiningMLSConversations();
       onConnectionStateChanged(ConnectionState.LIVE);
