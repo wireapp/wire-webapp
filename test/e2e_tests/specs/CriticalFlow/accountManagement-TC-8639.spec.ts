@@ -18,6 +18,7 @@
  */
 
 import {PageManager} from 'test/e2e_tests/pageManager';
+import {addMockCamerasToContext} from 'test/e2e_tests/utils/mockVideoDevice.util';
 import {addCreatedTeam, removeCreatedTeam} from 'test/e2e_tests/utils/tearDown.util';
 
 import {getUser} from '../../data/user';
@@ -35,6 +36,9 @@ const appLockPassphrase = generateSecurePassword();
 
 test('Account Management', {tag: ['@TC-8639', '@crit-flow-web']}, async ({pageManager, api}) => {
   test.slow(); // Increasing test timeout to 90 seconds to accommodate the full flow
+
+  // Add fake video devices to the browser context
+  await addMockCamerasToContext(pageManager.getContext());
 
   const {pages, modals, components} = pageManager.webapp;
 
@@ -97,6 +101,26 @@ test('Account Management', {tag: ['@TC-8639', '@crit-flow-web']}, async ({pageMa
     const activationUrl = await api.inbucket.getAccountActivationURL(newEmail);
     await pageManager.openNewTab(activationUrl);
     await pages.account().isDisplayedEmailEquals(newEmail);
+  });
+
+  await test.step('Member changes audio device settings', async () => {
+    const fakeAudioInput = 'Fake Audio Input 1';
+    const fakeAudioOutput = 'Fake Audio Output 1';
+    const fakeCamera = 'Fake Camera 1';
+
+    await pages.settings().clickAudioVideoSettingsButton();
+    await pages.audioVideoSettings().selectMicrophone(fakeAudioInput);
+    await pages.audioVideoSettings().selectSpeaker(fakeAudioOutput);
+    await pages.audioVideoSettings().selectCamera(fakeCamera);
+    expect(await pages.audioVideoSettings().isMicrophoneSetTo('Fake Audio Input 1'));
+    expect(await pages.audioVideoSettings().isSpeakerSetTo('Fake Audio Output 1'));
+    expect(await pages.audioVideoSettings().isCameraSetTo(fakeCamera));
+  });
+
+  await test.step('Member turns off data consent', async () => {
+    await pages.settings().clickAccountButton();
+    await pages.account().toggleReceiveNewsletter();
+    expect(await pages.account().isReceiveNewsletterEnabled()).toBeFalsy();
   });
 
   await test.step('Member resets their password ', async () => {
