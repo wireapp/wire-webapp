@@ -18,8 +18,7 @@
  */
 
 import {PageManager} from 'test/e2e_tests/pageManager';
-
-import {addMockCamerasToContext} from 'test/e2e_tests/utils/mockVideoDeviceUtils';
+import {addMockCamerasToContext} from 'test/e2e_tests/utils/mockVideoDevice.util';
 import {addCreatedTeam, removeCreatedTeam} from 'test/e2e_tests/utils/tearDown.util';
 
 import {getUser} from '../../data/user';
