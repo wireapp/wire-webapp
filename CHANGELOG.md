@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [46.31.8](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@46.31.7...@wireapp/core@46.31.8) (2025-07-30)
+
+### Reverts
+
+* Revert "fix(core): Queue incoming pending MLS proposals [WPB-18995] (#7102)" (#7105) ([7c1c722](https://github.com/wireapp/wire-web-packages/commit/7c1c7229db393363b6fe0fc2ce298982970d7e84)), closes [#7102](https://github.com/wireapp/wire-web-packages/issues/7102) [#7105](https://github.com/wireapp/wire-web-packages/issues/7105)
+
 ## [46.31.7](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@46.31.6...@wireapp/core@46.31.7) (2025-07-29)
 
 **Note:** Version bump only for package @wireapp/core
