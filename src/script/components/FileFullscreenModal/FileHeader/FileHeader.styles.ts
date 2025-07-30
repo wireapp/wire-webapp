@@ -62,6 +62,10 @@ export const metadataStyles: CSSObject = {
 export const nameStyles: CSSObject = {
   fontSize: 'var(--font-size-medium)',
   fontWeight: 'var(--font-weight-semibold)',
+  whiteSpace: 'nowrap',
+  overflow: 'hidden',
+  textOverflow: 'ellipsis',
+  width: 'calc(100vw - 320px)',
 };
 
 export const textStyles: CSSObject = {
