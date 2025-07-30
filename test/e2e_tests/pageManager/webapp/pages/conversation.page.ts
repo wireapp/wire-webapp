@@ -46,6 +46,7 @@ export class ConversationPage {
   readonly systemMessages: Locator;
   readonly callButton: Locator;
   readonly conversationInfoButton: Locator;
+  readonly messages: Locator;
 
   readonly getImageAltText = (user: User) => `Image from ${user.fullName}`;
 
@@ -74,6 +75,9 @@ export class ConversationPage {
     );
     this.callButton = page.locator(selectByDataAttribute('do-call'));
     this.conversationInfoButton = page.locator(selectByDataAttribute('do-open-info'));
+    this.messages = page.locator(
+      `${selectByDataAttribute('item-message')} ${selectByClass('message-body')}:not(:has(p${selectByClass('text-foreground')})):has(${selectByClass('text')})`,
+    );
   }
 
   private getImageLocator(user: User): Locator {
@@ -126,15 +130,14 @@ export class ConversationPage {
     await this.messageInput.press('Enter');
   }
 
-  async isMessageVisible(messageText: string) {
-    const locator = this.page.locator(
-      `${selectByDataAttribute('item-message')} ${selectByClass('message-body')}:not(:has(p${selectByClass('text-foreground')}))`,
-    );
-
-    await locator.last().waitFor({state: 'visible', timeout: 20_000});
+  async isMessageVisible(messageText: string, waitForVisibility = true) {
+    if (waitForVisibility) {
+      // Wait for the last message to be visible
+      await this.messages.last().waitFor({state: 'visible', timeout: 20_000});
+    }
 
     // Then get all matching elements
-    const messages = await locator.all();
+    const messages = await this.messages.all();
 
     for (const message of messages) {
       const messageTextContent = await message.locator(selectByClass('text')).textContent();
