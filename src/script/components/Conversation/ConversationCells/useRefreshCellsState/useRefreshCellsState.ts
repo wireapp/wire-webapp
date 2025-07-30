@@ -45,7 +45,7 @@ export const useRefreshCellsState = ({
   const fetchCountRef = useRef(0);
 
   const refreshCellsState = useCallback(async () => {
-    const conversation = await conversationRepository.fetchConversationById(conversationQualifiedId);
+    const conversation = await conversationRepository.getConversationById(conversationQualifiedId);
     setCellsState(conversation.cellsState());
     fetchCountRef.current += 1;
   }, [conversationRepository, conversationQualifiedId]);
