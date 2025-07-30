@@ -143,6 +143,9 @@ function getContent(message: MemberMessageEntity) {
     }
 
     case CONVERSATION_EVENT.MEMBER_LEAVE: {
+      if (message.reason === MemberLeaveReason.USER_DELETED) {
+        return t('converstationMemberDeleted');
+      }
       if (message.reason === MemberLeaveReason.LEGAL_HOLD_POLICY_CONFLICT) {
         const replaceLinkLegalHold = replaceLink(
           Config.getConfig().URL.SUPPORT.LEGAL_HOLD_BLOCK,

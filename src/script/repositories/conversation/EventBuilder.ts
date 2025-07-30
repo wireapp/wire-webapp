@@ -662,6 +662,24 @@ export const EventBuilder = {
     };
   },
 
+  buildMemberDeleted(
+    conversationEntity: Conversation,
+    userId: QualifiedId,
+    currentTimestamp: number,
+  ): MemberLeaveEvent {
+    return {
+      ...buildQualifiedId(conversationEntity),
+      data: {
+        qualified_user_ids: [userId],
+        user_ids: [userId.id],
+        reason: MemberLeaveReason.USER_DELETED,
+      },
+      from: userId.id,
+      time: conversationEntity.getNextIsoDate(currentTimestamp),
+      type: CONVERSATION_EVENT.MEMBER_LEAVE,
+    };
+  },
+
   buildUnableToDecrypt(
     event: ConversationOtrMessageAddEvent | ConversationMLSMessageAddEvent,
     decryptionError: DecryptionError,
