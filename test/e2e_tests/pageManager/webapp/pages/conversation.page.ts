@@ -137,7 +137,7 @@ export class ConversationPage {
     const messages = await locator.all();
 
     for (const message of messages) {
-      const messageTextContent = await message.textContent();
+      const messageTextContent = await message.locator(selectByClass('text')).textContent();
       if (messageTextContent?.trim() === messageText) {
         return true;
       }
