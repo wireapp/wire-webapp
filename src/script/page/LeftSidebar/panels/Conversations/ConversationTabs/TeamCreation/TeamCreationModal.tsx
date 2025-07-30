@@ -25,8 +25,8 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 
 import * as Icon from 'Components/Icon';
 import {ModalComponent} from 'Components/Modals/ModalComponent';
-import {EventName} from 'src/script/tracking/EventName';
-import {Segmentation} from 'src/script/tracking/Segmentation';
+import {EventName} from 'Repositories/tracking/EventName';
+import {Segmentation} from 'Repositories/tracking/Segmentation';
 import {t} from 'Util/LocalizerUtil';
 
 import {teamCreationModalBodyCss, teamCreationModalWrapperCss} from './TeamCreation.styles';

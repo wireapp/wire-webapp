@@ -20,7 +20,7 @@
 import {RestNode, RestPagination} from 'cells-sdk-ts';
 
 import {CellPagination} from 'Components/Conversation/ConversationCells/common/cellPagination/cellPagination';
-import {User} from 'src/script/entity/User';
+import {User} from 'Repositories/entity/User';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 import {formatBytes, getFileExtension} from 'Util/util';
 
@@ -28,67 +28,62 @@ import {CellNode} from '../common/cellNode/cellNode';
 import {getUserQualifiedIdFromNode} from '../common/getUserQualifiedIdFromNode/getUserQualifiedIdFromNode';
 
 export const transformDataToCellsNodes = ({nodes, users}: {nodes: RestNode[]; users: User[]}): Array<CellNode> => {
-  return (
-    nodes
-      .map(node => {
-        const id = node.Uuid;
-        const owner = getOwner(node);
-        const name = getName(node.Path);
-        const sizeMb = getSize(node);
-        const uploadedAtTimestamp = getUploadedAtTimestamp(node);
-        const publicLink: CellNode['publicLink'] = {
-          alreadyShared: !!node.Shares?.[0].Uuid,
-          uuid: node.Shares?.[0].Uuid || '',
-          url: undefined,
-        };
-        const url = node.PreSignedGET?.Url;
-        const path = node.Path;
-        const presignedUrlExpiresAt = node.PreSignedGET?.ExpiresAt
-          ? new Date(Number(node.PreSignedGET?.ExpiresAt) * TIME_IN_MILLIS.SECOND)
-          : null;
-        const userQualifiedId = getUserQualifiedIdFromNode(node);
-        const user = users.find(user => user.qualifiedId.id === userQualifiedId?.id) || null;
+  return nodes.map(node => {
+    const id = node.Uuid;
+    const owner = getOwner(node);
+    const name = getName(node.Path);
+    const sizeMb = getSize(node);
+    const uploadedAtTimestamp = getUploadedAtTimestamp(node);
+    const publicLink: CellNode['publicLink'] = {
+      alreadyShared: !!node.Shares?.[0].Uuid,
+      uuid: node.Shares?.[0].Uuid || '',
+      url: undefined,
+    };
+    const url = node.PreSignedGET?.Url;
+    const path = node.Path;
+    const presignedUrlExpiresAt = node.PreSignedGET?.ExpiresAt
+      ? new Date(Number(node.PreSignedGET?.ExpiresAt) * TIME_IN_MILLIS.SECOND)
+      : null;
+    const userQualifiedId = getUserQualifiedIdFromNode(node);
+    const user = users.find(user => user.qualifiedId.id === userQualifiedId?.id) || null;
 
-        if (node.Type === 'COLLECTION') {
-          return {
-            id,
-            type: 'folder' as const,
-            path,
-            url,
-            owner,
-            name,
-            sizeMb,
-            uploadedAtTimestamp,
-            publicLink,
-            tags: getTags(node),
-            presignedUrlExpiresAt,
-            user,
-          };
-        }
+    if (node.Type === 'COLLECTION') {
+      return {
+        id,
+        type: 'folder' as const,
+        path,
+        url,
+        owner,
+        name,
+        sizeMb,
+        uploadedAtTimestamp,
+        publicLink,
+        tags: getTags(node),
+        presignedUrlExpiresAt,
+        user,
+      };
+    }
 
-        return {
-          id,
-          type: 'file' as const,
-          url,
-          path,
-          owner,
-          conversationName: node.ContextWorkspace?.Label || '',
-          mimeType: node.ContentType,
-          extension: getFileExtension(node.Path),
-          name,
-          sizeMb,
-          previewImageUrl: getPreviewImageUrl(node),
-          previewPdfUrl: getPreviewPdfUrl(node),
-          uploadedAtTimestamp,
-          publicLink,
-          tags: getTags(node),
-          presignedUrlExpiresAt,
-          user,
-        };
-      })
-      // eslint-disable-next-line id-length
-      .sort((a, b) => (a.type === 'folder' ? -1 : b.type === 'folder' ? 1 : 0))
-  );
+    return {
+      id,
+      type: 'file' as const,
+      url,
+      path,
+      owner,
+      conversationName: node.ContextWorkspace?.Label || '',
+      mimeType: node.ContentType,
+      extension: getFileExtension(node.Path),
+      name,
+      sizeMb,
+      previewImageUrl: getPreviewImageUrl(node),
+      previewPdfUrl: getPreviewPdfUrl(node),
+      uploadedAtTimestamp,
+      publicLink,
+      tags: getTags(node),
+      presignedUrlExpiresAt,
+      user,
+    };
+  });
 };
 
 export const transformToCellPagination = (pagination: RestPagination): CellPagination => {

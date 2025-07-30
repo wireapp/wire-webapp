@@ -17,11 +17,23 @@
  *
  */
 
-import {BackendClientE2E} from './backendClient.e2e';
+import axios, {AxiosInstance} from 'axios';
 
 const BASIC_AUTH = process.env.BASIC_AUTH;
 
-export class BrigRepositoryE2E extends BackendClientE2E {
+export class BrigRepositoryE2E {
+  readonly axiosInstance: AxiosInstance;
+
+  constructor() {
+    this.axiosInstance = axios.create({
+      baseURL: process.env.BACKEND_URL,
+      withCredentials: true,
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+  }
+
   public async getActivationCodeForEmail(email: string): Promise<string> {
     const activationCodeResponse = await this.axiosInstance.get(`/i/users/activation-code`, {
       params: {email: email},
@@ -45,5 +57,77 @@ export class BrigRepositoryE2E extends BackendClientE2E {
     });
 
     return invitationCodeResponse.data.code;
+  }
+
+  public async unlockConferenceCallingFeature(teamId: string) {
+    await this.axiosInstance.put(
+      `i/teams/${teamId}/features/conferenceCalling/unlocked`,
+      {},
+      {
+        headers: {
+          Authorization: `Basic ${BASIC_AUTH}`,
+        },
+      },
+    );
+  }
+
+  public async enableConferenceCallingBackdoorViaBackdoorTeam(teamId: string) {
+    await this.axiosInstance.patch(
+      `i/teams/${teamId}/features/conferenceCalling`,
+      {
+        status: 'enabled',
+      },
+      {
+        headers: {
+          Authorization: `Basic ${BASIC_AUTH}`,
+        },
+      },
+    );
+  }
+
+  public async unlockChannelFeature(teamId: string) {
+    await this.axiosInstance.put(
+      `i/teams/${teamId}/features/channels/unlocked`,
+      {},
+      {
+        headers: {
+          Authorization: `Basic ${BASIC_AUTH}`,
+        },
+      },
+    );
+  }
+
+  public async enableChannelsFeature(teamId: string) {
+    await this.axiosInstance.patch(
+      `i/teams/${teamId}/features/channels`,
+      {
+        status: 'enabled',
+      },
+      {
+        headers: {
+          Authorization: `Basic ${BASIC_AUTH}`,
+        },
+      },
+    );
+  }
+  public async enableMLSFeature(teamId: string) {
+    await this.axiosInstance.patch(
+      `i/teams/${teamId}/features/mls`,
+      {
+        status: 'enabled',
+        config: {
+          protocolToggleUsers: [],
+          allowedCipherSuites: [2],
+          defaultProtocol: 'mls',
+          defaultCipherSuite: 2,
+          supportedProtocols: ['mls', 'proteus'],
+        },
+      },
+      {
+        headers: {
+          Authorization: `Basic ${BASIC_AUTH}`,
+        },
+      },
+    );
   }
 }

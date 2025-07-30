@@ -19,38 +19,39 @@
 
 import {container} from 'tsyringe';
 
+import type {AssetRepository} from 'Repositories/assets/AssetRepository';
+import type {AudioRepository} from 'Repositories/audio/AudioRepository';
+import type {BackupRepository} from 'Repositories/backup/BackupRepository';
+import type {CallingRepository} from 'Repositories/calling/CallingRepository';
+import {CellsRepository} from 'Repositories/cells/CellsRepository';
+import type {ClientRepository} from 'Repositories/client';
+import type {ConnectionRepository} from 'Repositories/connection/ConnectionRepository';
+import type {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
+import type {MessageRepository} from 'Repositories/conversation/MessageRepository';
+import type {CryptographyRepository} from 'Repositories/cryptography/CryptographyRepository';
+import type {EventRepository} from 'Repositories/event/EventRepository';
+import type {GiphyRepository} from 'Repositories/extension/GiphyRepository';
+import type {IntegrationRepository} from 'Repositories/integration/IntegrationRepository';
+import type {MediaRepository} from 'Repositories/media/MediaRepository';
+import type {NotificationRepository} from 'Repositories/notification/NotificationRepository';
+import type {PreferenceNotificationRepository} from 'Repositories/notification/PreferenceNotificationRepository';
+import type {PermissionRepository} from 'Repositories/permission/PermissionRepository';
+import type {PropertiesRepository} from 'Repositories/properties/PropertiesRepository';
+import type {SearchRepository} from 'Repositories/search/SearchRepository';
+import type {SelfRepository} from 'Repositories/self/SelfRepository';
+import type {StorageRepository} from 'Repositories/storage';
+import type {TeamRepository} from 'Repositories/team/TeamRepository';
+import type {EventTrackingRepository} from 'Repositories/tracking/EventTrackingRepository';
+import type {UserRepository} from 'Repositories/user/UserRepository';
+import {UserState} from 'Repositories/user/UserState';
+
 import {ActionsViewModel} from './ActionsViewModel';
 import {CallingViewModel} from './CallingViewModel';
 import {ContentViewModel} from './ContentViewModel';
 import {ListViewModel} from './ListViewModel';
 
-import type {AssetRepository} from '../assets/AssetRepository';
-import type {AudioRepository} from '../audio/AudioRepository';
-import type {BackupRepository} from '../backup/BackupRepository';
-import type {CallingRepository} from '../calling/CallingRepository';
-import {CellsRepository} from '../cells/CellsRepository';
-import type {ClientRepository} from '../client';
-import type {ConnectionRepository} from '../connection/ConnectionRepository';
-import type {ConversationRepository} from '../conversation/ConversationRepository';
-import type {MessageRepository} from '../conversation/MessageRepository';
-import type {CryptographyRepository} from '../cryptography/CryptographyRepository';
-import type {EventRepository} from '../event/EventRepository';
-import type {GiphyRepository} from '../extension/GiphyRepository';
-import type {IntegrationRepository} from '../integration/IntegrationRepository';
-import type {MediaRepository} from '../media/MediaRepository';
-import type {NotificationRepository} from '../notification/NotificationRepository';
-import type {PreferenceNotificationRepository} from '../notification/PreferenceNotificationRepository';
-import type {PermissionRepository} from '../permission/PermissionRepository';
-import type {PropertiesRepository} from '../properties/PropertiesRepository';
-import type {SearchRepository} from '../search/SearchRepository';
-import type {SelfRepository} from '../self/SelfRepository';
 import {Core} from '../service/CoreSingleton';
-import type {StorageRepository} from '../storage';
-import type {TeamRepository} from '../team/TeamRepository';
 import type {ServerTimeHandler} from '../time/serverTimeHandler';
-import type {EventTrackingRepository} from '../tracking/EventTrackingRepository';
-import type {UserRepository} from '../user/UserRepository';
-import {UserState} from '../user/UserState';
 
 export interface ViewModelRepositories {
   asset: AssetRepository;

@@ -21,24 +21,24 @@ import {act, fireEvent, render, waitFor} from '@testing-library/react';
 
 import {FileWithPreview} from 'Components/Conversation/useFilesUploadState/useFilesUploadState';
 import {InputBar} from 'Components/InputBar/index';
+import {AssetRepository} from 'Repositories/assets/AssetRepository';
+import {CellsRepository} from 'Repositories/cells/CellsRepository';
+import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
+import {MessageRepository} from 'Repositories/conversation/MessageRepository';
+import {Conversation} from 'Repositories/entity/Conversation';
+import {User} from 'Repositories/entity/User';
+import {EventRepository} from 'Repositories/event/EventRepository';
+import {PropertiesRepository} from 'Repositories/properties/PropertiesRepository';
+import {PropertiesService} from 'Repositories/properties/PropertiesService';
+import {SearchRepository} from 'Repositories/search/SearchRepository';
+import {SelfService} from 'Repositories/self/SelfService';
+import {StorageRepository} from 'Repositories/storage';
+import {TeamState} from 'Repositories/team/TeamState';
 import {withTheme} from 'src/script/auth/util/test/TestUtil';
-import {CellsRepository} from 'src/script/cells/CellsRepository';
 import {Config} from 'src/script/Config';
-import {PropertiesService} from 'src/script/properties/PropertiesService';
-import {SelfService} from 'src/script/self/SelfService';
 import {createUuid} from 'Util/uuid';
 
 import {TestFactory} from '../../../../test/helper/TestFactory';
-import {AssetRepository} from '../../assets/AssetRepository';
-import {ConversationRepository} from '../../conversation/ConversationRepository';
-import {MessageRepository} from '../../conversation/MessageRepository';
-import {Conversation} from '../../entity/Conversation';
-import {User} from '../../entity/User';
-import {EventRepository} from '../../event/EventRepository';
-import {PropertiesRepository} from '../../properties/PropertiesRepository';
-import {SearchRepository} from '../../search/SearchRepository';
-import {StorageRepository} from '../../storage';
-import {TeamState} from '../../team/TeamState';
 
 const testFactory = new TestFactory();
 

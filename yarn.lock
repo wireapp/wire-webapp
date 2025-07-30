@@ -8310,18 +8310,18 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@wireapp/api-client@npm:^27.68.0":
-  version: 27.68.0
-  resolution: "@wireapp/api-client@npm:27.68.0"
+"@wireapp/api-client@npm:^27.70.0":
+  version: 27.70.0
+  resolution: "@wireapp/api-client@npm:27.70.0"
   dependencies:
     "@aws-sdk/client-s3": "npm:3.750.0"
     "@aws-sdk/lib-storage": "npm:3.779.0"
-    "@wireapp/commons": "npm:^5.4.2"
+    "@wireapp/commons": "npm:^5.4.3"
     "@wireapp/priority-queue": "npm:^2.1.11"
     "@wireapp/protocol-messaging": "npm:1.52.0"
     axios: "npm:1.9.0"
     axios-retry: "npm:4.5.0"
-    cells-sdk-ts: "https://github.com/pydio/cells-sdk-ts#v0.1.1-alpha12"
+    cells-sdk-ts: "npm:0.1.1-alpha14"
     http-status-codes: "npm:2.3.0"
     logdown: "npm:3.3.1"
     pako: "npm:2.1.0"
@@ -8331,7 +8331,7 @@ __metadata:
     uuid: "npm:11.1.0"
     ws: "npm:8.18.1"
     zod: "npm:3.24.2"
-  checksum: 10/c51b42f70c878830b1760345d23fc93513b3aea7aaacef83b891fa6abfac9cc2195bd886ac128353f59f5d0d9de499c9d91500251f64021ac3b2eb50f3c38147
+  checksum: 10/a9de1773a54a986a756823695d9f467559d72b23b71424279cf30f764239dfb15296740c5eda1a2bb7d930295f10a8a7e4ece39e0651259a350c10da04478329
   languageName: node
   linkType: hard
 
@@ -8360,15 +8360,15 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@wireapp/commons@npm:5.4.2, @wireapp/commons@npm:^5.4.2":
-  version: 5.4.2
-  resolution: "@wireapp/commons@npm:5.4.2"
+"@wireapp/commons@npm:5.4.3, @wireapp/commons@npm:^5.4.3":
+  version: 5.4.3
+  resolution: "@wireapp/commons@npm:5.4.3"
   dependencies:
     ansi-regex: "npm:5.0.1"
     fs-extra: "npm:11.3.0"
     logdown: "npm:3.3.1"
     platform: "npm:1.3.6"
-  checksum: 10/730b304d2b9027431b984045316208f6cdd5597209c2d09e297a184e4d9793347e33cb3508bbeed22b1970adf39ff861e9ebe36bd036e89391135e5e1320d779
+  checksum: 10/81e2b260f17f0010b9ef34958c2641fe4eaa42673d31451e79d373534a6c119febe2ef47f8b591a8e8e0f2ea3fa7fd3b495bf560ae2786f718befa73bca1cc08
   languageName: node
   linkType: hard
 
@@ -8396,16 +8396,16 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@wireapp/core@npm:46.31.2":
-  version: 46.31.2
-  resolution: "@wireapp/core@npm:46.31.2"
+"@wireapp/core@npm:46.31.8":
+  version: 46.31.8
+  resolution: "@wireapp/core@npm:46.31.8"
   dependencies:
-    "@wireapp/api-client": "npm:^27.68.0"
-    "@wireapp/commons": "npm:^5.4.2"
+    "@wireapp/api-client": "npm:^27.70.0"
+    "@wireapp/commons": "npm:^5.4.3"
     "@wireapp/core-crypto": "npm:7.0.1"
     "@wireapp/cryptobox": "npm:12.8.0"
     "@wireapp/priority-queue": "npm:^2.1.11"
-    "@wireapp/promise-queue": "npm:^2.4.0"
+    "@wireapp/promise-queue": "npm:^2.4.1"
     "@wireapp/protocol-messaging": "npm:1.52.0"
     "@wireapp/store-engine": "npm:^5.1.11"
     axios: "npm:1.7.9"
@@ -8418,7 +8418,7 @@ __metadata:
     long: "npm:^5.2.0"
     uuid: "npm:9.0.1"
     zod: "npm:3.24.2"
-  checksum: 10/a5742306e0c15cd7831b9d81e72f001aad1d0d6f33ef641ca6d3b7be9a803dd80721c3089a8684e3a4c6c46294c073652c02a4ef7cb6a16dcc9a6bea77b4f3f2
+  checksum: 10/05b065db05d23f84edd2c2efe5b179b70adc37a08eb16bc55803ad08e17fb10b73962da1ad3103c238a9c599af5bb759bc6a998d753235c8202463c1ab2278a7
   languageName: node
   linkType: hard
 
@@ -8514,10 +8514,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@wireapp/promise-queue@npm:^2.4.0":
-  version: 2.4.0
-  resolution: "@wireapp/promise-queue@npm:2.4.0"
-  checksum: 10/61c7d4a3de8fdebec04499820eb2ddf36e85e77ac369041500a7536e8b7ebcdd0b5c1042bd77775d21e626f860fedc924c2b4681826fbc841eb843931720214e
+"@wireapp/promise-queue@npm:^2.4.1":
+  version: 2.4.1
+  resolution: "@wireapp/promise-queue@npm:2.4.1"
+  checksum: 10/b4239e6705ee92ef4582905ed65a85ccac7f9c34f6fe56acdd4e70850798253565dbe37d2d6c02ab547434064054d71ec172cad48c552d6528451639dfa8440a
   languageName: node
   linkType: hard
 
@@ -9901,12 +9901,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"cells-sdk-ts@https://github.com/pydio/cells-sdk-ts#v0.1.1-alpha12":
-  version: 0.1.0
-  resolution: "cells-sdk-ts@https://github.com/pydio/cells-sdk-ts.git#commit=7df0cf67605e2d53ab22a3c7b3deb1e04196db67"
+"cells-sdk-ts@npm:0.1.1-alpha14":
+  version: 0.1.1-alpha14
+  resolution: "cells-sdk-ts@npm:0.1.1-alpha14"
   dependencies:
     axios: "npm:^1.9.0"
-  checksum: 10/ef1762834c08c4b9a8f1b563a9b53403131c8a190157f23c9cbef8b7265f3d605a20893bc7b5e800f61bfec7846711b99b241b63e9cfdf16bc1b1af705df9393
+  checksum: 10/0b530d83bd56d3b3a63f8dd3f99014268bdafc9d3af32a3c45910b0529552ce4af3d7d8f9c5533c53cf3fcaccc8ac83be2f44639abcd622fb9f036f1d7fac17d
   languageName: node
   linkType: hard
 
@@ -18447,6 +18447,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"qrcode-reader@npm:1.0.4":
+  version: 1.0.4
+  resolution: "qrcode-reader@npm:1.0.4"
+  checksum: 10/973b71da2f2298a283a788dab38bf197cfad827a8c5e84e9c6a1fb9d8d767550cb9cb90b588dafd37d53cc4ba9ae7cc7be8ac61622fb1b55aee644cbf321153e
+  languageName: node
+  linkType: hard
+
 "querystringify@npm:^2.1.1":
   version: 2.2.0
   resolution: "querystringify@npm:2.2.0"
@@ -21996,9 +22003,9 @@ __metadata:
     "@types/wicg-file-system-access": "npm:^2023.10.5"
     "@wireapp/avs": "npm:10.0.46"
     "@wireapp/avs-debugger": "npm:0.0.7"
-    "@wireapp/commons": "npm:5.4.2"
+    "@wireapp/commons": "npm:5.4.3"
     "@wireapp/copy-config": "npm:2.3.0"
-    "@wireapp/core": "npm:46.31.2"
+    "@wireapp/core": "npm:46.31.8"
     "@wireapp/eslint-config": "npm:3.0.7"
     "@wireapp/kalium-backup": "npm:0.0.3"
     "@wireapp/prettier-config": "npm:0.6.4"
@@ -22069,6 +22076,7 @@ __metadata:
     prettier: "npm:3.3.2"
     prism-themes: "npm:^1.9.0"
     prismjs: "npm:^1.29.0"
+    qrcode-reader: "npm:1.0.4"
     raw-loader: "npm:4.0.2"
     react: "npm:18.3.1"
     react-dom: "npm:18.3.1"

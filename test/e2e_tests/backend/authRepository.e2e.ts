@@ -17,6 +17,7 @@
  *
  */
 
+import {User as AuthUser} from '@wireapp/api-client/lib/user';
 import {AxiosResponse} from 'axios';
 
 import {BackendClientE2E} from './backendClient.e2e';
@@ -31,12 +32,25 @@ export class AuthRepositoryE2E extends BackendClientE2E {
       email: user.email,
       ...(invitationCode && {team_code: invitationCode}),
     });
+
+    if (!response.data.id) {
+      throw new Error('User registration failed, no user ID returned');
+    }
+
     user.id = response.data.id;
+    user.qualifiedId = {
+      domain: response.data?.domain ?? '',
+      id: response.data.id,
+    };
     return response;
   }
 
-  public async registerTeamOwner(user: User, teamName: string, activationCode: string): Promise<AxiosResponse> {
-    const response = await this.axiosInstance.post('register', {
+  public async registerTeamOwner(
+    user: User,
+    teamName: string,
+    activationCode: string,
+  ): Promise<AxiosResponse<AuthUser>> {
+    return this.axiosInstance.post('register', {
       password: user.password,
       name: `${user.firstName} ${user.lastName}`,
       email: user.email,
@@ -47,9 +61,6 @@ export class AuthRepositoryE2E extends BackendClientE2E {
         binding: true,
       },
     });
-    user.id = response.data.id;
-    user.teamId = response.data.team;
-    return response;
   }
 
   public async activateAccount(email: string, code: string) {
@@ -80,7 +91,16 @@ export class AuthRepositoryE2E extends BackendClientE2E {
       },
     );
     user.token = response.data.access_token;
+
+    if (!response.data.id) {
+      throw new Error('User registration failed, no user ID returned');
+    }
+
     user.id = response.data.user;
+    user.qualifiedId = {
+      domain: response.data?.domain ?? '',
+      id: response.data.id,
+    };
     return response;
   }
 

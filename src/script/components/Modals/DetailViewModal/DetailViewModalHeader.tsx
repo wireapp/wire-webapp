@@ -20,11 +20,10 @@
 import {FC} from 'react';
 
 import * as Icon from 'Components/Icon';
+import {ContentMessage} from 'Repositories/entity/message/ContentMessage';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 import {formatLocale} from 'Util/TimeUtil';
-
-import {ContentMessage} from '../../../entity/message/ContentMessage';
 
 interface DetailViewModalHeaderProps {
   messageEntity: ContentMessage;

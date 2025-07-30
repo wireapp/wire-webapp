@@ -19,7 +19,7 @@
 
 import {render} from '@testing-library/react';
 
-import {LegalHoldMessage as LegalHoldMessageEntity} from 'src/script/entity/message/LegalHoldMessage';
+import {LegalHoldMessage as LegalHoldMessageEntity} from 'Repositories/entity/message/LegalHoldMessage';
 
 import {LegalHoldMessage} from './LegalHoldMessage';
 

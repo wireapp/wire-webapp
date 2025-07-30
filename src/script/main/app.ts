@@ -37,6 +37,53 @@ import {Runtime} from '@wireapp/commons';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
+import {AssetRepository} from 'Repositories/assets/AssetRepository';
+import {AudioRepository} from 'Repositories/audio/AudioRepository';
+import {BackupRepository} from 'Repositories/backup/BackupRepository';
+import {BackupService} from 'Repositories/backup/BackupService';
+import {CacheRepository} from 'Repositories/cache/CacheRepository';
+import {CallingRepository} from 'Repositories/calling/CallingRepository';
+import {CellsRepository} from 'Repositories/cells/CellsRepository';
+import {ClientRepository, ClientService} from 'Repositories/client';
+import {getClientMLSConfig} from 'Repositories/client/clientMLSConfig';
+import {ConnectionRepository} from 'Repositories/connection/ConnectionRepository';
+import {ConnectionService} from 'Repositories/connection/ConnectionService';
+import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
+import {ConversationService} from 'Repositories/conversation/ConversationService';
+import {ConversationVerificationState} from 'Repositories/conversation/ConversationVerificationState';
+import {OnConversationE2EIVerificationStateChange} from 'Repositories/conversation/ConversationVerificationStateHandler/shared';
+import {EventBuilder} from 'Repositories/conversation/EventBuilder';
+import {MessageRepository} from 'Repositories/conversation/MessageRepository';
+import {CryptographyRepository} from 'Repositories/cryptography/CryptographyRepository';
+import {User} from 'Repositories/entity/User';
+import {EventRepository} from 'Repositories/event/EventRepository';
+import {EventService} from 'Repositories/event/EventService';
+import {NotificationService} from 'Repositories/event/NotificationService';
+import {EventStorageMiddleware} from 'Repositories/event/preprocessor/EventStorageMiddleware';
+import {QuotedMessageMiddleware} from 'Repositories/event/preprocessor/QuoteDecoderMiddleware';
+import {ReceiptsMiddleware} from 'Repositories/event/preprocessor/ReceiptsMiddleware';
+import {RepliesUpdaterMiddleware} from 'Repositories/event/preprocessor/RepliesUpdaterMiddleware';
+import {ServiceMiddleware} from 'Repositories/event/preprocessor/ServiceMiddleware';
+import {FederationEventProcessor} from 'Repositories/event/processor/FederationEventProcessor';
+import {GiphyRepository} from 'Repositories/extension/GiphyRepository';
+import {GiphyService} from 'Repositories/extension/GiphyService';
+import {IntegrationRepository} from 'Repositories/integration/IntegrationRepository';
+import {IntegrationService} from 'Repositories/integration/IntegrationService';
+import {MediaRepository} from 'Repositories/media/MediaRepository';
+import {NotificationRepository} from 'Repositories/notification/NotificationRepository';
+import {PreferenceNotificationRepository} from 'Repositories/notification/PreferenceNotificationRepository';
+import {PermissionRepository} from 'Repositories/permission/PermissionRepository';
+import {PropertiesRepository} from 'Repositories/properties/PropertiesRepository';
+import {PropertiesService} from 'Repositories/properties/PropertiesService';
+import {SearchRepository} from 'Repositories/search/SearchRepository';
+import {SelfRepository} from 'Repositories/self/SelfRepository';
+import {SelfService} from 'Repositories/self/SelfService';
+import {StorageKey, StorageRepository, StorageService} from 'Repositories/storage';
+import {TeamRepository} from 'Repositories/team/TeamRepository';
+import {TeamService} from 'Repositories/team/TeamService';
+import {EventTrackingRepository} from 'Repositories/tracking/EventTrackingRepository';
+import {UserRepository} from 'Repositories/user/UserRepository';
+import {UserService} from 'Repositories/user/UserService';
 import {initializeDataDog} from 'Util/DataDog';
 import {DebugUtil} from 'Util/DebugUtil';
 import {Environment} from 'Util/Environment';
@@ -48,77 +95,30 @@ import {appendParameter} from 'Util/UrlUtil';
 import {AppInitializationStep, checkIndexedDb, InitializationEventLogger} from 'Util/util';
 
 import '../../style/default.less';
-import {AssetRepository} from '../assets/AssetRepository';
-import {AudioRepository} from '../audio/AudioRepository';
 import {SIGN_OUT_REASON} from '../auth/SignOutReason';
 import {URLParameter} from '../auth/URLParameter';
-import {BackupRepository} from '../backup/BackupRepository';
-import {BackupService} from '../backup/BackupService';
-import {CacheRepository} from '../cache/CacheRepository';
-import {CallingRepository} from '../calling/CallingRepository';
-import {CellsRepository} from '../cells/CellsRepository';
-import {ClientRepository, ClientService} from '../client';
-import {getClientMLSConfig} from '../client/clientMLSConfig';
 import {Config, Configuration} from '../Config';
-import {ConnectionRepository} from '../connection/ConnectionRepository';
-import {ConnectionService} from '../connection/ConnectionService';
-import {ConversationRepository} from '../conversation/ConversationRepository';
-import {ConversationService} from '../conversation/ConversationService';
-import {ConversationVerificationState} from '../conversation/ConversationVerificationState';
-import {OnConversationE2EIVerificationStateChange} from '../conversation/ConversationVerificationStateHandler/shared';
-import {EventBuilder} from '../conversation/EventBuilder';
-import {MessageRepository} from '../conversation/MessageRepository';
-import {CryptographyRepository} from '../cryptography/CryptographyRepository';
 import {E2EIHandler} from '../E2EIdentity';
 import {getModalOptions, ModalType} from '../E2EIdentity/Modals';
-import {User} from '../entity/User';
 import {AccessTokenError} from '../error/AccessTokenError';
 import {AuthError} from '../error/AuthError';
 import {BaseError} from '../error/BaseError';
 import {CLIENT_ERROR_TYPE, ClientError} from '../error/ClientError';
 import {TeamError} from '../error/TeamError';
-import {EventRepository} from '../event/EventRepository';
-import {EventService} from '../event/EventService';
-import {NotificationService} from '../event/NotificationService';
-import {EventStorageMiddleware} from '../event/preprocessor/EventStorageMiddleware';
-import {QuotedMessageMiddleware} from '../event/preprocessor/QuoteDecoderMiddleware';
-import {ReceiptsMiddleware} from '../event/preprocessor/ReceiptsMiddleware';
-import {RepliesUpdaterMiddleware} from '../event/preprocessor/RepliesUpdaterMiddleware';
-import {ServiceMiddleware} from '../event/preprocessor/ServiceMiddleware';
-import {FederationEventProcessor} from '../event/processor/FederationEventProcessor';
-import {GiphyRepository} from '../extension/GiphyRepository';
-import {GiphyService} from '../extension/GiphyService';
 import {externalUrl} from '../externalRoute';
-import {IntegrationRepository} from '../integration/IntegrationRepository';
-import {IntegrationService} from '../integration/IntegrationService';
 import {startNewVersionPolling} from '../lifecycle/newVersionHandler';
 import {scheduleApiVersionUpdate, updateApiVersion} from '../lifecycle/updateRemoteConfigs';
-import {MediaRepository} from '../media/MediaRepository';
 import {initialiseSelfAndTeamConversations, initMLSGroupConversations} from '../mls';
 import {joinConversationsAfterMigrationFinalisation} from '../mls/MLSMigration/migrationFinaliser';
-import {NotificationRepository} from '../notification/NotificationRepository';
-import {PreferenceNotificationRepository} from '../notification/PreferenceNotificationRepository';
 import {configureDownloadPath} from '../page/components/FeatureConfigChange/FeatureConfigChangeHandler/Features/downloadPath';
 import {configureE2EI} from '../page/components/FeatureConfigChange/FeatureConfigChangeHandler/Features/E2EIdentity';
-import {PermissionRepository} from '../permission/PermissionRepository';
-import {PropertiesRepository} from '../properties/PropertiesRepository';
-import {PropertiesService} from '../properties/PropertiesService';
-import {SearchRepository} from '../search/SearchRepository';
-import {SelfRepository} from '../self/SelfRepository';
-import {SelfService} from '../self/SelfService';
 import {APIClient} from '../service/APIClientSingleton';
 import {Core} from '../service/CoreSingleton';
-import {StorageKey, StorageRepository, StorageService} from '../storage';
-import {TeamRepository} from '../team/TeamRepository';
-import {TeamService} from '../team/TeamService';
 import {AppInitStatisticsValue} from '../telemetry/app_init/AppInitStatisticsValue';
 import {AppInitTelemetry} from '../telemetry/app_init/AppInitTelemetry';
 import {AppInitTimingsStep} from '../telemetry/app_init/AppInitTimingsStep';
 import {serverTimeHandler} from '../time/serverTimeHandler';
-import {EventTrackingRepository} from '../tracking/EventTrackingRepository';
 import {WindowHandler} from '../ui/WindowHandler';
-import {UserRepository} from '../user/UserRepository';
-import {UserService} from '../user/UserService';
 import {ViewModelRepositories} from '../view_model/MainViewModel';
 import {Warnings} from '../view_model/WarningsContainer';
 
@@ -349,20 +349,12 @@ export class App {
     amplify.subscribe(WebAppEvents.LIFECYCLE.SIGN_OUT, this.logout);
   }
 
-  private initializeCells({
-    cellsRepository,
-    selfUser,
-    accessToken,
-  }: {
-    cellsRepository: CellsRepository;
-    selfUser: User;
-    accessToken: string;
-  }) {
+  private initializeCells({cellsRepository, selfUser}: {cellsRepository: CellsRepository; selfUser: User}) {
     const cellPydioApiKey = Config.getConfig().CELLS_TOKEN_SHARED_SECRET;
     const cellsInitWithZauthToken = Config.getConfig().FEATURE.CELLS_INIT_WITH_ZAUTH_TOKEN;
 
     const cellsApiKey = cellsInitWithZauthToken
-      ? accessToken
+      ? undefined
       : `${cellPydioApiKey}:${selfUser.qualifiedId.id}@${selfUser.qualifiedId.domain}`;
 
     cellsRepository.initialize({
@@ -428,9 +420,7 @@ export class App {
 
       const selfUser = await this.repository.user.getSelf([{position: 'App.initiateSelfUser', vendor: 'webapp'}]);
 
-      const accessToken = this.apiClient.transport.http.accessTokenStore.accessTokenData?.access_token!;
-
-      this.initializeCells({cellsRepository, selfUser, accessToken});
+      this.initializeCells({cellsRepository, selfUser});
 
       await initializeDataDog(this.config, selfUser.qualifiedId);
       const eventLogger = new InitializationEventLogger(selfUser.id);

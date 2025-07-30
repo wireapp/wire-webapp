@@ -34,8 +34,12 @@ export interface User {
   fullName: string;
   username: string;
   devices: string[];
-  teamId?: string;
-  token?: string;
+  teamId: string;
+  token: string;
+  qualifiedId?: {
+    domain: string;
+    id: string;
+  };
 }
 
 export const getUser = (user: Partial<User> = {}): User => {
@@ -52,5 +56,7 @@ export const getUser = (user: Partial<User> = {}): User => {
     fullName: user.fullName ?? `${firstName} ${lastName}`,
     username: user.username ?? generateUsername(firstName, lastName),
     devices: user.devices ?? [],
+    teamId: user.teamId ?? '',
+    token: user.token ?? '',
   };
 };

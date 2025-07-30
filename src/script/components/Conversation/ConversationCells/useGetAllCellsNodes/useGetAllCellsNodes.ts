@@ -21,8 +21,8 @@ import {useEffect, useCallback, useState} from 'react';
 
 import {QualifiedId} from '@wireapp/api-client/lib/user/';
 
-import {CellsRepository} from 'src/script/cells/CellsRepository';
-import {UserRepository} from 'src/script/user/UserRepository';
+import {CellsRepository} from 'Repositories/cells/CellsRepository';
+import {UserRepository} from 'Repositories/user/UserRepository';
 
 import {getUsersFromNodes} from './getUsersFromNodes';
 import {transformDataToCellsNodes, transformToCellPagination} from './transformDataToCellsNodes';
@@ -87,15 +87,20 @@ export const useGetAllCellsNodes = ({
   }, [setNodes, setStatus, setError, id, offset, pageSize, setPagination]);
 
   const handleHashChange = useCallback(() => {
+    if (!enabled) {
+      return;
+    }
     clearAll({conversationId: id});
     setOffset(0);
     void fetchNodes();
-  }, [fetchNodes, setOffset, clearAll, id]);
+  }, [fetchNodes, setOffset, clearAll, id, enabled]);
 
   useEffect(() => {
-    if (enabled) {
-      void fetchNodes();
+    if (!enabled) {
+      return;
     }
+
+    void fetchNodes();
   }, [fetchNodes, enabled]);
 
   useEffect(() => {

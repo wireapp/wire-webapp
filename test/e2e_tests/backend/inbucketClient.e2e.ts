@@ -65,28 +65,18 @@ export class InbucketClientE2E {
   }
 
   async getAccountDeletionURL(email: string) {
-    let accountDeletionURL;
+    const deletionUrlRegex = 'https://[a-zA-Z_0-9.=-]+/d/\\?key=[a-zA-Z_0-9.\\-\\\\&_=]+';
+    return this.getMatchingURLFromEmailBody(email, deletionUrlRegex);
+  }
 
-    let timeout = 0;
-    while (!accountDeletionURL && timeout < 100) {
-      const response = await this.getLatestEmail(email);
-      if (response.status === 200) {
-        const regex = 'https://[a-zA-Z_0-9.=-]+/d/\\?key=[a-zA-Z_0-9.\\-\\\\&_=]+';
-        const message = response.data;
-        accountDeletionURL = message.body.text.match(regex)?.[0];
-        if (accountDeletionURL !== undefined) {
-          break;
-        }
-      }
-      await new Promise(resolve => setTimeout(resolve, 500)); // Wait for 500 ms
-      timeout++;
-    }
+  async getAccountActivationURL(email: string) {
+    const accountActivationRegex = 'https://[a-zA-Z_0-9.=-]+/verify/\\?key=[a-zA-Z_0-9.\\-\\\\&_=]+';
+    return this.getMatchingURLFromEmailBody(email, accountActivationRegex);
+  }
 
-    if (this.isValidURL(accountDeletionURL) === false) {
-      throw new Error('Account deletion URL not found in the email body');
-    }
-
-    return accountDeletionURL;
+  async getResetPasswordURL(email: string) {
+    const resetLinkRegex = 'https://[a-zA-Z_0-9.=-]+/reset/\\?key=[a-zA-Z_0-9.\\-\\\\&_=]+';
+    return this.getMatchingURLFromEmailBody(email, resetLinkRegex);
   }
 
   async isTeamInvitationEmailReceived(inviteeEmail: string, inviterEmail: string) {
@@ -107,6 +97,30 @@ export class InbucketClientE2E {
     }
 
     return false;
+  }
+
+  private async getMatchingURLFromEmailBody(email: string, regex: string) {
+    let matchingUrl;
+
+    let timeout = 0;
+    while (!matchingUrl && timeout < 100) {
+      const response = await this.getLatestEmail(email);
+      if (response.status === 200) {
+        const message = response.data;
+        matchingUrl = message.body.text.match(regex)?.[0];
+        if (matchingUrl !== undefined) {
+          break;
+        }
+      }
+      await new Promise(resolve => setTimeout(resolve, 500)); // Wait for 500 ms
+      timeout++;
+    }
+
+    if (this.isValidURL(matchingUrl) === false) {
+      throw new Error('Matching URL not found in the email body');
+    }
+
+    return matchingUrl;
   }
 
   private async getLatestEmail(email: string) {

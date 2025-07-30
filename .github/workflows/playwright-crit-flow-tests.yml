@@ -25,7 +25,7 @@ jobs:
         run: yarn --immutable
 
       - name: Install Playwright browsers
-        run: yarn playwright install --with-deps
+        run: yarn playwright install --with-deps && yarn playwright install chrome
 
       - name: Install 1Password
         uses: 1password/install-cli-action@v1
@@ -36,7 +36,7 @@ jobs:
           OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
 
       - name: Run critical flow tests
-        run: yarn e2e-test --grep "@crit-flow|@crit-flow-tm"
+        run: yarn e2e-test --grep "@crit-flow-web"
 
       - name: Upload test report
         if: always()

@@ -32,7 +32,16 @@ import {showDetailViewModal} from 'Components/Modals/DetailViewModal';
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {showWarningModal} from 'Components/Modals/utils/showWarningModal';
 import {TitleBar} from 'Components/TitleBar';
-import {CallState} from 'src/script/calling/CallState';
+import {CallState} from 'Repositories/calling/CallState';
+import {ConversationState} from 'Repositories/conversation/ConversationState';
+import {Conversation as ConversationEntity} from 'Repositories/entity/Conversation';
+import {ContentMessage} from 'Repositories/entity/message/ContentMessage';
+import {DecryptErrorMessage} from 'Repositories/entity/message/DecryptErrorMessage';
+import {MemberMessage} from 'Repositories/entity/message/MemberMessage';
+import {Message} from 'Repositories/entity/message/Message';
+import {User} from 'Repositories/entity/User';
+import {ServiceEntity} from 'Repositories/integration/ServiceEntity';
+import {TeamState} from 'Repositories/team/TeamState';
 import {Config} from 'src/script/Config';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {isLastReceivedMessage} from 'Util/conversationMessages';
@@ -53,22 +62,13 @@ import {ReadOnlyConversationMessage} from './ReadOnlyConversationMessage';
 import {useFilesUploadDropzone} from './useFilesUploadDropzone/useFilesUploadDropzone';
 import {checkFileSharingPermission} from './utils/checkFileSharingPermission';
 
-import {ConversationState} from '../../conversation/ConversationState';
-import {Conversation as ConversationEntity} from '../../entity/Conversation';
-import {ContentMessage} from '../../entity/message/ContentMessage';
-import {DecryptErrorMessage} from '../../entity/message/DecryptErrorMessage';
-import {MemberMessage} from '../../entity/message/MemberMessage';
-import {Message} from '../../entity/message/Message';
-import {User} from '../../entity/User';
 import {UserError} from '../../error/UserError';
 import {isMouseRightClickEvent, isAuxRightClickEvent} from '../../guards/Mouse';
 import {isServiceEntity} from '../../guards/Service';
-import {ServiceEntity} from '../../integration/ServiceEntity';
 import {MotionDuration} from '../../motion/MotionDuration';
 import {RightSidebarParams} from '../../page/AppMain';
 import {PanelState} from '../../page/RightSidebar';
 import {useMainViewModel} from '../../page/RootProvider';
-import {TeamState} from '../../team/TeamState';
 import {ElementType, MessageDetails} from '../MessagesList/Message/ContentMessage/asset/TextMessageRenderer';
 
 interface ConversationProps {
@@ -106,7 +106,7 @@ export const Conversation = ({
     'isFileSharingSendingEnabled',
   ]);
 
-  const {is1to1, isRequest, isReadOnlyConversation, isSelfUserRemoved, cellsState} = useKoSubscribableChildren(
+  const {is1to1, isRequest, isReadOnlyConversation, isSelfUserRemoved} = useKoSubscribableChildren(
     activeConversation!,
     [
       'is1to1',
@@ -116,7 +116,6 @@ export const Conversation = ({
       'connection',
       'isReadOnlyConversation',
       'isSelfUserRemoved',
-      'cellsState',
     ],
   );
 
@@ -479,7 +478,8 @@ export const Conversation = ({
     isDisabled: isFileTabActive,
   });
 
-  const isCellsEnabled = Config.getConfig().FEATURE.ENABLE_CELLS && cellsState !== CONVERSATION_CELLS_STATE.DISABLED;
+  const isCellsEnabled =
+    Config.getConfig().FEATURE.ENABLE_CELLS && activeConversation?.cellsState() !== CONVERSATION_CELLS_STATE.DISABLED;
 
   return (
     <ConversationFileDropzone
@@ -515,10 +515,10 @@ export const Conversation = ({
               <ConversationTabPanel id="files" isActive={isFileTabActive}>
                 {isFileTabActive && (
                   <ConversationCells
-                    conversationQualifiedId={activeConversation.qualifiedId}
-                    conversationName={activeConversation.name()}
+                    activeConversation={activeConversation}
                     userRepository={repositories.user}
-                    cellsState={cellsState}
+                    cellsRepository={repositories.cells}
+                    conversationRepository={conversationRepository}
                   />
                 )}
               </ConversationTabPanel>
