@@ -149,7 +149,7 @@ export const useLoadMessages = (
   // Load more messages on mount if the list doesn't fill the viewport
   useEffect(() => {
     if (itemsLength === 0 || fillContainerByMessagesRef.current) {
-      return;
+      return () => undefined;
     }
 
     const frame = requestAnimationFrame(() => {
