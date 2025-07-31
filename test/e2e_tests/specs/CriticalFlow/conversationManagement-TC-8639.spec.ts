@@ -89,7 +89,7 @@ test('Conversation Management', {tag: ['@TC-8636', '@crit-flow-web']}, async ({p
     expect(await pages.conversation().isMessageVisible(textMessage)).toBeTruthy();
     // Wait for more than 10 seconds to ensure the message is deleted
     await pages.conversation().page.waitForTimeout(11000);
-    expect(await pages.conversation().isMessageVisible(textMessage)).toBeFalsy();
+    expect(await pages.conversation().isMessageVisible(textMessage, false)).toBeFalsy();
     await components.inputBarControls().setEphemeralTimerTo('Off');
   });
 
