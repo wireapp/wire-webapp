@@ -127,7 +127,7 @@ export const useScrollMessages = (
 
     if (isAtBottom && !virtualizer.isScrolling) {
       requestAnimationFrame(() => {
-        virtualizer.scrollToIndex(lastIndex, {align: 'end', behavior: 'smooth'});
+        virtualizer.scrollToIndex(lastIndex, {align: 'end'});
       });
     }
   }, [virtualizer, messages]);
