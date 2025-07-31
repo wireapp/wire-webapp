@@ -59,23 +59,23 @@ test(
     });
 
     await test.step('Both users log in and open the group', async () => {
-      await Promise.all([
-        (async () => {
-          await userAPageManager.openMainPage();
-          await loginUser(userA, userAPageManager);
-          await userAModals.dataShareConsent().clickDecline();
-          await userAPages.conversationList().clickCreateGroup();
-          await userAPages.groupCreation().setGroupName(conversationName);
-          await userAPages.startUI().selectUsers([userB.username]);
-          await userAPages.groupCreation().clickCreateGroupButton();
-        })(),
+      const setupUserA = async () => {
+        await userAPageManager.openMainPage();
+        await loginUser(userA, userAPageManager);
+        await userAModals.dataShareConsent().clickDecline();
+        await userAPages.conversationList().clickCreateGroup();
+        await userAPages.groupCreation().setGroupName(conversationName);
+        await userAPages.startUI().selectUsers([userB.username]);
+        await userAPages.groupCreation().clickCreateGroupButton();
+      };
 
-        (async () => {
-          await userBPageManager.openMainPage();
-          await loginUser(userB, userBPageManager);
-          await userBModals.dataShareConsent().clickDecline();
-        })(),
-      ]);
+      const setupUserB = async () => {
+        await userBPageManager.openMainPage();
+        await loginUser(userB, userBPageManager);
+        await userBModals.dataShareConsent().clickDecline();
+      };
+
+      await Promise.all([setupUserA(), setupUserB()]);
     });
 
     await test.step('User A mentions User B in the group', async () => {
@@ -169,8 +169,8 @@ test(
     });
 
     await test.step('Both users see the message as removed', async () => {
-      expect(await userBPages.conversation().isMessageVisible(selfDestructMessageText)).toBeFalsy();
-      expect(await userAPages.conversation().isMessageVisible(selfDestructMessageText)).toBeFalsy();
+      expect(await userBPages.conversation().isMessageVisible(selfDestructMessageText, false)).toBeFalsy();
+      expect(await userAPages.conversation().isMessageVisible(selfDestructMessageText, false)).toBeFalsy();
 
       // Reset ephemeral timer to 'Off'
       await userAComponents.inputBarControls().setEphemeralTimerTo('Off');
