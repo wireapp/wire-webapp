@@ -687,6 +687,7 @@ export class MessageRepository {
       this.assetRepository.addToProcessQueue(message, conversation.id);
       return {message, metaData: meta as FileMetaDataContent};
     } catch (error) {
+      this.logger.error('Error while building metadata for asset', JSON.stringify(error));
       const logMessage = `Couldn't render asset preview from metadata. Asset might be corrupt: ${
         (error as Error).message
       }`;

@@ -19,7 +19,7 @@
 
 import {Page, Locator} from '@playwright/test';
 
-import {selectByDataAttribute} from 'test/e2e_tests/utils/useSelector';
+import {selectByDataAttribute} from 'test/e2e_tests/utils/selector.util';
 
 export class AccountPage {
   readonly page: Page;
@@ -31,6 +31,11 @@ export class AccountPage {
   readonly backupFileInput: Locator;
   readonly restoreBackupButton: Locator;
   readonly logoutButton: Locator;
+  readonly emailDisplay: Locator;
+  readonly editEmailButton: Locator;
+  readonly emailInput: Locator;
+  readonly resetPasswordButton: Locator;
+  readonly receiveNewsletterCheckbox: Locator;
 
   constructor(page: Page) {
     this.page = page;
@@ -42,6 +47,11 @@ export class AccountPage {
     this.backupFileInput = page.locator(selectByDataAttribute('input-import-file'));
     this.restoreBackupButton = page.locator("[data-uie-name='do-backup-import']+button");
     this.logoutButton = page.locator(selectByDataAttribute('do-logout'));
+    this.editEmailButton = page.locator(selectByDataAttribute('go-edit-email'));
+    this.emailInput = page.locator(selectByDataAttribute('enter-email-input'));
+    this.emailDisplay = page.locator(selectByDataAttribute('email-display'));
+    this.resetPasswordButton = page.locator(selectByDataAttribute('do-reset-password'));
+    this.receiveNewsletterCheckbox = page.locator("[data-uie-name='status-preference-marketing']+label");
   }
 
   async clickBackUpButton() {
@@ -60,11 +70,39 @@ export class AccountPage {
     await this.sendUsageDataCheckbox.click();
   }
 
+  async toggleReceiveNewsletter() {
+    await this.receiveNewsletterCheckbox.click();
+  }
+
+  async isSendUsageDataEnabled() {
+    return this.sendUsageDataCheckbox.isChecked();
+  }
+
+  async isReceiveNewsletterEnabled() {
+    return this.receiveNewsletterCheckbox.isChecked();
+  }
+
   async toggleAppLock() {
     await this.appLockCheckbox.click();
   }
 
   async clickLogoutButton() {
     await this.logoutButton.click();
+  }
+
+  async isDisplayedEmailEquals(expectedEmail: string) {
+    await this.emailDisplay.isVisible();
+    const displayedEmail = await this.emailDisplay.textContent();
+    return displayedEmail === expectedEmail;
+  }
+
+  async clickResetPasswordButton() {
+    await this.resetPasswordButton.click();
+  }
+
+  async changeEmailAddress(newEmail: string) {
+    await this.editEmailButton.click();
+    await this.emailInput.fill(newEmail);
+    await this.emailInput.press('Enter');
   }
 }

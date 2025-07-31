@@ -17,14 +17,18 @@
  *
  */
 
+import {PageManager} from 'test/e2e_tests/pageManager';
+import {addMockCamerasToContext} from 'test/e2e_tests/utils/mockVideoDevice.util';
+import {addCreatedTeam, removeCreatedTeam} from 'test/e2e_tests/utils/tearDown.util';
+
 import {getUser} from '../../data/user';
 import {test, expect} from '../../test.fixtures';
-import {addCreatedTeam, removeCreatedTeam} from '../../utils/tearDownUtil';
 import {loginUser} from '../../utils/userActions';
-import {generateSecurePassword} from '../../utils/userDataGenerator';
+import {generateSecurePassword, generateWireEmail} from '../../utils/userDataGenerator';
 
 // Generating test data
 let owner = getUser();
+const newEmail = generateWireEmail(owner.lastName);
 const member = getUser();
 const teamName = 'Critical';
 const conversationName = 'Tracking';
@@ -32,6 +36,9 @@ const appLockPassphrase = generateSecurePassword();
 
 test('Account Management', {tag: ['@TC-8639', '@crit-flow-web']}, async ({pageManager, api}) => {
   test.slow(); // Increasing test timeout to 90 seconds to accommodate the full flow
+
+  // Add fake video devices to the browser context
+  await addMockCamerasToContext(pageManager.getContext());
 
   const {pages, modals, components} = pageManager.webapp;
 
@@ -86,14 +93,67 @@ test('Account Management', {tag: ['@TC-8639', '@crit-flow-web']}, async ({pageMa
     expect(await pages.conversationList().isConversationItemVisible(conversationName));
   });
 
-  // TODO: Missing test steps for TC-8639 from testiny:
-  // Member changes their email address to a new email address
-  // Member resets their password
-  //
-  // These steps were not implemented in zautomation, so I skipped them here for the time being.
-  await test.step('Member changes their email address to a new email address', async () => {});
+  await test.step('Member changes their email address to a new email address', async () => {
+    await components.conversationSidebar().clickPreferencesButton();
+    await pages.account().changeEmailAddress(newEmail);
+    await modals.verifyEmail().clickOkButton();
 
-  await test.step('Member resets their password ', async () => {});
+    const activationUrl = await api.inbucket.getAccountActivationURL(newEmail);
+    await pageManager.openNewTab(activationUrl);
+    await pages.account().isDisplayedEmailEquals(newEmail);
+  });
+
+  await test.step('Member changes audio device settings', async () => {
+    const fakeAudioInput = 'Fake Audio Input 1';
+    const fakeAudioOutput = 'Fake Audio Output 1';
+    const fakeCamera = 'Fake Camera 1';
+
+    await pages.settings().clickAudioVideoSettingsButton();
+    await pages.audioVideoSettings().selectMicrophone(fakeAudioInput);
+    await pages.audioVideoSettings().selectSpeaker(fakeAudioOutput);
+    await pages.audioVideoSettings().selectCamera(fakeCamera);
+    expect(await pages.audioVideoSettings().isMicrophoneSetTo('Fake Audio Input 1'));
+    expect(await pages.audioVideoSettings().isSpeakerSetTo('Fake Audio Output 1'));
+    expect(await pages.audioVideoSettings().isCameraSetTo(fakeCamera));
+  });
+
+  await test.step('Member turns off data consent', async () => {
+    await pages.settings().clickAccountButton();
+    await pages.account().toggleReceiveNewsletter();
+    expect(await pages.account().isReceiveNewsletterEnabled()).toBeFalsy();
+  });
+
+  await test.step('Member resets their password ', async () => {
+    const [newPage] = await Promise.all([
+      pageManager.getContext().waitForEvent('page'), // Wait for the new tab
+      pages.account().clickResetPasswordButton(),
+    ]);
+
+    const resetPasswordPageManager = PageManager.from(newPage);
+    const resetPasswordPage = resetPasswordPageManager.webapp.pages.requestResetPassword();
+    await resetPasswordPage.requestPasswordResetForEmail(newEmail);
+    const resetPasswordUrl = await api.inbucket.getResetPasswordURL(newEmail);
+    await newPage.close(); // Close the new tab
+
+    const newPassword = generateSecurePassword();
+    member.password = newPassword; // Update member's password for password reset
+
+    await pageManager.openUrl(resetPasswordUrl);
+    await pages.resetPassword().setNewPassword(newPassword);
+    await pages.resetPassword().isPasswordChangeMessageVisible();
+
+    // Logging in with the new password
+    // Bug [WPB-19061] Getting 403 (/access) and 401 (/self) after trying to open main page after resetting passwowrd. Also it looks like endless empty loading screen and nothing happens
+
+    //   await pageManager.openMainPage();
+    //   await loginUser(member, pageManager);
+    //   await modals.dataShareConsent().clickDecline();
+
+    //   expect(await components.conversationSidebar().getPersonalStatusName()).toBe(
+    //     `${member.firstName} ${member.lastName}`,
+    //   );
+    //   expect(await components.conversationSidebar().getPersonalUserName()).toContain(member.username);
+  });
 });
 
 test.afterAll(async ({api}) => {

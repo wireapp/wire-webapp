@@ -32,6 +32,11 @@ export class AuthRepositoryE2E extends BackendClientE2E {
       email: user.email,
       ...(invitationCode && {team_code: invitationCode}),
     });
+
+    if (!response.data.id) {
+      throw new Error('User registration failed, no user ID returned');
+    }
+
     user.id = response.data.id;
     user.qualifiedId = {
       domain: response.data?.domain ?? '',
@@ -86,6 +91,11 @@ export class AuthRepositoryE2E extends BackendClientE2E {
       },
     );
     user.token = response.data.access_token;
+
+    if (!response.data.id) {
+      throw new Error('User registration failed, no user ID returned');
+    }
+
     user.id = response.data.user;
     user.qualifiedId = {
       domain: response.data?.domain ?? '',
