@@ -17,12 +17,28 @@
  *
  */
 
-import {CSSObject} from '@emotion/react';
+import {t} from 'Util/LocalizerUtil';
+import {formatLocale, isToday, isYesterday} from 'Util/TimeUtil';
 
-export const imageStyles: CSSObject = {
-  width: '100%',
-  height: '100%',
-  objectFit: 'cover',
-  borderRadius: '10px',
-  backgroundColor: 'var(--transparent-img-bg)',
+/**
+ If today: “Today”
+ If yesterday: “Yesterday”
+ Any other day: <Week day>, <date> (e.g. “Monday, April 12” or “Friday, January 6 2023”)
+ */
+export const getMessagesGroupLabel = (timestamp: number) => {
+  const date = new Date(timestamp);
+
+  if (isToday(date)) {
+    return t('conversationToday');
+  }
+
+  if (isYesterday(date)) {
+    return t('conversationYesterday');
+  }
+
+  const today = new Date();
+  const isCurrentYear = date.getFullYear() === today.getFullYear();
+  const pattern = isCurrentYear ? 'EEEE, MMMM d' : 'EEEE, MMMM d yyyy';
+
+  return formatLocale(date, pattern);
 };
