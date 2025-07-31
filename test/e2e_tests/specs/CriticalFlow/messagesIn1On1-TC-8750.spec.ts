@@ -189,8 +189,8 @@ test('Messages in 1:1', {tag: ['@TC-8750', '@crit-flow-web']}, async ({pageManag
     await memberBPM.webapp.pages.conversation().page.waitForTimeout(11_000);
   });
   await test.step('Both users see the message as removed', async () => {
-    expect(await memberBPM.webapp.pages.conversation().isMessageVisible(selfDestructMessageText)).toBeFalsy();
-    expect(await pages.conversation().isMessageVisible(selfDestructMessageText)).toBeFalsy();
+    expect(await memberBPM.webapp.pages.conversation().isMessageVisible(selfDestructMessageText, false)).toBeFalsy();
+    expect(await pages.conversation().isMessageVisible(selfDestructMessageText, false)).toBeFalsy();
 
     // Reset ephemeral timer to 'Off'
     await components.inputBarControls().setEphemeralTimerTo('Off');
