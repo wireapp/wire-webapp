@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2022 Wire Swiss GmbH
+ * Copyright (C) 2025 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,4 +17,19 @@
  *
  */
 
-export * from './Message';
+import {Message} from 'Repositories/entity/message/Message';
+
+import {GroupedMessage, Marker} from './messagesGroup';
+
+export const verticallyCenterMessage = (messages: Message[]): boolean => {
+  const filteredMessagesLength = messages.length;
+  if (filteredMessagesLength === 1) {
+    const [firstMessage] = messages;
+    return firstMessage.isMember() && firstMessage.isConnection();
+  }
+  return false;
+};
+
+export const getLastUnreadMessageIndex = (lastReadTimestamp: number, messages: (Marker | GroupedMessage)[]) => {
+  return messages.findIndex(message => message.timestamp > lastReadTimestamp);
+};
