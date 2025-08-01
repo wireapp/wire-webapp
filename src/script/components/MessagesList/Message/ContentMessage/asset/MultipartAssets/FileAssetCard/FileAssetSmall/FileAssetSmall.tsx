@@ -21,6 +21,8 @@ import {useId, useState} from 'react';
 
 import {FileCard} from 'Components/FileCard/FileCard';
 
+import {contentWrapperStyles} from './FileAssetSmall.styles';
+
 import {FileAssetOptions} from '../common/FileAssetOptions/FileAssetOptions';
 import {FilePreviewModal} from '../common/FilePreviewModal/FilePreviewModal';
 
@@ -53,27 +55,29 @@ export const FileAssetSmall = ({
   const id = useId();
 
   return (
-    <FileCard.Root extension={extension} name={name} size={size}>
-      <FileCard.Header>
-        <FileCard.Icon type={isError ? 'unavailable' : 'file'} />
-        {!isError && <FileCard.Type />}
-        <FileAssetOptions src={src} name={name} extension={extension} onOpen={() => setIsOpen(true)} />
-      </FileCard.Header>
-      <FileCard.Name variant={isError ? 'secondary' : 'primary'} truncateAfterLines={2} />
-      <FilePreviewModal
-        id={id}
-        fileUrl={src}
-        filePdfPreviewUrl={pdfPreviewUrl}
-        fileImagePreviewUrl={imagePreviewUrl}
-        fileName={name}
-        fileExtension={extension}
-        senderName={senderName}
-        timestamp={timestamp}
-        isOpen={isOpen}
-        onClose={() => setIsOpen(false)}
-        isError={isError}
-        isLoading={isLoading}
-      />
-    </FileCard.Root>
+    <button onClick={() => setIsOpen(true)} css={contentWrapperStyles}>
+      <FileCard.Root extension={extension} name={name} size={size}>
+        <FileCard.Header>
+          <FileCard.Icon type={isError ? 'unavailable' : 'file'} />
+          {!isError && <FileCard.Type />}
+          <FileAssetOptions src={src} name={name} extension={extension} onOpen={() => setIsOpen(true)} />
+        </FileCard.Header>
+        <FileCard.Name variant={isError ? 'secondary' : 'primary'} truncateAfterLines={2} />
+        <FilePreviewModal
+          id={id}
+          fileUrl={src}
+          filePdfPreviewUrl={pdfPreviewUrl}
+          fileImagePreviewUrl={imagePreviewUrl}
+          fileName={name}
+          fileExtension={extension}
+          senderName={senderName}
+          timestamp={timestamp}
+          isOpen={isOpen}
+          onClose={() => setIsOpen(false)}
+          isError={isError}
+          isLoading={isLoading}
+        />
+      </FileCard.Root>
+    </button>
   );
 };

@@ -19,20 +19,6 @@
 
 import {CSSObject} from '@emotion/react';
 
-export const videoStyles: CSSObject = {
-  width: '100%',
-  height: '100%',
-  objectFit: 'cover',
-  borderRadius: '10px',
-};
-
-export const iconWrapperStyles: CSSObject = {
-  position: 'absolute',
-  top: '50%',
-  left: '50%',
-  transform: 'translate(-50%, -50%)',
-};
-
 export const contentWrapperStyles: CSSObject = {
   padding: '0',
   border: 'none',
