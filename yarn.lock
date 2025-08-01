@@ -8471,16 +8471,16 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@wireapp/kalium-backup@npm:0.0.3":
-  version: 0.0.3
-  resolution: "@wireapp/kalium-backup@npm:0.0.3"
+"@wireapp/kalium-backup@npm:0.0.4":
+  version: 0.0.4
+  resolution: "@wireapp/kalium-backup@npm:0.0.4"
   dependencies:
     "@js-joda/core": "npm:3.2.0"
     format-util: "npm:^1.0.5"
     jszip: "npm:3.10.1"
     libsodium-wrappers-sumo: "npm:0.7.9"
     protobufjs: "npm:^7.3.2"
-  checksum: 10/92ffab3f2d1ea290543ee86aeec2e0d2a78a8b719a95bc248175900111b749dad90306ceaa95bd2b8acc3754a256260fa103706a8364496d9eff4ff63b476ce9
+  checksum: 10/af490844f03c4da6dfc9ee9d1f7805204026e1c43f1e2ae4aaebadea61796cf515f13ef69361d66670e9636d00379cba864d0152a5e5d2b19ef58c6624c89849
   languageName: node
   linkType: hard
 
@@ -22007,7 +22007,7 @@ __metadata:
     "@wireapp/copy-config": "npm:2.3.0"
     "@wireapp/core": "npm:46.31.8"
     "@wireapp/eslint-config": "npm:3.0.7"
-    "@wireapp/kalium-backup": "npm:0.0.3"
+    "@wireapp/kalium-backup": "npm:0.0.4"
     "@wireapp/prettier-config": "npm:0.6.4"
     "@wireapp/react-ui-kit": "npm:9.62.0"
     "@wireapp/store-engine": "npm:5.1.11"
