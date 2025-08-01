@@ -85,17 +85,22 @@ export const useScrollMessages = (
 
   // This function scrolling to the first unread message or bottom to the message list on initialization.
   useEffect(() => {
-    const shouldSkipInitialScroll = hasInitialScrollRef.current || messages.length === 0 || virtualizer.isScrolling;
+    const shouldSkipInitialScroll = hasInitialScrollRef.current || messages.length === 0;
 
     if (shouldSkipInitialScroll) {
       return;
     }
 
-    let lastUnreadMessageIndex = messages.length - 1;
+    const newMessages = messages.some(message => message.timestamp > conversationLastReadTimestamp.current);
 
-    const firstUnreadMessage = messages.findIndex(message => {
+    let hasNewMessages = false;
+
+    const firstUnreadMessage = messages.findIndex((message, index) => {
       if (isMarker(message)) {
-        return false;
+        hasNewMessages = true;
+        const nextMessage = messages[index + 1];
+
+        return nextMessage && !isMarker(nextMessage);
       }
 
       const isFromSelf = message.message.from === userId;
@@ -104,14 +109,17 @@ export const useScrollMessages = (
       return isFromSelf ? message.timestamp >= conversationLastReadTimestamp.current : isAfterLastRead;
     });
 
-    if (firstUnreadMessage !== -1) {
-      lastUnreadMessageIndex = firstUnreadMessage;
+    if (hasNewMessages) {
+      requestAnimationFrame(() => {
+        virtualizer.scrollToIndex(firstUnreadMessage + 1, {align: 'end'});
+        hasInitialScrollRef.current = true;
+      });
+    } else if (!newMessages) {
+      requestAnimationFrame(() => {
+        virtualizer.scrollToIndex(messages.length - 1, {align: 'end'});
+        hasInitialScrollRef.current = true;
+      });
     }
-
-    requestAnimationFrame(() => {
-      virtualizer.scrollToIndex(lastUnreadMessageIndex, {align: 'end'});
-      hasInitialScrollRef.current = true;
-    });
   }, [conversation, userId, virtualizer, messages, conversationLastReadTimestamp]);
 
   // If the scroll was at the top and new messages were loaded, scroll in a way that preserves the position.
