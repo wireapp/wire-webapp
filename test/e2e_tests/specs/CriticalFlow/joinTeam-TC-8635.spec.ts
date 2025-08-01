@@ -38,7 +38,7 @@ test(
   'New person joins team and setups up device',
   {tag: ['@TC-8635', '@crit-flow-web']},
   async ({pageManager, api, browser}) => {
-    test.slow(); // Increasing test timeout to 90 seconds to accommodate the full flow
+    test.setTimeout(120_000); // Increasing test timeout to 120 seconds to accommodate the full flow
 
     const {pages, components, modals} = pageManager.webapp;
 
@@ -150,7 +150,7 @@ test(
     });
 
     await test.step('A sees the mention in the chat', async () => {
-      await expect(pages.conversation().isMessageVisible(`@${memberA.fullName}`)).toBeTruthy();
+      await expect(pages.conversation().page.getByText(`@${memberA.fullName}`)).toBeVisible();
     });
   },
 );
