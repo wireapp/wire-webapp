@@ -104,8 +104,12 @@ export const useScrollMessages = (
         const nextMessage = messages[index + 1];
 
         if (nextMessage && !isMarker(nextMessage)) {
-          hasNewMessages = true;
-          return message.timestamp >= conversationLastReadTimestamp.current;
+          if (message.timestamp >= conversationLastReadTimestamp.current) {
+            hasNewMessages = true;
+            return true;
+          }
+
+          return false;
         }
 
         return false;
