@@ -38,7 +38,7 @@ test(
   'New person joins team and setups up device',
   {tag: ['@TC-8635', '@crit-flow-web']},
   async ({pageManager, api, browser}) => {
-    test.setTimeout(120_000); // Increasing test timeout to 120 seconds to accommodate the full flow
+    test.slow(); // Increasing test timeout to 90 seconds to accommodate the full flow
 
     const {pages, components, modals} = pageManager.webapp;
 
