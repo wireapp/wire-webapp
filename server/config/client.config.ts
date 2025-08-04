@@ -55,6 +55,7 @@ export function generateConfig(params: ConfigGeneratorParams, env: Env) {
         : null,
       ENABLE_CELLS: env.FEATURE_ENABLE_CELLS == 'true',
       CELLS_INIT_WITH_ZAUTH_TOKEN: env.FEATURE_CELLS_INIT_WITH_ZAUTH_TOKEN == 'true',
+      USE_ASYNC_NOTIFICATIONS: env.FEATURE_USE_ASYNC_NOTIFICATIONS == 'true',
       CHECK_CONSENT: env.FEATURE_CHECK_CONSENT != 'false',
       CONFERENCE_AUTO_MUTE: env.FEATURE_CONFERENCE_AUTO_MUTE == 'true',
       ENABLE_IN_CALL_REACTIONS: env.FEATURE_ENABLE_IN_CALL_REACTIONS == 'true',

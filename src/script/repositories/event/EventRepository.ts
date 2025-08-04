@@ -193,6 +193,7 @@ export class EventRepository {
    */
   async connectWebSocket(
     account: Account,
+    useLegacy: boolean,
     onNotificationStreamProgress: (currentProcessingNotificationTimestamp: string) => void,
     dryRun = false,
   ): Promise<void> {
@@ -202,6 +203,7 @@ export class EventRepository {
       this.disconnectWebSocket?.();
       return new Promise<void>(async resolve => {
         this.disconnectWebSocket = await account.listen({
+          useLegacy,
           onConnectionStateChanged: connectionState => {
             this.updateConnectivitityStatus(connectionState);
             if (connectionState === ConnectionState.LIVE) {
