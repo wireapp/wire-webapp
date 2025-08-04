@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [46.32.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@46.31.8...@wireapp/core@46.32.0) (2025-08-04)
+
+### Features
+
+* **core, api-client:** Support legacy notifications stream [WPB-19042] ([#7109](https://github.com/wireapp/wire-web-packages/issues/7109)) ([b5ba023](https://github.com/wireapp/wire-web-packages/commit/b5ba023361ebd529a90d23967b1b3f42a5564907))
+
 ## [46.31.8](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@46.31.7...@wireapp/core@46.31.8) (2025-07-30)
 
 ### Reverts
