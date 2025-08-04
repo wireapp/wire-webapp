@@ -68,6 +68,8 @@ export class WebSocketClient extends EventEmitter {
 
   public static readonly TOPIC = TOPIC;
 
+  private useLegacySocket: boolean = true;
+
   constructor(baseUrl: string, client: HttpClient) {
     super();
 
@@ -84,7 +86,7 @@ export class WebSocketClient extends EventEmitter {
 
   public useVersion(version: number): void {
     if (version < MINIMUM_API_VERSION) {
-      throw new Error('Minium supported api version is 8 in order to connect to /events web socket endpoint');
+      throw new Error(`Minium supported api version is ${MINIMUM_API_VERSION} `);
     }
     this.versionPrefix = version > 0 ? `/v${version}` : '';
   }
@@ -100,7 +102,9 @@ export class WebSocketClient extends EventEmitter {
     if (this.isLocked()) {
       this.bufferedMessages.push(data);
     } else {
-      const notification = ConsumableNotificationSchema.parse(JSON.parse(data));
+      const notification = this.useLegacySocket
+        ? JSON.parse(data)
+        : ConsumableNotificationSchema.parse(JSON.parse(data));
       this.emit(WebSocketClient.TOPIC.ON_MESSAGE, notification);
     }
   };
@@ -244,7 +248,7 @@ export class WebSocketClient extends EventEmitter {
       access_token: accessToken,
     });
 
-    if (markerToken) {
+    if (markerToken && !this.useLegacySocket) {
       queryParams.append('sync_marker', markerToken);
     }
 
@@ -260,7 +264,15 @@ export class WebSocketClient extends EventEmitter {
 
     this.logger.info(`WebSocket URL: ${this.baseUrl}${this.versionPrefix}/events?${queryString}`);
 
+    if (this.useLegacySocket) {
+      return `${this.baseUrl}/await?${queryString}`;
+    }
+
     return `${this.baseUrl}${this.versionPrefix}/events?${queryString}`;
+  }
+
+  public useAsyncNotificationsSocket() {
+    this.useLegacySocket = false;
   }
 
   public acknowledgeMissedNotification() {

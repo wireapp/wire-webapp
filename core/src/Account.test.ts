@@ -166,6 +166,12 @@ describe('Account', () => {
       .reply(HTTP_STATUS.OK);
 
     nock(MOCK_BACKEND.rest)
+      .put(/\/clients\/[\w-]+$/, {
+        capabilities: ['legalhold-implicit-consent'],
+      })
+      .reply(HTTP_STATUS.OK);
+
+    nock(MOCK_BACKEND.rest)
       .get(SelfAPI.URL.SELF)
       .reply(HTTP_STATUS.OK, {
         email: 'email@example.com',
@@ -327,6 +333,7 @@ describe('Account', () => {
           const onEvent = jest.fn().mockImplementation(() => {});
           mockNotifications(nbNotifications);
           await dependencies.account.listen({
+            useLegacy: false,
             onConnectionStateChanged: callWhen(ConnectionState.LIVE, async () => {
               expect(onNotificationStreamProgress).toHaveBeenCalledTimes(nbNotifications);
               expect(onEvent).toHaveBeenCalledTimes(nbNotifications);
@@ -340,7 +347,10 @@ describe('Account', () => {
               server.send(
                 JSON.stringify({
                   type: ConsumableEvent.EVENT,
-                  data: {delivery_tag: 1000, event: {id: uuidv4(), payload: []}},
+                  data: {
+                    delivery_tag: 1000,
+                    event: {id: uuidv4(), payload: []},
+                  },
                 }),
               );
 
@@ -355,7 +365,7 @@ describe('Account', () => {
         });
       });
 
-      it('warns consumer of the connection state', async () => {
+      it('sends information to consumer of the connection state change in order', async () => {
         await new Promise<void>(async resolve => {
           mockNotifications(10);
 
@@ -366,13 +376,44 @@ describe('Account', () => {
               case ConnectionState.CLOSED:
                 // Expect all states to have been called in order
                 expect(onConnectionStateChanged).toHaveBeenNthCalledWith(1, ConnectionState.PROCESSING_NOTIFICATIONS);
-                expect(onConnectionStateChanged).toHaveBeenNthCalledWith(2, ConnectionState.LIVE);
+                expect(onConnectionStateChanged).toHaveBeenNthCalledWith(2, ConnectionState.CONNECTING);
+                expect(onConnectionStateChanged).toHaveBeenNthCalledWith(3, ConnectionState.LIVE);
                 resolve();
                 break;
             }
           });
 
           const disconnect = await dependencies.account.listen({
+            useLegacy: false,
+            onConnectionStateChanged,
+          });
+
+          await waitFor(() => expect(onConnectionStateChanged).toHaveBeenCalledWith(ConnectionState.LIVE));
+
+          disconnect();
+        });
+      });
+
+      it('warns consumer of the connection close', async () => {
+        await new Promise<void>(async resolve => {
+          mockNotifications(10);
+
+          const onConnectionStateChanged = jest.fn().mockImplementation((state: ConnectionState) => {
+            switch (state) {
+              case ConnectionState.LIVE:
+                break;
+              case ConnectionState.CLOSED:
+                // Expect all states to have been called in order
+                expect(onConnectionStateChanged).toHaveBeenNthCalledWith(1, ConnectionState.PROCESSING_NOTIFICATIONS);
+                expect(onConnectionStateChanged).toHaveBeenNthCalledWith(2, ConnectionState.CONNECTING);
+                expect(onConnectionStateChanged).toHaveBeenNthCalledWith(3, ConnectionState.CLOSED);
+                resolve();
+                break;
+            }
+          });
+
+          const disconnect = await dependencies.account.listen({
+            useLegacy: false,
             onConnectionStateChanged,
           });
 
@@ -391,6 +432,7 @@ describe('Account', () => {
           const onEvent = jest.fn();
           mockNotifications(nbNotifications);
           await dependencies.account.listen({
+            useLegacy: false,
             onConnectionStateChanged: callWhen(ConnectionState.LIVE, () => {
               expect(onNotificationStreamProgress).toHaveBeenCalledTimes(nbNotifications);
               expect(onEvent).toHaveBeenCalledTimes(nbNotifications);
@@ -403,29 +445,47 @@ describe('Account', () => {
         });
       });
 
-      it('does not stop proccessing messages if websocket connection is aborted', async () => {
+      it('does stop processing messages if websocket connection is aborted', async () => {
         jest
           .spyOn(dependencies.account, 'getClientCapabilities')
-          .mockReturnValue([ClientCapability.LEGAL_HOLD_IMPLICIT_CONSENT]);
+          .mockReturnValue([ClientCapability.LEGAL_HOLD_IMPLICIT_CONSENT, ClientCapability.CONSUMABLE_NOTIFICATIONS]);
         const nbNotifications = 10;
-        const onNotificationStreamProgress = jest
+        const onNotificationStreamProgress = jest.fn();
+
+        const onEvent = jest
           .fn()
           .mockImplementationOnce(() => {})
           .mockImplementationOnce(() => {
             // abort websocket connection after the second notification is processeed
-            server.close();
+            server.close({reason: 'Aborted by test', code: 2000, wasClean: true});
           });
 
-        const onEvent = jest.fn();
-        mockNotifications(nbNotifications);
         return new Promise<void>(async resolve => {
           return dependencies.account.listen({
+            useLegacy: false,
             onConnectionStateChanged: async state => {
               switch (state) {
-                case ConnectionState.LIVE:
-                  expect(onNotificationStreamProgress).toHaveBeenCalledTimes(10);
-                  expect(onEvent).toHaveBeenCalledTimes(10);
-                  expect(onEvent).toHaveBeenCalledWith(expect.any(Object), NotificationSource.NOTIFICATION_STREAM);
+                case ConnectionState.CONNECTING:
+                  await server.connected;
+                  for (let i = 0; i < nbNotifications; i++) {
+                    server.send(
+                      JSON.stringify({
+                        type: ConsumableEvent.EVENT,
+                        data: {
+                          delivery_tag: 1000,
+                          event: {id: uuidv4(), payload: [{domain: 'zinfra.io', type: 'federation.delete'}]},
+                        },
+                      }),
+                    );
+                  }
+                  break;
+                case ConnectionState.CLOSED:
+                  expect(onNotificationStreamProgress).toHaveBeenCalledTimes(2);
+                  expect(onEvent).toHaveBeenCalledTimes(2);
+                  expect(onEvent).toHaveBeenCalledWith(
+                    {domain: 'zinfra.io', type: 'federation.delete'},
+                    NotificationSource.WEBSOCKET,
+                  );
                   expect(dependencies.account.service!.notification.handleNotification).not.toHaveBeenCalledWith(
                     expect.any(Object),
                     NotificationSource.WEBSOCKET,

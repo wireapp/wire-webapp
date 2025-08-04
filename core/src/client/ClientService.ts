@@ -164,6 +164,7 @@ export class ClientService {
     loginData: LoginData,
     clientInfo: ClientInfo,
     {prekeys, lastPrekey}: InitialPrekeys,
+    useLegacyNotificationStream: boolean = true,
   ): Promise<RegisteredClient> {
     if (!this.apiClient.context) {
       throw new Error('Context is not set.');
@@ -173,9 +174,14 @@ export class ClientService {
       throw new Error(`Can't register client of type "${ClientType.NONE}"`);
     }
 
+    const capabilities: ClientCapability[] = [ClientCapability.LEGAL_HOLD_IMPLICIT_CONSENT];
+    if (!useLegacyNotificationStream) {
+      capabilities.push(ClientCapability.CONSUMABLE_NOTIFICATIONS);
+    }
+
     const newClient: CreateClientPayload = {
       class: clientInfo.classification,
-      capabilities: [ClientCapability.LEGAL_HOLD_IMPLICIT_CONSENT, ClientCapability.CONSUMABLE_NOTIFICATIONS],
+      capabilities,
       cookie: clientInfo.cookieLabel,
       label: clientInfo.label,
       lastkey: lastPrekey,
