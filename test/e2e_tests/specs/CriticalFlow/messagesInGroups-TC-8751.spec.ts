@@ -56,6 +56,7 @@ test(
       addCreatedUser(userA);
       addCreatedUser(userB);
       await api.connectUsers(userA, userB);
+      await new Promise(resolve => setTimeout(resolve, 2000)); // Wait for connection to be updated
     });
 
     await test.step('Both users log in and open the group', async () => {
