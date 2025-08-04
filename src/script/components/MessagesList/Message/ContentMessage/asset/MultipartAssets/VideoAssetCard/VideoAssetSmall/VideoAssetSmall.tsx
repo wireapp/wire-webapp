@@ -22,10 +22,11 @@ import {useId, useState} from 'react';
 import {FileFullscreenModal} from 'Components/FileFullscreenModal/FileFullscreenModal';
 import {t} from 'Util/LocalizerUtil';
 
-import {contentWrapperStyles, iconWrapperStyles, videoStyles} from './VideoAssetSmall.styles';
+import {iconWrapperStyles, videoStyles} from './VideoAssetSmall.styles';
 
 import {FilePreviewPlayButton} from '../../common/FilePreviewPlayButton/FilePreviewPlayButton';
 import {MediaFilePreviewCard} from '../../common/MediaFilePreviewCard/MediaFilePreviewCard';
+import {hollowWrapperButtonStyles} from '../../MultipartAssets.styles';
 
 interface VideoAssetSmallProps {
   src?: string;
@@ -52,7 +53,7 @@ export const VideoAssetSmall = ({
   return (
     <>
       <button
-        css={contentWrapperStyles}
+        css={hollowWrapperButtonStyles}
         onClick={() => setIsOpen(true)}
         aria-label={t('accessibility.conversationAssetImageAlt', {
           username: senderName,

@@ -32,11 +32,3 @@ export const iconWrapperStyles: CSSObject = {
   left: '50%',
   transform: 'translate(-50%, -50%)',
 };
-
-export const contentWrapperStyles: CSSObject = {
-  padding: '0',
-  border: 'none',
-  background: 'none',
-  textAlign: 'unset',
-  cursor: 'pointer',
-};
