@@ -97,10 +97,22 @@ export const useScrollMessages = (
 
     const firstUnreadMessage = messages.findIndex((message, index) => {
       if (isMarker(message)) {
-        hasNewMessages = true;
+        if (message.type !== 'unread') {
+          return false;
+        }
+
         const nextMessage = messages[index + 1];
 
-        return nextMessage && !isMarker(nextMessage);
+        if (nextMessage && !isMarker(nextMessage)) {
+          if (message.timestamp >= conversationLastReadTimestamp.current) {
+            hasNewMessages = true;
+            return true;
+          }
+
+          return false;
+        }
+
+        return false;
       }
 
       const isFromSelf = message.message.from === userId;
