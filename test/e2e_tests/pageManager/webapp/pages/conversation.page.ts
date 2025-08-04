@@ -121,11 +121,17 @@ export class ConversationPage {
     await this.createGroupSubmitButton.click();
   }
 
-  async sendMention(memberId: string) {
+  async sendMessageWithUserMention(userFullName: string, messageText?: string) {
     await this.messageInput.fill(`@`);
     await this.page
-      .locator(`${selectByDataAttribute('item-mention-suggestion')}[data-uie-value="${memberId}"]`)
+      .locator(`${selectByDataAttribute('item-mention-suggestion')} ${selectByDataAttribute('status-name')}`, {
+        hasText: userFullName,
+      })
       .click({timeout: 1000});
+
+    if (messageText) {
+      await this.messageInput.pressSequentially(messageText);
+    }
 
     await this.messageInput.press('Enter');
   }
@@ -148,7 +154,7 @@ export class ConversationPage {
     return false;
   }
 
-  async isImageVisible(user: User) {
+  async isImageFromUserVisible(user: User) {
     // Trying multiple times for the image to appear
     const locator = this.getImageLocator(user);
 
