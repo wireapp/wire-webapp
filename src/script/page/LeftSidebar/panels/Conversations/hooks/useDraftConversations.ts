@@ -21,9 +21,10 @@ import {useEffect, useState, useRef, useCallback} from 'react';
 
 import {useDebouncedCallback} from 'use-debounce';
 
-import {Conversation} from 'src/script/entity/Conversation';
-import {conversationHasDraft} from 'src/script/page/LeftSidebar/panels/Conversations/utils/draftUtils';
-import {StorageKey} from 'src/script/storage/StorageKey';
+import {Conversation} from 'Repositories/entity/Conversation';
+import {StorageKey} from 'Repositories/storage';
+
+import {conversationHasDraft} from '../utils/draftUtils';
 
 export const useDraftConversations = (conversations: Conversation[]): Conversation[] => {
   const [draftConversations, setDraftConversations] = useState<Conversation[]>([]);

@@ -17,10 +17,9 @@
  *
  */
 
+import {Conversation} from 'Repositories/entity/Conversation';
+import {StorageKey} from 'Repositories/storage';
 import {getLogger} from 'Util/Logger';
-
-import {Conversation} from '../../../../../entity/Conversation';
-import {StorageKey} from '../../../../../storage';
 
 const logger = getLogger('draftUtils');
 
