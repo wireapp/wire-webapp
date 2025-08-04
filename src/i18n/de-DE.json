@@ -377,6 +377,7 @@
   "cells.emptySearchResults.heading": "Keine Ergebnisse gefunden",
   "cells.error.description": "Die Liste der Dateien konnte nicht geladen werden. Bitte versuchen Sie es erneut.",
   "cells.error.heading": "Beim Laden ist ein Fehler aufgetreten",
+  "cells.filePreviewButton.ariaLabel": "Preview for {name}",
   "cells.filtersModal.accordion.tags": "Tags",
   "cells.filtersModal.closeButton": "Schließen",
   "cells.filtersModal.primaryAction": "Anwenden",
