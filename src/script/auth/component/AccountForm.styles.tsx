@@ -39,6 +39,9 @@ const checkbox: CSSObject = {
   marginBottom: '6px',
   '& label': {
     alignItems: 'flex-start',
+    '& > svg': {
+      top: '12px !important',
+    },
   },
 };
 

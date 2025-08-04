@@ -20,16 +20,22 @@
 import {Message} from 'Repositories/entity/message/Message';
 import {isSameDay, fromUnixTime, TIME_IN_MILLIS} from 'Util/TimeUtil';
 
-export type MessagesGroup = {
+export type Marker = {
+  messageType: 'marker';
+  type: 'unread' | 'day';
+  timestamp: number;
+  firstMessageTimestamp: number;
+  lastMessageTimestamp: number;
+};
+
+export type GroupedMessage = {
+  messageType: 'message';
+  message: Message;
+  timestamp: number;
   sender: string;
   firstMessageTimestamp: number;
   lastMessageTimestamp: number;
-  messages: Message[];
-};
-
-export type Marker = {
-  type: 'unread' | 'day';
-  timestamp: number;
+  shouldGroup: boolean;
 };
 
 /**
@@ -66,7 +72,7 @@ function getMessageMarkerType(
 }
 
 export function isMarker(object: any): object is Marker {
-  return object && object.type && object.timestamp;
+  return object?.messageType === 'marker';
 }
 
 /**
@@ -106,41 +112,60 @@ function shouldGroupMessagesByTimestamp(
  * @param lastReadTimestamp - the timestamp of the last read message (used to mark unread messages)
  */
 export function groupMessagesBySenderAndTime(messages: Message[], lastReadTimestamp: number) {
-  return messages.reduce<Array<MessagesGroup | Marker>>((acc, message, index) => {
+  return messages.reduce<Array<Marker | GroupedMessage>>((acc, message, index) => {
     const previousMessage = messages[index - 1];
 
-    const marker = getMessageMarkerType(message, lastReadTimestamp, previousMessage);
+    const markerMessage = getMessageMarkerType(message, lastReadTimestamp, previousMessage);
 
-    if (marker) {
-      // if there is a marker to insert, we insert it before the current message
-      acc.push({type: marker, timestamp: message.timestamp()});
+    if (markerMessage) {
+      acc.push({
+        messageType: 'marker',
+        type: markerMessage,
+        timestamp: message.timestamp(),
+        firstMessageTimestamp: message.timestamp(),
+        lastMessageTimestamp: message.timestamp(),
+      });
     }
 
     const lastItem = acc[acc.length - 1];
-    const lastGroupInfo = isMarker(lastItem) ? undefined : lastItem;
+    const lastMessageInfo = isMarker(lastItem) ? undefined : lastItem;
 
     const areContentMessages = message.isContent() && previousMessage?.isContent();
 
-    if (
+    const shouldGroup =
       areContentMessages &&
-      lastGroupInfo &&
-      lastGroupInfo.sender === message.from &&
+      lastMessageInfo &&
+      lastMessageInfo.sender === message.from &&
       shouldGroupMessagesByTimestamp(
-        lastGroupInfo.firstMessageTimestamp,
-        lastGroupInfo.lastMessageTimestamp,
+        lastMessageInfo.firstMessageTimestamp,
+        lastMessageInfo.lastMessageTimestamp,
         message.timestamp(),
-      )
-    ) {
-      lastGroupInfo.messages.push(message);
-      lastGroupInfo.lastMessageTimestamp = message.timestamp();
-    } else {
+      );
+
+    if (shouldGroup) {
+      lastMessageInfo.lastMessageTimestamp = message.timestamp();
+
       acc.push({
+        messageType: 'message',
+        message,
+        timestamp: message.timestamp(),
         sender: message.from,
+        shouldGroup: true,
         firstMessageTimestamp: message.timestamp(),
         lastMessageTimestamp: message.timestamp(),
-        messages: [message],
+      });
+    } else {
+      acc.push({
+        messageType: 'message',
+        message,
+        timestamp: message.timestamp(),
+        sender: message.from,
+        shouldGroup: false,
+        firstMessageTimestamp: message.timestamp(),
+        lastMessageTimestamp: message.timestamp(),
       });
     }
+
     return acc;
   }, []);
 }

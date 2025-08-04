@@ -40,14 +40,29 @@ export class AudioVideoSettingsPage {
     await this.getMicrophoneOptions().locator(`text=${microphoneName}`).click();
   }
 
+  async isMicrophoneSetTo(expectedMicrophoneName: string) {
+    const selectedMicrophone = await this.microphoneDrowdown.getByText(expectedMicrophoneName, {exact: true});
+    return selectedMicrophone.isVisible();
+  }
+
   async selectSpeaker(speakerName: string) {
     await this.speakerDrowdown.click();
     await this.getSpeakerOptions().locator(`text=${speakerName}`).click();
   }
 
+  async isSpeakerSetTo(expectedSpeakerName: string) {
+    const selectedSpeaker = await this.speakerDrowdown.getByText(expectedSpeakerName, {exact: true});
+    return selectedSpeaker.isVisible();
+  }
+
   async selectCamera(cameraName: string) {
     await this.cameraDrowdown.click();
     await this.getCameraOptions().locator(`text=${cameraName}`).click();
+  }
+
+  async isCameraSetTo(expectedCameraName: string) {
+    const selectedCamera = await this.cameraDrowdown.getByText(expectedCameraName, {exact: true});
+    return selectedCamera.isVisible();
   }
 
   private getMicrophoneOptions(): Locator {

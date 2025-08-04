@@ -69,6 +69,7 @@ export const imageStyle: CSSObject = {
   objectFit: 'contain',
   objectPosition: 'left center',
   opacity: 'var(--opacity)',
+  backgroundColor: 'var(--transparent-img-bg)',
 };
 
 export const errorIconStyles: CSSObject = {

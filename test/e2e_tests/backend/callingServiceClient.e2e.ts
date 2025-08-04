@@ -60,7 +60,28 @@ export class CallingServiceClientE2E {
     return response.data;
   }
 
-  async getStatus(instanceId: string) {
+  async waitForInstanceToBeActive(instanceId: string): Promise<boolean> {
+    const {instanceStatus} = await this.getStatus(instanceId);
+
+    const isActive = instanceStatus === 'ACTIVE';
+
+    if (!isActive) {
+      await new Promise(resolve => setTimeout(resolve, 5000));
+      return this.waitForInstanceToBeActive(instanceId);
+    }
+
+    return isActive;
+  }
+
+  async getStatus(instanceId: string): Promise<{
+    id: string;
+    instanceStatus: 'STARTED' | 'WAITING' | 'CONNECTING' | 'ACTIVE';
+    currentCall: {
+      id: string;
+      status: 'NON_EXISTENT' | 'WAITING' | 'CONNECTING' | 'ACTIVE';
+      conversationId: string | null;
+    };
+  }> {
     const response = await this.axiosInstance.get(`/api/v1/instance/${instanceId}/status`);
     return response.data;
   }
