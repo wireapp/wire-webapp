@@ -17,7 +17,7 @@
  *
  */
 
-import React, {useState, useRef, useEffect} from 'react';
+import {useState, useRef, useEffect} from 'react';
 
 import * as Icon from 'Components/Icon';
 import {Config} from 'src/script/Config';
@@ -32,7 +32,7 @@ import {
   filterButtonWrapper,
 } from './ConversationFilterButton.styles';
 
-export const ConversationFilterButton: React.FC = () => {
+export const ConversationFilterButton = () => {
   const {conversationFilter, setConversationFilter} = useSidebarStore();
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
