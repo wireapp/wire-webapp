@@ -22,6 +22,7 @@ import {
   FeatureChannels,
   FeatureClassifiedDomains,
   FeatureConferenceCalling,
+  FeatureConsumableNotifications,
   FeatureDigitalSignature,
   FeatureDomainRegistration,
   FeatureDownloadPath,
@@ -42,6 +43,7 @@ export enum FEATURE_KEY {
   APPLOCK = 'appLock',
   CLASSIFIED_DOMAINS = 'classifiedDomains',
   CONFERENCE_CALLING = 'conferenceCalling',
+  CONSUMABLE_NOTIFICATIONS = 'consumableNotifications',
   CONVERSATION_GUEST_LINKS = 'conversationGuestLinks',
   DIGITAL_SIGNATURES = 'digitalSignatures',
   DOMAIN_REGISTRATION = 'domainRegistration',
@@ -66,6 +68,7 @@ export type FeatureList = {
   [FEATURE_KEY.CONFERENCE_CALLING]?: FeatureConferenceCalling;
   [FEATURE_KEY.DIGITAL_SIGNATURES]?: FeatureDigitalSignature;
   [FEATURE_KEY.DOMAIN_REGISTRATION]?: FeatureDomainRegistration;
+  [FEATURE_KEY.CONSUMABLE_NOTIFICATIONS]?: FeatureConsumableNotifications;
   [FEATURE_KEY.ENFORCE_DOWNLOAD_PATH]?: FeatureDownloadPath;
   [FEATURE_KEY.CONVERSATION_GUEST_LINKS]?: FeatureConversationGuestLink;
   [FEATURE_KEY.FILE_SHARING]?: FeatureFileSharing;

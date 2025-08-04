@@ -104,6 +104,7 @@ export type FeatureClassifiedDomains = Feature<FeatureClassifiedDomainsConfig>;
 export type FeatureConferenceCalling = Feature<FeatureConferenceCallingConfig>;
 export type FeatureDigitalSignature = FeatureWithoutConfig;
 export type FeatureDomainRegistration = FeatureWithoutConfig;
+export type FeatureConsumableNotifications = FeatureWithoutConfig;
 export type FeatureConversationGuestLink = FeatureWithoutConfig;
 export type FeatureFileSharing = FeatureWithoutConfig;
 export type FeatureLegalhold = FeatureWithoutConfig;

@@ -24,6 +24,7 @@ describe('"AssetAPI"', () => {
   const apiClient = new APIClient();
 
   it('adds token parameters', async () => {
+    await apiClient.useVersion(4, 5);
     jest.spyOn(apiClient.transport.http, 'sendRequest').mockReturnValue(
       Promise.resolve({
         config: {},
