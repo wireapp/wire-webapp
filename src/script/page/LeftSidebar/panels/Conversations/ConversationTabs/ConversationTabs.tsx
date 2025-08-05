@@ -52,12 +52,14 @@ import {
   footerDisclaimerEllipsis,
   footerDisclaimerTooltip,
   iconStyle,
+  conversationsTitleWrapper,
 } from './ConversationTabs.styles';
 import {FolderIcon} from './FolderIcon';
 import {TeamCreationBanner} from './TeamCreation/TeamCreationBanner';
 
 import {Config} from '../../../../../Config';
 import {ContentState} from '../../../../useAppState';
+import {ConversationFilterButton} from '../ConversationFilterButton';
 import {ConversationTab} from '../ConversationTab';
 
 interface ConversationTabsProps {
@@ -181,7 +183,10 @@ export const ConversationTabs = ({
         aria-owns="tab-1 tab-2 tab-3 tab-4 tab-5 tab-6 tab-7"
         className="conversations-sidebar-list"
       >
-        <div className="conversations-sidebar-title">{t('videoCallOverlayConversations')}</div>
+        <div className="conversations-sidebar-title" css={conversationsTitleWrapper}>
+          <span>{t('videoCallOverlayConversations')}</span>
+          <ConversationFilterButton />
+        </div>
 
         {conversationTabs.map((conversationTab, index) => {
           if (conversationTab.type === SidebarTabs.FOLDER) {

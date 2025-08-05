@@ -92,9 +92,11 @@ export const exportCPBHistoryFromDatabase = async ({
     const {success, data, error} = ConversationTableEntrySchema.safeParse(record);
 
     if (success) {
-      backupExporter.addConversation(
-        new BackUpConversation(new BackupQualifiedId(data.id, data.domain), data.name ?? ''),
-      );
+      const qualifiedId = new BackupQualifiedId(data.id, data.domain);
+      const name = data.name ?? '';
+      const lastModifiedTime = new BackupDateTime(new Date(data.last_event_timestamp));
+
+      backupExporter.addConversation(new BackUpConversation(qualifiedId, name, lastModifiedTime));
     } else {
       CPBLogger.error('Conversation data schema validation failed', error);
     }

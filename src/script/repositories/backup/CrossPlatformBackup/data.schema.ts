@@ -26,6 +26,7 @@ export const QualifiedIdSchema = zod.object({
 
 export const ConversationTableEntrySchema = QualifiedIdSchema.extend({
   name: zod.string().nullable().optional(),
+  last_event_timestamp: zod.number(),
 });
 export type ConversationTableEntry = zod.infer<typeof ConversationTableEntrySchema>;
 

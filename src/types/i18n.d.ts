@@ -392,6 +392,7 @@ declare module 'I18n/en-US.json' {
     'cells.filtersModal.title': `Filters`;
     'cells.folderBreadcrumbCombained': `Show more`;
     'cells.heading': `All files`;
+    'cells.filePreviewButton.ariaLabel': `Preview for {name}`;
     'cells.imageFullScreenModal.closeButton': `Close`;
     'cells.imageFullScreenModal.downloadButton': `Download`;
     'cells.modal.closeButton': `Close`;
@@ -798,10 +799,17 @@ declare module 'I18n/en-US.json' {
     'conversationUnverifiedUserWarning': `Please still be careful with whom you share sensitive information.`;
     'conversationUpdatedTimer': ` set the message timer to {time}`;
     'conversationUpdatedTimerYou': ` set the message timer to {time}`;
-    'conversationVideoAssetError': `Couldn’t generate preview`;
+    'conversationVideoAssetError': `Couldn\'t generate preview`;
     'conversationVideoAssetRestricted': `Receiving videos is prohibited`;
     'conversationViewAllConversations': `All conversations`;
     'conversationViewTooltip': `All`;
+    'conversationFilterNone': `No filter`;
+    'conversationFilterUnread': `Unread`;
+    'conversationFilterMentions': `Mentions`;
+    'conversationFilterReplies': `Replies`;
+    'conversationFilterDrafts': `Drafts`;
+    'conversationFilterPings': `Pings`;
+    'conversationFilterTooltip': `Filter conversations`;
     'conversationVoiceChannelDeactivate': ` called`;
     'conversationVoiceChannelDeactivateYou': ` called`;
     'conversationWithBlockedUser': `You blocked this user`;
