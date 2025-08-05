@@ -22,6 +22,7 @@ import React, {useLayoutEffect, useRef, useEffect} from 'react';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 import cx from 'classnames';
 
+import {InViewport} from 'Components/InViewport';
 import type {MessageRepository} from 'Repositories/conversation/MessageRepository';
 import type {Conversation} from 'Repositories/entity/Conversation';
 import type {ContentMessage} from 'Repositories/entity/message/ContentMessage';
@@ -37,6 +38,7 @@ import {isTabKey} from 'Util/KeyboardUtil';
 
 import {ElementType, MessageDetails} from './ContentMessage/asset/TextMessageRenderer';
 import {MessageWrapper} from './MessageWrapper';
+import {ScrollToElement} from './types';
 import {useMessageFocusedTabIndex} from './util';
 
 export interface MessageActions {
@@ -65,6 +67,8 @@ export interface MessageParams extends MessageActions {
     deleteMessageEveryone: (conversation: Conversation, message: BaseMessage) => void;
   };
   messageRepository: MessageRepository;
+  onVisible?: () => void;
+  onVisibilityLost?: () => void;
   selfId: QualifiedId;
   shouldShowInvitePeople: boolean;
   teamState?: TeamState;
@@ -78,11 +82,13 @@ export interface MessageParams extends MessageActions {
   setMsgElementsFocusable: (isMsgElementsFocusable: boolean) => void;
 }
 
-export const Message = (props: MessageParams & {scrollTo?: () => void}) => {
+export const Message = (props: MessageParams & {scrollTo?: ScrollToElement}) => {
   const {
     message,
     isHighlighted,
     hideHeader,
+    onVisible,
+    onVisibilityLost,
     scrollTo,
     isFocused,
     handleFocus,
@@ -99,7 +105,7 @@ export const Message = (props: MessageParams & {scrollTo?: () => void}) => {
       return;
     }
     if (isHighlighted) {
-      scrollTo?.();
+      scrollTo?.({center: true, element: messageElementRef.current});
       // for reply message, focus on the original message when original message link is clicked for keyboard users
       handleFocus(message.id);
     }
@@ -128,6 +134,9 @@ export const Message = (props: MessageParams & {scrollTo?: () => void}) => {
     }
   }, [isFocused]);
 
+  // When component is unmounted, it's not visible anymore
+  useEffect(() => onVisibilityLost, [onVisibilityLost]);
+
   // set message elements focus for non content type mesages
   // some non content type message has interactive element like invite people for member message
   useEffect(() => {
@@ -138,10 +147,19 @@ export const Message = (props: MessageParams & {scrollTo?: () => void}) => {
     setElementsTabIndex(interactiveMsgElements, isMsgElementsFocusable && isFocused);
   }, [isFocused, isMsgElementsFocusable, message]);
 
+  const messageContent = (
+    <MessageWrapper
+      {...props}
+      hideHeader={hideHeader}
+      isFocused={isFocused}
+      isMsgElementsFocusable={isMsgElementsFocusable}
+    />
+  );
+
   return (
     /*eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions*/
     <div
-      className={cx('message', {
+      className={cx('message message-wrapper', {
         'message-marked': isHighlighted,
         'content-message': message.isContent(),
         'system-message': !message.isContent(),
@@ -157,12 +175,19 @@ export const Message = (props: MessageParams & {scrollTo?: () => void}) => {
       onKeyDown={handleDivKeyDown}
       onClick={() => handleFocus(message.id)}
     >
-      <MessageWrapper
-        {...props}
-        hideHeader={hideHeader}
-        isFocused={isFocused}
-        isMsgElementsFocusable={isMsgElementsFocusable}
-      />
+      {onVisible ? (
+        <InViewport
+          requireFullyInView
+          allowBiggerThanViewport
+          checkOverlay
+          onVisible={onVisible}
+          onVisibilityLost={onVisibilityLost}
+        >
+          {messageContent}
+        </InViewport>
+      ) : (
+        messageContent
+      )}
     </div>
   );
 };

@@ -24,7 +24,7 @@ import {Virtualizer} from '@tanstack/react-virtual';
 import {Conversation} from 'Repositories/entity/Conversation';
 
 import {StatusType} from '../../../message/StatusType';
-import {GroupedMessage, isMarker, Marker} from '../utils/messagesGroup';
+import {GroupedMessage, isMarker, Marker} from '../utils/virtualizedMessagesGroup';
 
 interface Props {
   conversation: Conversation;

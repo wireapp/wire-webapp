@@ -17,7 +17,7 @@
  *
  */
 
-import {UIEvent, useCallback, useState} from 'react';
+import {UIEvent, useCallback, useEffect, useState} from 'react';
 
 import {CONVERSATION_CELLS_STATE} from '@wireapp/api-client/lib/conversation';
 import {container} from 'tsyringe';
@@ -27,7 +27,7 @@ import {useMatchMedia} from '@wireapp/react-ui-kit';
 import {CallingCell} from 'Components/calling/CallingCell';
 import {Giphy} from 'Components/Giphy';
 import {InputBar} from 'Components/InputBar';
-import {MessagesList} from 'Components/MessagesList';
+import {MessageListWrapper} from 'Components/MessagesList/MessageListWrapper';
 import {showDetailViewModal} from 'Components/Modals/DetailViewModal';
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {showWarningModal} from 'Components/Modals/utils/showWarningModal';
@@ -90,6 +90,8 @@ export const Conversation = ({
 }: ConversationProps) => {
   const messageListLogger = getLogger('ConversationList');
 
+  const isVirtualizedMessagesListEnabled = CONFIG.FEATURE.ENABLE_VIRTUALIZED_MESSAGES_LIST;
+
   const mainViewModel = useMainViewModel();
   const {content: contentViewModel} = mainViewModel;
   const {conversationRepository, repositories} = contentViewModel;
@@ -131,6 +133,14 @@ export const Conversation = ({
   const [activeTabIndex, setActiveTabIndex] = useState(0);
 
   const {addReadReceiptToBatch} = useReadReceiptSender(repositories.message);
+
+  useEffect(() => {
+    if (!isVirtualizedMessagesListEnabled) {
+      // When the component is mounted we want to make sure its conversation entity's last message is marked as visible
+      // not to display the jump to last message button initially
+      activeConversation?.isLastMessageVisible(true);
+    }
+  }, [activeConversation, isVirtualizedMessagesListEnabled]);
 
   const uploadImages = useCallback(
     (images: File[]) => {
@@ -541,7 +551,7 @@ export const Conversation = ({
               );
             })}
 
-            <MessagesList
+            <MessageListWrapper
               conversation={activeConversation}
               selfUser={selfUser}
               conversationRepository={conversationRepository}
