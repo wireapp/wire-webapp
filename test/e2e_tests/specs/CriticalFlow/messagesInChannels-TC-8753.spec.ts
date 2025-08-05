@@ -145,7 +145,7 @@ test(
       expect(await userAPages.conversation().isVideoMessageVisible()).toBeTruthy();
     });
 
-    await test.step('User B can play the message', async () => {
+    await test.step('User B can play the received video', async () => {
       await userBPages.conversation().playVideo();
       // Wait for 5 seconds to ensure video starts playing
       await userBPages.conversation().page.waitForTimeout(5000);
