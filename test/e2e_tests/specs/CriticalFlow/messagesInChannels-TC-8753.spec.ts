@@ -157,7 +157,7 @@ test(
       expect(await userAPages.conversation().isAudioMessageVisible()).toBeTruthy();
     });
 
-    await test.step('User B can play the file', async () => {
+    await test.step('User B can play the audio file', async () => {
       await userBPages.conversation().playAudio();
       // Wait for 5 seconds to ensure audio starts playing
       await userBPages.conversation().page.waitForTimeout(5000);
