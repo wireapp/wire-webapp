@@ -119,3 +119,4 @@ export type FeatureSndFactorPassword = FeatureWithoutConfig;
 export type FeatureValidateSAMLEmails = FeatureWithoutConfig;
 export type FeatureVideoCalling = FeatureWithoutConfig;
 export type FeatureChannels = Feature<FeatureChannelsConfig>;
+export type FeatureCells = FeatureWithoutConfig;
