@@ -23,7 +23,7 @@
 
 import {Context} from '@wireapp/api-client/lib/auth';
 import {ClientClassification, ClientType} from '@wireapp/api-client/lib/client/';
-import {FEATURE_KEY, FeatureList} from '@wireapp/api-client/lib/team';
+import {FEATURE_KEY, FeatureList, FeatureStatus} from '@wireapp/api-client/lib/team';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {EVENTS as CoreEvents} from '@wireapp/core/lib/Account';
 import {MLSServiceEvents} from '@wireapp/core/lib/messagingProtocols/mls';
@@ -541,20 +541,29 @@ export class App {
       await conversationRepository.conversationRoleRepository.loadTeamRoles();
 
       let totalNotifications = 0;
-      await eventRepository.connectWebSocket(this.core, (currentProcessingNotificationTimestamp: string) => {
-        /**
-         * NOTE: this call back is now also called when client was already open but websocket
-         * was offline for a while hence it can be used to demonstrate number of pending messages
-         * even when app is already loaded and in the main screen view
-         */
-        const baseMessage = t('initDecryption');
-        const extraInfo = this.config.FEATURE.SHOW_LOADING_INFORMATION
-          ? ` ${t('initProgress', {time: formatCoarseDuration(durationFrom(currentProcessingNotificationTimestamp))})}`
-          : '';
+      const useAsyncNotificationStream =
+        teamFeatures[FEATURE_KEY.CONSUMABLE_NOTIFICATIONS]?.status === FeatureStatus.ENABLED &&
+        Config.getConfig().FEATURE.USE_ASYNC_NOTIFICATIONS;
+      const useLegacyNotificationStream = !useAsyncNotificationStream;
 
-        totalNotifications++;
-        onProgress(`${baseMessage}${extraInfo}`);
-      });
+      await eventRepository.connectWebSocket(
+        this.core,
+        useLegacyNotificationStream,
+        (currentProcessingNotificationTimestamp: string) => {
+          /**
+           * NOTE: this call back is now also called when client was already open but websocket
+           * was offline for a while hence it can be used to demonstrate number of pending messages
+           * even when app is already loaded and in the main screen view
+           */
+          const baseMessage = t('initDecryption');
+          const extraInfo = this.config.FEATURE.SHOW_LOADING_INFORMATION
+            ? ` ${t('initProgress', {time: formatCoarseDuration(durationFrom(currentProcessingNotificationTimestamp))})}`
+            : '';
+
+          totalNotifications++;
+          onProgress(`${baseMessage}${extraInfo}`);
+        },
+      );
 
       eventLogger.log(AppInitializationStep.DecryptionCompleted, {count: totalNotifications});
 

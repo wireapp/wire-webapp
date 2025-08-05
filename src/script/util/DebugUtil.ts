@@ -28,7 +28,7 @@ import {
   USER_EVENT,
 } from '@wireapp/api-client/lib/event/';
 import type {Notification, NotificationList} from '@wireapp/api-client/lib/notification/';
-import {FeatureStatus} from '@wireapp/api-client/lib/team/feature/';
+import {FEATURE_KEY, FeatureStatus} from '@wireapp/api-client/lib/team/feature/';
 import type {QualifiedId} from '@wireapp/api-client/lib/user';
 import {NotificationSource} from '@wireapp/core/lib/notification';
 import {DatabaseKeys} from '@wireapp/core/lib/notification/NotificationDatabaseRepository';
@@ -66,6 +66,7 @@ import {getLogger, Logger} from 'Util/Logger';
 import {TIME_IN_MILLIS} from './TimeUtil';
 import {createUuid} from './uuid';
 
+import {Config} from '../Config';
 import {E2EIHandler} from '../E2EIdentity';
 import {checkVersion} from '../lifecycle/newVersionHandler';
 import {APIClient} from '../service/APIClientSingleton';
@@ -239,7 +240,12 @@ export class DebugUtil {
   }
 
   reconnectWebSocket({dryRun} = {dryRun: false}) {
-    return this.eventRepository.connectWebSocket(this.core, () => {}, dryRun);
+    const teamFeatures = this.teamState.teamFeatures();
+    const useAsyncNotificationStream =
+      teamFeatures?.[FEATURE_KEY.CONSUMABLE_NOTIFICATIONS]?.status === FeatureStatus.ENABLED &&
+      Config.getConfig().FEATURE.USE_ASYNC_NOTIFICATIONS;
+    const useLegacyNotificationStream = !useAsyncNotificationStream;
+    return this.eventRepository.connectWebSocket(this.core, useLegacyNotificationStream, () => {}, dryRun);
   }
 
   async reconnectWebSocketWithLastNotificationIdFromBackend({dryRun} = {dryRun: false}) {
