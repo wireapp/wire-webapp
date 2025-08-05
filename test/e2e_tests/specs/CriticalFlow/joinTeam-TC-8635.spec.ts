@@ -146,7 +146,7 @@ test(
     });
 
     await test.step('Team owner mentions A', async () => {
-      await adminPageManager.webapp.pages.conversation().sendMessageWithUserMention(memberA.qualifiedId!.id);
+      await adminPageManager.webapp.pages.conversation().sendMessageWithUserMention(memberA.fullName);
     });
 
     await test.step('A sees the mention in the chat', async () => {
