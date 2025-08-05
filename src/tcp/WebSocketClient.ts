@@ -273,6 +273,8 @@ export class WebSocketClient extends EventEmitter {
 
   public useAsyncNotificationsSocket() {
     this.useLegacySocket = false;
+    // we shouldn't send ping to the new async notifications sockets otherwise the backend will close the connection
+    this.socket.disablePinging();
   }
 
   public acknowledgeMissedNotification() {

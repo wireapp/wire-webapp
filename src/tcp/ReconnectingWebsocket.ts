@@ -66,6 +66,8 @@ export class ReconnectingWebsocket {
   private onError?: (error: ErrorEvent) => void;
   private onClose?: (event: CloseEvent) => void;
 
+  private isPingingEnabled = true;
+
   constructor(
     private readonly onReconnect: () => Promise<string>,
     options: {
@@ -132,7 +134,9 @@ export class ReconnectingWebsocket {
     this.logger.debug('Connecting to WebSocket');
     // The ping is needed to keep the connection alive as long as possible.
     // Otherwise the connection would be closed after 1 min of inactivity and re-established.
-    this.startPinging();
+    if (this.isPingingEnabled) {
+      this.startPinging();
+    }
     return this.onReconnect();
   };
 
@@ -210,5 +214,10 @@ export class ReconnectingWebsocket {
 
   public setOnClose(onClose: (event: CloseEvent) => void): void {
     this.onClose = onClose;
+  }
+
+  public disablePinging(): void {
+    this.isPingingEnabled = false;
+    this.stopPinging();
   }
 }
