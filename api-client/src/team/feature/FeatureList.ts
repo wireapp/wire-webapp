@@ -60,6 +60,7 @@ export enum FEATURE_KEY {
   VALIDATE_SAML_EMAILS = 'validateSAMLemails',
   VIDEO_CALLING = 'videoCalling',
   CHANNELS = 'channels',
+  CELLS = 'cells',
 }
 
 export type FeatureList = {
@@ -83,4 +84,5 @@ export type FeatureList = {
   [FEATURE_KEY.VALIDATE_SAML_EMAILS]?: FeatureWithoutConfig;
   [FEATURE_KEY.VIDEO_CALLING]?: FeatureVideoCalling;
   [FEATURE_KEY.CHANNELS]?: FeatureChannels;
+  [FEATURE_KEY.CELLS]?: FeatureWithoutConfig;
 };

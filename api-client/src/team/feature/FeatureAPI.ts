@@ -35,6 +35,7 @@ import {
   FeatureDownloadPath,
   FeatureDomainRegistration,
   FeatureChannels,
+  FeatureCells,
 } from './Feature';
 import {InvalidAppLockTimeoutError} from './FeatureError';
 import {FeatureList} from './FeatureList';
@@ -54,6 +55,7 @@ export class FeatureAPI {
     DIGITAL_SIGNATURES: 'digitalSignatures',
     DOMAIN_REGISTRATION: 'domainRegistration',
     DL_PATH: 'enforceFileDownloadLocation',
+    CELLS: 'cells',
     CHANNELS: 'channels',
     CONVERSATION_GUEST_LINKS: 'conversationGuestLinks',
     FEATURE_CONFIGS: '/feature-configs',
@@ -419,6 +421,16 @@ export class FeatureAPI {
     };
 
     const response = await this.client.sendJSON<FeatureChannels>(config);
+    return response.data;
+  }
+
+  public async getCellsFeature(teamId: string): Promise<FeatureCells> {
+    const config: AxiosRequestConfig = {
+      method: 'get',
+      url: `${FeatureAPI.URL.TEAMS}/${teamId}/${FeatureAPI.URL.FEATURES}/${FeatureAPI.URL.CELLS}`,
+    };
+
+    const response = await this.client.sendJSON<FeatureCells>(config);
     return response.data;
   }
 }
