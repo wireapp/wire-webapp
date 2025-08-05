@@ -17,15 +17,16 @@
  *
  */
 
-import {useLayoutEffect} from 'react';
+import {useLayoutEffect, useRef} from 'react';
 
 import {SerializedStyles, css} from '@emotion/react';
 
 import {useRelativeTimestamp} from 'src/script/hooks/useRelativeTimestamp';
 
-import {dayMarkerStyle, baseMarkerStyle} from './Marker.styles';
+import {dayMarkerStyle, baseMarkerStyle, notVirtualizedMarkerStyle} from './Marker.styles';
 import {getMessagesGroupLabel} from './Marker.utils';
 
+import {Config} from '../../../../Config';
 import {Marker} from '../../utils/messagesGroup';
 import {MessageTime} from '../MessageTime';
 
@@ -33,27 +34,36 @@ const markerStyles: Partial<Record<Marker['type'], SerializedStyles>> = {
   day: dayMarkerStyle,
 };
 
-interface Props {
+interface Props<T> {
   marker: Marker;
-  scrollTo: (isUnread: boolean) => void;
+  scrollTo: T;
+  // scrollTo: (isUnread: boolean) => void;
 }
 
-export const MarkerComponent = ({marker, scrollTo}: Props) => {
+export const MarkerComponent = <T extends Function>({marker, scrollTo}: Props<T>) => {
+  const elementRef = useRef<HTMLDivElement>(null);
+
   const isDay = marker.type === 'day';
   const timeAgo = useRelativeTimestamp(marker.timestamp, isDay, isDay ? getMessagesGroupLabel : undefined);
 
+  const isVirtualizedMessagesListEnabled = Config.getConfig().FEATURE.ENABLE_VIRTUALIZED_MESSAGES_LIST;
+
   const style = css`
-    ${baseMarkerStyle} ${markerStyles[marker.type]}
+    ${baseMarkerStyle} ${markerStyles[marker.type]} ${isVirtualizedMessagesListEnabled ? notVirtualizedMarkerStyle : ''}
   `;
 
   useLayoutEffect(() => {
-    if (marker.type === 'unread') {
-      scrollTo(true);
+    if (isVirtualizedMessagesListEnabled) {
+      if (marker.type === 'unread') {
+        scrollTo(true);
+      }
+    } else if (marker.type === 'unread' && elementRef.current) {
+      scrollTo({element: elementRef.current}, true);
     }
-  }, []);
+  }, [isVirtualizedMessagesListEnabled]);
 
   return (
-    <div className="message-header" css={style}>
+    <div className="message-header" css={style} ref={elementRef}>
       <div className="message-header-icon">
         {marker.type === 'unread' && <span className="message-unread-dot dot-md" />}
       </div>
