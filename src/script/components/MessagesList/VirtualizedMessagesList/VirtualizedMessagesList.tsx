@@ -22,13 +22,13 @@ import {MutableRefObject, useEffect, useState} from 'react';
 import {useVirtualizer} from '@tanstack/react-virtual';
 import cx from 'classnames';
 
-import {Message} from 'Components/MessagesList/Message';
 import {MarkerComponent} from 'Components/MessagesList/Message/Marker';
+import {Message} from 'Components/MessagesList/Message/VirtualizedMessage';
 import {MessagesListParams} from 'Components/MessagesList/MessageList.types';
 import {UploadAssets} from 'Components/MessagesList/UploadAssets';
 import {verticallyCenterMessage} from 'Components/MessagesList/utils/helpers';
 import {filterMessages} from 'Components/MessagesList/utils/messagesFilter';
-import {groupMessagesBySenderAndTime, isMarker} from 'Components/MessagesList/utils/messagesGroup';
+import {groupMessagesBySenderAndTime, isMarker} from 'Components/MessagesList/utils/virtualizedMessagesGroup';
 import {useLoadMessages} from 'Components/MessagesList/VirtualizedMessagesList/useLoadMessages';
 import {useScrollMessages} from 'Components/MessagesList/VirtualizedMessagesList/useScrollMessages';
 import {useRoveFocus} from 'Hooks/useRoveFocus';
@@ -36,7 +36,7 @@ import {Conversation} from 'Repositories/entity/Conversation';
 import {Message as MessageEntity} from 'Repositories/entity/message/Message';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 
-import {JumpToLastMessageButton} from '../JumpToLastMessageButton';
+import {VirtualizedJumpToLastMessageButton} from '../VirtualizedJumpToLastMessageButton';
 
 const ESTIMATED_ELEMENT_SIZE = 36;
 
@@ -239,7 +239,10 @@ export const VirtualizedMessagesList = ({
               }}
             >
               {isMarker(item) ? (
-                <MarkerComponent scrollTo={isUnread => scrollToElement(virtualItem.index, isUnread)} marker={item} />
+                <MarkerComponent<(isUnread: boolean) => void>
+                  scrollTo={isUnread => scrollToElement(virtualItem.index, isUnread)}
+                  marker={item}
+                />
               ) : (
                 <Message
                   key={`${item.message.id || 'message'}-${item.message.timestamp()}`}
@@ -279,7 +282,7 @@ export const VirtualizedMessagesList = ({
         <UploadAssets assetRepository={assetRepository} conversationId={conversation.id} />
       </div>
 
-      {!isLastMessageVisible && <JumpToLastMessageButton onGoToLastMessage={onJumpToLastMessageClick} />}
+      {!isLastMessageVisible && <VirtualizedJumpToLastMessageButton onGoToLastMessage={onJumpToLastMessageClick} />}
     </>
   );
 };

@@ -44,3 +44,8 @@ export const dayMarkerStyle = css`
     border: 0;
   }
 `;
+
+export const notVirtualizedMarkerStyle = css`
+  height: 48px;
+  margin-bottom: 8px;
+`;
