@@ -21,10 +21,16 @@ import {ConversationRecord} from 'Repositories/storage';
 
 import {BackUpConversation} from '../CPB.library';
 
-export const mapConversationRecord = ({id: qualifiedId, name}: BackUpConversation): ConversationRecord | null => {
+export const mapConversationRecord = ({
+  id: qualifiedId,
+  name,
+  lastModifiedTime,
+}: BackUpConversation): ConversationRecord | null => {
   if (!qualifiedId || !name) {
     return null;
   }
+
+  const lastEventTimestamp = lastModifiedTime ? new Date(lastModifiedTime.date.toString()).getTime() : 0;
 
   // We dont get all the "required" fields from the backup, so we need to outsmart the type system.
   // ToDO: Fix the backup to include all required fields or check if we can make them optional without breaking anything.
@@ -33,6 +39,7 @@ export const mapConversationRecord = ({id: qualifiedId, name}: BackUpConversatio
     name: name.toString(),
     domain: qualifiedId.domain.toString(),
     last_read_timestamp: new Date().getTime(),
+    last_event_timestamp: lastEventTimestamp,
   } as ConversationRecord;
   return conversationRecord;
 };

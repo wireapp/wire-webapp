@@ -377,6 +377,7 @@
   "cells.emptySearchResults.heading": "No results found",
   "cells.error.description": "The list of files couldn't be loaded. Please try again.",
   "cells.error.heading": "Something went wrong loading",
+  "cells.filePreviewButton.ariaLabel": "Preview for {name}",
   "cells.filtersModal.accordion.tags": "Tags",
   "cells.filtersModal.closeButton": "Close",
   "cells.filtersModal.primaryAction": "Apply",
