@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [27.72.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@27.71.0...@wireapp/api-client@27.72.0) (2025-08-05)
+
+### Features
+
+* **api-client:** Do not ping async notifications socket ([#7192](https://github.com/wireapp/wire-web-packages/issues/7192)) ([629590f](https://github.com/wireapp/wire-web-packages/commit/629590fb9ba6270fba20e68f18e2943e01e06ffa))
+
 # [27.71.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@27.70.0...@wireapp/api-client@27.71.0) (2025-08-04)
 
 ### Features
