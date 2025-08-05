@@ -19,7 +19,7 @@
 
 import {t} from 'Util/LocalizerUtil';
 
-import {FileAssetSmall} from './FileAssetSmall/FileAsseetSmall';
+import {FileAssetSmall} from './FileAssetSmall/FileAssetSmall';
 import {FileAssetWithPreview} from './FileAssetWithPreview/FileAssetWithPreview';
 
 interface FileAssetCardProps {

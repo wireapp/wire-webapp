@@ -133,22 +133,4 @@ export const useScrollMessages = (
       });
     }
   }, [conversation, userId, virtualizer, messages, conversationLastReadTimestamp]);
-
-  // If the scroll was at the top and new messages were loaded, scroll in a way that preserves the position.
-  useEffect(() => {
-    // Skip if there are no messages or a highlighted message is present
-    if (messages.length === 0 || highlightedMessage) {
-      return;
-    }
-
-    const virtualItems = virtualizer.getVirtualItems();
-    const lastIndex = messages.length - 1;
-    const isAtBottom = virtualItems.length > 0 && virtualItems[virtualItems.length - 1].index >= lastIndex - 1;
-
-    if (isAtBottom && !virtualizer.isScrolling) {
-      requestAnimationFrame(() => {
-        virtualizer.scrollToIndex(lastIndex, {align: 'end'});
-      });
-    }
-  }, [virtualizer, messages]);
 };

@@ -59,5 +59,15 @@ export const VideoAssetCard = ({
     );
   }
 
-  return <VideoAssetSmall src={src} isLoading={isLoading} isError={isError} />;
+  return (
+    <VideoAssetSmall
+      extension={extension}
+      fileName={name}
+      senderName={senderName}
+      timestamp={timestamp}
+      src={src}
+      isLoading={isLoading}
+      isError={isError}
+    />
+  );
 };
