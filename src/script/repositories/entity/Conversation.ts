@@ -170,6 +170,8 @@ export class Conversation {
   public readonly isSelfUserRemoved: ko.PureComputed<boolean>;
   public readonly roles: ko.Observable<Record<string, string>>;
   public readonly selfUser: ko.Observable<User | undefined>;
+  // TODO: Remove this when the conversation will be fully migrated to virtualized messages list
+  public readonly isLastMessageVisible: ko.Observable<boolean>;
   public readonly servicesCount: ko.PureComputed<number>;
   public readonly showNotificationsEverything: ko.PureComputed<boolean>;
   public readonly showNotificationsMentionsAndReplies: ko.PureComputed<boolean>;
@@ -217,6 +219,8 @@ export class Conversation {
     this.groupConversationType = ko.observable<GROUP_CONVERSATION_TYPE>(GROUP_CONVERSATION_TYPE.GROUP_CONVERSATION);
     this.conversationModerator = ko.observable<ADD_PERMISSION>(ADD_PERMISSION.ADMINS);
     this.cellsState = ko.observable<CONVERSATION_CELLS_STATE>(CONVERSATION_CELLS_STATE.DISABLED);
+    // TODO: Remove this when the conversation will be fully migrated to virtualized messages list
+    this.isLastMessageVisible = ko.observable(true);
     this.isLoadingMessages = ko.observable(false);
     this.isTextInputReady = ko.observable(false);
 

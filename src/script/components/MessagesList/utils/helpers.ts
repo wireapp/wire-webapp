@@ -19,8 +19,6 @@
 
 import {Message} from 'Repositories/entity/message/Message';
 
-import {GroupedMessage, Marker} from './messagesGroup';
-
 export const verticallyCenterMessage = (messages: Message[]): boolean => {
   const filteredMessagesLength = messages.length;
   if (filteredMessagesLength === 1) {
@@ -28,8 +26,4 @@ export const verticallyCenterMessage = (messages: Message[]): boolean => {
     return firstMessage.isMember() && firstMessage.isConnection();
   }
   return false;
-};
-
-export const getLastUnreadMessageIndex = (lastReadTimestamp: number, messages: (Marker | GroupedMessage)[]) => {
-  return messages.findIndex(message => message.timestamp > lastReadTimestamp);
 };
