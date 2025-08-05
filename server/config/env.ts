@@ -100,6 +100,9 @@ export type Env = {
   FEATURE_FORCE_EXTRA_CLIENT_ENTROPY?: string;
 
   /** Feature toggle for the user consent check. Can be set to true or false */
+  FEATURE_USE_ASYNC_NOTIFICATIONS: string;
+
+  /** Feature toggle for the user consent check. Can be set to true or false */
   FEATURE_CHECK_CONSENT: string;
 
   /** Wether the pre-select a temporary client on login page */
