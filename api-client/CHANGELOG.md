@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [27.73.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@27.72.0...@wireapp/api-client@27.73.0) (2025-08-05)
+
+### Features
+
+* **cells:** expose cells config to the team feature API [WPB-19293] ([#7193](https://github.com/wireapp/wire-web-packages/issues/7193)) ([620f0f3](https://github.com/wireapp/wire-web-packages/commit/620f0f3bf2a552f5ff4c32e90441be27f61613c9))
+
 # [27.72.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@27.71.0...@wireapp/api-client@27.72.0) (2025-08-05)
 
 ### Features
