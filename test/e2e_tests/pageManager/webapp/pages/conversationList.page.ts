@@ -60,6 +60,14 @@ export class ConversationListPage {
       .isVisible();
   }
 
+  async doesConversationHasMentionIndicator(conversationName: string) {
+    const mentionIndicator = this.getConversationLocator(conversationName).locator(
+      selectByDataAttribute('status-mention'),
+    );
+    await mentionIndicator.waitFor({state: 'visible'});
+    return await mentionIndicator.isVisible();
+  }
+
   async openConversation(conversationName: string) {
     await this.getConversationLocator(conversationName).click();
   }
