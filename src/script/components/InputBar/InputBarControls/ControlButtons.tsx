@@ -39,6 +39,7 @@ export type ControlButtonsProps = {
   conversation: Conversation;
   disablePing?: boolean;
   disableFilesharing?: boolean;
+  isCellsFeatureEnabled?: boolean;
   isEditing?: boolean;
   isFormatActive: boolean;
   isEmojiActive: boolean;
@@ -61,6 +62,7 @@ const ControlButtons = ({
   disablePing,
   disableFilesharing,
   input,
+  isCellsFeatureEnabled,
   isEditing,
   isFormatActive,
   isEmojiActive,
@@ -77,7 +79,7 @@ const ControlButtons = ({
   onCellImageUpload,
   onCellAssetUpload,
 }: ControlButtonsProps) => {
-  const isCellsEnabled = Config.getConfig().FEATURE.ENABLE_CELLS;
+  const isCellsEnabled = Config.getConfig().FEATURE.ENABLE_CELLS && isCellsFeatureEnabled;
 
   if (isEditing) {
     return (
