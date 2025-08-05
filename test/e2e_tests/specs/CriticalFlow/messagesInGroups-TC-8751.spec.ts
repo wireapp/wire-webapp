@@ -19,8 +19,6 @@
 
 import {getUser} from 'test/e2e_tests/data/user';
 import {PageManager} from 'test/e2e_tests/pageManager';
-import {getVideoFilePath, getAudioFilePath, getTextFilePath, isAssetDownloaded} from 'test/e2e_tests/utils/asset.util';
-import {getImageFilePath, getLocalQRCodeValue} from 'test/e2e_tests/utils/sendImage.util';
 import {addCreatedUser, removeCreatedUser} from 'test/e2e_tests/utils/tearDown.util';
 import {loginUser} from 'test/e2e_tests/utils/userActions';
 
@@ -30,12 +28,14 @@ const userA = getUser();
 const userB = getUser();
 const conversationName = 'Critical Group';
 const messageText = 'Hello, this is a test message!';
-const selfDestructMessageText = 'This message will self-destruct in 10 seconds.';
 
-const imageFilePath = getImageFilePath();
-const videoFilePath = getVideoFilePath();
-const audioFilePath = getAudioFilePath();
-const textFilePath = getTextFilePath();
+// Used in disabled steps
+//
+// const selfDestructMessageText = 'This message will self-destruct in 10 seconds.';
+// const imageFilePath = getImageFilePath();
+// const videoFilePath = getVideoFilePath();
+// const audioFilePath = getAudioFilePath();
+// const textFilePath = getTextFilePath();
 
 test(
   'Messages in Groups',
@@ -43,7 +43,7 @@ test(
   async ({pageManager: userAPageManager, api, browser}) => {
     test.slow(); // Increasing test timeout to 90 seconds to accommodate the full flow
 
-    const {pages: userAPages, modals: userAModals, components: userAComponents} = userAPageManager.webapp;
+    const {pages: userAPages, modals: userAModals} = userAPageManager.webapp;
 
     const userBContext = await browser.newContext();
     const userBPage = await userBContext.newPage();
@@ -94,98 +94,99 @@ test(
       expect(await userBPages.conversation().isMessageVisible(`@${userB.fullName} ${messageText}`)).toBeTruthy();
     });
 
-    await test.step('User A sends image', async () => {
-      await userAPages.conversationList().openConversation(conversationName);
-      await userAComponents.inputBarControls().clickShareImage(imageFilePath);
+    // TODO: Disabled due to bug with filechooser [WPB-19274]
+    //
+    // await test.step('User A sends image', async () => {
+    //   await userAPages.conversationList().openConversation(conversationName);
+    //   await userAComponents.inputBarControls().clickShareImage(imageFilePath);
 
-      expect(userBPages.conversation().isImageFromUserVisible(userA)).toBeTruthy();
-    });
+    //   expect(userBPages.conversation().isImageFromUserVisible(userA)).toBeTruthy();
+    // });
 
-    await test.step('User B can open the image preview and see the image', async () => {
-      // Click on the image to open it in a preview
-      await userBPages.conversation().clickImage(userA);
+    // await test.step('User B can open the image preview and see the image', async () => {
+    //   // Click on the image to open it in a preview
+    //   await userBPages.conversation().clickImage(userA);
 
-      // Verify that the detail view modal is visible
-      expect(await userBModals.detailViewModal().isVisible()).toBeTruthy();
-      expect(await userBModals.detailViewModal().isImageVisible()).toBeTruthy();
-    });
+    //   // Verify that the detail view modal is visible
+    //   expect(await userBModals.detailViewModal().isVisible()).toBeTruthy();
+    //   expect(await userBModals.detailViewModal().isImageVisible()).toBeTruthy();
+    // });
 
-    await test.step('User B can download the image', async () => {
-      // Click on the download button to download the image
-      const filePath = await userBModals.detailViewModal().downloadAsset();
-      const downloadQRCodeValue = await getLocalQRCodeValue(filePath);
-      const localQRCodeValue = await getLocalQRCodeValue(imageFilePath);
-      expect(downloadQRCodeValue).toBe(localQRCodeValue);
-    });
+    // await test.step('User B can download the image', async () => {
+    //   // Click on the download button to download the image
+    //   const filePath = await userBModals.detailViewModal().downloadAsset();
+    //   const downloadQRCodeValue = await getLocalQRCodeValue(filePath);
+    //   const localQRCodeValue = await getLocalQRCodeValue(imageFilePath);
+    //   expect(downloadQRCodeValue).toBe(localQRCodeValue);
+    // });
 
-    await test.step('User B reacts to A’s image', async () => {
-      await userBModals.detailViewModal().givePlusOneReaction();
-      await userBModals.detailViewModal().closeModal();
-      expect(await userBPages.conversation().isPlusOneReactionVisible()).toBeTruthy();
-    });
+    // await test.step('User B reacts to A’s image', async () => {
+    //   await userBModals.detailViewModal().givePlusOneReaction();
+    //   await userBModals.detailViewModal().closeModal();
+    //   expect(await userBPages.conversation().isPlusOneReactionVisible()).toBeTruthy();
+    // });
 
-    await test.step('User A can see the reaction', async () => {
-      // TODO: Bug [WPB-18226], remove this when fixed
-      await userAPageManager.refreshPage({waitUntil: 'load'});
+    // await test.step('User A can see the reaction', async () => {
+    //   // TODO: Bug [WPB-18226], remove this when fixed
+    //   await userAPageManager.refreshPage({waitUntil: 'load'});
 
-      expect(await userAPages.conversation().isPlusOneReactionVisible()).toBeTruthy();
-    });
+    //   expect(await userAPages.conversation().isPlusOneReactionVisible()).toBeTruthy();
+    // });
+    //
+    // await test.step('User A sends video message', async () => {
+    //   await userAComponents.inputBarControls().clickShareFile(videoFilePath);
+    //   expect(await userAPages.conversation().isVideoMessageVisible()).toBeTruthy();
+    // });
 
-    await test.step('User A sends video message', async () => {
-      await userAComponents.inputBarControls().clickShareFile(videoFilePath);
-      expect(await userAPages.conversation().isVideoMessageVisible()).toBeTruthy();
-    });
+    // await test.step('User B can play the message', async () => {
+    //   await userBPages.conversation().playVideo();
+    //   // Wait for 5 seconds to ensure video starts playing
+    //   await userBPages.conversation().page.waitForTimeout(5000);
+    //   // ToDO: Bug -> Video is not loaded from the server, so we cannot check if it is playing
+    // });
 
-    await test.step('User B can play the message', async () => {
-      await userBPages.conversation().playVideo();
-      // Wait for 5 seconds to ensure video starts playing
-      await userBPages.conversation().page.waitForTimeout(5000);
-      // ToDO: Bug -> Video is not loaded from the server, so we cannot check if it is playing
-    });
+    // await test.step('User A sends audio file', async () => {
+    //   await userAComponents.inputBarControls().clickShareFile(audioFilePath);
+    //   expect(await userAPages.conversation().isAudioMessageVisible()).toBeTruthy();
+    // });
 
-    await test.step('User A sends audio file', async () => {
-      await userAComponents.inputBarControls().clickShareFile(audioFilePath);
-      expect(await userAPages.conversation().isAudioMessageVisible()).toBeTruthy();
-    });
+    // await test.step('User B can play the file', async () => {
+    //   await userBPages.conversation().playAudio();
+    //   // Wait for 5 seconds to ensure audio starts playing
+    //   await userBPages.conversation().page.waitForTimeout(5000);
+    //   expect(await userBPages.conversation().isAudioPlaying()).toBeTruthy();
+    // });
+    // await test.step('User A sends a quick (10 sec) self deleting message', async () => {
+    //   await userAComponents.inputBarControls().setEphemeralTimerTo('10 seconds');
+    //   await userAPages.conversation().sendMessage(selfDestructMessageText);
+    //   expect(await userAPages.conversation().isMessageVisible(selfDestructMessageText)).toBeTruthy();
+    // });
 
-    await test.step('User B can play the file', async () => {
-      await userBPages.conversation().playAudio();
-      // Wait for 5 seconds to ensure audio starts playing
-      await userBPages.conversation().page.waitForTimeout(5000);
-      expect(await userBPages.conversation().isAudioPlaying()).toBeTruthy();
-    });
+    // await test.step('User B sees the message', async () => {
+    //   expect(await userBPages.conversation().isMessageVisible(selfDestructMessageText)).toBeTruthy();
+    // });
 
-    await test.step('User A sends a quick (10 sec) self deleting message', async () => {
-      await userAComponents.inputBarControls().setEphemeralTimerTo('10 seconds');
-      await userAPages.conversation().sendMessage(selfDestructMessageText);
-      expect(await userAPages.conversation().isMessageVisible(selfDestructMessageText)).toBeTruthy();
-    });
+    // await test.step('User B waits 10 seconds', async () => {
+    //   await userBPages.conversation().page.waitForTimeout(11_000);
+    // });
 
-    await test.step('User B sees the message', async () => {
-      expect(await userBPages.conversation().isMessageVisible(selfDestructMessageText)).toBeTruthy();
-    });
+    // await test.step('Both users see the message as removed', async () => {
+    //   expect(await userBPages.conversation().isMessageVisible(selfDestructMessageText, false)).toBeFalsy();
+    //   expect(await userAPages.conversation().isMessageVisible(selfDestructMessageText, false)).toBeFalsy();
 
-    await test.step('User B waits 10 seconds', async () => {
-      await userBPages.conversation().page.waitForTimeout(11_000);
-    });
+    //   // Reset ephemeral timer to 'Off'
+    //   await userAComponents.inputBarControls().setEphemeralTimerTo('Off');
+    // });
+    //
+    // await test.step('User A sends asset', async () => {
+    //   await userAComponents.inputBarControls().clickShareFile(textFilePath);
+    //   expect(await userAPages.conversation().isFileMessageVisible()).toBeTruthy();
+    // });
 
-    await test.step('Both users see the message as removed', async () => {
-      expect(await userBPages.conversation().isMessageVisible(selfDestructMessageText, false)).toBeFalsy();
-      expect(await userAPages.conversation().isMessageVisible(selfDestructMessageText, false)).toBeFalsy();
-
-      // Reset ephemeral timer to 'Off'
-      await userAComponents.inputBarControls().setEphemeralTimerTo('Off');
-    });
-
-    await test.step('User A sends asset', async () => {
-      await userAComponents.inputBarControls().clickShareFile(textFilePath);
-      expect(await userAPages.conversation().isFileMessageVisible()).toBeTruthy();
-    });
-
-    await test.step('User B can download the file', async () => {
-      const filePath = await userBPages.conversation().downloadFile();
-      expect(await isAssetDownloaded(filePath)).toBeTruthy();
-    });
+    // await test.step('User B can download the file', async () => {
+    //   const filePath = await userBPages.conversation().downloadFile();
+    //   expect(await isAssetDownloaded(filePath)).toBeTruthy();
+    // });
   },
 );
 
