@@ -392,6 +392,7 @@ declare module 'I18n/en-US.json' {
     'cells.filtersModal.title': `Filters`;
     'cells.folderBreadcrumbCombained': `Show more`;
     'cells.heading': `All files`;
+    'cells.filePreviewButton.ariaLabel': `Preview for {name}`;
     'cells.imageFullScreenModal.closeButton': `Close`;
     'cells.imageFullScreenModal.downloadButton': `Download`;
     'cells.modal.closeButton': `Close`;

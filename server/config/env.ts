@@ -205,6 +205,9 @@ export type Env = {
   /** Feature to enable rich text editor */
   FEATURE_ENABLE_MESSAGE_FORMAT_BUTTONS: string;
 
+  /** Feature to enable virtualized messages list */
+  FEATURE_ENABLE_VIRTUALIZED_MESSAGES_LIST: string;
+
   /** Feature to enable Cross Platform Backup export */
   FEATURE_ENABLE_CROSS_PLATFORM_BACKUP_EXPORT: string;
 

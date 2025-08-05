@@ -60,3 +60,11 @@ export const videoCardStyles = (isSingleAsset: boolean) => ({
 export const fileCardStyles = {
   ...largeCardStyles,
 };
+
+export const hollowWrapperButtonStyles: CSSObject = {
+  padding: '0',
+  border: 'none',
+  background: 'none',
+  textAlign: 'unset',
+  cursor: 'pointer',
+};

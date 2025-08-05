@@ -25,6 +25,10 @@
 }
 
 .messages {
+  &.message-wrapper {
+    transform: translateZ(0);
+  }
+
   &.flex-center {
     flex-wrap: wrap;
     margin: auto;
@@ -54,6 +58,10 @@
 
   & * {
     .accent-selection;
+  }
+
+  &.message-wrapper:last-child {
+    margin-bottom: 40px;
   }
 
   &.hover .time,
@@ -546,6 +554,10 @@
 
   .message-services-warning {
     margin-top: 32px;
+  }
+
+  &.message-wrapper {
+    margin-bottom: 48px;
   }
 }
 

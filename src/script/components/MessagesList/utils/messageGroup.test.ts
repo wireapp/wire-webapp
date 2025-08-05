@@ -26,7 +26,7 @@ import {createGroupCreationEvent, createMessageAddEvent} from 'test/helper/Event
 import {getRandomNumber} from 'Util/NumberUtil';
 import {createUuid} from 'Util/uuid';
 
-import {GroupedMessage, groupMessagesBySenderAndTime, isMarker} from './messagesGroup';
+import {groupMessagesBySenderAndTime, isMarker} from './messagesGroup';
 
 describe('MessagesGroup', () => {
   const eventMapper = new EventMapper();
@@ -40,30 +40,20 @@ describe('MessagesGroup', () => {
     // those are messages from different senders. They should not be grouped
     const otherSenderMessages = [...Array(nbOtherMessages)].map(() => createMessageAddEvent());
 
-    const baseTimestamp = Date.now();
-    const sameSenderMessages = Array.from({length: sizeGroup}, (_, i) => {
-      return createMessageAddEvent({
-        overrides: {from: sender, time: new Date(baseTimestamp + i * 1000).toISOString()},
-      });
-    });
+    const sameSenderMessages = Array(sizeGroup).fill(createMessageAddEvent({overrides: {from: sender}}));
 
     const allMessages = [...otherSenderMessages, ...sameSenderMessages].map(
       event => eventMapper.mapJsonEvent(event, conversation) as Message,
     );
 
     const groupedMessages = groupMessagesBySenderAndTime(allMessages, 0);
-
-    const sameSenderGrouped = groupedMessages.filter(m => m.messageType === 'message' && m.sender === sender);
-
     // We expect the number of groups to be the number of different senders + the group that contains all the message from user1
-    expect(sameSenderGrouped.length).toBe(sizeGroup);
+    expect(groupedMessages.length).toBe(nbOtherMessages + 1);
 
     // We expect the last group to have all the messages from the same sender
-    // const lastGroup: any = groupedMessages[groupedMessages.length - 1];
-    expect((sameSenderGrouped[0] as GroupedMessage).shouldGroup).toBe(false);
-    for (let i = 1; i < sameSenderGrouped.length; i++) {
-      expect((sameSenderGrouped[i] as GroupedMessage).shouldGroup).toBe(true);
-    }
+    const lastGroup: any = groupedMessages[groupedMessages.length - 1];
+    expect(lastGroup.messages.length).toBe(sizeGroup);
+    expect(lastGroup.sender).toBe(sender);
   });
 
   it('does not group together system messages and content messages', () => {
@@ -143,26 +133,14 @@ describe('MessagesGroup', () => {
     );
 
     const groupedMessages = groupMessagesBySenderAndTime(allMessages, lastReadTimestamp);
-
     /* There should be :
       - one group for read messages from the sender
       - one marker for unread messages
       - one group for unread messages from the sender
     */
-    expect(groupedMessages).toHaveLength(allMessages.length + 1);
-
-    const groupReadMessages = groupedMessages.filter(
-      item => !isMarker(item) && item.message.timestamp() <= lastReadTimestamp,
-    );
-
-    const firstReadIndex = groupedMessages.findIndex(item => isMarker(item) && item.timestamp >= lastReadTimestamp);
-
-    const groupUnReadMessages = groupedMessages.filter(
-      item => !isMarker(item) && item.message.timestamp() >= lastReadTimestamp,
-    );
-
-    expect(groupReadMessages).toHaveLength(nbReadMessages);
-    expect(isMarker(groupedMessages[firstReadIndex])).toBeTruthy();
-    expect(groupUnReadMessages).toHaveLength(nbUnreadMessages);
+    expect(groupedMessages).toHaveLength(3);
+    expect((groupedMessages[0] as any).messages).toHaveLength(nbReadMessages);
+    expect(isMarker(groupedMessages[1])).toBeTruthy();
+    expect((groupedMessages[2] as any).messages).toHaveLength(nbUnreadMessages);
   });
 });
