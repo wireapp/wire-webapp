@@ -111,10 +111,13 @@ export const InputBar = ({
   onCellImageUpload,
   onCellAssetUpload,
 }: InputBarProps) => {
-  const {classifiedDomains, isSelfDeletingMessagesEnabled, isFileSharingSendingEnabled} = useKoSubscribableChildren(
-    teamState,
-    ['classifiedDomains', 'isSelfDeletingMessagesEnabled', 'isFileSharingSendingEnabled'],
-  );
+  const {classifiedDomains, isSelfDeletingMessagesEnabled, isFileSharingSendingEnabled, isCellsEnabled} =
+    useKoSubscribableChildren(teamState, [
+      'classifiedDomains',
+      'isSelfDeletingMessagesEnabled',
+      'isFileSharingSendingEnabled',
+      'isCellsEnabled',
+    ]);
   const {connection, localMessageTimer, messageTimer, hasGlobalMessageTimer, isSelfUserRemoved, is1to1} =
     useKoSubscribableChildren(conversation, [
       'connection',
@@ -315,6 +318,7 @@ export const InputBar = ({
                   {!!files.length && <FilePreviews files={files} conversationQualifiedId={conversation.qualifiedId} />}
                   <InputBarControls
                     conversation={conversation}
+                    isCellsFeatureEnabled={isCellsEnabled}
                     isFileSharingSendingEnabled={isFileSharingSendingEnabled}
                     pingDisabled={ping.isPingDisabled}
                     messageContent={messageContent}
