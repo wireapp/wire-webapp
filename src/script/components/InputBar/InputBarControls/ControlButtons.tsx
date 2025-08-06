@@ -19,6 +19,8 @@
 
 import {MouseEvent} from 'react';
 
+import {CONVERSATION_CELLS_STATE} from '@wireapp/api-client/lib/conversation/';
+
 import {FormatSeparator} from 'Components/InputBar/common/FormatSeparator/FormatSeparator';
 import {Conversation} from 'Repositories/entity/Conversation';
 import {Config} from 'src/script/Config';
@@ -80,6 +82,7 @@ const ControlButtons = ({
   onCellAssetUpload,
 }: ControlButtonsProps) => {
   const isCellsEnabled = Config.getConfig().FEATURE.ENABLE_CELLS && isCellsFeatureEnabled;
+  const isCellsConversation = isCellsEnabled && conversation.cellsState() !== CONVERSATION_CELLS_STATE.DISABLED;
 
   if (isEditing) {
     return (
@@ -124,7 +127,7 @@ const ControlButtons = ({
         {!disableFilesharing && (
           <>
             <li>
-              {isCellsEnabled ? (
+              {isCellsConversation ? (
                 <CellImageUploadButton onClick={onCellImageUpload} />
               ) : (
                 <ImageUploadButton
@@ -135,7 +138,7 @@ const ControlButtons = ({
             </li>
 
             <li>
-              {isCellsEnabled ? (
+              {isCellsConversation ? (
                 <CellAssetUploadButton onClick={onCellAssetUpload} />
               ) : (
                 <AssetUploadButton
@@ -152,7 +155,7 @@ const ControlButtons = ({
         <li>
           <PingButton isDisabled={!!disablePing} onClick={onClickPing} />
         </li>
-        {!isCellsEnabled && (
+        {!isCellsConversation && (
           <li>
             <MessageTimerButton conversation={conversation} />
           </li>
