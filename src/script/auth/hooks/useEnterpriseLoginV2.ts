@@ -73,7 +73,7 @@ export const useEnterpriseLoginV2 = ({
         }
 
         case DomainRedirect.BACKEND: {
-          const url = await getRedirectURL(response.backend_url);
+          const url = await getRedirectURL(response.backend.webapp_url);
           updateRegistrationData({
             customBackendURL: url,
           });
