@@ -77,7 +77,13 @@ const GroupCreationModal: React.FC<GroupCreationModalProps> = ({
     isTeam,
     isMLSEnabled: isMLSEnabledForTeam,
     isProtocolToggleEnabledForUser,
-  } = useKoSubscribableChildren(teamState, ['isTeam', 'isMLSEnabled', 'isProtocolToggleEnabledForUser']);
+    isCellsEnabled: isCellsEnabledForTeam,
+  } = useKoSubscribableChildren(teamState, [
+    'isTeam',
+    'isMLSEnabled',
+    'isProtocolToggleEnabledForUser',
+    'isCellsEnabled',
+  ]);
   const {self: selfUser} = useKoSubscribableChildren(userState, ['self']);
 
   const enableMLSToggle = isMLSEnabledForTeam && isProtocolToggleEnabledForUser;
@@ -111,7 +117,7 @@ const GroupCreationModal: React.FC<GroupCreationModalProps> = ({
   const [groupCreationState, setGroupCreationState] = useState<GroupCreationModalState>(
     GroupCreationModalState.DEFAULT,
   );
-  const [isCellsOptionEnabled, setIsCellsOptionEnabled] = useState(true);
+  const [isCellsOptionEnabled, setIsCellsOptionEnabled] = useState(isCellsEnabledForTeam);
 
   const mainViewModel = useContext(RootContext);
 
@@ -141,7 +147,11 @@ const GroupCreationModal: React.FC<GroupCreationModalProps> = ({
   const isGuestEnabled = isGuestRoom || isGuestAndServicesRoom;
   const isServicesEnabled = isServicesRoom || isGuestAndServicesRoom;
 
-  const isCellsEnabled = Config.getConfig().FEATURE.ENABLE_CELLS && isCellsOptionEnabled;
+  const isCellsEnabledForEnvironment = Config.getConfig().FEATURE.ENABLE_CELLS;
+
+  const isCellsEnabledForGroup = isCellsEnabledForEnvironment && isCellsOptionEnabled;
+
+  const enableCellsToggle = isCellsEnabledForEnvironment && isCellsEnabledForTeam;
 
   const {setCurrentTab: setCurrentSidebarTab} = useSidebarStore();
 
@@ -223,7 +233,7 @@ const GroupCreationModal: React.FC<GroupCreationModalProps> = ({
           {
             protocol: enableMLSToggle ? selectedProtocol.value : defaultProtocol,
             receipt_mode: enableReadReceipts ? RECEIPT_MODE.ON : RECEIPT_MODE.OFF,
-            cells: isCellsEnabled,
+            cells: isCellsEnabledForGroup,
           },
         );
 
@@ -513,7 +523,7 @@ const GroupCreationModal: React.FC<GroupCreationModalProps> = ({
                   isDisabled={false}
                   name={t('readReceiptsToggleName')}
                 />
-                {Config.getConfig().FEATURE.ENABLE_CELLS && (
+                {enableCellsToggle && (
                   <InfoToggle
                     className="modal-style"
                     dataUieName="cells"
