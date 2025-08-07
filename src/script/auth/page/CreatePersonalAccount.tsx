@@ -55,7 +55,7 @@ export const CreatePersonalAccount = () => {
             <p css={styles.footer}>{t('createPersonalAccount.subHeader')}</p>
             <a
               css={styles.teamCreateButton}
-              href={`${Config.getConfig().URL.TEAMS_BASE}/register/email`}
+              href={`${Config.getConfig().URL.TEAMS_BASE}/signup/account?origin=web_desktop`}
               target="_blank"
               rel="noreferrer"
             >
