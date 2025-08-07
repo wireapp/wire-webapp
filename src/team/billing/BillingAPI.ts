@@ -57,6 +57,19 @@ export class BillingAPI {
     return response.data;
   }
 
+  public async getBillingEmbeddedSetup(teamId: string, currency: string): Promise<any> {
+    const config: AxiosRequestConfig = {
+      method: 'POST',
+      url: `/teams/${teamId}/billing/checkout/embedded/setup`,
+      data: {
+        currency,
+      },
+    };
+
+    const response = await this.client.sendJSON<any>(config);
+    return response.data;
+  }
+
   public async getBillingTeam(teamId: string): Promise<BillingTeamData> {
     const config: AxiosRequestConfig = {
       method: 'get',
