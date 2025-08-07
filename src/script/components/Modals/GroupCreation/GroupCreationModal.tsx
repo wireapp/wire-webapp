@@ -117,7 +117,7 @@ const GroupCreationModal: React.FC<GroupCreationModalProps> = ({
   const [groupCreationState, setGroupCreationState] = useState<GroupCreationModalState>(
     GroupCreationModalState.DEFAULT,
   );
-  const [isCellsOptionEnabled, setIsCellsOptionEnabled] = useState(isCellsEnabledForTeam);
+  const [isCellsOptionEnabled, setIsCellsOptionEnabled] = useState(enableCellsToggle);
 
   const mainViewModel = useContext(RootContext);
 
