@@ -104,6 +104,12 @@ const GroupCreationModal: React.FC<GroupCreationModalProps> = ({
 
   const initialProtocol = protocolOptions.find(protocol => protocol.value === defaultProtocol)!;
 
+  //both environment feature flag and team feature flag must be enabled to create conversations with cells
+  const isCellsEnabledForEnvironment = Config.getConfig().FEATURE.ENABLE_CELLS;
+  const enableCellsToggle = isCellsEnabledForEnvironment && isCellsEnabledForTeam;
+  const [isCellsOptionEnabled, setIsCellsOptionEnabled] = useState(enableCellsToggle);
+  const isCellsEnabledForGroup = isCellsEnabledForEnvironment && isCellsOptionEnabled;
+
   const [isShown, setIsShown] = useState<boolean>(false);
   const [selectedContacts, setSelectedContacts] = useState<User[]>([]);
   const [enableReadReceipts, setEnableReadReceipts] = useState<boolean>(false);
@@ -117,7 +123,6 @@ const GroupCreationModal: React.FC<GroupCreationModalProps> = ({
   const [groupCreationState, setGroupCreationState] = useState<GroupCreationModalState>(
     GroupCreationModalState.DEFAULT,
   );
-  const [isCellsOptionEnabled, setIsCellsOptionEnabled] = useState(enableCellsToggle);
 
   const mainViewModel = useContext(RootContext);
 
@@ -146,12 +151,6 @@ const GroupCreationModal: React.FC<GroupCreationModalProps> = ({
   const isGuestRoom = accessState === ACCESS_STATE.TEAM.GUEST_ROOM;
   const isGuestEnabled = isGuestRoom || isGuestAndServicesRoom;
   const isServicesEnabled = isServicesRoom || isGuestAndServicesRoom;
-
-  const isCellsEnabledForEnvironment = Config.getConfig().FEATURE.ENABLE_CELLS;
-
-  const isCellsEnabledForGroup = isCellsEnabledForEnvironment && isCellsOptionEnabled;
-
-  const enableCellsToggle = isCellsEnabledForEnvironment && isCellsEnabledForTeam;
 
   const {setCurrentTab: setCurrentSidebarTab} = useSidebarStore();
 
