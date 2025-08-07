@@ -29,7 +29,6 @@ import {APIClient} from '../../service/APIClientSingleton';
 import {actionRoot as ROOT_ACTIONS} from '../module/action/';
 import {RegistrationDataState} from '../module/reducer/authReducer';
 import {ROUTE} from '../route';
-import {getRedirectURL} from '../util/configUtil';
 
 export const useEnterpriseLoginV2 = ({
   loginWithSSO,
@@ -73,7 +72,7 @@ export const useEnterpriseLoginV2 = ({
         }
 
         case DomainRedirect.BACKEND: {
-          const url = await getRedirectURL(response.backend.webapp_url);
+          const url = response.backend.webapp_url;
           updateRegistrationData({
             customBackendURL: url,
           });
