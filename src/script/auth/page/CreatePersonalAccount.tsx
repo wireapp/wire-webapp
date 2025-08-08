@@ -30,6 +30,7 @@ import {Config} from '../../Config';
 import {AccountForm} from '../component/AccountForm';
 import {AccountRegistrationLayout} from '../component/AccountRegistrationLayout';
 import {BackButton} from '../component/BackButton';
+import {EXTERNAL_ROUTE} from '../externalRoute';
 import {ROUTE} from '../route';
 
 export const CreatePersonalAccount = () => {
@@ -53,12 +54,7 @@ export const CreatePersonalAccount = () => {
             <p css={styles.header}>{t('createPersonalAccount.headLine')}</p>
             <AccountForm onSubmit={onSubmit} />
             <p css={styles.footer}>{t('createPersonalAccount.subHeader')}</p>
-            <a
-              css={styles.teamCreateButton}
-              href={`${Config.getConfig().URL.TEAMS_BASE}/signup/account?origin=web_desktop`}
-              target="_blank"
-              rel="noreferrer"
-            >
+            <a css={styles.teamCreateButton} href={EXTERNAL_ROUTE.WIRE_TEAMS_SIGNUP} target="_blank" rel="noreferrer">
               {t('createPersonalAccount.createTeamButton')}
             </a>
           </FlexBox>
