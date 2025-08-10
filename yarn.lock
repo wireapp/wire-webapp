@@ -21338,12 +21338,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"use-debounce@npm:^10.0.4":
-  version: 10.0.4
-  resolution: "use-debounce@npm:10.0.4"
+"use-debounce@npm:^10.0.5":
+  version: 10.0.5
+  resolution: "use-debounce@npm:10.0.5"
   peerDependencies:
     react: "*"
-  checksum: 10/e193bbed307204b655abab545704ca608b23db10680f299f4b9b48b935a9fd68b68827c79de3bf5517010524bfa15709bf6b0ab1f915d6305b5d2ce27bf11ad7
+  checksum: 10/329e71d3c53baa3e1bc3d1cd8cba8f358d06e3594c606b8f26fc391be6ce0010704026056909d3975314900562dc963c54b1889c875e62d7971a82260cad62d4
   languageName: node
   linkType: hard
 
@@ -22149,7 +22149,7 @@ __metadata:
     tsyringe: "npm:4.10.0"
     typescript: "npm:5.5.2"
     underscore: "npm:1.13.7"
-    use-debounce: "npm:^10.0.4"
+    use-debounce: "npm:^10.0.5"
     uuid: "npm:11.1.0"
     webgl-utils.js: "npm:1.1.0"
     webpack: "npm:5.98.0"
