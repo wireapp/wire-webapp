@@ -20943,12 +20943,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"tsyringe@npm:4.8.0":
-  version: 4.8.0
-  resolution: "tsyringe@npm:4.8.0"
+"tsyringe@npm:4.10.0":
+  version: 4.10.0
+  resolution: "tsyringe@npm:4.10.0"
   dependencies:
     tslib: "npm:^1.9.3"
-  checksum: 10/3f0c5049c167cf32226894a0589ac3f25a7019c35d2cb06e65f4bd1618fd90c57d33ea600fdb41695c0d988628893e59d22e8cd4f89c7c97390d6cc58bf21985
+  checksum: 10/b42660dc112cee2db02b3d69f2ef6a6a9d185afd96b18d8f88e47c1e62be94b69a9f5a58fcfdb2a3fbb7c6c175b8162ea00f7db6499bf333ce945e570e31615c
   languageName: node
   linkType: hard
 
@@ -22169,7 +22169,7 @@ __metadata:
     text-encoding: "npm:0.7.0"
     ts-node: "npm:10.9.2"
     tsc-watch: "npm:6.2.1"
-    tsyringe: "npm:4.8.0"
+    tsyringe: "npm:4.10.0"
     typescript: "npm:5.5.2"
     underscore: "npm:1.13.7"
     use-debounce: "npm:^10.0.4"
