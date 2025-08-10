@@ -74,7 +74,7 @@
   },
   "devDependencies": {
     "@babel/core": "7.28.0",
-    "@babel/plugin-proposal-decorators": "7.25.9",
+    "@babel/plugin-proposal-decorators": "7.28.0",
     "@babel/preset-env": "7.28.0",
     "@babel/preset-react": "7.27.1",
     "@babel/preset-typescript": "7.27.0",
