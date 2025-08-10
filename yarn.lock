@@ -8560,16 +8560,16 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@wireapp/react-ui-kit@npm:9.62.0":
-  version: 9.62.0
-  resolution: "@wireapp/react-ui-kit@npm:9.62.0"
+"@wireapp/react-ui-kit@npm:9.63.0":
+  version: 9.63.0
+  resolution: "@wireapp/react-ui-kit@npm:9.63.0"
   dependencies:
     "@radix-ui/react-accordion": "npm:1.2.11"
     "@radix-ui/react-dropdown-menu": "npm:2.1.14"
     "@types/color": "npm:3.0.6"
     color: "npm:4.2.3"
     emotion-normalize: "npm:11.0.1"
-    react-select: "npm:5.10.1"
+    react-select: "npm:5.10.2"
     react-transition-group: "npm:4.4.5"
   peerDependencies:
     "@emotion/react": ^11
@@ -8579,7 +8579,7 @@ __metadata:
   peerDependenciesMeta:
     "@types/react":
       optional: true
-  checksum: 10/62e117733c1734b71d69f5bc08155b50587f02dceed572af268f3459382878934d6cfb3ff7c79be4853542410853be536e5764880b44a671c10712e3cac384b3
+  checksum: 10/dd5f2b6d21737e4cec1eeebb23804d0e8329c9f9f806a3a9138d1fae466029e62f89a0da5bbd4b13e8d8d8b637209db4f14d6a83d9c904deb914568314df90f0
   languageName: node
   linkType: hard
 
@@ -18748,9 +18748,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-select@npm:5.10.1":
-  version: 5.10.1
-  resolution: "react-select@npm:5.10.1"
+"react-select@npm:5.10.2":
+  version: 5.10.2
+  resolution: "react-select@npm:5.10.2"
   dependencies:
     "@babel/runtime": "npm:^7.12.0"
     "@emotion/cache": "npm:^11.4.0"
@@ -18764,7 +18764,7 @@ __metadata:
   peerDependencies:
     react: ^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0
     react-dom: ^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0
-  checksum: 10/c0c4d798e9b1f654b56c26bffb149ab811d24ca0950c1e8c3675438065628561eb132c6a5982cea893a288a0e9af6f9d9db290f4e53da71570dada0c1147f146
+  checksum: 10/9c7f488a9774f566f60e882343dc26276eed866669304805638378b3bafb87fb1f6189d1aacde5eba4f637a7ff022f8e24caec541d12c254bafc2eb9658e14d2
   languageName: node
   linkType: hard
 
@@ -22091,7 +22091,7 @@ __metadata:
     "@wireapp/eslint-config": "npm:3.0.7"
     "@wireapp/kalium-backup": "npm:0.0.4"
     "@wireapp/prettier-config": "npm:0.6.4"
-    "@wireapp/react-ui-kit": "npm:9.62.0"
+    "@wireapp/react-ui-kit": "npm:9.63.0"
     "@wireapp/store-engine": "npm:5.1.11"
     "@wireapp/store-engine-dexie": "npm:2.1.15"
     "@wireapp/telemetry": "npm:0.3.1"
