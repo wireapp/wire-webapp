@@ -16758,12 +16758,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"oidc-client-ts@npm:3.2.0":
-  version: 3.2.0
-  resolution: "oidc-client-ts@npm:3.2.0"
+"oidc-client-ts@npm:3.3.0":
+  version: 3.3.0
+  resolution: "oidc-client-ts@npm:3.3.0"
   dependencies:
     jwt-decode: "npm:^4.0.0"
-  checksum: 10/26bb3c7a050f15781e0c5ff8efecfd769bd9723fe2332c50b4c89213577a3ec67ae65be9a177f8cbb92c29d9c55ff725e6a699d76a44900ab65cc7ab1c0ac21a
+  checksum: 10/356940cb12075cc80c1b48ac5e67e2676542fa13664214c650fdf70f1f5a9f753bda8bfaf11182eb257a5ae564feefb165397ab44afa7138ba4846b63ecc6f0e
   languageName: node
   linkType: hard
 
@@ -22144,7 +22144,7 @@ __metadata:
     long: "npm:5.3.2"
     markdown-it: "npm:14.0.0"
     murmurhash: "npm:2.0.1"
-    oidc-client-ts: "npm:3.2.0"
+    oidc-client-ts: "npm:3.3.0"
     os-browserify: "npm:0.3.0"
     path-browserify: "npm:1.0.1"
     path-to-regexp: "npm:8.2.0"
