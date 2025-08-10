@@ -9464,15 +9464,15 @@ __metadata:
   languageName: node
   linkType: hard
 
-"babel-plugin-transform-import-meta@npm:2.3.2":
-  version: 2.3.2
-  resolution: "babel-plugin-transform-import-meta@npm:2.3.2"
+"babel-plugin-transform-import-meta@npm:2.3.3":
+  version: 2.3.3
+  resolution: "babel-plugin-transform-import-meta@npm:2.3.3"
   dependencies:
     "@babel/template": "npm:^7.25.9"
     tslib: "npm:^2.8.1"
   peerDependencies:
     "@babel/core": ^7.10.0
-  checksum: 10/a4a7896888046dc8bea7f01d30c4852a94beda5a7d448bb6305529576a2507e202df4a66e4b29af417861f16bb74089502af7fc65e54fd3131625fb69b7f0995
+  checksum: 10/5dd9326307f3c2d838029c2a58831382c25fed812c4008bd3651fb4d0b6b7b7eca675b4cc6328c3053eab7e38c27bb232de763982ea804bfcfc7e926b188f13d
   languageName: node
   linkType: hard
 
@@ -22100,7 +22100,7 @@ __metadata:
     archiver: "npm:7.0.1"
     autoprefixer: "npm:10.4.21"
     babel-loader: "npm:10.0.0"
-    babel-plugin-transform-import-meta: "npm:2.3.2"
+    babel-plugin-transform-import-meta: "npm:2.3.3"
     beautiful-react-hooks: "npm:5.0.3"
     classnames: "npm:2.5.1"
     copy-webpack-plugin: "npm:13.0.0"
