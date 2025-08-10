@@ -15440,9 +15440,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"less-loader@npm:12.2.0":
-  version: 12.2.0
-  resolution: "less-loader@npm:12.2.0"
+"less-loader@npm:12.3.0":
+  version: 12.3.0
+  resolution: "less-loader@npm:12.3.0"
   peerDependencies:
     "@rspack/core": 0.x || 1.x
     less: ^3.5.0 || ^4.0.0
@@ -15452,7 +15452,7 @@ __metadata:
       optional: true
     webpack:
       optional: true
-  checksum: 10/b9527053460aa82668f33bfbcfc23dbcb9023a9cd55f2f04fa9620e020acc3f032eb2dcb3625a1c3dd8852782c41490e6fde342e3185a477fa41d2f5eb35ca6f
+  checksum: 10/6f2eb5602c6d2f2d40afe340567b510dcbb8125d0cbf5e2ab02ed5cff43b26fe228d7baa0d47a940d7bebb1727be331f41c31a8f4d6ef8678fc96cc8a1dd60ad
   languageName: node
   linkType: hard
 
@@ -22123,7 +22123,7 @@ __metadata:
     keyboardjs: "npm:2.7.0"
     knockout: "npm:3.5.1"
     less: "npm:4.2.2"
-    less-loader: "npm:12.2.0"
+    less-loader: "npm:12.3.0"
     lexical: "npm:0.27.2"
     libsodium-wrappers: "npm:0.7.15"
     linkify-it: "npm:5.0.0"
