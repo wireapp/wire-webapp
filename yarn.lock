@@ -8424,11 +8424,11 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@wireapp/copy-config@npm:2.3.0":
-  version: 2.3.0
-  resolution: "@wireapp/copy-config@npm:2.3.0"
+"@wireapp/copy-config@npm:2.3.1":
+  version: 2.3.1
+  resolution: "@wireapp/copy-config@npm:2.3.1"
   dependencies:
-    axios: "npm:1.7.9"
+    axios: "npm:1.11.0"
     copy: "npm:0.3.2"
     cosmiconfig: "npm:9.0.0"
     fs-extra: "npm:11.3.0"
@@ -8437,7 +8437,7 @@ __metadata:
     rimraf: "npm:6.0.1"
   bin:
     copy-config: lib/cli.js
-  checksum: 10/ee62c996df4a53f35e98283588dc99e08d0229f297a93f94132bb63a6af24fc7fb6bd37e05e79ab6642bb552693b8b11d78589486292aa58d180f72e9a7892c3
+  checksum: 10/dd38e341304aa48ce584852a6185721296ba905e9c0e34cde6196cf20d1ce01e761881c7dab56c433804a9c5a716f53f9648848920ea001c0afa35dae5c8ba4f
   languageName: node
   linkType: hard
 
@@ -22069,7 +22069,7 @@ __metadata:
     "@wireapp/avs": "npm:10.0.46"
     "@wireapp/avs-debugger": "npm:0.0.7"
     "@wireapp/commons": "npm:5.4.3"
-    "@wireapp/copy-config": "npm:2.3.0"
+    "@wireapp/copy-config": "npm:2.3.1"
     "@wireapp/core": "npm:46.32.2"
     "@wireapp/eslint-config": "npm:3.0.7"
     "@wireapp/kalium-backup": "npm:0.0.4"
