@@ -11,7 +11,7 @@
     "@wireapp/store-engine": "5.x.x"
   },
   "dependencies": {
-    "fs-extra": "11.3.0"
+    "fs-extra": "11.3.1"
   },
   "devDependencies": {
     "@swc/core": "^1.3.10",
