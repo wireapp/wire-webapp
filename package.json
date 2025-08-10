@@ -150,7 +150,7 @@
     "postcss-import": "16.1.1",
     "postcss-less": "6.0.0",
     "postcss-loader": "8.1.1",
-    "postcss-preset-env": "10.1.5",
+    "postcss-preset-env": "10.2.4",
     "postcss-scss": "4.0.9",
     "prettier": "3.3.2",
     "qrcode-reader": "1.0.4",
