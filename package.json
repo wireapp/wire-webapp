@@ -120,7 +120,7 @@
     "archiver": "7.0.1",
     "autoprefixer": "10.4.21",
     "babel-loader": "10.0.0",
-    "babel-plugin-transform-import-meta": "2.3.2",
+    "babel-plugin-transform-import-meta": "2.3.3",
     "cross-env": "7.0.3",
     "css-loader": "7.1.2",
     "cssnano": "7.1.0",
