@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [46.33.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@46.32.4...@wireapp/core@46.33.0) (2025-08-11)
+
+### Features
+
+* **api-client:** Implement breaking changes of api V10 & V11 [WPB-19039] ([#7195](https://github.com/wireapp/wire-web-packages/issues/7195)) ([276ecf6](https://github.com/wireapp/wire-web-packages/commit/276ecf658d88ceef0f18d035ca139673ca7898fa))
+
 ## [46.32.4](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@46.32.3...@wireapp/core@46.32.4) (2025-08-11)
 
 ### Bug Fixes
