@@ -75,8 +75,6 @@ type UUID = string;
  */
 export interface Conversation {
   qualified_id: QualifiedId;
-  /** @deprecated Use qualified_id instead */
-  id: UUID;
   type: CONVERSATION_TYPE;
   creator: UUID;
   cells_state: CONVERSATION_CELLS_STATE;

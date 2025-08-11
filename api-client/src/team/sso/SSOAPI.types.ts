@@ -19,7 +19,10 @@
 
 export interface VerifyDomainRedirectConfig {
   domain: string;
-  backendUrl: string;
+  backend: {
+    config_url: string;
+    webapp_url: string;
+  };
   domainRedirect: 'remove' | 'backend' | 'no-registration';
 }
 
@@ -56,7 +59,10 @@ export interface GetAllRegisteredDomains {
 
 export interface RegisteredDomain {
   authorized_team: string;
-  backend_url: string;
+  backend: {
+    config_url: string;
+    webapp_url: string;
+  };
   dns_verification_token: string;
   domain: string;
   domain_redirect: DomainRedirect;

@@ -55,11 +55,11 @@ export class SSOAPI {
     return await this.client.sendJSON(config);
   }
 
-  public async updateDomainRedirect({domain, backendUrl, domainRedirect}: VerifyDomainRedirectConfig) {
+  public async updateDomainRedirect({domain, backend, domainRedirect}: VerifyDomainRedirectConfig) {
     const config: AxiosRequestConfig = {
       data: {
-        backend_url: backendUrl,
-        domainRedirect: domainRedirect,
+        backend,
+        domainRedirect,
       },
       method: 'post',
       url: `${SSOAPI.URL.DOMAIN_VERIFICATION}/${domain}/${SSOAPI.URL.BACKEND}`,

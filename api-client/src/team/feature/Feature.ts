@@ -52,6 +52,10 @@ export interface FeatureAppLockConfig extends FeatureConfig {
   inactivityTimeoutSecs: number;
 }
 
+export interface FeatureAllowedGlobalOperationsConfig extends FeatureConfig {
+  mlsConversationReset?: boolean;
+}
+
 export interface FeatureChannelsConfig {
   allowed_to_create_channels: AccessType;
   allowed_to_open_channels: AccessType;
@@ -100,6 +104,7 @@ export interface FeatureConferenceCallingConfig extends FeatureConfig {
 }
 
 export type FeatureAppLock = Feature<FeatureAppLockConfig>;
+export type FeatureAllowedGlobalOperations = Feature<FeatureAllowedGlobalOperationsConfig>;
 export type FeatureClassifiedDomains = Feature<FeatureClassifiedDomainsConfig>;
 export type FeatureConferenceCalling = Feature<FeatureConferenceCallingConfig>;
 export type FeatureDigitalSignature = FeatureWithoutConfig;
