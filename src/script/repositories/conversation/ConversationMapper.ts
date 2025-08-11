@@ -378,7 +378,7 @@ export class ConversationMapper {
 
     for (let i = 0; i < foundRemoteConversations.length; i++) {
       const remoteConversation = foundRemoteConversations[i];
-      const conversationId = remoteConversation.qualified_id?.id || remoteConversation.id;
+      const conversationId = remoteConversation.qualified_id?.id;
       const localConversation = conversationsMap.get(conversationId);
 
       if (localConversation) {

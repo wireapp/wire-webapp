@@ -1820,7 +1820,6 @@ describe('ConversationRepository', () => {
             access_role_v2: [],
             cells_state: CONVERSATION_CELLS_STATE.DISABLED,
             creator: 'c472ba79-0bca-4a74-aaa3-a559a16705d3',
-            id: 'c9405f98-e25a-4b1f-ade7-227ea765dff7',
             last_event: '0.0',
             last_event_time: '1970-01-01T00:00:00.000Z',
             members: {
