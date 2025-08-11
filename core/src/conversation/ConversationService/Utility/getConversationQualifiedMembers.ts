@@ -31,10 +31,15 @@ const getConversationQualifiedMembers = async ({apiClient, conversationId}: Para
    * yourself in the list of users if you want to sync a message also to your
    * other clients.
    */
-  return conversation.members.others
+  const filteredConversations = conversation.members.others
     .filter(member => !!member.qualified_id)
-    .map(member => member.qualified_id!)
-    .concat(conversation.members.self.qualified_id!);
+    .map(member => member.qualified_id!);
+
+  if (conversation.members.self?.qualified_id) {
+    filteredConversations.push(conversation.members.self.qualified_id);
+  }
+
+  return filteredConversations;
 };
 
 export {getConversationQualifiedMembers};
