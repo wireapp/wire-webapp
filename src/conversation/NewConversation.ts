@@ -42,6 +42,9 @@ export interface NewConversation
   receipt_mode: RECEIPT_MODE | null;
   protocol?: ConversationProtocol;
   team?: TeamInfo;
-  users?: string[]; // users must be empty for creating MLS conversations
+  /** users must be empty for creating MLS conversations */
+  users?: string[];
   cells?: boolean;
+  /** When set to true on a channel creation request, the creator will not be a member of the conversation. */
+  skip_creator?: boolean;
 }

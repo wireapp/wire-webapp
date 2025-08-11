@@ -36,6 +36,8 @@ import {
   FeatureDomainRegistration,
   FeatureChannels,
   FeatureCells,
+  FeatureAllowedGlobalOperations,
+  FeatureConsumableNotifications,
 } from './Feature';
 import {InvalidAppLockTimeoutError} from './FeatureError';
 import {FeatureList} from './FeatureList';
@@ -49,8 +51,10 @@ export class FeatureAPI {
 
   public static readonly URL = {
     APPLOCK: 'appLock',
+    ALLOWED_GLOBAL_OPERATIONS: 'allowedGlobalOperations',
     CALLING_CONFERENCE: 'conferenceCalling',
     CALLING_VIDEO: 'videoCalling',
+    CONSUMABLE_NOTIFICATIONS: 'consumableNotifications',
     SELF_DELETING_MESSAGES: 'selfDeletingMessages',
     DIGITAL_SIGNATURES: 'digitalSignatures',
     DOMAIN_REGISTRATION: 'domainRegistration',
@@ -371,6 +375,26 @@ export class FeatureAPI {
     };
 
     const response = await this.client.sendJSON<FeatureAppLock>(config);
+    return response.data;
+  }
+
+  public async getAllowedGlobalOperationsFeature(teamId: string): Promise<FeatureAllowedGlobalOperations> {
+    const config: AxiosRequestConfig = {
+      method: 'get',
+      url: `${FeatureAPI.URL.TEAMS}/${teamId}/${FeatureAPI.URL.FEATURES}/${FeatureAPI.URL.ALLOWED_GLOBAL_OPERATIONS}`,
+    };
+
+    const response = await this.client.sendJSON<FeatureAllowedGlobalOperations>(config);
+    return response.data;
+  }
+
+  public async getConsumableNotificationsFeature(teamId: string): Promise<FeatureConsumableNotifications> {
+    const config: AxiosRequestConfig = {
+      method: 'get',
+      url: `${FeatureAPI.URL.TEAMS}/${teamId}/${FeatureAPI.URL.FEATURES}/${FeatureAPI.URL.CONSUMABLE_NOTIFICATIONS}`,
+    };
+
+    const response = await this.client.sendJSON<FeatureConsumableNotifications>(config);
     return response.data;
   }
 

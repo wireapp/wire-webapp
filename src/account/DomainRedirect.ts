@@ -48,5 +48,8 @@ export type DomainRedirectPayload =
     }
   | {
       domain_redirect: DomainRedirect.BACKEND;
-      backend_url: string;
+      backend: {
+        config_url: string;
+        webapp_url: string;
+      };
     };
