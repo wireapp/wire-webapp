@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [46.32.4](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@46.32.3...@wireapp/core@46.32.4) (2025-08-11)
+
+### Bug Fixes
+
+* **core:** Handle possible undefined self in conversation ([#7221](https://github.com/wireapp/wire-web-packages/issues/7221)) ([dad89a1](https://github.com/wireapp/wire-web-packages/commit/dad89a1411735e2721fa552a5cb7d4886ccb7d5f))
+
+### Reverts
+
+* Revert "Revert "fix(core): Queue incoming pending MLS proposals [WPB-18995] (#7102)" (#7105)" (#7198) ([3cbacca](https://github.com/wireapp/wire-web-packages/commit/3cbaccad5bfd4acffa76f2b208f8844491e57dc9)), closes [#7102](https://github.com/wireapp/wire-web-packages/issues/7102) [#7105](https://github.com/wireapp/wire-web-packages/issues/7105) [#7198](https://github.com/wireapp/wire-web-packages/issues/7198)
+
 ## [46.32.3](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@46.32.2...@wireapp/core@46.32.3) (2025-08-07)
 
 **Note:** Version bump only for package @wireapp/core
