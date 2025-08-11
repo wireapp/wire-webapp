@@ -24,6 +24,7 @@ interface Params {
   apiClient: APIClient;
   conversationId: QualifiedId;
 }
+
 const getConversationQualifiedMembers = async ({apiClient, conversationId}: Params): Promise<QualifiedId[]> => {
   const conversation = await apiClient.api.conversation.getConversation(conversationId);
   /*

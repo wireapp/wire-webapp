@@ -683,7 +683,6 @@ describe('ProteusService', () => {
   describe('createConversation', () => {
     const newConversation: Conversation = {
       qualified_id: {id: '', domain: ''},
-      id: '',
       type: CONVERSATION_TYPE.REGULAR,
       creator: '',
       cells_state: CONVERSATION_CELLS_STATE.DISABLED,
