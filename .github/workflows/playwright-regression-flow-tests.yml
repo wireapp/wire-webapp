@@ -37,7 +37,7 @@ jobs:
           OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
 
       - name: Run critical flow tests
-        run: yarn e2e-test --grep "@regression"
+        run: yarn e2e-test --grep "@regression|@crit-flow-web"
 
       - name: Upload test report
         if: always()
