@@ -44,6 +44,7 @@ const mapCommonMessageFields = ({
   senderClientId,
   senderUserId,
   webPrimaryKey,
+  lastEditTime,
 }: BackupMessage): CommonMessageFields => {
   const common = {
     conversation: conversationId.id.toString(),
@@ -60,6 +61,7 @@ const mapCommonMessageFields = ({
     },
     time: creationDate.date.toISOString(),
     primary_key: webPrimaryKey?.toString() ?? '',
+    edited_time: lastEditTime ? lastEditTime.date.toISOString() : undefined,
   };
   return common;
 };
