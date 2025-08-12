@@ -36,6 +36,7 @@ interface InputBarControlsProps {
   isFileSharingSendingEnabled: boolean;
   pingDisabled: boolean;
   messageContent: MessageContent;
+  isCellsFeatureEnabled: boolean;
   isEditing: boolean;
   isSendingDisabled: boolean;
   showMarkdownPreview: boolean;
@@ -64,6 +65,7 @@ export const InputBarControls = ({
   isFileSharingSendingEnabled,
   pingDisabled,
   messageContent,
+  isCellsFeatureEnabled: isCellsFeatureEnabled,
   isEditing,
   isSendingDisabled,
   showMarkdownPreview,
@@ -98,6 +100,7 @@ export const InputBarControls = ({
           disableFilesharing={!isFileSharingSendingEnabled}
           disablePing={pingDisabled}
           input={messageContent.text}
+          isCellsFeatureEnabled={isCellsFeatureEnabled}
           isEditing={isEditing}
           onCancelEditing={onEscape}
           onClickPing={onClickPing}

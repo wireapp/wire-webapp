@@ -152,6 +152,17 @@ export class ApiManagerE2E {
     };
   }
 
+  async connectUsers(connectionInitiator: User, connectionReceiver: User) {
+    if (!connectionInitiator.token) {
+      throw new Error(`User1 ${connectionInitiator.username} has no token and can't be used for connection`);
+    }
+    if (!connectionReceiver.qualifiedId?.id.length) {
+      throw new Error(`User2 ${connectionReceiver.username} has no qualifiedId and can't be used for connection`);
+    }
+    await this.connection.sendConnectionRequest(connectionInitiator.token, connectionReceiver.qualifiedId.id);
+    await this.acceptConnectionRequest(connectionReceiver);
+  }
+
   async acceptConnectionRequest(user: User) {
     const token = user.token ?? (await this.auth.loginUser(user)).data.access_token;
     const listOfConnections = await this.connection.getConnectionsList(token);

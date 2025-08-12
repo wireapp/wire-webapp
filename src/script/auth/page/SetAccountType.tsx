@@ -28,6 +28,7 @@ import {styles} from './SetAccountType.styles';
 
 import {Config} from '../../Config';
 import {BackButton} from '../component/BackButton';
+import {EXTERNAL_ROUTE} from '../externalRoute';
 import {ROUTE} from '../route';
 import {pathWithParams} from '../util/urlUtil';
 
@@ -39,7 +40,7 @@ export const SetAccountType = () => {
   };
 
   const onCreateTeamAccount = () => {
-    window.open(`${Config.getConfig().URL.TEAMS_BASE}/signup/account?origin=web_desktop`, '_blank');
+    window.open(EXTERNAL_ROUTE.WIRE_TEAMS_SIGNUP, '_blank');
   };
 
   if (!Config.getConfig().FEATURE.ENABLE_ACCOUNT_REGISTRATION) {
