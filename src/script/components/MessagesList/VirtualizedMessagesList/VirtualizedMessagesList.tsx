@@ -192,14 +192,16 @@ export const VirtualizedMessagesList = ({
   useEffect(() => {
     // Timeout to ensure that the messages are rendered before calling getVisibleCallback
     const timeout = setTimeout(() => {
-      if (alreadyScrolledToLastMessage) {
-        virtualItems.forEach(virtualItem => {
-          const item = groupedMessages[virtualItem.index];
-          if (!isMarker(item)) {
-            getVisibleCallback(conversation, item.message)?.();
-          }
-        });
+      if (!alreadyScrolledToLastMessage) {
+        return;
       }
+
+      virtualItems.forEach(virtualItem => {
+        const item = groupedMessages[virtualItem.index];
+        if (!isMarker(item)) {
+          getVisibleCallback(conversation, item.message)?.();
+        }
+      });
     }, 100);
 
     return () => clearTimeout(timeout);
