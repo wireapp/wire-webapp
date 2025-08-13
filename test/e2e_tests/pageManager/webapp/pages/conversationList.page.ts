@@ -31,6 +31,7 @@ export class ConversationListPage {
   readonly pendingConnectionRequest: Locator;
   readonly leaveConversationButton: Locator;
   readonly searchConversationsInput: Locator;
+  readonly archiveConversationMenuButton: Locator;
 
   constructor(page: Page) {
     this.page = page;
@@ -46,6 +47,7 @@ export class ConversationListPage {
     );
     this.leaveConversationButton = page.locator(selectByDataAttribute('conversation-leave'));
     this.searchConversationsInput = page.locator(selectByDataAttribute('search-conversations'));
+    this.archiveConversationMenuButton = page.locator(selectById('btn-archive'));
   }
 
   async isConversationItemVisible(conversationName: string) {
@@ -86,6 +88,10 @@ export class ConversationListPage {
 
   async clickBlockConversation() {
     await this.blockConversationMenuButton.click();
+  }
+
+  async archiveConversation() {
+    await this.archiveConversationMenuButton.click();
   }
 
   async clickCreateGroup() {
