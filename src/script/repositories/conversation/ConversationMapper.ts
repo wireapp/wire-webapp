@@ -246,6 +246,17 @@ export class ConversationMapper {
       throw new ConversationError(BASE_ERROR_TYPE.INVALID_PARAMETER, BaseError.MESSAGE.INVALID_PARAMETER);
     }
 
+    // Ensure that conversationData has a qualified_id or id
+    if (!conversationData.qualified_id && !conversationData.id) {
+      throw new ConversationError(BASE_ERROR_TYPE.MISSING_PARAMETER, BaseError.MESSAGE.MISSING_QUALIFIED_ID);
+    }
+
+    // since api V10 /get or /post conversation does not return id in conversation data
+    const conversationIdFromQualifiedId = conversationData?.qualified_id?.id;
+    if (conversationIdFromQualifiedId) {
+      conversationData.id = conversationIdFromQualifiedId;
+    }
+
     const {
       creator,
       id,
@@ -367,7 +378,7 @@ export class ConversationMapper {
 
     for (let i = 0; i < foundRemoteConversations.length; i++) {
       const remoteConversation = foundRemoteConversations[i];
-      const conversationId = remoteConversation.qualified_id?.id || remoteConversation.id;
+      const conversationId = remoteConversation.qualified_id?.id;
       const localConversation = conversationsMap.get(conversationId);
 
       if (localConversation) {
