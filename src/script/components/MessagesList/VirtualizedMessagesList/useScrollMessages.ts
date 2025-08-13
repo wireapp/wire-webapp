@@ -99,11 +99,8 @@ export const useScrollMessages = (
     const scrollHeight = element?.scrollHeight || 0;
     const clientHeight = element?.clientHeight || 0;
 
-    const virtualItems = virtualizer.getVirtualItems();
-    const lastItem = virtualItems.find(item => item.index === messages.length - 1);
-
     const distanceFromBottom = scrollHeight - scrollTop - clientHeight;
-    const shouldStickToBottom = distanceFromBottom <= (lastItem?.size || 100);
+    const shouldStickToBottom = distanceFromBottom < 100;
 
     if (highlightedMessage && !scrollToHighlightedMessage) {
       // If we have an element we want to focus
