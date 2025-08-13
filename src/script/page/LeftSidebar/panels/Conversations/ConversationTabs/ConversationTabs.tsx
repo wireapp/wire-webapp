@@ -96,6 +96,7 @@ export const ConversationTabs = ({
   const teamState = container.resolve(TeamState);
   const totalUnreadConversations = unreadConversations.length;
   const {teamRole} = useKoSubscribableChildren(selfUser, ['teamRole']);
+  const {isCellsEnabled: isCellsEnabledForTeam} = useKoSubscribableChildren(teamState, ['isCellsEnabled']);
 
   const totalUnreadFavoriteConversations = favoriteConversations.filter(favoriteConversation =>
     favoriteConversation.hasUnread(),
@@ -175,6 +176,8 @@ export const ConversationTabs = ({
   const manageTeamUrl = getManageTeamUrl();
   const replaceWireLink = replaceLink('https://app.wire.com', '', '');
 
+  const showCellsTab = Config.getConfig().FEATURE.ENABLE_CELLS && isCellsEnabledForTeam;
+
   return (
     <>
       <div
@@ -231,7 +234,7 @@ export const ConversationTabs = ({
           isActive={currentTab === SidebarTabs.CONNECT}
         />
 
-        {Config.getConfig().FEATURE.ENABLE_CELLS && (
+        {showCellsTab && (
           <>
             <div className="conversations-sidebar-divider" />
 

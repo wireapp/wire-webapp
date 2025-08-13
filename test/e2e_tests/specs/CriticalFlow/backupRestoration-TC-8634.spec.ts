@@ -24,7 +24,11 @@ import {getUser} from '../../data/user';
 import {test, expect} from '../../test.fixtures';
 
 // Generating test data
-const user = getUser();
+const userA = getUser();
+const userB = getUser();
+const groupName = 'Critical Group';
+const personalMessage = 'Hello, this is a personal message!';
+const groupMessage = 'This is a group message!';
 let backupName: string;
 let passwordProtectedBackupName: string;
 
@@ -53,18 +57,35 @@ test('Setting up new device with a backup', {tag: ['@TC-8634', '@crit-flow-web']
 
   // Creating preconditions for the test via API
   await test.step('Preconditions: Creating preconditions for the test via API', async () => {
-    await api.createPersonalUser(user);
+    await api.createPersonalUser(userA);
+    await api.createPersonalUser(userB);
+    await api.connectUsers(userA, userB);
   });
 
   // Test steps
   await test.step('User logs in', async () => {
     await pageManager.openMainPage();
-    await loginUser(user, pageManager);
+    await loginUser(userA, pageManager);
     await modals.dataShareConsent().clickDecline();
   });
 
-  //TODO generate a conversation to restore
-  await test.step('User generates data', async () => {});
+  await test.step('User generates data', async () => {
+    await pages.conversationList().openConversation(userB.fullName);
+    await pages.conversation().sendMessage(personalMessage);
+    expect(pages.conversation().isMessageVisible(personalMessage)).toBeTruthy();
+
+    await pages.conversationList().clickCreateGroup();
+    await pages.groupCreation().setGroupName(groupName);
+    await pages.startUI().selectUsers([userB.username]);
+    await pages.groupCreation().clickCreateGroupButton();
+    await pages.conversationList().openConversation(groupName);
+    await pages.conversation().sendMessage(groupMessage);
+
+    // TODO: Bug [WPB-18226], remove this when fixed
+    await pageManager.refreshPage({waitUntil: 'load'});
+
+    expect(pages.conversation().isMessageVisible(groupMessage)).toBeTruthy();
+  });
 
   await test.step('User creates and saves a backup', async () => {
     await components.conversationSidebar().clickPreferencesButton();
@@ -72,7 +93,7 @@ test('Setting up new device with a backup', {tag: ['@TC-8634', '@crit-flow-web']
   });
 
   await test.step('User creates and saves a password backup', async () => {
-    passwordProtectedBackupName = await createAndSaveBackup(user.password, 'password-');
+    passwordProtectedBackupName = await createAndSaveBackup(userA.password, 'password-');
   });
 
   await test.step('User logs out and clears all data', async () => {
@@ -80,8 +101,16 @@ test('Setting up new device with a backup', {tag: ['@TC-8634', '@crit-flow-web']
   });
 
   await test.step('User logs back in', async () => {
-    await loginUser(user, pageManager);
+    await loginUser(userA, pageManager);
     await pages.historyInfo().clickConfirmButton();
+  });
+
+  await test.step('User doesnt see previous data (messages)', async () => {
+    await pages.conversationList().openConversation(userB.fullName);
+    expect(await pages.conversation().isMessageVisible(personalMessage, false)).toBeFalsy();
+
+    await pages.conversationList().openConversation(groupName);
+    expect(await pages.conversation().isMessageVisible(groupMessage, false)).toBeFalsy();
   });
 
   await test.step('User restores the previously created backup', async () => {
@@ -94,13 +123,23 @@ test('Setting up new device with a backup', {tag: ['@TC-8634', '@crit-flow-web']
     await components.conversationSidebar().clickPreferencesButton();
     await pages.account().backupFileInput.setInputFiles(passwordProtectedBackupName);
     expect(modals.importBackup().isTitleVisible()).toBeTruthy();
-    await modals.importBackup().enterPassword(user.password);
+    await modals.importBackup().enterPassword(userA.password);
     await modals.importBackup().clickContinue();
     expect(modals.importBackup().isTitleHidden()).toBeTruthy();
     expect(pages.historyImport().importSuccessHeadline.isVisible()).toBeTruthy();
   });
+
+  await test.step('All data (chat history, contacts) are restored', async () => {
+    await components.conversationSidebar().clickAllConversationsButton();
+    await pages.conversationList().openConversation(groupName);
+    expect(pages.conversation().isMessageVisible(groupMessage)).toBeTruthy();
+
+    await pages.conversationList().openConversation(userB.fullName);
+    expect(pages.conversation().isMessageVisible(personalMessage)).toBeTruthy();
+  });
 });
 
 test.afterAll(async ({api}) => {
-  await removeCreatedUser(api, user);
+  await removeCreatedUser(api, userA);
+  await removeCreatedUser(api, userB);
 });
