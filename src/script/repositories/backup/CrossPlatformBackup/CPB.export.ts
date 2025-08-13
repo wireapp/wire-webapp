@@ -149,7 +149,8 @@ export const exportCPBHistoryFromDatabase = async ({
     }
     const {success, data: eventData, error} = EventTableEntrySchema.safeParse(record);
     if (success) {
-      const {from, from_client_id, id, qualified_conversation, qualified_from, primary_key, time, type} = eventData;
+      const {edited_time, from, from_client_id, id, qualified_conversation, qualified_from, primary_key, time, type} =
+        eventData;
       if (!id) {
         // eslint-disable-next-line no-console
         CPBLogger.log('Event without id', eventData);
@@ -169,6 +170,7 @@ export const exportCPBHistoryFromDatabase = async ({
       );
       const senderClientId = from_client_id ?? '';
       const creationDate = new BackupDateTime(new Date(time));
+      const lastEditTime = edited_time ? new BackupDateTime(new Date(edited_time)) : null;
       // for debugging purposes
       const webPrimaryKey = primary_key;
 
@@ -199,14 +201,32 @@ export const exportCPBHistoryFromDatabase = async ({
         );
 
         backupExporter.addMessage(
-          new BackupMessage(id, conversationId, senderUserId, senderClientId, creationDate, asset, webPrimaryKey),
+          new BackupMessage(
+            id,
+            conversationId,
+            senderUserId,
+            senderClientId,
+            creationDate,
+            asset,
+            webPrimaryKey,
+            lastEditTime,
+          ),
         );
       }
 
       if (isMessageAddEvent(type) && eventData.data?.content) {
         const text = new BackupMessageContent.Text(eventData.data.content);
         backupExporter.addMessage(
-          new BackupMessage(id, conversationId, senderUserId, senderClientId, creationDate, text, webPrimaryKey),
+          new BackupMessage(
+            id,
+            conversationId,
+            senderUserId,
+            senderClientId,
+            creationDate,
+            text,
+            webPrimaryKey,
+            lastEditTime,
+          ),
         );
       }
 
@@ -227,7 +247,16 @@ export const exportCPBHistoryFromDatabase = async ({
           locationParseData.location.zoom,
         );
         backupExporter.addMessage(
-          new BackupMessage(id, conversationId, senderUserId, senderClientId, creationDate, location, webPrimaryKey),
+          new BackupMessage(
+            id,
+            conversationId,
+            senderUserId,
+            senderClientId,
+            creationDate,
+            location,
+            webPrimaryKey,
+            lastEditTime,
+          ),
         );
       }
     } else {
