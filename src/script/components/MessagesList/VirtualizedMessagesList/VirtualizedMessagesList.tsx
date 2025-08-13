@@ -40,7 +40,7 @@ import {VirtualizedJumpToLastMessageButton} from '../VirtualizedJumpToLastMessag
 
 const ESTIMATED_ELEMENT_SIZE = 36;
 
-interface Props extends Omit<MessagesListParams, 'isRightSidebarOpen'> {
+interface Props extends Omit<MessagesListParams, 'isRightSidebarOpen' | 'onLoading' | 'isConversationLoaded'> {
   parentElement: HTMLDivElement;
   conversationLastReadTimestamp: MutableRefObject<number>;
   loadConversation: (conversation: Conversation) => Promise<MessageEntity[]>;
@@ -67,7 +67,6 @@ export const VirtualizedMessagesList = ({
   isMsgElementsFocusable,
   setMsgElementsFocusable,
   conversationLastReadTimestamp,
-  isConversationLoaded,
   updateConversationLastRead,
   loadConversation,
 }: Props) => {
@@ -94,6 +93,7 @@ export const VirtualizedMessagesList = ({
 
   const [highlightedMessage, setHighlightedMessage] = useState<string | undefined>(undefined);
   const [loadingMessages, setLoadingMessages] = useState(false);
+  const [alreadyScrolledToLastMessage, setAlreadyScrolledToLastMessage] = useState(false);
 
   useEffect(() => {
     if (!initialMessageId) {
@@ -108,7 +108,7 @@ export const VirtualizedMessagesList = ({
     }, 3000);
 
     return () => clearTimeout(timeout);
-  }, [initialMessageId]);
+  }, [conversation, initialMessageId]);
 
   const {focusedId, handleKeyDown, setFocusedId} = useRoveFocus(filteredMessages.map(message => message.id));
 
@@ -119,7 +119,7 @@ export const VirtualizedMessagesList = ({
     getScrollElement: () => parentElement,
     estimateSize: () => ESTIMATED_ELEMENT_SIZE,
     measureElement: element => element?.getBoundingClientRect().height || ESTIMATED_ELEMENT_SIZE,
-    initialOffset: parentElement.scrollHeight,
+    overscan: 2,
   });
 
   useLoadMessages(virtualizer, {
@@ -132,16 +132,16 @@ export const VirtualizedMessagesList = ({
   });
 
   useScrollMessages(virtualizer, {
-    conversation,
     messages: groupedMessages,
     highlightedMessage,
     userId: selfUser.id,
     conversationLastReadTimestamp,
+    setAlreadyScrolledToLastMessage,
   });
 
   // When a new conversation is opened using keyboard(enter), focus on the last message
   useEffect(() => {
-    if (isConversationLoaded && history.state?.eventKey === 'Enter') {
+    if (history.state?.eventKey === 'Enter') {
       const lastMessage = filteredMessages[filteredMessages.length - 1];
       setFocusedId(lastMessage?.id);
 
@@ -150,19 +150,7 @@ export const VirtualizedMessagesList = ({
       history.state.eventKey = '';
       window.history.replaceState(history.state, '', window.location.hash);
     }
-  }, [isConversationLoaded]);
-
-  const scrollToElement = (messageIndex: number, isUnread?: boolean) => {
-    // if it's a new unread message, but we are not on the first render of the list,
-    // we do not need to scroll to the unread message
-    if (isUnread) {
-      return;
-    }
-
-    requestAnimationFrame(() => {
-      virtualizer.scrollToIndex(messageIndex, {align: 'center'});
-    });
-  };
+  }, []);
 
   const onTimestampClick = async (messageId: string) => {
     setHighlightedMessage(messageId);
@@ -201,14 +189,26 @@ export const VirtualizedMessagesList = ({
     });
   };
 
+  useEffect(() => {
+    // Timeout to ensure that the messages are rendered before calling getVisibleCallback
+    const timeout = setTimeout(() => {
+      if (!alreadyScrolledToLastMessage) {
+        return;
+      }
+
+      virtualItems.forEach(virtualItem => {
+        const item = groupedMessages[virtualItem.index];
+        if (!isMarker(item)) {
+          getVisibleCallback(conversation, item.message)?.();
+        }
+      });
+    }, 100);
+
+    return () => clearTimeout(timeout);
+  }, [alreadyScrolledToLastMessage, virtualItems]);
+
   return (
     <>
-      {!isConversationLoaded && (
-        <div className="conversation-loading">
-          <div className="icon-spinner spin accent-text"></div>
-        </div>
-      )}
-
       <div
         className={cx('messages', {'flex-center': verticallyCenterMessage(filteredMessages)})}
         style={{
@@ -219,11 +219,6 @@ export const VirtualizedMessagesList = ({
       >
         {virtualItems.map(virtualItem => {
           const item = groupedMessages[virtualItem.index];
-
-          if (!isMarker(item)) {
-            getVisibleCallback(conversation, item.message)?.();
-          }
-
           const isLast = virtualItem.index === groupedMessages.length - 1;
 
           return (
@@ -239,10 +234,7 @@ export const VirtualizedMessagesList = ({
               }}
             >
               {isMarker(item) ? (
-                <MarkerComponent<(isUnread: boolean) => void>
-                  scrollTo={isUnread => scrollToElement(virtualItem.index, isUnread)}
-                  marker={item}
-                />
+                <MarkerComponent marker={item} />
               ) : (
                 <Message
                   key={`${item.message.id || 'message'}-${item.message.timestamp()}`}
@@ -253,7 +245,6 @@ export const VirtualizedMessagesList = ({
                   hasReadReceiptsTurnedOn={conversationRepository.expectReadReceipt(conversation)}
                   isLastDeliveredMessage={lastDeliveredMessage?.id === item.message.id}
                   isHighlighted={!!highlightedMessage && highlightedMessage === item.message.id}
-                  scrollTo={() => scrollToElement(virtualItem.index)}
                   isSelfTemporaryGuest={selfUser.isTemporaryGuest()}
                   messageRepository={messageRepository}
                   onClickAvatar={showUserDetails}
