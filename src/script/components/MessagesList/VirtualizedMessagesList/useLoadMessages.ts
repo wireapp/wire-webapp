@@ -26,7 +26,7 @@ import {Conversation} from 'Repositories/entity/Conversation';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {isLastReceivedMessage} from 'Util/conversationMessages';
 
-const SCROLL_THRESHOLD = 10;
+const SCROLL_THRESHOLD = 30;
 
 interface Props {
   conversation: Conversation;
@@ -60,10 +60,7 @@ export const useLoadMessages = (
       const newMessages = await conversationRepository.getPrecedingMessages(conversation);
 
       if (!initialMessageId) {
-        requestAnimationFrame(() => {
-          const newIndex = itemsLength - (itemsLength - newMessages.length);
-          virtualizer.scrollToIndex(newIndex, {align: 'start'});
-        });
+        virtualizer.scrollToIndex(newMessages.length, {align: 'start'});
       }
     } catch (error) {
       console.error('Error loading preceding messages:', error);
@@ -96,17 +93,15 @@ export const useLoadMessages = (
       const newMessages = await conversationRepository.getSubsequentMessages(conversation, lastMessage);
 
       if (!initialMessageId) {
-        requestAnimationFrame(() => {
-          const newIndex = itemsLength - (itemsLength - newMessages.length);
-          virtualizer.scrollToIndex(newIndex, {align: 'start'});
-        });
+        const newIndex = itemsLength + newMessages.length;
+        virtualizer.scrollToIndex(newIndex, {align: 'end'});
       }
     } catch (error) {
       console.error('Error loading following messages:', error);
     } finally {
       onLoadingMessages(false);
     }
-  }, [conversation, conversationRepository, onLoadingMessages, initialMessageId]);
+  }, [itemsLength, conversation, conversationRepository, onLoadingMessages, initialMessageId]);
 
   // This function ensures that after user scroll to top or bottom content,
   // the preceding / following messages will be loaded.

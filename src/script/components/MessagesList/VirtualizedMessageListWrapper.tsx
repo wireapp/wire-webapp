@@ -75,7 +75,13 @@ export const VirtualizedMessageListWrapper = ({
       tabIndex={TabIndex.UNFOCUSABLE}
       style={{height: '100%', overflow: 'auto', position: 'relative'}}
     >
-      {parentRef.current && (
+      {!isConversationLoaded && (
+        <div className="conversation-loading">
+          <div className="icon-spinner spin accent-text"></div>
+        </div>
+      )}
+
+      {isConversationLoaded && parentRef.current && (
         <VirtualizedMessagesList
           parentElement={parentRef.current}
           conversationLastReadTimestamp={conversationLastReadTimestamp}
@@ -94,8 +100,6 @@ export const VirtualizedMessageListWrapper = ({
           assetRepository={assetRepository}
           messageRepository={messageRepository}
           messageActions={messageActions}
-          isConversationLoaded={isConversationLoaded}
-          onLoading={loading => onLoading(!loading)}
           getVisibleCallback={getVisibleCallback}
           isMsgElementsFocusable={isMsgElementsFocusable}
           setMsgElementsFocusable={setMsgElementsFocusable}
