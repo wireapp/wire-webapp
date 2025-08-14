@@ -17,11 +17,11 @@
  *
  */
 
-import {getUser} from '../data/user';
-import {test, expect} from '../test.fixtures';
-import {addCreatedUser, removeCreatedUser} from '../utils/tearDown.util';
-import {loginUser} from '../utils/userActions';
-import {generateSecurePassword} from '../utils/userDataGenerator';
+import {getUser} from '../../data/user';
+import {test, expect} from '../../test.fixtures';
+import {addCreatedUser, removeCreatedUser} from '../../utils/tearDown.util';
+import {loginUser} from '../../utils/userActions';
+import {generateSecurePassword} from '../../utils/userDataGenerator';
 
 const user = getUser();
 
