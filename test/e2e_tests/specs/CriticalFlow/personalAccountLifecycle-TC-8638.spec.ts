@@ -17,26 +17,43 @@
  *
  */
 
+import {PageManager} from 'test/e2e_tests/pageManager';
 import {addCreatedUser, removeCreatedUser} from 'test/e2e_tests/utils/tearDown.util';
+import {loginUser, sendTextMessageToUser} from 'test/e2e_tests/utils/userActions';
 
 import {getUser} from '../../data/user';
 import {test, expect} from '../../test.fixtures';
 
-// Generating test data
-// userB is the contact user, userA is the user who registers
-const userB = getUser();
 const userA = getUser();
+const otherUsers = Array.from({length: 2}, () => getUser());
+const [userB, userC] = otherUsers;
 
-test('Personal Account Lifecycle', {tag: ['@TC-8638', '@crit-flow-web']}, async ({pageManager, api}) => {
-  test.slow();
+test('Personal Account Lifecycle', {tag: ['@TC-8638', '@crit-flow-web']}, async ({pageManager, api, browser}) => {
+  const pageManagers = await Promise.all(
+    otherUsers.map(async () => {
+      const memberContext = await browser.newContext();
+      const memberPage = await memberContext.newPage();
+      return new PageManager(memberPage);
+    }),
+  );
+
+  const [pageManagerB, pageManagerC] = pageManagers;
+
   const {pages, modals, components} = pageManager.webapp;
+  test.slow(); // Increasing test timeout to 90 seconds to accommodate the full flow
 
   await test.step('Preconditions: Creating preconditions for the test via API', async () => {
-    await api.createPersonalUser(userB);
-    addCreatedUser(userB);
+    await Promise.all(
+      otherUsers.map(async (user, index) => {
+        await api.createPersonalUser(user);
+        addCreatedUser(user);
+        await pageManagers[index].openMainPage();
+        await loginUser(user, pageManagers[index]);
+        await pageManagers[index].webapp.modals.dataShareConsent().clickDecline();
+      }),
+    );
   });
 
-  // Test steps
   await test.step('User A opens the application and registers personal account', async () => {
     await pageManager.openMainPage();
     await pages.singleSignOn().enterEmailOnSSOPage(userA.email);
@@ -51,15 +68,15 @@ test('Personal Account Lifecycle', {tag: ['@TC-8638', '@crit-flow-web']}, async 
     expect(await pages.registration().isSubmitButtonEnabled()).toBeTruthy();
 
     await pages.registration().clickSubmitButton();
-    const verificationCode = await api.inbucket.getVerificationCode(userA.email);
-    await pageManager.tm.pages.emailVerification().enterVerificationCode(verificationCode);
-    await pageManager.tm.modals.marketingConsent().clickConfirmButton();
+    const verificationCode = await api.brig.getActivationCodeForEmail(userA.email);
+    expect(await pages.emailVerification().isEmailVerificationPageVisible()).toBeTruthy();
+    await pages.emailVerification().enterVerificationCode(verificationCode);
   });
 
   await test.step('Personal user A sets user name', async () => {
-    await pageManager.tm.pages.setUsername().setUsername(userA.username);
-    await pageManager.tm.pages.setUsername().clickNextButton();
-    await pageManager.tm.pages.registerSuccess().clickOpenWireWebButton();
+    await pages.setUsername().setUsername(userA.username);
+    await pages.setUsername().clickNextButton();
+    await pages.registerSuccess().clickOpenWireWebButton();
   });
 
   await test.step('Personal user A declines sending anonymous usage data', async () => {
@@ -86,22 +103,22 @@ test('Personal Account Lifecycle', {tag: ['@TC-8638', '@crit-flow-web']}, async 
     expect(await pages.outgoingConnection().isPendingIconVisible(userB.fullName));
   });
 
-  await test.step('Personal user B accepts request', async () => {
-    await api.acceptConnectionRequest(userB);
-    expect(await pages.outgoingConnection().isPendingIconHidden(userB.fullName));
+  await test.step('Personal user B accepts request from A', async () => {
+    await pageManagerB.webapp.pages.conversationList().openPendingConnectionRequest();
+    await pageManagerB.webapp.pages.connectRequest().clickConnectButton();
+    await pageManagerB.webapp.pages.conversationList().isConversationItemVisible(userA.fullName);
   });
 
-  await test.step('Personal user A and personal user B exchange some messages', async () => {
-    // TODO: Conversation sometimes closes after connection request was approved, so we need to reopen it
-    await pages.conversationList().openConversation(userB.fullName);
-    expect(await pages.conversation().isConversationOpen(userB.fullName));
+  await test.step('Personal user A send message to personal user B', async () => {
+    await sendTextMessageToUser(pageManager, userB, `Hello! ${userA.firstName} here.`);
+  });
 
-    // TODO: Bug [WPB-18226] Message is not visible in the conversation after sending it
-    // await pages.conversationPage.sendMessage('Hello there');
-    // expect(await pages.conversationPage.isMessageVisible('Hello there')).toBeTruthy();
-
-    // await api.sendMessageToPersonalConversation(userB, userA, 'Heya');
-    // expect(await pages.conversationPage.isMessageVisible('Heya')).toBeTruthy();
+  await test.step('Personal user B can see the message from user A', async () => {
+    await pageManagerB.refreshPage({waitUntil: 'domcontentloaded'});
+    await pageManagerB.webapp.pages.conversationList().openConversation(userA.fullName);
+    expect(
+      await pageManagerB.webapp.pages.conversation().isMessageVisible(`Hello! ${userA.firstName} here.`),
+    ).toBeTruthy();
   });
 
   await test.step('Personal user A blocks personal user B', async () => {
@@ -115,39 +132,56 @@ test('Personal Account Lifecycle', {tag: ['@TC-8638', '@crit-flow-web']}, async 
 
     await modals.blockWarning().clickBlock();
     expect(await pages.conversationList().isConversationBlocked(userB.fullName));
-
-    // [WPB-18093] Backend not returning the blocked 1:1 in conversations list
-    // When User <Contact> sends message "See this?" to personal MLS conversation <Name>
-    // Then I do not see text message See this?
   });
 
-  await test.step('Personal user A opens settings', async () => {
+  await test.step('Personal user C sends a connection request to personal user A', async () => {
+    await pageManagerC.webapp.components.conversationSidebar().clickConnectButton();
+    await pageManagerC.webapp.pages.startUI().selectUser(userA.username);
+    expect(await pageManagerC.webapp.modals.userProfile().isVisible());
+    await pageManagerC.webapp.modals.userProfile().clickConnectButton();
+    await pageManagerC.webapp.pages.conversationList().openConversation(userA.fullName);
+    expect(await pageManagerC.webapp.pages.outgoingConnection().getOutgoingConnectionUsername()).toContain(
+      userA.username,
+    );
+    expect(await pageManagerC.webapp.pages.outgoingConnection().isPendingIconVisible(userA.fullName));
+  });
+
+  await test.step('Personal user A accepts request from C', async () => {
+    await pages.conversationList().openPendingConnectionRequest();
+    await pages.connectRequest().clickConnectButton();
+  });
+
+  await test.step('Personal user A send message to personal user C', async () => {
+    await sendTextMessageToUser(pageManager, userC, `Hello! ${userA.firstName} here.`);
+  });
+
+  await test.step('Personal user C can see the message from user A', async () => {
+    await pageManagerC.webapp.pages.conversationList().openConversation(userA.fullName);
+    expect(
+      await pageManagerC.webapp.pages.conversation().isMessageVisible(`Hello! ${userA.firstName} here.`),
+    ).toBeTruthy();
+  });
+
+  await test.step('Personal User A deletes their account', async () => {
     await components.conversationSidebar().clickPreferencesButton();
+    await pages.account().clickDeleteAccountButton();
+    expect(await modals.deleteAccount().isModalPresent());
+    expect(await modals.deleteAccount().getModalTitle()).toContain('Delete account');
+    expect(await modals.deleteAccount().getModalText()).toContain(
+      'We will send you an email. Follow the link to delete your account permanently.',
+    );
+
+    await modals.deleteAccount().clickDelete();
+    const url = await api.inbucket.getAccountDeletionURL(userA.email);
+
+    await pageManager.openNewTab(url, async tab => {
+      await tab.webapp.pages.deleteAccount().clickDeleteAccountButton();
+      expect(await tab.webapp.pages.deleteAccount().isAccountDeletedHeadlineVisible()).toBeTruthy();
+    });
   });
-
-  // Uncomment when [WPB-18496] is fixed
-  // await test.step('Personal User A deletes their account', async () => {
-  //   await pages.accountPage.clickDeleteAccountButton();
-  //   expect(await pages.deleteAccountModal.isModalPresent());
-  //   expect(await pages.deleteAccountModal.getModalTitle()).toContain('Delete account');
-  //   expect(await pages.deleteAccountModal.getModalText()).toContain(
-  //     'We will send you an email. Follow the link to delete your account permanently.',
-  //   );
-
-  //   await pages.deleteAccountModal.clickDelete();
-  //   const url = await api.inbucket.getAccountDeletionURL(userA.email);
-
-  //   await pages.openNewTab(url, async tab => {
-  //     await tab.deleteAccountPage.clickDeleteAccountButton();
-  //     expect(await tab.deleteAccountPage.isAccountDeletedHeadlineVisible());
-  //   });
-
-  //   expect(await pages.welcomePage.getLogoutReasonText()).toContain(
-  //     'You were signed out because your account was deleted',
-  //   );
-  // });
 });
 
 test.afterAll(async ({api}) => {
   await removeCreatedUser(api, userB);
+  await removeCreatedUser(api, userC);
 });
