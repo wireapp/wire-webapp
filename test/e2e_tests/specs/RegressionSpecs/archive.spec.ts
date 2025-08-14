@@ -30,8 +30,8 @@ const userB = getUser();
 const teamName = 'Archive Conversation';
 
 test(
-  'Archived Conversation should not unarchive with messages',
-  {tag: ['@TC-97', '@TC-99', '@TC-104', '@TC-105', '@regression', '@torun']},
+  'Archive status of conversation should only change by user explicitly changing it',
+  {tag: ['@TC-97', '@TC-99', '@TC-104', '@TC-105', '@regression']},
   async ({pageManager: ownerAPageManager, api, browser}) => {
     const {pages: ownerAPages, modals: ownerAModals, components: ownerAComponents} = ownerAPageManager.webapp;
     const userBContext = await browser.newContext();
