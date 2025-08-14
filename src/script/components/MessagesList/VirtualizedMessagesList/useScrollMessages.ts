@@ -17,120 +17,123 @@
  *
  */
 
-import {MutableRefObject, useEffect, useRef, useState} from 'react';
+import {MutableRefObject, useCallback, useLayoutEffect, useRef, useState} from 'react';
 
 import {Virtualizer} from '@tanstack/react-virtual';
-
-import {Conversation} from 'Repositories/entity/Conversation';
 
 import {StatusType} from '../../../message/StatusType';
 import {GroupedMessage, isMarker, Marker} from '../utils/virtualizedMessagesGroup';
 
 interface Props {
-  conversation: Conversation;
   messages: (Marker | GroupedMessage)[];
   highlightedMessage?: string;
   userId: string;
   conversationLastReadTimestamp: MutableRefObject<number>;
+  setAlreadyScrolledToLastMessage: (scrolled: boolean) => void;
 }
 
 export const useScrollMessages = (
   virtualizer: Virtualizer<HTMLDivElement, Element>,
-  {conversation, messages, highlightedMessage, userId, conversationLastReadTimestamp}: Props,
+  {messages, highlightedMessage, userId, conversationLastReadTimestamp, setAlreadyScrolledToLastMessage}: Props,
 ) => {
-  const hasInitialScrollRef = useRef(false);
-  const [hasScrolledToHighlightedMessage, setHasScrolledToHighlightedMessage] = useState(false);
+  const prevNbMessages = useRef(0);
+  const newNbMessages = messages.length;
 
-  // 🟡 Scroll to highlightedMessage ONCE — only once per mount
-  useEffect(() => {
-    if (!highlightedMessage || hasScrolledToHighlightedMessage) {
+  const initiallyScrolled = useRef(false);
+  const newMessagesCount = useRef(messages.length);
+
+  const scrollToMessage = useCallback(() => {
+    if (messages.length !== newMessagesCount.current) {
       return;
     }
 
-    const index = messages.findIndex(message => !isMarker(message) && message.message.id === highlightedMessage);
+    for (const message of messages) {
+      const lastUnreadMessageIndex = messages.findIndex(
+        message => message.timestamp > conversationLastReadTimestamp.current,
+      );
 
-    if (index === -1) {
-      return;
+      if (lastUnreadMessageIndex !== -1) {
+        requestAnimationFrame(() => {
+          virtualizer.scrollToIndex(lastUnreadMessageIndex, {align: 'start'});
+          initiallyScrolled.current = true;
+          setAlreadyScrolledToLastMessage(true);
+        });
+        break;
+      }
+
+      // If the message is before the last read timestamp, we scroll to the last message
+      if (message.timestamp <= conversationLastReadTimestamp.current) {
+        requestAnimationFrame(() => {
+          virtualizer.scrollToIndex(messages.length - 1, {align: 'end'});
+          initiallyScrolled.current = true;
+          setAlreadyScrolledToLastMessage(true);
+        });
+        break;
+      }
     }
+  }, [messages, virtualizer, setAlreadyScrolledToLastMessage]);
 
-    setHasScrolledToHighlightedMessage(true);
+  useLayoutEffect(() => {
+    if (!initiallyScrolled.current && messages.length > 0) {
+      scrollToMessage();
+    }
+  }, [messages.length, scrollToMessage]);
 
-    virtualizer.scrollToIndex(index, {align: 'center'});
-  }, [highlightedMessage, hasScrolledToHighlightedMessage, messages, virtualizer]);
+  const [scrollToHighlightedMessage, setScrollToHighlightedMessage] = useState(false);
 
-  // This function scroll to currently send message by self user.
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (messages.length === 0) {
       return;
     }
 
-    const lastMessage = messages[messages.length - 1];
+    const lastMessageItem = messages[newNbMessages - 1];
 
-    if (isMarker(lastMessage)) {
+    if (isMarker(lastMessageItem)) {
       return;
     }
 
-    const isSendingStatus = lastMessage.message.status() === StatusType.SENDING;
+    const lastMessage = lastMessageItem?.message;
 
-    if (virtualizer.isScrolling && !isSendingStatus) {
-      return;
-    }
+    const element = virtualizer.scrollElement;
+    const scrollTop = element?.scrollTop || 0;
+    const scrollHeight = element?.scrollHeight || 0;
+    const clientHeight = element?.clientHeight || 0;
 
-    if (isSendingStatus && lastMessage.message.user().id === userId) {
-      requestAnimationFrame(() => {
-        virtualizer.scrollToIndex(messages.length - 1);
-      });
-    }
-  }, [messages, userId, virtualizer]);
+    const distanceFromBottom = scrollHeight - scrollTop - clientHeight;
+    const shouldStickToBottom = distanceFromBottom < 100;
 
-  // This function scrolling to the first unread message or bottom to the message list on initialization.
-  useEffect(() => {
-    const shouldSkipInitialScroll = hasInitialScrollRef.current || messages.length === 0;
+    if (highlightedMessage && !scrollToHighlightedMessage) {
+      // If we have an element we want to focus
+      const index = messages.findIndex(message => !isMarker(message) && message.message.id === highlightedMessage);
 
-    if (shouldSkipInitialScroll) {
-      return;
-    }
-
-    const newMessages = messages.some(message => message.timestamp > conversationLastReadTimestamp.current);
-
-    let hasNewMessages = false;
-
-    const firstUnreadMessage = messages.findIndex((message, index) => {
-      if (isMarker(message)) {
-        if (message.type !== 'unread') {
-          return false;
-        }
-
-        const nextMessage = messages[index + 1];
-
-        if (nextMessage && !isMarker(nextMessage)) {
-          if (message.timestamp >= conversationLastReadTimestamp.current) {
-            hasNewMessages = true;
-            return true;
-          }
-
-          return false;
-        }
-
-        return false;
+      if (index !== -1) {
+        requestAnimationFrame(() => {
+          virtualizer.scrollToIndex(index, {align: 'center'});
+          setScrollToHighlightedMessage(true);
+        });
       }
-
-      const isFromSelf = message.message.from === userId;
-      const isAfterLastRead = message.timestamp > conversationLastReadTimestamp.current;
-
-      return isFromSelf ? message.timestamp >= conversationLastReadTimestamp.current : isAfterLastRead;
-    });
-
-    if (hasNewMessages) {
-      requestAnimationFrame(() => {
-        virtualizer.scrollToIndex(firstUnreadMessage + 1, {align: 'end'});
-        hasInitialScrollRef.current = true;
-      });
-    } else if (!newMessages) {
-      requestAnimationFrame(() => {
-        virtualizer.scrollToIndex(messages.length - 1, {align: 'end'});
-        hasInitialScrollRef.current = true;
-      });
+    } else if (shouldStickToBottom) {
+      // We only want to animate the scroll if there are new messages in the list
+      const nbNewMessages = newNbMessages - prevNbMessages.current;
+      if (nbNewMessages >= 1) {
+        // Simple content update, we just scroll to bottom if we are in the stick to bottom threshold
+        const index = messages.findIndex(message => !isMarker(message) && message.message.id === lastMessage.id);
+        if (index !== -1) {
+          requestAnimationFrame(() => {
+            virtualizer.scrollToIndex(index, {align: 'end'});
+          });
+        }
+      }
+    } else if (lastMessage && lastMessage?.status() === StatusType.SENDING && lastMessage.user().id === userId) {
+      // The self user just sent a message, we scroll straight to the bottom
+      const index = messages.findIndex(message => !isMarker(message) && message.message.id === lastMessage.id);
+      if (index !== -1) {
+        requestAnimationFrame(() => {
+          virtualizer.scrollToIndex(index, {align: 'end'});
+        });
+      }
     }
-  }, [conversation, userId, virtualizer, messages, conversationLastReadTimestamp]);
+
+    prevNbMessages.current = messages.length;
+  }, [highlightedMessage, messages, virtualizer, userId, newNbMessages, scrollToHighlightedMessage]);
 };

@@ -21,6 +21,7 @@ import {useLayoutEffect, useRef} from 'react';
 
 import {SerializedStyles, css} from '@emotion/react';
 
+import {ScrollToElement} from 'Components/MessagesList/Message/types';
 import {useRelativeTimestamp} from 'src/script/hooks/useRelativeTimestamp';
 
 import {dayMarkerStyle, baseMarkerStyle, notVirtualizedMarkerStyle} from './Marker.styles';
@@ -34,13 +35,12 @@ const markerStyles: Partial<Record<Marker['type'], SerializedStyles>> = {
   day: dayMarkerStyle,
 };
 
-interface Props<T> {
+interface Props {
   marker: Marker;
-  scrollTo: T;
-  // scrollTo: (isUnread: boolean) => void;
+  scrollTo?: ScrollToElement;
 }
 
-export const MarkerComponent = <T extends Function>({marker, scrollTo}: Props<T>) => {
+export const MarkerComponent = ({marker, scrollTo}: Props) => {
   const elementRef = useRef<HTMLDivElement>(null);
 
   const isDay = marker.type === 'day';
@@ -53,12 +53,8 @@ export const MarkerComponent = <T extends Function>({marker, scrollTo}: Props<T>
   `;
 
   useLayoutEffect(() => {
-    if (isVirtualizedMessagesListEnabled) {
-      if (marker.type === 'unread') {
-        scrollTo(true);
-      }
-    } else if (marker.type === 'unread' && elementRef.current) {
-      scrollTo({element: elementRef.current}, true);
+    if (!isVirtualizedMessagesListEnabled && marker.type === 'unread' && elementRef.current) {
+      scrollTo?.({element: elementRef.current}, true);
     }
   }, [isVirtualizedMessagesListEnabled]);
 
