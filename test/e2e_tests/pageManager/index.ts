@@ -58,6 +58,7 @@ import {HistoryImportPage} from './webapp/pages/historyImport.page';
 import {HistoryInfoPage} from './webapp/pages/infoHistory.page';
 import {LoginPage} from './webapp/pages/login.page';
 import {OutgoingConnectionPage} from './webapp/pages/outgoingConnection.page';
+import {ParticipantDetails} from './webapp/pages/participantDetails.page';
 import {RegisterSuccessPage} from './webapp/pages/registerSuccess.page';
 import {RegistrationPage} from './webapp/pages/registration.page';
 import {RequestResetPasswordPage} from './webapp/pages/requestResetPassword.page';
@@ -156,6 +157,8 @@ export class PageManager {
       historyInfo: () => this.getOrCreate('webapp.pages.infoHostory', () => new HistoryInfoPage(this.page)),
       historyExport: () => this.getOrCreate('webapp.pages.historyExport', () => new HistoryExportPage(this.page)),
       historyImport: () => this.getOrCreate('webapp.pages.historyImport', () => new HistoryImportPage(this.page)),
+      participantDetails: () =>
+        this.getOrCreate('webapp.pages.participantsDetails', () => new ParticipantDetails(this.page)),
       requestResetPassword: () =>
         this.getOrCreate('webapp.pages.requestResetPassword', () => new RequestResetPasswordPage(this.page)),
       resetPassword: () => this.getOrCreate('webapp.pages.resetPassword', () => new ResetPasswordPage(this.page)),
