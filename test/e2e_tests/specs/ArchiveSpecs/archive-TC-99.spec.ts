@@ -31,13 +31,15 @@ const teamName = 'Archive Conversation';
 
 test(
   'Archived Conversation should not unarchive with messages',
-  {tag: ['@TC-99', '@regression', '@torun']},
+  {tag: ['@TC-97', '@TC-99', '@TC-104', '@TC-105', '@regression', '@torun']},
   async ({pageManager: ownerAPageManager, api, browser}) => {
     const {pages: ownerAPages, modals: ownerAModals, components: ownerAComponents} = ownerAPageManager.webapp;
     const userBContext = await browser.newContext();
     const userBPage = await userBContext.newPage();
     const userBPageManager = PageManager.from(userBPage);
     const {pages: userBPages, modals: userBModals, components: userBComponents} = userBPageManager.webapp;
+
+    const conversationName = 'Our Group Conversation';
 
     await test.step('Preconditions: Users A and B exist', async () => {
       const user = await api.createTeamOwner(ownerA, teamName);
@@ -69,28 +71,54 @@ test(
       await userBModals.userProfile().clickStartConversation();
     });
 
-    await test.step('Users A has archives conversation with User B', async () => {
+    await test.step('Preconditions: Users have a group conversation', async () => {
+      await userBPages.conversationList().clickCreateGroup();
+      await userBPages.groupCreation().setGroupName(conversationName);
+      await userBPages.startUI().selectUsers([ownerA.username]);
+      await userBPages.groupCreation().clickCreateGroupButton();
+    });
+
+    await test.step('Users A has archives conversations with User B', async () => {
       await ownerAPages.conversationList().openContextMenu(userB.fullName);
       await ownerAPages.conversationList().archiveConversation();
+
+      await ownerAPages.conversationList().openContextMenu(conversationName);
+      await ownerAPages.conversationList().archiveConversation();
+
       await ownerAComponents.conversationSidebar().clickArchive();
       await ownerAPages.conversationList().isConversationItemVisible(userB.fullName);
+      await ownerAPages.conversationList().isConversationItemVisible(conversationName);
     });
 
-    await test.step('User B sends messages to the conversations', async () => {
+    await test.step('User B sends message, ping, and call to the 1:1 conversation', async () => {
       await userBPages.conversationList().openConversation(ownerA.fullName);
       await userBPages.conversation().sendMessage('Anything');
-    });
-
-    await test.step('User B pings User A in the conversations', async () => {
       await userBPages.conversation().sendPing();
+      await userBPages.conversation().clickCallButton();
     });
 
-    await test.step('User B calls the conversations', async () => {
-      await userBPages.conversation().clickCallButton();
+    await test.step('User B sends message and ping to the group conversation', async () => {
+      await userBPages.conversationList().openConversation(conversationName);
+      await userBPages.conversation().sendMessage('Anything');
+      await userBPages.conversation().sendPing();
     });
 
     await test.step('User A should still see conversation archived', async () => {
       await ownerAPages.conversationList().isConversationItemVisible(userB.fullName);
+    });
+
+    await test.step('User A unarchives conversation', async () => {
+      await ownerAPages.conversationList().openContextMenu(userB.fullName);
+      await ownerAPages.conversationList().unarchiveConversation();
+
+      await ownerAPages.conversationList().openContextMenu(conversationName);
+      await ownerAPages.conversationList().unarchiveConversation();
+    });
+
+    await test.step('User A should see conversation in the regular list', async () => {
+      await ownerAComponents.conversationSidebar().clickAllConversationsButton();
+      await ownerAPages.conversationList().isConversationItemVisible(userB.fullName);
+      await ownerAPages.conversationList().isConversationItemVisible(conversationName);
     });
   },
 );
