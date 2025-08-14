@@ -71,6 +71,7 @@ test('Personal Account Lifecycle', {tag: ['@TC-8638', '@crit-flow-web']}, async 
     const verificationCode = await api.brig.getActivationCodeForEmail(userA.email);
     expect(await pages.emailVerification().isEmailVerificationPageVisible()).toBeTruthy();
     await pages.emailVerification().enterVerificationCode(verificationCode);
+    await modals.marketingConsent().clickConfirmButton();
   });
 
   await test.step('Personal user A sets user name', async () => {
