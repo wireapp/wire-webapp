@@ -77,11 +77,20 @@ test(
     });
 
     await test.step('User B sends messages to the conversations', async () => {
-      //TBD
+      await userBPages.conversationList().openConversation(ownerA.fullName);
+      await userBPages.conversation().sendMessage('Anything');
+    });
+
+    await test.step('User B pings User A in the conversations', async () => {
+      await userBPages.conversation().sendPing();
+    });
+
+    await test.step('User B calls the conversations', async () => {
+      await userBPages.conversation().clickCallButton();
     });
 
     await test.step('User A should still see conversation archived', async () => {
-      //TBD
+      await ownerAPages.conversationList().isConversationItemVisible(userB.fullName);
     });
   },
 );
