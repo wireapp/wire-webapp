@@ -48,7 +48,7 @@ test(
       await inviteMembers([userB], ownerA, api);
     });
 
-    await test.step('Users A and B are signed in to the application', async () => {
+    await test.step('Preconditions: Users A and B are signed in to the application', async () => {
       await Promise.all([
         (async () => {
           await ownerAPageManager.openMainPage();
