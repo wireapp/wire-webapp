@@ -22,7 +22,7 @@ import {addCreatedUser, removeCreatedUser} from 'test/e2e_tests/utils/tearDown.u
 import {loginUser} from 'test/e2e_tests/utils/userActions';
 
 import {getUser} from '../../data/user';
-import {test} from '../../test.fixtures';
+import {test, expect} from '../../test.fixtures';
 
 // Generating test data
 // userB is the contact user, userA is the user who blocks
@@ -91,8 +91,25 @@ test('Block specs', {tag: ['@TC-141', '@regression']}, async ({pageManager: user
 
   await test.step('User B sends messages to group', async () => {
     await userBPages.conversationList().openConversation(conversationName);
-    // TODO: Bug [WPB-18226] Message is not visible in the conversation after sending it
-    //await userBPages.conversation().sendMessage(messageText);
+    await userBPages.conversation().sendMessage(messageText);
+  });
+
+  await test.step('User A does not see the 1:1 message', async () => {
+    await userAPages.conversationList().openConversation(userB.fullName);
+    await expect(userAPages.conversation().conversationTitle).toHaveText(userB.fullName, {timeout: 10_000});
+    expect(await userAPages.conversation().messageCount()).toBe(0);
+  });
+
+  await test.step('User A does see the group message', async () => {
+    await userAPages.conversationList().openConversation(conversationName);
+    await expect(userAPages.conversation().conversationTitle).toHaveText(conversationName, {timeout: 10_000});
+
+    // TODO: Bug [WPB-18226], remove these lines when fixed
+    await userAPageManager.refreshPage({waitUntil: 'load'});
+    await userAPages.conversationList().openConversation(conversationName);
+    await expect(userAPages.conversation().conversationTitle).toHaveText(conversationName, {timeout: 10_000});
+
+    expect(await userAPages.conversation().messageCount()).toBe(1);
   });
 });
 

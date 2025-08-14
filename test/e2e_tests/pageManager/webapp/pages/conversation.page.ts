@@ -319,4 +319,12 @@ export class ConversationPage {
   async clickAddMemberButton() {
     await this.addMemberButton.click();
   }
+
+  async messageCount() {
+    return await this.messages.count();
+  }
+
+  async getTitle() {
+    return await this.conversationTitle.innerText();
+  }
 }
