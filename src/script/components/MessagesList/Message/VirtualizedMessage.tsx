@@ -78,12 +78,11 @@ export interface MessageParams extends MessageActions {
   setMsgElementsFocusable: (isMsgElementsFocusable: boolean) => void;
 }
 
-export const Message = (props: MessageParams & {scrollTo?: () => void}) => {
+export const Message = (props: MessageParams) => {
   const {
     message,
     isHighlighted,
     hideHeader,
-    scrollTo,
     isFocused,
     handleFocus,
     handleArrowKeyDown,
@@ -99,7 +98,6 @@ export const Message = (props: MessageParams & {scrollTo?: () => void}) => {
       return;
     }
     if (isHighlighted) {
-      scrollTo?.();
       // for reply message, focus on the original message when original message link is clicked for keyboard users
       handleFocus(message.id);
     }

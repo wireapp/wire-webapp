@@ -59,7 +59,7 @@ export function generateAPIConversation({
     name,
     type: type,
     protocol: protocol,
-    qualified_id: id,
+    qualified_id: overwites.id && overwites.domain ? {id: overwites.id, domain: overwites.domain} : id,
     access: [],
     verification_state: ConversationVerificationState.UNVERIFIED,
     mlsVerificationState: ConversationVerificationState.UNVERIFIED,

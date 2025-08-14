@@ -354,6 +354,7 @@ describe('ConversationMapper', () => {
         ephemeral_timer: null,
         global_message_timer: null,
         id: conversationId,
+        domain: 'wire.com',
         is_guest: false,
         last_event_timestamp: 1545058511982,
         last_read_timestamp: 1545058511982,
@@ -373,7 +374,7 @@ describe('ConversationMapper', () => {
         access: [CONVERSATION_ACCESS.INVITE, CONVERSATION_ACCESS.CODE],
         access_role: CONVERSATION_LEGACY_ACCESS_ROLE.NON_ACTIVATED,
         creator: conversationCreatorId,
-        id: conversationId,
+        qualified_id: {domain: 'wire.com', id: conversationId},
         last_event_timestamp: new Date('1970-01-01T00:00:00.000Z').getTime(),
         members: {
           others: [
@@ -408,7 +409,7 @@ describe('ConversationMapper', () => {
     const remoteData: Partial<ConversationBackendData> = {
       access: [CONVERSATION_ACCESS.PRIVATE],
       creator: '532af01e-1e24-4366-aacf-33b67d4ee376',
-      id: 'de7466b0-985c-4dc3-ad57-17877db45b4c',
+      qualified_id: {domain: 'wire.com', id: 'de7466b0-985c-4dc3-ad57-17877db45b4c'},
       members: {
         others: [{id: '532af01e-1e24-4366-aacf-33b67d4ee376', status: 0}],
         self: {
@@ -436,6 +437,7 @@ describe('ConversationMapper', () => {
         cleared_timestamp: 0,
         ephemeral_timer: 0,
         id: 'de7466b0-985c-4dc3-ad57-17877db45b4c',
+        domain: 'wire.com',
         last_event_timestamp: 1488387380633,
         last_read_timestamp: 1488387380633,
         muted_state: NOTIFICATION_STATE.EVERYTHING,
@@ -450,7 +452,7 @@ describe('ConversationMapper', () => {
 
       expect(mergedConversation.creator).toBe(remoteData.creator);
       expect(mergedConversation.name).toBe(remoteData.name);
-      expect(mergedConversation.others[0]).toBe(remoteData.members.others[0].id);
+      expect(mergedConversation.others[0]).toBe(remoteData.members?.others[0].id);
       expect(mergedConversation.team_id).toBe(remoteData.team);
       expect(mergedConversation.type).toBe(remoteData.type);
 
@@ -477,7 +479,7 @@ describe('ConversationMapper', () => {
       };
 
       const remoteData2: ConversationBackendData = JSON.parse(JSON.stringify(remoteData));
-      remoteData2.id = createUuid();
+      remoteData2.qualified_id = {domain: 'wire.com', id: createUuid()};
 
       const [merged_conversation, merged_conversation_2] = ConversationMapper.mergeConversations(
         [localData] as ConversationDatabaseData[],
@@ -486,7 +488,7 @@ describe('ConversationMapper', () => {
 
       expect(merged_conversation.creator).toBe(remoteData.creator);
       expect(merged_conversation.name).toBe(remoteData.name);
-      expect(merged_conversation.others[0]).toBe(remoteData.members.others[0].id);
+      expect(merged_conversation.others[0]).toBe(remoteData.members?.others[0].id);
       expect(merged_conversation.type).toBe(remoteData.type);
 
       expect(merged_conversation.cleared_timestamp).toBe(localData.cleared_timestamp);
@@ -514,6 +516,7 @@ describe('ConversationMapper', () => {
     it('updates local message timer if present on the remote', () => {
       const baseConversation: Partial<ConversationDatabaseData> = {
         id: 'd5a39ffb-6ce3-4cc8-9048-0123456789abc',
+        qualified_id: {domain: 'wire.com', id: 'd5a39ffb-6ce3-4cc8-9048-0123456789abc'},
         members: {others: [], self: {} as any},
       };
       [
@@ -578,7 +581,6 @@ describe('ConversationMapper', () => {
         archived_state: false,
         archived_timestamp: 1487239601118,
         creator: '532af01e-1e24-4366-aacf-33b67d4ee376',
-        id: 'de7466b0-985c-4dc3-ad57-17877db45b4c',
         last_event_timestamp: 1,
         last_server_timestamp: 1,
         muted_state: 0,
@@ -588,6 +590,8 @@ describe('ConversationMapper', () => {
         roles: {},
         team_id: '5316fe03-24ee-4b19-b789-6d026bd3ce5f',
         type: 2,
+        domain: 'wire.com',
+        id: 'de7466b0-985c-4dc3-ad57-17877db45b4c',
       };
 
       expect(merged_conversation).toEqual(mergedConversation);

@@ -281,11 +281,7 @@ export const MessagesList: FC<MessagesListParams> = ({
           {groupedMessages.flatMap((group, groupIndex) => {
             if (isMarker(group)) {
               return (
-                <MarkerComponent<ScrollToElement>
-                  key={`${group.type}-${group.timestamp}`}
-                  scrollTo={scrollToElement}
-                  marker={group}
-                />
+                <MarkerComponent key={`${group.type}-${group.timestamp}`} scrollTo={scrollToElement} marker={group} />
               );
             }
             const {messages, firstMessageTimestamp} = group;
