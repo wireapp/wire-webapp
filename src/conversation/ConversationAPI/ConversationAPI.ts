@@ -101,6 +101,7 @@ export class ConversationAPI {
     SUBCONVERSATIONS: 'subconversations',
     GROUP_INFO: 'groupinfo',
     MLS: 'mls',
+    RESET_CONVERSATION: 'reset-conversation',
     JOIN: 'join',
     LIST: 'list',
     LIST_IDS: 'list-ids',
@@ -980,5 +981,15 @@ export class ConversationAPI {
     }
 
     return response.data;
+  }
+
+  public async resetMLSConversation({groupId, epoch}: {groupId: string; epoch: number}) {
+    const config: AxiosRequestConfig = {
+      method: 'post',
+      url: `/${ConversationAPI.URL.MLS}/${ConversationAPI.URL.RESET_CONVERSATION}`,
+      data: {group_id: groupId, epoch},
+    };
+
+    await this.client.sendJSON(config);
   }
 }

@@ -35,6 +35,7 @@ import {
   ConversationMLSMessageAddData,
 } from '../conversation/data/';
 import {ConversationAddPermissionUpdateData} from '../conversation/data/ConversationAddPermissionUpdateData';
+import {ConversationMLSResetData} from '../conversation/data/ConversationMLSResetData';
 import {ConversationProtocolUpdateData} from '../conversation/data/ConversationProtocolUpdateData';
 import {QualifiedId} from '../user';
 
@@ -53,6 +54,7 @@ export enum CONVERSATION_EVENT {
   OTR_MESSAGE_ADD = 'conversation.otr-message-add',
   MLS_MESSAGE_ADD = 'conversation.mls-message-add',
   MLS_WELCOME_MESSAGE = 'conversation.mls-welcome',
+  MLS_RESET = 'conversation.mls-reset',
   RECEIPT_MODE_UPDATE = 'conversation.receipt-mode-update',
   ADD_PERMISSION_UPDATE = 'conversation.add-permission-update',
   RENAME = 'conversation.rename',
@@ -72,6 +74,7 @@ export type ConversationEventData =
   | ConversationOtrMessageAddData
   | ConversationMLSWelcomeData
   | ConversationMLSMessageAddData
+  | ConversationMLSResetData
   | ConversationReceiptModeUpdateData
   | ConversationRenameData
   | ConversationTypingData
@@ -91,6 +94,7 @@ export type ConversationEvent =
   | ConversationMessageTimerUpdateEvent
   | ConversationOtrMessageAddEvent
   | ConversationMLSMessageAddEvent
+  | ConversationMLSResetEvent
   | ConversationMLSWelcomeEvent
   | ConversationReceiptModeUpdateEvent
   | ConversationRenameEvent
@@ -179,6 +183,11 @@ export interface ConversationMLSMessageAddEvent extends BaseConversationEvent {
 export interface ConversationMLSWelcomeEvent extends BaseConversationEvent {
   data: ConversationMLSWelcomeData;
   type: CONVERSATION_EVENT.MLS_WELCOME_MESSAGE;
+}
+
+export interface ConversationMLSResetEvent extends BaseConversationEvent {
+  data: ConversationMLSResetData;
+  type: CONVERSATION_EVENT.MLS_RESET;
 }
 
 export interface ConversationReceiptModeUpdateEvent extends BaseConversationEvent {
