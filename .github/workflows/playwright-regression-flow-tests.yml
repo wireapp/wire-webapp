@@ -3,7 +3,7 @@ name: Playwright Regression Flow Tests
 on:
   schedule:
     # we want to run this nightly on dev
-    - cron: '* 05 * * 1-5'
+    - cron: '0 05 * * 1-5'
   workflow_dispatch:
 
 jobs:
