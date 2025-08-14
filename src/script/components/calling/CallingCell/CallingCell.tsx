@@ -33,6 +33,7 @@ import {GroupVideoGrid} from 'Components/calling/GroupVideoGrid';
 import {useCallAlertState} from 'Components/calling/useCallAlertState';
 import {ConversationClassifiedBar} from 'Components/ClassifiedBar/ClassifiedBar';
 import * as Icon from 'Components/Icon';
+import {useCallGuard} from 'Hooks/useCallGuard/useCallGuard';
 import type {Call} from 'Repositories/calling/Call';
 import type {CallingRepository} from 'Repositories/calling/CallingRepository';
 import {CallingViewMode, CallState, MuteState} from 'Repositories/calling/CallState';
@@ -111,6 +112,8 @@ export const CallingCell = ({
     'display_name',
   ]);
   const {activeCallViewTab, viewMode} = useKoSubscribableChildren(callState, ['activeCallViewTab', 'viewMode']);
+
+  const guardCall = useCallGuard();
 
   const selfParticipant = call.getSelfParticipant();
 
@@ -219,8 +222,10 @@ export const CallingCell = ({
   const {showAlert, clearShowAlert} = useCallAlertState();
 
   const answerCall = () => {
-    callActions.answer(call);
-    setCurrentView(ViewType.MOBILE_LEFT_SIDEBAR);
+    guardCall(() => {
+      callActions.answer(call);
+      setCurrentView(ViewType.MOBILE_LEFT_SIDEBAR);
+    });
   };
 
   const answerOrRejectCall = useCallback(

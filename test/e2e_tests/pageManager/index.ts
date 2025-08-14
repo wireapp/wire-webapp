@@ -29,6 +29,7 @@ import {ConversationSidebar} from './webapp/components/conversationSidebar.compo
 import {InputBarControls} from './webapp/components/inputBarControls.component';
 import {AppLockModal} from './webapp/modals/appLock.modal';
 import {BlockWarningModal} from './webapp/modals/blockWarning.modal';
+import {CallNotEstablishedModal} from './webapp/modals/callNotEstablished.modal';
 import {ConfirmLogoutModal} from './webapp/modals/confirmLogout.modal';
 import {CopyPasswordModal} from './webapp/modals/copyPassword.modal';
 import {CreatGuestLinkModal} from './webapp/modals/createGuestLink.modal';
@@ -173,6 +174,8 @@ export class PageManager {
       appLock: () => this.getOrCreate('webapp.modals.appLock', () => new AppLockModal(this.page)),
       userProfile: () => this.getOrCreate('webapp.modals.userProfile', () => new UserProfileModal(this.page)),
       blockWarning: () => this.getOrCreate('webapp.modals.blockWarning', () => new BlockWarningModal(this.page)),
+      callNotEstablished: () =>
+        this.getOrCreate('webapp.modals.callNotEstablished', () => new CallNotEstablishedModal(this.page)),
       deleteAccount: () => this.getOrCreate('webapp.modals.deleteAccount', () => new DeleteAccountModal(this.page)),
       confirmLogout: () => this.getOrCreate('webapp.modals.confirmLogout', () => new ConfirmLogoutModal(this.page)),
       leaveConversation: () =>
