@@ -22,7 +22,7 @@ import {addMockCamerasToContext} from 'test/e2e_tests/utils/mockVideoDevice.util
 import {addCreatedTeam, removeCreatedTeam} from 'test/e2e_tests/utils/tearDown.util';
 
 import {getUser} from '../../data/user';
-import {test, expect} from '../../test.fixtures';
+import {expect, test} from '../../test.fixtures';
 import {loginUser} from '../../utils/userActions';
 import {generateSecurePassword, generateWireEmail} from '../../utils/userDataGenerator';
 
@@ -83,7 +83,7 @@ test('Account Management', {tag: ['@TC-8639', '@crit-flow-web']}, async ({pageMa
   });
 
   await test.step('Member verifies if applock is working', async () => {
-    await pageManager.refreshPage();
+    await pageManager.refreshPage({waitUntil: 'domcontentloaded'});
     expect(await modals.appLock().isVisible());
     expect(await modals.appLock().getAppLockModalHeader()).toContain('Enter passcode to unlock');
     expect(await modals.appLock().getAppLockModalText()).toContain('Passcode');
