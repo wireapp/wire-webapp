@@ -293,12 +293,28 @@ export class ConversationService extends TypedEventEmitter<Events> {
       users: undefined,
       qualified_users: undefined,
     });
+
     const {group_id: groupId, qualified_id: qualifiedId} = newConversation;
+
     if (!groupId) {
       throw new Error('No group_id found in response which is required for creating MLS conversations.');
     }
 
-    const failures = await this.mlsService.registerConversation(groupId, qualifiedUsers.concat(selfUserId), {
+    return this.establishMLSGroupConversation(groupId, qualifiedUsers, selfUserId, selfClientId, qualifiedId);
+  }
+
+  /**
+   * Will create a conversation on backend and register it to CoreCrypto once created
+   * @param conversationData
+   */
+  public async establishMLSGroupConversation(
+    groupId: string,
+    userIdsToAdd: QualifiedId[],
+    selfUserId: QualifiedId,
+    selfClientId: string,
+    conversationQualifiedId: QualifiedId,
+  ): Promise<BaseCreateConversationResponse> {
+    const failures = await this.mlsService.registerConversation(groupId, userIdsToAdd.concat(selfUserId), {
       creator: {
         user: selfUserId,
         client: selfClientId,
@@ -306,7 +322,7 @@ export class ConversationService extends TypedEventEmitter<Events> {
     });
 
     // We fetch the fresh version of the conversation created on backend with the newly added users
-    const conversation = await this.apiClient.api.conversation.getConversation(qualifiedId);
+    const conversation = await this.apiClient.api.conversation.getConversation(conversationQualifiedId);
 
     return {
       conversation,
