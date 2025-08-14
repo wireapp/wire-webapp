@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [27.75.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@27.74.0...@wireapp/api-client@27.75.0) (2025-08-14)
+
+### Features
+
+* **api-client:** Support for reset MLS event [WPB-17706] ([#7223](https://github.com/wireapp/wire-web-packages/issues/7223)) ([7951c4a](https://github.com/wireapp/wire-web-packages/commit/7951c4afa759d91fa1d61ab66660bc0c92563dfe))
+
 # [27.74.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@27.73.2...@wireapp/api-client@27.74.0) (2025-08-11)
 
 ### Features
