@@ -19,15 +19,19 @@
 
 import {Locator, Page} from '@playwright/test';
 
+import {selectByDataAttribute} from 'test/e2e_tests/utils/selector.util';
+
 export class EmailVerificationPage {
   readonly page: Page;
 
   readonly verificationCodeInput: Locator;
+  readonly verificationCodeInputLabel: Locator;
 
   constructor(page: Page) {
     this.page = page;
 
     this.verificationCodeInput = page.locator('input');
+    this.verificationCodeInputLabel = page.locator(selectByDataAttribute('label-with-email'));
   }
 
   // Doesn't work with headless chromium
@@ -42,5 +46,10 @@ export class EmailVerificationPage {
       await this.page.keyboard.press(code[i]);
     }
     await this.page.keyboard.press('Enter');
+  }
+
+  async isEmailVerificationPageVisible() {
+    await this.verificationCodeInputLabel.waitFor({state: 'visible'});
+    return true;
   }
 }

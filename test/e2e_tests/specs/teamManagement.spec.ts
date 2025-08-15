@@ -103,7 +103,7 @@ test(
 
     await test.step('Team owner completes email verification step of the team sign up process', async () => {
       const code = await api.inbucket.getVerificationCode(teamOwner.email);
-      await pages.emailVerification().enterVerificationCode(code);
+      await pageManager.webapp.pages.emailVerification().enterVerificationCode(code);
     });
 
     await test.step('Team owner adds team members on the team sign up page', async () => {
@@ -118,13 +118,13 @@ test(
     });
 
     await test.step('TC-2176 - Team owner sees congratulations step after successful sign up', async () => {
-      expect(await pages.registerSuccess().isTeamSignUpSuccessMessageVisible());
+      expect(await pageManager.webapp.pages.registerSuccess().isTeamSignUpSuccessMessageVisible());
     });
 
     await test.step('TC-2177 - Team owner can go to team settings on congratulations step of sign up form', async () => {
-      await pages.registerSuccess().clickManageTeamButton();
+      await pageManager.webapp.pages.registerSuccess().clickManageTeamButton();
       await modals.dataShareConsent().clickAgree();
-      await modals.marketingConsent().clickConfirmButton();
+      await pageManager.webapp.modals.marketingConsent().clickConfirmButton();
       expect(await pages.teams().isProfileIconVisible());
     });
 
