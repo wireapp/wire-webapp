@@ -162,6 +162,10 @@ export class PageManager {
       requestResetPassword: () =>
         this.getOrCreate('webapp.pages.requestResetPassword', () => new RequestResetPasswordPage(this.page)),
       resetPassword: () => this.getOrCreate('webapp.pages.resetPassword', () => new ResetPasswordPage(this.page)),
+      registerSuccess: () => this.getOrCreate('webapp.pages.registerSuccess', () => new RegisterSuccessPage(this.page)),
+      emailVerification: () =>
+        this.getOrCreate('webapp.pages.verification', () => new EmailVerificationPage(this.page)),
+      setUsername: () => this.getOrCreate('webapp.pages.setUsername', () => new SetUsernamePage(this.page)),
     },
     modals: {
       dataShareConsent: () =>
@@ -183,6 +187,8 @@ export class PageManager {
       createGuestLink: () =>
         this.getOrCreate('webapp.modals.createGuestLink', () => new CreatGuestLinkModal(this.page)),
       verifyEmail: () => this.getOrCreate('webapp.modals.verifyEmail', () => new VerifyEmailModal(this.page)),
+      marketingConsent: () =>
+        this.getOrCreate('webapp.modals.marketingConsent', () => new MarketingConsentModal(this.page)),
     },
     components: {
       conversationSidebar: () =>
@@ -199,15 +205,10 @@ export class PageManager {
       teamLogin: () => this.getOrCreate('tm.pages.teamLogin', () => new TeamLoginPage(this.page)),
       teamSignUp: () => this.getOrCreate('tm.pages.teamSignUp', () => new TeamSignUpPage(this.page)),
       teams: () => this.getOrCreate('tm.pages.teams', () => new TeamsPage(this.page)),
-      registerSuccess: () => this.getOrCreate('tm.pages.registerSuccess', () => new RegisterSuccessPage(this.page)),
-      emailVerification: () => this.getOrCreate('tm.pages.verification', () => new EmailVerificationPage(this.page)),
-      setUsername: () => this.getOrCreate('tm.pages.setUsername', () => new SetUsernamePage(this.page)),
     },
     modals: {
       dataShareConsent: () =>
         this.getOrCreate('tm.modals.dataShareConsent', () => new TeamDataShareConsentModal(this.page)),
-      marketingConsent: () =>
-        this.getOrCreate('tm.modals.marketingConsent', () => new MarketingConsentModal(this.page)),
     },
   } as const;
 }
