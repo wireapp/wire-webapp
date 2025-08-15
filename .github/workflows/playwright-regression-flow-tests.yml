@@ -3,7 +3,7 @@ name: Playwright Regression Flow Tests
 on:
   schedule:
     # we want to run this nightly on dev
-    - cron: '* 05 * * 1-5'
+    - cron: '0 05 * * 1-5'
   workflow_dispatch:
 
 jobs:
@@ -36,8 +36,8 @@ jobs:
         env:
           OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
 
-      - name: Run critical flow tests
-        run: yarn e2e-test --grep "@regression"
+      - name: Run regression tests
+        run: yarn e2e-test --grep "@regression|@crit-flow-web"
 
       - name: Upload test report
         if: always()

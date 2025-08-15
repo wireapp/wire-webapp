@@ -46,6 +46,7 @@ export class ConversationPage {
   readonly systemMessages: Locator;
   readonly callButton: Locator;
   readonly conversationInfoButton: Locator;
+  readonly pingButton: Locator;
   readonly messages: Locator;
 
   readonly getImageAltText = (user: User) => `Image from ${user.fullName}`;
@@ -75,6 +76,7 @@ export class ConversationPage {
     );
     this.callButton = page.locator(selectByDataAttribute('do-call'));
     this.conversationInfoButton = page.locator(selectByDataAttribute('do-open-info'));
+    this.pingButton = page.locator(selectByDataAttribute('do-ping'));
     this.messages = page.locator(
       `${selectByDataAttribute('item-message')} ${selectByClass('message-body')}:not(:has(p${selectByClass('text-foreground')})):has(${selectByClass('text')})`,
     );
@@ -326,5 +328,9 @@ export class ConversationPage {
 
   async getTitle() {
     return await this.conversationTitle.innerText();
+  }
+
+  async sendPing() {
+    await this.pingButton.click();
   }
 }
