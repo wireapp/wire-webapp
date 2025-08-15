@@ -29,7 +29,7 @@ import {ChannelAvatar} from 'Components/Avatar/ChannelAvatar';
 import {UserBlockedBadge} from 'Components/Badge';
 import {CellDescription} from 'Components/ConversationListCell/components/CellDescription';
 import {UserInfo} from 'Components/UserInfo';
-import {useCallGuard} from 'Hooks/useCallGuard/useCallGuard';
+import {useNoInternetCallGuard} from 'Hooks/useNoInternetCallGuard/useNoInternetCallGuard';
 import type {Conversation} from 'Repositories/entity/Conversation';
 import {MediaType} from 'Repositories/media/MediaType';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
@@ -92,7 +92,7 @@ export const ConversationListCell = ({
     'isGroupOrChannel',
   ]);
 
-  const guardCall = useCallGuard();
+  const guardCall = useNoInternetCallGuard();
 
   const {isChannelsEnabled} = useChannelsFeatureFlag();
   const isActive = isSelected(conversation);

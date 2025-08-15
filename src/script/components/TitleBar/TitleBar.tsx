@@ -30,7 +30,7 @@ import {ConversationVerificationBadges} from 'Components/Badge';
 import {useCallAlertState} from 'Components/calling/useCallAlertState';
 import * as Icon from 'Components/Icon';
 import {LegalHoldDot} from 'Components/LegalHoldDot';
-import {useCallGuard} from 'Hooks/useCallGuard/useCallGuard';
+import {useNoInternetCallGuard} from 'Hooks/useNoInternetCallGuard/useNoInternetCallGuard';
 import {CallState} from 'Repositories/calling/CallState';
 import {ConversationFilter} from 'Repositories/conversation/ConversationFilter';
 import {Conversation} from 'Repositories/entity/Conversation';
@@ -102,7 +102,7 @@ export const TitleBar: React.FC<TitleBarProps> = ({
     'display_name',
   ]);
 
-  const guardCall = useCallGuard();
+  const guardCall = useNoInternetCallGuard();
 
   const {isActivatedAccount} = useKoSubscribableChildren(selfUser, ['isActivatedAccount']);
   const {joinedCall, activeCalls} = useKoSubscribableChildren(callState, ['joinedCall', 'activeCalls']);

@@ -20,13 +20,13 @@
 import {useCallback} from 'react';
 
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
-import {styles} from 'Hooks/useCallGuard/useCallGuard.styles';
+import {styles} from 'Hooks/useNoInternetCallGuard/useNoInternetCallGuard.styles';
 import {t} from 'Util/LocalizerUtil';
 
 import {useWarningsState} from '../../view_model/WarningsContainer/WarningsState';
 import {TYPE} from '../../view_model/WarningsContainer/WarningsTypes';
 
-export const useCallGuard = () => {
+export const useNoInternetCallGuard = () => {
   const warnings = useWarningsState(state => state.warnings);
   const visibleWarning = warnings[warnings.length - 1];
 
