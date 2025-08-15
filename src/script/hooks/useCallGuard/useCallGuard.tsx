@@ -20,6 +20,7 @@
 import {useCallback} from 'react';
 
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
+import {styles} from 'Hooks/useCallGuard/useCallGuard.styles';
 import {t} from 'Util/LocalizerUtil';
 
 import {useWarningsState} from '../../view_model/WarningsContainer/WarningsState';
@@ -33,9 +34,9 @@ export const useCallGuard = () => {
     PrimaryModal.show(PrimaryModal.type.ACKNOWLEDGE, {
       text: {
         message: (
-          <span className="call-not-established-modal-text">
+          <span>
             {t('callNotEstablishedDescription')}
-            <ul>
+            <ul css={styles}>
               <li>{t('callNotEstablishedDescriptionPoint1')}</li>
               <li>{t('callNotEstablishedDescriptionPoint2')}</li>
               <li>{t('callNotEstablishedDescriptionPoint3')}</li>
