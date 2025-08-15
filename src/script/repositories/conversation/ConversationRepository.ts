@@ -46,6 +46,7 @@ import {
   CONVERSATION_EVENT,
   ConversationProtocolUpdateEvent,
   ConversationAddPermissionUpdateEvent,
+  ConversationMLSResetEvent,
 } from '@wireapp/api-client/lib/event';
 import {BackendErrorLabel} from '@wireapp/api-client/lib/http/';
 import type {BackendError} from '@wireapp/api-client/lib/http/';
@@ -1110,9 +1111,15 @@ export class ConversationRepository {
     return this.updateConversations(this.conversationState.archivedConversations());
   }
 
-  private async updateConversationFromBackend(conversationEntity: Conversation) {
+  private async updateConversationFromBackend(conversationEntity: Conversation): Promise<void> {
     const conversationData = await this.conversationService.getConversationById(conversationEntity);
-    const {name, message_timer, type} = conversationData;
+    const {name, message_timer, type, group_id: groupId, epoch} = conversationData;
+
+    if (groupId && typeof epoch === 'number') {
+      ConversationMapper.updateProperties(conversationEntity, {groupId, epoch});
+    }
+
+    ConversationMapper.updateProperties(conversationEntity, {name, type});
     ConversationMapper.updateProperties(conversationEntity, {name, type});
     ConversationMapper.updateSelfStatus(conversationEntity, {message_timer});
   }
@@ -2791,9 +2798,9 @@ export class ConversationRepository {
    * @returns Resolves with updated conversation entity
    */
   private async refreshConversationProtocolProperties(conversation: Conversation) {
-    //refetch the conversation to get all new fields (groupId, ciphersuite, epoch and new protocol)
+    // refetch the conversation to get all new fields (groupId, ciphersuite, epoch and new protocol)
     const remoteConversationData = await this.conversationService.getConversationById(conversation.qualifiedId);
-    //update fields that came after protocol update
+    // update fields that came after protocol update
     const {cipher_suite: cipherSuite, epoch, group_id: newGroupId, protocol: newProtocol} = remoteConversationData;
     const updatedConversation = ConversationMapper.updateProperties(conversation, {
       cipherSuite,
@@ -3192,7 +3199,11 @@ export class ConversationRepository {
 
     const inSelfConversation = this.conversationState.isSelfConversation(conversationId);
     if (inSelfConversation) {
-      const typesInSelfConversation = [CONVERSATION_EVENT.MEMBER_UPDATE, ClientEvent.CONVERSATION.MESSAGE_HIDDEN];
+      const typesInSelfConversation = [
+        CONVERSATION_EVENT.MEMBER_UPDATE,
+        CONVERSATION_EVENT.MLS_RESET,
+        ClientEvent.CONVERSATION.MESSAGE_HIDDEN,
+      ];
 
       const isExpectedType = typesInSelfConversation.includes(type);
       if (!isExpectedType) {
@@ -3405,6 +3416,9 @@ export class ConversationRepository {
 
       case CONVERSATION_EVENT.MLS_WELCOME_MESSAGE:
         return this.onMLSWelcomeMessage(conversationEntity);
+
+      case CONVERSATION_EVENT.MLS_RESET:
+        return this.onMLSResetMessage(conversationEntity, eventJson);
 
       case ClientEvent.CONVERSATION.ASSET_ADD:
         return this.onAssetAdd(conversationEntity, eventJson);
@@ -4099,6 +4113,28 @@ export class ConversationRepository {
     }
 
     await this.resolve1To1Conversation(otherUserId);
+  }
+
+  /**
+   * A user has reset an MLS Conversation.
+   * This means group id and epoch have changed, so we need to
+   * update the conversation to the latest group id and epoch.
+   *
+   * @param conversationEntity Conversation entity user has received a welcome message in
+   * @returns Resolves when the event was handled
+   */
+  private async onMLSResetMessage(conversationEntity: Conversation, eventJson: ConversationMLSResetEvent) {
+    try {
+      if (!isMLSConversation(conversationEntity)) {
+        return;
+      }
+
+      await this.core.service?.conversation.wipeMLSConversation(eventJson.data.group_id);
+
+      await this.refreshConversationProtocolProperties(conversationEntity);
+    } catch (error) {
+      this.logger.error(`Failed to reset MLS conversation ${conversationEntity.id}`, error);
+    }
   }
 
   /**
