@@ -22,7 +22,7 @@ import {config} from 'dotenv';
 
 config({path: './test/e2e_tests/.env'});
 
-const numberOfRetriesOnCI = 1;
+const numberOfRetriesOnCI = 2;
 const numberOfParallelWorkersOnCI = 1;
 
 /**
