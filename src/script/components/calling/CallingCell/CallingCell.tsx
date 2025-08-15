@@ -33,7 +33,7 @@ import {GroupVideoGrid} from 'Components/calling/GroupVideoGrid';
 import {useCallAlertState} from 'Components/calling/useCallAlertState';
 import {ConversationClassifiedBar} from 'Components/ClassifiedBar/ClassifiedBar';
 import * as Icon from 'Components/Icon';
-import {useCallGuard} from 'Hooks/useCallGuard/useCallGuard';
+import {useNoInternetCallGuard} from 'Hooks/useNoInternetCallGuard/useNoInternetCallGuard';
 import type {Call} from 'Repositories/calling/Call';
 import type {CallingRepository} from 'Repositories/calling/CallingRepository';
 import {CallingViewMode, CallState, MuteState} from 'Repositories/calling/CallState';
@@ -113,7 +113,7 @@ export const CallingCell = ({
   ]);
   const {activeCallViewTab, viewMode} = useKoSubscribableChildren(callState, ['activeCallViewTab', 'viewMode']);
 
-  const guardCall = useCallGuard();
+  const guardCall = useNoInternetCallGuard();
 
   const selfParticipant = call.getSelfParticipant();
 

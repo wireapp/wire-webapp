@@ -21,7 +21,7 @@ import {act, renderHook} from '@testing-library/react';
 
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 
-import {useCallGuard} from './useCallGuard';
+import {useNoInternetCallGuard} from './useNoInternetCallGuard';
 
 import {useWarningsState} from '../../view_model/WarningsContainer/WarningsState';
 import {TYPE} from '../../view_model/WarningsContainer/WarningsTypes';
@@ -39,14 +39,14 @@ jest.mock('Util/LocalizerUtil', () => ({
 
 const mockedUseWarningsState = jest.mocked(useWarningsState);
 
-describe('useCallGuard', () => {
+describe('useNoInternetCallGuard', () => {
   beforeEach(() => {
     jest.clearAllMocks();
   });
 
   it('should show modal and not call startCall when warning is NO_INTERNET', () => {
     mockedUseWarningsState.mockReturnValue([TYPE.NO_INTERNET]);
-    const {result} = renderHook(() => useCallGuard());
+    const {result} = renderHook(() => useNoInternetCallGuard());
     const startCall = jest.fn();
 
     act(() => {
@@ -65,7 +65,7 @@ describe('useCallGuard', () => {
 
   it('should call startCall when there is no warning', () => {
     mockedUseWarningsState.mockReturnValue([]);
-    const {result} = renderHook(() => useCallGuard());
+    const {result} = renderHook(() => useNoInternetCallGuard());
     const startCall = jest.fn();
 
     act(() => {
@@ -78,7 +78,7 @@ describe('useCallGuard', () => {
 
   it('should call startCall when warning is different from NO_INTERNET', () => {
     mockedUseWarningsState.mockReturnValue(['SOME_OTHER_WARNING']);
-    const {result} = renderHook(() => useCallGuard());
+    const {result} = renderHook(() => useNoInternetCallGuard());
     const startCall = jest.fn();
 
     act(() => {
@@ -91,7 +91,7 @@ describe('useCallGuard', () => {
 
   it('should update behavior when warnings change between renders', () => {
     mockedUseWarningsState.mockReturnValue([TYPE.NO_INTERNET]);
-    const {result, rerender} = renderHook(() => useCallGuard());
+    const {result, rerender} = renderHook(() => useNoInternetCallGuard());
     const startCall = jest.fn();
 
     act(() => {
@@ -111,7 +111,7 @@ describe('useCallGuard', () => {
 
   it('should work with different startCall implementations', () => {
     mockedUseWarningsState.mockReturnValue([]);
-    const {result} = renderHook(() => useCallGuard());
+    const {result} = renderHook(() => useNoInternetCallGuard());
     const startAudio = jest.fn();
     const startVideo = jest.fn();
 
