@@ -78,4 +78,17 @@ export class ConversationDetailsPage {
     await userLocator.waitFor({state: 'visible'});
     return userLocator.isVisible();
   }
+
+  async openParticipantDetails(fullName: string) {
+    const userLocator = await this.getLocatorByUser(fullName);
+    await userLocator.click();
+  }
+
+  async getLocatorByUser(fullName: string) {
+    const userLocator = this.page.locator(
+      `${selectById('conversation-details')} ${selectByDataAttribute('list-members')} ${selectByDataAttribute('item-user')}[data-uie-value="${fullName}"]`,
+    );
+    await userLocator.waitFor({state: 'visible'});
+    return userLocator;
+  }
 }

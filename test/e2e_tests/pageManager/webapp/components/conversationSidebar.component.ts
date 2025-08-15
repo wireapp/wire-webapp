@@ -62,6 +62,10 @@ export class ConversationSidebar {
     await this.connectButton.click();
   }
 
+  async isPageLoaded() {
+    await this.preferencesButton.waitFor({state: 'visible'});
+  }
+
   async clickArchive() {
     await this.archiveButton.click();
   }
