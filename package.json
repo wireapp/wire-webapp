@@ -15,7 +15,7 @@
     "@tanstack/react-virtual": "3.13.4",
     "@wireapp/avs": "10.0.46",
     "@wireapp/avs-debugger": "0.0.7",
-    "@wireapp/commons": "5.4.3",
+    "@wireapp/commons": "5.4.4",
     "@wireapp/core": "46.34.0",
     "@wireapp/kalium-backup": "0.0.4",
     "@wireapp/react-ui-kit": "9.63.0",
