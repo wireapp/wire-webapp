@@ -29,6 +29,7 @@ import {ConversationSidebar} from './webapp/components/conversationSidebar.compo
 import {InputBarControls} from './webapp/components/inputBarControls.component';
 import {AppLockModal} from './webapp/modals/appLock.modal';
 import {BlockWarningModal} from './webapp/modals/blockWarning.modal';
+import {CallNotEstablishedModal} from './webapp/modals/callNotEstablished.modal';
 import {ConfirmLogoutModal} from './webapp/modals/confirmLogout.modal';
 import {CopyPasswordModal} from './webapp/modals/copyPassword.modal';
 import {CreatGuestLinkModal} from './webapp/modals/createGuestLink.modal';
@@ -58,6 +59,7 @@ import {HistoryImportPage} from './webapp/pages/historyImport.page';
 import {HistoryInfoPage} from './webapp/pages/infoHistory.page';
 import {LoginPage} from './webapp/pages/login.page';
 import {OutgoingConnectionPage} from './webapp/pages/outgoingConnection.page';
+import {ParticipantDetails} from './webapp/pages/participantDetails.page';
 import {RegisterSuccessPage} from './webapp/pages/registerSuccess.page';
 import {RegistrationPage} from './webapp/pages/registration.page';
 import {RequestResetPasswordPage} from './webapp/pages/requestResetPassword.page';
@@ -156,9 +158,15 @@ export class PageManager {
       historyInfo: () => this.getOrCreate('webapp.pages.infoHostory', () => new HistoryInfoPage(this.page)),
       historyExport: () => this.getOrCreate('webapp.pages.historyExport', () => new HistoryExportPage(this.page)),
       historyImport: () => this.getOrCreate('webapp.pages.historyImport', () => new HistoryImportPage(this.page)),
+      participantDetails: () =>
+        this.getOrCreate('webapp.pages.participantsDetails', () => new ParticipantDetails(this.page)),
       requestResetPassword: () =>
         this.getOrCreate('webapp.pages.requestResetPassword', () => new RequestResetPasswordPage(this.page)),
       resetPassword: () => this.getOrCreate('webapp.pages.resetPassword', () => new ResetPasswordPage(this.page)),
+      registerSuccess: () => this.getOrCreate('webapp.pages.registerSuccess', () => new RegisterSuccessPage(this.page)),
+      emailVerification: () =>
+        this.getOrCreate('webapp.pages.verification', () => new EmailVerificationPage(this.page)),
+      setUsername: () => this.getOrCreate('webapp.pages.setUsername', () => new SetUsernamePage(this.page)),
     },
     modals: {
       dataShareConsent: () =>
@@ -166,6 +174,8 @@ export class PageManager {
       appLock: () => this.getOrCreate('webapp.modals.appLock', () => new AppLockModal(this.page)),
       userProfile: () => this.getOrCreate('webapp.modals.userProfile', () => new UserProfileModal(this.page)),
       blockWarning: () => this.getOrCreate('webapp.modals.blockWarning', () => new BlockWarningModal(this.page)),
+      callNotEstablished: () =>
+        this.getOrCreate('webapp.modals.callNotEstablished', () => new CallNotEstablishedModal(this.page)),
       deleteAccount: () => this.getOrCreate('webapp.modals.deleteAccount', () => new DeleteAccountModal(this.page)),
       confirmLogout: () => this.getOrCreate('webapp.modals.confirmLogout', () => new ConfirmLogoutModal(this.page)),
       leaveConversation: () =>
@@ -180,6 +190,8 @@ export class PageManager {
       createGuestLink: () =>
         this.getOrCreate('webapp.modals.createGuestLink', () => new CreatGuestLinkModal(this.page)),
       verifyEmail: () => this.getOrCreate('webapp.modals.verifyEmail', () => new VerifyEmailModal(this.page)),
+      marketingConsent: () =>
+        this.getOrCreate('webapp.modals.marketingConsent', () => new MarketingConsentModal(this.page)),
     },
     components: {
       conversationSidebar: () =>
@@ -196,15 +208,10 @@ export class PageManager {
       teamLogin: () => this.getOrCreate('tm.pages.teamLogin', () => new TeamLoginPage(this.page)),
       teamSignUp: () => this.getOrCreate('tm.pages.teamSignUp', () => new TeamSignUpPage(this.page)),
       teams: () => this.getOrCreate('tm.pages.teams', () => new TeamsPage(this.page)),
-      registerSuccess: () => this.getOrCreate('tm.pages.registerSuccess', () => new RegisterSuccessPage(this.page)),
-      emailVerification: () => this.getOrCreate('tm.pages.verification', () => new EmailVerificationPage(this.page)),
-      setUsername: () => this.getOrCreate('tm.pages.setUsername', () => new SetUsernamePage(this.page)),
     },
     modals: {
       dataShareConsent: () =>
         this.getOrCreate('tm.modals.dataShareConsent', () => new TeamDataShareConsentModal(this.page)),
-      marketingConsent: () =>
-        this.getOrCreate('tm.modals.marketingConsent', () => new MarketingConsentModal(this.page)),
     },
   } as const;
 }

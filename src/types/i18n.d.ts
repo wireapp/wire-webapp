@@ -381,6 +381,7 @@ declare module 'I18n/en-US.json' {
     'cells.emptySearchResults.heading': `No results found`;
     'cells.error.description': `The list of files couldn\'t be loaded. Please try again.`;
     'cells.error.heading': `Something went wrong loading`;
+    'cells.filePreviewButton.ariaLabel': `Preview for {name}`;
     'cells.filtersModal.accordion.tags': `Tags`;
     'cells.filtersModal.closeButton': `Close`;
     'cells.filtersModal.primaryAction': `Apply`;
@@ -392,7 +393,6 @@ declare module 'I18n/en-US.json' {
     'cells.filtersModal.title': `Filters`;
     'cells.folderBreadcrumbCombained': `Show more`;
     'cells.heading': `All files`;
-    'cells.filePreviewButton.ariaLabel': `Preview for {name}`;
     'cells.imageFullScreenModal.closeButton': `Close`;
     'cells.imageFullScreenModal.downloadButton': `Download`;
     'cells.modal.closeButton': `Close`;
@@ -671,6 +671,13 @@ declare module 'I18n/en-US.json' {
     'conversationFileUploadOverlayDescription': `Drag & drop to add files`;
     'conversationFileUploadOverlayTitle': `Upload files`;
     'conversationFileVideoPreviewLabel': `Video file preview for: {src}`;
+    'conversationFilterDrafts': `Drafts`;
+    'conversationFilterMentions': `Mentions`;
+    'conversationFilterNone': `No filter`;
+    'conversationFilterPings': `Pings`;
+    'conversationFilterReplies': `Replies`;
+    'conversationFilterTooltip': `Filter conversations`;
+    'conversationFilterUnread': `Unread`;
     'conversationFoldersEmptyText': `Add your conversations to folders to stay organized.`;
     'conversationFoldersEmptyTextLearnMore': `Learn more`;
     'conversationFooterArchive': `Archive`;
@@ -803,13 +810,6 @@ declare module 'I18n/en-US.json' {
     'conversationVideoAssetRestricted': `Receiving videos is prohibited`;
     'conversationViewAllConversations': `All conversations`;
     'conversationViewTooltip': `All`;
-    'conversationFilterNone': `No filter`;
-    'conversationFilterUnread': `Unread`;
-    'conversationFilterMentions': `Mentions`;
-    'conversationFilterReplies': `Replies`;
-    'conversationFilterDrafts': `Drafts`;
-    'conversationFilterPings': `Pings`;
-    'conversationFilterTooltip': `Filter conversations`;
     'conversationVoiceChannelDeactivate': ` called`;
     'conversationVoiceChannelDeactivateYou': ` called`;
     'conversationWithBlockedUser': `You blocked this user`;
@@ -2011,6 +2011,11 @@ declare module 'I18n/en-US.json' {
     'warningCallUpgradeBrowser': `To call, please update Google Chrome.`;
     'warningConnectivityConnectionLost': `Trying to connect. {brandName} may not be able to deliver messages.`;
     'warningConnectivityNoInternet': `No Internet. You won’t be able to send or receive messages.`;
+    'callNotEstablishedTitle': `Call Not Established`;
+    'callNotEstablishedDescription': `Wire\'s calling service is not reachable. Try the following:`;
+    'callNotEstablishedDescriptionPoint1': `Use another network (mobile data or Wi-Fi)`;
+    'callNotEstablishedDescriptionPoint2': `If you use a VPN, disconnect`;
+    'callNotEstablishedDescriptionPoint3': `If you are in a corporate network, check with your system admin`;
     'warningLearnMore': `Learn more`;
     'warningLifecycleUpdate': `A new version of {brandName} is available.`;
     'warningLifecycleUpdateLink': `Update now`;

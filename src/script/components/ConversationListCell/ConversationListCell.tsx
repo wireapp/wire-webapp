@@ -17,7 +17,7 @@
  *
  */
 
-import React, {useRef, useState, MouseEvent as ReactMouseEvent, KeyboardEvent as ReactKeyBoardEvent} from 'react';
+import React, {KeyboardEvent as ReactKeyBoardEvent, MouseEvent as ReactMouseEvent, useRef, useState} from 'react';
 
 import {CONVERSATION_ACCESS} from '@wireapp/api-client/lib/conversation/';
 import cx from 'classnames';
@@ -29,6 +29,7 @@ import {ChannelAvatar} from 'Components/Avatar/ChannelAvatar';
 import {UserBlockedBadge} from 'Components/Badge';
 import {CellDescription} from 'Components/ConversationListCell/components/CellDescription';
 import {UserInfo} from 'Components/UserInfo';
+import {useNoInternetCallGuard} from 'Hooks/useNoInternetCallGuard/useNoInternetCallGuard';
 import type {Conversation} from 'Repositories/entity/Conversation';
 import {MediaType} from 'Repositories/media/MediaType';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
@@ -91,6 +92,8 @@ export const ConversationListCell = ({
     'isGroupOrChannel',
   ]);
 
+  const guardCall = useNoInternetCallGuard();
+
   const {isChannelsEnabled} = useChannelsFeatureFlag();
   const isActive = isSelected(conversation);
 
@@ -108,7 +111,9 @@ export const ConversationListCell = ({
 
   const onClickJoinCall = (event: React.MouseEvent) => {
     event.preventDefault();
-    onJoinCall(conversation, MediaType.AUDIO);
+    guardCall(() => {
+      onJoinCall(conversation, MediaType.AUDIO);
+    });
   };
 
   const handleDivKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
