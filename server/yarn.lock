@@ -2523,6 +2523,17 @@ __metadata:
   languageName: node
   linkType: hard
 
+"fs-extra@npm:11.3.1":
+  version: 11.3.1
+  resolution: "fs-extra@npm:11.3.1"
+  dependencies:
+    graceful-fs: "npm:^4.2.0"
+    jsonfile: "npm:^6.0.1"
+    universalify: "npm:^2.0.0"
+  checksum: 10/2b893213411b1da11f9b061ccb0bcff4d6dd66fe90aa8f5b1616219a5e7ca659da869f454ebd8e94aa21c58342730fb43a2e5c98b5c6c5124f0c54a4633f64b0
+  languageName: node
+  linkType: hard
+
 "fs-extra@npm:^8.1.0":
   version: 8.1.0
   resolution: "fs-extra@npm:8.1.0"
@@ -5720,7 +5731,7 @@ __metadata:
     express: "npm:4.21.2"
     express-sitemap-xml: "npm:3.1.0"
     express-useragent: "npm:1.0.15"
-    fs-extra: "npm:11.3.0"
+    fs-extra: "npm:11.3.1"
     geolite2: "npm:1.3.0"
     hbs: "npm:4.2.0"
     helmet: "npm:8.1.0"
