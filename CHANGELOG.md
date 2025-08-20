@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [27.75.1](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@27.75.0...@wireapp/api-client@27.75.1) (2025-08-20)
+
+### Bug Fixes
+
+* **events:** add qualified_id to UserDeleteData type [WPB-18869] ([#7252](https://github.com/wireapp/wire-web-packages/issues/7252)) ([d0e0d0f](https://github.com/wireapp/wire-web-packages/commit/d0e0d0fcfcfa8585eccd0e01903eae348ae0de0b))
+
 # [27.75.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@27.74.0...@wireapp/api-client@27.75.0) (2025-08-14)
 
 ### Features
