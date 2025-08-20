@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [27.75.2](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@27.75.1...@wireapp/api-client@27.75.2) (2025-08-20)
+
+### Bug Fixes
+
+* Handle expired token gracefully(WPB-19368) ([#7254](https://github.com/wireapp/wire-web-packages/issues/7254)) ([e96c746](https://github.com/wireapp/wire-web-packages/commit/e96c7466b2f894316c625ae4dbb47e3150456858))
+
 ## [27.75.1](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@27.75.0...@wireapp/api-client@27.75.1) (2025-08-20)
 
 ### Bug Fixes
