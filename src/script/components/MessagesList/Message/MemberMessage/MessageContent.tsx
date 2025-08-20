@@ -143,9 +143,6 @@ function getContent(message: MemberMessageEntity) {
     }
 
     case CONVERSATION_EVENT.MEMBER_LEAVE: {
-      if (message.reason === MemberLeaveReason.USER_DELETED) {
-        return t('converstationMemberDeleted');
-      }
       if (message.reason === MemberLeaveReason.LEGAL_HOLD_POLICY_CONFLICT) {
         const replaceLinkLegalHold = replaceLink(
           Config.getConfig().URL.SUPPORT.LEGAL_HOLD_BLOCK,
@@ -187,6 +184,11 @@ function getContent(message: MemberMessageEntity) {
       if (!actor.id) {
         return t('conversationMemberWereRemoved', {users: allUsers}, {}, true);
       }
+
+      if (message.reason === MemberLeaveReason.USER_DELETED) {
+        return t('converstationMemberDeleted');
+      }
+
       return actor.isMe
         ? t('conversationMemberRemovedYou', {users: allUsers}, {}, true)
         : t('conversationMemberRemoved', {name, users: allUsers}, {}, true);
