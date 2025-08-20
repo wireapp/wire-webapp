@@ -60,6 +60,11 @@ export class BackendErrorMapper {
             'Authentication failed because the cookie and token is missing.',
           ),
         },
+        [BackendErrorLabel.CLIENT_ERROR]: {
+          'Failed reading: Invalid zauth token': new InvalidTokenError(
+            'Authentication failed because the token is invalid.',
+          ),
+        },
         [BackendErrorLabel.NOT_CONNECTED]: {
           'Users are not connected': new UnconnectedUserError('Users are not connected.'),
         },
@@ -91,6 +96,17 @@ export class BackendErrorMapper {
     };
   }
 
+  private static logUnmapped(error: BackendError, reason: string) {
+    if (process.env.NODE_ENV === 'development') {
+      console.warn('[BackendErrorMapper] Unmapped error:', {
+        code: error.code,
+        label: error.label,
+        message: error.message,
+        reason,
+      });
+    }
+  }
+
   public static map(error: BackendError): BackendError {
     try {
       const mappedError: BackendError | undefined =
@@ -98,9 +114,10 @@ export class BackendErrorMapper {
       if (mappedError) {
         return mappedError;
       }
-      return error;
+      this.logUnmapped(error, 'No matching entry found in error mapping');
     } catch (mappingError) {
-      return error;
+      this.logUnmapped(error, 'Error mapping lookup failed with exception');
     }
+    return error;
   }
 }
