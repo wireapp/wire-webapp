@@ -32,6 +32,8 @@ import {ClientState} from 'Repositories/client/ClientState';
 import {ConnectionEntity} from 'Repositories/connection/ConnectionEntity';
 import {CryptographyRepository} from 'Repositories/cryptography/CryptographyRepository';
 import {Conversation} from 'Repositories/entity/Conversation';
+import {Button} from 'Repositories/entity/message/Button';
+import {CompositeMessage} from 'Repositories/entity/message/CompositeMessage';
 import {ContentMessage} from 'Repositories/entity/message/ContentMessage';
 import {Message} from 'Repositories/entity/message/Message';
 import {Text} from 'Repositories/entity/message/Text';
@@ -129,6 +131,7 @@ describe('MessageRepository', () => {
     conversation.legalHoldStatus(LegalHoldStatus.DISABLED);
 
     conversation.selfUser(selfUser);
+    conversation.participating_user_ets.push(selfUser);
 
     return conversation;
   };
@@ -182,6 +185,51 @@ describe('MessageRepository', () => {
         }),
         targetMode: undefined,
         userIds: expect.any(Object),
+      });
+    });
+  });
+
+  describe('sendButtonAction', () => {
+    it('sends a button action confirmation message', async () => {
+      const [messageRepository, {core, eventRepository}] = await buildMessageRepository();
+      jest.spyOn(core.service!.conversation, 'send').mockResolvedValue(successPayload);
+      jest.spyOn(eventRepository, 'injectEvent').mockResolvedValue(undefined);
+
+      const theNewButton = [new Button('button1', 'Button 1')];
+      const originalMessage = new CompositeMessage(createUuid());
+
+      // Set the sender properly - this is the key fix
+      originalMessage.user(selfUser);
+      originalMessage.from = selfUser.id; // Set the from field
+
+      originalMessage.errorButtonId(undefined);
+      originalMessage.assets.push(...theNewButton);
+
+      const conversation = generateConversation();
+
+      // Make sure the sender is in the conversation's participating users
+      // This should already be done by generateConversation() which adds selfUser,
+      // but let's be explicit
+      if (!conversation.participating_user_ets().some(user => user.id === selfUser.id)) {
+        conversation.participating_user_ets().push(selfUser);
+      }
+
+      conversation.addMessage(originalMessage);
+
+      await messageRepository.sendButtonAction(conversation, originalMessage, 'button1');
+
+      expect(core.service!.conversation.send).toHaveBeenCalledWith({
+        conversationId: conversation.qualifiedId,
+        nativePush: false,
+        payload: expect.objectContaining({
+          buttonAction: expect.objectContaining({
+            buttonId: 'button1',
+            referenceMessageId: originalMessage.id,
+          }),
+        }),
+        protocol: expect.any(String),
+        recipients: [originalMessage.qualifiedFrom],
+        targetMode: expect.any(String),
       });
     });
   });

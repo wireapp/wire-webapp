@@ -1214,19 +1214,29 @@ export class MessageRepository {
   }
 
   sendButtonAction(conversation: Conversation, message: CompositeMessage, buttonId: string): void {
+    this.logger.info('Sending button action:', buttonId);
+    this.logger.info('Sending button message iscomposite:', message.isComposite());
+    this.logger.info('Sending button message assets:', message.assets);
     if (conversation.isSelfUserRemoved()) {
       return;
     }
+
     const senderId = message.qualifiedFrom;
     const senderInConversation = conversation
       .participating_user_ets()
       .some(user => matchQualifiedIds(senderId, user.qualifiedId));
+
+    this.logger.info('PreSender check Building......', senderId);
+    this.logger.info('Other users......', conversation.participating_user_ets());
+    this.logger.info('PreSender check Building, is it ?......', senderInConversation);
 
     if (!senderInConversation) {
       message.setButtonError(buttonId, t('buttonActionError'));
       message.waitingButtonId(undefined);
       return;
     }
+
+    this.logger.info('Building......', buttonId);
 
     const buttonMessage = MessageBuilder.buildButtonActionMessage({
       buttonId,
