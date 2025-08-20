@@ -17,36 +17,70 @@
  *
  */
 
-import {BackendErrorLabel} from './BackendErrorLabel';
 import {BackendErrorMapper} from './BackendErrorMapper';
 
-import {ConversationIsUnknownError} from '../conversation/ConversationError';
-import {UserIsUnknownError} from '../user/UserError';
+import {InvalidCredentialsError, MissingCookieError, SuspendedAccountError, TokenExpiredError} from '../auth/';
+import {ConversationIsUnknownError} from '../conversation/';
+import {UserIsUnknownError} from '../user/';
 
-import {StatusCode} from '.';
+import {BackendError, BackendErrorLabel, StatusCode} from './';
 
 describe('BackendErrorMapper', () => {
-  describe('"map"', () => {
-    it('maps backend error payloads into error objects', () => {
-      const userIdError = {
-        code: StatusCode.BAD_REQUEST,
-        label: BackendErrorLabel.CLIENT_ERROR,
-        message: "[path] 'usr' invalid: Failed reading: Invalid UUID",
-        name: '',
-      };
+  describe('Focused critical cases', () => {
+    it('maps "Authentication failed." to InvalidCredentialsError', () => {
+      const error = new BackendError(
+        'Authentication failed.',
+        BackendErrorLabel.INVALID_CREDENTIALS,
+        StatusCode.FORBIDDEN,
+      );
+      const mapped = BackendErrorMapper.map(error);
+      expect(mapped).toBeInstanceOf(InvalidCredentialsError);
+    });
 
-      const userError = BackendErrorMapper.map(userIdError);
-      expect(userError).toEqual(expect.any(UserIsUnknownError));
+    it('maps "Token expired" to TokenExpiredError', () => {
+      const error = new BackendError('Token expired', BackendErrorLabel.INVALID_CREDENTIALS, StatusCode.FORBIDDEN);
+      const mapped = BackendErrorMapper.map(error);
+      expect(mapped).toBeInstanceOf(TokenExpiredError);
+    });
 
-      const conversationIdError = {
-        code: StatusCode.BAD_REQUEST,
-        label: BackendErrorLabel.CLIENT_ERROR,
-        message: "[path] 'cnv' invalid: Failed reading: Invalid UUID",
-        name: '',
-      };
+    it('maps "Missing cookie" to MissingCookieError', () => {
+      const error = new BackendError('Missing cookie', BackendErrorLabel.INVALID_CREDENTIALS, StatusCode.FORBIDDEN);
+      const mapped = BackendErrorMapper.map(error);
+      expect(mapped).toBeInstanceOf(MissingCookieError);
+    });
 
-      const conversationError = BackendErrorMapper.map(conversationIdError);
-      expect(conversationError).toEqual(expect.any(ConversationIsUnknownError));
+    it('maps invalid conversation UUID to ConversationIsUnknownError', () => {
+      const error = new BackendError(
+        "[path] 'cnv' invalid: Failed reading: Invalid UUID",
+        BackendErrorLabel.CLIENT_ERROR,
+        StatusCode.BAD_REQUEST,
+      );
+      const mapped = BackendErrorMapper.map(error);
+      expect(mapped).toBeInstanceOf(ConversationIsUnknownError);
+    });
+
+    it('maps invalid user UUID to UserIsUnknownError', () => {
+      const error = new BackendError(
+        "[path] 'usr' invalid: Failed reading: Invalid UUID",
+        BackendErrorLabel.CLIENT_ERROR,
+        StatusCode.BAD_REQUEST,
+      );
+      const mapped = BackendErrorMapper.map(error);
+      expect(mapped).toBeInstanceOf(UserIsUnknownError);
+    });
+
+    it('maps suspended account to SuspendedAccountError', () => {
+      const error = new BackendError('Account suspended.', BackendErrorLabel.SUSPENDED_ACCOUNT, StatusCode.FORBIDDEN);
+      const mapped = BackendErrorMapper.map(error);
+      expect(mapped).toBeInstanceOf(SuspendedAccountError);
+    });
+  });
+
+  describe('Fallback behavior', () => {
+    it('returns original error when no mapping exists', () => {
+      const error = new BackendError('unknown message', BackendErrorLabel.CLIENT_ERROR, StatusCode.BAD_REQUEST);
+      const mapped = BackendErrorMapper.map(error);
+      expect(mapped).toBe(error);
     });
   });
 });
