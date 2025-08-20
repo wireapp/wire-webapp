@@ -17,6 +17,9 @@
  *
  */
 
+import {QualifiedId} from '../QualifiedId';
+
 export interface UserDeleteData {
   id: string;
+  qualified_id: QualifiedId;
 }
