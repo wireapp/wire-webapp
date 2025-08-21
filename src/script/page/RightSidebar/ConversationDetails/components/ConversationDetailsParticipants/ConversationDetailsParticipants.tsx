@@ -20,12 +20,11 @@
 import * as Icon from 'Components/Icon';
 import {ServiceList} from 'Components/ServiceList';
 import {UserList} from 'Components/UserList';
+import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
+import {Conversation} from 'Repositories/entity/Conversation';
+import {User} from 'Repositories/entity/User';
+import {ServiceEntity} from 'Repositories/integration/ServiceEntity';
 import {t} from 'Util/LocalizerUtil';
-
-import {ConversationRepository} from '../../../../../conversation/ConversationRepository';
-import {Conversation} from '../../../../../entity/Conversation';
-import {User} from '../../../../../entity/User';
-import {ServiceEntity} from '../../../../../integration/ServiceEntity';
 
 interface ConversationDetailsParticipantsProps {
   activeConversation: Conversation;

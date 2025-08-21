@@ -20,15 +20,14 @@
 import React, {Fragment} from 'react';
 
 import {FadingScrollbar} from 'Components/FadingScrollbar';
-import {ContentMessage} from 'src/script/entity/message/ContentMessage';
+import {Conversation} from 'Repositories/entity/Conversation';
+import {ContentMessage} from 'Repositories/entity/message/ContentMessage';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 import {formatLocale, isThisYear, isToday} from 'Util/TimeUtil';
 import {noop} from 'Util/util';
 
 import {CollectionItem} from './CollectionItem';
-
-import {Conversation} from '../../../../entity/Conversation';
 
 interface CollectionDetailsProps {
   conversation: Conversation;

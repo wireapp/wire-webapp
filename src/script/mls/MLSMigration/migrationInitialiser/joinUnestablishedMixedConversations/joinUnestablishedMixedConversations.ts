@@ -21,8 +21,8 @@ import {QualifiedId} from '@wireapp/api-client/lib/user';
 
 import {Account} from '@wireapp/core';
 
-import {isMixedConversation, MixedConversation} from 'src/script/conversation/ConversationSelectors';
-import {Conversation} from 'src/script/entity/Conversation';
+import {isMixedConversation, MixedConversation} from 'Repositories/conversation/ConversationSelectors';
+import {Conversation} from 'Repositories/entity/Conversation';
 import {initMLSGroupConversation} from 'src/script/mls/MLSConversations';
 
 import {mlsMigrationLogger} from '../../MLSMigrationLogger';
@@ -61,7 +61,7 @@ export const joinUnestablishedMixedConversation = async (
   shouldRetry = true,
 ) => {
   if (mixedConversation.epoch > 0) {
-    return initMLSGroupConversation(mixedConversation, {
+    return initMLSGroupConversation(mixedConversation, selfUserId, {
       core,
       onError: ({id}, error) =>
         mlsMigrationLogger.error(`Failed when joining a mls group of mixed conversation with id ${id}, error: `, error),

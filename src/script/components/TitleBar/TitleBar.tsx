@@ -17,21 +17,25 @@
  *
  */
 
-import React, {useMemo, useEffect, useCallback, useRef} from 'react';
+import React, {useCallback, useEffect, useMemo, useRef} from 'react';
 
-import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
 import {amplify} from 'amplify';
 import cx from 'classnames';
 import {container} from 'tsyringe';
 
-import {IconButton, IconButtonVariant, QUERY, useMatchMedia, CallIcon} from '@wireapp/react-ui-kit';
+import {CallIcon, IconButton, IconButtonVariant, QUERY, TabIndex, useMatchMedia} from '@wireapp/react-ui-kit';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {ConversationVerificationBadges} from 'Components/Badge';
 import {useCallAlertState} from 'Components/calling/useCallAlertState';
 import * as Icon from 'Components/Icon';
 import {LegalHoldDot} from 'Components/LegalHoldDot';
-import {User} from 'src/script/entity/User';
+import {useNoInternetCallGuard} from 'Hooks/useNoInternetCallGuard/useNoInternetCallGuard';
+import {CallState} from 'Repositories/calling/CallState';
+import {ConversationFilter} from 'Repositories/conversation/ConversationFilter';
+import {Conversation} from 'Repositories/entity/Conversation';
+import {User} from 'Repositories/entity/User';
+import {TeamState} from 'Repositories/team/TeamState';
 import {useAppMainState, ViewType} from 'src/script/page/state';
 import {ContentState} from 'src/script/page/useAppState';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
@@ -40,12 +44,8 @@ import {t} from 'Util/LocalizerUtil';
 import {matchQualifiedIds} from 'Util/QualifiedId';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 
-import {CallState} from '../../calling/CallState';
-import {ConversationFilter} from '../../conversation/ConversationFilter';
-import {Conversation} from '../../entity/Conversation';
 import {RightSidebarParams} from '../../page/AppMain';
-import {PanelState} from '../../page/RightSidebar/RightSidebar';
-import {TeamState} from '../../team/TeamState';
+import {PanelState} from '../../page/RightSidebar';
 import {Shortcut} from '../../ui/Shortcut';
 import {ShortcutType} from '../../ui/ShortcutType';
 import {CallActions} from '../../view_model/CallingViewModel';
@@ -101,6 +101,8 @@ export const TitleBar: React.FC<TitleBarProps> = ({
     'hasLegalHold',
     'display_name',
   ]);
+
+  const guardCall = useNoInternetCallGuard();
 
   const {isActivatedAccount} = useKoSubscribableChildren(selfUser, ['isActivatedAccount']);
   const {joinedCall, activeCalls} = useKoSubscribableChildren(callState, ['joinedCall', 'activeCalls']);
@@ -197,9 +199,15 @@ export const TitleBar: React.FC<TitleBarProps> = ({
 
   const onClickDetails = () => showDetails(false);
 
+  const startCallAndShowAlert = () => {
+    guardCall(() => {
+      callActions.startAudio(conversation);
+      showStartedCallAlert(isGroupOrChannel);
+    });
+  };
+
   const onClickStartAudio = () => {
-    callActions.startAudio(conversation);
-    showStartedCallAlert(isGroupOrChannel);
+    startCallAndShowAlert();
 
     if (smBreakpoint) {
       setLeftSidebar();
@@ -295,8 +303,7 @@ export const TitleBar: React.FC<TitleBarProps> = ({
             aria-label={t('tooltipConversationCall')}
             onClick={event => {
               currentFocusedElementRef.current = event.target as HTMLButtonElement;
-              callActions.startAudio(conversation);
-              showStartedCallAlert(isGroupOrChannel);
+              startCallAndShowAlert();
             }}
             data-uie-name="do-call"
             disabled={isReadOnlyConversation}

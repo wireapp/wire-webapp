@@ -23,12 +23,18 @@ import {styleBreakpoint} from '../common/styleBreakpoint/styleBreakpoint';
 
 export const wrapperStyles: CSSObject = {
   maxWidth: '100%',
+  overflowX: 'auto',
+  marginBottom: 'auto',
 };
 
 export const tableStyles: CSSObject = {
   width: '100%',
   borderCollapse: 'collapse',
   tableLayout: 'fixed',
+
+  [`@media (min-width: ${styleBreakpoint}px)`]: {
+    minWidth: '1000px',
+  },
 };
 
 export const headerCellStyles: CSSObject = {

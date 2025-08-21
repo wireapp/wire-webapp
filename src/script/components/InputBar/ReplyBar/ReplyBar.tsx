@@ -19,17 +19,16 @@
 
 /* eslint-disable jsx-a11y/no-noninteractive-tabindex */
 
-import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
+import {TabIndex} from '@wireapp/react-ui-kit';
 
 import {RestrictedVideo} from 'Components/asset/RestrictedVideo';
 import {ParticipantMicOnIcon} from 'Components/calling/ParticipantMicOnIcon';
 import * as Icon from 'Components/Icon';
 import {AssetImage} from 'Components/Image';
+import {ContentMessage} from 'Repositories/entity/message/ContentMessage';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 import {renderMessage} from 'Util/messageRenderer';
-
-import {ContentMessage} from '../../../entity/message/ContentMessage';
 
 interface ReplyBarProps {
   replyMessageEntity: ContentMessage;

@@ -24,8 +24,8 @@ import {container} from 'tsyringe';
 
 import {Button, Input, Switch} from '@wireapp/react-ui-kit';
 
+import {ConversationState} from 'Repositories/conversation/ConversationState';
 import {Config, Configuration} from 'src/script/Config';
-import {ConversationState} from 'src/script/conversation/ConversationState';
 import {useClickOutside} from 'src/script/hooks/useClickOutside';
 
 import {wrapperStyles} from './ConfigToolbar.styles';

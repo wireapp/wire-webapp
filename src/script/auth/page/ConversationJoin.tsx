@@ -312,7 +312,6 @@ const ConversationJoinComponent = ({
 type ConnectedProps = ReturnType<typeof mapStateToProps>;
 const mapStateToProps = (state: RootState) => ({
   isFetchingAuth: AuthSelector.isFetching(state),
-  isAuthenticated: AuthSelector.isAuthenticated(state),
   hasLoadedClients: ClientSelector.hasLoadedClients(state),
   isFetchingConversation: ConversationSelector.isFetching(state),
   isTemporaryGuest: SelfSelector.isTemporaryGuest(state),

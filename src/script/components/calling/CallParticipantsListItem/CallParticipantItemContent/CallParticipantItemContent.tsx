@@ -19,11 +19,11 @@
 
 import React from 'react';
 
-import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
+import {TabIndex} from '@wireapp/react-ui-kit';
 
 import * as Icon from 'Components/Icon';
 import {UserInfo} from 'Components/UserInfo';
-import {User} from 'src/script/entity/User';
+import {User} from 'Repositories/entity/User';
 import {t} from 'Util/LocalizerUtil';
 import {capitalizeFirstChar} from 'Util/StringUtil';
 

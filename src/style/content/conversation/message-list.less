@@ -25,7 +25,10 @@
 }
 
 .messages {
-  transform: translateZ(0);
+  &.message-wrapper {
+    transform: translateZ(0);
+  }
+
   &.flex-center {
     flex-wrap: wrap;
     margin: auto;
@@ -57,7 +60,7 @@
     .accent-selection;
   }
 
-  &:last-child {
+  &.message-wrapper:last-child {
     margin-bottom: 40px;
   }
 
@@ -548,10 +551,13 @@
   flex-direction: column;
   align-items: center;
   margin-top: 32px;
-  margin-bottom: 48px;
 
   .message-services-warning {
     margin-top: 32px;
+  }
+
+  &.message-wrapper {
+    margin-bottom: 48px;
   }
 }
 

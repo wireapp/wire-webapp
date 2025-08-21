@@ -26,6 +26,12 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 import * as Icon from 'Components/Icon';
 import {PanelActions} from 'Components/panel/PanelActions';
 import {ReceiptModeToggle} from 'Components/toggle/ReceiptModeToggle';
+import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
+import {ConversationRoleRepository} from 'Repositories/conversation/ConversationRoleRepository';
+import {isMLSConversation} from 'Repositories/conversation/ConversationSelectors';
+import {Conversation} from 'Repositories/entity/Conversation';
+import {User} from 'Repositories/entity/User';
+import {TeamState} from 'Repositories/team/TeamState';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 import {replaceReactComponents} from 'Util/LocalizerUtil/ReactLocalizerUtil';
@@ -33,12 +39,6 @@ import {useChannelsFeatureFlag} from 'Util/useChannelsFeatureFlag';
 
 import {ConversationDetailsOption} from './ConversationDetailsOption';
 
-import {ConversationRepository} from '../../../../../conversation/ConversationRepository';
-import {ConversationRoleRepository} from '../../../../../conversation/ConversationRoleRepository';
-import {isMLSConversation} from '../../../../../conversation/ConversationSelectors';
-import {Conversation} from '../../../../../entity/Conversation';
-import {User} from '../../../../../entity/User';
-import {TeamState} from '../../../../../team/TeamState';
 import {ActionsViewModel} from '../../../../../view_model/ActionsViewModel';
 import {PanelEntity, PanelState} from '../../../RightSidebar';
 import {getConversationActions} from '../../utils/getConversationActions';

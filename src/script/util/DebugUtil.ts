@@ -28,7 +28,7 @@ import {
   USER_EVENT,
 } from '@wireapp/api-client/lib/event/';
 import type {Notification, NotificationList} from '@wireapp/api-client/lib/notification/';
-import {FeatureStatus} from '@wireapp/api-client/lib/team/feature/';
+import {FEATURE_KEY, FeatureStatus} from '@wireapp/api-client/lib/team/feature/';
 import type {QualifiedId} from '@wireapp/api-client/lib/user';
 import {NotificationSource} from '@wireapp/core/lib/notification';
 import {DatabaseKeys} from '@wireapp/core/lib/notification/NotificationDatabaseRepository';
@@ -40,36 +40,37 @@ import {container} from 'tsyringe';
 
 import {AvsDebugger} from '@wireapp/avs-debugger';
 
+import {CallingRepository} from 'Repositories/calling/CallingRepository';
+import {CallState} from 'Repositories/calling/CallState';
+import {Participant} from 'Repositories/calling/Participant';
+import {ClientRepository} from 'Repositories/client';
+import {ClientState} from 'Repositories/client/ClientState';
+import {ConnectionRepository} from 'Repositories/connection/ConnectionRepository';
+import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
+import {isMLSCapableConversation} from 'Repositories/conversation/ConversationSelectors';
+import {ConversationState} from 'Repositories/conversation/ConversationState';
+import type {MessageRepository} from 'Repositories/conversation/MessageRepository';
+import {Conversation} from 'Repositories/entity/Conversation';
+import {User} from 'Repositories/entity/User';
+import {EventRepository} from 'Repositories/event/EventRepository';
+import {PropertiesRepository} from 'Repositories/properties/PropertiesRepository';
+import {PROPERTIES_TYPE} from 'Repositories/properties/PropertiesType';
+import {EventRecord, StorageRepository, StorageSchemata} from 'Repositories/storage';
+import {TeamState} from 'Repositories/team/TeamState';
+import {disableForcedErrorReporting} from 'Repositories/tracking/Telemetry.helpers';
+import {UserRepository} from 'Repositories/user/UserRepository';
+import {UserState} from 'Repositories/user/UserState';
 import {getStorage} from 'Util/localStorage';
 import {getLogger, Logger} from 'Util/Logger';
 
 import {TIME_IN_MILLIS} from './TimeUtil';
 import {createUuid} from './uuid';
 
-import {CallingRepository} from '../calling/CallingRepository';
-import {CallState} from '../calling/CallState';
-import {Participant} from '../calling/Participant';
-import {ClientRepository} from '../client';
-import {ClientState} from '../client/ClientState';
-import {ConnectionRepository} from '../connection/ConnectionRepository';
-import {ConversationRepository} from '../conversation/ConversationRepository';
-import {isMLSCapableConversation} from '../conversation/ConversationSelectors';
-import {ConversationState} from '../conversation/ConversationState';
-import type {MessageRepository} from '../conversation/MessageRepository';
+import {Config} from '../Config';
 import {E2EIHandler} from '../E2EIdentity';
-import {Conversation} from '../entity/Conversation';
-import {User} from '../entity/User';
-import {EventRepository} from '../event/EventRepository';
 import {checkVersion} from '../lifecycle/newVersionHandler';
-import {PropertiesRepository} from '../properties/PropertiesRepository';
-import {PROPERTIES_TYPE} from '../properties/PropertiesType';
 import {APIClient} from '../service/APIClientSingleton';
 import {Core} from '../service/CoreSingleton';
-import {EventRecord, StorageRepository, StorageSchemata} from '../storage';
-import {TeamState} from '../team/TeamState';
-import {disableForcedErrorReporting} from '../tracking/Telemetry.helpers';
-import {UserRepository} from '../user/UserRepository';
-import {UserState} from '../user/UserState';
 import {ViewModelRepositories} from '../view_model/MainViewModel';
 
 export class DebugUtil {
@@ -239,11 +240,15 @@ export class DebugUtil {
   }
 
   reconnectWebSocket({dryRun} = {dryRun: false}) {
-    return this.eventRepository.connectWebSocket(this.core, () => {}, dryRun);
+    const teamFeatures = this.teamState.teamFeatures();
+    const useAsyncNotificationStream =
+      teamFeatures?.[FEATURE_KEY.CONSUMABLE_NOTIFICATIONS]?.status === FeatureStatus.ENABLED &&
+      Config.getConfig().FEATURE.USE_ASYNC_NOTIFICATIONS;
+    const useLegacyNotificationStream = !useAsyncNotificationStream;
+    return this.eventRepository.connectWebSocket(this.core, useLegacyNotificationStream, () => {}, dryRun);
   }
 
   async reconnectWebSocketWithLastNotificationIdFromBackend({dryRun} = {dryRun: false}) {
-    await this.core.service?.notification.initializeNotificationStream(this.clientState.currentClient!.id);
     return this.reconnectWebSocket({dryRun});
   }
 

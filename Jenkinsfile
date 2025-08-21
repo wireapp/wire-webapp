@@ -152,22 +152,5 @@ pipeline {
             }
         }
     }
-
-        stage('Trigger smoke test') {
-          steps {
-            build job: 'Webapp_Smoke_Chrome', parameters: [string(name: 'TAGS', value: '@smoke'), string(name: 'GIT_BRANCH', value: 'web-dev'), string(name: 'webappApplicationPath', value: "$webappApplicationPath")]
-          }
-        }
-    }
-
-  // post {
-  //     success {
-  //         wireSend secret: env.WIRE_BOT_SECRET, message: "✅ **Build finished for branch '$env.webappApplicationPath'**"
-  //     }
-  //     failure {
-  //         script {
-  //             wireSend(secret: env.WIRE_BOT_SECRET, message: "❌ **$BRANCH_NAME**\n[$CHANGE_TITLE](${CHANGE_URL})\nBuild aborted or failed! See [Github Actions](${env.GITHUB_ACTION_URL})")
-  //         }
-  //     }
-  // }
+  }
 }

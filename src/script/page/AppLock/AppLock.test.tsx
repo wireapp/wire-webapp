@@ -24,15 +24,14 @@ import ko from 'knockout';
 
 import {WebAppEvents} from '@wireapp/webapp-events';
 
+import type {ClientRepository} from 'Repositories/client';
+import {TeamState} from 'Repositories/team/TeamState';
+import {AppLockRepository} from 'Repositories/user/AppLockRepository';
+import {AppLockState} from 'Repositories/user/AppLockState';
+import {UserState} from 'Repositories/user/UserState';
 import {createUuid} from 'Util/uuid';
 
 import {AppLock, APPLOCK_STATE} from './AppLock';
-
-import type {ClientRepository} from '../../client';
-import {TeamState} from '../../team/TeamState';
-import {AppLockRepository} from '../../user/AppLockRepository';
-import {AppLockState} from '../../user/AppLockState';
-import {UserState} from '../../user/UserState';
 
 // https://github.com/jedisct1/libsodium.js/issues/235
 jest.mock('libsodium-wrappers', () => ({

@@ -18,7 +18,7 @@
  */
 
 import {Avatar, AVATAR_SIZE} from 'Components/Avatar';
-import {User} from 'src/script/entity/User';
+import {User} from 'Repositories/entity/User';
 
 interface InputBarAvatarProps {
   selfUser: User;

@@ -17,10 +17,13 @@
  *
  */
 
-import {PlayIcon} from '@wireapp/react-ui-kit';
+import {QualifiedId} from '@wireapp/api-client/lib/user/';
+
+import {FolderIcon, PlayIcon} from '@wireapp/react-ui-kit';
 
 import {FileTypeIcon} from 'Components/Conversation/common/FileTypeIcon/FileTypeIcon';
-import {CellFile} from 'Components/Conversation/ConversationCells/common/cellFile/cellFile';
+import {CellFile, CellNode} from 'Components/Conversation/ConversationCells/common/cellNode/cellNode';
+import {openFolder} from 'Components/Conversation/ConversationCells/common/openFolder/openFolder';
 import {getFileExtension} from 'Util/util';
 
 import {
@@ -35,42 +38,70 @@ import {
 import {useCellsFilePreviewModal} from '../../common/CellsFilePreviewModalContext/CellsFilePreviewModalContext';
 
 interface CellsTableNameColumnProps {
-  file: CellFile;
+  node: CellNode;
+  conversationQualifiedId: QualifiedId;
 }
 
-export const CellsTableNameColumn = ({file}: CellsTableNameColumnProps) => {
+export const CellsTableNameColumn = ({node, conversationQualifiedId}: CellsTableNameColumnProps) => {
+  return (
+    <>
+      <span css={mobileNameStyles}>{node.name}</span>
+      <div css={wrapperStyles}>
+        {node.type === 'file' ? (
+          <FileNameColumn file={node} />
+        ) : (
+          <FolderNameColumn name={node.name} conversationQualifiedId={conversationQualifiedId} />
+        )}
+      </div>
+    </>
+  );
+};
+
+const FileNameColumn = ({file}: {file: CellFile}) => {
   const {id, handleOpenFile, selectedFile} = useCellsFilePreviewModal();
 
   const isImage = file.mimeType?.startsWith('image');
   const isVideo = file.mimeType?.startsWith('video');
 
-  const shouldDisplayImagePreview = (isImage || isVideo) && file.previewImageUrl;
+  const shouldDisplayImagePreview = (isImage || isVideo) && file?.previewImageUrl;
 
   const {previewImageUrl, name} = file;
 
   return (
     <>
-      <span css={mobileNameStyles}>{file.name}</span>
-      <div css={wrapperStyles}>
-        {shouldDisplayImagePreview ? (
-          <div css={imagePreviewWrapperStyles}>
-            <img src={previewImageUrl} alt="" width={24} height={24} css={imagePreviewStyles} />
-            {isVideo && <PlayIcon css={playIconStyles} width={16} height={16} />}
-          </div>
-        ) : (
-          <FileTypeIcon extension={getFileExtension(name)} size={24} />
-        )}
-        <button
-          type="button"
-          css={desktopNameStyles}
-          onClick={() => handleOpenFile(file)}
-          aria-controls={id}
-          aria-expanded={!!selectedFile}
-          aria-haspopup="dialog"
-        >
-          {name}
-        </button>
-      </div>
+      {shouldDisplayImagePreview ? (
+        <div css={imagePreviewWrapperStyles}>
+          <img src={previewImageUrl} alt="" width={24} height={24} css={imagePreviewStyles} />
+          {isVideo && <PlayIcon css={playIconStyles} width={16} height={16} />}
+        </div>
+      ) : (
+        <FileTypeIcon extension={getFileExtension(name)} size={24} />
+      )}
+      <button
+        type="button"
+        css={desktopNameStyles}
+        onClick={() => handleOpenFile(file)}
+        aria-controls={id}
+        aria-expanded={!!selectedFile}
+        aria-haspopup="dialog"
+      >
+        {name}
+      </button>
+    </>
+  );
+};
+
+const FolderNameColumn = ({name, conversationQualifiedId}: {name: string; conversationQualifiedId: QualifiedId}) => {
+  return (
+    <>
+      <FolderIcon width={24} height={24} />
+      <button
+        type="button"
+        css={desktopNameStyles}
+        onClick={event => openFolder({conversationQualifiedId, name, event})}
+      >
+        {name}
+      </button>
     </>
   );
 };

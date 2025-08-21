@@ -18,62 +18,73 @@
  */
 
 import {createColumnHelper} from '@tanstack/react-table';
+import {QualifiedId} from '@wireapp/api-client/lib/user/';
 
-import {CellFile} from 'Components/CellsGlobalView/common/cellFile/cellFile';
-import {CellsRepository} from 'src/script/cells/CellsRepository';
+import {CellsRepository} from 'Repositories/cells/CellsRepository';
 import {t} from 'Util/LocalizerUtil';
 
-import {textWithEllipsisStyles} from './CellsTableColumns.styles';
 import {CellsTableDateColumn} from './CellsTableDateColumn/CellsTableDateColumn';
 import {CellsTableNameColumn} from './CellsTableNameColumn/CellsTableNameColumn';
+import {CellsTableOwnerColumn} from './CellsTableOwnerColumn/CellsTableOwnerColumn';
 import {CellsTableRowOptions} from './CellsTableRowOptions/CellsTableRowOptions';
 import {CellsTableSharedColumn} from './CellsTableSharedColumn/CellsTableSharedColumn';
+import {CellsTagsColumn} from './CellsTagsColumn/CellsTagsColumn';
 
-const columnHelper = createColumnHelper<CellFile>();
+import {CellNode} from '../../common/cellNode/cellNode';
+
+const columnHelper = createColumnHelper<CellNode>();
 
 export const getCellsTableColumns = ({
   cellsRepository,
-  conversationId,
-  onDeleteFile,
+  conversationQualifiedId,
+  conversationName,
+  onRefresh,
 }: {
   cellsRepository: CellsRepository;
-  conversationId: string;
-  onDeleteFile: (uuid: string) => void;
+  conversationQualifiedId: QualifiedId;
+  conversationName: string;
+  onRefresh: () => void;
 }) => [
   columnHelper.accessor('name', {
-    header: t('cellsGlobalView.tableRowName'),
-    cell: info => <CellsTableNameColumn file={info.row.original} />,
+    header: t('cells.tableRow.name'),
+    cell: info => <CellsTableNameColumn node={info.row.original} conversationQualifiedId={conversationQualifiedId} />,
   }),
   columnHelper.accessor('owner', {
-    header: t('cellsGlobalView.tableRowOwner'),
-    cell: info => <span css={textWithEllipsisStyles}>{info.getValue()}</span>,
+    header: t('cells.tableRow.owner'),
+    cell: info => <CellsTableOwnerColumn owner={info.getValue()} user={info.row.original.user} />,
     size: 170,
   }),
   columnHelper.accessor('sizeMb', {
-    header: t('cellsGlobalView.tableRowSize'),
+    header: t('cells.tableRow.size'),
     cell: info => info.getValue(),
     size: 100,
   }),
+  columnHelper.accessor('tags', {
+    header: t('cells.tableRow.tags'),
+    cell: info => <CellsTagsColumn tags={info.getValue()} />,
+    size: 120,
+  }),
   columnHelper.accessor('uploadedAtTimestamp', {
-    header: t('cellsGlobalView.tableRowCreated'),
+    header: t('cells.tableRow.created'),
     cell: info => <CellsTableDateColumn timestamp={info.getValue()} />,
     size: 125,
   }),
   columnHelper.accessor('publicLink', {
-    header: t('cellsGlobalView.tableRowPublicLink'),
+    header: t('cells.tableRow.publicLink'),
     cell: info => <CellsTableSharedColumn isShared={!!info.getValue()?.alreadyShared} />,
     size: 60,
   }),
   columnHelper.accessor('id', {
-    header: () => <span className="visually-hidden">{t('cellsGlobalView.tableRowActions')}</span>,
+    header: () => <span className="visually-hidden">{t('cells.tableRow.actions')}</span>,
     size: 40,
     cell: info => {
       return (
         <CellsTableRowOptions
-          file={info.row.original}
-          onDelete={uuid => onDeleteFile(uuid)}
+          node={info.row.original}
           cellsRepository={cellsRepository}
-          conversationId={conversationId}
+          conversationQualifiedId={conversationQualifiedId}
+          conversationName={conversationName}
+          onRefresh={onRefresh}
         />
       );
     },

@@ -22,7 +22,7 @@ import {container} from 'tsyringe';
 import {ICellAsset} from '@wireapp/protocol-messaging';
 
 import {useInView} from 'Hooks/useInView/useInView';
-import {CellsRepository} from 'src/script/cells/CellsRepository';
+import {CellsRepository} from 'Repositories/cells/CellsRepository';
 import {formatBytes, getFileExtension, trimFileExtension} from 'Util/util';
 
 import {FileAssetCard} from './FileAssetCard/FileAssetCard';
@@ -84,7 +84,7 @@ const MultipartAsset = ({
   senderName,
   timestamp,
 }: MultipartAssetProps) => {
-  const name = trimFileExtension(initialName!);
+  const name = getName(initialName!);
   const extension = getFileExtension(initialName!);
   const size = formatBytes(Number(initialSize));
 
@@ -132,6 +132,8 @@ const MultipartAsset = ({
           size={size}
           isLoading={isLoading}
           isError={isError}
+          senderName={senderName}
+          timestamp={timestamp}
         />
       </li>
     );
@@ -154,4 +156,10 @@ const MultipartAsset = ({
       />
     </li>
   );
+};
+
+const getName = (name: string): string => {
+  const parts = name.split('/');
+  const lastPart = parts[parts.length - 1];
+  return trimFileExtension(lastPart);
 };

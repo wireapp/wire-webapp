@@ -21,9 +21,9 @@ import {useState} from 'react';
 
 import {Accept, FileRejection, useDropzone} from 'react-dropzone';
 
-import {CellsRepository} from 'src/script/cells/CellsRepository';
+import {CellsRepository} from 'Repositories/cells/CellsRepository';
+import {Conversation} from 'Repositories/entity/Conversation';
 import {Config} from 'src/script/Config';
-import {Conversation} from 'src/script/entity/Conversation';
 import {t} from 'Util/LocalizerUtil';
 import {getLogger} from 'Util/Logger';
 
@@ -123,7 +123,7 @@ export const useFilesUploadDropzone = ({
     const decimalMultiplier = 100;
 
     try {
-      const {uuid, versionId} = await cellsRepository.uploadFile({
+      const {uuid, versionId} = await cellsRepository.uploadNodeDraft({
         uuid: file.id,
         file,
         path,

@@ -19,9 +19,8 @@
 
 import React from 'react';
 
+import {FileTypeRestrictedMessage as FileTypeRestrictedMessageEntity} from 'Repositories/entity/message/FileTypeRestrictedMessage';
 import {t} from 'Util/LocalizerUtil';
-
-import {FileTypeRestrictedMessage as FileTypeRestrictedMessageEntity} from '../../../entity/message/FileTypeRestrictedMessage';
 
 export interface FileTypeRestrictedMessageProps {
   message: FileTypeRestrictedMessageEntity;

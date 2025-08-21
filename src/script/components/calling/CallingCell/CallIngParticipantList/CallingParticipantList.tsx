@@ -17,7 +17,7 @@
  *
  */
 
-import React, {useMemo} from 'react';
+import React from 'react';
 
 import cx from 'classnames';
 
@@ -26,6 +26,9 @@ import {Tooltip} from '@wireapp/react-ui-kit';
 import {CallParticipantsListItem} from 'Components/calling/CallParticipantsListItem';
 import {FadingScrollbar} from 'Components/FadingScrollbar';
 import * as Icon from 'Components/Icon';
+import {CallingRepository} from 'Repositories/calling/CallingRepository';
+import {Participant} from 'Repositories/calling/Participant';
+import {Conversation} from 'Repositories/entity/Conversation';
 import {t} from 'Util/LocalizerUtil';
 import {sortUsersByPriority} from 'Util/StringUtil';
 
@@ -36,9 +39,6 @@ import {
   participantListWrapperStyles,
 } from './CallingParticipantList.styles';
 
-import {CallingRepository} from '../../../../calling/CallingRepository';
-import {Participant} from '../../../../calling/Participant';
-import {Conversation} from '../../../../entity/Conversation';
 import {ContextMenuEntry, showContextMenu} from '../../../../ui/ContextMenu';
 
 interface CallingParticipantListProps {
@@ -89,12 +89,6 @@ export const CallingParticipantList = ({
     showContextMenu({event, entries, identifier: 'participant-moderator-menu'});
   };
 
-  const participantsList = useMemo(() => {
-    return participants
-      .slice()
-      .sort((participantA, participantB) => sortUsersByPriority(participantA.user, participantB.user));
-  }, [participants]);
-
   return (
     <div
       className={cx('call-ui__participant-list__wrapper', {
@@ -140,18 +134,21 @@ export const CallingParticipantList = ({
         )}
         <p css={labelStyles}>{t('videoCallOverlayParticipantsListLabel', {count: participants.length})}</p>
         <ul className="call-ui__participant-list" data-uie-name="list-call-ui-participants">
-          {participantsList.map((participant, index, participantsArray) => (
-            <li key={participant.clientId} className="call-ui__participant-list__participant">
-              <CallParticipantsListItem
-                key={participant.clientId}
-                callParticipant={participant}
-                isSelfVerified={isSelfVerified}
-                showContextMenu={!!isModerator}
-                onContextMenu={event => getParticipantContext(event, participant)}
-                isLast={participantsArray.length === index}
-              />
-            </li>
-          ))}
+          {participants
+            .slice()
+            .sort((participantA, participantB) => sortUsersByPriority(participantA.user, participantB.user))
+            .map((participant, index, participantsArray) => (
+              <li key={participant.clientId} className="call-ui__participant-list__participant">
+                <CallParticipantsListItem
+                  key={participant.clientId}
+                  callParticipant={participant}
+                  isSelfVerified={isSelfVerified}
+                  showContextMenu={!!isModerator}
+                  onContextMenu={event => getParticipantContext(event, participant)}
+                  isLast={participantsArray.length === index}
+                />
+              </li>
+            ))}
         </ul>
       </FadingScrollbar>
     </div>

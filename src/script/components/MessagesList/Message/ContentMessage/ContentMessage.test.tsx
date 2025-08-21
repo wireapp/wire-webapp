@@ -20,16 +20,15 @@
 import {render, waitFor} from '@testing-library/react';
 import ko from 'knockout';
 
-import {LinkPreview} from 'src/script/entity/message/LinkPreview';
+import {Conversation} from 'Repositories/entity/Conversation';
+import {ContentMessage} from 'Repositories/entity/message/ContentMessage';
+import {LinkPreview} from 'Repositories/entity/message/LinkPreview';
+import {Text} from 'Repositories/entity/message/Text';
+import {User} from 'Repositories/entity/User';
 import {QuoteEntity} from 'src/script/message/QuoteEntity';
 import {createUuid} from 'Util/uuid';
 
 import {ContentMessageComponent, ContentMessageProps} from './ContentMessage';
-
-import {Conversation} from '../../../../entity/Conversation';
-import {ContentMessage} from '../../../../entity/message/ContentMessage';
-import {Text} from '../../../../entity/message/Text';
-import {User} from '../../../../entity/User';
 
 describe('message', () => {
   let defaultParams: ContentMessageProps;

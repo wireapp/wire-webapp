@@ -30,11 +30,20 @@ import {Avatar, AVATAR_SIZE} from 'Components/Avatar';
 import {ConversationClassifiedBar} from 'Components/ClassifiedBar/ClassifiedBar';
 import {useFileUploadState} from 'Components/Conversation/useFilesUploadState/useFilesUploadState';
 import {EmojiPicker} from 'Components/EmojiPicker/EmojiPicker';
-import {CellsRepository} from 'src/script/cells/CellsRepository';
-import {useUserPropertyValue} from 'src/script/hooks/useUserProperty';
-import {PROPERTIES_TYPE} from 'src/script/properties/PropertiesType';
-import {EventName} from 'src/script/tracking/EventName';
-import {CONVERSATION_TYPING_INDICATOR_MODE} from 'src/script/user/TypingIndicatorMode';
+import {useUserPropertyValue} from 'Hooks/useUserProperty';
+import {CellsRepository} from 'Repositories/cells/CellsRepository';
+import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
+import {MessageRepository} from 'Repositories/conversation/MessageRepository';
+import {Conversation} from 'Repositories/entity/Conversation';
+import {User} from 'Repositories/entity/User';
+import {EventRepository} from 'Repositories/event/EventRepository';
+import {PropertiesRepository} from 'Repositories/properties/PropertiesRepository';
+import {PROPERTIES_TYPE} from 'Repositories/properties/PropertiesType';
+import {SearchRepository} from 'Repositories/search/SearchRepository';
+import {StorageRepository} from 'Repositories/storage';
+import {TeamState} from 'Repositories/team/TeamState';
+import {EventName} from 'Repositories/tracking/EventName';
+import {CONVERSATION_TYPING_INDICATOR_MODE} from 'Repositories/user/TypingIndicatorMode';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
@@ -56,15 +65,6 @@ import {usePing} from './usePing/usePing';
 import {useTypingIndicator} from './useTypingIndicator/useTypingIndicator';
 
 import {Config} from '../../Config';
-import {ConversationRepository} from '../../conversation/ConversationRepository';
-import {MessageRepository} from '../../conversation/MessageRepository';
-import {Conversation} from '../../entity/Conversation';
-import {User} from '../../entity/User';
-import {EventRepository} from '../../event/EventRepository';
-import {PropertiesRepository} from '../../properties/PropertiesRepository';
-import {SearchRepository} from '../../search/SearchRepository';
-import {StorageRepository} from '../../storage';
-import {TeamState} from '../../team/TeamState';
 
 const CONFIG = {
   ...Config.getConfig(),
@@ -111,10 +111,13 @@ export const InputBar = ({
   onCellImageUpload,
   onCellAssetUpload,
 }: InputBarProps) => {
-  const {classifiedDomains, isSelfDeletingMessagesEnabled, isFileSharingSendingEnabled} = useKoSubscribableChildren(
-    teamState,
-    ['classifiedDomains', 'isSelfDeletingMessagesEnabled', 'isFileSharingSendingEnabled'],
-  );
+  const {classifiedDomains, isSelfDeletingMessagesEnabled, isFileSharingSendingEnabled, isCellsEnabled} =
+    useKoSubscribableChildren(teamState, [
+      'classifiedDomains',
+      'isSelfDeletingMessagesEnabled',
+      'isFileSharingSendingEnabled',
+      'isCellsEnabled',
+    ]);
   const {connection, localMessageTimer, messageTimer, hasGlobalMessageTimer, isSelfUserRemoved, is1to1} =
     useKoSubscribableChildren(conversation, [
       'connection',
@@ -315,6 +318,7 @@ export const InputBar = ({
                   {!!files.length && <FilePreviews files={files} conversationQualifiedId={conversation.qualifiedId} />}
                   <InputBarControls
                     conversation={conversation}
+                    isCellsFeatureEnabled={isCellsEnabled}
                     isFileSharingSendingEnabled={isFileSharingSendingEnabled}
                     pingDisabled={ping.isPingDisabled}
                     messageContent={messageContent}

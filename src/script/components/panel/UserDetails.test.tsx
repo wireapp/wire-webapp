@@ -19,12 +19,11 @@
 
 import {render} from '@testing-library/react';
 
+import {User} from 'Repositories/entity/User';
 import {t} from 'Util/LocalizerUtil';
 import {createUuid} from 'Util/uuid';
 
 import {UserDetails} from './UserDetails';
-
-import {User} from '../../entity/User';
 
 describe('UserDetails', () => {
   it('renders the correct infos for a user', () => {

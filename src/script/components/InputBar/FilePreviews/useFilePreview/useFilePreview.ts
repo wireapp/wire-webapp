@@ -20,7 +20,7 @@
 import {QualifiedId} from '@wireapp/api-client/lib/user/';
 
 import {FileWithPreview, useFileUploadState} from 'Components/Conversation/useFilesUploadState/useFilesUploadState';
-import {CellsRepository} from 'src/script/cells/CellsRepository';
+import {CellsRepository} from 'Repositories/cells/CellsRepository';
 import {Config} from 'src/script/Config';
 import {getFileExtension, trimFileExtension, formatBytes} from 'Util/util';
 
@@ -58,7 +58,7 @@ export const useFilePreview = ({file, cellsRepository, conversationQualifiedId}:
     }
 
     deleteFile({conversationId: conversationQualifiedId.id, fileId: file.id});
-    void cellsRepository.deleteFileDraft({uuid: file.remoteUuid, versionId: file.remoteVersionId});
+    void cellsRepository.deleteNodeDraft({uuid: file.remoteUuid, versionId: file.remoteVersionId});
   };
 
   const handleRetry = async () => {
@@ -71,7 +71,7 @@ export const useFilePreview = ({file, cellsRepository, conversationQualifiedId}:
           ? `${conversationQualifiedId.id}@${Config.getConfig().CELLS_WIRE_DOMAIN}`
           : `${conversationQualifiedId.id}@${conversationQualifiedId.domain}`;
 
-      const {uuid, versionId} = await cellsRepository.uploadFile({
+      const {uuid, versionId} = await cellsRepository.uploadNodeDraft({
         uuid: file.id,
         file,
         path,

@@ -115,7 +115,7 @@ const checkBrowser = (): void => {
     return;
   }
 
-  if (isMobileBrowser()) {
+  if (isMobileBrowser() && !window.location.pathname.includes('/auth/')) {
     redirectUnsupportedBrowser("This browser doesn't support the Wire app on mobile devices!");
     return;
   }

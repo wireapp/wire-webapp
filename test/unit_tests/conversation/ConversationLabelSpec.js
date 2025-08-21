@@ -17,8 +17,8 @@
  *
  */
 
-import {ConversationLabelRepository} from 'src/script/conversation/ConversationLabelRepository';
-import {Conversation} from 'src/script/entity/Conversation';
+import {ConversationLabelRepository} from 'Repositories/conversation/ConversationLabelRepository';
+import {Conversation} from 'Repositories/entity/Conversation';
 import {createUuid} from 'Util/uuid';
 
 describe('ConversationLabelRepository', () => {

@@ -31,7 +31,7 @@ let routes: Routes = {};
 /**
  * Matches the current URL path against configured routes and triggers the appropriate handler.
  */
-const parseRoute = () => {
+export const parseRoute = () => {
   const currentPath = window.location.hash.replace('#', '') || '/';
 
   const exactMatch = routes[currentPath];
@@ -56,8 +56,12 @@ const parseRoute = () => {
       const paramNames = Object.keys(params);
 
       // Handle wildcard parameter
-      if (params['*']) {
-        return handler(...Object.values(params));
+      if (paramNames.some(name => name.startsWith('*'))) {
+        const wildcardName = paramNames.find(name => name.startsWith('*'));
+        if (wildcardName) {
+          const segments = params[wildcardName];
+          return handler(...Object.values(params).filter(param => param !== segments), segments);
+        }
       }
 
       // Handle optional parameters
@@ -75,17 +79,16 @@ const parseRoute = () => {
 
   return routes['*']?.();
 };
-
 export const configureRoutes = (routeDefinitions: Routes): void => {
   routes = {...defaultRoute, ...routeDefinitions};
   window.addEventListener('hashchange', parseRoute);
   parseRoute();
 };
-export const navigate = (path: string, stateObj?: {}) => {
-  setHistoryParam(path, stateObj);
+export const navigate = (path: string) => {
+  setHistoryParam(path);
   parseRoute();
 };
 
-export const setHistoryParam = (path: string, stateObj: {} = window.history.state) => {
-  window.history.replaceState(stateObj, '', `#${path}`);
+export const setHistoryParam = (path: string) => {
+  window.location.hash = path;
 };

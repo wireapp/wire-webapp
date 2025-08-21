@@ -17,9 +17,9 @@
  *
  */
 
-import {ContentMessage} from 'src/script/entity/message/ContentMessage';
+import {ContentMessage} from 'Repositories/entity/message/ContentMessage';
+import {Text} from 'Repositories/entity/message/Text';
 
-import {Text} from '../../../../../../../entity/message/Text';
 import {$createMentionNode, MentionNode} from '../../../nodes/MentionNode';
 import {createNodes} from '../../../utils/generateNodes';
 

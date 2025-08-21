@@ -19,7 +19,7 @@
 
 import {t} from 'Util/LocalizerUtil';
 
-import {FileAssetSmall} from './FileAssetSmall/FileAsseetSmall';
+import {FileAssetSmall} from './FileAssetSmall/FileAssetSmall';
 import {FileAssetWithPreview} from './FileAssetWithPreview/FileAssetWithPreview';
 
 interface FileAssetCardProps {
@@ -49,7 +49,7 @@ export const FileAssetCard = ({
   senderName,
   timestamp,
 }: FileAssetCardProps) => {
-  const formattedName = isError ? t('cellsUnavailableFile') : name;
+  const formattedName = isError ? t('cells.unavailableFile') : name;
 
   if (variant === 'large') {
     return (

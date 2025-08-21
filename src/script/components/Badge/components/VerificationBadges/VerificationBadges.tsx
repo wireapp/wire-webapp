@@ -22,10 +22,10 @@ import {CSSProperties, useEffect, useMemo, useRef, useState} from 'react';
 import {CSSObject} from '@emotion/react';
 import {ConversationProtocol} from '@wireapp/api-client/lib/conversation';
 import {stringifyQualifiedId} from '@wireapp/core/lib/util/qualifiedIdUtil';
-import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
 import {container} from 'tsyringe';
 
 import {
+  TabIndex,
   CertificateExpiredIcon,
   CertificateRevoked,
   ExpiresSoon,
@@ -34,14 +34,14 @@ import {
   Tooltip,
 } from '@wireapp/react-ui-kit';
 
-import {ClientEntity} from 'src/script/client';
-import {ConversationVerificationState} from 'src/script/conversation/ConversationVerificationState';
-import {checkUserHandle} from 'src/script/conversation/ConversationVerificationStateHandler';
+import {useUserIdentity} from 'Hooks/useDeviceIdentities';
+import {ClientEntity} from 'Repositories/client';
+import {ConversationVerificationState} from 'Repositories/conversation/ConversationVerificationState';
+import {checkUserHandle} from 'Repositories/conversation/ConversationVerificationStateHandler';
+import {Conversation} from 'Repositories/entity/Conversation';
+import {User} from 'Repositories/entity/User';
+import {UserState} from 'Repositories/user/UserState';
 import {MLSStatuses, WireIdentity} from 'src/script/E2EIdentity/E2EIdentityVerification';
-import {Conversation} from 'src/script/entity/Conversation';
-import {User} from 'src/script/entity/User';
-import {useUserIdentity} from 'src/script/hooks/useDeviceIdentities';
-import {UserState} from 'src/script/user/UserState';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {StringIdentifer, t} from 'Util/LocalizerUtil';
 import {waitFor} from 'Util/waitFor';
@@ -88,7 +88,7 @@ const getMLSStatuses = ({identities, user}: {identities?: WireIdentity[]; user?:
   }
 
   return identities.map(identity => {
-    const matchingName = identity.x509Identity?.displayName === user.name();
+    const matchingName = identity.x509Identity?.display_name === user.name();
     const matchingHandle = checkUserHandle(identity, user);
 
     if (!matchingName || !matchingHandle) {

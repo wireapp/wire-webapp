@@ -39,6 +39,7 @@ interface FileFullscreenModalProps {
   status?: Status;
   senderName: string;
   timestamp: number;
+  badges?: string[];
 }
 
 export const FileFullscreenModal = ({
@@ -51,15 +52,18 @@ export const FileFullscreenModal = ({
   fileExtension,
   senderName,
   timestamp,
+  badges,
 }: FileFullscreenModalProps) => {
   return (
     <FullscreenModal id={id} isOpen={isOpen} onClose={onClose}>
       <FileHeader
         onClose={onClose}
         fileName={fileName}
+        filePreviewUrl={filePreviewUrl}
         fileExtension={fileExtension}
         senderName={senderName}
         timestamp={timestamp}
+        badges={badges}
       />
       <ModalContent
         filePreviewUrl={filePreviewUrl}

@@ -52,3 +52,9 @@ export const iconStyle: CSSObject = {
     fill: 'var(--amber-500)',
   },
 };
+
+export const conversationsTitleWrapper: CSSObject = {
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'space-between',
+};

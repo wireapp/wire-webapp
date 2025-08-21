@@ -18,11 +18,13 @@
  */
 
 import {ClientClassification, ClientType, RegisteredClient} from '@wireapp/api-client/lib/client/';
+import {FEATURE_KEY, FeatureStatus} from '@wireapp/api-client/lib/team';
 import {ClientInfo} from '@wireapp/core/lib/client/';
 
 import {Runtime} from '@wireapp/commons';
 
-import {getClientMLSConfig} from 'src/script/client/clientMLSConfig';
+import {getClientMLSConfig} from 'Repositories/client/clientMLSConfig';
+import {Config} from 'src/script/Config';
 
 import {ClientActionCreator} from './creator/';
 
@@ -65,6 +67,13 @@ export class ClientAction {
   ): ThunkAction => {
     return async (dispatch, getState, {core, actions: {clientAction}}) => {
       const localClient = await core.getLocalClient();
+      const commonConfig = (await core.service?.team.getCommonFeatureConfig()) ?? {};
+
+      const useAsyncNotificationStream =
+        commonConfig[FEATURE_KEY.CONSUMABLE_NOTIFICATIONS]?.status === FeatureStatus.ENABLED &&
+        Config.getConfig().FEATURE.USE_ASYNC_NOTIFICATIONS;
+
+      const useLegacyNotificationStream = !useAsyncNotificationStream;
 
       const creationStatus = localClient
         ? {isNew: false, client: localClient}
@@ -73,11 +82,11 @@ export class ClientAction {
             client: await core.registerClient(
               {clientType, password, verificationCode},
               clientAction.generateClientPayload(clientType),
+              useLegacyNotificationStream,
               entropyData,
             ),
           };
 
-      const commonConfig = (await core.service?.team.getCommonFeatureConfig()) ?? {};
       await core.initClient(creationStatus.client, getClientMLSConfig(commonConfig));
       dispatch(ClientActionCreator.successfulInitializeClient(creationStatus));
     };

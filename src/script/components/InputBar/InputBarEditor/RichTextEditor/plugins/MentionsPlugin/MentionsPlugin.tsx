@@ -26,10 +26,10 @@ import * as ReactDOM from 'react-dom';
 
 import {FadingScrollbar} from 'Components/FadingScrollbar';
 import {IgnoreOutsideClickWrapper} from 'Components/InputBar/util/clickHandlers';
+import {User} from 'Repositories/entity/User';
 
 import {MentionSuggestionsItem} from './MentionSuggestionsItem';
 
-import {User} from '../../../../../../entity/User';
 import {$createMentionNode} from '../../nodes/MentionNode';
 import {getSelectionInfo} from '../../utils/getSelectionInfo';
 import {TypeaheadMenuPlugin} from '../TypeaheadMenuPlugin/TypeaheadMenuPlugin';

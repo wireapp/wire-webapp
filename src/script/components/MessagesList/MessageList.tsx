@@ -19,21 +19,24 @@
 
 import React, {FC, useCallback, useEffect, useLayoutEffect, useRef, useState} from 'react';
 
-import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
 import cx from 'classnames';
+
+import {TabIndex} from '@wireapp/react-ui-kit';
 
 import {FadingScrollbar} from 'Components/FadingScrollbar';
 import {JumpToLastMessageButton} from 'Components/MessagesList/JumpToLastMessageButton';
 import {filterMessages} from 'Components/MessagesList/utils/messagesFilter';
-import {ConversationRepository} from 'src/script/conversation/ConversationRepository';
-import {MessageRepository} from 'src/script/conversation/MessageRepository';
-import {ContentMessage} from 'src/script/entity/message/ContentMessage';
-import {DecryptErrorMessage} from 'src/script/entity/message/DecryptErrorMessage';
-import {MemberMessage} from 'src/script/entity/message/MemberMessage';
-import {Message as MessageEntity} from 'src/script/entity/message/Message';
-import {User} from 'src/script/entity/User';
+import {AssetRepository} from 'Repositories/assets/AssetRepository';
+import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
+import {MessageRepository} from 'Repositories/conversation/MessageRepository';
+import {Conversation} from 'Repositories/entity/Conversation';
+import {ContentMessage} from 'Repositories/entity/message/ContentMessage';
+import {DecryptErrorMessage} from 'Repositories/entity/message/DecryptErrorMessage';
+import {MemberMessage} from 'Repositories/entity/message/MemberMessage';
+import {Message as MessageEntity} from 'Repositories/entity/message/Message';
+import {User} from 'Repositories/entity/User';
+import {ServiceEntity} from 'Repositories/integration/ServiceEntity';
 import {useRoveFocus} from 'src/script/hooks/useRoveFocus';
-import {ServiceEntity} from 'src/script/integration/ServiceEntity';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {isLastReceivedMessage} from 'Util/conversationMessages';
 import {onHitTopOrBottom} from 'Util/DOM/onHitTopOrBottom';
@@ -45,9 +48,6 @@ import {ScrollToElement} from './Message/types';
 import {UploadAssets} from './UploadAssets';
 import {groupMessagesBySenderAndTime, isMarker} from './utils/messagesGroup';
 import {updateScroll, FocusedElement} from './utils/scrollUpdater';
-
-import {AssetRepository} from '../../assets/AssetRepository';
-import {Conversation} from '../../entity/Conversation';
 
 interface MessagesListParams {
   assetRepository: AssetRepository;

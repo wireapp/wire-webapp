@@ -59,11 +59,6 @@ jobs:
           DOCKER_USERNAME: ${{secrets.WEBTEAM_QUAY_USERNAME}}
         run: yarn docker "${{inputs.tag}}-${{ steps.vars.outputs.sha_short }}"
 
-      - name: Install AWS CLI
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y awscli
-
       - name: Upload unit-tests.log to S3
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}

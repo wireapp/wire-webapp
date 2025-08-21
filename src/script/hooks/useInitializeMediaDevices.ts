@@ -19,10 +19,9 @@
 
 import {useEffect, useState} from 'react';
 
+import {MediaDevicesHandler} from 'Repositories/media/MediaDevicesHandler';
+import {MediaStreamHandler} from 'Repositories/media/MediaStreamHandler';
 import {getLogger} from 'Util/Logger';
-
-import {MediaDevicesHandler} from '../media/MediaDevicesHandler';
-import {MediaStreamHandler} from '../media/MediaStreamHandler';
 
 const logger = getLogger('useInitializeMediaDevices');
 

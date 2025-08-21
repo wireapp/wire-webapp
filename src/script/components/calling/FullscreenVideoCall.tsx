@@ -20,11 +20,11 @@
 import React, {useEffect, useState} from 'react';
 
 import {DefaultConversationRoleName} from '@wireapp/api-client/lib/conversation/';
-import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
 import cx from 'classnames';
 import {container} from 'tsyringe';
 
 import {
+  TabIndex,
   Checkbox,
   CheckboxLabel,
   CloseDetachedWindowIcon,
@@ -40,10 +40,17 @@ import {useCallAlertState} from 'Components/calling/useCallAlertState';
 import {ConversationClassifiedBar} from 'Components/ClassifiedBar/ClassifiedBar';
 import * as Icon from 'Components/Icon';
 import {ModalComponent} from 'Components/Modals/ModalComponent';
-import {CallingRepository} from 'src/script/calling/CallingRepository';
+import type {Call} from 'Repositories/calling/Call';
+import {CallingRepository} from 'Repositories/calling/CallingRepository';
+import {CallingViewMode, CallState, MuteState} from 'Repositories/calling/CallState';
+import {Participant} from 'Repositories/calling/Participant';
+import type {Grid} from 'Repositories/calling/videoGridHandler';
+import type {Conversation} from 'Repositories/entity/Conversation';
+import {MediaDevicesHandler} from 'Repositories/media/MediaDevicesHandler';
+import {PropertiesRepository} from 'Repositories/properties/PropertiesRepository';
+import {TeamState} from 'Repositories/team/TeamState';
 import {useActiveWindowMatchMedia} from 'src/script/hooks/useActiveWindowMatchMedia';
 import {useToggleState} from 'src/script/hooks/useToggleState';
-import {PropertiesRepository} from 'src/script/properties/PropertiesRepository';
 import {CallViewTab} from 'src/script/view_model/CallingViewModel';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {isDetachedCallingFeatureEnabled} from 'Util/isDetachedCallingFeatureEnabled';
@@ -66,13 +73,6 @@ import {GroupVideoGrid} from './GroupVideoGrid';
 import {Pagination} from './Pagination/Pagination';
 import {VideoControls} from './VideoControls/VideoControls';
 
-import type {Call} from '../../calling/Call';
-import {CallingViewMode, CallState, MuteState} from '../../calling/CallState';
-import {Participant} from '../../calling/Participant';
-import type {Grid} from '../../calling/videoGridHandler';
-import type {Conversation} from '../../entity/Conversation';
-import {MediaDevicesHandler} from '../../media/MediaDevicesHandler';
-import {TeamState} from '../../team/TeamState';
 import {useWarningsState} from '../../view_model/WarningsContainer/WarningsState';
 import {CONFIG, TYPE} from '../../view_model/WarningsContainer/WarningsTypes';
 
@@ -256,6 +256,7 @@ const FullscreenVideoCall = ({
 
   return (
     <div
+      data-uie-name="fullscreen-video-call"
       className={cx('video-calling-wrapper', {
         'app--small-offset': hasOffset && isMiniMode,
         'app--large-offset': hasOffset && !isMiniMode,

@@ -20,6 +20,7 @@
 import {Tooltip} from '@wireapp/react-ui-kit';
 
 import {useMessageFocusedTabIndex} from 'Components/MessagesList/Message/util';
+import {User} from 'Repositories/entity/User';
 import {getEmojiTitleFromEmojiUnicode} from 'Util/EmojiUtil';
 import {isTabKey} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
@@ -36,8 +37,6 @@ import {
   messageReactionCount,
   userBoldStyle,
 } from './MessageReactions.styles';
-
-import {User} from '../../../../../../entity/User';
 
 export interface EmojiPillProps {
   emoji: string;

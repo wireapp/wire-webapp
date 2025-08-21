@@ -22,20 +22,22 @@ import ko from 'knockout';
 
 import {useMatchMedia, QUERY} from '@wireapp/react-ui-kit';
 
+import {Call} from 'Repositories/calling/Call';
+import {Participant} from 'Repositories/calling/Participant';
+import {Grid} from 'Repositories/calling/videoGridHandler';
+import {Conversation} from 'Repositories/entity/Conversation';
+import {User} from 'Repositories/entity/User';
+import {MediaDevicesHandler} from 'Repositories/media/MediaDevicesHandler';
+import {PropertiesRepository} from 'Repositories/properties/PropertiesRepository';
+import {PropertiesService} from 'Repositories/properties/PropertiesService';
+import {SelfService} from 'Repositories/self/SelfService';
 import {withTheme} from 'src/script/auth/util/test/TestUtil';
-import {Call} from 'src/script/calling/Call';
-import {Participant} from 'src/script/calling/Participant';
-import {Grid} from 'src/script/calling/videoGridHandler';
-import {Conversation} from 'src/script/entity/Conversation';
-import {User} from 'src/script/entity/User';
-import {MediaDevicesHandler} from 'src/script/media/MediaDevicesHandler';
-import {PropertiesRepository} from 'src/script/properties/PropertiesRepository';
-import {PropertiesService} from 'src/script/properties/PropertiesService';
-import {SelfService} from 'src/script/self/SelfService';
 
 import {FullscreenVideoCall, FullscreenVideoCallProps} from './FullscreenVideoCall';
 
 const useMatchMediaMock = useMatchMedia as jest.Mock;
+
+jest.mock('@wireapp/api-client/lib/team');
 
 jest.mock('@wireapp/react-ui-kit', () => ({
   ...(jest.requireActual('@wireapp/react-ui-kit') as any),

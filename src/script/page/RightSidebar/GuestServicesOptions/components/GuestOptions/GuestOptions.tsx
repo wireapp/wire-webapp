@@ -29,17 +29,17 @@ import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {RadioGroup} from 'Components/Radio';
 import {SelectText} from 'Components/SelectText';
 import {BaseToggle} from 'Components/toggle/BaseToggle';
-import {TeamState} from 'src/script/team/TeamState';
+import {ACCESS_STATE} from 'Repositories/conversation/AccessState';
+import {teamPermissionsForAccessState} from 'Repositories/conversation/ConversationAccessPermission';
+import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
+import {Conversation} from 'Repositories/entity/Conversation';
+import {TeamRepository} from 'Repositories/team/TeamRepository';
+import {TeamState} from 'Repositories/team/TeamState';
 import {copyText} from 'Util/ClipboardUtil';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 
 import {Config} from '../../../../../Config';
-import {ACCESS_STATE} from '../../../../../conversation/AccessState';
-import {teamPermissionsForAccessState} from '../../../../../conversation/ConversationAccessPermission';
-import {ConversationRepository} from '../../../../../conversation/ConversationRepository';
-import {Conversation} from '../../../../../entity/Conversation';
-import {TeamRepository} from '../../../../../team/TeamRepository';
 
 const COPY_LINK_CONFIRM_DURATION = 1500;
 

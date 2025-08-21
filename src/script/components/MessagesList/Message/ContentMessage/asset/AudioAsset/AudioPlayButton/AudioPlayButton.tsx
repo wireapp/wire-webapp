@@ -22,7 +22,7 @@ import {ReactNode, useEffect, useState} from 'react';
 import {CloseIcon, PauseIcon, PlayIcon} from '@wireapp/react-ui-kit';
 
 import {useMessageFocusedTabIndex} from 'Components/MessagesList/Message/util';
-import {AssetTransferState} from 'src/script/assets/AssetTransferState';
+import {AssetTransferState} from 'Repositories/assets/AssetTransferState';
 import {t} from 'Util/LocalizerUtil';
 
 import {playButtonStyles, wrapperStyles} from './AudioPlayButton.styles';
