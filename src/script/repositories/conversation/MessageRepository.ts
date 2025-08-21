@@ -921,9 +921,6 @@ export class MessageRepository {
 
     try {
       const result = await this.conversationService.send(sendOptions);
-      console.log('Message sent successfully????', result);
-      console.log('Message sent successfully???? with', sendOptions);
-
       if (result.state === MessageSendingState.OUTGOING_SENT) {
         await handleSuccess(result);
       }
@@ -1228,24 +1225,17 @@ export class MessageRepository {
       .participating_user_ets()
       .some(user => matchQualifiedIds(senderId, user.qualifiedId));
 
-
-     console.log('PreSender check Building......', senderId);
-     console.log('PreSender check Building, is it ?......', senderInConversation);
-
     if (!senderInConversation) {
       message.setButtonError(buttonId, t('buttonActionError'));
       message.waitingButtonId(undefined);
       return;
     }
 
-    console.log('Building......', buttonId);
-
     const buttonMessage = MessageBuilder.buildButtonActionMessage({
       buttonId,
       referenceMessageId: message.id,
     });
     try {
-      console.log('Trying to send......', buttonMessage);
       this.sendAndInjectMessage(buttonMessage, conversation, {
         nativePush: false,
         recipients: [message.qualifiedFrom],
@@ -1253,7 +1243,6 @@ export class MessageRepository {
         targetMode: MessageTargetMode.USERS,
       });
     } catch (error) {
-      console.log('FAIILL Trying to send......', buttonMessage);
       message.waitingButtonId(undefined);
       return message.setButtonError(buttonId, t('buttonActionError'));
     }

@@ -20,7 +20,7 @@
 import {ConnectionStatus} from '@wireapp/api-client/lib/connection/';
 import {CONVERSATION_TYPE} from '@wireapp/api-client/lib/conversation/';
 import {ConversationProtocol} from '@wireapp/api-client/lib/conversation/NewConversation';
-import {MessageSendingState} from '@wireapp/core/lib/conversation';
+import {MessageSendingState, MessageTargetMode} from '@wireapp/core/lib/conversation';
 
 import {Account} from '@wireapp/core';
 import {LegalHoldStatus} from '@wireapp/protocol-messaging';
@@ -195,38 +195,50 @@ describe('MessageRepository', () => {
       jest.spyOn(core.service!.conversation, 'send').mockResolvedValue(successPayload);
       jest.spyOn(eventRepository, 'injectEvent').mockResolvedValue(undefined);
 
+      // Spy on the internal method that sendButtonAction actually calls
+      const sendAndInjectMessageSpy = jest
+        .spyOn(messageRepository as any, 'sendAndInjectMessage')
+        .mockResolvedValue(undefined);
+
       const buttonId = createUuid();
       const theNewButton = [new Button(buttonId, 'Button 1')];
       const originalMessage = new CompositeMessage(createUuid());
 
-      // Set the sender properly
+      // Set the sender properly - this is the key fix
       originalMessage.user(selfUser);
-      originalMessage.from = selfUser.id;
+      originalMessage.from = selfUser.id; // Set the from field
 
       originalMessage.errorButtonId(undefined);
       originalMessage.assets.push(...theNewButton);
 
       const conversation = generateConversation();
+
+      // Make sure the sender is in the conversation's participating users
+      // This should already be done by generateConversation() which adds selfUser,
+      // but let's be explicit
+      if (!conversation.participating_user_ets().some(user => user.id === selfUser.id)) {
+        conversation.participating_user_ets().push(selfUser);
+      }
+
       conversation.addMessage(originalMessage);
 
-      // Make the call and wait for it to complete
-      await new Promise(resolve => {
-        messageRepository.sendButtonAction(conversation, originalMessage, buttonId);
-        // Give it a tick to process
-        setTimeout(resolve, 0);
-      });
+      messageRepository.sendButtonAction(conversation, originalMessage, buttonId);
 
-      expect(core.service!.conversation.send).toHaveBeenCalledWith(
+      expect(sendAndInjectMessageSpy).toHaveBeenCalledWith(
         expect.objectContaining({
-          conversationId: conversation.qualifiedId,
-          nativePush: false,
-          payload: expect.objectContaining({
-            buttonAction: expect.objectContaining({
-              buttonId: buttonId,
-              referenceMessageId: originalMessage.id,
-            }),
+          buttonAction: expect.objectContaining({
+            buttonId: buttonId,
+            referenceMessageId: originalMessage.id,
           }),
-        })
+          messageId: expect.any(String),
+        }),
+        conversation,
+        expect.objectContaining({
+          nativePush: false,
+          recipients: [originalMessage.qualifiedFrom],
+          skipInjection: true,
+          targetMode: MessageTargetMode.USERS,
+        }),
       );
     });
   });
