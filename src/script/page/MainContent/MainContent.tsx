@@ -30,9 +30,11 @@ import {HistoryExport} from 'Components/HistoryExport';
 import {HistoryImport} from 'Components/HistoryImport';
 import * as Icon from 'Components/Icon';
 import {useLegalHoldModalState} from 'Components/Modals/LegalHoldModal/LegalHoldModal.state';
+import {useInitializeMediaDevices} from 'Hooks/useInitializeMediaDevices';
 import {ClientState} from 'Repositories/client/ClientState';
 import {ConversationState} from 'Repositories/conversation/ConversationState';
 import {User} from 'Repositories/entity/User';
+import {MediaDeviceType} from 'Repositories/media/MediaDeviceType';
 import {TeamState} from 'Repositories/team/TeamState';
 import {UserState} from 'Repositories/user/UserState';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
@@ -105,9 +107,25 @@ const MainContent: FC<MainContentProps> = ({
   }
   const {content: contentViewModel} = mainViewModel;
   const {isFederated, repositories, switchContent} = contentViewModel;
+  const mediaRepo = repositories.media;
+  const devicesHandler = mediaRepo.devicesHandler;
 
-  // eslint-disable-next-line react-hooks/rules-of-hooks
+  /* eslint-disable react-hooks/rules-of-hooks */
+  const {[MediaDeviceType.VIDEO_INPUT]: availableDevices} = useKoSubscribableChildren(
+    devicesHandler?.availableDevices,
+    [MediaDeviceType.VIDEO_INPUT],
+  );
+  const {[MediaDeviceType.VIDEO_INPUT]: currentDeviceId} = useKoSubscribableChildren(devicesHandler?.currentDeviceId, [
+    MediaDeviceType.VIDEO_INPUT,
+  ]);
+  const deviceSupport = useKoSubscribableChildren(devicesHandler?.deviceSupport, [
+    MediaDeviceType.AUDIO_INPUT,
+    MediaDeviceType.AUDIO_OUTPUT,
+    MediaDeviceType.VIDEO_INPUT,
+  ]);
+  const {isMediaDevicesAreInitialized} = useInitializeMediaDevices(devicesHandler, mediaRepo.streamHandler);
   const {activeConversation} = useKoSubscribableChildren(conversationState, ['activeConversation']);
+  /* eslint-enable react-hooks/rules-of-hooks */
 
   const statesTitle: Partial<Record<ContentState, string>> = {
     [ContentState.CONNECTION_REQUESTS]: t('accessibility.headings.connectionRequests'),
@@ -187,6 +205,10 @@ const MainContent: FC<MainContentProps> = ({
                   callingRepository={repositories.calling}
                   mediaRepository={repositories.media}
                   propertiesRepository={repositories.properties}
+                  isMediaDevicesAreInitialized={isMediaDevicesAreInitialized}
+                  deviceSupport={deviceSupport}
+                  availableDevices={availableDevices}
+                  currentDeviceId={currentDeviceId}
                 />
               </div>
             )}
