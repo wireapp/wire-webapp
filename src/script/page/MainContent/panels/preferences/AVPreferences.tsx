@@ -38,7 +38,7 @@ interface AVPreferencesProps {
   callingRepository: CallingRepository;
   mediaRepository: MediaRepository;
   propertiesRepository: PropertiesRepository;
-  isMediaDevicesAreInitialized: boolean;
+  areMediaDevicesInitialized: boolean;
   deviceSupport: Pick<
     Record<MediaDeviceType, boolean>,
     MediaDeviceType.AUDIO_INPUT | MediaDeviceType.AUDIO_OUTPUT | MediaDeviceType.VIDEO_INPUT
@@ -51,7 +51,7 @@ const AVPreferencesComponent = ({
   mediaRepository: {devicesHandler, constraintsHandler, streamHandler},
   propertiesRepository,
   callingRepository,
-  isMediaDevicesAreInitialized,
+  areMediaDevicesInitialized,
   deviceSupport,
   availableDevices,
   currentDeviceId,
@@ -60,20 +60,20 @@ const AVPreferencesComponent = ({
 
   return (
     <PreferencesPage title={t('preferencesAV')}>
-      {isMediaDevicesAreInitialized && (
+      {areMediaDevicesInitialized && (
         <div className="preferences-av-spinner-select">
           <div className="icon-spinner spin accent-text"></div>
         </div>
       )}
-      {!isMediaDevicesAreInitialized && deviceSupport.audioinput && (
+      {!areMediaDevicesInitialized && deviceSupport.audioinput && (
         <MicrophonePreferences
           {...{devicesHandler, streamHandler}}
           refreshStream={() => callingRepository.refreshAudioInput()}
           hasActiveCall={callingRepository.hasActiveCall()}
         />
       )}
-      {!isMediaDevicesAreInitialized && deviceSupport.audiooutput && <AudioOutPreferences {...{devicesHandler}} />}
-      {!isMediaDevicesAreInitialized && deviceSupport.videoinput && (
+      {!areMediaDevicesInitialized && deviceSupport.audiooutput && <AudioOutPreferences {...{devicesHandler}} />}
+      {!areMediaDevicesInitialized && deviceSupport.videoinput && (
         <CameraPreferences
           key={`camera-${shouldReloadCamera}`} // Force remount when call ends
           {...{devicesHandler, streamHandler}}
