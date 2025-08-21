@@ -35,7 +35,7 @@ interface PDFViewerProps {
 
 export const PDFViewer = ({src}: PDFViewerProps) => {
   const [pagesCount, setPagesCount] = useState(0);
-  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [sidebarOpen, setSidebarOpen] = useState(true);
 
   const {scale, zoomIn, zoomOut} = useZoomControls();
 

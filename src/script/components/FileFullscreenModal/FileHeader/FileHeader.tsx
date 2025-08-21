@@ -17,12 +17,13 @@
  *
  */
 
-import {CloseIcon} from '@wireapp/react-ui-kit';
+import {BadgesWithTooltip, Button, ButtonVariant, CloseIcon, DownloadIcon} from '@wireapp/react-ui-kit';
 
 import {FileTypeIcon} from 'Components/Conversation/common/FileTypeIcon/FileTypeIcon';
 import {MessageTime} from 'Components/MessagesList/Message/MessageTime';
 import {useRelativeTimestamp} from 'Hooks/useRelativeTimestamp';
 import {t} from 'Util/LocalizerUtil';
+import {forcedDownloadFile} from 'Util/util';
 
 import {
   headerStyles,
@@ -31,17 +32,29 @@ import {
   metadataStyles,
   nameStyles,
   textStyles,
+  downloadButtonStyles,
+  actionButtonsStyles,
 } from './FileHeader.styles';
 
 interface FileHeaderProps {
   onClose: () => void;
+  filePreviewUrl?: string;
   fileName: string;
   fileExtension: string;
   senderName: string;
   timestamp: number;
+  badges?: string[];
 }
 
-export const FileHeader = ({onClose, fileName, fileExtension, senderName, timestamp}: FileHeaderProps) => {
+export const FileHeader = ({
+  onClose,
+  filePreviewUrl,
+  fileName,
+  fileExtension,
+  senderName,
+  timestamp,
+  badges,
+}: FileHeaderProps) => {
   const timeAgo = useRelativeTimestamp(timestamp);
 
   return (
@@ -50,7 +63,7 @@ export const FileHeader = ({onClose, fileName, fileExtension, senderName, timest
         <button
           type="button"
           css={closeButtonStyles}
-          aria-label={t('cellsGlobalView.imageFullScreenModalCloseButton')}
+          aria-label={t('cells.imageFullScreenModal.closeButton')}
           onClick={onClose}
         >
           <CloseIcon />
@@ -62,7 +75,18 @@ export const FileHeader = ({onClose, fileName, fileExtension, senderName, timest
           <MessageTime timestamp={timestamp} data-timestamp-type="normal" css={textStyles}>
             {timeAgo}
           </MessageTime>
+          {badges && badges.length > 0 && <BadgesWithTooltip items={badges} />}
         </div>
+      </div>
+      <div css={actionButtonsStyles}>
+        <Button
+          variant={ButtonVariant.TERTIARY}
+          css={downloadButtonStyles}
+          onClick={() => forcedDownloadFile({url: filePreviewUrl || '', name: `${fileName}.${fileExtension}`})}
+          aria-label={t('cells.imageFullScreenModal.downloadButton')}
+        >
+          <DownloadIcon />
+        </Button>
       </div>
     </header>
   );

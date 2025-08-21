@@ -17,13 +17,13 @@
  *
  */
 
+import {isKnownSignature, MLSPublicKeys} from 'Repositories/client';
 import {E2EIHandler, MLSStatuses, WireIdentity} from 'src/script/E2EIdentity';
 import {t} from 'Util/LocalizerUtil';
 import {splitFingerprint} from 'Util/StringUtil';
 
 import {styles} from './MLSDeviceDetails.styles';
 
-import {isKnownSignature, MLSPublicKeys} from '../../../../../../../client';
 import {E2EICertificateDetails} from '../E2EICertificateDetails';
 import {FormattedId} from '../FormattedId';
 
@@ -48,10 +48,6 @@ export const MLSDeviceDetails = ({
   const isE2EIEnabled = E2EIHandler.getInstance().isE2EIEnabled();
   const showE2EICertificateDetails =
     isE2EIEnabled && (isSelfUser || (!isSelfUser && certificateState !== MLSStatuses.NOT_ACTIVATED));
-
-  if (!isSelfUser && certificateState === MLSStatuses.NOT_ACTIVATED) {
-    return null;
-  }
 
   if (!showE2EICertificateDetails && !identity?.thumbprint) {
     return null;

@@ -31,7 +31,7 @@ import {
   BaseSelection,
 } from 'lexical';
 
-import {User} from 'src/script/entity/User';
+import {User} from 'Repositories/entity/User';
 
 import {$createMentionNode} from '../../nodes/MentionNode';
 

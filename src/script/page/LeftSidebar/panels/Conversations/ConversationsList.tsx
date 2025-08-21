@@ -34,9 +34,12 @@ import {useDebouncedCallback} from 'use-debounce';
 import {WIDTH} from '@wireapp/react-ui-kit';
 
 import {ConversationListCell} from 'Components/ConversationListCell';
-import {Call} from 'src/script/calling/Call';
-import {ConversationLabel, ConversationLabelRepository} from 'src/script/conversation/ConversationLabelRepository';
-import {User} from 'src/script/entity/User';
+import {Call} from 'Repositories/calling/Call';
+import {CallState} from 'Repositories/calling/CallState';
+import {ConversationLabel, ConversationLabelRepository} from 'Repositories/conversation/ConversationLabelRepository';
+import {ConversationState} from 'Repositories/conversation/ConversationState';
+import {Conversation} from 'Repositories/entity/Conversation';
+import {User} from 'Repositories/entity/User';
 import {SidebarTabs, useSidebarStore} from 'src/script/page/LeftSidebar/panels/Conversations/useSidebarStore';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {isKeyboardEvent} from 'Util/KeyboardUtil';
@@ -48,9 +51,6 @@ import {ConnectionRequests} from './ConnectionRequests';
 import {conversationsList, headingTitle, noResultsMessage, virtualizationStyles} from './ConversationsList.styles';
 import {conversationSearchFilter, getConversationsWithHeadings} from './helpers';
 
-import {CallState} from '../../../../calling/CallState';
-import {ConversationState} from '../../../../conversation/ConversationState';
-import {Conversation} from '../../../../entity/Conversation';
 import {generateConversationUrl} from '../../../../router/routeGenerator';
 import {createNavigate, createNavigateKeyboard} from '../../../../router/routerBindings';
 import {ListViewModel} from '../../../../view_model/ListViewModel';
@@ -202,7 +202,9 @@ export const ConversationsList = ({
         .filter(conv => isConversationEntity(conv))
         .findIndex(conv => conv.id === clickedFilteredConversationId);
       if (conversationIndex !== -1) {
-        rowVirtualizer.scrollToIndex(conversationIndex, {align: 'auto'});
+        requestAnimationFrame(() => {
+          rowVirtualizer.scrollToIndex(conversationIndex, {align: 'auto'});
+        });
       }
 
       setClickedFilteredConversationId(null);

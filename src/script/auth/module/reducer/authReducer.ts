@@ -26,29 +26,32 @@ import type {UserAsset} from '@wireapp/api-client/lib/user/';
 
 import {Config} from '../../../Config';
 import {AUTH_ACTION, AppActions, USER_ACTION} from '../action/creator/';
-import {REGISTER_FLOW} from '../selector/AuthSelector';
 
 export interface RegistrationDataState {
-  accent_id: number;
-  assets: UserAsset[];
-  email: string;
-  email_code: string;
-  invitation_code: string;
-  label: string;
-  locale: string;
+  accent_id?: number;
+  assets: UserAsset[] | [];
+  email?: string;
+  email_code: string | null;
+  invitation_code?: string;
+  label?: string;
+  locale?: string;
   name: string;
-  password: string;
-  team: TeamData;
+  password?: string;
+  team?: TeamData;
   termsAccepted: boolean;
+  privacyPolicyAccepted: boolean;
+  customBackendURL: string;
+  accountCreationEnabled: boolean;
+  shouldDisplayWarning: boolean;
 }
 
 export type LoginDataState = Pick<LoginData, 'clientType'>;
 
 export type AuthState = {
   readonly account: RegistrationDataState;
-  readonly currentFlow: string;
+  readonly currentFlow: string | null;
   readonly entropy?: Uint8Array;
-  readonly error: Error;
+  readonly error: Error | null;
   readonly fetched: boolean;
   readonly fetching: boolean;
   readonly fetchingSSOSettings: boolean;
@@ -61,20 +64,16 @@ export type AuthState = {
 
 export const initialAuthState: AuthState = {
   account: {
-    accent_id: null,
-    assets: null,
-    email: null,
+    assets: [],
     email_code: null,
-    invitation_code: null,
-    label: null,
-    locale: null,
-    name: null,
-    password: null,
-    team: null,
     termsAccepted: false,
+    customBackendURL: '',
+    accountCreationEnabled: false,
+    shouldDisplayWarning: false,
+    privacyPolicyAccepted: false,
+    name: '',
   },
   currentFlow: null,
-  entropy: null,
   error: null,
   fetched: false,
   fetching: false,
@@ -86,7 +85,7 @@ export const initialAuthState: AuthState = {
   },
   oAuthApp: undefined,
   ssoSettings: {
-    default_sso_code: undefined,
+    default_sso_code: '',
   },
 };
 
@@ -96,7 +95,6 @@ export function authReducer(state: AuthState = initialAuthState, action: AppActi
     case AUTH_ACTION.REGISTER_JOIN_START:
     case AUTH_ACTION.REGISTER_WIRELESS_START:
     case AUTH_ACTION.REGISTER_PERSONAL_START:
-    case AUTH_ACTION.REGISTER_TEAM_START:
     case USER_ACTION.USER_SEND_ACTIVATION_CODE_START: {
       return {
         ...state,
@@ -144,7 +142,6 @@ export function authReducer(state: AuthState = initialAuthState, action: AppActi
     case AUTH_ACTION.REGISTER_JOIN_FAILED:
     case AUTH_ACTION.REGISTER_PERSONAL_FAILED:
     case AUTH_ACTION.REGISTER_WIRELESS_FAILED:
-    case AUTH_ACTION.REGISTER_TEAM_FAILED:
     case USER_ACTION.USER_SEND_ACTIVATION_CODE_FAILED: {
       return {
         ...state,
@@ -165,8 +162,7 @@ export function authReducer(state: AuthState = initialAuthState, action: AppActi
     case AUTH_ACTION.REFRESH_SUCCESS:
     case AUTH_ACTION.REGISTER_JOIN_SUCCESS:
     case AUTH_ACTION.REGISTER_WIRELESS_SUCCESS:
-    case AUTH_ACTION.REGISTER_PERSONAL_SUCCESS:
-    case AUTH_ACTION.REGISTER_TEAM_SUCCESS: {
+    case AUTH_ACTION.REGISTER_PERSONAL_SUCCESS: {
       return {
         ...state,
         account: {...initialAuthState.account},
@@ -240,15 +236,6 @@ export function authReducer(state: AuthState = initialAuthState, action: AppActi
     }
     case AUTH_ACTION.AUTH_RESET_ERROR: {
       return {...state, error: null};
-    }
-    case AUTH_ACTION.ENTER_TEAM_CREATION_FLOW: {
-      return {...state, currentFlow: REGISTER_FLOW.TEAM};
-    }
-    case AUTH_ACTION.ENTER_PERSONAL_CREATION_FLOW: {
-      return {...state, currentFlow: REGISTER_FLOW.PERSONAL, account: {...initialAuthState.account}};
-    }
-    case AUTH_ACTION.ENTER_GENERIC_INVITATION_FLOW: {
-      return {...state, currentFlow: REGISTER_FLOW.GENERIC_INVITATION};
     }
     case USER_ACTION.USER_SEND_ACTIVATION_CODE_SUCCESS: {
       return {

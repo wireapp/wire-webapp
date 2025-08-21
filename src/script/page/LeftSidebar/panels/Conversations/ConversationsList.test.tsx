@@ -23,11 +23,11 @@ import {render} from '@testing-library/react';
 import {ConversationProtocol, CONVERSATION_TYPE} from '@wireapp/api-client/lib/conversation';
 import ko from 'knockout';
 
-import {CallState} from 'src/script/calling/CallState';
-import {ConversationLabel, ConversationLabelRepository} from 'src/script/conversation/ConversationLabelRepository';
-import {ConversationState} from 'src/script/conversation/ConversationState';
-import {Conversation} from 'src/script/entity/Conversation';
-import {User} from 'src/script/entity/User';
+import {CallState} from 'Repositories/calling/CallState';
+import {ConversationLabel, ConversationLabelRepository} from 'Repositories/conversation/ConversationLabelRepository';
+import {ConversationState} from 'Repositories/conversation/ConversationState';
+import {Conversation} from 'Repositories/entity/Conversation';
+import {User} from 'Repositories/entity/User';
 import {ListViewModel} from 'src/script/view_model/ListViewModel';
 
 import {ConversationsList} from './ConversationsList';

@@ -24,10 +24,9 @@ import cx from 'classnames';
 
 import {selfIndicator} from 'Components/ParticipantItemContent/ParticipantItem.styles';
 import {UserName} from 'Components/UserName';
+import {User} from 'Repositories/entity/User';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {KEY} from 'Util/KeyboardUtil';
-
-import {User} from '../../entity/User';
 
 interface UserInfoProps {
   user: User;

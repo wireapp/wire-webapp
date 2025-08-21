@@ -26,5 +26,6 @@ export const EXTERNAL_ROUTE = {
   WIRE_TEAM_FEATURES: `${Config.getConfig().URL.WEBSITE_BASE}/create-team/#features`,
   WIRE_TERMS_PERSONAL: `${Config.getConfig().URL.WEBSITE_BASE}/legal/terms/#personal`,
   WIRE_TERMS_TEAMS: `${Config.getConfig().URL.WEBSITE_BASE}/legal/terms/#teams`,
+  WIRE_TEAMS_SIGNUP: `${Config.getConfig().URL.TEAMS_BASE}/signup/account?origin=web_desktop`,
   WIRE_WEBSITE: Config.getConfig().URL.WEBSITE_BASE,
 };

@@ -35,8 +35,8 @@ export const buttonStyles: CSSObject = {
   },
 
   [`@media (min-width: ${styleBreakpoint}px)`]: {
-    width: '40px',
-    height: '40px',
+    width: '32px',
+    height: '32px',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',

@@ -42,7 +42,7 @@ export const CellsPageSizeSelect = ({pageSize, onSizeChange}: CellsPageSizeSelec
 
   return (
     <div css={wrapperStyles}>
-      <div css={labelStyles}>{t('cellsGlobalView.pagination.rowsPerPage')}</div>
+      <div css={labelStyles}>{t('cells.pagination.rowsPerPage')}</div>
       <div css={selectWrapperStyles}>
         <Select
           id={'page-size'}

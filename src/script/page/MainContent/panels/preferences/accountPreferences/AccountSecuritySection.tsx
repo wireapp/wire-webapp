@@ -19,24 +19,23 @@
 
 import React from 'react';
 
-import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
 import {amplify} from 'amplify';
 import {container} from 'tsyringe';
 
 import {Runtime} from '@wireapp/commons';
-import {Link, LinkVariant} from '@wireapp/react-ui-kit';
+import {TabIndex, Link, LinkVariant} from '@wireapp/react-ui-kit';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
+import {User} from 'Repositories/entity/User';
+import {TeamState} from 'Repositories/team/TeamState';
+import {AppLockState} from 'Repositories/user/AppLockState';
+import {FEATURES, hasAccessToFeature} from 'Repositories/user/UserPermission';
+import {UserRepository} from 'Repositories/user/UserRepository';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 
-import {User} from '../../../../../entity/User';
 import {externalUrl, getManageTeamUrl} from '../../../../../externalRoute';
-import {TeamState} from '../../../../../team/TeamState';
-import {AppLockState} from '../../../../../user/AppLockState';
-import {FEATURES, hasAccessToFeature} from '../../../../../user/UserPermission';
-import {UserRepository} from '../../../../../user/UserRepository';
 import {PreferencesSection} from '../components/PreferencesSection';
 
 interface AccountSecuritySectionProps {

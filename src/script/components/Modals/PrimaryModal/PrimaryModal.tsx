@@ -82,6 +82,7 @@ export const PrimaryModalComponent: FC = () => {
     passwordOptional = false,
     allButtonsFullWidth = false,
     primaryBtnFirst = false,
+    size = 'small',
   } = content;
 
   const isPassword = currentType === PrimaryModalType.PASSWORD;
@@ -267,6 +268,7 @@ export const PrimaryModalComponent: FC = () => {
       onClose={onModalHidden}
       onBgClick={onBgClick}
       dataUieName={modalUie}
+      size={size}
     >
       <PrimaryModalHeader
         titleText={titleText}

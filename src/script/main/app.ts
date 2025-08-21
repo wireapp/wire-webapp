@@ -18,11 +18,12 @@
  */
 
 // Polyfill for "tsyringe" dependency injection
+
 // eslint-disable-next-line import/order
 
 import {Context} from '@wireapp/api-client/lib/auth';
 import {ClientClassification, ClientType} from '@wireapp/api-client/lib/client/';
-import {FEATURE_KEY, FeatureList} from '@wireapp/api-client/lib/team';
+import {FEATURE_KEY, FeatureList, FeatureStatus} from '@wireapp/api-client/lib/team';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {EVENTS as CoreEvents} from '@wireapp/core/lib/Account';
 import {MLSServiceEvents} from '@wireapp/core/lib/messagingProtocols/mls';
@@ -36,88 +37,88 @@ import {Runtime} from '@wireapp/commons';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
+import {AssetRepository} from 'Repositories/assets/AssetRepository';
+import {AudioRepository} from 'Repositories/audio/AudioRepository';
+import {BackupRepository} from 'Repositories/backup/BackupRepository';
+import {BackupService} from 'Repositories/backup/BackupService';
+import {CacheRepository} from 'Repositories/cache/CacheRepository';
+import {CallingRepository} from 'Repositories/calling/CallingRepository';
+import {CellsRepository} from 'Repositories/cells/CellsRepository';
+import {ClientRepository, ClientService} from 'Repositories/client';
+import {getClientMLSConfig} from 'Repositories/client/clientMLSConfig';
+import {ConnectionRepository} from 'Repositories/connection/ConnectionRepository';
+import {ConnectionService} from 'Repositories/connection/ConnectionService';
+import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
+import {ConversationService} from 'Repositories/conversation/ConversationService';
+import {ConversationVerificationState} from 'Repositories/conversation/ConversationVerificationState';
+import {OnConversationE2EIVerificationStateChange} from 'Repositories/conversation/ConversationVerificationStateHandler/shared';
+import {EventBuilder} from 'Repositories/conversation/EventBuilder';
+import {MessageRepository} from 'Repositories/conversation/MessageRepository';
+import {CryptographyRepository} from 'Repositories/cryptography/CryptographyRepository';
+import {User} from 'Repositories/entity/User';
+import {EventRepository} from 'Repositories/event/EventRepository';
+import {EventService} from 'Repositories/event/EventService';
+import {NotificationService} from 'Repositories/event/NotificationService';
+import {EventStorageMiddleware} from 'Repositories/event/preprocessor/EventStorageMiddleware';
+import {QuotedMessageMiddleware} from 'Repositories/event/preprocessor/QuoteDecoderMiddleware';
+import {ReceiptsMiddleware} from 'Repositories/event/preprocessor/ReceiptsMiddleware';
+import {RepliesUpdaterMiddleware} from 'Repositories/event/preprocessor/RepliesUpdaterMiddleware';
+import {ServiceMiddleware} from 'Repositories/event/preprocessor/ServiceMiddleware';
+import {FederationEventProcessor} from 'Repositories/event/processor/FederationEventProcessor';
+import {GiphyRepository} from 'Repositories/extension/GiphyRepository';
+import {GiphyService} from 'Repositories/extension/GiphyService';
+import {IntegrationRepository} from 'Repositories/integration/IntegrationRepository';
+import {IntegrationService} from 'Repositories/integration/IntegrationService';
+import {MediaRepository} from 'Repositories/media/MediaRepository';
+import {NotificationRepository} from 'Repositories/notification/NotificationRepository';
+import {PreferenceNotificationRepository} from 'Repositories/notification/PreferenceNotificationRepository';
+import {PermissionRepository} from 'Repositories/permission/PermissionRepository';
+import {PropertiesRepository} from 'Repositories/properties/PropertiesRepository';
+import {PropertiesService} from 'Repositories/properties/PropertiesService';
+import {SearchRepository} from 'Repositories/search/SearchRepository';
+import {SelfRepository} from 'Repositories/self/SelfRepository';
+import {SelfService} from 'Repositories/self/SelfService';
+import {StorageKey, StorageRepository, StorageService} from 'Repositories/storage';
+import {TeamRepository} from 'Repositories/team/TeamRepository';
+import {TeamService} from 'Repositories/team/TeamService';
+import {EventTrackingRepository} from 'Repositories/tracking/EventTrackingRepository';
+import {UserRepository} from 'Repositories/user/UserRepository';
+import {UserService} from 'Repositories/user/UserService';
 import {initializeDataDog} from 'Util/DataDog';
 import {DebugUtil} from 'Util/DebugUtil';
 import {Environment} from 'Util/Environment';
 import {t} from 'Util/LocalizerUtil';
 import {getLogger, Logger} from 'Util/Logger';
 import {includesString} from 'Util/StringUtil';
-import {TIME_IN_MILLIS} from 'Util/TimeUtil';
+import {durationFrom, formatCoarseDuration, TIME_IN_MILLIS} from 'Util/TimeUtil';
 import {appendParameter} from 'Util/UrlUtil';
 import {AppInitializationStep, checkIndexedDb, InitializationEventLogger} from 'Util/util';
 
 import '../../style/default.less';
-import {AssetRepository} from '../assets/AssetRepository';
-import {AudioRepository} from '../audio/AudioRepository';
 import {SIGN_OUT_REASON} from '../auth/SignOutReason';
 import {URLParameter} from '../auth/URLParameter';
-import {BackupRepository} from '../backup/BackupRepository';
-import {BackupService} from '../backup/BackupService';
-import {CacheRepository} from '../cache/CacheRepository';
-import {CallingRepository} from '../calling/CallingRepository';
-import {CellsRepository} from '../cells/CellsRepository';
-import {ClientRepository, ClientService} from '../client';
-import {getClientMLSConfig} from '../client/clientMLSConfig';
 import {Config, Configuration} from '../Config';
-import {ConnectionRepository} from '../connection/ConnectionRepository';
-import {ConnectionService} from '../connection/ConnectionService';
-import {ConversationRepository} from '../conversation/ConversationRepository';
-import {ConversationService} from '../conversation/ConversationService';
-import {ConversationVerificationState} from '../conversation/ConversationVerificationState';
-import {OnConversationE2EIVerificationStateChange} from '../conversation/ConversationVerificationStateHandler/shared';
-import {EventBuilder} from '../conversation/EventBuilder';
-import {MessageRepository} from '../conversation/MessageRepository';
-import {CryptographyRepository} from '../cryptography/CryptographyRepository';
 import {E2EIHandler} from '../E2EIdentity';
 import {getModalOptions, ModalType} from '../E2EIdentity/Modals';
-import {User} from '../entity/User';
 import {AccessTokenError} from '../error/AccessTokenError';
 import {AuthError} from '../error/AuthError';
 import {BaseError} from '../error/BaseError';
 import {CLIENT_ERROR_TYPE, ClientError} from '../error/ClientError';
 import {TeamError} from '../error/TeamError';
-import {EventRepository} from '../event/EventRepository';
-import {EventService} from '../event/EventService';
-import {NotificationService} from '../event/NotificationService';
-import {EventStorageMiddleware} from '../event/preprocessor/EventStorageMiddleware';
-import {QuotedMessageMiddleware} from '../event/preprocessor/QuoteDecoderMiddleware';
-import {ReceiptsMiddleware} from '../event/preprocessor/ReceiptsMiddleware';
-import {RepliesUpdaterMiddleware} from '../event/preprocessor/RepliesUpdaterMiddleware';
-import {ServiceMiddleware} from '../event/preprocessor/ServiceMiddleware';
-import {FederationEventProcessor} from '../event/processor/FederationEventProcessor';
-import {GiphyRepository} from '../extension/GiphyRepository';
-import {GiphyService} from '../extension/GiphyService';
 import {externalUrl} from '../externalRoute';
-import {IntegrationRepository} from '../integration/IntegrationRepository';
-import {IntegrationService} from '../integration/IntegrationService';
 import {startNewVersionPolling} from '../lifecycle/newVersionHandler';
 import {scheduleApiVersionUpdate, updateApiVersion} from '../lifecycle/updateRemoteConfigs';
-import {MediaRepository} from '../media/MediaRepository';
 import {initialiseSelfAndTeamConversations, initMLSGroupConversations} from '../mls';
 import {joinConversationsAfterMigrationFinalisation} from '../mls/MLSMigration/migrationFinaliser';
-import {NotificationRepository} from '../notification/NotificationRepository';
-import {PreferenceNotificationRepository} from '../notification/PreferenceNotificationRepository';
 import {configureDownloadPath} from '../page/components/FeatureConfigChange/FeatureConfigChangeHandler/Features/downloadPath';
 import {configureE2EI} from '../page/components/FeatureConfigChange/FeatureConfigChangeHandler/Features/E2EIdentity';
-import {PermissionRepository} from '../permission/PermissionRepository';
-import {PropertiesRepository} from '../properties/PropertiesRepository';
-import {PropertiesService} from '../properties/PropertiesService';
-import {SearchRepository} from '../search/SearchRepository';
-import {SelfRepository} from '../self/SelfRepository';
-import {SelfService} from '../self/SelfService';
 import {APIClient} from '../service/APIClientSingleton';
 import {Core} from '../service/CoreSingleton';
-import {StorageKey, StorageRepository, StorageService} from '../storage';
-import {TeamRepository} from '../team/TeamRepository';
-import {TeamService} from '../team/TeamService';
 import {AppInitStatisticsValue} from '../telemetry/app_init/AppInitStatisticsValue';
 import {AppInitTelemetry} from '../telemetry/app_init/AppInitTelemetry';
 import {AppInitTimingsStep} from '../telemetry/app_init/AppInitTimingsStep';
 import {serverTimeHandler} from '../time/serverTimeHandler';
-import {EventTrackingRepository} from '../tracking/EventTrackingRepository';
 import {WindowHandler} from '../ui/WindowHandler';
-import {UserRepository} from '../user/UserRepository';
-import {UserService} from '../user/UserService';
 import {ViewModelRepositories} from '../view_model/MainViewModel';
 import {Warnings} from '../view_model/WarningsContainer';
 
@@ -350,11 +351,11 @@ export class App {
 
   private initializeCells({cellsRepository, selfUser}: {cellsRepository: CellsRepository; selfUser: User}) {
     const cellPydioApiKey = Config.getConfig().CELLS_TOKEN_SHARED_SECRET;
+    const cellsInitWithZauthToken = Config.getConfig().FEATURE.CELLS_INIT_WITH_ZAUTH_TOKEN;
 
-    const cellsApiKey =
-      process.env.NODE_ENV === 'development'
-        ? cellPydioApiKey
-        : `${cellPydioApiKey}:${selfUser.qualifiedId.id}@${selfUser.qualifiedId.domain}`;
+    const cellsApiKey = cellsInitWithZauthToken
+      ? undefined
+      : `${cellPydioApiKey}:${selfUser.qualifiedId.id}@${selfUser.qualifiedId.domain}`;
 
     cellsRepository.initialize({
       pydio: {
@@ -386,7 +387,7 @@ export class App {
    * @param config
    * @param onProgress
    */
-  async initApp(clientType: ClientType, onProgress: (progress: number, message?: string) => void) {
+  async initApp(clientType: ClientType, onProgress: (message?: string) => void) {
     // add body information
     const startTime = Date.now();
     await updateApiVersion();
@@ -414,7 +415,7 @@ export class App {
         cells: cellsRepository,
       } = this.repository;
       await checkIndexedDb();
-      onProgress(2.5);
+
       telemetry.timeStep(AppInitTimingsStep.RECEIVED_ACCESS_TOKEN);
 
       let selfUser: User;
@@ -431,7 +432,8 @@ export class App {
       await initializeDataDog(this.config, selfUser.qualifiedId);
       const eventLogger = new InitializationEventLogger(selfUser.id);
       eventLogger.log(AppInitializationStep.AppInitialize);
-      onProgress(5, t('initReceivedSelfUser', {user: selfUser.name()}, {}, true));
+
+      onProgress(t('initReceivedSelfUser', {user: selfUser.name()}, {}, true));
 
       try {
         await this.core.init(clientType);
@@ -472,7 +474,8 @@ export class App {
       try {
         await this.core.initClient(localClient, getClientMLSConfig(teamFeatures));
       } catch (error) {
-        await this.showForceLogoutModal(SIGN_OUT_REASON.CLIENT_REMOVED);
+        console.warn('Failed to initialize client', {error});
+        this.showForceLogoutModal(SIGN_OUT_REASON.CLIENT_REMOVED);
       }
 
       const e2eiHandler = await configureE2EI(teamFeatures);
@@ -506,11 +509,12 @@ export class App {
       telemetry.timeStep(AppInitTimingsStep.RECEIVED_SELF_USER);
       const clientEntity = await this._initiateSelfUserClients(selfUser, clientRepository);
       callingRepository.initAvs(selfUser, clientEntity.id);
-      onProgress(7.5, t('initValidatedClient'));
+
+      onProgress(t('initValidatedClient'));
+
       telemetry.timeStep(AppInitTimingsStep.VALIDATED_CLIENT);
       telemetry.addStatistic(AppInitStatisticsValue.CLIENT_TYPE, clientEntity.type ?? clientType);
       eventLogger.log(AppInitializationStep.ValidatedClient);
-      onProgress(10);
       telemetry.timeStep(AppInitTimingsStep.INITIALIZED_CRYPTOGRAPHY);
 
       const {connections, deadConnections} = await connectionRepository.getConnections(teamMembers);
@@ -527,6 +531,7 @@ export class App {
       if (this.core.hasMLSDevice) {
         //if mls is supported, we need to initialize the callbacks (they are used when decrypting messages)
         conversationRepository.initMLSConversationRecoveredListener();
+        conversationRepository.initMLSEventDistributedListener();
         conversationRepository.registerMLSConversationVerificationStateHandler(
           selfUser.qualifiedId.domain,
           this.updateConversationE2EIVerificationState,
@@ -534,7 +539,7 @@ export class App {
         );
       }
 
-      onProgress(25, t('initReceivedUserData'));
+      onProgress(t('initReceivedUserData'));
       telemetry.addStatistic(AppInitStatisticsValue.CONVERSATIONS, conversations.length, 50);
       this._subscribeToUnloadEvents(selfUser);
       this._subscribeToBeforeUnload();
@@ -543,33 +548,49 @@ export class App {
       await conversationRepository.conversationRoleRepository.loadTeamRoles();
 
       let totalNotifications = 0;
-      await eventRepository.connectWebSocket(this.core, ({done, total}) => {
-        const baseMessage = t('initDecryption');
-        const extraInfo = this.config.FEATURE.SHOW_LOADING_INFORMATION
-          ? ` ${t('initProgress', {number1: done.toString(), number2: total.toString()})}`
-          : '';
+      const useAsyncNotificationStream =
+        teamFeatures[FEATURE_KEY.CONSUMABLE_NOTIFICATIONS]?.status === FeatureStatus.ENABLED &&
+        Config.getConfig().FEATURE.USE_ASYNC_NOTIFICATIONS;
+      const useLegacyNotificationStream = !useAsyncNotificationStream;
 
-        totalNotifications = total;
-        onProgress(25 + 50 * (done / total), `${baseMessage}${extraInfo}`);
-      });
+      await eventRepository.connectWebSocket(
+        this.core,
+        useLegacyNotificationStream,
+        (currentProcessingNotificationTimestamp: string) => {
+          /**
+           * NOTE: this call back is now also called when client was already open but websocket
+           * was offline for a while hence it can be used to demonstrate number of pending messages
+           * even when app is already loaded and in the main screen view
+           */
+          const baseMessage = t('initDecryption');
+          const extraInfo = this.config.FEATURE.SHOW_LOADING_INFORMATION
+            ? ` ${t('initProgress', {time: formatCoarseDuration(durationFrom(currentProcessingNotificationTimestamp))})}`
+            : '';
+
+          totalNotifications++;
+          onProgress(`${baseMessage}${extraInfo}`);
+        },
+      );
+
       eventLogger.log(AppInitializationStep.DecryptionCompleted, {count: totalNotifications});
 
       await conversationRepository.init1To1Conversations(connections, conversations);
       if (this.core.hasMLSDevice) {
-        //add the potential `self` and `team` conversations
+        // add the potential `self` and `team` conversations
         await initialiseSelfAndTeamConversations(conversations, selfUser, clientEntity.id, this.core);
 
-        //join all the mls groups that are known by the user but were migrated to mls
+        // join all the mls groups that are known by the user but were migrated to mls
         await joinConversationsAfterMigrationFinalisation({
           conversations,
+          selfUser,
           core: this.core,
           onSuccess: conversationRepository.injectJoinedAfterMigrationFinalisationMessage,
           onError: ({id}, error) =>
             this.logger.error(`Failed when joining a migrated mls conversation with id ${id}, error: `, error),
         });
 
-        //join all the mls groups we're member of and have not yet joined (eg. we were not send welcome message)
-        await initMLSGroupConversations(conversations, {
+        // join all the mls groups we're member of and have not yet joined (eg. we were not send welcome message)
+        await initMLSGroupConversations(conversations, selfUser, {
           core: this.core,
           onError: ({id}, error) =>
             this.logger.error(`Failed when initialising mls conversation with id ${id}, error: `, error),
@@ -579,14 +600,12 @@ export class App {
       eventLogger.log(AppInitializationStep.SetupMLS);
       telemetry.timeStep(AppInitTimingsStep.UPDATED_FROM_NOTIFICATIONS);
       telemetry.addStatistic(AppInitStatisticsValue.NOTIFICATIONS, totalNotifications, 100);
-      onProgress(97.5, t('initUpdatedFromNotifications', {brandName: this.config.BRAND_NAME}));
+      onProgress(t('initUpdatedFromNotifications', {brandName: this.config.BRAND_NAME}));
 
       const clientEntities = await clientRepository.updateClientsForSelf();
 
       // We unblock the lock screen by loading this code asynchronously, to make it appear to the user that the app is done loading earlier.
       void eventTrackerRepository.init(propertiesRepository.getUserConsentStatus().isTelemetryConsentGiven);
-
-      onProgress(99);
 
       eventLogger.log(AppInitializationStep.ClientsUpdated, {count: clientEntities.length});
       telemetry.addStatistic(AppInitStatisticsValue.CLIENTS, clientEntities.length);

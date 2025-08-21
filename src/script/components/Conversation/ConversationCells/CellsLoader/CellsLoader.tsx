@@ -17,27 +17,13 @@
  *
  */
 
-import {CSSProperties} from 'react';
-
 import {wrapperStyles} from './CellsLoader.styles';
 
 import {CellsTableLoader} from '../common/CellsTableLoader/CellsTableLoader';
 
-interface CellsLoaderProps {
-  minHeight?: number;
-}
-
-export const CellsLoader = ({minHeight}: CellsLoaderProps) => {
+export const CellsLoader = () => {
   return (
-    <div
-      css={wrapperStyles}
-      style={
-        {
-          '--margin-top': minHeight ? '0px' : '48px',
-          '--min-height': minHeight ? `${minHeight}px` : 'auto',
-        } as CSSProperties
-      }
-    >
+    <div css={wrapperStyles}>
       <CellsTableLoader />
     </div>
   );

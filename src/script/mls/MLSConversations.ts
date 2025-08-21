@@ -29,9 +29,9 @@ import {
   isTeamConversation,
   MLSCapableConversation,
   MLSConversation,
-} from '../conversation/ConversationSelectors';
-import {Conversation} from '../entity/Conversation';
-import {User} from '../entity/User';
+} from 'Repositories/conversation/ConversationSelectors';
+import {Conversation} from 'Repositories/entity/Conversation';
+import {User} from 'Repositories/entity/User';
 
 /**
  * Will initialize all the MLS conversations that the user is member of but that are not yet locally established.
@@ -41,6 +41,7 @@ import {User} from '../entity/User';
  */
 export async function initMLSGroupConversations(
   conversations: Conversation[],
+  selfUser: User,
   {
     core,
     onSuccessfulJoin,
@@ -62,7 +63,11 @@ export async function initMLSGroupConversations(
   );
 
   for (const mlsConversation of mlsGroupConversations) {
-    await initMLSGroupConversation(mlsConversation, {core, onSuccessfulJoin, onError});
+    await initMLSGroupConversation(mlsConversation, selfUser.qualifiedId, {
+      core,
+      onSuccessfulJoin,
+      onError,
+    });
   }
 }
 
@@ -74,6 +79,7 @@ export async function initMLSGroupConversations(
  */
 export async function initMLSGroupConversation(
   mlsConversation: MLSCapableConversation,
+  selfUserQualifiedId: QualifiedId,
   {
     core,
     onSuccessfulJoin,
@@ -102,6 +108,8 @@ export async function initMLSGroupConversation(
 
     //otherwise we should try joining via external commit
     await conversationService.joinByExternalCommit(qualifiedId);
+    await addOtherSelfClientsToMLSConversation(mlsConversation, selfUserQualifiedId, core.clientId, core);
+
     onSuccessfulJoin?.(mlsConversation);
   } catch (error) {
     onError?.(mlsConversation, error);
@@ -151,7 +159,8 @@ export async function initialiseSelfAndTeamConversations(
       }
 
       // Otherwise, we need to join the conversation via external commit.
-      return conversationService.joinByExternalCommit(conversation.qualifiedId);
+      await conversationService.joinByExternalCommit(conversation.qualifiedId);
+      await addOtherSelfClientsToMLSConversation(conversation, selfUser.qualifiedId, selfClientId, core);
     }),
   );
 }
@@ -170,20 +179,27 @@ export async function addOtherSelfClientsToMLSConversation(
   selfClientId: string,
   core: Account,
 ) {
-  const {groupId, qualifiedId} = conversation;
+  try {
+    const {groupId, qualifiedId} = conversation;
 
-  if (!groupId) {
-    throw new Error(`No group id found for MLS conversation ${conversation.id}`);
+    if (!groupId) {
+      throw new Error(`No group id found for MLS conversation ${conversation.id}`);
+    }
+
+    const selfQualifiedUser: KeyPackageClaimUser = {
+      ...selfUserId,
+      skipOwnClientId: selfClientId,
+    };
+
+    await core.service?.conversation.addUsersToMLSConversation({
+      conversationId: qualifiedId,
+      groupId,
+      qualifiedUsers: [selfQualifiedUser],
+    });
+  } catch (error) {
+    console.warn(
+      `Error when tried to add other self clients to MLS conversation ${conversation.qualifiedId.id} ${conversation.qualifiedId.domain}`,
+      error,
+    );
   }
-
-  const selfQualifiedUser: KeyPackageClaimUser = {
-    ...selfUserId,
-    skipOwnClientId: selfClientId,
-  };
-
-  await core.service?.conversation.addUsersToMLSConversation({
-    conversationId: qualifiedId,
-    groupId,
-    qualifiedUsers: [selfQualifiedUser],
-  });
 }

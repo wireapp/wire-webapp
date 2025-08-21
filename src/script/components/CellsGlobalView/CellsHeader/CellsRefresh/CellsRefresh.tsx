@@ -31,7 +31,7 @@ export const CellsRefresh = ({onRefresh}: CellsRefreshProps) => {
   return (
     <Button variant={ButtonVariant.TERTIARY} onClick={onRefresh} css={buttonStyles}>
       <ReloadIcon css={iconStyles} />
-      {t('cellsGlobalView.refreshButton')}
+      {t('cells.refreshButton')}
     </Button>
   );
 };

@@ -23,16 +23,23 @@ import {styleBreakpoint} from '../common/styleBreakpoint/styleBreakpoint';
 
 export const wrapperStyles: CSSObject = {
   maxWidth: '100%',
+  overflowX: 'auto',
+  overflowY: 'auto',
+  marginBottom: 'auto',
 };
 
 export const tableStyles: CSSObject = {
   width: '100%',
   borderCollapse: 'collapse',
   tableLayout: 'fixed',
+
+  [`@media (min-width: ${styleBreakpoint}px)`]: {
+    minWidth: '900px',
+  },
 };
 
 export const headerCellStyles: CSSObject = {
-  padding: '12px',
+  padding: '8px',
   textAlign: 'left',
   borderBottom: '1px solid var(--gray-70)',
   fontSize: 'var(--font-size-small)',
@@ -52,7 +59,7 @@ export const tableCellStyles: CSSObject = {
 
   [`@media (max-width: ${styleBreakpoint}px)`]: {
     display: 'block',
-    padding: '12px 0',
+    padding: '12px 8px',
     borderBottom: '1px solid var(--border-color)',
 
     '&[data-cell]': {
@@ -77,16 +84,15 @@ export const tableActionsCellStyles: CSSObject = {
     background: 'var(--foreground-fade-8)',
     border: 'none',
     marginTop: '8px',
-    borderRadius: '8px',
+    borderRadius: '0',
     width: '100% !important',
   },
 };
 
 export const tableCellRow: CSSObject = {
   display: 'block',
-  border: '1px solid var(--border-color)',
-  padding: '8px 12px',
-  borderRadius: '8px',
+  borderBottom: '1px solid var(--border-color)',
+  borderTop: '1px solid var(--border-color)',
 
   '&:hover': {
     backgroundColor: 'var(--white)',
@@ -104,7 +110,6 @@ export const tableCellRow: CSSObject = {
     display: 'table-row',
     padding: '0',
     border: 'none',
-    borderRadius: '0',
   },
 };
 

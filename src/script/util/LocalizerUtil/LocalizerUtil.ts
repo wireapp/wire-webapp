@@ -20,10 +20,10 @@
 import {escape} from 'underscore';
 
 import en from 'I18n/en-US.json';
+import type {User} from 'Repositories/entity/User';
 
 import {Declension} from './LocalizerUtil.types';
 
-import type {User} from '../../entity/User';
 import {sortUsersByPriority} from '../StringUtil';
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars

@@ -20,7 +20,7 @@
 import React from 'react';
 
 import {DeviceVerificationBadges} from 'Components/Badge';
-import {ClientEntity} from 'src/script/client/ClientEntity';
+import {ClientEntity} from 'Repositories/client/ClientEntity';
 import {E2EIHandler, WireIdentity} from 'src/script/E2EIdentity';
 
 import {MLSDeviceDetails} from './MLSDeviceDetails';

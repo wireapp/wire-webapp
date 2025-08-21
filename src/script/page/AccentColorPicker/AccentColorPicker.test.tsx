@@ -22,7 +22,7 @@ import ko from 'knockout';
 
 import {AccentColor} from '@wireapp/commons';
 
-import {User} from 'src/script/entity/User';
+import {User} from 'Repositories/entity/User';
 
 import {AccentColorPicker, AccentColorPickerProps} from './AccentColorPicker';
 

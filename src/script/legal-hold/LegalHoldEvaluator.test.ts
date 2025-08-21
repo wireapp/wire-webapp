@@ -21,12 +21,11 @@ import {GenericMessageType} from '@wireapp/core/lib/conversation';
 
 import {GenericMessage, LegalHoldStatus, Text} from '@wireapp/protocol-messaging';
 
+import {CryptographyMapper} from 'Repositories/cryptography/CryptographyMapper';
 import {createMessageAddEvent} from 'test/helper/EventGenerator';
 import {createUuid} from 'Util/uuid';
 
 import * as LegalHoldEvaluator from './LegalHoldEvaluator';
-
-import {CryptographyMapper} from '../cryptography/CryptographyMapper';
 
 describe('LegalHoldEvaluator', () => {
   describe('hasMessageLegalHoldFlag', () => {

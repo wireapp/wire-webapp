@@ -30,7 +30,6 @@ export const headerStyles: CSSObject = {
   lineHeight: 'var(--line-height-sm)',
   borderBottom: '1px solid var(--border-color)',
   backgroundColor: 'var(--app-bg)',
-  paddingRight: '8px',
 };
 
 export const closeButtonStyles: CSSObject = {
@@ -57,11 +56,16 @@ export const metadataStyles: CSSObject = {
   display: 'flex',
   alignItems: 'center',
   gap: '16px',
+  fontSize: 'var(--font-size-small)',
 };
 
 export const nameStyles: CSSObject = {
   fontSize: 'var(--font-size-medium)',
   fontWeight: 'var(--font-weight-semibold)',
+  whiteSpace: 'nowrap',
+  overflow: 'hidden',
+  textOverflow: 'ellipsis',
+  width: 'calc(100vw - 320px)',
 };
 
 export const textStyles: CSSObject = {
@@ -87,4 +91,19 @@ export const loaderIconStyles: CSSObject = {
   'body.theme-dark &': {
     color: 'var(--gray-40)',
   },
+};
+
+export const actionButtonsStyles: CSSObject = {
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  flexShrink: '0',
+  marginRight: '8px',
+};
+
+export const downloadButtonStyles: CSSObject = {
+  marginBottom: '0',
+  flexShrink: '0',
+  width: '40px',
+  height: '32px',
 };

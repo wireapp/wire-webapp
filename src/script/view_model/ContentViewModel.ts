@@ -26,6 +26,13 @@ import {container} from 'tsyringe';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
+import type {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
+import {ConversationState} from 'Repositories/conversation/ConversationState';
+import {MessageRepository} from 'Repositories/conversation/MessageRepository';
+import {Conversation} from 'Repositories/entity/Conversation';
+import type {Message} from 'Repositories/entity/message/Message';
+import type {UserRepository} from 'Repositories/user/UserRepository';
+import {UserState} from 'Repositories/user/UserState';
 import {t} from 'Util/LocalizerUtil';
 import {getLogger, Logger} from 'Util/Logger';
 import {isConversationEntity} from 'Util/TypePredicateUtil';
@@ -33,11 +40,6 @@ import {isConversationEntity} from 'Util/TypePredicateUtil';
 import type {MainViewModel, ViewModelRepositories} from './MainViewModel';
 
 import {Config} from '../Config';
-import type {ConversationRepository} from '../conversation/ConversationRepository';
-import {ConversationState} from '../conversation/ConversationState';
-import {MessageRepository} from '../conversation/MessageRepository';
-import {Conversation} from '../entity/Conversation';
-import type {Message} from '../entity/message/Message';
 import {ConversationError} from '../error/ConversationError';
 import '../page/LeftSidebar';
 import {SidebarTabs, useSidebarStore} from '../page/LeftSidebar/panels/Conversations/useSidebarStore';
@@ -47,8 +49,6 @@ import {useAppMainState} from '../page/state';
 import {ContentState, useAppState} from '../page/useAppState';
 import {generateConversationUrl} from '../router/routeGenerator';
 import {navigate, setHistoryParam} from '../router/Router';
-import type {UserRepository} from '../user/UserRepository';
-import {UserState} from '../user/UserState';
 
 interface ShowConversationOptions {
   exposeMessage?: Message;
@@ -153,7 +153,7 @@ export class ContentViewModel {
 
   private handleMissingConversation(): void {
     this.closeRightSidebar();
-    setHistoryParam('/', history.state);
+    setHistoryParam('/');
     return this.switchContent(ContentState.CONNECTION_REQUESTS);
   }
 
@@ -187,6 +187,7 @@ export class ContentViewModel {
 
     this.mainViewModel.list.openConversations(conversationEntity.archivedState());
   }
+
   private showAndNavigate(
     conversationEntity: Conversation,
     openNotificationSettings: boolean,
@@ -197,7 +198,6 @@ export class ContentViewModel {
     this.previousConversation = this.conversationState.activeConversation();
     setHistoryParam(
       generateConversationUrl({id: conversationEntity?.id ?? '', domain: conversationEntity?.domain ?? '', filePath}),
-      history.state,
     );
 
     if (openNotificationSettings) {

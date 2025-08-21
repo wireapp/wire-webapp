@@ -23,13 +23,13 @@ import {create} from 'zustand';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
+import {PermissionState} from 'Repositories/notification/PermissionState';
 import {t} from 'Util/LocalizerUtil';
 import {safeWindowOpen} from 'Util/SanitizationUtil';
 
 import {TYPE} from './WarningsTypes';
 
 import {Config} from '../../Config';
-import {PermissionState} from '../../notification/PermissionState';
 
 type WarningsState = {
   name: string;

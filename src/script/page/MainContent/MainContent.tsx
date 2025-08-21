@@ -30,7 +30,11 @@ import {HistoryExport} from 'Components/HistoryExport';
 import {HistoryImport} from 'Components/HistoryImport';
 import * as Icon from 'Components/Icon';
 import {useLegalHoldModalState} from 'Components/Modals/LegalHoldModal/LegalHoldModal.state';
-import {User} from 'src/script/entity/User';
+import {ClientState} from 'Repositories/client/ClientState';
+import {ConversationState} from 'Repositories/conversation/ConversationState';
+import {User} from 'Repositories/entity/User';
+import {TeamState} from 'Repositories/team/TeamState';
+import {UserState} from 'Repositories/user/UserState';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 import {incomingCssClass, removeAnimationsClass} from 'Util/util';
@@ -42,10 +46,6 @@ import {AVPreferences} from './panels/preferences/AVPreferences';
 import {DevicesPreferences} from './panels/preferences/DevicesPreferences';
 import {OptionPreferences} from './panels/preferences/OptionPreferences';
 
-import {ClientState} from '../../client/ClientState';
-import {ConversationState} from '../../conversation/ConversationState';
-import {TeamState} from '../../team/TeamState';
-import {UserState} from '../../user/UserState';
 import {RightSidebarParams} from '../AppMain';
 import {PanelState} from '../RightSidebar';
 import {RootContext} from '../RootProvider';
@@ -258,7 +258,13 @@ const MainContent: FC<MainContentProps> = ({
               />
             )}
 
-            {contentState === ContentState.CELLS && <CellsGlobalView />}
+            {contentState === ContentState.CELLS && (
+              <CellsGlobalView
+                cellsRepository={repositories.cells}
+                userRepository={repositories.user}
+                conversationRepository={repositories.conversation}
+              />
+            )}
           </>
         </Animated>
       </SwitchTransition>

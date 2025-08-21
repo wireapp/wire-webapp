@@ -19,13 +19,10 @@
 
 import React from 'react';
 
-import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
+import {TabIndex, Button, ButtonVariant} from '@wireapp/react-ui-kit';
 
-import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
-
+import type {ClientRepository} from 'Repositories/client';
 import {t} from 'Util/LocalizerUtil';
-
-import type {ClientRepository} from '../../../../../client';
 
 interface LogoutSectionProps {
   clientRepository: ClientRepository;

@@ -27,9 +27,13 @@ import {container} from 'tsyringe';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {E2EIVerificationMessage} from 'Components/MessagesList/Message/E2EIVerificationMessage';
-import {OutgoingQuote} from 'src/script/conversation/MessageRepository';
-import {ContentMessage} from 'src/script/entity/message/ContentMessage';
-import {Text} from 'src/script/entity/message/Text';
+import {AssetRepository} from 'Repositories/assets/AssetRepository';
+import {OutgoingQuote} from 'Repositories/conversation/MessageRepository';
+import {Conversation} from 'Repositories/entity/Conversation';
+import {CompositeMessage} from 'Repositories/entity/message/CompositeMessage';
+import {ContentMessage} from 'Repositories/entity/message/ContentMessage';
+import {Text} from 'Repositories/entity/message/Text';
+import {TeamState} from 'Repositories/team/TeamState';
 import {QuoteEntity} from 'src/script/message/QuoteEntity';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
@@ -49,10 +53,6 @@ import {PingMessage} from './PingMessage';
 import {SystemMessage} from './SystemMessage';
 import {VerificationMessage} from './VerificationMessage';
 
-import {AssetRepository} from '../../../assets/AssetRepository';
-import {Conversation} from '../../../entity/Conversation';
-import {CompositeMessage} from '../../../entity/message/CompositeMessage';
-import {TeamState} from '../../../team/TeamState';
 import {ContextMenuEntry} from '../../../ui/ContextMenu';
 
 import {MessageParams} from './index';

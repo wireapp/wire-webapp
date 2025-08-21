@@ -19,8 +19,8 @@
 
 import {act, render, waitFor} from '@testing-library/react';
 
+import {ClientEntity} from 'Repositories/client/ClientEntity';
 import {withTheme} from 'src/script/auth/util/test/TestUtil';
-import {ClientEntity} from 'src/script/client/ClientEntity';
 import {createUuid} from 'Util/uuid';
 
 import {DeviceDetailsPreferences} from './DeviceDetailsPreferences';

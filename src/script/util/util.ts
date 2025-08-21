@@ -22,10 +22,11 @@ import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 
 import {Runtime} from '@wireapp/commons';
 
+import type {Conversation} from 'Repositories/entity/Conversation';
+
 import {isTabKey} from './KeyboardUtil';
 import {getLogger} from './Logger';
 
-import type {Conversation} from '../entity/Conversation';
 import {AuthError} from '../error/AuthError';
 
 export const checkIndexedDb = (): Promise<void> => {

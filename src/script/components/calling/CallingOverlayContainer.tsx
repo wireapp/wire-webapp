@@ -22,19 +22,19 @@ import React, {Fragment, useEffect} from 'react';
 import {container} from 'tsyringe';
 
 import {useCallAlertState} from 'Components/calling/useCallAlertState';
-import {PropertiesRepository} from 'src/script/properties/PropertiesRepository';
+import {Call} from 'Repositories/calling/Call';
+import {CallingRepository} from 'Repositories/calling/CallingRepository';
+import {CallingViewMode, CallState, DesktopScreenShareMenu, MuteState} from 'Repositories/calling/CallState';
+import {LEAVE_CALL_REASON} from 'Repositories/calling/enum/LeaveCallReason';
+import {Participant} from 'Repositories/calling/Participant';
+import {useVideoGrid} from 'Repositories/calling/videoGridHandler';
+import {MediaRepository} from 'Repositories/media/MediaRepository';
+import {PropertiesRepository} from 'Repositories/properties/PropertiesRepository';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 
 import {ChooseScreen} from './ChooseScreen';
 import {FullscreenVideoCall} from './FullscreenVideoCall';
 
-import {Call} from '../../calling/Call';
-import {CallingRepository} from '../../calling/CallingRepository';
-import {CallingViewMode, CallState, DesktopScreenShareMenu, MuteState} from '../../calling/CallState';
-import {LEAVE_CALL_REASON} from '../../calling/enum/LeaveCallReason';
-import {Participant} from '../../calling/Participant';
-import {useVideoGrid} from '../../calling/videoGridHandler';
-import {MediaRepository} from '../../media/MediaRepository';
 import {CallViewTab} from '../../view_model/CallingViewModel';
 
 export interface CallingContainerProps {

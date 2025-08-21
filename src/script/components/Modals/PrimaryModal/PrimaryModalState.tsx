@@ -21,6 +21,7 @@ import {isValid} from 'date-fns';
 import {escape} from 'underscore';
 import {create} from 'zustand';
 
+import {ClientNotificationData} from 'Repositories/notification/PreferenceNotificationRepository';
 import {replaceLink, t} from 'Util/LocalizerUtil';
 import {getLogger} from 'Util/Logger';
 import {formatLocale} from 'Util/TimeUtil';
@@ -38,7 +39,6 @@ import {
 } from './PrimaryModalTypes';
 
 import {Config} from '../../../Config';
-import {ClientNotificationData} from '../../../notification/PreferenceNotificationRepository';
 
 type PrimaryModalState = {
   errorMessage: string | null;
@@ -146,6 +146,7 @@ const updateCurrentModalContent = (type: PrimaryModalType, options: ModalOptions
     allButtonsFullWidth = false,
     primaryBtnFirst = false,
     closeOnSecondaryAction = true,
+    size = 'small',
   } = options;
 
   const content = {
@@ -169,6 +170,7 @@ const updateCurrentModalContent = (type: PrimaryModalType, options: ModalOptions
     allButtonsFullWidth,
     primaryBtnFirst,
     closeOnSecondaryAction,
+    size,
   };
 
   switch (type) {
@@ -227,6 +229,7 @@ const updateCurrentModalContent = (type: PrimaryModalType, options: ModalOptions
     case PrimaryModalType.OPTION: {
       if (!hideSecondary) {
         content.secondaryAction = {text: t('modalOptionSecondary'), ...content.secondaryAction};
+        content.modalUie = PrimaryModalType.OPTION;
       }
       break;
     }

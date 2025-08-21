@@ -22,8 +22,8 @@ import React from 'react';
 import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
 
 import * as Icon from 'Components/Icon';
-import {MemberMessage as MemberMessageEntity} from 'src/script/entity/message/MemberMessage';
-import {User} from 'src/script/entity/User';
+import {MemberMessage as MemberMessageEntity} from 'Repositories/entity/message/MemberMessage';
+import {User} from 'Repositories/entity/User';
 import {SystemMessageType} from 'src/script/message/SystemMessageType';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';

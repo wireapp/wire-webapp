@@ -67,6 +67,7 @@ describe('useFilePaste', () => {
     const calledWithFile = mockOnFilePasted.mock.calls[0][0];
     expect(calledWithFile instanceof File).toBe(true);
     expect(calledWithFile.name).toBe(`Pasted file from ${mockFormattedDate}.txt`);
+    expect(checkFileSharingPermissionModule.checkFileSharingPermission).toHaveBeenCalled();
   });
 
   it('ignores paste events with text/plain content', () => {
@@ -79,6 +80,7 @@ describe('useFilePaste', () => {
     });
 
     expect(mockOnFilePasted).not.toHaveBeenCalled();
+    expect(checkFileSharingPermissionModule.checkFileSharingPermission).not.toHaveBeenCalled();
   });
 
   it('does nothing when no files are pasted', () => {
@@ -91,12 +93,6 @@ describe('useFilePaste', () => {
     });
 
     expect(mockOnFilePasted).not.toHaveBeenCalled();
-  });
-
-  it('uses checkFileSharingPermission wrapper', () => {
-    renderHook(() => useFilePaste({onFilePasted: mockOnFilePasted}));
-
-    expect(checkFileSharingPermissionModule.checkFileSharingPermission).toHaveBeenCalled();
   });
 });
 

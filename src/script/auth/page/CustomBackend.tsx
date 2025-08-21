@@ -18,7 +18,8 @@
  */
 
 import {pathWithParams} from '@wireapp/commons/lib/util/UrlUtil';
-import {useLocation, useNavigate} from 'react-router-dom';
+import {useSelector} from 'react-redux';
+import {useNavigate} from 'react-router-dom';
 
 import {Button, ButtonVariant, Container, Text} from '@wireapp/react-ui-kit';
 
@@ -28,13 +29,13 @@ import {t} from 'Util/LocalizerUtil';
 import {buttonContainerCss, containerCss, headerCss, logoCss, paragraphCss} from './CustomBackend.styles';
 import {Page} from './Page';
 
+import * as AuthSelector from '../module/selector/AuthSelector';
 import {QUERY_KEY, ROUTE} from '../route';
 import {getSearchParams, navigateTo} from '../util/urlUtil';
 
 export const CustomBackend = () => {
   const navigate = useNavigate();
-  const {state} = useLocation();
-  const url = state?.url as string;
+  const {customBackendURL: url} = useSelector(AuthSelector.getAccount);
 
   const navigateToIndex = () => {
     navigate(ROUTE.SSO);
