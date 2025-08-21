@@ -19,7 +19,13 @@
 
 import {BackendErrorMapper} from './BackendErrorMapper';
 
-import {InvalidCredentialsError, MissingCookieError, SuspendedAccountError, TokenExpiredError} from '../auth/';
+import {
+  InvalidCredentialsError,
+  InvalidTokenError,
+  MissingCookieError,
+  SuspendedAccountError,
+  TokenExpiredError,
+} from '../auth/';
 import {ConversationIsUnknownError} from '../conversation/';
 import {UserIsUnknownError} from '../user/';
 
@@ -27,6 +33,16 @@ import {BackendError, BackendErrorLabel, StatusCode} from './';
 
 describe('BackendErrorMapper', () => {
   describe('Focused critical cases', () => {
+    it('maps "Invalid zauth token" to InvalidTokenError', () => {
+      const error = new BackendError(
+        'Invalid zauth token',
+        BackendErrorLabel.INVALID_CREDENTIALS,
+        StatusCode.FORBIDDEN,
+      );
+      const mapped = BackendErrorMapper.map(error);
+      expect(mapped).toBeInstanceOf(InvalidTokenError);
+    });
+
     it('maps "Authentication failed." to InvalidCredentialsError', () => {
       const error = new BackendError(
         'Authentication failed.',
