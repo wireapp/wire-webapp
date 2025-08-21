@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [27.75.3](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@27.75.2...@wireapp/api-client@27.75.3) (2025-08-21)
+
+### Bug Fixes
+
+* endless loading after password reset by mapping token error correctly(WPB-19061) ([#7255](https://github.com/wireapp/wire-web-packages/issues/7255)) ([c162387](https://github.com/wireapp/wire-web-packages/commit/c162387c9fd1222612a60d2d457ef42010a11968))
+
 ## [27.75.2](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@27.75.1...@wireapp/api-client@27.75.2) (2025-08-20)
 
 ### Bug Fixes
