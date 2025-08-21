@@ -921,6 +921,7 @@ export class MessageRepository {
 
     try {
       const result = await this.conversationService.send(sendOptions);
+
       if (result.state === MessageSendingState.OUTGOING_SENT) {
         await handleSuccess(result);
       }
@@ -1213,9 +1214,6 @@ export class MessageRepository {
   }
 
   sendButtonAction(conversation: Conversation, message: CompositeMessage, buttonId: string): void {
-    this.logger.info('Sending button action:', buttonId);
-    this.logger.info('Sending button message iscomposite:', message.isComposite());
-    this.logger.info('Sending button message assets:', message.assets);
     if (conversation.isSelfUserRemoved()) {
       return;
     }
