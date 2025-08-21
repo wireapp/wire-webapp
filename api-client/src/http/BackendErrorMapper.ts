@@ -50,6 +50,7 @@ export class BackendErrorMapper {
       },
       [StatusCode.FORBIDDEN]: {
         [BackendErrorLabel.INVALID_CREDENTIALS]: {
+          'Invalid zauth token': new InvalidTokenError('Authentication failed because the token is invalid.'),
           'Authentication failed.': new InvalidCredentialsError(
             'Authentication failed because of invalid credentials.',
           ),
