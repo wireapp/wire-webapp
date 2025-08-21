@@ -204,24 +204,17 @@ describe('MessageRepository', () => {
       const theNewButton = [new Button(buttonId, 'Button 1')];
       const originalMessage = new CompositeMessage(createUuid());
 
-      // Set the sender properly - this is the key fix
+      // Set the sender properly, as sendButtonAction expects the message to have a senderId check
       originalMessage.user(selfUser);
-      originalMessage.from = selfUser.id; // Set the from field
+      originalMessage.from = selfUser.id;
 
       originalMessage.errorButtonId(undefined);
       originalMessage.assets.push(...theNewButton);
 
       const conversation = generateConversation();
-
-      // Make sure the sender is in the conversation's participating users
-      // This should already be done by generateConversation() which adds selfUser,
-      // but let's be explicit
-      if (!conversation.participating_user_ets().some(user => user.id === selfUser.id)) {
-        conversation.participating_user_ets().push(selfUser);
-      }
-
       conversation.addMessage(originalMessage);
 
+      // Subject under test
       messageRepository.sendButtonAction(conversation, originalMessage, buttonId);
 
       expect(sendAndInjectMessageSpy).toHaveBeenCalledWith(
