@@ -63,8 +63,14 @@ export const fileCardStyles = {
 
 export const hollowWrapperButtonStyles: CSSObject = {
   padding: '0',
+  position: 'absolute',
+  top: '0',
+  left: '0',
+  width: '100%',
+  height: '100%',
   border: 'none',
   background: 'none',
   textAlign: 'unset',
   cursor: 'pointer',
+  zIndex: '1',
 };
