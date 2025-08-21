@@ -64,7 +64,7 @@ export const FileAssetSmall = ({
         onClick={showModal}
         css={hollowWrapperButtonStyles}
         aria-label={t('cells.filePreviewButton.ariaLabel', {name})}
-      ></button>
+      />
       <FileCard.Header>
         <FileCard.Icon type={isError ? 'unavailable' : 'file'} />
         {!isError && <FileCard.Type />}
