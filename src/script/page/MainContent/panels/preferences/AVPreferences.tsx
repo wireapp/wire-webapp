@@ -17,12 +17,13 @@
  *
  */
 
-import {useInitializeMediaDevices} from 'Hooks/useInitializeMediaDevices';
+import {memo} from 'react';
+
 import type {CallingRepository} from 'Repositories/calling/CallingRepository';
-import {MediaDeviceType} from 'Repositories/media/MediaDeviceType';
+import {ElectronDesktopCapturerSource} from 'Repositories/media/MediaDevicesHandler';
+import type {MediaDeviceType} from 'Repositories/media/MediaDeviceType';
 import type {MediaRepository} from 'Repositories/media/MediaRepository';
 import type {PropertiesRepository} from 'Repositories/properties/PropertiesRepository';
-import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 
 import {AudioOutPreferences} from './avPreferences/AudioOutPreferences';
@@ -37,20 +38,25 @@ interface AVPreferencesProps {
   callingRepository: CallingRepository;
   mediaRepository: MediaRepository;
   propertiesRepository: PropertiesRepository;
+  isMediaDevicesAreInitialized: boolean;
+  deviceSupport: Pick<
+    Record<MediaDeviceType, boolean>,
+    MediaDeviceType.AUDIO_INPUT | MediaDeviceType.AUDIO_OUTPUT | MediaDeviceType.VIDEO_INPUT
+  >;
+  availableDevices: (MediaDeviceInfo | ElectronDesktopCapturerSource)[];
+  currentDeviceId: string;
 }
 
-const AVPreferences = ({
+const AVPreferencesComponent = ({
   mediaRepository: {devicesHandler, constraintsHandler, streamHandler},
   propertiesRepository,
   callingRepository,
+  isMediaDevicesAreInitialized,
+  deviceSupport,
+  availableDevices,
+  currentDeviceId,
 }: AVPreferencesProps) => {
   const {shouldReloadCamera} = useCameraReloadOnCallEnd(callingRepository);
-  const deviceSupport = useKoSubscribableChildren(devicesHandler?.deviceSupport, [
-    MediaDeviceType.AUDIO_INPUT,
-    MediaDeviceType.AUDIO_OUTPUT,
-    MediaDeviceType.VIDEO_INPUT,
-  ]);
-  const {isMediaDevicesAreInitialized} = useInitializeMediaDevices(devicesHandler, streamHandler);
 
   return (
     <PreferencesPage title={t('preferencesAV')}>
@@ -73,6 +79,8 @@ const AVPreferences = ({
           {...{devicesHandler, streamHandler}}
           refreshStream={() => callingRepository.refreshVideoInput()}
           hasActiveCameraStream={callingRepository.hasActiveCameraStream()}
+          availableDevices={availableDevices}
+          currentDeviceId={currentDeviceId}
         />
       )}
       <CallOptions {...{constraintsHandler, propertiesRepository}} />
@@ -80,5 +88,4 @@ const AVPreferences = ({
     </PreferencesPage>
   );
 };
-
-export {AVPreferences};
+export const AVPreferences = memo(AVPreferencesComponent);
