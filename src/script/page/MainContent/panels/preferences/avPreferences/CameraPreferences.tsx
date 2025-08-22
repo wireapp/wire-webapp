@@ -17,7 +17,7 @@
  *
  */
 
-import React, {memo, useCallback, useEffect, useRef, useState} from 'react';
+import {memo, useCallback, useEffect, useRef, useState} from 'react';
 
 import * as Icon from 'Components/Icon';
 import {ElectronDesktopCapturerSource, MediaDevicesHandler} from 'Repositories/media/MediaDevicesHandler';
@@ -43,14 +43,14 @@ interface CameraPreferencesProps {
   currentDeviceId: string;
 }
 
-const CameraPreferencesComponent: React.FC<CameraPreferencesProps> = ({
+const CameraPreferencesComponent = ({
   devicesHandler,
   streamHandler,
   refreshStream,
   hasActiveCameraStream,
   availableDevices,
   currentDeviceId,
-}) => {
+}: CameraPreferencesProps) => {
   const [isRequesting, setIsRequesting] = useState(false);
   const [stream, setStream] = useState<MediaStream | null>(null);
   const videoElement = useRef<HTMLVideoElement>(null);
