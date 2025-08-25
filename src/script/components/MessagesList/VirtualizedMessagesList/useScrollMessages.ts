@@ -32,6 +32,8 @@ interface Props {
   setAlreadyScrolledToLastMessage: (scrolled: boolean) => void;
 }
 
+let scrollTimeout: number | null = null;
+
 function shouldStickToBottomFromPrev(
   virtualizer: Virtualizer<HTMLDivElement, Element>,
   prevTotalSize: number,
@@ -57,6 +59,16 @@ export const useScrollMessages = (
 
   const initiallyScrolled = useRef(false);
   const newMessagesCount = useRef(messages.length);
+
+  const debouncedScrollToIndex = (index: number, options: any) => {
+    if (scrollTimeout) {
+      window.clearTimeout(scrollTimeout);
+    }
+
+    scrollTimeout = window.setTimeout(() => {
+      virtualizer.scrollToIndex(index, options);
+    }, 50); // 50ms debounce
+  };
 
   const scrollToMessage = useCallback(() => {
     if (messages.length !== newMessagesCount.current) {
@@ -118,7 +130,7 @@ export const useScrollMessages = (
 
       if (index !== -1) {
         requestAnimationFrame(() => {
-          virtualizer.scrollToIndex(index, {align: 'center'});
+          debouncedScrollToIndex(index, {align: 'center'});
           setScrollToHighlightedMessage(true);
         });
       }
@@ -131,7 +143,7 @@ export const useScrollMessages = (
         const index = messages.findIndex(message => !isMarker(message) && message.message.id === lastMessage.id);
         if (index !== -1) {
           requestAnimationFrame(() => {
-            virtualizer.scrollToIndex(index, {align: 'end'});
+            debouncedScrollToIndex(index, {align: 'end'});
           });
         }
       }
@@ -140,7 +152,7 @@ export const useScrollMessages = (
       const index = messages.findIndex(message => !isMarker(message) && message.message.id === lastMessage.id);
       if (index !== -1) {
         requestAnimationFrame(() => {
-          virtualizer.scrollToIndex(index, {align: 'end'});
+          debouncedScrollToIndex(index, {align: 'end'});
         });
       }
     }
