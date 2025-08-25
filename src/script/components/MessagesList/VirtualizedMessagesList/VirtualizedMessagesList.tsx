@@ -17,7 +17,7 @@
  *
  */
 
-import {MutableRefObject, useEffect, useState} from 'react';
+import {MutableRefObject, useEffect, useMemo, useState} from 'react';
 
 import {useVirtualizer} from '@tanstack/react-virtual';
 import cx from 'classnames';
@@ -38,7 +38,7 @@ import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 
 import {VirtualizedJumpToLastMessageButton} from '../VirtualizedJumpToLastMessageButton';
 
-const ESTIMATED_ELEMENT_SIZE = 36;
+const ESTIMATED_ELEMENT_SIZE = 48;
 
 interface Props extends Omit<MessagesListParams, 'isRightSidebarOpen' | 'onLoading' | 'isConversationLoaded'> {
   parentElement: HTMLDivElement;
@@ -87,7 +87,10 @@ export const VirtualizedMessagesList = ({
   ]);
 
   const filteredMessages = filterMessages(allMessages);
-  const groupedMessages = groupMessagesBySenderAndTime(filteredMessages, conversationLastReadTimestamp.current);
+
+  const groupedMessages = useMemo(() => {
+    return groupMessagesBySenderAndTime(filteredMessages, conversationLastReadTimestamp.current);
+  }, [conversationLastReadTimestamp, filteredMessages]);
 
   const initialMessageId = conversation.initialMessage()?.id;
 
@@ -223,9 +226,9 @@ export const VirtualizedMessagesList = ({
 
           return (
             <div
+              key={virtualItem.key}
               data-index={virtualItem.index}
               ref={virtualizer.measureElement}
-              key={virtualItem.index}
               style={{
                 position: 'absolute',
                 width: '100%',
