@@ -32,12 +32,28 @@ interface Props {
   setAlreadyScrolledToLastMessage: (scrolled: boolean) => void;
 }
 
+function shouldStickToBottomFromPrev(
+  virtualizer: Virtualizer<HTMLDivElement, Element>,
+  prevTotalSize: number,
+  threshold = 100,
+) {
+  const el = virtualizer.options.getScrollElement?.();
+  if (!el) {
+    return false;
+  }
+
+  const scrollBottomPosition = (virtualizer.scrollOffset || 0) + el.clientHeight;
+  const distanceFromPrevBottom = Math.max(0, prevTotalSize - scrollBottomPosition);
+
+  return distanceFromPrevBottom < threshold;
+}
+
 export const useScrollMessages = (
   virtualizer: Virtualizer<HTMLDivElement, Element>,
   {messages, highlightedMessage, userId, conversationLastReadTimestamp, setAlreadyScrolledToLastMessage}: Props,
 ) => {
   const prevNbMessages = useRef(0);
-  const newNbMessages = messages.length;
+  const prevTotalSizeRef = useRef(0);
 
   const initiallyScrolled = useRef(false);
   const newMessagesCount = useRef(messages.length);
@@ -82,11 +98,11 @@ export const useScrollMessages = (
   const [scrollToHighlightedMessage, setScrollToHighlightedMessage] = useState(false);
 
   useLayoutEffect(() => {
-    if (messages.length === 0) {
+    if (!initiallyScrolled.current && messages.length === 0) {
       return;
     }
 
-    const lastMessageItem = messages[newNbMessages - 1];
+    const lastMessageItem = messages[messages.length - 1];
 
     if (isMarker(lastMessageItem)) {
       return;
@@ -94,13 +110,7 @@ export const useScrollMessages = (
 
     const lastMessage = lastMessageItem?.message;
 
-    const element = virtualizer.scrollElement;
-    const scrollTop = element?.scrollTop || 0;
-    const scrollHeight = element?.scrollHeight || 0;
-    const clientHeight = element?.clientHeight || 0;
-
-    const distanceFromBottom = scrollHeight - scrollTop - clientHeight;
-    const shouldStickToBottom = distanceFromBottom < 100;
+    const shouldStickToBottom = shouldStickToBottomFromPrev(virtualizer, prevTotalSizeRef.current, 100);
 
     if (highlightedMessage && !scrollToHighlightedMessage) {
       // If we have an element we want to focus
@@ -114,7 +124,8 @@ export const useScrollMessages = (
       }
     } else if (shouldStickToBottom) {
       // We only want to animate the scroll if there are new messages in the list
-      const nbNewMessages = newNbMessages - prevNbMessages.current;
+      const nbNewMessages = messages.length - prevNbMessages.current;
+
       if (nbNewMessages >= 1) {
         // Simple content update, we just scroll to bottom if we are in the stick to bottom threshold
         const index = messages.findIndex(message => !isMarker(message) && message.message.id === lastMessage.id);
@@ -135,5 +146,6 @@ export const useScrollMessages = (
     }
 
     prevNbMessages.current = messages.length;
-  }, [highlightedMessage, messages, virtualizer, userId, newNbMessages, scrollToHighlightedMessage]);
+    prevTotalSizeRef.current = virtualizer.getTotalSize();
+  }, [highlightedMessage, messages, virtualizer, userId, scrollToHighlightedMessage]);
 };
