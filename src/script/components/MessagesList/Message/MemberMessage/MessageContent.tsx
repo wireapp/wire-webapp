@@ -186,7 +186,7 @@ function getContent(message: MemberMessageEntity) {
       }
 
       if (message.reason === MemberLeaveReason.USER_DELETED) {
-        return t('converstationMemberDeleted');
+        return t('conversationMemberDeleted');
       }
 
       return actor.isMe

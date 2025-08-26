@@ -548,6 +548,7 @@
   "conversationLikesCaptionSingular": "[bold]{userName}[/bold]",
   "conversationLocationLink": "Standort anzeigen",
   "conversationMLSMigrationFinalisationOngoingCall": "Aufgrund der Umstellung auf MLS haben Sie möglicherweise Probleme mit Ihrem aktuellen Anruf. Wenn das der Fall ist, legen Sie auf und rufen Sie erneut an.",
+  "conversationMemberDeleted": "Dieser Benutzer ist nicht mehr verfügbar",
   "conversationMemberJoined": "[bold]{name}[/bold] hat {users} hinzugefügt",
   "conversationMemberJoinedMore": "[bold]{name}[/bold] hat {users} und [showmore]{count} andere[/showmore] hinzugefügt",
   "conversationMemberJoinedSelf": "[bold]{name}[/bold] ist beigetreten",
