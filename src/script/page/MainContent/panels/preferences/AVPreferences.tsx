@@ -19,6 +19,7 @@
 
 import {memo} from 'react';
 
+import {useInitializeMediaDevices} from 'Hooks/useInitializeMediaDevices';
 import type {CallingRepository} from 'Repositories/calling/CallingRepository';
 import {ElectronDesktopCapturerSource} from 'Repositories/media/MediaDevicesHandler';
 import type {MediaDeviceType} from 'Repositories/media/MediaDeviceType';
@@ -38,7 +39,6 @@ interface AVPreferencesProps {
   callingRepository: CallingRepository;
   mediaRepository: MediaRepository;
   propertiesRepository: PropertiesRepository;
-  areMediaDevicesInitialized: boolean;
   deviceSupport: Pick<
     Record<MediaDeviceType, boolean>,
     MediaDeviceType.AUDIO_INPUT | MediaDeviceType.AUDIO_OUTPUT | MediaDeviceType.VIDEO_INPUT
@@ -51,29 +51,29 @@ const AVPreferencesComponent = ({
   mediaRepository: {devicesHandler, constraintsHandler, streamHandler},
   propertiesRepository,
   callingRepository,
-  areMediaDevicesInitialized,
   deviceSupport,
   availableDevices,
   currentDeviceId,
 }: AVPreferencesProps) => {
   const {shouldReloadCamera} = useCameraReloadOnCallEnd(callingRepository);
+  const {areMediaDevicesInitialized} = useInitializeMediaDevices(devicesHandler, streamHandler);
 
   return (
     <PreferencesPage title={t('preferencesAV')}>
-      {areMediaDevicesInitialized && (
+      {!areMediaDevicesInitialized && (
         <div className="preferences-av-spinner-select">
           <div className="icon-spinner spin accent-text"></div>
         </div>
       )}
-      {!areMediaDevicesInitialized && deviceSupport.audioinput && (
+      {areMediaDevicesInitialized && deviceSupport.audioinput && (
         <MicrophonePreferences
           {...{devicesHandler, streamHandler}}
           refreshStream={() => callingRepository.refreshAudioInput()}
           hasActiveCall={callingRepository.hasActiveCall()}
         />
       )}
-      {!areMediaDevicesInitialized && deviceSupport.audiooutput && <AudioOutPreferences {...{devicesHandler}} />}
-      {!areMediaDevicesInitialized && deviceSupport.videoinput && (
+      {areMediaDevicesInitialized && deviceSupport.audiooutput && <AudioOutPreferences {...{devicesHandler}} />}
+      {areMediaDevicesInitialized && deviceSupport.videoinput && (
         <CameraPreferences
           key={`camera-${shouldReloadCamera}`} // Force remount when call ends
           {...{devicesHandler, streamHandler}}
