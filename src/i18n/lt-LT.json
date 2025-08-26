@@ -870,6 +870,7 @@
   "conversationsSecondaryLineYouLeft": "Jūs išėjote",
   "conversationsSecondaryLineYouWereRemoved": "Jūs buvote pašalinti",
   "conversationsWelcome": "Welcome to {brandName} 👋",
+  "converstationMemberDeleted": "This user is no longer available",
   "cookiePolicyStrings.bannerText": "Naudojame slapukus suasmeninti patirtį mūsų svetainėje. Naršydami svetainę sutinkate su slapukų naudojimu.<br />Daugiau informacijos apie slapukus galite rasti <b>privatumo politikoje</b>.",
   "createAccount.headLine": "Konfigūruokite paskyrą",
   "createAccount.nextButton": "Kitas",

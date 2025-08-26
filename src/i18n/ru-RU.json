@@ -870,6 +870,7 @@
   "conversationsSecondaryLineYouLeft": "Вы покинули",
   "conversationsSecondaryLineYouWereRemoved": "Вы были удалены",
   "conversationsWelcome": "Приветствуем вас в {brandName} 👋",
+  "converstationMemberDeleted": "This user is no longer available",
   "cookiePolicyStrings.bannerText": "Мы используем файлы cookie для персонализации вашего опыта на нашем веб-сайте.\nПродолжая использовать веб-сайт, вы соглашаетесь на использование файлов cookie.{newline}Дополнительную информацию о файлах cookie можно найти в нашей<strong>политике конфиденциальности</strong>.",
   "createAccount.headLine": "Настройка учетной записи",
   "createAccount.nextButton": "Вперед",

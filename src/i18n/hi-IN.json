@@ -870,6 +870,7 @@
   "conversationsSecondaryLineYouLeft": "आप छोड़कर चले गए",
   "conversationsSecondaryLineYouWereRemoved": "आपको हटाया गया था",
   "conversationsWelcome": "Welcome to {brandName} 👋",
+  "converstationMemberDeleted": "This user is no longer available",
   "cookiePolicyStrings.bannerText": "We use cookies to personalize your experience on our website. By continuing to use the website, you agree to the use of cookies.{newline}Further information on cookies can be found in our <strong>privacy policy</strong>.",
   "createAccount.headLine": "Set up your account",
   "createAccount.nextButton": "Next",

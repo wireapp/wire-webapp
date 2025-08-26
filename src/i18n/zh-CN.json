@@ -870,6 +870,7 @@
   "conversationsSecondaryLineYouLeft": "您离开了",
   "conversationsSecondaryLineYouWereRemoved": "你被删除",
   "conversationsWelcome": "Welcome to {brandName} 👋",
+  "converstationMemberDeleted": "This user is no longer available",
   "cookiePolicyStrings.bannerText": "我们使用cookies来个性化您在我们网站上的体验。继续使用本网站即表示您同意使用cookies。{newline}有关cookie的更多信息，请参阅我们的<strong>隐私政策</strong>。",
   "createAccount.headLine": "设置您的帐户",
   "createAccount.nextButton": "继续",
