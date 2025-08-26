@@ -870,7 +870,6 @@
   "conversationsSecondaryLineYouLeft": "Sie haben die Unterhaltung verlassen",
   "conversationsSecondaryLineYouWereRemoved": "Sie wurden entfernt",
   "conversationsWelcome": "Willkommen bei {brandName} 👋",
-  "converstationMemberDeleted": "This user is no longer available",
   "cookiePolicyStrings.bannerText": "Um die Webseite ohne Anmeldung nutzen zu können, verwenden wir Cookies. Durch die weitere Nutzung der Webseite wird der Verwendung von Cookies zugestimmt.{newline}Weitere Informationen zu Cookies sind in unserer <strong>Datenschutzerklärung</strong> zu finden.",
   "createAccount.headLine": "Benutzerkonto einrichten",
   "createAccount.nextButton": "Weiter",
