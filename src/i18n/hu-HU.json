@@ -870,6 +870,7 @@
   "conversationsSecondaryLineYouLeft": "Kiléptél",
   "conversationsSecondaryLineYouWereRemoved": "El lettél távolítva",
   "conversationsWelcome": "Welcome to {brandName} 👋",
+  "converstationMemberDeleted": "This user is no longer available",
   "cookiePolicyStrings.bannerText": "Webes sütiket (cookie) használunk, hogy személyessé tegyük a weboldal által nyújtott élményt. A weboldal használatának folytatásával elfogadod a sütik használatát.{newline}A sütikkel kapcsolatban további információt találhatsz az <strong>adatvédelmi szabályzatunkban</strong>.",
   "createAccount.headLine": "Fiók beállítása",
   "createAccount.nextButton": "Tovább",

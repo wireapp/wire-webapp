@@ -870,6 +870,7 @@
   "conversationsSecondaryLineYouLeft": "изашли сте",
   "conversationsSecondaryLineYouWereRemoved": "уклоњени сте",
   "conversationsWelcome": "Welcome to {brandName} 👋",
+  "converstationMemberDeleted": "This user is no longer available",
   "cookiePolicyStrings.bannerText": "Ми користимо колачиће да би прилагодили ваше искуство на нашој веб страници. Настављајући да користите веб страницу, прихватате употребу колачића.{newline}Даљње информације о колачићима могу се наћи у нашој <strong>политици приватности</strong>.",
   "createAccount.headLine": "Подесите свој налог",
   "createAccount.nextButton": "Следећи",
