@@ -27,17 +27,17 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {LoadingBar} from 'Components/LoadingBar/LoadingBar';
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
-import {ClientState} from 'src/script/client/ClientState';
-import {User} from 'src/script/entity/User';
+import {CancelError} from 'Repositories/backup/Error';
+import {ClientState} from 'Repositories/client/ClientState';
+import {User} from 'Repositories/entity/User';
+import {EventName} from 'Repositories/tracking/EventName';
+import {Segmentation} from 'Repositories/tracking/Segmentation';
 import {ContentState} from 'src/script/page/useAppState';
-import {EventName} from 'src/script/tracking/EventName';
-import {Segmentation} from 'src/script/tracking/Segmentation';
 import {t} from 'Util/LocalizerUtil';
 import {getLogger} from 'Util/Logger';
 import {getCurrentDate} from 'Util/TimeUtil';
 import {downloadBlob} from 'Util/util';
 
-import {CancelError} from '../../backup/Error';
 import {Config} from '../../Config';
 import {RootContext} from '../../page/RootProvider';
 
@@ -49,7 +49,8 @@ enum ExportState {
 }
 
 export const CONFIG = {
-  FILE_EXTENSION: 'desktop_wbu',
+  LEGACY_FILE_EXTENSION: 'desktop_wbu',
+  UNIVERSAL_FILE_EXTENSION: 'wbu',
 };
 
 interface HistoryExportProps {
@@ -130,8 +131,13 @@ const HistoryExport = ({switchContent, user, clientState = container.resolve(Cli
   };
 
   const downloadArchiveFile = () => {
+    const {
+      FEATURE: {ENABLE_CROSS_PLATFORM_BACKUP_EXPORT},
+    } = Config.getConfig();
     const userName = user.username();
-    const fileExtension = CONFIG.FILE_EXTENSION;
+    const fileExtension = ENABLE_CROSS_PLATFORM_BACKUP_EXPORT
+      ? CONFIG.UNIVERSAL_FILE_EXTENSION
+      : CONFIG.LEGACY_FILE_EXTENSION;
     const sanitizedBrandName = Config.getConfig().BRAND_NAME.replace(/[^A-Za-z0-9_]/g, '');
     const filename = `${sanitizedBrandName}-${userName}-Backup_${getCurrentDate()}.${fileExtension}`;
 
@@ -149,8 +155,16 @@ const HistoryExport = ({switchContent, user, clientState = container.resolve(Cli
     backupRepository.cancelAction();
   };
 
+  const onClose = () => {
+    amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.HISTORY.BACKUP_CANCELLED, {
+      [Segmentation.GENERAL.STEP]: Segmentation.BACKUP_CREATION.CANCELLATION_STEP.BEFORE_BACKUP,
+    });
+    dismissExport();
+  };
+
   const showBackupModal = () => {
     PrimaryModal.show(PrimaryModal.type.PASSWORD_ADVANCED_SECURITY, {
+      preventClose: true,
       primaryAction: {
         action: async (password: string, hasMultipleAttempts: boolean) => {
           exportHistory(password, hasMultipleAttempts);
@@ -159,12 +173,7 @@ const HistoryExport = ({switchContent, user, clientState = container.resolve(Cli
       },
       secondaryAction: [
         {
-          action: () => {
-            amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.HISTORY.BACKUP_CANCELLED, {
-              [Segmentation.GENERAL.STEP]: Segmentation.BACKUP_CREATION.CANCELLATION_STEP.BEFORE_BACKUP,
-            });
-            dismissExport();
-          },
+          action: () => onClose(),
           text: t('backupEncryptionModalCloseBtn'),
         },
       ],

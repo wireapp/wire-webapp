@@ -36,6 +36,16 @@ import {SearchInput} from 'Components/SearchInput';
 import {TextInput} from 'Components/TextInput';
 import {InfoToggle} from 'Components/toggle/InfoToggle';
 import {UserSearchableList} from 'Components/UserSearchableList';
+import {ACCESS_STATE} from 'Repositories/conversation/AccessState';
+import {
+  ACCESS_TYPES,
+  teamPermissionsForAccessState,
+  toggleFeature,
+} from 'Repositories/conversation/ConversationAccessPermission';
+import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
+import {User} from 'Repositories/entity/User';
+import {TeamState} from 'Repositories/team/TeamState';
+import {UserState} from 'Repositories/user/UserState';
 import {SidebarTabs, useSidebarStore} from 'src/script/page/LeftSidebar/panels/Conversations/useSidebarStore';
 import {generateConversationUrl} from 'src/script/router/routeGenerator';
 import {createNavigate, createNavigateKeyboard} from 'src/script/router/routerBindings';
@@ -45,18 +55,8 @@ import {replaceLink, t} from 'Util/LocalizerUtil';
 import {sortUsersByPriority} from 'Util/StringUtil';
 
 import {Config} from '../../../Config';
-import {ACCESS_STATE} from '../../../conversation/AccessState';
-import {
-  ACCESS_TYPES,
-  teamPermissionsForAccessState,
-  toggleFeature,
-} from '../../../conversation/ConversationAccessPermission';
-import {ConversationRepository} from '../../../conversation/ConversationRepository';
-import {User} from '../../../entity/User';
 import {isProtocolOption, ProtocolOption} from '../../../guards/Protocol';
 import {RootContext} from '../../../page/RootProvider';
-import {TeamState} from '../../../team/TeamState';
-import {UserState} from '../../../user/UserState';
 import {PrimaryModal} from '../PrimaryModal';
 
 interface GroupCreationModalProps {
@@ -77,7 +77,13 @@ const GroupCreationModal: React.FC<GroupCreationModalProps> = ({
     isTeam,
     isMLSEnabled: isMLSEnabledForTeam,
     isProtocolToggleEnabledForUser,
-  } = useKoSubscribableChildren(teamState, ['isTeam', 'isMLSEnabled', 'isProtocolToggleEnabledForUser']);
+    isCellsEnabled: isCellsEnabledForTeam,
+  } = useKoSubscribableChildren(teamState, [
+    'isTeam',
+    'isMLSEnabled',
+    'isProtocolToggleEnabledForUser',
+    'isCellsEnabled',
+  ]);
   const {self: selfUser} = useKoSubscribableChildren(userState, ['self']);
 
   const enableMLSToggle = isMLSEnabledForTeam && isProtocolToggleEnabledForUser;
@@ -98,6 +104,12 @@ const GroupCreationModal: React.FC<GroupCreationModalProps> = ({
 
   const initialProtocol = protocolOptions.find(protocol => protocol.value === defaultProtocol)!;
 
+  //both environment feature flag and team feature flag must be enabled to create conversations with cells
+  const isCellsEnabledForEnvironment = Config.getConfig().FEATURE.ENABLE_CELLS;
+  const enableCellsToggle = isCellsEnabledForEnvironment && isCellsEnabledForTeam;
+  const [isCellsOptionEnabled, setIsCellsOptionEnabled] = useState(enableCellsToggle);
+  const isCellsEnabledForGroup = isCellsEnabledForEnvironment && isCellsOptionEnabled;
+
   const [isShown, setIsShown] = useState<boolean>(false);
   const [selectedContacts, setSelectedContacts] = useState<User[]>([]);
   const [enableReadReceipts, setEnableReadReceipts] = useState<boolean>(false);
@@ -111,7 +123,6 @@ const GroupCreationModal: React.FC<GroupCreationModalProps> = ({
   const [groupCreationState, setGroupCreationState] = useState<GroupCreationModalState>(
     GroupCreationModalState.DEFAULT,
   );
-  const [isCellsOptionEnabled, setIsCellsOptionEnabled] = useState(true);
 
   const mainViewModel = useContext(RootContext);
 
@@ -140,8 +151,6 @@ const GroupCreationModal: React.FC<GroupCreationModalProps> = ({
   const isGuestRoom = accessState === ACCESS_STATE.TEAM.GUEST_ROOM;
   const isGuestEnabled = isGuestRoom || isGuestAndServicesRoom;
   const isServicesEnabled = isServicesRoom || isGuestAndServicesRoom;
-
-  const isCellsEnabled = Config.getConfig().FEATURE.ENABLE_CELLS && isCellsOptionEnabled;
 
   const {setCurrentTab: setCurrentSidebarTab} = useSidebarStore();
 
@@ -223,7 +232,7 @@ const GroupCreationModal: React.FC<GroupCreationModalProps> = ({
           {
             protocol: enableMLSToggle ? selectedProtocol.value : defaultProtocol,
             receipt_mode: enableReadReceipts ? RECEIPT_MODE.ON : RECEIPT_MODE.OFF,
-            cells: isCellsEnabled,
+            cells: isCellsEnabledForGroup,
           },
         );
 
@@ -513,7 +522,7 @@ const GroupCreationModal: React.FC<GroupCreationModalProps> = ({
                   isDisabled={false}
                   name={t('readReceiptsToggleName')}
                 />
-                {Config.getConfig().FEATURE.ENABLE_CELLS && (
+                {enableCellsToggle && (
                   <InfoToggle
                     className="modal-style"
                     dataUieName="cells"

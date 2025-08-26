@@ -20,8 +20,8 @@
 import {render} from '@testing-library/react';
 
 import * as Icon from 'Components/Icon';
-import {createLabel, LabelType} from 'src/script/conversation/ConversationLabelRepository';
-import {Conversation} from 'src/script/entity/Conversation';
+import {createLabel, LabelType} from 'Repositories/conversation/ConversationLabelRepository';
+import {Conversation} from 'Repositories/entity/Conversation';
 import {TestFactory} from 'test/helper/TestFactory';
 
 import {ConversationFolderTab} from './ConversationFolderTab';

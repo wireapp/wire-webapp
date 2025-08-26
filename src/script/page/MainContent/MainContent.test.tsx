@@ -19,7 +19,7 @@
 
 import {act, render, screen, waitFor} from '@testing-library/react';
 
-import {User} from 'src/script/entity/User';
+import {User} from 'Repositories/entity/User';
 import {ContentViewModel} from 'src/script/view_model/ContentViewModel';
 
 import {MainContent} from './MainContent';

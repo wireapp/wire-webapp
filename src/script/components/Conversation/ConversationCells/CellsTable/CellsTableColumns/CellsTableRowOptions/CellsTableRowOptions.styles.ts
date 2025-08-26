@@ -28,7 +28,7 @@ export const buttonStyles: CSSObject = {
   margin: '0',
   width: '100%',
   padding: '12px 0',
-  borderRadius: '8px',
+  borderRadius: '0',
 
   '&:hover, &:focus-visible': {
     backgroundColor: 'var(--foreground-fade-8)',
@@ -38,9 +38,10 @@ export const buttonStyles: CSSObject = {
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
-    width: '40px',
-    height: '40px',
+    width: '32px',
+    height: '32px',
     padding: '0',
+    borderRadius: '8px',
   },
 };
 

@@ -326,3 +326,47 @@ export const formatDelayTime = (delayTimeInMS: number): string => {
   const seconds = Math.floor(delayTimeInMS / TIME_IN_MILLIS.SECOND);
   return `${seconds} ${t(`ephemeralUnitsSecond${seconds === 1 ? '' : 's'}`)}`;
 };
+
+/**
+ * Format duration into a coarse, human-readable unit:
+ * - ≥ 1 day   → "X days"
+ * - ≥ 1 hour  → "X hours"
+ * - ≥ 1 min   → "X minutes"
+ * - < 1 min   → "1 minute"
+ *
+ * @param duration - Duration in milliseconds
+ * @returns Localized string of the coarsest applicable unit
+ */
+export const formatCoarseDuration = (duration: number): string => {
+  if (duration >= TIME_IN_MILLIS.DAY) {
+    const days = Math.floor(duration / TIME_IN_MILLIS.DAY);
+    return `${days} ${t(`ephemeralUnitsDay${days === 1 ? '' : 's'}`)}`;
+  }
+
+  if (duration >= TIME_IN_MILLIS.HOUR) {
+    const hours = Math.floor(duration / TIME_IN_MILLIS.HOUR);
+    return `${hours} ${t(`ephemeralUnitsHour${hours === 1 ? '' : 's'}`)}`;
+  }
+
+  if (duration >= TIME_IN_MILLIS.MINUTE) {
+    const minutes = Math.floor(duration / TIME_IN_MILLIS.MINUTE);
+    return `${minutes} ${t(`ephemeralUnitsMinute${minutes === 1 ? '' : 's'}`)}`;
+  }
+
+  return `1 ${t('ephemeralUnitsMinute')}`;
+};
+
+/**
+ * Returns the duration in milliseconds from the given date to the current time.
+ *
+ * @example
+ * ```ts
+ * const startedAt = "2025-06-01T00:00:00Z";
+ * const elapsed = durationFrom(startedAt); // e.g. 2592000000 (30 days in ms)
+ * formatDuration(elapsed);                // e.g. "1 month"
+ * ```
+ *
+ * @param date - The past date to compare (Date or timestamp).
+ * @returns Duration in milliseconds between now and the given date.
+ */
+export const durationFrom = (date: Date | number | string) => Date.now() - new Date(date).getTime();

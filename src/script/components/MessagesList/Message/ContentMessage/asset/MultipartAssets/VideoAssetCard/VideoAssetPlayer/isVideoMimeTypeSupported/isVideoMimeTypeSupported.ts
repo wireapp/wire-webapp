@@ -21,7 +21,7 @@ import {amplify} from 'amplify';
 
 import {WebAppEvents} from '@wireapp/webapp-events';
 
-import {EventName} from 'src/script/tracking/EventName';
+import {EventName} from 'Repositories/tracking/EventName';
 
 export const isVideoMimeTypeSupported = (mimeType: string): boolean => {
   const video = document.createElement('video');

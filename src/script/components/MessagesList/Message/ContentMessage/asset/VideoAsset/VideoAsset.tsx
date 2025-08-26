@@ -19,22 +19,21 @@
 
 import React, {useCallback, useEffect, useState} from 'react';
 
-import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
 import {amplify} from 'amplify';
 import cx from 'classnames';
 import {container} from 'tsyringe';
 
-import {Button, ButtonVariant, useTimeout} from '@wireapp/react-ui-kit';
+import {TabIndex, Button, ButtonVariant, useTimeout} from '@wireapp/react-ui-kit';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {RestrictedVideo} from 'Components/asset/RestrictedVideo';
-import {AssetError} from 'src/script/assets/AssetError';
-import {AssetRepository} from 'src/script/assets/AssetRepository';
-import {AssetTransferState} from 'src/script/assets/AssetTransferState';
-import type {ContentMessage} from 'src/script/entity/message/ContentMessage';
-import type {FileAsset as FileAssetType} from 'src/script/entity/message/FileAsset';
-import {TeamState} from 'src/script/team/TeamState';
-import {EventName} from 'src/script/tracking/EventName';
+import {AssetError} from 'Repositories/assets/AssetError';
+import {AssetRepository} from 'Repositories/assets/AssetRepository';
+import {AssetTransferState} from 'Repositories/assets/AssetTransferState';
+import type {ContentMessage} from 'Repositories/entity/message/ContentMessage';
+import type {FileAsset as FileAssetType} from 'Repositories/entity/message/FileAsset';
+import {TeamState} from 'Repositories/team/TeamState';
+import {EventName} from 'Repositories/tracking/EventName';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 import {formatSeconds} from 'Util/TimeUtil';

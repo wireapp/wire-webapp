@@ -19,26 +19,26 @@
 
 import {act, render, waitFor} from '@testing-library/react';
 
-import {User} from 'src/script/entity/User';
+import {User} from 'Repositories/entity/User';
 
 import {AppLoader} from '.';
 
 describe('AppLoader', () => {
   it('triggers loading of the app once mounted', async () => {
     jest.useFakeTimers();
-    let nextStep: (progress: number, message: string) => void = () => {};
+    let nextStep: (message: string) => void = () => {};
     let done: () => void = () => {};
-    const init = jest.fn(async (onProgress: (p: number, m: string) => void) => {
-      nextStep = (progress: number, message: string) => onProgress(progress, message);
+    const init = jest.fn(async (onProgress: (m: string) => void) => {
+      nextStep = (message: string) => onProgress(message);
       return new Promise<User>(resolve => (done = () => resolve(new User())));
     });
 
     const {queryByText, getByText} = render(<AppLoader init={init}>{() => <div>LoadedApp</div>}</AppLoader>);
 
-    act(() => nextStep(1, 'first'));
+    act(() => nextStep('first'));
     expect(getByText('first')).not.toBe(null);
     expect(queryByText('LoadedApp')).toBe(null);
-    act(() => nextStep(2, 'second'));
+    act(() => nextStep('second'));
     expect(getByText('second')).not.toBe(null);
     expect(queryByText('LoadedApp')).toBe(null);
     done();

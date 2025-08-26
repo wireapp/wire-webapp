@@ -26,6 +26,7 @@ import {AnyAction, Dispatch} from 'redux';
 import {EntropyContainer} from './EntropyContainer';
 import {Page} from './Page';
 
+import {AccountRegistrationLayout} from '../component/AccountRegistrationLayout';
 import {actionRoot as ROOT_ACTIONS} from '../module/action';
 import {RootState, bindActionCreators} from '../module/reducer';
 import {ROUTE} from '../route';
@@ -46,7 +47,9 @@ const SetEntropyPageComponent = ({pushEntropyData}: Props & ConnectedProps & Dis
 
   return (
     <Page>
-      <EntropyContainer onSetEntropy={onSetEntropy} />
+      <AccountRegistrationLayout>
+        <EntropyContainer onSetEntropy={onSetEntropy} />
+      </AccountRegistrationLayout>
     </Page>
   );
 };

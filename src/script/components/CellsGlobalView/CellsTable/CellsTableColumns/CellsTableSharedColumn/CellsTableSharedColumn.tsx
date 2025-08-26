@@ -33,7 +33,7 @@ export const CellsTableSharedColumn = ({isShared}: CellsTableSharedColumnProps) 
         <LinkIcon width={10} height={10} />
       </div>
       <span css={textStyles}>
-        {isShared ? t('cellsGlobalView.tableRowSharedTruthyValue') : t('cellsGlobalView.tableRowSharedFalsyValue')}
+        {isShared ? t('cells.tableRow.shared.truthyValue') : t('cells.tableRow.shared.falsyValue')}
       </span>
     </div>
   );

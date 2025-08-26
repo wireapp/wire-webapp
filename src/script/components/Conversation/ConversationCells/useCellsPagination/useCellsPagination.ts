@@ -24,17 +24,17 @@ import {useCellsStore} from '../common/useCellsStore/useCellsStore';
 
 interface UsePaginationProps {
   pagination: CellPagination | null;
-  currentFilesCount: number;
+  currentNodesCount: number;
   conversationId: string;
   setOffset: (offset: number) => void;
 }
 
-export const useCellsPagination = ({pagination, conversationId, setOffset, currentFilesCount}: UsePaginationProps) => {
+export const useCellsPagination = ({pagination, conversationId, setOffset, currentNodesCount}: UsePaginationProps) => {
   const {clearAll, pageSize, setPageSize} = useCellsStore();
 
   const currentPage = pagination?.currentPage || 0;
   const totalPages = pagination?.totalPages || 1;
-  const totalRows = pagination?.total || currentFilesCount;
+  const totalRows = pagination?.total || currentNodesCount;
 
   const goToPage = useCallback(
     (page: number) => {

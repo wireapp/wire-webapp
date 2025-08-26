@@ -19,7 +19,7 @@
 
 import {useCallback, useEffect, useRef, useState} from 'react';
 
-import {CellsRepository} from 'src/script/cells/CellsRepository';
+import {CellsRepository} from 'Repositories/cells/CellsRepository';
 
 type Status = 'idle' | 'loading' | 'success' | 'error' | 'retrying';
 
@@ -77,7 +77,7 @@ export const useGetMultipartAsset = ({
 
     try {
       setStatus('loading');
-      const asset = await cellsRepository.getFile({uuid});
+      const asset = await cellsRepository.getNode({uuid});
 
       if (!isMounted.current) {
         return;

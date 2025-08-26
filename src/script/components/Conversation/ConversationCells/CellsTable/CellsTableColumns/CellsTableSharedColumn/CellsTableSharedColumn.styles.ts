@@ -49,8 +49,18 @@ export const iconWrapperStyles: CSSObject = {
   width: '20px',
   height: '20px',
 
+  'body.theme-dark &': {
+    backgroundColor: 'var(--foreground-fade-8)',
+  },
+
   [`@media (max-width: ${styleBreakpoint}px)`]: {
     display: 'none',
+  },
+};
+
+export const iconStyles: CSSObject = {
+  'body.theme-dark &': {
+    fill: 'var(--main-color)',
   },
 };
 

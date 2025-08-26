@@ -20,13 +20,13 @@
 import React from 'react';
 
 import * as Icon from 'Components/Icon';
-import {MediaDeviceType} from 'src/script/media/MediaDeviceType';
+import {MediaDevicesHandler} from 'Repositories/media/MediaDevicesHandler';
+import {MediaDeviceType} from 'Repositories/media/MediaDeviceType';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 
 import {DeviceSelect} from './DeviceSelect';
 
-import {MediaDevicesHandler} from '../../../../../media/MediaDevicesHandler';
 import {PreferencesSection} from '../components/PreferencesSection';
 
 interface AudioOutPreferencesProps {

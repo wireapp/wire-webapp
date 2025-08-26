@@ -19,29 +19,28 @@
 
 import React, {useState} from 'react';
 
-import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
 import classNames from 'classnames';
 import {container} from 'tsyringe';
 
 import {CALL_TYPE} from '@wireapp/avs';
-import {EmojiIcon, GridIcon, MoreIcon, QUERY, RaiseHandIcon} from '@wireapp/react-ui-kit';
+import {TabIndex, EmojiIcon, GridIcon, MoreIcon, QUERY, RaiseHandIcon} from '@wireapp/react-ui-kit';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import * as Icon from 'Components/Icon';
 import {useActiveWindowMatchMedia} from 'Hooks/useActiveWindowMatchMedia';
 import {useUserPropertyValue} from 'Hooks/useUserProperty';
-import {Call} from 'src/script/calling/Call';
-import {CallingViewMode, CallState} from 'src/script/calling/CallState';
-import {Participant} from 'src/script/calling/Participant';
+import {Call} from 'Repositories/calling/Call';
+import {CallingViewMode, CallState} from 'Repositories/calling/CallState';
+import {Participant} from 'Repositories/calling/Participant';
+import {Conversation} from 'Repositories/entity/Conversation';
+import {ElectronDesktopCapturerSource, MediaDevicesHandler} from 'Repositories/media/MediaDevicesHandler';
+import {MediaDeviceType} from 'Repositories/media/MediaDeviceType';
+import {PropertiesRepository} from 'Repositories/properties/PropertiesRepository';
+import {PROPERTIES_TYPE} from 'Repositories/properties/PropertiesType';
+import {TeamState} from 'Repositories/team/TeamState';
 import {Config} from 'src/script/Config';
-import {Conversation} from 'src/script/entity/Conversation';
 import {isCallViewOption} from 'src/script/guards/CallView';
 import {isMediaDevice} from 'src/script/guards/MediaDevice';
-import {ElectronDesktopCapturerSource, MediaDevicesHandler} from 'src/script/media/MediaDevicesHandler';
-import {MediaDeviceType} from 'src/script/media/MediaDeviceType';
-import {PropertiesRepository} from 'src/script/properties/PropertiesRepository';
-import {PROPERTIES_TYPE} from 'src/script/properties/PropertiesType';
-import {TeamState} from 'src/script/team/TeamState';
 import {ContextMenuEntry, showContextMenu} from 'src/script/ui/ContextMenu';
 import {CallViewTab} from 'src/script/view_model/CallingViewModel';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';

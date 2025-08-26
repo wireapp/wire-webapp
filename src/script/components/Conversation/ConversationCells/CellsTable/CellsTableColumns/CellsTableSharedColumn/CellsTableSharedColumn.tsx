@@ -20,7 +20,13 @@
 import {LinkIcon} from 'Components/Icon';
 import {t} from 'Util/LocalizerUtil';
 
-import {wrapperStyles, iconWrapperStyles, textStyles, wrapperStylesHidden} from './CellsTableSharedColumn.styles';
+import {
+  wrapperStyles,
+  iconWrapperStyles,
+  textStyles,
+  wrapperStylesHidden,
+  iconStyles,
+} from './CellsTableSharedColumn.styles';
 
 interface CellsTableSharedColumnProps {
   isShared: boolean;
@@ -30,10 +36,10 @@ export const CellsTableSharedColumn = ({isShared}: CellsTableSharedColumnProps) 
   return (
     <div css={isShared ? wrapperStyles : wrapperStylesHidden}>
       <div css={iconWrapperStyles}>
-        <LinkIcon width={10} height={10} />
+        <LinkIcon width={10} height={10} css={iconStyles} />
       </div>
       <span css={textStyles}>
-        {isShared ? t('cellsGlobalView.tableRowSharedTruthyValue') : t('cellsGlobalView.tableRowSharedFalsyValue')}
+        {isShared ? t('cells.tableRow.shared.truthyValue') : t('cells.tableRow.shared.falsyValue')}
       </span>
     </div>
   );

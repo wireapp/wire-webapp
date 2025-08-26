@@ -26,13 +26,13 @@ import {
 } from 'Components/calling/CallingCell/CallingControls/CallingControls.styles';
 import {useCallAlertState} from 'Components/calling/useCallAlertState';
 import * as Icon from 'Components/Icon';
-import {DesktopScreenShareMenu} from 'src/script/calling/CallState';
+import {Call} from 'Repositories/calling/Call';
+import {DesktopScreenShareMenu} from 'Repositories/calling/CallState';
+import {Participant} from 'Repositories/calling/Participant';
+import {TeamState} from 'Repositories/team/TeamState';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 
-import {Call} from '../../../../calling/Call';
-import {Participant} from '../../../../calling/Participant';
-import {TeamState} from '../../../../team/TeamState';
 import {CallActions} from '../../../../view_model/CallingViewModel';
 
 interface CallingControlsProps {

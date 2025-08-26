@@ -24,7 +24,7 @@ import {
   generateHandleVariations,
   appendRandomDigits,
   createSuggestions,
-} from 'src/script/user/UserHandleGenerator';
+} from 'Repositories/user/UserHandleGenerator';
 
 describe('UserHandleGenerator', () => {
   describe('generate_handle_variations', () => {

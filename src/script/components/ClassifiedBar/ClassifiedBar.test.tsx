@@ -19,8 +19,8 @@
 
 import {render} from '@testing-library/react';
 
-import {Conversation} from 'src/script/entity/Conversation';
-import {User} from 'src/script/entity/User';
+import {Conversation} from 'Repositories/entity/Conversation';
+import {User} from 'Repositories/entity/User';
 import {createUuid} from 'Util/uuid';
 
 import {ConversationClassifiedBar} from './ClassifiedBar';

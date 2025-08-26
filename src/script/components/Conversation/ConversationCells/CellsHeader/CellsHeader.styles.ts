@@ -25,6 +25,7 @@ export const wrapperStyles: CSSObject = {
   alignItems: 'flex-start',
   flexDirection: 'column',
   marginBottom: '20px',
+  paddingRight: '8px',
   width: '100%',
 };
 
@@ -47,4 +48,10 @@ export const contentStyles: CSSObject = {
   justifyContent: 'space-between',
   gap: '8px',
   width: '100%',
+};
+
+export const actionsStyles: CSSObject = {
+  display: 'flex',
+  alignItems: 'center',
+  gap: '8px',
 };

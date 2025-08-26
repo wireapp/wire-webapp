@@ -22,7 +22,7 @@ import {container} from 'tsyringe';
 import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
 
 import * as Icon from 'Components/Icon';
-import {UserState} from 'src/script/user/UserState';
+import {UserState} from 'Repositories/user/UserState';
 import {t} from 'Util/LocalizerUtil';
 
 import {createConversationHeaderContainerCss} from './CreateConversation.styles';
@@ -89,7 +89,7 @@ export const CreateConversationHeader = () => {
         <Icon.CloseIcon aria-hidden="true" className="modal__header__button" />
       </button>
 
-      <h2 id="group-creation-label" className="modal__header__title">
+      <h2 id="group-creation-label" className="modal__header__title" data-uie-name="status-people-selected">
         {t('createConversationModalHeader')}
       </h2>
 

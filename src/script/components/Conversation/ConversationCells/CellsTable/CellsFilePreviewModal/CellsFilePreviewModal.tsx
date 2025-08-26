@@ -22,6 +22,8 @@ import {getFileTypeFromExtension} from 'Util/getFileTypeFromExtension/getFileTyp
 
 import {useCellsFilePreviewModal} from '../common/CellsFilePreviewModalContext/CellsFilePreviewModalContext';
 
+// This component is duplicated across global view and conversation view
+// TODO: Abstract when it starts to grow / feels right
 export const CellsFilePreviewModal = () => {
   const {id, selectedFile, handleCloseFile} = useCellsFilePreviewModal();
 
@@ -29,13 +31,13 @@ export const CellsFilePreviewModal = () => {
     return null;
   }
 
-  const {fileUrl, extension, name, owner, uploadedAtTimestamp, previewPdfUrl, previewImageUrl} = selectedFile;
+  const {url, extension, name, owner, uploadedAtTimestamp, previewPdfUrl, previewImageUrl, tags} = selectedFile;
 
   const getFileUrl = () => {
     const type = getFileTypeFromExtension(extension);
 
     if (['pdf', 'image'].includes(type)) {
-      return fileUrl;
+      return url;
     }
 
     if (['audio', 'video'].includes(type)) {
@@ -56,6 +58,7 @@ export const CellsFilePreviewModal = () => {
       status={!getFileUrl() ? 'unavailable' : 'success'}
       senderName={owner}
       timestamp={uploadedAtTimestamp}
+      badges={tags}
     />
   );
 };

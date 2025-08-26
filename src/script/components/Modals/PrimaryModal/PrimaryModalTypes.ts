@@ -19,7 +19,7 @@
 
 import React from 'react';
 
-import {ClientNotificationData} from '../../../notification/PreferenceNotificationRepository';
+import {ClientNotificationData} from 'Repositories/notification/PreferenceNotificationRepository';
 
 export interface ButtonAction {
   action?: Function;
@@ -37,6 +37,8 @@ export interface Text {
   title?: string;
   closeBtnLabel?: string;
 }
+
+export type ModalSize = 'small' | 'medium' | 'large';
 
 export interface ModalOptions {
   close?: () => void;
@@ -59,6 +61,7 @@ export interface ModalOptions {
   confirmCancelBtnLabel?: string;
   allButtonsFullWidth?: boolean;
   primaryBtnFirst?: boolean;
+  size?: ModalSize;
 }
 
 export enum PrimaryModalType {
@@ -99,6 +102,7 @@ export interface ModalContent {
   passwordOptional?: boolean;
   allButtonsFullWidth?: boolean;
   primaryBtnFirst?: boolean;
+  size?: ModalSize;
 }
 
 export type ModalItem = {id: string; options: ModalOptions; type: PrimaryModalType};

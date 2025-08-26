@@ -26,11 +26,11 @@ import {COLOR} from '@wireapp/react-ui-kit';
 
 import {AvailabilityIcon} from 'Components/AvailabilityIcon';
 import {useUserName} from 'Components/UserName';
+import {User} from 'Repositories/entity/User';
+import {TeamState} from 'Repositories/team/TeamState';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 
-import {User} from '../../../entity/User';
-import {TeamState} from '../../../team/TeamState';
 import {AVATAR_SIZE, STATE} from '../Avatar';
 import {AvatarBackground} from '../AvatarBackground';
 import {AvatarBadge} from '../AvatarBadge';

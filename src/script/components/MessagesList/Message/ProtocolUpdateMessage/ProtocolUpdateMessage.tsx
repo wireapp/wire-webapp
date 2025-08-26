@@ -20,9 +20,9 @@
 import {ConversationProtocol} from '@wireapp/api-client/lib/conversation';
 
 import * as Icon from 'Components/Icon';
+import {ProtocolUpdateMessage as ProtocolUpdateMessageEntity} from 'Repositories/entity/message/ProtocolUpdateMessage';
+import {SystemMessage} from 'Repositories/entity/message/SystemMessage';
 import {Config} from 'src/script/Config';
-import {ProtocolUpdateMessage as ProtocolUpdateMessageEntity} from 'src/script/entity/message/ProtocolUpdateMessage';
-import {SystemMessage} from 'src/script/entity/message/SystemMessage';
 import {replaceLink, t} from 'Util/LocalizerUtil';
 
 import {SystemMessageBase} from '../SystemMessage/SystemMessageBase';

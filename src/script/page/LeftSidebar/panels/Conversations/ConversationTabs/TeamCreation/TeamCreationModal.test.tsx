@@ -26,7 +26,7 @@ import {setStrings} from 'Util/LocalizerUtil';
 import {TeamCreationModal} from './TeamCreationModal';
 import {useTeamCreationModal} from './useTeamCreationModal';
 
-jest.mock('src/script/team/TeamService');
+jest.mock('Repositories/team/TeamService');
 
 const testIdentifiers = {
   doContinue: 'do-continue',

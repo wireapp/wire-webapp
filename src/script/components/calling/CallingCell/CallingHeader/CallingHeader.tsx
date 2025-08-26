@@ -17,13 +17,12 @@
  *
  */
 
-import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
-
-import {IconButton, IconButtonVariant} from '@wireapp/react-ui-kit';
+import {TabIndex, IconButton, IconButtonVariant} from '@wireapp/react-ui-kit';
 
 import {Avatar, AVATAR_SIZE, GroupAvatar} from 'Components/Avatar';
 import {Duration} from 'Components/calling/Duration';
 import * as Icon from 'Components/Icon';
+import {User} from 'Repositories/entity/User';
 import {isDetachedCallingFeatureEnabled} from 'Util/isDetachedCallingFeatureEnabled';
 import {t} from 'Util/LocalizerUtil';
 
@@ -38,7 +37,6 @@ import {
   detachedWindowButton,
 } from './CallingHeader.styles';
 
-import {User} from '../../../../entity/User';
 import {createNavigate, createNavigateKeyboard} from '../../../../router/routerBindings';
 
 interface CallingHeaderProps {

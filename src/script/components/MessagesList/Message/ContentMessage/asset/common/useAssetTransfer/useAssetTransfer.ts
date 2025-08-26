@@ -21,11 +21,11 @@ import {useEffect, useState} from 'react';
 
 import {container} from 'tsyringe';
 
-import {AssetRemoteData} from 'src/script/assets/AssetRemoteData';
-import {AssetRepository} from 'src/script/assets/AssetRepository';
-import {AssetTransferState} from 'src/script/assets/AssetTransferState';
-import {ContentMessage} from 'src/script/entity/message/ContentMessage';
-import {FileAsset} from 'src/script/entity/message/FileAsset';
+import {AssetRemoteData} from 'Repositories/assets/AssetRemoteData';
+import {AssetRepository} from 'Repositories/assets/AssetRepository';
+import {AssetTransferState} from 'Repositories/assets/AssetTransferState';
+import {ContentMessage} from 'Repositories/entity/message/ContentMessage';
+import {FileAsset} from 'Repositories/entity/message/FileAsset';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 
 export type AssetUrl = {

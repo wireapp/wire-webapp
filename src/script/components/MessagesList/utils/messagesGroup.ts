@@ -17,7 +17,7 @@
  *
  */
 
-import {Message} from 'src/script/entity/message/Message';
+import {Message} from 'Repositories/entity/message/Message';
 import {isSameDay, fromUnixTime, TIME_IN_MILLIS} from 'Util/TimeUtil';
 
 export type MessagesGroup = {

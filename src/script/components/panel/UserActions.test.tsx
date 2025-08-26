@@ -25,15 +25,15 @@ import ko from 'knockout';
 import {container} from 'tsyringe';
 
 import {PrimaryModalComponent} from 'Components/Modals/PrimaryModal/PrimaryModal';
+import {ConnectionEntity} from 'Repositories/connection/ConnectionEntity';
+import {ConversationRoleRepository} from 'Repositories/conversation/ConversationRoleRepository';
+import {ConversationState} from 'Repositories/conversation/ConversationState';
+import {Conversation} from 'Repositories/entity/Conversation';
+import {User} from 'Repositories/entity/User';
+import {TeamEntity} from 'Repositories/team/TeamEntity';
+import {TeamState} from 'Repositories/team/TeamState';
+import {UserState} from 'Repositories/user/UserState';
 import {withTheme} from 'src/script/auth/util/test/TestUtil';
-import {ConnectionEntity} from 'src/script/connection/ConnectionEntity';
-import {ConversationRoleRepository} from 'src/script/conversation/ConversationRoleRepository';
-import {ConversationState} from 'src/script/conversation/ConversationState';
-import {Conversation} from 'src/script/entity/Conversation';
-import {User} from 'src/script/entity/User';
-import {TeamEntity} from 'src/script/team/TeamEntity';
-import {TeamState} from 'src/script/team/TeamState';
-import {UserState} from 'src/script/user/UserState';
 import {ActionsViewModel} from 'src/script/view_model/ActionsViewModel';
 import {noop} from 'Util/util';
 

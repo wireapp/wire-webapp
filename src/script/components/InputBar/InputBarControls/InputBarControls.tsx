@@ -23,8 +23,8 @@ import {amplify} from 'amplify';
 
 import {WebAppEvents} from '@wireapp/webapp-events';
 
+import {Conversation} from 'Repositories/entity/Conversation';
 import {Config} from 'src/script/Config';
-import {Conversation} from 'src/script/entity/Conversation';
 
 import {ControlButtons} from './ControlButtons';
 import {SendMessageButton} from './SendMessageButton/SendMessageButton';
@@ -36,6 +36,7 @@ interface InputBarControlsProps {
   isFileSharingSendingEnabled: boolean;
   pingDisabled: boolean;
   messageContent: MessageContent;
+  isCellsFeatureEnabled: boolean;
   isEditing: boolean;
   isSendingDisabled: boolean;
   showMarkdownPreview: boolean;
@@ -64,6 +65,7 @@ export const InputBarControls = ({
   isFileSharingSendingEnabled,
   pingDisabled,
   messageContent,
+  isCellsFeatureEnabled: isCellsFeatureEnabled,
   isEditing,
   isSendingDisabled,
   showMarkdownPreview,
@@ -98,6 +100,7 @@ export const InputBarControls = ({
           disableFilesharing={!isFileSharingSendingEnabled}
           disablePing={pingDisabled}
           input={messageContent.text}
+          isCellsFeatureEnabled={isCellsFeatureEnabled}
           isEditing={isEditing}
           onCancelEditing={onEscape}
           onClickPing={onClickPing}

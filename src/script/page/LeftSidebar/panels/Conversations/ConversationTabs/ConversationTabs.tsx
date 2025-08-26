@@ -28,15 +28,20 @@ import {
   SupportIcon,
   ChannelIcon,
   CollectionIcon,
+  TeamIcon,
 } from '@wireapp/react-ui-kit';
 
 import * as Icon from 'Components/Icon';
-import {ConversationRepository} from 'src/script/conversation/ConversationRepository';
-import {User} from 'src/script/entity/User';
+import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
+import {Conversation} from 'Repositories/entity/Conversation';
+import {User} from 'Repositories/entity/User';
+import {TeamState} from 'Repositories/team/TeamState';
+import {FEATURES, hasAccessToFeature} from 'Repositories/user/UserPermission';
+import {getManageTeamUrl} from 'src/script/externalRoute';
 import {ConversationFolderTab} from 'src/script/page/LeftSidebar/panels/Conversations/ConversationTab/ConversationFolderTab';
 import {SidebarTabs} from 'src/script/page/LeftSidebar/panels/Conversations/useSidebarStore';
 import {Core} from 'src/script/service/CoreSingleton';
-import {TeamState} from 'src/script/team/TeamState';
+import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {isDataDogEnabled} from 'Util/DataDog';
 import {getWebEnvironment} from 'Util/Environment';
 import {replaceLink, t} from 'Util/LocalizerUtil';
@@ -47,13 +52,14 @@ import {
   footerDisclaimerEllipsis,
   footerDisclaimerTooltip,
   iconStyle,
+  conversationsTitleWrapper,
 } from './ConversationTabs.styles';
 import {FolderIcon} from './FolderIcon';
 import {TeamCreationBanner} from './TeamCreation/TeamCreationBanner';
 
 import {Config} from '../../../../../Config';
-import {Conversation} from '../../../../../entity/Conversation';
 import {ContentState} from '../../../../useAppState';
+import {ConversationFilterButton} from '../ConversationFilterButton';
 import {ConversationTab} from '../ConversationTab';
 
 interface ConversationTabsProps {
@@ -89,6 +95,8 @@ export const ConversationTabs = ({
   const core = container.resolve(Core);
   const teamState = container.resolve(TeamState);
   const totalUnreadConversations = unreadConversations.length;
+  const {teamRole} = useKoSubscribableChildren(selfUser, ['teamRole']);
+  const {isCellsEnabled: isCellsEnabledForTeam} = useKoSubscribableChildren(teamState, ['isCellsEnabled']);
 
   const totalUnreadFavoriteConversations = favoriteConversations.filter(favoriteConversation =>
     favoriteConversation.hasUnread(),
@@ -165,8 +173,10 @@ export const ConversationTabs = ({
       unreadConversations: channelConversationsLength,
     });
   }
-
+  const manageTeamUrl = getManageTeamUrl();
   const replaceWireLink = replaceLink('https://app.wire.com', '', '');
+
+  const showCellsTab = Config.getConfig().FEATURE.ENABLE_CELLS && isCellsEnabledForTeam;
 
   return (
     <>
@@ -176,7 +186,10 @@ export const ConversationTabs = ({
         aria-owns="tab-1 tab-2 tab-3 tab-4 tab-5 tab-6 tab-7"
         className="conversations-sidebar-list"
       >
-        <div className="conversations-sidebar-title">{t('videoCallOverlayConversations')}</div>
+        <div className="conversations-sidebar-title" css={conversationsTitleWrapper}>
+          <span>{t('videoCallOverlayConversations')}</span>
+          <ConversationFilterButton />
+        </div>
 
         {conversationTabs.map((conversationTab, index) => {
           if (conversationTab.type === SidebarTabs.FOLDER) {
@@ -221,17 +234,17 @@ export const ConversationTabs = ({
           isActive={currentTab === SidebarTabs.CONNECT}
         />
 
-        {Config.getConfig().FEATURE.ENABLE_CELLS && (
+        {showCellsTab && (
           <>
             <div className="conversations-sidebar-divider" />
 
             <div className="conversations-sidebar-title" css={{marginBlock: '32px 0'}}>
-              {t('cellsSidebar.heading')}
+              {t('cells.sidebar.heading')}
             </div>
 
             <ConversationTab
-              title={t('cellsSidebar.title')}
-              label={t('cellsSidebar.title')}
+              title={t('cells.sidebar.title')}
+              label={t('cells.sidebar.title')}
               type={SidebarTabs.CELLS}
               Icon={<CollectionIcon />}
               onChangeTab={onChangeTab}
@@ -294,6 +307,24 @@ export const ConversationTabs = ({
           isActive={currentTab === SidebarTabs.PREFERENCES}
         />
 
+        {hasAccessToFeature(FEATURES.MANAGE_TEAM, teamRole) && (
+          <a
+            rel="nofollow noopener noreferrer"
+            target="_blank"
+            href={manageTeamUrl}
+            type="button"
+            className="conversations-sidebar-btn"
+            title={t('preferencesAccountManageTeam')}
+            data-uie-name="go-team-management"
+          >
+            <span className="conversations-sidebar-btn--text-wrapper">
+              <TeamIcon />
+              <span className="conversations-sidebar-btn--text"> {t('preferencesAccountManageTeam')}</span>
+              <ExternalLinkIcon className="external-link-icon" />
+            </span>
+          </a>
+        )}
+
         <a
           rel="nofollow noopener noreferrer"
           target="_blank"
@@ -302,7 +333,7 @@ export const ConversationTabs = ({
           type="button"
           className="conversations-sidebar-btn"
           title={t('preferencesAboutSupport')}
-          data-uie-name="go-people"
+          data-uie-name="go-support"
         >
           <span className="conversations-sidebar-btn--text-wrapper">
             <SupportIcon viewBox="0 0 16 16" />

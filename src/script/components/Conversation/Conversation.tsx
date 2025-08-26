@@ -19,6 +19,7 @@
 
 import {UIEvent, useCallback, useEffect, useState} from 'react';
 
+import {CONVERSATION_CELLS_STATE} from '@wireapp/api-client/lib/conversation';
 import {container} from 'tsyringe';
 
 import {useMatchMedia} from '@wireapp/react-ui-kit';
@@ -26,12 +27,21 @@ import {useMatchMedia} from '@wireapp/react-ui-kit';
 import {CallingCell} from 'Components/calling/CallingCell';
 import {Giphy} from 'Components/Giphy';
 import {InputBar} from 'Components/InputBar';
-import {MessagesList} from 'Components/MessagesList';
+import {MessageListWrapper} from 'Components/MessagesList/MessageListWrapper';
 import {showDetailViewModal} from 'Components/Modals/DetailViewModal';
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {showWarningModal} from 'Components/Modals/utils/showWarningModal';
 import {TitleBar} from 'Components/TitleBar';
-import {CallState} from 'src/script/calling/CallState';
+import {CallState} from 'Repositories/calling/CallState';
+import {ConversationState} from 'Repositories/conversation/ConversationState';
+import {Conversation as ConversationEntity} from 'Repositories/entity/Conversation';
+import {ContentMessage} from 'Repositories/entity/message/ContentMessage';
+import {DecryptErrorMessage} from 'Repositories/entity/message/DecryptErrorMessage';
+import {MemberMessage} from 'Repositories/entity/message/MemberMessage';
+import {Message} from 'Repositories/entity/message/Message';
+import {User} from 'Repositories/entity/User';
+import {ServiceEntity} from 'Repositories/integration/ServiceEntity';
+import {TeamState} from 'Repositories/team/TeamState';
 import {Config} from 'src/script/Config';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {isLastReceivedMessage} from 'Util/conversationMessages';
@@ -52,22 +62,13 @@ import {ReadOnlyConversationMessage} from './ReadOnlyConversationMessage';
 import {useFilesUploadDropzone} from './useFilesUploadDropzone/useFilesUploadDropzone';
 import {checkFileSharingPermission} from './utils/checkFileSharingPermission';
 
-import {ConversationState} from '../../conversation/ConversationState';
-import {Conversation as ConversationEntity} from '../../entity/Conversation';
-import {ContentMessage} from '../../entity/message/ContentMessage';
-import {DecryptErrorMessage} from '../../entity/message/DecryptErrorMessage';
-import {MemberMessage} from '../../entity/message/MemberMessage';
-import {Message} from '../../entity/message/Message';
-import {User} from '../../entity/User';
 import {UserError} from '../../error/UserError';
 import {isMouseRightClickEvent, isAuxRightClickEvent} from '../../guards/Mouse';
 import {isServiceEntity} from '../../guards/Service';
-import {ServiceEntity} from '../../integration/ServiceEntity';
 import {MotionDuration} from '../../motion/MotionDuration';
 import {RightSidebarParams} from '../../page/AppMain';
 import {PanelState} from '../../page/RightSidebar';
 import {useMainViewModel} from '../../page/RootProvider';
-import {TeamState} from '../../team/TeamState';
 import {ElementType, MessageDetails} from '../MessagesList/Message/ContentMessage/asset/TextMessageRenderer';
 
 interface ConversationProps {
@@ -88,6 +89,8 @@ export const Conversation = ({
   reloadApp,
 }: ConversationProps) => {
   const messageListLogger = getLogger('ConversationList');
+
+  const isVirtualizedMessagesListEnabled = CONFIG.FEATURE.ENABLE_VIRTUALIZED_MESSAGES_LIST;
 
   const mainViewModel = useMainViewModel();
   const {content: contentViewModel} = mainViewModel;
@@ -132,10 +135,12 @@ export const Conversation = ({
   const {addReadReceiptToBatch} = useReadReceiptSender(repositories.message);
 
   useEffect(() => {
-    // When the component is mounted we want to make sure its conversation entity's last message is marked as visible
-    // not to display the jump to last message button initially
-    activeConversation?.isLastMessageVisible(true);
-  }, [activeConversation]);
+    if (!isVirtualizedMessagesListEnabled) {
+      // When the component is mounted we want to make sure its conversation entity's last message is marked as visible
+      // not to display the jump to last message button initially
+      activeConversation?.isLastMessageVisible(true);
+    }
+  }, [activeConversation, isVirtualizedMessagesListEnabled]);
 
   const uploadImages = useCallback(
     (images: File[]) => {
@@ -477,7 +482,8 @@ export const Conversation = ({
     isDisabled: isFileTabActive,
   });
 
-  const isCellsEnabled = Config.getConfig().FEATURE.ENABLE_CELLS;
+  const isCellsEnabled =
+    Config.getConfig().FEATURE.ENABLE_CELLS && activeConversation?.cellsState() !== CONVERSATION_CELLS_STATE.DISABLED;
 
   return (
     <ConversationFileDropzone
@@ -505,9 +511,20 @@ export const Conversation = ({
 
           {isCellsEnabled && (
             <>
-              <ConversationTabs activeTabIndex={activeTabIndex} onIndexChange={setActiveTabIndex} />
+              <ConversationTabs
+                activeTabIndex={activeTabIndex}
+                onIndexChange={setActiveTabIndex}
+                conversationQualifiedId={activeConversation.qualifiedId}
+              />
               <ConversationTabPanel id="files" isActive={isFileTabActive}>
-                {isFileTabActive && <ConversationCells conversationQualifiedId={activeConversation.qualifiedId} />}
+                {isFileTabActive && (
+                  <ConversationCells
+                    activeConversation={activeConversation}
+                    userRepository={repositories.user}
+                    cellsRepository={repositories.cells}
+                    conversationRepository={conversationRepository}
+                  />
+                )}
               </ConversationTabPanel>
             </>
           )}
@@ -534,7 +551,7 @@ export const Conversation = ({
               );
             })}
 
-            <MessagesList
+            <MessageListWrapper
               conversation={activeConversation}
               selfUser={selfUser}
               conversationRepository={conversationRepository}
@@ -550,6 +567,7 @@ export const Conversation = ({
               showImageDetails={showDetail}
               resetSession={onSessionResetClick}
               onClickMessage={handleClickOnMessage}
+              isConversationLoaded={isConversationLoaded}
               onLoading={loading => setIsConversationLoaded(!loading)}
               getVisibleCallback={getInViewportCallback}
               isMsgElementsFocusable={isMsgElementsFocusable}

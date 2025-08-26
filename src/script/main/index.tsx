@@ -27,6 +27,7 @@ import {createRoot} from 'react-dom/client';
 import {Runtime} from '@wireapp/commons';
 
 import {AppContainer} from 'Components/AppContainer/AppContainer';
+import {StorageKey} from 'Repositories/storage';
 import {enableLogging} from 'Util/LoggerUtil';
 import {loadValue} from 'Util/StorageUtil';
 import {exposeWrapperGlobals} from 'Util/wrapper';
@@ -35,7 +36,6 @@ import {doRedirect} from './app';
 
 import {SIGN_OUT_REASON} from '../auth/SignOutReason';
 import {Config} from '../Config';
-import {StorageKey} from '../storage';
 
 document.addEventListener('DOMContentLoaded', async () => {
   const config = Config.getConfig();

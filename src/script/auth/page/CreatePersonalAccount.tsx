@@ -17,111 +17,49 @@
  *
  */
 
-import React from 'react';
-
-import {connect} from 'react-redux';
 import {useNavigate} from 'react-router-dom';
-import {AnyAction, Dispatch} from 'redux';
 
-import {Runtime} from '@wireapp/commons';
-import {ArrowIcon, COLOR, Column, Columns, Container, ContainerXS, H1, IsMobile} from '@wireapp/react-ui-kit';
+import {FlexBox} from '@wireapp/react-ui-kit';
 
 import {t} from 'Util/LocalizerUtil';
 
+import {styles} from './CreatePersonalAccount.styles';
 import {Page} from './Page';
 
 import {Config} from '../../Config';
 import {AccountForm} from '../component/AccountForm';
-import {RouterLink} from '../component/RouterLink';
-import {actionRoot as ROOT_ACTIONS} from '../module/action/';
-import {RootState, bindActionCreators} from '../module/reducer';
-import * as AuthSelector from '../module/selector/AuthSelector';
+import {AccountRegistrationLayout} from '../component/AccountRegistrationLayout';
+import {BackButton} from '../component/BackButton';
+import {EXTERNAL_ROUTE} from '../externalRoute';
 import {ROUTE} from '../route';
-import {getEnterpriseLoginV2FF} from '../util/helpers';
 
-type Props = React.HTMLAttributes<HTMLDivElement>;
-
-const CreatePersonalAccountComponent = ({
-  isPersonalFlow,
-  enterPersonalCreationFlow,
-}: Props & ConnectedProps & DispatchProps) => {
+export const CreatePersonalAccount = () => {
   const navigate = useNavigate();
-  const isEnterpriseLoginV2Enabled = getEnterpriseLoginV2FF();
+  const onSubmit = () => {
+    if (Config.getConfig().FEATURE.ENABLE_EXTRA_CLIENT_ENTROPY) {
+      navigate(ROUTE.SET_ENTROPY);
+    } else {
+      navigate(ROUTE.VERIFY_EMAIL_CODE);
+    }
+  };
 
-  const isMacOsWrapper = Runtime.isDesktopApp() && Runtime.isMacOS();
-  React.useEffect(() => {
-    enterPersonalCreationFlow();
-  }, []);
-
-  const pageContent = (
-    <ContainerXS
-      centerText
-      verticalCenter
-      style={{display: 'flex', flexDirection: 'column', justifyContent: 'space-between', minHeight: 428}}
-    >
-      <H1 center>{t('createPersonalAccount.headLine')}</H1>
-      <AccountForm
-        onSubmit={() => {
-          if (Config.getConfig().FEATURE.ENABLE_EXTRA_CLIENT_ENTROPY) {
-            navigate(ROUTE.SET_ENTROPY);
-          } else {
-            navigate(ROUTE.VERIFY_EMAIL_CODE);
-          }
-        }}
-        submitText={t('createPersonalAccount.nextButton')}
-      />
-    </ContainerXS>
-  );
-  const backArrow = (
-    <RouterLink
-      to={isMacOsWrapper ? ROUTE.INDEX : ROUTE.SET_ACCOUNT_TYPE}
-      data-uie-name="go-index"
-      aria-label={t('createPersonalAccount.goBack')}
-    >
-      <ArrowIcon aria-hidden="true" direction="left" color={COLOR.TEXT} style={{opacity: 0.56}} />
-    </RouterLink>
-  );
   return (
-    <Page withSideBar={isEnterpriseLoginV2Enabled}>
-      <IsMobile>
-        <div style={{margin: 16}}>{backArrow}</div>
-      </IsMobile>
-      {isPersonalFlow ? (
-        <Container centerText verticalCenter style={{width: '100%'}}>
-          <Columns>
-            <IsMobile not>
-              <Column style={{display: 'flex'}}>
-                <div style={{margin: 'auto'}}>{backArrow}</div>
-              </Column>
-            </IsMobile>
-            <Column style={{flexBasis: 384, flexGrow: 0, padding: 0}}>{pageContent}</Column>
-            <Column />
-          </Columns>
-        </Container>
-      ) : (
-        pageContent
-      )}
-      <IsMobile>
-        <div style={{minWidth: 48}} />
-      </IsMobile>
+    <Page>
+      <AccountRegistrationLayout>
+        <FlexBox>
+          <FlexBox css={styles.container}>
+            <div css={styles.backButtonContainer}>
+              <BackButton />
+            </div>
+            <p css={styles.header}>{t('createPersonalAccount.headLine')}</p>
+            <AccountForm onSubmit={onSubmit} />
+            <p css={styles.footer}>{t('createPersonalAccount.subHeader')}</p>
+            <a css={styles.teamCreateButton} href={EXTERNAL_ROUTE.WIRE_TEAMS_SIGNUP} target="_blank" rel="noreferrer">
+              {t('createPersonalAccount.createTeamButton')}
+            </a>
+          </FlexBox>
+        </FlexBox>
+      </AccountRegistrationLayout>
     </Page>
   );
 };
-
-type ConnectedProps = ReturnType<typeof mapStateToProps>;
-const mapStateToProps = (state: RootState) => ({
-  isPersonalFlow: AuthSelector.isPersonalFlow(state),
-});
-
-type DispatchProps = ReturnType<typeof mapDispatchToProps>;
-const mapDispatchToProps = (dispatch: Dispatch<AnyAction>) =>
-  bindActionCreators(
-    {
-      enterPersonalCreationFlow: ROOT_ACTIONS.authAction.enterPersonalCreationFlow,
-    },
-    dispatch,
-  );
-
-const CreatePersonalAccount = connect(mapStateToProps, mapDispatchToProps)(CreatePersonalAccountComponent);
-
-export {CreatePersonalAccount};

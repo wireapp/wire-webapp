@@ -28,9 +28,21 @@ interface VideoAssetCardProps {
   size: string;
   isLoading: boolean;
   isError: boolean;
+  senderName: string;
+  timestamp: number;
 }
 
-export const VideoAssetCard = ({variant, src, extension, name, size, isLoading, isError}: VideoAssetCardProps) => {
+export const VideoAssetCard = ({
+  variant,
+  src,
+  extension,
+  name,
+  size,
+  isLoading,
+  isError,
+  senderName,
+  timestamp,
+}: VideoAssetCardProps) => {
   if (variant === 'large') {
     return (
       <VideoAssetPlayer
@@ -41,9 +53,21 @@ export const VideoAssetCard = ({variant, src, extension, name, size, isLoading, 
         size={size}
         isLoading={isLoading}
         isError={isError}
+        senderName={senderName}
+        timestamp={timestamp}
       />
     );
   }
 
-  return <VideoAssetSmall src={src} isLoading={isLoading} isError={isError} />;
+  return (
+    <VideoAssetSmall
+      extension={extension}
+      fileName={name}
+      senderName={senderName}
+      timestamp={timestamp}
+      src={src}
+      isLoading={isLoading}
+      isError={isError}
+    />
+  );
 };

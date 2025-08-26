@@ -17,7 +17,7 @@
  *
  */
 
-import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
+import {TabIndex} from '@wireapp/react-ui-kit';
 
 import {useInView} from 'src/script/hooks/useInView/useInView';
 import {useEffectRef} from 'Util/useEffectRef';
@@ -39,6 +39,8 @@ interface VideoAssetPlayerProps {
   isError: boolean;
   isFocusable?: boolean;
   isFileShareRestricted: boolean;
+  senderName: string;
+  timestamp: number;
 }
 
 /**
@@ -56,6 +58,8 @@ export const VideoAssetPlayer = ({
   url,
   isLoading,
   isError,
+  senderName,
+  timestamp,
 }: VideoAssetPlayerProps) => {
   const [videoElement, setVideoElement] = useEffectRef<HTMLVideoElement>();
 
@@ -81,7 +85,15 @@ export const VideoAssetPlayer = ({
 
   if (isError || isFileShareRestricted || isPlaybackError) {
     return (
-      <VideoAssetCard ref={wrapperRef} extension={extension} name={name} size={size} isError>
+      <VideoAssetCard
+        ref={wrapperRef}
+        extension={extension}
+        name={name}
+        size={size}
+        isError
+        senderName={senderName}
+        timestamp={timestamp}
+      >
         <VideoAssetError isFileShareRestricted={isFileShareRestricted} />
       </VideoAssetCard>
     );
@@ -89,14 +101,30 @@ export const VideoAssetPlayer = ({
 
   if (isLoading || !url) {
     return (
-      <VideoAssetCard ref={wrapperRef} extension={extension} name={name} size={size} isLoading>
+      <VideoAssetCard
+        ref={wrapperRef}
+        extension={extension}
+        name={name}
+        size={size}
+        isLoading
+        senderName={senderName}
+        timestamp={timestamp}
+      >
         <VideoAssetLoading />
       </VideoAssetCard>
     );
   }
 
   return (
-    <VideoAssetCard ref={wrapperRef} extension={extension} name={name} size={size}>
+    <VideoAssetCard
+      src={url}
+      ref={wrapperRef}
+      extension={extension}
+      name={name}
+      size={size}
+      senderName={senderName}
+      timestamp={timestamp}
+    >
       <div css={wrapperStyles}>
         <video
           ref={setVideoElement}
