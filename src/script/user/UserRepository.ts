@@ -105,7 +105,10 @@ interface UserAvailabilityEvent {
   type: USER.AVAILABILITY;
 }
 
-type Events = {supportedProtocolsUpdated: {user: User; supportedProtocols: ConversationProtocol[]}};
+type Events = {
+  supportedProtocolsUpdated: {user: User; supportedProtocols: ConversationProtocol[]};
+  userDeleted: QualifiedId;
+};
 export class UserRepository extends TypedEventEmitter<Events> {
   private readonly logger: Logger;
   public readonly userMapper: UserMapper;
@@ -283,9 +286,9 @@ export class UserRepository extends TypedEventEmitter<Events> {
   /**
    * Event to delete the matching user.
    */
-  private userDelete({id}: {id: string}): void {
+  private userDelete({qualified_id}: {qualified_id: QualifiedId}): void {
     // @todo Add user deletion cases for other users
-    const isSelfUser = id === this.userState.self().id;
+    const isSelfUser = matchQualifiedIds(qualified_id, this.userState.self()?.qualifiedId);
     if (isSelfUser) {
       // Info: Deletion of the user causes a database deletion which may interrupt currently running database operations.
       // That's why we added a timeout, to leave some time for the database to finish running reads/writes before the
@@ -294,6 +297,7 @@ export class UserRepository extends TypedEventEmitter<Events> {
         amplify.publish(WebAppEvents.LIFECYCLE.SIGN_OUT, SIGN_OUT_REASON.ACCOUNT_DELETED, true);
       }, 100);
     }
+    this.emit('userDeleted', qualified_id);
   }
 
   private async onUserUpdate(eventJson: UserUpdateEvent, source: EventSource): Promise<void> {
