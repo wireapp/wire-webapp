@@ -386,6 +386,7 @@ export class ConversationRepository {
 
     this.selfRepository.on('selfSupportedProtocolsUpdated', this.initAllLocal1To1Conversations);
     this.userRepository.on('supportedProtocolsUpdated', this.onUserSupportedProtocolsUpdated);
+    this.userRepository.on('userDeleted', this.onUserDeleted);
   }
 
   public initMLSConversationRecoveredListener() {
@@ -2455,6 +2456,29 @@ export class ConversationRepository {
     const event = EventBuilder.buildMemberJoin(conversationEntity, sender, users, timestamp);
     return this.eventRepository.injectEvent(event, EventRepository.SOURCE.INJECTED);
   }
+
+  /**
+   * Will inject a member deleted event in 1:1 conversations with that user.
+   * This will be used to notify the other user that the user was deleted.
+   *
+   * @param userId User ID of the user that was deleted
+   */
+
+  private readonly onUserDeleted = async (userId: QualifiedId) => {
+    const found1to1Conversation = this.conversationState.get1to1ConversationWithUser(userId);
+    if (!found1to1Conversation) {
+      return;
+    }
+
+    const deletedEvent = EventBuilder.buildMemberLeave(
+      found1to1Conversation,
+      [userId],
+      '',
+      this.serverTimeHandler.toServerTimestamp(),
+      MemberLeaveReason.USER_DELETED,
+    );
+    await this.eventRepository.injectEvent(deletedEvent, EventRepository.SOURCE.INJECTED);
+  };
 
   /**
    * Add service to conversation.

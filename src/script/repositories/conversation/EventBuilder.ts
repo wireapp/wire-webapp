@@ -542,12 +542,14 @@ export const EventBuilder = {
     userIds: QualifiedId[],
     from: string,
     currentTimestamp: number,
+    reason?: MemberLeaveReason,
   ): MemberLeaveEvent {
     return {
       ...buildQualifiedId(conversationEntity),
       data: {
         qualified_user_ids: userIds,
         user_ids: userIds.map(({id}) => id),
+        reason,
       },
       from: from,
       time: conversationEntity.getNextIsoDate(currentTimestamp),
