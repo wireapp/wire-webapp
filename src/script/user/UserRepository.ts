@@ -109,6 +109,12 @@ type Events = {
   supportedProtocolsUpdated: {user: User; supportedProtocols: ConversationProtocol[]};
   userDeleted: QualifiedId;
 };
+
+type UserDeleteEventWithQualifiedId = {
+  id: string;
+  qualified_id: QualifiedId;
+  type: USER_EVENT.DELETE;
+};
 export class UserRepository extends TypedEventEmitter<Events> {
   private readonly logger: Logger;
   public readonly userMapper: UserMapper;
@@ -158,7 +164,8 @@ export class UserRepository extends TypedEventEmitter<Events> {
 
     switch (eventJson.type) {
       case USER_EVENT.DELETE:
-        this.userDelete(eventJson);
+        const userDeleteEvent = eventJson as UserDeleteEventWithQualifiedId;
+        this.userDelete(userDeleteEvent);
         break;
       case USER_EVENT.UPDATE:
         await this.onUserUpdate(eventJson, source);
