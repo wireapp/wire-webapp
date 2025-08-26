@@ -26,7 +26,7 @@ import {Conversation} from 'Repositories/entity/Conversation';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {isLastReceivedMessage} from 'Util/conversationMessages';
 
-const SCROLL_THRESHOLD = 30;
+const SCROLL_THRESHOLD = 10;
 
 interface Props {
   conversation: Conversation;
