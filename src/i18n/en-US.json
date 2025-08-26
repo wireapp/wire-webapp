@@ -740,7 +740,6 @@
   "conversationLikesCaptionSingular": "[bold]{userName}[/bold]",
   "conversationLocationLink": "Open Map",
   "conversationMLSMigrationFinalisationOngoingCall": "Due to migration to MLS, you might have issues with your current call. If that's the case, hang up and call again.",
-  "converstationMemberDeleted": "This user is no longer available",
   "conversationMemberJoined": "[bold]{name}[/bold] added {users} to the conversation",
   "conversationMemberJoinedMore": "[bold]{name}[/bold] added {users}, and [showmore]{count} more[/showmore] to the conversation",
   "conversationMemberJoinedSelf": "[bold]{name}[/bold] joined",

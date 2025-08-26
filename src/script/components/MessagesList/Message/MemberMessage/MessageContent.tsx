@@ -184,11 +184,6 @@ function getContent(message: MemberMessageEntity) {
       if (!actor.id) {
         return t('conversationMemberWereRemoved', {users: allUsers}, {}, true);
       }
-
-      if (message.reason === MemberLeaveReason.USER_DELETED) {
-        return t('converstationMemberDeleted');
-      }
-
       return actor.isMe
         ? t('conversationMemberRemovedYou', {users: allUsers}, {}, true)
         : t('conversationMemberRemoved', {name, users: allUsers}, {}, true);
