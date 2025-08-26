@@ -30,7 +30,6 @@ import {HistoryExport} from 'Components/HistoryExport';
 import {HistoryImport} from 'Components/HistoryImport';
 import * as Icon from 'Components/Icon';
 import {useLegalHoldModalState} from 'Components/Modals/LegalHoldModal/LegalHoldModal.state';
-import {useInitializeMediaDevices} from 'Hooks/useInitializeMediaDevices';
 import {ClientState} from 'Repositories/client/ClientState';
 import {ConversationState} from 'Repositories/conversation/ConversationState';
 import {User} from 'Repositories/entity/User';
@@ -123,7 +122,6 @@ const MainContent: FC<MainContentProps> = ({
     MediaDeviceType.AUDIO_OUTPUT,
     MediaDeviceType.VIDEO_INPUT,
   ]);
-  const {isMediaDevicesAreInitialized} = useInitializeMediaDevices(devicesHandler, mediaRepo.streamHandler);
   const {activeConversation} = useKoSubscribableChildren(conversationState, ['activeConversation']);
   /* eslint-enable react-hooks/rules-of-hooks */
 
@@ -205,7 +203,6 @@ const MainContent: FC<MainContentProps> = ({
                   callingRepository={repositories.calling}
                   mediaRepository={repositories.media}
                   propertiesRepository={repositories.properties}
-                  areMediaDevicesInitialized={isMediaDevicesAreInitialized}
                   deviceSupport={deviceSupport}
                   availableDevices={availableDevices}
                   currentDeviceId={currentDeviceId}
