@@ -2470,10 +2470,12 @@ export class ConversationRepository {
       return;
     }
 
-    const deletedEvent = EventBuilder.buildMemberDeleted(
+    const deletedEvent = EventBuilder.buildMemberLeave(
       found1to1Conversation,
-      userId,
+      [userId],
+      '',
       this.serverTimeHandler.toServerTimestamp(),
+      MemberLeaveReason.USER_DELETED,
     );
     await this.eventRepository.injectEvent(deletedEvent, EventRepository.SOURCE.INJECTED);
   };

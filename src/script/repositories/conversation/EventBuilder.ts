@@ -542,12 +542,14 @@ export const EventBuilder = {
     userIds: QualifiedId[],
     from: string,
     currentTimestamp: number,
+    reason?: MemberLeaveReason,
   ): MemberLeaveEvent {
     return {
       ...buildQualifiedId(conversationEntity),
       data: {
         qualified_user_ids: userIds,
         user_ids: userIds.map(({id}) => id),
+        reason,
       },
       from: from,
       time: conversationEntity.getNextIsoDate(currentTimestamp),
@@ -659,24 +661,6 @@ export const EventBuilder = {
       id: createUuid(),
       time: new Date(isoDate).toISOString(),
       type: ClientEvent.CONVERSATION.TEAM_MEMBER_LEAVE,
-    };
-  },
-
-  buildMemberDeleted(
-    conversationEntity: Conversation,
-    userId: QualifiedId,
-    currentTimestamp: number,
-  ): MemberLeaveEvent {
-    return {
-      ...buildQualifiedId(conversationEntity),
-      data: {
-        qualified_user_ids: [userId],
-        user_ids: [userId.id],
-        reason: MemberLeaveReason.USER_DELETED,
-      },
-      from: userId.id,
-      time: conversationEntity.getNextIsoDate(currentTimestamp),
-      type: CONVERSATION_EVENT.MEMBER_LEAVE,
     };
   },
 
