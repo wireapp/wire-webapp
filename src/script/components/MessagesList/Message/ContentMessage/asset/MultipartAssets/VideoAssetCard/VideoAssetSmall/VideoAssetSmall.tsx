@@ -52,21 +52,21 @@ export const VideoAssetSmall = ({
 
   return (
     <>
-      <button
-        css={hollowWrapperButtonStyles}
-        onClick={() => setIsOpen(true)}
-        aria-label={t('accessibility.conversationAssetImageAlt', {
-          username: senderName,
-          messageDate: timestamp,
-        })}
-        aria-haspopup="dialog"
-        aria-expanded={isOpen}
-        aria-controls={id}
+      <MediaFilePreviewCard
+        label={src ? t('conversationFileVideoPreviewLabel', {src}) : ''}
+        isLoading={isLoading}
+        isError={isError}
       >
-        <MediaFilePreviewCard
-          label={src ? t('conversationFileVideoPreviewLabel', {src}) : ''}
-          isLoading={isLoading}
-          isError={isError}
+        <button
+          css={hollowWrapperButtonStyles}
+          onClick={() => setIsOpen(true)}
+          aria-label={t('accessibility.conversationAssetImageAlt', {
+            username: senderName,
+            messageDate: timestamp,
+          })}
+          aria-haspopup="dialog"
+          aria-expanded={isOpen}
+          aria-controls={id}
         >
           {!isLoading && !isError && (
             <>
@@ -76,8 +76,8 @@ export const VideoAssetSmall = ({
               </div>
             </>
           )}
-        </MediaFilePreviewCard>
-      </button>
+        </button>
+      </MediaFilePreviewCard>
       <FileFullscreenModal
         id={id}
         isOpen={isOpen}
