@@ -227,6 +227,23 @@ export class ConversationState {
     return mlsConversation || null;
   }
 
+  /**
+   * Get a 1:1 conversation with a user.
+   * @param userId User ID
+   * @returns Conversation with the user or undefined if not found
+   */
+  get1to1ConversationWithUser(userId: QualifiedId): Conversation | undefined {
+    const foundMLSConversation = this.findMLS1to1Conversation(userId);
+    if (foundMLSConversation) {
+      return foundMLSConversation;
+    }
+    const foundProteusConversations = this.findProteus1to1Conversations(userId);
+    if (foundProteusConversations && foundProteusConversations.length > 0) {
+      return foundProteusConversations[0];
+    }
+    return undefined;
+  }
+
   has1to1ConversationWithUser(userId: QualifiedId): boolean {
     const foundMLSConversation = this.findMLS1to1Conversation(userId);
     if (foundMLSConversation) {
