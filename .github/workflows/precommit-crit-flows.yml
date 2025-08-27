@@ -138,26 +138,15 @@ jobs:
 
       # Log which URL will be used for tests (deploy output vs fallback) and probe if env responds
       - name: Show target URL + quick probe
-        env:
-          DEPLOY_URL: ${{ needs.deploy_to_aws.outputs.precommit_url }}
-          FALLBACK_URL: https://wire-webapp-precommit.zinfra.io/
         run: |
-          if [ -n "$DEPLOY_URL" ]; then
-            echo "Using DEPLOY_URL from deploy job: $DEPLOY_URL"
-            TARGET="$DEPLOY_URL"
-          else
-            echo "Using FALLBACK_URL: $FALLBACK_URL"
-            TARGET="$FALLBACK_URL"
-          fi
-
-          # quick probe
-          curl -Is --max-time 10 "$TARGET" || true
+          echo "Using precommit URL: https://wire-webapp-precommit.zinfra.io/"
+          curl -s -o /dev/null -w "HTTP %{http_code}\n" https://wire-webapp-precommit.zinfra.io/
 
       - name: Run critical flow tests
         env:
           # TODO: remove hardcoded precommit env in the future when ephemeral PR envs will exist
           # Overrides URL from 1Password
-          WEBAPP_URL: ${{ needs.deploy_to_aws.outputs.precommit_url || 'https://wire-webapp-precommit.zinfra.io/' }}
+          WEBAPP_URL: https://wire-webapp-precommit.zinfra.io/
         run: yarn e2e-test --grep "@crit-flow-web"
 
       - name: Upload test report
