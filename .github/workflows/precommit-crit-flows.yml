@@ -75,7 +75,7 @@ jobs:
 
       - name: Deploy to precommit environment
         id: deploy
-        uses: einaregilsson/beanstalk-deploy@v22
+        uses: einaregilsson/beanstalk-deploy@27edd8a0ebe8656ac70654372c73f06f7e9a1027 # v22
         with:
           application_name: Webapp
           aws_access_key: ${{ secrets.WEBTEAM_AWS_ACCESS_KEY_ID }}
@@ -129,7 +129,7 @@ jobs:
 
       - run: yarn --immutable
       - run: yarn playwright install --with-deps && yarn playwright install chrome
-      - uses: 1password/install-cli-action@v1
+      - uses: 1password/install-cli-action@143a85f84a90555d121cde2ff5872e393a47ab9f
 
       - name: Generate env file
         run: op inject -i test/e2e_tests/.env.tpl -o test/e2e_tests/.env
@@ -168,7 +168,7 @@ jobs:
 
       - name: Comment on PR
         if: always()
-        uses: marocchino/sticky-pull-request-comment@v2
+        uses: marocchino/sticky-pull-request-comment@773744901bac0e8cbb5a0dc842800d45e9b2b405
         with:
           header: playwright-summary
           message: |
