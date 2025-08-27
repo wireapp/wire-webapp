@@ -17,7 +17,7 @@
  *
  */
 
-import {MutableRefObject, useCallback, useLayoutEffect, useRef, useState} from 'react';
+import {useLayoutEffect, useRef} from 'react';
 
 import {Virtualizer} from '@tanstack/react-virtual';
 
@@ -26,10 +26,8 @@ import {GroupedMessage, isMarker, Marker} from '../utils/virtualizedMessagesGrou
 
 interface Props {
   messages: (Marker | GroupedMessage)[];
-  highlightedMessage?: string;
   userId: string;
-  conversationLastReadTimestamp: MutableRefObject<number>;
-  setAlreadyScrolledToLastMessage: (scrolled: boolean) => void;
+  isConversationLoaded: boolean;
 }
 
 function shouldStickToBottomFromPrev(
@@ -37,12 +35,13 @@ function shouldStickToBottomFromPrev(
   prevTotalSize: number,
   threshold = 100,
 ) {
-  const el = virtualizer.options.getScrollElement?.();
-  if (!el) {
+  const scrollElement = virtualizer.options.getScrollElement?.();
+
+  if (!scrollElement) {
     return false;
   }
 
-  const scrollBottomPosition = (virtualizer.scrollOffset || 0) + el.clientHeight;
+  const scrollBottomPosition = (virtualizer.scrollOffset || 0) + scrollElement.clientHeight;
   const distanceFromPrevBottom = Math.max(0, prevTotalSize - scrollBottomPosition);
 
   return distanceFromPrevBottom < threshold;
@@ -50,55 +49,13 @@ function shouldStickToBottomFromPrev(
 
 export const useScrollMessages = (
   virtualizer: Virtualizer<HTMLDivElement, Element>,
-  {messages, highlightedMessage, userId, conversationLastReadTimestamp, setAlreadyScrolledToLastMessage}: Props,
+  {messages, userId, isConversationLoaded}: Props,
 ) => {
   const prevNbMessages = useRef(0);
   const prevTotalSizeRef = useRef(0);
 
-  const initiallyScrolled = useRef(false);
-  const newMessagesCount = useRef(messages.length);
-
-  const scrollToMessage = useCallback(() => {
-    if (messages.length !== newMessagesCount.current) {
-      return;
-    }
-
-    for (const message of messages) {
-      const lastUnreadMessageIndex = messages.findIndex(
-        message => message.timestamp > conversationLastReadTimestamp.current,
-      );
-
-      if (lastUnreadMessageIndex !== -1) {
-        requestAnimationFrame(() => {
-          virtualizer.scrollToIndex(lastUnreadMessageIndex, {align: 'start'});
-          initiallyScrolled.current = true;
-          setAlreadyScrolledToLastMessage(true);
-        });
-        break;
-      }
-
-      // If the message is before the last read timestamp, we scroll to the last message
-      if (message.timestamp <= conversationLastReadTimestamp.current) {
-        requestAnimationFrame(() => {
-          virtualizer.scrollToIndex(messages.length - 1, {align: 'end'});
-          initiallyScrolled.current = true;
-          setAlreadyScrolledToLastMessage(true);
-        });
-        break;
-      }
-    }
-  }, [messages, virtualizer, setAlreadyScrolledToLastMessage]);
-
   useLayoutEffect(() => {
-    if (!initiallyScrolled.current && messages.length > 0) {
-      scrollToMessage();
-    }
-  }, [messages.length, scrollToMessage]);
-
-  const [scrollToHighlightedMessage, setScrollToHighlightedMessage] = useState(false);
-
-  useLayoutEffect(() => {
-    if (!initiallyScrolled.current && messages.length === 0) {
+    if (!isConversationLoaded && messages.length === 0) {
       return;
     }
 
@@ -112,17 +69,7 @@ export const useScrollMessages = (
 
     const shouldStickToBottom = shouldStickToBottomFromPrev(virtualizer, prevTotalSizeRef.current, 100);
 
-    if (highlightedMessage && !scrollToHighlightedMessage) {
-      // If we have an element we want to focus
-      const index = messages.findIndex(message => !isMarker(message) && message.message.id === highlightedMessage);
-
-      if (index !== -1) {
-        requestAnimationFrame(() => {
-          virtualizer.scrollToIndex(index, {align: 'center'});
-          setScrollToHighlightedMessage(true);
-        });
-      }
-    } else if (shouldStickToBottom) {
+    if (shouldStickToBottom) {
       // We only want to animate the scroll if there are new messages in the list
       const nbNewMessages = messages.length - prevNbMessages.current;
 
@@ -144,5 +91,5 @@ export const useScrollMessages = (
 
     prevNbMessages.current = messages.length;
     prevTotalSizeRef.current = virtualizer.getTotalSize();
-  }, [highlightedMessage, messages, virtualizer, userId, scrollToHighlightedMessage]);
+  }, [messages, virtualizer, userId, isConversationLoaded]);
 };
