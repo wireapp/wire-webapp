@@ -94,5 +94,5 @@ export const useScrollMessages = (
 
     prevNbMessages.current = messages.length;
     prevTotalSizeRef.current = virtualizer.getTotalSize();
-  }, [messages, virtualizer, userId]);
+  }, [messages, virtualizer, userId, isConversationLoaded]);
 };

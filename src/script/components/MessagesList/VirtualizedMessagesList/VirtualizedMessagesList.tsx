@@ -17,7 +17,7 @@
  *
  */
 
-import {MutableRefObject, useEffect, useMemo, useState} from 'react';
+import {MutableRefObject, useEffect, useLayoutEffect, useMemo, useRef, useState} from 'react';
 
 import {useVirtualizer} from '@tanstack/react-virtual';
 import cx from 'classnames';
@@ -157,11 +157,17 @@ export const VirtualizedMessagesList = ({
     }
   }, []);
 
+  const scrolledToHighlightedMessage = useRef(false);
+
   const onTimestampClick = async (messageId: string) => {
+    scrolledToHighlightedMessage.current = false;
     setHighlightedMessage(messageId);
 
-    const highlightMessageTimeout = setTimeout(() => setHighlightedMessage(undefined), 3000);
-    clearTimeout(highlightMessageTimeout);
+    const clearHighlightedMessage = setTimeout(() => {
+      setHighlightedMessage(undefined);
+      scrolledToHighlightedMessage.current = false;
+      clearTimeout(clearHighlightedMessage);
+    }, 5000);
 
     const messageIsLoaded = conversation.getMessage(messageId);
 
@@ -171,6 +177,21 @@ export const VirtualizedMessagesList = ({
       void conversationRepository.getMessagesWithOffset(conversation, messageEntity);
     }
   };
+
+  useLayoutEffect(() => {
+    if (highlightedMessage && !scrolledToHighlightedMessage.current) {
+      const highlightedMessageIndex = groupedMessages.findIndex(
+        msg => !isMarker(msg) && msg.message.id === highlightedMessage,
+      );
+
+      virtualizer.scrollToIndex(highlightedMessageIndex, {align: 'center'});
+
+      const setScrolledToHighlightedMessageTimeout = setTimeout(() => {
+        scrolledToHighlightedMessage.current = true;
+        clearTimeout(setScrolledToHighlightedMessageTimeout);
+      }, 100);
+    }
+  }, [groupedMessages, highlightedMessage, virtualizer]);
 
   const onJumpToLastMessageClick = async () => {
     setHighlightedMessage(undefined);
@@ -183,11 +204,12 @@ export const VirtualizedMessagesList = ({
       await loadConversation(conversation);
     }
 
-    conversationLastReadTimestamp.current = groupedMessages[groupedMessages.length - 1].timestamp;
+    conversationLastReadTimestamp.current = allMessages[allMessages.length - 1].timestamp();
 
-    requestAnimationFrame(() => {
-      virtualizer.scrollToIndex(groupedMessages.length - 1, {align: 'end'});
-    });
+    const scrollTimeout = setTimeout(() => {
+      virtualizer.scrollToIndex(allMessages.length - 1, {align: 'end'});
+      clearTimeout(scrollTimeout);
+    }, 100);
   };
 
   const virtualItems = virtualizer.getVirtualItems();
