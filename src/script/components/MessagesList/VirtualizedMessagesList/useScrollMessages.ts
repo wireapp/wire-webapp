@@ -75,12 +75,9 @@ export const useScrollMessages = (
 
       if (nbNewMessages >= 1) {
         // Simple content update, we just scroll to bottom if we are in the stick to bottom threshold
-        const index = messages.findIndex(message => !isMarker(message) && message.message.id === lastMessage.id);
-        if (index !== -1) {
-          requestAnimationFrame(() => {
-            virtualizer.scrollToIndex(index, {align: 'end'});
-          });
-        }
+        requestAnimationFrame(() => {
+          virtualizer.scrollToIndex(messages.length - 1, {align: 'end'});
+        });
       }
     } else if (lastMessage && lastMessage?.status() === StatusType.SENDING && lastMessage.user().id === userId) {
       // The self user just sent a message, we scroll straight to the bottom
