@@ -147,7 +147,7 @@ jobs:
       - name: Run critical flow tests
         env:
           # TODO: remove hardcoded precommit env in the future when ephemeral PR envs will exist
-          # Overrides URL from 1Password
+          # Overrides URL from .env file
           WEBAPP_URL: https://wire-webapp-precommit.zinfra.io/
         run: yarn e2e-test --grep "@crit-flow-web"
 
