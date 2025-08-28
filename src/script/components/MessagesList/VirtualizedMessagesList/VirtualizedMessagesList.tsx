@@ -17,7 +17,7 @@
  *
  */
 
-import {MutableRefObject, useEffect, useLayoutEffect, useMemo, useRef, useState} from 'react';
+import {MutableRefObject, useEffect, useMemo, useState} from 'react';
 
 import {useVirtualizer} from '@tanstack/react-virtual';
 import cx from 'classnames';
@@ -28,22 +28,22 @@ import {MessagesListParams} from 'Components/MessagesList/MessageList.types';
 import {UploadAssets} from 'Components/MessagesList/UploadAssets';
 import {verticallyCenterMessage} from 'Components/MessagesList/utils/helpers';
 import {filterMessages} from 'Components/MessagesList/utils/messagesFilter';
-import {useLoadConversation} from 'Components/MessagesList/utils/useLoadConversation';
-import {useLoadInitialMessage} from 'Components/MessagesList/utils/useLoadInitialMessage';
 import {groupMessagesBySenderAndTime, isMarker} from 'Components/MessagesList/utils/virtualizedMessagesGroup';
 import {useLoadMessages} from 'Components/MessagesList/VirtualizedMessagesList/useLoadMessages';
 import {useScrollMessages} from 'Components/MessagesList/VirtualizedMessagesList/useScrollMessages';
 import {useRoveFocus} from 'Hooks/useRoveFocus';
+import {Conversation} from 'Repositories/entity/Conversation';
+import {Message as MessageEntity} from 'Repositories/entity/message/Message';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 
 import {VirtualizedJumpToLastMessageButton} from '../VirtualizedJumpToLastMessageButton';
 
 const ESTIMATED_ELEMENT_SIZE = 48;
 
-interface Props extends Omit<MessagesListParams, 'isRightSidebarOpen' | 'onLoading'> {
+interface Props extends Omit<MessagesListParams, 'isRightSidebarOpen' | 'onLoading' | 'isConversationLoaded'> {
   parentElement: HTMLDivElement;
   conversationLastReadTimestamp: MutableRefObject<number>;
-  onLoading: (isLoading: boolean) => void;
+  loadConversation: (conversation: Conversation) => Promise<MessageEntity[]>;
 }
 
 export const VirtualizedMessagesList = ({
@@ -68,8 +68,7 @@ export const VirtualizedMessagesList = ({
   setMsgElementsFocusable,
   conversationLastReadTimestamp,
   updateConversationLastRead,
-  onLoading,
-  isConversationLoaded,
+  loadConversation,
 }: Props) => {
   const {
     messages: allMessages,
@@ -78,8 +77,6 @@ export const VirtualizedMessagesList = ({
     isGuestAndServicesRoom,
     isActiveParticipant,
     inTeam,
-    isLoadingMessages,
-    hasAdditionalMessages,
   } = useKoSubscribableChildren(conversation, [
     'inTeam',
     'isActiveParticipant',
@@ -87,8 +84,6 @@ export const VirtualizedMessagesList = ({
     'lastDeliveredMessage',
     'isGuestRoom',
     'isGuestAndServicesRoom',
-    'isLoadingMessages',
-    'hasAdditionalMessages',
   ]);
 
   const filteredMessages = filterMessages(allMessages);
@@ -97,8 +92,26 @@ export const VirtualizedMessagesList = ({
     return groupMessagesBySenderAndTime(filteredMessages, conversationLastReadTimestamp.current);
   }, [conversationLastReadTimestamp, filteredMessages]);
 
-  const [highlightedMessage, setHighlightedMessage] = useState<string | undefined>(conversation.initialMessage()?.id);
+  const initialMessageId = conversation.initialMessage()?.id;
+
+  const [highlightedMessage, setHighlightedMessage] = useState<string | undefined>(undefined);
   const [loadingMessages, setLoadingMessages] = useState(false);
+  const [alreadyScrolledToLastMessage, setAlreadyScrolledToLastMessage] = useState(false);
+
+  useEffect(() => {
+    if (!initialMessageId) {
+      return () => undefined;
+    }
+
+    setHighlightedMessage(initialMessageId);
+
+    const timeout = setTimeout(() => {
+      setHighlightedMessage(undefined);
+      conversation.initialMessage(undefined);
+    }, 3000);
+
+    return () => clearTimeout(timeout);
+  }, [conversation, initialMessageId]);
 
   const {focusedId, handleKeyDown, setFocusedId} = useRoveFocus(filteredMessages.map(message => message.id));
 
@@ -109,39 +122,24 @@ export const VirtualizedMessagesList = ({
     getScrollElement: () => parentElement,
     estimateSize: () => ESTIMATED_ELEMENT_SIZE,
     measureElement: element => element?.getBoundingClientRect().height || ESTIMATED_ELEMENT_SIZE,
+    overscan: 2,
   });
 
-  // Hook for load current conversation
-  const {loadConversation} = useLoadConversation({
-    conversation,
-    conversationRepository,
-    conversationLastReadTimestamp,
-    onLoading,
-  });
-
-  // Hook for loading the initial message ( it takes initial message from search, last unread message or last message )
-  useLoadInitialMessage(virtualizer, {
-    conversation,
-    isConversationLoaded,
-    allMessages,
-    conversationLastReadTimestamp,
-  });
-
-  // Hook for loading preceding / following messages when user scrolls to top / bottom
   useLoadMessages(virtualizer, {
     conversation,
     conversationRepository,
     loadingMessages,
     onLoadingMessages: setLoadingMessages,
     itemsLength: groupedMessages.length,
-    shouldPullMessages: !isLoadingMessages && hasAdditionalMessages,
+    initialMessageId,
   });
 
-  // Hook for scrolling messages when a new message is sent or received
   useScrollMessages(virtualizer, {
     messages: groupedMessages,
+    highlightedMessage,
     userId: selfUser.id,
-    isConversationLoaded,
+    conversationLastReadTimestamp,
+    setAlreadyScrolledToLastMessage,
   });
 
   // When a new conversation is opened using keyboard(enter), focus on the last message
@@ -157,41 +155,24 @@ export const VirtualizedMessagesList = ({
     }
   }, []);
 
-  const scrolledToHighlightedMessage = useRef(false);
-
   const onTimestampClick = async (messageId: string) => {
-    scrolledToHighlightedMessage.current = false;
     setHighlightedMessage(messageId);
 
-    const clearHighlightedMessage = setTimeout(() => {
-      setHighlightedMessage(undefined);
-      scrolledToHighlightedMessage.current = false;
-      clearTimeout(clearHighlightedMessage);
-    }, 5000);
+    const highlightMessageTimeout = setTimeout(() => setHighlightedMessage(undefined), 3000);
+    clearTimeout(highlightMessageTimeout);
 
     const messageIsLoaded = conversation.getMessage(messageId);
 
     if (!messageIsLoaded) {
       const messageEntity = await messageRepository.getMessageInConversationById(conversation, messageId);
       conversation.removeMessages();
-      void conversationRepository.getMessagesWithOffset(conversation, messageEntity);
+      conversationRepository.getMessagesWithOffset(conversation, messageEntity);
     }
   };
 
-  useLayoutEffect(() => {
-    if (highlightedMessage && !scrolledToHighlightedMessage.current) {
-      const highlightedMessageIndex = groupedMessages.findIndex(
-        msg => !isMarker(msg) && msg.message.id === highlightedMessage,
-      );
-
-      virtualizer.scrollToIndex(highlightedMessageIndex, {align: 'center'});
-
-      const setScrolledToHighlightedMessageTimeout = setTimeout(() => {
-        scrolledToHighlightedMessage.current = true;
-        clearTimeout(setScrolledToHighlightedMessageTimeout);
-      }, 100);
-    }
-  }, [groupedMessages, highlightedMessage, virtualizer]);
+  const virtualItems = virtualizer.getVirtualItems();
+  const lastIndex = groupedMessages.length - 1;
+  const isLastMessageVisible = virtualItems.some(item => item.index === lastIndex);
 
   const onJumpToLastMessageClick = async () => {
     setHighlightedMessage(undefined);
@@ -204,22 +185,17 @@ export const VirtualizedMessagesList = ({
       await loadConversation(conversation);
     }
 
-    conversationLastReadTimestamp.current = allMessages[allMessages.length - 1].timestamp();
+    conversationLastReadTimestamp.current = groupedMessages[groupedMessages.length - 1].timestamp;
 
-    const scrollTimeout = setTimeout(() => {
-      virtualizer.scrollToIndex(allMessages.length - 1, {align: 'end'});
-      clearTimeout(scrollTimeout);
-    }, 100);
+    requestAnimationFrame(() => {
+      virtualizer.scrollToIndex(groupedMessages.length - 1, {align: 'end'});
+    });
   };
-
-  const virtualItems = virtualizer.getVirtualItems();
-  const lastIndex = groupedMessages.length - 1;
-  const isLastMessageVisible = virtualItems.some(item => item.index === lastIndex);
 
   useEffect(() => {
     // Timeout to ensure that the messages are rendered before calling getVisibleCallback
     const timeout = setTimeout(() => {
-      if (!isConversationLoaded) {
+      if (!alreadyScrolledToLastMessage) {
         return;
       }
 
@@ -232,11 +208,7 @@ export const VirtualizedMessagesList = ({
     }, 100);
 
     return () => clearTimeout(timeout);
-  }, [isConversationLoaded, virtualItems]);
-
-  if (!isConversationLoaded) {
-    return null;
-  }
+  }, [alreadyScrolledToLastMessage, virtualItems]);
 
   return (
     <>
