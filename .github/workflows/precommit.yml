@@ -1,9 +1,9 @@
 name: precommit
 
-on:
-  pull_request:
-    # we want to run the CI on every PR targetting those branches
-    branches: [dev]
+#on:
+#  pull_request:
+#    # we want to run the CI on every PR targetting those branches
+#    branches: [dev]
 
 concurrency:
   group: precommit-deploy
