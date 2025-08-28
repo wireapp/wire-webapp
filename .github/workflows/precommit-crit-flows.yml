@@ -3,6 +3,8 @@ name: precommit
 on:
   pull_request:
     branches: [dev]
+    branches-ignore:
+      - 'dependabot/**' # skip all Dependabot PRs
 
 # One at a time lane for the shared precommit environment
 concurrency:
