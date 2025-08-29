@@ -216,6 +216,22 @@ describe('ConversationRepository', () => {
     await storage_service.clearStores();
   });
 
+  describe('saveConversation', () => {
+    it('preserves existing participants when new conversation lacks them', async () => {
+      const conversationRepository = testFactory.conversation_repository!;
+      const user = generateUser();
+      const existing = _generateConversation({type: CONVERSATION_TYPE.ONE_TO_ONE, users: [user]});
+      await conversationRepository['saveConversation'](existing);
+
+      const shell = _generateConversation({id: existing.qualifiedId, type: CONVERSATION_TYPE.ONE_TO_ONE, users: []});
+      await conversationRepository['saveConversation'](shell);
+
+      const stored = conversationRepository['conversationState'].findConversation(existing.qualifiedId)!;
+      expect(stored.participating_user_ids()).toHaveLength(1);
+      expect(stored.participating_user_ids()[0]).toEqual(user.qualifiedId);
+    });
+  });
+
   describe('filtered_conversations', () => {
     it('should not contain the self conversation', () => {
       const self_conversation_et = _generateConversation({type: CONVERSATION_TYPE.SELF});
