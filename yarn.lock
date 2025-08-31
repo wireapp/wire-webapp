@@ -4366,10 +4366,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@formkit/auto-animate@npm:0.8.2":
-  version: 0.8.2
-  resolution: "@formkit/auto-animate@npm:0.8.2"
-  checksum: 10/4414fbc9d13ddf8f9e39adfa1a96a9d3affca8d5fb3b148bd4bb9149066910a179b8477a9ce0af51d2abb2ee8d126d25d290460845ed8018858c569eed15655f
+"@formkit/auto-animate@npm:0.8.4":
+  version: 0.8.4
+  resolution: "@formkit/auto-animate@npm:0.8.4"
+  checksum: 10/9814f9425175e21d5cbfc93a354a291c6e7f74d40f3199745b4540407860ccff6384c90b2e1a9a5871bd44306eb7055db99d6cc9f1dbca0a8e9bcf51639a469a
   languageName: node
   linkType: hard
 
@@ -21994,7 +21994,7 @@ __metadata:
     "@emotion/react": "npm:11.11.4"
     "@faker-js/faker": "npm:9.9.0"
     "@formatjs/cli": "npm:6.7.2"
-    "@formkit/auto-animate": "npm:0.8.2"
+    "@formkit/auto-animate": "npm:0.8.4"
     "@lexical/code": "npm:0.27.2"
     "@lexical/history": "npm:0.27.2"
     "@lexical/list": "npm:0.27.2"
