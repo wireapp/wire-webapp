@@ -141,7 +141,7 @@
     "jest-jasmine2": "29.7.0",
     "jest-transform-stub": "2.0.0",
     "jsdom-worker": "0.3.0",
-    "less": "4.4.0",
+    "less": "4.4.1",
     "less-loader": "12.3.0",
     "lint-staged": "15.5.0",
     "os-browserify": "0.3.0",
