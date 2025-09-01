@@ -55,10 +55,7 @@ export const useLoadConversation = ({
   useEffect(() => {
     void loadConversation(conversation);
 
-    return () => {
-      conversation.release();
-      onLoading(true);
-    };
+    return () => conversation.release();
   }, [conversation]);
 
   return {loadConversation};
