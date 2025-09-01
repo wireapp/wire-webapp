@@ -17,7 +17,7 @@
  *
  */
 
-import React, {useEffect, useRef, useState} from 'react';
+import React, {useRef, useState} from 'react';
 
 import {LoginData} from '@wireapp/api-client/lib/auth';
 import {useSelector} from 'react-redux';
@@ -27,6 +27,7 @@ import {Button, Input, Loading} from '@wireapp/react-ui-kit';
 import {t} from 'Util/LocalizerUtil';
 import {isValidEmail, isValidUsername} from 'Util/ValidationUtil';
 
+import {useAutoFocus} from '../hooks/useAutoFocus';
 import {ValidationError} from '../module/action/ValidationError';
 import {RootState} from '../module/reducer';
 import * as AuthSelector from '../module/selector/AuthSelector';
@@ -98,42 +99,10 @@ const LoginForm = ({isFetching, onSubmit}: LoginFormProps) => {
     await onSubmit(loginData, validationErrors);
   };
 
-  // When email is locked (second screen), move focus to password after render.
-  useEffect(() => {
-    if (!defaultEmail) {
-      return;
-    }
-
-    const passwordField = passwordInput.current;
-    if (!passwordField) {
-      return;
-    }
-
-    const attemptPasswordFieldFocus = () => {
-      const currentlyFocusedElement = document.activeElement as HTMLElement | null;
-      const noElementHasFocus = !currentlyFocusedElement || currentlyFocusedElement === document.body;
-      const focusIsOnDifferentElement = currentlyFocusedElement && currentlyFocusedElement !== passwordField;
-
-      if (noElementHasFocus || focusIsOnDifferentElement) {
-        passwordField.focus({preventScroll: true});
-
-        // If autofill populated the field, position cursor at the end
-        if (passwordField.value.length > 0) {
-          passwordField.setSelectionRange(passwordField.value.length, passwordField.value.length);
-        }
-      }
-    };
-
-    // Strategy 1: Immediate attempt (works in most cases)
-    attemptPasswordFieldFocus();
-
-    // Strategy 2: Post-layout attempt (handles browser autofill timing)
-    const animationFrameId = requestAnimationFrame(attemptPasswordFieldFocus);
-
-    return () => {
-      cancelAnimationFrame(animationFrameId);
-    };
-  }, [defaultEmail]);
+  useAutoFocus({
+    elementRef: passwordInput,
+    shouldFocus: !!defaultEmail,
+  });
 
   return (
     <div>
