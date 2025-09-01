@@ -21,6 +21,8 @@ import {MutableRefObject, useEffect} from 'react';
 
 import {Virtualizer} from '@tanstack/react-virtual';
 
+import {filterMessages} from 'Components/MessagesList/utils/messagesFilter';
+import {groupMessagesBySenderAndTime, isMarker} from 'Components/MessagesList/utils/virtualizedMessagesGroup';
 import {Conversation} from 'Repositories/entity/Conversation';
 import {Message} from 'Repositories/entity/message/Message';
 
@@ -39,21 +41,24 @@ export const useLoadInitialMessage = (
     if (isConversationLoaded) {
       let scrollAlign: 'start' | 'center' | 'end' = 'end';
 
-      const initialMessageIndex = allMessages.findIndex(message => {
-        return message.id === conversation.initialMessage()?.id;
+      const filteredMessages = filterMessages(allMessages);
+      const groupedMessages = groupMessagesBySenderAndTime(filteredMessages, conversationLastReadTimestamp.current);
+
+      const initialMessageIndex = groupedMessages.findIndex(message => {
+        return !isMarker(message) && message.message.id === conversation.initialMessage()?.id;
       });
 
-      const firstUnreadMessageIndex = allMessages.findIndex(
-        message => message.timestamp() > conversationLastReadTimestamp.current,
+      const firstUnreadMessageIndex = groupedMessages.findIndex(
+        message => !isMarker(message) && message.timestamp > conversationLastReadTimestamp.current,
       );
 
-      let nextScrollIndex = allMessages.length - 1; // Default to the last message
+      let nextScrollIndex = groupedMessages.length - 1; // Default to the last message
 
       if (conversation.initialMessage()?.id && initialMessageIndex !== -1) {
         nextScrollIndex = initialMessageIndex;
         scrollAlign = 'center';
       } else if (firstUnreadMessageIndex !== -1) {
-        nextScrollIndex = firstUnreadMessageIndex;
+        nextScrollIndex = firstUnreadMessageIndex - 1;
         scrollAlign = 'start';
       }
 
