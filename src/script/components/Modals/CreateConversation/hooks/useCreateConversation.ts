@@ -57,6 +57,7 @@ export const useCreateConversation = () => {
     selectedContacts,
     setConversationName,
     setConversationCreationStep,
+    isCellsEnabled,
     isReadReceiptsEnabled,
     isServicesEnabled,
     isGuestsEnabled,
@@ -150,6 +151,7 @@ export const useCreateConversation = () => {
           add_permission: moderator === ADD_PERMISSION.ADMINS ? ADD_PERMISSION.ADMINS : ADD_PERMISSION.EVERYONE,
           protocol: defaultProtocol,
           receipt_mode: isReadReceiptsEnabled ? RECEIPT_MODE.ON : RECEIPT_MODE.OFF,
+          cells: isCellsEnabled,
           group_conv_type:
             conversationType === ConversationType.Channel
               ? GROUP_CONVERSATION_TYPE.CHANNEL

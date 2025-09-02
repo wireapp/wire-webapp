@@ -17,7 +17,12 @@
  *
  */
 
+import {container} from 'tsyringe';
+
 import {InfoToggle} from 'Components/toggle/InfoToggle';
+import {TeamState} from 'Repositories/team/TeamState';
+import {Config} from 'src/script/Config';
+import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 
 import {useCreateConversationModal} from '../hooks/useCreateConversationModal';
@@ -25,14 +30,22 @@ import {ConversationType} from '../types';
 
 export const Preference = () => {
   const {
+    isCellsEnabled,
     isGuestsEnabled,
     isReadReceiptsEnabled,
+    setIsCellsEnabled,
     setIsGuestsEnabled,
     setIsReadReceiptsEnabled,
     isServicesEnabled,
     setIsServicesEnabled,
     conversationType,
   } = useCreateConversationModal();
+
+  const teamState = container.resolve(TeamState);
+
+  const {isCellsEnabled: isCellsEnabledForTeam} = useKoSubscribableChildren(teamState, ['isCellsEnabled']);
+  const isCellsEnabledForEnvironment = Config.getConfig().FEATURE.ENABLE_CELLS;
+  const isCellsOptionEnabled = isCellsEnabledForEnvironment && isCellsEnabledForTeam;
 
   return (
     <>
@@ -69,6 +82,18 @@ export const Preference = () => {
         isDisabled={conversationType === ConversationType.Channel}
         name={t('readReceiptsToggleName')}
       />
+
+      {isCellsOptionEnabled && (
+        <InfoToggle
+          className="modal-style"
+          dataUieName="cells"
+          isChecked={isCellsEnabled}
+          setIsChecked={setIsCellsEnabled}
+          isDisabled={false}
+          name={t('modalCreateGroupCellsToggleHeading')}
+          info={t('modalCreateGroupCellsToggleInfo')}
+        />
+      )}
     </>
   );
 };
