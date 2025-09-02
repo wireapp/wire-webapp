@@ -47,6 +47,7 @@ type CreateConversationModalState = {
   selectedContacts: User[];
   historySharingQuantity: number;
   historySharingUnit: HistorySharingUnit;
+  isCellsEnabled: boolean;
   isCustomHistoryModalOpen: boolean;
   isConfirmDiscardModalOpen: boolean;
   isCreateTeamModalOpen: boolean;
@@ -65,6 +66,7 @@ type CreateConversationModalState = {
   gotoNextStep: () => void;
   gotoPreviousStep: () => void;
   setError: (error: string) => void;
+  setIsCellsEnabled: (isCellsEnabled: boolean) => void;
   setIsReadReceiptsEnabled: (isReadReceiptsEnabled: boolean) => void;
   setIsGuestsEnabled: (isGuestsEnabled: boolean) => void;
   setSelectedContacts: (contacts: User[]) => void;
@@ -92,6 +94,7 @@ const initialState = {
   conversationType: ConversationType.Channel,
   conversationCreationStep: ConversationCreationStep.ConversationDetails,
   error: '',
+  isCellsEnabled: false,
   isReadReceiptsEnabled: false,
   isServicesEnabled: true,
   isGuestsEnabled: true,
@@ -126,6 +129,7 @@ export const useCreateConversationModal = create<CreateConversationModalState>(s
   gotoLastStep: () => set({conversationCreationStep: ConversationCreationStep.ParticipantsSelection}),
   gotoPreviousStep: () => set(state => ({...state, conversationCreationStep: state.conversationCreationStep - 1})),
   setError: (error: string) => set({error}),
+  setIsCellsEnabled: (isCellsEnabled: boolean) => set({isCellsEnabled}),
   setIsReadReceiptsEnabled: (isReadReceiptsEnabled: boolean) => set({isReadReceiptsEnabled}),
   setIsGuestsEnabled: (isGuestsEnabled: boolean) => set({isGuestsEnabled}),
   setSelectedContacts: (contacts: User[]) => set({selectedContacts: contacts}),
