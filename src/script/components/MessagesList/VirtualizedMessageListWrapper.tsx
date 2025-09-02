@@ -28,7 +28,6 @@ import {VirtualizedMessagesList} from 'Components/MessagesList/VirtualizedMessag
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 
 import {MessagesListParams} from './MessageList.types';
-import {useLoadConversation} from './utils/useLoadConversation';
 
 export const VirtualizedMessageListWrapper = ({
   assetRepository,
@@ -59,14 +58,6 @@ export const VirtualizedMessageListWrapper = ({
   const parentRef = useRef<HTMLDivElement | null>(null);
   const conversationLastReadTimestamp = useRef<number>(lastReadTimestamp);
 
-  // Hook for load current conversation
-  const {loadConversation} = useLoadConversation({
-    conversation,
-    conversationRepository,
-    conversationLastReadTimestamp,
-    onLoading,
-  });
-
   return (
     <FadingScrollbar
       ref={parentRef}
@@ -81,7 +72,7 @@ export const VirtualizedMessageListWrapper = ({
         </div>
       )}
 
-      {isConversationLoaded && parentRef.current && (
+      {parentRef.current && (
         <VirtualizedMessagesList
           parentElement={parentRef.current}
           conversationLastReadTimestamp={conversationLastReadTimestamp}
@@ -104,7 +95,8 @@ export const VirtualizedMessageListWrapper = ({
           isMsgElementsFocusable={isMsgElementsFocusable}
           setMsgElementsFocusable={setMsgElementsFocusable}
           updateConversationLastRead={updateConversationLastRead}
-          loadConversation={loadConversation}
+          onLoading={onLoading}
+          isConversationLoaded={isConversationLoaded}
         />
       )}
     </FadingScrollbar>

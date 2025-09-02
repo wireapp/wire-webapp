@@ -59,33 +59,32 @@ export const FileAssetSmall = ({
   };
 
   return (
-    <button
-      onClick={showModal}
-      css={hollowWrapperButtonStyles}
-      aria-label={t('cells.filePreviewButton.ariaLabel', {name})}
-    >
-      <FileCard.Root extension={extension} name={name} size={size}>
-        <FileCard.Header>
-          <FileCard.Icon type={isError ? 'unavailable' : 'file'} />
-          {!isError && <FileCard.Type />}
-          <FileAssetOptions src={src} name={name} extension={extension} onOpen={showModal} />
-        </FileCard.Header>
-        <FileCard.Name variant={isError ? 'secondary' : 'primary'} truncateAfterLines={2} />
-        <FilePreviewModal
-          id={id}
-          fileUrl={src}
-          filePdfPreviewUrl={pdfPreviewUrl}
-          fileImagePreviewUrl={imagePreviewUrl}
-          fileName={name}
-          fileExtension={extension}
-          senderName={senderName}
-          timestamp={timestamp}
-          isOpen={isOpen}
-          onClose={() => setIsOpen(false)}
-          isError={isError}
-          isLoading={isLoading}
-        />
-      </FileCard.Root>
-    </button>
+    <FileCard.Root extension={extension} name={name} size={size}>
+      <button
+        onClick={showModal}
+        css={hollowWrapperButtonStyles}
+        aria-label={t('cells.filePreviewButton.ariaLabel', {name})}
+      />
+      <FileCard.Header>
+        <FileCard.Icon type={isError ? 'unavailable' : 'file'} />
+        {!isError && <FileCard.Type />}
+        <FileAssetOptions src={src} name={name} extension={extension} onOpen={showModal} />
+      </FileCard.Header>
+      <FileCard.Name variant={isError ? 'secondary' : 'primary'} truncateAfterLines={2} />
+      <FilePreviewModal
+        id={id}
+        fileUrl={src}
+        filePdfPreviewUrl={pdfPreviewUrl}
+        fileImagePreviewUrl={imagePreviewUrl}
+        fileName={name}
+        fileExtension={extension}
+        senderName={senderName}
+        timestamp={timestamp}
+        isOpen={isOpen}
+        onClose={() => setIsOpen(false)}
+        isError={isError}
+        isLoading={isLoading}
+      />
+    </FileCard.Root>
   );
 };
