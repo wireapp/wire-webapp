@@ -4026,15 +4026,16 @@ export class ConversationRepository {
     }
   }
 
-  private async onButtonAction(conversationEntity: Conversation, eventJson: ButtonActionEvent) {
-    const {messageId, buttonId} = eventJson.data;
+  /**
+   * Common logic for handling button selections (both actions and confirmations)
+   *
+   * @param conversationEntity Conversation containing the message
+   * @param messageId ID of the message with the button
+   * @param buttonId ID of the button that was selected
+   * @returns Promise that resolves when the button selection has been processed
+   */
+  private async handleButtonSelection(conversationEntity: Conversation, messageId: string, buttonId: string) {
     try {
-      const shouldSkipSelectionFromOtherUser = conversationEntity.selfUser()?.id !== eventJson.from;
-      if (shouldSkipSelectionFromOtherUser) {
-        this.logger.warn(`Skipping button action from other user in conversation '${conversationEntity.id}'`);
-        return;
-      }
-
       const messageEntity = await this.messageRepository.getMessageInConversationById(conversationEntity, messageId);
       if (!messageEntity || !messageEntity.isComposite()) {
         const type = messageEntity ? messageEntity.type : 'unknown';
@@ -4058,30 +4059,21 @@ export class ConversationRepository {
     }
   }
 
+  private async onButtonAction(conversationEntity: Conversation, eventJson: ButtonActionEvent) {
+    const {messageId, buttonId} = eventJson.data;
+
+    const shouldSkipSelectionFromOtherUser = conversationEntity.selfUser()?.id !== eventJson.from;
+    if (shouldSkipSelectionFromOtherUser) {
+      this.logger.warn(`Skipping button action from other user in conversation '${conversationEntity.id}'`);
+      return;
+    }
+
+    await this.handleButtonSelection(conversationEntity, messageId, buttonId);
+  }
+
   private async onButtonActionConfirmation(conversationEntity: Conversation, eventJson: ButtonActionConfirmationEvent) {
     const {messageId, buttonId} = eventJson.data;
-    try {
-      const messageEntity = await this.messageRepository.getMessageInConversationById(conversationEntity, messageId);
-      if (!messageEntity || !messageEntity.isComposite()) {
-        const type = messageEntity ? messageEntity.type : 'unknown';
-
-        this.logger.error(
-          `Cannot react to '${type}' message '${messageId}' in conversation '${conversationEntity.id}'`,
-        );
-        throw new ConversationError(ConversationError.TYPE.WRONG_TYPE, ConversationError.MESSAGE.WRONG_TYPE);
-      }
-      const changes = messageEntity.getSelectionChange(buttonId);
-      if (changes) {
-        await this.eventService.updateEventSequentially({primary_key: messageEntity.primary_key, ...changes});
-      }
-    } catch (error) {
-      const isNotFound = error.type === ConversationError.TYPE.MESSAGE_NOT_FOUND;
-      if (!isNotFound) {
-        const log = `Failed to handle reaction to message '${messageId}' in conversation '${conversationEntity.id}'`;
-        this.logger.error(log, error);
-        throw error;
-      }
-    }
+    await this.handleButtonSelection(conversationEntity, messageId, buttonId);
   }
 
   /**
