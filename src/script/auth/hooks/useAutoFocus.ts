@@ -35,7 +35,7 @@ export const useAutoFocus = ({
   useEffect(() => {
     // Early return if should not focus
     if (!shouldFocus) {
-      return;
+      return () => undefined;
     }
 
     const focusId = requestAnimationFrame(() => {
