@@ -20,7 +20,7 @@
 import {ConnectionStatus} from '@wireapp/api-client/lib/connection/';
 import {CONVERSATION_TYPE} from '@wireapp/api-client/lib/conversation/';
 import {ConversationProtocol} from '@wireapp/api-client/lib/conversation/NewConversation';
-import {MessageSendingState, MessageTargetMode} from '@wireapp/core/lib/conversation';
+import {MessageSendingState} from '@wireapp/core/lib/conversation';
 
 import {Account} from '@wireapp/core';
 import {LegalHoldStatus} from '@wireapp/protocol-messaging';
@@ -228,9 +228,7 @@ describe('MessageRepository', () => {
         conversation,
         expect.objectContaining({
           nativePush: false,
-          recipients: [originalMessage.qualifiedFrom],
           skipInjection: true,
-          targetMode: MessageTargetMode.USERS,
         }),
       );
     });

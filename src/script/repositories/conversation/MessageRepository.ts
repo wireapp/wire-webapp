@@ -1213,6 +1213,13 @@ export class MessageRepository {
     }
   }
 
+  /**
+   * Sends a buttonAction confirmation, a button was clicked.
+   * @param conversation conversation where this button was clicked
+   * @param message the composite message
+   * @param buttonId the button selected id
+   * @returns
+   */
   sendButtonAction(conversation: Conversation, message: CompositeMessage, buttonId: string): void {
     if (conversation.isSelfUserRemoved()) {
       return;
@@ -1236,9 +1243,7 @@ export class MessageRepository {
     try {
       this.sendAndInjectMessage(buttonMessage, conversation, {
         nativePush: false,
-        recipients: [message.qualifiedFrom],
         skipInjection: true,
-        targetMode: MessageTargetMode.USERS,
       });
     } catch (error) {
       message.waitingButtonId(undefined);
