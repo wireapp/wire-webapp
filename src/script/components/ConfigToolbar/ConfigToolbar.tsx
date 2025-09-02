@@ -216,6 +216,10 @@ export function ConfigToolbar() {
       <Button onClick={stopSendingMessages}>Stop Sending Messages</Button>
 
       <h3>Database dump & restore</h3>
+      <h6 style={{color: 'red', fontWeight: 'bold'}}>
+        Caution: this is a destructive action and will overwrite existing data. it is supposed to only be used for
+        debugging purposes and WILL RESULT in unexpected behavior & fully breaks your client
+      </h6>
       <Button onClick={() => window.wire?.app?.debug?.dumpIndexedDB()}>Dump IndexedDB</Button>
       <Button onClick={() => window.wire?.app?.debug?.restoreIndexedDB()}>Restore IndexedDB</Button>
     </div>
