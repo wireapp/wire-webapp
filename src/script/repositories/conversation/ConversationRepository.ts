@@ -143,6 +143,7 @@ import {
 import {
   AssetAddEvent,
   ButtonActionConfirmationEvent,
+  ButtonActionEvent,
   ClientConversationEvent,
   DeleteEvent,
   EventBuilder,
@@ -3441,6 +3442,9 @@ export class ConversationRepository {
       case CONVERSATION_EVENT.ADD_PERMISSION_UPDATE:
         return this.onAddPermissionChanged(conversationEntity, eventJson);
 
+      case ClientEvent.CONVERSATION.BUTTON_ACTION:
+        return this.onButtonAction(conversationEntity, eventJson);
+
       case ClientEvent.CONVERSATION.BUTTON_ACTION_CONFIRMATION:
         return this.onButtonActionConfirmation(conversationEntity, eventJson);
 
@@ -4019,6 +4023,38 @@ export class ConversationRepository {
         error,
       );
       throw error;
+    }
+  }
+
+  private async onButtonAction(conversationEntity: Conversation, eventJson: ButtonActionEvent) {
+    const {messageId, buttonId} = eventJson.data;
+    try {
+      const shouldSkipSelectionFromOtherUser = conversationEntity.selfUser()?.id !== eventJson.from;
+      if (shouldSkipSelectionFromOtherUser) {
+        this.logger.warn(`Skipping button action from other user in conversation '${conversationEntity.id}'`);
+        return;
+      }
+
+      const messageEntity = await this.messageRepository.getMessageInConversationById(conversationEntity, messageId);
+      if (!messageEntity || !messageEntity.isComposite()) {
+        const type = messageEntity ? messageEntity.type : 'unknown';
+
+        this.logger.error(
+          `Cannot react to '${type}' message '${messageId}' in conversation '${conversationEntity.id}'`,
+        );
+        throw new ConversationError(ConversationError.TYPE.WRONG_TYPE, ConversationError.MESSAGE.WRONG_TYPE);
+      }
+      const changes = messageEntity.getSelectionChange(buttonId);
+      if (changes) {
+        await this.eventService.updateEventSequentially({primary_key: messageEntity.primary_key, ...changes});
+      }
+    } catch (error) {
+      const isNotFound = error.type === ConversationError.TYPE.MESSAGE_NOT_FOUND;
+      if (!isNotFound) {
+        const log = `Failed to handle reaction to message '${messageId}' in conversation '${conversationEntity.id}'`;
+        this.logger.error(log, error);
+        throw error;
+      }
     }
   }
 
