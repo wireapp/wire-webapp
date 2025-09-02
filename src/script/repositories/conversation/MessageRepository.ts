@@ -1214,7 +1214,7 @@ export class MessageRepository {
   }
 
   /**
-   * Sends a buttonAction confirmation, a button was clicked.
+   * Sends a buttonAction confirmation, a button was clicked without targeted messages.
    * @param conversation conversation where this button was clicked
    * @param message the composite message
    * @param buttonId the button selected id
