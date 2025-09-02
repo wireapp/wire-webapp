@@ -191,6 +191,7 @@ describe('MessageRepository', () => {
 
   describe('sendButtonAction', () => {
     it('sends a button action confirmation message', async () => {
+      // given
       const [messageRepository, {core, eventRepository}] = await buildMessageRepository();
       jest.spyOn(core.service!.conversation, 'send').mockResolvedValue(successPayload);
       jest.spyOn(eventRepository, 'injectEvent').mockResolvedValue(undefined);
@@ -214,9 +215,10 @@ describe('MessageRepository', () => {
       const conversation = generateConversation();
       conversation.addMessage(originalMessage);
 
-      // Subject under test
+      // when
       messageRepository.sendButtonAction(conversation, originalMessage, buttonId);
 
+      // then - send message is called without targetMode or recipients
       expect(sendAndInjectMessageSpy).toHaveBeenCalledWith(
         expect.objectContaining({
           buttonAction: expect.objectContaining({
