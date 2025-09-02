@@ -214,6 +214,10 @@ export function ConfigToolbar() {
       />
       <Button onClick={startSendingMessages}>Send Incremented Messages</Button>
       <Button onClick={stopSendingMessages}>Stop Sending Messages</Button>
+
+      <h3>Database dump & restore</h3>
+      <Button onClick={() => window.wire?.app?.debug?.dumpIndexedDB()}>Dump IndexedDB</Button>
+      <Button onClick={() => window.wire?.app?.debug?.restoreIndexedDB()}>Restore IndexedDB</Button>
     </div>
   );
 }
