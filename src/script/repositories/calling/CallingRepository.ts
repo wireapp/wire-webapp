@@ -1390,7 +1390,8 @@ export class CallingRepository {
       this.showCallQualityFeedbackModal(conversationId);
     }
     const serializeSelfUser = this.selfUser ? this.serializeQualifiedId(this.selfUser) : 'unknown';
-    this.logger.info(`Call Epoch Info: _leave, user: ${serializeSelfUser}, conversation: ${conversationId}`);
+    const serializeConversationId = this.serializeQualifiedId(conversationId);
+    this.logger.info(`Call Epoch Info: _leave, user: ${serializeSelfUser}, conversation: ${serializeConversationId}`);
     await this.subconversationService.leaveConferenceSubconversation(conversationId);
 
     const conversationIdStr = this.serializeQualifiedId(conversationId);
@@ -1401,8 +1402,9 @@ export class CallingRepository {
 
   private readonly leaveMLSConference = async (conversationId: QualifiedId) => {
     const serializeSelfUser = this.selfUser ? this.serializeQualifiedId(this.selfUser) : 'unknown';
+    const serializeConversationId = this.serializeQualifiedId(conversationId);
 
-    this.logger.info(`Call Epoch Info: _leave, user: ${serializeSelfUser}, conversation: ${conversationId}`);
+    this.logger.info(`Call Epoch Info: _leave, user: ${serializeSelfUser}, conversation: ${serializeConversationId}`);
     await this.subconversationService.leaveConferenceSubconversation(conversationId);
   };
 
@@ -1418,6 +1420,7 @@ export class CallingRepository {
 
   private readonly joinMlsConferenceSubconversation = async ({qualifiedId, groupId}: MLSConversation) => {
     const serializeSelfUser = this.selfUser ? this.serializeQualifiedId(this.selfUser) : 'unknown';
+    const serializeConversationId = this.serializeQualifiedId(qualifiedId);
 
     const unsubscribe = await this.subconversationService.subscribeToEpochUpdates(
       qualifiedId,
@@ -1425,14 +1428,14 @@ export class CallingRepository {
       (groupId: string) => this.conversationState.findConversationByGroupId(groupId)?.qualifiedId,
       data => {
         this.logger.info(
-          `Call Epoch Info: _update_subscription_trigger, user: ${serializeSelfUser}, conversation: ${qualifiedId}`,
+          `Call Epoch Info: _update_subscription_trigger, user: ${serializeSelfUser}, conversation: ${serializeConversationId}`,
         );
         return this.setEpochInfo(qualifiedId, data);
       },
     );
 
     callingSubscriptions.addCall(qualifiedId, unsubscribe);
-    this.logger.info(`Call Epoch Info: _join, user: ${serializeSelfUser}, conversation: ${qualifiedId}`);
+    this.logger.info(`Call Epoch Info: _join, user: ${serializeSelfUser}, conversation: ${serializeConversationId}`);
   };
 
   private readonly updateConferenceSubconversationEpoch = async (conversationId: QualifiedId) => {
