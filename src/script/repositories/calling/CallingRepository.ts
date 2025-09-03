@@ -1386,7 +1386,8 @@ export class CallingRepository {
     if (isTelemetryEnabledAtCurrentEnvironment()) {
       this.showCallQualityFeedbackModal(conversationId);
     }
-
+    const serializeSelfUser = this.selfUser ? this.serializeQualifiedId(this.selfUser) : 'unknown';
+    this.logger.info(`Call Epoch Info: _leave, user: ${serializeSelfUser}, conversation: ${conversationId}`);
     await this.subconversationService.leaveConferenceSubconversation(conversationId);
 
     const conversationIdStr = this.serializeQualifiedId(conversationId);
@@ -1396,6 +1397,9 @@ export class CallingRepository {
   };
 
   private readonly leaveMLSConference = async (conversationId: QualifiedId) => {
+    const serializeSelfUser = this.selfUser ? this.serializeQualifiedId(this.selfUser) : 'unknown';
+
+    this.logger.info(`Call Epoch Info: _leave, user: ${serializeSelfUser}, conversation: ${conversationId}`);
     await this.subconversationService.leaveConferenceSubconversation(conversationId);
   };
 
@@ -1417,7 +1421,10 @@ export class CallingRepository {
       data => this.setEpochInfo(qualifiedId, data),
     );
 
+    const serializeSelfUser = this.selfUser ? this.serializeQualifiedId(this.selfUser) : 'unknown';
+
     callingSubscriptions.addCall(qualifiedId, unsubscribe);
+    this.logger.info(`Call Epoch Info: _join, user: ${serializeSelfUser}, conversation: ${qualifiedId}`);
   };
 
   private readonly updateConferenceSubconversationEpoch = async (conversationId: QualifiedId) => {
@@ -1425,6 +1432,8 @@ export class CallingRepository {
     if (!conversation || !this.isMLSConference(conversation)) {
       return;
     }
+
+    const serializeSelfUser = this.selfUser ? this.serializeQualifiedId(this.selfUser) : 'unknown';
 
     const subconversationEpochInfo = await this.subconversationService.getSubconversationEpochInfo(
       conversationId,
@@ -1436,6 +1445,9 @@ export class CallingRepository {
       return;
     }
 
+    this.logger.info(
+      `Call Epoch Info: _update, epoch: ${subconversationEpochInfo} user: ${serializeSelfUser}, conversation: ${conversationId}`,
+    );
     this.setEpochInfo(conversationId, subconversationEpochInfo);
   };
 
@@ -1444,6 +1456,8 @@ export class CallingRepository {
     if (!conversation || !this.isMLSConference(conversation)) {
       return;
     }
+
+    const serializeSelfUser = this.selfUser ? this.serializeQualifiedId(this.selfUser.qualifiedId) : 'unknown';
 
     for (const member of members) {
       const isSelfClient = member.userId.id === this.core.userId && member.clientid === this.core.clientId;
@@ -1475,18 +1489,29 @@ export class CallingRepository {
         firingDate,
         key,
         // if timer expires = client is stale -> remove client from the subconversation
-        task: () =>
-          this.subconversationService.removeClientFromConferenceSubconversation(conversationId, {
+        task: () => {
+          this.logger.info(
+            `Call Epoch Info: on client left remove from subconversation, user: ${serializeSelfUser}, conversation: ${conversationId}`,
+          );
+          return this.subconversationService.removeClientFromConferenceSubconversation(conversationId, {
             user: {id: member.userId.id, domain: member.userId.domain},
             clientId: member.clientid,
-          }),
+          });
+        },
       });
     }
   };
 
   private setCachedEpochInfos(call: Call) {
     call.epochCache.disable();
+    const userId = this.selfUser ? this.serializeQualifiedId(this.selfUser.qualifiedId) : 'unknown';
+    this.logger.info(
+      `Call Epoch Info: _cache_disable, user: ${userId}, conversation: ${this.serializeQualifiedId(call.conversation.qualifiedId)}`,
+    );
     call.epochCache.getEpochList().forEach((d: CallingEpochData) => {
+      this.logger.info(
+        `Call Epoch Info: _cache_avs_set, epoch: ${d.epoch}, user: ${userId}, conversation: ${d.serializedConversationId}`,
+      );
       this.wCall?.setEpochInfo(this.wUser, d.serializedConversationId, d.epoch, JSON.stringify(d.clients), d.secretKey);
     });
     call.epochCache.clean();
@@ -1494,6 +1519,7 @@ export class CallingRepository {
 
   private readonly setEpochInfo = (conversationId: QualifiedId, subconversationData: SubconversationData) => {
     const serializedConversationId = this.serializeQualifiedId(conversationId);
+    const userId = this.selfUser ? this.serializeQualifiedId(this.selfUser.qualifiedId) : 'unknown';
     const {epoch, secretKey, members} = subconversationData;
     const clients = {
       convid: serializedConversationId,
@@ -1505,10 +1531,15 @@ export class CallingRepository {
     }
 
     if (call.epochCache.isEnabled()) {
+      this.logger.info(
+        `Call Epoch Info: _cache_store, epoch: ${epoch}, user: ${userId}, conversation: ${serializedConversationId}`,
+      );
       return call.epochCache.store({serializedConversationId, epoch, clients, secretKey});
     }
 
-    this.logger.info(`Set Epoch Info: ${epoch} conversation: ${serializedConversationId}`);
+    this.logger.info(
+      `Call Epoch Info: _avs_set. epoch: ${epoch}, user: ${userId}, conversation: ${serializedConversationId}`,
+    );
     return this.wCall?.setEpochInfo(this.wUser, serializedConversationId, epoch, JSON.stringify(clients), secretKey);
   };
 
