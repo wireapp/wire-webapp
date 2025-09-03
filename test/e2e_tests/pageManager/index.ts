@@ -69,7 +69,7 @@ import {SingleSignOnPage} from './webapp/pages/singleSignOn.page';
 import {StartUIPage} from './webapp/pages/startUI.page';
 import {WelcomePage} from './webapp/pages/welcome.page';
 
-const webAppPath = process.env.WEBAPP_URL ?? '';
+export const webAppPath = process.env.WEBAPP_URL ?? '';
 const teamManagementPath = process.env.TEAM_MANAGEMENT_URL ?? '';
 
 export class PageManager {
