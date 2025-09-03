@@ -17,8 +17,9 @@
  *
  */
 
-import {getUser} from 'test/e2e_tests/data/user';
+import {getUser, User} from 'test/e2e_tests/data/user';
 import {webAppPath} from 'test/e2e_tests/pageManager';
+import {RegistrationPage} from 'test/e2e_tests/pageManager/webapp/pages/registration.page';
 import {addCreatedUser, removeCreatedUser} from 'test/e2e_tests/utils/tearDown.util';
 
 import {test, expect} from '../../test.fixtures';
@@ -26,9 +27,25 @@ import {test, expect} from '../../test.fixtures';
 test.describe('registration personal account', () => {
   const url = `${webAppPath}auth/#/createaccount`;
 
-  test.beforeAll(async ({pageManager}) => {
-    await pageManager.openMainPage();
-  });
+  // Helper function to handle common registration steps
+  const completeRegistrationForm = async (
+    reg: RegistrationPage,
+    user: User,
+    input: string | null = null,
+    inputType = 'email',
+  ) => {
+    await reg.fillInUserInfo(user);
+    if (input) {
+      if (inputType === 'email') {
+        await reg.emailInput.fill(input);
+      } else {
+        await reg.passwordInput.fill(input);
+        await reg.confirmPasswordInput.fill(input);
+      }
+    }
+    await reg.toggleTermsCheckbox();
+    await reg.clickSubmitButton();
+  };
 
   test.slow();
 
@@ -43,14 +60,11 @@ test.describe('registration personal account', () => {
     test(
       'I want to be notified if the email address I entered during registration has already been registered',
       {tag: ['@TC-1623', '@regression']},
-      async ({pageManager, api}) => {
+      async ({pageManager}) => {
         await pageManager.openUrl(url);
 
         const reg = pageManager.webapp.pages.registration();
-        await reg.fillInUserInfo(userA);
-        await reg.toggleTermsCheckbox();
-        await reg.clickSubmitButton();
-
+        await completeRegistrationForm(reg, userA);
         const text = await reg.errorLabel.innerText();
         expect(text).toContain('This email address has already been registered.');
       },
@@ -64,19 +78,15 @@ test.describe('registration personal account', () => {
   test(
     'I want to see an error message if the email address is blacklisted',
     {tag: ['@TC-1624', '@regression']},
-    async ({pageManager, api}) => {
+    async ({pageManager}) => {
       const incorrectEmail = 'nope@wearezeta.com';
       await pageManager.openUrl(url);
       const user = getUser();
-
       const reg = pageManager.webapp.pages.registration();
-      await reg.fillInUserInfo(user);
-      await reg.emailInput.fill(incorrectEmail);
-      await reg.toggleTermsCheckbox();
 
-      await reg.clickSubmitButton();
+      await completeRegistrationForm(reg, user, incorrectEmail, 'email');
+
       const text = await reg.errorLabel.innerText();
-
       expect(text).toContain('Something went wrong');
     },
   );
@@ -86,24 +96,35 @@ test.describe('registration personal account', () => {
       name: 'I want to see an error message if email is not valid',
       tag: ['@TC-1627', '@regression'],
       input: 'blablablawire.engineering',
+      inputType: 'email',
       errorMessage: 'Please enter a valid email address',
     },
     {
       name: 'I should not be able to submit a password less than 8 chars',
       tag: ['@TC-1634', '@regression'],
       input: '1234567',
+      inputType: 'password',
       errorMessage: 'Use at least 8 characters',
+    },
+    {
+      name: 'I should not be able to submit a password which does not have any Capital letter',
+      tag: ['@TC-1635', '@regression'],
+      input: 'pass!234567',
+      inputType: 'password',
+      errorMessage: 'capital letter',
     },
     {
       name: 'I should not be able to submit a password which does not have any number',
       tag: ['@TC-1636', '@regression'],
       input: 'testPassword!',
+      inputType: 'password',
       errorMessage: 'a number',
     },
     {
       name: 'I should not be able to submit a password which does not have any special letter',
       tag: ['@TC-1637', '@TC-1641', '@regression'],
       input: 'testPassword1',
+      inputType: 'password',
       errorMessage: 'special character',
     },
   ];
@@ -112,25 +133,14 @@ test.describe('registration personal account', () => {
     test(`${testData.name}`, {tag: testData.tag}, async ({pageManager}) => {
       await pageManager.openUrl(url);
       const user = getUser();
-
       const reg = pageManager.webapp.pages.registration();
-      await reg.fillInUserInfo(user);
 
-      if (testData.name.includes('email')) {
-        await reg.emailInput.fill(testData.input);
-      } else {
-        await reg.passwordInput.fill(testData.input);
-        await reg.confirmPasswordInput.fill(testData.input);
-      }
-
-      await reg.toggleTermsCheckbox();
-      await reg.clickSubmitButton();
+      await completeRegistrationForm(reg, user, testData.input, testData.inputType);
 
       const text = await reg.errorLabel.innerText();
       expect(text).toContain(testData.errorMessage);
 
       const errorColor = await reg.errorLabel.locator('span').evaluate(el => window.getComputedStyle(el).color);
-      // Assuming the error color is a specific red RGB value
       expect(errorColor).toBe('rgb(194, 0, 19)');
     });
   });
@@ -138,15 +148,15 @@ test.describe('registration personal account', () => {
   const testCasesPassword = [
     {
       name: 'I want to submit a password containing emojis',
-      tag: ['@TC-1632', '@TC-1641', '@regression'],
+      tag: ['@TC-1642', '@regression'],
       input: 'test😅😅😅Password😅1',
-      errorMessage: 'special character',
+      inputType: 'password',
     },
     {
       name: 'I want to submit a password containing spaces',
       tag: ['@TC-1643', '@regression'],
       input: 'testPassword 1',
-      errorMessage: 'special character',
+      inputType: 'password',
     },
   ];
 
@@ -154,22 +164,12 @@ test.describe('registration personal account', () => {
     test(`${testData.name}`, {tag: testData.tag}, async ({pageManager}) => {
       await pageManager.openUrl(url);
       const user = getUser();
-
       const reg = pageManager.webapp.pages.registration();
-      await reg.fillInUserInfo(user);
-
-      if (testData.name.includes('email')) {
-        await reg.emailInput.fill(testData.input);
-      } else {
-        await reg.passwordInput.fill(testData.input);
-        await reg.confirmPasswordInput.fill(testData.input);
-      }
 
       const page = await pageManager.getPage();
-
       const requestPromise = page.waitForRequest('*/**/activate/send');
-      await reg.toggleTermsCheckbox();
-      await reg.clickSubmitButton();
+
+      await completeRegistrationForm(reg, user, testData.input, testData.inputType);
       await requestPromise;
 
       const emailVeri = pageManager.webapp.pages.emailVerification();
@@ -182,9 +182,7 @@ test.describe('registration personal account', () => {
     {tag: ['@TC-1640', '@regression']},
     async ({pageManager}) => {
       await pageManager.openUrl(url);
-
       const reg = pageManager.webapp.pages.registration();
-
       const text = await reg.passwordPolicy.innerText();
       expect(text).toContain(
         'Use at least 8 characters, with one lowercase letter, one capital letter, a number, and a special character.',
