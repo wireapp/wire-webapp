@@ -981,6 +981,7 @@ export class CallingRepository {
       this.storeCall(call);
 
       if (this.isMLSConference(conversation)) {
+        call.epochCache.enable();
         await this.joinMlsConferenceSubconversation(conversation);
       }
 
@@ -1348,6 +1349,8 @@ export class CallingRepository {
       this.setMute(call.muteState() !== MuteState.NOT_MUTED);
 
       if (!!conversation && this.isMLSConference(conversation)) {
+        // Enable the epoch cache to save all epoch infos while init avs!
+        call.epochCache.enable();
         await this.joinMlsConferenceSubconversation(conversation);
       }
 
@@ -2021,6 +2024,8 @@ export class CallingRepository {
 
     // There's nothing we need to do for non-mls calls
     if (call.conversationType === CONV_TYPE.CONFERENCE_MLS) {
+      call.epochCache.clean();
+      call.epochCache.disable();
       if (!conversation?.is1to1()) {
         await this.leaveMLSConference(conversationId);
       } else {
@@ -2321,6 +2326,8 @@ export class CallingRepository {
     const {aestab: newEstablishedStatus} = nextOtherParticipant;
 
     if (isCurrentlyEstablished && newEstablishedStatus === AUDIO_STATE.CONNECTING) {
+      call.epochCache.clean();
+      call.epochCache.disable();
       void this.leave1on1MLSConference(conversationId);
     }
   };
