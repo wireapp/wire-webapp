@@ -1417,14 +1417,19 @@ export class CallingRepository {
   };
 
   private readonly joinMlsConferenceSubconversation = async ({qualifiedId, groupId}: MLSConversation) => {
+    const serializeSelfUser = this.selfUser ? this.serializeQualifiedId(this.selfUser) : 'unknown';
+
     const unsubscribe = await this.subconversationService.subscribeToEpochUpdates(
       qualifiedId,
       groupId,
       (groupId: string) => this.conversationState.findConversationByGroupId(groupId)?.qualifiedId,
-      data => this.setEpochInfo(qualifiedId, data),
+      data => {
+        this.logger.info(
+          `Call Epoch Info: _update_subscription_trigger, user: ${serializeSelfUser}, conversation: ${qualifiedId}`,
+        );
+        this.setEpochInfo(qualifiedId, data);
+      },
     );
-
-    const serializeSelfUser = this.selfUser ? this.serializeQualifiedId(this.selfUser) : 'unknown';
 
     callingSubscriptions.addCall(qualifiedId, unsubscribe);
     this.logger.info(`Call Epoch Info: _join, user: ${serializeSelfUser}, conversation: ${qualifiedId}`);
@@ -1541,7 +1546,7 @@ export class CallingRepository {
     }
 
     this.logger.info(
-      `Call Epoch Info: _avs_set. epoch: ${epoch}, user: ${userId}, conversation: ${serializedConversationId}`,
+      `Call Epoch Info: _avs_set, epoch: ${epoch}, user: ${userId}, conversation: ${serializedConversationId}`,
     );
     return this.wCall?.setEpochInfo(this.wUser, serializedConversationId, epoch, JSON.stringify(clients), secretKey);
   };
