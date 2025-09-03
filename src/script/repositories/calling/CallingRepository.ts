@@ -1427,7 +1427,7 @@ export class CallingRepository {
         this.logger.info(
           `Call Epoch Info: _update_subscription_trigger, user: ${serializeSelfUser}, conversation: ${qualifiedId}`,
         );
-        this.setEpochInfo(qualifiedId, data);
+        return this.setEpochInfo(qualifiedId, data);
       },
     );
 
