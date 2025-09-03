@@ -93,6 +93,8 @@ export class Conversation {
   private readonly incomingMessages: ko.ObservableArray<Message>;
   public readonly isProteusTeam1to1: ko.PureComputed<boolean>;
   public readonly isConversationWithBlockedUser: ko.PureComputed<boolean>;
+  public readonly isConversationWithDeletedUser: ko.PureComputed<boolean>;
+  public readonly is1to1ConversationWithDeletedUser: ko.PureComputed<boolean>;
   public readonly isReadOnlyConversation: ko.PureComputed<boolean>;
   public readonly last_server_timestamp: ko.Observable<number>;
   private readonly logger: Logger;
@@ -262,8 +264,20 @@ export class Conversation {
 
     this.isConversationWithBlockedUser = ko.pureComputed(() => !!this.connection()?.isBlocked());
 
+    this.isConversationWithDeletedUser = ko.pureComputed(() => {
+      const hasDeletedUser = this.participating_user_ets().some(userEntity => userEntity.isDeleted);
+      return hasDeletedUser;
+    });
+
+    this.is1to1ConversationWithDeletedUser = ko.pureComputed(
+      () => !!this.is1to1() && this.isConversationWithDeletedUser(),
+    );
+
     this.isReadOnlyConversation = ko.pureComputed(
-      () => this.isConversationWithBlockedUser() || this.readOnlyState() !== null,
+      () =>
+        this.isConversationWithBlockedUser() ||
+        this.is1to1ConversationWithDeletedUser() ||
+        this.readOnlyState() !== null,
     );
 
     this.isGroup = ko.pureComputed(() => {
