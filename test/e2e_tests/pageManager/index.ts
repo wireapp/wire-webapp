@@ -25,6 +25,9 @@ import {SetUsernamePage} from './team_management/pages/setUsername.page';
 import {TeamLoginPage} from './team_management/pages/teamLogin.page';
 import {TeamsPage} from './team_management/pages/teams.page';
 import {TeamSignUpPage} from './team_management/pages/teamSignUp.page';
+import {CellsConversationPage} from './webapp/cells/cellsConversation.page';
+import {CellsConversationFilesPage} from './webapp/cells/cellsConversationFiles.page';
+import {CellsFileDetailViewModal} from './webapp/cells/cellsFileDetailView.modal';
 import {ConversationSidebar} from './webapp/components/conversationSidebar.component';
 import {InputBarControls} from './webapp/components/inputBarControls.component';
 import {AppLockModal} from './webapp/modals/appLock.modal';
@@ -145,6 +148,10 @@ export class PageManager {
       conversationDetails: () =>
         this.getOrCreate('webapp.pages.conversationDetails', () => new ConversationDetailsPage(this.page)),
       conversation: () => this.getOrCreate('webapp.pages.conversation', () => new ConversationPage(this.page)),
+      cellsConversation: () =>
+        this.getOrCreate('webapp.pages.cellsConversation', () => new CellsConversationPage(this.page)),
+      cellsConversationFiles: () =>
+        this.getOrCreate('webapp.pages.cellsConversationFiles', () => new CellsConversationFilesPage(this.page)),
       connectRequest: () => this.getOrCreate('webapp.pages.connectRequest', () => new ConnectRequestPage(this.page)),
       calling: () => this.getOrCreate('webapp.pages.calling', () => new CallingPage(this.page)),
       settings: () => this.getOrCreate('webapp.pages.settings', () => new SettingsPage(this.page)),
@@ -192,6 +199,8 @@ export class PageManager {
       verifyEmail: () => this.getOrCreate('webapp.modals.verifyEmail', () => new VerifyEmailModal(this.page)),
       marketingConsent: () =>
         this.getOrCreate('webapp.modals.marketingConsent', () => new MarketingConsentModal(this.page)),
+      cellsFileDetailView: () =>
+        this.getOrCreate('webapp.modals.cellsFileDetailView', () => new CellsFileDetailViewModal(this.page)),
     },
     components: {
       conversationSidebar: () =>
