@@ -61,7 +61,6 @@ import {
   MLSDeviceStatus,
 } from '../E2EIdentityService/Helper';
 import {handleMLSMessageAdd, handleMLSWelcomeMessage} from '../EventHandler/events';
-import {deleteMLSMessagesQueue, queueIncomingMLSMessage} from '../EventHandler/events/messageAdd';
 import {ClientId, HandlePendingProposalsParams} from '../types';
 import {generateMLSDeviceId} from '../utils/MLSId';
 
@@ -832,7 +831,6 @@ export class MLSService extends TypedEventEmitter<Events> {
   }
 
   public async wipeConversation(groupId: string): Promise<void> {
-    deleteMLSMessagesQueue(groupId);
     await this.cancelKeyMaterialRenewal(groupId);
     await this.cancelPendingProposalsTask(groupId);
 
@@ -963,7 +961,7 @@ export class MLSService extends TypedEventEmitter<Events> {
       );
     }
 
-    return queueIncomingMLSMessage(groupId, () => handleMLSMessageAdd({event, mlsService: this, groupId}));
+    return handleMLSMessageAdd({event, mlsService: this, groupId});
   }
 
   public async handleMLSWelcomeMessageEvent(event: ConversationMLSWelcomeEvent, clientId: string) {
