@@ -312,7 +312,7 @@ jobs:
         target: ${{fromJson(needs.set_deployment_targets.outputs.deployment_targets)}}
 
     steps:
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v5
         with:
           name: 'build-artifact'
 
@@ -341,11 +341,11 @@ jobs:
       release_url: ${{ steps.release.outputs.url }}
 
     steps:
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v5
         with:
           name: 'changelog'
 
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v5
         with:
           name: 'unit-tests-report'
 
