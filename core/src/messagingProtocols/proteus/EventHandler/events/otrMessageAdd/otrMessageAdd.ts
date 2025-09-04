@@ -20,6 +20,7 @@
 import {ConversationOtrMessageAddEvent} from '@wireapp/api-client/lib/event';
 import {Decoder} from 'bazinga64';
 
+import {LogFactory} from '@wireapp/commons';
 import {ClientAction, GenericMessage} from '@wireapp/protocol-messaging';
 
 import {GenericMessageType} from '../../../../../conversation';
@@ -31,6 +32,8 @@ interface HandleOtrMessageAddParams {
   event: ConversationOtrMessageAddEvent;
   proteusService: ProteusService;
 }
+
+const logger = LogFactory.getLogger('@wireapp/core/otrMessageAdd');
 
 export const handleOtrMessageAdd = async ({
   event,
@@ -44,8 +47,10 @@ export const handleOtrMessageAdd = async ({
     } = event;
     const userId = qualified_from || {id: from, domain: ''};
     const messageBytes = Decoder.fromBase64(encodedCiphertext).asBytes;
+    const now = Date.now();
+    logger.info('Decrypting OTR message', {userId, clientId, event});
     const decryptedData = await proteusService.decrypt(messageBytes, userId, clientId);
-
+    logger.info('OTR message decrypted successfully', {userId, clientId, event, duration: Date.now() - now});
     const decodedData = GenericMessage.decode(decryptedData);
 
     const isSessionReset = decodedData[GenericMessageType.CLIENT_ACTION] === ClientAction.RESET_SESSION;
@@ -59,6 +64,7 @@ export const handleOtrMessageAdd = async ({
       decryptedData: decodedData,
     };
   } catch (error) {
+    logger.warn('Failed to decrypt OTR message', {event, error});
     if (error instanceof DecryptionError) {
       return {event, decryptionError: error};
     }

@@ -425,12 +425,16 @@ export class MLSService extends TypedEventEmitter<Events> {
     payload: Uint8Array,
   ): Promise<DecryptedMessage | undefined> {
     try {
+      const start = Date.now();
+      this.logger.info('Decrypting message', {conversationId});
       const decryptedMessage = await this.coreCryptoClient.transaction(cx =>
         cx.decryptMessage(conversationId, payload),
       );
       this.dispatchNewCrlDistributionPoints(decryptedMessage.crlNewDistributionPoints);
+      this.logger.info('Message decrypted successfully', {conversationId, duration: Date.now() - start});
       return decryptedMessage;
     } catch (error) {
+      this.logger.warn('Failed to decrypt MLS message', {conversationId, error});
       // According to CoreCrypto JS doc on .decryptMessage method, we should ignore some errors (corecrypto handle them internally)
       if (shouldMLSDecryptionErrorBeIgnored(error)) {
         return {

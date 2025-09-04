@@ -26,8 +26,6 @@ export interface PromiseQueueOptions {
   paused?: boolean;
   /** Timeout in ms. Default is 1000 (1 minute). */
   timeout?: number;
-  /** Delay between each promise execution in ms. Default is 0 (no delay). */
-  delay?: number;
   /** logger used to log errors */
   logger?: {warn: (...args: any[]) => void};
 }

@@ -34,9 +34,9 @@ export function isSendingMessage(): boolean {
 }
 
 export function resumeMessageSending(): void {
-  sendingQueue.pause(false);
+  sendingQueue.resume();
 }
 
 export function pauseMessageSending(): void {
-  sendingQueue.pause(true);
+  sendingQueue.pause();
 }

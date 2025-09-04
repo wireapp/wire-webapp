@@ -28,25 +28,39 @@ const defaultOptions = {
 };
 
 export class PromiseQueue {
+  static ERROR_CAUSES = {
+    TIMEOUT: 'QUEUE_TIMEOUT',
+    FLUSHED: 'QUEUE_FLUSHED',
+  };
+
+  static createTimeoutError(timeout: number): Error {
+    const error = new Error(`Timeout Error: Promise did not resolve in ${timeout}ms`);
+    error.cause = PromiseQueue.ERROR_CAUSES.TIMEOUT;
+    return error;
+  }
+
+  static createFlushError(): Error {
+    const error = new Error('Queue was flushed');
+    error.cause = PromiseQueue.ERROR_CAUSES.FLUSHED;
+
+    return error;
+  }
+
   private blocked: boolean;
   private runningTasks: number;
-  private interval?: NodeJS.Timeout;
   private paused: boolean;
   private readonly concurrent: number;
   private readonly logger?: {warn: (...args: any[]) => void};
   private readonly queue: QueueEntry<any>[];
   private readonly timeout: number;
-  private delay: number;
 
   constructor(options?: PromiseQueueOptions) {
     this.blocked = false;
     this.concurrent = options?.concurrent ?? defaultOptions.concurrent;
     this.runningTasks = 0;
-    this.interval = undefined;
     this.paused = options?.paused ?? defaultOptions.paused;
     this.queue = [];
     this.timeout = options?.timeout ?? defaultOptions.timeout;
-    this.delay = options?.delay ?? defaultOptions.delay;
   }
 
   /**
@@ -68,37 +82,39 @@ export class PromiseQueue {
       this.blocked = true;
     }
 
-    this.interval = setInterval(() => {
-      if (!this.paused) {
-        const logObject = {pendingEntry: queueEntry, queueState: this.queue};
-        this.logger?.warn(`Promise queue timed-out after ${this.timeout}ms, unblocking queue`, logObject);
-        this.resume();
-      }
-    }, this.timeout);
+    /**
+     * If we don’t clear the timer, the Node.js event loop (or browser timer queue) will still hold on to
+     * the timer until it fires. For many tasks this means we'll have thousands of useless timers still pending in memory.
+     * In long queues (like app startup notifications) it can lead to memory bloat and unnecessary wake-ups in the event loop.
+     */
+    let timeoutId: ReturnType<typeof setTimeout>;
+    const timeout = new Promise<never>((_, reject) => {
+      timeoutId = setTimeout(() => {
+        this.logger?.warn?.(
+          `Promise queue task timed-out after ${this.timeout}ms, rejecting and advancing to the next task in queue`,
+          {
+            pending: this.queue.length,
+          },
+        );
+        reject(PromiseQueue.createTimeoutError(this.timeout));
+      }, this.timeout);
+    });
 
-    queueEntry
-      .fn()
-      .then(response => {
-        queueEntry.resolveFn(response);
-      })
-      .catch(error => {
+    Promise.race([queueEntry.fn(), timeout])
+      .then(result => queueEntry.resolveFn(result as any))
+      .catch(err => {
         queueEntry.resolveFn = () => {};
-        queueEntry.rejectFn(error);
+        queueEntry.rejectFn(err);
       })
       .finally(() => {
-        this.clearInterval();
-
+        if (timeoutId) {
+          clearTimeout(timeoutId);
+        }
         this.runningTasks--;
-
         if (this.runningTasks < this.concurrent) {
           this.blocked = false;
         }
-
-        if (this.delay) {
-          setTimeout(() => this.execute(), this.delay);
-        } else {
-          this.execute();
-        }
+        this.execute();
       });
   }
 
@@ -114,19 +130,11 @@ export class PromiseQueue {
     return this.queue.length;
   }
 
-  setDelay(delay: number) {
-    this.delay = delay;
-  }
-
   /**
-   * Pause or resume the execution.
+   * Pause the execution.
    */
-  pause(shouldPause: boolean = true): PromiseQueue {
-    this.paused = shouldPause;
-
-    if (!this.paused) {
-      this.execute();
-    }
+  pause(): PromiseQueue {
+    this.paused = true;
 
     return this;
   }
@@ -156,17 +164,9 @@ export class PromiseQueue {
   /**
    * Resume execution of queue.
    */
-  private resume(): void {
-    this.clearInterval();
-    this.blocked = false;
-    this.pause(false);
-  }
-
-  private clearInterval(): void {
-    if (this.interval) {
-      clearInterval(this.interval);
-      this.interval = undefined;
-    }
+  public resume(): void {
+    this.paused = false;
+    this.execute();
   }
 
   /**
@@ -175,7 +175,7 @@ export class PromiseQueue {
    *
    * Running tasks are unaffected.
    */
-  flush(reason: Error = new Error('Queue was flushed')): void {
+  flush(reason: Error = PromiseQueue.createFlushError()): void {
     while (this.queue.length > 0) {
       const entry = this.queue.shift();
       if (entry) {

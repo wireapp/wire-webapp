@@ -31,10 +31,19 @@ export function queueProposal<T>(cb: Task<T>): Promise<T> {
 
 export function resumeProposalProcessing(): void {
   logger.info('Resuming proposal processing');
-  proposalsQueue.pause(false);
+  proposalsQueue.resume();
 }
 
 export function pauseProposalProcessing(): void {
   logger.info('Pausing proposal processing');
-  proposalsQueue.pause(true);
+  proposalsQueue.pause();
+}
+
+export function getProposalQueueLength() {
+  return proposalsQueue.getLength();
+}
+
+export function flushProposalsQueue(): void {
+  logger.info('Flushing proposals queue');
+  proposalsQueue.flush();
 }

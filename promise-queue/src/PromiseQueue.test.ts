@@ -51,75 +51,6 @@ describe('PromiseQueue', () => {
       expect(result).toEqual([0, 1, 2]);
     });
 
-    it('processes promises with some delay in between', async () => {
-      jest.useFakeTimers();
-      jest.setSystemTime(new Date());
-
-      let counter = 0;
-      const result: number[] = [];
-
-      const promiseFn = function () {
-        result.push(counter++);
-        return Promise.resolve();
-      };
-
-      const queue = new PromiseQueue({name: 'TestQueue', delay: 100});
-
-      void queue.push(promiseFn);
-      void queue.push(promiseFn);
-      void queue.push(promiseFn);
-
-      expect(result).toEqual([0]);
-
-      await new Promise(jest.requireActual('timers').setImmediate);
-      jest.advanceTimersByTime(100);
-      expect(result).toEqual([0, 1]);
-
-      await new Promise(jest.requireActual('timers').setImmediate);
-      jest.advanceTimersByTime(100);
-      expect(result).toEqual([0, 1, 2]);
-
-      jest.useRealTimers();
-    });
-
-    it('processes promises with some delay in between with delay changes in between', async () => {
-      jest.useFakeTimers();
-      jest.setSystemTime(new Date());
-
-      let counter = 0;
-      const result: number[] = [];
-
-      const promiseFn = function () {
-        result.push(counter++);
-        return Promise.resolve();
-      };
-
-      const queue = new PromiseQueue({name: 'TestQueue', delay: 100});
-
-      void queue.push(promiseFn);
-      void queue.push(promiseFn);
-      void queue.push(promiseFn);
-
-      expect(result).toEqual([0]);
-
-      await new Promise(jest.requireActual('timers').setImmediate);
-      jest.advanceTimersByTime(100);
-      expect(result).toEqual([0, 1]);
-
-      queue.setDelay(200);
-
-      await new Promise(jest.requireActual('timers').setImmediate);
-      jest.advanceTimersByTime(100);
-      expect(result).toEqual([0, 1]);
-
-      await new Promise(jest.requireActual('timers').setImmediate);
-      jest.advanceTimersByTime(100);
-
-      expect(result).toEqual([0, 1, 2]);
-
-      jest.useRealTimers();
-    });
-
     it('continues to process the queue even when a prior promise rejects', async () => {
       /**
        * Prevents Jest from failing due to unhandled promise rejection.
@@ -143,24 +74,52 @@ describe('PromiseQueue', () => {
       expect(resolvingPromiseSpy).toHaveBeenCalled();
     });
 
-    // eslint-disable-next-line jest/no-done-callback
-    it('processes promises even when one of them times out (with retries)', done => {
+    it('rejects a promise if it does not resolve in time', async () => {
       jest.useFakeTimers();
-      const resolvingPromiseSpy = jest.fn().mockImplementation(() => Promise.resolve(0));
 
-      const timeoutPromise = function () {
-        return new Promise(() => {});
-      };
+      const never = () => new Promise<void>(() => {}); // never resolves
+      const queue = new PromiseQueue({name: 'TestQueue', timeout: 91});
 
-      const queue = new PromiseQueue({name: 'TestQueue', timeout: 100});
-      void queue.push(timeoutPromise);
-      void queue.push(resolvingPromiseSpy).then(() => {
-        expect(resolvingPromiseSpy).toHaveBeenCalled();
-        expect(queue.getLength()).toBe(0);
-        done();
-      });
+      const p = queue.push(never);
 
-      jest.advanceTimersByTime(120);
+      // attach a handler immediately to avoid unhandled rejection
+      const captured = p.catch(e => e);
+
+      await jest.advanceTimersByTimeAsync(120);
+
+      const err = await captured;
+      expect(err).toBeInstanceOf(Error);
+      expect(err.cause).toBe(PromiseQueue.ERROR_CAUSES.TIMEOUT);
+      expect(err.message).toBe('Timeout Error: Promise did not resolve in 91ms');
+
+      jest.useRealTimers();
+    });
+
+    it('rejects a promise if it does not resolve in time and advances to the next promise in queue', async () => {
+      jest.useFakeTimers();
+
+      const never = () => new Promise<void>(() => {}); // never resolves
+      const second = jest.fn().mockResolvedValue('second-done');
+
+      const queue = new PromiseQueue({name: 'TestQueue', timeout: 95});
+
+      const p1 = queue.push(never).catch(e => e);
+
+      // Push a second task that should run after the first times out
+      const p2 = queue.push(second);
+
+      await jest.advanceTimersByTimeAsync(120);
+
+      // First promise should time out
+      const err = await p1;
+      expect(err).toBeInstanceOf(Error);
+      expect(err.cause).toBe(PromiseQueue.ERROR_CAUSES.TIMEOUT);
+      expect(err.message).toBe('Timeout Error: Promise did not resolve in 95ms');
+
+      // Queue should have advanced and executed the second task
+      await expect(p2).resolves.toBe('second-done');
+      expect(second).toHaveBeenCalledTimes(1);
+
       jest.useRealTimers();
     });
   });
@@ -188,10 +147,12 @@ describe('PromiseQueue', () => {
 
       const runSpy = jest.fn();
       const rejectSpy = jest.fn();
-      const flushError = new Error('Flushed');
 
       // Push a task that runs immediately
       await queue.push(() => Promise.resolve());
+
+      let err1: Error = new Error();
+      let err2: Error = new Error();
 
       // Push pending tasks
       const p1 = queue
@@ -201,6 +162,7 @@ describe('PromiseQueue', () => {
         })
         .catch(error => {
           rejectSpy();
+          err1 = error;
           throw error;
         });
 
@@ -211,13 +173,18 @@ describe('PromiseQueue', () => {
         })
         .catch(error => {
           rejectSpy();
+          err2 = error;
           throw error;
         });
 
-      queue.flush(flushError);
+      queue.flush();
 
-      await expect(p1).rejects.toThrow('Flushed');
-      await expect(p2).rejects.toThrow('Flushed');
+      await expect(p1).rejects.toThrow('Queue was flushed');
+      await expect(p2).rejects.toThrow('Queue was flushed');
+
+      // check error cause
+      expect(err1?.cause).toBe(PromiseQueue.ERROR_CAUSES.FLUSHED);
+      expect(err2?.cause).toBe(PromiseQueue.ERROR_CAUSES.FLUSHED);
 
       expect(runSpy).not.toHaveBeenCalled();
       expect(rejectSpy).toHaveBeenCalledTimes(2);
@@ -265,6 +232,35 @@ describe('PromiseQueue', () => {
       queue.flush();
 
       expect(queue.getLength()).toBe(0);
+    });
+  });
+
+  describe('stack safety', () => {
+    jest.setTimeout(30000);
+
+    // This test would overflow with synchronous recursion in execute()
+    // because it would re-enter execute() ~N times on the same call stack.
+    // With microtask/macrotask handoff, the stack stays flat.
+    it('processes very long queues without call stack overflow', async () => {
+      const N = 100_000; // large enough to blow typical V8 stacks if recursion is sync
+      const queue = new PromiseQueue({name: 'HugeQueue', concurrent: 1, timeout: 10_000, paused: true});
+
+      let ran = 0;
+      const task = async () => {
+        ran++;
+      };
+
+      for (let i = 0; i < N; i++) {
+        void queue.push(task);
+      }
+
+      queue.resume();
+
+      // Push a sentinel task and await it: when it resolves,
+      // all previous tasks must have completed.
+      await queue.push(() => Promise.resolve('sentinel'));
+
+      expect(ran).toBe(N);
     });
   });
 });

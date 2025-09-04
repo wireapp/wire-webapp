@@ -730,8 +730,10 @@ export class ConversationService extends TypedEventEmitter<Events> {
 
   private async handleMLSWelcomeMessageEvent(event: ConversationMLSWelcomeEvent) {
     try {
+      this.logger.info('Handling MLS welcome message event', {event});
       return await this.mlsService.handleMLSWelcomeMessageEvent(event, this.apiClient.validatedClientId);
     } catch (error) {
+      this.logger.warn('Failed to handle MLS welcome message event', {event, error});
       if (isCoreCryptoMLSOrphanWelcomeMessageError(error)) {
         const {qualified_conversation: conversationId} = event;
 
