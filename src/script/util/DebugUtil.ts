@@ -67,7 +67,6 @@ import {getLogger, Logger} from 'Util/Logger';
 import {TIME_IN_MILLIS} from './TimeUtil';
 import {createUuid} from './uuid';
 
-import {Config} from '../Config';
 import {E2EIHandler} from '../E2EIdentity';
 import {checkVersion} from '../lifecycle/newVersionHandler';
 import {APIClient} from '../service/APIClientSingleton';
@@ -243,8 +242,7 @@ export class DebugUtil {
   reconnectWebSocket({dryRun} = {dryRun: false}) {
     const teamFeatures = this.teamState.teamFeatures();
     const useAsyncNotificationStream =
-      teamFeatures?.[FEATURE_KEY.CONSUMABLE_NOTIFICATIONS]?.status === FeatureStatus.ENABLED &&
-      Config.getConfig().FEATURE.USE_ASYNC_NOTIFICATIONS;
+      teamFeatures?.[FEATURE_KEY.CONSUMABLE_NOTIFICATIONS]?.status === FeatureStatus.ENABLED;
     const useLegacyNotificationStream = !useAsyncNotificationStream;
     return this.eventRepository.connectWebSocket(this.core, useLegacyNotificationStream, () => {}, dryRun);
   }
