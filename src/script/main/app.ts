@@ -542,8 +542,7 @@ export class App {
 
       let totalNotifications = 0;
       const useAsyncNotificationStream =
-        teamFeatures[FEATURE_KEY.CONSUMABLE_NOTIFICATIONS]?.status === FeatureStatus.ENABLED &&
-        Config.getConfig().FEATURE.USE_ASYNC_NOTIFICATIONS;
+        teamFeatures[FEATURE_KEY.CONSUMABLE_NOTIFICATIONS]?.status === FeatureStatus.ENABLED;
       const useLegacyNotificationStream = !useAsyncNotificationStream;
 
       await eventRepository.connectWebSocket(
