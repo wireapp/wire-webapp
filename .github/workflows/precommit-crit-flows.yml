@@ -131,7 +131,7 @@ jobs:
 
       - run: yarn --immutable
       - run: yarn playwright install --with-deps && yarn playwright install chrome
-      - uses: 1password/install-cli-action@143a85f84a90555d121cde2ff5872e393a47ab9f
+      - uses: 1password/install-cli-action@f5d505685ccf986ef535da41cd180792c8ac3a36
 
       - name: Generate env file
         run: op inject -i test/e2e_tests/.env.tpl -o test/e2e_tests/.env
