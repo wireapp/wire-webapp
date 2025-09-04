@@ -1220,8 +1220,13 @@ export class MessageRepository {
    * @param buttonId the button selected id
    * @returns
    */
-  sendButtonAction(conversation: Conversation, message: CompositeMessage, buttonId: string): void {
+  async sendButtonAction(conversation: Conversation, message: CompositeMessage, buttonId: string): Promise<void> {
     if (conversation.isSelfUserRemoved()) {
+      return;
+    }
+
+    const changes = message.getSelectionChange(buttonId);
+    if (!changes) {
       return;
     }
 
@@ -1245,6 +1250,8 @@ export class MessageRepository {
         nativePush: false,
         skipInjection: true,
       });
+      const messageEntity = await this.getMessageInConversationById(conversation, message.id);
+      await this.eventService.updateEventSequentially({primary_key: messageEntity.primary_key, ...changes});
     } catch (error) {
       message.waitingButtonId(undefined);
       return message.setButtonError(buttonId, t('buttonActionError'));
