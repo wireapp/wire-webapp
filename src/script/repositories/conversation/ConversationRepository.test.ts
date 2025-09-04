@@ -2439,8 +2439,8 @@ describe('ConversationRepository', () => {
     });
   });
 
-  describe('shouldHandleCompositeMessagesActions', () => {
-    it('marks the button as selected from the button action confirmation event from another user', async () => {
+  describe('given a composite message event in a conversation', () => {
+    it('when the event is ButtonActionConfirmationEvent from another user, then marks the button as selected', async () => {
       // given
       const selfUser = generateUser();
       const botUserId = generateUser();
@@ -2485,7 +2485,7 @@ describe('ConversationRepository', () => {
       expect(retrievedMessage.selectedButtonId()).toBe(buttonActionConfirmationEvent.data.buttonId);
     });
 
-    it('marks the button as selected from the button action event if the event is triggered by the self user', async () => {
+    it('when the event is ButtonActionEvent from the self user, then marks the button as selected', async () => {
       // given
       const selfUser = generateUser();
       spyOn(testFactory.conversation_repository['userState'], 'self').and.returnValue(selfUser);
@@ -2527,7 +2527,7 @@ describe('ConversationRepository', () => {
       expect(retrievedMessage.selectedButtonId()).toBe(buttonActionEvent.data.buttonId);
     });
 
-    it('ignores the button action event if the event is NOT triggered by the self user', async () => {
+    it('when the event is ButtonActionEvent from another user, then ignores the event and no button is selected', async () => {
       // given
       const selfUser = generateUser();
       const otherUser = generateUser();

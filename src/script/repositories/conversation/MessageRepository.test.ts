@@ -189,8 +189,8 @@ describe('MessageRepository', () => {
     });
   });
 
-  describe('sendButtonAction', () => {
-    it('sends a button action confirmation message', async () => {
+  describe('given a button action confirmation message', () => {
+    it('when the message is sent, then should send without targeted parameters', async () => {
       // given
       const [messageRepository, {core, eventRepository}] = await buildMessageRepository();
       jest.spyOn(core.service!.conversation, 'send').mockResolvedValue(successPayload);
