@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.4.3](https://github.com/wireapp/wire-web-packages/compare/@wireapp/promise-queue@2.4.2...@wireapp/promise-queue@2.4.3) (2025-09-04)
+
+### Bug Fixes
+
+* **core, promise-queue:** Timeout error for message decryption tasks (WPB-18410) ([#7279](https://github.com/wireapp/wire-web-packages/issues/7279)) ([577a0aa](https://github.com/wireapp/wire-web-packages/commit/577a0aacbc6330661f74819c6cf922792f3e1620))
+
 ## [2.4.2](https://github.com/wireapp/wire-web-packages/compare/@wireapp/promise-queue@2.4.1...@wireapp/promise-queue@2.4.2) (2025-08-11)
 
 **Note:** Version bump only for package @wireapp/promise-queue
