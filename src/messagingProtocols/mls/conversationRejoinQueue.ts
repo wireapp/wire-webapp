@@ -39,9 +39,9 @@ export async function queueConversationRejoin<T>(groupId: string, rejoinFn: Task
 }
 
 export function resumeRejoiningMLSConversations(): void {
-  sendingQueue.pause(false);
+  sendingQueue.resume();
 }
 
 export function pauseRejoiningMLSConversations(): void {
-  sendingQueue.pause(true);
+  sendingQueue.pause();
 }

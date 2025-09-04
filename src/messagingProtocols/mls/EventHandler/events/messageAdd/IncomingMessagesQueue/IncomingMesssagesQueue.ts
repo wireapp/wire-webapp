@@ -55,13 +55,13 @@ export const deleteMLSMessagesQueue = (groupId: string) => {
 const lockMLSMessagesQueue = (groupId: string) => {
   logger.info(`Locking incoming MLS messages queue for group ${groupId}`);
   const conversationQueue = getQueue(groupId);
-  conversationQueue.pause(true);
+  conversationQueue.pause();
 };
 
 const unlockMLSMessagesQueue = (groupId: string) => {
   logger.info(`Unlocking incoming MLS messages queue for group ${groupId}`);
   const conversationQueue = getQueue(groupId);
-  conversationQueue.pause(false);
+  conversationQueue.resume();
 };
 
 export const withLockedMLSMessagesQueue = async <T>(groupId: string, fn: () => Promise<T>): Promise<T> => {
