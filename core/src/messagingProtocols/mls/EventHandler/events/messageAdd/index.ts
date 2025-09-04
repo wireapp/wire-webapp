@@ -18,4 +18,3 @@
  */
 
 export * from './messageAdd';
-export * from './IncomingMessagesQueue';
