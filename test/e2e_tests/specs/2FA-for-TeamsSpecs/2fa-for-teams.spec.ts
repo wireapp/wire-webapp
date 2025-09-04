@@ -18,31 +18,41 @@
  */
 
 import {getUser, User} from 'test/e2e_tests/data/user';
-import {addCreatedTeam, addCreatedUser, removeCreatedTeam} from 'test/e2e_tests/utils/tearDown.util';
+import {addCreatedTeam, addCreatedUser, tearDownAll} from 'test/e2e_tests/utils/tearDown.util';
 import {loginUser} from 'test/e2e_tests/utils/userActions';
 
 import {test} from '../../test.fixtures';
 
 test.describe('f2a for teams', () => {
+  test.slow();
   const teamName = 'Critical';
 
-  let createdUser: User | undefined = undefined;
+  let owner: User = getUser();
+  const member1 = getUser();
 
   test.beforeAll(async ({api}) => {
-    const owner = getUser();
-    createdUser = await api.createTeamOwner(owner, teamName);
-    addCreatedUser(createdUser);
-    addCreatedTeam(createdUser, createdUser.teamId);
+    const user = await api.createTeamOwner(owner, teamName);
+    owner = {...owner, ...user};
+    addCreatedTeam(owner, owner.teamId);
+    addCreatedUser(owner);
+    const invitationIdForMember1 = await api.team.inviteUserToTeam(member1.email, owner);
+    const invitationCodeForMember1 = await api.brig.getTeamInvitationCodeForEmail(owner.teamId, invitationIdForMember1);
+
+    await api.createPersonalUser(member1, invitationCodeForMember1);
+    addCreatedUser(member1);
+
+    await api.featureConfig.enableSndFactorPasswordChallenge(owner, owner.teamId);
+    // console.log({teamid: owner.teamId, token: owner.token});
   });
 
   test('2FA Code', {tag: ['@TC-8749', '@regression']}, async ({pageManager}) => {
     // enable f2a for user
-    if (createdUser === undefined) {
+    if (owner === undefined) {
       return;
     }
     // go to login page
     await pageManager.openMainPage();
-    await loginUser(createdUser, pageManager);
+    await loginUser(owner, pageManager);
     await pageManager.webapp.modals.dataShareConsent().clickDecline();
     // check if pages contain f2a
   });
@@ -63,9 +73,9 @@ test.describe('f2a for teams', () => {
     },
   );
   test.afterAll(async ({api}) => {
-    if (createdUser === undefined) {
+    if (owner === undefined) {
       return;
     }
-    removeCreatedTeam(api, createdUser);
+    tearDownAll(api);
   });
 });
