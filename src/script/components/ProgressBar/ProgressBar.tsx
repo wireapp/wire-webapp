@@ -32,7 +32,7 @@ const ProgressBar: FC<ProgressBarProps> = ({message, progress = 0, className = '
   <div className={cx('loading-bar', {'text-center': centerText}, className)}>
     {message && <div className="progress-console">{message}</div>}
     <div className="progress-bar">
-      <div data-uie-name="loading-bar-progress" style={{width: `${progress}%`}}></div>
+      <div data-uie-name="progress-bar-progress" style={{width: `${progress}%`}}></div>
     </div>
   </div>
 );

@@ -26,6 +26,6 @@ describe('ProgressBar', () => {
     const props = {message: 'example', progress: 30};
 
     const {getByTestId} = render(<ProgressBar {...props} />);
-    expect(getByTestId('Progress-bar-progress').getAttribute('style')).toBe('width: 30%;');
+    expect(getByTestId('progress-bar-progress').getAttribute('style')).toBe('width: 30%;');
   });
 });
