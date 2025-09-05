@@ -25,8 +25,8 @@ import {container} from 'tsyringe';
 import {Button, ButtonVariant, FlexBox} from '@wireapp/react-ui-kit';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
-import {LoadingBar} from 'Components/LoadingBar/LoadingBar';
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
+import {ProgressBar} from 'Components/ProgressBar/ProgressBar';
 import {CancelError} from 'Repositories/backup/Error';
 import {ClientState} from 'Repositories/client/ClientState';
 import {User} from 'Repositories/entity/User';
@@ -226,11 +226,11 @@ const HistoryExport = ({switchContent, user, clientState = container.resolve(Cli
 
   return (
     <div id="history-export">
-      {isPreparing && <LoadingBar progress={loadingProgress} message={loadingMessage} />}
+      {isPreparing && <ProgressBar progress={loadingProgress} message={loadingMessage} />}
 
       {isExporting && (
         <>
-          <LoadingBar progress={loadingProgress} message={loadingMessage} className="with-cancel" />
+          <ProgressBar progress={loadingProgress} message={loadingMessage} className="with-cancel" />
 
           <Button variant={ButtonVariant.SECONDARY} onClick={onCancel} data-uie-name="do-cancel-history-export">
             {t('backupCancel')}
