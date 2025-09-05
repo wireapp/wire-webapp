@@ -18,7 +18,7 @@
  */
 
 import {getUser, User} from 'test/e2e_tests/data/user';
-import {addCreatedTeam, addCreatedUser} from 'test/e2e_tests/utils/tearDown.util';
+import {addCreatedTeam, addCreatedUser, removeCreatedTeam, removeCreatedUser} from 'test/e2e_tests/utils/tearDown.util';
 import {loginUser} from 'test/e2e_tests/utils/userActions';
 
 import {test, expect} from '../../test.fixtures';
@@ -42,7 +42,7 @@ test.describe('f2a for teams', () => {
     addCreatedUser(member1);
 
     await api.brig.unlockSndFactorPasswordChallenge(owner.teamId);
-    await api.featureConfig.enableSndFactorPasswordChallenge(owner, owner.teamId);
+    await api.featureConfig.changeStateSndFactorPasswordChallenge(owner, owner.teamId, 'enabled');
   });
 
   test('2FA Code', {tag: ['@TC-8749', '@regression']}, async ({pageManager, api}) => {
@@ -120,14 +120,25 @@ test.describe('f2a for teams', () => {
   test(
     'I want to verify that verification code is not required after login if 2FA has been disabled',
     {tag: ['@TC-8749', '@regression']},
-    async ({pageManager}) => {
+    async ({pageManager, api}) => {
       //
+
+      await api.featureConfig.changeStateSndFactorPasswordChallenge(owner, owner.teamId, 'disabled');
+
+      await pageManager.openMainPage();
+      await loginUser(owner, pageManager);
+
+      await pageManager.webapp.components
+        .conversationSidebar()
+        .personalUserName.waitFor({state: 'visible', timeout: 60_000});
+
+      await expect(pageManager.webapp.components.conversationSidebar().personalUserName).toBeVisible();
     },
   );
   test.afterAll(async ({api}) => {
     if (owner === undefined) {
     }
-    //await removeCreatedTeam(api, owner);
-    // await removeCreatedUser(api, owner);
+    await removeCreatedTeam(api, owner);
+    await removeCreatedUser(api, owner);
   });
 });

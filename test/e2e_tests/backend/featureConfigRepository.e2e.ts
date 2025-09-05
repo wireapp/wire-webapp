@@ -34,7 +34,7 @@ export class FeatureConfigRepositoryE2E extends BackendClientE2E {
     return response.data[FeatureKey]?.status === FeatureStatus.ENABLED;
   }
 
-  async enableSndFactorPasswordChallenge(user: User, teamId: string) {
+  async changeStateSndFactorPasswordChallenge(user: User, teamId: string, status: string) {
     await this.axiosInstance.request({
       url: `teams/${teamId}/features/sndFactorPasswordChallenge`,
       method: 'PUT',
@@ -42,7 +42,7 @@ export class FeatureConfigRepositoryE2E extends BackendClientE2E {
         Authorization: `Bearer ${user.token}`,
       },
       data: {
-        status: 'enabled',
+        status: status,
         lockStatus: 'locked',
       },
     });
