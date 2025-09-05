@@ -30,15 +30,19 @@ import {uploadingProgressText} from './UploadAssetItem.styles';
 interface Props {
   assetRepository: AssetRepository;
   message: GenericMessage;
+  scrollToEnd?: () => void;
 }
 
-export const UploadAssetItem = ({assetRepository, message}: Props) => {
+export const UploadAssetItem = ({assetRepository, message, scrollToEnd}: Props) => {
   const [uploadProgress, setUploadProgress] = useState(0);
 
   useEffect(() => {
     const progressSubscribable = assetRepository.getUploadProgress(message.messageId);
     setUploadProgress(progressSubscribable());
     const subscription = progressSubscribable.subscribe(value => setUploadProgress(value));
+
+    scrollToEnd?.();
+
     return () => {
       subscription.dispose();
     };
