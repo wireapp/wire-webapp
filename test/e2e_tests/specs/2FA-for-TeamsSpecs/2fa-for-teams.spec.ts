@@ -18,10 +18,10 @@
  */
 
 import {getUser, User} from 'test/e2e_tests/data/user';
-import {addCreatedTeam, addCreatedUser, tearDownAll} from 'test/e2e_tests/utils/tearDown.util';
+import {addCreatedTeam, addCreatedUser} from 'test/e2e_tests/utils/tearDown.util';
 import {loginUser} from 'test/e2e_tests/utils/userActions';
 
-import {test} from '../../test.fixtures';
+import {test, expect} from '../../test.fixtures';
 
 test.describe('f2a for teams', () => {
   test.slow();
@@ -41,11 +41,11 @@ test.describe('f2a for teams', () => {
     await api.createPersonalUser(member1, invitationCodeForMember1);
     addCreatedUser(member1);
 
+    await api.brig.unlockSndFactorPasswordChallenge(owner.teamId);
     await api.featureConfig.enableSndFactorPasswordChallenge(owner, owner.teamId);
-    // console.log({teamid: owner.teamId, token: owner.token});
   });
 
-  test('2FA Code', {tag: ['@TC-8749', '@regression']}, async ({pageManager}) => {
+  test('2FA Code', {tag: ['@TC-8749', '@regression']}, async ({pageManager, api}) => {
     // enable f2a for user
     if (owner === undefined) {
       return;
@@ -53,15 +53,67 @@ test.describe('f2a for teams', () => {
     // go to login page
     await pageManager.openMainPage();
     await loginUser(owner, pageManager);
+
+    const page = await pageManager.webapp.pages.emailVerification();
+    const isVisible = await page.isEmailVerificationPageVisible();
+
+    await expect(isVisible).toBeTruthy();
+    // wait for mail
+    await new Promise(resolve => setTimeout(resolve, 1500));
+    const correctCode = await api.inbucket.getVerificationCode(owner.email);
+
+    //case: enter an incorrect code
+    await new Promise(resolve => setTimeout(resolve, 3500));
+    await page.enterVerificationCode('123456');
+
+    await expect(page.errorLabel).toBeVisible();
+    const errorText = await page.errorLabel.innerText();
+    expect(errorText).toContain('Please retry, or request another code.');
+
+    await page.clearCode();
+    await page.enterVerificationCode(correctCode);
+    // enter don't work
+    await page.pressSubmit();
+
+    // main screen loads over 45 secs
+    await pageManager.webapp.components
+      .conversationSidebar()
+      .personalUserName.waitFor({state: 'visible', timeout: 60_000});
+
     await pageManager.webapp.modals.dataShareConsent().clickDecline();
-    // check if pages contain f2a
+    await expect(pageManager.webapp.components.conversationSidebar().personalUserName).toBeVisible();
   });
 
   test(
-    'I want to receive new verification code email after clicking "Resend code" button 0',
+    'I want to receive new verification code email after clicking "Resend code" button',
     {tag: ['@TC-40', '@regression']},
     async ({pageManager, api}) => {
-      //
+      await pageManager.openMainPage();
+      await loginUser(owner, pageManager);
+
+      const emailPage = await pageManager.webapp.pages.emailVerification();
+      const isVisible = await emailPage.isEmailVerificationPageVisible();
+      await expect(isVisible).toBeTruthy();
+
+      const page = await pageManager.getPage();
+      // wait for mail
+      await page.waitForTimeout(2000);
+      const oldCode = await api.inbucket.getVerificationCode(owner.email);
+
+      expect(oldCode.length).toBe(6);
+      expect(Number.isInteger(parseInt(oldCode))).toBeTruthy();
+
+      const sendRequest = page.waitForRequest('*/**/verification-code/send');
+      await page.waitForTimeout(2000); // get every time 429
+      await emailPage.resendButton.click();
+      await sendRequest;
+
+      await page.waitForTimeout(3000);
+      const newCode = await api.inbucket.getVerificationCode(owner.email);
+
+      expect(oldCode).not.toBe(newCode);
+      expect(Number.isInteger(parseInt(newCode))).toBeTruthy();
+      expect(newCode.length).toBe(6);
     },
   );
 
@@ -74,8 +126,8 @@ test.describe('f2a for teams', () => {
   );
   test.afterAll(async ({api}) => {
     if (owner === undefined) {
-      return;
     }
-    tearDownAll(api);
+    //await removeCreatedTeam(api, owner);
+    // await removeCreatedUser(api, owner);
   });
 });
