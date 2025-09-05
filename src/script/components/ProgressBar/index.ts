@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2021 Wire Swiss GmbH
+ * Copyright (C) 2022 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,23 +17,4 @@
  *
  */
 
-import {FC} from 'react';
-
-import cx from 'classnames';
-
-import {Loading} from '@wireapp/react-ui-kit';
-
-export interface LoadingBarProps {
-  message?: string;
-  className?: string;
-  centerText?: boolean;
-}
-
-const LoadingBar: FC<LoadingBarProps> = ({message, className = '', centerText = true}) => (
-  <div className={cx('loading-bar', {'text-center': centerText}, className)}>
-    {message && <div className="progress-console">{message}</div>}
-    <Loading size={16} />
-  </div>
-);
-
-export {LoadingBar};
+export * from './ProgressBar';

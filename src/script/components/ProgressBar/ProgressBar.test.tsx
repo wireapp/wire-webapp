@@ -17,23 +17,15 @@
  *
  */
 
-import {FC} from 'react';
+import {render} from '@testing-library/react';
 
-import cx from 'classnames';
+import {ProgressBar} from './ProgressBar';
 
-import {Loading} from '@wireapp/react-ui-kit';
+describe('ProgressBar', () => {
+  it('renders correct progress', async () => {
+    const props = {message: 'example', progress: 30};
 
-export interface LoadingBarProps {
-  message?: string;
-  className?: string;
-  centerText?: boolean;
-}
-
-const LoadingBar: FC<LoadingBarProps> = ({message, className = '', centerText = true}) => (
-  <div className={cx('loading-bar', {'text-center': centerText}, className)}>
-    {message && <div className="progress-console">{message}</div>}
-    <Loading size={16} />
-  </div>
-);
-
-export {LoadingBar};
+    const {getByTestId} = render(<ProgressBar {...props} />);
+    expect(getByTestId('Progress-bar-progress').getAttribute('style')).toBe('width: 30%;');
+  });
+});
