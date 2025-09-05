@@ -107,7 +107,7 @@ export const VirtualizedMessagesList = ({
   const virtualizer = useVirtualizer({
     count: groupedMessages.length,
     getScrollElement: () => parentElement,
-    estimateSize: () => ESTIMATED_ELEMENT_SIZE,
+    estimateSize: () => parentElement.clientHeight,
     measureElement: element => element?.getBoundingClientRect().height || ESTIMATED_ELEMENT_SIZE,
   });
 
