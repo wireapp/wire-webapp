@@ -549,8 +549,7 @@ export class App {
 
       let totalNotifications = 0;
       const useAsyncNotificationStream =
-        teamFeatures[FEATURE_KEY.CONSUMABLE_NOTIFICATIONS]?.status === FeatureStatus.ENABLED &&
-        Config.getConfig().FEATURE.USE_ASYNC_NOTIFICATIONS;
+        teamFeatures[FEATURE_KEY.CONSUMABLE_NOTIFICATIONS]?.status === FeatureStatus.ENABLED;
       const useLegacyNotificationStream = !useAsyncNotificationStream;
 
       await eventRepository.connectWebSocket(
@@ -562,13 +561,12 @@ export class App {
            * was offline for a while hence it can be used to demonstrate number of pending messages
            * even when app is already loaded and in the main screen view
            */
-          const baseMessage = t('initDecryption');
-          const extraInfo = this.config.FEATURE.SHOW_LOADING_INFORMATION
+          const message = this.config.FEATURE.SHOW_LOADING_INFORMATION
             ? ` ${t('initProgress', {time: formatCoarseDuration(durationFrom(currentProcessingNotificationTimestamp))})}`
             : '';
 
           totalNotifications++;
-          onProgress(`${baseMessage}${extraInfo}`);
+          onProgress(message);
         },
       );
 

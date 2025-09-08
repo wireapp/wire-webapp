@@ -30,7 +30,7 @@ export class CallNotEstablishedModal {
   constructor(page: Page) {
     this.page = page;
 
-    this.modal = page.locator("[data-uie-name='primary-modals-container'][aria-label='Call Not Established']");
+    this.modal = page.locator("[data-uie-name='primary-modals-container'][aria-label='Call not established']");
     this.modalTitle = this.modal.locator("[data-uie-name='status-modal-title']");
     this.modalText = this.modal.locator("[data-uie-name='status-modal-text']");
     this.okButton = this.modal.locator("[data-uie-name='do-action']");

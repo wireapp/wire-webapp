@@ -2293,8 +2293,43 @@ export class ConversationRepository {
    * @returns Resolves when conversation was saved
    */
   saveConversation(conversationEntity: Conversation) {
-    this.conversationState.upsertConversation(conversationEntity);
+    // Look up an existing conversation with the same ID so we can merge if necessary
+    const existingConversation = this.conversationState.findConversation(conversationEntity.qualifiedId);
 
+    // Build a plain object copy of the entity, excluding methods
+    const conversationData: Partial<Record<keyof Conversation, unknown>> = {};
+    for (const key in conversationEntity) {
+      const value = conversationEntity[key as keyof Conversation];
+      if (typeof value !== 'function') {
+        conversationData[key as keyof Conversation] = value;
+      }
+    }
+
+    // Merge path: update the existing conversation with new fields
+    if (existingConversation) {
+      // Capture next and previous participant IDs
+      const nextParticipantIds = conversationEntity.participating_user_ids?.() || [];
+      const prevParticipantIds = existingConversation.participating_user_ids?.() || [];
+
+      // If the old conversation had participants and the new one doesn’t, drop the field
+      if (prevParticipantIds.length > 0 && nextParticipantIds.length === 0) {
+        delete conversationData.participating_user_ids;
+      }
+
+      // Apply merged data and persist the updated conversation
+      ConversationMapper.updateProperties(existingConversation, conversationData);
+      this.conversationState.upsertConversation(existingConversation);
+
+      // Save to storage
+      return this.saveConversationStateInDb(existingConversation);
+    }
+
+    // New conversation path: drop an empty participant list if present
+    if (conversationEntity.participating_user_ids().length === 0) {
+      delete conversationData.participating_user_ids;
+    }
+
+    this.conversationState.upsertConversation(conversationEntity);
     return this.saveConversationStateInDb(conversationEntity);
   }
 
