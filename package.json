@@ -65,7 +65,7 @@
     "speakingurl": "14.0.1",
     "tsyringe": "4.10.0",
     "underscore": "1.13.7",
-    "use-debounce": "^10.0.5",
+    "use-debounce": "^10.0.6",
     "uuid": "11.1.0",
     "webgl-utils.js": "1.1.0",
     "webrtc-adapter": "9.0.3",
