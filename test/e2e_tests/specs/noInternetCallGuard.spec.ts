@@ -93,7 +93,7 @@ test('Starting call 1:1 call without internet', async ({browser, pageManager: ow
       await makeNetworkOffline(ownerAPageManager);
       await ownerAPages.conversation().startCall();
       expect(await ownerAModals.callNotEstablished().isModalPresent());
-      expect(await ownerAModals.callNotEstablished().getModalTitle()).toContain('Call Not Established');
+      expect(await ownerAModals.callNotEstablished().getModalTitle()).toContain('Call not established');
       await ownerAModals.callNotEstablished().clickOk();
     } catch (error) {
       console.error('Error during call initiation:', error);
@@ -116,7 +116,7 @@ test('Starting call 1:1 call without internet', async ({browser, pageManager: ow
     await makeNetworkOffline(ownerBPageManager);
     await ownerBPages.conversation().startCall();
     expect(await ownerBModals.callNotEstablished().isModalPresent());
-    expect(await ownerBModals.callNotEstablished().getModalTitle()).toContain('Call Not Established');
+    expect(await ownerBModals.callNotEstablished().getModalTitle()).toContain('Call not established');
     await ownerBModals.callNotEstablished().clickOk();
   });
 
