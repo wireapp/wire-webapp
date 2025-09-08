@@ -88,7 +88,7 @@ export class PromiseQueue {
      * In long queues (like app startup notifications) it can lead to memory bloat and unnecessary wake-ups in the event loop.
      */
     let timeoutId: ReturnType<typeof setTimeout>;
-    const timeout = new Promise<never>((_, reject) => {
+    const timeoutPromise = new Promise<never>((_, reject) => {
       timeoutId = setTimeout(() => {
         this.logger?.warn?.(
           `Promise queue task timed-out after ${this.timeout}ms, rejecting and advancing to the next task in queue`,
@@ -100,7 +100,7 @@ export class PromiseQueue {
       }, this.timeout);
     });
 
-    Promise.race([queueEntry.fn(), timeout])
+    Promise.race([queueEntry.fn(), timeoutPromise])
       .then(result => queueEntry.resolveFn(result as any))
       .catch(err => {
         queueEntry.resolveFn = () => {};
