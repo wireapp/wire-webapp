@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [27.75.6](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@27.75.5...@wireapp/api-client@27.75.6) (2025-09-08)
+
+### Bug Fixes
+
+* create fresh error instances via handler functions in BackendErrorMapper and add fallback for unknown messages(WPB-19061) ([#7323](https://github.com/wireapp/wire-web-packages/issues/7323)) ([493600c](https://github.com/wireapp/wire-web-packages/commit/493600cbf2b1f373a7beababd61466de947688c3))
+
 ## [27.75.5](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@27.75.4...@wireapp/api-client@27.75.5) (2025-09-08)
 
 **Note:** Version bump only for package @wireapp/api-client
