@@ -18,6 +18,7 @@
     "@wireapp/commons": "5.4.4",
     "@wireapp/core": "46.34.7",
     "@wireapp/kalium-backup": "0.0.4",
+    "@wireapp/promise-queue": "2.4.4",
     "@wireapp/react-ui-kit": "9.63.0",
     "@wireapp/store-engine-dexie": "2.1.15",
     "@wireapp/telemetry": "0.3.1",
