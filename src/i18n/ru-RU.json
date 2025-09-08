@@ -345,7 +345,7 @@
   "callNotEstablishedDescriptionPoint1": "Использовать другую сеть (мобильные данные или Wi-Fi)",
   "callNotEstablishedDescriptionPoint2": "Если вы используете VPN, отключите",
   "callNotEstablishedDescriptionPoint3": "Если вы находитесь в корпоративной сети, проверьте вместе с вашим системным администратором",
-  "callNotEstablishedTitle": "Вызов не установлен",
+  "callNotEstablishedTitle": "Call not established",
   "callParticipants": "{number} участника(-ов)",
   "callReactionButtonAriaLabel": "Выбрать смайлик {emoji}",
   "callReactionButtonsAriaLabel": "Реакции",
