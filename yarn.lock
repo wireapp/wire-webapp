@@ -8644,9 +8644,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@wireapp/core@npm:46.34.7":
-  version: 46.34.7
-  resolution: "@wireapp/core@npm:46.34.7"
+"@wireapp/core@npm:46.34.8":
+  version: 46.34.8
+  resolution: "@wireapp/core@npm:46.34.8"
   dependencies:
     "@wireapp/api-client": "npm:^27.75.6"
     "@wireapp/commons": "npm:^5.4.4"
@@ -8666,7 +8666,7 @@ __metadata:
     long: "npm:^5.2.0"
     uuid: "npm:9.0.1"
     zod: "npm:3.24.2"
-  checksum: 10/b67b975e1ea54b7d4d4b92201d4713232b3508eb6cfa0d6b61084328aa8e0d78d05e747c44569dc2ff1f0f3fe715cdd012e55726790ecba89e246ed9e9684ee4
+  checksum: 10/2d4c9e38c3ed62ad9fd3e4e9005df5c6c76c0fa48ac43da1bcdb649b1ff5e002de9a811a6c85ebc6b8c98b2c1e128a9f1115677d9732ac142d23cc427e5680cf
   languageName: node
   linkType: hard
 
@@ -8762,7 +8762,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@wireapp/promise-queue@npm:^2.4.4":
+"@wireapp/promise-queue@npm:2.4.4, @wireapp/promise-queue@npm:^2.4.4":
   version: 2.4.4
   resolution: "@wireapp/promise-queue@npm:2.4.4"
   checksum: 10/ec3b8ecde2d3f5438389f1328c90cd95887ed4f1b2f1bb14423d2fec064b48acfacf96f448adf6f96ed27988298f5e8b387c73b737d32e6948d25a92e49962e1
@@ -22385,10 +22385,11 @@ __metadata:
     "@wireapp/avs-debugger": "npm:0.0.7"
     "@wireapp/commons": "npm:5.4.4"
     "@wireapp/copy-config": "npm:2.3.2"
-    "@wireapp/core": "npm:46.34.7"
+    "@wireapp/core": "npm:46.34.8"
     "@wireapp/eslint-config": "npm:3.0.7"
     "@wireapp/kalium-backup": "npm:0.0.4"
     "@wireapp/prettier-config": "npm:0.6.4"
+    "@wireapp/promise-queue": "npm:2.4.4"
     "@wireapp/react-ui-kit": "npm:9.63.0"
     "@wireapp/store-engine": "npm:5.1.11"
     "@wireapp/store-engine-dexie": "npm:2.1.15"
