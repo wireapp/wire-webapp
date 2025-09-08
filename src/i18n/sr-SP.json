@@ -1096,7 +1096,7 @@
   "index.welcome": "Welcome to {brandName}!",
   "initDecryption": "Дешифрирање порука",
   "initEvents": "Учитавање порука",
-  "initProgress": "Loading messages from {time} ago",
+  "initProgress": "Loading messages from the last {time}",
   "initReceivedSelfUser": "Hello, {user}.",
   "initReceivedUserData": "Проверавам нове поруке",
   "initUpdatedFromNotifications": "Скоро готово - уживајте {brandName}",
