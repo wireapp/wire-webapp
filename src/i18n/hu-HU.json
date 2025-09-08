@@ -345,7 +345,7 @@
   "callNotEstablishedDescriptionPoint1": "Use another network (mobile data or Wi-Fi)",
   "callNotEstablishedDescriptionPoint2": "If you use a VPN, disconnect",
   "callNotEstablishedDescriptionPoint3": "If you are in a corporate network, check with your system admin",
-  "callNotEstablishedTitle": "Call Not Established",
+  "callNotEstablishedTitle": "Call not established",
   "callParticipants": "{number} partner a vonalban",
   "callReactionButtonAriaLabel": "Select emoji {emoji}",
   "callReactionButtonsAriaLabel": "Reactions",
