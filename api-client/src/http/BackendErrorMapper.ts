@@ -17,85 +17,124 @@
  *
  */
 
+import {StatusCodes as StatusCode} from 'http-status-codes';
+
 import {
   IdentifierExistsError,
   InvalidCredentialsError,
-  InvalidTokenError,
   LoginTooFrequentError,
+  SuspendedAccountError,
+  InvalidTokenError,
   MissingCookieAndTokenError,
   MissingCookieError,
-  SuspendedAccountError,
   TokenExpiredError,
 } from '../auth/';
 import {ConversationIsUnknownError, ConversationOperationError} from '../conversation/';
 import {InvalidInvitationCodeError, InviteEmailInUseError, ServiceNotFoundError} from '../team/';
 import {UnconnectedUserError, UserIsUnknownError} from '../user/';
 
-import {BackendError, BackendErrorLabel, StatusCode} from './';
+import {BackendError, BackendErrorLabel} from './';
+
+type BackendErrorWithLabel = BackendError & {label: BackendErrorLabel};
+type ErrorBuilder = (e: BackendErrorWithLabel) => BackendError;
+
+// A mapper builds the appropriate error instance from the backend error payload.
+type ErrorLabelToBuilderMap = Partial<Record<BackendErrorLabel, ErrorBuilder>>;
+
+type StatusCodeToLabelMap = Partial<Record<StatusCode, ErrorLabelToBuilderMap>>;
+type MessageToBuilderMap = Record<string, ErrorBuilder>;
+type StatusCodeToMessageVariantMap = Partial<
+  Record<StatusCode, Partial<Record<BackendErrorLabel, MessageToBuilderMap>>>
+>;
 
 export class BackendErrorMapper {
-  public static get ERRORS(): Record<number, Record<string, Record<string, BackendError>>> {
-    return {
-      [StatusCode.BAD_REQUEST]: {
-        [BackendErrorLabel.CLIENT_ERROR]: {
-          'Error in $: Failed reading: satisfy': new BackendError('Wrong set of parameters.'),
-          "[path] 'cnv' invalid: Failed reading: Invalid UUID": new ConversationIsUnknownError(
-            'Conversation ID is unknown.',
+  /**
+   * Baseline/default handler for each (code, label). Used when no message variant matches.
+   */
+  public static defaultHandlers: StatusCodeToLabelMap = {
+    [StatusCode.BAD_REQUEST]: {
+      [BackendErrorLabel.CLIENT_ERROR]: e => new BackendError('Wrong set of parameters.', e.label, e.code),
+
+      [BackendErrorLabel.INVALID_INVITATION_CODE]: e =>
+        new InvalidInvitationCodeError('Invalid invitation code.', e.label, e.code),
+    },
+
+    [StatusCode.FORBIDDEN]: {
+      [BackendErrorLabel.INVALID_CREDENTIALS]: e =>
+        // default to logout-safe type for unknown messages
+        new InvalidTokenError('Authentication failed because the token is invalid.', e.label, e.code),
+
+      [BackendErrorLabel.CLIENT_ERROR]: e => new BackendError('Operation not permitted.', e.label, e.code),
+
+      [BackendErrorLabel.NOT_CONNECTED]: e => new UnconnectedUserError('Users are not connected.', e.label, e.code),
+
+      [BackendErrorLabel.INVALID_OPERATION]: e =>
+        new ConversationOperationError('Cannot perform this operation.', e.label, e.code),
+
+      [BackendErrorLabel.SUSPENDED_ACCOUNT]: e => new SuspendedAccountError('Account suspended.', e.label, e.code),
+    },
+
+    [StatusCode.TOO_MANY_REQUESTS]: {
+      [BackendErrorLabel.CLIENT_ERROR]: e =>
+        new LoginTooFrequentError('Logins too frequent. User login temporarily disabled.', e.label, e.code),
+    },
+
+    [StatusCode.CONFLICT]: {
+      [BackendErrorLabel.INVITE_EMAIL_EXISTS]: e =>
+        new InviteEmailInUseError('The given e-mail address is in use.', e.label, e.code),
+
+      [BackendErrorLabel.KEY_EXISTS]: e =>
+        new IdentifierExistsError('The given e-mail address is in use.', e.label, e.code),
+    },
+
+    [StatusCode.NOT_FOUND]: {
+      [BackendErrorLabel.NOT_FOUND]: e => new ServiceNotFoundError('Service not found', e.label, e.code),
+    },
+  };
+
+  /**
+   * Message-specific variants for known texts under a given (code,label).
+   * Provides finer granularity when wording matches; otherwise we fall back to defaultHandlers.
+   */
+  private static messageVariantHandlers: StatusCodeToMessageVariantMap = {
+    [StatusCode.BAD_REQUEST]: {
+      [BackendErrorLabel.CLIENT_ERROR]: {
+        'Error in $: Failed reading: satisfy': e => new BackendError('Wrong set of parameters.', e.label, e.code),
+        "[path] 'cnv' invalid: Failed reading: Invalid UUID": e =>
+          new ConversationIsUnknownError('Conversation ID is unknown.', e.label, e.code),
+        "[path] 'usr' invalid: Failed reading: Invalid UUID": e =>
+          new UserIsUnknownError('User ID is unknown.', e.label, e.code),
+      },
+    },
+    [StatusCode.FORBIDDEN]: {
+      [BackendErrorLabel.INVALID_CREDENTIALS]: {
+        'Invalid zauth token': e =>
+          new InvalidTokenError('Authentication failed because the token is invalid.', e.label, e.code),
+        'Invalid token': e =>
+          new InvalidTokenError('Authentication failed because the token is invalid.', e.label, e.code),
+        'Authentication failed.': e =>
+          new InvalidCredentialsError('Authentication failed because of invalid credentials.', e.label, e.code),
+        'Missing cookie': e =>
+          new MissingCookieError('Authentication failed because the cookie is missing.', e.label, e.code),
+        'Token expired': e =>
+          new TokenExpiredError('Authentication failed because the token is expired.', e.label, e.code),
+        'Missing cookie and token': e =>
+          new MissingCookieAndTokenError(
+            'Authentication failed because both cookie and token are missing.',
+            e.label,
+            e.code,
           ),
-          "[path] 'usr' invalid: Failed reading: Invalid UUID": new UserIsUnknownError('User ID is unknown.'),
-        },
-        [BackendErrorLabel.INVALID_INVITATION_CODE]: {
-          'Invalid invitation code.': new InvalidInvitationCodeError('Invalid invitation code.'),
-        },
       },
-      [StatusCode.FORBIDDEN]: {
-        [BackendErrorLabel.INVALID_CREDENTIALS]: {
-          'Invalid zauth token': new InvalidTokenError('Authentication failed because the token is invalid.'),
-          'Authentication failed.': new InvalidCredentialsError(
-            'Authentication failed because of invalid credentials.',
-          ),
-          'Invalid token': new InvalidTokenError('Authentication failed because the token is invalid.'),
-          'Missing cookie': new MissingCookieError('Authentication failed because the cookie is missing.'),
-          'Token expired': new TokenExpiredError('Authentication failed because the token is expired.'),
-          'Missing cookie and token': new MissingCookieAndTokenError(
-            'Authentication failed because the cookie and token is missing.',
-          ),
-        },
-        [BackendErrorLabel.CLIENT_ERROR]: {
-          'Failed reading: Invalid zauth token': new InvalidTokenError(
-            'Authentication failed because the token is invalid.',
-          ),
-        },
-        [BackendErrorLabel.NOT_CONNECTED]: {
-          'Users are not connected': new UnconnectedUserError('Users are not connected.'),
-        },
-        [BackendErrorLabel.INVALID_OPERATION]: {
-          'invalid operation for 1:1 conversations': new ConversationOperationError('Cannot leave 1:1 conversation.'),
-        },
-        [BackendErrorLabel.SUSPENDED_ACCOUNT]: {
-          'Account suspended.': new SuspendedAccountError('Account suspended.'),
-        },
+      [BackendErrorLabel.INVALID_OPERATION]: {
+        'invalid operation for 1:1 conversations': e =>
+          new ConversationOperationError('Cannot leave 1:1 conversation.', e.label, e.code),
       },
-      [StatusCode.TOO_MANY_REQUESTS]: {
-        [BackendErrorLabel.CLIENT_ERROR]: {
-          'Logins too frequent': new LoginTooFrequentError('Logins too frequent. User login temporarily disabled.'),
-        },
+      [BackendErrorLabel.CLIENT_ERROR]: {
+        'Failed reading: Invalid zauth token': e =>
+          new InvalidTokenError('Authentication failed because the token is invalid.', e.label, e.code),
       },
-      [StatusCode.CONFLICT]: {
-        [BackendErrorLabel.INVITE_EMAIL_EXISTS]: {
-          'The given e-mail address is in use.': new InviteEmailInUseError('The given e-mail address is in use.'),
-        },
-        [BackendErrorLabel.KEY_EXISTS]: {
-          'The given e-mail address is in use.': new IdentifierExistsError('The given e-mail address is in use.'),
-        },
-      },
-      [StatusCode.NOT_FOUND]: {
-        [BackendErrorLabel.NOT_FOUND]: {
-          'Service not found': new ServiceNotFoundError('Service not found'),
-        },
-      },
-    };
-  }
+    },
+  };
 
   private static logUnmapped(error: BackendError, reason: string) {
     if (process.env.NODE_ENV === 'development') {
@@ -109,16 +148,24 @@ export class BackendErrorMapper {
   }
 
   public static map(error: BackendError): BackendError {
-    try {
-      const mappedError: BackendError | undefined =
-        BackendErrorMapper.ERRORS[Number(error.code)][error.label][error.message];
-      if (mappedError) {
-        return mappedError;
-      }
-      this.logUnmapped(error, 'No matching entry found in error mapping');
-    } catch (mappingError) {
-      this.logUnmapped(error, 'Error mapping lookup failed with exception');
+    const code = Number(error.code) as StatusCode;
+    const label = error.label as BackendErrorLabel;
+    const message = error.message ?? '';
+
+    // 1) Message-specific variant
+    const messageVariantHandler = BackendErrorMapper.messageVariantHandlers[code]?.[label]?.[message];
+    if (messageVariantHandler) {
+      return messageVariantHandler(error as BackendErrorWithLabel);
     }
+
+    // 2) Default fallback for this (code,label)
+    const fallbackHandler = BackendErrorMapper.defaultHandlers[code]?.[label];
+    if (fallbackHandler) {
+      return fallbackHandler(error as BackendErrorWithLabel);
+    }
+
+    // 3) Unknown (code,label) — keep original but log in dev
+    this.logUnmapped(error, 'No mapping for code+label (+message)');
     return error;
   }
 }
