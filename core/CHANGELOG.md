@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [46.34.8](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@46.34.7...@wireapp/core@46.34.8) (2025-09-08)
+
+### Bug Fixes
+
+* Acknowledge messages on backend after webapp has processed them [WPB-19081] ([#7324](https://github.com/wireapp/wire-web-packages/issues/7324)) ([df6b1db](https://github.com/wireapp/wire-web-packages/commit/df6b1dbc9df88e811a846768ffc906aecfedbc2a))
+
 ## [46.34.7](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@46.34.6...@wireapp/core@46.34.7) (2025-09-08)
 
 **Note:** Version bump only for package @wireapp/core
