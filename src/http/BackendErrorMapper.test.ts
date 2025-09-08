@@ -93,8 +93,15 @@ describe('BackendErrorMapper', () => {
   });
 
   describe('Fallback behavior', () => {
-    it('returns original error when no mapping exists', () => {
-      const error = new BackendError('unknown message', BackendErrorLabel.CLIENT_ERROR, StatusCode.BAD_REQUEST);
+    it('falls back to default handler when message variant is unknown', () => {
+      const error = new BackendError('unknown message', BackendErrorLabel.INVALID_CREDENTIALS, StatusCode.FORBIDDEN);
+      const mapped = BackendErrorMapper.map(error);
+      expect(mapped).not.toBe(error);
+      expect(mapped).toBeInstanceOf(BackendError);
+      expect(mapped.message).toBe('Authentication failed because the token is invalid.');
+    });
+    it('returns original error when no handler exists for code and label', () => {
+      const error = new BackendError('unknown message', BackendErrorLabel.CLIENT_ERROR, StatusCode.UNAUTHORIZED);
       const mapped = BackendErrorMapper.map(error);
       expect(mapped).toBe(error);
     });
