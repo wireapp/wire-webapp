@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2021 Wire Swiss GmbH
+ * Copyright (C) 2025 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,15 +17,30 @@
  *
  */
 
-import {render} from '@testing-library/react';
+import {CSSObject} from '@emotion/react';
 
-import {LoadingBar} from './LoadingBar';
+export const headerIconBadge: CSSObject = {
+  display: 'inline-flex',
+  marginTop: '-2px',
+  marginLeft: '8px',
+  svg: {
+    fill: 'var(--background-fade-40)',
+  },
+};
 
-describe('LoadingBar', () => {
-  it('renders correct progress', async () => {
-    const props = {message: 'example', progress: 30};
+export const headerLabelBadge: CSSObject = {
+  fontSize: 'var(--font-size-small)',
+  fontWeight: 'var(--font-weight-regular)',
+  color: 'var(--text-input-placeholder)',
+  marginLeft: '4px',
+};
 
-    const {getByTestId} = render(<LoadingBar {...props} />);
-    expect(getByTestId('loading-bar-spinner')).toBeInTheDocument();
-  });
-});
+export const headerIconSizeS: CSSObject = {
+  width: '14px',
+  height: '14px',
+};
+
+export const headerIconSizeM: CSSObject = {
+  width: '16px',
+  height: '16px',
+};

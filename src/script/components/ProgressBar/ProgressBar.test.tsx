@@ -19,13 +19,13 @@
 
 import {render} from '@testing-library/react';
 
-import {LoadingBar} from './LoadingBar';
+import {ProgressBar} from './ProgressBar';
 
-describe('LoadingBar', () => {
+describe('ProgressBar', () => {
   it('renders correct progress', async () => {
     const props = {message: 'example', progress: 30};
 
-    const {getByTestId} = render(<LoadingBar {...props} />);
-    expect(getByTestId('loading-bar-spinner')).toBeInTheDocument();
+    const {getByTestId} = render(<ProgressBar {...props} />);
+    expect(getByTestId('progress-bar-progress').getAttribute('style')).toBe('width: 30%;');
   });
 });
