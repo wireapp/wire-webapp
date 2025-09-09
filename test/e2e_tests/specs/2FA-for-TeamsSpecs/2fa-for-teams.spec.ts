@@ -18,7 +18,7 @@
  */
 
 import {getUser, User} from 'test/e2e_tests/data/user';
-import {addCreatedTeam, addCreatedUser, removeCreatedTeam, removeCreatedUser} from 'test/e2e_tests/utils/tearDown.util';
+import {addCreatedTeam, addCreatedUser, tearDownAll} from 'test/e2e_tests/utils/tearDown.util';
 import {loginUser} from 'test/e2e_tests/utils/userActions';
 
 import {test, expect} from '../../test.fixtures';
@@ -26,31 +26,29 @@ import {test, expect} from '../../test.fixtures';
 test.describe('f2a for teams', () => {
   test.slow();
   const teamName = 'Critical';
-
   let owner: User = getUser();
   const member1 = getUser();
 
   test.beforeAll(async ({api}) => {
     const user = await api.createTeamOwner(owner, teamName);
+    if (!owner.token) {
+      throw new Error(`Owner ${owner.username} has no token and can't be used for team creation`);
+    }
     owner = {...owner, ...user};
-    addCreatedTeam(owner, owner.teamId);
-    addCreatedUser(owner);
+    addCreatedTeam(owner, owner.teamId!);
     const invitationIdForMember1 = await api.team.inviteUserToTeam(member1.email, owner);
     const invitationCodeForMember1 = await api.brig.getTeamInvitationCodeForEmail(owner.teamId, invitationIdForMember1);
 
     await api.createPersonalUser(member1, invitationCodeForMember1);
     addCreatedUser(member1);
-
     await api.brig.unlockSndFactorPasswordChallenge(owner.teamId);
     await api.featureConfig.changeStateSndFactorPasswordChallenge(owner, owner.teamId, 'enabled');
   });
 
   test('2FA Code', {tag: ['@TC-8749', '@regression']}, async ({pageManager, api}) => {
-    // enable f2a for user
     if (owner === undefined) {
       return;
     }
-    // go to login page
     await pageManager.openMainPage();
     await loginUser(owner, pageManager);
 
@@ -59,11 +57,12 @@ test.describe('f2a for teams', () => {
 
     await expect(isVisible).toBeTruthy();
     // wait for mail
-    await new Promise(resolve => setTimeout(resolve, 1500));
+    const currentPage = await pageManager.getPage();
+    await currentPage.waitForTimeout(500);
     const correctCode = await api.inbucket.getVerificationCode(owner.email);
 
     //case: enter an incorrect code
-    await new Promise(resolve => setTimeout(resolve, 3500));
+    await currentPage.waitForTimeout(500);
     await page.enterVerificationCode('123456');
 
     await expect(page.errorLabel).toBeVisible();
@@ -88,6 +87,8 @@ test.describe('f2a for teams', () => {
     'I want to receive new verification code email after clicking "Resend code" button',
     {tag: ['@TC-40', '@regression']},
     async ({pageManager, api}) => {
+      const oneMinTimeout = 62_000;
+      test.setTimeout(310_000);
       await pageManager.openMainPage();
       await loginUser(owner, pageManager);
 
@@ -103,8 +104,8 @@ test.describe('f2a for teams', () => {
       expect(oldCode.length).toBe(6);
       expect(Number.isInteger(parseInt(oldCode))).toBeTruthy();
 
-      const sendRequest = page.waitForRequest('*/**/verification-code/send');
-      await page.waitForTimeout(2000); // get every time 429
+      const sendRequest = page.waitForRequest('*/**/verification-code/send', {timeout: oneMinTimeout});
+      await page.waitForTimeout(61_000);
       await emailPage.resendButton.click();
       await sendRequest;
 
@@ -121,8 +122,6 @@ test.describe('f2a for teams', () => {
     'I want to verify that verification code is not required after login if 2FA has been disabled',
     {tag: ['@TC-8749', '@regression']},
     async ({pageManager, api}) => {
-      //
-
       await api.featureConfig.changeStateSndFactorPasswordChallenge(owner, owner.teamId, 'disabled');
 
       await pageManager.openMainPage();
@@ -138,7 +137,7 @@ test.describe('f2a for teams', () => {
   test.afterAll(async ({api}) => {
     if (owner === undefined) {
     }
-    await removeCreatedTeam(api, owner);
-    await removeCreatedUser(api, owner);
+    await api.featureConfig.changeStateSndFactorPasswordChallenge(owner, owner.teamId, 'disabled');
+    await tearDownAll(api);
   });
 });
