@@ -17,15 +17,24 @@
  *
  */
 
-import {render} from '@testing-library/react';
+import {FC} from 'react';
 
-import {LoadingBar} from './LoadingBar';
+import cx from 'classnames';
 
-describe('LoadingBar', () => {
-  it('renders correct progress', async () => {
-    const props = {message: 'example', progress: 30};
+export interface ProgressBarProps {
+  message?: string;
+  className?: string;
+  centerText?: boolean;
+  progress?: number;
+}
 
-    const {getByTestId} = render(<LoadingBar {...props} />);
-    expect(getByTestId('loading-bar-spinner')).toBeInTheDocument();
-  });
-});
+const ProgressBar: FC<ProgressBarProps> = ({message, progress = 0, className = '', centerText = true}) => (
+  <div className={cx('loading-bar', {'text-center': centerText}, className)}>
+    {message && <div className="progress-console">{message}</div>}
+    <div className="progress-bar">
+      <div data-uie-name="progress-bar-progress" style={{width: `${progress}%`}}></div>
+    </div>
+  </div>
+);
+
+export {ProgressBar};
