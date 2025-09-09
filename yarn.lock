@@ -4432,10 +4432,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@formkit/auto-animate@npm:0.8.4":
-  version: 0.8.4
-  resolution: "@formkit/auto-animate@npm:0.8.4"
-  checksum: 10/9814f9425175e21d5cbfc93a354a291c6e7f74d40f3199745b4540407860ccff6384c90b2e1a9a5871bd44306eb7055db99d6cc9f1dbca0a8e9bcf51639a469a
+"@formkit/auto-animate@npm:0.9.0":
+  version: 0.9.0
+  resolution: "@formkit/auto-animate@npm:0.9.0"
+  checksum: 10/6d44c4b739c9d0e674c2583d6fb0c37529829f2d0e10a8425ab1caadba51816750e28c40a80d19dfc3d22656f822f6813da485299e53b3a38db29118e4185f51
   languageName: node
   linkType: hard
 
@@ -8642,9 +8642,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@wireapp/core@npm:46.34.7":
-  version: 46.34.7
-  resolution: "@wireapp/core@npm:46.34.7"
+"@wireapp/core@npm:46.34.8":
+  version: 46.34.8
+  resolution: "@wireapp/core@npm:46.34.8"
   dependencies:
     "@wireapp/api-client": "npm:^27.75.6"
     "@wireapp/commons": "npm:^5.4.4"
@@ -8664,7 +8664,7 @@ __metadata:
     long: "npm:^5.2.0"
     uuid: "npm:9.0.1"
     zod: "npm:3.24.2"
-  checksum: 10/b67b975e1ea54b7d4d4b92201d4713232b3508eb6cfa0d6b61084328aa8e0d78d05e747c44569dc2ff1f0f3fe715cdd012e55726790ecba89e246ed9e9684ee4
+  checksum: 10/2d4c9e38c3ed62ad9fd3e4e9005df5c6c76c0fa48ac43da1bcdb649b1ff5e002de9a811a6c85ebc6b8c98b2c1e128a9f1115677d9732ac142d23cc427e5680cf
   languageName: node
   linkType: hard
 
@@ -8760,7 +8760,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@wireapp/promise-queue@npm:^2.4.4":
+"@wireapp/promise-queue@npm:2.4.4, @wireapp/promise-queue@npm:^2.4.4":
   version: 2.4.4
   resolution: "@wireapp/promise-queue@npm:2.4.4"
   checksum: 10/ec3b8ecde2d3f5438389f1328c90cd95887ed4f1b2f1bb14423d2fec064b48acfacf96f448adf6f96ed27988298f5e8b387c73b737d32e6948d25a92e49962e1
@@ -10053,13 +10053,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"cacheable@npm:^1.10.3":
-  version: 1.10.3
-  resolution: "cacheable@npm:1.10.3"
+"cacheable@npm:^1.10.4":
+  version: 1.10.4
+  resolution: "cacheable@npm:1.10.4"
   dependencies:
-    hookified: "npm:^1.10.0"
-    keyv: "npm:^5.4.0"
-  checksum: 10/1afb8633e0a9c43b0e1a3db43532e2ebff7b7fa6f358925c2ba67abf396dd57c53861e0574bfb1099d6f1a12e9159a4e14f3f993377e8b6ddc32aba3c3dedb8f
+    hookified: "npm:^1.11.0"
+    keyv: "npm:^5.5.0"
+  checksum: 10/d802d6ee58433e294ab6589fa09356e9004695194526709fd256db64c6bc7e6e20dedfaa5ef5fb53b73018004f5089cf73563d6fbc6e4340b922d45dd024cbb9
   languageName: node
   linkType: hard
 
@@ -12784,12 +12784,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"file-entry-cache@npm:^10.1.3":
-  version: 10.1.3
-  resolution: "file-entry-cache@npm:10.1.3"
+"file-entry-cache@npm:^10.1.4":
+  version: 10.1.4
+  resolution: "file-entry-cache@npm:10.1.4"
   dependencies:
-    flat-cache: "npm:^6.1.12"
-  checksum: 10/dcf7d0b7ca76ebd124e6a5b7fdcab25d18b087da17c4979a680ccc0e88baf5f6727aae0f865d47188da793863f65d6119ce6eb4301e407ea3879d70e97b5c487
+    flat-cache: "npm:^6.1.13"
+  checksum: 10/286fc7d632a7c62665baf8c794ab7aaa6ea30111da2f22bdb68b1b467e7393630737f637fe93298ef3d9d1ce149233fd739508a12c16c1555fbd85fe9d225ff0
   languageName: node
   linkType: hard
 
@@ -12908,14 +12908,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"flat-cache@npm:^6.1.12":
-  version: 6.1.12
-  resolution: "flat-cache@npm:6.1.12"
+"flat-cache@npm:^6.1.13":
+  version: 6.1.13
+  resolution: "flat-cache@npm:6.1.13"
   dependencies:
-    cacheable: "npm:^1.10.3"
+    cacheable: "npm:^1.10.4"
     flatted: "npm:^3.3.3"
-    hookified: "npm:^1.10.0"
-  checksum: 10/053976363bf2de150c77b4b4c9702b4f7fdebf4fa2f60e5b042606847d4556681da3ee489ed02e9f23cabeafe771d0b3bdf8a3f7fdc1945b55d5e42222d6ffc6
+    hookified: "npm:^1.11.0"
+  checksum: 10/f06ef88ad89b87e213ea54f68581fe7e1e92f94283f08ee29332600e2de9e39a078fc5da159c94ba5681ad688a5d9e38966628e7e8dd451516cfb27c75e0b960
   languageName: node
   linkType: hard
 
@@ -13713,10 +13713,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"hookified@npm:^1.10.0":
-  version: 1.11.0
-  resolution: "hookified@npm:1.11.0"
-  checksum: 10/a9cf288dcfaed9a96aaff9a725f74ea48690df45f7a42b73bef13faf6f5d8be6b3dd10e322b10fce2044e34982422a1efb25d462fc2c0c5d438151070ffee23f
+"hookified@npm:^1.11.0":
+  version: 1.12.0
+  resolution: "hookified@npm:1.12.0"
+  checksum: 10/c12ad1ef017a315f69d2c97837f75c81472752c12d31eb4f778ecbc45ecb7eee38df2a3502d8c7f9cd5604a2c90a104ea77017404456a1675ec69f729ccfbedf
   languageName: node
   linkType: hard
 
@@ -15665,7 +15665,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"keyv@npm:^5.4.0":
+"keyv@npm:^5.5.0":
   version: 5.5.0
   resolution: "keyv@npm:5.5.0"
   dependencies:
@@ -20663,9 +20663,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"stylelint@npm:16.23.1":
-  version: 16.23.1
-  resolution: "stylelint@npm:16.23.1"
+"stylelint@npm:16.24.0":
+  version: 16.24.0
+  resolution: "stylelint@npm:16.24.0"
   dependencies:
     "@csstools/css-parser-algorithms": "npm:^3.0.5"
     "@csstools/css-tokenizer": "npm:^3.0.4"
@@ -20680,7 +20680,7 @@ __metadata:
     debug: "npm:^4.4.1"
     fast-glob: "npm:^3.3.3"
     fastest-levenshtein: "npm:^1.0.16"
-    file-entry-cache: "npm:^10.1.3"
+    file-entry-cache: "npm:^10.1.4"
     global-modules: "npm:^2.0.0"
     globby: "npm:^11.1.0"
     globjoin: "npm:^0.1.4"
@@ -20707,7 +20707,7 @@ __metadata:
     write-file-atomic: "npm:^5.0.1"
   bin:
     stylelint: bin/stylelint.mjs
-  checksum: 10/7e49e1211c7f1cb2eae9f03c1fe1242c8131675ab28a615859b79f4c7c68bb089e20bae111f508ff39dbbc4c9670c1d2414e96e493a2f1e82387af127a1759c8
+  checksum: 10/cf818bb547d8b126d5934e72f5aeda2f49271f8bf618cc801e10bc5ef15ee6e61584ab04a36d517b76ead3ae4d35fa72348f2e6d97a6c6cf28fb81ca1eb1c706
   languageName: node
   linkType: hard
 
@@ -22415,7 +22415,7 @@ __metadata:
     "@emotion/react": "npm:11.11.4"
     "@faker-js/faker": "npm:9.9.0"
     "@formatjs/cli": "npm:6.7.2"
-    "@formkit/auto-animate": "npm:0.8.4"
+    "@formkit/auto-animate": "npm:0.9.0"
     "@lexical/code": "npm:0.27.2"
     "@lexical/history": "npm:0.27.2"
     "@lexical/list": "npm:0.27.2"
@@ -22461,10 +22461,11 @@ __metadata:
     "@wireapp/avs-debugger": "npm:0.0.7"
     "@wireapp/commons": "npm:5.4.4"
     "@wireapp/copy-config": "npm:2.3.2"
-    "@wireapp/core": "npm:46.34.7"
+    "@wireapp/core": "npm:46.34.8"
     "@wireapp/eslint-config": "npm:3.0.7"
     "@wireapp/kalium-backup": "npm:0.0.4"
     "@wireapp/prettier-config": "npm:0.6.4"
+    "@wireapp/promise-queue": "npm:2.4.4"
     "@wireapp/react-ui-kit": "npm:9.63.0"
     "@wireapp/store-engine": "npm:5.1.11"
     "@wireapp/store-engine-dexie": "npm:2.1.15"
@@ -22554,7 +22555,7 @@ __metadata:
     sonner: "npm:^2.0.7"
     speakingurl: "npm:14.0.1"
     style-loader: "npm:4.0.0"
-    stylelint: "npm:16.23.1"
+    stylelint: "npm:16.24.0"
     stylelint-config-idiomatic-order: "npm:10.0.0"
     svg-inline-loader: "npm:0.8.2"
     text-encoding: "npm:0.7.0"
