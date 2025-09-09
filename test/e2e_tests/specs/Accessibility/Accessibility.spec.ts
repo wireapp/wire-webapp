@@ -19,52 +19,71 @@
 
 import {getUser} from 'test/e2e_tests/data/user';
 import {PageManager} from 'test/e2e_tests/pageManager';
-import {addCreatedUser, tearDownAll} from 'test/e2e_tests/utils/tearDown.util';
-import {createGroup, inviteMembers, loginUser} from 'test/e2e_tests/utils/userActions';
+import {setupBasicTestScenario} from 'test/e2e_tests/utils/setup.utli';
+import {tearDownAll} from 'test/e2e_tests/utils/tearDown.util';
+import {createGroup, loginUser} from 'test/e2e_tests/utils/userActions';
 
-import {test} from '../../test.fixtures';
+import {test, expect} from '../../test.fixtures';
 
 test.describe('Accessibility', () => {
+  test.slow();
+
   let owner = getUser();
   const members = Array.from({length: 2}, () => getUser());
   const [memberA, memberB] = members;
   const teamName = 'Accessibility';
   const conversationName = 'AccTest';
+
   test.beforeAll(async ({api}) => {
-    const user = await api.createTeamOwner(owner, teamName);
+    const user = await setupBasicTestScenario(api, members, owner, teamName);
     owner = {...owner, ...user};
-    await inviteMembers(members, owner, api);
-    // register credentials for cleanup later
-    addCreatedUser(owner);
-    addCreatedUser(memberA);
-    addCreatedUser(memberB);
   });
 
   test(
     'I want to see typing indicator in group conversation',
     {tag: ['@TC-46', '@regression']},
     async ({pageManager: memberPageManagerA, browser}) => {
-      const memberContextB = await browser.newContext();
-      const memberPage = await memberContextB.newPage();
+      const memberContext = await browser.newContext();
+      const memberPage = await memberContext.newPage();
       const memberPageManagerB = new PageManager(memberPage);
+
       const memberAPages = memberPageManagerA.webapp.pages;
       const memberPagesB = memberPageManagerB.webapp.pages;
 
-      // log bouth in
+      // log both in
+      await memberPageManagerA.openMainPage();
+      await memberPageManagerB.openMainPage();
       await loginUser(memberA, memberPageManagerA);
       await loginUser(memberB, memberPageManagerB);
 
-      await createGroup(memberPageManagerA, conversationName, members);
+      // wait for rendered main ui
+      await memberPageManagerA.webapp.components
+        .conversationSidebar()
+        .personalUserName.waitFor({state: 'visible', timeout: 60_000});
 
-      await memberAPages.conversationList().clickCreateGroup();
-      await memberAPages.groupCreation().setGroupName(conversationName);
-      await memberAPages.startUI().selectUsers([memberB.username]);
+      await memberPageManagerA.webapp.modals.dataShareConsent().clickDecline();
+      await memberPageManagerB.webapp.modals.dataShareConsent().clickDecline();
 
-      await memberPageManagerA.webapp.pages.conversationList().openConversation(conversationName);
+      await createGroup(memberPageManagerA, conversationName, [memberB]);
 
+      await memberAPages.conversationList().openConversation(conversationName);
       await memberPagesB.conversationList().openConversation(conversationName);
 
-      // user a starts typing
+      await test.step('User A starts typing in group and B sees typing indicator', async () => {
+        // user b starts typing
+        await memberPagesB.conversation().messageInput.fill('t');
+        await memberPageManagerB.waitForTimeout(200);
+        await memberPagesB.conversation().messageInput.fill('ttttt');
+        await memberPageManagerB.waitForTimeout(200);
+        await memberPagesB.conversation().messageInput.fill('ttttt ttttt');
+
+        const isVisible = await memberAPages.conversation().isTypingIndicator.isVisible();
+        expect(isVisible).toBeTruthy();
+      });
+
+      await test.step('User A starts typing in group and B sees typing indicator', async () => {
+        // todo
+      });
       // user a turn off typing indicator?
       // user a starts typing -> user b don't see typing
     },

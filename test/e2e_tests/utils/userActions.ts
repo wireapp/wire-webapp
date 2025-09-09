@@ -89,4 +89,5 @@ export const createGroup = async (pageManager: PageManager, conversationName: st
   await pageManager.webapp.pages.conversationList().clickCreateGroup();
   await pageManager.webapp.pages.groupCreation().setGroupName(conversationName);
   await pageManager.webapp.pages.startUI().selectUsers(user.flatMap(user => user.username));
+  await pageManager.webapp.pages.groupCreation().clickCreateGroupButton();
 };
