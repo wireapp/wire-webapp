@@ -116,7 +116,15 @@ export class ConversationPage {
   async sendMessage(message: string) {
     await this.messageInput.fill(message);
     await this.messageInput.press('Enter');
-    await this.page.waitForTimeout(5000); // Wait for the message to be sent // task: refactor this to wait for request
+    await this.page.waitForTimeout(5000); // Wait for the message to be sent
+  }
+
+  async typeMessage(message: string) {
+    await this.messageInput.click();
+    for (let i = 0; i < message.length; i++) {
+      await this.page.keyboard.press(message[i]);
+      await this.page.waitForTimeout(300); // sim user input
+    }
   }
 
   async createGroup(groupName: string) {

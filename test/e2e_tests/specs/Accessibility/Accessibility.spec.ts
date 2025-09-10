@@ -33,11 +33,17 @@ test.describe('Accessibility', () => {
   const [memberA, memberB] = members;
   const teamName = 'Accessibility';
   const conversationName = 'AccTest';
+  const textMessage = 'long text message';
+  const narrowViewport = {width: 480, height: 800};
 
   test.beforeAll(async ({api}) => {
     const user = await setupBasicTestScenario(api, members, owner, teamName);
     owner = {...owner, ...user};
   });
+
+  const navigateToConversation = async (pageManager: PageManager, name: string) => {
+    await pageManager.webapp.pages.conversationList().openConversation(name);
+  };
 
   test(
     'I want to see typing indicator in group conversation',
@@ -47,16 +53,31 @@ test.describe('Accessibility', () => {
       const memberPage = await memberContext.newPage();
       const memberPageManagerB = new PageManager(memberPage);
 
-      const memberAPages = memberPageManagerA.webapp.pages;
-      const memberPagesB = memberPageManagerB.webapp.pages;
+      const toggleTypingIndicator = async (pageManager: PageManager) => {
+        await pageManager.webapp.components.conversationSidebar().clickPreferencesButton();
+        await pageManager.webapp.pages.account().toggleTypingIndicator();
+        await pageManager.webapp.components.conversationSidebar().clickAllConversationsButton();
+      };
 
-      // log both in
+      const typeAndCheckIndicator = async (
+        senderPage: PageManager,
+        receiverPage: PageManager,
+        message: string,
+        expectedState: boolean,
+      ) => {
+        await senderPage.webapp.pages.conversation().typeMessage(message);
+        // Wait for a short moment for the indicator to appear/disappear
+        await senderPage.waitForTimeout(800);
+        const isVisible = await receiverPage.webapp.pages.conversation().isTypingIndicator.isVisible();
+        expect(isVisible).toBe(expectedState);
+      };
+
+      // Initial setup
       await memberPageManagerA.openMainPage();
       await memberPageManagerB.openMainPage();
       await loginUser(memberA, memberPageManagerA);
       await loginUser(memberB, memberPageManagerB);
 
-      // wait for rendered main ui
       await memberPageManagerA.webapp.components
         .conversationSidebar()
         .personalUserName.waitFor({state: 'visible', timeout: 60_000});
@@ -66,38 +87,83 @@ test.describe('Accessibility', () => {
 
       await createGroup(memberPageManagerA, conversationName, [memberB]);
 
-      await memberAPages.conversationList().openConversation(conversationName);
-      await memberPagesB.conversationList().openConversation(conversationName);
+      await navigateToConversation(memberPageManagerA, conversationName);
+      await navigateToConversation(memberPageManagerB, conversationName);
 
       await test.step('User A starts typing in group and B sees typing indicator', async () => {
-        // user b starts typing
-        await memberPagesB.conversation().messageInput.fill('t');
-        await memberPageManagerB.waitForTimeout(200);
-        await memberPagesB.conversation().messageInput.fill('ttttt');
-        await memberPageManagerB.waitForTimeout(200);
-        await memberPagesB.conversation().messageInput.fill('ttttt ttttt');
-
-        const isVisible = await memberAPages.conversation().isTypingIndicator.isVisible();
-        expect(isVisible).toBeTruthy();
+        await typeAndCheckIndicator(memberPageManagerA, memberPageManagerB, textMessage, true);
       });
 
-      await test.step('User A starts typing in group and B sees typing indicator', async () => {
-        // todo
+      await test.step('User A starts typing in group and B does not see typing indicator', async () => {
+        // Disable typing indicator for user A
+        await toggleTypingIndicator(memberPageManagerA);
+        await navigateToConversation(memberPageManagerA, conversationName);
+
+        await typeAndCheckIndicator(memberPageManagerA, memberPageManagerB, textMessage, false);
+
+        // Re-enable typing indicator for user A for subsequent tests
+        await toggleTypingIndicator(memberPageManagerA);
+        await navigateToConversation(memberPageManagerA, conversationName);
       });
-      // user a turn off typing indicator?
-      // user a starts typing -> user b don't see typing
+
+      await test.step('User B turns indicator off and does not see typing indicator', async () => {
+        // Disable typing indicator for user B
+        await toggleTypingIndicator(memberPageManagerB);
+        await navigateToConversation(memberPageManagerB, conversationName);
+
+        await typeAndCheckIndicator(memberPageManagerA, memberPageManagerB, textMessage, false);
+      });
+
+      await test.step('User B turns indicator on again and sees typing indicator', async () => {
+        // Re-enable typing indicator for user B
+        await toggleTypingIndicator(memberPageManagerB);
+        await navigateToConversation(memberPageManagerB, conversationName);
+
+        await typeAndCheckIndicator(memberPageManagerA, memberPageManagerB, textMessage, true);
+      });
     },
   );
 
-  test(
-    'I want to see collapsed view when app is narrow',
-    {tag: ['@TC-48', '@regression']},
-    async ({pageManager}) => {},
-  );
+  test('I want to see collapsed view when app is narrow', {tag: ['@TC-48', '@regression']}, async ({pageManager}) => {
+    await (await pageManager.getPage()).setViewportSize(narrowViewport);
+
+    await pageManager.openMainPage();
+    await loginUser(memberA, pageManager);
+    await pageManager.webapp.components.conversationSidebar().sidebar.waitFor({state: 'visible', timeout: 60_000});
+    await pageManager.webapp.modals.dataShareConsent().clickDecline();
+
+    await expect(pageManager.webapp.components.conversationSidebar().sidebar).toHaveAttribute(
+      'data-is-collapsed',
+      'true',
+    );
+  });
   test(
     'I should not lose a drafted message when switching between conversations in collapsed view',
     {tag: ['@TC-51', '@regression']},
-    async ({pageManager}) => {},
+    async ({pageManager}) => {
+      const message = 'test';
+
+      await pageManager.openMainPage();
+      await loginUser(memberA, pageManager);
+      await pageManager.webapp.components.conversationSidebar().sidebar.waitFor({state: 'visible', timeout: 60_000});
+      await pageManager.webapp.modals.dataShareConsent().clickDecline();
+
+      await createGroup(pageManager, conversationName, [memberB]);
+
+      await pageManager.webapp.pages.conversation().typeMessage(message);
+      const page = await pageManager.getPage();
+
+      await pageManager.webapp.components.conversationSidebar().clickConnectButton();
+
+      await page.locator('[data-uie-name="highlighted"]').nth(0).click();
+      await page.locator('[data-uie-name="start-conversation"]').click();
+      await expect(page.locator('[data-uie-name="secondary-line"]')).toHaveText(message);
+
+      await pageManager.webapp.pages.conversationList().openConversation(memberB.fullName);
+
+      await pageManager.webapp.pages.conversationList().openConversation(conversationName);
+      await expect(await pageManager.webapp.pages.conversation().messageInput).toHaveText(message);
+    },
   );
 
   test.afterAll(async ({api}) => {
