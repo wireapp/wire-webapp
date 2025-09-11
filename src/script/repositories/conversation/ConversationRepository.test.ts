@@ -55,6 +55,7 @@ import {ClientEntity} from 'Repositories/client/ClientEntity';
 import {ConnectionEntity} from 'Repositories/connection/ConnectionEntity';
 import {ConnectionRepository} from 'Repositories/connection/ConnectionRepository';
 import {Conversation} from 'Repositories/entity/Conversation';
+import {CompositeMessage} from 'Repositories/entity/message/CompositeMessage';
 import {Message} from 'Repositories/entity/message/Message';
 import {User} from 'Repositories/entity/User';
 import {ClientEvent, CONVERSATION} from 'Repositories/event/Client';
@@ -84,7 +85,13 @@ import {CONVERSATION_READONLY_STATE, ConversationRepository} from './Conversatio
 import {ConversationService} from './ConversationService';
 import {ConversationState} from './ConversationState';
 import {ConversationStatus} from './ConversationStatus';
-import {DeleteEvent, EventBuilder, MessageHiddenEvent} from './EventBuilder';
+import {
+  ButtonActionConfirmationEvent,
+  ButtonActionEvent,
+  DeleteEvent,
+  EventBuilder,
+  MessageHiddenEvent,
+} from './EventBuilder';
 import {MessageRepository} from './MessageRepository';
 import {NOTIFICATION_STATE} from './NotificationSetting';
 
@@ -2445,6 +2452,128 @@ describe('ConversationRepository', () => {
         .then(() => {
           expect(testFactory.event_repository.injectEvent).toHaveBeenCalledWith(event, EventRepository.SOURCE.INJECTED);
         });
+    });
+  });
+
+  describe('given a composite message event in a conversation', () => {
+    it('when the event is ButtonActionConfirmationEvent from another user, then marks the button as selected', async () => {
+      // given
+      const selfUser = generateUser();
+      const botUserId = generateUser();
+      spyOn(testFactory.conversation_repository['userState'], 'self').and.returnValue(selfUser);
+      spyOn(testFactory.conversation_repository['eventService'], 'updateEventSequentially').and.returnValue(
+        Promise.resolve(),
+      );
+
+      const conversationEntity = _generateConversation({type: CONVERSATION_TYPE.GLOBAL_TEAM});
+
+      // Make sure the conversation is in the conversation state
+      testFactory.conversation_repository['conversationState'].conversations.push(conversationEntity);
+
+      // Set the self user on the conversation entity (for consistency)
+      conversationEntity.selfUser(selfUser);
+
+      const buttonActionConfirmationEvent: ButtonActionConfirmationEvent = {
+        conversation: conversationEntity.id,
+        data: {
+          buttonId: 'button-id',
+          messageId: 'message-id',
+        },
+        from: botUserId.id,
+        id: createUuid(),
+        qualified_conversation: conversationEntity.qualifiedId,
+        time: new Date().toISOString(),
+        type: ClientEvent.CONVERSATION.BUTTON_ACTION_CONFIRMATION,
+      };
+
+      const message = new CompositeMessage(buttonActionConfirmationEvent.data.messageId);
+      conversationEntity.addMessage(message);
+
+      expect(message.selectedButtonId()).toBeFalsy();
+
+      // when
+      await testFactory.conversation_repository['handleConversationEvent'](buttonActionConfirmationEvent);
+
+      // then - button is selected
+      const retrievedMessage = conversationEntity.getMessage(
+        buttonActionConfirmationEvent.data.messageId,
+      ) as CompositeMessage;
+      expect(retrievedMessage.selectedButtonId()).toBe(buttonActionConfirmationEvent.data.buttonId);
+    });
+
+    it('when the event is ButtonActionEvent from the self user, then marks the button as selected', async () => {
+      // given
+      const selfUser = generateUser();
+      spyOn(testFactory.conversation_repository['userState'], 'self').and.returnValue(selfUser);
+      spyOn(testFactory.conversation_repository['eventService'], 'updateEventSequentially').and.returnValue(
+        Promise.resolve(),
+      );
+
+      const conversationEntity = _generateConversation({type: CONVERSATION_TYPE.GLOBAL_TEAM});
+
+      // Make sure the conversation is in the conversation state
+      testFactory.conversation_repository['conversationState'].conversations.push(conversationEntity);
+
+      // Set the self user on the conversation entity
+      conversationEntity.selfUser(selfUser);
+
+      const buttonActionEvent: ButtonActionEvent = {
+        conversation: conversationEntity.id,
+        data: {
+          buttonId: 'button-id',
+          messageId: 'message-id',
+        },
+        from: selfUser.id,
+        id: createUuid(),
+        qualified_conversation: conversationEntity.qualifiedId,
+        time: new Date().toISOString(),
+        type: ClientEvent.CONVERSATION.BUTTON_ACTION,
+      };
+
+      const message = new CompositeMessage(buttonActionEvent.data.messageId);
+      conversationEntity.addMessage(message);
+
+      expect(message.selectedButtonId()).toBeFalsy();
+
+      // when
+      await testFactory.conversation_repository['handleConversationEvent'](buttonActionEvent);
+
+      // then - button is selected
+      const retrievedMessage = conversationEntity.getMessage(buttonActionEvent.data.messageId) as CompositeMessage;
+      expect(retrievedMessage.selectedButtonId()).toBe(buttonActionEvent.data.buttonId);
+    });
+
+    it('when the event is ButtonActionEvent from another user, then ignores the event and no button is selected', async () => {
+      // given
+      const selfUser = generateUser();
+      const otherUser = generateUser();
+      spyOn(testFactory.conversation_repository['userState'], 'self').and.returnValue(selfUser);
+      const conversationEntity = _generateConversation({type: CONVERSATION_TYPE.GLOBAL_TEAM});
+
+      const buttonActionEvent: ButtonActionEvent = {
+        conversation: conversationEntity.id,
+        data: {
+          buttonId: 'button-id',
+          messageId: 'message-id',
+        },
+        from: otherUser.id, // Event from another user should be ignored
+        id: createUuid(),
+        qualified_conversation: conversationEntity.qualifiedId,
+        time: new Date().toISOString(),
+        type: ClientEvent.CONVERSATION.BUTTON_ACTION,
+      };
+
+      const message = new CompositeMessage(buttonActionEvent.data.messageId);
+      conversationEntity.addMessage(message);
+
+      expect(message.selectedButtonId()).toBeFalsy();
+
+      // when
+      await testFactory.conversation_repository['handleConversationEvent'](buttonActionEvent);
+
+      // then - should remain unchanged since the event was from another user
+      const retrievedMessage = conversationEntity.getMessage(buttonActionEvent.data.messageId) as CompositeMessage;
+      expect(retrievedMessage.selectedButtonId()).toBeFalsy();
     });
   });
 

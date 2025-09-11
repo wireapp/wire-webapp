@@ -92,10 +92,10 @@ export const MessageWrapper: React.FC<MessageParams> = ({
       (await messageRepository.getMessageInConversationByReplacementId(conversation, messageId));
     return await messageRepository.ensureMessageSender(event);
   };
-  const clickButton = (message: CompositeMessage, buttonId: string) => {
+  const clickButton = async (message: CompositeMessage, buttonId: string) => {
     if (message.selectedButtonId() !== buttonId && message.waitingButtonId() !== buttonId) {
       message.waitingButtonId(buttonId);
-      messageRepository.sendButtonAction(conversation, message, buttonId);
+      await messageRepository.sendButtonAction(conversation, message, buttonId);
     }
   };
 
