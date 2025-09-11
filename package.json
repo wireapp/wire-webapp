@@ -122,7 +122,7 @@
     "autoprefixer": "10.4.21",
     "babel-loader": "10.0.0",
     "babel-plugin-transform-import-meta": "2.3.3",
-    "cross-env": "7.0.3",
+    "cross-env": "10.0.0",
     "css-loader": "7.1.2",
     "cssnano": "7.1.1",
     "dexie": "4.0.7",
