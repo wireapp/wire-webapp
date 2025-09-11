@@ -24,7 +24,6 @@ import {ClientInfo} from '@wireapp/core/lib/client/';
 import {Runtime} from '@wireapp/commons';
 
 import {getClientMLSConfig} from 'Repositories/client/clientMLSConfig';
-import {Config} from 'src/script/Config';
 
 import {ClientActionCreator} from './creator/';
 
@@ -70,8 +69,7 @@ export class ClientAction {
       const commonConfig = (await core.service?.team.getCommonFeatureConfig()) ?? {};
 
       const useAsyncNotificationStream =
-        commonConfig[FEATURE_KEY.CONSUMABLE_NOTIFICATIONS]?.status === FeatureStatus.ENABLED &&
-        Config.getConfig().FEATURE.USE_ASYNC_NOTIFICATIONS;
+        commonConfig[FEATURE_KEY.CONSUMABLE_NOTIFICATIONS]?.status === FeatureStatus.ENABLED;
 
       const useLegacyNotificationStream = !useAsyncNotificationStream;
 
