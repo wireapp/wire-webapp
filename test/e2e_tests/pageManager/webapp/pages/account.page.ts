@@ -32,8 +32,11 @@ export class AccountPage {
   readonly restoreBackupButton: Locator;
   readonly logoutButton: Locator;
   readonly emailDisplay: Locator;
+  readonly displayNameDisplay: Locator;
   readonly editEmailButton: Locator;
+  readonly editdisplayNameButton: Locator;
   readonly emailInput: Locator;
+  readonly displayNameInput: Locator;
   readonly resetPasswordButton: Locator;
   readonly receiveNewsletterCheckbox: Locator;
 
@@ -48,8 +51,11 @@ export class AccountPage {
     this.restoreBackupButton = page.locator("[data-uie-name='do-backup-import']+button");
     this.logoutButton = page.locator(selectByDataAttribute('do-logout'));
     this.editEmailButton = page.locator(selectByDataAttribute('go-edit-email'));
+    this.editdisplayNameButton = page.locator(selectByDataAttribute('go-edit-email'));
     this.emailInput = page.locator(selectByDataAttribute('enter-email-input'));
+    this.displayNameInput = page.locator(selectByDataAttribute('enter-displayname-input'));
     this.emailDisplay = page.locator(selectByDataAttribute('email-display'));
+    this.displayNameDisplay = page.locator(selectByDataAttribute('displayname-display'));
     this.resetPasswordButton = page.locator(selectByDataAttribute('do-reset-password'));
     this.receiveNewsletterCheckbox = page.locator("[data-uie-name='status-preference-marketing']+label");
   }
@@ -104,5 +110,11 @@ export class AccountPage {
     await this.editEmailButton.click();
     await this.emailInput.fill(newEmail);
     await this.emailInput.press('Enter');
+  }
+
+  async changeName(newName: string) {
+    await this.editEmailButton.click();
+    await this.displayNameInput.fill(newName);
+    await this.displayNameInput.press('Enter');
   }
 }
