@@ -17,16 +17,28 @@
  *
  */
 
-import ko from 'knockout';
-
 import {Runtime} from '@wireapp/commons';
 
-import {Logger, getLogger} from 'Util/Logger';
+import {getLogger, Logger} from 'Util/Logger';
 import {loadValue, storeValue} from 'Util/StorageUtil';
 
 import {MediaDeviceType} from './MediaDeviceType';
+import {MediaDevicesState, mediaDevicesStore} from './useMediaDevicesStore';
 
-import {isMediaDevice} from '../../guards/MediaDevice';
+export interface ElectronDesktopCapturerSource {
+  display_id: string;
+  id: string;
+  name: string;
+  thumbnail: HTMLCanvasElement;
+}
+
+interface ElectronGetSourcesOptions {
+  fetchWindowIcons?: boolean;
+  thumbnailSize?: {height: number; width: number};
+  types: string[];
+}
+
+type ElectronDesktopCapturerCallback = (error: Error | null, screenSources: ElectronDesktopCapturerSource[]) => void;
 
 declare global {
   interface Window {
@@ -40,46 +52,19 @@ declare global {
   }
 }
 
-export type CurrentAvailableDeviceId = Record<MediaDeviceType, ko.PureComputed<string>>;
-export type DeviceSupport = Record<MediaDeviceType, ko.PureComputed<boolean>>;
 export type PreviousDeviceSupport = Partial<Record<MediaDeviceType, number>>;
 
-export enum FavoriteDeviceTypes {
-  AUDIO_INPUT = 'audioinput-fave',
-  AUDIO_OUTPUT = 'audiooutput-fave',
-  VIDEO_INPUT = 'videoinput-fave',
-  SCREEN_INPUT = 'screeninput-fave',
-}
-
-export type Devices = Record<MediaDeviceType, ko.ObservableArray<ElectronDesktopCapturerSource | MediaDeviceInfo>>;
-export type DeviceIds = Record<MediaDeviceType, ko.Observable<string>>;
-type ElectronDesktopCapturerCallback = (error: Error | null, screenSources: ElectronDesktopCapturerSource[]) => void;
-
-interface ElectronGetSourcesOptions {
-  fetchWindowIcons?: boolean;
-  thumbnailSize?: {
-    height: number;
-    width: number;
-  };
-  types: string[];
-}
-
-/** @see http://electronjs.org/docs/api/structures/desktop-capturer-source */
-export interface ElectronDesktopCapturerSource {
-  display_id: string;
-  id: string;
-  name: string;
-  thumbnail: HTMLCanvasElement;
+enum FavoriteDeviceTypes {
+  AUDIO_INPUT = `${MediaDeviceType.AUDIO_INPUT}-fave`,
+  AUDIO_OUTPUT = `${MediaDeviceType.AUDIO_OUTPUT}-fave`,
+  VIDEO_INPUT = `${MediaDeviceType.VIDEO_INPUT}-fave`,
+  SCREEN_INPUT = `${MediaDeviceType.SCREEN_INPUT}-fave`,
 }
 
 export class MediaDevicesHandler {
   private readonly logger: Logger;
-  public availableDevices: Devices;
-  public currentDeviceId: DeviceIds;
-  public currentAvailableDeviceId: CurrentAvailableDeviceId;
-  public deviceSupport: DeviceSupport;
-  private previousDeviceSupport: PreviousDeviceSupport;
   private onMediaDevicesRefresh?: () => void;
+  private previousDeviceSupport: PreviousDeviceSupport = {};
   private devicesAreInit = false;
 
   static get CONFIG() {
@@ -100,175 +85,101 @@ export class MediaDevicesHandler {
   constructor() {
     this.logger = getLogger('MediaDevicesHandler');
 
-    this.availableDevices = {
-      audioinput: ko.observableArray<ElectronDesktopCapturerSource | MediaDeviceInfo>([]),
-      audiooutput: ko.observableArray<ElectronDesktopCapturerSource | MediaDeviceInfo>([]),
-      screeninput: ko.observableArray<ElectronDesktopCapturerSource | MediaDeviceInfo>([]),
-      videoinput: ko.observableArray<ElectronDesktopCapturerSource | MediaDeviceInfo>([]),
-    };
+    const supportsUserMedia = Runtime.isSupportingUserMedia();
+    mediaDevicesStore.setState({
+      audioInputDeviceId: loadValue(MediaDeviceType.AUDIO_INPUT) ?? 'default',
+      audioOutputDeviceId: loadValue(MediaDeviceType.AUDIO_OUTPUT) ?? 'default',
+      screenInputDeviceId: loadValue(MediaDeviceType.SCREEN_INPUT) ?? 'screen',
+      videoInputDeviceId: loadValue(MediaDeviceType.VIDEO_INPUT) ?? 'default',
+      audioInputSupported: supportsUserMedia,
+      videoInputSupported: supportsUserMedia,
+      audioOutputSupported: false,
+      screenInputSupported: !!window.desktopCapturer,
+    });
 
-    this.currentDeviceId = {
-      audioinput: ko.observable(loadValue(MediaDeviceType.AUDIO_INPUT) ?? 'default'),
-      audiooutput: ko.observable(loadValue(MediaDeviceType.AUDIO_OUTPUT) ?? 'default'),
-      screeninput: ko.observable(loadValue(MediaDeviceType.SCREEN_INPUT) ?? 'screen'),
-      videoinput: ko.observable(loadValue(MediaDeviceType.VIDEO_INPUT) ?? 'default'),
-    };
+    mediaDevicesStore.subscribe((state, prev) => {
+      this.updateFavoriteList(MediaDeviceType.AUDIO_INPUT, state.audioInputDeviceId, prev.audioInputDeviceId, state);
+      this.updateFavoriteList(MediaDeviceType.AUDIO_OUTPUT, state.audioOutputDeviceId, prev.audioOutputDeviceId, state);
+      this.updateFavoriteList(MediaDeviceType.VIDEO_INPUT, state.videoInputDeviceId, prev.videoInputDeviceId, state);
+      this.updateFavoriteList(MediaDeviceType.SCREEN_INPUT, state.screenInputDeviceId, prev.screenInputDeviceId, state);
+    });
 
-    const getCurrentAvailableDeviceId = (deviceType: MediaDeviceType): string => {
-      const currentDeviceId = this.currentDeviceId[deviceType]();
-      if (this.availableDevices[deviceType]().length === 0) {
-        return '';
-      }
-      const isAvailable = this.availableDevices[deviceType]().find(device => {
-        return (
-          ((device as MediaDeviceInfo).deviceId || (device as ElectronDesktopCapturerSource).id) === currentDeviceId
-        );
-      });
-
-      const favoriteDeviceId = loadValue<String[]>(`${deviceType}-fave`)?.find(id => id === currentDeviceId);
-
-      if (favoriteDeviceId && isAvailable) {
-        return currentDeviceId;
-      }
-      return isMediaDevice(isAvailable)
-        ? isAvailable.deviceId
-        : isAvailable?.id ?? MediaDevicesHandler.CONFIG.DEFAULT_DEVICE[deviceType];
-    };
-
-    this.currentAvailableDeviceId = {
-      audioinput: ko.pureComputed(() => getCurrentAvailableDeviceId(MediaDeviceType.AUDIO_INPUT)),
-      audiooutput: ko.pureComputed(() => getCurrentAvailableDeviceId(MediaDeviceType.AUDIO_OUTPUT)),
-      screeninput: ko.pureComputed(() => getCurrentAvailableDeviceId(MediaDeviceType.SCREEN_INPUT)),
-      videoinput: ko.pureComputed(() => getCurrentAvailableDeviceId(MediaDeviceType.VIDEO_INPUT)),
-    };
-
-    this.deviceSupport = {
-      audioinput: ko.pureComputed(() => !!this.availableDevices.audioinput().length),
-      audiooutput: ko.pureComputed(() => !!this.availableDevices.audiooutput().length),
-      screeninput: ko.pureComputed(() => !!this.availableDevices.screeninput().length),
-      videoinput: ko.pureComputed(() => !!this.availableDevices.videoinput().length),
-    };
-
-    this.previousDeviceSupport = {
-      audioinput: this.availableDevices.audioinput().length,
-      audiooutput: this.availableDevices.audiooutput().length,
-      videoinput: this.availableDevices.videoinput().length,
-    };
-
-    // The device list must be queried once to obtain the device IDs. This way, the frontend knows whether cameras
-    // and microphones exist and can request them specifically during a call. Additionally, the app needs to know
-    // the device IDs; otherwise, we will receive a Media-Query-Constraint error when querying the devices, as we
-    // explicitly query by the device ID.
-    // The false parameter ensures that we only load the list temporarily.
-    this.initializeMediaDevices(false);
+    void this.initializeMediaDevices(false);
   }
 
-  public setOnMediaDevicesRefreshHandler(handler: () => void): void {
+  public setOnMediaDevicesRefreshHandler(handler: () => void) {
     this.onMediaDevicesRefresh = handler;
   }
 
   /**
    * Initialize the list of MediaDevices and subscriptions.
    * @camera: boolean, Only when the camera is queried can the entire device list be accessed.
-   * @return Promise<void>
    */
-  public async initializeMediaDevices(camera = false): Promise<void> {
-    if (Runtime.isSupportingUserMedia() && !this.devicesAreInit) {
-      return this.refreshMediaDevices(camera).then(() => {
-        this.subscribeToObservables();
-        this.subscribeToDevices();
-        // The web browser cannot access the device labels without a camera stream.
-        // The device list is only complete when the camera was initialized.
-        if (camera) {
-          this.devicesAreInit = true;
-        }
-      });
+  public async initializeMediaDevices(camera = false) {
+    if (!Runtime.isSupportingUserMedia() || this.devicesAreInit) {
+      return;
     }
-    return Promise.resolve();
+
+    await this.refreshMediaDevices(camera);
+    this.subscribeToDevices();
+
+    if (camera) {
+      this.devicesAreInit = true;
+    }
+  }
+
+  private orderFavoriteDevices(selectedId: string, favoriteDevices: string[], disconnected: boolean) {
+    return disconnected ? favoriteDevices : [selectedId, ...favoriteDevices.filter(id => id !== selectedId)];
+  }
+
+  private updateFavoriteList(type: MediaDeviceType, newId: string, prevId: string, state: MediaDevicesState) {
+    if (newId === prevId) {
+      return;
+    }
+
+    const lengths = {
+      [MediaDeviceType.AUDIO_INPUT]: state.audioInputDevices.length,
+      [MediaDeviceType.AUDIO_OUTPUT]: state.audioOutputDevices.length,
+      [MediaDeviceType.VIDEO_INPUT]: state.videoInputDevices.length,
+      [MediaDeviceType.SCREEN_INPUT]: state.screenInputDevices.length,
+    };
+
+    storeValue(type, newId);
+
+    const favoriteKey = this.favoriteKeyFor(type);
+    const faves = loadValue<string[]>(favoriteKey) ?? [];
+
+    const prevCount = this.previousDeviceSupport[type] ?? 0;
+    const nowCount = lengths[type];
+    const disconnected = prevCount > nowCount;
+
+    const newFaves = this.orderFavoriteDevices(newId, faves, disconnected);
+    storeValue(favoriteKey, newFaves);
   }
 
   /**
    * Subscribe to MediaDevices updates if available.
    */
-  private subscribeToDevices(): void {
+  private subscribeToDevices() {
     navigator.mediaDevices.ondevicechange = () => {
       this.logger.info('List of available MediaDevices has changed');
       this.refreshMediaDevices();
     };
   }
 
-  private subscribeToDevice(deviceType: MediaDeviceType) {
-    this.currentDeviceId[deviceType].subscribe(mediaDeviceId => {
-      const deviceKey = Object.keys(MediaDeviceType)[
-        Object.values(MediaDeviceType).indexOf(deviceType as MediaDeviceType)
-      ] as keyof typeof MediaDeviceType;
-
-      const faveDevices = loadValue<string[]>(`${deviceType}-fave`) ?? [];
-      const disconnected = (this.previousDeviceSupport[deviceType] ?? 0) > this.availableDevices[deviceType]().length;
-      const newFaveDevices = this.orderFavoriteDevices(mediaDeviceId, faveDevices, disconnected);
-
-      storeValue(MediaDeviceType[deviceKey], mediaDeviceId);
-      storeValue(FavoriteDeviceTypes[deviceKey], newFaveDevices);
-    });
-  }
-
-  /**
-   * Subscribe to Knockout observables.
-   */
-  private subscribeToObservables(): void {
-    Object.values(MediaDeviceType).forEach(deviceType => {
-      this.subscribeToDevice(deviceType);
-    });
-  }
-
-  private orderFavoriteDevices = (mediaDevice: string, favoriteDevices: string[], disconnected: boolean): string[] => {
-    return disconnected ? favoriteDevices : [mediaDevice, ...favoriteDevices.filter(id => id !== mediaDevice)];
-  };
-
-  private filterMediaDevices(mediaDevices: MediaDeviceInfo[]): {
-    cameras: MediaDeviceInfo[];
-    microphones: MediaDeviceInfo[];
-    speakers: MediaDeviceInfo[];
-  } {
-    const videoInputDevices: MediaDeviceInfo[] = mediaDevices.filter(
-      device => device.kind === MediaDeviceType.VIDEO_INPUT,
-    );
-
-    const microphones = mediaDevices.filter(device => device.kind === MediaDeviceType.AUDIO_INPUT);
-    const speakers = mediaDevices.filter(device => device.kind === MediaDeviceType.AUDIO_OUTPUT);
-    return {
-      cameras: videoInputDevices,
-      microphones: microphones,
-      speakers: speakers,
-    };
+  private filterMediaDevices(mediaDevices: MediaDeviceInfo[]) {
+    const cameras = mediaDevices.filter(({kind}) => kind === MediaDeviceType.VIDEO_INPUT);
+    const microphones = mediaDevices.filter(({kind}) => kind === MediaDeviceType.AUDIO_INPUT);
+    const speakers = mediaDevices.filter(({kind}) => kind === MediaDeviceType.AUDIO_OUTPUT);
+    return {cameras, microphones, speakers};
   }
 
   /**
    * Update list of available MediaDevices.
    * @param [camera=false] If `camera=true`, a video track is also created when the device list is read.
    * This ensures that the video device labels can also be read. This is necessary for initializing the entire device list.
-   * @returns Resolves with all MediaDevices when the list has been updated
    */
-  public async refreshMediaDevices(camera = false): Promise<MediaDeviceInfo[]> {
-    const setDevices = (type: MediaDeviceType, devices: MediaDeviceInfo[]): void => {
-      this.availableDevices[type](devices);
-      const currentId = this.currentDeviceId[type];
-      const firstDeviceId = devices[0]?.deviceId;
-
-      const favorites = loadValue<string[]>(`${type}-fave`) ?? [];
-      const favoriteDeviceId = favorites.map(favorite => devices.some(d => d.deviceId === favorite));
-
-      if (favoriteDeviceId.some(favorite => favorite)) {
-        const faveIndex = favoriteDeviceId.findIndex(favorite => favorite);
-        currentId(
-          devices.find(d => d.deviceId === favorites[faveIndex] || d.deviceId === favorites[faveIndex])?.deviceId ??
-            firstDeviceId,
-        );
-      } else if (!devices.some(d => d.deviceId === currentId())) {
-        currentId(firstDeviceId);
-      }
-    };
-
+  public async refreshMediaDevices(camera = false) {
     try {
       this.removeAllDevices();
       const mediaDevices = await window.navigator.mediaDevices.enumerateDevices();
@@ -279,13 +190,32 @@ export class MediaDevicesHandler {
 
       const {microphones, speakers, cameras} = this.filterMediaDevices(mediaDevices);
 
-      setDevices(MediaDeviceType.AUDIO_INPUT, microphones);
-      setDevices(MediaDeviceType.AUDIO_OUTPUT, speakers);
-      setDevices(MediaDeviceType.VIDEO_INPUT, cameras);
+      const prev = mediaDevicesStore.getState();
+
+      const audioInputId = this.pickDeviceId(MediaDeviceType.AUDIO_INPUT, microphones, prev.audioInputDeviceId);
+      const audioOutputId = this.pickDeviceId(MediaDeviceType.AUDIO_OUTPUT, speakers, prev.audioOutputDeviceId);
+      const videoInputId = this.pickDeviceId(MediaDeviceType.VIDEO_INPUT, cameras, prev.videoInputDeviceId);
+
+      mediaDevicesStore.setState({
+        // lists
+        audioInputDevices: microphones,
+        audioOutputDevices: speakers,
+        videoInputDevices: cameras,
+        // support
+        audioInputSupported: microphones.length > 0,
+        audioOutputSupported: speakers.length > 0,
+        videoInputSupported: cameras.length > 0,
+        // selections (resolved once)
+        audioInputDeviceId: audioInputId,
+        audioOutputDeviceId: audioOutputId,
+        videoInputDeviceId: videoInputId,
+      });
+
+      // update for next disconnected detection pass
       this.previousDeviceSupport = {
-        audioinput: microphones.length,
-        audiooutput: speakers.length,
-        videoinput: cameras.length,
+        [MediaDeviceType.AUDIO_INPUT]: microphones.length,
+        [MediaDeviceType.AUDIO_OUTPUT]: speakers.length,
+        [MediaDeviceType.VIDEO_INPUT]: cameras.length,
       };
 
       this.onMediaDevicesRefresh?.();
@@ -297,11 +227,27 @@ export class MediaDevicesHandler {
     }
   }
 
-  /**
-   * Update list of available screens.
-   * @returns Resolves with all screen sources when the list has been updated
-   */
-  async getScreenSources(): Promise<ElectronDesktopCapturerSource[]> {
+  private pickDeviceId(type: MediaDeviceType, devices: MediaDeviceInfo[], currentId: string) {
+    const defaults = MediaDevicesHandler.CONFIG.DEFAULT_DEVICE[type];
+    const first = devices[0]?.deviceId;
+
+    // favorite first (must exist)
+    const favorites = loadValue<string[]>(this.favoriteKeyFor(type)) ?? [];
+    const matchedFavorite = favorites.find(fav => devices.some(({deviceId}) => deviceId === fav));
+    if (matchedFavorite) {
+      return matchedFavorite;
+    }
+
+    // keep current if still available
+    if (devices.some(({deviceId}) => deviceId === currentId)) {
+      return currentId;
+    }
+
+    // else first available or default
+    return first ?? defaults;
+  }
+
+  public async getScreenSources() {
     const options: ElectronGetSourcesOptions = {
       thumbnailSize: {
         height: 176,
@@ -313,40 +259,58 @@ export class MediaDevicesHandler {
       ],
     };
 
-    const getSourcesWrapper = (options: ElectronGetSourcesOptions): Promise<ElectronDesktopCapturerSource[]> => {
-      /**
-       * Electron.desktopCapturer.getSources() is not available from electron 17 anymore
-       * for further info please visit:
-       * https://www.electronjs.org/docs/latest/breaking-changes#removed-desktopcapturergetsources-in-the-renderer
-       */
-      if (window.desktopCapturer?.getDesktopSources) {
-        return window.desktopCapturer.getDesktopSources(options);
-      }
-      if (window.desktopCapturer?.getSources.constructor.name === 'AsyncFunction') {
-        // Electron > 4
-        return window.desktopCapturer.getSources(options);
-      }
-      // Electron <= 4
-      return new Promise((resolve, reject) =>
-        window.desktopCapturer?.getSources(options, (error, screenSources) =>
-          error ? reject(error) : resolve(screenSources),
-        ),
-      );
-    };
-
-    const screenSources = await getSourcesWrapper(options);
+    const screenSources = await this.getSourcesWrapper(options);
 
     this.logger.info(`Detected '${screenSources.length}' sources for screen sharing from Electron`);
-    this.availableDevices.screeninput(screenSources);
+
+    mediaDevicesStore.setState({
+      screenInputDevices: screenSources,
+      screenInputSupported: screenSources.length > 0,
+    });
+
     return screenSources;
+  }
+
+  private getSourcesWrapper(options: ElectronGetSourcesOptions): Promise<ElectronDesktopCapturerSource[]> {
+    /**
+     * Electron.desktopCapturer.getSources() is not available from electron 17 anymore
+     * for further info please visit:
+     * https://www.electronjs.org/docs/latest/breaking-changes#removed-desktopcapturergetsources-in-the-renderer
+     */
+    if (window.desktopCapturer?.getDesktopSources) {
+      return window.desktopCapturer.getDesktopSources(options);
+    }
+    if (window.desktopCapturer?.getSources.constructor.name === 'AsyncFunction') {
+      // Electron > 4
+      return window.desktopCapturer.getSources(options);
+    }
+    // Electron <= 4
+    return new Promise((resolve, reject) =>
+      window.desktopCapturer?.getSources(options, (error, screenSources) =>
+        error ? reject(error) : resolve(screenSources),
+      ),
+    );
   }
 
   /**
    * Remove all known MediaDevices from the lists.
    */
-  private removeAllDevices(): void {
-    this.availableDevices.audioinput.removeAll();
-    this.availableDevices.audiooutput.removeAll();
-    this.availableDevices.videoinput.removeAll();
+  private removeAllDevices() {
+    mediaDevicesStore.getState().resetDevices();
+  }
+
+  private favoriteKeyFor(type: MediaDeviceType) {
+    switch (type) {
+      case MediaDeviceType.AUDIO_INPUT:
+        return FavoriteDeviceTypes.AUDIO_INPUT;
+      case MediaDeviceType.AUDIO_OUTPUT:
+        return FavoriteDeviceTypes.AUDIO_OUTPUT;
+      case MediaDeviceType.VIDEO_INPUT:
+        return FavoriteDeviceTypes.VIDEO_INPUT;
+      case MediaDeviceType.SCREEN_INPUT:
+        return FavoriteDeviceTypes.SCREEN_INPUT;
+      default:
+        return `${type}-fave`;
+    }
   }
 }

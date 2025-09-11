@@ -17,8 +17,7 @@
  *
  */
 
-import {render, fireEvent} from '@testing-library/react';
-import ko from 'knockout';
+import {fireEvent, render} from '@testing-library/react';
 
 import {CALL_TYPE, VIDEO_STATE} from '@wireapp/avs';
 
@@ -26,9 +25,10 @@ import {Call} from 'Repositories/calling/Call';
 import {Participant} from 'Repositories/calling/Participant';
 import {Conversation} from 'Repositories/entity/Conversation';
 import {User} from 'Repositories/entity/User';
-import {MediaDevicesHandler} from 'Repositories/media/MediaDevicesHandler';
 
 import {GroupVideoGrid, GroupVideoGripProps} from './GroupVideoGrid';
+
+import {buildMediaDevicesHandler} from '../../auth/util/test/TestUtil';
 
 jest.mock('@wireapp/api-client/lib/team');
 
@@ -53,11 +53,7 @@ const createMockCall = () => {
     0,
     new Participant(new User(''), ''),
     CALL_TYPE.NORMAL,
-    {
-      currentAvailableDeviceId: {
-        audiooutput: ko.pureComputed(() => 'test'),
-      },
-    } as MediaDevicesHandler,
+    buildMediaDevicesHandler(),
   );
 };
 

@@ -19,14 +19,12 @@
 
 import {AudioPreference, WebappProperties} from '@wireapp/api-client/lib/user/data/';
 import {amplify} from 'amplify';
-import ko from 'knockout';
 
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {NOTIFICATION_HANDLING_STATE} from 'Repositories/event/NotificationHandlingState';
-import {MediaDevicesHandler} from 'Repositories/media/MediaDevicesHandler';
-import {MediaDeviceType} from 'Repositories/media/MediaDeviceType';
-import {Logger, getLogger} from 'Util/Logger';
+import {mediaDevicesStore} from 'Repositories/media/useMediaDevicesStore';
+import {getLogger, Logger} from 'Util/Logger';
 
 import {AudioPlayingType} from './AudioPlayingType';
 import {AudioType} from './AudioType';
@@ -40,16 +38,11 @@ enum AUDIO_PLAY_PERMISSION {
 export class AudioRepository {
   private readonly logger: Logger;
   private readonly audioElements: Record<string, HTMLAudioElement>;
-  private readonly audioPreference = ko.observable(AudioPreference.ALL);
+  private audioPreference: AudioPreference = AudioPreference.ALL;
   private muted: boolean;
 
-  constructor(private readonly devicesHandler?: MediaDevicesHandler) {
+  constructor() {
     this.logger = getLogger('AudioRepository');
-    this.audioPreference.subscribe(audioPreference => {
-      if (audioPreference === AudioPreference.NONE) {
-        this.stopAll();
-      }
-    });
     this.audioElements = {};
     this.muted = true;
     this.subscribeToEvents();
@@ -60,12 +53,12 @@ export class AudioRepository {
       return AUDIO_PLAY_PERMISSION.DISALLOWED_BY_MUTE_STATE;
     }
 
-    const preferenceIsNone = this.audioPreference() === AudioPreference.NONE;
+    const preferenceIsNone = this.audioPreference === AudioPreference.NONE;
     if (preferenceIsNone && !AudioPlayingType.NONE.includes(audioId)) {
       return AUDIO_PLAY_PERMISSION.DISALLOWED_BY_PREFERENCES;
     }
 
-    const preferenceIsSome = this.audioPreference() === AudioPreference.SOME;
+    const preferenceIsSome = this.audioPreference === AudioPreference.SOME;
     if (preferenceIsSome && !AudioPlayingType.SOME.includes(audioId)) {
       return AUDIO_PLAY_PERMISSION.DISALLOWED_BY_PREFERENCES;
     }
@@ -83,7 +76,7 @@ export class AudioRepository {
   }
 
   private updateSinkIds() {
-    const currentOutputDevice = this.devicesHandler?.currentDeviceId[MediaDeviceType.AUDIO_OUTPUT]();
+    const currentOutputDevice = mediaDevicesStore.getState().audioOutputDeviceId;
     if (!currentOutputDevice) {
       return;
     }
@@ -158,7 +151,9 @@ export class AudioRepository {
           await this.playAudio(audioElement, playInLoop);
           this.logger.log(`Playing sound '${audioId}' (loop: '${playInLoop}')`);
         } catch (error) {
-          this.logger.error(`Failed to play sound '${audioId}': ${error.message}`);
+          if (error instanceof Error) {
+            this.logger.error(`Failed to play sound '${audioId}': ${error.message}`);
+          }
           throw error;
         }
         break;
@@ -174,7 +169,10 @@ export class AudioRepository {
   }
 
   readonly setAudioPreference = (audioPreference: AudioPreference): void => {
-    this.audioPreference(audioPreference);
+    this.audioPreference = audioPreference;
+    if (audioPreference === AudioPreference.NONE) {
+      this.stopAll();
+    }
   };
 
   readonly setMutedState = (handlingNotifications: NOTIFICATION_HANDLING_STATE): void => {

@@ -17,14 +17,13 @@
  *
  */
 
-import React, {useEffect, useState} from 'react';
+import {useEffect, useState} from 'react';
 
 import * as Icon from 'Components/Icon';
 import {MediaDevicesHandler} from 'Repositories/media/MediaDevicesHandler';
-import {MediaDeviceType} from 'Repositories/media/MediaDeviceType';
 import {MediaStreamHandler} from 'Repositories/media/MediaStreamHandler';
 import {MediaType} from 'Repositories/media/MediaType';
-import {useKoSubscribableChildren} from 'Util/ComponentUtil';
+import {useMediaDevicesStore} from 'Repositories/media/useMediaDevicesStore';
 import {t} from 'Util/LocalizerUtil';
 import {getLogger} from 'Util/Logger';
 
@@ -43,22 +42,11 @@ interface MicrophonePreferencesProps {
   hasActiveCall: boolean;
 }
 
-const MicrophonePreferences: React.FC<MicrophonePreferencesProps> = ({
-  devicesHandler,
-  streamHandler,
-  refreshStream,
-  hasActiveCall,
-}) => {
+const MicrophonePreferences = ({streamHandler, refreshStream, hasActiveCall}: MicrophonePreferencesProps) => {
   const [isRequesting, setIsRequesting] = useState(false);
-  const [stream, setStream] = useState<MediaStream>();
-  const {[MediaDeviceType.AUDIO_INPUT]: availableDevices} = useKoSubscribableChildren(
-    devicesHandler?.availableDevices,
-    [MediaDeviceType.AUDIO_INPUT],
-  );
+  const [stream, setStream] = useState<MediaStream | null>(null);
 
-  const {[MediaDeviceType.AUDIO_INPUT]: currentDeviceId} = useKoSubscribableChildren(devicesHandler?.currentDeviceId, [
-    MediaDeviceType.AUDIO_INPUT,
-  ]);
+  const {audioInputDevices, audioInputDeviceId, setAudioInputDeviceId} = useMediaDevicesStore();
 
   const {URL: urls} = Config.getConfig();
 
@@ -67,7 +55,9 @@ const MicrophonePreferences: React.FC<MicrophonePreferencesProps> = ({
     try {
       setStream(await refreshStream());
     } catch (error) {
-      logger.warn(`Requesting MediaStream for type "${MediaType.AUDIO}" failed: ${error.message}`, error);
+      if (error instanceof Error) {
+        logger.warn(`Requesting MediaStream for type "${MediaType.AUDIO}" failed: ${error.message}`, error);
+      }
       setStream(null);
     } finally {
       setIsRequesting(false);
@@ -76,7 +66,8 @@ const MicrophonePreferences: React.FC<MicrophonePreferencesProps> = ({
 
   useEffect(() => {
     requestStream();
-  }, [currentDeviceId]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [audioInputDeviceId]);
 
   useEffect(
     () => () => {
@@ -99,12 +90,12 @@ const MicrophonePreferences: React.FC<MicrophonePreferencesProps> = ({
 
       <DeviceSelect
         uieName="enter-microphone"
-        devices={availableDevices as MediaDeviceInfo[]}
-        value={currentDeviceId}
+        devices={audioInputDevices}
+        value={audioInputDeviceId}
         defaultDeviceName={t('preferencesAVMicrophone')}
         icon={Icon.MicOnIcon}
         isRequesting={isRequesting}
-        onChange={deviceId => devicesHandler.currentDeviceId[MediaDeviceType.AUDIO_INPUT](deviceId)}
+        onChange={deviceId => setAudioInputDeviceId(deviceId)}
         title={t('preferencesAVMicrophone')}
       />
       {isRequesting ? (

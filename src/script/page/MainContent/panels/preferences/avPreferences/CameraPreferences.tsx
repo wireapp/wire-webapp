@@ -20,10 +20,9 @@
 import {memo, useCallback, useEffect, useRef, useState} from 'react';
 
 import * as Icon from 'Components/Icon';
-import {ElectronDesktopCapturerSource, MediaDevicesHandler} from 'Repositories/media/MediaDevicesHandler';
-import {MediaDeviceType} from 'Repositories/media/MediaDeviceType';
 import {MediaStreamHandler} from 'Repositories/media/MediaStreamHandler';
 import {MediaType} from 'Repositories/media/MediaType';
+import {useMediaDevicesStore} from 'Repositories/media/useMediaDevicesStore';
 import {t} from 'Util/LocalizerUtil';
 import {getLogger} from 'Util/Logger';
 
@@ -35,25 +34,17 @@ import {PreferencesSection} from '../components/PreferencesSection';
 const logger = getLogger('CameraPreferences');
 
 interface CameraPreferencesProps {
-  devicesHandler: MediaDevicesHandler;
   hasActiveCameraStream: boolean;
   refreshStream: () => Promise<MediaStream | void>;
   streamHandler: MediaStreamHandler;
-  availableDevices: (MediaDeviceInfo | ElectronDesktopCapturerSource)[];
-  currentDeviceId: string;
 }
 
-const CameraPreferencesComponent = ({
-  devicesHandler,
-  streamHandler,
-  refreshStream,
-  hasActiveCameraStream,
-  availableDevices,
-  currentDeviceId,
-}: CameraPreferencesProps) => {
+const CameraPreferencesComponent = ({streamHandler, refreshStream, hasActiveCameraStream}: CameraPreferencesProps) => {
   const [isRequesting, setIsRequesting] = useState(false);
   const [stream, setStream] = useState<MediaStream | null>(null);
   const videoElement = useRef<HTMLVideoElement>(null);
+
+  const {videoInputDevices, videoInputDeviceId, setVideoInputDeviceId} = useMediaDevicesStore();
 
   const {URL: urls, BRAND_NAME: brandName} = Config.getConfig();
 
@@ -86,7 +77,7 @@ const CameraPreferencesComponent = ({
 
   useEffect(() => {
     requestStream();
-  }, [currentDeviceId, requestStream]);
+  }, [videoInputDeviceId, requestStream]);
 
   useEffect(() => {
     if (videoElement.current && stream) {
@@ -114,12 +105,12 @@ const CameraPreferencesComponent = ({
       )}
       <DeviceSelect
         uieName="enter-camera"
-        devices={availableDevices as MediaDeviceInfo[]}
-        value={currentDeviceId}
+        devices={videoInputDevices}
+        value={videoInputDeviceId}
         defaultDeviceName={t('preferencesAVCamera')}
         icon={Icon.CameraIcon}
         isRequesting={isRequesting}
-        onChange={deviceId => devicesHandler.currentDeviceId[MediaDeviceType.VIDEO_INPUT](deviceId)}
+        onChange={deviceId => setVideoInputDeviceId(deviceId)}
         title={t('preferencesAVCamera')}
       />
 
