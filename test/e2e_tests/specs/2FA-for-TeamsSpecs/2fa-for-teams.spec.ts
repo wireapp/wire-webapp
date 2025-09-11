@@ -18,7 +18,8 @@
  */
 
 import {getUser, User} from 'test/e2e_tests/data/user';
-import {addCreatedTeam, addCreatedUser, tearDownAll} from 'test/e2e_tests/utils/tearDown.util';
+import {setupBasicTestScenario} from 'test/e2e_tests/utils/setup.utli';
+import {tearDownAll} from 'test/e2e_tests/utils/tearDown.util';
 import {loginUser} from 'test/e2e_tests/utils/userActions';
 
 import {test, expect} from '../../test.fixtures';
@@ -30,17 +31,9 @@ test.describe('f2a for teams', () => {
   const member1 = getUser();
 
   test.beforeAll(async ({api}) => {
-    const user = await api.createTeamOwner(owner, teamName);
-    if (!owner.token) {
-      throw new Error(`Owner ${owner.username} has no token and can't be used for team creation`);
-    }
+    const user = await setupBasicTestScenario(api, [member1], owner, teamName);
     owner = {...owner, ...user};
-    addCreatedTeam(owner, owner.teamId!);
-    const invitationIdForMember1 = await api.team.inviteUserToTeam(member1.email, owner);
-    const invitationCodeForMember1 = await api.brig.getTeamInvitationCodeForEmail(owner.teamId, invitationIdForMember1);
 
-    await api.createPersonalUser(member1, invitationCodeForMember1);
-    addCreatedUser(member1);
     await api.brig.unlockSndFactorPasswordChallenge(owner.teamId);
     await api.featureConfig.changeStateSndFactorPasswordChallenge(owner, owner.teamId, 'enabled');
   });
@@ -52,64 +45,56 @@ test.describe('f2a for teams', () => {
     await pageManager.openMainPage();
     await loginUser(owner, pageManager);
 
-    const page = await pageManager.webapp.pages.emailVerification();
-    const isVisible = await page.isEmailVerificationPageVisible();
+    const {pages, components, modals} = await pageManager.webapp;
+    const isVisible = await pages.emailVerification().isEmailVerificationPageVisible();
 
     await expect(isVisible).toBeTruthy();
     // wait for mail
-    const currentPage = await pageManager.getPage();
-    await currentPage.waitForTimeout(500);
+    await pageManager.waitForTimeout(800);
     const correctCode = await api.inbucket.getVerificationCode(owner.email);
 
     //case: enter an incorrect code
-    await currentPage.waitForTimeout(500);
-    await page.enterVerificationCode('123456');
+    await pageManager.waitForTimeout(500);
+    await pages.emailVerification().enterVerificationCode('123456');
 
-    await expect(page.errorLabel).toBeVisible();
-    const errorText = await page.errorLabel.innerText();
-    expect(errorText).toContain('Please retry, or request another code.');
+    await expect(pages.emailVerification().errorLabel).toBeVisible();
+    await expect(pages.emailVerification().errorLabel).toHaveText('Please retry, or request another code.');
 
-    await page.clearCode();
-    await page.enterVerificationCode(correctCode);
+    await pages.emailVerification().clearCode();
+    await pages.emailVerification().enterVerificationCode(correctCode);
     // enter don't work
-    await page.pressSubmit();
+    await pages.emailVerification().pressSubmit();
 
     // main screen loads over 45 secs
-    await pageManager.webapp.components
-      .conversationSidebar()
-      .personalUserName.waitFor({state: 'visible', timeout: 60_000});
+    await components.conversationSidebar().personalUserName.waitFor({state: 'visible', timeout: 60_000});
 
-    await pageManager.webapp.modals.dataShareConsent().clickDecline();
-    await expect(pageManager.webapp.components.conversationSidebar().personalUserName).toBeVisible();
+    await modals.dataShareConsent().clickDecline();
+    await expect(components.conversationSidebar().personalUserName).toBeVisible();
   });
 
   test(
     'I want to receive new verification code email after clicking "Resend code" button',
     {tag: ['@TC-40', '@regression']},
     async ({pageManager, api}) => {
-      const oneMinTimeout = 62_000;
       test.setTimeout(310_000);
       await pageManager.openMainPage();
       await loginUser(owner, pageManager);
 
-      const emailPage = await pageManager.webapp.pages.emailVerification();
-      const isVisible = await emailPage.isEmailVerificationPageVisible();
+      const {pages} = await pageManager.webapp;
+      const isVisible = await pages.emailVerification().isEmailVerificationPageVisible();
       await expect(isVisible).toBeTruthy();
 
-      const page = await pageManager.getPage();
       // wait for mail
-      await page.waitForTimeout(2000);
+      await pageManager.waitForTimeout(800);
       const oldCode = await api.inbucket.getVerificationCode(owner.email);
 
       expect(oldCode.length).toBe(6);
       expect(Number.isInteger(parseInt(oldCode))).toBeTruthy();
 
-      const sendRequest = page.waitForRequest('*/**/verification-code/send', {timeout: oneMinTimeout});
-      await page.waitForTimeout(61_000);
-      await emailPage.resendButton.click();
-      await sendRequest;
+      await pageManager.waitForTimeout(61_000); // wait 1 min to prevent 429 on request
+      await pages.emailVerification().resendButton.click();
 
-      await page.waitForTimeout(3000);
+      await pageManager.waitForTimeout(3000);
       const newCode = await api.inbucket.getVerificationCode(owner.email);
 
       expect(oldCode).not.toBe(newCode);
@@ -126,12 +111,10 @@ test.describe('f2a for teams', () => {
 
       await pageManager.openMainPage();
       await loginUser(owner, pageManager);
+      const {components} = pageManager.webapp;
+      await components.conversationSidebar().personalUserName.waitFor({state: 'visible', timeout: 60_000});
 
-      await pageManager.webapp.components
-        .conversationSidebar()
-        .personalUserName.waitFor({state: 'visible', timeout: 60_000});
-
-      await expect(pageManager.webapp.components.conversationSidebar().personalUserName).toBeVisible();
+      await expect(components.conversationSidebar().personalUserName).toBeVisible();
     },
   );
   test.afterAll(async ({api}) => {
