@@ -17,16 +17,16 @@
  *
  */
 
-import React, {useEffect, useRef} from 'react';
+import {HTMLProps, useEffect, useRef, useState} from 'react';
 
 import cx from 'classnames';
 
 import {t} from 'Util/LocalizerUtil';
 import {getLogger} from 'Util/Logger';
 
-export interface InputLevelProps extends React.HTMLProps<HTMLDivElement> {
+export interface InputLevelProps extends HTMLProps<HTMLDivElement> {
   disabled: boolean;
-  mediaStream: MediaStream;
+  mediaStream: MediaStream | null;
 }
 
 /** How many bullets should be displayed */
@@ -45,9 +45,9 @@ const logger = getLogger('InputLevel');
  * @param disabled Show audio meter with disabled bullets if set to `true`
  * @param level Audio input volume as floating point number, `1.0` is 100%
  */
-const InputLevel: React.FC<InputLevelProps> = ({disabled, mediaStream, className = '', ...rest}) => {
+const InputLevel = ({disabled, mediaStream, className = '', ...rest}: InputLevelProps) => {
   const bullets = useRef(Array.from(Array(MAX_AUDIO_BULLETS).keys()));
-  const [level, setLevel] = React.useState(0);
+  const [level, setLevel] = useState(0);
 
   useEffect(() => {
     if (!mediaStream) {

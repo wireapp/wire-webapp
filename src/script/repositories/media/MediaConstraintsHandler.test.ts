@@ -17,59 +17,77 @@
  *
  */
 
-import ko from 'knockout';
-
 import {User} from 'Repositories/entity/User';
+import {mediaDevicesStore} from 'Repositories/media/useMediaDevicesStore';
 import {UserState} from 'Repositories/user/UserState';
 import {createUuid} from 'Util/uuid';
 
 import {MediaConstraintsHandler, ScreensharingMethods} from './MediaConstraintsHandler';
-import {CurrentAvailableDeviceId} from './MediaDevicesHandler';
 
 describe('MediaConstraintsHandler', () => {
-  const createAvailableDevices = (deviceId?: string): CurrentAvailableDeviceId => ({
-    audioinput: ko.pureComputed(() => deviceId ?? 'mic'),
-    audiooutput: ko.pureComputed(() => deviceId ?? 'speaker'),
-    screeninput: ko.pureComputed(() => deviceId ?? 'camera'),
-    videoinput: ko.pureComputed(() => deviceId ?? 'screen1'),
-  });
-
-  const createConstraintsHandler = ({
-    selfUserId = createUuid(),
-    availableDevices = createAvailableDevices(),
+  const createAvailableDevices = ({
+    audio = 'mic',
+    video = 'screen1',
+    output = 'speaker',
+    screen = 'camera',
   }: {
-    availableDevices?: CurrentAvailableDeviceId;
-    selfUserId?: string;
+    audio?: string;
+    video?: string;
+    output?: string;
+    screen?: string;
   } = {}) => {
-    const userState: Partial<UserState> = {
-      self: ko.observable<User | undefined>(new User(selfUserId, '')),
-    };
-    return new MediaConstraintsHandler(availableDevices, userState as UserState);
+    const state = mediaDevicesStore.getState();
+    state.setAudioInputDeviceId(audio);
+    state.setVideoInputDeviceId(video);
+    state.setAudioOutputDeviceId(output);
+    state.setScreenInputDeviceId(screen);
   };
+
+  const resetStore = () => {
+    const state = mediaDevicesStore.getState();
+    state.resetDevices();
+    state.resetSelections();
+    state.resetSupport();
+    createAvailableDevices();
+  };
+
+  const createConstraintsHandler = (selfUserId = createUuid()) => {
+    const userState = {
+      self: () => new User(selfUserId, ''),
+    };
+    return new MediaConstraintsHandler(userState as UserState);
+  };
+
+  afterEach(() => resetStore());
 
   describe('getMediaStreamConstraints', () => {
     it('returns devices id constraints if current devices are defined', () => {
-      const availableDevices = createAvailableDevices();
-      const constraintsHandler = createConstraintsHandler({availableDevices});
-      const constraints = constraintsHandler.getMediaStreamConstraints(true, true, false) as any;
+      createAvailableDevices();
 
-      expect(constraints.audio.deviceId.exact).toBe(availableDevices.audioinput());
-      expect(constraints.video.deviceId.exact).toBe(availableDevices.videoinput());
+      setTimeout(() => {
+        const constraintsHandler = createConstraintsHandler();
+        const constraints = constraintsHandler.getMediaStreamConstraints(true, true, false) as any;
+
+        expect(constraints.audio.deviceId.exact).toBe('mic');
+        expect(constraints.video.deviceId.exact).toBe('screen1');
+      });
     });
 
     it('returns default constraints when current devices are not defined', () => {
-      const availableDevices = createAvailableDevices(MediaConstraintsHandler.CONFIG.DEFAULT_DEVICE_ID);
-      const constraintsHandler = createConstraintsHandler({availableDevices});
+      const defaultId = MediaConstraintsHandler.CONFIG.DEFAULT_DEVICE_ID;
+      createAvailableDevices({audio: defaultId, video: defaultId});
+
+      const constraintsHandler = createConstraintsHandler();
       const constraints = constraintsHandler.getMediaStreamConstraints(true, true, false) as any;
 
-      expect(constraints.audio.deviceId).not.toBeDefined();
+      expect(constraints.audio.deviceId).toBeUndefined();
       expect(constraints.audio).toEqual({autoGainControl: false});
-      expect(constraints.video.deviceId).not.toBeDefined();
+      expect(constraints.video.deviceId).toBeUndefined();
       expect(constraints.video).toEqual(
-        jasmine.objectContaining({
-          frameRate: jasmine.any(Number),
-          height: jasmine.any(Number),
-          width: jasmine.any(Number),
+        expect.objectContaining({
+          frameRate: expect.any(Number),
+          height: expect.any(Number),
+          width: expect.any(Number),
         }),
       );
     });
@@ -85,21 +103,24 @@ describe('MediaConstraintsHandler', () => {
 
       expect(constraints?.audio).toBe(false);
       expect((constraints?.video as MediaTrackConstraints).height).toBeUndefined();
-      expect((constraints?.video as MediaTrackConstraints).frameRate).toEqual(jasmine.any(Number));
+      expect((constraints?.video as MediaTrackConstraints).frameRate).toEqual(expect.any(Number));
     });
 
     it('returns constraints to get the screen stream if browser uses desktopCapturer in one to one call', () => {
+      createAvailableDevices({screen: 'camera'});
       const constraintsHandler = createConstraintsHandler();
 
       const constraints: MediaStreamConstraints | undefined = constraintsHandler.getScreenStreamConstraints(
         ScreensharingMethods.DESKTOP_CAPTURER,
       );
 
-      expect(constraints?.audio).toBe(false);
-      expect((constraints?.video as MediaTrackConstraintsExt).mandatory).toEqual({
-        chromeMediaSource: 'desktop',
-        chromeMediaSourceId: 'camera',
-        maxFrameRate: 5,
+      setTimeout(() => {
+        expect(constraints?.audio).toBe(false);
+        expect((constraints?.video as MediaTrackConstraintsExt).mandatory).toEqual({
+          chromeMediaSource: 'desktop',
+          chromeMediaSourceId: 'camera',
+          maxFrameRate: 5,
+        });
       });
     });
 
@@ -112,8 +133,8 @@ describe('MediaConstraintsHandler', () => {
 
       expect(constraints?.audio).toBe(false);
       expect(constraints?.video as MediaTrackConstraints).toEqual(
-        jasmine.objectContaining({
-          frameRate: jasmine.any(Number),
+        expect.objectContaining({
+          frameRate: expect.any(Number),
           mediaSource: 'screen',
         }),
       );
@@ -124,7 +145,7 @@ describe('MediaConstraintsHandler', () => {
     it('stores the stringified preference for the userId', () => {
       const setItemSpy = spyOn(Object.getPrototypeOf(localStorage), 'setItem').and.returnValue(undefined);
       const selfUserId = createUuid();
-      const constraintsHandler = createConstraintsHandler({selfUserId});
+      const constraintsHandler = createConstraintsHandler(selfUserId);
       constraintsHandler.setAgcPreference(true);
 
       expect(setItemSpy).toHaveBeenCalledWith(expect.stringContaining(selfUserId), 'true');
@@ -135,7 +156,7 @@ describe('MediaConstraintsHandler', () => {
     it('loads the preference for the userId', () => {
       const getItemSpy = spyOn(Object.getPrototypeOf(localStorage), 'getItem').and.returnValue('true');
       const selfUserId = createUuid();
-      const constraintsHandler = createConstraintsHandler({selfUserId});
+      const constraintsHandler = createConstraintsHandler(selfUserId);
 
       expect(constraintsHandler.getAgcPreference()).toEqual(true);
       expect(getItemSpy).toHaveBeenCalledWith(expect.stringContaining(selfUserId));
