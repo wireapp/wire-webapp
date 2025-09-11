@@ -27,6 +27,7 @@ export class WelcomePage {
   readonly createEnterpriseAccountButton: Locator;
   readonly createPersonalAccountButton: Locator;
   readonly logoutReasonText: Locator;
+  readonly ssoCode: Locator;
 
   constructor(page: Page) {
     this.page = page;
@@ -40,6 +41,7 @@ export class WelcomePage {
       '[data-uie-name="select-account-type-button"][variant="secondary"]',
     );
     this.logoutReasonText = page.locator('[data-uie-name="status-logout-reason"]');
+    this.ssoCode = page.locator('[data-uie-name="status-logout-reason"]');
   }
 
   async getLogoutReasonText() {

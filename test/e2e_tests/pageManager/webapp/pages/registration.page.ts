@@ -31,6 +31,8 @@ export class RegistrationPage {
   readonly confirmPasswordInput: Locator;
   readonly submitButton: Locator;
   readonly termsCheckbox: Locator;
+  readonly errorLabel: Locator;
+  readonly passwordPolicy: Locator;
 
   constructor(page: Page) {
     this.page = page;
@@ -41,6 +43,8 @@ export class RegistrationPage {
     this.confirmPasswordInput = page.locator('[data-uie-name="enter-confirm-password"]');
     this.submitButton = page.locator('[data-uie-name="do-next"]');
     this.termsCheckbox = page.locator('[data-uie-name="do-accept-terms"]');
+    this.errorLabel = page.locator('[data-uie-name="error-message"]');
+    this.passwordPolicy = page.locator('[data-uie-name="element-password-help"]');
   }
 
   async isPasswordPolicyInfoVisible() {
