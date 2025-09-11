@@ -22574,7 +22574,7 @@ __metadata:
     webpack-hot-middleware: "npm:2.26.1"
     webrtc-adapter: "npm:9.0.3"
     workbox-webpack-plugin: "npm:7.3.0"
-    zod: "npm:^3.24.2"
+    zod: "npm:^4.1.7"
     zustand: "npm:4.5.5"
   languageName: unknown
   linkType: soft
@@ -23051,10 +23051,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"zod@npm:^3.24.2":
-  version: 3.24.3
-  resolution: "zod@npm:3.24.3"
-  checksum: 10/1b15db625ca633324084f3a8587bfb907043bbca407a09f7d5da6a9781b3838c68e9312b49e91e479d2f8bf04cdda5810803ac9504e3b7ccbec3adf2de625fb8
+"zod@npm:^4.1.7":
+  version: 4.1.7
+  resolution: "zod@npm:4.1.7"
+  checksum: 10/8d8bfd45814d5aa565baeddfcbbad198f69815ce139e3c333247e5336996b84e694d218b2dc38871137e6194517066d7df5436b32c8cf4ed3519803902f11fa9
   languageName: node
   linkType: hard
 
