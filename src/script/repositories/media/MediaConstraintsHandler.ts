@@ -19,10 +19,10 @@
 
 import {container} from 'tsyringe';
 
+import {mediaDevicesStore} from 'Repositories/media/useMediaDevicesStore';
 import {UserState} from 'Repositories/user/UserState';
-import {Logger, getLogger} from 'Util/Logger';
+import {getLogger, Logger} from 'Util/Logger';
 
-import type {CurrentAvailableDeviceId} from './MediaDevicesHandler';
 import {VIDEO_QUALITY_MODE} from './VideoQualityMode';
 
 interface Config {
@@ -95,15 +95,12 @@ export class MediaConstraintsHandler {
     };
   }
 
-  constructor(
-    private readonly currentDeviceId: CurrentAvailableDeviceId,
-    private readonly userState = container.resolve(UserState),
-  ) {
+  constructor(private readonly userState = container.resolve(UserState)) {
     this.logger = getLogger('MediaConstraintsHandler');
   }
 
   private get agcStorageKey(): string {
-    return `agc_enabled_${this.userState.self().id}`;
+    return `agc_enabled_${this.userState.self()?.id}`;
   }
 
   setAgcPreference(agcEnabled: boolean): void {
@@ -120,32 +117,37 @@ export class MediaConstraintsHandler {
     requestVideo: boolean = false,
     isGroup: boolean = false,
   ): MediaStreamConstraints {
-    const currentDeviceId = this.currentDeviceId;
+    const {audioInputDeviceId, videoInputDeviceId} = mediaDevicesStore.getState();
     const mode = isGroup ? VIDEO_QUALITY_MODE.GROUP : VIDEO_QUALITY_MODE.MOBILE;
 
     return {
-      audio: requestAudio ? this.getAudioStreamConstraints(currentDeviceId.audioinput()) : undefined,
-      video: requestVideo ? this.getVideoStreamConstraints(currentDeviceId.videoinput(), mode) : undefined,
+      audio: requestAudio ? this.getAudioStreamConstraints(audioInputDeviceId) : undefined,
+      video: requestVideo ? this.getVideoStreamConstraints(videoInputDeviceId, mode) : undefined,
     };
   }
 
   getScreenStreamConstraints(method: ScreensharingMethods): MediaStreamConstraints | undefined {
     switch (method) {
-      case ScreensharingMethods.DESKTOP_CAPTURER:
+      case ScreensharingMethods.DESKTOP_CAPTURER: {
         this.logger.info(`Enabling screen sharing from desktopCapturer (with FULL resolution)`);
 
         const desktopCapturer = MediaConstraintsHandler.CONFIG.CONSTRAINTS.SCREEN.DESKTOP_CAPTURER;
+        const {screenInputDeviceId} = mediaDevicesStore.getState();
 
         const streamConstraints = {
-          audio: false,
-          video: desktopCapturer,
+          ...desktopCapturer,
+          mandatory: {
+            ...desktopCapturer.mandatory,
+            chromeMediaSourceId: screenInputDeviceId,
+          },
         };
 
-        const chromeMediaSourceId = this.currentDeviceId.screeninput();
-        streamConstraints.video.mandatory = {...streamConstraints.video.mandatory, chromeMediaSourceId};
-
-        return streamConstraints;
-      case ScreensharingMethods.DISPLAY_MEDIA:
+        return {
+          audio: false,
+          video: streamConstraints,
+        };
+      }
+      case ScreensharingMethods.DISPLAY_MEDIA: {
         this.logger.info(`Enabling screen sharing from getDisplayMedia (with FULL resolution)`);
 
         const display = MediaConstraintsHandler.CONFIG.CONSTRAINTS.SCREEN.DISPLAY_MEDIA;
@@ -154,7 +156,8 @@ export class MediaConstraintsHandler {
           audio: false,
           video: display,
         };
-      case ScreensharingMethods.USER_MEDIA:
+      }
+      case ScreensharingMethods.USER_MEDIA: {
         this.logger.info(`Enabling screen sharing from getUserMedia (with FULL resolution)`);
 
         const userMedia = MediaConstraintsHandler.CONFIG.CONSTRAINTS.SCREEN.USER_MEDIA;
@@ -163,6 +166,7 @@ export class MediaConstraintsHandler {
           audio: false,
           video: userMedia,
         };
+      }
       default:
         return undefined;
     }
@@ -175,10 +179,7 @@ export class MediaConstraintsHandler {
       : {autoGainControl: this.getAgcPreference()};
   }
 
-  private getVideoStreamConstraints(
-    mediaDeviceId: string,
-    mode: VIDEO_QUALITY_MODE = VIDEO_QUALITY_MODE.MOBILE,
-  ): MediaTrackConstraints {
+  private getVideoStreamConstraints(mediaDeviceId?: string, mode: VIDEO_QUALITY_MODE = VIDEO_QUALITY_MODE.MOBILE) {
     const streamConstraints = MediaConstraintsHandler.CONFIG.CONSTRAINTS.VIDEO[mode];
 
     if (typeof mediaDeviceId === 'string' && mediaDeviceId !== MediaConstraintsHandler.CONFIG.DEFAULT_DEVICE_ID) {
