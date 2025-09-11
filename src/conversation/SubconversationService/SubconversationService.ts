@@ -80,6 +80,9 @@ export class SubconversationService extends TypedEventEmitter<Events> {
         subconv_id: subconversationId,
       } = await this.getConferenceSubconversation(conversationId);
 
+      // We store the mapping between the subconversation and the parent conversation
+      await this.saveSubconversationGroupId(conversationId, subconversationId, subconversationGroupId);
+
       if (subconversationEpoch === 0) {
         const doesConversationExistsLocally = await this.mlsService.conversationExists(subconversationGroupId);
         if (doesConversationExistsLocally) {
@@ -107,9 +110,6 @@ export class SubconversationService extends TypedEventEmitter<Events> {
       }
 
       const epoch = Number(await this.mlsService.getEpoch(subconversationGroupId));
-
-      // We store the mapping between the subconversation and the parent conversation
-      await this.saveSubconversationGroupId(conversationId, subconversationId, subconversationGroupId);
 
       return {groupId: subconversationGroupId, epoch};
     } catch (error) {
