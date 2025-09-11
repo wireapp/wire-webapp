@@ -97,6 +97,18 @@ export class BrigRepositoryE2E {
     );
   }
 
+  public async unlockSndFactorPasswordChallenge(teamId: string) {
+    await this.axiosInstance.put(
+      `i/teams/${teamId}/features/sndFactorPasswordChallenge/unlocked`,
+      {},
+      {
+        headers: {
+          Authorization: `Basic ${BASIC_AUTH}`,
+        },
+      },
+    );
+  }
+
   public async enableChannelsFeature(teamId: string) {
     await this.axiosInstance.patch(
       `i/teams/${teamId}/features/channels`,
