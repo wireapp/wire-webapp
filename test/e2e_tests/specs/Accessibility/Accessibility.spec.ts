@@ -35,6 +35,7 @@ test.describe('Accessibility', () => {
   const conversationName = 'AccTest';
   const textMessage = 'long text message';
   const narrowViewport = {width: 480, height: 800};
+  const loginTimeOut = 60_000;
 
   test.beforeAll(async ({api}) => {
     const user = await setupBasicTestScenario(api, members, owner, teamName);
@@ -80,7 +81,7 @@ test.describe('Accessibility', () => {
 
       await memberPageManagerA.webapp.components
         .conversationSidebar()
-        .personalUserName.waitFor({state: 'visible', timeout: 60_000});
+        .personalUserName.waitFor({state: 'visible', timeout: loginTimeOut});
 
       await memberPageManagerA.webapp.modals.dataShareConsent().clickDecline();
       await memberPageManagerB.webapp.modals.dataShareConsent().clickDecline();
@@ -129,14 +130,14 @@ test.describe('Accessibility', () => {
 
     await pageManager.openMainPage();
     await loginUser(memberA, pageManager);
-    await pageManager.webapp.components.conversationSidebar().sidebar.waitFor({state: 'visible', timeout: 60_000});
-    await pageManager.webapp.modals.dataShareConsent().clickDecline();
+    const {components, modals} = pageManager.webapp;
 
-    await expect(pageManager.webapp.components.conversationSidebar().sidebar).toHaveAttribute(
-      'data-is-collapsed',
-      'true',
-    );
+    await components.conversationSidebar().sidebar.waitFor({state: 'visible', timeout: loginTimeOut});
+    await modals.dataShareConsent().clickDecline();
+
+    await expect(components.conversationSidebar().sidebar).toHaveAttribute('data-is-collapsed', 'true');
   });
+
   test(
     'I should not lose a drafted message when switching between conversations in collapsed view',
     {tag: ['@TC-51', '@regression']},
@@ -145,24 +146,25 @@ test.describe('Accessibility', () => {
 
       await pageManager.openMainPage();
       await loginUser(memberA, pageManager);
-      await pageManager.webapp.components.conversationSidebar().sidebar.waitFor({state: 'visible', timeout: 60_000});
-      await pageManager.webapp.modals.dataShareConsent().clickDecline();
+      const {components, modals, pages} = pageManager.webapp;
+      await components.conversationSidebar().sidebar.waitFor({state: 'visible', timeout: loginTimeOut});
+      await modals.dataShareConsent().clickDecline();
 
       await createGroup(pageManager, conversationName, [memberB]);
 
-      await pageManager.webapp.pages.conversation().typeMessage(message);
+      await pages.conversation().typeMessage(message);
       const page = await pageManager.getPage();
 
-      await pageManager.webapp.components.conversationSidebar().clickConnectButton();
+      await components.conversationSidebar().clickConnectButton();
 
       await page.locator('[data-uie-name="highlighted"]').nth(0).click();
-      await pageManager.webapp.modals.userProfile().clickStartConversation();
+      await modals.userProfile().clickStartConversation();
       await expect(page.locator('[data-uie-name="secondary-line"]')).toHaveText(message);
 
-      await pageManager.webapp.pages.conversationList().openConversation(memberB.fullName);
+      await pages.conversationList().openConversation(memberB.fullName);
 
-      await pageManager.webapp.pages.conversationList().openConversation(conversationName);
-      await expect(await pageManager.webapp.pages.conversation().messageInput).toHaveText(message);
+      await pages.conversationList().openConversation(conversationName);
+      await expect(await pages.conversation().messageInput).toHaveText(message);
     },
   );
 
