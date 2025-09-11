@@ -27,6 +27,7 @@ import {Button, Input, Loading} from '@wireapp/react-ui-kit';
 import {t} from 'Util/LocalizerUtil';
 import {isValidEmail, isValidUsername} from 'Util/ValidationUtil';
 
+import {useAutoFocus} from '../hooks/useAutoFocus';
 import {ValidationError} from '../module/action/ValidationError';
 import {RootState} from '../module/reducer';
 import * as AuthSelector from '../module/selector/AuthSelector';
@@ -47,7 +48,7 @@ const LoginForm = ({isFetching, onSubmit}: LoginFormProps) => {
   const [email, setEmail] = useState(defaultEmail || '');
   const [password, setPassword] = useState('');
 
-  const handleSubmit = (event: React.FormEvent): void => {
+  const handleSubmit = async (event: React.FormEvent): Promise<void> => {
     event.preventDefault();
     if (isFetching) {
       return;
@@ -95,8 +96,13 @@ const LoginForm = ({isFetching, onSubmit}: LoginFormProps) => {
     } else if (isValidUsername(localEmail.toLowerCase())) {
       loginData.handle = localEmail.replace('@', '').toLowerCase();
     }
-    onSubmit(loginData, validationErrors);
+    await onSubmit(loginData, validationErrors);
   };
+
+  useAutoFocus({
+    elementRef: passwordInput,
+    shouldFocus: !!defaultEmail,
+  });
 
   return (
     <div>
