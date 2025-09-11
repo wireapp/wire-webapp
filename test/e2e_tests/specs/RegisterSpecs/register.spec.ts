@@ -17,36 +17,14 @@
  *
  */
 
-import {getUser, User} from 'test/e2e_tests/data/user';
-import {webAppPath} from 'test/e2e_tests/pageManager';
-import {RegistrationPage} from 'test/e2e_tests/pageManager/webapp/pages/registration.page';
+import {getUser} from 'test/e2e_tests/data/user';
+import {completeRegistrationForm, goToPersonalRegistration} from 'test/e2e_tests/utils/registration.util';
 import {addCreatedUser, removeCreatedUser} from 'test/e2e_tests/utils/tearDown.util';
 
 import {test, expect} from '../../test.fixtures';
 
 test.describe('registration personal account', () => {
-  const url = `${webAppPath}auth/#/createaccount`;
-
   // Helper function to handle common registration steps
-  const completeRegistrationForm = async (
-    reg: RegistrationPage,
-    user: User,
-    input: string | null = null,
-    inputType = 'email',
-  ) => {
-    await reg.fillInUserInfo(user);
-    if (input) {
-      if (inputType === 'email') {
-        await reg.emailInput.fill(input);
-      } else {
-        await reg.passwordInput.fill(input);
-        await reg.confirmPasswordInput.fill(input);
-      }
-    }
-    await reg.toggleTermsCheckbox();
-    await reg.clickSubmitButton();
-  };
-
   test.slow();
 
   test.describe('email registration used', () => {
@@ -59,14 +37,21 @@ test.describe('registration personal account', () => {
 
     test(
       'I want to be notified if the email address I entered during registration has already been registered',
-      {tag: ['@TC-1623', '@regression']},
+      {tag: ['@TC-1623', '@TC-1640', '@regression']},
       async ({pageManager}) => {
-        await pageManager.openUrl(url);
+        await pageManager.openMainPage();
+        const {pages} = pageManager.webapp;
 
-        const reg = pageManager.webapp.pages.registration();
-        await completeRegistrationForm(reg, userA);
-        const text = await reg.errorLabel.innerText();
-        expect(text).toContain('This email address has already been registered.');
+        await goToPersonalRegistration(pageManager, userA.email);
+
+        await completeRegistrationForm(pageManager, userA);
+        await expect(pages.registration().errorLabel).toHaveText(
+          'This email address has already been registered. Learn more',
+        );
+
+        expect(pageManager.webapp.pages.registration().passwordPolicy).toHaveText(
+          'Use at least 8 characters, with one lowercase letter, one capital letter, a number, and a special character.',
+        );
       },
     );
 
@@ -79,18 +64,21 @@ test.describe('registration personal account', () => {
     'I want to see an error message if the email address is blacklisted',
     {tag: ['@TC-1624', '@regression']},
     async ({pageManager}) => {
+      const {pages} = pageManager.webapp;
       const incorrectEmail = 'nope@wearezeta.com';
-      await pageManager.openUrl(url);
       const user = getUser();
-      const reg = pageManager.webapp.pages.registration();
 
-      await completeRegistrationForm(reg, user, incorrectEmail, 'email');
+      await pageManager.openMainPage();
+      await goToPersonalRegistration(pageManager, user.email);
+      await completeRegistrationForm(pageManager, user, incorrectEmail, 'email');
 
-      const text = await reg.errorLabel.innerText();
-      expect(text).toContain('Something went wrong');
+      await expect(pages.registration().errorLabel).toHaveText(
+        'Something went wrong. Please reload the page and try again',
+      );
     },
   );
-
+  const errorMessagePW =
+    'Use at least 8 characters, with one lowercase letter, one capital letter, a number, and a special character.';
   const testCases = [
     {
       name: 'I want to see an error message if email is not valid',
@@ -104,43 +92,48 @@ test.describe('registration personal account', () => {
       tag: ['@TC-1634', '@regression'],
       input: '1234567',
       inputType: 'password',
-      errorMessage: 'Use at least 8 characters',
+      errorMessage: errorMessagePW,
     },
     {
       name: 'I should not be able to submit a password which does not have any Capital letter',
       tag: ['@TC-1635', '@regression'],
       input: 'pass!234567',
       inputType: 'password',
-      errorMessage: 'capital letter',
+      errorMessage: errorMessagePW,
     },
     {
       name: 'I should not be able to submit a password which does not have any number',
       tag: ['@TC-1636', '@regression'],
       input: 'testPassword!',
       inputType: 'password',
-      errorMessage: 'a number',
+      errorMessage:
+        'Use at least 8 characters, with one lowercase letter, one capital letter, a number, and a special character.',
     },
     {
       name: 'I should not be able to submit a password which does not have any special letter',
       tag: ['@TC-1637', '@TC-1641', '@regression'],
       input: 'testPassword1',
       inputType: 'password',
-      errorMessage: 'special character',
+      errorMessage:
+        'Use at least 8 characters, with one lowercase letter, one capital letter, a number, and a special character.',
     },
   ];
 
   testCases.forEach(testData => {
     test(`${testData.name}`, {tag: testData.tag}, async ({pageManager}) => {
-      await pageManager.openUrl(url);
+      const {pages} = pageManager.webapp;
       const user = getUser();
-      const reg = pageManager.webapp.pages.registration();
 
-      await completeRegistrationForm(reg, user, testData.input, testData.inputType);
+      await pageManager.openMainPage();
+      await goToPersonalRegistration(pageManager, user.email);
+      await completeRegistrationForm(pageManager, user, testData.input, testData.inputType);
 
-      const text = await reg.errorLabel.innerText();
-      expect(text).toContain(testData.errorMessage);
+      await expect(pages.registration().errorLabel).toHaveText(testData.errorMessage);
 
-      const errorColor = await reg.errorLabel.locator('span').evaluate(el => window.getComputedStyle(el).color);
+      const errorColor = await pages
+        .registration()
+        .errorLabel.locator('span')
+        .evaluate(el => window.getComputedStyle(el).color);
       expect(errorColor).toBe('rgb(194, 0, 19)');
     });
   });
@@ -162,31 +155,16 @@ test.describe('registration personal account', () => {
 
   testCasesPassword.forEach(testData => {
     test(`${testData.name}`, {tag: testData.tag}, async ({pageManager}) => {
-      await pageManager.openUrl(url);
       const user = getUser();
-      const reg = pageManager.webapp.pages.registration();
+      await pageManager.openMainPage();
 
-      const page = await pageManager.getPage();
-      const requestPromise = page.waitForRequest('*/**/activate/send');
+      const requestPromise = pageManager.waitForRequest('*/**/activate/send');
 
-      await completeRegistrationForm(reg, user, testData.input, testData.inputType);
+      await goToPersonalRegistration(pageManager, user.email);
+      await completeRegistrationForm(pageManager, user, testData.input, testData.inputType);
       await requestPromise;
 
-      const emailVeri = pageManager.webapp.pages.emailVerification();
-      await expect(emailVeri.verificationCodeInputLabel).toBeVisible();
+      await expect(pageManager.webapp.pages.emailVerification().verificationCodeInputLabel).toBeVisible();
     });
   });
-
-  test(
-    'I want to see the password policy in the set password step',
-    {tag: ['@TC-1640', '@regression']},
-    async ({pageManager}) => {
-      await pageManager.openUrl(url);
-      const reg = pageManager.webapp.pages.registration();
-      const text = await reg.passwordPolicy.innerText();
-      expect(text).toContain(
-        'Use at least 8 characters, with one lowercase letter, one capital letter, a number, and a special character.',
-      );
-    },
-  );
 });

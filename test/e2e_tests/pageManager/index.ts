@@ -122,6 +122,10 @@ export class PageManager {
     return await this.page;
   };
 
+  waitForRequest = (url: string) => {
+    return this.page.waitForRequest(url);
+  };
+
   // Helper method to get or create a page or modal instance
   // This method uses a cache to avoid creating multiple instances of the same page/modal
   private getOrCreate<T>(key: string, factory: () => T): T {
