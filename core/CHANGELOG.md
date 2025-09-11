@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [46.34.9](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@46.34.8...@wireapp/core@46.34.9) (2025-09-11)
+
+### Bug Fixes
+
+* move mapping of subconversation to occur before joining ([3957bd0](https://github.com/wireapp/wire-web-packages/commit/3957bd0fdc9ba0161550015c80e0db661b397bdb))
+
 ## [46.34.8](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@46.34.7...@wireapp/core@46.34.8) (2025-09-08)
 
 ### Bug Fixes
