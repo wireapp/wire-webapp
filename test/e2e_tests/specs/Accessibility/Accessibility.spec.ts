@@ -156,7 +156,7 @@ test.describe('Accessibility', () => {
       await pageManager.webapp.components.conversationSidebar().clickConnectButton();
 
       await page.locator('[data-uie-name="highlighted"]').nth(0).click();
-      await page.locator('[data-uie-name="start-conversation"]').click();
+      await pageManager.webapp.modals.userProfile().clickStartConversation();
       await expect(page.locator('[data-uie-name="secondary-line"]')).toHaveText(message);
 
       await pageManager.webapp.pages.conversationList().openConversation(memberB.fullName);
