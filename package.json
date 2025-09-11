@@ -15,7 +15,7 @@
     "@wireapp/avs": "9.10.25",
     "@wireapp/avs-debugger": "0.0.7",
     "@wireapp/commons": "5.4.2",
-    "@wireapp/core": "46.23.7-hotfix-1.2.0",
+    "@wireapp/core": "46.23.7-hotfix-1.2.1",
     "@wireapp/react-ui-kit": "9.44.1",
     "@wireapp/store-engine-dexie": "2.1.15",
     "@wireapp/telemetry": "0.3.1",
