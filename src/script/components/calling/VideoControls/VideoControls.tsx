@@ -145,13 +145,20 @@ export const VideoControls: React.FC<VideoControlsProps> = ({
   const {isVideoCallingEnabled} = useKoSubscribableChildren(teamState, ['isVideoCallingEnabled']);
 
   const {
-    videoInputDeviceId: currentCameraDevice,
-    audioInputDeviceId: currentMicrophoneDevice,
-    audioOutputDeviceId: currentSpeakerDevice,
+    currentCameraDevice,
+    currentMicrophoneDevice,
+    currentSpeakerDevice,
     videoInputDevices,
     audioInputDevices,
     audioOutputDevices,
-  } = useMediaDevicesStore();
+  } = useMediaDevicesStore(state => ({
+    currentCameraDevice: state.video.input.selectedId,
+    currentMicrophoneDevice: state.audio.input.selectedId,
+    currentSpeakerDevice: state.audio.output.selectedId,
+    videoInputDevices: state.video.input.devices,
+    audioInputDevices: state.audio.input.devices,
+    audioOutputDevices: state.audio.output.devices,
+  }));
 
   const isMobile = useActiveWindowMatchMedia(QUERY.mobile);
   const isDesktop = useActiveWindowMatchMedia(QUERY.desktop);

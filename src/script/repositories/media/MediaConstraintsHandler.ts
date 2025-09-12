@@ -117,7 +117,14 @@ export class MediaConstraintsHandler {
     requestVideo: boolean = false,
     isGroup: boolean = false,
   ): MediaStreamConstraints {
-    const {audioInputDeviceId, videoInputDeviceId} = mediaDevicesStore.getState();
+    const {
+      audio: {
+        input: {selectedId: audioInputDeviceId},
+      },
+      video: {
+        input: {selectedId: videoInputDeviceId},
+      },
+    } = mediaDevicesStore.getState();
     const mode = isGroup ? VIDEO_QUALITY_MODE.GROUP : VIDEO_QUALITY_MODE.MOBILE;
 
     return {
@@ -132,7 +139,11 @@ export class MediaConstraintsHandler {
         this.logger.info(`Enabling screen sharing from desktopCapturer (with FULL resolution)`);
 
         const desktopCapturer = MediaConstraintsHandler.CONFIG.CONSTRAINTS.SCREEN.DESKTOP_CAPTURER;
-        const {screenInputDeviceId} = mediaDevicesStore.getState();
+        const {
+          screen: {
+            input: {selectedId: screenInputDeviceId},
+          },
+        } = mediaDevicesStore.getState();
 
         const streamConstraints = {
           ...desktopCapturer,

@@ -46,7 +46,11 @@ const MicrophonePreferences = ({streamHandler, refreshStream, hasActiveCall}: Mi
   const [isRequesting, setIsRequesting] = useState(false);
   const [stream, setStream] = useState<MediaStream | null>(null);
 
-  const {audioInputDevices, audioInputDeviceId, setAudioInputDeviceId} = useMediaDevicesStore();
+  const {audioInputDevices, audioInputDeviceId, setAudioInputDeviceId} = useMediaDevicesStore(state => ({
+    audioInputDevices: state.audio.input.devices,
+    audioInputDeviceId: state.audio.input.selectedId,
+    setAudioInputDeviceId: state.setAudioInputDeviceId,
+  }));
 
   const {URL: urls} = Config.getConfig();
 

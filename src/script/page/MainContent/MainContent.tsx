@@ -109,7 +109,11 @@ const MainContent = ({
   const {isFederated, repositories, switchContent} = contentViewModel;
 
   /* eslint-disable react-hooks/rules-of-hooks */
-  const {audioInputSupported, audioOutputSupported, videoInputSupported} = useMediaDevicesStore();
+  const {audioInputSupported, audioOutputSupported, videoInputSupported} = useMediaDevicesStore(state => ({
+    audioInputSupported: state.audio.input.supported,
+    audioOutputSupported: state.audio.output.supported,
+    videoInputSupported: state.video.input.supported,
+  }));
   const deviceSupport = {
     [MediaDeviceType.AUDIO_INPUT]: audioInputSupported,
     [MediaDeviceType.AUDIO_OUTPUT]: audioOutputSupported,
