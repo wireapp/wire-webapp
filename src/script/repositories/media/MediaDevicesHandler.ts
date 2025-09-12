@@ -86,26 +86,64 @@ export class MediaDevicesHandler {
     this.logger = getLogger('MediaDevicesHandler');
 
     const supportsUserMedia = Runtime.isSupportingUserMedia();
-    mediaDevicesStore.setState({
-      audioInputDeviceId: loadValue(MediaDeviceType.AUDIO_INPUT) ?? 'default',
-      audioOutputDeviceId: loadValue(MediaDeviceType.AUDIO_OUTPUT) ?? 'default',
-      screenInputDeviceId: loadValue(MediaDeviceType.SCREEN_INPUT) ?? 'screen',
-      videoInputDeviceId: loadValue(MediaDeviceType.VIDEO_INPUT) ?? 'default',
-      audioInputSupported: supportsUserMedia,
-      videoInputSupported: supportsUserMedia,
-      audioOutputSupported: false,
-      screenInputSupported: !!window.desktopCapturer,
-    });
+    this.initializeDeviceState(supportsUserMedia);
 
     mediaDevicesStore.subscribe((state, prev) => {
-      this.updateFavoriteList(MediaDeviceType.AUDIO_INPUT, state.audioInputDeviceId, prev.audioInputDeviceId, state);
-      this.updateFavoriteList(MediaDeviceType.AUDIO_OUTPUT, state.audioOutputDeviceId, prev.audioOutputDeviceId, state);
-      this.updateFavoriteList(MediaDeviceType.VIDEO_INPUT, state.videoInputDeviceId, prev.videoInputDeviceId, state);
-      this.updateFavoriteList(MediaDeviceType.SCREEN_INPUT, state.screenInputDeviceId, prev.screenInputDeviceId, state);
+      this.updateFavoriteList(
+        MediaDeviceType.AUDIO_INPUT,
+        state.audio.input.selectedId,
+        prev.audio.input.selectedId,
+        state,
+      );
+      this.updateFavoriteList(
+        MediaDeviceType.AUDIO_OUTPUT,
+        state.audio.output.selectedId,
+        prev.audio.output.selectedId,
+        state,
+      );
+      this.updateFavoriteList(
+        MediaDeviceType.VIDEO_INPUT,
+        state.video.input.selectedId,
+        prev.video.input.selectedId,
+        state,
+      );
+      this.updateFavoriteList(
+        MediaDeviceType.SCREEN_INPUT,
+        state.screen.input.selectedId,
+        prev.screen.input.selectedId,
+        state,
+      );
     });
 
     void this.initializeMediaDevices(false);
   }
+
+  private initializeDeviceState = (supportsUserMedia: boolean) => {
+    mediaDevicesStore.getState().setAll({
+      audio: {
+        input: {
+          selectedId: loadValue(MediaDeviceType.AUDIO_INPUT) ?? 'default',
+          supported: supportsUserMedia,
+        },
+        output: {
+          selectedId: loadValue(MediaDeviceType.AUDIO_OUTPUT) ?? 'default',
+          supported: false,
+        },
+      },
+      video: {
+        input: {
+          selectedId: loadValue(MediaDeviceType.VIDEO_INPUT) ?? 'default',
+          supported: supportsUserMedia,
+        },
+      },
+      screen: {
+        input: {
+          selectedId: loadValue(MediaDeviceType.SCREEN_INPUT) ?? 'screen',
+          supported: !!window.desktopCapturer,
+        },
+      },
+    });
+  };
 
   public setOnMediaDevicesRefreshHandler(handler: () => void) {
     this.onMediaDevicesRefresh = handler;
@@ -138,10 +176,10 @@ export class MediaDevicesHandler {
     }
 
     const lengths = {
-      [MediaDeviceType.AUDIO_INPUT]: state.audioInputDevices.length,
-      [MediaDeviceType.AUDIO_OUTPUT]: state.audioOutputDevices.length,
-      [MediaDeviceType.VIDEO_INPUT]: state.videoInputDevices.length,
-      [MediaDeviceType.SCREEN_INPUT]: state.screenInputDevices.length,
+      [MediaDeviceType.AUDIO_INPUT]: state.audio.input.devices.length,
+      [MediaDeviceType.AUDIO_OUTPUT]: state.audio.output.devices.length,
+      [MediaDeviceType.VIDEO_INPUT]: state.video.input.devices.length,
+      [MediaDeviceType.SCREEN_INPUT]: state.screen.input.devices.length,
     };
 
     storeValue(type, newId);
@@ -192,23 +230,30 @@ export class MediaDevicesHandler {
 
       const prev = mediaDevicesStore.getState();
 
-      const audioInputId = this.pickDeviceId(MediaDeviceType.AUDIO_INPUT, microphones, prev.audioInputDeviceId);
-      const audioOutputId = this.pickDeviceId(MediaDeviceType.AUDIO_OUTPUT, speakers, prev.audioOutputDeviceId);
-      const videoInputId = this.pickDeviceId(MediaDeviceType.VIDEO_INPUT, cameras, prev.videoInputDeviceId);
+      const audioInputId = this.pickDeviceId(MediaDeviceType.AUDIO_INPUT, microphones, prev.audio.input.selectedId);
+      const audioOutputId = this.pickDeviceId(MediaDeviceType.AUDIO_OUTPUT, speakers, prev.audio.output.selectedId);
+      const videoInputId = this.pickDeviceId(MediaDeviceType.VIDEO_INPUT, cameras, prev.video.input.selectedId);
 
-      mediaDevicesStore.setState({
-        // lists
-        audioInputDevices: microphones,
-        audioOutputDevices: speakers,
-        videoInputDevices: cameras,
-        // support
-        audioInputSupported: microphones.length > 0,
-        audioOutputSupported: speakers.length > 0,
-        videoInputSupported: cameras.length > 0,
-        // selections (resolved once)
-        audioInputDeviceId: audioInputId,
-        audioOutputDeviceId: audioOutputId,
-        videoInputDeviceId: videoInputId,
+      mediaDevicesStore.getState().setAll({
+        audio: {
+          input: {
+            devices: microphones,
+            supported: microphones.length > 0,
+            selectedId: audioInputId,
+          },
+          output: {
+            devices: speakers,
+            supported: speakers.length > 0,
+            selectedId: audioOutputId,
+          },
+        },
+        video: {
+          input: {
+            devices: cameras,
+            supported: cameras.length > 0,
+            selectedId: videoInputId,
+          },
+        },
       });
 
       // update for next disconnected detection pass
@@ -263,9 +308,13 @@ export class MediaDevicesHandler {
 
     this.logger.info(`Detected '${screenSources.length}' sources for screen sharing from Electron`);
 
-    mediaDevicesStore.setState({
-      screenInputDevices: screenSources,
-      screenInputSupported: screenSources.length > 0,
+    mediaDevicesStore.getState().setAll({
+      screen: {
+        input: {
+          devices: screenSources,
+          supported: screenSources.length > 0,
+        },
+      },
     });
 
     return screenSources;
