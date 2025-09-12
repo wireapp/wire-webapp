@@ -277,7 +277,8 @@ export class Conversation {
       () =>
         this.isConversationWithBlockedUser() ||
         this.is1to1ConversationWithDeletedUser() ||
-        this.readOnlyState() !== null,
+        this.readOnlyState() !== null ||
+        this.accessState() === undefined,
     );
 
     this.isGroup = ko.pureComputed(() => {
@@ -558,11 +559,11 @@ export class Conversation {
         return userName || t('unavailableUser');
       }
 
-      if (this.isGroupOrChannel()) {
-        if (this.name()) {
-          return this.name();
-        }
+      if (this.name()) {
+        return this.name();
+      }
 
+      if (this.isGroupOrChannel()) {
         const hasUserEntities = !!this.participating_user_ets().length;
         if (hasUserEntities) {
           const isJustServices = this.participating_user_ets().every(userEntity => userEntity.isService);
