@@ -102,7 +102,11 @@ const CallingContainer = ({
     }
   };
 
-  const {setVideoInputDeviceId, setAudioInputDeviceId, setAudioOutputDeviceId} = useMediaDevicesStore();
+  const {setVideoInputDeviceId, setAudioInputDeviceId, setAudioOutputDeviceId} = useMediaDevicesStore(state => ({
+    setVideoInputDeviceId: state.setVideoInputDeviceId,
+    setAudioInputDeviceId: state.setAudioInputDeviceId,
+    setAudioOutputDeviceId: state.setAudioOutputDeviceId,
+  }));
 
   const switchCameraInput = (deviceId: string) => {
     setVideoInputDeviceId(deviceId);

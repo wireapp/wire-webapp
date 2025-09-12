@@ -26,7 +26,11 @@ import {DeviceSelect} from './DeviceSelect';
 import {PreferencesSection} from '../components/PreferencesSection';
 
 const AudioOutPreferences = () => {
-  const {audioOutputDeviceId, setAudioOutputDeviceId, audioOutputDevices} = useMediaDevicesStore();
+  const {audioOutputDeviceId, setAudioOutputDeviceId, audioOutputDevices} = useMediaDevicesStore(state => ({
+    audioOutputDeviceId: state.audio.output.selectedId,
+    setAudioOutputDeviceId: state.setAudioOutputDeviceId,
+    audioOutputDevices: state.audio.output.devices,
+  }));
 
   return (
     <PreferencesSection title={t('preferencesAVSpeakers')}>
