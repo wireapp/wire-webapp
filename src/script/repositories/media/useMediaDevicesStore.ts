@@ -128,25 +128,25 @@ export const mediaDevicesStore = createStore<MediaDevicesState>()(
     // id setters
     setAudioInputDeviceId: id =>
       set(state => {
-        const exists = state.audio.input.devices.some(({deviceId}) => deviceId === id);
+        const exists = state.audio.input.devices.some((device: MediaDeviceInfo) => device.deviceId === id);
         state.audio.input.selectedId = exists ? id : defaultAudioInputId;
       }),
 
     setAudioOutputDeviceId: id =>
       set(state => {
-        const exists = state.audio.output.devices.some(({deviceId}) => deviceId === id);
+        const exists = state.audio.output.devices.some((device: MediaDeviceInfo) => device.deviceId === id);
         state.audio.output.selectedId = exists ? id : defaultAudioOutputId;
       }),
 
     setVideoInputDeviceId: id =>
       set(state => {
-        const exists = state.video.input.devices.some(({deviceId}) => deviceId === id);
+        const exists = state.video.input.devices.some((device: MediaDeviceInfo) => device.deviceId === id);
         state.video.input.selectedId = exists ? id : defaultVideoInputId;
       }),
 
     setScreenInputDeviceId: id =>
       set(state => {
-        const exists = state.screen.input.devices.some(device => device.id === id);
+        const exists = state.screen.input.devices.some((device: ScreenDevice) => device.id === id);
         state.screen.input.selectedId = exists ? id : defaultScreenInputId;
       }),
 
