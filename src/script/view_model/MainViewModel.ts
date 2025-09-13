@@ -32,7 +32,8 @@ import type {CryptographyRepository} from 'Repositories/cryptography/Cryptograph
 import type {EventRepository} from 'Repositories/event/EventRepository';
 import type {GiphyRepository} from 'Repositories/extension/GiphyRepository';
 import type {IntegrationRepository} from 'Repositories/integration/IntegrationRepository';
-import type {MediaRepository} from 'Repositories/media/MediaRepository';
+import {MediaDevicesHandler} from 'Repositories/media/MediaDevicesHandler';
+import {MediaStreamHandler} from 'Repositories/media/MediaStreamHandler';
 import type {NotificationRepository} from 'Repositories/notification/NotificationRepository';
 import type {PreferenceNotificationRepository} from 'Repositories/notification/PreferenceNotificationRepository';
 import type {PermissionRepository} from 'Repositories/permission/PermissionRepository';
@@ -67,7 +68,6 @@ export interface ViewModelRepositories {
   eventTracker: EventTrackingRepository;
   giphy: GiphyRepository;
   integration: IntegrationRepository;
-  media: MediaRepository;
   message: MessageRepository;
   notification: NotificationRepository;
   permission: PermissionRepository;
@@ -103,6 +103,8 @@ export class MainViewModel {
 
   constructor(repositories: ViewModelRepositories) {
     const userState = container.resolve(UserState);
+    const mediaDevicesHandler = container.resolve(MediaDevicesHandler);
+    const mediaStreamHandler = container.resolve(MediaStreamHandler);
 
     this.actions = new ActionsViewModel(
       repositories.self,
@@ -117,8 +119,8 @@ export class MainViewModel {
     this.calling = new CallingViewModel(
       repositories.calling,
       repositories.audio,
-      repositories.media.devicesHandler,
-      repositories.media.streamHandler,
+      mediaDevicesHandler,
+      mediaStreamHandler,
       repositories.permission,
       repositories.team,
       repositories.properties,
