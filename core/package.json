@@ -38,7 +38,7 @@
     "@types/long": "^5.0.0",
     "@types/tough-cookie": "4.0.5",
     "@types/uuid": "9.0.8",
-    "commander": "14.0.0",
+    "commander": "14.0.1",
     "cross-env": "10.0.0",
     "dotenv-defaults": "5.0.2",
     "fake-indexeddb": "^5.0.2",
