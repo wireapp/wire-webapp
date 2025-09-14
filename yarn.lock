@@ -6255,50 +6255,50 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@roamhq/wrtc-darwin-arm64@npm:0.9.0":
-  version: 0.9.0
-  resolution: "@roamhq/wrtc-darwin-arm64@npm:0.9.0"
+"@roamhq/wrtc-darwin-arm64@npm:0.9.1":
+  version: 0.9.1
+  resolution: "@roamhq/wrtc-darwin-arm64@npm:0.9.1"
   conditions: os=darwin & cpu=arm64
   languageName: node
   linkType: hard
 
-"@roamhq/wrtc-darwin-x64@npm:0.9.0":
-  version: 0.9.0
-  resolution: "@roamhq/wrtc-darwin-x64@npm:0.9.0"
+"@roamhq/wrtc-darwin-x64@npm:0.9.1":
+  version: 0.9.1
+  resolution: "@roamhq/wrtc-darwin-x64@npm:0.9.1"
   conditions: os=darwin & cpu=x64
   languageName: node
   linkType: hard
 
-"@roamhq/wrtc-linux-arm64@npm:0.9.0":
-  version: 0.9.0
-  resolution: "@roamhq/wrtc-linux-arm64@npm:0.9.0"
+"@roamhq/wrtc-linux-arm64@npm:0.9.1":
+  version: 0.9.1
+  resolution: "@roamhq/wrtc-linux-arm64@npm:0.9.1"
   conditions: os=linux & cpu=arm64
   languageName: node
   linkType: hard
 
-"@roamhq/wrtc-linux-x64@npm:0.9.0":
-  version: 0.9.0
-  resolution: "@roamhq/wrtc-linux-x64@npm:0.9.0"
+"@roamhq/wrtc-linux-x64@npm:0.9.1":
+  version: 0.9.1
+  resolution: "@roamhq/wrtc-linux-x64@npm:0.9.1"
   conditions: os=linux & cpu=x64
   languageName: node
   linkType: hard
 
-"@roamhq/wrtc-win32-x64@npm:0.9.0":
-  version: 0.9.0
-  resolution: "@roamhq/wrtc-win32-x64@npm:0.9.0"
+"@roamhq/wrtc-win32-x64@npm:0.9.1":
+  version: 0.9.1
+  resolution: "@roamhq/wrtc-win32-x64@npm:0.9.1"
   conditions: os=win32 & cpu=x64
   languageName: node
   linkType: hard
 
-"@roamhq/wrtc@npm:0.9.0":
-  version: 0.9.0
-  resolution: "@roamhq/wrtc@npm:0.9.0"
+"@roamhq/wrtc@npm:0.9.1":
+  version: 0.9.1
+  resolution: "@roamhq/wrtc@npm:0.9.1"
   dependencies:
-    "@roamhq/wrtc-darwin-arm64": "npm:0.9.0"
-    "@roamhq/wrtc-darwin-x64": "npm:0.9.0"
-    "@roamhq/wrtc-linux-arm64": "npm:0.9.0"
-    "@roamhq/wrtc-linux-x64": "npm:0.9.0"
-    "@roamhq/wrtc-win32-x64": "npm:0.9.0"
+    "@roamhq/wrtc-darwin-arm64": "npm:0.9.1"
+    "@roamhq/wrtc-darwin-x64": "npm:0.9.1"
+    "@roamhq/wrtc-linux-arm64": "npm:0.9.1"
+    "@roamhq/wrtc-linux-x64": "npm:0.9.1"
+    "@roamhq/wrtc-win32-x64": "npm:0.9.1"
     domexception: "npm:^4.0.0"
   dependenciesMeta:
     "@roamhq/wrtc-darwin-arm64":
@@ -6313,7 +6313,7 @@ __metadata:
       optional: true
     domexception:
       optional: true
-  checksum: 10/7702d8b9cd3ac65dae40b4b16b16eb558329dd82ecba8cb8955f421bf8c0341743c8ff0c6c2e9bf9b1005fbaaabda9633cea4129f068f4b5dfbeca28a5d22a1a
+  checksum: 10/e8d96dcecebefca025207abeb764c119ec14738d77974b3086b37147b5924a6404dad159d69a4ff130fe75c075e29be9525cb9ed7d3048d649023fa183314b1a
   languageName: node
   linkType: hard
 
@@ -22424,7 +22424,7 @@ __metadata:
     "@lexical/rich-text": "npm:0.27.2"
     "@mediapipe/tasks-vision": "npm:0.10.21"
     "@playwright/test": "npm:1.55.0"
-    "@roamhq/wrtc": "npm:0.9.0"
+    "@roamhq/wrtc": "npm:0.9.1"
     "@tanstack/react-table": "npm:8.21.3"
     "@tanstack/react-virtual": "npm:3.13.4"
     "@testing-library/dom": "npm:^10.4.1"
