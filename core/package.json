@@ -19,7 +19,7 @@
     "@wireapp/promise-queue": "workspace:^",
     "@wireapp/protocol-messaging": "1.53.0",
     "@wireapp/store-engine": "workspace:^",
-    "axios": "1.12.0",
+    "axios": "1.12.2",
     "bazinga64": "workspace:^",
     "deepmerge-ts": "6.0.0",
     "hash.js": "1.1.7",
