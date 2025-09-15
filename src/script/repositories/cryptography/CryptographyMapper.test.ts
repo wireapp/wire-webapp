@@ -24,6 +24,7 @@ import {isObject} from 'underscore';
 import {
   Asset,
   Availability,
+  ButtonAction,
   Calling,
   Cleared,
   External,
@@ -519,6 +520,26 @@ describe('CryptographyMapper', () => {
       expect(event_json.data.content).toBe(plaintext);
       expect(event_json.type).toBe(ClientEvent.CONVERSATION.MESSAGE_ADD);
       expect(event_json.id).toBe(generic_message.messageId);
+    });
+
+    it('resolves with a mapped button action message', async () => {
+      const generic_message = new GenericMessage({
+        buttonAction: new ButtonAction({
+          referenceMessageId: createUuid(),
+          buttonId: createUuid(),
+        }),
+        messageId: createUuid(),
+      });
+
+      return mapper.mapGenericMessage(generic_message, event).then(event_json => {
+        expect(isObject(event_json)).toBeTruthy();
+        expect(event_json.type).toBe(ClientEvent.CONVERSATION.BUTTON_ACTION);
+        expect(event_json.conversation).toBe(event.conversation);
+
+        expect(event_json.data.messageId).toBe(generic_message.buttonAction?.referenceMessageId);
+        expect(event_json.data.buttonId).toBe(generic_message.buttonAction?.buttonId);
+        expect(event_json.qualified_from).toBe(event.qualified_from);
+      });
     });
 
     it('can map a ping wrapped inside an external message', async () => {
