@@ -14004,6 +14004,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"immer@npm:10.1.3":
+  version: 10.1.3
+  resolution: "immer@npm:10.1.3"
+  checksum: 10/672faf5fc84177eecbfb49143ea8f6b5c1f981bd78c57e1562469354f6df658921ed6e0372b9ceed1e07c031e0c6d66863c4df80605928c6c774840b945aef83
+  languageName: node
+  linkType: hard
+
 "import-fresh@npm:^3.2.1, import-fresh@npm:^3.3.0":
   version: 3.3.0
   resolution: "import-fresh@npm:3.3.0"
@@ -22498,6 +22505,7 @@ __metadata:
     http-status-codes: "npm:2.3.0"
     husky: "npm:9.1.7"
     i18next-scanner: "npm:4.6.0"
+    immer: "npm:10.1.3"
     intersection-observer: "npm:0.12.2"
     jest: "npm:29.7.0"
     jest-canvas-mock: "npm:2.5.2"
