@@ -19,7 +19,7 @@
 
 import {forwardRef, useEffect, useMemo, useState} from 'react';
 
-import {CONVERSATION_ACCESS} from '@wireapp/api-client/lib/conversation';
+import {CONVERSATION_ACCESS, CONVERSATION_CELLS_STATE} from '@wireapp/api-client/lib/conversation';
 import {RECEIPT_MODE} from '@wireapp/api-client/lib/conversation/data/';
 
 import {TabIndex} from '@wireapp/react-ui-kit';
@@ -109,6 +109,7 @@ const ConversationDetails = forwardRef<HTMLDivElement, ConversationDetailsProps>
       participating_user_ets: participatingUserEts,
       firstUserEntity: firstParticipant,
       isGroupOrChannel,
+      cellsState,
     } = useKoSubscribableChildren(activeConversation, [
       'isMutable',
       'showNotificationsNothing',
@@ -126,6 +127,7 @@ const ConversationDetails = forwardRef<HTMLDivElement, ConversationDetailsProps>
       'participating_user_ets',
       'firstUserEntity',
       'isGroupOrChannel',
+      'cellsState',
     ]);
 
     const {isTemporaryGuest} = useKoSubscribableChildren(firstParticipant!, ['isTemporaryGuest']);
@@ -152,12 +154,23 @@ const ConversationDetails = forwardRef<HTMLDivElement, ConversationDetailsProps>
     const servicesOptionsText = isServicesRoom ? t('conversationDetailsOn') : t('conversationDetailsOff');
     const isChannelPublic = activeConversation.accessModes?.includes(CONVERSATION_ACCESS.LINK);
 
+    const isCellsConversation = !!cellsState && cellsState !== CONVERSATION_CELLS_STATE.DISABLED;
+
     const notificationStatusText = getNotificationText(notificationState);
-    const timedMessagesText = isSelfDeletingMessagesEnforced
-      ? formatDuration(getEnforcedSelfDeletingMessagesTimeout).text
-      : hasTimer && globalMessageTimer
-        ? formatDuration(globalMessageTimer).text
-        : t('ephemeralUnitsNone');
+    function getTimedMessagesText(): string {
+      if (isSelfDeletingMessagesEnforced) {
+        return formatDuration(getEnforcedSelfDeletingMessagesTimeout).text;
+      }
+      if (hasTimer && globalMessageTimer) {
+        return formatDuration(globalMessageTimer).text;
+      }
+      if (isCellsConversation) {
+        return t('cells.selfDeletingMessage.info');
+      }
+      return t('ephemeralUnitsNone');
+    }
+
+    const timedMessagesText = getTimedMessagesText();
 
     const showActionMute = isMutable && !isTeam;
     const isVerified = verificationState === ConversationVerificationState.VERIFIED;

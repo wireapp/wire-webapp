@@ -465,6 +465,7 @@ declare module 'I18n/en-US.json' {
     'cells.search.closeButton': `Close`;
     'cells.search.failed': `Something went wrong, please try again later.`;
     'cells.search.placeholder': `Search files and folders`;
+    'cells.selfDeletingMessage.info': `Self-deleting messages are currently not available for conversations with Cells.`;
     'cells.shareModal.copyLink': `Copy Link`;
     'cells.shareModal.disablePublicLink': `Disable public link`;
     'cells.shareModal.disablePublicLink.description': `Disable public link`;

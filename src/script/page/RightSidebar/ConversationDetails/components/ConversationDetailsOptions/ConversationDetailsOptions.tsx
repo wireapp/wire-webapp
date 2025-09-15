@@ -126,7 +126,7 @@ const ConversationDetailsOptions = ({
 
   const showOptionGuests = isActiveGroupParticipant && isTeamConversation;
   const showOptionNotificationsGroup = isMutable && isGroupOrChannel;
-  const showOptionTimedMessages = isActiveGroupParticipant && isSelfDeletingMessagesEnabled && !isCellsConversation;
+  const showOptionTimedMessages = isActiveGroupParticipant && isSelfDeletingMessagesEnabled;
   const showOptionServices = isActiveGroupParticipant && isTeamConversation && !isMLSConversation(activeConversation);
   const showOptionNotifications1To1 = isMutable && !isGroupOrChannel;
   const showOptionReadReceipts = isTeamConversation;
@@ -135,7 +135,7 @@ const ConversationDetailsOptions = ({
   const hasReceiptsEnabled = conversationRepository.expectReadReceipt(activeConversation);
 
   const canEditGuests = roleRepository.canToggleGuests(activeConversation);
-  const canEditTimeout = roleRepository.canToggleTimeout(activeConversation);
+  const canEditTimeout = roleRepository.canToggleTimeout(activeConversation) && !isCellsConversation;
   const canEditReadReceipts = roleRepository.canToggleReadReceipts(activeConversation);
 
   const openNotificationsPanel = () => togglePanel(PanelState.NOTIFICATIONS, activeConversation);
