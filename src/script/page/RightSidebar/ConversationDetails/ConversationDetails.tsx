@@ -158,14 +158,14 @@ const ConversationDetails = forwardRef<HTMLDivElement, ConversationDetailsProps>
 
     const notificationStatusText = getNotificationText(notificationState);
     function getTimedMessagesText(): string {
+      if (isCellsConversation) {
+        return t('cells.selfDeletingMessage.info');
+      }
       if (isSelfDeletingMessagesEnforced) {
         return formatDuration(getEnforcedSelfDeletingMessagesTimeout).text;
       }
       if (hasTimer && globalMessageTimer) {
         return formatDuration(globalMessageTimer).text;
-      }
-      if (isCellsConversation) {
-        return t('cells.selfDeletingMessage.info');
       }
       return t('ephemeralUnitsNone');
     }

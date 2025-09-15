@@ -420,7 +420,9 @@ export class Conversation {
 
     this.receiptMode = ko.observable(RECEIPT_MODE.OFF);
 
-    // The team configuration for self-deleting messages has
+    // Self-deleting messages are not available for conversations
+    // with Cells enabled.
+    // Otherwise the team configuration for self-deleting messages has
     // always precedence over conversation or local settings.
     // https://wearezeta.atlassian.net/wiki/spaces/SER/pages/474873953/Tech+spec+Self-deleting+messages+feature+config
     //
