@@ -429,13 +429,29 @@ export class Conversation {
     // messages are disabled for the users team, the user will
     // send normal messages (not self-deleting) and ignore the
     // setting of the conversation.
-    this.messageTimer = ko.pureComputed(
-      () =>
-        this.teamState.isSelfDeletingMessagesEnabled() &&
-        (this.teamState.getEnforcedSelfDeletingMessagesTimeout() ||
-          this.globalMessageTimer() ||
-          this.localMessageTimer()),
-    );
+    this.messageTimer = ko.pureComputed(() => {
+      // If cells is enabled for a conversation, always return 0
+      if (!!this.cellsState && this.cellsState() !== CONVERSATION_CELLS_STATE.DISABLED) {
+        return 0;
+      }
+      // If team does not allow self-deleting messages, return 0
+      if (!this.teamState.isSelfDeletingMessagesEnabled()) {
+        return 0;
+      }
+      // If team enforces a timeout, use it
+      const enforcedTimeout = this.teamState.getEnforcedSelfDeletingMessagesTimeout();
+      if (enforcedTimeout) {
+        return enforcedTimeout;
+      }
+      // Otherwise, use global or local timer if available
+      if (this.globalMessageTimer() !== null) {
+        return this.globalMessageTimer();
+      }
+      if (this.localMessageTimer()) {
+        return this.localMessageTimer();
+      }
+      return 0;
+    });
     this.hasGlobalMessageTimer = ko.pureComputed(() => this.globalMessageTimer() > 0);
 
     this.messages_unordered = ko.observableArray();
