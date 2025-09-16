@@ -19,6 +19,7 @@
 
 import {MessagesList} from 'Components/MessagesList/MessageList';
 import {MessagesListParams} from 'Components/MessagesList/MessageList.types';
+import {ReactWindowVirtualization} from 'Components/MessagesList/ReactWindowVirtualization';
 
 import {VirtualizedMessageListWrapper} from './VirtualizedMessageListWrapper';
 
@@ -40,7 +41,7 @@ export const MessageListWrapper = ({
   cancelConnectionRequest,
   resetSession,
   invitePeople,
-  messageActions,
+  contextMessageActions,
   onLoading,
   isMsgElementsFocusable,
   setMsgElementsFocusable,
@@ -52,13 +53,40 @@ export const MessageListWrapper = ({
 
   if (isVirtualizedMessagesListEnabled) {
     return (
+      <ReactWindowVirtualization
+        conversation={conversation}
+        conversationRepository={conversationRepository}
+        onLoading={onLoading}
+        contextMessageActions={contextMessageActions}
+        selfUser={selfUser}
+        messageRepository={messageRepository}
+        isMsgElementsFocusable={isMsgElementsFocusable}
+        setMsgElementsFocusable={setMsgElementsFocusable}
+        invitePeople={invitePeople}
+        cancelConnectionRequest={cancelConnectionRequest}
+        showUserDetails={showUserDetails}
+        showMessageDetails={showMessageDetails}
+        showMessageReactions={showMessageReactions}
+        showParticipants={showParticipants}
+        showImageDetails={showImageDetails}
+        resetSession={resetSession}
+        onClickMessage={onClickMessage}
+        assetRepository={assetRepository}
+        isConversationLoaded={isConversationLoaded}
+        updateConversationLastRead={updateConversationLastRead}
+      />
+    );
+  }
+
+  if (false) {
+    return (
       <VirtualizedMessageListWrapper
         conversation={conversation}
         selfUser={selfUser}
         conversationRepository={conversationRepository}
         assetRepository={assetRepository}
         messageRepository={messageRepository}
-        messageActions={messageActions}
+        contextMessageActions={contextMessageActions}
         invitePeople={invitePeople}
         cancelConnectionRequest={cancelConnectionRequest}
         showUserDetails={showUserDetails}
@@ -86,7 +114,7 @@ export const MessageListWrapper = ({
       conversationRepository={conversationRepository}
       assetRepository={assetRepository}
       messageRepository={messageRepository}
-      messageActions={messageActions}
+      contextMessageActions={contextMessageActions}
       invitePeople={invitePeople}
       cancelConnectionRequest={cancelConnectionRequest}
       showUserDetails={showUserDetails}

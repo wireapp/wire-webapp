@@ -60,7 +60,7 @@ export interface MessageParams extends MessageActions {
   message: BaseMessage;
   /** whether the message should display the user avatar and user name before the actual content */
   hideHeader: boolean;
-  messageActions: {
+  contextMessageActions: {
     deleteMessage: (conversation: Conversation, message: BaseMessage) => void;
     deleteMessageEveryone: (conversation: Conversation, message: BaseMessage) => void;
   };

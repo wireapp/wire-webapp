@@ -45,7 +45,7 @@ export const VirtualizedMessageListWrapper = ({
   cancelConnectionRequest,
   resetSession,
   invitePeople,
-  messageActions,
+  contextMessageActions,
   onLoading,
   isMsgElementsFocusable,
   setMsgElementsFocusable,
@@ -90,7 +90,7 @@ export const VirtualizedMessageListWrapper = ({
           conversationRepository={conversationRepository}
           assetRepository={assetRepository}
           messageRepository={messageRepository}
-          messageActions={messageActions}
+          contextMessageActions={contextMessageActions}
           getVisibleCallback={getVisibleCallback}
           isMsgElementsFocusable={isMsgElementsFocusable}
           setMsgElementsFocusable={setMsgElementsFocusable}

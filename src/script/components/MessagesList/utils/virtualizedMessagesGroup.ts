@@ -112,7 +112,7 @@ function shouldGroupMessagesByTimestamp(
  * @param lastReadTimestamp - the timestamp of the last read message (used to mark unread messages)
  */
 export function groupMessagesBySenderAndTime(messages: Message[], lastReadTimestamp: number) {
-  return messages.reduce<Array<Marker | GroupedMessage>>((acc, message, index) => {
+  const arrayOfMessages = messages.reduce<Array<Marker | GroupedMessage>>((acc, message, index) => {
     const previousMessage = messages[index - 1];
 
     const markerMessage = getMessageMarkerType(message, lastReadTimestamp, previousMessage);
@@ -168,4 +168,8 @@ export function groupMessagesBySenderAndTime(messages: Message[], lastReadTimest
 
     return acc;
   }, []);
+
+  console.log('[virtualizedMessagesGroup.ts] przemvs arrayOfMessages', arrayOfMessages);
+
+  return arrayOfMessages;
 }

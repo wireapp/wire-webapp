@@ -38,7 +38,7 @@ export interface MessagesListParams {
   conversationRepository: ConversationRepository;
   getVisibleCallback: (conversationEntity: Conversation, messageEntity: MessageEntity) => (() => void) | undefined;
   invitePeople: (conversation: Conversation) => void;
-  messageActions: {
+  contextMessageActions: {
     deleteMessage: (conversation: Conversation, message: MessageEntity) => void;
     deleteMessageEveryone: (conversation: Conversation, message: MessageEntity) => void;
   };

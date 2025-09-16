@@ -63,7 +63,7 @@ export const VirtualizedMessagesList = ({
   showImageDetails,
   resetSession,
   onClickMessage,
-  messageActions,
+  contextMessageActions,
   isMsgElementsFocusable,
   setMsgElementsFocusable,
   conversationLastReadTimestamp,
@@ -112,6 +112,10 @@ export const VirtualizedMessagesList = ({
     getScrollElement: () => parentElement,
     estimateSize: () => parentElement.clientHeight,
     measureElement: element => element?.getBoundingClientRect().height || ESTIMATED_ELEMENT_SIZE,
+    getItemKey: index => {
+      const item = groupedMessages[index];
+      return isMarker(item) ? `marker-${index}-${item.timestamp}` : item.message.id || `message-${index}`;
+    },
   });
 
   // Hook for load current conversation
@@ -271,10 +275,9 @@ export const VirtualizedMessagesList = ({
                 <MarkerComponent marker={item} />
               ) : (
                 <Message
-                  key={`${item.message.id || 'message'}-${item.message.timestamp()}`}
                   message={item.message}
                   hideHeader={item.shouldGroup}
-                  messageActions={messageActions}
+                  contextMessageActions={contextMessageActions}
                   conversation={conversation}
                   hasReadReceiptsTurnedOn={conversationRepository.expectReadReceipt(conversation)}
                   isLastDeliveredMessage={lastDeliveredMessage?.id === item.message.id}

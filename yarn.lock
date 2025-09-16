@@ -19164,6 +19164,26 @@ __metadata:
   languageName: node
   linkType: hard
 
+"react-virtualized-auto-sizer@npm:^1.0.26":
+  version: 1.0.26
+  resolution: "react-virtualized-auto-sizer@npm:1.0.26"
+  peerDependencies:
+    react: ^15.3.0 || ^16.0.0-alpha || ^17.0.0 || ^18.0.0 || ^19.0.0
+    react-dom: ^15.3.0 || ^16.0.0-alpha || ^17.0.0 || ^18.0.0 || ^19.0.0
+  checksum: 10/8f8127369fb3ae1a49987a1e7d2d136f379b71d1b031a4c169389274946eca0248e3fb9130aa8a7ebe82f4ca8aaab58c37252398f8f6220a6eafaa78b8464b6b
+  languageName: node
+  linkType: hard
+
+"react-window@npm:^2.1.0":
+  version: 2.1.0
+  resolution: "react-window@npm:2.1.0"
+  peerDependencies:
+    react: ^18.0.0 || ^19.0.0
+    react-dom: ^18.0.0 || ^19.0.0
+  checksum: 10/163c3b09cb2a353d9b09b7b1599aced732c87c658d1590bf072f8bffc7d982f877d09fba038a09576d1235e53d0d41c96d36b51100f41972d19708332be79c28
+  languageName: node
+  linkType: hard
+
 "react@npm:18.3.1":
   version: 18.3.1
   resolution: "react@npm:18.3.1"
@@ -22545,6 +22565,8 @@ __metadata:
     react-router: "npm:6.28.0"
     react-router-dom: "npm:6.28.0"
     react-transition-group: "npm:4.4.5"
+    react-virtualized-auto-sizer: "npm:^1.0.26"
+    react-window: "npm:^2.1.0"
     redux: "npm:5.0.1"
     redux-logdown: "npm:1.0.4"
     redux-mock-store: "npm:1.5.5"

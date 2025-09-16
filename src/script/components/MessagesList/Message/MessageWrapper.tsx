@@ -82,7 +82,7 @@ export const MessageWrapper: React.FC<MessageParams> = ({
   onClickResetSession,
   onClickCancelRequest,
   messageRepository,
-  messageActions,
+  contextMessageActions,
   teamState = container.resolve(TeamState),
   isMsgElementsFocusable,
 }) => {
@@ -165,14 +165,14 @@ export const MessageWrapper: React.FC<MessageParams> = ({
 
     if (message.isDeletable()) {
       entries.push({
-        click: () => messageActions.deleteMessage(conversation, message),
+        click: () => contextMessageActions.deleteMessage(conversation, message),
         label: t('conversationContextMenuDelete'),
       });
     }
 
     if (canDelete) {
       entries.push({
-        click: () => messageActions.deleteMessageEveryone(conversation, message),
+        click: () => contextMessageActions.deleteMessageEveryone(conversation, message),
         label: t('conversationContextMenuDeleteEveryone'),
       });
     }

@@ -56,7 +56,7 @@ interface MessagesListParams {
   conversationRepository: ConversationRepository;
   getVisibleCallback: (conversationEntity: Conversation, messageEntity: MessageEntity) => (() => void) | undefined;
   invitePeople: (convesation: Conversation) => void;
-  messageActions: {
+  contextMessageActions: {
     deleteMessage: (conversation: Conversation, message: MessageEntity) => void;
     deleteMessageEveryone: (conversation: Conversation, message: MessageEntity) => void;
   };
@@ -92,7 +92,7 @@ export const MessagesList: FC<MessagesListParams> = ({
   cancelConnectionRequest,
   resetSession,
   invitePeople,
-  messageActions,
+  contextMessageActions,
   onLoading,
   isMsgElementsFocusable,
   setMsgElementsFocusable,
@@ -318,7 +318,7 @@ export const MessagesList: FC<MessagesListParams> = ({
                   onVisibilityLost={lastMessageInvisibleCallback}
                   message={message}
                   hideHeader={message.timestamp() !== firstMessageTimestamp}
-                  messageActions={messageActions}
+                  contextMessageActions={contextMessageActions}
                   conversation={conversation}
                   hasReadReceiptsTurnedOn={conversationRepository.expectReadReceipt(conversation)}
                   isLastDeliveredMessage={isLastDeliveredMessage}
