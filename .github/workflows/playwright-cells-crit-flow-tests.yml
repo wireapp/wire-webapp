@@ -52,25 +52,3 @@ jobs:
         with:
           name: playwright-report
           path: playwright-report/
-
-      - name: Generate PR comment
-        if: always()
-        id: generate_comment
-        run: |
-          node test/e2e_tests/scripts/create-playwright-report-summary.js
-          COMMENT=$(cat playwright-report-summary.txt)
-          echo "comment<<EOF" >> $GITHUB_OUTPUT
-          echo "$COMMENT" >> $GITHUB_OUTPUT
-          echo "EOF" >> $GITHUB_OUTPUT
-
-      - name: Comment on PR
-        if: always()
-        uses: marocchino/sticky-pull-request-comment@v2
-        with:
-          header: playwright-summary
-          message: |
-            🔗 [Download Full Report Artifact](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})
-
-            ${{ steps.generate_comment.outputs.comment }}
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
