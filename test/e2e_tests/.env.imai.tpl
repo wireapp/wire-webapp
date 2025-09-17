@@ -16,8 +16,7 @@
 // along with this program. If not, see http://www.gnu.org/licenses/.
 //
 
-# Define browsers [chromium, firefox, webkit]
-BROWSERS=chromium
+# Playwright settings
 HEADLESS=true
 
 # Test service
@@ -27,11 +26,11 @@ TEST_SERVICE_URL=http://192.168.2.18:8080
 CALLING_SERVICE_URL=op://Test Automation/CALLINGSERVICE_BASIC_AUTH/website
 CALLING_SERVICE_BASIC_AUTH=op://Test Automation/CALLINGSERVICE_BASIC_AUTH/basicAuth
 
-INBUCKET_USERNAME=op://Test Automation/BackendConnection staging/inbucketUsername
-INBUCKET_PASSWORD="{{ op://Test Automation/BackendConnection staging/inbucketPassword }}"
-INBUCKET_URL=op://Test Automation/BackendConnection staging/inbucketUrl
-BACKEND_URL=op://Test Automation/BackendConnection staging/backendUrl
-WEBAPP_URL=op://Test Automation/BackendConnection staging/webappUrl
-TEAM_MANAGEMENT_URL=op://Test Automation/BackendConnection staging/teamManagementUrl
-DOMAIN=op://Test Automation/BackendConnection staging/domain
-BASIC_AUTH=op://Test Automation/BackendConnection staging/basicAuth
+INBUCKET_USERNAME=op://Test Automation/BackendConnection imai/inbucketUsername
+INBUCKET_PASSWORD="{{ op://Test Automation/BackendConnection imai/inbucketPassword }}"
+INBUCKET_URL=op://Test Automation/BackendConnection imai/inbucketUrl
+BACKEND_URL=op://Test Automation/BackendConnection imai/backendUrl
+WEBAPP_URL=op://Test Automation/BackendConnection imai/webappUrl
+TEAM_MANAGEMENT_URL=op://Test Automation/BackendConnection imai/teamManagementUrl
+DOMAIN=op://Test Automation/BackendConnection imai/domain
+BASIC_AUTH=op://Test Automation/BackendConnection imai/basicAuth
