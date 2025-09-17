@@ -69,7 +69,9 @@ import {GiphyRepository} from 'Repositories/extension/GiphyRepository';
 import {GiphyService} from 'Repositories/extension/GiphyService';
 import {IntegrationRepository} from 'Repositories/integration/IntegrationRepository';
 import {IntegrationService} from 'Repositories/integration/IntegrationService';
-import {MediaRepository} from 'Repositories/media/MediaRepository';
+import {MediaConstraintsHandler} from 'Repositories/media/MediaConstraintsHandler';
+import {MediaDevicesHandler} from 'Repositories/media/MediaDevicesHandler';
+import {MediaStreamHandler} from 'Repositories/media/MediaStreamHandler';
 import {NotificationRepository} from 'Repositories/notification/NotificationRepository';
 import {PreferenceNotificationRepository} from 'Repositories/notification/PreferenceNotificationRepository';
 import {PermissionRepository} from 'Repositories/permission/PermissionRepository';
@@ -219,6 +221,14 @@ export class App {
     const repositories: ViewModelRepositories = {} as ViewModelRepositories;
     const selfService = new SelfService();
     const teamService = new TeamService();
+    const permissionRepository = new PermissionRepository();
+    const mediaConstraintsHandler = new MediaConstraintsHandler();
+
+    const mediaStreamHandler = new MediaStreamHandler(mediaConstraintsHandler, permissionRepository);
+    const mediaDevicesHandler = new MediaDevicesHandler();
+
+    container.registerInstance(MediaDevicesHandler, mediaDevicesHandler);
+    container.registerInstance(MediaStreamHandler, mediaStreamHandler);
 
     repositories.asset = container.resolve(AssetRepository);
 
@@ -229,8 +239,7 @@ export class App {
 
     repositories.cryptography = new CryptographyRepository();
     repositories.client = new ClientRepository(new ClientService(), repositories.cryptography);
-    repositories.media = new MediaRepository(new PermissionRepository());
-    repositories.audio = new AudioRepository(repositories.media.devicesHandler);
+    repositories.audio = new AudioRepository();
 
     repositories.user = new UserRepository(
       new UserService(),
@@ -276,8 +285,8 @@ export class App {
       repositories.message,
       repositories.event,
       repositories.user,
-      repositories.media.streamHandler,
-      repositories.media.devicesHandler,
+      mediaStreamHandler,
+      mediaDevicesHandler,
       serverTimeHandler,
     );
 
@@ -305,7 +314,7 @@ export class App {
       repositories.conversation,
       repositories.team,
     );
-    repositories.permission = new PermissionRepository();
+    repositories.permission = permissionRepository;
     repositories.notification = new NotificationRepository(
       repositories.conversation,
       repositories.permission,
@@ -542,8 +551,7 @@ export class App {
 
       let totalNotifications = 0;
       const useAsyncNotificationStream =
-        teamFeatures[FEATURE_KEY.CONSUMABLE_NOTIFICATIONS]?.status === FeatureStatus.ENABLED &&
-        Config.getConfig().FEATURE.USE_ASYNC_NOTIFICATIONS;
+        teamFeatures[FEATURE_KEY.CONSUMABLE_NOTIFICATIONS]?.status === FeatureStatus.ENABLED;
       const useLegacyNotificationStream = !useAsyncNotificationStream;
 
       await eventRepository.connectWebSocket(
@@ -555,13 +563,12 @@ export class App {
            * was offline for a while hence it can be used to demonstrate number of pending messages
            * even when app is already loaded and in the main screen view
            */
-          const baseMessage = t('initDecryption');
-          const extraInfo = this.config.FEATURE.SHOW_LOADING_INFORMATION
+          const message = this.config.FEATURE.SHOW_LOADING_INFORMATION
             ? ` ${t('initProgress', {time: formatCoarseDuration(durationFrom(currentProcessingNotificationTimestamp))})}`
             : '';
 
           totalNotifications++;
-          onProgress(`${baseMessage}${extraInfo}`);
+          onProgress(message);
         },
       );
 

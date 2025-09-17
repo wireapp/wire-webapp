@@ -17,14 +17,12 @@
  *
  */
 
-import React, {useEffect, useRef, useState} from 'react';
+import {memo, useCallback, useEffect, useRef, useState} from 'react';
 
 import * as Icon from 'Components/Icon';
-import {MediaDevicesHandler} from 'Repositories/media/MediaDevicesHandler';
-import {MediaDeviceType} from 'Repositories/media/MediaDeviceType';
 import {MediaStreamHandler} from 'Repositories/media/MediaStreamHandler';
 import {MediaType} from 'Repositories/media/MediaType';
-import {useKoSubscribableChildren} from 'Util/ComponentUtil';
+import {useMediaDevicesStore} from 'Repositories/media/useMediaDevicesStore';
 import {t} from 'Util/LocalizerUtil';
 import {getLogger} from 'Util/Logger';
 
@@ -36,33 +34,25 @@ import {PreferencesSection} from '../components/PreferencesSection';
 const logger = getLogger('CameraPreferences');
 
 interface CameraPreferencesProps {
-  devicesHandler: MediaDevicesHandler;
   hasActiveCameraStream: boolean;
   refreshStream: () => Promise<MediaStream | void>;
   streamHandler: MediaStreamHandler;
 }
 
-const CameraPreferences: React.FC<CameraPreferencesProps> = ({
-  devicesHandler,
-  streamHandler,
-  refreshStream,
-  hasActiveCameraStream,
-}) => {
+const CameraPreferencesComponent = ({streamHandler, refreshStream, hasActiveCameraStream}: CameraPreferencesProps) => {
   const [isRequesting, setIsRequesting] = useState(false);
   const [stream, setStream] = useState<MediaStream | null>(null);
   const videoElement = useRef<HTMLVideoElement>(null);
-  const {[MediaDeviceType.VIDEO_INPUT]: availableDevices} = useKoSubscribableChildren(
-    devicesHandler?.availableDevices,
-    [MediaDeviceType.VIDEO_INPUT],
-  );
 
-  const {[MediaDeviceType.VIDEO_INPUT]: currentDeviceId} = useKoSubscribableChildren(devicesHandler?.currentDeviceId, [
-    MediaDeviceType.VIDEO_INPUT,
-  ]);
+  const {videoInputDevices, videoInputDeviceId, setVideoInputDeviceId} = useMediaDevicesStore(state => ({
+    videoInputDevices: state.video.input.devices,
+    videoInputDeviceId: state.video.input.selectedId,
+    setVideoInputDeviceId: state.setVideoInputDeviceId,
+  }));
 
   const {URL: urls, BRAND_NAME: brandName} = Config.getConfig();
 
-  const requestStream = async () => {
+  const requestStream = useCallback(async () => {
     setIsRequesting(true);
     try {
       // we should be able to change camera from preferences page in middle of the call
@@ -80,16 +70,18 @@ const CameraPreferences: React.FC<CameraPreferencesProps> = ({
         setStream(stream);
       }
     } catch (error) {
-      logger.warn(`Requesting MediaStream for type "${MediaType.VIDEO}" failed: ${error.message}`, error);
+      if (error instanceof Error) {
+        logger.warn(`Requesting MediaStream for type "${MediaType.VIDEO}" failed: ${error.message}`, error);
+      }
       setStream(null);
     } finally {
       setIsRequesting(false);
     }
-  };
+  }, [hasActiveCameraStream, refreshStream, streamHandler]);
 
   useEffect(() => {
     requestStream();
-  }, [currentDeviceId]);
+  }, [videoInputDeviceId, requestStream]);
 
   useEffect(() => {
     if (videoElement.current && stream) {
@@ -103,7 +95,7 @@ const CameraPreferences: React.FC<CameraPreferencesProps> = ({
         streamHandler.releaseTracksFromStream(stream);
       }
     },
-    [stream],
+    [hasActiveCameraStream, stream, streamHandler],
   );
 
   return (
@@ -117,12 +109,12 @@ const CameraPreferences: React.FC<CameraPreferencesProps> = ({
       )}
       <DeviceSelect
         uieName="enter-camera"
-        devices={availableDevices as MediaDeviceInfo[]}
-        value={currentDeviceId}
+        devices={videoInputDevices}
+        value={videoInputDeviceId}
         defaultDeviceName={t('preferencesAVCamera')}
         icon={Icon.CameraIcon}
         isRequesting={isRequesting}
-        onChange={deviceId => devicesHandler.currentDeviceId[MediaDeviceType.VIDEO_INPUT](deviceId)}
+        onChange={deviceId => setVideoInputDeviceId(deviceId)}
         title={t('preferencesAVCamera')}
       />
 
@@ -168,4 +160,4 @@ const CameraPreferences: React.FC<CameraPreferencesProps> = ({
   );
 };
 
-export {CameraPreferences};
+export const CameraPreferences = memo(CameraPreferencesComponent);

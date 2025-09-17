@@ -26,9 +26,10 @@ import {uploadAssetsContainer} from './UploadAssets.styles';
 interface Props {
   assetRepository: AssetRepository;
   conversationId: string;
+  scrollToEnd?: () => void;
 }
 
-export const UploadAssets = ({assetRepository, conversationId}: Props) => {
+export const UploadAssets = ({assetRepository, conversationId, scrollToEnd}: Props) => {
   const {processQueue, uploadProgressQueue} = useKoSubscribableChildren(assetRepository, [
     'processQueue',
     'uploadProgressQueue',
@@ -60,6 +61,7 @@ export const UploadAssets = ({assetRepository, conversationId}: Props) => {
             assetRepository={assetRepository}
             message={processingMessage.message}
             key={processingMessage.message.messageId}
+            scrollToEnd={scrollToEnd}
           />
         );
       })}

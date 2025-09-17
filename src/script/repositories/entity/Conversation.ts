@@ -93,6 +93,8 @@ export class Conversation {
   private readonly incomingMessages: ko.ObservableArray<Message>;
   public readonly isProteusTeam1to1: ko.PureComputed<boolean>;
   public readonly isConversationWithBlockedUser: ko.PureComputed<boolean>;
+  public readonly isConversationWithDeletedUser: ko.PureComputed<boolean>;
+  public readonly is1to1ConversationWithDeletedUser: ko.PureComputed<boolean>;
   public readonly isReadOnlyConversation: ko.PureComputed<boolean>;
   public readonly last_server_timestamp: ko.Observable<number>;
   private readonly logger: Logger;
@@ -262,8 +264,20 @@ export class Conversation {
 
     this.isConversationWithBlockedUser = ko.pureComputed(() => !!this.connection()?.isBlocked());
 
+    this.isConversationWithDeletedUser = ko.pureComputed(() => {
+      const hasDeletedUser = this.participating_user_ets().some(userEntity => userEntity.isDeleted);
+      return hasDeletedUser;
+    });
+
+    this.is1to1ConversationWithDeletedUser = ko.pureComputed(
+      () => !!this.is1to1() && this.isConversationWithDeletedUser(),
+    );
+
     this.isReadOnlyConversation = ko.pureComputed(
-      () => this.isConversationWithBlockedUser() || this.readOnlyState() !== null,
+      () =>
+        this.isConversationWithBlockedUser() ||
+        this.is1to1ConversationWithDeletedUser() ||
+        this.readOnlyState() !== null,
     );
 
     this.isGroup = ko.pureComputed(() => {
@@ -406,7 +420,9 @@ export class Conversation {
 
     this.receiptMode = ko.observable(RECEIPT_MODE.OFF);
 
-    // The team configuration for self-deleting messages has
+    // Self-deleting messages are not available for conversations
+    // with Cells enabled.
+    // Otherwise the team configuration for self-deleting messages has
     // always precedence over conversation or local settings.
     // https://wearezeta.atlassian.net/wiki/spaces/SER/pages/474873953/Tech+spec+Self-deleting+messages+feature+config
     //
@@ -415,13 +431,29 @@ export class Conversation {
     // messages are disabled for the users team, the user will
     // send normal messages (not self-deleting) and ignore the
     // setting of the conversation.
-    this.messageTimer = ko.pureComputed(
-      () =>
-        this.teamState.isSelfDeletingMessagesEnabled() &&
-        (this.teamState.getEnforcedSelfDeletingMessagesTimeout() ||
-          this.globalMessageTimer() ||
-          this.localMessageTimer()),
-    );
+    this.messageTimer = ko.pureComputed(() => {
+      // If cells is enabled for a conversation, always return 0
+      if (!!this.cellsState && this.cellsState() !== CONVERSATION_CELLS_STATE.DISABLED) {
+        return 0;
+      }
+      // If team does not allow self-deleting messages, return 0
+      if (!this.teamState.isSelfDeletingMessagesEnabled()) {
+        return 0;
+      }
+      // If team enforces a timeout, use it
+      const enforcedTimeout = this.teamState.getEnforcedSelfDeletingMessagesTimeout();
+      if (enforcedTimeout) {
+        return enforcedTimeout;
+      }
+      // Otherwise, use global or local timer if available
+      if (this.globalMessageTimer() !== null) {
+        return this.globalMessageTimer();
+      }
+      if (this.localMessageTimer()) {
+        return this.localMessageTimer();
+      }
+      return 0;
+    });
     this.hasGlobalMessageTimer = ko.pureComputed(() => this.globalMessageTimer() > 0);
 
     this.messages_unordered = ko.observableArray();
