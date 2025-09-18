@@ -17,19 +17,17 @@
  *
  */
 
-import {Store, applyMiddleware, combineReducers, createStore} from 'redux';
-import {composeWithDevTools} from 'redux-devtools-extension/developmentOnly';
-import thunk from 'redux-thunk';
+import {applyMiddleware, combineReducers, legacy_createStore as createStore} from 'redux';
+import {withExtraArgument} from 'redux-thunk';
 
 import {LOGGER_NAMESPACE} from 'Util/Logger';
 
-import {runtimeAction} from './module/action/RuntimeAction';
-import {RootState, ThunkDispatch, reducers} from './module/reducer';
+import {reducers} from './module/reducer';
 
 const reduxLogdown = require('redux-logdown');
 
 const configureStore = (thunkArguments: object = {}) => {
-  const store: Store<RootState> = createStore(combineReducers(reducers), createMiddleware(thunkArguments));
+  const store = createStore(combineReducers(reducers), undefined, createMiddleware(thunkArguments));
 
   if (process.env.NODE_ENV !== 'production') {
     if (module.hot) {
@@ -39,22 +37,14 @@ const configureStore = (thunkArguments: object = {}) => {
     }
   }
 
-  const dispatch: ThunkDispatch = store.dispatch;
-  dispatch(runtimeAction.checkIndexedDbSupport());
-  dispatch(runtimeAction.checkCookieSupport());
-  dispatch(runtimeAction.checkSupportedBrowser());
-
   return store;
 };
 
 const createLoggerMiddleware = () => reduxLogdown(LOGGER_NAMESPACE, {diff: true});
 
 const createMiddleware = (thunkArguments: object) => {
-  const middlewares = [thunk.withExtraArgument(thunkArguments), createLoggerMiddleware()];
-
-  // Note: Redux DevTools will only be applied when NODE_ENV is NOT production
-  // https://github.com/zalmoxisus/redux-devtools-extension/blob/master/npm-package/developmentOnly.js
-  return composeWithDevTools(applyMiddleware(...middlewares));
+  const middlewares = [withExtraArgument(thunkArguments), createLoggerMiddleware()];
+  return applyMiddleware(...middlewares);
 };
 
 export {configureStore};

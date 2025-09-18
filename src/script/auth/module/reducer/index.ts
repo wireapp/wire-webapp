@@ -28,7 +28,6 @@ import {ClientState, clientReducer, initialClientState} from './clientReducer';
 import {ConversationState, conversationReducer, initialConversationState} from './conversationReducer';
 import {InvitationState, initialInvitationState, invitationReducer} from './inviteReducer';
 import {LanguageState, initialLanguageState, languageReducer} from './languageReducer';
-import {RuntimeState, initialRuntimeState, runtimeReducer} from './runtimeReducer';
 import {SelfState, initialSelfState, selfReducer} from './selfReducer';
 
 import type {Configuration} from '../../../Config';
@@ -48,7 +47,6 @@ export interface RootState {
   conversationState: ConversationState;
   inviteState: InvitationState;
   languageState: LanguageState;
-  runtimeState: RuntimeState;
   selfState: SelfState;
 }
 
@@ -58,7 +56,6 @@ export const initialRootState: RootState = {
   conversationState: initialConversationState,
   inviteState: initialInvitationState,
   languageState: initialLanguageState,
-  runtimeState: initialRuntimeState,
   selfState: initialSelfState,
 };
 
@@ -82,6 +79,5 @@ export const reducers = {
   conversationState: conversationReducer,
   inviteState: invitationReducer,
   languageState: languageReducer,
-  runtimeState: runtimeReducer,
   selfState: selfReducer,
 };

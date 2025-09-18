@@ -19,17 +19,18 @@
 
 import {FC, ReactElement} from 'react';
 
-import {Icon} from 'Components/Icon';
+import * as Icon from 'Components/Icon';
 
 interface ConversationDetailsOptionProps {
   className: string;
-  onClick: () => void;
+  onClick?: () => void;
   title: string;
   icon: ReactElement;
   statusText: string;
   dataUieName: string;
   statusUieName: string;
   iconClassName?: string;
+  disabled?: boolean;
 }
 
 const ConversationDetailsOption: FC<ConversationDetailsOptionProps> = ({
@@ -40,9 +41,16 @@ const ConversationDetailsOption: FC<ConversationDetailsOptionProps> = ({
   statusText,
   dataUieName,
   statusUieName,
+  disabled = false,
 }) => (
   <li className={className}>
-    <button className="panel__action-item" onClick={onClick} data-uie-name={dataUieName} type="button">
+    <button
+      className="panel__action-item"
+      onClick={onClick}
+      data-uie-name={dataUieName}
+      type="button"
+      disabled={disabled}
+    >
       <span className="panel__action-item__icon">{icon}</span>
 
       <span className="panel__action-item__summary">
@@ -55,7 +63,7 @@ const ConversationDetailsOption: FC<ConversationDetailsOptionProps> = ({
         </p>
       </span>
 
-      <Icon.ChevronRight className="chevron-right-icon" />
+      {!disabled && <Icon.ChevronRight className="chevron-right-icon" />}
     </button>
   </li>
 );

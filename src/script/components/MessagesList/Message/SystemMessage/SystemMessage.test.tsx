@@ -19,23 +19,21 @@
 
 import {render, screen} from '@testing-library/react';
 
-import {MessageTimerUpdateMessage} from 'src/script/entity/message/MessageTimerUpdateMessage';
-import {ReceiptModeUpdateMessage} from 'src/script/entity/message/ReceiptModeUpdateMessage';
-import {RenameMessage} from 'src/script/entity/message/RenameMessage';
+import {MessageTimerUpdateMessage} from 'Repositories/entity/message/MessageTimerUpdateMessage';
+import {ReceiptModeUpdateMessage} from 'Repositories/entity/message/ReceiptModeUpdateMessage';
+import {RenameMessage} from 'Repositories/entity/message/RenameMessage';
 
 import {SystemMessage} from './SystemMessage';
 
 jest.mock('Components/Icon', () => ({
-  Icon: {
-    Edit: () => {
-      return <span data-uie-name="editicon" className="editicon"></span>;
-    },
-    Read: () => {
-      return <span data-uie-name="readicon" className="readicon"></span>;
-    },
-    Timer: () => {
-      return <span data-uie-name="timericon" className="timericon"></span>;
-    },
+  EditIcon: () => {
+    return <span data-uie-name="editicon" className="editicon"></span>;
+  },
+  ReadIcon: () => {
+    return <span data-uie-name="readicon" className="readicon"></span>;
+  },
+  TimerIcon: () => {
+    return <span data-uie-name="timericon" className="timericon"></span>;
   },
   __esModule: true,
 }));

@@ -17,57 +17,55 @@
  *
  */
 
-import Dexie from 'dexie';
+import {applyEncryptionMiddleware, NON_INDEXED_FIELDS} from 'dexie-encrypted';
 
 import type {CRUDEngine} from '@wireapp/store-engine';
 import {MemoryEngine} from '@wireapp/store-engine';
 import {IndexedDBEngine} from '@wireapp/store-engine-dexie';
-import {SQLeetEngine} from '@wireapp/store-engine-sqleet';
 
-import {saveRandomEncryptionKey} from 'Util/ephemeralValueStore';
+import {DexieDatabase} from 'Repositories/storage/DexieDatabase';
+import {getLogger} from 'Util/Logger';
 
-import {DexieDatabase} from '../storage/DexieDatabase';
-import {SQLeetSchemata} from '../storage/SQLeetSchemata';
+const logger = getLogger('StoreEngineProvider');
 
 export enum DatabaseTypes {
   /** a permament storage that will still live after logout */
   PERMANENT,
-  /** a storage that is encrypted on disk */
-  ENCRYPTED,
   /** a storage that will be lost when the app is reloaded */
   EFFEMERAL,
 }
 
-const providePermanentEngine = async (storeName: string, requestPersistentStorage: boolean): Promise<CRUDEngine> => {
+const providePermanentEngine = async (
+  storeName: string,
+  key?: Uint8Array,
+  requestPersistentStorage?: boolean,
+): Promise<CRUDEngine> => {
   const db = new DexieDatabase(storeName);
+
+  // In case the encryption key is empty, we just give an empty config to the encryption middleware.
+  // We still need to set it up, even if encryption at rest is disabled, as we need to upgrade the DB version for the middleware to install its config table
+  const encryptionConfig = key ? {events: NON_INDEXED_FIELDS} : {};
+  const encryptionKey = key ? key : new Uint8Array(32).fill(0);
+  applyEncryptionMiddleware(db, encryptionKey, encryptionConfig, async () =>
+    logger.info('DB encyption config has changed'),
+  );
   const engine = new IndexedDBEngine();
   try {
     await engine.initWithDb(db, requestPersistentStorage);
   } catch (error) {
     await engine.initWithDb(db, false);
   }
-  return engine as CRUDEngine; // FIXME: the type of IndexedDBEngine needs fixing on the web packages side
-};
-
-const provideTemporaryAndNonPersistentEngine = async (storeName: string): Promise<CRUDEngine> => {
-  await Dexie.delete('/sqleet');
-  const encryptionKey = await saveRandomEncryptionKey();
-  const engine = new SQLeetEngine('/worker/sqleet-worker.js', SQLeetSchemata.getLatest(), encryptionKey);
-  await engine.init(storeName);
   return engine;
 };
 
 export async function createStorageEngine(
   storeName: string,
   type: DatabaseTypes,
-  requestPersistentStorage: boolean = false,
+  {key, requestPersistentStorage}: {key?: Uint8Array; requestPersistentStorage?: boolean} = {},
 ): Promise<CRUDEngine> {
   switch (type) {
     case DatabaseTypes.PERMANENT:
-      return providePermanentEngine(storeName, requestPersistentStorage);
-
-    case DatabaseTypes.ENCRYPTED:
-      return provideTemporaryAndNonPersistentEngine(storeName);
+      return providePermanentEngine(storeName, key, requestPersistentStorage);
 
     case DatabaseTypes.EFFEMERAL:
       return new MemoryEngine();

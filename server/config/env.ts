@@ -46,6 +46,17 @@ export type Env = {
   /** Specifies the name of the application, e.g. Webapp */
   APP_NAME: string;
 
+  /** Specifies configuration for Cells */
+  FEATURE_ENABLE_CELLS: string;
+  FEATURE_CELLS_INIT_WITH_ZAUTH_TOKEN: string;
+  CELLS_TOKEN_SHARED_SECRET: string;
+  CELLS_PYDIO_SEGMENT: string;
+  CELLS_PYDIO_URL: string;
+  CELLS_S3_BUCKET: string;
+  CELLS_S3_REGION: string;
+  CELLS_S3_ENDPOINT: string;
+  CELLS_WIRE_DOMAIN: string;
+
   /** Specifies the name of the backend, e.g. Wire */
   BACKEND_NAME: string;
 
@@ -61,6 +72,9 @@ export type Env = {
   /** Specifies the name of the brand, e.g. Wire */
   BRAND_NAME: string;
 
+  /** enables replacing all occurences of {{hostname}} in the urls given to the frontend by the hostname of the client*/
+  ENABLE_DYNAMIC_HOSTNAME?: string;
+
   /** Allows a client to use a development version of the api (if present) */
   ENABLE_DEV_BACKEND_API?: string;
 
@@ -74,12 +88,9 @@ export type Env = {
   /** Accepted file extensions for asset upload (e.g. ".txt,.jpg" or "*") */
   FEATURE_ALLOWED_FILE_UPLOAD_EXTENSIONS: string;
 
+  FEATURE_ALLOW_LINK_PREVIEWS: string;
+
   /** will enable the MLS protocol */
-  FEATURE_ENABLE_MLS?: string;
-
-  /** will enable the user to periodically update the list of supported protocols */
-  FEATURE_ENABLE_SELF_SUPPORTED_PROTOCOLS_UPDATES?: string;
-
   FEATURE_USE_CORE_CRYPTO?: string;
 
   FEATURE_MLS_CONFIG_KEYING_MATERIAL_UPDATE_THRESHOLD?: string;
@@ -102,10 +113,16 @@ export type Env = {
    */
   FEATURE_ENABLE_ACCOUNT_REGISTRATION_ACCEPT_TERMS_AND_PRIVACY_POLICY: string;
 
+  /** Feature toggle for advanced filters */
+  FEATURE_ENABLE_ADVANCED_FILTERS: string;
+
+  /** Feature toggle to blur the background during video call */
+  FEATURE_ENABLE_BLUR_BACKGROUND: string;
+
   /** Feature toggle for debug utils. Can be set to true or false */
   FEATURE_ENABLE_DEBUG: string;
 
-  /** Feature to open a confirm modal before pinging large groups */
+  /** Feature to open a confirmation modal before pinging large groups */
   FEATURE_ENABLE_PING_CONFIRMATION: string;
 
   /**
@@ -131,20 +148,17 @@ export type Env = {
   /** Feature toggle for rendering youtube, vimeo, soundcloud and spotify embeds in the client */
   FEATURE_ENABLE_MEDIA_EMBEDS: string;
 
-  /** Feature toggle for the log in with phone number. Can be set to true or false */
-  FEATURE_ENABLE_PHONE_LOGIN: string;
-
   /** Feature toggle for the log in via Single Sign On. Can be set to true or false */
   FEATURE_ENABLE_SSO: string;
 
   /** Feature toggle to enforce constant bitrate encoding for calls. Can be set to true or false */
   FEATURE_ENFORCE_CONSTANT_BITRATE: string;
 
+  /** will make sure the clear text content of messages are encrypted before being written in the DB (enabling this will also disable full text search on messages) */
+  FEATURE_ENABLE_ENCRYPTION_AT_REST: string;
+
   /** Set a default federation domain in case no domain can be found */
   FEATURE_FEDERATION_DOMAIN: string;
-
-  /** Wether the temporary clients should use IndexedDB. If set to false, they will use an in-memory database */
-  FEATURE_PERSIST_TEMPORARY_CLIENTS: string;
 
   /** Feature toggle for the log in with a username. Can be set to true or false */
   FEATURE_ENABLE_USERNAME_LOGIN: string;
@@ -161,6 +175,45 @@ export type Env = {
   /** Feature toggle to automatically mute when accepting incoming conference calls */
   FEATURE_CONFERENCE_AUTO_MUTE: string;
 
+  /** Feature to enable in call reactions */
+  FEATURE_ENABLE_IN_CALL_REACTIONS: string;
+
+  /** Feature to enable in call hand raise */
+  FEATURE_ENABLE_IN_CALL_HAND_RAISE: string;
+
+  /** Feature to enable remove conversation locally */
+  FEATURE_ENABLE_REMOVE_GROUP_CONVERSATION: string;
+
+  /** Feature to enable calling popout window */
+  FEATURE_ENABLE_DETACHED_CALLING_WINDOW: string;
+
+  /** Feature to enable channels */
+  FEATURE_ENABLE_CHANNELS: string;
+
+  /** Feature to enable channels history sharing */
+  FEATURE_ENABLE_CHANNELS_HISTORY_SHARING: string;
+
+  /** Feature to enable channels public channels */
+  FEATURE_ENABLE_PUBLIC_CHANNELS: string;
+
+  /** Feature to enable team creation flow for individual users */
+  FEATURE_ENABLE_TEAM_CREATION: string;
+
+  /** Feature to enable auto login */
+  FEATURE_ENABLE_AUTO_LOGIN: string;
+
+  /** Feature to enable rich text editor */
+  FEATURE_ENABLE_MESSAGE_FORMAT_BUTTONS: string;
+
+  /** Feature to enable virtualized messages list */
+  FEATURE_ENABLE_VIRTUALIZED_MESSAGES_LIST: string;
+
+  /** Feature to enable Cross Platform Backup export */
+  FEATURE_ENABLE_CROSS_PLATFORM_BACKUP_EXPORT: string;
+
+  /** Feature to enable the press space to unmute feature */
+  FEATURE_ENABLE_PRESS_SPACE_TO_UNMUTE: string;
+
   /** Sets the verification ID for Google webmasters */
   GOOGLE_WEBMASTER_ID: string;
 
@@ -175,6 +228,18 @@ export type Env = {
 
   /** Sets the Countly product reporting API key */
   COUNTLY_API_KEY: string;
+
+  /** Enables logging for Countly */
+  COUNTLY_ENABLE_LOGGING: string;
+
+  /** Force Countly reporting (only to be used on internal environments) */
+  COUNTLY_FORCE_REPORTING: string;
+
+  /** Countly allow list for backend urls
+   * Multiple entries separated by comma, e.g. "https://nginz-https.anta.wire.link, https://nginz-https.diya.wire.link, https://prod-nginz-https.wire.com"
+   * Used to disable countly tracking on on-prem instances
+   */
+  COUNTLY_ALLOWED_BACKEND: string;
 
   /** Open graph header description */
   OPEN_GRAPH_DESCRIPTION: string;
@@ -215,7 +280,19 @@ export type Env = {
   /** Sets the host URL for the website, e.g. https://wire.com */
   URL_WEBSITE_BASE: string;
 
+  /** Sets paths to append to a base URL */
+  URL_PATH_CREATE_TEAM: string;
+
+  URL_PATH_MANAGE_SERVICES: string;
+
+  URL_PATH_MANAGE_TEAM: string;
+
+  URL_PATH_PASSWORD_RESET: string;
+
+  /** Sets Support URLs to specific pages */
   URL_SUPPORT_INDEX: string;
+
+  URL_SUPPORT_FOLDERS: string;
 
   URL_SUPPORT_BUG_REPORT: string;
 
@@ -235,15 +312,47 @@ export type Env = {
 
   URL_SUPPORT_LEGAL_HOLD_BLOCK: string;
 
+  URL_SUPPORT_MLS_LEARN_MORE: string;
+
+  URL_SUPPORT_MLS_MIGRATION_FROM_PROTEUS: string;
+
   URL_SUPPORT_MICROPHONE_ACCESS_DENIED: string;
 
   URL_SUPPORT_PRIVACY_VERIFY_FINGERPRINT: string;
 
   URL_SUPPORT_SCREEN_ACCESS_DENIED: string;
 
+  URL_SUPPORT_SYSTEM_KEYCHAIN_ACCESS: string;
+
+  URL_SUPPORT_E2E_ENCRYPTION: string;
+
+  URL_SUPPORT_FAVORITES: string;
+
+  URL_LEARN_MORE_ABOUT_GUEST_LINKS: string;
+
+  URL_SUPPORT_NON_FEDERATING_INFO: string;
+
+  URL_SUPPORT_OAUTH_LEARN_MORE: string;
+
   URL_SUPPORT_OFFLINE_BACKEND: string;
 
   URL_SUPPORT_FEDERATION_STOP: string;
+
+  URL_SUPPORT_E2EI_VERIFICATION: string;
+
+  URL_SUPPORT_E2EI_VERIFICATION_CERTIFICATE: string;
+
+  URL_SUPPORT_DECRYPT_ERROR: string;
+
+  URL_SUPPORT_PRIVACY_UNVERIFIED_USERS: string;
+
+  URL_SUPPORT_PRIVACY_WHY: string;
+
+  URL_SUPPORT_CHANGE_EMAIL_ADDRESS: string;
+
+  URL_SUPPORT_DELETE_PERSONAL_ACCOUNT: string;
+
+  URL_SUPPORT_REMOVE_TEAM_MEMBER: string;
 
   URL_WHATS_NEW: string;
 
@@ -285,4 +394,8 @@ export type Env = {
 
   DATADOG_APPLICATION_ID?: string;
   DATADOG_CLIENT_TOKEN?: string;
+  FEATURE_DATADOG_ENVIRONMENT?: string;
+
+  /** Feature to enable screen sharing with video overlay */
+  FEATURE_ENABLE_SCREEN_SHARE_WITH_VIDEO: string;
 };

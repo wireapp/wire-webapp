@@ -18,8 +18,6 @@
  */
 
 // vars
-@media-button-size: 32px;
-@media-button-size-lg: 64px;
 
 @keyframes progress-animation {
   to {
@@ -35,15 +33,15 @@
 
 // Buttons
 .media-button {
-  .circle(@media-button-size);
+  .circle(var(--media-button-size));
 
   position: relative;
   flex: 0 0 auto;
   background-color: fade(#000, 40%);
   color: #fff;
   cursor: pointer;
-  font-size: @font-size-sm;
-  line-height: @media-button-size;
+  font-size: var(--font-size-base);
+  line-height: var(--media-button-size);
   text-align: center;
 
   & svg {
@@ -84,15 +82,15 @@
 
   &.media-button-progress-animation {
     & circle {
-      animation: progress-animation @animation-timing-slower * 3 linear infinite;
+      animation: progress-animation calc(var(--animation-timing-slower) * 3) linear infinite;
     }
   }
 
   .media-button-lg & {
-    .circle(@media-button-size-lg);
+    .circle(var(--media-button-size-lg));
 
-    font-size: @font-size-xl;
-    line-height: @media-button-size-lg;
+    font-size: var(--font-size-xxl);
+    line-height: var(--media-button-size-lg);
 
     & circle {
       stroke-dasharray: 0 200;
@@ -100,7 +98,7 @@
 
     &.media-button-progress-animation {
       & circle {
-        animation: progress-animation-lg @animation-timing-slower * 3 linear infinite;
+        animation: progress-animation-lg calc(var(--animation-timing-slower) * 3) linear infinite;
       }
     }
   }

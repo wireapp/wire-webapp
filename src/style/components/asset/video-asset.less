@@ -17,8 +17,6 @@
  *
  */
 
-@play-button-size: 32px;
-
 @keyframes loading {
   to {
     transform: rotate(360deg);
@@ -27,8 +25,10 @@
 
 // Video asset component
 .video-asset {
+  .asset-container-style;
   position: relative;
   display: block;
+  flex: 1 1 auto;
 
   &__container {
     .asset-container-style;
@@ -67,16 +67,18 @@
     .flex-center;
 
     z-index: -1;
-    color: @separator-color;
-    font-size: @font-size-xl;
+    color: var(--separator-color);
+    font-size: var(--font-size-xxl);
   }
 
   &__playback-error {
     .full-screen;
     .flex-center;
 
-    background-color: var(--background-fade-40);
-    color: #fff;
+    flex-direction: column;
+    background-color: var(--background-fade-8);
+    color: var(--main-color);
+    gap: 16px;
   }
 
   &__controls {
@@ -122,7 +124,7 @@
 
     &--hidden {
       opacity: 0;
-      transition: opacity @animation-timing-fast ease-in-out;
+      transition: opacity var(--animation-timing-fast) ease-in-out;
     }
   }
 
@@ -144,15 +146,15 @@
     }
 
     &__play-button {
-      .circle(@play-button-size);
+      .circle(var(--play-button-size));
       .text-foreground;
 
       position: relative;
       flex: 0 0 auto;
       margin: auto;
       background-color: white;
-      font-size: @font-size-sm;
-      line-height: @play-button-size;
+      font-size: var(--font-size-base);
+      line-height: var(--play-button-size);
       text-align: center;
     }
 

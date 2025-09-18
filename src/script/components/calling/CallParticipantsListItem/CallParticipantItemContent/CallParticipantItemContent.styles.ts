@@ -19,16 +19,6 @@
 
 import {CSSObject} from '@emotion/react';
 
-export const listItem = (noInteraction = false): CSSObject => ({
-  display: 'flex',
-  overflow: 'hidden',
-  height: '56px',
-  alignItems: 'center',
-  paddingRight: '16px',
-  margin: '0',
-  cursor: noInteraction ? 'default' : 'pointer',
-});
-
 export const chevronIcon: CSSObject = {
   border: 'none',
   background: 'none',
@@ -39,7 +29,7 @@ export const chevronIcon: CSSObject = {
   justifyContent: 'center',
   opacity: '0',
   transition: 'opacity 0.25s ease-in-out',
-  width: '16px',
+  minWidth: '16px',
   svg: {
     width: '8px',
     path: {
@@ -87,11 +77,6 @@ export const nameWrapper = (isAudioEstablished: boolean): CSSObject => ({
 export const userAvailability: CSSObject = {
   maxWidth: '100%',
   whiteSpace: 'nowrap',
-
-  '.availability-state-label': ellipsis,
-  '.availability-state-icon': {
-    display: 'flex',
-  },
 };
 
 export const userName: CSSObject = {

@@ -19,15 +19,14 @@
 
 import React from 'react';
 
-import {User} from 'src/script/entity/User';
+import {DeleteMessage as DeleteMessageEntity} from 'Repositories/entity/message/DeleteMessage';
+import {User} from 'Repositories/entity/User';
+import {ServiceEntity} from 'Repositories/integration/ServiceEntity';
 import {t} from 'Util/LocalizerUtil';
 import {formatTimeShort, fromUnixTime, TIME_IN_MILLIS} from 'Util/TimeUtil';
 
 import {MessageHeader} from './ContentMessage/MessageHeader';
 import {MessageTime} from './MessageTime';
-
-import {DeleteMessage as DeleteMessageEntity} from '../../../entity/message/DeleteMessage';
-import {ServiceEntity} from '../../../integration/ServiceEntity';
 
 export interface DeleteMessageProps {
   message: DeleteMessageEntity;
@@ -37,10 +36,9 @@ export interface DeleteMessageProps {
 const DeleteMessage: React.FC<DeleteMessageProps> = ({message, onClickAvatar = () => {}}) => {
   const deletedTimeStamp = message.deleted_timestamp || 0;
 
-  const formattedDeletionTime = t(
-    'conversationDeleteTimestamp',
-    formatTimeShort(fromUnixTime(deletedTimeStamp / TIME_IN_MILLIS.SECOND)),
-  );
+  const formattedDeletionTime = t('conversationDeleteTimestamp', {
+    date: formatTimeShort(fromUnixTime(deletedTimeStamp / TIME_IN_MILLIS.SECOND)),
+  });
 
   return (
     <MessageHeader message={message} onClickAvatar={onClickAvatar} uieName="element-message-delete" noBadges noColor>

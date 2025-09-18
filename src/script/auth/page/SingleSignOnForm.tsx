@@ -20,49 +20,47 @@
 import React, {useEffect, useRef, useState} from 'react';
 
 import {ClientType} from '@wireapp/api-client/lib/client/index';
-import {BackendErrorLabel, SyntheticErrorLabel} from '@wireapp/api-client/lib/http';
+import {BackendError, BackendErrorLabel, SyntheticErrorLabel} from '@wireapp/api-client/lib/http';
 import {pathWithParams} from '@wireapp/commons/lib/util/UrlUtil';
 import {isValidEmail, PATTERN} from '@wireapp/commons/lib/util/ValidationUtil';
-import {FormattedMessage, useIntl} from 'react-intl';
+import {FormattedMessage} from 'react-intl';
 import {connect} from 'react-redux';
 import {Navigate, useNavigate} from 'react-router-dom';
 import {AnyAction, Dispatch} from 'redux';
 
 import {Runtime, UrlUtil} from '@wireapp/commons';
-import {
-  ArrowIcon,
-  Checkbox,
-  CheckboxLabel,
-  ErrorMessage,
-  Form,
-  Input,
-  InputBlock,
-  InputSubmitCombo,
-  Loading,
-  RoundIconButton,
-} from '@wireapp/react-ui-kit';
+import {Button, Checkbox, CheckboxLabel, ErrorMessage, Form, Input, InputBlock, Loading} from '@wireapp/react-ui-kit';
+
+import {t} from 'Util/LocalizerUtil';
+import {isBackendError} from 'Util/TypePredicateUtil';
 
 import {Config} from '../../Config';
-import {loginStrings, logoutReasonStrings, ssoLoginStrings} from '../../strings';
+import {JoinGuestLinkPasswordModal} from '../component/JoinGuestLinkPasswordModal';
+import {useEnterpriseLoginV2} from '../hooks/useEnterpriseLoginV2';
 import {actionRoot as ROOT_ACTIONS} from '../module/action/';
 import {ValidationError} from '../module/action/ValidationError';
 import {bindActionCreators, RootState} from '../module/reducer';
 import * as AuthSelector from '../module/selector/AuthSelector';
+import * as ConversationSelector from '../module/selector/ConversationSelector';
 import {QUERY_KEY, ROUTE} from '../route';
 import {parseError, parseValidationErrors} from '../util/errorUtil';
-import {getSearchParams} from '../util/urlUtil';
+import {getEnterpriseLoginV2FF} from '../util/helpers';
+import {logoutReasonStrings} from '../util/logoutUtil';
+import {getSearchParams, SSO_CODE_PREFIX} from '../util/urlUtil';
 
 export interface SingleSignOnFormProps extends React.HTMLAttributes<HTMLDivElement> {
   doLogin: (code: string) => Promise<void>;
   initialCode?: string;
 }
 
-const SSO_CODE_PREFIX = 'wire-';
 const SSO_CODE_PREFIX_REGEX = '[wW][iI][rR][eE]-';
 const SingleSignOnFormComponent = ({
   initialCode,
   isFetching,
   authError,
+  conversationError,
+  conversationInfo,
+  conversationInfoFetching,
   resetAuthError,
   validateSSOCode,
   doLogin,
@@ -70,15 +68,17 @@ const SingleSignOnFormComponent = ({
   doGetDomainInfo,
   doCheckConversationCode,
   doJoinConversationByCode,
+  doGetConversationInfoByCode,
   doNavigate,
+  pushAccountRegistrationData,
+  account,
 }: SingleSignOnFormProps & ConnectedProps & DispatchProps) => {
   const codeOrMailInput = useRef<HTMLInputElement>();
-  const [codeOrMail, setCodeOrMail] = useState('');
+  const [codeOrMail, setCodeOrMail] = useState(account.email || '');
   const [disableInput, setDisableInput] = useState(false);
-  const {formatMessage: _} = useIntl();
   const navigate = useNavigate();
-  const [clientType, setClientType] = useState<ClientType>(null);
-  const [ssoError, setSsoError] = useState(null);
+  const [clientType, setClientType] = useState<ClientType | null>(null);
+  const [ssoError, setSsoError] = useState<BackendError | null>(null);
   const [isCodeOrMailInputValid, setIsCodeOrMailInputValid] = useState(true);
   const [validationError, setValidationError] = useState<any>();
   const [logoutReason, setLogoutReason] = useState<string>();
@@ -89,6 +89,37 @@ const SingleSignOnFormComponent = ({
   const [isValidLink, setIsValidLink] = useState(true);
 
   const [shouldAutoLogin, setShouldAutoLogin] = useState(false);
+
+  const [isLinkPasswordModalOpen, setIsLinkPasswordModalOpen] = useState<boolean>(
+    !!conversationInfo?.has_password ||
+      (!!conversationError && conversationError.label === BackendErrorLabel.INVALID_CONVERSATION_PASSWORD),
+  );
+  const isEnterpriseLoginV2Enabled = getEnterpriseLoginV2FF();
+
+  const loginWithSSO = async (code = codeOrMail, password?: string) => {
+    setIsLoading(true);
+    const strippedCode = stripPrefix(code);
+    await validateSSOCode(strippedCode);
+    await doLogin(strippedCode);
+    await doFinalizeSSOLogin({clientType});
+    const hasKeyAndCode = conversationKey && conversationCode;
+    if (hasKeyAndCode) {
+      await doJoinConversationByCode(conversationKey, conversationCode, undefined, password);
+    }
+
+    navigate(ROUTE.HISTORY_INFO);
+  };
+
+  const {loginV2} = useEnterpriseLoginV2({
+    loginWithSSO,
+  });
+
+  useEffect(() => {
+    setIsLinkPasswordModalOpen(
+      !!conversationInfo?.has_password ||
+        (!!conversationError && conversationError.label === BackendErrorLabel.INVALID_CONVERSATION_PASSWORD),
+    );
+  }, [conversationError, conversationInfo?.has_password]);
 
   useEffect(() => {
     const queryAutoLogin = UrlUtil.hasURLParameter(QUERY_KEY.SSO_AUTO_LOGIN);
@@ -126,6 +157,10 @@ const SingleSignOnFormComponent = ({
         console.warn('Invalid conversation code', error);
         setIsValidLink(false);
       });
+      doGetConversationInfoByCode(queryConversationKey, queryConversationCode).catch(error => {
+        console.warn('Failed to fetch conversation info', error);
+        setIsValidLink(false);
+      });
     }
   }, []);
 
@@ -147,12 +182,23 @@ const SingleSignOnFormComponent = ({
     setIsCodeOrMailInputValid(true);
   };
 
-  const handleSubmit = async (event?: React.FormEvent): Promise<void> => {
+  const handleSubmit = async (event?: React.FormEvent, password?: string): Promise<void> => {
     if (event) {
       event.preventDefault();
     }
+
     resetAuthError();
-    if (isFetching) {
+
+    if (isFetching || !codeOrMailInput.current) {
+      return;
+    }
+
+    if (
+      !isLinkPasswordModalOpen &&
+      (!!conversationInfo?.has_password ||
+        (!!conversationError && conversationError.label === BackendErrorLabel.INVALID_CONVERSATION_PASSWORD))
+    ) {
+      setIsLinkPasswordModalOpen(true);
       return;
     }
 
@@ -175,64 +221,65 @@ const SingleSignOnFormComponent = ({
       }
       const email = codeOrMail.trim();
       if (isValidEmail(email)) {
-        const domain = email.split('@')[1];
-        const {webapp_welcome_url} = await doGetDomainInfo(domain);
-        const [path, query = ''] = webapp_welcome_url.split('?');
-        const welcomeUrl = pathWithParams(
-          path,
-          {[QUERY_KEY.CLIENT_TYPE]: clientType, [QUERY_KEY.SSO_AUTO_LOGIN]: true},
-          null,
-          query,
-        );
+        await pushAccountRegistrationData({email});
+        if (isEnterpriseLoginV2Enabled) {
+          await loginV2(email, password);
+        } else {
+          const domain = email.split('@')[1];
+          const {webapp_welcome_url} = await doGetDomainInfo(domain);
+          const [path, query = ''] = webapp_welcome_url.split('?');
+          const welcomeUrl = pathWithParams(
+            path,
+            {[QUERY_KEY.CLIENT_TYPE]: clientType, [QUERY_KEY.SSO_AUTO_LOGIN]: true},
+            null,
+            query,
+          );
 
-        // This refreshes the page as we replace the whole URL.
-        // This works for now as we don't need anything from the state anymore at this point.
-        // Ideal would be to abandon the HashRouter (in the near future) and use something that
-        // allows us to pass search query parameters.
-        // https://reacttraining.com/react-router/web/api/HashRouter
-        doNavigate(
-          `/auth?${getSearchParams({[QUERY_KEY.DESTINATION_URL]: encodeURIComponent(welcomeUrl)})}#${
-            ROUTE.CUSTOM_ENV_REDIRECT
-          }`,
-        );
-      } else {
-        setIsLoading(true);
-        const strippedCode = stripPrefix(codeOrMail);
-        await validateSSOCode(strippedCode);
-        await doLogin(strippedCode);
-        await doFinalizeSSOLogin({clientType});
-        const hasKeyAndCode = conversationKey && conversationCode;
-        if (hasKeyAndCode) {
-          await doJoinConversationByCode(conversationKey, conversationCode);
+          // This refreshes the page as we replace the whole URL.
+          // This works for now as we don't need anything from the state anymore at this point.
+          // Ideal would be to abandon the HashRouter (in the near future) and use something that
+          // allows us to pass search query parameters.
+          // https://reacttraining.com/react-router/web/api/HashRouter
+          doNavigate(
+            `/auth?${getSearchParams({[QUERY_KEY.DESTINATION_URL]: encodeURIComponent(welcomeUrl)})}#${
+              ROUTE.CUSTOM_ENV_REDIRECT
+            }`,
+          );
         }
-
-        navigate(ROUTE.HISTORY_INFO);
+      } else {
+        await loginWithSSO(codeOrMail, password);
       }
     } catch (error) {
       setIsLoading(false);
-      switch (error.label) {
-        case BackendErrorLabel.TOO_MANY_CLIENTS: {
-          resetAuthError();
-          navigate(ROUTE.CLIENTS);
-          break;
-        }
-        case BackendErrorLabel.CUSTOM_BACKEND_NOT_FOUND: {
-          setSsoError(error);
-          break;
-        }
-        case SyntheticErrorLabel.SSO_USER_CANCELLED_ERROR:
-        case BackendErrorLabel.NOT_FOUND: {
-          break;
-        }
-        default: {
-          setSsoError(error);
-          const isValidationError = Object.values(ValidationError.ERROR).some(
-            errorType => error.label && error.label.endsWith(errorType),
-          );
-          if (!isValidationError) {
-            console.warn('SSO authentication error', JSON.stringify(Object.entries(error)), error);
+      if (isBackendError(error)) {
+        switch (error.label) {
+          case BackendErrorLabel.TOO_MANY_CLIENTS: {
+            resetAuthError();
+            navigate(ROUTE.CLIENTS);
+            break;
           }
-          break;
+          case BackendErrorLabel.CUSTOM_BACKEND_NOT_FOUND: {
+            setSsoError(error);
+            break;
+          }
+          case BackendErrorLabel.INVALID_CONVERSATION_PASSWORD: {
+            // error will be hanlded by opening modal
+            break;
+          }
+          case SyntheticErrorLabel.SSO_USER_CANCELLED_ERROR:
+          case BackendErrorLabel.NOT_FOUND: {
+            break;
+          }
+          default: {
+            setSsoError(error);
+            const isValidationError = Object.values(ValidationError.ERROR).some(
+              errorType => error.label && error.label.endsWith(errorType),
+            );
+            if (!isValidationError) {
+              console.warn('SSO authentication error', JSON.stringify(Object.entries(error)), error);
+            }
+            break;
+          }
         }
       }
     }
@@ -248,27 +295,42 @@ const SingleSignOnFormComponent = ({
     : ValidationError.FIELD.SSO_CODE.name;
 
   const inputPlaceholder = enableDomainDiscovery
-    ? ssoLoginStrings.codeOrMailInputPlaceholder
-    : ssoLoginStrings.codeInputPlaceholder;
+    ? t('ssoLogin.codeOrMailInputPlaceholder')
+    : t('ssoLogin.codeInputPlaceholder');
 
   const inputPattern = enableDomainDiscovery
     ? `(${SSO_CODE_PREFIX_REGEX}${PATTERN.UUID_V4}|${PATTERN.EMAIL})`
     : `${SSO_CODE_PREFIX_REGEX}${PATTERN.UUID_V4}`;
 
-  return isLoading ? (
-    <Loading style={{marginTop: '24px'}} />
-  ) : (
-    <Form style={{marginTop: 30}} data-uie-name="sso" onSubmit={handleSubmit}>
-      {!isValidLink && <Navigate to={ROUTE.CONVERSATION_JOIN_INVALID} replace />}
-      <InputBlock>
-        <InputSubmitCombo>
+  const submitJoinCodeWithPassword = async (password?: string) => {
+    await handleSubmit(undefined, password);
+  };
+
+  if (isLoading) {
+    return <Loading style={{marginTop: '24px'}} />;
+  }
+
+  return (
+    <>
+      {isLinkPasswordModalOpen && (
+        <JoinGuestLinkPasswordModal
+          onClose={() => setIsLinkPasswordModalOpen(false)}
+          error={conversationError}
+          conversationName={conversationInfo?.name}
+          isLoading={isFetching || conversationInfoFetching}
+          onSubmitPassword={submitJoinCodeWithPassword}
+        />
+      )}
+      <Form style={{marginTop: 30}} data-uie-name="sso" onSubmit={handleSubmit}>
+        {!isValidLink && <Navigate to={ROUTE.CONVERSATION_JOIN_INVALID} replace />}
+        <InputBlock>
           <Input
             id={inputName}
             name={inputName}
             onChange={onCodeChange}
             ref={codeOrMailInput}
             markInvalid={!isCodeOrMailInputValid}
-            placeholder={_(inputPlaceholder)}
+            placeholder={inputPlaceholder}
             value={codeOrMail}
             autoComplete="section-login sso-code"
             maxLength={1024}
@@ -278,52 +340,63 @@ const SingleSignOnFormComponent = ({
             disabled={disableInput}
             data-uie-name="enter-code"
           />
-          <RoundIconButton disabled={!codeOrMail} type="submit" formNoValidate data-uie-name="do-sso-sign-in">
-            <ArrowIcon />
-          </RoundIconButton>
-        </InputSubmitCombo>
-      </InputBlock>
-      {validationError ? (
-        parseValidationErrors([validationError])
-      ) : authError ? (
-        parseError(authError)
-      ) : ssoError ? (
-        parseError(ssoError)
-      ) : logoutReason ? (
-        <ErrorMessage data-uie-name="status-logout-reason">
-          <FormattedMessage
-            {...logoutReasonStrings[logoutReason]}
-            values={{
-              newline: <br />,
-            }}
-          />
-        </ErrorMessage>
-      ) : (
-        <span style={{marginBottom: '4px'}}>&nbsp;</span>
-      )}
-      {!Runtime.isDesktopApp() && (
-        <Checkbox
-          name="enter-public-computer-sso-sign-in"
-          id="enter-public-computer-sso-sign-in"
-          onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
-            setClientType(event.target.checked ? ClientType.TEMPORARY : ClientType.PERMANENT)
-          }
-          checked={clientType === ClientType.TEMPORARY}
-          data-uie-name="enter-public-computer-sso-sign-in"
-          aligncenter
-          style={{justifyContent: 'center', marginTop: '36px'}}
+        </InputBlock>
+        <Button
+          block
+          type="submit"
+          disabled={!codeOrMail}
+          formNoValidate
+          onClick={handleSubmit}
+          aria-label={t('login.headline')}
+          data-uie-name="do-sso-sign-in"
         >
-          <CheckboxLabel htmlFor="">{_(loginStrings.publicComputer)}</CheckboxLabel>
-        </Checkbox>
-      )}
-    </Form>
+          {t('login.headline')}
+        </Button>
+        {validationError
+          ? parseValidationErrors([validationError])
+          : authError
+            ? parseError(authError)
+            : ssoError
+              ? parseError(ssoError)
+              : logoutReason && (
+                  <ErrorMessage data-uie-name="status-logout-reason">
+                    <FormattedMessage
+                      id={logoutReasonStrings[logoutReason]}
+                      values={{
+                        newline: <br />,
+                      }}
+                    />
+                  </ErrorMessage>
+                )}
+
+        {!Runtime.isDesktopApp() && (
+          <Checkbox
+            name="enter-public-computer-sso-sign-in"
+            id="enter-public-computer-sso-sign-in"
+            onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+              setClientType(event.target.checked ? ClientType.TEMPORARY : ClientType.PERMANENT);
+            }}
+            checked={clientType === ClientType.TEMPORARY}
+            data-uie-name="enter-public-computer-sso-sign-in"
+            aligncenter
+            style={{justifyContent: 'center', marginTop: '2rem'}}
+          >
+            <CheckboxLabel htmlFor="">{t('login.publicComputer')}</CheckboxLabel>
+          </Checkbox>
+        )}
+      </Form>
+    </>
   );
 };
 
 type ConnectedProps = ReturnType<typeof mapStateToProps>;
 const mapStateToProps = (state: RootState) => ({
   isFetching: AuthSelector.isFetching(state),
+  account: AuthSelector.getAccount(state),
   authError: AuthSelector.getError(state),
+  conversationError: ConversationSelector.getError(state),
+  conversationInfo: ConversationSelector.conversationInfo(state),
+  conversationInfoFetching: ConversationSelector.conversationInfoFetching(state),
 });
 
 type DispatchProps = ReturnType<typeof mapDispatchToProps>;
@@ -334,9 +407,11 @@ const mapDispatchToProps = (dispatch: Dispatch<AnyAction>) =>
       doFinalizeSSOLogin: ROOT_ACTIONS.authAction.doFinalizeSSOLogin,
       doGetDomainInfo: ROOT_ACTIONS.authAction.doGetDomainInfo,
       doJoinConversationByCode: ROOT_ACTIONS.conversationAction.doJoinConversationByCode,
+      doGetConversationInfoByCode: ROOT_ACTIONS.conversationAction.doGetConversationInfoByCode,
       doNavigate: ROOT_ACTIONS.navigationAction.doNavigate,
       resetAuthError: ROOT_ACTIONS.authAction.resetAuthError,
       validateSSOCode: ROOT_ACTIONS.authAction.validateSSOCode,
+      pushAccountRegistrationData: ROOT_ACTIONS.authAction.pushAccountRegistrationData,
     },
     dispatch,
   );

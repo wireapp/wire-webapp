@@ -17,14 +17,12 @@
  *
  */
 
-import {FC, useRef} from 'react';
+import {useRef} from 'react';
 
-import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
-
-import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
+import {TabIndex, Button, ButtonVariant} from '@wireapp/react-ui-kit';
 
 import {CONFIG as HistoryExportConfig} from 'Components/HistoryExport';
-import {handleKeyDown} from 'Util/KeyboardUtil';
+import {handleKeyDown, KEY} from 'Util/KeyboardUtil';
 
 interface BackupFileUploadProps {
   onFileChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
@@ -33,12 +31,12 @@ interface BackupFileUploadProps {
   cssClassName?: string;
 }
 
-const BackupFileUpload: FC<BackupFileUploadProps> = ({
+const BackupFileUpload = ({
   onFileChange,
   backupImportHeadLine,
   variant,
   cssClassName = 'button button-secondary',
-}) => {
+}: BackupFileUploadProps) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const fileInputClick = () => fileInputRef.current?.click();
@@ -51,7 +49,7 @@ const BackupFileUpload: FC<BackupFileUploadProps> = ({
           ref={fileInputRef}
           tabIndex={TabIndex.UNFOCUSABLE}
           type="file"
-          accept={`.${HistoryExportConfig.FILE_EXTENSION}`}
+          accept={`.${HistoryExportConfig.LEGACY_FILE_EXTENSION},.${HistoryExportConfig.UNIVERSAL_FILE_EXTENSION}`}
           onChange={onFileChange}
           onFocus={({target}) => target.blur()}
           data-uie-name="input-import-file"
@@ -64,7 +62,7 @@ const BackupFileUpload: FC<BackupFileUploadProps> = ({
         className={cssClassName}
         role="button"
         tabIndex={TabIndex.FOCUSABLE}
-        onKeyDown={event => handleKeyDown(event, fileInputClick)}
+        onKeyDown={event => handleKeyDown({event, callback: fileInputClick, keys: [KEY.ENTER, KEY.SPACE]})}
         onClick={() => fileInputRef.current?.click()}
         aria-labelledby="do-backup-import"
       >

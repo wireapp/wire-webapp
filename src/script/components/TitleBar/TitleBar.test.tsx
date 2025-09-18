@@ -27,18 +27,17 @@ import * as uiKit from '@wireapp/react-ui-kit';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {TitleBar} from 'Components/TitleBar';
+import {CallingRepository} from 'Repositories/calling/CallingRepository';
+import {CallState} from 'Repositories/calling/CallState';
+import {ConversationVerificationState} from 'Repositories/conversation/ConversationVerificationState';
+import {Conversation} from 'Repositories/entity/Conversation';
+import {User} from 'Repositories/entity/User';
+import {TeamState} from 'Repositories/team/TeamState';
 import {withTheme} from 'src/script/auth/util/test/TestUtil';
 import {ContentState} from 'src/script/page/useAppState';
 
 import {TestFactory} from '../../../../test/helper/TestFactory';
-import {CallingRepository} from '../../calling/CallingRepository';
-import {CallState} from '../../calling/CallState';
-import {ConversationVerificationState} from '../../conversation/ConversationVerificationState';
-import {Conversation} from '../../entity/Conversation';
-import {User} from '../../entity/User';
 import {PanelState} from '../../page/RightSidebar/RightSidebar';
-import {TeamState} from '../../team/TeamState';
-import {UserState} from '../../user/UserState';
 import {ViewModelRepositories} from '../../view_model/MainViewModel';
 
 jest.mock('@wireapp/react-ui-kit', () => ({
@@ -85,7 +84,8 @@ const getDefaultProps = (callingRepository: CallingRepository, conversation: Con
     } as CallingRepository,
   } as ViewModelRepositories,
   teamState: new TeamState(),
-  userState: new UserState(),
+  selfUser: new User(),
+  withBottomDivider: true,
 });
 
 describe('TitleBar', () => {
@@ -101,22 +101,22 @@ describe('TitleBar', () => {
   });
 
   it("doesn't show conversation search button for user with activated account", async () => {
-    const userState = createUserState({isActivatedAccount: ko.pureComputed(() => false)});
+    const selfUser = createUser(false);
     const conversation = new Conversation();
 
     const {queryByText} = render(
-      withTheme(<TitleBar {...getDefaultProps(callingRepository, conversation)} userState={userState} />),
+      withTheme(<TitleBar {...getDefaultProps(callingRepository, conversation)} selfUser={selfUser} />),
     );
 
     expect(queryByText('tooltipConversationSearch')).toBeNull();
   });
 
   it('opens search area after search button click', async () => {
-    const userState = createUserState({isActivatedAccount: ko.pureComputed(() => true)});
+    const selfUser = createUser(true);
     const conversation = new Conversation();
 
     const {getByText} = render(
-      withTheme(<TitleBar {...getDefaultProps(callingRepository, conversation)} userState={userState} />),
+      withTheme(<TitleBar {...getDefaultProps(callingRepository, conversation)} selfUser={selfUser} />),
     );
 
     const searchButton = getByText('tooltipConversationSearch');
@@ -128,13 +128,13 @@ describe('TitleBar', () => {
   });
 
   it('opens conversation details on conversation name click', async () => {
-    const userState = createUserState({isActivatedAccount: ko.pureComputed(() => true)});
+    const selfUser = createUser(true);
     const displayName = 'test name';
     const conversation = createConversationEntity({
       display_name: ko.pureComputed(() => displayName),
     });
     const props = getDefaultProps(callingRepository, conversation);
-    const {getByText} = render(withTheme(<TitleBar {...props} userState={userState} />));
+    const {getByText} = render(withTheme(<TitleBar {...props} selfUser={selfUser} />));
 
     const conversationName = getByText(displayName);
     expect(conversationName).toBeDefined();
@@ -144,13 +144,13 @@ describe('TitleBar', () => {
   });
 
   it('opens conversation details on info button click', async () => {
-    const userState = createUserState({isActivatedAccount: ko.pureComputed(() => true)});
+    const selfUser = createUser(true);
     const conversation = createConversationEntity();
     const props = getDefaultProps(callingRepository, conversation);
 
     mockedUiKit.useMatchMedia.mockReturnValue(false);
 
-    const {getByLabelText} = render(withTheme(<TitleBar {...props} userState={userState} />));
+    const {getByLabelText} = render(withTheme(<TitleBar {...props} selfUser={selfUser} />));
 
     const infoButton = getByLabelText('tooltipConversationInfo');
     expect(infoButton).toBeDefined();
@@ -172,11 +172,11 @@ describe('TitleBar', () => {
   });
 
   it("doesn't show legal-hold icon for non legal-hold user", async () => {
-    const userState = createUserState({isActivatedAccount: ko.pureComputed(() => true)});
+    const selfUser = createUser(true);
     const conversation = createConversationEntity({hasLegalHold: ko.pureComputed(() => false)});
 
     const {container} = render(
-      withTheme(<TitleBar {...getDefaultProps(callingRepository, conversation)} userState={userState} />),
+      withTheme(<TitleBar {...getDefaultProps(callingRepository, conversation)} selfUser={selfUser} />),
     );
 
     const legalHoldDotButton = container.querySelector('button[data-uie-name="status-legal-hold-conversation"]');
@@ -184,11 +184,11 @@ describe('TitleBar', () => {
   });
 
   it('shows legal-hold icon for legal-hold user', async () => {
-    const userState = createUserState({isActivatedAccount: ko.pureComputed(() => true)});
+    const selfUser = createUser(true);
     const conversation = createConversationEntity({hasLegalHold: ko.pureComputed(() => true)});
 
     const {container} = render(
-      withTheme(<TitleBar {...getDefaultProps(callingRepository, conversation)} userState={userState} />),
+      withTheme(<TitleBar {...getDefaultProps(callingRepository, conversation)} selfUser={selfUser} />),
     );
 
     const legalHoldDotButton = container.querySelector('button[data-uie-name="status-legal-hold-conversation"]');
@@ -198,31 +198,31 @@ describe('TitleBar', () => {
   it.each([ConversationVerificationState.UNVERIFIED, ConversationVerificationState.DEGRADED])(
     "doesn't show verified icon in not-verified conversation",
     async state => {
-      const userState = createUserState({isActivatedAccount: ko.pureComputed(() => true)});
+      const selfUser = createUser(true);
       const conversation = createConversationEntity({
         verification_state: ko.observable<ConversationVerificationState>(state),
       });
 
-      const {container} = render(
-        withTheme(<TitleBar {...getDefaultProps(callingRepository, conversation)} userState={userState} />),
+      const {queryByTestId} = render(
+        withTheme(<TitleBar {...getDefaultProps(callingRepository, conversation)} selfUser={selfUser} />),
       );
 
-      const verifiedIcon = container.querySelector('[data-uie-name="conversation-title-bar-verified-icon"]');
+      const verifiedIcon = queryByTestId('proteus-conversations-verified');
       expect(verifiedIcon).toBeNull();
     },
   );
 
   it('shows verified icon in verified conversation', async () => {
-    const userState = createUserState({isActivatedAccount: ko.pureComputed(() => true)});
+    const selfUser = createUser(true);
     const conversation = createConversationEntity({
       verification_state: ko.observable<ConversationVerificationState>(ConversationVerificationState.VERIFIED),
     });
 
-    const {container} = render(
-      withTheme(<TitleBar {...getDefaultProps(callingRepository, conversation)} userState={userState} />),
+    const {getByTestId} = render(
+      withTheme(<TitleBar {...getDefaultProps(callingRepository, conversation)} selfUser={selfUser} />),
     );
 
-    const verifiedIcon = container.querySelector('[data-uie-name="conversation-title-bar-verified-icon"]');
+    const verifiedIcon = getByTestId('proteus-conversation-verified');
     expect(verifiedIcon).not.toBeNull();
   });
 
@@ -265,31 +265,6 @@ describe('TitleBar', () => {
     expect(videoCallButton).toBeNull();
   });
 
-  it('starts video call on video call button click', async () => {
-    mockedUiKit.useMatchMedia.mockReturnValue(false);
-
-    const firstUser = new User();
-    const teamState = createTeamState({isVideoCallingEnabled: ko.pureComputed(() => true)});
-    const conversation = createConversationEntity({
-      firstUserEntity: ko.pureComputed(() => firstUser),
-      is1to1: ko.pureComputed(() => true),
-      participating_user_ids: ko.observableArray([
-        {domain: '', id: ''},
-        {domain: '', id: ''},
-      ] as QualifiedId[]),
-    });
-
-    const {getByLabelText} = render(
-      withTheme(<TitleBar {...getDefaultProps(callingRepository, conversation)} teamState={teamState} />),
-    );
-
-    const videoCallButton = getByLabelText('tooltipConversationVideoCall');
-    expect(videoCallButton).toBeDefined();
-
-    fireEvent.click(videoCallButton);
-    expect(callActions.startVideo).toHaveBeenCalledWith(conversation);
-  });
-
   it('displays warning badge', async () => {
     const conversation = createConversationEntity({
       hasDirectGuest: ko.pureComputed(() => true),
@@ -302,9 +277,10 @@ describe('TitleBar', () => {
   });
 });
 
-function createUserState(user?: Partial<UserState>) {
-  const userState = new UserState();
-  return Object.assign(userState, user) as UserState;
+function createUser(activated: boolean = true) {
+  const user = new User();
+  user.isTemporaryGuest(!activated);
+  return user;
 }
 
 function createTeamState(team?: Partial<TeamState>) {

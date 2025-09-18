@@ -21,10 +21,37 @@ const webpack = require('webpack');
 
 const path = require('path');
 
+const spawn = require('cross-spawn');
+
 const commonConfig = require('./webpack.config.common');
 
 const srcScript = 'src/script/';
 
+const updateTranslationTypesPlugin = {
+  apply: compiler => {
+    compiler.hooks.watchRun.tapAsync('TranslationWatcher', (compiler, callback) => {
+      const changedFiles = Array.from(compiler.modifiedFiles || new Set());
+      const translationsFilePath = path.resolve(__dirname, 'src/i18n/en-US.json');
+
+      if (!changedFiles.includes(translationsFilePath)) {
+        return callback();
+      }
+
+      console.log('Translations file changed. Generating types...');
+
+      const process = spawn('yarn', ['run', 'translate:generate-types'], {
+        stdio: 'inherit',
+      });
+
+      process.on('close', code => {
+        if (code !== 0) {
+          console.error(`Translation type generation failed with code ${code}`);
+        }
+        callback();
+      });
+    });
+  },
+};
 module.exports = {
   ...commonConfig,
   devtool: 'eval-source-map',
@@ -34,7 +61,7 @@ module.exports = {
     auth: ['webpack-hot-middleware/client', path.resolve(__dirname, srcScript, 'auth/main.tsx')],
   },
   mode: 'development',
-  plugins: [...commonConfig.plugins, new webpack.HotModuleReplacementPlugin()],
+  plugins: [...commonConfig.plugins, new webpack.HotModuleReplacementPlugin(), updateTranslationTypesPlugin],
   snapshot: {
     // This will make sure that changes in the node_modules will be detected and recompiled automatically (when using yalc for example)
     managedPaths: [],

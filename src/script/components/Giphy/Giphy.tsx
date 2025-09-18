@@ -26,10 +26,9 @@ import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {GifImage} from 'Components/Giphy/GifImage';
-import {Icon} from 'Components/Icon';
+import * as Icon from 'Components/Icon';
+import {Gif, GiphyRepository} from 'Repositories/extension/GiphyRepository';
 import {t} from 'Util/LocalizerUtil';
-
-import {Gif, GiphyRepository} from '../../extension/GiphyRepository';
 
 const GIPHY_CLOSE_TIMEOUT = 350;
 
@@ -213,7 +212,7 @@ const Giphy: FC<GiphyProps> = ({giphyRepository, defaultGiphyState = GiphyState.
               onClick={onCloseClick}
               data-uie-name="do-close-giphy-modal"
             >
-              <Icon.Close />
+              <Icon.CloseIcon />
             </button>
           </header>
 

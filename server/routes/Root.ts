@@ -44,6 +44,10 @@ const Root = () => [
     await addGeoIP(req);
     return res.render('auth/index');
   }),
+  Router().get('/unsupported', async (req, res) => {
+    await addGeoIP(req);
+    return res.render('unsupported/index');
+  }),
   Router().get('/login', async (req, res) => {
     await addGeoIP(req);
     return res.render('login/index');

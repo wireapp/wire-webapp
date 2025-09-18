@@ -27,4 +27,5 @@ export enum SIGN_OUT_REASON {
   NOT_SIGNED_IN = 'not_signed_in',
   SESSION_EXPIRED = 'expired',
   USER_REQUESTED = 'user_requested',
+  MLS_CLIENT_MISMATCH = 'mls_client_mismatch',
 }

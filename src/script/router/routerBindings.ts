@@ -25,28 +25,33 @@ import {navigate} from './Router';
 
 import {useAppMainState, ViewType} from '../page/state';
 
-export const createNavigate =
-  (link: string): React.MouseEventHandler =>
-  (event: React.MouseEvent<Element, MouseEvent>) => {
-    // The order here matters, setting the view before calling navigate() would not save the history
-    navigate(link);
-    setResponsiveView();
-    event.preventDefault();
-  };
+export const createNavigate = (link: string) => (event?: React.MouseEvent<Element, MouseEvent>) => {
+  // The order here matters, setting the view before calling navigate() would not save the history
+  navigate(link);
+  setResponsiveView();
+  event?.preventDefault();
+};
 
 export const createNavigateKeyboard =
-  (link: string, setIsResponsive = false): React.KeyboardEventHandler =>
+  (
+    link: string,
+    setIsResponsive = false,
+    supportedKeys: string[] = [KEY.ENTER, KEY.SPACE],
+  ): React.KeyboardEventHandler =>
   (event: React.KeyboardEvent<Element>) => {
     if (setIsResponsive) {
       setResponsiveView();
     }
-    if (event.key === KEY.ENTER || event.key === KEY.SPACE) {
-      navigate(link, {eventKey: event.key});
+
+    const isSupportedKey = supportedKeys.includes('*') || supportedKeys.includes(event.key);
+
+    if (isSupportedKey) {
+      navigate(link);
       event.preventDefault();
     }
   };
 
-export const setResponsiveView = () => {
+const setResponsiveView = () => {
   const {responsiveView} = useAppMainState.getState();
-  responsiveView.setCurrentView(ViewType.CENTRAL_COLUMN);
+  responsiveView.setCurrentView(ViewType.MOBILE_CENTRAL_COLUMN);
 };

@@ -21,7 +21,7 @@ import {FC, InputHTMLAttributes, useEffect, useRef, useState} from 'react';
 
 import {IconButton, IconButtonVariant} from '@wireapp/react-ui-kit';
 
-import {Icon} from 'Components/Icon';
+import * as Icon from 'Components/Icon';
 import {TextInput} from 'Components/TextInput';
 import {useIsMounted} from 'Util/useIsMounted';
 
@@ -139,7 +139,7 @@ const AccountInput: FC<AccountInputProps> = ({
               alignItems: 'center',
               display: 'flex',
               height: 32,
-              lineHeight: '0.875rem',
+              lineHeight: 'var(--line-height-small-plus)',
               position: 'relative',
             }}
             data-uie-name={labelUie}
@@ -160,12 +160,12 @@ const AccountInput: FC<AccountInputProps> = ({
                 }}
               >
                 {isDone ? (
-                  <Icon.AnimatedCheck
+                  <Icon.AnimatedCheckIcon
                     css={{path: {stroke: 'var(--foreground)'}}}
                     data-uie-name={`${iconUiePrefix}-icon-check`}
                   />
                 ) : (
-                  <Icon.Edit className="edit-icon" data-uie-name={`${iconUiePrefix}-icon`} />
+                  <Icon.EditIcon className="edit-icon" data-uie-name={`${iconUiePrefix}-icon`} />
                 )}
               </IconButton>
             )}

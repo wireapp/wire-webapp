@@ -90,166 +90,207 @@
 // ----------------------------------------------------------------------------
 @ars-font-path: '../font/';
 
-@font-family-base: emoji, BlinkMacSystemFont, -apple-system, Helvetica Neue, Arial, sans-serif;
-@font-family-ephemeral: Redacted Script;
-
-@font-size-xxs: 0.5rem;
-@font-size-xs: 0.6875rem;
-@font-size-sm: 1rem;
-@font-size-md: 1.25rem;
-@font-size-lg: 1.5rem;
-@font-size-xl: 2rem;
-@font-size-xxl: 3.5rem;
-
-@font-size-xsmall: 0.6875rem;
-@font-size-small: 0.75rem;
-@font-size-medium: 0.875rem;
-@font-size-base: 1rem;
-@font-size-large: 1.25rem;
-@font-size-xlarge: 1.5rem;
-
 body {
-  --line-height-xs: 0.6875rem;
-  --line-height-sm: 1rem;
-  --line-height-md: 1.25rem;
-  --line-height-lg: 1.5rem;
-  --line-height-xl: 2rem;
-  --line-height-xxl: 4rem;
+  // Fonts
+  --font-family-base: emoji, BlinkMacSystemFont, -apple-system, Helvetica Neue, Arial, sans-serif;
+  --font-family-ephemeral: Redacted Script;
 
+  --font-size-xxs: 0.5rem;
   --font-size-xsmall: 0.6875rem;
   --font-size-small: 0.75rem;
   --font-size-medium: 0.875rem;
   --font-size-base: 1rem;
   --font-size-large: 1.25rem;
   --font-size-xlarge: 1.5rem;
+  --font-size-xxl: 2rem;
+  --font-size-xxxl: 3.5rem;
 
-  --font-weight-bold: 700;
-  --font-weight-semibold: 600;
-  --font-weight-medium: 500;
-  --font-weight-regular: 400; // font-weight-xs should this this
   --font-weight-light: 300;
-}
+  --font-weight-regular: 400; // font-weight-xs should this this
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
 
-@line-height-xs: var(--line-height-xs);
-@line-height-sm: var(--line-height-sm);
-@line-height-md: var(--line-height-md);
-@line-height-lg: var(--line-height-lg);
-@line-height-xl: var(--line-height-xl);
-@line-height-xxl: var(--line-height-xxl);
+  --line-height-xs: 0.6875rem;
+  --line-height-small: 0.75rem;
+  --line-height-small-plus: 0.875rem;
+  --line-height-sm: 1rem;
+  --line-height-md: 1.25rem;
+  --line-height-lg: 1.5rem;
+  --line-height-xl: 2rem;
+  --line-height-xxl: 4rem;
 
-@font-weight-bold: var(--font-weight-bold);
-@font-weight-semibold: var(--font-weight-semibold);
-@font-weight-medium: var(--font-weight-medium);
-@font-weight-regular: var(--font-weight-regular);
-@font-weight-light: var(--font-weight-light);
-
-// ----------------------------------------------------------------------------
-// Icons
-// ----------------------------------------------------------------------------
-@icon-size-sm: 16px;
-@icon-size-md: 32px;
-@icon-size-lg: 56px;
-
-body {
+  // Icons
   --icon-size-sm: 1rem;
   --icon-size-md: 2rem;
   --icon-size-lg: 3.5rem;
-}
 
-// ----------------------------------------------------------------------------
-// Dot sizes
-// ----------------------------------------------------------------------------
-@dot-md: 8px;
+  // Dot sizes
+  --dot-md: 0.5rem;
 
-// ----------------------------------------------------------------------------
-// Common Colors
-// ----------------------------------------------------------------------------
-// use for seperator and icon surrounds on white background
-@separator-color: var(--foreground-fade-24);
+  // Common Colors
+  // use for seperator and icon surrounds on white background
+  --separator-color: var(--foreground-fade-24);
 
-// ----------------------------------------------------------------------------
-// Buttons
-// ----------------------------------------------------------------------------
-@button-border-radius: 4px;
-@button-border-size: 1px;
+  // Buttons
+  --button-border-radius: 4px;
+  --button-border-size: 1px;
+  --button-height: 40px;
+  --button-width: 192px;
+  --button-medium-height: 32px;
+  --button-medium-sm-height: 28px;
+  --button-medium-width: 108px;
+  --button-round-size: 28px;
+  --button-round-size-xs: 28px;
+  --button-round-size-sm: 32px;
+  --button-round-size-md: 40px;
+  --button-round-size-lg: 64px;
+  --button-round-size-xl: 72px;
 
-@button-height: 40px;
-@button-width: 192px;
+  // Framework
+  --teams-width: 78px;
+  --conversation-list-width: 320px;
+  --right-width: 320px;
+  --panel-content-min-height: 150px;
+  --panel-width: 320px;
+  --badge-height: 24px;
 
-@button-medium-height: 32px;
-@button-medium-sm-height: 28px;
-@button-medium-width: 108px;
+  --delivered-state-width: 56px;
 
-@button-round-size: 28px;
-@button-round-size-xs: 28px;
-@button-round-size-sm: 32px;
-@button-round-size-md: 40px;
-@button-round-size-lg: 64px;
-@button-round-size-xl: 72px;
+  // Start UI
+  --start-ui-search-bar-offset: 88px;
 
-// ----------------------------------------------------------------------------
-// Framework
-// ----------------------------------------------------------------------------
-@teams-width: 78px;
+  // Margins
+  --offscreen-left: -9999px;
 
-@conversation-list-color: #fff;
-@conversation-list-width: 320px;
+  // Warnings
+  --warning-bar-feature-height: 64px;
+  --warning-bar-connection-height: 32px;
 
-@right-width: 304px;
-@panel-content-min-height: 150px;
-
-body {
   --preferences-width: 560px;
 
-  @media (max-width: @screen-lg-min) {
+  @media (max-width: 960px) {
     --preferences-width: 100%;
   }
-}
 
-// ----------------------------------------------------------------------------
-// Left list
-// ----------------------------------------------------------------------------
-body {
+  // Left list
   --left-list-header-height: 45px;
   --left-list-item-height: 48px;
   --left-list-item-left-width: 60px;
   --left-list-item-right-width: 56px;
   --left-list-controls-width: 104px;
+
+  // Conversation
+  --conversation-max-width: 100%;
+  --conversation-message-max-width: 640px;
+  --conversation-message-sender-width: 64px;
+  --conversation-message-asset-width: 800px;
+  // Images should be in the viewport regardless of the window's size
+  // To ensure this, we calculate the maximum height as:
+  // 100vh - TitleBar(45px) - ImagePadding(12px) - TypingIndicator(40px) - ClassifiedBar(1rem) - InputBar(56px)
+  --conversation-message-image-asset-max-height: calc(100vh - 155px - 1rem);
+
+  // Conversation Input
+  --conversation-input-min-height: 56px;
+  --conversation-input-max-height: 200px;
+  --conversation-input-line-height: var(--line-height-lg);
+
+  // Content Title Bar
+  --content-title-bar-height: 46px;
+
+  // Modal
+  --modal-padding: 24px;
+
+  // Avatar
+  --avatar-diameter-xl: 200px;
+  --avatar-initials-xl: var(--font-size-xxl);
+
+  --avatar-diameter-l: 72px;
+  --avatar-initials-l: var(--font-size-xlarge);
+
+  --avatar-diameter-m: 40px;
+  --avatar-initials-m: var(--font-size-base);
+
+  --avatar-diameter-s: 28px;
+  --avatar-initials-s: var(--font-size-xsmall);
+
+  --avatar-diameter-xs: 24px;
+  --avatar-initials-xs: var(--font-size-xsmall);
+
+  --avatar-diameter-xxs: 20px;
+  --avatar-initials-xxs: var(--font-size-xsmall);
+
+  --avatar-diameter-xxxs: 16px;
+  --avatar-initials-xxxs: var(--font-size-xxs);
+
+  // Bubble
+  --bubble-width: 306px;
+  --bubble-height: 440px;
+
+  // Media queries
+  --screen-sm-min: 320px;
+  --screen-sm: 480px;
+  --screen-md-min: 768px;
+
+  //Animations
+  // for slower animation use n * slower
+  --animation-timing-faster: 0.15s;
+  --animation-timing-fast: 0.35s;
+  --animation-timing-slow: 0.55s;
+  --animation-timing-slower: 0.7s;
+
+  // Easing functions
+  --ease-in-quad: cubic-bezier(0.165, 0.84, 0.44, 1);
+  --ease-in-cubic: cubic-bezier(0.55, 0.055, 0.675, 0.19);
+  --ease-in-expo: cubic-bezier(0.6, 0.04, 0.98, 0.335);
+  --ease-in-quart: cubic-bezier(0.895, 0.03, 0.685, 0.22);
+  --ease-out-expo: cubic-bezier(0.19, 1, 0.22, 1);
+  --ease-out-quart: cubic-bezier(0.165, 0.84, 0.44, 1);
+  --ease-out-back: cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  --ease-in-out-expo: cubic-bezier(1, 0, 0, 1);
+  --ease-in-out-quart: cubic-bezier(0.77, 0, 0.175, 1);
+
+  // Collection
+  --collection-image-size: 110px;
+  --collection-images-per-row: 6;
+  --collection-images-padding: 3px;
+  --collection-max-section-width: 696px;
+
+  // Scrollbar
+  --scrollbar-size: 7px;
+
+  // Media Button
+  --media-button-size: 32px;
+  --media-button-size-lg: 64px;
+
+  // Link Preview
+  --link-preview-height: 5.5rem;
+
+  // Video
+  --play-button-size: 32px;
+
+  // Input Level
+  --input-level-bullet-size: 16px;
+  --input-level-bullet-size-sm: 12px;
+
+  --z-index-level-0: 0;
+  --z-index-level-1: 10;
+  --z-index-level-2: 100;
+  --z-index-level-3: 1000;
+  --z-index-level-4: 10000;
+  --z-index-level-5: 100000;
+  --z-index-level-6: 1000000;
+  --z-index-level-7: 10000000;
+
+  --z-index-badge: var(--z-index-level-2);
+  --z-index-panel: var(--z-index-level-3);
+  --z-index-bubble: var(--z-index-level-3);
+  --z-index-video: var(--z-index-level-4);
+  --z-index-choosescreen: var(--z-index-level-5);
+  --z-index-context: var(--z-index-level-5);
+  --z-index-warnings: var(--z-index-level-6);
+  --z-index-modal: var(--z-index-level-7);
 }
-
-@left-list-width: @conversation-list-width;
-@left-list-header-height: var(--left-list-header-height);
-@left-list-item-height: var(--left-list-item-height);
-@left-list-item-left-width: var(--left-list-item-left-width);
-@left-list-item-right-width: var(--left-list-item-right-width);
-@left-list-controls-width: var(--left-list-controls-width);
-
-// ----------------------------------------------------------------------------
-// Conversation
-// ----------------------------------------------------------------------------
-@conversation-max-width: 800px;
-
-@conversation-message-max-width: 640px;
-@conversation-message-sender-width: 56px;
-
-body {
-  --conversation-message-timestamp-width: 140px;
-  @media (max-width: @screen-md-min) {
-    --conversation-message-timestamp-width: 60px;
-  }
-}
-
-// ----------------------------------------------------------------------------
-// Conversation Input
-// ----------------------------------------------------------------------------
-@conversation-input-min-height: 56px;
-@conversation-input-max-height: 200px;
-@conversation-input-line-height: @line-height-lg;
-
-// ----------------------------------------------------------------------------
-// Content Title Bar
-// ----------------------------------------------------------------------------
-@content-title-bar-height: 45px;
 
 // ----------------------------------------------------------------------------
 // Z-Indexes
@@ -271,115 +312,3 @@ body {
 @z-index-context: @z-index-level-5;
 @z-index-warnings: @z-index-level-6;
 @z-index-modal: @z-index-level-7;
-
-// ----------------------------------------------------------------------------
-// Modal
-// ----------------------------------------------------------------------------
-@modal-padding: 24px;
-
-// ----------------------------------------------------------------------------
-// Avatar
-// ---------------------------------------------------------------------------
-body {
-  --avatar-diameter-m: 40px;
-  --font-weight-semibold: 600;
-  --font-weight-medium: 500;
-  --font-weight-regular: 400; // font-weight-xs should this this
-  --font-weight-light: 300;
-}
-
-@avatar-diameter-xl: 200px;
-@avatar-initials-xl: @font-size-xl;
-
-@avatar-diameter-l: 72px;
-@avatar-initials-l: @font-size-lg;
-
-@avatar-diameter-m: var(--avatar-diameter-m);
-@avatar-initials-m: @font-size-sm;
-
-@avatar-diameter-s: 28px;
-@avatar-initials-s: @font-size-xs;
-
-@avatar-diameter-xs: 24px;
-@avatar-initials-xs: @font-size-xs;
-
-@avatar-diameter-xxs: 20px;
-@avatar-initials-xxs: @font-size-xs;
-
-@avatar-diameter-xxxs: 16px;
-@avatar-initials-xxxs: @font-size-xxs;
-
-// ----------------------------------------------------------------------------
-// Bubble
-// ----------------------------------------------------------------------------
-@bubble-width: 306px;
-@bubble-height: 440px;
-@bubble-footer-height: 56px;
-@bubble-border-radius: 4px;
-
-@bubble-inner-padding: 24px;
-@bubble-image-margin: 2px;
-
-@bubble-transition_offset: 100%;
-
-// ----------------------------------------------------------------------------
-// Media queries breakpoints
-// ----------------------------------------------------------------------------
-@screen-sm-min: 320px;
-@screen-sm: 480px;
-@screen-md-min: 768px;
-@screen-lg-min: 960px;
-
-@screen-height-sm: 420px;
-
-@call-ui-sm: 680px;
-@call-ui-xs: 500px;
-
-// So media queries don't overlap when required, provide a maximum
-@screen-sm-max: @screen-md-min - 1;
-@screen-md-max: @screen-lg-min - 1;
-
-// ----------------------------------------------------------------------------
-// Warnings
-// ----------------------------------------------------------------------------
-@warning-bar-feature-height: 64px;
-@warning-bar-connection-height: 32px;
-
-// ----------------------------------------------------------------------------
-// Animations
-// ----------------------------------------------------------------------------
-
-// for slower animation use n * slower
-@animation-timing-faster: 0.15s;
-@animation-timing-fast: 0.35s;
-@animation-timing-slow: 0.55s;
-@animation-timing-slower: 0.7s;
-
-body {
-  --ease-in-quad: cubic-bezier(0.165, 0.84, 0.44, 1);
-  --ease-in-cubic: cubic-bezier(0.55, 0.055, 0.675, 0.19);
-  --ease-in-expo: cubic-bezier(0.6, 0.04, 0.98, 0.335);
-  --ease-in-quart: cubic-bezier(0.895, 0.03, 0.685, 0.22);
-  --ease-out-expo: cubic-bezier(0.19, 1, 0.22, 1);
-  --ease-out-quart: cubic-bezier(0.165, 0.84, 0.44, 1);
-  --ease-out-back: cubic-bezier(0.175, 0.885, 0.32, 1.275);
-  --ease-in-out-expo: cubic-bezier(1, 0, 0, 1);
-  --ease-in-out-quart: cubic-bezier(0.77, 0, 0.175, 1);
-}
-
-// easing functions
-@ease-in-quad: var(--ease-in-quad);
-@ease-in-cubic: var(--ease-in-cubic);
-@ease-in-expo: var(--ease-in-expo);
-@ease-in-quart: var(--ease-in-quart);
-@ease-out-expo: var(--ease-out-expo);
-@ease-out-quart: var(--ease-out-quart);
-@ease-out-back: var(--ease-out-back);
-@ease-in-out-expo: var(--ease-in-out-expo);
-@ease-in-out-quart: var(--ease-in-out-quart);
-
-// Start UI
-@start-ui-search-bar-offset: 88px;
-
-// Margins
-@offscreen-left: -9999px;

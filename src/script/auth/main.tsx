@@ -28,6 +28,8 @@ import {createRoot} from 'react-dom/client';
 import {Provider} from 'react-redux';
 import {container} from 'tsyringe';
 
+import {Runtime} from '@wireapp/commons';
+
 import {initializeDataDog} from 'Util/DataDog';
 import {enableLogging} from 'Util/LoggerUtil';
 import {exposeWrapperGlobals} from 'Util/wrapper';
@@ -38,6 +40,8 @@ import {actionRoot} from './module/action';
 import {Root} from './page/Root';
 
 import {Config} from '../Config';
+import {updateApiVersion} from '../lifecycle/updateRemoteConfigs';
+import {setAppLocale} from '../localization/Localizer';
 import {APIClient} from '../service/APIClientSingleton';
 import {Core} from '../service/CoreSingleton';
 
@@ -76,11 +80,11 @@ const render = (Component: FC): void => {
 const config = Config.getConfig();
 
 async function runApp() {
-  const [min, max] = config.SUPPORTED_API_RANGE;
-  const {domain} = await core.useAPIVersion(min, max, config.ENABLE_DEV_BACKEND_API);
+  const {domain} = await updateApiVersion();
   await initializeDataDog(config, {domain: domain});
 
   render(Root);
+  setAppLocale();
   if (module.hot) {
     module.hot.accept('./page/Root', () => {
       render(require('./page/Root').Root);
@@ -89,4 +93,12 @@ async function runApp() {
 }
 
 enableLogging(config);
+
+const enforceDesktopApplication = config.FEATURE.ENABLE_ENFORCE_DESKTOP_APPLICATION_ONLY && !Runtime.isDesktopApp();
+
+if (enforceDesktopApplication) {
+  const unSupportedPageUrl = `${window.location.origin}/unsupported`;
+  window.location.replace(unSupportedPageUrl);
+}
+
 runApp();

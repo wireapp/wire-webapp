@@ -17,11 +17,11 @@
  *
  */
 
-import {AssetTransferState} from 'src/script/assets/AssetTransferState';
+import {AssetTransferState} from 'Repositories/assets/AssetTransferState';
+import {StorageSchemata} from 'Repositories/storage/StorageSchemata';
 import {ConversationError} from 'src/script/error/ConversationError';
 import {StorageError} from 'src/script/error/StorageError';
 import {MessageCategory} from 'src/script/message/MessageCategory';
-import {StorageSchemata} from 'src/script/storage/StorageSchemata';
 import {createUuid} from 'Util/uuid';
 
 import {TestFactory} from '../../helper/TestFactory';
@@ -350,6 +350,7 @@ const testEventServiceClass = (testedServiceName, className) => {
         const initialEvent = {
           id: 'event-id',
           data: {content: ''},
+          type: 'conversation.asset-add',
         };
         const reason = AssetTransferState.UPLOAD_FAILED;
         spyOn(testFactory.storage_service, 'load').and.returnValue(Promise.resolve(initialEvent));
@@ -371,7 +372,7 @@ const testEventServiceClass = (testedServiceName, className) => {
       it('fails if changes do not contain version property', () => {
         const updates = {reactions: ['user-id']};
         return testFactory[testedServiceName]
-          .updateEventSequentially(12, updates)
+          .updateEventSequentially({primary_key: 12, ...updates})
           .then(fail)
           .catch(error => {
             expect(error.type).toBe(ConversationError.TYPE.WRONG_CHANGE);
@@ -384,7 +385,7 @@ const testEventServiceClass = (testedServiceName, className) => {
         spyOn(testFactory.storage_service, 'load').and.returnValue(Promise.resolve({version: 2}));
 
         return testFactory[testedServiceName]
-          .updateEventSequentially(12, updates)
+          .updateEventSequentially({primary_key: 12, ...updates})
           .then(fail)
           .catch(error => {
             expect(error.type).toBe(StorageError.TYPE.NON_SEQUENTIAL_UPDATE);
@@ -398,7 +399,7 @@ const testEventServiceClass = (testedServiceName, className) => {
         spyOn(testFactory.storage_service, 'update').and.returnValue(Promise.resolve('ok'));
 
         return testFactory[testedServiceName]
-          .updateEventSequentially(12, updates)
+          .updateEventSequentially({primary_key: 12, ...updates})
           .then(fail)
           .catch(error => {
             expect(error.type).toBe(StorageError.TYPE.NOT_FOUND);
@@ -412,7 +413,7 @@ const testEventServiceClass = (testedServiceName, className) => {
         spyOn(testFactory.storage_service, 'update').and.returnValue(Promise.resolve('ok'));
         spyOn(testFactory.storage_service.db, 'transaction').and.callThrough();
 
-        return testFactory[testedServiceName].updateEventSequentially(12, updates).then(() => {
+        return testFactory[testedServiceName].updateEventSequentially({primary_key: 12, ...updates}).then(() => {
           expect(testFactory.storage_service.update).toHaveBeenCalledWith(eventStoreName, 12, updates);
           expect(testFactory.storage_service.db.transaction).toHaveBeenCalled();
         });
@@ -507,6 +508,113 @@ const testEventServiceClass = (testedServiceName, className) => {
       });
     });
 
+    describe('loadAllConversationEvents', () => {
+      const conversationId = {id: 'conversation-id', domain: 'conversation-domain'};
+      const otherConversationId = {id: 'other-conversation-id', domain: 'other-conversation-domain'};
+
+      afterEach(() => {
+        testFactory.storage_service.clearStores();
+      });
+
+      it('Loads all the events by conversation id', async () => {
+        const numberOfConversationEvents = 3;
+        const numberOfOtherConversationEvents = 1;
+
+        const conversationEvents = Array.from({length: numberOfConversationEvents}, () => ({
+          conversation: conversationId.id,
+          qualified_conversation: conversationId,
+          id: createUuid(),
+          time: '2016-08-04T13:27:55.182Z',
+        }));
+
+        const otherConversationEvents = Array.from({length: numberOfOtherConversationEvents}, () => ({
+          conversation: otherConversationId.id,
+          qualified_conversation: otherConversationId,
+          id: createUuid(),
+          time: '2016-08-04T13:27:55.182Z',
+        }));
+
+        const events = [...conversationEvents, ...otherConversationEvents];
+
+        Promise.all(events.map(event => testFactory.storage_service.save(eventStoreName, undefined, event)));
+
+        const eventService = testFactory[testedServiceName];
+
+        const foundConversationEvents = await eventService.loadAllConversationEvents(conversationId.id);
+
+        expect(foundConversationEvents.length).toBe(numberOfConversationEvents);
+      });
+
+      it('Skips types of events included in the skip array', async () => {
+        const numberOfConversationEvents = 3;
+        const skipTypes = ['conversation.message-add'];
+        const numberOfEventsToSkip = 2;
+
+        const conversationEvents = Array.from({length: numberOfConversationEvents}, () => ({
+          conversation: conversationId.id,
+          qualified_conversation: conversationId,
+          id: createUuid(),
+          time: '2016-08-04T13:27:55.182Z',
+        }));
+
+        const conversationEventsToSkip = Array.from({length: numberOfEventsToSkip}, () => ({
+          conversation: conversationId.id,
+          qualified_conversation: conversationId,
+          id: createUuid(),
+          time: '2016-08-04T13:27:55.182Z',
+          type: skipTypes[0],
+        }));
+
+        const events = [...conversationEvents, ...conversationEventsToSkip];
+
+        Promise.all(events.map(event => testFactory.storage_service.save(eventStoreName, undefined, event)));
+
+        const eventService = testFactory[testedServiceName];
+
+        const foundConversationEvents = await eventService.loadAllConversationEvents(conversationId.id, skipTypes);
+
+        expect(foundConversationEvents.length).toBe(numberOfConversationEvents);
+      });
+    });
+
+    describe('moveEventsToConversation', () => {
+      const oldConversationId = {id: 'old-conversation-id', domain: 'old-conversation-domain'};
+      const newConversationId = {id: 'new-conversation-id', domain: 'new-conversation-domain'};
+
+      afterEach(() => {
+        testFactory.storage_service.clearStores();
+      });
+
+      it('Loads all the events by conversation id', async () => {
+        const numberOfConversationEvents = 3;
+
+        const conversationEvents = Array.from({length: numberOfConversationEvents}, () => ({
+          conversation: oldConversationId.id,
+          qualified_conversation: oldConversationId,
+          id: createUuid(),
+          time: '2016-08-04T13:27:55.182Z',
+        }));
+
+        Promise.all(
+          conversationEvents.map(event => testFactory.storage_service.save(eventStoreName, undefined, event)),
+        );
+
+        const eventService = testFactory[testedServiceName];
+
+        const loadedOldConversationEvents = await eventService.loadAllConversationEvents(oldConversationId.id);
+        const loadedNewConversationEvents = await eventService.loadAllConversationEvents(newConversationId.id);
+        expect(loadedOldConversationEvents.length).toBe(numberOfConversationEvents);
+        expect(loadedNewConversationEvents.length).toBe(0);
+
+        await eventService.moveEventsToConversation(oldConversationId, newConversationId);
+
+        const loadedOldConversationEventsAfterMove = await eventService.loadAllConversationEvents(oldConversationId.id);
+        const loadedNewConversationEventsAfterMove = await eventService.loadAllConversationEvents(newConversationId.id);
+        expect(loadedOldConversationEventsAfterMove.length).toBe(0);
+        expect(loadedNewConversationEventsAfterMove.length).toBe(numberOfConversationEvents);
+      });
+    });
+
     describe('deleteEventByKey', () => {
       let primary_keys = undefined;
 
@@ -546,25 +654,6 @@ const testEventServiceClass = (testedServiceName, className) => {
 
       afterEach(() => {
         testFactory.storage_service.clearStores();
-      });
-
-      it('deletes message with the given key', () => {
-        return testFactory[testedServiceName]
-          .deleteEventByKey(primary_keys[1])
-          .then(() => testFactory[testedServiceName].loadPrecedingEvents(conversationId))
-          .then(events => {
-            expect(events.length).toBe(2);
-            events.forEach(event => expect(event.primary_key).not.toBe(primary_keys[1]));
-          });
-      });
-
-      it('does not delete the event if key is wrong', () => {
-        return testFactory[testedServiceName]
-          .deleteEventByKey('wrongKey')
-          .then(() => testFactory[testedServiceName].loadPrecedingEvents(conversationId))
-          .then(events => {
-            expect(events.length).toBe(3);
-          });
       });
     });
 

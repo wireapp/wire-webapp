@@ -19,16 +19,22 @@
 
 import {render, fireEvent, within} from '@testing-library/react';
 
+import {User} from 'Repositories/entity/User';
+import {ReactionMap} from 'Repositories/storage';
 import {withTheme} from 'src/script/auth/util/test/TestUtil';
-import {createUuid} from 'Util/uuid';
+import {generateQualifiedId} from 'test/helper/UserGenerator';
 
 import {MessageReactionsList, MessageReactionsListProps} from './MessageReactionsList';
 
-const reactions = {
-  '1': '😇,😊',
-  '2': '😊,👍,😉,😇',
-  '3': '😇',
-};
+const user1 = new User();
+const user2 = new User();
+const user3 = new User();
+const reactions: ReactionMap = [
+  ['😇', [user1.qualifiedId, user2.qualifiedId, user3.qualifiedId]],
+  ['😊', [user1.qualifiedId, user2.qualifiedId]],
+  ['👍', [user2.qualifiedId]],
+  ['😉', [user2.qualifiedId]],
+];
 
 const defaultProps: MessageReactionsListProps = {
   reactions: reactions,
@@ -37,7 +43,8 @@ const defaultProps: MessageReactionsListProps = {
   isMessageFocused: false,
   onLastReactionKeyEvent: jest.fn(),
   isRemovedFromConversation: false,
-  userId: createUuid(),
+  selfUserId: generateQualifiedId(),
+  users: [user1, user2, user3],
 };
 
 describe('MessageReactionsList', () => {

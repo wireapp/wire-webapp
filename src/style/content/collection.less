@@ -17,13 +17,6 @@
  *
  */
 
-// Variables
-@image-size: 110px;
-@image-items-per-row: 6;
-@collection-images-padding: 3px;
-
-@max-section-width: 696px;
-
 .collection-list {
   display: flex;
   flex-direction: column;
@@ -33,7 +26,7 @@
 // Sections
 .collection-section {
   display: inline-block;
-  max-width: @max-section-width;
+  max-width: var(--collection-max-section-width);
 
   > header {
     display: flex;
@@ -77,20 +70,19 @@
 
   margin-right: 0;
   margin-left: auto;
-  font-weight: @font-weight-bold;
+  font-weight: var(--font-weight-bold);
 }
 
 // Images
 .collection-images {
   display: flex;
-  max-width: (@image-size + @collection-images-padding) * @image-items-per-row;
+  max-width: calc((var(--collection-image-size) + var(--collection-images-padding)) * var(--collection-images-per-row));
   flex-wrap: wrap;
   border-radius: 4px;
 }
 
 .collection-image {
-  .square(@image-size);
-  padding: @collection-images-padding;
+  padding: var(--collection-images-padding);
   border-radius: 6px;
   background-color: transparent;
 
@@ -106,14 +98,14 @@
 
 // Videos
 .collection-video {
-  height: @image-size;
+  height: var(--collection-image-size);
   flex: 1 1 auto;
   outline: 1px solid #fff;
 }
 
 // Links
 .collection-link {
-  margin-left: @conversation-message-sender-width;
+  margin-left: var(--conversation-message-sender-width);
 }
 
 // Details

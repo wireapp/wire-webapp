@@ -23,7 +23,7 @@ import {useMessageFocusedTabIndex} from 'Components/MessagesList/Message/util';
 import {Config} from 'src/script/Config';
 import {t} from 'Util/LocalizerUtil';
 
-import {backendErrorLink, warning} from '../Warnings.styles';
+import {backendErrorLink, button, warning, wrapper} from '../Warnings.styles';
 
 type Props = {
   isMessageFocused: boolean;
@@ -36,7 +36,7 @@ const config = Config.getConfig();
 export const CompleteFailureToSendWarning = ({isMessageFocused, onRetry, unreachableDomain}: Props) => {
   const messageFocusedTabIndex = useMessageFocusedTabIndex(isMessageFocused);
   return (
-    <>
+    <div css={wrapper}>
       {unreachableDomain ? (
         <p>
           <span
@@ -60,10 +60,16 @@ export const CompleteFailureToSendWarning = ({isMessageFocused, onRetry, unreach
         <p css={warning}>{t('messageCouldNotBeSentConnectivityIssues')}</p>
       )}
       <div css={{display: 'flex'}}>
-        <Button tabIndex={messageFocusedTabIndex} type="button" variant={ButtonVariant.TERTIARY} onClick={onRetry}>
+        <Button
+          css={button}
+          tabIndex={messageFocusedTabIndex}
+          type="button"
+          variant={ButtonVariant.TERTIARY}
+          onClick={onRetry}
+        >
           {t('messageCouldNotBeSentRetry')}
         </Button>
       </div>
-    </>
+    </div>
   );
 };

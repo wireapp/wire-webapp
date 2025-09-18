@@ -1,0 +1,45 @@
+name: CI
+
+on:
+  pull_request:
+    # we want to run the CI on every PR targetting those branches
+    branches: [master, dev, release/*]
+
+  push:
+    # We also run CI on dev in order to update the coverage monitoring
+    branches: [dev]
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    runs-on: buildjet-8vcpu-ubuntu-2204
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18.16.x
+          cache: 'yarn'
+
+      - name: Install JS dependencies
+        run: yarn --immutable
+
+      - name: Lint
+        run: yarn lint
+
+      - name: Test
+        run: yarn test --coverage --coverage-reporters=lcov --detectOpenHandles=false
+
+      - name: Monitor coverage
+        uses: codecov/codecov-action@v5.5.1
+        with:
+          fail_ci_if_error: false
+          files: ./coverage/lcov.info
+          flags: unittests
+          token: ${{ secrets.CODECOV_TOKEN }}

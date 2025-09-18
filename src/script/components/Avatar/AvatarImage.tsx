@@ -23,11 +23,10 @@ import {CSSObject} from '@emotion/serialize';
 import {Transition} from 'react-transition-group';
 import {container} from 'tsyringe';
 
-import {InViewport} from 'Components/utils/InViewport';
+import {InViewport} from 'Components/InViewport';
+import {AssetRemoteData} from 'Repositories/assets/AssetRemoteData';
+import {AssetRepository} from 'Repositories/assets/AssetRepository';
 import {CSS_FILL_PARENT} from 'Util/CSSMixin';
-
-import {AssetRemoteData} from '../../assets/AssetRemoteData';
-import {AssetRepository} from '../../assets/AssetRepository';
 
 import {AVATAR_SIZE} from '.';
 

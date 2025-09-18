@@ -17,55 +17,74 @@
  *
  */
 
-import React from 'react';
-
 import cx from 'classnames';
 
+import {OutlineCheck} from '@wireapp/react-ui-kit';
+
+import {Message} from 'Repositories/entity/message/Message';
+import {PingMessage as PingMessageEntity} from 'Repositories/entity/message/PingMessage';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
+import {t} from 'Util/LocalizerUtil';
 
 import {ReadReceiptStatus} from './ReadReceiptStatus';
-
-import {PingMessage as PingMessageEntity} from '../../../entity/message/PingMessage';
 
 export interface PingMessageProps {
   message: PingMessageEntity;
   is1to1Conversation: boolean;
   isLastDeliveredMessage: boolean;
+  onClickDetails: (message: Message) => void;
 }
 
-const PingMessage: React.FC<PingMessageProps> = ({message, is1to1Conversation, isLastDeliveredMessage}) => {
-  const {unsafeSenderName, caption, ephemeral_caption, isObfuscated, get_icon_classes} = useKoSubscribableChildren(
-    message,
-    ['unsafeSenderName', 'caption', 'ephemeral_caption', 'isObfuscated', 'get_icon_classes'],
-  );
+export const PingMessage = ({
+  message,
+  is1to1Conversation,
+  isLastDeliveredMessage,
+  onClickDetails,
+}: PingMessageProps) => {
+  const {unsafeSenderName, caption, ephemeralCaption, isObfuscated, iconClasses} = useKoSubscribableChildren(message, [
+    'unsafeSenderName',
+    'caption',
+    'ephemeralCaption',
+    'isObfuscated',
+    'iconClasses',
+  ]);
 
   return (
     <div className="message-header" data-uie-name="element-message-ping">
       <div className="message-header-icon">
-        <div className={`icon-ping ${get_icon_classes}`} />
+        <div className={cx('icon-ping', iconClasses)} />
       </div>
+
       <div
-        className={cx('message-body-content', 'message-header-label', {
+        className={cx('message-header-label message-header-ping', {
           'ephemeral-message-obfuscated': isObfuscated,
         })}
-        title={ephemeral_caption}
+        title={ephemeralCaption}
         data-uie-name="element-message-ping-text"
       >
-        <p className="message-header-label__multiline">
-          <span className="message-header-sender-name">{unsafeSenderName}</span>
-          <span className="ellipsis">{caption}</span>
-        </p>
-      </div>
-      <div className="message-body-actions">
-        <ReadReceiptStatus
-          showOnHover
-          message={message}
-          is1to1Conversation={is1to1Conversation}
-          isLastDeliveredMessage={isLastDeliveredMessage}
-        />
+        <div className="message-header-content">
+          <p className="message-header-label__multiline message-ping__content">
+            <span className="message-header-sender-name">{unsafeSenderName}</span>
+            <span className="ellipsis">{caption}</span>
+          </p>
+
+          <ReadReceiptStatus
+            message={message}
+            is1to1Conversation={is1to1Conversation}
+            onClickDetails={onClickDetails}
+          />
+        </div>
+
+        {message.expectsReadConfirmation && is1to1Conversation && isLastDeliveredMessage && (
+          <div
+            data-uie-name="status-message-read-receipt-delivered"
+            title={t('conversationMessageDelivered')}
+            className="delivered-message-icon"
+          >
+            <OutlineCheck />
+          </div>
+        )}
       </div>
     </div>
   );
 };
-
-export {PingMessage};

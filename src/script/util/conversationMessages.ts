@@ -17,60 +17,11 @@
  *
  */
 
-import {Asset} from 'src/script/entity/message/Asset';
-import type {FileAsset as FileAssetType} from 'src/script/entity/message/FileAsset';
-import {isSameDay, differenceInMinutes} from 'Util/TimeUtil';
-
-import {AssetType} from '../assets/AssetType';
-import {Message} from '../entity/message/Message';
-
-export enum MessageMarkerType {
-  /** The message should be displayed standalone and should not create any section*/
-  NONE,
-  /** The message should create a new 'unread' section when rendered */
-  UNREAD,
-  /** The message should create a new 'day' section when rendered */
-  DAY,
-  /** The message should create a new 'hour' section when rendered */
-  HOUR,
-}
-
-/**
- * Return a marker that should be displayed right before the given message.
- * A marker would indicated a new day, hour or unread section
- *
- * @param message The message we want to render
- * @param lastReadTimestamp If given will check new messages from this timestamp instead of live value of conversation.last_read_timestamp()
- * @param previousMessage The right before in the conversation
- */
-export function getMessageMarkerType(
-  message: Message,
-  lastReadTimestamp: number,
-  previousMessage?: Message,
-): MessageMarkerType {
-  if (!previousMessage || message.isCall()) {
-    return MessageMarkerType.NONE;
-  }
-
-  const isFirstUnread = previousMessage.timestamp() <= lastReadTimestamp && message.timestamp() > lastReadTimestamp;
-
-  if (isFirstUnread) {
-    return MessageMarkerType.UNREAD;
-  }
-
-  const last = previousMessage.timestamp();
-  const current = message.timestamp();
-
-  if (!isSameDay(last, current)) {
-    return MessageMarkerType.DAY;
-  }
-
-  if (differenceInMinutes(current, last) > 60) {
-    return MessageMarkerType.HOUR;
-  }
-
-  return MessageMarkerType.NONE;
-}
+import {AssetType} from 'Repositories/assets/AssetType';
+import {Conversation} from 'Repositories/entity/Conversation';
+import {Asset} from 'Repositories/entity/message/Asset';
+import type {FileAsset as FileAssetType} from 'Repositories/entity/message/FileAsset';
+import type {Message} from 'Repositories/entity/message/Message';
 
 interface MessageDataType {
   senderName: string;
@@ -105,3 +56,7 @@ export function getMessageAriaLabel({senderName, displayTimestampShort, assets}:
     }
   });
 }
+
+export const isLastReceivedMessage = (messageEntity: Message, conversationEntity: Conversation): boolean => {
+  return messageEntity.timestamp() >= conversationEntity.last_event_timestamp();
+};

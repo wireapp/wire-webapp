@@ -20,7 +20,7 @@
 import React, {useState} from 'react';
 
 import {OAuthClient} from '@wireapp/api-client/lib/oauth/OAuthClient';
-import {FormattedMessage, useIntl} from 'react-intl';
+import {FormattedMessage} from 'react-intl';
 import {connect} from 'react-redux';
 import {AnyAction, Dispatch} from 'redux';
 import {container} from 'tsyringe';
@@ -40,10 +40,11 @@ import {
   useMatchMedia,
 } from '@wireapp/react-ui-kit';
 
-import {Icon} from 'Components/Icon';
-import {AssetRemoteData} from 'src/script/assets/AssetRemoteData';
-import {AssetRepository} from 'src/script/assets/AssetRepository';
-import {handleKeyDown, KEY} from 'Util/KeyboardUtil';
+import * as Icon from 'Components/Icon';
+import {AssetRemoteData} from 'Repositories/assets/AssetRemoteData';
+import {AssetRepository} from 'Repositories/assets/AssetRepository';
+import {handleEscDown, handleKeyDown, KEY} from 'Util/KeyboardUtil';
+import {t} from 'Util/LocalizerUtil';
 import {loadDataUrl} from 'Util/util';
 
 import {
@@ -62,7 +63,6 @@ import {
 import {Page} from './Page';
 
 import {Config} from '../../Config';
-import {oauthStrings} from '../../strings';
 import {actionRoot} from '../module/action';
 import {bindActionCreators, RootState} from '../module/reducer';
 import * as SelfSelector from '../module/selector/SelfSelector';
@@ -79,6 +79,13 @@ export enum Scope {
   READ_FEATURE_CONFIGS = 'read:feature_configs',
 }
 
+const scopeText: Record<Scope, string> = {
+  [Scope.WRITE_CONVERSATIONS]: t('oauth.scope.write_conversations'),
+  [Scope.WRITE_CONVERSATIONS_CODE]: t('oauth.scope.write_conversations_code'),
+  [Scope.READ_SELF]: t('oauth.scope.read_self'),
+  [Scope.READ_FEATURE_CONFIGS]: t('oauth.scope.read_feature_configs'),
+};
+
 const OAuthPermissionsComponent = ({
   doLogout,
   getOAuthApp,
@@ -89,7 +96,6 @@ const OAuthPermissionsComponent = ({
   getSelf,
   getTeam,
 }: Props & ConnectedProps & DispatchProps) => {
-  const {formatMessage: _} = useIntl();
   const [teamImage, setTeamImage] = React.useState<string | ArrayBuffer | undefined>(undefined);
   const isMobile = useMatchMedia(QUERY.mobile);
 
@@ -155,10 +161,10 @@ const OAuthPermissionsComponent = ({
     <Page>
       <ContainerXS centerText verticalCenter css={containerCSS}>
         {!oAuthApp ? (
-          <Icon.Loading width="36" height="36" css={{path: {fill: COLOR_V2.BLUE_DARK_500}}} />
+          <Icon.LoadingIcon width="36" height="36" css={{path: {fill: COLOR_V2.BLUE_DARK_500}}} />
         ) : (
           <>
-            <H2 css={headerCSS}>{_(oauthStrings.headline)}</H2>
+            <H2 css={headerCSS}>{t('oauth.headline')}</H2>
             {typeof teamImage === 'string' && <img src={teamImage} css={teamImageCSS} alt="teamIcon" />}
             <Text css={{marginBottom: '8px'}}>{selfUser.email}</Text>
             <Link
@@ -168,11 +174,11 @@ const OAuthPermissionsComponent = ({
               variant={LinkVariant.PRIMARY}
               color={COLOR_V2.BLUE}
             >
-              {_(oauthStrings.logout)}
+              {t('oauth.logout')}
             </Link>
 
             <Text data-uie-name="oauth-permissions-requester" css={{marginBottom: '24px'}}>
-              {_(oauthStrings.subhead)}
+              {t('oauth.subhead')}
             </Text>
 
             {oauthParams.scope.length > 1 && (
@@ -180,20 +186,20 @@ const OAuthPermissionsComponent = ({
                 <ul css={listCSS} data-uie-name="oauth-permissions-list">
                   {oauthScope.map((scope, index) => (
                     <li key={index} css={{textAlign: 'start'}}>
-                      <Text>{_(oauthStrings[scope])}</Text>
+                      <Text>{scopeText[scope]}</Text>
                     </li>
                   ))}
                 </ul>
                 <Text data-uie-name="oauth-learn-more" css={textCSS}>
                   <FormattedMessage
-                    {...oauthStrings.learnMore}
+                    id="oauth.learnMore"
                     values={{
                       learnMore: (...chunks: string[] | React.ReactNode[]) => (
                         <a
                           target="_blank"
                           rel="noopener noreferrer"
                           data-uie-name="go-learn-more"
-                          href="https://support.wire.com/hc/en-us/articles/9628065287965-Calendar-integration"
+                          href={Config.getConfig().URL.SUPPORT.OAUTH_LEARN_MORE}
                         >
                           {chunks}
                         </a>
@@ -204,7 +210,7 @@ const OAuthPermissionsComponent = ({
               </Box>
             )}
             <Text muted css={isMobile ? mobileTextCSS : textCSS} data-uie-name="oauth-details">
-              {_(oauthStrings.details)}
+              {t('oauth.details')}
             </Text>
             <div css={isMobile ? mobileButtonsCSS : buttonsCSS}>
               <Button
@@ -213,27 +219,23 @@ const OAuthPermissionsComponent = ({
                 type="button"
                 onClick={onCancel}
                 data-uie-name="do-oauth-cancel"
-                onKeyDown={(event: React.KeyboardEvent) => {
-                  if (event.key === KEY.ESC) {
-                    onCancel();
-                  }
-                }}
+                onKeyDown={event => handleEscDown(event, onCancel)}
               >
-                {_(oauthStrings.cancel)}
+                {t('oauth.cancel')}
               </Button>
               <Button
                 css={isMobile ? mobileButtonCSS : buttonCSS}
                 type="button"
                 onClick={onContinue}
                 data-uie-name="do-oauth-allow"
-                onKeyDown={event => handleKeyDown(event, () => onContinue())}
+                onKeyDown={event => handleKeyDown({event, callback: onContinue, keys: [KEY.ENTER, KEY.SPACE]})}
               >
-                {_(oauthStrings.allow)}
+                {t('oauth.allow')}
               </Button>
             </div>
             <Paragraph center css={{marginTop: 40}}>
               <FormattedMessage
-                {...oauthStrings.privacyPolicy}
+                id="oauth.privacypolicy"
                 values={{
                   privacypolicy: (...chunks: string[] | React.ReactNode[]) => (
                     <a

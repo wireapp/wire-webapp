@@ -1,0 +1,21 @@
+name: rename-auto-cherry-pick-pr
+on: pull_request
+
+permissions:
+  pull-requests: write
+
+# This job will remove the AUTO: prefix from the PR title
+jobs:
+  rename-auto-cherry-pick-pr:
+    runs-on: ubuntu-latest
+    if: startsWith(github.event.pull_request.title, 'AUTO:')
+    steps:
+      - name: Make title semantic
+        run: |
+          TITLE="$PR_TITLE"
+          SEMANTIC_TITLE="${TITLE/AUTO: /}"
+          echo "renaming pr to: $SEMANTIC_TITLE"
+          gh pr edit ${{github.event.pull_request.html_url}} --title "$SEMANTIC_TITLE"
+        env:
+          GH_TOKEN: ${{secrets.OTTO_THE_BOT_GH_TOKEN}}
+          PR_TITLE: ${{github.event.pull_request.title}}

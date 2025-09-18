@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <!-- Wire, Copyright (C) 2022 Wire Swiss GmbH -->
 <!-- <%= VERSION %> -->
 <html>
@@ -18,14 +18,20 @@
     <meta property="og:image" content="<%= OPEN_GRAPH_IMAGE_URL %>" />
 
     <title><%= BRAND_NAME %></title>
+
+    <script src="../min/basicBrowserFeatureCheck.js?v=<%= VERSION %>"></script>
+    <script src="../min/checkBrowser.js?v=<%= VERSION %>"></script>
+
+    <script src="../libs/wire/telemetry/embed.js"></script>
+    <link href="../min/core-crypto-ffi_bg.wasm" rel="prefetch" />
   </head>
 
   <body>
     <div id="main"></div>
-    <script src="../config.js?<%= VERSION %>"></script>
-    <script src="../min/dexie.js?<%= VERSION %>"></script>
-    <script src="../min/vendor.js?<%= VERSION %>"></script>
-    <script src="../min/runtime.js?<%= VERSION %>"></script>
-    <script src="../min/auth.js?<%= VERSION %>"></script>
+    <script src="../config.js"></script>
+    <script src="../min/dexie.js?v=<%= VERSION %>"></script>
+    <script src="../min/vendor.js?v=<%= VERSION %>"></script>
+    <script src="../min/runtime.js?v=<%= VERSION %>"></script>
+    <script src="../min/auth.js?v=<%= VERSION %>"></script>
   </body>
 </html>

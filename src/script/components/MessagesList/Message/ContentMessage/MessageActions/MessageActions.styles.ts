@@ -31,9 +31,10 @@ export const messageBodyActions: CSSObject = {
   minHeight: '32px',
   minWidth: '40px',
   position: 'absolute',
-  right: '16px',
-  top: '-20px',
-  '@media (max-width: @screen-md-min)': {
+  right: '-40px',
+  top: '-34px',
+  userSelect: 'none',
+  '@media (max-width: 768px)': {
     height: '45px',
     flexDirection: 'column',
   },
@@ -63,10 +64,6 @@ export const messageActionsMenuButton = (isReactable = true): CSSObject => {
     ...defaultStyle,
     borderRadius: '12px',
   };
-};
-
-export const nonReactableMSgMenu: CSSObject = {
-  borderRadius: '12px',
 };
 
 export const getIconCSS: CSSObject = {
@@ -106,5 +103,5 @@ export const getActionsMenuCSS = (isActive?: boolean): CSSObject => {
 };
 
 export const messageWithHeaderTop: CSSObject = {
-  top: '-53px',
+  top: '-58px',
 };

@@ -17,22 +17,28 @@
  *
  */
 
-import React, {useRef} from 'react';
-
 import {ErrorBoundary} from 'react-error-boundary';
 import {container} from 'tsyringe';
 
 import {Runtime} from '@wireapp/commons';
 
+import {UserVerificationBadges} from 'Components/Badge';
 import {ErrorFallback} from 'Components/ErrorFallback';
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {useEnrichedFields} from 'Components/panel/EnrichedFields';
+import {ClientRepository} from 'Repositories/client';
+import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
+import {ConversationState} from 'Repositories/conversation/ConversationState';
+import {User} from 'Repositories/entity/User';
+import {PropertiesRepository} from 'Repositories/properties/PropertiesRepository';
+import {TeamState} from 'Repositories/team/TeamState';
+import type {UserRepository} from 'Repositories/user/UserRepository';
+import {TeamCreationAccountHeader} from 'src/script/page/LeftSidebar/panels/Conversations/ConversationTabs/TeamCreation/TeamCreationAccountHeader';
 import {ContentState} from 'src/script/page/useAppState';
+import {Core} from 'src/script/service/CoreSingleton';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 import {getLogger} from 'Util/Logger';
-import {loadValue} from 'Util/StorageUtil';
-import {isTemporaryClientAndNonPersistent} from 'Util/util';
 
 import {AccountInput} from './accountPreferences/AccountInput';
 import {AccountLink} from './accountPreferences/AccountLink';
@@ -49,16 +55,7 @@ import {UsernameInput} from './accountPreferences/UsernameInput';
 import {PreferencesPage} from './components/PreferencesPage';
 import {PreferencesSection} from './components/PreferencesSection';
 
-import {ClientRepository} from '../../../../client';
 import {Config} from '../../../../Config';
-import {ConversationRepository} from '../../../../conversation/ConversationRepository';
-import {User} from '../../../../entity/User';
-import {PropertiesRepository} from '../../../../properties/PropertiesRepository';
-import {StorageKey} from '../../../../storage';
-import {TeamState} from '../../../../team/TeamState';
-import {RichProfileRepository} from '../../../../user/RichProfileRepository';
-import type {UserRepository} from '../../../../user/UserRepository';
-import {UserState} from '../../../../user/UserState';
 import {AccentColorPicker} from '../../../AccentColorPicker';
 
 interface AccountPreferencesProps {
@@ -67,43 +64,48 @@ interface AccountPreferencesProps {
   conversationRepository: ConversationRepository;
   propertiesRepository: PropertiesRepository;
   switchContent: (contentState: ContentState) => void;
-  richProfileRepository?: RichProfileRepository;
   /** Should the domain be displayed */
   showDomain?: boolean;
   teamState?: TeamState;
   userRepository: UserRepository;
-  userState?: UserState;
+  selfUser: User;
+  isActivatedAccount?: boolean;
+  conversationState?: ConversationState;
 }
 
 const logger = getLogger('AccountPreferences');
 
-const AccountPreferences: React.FC<AccountPreferencesProps> = ({
+export const AccountPreferences = ({
   importFile,
   clientRepository,
   userRepository,
   propertiesRepository,
   switchContent,
   conversationRepository,
+  selfUser,
+  isActivatedAccount = false,
   showDomain = false,
-  userState = container.resolve(UserState),
   teamState = container.resolve(TeamState),
-}) => {
-  const {self: selfUser, isActivatedAccount} = useKoSubscribableChildren(userState, ['self', 'isActivatedAccount']);
+  conversationState = container.resolve(ConversationState),
+}: AccountPreferencesProps) => {
+  const core = container.resolve(Core);
   const {isTeam, teamName} = useKoSubscribableChildren(teamState, ['isTeam', 'teamName']);
-  const {name, email, availability, username, managedBy, phone} = useKoSubscribableChildren(selfUser, [
+  const {name, email, availability, username, managedBy} = useKoSubscribableChildren(selfUser, [
     'name',
     'email',
     'availability',
     'username',
     'managedBy',
-    'phone',
   ]);
+
   const canEditProfile = managedBy === User.CONFIG.MANAGED_BY.WIRE;
   const isDesktop = Runtime.isDesktopApp();
-  const isTemporaryAndNonPersistent = useRef(isTemporaryClientAndNonPersistent(loadValue(StorageKey.AUTH.PERSIST)));
   const config = Config.getConfig();
   const brandName = config.BRAND_NAME;
   const isConsentCheckEnabled = config.FEATURE.CHECK_CONSENT;
+  const isTeamCreationEnabled =
+    Config.getConfig().FEATURE.ENABLE_TEAM_CREATION &&
+    core.backendFeatures.version >= Config.getConfig().MIN_TEAM_CREATION_SUPPORTED_API_VERSION;
 
   const richFields = useEnrichedFields(selfUser, {addDomain: showDomain, addEmail: false});
   const domain = selfUser.domain;
@@ -117,7 +119,7 @@ const AccountPreferences: React.FC<AccountPreferencesProps> = ({
           action: async (): Promise<void> => {
             try {
               await conversationRepository.leaveGuestRoom();
-              clientRepository.logoutClient();
+              void clientRepository.logoutClient();
             } catch (error) {
               logger.warn('Error while leaving room', error);
             }
@@ -135,35 +137,31 @@ const AccountPreferences: React.FC<AccountPreferencesProps> = ({
 
   return (
     <PreferencesPage title={t('preferencesAccount')}>
-      <div
-        css={{
-          alignItems: 'center',
-          display: 'flex',
-          flexDirection: 'column',
-          width: 'var(--preferences-width)',
-        }}
-      >
-        <h3
-          className="heading-h3 text-center ellipsis"
-          title={name}
-          css={{
-            marginBottom: 16,
-            width: '100%',
-          }}
-        >
-          {name}
-        </h3>
+      <div className="preferences-wrapper">
+        {isTeamCreationEnabled && !teamState.isInTeam(selfUser) && <TeamCreationAccountHeader />}
+        <div className="preferences-account-name">
+          <h3 className="heading-h3 text-center" title={name}>
+            {name}
+          </h3>
 
-        <div>
+          <UserVerificationBadges user={selfUser} groupId={conversationState.selfMLSConversation()?.groupId} />
+        </div>
+
+        <div className="preferences-account-image">
           <ErrorBoundary FallbackComponent={ErrorFallback}>
-            <AvatarInput {...{isActivatedAccount, selfUser, userRepository}} />
+            <AvatarInput
+              selfUser={selfUser}
+              isActivatedAccount={isActivatedAccount}
+              userRepository={userRepository}
+              hideAvailabilityStatus
+            />
           </ErrorBoundary>
         </div>
 
-        {isActivatedAccount && isTeam && <AvailabilityButtons {...{availability}} />}
+        {isActivatedAccount && isTeam && <AvailabilityButtons availability={availability} />}
 
         {isActivatedAccount && (
-          <div>
+          <div className="preferences-accent-color-picker">
             <AccentColorPicker user={selfUser} doSetAccentColor={id => userRepository.changeAccentColor(id)} />
           </div>
         )}
@@ -179,13 +177,23 @@ const AccountPreferences: React.FC<AccountPreferencesProps> = ({
               marginLeft: '-8px',
             }}
           >
-            <NameInput {...{canEditProfile, name, userRepository}} />
-            <UsernameInput {...{canEditProfile, userRepository, username}} domain={showDomain ? domain : undefined} />
-            {email && !selfUser.isNoPasswordSSO && <EmailInput {...{canEditProfile, email, userRepository}} />}
-            {phone && <AccountInput label={t('preferencesAccountPhone')} value={phone} readOnly fieldName="phone" />}
+            <NameInput canEditProfile={canEditProfile} name={name} userRepository={userRepository} />
+
+            <UsernameInput
+              canEditProfile={canEditProfile}
+              userRepository={userRepository}
+              username={username}
+              domain={showDomain ? domain : undefined}
+            />
+
+            {email && !selfUser.isNoPasswordSSO && (
+              <EmailInput canEditProfile={canEditProfile} email={email} userRepository={userRepository} />
+            )}
+
             {isTeam && (
               <AccountInput label={t('preferencesAccountTeam')} value={teamName} readOnly fieldName="status-team" />
             )}
+
             {richFields.map(({type, value}) => (
               <AccountInput
                 key={type}
@@ -198,9 +206,10 @@ const AccountPreferences: React.FC<AccountPreferencesProps> = ({
               />
             ))}
           </div>
+
           <AccountLink
             label={t('preferencesAccountLink')}
-            value={`${Config.getConfig().URL.ACCOUNT_BASE}/user-profile/?id=${selfUser.id}`}
+            value={`${Config.getConfig().URL.ACCOUNT_BASE}/user-profile/?id=${selfUser.id}@${selfUser.domain}`}
             data-uie-name="element-profile-link"
           />
         </PreferencesSection>
@@ -214,25 +223,30 @@ const AccountPreferences: React.FC<AccountPreferencesProps> = ({
           >
             {t('preferencesAccountLeaveGuestRoom')}
           </button>
+
           <div className="preferences-leave-disclaimer">{t('preferencesAccountLeaveGuestRoomDescription')}</div>
         </PreferencesSection>
       )}
 
-      {isConsentCheckEnabled && <DataUsageSection {...{brandName, isActivatedAccount, propertiesRepository}} />}
+      {isConsentCheckEnabled && (
+        <DataUsageSection
+          brandName={brandName}
+          isActivatedAccount={isActivatedAccount}
+          propertiesRepository={propertiesRepository}
+        />
+      )}
 
-      <PrivacySection {...{propertiesRepository}} />
+      <PrivacySection propertiesRepository={propertiesRepository} />
 
       {isActivatedAccount && (
         <>
-          {!isTemporaryAndNonPersistent.current && (
-            <HistoryBackupSection brandName={brandName} importFile={importFile} switchContent={switchContent} />
-          )}
-          <AccountSecuritySection {...{selfUser, userRepository}} />
-          {!isDesktop && <LogoutSection {...{clientRepository}} />}
+          <HistoryBackupSection brandName={brandName} importFile={importFile} switchContent={switchContent} />
+
+          <AccountSecuritySection selfUser={selfUser} userRepository={userRepository} />
+
+          {!isDesktop && <LogoutSection clientRepository={clientRepository} />}
         </>
       )}
     </PreferencesPage>
   );
 };
-
-export {AccountPreferences};

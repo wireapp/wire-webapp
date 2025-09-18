@@ -21,11 +21,20 @@ import {amplify} from 'amplify';
 import ko from 'knockout';
 import {container} from 'tsyringe';
 
-import {CONV_TYPE} from '@wireapp/avs';
 import {Runtime} from '@wireapp/commons';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {PrimaryModal, usePrimaryModalState} from 'Components/Modals/PrimaryModal';
+import type {CallingRepository} from 'Repositories/calling/CallingRepository';
+import type {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
+import {ConversationState} from 'Repositories/conversation/ConversationState';
+import type {Conversation} from 'Repositories/entity/Conversation';
+import type {User} from 'Repositories/entity/User';
+import {PropertiesRepository} from 'Repositories/properties/PropertiesRepository';
+import {SearchRepository} from 'Repositories/search/SearchRepository';
+import type {TeamRepository} from 'Repositories/team/TeamRepository';
+import {TeamState} from 'Repositories/team/TeamState';
+import {UserState} from 'Repositories/user/UserState';
 import {iterateItem} from 'Util/ArrayUtil';
 import {isEscapeKey} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
@@ -35,23 +44,15 @@ import {CallingViewModel} from './CallingViewModel';
 import {ContentViewModel} from './ContentViewModel';
 import type {MainViewModel, ViewModelRepositories} from './MainViewModel';
 
-import type {CallingRepository} from '../calling/CallingRepository';
-import type {ConversationRepository} from '../conversation/ConversationRepository';
-import {ConversationState} from '../conversation/ConversationState';
-import type {Conversation} from '../entity/Conversation';
-import type {User} from '../entity/User';
+import {Config} from '../Config';
+import {SidebarTabs, useSidebarStore} from '../page/LeftSidebar/panels/Conversations/useSidebarStore';
 import {PanelState} from '../page/RightSidebar';
 import {useAppMainState} from '../page/state';
 import {ContentState, ListState, useAppState} from '../page/useAppState';
-import {PropertiesRepository} from '../properties/PropertiesRepository';
-import {SearchRepository} from '../search/SearchRepository';
-import type {TeamRepository} from '../team/TeamRepository';
-import {TeamState} from '../team/TeamState';
 import {showContextMenu} from '../ui/ContextMenu';
 import {showLabelContextMenu} from '../ui/LabelContextMenu';
 import {Shortcut} from '../ui/Shortcut';
 import {ShortcutType} from '../ui/ShortcutType';
-import {UserState} from '../user/UserState';
 
 export class ListViewModel {
   private readonly userState: UserState;
@@ -96,9 +97,9 @@ export class ListViewModel {
     this.contentViewModel = mainViewModel.content;
     this.callingViewModel = mainViewModel.calling;
 
-    this.isActivatedAccount = this.userState.isActivatedAccount;
     this.isProAccount = this.teamState.isTeam;
     this.selfUser = this.userState.self;
+    this.isActivatedAccount = ko.pureComputed(() => this.selfUser()?.isActivatedAccount());
 
     // State
     this.lastUpdate = ko.observable();
@@ -132,7 +133,9 @@ export class ListViewModel {
   }
 
   private readonly _initSubscriptions = () => {
-    amplify.subscribe(WebAppEvents.CONVERSATION.SHOW, this.openConversations);
+    amplify.subscribe(WebAppEvents.CONVERSATION.SHOW, (conversation?: Conversation) => {
+      this.openConversations(conversation?.archivedState());
+    });
     amplify.subscribe(WebAppEvents.PREFERENCES.MANAGE_ACCOUNT, this.openPreferencesAccount);
     amplify.subscribe(WebAppEvents.PREFERENCES.MANAGE_DEVICES, this.openPreferencesDevices);
     amplify.subscribe(WebAppEvents.PREFERENCES.SHOW_AV, this.openPreferencesAudioVideo);
@@ -152,7 +155,7 @@ export class ListViewModel {
       return;
     }
 
-    if (call.conversationType === CONV_TYPE.CONFERENCE && !this.callingRepository.supportsConferenceCalling) {
+    if (call.isConference && !this.callingRepository.supportsConferenceCalling) {
       PrimaryModal.show(PrimaryModal.type.ACKNOWLEDGE, {
         text: {
           message: `${t('modalConferenceCallNotSupportedMessage')} ${t('modalConferenceCallNotSupportedJoinMessage')}`,
@@ -183,9 +186,15 @@ export class ListViewModel {
 
   onKeyDownListView = (keyboardEvent: KeyboardEvent) => {
     const {currentModalId} = usePrimaryModalState.getState();
+    const {currentTab} = useSidebarStore.getState();
+
     // don't switch view for primary modal(ex: preferences->set status->modal opened)
     // when user press escape, only close the modal and stay within the preference screen
-    if (isEscapeKey(keyboardEvent) && currentModalId === null) {
+    if (
+      isEscapeKey(keyboardEvent) &&
+      currentModalId === null &&
+      ![SidebarTabs.PREFERENCES, SidebarTabs.CELLS].includes(currentTab)
+    ) {
       const newState = this.isActivatedAccount() ? ListState.CONVERSATIONS : ListState.TEMPORARY_GUEST;
       this.switchList(newState);
     }
@@ -236,6 +245,9 @@ export class ListViewModel {
   openPreferencesAccount = async (): Promise<void> => {
     await this.teamRepository.getTeam();
 
+    const {setCurrentTab} = useSidebarStore.getState();
+    setCurrentTab(SidebarTabs.PREFERENCES);
+
     this.switchList(ListState.PREFERENCES);
     this.contentViewModel.switchContent(ContentState.PREFERENCES_ACCOUNT);
   };
@@ -279,9 +291,15 @@ export class ListViewModel {
     }
   };
 
-  readonly openConversations = (): void => {
-    const newState = this.isActivatedAccount() ? ListState.CONVERSATIONS : ListState.TEMPORARY_GUEST;
+  readonly openConversations = (archive = false): void => {
+    const {currentTab, setCurrentTab} = useSidebarStore.getState();
+    const newState = this.isActivatedAccount()
+      ? archive
+        ? ListState.ARCHIVE
+        : ListState.CONVERSATIONS
+      : ListState.TEMPORARY_GUEST;
     this.switchList(newState, false);
+    setCurrentTab(archive ? SidebarTabs.ARCHIVES : currentTab);
   };
 
   private readonly hideList = (): void => {
@@ -329,15 +347,15 @@ export class ListViewModel {
         entries.push({
           click: () => this.clickToOpenNotificationSettings(conversationEntity),
           label: t('conversationsPopoverNotificationSettings'),
-          title: t('tooltipConversationsNotifications', notificationsShortcut),
+          title: t('tooltipConversationsNotifications', {shortcut: notificationsShortcut}),
         });
       } else {
         const label = conversationEntity.showNotificationsNothing()
           ? t('conversationsPopoverNotify')
           : t('conversationsPopoverSilence');
         const title = conversationEntity.showNotificationsNothing()
-          ? t('tooltipConversationsNotify', notificationsShortcut)
-          : t('tooltipConversationsSilence', notificationsShortcut);
+          ? t('tooltipConversationsNotify', {shortcut: notificationsShortcut})
+          : t('tooltipConversationsSilence', {shortcut: notificationsShortcut});
 
         entries.push({
           click: () => this.clickToToggleMute(conversationEntity),
@@ -369,7 +387,7 @@ export class ListViewModel {
       if (customLabel) {
         entries.push({
           click: () => conversationLabelRepository.removeConversationFromLabel(customLabel, conversationEntity),
-          label: t('conversationsPopoverRemoveFrom', customLabel.name),
+          label: t('conversationsPopoverRemoveFrom', {name: customLabel.name}, {}, true),
         });
       }
 
@@ -390,7 +408,7 @@ export class ListViewModel {
       entries.push({
         click: () => this.clickToArchive(conversationEntity),
         label: t('conversationsPopoverArchive'),
-        title: t('tooltipConversationsArchive', shortcut),
+        title: t('tooltipConversationsArchive', {shortcut}),
       });
     }
 
@@ -408,14 +426,20 @@ export class ListViewModel {
       });
     }
 
-    if (!conversationEntity.isGroup()) {
+    if (!conversationEntity.isGroupOrChannel()) {
       const userEntity = conversationEntity.firstUserEntity();
       const canBlock = userEntity && (userEntity.isConnected() || userEntity.isRequest());
+      const canUnblock = userEntity && userEntity.isBlocked();
 
       if (canBlock) {
         entries.push({
           click: () => this.clickToBlock(conversationEntity),
           label: t('conversationsPopoverBlock'),
+        });
+      } else if (canUnblock) {
+        entries.push({
+          click: () => this.clickToUnblock(conversationEntity),
+          label: t('conversationsPopoverUnblock'),
         });
       }
     }
@@ -423,11 +447,23 @@ export class ListViewModel {
     if (conversationEntity.isLeavable()) {
       entries.push({
         click: () => this.clickToLeave(conversationEntity),
-        label: t('conversationsPopoverLeave'),
+        label: conversationEntity.isChannel() ? t('channelsPopoverLeave') : t('groupsPopoverLeave'),
+        identifier: 'conversation-leave',
       });
     }
 
-    showContextMenu(event, entries, 'conversation-list-options-menu');
+    if (
+      Config.getConfig().FEATURE.ENABLE_REMOVE_GROUP_CONVERSATION &&
+      conversationEntity.isGroupOrChannel() &&
+      conversationEntity.isSelfUserRemoved()
+    ) {
+      entries.push({
+        click: () => this.actionsViewModel.removeConversation(conversationEntity),
+        label: t('conversationsPopoverDeleteForMe'),
+      });
+    }
+
+    showContextMenu({event, entries, identifier: 'conversation-list-options-menu'});
   };
 
   readonly clickToArchive = (conversationEntity = this.conversationState.activeConversation()): void => {
@@ -438,9 +474,20 @@ export class ListViewModel {
 
   clickToBlock = async (conversationEntity: Conversation): Promise<void> => {
     const userEntity = conversationEntity.firstUserEntity();
-    const hideConversation = this.shouldHideConversation(conversationEntity);
-    const nextConversationEntity = this.conversationRepository.getNextConversation(conversationEntity);
-    await this.actionsViewModel.blockUser(userEntity, hideConversation, nextConversationEntity);
+
+    if (!userEntity) {
+      return;
+    }
+
+    await this.actionsViewModel.blockUser(userEntity);
+  };
+
+  clickToUnblock = async (conversationEntity: Conversation): Promise<void> => {
+    const userEntity = conversationEntity.firstUserEntity();
+    if (!userEntity) {
+      return;
+    }
+    await this.actionsViewModel.unblockUser(userEntity);
   };
 
   readonly clickToCancelRequest = (conversationEntity: Conversation): void => {

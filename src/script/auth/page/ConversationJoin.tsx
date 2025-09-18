@@ -21,34 +21,35 @@ import React, {useEffect, useState} from 'react';
 
 import type {RegisterData} from '@wireapp/api-client/lib/auth';
 import {BackendErrorLabel} from '@wireapp/api-client/lib/http';
-import {useIntl} from 'react-intl';
 import {connect} from 'react-redux';
+import {Navigate} from 'react-router-dom';
 import {AnyAction, Dispatch} from 'redux';
 
 import {UrlUtil} from '@wireapp/commons';
 import {Column, Columns, H1, Muted} from '@wireapp/react-ui-kit';
 
+import {t} from 'Util/LocalizerUtil';
 import {noop} from 'Util/util';
 
 import {GuestLoginColumn, IsLoggedInColumn, Separator} from './ConversationJoinComponents';
-import {ConversationJoinFull, ConversationJoinInvalid} from './ConversationJoinInvalid';
+import {ConversationJoinFull} from './ConversationJoinInvalid';
 import {EntropyContainer} from './EntropyContainer';
 import {Login} from './Login';
 import {Page} from './Page';
 
 import {Config} from '../../Config';
-import {conversationJoinStrings} from '../../strings';
 import {AppAlreadyOpen} from '../component/AppAlreadyOpen';
-import {UnsupportedBrowser} from '../component/UnsupportedBrowser';
+import {JoinGuestLinkPasswordModal} from '../component/JoinGuestLinkPasswordModal';
 import {WirelessContainer} from '../component/WirelessContainer';
 import {EXTERNAL_ROUTE} from '../externalRoute';
 import {actionRoot as ROOT_ACTIONS} from '../module/action';
 import {ValidationError} from '../module/action/ValidationError';
 import {bindActionCreators, RootState} from '../module/reducer';
 import * as AuthSelector from '../module/selector/AuthSelector';
+import * as ClientSelector from '../module/selector/ClientSelector';
 import * as ConversationSelector from '../module/selector/ConversationSelector';
 import * as SelfSelector from '../module/selector/SelfSelector';
-import {QUERY_KEY} from '../route';
+import {QUERY_KEY, ROUTE} from '../route';
 import * as AccentColor from '../util/AccentColor';
 
 type Props = React.HTMLProps<HTMLDivElement>;
@@ -60,14 +61,23 @@ const ConversationJoinComponent = ({
   doRegisterWireless,
   setLastEventDate,
   doLogout,
+  doGetConversationInfoByCode,
   selfName,
   conversationError,
+  hasLoadedClients,
+  isFetchingAuth,
+  isFetchingConversation,
+  conversationInfo,
+  conversationInfoFetching,
+  generalError,
+  doGetAllClients,
 }: Props & ConnectedProps & DispatchProps) => {
   const nameInput = React.useRef<HTMLInputElement>(null);
-  const {formatMessage: _} = useIntl();
 
-  const [isLoggedIn, setIsLoggedIn] = useState(selfName !== null);
+  const conversationHasPassword = conversationInfo?.has_password;
+
   const [accentColor] = useState(AccentColor.STRONG_BLUE);
+  const [isJoinGuestLinkPasswordModalOpen, setIsJoinGuestLinkPasswordModalOpen] = useState<boolean>(false);
   const [conversationCode, setConversationCode] = useState<string>();
   const [conversationKey, setConversationKey] = useState<string>();
   const [enteredName, setEnteredName] = useState<string>('');
@@ -78,7 +88,11 @@ const ConversationJoinComponent = ({
   const [isSubmitingName, setIsSubmitingName] = useState(false);
   const [showCookiePolicyBanner, setShowCookiePolicyBanner] = useState(true);
   const [showEntropyForm, setShowEntropyForm] = useState(false);
+  const [isTemporaryGuest, setIsTemporaryGuest] = useState<boolean>(false);
   const isEntropyRequired = Config.getConfig().FEATURE.ENABLE_EXTRA_CLIENT_ENTROPY;
+  const isFetching = isFetchingAuth || isFetchingConversation || conversationInfoFetching;
+
+  const isWirePublicInstance = Config.getConfig().BRAND_NAME === 'Wire';
 
   useEffect(() => {
     const localConversationCode = UrlUtil.getURLParameter(QUERY_KEY.CONVERSATION_CODE);
@@ -91,12 +105,17 @@ const ConversationJoinComponent = ({
     setIsValidLink(true);
     doInit({isImmediateLogin: false, shouldValidateLocalClient: true})
       .catch(noop)
-      .then(() =>
-        localConversationCode && localConversationKey
-          ? doCheckConversationCode(localConversationKey, localConversationCode)
-          : null,
-      )
+      .then(async () => {
+        if (localConversationCode && localConversationKey) {
+          await doCheckConversationCode(localConversationKey, localConversationCode);
+          await doGetConversationInfoByCode(localConversationKey, localConversationCode);
+        }
+        await doGetAllClients();
+      })
       .catch(error => {
+        if (error.label === BackendErrorLabel.INVALID_CREDENTIALS) {
+          return;
+        }
         setIsValidLink(false);
       });
   }, []);
@@ -108,7 +127,39 @@ const ConversationJoinComponent = ({
     window.location.replace(redirectLocation);
   };
 
-  const handleSubmit = async (entropyData?: Uint8Array) => {
+  const getConversationInfoAndJoin = async (password?: string) => {
+    if (!isJoinGuestLinkPasswordModalOpen && !!conversationHasPassword) {
+      setIsJoinGuestLinkPasswordModalOpen(true);
+      return;
+    }
+    try {
+      if (!conversationCode || !conversationKey) {
+        throw Error('Conversation code or key missing');
+      }
+      const conversationEvent = await doJoinConversationByCode(conversationKey, conversationCode, undefined, password);
+      /* When we join a conversation, we create the join event before loading the webapp.
+       * That means that when the webapp loads and tries to fetch the notificationStream is will get the join event once again and will try to handle it
+       * Here we set the core's lastEventDate so that it knows that this duplicated event should be skipped
+       */
+      await setLastEventDate(conversationEvent?.time ? new Date(conversationEvent.time) : new Date());
+
+      routeToApp(conversationEvent?.conversation, conversationEvent?.qualified_conversation?.domain ?? '');
+    } catch (error) {
+      setIsSubmitingName(false);
+      if (error.label === BackendErrorLabel.INVALID_CONVERSATION_PASSWORD) {
+        setIsJoinGuestLinkPasswordModalOpen(true);
+        return;
+      }
+      console.warn('Unable to join conversation', error);
+      setShowEntropyForm(false);
+    }
+  };
+
+  const handleSubmit = async (entropyData?: Uint8Array, password?: string) => {
+    if (!isJoinGuestLinkPasswordModalOpen && !!conversationHasPassword) {
+      setIsJoinGuestLinkPasswordModalOpen(true);
+      return;
+    }
     setIsSubmitingName(true);
     try {
       if (!conversationCode || !conversationKey) {
@@ -127,14 +178,7 @@ const ConversationJoinComponent = ({
         },
         entropyData,
       );
-      const conversationEvent = await doJoinConversationByCode(conversationKey, conversationCode);
-      /* When we join a conversation, we create the join event before loading the webapp.
-       * That means that when the webapp loads and tries to fetch the notificationStream is will get the join event once again and will try to handle it
-       * Here we set the core's lastEventDate so that it knows that this duplicated event should be skipped
-       */
-      await setLastEventDate(new Date(conversationEvent.time));
-
-      routeToApp(conversationEvent.conversation, conversationEvent.qualified_conversation?.domain ?? '');
+      await getConversationInfoAndJoin(password);
     } catch (error) {
       setIsSubmitingName(false);
       if (error.label) {
@@ -144,7 +188,7 @@ const ConversationJoinComponent = ({
               error.label.endsWith(errorType),
             );
             if (!isValidationError) {
-              doLogout();
+              void doLogout();
               console.warn('Unable to create wireless account', error);
               setShowEntropyForm(false);
             }
@@ -162,17 +206,19 @@ const ConversationJoinComponent = ({
   };
 
   const checkNameValidity = async (event: React.FormEvent) => {
+    setIsTemporaryGuest(true);
     event.preventDefault();
-    if (nameInput.current) {
-      nameInput.current.value = nameInput.current.value.trim();
-      if (!nameInput.current.checkValidity()) {
-        setError(ValidationError.handleValidationState('name', nameInput.current.validity));
-        setIsValidName(false);
-      } else if (isEntropyRequired) {
-        setShowEntropyForm(true);
-      } else {
-        await handleSubmit();
-      }
+    if (!nameInput.current) {
+      return;
+    }
+    nameInput.current.value = nameInput.current.value.trim();
+    if (!nameInput.current.checkValidity()) {
+      setError(ValidationError.handleValidationState('name', nameInput.current.validity));
+      setIsValidName(false);
+    } else if (isEntropyRequired) {
+      setShowEntropyForm(true);
+    } else {
+      await handleSubmit();
     }
   };
 
@@ -186,23 +232,35 @@ const ConversationJoinComponent = ({
     setEnteredName(event.target.value);
   };
 
-  const handleLogout = async () => {
-    setIsLoggedIn(false);
-    await doLogout();
-  };
-
   if (!isValidLink) {
-    return <ConversationJoinInvalid />;
+    return <Navigate to={ROUTE.CONVERSATION_JOIN_INVALID} replace />;
   }
 
   const isFullConversation =
     conversationError && conversationError.label && conversationError.label === BackendErrorLabel.TOO_MANY_MEMBERS;
+
+  const submitJoinCodeWithPassword = async (password: string) => {
+    await handleSubmit(undefined, password);
+  };
+
   if (isFullConversation) {
     return <ConversationJoinFull />;
   }
 
   return (
-    <UnsupportedBrowser isTemporaryGuest>
+    <>
+      {isJoinGuestLinkPasswordModalOpen && (
+        <JoinGuestLinkPasswordModal
+          onClose={() => {
+            setIsJoinGuestLinkPasswordModalOpen(false);
+            setIsTemporaryGuest(false);
+          }}
+          error={conversationError || generalError}
+          isLoading={isFetching}
+          conversationName={conversationInfo?.name}
+          onSubmitPassword={!isTemporaryGuest ? getConversationInfoAndJoin : submitJoinCodeWithPassword}
+        />
+      )}
       <WirelessContainer
         showCookiePolicyBanner={showCookiePolicyBanner}
         onCookiePolicyBannerClose={() => setShowCookiePolicyBanner(false)}
@@ -210,16 +268,18 @@ const ConversationJoinComponent = ({
         <AppAlreadyOpen />
         <div style={{display: 'flex', alignItems: 'center', flexDirection: 'column', marginBottom: '2rem'}}>
           <H1 style={{fontWeight: 500, marginTop: '0', marginBottom: '1rem'}} data-uie-name="status-join-headline">
-            {_(conversationJoinStrings.mainHeadline)}
+            {t('conversationJoin.mainHeadline')}
           </H1>
-          <Muted data-uie-name="status-join-subhead">
-            {_(conversationJoinStrings.headline, {brandName: Config.getConfig().BRAND_NAME})}
-          </Muted>
+          {!isWirePublicInstance && (
+            <Muted data-uie-name="status-join-subhead">
+              {t('conversationJoin.headline', {domain: window.location.hostname})}
+            </Muted>
+          )}
         </div>
         <Columns style={{display: 'flex', gap: '2rem', alignSelf: 'center', maxWidth: '100%'}}>
           <Column>
-            {isLoggedIn ? (
-              <IsLoggedInColumn selfName={selfName} handleLogout={handleLogout} handleSubmit={handleSubmit} />
+            {selfName && hasLoadedClients ? (
+              <IsLoggedInColumn selfName={selfName} handleLogout={doLogout} handleSubmit={getConversationInfoAndJoin} />
             ) : (
               <Login embedded />
             )}
@@ -235,7 +295,6 @@ const ConversationJoinComponent = ({
                   nameInput={nameInput}
                   onNameChange={onNameChange}
                   checkNameValidity={checkNameValidity}
-                  handleSubmit={handleSubmit}
                   isSubmitingName={isSubmitingName}
                   isValidName={isValidName}
                   conversationError={conversationError}
@@ -246,24 +305,30 @@ const ConversationJoinComponent = ({
           </Column>
         </Columns>
       </WirelessContainer>
-    </UnsupportedBrowser>
+    </>
   );
 };
 
 type ConnectedProps = ReturnType<typeof mapStateToProps>;
 const mapStateToProps = (state: RootState) => ({
-  conversationError: ConversationSelector.getError(state),
-  isAuthenticated: AuthSelector.isAuthenticated(state),
-  isFetching: ConversationSelector.isFetching(state),
+  isFetchingAuth: AuthSelector.isFetching(state),
+  hasLoadedClients: ClientSelector.hasLoadedClients(state),
+  isFetchingConversation: ConversationSelector.isFetching(state),
   isTemporaryGuest: SelfSelector.isTemporaryGuest(state),
-  selfName: SelfSelector.getSelfName(state),
+  selfName: !SelfSelector.isTemporaryGuest(state) && SelfSelector.getSelfName(state),
+  conversationError: ConversationSelector.getError(state),
+  conversationInfo: ConversationSelector.conversationInfo(state),
+  conversationInfoFetching: ConversationSelector.conversationInfoFetching(state),
+  generalError: AuthSelector.getError(state),
 });
 
 type DispatchProps = ReturnType<typeof mapDispatchToProps>;
 const mapDispatchToProps = (dispatch: Dispatch<AnyAction>) =>
   bindActionCreators(
     {
+      doGetAllClients: ROOT_ACTIONS.clientAction.doGetAllClients,
       doCheckConversationCode: ROOT_ACTIONS.conversationAction.doCheckConversationCode,
+      doGetConversationInfoByCode: ROOT_ACTIONS.conversationAction.doGetConversationInfoByCode,
       doInit: ROOT_ACTIONS.authAction.doInit,
       doJoinConversationByCode: ROOT_ACTIONS.conversationAction.doJoinConversationByCode,
       doLogout: ROOT_ACTIONS.authAction.doLogout,

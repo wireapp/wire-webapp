@@ -26,10 +26,13 @@ const config: Config = {
   // Must be in sync with tsconfig.json >> paths
   moduleNameMapper: {
     'Components/(.*)': '<rootDir>/src/script/components/$1',
+    'Hooks/(.*)': '<rootDir>/src/script/hooks/$1',
     'I18n/(.*)': '<rootDir>/src/i18n/$1',
+    'Repositories/(.*)': '<rootDir>/src/script/repositories/$1',
     'Resource/(.*)': '<rootDir>/resource/$1',
     'Util/(.*)': '<rootDir>/src/script/util/$1',
     '^react(.*)$': '<rootDir>/node_modules/react$1',
+    '.*\\.glsl': 'jest-transform-stub',
   },
   reporters: ['default', 'github-actions'],
   setupFilesAfterEnv: ['<rootDir>/setupTests.js'],
@@ -37,7 +40,7 @@ const config: Config = {
   testEnvironmentOptions: {
     customExportConditions: ['node', 'node-addons'],
   },
-  testPathIgnorePatterns: ['<rootDir>/server'],
+  testPathIgnorePatterns: ['<rootDir>/server', '<rootDir>/.yalc'],
   testRegex: '(test|Spec)\\.[tj]sx?$',
   testRunner: 'jest-jasmine2',
 };

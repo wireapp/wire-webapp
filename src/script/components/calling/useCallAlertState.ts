@@ -17,6 +17,7 @@
  *
  */
 
+import type {QualifiedId} from '@wireapp/api-client/lib/user';
 import {create} from 'zustand';
 
 type CallAlertState = {
@@ -24,11 +25,26 @@ type CallAlertState = {
   isGroupCall: boolean;
   showStartedCallAlert: (isGroupCall: boolean, isVideoCall?: boolean) => void;
   clearShowAlert: () => void;
+  conversationId?: QualifiedId;
+  qualityFeedbackModalShown: boolean;
+  setQualityFeedbackModalShown: (isVisible: boolean) => void;
+  setConversationId: (conversationId?: QualifiedId) => void;
 };
 
 const useCallAlertState = create<CallAlertState>((set, get) => ({
   showAlert: false,
   isGroupCall: false,
+  qualityFeedbackModalShown: false,
+  setQualityFeedbackModalShown: isVisible =>
+    set(state => ({
+      ...state,
+      qualityFeedbackModalShown: isVisible,
+    })),
+  setConversationId: conversationId =>
+    set(state => ({
+      ...state,
+      conversationId,
+    })),
   showStartedCallAlert: (isGroupCall = false, isVideoCall = false) =>
     set(state => ({
       ...state,

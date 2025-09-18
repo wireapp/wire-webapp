@@ -17,8 +17,6 @@
  *
  */
 
-@button-group-width: 128px;
-
 #show-participants {
   min-width: 0; //needed for the truncation of long titles to work properly in flex-boxes
 }
@@ -27,11 +25,16 @@
   .flex-center;
   position: relative;
   width: 100%;
-  height: @content-title-bar-height;
+  height: var(--content-title-bar-height);
+  flex-shrink: 0;
   padding: 0 8px;
   margin: 0;
-  background-color: var(--sidebar-bg);
+  background-color: var(--app-bg);
   list-style-type: none;
+
+  &--with-bottom-divider {
+    border-bottom: 1px solid var(--border-color);
+  }
 }
 
 .conversation-title-bar-name {
@@ -67,44 +70,28 @@ body.theme-dark {
   border-radius: 6px;
   background-color: var(--accent-color);
   box-shadow: 0 2px 16px 0 fade(#000, 8%);
-  font-size: @font-size-small;
-  font-weight: @font-weight-regular;
+  font-size: var(--font-size-small);
+  font-weight: var(--font-weight-regular);
 
   strong {
-    font-weight: @font-weight-bold;
+    font-weight: var(--font-weight-bold);
   }
 }
 
 .conversation-title-bar-icons,
 .conversation-title-bar-library {
   display: flex;
-  min-width: @button-group-width;
+  min-width: 128px;
   height: 100%;
   align-items: center;
-  @media (min-width: calc(@screen-sm-min * 2)) and (max-width: @screen-md-min) {
+  @media (min-width: 640px) and (max-width: 768px) {
     min-width: 0;
   }
 }
 
 .conversation-title-bar-icons {
   justify-content: flex-end;
-
-  .buttons-group {
-    margin-right: 8px;
-
-    button,
-    [role='button'] {
-      border-radius: 0;
-
-      &:first-of-type {
-        border-radius: 12px 0 0 12px;
-      }
-
-      &:last-of-type {
-        border-radius: 0 12px 12px 0;
-      }
-    }
-  }
+  gap: 8px;
 }
 
 .conversation-title-bar-icon {
@@ -124,6 +111,10 @@ body.theme-dark {
   &--wrapper {
     .flex-center;
     display: flex;
+  }
+
+  + .conversation-badges {
+    margin-left: 4px;
   }
 }
 

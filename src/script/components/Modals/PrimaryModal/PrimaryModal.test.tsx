@@ -19,7 +19,10 @@
 
 import {render, fireEvent, act} from '@testing-library/react';
 
+import {withTheme} from 'src/script/auth/util/test/TestUtil';
+
 import {PrimaryModalComponent} from './PrimaryModal';
+import {PrimaryModalType} from './PrimaryModalTypes';
 
 import {PrimaryModal, removeCurrentModal} from '.';
 
@@ -27,109 +30,139 @@ describe('PrimaryModal', () => {
   beforeEach(() => {
     removeCurrentModal();
   });
-  it('does not render when no item is in the queue', async () => {
-    const {getByTestId} = render(<PrimaryModalComponent />);
-    const PrimaryModalWrapper = getByTestId('primary-modals-container');
-    expect(PrimaryModalWrapper.children[0].getAttribute('style')).toBe('display: none;');
-  });
 
-  it('correctly calls action callback', async () => {
-    const {getByTestId} = render(<PrimaryModalComponent />);
-    const actionCallback = jest.fn();
-    act(() => {
-      PrimaryModal.show(PrimaryModal.type.CONFIRM, {
-        primaryAction: {
-          action: actionCallback,
-          text: 'test-text',
-        },
-        secondaryAction: {
-          action: () => {},
-          text: 'secondary-text',
-        },
-        text: {
-          message: 'test-message',
-          title: 'test-title',
-        },
-      });
+  describe('Confirm', () => {
+    it('does not render when no item is in the queue', async () => {
+      const {getByTestId} = render(<PrimaryModalComponent />);
+      const primaryModalWrapper = getByTestId('primary-modals-container');
+      expect(primaryModalWrapper.children).toHaveLength(0);
     });
 
-    const actionButton = getByTestId('do-action');
-    fireEvent.click(actionButton);
+    it('correctly calls action callback', async () => {
+      const actionCallback = jest.fn();
+      const {getPrimaryActionButton} = renderPrimaryModal(PrimaryModalType.CONFIRM, actionCallback);
 
-    expect(actionCallback).toHaveBeenCalledTimes(1);
-  });
-  it('correctly calls secondary action callback', async () => {
-    const {getByTestId} = render(<PrimaryModalComponent />);
-    const secondaryActionCallback = jest.fn();
-    act(() => {
-      PrimaryModal.show(PrimaryModal.type.CONFIRM, {
-        primaryAction: {
-          action: () => {},
-          text: 'test-text',
-        },
-        secondaryAction: {
-          action: secondaryActionCallback,
-          text: 'secondary-text',
-        },
-        text: {
-          message: 'test-message',
-          title: 'test-title',
-        },
-      });
+      fireEvent.click(getPrimaryActionButton());
+
+      expect(actionCallback).toHaveBeenCalledTimes(1);
     });
 
-    const secondaryActionButton = getByTestId('do-secondary');
-    fireEvent.click(secondaryActionButton);
+    it('correctly calls secondary action callback', async () => {
+      const secondaryActionCallback = jest.fn();
 
-    expect(secondaryActionCallback).toHaveBeenCalledTimes(1);
+      const {getSecondaryActionButton} = renderPrimaryModal(
+        PrimaryModalType.CONFIRM,
+        jest.fn(),
+        secondaryActionCallback,
+      );
+
+      fireEvent.click(getSecondaryActionButton());
+
+      expect(secondaryActionCallback).toHaveBeenCalledTimes(1);
+    });
+
+    it('shows close button by default', async () => {
+      const {getCloseButton} = renderPrimaryModal(PrimaryModalType.CONFIRM);
+
+      expect(getCloseButton()).toBeTruthy();
+    });
+
+    it('hides close button when hideCloseBtn is true', async () => {
+      const {getCloseButton} = renderPrimaryModal(PrimaryModalType.CONFIRM, jest.fn(), jest.fn(), true);
+
+      expect(getCloseButton()).toBeFalsy();
+    });
   });
 
-  it('shows close button by default', async () => {
-    const {getByTestId} = render(<PrimaryModalComponent />);
+  describe('GuestLinkPassword', () => {
+    const action = jest.fn().mockImplementation();
 
-    act(() => {
-      PrimaryModal.show(PrimaryModal.type.CONFIRM, {
-        primaryAction: {
-          action: () => {},
-          text: 'test-text',
-        },
-        secondaryAction: {
-          action: () => {},
-          text: 'secondary-text',
-        },
-        text: {
-          message: 'test-message',
-          title: 'test-title',
-        },
-      });
+    it('should show the active primary button', async () => {
+      const {getPrimaryActionButton} = renderPrimaryModal(PrimaryModalType.GUEST_LINK_PASSWORD, action);
+
+      expect(getPrimaryActionButton()).toHaveProperty('disabled', false);
     });
-    const closeButton = getByTestId('do-close');
 
-    expect(closeButton).toBeTruthy();
-  });
+    it('should fire validation on submit click', async () => {
+      const {getErrorMessage, getPrimaryActionButton} = renderPrimaryModal(
+        PrimaryModalType.GUEST_LINK_PASSWORD,
+        action,
+      );
 
-  it('hides close button when hideCloseBtn is true', async () => {
-    const {queryByTestId} = render(<PrimaryModalComponent />);
+      fireEvent.click(getPrimaryActionButton());
 
-    act(() => {
-      PrimaryModal.show(PrimaryModal.type.CONFIRM, {
-        primaryAction: {
-          action: () => {},
-          text: 'test-text2',
-        },
-        secondaryAction: {
-          action: () => {},
-          text: 'secondary-text',
-        },
-        text: {
-          message: 'test-message',
-          title: 'test-title',
-        },
-        hideCloseBtn: true,
-      });
+      expect(getErrorMessage()).toBeTruthy();
     });
-    const closeButton = queryByTestId('do-close');
 
-    expect(closeButton).toBeFalsy();
+    it('should fill password fields when generate password button clicked', async () => {
+      const {getGeneratePasswordButton, getConfirmPasswordInput, getPasswordInput} = renderPrimaryModal(
+        PrimaryModalType.GUEST_LINK_PASSWORD,
+        action,
+      );
+
+      fireEvent.click(getGeneratePasswordButton());
+
+      const password = (getPasswordInput() as HTMLInputElement).value;
+
+      expect(password).not.toBe('');
+      expect(getConfirmPasswordInput()).toHaveProperty('value', password);
+    });
+
+    it('should call the action when form submitted successfully', async () => {
+      const {getGeneratePasswordButton, getPrimaryActionButton, getPasswordInput} = renderPrimaryModal(
+        PrimaryModalType.GUEST_LINK_PASSWORD,
+        action,
+      );
+
+      const generatePasswordButton = getGeneratePasswordButton();
+
+      fireEvent.click(generatePasswordButton);
+      const password = (getPasswordInput() as HTMLInputElement).value;
+
+      act(() => {
+        fireEvent.click(getPrimaryActionButton());
+      });
+
+      expect(action).toHaveBeenCalledWith(password, false);
+    });
   });
 });
+
+const renderPrimaryModal = (
+  type: PrimaryModalType = PrimaryModalType.CONFIRM,
+  primaryAction = () => {},
+  secondaryAction = () => {},
+  hideCloseBtn = false,
+) => {
+  const {getByTestId, queryByTestId} = render(withTheme(<PrimaryModalComponent />));
+  act(() => {
+    PrimaryModal.show(type, {
+      primaryAction: {
+        action: primaryAction,
+        text: 'test-text2',
+      },
+      secondaryAction: {
+        action: secondaryAction,
+        text: 'secondary-text',
+      },
+      text: {
+        message: 'test-message',
+        title: 'test-title',
+      },
+      hideCloseBtn,
+      copyPassword: true,
+      closeOnConfirm: true,
+      preventClose: false,
+    });
+  });
+
+  return {
+    getPrimaryActionButton: () => getByTestId('do-action'),
+    getSecondaryActionButton: () => getByTestId('do-secondary'),
+    getCloseButton: () => queryByTestId('do-close'),
+    getErrorMessage: () => getByTestId('primary-modals-error-message'),
+    getPasswordInput: () => getByTestId('guest-link-password'),
+    getGeneratePasswordButton: () => getByTestId('do-generate-password'),
+    getConfirmPasswordInput: () => getByTestId('guest-link-password-confirm'),
+  };
+};

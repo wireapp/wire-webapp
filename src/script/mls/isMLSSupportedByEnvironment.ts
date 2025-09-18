@@ -34,17 +34,5 @@ export const isMLSSupportedByEnvironment = async () => {
   }
 
   const apiClient = container.resolve(APIClient);
-  const isMLSEnabledOnBackend = apiClient.backendFeatures.supportsMLS;
-
-  if (!isMLSEnabledOnBackend) {
-    return false;
-  }
-
-  let isBackendRemovalKeyPresent = false;
-  try {
-    const backendRemovalKey = (await apiClient.api.client.getPublicKeys()).removal;
-    isBackendRemovalKeyPresent = !!backendRemovalKey;
-  } catch {}
-
-  return isBackendRemovalKeyPresent;
+  return apiClient.supportsMLS();
 };

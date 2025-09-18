@@ -17,42 +17,44 @@
  *
  */
 
-import React, {FC, useEffect, useLayoutEffect, useRef, useState} from 'react';
+import React, {FC, useCallback, useEffect, useLayoutEffect, useRef, useState} from 'react';
 
-import {CONVERSATION_EVENT} from '@wireapp/api-client/lib/event/';
-import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
 import cx from 'classnames';
 
+import {TabIndex} from '@wireapp/react-ui-kit';
+
 import {FadingScrollbar} from 'Components/FadingScrollbar';
-import {ConversationRepository} from 'src/script/conversation/ConversationRepository';
-import {MessageRepository} from 'src/script/conversation/MessageRepository';
-import {ContentMessage} from 'src/script/entity/message/ContentMessage';
-import {DecryptErrorMessage} from 'src/script/entity/message/DecryptErrorMessage';
-import {MemberMessage} from 'src/script/entity/message/MemberMessage';
-import {Message as MessageEntity} from 'src/script/entity/message/Message';
-import {SystemMessage} from 'src/script/entity/message/SystemMessage';
-import {User} from 'src/script/entity/User';
-import {ClientEvent} from 'src/script/event/Client';
+import {JumpToLastMessageButton} from 'Components/MessagesList/JumpToLastMessageButton';
+import {filterMessages} from 'Components/MessagesList/utils/messagesFilter';
+import {AssetRepository} from 'Repositories/assets/AssetRepository';
+import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
+import {MessageRepository} from 'Repositories/conversation/MessageRepository';
+import {Conversation} from 'Repositories/entity/Conversation';
+import {ContentMessage} from 'Repositories/entity/message/ContentMessage';
+import {DecryptErrorMessage} from 'Repositories/entity/message/DecryptErrorMessage';
+import {MemberMessage} from 'Repositories/entity/message/MemberMessage';
+import {Message as MessageEntity} from 'Repositories/entity/message/Message';
+import {User} from 'Repositories/entity/User';
+import {ServiceEntity} from 'Repositories/integration/ServiceEntity';
 import {useRoveFocus} from 'src/script/hooks/useRoveFocus';
-import {ServiceEntity} from 'src/script/integration/ServiceEntity';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
+import {isLastReceivedMessage} from 'Util/conversationMessages';
 import {onHitTopOrBottom} from 'Util/DOM/onHitTopOrBottom';
 import {useResizeObserver} from 'Util/DOM/resizeObserver';
 
 import {Message, MessageActions} from './Message';
-
-import {Conversation as ConversationEntity, Conversation} from '../../entity/Conversation';
-import {isMemberMessage, isContentMessage} from '../../guards/Message';
-import {StatusType} from '../../message/StatusType';
-
-type FocusedElement = {center?: boolean; element: Element};
+import {MarkerComponent} from './Message/Marker';
+import {ScrollToElement} from './Message/types';
+import {UploadAssets} from './UploadAssets';
+import {groupMessagesBySenderAndTime, isMarker} from './utils/messagesGroup';
+import {updateScroll, FocusedElement} from './utils/scrollUpdater';
 
 interface MessagesListParams {
+  assetRepository: AssetRepository;
   cancelConnectionRequest: (message: MemberMessage) => void;
   conversation: Conversation;
   conversationRepository: ConversationRepository;
   getVisibleCallback: (conversationEntity: Conversation, messageEntity: MessageEntity) => (() => void) | undefined;
-  initialMessage?: MessageEntity;
   invitePeople: (convesation: Conversation) => void;
   messageActions: {
     deleteMessage: (conversation: Conversation, message: MessageEntity) => void;
@@ -68,76 +70,15 @@ interface MessagesListParams {
   showMessageReactions: (message: MessageEntity, showReactions?: boolean) => void;
   showParticipants: (users: User[]) => void;
   showUserDetails: (user: User | ServiceEntity) => void;
-  isLastReceivedMessage: (messageEntity: MessageEntity, conversationEntity: ConversationEntity) => boolean;
   isMsgElementsFocusable: boolean;
   setMsgElementsFocusable: (isMsgElementsFocusable: boolean) => void;
+  isRightSidebarOpen?: boolean;
+  updateConversationLastRead: (conversation: Conversation) => void;
 }
 
-const filterDuplicatedSystemMessages = (messages: MessageEntity[]) => {
-  return messages.reduce<MessageEntity[]>((uniqMessages, currentMessage) => {
-    if (isMemberMessage(currentMessage)) {
-      const typesToFilter = [
-        CONVERSATION_EVENT.MEMBER_JOIN,
-        CONVERSATION_EVENT.MEMBER_LEAVE,
-        ClientEvent.CONVERSATION.GROUP_CREATION,
-      ] as string[];
-
-      const uniqMemberMessages = uniqMessages.filter(isMemberMessage);
-
-      if (!!uniqMemberMessages.length && typesToFilter.includes(currentMessage.type)) {
-        switch (currentMessage.type) {
-          case ClientEvent.CONVERSATION.GROUP_CREATION:
-            // Dont show duplicated group creation messages
-            if (uniqMemberMessages.some(m => m.type === currentMessage.type)) {
-              return uniqMessages;
-            }
-          case CONVERSATION_EVENT.MEMBER_JOIN:
-          case CONVERSATION_EVENT.MEMBER_LEAVE:
-            // Dont show duplicated member join/leave messages that follow each other
-            if (uniqMemberMessages?.[uniqMemberMessages.length - 1]?.htmlCaption() === currentMessage.htmlCaption()) {
-              return uniqMessages;
-            }
-        }
-      }
-    }
-
-    if (currentMessage.isSystem()) {
-      const systemMessagesToFilter = [CONVERSATION_EVENT.RENAME] as string[];
-      if (systemMessagesToFilter.includes(currentMessage.type)) {
-        const uniqUpdateMessages = uniqMessages.filter(
-          (message): message is SystemMessage => message.isSystem() && systemMessagesToFilter.includes(message.type),
-        );
-
-        if (uniqUpdateMessages.length > 0) {
-          const prevMessage = uniqUpdateMessages?.[uniqUpdateMessages.length - 1];
-          if (!prevMessage) {
-            return [...uniqMessages, currentMessage];
-          }
-
-          if (prevMessage.isConversationRename() && currentMessage.isConversationRename()) {
-            // for rename messages, only name changes are relevant, caption stays the same
-            if (prevMessage.name === currentMessage.name) {
-              return uniqMessages;
-            }
-            return [...uniqMessages, currentMessage];
-          }
-          // Dont show duplicated system messages that follow each other
-          if (prevMessage.caption === currentMessage.caption) {
-            return uniqMessages;
-          }
-        }
-      }
-    }
-
-    return [...uniqMessages, currentMessage];
-  }, []);
-};
-
-const filterHiddenMessages = (messages: MessageEntity[]) => messages.filter(message => message.visible());
-
-const MessagesList: FC<MessagesListParams> = ({
+export const MessagesList: FC<MessagesListParams> = ({
+  assetRepository,
   conversation,
-  initialMessage,
   selfUser,
   conversationRepository,
   messageRepository,
@@ -153,9 +94,10 @@ const MessagesList: FC<MessagesListParams> = ({
   invitePeople,
   messageActions,
   onLoading,
-  isLastReceivedMessage,
   isMsgElementsFocusable,
   setMsgElementsFocusable,
+  isRightSidebarOpen = false,
+  updateConversationLastRead,
 }) => {
   const {
     messages: allMessages,
@@ -164,7 +106,7 @@ const MessagesList: FC<MessagesListParams> = ({
     isGuestAndServicesRoom,
     isActiveParticipant,
     inTeam,
-    is_pending: isPending,
+    isLoadingMessages,
     hasAdditionalMessages,
   } = useKoSubscribableChildren(conversation, [
     'inTeam',
@@ -173,18 +115,21 @@ const MessagesList: FC<MessagesListParams> = ({
     'lastDeliveredMessage',
     'isGuestRoom',
     'isGuestAndServicesRoom',
-    'is_pending',
+    'isLoadingMessages',
     'hasAdditionalMessages',
   ]);
 
   const messageListRef = useRef<HTMLDivElement | null>(null);
   const [loaded, setLoaded] = useState(false);
-  const [focusedMessage, setFocusedMessage] = useState<string | undefined>(initialMessage?.id);
+  const [highlightedMessage, setHighlightedMessage] = useState<string | undefined>(conversation.initialMessage()?.id);
+  const conversationLastReadTimestamp = useRef(conversation.last_read_timestamp());
 
-  const filteredMessages = filterDuplicatedSystemMessages(filterHiddenMessages(allMessages));
+  const filteredMessages = filterMessages(allMessages);
   const filteredMessagesLength = filteredMessages.length;
 
-  const [messagesContainer, setMessageContainer] = useState<HTMLDivElement | null>(null);
+  const groupedMessages = groupMessagesBySenderAndTime(filteredMessages, conversationLastReadTimestamp.current);
+
+  const [messagesContainer, setMessagesContainer] = useState<HTMLDivElement | null>(null);
 
   const shouldShowInvitePeople = isActiveParticipant && inTeam && (isGuestRoom || isGuestAndServicesRoom);
 
@@ -207,50 +152,34 @@ const MessagesList: FC<MessagesListParams> = ({
   const scrollHeight = useRef(0);
   const nbMessages = useRef(0);
   const focusedElement = useRef<FocusedElement | null>(null);
-  const conversationLastReadTimestamp = useRef(conversation.last_read_timestamp());
 
-  const updateScroll = (container: Element | null) => {
-    const scrollingContainer = container?.parentElement;
-
+  const syncScrollPosition = useCallback(() => {
+    const scrollingContainer = messagesContainer?.parentElement;
     if (!scrollingContainer || !loaded) {
       return;
     }
 
-    const lastMessage = filteredMessages[filteredMessagesLength - 1];
-    const previousScrollHeight = scrollHeight.current;
-    const scrollBottomPosition = scrollingContainer.scrollTop + scrollingContainer.clientHeight;
-    const shouldStickToBottom = previousScrollHeight - scrollBottomPosition < 100;
+    const newScrollHeight = updateScroll(scrollingContainer, {
+      focusedElement: focusedElement.current,
+      prevScrollHeight: scrollHeight.current,
+      prevNbMessages: nbMessages.current,
+      messages: filteredMessages,
+      selfUserId: selfUser?.id,
+    });
 
-    if (focusedElement.current) {
-      // If we have an element we want to focus
-      const {element, center} = focusedElement.current;
-      const elementPosition = element.getBoundingClientRect();
-      const containerPosition = scrollingContainer.getBoundingClientRect();
-      const scrollBy = scrollingContainer.scrollTop + elementPosition.top - containerPosition.top;
-      scrollingContainer.scrollTo({top: scrollBy - (center ? scrollingContainer.offsetHeight / 2 : 0)});
-    } else if (scrollingContainer.scrollTop === 0 && scrollingContainer.scrollHeight > previousScrollHeight) {
-      // If we hit the top and new messages were loaded, we keep the scroll position stable
-      scrollingContainer.scrollTop = scrollingContainer.scrollHeight - previousScrollHeight;
-    } else if (shouldStickToBottom) {
-      // We only want to animate the scroll if there are new messages in the list
-      const behavior = nbMessages.current !== filteredMessagesLength ? 'smooth' : 'auto';
-      // Simple content update, we just scroll to bottom if we are in the stick to bottom threshold
-      scrollingContainer.scrollTo?.({behavior, top: scrollingContainer.scrollHeight});
-    } else if (lastMessage && lastMessage.status() === StatusType.SENDING && lastMessage.user().id === selfUser.id) {
-      // The self user just sent a message, we scroll straight to the bottom
-      scrollingContainer.scrollTo?.({behavior: 'smooth', top: scrollingContainer.scrollHeight});
-    }
-    scrollHeight.current = scrollingContainer.scrollHeight;
-    nbMessages.current = filteredMessagesLength;
-  };
+    nbMessages.current = filteredMessages.length;
+    scrollHeight.current = newScrollHeight;
+  }, [messagesContainer?.parentElement, loaded, filteredMessages, selfUser?.id]);
 
-  // Listen to resizes of the the container element (if it's resized it means something has changed in the message list)
-  useResizeObserver(() => updateScroll(messagesContainer), messagesContainer);
+  // Listen to resizes of the content element (if it's resized it means something has changed in the message list, link a link preview was generated)
+  useResizeObserver(syncScrollPosition, messagesContainer);
   // Also listen to the scrolling container resizes (when the window resizes or the inputBar changes)
-  useResizeObserver(() => updateScroll(messagesContainer), messagesContainer?.parentElement);
+  useResizeObserver(syncScrollPosition, messagesContainer?.parentElement);
+
+  useLayoutEffect(syncScrollPosition, [syncScrollPosition]);
 
   const loadPrecedingMessages = async (): Promise<void> => {
-    const shouldPullMessages = !isPending && hasAdditionalMessages;
+    const shouldPullMessages = !isLoadingMessages && hasAdditionalMessages;
 
     if (shouldPullMessages) {
       await conversationRepository.getPrecedingMessages(conversation);
@@ -263,31 +192,28 @@ const MessagesList: FC<MessagesListParams> = ({
     if (lastMessage) {
       if (!isLastReceivedMessage(lastMessage, conversation)) {
         // if the last loaded message is not the last of the conversation, we load the subsequent messages
-        if (isContentMessage(lastMessage)) {
-          conversationRepository.getSubsequentMessages(conversation, lastMessage);
-        }
+        conversationRepository.getSubsequentMessages(conversation, lastMessage);
       }
     }
   };
-
-  useLayoutEffect(() => {
-    if (messagesContainer) {
-      updateScroll(messagesContainer);
-    }
-  }, [messagesContainer, filteredMessagesLength]);
 
   useEffect(() => {
     onLoading(true);
     setLoaded(false);
     conversationLastReadTimestamp.current = conversation.last_read_timestamp();
-    loadConversation(conversation, initialMessage).then(() => {
+    loadConversation(conversation, conversation.initialMessage()).then(() => {
       setTimeout(() => {
         setLoaded(true);
         onLoading(false);
+        // if new conversation is loaded but there are unread messages, previous conversation
+        // last message visibility might not be cleaned as this conversation last message is not loaded yet
+        if (!conversation.hasLastReceivedMessageLoaded()) {
+          conversation.isLastMessageVisible(false);
+        }
       }, 10);
     });
     return () => conversation.release();
-  }, [conversation, initialMessage]);
+  }, [conversation]);
 
   useLayoutEffect(() => {
     if (loaded && messageListRef.current) {
@@ -295,87 +221,152 @@ const MessagesList: FC<MessagesListParams> = ({
     }
   }, [loaded]);
 
-  const defaultFocus = -1;
-  const isMsgListInfinite = false;
-  const {currentFocus, handleKeyDown, setCurrentFocus} = useRoveFocus(
-    filteredMessagesLength,
-    defaultFocus,
-    isMsgListInfinite,
-  );
+  const {focusedId, handleKeyDown, setFocusedId} = useRoveFocus(filteredMessages.map(message => message.id));
+
+  // when a new conversation is opened using keyboard(enter), focus on the last message
+  useEffect(() => {
+    if (loaded && history.state?.eventKey === 'Enter') {
+      const lastMessage = filteredMessages[filteredMessages.length - 1];
+      setFocusedId(lastMessage?.id);
+
+      // reset the eventKey to stop focusing on every new message user send/receive afterwards
+      // last message should be focused only when user enters a new conversation using keyboard(press enter)
+      history.state.eventKey = '';
+      window.history.replaceState(history.state, '', window.location.hash);
+    }
+  }, [loaded]);
 
   if (!loaded) {
     return null;
   }
+
+  const scrollToElement: ScrollToElement = ({element, center}, isUnread) => {
+    if (isUnread && messagesContainer) {
+      // if it's a new unread message, but we are not on the first render of the list,
+      // we do not need to scroll to the unread message
+      return;
+    }
+    focusedElement.current = {center, element};
+    setTimeout(() => (focusedElement.current = null), 1000);
+    syncScrollPosition();
+  };
+
+  const jumpToLastMessage = () => {
+    if (conversation) {
+      // clean up anything like search result
+      setHighlightedMessage(undefined);
+      conversation.initialMessage(undefined);
+      focusedElement.current = null;
+      // if there are unloaded messages, the conversation should be marked as read and reloaded
+      if (!conversation.hasLastReceivedMessageLoaded()) {
+        updateConversationLastRead(conversation);
+        conversation.release();
+        loadConversation(conversation);
+      } else {
+        // we just need to scroll down
+        messageListRef.current?.scrollTo?.({behavior: 'smooth', top: messageListRef.current.scrollHeight});
+      }
+    }
+  };
+
   return (
-    <FadingScrollbar ref={messageListRef} id="message-list" className="message-list" tabIndex={TabIndex.UNFOCUSABLE}>
-      <div ref={setMessageContainer} className={cx('messages', {'flex-center': verticallyCenterMessage()})}>
-        {filteredMessages.map((message, index) => {
-          const previousMessage = filteredMessages[index - 1];
-          const isLastDeliveredMessage = lastDeliveredMessage?.id === message.id;
+    <>
+      <FadingScrollbar
+        ref={messageListRef}
+        id="message-list"
+        className={cx('message-list', {'is-right-panel-open': isRightSidebarOpen})}
+        tabIndex={TabIndex.UNFOCUSABLE}
+      >
+        <div ref={setMessagesContainer} className={cx('messages', {'flex-center': verticallyCenterMessage()})}>
+          {groupedMessages.flatMap((group, groupIndex) => {
+            if (isMarker(group)) {
+              return (
+                <MarkerComponent key={`${group.type}-${group.timestamp}`} scrollTo={scrollToElement} marker={group} />
+              );
+            }
+            const {messages, firstMessageTimestamp} = group;
 
-          const visibleCallback = getVisibleCallback(conversation, message);
+            return messages.map((message, messageIndex) => {
+              const isLastDeliveredMessage = lastDeliveredMessage?.id === message.id;
+              const isLastLoadedMessage =
+                groupIndex === groupedMessages.length - 1 && messageIndex === messages.length - 1;
 
-          const key = `${message.id || 'message'}-${message.timestamp()}`;
+              const isLastMessage = isLastLoadedMessage && conversation.hasLastReceivedMessageLoaded();
 
-          return (
-            <Message
-              key={key}
-              onVisible={visibleCallback}
-              message={message}
-              previousMessage={previousMessage}
-              messageActions={messageActions}
-              conversation={conversation}
-              hasReadReceiptsTurnedOn={conversationRepository.expectReadReceipt(conversation)}
-              isLastDeliveredMessage={isLastDeliveredMessage}
-              isMarked={!!focusedMessage && focusedMessage === message.id}
-              scrollTo={({element, center}, isUnread) => {
-                if (isUnread && messagesContainer) {
-                  // if it's a new unread message, but we are not on the first render of the list,
-                  // we do not need to scroll to the unread message
-                  return;
+              const visibleCallback = () => {
+                getVisibleCallback(conversation, message)?.();
+                if (isLastMessage) {
+                  conversation.isLastMessageVisible(true);
                 }
-                focusedElement.current = {center, element};
-                setTimeout(() => (focusedElement.current = null), 1000);
-                updateScroll(messagesContainer);
-              }}
-              isSelfTemporaryGuest={selfUser.isTemporaryGuest()}
-              messageRepository={messageRepository}
-              lastReadTimestamp={conversationLastReadTimestamp.current}
-              onClickAvatar={showUserDetails}
-              onClickCancelRequest={cancelConnectionRequest}
-              onClickImage={showImageDetails}
-              onClickInvitePeople={() => invitePeople(conversation)}
-              onClickReactionDetails={message => showMessageReactions(message, true)}
-              onClickMessage={onClickMessage}
-              onClickParticipants={showParticipants}
-              onClickDetails={message => showMessageDetails(message)}
-              onClickResetSession={resetSession}
-              onClickTimestamp={async function (messageId: string) {
-                setFocusedMessage(messageId);
-                setTimeout(() => setFocusedMessage(undefined), 5000);
-                const messageIsLoaded = conversation.getMessage(messageId);
+              };
 
-                if (!messageIsLoaded) {
-                  const messageEntity = await messageRepository.getMessageInConversationById(conversation, messageId);
-                  conversation.removeMessages();
-                  conversationRepository.getMessagesWithOffset(conversation, messageEntity);
-                }
-              }}
-              selfId={selfUser.qualifiedId}
-              shouldShowInvitePeople={shouldShowInvitePeople}
-              totalMessage={filteredMessagesLength}
-              index={index}
-              isMessageFocused={currentFocus === index}
-              handleFocus={setCurrentFocus}
-              handleArrowKeyDown={handleKeyDown}
-              isMsgElementsFocusable={isMsgElementsFocusable}
-              setMsgElementsFocusable={setMsgElementsFocusable}
-            />
-          );
-        })}
-      </div>
-    </FadingScrollbar>
+              const lastMessageInvisibleCallback = isLastMessage
+                ? () => {
+                    conversation.isLastMessageVisible(false);
+                  }
+                : undefined;
+
+              const key = `${message.id || 'message'}-${message.timestamp()}`;
+
+              const isHighlighted = !!highlightedMessage && highlightedMessage === message.id;
+              const isFocused = !!focusedId && focusedId === message.id;
+
+              return (
+                <Message
+                  key={key}
+                  onVisible={visibleCallback}
+                  onVisibilityLost={lastMessageInvisibleCallback}
+                  message={message}
+                  hideHeader={message.timestamp() !== firstMessageTimestamp}
+                  messageActions={messageActions}
+                  conversation={conversation}
+                  hasReadReceiptsTurnedOn={conversationRepository.expectReadReceipt(conversation)}
+                  isLastDeliveredMessage={isLastDeliveredMessage}
+                  isHighlighted={isHighlighted}
+                  scrollTo={scrollToElement}
+                  isSelfTemporaryGuest={selfUser.isTemporaryGuest()}
+                  messageRepository={messageRepository}
+                  onClickAvatar={showUserDetails}
+                  onClickCancelRequest={cancelConnectionRequest}
+                  onClickImage={showImageDetails}
+                  onClickInvitePeople={() => invitePeople(conversation)}
+                  onClickReactionDetails={message => showMessageReactions(message, true)}
+                  onClickMessage={onClickMessage}
+                  onClickParticipants={showParticipants}
+                  onClickDetails={message => showMessageDetails(message)}
+                  onClickResetSession={resetSession}
+                  onClickTimestamp={async function (messageId: string) {
+                    setHighlightedMessage(messageId);
+                    setTimeout(() => setHighlightedMessage(undefined), 5000);
+                    const messageIsLoaded = conversation.getMessage(messageId);
+
+                    if (!messageIsLoaded) {
+                      setLoaded(false); // this will block automatic scroll triggers (like loading extra messages)
+                      const messageEntity = await messageRepository.getMessageInConversationById(
+                        conversation,
+                        messageId,
+                      );
+                      conversation.removeMessages();
+                      conversationRepository.getMessagesWithOffset(conversation, messageEntity);
+                      setLoaded(true); // unblock automatic scroll triggers
+                    }
+                  }}
+                  selfId={selfUser.qualifiedId}
+                  shouldShowInvitePeople={shouldShowInvitePeople}
+                  isFocused={isFocused}
+                  handleFocus={setFocusedId}
+                  handleArrowKeyDown={handleKeyDown}
+                  isMsgElementsFocusable={isMsgElementsFocusable}
+                  setMsgElementsFocusable={setMsgElementsFocusable}
+                />
+              );
+            });
+          })}
+
+          <UploadAssets assetRepository={assetRepository} conversationId={conversation.id} />
+        </div>
+        <JumpToLastMessageButton onGoToLastMessage={jumpToLastMessage} conversation={conversation} />
+      </FadingScrollbar>
+    </>
   );
 };
-
-export {MessagesList};

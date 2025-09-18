@@ -17,29 +17,23 @@
  *
  */
 
-import React, {useEffect, useState} from 'react';
+import {useEffect, useState} from 'react';
 
 import cx from 'classnames';
 
-import {Icon} from 'Components/Icon';
-import {Message} from 'src/script/entity/message/Message';
+import {ReadIcon} from 'Components/Icon';
+import {Message} from 'Repositories/entity/message/Message';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 import {formatTimeShort} from 'Util/TimeUtil';
 
 export interface ReadReceiptStatusProps {
   is1to1Conversation: boolean;
-  isLastDeliveredMessage: boolean;
   message: Message;
-  showOnHover?: boolean;
+  onClickDetails?: (message: Message) => void;
 }
 
-const ReadReceiptStatus: React.FC<ReadReceiptStatusProps> = ({
-  message,
-  is1to1Conversation,
-  isLastDeliveredMessage,
-  showOnHover = false,
-}) => {
+export const ReadReceiptStatus = ({message, is1to1Conversation, onClickDetails}: ReadReceiptStatusProps) => {
   const [readReceiptText, setReadReceiptText] = useState('');
   const {readReceipts} = useKoSubscribableChildren(message, ['readReceipts']);
 
@@ -50,34 +44,31 @@ const ReadReceiptStatus: React.FC<ReadReceiptStatusProps> = ({
     }
   }, [is1to1Conversation, readReceipts]);
 
-  const showDeliveredMessage = isLastDeliveredMessage && readReceiptText === '';
   const showEyeIndicator = !!readReceiptText;
 
+  if (!showEyeIndicator) {
+    return null;
+  }
+
   return (
-    <>
-      {showDeliveredMessage && (
-        <span className="message-status" data-uie-name="status-message-read-receipt-delivered">
-          {t('conversationMessageDelivered')}
-        </span>
+    <button
+      className={cx(
+        'message-status-read',
+        is1to1Conversation && 'message-status-read__one-on-one',
+        !!onClickDetails && 'message-status-read__clickable',
       )}
-      {showEyeIndicator && (
-        <div
-          className={cx(
-            'message-status-read',
-            is1to1Conversation && 'message-status-read__one-on-one',
-            showOnHover && 'message-status-read__show-on-hover',
-          )}
-          data-uie-name="status-message-read-receipts"
-          aria-label={t('accessibility.messageDetailsReadReceipts', readReceiptText)}
-        >
-          <Icon.Read />
-          <span className="message-status-read__count" data-uie-name="status-message-read-receipt-count">
-            {readReceiptText}
-          </span>
-        </div>
-      )}
-    </>
+      data-uie-name="status-message-read-receipts"
+      aria-label={t('accessibility.messageDetailsReadReceipts', {readReceiptText})}
+      {...(!is1to1Conversation && {
+        onClick: () => {
+          onClickDetails?.(message);
+        },
+      })}
+    >
+      <ReadIcon />
+      <span className="message-status-read__count" data-uie-name="status-message-read-receipt-count">
+        {readReceiptText}
+      </span>
+    </button>
   );
 };
-
-export {ReadReceiptStatus};

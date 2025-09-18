@@ -21,51 +21,48 @@ import React, {Fragment, useEffect} from 'react';
 
 import {container} from 'tsyringe';
 
-import {CALL_TYPE, STATE as CALL_STATE} from '@wireapp/avs';
-
 import {useCallAlertState} from 'Components/calling/useCallAlertState';
+import {Call} from 'Repositories/calling/Call';
+import {CallingRepository} from 'Repositories/calling/CallingRepository';
+import {CallingViewMode, CallState, DesktopScreenShareMenu, MuteState} from 'Repositories/calling/CallState';
+import {LEAVE_CALL_REASON} from 'Repositories/calling/enum/LeaveCallReason';
+import {Participant} from 'Repositories/calling/Participant';
+import {useVideoGrid} from 'Repositories/calling/videoGridHandler';
+import {MediaRepository} from 'Repositories/media/MediaRepository';
+import {PropertiesRepository} from 'Repositories/properties/PropertiesRepository';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 
-import {ChooseScreen, Screen} from './ChooseScreen';
+import {ChooseScreen} from './ChooseScreen';
 import {FullscreenVideoCall} from './FullscreenVideoCall';
 
-import {Call} from '../../calling/Call';
-import {CallingRepository} from '../../calling/CallingRepository';
-import {CallState, MuteState} from '../../calling/CallState';
-import {LEAVE_CALL_REASON} from '../../calling/enum/LeaveCallReason';
-import {Participant} from '../../calling/Participant';
-import {useVideoGrid} from '../../calling/videoGridHandler';
-import {ConversationState} from '../../conversation/ConversationState';
-import {ElectronDesktopCapturerSource} from '../../media/MediaDevicesHandler';
-import {MediaRepository} from '../../media/MediaRepository';
-import {Multitasking} from '../../notification/NotificationRepository';
 import {CallViewTab} from '../../view_model/CallingViewModel';
 
 export interface CallingContainerProps {
+  readonly propertiesRepository: PropertiesRepository;
   readonly callingRepository: CallingRepository;
   readonly mediaRepository: MediaRepository;
   readonly callState?: CallState;
-  readonly conversationState?: ConversationState;
-  readonly multitasking: Multitasking;
+  readonly toggleScreenshare: (call: Call, desktopScreenShareMenu: DesktopScreenShareMenu) => void;
 }
 
 const CallingContainer: React.FC<CallingContainerProps> = ({
-  multitasking,
+  propertiesRepository,
   mediaRepository,
   callingRepository,
   callState = container.resolve(CallState),
-  conversationState = container.resolve(ConversationState),
+  toggleScreenshare,
 }) => {
-  const {streamHandler: mediaStreamHandler, devicesHandler: mediaDevicesHandler} = mediaRepository;
-  const {isMinimized} = useKoSubscribableChildren(multitasking, ['isMinimized']);
-  const {activeCallViewTab, joinedCall, selectableScreens, selectableWindows, isChoosingScreen} =
+  const {devicesHandler: mediaDevicesHandler} = mediaRepository;
+  const {activeCallViewTab, joinedCall, hasAvailableScreensToShare, desktopScreenShareMenu, viewMode} =
     useKoSubscribableChildren(callState, [
       'activeCallViewTab',
       'joinedCall',
-      'selectableScreens',
-      'selectableWindows',
-      'isChoosingScreen',
+      'hasAvailableScreensToShare',
+      'desktopScreenShareMenu',
+      'viewMode',
     ]);
+
+  const isFullScreenOrDetached = [CallingViewMode.DETACHED_WINDOW, CallingViewMode.FULL_SCREEN].includes(viewMode);
 
   const {
     maximizedParticipant,
@@ -76,27 +73,20 @@ const CallingContainer: React.FC<CallingContainerProps> = ({
   const isMuted = muteState !== MuteState.NOT_MUTED;
 
   useEffect(() => {
-    if (currentCallState === CALL_STATE.MEDIA_ESTAB && joinedCall?.initialType === CALL_TYPE.VIDEO) {
-      multitasking.isMinimized(false);
-    }
     if (currentCallState === undefined) {
-      multitasking.isMinimized(true);
+      void callingRepository.setViewModeMinimized();
     }
   }, [currentCallState]);
 
   const videoGrid = useVideoGrid(joinedCall!);
-
-  const onCancelScreenSelection = () => {
-    callState.selectableScreens([]);
-    callState.selectableWindows([]);
-  };
 
   const changePage = (newPage: number, call: Call) => callingRepository.changeCallPage(call, newPage);
 
   const {clearShowAlert} = useCallAlertState();
 
   const leave = (call: Call) => {
-    callingRepository.leaveCall(call.conversationId, LEAVE_CALL_REASON.MANUAL_LEAVE_BY_UI_CLICK);
+    callingRepository.setViewModeMinimized();
+    callingRepository.leaveCall(call.conversation.qualifiedId, LEAVE_CALL_REASON.MANUAL_LEAVE_BY_UI_CLICK);
     callState.activeCallViewTab(CallViewTab.ALL);
     call.maximizedParticipant(null);
     clearShowAlert();
@@ -106,101 +96,86 @@ const CallingContainer: React.FC<CallingContainerProps> = ({
     call.maximizedParticipant(participant);
   };
 
-  const setActiveCallViewTab = (tab: string) => {
+  const setActiveCallViewTab = (tab: CallViewTab) => {
     callState.activeCallViewTab(tab);
     if (tab === CallViewTab.ALL && joinedCall) {
       callingRepository.requestCurrentPageVideoStreams(joinedCall);
     }
   };
 
-  const switchCameraInput = (call: Call, deviceId: string) => {
-    mediaDevicesHandler.currentDeviceId.videoInput(deviceId);
+  const switchCameraInput = (deviceId: string) => {
+    mediaDevicesHandler.currentDeviceId.videoinput(deviceId);
     callingRepository.refreshVideoInput();
   };
 
-  const switchMicrophoneInput = (call: Call, deviceId: string) => {
-    mediaDevicesHandler.currentDeviceId.audioInput(deviceId);
+  const switchMicrophoneInput = (deviceId: string) => {
+    mediaDevicesHandler.currentDeviceId.audioinput(deviceId);
     callingRepository.refreshAudioInput();
+  };
+
+  const sendEmoji = (emoji: string, call: Call) => {
+    void callingRepository.sendInCallEmoji(emoji, call);
+  };
+
+  const sendHandRaised = (isHandUp: boolean, call: Call) => {
+    void callingRepository.sendInCallHandRaised(isHandUp, call);
+  };
+
+  const switchSpeakerOutput = (deviceId: string) => {
+    mediaDevicesHandler.currentDeviceId.audiooutput(deviceId);
   };
 
   const toggleCamera = (call: Call) => callingRepository.toggleCamera(call);
 
   const toggleMute = (call: Call, muteState: boolean) => callingRepository.muteCall(call, muteState);
 
-  const toggleScreenshare = async (call: Call): Promise<void> => {
-    if (call.getSelfParticipant().sharesScreen()) {
-      return callingRepository.toggleScreenshare(call);
-    }
-    const showScreenSelection = (): Promise<void> => {
-      return new Promise(resolve => {
-        callingRepository.onChooseScreen = (deviceId: string): void => {
-          mediaDevicesHandler.currentDeviceId.screenInput(deviceId);
-          callState.selectableScreens([]);
-          callState.selectableWindows([]);
-          resolve();
-        };
-        mediaDevicesHandler.getScreenSources().then((sources: ElectronDesktopCapturerSource[]) => {
-          if (sources.length === 1) {
-            return callingRepository.onChooseScreen(sources[0].id);
-          }
-          callState.selectableScreens(sources.filter(source => source.id.startsWith('screen')));
-          callState.selectableWindows(sources.filter(source => source.id.startsWith('window')));
-        });
-      });
-    };
+  const conversation = joinedCall?.conversation;
 
-    mediaStreamHandler.selectScreenToShare(showScreenSelection).then(() => {
-      const isAudioCall = [CALL_TYPE.NORMAL, CALL_TYPE.FORCED_AUDIO].includes(call.initialType);
-      const isFullScreenVideoCall = call.initialType === CALL_TYPE.VIDEO && !multitasking.isMinimized();
-      if (isAudioCall || isFullScreenVideoCall) {
-        multitasking.isMinimized(true);
-      }
-      return callingRepository.toggleScreenshare(call);
-    });
-  };
-
-  const conversation = joinedCall && conversationState.findConversation(joinedCall.conversationId);
-
-  if (!joinedCall || !conversation || conversation.removed_from_conversation()) {
+  if (!joinedCall || !conversation || conversation.isSelfUserRemoved()) {
     return null;
   }
 
+  const toggleScreenShare = (call: Call) => {
+    toggleScreenshare(call, DesktopScreenShareMenu.DETACHED_WINDOW);
+  };
+
+  const isScreenshareActive =
+    hasAvailableScreensToShare && desktopScreenShareMenu === DesktopScreenShareMenu.DETACHED_WINDOW;
+
   return (
     <Fragment>
-      {!isMinimized && !!videoGrid?.grid.length && (
+      {isFullScreenOrDetached && !!videoGrid?.grid.length && (
         <FullscreenVideoCall
-          key={joinedCall.conversationId.id}
+          key={conversation.id}
           videoGrid={videoGrid}
           call={joinedCall}
           activeCallViewTab={activeCallViewTab}
           conversation={conversation}
-          multitasking={multitasking}
           canShareScreen={callingRepository.supportsScreenSharing}
           maximizedParticipant={maximizedParticipant}
+          propertiesRepository={propertiesRepository}
+          callingRepository={callingRepository}
           mediaDevicesHandler={mediaDevicesHandler}
           isMuted={isMuted}
           muteState={muteState}
-          isChoosingScreen={isChoosingScreen}
+          isChoosingScreen={isScreenshareActive}
+          sendEmoji={sendEmoji}
+          sendHandRaised={sendHandRaised}
           switchCameraInput={switchCameraInput}
           switchMicrophoneInput={switchMicrophoneInput}
+          switchSpeakerOutput={switchSpeakerOutput}
+          switchBlurredBackground={status => callingRepository.switchVideoBackgroundBlur(status)}
           setMaximizedParticipant={setMaximizedParticipant}
           setActiveCallViewTab={setActiveCallViewTab}
           toggleMute={toggleMute}
           toggleCamera={toggleCamera}
-          toggleScreenshare={toggleScreenshare}
+          toggleScreenshare={toggleScreenShare}
           leave={leave}
           changePage={changePage}
         />
       )}
 
-      {isChoosingScreen && (
-        <ChooseScreen
-          cancel={onCancelScreenSelection}
-          choose={callingRepository.onChooseScreen}
-          screens={selectableScreens as unknown as Screen[]}
-          windows={selectableWindows as unknown as Screen[]}
-        />
-      )}
+      {isScreenshareActive && <ChooseScreen choose={callingRepository.onChooseScreen} />}
     </Fragment>
   );
 };

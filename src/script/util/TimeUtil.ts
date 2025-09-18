@@ -194,8 +194,8 @@ export const formatDuration = (duration: number): DurationUnit => {
     const seconds = durationUnits().pop();
 
     return {
-      symbol: seconds.symbol,
-      text: `0 ${seconds.plural}`,
+      symbol: seconds?.symbol ?? 's',
+      text: `0 ${seconds?.plural}`,
       value: 0,
     };
   }
@@ -216,12 +216,12 @@ export const formatDurationCaption = (duration: number): string => {
   const mappedUnits = mapUnits(duration, false);
   const hours = mappedUnits.find(unit => unit.symbol === 'h');
   const minutes = mappedUnits.find(unit => unit.symbol === 'm');
-  const hasHours = hours.value > 0;
+  const hasHours = hours?.value ?? 0 > 0;
   const validUnitStrings = [];
   for (let index = 0; index < mappedUnits.length; index++) {
     const unit = mappedUnits[index];
     if (unit === hours && hasHours) {
-      validUnitStrings.push(`${zeroPadding(hours.value)}:${zeroPadding(minutes.value)}`);
+      validUnitStrings.push(`${zeroPadding(hours.value)}:${zeroPadding(minutes?.value ?? 0)}`);
       break;
     }
     if (unit.value > 0) {
@@ -285,7 +285,7 @@ export const formatTimestamp = (timestamp: number | string, longFormat: boolean 
 export const getCurrentDate = () => new Date().toISOString().substring(0, 10);
 export const getUnixTimestamp = () => Math.floor(Date.now() / TIME_IN_MILLIS.SECOND);
 export const isBeforeToday = (date: FnDate): boolean => isBefore(date, startOfToday());
-export const isYoungerThan2Minutes = (date: FnDate): boolean => differenceInMinutes(new Date(), date) < 2;
+export const isYoungerThanMinute = (date: FnDate): boolean => differenceInMinutes(new Date(), date) < 1;
 export const isYoungerThan1Hour = (date: FnDate) => differenceInHours(new Date(), date) < 1;
 export const isYoungerThan7Days = (date: FnDate) => differenceInDays(new Date(), date) < 7;
 
@@ -307,3 +307,66 @@ export const weeksPassedSinceDate = (date: Date): number => {
 
   return Math.max(1, Math.ceil(diffInWeeks));
 };
+
+export const formatDelayTime = (delayTimeInMS: number): string => {
+  if (delayTimeInMS >= TIME_IN_MILLIS.WEEK) {
+    const weeks = Math.floor(delayTimeInMS / TIME_IN_MILLIS.WEEK);
+    return `${weeks} ${t(`ephemeralUnitsWeek${weeks === 1 ? '' : 's'}`)}`;
+  } else if (delayTimeInMS >= TIME_IN_MILLIS.DAY) {
+    const days = Math.floor(delayTimeInMS / TIME_IN_MILLIS.DAY);
+    return `${days} ${t(`ephemeralUnitsDay${days === 1 ? '' : 's'}`)}`;
+  } else if (delayTimeInMS >= TIME_IN_MILLIS.HOUR) {
+    const hours = Math.floor(delayTimeInMS / TIME_IN_MILLIS.HOUR);
+    return `${hours} ${t(`ephemeralUnitsHour${hours === 1 ? '' : 's'}`)}`;
+  } else if (delayTimeInMS >= TIME_IN_MILLIS.MINUTE) {
+    const minutes = Math.floor(delayTimeInMS / TIME_IN_MILLIS.MINUTE);
+    return `${minutes} ${t(`ephemeralUnitsMinute${minutes === 1 ? '' : 's'}`)}`;
+  }
+
+  const seconds = Math.floor(delayTimeInMS / TIME_IN_MILLIS.SECOND);
+  return `${seconds} ${t(`ephemeralUnitsSecond${seconds === 1 ? '' : 's'}`)}`;
+};
+
+/**
+ * Format duration into a coarse, human-readable unit:
+ * - ≥ 1 day   → "X days"
+ * - ≥ 1 hour  → "X hours"
+ * - ≥ 1 min   → "X minutes"
+ * - < 1 min   → "1 minute"
+ *
+ * @param duration - Duration in milliseconds
+ * @returns Localized string of the coarsest applicable unit
+ */
+export const formatCoarseDuration = (duration: number): string => {
+  if (duration >= TIME_IN_MILLIS.DAY) {
+    const days = Math.floor(duration / TIME_IN_MILLIS.DAY);
+    return `${days} ${t(`ephemeralUnitsDay${days === 1 ? '' : 's'}`)}`;
+  }
+
+  if (duration >= TIME_IN_MILLIS.HOUR) {
+    const hours = Math.floor(duration / TIME_IN_MILLIS.HOUR);
+    return `${hours} ${t(`ephemeralUnitsHour${hours === 1 ? '' : 's'}`)}`;
+  }
+
+  if (duration >= TIME_IN_MILLIS.MINUTE) {
+    const minutes = Math.floor(duration / TIME_IN_MILLIS.MINUTE);
+    return `${minutes} ${t(`ephemeralUnitsMinute${minutes === 1 ? '' : 's'}`)}`;
+  }
+
+  return `1 ${t('ephemeralUnitsMinute')}`;
+};
+
+/**
+ * Returns the duration in milliseconds from the given date to the current time.
+ *
+ * @example
+ * ```ts
+ * const startedAt = "2025-06-01T00:00:00Z";
+ * const elapsed = durationFrom(startedAt); // e.g. 2592000000 (30 days in ms)
+ * formatDuration(elapsed);                // e.g. "1 month"
+ * ```
+ *
+ * @param date - The past date to compare (Date or timestamp).
+ * @returns Duration in milliseconds between now and the given date.
+ */
+export const durationFrom = (date: Date | number | string) => Date.now() - new Date(date).getTime();

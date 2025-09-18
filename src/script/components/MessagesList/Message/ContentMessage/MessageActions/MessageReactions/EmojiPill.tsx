@@ -17,17 +17,16 @@
  *
  */
 
-import {FC, useState} from 'react';
-
 import {Tooltip} from '@wireapp/react-ui-kit';
 
 import {useMessageFocusedTabIndex} from 'Components/MessagesList/Message/util';
+import {User} from 'Repositories/entity/User';
 import {getEmojiTitleFromEmojiUnicode} from 'Util/EmojiUtil';
 import {isTabKey} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
-import {getEmojiUrl} from 'Util/ReactionUtil';
+import {replaceReactComponents} from 'Util/LocalizerUtil/ReactLocalizerUtil';
 
-import {EmojiImg} from './EmojiImg';
+import {EmojiChar} from './EmojiChar';
 import {
   getReactionsButtonCSS,
   messageReactionButton,
@@ -36,12 +35,12 @@ import {
   messageReactionButtonTooltipText,
   messageReactionButtonTooltipTextLink,
   messageReactionCount,
+  userBoldStyle,
 } from './MessageReactions.styles';
 
 export interface EmojiPillProps {
   emoji: string;
   emojiUnicode: string;
-  emojiCount: number;
   handleReactionClick: (emoji: string) => void;
   isMessageFocused: boolean;
   onTooltipReactionCountClick: () => void;
@@ -50,12 +49,14 @@ export interface EmojiPillProps {
   index: number;
   emojiListCount: number;
   hasUserReacted: boolean;
+  reactingUsers: User[];
 }
 
-const EmojiPill: FC<EmojiPillProps> = ({
+const MAX_USER_NAMES_TO_SHOW = 2;
+
+export const EmojiPill = ({
   emoji,
   emojiUnicode,
-  emojiCount,
   handleReactionClick,
   isMessageFocused,
   onTooltipReactionCountClick,
@@ -64,47 +65,89 @@ const EmojiPill: FC<EmojiPillProps> = ({
   index,
   emojiListCount,
   hasUserReacted,
-}) => {
+  reactingUsers,
+}: EmojiPillProps) => {
   const messageFocusedTabIndex = useMessageFocusedTabIndex(isMessageFocused);
-  const [isOpen, setTooltipVisibility] = useState(false);
-  const emojiUrl = getEmojiUrl(emojiUnicode);
   const emojiName = getEmojiTitleFromEmojiUnicode(emojiUnicode);
   const isActive = hasUserReacted && !isRemovedFromConversation;
 
-  const showTooltip = () => {
-    setTooltipVisibility(true);
+  const emojiCount = reactingUsers.length;
+
+  const reactingUserNames = reactingUsers.slice(0, MAX_USER_NAMES_TO_SHOW).map(user => user.name());
+
+  const conversationReactionCaption = () => {
+    if (emojiCount > MAX_USER_NAMES_TO_SHOW) {
+      return t(
+        'conversationLikesCaptionPluralMoreThan2',
+        {
+          number: (emojiCount - MAX_USER_NAMES_TO_SHOW).toString(),
+          userNames: reactingUserNames.join(', '),
+        },
+        {},
+        true,
+      );
+    }
+
+    if (emojiCount === MAX_USER_NAMES_TO_SHOW) {
+      return t(
+        'conversationLikesCaptionPlural',
+        {
+          firstUser: reactingUserNames[0],
+          secondUser: reactingUserNames[1],
+        },
+        {},
+        true,
+      );
+    }
+
+    return t('conversationLikesCaptionSingular', {userName: reactingUserNames?.[0] || ''}, {}, true);
   };
 
-  const hideTooltip = () => {
-    setTooltipVisibility(false);
-  };
+  const caption = conversationReactionCaption();
+
+  const content = replaceReactComponents(caption, [
+    {
+      start: '<strong>',
+      end: '</strong>',
+      render: text => (
+        <strong key={text} css={userBoldStyle}>
+          {text}
+        </strong>
+      ),
+    },
+    {
+      start: '[showmore]',
+      end: '[/showmore]',
+      render: text => (
+        <button key={text} onClick={onTooltipReactionCountClick} css={messageReactionButtonTooltipTextLink}>
+          {text}
+        </button>
+      ),
+    },
+  ]);
+
   return (
-    <div onMouseEnter={showTooltip} onMouseLeave={hideTooltip} onFocus={showTooltip} onBlur={hideTooltip}>
+    !!emojiCount && (
       <Tooltip
         body={
           <div css={messageReactionButtonTooltip}>
-            <EmojiImg
-              emojiImgSize={{
-                width: '1.2rem',
-              }}
-              styles={messageReactionButtonTooltipImage}
-              emojiUrl={emojiUrl}
-              emojiName={emojiName}
-            />
+            <EmojiChar styles={messageReactionButtonTooltipImage} emoji={emoji} />
             <p css={messageReactionButtonTooltipText}>
-              {/* eslint-disable-next-line jsx-a11y/no-static-element-interactions, jsx-a11y/click-events-have-key-events */}
-              <span onClick={onTooltipReactionCountClick} css={messageReactionButtonTooltipTextLink}>
-                {t('conversationLikesCaption', {number: emojiCount.toString()})}
-              </span>{' '}
-              {t('conversationLikesCaptionReacted', {emojiName})}
+              {content}{' '}
+              {emojiCount > 1
+                ? t('conversationLikesCaptionReactedPlural', {emojiName})
+                : t('conversationLikesCaptionReactedSingular', {emojiName})}
             </p>
           </div>
         }
-        isOpen={isOpen}
       >
         <button
           css={{...messageReactionButton, ...getReactionsButtonCSS(isActive, isRemovedFromConversation)}}
-          aria-label={t('messageReactionDetails', {emojiCount: emojiCount.toString(), emojiName})}
+          aria-label={
+            emojiCount > 1
+              ? t('accessibility.messageReactionDetailsPlural', {emojiCount: emojiCount.toString(), emojiName})
+              : t('accessibility.messageReactionDetailsSingular', {emojiCount: emojiCount.toString(), emojiName})
+          }
           title={emojiName}
           aria-pressed={isActive}
           type="button"
@@ -123,18 +166,10 @@ const EmojiPill: FC<EmojiPillProps> = ({
             }
           }}
         >
-          <EmojiImg
-            emojiUrl={emojiUrl}
-            emojiName={emojiName}
-            emojiImgSize={{
-              width: 'var(--font-size-medium)',
-            }}
-          />
+          <EmojiChar emoji={emoji} />
           <span css={messageReactionCount(isActive)}>{emojiCount}</span>
         </button>
       </Tooltip>
-    </div>
+    )
   );
 };
-
-export {EmojiPill};

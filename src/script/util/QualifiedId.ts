@@ -17,7 +17,7 @@
  *
  */
 
-export interface QualifiedEntity {
+interface QualifiedEntity {
   [index: string]: any;
   domain: string | null;
   id: string;
@@ -31,7 +31,11 @@ export interface QualifiedEntity {
  * @param entity2 - The second entity to compare
  * @return boolean - do the entities match
  */
-export function matchQualifiedIds(entity1: QualifiedEntity, entity2: QualifiedEntity) {
+export function matchQualifiedIds(entity1?: QualifiedEntity, entity2?: QualifiedEntity) {
+  if (!entity1 || !entity2) {
+    return false;
+  }
+
   const idsMatch = entity1.id === entity2.id;
   const domainsMatch = !entity1.domain || !entity2.domain || entity1.domain === entity2.domain;
   return idsMatch && domainsMatch;

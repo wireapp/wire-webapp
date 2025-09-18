@@ -19,19 +19,19 @@
 
 import React, {useEffect, useMemo, useRef, useState} from 'react';
 
+import {useDebouncedCallback} from 'use-debounce';
+
 import {CloseIcon, Input, InputSubmitCombo, SearchIcon} from '@wireapp/react-ui-kit';
 
+import {ContentMessage} from 'Repositories/entity/message/ContentMessage';
+import type {Message} from 'Repositories/entity/message/Message';
+import {getSearchRegex} from 'Repositories/search/FullTextSearch';
 import {t} from 'Util/LocalizerUtil';
 import {isScrolledBottom} from 'Util/scroll-helpers';
 import {useEffectRef} from 'Util/useEffectRef';
 import {noop} from 'Util/util';
 
 import {FullSearchItem} from './fullSearch/FullSearchItem';
-
-import {ContentMessage} from '../../../../entity/message/ContentMessage';
-import type {Message} from '../../../../entity/message/Message';
-import {useDebounce} from '../../../../hooks/useDebounce';
-import {getSearchRegex} from '../../../../search/FullTextSearch';
 
 const MAX_VISIBLE_MESSAGES = 30;
 const PRE_MARKED_OFFSET = 20;
@@ -53,26 +53,26 @@ const FullSearch: React.FC<FullSearchProps> = ({searchProvider, click = noop, ch
   const [hasNoResults, setHasNoResults] = useState(false);
   const [element, setElement] = useEffectRef<HTMLDivElement>();
 
-  useDebounce(
-    async () => {
-      const trimmedInput = searchValue.trim();
-      change(trimmedInput);
-      if (trimmedInput.length < 2) {
-        setMessages([]);
-        setMessageCount(0);
-        setHasNoResults(false);
-        return;
-      }
-      const {messageEntities, query} = await searchProvider(trimmedInput);
-      if (query === trimmedInput) {
-        setHasNoResults(messageEntities.length === 0);
-        setMessages(messageEntities as ContentMessage[]);
-        setMessageCount(MAX_VISIBLE_MESSAGES);
-      }
-    },
-    DEBOUNCE_TIME,
-    [searchValue],
-  );
+  const debouncedSearch = useDebouncedCallback(async () => {
+    const trimmedInput = searchValue.trim();
+    change(trimmedInput);
+    if (trimmedInput.length < 2) {
+      setMessages([]);
+      setMessageCount(0);
+      setHasNoResults(false);
+      return;
+    }
+    const {messageEntities, query} = await searchProvider(trimmedInput);
+    if (query === trimmedInput) {
+      setHasNoResults(messageEntities.length === 0);
+      setMessages(messageEntities as ContentMessage[]);
+      setMessageCount(MAX_VISIBLE_MESSAGES);
+    }
+  }, DEBOUNCE_TIME);
+
+  useEffect(() => {
+    debouncedSearch();
+  }, [searchValue]);
 
   useEffect(() => {
     const parent = element?.closest('.collection-list') as HTMLDivElement;

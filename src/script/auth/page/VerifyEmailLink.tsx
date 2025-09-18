@@ -19,15 +19,15 @@
 
 import React, {useEffect} from 'react';
 
-import {useIntl} from 'react-intl';
 import {connect} from 'react-redux';
 import {useNavigate} from 'react-router-dom';
 
 import {ContainerXS, H1, H3, Muted} from '@wireapp/react-ui-kit';
 
+import {t} from 'Util/LocalizerUtil';
+
 import {Page} from './Page';
 
-import {setEmailStrings} from '../../strings';
 import {RouterLink} from '../component/RouterLink';
 import {RootState} from '../module/reducer';
 import * as SelfSelector from '../module/selector/SelfSelector';
@@ -36,7 +36,6 @@ import {ROUTE} from '../route';
 type Props = React.HTMLProps<HTMLDivElement>;
 
 const VerifyEmailLinkComponent = ({hasSelfEmail}: Props & ConnectedProps) => {
-  const {formatMessage: _} = useIntl();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -57,16 +56,16 @@ const VerifyEmailLinkComponent = ({hasSelfEmail}: Props & ConnectedProps) => {
       >
         <div>
           <H1 center data-uie-name="verify-email-headline">
-            {_(setEmailStrings.verifyHeadline)}
+            {t('authPostedResendHeadline')}
           </H1>
           <H3 center block data-uie-name="verify-email-subhead">
-            {_(setEmailStrings.verifySubhead)}
+            {t('authPostedResendDetail')}
           </H3>
           <Muted center block style={{marginTop: 64}} data-uie-name="verify-email-no-mail">
-            {_(setEmailStrings.noMailHeadline)}
+            {t('authPostedResendAction')}
           </Muted>
           <RouterLink to={ROUTE.SET_EMAIL} data-uie-name="go-set-email">
-            {_(setEmailStrings.tryAgain)}
+            {t('setEmail.tryAgain')}
           </RouterLink>
         </div>
       </ContainerXS>

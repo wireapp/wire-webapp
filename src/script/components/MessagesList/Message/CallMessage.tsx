@@ -19,12 +19,11 @@
 
 import React from 'react';
 
-import {Icon} from 'Components/Icon';
+import * as Icon from 'Components/Icon';
+import {CallMessage as CallMessageEntity} from 'Repositories/entity/message/CallMessage';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 
 import {MessageTime} from './MessageTime';
-
-import {CallMessage as CallMessageEntity} from '../../../entity/message/CallMessage';
 
 export interface CallMessageProps {
   message: CallMessageEntity;
@@ -44,11 +43,11 @@ const CallMessage: React.FC<CallMessageProps> = ({message}) => {
       <div className="message-header-icon message-header-icon--svg">
         {isCompleted ? (
           <div className="svg-green">
-            <Icon.Pickup />
+            <Icon.PickupIcon />
           </div>
         ) : (
           <div className="svg-red">
-            <Icon.Hangup />
+            <Icon.HangupIcon />
           </div>
         )}
       </div>

@@ -21,13 +21,12 @@ import React from 'react';
 
 import {REASON} from '@wireapp/avs';
 
-import {Icon} from 'Components/Icon';
+import * as Icon from 'Components/Icon';
+import {CallingTimeoutMessage} from 'Repositories/entity/message/CallingTimeoutMessage';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 
 import {MessageTime} from './MessageTime';
-
-import {CallingTimeoutMessage} from '../../../entity/message/CallingTimeoutMessage';
 
 export interface CallTimeoutMessageProps {
   message: CallingTimeoutMessage;
@@ -42,7 +41,7 @@ const CallTimeoutMessage: React.FC<CallTimeoutMessageProps> = ({message}) => {
     <div className="message-header">
       <div className="message-header-icon message-header-icon--svg">
         <div className="svg-red">
-          <Icon.Hangup />
+          <Icon.HangupIcon />
         </div>
       </div>
       <div

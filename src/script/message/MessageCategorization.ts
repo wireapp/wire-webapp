@@ -19,10 +19,10 @@
 
 import {isObject} from 'underscore';
 
-import {MessageCategory} from './MessageCategory';
+import {ClientEvent} from 'Repositories/event/Client';
+import {EventRecord} from 'Repositories/storage/record/EventRecord';
 
-import {ClientEvent} from '../event/Client';
-import {EventRecord} from '../storage/record/EventRecord';
+import {MessageCategory} from './MessageCategory';
 
 const _checkAsset = (event: any): MessageCategory | void => {
   const {data: eventData, type: eventType} = event;
@@ -67,7 +67,8 @@ const _checkComposite = (event: any): MessageCategory | void => {
 const _checkText = (event: any): MessageCategory | void => {
   const {data: eventData, type: eventType} = event;
 
-  const isMessageAdd = eventType === ClientEvent.CONVERSATION.MESSAGE_ADD;
+  const isMessageAdd =
+    eventType === ClientEvent.CONVERSATION.MESSAGE_ADD || eventType === ClientEvent.CONVERSATION.MULTIPART_MESSAGE_ADD;
   if (isMessageAdd) {
     let category = MessageCategory.TEXT;
 

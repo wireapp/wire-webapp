@@ -27,3 +27,36 @@ export enum RatchetTreeType {
   Delta = 2,
   ByRef = 3,
 }
+export enum Ciphersuite {
+  MLS_128_DHKEMX25519_AES128GCM_SHA256_Ed25519 = 1,
+  MLS_128_DHKEMP256_AES128GCM_SHA256_P256 = 2,
+  MLS_128_DHKEMX25519_CHACHA20POLY1305_SHA256_Ed25519 = 3,
+  MLS_256_DHKEMX448_AES256GCM_SHA512_Ed448 = 4,
+  MLS_256_DHKEMP521_AES256GCM_SHA512_P521 = 5,
+  MLS_256_DHKEMX448_CHACHA20POLY1305_SHA512_Ed448 = 6,
+  MLS_256_DHKEMP384_AES256GCM_SHA384_P384 = 7,
+  MLS_128_X25519KYBER768DRAFT00_AES128GCM_SHA256_Ed25519 = 61489,
+}
+export enum CredentialType {
+  Basic = 1,
+  X509 = 2,
+}
+export enum DeviceStatus {
+  Valid = 1,
+  Expired = 2,
+  Revoked = 3,
+}
+export enum E2eiConversationState {
+  /**
+   * All clients have a valid E2EI certificate
+   */
+  Verified = 1,
+  /**
+   * Some clients are either still Basic or their certificate is expired
+   */
+  Degraded = 2,
+  /**
+   * All clients are still Basic. If all client have expired certificates, Degraded is returned.
+   */
+  NotEnabled = 3,
+}

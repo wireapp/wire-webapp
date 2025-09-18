@@ -17,8 +17,8 @@
  *
  */
 
-import {Icon} from 'Components/Icon';
-import {Participant} from 'src/script/calling/Participant';
+import * as Icon from 'Components/Icon';
+import {Participant} from 'Repositories/calling/Participant';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 
 import {
@@ -49,13 +49,13 @@ export const CallParticipantStatusIcons = ({callParticipant}: CallParticipantSta
 
   return (
     <div css={callStatusIcons(activeIconsCount + DEFAULT_VISIBLE_ICONS)}>
-      {sharesScreen && <Icon.Screenshare css={screenShareIcon} data-uie-name="status-screenshare" />}
+      {sharesScreen && <Icon.ScreenshareIcon css={screenShareIcon} data-uie-name="status-screenshare" />}
 
-      {sharesCamera && <Icon.Camera css={cameraIcon} data-uie-name="status-video" />}
+      {sharesCamera && <Icon.CameraIcon css={cameraIcon} data-uie-name="status-video" />}
 
       {isMuted ? (
         <span css={micOffWrapper}>
-          <Icon.MicOff css={micOffIcon} data-uie-name="status-audio-off" />
+          <Icon.MicOffIcon css={micOffIcon} data-uie-name="status-audio-off" />
         </span>
       ) : (
         <ParticipantMicOnIcon

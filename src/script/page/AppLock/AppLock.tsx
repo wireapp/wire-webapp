@@ -27,15 +27,14 @@ import {container} from 'tsyringe';
 import {ValidationUtil} from '@wireapp/commons';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
-import {Icon} from 'Components/Icon';
-import {ModalComponent} from 'Components/ModalComponent';
-import {PrimaryModal} from 'Components/Modals/PrimaryModal';
+import * as Icon from 'Components/Icon';
+import {ModalComponent} from 'Components/Modals/ModalComponent';
+import {ClientRepository} from 'Repositories/client';
+import {ClientState} from 'Repositories/client/ClientState';
+import {AppLockRepository} from 'Repositories/user/AppLockRepository';
+import {AppLockState} from 'Repositories/user/AppLockState';
 import {SIGN_OUT_REASON} from 'src/script/auth/SignOutReason';
-import {ClientRepository} from 'src/script/client';
-import {ClientState} from 'src/script/client/ClientState';
 import {Config} from 'src/script/Config';
-import {AppLockRepository} from 'src/script/user/AppLockRepository';
-import {AppLockState} from 'src/script/user/AppLockState';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 
@@ -85,6 +84,8 @@ const AppLock: React.FC<AppLockProps> = ({
     'isAppLockEnforced',
   ]);
 
+  // We log the user out if there is a style change on the app element
+  // i.e. if there is an attempt to remove the blur effect
   const {current: appObserver} = useRef(
     new MutationObserver(mutationRecords => {
       const [{attributeName}] = mutationRecords;
@@ -94,6 +95,7 @@ const AppLock: React.FC<AppLockProps> = ({
     }),
   );
 
+  // We log the user out if the modal is removed from the DOM
   const {current: modalObserver} = useRef(
     new MutationObserver(() => {
       const modalInDOM = document.querySelector('[data-uie-name="applock-modal"]');
@@ -136,13 +138,6 @@ const AppLock: React.FC<AppLockProps> = ({
       showAppLock();
     } else if (appLockState.hasPassphrase()) {
       appLockRepository.removeCode();
-      PrimaryModal.show(PrimaryModal.type.ACKNOWLEDGE, {
-        text: {
-          closeBtnLabel: t('teamSettingsModalCloseBtn'),
-          htmlMessage: t('featureConfigChangeModalApplock'),
-          title: t('featureConfigChangeModalApplockHeadline'),
-        },
-      });
     }
   }, [isAppLockEnabled]);
 
@@ -164,11 +159,16 @@ const AppLock: React.FC<AppLockProps> = ({
     app?.style.setProperty('pointer-events', isVisible ? 'none' : 'auto', 'important');
 
     if (isVisible) {
-      modalObserver.observe(document.querySelector('#wire-main'), {
-        childList: true,
-        subtree: true,
-      });
-      appObserver.observe(document.querySelector('#app'), {attributes: true});
+      const wireMain = document.querySelector('#wire-main');
+      if (wireMain) {
+        modalObserver.observe(wireMain, {
+          childList: true,
+        });
+      }
+      const appElement = document.querySelector('#app');
+      if (appElement) {
+        appObserver.observe(appElement, {attributes: true});
+      }
     }
     return () => {
       modalObserver.disconnect();
@@ -211,7 +211,7 @@ const AppLock: React.FC<AppLockProps> = ({
     const target = event.target as HTMLFormElement & {password: HTMLInputElement};
     try {
       setIsLoading(true);
-      const currentClientId = clientState.currentClient().id;
+      const currentClientId = clientState.currentClient.id;
       await clientRepository.clientService.deleteClient(currentClientId, target.password.value);
       appLockRepository.removeCode();
       amplify.publish(WebAppEvents.LIFECYCLE.SIGN_OUT, SIGN_OUT_REASON.USER_REQUESTED, true);
@@ -254,17 +254,17 @@ const AppLock: React.FC<AppLockProps> = ({
   const headerText = () => {
     switch (state) {
       case APPLOCK_STATE.SETUP_CHANGE:
-        return t('modalAppLockSetupChangeTitle', Config.getConfig().BRAND_NAME);
+        return t('modalAppLockSetupChangeTitle', {brandName: Config.getConfig().BRAND_NAME});
       case APPLOCK_STATE.SETUP:
         return t('modalAppLockSetupTitle');
       case APPLOCK_STATE.LOCKED:
-        return t('modalAppLockLockedTitle', Config.getConfig().BRAND_NAME);
+        return t('modalAppLockLockedTitle', {brandName: Config.getConfig().BRAND_NAME});
       case APPLOCK_STATE.FORGOT:
         return t('modalAppLockForgotTitle');
       case APPLOCK_STATE.WIPE_CONFIRM:
         return t('modalAppLockWipeConfirmTitle');
       case APPLOCK_STATE.WIPE_PASSWORD:
-        return t('modalAppLockWipePasswordTitle', Config.getConfig().BRAND_NAME);
+        return t('modalAppLockWipePasswordTitle', {brandName: Config.getConfig().BRAND_NAME});
       default:
         return '';
     }
@@ -282,7 +282,7 @@ const AppLock: React.FC<AppLockProps> = ({
             aria-label={t('modalAppLockSetupCloseBtn')}
           >
             <span className="modal__header__icon" aria-hidden="true">
-              <Icon.Close />
+              <Icon.CloseIcon />
             </span>
           </button>
         )}
@@ -297,7 +297,7 @@ const AppLock: React.FC<AppLockProps> = ({
           <form onSubmit={onSetCode}>
             <p
               className="modal__text"
-              dangerouslySetInnerHTML={{__html: t('modalAppLockSetupMessage', {}, {br: '<br><br>'})}}
+              dangerouslySetInnerHTML={{__html: t('modalAppLockSetupMessage', undefined, {br: '<br><br>'})}}
               data-uie-name="label-applock-set-text"
             />
 
@@ -408,7 +408,7 @@ const AppLock: React.FC<AppLockProps> = ({
             </div>
 
             <input
-              aria-label={t('modalAppLockSetupChangeTitle')}
+              aria-label={t('modalAppLockSetupChangeTitle', {brandName: Config.getConfig().BRAND_NAME})}
               autoFocus
               className="modal__input"
               type="password"
@@ -461,7 +461,7 @@ const AppLock: React.FC<AppLockProps> = ({
             </div>
 
             <input
-              aria-label={t('modalAppLockLockedTitle')}
+              aria-label={t('modalAppLockLockedTitle', {brandName: Config.getConfig().BRAND_NAME})}
               autoFocus
               className="modal__input"
               type="password"
@@ -549,7 +549,7 @@ const AppLock: React.FC<AppLockProps> = ({
         {state === APPLOCK_STATE.WIPE_PASSWORD && (
           <form onSubmit={onWipeDatabase}>
             <input
-              aria-label={t('modalAppLockWipePasswordTitle')}
+              aria-label={t('modalAppLockWipePasswordTitle', {brandName: Config.getConfig().BRAND_NAME})}
               autoFocus
               className="modal__input"
               type="password"

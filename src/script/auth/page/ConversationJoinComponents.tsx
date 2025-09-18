@@ -17,9 +17,7 @@
  *
  */
 
-import React from 'react';
-
-import {useIntl} from 'react-intl';
+import React, {useState} from 'react';
 
 import {
   useMatchMedia,
@@ -35,11 +33,13 @@ import {
   Muted,
   Form,
   Input,
-  InputBlock,
   Loading,
+  Checkbox,
 } from '@wireapp/react-ui-kit';
 
-import {conversationJoinStrings} from '../../strings';
+import {Config} from 'src/script/Config';
+import {t} from 'Util/LocalizerUtil';
+
 import {parseValidationErrors, parseError} from '../util/errorUtil';
 
 interface IsLoggedInColumnProps {
@@ -49,14 +49,13 @@ interface IsLoggedInColumnProps {
 }
 
 interface GuestLoginColumnProps {
-  handleSubmit: () => void;
   enteredName: string;
   onNameChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   checkNameValidity: (event: React.FormEvent) => Promise<void>;
   isValidName: boolean;
   isSubmitingName: boolean;
   nameInput: React.RefObject<HTMLInputElement>;
-  conversationError: Error & {label?: string | undefined};
+  conversationError: (Error & {label?: string | undefined}) | null;
   error: any;
 }
 
@@ -89,7 +88,6 @@ const Separator = () => {
 };
 
 const IsLoggedInColumn = ({handleLogout, handleSubmit, selfName}: IsLoggedInColumnProps) => {
-  const {formatMessage: _} = useIntl();
   return (
     <Container centerText verticalCenter style={{width: '100%', display: 'flex'}}>
       <Columns style={{justifyContent: 'center'}}>
@@ -104,20 +102,18 @@ const IsLoggedInColumn = ({handleLogout, handleSubmit, selfName}: IsLoggedInColu
             }}
           >
             <>
-              <H2 center>{_(conversationJoinStrings.existentAccountJoinInBrowser)}</H2>
-              <Muted style={{marginBottom: '1rem'}}>
-                {_(conversationJoinStrings.existentAccountUserName, {selfName})}
-              </Muted>
+              <H2 center>{t('conversationJoin.existentAccountJoinInBrowser')}</H2>
+              <Muted style={{marginBottom: '1rem'}}>{t('conversationJoin.existentAccountUserName', {selfName})}</Muted>
 
               <Button
                 block
                 type="submit"
                 formNoValidate
                 onClick={() => handleSubmit()}
-                aria-label={_(conversationJoinStrings.join)}
+                aria-label={t('conversationJoin.join')}
                 data-uie-name="do-join-as-member"
               >
-                {_(conversationJoinStrings.join)}
+                {t('conversationJoin.join')}
               </Button>
               <Link
                 variant={LinkVariant.PRIMARY}
@@ -127,7 +123,7 @@ const IsLoggedInColumn = ({handleLogout, handleSubmit, selfName}: IsLoggedInColu
                 style={{fontSize: '1rem'}}
                 data-uie-name="go-logout"
               >
-                {_(conversationJoinStrings.joinWithOtherAccount)}
+                {t('conversationJoin.joinWithOtherAccount')}
               </Link>
             </>
           </ContainerXS>
@@ -147,7 +143,7 @@ const GuestLoginColumn = ({
   conversationError,
   error,
 }: GuestLoginColumnProps) => {
-  const {formatMessage: _} = useIntl();
+  const [isTermOfUseAccepted, setIsTermOfUseAccepted] = useState(false);
 
   return (
     <Container centerText verticalCenter style={{width: '100%'}}>
@@ -162,25 +158,58 @@ const GuestLoginColumn = ({
             }}
           >
             <>
-              <H2 center>{_(conversationJoinStrings.noAccountHead)}</H2>
-              <Muted>{_(conversationJoinStrings.subhead)}</Muted>
+              <H2 center>{t('conversationJoin.noAccountHead')}</H2>
+              <Muted>{t('conversationJoin.subhead')}</Muted>
               <Form style={{marginTop: 30}}>
-                <InputBlock>
-                  <Input
-                    id="enter-name"
-                    name="name"
-                    autoComplete="username"
-                    value={enteredName}
-                    ref={nameInput}
-                    onChange={onNameChange}
-                    placeholder={_(conversationJoinStrings.namePlaceholder)}
-                    maxLength={64}
-                    minLength={2}
-                    pattern=".{2,64}"
-                    required
-                    data-uie-name="enter-name"
-                  />
-                </InputBlock>
+                <Input
+                  id="enter-name"
+                  name="name"
+                  autoComplete="username"
+                  value={enteredName}
+                  ref={nameInput}
+                  onChange={onNameChange}
+                  placeholder={t('conversationJoin.namePlaceholder')}
+                  maxLength={64}
+                  minLength={2}
+                  pattern=".{2,64}"
+                  required
+                  data-uie-name="enter-name"
+                  wrapperCSS={{marginBottom: 0}}
+                />
+
+                <Checkbox
+                  checked={isTermOfUseAccepted}
+                  onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                    setIsTermOfUseAccepted(event.target.checked);
+                  }}
+                  id="do-accept-terms"
+                  data-uie-name="do-accept-terms"
+                  wrapperCSS={{
+                    margin: '1rem 0',
+                  }}
+                >
+                  <span className="subline">
+                    {t('conversationJoin.termsAcceptanceText')}{' '}
+                    <Link
+                      href={Config.getConfig().URL.TERMS_OF_USE_TEAMS}
+                      css={{
+                        textTransform: 'none',
+                        fontSize: 'var(--font-size-base)',
+                        fontWeight: 'var(--font-weight-regular)',
+                      }}
+                      targetBlank
+                    >
+                      <span
+                        css={{
+                          color: 'var(--accent-color)',
+                        }}
+                      >
+                        {t('conversationJoin.termsLink', {brandName: Config.getConfig().BRAND_NAME})}
+                      </span>
+                    </Link>
+                    .
+                  </span>
+                </Checkbox>
                 {error ? parseValidationErrors(error) : parseError(conversationError)}
                 {isSubmitingName ? (
                   <Loading size={32} />
@@ -188,13 +217,13 @@ const GuestLoginColumn = ({
                   <Button
                     block
                     type="submit"
-                    disabled={!enteredName || !isValidName || isSubmitingName}
+                    disabled={!enteredName || !isValidName || isSubmitingName || !isTermOfUseAccepted}
                     formNoValidate
                     onClick={checkNameValidity}
-                    aria-label={_(conversationJoinStrings.joinButton)}
+                    aria-label={t('conversationJoin.joinButton')}
                     data-uie-name="do-join-as-guest"
                   >
-                    {_(conversationJoinStrings.joinButton)}
+                    {t('conversationJoin.joinButton')}
                   </Button>
                 )}
               </Form>

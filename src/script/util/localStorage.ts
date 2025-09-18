@@ -34,3 +34,17 @@ export function getStorage(): Storage | undefined {
     return undefined;
   }
 }
+
+/**
+ * Clears all keys starting with the given prefix from the given storage
+ * Supports storages with the web storage API (localStorage, sessionStorage)
+ * @param prefix string
+ * @param storage Storage
+ */
+export function clearKeysStartingWith(prefix: string, storage: Storage): void {
+  Object.keys(storage)
+    .filter(item => item.startsWith(prefix))
+    .forEach(item => {
+      storage.removeItem(item);
+    });
+}

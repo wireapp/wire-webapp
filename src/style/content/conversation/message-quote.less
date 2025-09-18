@@ -1,12 +1,9 @@
 .message-quote {
   position: relative;
-  max-width: calc(
-    @conversation-max-width - var(--conversation-message-timestamp-width) - @conversation-message-sender-width - 16px
-  );
-  padding-right: var(--conversation-message-timestamp-width);
-  padding-left: @conversation-message-sender-width + 16;
+  max-width: calc(var(--conversation-max-width) - var(--conversation-message-sender-width) - 16px);
+  padding-left: 16px;
   margin-bottom: 10px;
-  font-size: @font-size-medium;
+  font-size: var(--font-size-medium);
   line-height: 1.5em;
 
   button {
@@ -14,6 +11,7 @@
       .focus-outline;
       .focus-border-radius;
       .focus-offset;
+      margin: 0.75rem 0;
     }
   }
 
@@ -21,7 +19,7 @@
     position: absolute;
     top: 0;
     bottom: 0;
-    left: @conversation-message-sender-width;
+    left: 0;
     display: block;
     width: 4px;
     height: 100%;
@@ -38,8 +36,8 @@
   &__sender {
     margin-bottom: 4px;
     cursor: pointer;
-    font-size: @font-size-small;
-    font-weight: @font-weight-bold;
+    font-size: var(--font-size-small);
+    font-weight: var(--font-weight-bold);
 
     svg {
       width: 8px;
@@ -63,8 +61,14 @@
       text-overflow: ellipsis;
     }
 
+    ol,
+    ul {
+      padding: 0 16px;
+      margin: 0;
+    }
+
     &--large {
-      font-size: @font-size-xl;
+      font-size: var(--font-size-xxl);
     }
 
     &--full {
@@ -72,31 +76,40 @@
       max-height: unset;
       white-space: normal;
 
+      &:not(pre) > code {
+        padding: 2px 4px;
+        border-radius: 4px;
+        background: var(--foreground-fade-8);
+      }
+
       pre {
         overflow: auto;
+        max-width: var(--conversation-message-asset-width);
+        padding: 8px 12px;
+        border-radius: 8px;
+        background: var(--foreground-fade-8);
+        font-size: var(--font-size-small);
+        margin-block: 4px;
         text-overflow: unset;
       }
     }
 
     &__show-more {
       display: block;
-      color: @w-blue;
+      color: var(--accent-color-500);
       cursor: pointer;
-      font-size: @font-size-small;
-      font-weight: @font-weight-regular;
+      font-size: var(--font-size-small);
+      font-weight: var(--font-weight-regular);
       user-select: none;
 
       .disclose-icon {
         margin-left: 4px;
-        svg {
-          fill: currentColor;
-          transform: rotate(90deg);
-        }
+        color: var(--foreground);
+        fill: currentColor;
+        transform: rotate(90deg);
 
         &.upside-down {
-          svg {
-            transform: rotate(-90deg);
-          }
+          transform: rotate(-90deg);
         }
       }
     }
@@ -116,8 +129,8 @@
     display: block;
     margin-top: 4px;
     cursor: pointer;
-    font-size: @font-size-small;
-    font-weight: @font-weight-regular;
+    font-size: var(--font-size-small);
+    font-weight: var(--font-weight-regular);
     opacity: 0.4;
 
     &:hover {
@@ -130,6 +143,6 @@
   }
 
   .message-mention {
-    font-size: @font-size-medium;
+    font-size: var(--font-size-medium);
   }
 }

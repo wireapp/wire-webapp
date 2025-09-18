@@ -23,12 +23,16 @@
   .text-selection;
 
   margin-bottom: 4px;
-  font-weight: @font-weight-bold;
-  line-height: @line-height-md;
+  font-weight: var(--font-weight-bold);
+  line-height: var(--line-height-md);
 }
 
 .popover-meta {
   color: var(--foreground);
-  font-size: @font-size-xs;
-  line-height: @line-height-sm;
+  font-size: var(--font-size-xsmall);
+  line-height: var(--line-height-sm);
+}
+
+.epr-emoji-category-content > button:hover {
+  background: transparent;
 }

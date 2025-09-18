@@ -21,23 +21,11 @@ import {render} from '@testing-library/react';
 
 import {GroupAvatar} from './GroupAvatar';
 
-import {User} from '../../entity/User';
-
 describe('GroupAvatar', () => {
   it('renders avatar', async () => {
-    const user0 = new User('user0');
-    const user1 = new User('user1');
-    const user2 = new User('user2');
-    const user3 = new User('user3');
-    user0.name('Anton Bertha');
-    user1.name('Spencer Senger');
-    user2.name('Tasia Price');
-    user3.name('Dorsey Rath');
-
-    const {getByTestId} = render(<GroupAvatar users={[user0, user1, user2, user3]} />);
-
+    const {getByTestId} = render(<GroupAvatar />);
     const avatarWrapper = getByTestId('group-avatar-box-wrapper');
 
-    expect(avatarWrapper.children).toHaveLength(4);
+    expect(avatarWrapper.children).toHaveLength(1);
   });
 });

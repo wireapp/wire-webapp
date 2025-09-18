@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2018 Wire Swiss GmbH
+ * Copyright (C) 2025 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,7 +23,7 @@ import {TeamData} from '@wireapp/api-client/lib/team';
 import {connect} from 'react-redux';
 import {Navigate} from 'react-router-dom';
 
-import {UnsupportedBrowser} from '../component/UnsupportedBrowser';
+import {Layout} from '../component/Layout';
 import {RootState} from '../module/reducer';
 import {RegistrationDataState} from '../module/reducer/authReducer';
 import * as AuthSelector from '../module/selector/AuthSelector';
@@ -33,41 +33,40 @@ interface Props extends React.HTMLProps<HTMLDivElement> {
   hasAccountData?: boolean;
   hasTeamData?: boolean;
   isAuthenticated?: boolean;
+  withSideBar?: boolean;
 }
 
 const hasInvalidAccountData = (account: RegistrationDataState) => !account.name || !account.email || !account.password;
 
-const hasInvalidTeamData = ({team}: {team: TeamData}) => !team || !team.name;
-
-const redirects = {
-  [AuthSelector.REGISTER_FLOW.PERSONAL]: ROUTE.CREATE_ACCOUNT,
-  [AuthSelector.REGISTER_FLOW.GENERIC_INVITATION]: ROUTE.CREATE_ACCOUNT,
-  [AuthSelector.REGISTER_FLOW.TEAM]: ROUTE.CREATE_TEAM,
-};
+const hasInvalidTeamData = ({team}: {team?: TeamData}) => !team || !team.name;
 
 const PageComponent = ({
   hasAccountData,
   hasTeamData,
-  currentFlow,
   isAuthenticated,
   isStateAuthenticated,
   account,
   children,
+  withSideBar,
 }: Props & ConnectedProps) => {
   if (
     (hasAccountData && hasInvalidAccountData(account) && !isStateAuthenticated) ||
     (hasTeamData && hasInvalidTeamData(account) && !isStateAuthenticated) ||
     (isAuthenticated && !isStateAuthenticated)
   ) {
-    return <Navigate to={redirects[currentFlow] || ROUTE.INDEX} replace />;
+    return <Navigate to={ROUTE.CREATE_ACCOUNT} replace />;
   }
-  return <UnsupportedBrowser>{children}</UnsupportedBrowser>;
+
+  if (withSideBar) {
+    return <Layout>{children}</Layout>;
+  }
+
+  return <>{children}</>;
 };
 
 type ConnectedProps = ReturnType<typeof mapStateToProps>;
 const mapStateToProps = (state: RootState) => ({
   account: AuthSelector.getAccount(state),
-  currentFlow: AuthSelector.getCurrentFlow(state),
   isStateAuthenticated: AuthSelector.isAuthenticated(state),
 });
 

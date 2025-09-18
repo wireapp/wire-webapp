@@ -19,15 +19,15 @@
 
 import React from 'react';
 
-import {SVGIcon} from '@wireapp/react-ui-kit/lib/Icon/SVGIcon';
-import {FormattedMessage, useIntl} from 'react-intl';
+import {FormattedMessage} from 'react-intl';
 
 import {CloseIcon, Content, Footer, Header, Link, Small} from '@wireapp/react-ui-kit';
 
+import {LogoFullIcon} from 'Components/Icon';
+import {t} from 'Util/LocalizerUtil';
+
 import {Config} from '../../Config';
-import {cookiePolicyStrings, footerStrings} from '../../strings';
 import {EXTERNAL_ROUTE} from '../externalRoute';
-import {getSVG} from '../util/SVGProvider';
 
 export interface Props extends React.HTMLAttributes<HTMLDivElement> {
   children: React.ReactNode;
@@ -36,7 +36,6 @@ export interface Props extends React.HTMLAttributes<HTMLDivElement> {
 }
 
 const WirelessContainer: React.FC<Props> = ({showCookiePolicyBanner, onCookiePolicyBannerClose, children}) => {
-  const {formatMessage: _} = useIntl();
   return (
     <div
       style={{
@@ -66,7 +65,7 @@ const WirelessContainer: React.FC<Props> = ({showCookiePolicyBanner, onCookiePol
               data-uie-name="go-privacy"
             >
               <FormattedMessage
-                {...cookiePolicyStrings.bannerText}
+                id="cookiePolicyStrings.bannerText"
                 values={{
                   newline: <br />,
                   strong: (...chunks: any[]) => <strong>{chunks}</strong>,
@@ -94,14 +93,12 @@ const WirelessContainer: React.FC<Props> = ({showCookiePolicyBanner, onCookiePol
       )}
       <Content>
         <Header style={{height: '40px', marginLeft: '8px', marginTop: '20px'}}>
-          <SVGIcon aria-hidden="true" scale={0.9} realWidth={78} realHeight={25}>
-            <g dangerouslySetInnerHTML={{__html: getSVG('logo-full-icon')?.documentElement?.innerHTML}} />
-          </SVGIcon>
+          <LogoFullIcon width={70} height={22} />
         </Header>
         <Content style={{flex: '1', paddingLeft: '8px', width: '100%'}}>{children}</Content>
         <Footer style={{height: '30px', justifyContent: 'flex-end', margin: '0 0 18px 8px'}}>
           <Link href={EXTERNAL_ROUTE.WIRE_WEBSITE}>{Config.getConfig().WEBSITE_LABEL}</Link>
-          <Small> &middot; {_(footerStrings.copy)}</Small>
+          <Small> &middot; {t('footer.copy')}</Small>
         </Footer>
       </Content>
     </div>

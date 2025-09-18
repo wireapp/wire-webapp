@@ -22,12 +22,13 @@ import React from 'react';
 import {fireEvent, render} from '@testing-library/react';
 
 import {UserList} from 'Components/UserList/UserList';
-import {User} from 'src/script/entity/User';
+import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
+import {User} from 'Repositories/entity/User';
 
 import {TestFactory} from '../../../../test/helper/TestFactory';
 import {withTheme} from '../../auth/util/test/TestUtil';
-import {ConversationRepository} from '../../conversation/ConversationRepository';
-import {UserState} from '../../user/UserState';
+
+jest.mock('@wireapp/api-client/lib/team');
 
 const testFactory = new TestFactory();
 let conversationRepository: ConversationRepository;
@@ -41,18 +42,14 @@ beforeAll(() => {
 
 describe('UserList', () => {
   it('lists all selected users', () => {
-    const userState = new UserState();
     const user = new User('test-id');
     user.isMe = true;
-
-    userState.self(user);
-    userState.users([user]);
 
     const users = ['1', '2', '3', '4'].map(id => new User(id));
     const props = {
       conversationRepository,
       onSelectUser: (user: User) => jest.fn(),
-      userState,
+      selfUser: user,
       selectedUsers: users,
       users,
       isSelectable: true,
@@ -64,12 +61,8 @@ describe('UserList', () => {
   });
 
   it('select user', async () => {
-    const userState = new UserState();
     const user = new User('test-id');
     user.isMe = true;
-
-    userState.self(user);
-    userState.users([user]);
 
     const setStateMock = jest.fn();
     const useStateMock: any = (useState: any) => [useState, setStateMock];
@@ -83,7 +76,7 @@ describe('UserList', () => {
     const props = {
       conversationRepository,
       onSelectUser: mockOnSelectUser,
-      userState,
+      selfUser: user,
       selectedUsers,
       users,
       isSelectable: true,

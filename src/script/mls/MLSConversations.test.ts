@@ -23,106 +23,145 @@ import {randomUUID} from 'crypto';
 
 import {Account} from '@wireapp/core';
 
-import {initMLSConversations, registerUninitializedSelfAndTeamConversations} from './MLSConversations';
+import {MLSConversation} from 'Repositories/conversation/ConversationSelectors';
+import {Conversation} from 'Repositories/entity/Conversation';
+import {User} from 'Repositories/entity/User';
 
-import {Conversation} from '../entity/Conversation';
-import {User} from '../entity/User';
+import {initMLSGroupConversations, initialiseSelfAndTeamConversations} from './MLSConversations';
 
-function createConversation(protocol: ConversationProtocol, type?: CONVERSATION_TYPE) {
-  const conversation = new Conversation(randomUUID(), '', protocol);
-  if (protocol === ConversationProtocol.MLS) {
-    conversation.groupId = `groupid-${randomUUID()}`;
-    conversation.epoch = 0;
-  }
-  if (type) {
+function createMLSConversation(type?: CONVERSATION_TYPE, epoch = 0): MLSConversation {
+  const conversation = new Conversation(randomUUID(), '', ConversationProtocol.MLS);
+  conversation.groupId = `groupid-${randomUUID()}`;
+  conversation.epoch = epoch;
+  if (type !== undefined) {
     conversation.type(type);
   }
-  return conversation;
+  return conversation as MLSConversation;
 }
 
-function createConversations(
-  nbConversations: number,
-  protocol: ConversationProtocol = ConversationProtocol.MLS,
-  type?: CONVERSATION_TYPE,
-) {
-  return Array.from(new Array(nbConversations)).map(() => createConversation(protocol, type));
+function createMLSConversations(nbConversations: number, type?: CONVERSATION_TYPE) {
+  return Array.from(new Array(nbConversations)).map(() => createMLSConversation(type));
 }
 
 describe('MLSConversations', () => {
-  describe('initMLSConversations', () => {
+  describe('initMLSGroupConversations', () => {
     it('joins all the unestablished MLS groups', async () => {
       const core = new Account();
-      const nbProteusConversations = 5 + Math.ceil(Math.random() * 10);
       const nbMLSConversations = 5 + Math.ceil(Math.random() * 10);
 
-      const proteusConversations = createConversations(nbProteusConversations, ConversationProtocol.PROTEUS);
-      const mlsConversations = createConversations(nbMLSConversations);
-      const conversations = [...proteusConversations, ...mlsConversations];
+      const mlsConversations = createMLSConversations(nbMLSConversations, CONVERSATION_TYPE.REGULAR);
 
-      jest.spyOn(core.service!.conversation, 'isMLSConversationEstablished').mockResolvedValue(false);
+      jest.spyOn(core.service!.conversation, 'mlsGroupExistsLocally').mockResolvedValue(false);
       jest.spyOn(core.service!.conversation, 'joinByExternalCommit');
 
-      await initMLSConversations(conversations, core);
+      await initMLSGroupConversations(mlsConversations, new User(), {core});
 
       for (const conversation of mlsConversations) {
         expect(core.service?.conversation.joinByExternalCommit).toHaveBeenCalledWith(conversation.qualifiedId);
       }
     });
+  });
 
-    it('schedules key renewal intervals for all already established mls groups', async () => {
+  it('schedules key renewal intervals for all already established mls groups', async () => {
+    const core = new Account();
+    const nbMLSConversations = 5 + Math.ceil(Math.random() * 10);
+
+    const mlsConversations = createMLSConversations(nbMLSConversations, CONVERSATION_TYPE.REGULAR);
+
+    jest.spyOn(core.service!.conversation!, 'mlsGroupExistsLocally').mockResolvedValue(true);
+    jest.spyOn(core.service!.mls!, 'scheduleKeyMaterialRenewal');
+
+    await initMLSGroupConversations(mlsConversations, new User(), {core});
+
+    for (const conversation of mlsConversations) {
+      expect(core.service!.mls!.scheduleKeyMaterialRenewal).toHaveBeenCalledWith(conversation.groupId);
+    }
+  });
+
+  describe('initialiseSelfAndTeamConversations', () => {
+    it('register unestablished team and self mls conversations', async () => {
       const core = new Account();
       const nbMLSConversations = 5 + Math.ceil(Math.random() * 10);
 
-      const mlsConversations = createConversations(nbMLSConversations);
+      const selfConversation = createMLSConversation(CONVERSATION_TYPE.SELF);
 
-      jest.spyOn(core.service!.conversation!, 'isMLSConversationEstablished').mockResolvedValue(true);
+      const teamConversation = createMLSConversation(CONVERSATION_TYPE.GLOBAL_TEAM);
+      jest.spyOn(core.service!.conversation!, 'mlsGroupExistsLocally').mockResolvedValue(true);
       jest.spyOn(core.service!.mls!, 'scheduleKeyMaterialRenewal');
 
-      await initMLSConversations(mlsConversations, core);
+      const mlsConversations = createMLSConversations(nbMLSConversations);
+      const conversations = [teamConversation, ...mlsConversations, selfConversation];
 
-      for (const conversation of mlsConversations) {
-        expect(core.service!.mls!.scheduleKeyMaterialRenewal).toHaveBeenCalledWith(conversation.groupId);
-      }
-    });
-
-    it('register all uninitiated conversations', async () => {
-      const core = new Account();
-      const nbProteusConversations = 5 + Math.ceil(Math.random() * 10);
-      const nbMLSConversations = 5 + Math.ceil(Math.random() * 10);
-
-      const proteusConversations = createConversations(nbProteusConversations, ConversationProtocol.PROTEUS);
-      const selfConversation = createConversation(ConversationProtocol.MLS, CONVERSATION_TYPE.SELF);
-
-      const teamConversation = createConversation(ConversationProtocol.MLS, CONVERSATION_TYPE.GLOBAL_TEAM);
-
-      const mlsConversations = createConversations(nbMLSConversations);
-      const conversations = [...proteusConversations, teamConversation, ...mlsConversations, selfConversation];
-
-      await registerUninitializedSelfAndTeamConversations(conversations, new User(), 'client-1', core);
+      await initialiseSelfAndTeamConversations(conversations, new User(), 'client-1', core);
 
       expect(core.service!.mls!.registerConversation).toHaveBeenCalledTimes(2);
     });
 
     it('does not register self and team conversation that have epoch > 0', async () => {
       const core = new Account();
-      const nbProteusConversations = 5 + Math.ceil(Math.random() * 10);
       const nbMLSConversations = 5 + Math.ceil(Math.random() * 10);
 
-      const proteusConversations = createConversations(nbProteusConversations, ConversationProtocol.PROTEUS);
-      const selfConversation = createConversation(ConversationProtocol.MLS);
+      const selfConversation = createMLSConversation();
       selfConversation.epoch = 1;
       selfConversation.type(CONVERSATION_TYPE.SELF);
 
-      const teamConversation = createConversation(ConversationProtocol.MLS);
+      const teamConversation = createMLSConversation();
       teamConversation.epoch = 2;
       teamConversation.type(CONVERSATION_TYPE.GLOBAL_TEAM);
 
-      const mlsConversations = createConversations(nbMLSConversations);
-      const conversations = [...proteusConversations, teamConversation, ...mlsConversations, selfConversation];
+      const mlsConversations = createMLSConversations(nbMLSConversations);
+      const conversations = [teamConversation, ...mlsConversations, selfConversation];
 
-      await initMLSConversations(conversations, core);
+      await initialiseSelfAndTeamConversations(conversations, new User(), 'clientId', core);
 
       expect(core.service!.mls!.registerConversation).toHaveBeenCalledTimes(0);
+    });
+
+    it('joins self and team conversation with external commit that have epoch > 0', async () => {
+      const core = new Account();
+      const nbMLSConversations = 5 + Math.ceil(Math.random() * 10);
+
+      const selfConversation = createMLSConversation();
+      selfConversation.epoch = 1;
+      selfConversation.type(CONVERSATION_TYPE.SELF);
+
+      const teamConversation = createMLSConversation();
+      teamConversation.epoch = 2;
+      teamConversation.type(CONVERSATION_TYPE.GLOBAL_TEAM);
+
+      const mlsConversations = createMLSConversations(nbMLSConversations);
+      const conversations = [teamConversation, ...mlsConversations, selfConversation];
+
+      // MLS group is not yet established locally
+      jest.spyOn(core.service!.mls!, 'isConversationEstablished').mockResolvedValue(false);
+
+      await initialiseSelfAndTeamConversations(conversations, new User(), 'clientId', core);
+
+      expect(core.service!.mls!.registerConversation).toHaveBeenCalledTimes(0);
+      expect(core.service!.conversation!.joinByExternalCommit).toHaveBeenCalledTimes(2);
+    });
+
+    it('DOES NOT join self and team conversation with external commit that have epoch > 0, but is already established locally', async () => {
+      const core = new Account();
+      const nbMLSConversations = 5 + Math.ceil(Math.random() * 10);
+
+      const selfConversation = createMLSConversation();
+      selfConversation.epoch = 1;
+      selfConversation.type(CONVERSATION_TYPE.SELF);
+
+      const teamConversation = createMLSConversation();
+      teamConversation.epoch = 2;
+      teamConversation.type(CONVERSATION_TYPE.GLOBAL_TEAM);
+
+      const mlsConversations = createMLSConversations(nbMLSConversations);
+      const conversations = [teamConversation, ...mlsConversations, selfConversation];
+
+      jest.spyOn(core.service!.mls!, 'isConversationEstablished').mockResolvedValue(true);
+
+      await initialiseSelfAndTeamConversations(conversations, new User(), 'clientId', core);
+
+      expect(core.service!.mls!.registerConversation).not.toHaveBeenCalled();
+      expect(core.service!.conversation!.joinByExternalCommit).not.toHaveBeenCalled();
     });
   });
 });

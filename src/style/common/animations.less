@@ -21,19 +21,21 @@
   opacity: 1;
   pointer-events: auto;
   transform: translateY(0);
-  transition: visibility 0s, all @animation-timing-slow @ease-out-expo @animation-timing-fast;
+  transition:
+    visibility 0s,
+    all var(--animation-timing-slow) var(--ease-out-expo) var(--animation-timing-fast);
   visibility: visible;
 }
 
 .start-ui-transition-fadeout {
   opacity: 0;
   pointer-events: none;
-  transform: translateY(@start-ui-search-bar-offset);
+  transform: translateY(var(--start-ui-search-bar-offset));
   transition: visibility 0s;
   transition-delay: 0s;
-  transition-duration: @animation-timing-fast;
+  transition-duration: var(--animation-timing-fast);
   transition-property: all;
-  transition-timing-function: @ease-in-expo;
+  transition-timing-function: var(--ease-in-expo);
   visibility: hidden;
 }
 
@@ -41,7 +43,7 @@
   &-enter {
     opacity: 0;
     transform: translateY(88px);
-    transition: all 500ms @ease-out-expo;
+    transition: all 500ms var(--ease-out-expo);
 
     &&-active {
       opacity: 1;
@@ -51,7 +53,7 @@
   &-exit {
     opacity: 1;
     transform: translateY(0);
-    transition: all 300ms @ease-in-expo;
+    transition: all 300ms var(--ease-in-expo);
 
     &&-active {
       opacity: 0;
@@ -64,7 +66,7 @@
   &-enter {
     opacity: 0;
     transform: translateX(24px);
-    transition: all @animation-timing-slow @ease-out-expo;
+    transition: all var(--animation-timing-slow) var(--ease-out-expo);
 
     &&-active {
       opacity: 1;
@@ -74,12 +76,12 @@
 }
 
 .right-column {
-  animation: slide-left @animation-timing-fast ease;
+  animation: slide-left var(--animation-timing-fast) ease;
 }
 
 @keyframes slide-left {
   0% {
-    transform: translateX(304px);
+    transform: translateX(320px);
   }
   100% {
     transform: translateX(0);
@@ -102,20 +104,20 @@
 
   .panel__content,
   .panel__footer {
-    transform: translateX(@panel-width);
+    transform: translateX(var(--panel-width));
   }
 }
 
 .right-to-left-enter-active {
   .panel__header {
     opacity: 1;
-    transition: opacity @animation-timing-fast @ease-out-quart;
+    transition: opacity var(--animation-timing-fast) var(--ease-out-quart);
   }
 
   .panel__content,
   .panel__footer {
     transform: translateX(0);
-    transition: transform @animation-timing-fast @ease-out-quart;
+    transition: transform var(--animation-timing-fast) var(--ease-out-quart);
   }
 }
 
@@ -133,13 +135,13 @@
 .right-to-left-exit-active {
   .panel__header {
     opacity: 0;
-    transition: opacity @animation-timing-fast @ease-out-quart;
+    transition: opacity var(--animation-timing-fast) var(--ease-out-quart);
   }
 
   .panel__content,
   .panel__footer {
-    transform: translateX(-@panel-width);
-    transition: transform @animation-timing-fast @ease-out-quart;
+    transform: translateX(calc(var(--panel-width) * -1));
+    transition: transform var(--animation-timing-fast) var(--ease-out-quart);
   }
 }
 
@@ -150,20 +152,20 @@
 
   .panel__content,
   .panel__footer {
-    transform: translateX(-@panel-width);
+    transform: translateX(calc(var(--panel-width) * -1));
   }
 }
 
 .left-to-right-enter-active {
   .panel__header {
     opacity: 1;
-    transition: opacity @animation-timing-fast @ease-out-quart;
+    transition: opacity var(--animation-timing-fast) var(--ease-out-quart);
   }
 
   .panel__content,
   .panel__footer {
     transform: translateX(0);
-    transition: transform @animation-timing-fast @ease-out-quart;
+    transition: transform var(--animation-timing-fast) var(--ease-out-quart);
   }
 }
 
@@ -181,13 +183,13 @@
 .left-to-right-exit-active {
   .panel__header {
     opacity: 0;
-    transition: opacity @animation-timing-fast @ease-out-quart;
+    transition: opacity var(--animation-timing-fast) var(--ease-out-quart);
   }
 
   .panel__content,
   .panel__footer {
-    transform: translateX(@panel-width);
-    transition: transform @animation-timing-fast @ease-out-quart;
+    transform: translateX(var(--panel-width));
+    transition: transform var(--animation-timing-fast) var(--ease-out-quart);
   }
 }
 

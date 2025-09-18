@@ -29,10 +29,12 @@ const SRC_PATH = path.resolve(__dirname, 'src');
 
 const dist = path.resolve(DIST_PATH, 'static');
 const auth = path.resolve(SRC_PATH, 'script/auth');
+const checkBrowser = path.resolve(SRC_PATH, 'script/browser');
 const srcScript = path.resolve(SRC_PATH, 'script');
 
 const HOME_TEMPLATE_PATH = path.resolve(SRC_PATH, 'page/index.ejs');
 const AUTH_TEMPLATE_PATH = path.resolve(SRC_PATH, 'page/auth.ejs');
+const UNSUPPORTED_TEMPLATE_PATH = path.resolve(SRC_PATH, 'page/unsupported.ejs');
 
 const {clientConfig, serverConfig} = require(path.resolve(DIST_PATH, 'config/index.js'));
 
@@ -57,6 +59,7 @@ module.exports = {
   entry: {
     app: path.resolve(srcScript, 'main/index.tsx'),
     auth: path.resolve(auth, 'main.tsx'),
+    checkBrowser: path.resolve(checkBrowser, 'CheckBrowser.ts'),
   },
   externals: {
     'fs-extra': '{}',
@@ -79,6 +82,10 @@ module.exports = {
         test: /\.svg$/,
       },
       {
+        loader: 'raw-loader',
+        test: /\.glsl$/,
+      },
+      {
         test: /\.less$/i,
         use: [
           'style-loader',
@@ -97,6 +104,18 @@ module.exports = {
             },
           },
           {loader: 'less-loader'},
+        ],
+      },
+      {
+        test: /\.css$/i,
+        use: [
+          'style-loader',
+          {
+            loader: 'css-loader',
+            options: {
+              url: false,
+            },
+          },
         ],
       },
     ],
@@ -131,11 +150,7 @@ module.exports = {
   },
   plugins: [
     new webpack.ProvidePlugin({
-      $: 'jquery',
       Buffer: ['buffer', 'Buffer'],
-      _: 'underscore',
-      jQuery: 'jquery',
-      ko: 'knockout',
     }),
     new WorkboxPlugin.InjectManifest({
       maximumFileSizeToCacheInBytes: process.env.NODE_ENV !== 'production' ? 10 * 1024 * 1024 : undefined,
@@ -146,14 +161,28 @@ module.exports = {
     new CopyPlugin({
       patterns: [
         {
-          context: 'node_modules/@wireapp/core-crypto/platforms/web/assets',
-          from: '*.wasm',
-          to: `${dist}/min/core-crypto.wasm`,
+          context: 'node_modules/@mediapipe/tasks-vision/wasm',
+          from: '*',
+          to: `${dist}/min/mediapipe/wasm`,
         },
         // copying all static resources (audio, images, fonts...)
         {from: 'resource', to: dist},
-        // copying worker files
-        {context: `${SRC_PATH}`, from: 'worker', to: `${dist}/worker`},
+        {from: `assets`, to: `${dist}/assets`},
+        {from: 'src/page/basicBrowserFeatureCheck.js', to: `${dist}/min/`},
+        {from: 'src/page/loader.js', to: `${dist}/min/`},
+        // Copy PDF worker for react-pdf package
+        {
+          from: path.dirname(require.resolve('pdfjs-dist/package.json')) + '/build/pdf.worker.mjs',
+          to: `${dist}/min/pdf.worker.mjs`,
+          // Prevents content hashing
+          info: {minimized: true},
+        },
+        // Copy Core-Crypto worker for @wireapp/core-crypto package
+        {
+          context: 'node_modules/@wireapp/core-crypto/src',
+          from: '*',
+          to: `${dist}/min/`,
+        },
       ],
     }),
     new webpack.IgnorePlugin({resourceRegExp: /.*\.wasm/}),
@@ -169,10 +198,18 @@ module.exports = {
       template: AUTH_TEMPLATE_PATH,
       templateParameters,
     }),
+    new HtmlWebpackPlugin({
+      inject: false,
+      filename: 'unsupported/index.html',
+      template: UNSUPPORTED_TEMPLATE_PATH,
+      templateParameters,
+    }),
   ],
   resolve: {
     alias: {
       Components: path.resolve(srcScript, 'components'),
+      Hooks: path.resolve(srcScript, 'hooks'),
+      Repositories: path.resolve(srcScript, 'repositories'),
       I18n: path.resolve(SRC_PATH, 'i18n'),
       Resource: path.resolve(ROOT_PATH, 'resource'),
       Util: path.resolve(srcScript, 'util'),

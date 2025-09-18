@@ -1,0 +1,62 @@
+name: Generate test reports
+
+on:
+  workflow_dispatch:
+    inputs:
+      commit:
+        description: 'Commit SHA'
+        required: true
+        type: string
+
+jobs:
+  generate_test_report:
+    runs-on: ubuntu-latest
+
+    env:
+      UNIT_TEST_REPORT_FILE: './unit-tests.log'
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4.1.6
+        with:
+          ref: ${{ inputs.commit }}
+
+      - name: Set TITLE
+        env:
+          PR_TITLE: ${{github.event.pull_request.title || env.COMMIT_MESSAGE}}
+        run: echo "TITLE=$PR_TITLE" >> $GITHUB_ENV
+
+      - name: Cancel Previous Runs
+        uses: styfle/cancel-workflow-action@0.12.1
+        with:
+          access_token: ${{github.token}}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18.16.x
+          cache: 'yarn'
+
+      - name: Authenticate git clone
+        env:
+          GH_TOKEN: ${{secrets.OTTO_THE_BOT_GH_TOKEN}}
+        run: echo -e "machine github.com\n  login ${GH_TOKEN}" > ~/.netrc
+
+      - name: Install JS dependencies
+        run: yarn --immutable
+
+      - name: Test
+        run: |
+          set -o pipefail
+          yarn test --coverage --coverage_reporters=lcov 2>&1 | tee ${{ env.UNIT_TEST_REPORT_FILE }}
+          echo -e "COMMIT SHA = ${{ inputs.commit }}" >> ${{ env.UNIT_TEST_REPORT_FILE }}
+          echo -e "TEST RUN DATE = $(date -u +'%Y-%m-%dT%H:%M:%SZ')" >> ${{ env.UNIT_TEST_REPORT_FILE }}
+
+      - name: Upload unit-tests.log to S3
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: eu-west-1
+        run: |
+          TIMESTAMP=$(date -u +'%Y%m%dT%H%M%SZ')
+          aws s3 cp ${{ env.UNIT_TEST_REPORT_FILE }} s3://wire-webapp/unit-tests-${TIMESTAMP}-${{ inputs.commit }}.log

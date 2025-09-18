@@ -17,14 +17,8 @@
  *
  */
 
-import en from 'I18n/en-US.json';
-
 export const Declension = {
   ACCUSATIVE: 'accusative',
   DATIVE: 'dative',
   NOMINATIVE: 'nominative',
 };
-
-export type StringIdentifer = keyof typeof en | '';
-
-export type Substitutes = Record<string, string> | string | number;

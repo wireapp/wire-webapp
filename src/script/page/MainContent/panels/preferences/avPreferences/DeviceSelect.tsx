@@ -57,7 +57,7 @@ const DeviceSelect: React.FC<DeviceSelectProps> = ({
       className={cx('preferences-option', {
         'preferences-av-select-disabled': disabled,
       })}
-      css={{width: 'var(--preferences-width)'}}
+      css={{width: '100%'}}
     >
       <div className="preferences-option-icon preferences-av-select-icon">
         <DeviceIcon />
@@ -75,7 +75,7 @@ const DeviceSelect: React.FC<DeviceSelectProps> = ({
           }}
           dataUieName={uieName}
           options={devicesList}
-          defaultValue={currentValue}
+          value={currentValue}
           label={title}
           isDisabled={disabled}
         />

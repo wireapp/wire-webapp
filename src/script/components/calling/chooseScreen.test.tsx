@@ -18,6 +18,9 @@
  */
 
 import {render, fireEvent} from '@testing-library/react';
+import {container} from 'tsyringe';
+
+import {CallState} from 'Repositories/calling/CallState';
 
 import {ChooseScreen} from './ChooseScreen';
 
@@ -31,15 +34,16 @@ describe('ChooseScreen', () => {
     {id: 'window:second', thumbnail: {toDataURL: () => 'second window'} as HTMLCanvasElement},
   ];
 
-  const cancel = jest.fn();
-  const choose = jest.fn();
-
   const props = {
-    cancel,
-    choose,
-    screens,
-    windows,
+    choose: jest.fn(),
   };
+
+  const callState = container.resolve(CallState);
+
+  beforeEach(() => {
+    callState.selectableScreens(screens as any);
+    callState.selectableWindows(windows as any);
+  });
 
   it('shows the available screens', () => {
     const {container} = render(<ChooseScreen {...props} />);
@@ -54,7 +58,8 @@ describe('ChooseScreen', () => {
     render(<ChooseScreen {...props} />);
 
     fireEvent.keyDown(document, {code: 'Enter', key: 'Escape'});
-    expect(props.cancel).toHaveBeenCalled();
+    expect(callState.selectableScreens()).toEqual([]);
+    expect(callState.selectableWindows()).toEqual([]);
   });
 
   it('calls cancel on cancel button click', () => {
@@ -64,7 +69,8 @@ describe('ChooseScreen', () => {
     expect(cancelButton).not.toBeNull();
 
     fireEvent.click(cancelButton!);
-    expect(props.cancel).toHaveBeenCalled();
+    expect(callState.selectableScreens()).toEqual([]);
+    expect(callState.selectableWindows()).toEqual([]);
   });
 
   it('chooses the correct screens on click', () => {

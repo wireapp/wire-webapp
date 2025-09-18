@@ -17,6 +17,8 @@
  *
  */
 
+import {TaskScheduler} from '@wireapp/core/lib/util';
+
 import {EventEmitter} from 'stream';
 
 export class Account extends EventEmitter {
@@ -24,36 +26,91 @@ export class Account extends EventEmitter {
     federationEndpoints: true,
   };
 
-  configureMLSCallbacks = jest.fn();
+  recurringTaskScheduler = {
+    registerTask: jest.fn(),
+    cancelTask: jest.fn(),
+  };
 
+  get hasMLSDevice() {
+    return true;
+  }
+  configureMLSCallbacks = jest.fn();
+  enrollE2EI = jest.fn();
+  isMLSActiveForClient = jest.fn();
   service = {
+    e2eIdentity: {
+      isE2EIEnabled: jest.fn(),
+      isEnrollmentInProgress: jest.fn(),
+      isFreshMLSSelfClient: jest.fn(),
+      clearAllProgress: jest.fn(),
+      getUsersIdentities: jest.fn(() => new Map()),
+      getAllGroupUsersIdentities: jest.fn(() => new Map()),
+      getDeviceIdentities: jest.fn(),
+      getConversationState: jest.fn(),
+      registerServerCertificates: jest.fn(),
+      on: jest.fn(),
+      emit: jest.fn(),
+      off: jest.fn(),
+      initialize: jest.fn(),
+    },
     mls: {
       schedulePeriodicKeyMaterialRenewals: jest.fn(),
+      addUsersToExistingConversation: jest.fn(),
+      conversationExists: jest.fn(),
+      wipeConversation: jest.fn(),
       registerConversation: jest.fn(),
-      joinConferenceSubconversation: jest.fn(),
       getGroupIdFromConversationId: jest.fn(),
       renewKeyMaterial: jest.fn(),
       getClientIds: jest.fn(),
       getEpoch: jest.fn(),
-      conversationExists: jest.fn(),
       exportSecretKey: jest.fn(),
-      leaveConferenceSubconversation: jest.fn(),
-      on: this.on,
-      emit: this.emit,
-      off: this.off,
+      on: jest.fn(),
+      emit: jest.fn(),
+      off: jest.fn(),
       scheduleKeyMaterialRenewal: jest.fn(),
+      isConversationEstablished: jest.fn(),
     },
     asset: {
       uploadAsset: jest.fn(),
     },
     conversation: {
       send: jest.fn(),
-      isMLSConversationEstablished: jest.fn(),
+      mlsGroupExistsLocally: jest.fn(),
       joinByExternalCommit: jest.fn(),
       addUsersToMLSConversation: jest.fn(),
+      removeUserFromConversation: jest.fn(),
+      removeUsersFromMLSConversation: jest.fn(),
+      wipeMLSConversation: jest.fn(),
+      addUsersToProteusConversation: jest.fn(),
       messageTimer: {
         setConversationLevelTimer: jest.fn(),
       },
+      tryEstablishingMLSGroup: jest.fn(),
+      isMLSGroupEstablishedLocally: jest.fn(),
+      establishMLS1to1Conversation: jest.fn(),
+      blacklistConversation: jest.fn(),
+      removeConversationFromBlacklist: jest.fn(),
+      getMLSSelfConversation: jest.fn(),
+    },
+    subconversation: {
+      joinConferenceSubconversation: jest.fn(),
+      leaveConferenceSubconversation: jest.fn(),
+      subscribeToEpochUpdates: jest.fn(),
+    },
+    client: {
+      deleteClient: jest.fn(),
+    },
+    self: {
+      putSupportedProtocols: jest.fn(),
+    },
+    user: {
+      getUserSupportedProtocols: jest.fn(),
     },
   };
 }
+
+export const util = {
+  TaskScheduler,
+};
+
+export {Ciphersuite} from '@wireapp/core-crypto';

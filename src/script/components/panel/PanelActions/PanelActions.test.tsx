@@ -19,11 +19,13 @@
 
 import {render, fireEvent} from '@testing-library/react';
 
+import {CopyIcon, EditIcon, PickupIcon} from 'Components/Icon';
+
 import {PanelActions, MenuItem} from './PanelActions';
 
 describe('PanelActions', () => {
   it('displays a single action', () => {
-    const items: MenuItem[] = [{click: () => {}, icon: 'edit-icon', identifier: 'testIdentifier', label: 'testLabel'}];
+    const items: MenuItem[] = [{click: () => {}, Icon: EditIcon, identifier: 'testIdentifier', label: 'testLabel'}];
     const itemSpy = jest.spyOn(items[0], 'click');
 
     const {getByTestId, queryByText} = render(<PanelActions items={items} />);
@@ -39,8 +41,8 @@ describe('PanelActions', () => {
 
   it('displays more than one action', () => {
     const items: MenuItem[] = [
-      {click: () => {}, icon: 'copy-icon', identifier: 'mainIdentifier', label: 'mainLabel'},
-      {click: () => {}, icon: 'pickup-icon', identifier: 'secondaryIdentifier', label: 'secondaryLabel'},
+      {click: () => {}, Icon: CopyIcon, identifier: 'mainIdentifier', label: 'mainLabel'},
+      {click: () => {}, Icon: PickupIcon, identifier: 'secondaryIdentifier', label: 'secondaryLabel'},
     ];
 
     const {queryByText, getByTestId} = render(<PanelActions items={items} />);

@@ -19,12 +19,11 @@
 
 import {render} from '@testing-library/react';
 
+import {User} from 'Repositories/entity/User';
+
 import {TemporaryGuestAvatar} from './TemporaryGuestAvatar';
 
-import {User} from '../../entity/User';
-
 import {AVATAR_SIZE, STATE} from '.';
-jest.mock('../../auth/util/SVGProvider');
 
 describe('TemporaryGuestAvatar', () => {
   it('shows expiration circle', async () => {

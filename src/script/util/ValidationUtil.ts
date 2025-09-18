@@ -17,7 +17,7 @@
  *
  */
 
-import {Config} from '../Config';
+import {ValidationError} from '../auth/module/action/ValidationError';
 
 export class ValidationUtilError extends Error {
   constructor(message = 'Unknown ValidationUtilError') {
@@ -35,24 +35,6 @@ export class ValidationUtilError extends Error {
 }
 
 export const isValidUsername = (username: string) => /^@?[a-z_0-9.-]{2,256}$/.test(username);
-export const isValidFederationUsername = (username: string) => {
-  const federationUsernameRegex =
-    /^(@?[a-z_0-9.-]{2,256})@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-  return federationUsernameRegex.test(username);
-};
-
-/**
- * Checks if input has the format of an international phone number
- * @note Begins with + and contains only numbers
- * @param phoneNumber Input
- * @returns `true`, if the input a phone number
- */
-export const isValidPhoneNumber = (phoneNumber: string): boolean => {
-  const allowDebugPhoneNumbers = Config.getConfig().FEATURE.ENABLE_DEBUG;
-  const regularExpression = allowDebugPhoneNumbers ? /^\+[0-9]\d{1,14}$/ : /^\+[1-9]\d{1,14}$/;
-
-  return regularExpression.test(phoneNumber);
-};
 
 export const isValidEmail = (email: string): boolean => {
   const regExp =
@@ -66,16 +48,6 @@ export const isBearerToken = (token: string): boolean => /^[a-zA-Z0-9\-._~+/]+[=
 
 export const isUUID = (string: string): boolean =>
   /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(string);
-
-export const isBase64 = (string: string): boolean => {
-  try {
-    // Will raise a DOM exception if base64 string is invalid
-    window.atob(string);
-  } catch (error) {
-    return false;
-  }
-  return true;
-};
 
 export const isValidApiPath = (path: string): boolean => {
   const [urlPath] = path.split('?');
@@ -122,4 +94,15 @@ export const assetV3 = (assetKey: string, assetToken?: string): true => {
     throw new ValidationUtilError('Invalid asset token');
   }
   return true;
+};
+
+export const validationErrorStrings = {
+  [ValidationError.FIELD.NAME.PATTERN_MISMATCH]: 'ValidationError.FIELD.NAME.PATTERN_MISMATCH',
+  [ValidationError.FIELD.NAME.VALUE_MISSING]: 'ValidationError.FIELD.NAME.VALUE_MISSING',
+  [ValidationError.FIELD.PASSWORD.PATTERN_MISMATCH]: 'ValidationError.FIELD.PASSWORD.PATTERN_MISMATCH',
+  [ValidationError.FIELD.CONFIRM_PASSWORD.PATTERN_MISMATCH]: 'ValidationError.FIELD.CONFIRM_PASSWORD.PATTERN_MISMATCH',
+  [ValidationError.FIELD.PASSWORD_LOGIN.PATTERN_MISMATCH]: 'ValidationError.FIELD.PASSWORD_LOGIN.PATTERN_MISMATCH',
+  [ValidationError.FIELD.SSO_CODE.PATTERN_MISMATCH]: 'ValidationError.FIELD.SSO_CODE.PATTERN_MISMATCH',
+  [ValidationError.FIELD.SSO_EMAIL_CODE.PATTERN_MISMATCH]: 'ValidationError.FIELD.SSO_EMAIL_CODE.PATTERN_MISMATCH',
+  [ValidationError.FIELD.EMAIL.TYPE_MISMATCH]: 'ValidationError.FIELD.EMAIL.TYPE_MISMATCH',
 };

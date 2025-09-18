@@ -27,11 +27,9 @@ export class BaseError extends Error {
   type: BASE_ERROR_TYPE | string;
 
   constructor(type: BASE_ERROR_TYPE | string, message: string) {
-    super();
+    super(message);
 
     this.type = type;
-    this.message = message;
-    this.stack = new Error().stack;
     this.name = this.constructor.name;
   }
 
@@ -39,6 +37,7 @@ export class BaseError extends Error {
     return {
       INVALID_PARAMETER: 'Invalid parameter passed',
       MISSING_PARAMETER: 'Required parameter is not defined',
+      MISSING_QUALIFIED_ID: 'Required qualified ID is not defined',
       UNKNOWN: 'Unknown',
     };
   }

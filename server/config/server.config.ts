@@ -30,7 +30,7 @@ const ROBOTS_ALLOW_FILE = path.join(ROBOTS_DIR, 'robots.txt');
 const ROBOTS_DISALLOW_FILE = path.join(ROBOTS_DIR, 'robots-disallow.txt');
 
 const defaultCSP = {
-  connectSrc: ["'self'", 'blob:', 'data:', 'https://*.giphy.com'],
+  connectSrc: ["'self'", 'blob:', 'data:', 'https://*.giphy.com', 'https://service.zeta.pydiocells.com'],
   defaultSrc: ["'self'"],
   fontSrc: ["'self'", 'data:'],
   frameSrc: [
@@ -39,12 +39,12 @@ const defaultCSP = {
     'https://*.vimeo.com',
     'https://*.youtube-nocookie.com',
   ],
-  imgSrc: ["'self'", 'blob:', 'data:', 'https://*.giphy.com'],
+  imgSrc: ["'self'", 'blob:', 'data:', 'https://*.giphy.com', 'https://service.zeta.pydiocells.com'],
   manifestSrc: ["'self'"],
-  mediaSrc: ["'self'", 'blob:', 'data:'],
+  mediaSrc: ["'self'", 'blob:', 'data:', 'https://service.zeta.pydiocells.com'],
   scriptSrc: ["'self'", "'unsafe-eval'"],
   styleSrc: ["'self'", "'unsafe-inline'"],
-  workerSrc: ["'self'", 'blob:'],
+  workerSrc: ["'self'", 'blob:', 'data:'],
 };
 const logger = logdown('config', {
   logger: console,
@@ -71,7 +71,14 @@ function parseCommaSeparatedList(list: string = ''): string[] {
 function mergedCSP({urls}: ConfigGeneratorParams, env: Record<string, string>): Record<string, Iterable<string>> {
   const objectSrc = parseCommaSeparatedList(env.CSP_EXTRA_OBJECT_SRC);
   const csp = {
-    connectSrc: [...defaultCSP.connectSrc, urls.api, urls.ws, ...parseCommaSeparatedList(env.CSP_EXTRA_CONNECT_SRC)],
+    connectSrc: [
+      ...defaultCSP.connectSrc,
+      urls.api,
+      urls.ws,
+      ...parseCommaSeparatedList(env.CSP_EXTRA_CONNECT_SRC),
+      // Allow all other connections in debug mode
+      env.FEATURE_ENABLE_DEBUG == 'true' ? '*' : '',
+    ].filter(Boolean),
     defaultSrc: [...defaultCSP.defaultSrc, ...parseCommaSeparatedList(env.CSP_EXTRA_DEFAULT_SRC)],
     fontSrc: [...defaultCSP.fontSrc, ...parseCommaSeparatedList(env.CSP_EXTRA_FONT_SRC)],
     frameSrc: [...defaultCSP.frameSrc, ...parseCommaSeparatedList(env.CSP_EXTRA_FRAME_SRC)],
@@ -99,6 +106,7 @@ export function generateConfig(params: ConfigGeneratorParams, env: Env) {
     BACKEND_REST: urls.api,
     BACKEND_WS: urls.ws,
     DEVELOPMENT: nodeEnv === 'development',
+    DEVELOPMENT_ENABLE_TLS: urls.base.startsWith('https://'),
     ENFORCE_HTTPS: env.ENFORCE_HTTPS != 'false',
     ENVIRONMENT: nodeEnv,
     GOOGLE_WEBMASTER_ID: env.GOOGLE_WEBMASTER_ID,
@@ -107,6 +115,7 @@ export function generateConfig(params: ConfigGeneratorParams, env: Env) {
       IMAGE_URL: env.OPEN_GRAPH_IMAGE_URL,
       TITLE: env.OPEN_GRAPH_TITLE,
     },
+    ENABLE_DYNAMIC_HOSTNAME: env.ENABLE_DYNAMIC_HOSTNAME === 'true',
     PORT_HTTP: Number(env.PORT) || 21080,
     ROBOTS: {
       ALLOW: readFile(ROBOTS_ALLOW_FILE, 'User-agent: *\r\nDisallow: /'),

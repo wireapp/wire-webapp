@@ -17,50 +17,51 @@
  *
  */
 
-import {FC} from 'react';
+import type {QualifiedId} from '@wireapp/api-client/lib/user/';
 
+import {User} from 'Repositories/entity/User';
+import {ReactionMap} from 'Repositories/storage';
 import {getEmojiUnicode} from 'Util/EmojiUtil';
-import {Reactions, groupByReactionUsers, sortReactionsByUserCount} from 'Util/ReactionUtil';
+import {matchQualifiedIds} from 'Util/QualifiedId';
 
 import {EmojiPill} from './EmojiPill';
 import {messageReactionWrapper} from './MessageReactions.styles';
 
 export interface MessageReactionsListProps {
-  reactions: Reactions;
+  reactions: ReactionMap;
   handleReactionClick: (emoji: string) => void;
-  userId: string;
+  selfUserId: QualifiedId;
   isMessageFocused: boolean;
   onTooltipReactionCountClick: () => void;
   onLastReactionKeyEvent: () => void;
   isRemovedFromConversation: boolean;
+  users: User[];
 }
 
-const MessageReactionsList: FC<MessageReactionsListProps> = ({reactions, ...props}) => {
-  const reactionGroupedByUser = groupByReactionUsers(reactions);
-  const reactionsGroupedByUserArray = Array.from(reactionGroupedByUser);
-  const reactionsList =
-    reactionsGroupedByUserArray.length > 1
-      ? sortReactionsByUserCount(reactionsGroupedByUserArray)
-      : reactionsGroupedByUserArray;
-  const {userId, ...emojiPillProps} = props;
+const MessageReactionsList = ({reactions, ...props}: MessageReactionsListProps) => {
+  const {selfUserId, users: conversationUsers, ...emojiPillProps} = props;
 
   return (
     <div css={messageReactionWrapper} data-uie-name="message-reactions">
-      {reactionsList.map(([emoji, users], index) => {
+      {reactions.map(([emoji, users], index) => {
         const emojiUnicode = getEmojiUnicode(emoji);
-        const emojiListCount = reactionsList.length;
-        const hasUserReacted = users.includes(userId);
+        const emojiListCount = users.length;
+        const hasUserReacted = users.some(user => matchQualifiedIds(selfUserId, user));
+
+        const reactingUsers = users
+          .map(qualifiedId => conversationUsers.find(user => matchQualifiedIds(qualifiedId, user.qualifiedId)))
+          .filter((user): user is User => typeof user !== 'undefined');
 
         return (
           <EmojiPill
-            emojiCount={users.length}
+            reactingUsers={reactingUsers}
             hasUserReacted={hasUserReacted}
             emojiUnicode={emojiUnicode}
             emoji={emoji}
             index={index}
             emojiListCount={emojiListCount}
             {...emojiPillProps}
-            key={emojiUnicode}
+            key={emojiUnicode + index}
           />
         );
       })}

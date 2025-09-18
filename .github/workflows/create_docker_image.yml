@@ -1,38 +1,54 @@
-name: Create Docker image
+name: Create Release Artifact
 
 on:
   workflow_dispatch:
     inputs:
       tag:
-        description: 'tagname for the Docker image'
+        description: 'tagname for the Artifact'
         required: true
         type: string
+
+      create_release:
+        description: 'Wether or not a release entry should be created on github'
+        required: false
+        default: true
+        type: boolean
 
 concurrency:
   group: ci-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
-  test_build_deploy:
+  create_image:
     runs-on: ubuntu-latest
+
+    env:
+      UNIT_TEST_REPORT_FILE: './unit-tests.log'
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
+        uses: actions/checkout@v4
 
       - name: Setup Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
-          node-version: 16.x
+          node-version: 18.16.x
           cache: 'yarn'
 
       - name: Install JS dependencies
         run: yarn --immutable
 
+      - name: Set short sha
+        id: vars
+        run: echo "sha_short=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
+
       - name: Test
-        run: yarn test --coverage --coverage-reporters=lcov --detectOpenHandles=false
+        run: |
+          set -o pipefail
+          yarn test --coverage --coverage-reporters=lcov --detectOpenHandles=false 2>&1 | tee ${{ env.UNIT_TEST_REPORT_FILE }}
+          echo -e "RELEASE TAG = ${{ inputs.tag }}" >> ${{ env.UNIT_TEST_REPORT_FILE }}
+          echo -e "SHORT COMMIT SHA = ${{ steps.vars.outputs.sha_short }}" >> ${{ env.UNIT_TEST_REPORT_FILE }}
+          echo -e "TEST RUN DATE = $(date -u +'%Y-%m-%dT%H:%M:%SZ')" >> ${{ env.UNIT_TEST_REPORT_FILE }}
 
       - name: Build
         run: yarn build:prod
@@ -41,4 +57,26 @@ jobs:
         env:
           DOCKER_PASSWORD: ${{secrets.WEBTEAM_QUAY_PASSWORD}}
           DOCKER_USERNAME: ${{secrets.WEBTEAM_QUAY_USERNAME}}
-        run: yarn docker '' "${{inputs.tag}}"
+        run: yarn docker "${{inputs.tag}}-${{ steps.vars.outputs.sha_short }}"
+
+      - name: Upload unit-tests.log to S3
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: eu-west-1
+        run: |
+          TIMESTAMP=$(date -u +'%Y%m%dT%H%M%SZ')
+          aws s3 cp ${{ env.UNIT_TEST_REPORT_FILE }} s3://wire-webapp/unit-tests-release-${{ inputs.tag }}-${TIMESTAMP}-${{ steps.vars.outputs.sha_short }}.log
+
+      - name: Create GitHub release
+        if: ${{inputs.create_release}}
+        id: create_release_production
+        uses: softprops/action-gh-release@v2
+        env:
+          GITHUB_TOKEN: ${{github.token}}
+        with:
+          tag_name: ${{inputs.tag}}
+          name: ${{inputs.tag}}
+          files: ${{ env.UNIT_TEST_REPORT_FILE }}
+          draft: false
+          prerelease: true

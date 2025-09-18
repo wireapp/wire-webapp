@@ -19,9 +19,15 @@
 
 import {useId} from 'react';
 
-import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
+import {TabIndex} from '@wireapp/react-ui-kit';
 
-import {radioHintStyles, radioInputStyles, radioLabelStyles, radioOptionStyles} from './RadioGroup.styles';
+import {
+  radioHintStyles,
+  radioInputStyles,
+  radioLabelStyles,
+  radioOptionHorizontalStyles,
+  radioOptionStyles,
+} from './RadioGroup.styles';
 
 interface RadioGroupProps<T> {
   ariaLabelledBy: string;
@@ -36,6 +42,8 @@ interface RadioGroupProps<T> {
   }[];
   selectedValue: T;
   uieName?: string;
+  horizontal?: boolean;
+  disabled?: boolean;
 }
 
 const RadioGroup = <T extends string | number>({
@@ -45,11 +53,18 @@ const RadioGroup = <T extends string | number>({
   onChange,
   uieName = name,
   selectedValue,
+  horizontal,
+  disabled = false,
 }: RadioGroupProps<T>) => {
   const radioId = useId();
 
   return (
-    <div aria-labelledby={ariaLabelledBy} data-uie-name={uieName} role="radiogroup">
+    <div
+      aria-labelledby={ariaLabelledBy}
+      data-uie-name={uieName}
+      css={horizontal && radioOptionHorizontalStyles}
+      role="radiogroup"
+    >
       {options.map(({value, label, detailLabel, isDisabled = false, optionUeiName = `${uieName}-${value}`}) => {
         const currentId = radioId + value;
         const isChecked = selectedValue === value;
@@ -57,8 +72,8 @@ const RadioGroup = <T extends string | number>({
         return (
           <div key={value} css={radioOptionStyles} aria-describedby={currentId}>
             <input
-              css={radioInputStyles(isDisabled)}
-              disabled={isDisabled}
+              css={radioInputStyles(isDisabled || disabled)}
+              disabled={isDisabled || disabled}
               tabIndex={TabIndex.FOCUSABLE}
               type="radio"
               id={currentId}
@@ -69,7 +84,7 @@ const RadioGroup = <T extends string | number>({
               data-uie-name={optionUeiName}
             />
 
-            <label css={radioLabelStyles(isDisabled)} htmlFor={currentId}>
+            <label css={radioLabelStyles(isDisabled || disabled)} htmlFor={currentId}>
               <span>{label}</span>
 
               {detailLabel && isChecked && <span css={radioHintStyles}>{` · ${detailLabel}`}</span>}

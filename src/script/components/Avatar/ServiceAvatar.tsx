@@ -21,7 +21,8 @@ import React from 'react';
 
 import ko from 'knockout';
 
-import {Icon} from 'Components/Icon';
+import * as Icon from 'Components/Icon';
+import {ServiceEntity} from 'Repositories/integration/ServiceEntity';
 import {CSS_FILL_PARENT} from 'Util/CSSMixin';
 
 import {AvatarBackground} from './AvatarBackground';
@@ -29,11 +30,9 @@ import {AvatarBorder} from './AvatarBorder';
 import {AvatarImage} from './AvatarImage';
 import {AvatarWrapper} from './AvatarWrapper';
 
-import {ServiceEntity} from '../../integration/ServiceEntity';
-
 import {AVATAR_SIZE} from '.';
 
-export interface ServiceAvatarProps extends React.HTMLProps<HTMLDivElement> {
+interface ServiceAvatarProps extends React.HTMLProps<HTMLDivElement> {
   avatarSize: AVATAR_SIZE;
   onClick?: (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => void;
   participant: ServiceEntity;
@@ -61,7 +60,7 @@ const ServiceAvatar: React.FunctionComponent<ServiceAvatarProps> = ({participant
         }}
         data-uie-name="element-avatar-service-icon"
       >
-        <Icon.Service
+        <Icon.ServiceIcon
           css={{
             '& > path': {
               fill: 'rgba(141, 152, 159, 0.24)',

@@ -22,16 +22,16 @@ import {FC, useMemo, useState} from 'react';
 import {FadingScrollbar} from 'Components/FadingScrollbar';
 import {SearchInput} from 'Components/SearchInput';
 import {UserSearchableList} from 'Components/UserSearchableList';
+import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
+import {Conversation} from 'Repositories/entity/Conversation';
+import {User} from 'Repositories/entity/User';
+import {SearchRepository} from 'Repositories/search/SearchRepository';
+import {TeamRepository} from 'Repositories/team/TeamRepository';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 import {sortUsersByPriority} from 'Util/StringUtil';
 
-import {ConversationRepository} from '../../../conversation/ConversationRepository';
-import {Conversation} from '../../../entity/Conversation';
-import {User} from '../../../entity/User';
 import {isServiceEntity} from '../../../guards/Service';
-import {SearchRepository} from '../../../search/SearchRepository';
-import {TeamRepository} from '../../../team/TeamRepository';
 import {PanelHeader} from '../PanelHeader';
 import {PanelEntity, PanelState} from '../RightSidebar';
 
@@ -57,16 +57,11 @@ const ConversationParticipants: FC<ConversationParticipantsProps> = ({
   highlightedUsers,
 }) => {
   const [searchInput, setSearchInput] = useState<string>('');
-
   const {
     participating_user_ets: participatingUserEts,
-    removed_from_conversation: removedFromConversation,
+    isSelfUserRemoved,
     selfUser,
-  } = useKoSubscribableChildren(activeConversation, [
-    'participating_user_ets',
-    'removed_from_conversation',
-    'selfUser',
-  ]);
+  } = useKoSubscribableChildren(activeConversation, ['participating_user_ets', 'isSelfUserRemoved', 'selfUser']);
 
   const showUser = (userEntity: User) => togglePanel(PanelState.GROUP_PARTICIPANT_USER, userEntity);
 
@@ -76,12 +71,12 @@ const ConversationParticipants: FC<ConversationParticipantsProps> = ({
       return isUser ? [user] : [];
     });
 
-    if (!removedFromConversation && selfUser) {
+    if (!isSelfUserRemoved && selfUser) {
       return [...users, selfUser].sort(sortUsersByPriority);
     }
 
     return users;
-  }, [participatingUserEts, removedFromConversation, selfUser]);
+  }, [participatingUserEts, isSelfUserRemoved, selfUser]);
 
   return (
     <div id="conversation-participants" className="panel__page conversation-participants">
@@ -90,15 +85,18 @@ const ConversationParticipants: FC<ConversationParticipantsProps> = ({
         onClose={onClose}
         goBackUie="go-back-conversation-participants"
         title={t('conversationParticipantsTitle')}
+        shouldFocusFirstButton={false}
       />
 
       <div className="panel__content conversation-participants__content">
-        <SearchInput
-          input={searchInput}
-          setInput={setSearchInput}
-          placeholder={t('conversationParticipantsSearchPlaceholder')}
-          forceDark
-        />
+        <div style={{padding: '0 12px'}}>
+          <SearchInput
+            input={searchInput}
+            setInput={setSearchInput}
+            placeholder={t('conversationParticipantsSearchPlaceholder')}
+            forceDark
+          />
+        </div>
 
         <FadingScrollbar className="conversation-participants__list panel__content">
           <UserSearchableList
@@ -113,6 +111,7 @@ const ConversationParticipants: FC<ConversationParticipantsProps> = ({
             conversationRepository={conversationRepository}
             conversation={activeConversation}
             selfFirst={false}
+            selfUser={selfUser}
             noSelfInteraction
           />
         </FadingScrollbar>

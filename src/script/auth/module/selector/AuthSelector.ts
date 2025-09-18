@@ -22,33 +22,29 @@ import type {TeamData} from '@wireapp/api-client/lib/team/';
 import type {RootState} from '../reducer';
 import type {RegistrationDataState} from '../reducer/authReducer';
 
-export const REGISTER_FLOW = {
-  GENERIC_INVITATION: 'REGISTER_FLOW_GENERIC_INVITATION',
-  PERSONAL: 'REGISTER_FLOW_PERSONAL',
-  TEAM: 'REGISTER_FLOW_TEAM',
+const unsetTeam: TeamData = {
+  creator: '',
+  icon: '',
+  id: '',
+  name: '',
 };
 
 const unsetRegistrationData: RegistrationDataState = {
   accent_id: 0,
   assets: [],
-  email: undefined,
-  email_code: undefined,
-  invitation_code: undefined,
-  label: undefined,
-  locale: undefined,
-  name: undefined,
-  password: undefined,
-  phone: undefined,
-  phone_code: undefined,
-  team: undefined,
+  email: '',
+  email_code: '',
+  invitation_code: '',
+  label: '',
+  locale: '',
+  name: '',
+  password: '',
+  team: unsetTeam,
   termsAccepted: false,
-};
-
-const unsetTeam: TeamData = {
-  creator: undefined,
-  icon: undefined,
-  id: undefined,
-  name: undefined,
+  customBackendURL: '',
+  accountCreationEnabled: false,
+  shouldDisplayWarning: false,
+  privacyPolicyAccepted: false,
 };
 
 export const isAuthenticated = (state: RootState) => state.authState.isAuthenticated;
@@ -59,12 +55,7 @@ export const getDefaultSSOCode = (state: RootState) => state.authState.ssoSettin
 export const hasDefaultSSOCode = (state: RootState) => !!state.authState.ssoSettings?.default_sso_code;
 export const getError = (state: RootState) => state.authState.error;
 export const getLoginData = (state: RootState) => state.authState.loginData;
-export const getCurrentFlow = (state: RootState) => state.authState.currentFlow;
 export const getEntropy = (state: RootState) => state.authState.entropy;
 export const getAccount = (state: RootState): RegistrationDataState => state.authState.account || unsetRegistrationData;
 export const getAccountTeam = (state: RootState) => getAccount(state).team || unsetTeam;
 export const getAccountTeamName = (state: RootState) => getAccountTeam(state).name;
-
-export const isGenericInvitationFlow = (state: RootState) => getCurrentFlow(state) === REGISTER_FLOW.GENERIC_INVITATION;
-export const isPersonalFlow = (state: RootState) => getCurrentFlow(state) === REGISTER_FLOW.PERSONAL;
-export const isTeamFlow = (state: RootState) => getCurrentFlow(state) === REGISTER_FLOW.TEAM;

@@ -19,31 +19,30 @@
 
 .participant-devices {
   &__fingerprint {
-    min-height: 72px;
+    width: 230px;
     margin-bottom: 32px;
-    font-family: monospace;
-    line-height: 1.375rem;
   }
 
   &__header {
     &--padding {
       padding: 16px;
     }
-    & > * + * {
-      margin-top: 8px;
-    }
   }
 
   &__link {
-    margin: 8px 0;
-    color: @w-blue;
+    color: var(--black);
     cursor: pointer;
-    font-size: @font-size-xsmall;
-    font-weight: @font-weight-bold;
-    text-transform: uppercase;
+    font-weight: var(--font-weight-medium);
+    letter-spacing: 0.05px;
+    text-decoration: underline;
+
+    body.theme-dark & {
+      color: var(--gray-50);
+    }
   }
 
   &__device-list {
+    padding: 0;
     margin-top: 8px;
   }
 
@@ -63,15 +62,6 @@
     }
   }
 
-  &__show-self-fingerprint {
-    margin-bottom: 56px;
-  }
-
-  &__reset-session {
-    font-size: @font-size-xsmall;
-    text-transform: uppercase;
-  }
-
   &__single-client {
     margin-top: 40px;
   }
@@ -79,11 +69,21 @@
   &__verify {
     display: flex;
     justify-content: space-between;
+
+    margin-bottom: 16px;
   }
 
-  &__actions {
-    .flex-center;
+  .device-details__reset-fingerprint {
+    margin-bottom: 8px;
+  }
 
-    width: 50%;
+  .device-proteus-details {
+    padding-top: 24px;
+  }
+
+  .device-details-title,
+  .panel__info-text,
+  .participant-devices__fingerprint {
+    margin-bottom: 16px;
   }
 }

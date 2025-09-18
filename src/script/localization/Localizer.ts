@@ -35,17 +35,18 @@ import pl from 'I18n/pl-PL.json';
 import pt from 'I18n/pt-BR.json';
 import ro from 'I18n/ro-RO.json';
 import ru from 'I18n/ru-RU.json';
+import si from 'I18n/si-LK.json';
 import sk from 'I18n/sk-SK.json';
 import sl from 'I18n/sl-SI.json';
 import tr from 'I18n/tr-TR.json';
 import uk from 'I18n/uk-UA.json';
+import {StorageKey} from 'Repositories/storage/StorageKey';
 import {DEFAULT_LOCALE, setLocale, setStrings} from 'Util/LocalizerUtil';
 import {loadValue, storeValue} from 'Util/StorageUtil';
 import {setDateLocale, LocaleType} from 'Util/TimeUtil';
 import {getParameter} from 'Util/UrlUtil';
 
 import {URLParameter} from '../auth/URLParameter';
-import {StorageKey} from '../storage/StorageKey';
 
 const strings = {
   cs,
@@ -66,6 +67,7 @@ const strings = {
   pt,
   ro,
   ru,
+  si,
   sk,
   sl,
   tr,

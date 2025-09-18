@@ -119,20 +119,6 @@ export const iterateItem = <T>(array: T[], currentItem: T, reverse = false): T |
  */
 export const randomElement = <T>(array: T[] = []) => array[Math.floor(Math.random() * array.length)];
 
-/**
- * Remove given element from array
- * @param array source
- * @param element Element which should be removed
- * @returns containing the removed element
- */
-export const removeElement = <T>(array: T[] = [], element: T): T[] | undefined => {
-  const index = array.indexOf(element);
-  if (index > -1) {
-    return array.splice(index, 1);
-  }
-  return undefined;
-};
-
 export const deArrayify = <T>(value: T[] | T): T => (value instanceof Array ? value[0] : value);
 
 export const uniquify = <T>(elements: T[]): T[] => Array.from(new Set<T>(elements));
@@ -150,4 +136,12 @@ export const partition = <T>(array: T[], condition: (element: T) => boolean): [T
     }
   });
   return [matching, notMatching];
+};
+
+type Entries<T> = {
+  [K in keyof T]: [K, T[K]];
+}[keyof T][];
+
+export const typedEntries = <T extends {}>(obj: T): Entries<T> => {
+  return Object.entries(obj) as Entries<T>;
 };

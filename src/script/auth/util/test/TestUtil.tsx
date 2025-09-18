@@ -20,9 +20,10 @@
 import React from 'react';
 
 import {render} from '@testing-library/react';
-import type {QualifiedUserClients} from '@wireapp/api-client/lib/conversation';
+import {CONVERSATION_TYPE, ConversationProtocol, QualifiedUserClients} from '@wireapp/api-client/lib/conversation';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {RecursivePartial} from '@wireapp/commons/lib/util/TypeUtil';
+import ko from 'knockout';
 import {IntlProvider} from 'react-intl';
 import {Provider} from 'react-redux';
 import {HashRouter as Router} from 'react-router-dom';
@@ -32,21 +33,87 @@ import {ThunkDispatch} from 'redux-thunk';
 
 import {StyledApp, THEME_ID} from '@wireapp/react-ui-kit';
 
-import {User} from 'src/script/entity/User';
+import cs from 'I18n/cs-CZ.json';
+import da from 'I18n/da-DK.json';
+import de from 'I18n/de-DE.json';
+import el from 'I18n/el-GR.json';
+import en from 'I18n/en-US.json';
+import es from 'I18n/es-ES.json';
+import et from 'I18n/et-EE.json';
+import fi from 'I18n/fi-FI.json';
+import fr from 'I18n/fr-FR.json';
+import hr from 'I18n/hr-HR.json';
+import hu from 'I18n/hu-HU.json';
+import it from 'I18n/it-IT.json';
+import lt from 'I18n/lt-LT.json';
+import nl from 'I18n/nl-NL.json';
+import pl from 'I18n/pl-PL.json';
+import pt from 'I18n/pt-BR.json';
+import ro from 'I18n/ro-RO.json';
+import ru from 'I18n/ru-RU.json';
+import si from 'I18n/si-LK.json';
+import sk from 'I18n/sk-SK.json';
+import sl from 'I18n/sl-SI.json';
+import tr from 'I18n/tr-TR.json';
+import uk from 'I18n/uk-UA.json';
+import {Participant} from 'Repositories/calling/Participant';
+import {Conversation} from 'Repositories/entity/Conversation';
+import {User} from 'Repositories/entity/User';
+import {MediaDevicesHandler} from 'Repositories/media/MediaDevicesHandler';
+import {setStrings} from 'Util/LocalizerUtil';
 import {createUuid} from 'Util/uuid';
 
+import {mapLanguage} from '../../localeConfig';
 import {Api, RootState} from '../../module/reducer';
 
-export const withStore = (
+const internalizationStrings = {
+  cs,
+  da,
+  de,
+  el,
+  en,
+  es,
+  et,
+  fi,
+  fr,
+  hr,
+  hu,
+  it,
+  lt,
+  nl,
+  pl,
+  pt,
+  ro,
+  ru,
+  si,
+  sk,
+  sl,
+  tr,
+  uk,
+};
+
+const withStore = (
   children: React.ReactNode,
   store: MockStoreEnhanced<RecursivePartial<RootState>, ThunkDispatch<RootState, Api, AnyAction>>,
 ) => <Provider store={store}>{children}</Provider>;
 
-export const withIntl = (component: React.ReactNode) => <IntlProvider locale="en">{component}</IntlProvider>;
+const withRouter = (component: React.ReactNode) => <Router>{component}</Router>;
+
+const loadLanguage = (language: string) => {
+  return require(`I18n/${mapLanguage(language)}.json`);
+};
+
+export const withIntl = (component: React.ReactNode) => {
+  setStrings(internalizationStrings);
+
+  return (
+    <IntlProvider locale="en" messages={loadLanguage('en-US')}>
+      {component}
+    </IntlProvider>
+  );
+};
 
 export const withTheme = (component: React.ReactNode) => <StyledApp themeId={THEME_ID.DEFAULT}>{component}</StyledApp>;
-
-export const withRouter = (component: React.ReactNode) => <Router>{component}</Router>;
 
 const wrapComponent = (
   component: React.ReactNode,
@@ -85,3 +152,38 @@ export function generateQualifiedIds(nbUsers: number, domain: string) {
   }
   return users;
 }
+
+export const createConversation = (
+  type: CONVERSATION_TYPE = CONVERSATION_TYPE.ONE_TO_ONE,
+  protocol: ConversationProtocol = ConversationProtocol.PROTEUS,
+  conversationId: QualifiedId = {id: createUuid(), domain: ''},
+  groupId = 'group-id',
+) => {
+  const conversation = new Conversation(conversationId.id, conversationId.domain, protocol);
+  conversation.participating_user_ets.push(new User(createUuid()));
+  conversation.type(type);
+  if (protocol === ConversationProtocol.MLS) {
+    conversation.groupId = groupId;
+  }
+  return conversation;
+};
+
+export const createSelfParticipant = () => {
+  const selfUser = new User();
+  selfUser.isMe = true;
+  return new Participant(selfUser, 'client1');
+};
+
+export const mediaDevices = {
+  audioinput: ko.pureComputed(() => 'test'),
+  audiooutput: ko.pureComputed(() => 'test'),
+  screeninput: ko.pureComputed(() => 'test'),
+  videoinput: ko.pureComputed(() => 'test'),
+};
+
+export const buildMediaDevicesHandler = () => {
+  return {
+    currentAvailableDeviceId: mediaDevices,
+    setOnMediaDevicesRefreshHandler: jest.fn(),
+  } as unknown as MediaDevicesHandler;
+};

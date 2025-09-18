@@ -61,11 +61,32 @@ Object.keys(emojiesList).forEach(key => {
   const emojiObject = emojiValue[0];
   const emojiNames = emojiObject.n;
 
-  emojiDictionary.set(key, emojiNames[0].replaceAll('-', ' '));
+  // Replace hyphens with spaces, but only if not followed by a number
+  // example- thumbs down emoji name is -1
+  const formattedEmojiName = emojiNames[0].replace(/-(?![0-9])/g, ' ');
+
+  emojiDictionary.set(key, formattedEmojiName);
 });
 
+// Function to get the emoji without skintone modifiers
+const removeSkinToneModifiers = (emojiUnicode: string): string => {
+  const skinToneModifiers = new Set(['1f3fd', '1f3fe', '1f3ff', '1f3fc', '1f3fb']);
+  if (!emojiUnicode) {
+    return '';
+  }
+  const emojiUnicodeSplitted = emojiUnicode.split('-');
+  const unicodeWithoutSkinModifier = emojiUnicodeSplitted.filter(part => !skinToneModifiers.has(part));
+
+  return unicodeWithoutSkinModifier.join('-');
+};
 export const getEmojiTitleFromEmojiUnicode = (emojiUnicode: string): string => {
-  return emojiDictionary.has(emojiUnicode) ? emojiDictionary.get(emojiUnicode)! : '';
+  if (emojiDictionary.has(emojiUnicode)) {
+    return emojiDictionary.get(emojiUnicode)!;
+  }
+
+  const unicodeWithoutSkinModifier = removeSkinToneModifiers(emojiUnicode);
+
+  return emojiDictionary.get(unicodeWithoutSkinModifier) || '';
 };
 
 export function getEmojiUnicode(emojis: string) {

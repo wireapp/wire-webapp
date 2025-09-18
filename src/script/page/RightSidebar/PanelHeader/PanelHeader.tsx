@@ -19,11 +19,12 @@
 
 import {FC, useEffect, useRef} from 'react';
 
-import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
 import cx from 'classnames';
 
-import {DragableClickWrapper} from 'Components/DragableClickWrapper';
-import {Icon} from 'Components/Icon';
+import {TabIndex} from '@wireapp/react-ui-kit';
+
+import {DraggableClickWrapper} from 'Components/DraggableClickWrapper';
+import * as Icon from 'Components/Icon';
 import {t} from 'Util/LocalizerUtil';
 import {noop} from 'Util/util';
 
@@ -43,6 +44,7 @@ export interface PanelHeaderProps {
   title?: string;
   handleBlur?: () => void;
   onToggleMute?: () => void;
+  shouldFocusFirstButton?: boolean;
 }
 
 const PanelHeader: FC<PanelHeaderProps> = ({
@@ -61,11 +63,12 @@ const PanelHeader: FC<PanelHeaderProps> = ({
   handleBlur = noop,
   onGoBack = noop,
   onToggleMute = noop,
+  shouldFocusFirstButton = true,
 }: PanelHeaderProps) => {
   const panelHeaderRef = useRef<HTMLHeadingElement>(null);
 
   useEffect(() => {
-    if (!!panelHeaderRef.current) {
+    if (!!panelHeaderRef.current && shouldFocusFirstButton) {
       const nextElementToFocus = panelHeaderRef.current.querySelector('button');
       // TO-DO Remove setTimeout after replacing transition group animation libray
       // triggering focus method without setTimeout is not working due to right side bar animation
@@ -73,16 +76,16 @@ const PanelHeader: FC<PanelHeaderProps> = ({
         nextElementToFocus?.focus();
       }, 0);
     }
-  }, []);
+  }, [shouldFocusFirstButton]);
 
   return (
     <header className={cx('panel__header', {'panel__header--reverse': isReverse}, className)} ref={panelHeaderRef}>
       {showBackArrow && (
-        <DragableClickWrapper onClick={() => onGoBack()}>
+        <DraggableClickWrapper onClick={() => onGoBack()}>
           <button className="icon-button" data-uie-name={goBackUie} title={goBackTitle} onBlur={handleBlur}>
-            <Icon.ArrowLeft />
+            <Icon.ArrowLeftIcon />
           </button>
-        </DragableClickWrapper>
+        </DraggableClickWrapper>
       )}
 
       {title && (
@@ -91,14 +94,14 @@ const PanelHeader: FC<PanelHeaderProps> = ({
         </h2>
       )}
 
-      <DragableClickWrapper onClick={onClose}>
+      <DraggableClickWrapper onClick={onClose}>
         <button className="icon-button" data-uie-name={closeUie} title={closeBtnTitle} onBlur={handleBlur}>
-          <Icon.Close className="right-panel-close" />
+          <Icon.CloseIcon className="right-panel-close" />
         </button>
-      </DragableClickWrapper>
+      </DraggableClickWrapper>
 
       {showActionMute && (
-        <DragableClickWrapper onClick={onToggleMute}>
+        <DraggableClickWrapper onClick={onToggleMute}>
           <button
             className={cx('right-panel-close icon-button', {
               'right-panel-mute--active': showNotificationsNothing,
@@ -107,9 +110,9 @@ const PanelHeader: FC<PanelHeaderProps> = ({
             onClick={onToggleMute}
             data-uie-name="do-mute"
           >
-            <Icon.Mute />
+            <Icon.MuteIcon />
           </button>
-        </DragableClickWrapper>
+        </DraggableClickWrapper>
       )}
     </header>
   );

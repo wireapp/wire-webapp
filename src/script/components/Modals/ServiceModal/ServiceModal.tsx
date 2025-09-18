@@ -20,14 +20,15 @@
 import React from 'react';
 
 import {Avatar, AVATAR_SIZE} from 'Components/Avatar';
-import {Icon} from 'Components/Icon';
-import {ModalComponent} from 'Components/ModalComponent';
+import * as Icon from 'Components/Icon';
+import {ModalComponent} from 'Components/Modals/ModalComponent';
+import {IntegrationRepository} from 'Repositories/integration/IntegrationRepository';
+import {ServiceEntity} from 'Repositories/integration/ServiceEntity';
+import {SidebarTabs, useSidebarStore} from 'src/script/page/LeftSidebar/panels/Conversations/useSidebarStore';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 import {renderElement} from 'Util/renderElement';
 
-import {IntegrationRepository} from '../../../integration/IntegrationRepository';
-import {ServiceEntity} from '../../../integration/ServiceEntity';
 import {ActionsViewModel} from '../../../view_model/ActionsViewModel';
 
 interface ServiceModalProps {
@@ -44,8 +45,11 @@ const ServiceModal: React.FC<ServiceModalProps> = ({
   actionsViewModel,
   onClose,
 }) => {
+  const {setCurrentTab: setCurrentSidebarTab} = useSidebarStore();
+
   const onOpenService = () => {
     onClose?.();
+    setCurrentSidebarTab(SidebarTabs.RECENT);
     actionsViewModel.open1to1ConversationWithService(service);
   };
 
@@ -58,7 +62,7 @@ const ServiceModal: React.FC<ServiceModalProps> = ({
           <>
             <div className="modal__header">
               <button className="modal__header__button" type="button" onClick={onClose} data-uie-name="do-close">
-                <Icon.Close />
+                <Icon.CloseIcon />
               </button>
             </div>
 
@@ -98,6 +102,4 @@ const ServiceModal: React.FC<ServiceModalProps> = ({
   );
 };
 
-const showServiceModal = renderElement<ServiceModalProps>(ServiceModal);
-
-export {ServiceModal, showServiceModal};
+export const showServiceModal = renderElement<ServiceModalProps>(ServiceModal);

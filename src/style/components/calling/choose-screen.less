@@ -62,10 +62,10 @@
   height: 176px;
   padding-right: 32px;
   cursor: pointer;
-  transition: all @animation-timing-faster;
+  transition: all var(--animation-timing-faster);
 
   img {
-    transition: all @animation-timing-faster;
+    transition: all var(--animation-timing-faster);
   }
 
   &::after {
@@ -75,7 +75,7 @@
     border-radius: 4px;
     background-color: transparent;
     content: '';
-    transition: all @animation-timing-faster;
+    transition: all var(--animation-timing-faster);
   }
 
   &:first-child {

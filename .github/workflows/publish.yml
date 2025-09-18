@@ -1,0 +1,377 @@
+name: Publish
+
+on:
+  push:
+    branches: [master, dev, release/*, new-navigation]
+    tags:
+      - '*q1-2024*'
+      - '*q2-2025*'
+      - '*staging*'
+      - '*production*'
+
+concurrency:
+  group: publish-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: Build Docker image and Helm Chart
+    runs-on: buildjet-8vcpu-ubuntu-2204
+
+    outputs:
+      wire_builds_target_branches: ${{ steps.output_target_branches.outputs.targets }}
+      image_tag: ${{ steps.push_docker_image.outputs.image_tag }}
+      release_name: ${{ steps.push_docker_image.outputs.release_name }}
+      chart_version: ${{ steps.bump_chart_version.outputs.chart_version }}
+      changelog: ${{ steps.generate_changelog.outputs.changelog }}
+      unit_tests_report: ${{ env.UNIT_TEST_REPORT_FILE }}
+      build_artifact: ${{ env.BUILD_ARTIFACT }}
+
+    env:
+      BUILD_DIR: server/dist/s3/
+      BUILD_ARTIFACT: ebs.zip
+      COMMIT_URL: ${{github.event.head_commit.url}}
+      COMMITTER: ${{github.event.head_commit.committer.name}}
+      CHANGELOG_FILE: './changelog.md'
+      UNIT_TEST_REPORT_FILE: './unit-tests.log'
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18.16.x
+          cache: 'yarn'
+
+      - name: Set environment variables
+        run: |
+          echo "BRANCH_NAME=$(git branch --show-current)" >> $GITHUB_ENV
+          echo "TAG=$(git tag --points-at ${{github.sha}})" >> $GITHUB_ENV
+
+      - name: Print environment variables
+        run: |
+          echo -e "BRANCH_NAME = ${BRANCH_NAME}"
+          echo -e "TAG = ${TAG}"
+          echo -e "COMMIT_URL = ${COMMIT_URL}"
+          echo -e "COMMITTER = ${COMMITTER}"
+
+      - name: Install JS dependencies
+        run: yarn --immutable
+
+      - name: Update configuration
+        run: yarn configure
+
+      - name: Test
+        run: |
+          set -o pipefail
+          yarn test --detectOpenHandles=false 2>&1 | tee ${{ env.UNIT_TEST_REPORT_FILE }}
+          echo -e "COMMIT SHA = ${{ github.sha }}" >> ${{env.UNIT_TEST_REPORT_FILE}}
+          echo -e "TEST RUN DATE = $(date -u +'%Y-%m-%dT%H:%M:%SZ')" >> ${{env.UNIT_TEST_REPORT_FILE}}
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: 'unit-tests-report'
+          path: ${{env.UNIT_TEST_REPORT_FILE}}
+
+      - name: Upload unit-tests.log to S3
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: eu-west-1
+        run: |
+          TIMESTAMP=$(date -u +'%Y%m%dT%H%M%SZ')
+          aws s3 cp ${{env.UNIT_TEST_REPORT_FILE}} s3://wire-webapp/unit-tests-${TIMESTAMP}-${{ github.sha }}.log
+
+      - name: Build
+        run: yarn build:prod
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: 'build-artifact'
+          path: '${{env.BUILD_DIR}}${{env.BUILD_ARTIFACT}}'
+
+      - uses: kanga333/variable-mapper@master
+        id: changelog
+        with:
+          key: '${{github.ref}}'
+          map: |
+            {
+              "production": {
+                "changelog_type": "production"
+              },
+              "staging": {
+                "changelog_type": "staging"
+              }
+            }
+          export_to: env
+
+      - name: Generate changelog
+        id: generate_changelog
+        if: ${{ env.changelog_type }}
+        run: |
+          yarn changelog:${{ env.changelog_type }} > ${{ env.CHANGELOG_FILE }}
+          echo "changelog=${{ env.CHANGELOG_FILE }}" >> $GITHUB_OUTPUT
+
+      - uses: actions/upload-artifact@v4
+        if: ${{ env.changelog_type }}
+        with:
+          name: 'changelog'
+          path: ${{ env.CHANGELOG_FILE }}
+
+      - name: Push Docker image
+        id: push_docker_image
+        env:
+          DOCKER_PASSWORD: ${{secrets.WEBTEAM_QUAY_PASSWORD}}
+          DOCKER_USERNAME: ${{secrets.WEBTEAM_QUAY_USERNAME}}
+          aws_secret_key: ${{secrets.WEBTEAM_AWS_SECRET_ACCESS_KEY}}
+        run: |
+          version_tag="${TAG:-$BRANCH_NAME}"
+          yarn docker "$version_tag" ./image_tag.txt
+
+          image_tag="$(cat ./image_tag.txt)"
+          echo "image_tag=$image_tag" >> $GITHUB_OUTPUT
+
+          packageVersion=$(cat ./package.json | jq -r '.version')
+          release_name="${TAG:-v${packageVersion}}"
+          echo "release_name=$release_name" >> $GITHUB_OUTPUT
+
+      - uses: azure/setup-helm@v4
+        with:
+          version: '3.12.2'
+
+      - name: Bump helm chart version
+        shell: bash
+        id: bump_chart_version
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.CHARTS_WEBAPP_AUTOMATION_AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.CHARTS_WEBAPP_AUTOMATION_AWS_SECRET_ACCESS_KEY }}
+        run: |
+          set -eo pipefail
+
+          image_tag="${{steps.push_docker_image.outputs.image_tag}}"
+
+          helm plugin install https://github.com/hypnoglow/helm-s3.git --version 0.15.1
+
+          helm repo add charts-webapp s3://public.wire.com/charts-webapp
+
+          if [[ "${{github.ref}}" =~ "/refs/tags" ]]; then
+            chart_version="$(./bin/chart-next-version.sh release)"
+          else
+            chart_version="$(./bin/chart-next-version.sh prerelease)"
+          fi
+          echo "chart_version=$chart_version" >> $GITHUB_OUTPUT
+
+          chart_patched="$(yq -Mr ".version = \"$chart_version\" | .appVersion = \"$image_tag\"" ./charts/webapp/Chart.yaml)"
+          echo "$chart_patched" > ./charts/webapp/Chart.yaml
+
+          helm package ./charts/webapp
+
+          helm s3 push --relative webapp-*.tgz charts-webapp
+
+      # generates a mapping between branches/tag to wire-build branches
+      - name: Define target branches in wireapp/wire-builds to bump
+        uses: kanga333/variable-mapper@master
+        id: output_target_branches
+        with:
+          key: '${{github.ref}}'
+          # TODO  Add staging if we ever use a wire-builds as a source for staging (we use k8s)
+          # "staging": {
+          #   "targets": "[\"TBD\"]"
+          # },
+          map: |
+            {
+              "production": {
+                "targets": "[\"main\"]"
+              },
+              "dev": {
+                "targets": "[\"dev\"]"
+              },
+              "q1-2024": {
+                "targets": "[\"q1-2024\"]"
+              },
+              "q2-2025": {
+                "targets": "[\"q2-2025\"]"
+              }
+            }
+          export_to: log,output
+
+  publish_wire_builds:
+    name: Bump webapp chart in wire-builds
+    runs-on: ubuntu-latest
+    needs: build
+    if: ${{needs.build.outputs.wire_builds_target_branches}}
+
+    strategy:
+      matrix:
+        target_branch: ${{fromJSON(needs.build.outputs.wire_builds_target_branches)}}
+
+    steps:
+      - name: Check out wire-builds
+        uses: actions/checkout@v4
+        with:
+          repository: wireapp/wire-builds
+          token: ${{secrets.WIRE_BUILDS_WRITE_ACCESS_GH_TOKEN}}
+          ref: ${{matrix.target_branch}}
+          fetch-depth: 1
+
+      - name: Create new build in wire-build
+        shell: bash
+        run: |
+          set -eo pipefail
+
+          chart_version="${{needs.build.outputs.chart_version}}"
+          image_tag="${{needs.build.outputs.image_tag}}"
+
+          git config --global user.email "zebot@users.noreply.github.com"
+          git config --global user.name "Zebot"
+
+          for retry in $(seq 3); do
+            set +e
+            (
+            set -e
+
+            if (( retry > 1 )); then
+              echo "Retrying..."
+            fi
+
+            git fetch --depth 1 origin "${{ matrix.target_branch }}"
+            git checkout "${{ matrix.target_branch }}"
+            git reset --hard @{upstream}
+
+            build_json=$(cat ./build.json | \
+              ./bin/set-chart-fields webapp \
+              "version=$chart_version" \
+              "repo=https://s3-eu-west-1.amazonaws.com/public.wire.com/charts-webapp" \
+              "meta.appVersion=$image_tag" \
+              "meta.commitURL=${{github.event.head_commit.url}}" \
+              "meta.commit=${{github.event.head_commit.id}}" \
+              | ./bin/bump-prerelease )
+            echo "$build_json" > ./build.json
+
+            git add build.json
+            git commit -m "Bump webapp to $chart_version"
+            git push origin "${{ matrix.target_branch }}"
+
+            )
+            if [ $? -eq 0 ]; then
+              echo "pushing to wire-builds succeeded"
+              break
+            else
+              echo "pushing to wire-builds FAILED (in retry $retry)"
+            fi
+            set -e
+          done
+          if (( $? != 0 )); then
+              echo "Retrying didn't help. Failing the step."
+              exit 1
+          fi
+
+  set_deployment_targets:
+    name: 'Set deployment targets'
+    runs-on: ubuntu-latest
+    needs: build
+    outputs:
+      deployment_targets: ${{env.targets}}
+
+    steps:
+      # generates a mapping between branches/tag to aws envs to deploy to
+      - uses: kanga333/variable-mapper@master
+        id: targets
+        with:
+          key: '${{github.ref}}'
+          map: |
+            {
+              "dev": {
+                "targets": "[\"wire-webapp-dev\", \"wire-webapp-edge\"]"
+              },
+              "master": {
+                "targets": "[\"wire-webapp-main\"]"
+              },
+              "production": {
+                "targets": "[\"wire-webapp-prod\"]"
+              },
+              "staging": {
+                "targets": "[\"wire-webapp-staging\"]"
+              }
+            }
+          export_to: env
+
+  deploy_to_aws:
+    name: 'Deploy to live environments'
+    runs-on: ubuntu-latest
+    environment: ${{ matrix.target }}
+    needs: [build, set_deployment_targets]
+    if: ${{needs.set_deployment_targets.outputs.deployment_targets}}
+
+    strategy:
+      matrix:
+        target: ${{fromJson(needs.set_deployment_targets.outputs.deployment_targets)}}
+
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: 'build-artifact'
+
+      - name: Deploy to ${{matrix.target}}
+        uses: einaregilsson/beanstalk-deploy@v22
+        with:
+          application_name: Webapp
+          aws_access_key: ${{secrets.WEBTEAM_AWS_ACCESS_KEY_ID}}
+          aws_secret_key: ${{secrets.WEBTEAM_AWS_SECRET_ACCESS_KEY}}
+          deployment_package: ${{needs.build.outputs.build_artifact}}
+          environment_name: ${{matrix.target}}
+          region: eu-central-1
+          use_existing_version_if_available: true
+          version_description: ${{github.sha}}
+          version_label: '${{github.run_id}}-${{matrix.target}}'
+          wait_for_deployment: false
+          wait_for_environment_recovery: 150
+
+  create_gh_release:
+    name: 'Create Github release'
+    runs-on: ubuntu-latest
+    needs: [deploy_to_aws, build]
+    if: ${{ needs.build.outputs.changelog }}
+
+    outputs:
+      release_url: ${{ steps.release.outputs.url }}
+
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: 'changelog'
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: 'unit-tests-report'
+
+      - name: Create GitHub release
+        id: 'release'
+        uses: softprops/action-gh-release@v2
+        env:
+          GITHUB_TOKEN: ${{github.token}}
+        with:
+          tag_name: ${{needs.build.outputs.release_name}}
+          body_path: ${{ needs.build.outputs.changelog }}
+          files: ${{ needs.build.outputs.unit_tests_report }}
+          draft: true
+          prerelease: ${{contains(needs.build.outputs.release_name, 'staging')}}
+
+  announce_deployment:
+    name: 'Announce deployment to wire chats'
+    runs-on: ubuntu-latest
+    needs: create_gh_release
+
+    steps:
+      - name: Announce staging release
+        if: ${{ needs.create_gh_release.outputs.release_url }}
+        uses: wireapp/github-action-wire-messenger@v2.0.0
+        with:
+          email: ${{secrets.WIRE_BOT_EMAIL}}
+          password: ${{secrets.WIRE_BOT_PASSWORD}}
+          conversation: '697c93e8-0b13-4204-a35e-59270462366a'
+          send_text: 'New release done ([full changelog](${{ needs.create_gh_release.outputs.release_url }})) 🚀'

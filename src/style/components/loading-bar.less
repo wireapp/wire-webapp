@@ -17,11 +17,30 @@
  *
  */
 
+.uploading-asset {
+  margin-top: 8px;
+
+  .progress-bar {
+    @rotation: 127deg;
+    @size: 14px;
+    @rotatedSize: (abs(cos(@rotation)) + abs(sin(@rotation))) * @size;
+    height: 6px;
+    border-radius: 100px;
+    margin-left: 0;
+    background-size: @rotatedSize 6px;
+
+    > div {
+      border-radius: 100px;
+      background-color: var(--accent-color-500);
+    }
+  }
+}
+
 .progress-console {
   overflow: hidden;
   height: 14px;
   margin-bottom: 14px;
-  font-size: @font-size-xs;
+  font-size: var(--font-size-xsmall);
   text-overflow: ellipsis;
   white-space: pre;
 }
@@ -47,6 +66,7 @@
     var(--background-fade-8) 14px
   );
   background-size: @rotatedSize 4px;
+  margin-inline: auto;
 
   > div {
     width: 0;

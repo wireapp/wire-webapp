@@ -66,9 +66,9 @@
     background-size: cover;
 
     &:not(:hover) {
-      transition-duration: @animation-timing-fast;
+      transition-duration: var(--animation-timing-fast);
       transition-property: opacity;
-      transition-timing-function: @ease-out-quart;
+      transition-timing-function: var(--ease-out-quart);
     }
 
     &.gif-container-item-selected {

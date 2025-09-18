@@ -17,75 +17,64 @@
  *
  */
 
-import React from 'react';
+import React, {useEffect} from 'react';
 
-import {FormattedMessage, useIntl} from 'react-intl';
+import type {RegisterData} from '@wireapp/api-client/lib/auth/';
+import {FormattedMessage} from 'react-intl';
 import {connect} from 'react-redux';
 import {useNavigate} from 'react-router-dom';
 import {AnyAction, Dispatch} from 'redux';
 
-import {CodeInput, ContainerXS, H1, Muted} from '@wireapp/react-ui-kit';
+import {CodeInput, FlexBox, Text} from '@wireapp/react-ui-kit';
 
+import {t} from 'Util/LocalizerUtil';
 import {getLogger} from 'Util/Logger';
 
 import {Page} from './Page';
+import {styles} from './VerifyEmailCode.styles';
 
-import {verifyStrings} from '../../strings';
+import {AccountRegistrationLayout} from '../component/AccountRegistrationLayout';
+import {BackButton} from '../component/BackButton';
 import {LinkButton} from '../component/LinkButton';
-import {RouterLink} from '../component/RouterLink';
 import {actionRoot as ROOT_ACTIONS} from '../module/action';
 import {RootState, bindActionCreators} from '../module/reducer';
 import * as AuthSelector from '../module/selector/AuthSelector';
 import {ROUTE} from '../route';
 import {parseError} from '../util/errorUtil';
+import {PageView, trackTelemetryPageView} from '../util/trackingUtil';
 
 type Props = React.HTMLProps<HTMLDivElement>;
-
-const changeEmailRedirect = {
-  [AuthSelector.REGISTER_FLOW.PERSONAL]: ROUTE.CREATE_ACCOUNT,
-  [AuthSelector.REGISTER_FLOW.GENERIC_INVITATION]: ROUTE.CREATE_ACCOUNT,
-  [AuthSelector.REGISTER_FLOW.TEAM]: ROUTE.CREATE_TEAM_ACCOUNT,
-};
 
 const VerifyEmailCodeComponent = ({
   account,
   authError,
-  currentFlow,
   entropyData,
   doRegisterPersonal,
-  doRegisterTeam,
   doSendActivationCode,
 }: Props & ConnectedProps & DispatchProps) => {
   const navigate = useNavigate();
-  const {formatMessage: _} = useIntl();
 
   const logger = getLogger('VerifyEmailCode');
-  const createAccount = async (email_code: string) => {
-    switch (currentFlow) {
-      case AuthSelector.REGISTER_FLOW.TEAM: {
-        try {
-          await doRegisterTeam({...account, email_code});
-          navigate(ROUTE.SET_HANDLE);
-        } catch (error) {
-          logger.error('Failed to create team account', error);
-        }
-        break;
-      }
-
-      case AuthSelector.REGISTER_FLOW.PERSONAL:
-      case AuthSelector.REGISTER_FLOW.GENERIC_INVITATION: {
-        try {
-          await doRegisterPersonal({...account, email_code}, entropyData);
-          navigate(ROUTE.SET_HANDLE);
-        } catch (error) {
-          logger.error('Failed to create personal account', error);
-        }
-      }
+  const createAccount = async (email_code?: string) => {
+    try {
+      const validAccount: RegisterData = {
+        ...account,
+        email_code,
+      };
+      await doRegisterPersonal(validAccount, entropyData);
+      navigate(ROUTE.SET_HANDLE, {state: {isNewAccount: true}});
+    } catch (error) {
+      trackTelemetryPageView(PageView.ACCOUNT_VERIFICATION_FAILED_SCREEN_2_5);
+      logger.error('Failed to create personal account', error);
     }
   };
 
   const resendCode = async (event: React.MouseEvent) => {
     event.preventDefault();
+    if (!account.email) {
+      return;
+    }
+
     try {
       await doSendActivationCode(account.email);
     } catch (error) {
@@ -93,36 +82,34 @@ const VerifyEmailCodeComponent = ({
     }
   };
 
+  useEffect(() => {
+    trackTelemetryPageView(PageView.ACCOUNT_VERIFICATION_SCREEN_2);
+  }, []);
+
   return (
     <Page hasAccountData>
-      <ContainerXS
-        centerText
-        verticalCenter
-        style={{display: 'flex', flexDirection: 'column', height: 428, justifyContent: 'space-between'}}
-      >
-        <div>
-          <H1 center>{_(verifyStrings.headline)}</H1>
-          <Muted data-uie-name="label-with-email">
+      <AccountRegistrationLayout>
+        <FlexBox css={styles.container}>
+          <FlexBox css={styles.header}>
+            <BackButton />
+            <p css={styles.headline}>{t('verify.headline')}</p>
+          </FlexBox>
+          <Text block data-uie-name="label-with-email" css={styles.subhead}>
             <FormattedMessage
-              {...verifyStrings.subhead}
+              id="verify.subhead"
               values={{
                 email: account.email,
                 newline: <br />,
               }}
             />
-          </Muted>
-          <CodeInput style={{marginTop: 10}} onCodeComplete={createAccount} data-uie-name="enter-code" />
+          </Text>
+          <CodeInput style={styles.codeInput} onCodeComplete={createAccount} data-uie-name="enter-code" />
           {parseError(authError)}
-        </div>
-        <div>
-          <LinkButton onClick={resendCode} data-uie-name="do-resend-code">
-            {_(verifyStrings.resendCode)}
+          <LinkButton onClick={resendCode} data-uie-name="do-resend-code" css={styles.resendLink}>
+            {t('verify.resendCode')}
           </LinkButton>
-          <RouterLink to={changeEmailRedirect[currentFlow]} style={{marginLeft: 35}} data-uie-name="go-change-email">
-            {_(verifyStrings.changeEmail)}
-          </RouterLink>
-        </div>
-      </ContainerXS>
+        </FlexBox>
+      </AccountRegistrationLayout>
     </Page>
   );
 };
@@ -131,7 +118,6 @@ type ConnectedProps = ReturnType<typeof mapStateToProps>;
 const mapStateToProps = (state: RootState) => ({
   account: AuthSelector.getAccount(state),
   authError: AuthSelector.getError(state),
-  currentFlow: AuthSelector.getCurrentFlow(state),
   entropyData: AuthSelector.getEntropy(state),
 });
 
@@ -140,7 +126,6 @@ const mapDispatchToProps = (dispatch: Dispatch<AnyAction>) =>
   bindActionCreators(
     {
       doRegisterPersonal: ROOT_ACTIONS.authAction.doRegisterPersonal,
-      doRegisterTeam: ROOT_ACTIONS.authAction.doRegisterTeam,
       doSendActivationCode: ROOT_ACTIONS.userAction.doSendActivationCode,
     },
     dispatch,

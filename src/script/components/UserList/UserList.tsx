@@ -17,26 +17,24 @@
  *
  */
 
-import {ChangeEvent, useCallback, useState} from 'react';
+import {ChangeEvent, useCallback, useMemo, useState} from 'react';
 
 import cx from 'classnames';
 import {container} from 'tsyringe';
 
-import {Icon} from 'Components/Icon';
+import * as Icon from 'Components/Icon';
+import {InViewport} from 'Components/InViewport';
 import {collapseButton, collapseIcon} from 'Components/UserList/UserList.styles';
+import type {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
+import {ConversationState} from 'Repositories/conversation/ConversationState';
+import type {Conversation} from 'Repositories/entity/Conversation';
+import type {User} from 'Repositories/entity/User';
+import {TeamState} from 'Repositories/team/TeamState';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {isEnterKey, isSpaceKey} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
 
 import {UserListItem} from './components/UserListItem';
-
-import type {ConversationRepository} from '../../conversation/ConversationRepository';
-import {ConversationState} from '../../conversation/ConversationState';
-import type {Conversation} from '../../entity/Conversation';
-import type {User} from '../../entity/User';
-import {TeamState} from '../../team/TeamState';
-import {UserState} from '../../user/UserState';
-import {InViewport} from '../utils/InViewport';
 
 export enum UserlistMode {
   COMPACT = 'UserlistMode.COMPACT',
@@ -53,7 +51,7 @@ const USER_CHUNK_SIZE = 64;
 
 export interface UserListProps {
   conversation?: Conversation;
-  conversationRepository: ConversationRepository;
+  conversationRepository?: ConversationRepository;
   conversationState?: ConversationState;
   highlightedUsers?: User[];
   infos?: Record<string, string>;
@@ -70,8 +68,9 @@ export interface UserListProps {
   teamState?: TeamState;
   truncate?: boolean;
   users: User[];
-  userState?: UserState;
   isSelectable?: boolean;
+  selfUser: User;
+  filterDeletedUsers?: boolean;
 }
 
 export const UserList = ({
@@ -90,24 +89,29 @@ export const UserList = ({
   showEmptyAdmin = false,
   noSelfInteraction = false,
   showArrow = false,
-  userState = container.resolve(UserState),
   teamState = container.resolve(TeamState),
   isSelectable = false,
   onSelectUser,
+  selfUser,
+  filterDeletedUsers = true,
 }: UserListProps) => {
   const [maxShownUsers, setMaxShownUsers] = useState(USER_CHUNK_SIZE);
 
+  // filter out deleted users
+  const filteredUsers = useMemo(
+    () => (filterDeletedUsers ? users.filter(user => !user.isDeleted) : users),
+    [users, filterDeletedUsers],
+  );
+
   const [expandedFolders, setExpandedFolders] = useState<UserListSections[]>([UserListSections.CONTACTS]);
 
-  const hasMoreUsers = !truncate && users.length > maxShownUsers;
+  const hasMoreUsers = !truncate && filteredUsers.length > maxShownUsers;
 
   const highlightedUserIds = highlightedUsers.map(user => user.id);
-  const selfInTeam = userState.self().inTeam();
-  const {self} = useKoSubscribableChildren(userState, ['self']);
-  const {is_verified: isSelfVerified} = useKoSubscribableChildren(self, ['is_verified']);
+  const {is_verified: isSelfVerified} = useKoSubscribableChildren(selfUser, ['is_verified']);
 
   // subscribe to roles changes in order to react to them
-  useKoSubscribableChildren(conversation, ['roles']);
+  useKoSubscribableChildren(conversation!, ['roles']);
 
   const isCompactMode = mode === UserlistMode.COMPACT;
   const cssClasses = isCompactMode ? 'search-list-sm' : 'search-list-lg';
@@ -132,6 +136,7 @@ export const UserList = ({
       return (
         <li key={user.id}>
           <UserListItem
+            groupId={conversation?.groupId}
             noInteraction={noSelfInteraction && user.isMe}
             user={user}
             noUnderline={isLastItem || noUnderline}
@@ -141,7 +146,6 @@ export const UserList = ({
             isSelected={isSelected(user)}
             mode={mode}
             external={teamState.isExternal(user.id)}
-            selfInTeam={selfInTeam}
             isSelfVerified={isSelfVerified}
             onClick={onClickOrKeyPressed}
             onKeyDown={onUserKeyPressed}
@@ -150,7 +154,7 @@ export const UserList = ({
         </li>
       );
     },
-    [highlightedUserIds, isSelectable, isSelfVerified, mode, noSelfInteraction, selectedUsers, selfInTeam, teamState],
+    [highlightedUserIds, isSelectable, isSelfVerified, mode, noSelfInteraction, selectedUsers, teamState],
   );
 
   let content;
@@ -162,11 +166,11 @@ export const UserList = ({
     let adminCount = 0;
     let memberCount = 0;
 
-    users.forEach((userEntity: User) => {
+    filteredUsers.forEach((userEntity: User) => {
       if (userEntity.isService) {
         return;
       }
-      if (conversationRepository.conversationRoleRepository.isUserGroupAdmin(conversation, userEntity)) {
+      if (conversationRepository?.conversationRoleRepository.isUserGroupAdmin(conversation, userEntity)) {
         admins.push(userEntity);
       } else {
         members.push(userEntity);
@@ -185,7 +189,7 @@ export const UserList = ({
         {(admins.length > 0 || showEmptyAdmin) && (
           <>
             <h3 className="user-list__header" data-uie-name="label-conversation-admins">
-              {t('searchListAdmins', adminCount)}
+              {t('searchListAdmins', {count: adminCount})}
             </h3>
 
             {admins.length > 0 && (
@@ -205,7 +209,7 @@ export const UserList = ({
         {members.length > 0 && maxShownUsers > admins.length && (
           <>
             <h3 className="user-list__header" data-uie-name="label-conversation-members">
-              {t('searchListMembers', memberCount)}
+              {t('searchListMembers', {count: memberCount})}
             </h3>
 
             <ul className={cx('search-list', cssClasses)} data-uie-name="list-members">
@@ -216,13 +220,11 @@ export const UserList = ({
       </>
     );
   } else {
-    const truncatedUsers = truncate ? users.slice(0, reducedUserCount) : users;
+    const truncatedUsers = truncate ? filteredUsers.slice(0, reducedUserCount) : filteredUsers;
     const isSelected = (userEntity: User): boolean =>
       isSelectable && !!selectedUsers?.some(user => user.id === userEntity.id);
 
-    const currentUsers = truncatedUsers.filter(user => isSelected(user));
-
-    const selectedUsersCount = currentUsers.length;
+    const selectedUsersCount = selectedUsers.length;
     const hasSelectedUsers = selectedUsersCount > 0;
 
     const toggleFolder = (folderName: UserListSections) => {
@@ -244,10 +246,10 @@ export const UserList = ({
               data-uie-name="do-toggle-selected-search-list"
             >
               <span css={collapseIcon(isSelectedContactsOpen)} aria-hidden="true">
-                <Icon.Disclose width={16} height={16} />
+                <Icon.DiscloseIcon width={16} height={16} />
               </span>
 
-              {t('userListSelectedContacts', selectedUsersCount)}
+              {t('userListSelectedContacts', {selectedContacts: selectedUsersCount})}
             </button>
 
             <ul
@@ -256,7 +258,7 @@ export const UserList = ({
               className={cx('search-list', cssClasses)}
             >
               {isSelectedContactsOpen &&
-                currentUsers.map((user, index) => {
+                selectedUsers.map((user, index) => {
                   const isLastItem = index === selectedUsersCount - 1;
 
                   return renderListItem(user, isLastItem);
@@ -272,7 +274,7 @@ export const UserList = ({
             data-uie-name="do-toggle-search-list"
           >
             <span css={collapseIcon(isContactsOpen)} aria-hidden="true">
-              <Icon.Disclose width={16} height={16} />
+              <Icon.DiscloseIcon width={16} height={16} />
             </span>
 
             {t('userListContacts')}

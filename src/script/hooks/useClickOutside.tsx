@@ -23,6 +23,7 @@ export const useClickOutside = (
   ref: RefObject<Element>,
   onClick: (e: MouseEvent) => void,
   exclude?: RefObject<Element>,
+  windowDocument = window.document,
 ) => {
   useEffect(() => {
     const handleClick = (event: MouseEvent) => {
@@ -34,8 +35,8 @@ export const useClickOutside = (
         }
       }
     };
-    document.addEventListener('click', handleClick);
+    windowDocument.addEventListener('click', handleClick);
 
-    return () => document.removeEventListener('click', handleClick);
-  }, [onClick]);
+    return () => windowDocument.removeEventListener('click', handleClick);
+  }, [exclude, onClick, ref, windowDocument]);
 };

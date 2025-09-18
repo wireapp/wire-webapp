@@ -20,8 +20,8 @@
 import {render, fireEvent} from '@testing-library/react';
 import ko from 'knockout';
 
-import {Message as MessageEntity} from 'src/script/entity/message/Message';
-import {ReadReceipt} from 'src/script/storage';
+import {Message as MessageEntity} from 'Repositories/entity/message/Message';
+import {ReadReceipt} from 'Repositories/storage';
 import {formatTimeShort} from 'Util/TimeUtil';
 
 import {ReadReceiptStatus} from './ReadReceiptStatus';
@@ -36,42 +36,10 @@ const createReadReceiptMessage = (partialReadReceiptStatus: Partial<MessageEntit
 };
 
 describe('ReadReceiptStatus', () => {
-  it('is not shown when message is not last delivered message', () => {
-    const props = {
-      isMessageFocused: true,
-      is1to1Conversation: false,
-      isLastDeliveredMessage: false,
-      message: createReadReceiptMessage({
-        readReceipts: ko.observableArray([] as ReadReceipt[]),
-      }),
-    };
-
-    const {queryByTestId} = render(<ReadReceiptStatus {...props} />);
-
-    expect(queryByTestId('status-message-read-receipt-delivered')).toBeNull();
-  });
-
-  it('shows "delivered" when noone read the message', () => {
-    const props = {
-      isMessageFocused: true,
-      is1to1Conversation: false,
-      isLastDeliveredMessage: true,
-      message: createReadReceiptMessage({
-        readReceipts: ko.observableArray([] as ReadReceipt[]),
-      }),
-    };
-
-    const {queryByTestId} = render(<ReadReceiptStatus {...props} />);
-
-    expect(queryByTestId('status-message-read-receipt-delivered')).not.toBeNull();
-    expect(queryByTestId('status-message-read-receipts')).toBeNull();
-  });
-
   it('shows the read icon', () => {
     const props = {
       isMessageFocused: true,
       is1to1Conversation: false,
-      isLastDeliveredMessage: true,
       message: createReadReceiptMessage({
         readReceipts: ko.observableArray([{} as ReadReceipt]),
       }),
@@ -90,7 +58,6 @@ describe('ReadReceiptStatus', () => {
       const props = {
         isMessageFocused: true,
         is1to1Conversation: true,
-        isLastDeliveredMessage: true,
         message: createReadReceiptMessage({
           readReceipts: ko.observableArray([{time: readReceiptTime} as ReadReceipt]),
         }),
@@ -109,7 +76,6 @@ describe('ReadReceiptStatus', () => {
       const props = {
         isMessageFocused: true,
         is1to1Conversation: true,
-        isLastDeliveredMessage: true,
         message: createReadReceiptMessage({
           readReceipts: ko.observableArray([{time: readReceiptTime} as ReadReceipt]),
         }),
@@ -127,7 +93,6 @@ describe('ReadReceiptStatus', () => {
       const props = {
         isMessageFocused: true,
         is1to1Conversation: false,
-        isLastDeliveredMessage: true,
         message: createReadReceiptMessage({
           readReceipts: ko.observableArray([{} as ReadReceipt, {} as ReadReceipt]),
         }),

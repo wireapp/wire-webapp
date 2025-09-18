@@ -20,19 +20,23 @@
 /* eslint-disable import/order */
 
 // Polyfill for "tsyringe" dependency injection
-require('core-js/full/reflect');
-require('intersection-observer');
-require('fake-indexeddb/auto');
+import 'core-js/full/reflect';
+import 'intersection-observer';
+import 'core-js/stable/structured-clone';
+import 'fake-indexeddb/auto';
+import '@testing-library/jest-dom';
 
-require('src/script/util/test/mock/createObjectURLMock');
-require('src/script/util/test/mock/cryptoMock');
-require('src/script/util/test/mock/matchMediaMock');
-require('src/script/util/test/mock/mediaDevicesMock');
-require('src/script/util/test/mock/navigatorPermissionsMock');
-require('src/script/util/test/mock/ResponseMock');
-require('src/script/util/test/mock/SVGProviderMock');
-require('src/script/util/test/mock/WebRTCMock');
-require('src/script/util/test/mock/resizeObserver.mock');
+import 'src/script/util/test/mock/createObjectURLMock';
+import 'src/script/util/test/mock/cryptoMock';
+import 'src/script/util/test/mock/matchMediaMock';
+import 'src/script/util/test/mock/mediaDevicesMock';
+import 'src/script/util/test/mock/navigatorPermissionsMock';
+import 'src/script/util/test/mock/ResponseMock';
+import 'src/script/util/test/mock/WebRTCMock';
+import 'src/script/util/test/mock/resizeObserver.mock';
+import 'src/script/util/test/mock/wireEnvMock';
+
+import encoding from 'text-encoding';
 
 jest.mock('axios', () => {
   return {
@@ -48,37 +52,32 @@ jest.mock('axios', () => {
   };
 });
 
-require('test/api/payloads');
-
-const encoding = require('text-encoding');
 window.TextEncoder = encoding.TextEncoder;
 window.TextDecoder = encoding.TextDecoder;
-
-const sinon = require('sinon');
-window.sinon = sinon;
-
-const ko = require('knockout');
-window.ko = ko;
-
-const {amplify} = require('amplify');
-window.amplify = amplify;
-
-const jQuery = require('jquery');
-window.jQuery = jQuery;
-window.$ = jQuery;
-
-window.wire = {
-  env: {
-    BACKEND_REST: 'https://test.wire.link',
-    FEATURE: {},
-    URL: {SUPPORT: {}},
-    NEW_PASSWORD_MINIMUM_LENGTH: 8,
-  },
-};
 
 window.z = {userPermission: {}};
 
 window.URL.createObjectURL = jest.fn();
+window.URL.revokeObjectURL = jest.fn();
+
+Object.defineProperty(document, 'elementFromPoint', {
+  writable: true,
+  value: jest.fn().mockImplementation((x, y) => {
+    return null;
+  }),
+});
 
 const testLib = require('@testing-library/react');
 testLib.configure({testIdAttribute: 'data-uie-name'});
+
+jest.mock('@formkit/auto-animate/react', () => ({
+  useAutoAnimate: () => [null, () => {}],
+}));
+
+jest.mock('react-pdf', () => ({
+  pdfjs: {
+    GlobalWorkerOptions: {
+      workerSrc: 'pdf.worker.js',
+    },
+  },
+}));

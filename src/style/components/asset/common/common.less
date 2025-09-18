@@ -17,13 +17,12 @@
  *
  */
 
-// Variables
-@border-radius: 4px;
-
 .asset-container-style {
   position: relative;
   display: flex;
   overflow: hidden;
+  width: 100%;
+  max-width: var(--conversation-message-asset-width);
   min-height: 64px;
 
   border-radius: 12px;
@@ -31,10 +30,6 @@
 
   & + & {
     margin-top: 1px;
-  }
-
-  &:first-of-type {
-    margin-bottom: 4px;
   }
 }
 

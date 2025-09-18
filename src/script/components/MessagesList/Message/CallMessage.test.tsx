@@ -20,18 +20,16 @@
 import {render, screen} from '@testing-library/react';
 import ko from 'knockout';
 
-import {CallMessage as CallMessageEntity} from 'src/script/entity/message/CallMessage';
+import {CallMessage as CallMessageEntity} from 'Repositories/entity/message/CallMessage';
 
 import {CallMessage} from './CallMessage';
 
 jest.mock('Components/Icon', () => ({
-  Icon: {
-    Hangup: () => {
-      return <span>hangupIcon</span>;
-    },
-    Pickup: () => {
-      return <span>pickupIcon</span>;
-    },
+  HangupIcon: () => {
+    return <span>hangupIcon</span>;
+  },
+  PickupIcon: () => {
+    return <span>pickupIcon</span>;
   },
   __esModule: true,
 }));

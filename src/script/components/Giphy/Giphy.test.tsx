@@ -19,15 +19,14 @@
 
 import {fireEvent, render, waitFor} from '@testing-library/react';
 
+import {GiphyRepository} from 'Repositories/extension/GiphyRepository';
 import {withTheme} from 'src/script/auth/util/test/TestUtil';
-
-import {GiphyRepository} from '../../extension/GiphyRepository';
 
 import {Giphy, GiphyState} from '.';
 
 const inputValue = 'Yammy yammy';
 const getDefaultProps = () => ({
-  giphyRepository: {getGifs: jest.fn().mockResolvedValue([])} as unknown as GiphyRepository,
+  giphyRepository: {getGifs: jest.fn().mockResolvedValue([]), resetOffset: jest.fn()} as unknown as GiphyRepository,
   inputValue,
   onClose: jest.fn(),
 });

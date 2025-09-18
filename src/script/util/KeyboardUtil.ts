@@ -35,7 +35,7 @@ export const KEY = {
   PAGE_UP: 'PageUp',
   SPACE: ' ',
   TAB: 'Tab',
-};
+} as const;
 
 export const isOneOfKeys = (keyboardEvent: KeyboardEvent | ReactKeyboardEvent, expectedKeys: string[] = []) => {
   expectedKeys = expectedKeys.map(key => key.toLowerCase());
@@ -78,83 +78,34 @@ export const isMetaKey = (keyboardEvent: KeyboardEvent): boolean =>
 export const isPasteAction = (keyboardEvent: KeyboardEvent): boolean =>
   isMetaKey(keyboardEvent) && isKey(keyboardEvent, KEY.KEY_V);
 
-export const isRemovalAction = (key: string): boolean => [KEY.BACKSPACE, KEY.DELETE].includes(key);
+const removalKeys: string[] = [KEY.BACKSPACE, KEY.DELETE];
+export const isRemovalAction = (key: string): boolean => removalKeys.includes(key);
 
-export const insertAtCaret = (areaId: string, text: string) => {
-  // http://stackoverflow.com/a/1064139
-  const textArea = document.getElementById(areaId) as HTMLTextAreaElement;
-  if (!textArea) {
-    return;
-  }
+export const isSpaceOrEnterKey = (key: string): boolean => key === KEY.SPACE || key === KEY.ENTER;
 
-  const scrollPos = textArea.scrollTop;
-  let strPos = 0;
-  const br =
-    textArea.selectionStart || textArea.selectionStart === 0 ? 'ff' : (document as any).selection ? 'ie' : false;
-
-  if (br === 'ie') {
-    textArea.focus();
-    const range = (document as any).selection.createRange();
-    range.moveStart('character', -textArea.value.length);
-    strPos = range.text.length;
-  } else if (br === 'ff') {
-    strPos = textArea.selectionStart;
-  }
-
-  const front = textArea.value.substring(0, strPos);
-  const back = textArea.value.substring(strPos, textArea.value.length);
-
-  textArea.value = `${front}${text}${back}`;
-  strPos = strPos + text.length;
-
-  if (br === 'ie') {
-    textArea.focus();
-    const ieRange = (document as any).selection.createRange();
-    ieRange.moveStart('character', -textArea.value.length);
-    ieRange.moveStart('character', strPos);
-    ieRange.moveEnd('character', 0);
-    ieRange.select();
-  } else if (br === 'ff') {
-    textArea.selectionStart = strPos;
-    textArea.selectionEnd = strPos;
-    textArea.focus();
-  }
-
-  textArea.scrollTop = scrollPos;
-};
-
-type KeyboardHandler = (event: KeyboardEvent) => void;
-
-const escKeyHandlers: KeyboardHandler[] = [];
-
-document.addEventListener('keydown', event => {
-  if (event.key === 'Escape') {
-    escKeyHandlers.forEach(handler => handler(event));
-  }
-});
-
-export const onEscKey = (handler: KeyboardHandler) => escKeyHandlers.push(handler);
-
-export const offEscKey = (handler: KeyboardHandler) => {
-  const index = escKeyHandlers.indexOf(handler);
-  if (index >= 0) {
-    escKeyHandlers.splice(index, 1);
-  }
-};
-
-export const handleKeyDown = (
-  event: React.KeyboardEvent<Element> | KeyboardEvent,
-  callback: (event?: React.KeyboardEvent<Element> | KeyboardEvent) => void,
-) => {
-  if (event.key === KEY.ENTER || event.key === KEY.SPACE) {
+export const handleKeyDown = ({
+  event,
+  callback,
+  keys,
+}: {
+  event: ReactKeyboardEvent<Element> | KeyboardEvent;
+  callback: (event?: ReactKeyboardEvent<Element> | KeyboardEvent) => void;
+  keys: Array<(typeof KEY)[keyof typeof KEY]>;
+}) => {
+  if (keys.includes(event.key as (typeof KEY)[keyof typeof KEY])) {
     callback(event);
   }
   return true;
 };
 
-export const handleEnterDown = (event: React.KeyboardEvent<HTMLElement> | KeyboardEvent, callback: () => void) => {
+export const handleEnterDown = (event: ReactKeyboardEvent<HTMLElement> | KeyboardEvent, callback: () => void): void => {
   if (event.key === KEY.ENTER) {
     callback();
   }
-  return true;
+};
+
+export const handleEscDown = (event: ReactKeyboardEvent<Element> | KeyboardEvent, callback: () => void): void => {
+  if (event?.key === KEY.ESC) {
+    callback();
+  }
 };

@@ -20,18 +20,18 @@
 import {render, waitFor} from '@testing-library/react';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 
-import {Conversation} from 'src/script/entity/Conversation';
+import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
+import {Conversation} from 'Repositories/entity/Conversation';
+import {ContentMessage} from 'Repositories/entity/message/ContentMessage';
+import {User} from 'Repositories/entity/User';
+import {SearchRepository} from 'Repositories/search/SearchRepository';
+import {TeamRepository} from 'Repositories/team/TeamRepository';
+import {UserRepository} from 'Repositories/user/UserRepository';
 import {createUuid} from 'Util/uuid';
 
 import {MessageDetails} from './MessageDetails';
 
 import {TestFactory} from '../../../../../test/helper/TestFactory';
-import {ConversationRepository} from '../../../conversation/ConversationRepository';
-import {ContentMessage} from '../../../entity/message/ContentMessage';
-import {User} from '../../../entity/User';
-import {SearchRepository} from '../../../search/SearchRepository';
-import {TeamRepository} from '../../../team/TeamRepository';
-import {UserRepository} from '../../../user/UserRepository';
 
 const testFactory = new TestFactory();
 let conversationRepository: ConversationRepository;
@@ -66,7 +66,7 @@ const getDefaultParams = (showReactions: boolean = false) => {
 describe('MessageDetails', () => {
   it('renders no reactions view', async () => {
     const conversation = new Conversation();
-    conversation.team_id = 'mock-team-id';
+    conversation.teamId = 'mock-team-id';
 
     const timestamp = new Date('2022-01-21T15:08:14.225Z').getTime();
     const userName = 'Jan Kowalski';
@@ -78,18 +78,19 @@ describe('MessageDetails', () => {
     message.timestamp(timestamp);
     message.user(user);
 
-    const getUsersById = jest.fn(async (ids: QualifiedId[]) => {
+    const findUsersByIds = jest.fn((ids: QualifiedId[]) => {
       return ids.map(id => new User(id.id, 'test-domain.mock'));
     });
 
     const userRepository = {
-      getUsersById,
+      findUsersByIds,
     } as unknown as UserRepository;
 
     const defaultProps = getDefaultParams();
     const {getByText} = render(
       <MessageDetails
         {...defaultProps}
+        selfUser={new User()}
         togglePanel={() => undefined}
         activeConversation={conversation}
         messageEntity={message}

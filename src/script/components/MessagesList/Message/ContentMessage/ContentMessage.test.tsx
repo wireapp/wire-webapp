@@ -20,16 +20,15 @@
 import {render, waitFor} from '@testing-library/react';
 import ko from 'knockout';
 
-import {LinkPreview} from 'src/script/entity/message/LinkPreview';
+import {Conversation} from 'Repositories/entity/Conversation';
+import {ContentMessage} from 'Repositories/entity/message/ContentMessage';
+import {LinkPreview} from 'Repositories/entity/message/LinkPreview';
+import {Text} from 'Repositories/entity/message/Text';
+import {User} from 'Repositories/entity/User';
 import {QuoteEntity} from 'src/script/message/QuoteEntity';
 import {createUuid} from 'Util/uuid';
 
 import {ContentMessageComponent, ContentMessageProps} from './ContentMessage';
-
-import {Conversation} from '../../../../entity/Conversation';
-import {ContentMessage} from '../../../../entity/message/ContentMessage';
-import {Text} from '../../../../entity/message/Text';
-import {User} from '../../../../entity/User';
 
 describe('message', () => {
   let defaultParams: ContentMessageProps;
@@ -46,8 +45,9 @@ describe('message', () => {
       contextMenu: {entries: ko.observable([])},
       conversation: new Conversation(),
       findMessage: jest.fn(),
-      isMessageFocused: true,
+      isFocused: true,
       isLastDeliveredMessage: false,
+      hideHeader: false,
       message,
       onClickAvatar: jest.fn(),
       onClickButton: jest.fn(),
@@ -61,9 +61,9 @@ describe('message', () => {
       onClickDetails: jest.fn(),
       onClickTimestamp: jest.fn(),
       onRetry: jest.fn(),
-      previousMessage: undefined,
       selfId: {domain: '', id: createUuid()},
       isMsgElementsFocusable: true,
+      isFileShareRestricted: false,
     };
   });
 

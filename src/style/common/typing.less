@@ -17,112 +17,112 @@
  *
  */
 .heading-h1 {
-  font-size: @font-size-xlarge;
-  font-weight: @font-weight-medium;
+  font-size: var(--font-size-xlarge);
+  font-weight: var(--font-weight-medium);
 }
 .heading-h2 {
-  font-size: @font-size-large;
-  font-weight: @font-weight-semibold;
+  font-size: var(--font-size-large);
+  font-weight: var(--font-weight-semibold);
 }
 .heading-h3 {
-  font-size: @font-size-medium;
-  font-weight: @font-weight-semibold;
+  font-size: var(--font-size-medium);
+  font-weight: var(--font-weight-semibold);
 }
 .heading-h4 {
-  font-size: @font-size-small;
-  font-weight: @font-weight-bold;
+  font-size: var(--font-size-small);
+  font-weight: var(--font-weight-bold);
 }
 
 .text {
-  font-size: @font-size-base;
+  font-size: var(--font-size-base);
   letter-spacing: 0.05px;
 }
 
 .text-light {
   .text;
 
-  font-weight: @font-weight-light;
+  font-weight: var(--font-weight-light);
 }
 
 .text-regular {
   .text;
 
-  font-weight: @font-weight-regular;
+  font-weight: var(--font-weight-regular);
 }
 .text-medium {
   .text;
 
-  font-weight: @font-weight-medium;
+  font-weight: var(--font-weight-medium);
 }
 .text-bold {
   .text;
 
-  font-weight: @font-weight-bold;
+  font-weight: var(--font-weight-bold);
 }
 .text-bold-small {
-  font-size: @font-size-medium;
-  font-weight: @font-weight-bold;
+  font-size: var(--font-size-medium);
+  font-weight: var(--font-weight-bold);
   letter-spacing: 0.35px;
 }
 
 .link {
   .text;
 
-  font-weight: @font-weight-regular;
+  font-weight: var(--font-weight-regular);
   text-decoration: underline;
 }
 
 .subline {
-  font-size: @font-size-small;
-  font-weight: @font-weight-regular;
+  font-size: var(--font-size-small);
+  font-weight: var(--font-weight-regular);
 }
 
 .label {
-  font-size: @font-size-small;
-  font-weight: @font-weight-regular;
+  font-size: var(--font-size-small);
+  font-weight: var(--font-weight-regular);
 }
 
 .label-small {
-  font-size: @font-size-xsmall;
+  font-size: var(--font-size-xsmall);
 }
 
 .label-medium {
-  font-size: @font-size-medium;
-  font-weight: @font-weight-regular;
-  line-height: @line-height-sm;
+  font-size: var(--font-size-medium);
+  font-weight: var(--font-weight-regular);
+  line-height: var(--line-height-sm);
 }
 
 .label-bold {
-  font-weight: @font-weight-bold;
+  font-weight: var(--font-weight-bold);
 }
 
 .label-base {
-  font-size: @font-size-base;
-  font-weight: @font-weight-regular;
-  line-height: @line-height-lg;
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-regular);
+  line-height: var(--line-height-lg);
 }
 
 .label-small-medium {
-  font-size: @font-size-xsmall;
-  font-weight: @font-weight-medium;
+  font-size: var(--font-size-xsmall);
+  font-weight: var(--font-weight-medium);
 }
 
 .label-small-medium--spacing {
-  font-size: @font-size-xsmall;
-  font-weight: @font-weight-medium;
+  font-size: var(--font-size-xsmall);
+  font-weight: var(--font-weight-medium);
   letter-spacing: 0.5px;
 }
 
 .text-input {
-  font-size: @font-size-base;
-  font-weight: @font-weight-regular;
-  line-height: @line-height-lg;
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-regular);
+  line-height: var(--line-height-lg);
 }
 
 .button-small {
-  font-size: @font-size-small;
-  font-weight: @font-weight-medium;
-  line-height: @line-height-sm;
+  font-size: var(--font-size-small);
+  font-weight: var(--font-weight-medium);
+  line-height: var(--line-height-sm);
 }
 
 .focus-outline {
@@ -143,4 +143,33 @@
     .focus-offset;
     .focus-border-radius;
   }
+}
+
+// NEW Typography
+.paragraph-body-1 {
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-medium);
+  letter-spacing: 0.05px;
+  line-height: var(--line-height-lg);
+}
+
+.paragraph-body-3 {
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-semibold);
+  letter-spacing: 0.05px;
+  line-height: var(--line-height-lg);
+}
+
+.label-1 {
+  font-size: var(--font-size-medium);
+  font-weight: var(--font-weight-regular);
+  line-height: var(--line-height-sm);
+}
+
+.label-2 {
+  color: var(--text-input-label);
+  font-size: var(--font-size-small);
+  font-weight: var(--font-weight-semibold);
+  letter-spacing: 0.25px;
+  line-height: var(--line-height-md);
 }

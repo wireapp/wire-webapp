@@ -1,0 +1,30 @@
+# This job will automatically create a cherry-pick PR from any release/* or master branch to the dev branch.
+# This job will not run if the push/PR is from the dev branch itself.
+# It allows the dev branch to stay up-to-date with fixes made to specific release branches
+name: Cherry pick to dev
+on:
+  push:
+    branches:
+      - 'release/*'
+      - 'master'
+
+permissions:
+  pull-requests: write
+  contents: write
+
+jobs:
+  cherry_pick:
+    if: github.event.pull_request.head.ref != 'dev'
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Create PR to branch
+        uses: gorillio/github-action-cherry-pick@master
+        with:
+          pr_branch: 'dev'
+        env:
+          GITHUB_TOKEN: ${{secrets.OTTO_THE_BOT_GH_TOKEN}}

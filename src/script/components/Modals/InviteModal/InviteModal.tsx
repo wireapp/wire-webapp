@@ -21,9 +21,9 @@ import React, {useState} from 'react';
 
 import {Runtime} from '@wireapp/commons';
 
-import {Icon} from 'Components/Icon';
-import {ModalComponent} from 'Components/ModalComponent';
-import {User} from 'src/script/entity/User';
+import * as Icon from 'Components/Icon';
+import {ModalComponent} from 'Components/Modals/ModalComponent';
+import {User} from 'Repositories/entity/User';
 import {t} from 'Util/LocalizerUtil';
 import {renderElement} from 'Util/renderElement';
 
@@ -41,10 +41,12 @@ const InviteModal: React.FC<InviteModalProps> = ({selfUser, onClose}) => {
   const userName = selfUser.username();
   const inviteMessage = userName
     ? t('inviteMessage', {brandName: brandName, username: `@${userName}`})
-    : t('inviteMessageNoEmail', brandName);
+    : t('inviteMessageNoEmail', {brandName});
 
   const metaKey = Runtime.isMacOS() ? t('inviteMetaKeyMac') : t('inviteMetaKeyPc');
-  const inviteHint = isInviteMessageSelected ? t('inviteHintSelected', metaKey) : t('inviteHintUnselected', metaKey);
+  const inviteHint = isInviteMessageSelected
+    ? t('inviteHintSelected', {metaKey})
+    : t('inviteHintUnselected', {metaKey});
 
   const onTextClick = () => setIsInviteMessageSelected(true);
   const onBlur = () => setIsInviteMessageSelected(false);
@@ -60,33 +62,37 @@ const InviteModal: React.FC<InviteModalProps> = ({selfUser, onClose}) => {
   };
 
   return (
-    <div className="invite-modal">
-      <ModalComponent isShown onBgClick={onClose} onClosed={onClose} data-uie-name="modal-invite">
-        <div className="modal__header">
-          <h2 className="modal__header__title" data-uie-name="status-modal-title">
-            {t('inviteHeadline', brandName)}
-          </h2>
+    <ModalComponent
+      isShown
+      onBgClick={onClose}
+      onClosed={onClose}
+      data-uie-name="modal-invite"
+      className="invite-modal"
+    >
+      <div className="modal__header">
+        <h2 className="modal__header__title" data-uie-name="status-modal-title">
+          {t('inviteHeadline', {brandName})}
+        </h2>
 
-          <button type="button" className="modal__header__button" onClick={onClose} data-uie-name="do-close">
-            <Icon.Close />
-          </button>
-        </div>
+        <button type="button" className="modal__header__button" onClick={onClose} data-uie-name="do-close">
+          <Icon.CloseIcon />
+        </button>
+      </div>
 
-        <div className="modal__body invite-modal__body">
-          <textarea
-            defaultValue={inviteMessage}
-            onClick={onClick}
-            onFocus={onFocus}
-            onBlur={onBlur}
-            className="modal__input reset-textarea invite-modal__message"
-            dir="auto"
-            data-uie-name="invite-modal-message"
-          />
+      <div className="modal__body invite-modal__body">
+        <textarea
+          defaultValue={inviteMessage}
+          onClick={onClick}
+          onFocus={onFocus}
+          onBlur={onBlur}
+          className="modal__input reset-textarea invite-modal__message"
+          dir="auto"
+          data-uie-name="invite-modal-message"
+        />
 
-          <div className="modal__info invite-modal__info">{inviteHint}</div>
-        </div>
-      </ModalComponent>
-    </div>
+        <div className="modal__info invite-modal__info">{inviteHint}</div>
+      </div>
+    </ModalComponent>
   );
 };
 

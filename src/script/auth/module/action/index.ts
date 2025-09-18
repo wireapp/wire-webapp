@@ -24,7 +24,6 @@ import {InvitationAction, invitationAction} from './InvitationAction';
 import {LocalStorageAction, localStorageAction} from './LocalStorageAction';
 import {NavigationAction, navigationAction} from './NavigationAction';
 import {NotificationAction, notificationAction} from './NotificationAction';
-import {RuntimeAction, runtimeAction} from './RuntimeAction';
 import {SelfAction, selfAction} from './SelfAction';
 import {UserAction, userAction} from './UserAction';
 import {WrapperEventAction, wrapperEventAction} from './WrapperEventAction';
@@ -37,7 +36,6 @@ export interface ActionRoot {
   localStorageAction: LocalStorageAction;
   navigationAction: NavigationAction;
   notificationAction: NotificationAction;
-  runtimeAction: RuntimeAction;
   selfAction: SelfAction;
   userAction: UserAction;
   wrapperEventAction: WrapperEventAction;
@@ -51,7 +49,6 @@ export const actionRoot: ActionRoot = {
   localStorageAction,
   navigationAction,
   notificationAction,
-  runtimeAction,
   selfAction,
   userAction,
   wrapperEventAction,

@@ -18,6 +18,7 @@
  */
 
 import {ConnectionStatus} from '@wireapp/api-client/lib/connection/';
+import {QualifiedId} from '@wireapp/api-client/lib/user/';
 import {amplify} from 'amplify';
 import ko from 'knockout';
 import {container} from 'tsyringe';
@@ -25,6 +26,13 @@ import {container} from 'tsyringe';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
+import type {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
+import {ConversationState} from 'Repositories/conversation/ConversationState';
+import {MessageRepository} from 'Repositories/conversation/MessageRepository';
+import {Conversation} from 'Repositories/entity/Conversation';
+import type {Message} from 'Repositories/entity/message/Message';
+import type {UserRepository} from 'Repositories/user/UserRepository';
+import {UserState} from 'Repositories/user/UserState';
 import {t} from 'Util/LocalizerUtil';
 import {getLogger, Logger} from 'Util/Logger';
 import {isConversationEntity} from 'Util/TypePredicateUtil';
@@ -32,31 +40,26 @@ import {isConversationEntity} from 'Util/TypePredicateUtil';
 import type {MainViewModel, ViewModelRepositories} from './MainViewModel';
 
 import {Config} from '../Config';
-import type {ConversationRepository} from '../conversation/ConversationRepository';
-import {ConversationState} from '../conversation/ConversationState';
-import {MessageRepository} from '../conversation/MessageRepository';
-import {Conversation} from '../entity/Conversation';
-import type {Message} from '../entity/message/Message';
 import {ConversationError} from '../error/ConversationError';
 import '../page/LeftSidebar';
+import {SidebarTabs, useSidebarStore} from '../page/LeftSidebar/panels/Conversations/useSidebarStore';
 import '../page/MainContent';
 import {PanelState} from '../page/RightSidebar';
 import {useAppMainState} from '../page/state';
 import {ContentState, useAppState} from '../page/useAppState';
 import {generateConversationUrl} from '../router/routeGenerator';
 import {navigate, setHistoryParam} from '../router/Router';
-import type {UserRepository} from '../user/UserRepository';
-import {UserState} from '../user/UserState';
 
 interface ShowConversationOptions {
   exposeMessage?: Message;
   openFirstSelfMention?: boolean;
   openNotificationSettings?: boolean;
+  filePath?: string;
 }
 
 interface ShowConversationOverload {
-  (conversation: Conversation | undefined, options: ShowConversationOptions): Promise<void>;
-  (conversationId: string, options: ShowConversationOptions, domain: string | null): Promise<void>;
+  (conversation: Conversation | undefined, options?: ShowConversationOptions): Promise<void>;
+  (conversationId: QualifiedId, options?: ShowConversationOptions): Promise<void>;
 }
 
 export class ContentViewModel {
@@ -70,7 +73,6 @@ export class ContentViewModel {
   mainViewModel: MainViewModel;
   previousConversation?: Conversation;
   userRepository: UserRepository;
-  initialMessage?: Message;
 
   get isFederated() {
     return this.mainViewModel.isFederated;
@@ -92,7 +94,7 @@ export class ContentViewModel {
 
     const showMostRecentConversation = () => {
       const mostRecentConversation = this.conversationState.getMostRecentConversation();
-      this.showConversation(mostRecentConversation, {});
+      this.showConversation(mostRecentConversation);
     };
 
     this.userState.connectRequests.subscribe(requests => {
@@ -106,7 +108,7 @@ export class ContentViewModel {
 
     ko.computed(() => {
       if (
-        this.conversationState.activeConversation()?.connection().status() ===
+        this.conversationState.activeConversation()?.connection()?.status() ===
         ConnectionStatus.MISSING_LEGAL_HOLD_CONSENT
       ) {
         showMostRecentConversation();
@@ -122,21 +124,103 @@ export class ContentViewModel {
   }
 
   private _shiftContent(hideSidebar: boolean = false): void {
-    const sidebar = document.querySelector(`#${this.sidebarId}`) as HTMLElement | null;
+    useAppMainState.getState().leftSidebar.hide(hideSidebar);
+  }
 
-    if (hideSidebar) {
-      if (sidebar) {
-        sidebar.style.visibility = 'hidden';
-      }
-    } else if (sidebar) {
-      sidebar.style.visibility = '';
+  private changeConversation(conversationEntity: Conversation, messageEntity?: Message): void {
+    conversationEntity.initialMessage(messageEntity);
+    this.conversationState.activeConversation(conversationEntity);
+  }
+
+  private readonly getConversationEntity = async (
+    conversation: Conversation | QualifiedId,
+  ): Promise<Conversation | null> => {
+    const conversationEntity = isConversationEntity(conversation)
+      ? conversation
+      : await this.conversationRepository.getConversationById(conversation);
+
+    if (!conversationEntity.is1to1()) {
+      return conversationEntity;
+    }
+
+    return this.conversationRepository.init1to1Conversation(conversationEntity, true);
+  };
+
+  private closeRightSidebar(): void {
+    const {rightSidebar} = useAppMainState.getState();
+    rightSidebar.close();
+  }
+
+  private handleMissingConversation(): void {
+    this.closeRightSidebar();
+    setHistoryParam('/');
+    return this.switchContent(ContentState.CONNECTION_REQUESTS);
+  }
+
+  private isConversationOpen(conversationEntity: Conversation, isActiveConversation: boolean): boolean {
+    const {contentState} = useAppState.getState();
+    const isConversationState = contentState === ContentState.CONVERSATION;
+    return conversationEntity && isActiveConversation && isConversationState;
+  }
+
+  private switchToNotificationSettingsIfApplicable(
+    openNotificationSettings: boolean,
+    conversationEntity: Conversation,
+  ): void {
+    if (openNotificationSettings) {
+      const {rightSidebar} = useAppMainState.getState();
+      rightSidebar.goTo(PanelState.NOTIFICATIONS, {entity: conversationEntity});
     }
   }
 
-  changeConversation = (conversationEntity: Conversation, messageEntity?: Message) => {
-    this.initialMessage = messageEntity;
-    this.conversationState.activeConversation(conversationEntity);
-  };
+  private handleConversationState(
+    isOpenedConversation: boolean,
+    openNotificationSettings: boolean,
+    conversationEntity: Conversation,
+  ): void {
+    const {setContentState} = useAppState.getState();
+    if (isOpenedConversation) {
+      this.switchToNotificationSettingsIfApplicable(openNotificationSettings, conversationEntity);
+      return;
+    }
+    setContentState(ContentState.CONVERSATION);
+
+    this.mainViewModel.list.openConversations(conversationEntity.archivedState());
+  }
+
+  private showAndNavigate(
+    conversationEntity: Conversation,
+    openNotificationSettings: boolean,
+    filePath?: string,
+  ): void {
+    const {rightSidebar} = useAppMainState.getState();
+    this.showContent(ContentState.CONVERSATION);
+    this.previousConversation = this.conversationState.activeConversation();
+    setHistoryParam(
+      generateConversationUrl({id: conversationEntity?.id ?? '', domain: conversationEntity?.domain ?? '', filePath}),
+    );
+
+    if (openNotificationSettings) {
+      rightSidebar.goTo(PanelState.NOTIFICATIONS, {entity: this.conversationState.activeConversation() ?? null});
+    }
+  }
+
+  private showConversationNotFoundErrorModal(): void {
+    PrimaryModal.show(
+      PrimaryModal.type.ACKNOWLEDGE,
+      {
+        text: {
+          message: t('conversationNotFoundMessage'),
+          title: t('conversationNotFoundTitle', {brandName: Config.getConfig().BRAND_NAME}),
+        },
+      },
+      undefined,
+    );
+  }
+
+  private isConversationNotFoundError(error: any): boolean {
+    return error.type === ConversationError.TYPE.CONVERSATION_NOT_FOUND;
+  }
 
   /**
    * Opens the specified conversation.
@@ -148,32 +232,25 @@ export class ContentViewModel {
    * @param domain Domain name
    */
   readonly showConversation: ShowConversationOverload = async (
-    conversation: Conversation | string | undefined,
-    options: ShowConversationOptions,
-    domain: string | null = null,
+    conversation: Conversation | QualifiedId | undefined,
+    options?: ShowConversationOptions,
   ) => {
     const {
       exposeMessage: exposeMessageEntity,
       openFirstSelfMention = false,
       openNotificationSettings = false,
-    } = options;
-
-    const {rightSidebar} = useAppMainState.getState();
-    const {contentState, setContentState} = useAppState.getState();
+      filePath,
+    } = options || {};
 
     if (!conversation) {
-      rightSidebar.close();
-      return this.switchContent(ContentState.CONNECTION_REQUESTS);
+      return this.handleMissingConversation();
     }
 
     try {
-      const conversationEntity = isConversationEntity(conversation)
-        ? conversation
-        : await this.conversationRepository.getConversationById({domain: domain || '', id: conversation});
+      const conversationEntity = await this.getConversationEntity(conversation);
 
       if (!conversationEntity) {
-        rightSidebar.close();
-
+        this.closeRightSidebar();
         throw new ConversationError(
           ConversationError.TYPE.CONVERSATION_NOT_FOUND,
           ConversationError.MESSAGE.CONVERSATION_NOT_FOUND,
@@ -183,62 +260,31 @@ export class ContentViewModel {
       const isActiveConversation = this.conversationState.isActiveConversation(conversationEntity);
 
       if (!isActiveConversation) {
-        rightSidebar.close();
+        this.closeRightSidebar();
       }
 
-      const isConversationState = contentState === ContentState.CONVERSATION;
-      const isOpenedConversation = conversationEntity && isActiveConversation && isConversationState;
+      const isOpenedConversation = this.isConversationOpen(conversationEntity, isActiveConversation);
 
-      if (isOpenedConversation) {
-        if (openNotificationSettings) {
-          rightSidebar.goTo(PanelState.NOTIFICATIONS, {entity: conversationEntity});
-        }
-        return;
-      }
-
-      setContentState(ContentState.CONVERSATION);
-      this.mainViewModel.list.openConversations();
-
+      this.handleConversationState(isOpenedConversation, openNotificationSettings, conversationEntity);
       if (!isActiveConversation) {
         this.conversationState.activeConversation(conversationEntity);
       }
 
+      void this.conversationRepository.refreshMLSConversationVerificationState(conversationEntity);
       const messageEntity = openFirstSelfMention ? conversationEntity.getFirstUnreadSelfMention() : exposeMessageEntity;
-
-      if (conversationEntity.is_cleared()) {
-        conversationEntity.cleared_timestamp(0);
-      }
-
-      if (conversationEntity.is_archived()) {
-        await this.conversationRepository.unarchiveConversation(conversationEntity);
-      }
-
       this.changeConversation(conversationEntity, messageEntity);
-      this.showContent(ContentState.CONVERSATION);
-      this.previousConversation = this.conversationState.activeConversation();
-      setHistoryParam(
-        generateConversationUrl({id: conversationEntity?.id ?? '', domain: conversationEntity?.domain ?? ''}),
-        history.state,
-      );
-
-      if (openNotificationSettings) {
-        rightSidebar.goTo(PanelState.NOTIFICATIONS, {entity: this.conversationState.activeConversation() ?? null});
+      this.showAndNavigate(conversationEntity, openNotificationSettings, filePath);
+    } catch (error: any) {
+      if (this.isConversationNotFoundError(error)) {
+        return this.showConversationNotFoundErrorModal();
       }
-    } catch (error) {
-      const isConversationNotFound = error.type === ConversationError.TYPE.CONVERSATION_NOT_FOUND;
-      if (isConversationNotFound) {
-        PrimaryModal.show(
-          PrimaryModal.type.ACKNOWLEDGE,
-          {
-            text: {
-              message: t('conversationNotFoundMessage'),
-              title: t('conversationNotFoundTitle', Config.getConfig().BRAND_NAME),
-            },
-          },
-          undefined,
-        );
-      } else {
-        throw error;
+
+      throw error;
+    } finally {
+      const {currentTab, setCurrentTab} = useSidebarStore.getState();
+
+      if ([SidebarTabs.PREFERENCES, SidebarTabs.CONNECT].includes(currentTab)) {
+        setCurrentTab(SidebarTabs.RECENT);
       }
     }
   };

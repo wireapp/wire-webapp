@@ -31,13 +31,14 @@ body.theme-default {
   @app-bg: var(--gray-10);
   @sidebar-bg: var(--gray-20);
   @sidebar-border-color: var(--gray-50);
+  @sidebar-folder-selected-bg: var(--gray-30);
   @border-color: var(--gray-40);
   @main-color: var(--black);
   @app-bg-secondary: var(--white);
   @conversation-list-bg-opacity: fade(#000, 64%);
-  @sidebar-box-shadow: #eee;
-  @sidebar-box-shadow-lg: rgba(0, 0, 0, 0.12);
   @input-bar-bg: var(--white);
+  @transparent-img-bg: var(--gray-20);
+  @group-icon-bg: var(--white);
 
   // ----------------------------------------------------------------------------
   // Calling
@@ -118,7 +119,7 @@ body.theme-default {
     .applyTheme();
   }
 
-  @import (less) 'highlight.js/styles/base16/solarized-light.css';
+  @import (less) 'prism-themes/themes/prism-one-light.css';
 }
 
 body.theme-dark {
@@ -134,11 +135,14 @@ body.theme-dark {
   @app-bg: var(--gray-95);
   @sidebar-bg: var(--gray-100);
   @sidebar-border-color: var(--gray-95);
+  @sidebar-folder-selected-bg: var(--gray-95);
   @main-color: var(--white);
   @border-color: var(--gray-90);
   @app-bg-secondary: var(--black);
   @conversation-list-bg-opacity: fade(#000, 78%);
   @input-bar-bg: var(--gray-100);
+  @transparent-img-bg: var(--gray-90);
+  @group-icon-bg: var(--gray-95);
 
   // ----------------------------------------------------------------------------
   // Calling
@@ -161,7 +165,7 @@ body.theme-dark {
   // ----------------------------------------------------------------------------
   // Modal
   // ----------------------------------------------------------------------------
-  @modal-bg: #33373a;
+  @modal-bg: #26272c;
   @modal-border-color: 1px solid rgba(255, 255, 255, 0.12);
 
   // ----------------------------------------------------------------------------
@@ -213,5 +217,5 @@ body.theme-dark {
 
   .applyTheme();
 
-  @import (less) 'highlight.js/styles/base16/solarized-dark.css';
+  @import (less) 'prism-themes/themes/prism-one-dark.css';
 }

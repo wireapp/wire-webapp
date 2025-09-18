@@ -21,7 +21,7 @@ import {CSSObject} from '@emotion/react';
 
 export const getIconCSS = (fill?: string): CSSObject => ({
   alignItems: 'center',
-  bottom: 42,
+  top: 36,
   fill: fill,
   height: 16,
   margin: 0,
@@ -34,18 +34,18 @@ export const getIconCSS = (fill?: string): CSSObject => ({
 export const containerCSS: CSSObject = {
   display: 'flex',
   flexDirection: 'column-reverse',
-  paddingBottom: 26,
+  paddingBottom: '1rem',
   position: 'relative',
   width: '100%',
 };
 
 export const errorMessageCSS: CSSObject = {
-  bottom: 4,
   color: 'var(--text-input-alert)',
   left: 0,
-  lineHeight: '0.875rem',
-  position: 'absolute',
+  lineHeight: 'var(--line-height-small-plus)',
   textTransform: 'unset',
+  marginTop: '4px',
+  fontWeight: 'normal',
 };
 
 export const getInputCSS = (disabled?: boolean, borderColor?: string): CSSObject => ({
@@ -85,7 +85,8 @@ export const getInputCSS = (disabled?: boolean, borderColor?: string): CSSObject
 });
 
 export const getLabelCSS = (color?: string): CSSObject => ({
-  color: color || 'var(--text-input-label)',
+  color: color || 'var(--text-input-color)',
+  fontWeight: 'var(--font-weight-semibold)',
   display: 'flex',
   flexDirection: 'column',
   marginBottom: 2,
@@ -96,7 +97,7 @@ export const cancelButtonCSS: CSSObject = {
   background: 'var(--text-input-color)',
   border: 'none',
   borderRadius: '50%',
-  bottom: 42,
+  bottom: '2rem',
   display: 'flex',
   height: 16,
   justifyContent: 'center',

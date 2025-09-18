@@ -19,12 +19,13 @@
 
 import React from 'react';
 
-import {FormattedMessage, useIntl} from 'react-intl';
+import {FormattedMessage} from 'react-intl';
 
 import {Button, COLOR, Column, Columns, Container, H3, Link, Modal, Text} from '@wireapp/react-ui-kit';
 
+import {t} from 'Util/LocalizerUtil';
+
 import {Config} from '../../Config';
-import {acceptNewsModalStrings} from '../../strings';
 
 export interface Props extends React.HTMLProps<HTMLDivElement> {
   onConfirm: (event: React.MouseEvent<HTMLButtonElement>) => void;
@@ -32,19 +33,18 @@ export interface Props extends React.HTMLProps<HTMLDivElement> {
 }
 
 const AcceptNewsModal = ({onConfirm, onDecline}: Props) => {
-  const {formatMessage: _} = useIntl();
   return (
     <Modal>
       <Container style={{maxWidth: '400px'}} data-uie-name="modal-marketing-consent">
         <H3 style={{fontWeight: 500, marginTop: '10px'}} data-uie-name="modal-marketing-consent-title">
-          {_(acceptNewsModalStrings.headline, {brandName: Config.getConfig().BRAND_NAME})}
+          {t('acceptNewsModal.headline', {brandName: Config.getConfig().BRAND_NAME})}
         </H3>
         <div data-uie-name="modal-marketing-consent-description">
-          <Text block>{_(acceptNewsModalStrings.unsubscribeDescription)}</Text>
+          <Text block>{t('acceptNewsModal.unsubscribeDescription')}</Text>
           <Link href={Config.getConfig().URL.PRIVACY_POLICY} target="_blank" data-uie-name="go-privacy">
             <Text block>
               <FormattedMessage
-                {...acceptNewsModalStrings.privacyDescription}
+                id="acceptNewsModal.privacyDescription"
                 values={{
                   strong: (...chunks: any[]) => <strong>{chunks}</strong>,
                 }}
@@ -60,12 +60,12 @@ const AcceptNewsModal = ({onConfirm, onDecline}: Props) => {
               backgroundColor={COLOR.GRAY}
               data-uie-name="do-decline-marketing-consent"
             >
-              {_(acceptNewsModalStrings.declineButton)}
+              {t('acceptNewsModal.declineButton')}
             </Button>
           </Column>
           <Column style={{textAlign: 'center'}}>
             <Button type="button" onClick={onConfirm} data-uie-name="do-confirm-marketing-consent">
-              {_(acceptNewsModalStrings.confirmButton)}
+              {t('acceptNewsModal.confirmButton')}
             </Button>
           </Column>
         </Columns>

@@ -20,15 +20,16 @@
 import React, {useRef, useState} from 'react';
 
 import {LoginData} from '@wireapp/api-client/lib/auth';
-import {useIntl} from 'react-intl';
+import {useSelector} from 'react-redux';
 
 import {Button, Input, Loading} from '@wireapp/react-ui-kit';
 
-import {isValidEmail, isValidPhoneNumber, isValidUsername} from 'Util/ValidationUtil';
+import {t} from 'Util/LocalizerUtil';
+import {isValidEmail, isValidUsername} from 'Util/ValidationUtil';
 
-import {Config} from '../../Config';
-import {loginStrings} from '../../strings';
 import {ValidationError} from '../module/action/ValidationError';
+import {RootState} from '../module/reducer';
+import * as AuthSelector from '../module/selector/AuthSelector';
 
 interface LoginFormProps {
   isFetching: boolean;
@@ -36,14 +37,14 @@ interface LoginFormProps {
 }
 
 const LoginForm = ({isFetching, onSubmit}: LoginFormProps) => {
-  const {formatMessage: _} = useIntl();
   const emailInput = useRef<HTMLInputElement>(null);
   const passwordInput = useRef<HTMLInputElement>(null);
 
   const [validEmailInput, setValidEmailInput] = useState(true);
   const [validPasswordInput, setValidPasswordInput] = useState(true);
+  const {email: defaultEmail} = useSelector((state: RootState) => AuthSelector.getAccount(state));
 
-  const [email, setEmail] = useState('');
+  const [email, setEmail] = useState(defaultEmail || '');
   const [password, setPassword] = useState('');
 
   const handleSubmit = (event: React.FormEvent): void => {
@@ -93,8 +94,6 @@ const LoginForm = ({isFetching, onSubmit}: LoginFormProps) => {
       loginData.email = localEmail;
     } else if (isValidUsername(localEmail.toLowerCase())) {
       loginData.handle = localEmail.replace('@', '').toLowerCase();
-    } else if (Config.getConfig().FEATURE.ENABLE_PHONE_LOGIN && isValidPhoneNumber(localEmail)) {
-      loginData.phone = localEmail;
     }
     onSubmit(loginData, validationErrors);
   };
@@ -102,6 +101,7 @@ const LoginForm = ({isFetching, onSubmit}: LoginFormProps) => {
   return (
     <div>
       <Input
+        disabled={!!defaultEmail}
         id="email"
         name="email"
         onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
@@ -112,7 +112,7 @@ const LoginForm = ({isFetching, onSubmit}: LoginFormProps) => {
         markInvalid={!validEmailInput}
         value={email}
         autoComplete="username email"
-        placeholder={_(loginStrings.emailPlaceholder)}
+        placeholder={t('login.emailPlaceholder')}
         maxLength={128}
         type="text"
         required
@@ -130,7 +130,7 @@ const LoginForm = ({isFetching, onSubmit}: LoginFormProps) => {
         value={password}
         autoComplete="section-login password"
         type="password"
-        placeholder={_(loginStrings.passwordPlaceholder)}
+        placeholder={t('login.passwordPlaceholder')}
         pattern={'.{1,1024}'}
         required
         data-uie-name="enter-password"
@@ -145,10 +145,10 @@ const LoginForm = ({isFetching, onSubmit}: LoginFormProps) => {
           disabled={!email || !password}
           formNoValidate
           onClick={handleSubmit}
-          aria-label={_(loginStrings.headline)}
+          aria-label={t('login.headline')}
           data-uie-name="do-sign-in"
         >
-          {_(loginStrings.headline)}
+          {t('login.headline')}
         </Button>
       )}
     </div>

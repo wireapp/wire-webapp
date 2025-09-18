@@ -17,19 +17,22 @@
  *
  */
 
-import React, {useEffect, useState} from 'react';
+import {useEffect, useState} from 'react';
 
 import {amplify} from 'amplify';
 
 import {WebAppEvents} from '@wireapp/webapp-events';
 
-import {Icon} from 'Components/Icon';
+import * as Icon from 'Components/Icon';
 import {showDetailViewModal} from 'Components/Modals/DetailViewModal';
-import {ConversationRepository} from 'src/script/conversation/ConversationRepository';
-import {ContentMessage} from 'src/script/entity/message/ContentMessage';
+import {AssetRepository} from 'Repositories/assets/AssetRepository';
+import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
+import {MessageRepository} from 'Repositories/conversation/MessageRepository';
+import {Conversation} from 'Repositories/entity/Conversation';
+import {ContentMessage} from 'Repositories/entity/message/ContentMessage';
+import {User} from 'Repositories/entity/User';
 import {generateConversationUrl} from 'src/script/router/routeGenerator';
 import {createNavigate} from 'src/script/router/routerBindings';
-import {UserState} from 'src/script/user/UserState';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 
@@ -38,9 +41,6 @@ import {CollectionSection} from './CollectionSection';
 import {FullSearch} from './FullSearch';
 import {Category, isOfCategory} from './utils';
 
-import {AssetRepository} from '../../../../assets/AssetRepository';
-import {MessageRepository} from '../../../../conversation/MessageRepository';
-import {Conversation} from '../../../../entity/Conversation';
 import {MessageCategory} from '../../../../message/MessageCategory';
 
 interface CollectionDetailsProps {
@@ -48,7 +48,7 @@ interface CollectionDetailsProps {
   conversationRepository: ConversationRepository;
   assetRepository: AssetRepository;
   messageRepository: MessageRepository;
-  readonly userState: UserState;
+  selfUser: User;
 }
 
 type Categories = Record<Category, ContentMessage[]>;
@@ -80,18 +80,17 @@ function splitIntoCategories(messages: ContentMessage[]): Categories {
   );
 }
 
-const Collection: React.FC<CollectionDetailsProps> = ({
+const Collection = ({
   conversation,
   conversationRepository,
   assetRepository,
   messageRepository,
-  userState,
-}) => {
+  selfUser,
+}: CollectionDetailsProps) => {
   const [searchTerm, setSearchTerm] = useState('');
   const {display_name} = useKoSubscribableChildren(conversation, ['display_name']);
   const [messages, setMessages] = useState<ContentMessage[]>([]);
   const [detailCategory, setDetailCategory] = useState<Category | undefined>(undefined);
-  const {self: selfUser} = useKoSubscribableChildren(userState, ['self']);
 
   useEffect(() => {
     conversationRepository
@@ -178,7 +177,7 @@ const Collection: React.FC<CollectionDetailsProps> = ({
         onSelect={() => setDetailCategory('audio')}
         label={t('collectionSectionAudio')}
       >
-        <Icon.MicOn className="collection-header-icon" />
+        <Icon.MicOnIcon className="collection-header-icon" />
       </CollectionSection>
       <CollectionSection
         messages={files}
@@ -202,7 +201,7 @@ const Collection: React.FC<CollectionDetailsProps> = ({
             onClick={createNavigate(generateConversationUrl(conversation))}
             aria-label={t('fullsearchCancelLabel')}
           >
-            <Icon.Close />
+            <Icon.CloseIcon />
           </button>
         </div>
         <h2 className="content-titlebar-items-center">{display_name}</h2>

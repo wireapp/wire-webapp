@@ -24,14 +24,14 @@ import {container} from 'tsyringe';
 
 import {Checkbox, CheckboxLabel} from '@wireapp/react-ui-kit';
 
+import {PropertiesRepository} from 'Repositories/properties/PropertiesRepository';
+import {AppLockRepository} from 'Repositories/user/AppLockRepository';
+import {AppLockState} from 'Repositories/user/AppLockState';
+import {CONVERSATION_TYPING_INDICATOR_MODE} from 'Repositories/user/TypingIndicatorMode';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 import {formatDurationCaption} from 'Util/TimeUtil';
 
-import {PropertiesRepository} from '../../../../../properties/PropertiesRepository';
-import {AppLockRepository} from '../../../../../user/AppLockRepository';
-import {AppLockState} from '../../../../../user/AppLockState';
-import {CONVERSATION_TYPING_INDICATOR_MODE} from '../../../../../user/TypingIndicatorMode';
 import {PreferencesSection} from '../components/PreferencesSection';
 
 interface PrivacySectionProps {
@@ -119,7 +119,9 @@ const PrivacySection: React.FC<PrivacySectionProps> = ({
             <CheckboxLabel htmlFor="status-preference-applock">{t('preferencesAccountAppLockCheckbox')}</CheckboxLabel>
           </Checkbox>
           <p className="preferences-detail preferences-detail-intended">
-            {t('preferencesAccountAppLockDetail', formatDurationCaption(appLockInactivityTimeoutSecs * 1000))}
+            {t('preferencesAccountAppLockDetail', {
+              locktime: formatDurationCaption(appLockInactivityTimeoutSecs * 1000),
+            })}
           </p>
         </div>
       )}

@@ -17,19 +17,20 @@
  *
  */
 
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
+
+import {useDebouncedCallback} from 'use-debounce';
 
 import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
 
-import {Icon} from 'Components/Icon';
+import * as Icon from 'Components/Icon';
 import {ServiceList} from 'Components/ServiceList/ServiceList';
-import {IntegrationRepository} from 'src/script/integration/IntegrationRepository';
-import {ServiceEntity} from 'src/script/integration/ServiceEntity';
+import {IntegrationRepository} from 'Repositories/integration/IntegrationRepository';
+import {ServiceEntity} from 'Repositories/integration/ServiceEntity';
 import {t} from 'Util/LocalizerUtil';
 import {safeWindowOpen} from 'Util/SanitizationUtil';
 
 import {getManageServicesUrl} from '../../../../externalRoute';
-import {useDebounce} from '../../../../hooks/useDebounce';
 
 export const ServicesTab: React.FC<{
   canManageServices: boolean;
@@ -41,18 +42,18 @@ export const ServicesTab: React.FC<{
   const [services, setServices] = useState<ServiceEntity[]>(integrationRepository.services());
   const manageServicesUrl = getManageServicesUrl('client_landing');
 
-  const openManageServices = () => safeWindowOpen(manageServicesUrl);
+  const openManageServices = () => safeWindowOpen(manageServicesUrl!);
 
-  useDebounce(
-    async () => {
-      const results = await integrationRepository.searchForServices(searchQuery);
-      if (results) {
-        setServices(results);
-      }
-    },
-    300,
-    [searchQuery],
-  );
+  const debouncedSearch = useDebouncedCallback(async () => {
+    const results = await integrationRepository.searchForServices(searchQuery);
+    if (results) {
+      setServices(results);
+    }
+  }, 300);
+
+  useEffect(() => {
+    debouncedSearch();
+  }, [searchQuery]);
 
   return (
     <>
@@ -68,7 +69,7 @@ export const ServicesTab: React.FC<{
                   data-uie-name="go-manage-services"
                 >
                   <span className="left-column-icon">
-                    <Icon.Service />
+                    <Icon.ServiceIcon />
                   </span>
                   <span className="column-center">{t('searchManageServices')}</span>
                 </button>
@@ -82,7 +83,7 @@ export const ServicesTab: React.FC<{
       {services.length === 0 && !isInitial && (
         <div className="search__no-services">
           <span className="search__no-services__icon">
-            <Icon.Service />
+            <Icon.ServiceIcon />
           </span>
 
           {canManageServices && manageServicesUrl ? (

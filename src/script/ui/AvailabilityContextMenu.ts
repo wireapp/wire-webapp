@@ -47,6 +47,6 @@ export const AvailabilityContextMenu = {
       },
     ];
 
-    showContextMenu(event, entries, elementName);
+    showContextMenu({event, entries, identifier: elementName});
   },
 };

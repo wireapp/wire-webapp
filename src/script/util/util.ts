@@ -19,40 +19,17 @@
 
 import {Decoder, Encoder} from 'bazinga64';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
-import type {ObservableArray} from 'knockout';
 
-import {UrlUtil, Runtime} from '@wireapp/commons';
+import {Runtime} from '@wireapp/commons';
 
-import {findMentionAtPosition} from 'Util/MentionUtil';
+import type {Conversation} from 'Repositories/entity/Conversation';
 
 import {isTabKey} from './KeyboardUtil';
-import {loadValue} from './StorageUtil';
+import {getLogger} from './Logger';
 
-import {QUERY_KEY} from '../auth/route';
-import {Config} from '../Config';
-import type {Conversation} from '../entity/Conversation';
 import {AuthError} from '../error/AuthError';
-import {MentionEntity} from '../message/MentionEntity';
-import {StorageKey} from '../storage/StorageKey';
-
-export const isTemporaryClientAndNonPersistent = (persist: boolean): boolean => {
-  if (persist === undefined) {
-    throw new Error('Type of client is unspecified.');
-  }
-
-  const isNonPersistentByUrl = UrlUtil.getURLParameter(QUERY_KEY.PERSIST_TEMPORARY_CLIENTS) === 'false';
-  const isNonPersistentByServerConfig = Config.getConfig().FEATURE?.PERSIST_TEMPORARY_CLIENTS === false;
-  const isNonPersistent = isNonPersistentByUrl || isNonPersistentByServerConfig;
-
-  const isTemporary = persist === false;
-  return isTemporary && isNonPersistent;
-};
 
 export const checkIndexedDb = (): Promise<void> => {
-  if (isTemporaryClientAndNonPersistent(loadValue(StorageKey.AUTH.PERSIST))) {
-    return Promise.resolve();
-  }
-
   if (!Runtime.isSupportingIndexedDb()) {
     const errorType = Runtime.isEdge() ? AuthError.TYPE.PRIVATE_MODE : AuthError.TYPE.INDEXED_DB_UNSUPPORTED;
     const errorMessage = Runtime.isEdge() ? AuthError.MESSAGE.PRIVATE_MODE : AuthError.MESSAGE.INDEXED_DB_UNSUPPORTED;
@@ -109,7 +86,7 @@ export const loadDataUrl = (file: Blob): Promise<string | ArrayBuffer> => {
   });
 };
 
-export const loadUrlBuffer = (
+const loadUrlBuffer = (
   url: string,
   xhrAccessorFunction?: (xhr: XMLHttpRequest) => void,
 ): Promise<{buffer: ArrayBuffer; mimeType: string}> => {
@@ -164,6 +141,11 @@ export const getFileExtension = (filename: string): string => {
   const extensionMatch = filename?.match(/\.(tar\.gz|[^.]*)$/i);
   const foundExtension = extensionMatch?.[1];
   return foundExtension || '';
+};
+
+export const getFileExtensionFromUrl = (url: string): string => {
+  const cleanUrl = url.split(/[?#]/)[0];
+  return getFileExtension(cleanUrl);
 };
 
 export const trimFileExtension = (filename?: string): string => {
@@ -254,23 +236,22 @@ export const downloadFile = (url: string, fileName: string, mimeType?: string): 
   }, 100);
 };
 
-// Note: IE10 listens to "transitionend" instead of "animationend"
-export const alias = {
-  animationend: 'transitionend animationend oAnimationEnd MSAnimationEnd mozAnimationEnd webkitAnimationEnd',
-};
-
-export const koPushDeferred = (target: ObservableArray, src: any[], number = 100, delay = 300) => {
-  /** push array deferred to knockout's `observableArray` */
-  let interval: number;
-
-  return (interval = window.setInterval(() => {
-    const chunk = src.splice(0, number);
-    target.push(...chunk);
-
-    if (src.length === 0) {
-      return window.clearInterval(interval);
-    }
-  }, delay));
+/**
+ * Forces file download instead of browser "preview".
+ * We use fetch + blob because native <a download> doesn't work reliably across browsers and file types (especially PDFs and images).
+ */
+export const forcedDownloadFile = async ({url, name}: {url: string; name: string}) => {
+  const response = await fetch(url);
+  const blob = await response.blob();
+  const newBlob = new Blob([blob], {type: 'application/octet-stream'});
+  const newUrl = window.URL.createObjectURL(newBlob);
+  const link = document.createElement('a');
+  link.href = newUrl;
+  link.setAttribute('download', name);
+  document.body.appendChild(link);
+  link.click();
+  link.parentNode?.removeChild(link);
+  window.URL.revokeObjectURL(newUrl);
 };
 
 /**
@@ -283,21 +264,6 @@ export const zeroPadding = (value: string | number, length = 2): string => {
 
 export const sortGroupsByLastEvent = (groupA: Conversation, groupB: Conversation): number =>
   groupB.last_event_timestamp() - groupA.last_event_timestamp();
-
-export const sortObjectByKeys = (object: Record<string, any>, reverse: boolean) => {
-  const keys = Object.keys(object);
-  keys.sort();
-
-  if (reverse) {
-    keys.reverse();
-  }
-
-  // Returns a copy of an object, which is ordered by the keys of the original object.
-  return keys.reduce<Record<string, any>>((sortedObject, key: string) => {
-    sortedObject[key] = object[key];
-    return sortedObject;
-  }, {});
-};
 
 // Removes url(' and url(" from the beginning of the string and also ") and ') from the end
 export const stripUrlWrapper = (url: string) => url.replace(/^url\(["']?/, '').replace(/["']?\)$/, '');
@@ -320,30 +286,7 @@ export const afterRender = (callback: TimerHandler): number =>
  */
 export const noop = (): void => {};
 
-export function throttle(callback: Function, wait: number, immediate = false) {
-  let timeout: number | null = null;
-  let initialCall = true;
-
-  return function () {
-    const callNow = immediate && initialCall;
-    const next = () => {
-      // eslint-disable-next-line prefer-rest-params
-      callback.apply(this, arguments);
-      timeout = null;
-    };
-
-    if (callNow) {
-      initialCall = false;
-      next();
-    }
-
-    if (!timeout) {
-      timeout = window.setTimeout(next, wait);
-    }
-  };
-}
-
-export const focusableElementsSelector =
+const focusableElementsSelector =
   'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
 
 export const preventFocusOutside = (event: KeyboardEvent, parentId: string): void => {
@@ -381,35 +324,10 @@ export const setContextMenuPosition = (event: React.KeyboardEvent) => {
   });
 };
 
-export const generateConversationInputStorageKey = (conversationEntity: Conversation): string =>
-  `${StorageKey.CONVERSATION.INPUT}|${conversationEntity.id}`;
-
-export const getSelectionPosition = (element: HTMLTextAreaElement, currentMentions: MentionEntity[]) => {
-  const {selectionStart: start, selectionEnd: end} = element;
-  const defaultRange = {endIndex: 0, startIndex: Infinity};
-
-  const firstMention = findMentionAtPosition(start, currentMentions) || defaultRange;
-  const lastMention = findMentionAtPosition(end, currentMentions) || defaultRange;
-
-  const mentionStart = Math.min(firstMention.startIndex, lastMention.startIndex);
-  const mentionEnd = Math.max(firstMention.endIndex, lastMention.endIndex);
-
-  const newStart = Math.min(mentionStart, start);
-  const newEnd = Math.max(mentionEnd, end);
-
-  return {newEnd, newStart};
-};
-
 const supportsSecretStorage = () => !Runtime.isDesktopApp() || !!window.systemCrypto;
 
 // disables mls for old 'broken' desktop clients, see https://github.com/wireapp/wire-desktop/pull/6094
-export const supportsMLS = () => Config.getConfig().FEATURE.ENABLE_MLS && supportsSecretStorage();
-
-export const supportsSelfSupportedProtocolsUpdates = () =>
-  Config.getConfig().FEATURE.ENABLE_SELF_SUPPORTED_PROTOCOLS_UPDATES;
-
-export const supportsCoreCryptoProteus = () =>
-  Config.getConfig().FEATURE.ENABLE_PROTEUS_CORE_CRYPTO && supportsSecretStorage();
+export const supportsMLS = () => supportsSecretStorage();
 
 export const incomingCssClass = 'content-animation-incoming-horizontal-left';
 
@@ -422,3 +340,37 @@ export const removeAnimationsClass = (element: HTMLElement | null) => {
     });
   }
 };
+
+export class InitializationEventLogger {
+  private logger = getLogger('AppInitialization');
+  private timestamp: number;
+
+  constructor(private userId: string) {
+    this.timestamp = Date.now();
+  }
+
+  log(step: string, options = {}) {
+    this.logger.info('Performance tracking: ', {
+      appInitialization: {
+        user_id: this.userId,
+        step,
+        duration: Date.now() - this.timestamp,
+        ...options,
+      },
+    });
+    this.timestamp = Date.now(); // Reset the timestamp after logging
+  }
+}
+
+export enum AppInitializationStep {
+  AppInitialize = 'AppInitialize',
+  UserInitialize = 'UserInitialize',
+  SetupEventProcessors = 'SetupEventProcessors',
+  ValidatedClient = 'ValidatedClient',
+  ConversationsLoaded = 'ConversationsLoaded',
+  UserDataLoaded = 'UserDataLoaded',
+  DecryptionCompleted = 'DecryptionCompleted',
+  SetupMLS = 'SetupMls',
+  ClientsUpdated = 'ClientsUpdated',
+  AppInitCompleted = 'AppInitCompleted',
+}

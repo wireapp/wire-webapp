@@ -17,21 +17,18 @@
  *
  */
 
-import React, {useEffect} from 'react';
+import {useEffect} from 'react';
 
 import {amplify} from 'amplify';
 import cx from 'classnames';
-import {CSSTransition, SwitchTransition} from 'react-transition-group';
 
 import {WebAppEvents} from '@wireapp/webapp-events';
 
-import {Archive} from './panels/Archive';
+import {User} from 'Repositories/entity/User';
+
 import {Conversations} from './panels/Conversations';
-import {Preferences} from './panels/Preferences';
-import {StartUI} from './panels/StartUI';
 import {TemporaryGuestConversations} from './panels/TemporatyGuestConversations';
 
-import {User} from '../../entity/User';
 import {ListViewModel} from '../../view_model/ListViewModel';
 import {useAppState, ListState} from '../useAppState';
 
@@ -40,91 +37,60 @@ type LeftSidebarProps = {
   selfUser: User;
   isActivatedAccount: boolean;
 };
-const Animated: React.FC<{children: React.ReactNode}> = ({children, ...rest}) => {
-  return (
-    <CSSTransition classNames="fade-in-out" timeout={{enter: 700, exit: 300}} {...rest}>
-      {children}
-    </CSSTransition>
-  );
-};
 
-const LeftSidebar: React.FC<LeftSidebarProps> = ({listViewModel, selfUser, isActivatedAccount}) => {
+export const LeftSidebar = ({listViewModel, selfUser, isActivatedAccount}: LeftSidebarProps) => {
   const {conversationRepository, propertiesRepository} = listViewModel;
   const repositories = listViewModel.contentViewModel.repositories;
+
   const listState = useAppState(state => state.listState);
 
-  const switchList = (list: ListState) => listViewModel.switchList(list);
-
-  const goHome = () =>
-    selfUser.isTemporaryGuest()
-      ? listViewModel.switchList(ListState.TEMPORARY_GUEST)
-      : listViewModel.switchList(ListState.CONVERSATIONS);
-
   useEffect(() => {
-    amplify.subscribe(WebAppEvents.SHORTCUT.START, () => {
-      listViewModel.switchList(ListState.START_UI);
-    });
+    function openCreateGroupModal() {
+      amplify.publish(WebAppEvents.CONVERSATION.CREATE_GROUP, 'conversation_details');
+    }
+
+    amplify.subscribe(WebAppEvents.SHORTCUT.START, openCreateGroupModal);
+
+    return () => {
+      amplify.unsubscribe(WebAppEvents.SHORTCUT.START, openCreateGroupModal);
+    };
   }, []);
 
   return (
-    <aside id="left-column" className={cx('left-column', {'left-column--light-theme': !isActivatedAccount})}>
-      <SwitchTransition>
-        <Animated key={listState}>
-          <>
-            {listState === ListState.CONVERSATIONS && (
-              <Conversations
-                listViewModel={listViewModel}
-                preferenceNotificationRepository={repositories.preferenceNotification}
-                conversationRepository={conversationRepository}
-                propertiesRepository={propertiesRepository}
-                switchList={switchList}
-                selfUser={selfUser}
-              />
-            )}
+    <aside
+      id="left-column"
+      className={cx('left-column', {
+        'left-column--light-theme': !isActivatedAccount,
+        'left-column--shrinked': listState === ListState.CELLS,
+      })}
+    >
+      {[
+        ListState.CONVERSATIONS,
+        ListState.START_UI,
+        ListState.PREFERENCES,
+        ListState.ARCHIVE,
+        ListState.CELLS,
+      ].includes(listState) && (
+        <Conversations
+          selfUser={selfUser}
+          listViewModel={listViewModel}
+          searchRepository={repositories.search}
+          teamRepository={repositories.team}
+          integrationRepository={repositories.integration}
+          userRepository={repositories.user}
+          propertiesRepository={propertiesRepository}
+          conversationRepository={conversationRepository}
+          preferenceNotificationRepository={repositories.preferenceNotification}
+        />
+      )}
 
-            {listState === ListState.PREFERENCES && (
-              <Preferences
-                contentViewModel={listViewModel.contentViewModel}
-                teamRepository={repositories.team}
-                preferenceNotificationRepository={repositories.preferenceNotification}
-                onClose={goHome}
-              />
-            )}
-
-            {listState === ListState.ARCHIVE && (
-              <Archive
-                answerCall={listViewModel.answerCall}
-                conversationRepository={conversationRepository}
-                listViewModel={listViewModel}
-                onClose={goHome}
-              />
-            )}
-
-            {listState === ListState.TEMPORARY_GUEST && (
-              <TemporaryGuestConversations
-                callingViewModel={listViewModel.callingViewModel}
-                listViewModel={listViewModel}
-                selfUser={selfUser}
-              />
-            )}
-
-            {listState === ListState.START_UI && (
-              <StartUI
-                onClose={goHome}
-                conversationRepository={conversationRepository}
-                searchRepository={repositories.search}
-                teamRepository={repositories.team}
-                integrationRepository={repositories.integration}
-                mainViewModel={listViewModel.mainViewModel}
-                userRepository={repositories.user}
-                isFederated={listViewModel.isFederated}
-              />
-            )}
-          </>
-        </Animated>
-      </SwitchTransition>
+      {listState === ListState.TEMPORARY_GUEST && (
+        <TemporaryGuestConversations
+          callingViewModel={listViewModel.callingViewModel}
+          listViewModel={listViewModel}
+          selfUser={selfUser}
+        />
+      )}
     </aside>
   );
 };
-
-export {LeftSidebar};

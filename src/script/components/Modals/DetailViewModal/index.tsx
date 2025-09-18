@@ -17,28 +17,30 @@
  *
  */
 
-import {FC, KeyboardEvent as ReactKeyboardEvent, useEffect, useRef, useState} from 'react';
+import {KeyboardEvent as ReactKeyboardEvent, useEffect, useRef, useState} from 'react';
 
 import {amplify} from 'amplify';
 import cx from 'classnames';
 
 import {WebAppEvents} from '@wireapp/webapp-events';
 
-import {User} from 'src/script/entity/User';
+import {ZoomableImage} from 'Components/ZoomableImage';
+import {AssetRepository} from 'Repositories/assets/AssetRepository';
+import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
+import {MessageRepository} from 'Repositories/conversation/MessageRepository';
+import {Conversation} from 'Repositories/entity/Conversation';
+import {ContentMessage} from 'Repositories/entity/message/ContentMessage';
+import {MediumImage} from 'Repositories/entity/message/MediumImage';
+import {User} from 'Repositories/entity/User';
 import {handleKeyDown, KEY} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
 import {renderElement} from 'Util/renderElement';
 import {preventFocusOutside} from 'Util/util';
+import {waitFor} from 'Util/waitFor';
 
 import {DetailViewModalFooter} from './DetailViewModalFooter';
 import {DetailViewModalHeader} from './DetailViewModalHeader';
 
-import {AssetRepository} from '../../../assets/AssetRepository';
-import {ConversationRepository} from '../../../conversation/ConversationRepository';
-import {MessageRepository} from '../../../conversation/MessageRepository';
-import {Conversation} from '../../../entity/Conversation';
-import {ContentMessage} from '../../../entity/message/ContentMessage';
-import {MediumImage} from '../../../entity/message/MediumImage';
 import {isContentMessage} from '../../../guards/Message';
 import {MessageCategory} from '../../../message/MessageCategory';
 import {isOfCategory} from '../../../page/MainContent/panels/Collection/utils';
@@ -52,14 +54,14 @@ interface DetailViewModalProps {
   selfUser: User;
 }
 
-const DetailViewModal: FC<DetailViewModalProps> = ({
+export const DetailViewModal = ({
   assetRepository,
   conversationRepository,
   messageRepository,
   currentMessageEntity,
   onClose,
   selfUser,
-}) => {
+}: DetailViewModalProps) => {
   const currentMessageEntityId = useRef<string>(currentMessageEntity.id);
 
   const [conversationEntity, setConversationEntity] = useState<Conversation | null>(null);
@@ -83,12 +85,22 @@ const DetailViewModal: FC<DetailViewModalProps> = ({
   };
 
   const handleOnClosePress = (event: KeyboardEvent | ReactKeyboardEvent<HTMLButtonElement>) => {
-    handleKeyDown(event, onCloseClick);
+    handleKeyDown({
+      event,
+      callback: onCloseClick,
+      keys: [KEY.ENTER, KEY.SPACE],
+    });
   };
 
-  const onReplyClick = (conversation: Conversation, message: ContentMessage) => {
+  const onReplyClick = async (conversation: Conversation, message: ContentMessage) => {
     amplify.publish(WebAppEvents.CONVERSATION.SHOW, conversation, {});
-    amplify.publish(WebAppEvents.CONVERSATION.MESSAGE.REPLY, message);
+
+    // The event above will make react to render the conversation view,
+    // so we need to wait for the text input to be ready before inserting the reply.
+    const isTextInputReady = await waitFor(() => conversation.isTextInputReady());
+    if (isTextInputReady) {
+      amplify.publish(WebAppEvents.CONVERSATION.MESSAGE.REPLY, message);
+    }
 
     onCloseClick();
   };
@@ -234,11 +246,14 @@ const DetailViewModal: FC<DetailViewModalProps> = ({
   }, []);
 
   const modalId = 'detail-view';
+
   useEffect(() => {
     const onKeyDown = (event: KeyboardEvent): void => {
       preventFocusOutside(event, modalId);
     };
+
     document.addEventListener('keydown', onKeyDown);
+
     return () => {
       document.removeEventListener('keydown', onKeyDown);
     };
@@ -258,9 +273,8 @@ const DetailViewModal: FC<DetailViewModalProps> = ({
             className="detail-view-main button-reset-default"
             onKeyDown={handleOnClosePress}
             aria-label={t('accessibility.conversationDetailsCloseLabel')}
-            onClick={onCloseClick}
           >
-            <img className="detail-view-image" src={imageSrc} data-uie-name="status-picture" alt="" />
+            <ZoomableImage key={currentMessageEntityId.current} src={imageSrc} data-uie-name="status-picture" />
           </button>
 
           <DetailViewModalFooter
@@ -276,7 +290,5 @@ const DetailViewModal: FC<DetailViewModalProps> = ({
     </div>
   );
 };
-
-export {DetailViewModal};
 
 export const showDetailViewModal = renderElement<DetailViewModalProps>(DetailViewModal);

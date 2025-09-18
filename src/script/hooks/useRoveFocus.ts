@@ -24,35 +24,33 @@ import type {KeyboardEvent as ReactKeyboardEvent} from 'react';
 
 import {isKey, isTabKey, KEY} from 'Util/KeyboardUtil';
 
-function useRoveFocus(size: number, defaultFocus = 0, infinite = true) {
-  const [currentFocus, setCurrentFocus] = useState(defaultFocus);
-  const firstItem = 0;
-  const interval = 1;
-  const lastItem = size - 1;
+export function useRoveFocus(elements: string[]) {
+  const [focusedId, setFocusedId] = useState<string | undefined>(undefined);
+
+  const lastIndex = elements.length - 1;
 
   const handleKeyDown = useCallback(
     (event: ReactKeyboardEvent | KeyboardEvent) => {
+      const currentIndex = focusedId ? elements.indexOf(focusedId) : -1;
       if (isKey(event, KEY.ARROW_DOWN)) {
         event.preventDefault();
-        if (infinite) {
-          setCurrentFocus(currentFocus === lastItem ? firstItem : currentFocus + interval);
-        } else if (currentFocus !== lastItem) {
-          setCurrentFocus(currentFocus + interval);
+        if (currentIndex < lastIndex) {
+          setFocusedId(elements[currentIndex + 1]);
         }
       } else if (isKey(event, KEY.ARROW_UP)) {
         event.preventDefault();
-        if (infinite) {
-          setCurrentFocus(currentFocus === firstItem ? lastItem : currentFocus - interval);
-        } else if (currentFocus !== firstItem) {
-          setCurrentFocus(currentFocus - interval);
+        if (currentIndex === -1) {
+          setFocusedId(elements[lastIndex]);
+        }
+        if (currentIndex > 0) {
+          setFocusedId(elements[currentIndex - 1]);
         }
       } else if (isTabKey(event)) {
-        setCurrentFocus(firstItem);
+        setFocusedId(elements[lastIndex]);
       }
     },
-    [currentFocus, setCurrentFocus, infinite, lastItem],
+    [focusedId, elements, lastIndex],
   );
-  return {currentFocus, handleKeyDown, setCurrentFocus};
-}
 
-export {useRoveFocus};
+  return {focusedId, handleKeyDown, setFocusedId};
+}

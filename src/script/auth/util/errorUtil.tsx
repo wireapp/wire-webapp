@@ -21,7 +21,9 @@ import {FormattedMessage} from 'react-intl';
 
 import {ErrorMessage} from '@wireapp/react-ui-kit';
 
-import {errorHandlerStrings, validationErrorStrings} from '../../strings';
+import {errorHandlerStrings} from 'Util/ErrorUtil';
+import {validationErrorStrings} from 'Util/ValidationUtil';
+
 import {ValidationError} from '../module/action/ValidationError';
 
 export function parseError(error: any): JSX.Element | null {
@@ -29,13 +31,13 @@ export function parseError(error: any): JSX.Element | null {
     if (errorHandlerStrings.hasOwnProperty(error.label)) {
       return (
         <ErrorMessage data-uie-name="error-message" data-uie-value={error.label}>
-          <FormattedMessage {...errorHandlerStrings[error.label]} />
+          <FormattedMessage id={errorHandlerStrings[error.label]} />
         </ErrorMessage>
       );
     }
     return (
       <ErrorMessage data-uie-name="error-message" data-uie-value={'unexpected-error'}>
-        <FormattedMessage {...errorHandlerStrings.unexpected} values={error} />
+        <FormattedMessage id="BackendError.unexpected" values={error} />
       </ErrorMessage>
     );
   }
@@ -47,9 +49,9 @@ export function parseValidationErrors(errors: any | any[]): JSX.Element[] {
   return errorMessages.map(error => (
     <ErrorMessage data-uie-name="error-message" data-uie-value={error.label} key={error.label}>
       {validationErrorStrings.hasOwnProperty(error.label) ? (
-        <FormattedMessage {...validationErrorStrings[error.label]} />
+        <FormattedMessage id={validationErrorStrings[error.label]} />
       ) : (
-        <FormattedMessage {...validationErrorStrings.unexpected} values={error} />
+        <FormattedMessage id="BackendError.unexpected" values={error} />
       )}
     </ErrorMessage>
   ));

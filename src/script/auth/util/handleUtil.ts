@@ -62,23 +62,20 @@ function getRandomWordCombination(): string {
   return `${randomArrayElement(RANDOM_WORDS_1)}${randomArrayElement(RANDOM_WORDS_2)}`;
 }
 
-export function generateHandleVariations(
-  handle: string,
-  numberOfVariations: number = DEFAULT_NUMBER_VARIATIONS,
-): string[] {
+function generateHandleVariations(handle: string, numberOfVariations: number = DEFAULT_NUMBER_VARIATIONS): string[] {
   return Array.from(Array(numberOfVariations), (_, index) => {
     const digitCount = index + 1;
     return appendRandomDigits(handle.slice(0, MAX_HANDLE_LENGTH - digitCount), digitCount);
   });
 }
 
-export function appendRandomDigits(handle: string, additionalNumbers: number): string {
+function appendRandomDigits(handle: string, additionalNumbers: number): string {
   const MAX_RANDOM_INT = 9;
   const randomDigits = Array.from(Array(additionalNumbers), () => randomInt(MAX_RANDOM_INT));
   return `${handle}${randomDigits.join('')}`;
 }
 
-export function normalizeName(name: string): string {
+function normalizeName(name: string): string {
   return getSlug(name)
     .toLowerCase()
     .replace(/[^a-z0-9_]/g, '')

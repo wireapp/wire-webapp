@@ -56,13 +56,13 @@
 }
 
 .warning-bar-feature {
-  height: @warning-bar-feature-height;
+  height: var(--warning-bar-feature-height);
 }
 
 .warning-bar-connection {
   .label-xs;
 
-  height: @warning-bar-connection-height;
+  height: var(--warning-bar-connection-height);
   justify-content: center;
 }
 
@@ -78,7 +78,7 @@
   position: absolute;
   width: 100%;
   height: 4px;
-  animation: anim 2.1s @ease-in-out-quart infinite;
+  animation: anim 2.1s var(--ease-in-out-quart) infinite;
   background-color: @w-yellow;
 
   &::after {
@@ -109,17 +109,17 @@
   position: absolute;
   top: 50%;
   right: 24px;
-  margin-top: -@button-medium-sm-height / 2;
+  margin-top: calc((var(--button-medium-sm-height) / 2) * -1);
 }
 
 .warning-bar-icon {
   margin-right: 8px;
-  font-size: @icon-size-md;
-  line-height: @icon-size-md;
+  font-size: var(--icon-size-md);
+  line-height: var(--icon-size-md);
 
   svg {
-    width: @icon-size-md;
-    height: @icon-size-md;
+    width: var(--icon-size-md);
+    height: var(--icon-size-md);
 
     path {
       fill: #fff;

@@ -28,9 +28,6 @@ import type {AppAction} from '.';
 
 export enum AUTH_ACTION {
   AUTH_RESET_ERROR = 'AUTH_RESET_ERROR',
-  ENTER_GENERIC_INVITATION_FLOW = 'ENTER_GENERIC_INVITATION_FLOW',
-  ENTER_PERSONAL_CREATION_FLOW = 'ENTER_PERSONAL_CREATION_FLOW',
-  ENTER_TEAM_CREATION_FLOW = 'ENTER_TEAM_CREATION_FLOW',
   FETCH_TEAM_FAILED = 'FETCH_TEAM_FAILED',
   FETCH_TEAM_START = 'FETCH_TEAM_START',
   FETCH_TEAM_SUCCESS = 'FETCH_TEAM_SUCCESS',
@@ -58,16 +55,10 @@ export enum AUTH_ACTION {
   REGISTER_PUSH_ACCOUNT_DATA = 'REGISTER_PUSH_ACCOUNT_DATA',
   REGISTER_PUSH_ENTROPY_DATA = 'REGISTER_PUSH_ENTROPY_DATA',
   REGISTER_RESET_ACCOUNT_DATA = 'REGISTER_RESET_ACCOUNT_DATA',
-  REGISTER_TEAM_FAILED = 'REGISTER_TEAM_FAILED',
-  REGISTER_TEAM_START = 'REGISTER_TEAM_START',
-  REGISTER_TEAM_SUCCESS = 'REGISTER_TEAM_SUCCESS',
   REGISTER_WIRELESS_FAILED = 'REGISTER_WIRELESS_FAILED',
   REGISTER_WIRELESS_START = 'REGISTER_WIRELESS_START',
   REGISTER_WIRELESS_SUCCESS = 'REGISTER_WIRELESS_SUCCESS',
   RESET_LOGIN_DATA = 'RESET_LOGIN_DATA',
-  SEND_PHONE_LOGIN_CODE_FAILED = 'SEND_PHONE_LOGIN_CODE_FAILED',
-  SEND_PHONE_LOGIN_CODE_START = 'SEND_PHONE_LOGIN_CODE_START',
-  SEND_PHONE_LOGIN_CODE_SUCCESS = 'SEND_PHONE_LOGIN_CODE_SUCCESS',
   SEND_OAUTH_CODE_FAILED = 'SEND_OAUTH_CODE_FAILED',
   SEND_OAUTH_CODE_START = 'SEND_OAUTH_CODE_START',
   SEND_OAUTH_CODE_SUCCESS = 'SEND_OAUTH_CODE_SUCCESS',
@@ -85,15 +76,9 @@ export type AuthActions =
   | SendTwoFactorCodeStartAction
   | SendTwoFactorCodeSuccessAction
   | SendTwoFactorCodeFailedAction
-  | SendPhoneLoginCodeStartAction
-  | SendPhoneLoginCodeSuccessAction
-  | SendPhoneLoginCodeFailedAction
   | SendOAuthCodeStartAction
   | SendOAuthCodeSuccessAction
   | SendOAuthCodeFailedAction
-  | RegisterTeamStartAction
-  | RegisterTeamSuccessAction
-  | RegisterTeamFailedAction
   | FetchTeamStartAction
   | FetchTeamSuccessAction
   | FetchTeamFailedAction
@@ -124,10 +109,7 @@ export type AuthActions =
   | PushRegistrationDataAction
   | PushEntropyDataAction
   | ResetLoginDataAction
-  | PushLoginDataAction
-  | EnterTeamCreationFlowAction
-  | EnterPersonalCreationFlowAction
-  | EnterGenericInvitationCreationFlowAction;
+  | PushLoginDataAction;
 
 export interface LoginStartAction extends AppAction {
   readonly type: AUTH_ACTION.LOGIN_START;
@@ -138,20 +120,6 @@ export interface LoginSuccessAction extends AppAction {
 export interface LoginFailedAction extends AppAction {
   readonly error: Error;
   readonly type: AUTH_ACTION.LOGIN_FAILED;
-}
-
-export interface SendPhoneLoginCodeStartAction extends AppAction {
-  readonly type: AUTH_ACTION.SEND_PHONE_LOGIN_CODE_START;
-}
-export interface SendPhoneLoginCodeSuccessAction extends AppAction {
-  readonly payload: {
-    expiresIn: number;
-  };
-  readonly type: AUTH_ACTION.SEND_PHONE_LOGIN_CODE_SUCCESS;
-}
-export interface SendPhoneLoginCodeFailedAction extends AppAction {
-  readonly error: Error;
-  readonly type: AUTH_ACTION.SEND_PHONE_LOGIN_CODE_FAILED;
 }
 
 export interface SendOAuthCodeStartAction extends AppAction {
@@ -174,18 +142,6 @@ export interface SendTwoFactorCodeSuccessAction extends AppAction {
 export interface SendTwoFactorCodeFailedAction extends AppAction {
   readonly error: Error;
   readonly type: AUTH_ACTION.SEND_TWO_FACTOR_CODE_FAILED;
-}
-
-export interface RegisterTeamStartAction extends AppAction {
-  readonly type: AUTH_ACTION.REGISTER_TEAM_START;
-}
-export interface RegisterTeamSuccessAction extends AppAction {
-  readonly payload: RegisterData;
-  readonly type: AUTH_ACTION.REGISTER_TEAM_SUCCESS;
-}
-export interface RegisterTeamFailedAction extends AppAction {
-  readonly error: Error;
-  readonly type: AUTH_ACTION.REGISTER_TEAM_FAILED;
 }
 
 export interface FetchTeamStartAction extends AppAction {
@@ -310,17 +266,6 @@ export interface PushLoginDataAction extends AppAction {
   readonly payload: Partial<LoginDataState>;
   readonly type: AUTH_ACTION.PUSH_LOGIN_DATA;
 }
-
-export interface EnterTeamCreationFlowAction extends AppAction {
-  readonly type: AUTH_ACTION.ENTER_TEAM_CREATION_FLOW;
-}
-export interface EnterPersonalCreationFlowAction extends AppAction {
-  readonly type: AUTH_ACTION.ENTER_PERSONAL_CREATION_FLOW;
-}
-export interface EnterGenericInvitationCreationFlowAction extends AppAction {
-  readonly type: AUTH_ACTION.ENTER_GENERIC_INVITATION_FLOW;
-}
-
 export class AuthActionCreator {
   static startLogin = (): LoginStartAction => ({
     type: AUTH_ACTION.LOGIN_START,
@@ -333,20 +278,6 @@ export class AuthActionCreator {
   static failedLogin = (error: Error): LoginFailedAction => ({
     error,
     type: AUTH_ACTION.LOGIN_FAILED,
-  });
-
-  static startSendPhoneLoginCode = (): SendPhoneLoginCodeStartAction => ({
-    type: AUTH_ACTION.SEND_PHONE_LOGIN_CODE_START,
-  });
-
-  static successfulSendPhoneLoginCode = (expiresIn: number): SendPhoneLoginCodeSuccessAction => ({
-    payload: {expiresIn},
-    type: AUTH_ACTION.SEND_PHONE_LOGIN_CODE_SUCCESS,
-  });
-
-  static failedSendPhoneLoginCode = (error: Error): SendPhoneLoginCodeFailedAction => ({
-    error,
-    type: AUTH_ACTION.SEND_PHONE_LOGIN_CODE_FAILED,
   });
 
   static startSendOAuthCode = (): SendOAuthCodeStartAction => ({
@@ -373,20 +304,6 @@ export class AuthActionCreator {
   static failedSendTwoFactorCode = (error: Error): SendTwoFactorCodeFailedAction => ({
     error,
     type: AUTH_ACTION.SEND_TWO_FACTOR_CODE_FAILED,
-  });
-
-  static startRegisterTeam = (): RegisterTeamStartAction => ({
-    type: AUTH_ACTION.REGISTER_TEAM_START,
-  });
-
-  static successfulRegisterTeam = (authData: RegisterData): RegisterTeamSuccessAction => ({
-    payload: authData,
-    type: AUTH_ACTION.REGISTER_TEAM_SUCCESS,
-  });
-
-  static failedRegisterTeam = (error: Error): RegisterTeamFailedAction => ({
-    error,
-    type: AUTH_ACTION.REGISTER_TEAM_FAILED,
   });
 
   static startFetchTeam = (): FetchTeamStartAction => ({
@@ -530,17 +447,5 @@ export class AuthActionCreator {
 
   static resetLoginData = (): ResetLoginDataAction => ({
     type: AUTH_ACTION.RESET_LOGIN_DATA,
-  });
-
-  static enterTeamCreationFlow = (): EnterTeamCreationFlowAction => ({
-    type: AUTH_ACTION.ENTER_TEAM_CREATION_FLOW,
-  });
-
-  static enterPersonalCreationFlow = (): EnterPersonalCreationFlowAction => ({
-    type: AUTH_ACTION.ENTER_PERSONAL_CREATION_FLOW,
-  });
-
-  static enterGenericInviteCreationFlow = (): EnterGenericInvitationCreationFlowAction => ({
-    type: AUTH_ACTION.ENTER_GENERIC_INVITATION_FLOW,
   });
 }

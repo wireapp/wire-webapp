@@ -5,8 +5,10 @@ src/i18n/
 /docs/coverage
 /package-lock.json
 /resource
+/assets
 /src/ext
 CHANGELOG.md
 node_modules
 npm-debug.log
 yarn-error.log
+src/types/i18n.d.ts

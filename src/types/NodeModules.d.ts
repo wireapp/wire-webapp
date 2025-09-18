@@ -20,6 +20,7 @@
 declare module '@koush/wrtc' {
   export const nonstandard: {
     RTCAudioSource: any;
+    RTCRtpSender: {prototype: {createEncodedVideoStreams: any; createEncodedStreams: any; transform: any}};
   };
   export const MediaStream: any;
 }

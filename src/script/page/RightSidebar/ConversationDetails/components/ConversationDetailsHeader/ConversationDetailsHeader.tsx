@@ -19,39 +19,45 @@
 
 import {ChangeEvent, FC, KeyboardEvent, useEffect, useRef, useState} from 'react';
 
-import {Icon} from 'Components/Icon';
+import {ConversationVerificationBadges} from 'Components/Badge';
+import * as Icon from 'Components/Icon';
+import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
+import {Conversation} from 'Repositories/entity/Conversation';
+import {User} from 'Repositories/entity/User';
+import {ServiceEntity} from 'Repositories/integration/ServiceEntity';
+import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {isEnterKey} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
 import {removeLineBreaks} from 'Util/StringUtil';
 
-import {ConversationRepository} from '../../../../../conversation/ConversationRepository';
-import {User} from '../../../../../entity/User';
-import {ServiceEntity} from '../../../../../integration/ServiceEntity';
 import {GroupDetails} from '../GroupDetails/GroupDetails';
 
 interface ConversationDetailsHeaderProps {
   isActiveGroupParticipant: boolean;
   canRenameGroup: boolean;
-  displayName: string;
   updateConversationName: (conversationName: string) => void;
-  isGroup: boolean;
   userParticipants: User[];
   serviceParticipants: ServiceEntity[];
   allUsersCount: number;
   isTeam?: boolean;
+  conversation: Conversation;
 }
 
 const ConversationDetailsHeader: FC<ConversationDetailsHeaderProps> = ({
   isActiveGroupParticipant,
   canRenameGroup,
-  displayName,
   updateConversationName,
-  isGroup,
   userParticipants,
   serviceParticipants,
   allUsersCount,
   isTeam = false,
+  conversation,
 }) => {
+  const {isGroupOrChannel, display_name: displayName} = useKoSubscribableChildren(conversation, [
+    'isGroupOrChannel',
+    'display_name',
+  ]);
+
   const textAreaRef = useRef<HTMLTextAreaElement | null>(null);
   const isEditGroupNameTouched = useRef(false);
 
@@ -129,7 +135,7 @@ const ConversationDetailsHeader: FC<ConversationDetailsHeaderProps> = ({
                   className="conversation-details__name__edit-icon"
                   aria-label={t('tooltipConversationDetailsRename')}
                 >
-                  <Icon.Edit />
+                  <Icon.EditIcon />
                 </button>
               )}
             </div>
@@ -146,6 +152,8 @@ const ConversationDetailsHeader: FC<ConversationDetailsHeaderProps> = ({
               data-uie-name="enter-name"
             />
           )}
+
+          <ConversationVerificationBadges displayTitle conversation={conversation} />
         </>
       ) : (
         <div className="conversation-details__name">
@@ -155,7 +163,7 @@ const ConversationDetailsHeader: FC<ConversationDetailsHeaderProps> = ({
         </div>
       )}
 
-      {isGroup && (
+      {isGroupOrChannel && (
         <GroupDetails
           userParticipants={userParticipants}
           serviceParticipants={serviceParticipants}

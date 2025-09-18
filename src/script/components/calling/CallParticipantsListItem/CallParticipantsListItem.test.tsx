@@ -21,9 +21,9 @@ import {render} from '@testing-library/react';
 
 import {Availability} from '@wireapp/protocol-messaging';
 
-import {Participant} from 'src/script/calling/Participant';
-import {User} from 'src/script/entity/User';
-import {ROLE} from 'src/script/user/UserPermission';
+import {Participant} from 'Repositories/calling/Participant';
+import {User} from 'Repositories/entity/User';
+import {ROLE} from 'Repositories/user/UserPermission';
 import {createUuid} from 'Util/uuid';
 
 import {CallParticipantsListItem} from './CallParticipantsListItem';
@@ -80,22 +80,18 @@ describe('CallParticipantsListItem', () => {
     expect(getByTestId('element-avatar-user')).toBeDefined();
   });
 
-  it('should render participant user name and availability status', () => {
+  it('should render participant user name', () => {
     const participantName = 'John Doe';
     const participant = createMockParticipant({
       name: participantName,
-      availability: Availability.Type.AVAILABLE,
       isSelfUser: false,
     });
 
-    const {getByTestId, getByText} = render(
-      <CallParticipantsListItem showContextMenu onContextMenu={jest.fn()} callParticipant={participant} selfInTeam />,
+    const {getByText} = render(
+      <CallParticipantsListItem showContextMenu onContextMenu={jest.fn()} callParticipant={participant} />,
     );
 
     expect(getByText(participantName)).toBeDefined();
-
-    const availabilityElement = getByTestId('status-availability-icon');
-    expect(availabilityElement.dataset.uieValue).toEqual('available');
   });
 
   it('should mark user as self if relevant', () => {

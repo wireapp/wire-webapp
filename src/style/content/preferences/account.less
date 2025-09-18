@@ -33,7 +33,7 @@
     height: 100%;
     align-items: center;
     pointer-events: none;
-    transition: opacity @animation-timing-faster;
+    transition: opacity var(--animation-timing-faster);
 
     svg {
       width: 12px;
@@ -67,11 +67,11 @@
 }
 
 .preferences-section-account-space-before {
-  margin-top: @line-height-lg;
+  margin-top: var(--line-height-lg);
 }
 
 .preferences-section-account-space-after {
-  margin-bottom: @line-height-lg;
+  margin-bottom: var(--line-height-lg);
 }
 
 .preferences-section-info {
@@ -92,7 +92,7 @@
 }
 
 .preferences-account-user-data {
-  line-height: @line-height-xl;
+  line-height: var(--line-height-xl);
 }
 
 .preferences-account-user-data-temporary {
@@ -105,8 +105,8 @@
 
   .preferences-leave-disclaimer {
     margin-top: 16px;
-    font-size: @font-size-small;
-    font-weight: @font-weight-regular;
+    font-size: var(--font-size-small);
+    font-weight: var(--font-weight-regular);
     line-height: initial;
   }
 }
@@ -115,13 +115,12 @@
   width: 300px;
 }
 
-.preferences-account-mail,
-.preferences-account-phone {
+.preferences-account-mail {
   .no-text-selection;
 }
 
 .preferences-account-picture-button {
-  .square(@avatar-diameter-xl);
+  .square(var(--avatar-diameter-xl));
 
   position: relative;
   display: inline-block;
@@ -132,7 +131,7 @@
     .flex-center;
 
     color: #fff;
-    font-size: @font-size-xl;
+    font-size: var(--font-size-xxl);
     opacity: 0;
     pointer-events: none;
 
@@ -149,7 +148,7 @@
 
   > input {
     position: absolute;
-    left: @offscreen-left;
+    left: var(--offscreen-left);
   }
 
   &.loading {
@@ -161,7 +160,7 @@
   cursor: pointer;
   > input {
     position: absolute;
-    left: @offscreen-left;
+    left: var(--offscreen-left);
   }
 }
 
@@ -178,7 +177,7 @@
 .preferences-account-username-wrapper {
   position: relative;
   width: 256px;
-  min-height: calc(@line-height-xl * 2);
+  min-height: calc(var(--line-height-xl) * 2);
 
   .edit-icon,
   .animated-check-icon {
@@ -190,12 +189,12 @@
   .reset-textarea;
 
   width: 100%;
-  height: @line-height-xl;
+  height: var(--line-height-xl);
   padding-right: 28px;
   padding-left: 4px;
   margin-left: -4px;
   background: transparent;
-  line-height: @line-height-xl;
+  line-height: var(--line-height-xl);
 
   &::placeholder {
     .label-xs;
@@ -212,7 +211,14 @@
 }
 
 .preferences-account-name {
-  font-weight: @font-weight-bold;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 16px;
+
+  .conversation-badges {
+    padding-left: 4px;
+  }
 }
 
 .preferences-account-username-atsign {
@@ -220,15 +226,17 @@
   top: 0;
   left: 0;
   color: var(--foreground);
-  line-height: @line-height-xl;
+  line-height: var(--line-height-xl);
 }
 
 .preferences-account-username {
   padding-left: 22px;
 }
 
-.preferences-account-availability {
-  .label-bold-xs;
+.preferences-account-image {
+  text-align: center;
+}
 
-  cursor: pointer;
+.preferences-accent-color-picker {
+  text-align: center;
 }

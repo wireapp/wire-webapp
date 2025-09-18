@@ -17,11 +17,10 @@
  *
  */
 
-import {Draft} from 'Util/DraftStateUtil';
+import {ContentMessage} from 'Repositories/entity/message/ContentMessage';
+import {DeleteMessage} from 'Repositories/entity/message/DeleteMessage';
+import {MemberMessage} from 'Repositories/entity/message/MemberMessage';
 
-import {ContentMessage} from '../entity/message/ContentMessage';
-import {DeleteMessage} from '../entity/message/DeleteMessage';
-import {MemberMessage} from '../entity/message/MemberMessage';
 import {SuperType} from '../message/SuperType';
 
 export const isReadableMessage = (message: any): message is ContentMessage =>
@@ -37,6 +36,3 @@ export const isDeleteMessage = (message: any): message is DeleteMessage =>
 
 export const isMemberMessage = (message: any | undefined | null): message is MemberMessage =>
   message && 'super_type' in message && message.super_type === SuperType.MEMBER;
-
-export const isDraftMessageWithReplyId = (message: any | undefined | null): message is Draft =>
-  message && 'reply' in message && 'messageId' in message.reply;

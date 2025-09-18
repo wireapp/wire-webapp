@@ -25,24 +25,36 @@ import {STATE} from '.';
 
 export interface AvatarBadgeProps {
   state: STATE;
+  iconSize?: string;
 }
 
-const AvatarBadge: React.FunctionComponent<AvatarBadgeProps> = ({state}) => {
+const AvatarBadge: React.FunctionComponent<AvatarBadgeProps> = ({state, iconSize = '16px'}) => {
   const icons: Record<string, string> = {
     [STATE.PENDING]: '\\e165',
     [STATE.BLOCKED]: '\\e104',
   };
+
+  const defaultBackgroundColor = 'rgba(0, 0, 0, .56)';
+  const backgroundColor: Record<string, string> = {
+    [STATE.BLOCKED]: 'var(--white)',
+  };
+
+  const defaultColor = 'var(--white)';
+  const color: Record<string, string> = {
+    [STATE.BLOCKED]: 'var(--gray-70)',
+  };
+
   return (
     <div
       css={{
         ...CSS_FILL_PARENT,
         ...CSS_FLEX_CENTER,
         '&::before': {
-          ...CSS_ICON(icons[state]),
+          ...CSS_ICON(icons[state], iconSize),
         },
-        backgroundColor: 'rgba(0, 0, 0, .56)',
+        backgroundColor: backgroundColor[state] || defaultBackgroundColor,
         borderRadius: '50%',
-        color: '#fff',
+        color: color[state] || defaultColor,
       }}
       data-uie-name="element-avatar-user-badge-icon"
       data-uie-value={state}

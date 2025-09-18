@@ -20,59 +20,59 @@
 import React from 'react';
 
 import {act, render} from '@testing-library/react';
-import ko from 'knockout';
+import {observable} from 'knockout';
 
-import {User} from 'src/script/entity/User';
+import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
+import {User} from 'Repositories/entity/User';
+import {SearchRepository} from 'Repositories/search/SearchRepository';
+import {UserRepository} from 'Repositories/user/UserRepository';
+import {withTheme} from 'src/script/auth/util/test/TestUtil';
 import {ListState} from 'src/script/page/useAppState';
-import {PROPERTIES_TYPE} from 'src/script/properties/PropertiesType';
+import {TestFactory} from 'test/helper/TestFactory';
 
 import {Conversations} from './';
 
-describe('Conversations', () => {
-  const defaultParams: React.ComponentProps<typeof Conversations> = {
-    conversationRepository: {
-      conversationLabelRepository: {
-        addEventListener: jest.fn(),
-        removeEventListener: jest.fn(),
-      },
-    } as any,
-    listViewModel: {} as any,
-    preferenceNotificationRepository: {notifications: ko.observable([])} as any,
-    propertiesRepository: {getPreference: jest.fn(), savePreference: jest.fn()} as any,
-    selfUser: new User(),
+const defaultParams: Omit<React.ComponentProps<typeof Conversations>, 'conversationRepository' | 'searchRepository'> = {
+  listViewModel: {
     switchList: jest.fn(),
-  };
+    contentViewModel: {
+      loadPreviousContent: jest.fn(),
+      switchContent: jest.fn(),
+    },
+  } as any,
+  preferenceNotificationRepository: {notifications: observable([])} as any,
+  propertiesRepository: {getPreference: jest.fn(), savePreference: jest.fn()} as any,
+  selfUser: new User(),
+  integrationRepository: {integrations: observable([])} as any,
+  teamRepository: {getTeam: jest.fn()} as any,
+  userRepository: {users: observable([])} as any,
+};
+
+describe('Conversations', () => {
+  let conversationRepository: ConversationRepository;
+  let searchRepository: SearchRepository;
+
+  beforeEach(async () => {
+    const testFactory = new TestFactory();
+    conversationRepository = await testFactory.exposeConversationActors();
+    searchRepository = new SearchRepository({} as UserRepository);
+  });
 
   it('Opens preferences when clicked', () => {
-    const {getByTitle} = render(<Conversations {...defaultParams} />);
-    const openPrefButton = getByTitle('tooltipConversationsPreferences');
+    const {getByTitle} = render(
+      withTheme(
+        <Conversations
+          {...defaultParams}
+          searchRepository={searchRepository}
+          conversationRepository={conversationRepository}
+        />,
+      ),
+    );
+    const openPrefButton = getByTitle('preferencesHeadline');
     act(() => {
       openPrefButton.click();
     });
 
-    expect(defaultParams.switchList).toHaveBeenCalledWith(ListState.PREFERENCES);
-  });
-
-  it('Switches between folder and list view and save view state', () => {
-    const {getByTitle} = render(<Conversations {...defaultParams} />);
-    const switchToFolder = getByTitle('folderViewTooltip');
-    act(() => {
-      switchToFolder.click();
-    });
-
-    expect(defaultParams.propertiesRepository.savePreference).toHaveBeenCalledWith(
-      PROPERTIES_TYPE.INTERFACE.VIEW_FOLDERS,
-      true,
-    );
-
-    const switchToList = getByTitle('conversationViewTooltip');
-    act(() => {
-      switchToList.click();
-    });
-
-    expect(defaultParams.propertiesRepository.savePreference).toHaveBeenCalledWith(
-      PROPERTIES_TYPE.INTERFACE.VIEW_FOLDERS,
-      false,
-    );
+    expect(defaultParams.listViewModel.switchList).toHaveBeenCalledWith(ListState.PREFERENCES);
   });
 });

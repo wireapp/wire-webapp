@@ -21,13 +21,13 @@ import React, {FormEvent, useState} from 'react';
 
 import cx from 'classnames';
 
+import {validateHandle} from 'Repositories/user/UserHandleGenerator';
+import {UserRepository} from 'Repositories/user/UserRepository';
 import {t} from 'Util/LocalizerUtil';
 
 import {AccountInput, useInputDone} from './AccountInput';
 
 import {UserError} from '../../../../../error/UserError';
-import {validateHandle} from '../../../../../user/UserHandleGenerator';
-import {UserRepository} from '../../../../../user/UserRepository';
 
 enum UserNameState {
   AVAILABLE = 'AVAILABLE',
@@ -123,7 +123,7 @@ const UsernameInput: React.FC<UsernameInputProps> = ({username, domain, userRepo
         isDone={usernameInputDone.isDone}
         onValueChange={changeUsername}
         maxLength={256 - (domain?.length ?? 0)}
-        allowedChars="0-9a-zA-Z_"
+        allowedChars="0-9a-zA-Z_.-"
         fieldName="username"
       />
       {canEditProfile && (

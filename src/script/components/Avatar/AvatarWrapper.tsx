@@ -42,7 +42,6 @@ const AvatarWrapper: React.FunctionComponent<AvatarWrapperProps> = ({
         ...CSS_SQUARE(avatarDiameter),
         color,
         display: 'inline-block',
-        overflow: 'hidden',
         position: 'relative',
         transform: 'translateZ(0)',
         userSelect: 'none',

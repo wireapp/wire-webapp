@@ -33,7 +33,7 @@ const roots = new Map<
   }
 >();
 
-export const cleanUpElement = (elementId: string) => {
+const cleanUpElement = (elementId: string) => {
   const root = roots.get(elementId);
   if (root && root.elementContainer) {
     root.reactRoot.unmount();
@@ -97,4 +97,22 @@ const renderElement =
     reactRoot.render(element);
   };
 
-export {renderElement};
+/**
+ *  Copy styles from one document to another - link, style elements and body element class names.
+ * @param source the source document object
+ * @param target the target document object
+ */
+const copyStyles = (source: Document, target: Document) => {
+  const targetHead = target.head;
+
+  const elements = source.head.querySelectorAll('link, style');
+
+  elements.forEach(htmlElement => {
+    targetHead.insertBefore(htmlElement.cloneNode(true), targetHead.firstChild);
+  });
+
+  target.body.className = source.body.className;
+  target.body.style.height = '100%';
+};
+
+export {renderElement, copyStyles};

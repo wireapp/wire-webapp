@@ -18,18 +18,24 @@
  */
 
 import {ConnectionStatus} from '@wireapp/api-client/lib/connection/';
-import {CONVERSATION_TYPE, CONVERSATION_ACCESS_ROLE} from '@wireapp/api-client/lib/conversation/';
+import {
+  CONVERSATION_TYPE,
+  CONVERSATION_ACCESS_ROLE,
+  Conversation as BackendConversation,
+  Member,
+  CONVERSATION_CELLS_STATE,
+} from '@wireapp/api-client/lib/conversation/';
 import {RECEIPT_MODE} from '@wireapp/api-client/lib/conversation/data';
 import {ConversationProtocol} from '@wireapp/api-client/lib/conversation/NewConversation';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {LegalHoldStatus} from '@wireapp/core/lib/conversation/content';
 
-import {ConnectionEntity} from 'src/script/connection/ConnectionEntity';
-import {ConversationDatabaseData, ConversationMapper} from 'src/script/conversation/ConversationMapper';
-import {ConversationStatus} from 'src/script/conversation/ConversationStatus';
-import {ConversationVerificationState} from 'src/script/conversation/ConversationVerificationState';
-import {Conversation} from 'src/script/entity/Conversation';
-import {User} from 'src/script/entity/User';
+import {ConnectionEntity} from 'Repositories/connection/ConnectionEntity';
+import {ConversationDatabaseData, ConversationMapper} from 'Repositories/conversation/ConversationMapper';
+import {ConversationStatus} from 'Repositories/conversation/ConversationStatus';
+import {ConversationVerificationState} from 'Repositories/conversation/ConversationVerificationState';
+import {Conversation} from 'Repositories/entity/Conversation';
+import {User} from 'Repositories/entity/User';
 import {createUuid} from 'Util/uuid';
 
 interface GenerateAPIConversationParams {
@@ -38,6 +44,7 @@ interface GenerateAPIConversationParams {
   protocol?: ConversationProtocol;
   overwites?: Partial<ConversationDatabaseData>;
   name?: string;
+  groupId?: string;
 }
 
 export function generateAPIConversation({
@@ -46,21 +53,22 @@ export function generateAPIConversation({
   protocol = ConversationProtocol.PROTEUS,
   overwites = {},
   name,
-}: GenerateAPIConversationParams): ConversationDatabaseData {
+}: GenerateAPIConversationParams): BackendConversation {
   return {
     id: id.id,
     name,
     type: type,
     protocol: protocol,
-    qualified_id: id,
+    qualified_id: overwites.id && overwites.domain ? {id: overwites.id, domain: overwites.domain} : id,
     access: [],
     verification_state: ConversationVerificationState.UNVERIFIED,
+    mlsVerificationState: ConversationVerificationState.UNVERIFIED,
     receipt_mode: RECEIPT_MODE.ON,
     team_id: '',
     status: ConversationStatus.CURRENT_MEMBER,
     is_guest: false,
     archived_state: false,
-    is_managed: false,
+    readonly_state: null,
     archived_timestamp: 0,
     last_event_timestamp: 0,
     last_read_timestamp: 0,
@@ -80,6 +88,8 @@ export function generateAPIConversation({
     domain: id.domain,
     creator: '',
     access_role: [CONVERSATION_ACCESS_ROLE.TEAM_MEMBER],
+    members: {others: [], self: {} as Member},
+    cells_state: CONVERSATION_CELLS_STATE.DISABLED,
     ...overwites,
   };
 }
@@ -95,24 +105,26 @@ export function generateConversation({
   protocol = ConversationProtocol.PROTEUS,
   id,
   name,
+  groupId = 'groupId',
   users = [],
   overwites = {},
 }: GenerateConversationParams = {}): Conversation {
   const apiConversation = generateAPIConversation({id, type, protocol, name, overwites});
 
-  const conversation = ConversationMapper.mapConversations([apiConversation])[0];
+  const conversation = ConversationMapper.mapConversations([apiConversation as ConversationDatabaseData])[0];
   const connectionEntity = new ConnectionEntity();
   connectionEntity.conversationId = conversation.qualifiedId;
   connectionEntity.status(status);
   conversation.connection(connectionEntity);
   conversation.type(type);
 
-  if (protocol === ConversationProtocol.MLS) {
-    conversation.groupId = 'groupId';
+  if ([ConversationProtocol.MLS, ConversationProtocol.MIXED].includes(protocol)) {
+    conversation.groupId = groupId;
   }
 
   if (users) {
     conversation.participating_user_ets(users);
+    conversation.participating_user_ids(users.map(user => user.qualifiedId));
   }
 
   return conversation;

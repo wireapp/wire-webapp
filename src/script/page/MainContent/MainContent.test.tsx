@@ -19,7 +19,8 @@
 
 import {act, render, screen, waitFor} from '@testing-library/react';
 
-import {User} from 'src/script/entity/User';
+import {User} from 'Repositories/entity/User';
+import {ElectronDesktopCapturerSource, MediaDevicesHandler} from 'Repositories/media/MediaDevicesHandler';
 import {ContentViewModel} from 'src/script/view_model/ContentViewModel';
 
 import {MainContent} from './MainContent';
@@ -34,16 +35,31 @@ jest.mock('./panels/preferences/AccountPreferences', () => ({
   __esModule: true,
 }));
 
+jest.mock('@formkit/auto-animate/react', () => ({
+  __esModule: true,
+  useAutoAnimate: jest.fn(),
+}));
+
+const mockDevicesHandler = {
+  availableDevices: (): (MediaDeviceInfo | ElectronDesktopCapturerSource)[] => [],
+  currentDeviceId: () => 'mock-device-id',
+} as unknown as MediaDevicesHandler;
+
 describe('Preferences', () => {
   const mainViewModel = {
     content: {
-      repositories: {} as any,
+      repositories: {
+        media: {
+          devicesHandler: mockDevicesHandler,
+        },
+      } as any,
     } as ContentViewModel,
   } as MainViewModel;
 
   const defaultParams = {
     openRightSidebar: jest.fn(),
     selfUser: new User('selfUser'),
+    reloadApp: jest.fn(),
   };
 
   it('renders the right component according to view state', () => {

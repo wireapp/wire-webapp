@@ -21,21 +21,20 @@ import {act, render} from '@testing-library/react';
 import type {QualifiedId} from '@wireapp/api-client/lib/user/';
 
 import {useLegalHoldModalState} from 'Components/Modals/LegalHoldModal/LegalHoldModal.state';
+import {CallingRepository} from 'Repositories/calling/CallingRepository';
+import {ClientRepository} from 'Repositories/client';
+import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
+import {MessageRepository} from 'Repositories/conversation/MessageRepository';
+import {CryptographyRepository} from 'Repositories/cryptography/CryptographyRepository';
+import {Conversation} from 'Repositories/entity/Conversation';
+import {User} from 'Repositories/entity/User';
+import {SearchRepository} from 'Repositories/search/SearchRepository';
+import {TeamRepository} from 'Repositories/team/TeamRepository';
+import {UserRepository} from 'Repositories/user/UserRepository';
 
 import {LegalHoldModal, LegalHoldModalType} from './LegalHoldModal';
 
 import {TestFactory} from '../../../../../test/helper/TestFactory';
-import {CallingRepository} from '../../../calling/CallingRepository';
-import {ClientRepository} from '../../../client';
-import {ConversationRepository} from '../../../conversation/ConversationRepository';
-import {MessageRepository} from '../../../conversation/MessageRepository';
-import {CryptographyRepository} from '../../../cryptography/CryptographyRepository';
-import {Conversation} from '../../../entity/Conversation';
-import {User} from '../../../entity/User';
-import {SearchRepository} from '../../../search/SearchRepository';
-import {SearchService} from '../../../search/SearchService';
-import {TeamRepository} from '../../../team/TeamRepository';
-import {UserRepository} from '../../../user/UserRepository';
 
 const userRepository = {} as UserRepository;
 const testFactory = new TestFactory();
@@ -57,7 +56,7 @@ const defaultProps = () => ({
   messageRepository: {
     updateAllClients: (conversation: Conversation, blockSystemMessage: boolean): Promise<void> => Promise.resolve(),
   } as MessageRepository,
-  searchRepository: new SearchRepository(new SearchService(), userRepository),
+  searchRepository: new SearchRepository(userRepository),
   teamRepository: {} as TeamRepository,
   selfUser: new User('mocked-id'),
 });

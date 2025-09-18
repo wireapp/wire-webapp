@@ -26,8 +26,7 @@ import cx from 'classnames';
 import {Availability} from '@wireapp/protocol-messaging';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
-import {Icon} from 'Components/Icon';
-import {CSS_SQUARE} from 'Util/CSSMixin';
+import {availabilityStatus} from 'Util/AvailabilityStatus';
 import {t} from 'Util/LocalizerUtil';
 
 import {ContextMenuEntry} from '../../../../../ui/ContextMenu';
@@ -36,50 +35,14 @@ interface AvailabilityInputProps {
   availability: Availability.Type;
 }
 
-const iconStyles: CSSObject = {
-  ...CSS_SQUARE(10),
-  fill: 'currentColor',
-  margin: '0 6px 1px 0',
-  minWidth: 10,
-  stroke: 'currentColor',
-};
-
 const headerStyles: CSSObject = {
-  lineHeight: '0.875rem',
+  lineHeight: 'var(--line-height-small-plus)',
   margin: '37px 0 6px',
   padding: 0,
+  textAlign: 'center',
 };
 
 const AvailabilityButtons: React.FC<AvailabilityInputProps> = ({availability}) => {
-  const icons: {
-    [key: string]: any;
-  } = {
-    [Availability.Type.AVAILABLE]: (
-      <Icon.AvailabilityAvailable
-        className="availability-state-icon"
-        css={{...iconStyles, fill: 'var(--green-500)', stroke: 'var(--green-500)'}}
-        data-uie-name="status-availability-icon"
-        data-uie-value="available"
-      />
-    ),
-    [Availability.Type.BUSY]: (
-      <Icon.AvailabilityBusy
-        className="availability-state-icon"
-        css={{...iconStyles, fill: 'var(--amber-500)', stroke: 'var(--amber-500)'}}
-        data-uie-name="status-availability-icon"
-        data-uie-value="busy"
-      />
-    ),
-    [Availability.Type.AWAY]: (
-      <Icon.AvailabilityAway
-        className="availability-state-icon"
-        css={{...iconStyles, fill: 'var(--red-500)', stroke: 'var(--red-500)'}}
-        data-uie-name="status-availability-icon"
-        data-uie-value="away"
-      />
-    ),
-    [Availability.Type.NONE]: null,
-  };
   const entries: ContextMenuEntry[] = [
     {
       availability: Availability.Type.AVAILABLE,
@@ -130,7 +93,7 @@ const AvailabilityButtons: React.FC<AvailabilityInputProps> = ({availability}) =
                   : `${t('preferencesAccountUpdateLabel')} ${item.label}`
               }
             >
-              {item.availability !== undefined && icons[item.availability]}
+              {item.availability !== undefined && availabilityStatus[item.availability]}
               {item.label}
             </button>
           );

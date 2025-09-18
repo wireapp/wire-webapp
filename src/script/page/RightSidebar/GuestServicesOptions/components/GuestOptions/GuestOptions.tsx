@@ -20,25 +20,33 @@
 import {FC, useCallback, useEffect, useMemo, useState} from 'react';
 
 import cx from 'classnames';
+import {container} from 'tsyringe';
 
 import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
 
-import {CopyToClipboard} from 'Components/CopyToClipboard';
-import {Icon} from 'Components/Icon';
+import * as Icon from 'Components/Icon';
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
+import {RadioGroup} from 'Components/Radio';
+import {SelectText} from 'Components/SelectText';
 import {BaseToggle} from 'Components/toggle/BaseToggle';
+import {ACCESS_STATE} from 'Repositories/conversation/AccessState';
+import {teamPermissionsForAccessState} from 'Repositories/conversation/ConversationAccessPermission';
+import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
+import {Conversation} from 'Repositories/entity/Conversation';
+import {TeamRepository} from 'Repositories/team/TeamRepository';
+import {TeamState} from 'Repositories/team/TeamState';
 import {copyText} from 'Util/ClipboardUtil';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 
 import {Config} from '../../../../../Config';
-import {ACCESS_STATE} from '../../../../../conversation/AccessState';
-import {teamPermissionsForAccessState} from '../../../../../conversation/ConversationAccessPermission';
-import {ConversationRepository} from '../../../../../conversation/ConversationRepository';
-import {Conversation} from '../../../../../entity/Conversation';
-import {TeamRepository} from '../../../../../team/TeamRepository';
 
 const COPY_LINK_CONFIRM_DURATION = 1500;
+
+enum PasswordPreference {
+  PASSWORD_SECURED = 'Password secured',
+  NOT_PASSWORD_SECURED = 'Not password secured',
+}
 
 interface GuestOptionsProps {
   activeConversation: Conversation;
@@ -49,6 +57,8 @@ interface GuestOptionsProps {
   isRequestOngoing?: boolean;
   isTeamStateGuestLinkEnabled?: boolean;
   isToggleDisabled?: boolean;
+  isPasswordSupported?: boolean;
+  teamState?: TeamState;
 }
 
 const GuestOptions: FC<GuestOptionsProps> = ({
@@ -60,14 +70,25 @@ const GuestOptions: FC<GuestOptionsProps> = ({
   isRequestOngoing = false,
   isTeamStateGuestLinkEnabled = false,
   isToggleDisabled = false,
+  isPasswordSupported = false,
+  teamState = container.resolve(TeamState),
 }) => {
   const [isLinkCopied, setIsLinkCopied] = useState<boolean>(false);
   const [conversationHasGuestLinkEnabled, setConversationHasGuestLinkEnabled] = useState<boolean>(false);
-
-  const {accessCode, hasGuest, inTeam, isGuestAndServicesRoom, isGuestRoom, isServicesRoom} = useKoSubscribableChildren(
-    activeConversation,
-    ['accessCode', 'hasGuest', 'inTeam', 'isGuestAndServicesRoom', 'isGuestRoom', 'isServicesRoom'],
+  const [optionPasswordSecured, setOptionPasswordSecured] = useState<PasswordPreference>(
+    PasswordPreference.PASSWORD_SECURED,
   );
+  const {accessCode, accessCodeHasPassword, hasGuest, isGuestAndServicesRoom, isGuestRoom, isServicesRoom} =
+    useKoSubscribableChildren(activeConversation, [
+      'accessCode',
+      'accessCodeHasPassword',
+      'hasGuest',
+      'isGuestAndServicesRoom',
+      'isGuestRoom',
+      'isServicesRoom',
+    ]);
+
+  const inTeam = teamState.isInTeam(activeConversation);
 
   const isGuestEnabled = isGuestRoom || isGuestAndServicesRoom;
   const isGuestLinkEnabled = inTeam
@@ -75,19 +96,31 @@ const GuestOptions: FC<GuestOptionsProps> = ({
     : isTeamStateGuestLinkEnabled && conversationHasGuestLinkEnabled;
   const isServicesEnabled = isServicesRoom || isGuestAndServicesRoom;
 
-  const hasAccessCode = isGuestEnabled ? accessCode : false;
+  const hasAccessCode: boolean = isGuestEnabled ? !!accessCode : false;
 
   const guestInfoText = useMemo(() => {
     if (!inTeam) {
       return t('guestRoomToggleInfoDisabled');
     }
+    if (accessCodeHasPassword) {
+      return isGuestEnabled ? (
+        <span>
+          <span style={{marginBottom: 8, display: 'block'}}>{t('guestOptionsInfoTextWithPassword')}</span>
+          {'\n'}
+          <span>{t('guestOptionsInfoTextForgetPassword')}</span>
+        </span>
+      ) : (
+        t('guestRoomToggleInfo')
+      );
+    }
+    return isGuestEnabled
+      ? t('guestOptionsInfoText', {brandName: Config.getConfig().BRAND_NAME})
+      : t('guestRoomToggleInfo');
+  }, [inTeam, isGuestEnabled, accessCodeHasPassword]);
 
-    return isGuestEnabled ? t('guestOptionsInfoText', Config.getConfig().BRAND_NAME) : t('guestRoomToggleInfo');
-  }, [inTeam, isGuestEnabled]);
-
-  const guestLinkDisabledInfo = !conversationHasGuestLinkEnabled
-    ? t('guestLinkDisabledByOtherTeam')
-    : t('guestLinkDisabled');
+  const guestLinkDisabledInfo = !isTeamStateGuestLinkEnabled
+    ? t('guestLinkDisabled')
+    : t('guestLinkDisabledByOtherTeam');
 
   const toggleGuestAccess = async () => {
     await toggleAccessState(
@@ -125,16 +158,87 @@ const GuestOptions: FC<GuestOptionsProps> = ({
     });
   };
 
-  const requestAccessCode = async () => {
+  const openForcePasswordCopyModal = async (password: string) => {
+    PrimaryModal.show(
+      PrimaryModal.type.CONFIRM,
+      {
+        closeOnConfirm: true,
+        preventClose: false,
+        primaryAction: {
+          action: async () => {
+            await copyText(password);
+            await requestAccessCode(password);
+          },
+          text: t('guestOptionsPasswordCopyToClipboard'),
+        },
+        text: {
+          title: t('guestOptionsPasswordCopyToClipboard'),
+          message: t('guestOptionsPasswordForceToCopy'),
+        },
+      },
+      undefined,
+    );
+  };
+
+  const createGuestLinkWithPassword = async () => {
+    const onCreate = async (password: string, didCopyPassword: boolean) => {
+      if (!didCopyPassword) {
+        await openForcePasswordCopyModal(password);
+        return;
+      }
+      await requestAccessCode(password);
+    };
+    PrimaryModal.show(
+      PrimaryModal.type.GUEST_LINK_PASSWORD,
+      {
+        copyPassword: true,
+        closeOnConfirm: true,
+        preventClose: false,
+        primaryAction: {
+          action: onCreate,
+          text: t('guestOptionsInfoModalAction'),
+        },
+        secondaryAction: {
+          text: t('modalConfirmSecondary'),
+        },
+        text: {
+          closeBtnLabel: t('guestOptionsInfoModalCancel'),
+          input: t('guestOptionsInfoModalFormLabel'),
+          message: (
+            <>
+              {t('guestOptionsInfoModalTitleSubTitle')}
+              {'\n'}
+              <span css={{display: 'block'}} className="text-bold-small">
+                {t('guestOptionsInfoModalTitleBoldSubTitle')}
+              </span>
+            </>
+          ),
+          title: t('guestOptionsInfoModalTitle'),
+        },
+      },
+      undefined,
+    );
+  };
+
+  const requestAccessCode = async (password?: string) => {
     if (!isGuestEnabled && !isServicesEnabled) {
       await conversationRepository.stateHandler.changeAccessState(activeConversation, ACCESS_STATE.TEAM.GUEST_ROOM);
     }
 
     if (!isRequestOngoing) {
       setIsRequestOngoing(true);
-      await conversationRepository.stateHandler.requestAccessCode(activeConversation);
+      await conversationRepository.stateHandler.requestAccessCode(activeConversation, password);
       setIsRequestOngoing(false);
     }
+  };
+
+  const createLink = async () => {
+    if (optionPasswordSecured === PasswordPreference.PASSWORD_SECURED) {
+      await createGuestLinkWithPassword();
+      return;
+    }
+
+    await requestAccessCode();
   };
 
   const updateCode = useCallback(async () => {
@@ -160,6 +264,10 @@ const GuestOptions: FC<GuestOptionsProps> = ({
     initializeOptions();
   }, [initializeOptions]);
 
+  const saveOptionPasswordSecured = (preference: PasswordPreference) => {
+    setOptionPasswordSecured(preference);
+  };
+
   return (
     <>
       <div className="guest-options__content">
@@ -170,10 +278,22 @@ const GuestOptions: FC<GuestOptionsProps> = ({
           toggleName={t('guestRoomToggleName')}
           toggleId="guests"
         />
-
-        <p className="guest-options__info-head">{t('guestRoomToggleInfoHead')}</p>
-
-        <p className="guest-options__info-text" data-uie-name="status-guest-options-info">
+        <p className="guest-options__info-head">
+          {hasAccessCode && accessCodeHasPassword ? (
+            <span style={{display: 'flex', alignItems: 'center', marginBottom: 8}}>
+              <Icon.ShieldIcon
+                data-uie-name="generate-password-icon"
+                width="16"
+                height="16"
+                css={{marginRight: '10px'}}
+              />
+              {t('guestOptionsInfoPasswordSecured')}
+            </span>
+          ) : (
+            t('guestRoomToggleInfoHead')
+          )}
+        </p>
+        <p className="guest-options__info-text " data-uie-name="status-guest-options-info">
           {guestInfoText}
         </p>
       </div>
@@ -184,7 +304,7 @@ const GuestOptions: FC<GuestOptionsProps> = ({
             <>
               {hasAccessCode && (
                 <>
-                  <CopyToClipboard text={accessCode} className="guest-options__link" dataUieName="status-invite-link" />
+                  <SelectText text={accessCode} className="guest-options__link" dataUieName="status-invite-link" />
 
                   <button
                     className={cx('panel__action-item panel__action-item--link panel__action-item--alternate', {
@@ -196,7 +316,7 @@ const GuestOptions: FC<GuestOptionsProps> = ({
                   >
                     <span className="panel__action-item__default">
                       <span className="panel__action-item__icon">
-                        <Icon.Copy />
+                        <Icon.CopyIcon />
                       </span>
 
                       <span className="panel__action-item__text">{t('guestOptionsCopyLink')}</span>
@@ -204,7 +324,7 @@ const GuestOptions: FC<GuestOptionsProps> = ({
 
                     <span className="panel__action-item__alternative">
                       <span className="panel__action-item__icon">
-                        <Icon.Check />
+                        <Icon.CheckIcon />
                       </span>
 
                       <span className="panel__action-item__text" data-uie-name="status-copy-link-done">
@@ -220,7 +340,7 @@ const GuestOptions: FC<GuestOptionsProps> = ({
                     onClick={revokeAccessCode}
                   >
                     <span className="panel__action-item__icon">
-                      <Icon.Close />
+                      <Icon.CloseIcon />
                     </span>
 
                     <span className="panel__action-item__text" data-uie-name="do-revoke-link">
@@ -230,18 +350,53 @@ const GuestOptions: FC<GuestOptionsProps> = ({
                 </>
               )}
 
-              {!hasAccessCode && (
+              {!hasAccessCode && !isPasswordSupported && (
                 <div className="guest-options__content">
                   <Button
                     disabled={isRequestOngoing}
                     variant={ButtonVariant.TERTIARY}
-                    onClick={requestAccessCode}
+                    onClick={() => requestAccessCode()}
                     data-uie-name="do-create-link"
                   >
-                    <Icon.Link width="16" height="16" css={{marginRight: '10px'}} />
+                    <Icon.LinkIcon width="16" height="16" css={{marginRight: '10px'}} />
                     {t('guestOptionsCreateLink')}
                   </Button>
                 </div>
+              )}
+
+              {!hasAccessCode && isPasswordSupported && (
+                <>
+                  <div className="guest-options__password-radio">
+                    <p className="guest-options__info-text">{t('guestOptionsInfoTextSecureWithPassword')}</p>
+                    <RadioGroup
+                      ariaLabelledBy={t('guestOptionsPasswordRadioLabel')}
+                      name="guest-links-password"
+                      selectedValue={optionPasswordSecured}
+                      onChange={saveOptionPasswordSecured}
+                      options={[
+                        {
+                          label: t('guestOptionsPasswordRadioOptionSecured'),
+                          value: PasswordPreference.PASSWORD_SECURED,
+                        },
+                        {
+                          label: t('guestOptionsPasswordRadioOptionNotSecured'),
+                          value: PasswordPreference.NOT_PASSWORD_SECURED,
+                        },
+                      ]}
+                    />
+                  </div>
+                  <div className="guest-options__content">
+                    <Button
+                      disabled={isRequestOngoing}
+                      variant={ButtonVariant.TERTIARY}
+                      onClick={createLink}
+                      data-uie-name="do-create-link"
+                    >
+                      <Icon.LinkIcon width="16" height="16" css={{marginRight: '10px'}} />
+                      {t('guestOptionsCreateLink')}
+                    </Button>
+                  </div>
+                </>
               )}
             </>
           )}
@@ -249,7 +404,7 @@ const GuestOptions: FC<GuestOptionsProps> = ({
           {!isGuestLinkEnabled && (
             <div className="panel__action-item--info">
               <span className="panel__action-item__icon--info">
-                <Icon.Info />
+                <Icon.InfoIcon />
               </span>
 
               <p className="panel__action-item__text--info" data-uie-name="guest-link-disabled-info">

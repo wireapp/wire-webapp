@@ -18,22 +18,25 @@
  */
 
 import {amplify} from 'amplify';
-import jQuery from 'jquery';
-import ko from 'knockout';
-
-import {t} from 'Util/LocalizerUtil';
 
 import {WireModule} from './Wire.types';
 
+interface Connection {
+  // See https://developer.mozilla.org/en-US/docs/Web/API/NetworkInformation/effectiveType
+  effectiveType: 'slow-2g' | '2g' | '3g' | '4g';
+  addEventListener: (type: 'change', listener: () => void) => void;
+  removeEventListener: (type: 'change', listener: () => void) => void;
+}
+
 declare global {
   interface Window {
-    $: typeof jQuery;
-    amplify: amplify.Static;
-    jQuery: typeof jQuery;
-    ko: typeof ko;
-    t: typeof t;
     wire: WireModule;
-    wSSOCapable: boolean;
+    amplify: amplify.Static;
     z: any;
+  }
+
+  interface Navigator {
+    // TODO: Remove once the type is available in TS native types
+    connection?: Connection;
   }
 }

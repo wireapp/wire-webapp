@@ -18,9 +18,11 @@
  */
 
 .loading-dots {
+  position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
+  background-color: var(--foreground-fade-8);
   &::after {
     position: absolute;
     right: 50%;
@@ -33,7 +35,10 @@
     margin-bottom: -2px;
     animation: threeLoadingDotsAni 1s linear infinite;
     background-color: var(--background-fade-16);
-    box-shadow: -8px 0 var(--background-fade-16), 0 0 var(--background-fade-16), 8px 0 var(--background-fade-16);
+    box-shadow:
+      -8px 0 var(--background-fade-16),
+      0 0 var(--background-fade-16),
+      8px 0 var(--background-fade-16);
     content: '';
   }
 }
@@ -41,15 +46,27 @@
 @keyframes threeLoadingDotsAni {
   0%,
   80% {
-    box-shadow: -8px 0 var(--background-fade-16), 0 0 var(--background-fade-16), 8px 0 var(--background-fade-16);
+    box-shadow:
+      -8px 0 var(--background-fade-16),
+      0 0 var(--background-fade-16),
+      8px 0 var(--background-fade-16);
   }
   20% {
-    box-shadow: -9px 0 0 2px var(--background-fade-16), 0 0 var(--background-fade-16), 8px 0 var(--background-fade-16);
+    box-shadow:
+      -9px 0 0 2px var(--background-fade-16),
+      0 0 var(--background-fade-16),
+      8px 0 var(--background-fade-16);
   }
   40% {
-    box-shadow: -8px 0 var(--background-fade-16), 0 0 0 2px var(--background-fade-16), 8px 0 var(--background-fade-16);
+    box-shadow:
+      -8px 0 var(--background-fade-16),
+      0 0 0 2px var(--background-fade-16),
+      8px 0 var(--background-fade-16);
   }
   60% {
-    box-shadow: -8px 0 var(--background-fade-16), 0 0 var(--background-fade-16), 9px 0 0 2px var(--background-fade-16);
+    box-shadow:
+      -8px 0 var(--background-fade-16),
+      0 0 var(--background-fade-16),
+      9px 0 0 2px var(--background-fade-16);
   }
 }

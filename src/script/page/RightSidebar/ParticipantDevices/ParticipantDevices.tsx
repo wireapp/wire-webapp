@@ -20,21 +20,23 @@
 import {FC} from 'react';
 
 import {FadingScrollbar} from 'Components/FadingScrollbar';
-import {UserDevices, UserDevicesState, useUserDevicesHistory} from 'Components/UserDevices';
+import {UserDevices, UserDevicesState} from 'Components/UserDevices';
+import {useUserDevicesHistory} from 'Hooks/useUserDevicesHistory';
+import type {User} from 'Repositories/entity/User';
 import {t} from 'Util/LocalizerUtil';
 
-import type {User} from '../../../entity/User';
 import {ViewModelRepositories} from '../../../view_model/MainViewModel';
 import {PanelHeader} from '../PanelHeader';
 
 interface ParticipantDevicesProps {
   onClose: () => void;
   onGoBack: (userEntity: User) => void;
+  groupId?: string;
   repositories: ViewModelRepositories;
   user: User;
 }
 
-const ParticipantDevices: FC<ParticipantDevicesProps> = ({repositories, onClose, onGoBack, user}) => {
+const ParticipantDevices: FC<ParticipantDevicesProps> = ({repositories, onClose, onGoBack, groupId, user}) => {
   const history = useUserDevicesHistory();
 
   return (
@@ -57,6 +59,7 @@ const ParticipantDevices: FC<ParticipantDevicesProps> = ({repositories, onClose,
 
       <FadingScrollbar className="panel__content">
         <UserDevices
+          groupId={groupId}
           clientRepository={repositories.client}
           cryptographyRepository={repositories.cryptography}
           messageRepository={repositories.message}

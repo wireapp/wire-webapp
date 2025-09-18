@@ -17,44 +17,40 @@
  *
  */
 
-import {forwardRef, useCallback, useEffect, useMemo, useState} from 'react';
+import {forwardRef, useEffect, useMemo, useState} from 'react';
 
+import {CONVERSATION_ACCESS} from '@wireapp/api-client/lib/conversation';
 import {RECEIPT_MODE} from '@wireapp/api-client/lib/conversation/data/';
-import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
+
+import {TabIndex} from '@wireapp/react-ui-kit';
 
 import {FadingScrollbar} from 'Components/FadingScrollbar';
-import {Icon} from 'Components/Icon';
+import * as Icon from 'Components/Icon';
 import {ConversationProtocolDetails} from 'Components/panel/ConversationProtocolDetails/ConversationProtocolDetails';
 import {EnrichedFields} from 'Components/panel/EnrichedFields';
-import {PanelActions} from 'Components/panel/PanelActions';
 import {ServiceDetails} from 'Components/panel/ServiceDetails';
 import {UserDetails} from 'Components/panel/UserDetails';
-import {ServiceList} from 'Components/ServiceList/ServiceList';
-import {UserSearchableList} from 'Components/UserSearchableList';
+import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
+import {ConversationVerificationState} from 'Repositories/conversation/ConversationVerificationState';
+import {getNotificationText} from 'Repositories/conversation/NotificationSetting';
+import {Conversation} from 'Repositories/entity/Conversation';
+import {User} from 'Repositories/entity/User';
+import {IntegrationRepository} from 'Repositories/integration/IntegrationRepository';
+import {ServiceEntity} from 'Repositories/integration/ServiceEntity';
+import {TeamRepository} from 'Repositories/team/TeamRepository';
+import {TeamState} from 'Repositories/team/TeamState';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 import {sortUsersByPriority} from 'Util/StringUtil';
 import {formatDuration} from 'Util/TimeUtil';
 
-import {ConversationDetailsBottomActions} from './components/ConversationDetailsBottomActions';
 import {ConversationDetailsHeader} from './components/ConversationDetailsHeader';
 import {ConversationDetailsOptions} from './components/ConversationDetailsOptions';
-import {getConversationActions} from './utils/getConversationActions';
+import {ConversationDetailsParticipants} from './components/ConversationDetailsParticipants';
 
-import {ConversationRepository} from '../../../conversation/ConversationRepository';
-import {ConversationVerificationState} from '../../../conversation/ConversationVerificationState';
-import {getNotificationText} from '../../../conversation/NotificationSetting';
-import {Conversation} from '../../../entity/Conversation';
-import {User} from '../../../entity/User';
 import {isServiceEntity} from '../../../guards/Service';
-import {IntegrationRepository} from '../../../integration/IntegrationRepository';
-import {ServiceEntity} from '../../../integration/ServiceEntity';
-import {SearchRepository} from '../../../search/SearchRepository';
-import {TeamRepository} from '../../../team/TeamRepository';
-import {TeamState} from '../../../team/TeamState';
 import {Shortcut} from '../../../ui/Shortcut';
 import {ShortcutType} from '../../../ui/ShortcutType';
-import {UserState} from '../../../user/UserState';
 import {ActionsViewModel} from '../../../view_model/ActionsViewModel';
 import {PanelHeader} from '../PanelHeader';
 import {PanelEntity, PanelState} from '../RightSidebar';
@@ -65,32 +61,30 @@ const CONFIG = {
 };
 
 interface ConversationDetailsProps {
-  onClose: () => void;
-  togglePanel: (panel: PanelState, entity: PanelEntity, addMode?: boolean, direction?: 'left' | 'right') => void;
+  onClose?: () => void;
+  togglePanel?: (panel: PanelState, entity: PanelEntity, addMode?: boolean, direction?: 'left' | 'right') => void;
   actionsViewModel: ActionsViewModel;
   activeConversation: Conversation;
   conversationRepository: ConversationRepository;
   integrationRepository: IntegrationRepository;
-  searchRepository: SearchRepository;
   teamRepository: TeamRepository;
   teamState: TeamState;
-  userState: UserState;
+  selfUser: User;
   isFederated?: boolean;
 }
 
 const ConversationDetails = forwardRef<HTMLDivElement, ConversationDetailsProps>(
   (
     {
-      onClose,
-      togglePanel,
+      onClose = () => {},
+      togglePanel = () => {},
       actionsViewModel,
       activeConversation,
       conversationRepository,
       integrationRepository,
-      searchRepository,
       teamRepository,
       teamState,
-      userState,
+      selfUser,
       isFederated = false,
     },
     ref,
@@ -103,27 +97,23 @@ const ConversationDetails = forwardRef<HTMLDivElement, ConversationDetailsProps>
       isMutable,
       showNotificationsNothing,
       verification_state: verificationState,
-      isGroup,
-      removed_from_conversation: removedFromConversation,
-      display_name: displayName,
+      isSelfUserRemoved,
       notificationState,
       hasGlobalMessageTimer,
       globalMessageTimer,
       isTeamOnly: isConversationTeamOnly,
       isServicesRoom: isConversationServicesRoomOnly,
       isGuestAndServicesRoom,
-      receiptMode,
       is1to1,
       isRequest,
       participating_user_ets: participatingUserEts,
       firstUserEntity: firstParticipant,
+      isGroupOrChannel,
     } = useKoSubscribableChildren(activeConversation, [
       'isMutable',
       'showNotificationsNothing',
       'verification_state',
-      'isGroup',
-      'removed_from_conversation',
-      'display_name',
+      'isSelfUserRemoved',
       'notificationState',
       'hasGlobalMessageTimer',
       'globalMessageTimer',
@@ -135,47 +125,23 @@ const ConversationDetails = forwardRef<HTMLDivElement, ConversationDetailsProps>
       'isRequest',
       'participating_user_ets',
       'firstUserEntity',
+      'isGroupOrChannel',
     ]);
 
-    const teamId = activeConversation.team_id;
+    const {isTemporaryGuest} = useKoSubscribableChildren(firstParticipant!, ['isTemporaryGuest']);
 
-    const {
-      isTeam,
-      classifiedDomains,
-      team,
-      isSelfDeletingMessagesEnabled,
-      isSelfDeletingMessagesEnforced,
-      getEnforcedSelfDeletingMessagesTimeout,
-    } = useKoSubscribableChildren(teamState, [
-      'isTeam',
-      'classifiedDomains',
-      'isSelfDeletingMessagesEnabled',
-      'isSelfDeletingMessagesEnforced',
-      'getEnforcedSelfDeletingMessagesTimeout',
-      'team',
-    ]);
+    const {isTeam, classifiedDomains, team, isSelfDeletingMessagesEnforced, getEnforcedSelfDeletingMessagesTimeout} =
+      useKoSubscribableChildren(teamState, [
+        'isTeam',
+        'classifiedDomains',
+        'isSelfDeletingMessagesEnforced',
+        'getEnforcedSelfDeletingMessagesTimeout',
+        'team',
+      ]);
 
-    const {self: selfUser, isActivatedAccount} = useKoSubscribableChildren(userState, ['self', 'isActivatedAccount']);
-    const {is_verified: isSelfVerified, teamRole} = useKoSubscribableChildren(selfUser, ['is_verified', 'teamRole']);
-
-    const isActiveGroupParticipant = isGroup && !removedFromConversation;
-
-    const showOptionGuests = isActiveGroupParticipant && !!teamId && roleRepository.canToggleGuests(activeConversation);
-    const hasAdvancedNotifications = isMutable && isTeam;
-    const showOptionNotificationsGroup = hasAdvancedNotifications && isGroup;
-    const showOptionTimedMessages =
-      isActiveGroupParticipant && roleRepository.canToggleTimeout(activeConversation) && isSelfDeletingMessagesEnabled;
-    const showOptionServices =
-      isActiveGroupParticipant && !!teamId && roleRepository.canToggleGuests(activeConversation);
-    const showOptionReadReceipts = !!teamId && roleRepository.canToggleReadReceipts(activeConversation);
-
-    const showSectionOptions =
-      showOptionGuests || showOptionNotificationsGroup || showOptionTimedMessages || showOptionServices;
-    const showTopActions = isActiveGroupParticipant || showSectionOptions;
+    const isActiveGroupParticipant = isGroupOrChannel && !isSelfUserRemoved;
 
     const showActionAddParticipants = isActiveGroupParticipant && roleRepository.canAddParticipants(activeConversation);
-
-    const showOptionNotifications1To1 = hasAdvancedNotifications && !isGroup;
 
     const hasTimer = hasGlobalMessageTimer;
 
@@ -184,19 +150,19 @@ const ConversationDetails = forwardRef<HTMLDivElement, ConversationDetailsProps>
 
     const guestOptionsText = isTeamOnly ? t('conversationDetailsOff') : t('conversationDetailsOn');
     const servicesOptionsText = isServicesRoom ? t('conversationDetailsOn') : t('conversationDetailsOff');
+    const isChannelPublic = activeConversation.accessModes?.includes(CONVERSATION_ACCESS.LINK);
 
     const notificationStatusText = getNotificationText(notificationState);
     const timedMessagesText = isSelfDeletingMessagesEnforced
       ? formatDuration(getEnforcedSelfDeletingMessagesTimeout).text
       : hasTimer && globalMessageTimer
-      ? formatDuration(globalMessageTimer).text
-      : t('ephemeralUnitsNone');
+        ? formatDuration(globalMessageTimer).text
+        : t('ephemeralUnitsNone');
 
     const showActionMute = isMutable && !isTeam;
     const isVerified = verificationState === ConversationVerificationState.VERIFIED;
 
     const canRenameGroup = roleRepository.canRenameGroup(activeConversation);
-    const hasReceiptsEnabled = conversationRepository.expectReadReceipt(activeConversation);
 
     const userParticipants = useMemo(() => {
       const filteredUsers: User[] = participatingUserEts.flatMap(user => {
@@ -204,12 +170,12 @@ const ConversationDetails = forwardRef<HTMLDivElement, ConversationDetailsProps>
         return isUser ? [user] : [];
       });
 
-      if (!removedFromConversation) {
+      if (!isSelfUserRemoved) {
         return [...filteredUsers, selfUser].sort(sortUsersByPriority);
       }
 
       return filteredUsers;
-    }, [participatingUserEts, removedFromConversation, selfUser]);
+    }, [participatingUserEts, isSelfUserRemoved, selfUser]);
 
     const usersCount = userParticipants.length;
     const exceedsMaxUserCount = usersCount > CONFIG.MAX_USERS_VISIBLE;
@@ -222,8 +188,6 @@ const ConversationDetails = forwardRef<HTMLDivElement, ConversationDetailsProps>
 
     const toggleMute = () => actionsViewModel.toggleMuteConversation(activeConversation);
 
-    const openParticipantDevices = () => togglePanel(PanelState.PARTICIPANT_DEVICES, firstParticipant, false, 'left');
-
     const updateConversationName = (conversationName: string) =>
       conversationRepository.renameConversation(activeConversation, conversationName);
 
@@ -235,54 +199,42 @@ const ConversationDetails = forwardRef<HTMLDivElement, ConversationDetailsProps>
       const serviceEntity = await integrationRepository.getServiceFromUser(entity);
 
       if (serviceEntity) {
-        togglePanel(PanelState.GROUP_PARTICIPANT_SERVICE, {...serviceEntity, id: entity.id});
+        togglePanel(PanelState.GROUP_PARTICIPANT_SERVICE, serviceEntity);
       }
     };
 
     const showAllParticipants = () => togglePanel(PanelState.CONVERSATION_PARTICIPANTS, activeConversation);
 
-    const showNotifications = () => togglePanel(PanelState.NOTIFICATIONS, activeConversation);
-
     const updateConversationReceiptMode = (receiptMode: RECEIPT_MODE) =>
       conversationRepository.updateConversationReceiptMode(activeConversation, {receipt_mode: receiptMode});
 
     const isSingleUserMode = is1to1 || isRequest;
-
-    const isServiceMode = isSingleUserMode && firstParticipant.isService;
-
-    const getService = useCallback(async () => {
-      if (firstParticipant) {
-        const serviceEntity = await integrationRepository.getServiceFromUser(firstParticipant);
-
-        if (serviceEntity) {
-          setSelectedService(serviceEntity);
-          await integrationRepository.addProviderNameToParticipant(serviceEntity);
-        }
-      }
-    }, [firstParticipant]);
-
-    const conversationActions = getConversationActions(
-      activeConversation,
-      actionsViewModel,
-      conversationRepository,
-      teamRole,
-      isServiceMode,
-      isTeam,
-    );
+    const isServiceMode = isSingleUserMode && firstParticipant!.isService;
 
     useEffect(() => {
-      conversationRepository.refreshUnavailableParticipants(activeConversation);
+      void conversationRepository.refreshUnavailableParticipants(activeConversation);
     }, [activeConversation, conversationRepository]);
 
     useEffect(() => {
-      if (isTeam && isSingleUserMode) {
-        teamRepository.updateTeamMembersByIds(team, [firstParticipant.id], true);
+      if (team.id && isSingleUserMode) {
+        void teamRepository.updateTeamMembersByIds(team.id, [firstParticipant!.id], true);
       }
-    }, [firstParticipant, isSingleUserMode, isTeam, team, teamRepository]);
+    }, [firstParticipant, isSingleUserMode, team, teamRepository]);
 
     useEffect(() => {
-      getService();
-    }, [getService]);
+      const getService = async () => {
+        if (firstParticipant) {
+          const serviceEntity = await integrationRepository.getServiceFromUser(firstParticipant);
+
+          if (serviceEntity) {
+            setSelectedService(serviceEntity);
+            await integrationRepository.addProviderNameToParticipant(serviceEntity);
+          }
+        }
+      };
+
+      void getService();
+    }, [firstParticipant, integrationRepository]);
 
     return (
       <div
@@ -308,15 +260,18 @@ const ConversationDetails = forwardRef<HTMLDivElement, ConversationDetailsProps>
           {isSingleUserMode && !isServiceMode && firstParticipant && (
             <>
               <UserDetails
-                conversationDomain={activeConversation.domain}
+                groupId={activeConversation.groupId}
                 participant={firstParticipant}
                 isVerified={isVerified}
-                isSelfVerified={isSelfVerified}
                 badge={teamRepository.getRoleBadge(firstParticipant.id)}
                 classifiedDomains={classifiedDomains}
               />
 
-              <EnrichedFields user={firstParticipant} showDomain={isFederated} />
+              <EnrichedFields
+                user={firstParticipant}
+                showDomain={isFederated}
+                showAvailability={isTeam && !isTemporaryGuest && teamState.isInTeam(firstParticipant)}
+              />
             </>
           )}
 
@@ -325,29 +280,27 @@ const ConversationDetails = forwardRef<HTMLDivElement, ConversationDetailsProps>
               <ConversationDetailsHeader
                 isActiveGroupParticipant={isActiveGroupParticipant}
                 canRenameGroup={canRenameGroup}
-                displayName={displayName}
                 updateConversationName={updateConversationName}
-                isGroup={isGroup}
                 userParticipants={userParticipants}
                 serviceParticipants={serviceParticipants}
                 allUsersCount={allUsersCount}
                 isTeam={isTeam}
+                conversation={activeConversation}
               />
 
-              {showTopActions && showActionAddParticipants && (
+              {showActionAddParticipants && (
                 <div className="conversation-details__participant-options">
                   <button
                     className="panel__action-item"
                     type="button"
-                    title={t(
-                      'tooltipConversationDetailsAddPeople',
-                      Shortcut.getShortcutTooltip(ShortcutType.ADD_PEOPLE),
-                    )}
+                    title={t('tooltipConversationDetailsAddPeople', {
+                      shortcut: Shortcut.getShortcutTooltip(ShortcutType.ADD_PEOPLE),
+                    })}
                     onClick={openAddParticipants}
                     data-uie-name="go-add-people"
                   >
                     <span className="panel__action-item__icon">
-                      <Icon.Plus />
+                      <Icon.PlusIcon />
                     </span>
 
                     <span className="panel__action-item__text">{t('conversationDetailsActionAddParticipants')}</span>
@@ -357,111 +310,37 @@ const ConversationDetails = forwardRef<HTMLDivElement, ConversationDetailsProps>
                 </div>
               )}
 
-              <div className="conversation-details__participants">
-                {isGroup && !!userParticipants.length && (
-                  <>
-                    <UserSearchableList
-                      dataUieName="list-users"
-                      users={userParticipants}
-                      onClick={showUser}
-                      noUnderline
-                      searchRepository={searchRepository}
-                      teamRepository={teamRepository}
-                      conversationRepository={conversationRepository}
-                      conversation={activeConversation}
-                      truncate
-                      showEmptyAdmin
-                      selfFirst={false}
-                      noSelfInteraction
-                    />
-
-                    {allUsersCount > 0 && (
-                      <button
-                        type="button"
-                        className="panel__action-item panel__action-item--no-border"
-                        onClick={showAllParticipants}
-                        data-uie-name="go-conversation-participants"
-                      >
-                        <span className="panel__action-item__icon">
-                          <Icon.People />
-                        </span>
-
-                        <span className="panel__action-item__text">
-                          {t('conversationDetailsActionConversationParticipants', allUsersCount)}
-                        </span>
-
-                        <Icon.ChevronRight className="chevron-right-icon" />
-                      </button>
-                    )}
-                  </>
-                )}
-              </div>
-
-              {showTopActions && showSectionOptions && (
-                <ConversationDetailsOptions
+              {isGroupOrChannel && (!!userParticipants.length || !!serviceParticipants.length) && (
+                <ConversationDetailsParticipants
                   activeConversation={activeConversation}
-                  togglePanel={togglePanel}
-                  receiptMode={receiptMode}
-                  guestOptionsText={guestOptionsText}
-                  notificationStatusText={notificationStatusText}
-                  servicesOptionsText={servicesOptionsText}
-                  showOptionGuests={showOptionGuests}
-                  showOptionNotificationsGroup={showOptionNotificationsGroup}
-                  showOptionReadReceipts={showOptionReadReceipts}
-                  showOptionServices={showOptionServices}
-                  showOptionTimedMessages={showOptionTimedMessages}
-                  timedMessagesText={timedMessagesText}
-                  updateConversationReceiptMode={updateConversationReceiptMode}
+                  allUsersCount={allUsersCount}
+                  conversationRepository={conversationRepository}
+                  selfUser={selfUser}
+                  serviceParticipants={serviceParticipants}
+                  showAllParticipants={showAllParticipants}
+                  showService={showService}
+                  showUser={showUser}
+                  userParticipants={userParticipants}
                 />
               )}
-
-              {!!serviceParticipants.length && (
-                <div className="conversation-details__participants">
-                  <h3 className="conversation-details__list-head">{t('conversationDetailsServices')}</h3>
-
-                  <ServiceList
-                    services={serviceParticipants}
-                    onServiceClick={showService}
-                    dataUieName="list-services"
-                  />
-                </div>
-              )}
             </>
           )}
 
-          {isActivatedAccount && (
-            <>
-              <ConversationDetailsBottomActions
-                isDeviceActionEnabled={
-                  isSingleUserMode && firstParticipant && (firstParticipant.isConnected() || firstParticipant.inTeam())
-                }
-                showDevices={openParticipantDevices}
-                showNotifications={showNotifications}
-                notificationStatusText={notificationStatusText}
-                showOptionNotifications1To1={showOptionNotifications1To1}
-              />
-
-              {isSingleUserMode && (
-                <div className="conversation-details__read-receipts" data-uie-name="label-1to1-read-receipts">
-                  <strong className="panel__info-text panel__info-text--head panel__info-text--margin-bottom">
-                    {hasReceiptsEnabled
-                      ? t('conversationDetails1to1ReceiptsHeadEnabled')
-                      : t('conversationDetails1to1ReceiptsHeadDisabled')}
-                  </strong>
-
-                  <p className="panel__info-text panel__info-text--margin-bottom">
-                    {t('conversationDetails1to1ReceiptsFirst')}
-                  </p>
-
-                  <p className="panel__info-text panel__info-text--margin">
-                    {t('conversationDetails1to1ReceiptsSecond')}
-                  </p>
-                </div>
-              )}
-
-              <PanelActions items={conversationActions} />
-            </>
-          )}
+          <ConversationDetailsOptions
+            actionsViewModel={actionsViewModel}
+            activeConversation={activeConversation}
+            conversationRepository={conversationRepository}
+            togglePanel={togglePanel}
+            guestOptionsText={guestOptionsText}
+            notificationStatusText={notificationStatusText}
+            roleRepository={conversationRepository.conversationRoleRepository}
+            selfUser={selfUser}
+            servicesOptionsText={servicesOptionsText}
+            teamState={teamState}
+            timedMessagesText={timedMessagesText}
+            updateConversationReceiptMode={updateConversationReceiptMode}
+            isChannelPublic={isChannelPublic}
+          />
 
           <ConversationProtocolDetails
             protocol={activeConversation.protocol}

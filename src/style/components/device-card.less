@@ -17,13 +17,9 @@
  *
  */
 
-device-card,
 .device-card {
   position: relative;
   display: flex;
-}
-
-.device-card {
   flex-grow: 1;
   align-items: center;
 
@@ -37,23 +33,34 @@ device-card,
 
   .disclose-icon {
     display: flex;
-    height: 8px;
+    height: 16px;
     align-self: center;
 
     path {
-      fill: var(--background-fade-40);
+      fill: var(--gray-90);
     }
   }
 
   &__info {
     width: 100%;
     padding-right: 16px;
-    line-height: @line-height-sm;
+    line-height: var(--line-height-sm);
+  }
+
+  &__name {
+    display: flex;
+    align-items: center;
+
+    .conversation-badges {
+      margin-left: 4px;
+    }
   }
 
   &__label,
   &__model {
-    font-weight: @font-weight-bold;
+    font-size: var(--font-size-medium);
+    font-weight: var(--font-weight-bold);
+    line-height: var(--line-height-md);
   }
 
   .verified-icon,
@@ -74,17 +81,18 @@ device-card,
   min-height: 16px;
 }
 
-.device-id-part {
-  .text-selection;
+.device-card__id {
+  display: grid;
+  font-size: var(--font-size-small);
+  grid-template-columns: auto 1fr;
+  line-height: var(--line-height-sm);
+  text-transform: uppercase;
 
-  display: inline-block;
-  margin-right: 4px;
+  .formatted-id {
+    overflow: hidden;
 
-  &:nth-child(odd) strong {
-    font-weight: @font-weight-bold;
-  }
-
-  &:last-child {
-    margin-right: 0;
+    margin-left: 2px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
 }

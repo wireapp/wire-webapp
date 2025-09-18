@@ -17,16 +17,8 @@
  *
  */
 
-import {amplify} from 'amplify';
-import jQuery from 'jquery';
-
-import '../event/Client';
 import '../message/MessageCategorization';
 import '../message/MessageCategory';
+import '../repositories/event/Client';
+import '../repositories/storage/StorageSchemata';
 import '../service/BackendEnvironment';
-import '../storage/StorageSchemata';
-
-window.amplify = amplify;
-window.jQuery = jQuery;
-// eslint-disable-next-line id-length
-window.$ = jQuery;

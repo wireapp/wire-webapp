@@ -25,26 +25,37 @@ import cx from 'classnames';
 
 import {WebAppEvents} from '@wireapp/webapp-events';
 
-import {Icon} from 'Components/Icon';
-import {Image} from 'Components/Image';
+import * as Icon from 'Components/Icon';
+import {AssetImage} from 'Components/Image';
+import type {Conversation} from 'Repositories/entity/Conversation';
+import {ContentMessage} from 'Repositories/entity/message/ContentMessage';
+import {Text} from 'Repositories/entity/message/Text';
+import {User} from 'Repositories/entity/User';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {includesOnlyEmojis} from 'Util/EmojiUtil';
 import {t} from 'Util/LocalizerUtil';
 import {formatDateNumeral, formatTimeShort, isBeforeToday} from 'Util/TimeUtil';
 
-import {AudioAsset} from './asset/AudioAsset';
-import {FileAsset} from './asset/FileAssetComponent';
+import {AudioAsset} from './asset/AudioAsset/AudioAsset';
+import {FileAsset} from './asset/FileAsset/FileAsset';
 import {LocationAsset} from './asset/LocationAsset';
 import {TextMessageRenderer} from './asset/TextMessageRenderer';
-import {VideoAsset} from './asset/VideoAsset';
+import {VideoAsset} from './asset/VideoAsset/VideoAsset';
 
 import {MessageActions} from '..';
-import type {Conversation} from '../../../../entity/Conversation';
-import type {ContentMessage} from '../../../../entity/message/ContentMessage';
-import type {User} from '../../../../entity/User';
 import {ConversationError} from '../../../../error/ConversationError';
 import {QuoteEntity} from '../../../../message/QuoteEntity';
 import {useMessageFocusedTabIndex} from '../util';
+
+function createPlaceholderMessage() {
+  const message = new ContentMessage();
+  const user = new User();
+  user.name(' ');
+  message.user(user);
+  const textAsset = new Text('fake-text', ' ');
+  message.assets.push(textAsset);
+  return message;
+}
 
 export interface QuoteProps {
   conversation: Conversation;
@@ -58,7 +69,7 @@ export interface QuoteProps {
   isMessageFocused: boolean;
 }
 
-const Quote: FC<QuoteProps> = ({
+export const Quote: FC<QuoteProps> = ({
   conversation,
   findMessage,
   focusMessage,
@@ -110,26 +121,22 @@ const Quote: FC<QuoteProps> = ({
     }
   }, [quote, error]);
 
-  return !quotedMessage && !error ? (
-    <div />
-  ) : (
+  return (
     <div className="message-quote" data-uie-name="quote-item">
       {error ? (
         <div className="message-quote__error" data-uie-name="label-error-quote">
           {t('replyQuoteError')}
         </div>
       ) : (
-        quotedMessage && (
-          <QuotedMessage
-            quotedMessage={quotedMessage}
-            selfId={selfId}
-            focusMessage={focusMessage}
-            handleClickOnMessage={handleClickOnMessage}
-            showDetail={showDetail}
-            showUserDetails={showUserDetails}
-            isMessageFocused={isMessageFocused}
-          />
-        )
+        <QuotedMessage
+          quotedMessage={quotedMessage ?? createPlaceholderMessage()}
+          selfId={selfId}
+          focusMessage={focusMessage}
+          handleClickOnMessage={handleClickOnMessage}
+          showDetail={showDetail}
+          showUserDetails={showUserDetails}
+          isMessageFocused={isMessageFocused}
+        />
       )}
     </div>
   );
@@ -154,13 +161,13 @@ const QuotedMessage: FC<QuotedMessageProps> = ({
   showUserDetails,
   isMessageFocused,
 }) => {
-  const {
-    user: quotedUser,
-    assets: quotedAssets,
-    senderName,
-    was_edited,
-    timestamp,
-  } = useKoSubscribableChildren(quotedMessage, ['user', 'assets', 'senderName', 'was_edited', 'timestamp']);
+  const {user, assets, senderName, was_edited, timestamp} = useKoSubscribableChildren(quotedMessage, [
+    'user',
+    'assets',
+    'senderName',
+    'was_edited',
+    'timestamp',
+  ]);
   const messageFocusedTabIndex = useMessageFocusedTabIndex(isMessageFocused);
 
   return (
@@ -168,8 +175,8 @@ const QuotedMessage: FC<QuotedMessageProps> = ({
       <div className="message-quote__sender">
         <button
           type="button"
-          className="button-reset-default"
-          onClick={() => showUserDetails(quotedUser)}
+          className="button-reset-default text-left"
+          onClick={() => showUserDetails(user)}
           data-uie-name="label-name-quote"
           tabIndex={messageFocusedTabIndex}
         >
@@ -177,19 +184,19 @@ const QuotedMessage: FC<QuotedMessageProps> = ({
         </button>
         {was_edited && (
           <span data-uie-name="message-edited-quote" title={quotedMessage.displayEditedTimestamp()}>
-            <Icon.Edit />
+            <Icon.EditIcon />
           </span>
         )}
       </div>
-      {quotedAssets.map((asset, index) => (
+      {assets.map((asset, index) => (
         <Fragment key={index}>
           {asset.isImage() && (
             <div data-uie-name="media-picture-quote">
-              <Image
+              <AssetImage
                 className="message-quote__image"
-                asset={asset.resource()}
-                aspectRatio={asset.ratio}
-                click={(asset, event) => showDetail(quotedMessage, event)}
+                imageStyles={{objectFit: 'cover'}}
+                image={asset}
+                onClick={event => showDetail(quotedMessage, event)}
               />
             </div>
           )}
@@ -250,11 +257,9 @@ const QuotedMessage: FC<QuotedMessageProps> = ({
         tabIndex={messageFocusedTabIndex}
       >
         {isBeforeToday(timestamp)
-          ? t('replyQuoteTimeStampDate', formatDateNumeral(timestamp))
-          : t('replyQuoteTimeStampTime', formatTimeShort(timestamp))}
+          ? t('replyQuoteTimeStampDate', {date: formatDateNumeral(timestamp)})
+          : t('replyQuoteTimeStampTime', {time: formatTimeShort(timestamp)})}
       </button>
     </>
   );
 };
-
-export {Quote, QuotedMessage};

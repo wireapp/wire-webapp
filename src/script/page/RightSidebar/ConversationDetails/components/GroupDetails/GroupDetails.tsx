@@ -19,11 +19,10 @@
 
 import {FC} from 'react';
 
+import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
+import {User} from 'Repositories/entity/User';
+import {ServiceEntity} from 'Repositories/integration/ServiceEntity';
 import {t} from 'Util/LocalizerUtil';
-
-import {ConversationRepository} from '../../../../../conversation/ConversationRepository';
-import {User} from '../../../../../entity/User';
-import {ServiceEntity} from '../../../../../integration/ServiceEntity';
 
 interface GroupDetailsProps {
   userParticipants: User[];
@@ -77,7 +76,7 @@ const GroupDetails: FC<GroupDetailsProps> = ({
           className="panel__info-text conversation-details__group-size-info"
           data-uie-name="status-group-size-info-conversation-details"
         >
-          {t('groupSizeInfo', ConversationRepository.CONFIG.GROUP.MAX_SIZE)}
+          {t('groupSizeInfo', {count: ConversationRepository.CONFIG.GROUP.MAX_SIZE})}
         </p>
       )}
     </>

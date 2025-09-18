@@ -17,7 +17,7 @@
  *
  */
 
-import React, {useEffect, useRef, useState} from 'react';
+import React, {ChangeEvent, useCallback, useEffect, useRef, useState} from 'react';
 
 import type {WebappProperties} from '@wireapp/api-client/lib/user/data/';
 import {amplify} from 'amplify';
@@ -25,12 +25,12 @@ import {amplify} from 'amplify';
 import {Checkbox, CheckboxLabel} from '@wireapp/react-ui-kit';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
+import type {MediaConstraintsHandler} from 'Repositories/media/MediaConstraintsHandler';
+import type {PropertiesRepository} from 'Repositories/properties/PropertiesRepository';
+import {PROPERTIES_TYPE} from 'Repositories/properties/PropertiesType';
 import {t} from 'Util/LocalizerUtil';
 
 import {Config} from '../../../../../Config';
-import type {MediaConstraintsHandler} from '../../../../../media/MediaConstraintsHandler';
-import type {PropertiesRepository} from '../../../../../properties/PropertiesRepository';
-import {PROPERTIES_TYPE} from '../../../../../properties/PropertiesType';
 import {PreferencesSection} from '../components/PreferencesSection';
 
 interface CallOptionsProps {
@@ -48,6 +48,12 @@ const CallOptions: React.FC<CallOptionsProps> = ({constraintsHandler, properties
     propertiesRepository.properties.settings.call.enable_soundless_incoming_calls,
   );
 
+  const isPressSpaceToUnmuteFlagEnabled = Config.getConfig().FEATURE.ENABLE_PRESS_SPACE_TO_UNMUTE;
+
+  const [pressSpaceToUnmuteEnabled, setPressSpaceToUnmuteEnabled] = useState(
+    !!propertiesRepository.properties.settings.call.enable_press_space_to_unmute,
+  );
+
   useEffect(() => {
     const updateProperties = ({settings}: WebappProperties) => {
       setVbrEncoding(!isCbrEncodingEnforced && settings.call.enable_vbr_encoding);
@@ -58,17 +64,49 @@ const CallOptions: React.FC<CallOptionsProps> = ({constraintsHandler, properties
     };
   }, []);
 
+  const handleCbrEncodingChange = useCallback(
+    (event: ChangeEvent<HTMLInputElement>) => {
+      if (!isCbrEncodingEnforced) {
+        const isChecked = event.target.checked;
+        propertiesRepository.savePreference(PROPERTIES_TYPE.CALL.ENABLE_VBR_ENCODING, isChecked);
+        setVbrEncoding(isChecked);
+      }
+    },
+    [isCbrEncodingEnforced, propertiesRepository],
+  );
+
+  const handleAgcChange = useCallback(
+    (event: ChangeEvent<HTMLInputElement>) => {
+      const isChecked = event.target.checked;
+      constraintsHandler.setAgcPreference(isChecked);
+      setAgcEnabled(isChecked);
+    },
+    [constraintsHandler],
+  );
+
+  const handleSoundlessCallsChange = useCallback(
+    (event: ChangeEvent<HTMLInputElement>) => {
+      const isChecked = event.target.checked;
+      propertiesRepository.savePreference(PROPERTIES_TYPE.CALL.ENABLE_SOUNDLESS_INCOMING_CALLS, isChecked);
+      setSoundlessCallsEnabled(isChecked);
+    },
+    [propertiesRepository],
+  );
+
+  const handlePressSpaceToUnmuteChange = useCallback(
+    (event: ChangeEvent<HTMLInputElement>) => {
+      const isChecked = event.target.checked;
+      propertiesRepository.savePreference(PROPERTIES_TYPE.CALL.ENABLE_PRESS_SPACE_TO_UNMUTE, isChecked);
+      setPressSpaceToUnmuteEnabled(isChecked);
+    },
+    [propertiesRepository],
+  );
+
   return (
     <PreferencesSection title={t('preferencesOptionsCall')}>
       <div>
         <Checkbox
-          onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-            if (!isCbrEncodingEnforced) {
-              const isChecked = event.target.checked;
-              propertiesRepository.savePreference(PROPERTIES_TYPE.CALL.ENABLE_VBR_ENCODING, isChecked);
-              setVbrEncoding(isChecked);
-            }
-          }}
+          onChange={handleCbrEncodingChange}
           checked={vbrEncoding}
           data-uie-name="status-preference-vbr-encoding"
           disabled={isCbrEncodingEnforced}
@@ -80,29 +118,16 @@ const CallOptions: React.FC<CallOptionsProps> = ({constraintsHandler, properties
         <p className="preferences-detail preferences-detail-intended">{t('preferencesOptionsEnableVbrDetails')}</p>
       </div>
       <div className="checkbox-margin">
-        <Checkbox
-          onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-            const isChecked = event.target.checked;
-            constraintsHandler.setAgcPreference(isChecked);
-            setAgcEnabled(isChecked);
-          }}
-          checked={agcEnabled}
-          data-uie-name="status-preference-agc"
-        >
+        <Checkbox onChange={handleAgcChange} checked={agcEnabled} data-uie-name="status-preference-agc">
           <CheckboxLabel htmlFor="status-preference-agc">{t('preferencesOptionsEnableAgcCheckbox')}</CheckboxLabel>
         </Checkbox>
         <p className="preferences-detail preferences-detail-intended">{t('preferencesOptionsEnableAgcDetails')}</p>
       </div>
       <div className="checkbox-margin">
         <Checkbox
-          onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-            const isChecked = event.target.checked;
-            propertiesRepository.savePreference(PROPERTIES_TYPE.CALL.ENABLE_SOUNDLESS_INCOMING_CALLS, isChecked);
-            setSoundlessCallsEnabled(isChecked);
-          }}
+          onChange={handleSoundlessCallsChange}
           checked={soundlessCallsEnabled}
           data-uie-name="status-preference-soundless-incoming-calls"
-          disabled={isCbrEncodingEnforced}
         >
           <CheckboxLabel htmlFor="status-preference-soundless-incoming-calls">
             {t('preferencesOptionsEnableSoundlessIncomingCalls')}
@@ -112,6 +137,22 @@ const CallOptions: React.FC<CallOptionsProps> = ({constraintsHandler, properties
           {t('preferencesOptionsEnableSoundlessIncomingCallsDetails')}
         </p>
       </div>
+      {isPressSpaceToUnmuteFlagEnabled && (
+        <div className="checkbox-margin">
+          <Checkbox
+            onChange={handlePressSpaceToUnmuteChange}
+            checked={pressSpaceToUnmuteEnabled}
+            data-uie-name="status-preference-press-space-to-unmute"
+          >
+            <CheckboxLabel htmlFor="status-preference-press-space-to-unmute">
+              {t('preferencesOptionsEnablePressSpaceToUnmute')}
+            </CheckboxLabel>
+          </Checkbox>
+          <p className="preferences-detail preferences-detail-intended">
+            {t('preferencesOptionsEnablePressSpaceToUnmuteDetails')}
+          </p>
+        </div>
+      )}
     </PreferencesSection>
   );
 };

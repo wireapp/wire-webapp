@@ -20,29 +20,45 @@
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 import cx from 'classnames';
 
-import {Asset} from 'src/script/entity/message/Asset';
-import type {FileAsset as FileAssetType} from 'src/script/entity/message/FileAsset';
-import type {Location} from 'src/script/entity/message/Location';
-import type {MediumImage} from 'src/script/entity/message/MediumImage';
-import {Text} from 'src/script/entity/message/Text';
+import {AssetType} from 'Repositories/assets/AssetType';
+import {Asset} from 'Repositories/entity/message/Asset';
+import {Button} from 'Repositories/entity/message/Button';
+import {CompositeMessage} from 'Repositories/entity/message/CompositeMessage';
+import {ContentMessage} from 'Repositories/entity/message/ContentMessage';
+import type {FileAsset as FileAssetType} from 'Repositories/entity/message/FileAsset';
+import type {Location} from 'Repositories/entity/message/Location';
+import type {MediumImage} from 'Repositories/entity/message/MediumImage';
+import {Multipart} from 'Repositories/entity/message/Multipart';
+import {Text} from 'Repositories/entity/message/Text';
 import {StatusType} from 'src/script/message/StatusType';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {includesOnlyEmojis} from 'Util/EmojiUtil';
 
-import {AudioAsset} from './AudioAsset';
-import {FileAsset} from './FileAssetComponent';
+import {AudioAsset} from './AudioAsset/AudioAsset';
+import {FileAsset} from './FileAsset/FileAsset';
 import {ImageAsset} from './ImageAsset';
 import {LinkPreviewAsset} from './LinkPreviewAssetComponent';
 import {LocationAsset} from './LocationAsset';
 import {MessageButton} from './MessageButton';
+import {MultipartAssets} from './MultipartAssets/MultipartAssets';
 import {TextMessageRenderer} from './TextMessageRenderer';
-import {VideoAsset} from './VideoAsset';
+import {VideoAsset} from './VideoAsset/VideoAsset';
 
 import {MessageActions} from '../..';
-import {AssetType} from '../../../../../assets/AssetType';
-import {Button} from '../../../../../entity/message/Button';
-import {CompositeMessage} from '../../../../../entity/message/CompositeMessage';
-import {ContentMessage} from '../../../../../entity/message/ContentMessage';
+import {ReadIndicator} from '../../ReadIndicator';
+
+interface ContentAssetProps {
+  asset: Asset;
+  message: ContentMessage;
+  onClickButton: (message: CompositeMessage, buttonId: string) => void;
+  onClickImage: MessageActions['onClickImage'];
+  onClickMessage: MessageActions['onClickMessage'];
+  selfId: QualifiedId;
+  isMessageFocused: boolean;
+  is1to1Conversation: boolean;
+  isFileShareRestricted: boolean;
+  onClickDetails: () => void;
+}
 
 const ContentAsset = ({
   asset,
@@ -52,25 +68,31 @@ const ContentAsset = ({
   onClickMessage,
   onClickButton,
   isMessageFocused,
-}: {
-  asset: Asset;
-  message: ContentMessage;
-  onClickButton: (message: CompositeMessage, buttonId: string) => void;
-  onClickImage: MessageActions['onClickImage'];
-  onClickMessage: MessageActions['onClickMessage'];
-  selfId: QualifiedId;
-  isMessageFocused: boolean;
-}) => {
-  const {isObfuscated, status} = useKoSubscribableChildren(message, ['isObfuscated', 'status']);
+  is1to1Conversation,
+  onClickDetails,
+}: ContentAssetProps) => {
+  const {isObfuscated, status, senderName, timestamp} = useKoSubscribableChildren(message, [
+    'isObfuscated',
+    'status',
+    'senderName',
+    'timestamp',
+  ]);
+  const {previews} = useKoSubscribableChildren(asset as Text, ['previews']);
 
   switch (asset.type) {
-    case AssetType.TEXT:
+    case AssetType.MULTIPART:
+      const multipartAsset = asset as Multipart;
+      const shouldRenderTextMultipart = multipartAsset.should_render_text();
+      const renderTextMultipart = multipartAsset.render(selfId, message.accent_color());
+
+      const filesMultipart = multipartAsset.getCellAssets();
+
       return (
         <>
-          {(asset as Text).should_render_text() && (
+          {shouldRenderTextMultipart && (
             <TextMessageRenderer
               onMessageClick={onClickMessage}
-              text={(asset as Text).render(selfId, message.accent_color())}
+              text={renderTextMultipart}
               className={cx('text', {
                 'text-foreground': [StatusType.FAILED, StatusType.FEDERATION_ERROR, StatusType.SENDING].includes(
                   status,
@@ -81,37 +103,72 @@ const ContentAsset = ({
               isFocusable={isMessageFocused}
             />
           )}
-          {(asset as Text).previews().map(preview => (
+
+          <MultipartAssets senderName={senderName} timestamp={timestamp} assets={filesMultipart} />
+
+          {shouldRenderTextMultipart && (
+            <ReadIndicator message={message} is1to1Conversation={is1to1Conversation} onClick={onClickDetails} />
+          )}
+          {previews.map(() => (
             <div key={asset.id} className="message-asset">
               <LinkPreviewAsset message={message} isFocusable={isMessageFocused} />
+
+              {!shouldRenderText && (
+                <ReadIndicator message={message} is1to1Conversation={is1to1Conversation} onClick={onClickDetails} />
+              )}
+            </div>
+          ))}
+        </>
+      );
+    case AssetType.TEXT:
+      const shouldRenderText = (asset as Text).should_render_text();
+      const renderText = (asset as Text).render(selfId, message.accent_color());
+
+      return (
+        <>
+          {shouldRenderText && (
+            <TextMessageRenderer
+              onMessageClick={onClickMessage}
+              text={renderText}
+              className={cx('text', {
+                'text-foreground': [StatusType.FAILED, StatusType.FEDERATION_ERROR, StatusType.SENDING].includes(
+                  status,
+                ),
+                'text-large': includesOnlyEmojis(asset.text),
+                'ephemeral-message-obfuscated': isObfuscated,
+              })}
+              isFocusable={isMessageFocused}
+            />
+          )}
+
+          {shouldRenderText && (
+            <ReadIndicator message={message} is1to1Conversation={is1to1Conversation} onClick={onClickDetails} />
+          )}
+
+          {previews.map(() => (
+            <div key={asset.id} className="message-asset">
+              <LinkPreviewAsset message={message} isFocusable={isMessageFocused} />
+
+              {!shouldRenderText && (
+                <ReadIndicator message={message} is1to1Conversation={is1to1Conversation} onClick={onClickDetails} />
+              )}
             </div>
           ))}
         </>
       );
     case AssetType.FILE:
       if ((asset as FileAssetType).isFile()) {
-        return (
-          <div className={`message-asset ${isObfuscated ? 'ephemeral-asset-expired icon-file' : ''}`}>
-            <FileAsset message={message} isFocusable={isMessageFocused} />
-          </div>
-        );
+        return <FileAsset message={message} isFocusable={isMessageFocused} />;
       }
 
       if ((asset as FileAssetType).isAudio()) {
-        return (
-          <div className={`message-asset ${isObfuscated ? 'ephemeral-asset-expired' : ''}`}>
-            <AudioAsset message={message} isFocusable={isMessageFocused} />
-          </div>
-        );
+        return <AudioAsset message={message} isFocusable={isMessageFocused} />;
       }
 
       if ((asset as FileAssetType).isVideo()) {
-        return (
-          <div className={`message-asset ${isObfuscated ? 'ephemeral-asset-expired icon-movie' : ''}`}>
-            <VideoAsset message={message} isFocusable={isMessageFocused} />
-          </div>
-        );
+        return <VideoAsset message={message} isFocusable={isMessageFocused} />;
       }
+
     case AssetType.IMAGE:
       return (
         <ImageAsset
@@ -121,8 +178,10 @@ const ContentAsset = ({
           isFocusable={isMessageFocused}
         />
       );
+
     case AssetType.LOCATION:
       return <LocationAsset asset={asset as Location} />;
+
     case AssetType.BUTTON:
       const assetId = asset.id;
       if (!(message instanceof CompositeMessage && asset instanceof Button && assetId)) {
@@ -138,6 +197,7 @@ const ContentAsset = ({
         />
       );
   }
+
   return null;
 };
 

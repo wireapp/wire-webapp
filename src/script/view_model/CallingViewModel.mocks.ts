@@ -17,17 +17,19 @@
  *
  */
 
-import {QualifiedId} from '@wireapp/api-client/lib/user';
 import ko from 'knockout';
 import {container} from 'tsyringe';
 
 import {CALL_TYPE, CONV_TYPE} from '@wireapp/avs';
 
+import {Call} from 'Repositories/calling/Call';
+import {CallingRepository} from 'Repositories/calling/CallingRepository';
+import {CallState} from 'Repositories/calling/CallState';
+import {Conversation} from 'Repositories/entity/Conversation';
+import {MediaDevicesHandler} from 'Repositories/media/MediaDevicesHandler';
+
 import {CallingViewModel} from './CallingViewModel';
 
-import {Call} from '../calling/Call';
-import {CallingRepository} from '../calling/CallingRepository';
-import {CallState} from '../calling/CallState';
 import {Core} from '../service/CoreSingleton';
 
 export const mockCallingRepository = {
@@ -39,26 +41,29 @@ export const mockCallingRepository = {
   onCallParticipantChangedCallback: jest.fn(),
   onCallClosed: jest.fn(),
   leaveCall: jest.fn(),
+  rejectCall: jest.fn(),
   setEpochInfo: jest.fn(),
+  supportsConferenceCalling: true,
 } as unknown as CallingRepository;
+
+export const mockMediaDevicesHandler = {
+  initializeMediaDevices: jest.fn(() => Promise.resolve()),
+} as unknown as MediaDevicesHandler;
 
 export const callState = new CallState();
 
-export function buildCall(conversationId: QualifiedId, convType = CONV_TYPE.ONEONONE) {
-  const qualifiedId = typeof conversationId === 'string' ? {id: conversationId, domain: ''} : conversationId;
-  return new Call({id: 'user1', domain: ''}, qualifiedId, convType, {} as any, CALL_TYPE.NORMAL, {
-    currentAvailableDeviceId: {audioOutput: ko.observable()},
+export function buildCall(conversation: Conversation, convType = CONV_TYPE.ONEONONE) {
+  return new Call({id: 'user1', domain: ''}, conversation, convType, {} as any, CALL_TYPE.NORMAL, {
+    currentAvailableDeviceId: {audiooutput: ko.observable()},
   } as any);
 }
 
-const mockCore = container.resolve(Core);
-
 export function buildCallingViewModel() {
+  const mockCore = container.resolve(Core);
   const callingViewModel = new CallingViewModel(
     mockCallingRepository,
     {} as any,
-    {} as any,
-    {} as any,
+    mockMediaDevicesHandler,
     {} as any,
     {} as any,
     {} as any,
@@ -66,86 +71,7 @@ export function buildCallingViewModel() {
     {} as any,
     undefined,
     callState,
-    undefined,
-    mockCore,
   );
 
-  return callingViewModel;
+  return [callingViewModel, {core: mockCore}] as const;
 }
-
-export const prepareMLSConferenceMocks = (parentGroupId: string, subGroupId: string) => {
-  const mockGetClientIdsResponses = {
-    [parentGroupId]: [
-      {userId: 'userId1', clientId: 'clientId1', domain: 'example.com'},
-      {userId: 'userId1', clientId: 'clientId1A', domain: 'example.com'},
-      {userId: 'userId2', clientId: 'clientId2', domain: 'example.com'},
-      {userId: 'userId2', clientId: 'clientId2A', domain: 'example.com'},
-      {userId: 'userId3', clientId: 'clientId3', domain: 'example.com'},
-    ],
-    [subGroupId]: [
-      {userId: 'userId1', clientId: 'clientId1', domain: 'example.com'},
-      {userId: 'userId1', clientId: 'clientId1A', domain: 'example.com'},
-      {userId: 'userId2', clientId: 'clientId2', domain: 'example.com'},
-    ],
-  };
-
-  const expectedMemberListResult = [
-    {
-      userid: 'userId1@example.com',
-      clientid: 'clientId1',
-      in_subconv: true,
-    },
-    {
-      userid: 'userId1@example.com',
-      clientid: 'clientId1A',
-      in_subconv: true,
-    },
-    {
-      userid: 'userId2@example.com',
-      clientid: 'clientId2',
-      in_subconv: true,
-    },
-    {
-      userid: 'userId2@example.com',
-      clientid: 'clientId2A',
-      in_subconv: false,
-    },
-    {
-      userid: 'userId3@example.com',
-      clientid: 'clientId3',
-      in_subconv: false,
-    },
-  ];
-
-  const mockSecretKey = 'secretKey';
-  const mockEpochNumber = 1;
-
-  jest
-    .spyOn(mockCore.service!.mls!, 'joinConferenceSubconversation')
-    .mockResolvedValue({epoch: mockEpochNumber, groupId: subGroupId});
-
-  jest
-    .spyOn(mockCore.service!.mls!, 'getGroupIdFromConversationId')
-    .mockImplementation((_conversationId, subconversationId) =>
-      subconversationId ? Promise.resolve(subGroupId) : Promise.resolve(parentGroupId),
-    );
-
-  jest
-    .spyOn(mockCore.service!.mls!, 'getClientIds')
-    .mockImplementation(groupId =>
-      Promise.resolve(mockGetClientIdsResponses[groupId as keyof typeof mockGetClientIdsResponses]),
-    );
-
-  jest.spyOn(mockCore.service!.mls!, 'getEpoch').mockImplementation(() => Promise.resolve(mockEpochNumber));
-
-  jest.spyOn(mockCore.service!.mls!, 'exportSecretKey').mockResolvedValue(mockSecretKey);
-
-  let callClosedCallback: (conversationId: QualifiedId, callType: CONV_TYPE) => void;
-
-  jest.spyOn(mockCallingRepository, 'onCallClosed').mockImplementation(callback => (callClosedCallback = callback));
-  jest
-    .spyOn(mockCallingRepository, 'leaveCall')
-    .mockImplementation(conversationId => callClosedCallback(conversationId, CONV_TYPE.CONFERENCE_MLS));
-
-  return {expectedMemberListResult, mockSecretKey, mockEpochNumber};
-};

@@ -23,13 +23,19 @@ import cx from 'classnames';
 import {CSSTransition, SwitchTransition} from 'react-transition-group';
 import {container} from 'tsyringe';
 
+import {CellsGlobalView} from 'Components/CellsGlobalView/CellsGlobalView';
 import {ConnectRequests} from 'Components/ConnectRequests';
 import {Conversation} from 'Components/Conversation';
 import {HistoryExport} from 'Components/HistoryExport';
 import {HistoryImport} from 'Components/HistoryImport';
-import {Icon} from 'Components/Icon';
+import * as Icon from 'Components/Icon';
 import {useLegalHoldModalState} from 'Components/Modals/LegalHoldModal/LegalHoldModal.state';
-import {User} from 'src/script/entity/User';
+import {ClientState} from 'Repositories/client/ClientState';
+import {ConversationState} from 'Repositories/conversation/ConversationState';
+import {User} from 'Repositories/entity/User';
+import {MediaDeviceType} from 'Repositories/media/MediaDeviceType';
+import {TeamState} from 'Repositories/team/TeamState';
+import {UserState} from 'Repositories/user/UserState';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 import {incomingCssClass, removeAnimationsClass} from 'Util/util';
@@ -38,13 +44,9 @@ import {Collection} from './panels/Collection';
 import {AboutPreferences} from './panels/preferences/AboutPreferences';
 import {AccountPreferences} from './panels/preferences/AccountPreferences';
 import {AVPreferences} from './panels/preferences/AVPreferences';
-import {DevicesPreferences} from './panels/preferences/devices/DevicesPreferences';
+import {DevicesPreferences} from './panels/preferences/DevicesPreferences';
 import {OptionPreferences} from './panels/preferences/OptionPreferences';
 
-import {ClientState} from '../../client/ClientState';
-import {ConversationState} from '../../conversation/ConversationState';
-import {TeamState} from '../../team/TeamState';
-import {UserState} from '../../user/UserState';
 import {RightSidebarParams} from '../AppMain';
 import {PanelState} from '../RightSidebar';
 import {RootContext} from '../RootProvider';
@@ -63,6 +65,7 @@ interface MainContentProps {
   isRightSidebarOpen?: boolean;
   selfUser: User;
   conversationState?: ConversationState;
+  reloadApp: () => void;
 }
 
 const MainContent: FC<MainContentProps> = ({
@@ -70,6 +73,7 @@ const MainContent: FC<MainContentProps> = ({
   isRightSidebarOpen = false,
   selfUser,
   conversationState = container.resolve(ConversationState),
+  reloadApp,
 }) => {
   const [uploadedFile, setUploadedFile] = useState<File | null>(null);
   const mainViewModel = useContext(RootContext);
@@ -77,6 +81,8 @@ const MainContent: FC<MainContentProps> = ({
   const userState = container.resolve(UserState);
   const teamState = container.resolve(TeamState);
   const {showRequestModal} = useLegalHoldModalState();
+
+  const {isActivatedAccount} = useKoSubscribableChildren(selfUser, ['isActivatedAccount']);
 
   const contentState = useAppState(state => state.contentState);
   const isShowingConversation = useAppState(state => state.isShowingConversation);
@@ -99,10 +105,25 @@ const MainContent: FC<MainContentProps> = ({
     return null;
   }
   const {content: contentViewModel} = mainViewModel;
-  const {initialMessage, isFederated, repositories, switchContent} = contentViewModel;
+  const {isFederated, repositories, switchContent} = contentViewModel;
+  const mediaRepo = repositories.media;
+  const devicesHandler = mediaRepo.devicesHandler;
 
-  // eslint-disable-next-line react-hooks/rules-of-hooks
+  /* eslint-disable react-hooks/rules-of-hooks */
+  const {[MediaDeviceType.VIDEO_INPUT]: availableDevices} = useKoSubscribableChildren(
+    devicesHandler?.availableDevices,
+    [MediaDeviceType.VIDEO_INPUT],
+  );
+  const {[MediaDeviceType.VIDEO_INPUT]: currentDeviceId} = useKoSubscribableChildren(devicesHandler?.currentDeviceId, [
+    MediaDeviceType.VIDEO_INPUT,
+  ]);
+  const deviceSupport = useKoSubscribableChildren(devicesHandler?.deviceSupport, [
+    MediaDeviceType.AUDIO_INPUT,
+    MediaDeviceType.AUDIO_OUTPUT,
+    MediaDeviceType.VIDEO_INPUT,
+  ]);
   const {activeConversation} = useKoSubscribableChildren(conversationState, ['activeConversation']);
+  /* eslint-enable react-hooks/rules-of-hooks */
 
   const statesTitle: Partial<Record<ContentState, string>> = {
     [ContentState.CONNECTION_REQUESTS]: t('accessibility.headings.connectionRequests'),
@@ -138,7 +159,7 @@ const MainContent: FC<MainContentProps> = ({
                 conversationRepository={repositories.conversation}
                 assetRepository={repositories.asset}
                 messageRepository={repositories.message}
-                userState={userState}
+                selfUser={selfUser}
               />
             )}
 
@@ -148,7 +169,7 @@ const MainContent: FC<MainContentProps> = ({
                 className={cx('preferences-page preferences-about', incomingCssClass)}
                 ref={removeAnimationsClass}
               >
-                <AboutPreferences />
+                <AboutPreferences selfUser={selfUser} teamState={teamState} />
               </div>
             )}
 
@@ -166,6 +187,8 @@ const MainContent: FC<MainContentProps> = ({
                   conversationRepository={repositories.conversation}
                   propertiesRepository={repositories.properties}
                   userRepository={repositories.user}
+                  selfUser={selfUser}
+                  isActivatedAccount={isActivatedAccount}
                 />
               </div>
             )}
@@ -180,6 +203,9 @@ const MainContent: FC<MainContentProps> = ({
                   callingRepository={repositories.calling}
                   mediaRepository={repositories.media}
                   propertiesRepository={repositories.properties}
+                  deviceSupport={deviceSupport}
+                  availableDevices={availableDevices}
+                  currentDeviceId={currentDeviceId}
                 />
               </div>
             )}
@@ -198,7 +224,7 @@ const MainContent: FC<MainContentProps> = ({
                   resetSession={(userId, device, conversation) =>
                     repositories.message.resetSession(userId, device.id, conversation)
                   }
-                  userState={userState}
+                  selfUser={selfUser}
                   verifyDevice={(userId, device, verified) =>
                     repositories.client.verifyClient(userId, device, verified)
                   }
@@ -212,14 +238,14 @@ const MainContent: FC<MainContentProps> = ({
                 className={cx('preferences-page preferences-options', incomingCssClass)}
                 ref={removeAnimationsClass}
               >
-                <OptionPreferences propertiesRepository={repositories.properties} />
+                <OptionPreferences selfUser={selfUser} propertiesRepository={repositories.properties} />
               </div>
             )}
 
             {contentState === ContentState.WATERMARK && (
               <div className="watermark">
                 <span className="absolute-center" aria-hidden="true" data-uie-name="no-conversation">
-                  <Icon.Watermark />
+                  <Icon.WatermarkIcon />
                 </span>
               </div>
             )}
@@ -230,11 +256,11 @@ const MainContent: FC<MainContentProps> = ({
 
             {contentState === ContentState.CONVERSATION && (
               <Conversation
-                initialMessage={initialMessage}
                 teamState={teamState}
-                userState={userState}
+                selfUser={selfUser}
                 isRightSidebarOpen={isRightSidebarOpen}
                 openRightSidebar={openRightSidebar}
+                reloadApp={reloadApp}
               />
             )}
 
@@ -248,6 +274,14 @@ const MainContent: FC<MainContentProps> = ({
                 file={uploadedFile}
                 backupRepository={repositories.backup}
                 switchContent={switchContent}
+              />
+            )}
+
+            {contentState === ContentState.CELLS && (
+              <CellsGlobalView
+                cellsRepository={repositories.cells}
+                userRepository={repositories.user}
+                conversationRepository={repositories.conversation}
               />
             )}
           </>

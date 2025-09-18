@@ -17,38 +17,51 @@
  *
  */
 
-import {ClientNotificationData} from '../../../notification/PreferenceNotificationRepository';
+import React from 'react';
 
-export interface Action {
+import {ClientNotificationData} from 'Repositories/notification/PreferenceNotificationRepository';
+
+export interface ButtonAction {
   action?: Function;
+  runActionOnEnterClick?: Boolean;
   uieName?: string;
-  text?: string;
+  text?: React.ReactNode;
+  disabled?: boolean;
 }
 
 export interface Text {
   htmlMessage?: string;
   input?: string;
-  message?: string;
+  message?: React.ReactNode;
   option?: string;
   title?: string;
   closeBtnLabel?: string;
 }
 
+export type ModalSize = 'small' | 'medium' | 'large';
+
 export interface ModalOptions {
   close?: () => void;
+  closeOnSecondaryAction?: boolean;
   closeOnConfirm?: boolean;
+  /** Set to `true` to add a password copy to clipboard button */
+  copyPassword?: boolean;
   /** Content needed for visualization on modal */
   data?: ClientNotificationData[] | boolean;
   hideSecondary?: boolean;
   /** Set to `true` to disable autoclose behavior */
   preventClose?: boolean;
   /** Called when action in modal is triggered */
-  primaryAction?: Action;
+  primaryAction?: ButtonAction;
   /** Called when secondary action in modal is triggered */
-  secondaryAction?: Action[] | Action;
+  secondaryAction?: ButtonAction[] | ButtonAction;
   hideCloseBtn?: boolean;
   text?: Text;
   passwordOptional?: boolean;
+  confirmCancelBtnLabel?: string;
+  allButtonsFullWidth?: boolean;
+  primaryBtnFirst?: boolean;
+  size?: ModalSize;
 }
 
 export enum PrimaryModalType {
@@ -60,27 +73,36 @@ export enum PrimaryModalType {
   MULTI_ACTIONS = 'modal-multi-actions',
   OPTION = 'modal-template-option',
   PASSWORD = 'modal-template-password',
+  GUEST_LINK_PASSWORD = 'modal-template-guest-link-password',
+  JOIN_GUEST_LINK_PASSWORD = 'modal-template-join-guest-link-password',
   PASSWORD_ADVANCED_SECURITY = 'modal-template-password-advance',
   SESSION_RESET = 'modal-session-reset',
   WITHOUT_TITLE = 'modal-without-title',
+  LOADING = 'modal-loading',
 }
 
 export interface ModalContent {
   checkboxLabel: string;
+  closeBtnTitle?: string;
   closeFn: () => void;
+  closeOnSecondaryAction?: boolean;
   closeOnConfirm?: boolean;
-  currentType: string;
+  copyPassword?: boolean;
+  currentType: string | PrimaryModalType;
   inputPlaceholder: string;
-  messageHtml: string;
-  messageText: string;
+  message: React.ReactNode;
+  /** @deprecated please use `message` instead */
+  messageHtml?: string;
   modalUie: string;
   onBgClick: () => void;
-  primaryAction: Action | null;
-  secondaryAction: Action[] | Action | null;
+  primaryAction: ButtonAction | null;
+  secondaryAction: ButtonAction[] | ButtonAction | null;
   titleText: string;
-  closeBtnTitle?: string;
   hideCloseBtn?: boolean;
   passwordOptional?: boolean;
+  allButtonsFullWidth?: boolean;
+  primaryBtnFirst?: boolean;
+  size?: ModalSize;
 }
 
 export type ModalItem = {id: string; options: ModalOptions; type: PrimaryModalType};

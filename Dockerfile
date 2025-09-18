@@ -1,4 +1,4 @@
-FROM node:20-alpine
+FROM node:23-alpine
 
 # For some extra dependencies...
 RUN apk add --no-cache dumb-init git bash

@@ -35,6 +35,7 @@
   width: 100%;
   height: 100%;
   flex-direction: column;
+  align-items: center;
 }
 
 // layout
@@ -43,7 +44,7 @@
 
   height: 72px;
   flex: 0 0 auto;
-  line-height: @line-height-sm;
+  line-height: var(--line-height-sm);
 }
 
 .detail-view-header-close-button {
@@ -59,9 +60,14 @@
 
 .detail-view-main {
   .flex-center;
+  overflow: hidden;
+  width: 100%;
+
+  max-width: 84%;
 
   flex: 1 1;
   contain: strict;
+  cursor: default;
 }
 
 // fix flexbox issue in FF
@@ -97,11 +103,4 @@
   svg {
     fill: currentColor;
   }
-}
-
-.detail-view-image {
-  overflow: hidden;
-  max-width: 84%;
-  max-height: 84%;
-  object-fit: scale-down;
 }

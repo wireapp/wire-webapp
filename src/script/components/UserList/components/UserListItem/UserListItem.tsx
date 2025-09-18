@@ -19,22 +19,21 @@
 
 import React, {ChangeEvent, useId} from 'react';
 
-import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
-
-import {Checkbox, CheckboxLabel} from '@wireapp/react-ui-kit';
+import {TabIndex, Checkbox, CheckboxLabel} from '@wireapp/react-ui-kit';
 
 import {Avatar, AVATAR_SIZE} from 'Components/Avatar';
+import {UserStatusBadges} from 'Components/Badge';
 import {ParticipantItemContent} from 'Components/ParticipantItemContent';
 import {listItem, listWrapper} from 'Components/ParticipantItemContent/ParticipantItem.styles';
-import {UserStatusBadges} from 'Components/UserBadges';
 import {UserlistMode} from 'Components/UserList';
+import {useUserName} from 'Components/UserName';
+import {User} from 'Repositories/entity/User';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 import {capitalizeFirstChar} from 'Util/StringUtil';
 
-import {User} from '../../../../entity/User';
-
 export interface UserListItemProps {
+  groupId?: string;
   canSelect: boolean;
   customInfo?: string;
   external: boolean;
@@ -48,35 +47,27 @@ export interface UserListItemProps {
   onClick: (user: User, event: MouseEvent | ChangeEvent) => void;
   onKeyDown: (user: User, event: KeyboardEvent) => void;
   user: User;
-  selfInTeam: boolean;
   showArrow: boolean;
 }
 
-const UserListItem = ({
+export const UserListItem = ({
+  groupId,
   canSelect,
   customInfo,
   external,
   hideInfo,
   isHighlighted,
   isSelected,
-  isSelfVerified = false,
   mode = UserlistMode.DEFAULT,
   noInteraction,
   noUnderline = false,
   user,
-  selfInTeam,
   onClick,
   onKeyDown,
 }: UserListItemProps) => {
   const checkboxId = useId();
 
-  const {
-    is_verified: isVerified,
-    isDirectGuest,
-    availability,
-    expirationText,
-    name,
-  } = useKoSubscribableChildren(user, ['isDirectGuest', 'is_verified', 'availability', 'expirationText', 'name']);
+  const {isDirectGuest, expirationText} = useKoSubscribableChildren(user, ['isDirectGuest', 'expirationText']);
 
   const {isMe: isSelf, isFederated} = user;
   const isTemporaryGuest = user.isTemporaryGuest();
@@ -87,7 +78,7 @@ const UserListItem = ({
 
   const selfString = `(${capitalizeFirstChar(t('conversationYouNominative'))})`;
 
-  const userName = isAvailable ? name : t('unavailableUser');
+  const userName = useUserName(user);
 
   const getContentInfoText = () => {
     if (customInfo) {
@@ -116,13 +107,11 @@ const UserListItem = ({
         <Avatar avatarSize={AVATAR_SIZE.SMALL} participant={user} aria-hidden="true" css={{margin: '0 16px'}} />
 
         <ParticipantItemContent
-          name={userName}
+          groupId={groupId}
+          participant={user}
           shortDescription={contentInfoText}
-          selfInTeam={selfInTeam}
-          availability={availability}
           {...(isSelf && {selfString})}
           hasUsernameInfo={hasUsernameInfo}
-          showAvailabilityState
         />
 
         <UserStatusBadges
@@ -130,7 +119,6 @@ const UserListItem = ({
             guest: !isOthersMode && isDirectGuest && !isFederated,
             federated: isFederated,
             external,
-            verified: isSelfVerified && isVerified,
           }}
         />
       </div>
@@ -146,7 +134,7 @@ const UserListItem = ({
     <>
       {canSelect ? (
         <div
-          aria-label={t('accessibility.openConversation', userName)}
+          aria-label={t('accessibility.openConversation', {name: userName})}
           css={listWrapper({isHighlighted, noUnderline, noInteraction})}
         >
           <Checkbox
@@ -168,7 +156,7 @@ const UserListItem = ({
         <div
           tabIndex={TabIndex.FOCUSABLE}
           role="button"
-          aria-label={t('accessibility.openConversation', userName)}
+          aria-label={t('accessibility.openConversation', {name: userName})}
           css={listWrapper({isHighlighted, noUnderline})}
           {...(!noInteraction && {
             onClick: event => onClick(user, event.nativeEvent),
@@ -182,5 +170,3 @@ const UserListItem = ({
     </>
   );
 };
-
-export {UserListItem};

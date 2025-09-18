@@ -17,13 +17,14 @@
  *
  */
 
-import {useContext, FC} from 'react';
+import {FC} from 'react';
 
-import {IconButton, IconButtonVariant, useMatchMedia} from '@wireapp/react-ui-kit';
+import {IconButton, IconButtonVariant, QUERY, useMatchMedia} from '@wireapp/react-ui-kit';
 
 import {FadingScrollbar} from 'Components/FadingScrollbar';
-import {RootContext} from 'src/script/page/RootProvider';
 import {useAppMainState, ViewType} from 'src/script/page/state';
+
+import {buttonsStyle, contentStyle, titleStyle, wrapperStyle} from './PreferencesPage.styles';
 
 interface PreferencesPageProps {
   children: React.ReactNode;
@@ -32,37 +33,29 @@ interface PreferencesPageProps {
 
 const PreferencesPage: FC<PreferencesPageProps> = ({title, children}) => {
   // To be changed when design chooses a breakpoint, the conditional can be integrated to the ui-kit directly
-  const smBreakpoint = useMatchMedia('max-width: 640px');
+  const smBreakpoint = useMatchMedia(QUERY.tabletSMDown);
 
   const {currentView, setCurrentView} = useAppMainState(state => state.responsiveView);
-  const isCentralColumn = currentView == ViewType.CENTRAL_COLUMN;
-
-  const root = useContext(RootContext);
-
-  const goHome = () => root?.content.loadPreviousContent();
+  const isCentralColumn = currentView == ViewType.MOBILE_CENTRAL_COLUMN;
 
   return (
-    <div role="tabpanel" aria-labelledby={title} style={{display: 'flex', flexDirection: 'column', height: '100vh'}}>
+    <div role="tabpanel" aria-labelledby={title} css={wrapperStyle}>
       <div className="preferences-titlebar">
         {smBreakpoint && isCentralColumn && (
           <IconButton
             variant={IconButtonVariant.SECONDARY}
             className="conversation-title-bar-icon icon-back"
-            css={{marginBottom: 0}}
-            onClick={() => setCurrentView(ViewType.LEFT_SIDEBAR)}
+            css={buttonsStyle}
+            onClick={() => setCurrentView(ViewType.MOBILE_LEFT_SIDEBAR)}
           />
         )}
-        <h2 className="preferences-titlebar">{title}</h2>
-        {smBreakpoint && isCentralColumn && (
-          <IconButton
-            variant={IconButtonVariant.SECONDARY}
-            className="conversation-title-bar-icon icon-close"
-            css={{marginBottom: 0}}
-            onClick={goHome}
-          />
-        )}
+        <h2 className="preferences-titlebar" css={titleStyle(smBreakpoint && isCentralColumn)}>
+          {title}
+        </h2>
       </div>
-      <FadingScrollbar className="preferences-content">{children}</FadingScrollbar>
+      <FadingScrollbar className="preferences-content" css={contentStyle}>
+        {children}
+      </FadingScrollbar>
     </div>
   );
 };

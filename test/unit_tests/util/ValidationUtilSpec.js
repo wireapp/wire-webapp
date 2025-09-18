@@ -21,7 +21,6 @@ import {createUuid} from 'Util/uuid';
 import {
   isBearerToken,
   isUUID,
-  isBase64,
   isValidApiPath,
   isTweetUrl,
   legacyAsset,
@@ -98,22 +97,6 @@ describe('ValidationUtil', () => {
     it('detects invalid retention numbers', () => {
       expect(assetRetentionPolicy(0)).toBe(false);
       expect(assetRetentionPolicy(6)).toBe(false);
-    });
-  });
-
-  describe('"isBase64"', () => {
-    it('detects a correct Base64-encoded string', () => {
-      const encoded = 'SGVsbG8gV29ybGQh';
-      const actual = isBase64(encoded);
-
-      expect(actual).toBe(true);
-    });
-
-    it('detects an incorrect Base64-encoded string', () => {
-      const encoded = 'SGVsbG8gV29ybGQh==';
-      const actual = isBase64(encoded);
-
-      expect(actual).toBe(false);
     });
   });
 

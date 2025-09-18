@@ -17,48 +17,58 @@
  *
  */
 
-import {FC, useContext, useEffect, useRef} from 'react';
+import {useContext, useEffect, useRef} from 'react';
 
 import {container} from 'tsyringe';
 
 import {Button, ButtonVariant, IconButton, IconButtonVariant, useMatchMedia} from '@wireapp/react-ui-kit';
 
 import {Avatar, AVATAR_SIZE} from 'Components/Avatar';
-import {ClassifiedBar} from 'Components/input/ClassifiedBar';
+import {UserClassifiedBar} from 'Components/ClassifiedBar/ClassifiedBar';
 import {UnverifiedUserWarning} from 'Components/Modals/UserModal';
+import {UserName} from 'Components/UserName';
+import {User} from 'Repositories/entity/User';
+import {TeamState} from 'Repositories/team/TeamState';
+import {UserState} from 'Repositories/user/UserState';
+import {SidebarTabs, useSidebarStore} from 'src/script/page/LeftSidebar/panels/Conversations/useSidebarStore';
 import {useAppMainState, ViewType} from 'src/script/page/state';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 
-import {User} from '../../entity/User';
 import {RootContext} from '../../page/RootProvider';
-import {TeamState} from '../../team/TeamState';
-import {UserState} from '../../user/UserState';
 
 interface ConnectRequestsProps {
   readonly userState: UserState;
   readonly teamState: TeamState;
 }
 
-export const ConnectRequests: FC<ConnectRequestsProps> = ({
+export const ConnectRequests = ({
   userState = container.resolve(UserState),
   teamState = container.resolve(TeamState),
-}) => {
+}: ConnectRequestsProps) => {
   const connectRequestsRefEnd = useRef<HTMLDivElement | null>(null);
   const temporaryConnectRequestsCount = useRef<number>(0);
 
   const mainViewModel = useContext(RootContext);
   const {classifiedDomains} = useKoSubscribableChildren(teamState, ['classifiedDomains']);
   const {connectRequests: unsortedConnectionRequests} = useKoSubscribableChildren(userState, ['connectRequests']);
-  const connectionRequests = unsortedConnectionRequests.sort(
-    (user1, user2) =>
-      new Date(user1.connection().lastUpdate).getTime() - new Date(user2.connection().lastUpdate).getTime(),
-  );
+  const connectionRequests = unsortedConnectionRequests.sort((user1, user2) => {
+    const user1Connection = user1.connection();
+    const user2Connection = user2.connection();
+
+    if (!user1Connection || !user2Connection) {
+      return 0;
+    }
+
+    return new Date(user1Connection.lastUpdate).getTime() - new Date(user2Connection.lastUpdate).getTime();
+  });
 
   // To be changed when design chooses a breakpoint, the conditional can be integrated to the ui-kit directly
   const smBreakpoint = useMatchMedia('max-width: 640px');
 
   const {setCurrentView} = useAppMainState(state => state.responsiveView);
+
+  const {setCurrentTab: setCurrentSidebarTab} = useSidebarStore();
 
   const scrollToBottom = (behavior: ScrollBehavior = 'auto') => {
     if (connectRequestsRefEnd.current) {
@@ -90,13 +100,15 @@ export const ConnectRequests: FC<ConnectRequestsProps> = ({
 
   const onAcceptClick = async (userEntity: User) => {
     await actionsViewModel.acceptConnectionRequest(userEntity);
+
     const conversationEntity = await actionsViewModel.getOrCreate1to1Conversation(userEntity);
 
     if (connectionRequests.length === 1) {
       /**
        * In the connect request view modal, we show an overview of all incoming connection requests. When there are multiple open connection requests, we want that the user sees them all and can accept them one-by-one. When the last open connection request gets accepted, we want the user to switch to this conversation.
        */
-      actionsViewModel.open1to1Conversation(conversationEntity);
+      setCurrentSidebarTab(SidebarTabs.RECENT);
+      return actionsViewModel.open1to1Conversation(conversationEntity);
     }
   };
 
@@ -110,7 +122,7 @@ export const ConnectRequests: FC<ConnectRequestsProps> = ({
                 variant={IconButtonVariant.SECONDARY}
                 className="connect-requests-icon-back icon-back"
                 css={{marginBottom: 0}}
-                onClick={() => setCurrentView(ViewType.LEFT_SIDEBAR)}
+                onClick={() => setCurrentView(ViewType.MOBILE_LEFT_SIDEBAR)}
               />
             </div>
           )}
@@ -121,12 +133,14 @@ export const ConnectRequests: FC<ConnectRequestsProps> = ({
               data-uie-uid={connectRequest.id}
               data-uie-name="connect-request"
             >
-              <div className="connect-request-name ellipsis">{connectRequest.name()}</div>
+              <div className="connect-request-name ellipsis">
+                <UserName user={connectRequest} />
+              </div>
 
               <div className="connect-request-username label-username">{connectRequest.handle}</div>
 
               {classifiedDomains && (
-                <ClassifiedBar users={[userState.self(), connectRequest]} classifiedDomains={classifiedDomains} />
+                <UserClassifiedBar users={[connectRequest]} classifiedDomains={classifiedDomains} />
               )}
 
               <Avatar
@@ -135,6 +149,7 @@ export const ConnectRequests: FC<ConnectRequestsProps> = ({
                 avatarSize={AVATAR_SIZE.X_LARGE}
                 noBadge
                 noFilter
+                hideAvailabilityStatus
               />
 
               <UnverifiedUserWarning />

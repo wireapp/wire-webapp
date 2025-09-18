@@ -20,7 +20,7 @@
 import {render, fireEvent} from '@testing-library/react';
 import ko from 'knockout';
 
-import {ContentMessage} from 'src/script/entity/message/ContentMessage';
+import {ContentMessage} from 'Repositories/entity/message/ContentMessage';
 import {t} from 'Util/LocalizerUtil';
 import {createUuid} from 'Util/uuid';
 
@@ -31,7 +31,6 @@ const defaultProps: MessageActionsMenuProps = {
   contextMenu: {entries: ko.observable([{label: 'option1', text: 'option1'}])},
   isMessageFocused: true,
   handleActionMenuVisibility: jest.fn(),
-  messageWithSection: false,
   handleReactionClick: jest.fn(),
   reactionsTotalCount: 0,
   isRemovedFromConversation: false,

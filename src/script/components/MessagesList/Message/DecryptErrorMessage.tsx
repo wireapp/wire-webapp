@@ -19,13 +19,16 @@
 
 import React, {useState} from 'react';
 
-import {DeviceId} from 'Components/DeviceId';
-import {Icon} from 'Components/Icon';
-import {getDecryptErrorUrl} from 'src/script/externalRoute';
+import * as Icon from 'Components/Icon';
+import {DecryptErrorMessage as DecryptErrorMessageEntity} from 'Repositories/entity/message/DecryptErrorMessage';
+import {Config} from 'src/script/Config';
 import {MotionDuration} from 'src/script/motion/MotionDuration';
 import {t} from 'Util/LocalizerUtil';
+import {splitFingerprint} from 'Util/StringUtil';
 
-import {DecryptErrorMessage as DecryptErrorMessageEntity} from '../../../entity/message/DecryptErrorMessage';
+import {messageBodyWrapper} from './ContentMessage/ContentMessage.styles';
+
+import {FormattedId} from '../../../page/MainContent/panels/preferences/DevicesPreferences/components/FormattedId';
 
 export interface DecryptErrorMessageProps {
   message: DecryptErrorMessageEntity;
@@ -35,16 +38,24 @@ export interface DecryptErrorMessageProps {
 const DecryptErrorMessage: React.FC<DecryptErrorMessageProps> = ({message, onClickResetSession}) => {
   const [isResettingSession, setIsResettingSession] = useState(false);
 
-  const link = getDecryptErrorUrl();
+  const link = Config.getConfig().URL.SUPPORT.DECRYPT_ERROR;
   const caption = message.isIdentityChanged
-    ? t('conversationUnableToDecrypt2', message.user().name(), {
-        '/highlight': '</span>',
-        highlight: '<span class="label-bold-xs">',
-      })
-    : t('conversationUnableToDecrypt1', message.user().name(), {
-        '/highlight': '</span>',
-        highlight: '<span class="label-bold-xs">',
-      });
+    ? t(
+        'conversationUnableToDecrypt2',
+        {user: message.user().name()},
+        {
+          '/highlight': '</span>',
+          highlight: '<span class="label-bold-xs">',
+        },
+      )
+    : t(
+        'conversationUnableToDecrypt1',
+        {user: message.user().name()},
+        {
+          '/highlight': '</span>',
+          highlight: '<span class="label-bold-xs">',
+        },
+      );
 
   return (
     <div data-uie-name="element-message-decrypt-error">
@@ -70,42 +81,44 @@ const DecryptErrorMessage: React.FC<DecryptErrorMessageProps> = ({message, onCli
         </div>
       </div>
 
-      <div className="message-body message-body-decrypt-error">
-        <p className="message-header-decrypt-error-label" data-uie-name="status-decrypt-error">
-          {message.code && (
-            <>
-              {`${t('conversationUnableToDecryptErrorMessage')} `}
-              <span className="label-bold-xs">{message.code}</span>{' '}
-            </>
-          )}
-          {message.clientId && (
-            <>
-              {'ID: '}
-              <DeviceId deviceId={message.clientId} />
-            </>
-          )}
-        </p>
-
-        {message.isRecoverable && (
-          <div className="message-header-decrypt-reset-session">
-            {isResettingSession ? (
-              <Icon.Loading className="accent-fill" data-uie-name="status-loading" />
-            ) : (
-              <button
-                type="button"
-                className="button-reset-default message-header-decrypt-reset-session-action button-label accent-text"
-                onClick={() => {
-                  setIsResettingSession(true);
-                  onClickResetSession(message);
-                  setTimeout(() => setIsResettingSession(false), MotionDuration.LONG);
-                }}
-                data-uie-name="do-reset-encryption-session"
-              >
-                {t('conversationUnableToDecryptResetSession')}
-              </button>
+      <div css={messageBodyWrapper()}>
+        <div className="message-body message-body-decrypt-error">
+          <p className="message-header-decrypt-error-label" data-uie-name="status-decrypt-error">
+            {message.code && (
+              <>
+                {`${t('conversationUnableToDecryptErrorMessage')} `}
+                <span className="label-bold-xs">{message.code}</span>{' '}
+              </>
             )}
-          </div>
-        )}
+            {message.clientId && (
+              <>
+                {'ID: '}
+                <FormattedId idSlices={splitFingerprint(message.clientId)} smallPadding />
+              </>
+            )}
+          </p>
+
+          {message.isRecoverable && (
+            <div className="message-header-decrypt-reset-session">
+              {isResettingSession ? (
+                <Icon.LoadingIcon className="accent-fill" data-uie-name="status-loading" />
+              ) : (
+                <button
+                  type="button"
+                  className="button-reset-default message-header-decrypt-reset-session-action button-label accent-text"
+                  onClick={() => {
+                    setIsResettingSession(true);
+                    onClickResetSession(message);
+                    setTimeout(() => setIsResettingSession(false), MotionDuration.LONG);
+                  }}
+                  data-uie-name="do-reset-encryption-session"
+                >
+                  {t('conversationUnableToDecryptResetSession')}
+                </button>
+              )}
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );

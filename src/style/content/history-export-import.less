@@ -4,7 +4,6 @@
   height: 100%;
   flex-direction: column;
   align-items: center;
-  margin-left: -@conversation-list-width;
   background-color: var(--app-bg);
 
   .loading-bar {
@@ -15,47 +14,33 @@
     }
   }
 
-  .cancel-button {
-    .button-reset-default;
-
-    margin-bottom: 56px;
-    cursor: pointer;
-    font-size: @font-size-medium;
-    font-weight: @font-weight-regular;
-    line-height: @line-height-sm;
-    user-select: none;
-  }
-
   .history-message {
     margin: auto;
     text-align: center;
 
-    check-icon {
+    svg {
+      width: 32px;
+      height: 32px;
       margin-bottom: 16px;
 
-      svg {
-        width: 32px;
-        height: 32px;
-
-        path {
-          fill: @w-blue;
-        }
+      path {
+        fill: var(--success-color);
       }
     }
 
     &__headline {
       padding: 0;
       margin: 0;
-      font-size: @font-size-medium;
-      font-weight: @font-weight-bold;
-      line-height: @line-height-lg;
+      font-size: var(--font-size-medium);
+      font-weight: var(--font-weight-bold);
+      line-height: var(--line-height-lg);
     }
 
     &__info {
       margin: 8px 0 0;
-      font-size: @font-size-medium;
-      font-weight: @font-weight-regular;
-      line-height: @line-height-lg;
+      font-size: var(--font-size-medium);
+      font-weight: var(--font-weight-regular);
+      line-height: var(--line-height-lg);
     }
 
     &__buttons {

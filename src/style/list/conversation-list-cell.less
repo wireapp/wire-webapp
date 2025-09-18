@@ -24,7 +24,7 @@
   width: 100%;
   height: 56px;
   cursor: pointer;
-  font-weight: @font-weight-regular;
+  font-weight: var(--font-weight-regular);
 
   .button-states();
 
@@ -39,7 +39,7 @@
     position: absolute;
     right: 0;
     bottom: 0;
-    left: @left-list-item-left-width;
+    left: var(--left-list-item-left-width);
     height: 1px;
     background-color: #fff;
     content: '';
@@ -71,14 +71,10 @@
   }
 }
 
-.conversation-list-cell-button {
-  max-width: calc(100% - 56px);
-}
-
 .conversation-list-cell-left {
   .flex-center;
 
-  width: @left-list-item-left-width;
+  width: var(--left-list-item-left-width);
   flex: 0 0 auto;
 }
 
@@ -100,23 +96,6 @@
 
   padding-right: 16px;
   border-bottom: 1px solid var(--border-color);
-
-  &__calling {
-    position: relative;
-    display: flex;
-    width: 100%;
-    height: 56px;
-    border-radius: 8px 8px 0 0;
-    cursor: pointer;
-    font-weight: @font-weight-regular;
-    & > * {
-      border-radius: 8px;
-    }
-    & > *,
-    & > * > * {
-      border: none;
-    }
-  }
 }
 
 .conversation-recent-view-list {
@@ -125,35 +104,13 @@
 }
 
 /* elements */
-.conversation-list-cell-availability {
-  .availability-state-icon {
-    svg {
-      margin: 1px 8px 1px 0;
-    }
-  }
-
-  .availability-state-label {
-    .ellipsis-nowrap;
-    padding-bottom: 2px;
-    margin-right: 4px;
-    margin-bottom: -2px;
-
-    font-size: @font-size-medium;
-    font-weight: @font-weight-medium;
-
-    &--active {
-      color: var(--app-bg-secondary);
-    }
-  }
-}
-
 .conversation-list-cell-name {
   .ellipsis-nowrap;
   padding-bottom: 2px;
   margin-right: 4px;
   margin-bottom: -2px;
-  font-size: @font-size-medium;
-  font-weight: @font-weight-medium;
+  font-size: var(--font-size-medium);
+  font-weight: var(--font-weight-medium);
 
   &--active {
     color: var(--app-bg-secondary);
@@ -187,7 +144,7 @@ body.theme-dark {
 }
 
 .conversation-list-cell-badge {
-  font-size: @font-size-small;
+  font-size: var(--font-size-small);
 }
 
 .conversation-list-cell-context-menu {
@@ -203,7 +160,7 @@ body.theme-dark {
     border-left: 4px solid transparent;
     content: '';
     opacity: 0;
-    transition: opacity @animation-timing-slow @ease-out-quart @animation-timing-faster + 0.05;
+    transition: opacity var(--animation-timing-slow) var(--ease-out-quart) calc(var(--animation-timing-faster) + 0.05s);
 
     .conversation-list-cell:hover &,
     :focus-visible & {

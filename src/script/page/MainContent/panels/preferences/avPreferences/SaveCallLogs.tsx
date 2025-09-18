@@ -24,13 +24,13 @@ import {container} from 'tsyringe';
 import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
 
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
+import type {CallingRepository} from 'Repositories/calling/CallingRepository';
+import {UserState} from 'Repositories/user/UserState';
 import {t} from 'Util/LocalizerUtil';
 import {getCurrentDate} from 'Util/TimeUtil';
 import {downloadBlob} from 'Util/util';
 
-import type {CallingRepository} from '../../../../../calling/CallingRepository';
 import {Config} from '../../../../../Config';
-import {UserState} from '../../../../../user/UserState';
 import {PreferencesSection} from '../components/PreferencesSection';
 
 interface SaveCallLogsProps {
@@ -76,7 +76,7 @@ const SaveCallLogs: React.FC<SaveCallLogsProps> = ({callingRepository, userState
         </Button>
       </div>
       <p id="call-logs-description" className="preferences-detail">
-        {t('preferencesOptionsCallLogsDetail', brandName)}
+        {t('preferencesOptionsCallLogsDetail', {brandName})}
       </p>
     </PreferencesSection>
   );

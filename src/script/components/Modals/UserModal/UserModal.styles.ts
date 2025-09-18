@@ -17,7 +17,7 @@
  *
  */
 
-import {css} from '@emotion/react';
+import {CSSObject, css} from '@emotion/react';
 
 export const userModalStyle = css`
   .enriched-fields {
@@ -45,12 +45,8 @@ export const userModalStyle = css`
     padding: 0;
   }
 
-  .modal__header {
-    margin: 16px;
-  }
-
   .modal__body {
-    padding: 16px;
+    padding: 0 16px;
 
     .classified-bar {
       margin-top: 12px;
@@ -58,3 +54,8 @@ export const userModalStyle = css`
     }
   }
 `;
+
+export const userModalWrapperStyle: CSSObject = {
+  maxHeight: '90vh',
+  padding: 0,
+};

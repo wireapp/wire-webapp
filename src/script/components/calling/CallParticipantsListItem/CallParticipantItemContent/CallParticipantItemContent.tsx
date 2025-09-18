@@ -19,19 +19,16 @@
 
 import React from 'react';
 
-import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
+import {TabIndex} from '@wireapp/react-ui-kit';
 
-import {Availability} from '@wireapp/protocol-messaging';
-
-import {AvailabilityState} from 'Components/AvailabilityState';
-import {Icon} from 'Components/Icon';
+import * as Icon from 'Components/Icon';
+import {UserInfo} from 'Components/UserInfo';
+import {User} from 'Repositories/entity/User';
 import {t} from 'Util/LocalizerUtil';
 import {capitalizeFirstChar} from 'Util/StringUtil';
 
 import {
   selfIndicator,
-  userName,
-  userAvailability,
   ellipsis,
   nameWrapper,
   chevronIcon,
@@ -40,20 +37,16 @@ import {
 } from './CallParticipantItemContent.styles';
 
 export interface CallParticipantItemContentProps {
-  name: string;
-  selfInTeam?: boolean;
+  user: User;
   isAudioEstablished: boolean;
-  availability?: Availability.Type;
   isSelf?: boolean;
   showContextMenu: boolean;
   onDropdownClick: (event: React.MouseEvent<HTMLButtonElement>) => void;
 }
 
 export const CallParticipantItemContent = ({
-  name,
-  selfInTeam = false,
+  user,
   isAudioEstablished,
-  availability = Availability.Type.NONE,
   isSelf = false,
   showContextMenu,
   onDropdownClick,
@@ -64,35 +57,22 @@ export const CallParticipantItemContent = ({
     <div css={wrapper}>
       <div css={contentText}>
         <div css={nameWrapper(isAudioEstablished)}>
-          {selfInTeam ? (
-            <AvailabilityState
-              availability={availability}
-              css={[userAvailability, ellipsis]}
-              dataUieName="status-name"
-              label={name}
-            />
-          ) : (
-            <div css={[userName, ellipsis]} data-uie-name="status-name">
-              {name}
-            </div>
-          )}
-
+          <UserInfo user={user} css={[ellipsis]} dataUieName="status-name" />
           {isSelf && <div css={selfIndicator}>{selfString}</div>}
+          {isAudioEstablished && showContextMenu && (
+            <button
+              data-hoverClass="chevron-icon"
+              tabIndex={TabIndex.UNFOCUSABLE}
+              css={chevronIcon}
+              onClick={onDropdownClick}
+              type="button"
+              data-uie-name="participant-menu-icon"
+            >
+              <Icon.ChevronIcon />
+            </button>
+          )}
         </div>
       </div>
-
-      {isAudioEstablished && showContextMenu && (
-        <button
-          data-hoverClass="chevron-icon"
-          tabIndex={TabIndex.UNFOCUSABLE}
-          css={chevronIcon}
-          onClick={onDropdownClick}
-          type="button"
-          data-uie-name="participant-menu-icon"
-        >
-          <Icon.Chevron />
-        </button>
-      )}
     </div>
   );
 };

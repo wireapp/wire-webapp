@@ -21,7 +21,7 @@ import React from 'react';
 
 import {keyframes} from '@emotion/react';
 
-import {getSVG} from '../../auth/util/SVGProvider';
+import {MicOnIcon} from 'Components/Icon';
 
 const fadeAnimation = keyframes`
   0%   { opacity: 0.2; }
@@ -51,7 +51,7 @@ const ParticipantMicOnIcon: React.FC<ParticipantMicOnIconProps> = ({
       className={className}
       {...props}
     >
-      <svg
+      <MicOnIcon
         data-uie-name="mic-icon-on"
         data-uie-active={isActive ? 'active' : 'inactive'}
         css={{
@@ -60,8 +60,7 @@ const ParticipantMicOnIcon: React.FC<ParticipantMicOnIconProps> = ({
           },
         }}
         viewBox="0 0 16 16"
-        dangerouslySetInnerHTML={{__html: getSVG('mic-on-icon')?.documentElement?.innerHTML}}
-      ></svg>
+      />
     </span>
   );
 };

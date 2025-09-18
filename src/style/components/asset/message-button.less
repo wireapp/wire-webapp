@@ -17,60 +17,7 @@
  *
  */
 
-.message-button {
-  position: relative;
-  overflow: hidden;
-  width: 100%;
-  max-width: 287px;
-  padding: 16px;
-  border: 1px solid @w-red;
-  border-radius: 6px;
-  margin-top: 8px;
-  background-color: transparent;
+.message-button__error {
+  margin-top: 4px;
   color: @w-red;
-  font-size: @font-size-xs;
-  font-weight: @font-weight-bold;
-  line-height: 1.45;
-  outline: none;
-  text-align: start;
-  text-transform: uppercase;
-  transition: all 0.1s linear;
-
-  &--selected {
-    background-color: @w-red;
-    color: white;
-  }
-
-  &__waiting-overlay {
-    position: absolute;
-    top: 0;
-    right: 0;
-    bottom: 0;
-    display: flex;
-    width: 48px;
-    align-items: center;
-    justify-content: center;
-    background-color: transparent;
-    opacity: 0;
-    transform: translateX(50%);
-    transition: background-color 0.05s, transform 0.2s ease-in-out, opacity 0.2s ease-in-out;
-
-    svg {
-      fill: @w-red;
-    }
-
-    &--visible {
-      background-color: var(--app-bg);
-      opacity: 0.9;
-      transform: translateX(0);
-      transition: all 0.2s ease-in-out;
-    }
-  }
-
-  &__error {
-    margin-top: 4px;
-    color: @w-red;
-    font-size: @font-size-xs;
-    font-weight: @font-weight-regular;
-  }
 }

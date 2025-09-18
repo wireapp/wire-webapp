@@ -23,32 +23,35 @@ import {container} from 'tsyringe';
 
 import {Link, LinkVariant} from '@wireapp/react-ui-kit';
 
+import {User} from 'Repositories/entity/User';
+import {TeamState} from 'Repositories/team/TeamState';
 import {t} from 'Util/LocalizerUtil';
 
 import {PreferencesPage} from './components/PreferencesPage';
 import {PreferencesSection} from './components/PreferencesSection';
 
 import {Config} from '../../../../Config';
-import {getPrivacyPolicyUrl, getTermsOfUsePersonalUrl, getTermsOfUseTeamUrl, URL} from '../../../../externalRoute';
-import {UserState} from '../../../../user/UserState';
-import {useKoSubscribableChildren} from '../../../../util/ComponentUtil';
+import {externalUrl} from '../../../../externalRoute';
 
 interface AboutPreferencesProps {
-  userState?: UserState;
+  selfUser: User;
+  teamState: TeamState;
 }
 
-const AboutPreferences: React.FC<AboutPreferencesProps> = ({userState = container.resolve(UserState)}) => {
-  const {self} = useKoSubscribableChildren(userState, ['self']);
-  const {inTeam} = useKoSubscribableChildren(self, ['inTeam']);
+const AboutPreferences: React.FC<AboutPreferencesProps> = ({selfUser, teamState = container.resolve(TeamState)}) => {
+  const inTeam = teamState.isInTeam(selfUser);
   const config = Config.getConfig();
-  const websiteUrl = URL.WEBSITE;
-  const privacyPolicyUrl = getPrivacyPolicyUrl();
+
+  const websiteUrl = externalUrl.website;
+  const privacyPolicyUrl = externalUrl.privacyPolicy;
+  const desktopConfig = Config.getDesktopConfig();
+
   const termsOfUseUrl = useMemo(() => {
-    if (self) {
-      return inTeam ? getTermsOfUseTeamUrl() : getTermsOfUsePersonalUrl();
+    if (selfUser) {
+      return inTeam ? externalUrl.termsOfUseTeam : externalUrl.termsOfUsePersonnal;
     }
     return '';
-  }, [self, inTeam]);
+  }, [selfUser, inTeam]);
 
   const showWireSection = !!(termsOfUseUrl || websiteUrl || privacyPolicyUrl);
   const showSupportSection = !!(config.URL.SUPPORT.INDEX || config.URL.SUPPORT.CONTACT);
@@ -101,7 +104,7 @@ const AboutPreferences: React.FC<AboutPreferencesProps> = ({userState = containe
             {websiteUrl && (
               <li className="preferences-about-list-item">
                 <Link variant={LinkVariant.PRIMARY} targetBlank href={websiteUrl} data-uie-name="go-wire-dot-com">
-                  {t('preferencesAboutWebsite', config.BRAND_NAME)}
+                  {t('preferencesAboutWebsite', {brandName: config.BRAND_NAME})}
                 </Link>
               </li>
             )}
@@ -109,7 +112,13 @@ const AboutPreferences: React.FC<AboutPreferencesProps> = ({userState = containe
         </PreferencesSection>
       )}
       <PreferencesSection hasSeparator>
-        <p className="preferences-detail">{t('preferencesAboutVersion', config.VERSION)}</p>
+        {desktopConfig && (
+          <p className="preferences-detail">{t('preferencesAboutDesktopVersion', {version: desktopConfig.version})}</p>
+        )}
+        <p className="preferences-detail">
+          {t('preferencesAboutVersion', {brandName: config.BRAND_NAME, version: config.VERSION})}
+        </p>
+        <p className="preferences-detail">{t('preferencesAboutAVSVersion', {version: config.AVS_VERSION})}</p>
         <p className="preferences-detail">{t('preferencesAboutCopyright')}</p>
       </PreferencesSection>
     </PreferencesPage>

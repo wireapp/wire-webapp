@@ -19,25 +19,23 @@
 
 import React from 'react';
 
-import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
 import {amplify} from 'amplify';
 import {container} from 'tsyringe';
 
 import {Runtime} from '@wireapp/commons';
-import {Link, LinkVariant} from '@wireapp/react-ui-kit';
+import {TabIndex, Link, LinkVariant} from '@wireapp/react-ui-kit';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
+import {User} from 'Repositories/entity/User';
+import {TeamState} from 'Repositories/team/TeamState';
+import {AppLockState} from 'Repositories/user/AppLockState';
+import {FEATURES, hasAccessToFeature} from 'Repositories/user/UserPermission';
+import {UserRepository} from 'Repositories/user/UserRepository';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
-import {safeWindowOpen} from 'Util/SanitizationUtil';
 
-import {User} from '../../../../../entity/User';
-import {getAccountPagesUrl, getCreateTeamUrl, getManageTeamUrl, URL_PATH} from '../../../../../externalRoute';
-import {TeamState} from '../../../../../team/TeamState';
-import {AppLockState} from '../../../../../user/AppLockState';
-import {FEATURES, hasAccessToFeature} from '../../../../../user/UserPermission';
-import {UserRepository} from '../../../../../user/UserRepository';
+import {externalUrl, getManageTeamUrl} from '../../../../../externalRoute';
 import {PreferencesSection} from '../components/PreferencesSection';
 
 interface AccountSecuritySectionProps {
@@ -53,7 +51,7 @@ const AccountSecuritySection: React.FC<AccountSecuritySectionProps> = ({
   appLockState = container.resolve(AppLockState),
   teamState = container.resolve(TeamState),
 }) => {
-  const createTeamUrl = getCreateTeamUrl();
+  const createTeamUrl = externalUrl.createTeam;
   const manageTeamUrl = getManageTeamUrl('client_settings');
   const {teamRole} = useKoSubscribableChildren(selfUser, ['teamRole']);
   const {isAppLockActivated} = useKoSubscribableChildren(appLockState, ['isAppLockActivated']);
@@ -82,7 +80,8 @@ const AccountSecuritySection: React.FC<AccountSecuritySectionProps> = ({
         <Link
           tabIndex={TabIndex.FOCUSABLE}
           variant={LinkVariant.PRIMARY}
-          onClick={() => safeWindowOpen(manageTeamUrl)}
+          href={manageTeamUrl}
+          targetBlank
           data-uie-name="do-manage-team"
           type="button"
         >
@@ -110,8 +109,8 @@ const AccountSecuritySection: React.FC<AccountSecuritySectionProps> = ({
         <Link
           tabIndex={TabIndex.FOCUSABLE}
           variant={LinkVariant.PRIMARY}
-          href="#"
-          onClick={() => safeWindowOpen(getAccountPagesUrl(URL_PATH.PASSWORD_RESET))}
+          href={externalUrl.passwordReset}
+          targetBlank
           title={t('tooltipPreferencesPassword')}
           data-uie-name="do-reset-password"
           type="button"

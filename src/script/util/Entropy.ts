@@ -17,7 +17,7 @@
  *
  */
 
-export interface EntropyFrame {
+interface EntropyFrame {
   x: number;
   y: number;
   t: number;

@@ -17,6 +17,8 @@
  *
  */
 
+import {Asset} from 'Repositories/entity/message/Asset';
+
 import {getMessageAriaLabel} from './conversationMessages';
 
 describe('Conversation messages', () => {
@@ -38,7 +40,7 @@ describe('Conversation messages', () => {
           size: '',
           text: '',
           type: 'File',
-        },
+        } as unknown as Asset,
       ],
       displayTimestampShort: '5:15 PM',
       senderName: 'Arjita',
@@ -68,7 +70,7 @@ describe('Conversation messages', () => {
           size: '',
           text: '',
           type: 'File',
-        },
+        } as unknown as Asset,
       ],
       displayTimestampShort: '2:15 PM',
       senderName: 'Tim',
@@ -97,7 +99,7 @@ describe('Conversation messages', () => {
           size: '',
           text: 'Hello, this is a text message',
           type: 'Text',
-        },
+        } as unknown as Asset,
       ],
       displayTimestampShort: '10:15 PM',
       senderName: 'Virgil',

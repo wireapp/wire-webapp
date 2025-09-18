@@ -19,7 +19,7 @@
 
 import React, {ReactNode} from 'react';
 
-import {SystemMessage} from 'src/script/entity/message/SystemMessage';
+import {SystemMessage} from 'Repositories/entity/message/SystemMessage';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 
 import {MessageTime} from '../MessageTime';
@@ -39,7 +39,9 @@ export const SystemMessageBase: React.FC<SystemMessageProps> = ({message, isSend
       <p className="message-header-label">
         <span className="message-header-label__multiline">
           {isSenderNameVisible && <span className="message-header-sender-name">{unsafeSenderName}</span>}
-          {message.caption && <span className="ellipsis">{message.caption}</span>}
+          {message.caption && (
+            <span className="system-message-caption ellipsis" dangerouslySetInnerHTML={{__html: message.caption}} />
+          )}
         </span>
       </p>
       <div className="message-body-actions">

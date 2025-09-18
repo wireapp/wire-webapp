@@ -21,8 +21,8 @@ import React from 'react';
 
 import {CSSObject} from '@emotion/serialize';
 
+import {User} from 'Repositories/entity/User';
 import {ACCENT_ID} from 'src/script/Config';
-import {User} from 'src/script/entity/User';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {CSS_SQUARE} from 'Util/CSSMixin';
 import {t} from 'Util/LocalizerUtil';
@@ -33,7 +33,7 @@ export interface AccentColorPickerProps {
 }
 
 const headerStyles: CSSObject = {
-  lineHeight: '0.875rem',
+  lineHeight: 'var(--line-height-small-plus)',
   margin: '20px 0 6px',
   padding: 0,
   textAlign: 'center',

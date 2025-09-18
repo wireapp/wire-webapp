@@ -24,9 +24,15 @@ const path = require('path');
 
 const srcFolder = '../';
 const distFolder = '../dist/';
+const npmModulesFolder = '../../node_modules/';
 
 const assetFolders = ['.ebextensions/', 'robots/', 'templates/', 'certificate'];
 
 assetFolders.forEach(assetFolder => {
   fs.copySync(path.resolve(__dirname, srcFolder, assetFolder), path.resolve(__dirname, distFolder, assetFolder));
 });
+
+fs.copySync(
+  path.resolve(__dirname, npmModulesFolder, '@wireapp/telemetry/lib/embed.js'),
+  path.resolve(__dirname, distFolder, 'libs/wire/telemetry/embed.js'),
+);

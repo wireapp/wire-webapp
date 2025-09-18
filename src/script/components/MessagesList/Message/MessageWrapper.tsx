@@ -26,9 +26,14 @@ import {container} from 'tsyringe';
 
 import {WebAppEvents} from '@wireapp/webapp-events';
 
-import {OutgoingQuote} from 'src/script/conversation/MessageRepository';
-import {ContentMessage} from 'src/script/entity/message/ContentMessage';
-import {Text} from 'src/script/entity/message/Text';
+import {E2EIVerificationMessage} from 'Components/MessagesList/Message/E2EIVerificationMessage';
+import {AssetRepository} from 'Repositories/assets/AssetRepository';
+import {OutgoingQuote} from 'Repositories/conversation/MessageRepository';
+import {Conversation} from 'Repositories/entity/Conversation';
+import {CompositeMessage} from 'Repositories/entity/message/CompositeMessage';
+import {ContentMessage} from 'Repositories/entity/message/ContentMessage';
+import {Text} from 'Repositories/entity/message/Text';
+import {TeamState} from 'Repositories/team/TeamState';
 import {QuoteEntity} from 'src/script/message/QuoteEntity';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
@@ -48,10 +53,6 @@ import {PingMessage} from './PingMessage';
 import {SystemMessage} from './SystemMessage';
 import {VerificationMessage} from './VerificationMessage';
 
-import {AssetRepository} from '../../../assets/AssetRepository';
-import {Conversation} from '../../../entity/Conversation';
-import {CompositeMessage} from '../../../entity/message/CompositeMessage';
-import {TeamState} from '../../../team/TeamState';
 import {ContextMenuEntry} from '../../../ui/ContextMenu';
 
 import {MessageParams} from './index';
@@ -60,16 +61,15 @@ const isOutgoingQuote = (quoteEntity: QuoteEntity): quoteEntity is OutgoingQuote
   return quoteEntity.hash !== undefined;
 };
 
-export const MessageWrapper: React.FC<MessageParams & {hasMarker: boolean; isMessageFocused: boolean}> = ({
+export const MessageWrapper: React.FC<MessageParams> = ({
   message,
   conversation,
   selfId,
-  hasMarker,
-  isMessageFocused,
+  isFocused,
   isSelfTemporaryGuest,
   isLastDeliveredMessage,
   shouldShowInvitePeople,
-  previousMessage,
+  hideHeader,
   hasReadReceiptsTurnedOn,
   onClickAvatar,
   onClickImage,
@@ -111,25 +111,31 @@ export const MessageWrapper: React.FC<MessageParams & {hasMarker: boolean; isMes
       const quote: OutgoingQuote | undefined =
         incomingQuote && isOutgoingQuote(incomingQuote) ? (incomingQuote as OutgoingQuote) : undefined;
 
-      await messageRepository.sendTextWithLinkPreview(conversation, messageText, mentions, quote, messageId);
+      await messageRepository.sendTextWithLinkPreview({
+        conversation,
+        textMessage: messageText,
+        mentions,
+        quoteEntity: quote,
+        messageId,
+        attachments: [],
+      });
     } else if (file) {
       await messageRepository.retryUploadFile(conversation, file, firstAsset.isImage(), message.id);
     }
   };
   const {display_name: displayName} = useKoSubscribableChildren(conversation, ['display_name']);
+  const isFileShareRestricted = !teamState.isFileSharingReceivingEnabled();
 
   const contextMenuEntries = ko.pureComputed(() => {
     const entries: ContextMenuEntry[] = [];
 
-    const isRestrictedFileShare = !teamState.isFileSharingReceivingEnabled();
+    const canDelete = message.user().isMe && !conversation.isSelfUserRemoved() && message.isDeletable();
 
-    const canDelete = message.user().isMe && !conversation.removed_from_conversation() && message.isDeletable();
+    const canEdit = message.isEditable() && !conversation.isSelfUserRemoved();
 
-    const canEdit = message.isEditable() && !conversation.removed_from_conversation();
+    const hasDetails = !conversation.is1to1() && !message.isEphemeral() && !conversation.isSelfUserRemoved();
 
-    const hasDetails = !conversation.is1to1() && !message.isEphemeral() && !conversation.removed_from_conversation();
-
-    if (message.isDownloadable() && !isRestrictedFileShare) {
+    if (message.isDownloadable() && !isFileShareRestricted) {
       entries.push({
         click: () => message.download(container.resolve(AssetRepository)),
         label: t('conversationContextMenuDownload'),
@@ -143,7 +149,7 @@ export const MessageWrapper: React.FC<MessageParams & {hasMarker: boolean; isMes
       });
     }
 
-    if (message.isCopyable() && !isRestrictedFileShare) {
+    if (message.isCopyable() && !isFileShareRestricted) {
       entries.push({
         click: () => message.copy(),
         label: t('conversationContextMenuCopy'),
@@ -178,7 +184,7 @@ export const MessageWrapper: React.FC<MessageParams & {hasMarker: boolean; isMes
     if (!message.isContent()) {
       return;
     }
-    return void messageRepository.toggleReaction(conversation, message, reaction, selfId.id);
+    return void messageRepository.toggleReaction(conversation, message, reaction, selfId);
   };
   if (message.isContent()) {
     return (
@@ -186,8 +192,7 @@ export const MessageWrapper: React.FC<MessageParams & {hasMarker: boolean; isMes
         message={message}
         findMessage={findMessage}
         conversation={conversation}
-        previousMessage={previousMessage}
-        hasMarker={hasMarker}
+        hideHeader={hideHeader}
         selfId={selfId}
         isLastDeliveredMessage={isLastDeliveredMessage}
         onClickMessage={onClickMessage}
@@ -202,9 +207,11 @@ export const MessageWrapper: React.FC<MessageParams & {hasMarker: boolean; isMes
         onClickParticipants={onClickParticipants}
         onClickDetails={onClickDetails}
         onRetry={onRetry}
-        isMessageFocused={isMessageFocused}
+        isFocused={isFocused}
         isMsgElementsFocusable={isMsgElementsFocusable}
         onClickReaction={handleReactionClick}
+        is1to1={conversation.is1to1()}
+        isFileShareRestricted={isFileShareRestricted}
       />
     );
   }
@@ -215,10 +222,13 @@ export const MessageWrapper: React.FC<MessageParams & {hasMarker: boolean; isMes
     return <LegalHoldMessage message={message} />;
   }
   if (message.isFederationStop()) {
-    return <FederationStopMessage isMessageFocused={isMessageFocused} message={message} />;
+    return <FederationStopMessage isMessageFocused={isFocused} message={message} />;
   }
   if (message.isVerification()) {
     return <VerificationMessage message={message} />;
+  }
+  if (message.isE2EIVerification()) {
+    return <E2EIVerificationMessage message={message} conversation={conversation} />;
   }
   if (message.isDelete()) {
     return <DeleteMessage message={message} onClickAvatar={onClickAvatar} />;
@@ -230,7 +240,7 @@ export const MessageWrapper: React.FC<MessageParams & {hasMarker: boolean; isMes
     return <CallTimeoutMessage message={message} />;
   }
   if (message.isFailedToAddUsersMessage()) {
-    return <FailedToAddUsersMessage isMessageFocused={isMessageFocused} message={message} />;
+    return <FailedToAddUsersMessage isMessageFocused={isFocused} message={message} />;
   }
   if (message.isSystem()) {
     return <SystemMessage message={message} />;
@@ -256,14 +266,17 @@ export const MessageWrapper: React.FC<MessageParams & {hasMarker: boolean; isMes
         message={message}
         is1to1Conversation={conversation.is1to1()}
         isLastDeliveredMessage={isLastDeliveredMessage}
+        onClickDetails={onClickDetails}
       />
     );
   }
   if (message.isFileTypeRestricted()) {
     return <FileTypeRestrictedMessage message={message} />;
   }
+
   if (message.isMissed()) {
     return <MissedMessage />;
   }
+
   return null;
 };

@@ -17,19 +17,19 @@
  *
  */
 
-import {FC, HTMLProps, MouseEvent as ReactMouseEvent, KeyboardEvent as ReactKeyBoardEvent} from 'react';
+import {HTMLProps, MouseEvent as ReactMouseEvent, KeyboardEvent as ReactKeyBoardEvent} from 'react';
 
+import {User} from 'Repositories/entity/User';
+import {ServiceEntity} from 'Repositories/integration/ServiceEntity';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
-import {handleKeyDown, isKeyboardEvent} from 'Util/KeyboardUtil';
+import {handleKeyDown, isKeyboardEvent, KEY} from 'Util/KeyboardUtil';
 
 import {PlaceholderAvatar} from './PlaceholderAvatar';
 import {ServiceAvatar} from './ServiceAvatar';
 import {TemporaryGuestAvatar} from './TemporaryGuestAvatar';
 import {UserAvatar} from './UserAvatar';
 
-import {User} from '../../entity/User';
 import {isServiceEntity} from '../../guards/Service';
-import {ServiceEntity} from '../../integration/ServiceEntity';
 
 export enum AVATAR_SIZE {
   LARGE = 'avatar-l',
@@ -79,9 +79,10 @@ export interface AvatarProps extends HTMLProps<HTMLDivElement> {
   noFilter?: boolean;
   isResponsive?: boolean;
   onAvatarClick?: (participant: User | ServiceEntity) => void;
+  hideAvailabilityStatus?: boolean;
 }
 
-const Avatar: FC<AvatarProps> = ({
+const Avatar = ({
   avatarSize = AVATAR_SIZE.LARGE,
   noBadge = false,
   noFilter = false,
@@ -89,14 +90,14 @@ const Avatar: FC<AvatarProps> = ({
   participant,
   isResponsive = false,
   ...props
-}) => {
+}: AvatarProps) => {
   const handleAvatarInteraction = (
     event: ReactMouseEvent<HTMLDivElement, MouseEvent> | ReactKeyBoardEvent<HTMLDivElement>,
   ) => {
     const parentNode = event.currentTarget.parentNode;
     if (parentNode) {
       if (isKeyboardEvent(event)) {
-        handleKeyDown(event, () => onAvatarClick?.(participant));
+        handleKeyDown({event, callback: () => onAvatarClick?.(participant), keys: [KEY.ENTER, KEY.SPACE]});
         return;
       }
       onAvatarClick?.(participant);

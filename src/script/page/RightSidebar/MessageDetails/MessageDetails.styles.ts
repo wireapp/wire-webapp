@@ -22,7 +22,7 @@ import {CSSObject} from '@emotion/react';
 export const panelContentTitleStyles: CSSObject = {
   display: 'inline-flex',
   paddingLeft: 20,
-  borderBottom: '1px solid var(--sidebar-border-color)',
+  borderBottom: '1px solid var(--border-color)',
   marginTop: 20,
   span: {
     color: 'var(--text-input-placeholder)',

@@ -33,7 +33,6 @@ import {ROUTE} from '../route';
 import {mockStoreFactory} from '../util/test/mockStoreFactory';
 import {mountComponent} from '../util/test/TestUtil';
 
-jest.mock('../util/SVGProvider');
 describe('Login', () => {
   it('successfully logs in with email', async () => {
     const historyPushSpy = spyOn(history, 'pushState');
@@ -43,17 +42,7 @@ describe('Login', () => {
 
     spyOn(actionRoot.authAction, 'doLogin').and.returnValue(() => Promise.resolve());
 
-    const {getByTestId} = mountComponent(
-      <Login />,
-      mockStoreFactory()({
-        ...initialRootState,
-        runtimeState: {
-          hasCookieSupport: true,
-          hasIndexedDbSupport: true,
-          isSupportedBrowser: true,
-        },
-      }),
-    );
+    const {getByTestId} = mountComponent(<Login />, mockStoreFactory()(initialRootState));
 
     const emailInput = getByTestId('enter-email');
     const passwordInput = getByTestId('enter-password');
@@ -83,17 +72,7 @@ describe('Login', () => {
       Promise.reject(new BackendError('Too many clients', BackendErrorLabel.TOO_MANY_CLIENTS, StatusCodes.NOT_FOUND)),
     );
 
-    const {getByTestId} = mountComponent(
-      <Login />,
-      mockStoreFactory()({
-        ...initialRootState,
-        runtimeState: {
-          hasCookieSupport: true,
-          hasIndexedDbSupport: true,
-          isSupportedBrowser: true,
-        },
-      }),
-    );
+    const {getByTestId} = mountComponent(<Login />, mockStoreFactory()(initialRootState));
 
     const emailInput = getByTestId('enter-email');
     const passwordInput = getByTestId('enter-password');
@@ -121,17 +100,7 @@ describe('Login', () => {
 
     spyOn(actionRoot.authAction, 'doLogin').and.returnValue(() => Promise.resolve());
 
-    const {getByTestId} = mountComponent(
-      <Login />,
-      mockStoreFactory()({
-        ...initialRootState,
-        runtimeState: {
-          hasCookieSupport: true,
-          hasIndexedDbSupport: true,
-          isSupportedBrowser: true,
-        },
-      }),
-    );
+    const {getByTestId} = mountComponent(<Login />, mockStoreFactory()(initialRootState));
 
     const emailInput = getByTestId('enter-email');
     const passwordInput = getByTestId('enter-password');
@@ -152,17 +121,7 @@ describe('Login', () => {
   });
 
   it('has disabled submit button as long as one input is empty', () => {
-    const {getByTestId} = mountComponent(
-      <Login />,
-      mockStoreFactory()({
-        ...initialRootState,
-        runtimeState: {
-          hasCookieSupport: true,
-          hasIndexedDbSupport: true,
-          isSupportedBrowser: true,
-        },
-      }),
-    );
+    const {getByTestId} = mountComponent(<Login />, mockStoreFactory()(initialRootState));
 
     const emailInput = getByTestId('enter-email');
     const passwordInput = getByTestId('enter-password');
@@ -186,17 +145,7 @@ describe('Login', () => {
           ENABLE_SSO: false,
         },
       });
-      const {queryByTestId} = mountComponent(
-        <Login />,
-        mockStoreFactory()({
-          ...initialRootState,
-          runtimeState: {
-            hasCookieSupport: true,
-            hasIndexedDbSupport: true,
-            isSupportedBrowser: true,
-          },
-        }),
-      );
+      const {queryByTestId} = mountComponent(<Login />, mockStoreFactory()(initialRootState));
 
       const backButton = queryByTestId('go-index');
       expect(backButton).toBeNull();
@@ -210,17 +159,7 @@ describe('Login', () => {
           ENABLE_ACCOUNT_REGISTRATION: true,
         },
       });
-      const {getByTestId} = mountComponent(
-        <Login />,
-        mockStoreFactory()({
-          ...initialRootState,
-          runtimeState: {
-            hasCookieSupport: true,
-            hasIndexedDbSupport: true,
-            isSupportedBrowser: true,
-          },
-        }),
-      );
+      const {getByTestId} = mountComponent(<Login />, mockStoreFactory()(initialRootState));
 
       const backButton = getByTestId('go-index');
       expect(backButton).not.toBeNull();

@@ -20,45 +20,42 @@
 import React, {useEffect, useState} from 'react';
 
 import {AudioPreference, NotificationPreference, WebappProperties} from '@wireapp/api-client/lib/user/data/';
-import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
 import {amplify} from 'amplify';
-import {container} from 'tsyringe';
 
-import {Checkbox, CheckboxLabel, IndicatorRangeInput} from '@wireapp/react-ui-kit';
+import {TabIndex, Checkbox, CheckboxLabel, IndicatorRangeInput} from '@wireapp/react-ui-kit';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
+import {Theme} from 'Components/AppContainer/hooks/useTheme';
 import {RadioGroup} from 'Components/Radio';
+import {RootFontSize, useRootFontSize} from 'Hooks/useRootFontSize';
+import {User} from 'Repositories/entity/User';
+import {PropertiesRepository} from 'Repositories/properties/PropertiesRepository';
+import {PROPERTIES_TYPE} from 'Repositories/properties/PropertiesType';
+import {Config} from 'src/script/Config';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 
 import {PreferencesPage} from './components/PreferencesPage';
 import {PreferencesSection} from './components/PreferencesSection';
 
-import {RootFontSize, useRootFontSize} from '../../../../hooks/useRootFontSize';
-import {PropertiesRepository} from '../../../../properties/PropertiesRepository';
-import {PROPERTIES_TYPE} from '../../../../properties/PropertiesType';
-import {UserState} from '../../../../user/UserState';
-import {THEMES as ThemeViewModelThemes} from '../../../../view_model/ThemeViewModel';
 interface OptionPreferencesProps {
   propertiesRepository: PropertiesRepository;
-  userState?: UserState;
+  selfUser: User;
 }
 
 const fontSizes = Object.values(RootFontSize);
 
-const OptionPreferences: React.FC<OptionPreferencesProps> = ({
-  propertiesRepository,
-  userState = container.resolve(UserState),
-}) => {
-  const {isActivatedAccount} = useKoSubscribableChildren(userState, ['self', 'isActivatedAccount']);
+const OptionPreferences = ({propertiesRepository, selfUser}: OptionPreferencesProps) => {
+  const {isActivatedAccount} = useKoSubscribableChildren(selfUser, ['isActivatedAccount']);
   const {
     properties: {settings},
   } = propertiesRepository;
   const [optionAudio, setOptionAudio] = useState<AudioPreference>(settings.sound.alerts);
   const [optionReplaceInlineEmoji, setOptionReplaceInlineEmoji] = useState<boolean>(settings.emoji.replace_inline);
-  const [optionDarkMode, setOptionDarkMode] = useState<boolean>(settings.interface.theme === ThemeViewModelThemes.DARK);
+  const [optionDarkMode, setOptionDarkMode] = useState<boolean>(settings.interface.theme === 'dark');
   const [optionSendPreviews, setOptionSendPreviews] = useState<boolean>(settings.previews.send);
   const [optionNotifications, setOptionNotifications] = useState<NotificationPreference>(settings.notifications);
+  const [optionMarkdownPreview, setOptionMarkdownPreview] = useState<boolean>(settings.interface.markdown_preview);
   const [currentRootFontSize, setCurrentRootFontSize] = useRootFontSize();
   const [sliderValue, setSliderValue] = useState<number>(fontSizes.indexOf(currentRootFontSize));
 
@@ -66,9 +63,10 @@ const OptionPreferences: React.FC<OptionPreferencesProps> = ({
     const updateProperties = ({settings}: WebappProperties): void => {
       setOptionAudio(settings.sound.alerts);
       setOptionReplaceInlineEmoji(settings.emoji.replace_inline);
-      setOptionDarkMode(settings.interface.theme === ThemeViewModelThemes.DARK);
+      setOptionDarkMode(settings.interface.theme === 'dark');
       setOptionSendPreviews(settings.previews.send);
       setOptionNotifications(settings.notifications);
+      setOptionMarkdownPreview(settings.interface.markdown_preview);
     };
 
     const updateDarkMode = (newDarkMode: boolean) => setOptionDarkMode(newDarkMode);
@@ -97,13 +95,18 @@ const OptionPreferences: React.FC<OptionPreferencesProps> = ({
     setOptionNotifications(notificationsPreference);
   };
 
+  const saveMarkdownPreviewPreference = (markdownPreviewPreference: boolean) => {
+    propertiesRepository.savePreference(PROPERTIES_TYPE.INTERFACE.MARKDOWN_PREVIEW, markdownPreviewPreference);
+    setOptionMarkdownPreview(markdownPreviewPreference);
+  };
+
   const saveOptionSendPreviewsPreference = (sendPreviewsPreference: boolean) => {
     propertiesRepository.savePreference(PROPERTIES_TYPE.PREVIEWS.SEND, sendPreviewsPreference);
     setOptionSendPreviews(sendPreviewsPreference);
   };
 
   const saveOptionNewTheme = (useDarkMode: boolean) => {
-    const newTheme = useDarkMode ? ThemeViewModelThemes.DARK : ThemeViewModelThemes.DEFAULT;
+    const newTheme: Theme = useDarkMode ? 'dark' : 'default';
     propertiesRepository.savePreference(PROPERTIES_TYPE.INTERFACE.THEME, newTheme);
     setOptionDarkMode(useDarkMode);
   };
@@ -130,6 +133,9 @@ const OptionPreferences: React.FC<OptionPreferencesProps> = ({
     {value: 5, label: RootFontSize.XL},
     {value: 6, label: RootFontSize.XXL, heading: t('preferencesOptionsFontSizeLarge')},
   ];
+
+  const isMessageFormatButtonsFlagEnabled = Config.getConfig().FEATURE.ENABLE_MESSAGE_FORMAT_BUTTONS;
+  const isLinkPreviewsEnabled = Config.getConfig().FEATURE.ALLOW_LINK_PREVIEWS;
 
   return (
     <PreferencesPage title={t('preferencesOptions')}>
@@ -236,33 +242,54 @@ const OptionPreferences: React.FC<OptionPreferencesProps> = ({
                 className="preferences-detail preferences-detail-intended"
                 aria-hidden="true"
                 dangerouslySetInnerHTML={{
-                  __html: t(
-                    'preferencesOptionsEmojiReplaceDetail',
-                    {},
-                    {icon: "<span class='font-size-xs icon-emoji'></span>"},
-                  ),
+                  __html: t('preferencesOptionsEmojiReplaceDetail', undefined, {
+                    icon: "<span class='font-size-xs icon-emoji'></span>",
+                  }),
                 }}
               />
             </div>
 
-            <div className="checkbox-margin">
-              <Checkbox
-                tabIndex={TabIndex.FOCUSABLE}
-                onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-                  saveOptionSendPreviewsPreference(event.target.checked);
-                }}
-                checked={optionSendPreviews}
-                data-uie-name="status-preference-previews-send"
-              >
-                <CheckboxLabel htmlFor="status-preference-previews-send">
-                  {t('preferencesOptionsPreviewsSendCheckbox')}
-                </CheckboxLabel>
-              </Checkbox>
+            {isMessageFormatButtonsFlagEnabled && (
+              <div className="checkbox-margin">
+                <Checkbox
+                  tabIndex={TabIndex.FOCUSABLE}
+                  onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                    saveMarkdownPreviewPreference(event.target.checked);
+                  }}
+                  checked={optionMarkdownPreview}
+                  data-uie-name="status-preference-markdown-preview"
+                >
+                  <CheckboxLabel htmlFor="status-preference-markdown-preview">
+                    {t('preferencesOptionsMarkdownPreview')}
+                  </CheckboxLabel>
+                </Checkbox>
 
-              <p className="preferences-detail preferences-detail-intended">
-                {t('preferencesOptionsPreviewsSendDetail')}
-              </p>
-            </div>
+                <p className="preferences-detail preferences-detail-intended">
+                  {t('preferencesOptionsMarkdownPreviewDetails')}
+                </p>
+              </div>
+            )}
+
+            {isLinkPreviewsEnabled && (
+              <div className="checkbox-margin">
+                <Checkbox
+                  tabIndex={TabIndex.FOCUSABLE}
+                  onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                    saveOptionSendPreviewsPreference(event.target.checked);
+                  }}
+                  checked={optionSendPreviews}
+                  data-uie-name="status-preference-previews-send"
+                >
+                  <CheckboxLabel htmlFor="status-preference-previews-send">
+                    {t('preferencesOptionsPreviewsSendCheckbox')}
+                  </CheckboxLabel>
+                </Checkbox>
+
+                <p className="preferences-detail preferences-detail-intended">
+                  {t('preferencesOptionsPreviewsSendDetail')}
+                </p>
+              </div>
+            )}
           </>
         )}
       </PreferencesSection>

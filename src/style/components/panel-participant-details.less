@@ -49,13 +49,6 @@
       .heading-h2;
       text-align: center;
       word-break: break-word;
-
-      .availability-state-icon,
-      .availability-state-label {
-        display: inline;
-
-        .ellipsis;
-      }
     }
   }
 
@@ -68,8 +61,8 @@
   &__provider-name {
     width: 100%;
     margin: 8px 0 0;
-    font-size: @font-size-small;
-    font-weight: @font-weight-regular;
+    font-size: var(--font-size-small);
+    font-weight: var(--font-weight-regular);
     text-align: center;
     white-space: pre;
   }
@@ -83,8 +76,8 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: @font-size-xsmall;
-    font-weight: @font-weight-bold;
+    font-size: var(--font-size-xsmall);
+    font-weight: var(--font-weight-bold);
     text-transform: uppercase;
     &:not(:last-of-type) {
       margin-bottom: 8px;
@@ -114,14 +107,14 @@
     justify-content: center;
     margin-top: 8px;
     color: var(--background-fade-56);
-    font-size: @font-size-small;
-    font-weight: @font-weight-bold;
+    font-size: var(--font-size-small);
+    font-weight: var(--font-weight-bold);
   }
 
   &__availability {
     justify-content: center;
-    font-size: @font-size-xsmall;
-    font-weight: @font-weight-bold;
+    font-size: var(--font-size-xsmall);
+    font-weight: var(--font-weight-bold);
     text-transform: uppercase;
   }
 
@@ -131,13 +124,9 @@
     margin-bottom: 16px;
   }
 
-  &__availability > .availability-state-icon {
-    margin-bottom: 14px;
-  }
-
   &__service-description {
-    font-size: @font-size-medium;
-    font-weight: @font-weight-regular;
+    font-size: var(--font-size-medium);
+    font-weight: var(--font-weight-regular);
   }
 
   &__role-label {
@@ -147,8 +136,8 @@
     margin-bottom: 14px;
     background-color: var(--background);
     color: var(--app-bg);
-    font-size: @font-size-small;
-    font-weight: @font-weight-bold;
+    font-size: var(--font-size-small);
+    font-weight: var(--font-weight-bold);
     text-transform: uppercase;
   }
 }

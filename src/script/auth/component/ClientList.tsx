@@ -17,7 +17,7 @@
  *
  */
 
-import React from 'react';
+import {HTMLProps, useEffect, useState} from 'react';
 
 import {ClientType} from '@wireapp/api-client/lib/client/index';
 import {connect} from 'react-redux';
@@ -41,7 +41,7 @@ import {QUERY_KEY, ROUTE} from '../route';
 
 const logger = getLogger('ClientList');
 
-type Props = React.HTMLProps<HTMLDivElement>;
+type Props = HTMLProps<HTMLDivElement>;
 const ClientListComponent = ({
   clientError,
   isFetching,
@@ -56,9 +56,18 @@ const ClientListComponent = ({
   removeLocalStorage,
 }: Props & ConnectedProps & DispatchProps) => {
   const navigate = useNavigate();
-  const [showLoading, setShowLoading] = React.useState(false);
+  const [showLoading, setShowLoading] = useState(false);
   const isOauth = UrlUtil.hasURLParameter(QUERY_KEY.SCOPE);
-  const [currentlySelectedClient, setCurrentlySelectedClient] = React.useState<string | null>(null);
+  const [currentlySelectedClient, setCurrentlySelectedClient] = useState<string | null>(null);
+  const [sortedClients, setSortedClients] = useState(permanentClients);
+
+  useEffect(() => {
+    setSortedClients(
+      permanentClients.sort((clientA, clientB) => {
+        return new Date(clientA.time).getTime() - new Date(clientB.time).getTime();
+      }),
+    );
+  }, [permanentClients]);
 
   const setSelectedClient = (clientId: string) => {
     const isSelectedClient = currentlySelectedClient === clientId;
@@ -103,10 +112,10 @@ const ClientListComponent = ({
       verticalCenter
       style={{display: 'flex', flexDirection: 'column', justifyContent: 'space-around'}}
     >
-      {permanentClients.map(client => (
+      {sortedClients.map(client => (
         <ClientItem
           client={client}
-          clientError={isSelectedClient(client.id) ? clientError : undefined}
+          clientError={isSelectedClient(client.id) ? clientError ?? undefined : undefined}
           key={client.id}
           onClick={() => setSelectedClient(client.id)}
           onClientRemoval={(password?: string) => removeClient(client.id, password)}

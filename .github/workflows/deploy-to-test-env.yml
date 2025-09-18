@@ -8,13 +8,12 @@ on:
         required: true
         type: choice
         options:
-          - wire-webapp-qa-al2-migration
-          - wire-webapp-edge-al2
-          - wire-webapp-mls-al2
+          - wire-webapp-qa
+          - wire-webapp-mls
 
 concurrency:
   group: ci-${{ github.ref }}
-  cancel-in-progress: true
+  cancel-in-progress: false
 
 jobs:
   deploy:
@@ -28,18 +27,18 @@ jobs:
     steps:
       - name: Print environment variables
         run: |
-          echo -e "branch = ${{github.ref_name}}"
-          echo -e "env = ${{inputs.env}}"
+          echo -e "branch = ${GITHUB_REF_NAME}"
+          echo -e "env = ${ENV}"
+        env:
+          ENV: ${{ inputs.env }}
 
       - name: Checkout
-        uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
+        uses: actions/checkout@v4
 
       - name: Setup Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
-          node-version: 16.x
+          node-version: 20.14.x
           cache: 'yarn'
 
       - name: Install JS dependencies
@@ -49,7 +48,7 @@ jobs:
         run: yarn build:prod
 
       - name: Deploy to Elastic Beanstalk
-        uses: einaregilsson/beanstalk-deploy@v21
+        uses: einaregilsson/beanstalk-deploy@v22
         with:
           application_name: ${{env.AWS_APPLICATION_NAME}}
           aws_access_key: ${{secrets.WEBTEAM_AWS_ACCESS_KEY_ID}}

@@ -17,154 +17,117 @@
  *
  */
 
-import React from 'react';
+import {Navigate, useNavigate} from 'react-router-dom';
 
-import {useIntl} from 'react-intl';
-import {Navigate} from 'react-router-dom';
+import {Button, ButtonVariant, CheckRoundIcon, FlexBox} from '@wireapp/react-ui-kit';
 
-import {Runtime} from '@wireapp/commons';
-import {
-  ArrowIcon,
-  Bold,
-  COLOR,
-  Column,
-  Columns,
-  Container,
-  IsMobile,
-  Link,
-  Logo,
-  ProfileIcon,
-  TeamIcon,
-  Text,
-} from '@wireapp/react-ui-kit';
+import {t} from 'Util/LocalizerUtil';
 
 import {Page} from './Page';
+import {styles} from './SetAccountType.styles';
 
 import {Config} from '../../Config';
-import {setAccountTypeStrings} from '../../strings';
-import {RouterLink} from '../component/RouterLink';
+import {BackButton} from '../component/BackButton';
+import {EXTERNAL_ROUTE} from '../externalRoute';
 import {ROUTE} from '../route';
 import {pathWithParams} from '../util/urlUtil';
 
-type Props = React.HTMLProps<HTMLDivElement>;
+export const SetAccountType = () => {
+  const navigate = useNavigate();
 
-const SetAccountType = ({}: Props) => {
-  const {formatMessage: _} = useIntl();
-  const isMacOsWrapper = Runtime.isDesktopApp() && Runtime.isMacOS();
-
-  const backArrow = (
-    <RouterLink to={ROUTE.INDEX} data-uie-name="go-index" aria-label={_(setAccountTypeStrings.goBack)}>
-      <ArrowIcon direction="left" color={COLOR.TEXT} style={{opacity: 0.56}} />
-    </RouterLink>
-  );
-
-  const iconStyles: React.CSSProperties = {
-    alignItems: 'center',
-    borderRadius: '50%',
-    display: 'flex',
-    height: 72,
-    justifyContent: 'center',
-    margin: '0 auto',
-    width: 72,
+  const onCreatePersonalAccount = () => {
+    navigate(ROUTE.CREATE_ACCOUNT);
   };
 
+  const onCreateTeamAccount = () => {
+    window.open(EXTERNAL_ROUTE.WIRE_TEAMS_SIGNUP, '_blank');
+  };
+
+  if (!Config.getConfig().FEATURE.ENABLE_ACCOUNT_REGISTRATION) {
+    return <Navigate to={pathWithParams(ROUTE.INDEX)} replace data-uie-name="redirect-login" />;
+  }
+
+  const accountTypeOptions = [
+    {
+      heading: t('selectTeamAccountTypeOptionHeading'),
+      description: t('selectTeamAccountTypeOptionDescription'),
+      buttonText: t('selectTeamAccountTypeOptionButtonText'),
+      action: onCreateTeamAccount,
+      features: [t('selectTeamAccountTypeOptionFeature1'), t('selectTeamAccountTypeOptionFeature2')],
+      isPrimary: true,
+    },
+    {
+      heading: t('selectPersonalAccountTypeOptionHeading'),
+      description: t('selectPersonalAccountTypeOptionDescription'),
+      buttonText: t('selectPersonalAccountTypeOptionButtonText'),
+      features: [t('selectPersonalAccountTypeOptionFeature1'), t('selectPersonalAccountTypeOptionFeature2')],
+      action: onCreatePersonalAccount,
+    },
+  ];
+
   return (
-    <Page>
-      {(Config.getConfig().FEATURE.ENABLE_DOMAIN_DISCOVERY ||
-        Config.getConfig().FEATURE.ENABLE_SSO ||
-        Config.getConfig().FEATURE.ENABLE_ACCOUNT_REGISTRATION) && (
-        <IsMobile>
-          <div style={{margin: 16}}>{backArrow}</div>
-        </IsMobile>
-      )}
-      {!Config.getConfig().FEATURE.ENABLE_ACCOUNT_REGISTRATION && (
-        <Navigate to={pathWithParams(ROUTE.INDEX)} replace data-uie-name="redirect-login" />
-      )}
-      {isMacOsWrapper && (
-        <Navigate to={pathWithParams(ROUTE.CREATE_ACCOUNT)} replace data-uie-name="redirect-register-personal" />
-      )}
-      <Container centerText verticalCenter style={{width: '100%'}}>
-        <Columns>
-          <IsMobile not>
-            <Column style={{display: 'flex'}}>
-              <div style={{margin: 'auto'}}>{backArrow}</div>
-            </Column>
-          </IsMobile>
-          <Column style={{flexBasis: 384, flexGrow: 0, padding: 0}}>
-            <Column>
-              <Logo scale={1.68} data-uie-name="ui-wire-logo" />
-            </Column>
-            <Columns style={{margin: '70px auto'}}>
-              <Column style={{marginLeft: isMacOsWrapper ? 0 : 16}}>
-                <RouterLink to={ROUTE.CREATE_ACCOUNT} data-uie-name="go-register-personal">
-                  <div
-                    style={{
-                      ...iconStyles,
-                      background: COLOR.GREEN,
-                    }}
-                  >
-                    <ProfileIcon height={31} width={31} color={'white'} />
-                  </div>
-                  <Bold fontSize="24px" color={COLOR.LINK}>
-                    {_(setAccountTypeStrings.createAccountForPersonalUse)}
-                  </Bold>
-                  <br />
-                  <Text
-                    block
-                    center
-                    light
-                    fontSize="16px"
-                    color={COLOR.LINK}
-                    style={{
-                      marginTop: 8,
-                    }}
-                  >
-                    {_(setAccountTypeStrings.createPersonalAccount)}
-                  </Text>
-                </RouterLink>
-              </Column>
-              <Column>
-                <Link
-                  href={`${Config.getConfig().URL.TEAMS_BASE}/register/email`}
-                  target="_blank"
-                  data-uie-name="go-register-team"
-                >
-                  <div
-                    style={{
-                      ...iconStyles,
-                      background: COLOR.BLUE,
-                    }}
-                  >
-                    <TeamIcon height={31} width={31} color={'white'} />
-                  </div>
-                  <Bold fontSize="24px" color={COLOR.LINK}>
-                    {_(setAccountTypeStrings.createAccountForOrganizations)}
-                  </Bold>
-                  <br />
-                  <Text
-                    block
-                    center
-                    light
-                    fontSize="16px"
-                    color={COLOR.LINK}
-                    style={{
-                      marginTop: 8,
-                    }}
-                  >
-                    {_(setAccountTypeStrings.createTeam)}
-                  </Text>
-                </Link>
-              </Column>
-            </Columns>
-          </Column>
-          <Column />
-        </Columns>
-      </Container>
-      <IsMobile>
-        <div style={{minWidth: 48}} />
-      </IsMobile>
+    <Page withSideBar>
+      <FlexBox css={styles.container}>
+        <FlexBox css={styles.header}>
+          <FlexBox css={styles.headerIcon}>
+            <BackButton />
+          </FlexBox>
+          <FlexBox css={styles.headerText}>{t('selectAccountTypeHeading')}</FlexBox>
+        </FlexBox>
+        <FlexBox css={styles.optionWrapper}>
+          {accountTypeOptions.map((option, index) => (
+            <AccountTypeOption
+              key={index}
+              heading={option.heading}
+              description={option.description}
+              buttonText={option.buttonText}
+              action={option.action}
+              features={option.features}
+              isPrimary={option.isPrimary}
+            />
+          ))}
+        </FlexBox>
+      </FlexBox>
     </Page>
   );
 };
 
-export {SetAccountType};
+interface AccountTypeOptionProps {
+  heading: string;
+  description: string;
+  buttonText: string;
+  action: () => void;
+  features: string[];
+  isPrimary?: boolean;
+}
+
+const AccountTypeOption = ({action, buttonText, description, heading, features, isPrimary}: AccountTypeOptionProps) => {
+  return (
+    <FlexBox data-uie-name="account-type-option" css={styles.optionContainer(isPrimary)}>
+      <div css={styles.option}>
+        <p css={styles.optionHeading}>{heading}</p>
+        <p css={styles.optionDescription}>{description}</p>
+        <div css={styles.featureList}>
+          <div css={styles.horizontalLine} />
+          {features.map((feature, index) => (
+            <>
+              <FlexBox key={index} css={styles.optionFeatureContainer}>
+                <CheckRoundIcon css={styles.featureIcon} />
+                <p css={styles.featureText}>{feature}</p>
+              </FlexBox>
+              <div css={styles.horizontalLine} />
+            </>
+          ))}
+        </div>
+        <Button
+          data-uie-name="select-account-type-button"
+          onClick={action}
+          css={styles.optionButton}
+          variant={isPrimary ? ButtonVariant.PRIMARY : ButtonVariant.SECONDARY}
+        >
+          {buttonText}
+        </Button>
+      </div>
+    </FlexBox>
+  );
+};

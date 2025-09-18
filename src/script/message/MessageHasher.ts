@@ -19,16 +19,15 @@
 
 import Long from 'long';
 
+import {ClientEvent} from 'Repositories/event/Client';
+import {LegacyEventRecord} from 'Repositories/storage/record/EventRecord';
 import {utf8ToUtf16BE} from 'Util/StringUtil';
-
-import {ClientEvent} from '../event/Client';
-import {LegacyEventRecord} from '../storage/record/EventRecord';
 
 /**
  * @returns Promise with hashed string bytes
  */
 const createSha256Hash = async (bytes: number[]): Promise<ArrayBuffer> => {
-  const buffer = new Uint8Array(bytes).buffer;
+  const buffer = new Uint8Array(bytes);
   return window.crypto.subtle.digest('SHA-256', buffer);
 };
 

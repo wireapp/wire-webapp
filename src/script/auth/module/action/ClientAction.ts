@@ -18,9 +18,12 @@
  */
 
 import {ClientClassification, ClientType, RegisteredClient} from '@wireapp/api-client/lib/client/';
+import {FEATURE_KEY, FeatureStatus} from '@wireapp/api-client/lib/team';
 import {ClientInfo} from '@wireapp/core/lib/client/';
 
 import {Runtime} from '@wireapp/commons';
+
+import {getClientMLSConfig} from 'Repositories/client/clientMLSConfig';
 
 import {ClientActionCreator} from './creator/';
 
@@ -62,7 +65,14 @@ export class ClientAction {
     entropyData?: Uint8Array,
   ): ThunkAction => {
     return async (dispatch, getState, {core, actions: {clientAction}}) => {
-      const localClient = await core.initClient();
+      const localClient = await core.getLocalClient();
+      const commonConfig = (await core.service?.team.getCommonFeatureConfig()) ?? {};
+
+      const useAsyncNotificationStream =
+        commonConfig[FEATURE_KEY.CONSUMABLE_NOTIFICATIONS]?.status === FeatureStatus.ENABLED;
+
+      const useLegacyNotificationStream = !useAsyncNotificationStream;
+
       const creationStatus = localClient
         ? {isNew: false, client: localClient}
         : {
@@ -70,10 +80,12 @@ export class ClientAction {
             client: await core.registerClient(
               {clientType, password, verificationCode},
               clientAction.generateClientPayload(clientType),
+              useLegacyNotificationStream,
               entropyData,
             ),
           };
 
+      await core.initClient(creationStatus.client, getClientMLSConfig(commonConfig));
       dispatch(ClientActionCreator.successfulInitializeClient(creationStatus));
     };
   };
@@ -84,6 +96,7 @@ export class ClientAction {
     }
     const deviceLabel = `${Runtime.getOS()}${Runtime.getOS().version ? ` ${Runtime.getOS().version}` : ''}`;
     let deviceModel = StringUtil.capitalize(Runtime.getBrowserName());
+    const dev = Runtime.isEdgeEnvironment() ? '(Edge)' : Runtime.isStagingEnvironment() ? '(Staging)' : false;
 
     if (Runtime.isDesktopApp()) {
       if (Runtime.isMacOS()) {
@@ -96,7 +109,9 @@ export class ClientAction {
     } else if (clientType === ClientType.TEMPORARY) {
       deviceModel = `${deviceModel} (Temporary)`;
     }
-
+    if (dev) {
+      deviceModel = `${deviceModel} ${dev}`;
+    }
     return {
       classification: ClientClassification.DESKTOP,
       cookieLabel: undefined,

@@ -20,14 +20,15 @@
 import {FC, useCallback, useRef, useState} from 'react';
 
 import {amplify} from 'amplify';
+import ko from 'knockout';
 
 import {WebAppEvents} from '@wireapp/webapp-events';
 
-import {ContentMessage} from 'src/script/entity/message/ContentMessage';
-import {useClickOutside} from 'src/script/hooks/useClickOutside';
+import {useClickOutside} from 'Hooks/useClickOutside';
+import {ContentMessage} from 'Repositories/entity/message/ContentMessage';
 import {ContextMenuEntry, showContextMenu} from 'src/script/ui/ContextMenu';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
-import {isTabKey, KEY} from 'Util/KeyboardUtil';
+import {isSpaceOrEnterKey, isTabKey} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
 import {setContextMenuPosition} from 'Util/util';
 
@@ -59,7 +60,6 @@ export interface MessageActionsMenuProps {
   contextMenu: {entries: ko.Subscribable<ContextMenuEntry[]>};
   isMessageFocused: boolean;
   handleActionMenuVisibility: (isVisible: boolean) => void;
-  messageWithSection: boolean;
   handleReactionClick: (emoji: string) => void;
   reactionsTotalCount: number;
   isRemovedFromConversation: boolean;
@@ -71,7 +71,6 @@ const MessageActionsMenu: FC<MessageActionsMenuProps> = ({
   isMessageFocused,
   handleActionMenuVisibility,
   message,
-  messageWithSection,
   handleReactionClick,
   reactionsTotalCount,
   isRemovedFromConversation,
@@ -98,12 +97,12 @@ const MessageActionsMenu: FC<MessageActionsMenuProps> = ({
   const handleContextKeyDown = useCallback(
     (event: React.KeyboardEvent<HTMLButtonElement>) => {
       const selectedMsgActionName = event.currentTarget.dataset.uieName;
-      if ([KEY.SPACE, KEY.ENTER].includes(event.key)) {
+      if (isSpaceOrEnterKey(event.key)) {
         if (selectedMsgActionName) {
           setCurrentMsgAction(selectedMsgActionName);
           handleMenuOpen(true);
           const newEvent = setContextMenuPosition(event);
-          showContextMenu(newEvent, menuEntries, 'message-options-menu');
+          showContextMenu({event: newEvent, entries: menuEntries, identifier: 'message-options-menu'});
         }
       } else if (!event.shiftKey && isTabKey(event) && !reactionsTotalCount) {
         // if there's no reaction then on tab from context menu hide the message actions menu
@@ -128,7 +127,12 @@ const MessageActionsMenu: FC<MessageActionsMenuProps> = ({
       } else if (selectedMsgActionName) {
         setCurrentMsgAction(selectedMsgActionName);
         handleMenuOpen(true);
-        showContextMenu(event, menuEntries, 'message-options-menu', resetActionMenuStates);
+        showContextMenu({
+          event,
+          entries: menuEntries,
+          identifier: 'message-options-menu',
+          resetMenuStates: resetActionMenuStates,
+        });
       }
     },
     [currentMsgActionName, handleMenuOpen, menuEntries],
@@ -181,7 +185,6 @@ const MessageActionsMenu: FC<MessageActionsMenuProps> = ({
               handleKeyDown={handleKeyDown}
               resetActionMenuStates={resetActionMenuStates}
               wrapperRef={wrapperRef}
-              message={message}
               handleReactionClick={handleReactionClick}
             />
             {message.isReplyable() && (

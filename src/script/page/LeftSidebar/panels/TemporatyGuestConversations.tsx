@@ -19,16 +19,14 @@
 
 import React from 'react';
 
-import {QualifiedId} from '@wireapp/api-client/lib/user';
-
 import {CallingCell} from 'Components/calling/CallingCell';
-import {Icon} from 'Components/Icon';
+import * as Icon from 'Components/Icon';
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
+import {User} from 'Repositories/entity/User';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 
 import {Config} from '../../../Config';
-import {User} from '../../../entity/User';
 import {CallingViewModel} from '../../../view_model/CallingViewModel';
 import {ListViewModel} from '../../../view_model/ListViewModel';
 
@@ -50,7 +48,6 @@ const TemporaryGuestConversations: React.FC<TemporaryGuestConversations> = ({
 
   const {activeCalls} = useKoSubscribableChildren(callingViewModel, ['activeCalls']);
   const isAccountCreationEnabled = Config.getConfig().FEATURE.ENABLE_ACCOUNT_REGISTRATION;
-  const getConversationById = (conversationId: QualifiedId) => callingViewModel.getConversationById(conversationId);
   const openPreferences = () => {
     listViewModel.openPreferencesAccount();
   };
@@ -72,28 +69,25 @@ const TemporaryGuestConversations: React.FC<TemporaryGuestConversations> = ({
   return (
     <div id="temporary-guest" className={`temporary-guest`}>
       {activeCalls.map(call => {
-        const conversation = getConversationById(call.conversationId);
+        const {conversation} = call;
         return (
-          <div key={call.conversationId.id} className="calling-cell">
-            <CallingCell
-              data-uie-name="item-call"
-              data-uie-uid={call.conversationId.id}
-              data-uie-value={conversation.display_name()}
-              call={call}
-              conversation={conversation}
-              temporaryUserStyle
-              isFullUi
-              isSelfVerified={false}
-              callActions={callingViewModel.callActions}
-              callingRepository={callingViewModel.callingRepository}
-              hasAccessToCamera={callingViewModel.hasAccessToCamera()}
-              multitasking={callingViewModel.multitasking}
-            />
-          </div>
+          <CallingCell
+            key={conversation.id}
+            data-uie-name="item-call"
+            data-uie-uid={conversation.id}
+            data-uie-value={conversation.display_name()}
+            call={call}
+            isTemporaryUser
+            isFullUi
+            callActions={callingViewModel.callActions}
+            callingRepository={callingViewModel.callingRepository}
+            propertiesRepository={callingViewModel.propertiesRepository}
+            hasAccessToCamera={callingViewModel.hasAccessToCamera()}
+          />
         );
       })}
       <div className="temporary-guest__content">
-        <Icon.LogoFull />
+        <Icon.LogoFullIcon />
         <div className="temporary-guest__description">{t('temporaryGuestDescription')}</div>
         {isAccountCreationEnabled && (
           <button
@@ -125,7 +119,7 @@ const TemporaryGuestConversations: React.FC<TemporaryGuestConversations> = ({
           data-uie-name="go-preferences"
           onClick={openPreferences}
         >
-          <Icon.Settings />
+          <Icon.SettingsIcon />
         </button>
       </div>
     </div>

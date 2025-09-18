@@ -19,13 +19,6 @@
 
 import {CSSObject} from '@emotion/serialize';
 
-export const CSS_ABSOLUTE_CENTER: CSSObject = {
-  left: '50%',
-  position: 'absolute',
-  top: '50%',
-  transform: 'translate(-50%, -50%)',
-};
-
 export const CSS_SQUARE: (size: number | string) => CSSObject = size => ({
   height: size,
   width: size,
@@ -58,3 +51,11 @@ export const CSS_ICON: (code: string, iconSize?: string | number) => CSSObject =
   speak: 'none',
   textTransform: 'none',
 });
+
+export const CSS_VISUALLY_HIDDEN: CSSObject = {
+  position: 'absolute',
+  left: '-10000px',
+  overflow: 'hidden',
+  width: '1px',
+  height: '1px',
+};

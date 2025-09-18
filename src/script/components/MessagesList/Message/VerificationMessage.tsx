@@ -23,12 +23,13 @@ import {amplify} from 'amplify';
 
 import {WebAppEvents} from '@wireapp/webapp-events';
 
-import {VerifiedIcon} from 'Components/VerifiedIcon';
+import {VerificationIcon} from 'Components/VerificationIcon';
+import {VerificationMessage as VerificationMessageEntity} from 'Repositories/entity/message/VerificationMessage';
+import {SidebarTabs, useSidebarStore} from 'src/script/page/LeftSidebar/panels/Conversations/useSidebarStore';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {Declension, joinNames, t} from 'Util/LocalizerUtil';
 import {capitalizeFirstChar} from 'Util/StringUtil';
 
-import {VerificationMessage as VerificationMessageEntity} from '../../../entity/message/VerificationMessage';
 import {VerificationMessageType} from '../../../message/VerificationMessageType';
 
 export interface VerificationMessageProps {
@@ -46,8 +47,11 @@ const VerificationMessage: React.FC<VerificationMessageProps> = ({message}) => {
     return capitalizeFirstChar(namesString);
   }, [userEntities]);
 
+  const {setCurrentTab} = useSidebarStore();
+
   const showDevice = (): void => {
     const topic = isSelfClient ? WebAppEvents.PREFERENCES.MANAGE_DEVICES : WebAppEvents.SHORTCUT.PEOPLE;
+    setCurrentTab(SidebarTabs.PREFERENCES);
     amplify.publish(topic);
   };
 
@@ -60,14 +64,14 @@ const VerificationMessage: React.FC<VerificationMessageProps> = ({message}) => {
   return (
     <div className="message-header">
       <div className="message-header-icon">
-        <VerifiedIcon isVerified={isTypeVerified} />
+        <VerificationIcon isVerified={isTypeVerified} />
       </div>
       <div
         className="message-header-label message-header-label--verification"
         data-uie-name="element-message-verification"
         data-uie-value={verificationMessageType}
       >
-        {isTypeVerified && <span>{t('tooltipConversationAllVerified')}</span>}
+        {isTypeVerified && <span>{t('conversation.AllVerified')}</span>}
         {isTypeUnverified && (
           <>
             <span className="message-header-sender-name">{unsafeSenderName}</span>
@@ -80,7 +84,7 @@ const VerificationMessage: React.FC<VerificationMessageProps> = ({message}) => {
             >
               {isSelfClient
                 ? t('conversationDeviceYourDevices')
-                : t('conversationDeviceUserDevices', userEntities[0]?.name())}
+                : t('conversationDeviceUserDevices', {user: userEntities[0]?.name()})}
             </button>
           </>
         )}
@@ -88,7 +92,11 @@ const VerificationMessage: React.FC<VerificationMessageProps> = ({message}) => {
           <>
             <span className="message-header-plain-sender-name">{nameList}</span>
             <span>
-              {hasMultipleUsers ? t('conversationDeviceStartedUsingMany') : t('conversationDeviceStartedUsingOne')}
+              {hasMultipleUsers
+                ? t('conversationDeviceStartedUsingMany')
+                : isSelfClient
+                  ? t('conversationDeviceStartedUsingYou')
+                  : t('conversationDeviceStartedUsingOne')}
             </span>
             <button
               type="button"

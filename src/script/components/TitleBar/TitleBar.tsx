@@ -17,37 +17,37 @@
  *
  */
 
-import React, {useMemo, useEffect, useCallback, useRef} from 'react';
+import React, {useCallback, useEffect, useMemo, useRef} from 'react';
 
-import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
 import {amplify} from 'amplify';
 import cx from 'classnames';
 import {container} from 'tsyringe';
 
-import {IconButton, IconButtonVariant, useMatchMedia} from '@wireapp/react-ui-kit';
+import {CallIcon, IconButton, IconButtonVariant, QUERY, TabIndex, useMatchMedia} from '@wireapp/react-ui-kit';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
+import {ConversationVerificationBadges} from 'Components/Badge';
 import {useCallAlertState} from 'Components/calling/useCallAlertState';
-import {Icon} from 'Components/Icon';
+import * as Icon from 'Components/Icon';
 import {LegalHoldDot} from 'Components/LegalHoldDot';
+import {useNoInternetCallGuard} from 'Hooks/useNoInternetCallGuard/useNoInternetCallGuard';
+import {CallState} from 'Repositories/calling/CallState';
+import {ConversationFilter} from 'Repositories/conversation/ConversationFilter';
+import {Conversation} from 'Repositories/entity/Conversation';
+import {User} from 'Repositories/entity/User';
+import {TeamState} from 'Repositories/team/TeamState';
 import {useAppMainState, ViewType} from 'src/script/page/state';
 import {ContentState} from 'src/script/page/useAppState';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
-import {handleKeyDown} from 'Util/KeyboardUtil';
-import {StringIdentifer, t} from 'Util/LocalizerUtil';
+import {handleKeyDown, KEY} from 'Util/KeyboardUtil';
+import {t} from 'Util/LocalizerUtil';
 import {matchQualifiedIds} from 'Util/QualifiedId';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 
-import {CallState} from '../../calling/CallState';
-import {ConversationFilter} from '../../conversation/ConversationFilter';
-import {ConversationVerificationState} from '../../conversation/ConversationVerificationState';
-import {Conversation} from '../../entity/Conversation';
 import {RightSidebarParams} from '../../page/AppMain';
-import {PanelState} from '../../page/RightSidebar/RightSidebar';
-import {TeamState} from '../../team/TeamState';
+import {PanelState} from '../../page/RightSidebar';
 import {Shortcut} from '../../ui/Shortcut';
 import {ShortcutType} from '../../ui/ShortcutType';
-import {UserState} from '../../user/UserState';
 import {CallActions} from '../../view_model/CallingViewModel';
 import {ViewModelRepositories} from '../../view_model/MainViewModel';
 
@@ -56,28 +56,31 @@ export interface TitleBarProps {
   conversation: Conversation;
   openRightSidebar: (panelState: PanelState, params: RightSidebarParams, compareEntityId?: boolean) => void;
   repositories: ViewModelRepositories;
-  userState: UserState;
+  selfUser: User;
   teamState: TeamState;
   isRightSidebarOpen?: boolean;
   callState?: CallState;
+  isReadOnlyConversation?: boolean;
+  withBottomDivider: boolean;
 }
 
 export const TitleBar: React.FC<TitleBarProps> = ({
   repositories,
   conversation,
   callActions,
+  selfUser,
   openRightSidebar,
   isRightSidebarOpen = false,
-  userState = container.resolve(UserState),
   callState = container.resolve(CallState),
   teamState = container.resolve(TeamState),
+  isReadOnlyConversation = false,
+  withBottomDivider,
 }) => {
-  const {calling: callingRepository} = repositories;
   const {
     is1to1,
     isRequest,
     isActiveParticipant,
-    isGroup,
+    isGroupOrChannel,
     hasExternal,
     hasDirectGuest,
     hasService,
@@ -85,12 +88,11 @@ export const TitleBar: React.FC<TitleBarProps> = ({
     firstUserEntity,
     hasLegalHold,
     display_name: displayName,
-    verification_state: verificationState,
   } = useKoSubscribableChildren(conversation, [
     'is1to1',
     'isRequest',
     'isActiveParticipant',
-    'isGroup',
+    'isGroupOrChannel',
     'hasExternal',
     'hasDirectGuest',
     'hasService',
@@ -98,12 +100,12 @@ export const TitleBar: React.FC<TitleBarProps> = ({
     'firstUserEntity',
     'hasLegalHold',
     'display_name',
-    'verification_state',
   ]);
 
-  const {isActivatedAccount} = useKoSubscribableChildren(userState, ['isActivatedAccount']);
+  const guardCall = useNoInternetCallGuard();
+
+  const {isActivatedAccount} = useKoSubscribableChildren(selfUser, ['isActivatedAccount']);
   const {joinedCall, activeCalls} = useKoSubscribableChildren(callState, ['joinedCall', 'activeCalls']);
-  const {isVideoCallingEnabled} = useKoSubscribableChildren(teamState, ['isVideoCallingEnabled']);
 
   const currentFocusedElementRef = useRef<HTMLButtonElement | null>(null);
 
@@ -128,28 +130,26 @@ export const TitleBar: React.FC<TitleBarProps> = ({
 
   const hasCall = useMemo(() => {
     const hasEntities = !!joinedCall;
-    return hasEntities && matchQualifiedIds(conversation.qualifiedId, joinedCall.conversationId);
+    return hasEntities && matchQualifiedIds(conversation.qualifiedId, joinedCall.conversation.qualifiedId);
   }, [conversation, joinedCall]);
 
   const showCallControls = ConversationFilter.showCallControls(conversation, hasCall);
 
-  const supportsVideoCall = conversation.supportsVideoCall(callingRepository.supportsConferenceCalling);
-
   const conversationSubtitle = is1to1 && firstUserEntity?.isFederated ? firstUserEntity?.handle ?? '' : '';
 
   const shortcut = Shortcut.getShortcutTooltip(ShortcutType.PEOPLE);
-  const peopleTooltip = t('tooltipConversationPeople', shortcut);
+  const peopleTooltip = t('tooltipConversationPeople', {shortcut});
 
   // To be changed when design chooses a breakpoint, the conditional can be integrated to the ui-kit directly
-  const mdBreakpoint = useMatchMedia('max-width: 768px');
-  const smBreakpoint = useMatchMedia('max-width: 640px');
+  const mdBreakpoint = useMatchMedia('max-width: 1000px');
+  const smBreakpoint = useMatchMedia(QUERY.tabletSMDown);
 
   const {close: closeRightSidebar} = useAppMainState(state => state.rightSidebar);
 
   const {setCurrentView: setView} = useAppMainState(state => state.responsiveView);
 
   const setLeftSidebar = () => {
-    setView(ViewType.LEFT_SIDEBAR);
+    setView(ViewType.MOBILE_LEFT_SIDEBAR);
     closeRightSidebar();
   };
 
@@ -163,29 +163,31 @@ export const TitleBar: React.FC<TitleBarProps> = ({
   );
 
   const showAddParticipant = useCallback(() => {
+    if (is1to1) {
+      return;
+    }
+
     if (!isActiveParticipant) {
       return showDetails(false);
     }
 
-    if (isGroup) {
+    if (isGroupOrChannel) {
       showDetails(true);
     } else {
       amplify.publish(WebAppEvents.CONVERSATION.CREATE_GROUP, 'conversation_details', firstUserEntity);
     }
-  }, [firstUserEntity, isActiveParticipant, isGroup, showDetails]);
+  }, [firstUserEntity, isActiveParticipant, isGroupOrChannel, showDetails, is1to1]);
 
   useEffect(() => {
     // TODO remove the titlebar for now to ensure that buttons are clickable in macOS wrappers
     window.setTimeout(() => document.querySelector('.titlebar')?.remove(), TIME_IN_MILLIS.SECOND);
 
-    window.setTimeout(() => {
-      amplify.subscribe(WebAppEvents.SHORTCUT.PEOPLE, () => showDetails(false));
-      amplify.subscribe(WebAppEvents.SHORTCUT.ADD_PEOPLE, () => {
-        if (isActivatedAccount) {
-          showAddParticipant();
-        }
-      });
-    }, 50);
+    amplify.subscribe(WebAppEvents.SHORTCUT.PEOPLE, () => showDetails(false));
+    amplify.subscribe(WebAppEvents.SHORTCUT.ADD_PEOPLE, () => {
+      if (isActivatedAccount) {
+        showAddParticipant();
+      }
+    });
 
     return () => {
       amplify.unsubscribeAll(WebAppEvents.SHORTCUT.PEOPLE);
@@ -197,9 +199,15 @@ export const TitleBar: React.FC<TitleBarProps> = ({
 
   const onClickDetails = () => showDetails(false);
 
+  const startCallAndShowAlert = () => {
+    guardCall(() => {
+      callActions.startAudio(conversation);
+      showStartedCallAlert(isGroupOrChannel);
+    });
+  };
+
   const onClickStartAudio = () => {
-    callActions.startAudio(conversation);
-    showStartedCallAlert(isGroup);
+    startCallAndShowAlert();
 
     if (smBreakpoint) {
       setLeftSidebar();
@@ -218,7 +226,10 @@ export const TitleBar: React.FC<TitleBarProps> = ({
   return (
     <ul
       id="conversation-title-bar"
-      className={cx('conversation-title-bar', {'is-right-panel-open': isRightSidebarOpen})}
+      className={cx('conversation-title-bar', {
+        'is-right-panel-open': isRightSidebarOpen,
+        'conversation-title-bar--with-bottom-divider': withBottomDivider,
+      })}
     >
       <li className="conversation-title-bar-library">
         {smBreakpoint && (
@@ -250,7 +261,13 @@ export const TitleBar: React.FC<TitleBarProps> = ({
           onClick={onClickDetails}
           title={peopleTooltip}
           aria-label={peopleTooltip}
-          onKeyDown={event => handleKeyDown(event, onClickDetails)}
+          onKeyDown={event =>
+            handleKeyDown({
+              event,
+              callback: onClickDetails,
+              keys: [KEY.ENTER, KEY.SPACE],
+            })
+          }
           data-placement="bottom"
           role="button"
           tabIndex={TabIndex.FOCUSABLE}
@@ -266,16 +283,11 @@ export const TitleBar: React.FC<TitleBarProps> = ({
               />
             )}
 
-            {verificationState === ConversationVerificationState.VERIFIED && (
-              <Icon.Verified
-                data-uie-name="conversation-title-bar-verified-icon"
-                className="conversation-title-bar-name--verified"
-              />
-            )}
-
             <span className="conversation-title-bar-name-label" data-uie-name="status-conversation-title-bar-label">
               {displayName}
             </span>
+
+            <ConversationVerificationBadges conversation={conversation} />
           </div>
 
           {conversationSubtitle && <div className="conversation-title-bar-name--subtitle">{conversationSubtitle}</div>}
@@ -284,39 +296,20 @@ export const TitleBar: React.FC<TitleBarProps> = ({
 
       <li className="conversation-title-bar-icons">
         {showCallControls && !mdBreakpoint && (
-          <div className="buttons-group">
-            {supportsVideoCall && isVideoCallingEnabled && (
-              <button
-                type="button"
-                className="conversation-title-bar-icon"
-                title={t('tooltipConversationVideoCall')}
-                aria-label={t('tooltipConversationVideoCall')}
-                onClick={event => {
-                  currentFocusedElementRef.current = event.target as HTMLButtonElement;
-                  callActions.startVideo(conversation);
-                  showStartedCallAlert(isGroup, true);
-                }}
-                data-uie-name="do-video-call"
-              >
-                <Icon.Camera />
-              </button>
-            )}
-
-            <button
-              type="button"
-              className="conversation-title-bar-icon"
-              title={t('tooltipConversationCall')}
-              aria-label={t('tooltipConversationCall')}
-              onClick={event => {
-                currentFocusedElementRef.current = event.target as HTMLButtonElement;
-                callActions.startAudio(conversation);
-                showStartedCallAlert(isGroup);
-              }}
-              data-uie-name="do-call"
-            >
-              <Icon.Pickup />
-            </button>
-          </div>
+          <button
+            type="button"
+            className="conversation-title-bar-icon"
+            title={t('tooltipConversationCall')}
+            aria-label={t('tooltipConversationCall')}
+            onClick={event => {
+              currentFocusedElementRef.current = event.target as HTMLButtonElement;
+              startCallAndShowAlert();
+            }}
+            data-uie-name="do-call"
+            disabled={isReadOnlyConversation}
+          >
+            <CallIcon />
+          </button>
         )}
 
         {mdBreakpoint ? (
@@ -338,8 +331,9 @@ export const TitleBar: React.FC<TitleBarProps> = ({
                 css={{marginBottom: 0}}
                 onClick={onClickStartAudio}
                 data-uie-name="do-call"
+                disabled={isReadOnlyConversation}
               >
-                <Icon.Pickup />
+                <CallIcon />
               </IconButton>
             )}
           </>
@@ -352,7 +346,7 @@ export const TitleBar: React.FC<TitleBarProps> = ({
             className={cx('conversation-title-bar-icon', {active: isRightSidebarOpen})}
             data-uie-name="do-open-info"
           >
-            <Icon.Info />
+            <Icon.InfoIcon />
           </button>
         )}
       </li>
@@ -368,6 +362,24 @@ export const TitleBar: React.FC<TitleBarProps> = ({
   );
 };
 
+type BadgeKeys =
+  | 'External'
+  | 'ExternalAndGuest'
+  | 'ExternalAndGuestAndService'
+  | 'ExternalAndService'
+  | 'Federated'
+  | 'FederatedAndExternal'
+  | 'FederatedAndExternalAndGuest'
+  | 'FederatedAndExternalAndGuestAndService'
+  | 'FederatedAndExternalAndService'
+  | 'FederatedAndGuest'
+  | 'FederatedAndGuestAndService'
+  | 'FederatedAndService'
+  | 'GuestAndService'
+  | 'Service';
+
+type WarningBadgeKey = '' | 'guestRoomConversationBadge' | `${'guestRoomConversationBadge'}${BadgeKeys}`;
+
 export function generateWarningBadgeKey({
   hasFederated,
   hasExternal,
@@ -378,7 +390,7 @@ export function generateWarningBadgeKey({
   hasFederated?: boolean;
   hasGuest?: boolean;
   hasService?: boolean;
-}): StringIdentifer {
+}): WarningBadgeKey {
   const baseKey = 'guestRoomConversationBadge';
   const extras = [];
   if (hasGuest && !hasExternal && !hasService && !hasFederated) {
@@ -399,5 +411,5 @@ export function generateWarningBadgeKey({
   if (!extras.length) {
     return '';
   }
-  return `${baseKey}${extras.join('And')}` as StringIdentifer;
+  return `${baseKey}${extras.join('And')}` as WarningBadgeKey;
 }

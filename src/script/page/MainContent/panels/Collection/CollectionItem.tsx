@@ -19,12 +19,12 @@
 
 import {FC} from 'react';
 
-import {Image} from 'Components/Image';
-import {AudioAsset} from 'Components/MessagesList/Message/ContentMessage/asset/AudioAsset';
-import {FileAsset} from 'Components/MessagesList/Message/ContentMessage/asset/FileAssetComponent';
+import {AssetImage} from 'Components/Image';
+import {AudioAsset} from 'Components/MessagesList/Message/ContentMessage/asset/AudioAsset/AudioAsset';
+import {FileAsset} from 'Components/MessagesList/Message/ContentMessage/asset/FileAsset/FileAsset';
 import {LinkPreviewAsset} from 'Components/MessagesList/Message/ContentMessage/asset/LinkPreviewAssetComponent';
-import {ContentMessage} from 'src/script/entity/message/ContentMessage';
-import {MediumImage} from 'src/script/entity/message/MediumImage';
+import {ContentMessage} from 'Repositories/entity/message/ContentMessage';
+import {MediumImage} from 'Repositories/entity/message/MediumImage';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 
 import {isOfCategory} from './utils';
@@ -40,13 +40,15 @@ const CollectionItem: FC<CollectionItemProps> = ({message, onImageClick}) => {
   const firstAsset = assets[0];
   const {resource} = useKoSubscribableChildren(firstAsset as MediumImage, ['resource']);
 
-  if (isOfCategory('images', message) && resource) {
+  if (isOfCategory('images', message) && firstAsset.isImage() && resource) {
     return (
-      <Image
+      <AssetImage
+        css={{width: '110px', height: '110px'}}
         className="collection-image"
-        asset={resource}
+        image={firstAsset}
         data-uie-name="image-asset"
-        click={() => onImageClick?.(message)}
+        onClick={() => onImageClick?.(message)}
+        imageStyles={{objectFit: 'cover', objectPosition: 'center'}}
       />
     );
   }

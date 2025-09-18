@@ -18,7 +18,7 @@
  */
 
 .user-list-wrapper,
-service-list {
+.service-list {
   display: block;
 
   .user-list {
@@ -26,16 +26,18 @@ service-list {
       .text-center;
 
       margin: 106px 18px;
-      line-height: @line-height-lg;
+      line-height: var(--line-height-lg);
       white-space: pre;
     }
+
     &__header {
       .panel-header;
     }
+
     &__no-admin {
       margin: 8px 16px;
       color: #c0c0c0;
-      font-size: @font-size-xsmall;
+      font-size: var(--font-size-xsmall);
     }
   }
 }

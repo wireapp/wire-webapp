@@ -17,16 +17,8 @@
  *
  */
 
-// variables
-@link-preview-height: 88px;
-
-link-preview-asset,
 .link-preview-asset {
   .asset-container-style;
-  width: 100%;
-}
-
-.link-preview-asset {
   display: flex;
   width: 100%;
   cursor: pointer;
@@ -37,7 +29,8 @@ link-preview-asset,
 }
 
 .link-preview-image-container {
-  width: @link-preview-height;
+  width: var(--link-preview-height);
+  height: var(--link-preview-height);
   flex: 0 0 auto;
   background-color: var(--foreground-fade-24);
 }
@@ -58,7 +51,7 @@ link-preview-asset,
 .link-preview-info {
   display: flex;
   width: 0;
-  min-height: @link-preview-height;
+  min-height: var(--link-preview-height);
   flex: 1 1 auto;
   flex-direction: column;
   justify-content: center;
@@ -70,8 +63,8 @@ link-preview-asset,
 }
 
 .link-preview-info-title {
-  font-weight: @font-weight-bold;
-  line-height: @line-height-lg;
+  font-weight: var(--font-weight-bold);
+  line-height: var(--line-height-lg);
 }
 
 .link-preview-info-title-singleline {
@@ -86,6 +79,6 @@ link-preview-asset,
 
 .link-preview-info-link {
   margin-top: 4px;
-  font-size: @font-size-xs;
-  line-height: @line-height-sm;
+  font-size: var(--font-size-xsmall);
+  line-height: var(--line-height-sm);
 }

@@ -23,6 +23,13 @@
   height: 100%;
 }
 
+.tile-wrapper {
+  position: absolute;
+  top: 0;
+  width: 100%;
+  height: 100%;
+}
+
 .group-video {
   position: relative;
   width: 100%;
@@ -33,7 +40,7 @@
     overflow: hidden;
     height: 168px;
     border-radius: 8px;
-    margin: 8px;
+    margin-bottom: 8px;
 
     &--no-camera-access {
       display: flex;
@@ -41,7 +48,7 @@
       justify-content: center;
       background-color: var(--foreground-fade-16);
       color: var(--background);
-      font-size: @font-size-small;
+      font-size: var(--font-size-small);
       font-weight: 600;
       text-align: center;
       text-transform: uppercase;
@@ -61,7 +68,7 @@
       color: var(--white);
       cursor: pointer;
       opacity: 0;
-      transition: opacity @animation-timing-fast @ease-out-quart;
+      transition: opacity var(--animation-timing-fast) var(--ease-out-quart);
 
       body.theme-dark {
         background-color: var(--background-fade-40);
@@ -115,7 +122,19 @@
         &:hover {
           opacity: 1;
         }
+
         &__label {
+          .label-small-medium;
+          position: absolute;
+          top: 7px;
+          right: 7px;
+          padding: 5px 10px;
+          border-radius: 6px;
+          background-color: var(--accent-color);
+          color: var(--app-bg-secondary);
+        }
+
+        &__hand_raise_icon {
           .label-small-medium;
           position: absolute;
           top: 7px;
@@ -177,6 +196,53 @@
           }
         }
 
+        &__hand_icon {
+          position: absolute;
+          top: 10px;
+          left: 10px;
+
+          display: inline-block;
+          animation:
+            raise 0.5s ease-in-out,
+            shake 1s ease-in-out 0.5s;
+          animation-fill-mode: forwards;
+          font-size: 1.5rem;
+
+          @keyframes raise {
+            0% {
+              opacity: 0;
+              transform: translateY(10px);
+            }
+
+            100% {
+              transform: translateY(0);
+            }
+          }
+
+          @keyframes shake {
+            0% {
+              transform: rotate(0deg);
+            }
+            25% {
+              transform: rotate(-10deg);
+            }
+            50% {
+              transform: rotate(10deg);
+            }
+            75% {
+              transform: rotate(-10deg);
+            }
+            100% {
+              transform: rotate(0deg);
+            }
+          }
+        }
+
+        &__hand_icon.small {
+          top: 12px;
+          font-size: 1.2rem;
+        }
+
         &__name {
           overflow: hidden;
           text-overflow: ellipsis;
@@ -206,8 +272,8 @@
         z-index: 1;
         max-width: 50%;
         color: #fff;
-        font-size: @font-size-medium;
-        font-weight: @font-weight-bold;
+        font-size: var(--font-size-medium);
+        font-weight: var(--font-weight-bold);
         text-align: center;
       }
 

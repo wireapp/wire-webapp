@@ -28,6 +28,15 @@ const APP_ENV = {
   VIRTUAL_HOST: 'wire.ms', // The domain "wire.ms" is our virtual host for testing contact uploads
 };
 
+const DEV_ENVIRONMENT_IDENTIFIERS = {
+  EDGE: 'edge',
+  DEV: 'dev',
+  INTERNAL: 'internal',
+  LINK: 'wire.link',
+  LOCAL: 'local.',
+  STAGING: 'staging',
+} as const;
+
 const getElectronVersion = (userAgent: string): string => {
   // [match, version]
   const [, electronVersion] = /Wire(?:Internal)?\/(\S+)/i.exec(userAgent) || [];
@@ -36,7 +45,46 @@ const getElectronVersion = (userAgent: string): string => {
 
 const isLocalhost = (): boolean => [APP_ENV.LOCALHOST, APP_ENV.VIRTUAL_HOST].includes(window.location.hostname);
 const isProduction = (): boolean => {
-  return window.wire.env.ENVIRONMENT === BackendEnvironment.PRODUCTION;
+  return Config.getConfig().ENVIRONMENT === BackendEnvironment.PRODUCTION;
+};
+export const getWebEnvironment = () => {
+  const {APP_BASE} = Config.getConfig();
+
+  const environment = {
+    isEdge: false,
+    isStaging: false,
+    isDev: false,
+    isInternal: false,
+    isLinked: false,
+    isLocalhost: false,
+    isProduction: false,
+    name: '',
+  };
+
+  if (APP_BASE.includes(DEV_ENVIRONMENT_IDENTIFIERS.LOCAL) || isLocalhost()) {
+    environment.isLocalhost = true;
+    environment.name = 'Localhost';
+  } else if (APP_BASE.includes(DEV_ENVIRONMENT_IDENTIFIERS.EDGE)) {
+    environment.isEdge = true;
+    environment.name = 'Edge Environment';
+  } else if (APP_BASE.includes(DEV_ENVIRONMENT_IDENTIFIERS.STAGING)) {
+    environment.isStaging = true;
+    environment.name = 'Staging Environment';
+  } else if (APP_BASE.includes(DEV_ENVIRONMENT_IDENTIFIERS.DEV)) {
+    environment.isDev = true;
+    environment.name = 'Dev Environment';
+  } else if (APP_BASE.includes(DEV_ENVIRONMENT_IDENTIFIERS.INTERNAL)) {
+    environment.isInternal = true;
+    environment.name = 'Internal Environment';
+  } else if (APP_BASE.includes(DEV_ENVIRONMENT_IDENTIFIERS.LINK)) {
+    environment.isLinked = true;
+    environment.name = 'Linked Environment';
+  } else if (isProduction()) {
+    environment.isProduction = true;
+    environment.name = 'Production Environment';
+  }
+
+  return environment;
 };
 
 interface Environment {
@@ -49,6 +97,7 @@ interface Environment {
     isProduction: typeof isProduction;
   };
   version: (showWrapperVersion?: boolean) => string;
+  avsVersion: () => string;
 }
 
 export const Environment: Environment = {
@@ -67,4 +116,5 @@ export const Environment: Environment = {
     const showElectronVersion = electronVersion && showWrapperVersion;
     return showElectronVersion ? electronVersion : Config.getConfig().VERSION;
   },
+  avsVersion: (): string => Config.getConfig().AVS_VERSION,
 };

@@ -18,11 +18,12 @@
  */
 
 import {CONV_TYPE, CALL_TYPE, VIDEO_STATE} from '@wireapp/avs';
+import ko from 'knockout';
 
-import {Call} from 'src/script/calling/Call';
-import {Participant} from 'src/script/calling/Participant';
-import {getGrid} from 'src/script/calling/videoGridHandler';
-import {User} from 'src/script/entity/User';
+import {Call} from 'Repositories/calling/Call';
+import {Participant} from 'Repositories/calling/Participant';
+import {getGrid} from 'Repositories/calling/videoGridHandler';
+import {User} from 'Repositories/entity/User';
 describe('videoGridHandler', () => {
   let participants;
 
@@ -70,10 +71,10 @@ describe('videoGridHandler', () => {
         selfUser.isMe = true;
         const selfParticipant = new Participant(selfUser, 'selfdevice');
         selfParticipant.videoState(VIDEO_STATE.STARTED);
-        selfParticipant.videoStream({});
+        selfParticipant.videoStream({getVideoTracks: () => []});
         const call = new Call('', '', undefined, selfParticipant, CALL_TYPE.NORMAL, {
           currentAvailableDeviceId: {
-            audioOutput: ko.pureComputed(() => 'test'),
+            audiooutput: ko.pureComputed(() => 'test'),
           },
         });
         call.participants = participantsObs;
@@ -95,7 +96,7 @@ describe('videoGridHandler', () => {
         const selfParticipant = generateVideoParticipant('self', true);
         const call = new Call('', '', CONV_TYPE.ONEONONE, selfParticipant, CALL_TYPE.NORMAL, {
           currentAvailableDeviceId: {
-            audioOutput: ko.pureComputed(() => 'test'),
+            audiooutput: ko.pureComputed(() => 'test'),
           },
         });
         call.addParticipant(participants[0]);
@@ -111,7 +112,7 @@ describe('videoGridHandler', () => {
         const selfParticipant = generateVideoParticipant('self', true);
         const call = new Call('', '', CONV_TYPE.GROUP, selfParticipant, CALL_TYPE.NORMAL, {
           currentAvailableDeviceId: {
-            audioOutput: ko.pureComputed(() => 'test'),
+            audiooutput: ko.pureComputed(() => 'test'),
           },
         });
         call.addParticipant(participants[0]);
@@ -127,7 +128,7 @@ describe('videoGridHandler', () => {
         const selfParticipant = generateVideoParticipant('self', true);
         const call = new Call('', '', CONV_TYPE.GROUP, selfParticipant, CALL_TYPE.NORMAL, {
           currentAvailableDeviceId: {
-            audioOutput: ko.pureComputed(() => 'test'),
+            audiooutput: ko.pureComputed(() => 'test'),
           },
         });
         call.updatePages();
@@ -142,7 +143,7 @@ describe('videoGridHandler', () => {
         const selfParticipant = generateVideoParticipant('self', true);
         const call = new Call('', '', CONV_TYPE.GROUP, selfParticipant, CALL_TYPE.NORMAL, {
           currentAvailableDeviceId: {
-            audioOutput: ko.pureComputed(() => 'test'),
+            audiooutput: ko.pureComputed(() => 'test'),
           },
         });
         call.addParticipant(participants[0]);

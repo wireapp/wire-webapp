@@ -17,23 +17,32 @@
  *
  */
 
-import wrtc from '@koush/wrtc';
+import {nonstandard, RTCRtpSender, MediaStream} from '@roamhq/wrtc';
 
-const {RTCAudioSource} = wrtc.nonstandard;
+const {RTCAudioSource} = nonstandard;
 
 declare global {
   interface Window {
-    MediaStream: typeof wrtc.MediaStream;
+    MediaStream: typeof MediaStream;
     RTCAudioSource: typeof RTCAudioSource;
+    RTCRtpSender: typeof RTCRtpSender;
   }
 }
+const RTCRtpSenderMock = {
+  prototype: {createEncodedVideoStreams: {}, createEncodedStreams: {}, transform: {}},
+};
 
 Object.defineProperty(window, 'MediaStream', {
-  value: wrtc.MediaStream,
+  value: MediaStream,
   writable: true,
 });
 
 Object.defineProperty(window, 'RTCAudioSource', {
   value: RTCAudioSource,
+  writable: true,
+});
+
+Object.defineProperty(window, 'RTCRtpSender', {
+  value: RTCRtpSenderMock,
   writable: true,
 });

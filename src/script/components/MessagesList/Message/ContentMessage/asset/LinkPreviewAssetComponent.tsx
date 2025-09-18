@@ -17,22 +17,22 @@
  *
  */
 
-import React from 'react';
+import React, {UIEvent, useRef} from 'react';
 
 import cx from 'classnames';
 
 import {Image} from 'Components/Image';
+import type {ContentMessage} from 'Repositories/entity/message/ContentMessage';
+import type {Text} from 'Repositories/entity/message/Text';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
-import {handleKeyDown} from 'Util/KeyboardUtil';
+import {handleKeyDown, KEY} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
 import {safeWindowOpen} from 'Util/SanitizationUtil';
-import {cleanURL} from 'Util/UrlUtil';
+import {cleanURL, prependProtocol} from 'Util/UrlUtil';
 import {isTweetUrl} from 'Util/ValidationUtil';
 
-import {AssetHeader} from './AssetHeader';
+import {AssetHeader} from './common/AssetHeader/AssetHeader';
 
-import type {ContentMessage} from '../../../../../entity/message/ContentMessage';
-import type {Text} from '../../../../../entity/message/Text';
 import {useMessageFocusedTabIndex} from '../../util';
 
 export interface LinkPreviewAssetProps {
@@ -54,8 +54,13 @@ const LinkPreviewAsset: React.FC<LinkPreviewAssetProps> = ({header = false, mess
   const {isObfuscated} = useKoSubscribableChildren(message, ['isObfuscated']);
   const messageFocusedTabIndex = useMessageFocusedTabIndex(isFocusable);
 
-  const onClick = () => {
-    if (!message.isExpired()) {
+  const linkRef = useRef<HTMLAnchorElement>(null);
+
+  const onClick = ({target}: UIEvent) => {
+    // Clicking on the link directly will already open the link, so we don't want to open it manually
+    const wasLinkClicked = target === linkRef.current;
+
+    if (!message.isExpired() && !wasLinkClicked) {
       safeWindowOpen(preview?.url);
     }
   };
@@ -84,11 +89,16 @@ const LinkPreviewAsset: React.FC<LinkPreviewAssetProps> = ({header = false, mess
       tabIndex={messageFocusedTabIndex}
       className="link-preview-asset"
       onClick={onClick}
-      onKeyDown={e => handleKeyDown(e, onClick)}
+      onKeyDown={event => handleKeyDown({event, callback: () => onClick(event), keys: [KEY.ENTER, KEY.SPACE]})}
     >
       <div className="link-preview-image-container">
         {preview && previewImage ? (
-          <Image className="link-preview-image" asset={previewImage} data-uie-name="link-preview-image" />
+          <Image
+            className="link-preview-image"
+            imageStyles={{height: '100%', objectFit: 'cover', objectPosition: 'center'}}
+            image={previewImage}
+            data-uie-name="link-preview-image"
+          />
         ) : (
           <div className="link-preview-image-placeholder icon-link" />
         )}
@@ -116,13 +126,17 @@ const LinkPreviewAsset: React.FC<LinkPreviewAssetProps> = ({header = false, mess
                 <p>{t('conversationTweetAuthor')}</p>
               </div>
             ) : (
-              <p
+              <a
                 className="link-preview-info-link text-foreground ellipsis"
+                href={prependProtocol(preview.url)}
+                target="_blank"
+                rel="noopener noreferrer"
                 title={preview.url}
                 data-uie-name="link-preview-url"
+                ref={linkRef}
               >
                 {cleanURL(preview.url)}
-              </p>
+              </a>
             )}
           </>
         )}

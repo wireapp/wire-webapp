@@ -18,7 +18,7 @@
  */
 
 .spinner:extend(.spin-slow) {
-  .circle(@avatar-diameter-l);
+  .circle(var(--avatar-diameter-l));
 
   position: relative;
   background: @accent_colors-1;
@@ -35,7 +35,8 @@
     right: -1px;
     bottom: -1px;
     left: -1px;
-    background: linear-gradient(0deg, hsla(0, 0, 100%, 1) 50%, hsla(0, 0, 100%, 0.9) 100%) 0 0,
+    background:
+      linear-gradient(0deg, hsla(0, 0, 100%, 1) 50%, hsla(0, 0, 100%, 0.9) 100%) 0 0,
       linear-gradient(90deg, hsla(0, 0, 100%, 0.9) 0, hsla(0, 0, 100%, 0.6) 100%) 100% 0,
       linear-gradient(180deg, hsla(0, 0, 100%, 0.6) 0, hsla(0, 0, 100%, 0.3) 100%) 100% 100%,
       linear-gradient(360deg, hsla(0, 0, 100%, 0.3) 0, hsla(0, 0, 100%, 0) 100%) 0 100%;

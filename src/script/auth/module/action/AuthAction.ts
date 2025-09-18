@@ -18,7 +18,7 @@
  */
 
 import type {DomainData} from '@wireapp/api-client/lib/account/DomainData';
-import type {LoginData, RegisterData, SendLoginCode} from '@wireapp/api-client/lib/auth/';
+import type {LoginData, RegisterData} from '@wireapp/api-client/lib/auth/';
 import {VerificationActionType} from '@wireapp/api-client/lib/auth/VerificationActionType';
 import {ClientType} from '@wireapp/api-client/lib/client/';
 import {BackendError, BackendErrorLabel, SyntheticErrorLabel} from '@wireapp/api-client/lib/http';
@@ -28,32 +28,23 @@ import type {TeamData} from '@wireapp/api-client/lib/team/';
 import {LowDiskSpaceError} from '@wireapp/store-engine/lib/engine/error';
 import {StatusCodes as HTTP_STATUS, StatusCodes} from 'http-status-codes';
 
-import type {CRUDEngine} from '@wireapp/store-engine';
-import {SQLeetEngine} from '@wireapp/store-engine-sqleet';
-
-import {isAxiosError, isBackendError} from 'Util/TypePredicateUtil';
-import {isTemporaryClientAndNonPersistent} from 'Util/util';
+import {isBackendError} from 'Util/TypePredicateUtil';
 
 import {AuthActionCreator} from './creator/';
 import {LabeledError} from './LabeledError';
 import {LocalStorageAction, LocalStorageKey} from './LocalStorageAction';
 
-import {currentCurrency, currentLanguage} from '../../localeConfig';
+import {currentLanguage} from '../../localeConfig';
 import type {Api, RootState, ThunkAction, ThunkDispatch} from '../reducer';
 import type {LoginDataState, RegistrationDataState} from '../reducer/authReducer';
 
 type LoginLifecycleFunction = (dispatch: ThunkDispatch, getState: () => RootState, global: Api) => Promise<void>;
 
-export class AuthAction {
-  doFlushDatabase = (): ThunkAction => {
-    return async (dispatch, getState, {core}) => {
-      const storeEngine: CRUDEngine = (core as any).storeEngine;
-      if (storeEngine instanceof SQLeetEngine) {
-        await (core as any).storeEngine.save();
-      }
-    };
-  };
+const isSystemKeychainAccessError = (error: any): error is Error => {
+  return error instanceof Error && error.message.includes('cryption is not available');
+};
 
+export class AuthAction {
   doLogin = (loginData: LoginData, getEntropy?: () => Promise<Uint8Array>): ThunkAction => {
     const onBeforeLogin: LoginLifecycleFunction = async (dispatch, getState, {actions: {authAction}}) =>
       dispatch(authAction.doSilentLogout());
@@ -66,6 +57,7 @@ export class AuthAction {
     code: string,
     uri?: string,
     getEntropy?: () => Promise<Uint8Array>,
+    password?: string,
   ): ThunkAction => {
     const onBeforeLogin: LoginLifecycleFunction = async (dispatch, getState, {actions: {authAction}}) =>
       dispatch(authAction.doSilentLogout());
@@ -74,7 +66,7 @@ export class AuthAction {
       getState,
       {actions: {localStorageAction, conversationAction}},
     ) => {
-      const conversation = await dispatch(conversationAction.doJoinConversationByCode(key, code, uri));
+      const conversation = await dispatch(conversationAction.doJoinConversationByCode(key, code, uri, password));
       const domain = conversation?.qualified_conversation?.domain;
       return (
         conversation &&
@@ -129,21 +121,11 @@ export class AuthAction {
           if (error instanceof LowDiskSpaceError) {
             error = new LabeledError(LabeledError.GENERAL_ERRORS.LOW_DISK_SPACE, error);
           }
+          if (isSystemKeychainAccessError(error)) {
+            error = new LabeledError(LabeledError.GENERAL_ERRORS.SYSTEM_KEYCHAIN_ACCESS, error);
+          }
           dispatch(AuthActionCreator.failedLogin(error));
         }
-        throw error;
-      }
-    };
-  };
-
-  doSendPhoneLoginCode = (loginRequest: Omit<SendLoginCode, 'voice_call'>): ThunkAction => {
-    return async (dispatch, getState, {apiClient}) => {
-      dispatch(AuthActionCreator.startSendPhoneLoginCode());
-      try {
-        const {expires_in} = await apiClient.api.auth.postLoginSend(loginRequest);
-        dispatch(AuthActionCreator.successfulSendPhoneLoginCode(expires_in));
-      } catch (error) {
-        dispatch(AuthActionCreator.failedSendPhoneLoginCode(error));
         throw error;
       }
     };
@@ -174,7 +156,7 @@ export class AuthAction {
          * We don't want to block the user from logging in if they have already received a code in the last few minutes.
          * Any other error should still be thrown.
          */
-        if (isAxiosError(error) && error.response?.status === StatusCodes.TOO_MANY_REQUESTS) {
+        if (isBackendError(error) && SyntheticErrorLabel.TOO_MANY_REQUESTS === error.label) {
           dispatch(AuthActionCreator.successfulSendTwoFactorCode());
           return;
         }
@@ -291,32 +273,7 @@ export class AuthAction {
     };
   };
 
-  doRegisterTeam = (registration: RegisterData): ThunkAction => {
-    return async (dispatch, getState, {getConfig, core, actions: {clientAction, selfAction, localStorageAction}}) => {
-      const clientType = ClientType.PERMANENT;
-      registration.locale = currentLanguage();
-      registration.name = registration.name.trim();
-      registration.email = registration.email.trim();
-      registration.team.icon = 'default';
-      registration.team.currency = currentCurrency();
-      registration.team.name = registration.team.name.trim();
-
-      dispatch(AuthActionCreator.startRegisterTeam());
-      try {
-        await dispatch(this.doSilentLogout());
-        await core.register(registration, clientType);
-        await this.persistClientData(clientType, dispatch, localStorageAction);
-        await dispatch(selfAction.fetchSelf());
-        await dispatch(clientAction.doInitializeClient(clientType));
-        dispatch(AuthActionCreator.successfulRegisterTeam(registration));
-      } catch (error) {
-        dispatch(AuthActionCreator.failedRegisterTeam(error));
-        throw error;
-      }
-    };
-  };
-
-  doRegisterPersonal = (registration: RegisterData, entropyData: Uint8Array): ThunkAction => {
+  doRegisterPersonal = (registration: RegisterData, entropyData?: Uint8Array): ThunkAction => {
     return async (
       dispatch,
       getState,
@@ -364,7 +321,6 @@ export class AuthAction {
         await dispatch(selfAction.fetchSelf());
         await (clientType !== ClientType.NONE &&
           dispatch(clientAction.doInitializeClient(clientType, undefined, undefined, entropyData)));
-        await dispatch(authAction.doFlushDatabase());
         dispatch(AuthActionCreator.successfulRegisterWireless(registrationData));
       } catch (error) {
         dispatch(AuthActionCreator.failedRegisterWireless(error));
@@ -425,13 +381,6 @@ export class AuthAction {
     return async (dispatch, getState, {getConfig, core, actions: {localStorageAction}}) => {
       try {
         await core.logout();
-        if (isTemporaryClientAndNonPersistent(false)) {
-          /**
-           * WEBAPP-6804: Our current implementation of "websql" has the drawback that a mounted database can only get unmounted by refreshing the page.
-           * @see https://github.com/wireapp/websql/blob/v0.0.15/packages/worker/src/Database.ts#L142-L145
-           */
-          window.location.reload();
-        }
         dispatch(AuthActionCreator.successfulLogout());
       } catch (error) {
         dispatch(AuthActionCreator.failedLogout(error));
@@ -447,24 +396,6 @@ export class AuthAction {
       } catch (error) {
         dispatch(AuthActionCreator.failedLogout(error));
       }
-    };
-  };
-
-  enterPersonalCreationFlow = (): ThunkAction => {
-    return async dispatch => {
-      dispatch(AuthActionCreator.enterPersonalCreationFlow());
-    };
-  };
-
-  enterTeamCreationFlow = (): ThunkAction => {
-    return async dispatch => {
-      dispatch(AuthActionCreator.enterTeamCreationFlow());
-    };
-  };
-
-  enterGenericInviteCreationFlow = (): ThunkAction => {
-    return async dispatch => {
-      dispatch(AuthActionCreator.enterGenericInviteCreationFlow());
     };
   };
 

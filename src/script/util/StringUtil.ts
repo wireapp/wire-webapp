@@ -19,9 +19,8 @@
 
 import getSlug from 'speakingurl';
 
+import type {User} from 'Repositories/entity/User';
 import {randomElement} from 'Util/ArrayUtil';
-
-import type {User} from '../entity/User';
 
 export const startsWith = (string = '', query: string): boolean => string.toLowerCase().startsWith(query.toLowerCase());
 export const includesString = (string = '', query = ''): boolean => string.toLowerCase().includes(query.toLowerCase());
@@ -50,9 +49,13 @@ export const getRandomChar = (): string => {
 };
 
 export const obfuscate = (text: string): string => {
-  /* cspell:disable-next-line */
-  const alphabet = Array.from('abcdefghijklmnopqrstuvwxyz');
-  return Array.from(text, char => (/\s/.test(char) ? char : randomElement(alphabet))).join('');
+  const alphabet = Array.from('abcdefghijklmnopqrstuvwxyz ');
+
+  const obfuscatedText = Array.from({length: text.length + Math.floor((1 + Math.random()) * 10)}, () =>
+    randomElement(alphabet),
+  ).join('');
+
+  return obfuscatedText;
 };
 
 /**
@@ -214,3 +217,71 @@ const accentsMap: Record<string, string> = {
  * @returns new string with replaced accents charachters
  */
 export const replaceAccents = (text: string) => getSlug(text, {custom: accentsMap, uric: true});
+
+/**
+ * generate a random password
+ * @param passwordLength the desired length of the password
+ * @returns the newly generated password
+ */
+export const generateRandomPassword = (passwordLength: number = 8): string => {
+  // Define strings containing all possible lowercase letters, uppercase letters, numbers, and special characters
+  const lowercaseChars = 'abcdefghijklmnopqrstuvwxyz';
+  const uppercaseChars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+  const numericChars = '0123456789';
+  const specialChars = '!@#$%^&*()_+-={}[];\',.?/~`|:"<>';
+
+  // Concatenate all possible characters into a single string
+  const allChars = lowercaseChars + uppercaseChars + numericChars + specialChars;
+
+  // Helper function to get a secure random index
+  const getRandomIndex = (max: number): number => {
+    const randomValues = new Uint32Array(1);
+    crypto.getRandomValues(randomValues);
+    return randomValues[0] % max;
+  };
+
+  // Calculate the number of characters to add to the password to meet the minimum requirements
+  const minRequiredChars = 4;
+  const additionalChars = Math.max(0, passwordLength - minRequiredChars);
+
+  // Add one random lowercase letter, one random uppercase letter, one random number, and one random special character to the password
+  let password = '';
+  password += lowercaseChars[getRandomIndex(lowercaseChars.length)];
+  password += uppercaseChars[getRandomIndex(uppercaseChars.length)];
+  password += numericChars[getRandomIndex(numericChars.length)];
+  password += specialChars[getRandomIndex(specialChars.length)];
+
+  // Add additional random characters to the password using all possible characters
+  for (let i = 0; i < additionalChars; i++) {
+    password += allChars[getRandomIndex(allChars.length)];
+  }
+
+  // Shuffle the characters of the password randomly to make it more secure
+  password = password
+    .split('')
+    .sort(() => getRandomIndex(2) - 1) // Generates either -1 or 1 for shuffling
+    .join('');
+
+  // Truncate the password to the desired length if necessary
+  password = password.slice(0, passwordLength);
+
+  // Return the resulting password as a string
+  return password;
+};
+
+/**
+ * Checks if a given password meets the specified conditions.
+ * The password must:
+ * - Have at least one uppercase letter
+ * - Have at least one lowercase letter
+ * - Have at least one number
+ * - Have at least one symbol
+ * - Have a minimum length of 8 characters
+ *
+ * @param {string} password - The password to be checked.
+ * @returns {boolean} True if the password meets all conditions, false otherwise.
+ */
+export function isValidPassword(password: string): boolean {
+  const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^\da-zA-Z]).{8,}$/;
+  return passwordRegex.test(password);
+}

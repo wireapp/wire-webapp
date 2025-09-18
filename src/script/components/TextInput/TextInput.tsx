@@ -21,7 +21,7 @@ import React, {forwardRef, useEffect} from 'react';
 
 import {CheckIcon, COLOR} from '@wireapp/react-ui-kit';
 
-import {Icon} from 'Components/Icon';
+import * as Icon from 'Components/Icon';
 import {isTabKey} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
 
@@ -142,7 +142,7 @@ const TextInput = forwardRef<HTMLInputElement, UserInputProps>(
               }
             }}
           >
-            <Icon.Close css={{fill: 'var(--text-input-background)', height: 8, width: 8}} />
+            <Icon.CloseIcon css={{fill: 'var(--text-input-background)', height: 8, width: 8}} />
           </button>
         )}
         {isSuccess && !isError && <CheckIcon css={getIconCSS(changedColor)} color={COLOR.TEXT} />}

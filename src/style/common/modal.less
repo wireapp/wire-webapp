@@ -47,7 +47,7 @@
     transition-delay: 0.35s;
     transition-duration: 0.55s;
     transition-property: opacity;
-    transition-timing-function: @ease-out-quart;
+    transition-timing-function: var(--ease-out-quart);
   }
 
   .modal-header {
@@ -60,7 +60,7 @@
       transition-delay: 0s;
       transition-duration: 0.35s;
       transition-property: opacity;
-      transition-timing-function: @ease-out-quart;
+      transition-timing-function: var(--ease-out-quart);
     }
 
     .modal-content {
@@ -86,7 +86,7 @@
       position: absolute;
       top: 24px;
       right: 24px;
-      font-weight: @font-weight-bold;
+      font-weight: var(--font-weight-bold);
     }
 
     @media (max-width: 600px) {
@@ -99,21 +99,21 @@
       .text-center;
 
       position: relative;
-      margin-bottom: @line-height-lg;
-      line-height: @line-height-lg;
+      margin-bottom: var(--line-height-lg);
+      line-height: var(--line-height-lg);
     }
 
     section {
       display: flex;
       padding-bottom: 24px;
-      font-size: @font-size-xs;
+      font-size: var(--font-size-xsmall);
 
       &:not(:first-child) {
         padding-top: 24px;
       }
 
       &:not(:last-child) {
-        border-bottom: 1px solid @separator-color;
+        border-bottom: 1px solid var(--separator-color);
       }
     }
   }
@@ -137,14 +137,14 @@
   .modal-title {
     padding-right: 48px;
     margin-bottom: 16px;
-    font-weight: @font-weight-bold;
-    line-height: @line-height-lg;
+    font-weight: var(--font-weight-bold);
+    line-height: var(--line-height-lg);
   }
 
   .modal-text {
     padding-right: 32px;
     margin-bottom: 16px;
-    line-height: @line-height-lg;
+    line-height: var(--line-height-lg);
     overflow-wrap: break-word;
   }
 
@@ -197,7 +197,7 @@
   transition-delay: 0s, 0s;
   transition-duration: 0.35s, 0.35s;
   transition-property: transform, opacity;
-  transition-timing-function: @ease-in-expo, @ease-in-expo;
+  transition-timing-function: var(--ease-in-expo), var(--ease-in-expo);
 }
 
 .modal-content-anim-open {
@@ -206,7 +206,7 @@
   transition-delay: 0.15s, 0.15s;
   transition-duration: 0.55s, 0.55s;
   transition-property: transform, opacity;
-  transition-timing-function: @ease-out-expo, @ease-out-expo;
+  transition-timing-function: var(--ease-out-expo), var(--ease-out-expo);
 }
 
 .modal {
@@ -221,11 +221,11 @@
     opacity: 0;
     overflow-x: hidden;
     overflow-y: auto;
-    transition: opacity 0.15s @ease-out-quart;
+    transition: opacity 0.15s var(--ease-out-quart);
 
     &--visible {
       opacity: 1;
-      transition: opacity 0.25s @ease-out-quart;
+      transition: opacity 0.25s var(--ease-out-quart);
     }
   }
   &__loading {
@@ -255,23 +255,23 @@
     border: var(--gray-10);
     border-radius: 4px;
     margin: auto;
-    animation: scaleIn 0.35s @ease-out-quart;
+    animation: scaleIn 0.35s var(--ease-out-quart);
     background-color: var(--white);
     cursor: default;
-    font-size: @font-size-base;
+    font-size: var(--font-size-base);
     justify-self: center;
     overflow-y: hidden;
 
     transform: scale(0.8);
-    transition: transform 0.35s @ease-out-quart;
+    transition: transform 0.35s var(--ease-out-quart);
 
     &__device-list {
       .label-xs;
 
       margin-bottom: 16px;
-      line-height: @line-height-sm;
+      line-height: var(--line-height-sm);
 
-      & div:nth-child(even) {
+      & div:nth-of-type(even) {
         margin-bottom: 16px;
       }
     }
@@ -282,13 +282,16 @@
   }
 
   &__header {
-    position: relative;
-    min-height: 24px;
-    padding-top: 12px;
+    position: sticky;
+    top: 0;
+    min-height: 32px;
+    padding: 32px 32px 0 32px;
     margin-bottom: 20px;
+    background-color: var(--modal-bg);
     color: var(--main-color);
     fill: var(--main-color);
     text-align: center;
+    white-space: pre-line;
 
     &__title {
       margin: 0;
@@ -301,8 +304,8 @@
     &__button {
       .button-reset-default;
       position: absolute;
-      top: -6px;
-      right: -5px;
+      top: 16px;
+      right: 16px;
 
       display: flex;
       width: 16px;
@@ -317,7 +320,7 @@
 
       &__left {
         right: unset;
-        left: -6px;
+        left: 16px;
       }
     }
     &__icon {
@@ -330,7 +333,7 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding-top: 0;
+      padding: 16px 16px;
 
       .modal__header {
         &__button {
@@ -343,16 +346,23 @@
   }
 
   &__body {
-    overflow: visible;
+    overflow: auto;
+    padding: 0 16px;
   }
 
   &__buttons {
+    position: sticky;
+    right: 0;
+    bottom: 0;
+    left: 0;
     display: flex;
     justify-content: flex-end;
-    margin-top: 20px;
+    margin: 20px;
+    background-color: var(--modal-bg);
     --button-color: var(--accent-color);
 
     &--column {
+      position: relative;
       flex-direction: column;
     }
   }
@@ -391,7 +401,7 @@
 
   &__title {
     margin: 8px 0;
-    font-weight: @font-weight-bold;
+    font-weight: var(--font-weight-bold);
   }
 
   &__message {
@@ -449,21 +459,21 @@
   &__info {
     margin: 8px 0 24px;
     color: var(--gray-80);
-    font-size: @font-size-small;
-    line-height: @line-height-xs;
+    font-size: var(--font-size-small);
+    line-height: var(--line-height-xs);
   }
 
   &__cta {
     margin: 32px 0;
     color: @w-blue;
     cursor: pointer;
-    font-size: @font-size-xs;
-    font-weight: @font-weight-bold;
+    font-size: var(--font-size-xsmall);
+    font-weight: var(--font-weight-bold);
     white-space: nowrap;
 
     &--input {
       margin: 8px 0;
-      font-weight: @font-weight-regular;
+      font-weight: var(--font-weight-regular);
       text-align: right;
     }
   }
@@ -497,20 +507,20 @@ body.theme-dark {
     }
     &__header {
       margin-bottom: 32px;
-      font-size: @font-size-md;
+      font-size: var(--font-size-large);
       text-transform: initial;
     }
 
     &__label {
       margin-bottom: 0;
-      font-size: @font-size-xs;
+      font-size: var(--font-size-xsmall);
     }
     &__cta {
       margin: 32px 0;
       color: @w-blue;
       cursor: pointer;
-      font-size: @font-size-sm;
-      font-weight: @font-weight-bold;
+      font-size: var(--font-size-base);
+      font-weight: var(--font-weight-bold);
       text-align: center;
       white-space: nowrap;
     }
@@ -521,9 +531,9 @@ body.theme-dark {
     &__passcode__info {
       margin: 2px 0;
       color: var(--foreground);
-      font-size: @font-size-xs;
+      font-size: var(--font-size-xsmall);
       font-weight: 600;
-      line-height: @line-height-sm;
+      line-height: var(--line-height-sm);
       &:before {
         position: relative;
         top: 2px;

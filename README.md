@@ -37,15 +37,54 @@ Prerequisites:
 1. Add the following entries to your hosts file (macOS / Linux: `/etc/hosts`, Windows 10: `%WINDIR%\system32\drivers\etc\hosts`):
    - `127.0.0.1 local.wire.com` (to connect with production backend)
    - `127.0.0.1 local.zinfra.io` (to connect with staging backend)
+   - `127.0.0.1 local.imai.wire.link` (to connect with imai backend)
 1. Run `yarn start` and Wire's web app will be available at: https://local.zinfra.io:8081/auth/
 
 #### Install the self-signed certificate
 
-If you would like your browser to trust the certificate from "local.wire.com" or "local.zinfra.io":
+If you would like your browser to trust the certificate from "local.wire.com"/"local.zinfra.io"/"local.imai.wire.link":
 
 1. Download [mkcert](https://github.com/FiloSottile/mkcert/releases/latest)
 1. Set the `CAROOT` environment variable to `<WebApp Dir>/server/certificate`
 1. Run `mkcert -install`
+
+#### Environment Configuration
+
+The application can be configured to connect to different environments by modifying the following environment variables in your `.env` file:
+
+**Production:**
+
+```
+APP_BASE="https://local.wire.com:8081"
+BACKEND_REST="https://prod-nginz-https.wire.com"
+BACKEND_WS="https://prod-nginz-ssl.wire.com"
+```
+
+**Staging:**
+
+```
+APP_BASE="https://local.zinfra.io:8081"
+BACKEND_REST="https://nginz-https.zinfra.io"
+BACKEND_WS="https://nginz-ssl.zinfra.io"
+```
+
+**Imai:**
+
+```
+APP_BASE="https://local.imai.wire.link:8081"
+BACKEND_REST="https://nginz-https.imai.wire.link"
+BACKEND_WS="https://nginz-ssl.imai.wire.link"
+```
+
+**Local:**
+
+```
+APP_BASE="http://localhost:8081"
+BACKEND_REST="http://localhost:8080"
+BACKEND_WS="ws://localhost:8080"
+```
+
+After updating the environment variables, the app will be available at the corresponding `APP_BASE` URL.
 
 ### Production
 
@@ -90,8 +129,8 @@ username: your-username
 
 **Usage:**
 
-1. Add string variable to "src/script/strings.ts" (source for the React part of our app) and text to "i18n/en-US.json" (source for the Knockout part of our app)
-1. Create a PR and merge it after approval. When the PR gets merged, our CI will take care of uploading the english texts to Crowdin.
+1. Add string variable to "i18n/en-US.json"
+2. Create a PR and merge it after approval. When the PR gets merged, our CI will take care of uploading the english texts to Crowdin.
 
 If our CI pipeline is broken, you still have the option to upload new strings manually. For this case do the following:
 

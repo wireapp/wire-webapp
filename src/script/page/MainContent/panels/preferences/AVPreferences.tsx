@@ -17,9 +17,14 @@
  *
  */
 
-import React from 'react';
+import {memo} from 'react';
 
-import {useKoSubscribableChildren} from 'Util/ComponentUtil';
+import {useInitializeMediaDevices} from 'Hooks/useInitializeMediaDevices';
+import type {CallingRepository} from 'Repositories/calling/CallingRepository';
+import {ElectronDesktopCapturerSource} from 'Repositories/media/MediaDevicesHandler';
+import type {MediaDeviceType} from 'Repositories/media/MediaDeviceType';
+import type {MediaRepository} from 'Repositories/media/MediaRepository';
+import type {PropertiesRepository} from 'Repositories/properties/PropertiesRepository';
 import {t} from 'Util/LocalizerUtil';
 
 import {AudioOutPreferences} from './avPreferences/AudioOutPreferences';
@@ -28,43 +33,54 @@ import {CameraPreferences} from './avPreferences/CameraPreferences';
 import {MicrophonePreferences} from './avPreferences/MicrophonePreferences';
 import {SaveCallLogs} from './avPreferences/SaveCallLogs';
 import {PreferencesPage} from './components/PreferencesPage';
-
-import type {CallingRepository} from '../../../../calling/CallingRepository';
-import {DeviceTypes} from '../../../../media/MediaDevicesHandler';
-import type {MediaRepository} from '../../../../media/MediaRepository';
-import type {PropertiesRepository} from '../../../../properties/PropertiesRepository';
+import {useCameraReloadOnCallEnd} from './useCameraReloadOnCallEnd';
 
 interface AVPreferencesProps {
   callingRepository: CallingRepository;
   mediaRepository: MediaRepository;
   propertiesRepository: PropertiesRepository;
+  deviceSupport: Pick<
+    Record<MediaDeviceType, boolean>,
+    MediaDeviceType.AUDIO_INPUT | MediaDeviceType.AUDIO_OUTPUT | MediaDeviceType.VIDEO_INPUT
+  >;
+  availableDevices: (MediaDeviceInfo | ElectronDesktopCapturerSource)[];
+  currentDeviceId: string;
 }
 
-const AVPreferences: React.FC<AVPreferencesProps> = ({
+const AVPreferencesComponent = ({
   mediaRepository: {devicesHandler, constraintsHandler, streamHandler},
   propertiesRepository,
   callingRepository,
-}) => {
-  const deviceSupport = useKoSubscribableChildren(devicesHandler?.deviceSupport, [
-    DeviceTypes.AUDIO_INPUT,
-    DeviceTypes.AUDIO_OUTPUT,
-    DeviceTypes.VIDEO_INPUT,
-  ]);
+  deviceSupport,
+  availableDevices,
+  currentDeviceId,
+}: AVPreferencesProps) => {
+  const {shouldReloadCamera} = useCameraReloadOnCallEnd(callingRepository);
+  const {areMediaDevicesInitialized} = useInitializeMediaDevices(devicesHandler, streamHandler);
 
   return (
     <PreferencesPage title={t('preferencesAV')}>
-      {deviceSupport.audioInput && (
+      {!areMediaDevicesInitialized && (
+        <div className="preferences-av-spinner-select">
+          <div className="icon-spinner spin accent-text"></div>
+        </div>
+      )}
+      {areMediaDevicesInitialized && deviceSupport.audioinput && (
         <MicrophonePreferences
           {...{devicesHandler, streamHandler}}
           refreshStream={() => callingRepository.refreshAudioInput()}
+          hasActiveCall={callingRepository.hasActiveCall()}
         />
       )}
-      {deviceSupport.audioOutput && <AudioOutPreferences {...{devicesHandler}} />}
-      {deviceSupport.videoInput && (
+      {areMediaDevicesInitialized && deviceSupport.audiooutput && <AudioOutPreferences {...{devicesHandler}} />}
+      {areMediaDevicesInitialized && deviceSupport.videoinput && (
         <CameraPreferences
+          key={`camera-${shouldReloadCamera}`} // Force remount when call ends
           {...{devicesHandler, streamHandler}}
           refreshStream={() => callingRepository.refreshVideoInput()}
           hasActiveCameraStream={callingRepository.hasActiveCameraStream()}
+          availableDevices={availableDevices}
+          currentDeviceId={currentDeviceId}
         />
       )}
       <CallOptions {...{constraintsHandler, propertiesRepository}} />
@@ -72,5 +88,4 @@ const AVPreferences: React.FC<AVPreferencesProps> = ({
     </PreferencesPage>
   );
 };
-
-export {AVPreferences};
+export const AVPreferences = memo(AVPreferencesComponent);

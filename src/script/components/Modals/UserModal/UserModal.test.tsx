@@ -20,11 +20,10 @@
 import {render, waitFor} from '@testing-library/react';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 
-import {User} from 'src/script/entity/User';
+import {User} from 'Repositories/entity/User';
+import {TeamState} from 'Repositories/team/TeamState';
+import {UserRepository} from 'Repositories/user/UserRepository';
 import {Core} from 'src/script/service/CoreSingleton';
-import {TeamState} from 'src/script/team/TeamState';
-import {UserRepository} from 'src/script/user/UserRepository';
-import {UserState} from 'src/script/user/UserState';
 
 import {UserModal, UserModalProps} from './UserModal';
 import {showUserModal} from './UserModal.state';
@@ -32,7 +31,7 @@ import {showUserModal} from './UserModal.state';
 describe('UserModal', () => {
   it('correctly fetches user from user repository', async () => {
     jest.useFakeTimers();
-    const getUserById = jest.fn(async (id: QualifiedId) => {
+    const refreshUser = jest.fn(async (id: QualifiedId) => {
       return new User('mock-id', 'test-domain.mock');
     });
 
@@ -40,20 +39,20 @@ describe('UserModal', () => {
       core: {} as Core,
       teamState: {} as TeamState,
       userRepository: {
-        getUserById,
+        refreshUser,
       } as unknown as UserRepository,
-      userState: {} as UserState,
+      selfUser: new User(),
     };
     showUserModal({domain: 'test-domain.mock', id: 'mock-id'});
     const {getByTestId} = render(<UserModal {...props} />);
     await waitFor(() => getByTestId('do-close'));
 
-    expect(getUserById).toHaveBeenCalledTimes(1);
+    expect(refreshUser).toHaveBeenCalledTimes(1);
   });
 
   it('shows user not found when user is deleted', async () => {
     jest.useFakeTimers();
-    const getUserById = jest.fn(async (id: QualifiedId) => {
+    const refreshUser = jest.fn(async (id: QualifiedId) => {
       const user = new User('mock-id', 'test-domain.mock');
       user.isDeleted = true;
       return user;
@@ -63,16 +62,16 @@ describe('UserModal', () => {
       core: {} as Core,
       teamState: {} as TeamState,
       userRepository: {
-        getUserById,
+        refreshUser,
       } as unknown as UserRepository,
-      userState: {} as UserState,
+      selfUser: new User(),
     };
 
     showUserModal({domain: 'test-domain.mock', id: 'mock-id'});
 
     const {getByTestId} = render(<UserModal {...props} />);
 
-    expect(getUserById).toHaveBeenCalledTimes(1);
+    expect(refreshUser).toHaveBeenCalledTimes(1);
 
     await waitFor(() => {
       expect(getByTestId('status-modal-text')).toBeInstanceOf(HTMLDivElement);

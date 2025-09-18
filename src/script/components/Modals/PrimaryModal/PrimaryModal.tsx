@@ -17,27 +17,40 @@
  *
  */
 
-import {FC, FormEvent, MouseEvent, useState, useRef, ChangeEvent, useEffect} from 'react';
-
-import cx from 'classnames';
+import {FC, FormEvent, MouseEvent, useState, useRef, ChangeEvent, useEffect, useMemo} from 'react';
 
 import {ValidationUtil} from '@wireapp/commons';
-import {Checkbox, CheckboxLabel, Input} from '@wireapp/react-ui-kit';
+import {ErrorMessage} from '@wireapp/react-ui-kit';
 
+import {CopyToClipboardButton} from 'Components/CopyToClipboardButton';
 import {FadingScrollbar} from 'Components/FadingScrollbar';
-import {Icon} from 'Components/Icon';
-import {ModalComponent} from 'Components/ModalComponent';
 import {Config} from 'src/script/Config';
-import {isEscapeKey} from 'Util/KeyboardUtil';
+import {isEnterKey, isEscapeKey} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
+import {isValidPassword} from 'Util/StringUtil';
 
+import {CheckboxOption} from './CheckboxOption/CheckboxOption';
+import {MessageContent} from './Content/MessageContent';
+import {GuestLinkPasswordForm} from './GuestLinkPasswordForm/GuestLinkPasswordForm';
+import {InputForm} from './InputForm/InputForm';
+import {JoinGuestLinkPasswordForm} from './JoinGuestLinkPasswordForm/JoinGuestLinkPasswordForm';
+import {PasswordAdvancedSecurityForm} from './PasswordAdvancedSecurityForm/PasswordAdvancedSecurityForm';
+import {PasswordForm} from './PasswordForm/PasswordForm';
+import {PrimaryButton} from './PrimaryButton/PrimaryButton';
+import {PrimaryModalButtons} from './PrimaryModalButtons/PrimaryModalButtons';
+import {PrimaryModalHeader} from './PrimaryModalHeader/PrimaryModalHeader';
+import {PrimaryModalLoading} from './PrimaryModalLoading/PrimaryModalLoading';
+import {PrimaryModalShell} from './PrimaryModalShell/PrimaryModalShell';
 import {usePrimaryModalState, showNextModalInQueue, defaultContent, removeCurrentModal} from './PrimaryModalState';
-import {Action, PrimaryModalType} from './PrimaryModalTypes';
+import {ButtonAction, PrimaryModalType} from './PrimaryModalTypes';
+import {SecondaryButton} from './SecondaryButton/SecondaryButton';
 
 export const PrimaryModalComponent: FC = () => {
   const [inputValue, updateInputValue] = useState<string>('');
-  const [passwordValue, updatePasswordValue] = useState<string>('');
+  const [passwordValue, setPasswordValue] = useState<string>('');
   const [passwordInput, updatePasswordWithRules] = useState<string>('');
+  const [passwordConfirmationValue, setPasswordConfirmationValue] = useState<string>('');
+  const [didCopyPassword, setDidCopyPassword] = useState<boolean>(false);
   const [optionChecked, updateOptionChecked] = useState<boolean>(false);
   const content = usePrimaryModalState(state => state.currentModalContent);
   const errorMessage = usePrimaryModalState(state => state.errorMessage);
@@ -46,36 +59,57 @@ export const PrimaryModalComponent: FC = () => {
   const currentId = usePrimaryModalState(state => state.currentModalId);
   const primaryActionButtonRef = useRef<HTMLButtonElement>(null);
   const isModalVisible = currentId !== null;
+  const passwordValueRef = useRef<HTMLInputElement>(null);
+  const [isFormSubmitted, setIsFormSubmitted] = useState(false);
+  const isBackupPasswordValid = useMemo(() => passwordInput === '' || isValidPassword(passwordInput), [passwordInput]);
+
   const {
     checkboxLabel,
     closeOnConfirm,
+    closeOnSecondaryAction,
     currentType,
     inputPlaceholder,
+    message,
     messageHtml,
-    messageText,
     modalUie,
     onBgClick,
     primaryAction,
     secondaryAction,
     titleText,
     closeBtnTitle,
+    copyPassword,
     hideCloseBtn = false,
     passwordOptional = false,
+    allButtonsFullWidth = false,
+    primaryBtnFirst = false,
+    size = 'small',
   } = content;
-  const hasPassword = currentType === PrimaryModalType.PASSWORD;
+
+  const isPassword = currentType === PrimaryModalType.PASSWORD;
+  const showLoadingIndicator = currentType === PrimaryModalType.LOADING;
   const hasPasswordWithRules = currentType === PrimaryModalType.PASSWORD_ADVANCED_SECURITY;
-  const hasInput = currentType === PrimaryModalType.INPUT;
-  const hasOption = currentType === PrimaryModalType.OPTION;
+  const isInput = currentType === PrimaryModalType.INPUT;
+  const isOption = currentType === PrimaryModalType.OPTION;
   const hasMultipleSecondary = currentType === PrimaryModalType.MULTI_ACTIONS;
+  const isGuestLinkPassword = currentType === PrimaryModalType.GUEST_LINK_PASSWORD;
+  const isJoinGuestLinkPassword = currentType === PrimaryModalType.JOIN_GUEST_LINK_PASSWORD;
+  const isConfirm = currentType === PrimaryModalType.CONFIRM;
+
+  const isPasswordRequired = hasPasswordWithRules || isGuestLinkPassword;
+
   const onModalHidden = () => {
     updateCurrentModalContent(defaultContent);
     updateInputValue('');
-    updatePasswordValue('');
+    setPasswordValue('');
     updatePasswordWithRules('');
     updateErrorMessage('');
     updateOptionChecked(false);
     showNextModalInQueue();
+    setPasswordConfirmationValue('');
+    setDidCopyPassword(false);
+    setIsFormSubmitted(false);
   };
+
   const isPasswordOptional = () => {
     const skipValidation = passwordOptional && !passwordInput.trim().length;
     if (skipValidation) {
@@ -84,20 +118,54 @@ export const PrimaryModalComponent: FC = () => {
     return passwordRegex.test(passwordInput);
   };
 
+  const checkGuestLinkPassword = (password: string, passwordConfirm: string): boolean => {
+    if (password !== passwordConfirm) {
+      return false;
+    }
+    return isValidPassword(password);
+  };
+
   const passwordRegex = new RegExp(
     ValidationUtil.getNewPasswordPattern(Config.getConfig().NEW_PASSWORD_MINIMUM_LENGTH),
   );
-  const actionEnabled =
-    (!hasInput || !!inputValue.trim().length) && (hasPasswordWithRules ? isPasswordOptional() : true);
+  const actionEnabled = isPasswordRequired ? isPasswordOptional() : true;
+  const inputActionEnabled = !isInput || !!inputValue.trim().length;
 
-  const doAction =
+  const areGuestLinkPasswordsValid = checkGuestLinkPassword(passwordValue, passwordConfirmationValue);
+
+  const passwordGuestLinkActionEnabled =
+    (!isGuestLinkPassword || !!passwordValue.trim().length) && areGuestLinkPasswordsValid;
+
+  const isPrimaryActionDisabled = (disabled: boolean | undefined) => {
+    if (!!disabled) {
+      return true;
+    }
+    if (isConfirm) {
+      return false;
+    }
+    return !inputActionEnabled && !actionEnabled;
+  };
+
+  const performAction =
     (action?: Function, closeAfter = true, skipValidation = false) =>
     (event: FormEvent<HTMLFormElement> | MouseEvent<HTMLButtonElement>) => {
       event.preventDefault();
 
-      if (!skipValidation && !actionEnabled) {
+      if (!skipValidation && !inputActionEnabled) {
         return;
       }
+
+      if (hasPasswordWithRules && !isBackupPasswordValid) {
+        setIsFormSubmitted(true);
+        return;
+      }
+
+      // prevent from submit when validation not passed
+      if (!skipValidation && isGuestLinkPassword && !areGuestLinkPasswordsValid) {
+        setIsFormSubmitted(true);
+        return;
+      }
+
       if (typeof action === 'function') {
         action();
       }
@@ -108,19 +176,23 @@ export const PrimaryModalComponent: FC = () => {
 
   const confirm = () => {
     const action = content?.primaryAction?.action;
-    if (typeof action === 'function') {
-      const actions = {
-        [PrimaryModalType.OPTION]: () => action(optionChecked),
-        [PrimaryModalType.INPUT]: () => action(inputValue),
-        [PrimaryModalType.PASSWORD]: () => action(passwordValue),
-        [PrimaryModalType.PASSWORD_ADVANCED_SECURITY]: () => action(passwordInput),
-      };
-      if (Object.keys(actions).includes(content?.currentType ?? '')) {
-        actions[content?.currentType as keyof typeof actions]();
-        return;
-      }
-      action();
+    if (!action) {
+      return;
     }
+    const actions = {
+      [PrimaryModalType.OPTION]: () => action(optionChecked),
+      [PrimaryModalType.INPUT]: () => action(inputValue),
+      [PrimaryModalType.PASSWORD]: () => action(passwordValue),
+      [PrimaryModalType.GUEST_LINK_PASSWORD]: () => action(passwordValue, didCopyPassword),
+      [PrimaryModalType.JOIN_GUEST_LINK_PASSWORD]: () => action(passwordValue),
+      [PrimaryModalType.PASSWORD_ADVANCED_SECURITY]: () => action(passwordInput, isFormSubmitted),
+    };
+
+    if (Object.keys(actions).includes(content?.currentType ?? '')) {
+      actions[content?.currentType as keyof typeof actions]();
+      return;
+    }
+    action();
   };
 
   const onOptionChange = (event: ChangeEvent<HTMLInputElement>) => {
@@ -132,23 +204,22 @@ export const PrimaryModalComponent: FC = () => {
 
   const secondaryActions = Array.isArray(secondaryAction) ? secondaryAction : [secondaryAction];
 
-  const modalRef = useRef<HTMLDivElement>(null);
-
   useEffect(() => {
-    if (isModalVisible) {
-      modalRef.current?.focus();
-    }
-
-    const handleEscape = (event: KeyboardEvent) => {
+    const onKeyPress = (event: KeyboardEvent) => {
       if (isEscapeKey(event) && isModalVisible) {
         removeCurrentModal();
         closeAction();
       }
+
+      if (isEnterKey(event) && primaryAction?.runActionOnEnterClick) {
+        primaryAction?.action?.();
+        removeCurrentModal();
+      }
     };
 
-    document.addEventListener('keydown', handleEscape);
-    return () => document.removeEventListener('keydown', handleEscape);
-  }, [isModalVisible]);
+    document.addEventListener('keypress', onKeyPress);
+    return () => document.removeEventListener('keypress', onKeyPress);
+  }, [primaryAction, isModalVisible]);
 
   const closeAction = () => {
     if (hasPasswordWithRules) {
@@ -157,156 +228,134 @@ export const PrimaryModalComponent: FC = () => {
     }
   };
 
-  return (
-    <div
-      id="modals"
-      data-uie-name="primary-modals-container"
-      role="dialog"
-      aria-modal="true"
-      aria-label={titleText}
-      tabIndex={-1}
-      ref={modalRef}
+  const secondaryButtons = secondaryActions
+    .filter((action): action is ButtonAction => action !== null && !!action.text)
+    .map(action => (
+      <SecondaryButton
+        key={`${action.text}-${action.uieName}`}
+        onClick={performAction(action.action, !!closeOnSecondaryAction, true)}
+        disabled={action.disabled}
+        fullWidth={hasMultipleSecondary || allButtonsFullWidth}
+        uieName={action.uieName}
+      >
+        {action.text}
+      </SecondaryButton>
+    ));
+
+  const primaryButton = !!primaryAction?.text && (
+    <PrimaryButton
+      key="modal-primary-button"
+      ref={primaryActionButtonRef}
+      onClick={performAction(confirm, !!closeOnConfirm)}
+      disabled={isPrimaryActionDisabled(primaryAction.disabled)}
+      fullWidth={hasMultipleSecondary || allButtonsFullWidth}
     >
-      <ModalComponent isShown={isModalVisible} onClosed={onModalHidden} onBgClick={onBgClick} data-uie-name={modalUie}>
-        {isModalVisible && (
-          <>
-            <div className="modal__header" data-uie-name="status-modal-title">
-              {titleText && (
-                <h2 className="modal__header__title" id="modal-title">
-                  {titleText}
-                </h2>
-              )}
-              {!hideCloseBtn && (
-                <button
-                  type="button"
-                  className="modal__header__button"
-                  onClick={() => {
-                    removeCurrentModal();
-                    closeAction();
-                  }}
-                  aria-label={closeBtnTitle}
-                  data-uie-name="do-close"
-                >
-                  <Icon.Close className="modal__header__icon" aria-hidden="true" />
-                </button>
-              )}
-            </div>
+      {primaryAction.text}
+    </PrimaryButton>
+  );
 
-            <FadingScrollbar className="modal__body">
-              {(messageHtml || messageText) && (
-                <div className="modal__text" data-uie-name="status-modal-text">
-                  {messageHtml && <p id="modal-description-html" dangerouslySetInnerHTML={{__html: messageHtml}} />}
-                  {messageText && <p id="modal-description-text">{messageText}</p>}
-                </div>
-              )}
+  const buttons = primaryBtnFirst ? [primaryButton, ...secondaryButtons] : [...secondaryButtons, primaryButton];
+  const isPasswordFieldValid = isFormSubmitted && !passwordValueRef.current?.validity.valid;
 
-              {hasPassword && (
-                <form onSubmit={doAction(confirm, !!closeOnConfirm)}>
-                  <label htmlFor="modal_pswd" className="visually-hidden">
-                    {inputPlaceholder}
-                  </label>
+  const backupPasswordHint = t('backupPasswordHint', {
+    minPasswordLength: Config.getConfig().NEW_PASSWORD_MINIMUM_LENGTH.toString(),
+  });
 
-                  <input
-                    id="modal_pswd"
-                    className="modal__input"
-                    type="password"
-                    value={passwordValue}
-                    placeholder={inputPlaceholder}
-                    onChange={event => updatePasswordValue(event.target.value)}
-                  />
-                </form>
-              )}
+  return (
+    <PrimaryModalShell
+      title={titleText}
+      isShown={isModalVisible}
+      onClose={onModalHidden}
+      onBgClick={onBgClick}
+      dataUieName={modalUie}
+      size={size}
+    >
+      <PrimaryModalHeader
+        titleText={titleText}
+        closeBtnTitle={closeBtnTitle}
+        hideCloseBtn={hideCloseBtn}
+        closeAction={closeAction}
+      />
+      <FadingScrollbar className="modal__body">
+        <MessageContent message={message} messageHtml={messageHtml} />
 
-              {hasPasswordWithRules && (
-                <form onSubmit={doAction(confirm, !!closeOnConfirm)}>
-                  <Input
-                    id="modal_pswd_with_rules"
-                    type="password"
-                    value={passwordInput}
-                    placeholder={inputPlaceholder}
-                    required
-                    data-uie-name="backup-password"
-                    onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
-                      updatePasswordWithRules(event.target.value)
-                    }
-                    autoComplete="password"
-                    pattern=".{2,64}"
-                    helperText={t('backupPasswordHint', {
-                      minPasswordLength: Config.getConfig().NEW_PASSWORD_MINIMUM_LENGTH.toString(),
-                    })}
-                  />
-                </form>
-              )}
-
-              {hasInput && (
-                <form onSubmit={doAction(confirm, !!closeOnConfirm)}>
-                  <label htmlFor="modal-input" className="visually-hidden">
-                    {inputPlaceholder}
-                  </label>
-
-                  <input
-                    maxLength={64}
-                    className="modal__input"
-                    id="modal-input"
-                    value={inputValue}
-                    placeholder={inputPlaceholder}
-                    onChange={event => updateInputValue(event.target.value)}
-                  />
-                </form>
-              )}
-
-              {errorMessage && <div className="modal__input__error">{errorMessage}</div>}
-
-              {hasOption && (
-                <div className="modal-option">
-                  <Checkbox
-                    checked={optionChecked}
-                    data-uie-name="modal-option-checkbox"
-                    id="clear-data-checkbox"
-                    onChange={onOptionChange}
-                  >
-                    <CheckboxLabel className="label-xs" htmlFor="clear-data-checkbox">
-                      {checkboxLabel}
-                    </CheckboxLabel>
-                  </Checkbox>
-                </div>
-              )}
-
-              <div className={cx('modal__buttons', {'modal__buttons--column': hasMultipleSecondary})}>
-                {secondaryActions
-                  .filter((action): action is Action => action !== null && !!action.text)
-                  .map(action => (
-                    <button
-                      key={`${action.text}-${action.uieName}`}
-                      type="button"
-                      onClick={doAction(action.action, true, true)}
-                      data-uie-name={action?.uieName}
-                      className={cx('modal__button modal__button--secondary', {
-                        'modal__button--full': hasMultipleSecondary,
-                      })}
-                    >
-                      {action.text}
-                    </button>
-                  ))}
-                {primaryAction?.text && (
-                  <button
-                    ref={primaryActionButtonRef}
-                    type="button"
-                    onClick={doAction(confirm, !!closeOnConfirm)}
-                    disabled={!actionEnabled}
-                    className={cx('modal__button modal__button--primary', {
-                      'modal__button--full': hasMultipleSecondary,
-                    })}
-                    data-uie-name="do-action"
-                  >
-                    {primaryAction.text}
-                  </button>
-                )}
-              </div>
-            </FadingScrollbar>
-          </>
+        {isGuestLinkPassword && (
+          <GuestLinkPasswordForm
+            onSubmit={performAction(confirm, !!closeOnConfirm)}
+            onGeneratePassword={password => {
+              setPasswordValue(password);
+              setPasswordConfirmationValue(password);
+              setIsFormSubmitted(false);
+            }}
+            passwordValue={passwordValue}
+            passwordValueRef={passwordValueRef}
+            onPasswordValueChange={setPasswordValue}
+            isPasswordInputMarkInvalid={isPasswordFieldValid}
+            passwordConfirmationValue={passwordConfirmationValue}
+            onPasswordConfirmationChange={setPasswordConfirmationValue}
+            isPasswordConfirmationMarkInvalid={isFormSubmitted && !areGuestLinkPasswordsValid}
+          />
         )}
-      </ModalComponent>
-    </div>
+
+        {copyPassword && (
+          <CopyToClipboardButton
+            disabled={!passwordGuestLinkActionEnabled}
+            textToCopy={passwordValue}
+            displayText={t('guestOptionsPasswordCopyToClipboard')}
+            copySuccessText={t('guestOptionsPasswordCopyToClipboardSuccess')}
+            onCopySuccess={() => setDidCopyPassword(true)}
+          />
+        )}
+
+        {isPassword && (
+          <PasswordForm
+            onSubmit={performAction(confirm, !!closeOnConfirm)}
+            inputPlaceholder={inputPlaceholder}
+            inputValue={passwordValue}
+            onInputChange={setPasswordValue}
+          />
+        )}
+
+        {isJoinGuestLinkPassword && (
+          <JoinGuestLinkPasswordForm
+            onSubmit={performAction(confirm, !!closeOnConfirm)}
+            inputValue={passwordValue}
+            onInputChange={setPasswordValue}
+          />
+        )}
+
+        {hasPasswordWithRules && (
+          <PasswordAdvancedSecurityForm
+            onSubmit={performAction(confirm, !!closeOnConfirm)}
+            inputValue={passwordInput}
+            inputPlaceholder={inputPlaceholder}
+            isInputInvalid={isFormSubmitted && !isBackupPasswordValid}
+            onInputChange={updatePasswordWithRules}
+            inputHelperText={backupPasswordHint}
+            {...(isFormSubmitted &&
+              !isBackupPasswordValid && {error: <ErrorMessage>{backupPasswordHint}</ErrorMessage>})}
+          />
+        )}
+
+        {isInput && (
+          <InputForm
+            onSubmit={performAction(confirm, !!closeOnConfirm)}
+            inputValue={inputValue}
+            inputPlaceholder={inputPlaceholder}
+            onInputChange={updateInputValue}
+          />
+        )}
+
+        {errorMessage && <div className="modal__input__error">{errorMessage}</div>}
+
+        {isOption && <CheckboxOption isChecked={optionChecked} onChange={onOptionChange} label={checkboxLabel} />}
+
+        {showLoadingIndicator ? (
+          <PrimaryModalLoading />
+        ) : (
+          <PrimaryModalButtons isColumn={hasMultipleSecondary || allButtonsFullWidth}>{buttons}</PrimaryModalButtons>
+        )}
+      </FadingScrollbar>
+    </PrimaryModalShell>
   );
 };

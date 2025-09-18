@@ -18,39 +18,39 @@
  */
 
 .label {
-  font-size: @font-size-medium;
-  font-weight: @font-weight-semibold;
+  font-size: var(--font-size-medium);
+  font-weight: var(--font-weight-semibold);
 }
 
 .label-xs {
   .label;
 
-  font-size: @font-size-xs;
-  font-weight: @font-weight-regular;
+  font-size: var(--font-size-xsmall);
+  font-weight: var(--font-weight-regular);
 }
 
 .label-bold {
   .label;
 
-  font-weight: @font-weight-bold;
+  font-weight: var(--font-weight-bold);
 }
 
 .label-bold-xs {
   .label-bold;
 
-  font-size: @font-size-xs;
+  font-size: var(--font-size-xsmall);
 }
 
 .label-nocase-xs {
-  font-size: @font-size-small;
-  font-weight: @font-weight-regular;
+  font-size: var(--font-size-small);
+  font-weight: var(--font-weight-regular);
   text-transform: none;
 }
 
 .label-nocase-bold-xs {
   .label-nocase-xs;
 
-  font-weight: @font-weight-bold;
+  font-weight: var(--font-weight-bold);
 }
 
 .label-username {

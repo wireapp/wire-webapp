@@ -17,9 +17,13 @@
  *
  */
 
+import {MINIMUM_API_VERSION} from '@wireapp/api-client/lib/Config';
+
 import {Runtime} from '@wireapp/commons';
 
 import {createUuid} from 'Util/uuid';
+
+import packageJson from '../../package.json';
 const env = window.wire.env;
 
 export const ACCENT_ID = {
@@ -72,17 +76,28 @@ const config = {
   /** measured in pixel */
   SCROLL_TO_LAST_MESSAGE_THRESHOLD: 100,
 
+  /** min supported api version for team creation */
+  MIN_TEAM_CREATION_SUPPORTED_API_VERSION: 7,
+
+  /** min supported api version for Enterprise login v2 */
+  MIN_ENTERPRISE_LOGIN_V2_AND_CHANNELS_SUPPORTED_API_VERSION: 8,
+
   /** Image MIME types */
-  ALLOWED_IMAGE_TYPES: ['image/bmp', 'image/gif', 'image/jpeg', 'image/jpg', 'image/png'],
+  ALLOWED_IMAGE_TYPES: ['image/bmp', 'image/gif', 'image/jpeg', 'image/jpg', 'image/png', 'image/webp'],
 
   /** Which min and max version of the backend api do we support */
-  SUPPORTED_API_RANGE: [1, env.ENABLE_DEV_BACKEND_API ? Infinity : 3],
+  SUPPORTED_API_RANGE: [MINIMUM_API_VERSION, 11],
 
-  /** DataDog client api keys acces */
+  /** DataDog client api keys access */
   dataDog: {
     clientToken: env.DATADOG_CLIENT_TOKEN,
     applicationId: env.DATADOG_APPLICATION_ID,
   },
+
+  AVS_VERSION: packageJson.dependencies['@wireapp/avs'],
+
+  COUNTLY_SERVER_URL: 'https://countly.wire.com/',
+  GET_WIRE_URL: 'https://get.wire.com',
 } as const;
 
 export type Configuration = typeof config;
@@ -90,6 +105,16 @@ export type Configuration = typeof config;
 const Config = {
   getConfig: () => {
     return config;
+  },
+  _dangerouslySetConfigFeaturesForDebug: (newConfigFeatures: Configuration['FEATURE']) => {
+    (config.FEATURE as unknown) = newConfigFeatures;
+  },
+  getDesktopConfig: () => {
+    if (!Runtime.isDesktopApp) {
+      return undefined;
+    }
+
+    return window.desktopAppConfig;
   },
 };
 

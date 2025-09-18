@@ -19,14 +19,24 @@
 
 import React from 'react';
 
-import {Icon} from 'Components/Icon';
-import {MessageTimerUpdateMessage} from 'src/script/entity/message/MessageTimerUpdateMessage';
-import {MLSConversationRecoveredMessage} from 'src/script/entity/message/MLSConversationRecoveredMessage';
-import {ReceiptModeUpdateMessage} from 'src/script/entity/message/ReceiptModeUpdateMessage';
-import {RenameMessage} from 'src/script/entity/message/RenameMessage';
-import {SystemMessage as SystemMessageEntity} from 'src/script/entity/message/SystemMessage';
+import {MLSVerified} from '@wireapp/react-ui-kit';
+
+import * as Icon from 'Components/Icon';
+import {E2EIVerificationMessage} from 'Repositories/entity/message/E2EIVerificationMessage';
+import {JoinedAfterMLSMigrationFinalisationMessage} from 'Repositories/entity/message/JoinedAfterMLSMigrationFinalisationMessage';
+import {MessageTimerUpdateMessage} from 'Repositories/entity/message/MessageTimerUpdateMessage';
+import {MLSConversationRecoveredMessage} from 'Repositories/entity/message/MLSConversationRecoveredMessage';
+import {MLSMigrationFinalisationOngoingCallMessage} from 'Repositories/entity/message/MLSMigrationFinalisationOngoingCallMessage';
+import {OneToOneMigratedToMlsMessage} from 'Repositories/entity/message/OneToOneMigratedToMlsMessage';
+import {ProtocolUpdateMessage} from 'Repositories/entity/message/ProtocolUpdateMessage';
+import {ReceiptModeUpdateMessage} from 'Repositories/entity/message/ReceiptModeUpdateMessage';
+import {RenameMessage} from 'Repositories/entity/message/RenameMessage';
+import {SystemMessage as SystemMessageEntity} from 'Repositories/entity/message/SystemMessage';
 
 import {SystemMessageBase} from './SystemMessageBase';
+
+import {messageBodyWrapper} from '../ContentMessage/ContentMessage.styles';
+import {ProtocolUpdateMessage as ProtocolUpdateMessageComponent} from '../ProtocolUpdateMessage';
 
 export interface SystemMessageProps {
   message: SystemMessageEntity;
@@ -36,22 +46,44 @@ export const SystemMessage: React.FC<SystemMessageProps> = ({message}) => {
   if (message instanceof RenameMessage) {
     return (
       <>
-        <SystemMessageBase message={message} isSenderNameVisible icon={<Icon.Edit />} />
-        <div className="message-body font-weight-bold">{message.name}</div>
+        <SystemMessageBase message={message} isSenderNameVisible icon={<Icon.EditIcon />} />
+        <div css={messageBodyWrapper()}>
+          <div className="message-body font-weight-bold">{message.name}</div>
+        </div>
       </>
     );
   }
 
   if (message instanceof MessageTimerUpdateMessage) {
-    return <SystemMessageBase message={message} isSenderNameVisible icon={<Icon.Timer />} />;
+    return <SystemMessageBase message={message} isSenderNameVisible icon={<Icon.TimerIcon />} />;
   }
 
   if (message instanceof ReceiptModeUpdateMessage) {
-    return <SystemMessageBase message={message} isSenderNameVisible icon={<Icon.Read />} />;
+    return <SystemMessageBase message={message} isSenderNameVisible icon={<Icon.ReadIcon />} />;
   }
 
   if (message instanceof MLSConversationRecoveredMessage) {
-    return <SystemMessageBase message={message} icon={<Icon.Info />} />;
+    return <SystemMessageBase message={message} icon={<Icon.InfoIcon />} />;
+  }
+
+  if (message instanceof E2EIVerificationMessage) {
+    return <SystemMessageBase message={message} icon={<MLSVerified className="filled" />} />;
+  }
+
+  if (message instanceof ProtocolUpdateMessage) {
+    return <ProtocolUpdateMessageComponent message={message} />;
+  }
+
+  if (message instanceof JoinedAfterMLSMigrationFinalisationMessage) {
+    return <SystemMessageBase message={message} icon={<Icon.InfoIcon />} />;
+  }
+
+  if (message instanceof OneToOneMigratedToMlsMessage) {
+    return <SystemMessageBase message={message} icon={<Icon.InfoIcon />} />;
+  }
+
+  if (message instanceof MLSMigrationFinalisationOngoingCallMessage) {
+    return <SystemMessageBase message={message} icon={<Icon.InfoIcon />} />;
   }
 
   return <SystemMessageBase message={message} />;

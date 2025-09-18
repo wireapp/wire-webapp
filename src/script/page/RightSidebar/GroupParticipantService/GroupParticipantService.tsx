@@ -19,22 +19,20 @@
 
 import {FC, useEffect} from 'react';
 
-import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
+import {TabIndex} from '@wireapp/react-ui-kit';
 
 import {FadingScrollbar} from 'Components/FadingScrollbar';
-import {Icon} from 'Components/Icon';
+import * as Icon from 'Components/Icon';
 import {ServiceDetails} from 'Components/panel/ServiceDetails';
+import {Conversation} from 'Repositories/entity/Conversation';
+import {User} from 'Repositories/entity/User';
+import {IntegrationRepository} from 'Repositories/integration/IntegrationRepository';
+import {ServiceEntity} from 'Repositories/integration/ServiceEntity';
+import {generatePermissionHelpers} from 'Repositories/user/UserPermission';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
-import {handleKeyDown} from 'Util/KeyboardUtil';
+import {handleKeyDown, KEY} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
-import {matchQualifiedIds} from 'Util/QualifiedId';
 
-import {Conversation} from '../../../entity/Conversation';
-import {User} from '../../../entity/User';
-import {IntegrationRepository} from '../../../integration/IntegrationRepository';
-import {ServiceEntity} from '../../../integration/ServiceEntity';
-import {generatePermissionHelpers} from '../../../user/UserPermission';
-import {UserState} from '../../../user/UserState';
 import {ActionsViewModel} from '../../../view_model/ActionsViewModel';
 import {PanelHeader} from '../PanelHeader';
 
@@ -42,12 +40,12 @@ interface GroupParticipantServiceProps {
   activeConversation: Conversation;
   actionsViewModel: ActionsViewModel;
   integrationRepository: IntegrationRepository;
+  enableRemove: boolean;
   goToRoot: () => void;
   onBack: () => void;
   onClose: () => void;
   serviceEntity: ServiceEntity;
-  userEntity: User;
-  userState: UserState;
+  selfUser: User;
   isAddMode?: boolean;
 }
 
@@ -55,39 +53,38 @@ const GroupParticipantService: FC<GroupParticipantServiceProps> = ({
   activeConversation,
   actionsViewModel,
   integrationRepository,
+  enableRemove,
   goToRoot,
   onBack,
   onClose,
   serviceEntity,
-  userEntity,
-  userState,
+  selfUser,
   isAddMode = false,
 }) => {
   const {
     inTeam,
     isActiveParticipant,
-    participating_user_ids: participatingUserIds,
-  } = useKoSubscribableChildren(activeConversation, ['inTeam', 'isActiveParticipant', 'participating_user_ids']);
-  const {self: selfUser} = useKoSubscribableChildren(userState, ['self']);
+    participating_user_ets: participatingUserEts,
+  } = useKoSubscribableChildren(activeConversation, ['inTeam', 'isActiveParticipant', 'participating_user_ets']);
   const {teamRole} = useKoSubscribableChildren(selfUser, ['teamRole']);
 
-  const {canChatWithServices, canUpdateGroupParticipants} = generatePermissionHelpers(teamRole);
+  const {canChatWithServices} = generatePermissionHelpers(teamRole);
 
-  const selectedInConversation = participatingUserIds.some(user => matchQualifiedIds(userEntity, user));
+  const serviceUser = participatingUserEts.find(user => user.serviceId === serviceEntity.id);
 
-  const showActions = isActiveParticipant && selectedInConversation && inTeam;
+  const showActions = isActiveParticipant && serviceUser && inTeam;
 
   const onOpen = () => {
     actionsViewModel.open1to1ConversationWithService(serviceEntity);
   };
 
-  const onRemove = () => {
-    actionsViewModel.removeFromConversation(activeConversation, userEntity);
+  const onRemove = (user: User) => {
+    actionsViewModel.removeFromConversation(activeConversation, user);
     onBack();
   };
 
   const onAdd = () => {
-    integrationRepository.addService(activeConversation, serviceEntity);
+    integrationRepository.addServiceToExistingConversation(activeConversation, serviceEntity);
     goToRoot();
   };
 
@@ -109,27 +106,39 @@ const GroupParticipantService: FC<GroupParticipantServiceProps> = ({
             className="panel__action-item"
             data-uie-name="go-conversation"
             onClick={onOpen}
-            onKeyDown={event => handleKeyDown(event, onOpen)}
+            onKeyDown={event =>
+              handleKeyDown({
+                event,
+                callback: onOpen,
+                keys: [KEY.ENTER, KEY.SPACE],
+              })
+            }
           >
             <span className="panel__action-item__icon">
-              <Icon.Message />
+              <Icon.MessageIcon />
             </span>
 
             <div className="panel__action-item__text">{t('groupParticipantActionOpenConversation')}</div>
           </div>
         )}
 
-        {showActions && canUpdateGroupParticipants() && (
+        {showActions && enableRemove && (
           <div
             role="button"
             tabIndex={TabIndex.FOCUSABLE}
             className="panel__action-item"
             data-uie-name="do-remove"
-            onClick={onRemove}
-            onKeyDown={event => handleKeyDown(event, onRemove)}
+            onClick={() => onRemove(serviceUser)}
+            onKeyDown={event =>
+              handleKeyDown({
+                event,
+                callback: () => onRemove(serviceUser),
+                keys: [KEY.ENTER, KEY.SPACE],
+              })
+            }
           >
             <span className="panel__action-item__icon">
-              <Icon.Minus />
+              <Icon.MinusIcon />
             </span>
 
             <div className="panel__action-item__text">{t('groupParticipantActionRemove')}</div>

@@ -1,0 +1,122 @@
+name: precommit
+
+#on:
+#  pull_request:
+#    # we want to run the CI on every PR targetting those branches
+#    branches: [dev]
+
+concurrency:
+  group: precommit-deploy
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: buildjet-8vcpu-ubuntu-2204
+
+    outputs:
+      unit_tests_report: ${{ env.UNIT_TEST_REPORT_FILE }}
+      build_artifact: ${{ env.BUILD_ARTIFACT }}
+      total_additions: ${{ steps.check_additions.outputs.total_additions }}
+
+    env:
+      BUILD_DIR: server/dist/s3/
+      BUILD_ARTIFACT: ebs.zip
+      COMMIT_URL: ${{github.event.head_commit.url}}
+      COMMITTER: ${{github.event.head_commit.committer.name}}
+      CHANGELOG_FILE: './changelog.md'
+      UNIT_TEST_REPORT_FILE: './unit-tests.log'
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: ${{ github.event.pull_request.head.sha }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18.16.x
+          cache: 'yarn'
+
+      - name: Install JS dependencies
+        run: yarn --immutable
+
+      - name: Update configuration
+        run: yarn configure
+
+      - name: Build
+        run: yarn build:prod
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: 'build-artifact'
+          path: '${{env.BUILD_DIR}}${{env.BUILD_ARTIFACT}}'
+
+      - name: Check total PR additions
+        id: check_additions
+        run: |
+          total_additions=$(gh api -H "Accept: application/vnd.github.v3+json" \
+                                "repos/${{ github.repository }}/pulls/${{ github.event.pull_request.number }}" \
+                                | jq -r '.additions')
+          if [ -z "$total_additions" ] || [ "$total_additions" = "null" ]; then
+            echo "Error: Could not extract additions"
+            exit 1
+          fi
+          echo "Found total additions: $total_additions"
+          echo "total_additions=$total_additions" >> $GITHUB_OUTPUT
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  deploy_to_aws:
+    name: 'Deploy to live environments'
+    runs-on: ubuntu-latest
+    needs: [build]
+
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: 'build-artifact'
+
+      - name: Check if deploy is necessary
+        id: check_deploy
+        if: ${{ always() }}
+        run: |
+          if [[ ${{ needs.build.outputs.total_additions }} -le 100 || "${{ github.actor }}" == "dependabot[bot]" ]]; then
+            echo "Skipping deployment"
+            exit 0
+            fi
+
+      - name: Deploy to precommit environment
+        id: deploy
+        uses: einaregilsson/beanstalk-deploy@v22
+        with:
+          application_name: Webapp
+          aws_access_key: ${{ secrets.WEBTEAM_AWS_ACCESS_KEY_ID }}
+          aws_secret_key: ${{ secrets.WEBTEAM_AWS_SECRET_ACCESS_KEY }}
+          deployment_package: ${{needs.build.outputs.build_artifact}}
+          environment_name: wire-webapp-precommit
+          region: eu-central-1
+          use_existing_version_if_available: true
+          version_description: ${{ github.sha }}
+          version_label: ${{ github.run_id }}
+          wait_for_deployment: false
+          wait_for_environment_recovery: 150
+
+      - name: Deployment Status
+        if: ${{ always() }}
+        run: |
+          if [[ "${{ steps.deploy.outcome }}" == "success" ]]; then
+            echo "✅ Deployment completed successfully"
+          elif [[ "${{ steps.deploy.outcome }}" == "skipped" ]]; then
+            if [[ "${{ needs.build.outputs.total_additions }}" -le 100 ]]; then
+              echo "⏭️ Deployment was skipped: PR has ${{ needs.build.outputs.total_additions }} additions (threshold: 100)"
+            elif [[ "${{ github.actor }}" == "dependabot[bot]" ]]; then
+              echo "⏭️ Deployment was skipped: PR is from dependabot"
+            else
+              echo "⏭️ Deployment was skipped"
+            fi
+          else
+            echo "❌ Deployment failed"
+            exit 1
+          fi

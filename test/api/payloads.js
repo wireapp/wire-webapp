@@ -115,10 +115,6 @@ entities.clients = {
     permanent: {
       cookie: 'webapp@2153234453@permanent@1458071394172',
       time: '2016-03-15T19:59:20.278Z',
-      location: {
-        lat: 52.5233,
-        lon: 13.4138,
-      },
       address: '62.96.148.44',
       model: 'Chrome',
       id: '93fa36b916a91118',
@@ -133,10 +129,6 @@ entities.clients = {
     temporary: {
       cookie: 'webapp@2153234453@temporary@1458070104403',
       time: '2016-03-15T19:28:25.685Z',
-      location: {
-        lat: 52.5233,
-        lon: 13.4138,
-      },
       address: '62.96.148.44',
       model: 'Chrome (Temporary)',
       id: '9d1b37cab836df45',
@@ -156,7 +148,6 @@ entities.clients = {
 entities.user = {
   john_doe: {
     email: 'jd@wire.com',
-    phone: '+49177123456',
     accent_id: 1,
     picture: entities.picture,
     name: 'John Doe',
@@ -166,7 +157,6 @@ entities.user = {
   },
   jane_roe: {
     email: 'jr@wire.com',
-    phone: null,
     accent_id: 1,
     picture: entities.picture,
     name: 'Jane Roe',

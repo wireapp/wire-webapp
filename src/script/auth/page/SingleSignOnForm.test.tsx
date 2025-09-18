@@ -52,14 +52,7 @@ describe('SingleSignOnForm', () => {
 
     const {getByTestId} = mountComponent(
       <SingleSignOnForm {...{doLogin, initialCode}} />,
-      mockStoreFactory()({
-        ...initialRootState,
-        runtimeState: {
-          hasCookieSupport: true,
-          hasIndexedDbSupport: true,
-          isSupportedBrowser: true,
-        },
-      }),
+      mockStoreFactory()(initialRootState),
     );
 
     const codeOrEmailInput = getByTestId(codeOrEmailInputId) as HTMLInputElement;
@@ -86,17 +79,7 @@ describe('SingleSignOnForm', () => {
     spyOn(actionRoot.authAction, 'validateSSOCode').and.returnValue(() => Promise.resolve());
     spyOn(actionRoot.authAction, 'doFinalizeSSOLogin').and.returnValue(() => Promise.resolve());
 
-    const {getByTestId} = mountComponent(
-      <SingleSignOnForm {...{doLogin}} />,
-      mockStoreFactory()({
-        ...initialRootState,
-        runtimeState: {
-          hasCookieSupport: true,
-          hasIndexedDbSupport: true,
-          isSupportedBrowser: true,
-        },
-      }),
-    );
+    const {getByTestId} = mountComponent(<SingleSignOnForm {...{doLogin}} />, mockStoreFactory()(initialRootState));
 
     const codeOrEmailInput = getByTestId(codeOrEmailInputId) as HTMLInputElement;
     const submitButton = getByTestId(submitButtonId) as HTMLInputElement;
@@ -125,14 +108,7 @@ describe('SingleSignOnForm', () => {
 
     const {getByTestId, container} = mountComponent(
       <SingleSignOnForm {...{doLogin: () => Promise.reject()}} />,
-      mockStoreFactory()({
-        ...initialRootState,
-        runtimeState: {
-          hasCookieSupport: true,
-          hasIndexedDbSupport: true,
-          isSupportedBrowser: true,
-        },
-      }),
+      mockStoreFactory()(initialRootState),
     );
 
     const codeOrEmailInput = getByTestId(codeOrEmailInputId) as HTMLInputElement;
@@ -160,14 +136,7 @@ describe('SingleSignOnForm', () => {
 
     const {getByTestId, container} = mountComponent(
       <SingleSignOnForm {...{doLogin: () => Promise.reject()}} />,
-      mockStoreFactory()({
-        ...initialRootState,
-        runtimeState: {
-          hasCookieSupport: true,
-          hasIndexedDbSupport: true,
-          isSupportedBrowser: true,
-        },
-      }),
+      mockStoreFactory()(initialRootState),
     );
 
     const codeOrEmailInput = getByTestId(codeOrEmailInputId) as HTMLInputElement;
@@ -204,14 +173,7 @@ describe('SingleSignOnForm', () => {
 
     const {getByTestId, container} = mountComponent(
       <SingleSignOnForm {...{doLogin: () => Promise.reject()}} />,
-      mockStoreFactory()({
-        ...initialRootState,
-        runtimeState: {
-          hasCookieSupport: true,
-          hasIndexedDbSupport: true,
-          isSupportedBrowser: true,
-        },
-      }),
+      mockStoreFactory()(initialRootState),
     );
 
     const codeOrEmailInput = getByTestId(codeOrEmailInputId) as HTMLInputElement;
@@ -225,9 +187,8 @@ describe('SingleSignOnForm', () => {
 
     fireEvent.submit(container.querySelector('form')!);
 
-    expect(actionRoot.authAction.doGetDomainInfo).toHaveBeenCalledTimes(1);
-
     await waitFor(() => {
+      expect(actionRoot.authAction.doGetDomainInfo).toHaveBeenCalledTimes(1);
       expect(actionRoot.navigationAction.doNavigate).toHaveBeenCalledWith(expectedHost);
     });
   });
@@ -251,14 +212,7 @@ describe('SingleSignOnForm', () => {
 
     const {getByTestId, container} = mountComponent(
       <SingleSignOnForm {...{doLogin: () => Promise.reject()}} />,
-      mockStoreFactory()({
-        ...initialRootState,
-        runtimeState: {
-          hasCookieSupport: true,
-          hasIndexedDbSupport: true,
-          isSupportedBrowser: true,
-        },
-      }),
+      mockStoreFactory()(initialRootState),
     );
 
     const codeOrEmailInput = getByTestId(codeOrEmailInputId) as HTMLInputElement;
@@ -274,9 +228,8 @@ describe('SingleSignOnForm', () => {
 
     fireEvent.submit(container.querySelector('form')!);
 
-    expect(actionRoot.authAction.doGetDomainInfo).toHaveBeenCalledTimes(1);
-
     await waitFor(() => {
+      expect(actionRoot.authAction.doGetDomainInfo).toHaveBeenCalledTimes(1);
       expect(actionRoot.navigationAction.doNavigate).toHaveBeenCalledWith(expectedHost);
     });
   });

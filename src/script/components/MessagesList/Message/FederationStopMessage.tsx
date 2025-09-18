@@ -21,15 +21,14 @@ import React from 'react';
 
 import {Link, LinkVariant} from '@wireapp/react-ui-kit';
 
-import {Icon} from 'Components/Icon';
+import * as Icon from 'Components/Icon';
+import {FederationStopMessage as FederationStopMessageEntity} from 'Repositories/entity/message/FederationStopMessage';
 import {Config} from 'src/script/Config';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 
 import {MessageTime} from './MessageTime';
 import {useMessageFocusedTabIndex} from './util';
-
-import {FederationStopMessage as FederationStopMessageEntity} from '../../../entity/message/FederationStopMessage';
 
 export interface FederationStopMessageProps {
   message: FederationStopMessageEntity;
@@ -47,7 +46,7 @@ const FederationStopMessage: React.FC<FederationStopMessageProps> = ({message, i
     <div className="message-header">
       <div className="message-header-icon message-header-icon--svg">
         <div>
-          <Icon.Info />
+          <Icon.InfoIcon />
         </div>
       </div>
       <div

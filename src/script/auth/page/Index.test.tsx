@@ -28,8 +28,7 @@ import {initialAuthState} from '../module/reducer/authReducer';
 import {ROUTE} from '../route';
 import {mockStoreFactory} from '../util/test/mockStoreFactory';
 import {mountComponent} from '../util/test/TestUtil';
-
-jest.mock('../util/SVGProvider');
+import {getPrefixedSSOCode} from '../util/urlUtil';
 
 jest.mock('react-router-dom', () => ({
   ...jest.requireActual('react-router-dom'),
@@ -38,8 +37,10 @@ jest.mock('react-router-dom', () => ({
 
 describe('when visiting the index page', () => {
   let configSpy: jest.SpyInstance;
+
   beforeEach(() => {
     configSpy = jest.spyOn(Config, 'getConfig').mockReturnValue({
+      APP_BASE: 'https://app.wire.com',
       BACKEND_NAME: 'mybrand',
       FEATURE: {
         ENABLE_ACCOUNT_REGISTRATION: true,
@@ -49,17 +50,7 @@ describe('when visiting the index page', () => {
     } as any);
   });
   it('shows the logo', () => {
-    const {getByTestId} = mountComponent(
-      <Index />,
-      mockStoreFactory()({
-        ...initialRootState,
-        runtimeState: {
-          hasCookieSupport: true,
-          hasIndexedDbSupport: true,
-          isSupportedBrowser: true,
-        },
-      }),
-    );
+    const {getByTestId} = mountComponent(<Index />, mockStoreFactory()(initialRootState));
 
     const logo = getByTestId('ui-wire-logo');
     expect(logo).not.toBeNull();
@@ -78,29 +69,14 @@ describe('when visiting the index page', () => {
             default_sso_code: defaultSSOCode,
           },
         },
-        runtimeState: {
-          hasCookieSupport: true,
-          hasIndexedDbSupport: true,
-          isSupportedBrowser: true,
-        },
       }),
     );
 
-    expect(Navigate).toHaveBeenCalledWith({to: `${ROUTE.SSO}/wire-${defaultSSOCode}`}, {});
+    expect(Navigate).toHaveBeenCalledWith({to: `${ROUTE.SSO}/${getPrefixedSSOCode(defaultSSOCode)}`}, {});
   });
 
   it('shows the welcome text with default backend name', () => {
-    const {getByTestId} = mountComponent(
-      <Index />,
-      mockStoreFactory()({
-        ...initialRootState,
-        runtimeState: {
-          hasCookieSupport: true,
-          hasIndexedDbSupport: true,
-          isSupportedBrowser: true,
-        },
-      }),
-    );
+    const {getByTestId} = mountComponent(<Index />, mockStoreFactory()(initialRootState));
 
     const welcomeText = getByTestId('welcome-text');
     expect(welcomeText.innerHTML).toContain(Config.getConfig().BACKEND_NAME);
@@ -108,23 +84,15 @@ describe('when visiting the index page', () => {
 
   it('shows the welcome text with custom backend name', () => {
     const customBackendName = 'Test';
+
     configSpy.mockReturnValue({
+      APP_BASE: 'https://app.wire.com',
       BACKEND_NAME: customBackendName,
       FEATURE: {
         ENABLE_ACCOUNT_REGISTRATION: true,
       },
     });
-    const {getByTestId} = mountComponent(
-      <Index />,
-      mockStoreFactory()({
-        ...initialRootState,
-        runtimeState: {
-          hasCookieSupport: true,
-          hasIndexedDbSupport: true,
-          isSupportedBrowser: true,
-        },
-      }),
-    );
+    const {getByTestId} = mountComponent(<Index />, mockStoreFactory()(initialRootState));
 
     const welcomeText = getByTestId('welcome-text');
 
@@ -134,17 +102,7 @@ describe('when visiting the index page', () => {
   it('navigates to login page when clicking login button', async () => {
     const historyPushSpy = spyOn(history, 'pushState');
 
-    const {getByTestId} = mountComponent(
-      <Index />,
-      mockStoreFactory()({
-        ...initialRootState,
-        runtimeState: {
-          hasCookieSupport: true,
-          hasIndexedDbSupport: true,
-          isSupportedBrowser: true,
-        },
-      }),
-    );
+    const {getByTestId} = mountComponent(<Index />, mockStoreFactory()(initialRootState));
 
     const loginButton = getByTestId('go-login');
     act(() => {
@@ -158,6 +116,7 @@ describe('when visiting the index page', () => {
 
   it('navigates to SSO login page when clicking SSO login button', async () => {
     configSpy.mockReturnValue({
+      APP_BASE: 'https://app.wire.com',
       FEATURE: {
         ENABLE_DOMAIN_DISCOVERY: true,
         ENABLE_SSO: true,
@@ -166,17 +125,7 @@ describe('when visiting the index page', () => {
 
     const historyPushSpy = spyOn(history, 'pushState');
 
-    const {getByTestId} = mountComponent(
-      <Index />,
-      mockStoreFactory()({
-        ...initialRootState,
-        runtimeState: {
-          hasCookieSupport: true,
-          hasIndexedDbSupport: true,
-          isSupportedBrowser: true,
-        },
-      }),
-    );
+    const {getByTestId} = mountComponent(<Index />, mockStoreFactory()(initialRootState));
 
     const ssoLogin = getByTestId('go-sso-login');
     expect(ssoLogin).not.toBeNull();
@@ -199,17 +148,7 @@ describe('when visiting the index page', () => {
     });
 
     it('does not show create account button', () => {
-      const {queryByTestId} = mountComponent(
-        <Index />,
-        mockStoreFactory()({
-          ...initialRootState,
-          runtimeState: {
-            hasCookieSupport: true,
-            hasIndexedDbSupport: true,
-            isSupportedBrowser: true,
-          },
-        }),
-      );
+      const {queryByTestId} = mountComponent(<Index />, mockStoreFactory()(initialRootState));
 
       const createAccountButton = queryByTestId('go-set-account-type');
       expect(createAccountButton).toBeNull();
@@ -219,6 +158,7 @@ describe('when visiting the index page', () => {
   describe('and the account registration is enabled', () => {
     beforeEach(() => {
       configSpy.mockReturnValue({
+        APP_BASE: 'https://app.wire.com',
         FEATURE: {
           ENABLE_ACCOUNT_REGISTRATION: true,
         },
@@ -228,17 +168,7 @@ describe('when visiting the index page', () => {
     it('show create account button and navigates to account type selection on click', async () => {
       const historyPushSpy = spyOn(history, 'pushState');
 
-      const {getByTestId} = mountComponent(
-        <Index />,
-        mockStoreFactory()({
-          ...initialRootState,
-          runtimeState: {
-            hasCookieSupport: true,
-            hasIndexedDbSupport: true,
-            isSupportedBrowser: true,
-          },
-        }),
-      );
+      const {getByTestId} = mountComponent(<Index />, mockStoreFactory()(initialRootState));
 
       const createAccount = getByTestId('go-set-account-type');
       expect(createAccount).not.toBeNull();
@@ -259,6 +189,7 @@ describe('when visiting the index page', () => {
   describe('and SSO & domain discovery is disabled', () => {
     beforeEach(() => {
       configSpy.mockReturnValue({
+        APP_BASE: 'https://app.wire.com',
         FEATURE: {
           ENABLE_DOMAIN_DISCOVERY: false,
           ENABLE_SSO: false,
@@ -267,17 +198,7 @@ describe('when visiting the index page', () => {
     });
 
     it('does not show SSO login button', () => {
-      const {queryByTestId} = mountComponent(
-        <Index />,
-        mockStoreFactory()({
-          ...initialRootState,
-          runtimeState: {
-            hasCookieSupport: true,
-            hasIndexedDbSupport: true,
-            isSupportedBrowser: true,
-          },
-        }),
-      );
+      const {queryByTestId} = mountComponent(<Index />, mockStoreFactory()(initialRootState));
 
       expect(queryByTestId('go-sso-login')).toBeNull();
     });
@@ -286,6 +207,7 @@ describe('when visiting the index page', () => {
   describe('and SSO, domain discovery & account registration is disabled', () => {
     beforeEach(() => {
       configSpy.mockReturnValue({
+        APP_BASE: 'https://app.wire.com',
         FEATURE: {
           ENABLE_ACCOUNT_REGISTRATION: false,
           ENABLE_DOMAIN_DISCOVERY: false,
@@ -295,17 +217,7 @@ describe('when visiting the index page', () => {
     });
 
     it('navigates directly to email login', async () => {
-      mountComponent(
-        <Index />,
-        mockStoreFactory()({
-          ...initialRootState,
-          runtimeState: {
-            hasCookieSupport: true,
-            hasIndexedDbSupport: true,
-            isSupportedBrowser: true,
-          },
-        }),
-      );
+      mountComponent(<Index />, mockStoreFactory()(initialRootState));
 
       expect(Navigate).toHaveBeenCalledWith({to: ROUTE.LOGIN}, {});
     });

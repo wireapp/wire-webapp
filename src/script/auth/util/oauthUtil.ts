@@ -27,8 +27,15 @@ import {Scope} from '../page/OAuthPermissions';
  * @returns OAuthBody
  */
 export const oAuthParams = (location: Location) => {
-  const params = new URLSearchParams(location.search);
+  const queryString = getOAuthQueryString(location);
+  const params = new URLSearchParams(queryString ?? location.hash);
   return Object.fromEntries(params) as unknown as OAuthBody;
+};
+
+export const getOAuthQueryString = (location: Location) => {
+  const hash = location.hash;
+  const queryParamIndex = hash.indexOf('?');
+  return hash.substring(queryParamIndex);
 };
 
 /**

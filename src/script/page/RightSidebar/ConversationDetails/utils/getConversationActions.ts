@@ -21,22 +21,35 @@ import {amplify} from 'amplify';
 
 import {WebAppEvents} from '@wireapp/webapp-events';
 
+import * as Icon from 'Components/Icon';
 import {MenuItem} from 'Components/panel/PanelActions';
+import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
+import {Conversation} from 'Repositories/entity/Conversation';
+import * as UserPermission from 'Repositories/user/UserPermission';
 import {t} from 'Util/LocalizerUtil';
 
-import {ConversationRepository} from '../../../../conversation/ConversationRepository';
-import {Conversation} from '../../../../entity/Conversation';
-import * as UserPermission from '../../../../user/UserPermission';
+import {Config} from '../../../../Config';
 import {ActionsViewModel} from '../../../../view_model/ActionsViewModel';
 
-const getConversationActions = (
-  conversationEntity: Conversation,
-  actionsViewModel: ActionsViewModel,
-  conversationRepository: ConversationRepository,
-  teamRole: UserPermission.ROLE,
-  isServiceMode: boolean = false,
-  isTeam: boolean = false,
-): MenuItem[] => {
+interface GetConversationActionsParams {
+  conversationEntity: Conversation;
+  actionsViewModel: ActionsViewModel;
+  conversationRepository: ConversationRepository;
+  teamRole: UserPermission.ROLE;
+  isServiceMode?: boolean;
+  isTeam?: boolean;
+  isParticipantBlocked?: boolean;
+}
+
+const getConversationActions = ({
+  conversationEntity,
+  actionsViewModel,
+  conversationRepository,
+  teamRole,
+  isServiceMode = false,
+  isTeam = false,
+  isParticipantBlocked = false,
+}: GetConversationActionsParams): MenuItem[] => {
   if (!conversationEntity) {
     return [];
   }
@@ -47,33 +60,47 @@ const getConversationActions = (
   const isSingleUser = is1to1Action || conversationEntity.isRequest();
   const userEntity = conversationEntity.firstUserEntity();
 
-  const nextConversationEntity = conversationRepository.getNextConversation(conversationEntity);
+  const getNextConversation = () => conversationRepository.getNextConversation(conversationEntity);
   const userPermissions = UserPermission.generatePermissionHelpers(teamRole);
 
-  const allMenuElements = [
+  const allMenuElements: {item: MenuItem; condition: boolean}[] = [
     {
       condition: userPermissions.canCreateGroupConversation() && is1to1Action && !isServiceMode,
       item: {
         click: () => amplify.publish(WebAppEvents.CONVERSATION.CREATE_GROUP, 'conversation_details', userEntity),
-        icon: 'group-icon',
+        Icon: Icon.GroupIcon,
         identifier: 'go-create-group',
         label: t('conversationDetailsActionCreateGroup'),
       },
     },
     {
-      condition: true,
+      condition: !conversationEntity.is_archived(),
       item: {
         click: async () => actionsViewModel.archiveConversation(conversationEntity),
-        icon: 'archive-icon',
+        Icon: Icon.ArchiveIcon,
         identifier: 'do-archive',
         label: t('conversationDetailsActionArchive'),
       },
     },
     {
+      condition: conversationEntity.is_archived(),
+      item: {
+        click: async () => actionsViewModel.unarchiveConversation(conversationEntity),
+        Icon: Icon.ArchiveIcon,
+        identifier: 'do-unarchive',
+        label: t('conversationsPopoverUnarchive'),
+      },
+    },
+    {
       condition: conversationEntity.isRequest(),
       item: {
-        click: async () => actionsViewModel.cancelConnectionRequest(userEntity, true, nextConversationEntity),
-        icon: 'close-icon',
+        click: async () => {
+          if (!userEntity) {
+            return;
+          }
+          void actionsViewModel.cancelConnectionRequest(userEntity, true, getNextConversation());
+        },
+        Icon: Icon.CloseIcon,
         identifier: 'do-cancel-request',
         label: t('conversationDetailsActionCancelRequest'),
       },
@@ -82,27 +109,46 @@ const getConversationActions = (
       condition: conversationEntity.isClearable(),
       item: {
         click: () => actionsViewModel.clearConversation(conversationEntity),
-        icon: 'eraser-icon',
+        Icon: Icon.EraserIcon,
         identifier: 'do-clear',
         label: t('conversationDetailsActionClear'),
       },
     },
     {
-      condition: isSingleUser && (userEntity?.isConnected() || userEntity?.isRequest()),
+      condition: isSingleUser && Boolean(userEntity?.isConnected() || userEntity?.isRequest()),
       item: {
-        click: () => actionsViewModel.blockUser(userEntity, true, nextConversationEntity),
-        icon: 'block-icon',
+        click: () => {
+          if (!userEntity) {
+            return;
+          }
+          void actionsViewModel.blockUser(userEntity);
+        },
+        Icon: Icon.BlockIcon,
         identifier: 'do-block',
         label: t('conversationDetailsActionBlock'),
+      },
+    },
+    {
+      condition: isSingleUser && isParticipantBlocked,
+      item: {
+        click: () => {
+          if (!userEntity) {
+            return;
+          }
+          void actionsViewModel.unblockUser(userEntity);
+        },
+        Icon: Icon.BlockIcon,
+        identifier: 'do-unblock',
+        label: t('conversationDetailsActionUnblock'),
       },
     },
     {
       condition: conversationEntity.isLeavable() && roleRepository.canLeaveGroup(conversationEntity),
       item: {
         click: async () => actionsViewModel.leaveConversation(conversationEntity),
-        icon: 'leave-icon',
+        Icon: Icon.LeaveIcon,
         identifier: 'do-leave',
-        label: t('conversationDetailsActionLeave'),
+        label: conversationEntity.isChannel() ? t('channelDetailsActionLeave') : t('groupDetailsActionLeave'),
       },
     },
     {
@@ -110,12 +156,25 @@ const getConversationActions = (
         !isSingleUser &&
         isTeam &&
         roleRepository.canDeleteGroup(conversationEntity) &&
-        conversationEntity.isCreatedBySelf(),
+        !conversationEntity.isSelfUserRemoved() &&
+        conversationEntity.inTeam(),
       item: {
-        click: async () => actionsViewModel.deleteConversation(conversationEntity),
-        icon: 'delete-icon',
+        click: () => actionsViewModel.deleteConversation(conversationEntity),
+        Icon: Icon.DeleteIcon,
         identifier: 'do-delete',
-        label: t('conversationDetailsActionDelete'),
+        label: conversationEntity.isChannel() ? t('channelDetailsActionDelete') : t('groupDetailsActionDelete'),
+      },
+    },
+    {
+      condition:
+        conversationEntity.isGroupOrChannel() &&
+        conversationEntity.isSelfUserRemoved() &&
+        Config.getConfig().FEATURE.ENABLE_REMOVE_GROUP_CONVERSATION,
+      item: {
+        click: () => actionsViewModel.removeConversation(conversationEntity),
+        Icon: Icon.CloseIcon,
+        identifier: 'do-remove',
+        label: t('conversationDetailsActionDeleteForMe'),
       },
     },
   ];

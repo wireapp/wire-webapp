@@ -19,13 +19,11 @@
 
 import React, {useState} from 'react';
 
-import {useIntl} from 'react-intl';
-
 import {Button, CheckRoundIcon, ContainerSM, H1, Muted, Text} from '@wireapp/react-ui-kit';
 
-import {KEY} from 'Util/KeyboardUtil';
+import {handleEnterDown} from 'Util/KeyboardUtil';
+import {t} from 'Util/LocalizerUtil';
 
-import {setEntropyStrings} from '../../strings';
 import {EntropyData} from '../../util/Entropy';
 import {EntropyCanvas} from '../component/EntropyCanvas';
 import {ProgressBar} from '../component/ProgressBar';
@@ -36,7 +34,6 @@ interface Props extends React.HTMLProps<HTMLDivElement> {
 }
 
 const EntropyContainer = ({onSetEntropy, containerSize = 400}: Props) => {
-  const {formatMessage: _} = useIntl();
   const [entropy, setEntropy] = useState<EntropyData>(new EntropyData());
   const [pause, setPause] = useState<boolean>();
   const [percent, setPercent] = useState(0);
@@ -66,31 +63,27 @@ const EntropyContainer = ({onSetEntropy, containerSize = 400}: Props) => {
       }}
     >
       <H1 center css={{marginBottom: 16}}>
-        {_(setEntropyStrings.headline)}
+        {t('setEntropy.headline')}
       </H1>
       {percent >= 100 ? (
         <>
           <CheckRoundIcon width={64} height={64} css={{alignSelf: 'center', marginBottom: 64}} />
           <Muted center style={{marginBottom: 40}}>
-            {_(setEntropyStrings.success)}
+            {t('setEntropy.success')}
           </Muted>
           <Button
             css={{width: '70%'}}
             onClick={() => forwardEntropy(entropy.entropyData)}
             data-uie-name="do-entropy-confirm"
-            onKeyDown={(event: React.KeyboardEvent) => {
-              if (event.key === KEY.ENTER) {
-                forwardEntropy(entropy.entropyData);
-              }
-            }}
+            onKeyDown={event => handleEnterDown(event, () => forwardEntropy(entropy.entropyData))}
           >
-            {_(setEntropyStrings.continue)}
+            {t('setEntropy.continue')}
           </Button>
         </>
       ) : (
         <>
           <Muted center css={{marginBottom: '24px'}}>
-            {_(setEntropyStrings.subheadline)}
+            {t('setEntropy.subheadline')}
           </Muted>
           <EntropyCanvas
             css={{border: pause ? 'red 2px solid' : 'black 2px solid'}}

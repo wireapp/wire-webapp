@@ -17,14 +17,17 @@
  *
  */
 
-import {useState, useRef, FC} from 'react';
+import {useState, useRef} from 'react';
 
-import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
 import cx from 'classnames';
+
+import {TabIndex} from '@wireapp/react-ui-kit';
 
 import {Avatar, AVATAR_SIZE} from 'Components/Avatar';
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
-import {handleKeyDown} from 'Util/KeyboardUtil';
+import {User} from 'Repositories/entity/User';
+import {UserRepository} from 'Repositories/user/UserRepository';
+import {handleKeyDown, KEY} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
 import {getLogger} from 'Util/Logger';
 import {validateProfileImageResolution} from 'Util/util';
@@ -32,20 +35,24 @@ import {validateProfileImageResolution} from 'Util/util';
 import {FileInput} from './FileInput';
 
 import {Config} from '../../../../../Config';
-import {User} from '../../../../../entity/User';
 import {UserError} from '../../../../../error/UserError';
-import {UserRepository} from '../../../../../user/UserRepository';
 
 interface AvatarInputProps {
   isActivatedAccount: boolean;
   selfUser: User;
   userRepository: UserRepository;
+  hideAvailabilityStatus?: boolean;
 }
 
 const FILE_TYPES = ['image/bmp', 'image/jpeg', 'image/jpg', 'image/png', '.jpg-large'];
 const logger = getLogger('AvatarInput');
 
-const AvatarInput: FC<AvatarInputProps> = ({selfUser, isActivatedAccount, userRepository}) => {
+export const AvatarInput = ({
+  selfUser,
+  isActivatedAccount,
+  userRepository,
+  hideAvailabilityStatus = false,
+}: AvatarInputProps) => {
   const inputRef = useRef<HTMLInputElement>(null);
   const [isUploading, setIsUploading] = useState<boolean>(false);
 
@@ -63,7 +70,7 @@ const AvatarInput: FC<AvatarInputProps> = ({selfUser, isActivatedAccount, userRe
     const isTooLarge = newUserPicture.size > Config.getConfig().MAXIMUM_IMAGE_FILE_SIZE;
     if (isTooLarge) {
       const maximumSizeInMB = Config.getConfig().MAXIMUM_IMAGE_FILE_SIZE / 1024 / 1024;
-      const messageString = t('modalPictureTooLargeMessage', maximumSizeInMB);
+      const messageString = t('modalPictureTooLargeMessage', {number: maximumSizeInMB});
       const titleString = t('modalPictureTooLargeHeadline');
 
       return showUploadWarning(titleString, messageString);
@@ -122,7 +129,13 @@ const AvatarInput: FC<AvatarInputProps> = ({selfUser, isActivatedAccount, userRe
     <div
       tabIndex={TabIndex.FOCUSABLE}
       role="button"
-      onKeyDown={(event: React.KeyboardEvent<HTMLElement>) => handleKeyDown(event, inputClick)}
+      onKeyDown={(event: React.KeyboardEvent<HTMLElement>) =>
+        handleKeyDown({
+          event,
+          callback: inputClick,
+          keys: [KEY.ENTER, KEY.SPACE],
+        })
+      }
       aria-label={`${t('tooltipPreferencesPicture')}`}
     >
       <label
@@ -135,7 +148,9 @@ const AvatarInput: FC<AvatarInputProps> = ({selfUser, isActivatedAccount, userRe
           participant={selfUser}
           avatarSize={AVATAR_SIZE.X_LARGE}
           avatarAlt={t('selfProfileImageAlt')}
+          hideAvailabilityStatus={hideAvailabilityStatus}
         />
+
         <FileInput
           disabled={isUploading}
           ref={inputRef}
@@ -150,5 +165,3 @@ const AvatarInput: FC<AvatarInputProps> = ({selfUser, isActivatedAccount, userRe
     </div>
   );
 };
-
-export {AvatarInput};

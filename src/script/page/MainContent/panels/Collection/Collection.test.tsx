@@ -20,21 +20,20 @@
 import {fireEvent, render, waitFor, act} from '@testing-library/react';
 import {container} from 'tsyringe';
 
+import {AssetRepository} from 'Repositories/assets/AssetRepository';
+import {MessageRepository} from 'Repositories/conversation/MessageRepository';
+import {Conversation} from 'Repositories/entity/Conversation';
+import {ContentMessage} from 'Repositories/entity/message/ContentMessage';
+import {FileAsset} from 'Repositories/entity/message/FileAsset';
+import {LinkPreview} from 'Repositories/entity/message/LinkPreview';
+import {MediumImage} from 'Repositories/entity/message/MediumImage';
+import {Text} from 'Repositories/entity/message/Text';
+import {User} from 'Repositories/entity/User';
 import {withTheme} from 'src/script/auth/util/test/TestUtil';
-import {Conversation} from 'src/script/entity/Conversation';
-import {ContentMessage} from 'src/script/entity/message/ContentMessage';
-import {FileAsset} from 'src/script/entity/message/FileAsset';
-import {LinkPreview} from 'src/script/entity/message/LinkPreview';
-import {MediumImage} from 'src/script/entity/message/MediumImage';
 import {MessageCategory} from 'src/script/message/MessageCategory';
-import {UserState} from 'src/script/user/UserState';
 import {createUuid} from 'Util/uuid';
 
 import {Collection} from './Collection';
-
-import {AssetRepository} from '../../../../assets/AssetRepository';
-import {MessageRepository} from '../../../../conversation/MessageRepository';
-import {Text} from '../../../../entity/message/Text';
 
 jest.mock('./CollectionDetails', () => ({
   CollectionDetails: () => <div>CollectionDetails</div>,
@@ -89,7 +88,7 @@ describe('Collection', () => {
   };
   const mockAssetRepository = container.resolve(AssetRepository);
   const mockMessageRepository = {} as MessageRepository;
-  const mockUserState = new UserState();
+  const mockSelfUser = new User(createUuid());
 
   it('displays all image assets', async () => {
     const {getAllByText, getByText, queryByText} = render(
@@ -99,7 +98,7 @@ describe('Collection', () => {
           conversation={conversation}
           conversationRepository={mockConversationRepository as any}
           messageRepository={mockMessageRepository}
-          userState={mockUserState}
+          selfUser={mockSelfUser}
         />,
       ),
     );
@@ -125,7 +124,7 @@ describe('Collection', () => {
           messageRepository={mockMessageRepository}
           conversation={conversation}
           conversationRepository={mockConversationRepository as any}
-          userState={mockUserState}
+          selfUser={mockSelfUser}
         />,
       ),
     );
@@ -146,7 +145,7 @@ describe('Collection', () => {
           messageRepository={mockMessageRepository}
           conversation={conversation}
           conversationRepository={mockConversationRepository as any}
-          userState={mockUserState}
+          selfUser={mockSelfUser}
         />,
       ),
     );

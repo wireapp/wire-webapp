@@ -17,7 +17,7 @@
  *
  */
 
-import {FC, useEffect} from 'react';
+import {FC, ReactNode, useEffect} from 'react';
 
 import {pathWithParams} from '@wireapp/commons/lib/util/UrlUtil';
 import {IntlProvider} from 'react-intl';
@@ -29,29 +29,25 @@ import {ContainerXS, Loading, StyledApp, THEME_ID} from '@wireapp/react-ui-kit';
 
 import {t} from 'Util/LocalizerUtil';
 
-import {CheckPassword} from './CheckPassword';
 import {ClientManager} from './ClientManager';
 import {ConversationJoin} from './ConversationJoin';
 import {ConversationJoinInvalid} from './ConversationJoinInvalid';
-import {CreateAccount} from './CreateAccount';
 import {CreatePersonalAccount} from './CreatePersonalAccount';
+import {CustomBackend} from './CustomBackend';
 import {CustomEnvironmentRedirect} from './CustomEnvironmentRedirect';
 import {HistoryInfo} from './HistoryInfo';
 import {Index} from './Index';
-import {InitialInvite} from './InitialInvite';
 import {Login} from './Login';
 import {OAuthPermissions} from './OAuthPermissions';
-import {PhoneLogin} from './PhoneLogin';
 import {SetAccountType} from './SetAccountType';
 import {SetEmail} from './SetEmail';
 import {SetEntropyPage} from './SetEntropyPage';
 import {SetHandle} from './SetHandle';
 import {SetPassword} from './SetPassword';
 import {SingleSignOn} from './SingleSignOn';
-import {TeamName} from './TeamName';
+import {Success} from './Success';
 import {VerifyEmailCode} from './VerifyEmailCode';
 import {VerifyEmailLink} from './VerifyEmailLink';
-import {VerifyPhoneCode} from './VerifyPhoneCode';
 
 import {Config} from '../../Config';
 import {mapLanguage, normalizeLanguage} from '../localeConfig';
@@ -60,10 +56,11 @@ import {bindActionCreators, RootState} from '../module/reducer';
 import * as AuthSelector from '../module/selector/AuthSelector';
 import * as LanguageSelector from '../module/selector/LanguageSelector';
 import {ROUTE} from '../route';
+import {getOAuthQueryString} from '../util/oauthUtil';
 
 interface RootProps {}
 
-const Title: FC<{title: string; children: React.ReactNode}> = ({title, children}) => {
+const Title: FC<{title: string; children: ReactNode}> = ({title, children}) => {
   useEffect(() => {
     document.title = title;
   }, [title]);
@@ -106,11 +103,22 @@ const RootComponent: FC<RootProps & ConnectedProps & DispatchProps> = ({
     return null;
   };
 
-  const isAuthenticatedCheck = (page: any): any => (page ? (isAuthenticated ? page : navigate('/auth')) : null);
-  const isOAuthCheck = (page: any): any => (page ? isAuthenticated ? page : <Navigate to={ROUTE.LOGIN} /> : null);
+  const isAuthenticatedCheck = (page: ReactNode): ReactNode =>
+    page ? (isAuthenticated ? page : navigate('/auth')) : null;
+
+  const isOAuthCheck = (page: ReactNode): ReactNode => {
+    if (page) {
+      if (isAuthenticated) {
+        return page;
+      }
+
+      const queryString = getOAuthQueryString(window.location);
+      return queryString ? <Navigate to={`${ROUTE.LOGIN}/${queryString}`} /> : <Navigate to={ROUTE.LOGIN} />;
+    }
+    return null;
+  };
 
   const ProtectedHistoryInfo = () => isAuthenticatedCheck(<HistoryInfo />);
-  const ProtectedInitialInvite = () => isAuthenticatedCheck(<InitialInvite />);
   const ProtectedClientManager = () => isAuthenticatedCheck(<ClientManager />);
 
   const ProtectedSetHandle = () => isAuthenticatedCheck(<SetHandle />);
@@ -118,10 +126,20 @@ const RootComponent: FC<RootProps & ConnectedProps & DispatchProps> = ({
   const ProtectedSetPassword = () => isAuthenticatedCheck(<SetPassword />);
   const ProtectedOAuthPermissions = () => isOAuthCheck(<OAuthPermissions />);
 
+  // Send user back to index page after e2ei oauth redirect
+  // This is needed because the oauth redirect is only done by logged in users
+  // and the user would otherwise be stuck on login page without getting logged in
+  if (window.location.hash.includes(ROUTE.E2EI_OAUTH_REDIRECT)) {
+    navigate(ROUTE.INDEX);
+  }
+
   const brandName = Config.getConfig().BRAND_NAME;
   return (
     <IntlProvider locale={normalizeLanguage(language)} messages={loadLanguage(language)}>
-      <StyledApp themeId={THEME_ID.DEFAULT} style={{display: 'flex', height: '100%', minHeight: '100vh'}}>
+      <StyledApp
+        themeId={THEME_ID.DEFAULT}
+        style={{alignContent: 'center', height: '100%', minHeight: '100vh', display: 'flex'}}
+      >
         {isFetchingSSOSettings ? (
           <ContainerXS centerText verticalCenter style={{justifyContent: 'center'}}>
             <Loading />
@@ -137,16 +155,13 @@ const RootComponent: FC<RootProps & ConnectedProps & DispatchProps> = ({
                   </Title>
                 }
               />
-              <Route path={ROUTE.CHECK_PASSWORD} element={<CheckPassword />} />
               <Route path={ROUTE.CLIENTS} element={<ProtectedClientManager />} />
               <Route path={ROUTE.CONVERSATION_JOIN_INVALID} element={<ConversationJoinInvalid />} />
               <Route path={ROUTE.CONVERSATION_JOIN} element={<ConversationJoin />} />
-              {Config.getConfig().FEATURE.ENABLE_ACCOUNT_REGISTRATION && (
-                <Route path={ROUTE.CREATE_TEAM} element={<TeamName />} />
-              )}
               <Route path={ROUTE.HISTORY_INFO} element={<ProtectedHistoryInfo />} />
-              <Route path={ROUTE.INITIAL_INVITE} element={<ProtectedInitialInvite />} />
               <Route path={`${ROUTE.AUTHORIZE}`} element={<ProtectedOAuthPermissions />} />
+              <Route path={ROUTE.CUSTOM_BACKEND} element={<CustomBackend />} />
+              <Route path={ROUTE.SUCCESS} element={<Success />} />
               <Route
                 path={`${ROUTE.LOGIN}/*`}
                 element={
@@ -155,7 +170,6 @@ const RootComponent: FC<RootProps & ConnectedProps & DispatchProps> = ({
                   </Title>
                 }
               />
-              <Route path={ROUTE.LOGIN_PHONE} element={<PhoneLogin />} />
               <Route
                 path={ROUTE.SET_ACCOUNT_TYPE}
                 element={
@@ -165,7 +179,14 @@ const RootComponent: FC<RootProps & ConnectedProps & DispatchProps> = ({
                 }
               />
               <Route path={ROUTE.SET_EMAIL} element={<ProtectedSetEmail />} />
-              <Route path={ROUTE.SET_HANDLE} element={<ProtectedSetHandle />} />
+              <Route
+                path={ROUTE.SET_HANDLE}
+                element={
+                  <Title title={`${t('authSetUsername')} . ${brandName}`}>
+                    <ProtectedSetHandle />
+                  </Title>
+                }
+              />
               <Route
                 path={ROUTE.SET_PASSWORD}
                 element={
@@ -193,7 +214,6 @@ const RootComponent: FC<RootProps & ConnectedProps & DispatchProps> = ({
                 />
               </Route>
               <Route path={ROUTE.VERIFY_EMAIL_LINK} element={<VerifyEmailLink />} />
-              <Route path={ROUTE.VERIFY_PHONE_CODE} element={<VerifyPhoneCode />} />
               <Route path={ROUTE.CUSTOM_ENV_REDIRECT} element={<CustomEnvironmentRedirect />} />
               {Config.getConfig().FEATURE.ENABLE_EXTRA_CLIENT_ENTROPY && (
                 <Route path={ROUTE.SET_ENTROPY} element={<SetEntropyPage />} />
@@ -203,9 +223,6 @@ const RootComponent: FC<RootProps & ConnectedProps & DispatchProps> = ({
               )}
               {Config.getConfig().FEATURE.ENABLE_ACCOUNT_REGISTRATION && (
                 <Route path={ROUTE.CREATE_ACCOUNT} element={<CreatePersonalAccount />} />
-              )}
-              {Config.getConfig().FEATURE.ENABLE_ACCOUNT_REGISTRATION && (
-                <Route path={ROUTE.CREATE_TEAM_ACCOUNT} element={<CreateAccount />} />
               )}
               <Route path="*" element={<Navigate to={ROUTE.INDEX} replace />} />
             </Routes>

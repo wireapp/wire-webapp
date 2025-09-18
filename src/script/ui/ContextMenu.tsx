@@ -17,22 +17,25 @@
  *
  */
 
-import React, {useEffect, useMemo, useState} from 'react';
+import React, {ReactNode, useEffect, useMemo, useRef, useState} from 'react';
 
 import cx from 'classnames';
 import {createRoot, Root} from 'react-dom/client';
 
 import {Availability} from '@wireapp/protocol-messaging';
+import {StyledApp, THEME_ID} from '@wireapp/react-ui-kit';
 
-import {Icon} from 'Components/Icon';
+import * as Icon from 'Components/Icon';
 import {IgnoreOutsideClickWrapper} from 'Components/InputBar/util/clickHandlers';
 import {useMessageActionsState} from 'Components/MessagesList/Message/ContentMessage/MessageActions/MessageActions.state';
 import {isEnterKey, isEscapeKey, isKey, isOneOfKeys, isSpaceKey, KEY} from 'Util/KeyboardUtil';
 
+import {useActiveWindowState} from '../hooks/useActiveWindow';
+
 export interface ContextMenuEntry {
   availability?: Availability.Type;
   click?: (event?: MouseEvent) => void;
-  icon?: string;
+  icon?: React.ComponentType<React.SVGProps<SVGSVGElement>>;
   identifier?: string;
   isChecked?: boolean;
   isDisabled?: boolean;
@@ -44,19 +47,22 @@ export interface ContextMenuEntry {
 interface ContextMenuProps {
   defaultIdentifier?: string;
   entries: ContextMenuEntry[];
+  placeholder?: ReactNode;
   posX: number;
   posY: number;
   resetMenuStates?: () => void;
 }
 
-let container: HTMLDivElement;
+let container: HTMLDivElement | undefined;
 let previouslyFocused: HTMLElement;
 let reactRoot: Root;
 
 const cleanUp = () => {
+  const {activeWindow} = useActiveWindowState.getState();
+
   if (container) {
     reactRoot.unmount();
-    document.body.removeChild(container);
+    activeWindow.document.body.removeChild(container);
     container = undefined;
   }
 };
@@ -71,23 +77,28 @@ const ContextMenu: React.FC<ContextMenuProps> = ({
   posX,
   posY,
   resetMenuStates,
+  placeholder,
 }) => {
+  const {activeWindow} = useActiveWindowState();
   const [mainElement, setMainElement] = useState<HTMLUListElement>();
+  const placeholderElement = useRef<HTMLDivElement>(null);
   const [selected, setSelected] = useState<ContextMenuEntry>();
 
   const style = useMemo<React.CSSProperties>(() => {
     const left =
-      mainElement && window.innerWidth - posX < mainElement.offsetWidth ? posX - mainElement.offsetWidth : posX;
+      mainElement && activeWindow.innerWidth - posX < mainElement.offsetWidth ? posX - mainElement.offsetWidth : posX;
     const top = Math.max(
-      mainElement && window.innerHeight - posY < mainElement.offsetHeight ? posY - mainElement.offsetHeight : posY,
+      mainElement && activeWindow.innerHeight - posY < mainElement.offsetHeight
+        ? posY - mainElement.offsetHeight
+        : posY,
       0,
     );
     return {
       left,
       top,
-      visibility: mainElement ? 'unset' : 'hidden',
+      visibility: mainElement || placeholderElement ? 'unset' : 'hidden',
     };
-  }, [mainElement]);
+  }, [mainElement, placeholderElement]);
 
   useEffect(() => {
     if (selected) {
@@ -96,7 +107,9 @@ const ContextMenu: React.FC<ContextMenuProps> = ({
 
       // context menu options such as 10 seconds etc begings with digit which is an invalid querySelector
       // param append btn- to avoid such errors
-      const selectedButton = document.querySelector(`#${getButtonId(labelWithoutQuotes!)}`) as HTMLButtonElement;
+      const selectedButton = activeWindow.document.querySelector(
+        `#${getButtonId(labelWithoutQuotes!)}`,
+      ) as HTMLButtonElement;
       selectedButton?.focus();
     }
   }, [selected]);
@@ -139,25 +152,28 @@ const ContextMenu: React.FC<ContextMenuProps> = ({
     };
 
     const onMouseDown = (event: MouseEvent): void => {
-      const isOutsideClick = mainElement && !mainElement.contains(event.target as Node);
+      const isOutsideClick = entries.length
+        ? mainElement && !mainElement.contains(event.target as Node)
+        : placeholderElement && !placeholderElement.current?.contains(event.target as Node);
+
       if (isOutsideClick) {
         cleanUp();
         resetMsgMenuStates(isOutsideClick);
       }
     };
 
-    window.addEventListener('wheel', onWheel);
-    window.addEventListener('keydown', onKeyDown);
-    window.addEventListener('mousedown', onMouseDown);
-    window.addEventListener('resize', cleanUp);
+    activeWindow.addEventListener('wheel', onWheel);
+    activeWindow.addEventListener('keydown', onKeyDown);
+    activeWindow.addEventListener('mousedown', onMouseDown);
+    activeWindow.addEventListener('resize', cleanUp);
 
     return () => {
-      window.removeEventListener('wheel', onWheel);
-      window.removeEventListener('keydown', onKeyDown);
-      window.removeEventListener('mousedown', onMouseDown);
-      window.removeEventListener('resize', cleanUp);
+      activeWindow.removeEventListener('wheel', onWheel);
+      activeWindow.removeEventListener('keydown', onKeyDown);
+      activeWindow.removeEventListener('mousedown', onMouseDown);
+      activeWindow.removeEventListener('resize', cleanUp);
     };
-  }, [mainElement, selected]);
+  }, [mainElement, selected, activeWindow]);
 
   const {handleMenuOpen} = useMessageActionsState();
   const resetMsgMenuStates = (isOutsideClick = false) => {
@@ -173,86 +189,103 @@ const ContextMenu: React.FC<ContextMenuProps> = ({
   return (
     <IgnoreOutsideClickWrapper>
       <div className="overlay">
-        <ul
-          className={contextMenuClassName}
-          ref={setMainElement}
-          style={{maxHeight: window.innerHeight, ...style}}
-          role="menu"
-        >
-          {entries.map((entry, index) =>
-            entry.isSeparator ? (
-              <li key={`${index}`} className={`${contextMenuClassName}__separator`} />
-            ) : (
-              <li
-                key={`${index}`}
-                className={cx(`${contextMenuClassName}__item`, {
-                  [`${contextMenuClassName}__item--checked`]: entry.isChecked,
-                  [`${contextMenuClassName}__item--disabled`]: entry.isDisabled,
-                  selected: entry === selected,
-                })}
-                role="menuitem"
-                aria-haspopup="true"
-              >
-                <button
-                  id={getButtonId(entry.label!)}
-                  className={`${contextMenuClassName}__button`}
-                  type="button"
-                  data-uie-name={entry.identifier || defaultIdentifier}
-                  title={entry.title || entry.label}
-                  {...(entry.isDisabled
-                    ? undefined
-                    : {
-                        onClick: event => {
-                          event.preventDefault();
-                          cleanUp();
-                          resetMsgMenuStates();
-                          entry.click?.(event.nativeEvent);
-                        },
-                        onMouseEnter: () => {
-                          setSelected(undefined);
-                        },
-                      })}
+        {entries.length ? (
+          <ul
+            className={contextMenuClassName}
+            ref={setMainElement}
+            style={{maxHeight: activeWindow.innerHeight, ...style}}
+            role="menu"
+          >
+            {entries.map((entry, index) =>
+              entry.isSeparator ? (
+                <li key={`${index}`} className={`${contextMenuClassName}__separator`} />
+              ) : (
+                <li
+                  key={`${index}`}
+                  className={cx(`${contextMenuClassName}__item`, {
+                    [`${contextMenuClassName}__item--checked`]: entry.isChecked,
+                    [`${contextMenuClassName}__item--disabled`]: entry.isDisabled,
+                    selected: entry === selected,
+                  })}
+                  role="menuitem"
+                  aria-haspopup="true"
                 >
-                  {entry.icon && <Icon name={entry.icon} className={`${contextMenuClassName}__icon`} />}
-                  <span>{entry.label}</span>
-                  {entry.isChecked && (
-                    <Icon.Check
-                      className={`${contextMenuClassName}__check`}
-                      data-uie-name={`${contextMenuClassName}-check`}
-                    />
-                  )}
-                </button>
-              </li>
-            ),
-          )}
-        </ul>
+                  <button
+                    id={getButtonId(entry.label!)}
+                    className={`${contextMenuClassName}__button`}
+                    type="button"
+                    data-uie-name={entry.identifier || defaultIdentifier}
+                    title={entry.title || entry.label}
+                    {...(entry.isDisabled
+                      ? undefined
+                      : {
+                          onClick: event => {
+                            event.preventDefault();
+                            cleanUp();
+                            resetMsgMenuStates();
+                            entry.click?.(event.nativeEvent);
+                          },
+                          onMouseEnter: () => {
+                            setSelected(undefined);
+                          },
+                        })}
+                  >
+                    {entry.icon && <entry.icon className={`${contextMenuClassName}__icon`} />}
+                    <span>{entry.label}</span>
+                    {entry.isChecked && (
+                      <Icon.CheckIcon
+                        className={`${contextMenuClassName}__check`}
+                        data-uie-name={`${contextMenuClassName}-check`}
+                      />
+                    )}
+                  </button>
+                </li>
+              ),
+            )}
+          </ul>
+        ) : (
+          <div ref={placeholderElement} className={`${contextMenuClassName}__placeholder`} style={style}>
+            {placeholder}
+          </div>
+        )}
       </div>
     </IgnoreOutsideClickWrapper>
   );
 };
 
-export const showContextMenu = (
-  event: MouseEvent | React.MouseEvent,
-  entries: ContextMenuEntry[],
-  identifier: string,
-  resetMenuStates?: () => void,
-) => {
+export const showContextMenu = ({
+  entries,
+  event,
+  identifier,
+  placeholder,
+  resetMenuStates,
+}: {
+  event: MouseEvent | React.MouseEvent;
+  entries: ContextMenuEntry[];
+  identifier: string;
+  resetMenuStates?: () => void;
+  placeholder?: ReactNode;
+}) => {
+  const {activeWindow} = useActiveWindowState.getState();
   event.preventDefault();
   event.stopPropagation();
 
-  previouslyFocused = document.activeElement as HTMLElement;
+  previouslyFocused = activeWindow.document.activeElement as HTMLElement;
   cleanUp();
 
-  container = document.createElement('div');
-  document.body.appendChild(container);
+  container = activeWindow.document.createElement('div');
+  activeWindow.document.body.appendChild(container);
   reactRoot = createRoot(container);
   reactRoot.render(
-    <ContextMenu
-      entries={entries}
-      defaultIdentifier={identifier}
-      posX={event.clientX}
-      posY={event.clientY}
-      resetMenuStates={resetMenuStates}
-    />,
+    <StyledApp themeId={THEME_ID.DEFAULT}>
+      <ContextMenu
+        entries={entries}
+        defaultIdentifier={identifier}
+        posX={event.clientX}
+        posY={event.clientY}
+        resetMenuStates={resetMenuStates}
+        placeholder={placeholder}
+      />
+    </StyledApp>,
   );
 };

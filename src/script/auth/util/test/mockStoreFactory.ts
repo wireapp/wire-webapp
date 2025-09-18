@@ -18,7 +18,7 @@
  */
 
 import configureStore from 'redux-mock-store';
-import thunk from 'redux-thunk';
+import {withExtraArgument} from 'redux-thunk';
 
 import {APIClient} from '@wireapp/api-client';
 import type {TypeUtil} from '@wireapp/commons';
@@ -46,9 +46,7 @@ const defaultGetConfig = () => ({
     DEFAULT_LOGIN_TEMPORARY_CLIENT: false,
     ENABLE_ACCOUNT_REGISTRATION: true,
     ENABLE_DEBUG: true,
-    ENABLE_PHONE_LOGIN: true,
     ENABLE_SSO: true,
-    PERSIST_TEMPORARY_CLIENTS: true,
   },
 });
 
@@ -66,12 +64,12 @@ export const mockStoreFactory = (
     (core as any).apiClient = apiClient;
   }
   return configureStore<TypeUtil.RecursivePartial<RootState>, ThunkDispatch>([
-    thunk.withExtraArgument({
+    withExtraArgument({
       actions,
       apiClient,
       core,
       getConfig: getConfig || defaultGetConfig,
       localStorage,
-    }),
+    }) as any,
   ]);
 };

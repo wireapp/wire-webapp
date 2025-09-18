@@ -98,8 +98,15 @@ export const getLinksFromHtml = <T extends HTMLElement>(html: string): T[] => {
   const anchorTags = new RegExp(/<a[\s]+([^>]+)>((?:.(?!\<\/a\>))*.)<\/a>/, 'g');
   const links = html.match(anchorTags);
 
-  const hasLinks = links?.length;
-  return hasLinks ? links.map(element => $<T>(element)[0]) : [];
+  return links?.length
+    ? links.map(element => {
+        const container = document.createElement('div');
+        container.innerHTML = element.trim();
+
+        // Extract the first child, which should be the anchor element
+        return container.firstElementChild as T;
+      })
+    : [];
 };
 
 /**
@@ -108,3 +115,10 @@ export const getLinksFromHtml = <T extends HTMLElement>(html: string): T[] => {
  * @returns prepended URL
  */
 export const prependProtocol = (url: string) => (!url.match(/^http[s]?:\/\//i) ? `http://${url}` : url);
+
+/**
+ * Removes all URL parameters from the current URL
+ */
+export const removeUrlParameters = () => {
+  history.replaceState({}, '', `${location.origin}/${location.hash}`);
+};

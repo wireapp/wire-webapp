@@ -84,6 +84,7 @@ export class ValidationError extends Error {
     EMAIL: {...ValidationError.mapErrorsToField('email'), name: 'email'},
     NAME: {...ValidationError.mapErrorsToField('name'), name: 'name'},
     PASSWORD: {...ValidationError.mapErrorsToField('password'), name: 'password'},
+    CONFIRM_PASSWORD: {...ValidationError.mapErrorsToField('confirmPassword'), name: 'confirmPassword'},
     PASSWORD_LOGIN: {...ValidationError.mapErrorsToField('password-login'), name: 'password-login'},
     SSO_CODE: {...ValidationError.mapErrorsToField('sso-code'), name: 'sso-code'},
     SSO_EMAIL_CODE: {...ValidationError.mapErrorsToField('sso-code-email'), name: 'sso-code-email'},

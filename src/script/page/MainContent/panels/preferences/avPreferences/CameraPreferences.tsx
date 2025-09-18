@@ -17,19 +17,19 @@
  *
  */
 
-import React, {useEffect, useRef, useState} from 'react';
+import {memo, useCallback, useEffect, useRef, useState} from 'react';
 
-import {Icon} from 'Components/Icon';
-import {useKoSubscribableChildren} from 'Util/ComponentUtil';
+import * as Icon from 'Components/Icon';
+import {ElectronDesktopCapturerSource, MediaDevicesHandler} from 'Repositories/media/MediaDevicesHandler';
+import {MediaDeviceType} from 'Repositories/media/MediaDeviceType';
+import {MediaStreamHandler} from 'Repositories/media/MediaStreamHandler';
+import {MediaType} from 'Repositories/media/MediaType';
 import {t} from 'Util/LocalizerUtil';
 import {getLogger} from 'Util/Logger';
 
 import {DeviceSelect} from './DeviceSelect';
 
 import {Config} from '../../../../../Config';
-import {DeviceTypes, MediaDevicesHandler} from '../../../../../media/MediaDevicesHandler';
-import {MediaStreamHandler} from '../../../../../media/MediaStreamHandler';
-import {MediaType} from '../../../../../media/MediaType';
 import {PreferencesSection} from '../components/PreferencesSection';
 
 const logger = getLogger('CameraPreferences');
@@ -39,28 +39,25 @@ interface CameraPreferencesProps {
   hasActiveCameraStream: boolean;
   refreshStream: () => Promise<MediaStream | void>;
   streamHandler: MediaStreamHandler;
+  availableDevices: (MediaDeviceInfo | ElectronDesktopCapturerSource)[];
+  currentDeviceId: string;
 }
 
-const CameraPreferences: React.FC<CameraPreferencesProps> = ({
+const CameraPreferencesComponent = ({
   devicesHandler,
   streamHandler,
   refreshStream,
   hasActiveCameraStream,
-}) => {
+  availableDevices,
+  currentDeviceId,
+}: CameraPreferencesProps) => {
   const [isRequesting, setIsRequesting] = useState(false);
   const [stream, setStream] = useState<MediaStream | null>(null);
   const videoElement = useRef<HTMLVideoElement>(null);
-  const {[DeviceTypes.VIDEO_INPUT]: availableDevices} = useKoSubscribableChildren(devicesHandler?.availableDevices, [
-    DeviceTypes.VIDEO_INPUT,
-  ]);
-
-  const {[DeviceTypes.VIDEO_INPUT]: currentDeviceId} = useKoSubscribableChildren(devicesHandler?.currentDeviceId, [
-    DeviceTypes.VIDEO_INPUT,
-  ]);
 
   const {URL: urls, BRAND_NAME: brandName} = Config.getConfig();
 
-  const requestStream = async () => {
+  const requestStream = useCallback(async () => {
     setIsRequesting(true);
     try {
       // we should be able to change camera from preferences page in middle of the call
@@ -78,16 +75,18 @@ const CameraPreferences: React.FC<CameraPreferencesProps> = ({
         setStream(stream);
       }
     } catch (error) {
-      logger.warn(`Requesting MediaStream for type "${MediaType.VIDEO}" failed: ${error.message}`, error);
+      if (error instanceof Error) {
+        logger.warn(`Requesting MediaStream for type "${MediaType.VIDEO}" failed: ${error.message}`, error);
+      }
       setStream(null);
     } finally {
       setIsRequesting(false);
     }
-  };
+  }, [hasActiveCameraStream, refreshStream, streamHandler]);
 
   useEffect(() => {
     requestStream();
-  }, [currentDeviceId]);
+  }, [currentDeviceId, requestStream]);
 
   useEffect(() => {
     if (videoElement.current && stream) {
@@ -101,7 +100,7 @@ const CameraPreferences: React.FC<CameraPreferencesProps> = ({
         streamHandler.releaseTracksFromStream(stream);
       }
     },
-    [stream],
+    [hasActiveCameraStream, stream, streamHandler],
   );
 
   return (
@@ -118,9 +117,9 @@ const CameraPreferences: React.FC<CameraPreferencesProps> = ({
         devices={availableDevices as MediaDeviceInfo[]}
         value={currentDeviceId}
         defaultDeviceName={t('preferencesAVCamera')}
-        icon={Icon.Camera}
+        icon={Icon.CameraIcon}
         isRequesting={isRequesting}
-        onChange={deviceId => devicesHandler.currentDeviceId[DeviceTypes.VIDEO_INPUT](deviceId)}
+        onChange={deviceId => devicesHandler.currentDeviceId[MediaDeviceType.VIDEO_INPUT](deviceId)}
         title={t('preferencesAVCamera')}
       />
 
@@ -137,12 +136,17 @@ const CameraPreferences: React.FC<CameraPreferencesProps> = ({
               <div
                 className="preferences-av-video-disabled__info"
                 dangerouslySetInnerHTML={{
-                  __html: t('preferencesAVNoCamera', brandName, {
-                    '/faqLink': '</a>',
-                    br: '<br>',
-                    faqLink:
-                      "<a href='https://support.wire.com/hc/articles/202935412' data-uie-name='go-no-camera-faq' target='_blank' rel='noopener noreferrer'>",
-                  }),
+                  __html: t(
+                    'preferencesAVNoCamera',
+                    {brandName},
+                    {
+                      '/faqLink': '</a>',
+                      br: '<br>',
+                      faqLink: `<a href='${
+                        Config.getConfig().URL.SUPPORT.CAMERA_ACCESS_DENIED
+                      }' data-uie-name='go-no-camera-faq' target='_blank' rel='noopener noreferrer'>`,
+                    },
+                  ),
                 }}
               />
               <button
@@ -161,4 +165,4 @@ const CameraPreferences: React.FC<CameraPreferencesProps> = ({
   );
 };
 
-export {CameraPreferences};
+export const CameraPreferences = memo(CameraPreferencesComponent);

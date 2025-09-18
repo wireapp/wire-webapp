@@ -37,7 +37,7 @@ import {InternalErrorRoute, NotFoundRoute} from './routes/error/ErrorRoutes';
 import {GoogleWebmasterRoute} from './routes/googlewebmaster/GoogleWebmasterRoute';
 import {RedirectRoutes} from './routes/RedirectRoutes';
 import {Root} from './routes/Root';
-import * as BrowserUtil from './util/BrowserUtil';
+import {replaceHostnameInObject} from './util/hostnameReplacer';
 
 class Server {
   private readonly app: express.Express;
@@ -67,9 +67,11 @@ class Server {
     this.initStaticRoutes();
     this.initWebpack();
     this.initSiteMap(this.config);
+    // eslint-disable-next-line import/no-named-as-default-member
+    this.app.use('/libs', express.static(path.join(__dirname, 'libs')));
     this.app.use(Root());
     this.app.use(HealthCheckRoute());
-    this.app.use(ConfigRoute(this.clientConfig));
+    this.app.use(ConfigRoute(this.config, this.clientConfig));
     this.app.use(GoogleWebmasterRoute(this.config));
     this.app.use(AppleAssociationRoute());
     this.app.use(NotFoundRoute());
@@ -94,9 +96,13 @@ class Server {
       this.app.use(nocache());
     } else {
       this.app.use((req, res, next) => {
+        // If the user agent adds a v param, it means that its requesting a particular version of the file and that could be cached forever since the file will never change.
+        const hasCacheVersionParam = req.query.v && typeof req.query.v === 'string';
+        const oneYear = 31536000;
+        const maxAge = hasCacheVersionParam ? oneYear : this.config.CACHE_DURATION_SECONDS;
         const milliSeconds = 1000;
-        res.header('Cache-Control', `public, max-age=${this.config.CACHE_DURATION_SECONDS}`);
-        res.header('Expires', new Date(Date.now() + this.config.CACHE_DURATION_SECONDS * milliSeconds).toUTCString());
+        res.header('Cache-Control', `public, max-age=${maxAge}`);
+        res.header('Expires', new Date(Date.now() + maxAge * milliSeconds).toUTCString());
         next();
       });
     }
@@ -136,12 +142,14 @@ class Server {
         preload: true,
       }),
     );
-    this.app.use(
+    this.app.use((req, res, next) => {
       helmet.contentSecurityPolicy({
-        directives: this.config.CSP,
+        directives: this.config.ENABLE_DYNAMIC_HOSTNAME
+          ? replaceHostnameInObject(this.config.CSP, req)
+          : this.config.CSP,
         reportOnly: false,
-      }),
-    );
+      })(req, res, next);
+    });
     this.app.use(
       helmet.referrerPolicy({
         policy: 'same-origin',
@@ -159,14 +167,12 @@ class Server {
   private initStaticRoutes() {
     this.app.use(RedirectRoutes(this.config, this.clientConfig));
 
-    this.app.use('/audio', express.static(path.join(__dirname, 'static/audio')));
-    this.app.use('/ext', express.static(path.join(__dirname, 'static/ext')));
-    this.app.use('/font', express.static(path.join(__dirname, 'static/font')));
-    this.app.use('/image', express.static(path.join(__dirname, 'static/image')));
-    this.app.use('/min', express.static(path.join(__dirname, 'static/min')));
-    this.app.use('/proto', express.static(path.join(__dirname, 'static/proto')));
-    this.app.use('/style', express.static(path.join(__dirname, 'static/style')));
-    this.app.use('/worker', express.static(path.join(__dirname, 'static/worker')));
+    const staticRoutes = ['audio', 'ext', 'font', 'image', 'min', 'proto', 'style', 'worker', 'assets'];
+
+    staticRoutes.forEach(route => {
+      // eslint-disable-next-line import/no-named-as-default-member
+      this.app.use(`/${route}`, express.static(path.join(__dirname, `static/${route}`)));
+    });
 
     this.app.get('/favicon.ico', (_req, res) => res.sendFile(path.join(__dirname, 'static/image/favicon.ico')));
     if (!this.config.DEVELOPMENT) {
@@ -185,16 +191,13 @@ class Server {
         req.path.startsWith('/join') ||
         req.path.startsWith('/auth') ||
         req.path.startsWith('/google') ||
+        req.path.startsWith('/unsupported') ||
         req.path.startsWith('/apple-app-site-association');
 
       if (ignoredPath) {
         return next();
       }
 
-      const userAgent = req.header('User-Agent');
-      if (!BrowserUtil.isSupportedBrowser(userAgent)) {
-        return res.redirect(HTTP_STATUS.MOVED_TEMPORARILY, '/auth/');
-      }
       return next();
     });
   }
@@ -232,7 +235,7 @@ class Server {
       if (this.server) {
         reject('Server is already running.');
       } else if (this.config.PORT_HTTP) {
-        if (this.config.DEVELOPMENT) {
+        if (this.config.DEVELOPMENT && this.config.DEVELOPMENT_ENABLE_TLS) {
           const options = {
             cert: fs.readFileSync(this.config.SSL_CERTIFICATE_PATH),
             key: fs.readFileSync(this.config.SSL_CERTIFICATE_KEY_PATH),

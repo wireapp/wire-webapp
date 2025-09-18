@@ -197,6 +197,18 @@ describe('renderMessage', () => {
     );
   });
 
+  it('renders a wire deeplink with config url', () => {
+    expect(renderMessage('wire://access/?config=https://test.com/deeplink.json')).toBe(
+      '<a href="wire://access/?config=https://test.com/deeplink.json" target="_blank" rel="nofollow noopener noreferrer" data-uie-name="wire-deep-link">wire://access/?config=https://test.com/deeplink.json</a>',
+    );
+  });
+
+  it('renders a wire deeplink with config url with alias', () => {
+    expect(renderMessage('[deeplink](wire://access/?config=https://test.com/deeplink.json)')).toBe(
+      '<a href="wire://access/?config=https://test.com/deeplink.json" target="_blank" rel="nofollow noopener noreferrer" data-uie-name="wire-deep-link">deeplink</a>',
+    );
+  });
+
   it('renders a link from markdown notation with formatting', () => {
     expect(renderMessage('[**doop**](http://www.example.com)')).toBe(
       '<a href="http://www.example.com" target="_blank" rel="nofollow noopener noreferrer" data-md-link="true" data-uie-name="markdown-link"><strong>doop</strong></a>',
@@ -497,8 +509,12 @@ describe('Markdown for code snippets', () => {
   });
 
   it(`doesn't render links within code blocks`, () => {
-    const expected =
-      '<pre><code class="lang-xml"><span class="hljs-tag">&lt;<span class="hljs-name">dependency</span>&gt;</span>\n  <span class="hljs-tag">&lt;<span class="hljs-name">groupId</span>&gt;</span>com.ibm.icu<span class="hljs-tag">&lt;/<span class="hljs-name">groupId</span>&gt;</span>\n  <span class="hljs-tag">&lt;<span class="hljs-name">artifactId</span>&gt;</span>icu4j<span class="hljs-tag">&lt;/<span class="hljs-name">artifactId</span>&gt;</span>\n  <span class="hljs-tag">&lt;<span class="hljs-name">version</span>&gt;</span>53.1<span class="hljs-tag">&lt;/<span class="hljs-name">version</span>&gt;</span>\n<span class="hljs-tag">&lt;/<span class="hljs-name">dependency</span>&gt;</span>\n</code></pre>';
+    const expected = `<pre><code class="lang-xml"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>dependency</span><span class="token punctuation">></span></span>
+  <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>groupId</span><span class="token punctuation">></span></span>com.ibm.icu<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>groupId</span><span class="token punctuation">></span></span>
+  <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>artifactId</span><span class="token punctuation">></span></span>icu4j<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>artifactId</span><span class="token punctuation">></span></span>
+  <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>version</span><span class="token punctuation">></span></span>53.1<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>version</span><span class="token punctuation">></span></span>
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>dependency</span><span class="token punctuation">></span></span>
+</code></pre>`;
 
     expect(
       renderMessage(
@@ -506,58 +522,14 @@ describe('Markdown for code snippets', () => {
       ),
     ).toEqual(expected);
   });
-
-  it('renders escaped Ruby code blocks', () => {
-    const expected =
-      '<pre><code class="lang-ruby"><span class="hljs-keyword">require</span> <span class="hljs-string">&#x27;redcarpet&#x27;</span>\nmarkdown = <span class="hljs-title class_">Redcarpet</span>.new(<span class="hljs-string">&quot;Hello World!&quot;</span>)\nputs markdown.to_html\n</code></pre>';
-
-    expect(
-      renderMessage(
-        '```ruby\nrequire \'redcarpet\'\nmarkdown = Redcarpet.new("Hello World!")\nputs markdown.to_html\n```',
-      ),
-    ).toEqual(expected);
-  });
-
-  it('renders escaped JavaScript code blocks', () => {
-    const expected =
-      '<pre><code class="lang-js">$(<span class="hljs-variable language_">document</span>).<span class="hljs-title function_">ready</span>(<span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) {\n  $(<span class="hljs-string">&#x27;pre code&#x27;</span>).<span class="hljs-title function_">each</span>(<span class="hljs-keyword">function</span>(<span class="hljs-params">i, block</span>) {\n    hljs.<span class="hljs-title function_">highlightBlock</span>(block);\n  });\n});\n</code></pre>';
-    expect(
-      renderMessage(
-        "```js\n$(document).ready(function() {\n  $('pre code').each(function(i, block) {\n    hljs.highlightBlock(block);\n  });\n});\n```",
-      ),
-    ).toEqual(expected);
-  });
-
-  it('renders escaped TypeScript code blocks', () => {
-    const expected =
-      '<pre><code class="lang-typescript"><span class="hljs-keyword">const</span> greetings = (<span class="hljs-attr">name</span>: <span class="hljs-built_in">string</span>): <span class="hljs-function"><span class="hljs-params">string</span> =&gt;</span> {\n  <span class="hljs-keyword">return</span> <span class="hljs-string">`Hello, <span class="hljs-subst">${name}</span>!`</span>;\n};\n<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-title function_">greetings</span>(<span class="hljs-string">&#x27;world&#x27;</span>));\n</code></pre>';
-    expect(
-      renderMessage(
-        "```typescript\nconst greetings = (name: string): string => {\n  return `Hello, ${name}!`;\n};\nconsole.log(greetings('world'));\n```",
-      ),
-    ).toEqual(expected);
-  });
-
-  it('renders escaped HTML code blocks', () => {
-    const expected =
-      '<pre><code class="lang-html"><span class="hljs-tag">&lt;<span class="hljs-name">a</span> <span class="hljs-attr">href</span>=<span class="hljs-string">&quot;javascript:wire.app.logout()&quot;</span>&gt;</span>This is a trick<span class="hljs-tag">&lt;/<span class="hljs-name">a</span>&gt;</span>\n</code></pre>';
-
-    expect(renderMessage('```html\n<a href="javascript:wire.app.logout()">This is a trick</a>\n```')).toEqual(expected);
-  });
-
-  it('renders escaped HTML code spans', () => {
-    const expected = '<code>&lt;a href=&quot;javascript:wire.app.logout()&quot;&gt;This is a trick&lt;/a&gt;</code>';
-
-    expect(renderMessage('`<a href="javascript:wire.app.logout()">This is a trick</a>`')).toEqual(expected);
-  });
 });
 
 describe('Markdown for headings', () => {
-  it('renders all headings the same', () => {
-    expect(renderMessage('# heading')).toBe('<div class="md-heading">heading</div>');
-    expect(renderMessage('## heading')).toBe('<div class="md-heading">heading</div>');
-    expect(renderMessage('### heading')).toBe('<div class="md-heading">heading</div>');
-    expect(renderMessage('#### heading')).toBe('<div class="md-heading">heading</div>');
+  it('differentiate heading size by its level', () => {
+    expect(renderMessage('# heading')).toBe('<div class="md-heading md-heading--1">heading</div>');
+    expect(renderMessage('## heading')).toBe('<div class="md-heading md-heading--2">heading</div>');
+    expect(renderMessage('### heading')).toBe('<div class="md-heading md-heading--3">heading</div>');
+    expect(renderMessage('#### heading')).toBe('<div class="md-heading md-heading--4">heading</div>');
   });
 });
 
@@ -590,11 +562,6 @@ describe('Ignored Markdown syntax', () => {
   it('does not render underline headers', () => {
     expect(renderMessage('no h1\n===')).toBe('no h1<br>===');
     expect(renderMessage('no h2\n---')).toBe('no h2<br>---');
-  });
-
-  it('does not render blockquotes', () => {
-    expect(renderMessage('>no blockquote')).toBe('&gt;no blockquote');
-    expect(renderMessage('> no blockquote')).toBe('&gt; no blockquote');
   });
 
   it('does not render tables', () => {

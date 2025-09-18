@@ -19,7 +19,7 @@
 
 import type {Self} from '@wireapp/api-client/lib/self/';
 
-import {AppActions, SELF_ACTION} from '../action/creator/';
+import {AUTH_ACTION, AppActions, SELF_ACTION} from '../action/creator/';
 
 export interface SelfState {
   consents: {[key: number]: number};
@@ -98,6 +98,11 @@ export function selfReducer(state: SelfState = initialSelfState, action: AppActi
       return {
         ...state,
         consents: {...state.consents, [action.payload.type]: action.payload.value},
+      };
+    }
+    case AUTH_ACTION.LOGOUT_SUCCESS: {
+      return {
+        ...initialSelfState,
       };
     }
     default: {

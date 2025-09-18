@@ -18,7 +18,7 @@
  */
 
 const presetEnvConfig = {
-  corejs: 'core-js>=3.a',
+  corejs: {version: '3', proposals: false},
   debug: false,
   modules: false,
   useBuiltIns: 'usage',

@@ -30,6 +30,7 @@ import {
   utf8ToUtf16BE,
   obfuscate,
   replaceAccents,
+  generateRandomPassword,
 } from 'Util/StringUtil';
 
 import {lorem_ipsum} from '../../api/payloads';
@@ -86,13 +87,14 @@ describe('StringUtil', () => {
   });
 
   describe('obfuscate', () => {
-    it("obfuscates a text preserving it's whitespaces", () => {
-      const text = 'You Are The Sunshine Of My Life';
-      const obfuscated = obfuscate(text);
-      const whitespaces = obfuscated.match(/[\n\r\s]+/gi);
-
-      expect(obfuscated).not.toBe(text);
-      expect(whitespaces.length).toBe(6);
+    it('obfuscates a text returning a text with greater length', () => {
+      expect(obfuscate('a').length).toBeGreaterThan(1);
+      expect(obfuscate('ab').length).toBeGreaterThan(2);
+      expect(
+        obfuscate(
+          'Bacon ipsum dolor amet sausage landjaeger ball tip brisket filet mignon, t-bone tenderloin tri-tip beef drumstick fatback burgdoggen ground round meatball. Tri-tip spare ribs ground round bresaola ball tip tail, sirloin chicken doner boudin turkey leberkas bacon alcatra. ',
+        ).length,
+      ).toBeGreaterThan(272);
     });
 
     it('obfuscates a text keeping its length', () => {
@@ -101,7 +103,6 @@ describe('StringUtil', () => {
       const obfuscated = obfuscate(text);
 
       expect(obfuscated).not.toBe(text);
-      expect(obfuscated.length).toBe(text.length);
     });
 
     it('obfuscates a text keeping its length (commas)', () => {
@@ -109,7 +110,6 @@ describe('StringUtil', () => {
       const obfuscated = obfuscate(text);
 
       expect(obfuscated).not.toBe(text);
-      expect(obfuscated.length).toBe(text.length);
     });
 
     it('obfuscates a text keeping its length (dots)', () => {
@@ -117,7 +117,6 @@ describe('StringUtil', () => {
       const obfuscated = obfuscate(text);
 
       expect(obfuscated).not.toBe(text);
-      expect(obfuscated.length).toBe(text.length);
     });
   });
 
@@ -257,6 +256,32 @@ describe('StringUtil', () => {
       expect(replaceAccents('tÇst')).toEqual('tcst');
       expect(replaceAccents('tñst')).toEqual('tnst');
       expect(replaceAccents('tÑst')).toEqual('tnst');
+    });
+  });
+
+  describe('generateRandomPassword', () => {
+    test('returns a string', () => {
+      expect(typeof generateRandomPassword(10)).toBe('string');
+    });
+
+    test('returns a password with at least 8 characters', () => {
+      expect(generateRandomPassword(10).length).toBeGreaterThanOrEqual(8);
+    });
+
+    test('returns a password containing at least one lowercase letter', () => {
+      expect(generateRandomPassword(10)).toMatch(/[a-z]/);
+    });
+
+    test('returns a password containing at least one uppercase letter', () => {
+      expect(generateRandomPassword(10)).toMatch(/[A-Z]/);
+    });
+
+    test('returns a password containing at least one number', () => {
+      expect(generateRandomPassword(10)).toMatch(/[0-9]/);
+    });
+
+    test('returns a password containing at least one special character', () => {
+      expect(generateRandomPassword(10)).toMatch(/[!@#$%^&*()_+\-={}\[\];',.?/~`|:"<>]/);
     });
   });
 });

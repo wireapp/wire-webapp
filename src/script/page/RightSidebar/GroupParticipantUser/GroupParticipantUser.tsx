@@ -20,29 +20,28 @@
 import {FC, useEffect} from 'react';
 
 import {DefaultConversationRoleName as DefaultRole} from '@wireapp/api-client/lib/conversation/';
-import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
 import {amplify} from 'amplify';
 
+import {TabIndex} from '@wireapp/react-ui-kit';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {FadingScrollbar} from 'Components/FadingScrollbar';
-import {Icon} from 'Components/Icon';
+import * as Icon from 'Components/Icon';
 import {EnrichedFields} from 'Components/panel/EnrichedFields';
 import {UserActions, Actions} from 'Components/panel/UserActions';
 import {UserDetails} from 'Components/panel/UserDetails';
 import {BaseToggle} from 'Components/toggle/BaseToggle';
+import {ConversationRoleRepository} from 'Repositories/conversation/ConversationRoleRepository';
+import {MemberLeaveEvent, TeamMemberLeaveEvent} from 'Repositories/conversation/EventBuilder';
+import {Conversation} from 'Repositories/entity/Conversation';
+import {User} from 'Repositories/entity/User';
+import {ClientEvent} from 'Repositories/event/Client';
+import {TeamRepository} from 'Repositories/team/TeamRepository';
+import {TeamState} from 'Repositories/team/TeamState';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
-import {handleKeyDown} from 'Util/KeyboardUtil';
+import {handleKeyDown, KEY} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
 
-import {ConversationRoleRepository} from '../../../conversation/ConversationRoleRepository';
-import {MemberLeaveEvent, TeamMemberLeaveEvent} from '../../../conversation/EventBuilder';
-import {Conversation} from '../../../entity/Conversation';
-import {User} from '../../../entity/User';
-import {ClientEvent} from '../../../event/Client';
-import {TeamRepository} from '../../../team/TeamRepository';
-import {TeamState} from '../../../team/TeamState';
-import {UserState} from '../../../user/UserState';
 import {ActionsViewModel} from '../../../view_model/ActionsViewModel';
 import {PanelHeader} from '../PanelHeader';
 import {PanelEntity} from '../RightSidebar';
@@ -58,7 +57,7 @@ interface GroupParticipantUserProps {
   conversationRoleRepository: ConversationRoleRepository;
   teamRepository: TeamRepository;
   teamState: TeamState;
-  userState: UserState;
+  selfUser: User;
   isFederated?: boolean;
 }
 
@@ -73,23 +72,22 @@ const GroupParticipantUser: FC<GroupParticipantUserProps> = ({
   conversationRoleRepository,
   teamRepository,
   teamState,
-  userState,
+  selfUser,
   isFederated = false,
 }) => {
-  const {isGroup, roles} = useKoSubscribableChildren(activeConversation, ['isGroup', 'roles']);
+  const {isGroupOrChannel, roles} = useKoSubscribableChildren(activeConversation, ['isGroupOrChannel', 'roles']);
   const {isTemporaryGuest, isAvailable} = useKoSubscribableChildren(currentUser, ['isTemporaryGuest', 'isAvailable']);
-  const {classifiedDomains, isTeam, team} = useKoSubscribableChildren(teamState, [
+  const {classifiedDomains, team, isTeam} = useKoSubscribableChildren(teamState, [
     'classifiedDomains',
-    'isTeam',
     'team',
+    'isTeam',
   ]);
-  const {isActivatedAccount, self: selfUser} = useKoSubscribableChildren(userState, ['isActivatedAccount', 'self']);
-  const {is_verified: isSelfVerified} = useKoSubscribableChildren(selfUser, ['is_verified']);
+  const {isActivatedAccount} = useKoSubscribableChildren(selfUser, ['isActivatedAccount']);
 
   const canChangeRole =
     conversationRoleRepository.canChangeParticipantRoles(activeConversation) && !currentUser.isMe && !isTemporaryGuest;
 
-  const isAdmin = isGroup && conversationRoleRepository.isUserGroupAdmin(activeConversation, currentUser);
+  const isAdmin = isGroupOrChannel && conversationRoleRepository.isUserGroupAdmin(activeConversation, currentUser);
 
   const toggleAdmin = async () => {
     if (currentUser.isFederated) {
@@ -97,7 +95,7 @@ const GroupParticipantUser: FC<GroupParticipantUserProps> = ({
     }
 
     const newRole = isAdmin ? DefaultRole.WIRE_MEMBER : DefaultRole.WIRE_ADMIN;
-    await conversationRoleRepository.setMemberConversationRole(activeConversation, currentUser.id, newRole);
+    await conversationRoleRepository.setMemberConversationRole(activeConversation, currentUser.qualifiedId, newRole);
 
     roles[currentUser.id] = newRole;
     activeConversation.roles(roles);
@@ -126,10 +124,10 @@ const GroupParticipantUser: FC<GroupParticipantUserProps> = ({
   }, [currentUser]);
 
   useEffect(() => {
-    if (isTeam) {
-      teamRepository.updateTeamMembersByIds(team, [currentUser.id], true);
+    if (team.id) {
+      teamRepository.updateTeamMembersByIds(team.id, [currentUser.id], true);
     }
-  }, [isTeam, currentUser, teamRepository, team]);
+  }, [currentUser, teamRepository, team]);
 
   useEffect(() => {
     if (isTemporaryGuest) {
@@ -148,11 +146,10 @@ const GroupParticipantUser: FC<GroupParticipantUserProps> = ({
 
       <FadingScrollbar className="panel__content">
         <UserDetails
-          conversationDomain={activeConversation.domain}
+          groupId={activeConversation?.groupId}
           participant={currentUser}
           badge={teamRepository.getRoleBadge(currentUser.id)}
           isGroupAdmin={isAdmin}
-          isSelfVerified={isSelfVerified}
           classifiedDomains={classifiedDomains}
         />
 
@@ -166,7 +163,7 @@ const GroupParticipantUser: FC<GroupParticipantUserProps> = ({
               type="button"
             >
               <span className="panel__action-item__icon">
-                <Icon.Devices />
+                <Icon.DevicesIcon />
               </span>
 
               <span className="panel__action-item__text">{t('conversationDetailsActionDevices')}</span>
@@ -187,10 +184,16 @@ const GroupParticipantUser: FC<GroupParticipantUserProps> = ({
                 aria-label={t('accessibility.conversationDetailsActionGroupAdminLabel')}
                 aria-pressed={isAdmin}
                 onClick={toggleAdmin}
-                onKeyDown={(event: React.KeyboardEvent<HTMLElement>) => handleKeyDown(event, toggleAdmin)}
+                onKeyDown={(event: React.KeyboardEvent<HTMLElement>) =>
+                  handleKeyDown({
+                    event,
+                    callback: toggleAdmin,
+                    keys: [KEY.ENTER, KEY.SPACE],
+                  })
+                }
               >
                 <span className="panel__action-item__icon">
-                  <Icon.GroupAdmin />
+                  <Icon.GroupAdminIcon />
                 </span>
 
                 <BaseToggle
@@ -209,7 +212,13 @@ const GroupParticipantUser: FC<GroupParticipantUserProps> = ({
           </>
         )}
 
-        {!isTemporaryGuest && <EnrichedFields user={currentUser} showDomain={isFederated} />}
+        {!isTemporaryGuest && (
+          <EnrichedFields
+            user={currentUser}
+            showDomain={isFederated}
+            showAvailability={isTeam && teamState.isInTeam(currentUser)}
+          />
+        )}
 
         <UserActions
           user={currentUser}

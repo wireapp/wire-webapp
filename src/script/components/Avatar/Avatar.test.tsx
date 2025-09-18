@@ -19,10 +19,10 @@
 
 import {fireEvent, render} from '@testing-library/react';
 
-import {Avatar} from './Avatar';
+import {User} from 'Repositories/entity/User';
+import {ServiceEntity} from 'Repositories/integration/ServiceEntity';
 
-import {User} from '../../entity/User';
-import {ServiceEntity} from '../../integration/ServiceEntity';
+import {Avatar} from './Avatar';
 
 describe('Avatar', () => {
   it('executes onClick with current participant', () => {

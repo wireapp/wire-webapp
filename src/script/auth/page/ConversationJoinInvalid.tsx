@@ -19,55 +19,49 @@
 
 import React from 'react';
 
-import {FormattedMessage, useIntl} from 'react-intl';
+import {FormattedMessage} from 'react-intl';
 
 import {ContainerXS, H2, Text} from '@wireapp/react-ui-kit';
 
+import {t} from 'Util/LocalizerUtil';
+
 import {Config} from '../../Config';
-import {conversationJoinStrings} from '../../strings';
-import {UnsupportedBrowser} from '../component/UnsupportedBrowser';
 import {WirelessContainer} from '../component/WirelessContainer';
 
 type Props = React.HTMLProps<HTMLDivElement>;
 
 const ConversationJoinInvalid = ({}: Props) => {
-  const {formatMessage: _} = useIntl();
   return (
-    <UnsupportedBrowser isTemporaryGuest>
-      <WirelessContainer>
-        <ContainerXS style={{margin: 'auto 0'}}>
-          <H2 style={{fontWeight: 500, marginBottom: '10px', marginTop: '0'}} data-uie-name="status-invalid-headline">
-            <FormattedMessage
-              {...conversationJoinStrings.invalidHeadline}
-              values={{
-                brandName: Config.getConfig().BRAND_NAME,
-              }}
-            />
-          </H2>
-          <Text style={{fontSize: '1rem', marginTop: '10px'}} data-uie-name="status-invalid-text">
-            {_(conversationJoinStrings.invalidSubhead)}
-          </Text>
-        </ContainerXS>
-      </WirelessContainer>
-    </UnsupportedBrowser>
+    <WirelessContainer>
+      <ContainerXS style={{margin: 'auto'}}>
+        <H2 style={{fontWeight: 500, marginBottom: '10px', marginTop: '0'}} data-uie-name="status-invalid-headline">
+          <FormattedMessage
+            id="conversationJoin.invalidHeadline"
+            values={{
+              brandName: Config.getConfig().BRAND_NAME,
+            }}
+          />
+        </H2>
+        <Text style={{fontSize: '1rem', marginTop: '10px'}} data-uie-name="status-invalid-text">
+          {t('conversationJoin.invalidSubhead')}
+        </Text>
+      </ContainerXS>
+    </WirelessContainer>
   );
 };
 
 const ConversationJoinFull = ({}: Props) => {
-  const {formatMessage: _} = useIntl();
   return (
-    <UnsupportedBrowser isTemporaryGuest>
-      <WirelessContainer>
-        <ContainerXS style={{margin: 'auto 0'}}>
-          <H2 style={{fontWeight: 500, marginBottom: '10px', marginTop: '0'}} data-uie-name="status-full-headline">
-            <FormattedMessage {...conversationJoinStrings.fullConversationHeadline} />
-          </H2>
-          <Text style={{fontSize: '1rem', marginTop: '10px'}} data-uie-name="status-full-text">
-            {_(conversationJoinStrings.fullConversationSubhead)}
-          </Text>
-        </ContainerXS>
-      </WirelessContainer>
-    </UnsupportedBrowser>
+    <WirelessContainer>
+      <ContainerXS style={{margin: 'auto 0'}}>
+        <H2 style={{fontWeight: 500, marginBottom: '10px', marginTop: '0'}} data-uie-name="status-full-headline">
+          <FormattedMessage id="conversationJoin.fullConversationHeadline" />
+        </H2>
+        <Text style={{fontSize: '1rem', marginTop: '10px'}} data-uie-name="status-full-text">
+          {t('conversationJoin.fullConversationSubhead')}
+        </Text>
+      </ContainerXS>
+    </WirelessContainer>
   );
 };
 

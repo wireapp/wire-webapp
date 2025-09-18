@@ -21,17 +21,19 @@ import React from 'react';
 
 import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
 
-import {Icon} from 'Components/Icon';
-import {User} from 'src/script/entity/User';
+import * as Icon from 'Components/Icon';
+import {MemberMessage as MemberMessageEntity} from 'Repositories/entity/message/MemberMessage';
+import {User} from 'Repositories/entity/User';
+import {SystemMessageType} from 'src/script/message/SystemMessageType';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 
-import {ConnectedMessage} from './memberMessage/ConnectedMessage';
+import {E2eEncryptionMessage} from './E2eEncryptionMessage/E2eEncryptionMessage';
+import {ConnectedMessage} from './MemberMessage/ConnectedMessage';
+import {MessageContent} from './MemberMessage/MessageContent';
 import {MessageTime} from './MessageTime';
 
-import {MemberMessage as MemberMessageEntity} from '../../../entity/message/MemberMessage';
-
-export interface MemberMessageProps {
+interface MemberMessageProps {
   classifiedDomains?: string[];
   hasReadReceiptsTurnedOn: boolean;
   isSelfTemporaryGuest: boolean;
@@ -43,7 +45,7 @@ export interface MemberMessageProps {
   conversationName: string;
 }
 
-const MemberMessage: React.FC<MemberMessageProps> = ({
+export const MemberMessage: React.FC<MemberMessageProps> = ({
   message,
   shouldShowInvitePeople,
   isSelfTemporaryGuest,
@@ -54,147 +56,115 @@ const MemberMessage: React.FC<MemberMessageProps> = ({
   classifiedDomains,
   conversationName,
 }) => {
-  const {
-    otherUser,
-    timestamp,
-    user,
-    htmlGroupCreationHeader,
-    htmlCaption,
-    highlightedUsers,
-    showNamedCreation,
-    hasUsers,
-  } = useKoSubscribableChildren(message, [
-    'otherUser',
-    'timestamp',
-    'user',
-    'name',
-    'htmlGroupCreationHeader',
-    'htmlCaption',
-    'highlightedUsers',
-    'showNamedCreation',
-    'hasUsers',
-  ]);
+  const {otherUser, timestamp, user, htmlGroupCreationHeader, showNamedCreation, hasUsers} = useKoSubscribableChildren(
+    message,
+    ['otherUser', 'timestamp', 'user', 'htmlGroupCreationHeader', 'showNamedCreation', 'hasUsers'],
+  );
 
-  const showConnectedMessage = message.showLargeAvatar();
   const isGroupCreation = message.isGroupCreation();
   const isMemberRemoval = message.isMemberRemoval();
   const isMemberJoin = message.isMemberJoin();
   const isMemberLeave = message.isMemberLeave();
   const isMemberChange = message.isMemberChange();
 
-  const handleShowMoreClick = (event: React.MouseEvent<HTMLElement, MouseEvent>) => {
-    const clickedOnShowMore = (event.target as HTMLElement).closest('.message-header-show-more');
-    if (clickedOnShowMore) {
-      onClickParticipants(highlightedUsers);
-    }
-  };
+  const isConnectedMessage = [SystemMessageType.CONNECTION_ACCEPTED, SystemMessageType.CONNECTION_REQUEST].includes(
+    message.memberMessageType,
+  );
+
+  if (isConnectedMessage) {
+    return (
+      <ConnectedMessage
+        user={otherUser}
+        showServicesWarning={message.showServicesWarning}
+        onClickCancelRequest={() => onClickCancelRequest(message)}
+        classifiedDomains={classifiedDomains}
+      />
+    );
+  }
 
   return (
     <>
-      {showConnectedMessage ? (
-        <ConnectedMessage
-          user={otherUser}
-          showServicesWarning={message.showServicesWarning}
-          onClickCancelRequest={() => onClickCancelRequest(message)}
-          classifiedDomains={classifiedDomains}
-        />
-      ) : (
-        <>
-          {showNamedCreation && (
-            <div className="message-group-creation-header">
-              <p
-                className="message-group-creation-header-text"
-                dangerouslySetInnerHTML={{__html: htmlGroupCreationHeader}}
-              />
-              <h2 className="message-group-creation-header-name" data-uie-name="conversation-name">
-                {conversationName}
-              </h2>
-            </div>
-          )}
-          {hasUsers && (
-            <div className="message-header">
-              <div className="message-header-icon message-header-icon--svg text-foreground">
-                {isGroupCreation && <Icon.Message />}
-                {isMemberRemoval && <span className="icon-minus" />}
-                {isMemberJoin && <span className="icon-plus" />}
-              </div>
-              {/* event is being triggered only when clicked on <a> tag with specified class (keyboard accessible by default) */}
-              {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions */}
-              <div onClick={handleShowMoreClick} className="message-header-label">
-                <p className="message-header-caption" dangerouslySetInnerHTML={{__html: htmlCaption}} />
-              </div>
-              {isMemberChange && (
-                <div className="message-body-actions">
-                  <MessageTime
-                    timestamp={timestamp}
-                    data-uie-uid={message.id}
-                    data-uie-name="item-message-member-timestamp"
-                  />
-                </div>
-              )}
-            </div>
-          )}
-          {hasUsers && message.showServicesWarning && (
-            <p className="message-services-warning" data-uie-name="label-services-warning">
-              {t('conversationServicesWarning')}
-            </p>
-          )}
-
-          {isGroupCreation && shouldShowInvitePeople && (
-            <div className="message-member-footer">
-              <p>{t('guestRoomConversationHead')}</p>
-
-              <Button
-                variant={ButtonVariant.TERTIARY}
-                type="button"
-                onClick={onClickInvitePeople}
-                data-uie-name="do-invite-people"
-                style={{marginTop: '1em'}}
-              >
-                {t('guestRoomConversationButton')}
-              </Button>
-            </div>
-          )}
-
-          {isGroupCreation && isSelfTemporaryGuest && (
-            <div className="message-member-footer">
-              <p className="message-member-footer-message">{t('temporaryGuestJoinMessage')}</p>
-              <p className="message-member-footer-description">{t('temporaryGuestJoinDescription')}</p>
-            </div>
-          )}
-          {isGroupCreation && hasReadReceiptsTurnedOn && (
-            <div className="message-header" data-uie-name="label-group-creation-receipts">
-              <div className="message-header-icon message-header-icon--svg text-foreground">
-                <Icon.Read />
-              </div>
-              <p className="message-header-label">
-                <span className="ellipsis">{t('conversationCreateReceiptsEnabled')}</span>
-              </p>
-            </div>
-          )}
-          {isMemberLeave && user.isMe && isSelfTemporaryGuest && (
-            <div className="message-member-footer">
-              <p className="message-member-footer-description">{t('temporaryGuestLeaveDescription')}</p>
-            </div>
-          )}
-          {isGroupCreation && (
-            <>
-              <div className="message-header">
-                <div className="message-header-icon" />
-                <p className="message-header-label">{t('conversationNewConversation')}</p>
-              </div>
-              <div className="message-header">
-                <div className="message-header-icon message-header-icon--svg text-foreground">
-                  <Icon.Info />
-                </div>
-                <p className="message-header-label">{t('conversationUnverifiedUserWarning')}</p>
-              </div>
-            </>
-          )}
-        </>
+      {showNamedCreation && (
+        <div className="message-group-creation-header">
+          <p
+            className="message-group-creation-header-text"
+            dangerouslySetInnerHTML={{__html: htmlGroupCreationHeader}}
+          />
+          <h2 className="message-group-creation-header-name" data-uie-name="conversation-name">
+            {conversationName}
+          </h2>
+        </div>
       )}
+
+      {hasUsers && (
+        <div className="message-header">
+          <div className="message-header-icon message-header-icon--svg text-foreground">
+            {isGroupCreation && <Icon.MessageIcon />}
+            {isMemberRemoval && <span className="icon-minus" />}
+            {isMemberJoin && <span className="icon-plus" />}
+          </div>
+          <div className="message-header-label">
+            <MessageContent onClickParticipants={onClickParticipants} message={message} />
+          </div>
+          {isMemberChange && (
+            <div className="message-body-actions">
+              <MessageTime
+                timestamp={timestamp}
+                data-uie-uid={message.id}
+                data-uie-name="item-message-member-timestamp"
+              />
+            </div>
+          )}
+        </div>
+      )}
+
+      {hasUsers && message.showServicesWarning && (
+        <p className="message-services-warning" data-uie-name="label-services-warning">
+          {t('conversationServicesWarning')}
+        </p>
+      )}
+
+      {isGroupCreation && shouldShowInvitePeople && (
+        <div className="message-member-footer">
+          <p>{t('guestRoomConversationHead')}</p>
+
+          <Button
+            variant={ButtonVariant.TERTIARY}
+            type="button"
+            onClick={onClickInvitePeople}
+            data-uie-name="do-invite-people"
+            style={{marginTop: '1em'}}
+          >
+            {t('guestRoomConversationButton')}
+          </Button>
+        </div>
+      )}
+
+      {isGroupCreation && isSelfTemporaryGuest && (
+        <div className="message-member-footer">
+          <p className="message-member-footer-message">{t('temporaryGuestJoinMessage')}</p>
+          <p className="message-member-footer-description">{t('temporaryGuestJoinDescription')}</p>
+        </div>
+      )}
+
+      {isGroupCreation && hasReadReceiptsTurnedOn && (
+        <div className="message-header" data-uie-name="label-group-creation-receipts">
+          <div className="message-header-icon message-header-icon--svg text-foreground">
+            <Icon.ReadIcon />
+          </div>
+          <p className="message-header-label">
+            <span className="ellipsis">{t('conversationCreateReceiptsEnabled')}</span>
+          </p>
+        </div>
+      )}
+
+      {isMemberLeave && user.isMe && isSelfTemporaryGuest && (
+        <div className="message-member-footer">
+          <p className="message-member-footer-description">{t('temporaryGuestLeaveDescription')}</p>
+        </div>
+      )}
+
+      {isGroupCreation && <E2eEncryptionMessage />}
     </>
   );
 };
-
-export {MemberMessage};

@@ -22,7 +22,7 @@ import {useEffect, FC, useState, HTMLProps, useRef} from 'react';
 import {isKeyDownEvent} from 'src/script/guards/Event';
 import {isAuxClickEvent, isClickEvent} from 'src/script/guards/Mouse';
 import {getAllFocusableElements, setElementsTabIndex} from 'Util/focusUtil';
-import {handleKeyDown} from 'Util/KeyboardUtil';
+import {handleKeyDown, KEY} from 'Util/KeyboardUtil';
 
 import {ShowMoreButton} from './ShowMoreButton';
 
@@ -88,9 +88,13 @@ const TextMessage: FC<TextMessageRendererProps> = ({
     messageDetails: MessageDetails,
   ) => {
     if (isKeyDownEvent(event) && isFocusable) {
-      handleKeyDown(event, () => {
-        event.preventDefault();
-        onMessageClick(event, elementType, messageDetails);
+      handleKeyDown({
+        event,
+        callback: () => {
+          event.preventDefault();
+          onMessageClick(event, elementType, messageDetails);
+        },
+        keys: [KEY.ENTER, KEY.SPACE],
       });
     } else if (isClickEvent(event) || isAuxClickEvent(event)) {
       event.preventDefault();

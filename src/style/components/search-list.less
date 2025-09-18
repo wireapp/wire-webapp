@@ -40,7 +40,7 @@
   .search-list-sm & {
     text-align: center;
 
-    &:nth-child(3n) {
+    &:nth-of-type(3n) {
       margin-right: 0;
     }
   }
@@ -54,7 +54,7 @@
 
 .search-list-item-image {
   .search-list-sm & {
-    .square(@avatar-diameter-l);
+    .square(var(--avatar-diameter-l));
 
     position: relative;
     margin-bottom: 3px;
@@ -63,7 +63,7 @@
   .search-list-lg & {
     position: relative;
     display: flex;
-    height: @avatar-diameter-m;
+    height: var(--avatar-diameter-m);
     flex: 0 0 auto;
     align-items: center;
   }
@@ -97,25 +97,14 @@
   justify-content: center;
 
   .search-list-sm & {
-    width: @avatar-diameter-l;
+    width: var(--avatar-diameter-l);
   }
 
   .search-list-lg & {
     min-width: 0; // this will ensure that ellipses is working
-    height: @avatar-diameter-m;
+    height: var(--avatar-diameter-m);
     flex: 1 1;
     margin-left: 16px;
-  }
-}
-
-.search-list-item-content-availability {
-  .availability-state-label {
-    .ellipsis;
-  }
-
-  .search-list-sm & {
-    height: 12px;
-    justify-content: center;
   }
 }
 
@@ -131,8 +120,8 @@
 
 .search-list-item-content-info {
   display: flex;
-  font-size: @font-size-xs;
-  line-height: @line-height-sm;
+  font-size: var(--font-size-xsmall);
+  line-height: var(--line-height-sm);
   opacity: 0.56;
 }
 
@@ -140,11 +129,11 @@
   .ellipsis;
 
   max-width: 184px;
-  height: @avatar-diameter-m;
+  height: var(--avatar-diameter-m);
   margin-left: 16px;
-  font-size: @font-size-medium;
-  font-weight: @font-weight-medium;
-  line-height: @avatar-diameter-m;
+  font-size: var(--font-size-medium);
+  font-weight: var(--font-weight-medium);
+  line-height: var(--avatar-diameter-m);
 }
 
 .search-list-theme-black .image.state-badge::before {
@@ -154,9 +143,9 @@
 
 .search-list-item-guest-indicator {
   display: flex;
-  height: @avatar-diameter-m;
+  height: var(--avatar-diameter-m);
   align-items: center;
-  font-size: @font-size-xs;
+  font-size: var(--font-size-xsmall);
 }
 
 .search-list-item-select {
@@ -179,7 +168,7 @@
   &::before {
     margin-left: 3px;
     color: var(--white);
-    font-size: @font-size-medium;
+    font-size: var(--font-size-medium);
     opacity: 0;
   }
 

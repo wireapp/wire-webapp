@@ -19,22 +19,25 @@
 
 // default
 .button {
-  .button-large; // default size is large
   .label-bold-xs;
   display: inline-block;
+
+  width: var(--button-width);
+  height: var(--button-height);
   padding: 0 16px;
-  border: @button-border-size solid transparent;
-  border-radius: @button-border-radius;
+  border: var(--button-border-size) solid transparent;
+  border-radius: var(--button-border-radius);
   background-color: var(--accent-color);
   color: #fff;
   cursor: pointer;
+  line-height: calc(var(--button-height) - var(--button-border-size) * 2);
   text-align: center;
   text-decoration: none;
   user-select: none;
 
   > input {
     position: absolute;
-    left: @offscreen-left;
+    left: var(--offscreen-left);
   }
 
   // types
@@ -70,19 +73,12 @@
     }
   }
 
-  // sizes
-  &.button-large {
-    width: @button-width;
-    height: @button-height;
-    line-height: (@button-height - @button-border-size * 2);
-  }
-
   &.button-small,
   &.button-medium {
-    width: @button-medium-width;
-    min-width: @button-medium-width;
-    height: @button-medium-sm-height;
-    line-height: (@button-medium-sm-height - @button-border-size * 2);
+    width: var(--button-medium-width);
+    min-width: var(--button-medium-width);
+    height: var(--button-medium-sm-height);
+    line-height: calc(var(--button-medium-sm-height) - var(--button-border-size) * 2);
   }
 
   // expansion
@@ -188,7 +184,7 @@
   -webkit-appearance: none;
   background: none;
   cursor: pointer;
-  line-height: @line-height-lg;
+  line-height: var(--line-height-lg);
   outline: 0;
 
   &.disabled {
@@ -322,7 +318,9 @@
   padding: 10px;
   border: 1px solid transparent;
   border-radius: 16px;
-  transition: background-color 0.15s ease-in-out, border-color 0.15s ease-in-out;
+  transition:
+    background-color 0.15s ease-in-out,
+    border-color 0.15s ease-in-out;
 }
 
 .button-text-primary {
@@ -336,6 +334,7 @@
   }
 
   &:focus-visible {
+    border-radius: 16px;
     background-color: var(--accent-color-600);
     outline: 1px solid var(--accent-color-700);
   }
@@ -443,7 +442,9 @@
   padding: 0;
   border: 1px solid transparent;
   border-radius: 12px;
-  transition: background-color 0.15s ease-in-out, border-color 0.15s ease-in-out;
+  transition:
+    background-color 0.15s ease-in-out,
+    border-color 0.15s ease-in-out;
 
   svg {
     path {

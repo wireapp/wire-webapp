@@ -5,7 +5,7 @@
     "module": "commonjs",
     "outDir": "dist",
     "removeComments": true,
-    "lib": ["esnext", "dom"],
+    "lib": ["esnext"],
     "downlevelIteration": true,
     "forceConsistentCasingInFileNames": true,
     "moduleResolution": "node",

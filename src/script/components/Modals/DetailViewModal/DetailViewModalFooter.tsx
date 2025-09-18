@@ -21,7 +21,8 @@ import {FC, useCallback, useRef, useState} from 'react';
 
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {ReactionType} from '@wireapp/core/lib/conversation';
-import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
+
+import {TabIndex} from '@wireapp/react-ui-kit';
 
 import {DownloadButton} from 'Components/MessagesList/Message/ContentMessage/MessageActions/DownloadButton';
 import {useMessageActionsState} from 'Components/MessagesList/Message/ContentMessage/MessageActions/MessageActions.state';
@@ -32,13 +33,12 @@ import {
 } from 'Components/MessagesList/Message/ContentMessage/MessageActions/MessageActions.styles';
 import {MessageReactions} from 'Components/MessagesList/Message/ContentMessage/MessageActions/MessageReactions/MessageReactions';
 import {ReplyButton} from 'Components/MessagesList/Message/ContentMessage/MessageActions/ReplyButton';
+import {MessageRepository} from 'Repositories/conversation/MessageRepository';
+import {Conversation} from 'Repositories/entity/Conversation';
+import {ContentMessage} from 'Repositories/entity/message/ContentMessage';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {isTabKey} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
-
-import {MessageRepository} from '../../../conversation/MessageRepository';
-import {Conversation} from '../../../entity/Conversation';
-import {ContentMessage} from '../../../entity/message/ContentMessage';
 
 interface DetailViewModalFooterProps {
   messageEntity: ContentMessage;
@@ -60,9 +60,7 @@ const DetailViewModalFooter: FC<DetailViewModalFooterProps> = ({
   messageRepository,
   selfId,
 }) => {
-  const {removed_from_conversation: isRemovedFromConversation} = useKoSubscribableChildren(conversationEntity, [
-    'removed_from_conversation',
-  ]);
+  const {isSelfUserRemoved} = useKoSubscribableChildren(conversationEntity, ['isSelfUserRemoved']);
   const [currentMsgActionName, setCurrentMsgAction] = useState('');
   const wrapperRef = useRef<HTMLDivElement>(null);
   const isMsgReactable = messageEntity.isReactable();
@@ -70,7 +68,7 @@ const DetailViewModalFooter: FC<DetailViewModalFooterProps> = ({
     if (!messageEntity.isContent()) {
       return;
     }
-    return void messageRepository.toggleReaction(conversationEntity, messageEntity, reaction, selfId.id);
+    return void messageRepository.toggleReaction(conversationEntity, messageEntity, reaction, selfId);
   };
   const {handleMenuOpen} = useMessageActionsState();
   const resetActionMenuStates = useCallback(() => {
@@ -116,7 +114,7 @@ const DetailViewModalFooter: FC<DetailViewModalFooterProps> = ({
 
   return (
     <footer className="detail-view-footer">
-      {isMsgReactable && !isRemovedFromConversation && (
+      {isMsgReactable && !isSelfUserRemoved && (
         <div ref={wrapperRef} style={{display: 'flex'}}>
           <MessageReactions
             messageFocusedTabIndex={TabIndex.FOCUSABLE}
@@ -124,12 +122,11 @@ const DetailViewModalFooter: FC<DetailViewModalFooterProps> = ({
             handleCurrentMsgAction={setCurrentMsgAction}
             resetActionMenuStates={resetActionMenuStates}
             wrapperRef={wrapperRef}
-            message={messageEntity}
             handleReactionClick={handleReactionClick}
             toggleActiveMenu={toggleActiveMenu}
             handleKeyDown={handleKeyDown}
           />
-          {messageEntity.isReplyable() && !isRemovedFromConversation && (
+          {messageEntity.isReplyable() && !isSelfUserRemoved && (
             <ReplyButton
               actionId={MESSAGE_REPLY_ID}
               currentMsgActionName={currentMsgActionName}

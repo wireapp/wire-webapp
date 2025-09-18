@@ -52,6 +52,7 @@ export enum ContentState {
   PREFERENCES_DEVICES = 'ContentState.PREFERENCES_DEVICES',
   PREFERENCES_OPTIONS = 'ContentState.PREFERENCES_OPTIONS',
   WATERMARK = 'ContentState.WATERMARK',
+  CELLS = 'ContentState.CELLS',
 }
 
 export enum ListState {
@@ -60,6 +61,7 @@ export enum ListState {
   PREFERENCES = 'ListState.PREFERENCES',
   START_UI = 'ListState.START_UI',
   TEMPORARY_GUEST = 'ListState.TEMPORARY_GUEST',
+  CELLS = 'ListState.CELLS',
 }
 
 type AppState = {

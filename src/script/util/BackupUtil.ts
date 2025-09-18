@@ -17,9 +17,19 @@
  *
  */
 
-import {ENCRYPTED_BACKUP_FORMAT} from '../backup/BackUpHeader';
+import {ENCRYPTED_BACKUP_FORMAT} from 'Repositories/backup/BackUpHeader';
+import {isCPBackup, peekCrossPlatformData} from 'Repositories/backup/CrossPlatformBackup';
 
 export const checkBackupEncryption = async (data: ArrayBuffer | Blob): Promise<boolean> => {
+  if (data instanceof Blob) {
+    data = await readBlobAsArrayBuffer(data);
+  }
+
+  if (await isCPBackup(data)) {
+    const peekedData = await peekCrossPlatformData(data);
+    return peekedData.isEncrypted;
+  }
+
   const fileBytes = await getFileBytes(data);
   const encrptedFileFormat = new TextEncoder().encode(ENCRYPTED_BACKUP_FORMAT);
 
@@ -38,10 +48,8 @@ export const checkBackupEncryption = async (data: ArrayBuffer | Blob): Promise<b
 const getFileBytes = async (data: ArrayBuffer | Blob): Promise<Uint8Array> => {
   if (data instanceof ArrayBuffer) {
     return Promise.resolve(new Uint8Array(data));
-  } else if (data instanceof Blob) {
-    return readBlobAsArrayBuffer(data).then(arrayBuffer => new Uint8Array(arrayBuffer));
   }
-  return Promise.reject(new Error('Invalid data type. Expected ArrayBuffer or Blob.'));
+  return Promise.reject(new Error('Invalid data type. Expected ArrayBuffer.'));
 };
 
 const readBlobAsArrayBuffer = (blob: Blob): Promise<ArrayBuffer> => {

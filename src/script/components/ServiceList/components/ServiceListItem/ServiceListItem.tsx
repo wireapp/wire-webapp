@@ -17,16 +17,15 @@
  *
  */
 
-import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
+import {TabIndex} from '@wireapp/react-ui-kit';
 
 import {Avatar, AVATAR_SIZE} from 'Components/Avatar';
 import {ParticipantItemContent} from 'Components/ParticipantItemContent';
 import {listItem, listWrapper} from 'Components/ParticipantItemContent/ParticipantItem.styles';
+import {ServiceEntity} from 'Repositories/integration/ServiceEntity';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
-import {handleKeyDown} from 'Util/KeyboardUtil';
+import {handleKeyDown, KEY} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
-
-import {ServiceEntity} from '../../../../integration/ServiceEntity';
 
 export interface ServiceListItemProps {
   service: ServiceEntity;
@@ -44,16 +43,22 @@ export const ServiceListItem = ({service, onClick}: ServiceListItemProps) => {
       tabIndex={TabIndex.FOCUSABLE}
       role="button"
       onClick={onServiceClick}
-      onKeyDown={event => handleKeyDown(event, onServiceClick)}
+      onKeyDown={event =>
+        handleKeyDown({
+          event,
+          callback: onServiceClick,
+          keys: [KEY.ENTER, KEY.SPACE],
+        })
+      }
       data-uie-name="item-service"
       data-uie-value={serviceName}
-      aria-label={t('accessibility.openConversation', serviceName)}
+      aria-label={t('accessibility.openConversation', {name: serviceName})}
       css={listWrapper({noUnderline: true})}
     >
       <div css={listItem()}>
         <Avatar avatarSize={AVATAR_SIZE.SMALL} participant={service} aria-hidden="true" css={{margin: '0 16px'}} />
 
-        <ParticipantItemContent name={serviceName} shortDescription={serviceShortDescription} showArrow />
+        <ParticipantItemContent participant={service} shortDescription={serviceShortDescription} showArrow />
       </div>
     </div>
   );

@@ -17,10 +17,9 @@
  *
  */
 
+import {PrimaryModal} from 'Components/Modals/PrimaryModal';
+import {AssetRepository} from 'Repositories/assets/AssetRepository';
 import {t} from 'Util/LocalizerUtil';
-
-import {AssetRepository} from '../assets/AssetRepository';
-import {PrimaryModal} from '../components/Modals/PrimaryModal';
 
 const CONCURRENT_UPLOAD_LIMIT = 10;
 
@@ -31,7 +30,7 @@ const isHittingUploadLimit = (files: File[], assetRepository: AssetRepository): 
   if (isHittingUploadLimit) {
     const modalOptions = {
       text: {
-        message: t('modalAssetParallelUploadsMessage', CONCURRENT_UPLOAD_LIMIT),
+        message: t('modalAssetParallelUploadsMessage', {number: CONCURRENT_UPLOAD_LIMIT}),
         title: t('modalAssetParallelUploadsHeadline'),
       },
     };

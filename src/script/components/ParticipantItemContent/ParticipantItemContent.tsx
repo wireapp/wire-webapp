@@ -19,17 +19,20 @@
 
 import React from 'react';
 
-import {Availability} from '@wireapp/protocol-messaging';
+import ko from 'knockout';
 
-import {AvailabilityState} from 'Components/AvailabilityState';
-import {Icon} from 'Components/Icon';
+import {UserBlockedBadge, UserVerificationBadges} from 'Components/Badge';
+import * as Icon from 'Components/Icon';
+import {UserInfo} from 'Components/UserInfo';
+import {User} from 'Repositories/entity/User';
+import {ServiceEntity} from 'Repositories/integration/ServiceEntity';
+import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 
 import {
   contentInfoWrapper,
   contentInfoText,
   selfIndicator,
   userName,
-  userAvailability,
   ellipsis,
   nameWrapper,
   chevronIcon,
@@ -38,45 +41,56 @@ import {
 } from './ParticipantItem.styles';
 
 export interface ParticipantItemContentProps {
-  name: string;
-  selfInTeam?: boolean;
-  availability?: Availability.Type;
+  /** the conversation context in which we are displaying the user (will enable e2ei verification badges) */
+  groupId?: string;
+  participant: User | ServiceEntity;
   shortDescription?: string;
   selfString?: string;
   hasUsernameInfo?: boolean;
   showArrow?: boolean;
   onDropdownClick?: (event: React.MouseEvent<HTMLButtonElement>) => void;
-  showAvailabilityState?: boolean;
+  isProteusVerified?: boolean;
+  isMLSVerified?: boolean;
 }
 
+const servicePlaceholder = {isBlocked: ko.observable(false)};
+
 export const ParticipantItemContent = ({
-  name,
-  selfInTeam = false,
-  availability = Availability.Type.NONE,
+  groupId,
+  participant,
   shortDescription = '',
   selfString = '',
   hasUsernameInfo = false,
   showArrow = false,
-  showAvailabilityState = false,
 }: ParticipantItemContentProps) => {
+  const {name} = useKoSubscribableChildren(participant, ['name']);
+
+  const isService = participant instanceof ServiceEntity;
+
+  const {isBlocked} = useKoSubscribableChildren(!isService ? participant : servicePlaceholder, ['isBlocked']);
+
   return (
     <div css={wrapper}>
       <div css={contentText}>
         <div css={nameWrapper}>
-          {showAvailabilityState && selfInTeam ? (
-            <AvailabilityState
-              availability={availability}
-              css={[userName, userAvailability, ellipsis]}
-              dataUieName="status-name"
-              label={name}
-            />
+          {!isService ? (
+            <UserInfo user={participant} css={[userName, ellipsis]} selfString={selfString} dataUieName="status-name">
+              <UserVerificationBadges user={participant} groupId={groupId} />
+              {isBlocked && (
+                <span css={{marginLeft: 4}}>
+                  <UserBlockedBadge />
+                </span>
+              )}
+            </UserInfo>
           ) : (
-            <div css={[userName, ellipsis]} data-uie-name="status-name">
-              {name}
-            </div>
-          )}
+            <>
+              <div css={[userName, ellipsis]} data-uie-name="status-name">
+                {name}
 
-          {selfString && <div css={selfIndicator}>{selfString}</div>}
+                {selfString && <span css={selfIndicator}>{selfString}</span>}
+              </div>
+            </>
+          )}
         </div>
 
         {shortDescription && (

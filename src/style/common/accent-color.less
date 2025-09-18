@@ -72,6 +72,14 @@
 @blue-dark-800: #224266;
 @blue-dark-900: #19324d;
 
+@black-50: @w-gray-30;
+@black-100: @w-gray-40;
+@black-500: @w-gray-80;
+
+@black-dark-500: @w-gray-40;
+@black-dark-800: @w-gray-80;
+@black-dark-900: @w-gray-90;
+
 @green-50: #e8f1ea;
 @green-100: #d2e4d6;
 @green-200: #a5c9ad;
@@ -179,7 +187,7 @@
 @amber-dark-500: #ffd426;
 @amber-dark-600: #ccaa1e;
 @amber-dark-700: #997f17;
-@amber-dark-800: #201204;
+@amber-dark-800: #66550f;
 @amber-dark-900: #4d400b;
 
 .colors() {
@@ -191,21 +199,38 @@
   turquoise: 6;
 }
 
+@colors: amber, blue, green, purple, red, turquoise;
+@colorsWithBlack: amber, blue, green, purple, red, turquoise, black;
+
 @color-index: 50, 100, 200, 300, 400, 500, 600, 700, 800, 900;
 
 body {
   &.theme-default {
-    each(.colors(), .(@color-key, @color-name) {
-      @name: @color-name;
-      @accent-color: '@{color-name}-500';
-      --@{name}-500: @@accent-color;
+    each(@colors, {
+      @accent-color: "@{value}-500";
+      --@{value}-500: @@accent-color;
+    });
+    each(@colorsWithBlack, {
+      @border-color: "@{value}-100";
+      @background-color: "@{value}-50";
+      @color: "@{value}-500";
+      --@{value}-border: @@border-color;
+      --@{value}-background: @@background-color;
+      --@{value}-color: @@color;
     });
   }
   &.theme-dark {
-    each(.colors(), .(@color-key, @color-name) {
-      @name: @color-name;
-      @accent-dark-color:'@{color-name}-dark-500';
-        --@{name}-500: @@accent-dark-color;
+    each(@colors, {
+      @accent-dark-color: "@{value}-dark-500";
+      --@{value}-500: @@accent-dark-color;
+    });
+    each(@colorsWithBlack, {
+      @border-color: "@{value}-dark-900";
+      @background-color: "@{value}-dark-800";
+      @color: "@{value}-dark-500";
+      --@{value}-border: @@border-color;
+      --@{value}-background: @@background-color;
+      --@{value}-color: @@color;
     });
   }
 }
@@ -222,10 +247,12 @@ each(.colors(), .(@color-key, @color-name) {
   @button-primary-hover: '@{name}-600';
   @button-primary-focus-border: '@{name}-700';
   @button-primary-active: '@{name}-800';
+  @button-primary-active-bg: '@{name}-50';
   @button-primary-active-border: '@{name}-800';
   @button-secondary-hover-border: '@{name}-500';
   @button-secondary-active-bg: '@{name}-50';
   @button-secondary-active-border: '@{name}-500';
+  @list-item-selected-bg: '@{name}-500';
   @message-actions-active-border: '@{name}-300';
   @message-actions-active-background: '@{name}-50';
   @message-reactions-active-border: '@{name}-300';
@@ -245,10 +272,12 @@ each(.colors(), .(@color-key, @color-name) {
     --button-primary-hover: @@button-primary-hover;
     --button-primary-focus-border: @@button-primary-focus-border;
     --button-primary-active: @@button-primary-active;
+    --button-primary-active-bg: @@button-primary-active-bg;
     --button-primary-active-border: @@button-primary-active-border;
     --button-secondary-hover-border: @@button-secondary-hover-border;
     --button-secondary-active-bg: @@button-secondary-active-bg;
     --button-secondary-active-border: @@button-secondary-active-border;
+    --list-item-selected-bg: @@list-item-selected-bg;
     --message-actions-active-border:@@message-actions-active-border;
     --message-actions-active-background:@@message-actions-active-background;
     --message-reactions-active-border:@@message-reactions-active-border;
@@ -294,10 +323,12 @@ each(.colors(), .(@color-key, @color-name) {
     @button-primary-hover-dark: '@{name}-dark-400';
     @button-primary-focus-border-dark: '@{name}-dark-100';
     @button-primary-active-dark: '@{name}-dark-800';
+    @button-primary-active-bg-dark: '@{name}-dark-800';
     @button-primary-active-border-dark: '@{name}-dark-600';
     @button-secondary-hover-border-dark: 'w-gray-70';
     @button-secondary-active-bg-dark: 'w-gray-95';
     @button-secondary-active-border-dark: '@{name}-dark-800';
+    @list-item-selected-bg-dark: '@{name}-dark-600';
     @message-actions-active-border-dark: '@{name}-dark-600';
     @message-actions-active-background-dark: '@{name}-dark-800';
     @message-reactions-active-border-dark: '@{name}-dark-700';
@@ -312,14 +343,16 @@ each(.colors(), .(@color-key, @color-name) {
     @icon-secondary-active-border-dark: '@{name}-dark-800' ;
     @indicator-range-input-thumb-dark: '@{name}-dark-300';
     @toggle-button-unselected-bg-dark: '@{name}-dark-800';
-    .main-accent-color-@{color-key} {
+    &.main-accent-color-@{color-key} {
       --button-primary-hover: @@button-primary-hover-dark;
       --button-primary-focus-border: @@button-primary-focus-border-dark;
       --button-primary-active: @@button-primary-active-dark;
+      --button-primary-active-bg: @@button-primary-active-bg-dark;
       --button-primary-active-border: @@button-primary-active-border-dark;
       --button-secondary-hover-border: @@button-secondary-hover-border-dark;
       --button-secondary-active-bg: @@button-secondary-active-bg-dark;
       --button-secondary-active-border: @@button-secondary-active-border-dark;
+      --list-item-selected-bg: @@list-item-selected-bg-dark;
       --message-actions-active-border: @@message-actions-active-border-dark;
       --message-actions-active-background: @@message-actions-active-background-dark;
       --message-reactions-active-border: @@message-reactions-active-border-dark;

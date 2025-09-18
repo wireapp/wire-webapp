@@ -20,24 +20,29 @@
 import {render, waitFor, act} from '@testing-library/react';
 import ko from 'knockout';
 
-import * as uiKit from '@wireapp/react-ui-kit';
+import {useMatchMedia, QUERY} from '@wireapp/react-ui-kit';
 
+import {Call} from 'Repositories/calling/Call';
+import {Participant} from 'Repositories/calling/Participant';
+import {Grid} from 'Repositories/calling/videoGridHandler';
+import {Conversation} from 'Repositories/entity/Conversation';
+import {User} from 'Repositories/entity/User';
+import {MediaDevicesHandler} from 'Repositories/media/MediaDevicesHandler';
+import {PropertiesRepository} from 'Repositories/properties/PropertiesRepository';
+import {PropertiesService} from 'Repositories/properties/PropertiesService';
+import {SelfService} from 'Repositories/self/SelfService';
 import {withTheme} from 'src/script/auth/util/test/TestUtil';
-import {Call} from 'src/script/calling/Call';
-import {Participant} from 'src/script/calling/Participant';
-import {Grid} from 'src/script/calling/videoGridHandler';
-import {Conversation} from 'src/script/entity/Conversation';
-import {User} from 'src/script/entity/User';
-import {MediaDevicesHandler} from 'src/script/media/MediaDevicesHandler';
 
 import {FullscreenVideoCall, FullscreenVideoCallProps} from './FullscreenVideoCall';
+
+const useMatchMediaMock = useMatchMedia as jest.Mock;
+
+jest.mock('@wireapp/api-client/lib/team');
 
 jest.mock('@wireapp/react-ui-kit', () => ({
   ...(jest.requireActual('@wireapp/react-ui-kit') as any),
   useMatchMedia: jest.fn(),
 }));
-
-const mockedUiKit = uiKit as jest.Mocked<typeof uiKit>;
 
 describe('fullscreenVideoCall', () => {
   const createProps = (): FullscreenVideoCallProps => {
@@ -45,9 +50,9 @@ describe('fullscreenVideoCall', () => {
     spyOn(conversation, 'supportsVideoCall').and.returnValue(true);
     const selfUser = new User('');
     selfUser.isMe = true;
-    const call = new Call({domain: '', id: ''}, {domain: '', id: ''}, 0, new Participant(selfUser, ''), 0, {
+    const call = new Call({domain: '', id: ''}, new Conversation('', ''), 0, new Participant(selfUser, ''), 0, {
       currentAvailableDeviceId: {
-        audioOutput: ko.pureComputed(() => 'test'),
+        audiooutput: ko.pureComputed(() => 'test'),
       },
     } as MediaDevicesHandler);
     const props: Partial<FullscreenVideoCallProps> = {
@@ -56,19 +61,20 @@ describe('fullscreenVideoCall', () => {
       conversation: conversation,
       isChoosingScreen: false,
       isMuted: false,
+      propertiesRepository: new PropertiesRepository({} as PropertiesService, {} as SelfService),
       mediaDevicesHandler: {
         availableDevices: {
-          audioInput: ko.observableArray(),
-          videoInput: ko.observableArray(),
+          audioinput: ko.observableArray(),
+          videoinput: ko.observableArray(),
+          audiooutput: ko.observableArray(),
         },
         currentDeviceId: {
-          audioInput: ko.observable(''),
-          audioOutput: ko.observable(''),
-          screenInput: ko.observable(''),
-          videoInput: ko.observable(''),
+          audioinput: ko.observable(''),
+          audiooutput: ko.observable(''),
+          screeninput: ko.observable(''),
+          videoinput: ko.observable(''),
         },
       } as MediaDevicesHandler,
-      multitasking: {isMinimized: ko.observable(false)},
       videoGrid: {grid: [], thumbnail: null} as Grid,
     };
     return props as FullscreenVideoCallProps;
@@ -79,15 +85,6 @@ describe('fullscreenVideoCall', () => {
   });
 
   afterEach(() => jest.useRealTimers());
-
-  it('shows the available screens', () => {
-    mockedUiKit.useMatchMedia.mockReturnValue(false);
-    const props = createProps();
-
-    const {queryByText} = render(withTheme(<FullscreenVideoCall {...props} />));
-
-    expect(queryByText('videoCallOverlayConversations')).not.toBe(null);
-  });
 
   it('shows the calling timer', async () => {
     const props = createProps();
@@ -111,12 +108,13 @@ describe('fullscreenVideoCall', () => {
 
   it('has no active speaker toggle for calls with more less than 3 participants', () => {
     const props = createProps();
-    const {queryByText} = render(withTheme(<FullscreenVideoCall {...props} />));
+    const {queryByTestId} = render(withTheme(<FullscreenVideoCall {...props} />));
 
-    expect(queryByText('videoSpeakersTabSpeakers')).toBeNull();
+    expect(queryByTestId('do-call-controls-video-call-view')).toBeNull();
   });
 
   it('resets the maximized participant on active speaker switch', async () => {
+    useMatchMediaMock.mockImplementation(mediaQuery => mediaQuery === QUERY.desktop);
     const setMaximizedSpy = jasmine.createSpy();
     const props = createProps();
     props.setMaximizedParticipant = setMaximizedSpy;
@@ -126,11 +124,15 @@ describe('fullscreenVideoCall', () => {
     props.call.addParticipant(new Participant(new User('c'), 'd'));
     props.call.addParticipant(new Participant(new User('e'), 'f'));
 
-    const {getByText} = render(withTheme(<FullscreenVideoCall {...props} />));
-    const speakersButtonLabel = 'videoSpeakersTabSpeakers'.toUpperCase();
-    await waitFor(() => getByText(speakersButtonLabel));
+    const {getByTestId, getByText} = render(withTheme(<FullscreenVideoCall {...props} />));
+    const callViewToggleButton = getByTestId('do-call-controls-video-call-view');
 
-    getByText(speakersButtonLabel).click();
+    callViewToggleButton.click();
+
+    await waitFor(() => expect(getByText('videoCallOverlayViewModeLabel')).toBeDefined());
+
+    const viewModeAllSpeakersOption = getByText('videoCallOverlayViewModeSpeakers');
+    viewModeAllSpeakersOption.click();
 
     expect(setMaximizedSpy).toHaveBeenCalledWith(props.call, null);
   });
