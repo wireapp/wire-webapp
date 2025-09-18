@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [46.34.11](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@46.34.10...@wireapp/core@46.34.11) (2025-09-18)
+
+### Bug Fixes
+
+* wipe identity/crypto on CLIENT_REMOVED and make local-client delete safe(WPB-19348) ([#7347](https://github.com/wireapp/wire-web-packages/issues/7347)) ([c275b53](https://github.com/wireapp/wire-web-packages/commit/c275b53589be2109f563b0ccef5c01c0a0c4163b))
+
 ## [46.34.10](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@46.34.9...@wireapp/core@46.34.10) (2025-09-18)
 
 ### Bug Fixes
