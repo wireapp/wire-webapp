@@ -34,5 +34,5 @@
     "test": "jest",
     "test:coverage": "jest --coverage"
   },
-  "version": "2.3.2"
+  "version": "2.3.3"
 }
