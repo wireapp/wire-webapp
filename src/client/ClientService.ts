@@ -86,15 +86,16 @@ export class ClientService {
   public async deleteLocalClient(password?: string): Promise<string> {
     const localClientId = this.apiClient.context?.clientId;
     if (!localClientId) {
-      throw new Error('Trying to delete local client, but local client has not been set');
+      // No client in context -> there's nothing to delete on backend, just drop local state
+      this.logger.warn('No local client id in context; deleting local client data from DB only.');
+      return this.database.deleteLocalClient();
     }
     try {
       await this.backend.deleteClient(localClientId, password);
     } catch (error) {
       this.logger.warn('Failed to delete client on backend', error);
-    } finally {
-      return this.database.deleteLocalClient();
     }
+    return this.database.deleteLocalClient();
   }
 
   private async getLocalClient(): Promise<MetaClient | undefined> {
