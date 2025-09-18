@@ -25,9 +25,11 @@ import {SetUsernamePage} from './team_management/pages/setUsername.page';
 import {TeamLoginPage} from './team_management/pages/teamLogin.page';
 import {TeamsPage} from './team_management/pages/teams.page';
 import {TeamSignUpPage} from './team_management/pages/teamSignUp.page';
+import {ConversationList} from './webapp/components/conversationList.component';
 import {ConversationSidebar} from './webapp/components/conversationSidebar.component';
 import {InputBarControls} from './webapp/components/inputBarControls.component';
 import {AppLockModal} from './webapp/modals/appLock.modal';
+import {BaseModal} from './webapp/modals/base.modal';
 import {BlockWarningModal} from './webapp/modals/blockWarning.modal';
 import {CallNotEstablishedModal} from './webapp/modals/callNotEstablished.modal';
 import {ConfirmLogoutModal} from './webapp/modals/confirmLogout.modal';
@@ -58,6 +60,7 @@ import {HistoryExportPage} from './webapp/pages/historyExport.page';
 import {HistoryImportPage} from './webapp/pages/historyImport.page';
 import {HistoryInfoPage} from './webapp/pages/infoHistory.page';
 import {LoginPage} from './webapp/pages/login.page';
+import {OptionsPage} from './webapp/pages/options.page';
 import {OutgoingConnectionPage} from './webapp/pages/outgoingConnection.page';
 import {ParticipantDetails} from './webapp/pages/participantDetails.page';
 import {RegisterSuccessPage} from './webapp/pages/registerSuccess.page';
@@ -148,6 +151,7 @@ export class PageManager {
       connectRequest: () => this.getOrCreate('webapp.pages.connectRequest', () => new ConnectRequestPage(this.page)),
       calling: () => this.getOrCreate('webapp.pages.calling', () => new CallingPage(this.page)),
       settings: () => this.getOrCreate('webapp.pages.settings', () => new SettingsPage(this.page)),
+      options: () => this.getOrCreate('webapp.pages.options', () => new OptionsPage(this.page)),
       audioVideoSettings: () =>
         this.getOrCreate('webapp.pages.audioVideoSettings', () => new AudioVideoSettingsPage(this.page)),
       outgoingConnection: () =>
@@ -169,6 +173,7 @@ export class PageManager {
       setUsername: () => this.getOrCreate('webapp.pages.setUsername', () => new SetUsernamePage(this.page)),
     },
     modals: {
+      baseModal: () => this.getOrCreate('webapp.modals.baseModal', () => new BaseModal(this.page)),
       dataShareConsent: () =>
         this.getOrCreate('webapp.modals.dataShareConsent', () => new DataShareConsentModal(this.page)),
       appLock: () => this.getOrCreate('webapp.modals.appLock', () => new AppLockModal(this.page)),
@@ -194,6 +199,8 @@ export class PageManager {
         this.getOrCreate('webapp.modals.marketingConsent', () => new MarketingConsentModal(this.page)),
     },
     components: {
+      conversationList: () =>
+        this.getOrCreate('webapp.components.ConversationList', () => new ConversationList(this.page)),
       conversationSidebar: () =>
         this.getOrCreate('webapp.components.conversationSidebar', () => new ConversationSidebar(this.page)),
       inputBarControls: () =>

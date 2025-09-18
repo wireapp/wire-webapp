@@ -22,14 +22,15 @@ import {Page, Locator} from '@playwright/test';
 import {selectByDataAttribute} from 'test/e2e_tests/utils/selector.util';
 
 export class ConversationSidebar {
+  readonly pageLoadingTimeout = 60_000;
   readonly page: Page;
-
   readonly personalStatusName: Locator;
   readonly personalUserName: Locator;
   readonly preferencesButton: Locator;
   readonly allConverationsButton: Locator;
   readonly connectButton: Locator;
   readonly archiveButton: Locator;
+  readonly manageTeamButton: Locator;
 
   constructor(page: Page) {
     this.page = page;
@@ -40,6 +41,7 @@ export class ConversationSidebar {
     this.allConverationsButton = page.locator(`${selectByDataAttribute('go-recent-view')}`);
     this.connectButton = page.locator(`button${selectByDataAttribute('go-people')}`);
     this.archiveButton = page.locator(selectByDataAttribute('go-archive'));
+    this.manageTeamButton = page.locator(selectByDataAttribute('go-team-management'));
   }
 
   async getPersonalStatusName() {
@@ -63,7 +65,7 @@ export class ConversationSidebar {
   }
 
   async isPageLoaded() {
-    await this.preferencesButton.waitFor({state: 'visible'});
+    await this.preferencesButton.waitFor({state: 'visible', timeout: this.pageLoadingTimeout});
   }
 
   async clickArchive() {

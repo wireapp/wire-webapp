@@ -19,29 +19,26 @@
 
 import {Page, Locator} from '@playwright/test';
 
-export class SettingsPage {
-  readonly page: Page;
+import {selectByDataAttribute} from 'test/e2e_tests/utils/selector.util';
 
-  readonly audioVideoSettingsButton: Locator;
-  readonly accountButton: Locator;
-  readonly optionsButton: Locator;
+export class OptionsPage {
+  readonly checkboxSoundAlertsAll: Locator;
+  readonly checkboxSoundAlertsSome: Locator;
+  readonly checkboxSoundAlertsNone: Locator;
 
   constructor(page: Page) {
-    this.page = page;
-    this.audioVideoSettingsButton = page.locator("[data-uie-name='go-audio-video']");
-    this.accountButton = page.locator("[data-uie-name='go-account']");
-    this.optionsButton = page.locator("[data-uie-name='go-options']");
+    this.checkboxSoundAlertsAll = page.locator(selectByDataAttribute('preferences-options-audio-all'));
+    this.checkboxSoundAlertsSome = page.locator(selectByDataAttribute('preferences-options-audio-some'));
+    this.checkboxSoundAlertsNone = page.locator(selectByDataAttribute('preferences-options-audio-none'));
   }
 
-  async clickAudioVideoSettingsButton() {
-    await this.audioVideoSettingsButton.click();
+  async checkSoundAll() {
+    await this.checkboxSoundAlertsAll.check();
   }
-
-  async clickAccountButton() {
-    await this.accountButton.click();
+  async checkSoundSome() {
+    await this.checkboxSoundAlertsSome.check();
   }
-
-  async clickOptionsButton() {
-    await this.optionsButton.click();
+  async checkSoundNone() {
+    await this.checkboxSoundAlertsNone.check();
   }
 }

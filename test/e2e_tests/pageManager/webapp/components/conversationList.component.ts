@@ -19,29 +19,16 @@
 
 import {Page, Locator} from '@playwright/test';
 
-export class SettingsPage {
+export class ConversationList {
   readonly page: Page;
-
-  readonly audioVideoSettingsButton: Locator;
-  readonly accountButton: Locator;
-  readonly optionsButton: Locator;
+  readonly searchList: Locator;
 
   constructor(page: Page) {
     this.page = page;
-    this.audioVideoSettingsButton = page.locator("[data-uie-name='go-audio-video']");
-    this.accountButton = page.locator("[data-uie-name='go-account']");
-    this.optionsButton = page.locator("[data-uie-name='go-options']");
+    this.searchList = page.getByTestId('search-list');
   }
 
-  async clickAudioVideoSettingsButton() {
-    await this.audioVideoSettingsButton.click();
-  }
-
-  async clickAccountButton() {
-    await this.accountButton.click();
-  }
-
-  async clickOptionsButton() {
-    await this.optionsButton.click();
+  async clickOnContact(name: string) {
+    await this.searchList.getByRole('button').getByText(name).click();
   }
 }
