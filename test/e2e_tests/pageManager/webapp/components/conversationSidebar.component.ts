@@ -24,6 +24,7 @@ import {selectByDataAttribute} from 'test/e2e_tests/utils/selector.util';
 export class ConversationSidebar {
   readonly pageLoadingTimeout = 60_000;
   readonly page: Page;
+  readonly personalStatusLabel: Locator;
   readonly personalStatusName: Locator;
   readonly personalUserName: Locator;
   readonly preferencesButton: Locator;
@@ -35,6 +36,7 @@ export class ConversationSidebar {
   constructor(page: Page) {
     this.page = page;
 
+    this.personalStatusLabel = page.getByTestId('status-label');
     this.personalStatusName = page.locator(`${selectByDataAttribute('status-name')}`);
     this.personalUserName = page.locator(`${selectByDataAttribute('user-handle')}`);
     this.preferencesButton = page.locator(`${selectByDataAttribute('go-preferences')}`);

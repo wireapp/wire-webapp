@@ -21,7 +21,7 @@ import {getUser, User} from 'test/e2e_tests/data/user';
 import {PageManager} from 'test/e2e_tests/pageManager';
 import {setupBasicTestScenario} from 'test/e2e_tests/utils/setup.utli';
 import {tearDownAll} from 'test/e2e_tests/utils/tearDown.util';
-import {loginUser} from 'test/e2e_tests/utils/userActions';
+import {createChannel, createGroup, loginUser} from 'test/e2e_tests/utils/userActions';
 
 import {test, expect} from '../../test.fixtures';
 
@@ -202,37 +202,51 @@ test.describe('account settings', () => {
     },
   );
 
-  test.skip(
-    'I want to see the Full Name wherever my name gets displayed (see readme)',
+  /*
+    1. Conversation sidebar.
+    2. Conversation itself on top of the user's message
+    3. The list of "likes" under the liked message.
+    4. Settings - Account
+    5. Group conversation details
+    6. Channel details
+  */
+  test(
+    'I want to see the Full Name wherever my name gets displayed',
     {tag: ['@TC-1948', '@regression']},
-    async ({pageManager}) => {
-      const {components} = pageManager.webapp;
+    async ({pageManager, api}) => {
+      const {components, pages} = pageManager.webapp;
 
       await startUpApp(pageManager, memberA);
-      // TODO: needs clarification
+      await expect(components.conversationSidebar().personalStatusLabel).toHaveText(memberA.fullName);
+      await createGroup(pageManager, 'test group', [memberB]);
+      await pages.conversation().sendMessage('test');
 
-      /*
-        1. Conversation sidebar.
-        2. Conversation itself on top of the user's message
-        3. The list of "likes" under the liked message.
-        4. Settings - Account
-        5. Group conversation details
-        6. Channel details
-      */
-      expect(components.conversationSidebar().personalUserName).toBe(memberA.fullName);
-      // generate group chat
-      // go to group chat
-      // send message
-      // check name
-      // like message
-      // check tooltip
+      const message = await pages.conversation().messageItems.nth(1); // skip the system messages
+      await expect(message.getByTestId('sender-name')).toHaveText(memberA.fullName);
+
+      await pages.conversation().reactOnMessage(message);
+
+      await expect(await pages.conversation().getCurrentFocusedToolTip(message)).toHaveText(
+        `${memberA.fullName} reacted with +1`,
+      );
+
+      await pages.conversation().clickConversationInfoButton();
+      await expect(pages.conversationDetails().isUserPartOfConversationAsAdmin(memberA.fullName)).toBeTruthy();
+
+      await api.brig.enableMLSFeature(owner.teamId);
+      await api.brig.unlockChannelFeature(owner.teamId);
+      await api.brig.enableChannelsFeature(owner.teamId);
+
+      await (await pageManager.getPage()).reload();
+
+      await createChannel(pageManager, 'test', [memberB]);
+
+      await pages.conversation().clickConversationInfoButton();
+      await expect(pages.conversationDetails().isUserPartOfConversationAsAdmin(memberA.fullName)).toBeTruthy();
+
       // go to settings
-      // check name
-      // go to group conversation details
-      // check the user list and name
-      // generate an channel
-      // open up details on the channel
-      // check user
+      await components.conversationSidebar().clickPreferencesButton();
+      await expect(pages.account().displayNameDisplay).toHaveText(memberA.fullName);
     },
   );
 
