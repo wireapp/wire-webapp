@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [46.34.10](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@46.34.9...@wireapp/core@46.34.10) (2025-09-18)
+
+### Bug Fixes
+
+* try deleting every kind of dataset even if an error happens, sonarqube ([#7346](https://github.com/wireapp/wire-web-packages/issues/7346)) ([4b92c1c](https://github.com/wireapp/wire-web-packages/commit/4b92c1c10016dcd21154711ce29f5da790b7b174))
+
 ## [46.34.9](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@46.34.8...@wireapp/core@46.34.9) (2025-09-11)
 
 ### Bug Fixes
