@@ -165,7 +165,10 @@ export class Account extends TypedEventEmitter<Events> {
   private coreCallbacks?: CoreCallbacks;
   private connectionState: ConnectionState = ConnectionState.CLOSED;
 
-  private notificationProcessingQueue = new PromiseQueue({name: 'notification-processing-queue', paused: true});
+  private readonly notificationProcessingQueue = new PromiseQueue({
+    name: 'notification-processing-queue',
+    paused: true,
+  });
 
   public service?: {
     mls?: MLSService;
@@ -194,7 +197,7 @@ export class Account extends TypedEventEmitter<Events> {
    */
   constructor(
     apiClient: APIClient = new APIClient(),
-    private options: AccountOptions = {
+    private readonly options: AccountOptions = {
       nbPrekeys: 100,
       coreCryptoConfig: {wasmFilePath: '', enabled: false},
     },
@@ -246,7 +249,7 @@ export class Account extends TypedEventEmitter<Events> {
     return features;
   };
 
-  private persistCookie = (storeEngine: CRUDEngine, cookie: Cookie): Promise<string> => {
+  private readonly persistCookie = (storeEngine: CRUDEngine, cookie: Cookie): Promise<string> => {
     const entity = {expiration: cookie.expiration, zuid: cookie.zuid};
     return storeEngine.updateOrCreate(AUTH_TABLE_NAME, AUTH_COOKIE_KEY, entity);
   };
@@ -355,10 +358,10 @@ export class Account extends TypedEventEmitter<Events> {
    */
   public registerClient = async (
     loginData: LoginData,
-    clientInfo: ClientInfo = coreDefaultClient,
     useLegacyNotificationStream: boolean,
     /** will add extra manual entropy to the client's identity being created */
     entropyData?: Uint8Array,
+    clientInfo: ClientInfo = coreDefaultClient,
   ): Promise<RegisteredClient> => {
     if (!this.service || !this.apiClient.context || !this.storeEngine) {
       throw new Error('Services are not set or context not initialized.');
@@ -425,7 +428,11 @@ export class Account extends TypedEventEmitter<Events> {
     return client;
   };
 
-  private buildCryptoClient = async (context: Context, storeEngine: CRUDEngine, encryptedStore: EncryptedStore) => {
+  private readonly buildCryptoClient = async (
+    context: Context,
+    storeEngine: CRUDEngine,
+    encryptedStore: EncryptedStore,
+  ) => {
     const baseConfig = {
       nbPrekeys: this.options.nbPrekeys,
       onNewPrekeys: async (prekeys: PreKey[]) => {
@@ -465,7 +472,7 @@ export class Account extends TypedEventEmitter<Events> {
     this.coreCallbacks = coreCallbacks;
   };
 
-  private initServices = async (context: Context): Promise<void> => {
+  private readonly initServices = async (context: Context): Promise<void> => {
     const encryptedStoreName = this.generateEncryptedDbName(context);
     this.encryptedDb = this.options.systemCrypto
       ? await createCustomEncryptedStore(encryptedStoreName, this.options.systemCrypto)
@@ -546,7 +553,7 @@ export class Account extends TypedEventEmitter<Events> {
     };
   };
 
-  private resetContext = (): void => {
+  private readonly resetContext = (): void => {
     this.currentClient = undefined;
     delete this.apiClient.context;
     delete this.service;
@@ -570,27 +577,49 @@ export class Account extends TypedEventEmitter<Events> {
     this.resetContext();
   };
 
-  private wipeCommonData = async (): Promise<void> => {
-    await this.service?.client.deleteLocalClient();
-
-    if (this.storeEngine) {
-      await wipeCoreCryptoDb(this.storeEngine);
+  private readonly wipeCommonData = async (): Promise<void> => {
+    try {
+      await this.service?.client.deleteLocalClient();
+    } catch (error) {
+      this.logger.error('Failed to delete local client during logout cleanup:', error);
     }
 
-    // needs to be wiped last
-    await this.encryptedDb?.wipe();
+    try {
+      if (this.storeEngine) {
+        await wipeCoreCryptoDb(this.storeEngine);
+      }
+    } catch (error) {
+      this.logger.error('Failed to wipe crypto database during logout cleanup:', error);
+    }
+
+    try {
+      // needs to be wiped last
+      await this.encryptedDb?.wipe();
+    } catch (error) {
+      this.logger.error('Failed to delete encrypted database during logout cleanup:', error);
+    }
   };
 
   /**
    * Will delete the identity and history of the current user
    */
-  private wipeAllData = async (): Promise<void> => {
-    if (this.storeEngine) {
-      await deleteIdentity(this.storeEngine, false);
+  private readonly wipeAllData = async (): Promise<void> => {
+    try {
+      if (this.storeEngine) {
+        await deleteIdentity(this.storeEngine, false);
+      }
+    } catch (error) {
+      this.logger.error('Failed to delete identity during logout cleanup:', error);
     }
-    if (this.db) {
-      await deleteDB(this.db);
+
+    try {
+      if (this.db) {
+        await deleteDB(this.db);
+      }
+    } catch (error) {
+      this.logger.error('Failed to delete database during logout cleanup:', error);
     }
+
     await this.wipeCommonData();
   };
 
@@ -598,10 +627,15 @@ export class Account extends TypedEventEmitter<Events> {
    * Will delete the cryptography and client of the current user
    * Will keep the history intact
    */
-  private wipeCryptoData = async (): Promise<void> => {
-    if (this.storeEngine) {
-      await deleteIdentity(this.storeEngine, true);
+  private readonly wipeCryptoData = async (): Promise<void> => {
+    try {
+      if (this.storeEngine) {
+        await deleteIdentity(this.storeEngine, true);
+      }
+    } catch (error) {
+      this.logger.error('Failed to delete identity during logout cleanup:', error);
     }
+
     await this.wipeCommonData();
   };
 
@@ -767,7 +801,7 @@ export class Account extends TypedEventEmitter<Events> {
     };
   };
 
-  private createConnectionStateChangedHandler = (
+  private readonly createConnectionStateChangedHandler = (
     onConnectionStateChanged: (state: ConnectionState) => void,
   ): ((state: ConnectionState) => void) => {
     return (state: ConnectionState): void => {
@@ -782,7 +816,7 @@ export class Account extends TypedEventEmitter<Events> {
    * Responsible for handling specific event types like `MESSAGE_TIMER_UPDATE`, and then
    * forwarding the event to the consumer via the `onEvent` callback.
    */
-  private createEventHandler = (
+  private readonly createEventHandler = (
     onEvent: (payload: HandledEventPayload, source: NotificationSource) => Promise<void>,
   ) => {
     return async (payload: HandledEventPayload, source: NotificationSource) => {
@@ -810,7 +844,7 @@ export class Account extends TypedEventEmitter<Events> {
    * It can be replaced with the new notification handling system using `ConsumableNotification`
    * when all clients are capable of handling consumable notifications.
    */
-  private createLegacyNotificationHandler = (
+  private readonly createLegacyNotificationHandler = (
     handleEvent: (payload: HandledEventPayload, source: NotificationSource) => Promise<void>,
     onNotificationStreamProgress: (currentProcessingNotificationTimestamp: string) => void,
     dryRun: boolean,
@@ -848,7 +882,7 @@ export class Account extends TypedEventEmitter<Events> {
     };
   };
 
-  private createNotificationHandler = (
+  private readonly createNotificationHandler = (
     handleEvent: (payload: HandledEventPayload, source: NotificationSource) => Promise<void>,
     onNotificationStreamProgress: (currentProcessingNotificationTimestamp: string) => void,
     onConnectionStateChanged: (state: ConnectionState) => void,
@@ -879,7 +913,7 @@ export class Account extends TypedEventEmitter<Events> {
     };
   };
 
-  private handleNotificationQueueError = (error: unknown) => {
+  private readonly handleNotificationQueueError = (error: unknown) => {
     if (!(error instanceof Error)) {
       throw error;
     }
@@ -894,11 +928,11 @@ export class Account extends TypedEventEmitter<Events> {
     }
   };
 
-  private acknowledgeSynchronizationNotification = (notification: ConsumableNotificationSynchronization) => {
+  private readonly acknowledgeSynchronizationNotification = (notification: ConsumableNotificationSynchronization) => {
     this.apiClient.transport.ws.acknowledgeConsumableNotificationSynchronization(notification);
   };
 
-  private handleSynchronizationNotification = async (
+  private readonly handleSynchronizationNotification = async (
     notification: ConsumableNotificationSynchronization,
     onConnectionStateChanged: (state: ConnectionState) => void,
   ) => {
@@ -920,7 +954,7 @@ export class Account extends TypedEventEmitter<Events> {
     }
   };
 
-  private decryptAckEmitNotification = async (
+  private readonly decryptAckEmitNotification = async (
     notification: ConsumableNotificationEvent,
     handleEvent: (payload: HandledEventPayload, source: NotificationSource) => Promise<void>,
     source: NotificationSource,
@@ -964,10 +998,12 @@ export class Account extends TypedEventEmitter<Events> {
    * It should be replaced with the new notification handling system using `ConsumableNotification`.
    * when all clients are capable of handling consumable notifications.
    */
-  private createLegacyMissedNotificationsHandler = (onMissedNotifications: (notificationId: string) => void) => {
+  private readonly createLegacyMissedNotificationsHandler = (
+    onMissedNotifications: (notificationId: string) => void,
+  ) => {
     return async (notificationId: string) => {
       if (this.hasMLSDevice) {
-        queueConversationRejoin('all-conversations', () =>
+        void queueConversationRejoin('all-conversations', () =>
           this.service!.conversation.handleConversationsEpochMismatch(),
         );
       }
@@ -987,7 +1023,7 @@ export class Account extends TypedEventEmitter<Events> {
    *
    * @param handlers Various logic handlers wired to notification callbacks
    */
-  private createLegacyNotificationStreamProcessor = ({
+  private readonly createLegacyNotificationStreamProcessor = ({
     handleLegacyNotification,
     handleMissedNotifications,
     onConnectionStateChanged,
@@ -1038,7 +1074,7 @@ export class Account extends TypedEventEmitter<Events> {
    * they will be resent next time the connection is opened
    * this is to avoid duplicate decryption of notifications
    */
-  private pauseAndFlushNotificationQueue = () => {
+  private readonly pauseAndFlushNotificationQueue = () => {
     this.notificationProcessingQueue.pause();
     this.notificationProcessingQueue.flush();
     this.logger.info('Notification processing queue paused and flushed');
@@ -1051,7 +1087,7 @@ export class Account extends TypedEventEmitter<Events> {
    * On each new backend message, we pass it to the  notification handler.
    * On state changes, we map raw socket states to public connection states and emit them.
    */
-  private setupWebSocketListeners = (
+  private readonly setupWebSocketListeners = (
     onConnectionStateChanged: (state: ConnectionState) => void,
     handleNotification: (notification: ConsumableNotification, source: NotificationSource) => Promise<void>,
     handleLegacyNotification: (notification: Notification, source: NotificationSource) => Promise<void>,
@@ -1107,7 +1143,7 @@ export class Account extends TypedEventEmitter<Events> {
    * the WebSocket transport, unblocking the backend so it resumes sending updates
    * then we remove the flag.
    */
-  private reactToMissedNotification = () => {
+  private readonly reactToMissedNotification = () => {
     const localStorageKey = 'has_missing_notification';
 
     // First-time handling: set flag and reload to trigger full re-fetch of state.
@@ -1132,20 +1168,20 @@ export class Account extends TypedEventEmitter<Events> {
     return 'type' in notification;
   };
 
-  private generateDbName = (context: Context) => {
+  private readonly generateDbName = (context: Context) => {
     const clientType = context.clientType === ClientType.NONE ? '' : `@${context.clientType}`;
     return `wire@${this.apiClient.config.urls.name}@${context.userId}${clientType}`;
   };
 
-  private generateCoreDbName = (context: Context) => {
+  private readonly generateCoreDbName = (context: Context) => {
     return `core-${this.generateDbName(context)}`;
   };
 
-  private generateEncryptedDbName = (context: Context) => {
+  private readonly generateEncryptedDbName = (context: Context) => {
     return `secrets-${this.generateDbName(context)}`;
   };
 
-  private initEngine = async (context: Context, encryptedStore: EncryptedStore): Promise<CRUDEngine> => {
+  private readonly initEngine = async (context: Context, encryptedStore: EncryptedStore): Promise<CRUDEngine> => {
     const dbName = this.generateDbName(context);
     this.logger.debug(`Initialising store with name "${dbName}"...`);
     const openDb = async () => {
@@ -1168,7 +1204,7 @@ export class Account extends TypedEventEmitter<Events> {
     return storeEngine;
   };
 
-  private groupIdFromConversationId = async (
+  private readonly groupIdFromConversationId = async (
     conversationId: QualifiedId,
     subconversationId?: SUBCONVERSATION_ID,
   ): Promise<string | undefined> => {
