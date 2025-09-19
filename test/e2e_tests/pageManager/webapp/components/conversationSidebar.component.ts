@@ -36,7 +36,7 @@ export class ConversationSidebar {
   constructor(page: Page) {
     this.page = page;
 
-    this.personalStatusLabel = page.getByTestId('status-label');
+    this.personalStatusLabel = page.getByTestId('status-availability');
     this.personalStatusName = page.locator(`${selectByDataAttribute('status-name')}`);
     this.personalUserName = page.locator(`${selectByDataAttribute('user-handle')}`);
     this.preferencesButton = page.locator(`${selectByDataAttribute('go-preferences')}`);
