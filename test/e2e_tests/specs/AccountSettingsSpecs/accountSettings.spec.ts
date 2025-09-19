@@ -99,8 +99,8 @@ test.describe('account settings', () => {
     {tag: ['@TC-60', '@regression']},
     async ({pageManager, api}) => {
       ///TODO: read in docs
-      // setup -> owner get token and add one user
-      // add to the bridge the url or create an new service
+      // add to the bridge the url to enable scim?
+      // add a new user
       // login with the user
       // try to change the email
     },
@@ -147,9 +147,8 @@ test.describe('account settings', () => {
       const {components} = pageManager.webapp;
 
       await startUpApp(pageManager, owner);
-      // check if the tab is shown
+
       await expect(components.conversationSidebar().manageTeamButton).toBeVisible();
-      // check link
       await expect(await components.conversationSidebar().manageTeamButton.getAttribute('href')).toBe(
         'https://wire-teams-dev.zinfra.io/login/',
       );
