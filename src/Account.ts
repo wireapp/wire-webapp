@@ -659,7 +659,6 @@ export class Account extends TypedEventEmitter<Events> {
     onConnectionStateChanged: onConnectionStateChangedCallBack = () => {},
     onNotificationStreamProgress = () => {},
     onMissedNotifications = () => {},
-    dryRun = false,
   }: {
     /**
      * Called when a new event arrives from backend
@@ -694,6 +693,7 @@ export class Account extends TypedEventEmitter<Events> {
 
     /**
      * When set will not decrypt and not store the last notification ID. This is useful if you only want to subscribe to unencrypted backend events
+     * @deprecated Core doesn't support dryRun mode anymore and this parameter will be removed in future versions
      */
     dryRun?: boolean;
   } = {}): Promise<() => void> => {
@@ -709,16 +709,11 @@ export class Account extends TypedEventEmitter<Events> {
 
     const handleEvent = this.createEventHandler(onEvent);
 
-    const handleLegacyNotification = this.createLegacyNotificationHandler(
-      handleEvent,
-      onNotificationStreamProgress,
-      dryRun,
-    );
+    const handleLegacyNotification = this.createLegacyNotificationHandler(handleEvent, onNotificationStreamProgress);
     const handleNotification = this.createNotificationHandler(
       handleEvent,
       onNotificationStreamProgress,
       onConnectionStateChanged,
-      dryRun,
     );
 
     const handleMissedNotifications = this.createLegacyMissedNotificationsHandler(onMissedNotifications);
@@ -847,7 +842,6 @@ export class Account extends TypedEventEmitter<Events> {
   private readonly createLegacyNotificationHandler = (
     handleEvent: (payload: HandledEventPayload, source: NotificationSource) => Promise<void>,
     onNotificationStreamProgress: (currentProcessingNotificationTimestamp: string) => void,
-    dryRun: boolean,
   ) => {
     return async (notification: Notification, source: NotificationSource): Promise<void> => {
       void this.notificationProcessingQueue
@@ -864,7 +858,7 @@ export class Account extends TypedEventEmitter<Events> {
               onNotificationStreamProgress(notificationTime);
             }
 
-            const messages = this.service!.notification.handleNotification(notification, source, dryRun);
+            const messages = this.service!.notification.handleNotification(notification, source);
 
             for await (const message of messages) {
               await handleEvent(message, source);
@@ -886,7 +880,6 @@ export class Account extends TypedEventEmitter<Events> {
     handleEvent: (payload: HandledEventPayload, source: NotificationSource) => Promise<void>,
     onNotificationStreamProgress: (currentProcessingNotificationTimestamp: string) => void,
     onConnectionStateChanged: (state: ConnectionState) => void,
-    dryRun: boolean,
   ) => {
     return async (notification: ConsumableNotification, source: NotificationSource): Promise<void> => {
       try {
@@ -903,9 +896,7 @@ export class Account extends TypedEventEmitter<Events> {
         }
 
         this.notificationProcessingQueue
-          .push(() =>
-            this.decryptAckEmitNotification(notification, handleEvent, source, onNotificationStreamProgress, dryRun),
-          )
+          .push(() => this.decryptAckEmitNotification(notification, handleEvent, source, onNotificationStreamProgress))
           .catch(this.handleNotificationQueueError);
       } catch (error) {
         this.logger.error(`Failed to handle notification "${notification.type}": ${(error as any).message}`, error);
@@ -959,10 +950,9 @@ export class Account extends TypedEventEmitter<Events> {
     handleEvent: (payload: HandledEventPayload, source: NotificationSource) => Promise<void>,
     source: NotificationSource,
     onNotificationStreamProgress: (currentProcessingNotificationTimestamp: string) => void,
-    dryRun: boolean,
   ): Promise<void> => {
     try {
-      const payloads = this.service!.notification.handleNotification(notification.data.event, source, dryRun);
+      const payloads = this.service!.notification.handleNotification(notification.data.event, source);
 
       const notificationTime = this.getNotificationEventTime(notification.data.event.payload[0]);
       if (this.connectionState !== ConnectionState.LIVE && notificationTime) {
@@ -973,9 +963,7 @@ export class Account extends TypedEventEmitter<Events> {
         await handleEvent(payload, source);
       }
 
-      if (!dryRun) {
-        this.apiClient.transport.ws.acknowledgeNotification(notification);
-      }
+      this.apiClient.transport.ws.acknowledgeNotification(notification);
     } catch (err) {
       this.logger.error(`Failed to process notification ${notification.data.delivery_tag}`, err);
     }
