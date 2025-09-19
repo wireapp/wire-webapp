@@ -38,7 +38,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 18.16.x
-        cache: yarn
+          cache: yarn
 
       - run: yarn --immutable
       - run: yarn configure
