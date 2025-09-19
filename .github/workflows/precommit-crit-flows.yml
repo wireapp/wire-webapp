@@ -1,10 +1,8 @@
-name: precommit
+name: precommit-crit-flows
 
 on:
   pull_request:
     branches: [dev]
-    branches-ignore:
-      - 'dependabot/**' # skip all Dependabot PRs
 
 # One at a time lane for the shared precommit environment
 concurrency:
@@ -13,6 +11,8 @@ concurrency:
 
 jobs:
   build:
+    # Skip entire job for Dependabot PRs
+    if: ${{ github.actor != 'dependabot[bot]' && github.actor != 'dependabot' }}
     runs-on: buildjet-8vcpu-ubuntu-2204
     timeout-minutes: 20
 
@@ -20,12 +20,12 @@ jobs:
       unit_tests_report: ${{ env.UNIT_TEST_REPORT_FILE }}
       build_artifact: ${{ env.BUILD_ARTIFACT }}
       total_additions: ${{ steps.check_additions.outputs.total_additions }}
+      commit_url: ${{ steps.meta.outputs.commit_url }}
+      committer: ${{ steps.meta.outputs.committer }}
 
     env:
       BUILD_DIR: server/dist/s3/
       BUILD_ARTIFACT: ebs.zip
-      COMMIT_URL: ${{ github.event.head_commit.url }}
-      COMMITTER: ${{ github.event.head_commit.committer.name }}
       CHANGELOG_FILE: ./changelog.md
       UNIT_TEST_REPORT_FILE: ./unit-tests.log
 
@@ -38,11 +38,22 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 18.16.x
-          cache: yarn
+        cache: yarn
 
       - run: yarn --immutable
       - run: yarn configure
       - run: yarn build:prod
+
+      - name: Derive PR commit metadata
+        id: meta
+        run: |
+          SHA="${{ github.event.pull_request.head.sha }}"
+          COMMIT_URL="https://github.com/${{ github.repository }}/commit/$SHA"
+          AUTHOR="$(git show -s --format='%an' "$SHA" || true)"
+          echo "COMMIT_URL=$COMMIT_URL" >> "$GITHUB_ENV"
+          echo "COMMITTER=$AUTHOR" >> "$GITHUB_ENV"
+          echo "commit_url=$COMMIT_URL" >> "$GITHUB_OUTPUT"
+          echo "committer=$AUTHOR" >> "$GITHUB_OUTPUT"
 
       - uses: actions/upload-artifact@v4
         with:
@@ -63,6 +74,7 @@ jobs:
 
   deploy_to_aws:
     name: Deploy to precommit
+    if: ${{ github.actor != 'dependabot[bot]' && github.actor != 'dependabot' }}
     runs-on: ubuntu-latest
     needs: [build]
     timeout-minutes: 25
@@ -86,7 +98,7 @@ jobs:
           environment_name: wire-webapp-precommit
           region: eu-central-1
           use_existing_version_if_available: true
-          version_description: ${{ github.sha }}
+          version_description: ${{ needs.build.outputs.committer }} — ${{ needs.build.outputs.commit_url }}
           version_label: ${{ github.run_id }}
           wait_for_deployment: true # ✅ wait until EB is green
 
@@ -114,10 +126,10 @@ jobs:
 
   e2e_crit_flow:
     name: Playwright Critical Flow (precommit)
+    if: ${{ github.repository == 'wireapp/wire-webapp' && github.actor != 'dependabot[bot]' && github.actor != 'dependabot' }}
     runs-on: [self-hosted, Linux, X64, office]
     needs: [deploy_to_aws]
     timeout-minutes: 35
-    if: github.repository == 'wireapp/wire-webapp'
 
     steps:
       - uses: actions/checkout@v4
