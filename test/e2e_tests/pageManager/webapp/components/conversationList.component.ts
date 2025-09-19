@@ -17,28 +17,18 @@
  *
  */
 
-import {Locator, Page} from '@playwright/test';
+import {Page, Locator} from '@playwright/test';
 
-import {selectByDataAttribute} from 'test/e2e_tests/utils/selector.util';
-
-export class HistoryInfoPage {
+export class ContactList {
   readonly page: Page;
-  private readonly continueButton: Locator;
+  readonly searchList: Locator;
 
   constructor(page: Page) {
     this.page = page;
-    this.continueButton = this.page.locator(selectByDataAttribute('do-history-confirm'));
-  }
-  async isButtonVisible() {
-    try {
-      await this.continueButton.waitFor({state: 'visible', timeout: 10000});
-      return true;
-    } catch (err) {
-      return false;
-    }
+    this.searchList = page.getByTestId('search-list');
   }
 
-  async clickConfirmButton() {
-    await this.continueButton.click();
+  async clickOnContact(name: string) {
+    await this.searchList.getByRole('button').getByText(name).click();
   }
 }

@@ -25,6 +25,7 @@ import {SetUsernamePage} from './team_management/pages/setUsername.page';
 import {TeamLoginPage} from './team_management/pages/teamLogin.page';
 import {TeamsPage} from './team_management/pages/teams.page';
 import {TeamSignUpPage} from './team_management/pages/teamSignUp.page';
+import {ContactList} from './webapp/components/conversationList.component';
 import {ConversationSidebar} from './webapp/components/conversationSidebar.component';
 import {InputBarControls} from './webapp/components/inputBarControls.component';
 import {AppLockModal} from './webapp/modals/appLock.modal';
@@ -194,6 +195,7 @@ export class PageManager {
         this.getOrCreate('webapp.modals.marketingConsent', () => new MarketingConsentModal(this.page)),
     },
     components: {
+      contactList: () => this.getOrCreate('webapp.components.ContactList', () => new ContactList(this.page)),
       conversationSidebar: () =>
         this.getOrCreate('webapp.components.conversationSidebar', () => new ConversationSidebar(this.page)),
       inputBarControls: () =>
