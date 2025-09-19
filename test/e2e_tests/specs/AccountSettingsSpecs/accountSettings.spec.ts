@@ -56,7 +56,7 @@ test.describe('account settings', () => {
 
     await startUpApp(pageManager, memberA);
     await components.conversationSidebar().clickPreferencesButton();
-    await pageManager.waitForTimeout(15000);
+
     await expect(pages.account().emailDisplay).toHaveText(memberA.email);
     await expect(pages.account().displayNameDisplay).toHaveText(memberA.fullName);
     await expect(pages.account().domainDisplay).toHaveText('staging.zinfra.io');
@@ -197,13 +197,14 @@ test.describe('account settings', () => {
       await pages.conversation().startCall();
       await components.calling().waitForCell();
       await memberPageManagerB.webapp.components.calling().clickAcceptCallButton();
-      // go to call
+      // wait a bit to get logs
       await memberPageManagerA.waitForTimeout(1000);
 
       const expectedLog = '@wireapp/webapp/avs'; // get one phone call
       const foundLog = consoleMessages.some(msg => msg.includes(expectedLog));
 
       expect(foundLog).toBeTruthy();
+      await memberContext.close();
     },
   );
 
@@ -219,13 +220,16 @@ test.describe('account settings', () => {
     'I want to see the Full Name wherever my name gets displayed',
     {tag: ['@TC-1948', '@regression']},
     async ({pageManager, api}) => {
+      const groupName = 'test group';
       const {components, pages} = pageManager.webapp;
 
       await startUpApp(pageManager, memberA);
 
       await expect(components.conversationSidebar().personalStatusLabel).toHaveText(memberA.fullName);
 
-      await createGroup(pageManager, 'test group', [memberB]);
+      await createGroup(pageManager, groupName, [memberB]);
+      // check that the chat is open
+      expect(await pages.conversationList().isConversationItemVisible(groupName)).toBeTruthy();
       await pages.conversation().sendMessage('test');
       const message = await pages.conversation().messageItems.nth(1); // skip the system messages
 
