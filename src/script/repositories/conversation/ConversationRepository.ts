@@ -345,6 +345,10 @@ export class ConversationRepository {
     }
   }
 
+  public getActiveConversation() {
+    return this.conversationState.activeConversation();
+  }
+
   public registerMLSConversationVerificationStateHandler = (
     domain: string,
     onConversationVerificationStateChange: OnConversationE2EIVerificationStateChange = () => {},
