@@ -17,9 +17,9 @@
  *
  */
 
-import {getUser, User} from 'test/e2e_tests/data/user';
+import {getUser} from 'test/e2e_tests/data/user';
 import {PageManager} from 'test/e2e_tests/pageManager';
-import {setupBasicTestScenario} from 'test/e2e_tests/utils/setup.utli';
+import {setupBasicTestScenario, startUpApp} from 'test/e2e_tests/utils/setup.utli';
 import {tearDownAll} from 'test/e2e_tests/utils/tearDown.util';
 import {createChannel, createGroup, loginUser} from 'test/e2e_tests/utils/userActions';
 
@@ -30,21 +30,6 @@ test.describe('account settings', () => {
   const members = Array.from({length: 2}, () => getUser());
   const [memberA, memberB] = members;
   test.slow();
-
-  const startUpApp = async (pageManager: PageManager, user: User) => {
-    const {components, modals, pages} = pageManager.webapp;
-    await pageManager.openMainPage();
-    await loginUser(user, pageManager);
-
-    const hasLocalData = await pages.historyInfo().isButtonVisible();
-    if (hasLocalData) {
-      await pages.historyInfo().clickConfirmButton();
-    }
-    await components.conversationSidebar().isPageLoaded();
-    if (!hasLocalData) {
-      await modals.dataShareConsent().clickDecline();
-    }
-  };
 
   test.beforeAll(async ({api}) => {
     const user = await setupBasicTestScenario(api, members, owner, 'test');
@@ -192,7 +177,7 @@ test.describe('account settings', () => {
       await Promise.all([startUpApp(memberPageManagerA, memberA), startUpApp(memberPageManagerB, memberB)]);
 
       await components.conversationSidebar().clickConnectButton();
-      await components.conversationList().clickOnContact(memberB.fullName);
+      await components.contactList().clickOnContact(memberB.fullName);
       await modals.userProfile().clickStartConversation();
       await pages.conversation().startCall();
       await components.calling().waitForCell();

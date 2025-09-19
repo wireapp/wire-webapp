@@ -19,7 +19,7 @@
 
 import {Page, Locator} from '@playwright/test';
 
-export class ConversationList {
+export class ContactList {
   readonly page: Page;
   readonly searchList: Locator;
 
