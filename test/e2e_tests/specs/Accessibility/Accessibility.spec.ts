@@ -19,7 +19,7 @@
 
 import {getUser} from 'test/e2e_tests/data/user';
 import {PageManager} from 'test/e2e_tests/pageManager';
-import {setupBasicTestScenario} from 'test/e2e_tests/utils/setup.utli';
+import {setupBasicTestScenario} from 'test/e2e_tests/utils/setup.util';
 import {tearDownAll} from 'test/e2e_tests/utils/tearDown.util';
 import {createGroup, loginUser} from 'test/e2e_tests/utils/userActions';
 
