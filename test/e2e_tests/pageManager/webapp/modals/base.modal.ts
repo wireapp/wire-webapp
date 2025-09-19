@@ -19,19 +19,17 @@
 
 import {Locator, Page} from '@playwright/test';
 
-export class BaseModal {
+export abstract class BaseModal {
   readonly page: Page;
-
   readonly modal: Locator;
   readonly modalTitle: Locator;
   readonly modalText: Locator;
   readonly blockButton: Locator;
   readonly cancelButton: Locator;
 
-  constructor(page: Page) {
+  constructor(page: Page, modalLocator: string) {
     this.page = page;
-
-    this.modal = page.locator("[data-uie-name='primary-modals-container']");
+    this.modal = page.locator(modalLocator);
     this.modalTitle = this.modal.locator("[data-uie-name='status-modal-title']");
     this.modalText = this.modal.locator("[data-uie-name='status-modal-text']");
     this.blockButton = this.modal.locator("[data-uie-name='do-action']");

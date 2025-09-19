@@ -29,7 +29,6 @@ import {ConversationList} from './webapp/components/conversationList.component';
 import {ConversationSidebar} from './webapp/components/conversationSidebar.component';
 import {InputBarControls} from './webapp/components/inputBarControls.component';
 import {AppLockModal} from './webapp/modals/appLock.modal';
-import {BaseModal} from './webapp/modals/base.modal';
 import {BlockWarningModal} from './webapp/modals/blockWarning.modal';
 import {CallNotEstablishedModal} from './webapp/modals/callNotEstablished.modal';
 import {ConfirmLogoutModal} from './webapp/modals/confirmLogout.modal';
@@ -38,6 +37,7 @@ import {CreatGuestLinkModal} from './webapp/modals/createGuestLink.modal';
 import {DataShareConsentModal} from './webapp/modals/dataShareConsent.modal';
 import {DeleteAccountModal} from './webapp/modals/deleteAccount.modal';
 import {DetailViewModal} from './webapp/modals/detailView.modal';
+import {ErrorModal} from './webapp/modals/error.modal';
 import {ExportBackupModal} from './webapp/modals/exportBackup.modal';
 import {importBackupModal} from './webapp/modals/importBackup.modal';
 import {LeaveConversationModal} from './webapp/modals/leaveConversation.modal';
@@ -173,7 +173,7 @@ export class PageManager {
       setUsername: () => this.getOrCreate('webapp.pages.setUsername', () => new SetUsernamePage(this.page)),
     },
     modals: {
-      baseModal: () => this.getOrCreate('webapp.modals.baseModal', () => new BaseModal(this.page)),
+      errorModal: () => this.getOrCreate('webapp.modals.errorModal', () => new ErrorModal(this.page)),
       dataShareConsent: () =>
         this.getOrCreate('webapp.modals.dataShareConsent', () => new DataShareConsentModal(this.page)),
       appLock: () => this.getOrCreate('webapp.modals.appLock', () => new AppLockModal(this.page)),

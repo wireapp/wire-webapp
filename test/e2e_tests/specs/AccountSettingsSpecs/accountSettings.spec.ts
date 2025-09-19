@@ -32,11 +32,18 @@ test.describe('account settings', () => {
   test.slow();
 
   const startUpApp = async (pageManager: PageManager, user: User) => {
-    const {components, modals} = pageManager.webapp;
+    const {components, modals, pages} = pageManager.webapp;
     await pageManager.openMainPage();
     await loginUser(user, pageManager);
+
+    const hasLocalData = await pages.historyInfo().isButtonVisible();
+    if (hasLocalData) {
+      await pages.historyInfo().clickConfirmButton();
+    }
     await components.conversationSidebar().isPageLoaded();
-    await modals.dataShareConsent().clickDecline();
+    if (!hasLocalData) {
+      await modals.dataShareConsent().clickDecline();
+    }
   };
 
   test.beforeAll(async ({api}) => {
@@ -59,7 +66,7 @@ test.describe('account settings', () => {
   test(
     'I should not be able to change my email to already taken email',
     {tag: ['@TC-58', '@regression']},
-    async ({pageManager, api}) => {
+    async ({pageManager}) => {
       const {components, modals, pages} = pageManager.webapp;
 
       await startUpApp(pageManager, memberA);
@@ -67,10 +74,9 @@ test.describe('account settings', () => {
 
       await expect(pages.account().emailDisplay).toHaveText(memberA.email);
 
-      await pages.account().changeEmailAddress(memberA.email);
-      await modals.baseModal().modalTitle.waitFor({state: 'visible'});
-
-      expect(await modals.baseModal().getModalTitle()).toContain('Error');
+      await pages.account().changeEmailAddress(memberB.email);
+      await modals.errorModal().modalTitle.waitFor({state: 'visible'});
+      expect(await modals.errorModal().getModalTitle()).toContain('Error');
     },
   );
 
@@ -87,10 +93,10 @@ test.describe('account settings', () => {
       await expect(pages.account().emailDisplay).toHaveText(memberA.email);
 
       await pages.account().changeEmailAddress(incorrectEmail);
-      await modals.baseModal().modalTitle.waitFor({state: 'visible'});
+      await modals.errorModal().modalTitle.waitFor({state: 'visible'});
 
-      expect(await modals.baseModal().getModalTitle()).toContain('Error');
-      expect(await modals.baseModal().getModalText()).toContain('Email address is invalid.');
+      expect(await modals.errorModal().getModalTitle()).toContain('Error');
+      expect(await modals.errorModal().getModalText()).toContain('Email address is invalid.');
     },
   );
 
