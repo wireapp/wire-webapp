@@ -486,10 +486,7 @@ describe('Account', () => {
                     {domain: 'zinfra.io', type: 'federation.delete'},
                     NotificationSource.WEBSOCKET,
                   );
-                  expect(dependencies.account.service!.notification.handleNotification).not.toHaveBeenCalledWith(
-                    expect.any(Object),
-                    NotificationSource.WEBSOCKET,
-                  );
+                  expect(dependencies.account.service!.notification.handleNotification).toHaveBeenCalledTimes(2);
                   resolve();
               }
             },

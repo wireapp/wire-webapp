@@ -210,7 +210,6 @@ export class NotificationService extends TypedEventEmitter<Events> {
   public async *handleNotification(
     notification: Notification,
     source: NotificationSource,
-    dryRun: boolean = false,
   ): AsyncGenerator<HandledEventPayload> {
     for (const event of notification.payload) {
       this.logger.debug(`Handling event of type "${event.type}"`, event);
@@ -223,7 +222,7 @@ export class NotificationService extends TypedEventEmitter<Events> {
         continue;
       }
       try {
-        const handledEventResult = await this.handleEvent(event, dryRun);
+        const handledEventResult = await this.handleEvent(event);
         if (handledEventResult.status === 'handled' && handledEventResult.payload) {
           yield handledEventResult.payload;
         }
@@ -240,7 +239,7 @@ export class NotificationService extends TypedEventEmitter<Events> {
         this.emit(NotificationService.TOPIC.NOTIFICATION_ERROR, notificationError);
       }
     }
-    if (!dryRun && !notification.transient) {
+    if (!notification.transient) {
       // keep track of the last handled notification for next time we fetch the notification stream
       await this.setLastNotificationId(notification);
     }
@@ -249,16 +248,9 @@ export class NotificationService extends TypedEventEmitter<Events> {
   /**
    * Will process one event
    * @param event The backend event to process
-   * @param dryRun Will not try to decrypt if true
    * @return event handling status and if event was handled, the payload
    */
-  private async handleEvent(event: BackendEvent, dryRun: boolean = false): Promise<HandledEventResult> {
-    if (dryRun) {
-      // In case of a dry run, we do not want to decrypt messages
-      // We just return the raw event to the caller
-      return {status: 'handled', payload: {event}};
-    }
-
+  private async handleEvent(event: BackendEvent): Promise<HandledEventResult> {
     const conversationEventResult = await this.conversationService.handleEvent(event);
     if (conversationEventResult.status !== 'unhandled') {
       return conversationEventResult;
