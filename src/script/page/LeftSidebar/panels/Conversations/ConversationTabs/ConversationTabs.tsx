@@ -49,6 +49,7 @@ import {replaceLink, t} from 'Util/LocalizerUtil';
 import {useChannelsFeatureFlag} from 'Util/useChannelsFeatureFlag';
 
 import {
+  conversationsSidebarTitle,
   conversationsTitleWrapper,
   footerDisclaimer,
   footerDisclaimerEllipsis,
@@ -220,7 +221,7 @@ export const ConversationTabs = ({
 
         <div className="conversations-sidebar-divider" />
 
-        <div className="conversations-sidebar-title" css={{marginBlock: '32px 0'}}>
+        <div className="conversations-sidebar-title" css={conversationsSidebarTitle}>
           {t('conversationFooterContacts')}
         </div>
 
@@ -239,7 +240,7 @@ export const ConversationTabs = ({
           <>
             <div className="conversations-sidebar-divider" />
 
-            <div className="conversations-sidebar-title" css={{marginBlock: '32px 0'}}>
+            <div className="conversations-sidebar-title" css={conversationsSidebarTitle}>
               {t('cells.sidebar.heading')}
             </div>
 
@@ -258,7 +259,7 @@ export const ConversationTabs = ({
 
         <div className="conversations-sidebar-divider" />
 
-        <div className="conversations-sidebar-title" css={{marginBlock: '32px 0'}}>
+        <div className="conversations-sidebar-title" css={conversationsSidebarTitle}>
           {t('meetings.navigation.parent.label')}
         </div>
 
