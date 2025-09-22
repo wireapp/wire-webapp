@@ -91,6 +91,9 @@ export const VirtualizedMessagesList = ({
     'hasAdditionalMessages',
   ]);
 
+  const {processQueue} = useKoSubscribableChildren(assetRepository, ['processQueue', 'uploadProgressQueue']);
+  const currentConversationProcessQueue = processQueue.filter(item => item.conversationId === conversation.id);
+
   const filteredMessages = filterMessages(allMessages);
 
   const groupedMessages = useMemo(() => {
@@ -107,7 +110,7 @@ export const VirtualizedMessagesList = ({
   const virtualizer = useVirtualizer({
     count: groupedMessages.length,
     getScrollElement: () => parentElement,
-    estimateSize: () => ESTIMATED_ELEMENT_SIZE,
+    estimateSize: () => parentElement.clientHeight,
     measureElement: element => element?.getBoundingClientRect().height || ESTIMATED_ELEMENT_SIZE,
   });
 
@@ -261,7 +264,7 @@ export const VirtualizedMessagesList = ({
                 position: 'absolute',
                 width: '100%',
                 transform: `translateY(${virtualItem.start}px)`,
-                paddingBottom: isLast ? '40px' : '0px',
+                paddingBottom: isLast && !currentConversationProcessQueue?.length ? '40px' : '0px',
               }}
             >
               {isMarker(item) ? (
@@ -301,7 +304,24 @@ export const VirtualizedMessagesList = ({
           );
         })}
 
-        <UploadAssets assetRepository={assetRepository} conversationId={conversation.id} />
+        {currentConversationProcessQueue?.length > 0 && (
+          <div
+            key={`upload-assets-${conversation.id}`}
+            ref={virtualizer.measureElement}
+            style={{
+              position: 'absolute',
+              width: '100%',
+              transform: `translateY(${virtualizer.getTotalSize()}px)`,
+              paddingBottom: '40px',
+            }}
+          >
+            <UploadAssets
+              assetRepository={assetRepository}
+              conversationId={conversation.id}
+              scrollToEnd={() => virtualizer.scrollToOffset(parentElement.scrollHeight, {align: 'end'})}
+            />
+          </div>
+        )}
       </div>
 
       {!isLastMessageVisible && <VirtualizedJumpToLastMessageButton onGoToLastMessage={onJumpToLastMessageClick} />}

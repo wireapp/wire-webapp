@@ -242,36 +242,39 @@ export class ListViewModel {
     }
   };
 
+  private switchListAndSetTab = (listState: ListState, tab: SidebarTabs) => {
+    useSidebarStore.getState().setCurrentTab(tab);
+    this.switchList(listState);
+  };
+
   openPreferencesAccount = async (): Promise<void> => {
     await this.teamRepository.getTeam();
 
-    const {setCurrentTab} = useSidebarStore.getState();
-    setCurrentTab(SidebarTabs.PREFERENCES);
+    this.switchListAndSetTab(ListState.PREFERENCES, SidebarTabs.PREFERENCES);
 
-    this.switchList(ListState.PREFERENCES);
     this.contentViewModel.switchContent(ContentState.PREFERENCES_ACCOUNT);
   };
 
   readonly openPreferencesDevices = (): void => {
-    this.switchList(ListState.PREFERENCES);
+    this.switchListAndSetTab(ListState.PREFERENCES, SidebarTabs.PREFERENCES);
 
     return this.contentViewModel.switchContent(ContentState.PREFERENCES_DEVICES);
   };
 
   readonly openPreferencesAbout = (): void => {
-    this.switchList(ListState.PREFERENCES);
+    this.switchListAndSetTab(ListState.PREFERENCES, SidebarTabs.PREFERENCES);
 
     return this.contentViewModel.switchContent(ContentState.PREFERENCES_ABOUT);
   };
 
   readonly openPreferencesAudioVideo = (): void => {
-    this.switchList(ListState.PREFERENCES);
+    this.switchListAndSetTab(ListState.PREFERENCES, SidebarTabs.PREFERENCES);
 
     return this.contentViewModel.switchContent(ContentState.PREFERENCES_AV);
   };
 
   readonly openPreferencesOptions = (): void => {
-    this.switchList(ListState.PREFERENCES);
+    this.switchListAndSetTab(ListState.PREFERENCES, SidebarTabs.PREFERENCES);
 
     return this.contentViewModel.switchContent(ContentState.PREFERENCES_OPTIONS);
   };

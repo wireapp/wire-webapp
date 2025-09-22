@@ -93,6 +93,8 @@ After updating the environment variables, the app will be available at the corre
 
 ## Testing
 
+[![codecov](https://codecov.io/gh/wireapp/wire-webapp/branch/dev/graph/badge.svg?token=9ELBEPM793)](https://codecov.io/gh/wireapp/wire-webapp)
+
 To launch the full test suite (types check + linting + server tests + app tests), simply run:
 
 `yarn test`
@@ -103,7 +105,7 @@ Alternatively, you can test specific parts of the app:
 
 ## CI Status
 
-[![CI](https://github.com/wireapp/wire-webapp/actions/workflows/test_build_deploy.yml/badge.svg?branch=dev)](https://github.com/wireapp/wire-webapp/actions/workflows/test_build_deploy.yml) [![Lint](https://github.com/wireapp/wire-webapp/actions/workflows/lint.yml/badge.svg?branch=dev)](https://github.com/wireapp/wire-webapp/actions/workflows/lint.yml) [![styled with prettier](https://img.shields.io/badge/styled_with-prettier-ff69b4.svg)](https://github.com/prettier/prettier)
+[![CI](https://github.com/wireapp/wire-webapp/actions/workflows/ci.yml/badge.svg?branch=dev)](https://github.com/wireapp/wire-webapp/actions/workflows/ci.yml) [![styled with prettier](https://img.shields.io/badge/styled_with-prettier-ff69b4.svg)](https://github.com/prettier/prettier)
 
 ## Translations
 

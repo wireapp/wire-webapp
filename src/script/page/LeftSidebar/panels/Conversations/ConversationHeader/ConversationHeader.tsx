@@ -105,7 +105,7 @@ export const ConversationHeaderComponent = ({
   }, [searchInputRef, jumpToRecentSearch]);
 
   const showCreateConversationModal = () => {
-    if (isChannelsEnabled && (canCreateChannels || !selfUser.teamId)) {
+    if (isChannelsEnabled && canCreateChannels) {
       showModal();
     } else {
       amplify.publish(WebAppEvents.CONVERSATION.CREATE_GROUP, 'conversation_details');

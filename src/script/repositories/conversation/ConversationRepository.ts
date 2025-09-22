@@ -143,6 +143,7 @@ import {
 import {
   AssetAddEvent,
   ButtonActionConfirmationEvent,
+  ButtonActionEvent,
   ClientConversationEvent,
   DeleteEvent,
   EventBuilder,
@@ -342,6 +343,10 @@ export class ConversationRepository {
     if (this.core.backendFeatures.isFederated) {
       this.scheduleMissingUsersAndConversationsMetadataRefresh();
     }
+  }
+
+  public getActiveConversation() {
+    return this.conversationState.activeConversation();
   }
 
   public registerMLSConversationVerificationStateHandler = (
@@ -2293,8 +2298,43 @@ export class ConversationRepository {
    * @returns Resolves when conversation was saved
    */
   saveConversation(conversationEntity: Conversation) {
-    this.conversationState.upsertConversation(conversationEntity);
+    // Look up an existing conversation with the same ID so we can merge if necessary
+    const existingConversation = this.conversationState.findConversation(conversationEntity.qualifiedId);
 
+    // Build a plain object copy of the entity, excluding methods
+    const conversationData: Partial<Record<keyof Conversation, unknown>> = {};
+    for (const key in conversationEntity) {
+      const value = conversationEntity[key as keyof Conversation];
+      if (typeof value !== 'function') {
+        conversationData[key as keyof Conversation] = value;
+      }
+    }
+
+    // Merge path: update the existing conversation with new fields
+    if (existingConversation) {
+      // Capture next and previous participant IDs
+      const nextParticipantIds = conversationEntity.participating_user_ids?.() || [];
+      const prevParticipantIds = existingConversation.participating_user_ids?.() || [];
+
+      // If the old conversation had participants and the new one doesn’t, drop the field
+      if (prevParticipantIds.length > 0 && nextParticipantIds.length === 0) {
+        delete conversationData.participating_user_ids;
+      }
+
+      // Apply merged data and persist the updated conversation
+      ConversationMapper.updateProperties(existingConversation, conversationData);
+      this.conversationState.upsertConversation(existingConversation);
+
+      // Save to storage
+      return this.saveConversationStateInDb(existingConversation);
+    }
+
+    // New conversation path: drop an empty participant list if present
+    if (conversationEntity.participating_user_ids().length === 0) {
+      delete conversationData.participating_user_ids;
+    }
+
+    this.conversationState.upsertConversation(conversationEntity);
     return this.saveConversationStateInDb(conversationEntity);
   }
 
@@ -3441,6 +3481,9 @@ export class ConversationRepository {
       case CONVERSATION_EVENT.ADD_PERMISSION_UPDATE:
         return this.onAddPermissionChanged(conversationEntity, eventJson);
 
+      case ClientEvent.CONVERSATION.BUTTON_ACTION:
+        return this.onButtonAction(conversationEntity, eventJson);
+
       case ClientEvent.CONVERSATION.BUTTON_ACTION_CONFIRMATION:
         return this.onButtonActionConfirmation(conversationEntity, eventJson);
 
@@ -4022,8 +4065,15 @@ export class ConversationRepository {
     }
   }
 
-  private async onButtonActionConfirmation(conversationEntity: Conversation, eventJson: ButtonActionConfirmationEvent) {
-    const {messageId, buttonId} = eventJson.data;
+  /**
+   * Common logic for handling button selections (both actions and confirmations)
+   *
+   * @param conversationEntity Conversation containing the message
+   * @param messageId ID of the message with the button
+   * @param buttonId ID of the button that was selected
+   * @returns Promise that resolves when the button selection has been processed
+   */
+  private async handleButtonSelection(conversationEntity: Conversation, messageId: string, buttonId: string) {
     try {
       const messageEntity = await this.messageRepository.getMessageInConversationById(conversationEntity, messageId);
       if (!messageEntity || !messageEntity.isComposite()) {
@@ -4046,6 +4096,23 @@ export class ConversationRepository {
         throw error;
       }
     }
+  }
+
+  private async onButtonAction(conversationEntity: Conversation, eventJson: ButtonActionEvent) {
+    const {messageId, buttonId} = eventJson.data;
+
+    const shouldSkipSelectionFromOtherUser = conversationEntity.selfUser()?.id !== eventJson.from;
+    if (shouldSkipSelectionFromOtherUser) {
+      this.logger.warn(`Skipping button action from other user in conversation '${conversationEntity.id}'`);
+      return;
+    }
+
+    await this.handleButtonSelection(conversationEntity, messageId, buttonId);
+  }
+
+  private async onButtonActionConfirmation(conversationEntity: Conversation, eventJson: ButtonActionConfirmationEvent) {
+    const {messageId, buttonId} = eventJson.data;
+    await this.handleButtonSelection(conversationEntity, messageId, buttonId);
   }
 
   /**
