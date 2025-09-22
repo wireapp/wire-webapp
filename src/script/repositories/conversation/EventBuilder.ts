@@ -193,6 +193,7 @@ export type ButtonActionConfirmationEvent = ConversationEvent<
   CONVERSATION.BUTTON_ACTION_CONFIRMATION,
   {buttonId: string; messageId: string}
 >;
+export type ButtonActionEvent = ConversationEvent<CONVERSATION.BUTTON_ACTION, {buttonId: string; messageId: string}>;
 export type DeleteEverywhereEvent = ConversationEvent<
   CONVERSATION.DELETE_EVERYWHERE,
   {
@@ -251,6 +252,7 @@ export type ClientConversationEvent =
   | DeleteEverywhereEvent
   | DegradedMessageEvent
   | ButtonActionConfirmationEvent
+  | ButtonActionEvent
   | KnockEvent
   | IncomingMessageTooBigEvent
   | GroupCreationEvent
