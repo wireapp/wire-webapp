@@ -20,6 +20,7 @@
 import {container} from 'tsyringe';
 
 import {
+  CallIcon,
   ChannelIcon,
   CollectionIcon,
   ExternalLinkIcon,
@@ -265,7 +266,7 @@ export const ConversationTabs = ({
           title={t('meetings.navigation.title')}
           label={t('meetings.navigation.label')}
           type={SidebarTabs.MEETINGS}
-          Icon={<Icon.CameraIcon />}
+          Icon={<CallIcon />}
           onChangeTab={onChangeTab}
           conversationTabIndex={conversationTabs.length + 1}
           dataUieName="go-meetings"
