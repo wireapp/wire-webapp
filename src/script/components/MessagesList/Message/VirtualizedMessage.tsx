@@ -76,8 +76,6 @@ export interface MessageParams extends MessageActions {
   handleArrowKeyDown: (e: React.KeyboardEvent) => void;
   isMsgElementsFocusable: boolean;
   setMsgElementsFocusable: (isMsgElementsFocusable: boolean) => void;
-  measureElement?: (element: HTMLElement | null) => void;
-  index?: number;
 }
 
 export const Message = (props: MessageParams) => {
@@ -90,10 +88,8 @@ export const Message = (props: MessageParams) => {
     handleArrowKeyDown,
     isMsgElementsFocusable,
     setMsgElementsFocusable,
-    measureElement,
-    index,
   } = props;
-  const messageElementRef = useRef<HTMLDivElement | null>(null);
+  const messageElementRef = useRef<HTMLDivElement>(null);
   const {status, ephemeral_expires} = useKoSubscribableChildren(message, ['status', 'ephemeral_expires']);
   const messageFocusedTabIndex = useMessageFocusedTabIndex(isFocused);
 
@@ -148,16 +144,12 @@ export const Message = (props: MessageParams) => {
         'content-message': message.isContent(),
         'system-message': !message.isContent(),
       })}
-      ref={element => {
-        messageElementRef.current = element;
-        measureElement?.(element);
-      }}
+      ref={messageElementRef}
       data-uie-uid={message.id}
       data-uie-value={message.super_type}
       data-uie-expired-status={ephemeral_expires}
       data-uie-send-status={status}
       data-uie-name="item-message"
-      data-index={index}
       role="list"
       tabIndex={messageFocusedTabIndex}
       onKeyDown={handleDivKeyDown}

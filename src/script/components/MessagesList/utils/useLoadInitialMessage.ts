@@ -21,21 +21,32 @@ import {MutableRefObject, useEffect} from 'react';
 
 import {Virtualizer} from '@tanstack/react-virtual';
 
-import {GroupedMessage, isMarker, Marker} from 'Components/MessagesList/utils/virtualizedMessagesGroup';
+import {filterMessages} from 'Components/MessagesList/utils/messagesFilter';
+import {groupMessagesBySenderAndTime, isMarker} from 'Components/MessagesList/utils/virtualizedMessagesGroup';
+import {Conversation} from 'Repositories/entity/Conversation';
+import {Message} from 'Repositories/entity/message/Message';
 
 interface Props {
+  conversation: Conversation;
   isConversationLoaded: boolean;
-  groupedMessages: (Marker | GroupedMessage)[];
+  allMessages: Message[];
   conversationLastReadTimestamp: MutableRefObject<number>;
 }
 
-export const useScrollToLastUnreadMessage = (
+export const useLoadInitialMessage = (
   virtualizer: Virtualizer<HTMLDivElement, Element>,
-  {isConversationLoaded, groupedMessages, conversationLastReadTimestamp}: Props,
+  {conversation, isConversationLoaded, allMessages, conversationLastReadTimestamp}: Props,
 ) => {
   useEffect(() => {
     if (isConversationLoaded) {
-      let scrollAlign: 'start' | 'center' | 'end' = 'center';
+      let scrollAlign: 'start' | 'center' | 'end' = 'end';
+
+      const filteredMessages = filterMessages(allMessages);
+      const groupedMessages = groupMessagesBySenderAndTime(filteredMessages, conversationLastReadTimestamp.current);
+
+      const initialMessageIndex = groupedMessages.findIndex(message => {
+        return !isMarker(message) && message.message.id === conversation.initialMessage()?.id;
+      });
 
       const firstUnreadMessageIndex = groupedMessages.findIndex(
         message => !isMarker(message) && message.timestamp > conversationLastReadTimestamp.current,
@@ -43,16 +54,21 @@ export const useScrollToLastUnreadMessage = (
 
       let nextScrollIndex = groupedMessages.length - 1; // Default to the last message
 
-      if (firstUnreadMessageIndex !== -1) {
+      if (conversation.initialMessage()?.id && initialMessageIndex !== -1) {
+        nextScrollIndex = initialMessageIndex;
+        scrollAlign = 'center';
+      } else if (firstUnreadMessageIndex !== -1) {
         nextScrollIndex = firstUnreadMessageIndex - 1;
         scrollAlign = 'start';
       }
 
-      const scrollIndex = nextScrollIndex;
+      const nextMessageIndex = nextScrollIndex;
+      const hasInitialMessage = nextMessageIndex !== -1;
+      const scrollIndex = hasInitialMessage ? nextMessageIndex : allMessages.length - 1;
 
       requestAnimationFrame(() => {
         virtualizer.scrollToIndex(scrollIndex, {align: scrollAlign});
       });
     }
-  }, [isConversationLoaded]);
+  }, [virtualizer, isConversationLoaded]);
 };
