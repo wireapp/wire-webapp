@@ -17,7 +17,7 @@
  *
  */
 
-import {getUser} from 'test/e2e_tests/data/user';
+import {getUser, User} from 'test/e2e_tests/data/user';
 import {PageManager} from 'test/e2e_tests/pageManager';
 import {setupBasicTestScenario, startUpApp} from 'test/e2e_tests/utils/setup.utli';
 import {tearDownAll} from 'test/e2e_tests/utils/tearDown.util';
@@ -85,18 +85,39 @@ test.describe('account settings', () => {
     },
   );
 
-  test.skip(
+  test(
     'I should not be able to change email of user managed by SCIM',
     {tag: ['@TC-60', '@regression']},
-    async ({pageManager, api}) => {
-      ///TODO: read in docs
-      // add to the bridge the url to enable scim?
-      // add a new user
-      // login with the user
-      // try to change the email
+    async ({pageManager, context}) => {
+      const {components, pages} = pageManager.webapp;
+      // use an extra account
+      const ssoUser: User = getUser({
+        email: process.env.SSO_USERNAME,
+        username: process.env.SSO_EMAIL,
+        password: process.env.SSO_PASSWORD,
+      });
+      await pageManager.openMainPage();
+
+      await pages.singleSignOn().isSSOPageVisible();
+
+      const [newPage] = await Promise.all([
+        context.waitForEvent('page'),
+        pages.singleSignOn().enterEmailOnSSOPage(ssoUser.email),
+      ]);
+
+      await newPage.waitForLoadState();
+      await newPage.getByRole('textbox', {name: 'Username'}).fill(ssoUser.username);
+      await newPage.getByRole('textbox', {name: 'Password'}).fill(ssoUser.password);
+      await newPage.getByRole('button', {name: 'Sign In'}).click();
+
+      await pages.historyInfo().clickConfirmButton();
+      await components.conversationSidebar().isPageLoaded();
+      await components.conversationSidebar().clickPreferencesButton();
+      await expect(pages.account().emailDisplay).toHaveCount(0);
     },
   );
 
+  // see https://wearezeta.atlassian.net/browse/WPB-20548
   test.skip(
     'Verify sound settings are saved after re-login',
     {tag: ['@TC-1718', '@TC-1720', '@regression']},
