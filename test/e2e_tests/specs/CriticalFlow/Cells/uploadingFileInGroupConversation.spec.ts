@@ -42,6 +42,8 @@ test(
   'Uploading an file in a group conversation',
   {tag: ['@crit-flow-cells']},
   async ({pageManager: userAPageManager, browser, api}) => {
+    test.slow(); // This test involves file upload and download, which can be slow
+
     const {pages: userAPages, modals: userAModals, components: userAComponents} = userAPageManager.webapp;
 
     const userBContext = await browser.newContext();
@@ -65,9 +67,14 @@ test(
       const loginOwner = async () => {
         await userAPageManager.openMainPage();
         await loginUser(userA, userAPageManager);
-        await userAModals.dataShareConsent().clickDecline();
+        if (process.env.ENV_NAME === 'staging') {
+          await userAModals.dataShareConsent().clickDecline();
+        }
         await userAPages.conversationList().clickCreateGroup();
+        // Files should be enabled by default
+        expect(await userAPages.groupCreation().isFilesCheckboxChecked()).toBeTruthy();
         await userAPages.groupCreation().setGroupName(conversationName);
+
         await userAPages.startUI().selectUsers([userB.username]);
         await userAPages.groupCreation().clickCreateGroupButton();
       };
@@ -75,10 +82,15 @@ test(
       const loginMember = async () => {
         await userBPageManager.openMainPage();
         await loginUser(userB, userBPageManager);
-        await userBModals.dataShareConsent().clickDecline();
+        if (process.env.ENV_NAME === 'staging') {
+          await userBModals.dataShareConsent().clickDecline();
+        }
       };
 
       await Promise.all([loginOwner(), loginMember()]);
+
+      // Wait for some time before uploading the file to make sure the cell is ready
+      await new Promise(resolve => setTimeout(resolve, 5000));
     });
 
     await test.step('User A sends an image to User B in a group conversation', async () => {
@@ -86,19 +98,13 @@ test(
       await userAComponents.inputBarControls().clickShareFile(imageFilePath);
       await userAComponents.inputBarControls().clickSendMessage();
 
-      // expect(userBPages.conversation().isImageFromUserVisible(userA)).toBeTruthy();
       expect(userBPages.cellsConversation().isImageFromUserVisible(userA)).toBeTruthy();
     });
 
     await test.step('User B opens the image in the conversation', async () => {
-      // TODO: Bug [WPB-18226], remove this when fixed
-      await userBPageManager.refreshPage({waitUntil: 'load'});
-
+      await userBPages.conversationList().openConversation(conversationName);
       await userBPages.cellsConversation().clickImage(userA);
 
-      // TODO: detail image view in Cells doesn't have detail-view id
-      // Verify that the detail view modal is visible
-      expect(await userBModals.cellsFileDetailView().isVisible()).toBeTruthy();
       expect(await userBModals.cellsFileDetailView().isImageVisible()).toBeTruthy();
     });
 
@@ -117,7 +123,6 @@ test(
 
       await userAPages.cellsConversationFiles().clickFile(imageFilePath.split('/').pop()!);
 
-      expect(await userAModals.cellsFileDetailView().isVisible()).toBeTruthy();
       expect(await userAModals.cellsFileDetailView().isImageVisible()).toBeTruthy();
     });
   },

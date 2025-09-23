@@ -23,21 +23,15 @@ import {downloadAssetAndGetFilePath} from 'test/e2e_tests/utils/asset.util';
 
 export class CellsFileDetailViewModal {
   readonly page: Page;
-  readonly mainWindow: Locator;
   readonly closeButton: Locator;
   readonly downloadButton: Locator;
   readonly image: Locator;
 
   constructor(page: Page) {
     this.page = page;
-    this.mainWindow = page.locator("[role='dialog'][aria-modal='true'][id^=':'][id$=':']");
-    this.closeButton = this.mainWindow.locator("[aria-label='Close']");
-    this.downloadButton = this.mainWindow.locator("[aria-label='Download']");
-    this.image = this.mainWindow.locator(`img`);
-  }
-
-  async isVisible() {
-    return await this.mainWindow.isVisible();
+    this.closeButton = page.locator("[aria-label='Close']");
+    this.downloadButton = page.locator("[aria-label='Download']");
+    this.image = page.locator("[role='dialog'][aria-modal='true'][id^=':'][id$=':'] img");
   }
 
   async isImageVisible() {

@@ -13,11 +13,24 @@ on:
           - staging
         default: staging
 
+  schedule:
+    # runs on all three of the environments (in the morning, 9:00 Berlin summer time)
+    - cron: '0 7 * * *'
+
 jobs:
   smoke-tests:
     name: Run Playwright Cells Critical Flow Tests
     if: github.repository == 'wireapp/wire-webapp'
     runs-on: [self-hosted, Linux, X64, office]
+
+    # Strategy is only used for scheduled runs, for manual runs the selected environment is used
+    strategy:
+      matrix:
+        environment: >-
+          ${{ github.event_name == 'schedule'
+              && fromJson('["imai","fulu","staging"]')
+              || fromJson(format('["{0}"]', github.event.inputs.environment)) }}
+
 
     steps:
       - name: Checkout repository

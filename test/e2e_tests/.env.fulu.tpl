@@ -26,6 +26,7 @@ TEST_SERVICE_URL=http://192.168.2.18:8080
 CALLING_SERVICE_URL=op://Test Automation/CALLINGSERVICE_BASIC_AUTH/website
 CALLING_SERVICE_BASIC_AUTH=op://Test Automation/CALLINGSERVICE_BASIC_AUTH/basicAuth
 
+ENV_NAME=fulu
 INBUCKET_USERNAME=op://Test Automation/BackendConnection fulu/inbucketUsername
 INBUCKET_PASSWORD="{{ op://Test Automation/BackendConnection fulu/inbucketPassword }}"
 INBUCKET_URL=op://Test Automation/BackendConnection fulu/inbucketUrl
