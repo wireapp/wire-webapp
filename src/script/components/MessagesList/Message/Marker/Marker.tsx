@@ -38,12 +38,10 @@ const markerStyles: Partial<Record<Marker['type'], SerializedStyles>> = {
 interface Props {
   marker: Marker;
   scrollTo?: ScrollToElement;
-  measureElement?: any;
-  index?: number;
 }
 
-export const MarkerComponent = ({marker, scrollTo, measureElement, index}: Props) => {
-  const elementRef = useRef<HTMLDivElement | null>(null);
+export const MarkerComponent = ({marker, scrollTo}: Props) => {
+  const elementRef = useRef<HTMLDivElement>(null);
 
   const isDay = marker.type === 'day';
   const timeAgo = useRelativeTimestamp(marker.timestamp, isDay, isDay ? getMessagesGroupLabel : undefined);
@@ -61,15 +59,7 @@ export const MarkerComponent = ({marker, scrollTo, measureElement, index}: Props
   }, [isVirtualizedMessagesListEnabled]);
 
   return (
-    <div
-      className="message-header"
-      css={style}
-      data-index={index}
-      ref={ref => {
-        measureElement?.(ref);
-        elementRef.current = ref;
-      }}
-    >
+    <div className="message-header" css={style} ref={elementRef}>
       <div className="message-header-icon">
         {marker.type === 'unread' && <span className="message-unread-dot dot-md" />}
       </div>
