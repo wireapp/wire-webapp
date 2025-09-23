@@ -17,7 +17,7 @@
  *
  */
 
-import {useCallback, useEffect, useRef, useState} from 'react';
+import {useCallback, useEffect, useRef} from 'react';
 
 import {Virtualizer} from '@tanstack/react-virtual';
 
@@ -25,119 +25,101 @@ import {ConversationRepository} from 'Repositories/conversation/ConversationRepo
 import {Conversation} from 'Repositories/entity/Conversation';
 import {isLastReceivedMessage} from 'Util/conversationMessages';
 
+const SCROLL_THRESHOLD = 100;
+
 interface Props {
   conversation: Conversation;
   conversationRepository: ConversationRepository;
+  loadingMessages: boolean;
+  onLoadingMessages: (isLoading: boolean) => void;
   itemsLength: number;
   shouldPullMessages: boolean;
-  isConversationLoaded: boolean;
-  parentElement: HTMLElement;
 }
 
 export const useLoadMessages = (
   virtualizer: Virtualizer<HTMLDivElement, Element>,
-  {conversation, conversationRepository, itemsLength, shouldPullMessages, isConversationLoaded, parentElement}: Props,
+  {conversation, conversationRepository, loadingMessages, onLoadingMessages, itemsLength, shouldPullMessages}: Props,
 ) => {
   const fillContainerByMessagesRef = useRef(false);
-  const [isLoadingMessages, setIsLoadingMessages] = useState(false);
 
-  // On hit top, we load preceding messages
   const loadPrecedingMessages = useCallback(async () => {
     if (!shouldPullMessages) {
       return;
     }
 
-    virtualizer.measure();
-    const prev = virtualizer.getTotalSize();
+    try {
+      onLoadingMessages(true);
+      const newMessages = await conversationRepository.getPrecedingMessages(conversation);
+      virtualizer.scrollToIndex(newMessages.length, {align: 'start'});
+    } catch (error) {
+      console.error('Error loading preceding messages:', error);
+    } finally {
+      onLoadingMessages(false);
+    }
+  }, [conversation, conversationRepository, shouldPullMessages, onLoadingMessages]);
 
-    setIsLoadingMessages(true);
-    await conversationRepository.getPrecedingMessages(conversation).finally(() => {
-      requestAnimationFrame(() => {
-        const newSize = virtualizer.getTotalSize();
-        const diff = newSize - prev;
-
-        parentElement.scrollTop += diff;
-        setIsLoadingMessages(false);
-      });
-    });
-  }, [virtualizer, parentElement, shouldPullMessages, conversationRepository, conversation]);
-
-  // On hit bottom, we load following messages
   const loadFollowingMessages = useCallback(async () => {
     const lastMessage = conversation.getNewestMessage();
 
-    if (lastMessage) {
-      if (!isLastReceivedMessage(lastMessage, conversation)) {
-        virtualizer.measure();
-        setIsLoadingMessages(true);
-        // if the last loaded message is not the last of the conversation, we load the subsequent messages
-        await conversationRepository.getSubsequentMessages(conversation, lastMessage).finally(() => {
-          requestAnimationFrame(() => {
-            const clientHeight = parentElement.clientHeight;
-            const diff = clientHeight / 2;
-
-            parentElement.scrollTop += diff;
-            setIsLoadingMessages(false);
-          });
-        });
-      }
-    }
-  }, [conversation, conversationRepository, parentElement, virtualizer]);
-
-  const virtualItems = virtualizer.getVirtualItems();
-
-  // Load previous messages when scrolling to the top
-  useEffect(() => {
-    if (isLoadingMessages) {
-      return () => undefined;
+    if (!lastMessage) {
+      return;
     }
 
-    const timeout = setTimeout(() => {
-      if (!isConversationLoaded) {
-        return;
-      }
-
-      const [firstItem] = [...virtualItems];
-
-      if (!firstItem) {
-        return;
-      }
-
-      if (firstItem.index === 0) {
-        void loadPrecedingMessages();
-      }
-    }, 100);
-
-    return () => clearTimeout(timeout);
-  }, [isConversationLoaded, isLoadingMessages, loadPrecedingMessages, virtualItems]);
-
-  // Load new messages when scrolling to the down
-  useEffect(() => {
-    if (isLoadingMessages) {
-      return () => undefined;
+    if (isLastReceivedMessage(lastMessage, conversation)) {
+      return;
     }
 
-    const timeout = setTimeout(() => {
-      if (!isConversationLoaded) {
-        return;
-      }
+    try {
+      onLoadingMessages(true);
+      // if the last loaded message is not the last of the conversation, we load the subsequent messages
+      const newMessages = await conversationRepository.getSubsequentMessages(conversation, lastMessage);
 
-      const [lastItem] = [...virtualItems].reverse();
-
-      if (!lastItem) {
-        return;
-      }
-
-      if (lastItem.index >= itemsLength - 1) {
-        void loadFollowingMessages();
-      }
-    }, 100);
-
-    return () => clearTimeout(timeout);
-  }, [isConversationLoaded, isLoadingMessages, itemsLength, loadFollowingMessages, virtualizer, virtualItems]);
+      const newIndex = itemsLength + newMessages.length;
+      virtualizer.scrollToIndex(newIndex, {align: 'end'});
+    } catch (error) {
+      console.error('Error loading following messages:', error);
+    } finally {
+      onLoadingMessages(false);
+    }
+  }, [itemsLength, conversation, conversationRepository, onLoadingMessages]);
 
   // This function ensures that after user scroll to top or bottom content,
   // the preceding / following messages will be loaded.
+  useEffect(() => {
+    const scrollElement = virtualizer.scrollElement;
+
+    if (!scrollElement) {
+      return () => undefined;
+    }
+
+    let ticking = false;
+
+    const onScroll = () => {
+      if (ticking) {
+        return;
+      }
+
+      ticking = true;
+
+      requestAnimationFrame(() => {
+        ticking = false;
+        const scrollBottom = scrollElement.scrollTop + scrollElement.clientHeight;
+        const scrollHeight = scrollElement.scrollHeight;
+
+        const isScrollAtTop = scrollElement.scrollTop <= SCROLL_THRESHOLD;
+        const isScrollAtBottom = scrollHeight - scrollBottom <= SCROLL_THRESHOLD;
+
+        if (isScrollAtTop && !loadingMessages) {
+          void loadPrecedingMessages();
+        } else if (isScrollAtBottom && !loadingMessages) {
+          void loadFollowingMessages();
+        }
+      });
+    };
+
+    scrollElement.addEventListener('scroll', onScroll);
+    return () => scrollElement.removeEventListener('scroll', onScroll);
+  }, [loadingMessages, loadFollowingMessages, loadPrecedingMessages, virtualizer.scrollElement]);
 
   // Load more messages on mount if the list doesn't fill the viewport
   useEffect(() => {
