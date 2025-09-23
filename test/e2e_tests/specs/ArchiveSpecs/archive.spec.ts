@@ -21,7 +21,7 @@ import {getUser} from 'test/e2e_tests/data/user';
 import {setupBasicTestScenario, startUpApp} from 'test/e2e_tests/utils/setup.util';
 import {tearDownAll} from 'test/e2e_tests/utils/tearDown.util';
 
-import {test} from '../../test.fixtures';
+import {test, expect} from '../../test.fixtures';
 
 test.describe('Accessibility', () => {
   test.slow();
@@ -39,18 +39,25 @@ test.describe('Accessibility', () => {
   test(
     'I want to archive and unarchive conversation via conversation list',
     {tag: ['@TC-97', '@regression']},
-    async ({pageManager, browser}) => {
-      const {components, modals} = pageManager.webapp;
+    async ({pageManager}) => {
+      const {components, modals, pages} = pageManager.webapp;
       await startUpApp(pageManager, memberA);
-      // starts an 1o1
+      // starts an 1o1 // exclude to startup
       await components.conversationSidebar().clickConnectButton();
       await components.contactList().clickOnContact(memberB.fullName);
       await modals.userProfile().clickStartConversation();
       // right click archive
-      // click archive
-      // check chat is there
-      // rightclick unarchive
-      // check if its in the all tab
+      await pages.conversationList().clickConversationOptions(memberB.fullName);
+      await pages.conversationList().archiveConversation();
+
+      await components.conversationSidebar().clickArchive();
+      expect(await pages.conversationList().isConversationItemVisible(memberB.fullName)).toBeTruthy();
+
+      await pages.conversationList().clickConversationOptions(memberB.fullName);
+      await pages.conversationList().unarchiveConversation();
+      await components.conversationSidebar().clickAllConversationsButton();
+
+      expect(await pages.conversationList().isConversationItemVisible(memberB.fullName)).toBeTruthy();
     },
   );
 
@@ -58,9 +65,12 @@ test.describe('Accessibility', () => {
     'Verify the conversation is not unarchived when there are new messages in this conversation',
     {tag: ['@TC-99', '@regression']},
     async ({pageManager, browser}) => {
-      await startUpApp(pageManager, memberA);
+      // get new context
+
+      await Promise.all([startUpApp(pageManager, memberA), startUpApp(pageManager, memberB)]);
       // starts an 1o1
       // write an message from user b
+
       // click archive
       // check chat is there
       // rightclick unarchive
