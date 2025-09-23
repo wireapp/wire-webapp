@@ -565,7 +565,7 @@ export class App {
            * even when app is already loaded and in the main screen view
            */
           const message = this.config.FEATURE.SHOW_LOADING_INFORMATION
-            ? ` ${t('initProgress', {time: formatCoarseDuration(durationFrom(currentProcessingNotificationTimestamp))})}`
+            ? formatCoarseDuration(durationFrom(currentProcessingNotificationTimestamp))
             : '';
 
           totalNotifications++;
