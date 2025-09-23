@@ -17,7 +17,7 @@
  *
  */
 
-import React, {ReactNode, useEffect, useMemo, useRef, useState} from 'react';
+import {ComponentType, CSSProperties, ReactNode, SVGProps, useEffect, useMemo, useRef, useState} from 'react';
 
 import cx from 'classnames';
 import {createRoot, Root} from 'react-dom/client';
@@ -35,7 +35,7 @@ import {useActiveWindowState} from '../hooks/useActiveWindow';
 export interface ContextMenuEntry {
   availability?: Availability.Type;
   click?: (event?: MouseEvent) => void;
-  icon?: React.ComponentType<React.SVGProps<SVGSVGElement>>;
+  icon?: ComponentType<SVGProps<SVGSVGElement>>;
   identifier?: string;
   isChecked?: boolean;
   isDisabled?: boolean;
@@ -44,6 +44,16 @@ export interface ContextMenuEntry {
   title?: string;
 }
 
+type Placement =
+  | 'bottom-start'
+  | 'bottom-end'
+  | 'top-start'
+  | 'top-end'
+  | 'right-start'
+  | 'right-end'
+  | 'left-start'
+  | 'left-end';
+
 interface ContextMenuProps {
   defaultIdentifier?: string;
   entries: ContextMenuEntry[];
@@ -51,12 +61,16 @@ interface ContextMenuProps {
   posX: number;
   posY: number;
   resetMenuStates?: () => void;
+  anchorEl?: HTMLElement | null;
+  placement?: Placement;
+  offset?: number;
 }
 
 let container: HTMLDivElement | undefined;
 let previouslyFocused: HTMLElement;
 let reactRoot: Root;
 
+// Unmount and remove the container from DOM
 const cleanUp = () => {
   const {activeWindow} = useActiveWindowState.getState();
 
@@ -67,38 +81,90 @@ const cleanUp = () => {
   }
 };
 
+// Clamping the value between min and max
+const clampValue = (value: number, min: number, max: number) => Math.max(min, Math.min(value, max));
+
+const getPositionFromPlacement = (
+  anchorRect: DOMRect,
+  menuW: number,
+  menuH: number,
+  placement: Placement = 'bottom-start',
+  offset: number,
+): {left: number; top: number} => {
+  switch (placement) {
+    case 'bottom-start':
+      return {left: anchorRect.left, top: anchorRect.bottom + offset};
+    case 'bottom-end':
+      return {left: anchorRect.right - menuW, top: anchorRect.bottom + offset};
+    case 'top-start':
+      return {left: anchorRect.left, top: anchorRect.top - menuH - offset};
+    case 'top-end':
+      return {left: anchorRect.right - menuW, top: anchorRect.top - menuH - offset};
+    case 'right-start':
+      return {left: anchorRect.right + offset, top: anchorRect.top};
+    case 'right-end':
+      return {left: anchorRect.right + offset, top: anchorRect.bottom - menuH};
+    case 'left-start':
+      return {left: anchorRect.left - menuW - offset, top: anchorRect.top};
+    case 'left-end':
+      return {left: anchorRect.left - menuW - offset, top: anchorRect.bottom - menuH};
+  }
+};
+
 const getButtonId = (label: string): string => `btn-${label?.split(' ').join('-').toLowerCase()}`;
 
 const contextMenuClassName = 'ctx-menu';
 const msgMenuIdentifier = 'message-options-menu';
-const ContextMenu: React.FC<ContextMenuProps> = ({
+
+const ContextMenu = ({
   entries,
   defaultIdentifier = `${contextMenuClassName}-item`,
   posX,
   posY,
   resetMenuStates,
   placeholder,
-}) => {
+  anchorEl,
+  placement,
+  offset = 8,
+}: ContextMenuProps) => {
   const {activeWindow} = useActiveWindowState();
   const [mainElement, setMainElement] = useState<HTMLUListElement>();
   const placeholderElement = useRef<HTMLDivElement>(null);
   const [selected, setSelected] = useState<ContextMenuEntry>();
 
-  const style = useMemo<React.CSSProperties>(() => {
-    const left =
-      mainElement && activeWindow.innerWidth - posX < mainElement.offsetWidth ? posX - mainElement.offsetWidth : posX;
-    const top = Math.max(
-      mainElement && activeWindow.innerHeight - posY < mainElement.offsetHeight
-        ? posY - mainElement.offsetHeight
-        : posY,
-      0,
-    );
+  const style = useMemo<CSSProperties>(() => {
+    const viewportWidth = activeWindow.innerWidth;
+    const viewportHeight = activeWindow.innerHeight;
+
+    const menuWidth = mainElement?.offsetWidth ?? 0;
+    const menuHeight = mainElement?.offsetHeight ?? 0;
+
+    let leftPx = 0;
+    let topPx = 0;
+
+    if (anchorEl) {
+      const anchorRect = anchorEl.getBoundingClientRect();
+      const position = getPositionFromPlacement(anchorRect, menuWidth, menuHeight, placement, offset);
+      leftPx = position.left;
+      topPx = position.top;
+    } else {
+      const fitsRight = viewportWidth - posX >= menuWidth;
+      const fitsBelow = viewportHeight - posY >= menuHeight;
+
+      leftPx = fitsRight ? posX : posX - menuWidth;
+      topPx = fitsBelow ? posY : posY - menuHeight;
+    }
+
+    leftPx = clampValue(leftPx, 0, Math.max(0, viewportWidth - menuWidth));
+    topPx = clampValue(topPx, 0, Math.max(0, viewportHeight - menuHeight));
+
     return {
-      left,
-      top,
-      visibility: mainElement || placeholderElement ? 'unset' : 'hidden',
+      position: 'fixed',
+      left: leftPx,
+      top: topPx,
+      visibility: mainElement || placeholderElement.current ? 'unset' : 'hidden',
     };
-  }, [mainElement, placeholderElement]);
+  }, [mainElement, placeholderElement, anchorEl, placement, offset, posX, posY, activeWindow]);
 
   useEffect(() => {
     if (selected) {
@@ -128,7 +194,7 @@ const ContextMenu: React.FC<ContextMenuProps> = ({
         // escape/tab key press while the menu is open will close the menu and focus the trigerer
         cleanUp();
         previouslyFocused.focus();
-        resetMsgMenuStates();
+        resetMsgMenuStates(true);
       }
 
       if (isOneOfKeys(event, [KEY.ARROW_UP, KEY.ARROW_DOWN])) {
@@ -192,7 +258,7 @@ const ContextMenu: React.FC<ContextMenuProps> = ({
         {entries.length ? (
           <ul
             className={contextMenuClassName}
-            ref={setMainElement}
+            ref={el => setMainElement(el ?? undefined)}
             style={{maxHeight: activeWindow.innerHeight, ...style}}
             role="menu"
           >
@@ -259,12 +325,18 @@ export const showContextMenu = ({
   identifier,
   placeholder,
   resetMenuStates,
+  anchor,
+  placement,
+  offset,
 }: {
   event: MouseEvent | React.MouseEvent;
   entries: ContextMenuEntry[];
   identifier: string;
   resetMenuStates?: () => void;
   placeholder?: ReactNode;
+  anchor?: HTMLElement | undefined;
+  placement?: Placement;
+  offset?: number;
 }) => {
   const {activeWindow} = useActiveWindowState.getState();
   event.preventDefault();
@@ -285,6 +357,9 @@ export const showContextMenu = ({
         posY={event.clientY}
         resetMenuStates={resetMenuStates}
         placeholder={placeholder}
+        anchorEl={anchor}
+        placement={placement}
+        offset={offset}
       />
     </StyledApp>,
   );
