@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [27.75.8](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@27.75.7...@wireapp/api-client@27.75.8) (2025-09-23)
+
+### Bug Fixes
+
+* Add a guard against empty websocket messages [WPB-19372] ([#7372](https://github.com/wireapp/wire-web-packages/issues/7372)) ([1e40d29](https://github.com/wireapp/wire-web-packages/commit/1e40d29b43368c6ff56e9ae220409f222dc6b3f0))
+
 ## [27.75.7](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@27.75.6...@wireapp/api-client@27.75.7) (2025-09-18)
 
 **Note:** Version bump only for package @wireapp/api-client
