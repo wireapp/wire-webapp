@@ -1095,7 +1095,12 @@ declare module 'I18n/en-US.json' {
     'index.welcome': `Welcome to {brandName}!`;
     'initDecryption': `Decrypting messages`;
     'initEvents': `Loading messages`;
-    'initProgress': `Loading messages from {time} ago`;
+    'initProgressDaysPlural': `Loading messages from the last {time} days`;
+    'initProgressDaysSingular': `Loading messages from the last {time} day`;
+    'initProgressHoursPlural': `Loading messages from the last {time} hours`;
+    'initProgressHoursSingular': `Loading messages from the last {time} hour`;
+    'initProgressMinutesPlural': `Loading messages from the last {time} minutes`;
+    'initProgressMinutesSingular': `Loading messages from the last {time} minute`;
     'initReceivedSelfUser': `Hello, {user}.`;
     'initReceivedUserData': `Checking for new messages`;
     'initUpdatedFromNotifications': `Almost done - Enjoy {brandName}`;
