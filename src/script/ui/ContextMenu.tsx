@@ -128,7 +128,7 @@ const ContextMenu = ({
   offset = 8,
 }: ContextMenuProps) => {
   const {activeWindow} = useActiveWindowState();
-  const [mainElement, setMainElement] = useState<HTMLUListElement>();
+  const [activeElement, setActiveElement] = useState<HTMLUListElement>();
   const placeholderElement = useRef<HTMLDivElement>(null);
   const [selected, setSelected] = useState<ContextMenuEntry>();
 
@@ -136,8 +136,8 @@ const ContextMenu = ({
     const viewportWidth = activeWindow.innerWidth;
     const viewportHeight = activeWindow.innerHeight;
 
-    const menuWidth = mainElement?.offsetWidth ?? 0;
-    const menuHeight = mainElement?.offsetHeight ?? 0;
+    const menuWidth = activeElement?.offsetWidth ?? 0;
+    const menuHeight = activeElement?.offsetHeight ?? 0;
 
     let leftPx = 0;
     let topPx = 0;
@@ -162,9 +162,9 @@ const ContextMenu = ({
       position: 'fixed',
       left: leftPx,
       top: topPx,
-      visibility: mainElement || placeholderElement.current ? 'unset' : 'hidden',
+      visibility: activeElement || placeholderElement.current ? 'unset' : 'hidden',
     };
-  }, [mainElement, placeholderElement, anchorEl, placement, offset, posX, posY, activeWindow]);
+  }, [activeElement, placeholderElement, anchorEl, placement, offset, posX, posY, activeWindow]);
 
   useEffect(() => {
     if (selected) {
@@ -219,7 +219,7 @@ const ContextMenu = ({
 
     const onMouseDown = (event: MouseEvent): void => {
       const isOutsideClick = entries.length
-        ? mainElement && !mainElement.contains(event.target as Node)
+        ? activeElement && !activeElement.contains(event.target as Node)
         : placeholderElement && !placeholderElement.current?.contains(event.target as Node);
 
       if (isOutsideClick) {
@@ -239,7 +239,7 @@ const ContextMenu = ({
       activeWindow.removeEventListener('mousedown', onMouseDown);
       activeWindow.removeEventListener('resize', cleanUp);
     };
-  }, [mainElement, selected, activeWindow]);
+  }, [activeElement, selected, activeWindow]);
 
   const {handleMenuOpen} = useMessageActionsState();
   const resetMsgMenuStates = (isOutsideClick = false) => {
@@ -258,7 +258,7 @@ const ContextMenu = ({
         {entries.length ? (
           <ul
             className={contextMenuClassName}
-            ref={el => setMainElement(el ?? undefined)}
+            ref={el => setActiveElement(el ?? undefined)}
             style={{maxHeight: activeWindow.innerHeight, ...style}}
             role="menu"
           >
