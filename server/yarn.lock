@@ -4696,9 +4696,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"pm2@npm:6.0.10":
-  version: 6.0.10
-  resolution: "pm2@npm:6.0.10"
+"pm2@npm:6.0.11":
+  version: 6.0.11
+  resolution: "pm2@npm:6.0.11"
   dependencies:
     "@pm2/agent": "npm:~2.1.1"
     "@pm2/io": "npm:~6.1.0"
@@ -4738,7 +4738,7 @@ __metadata:
     pm2-dev: bin/pm2-dev
     pm2-docker: bin/pm2-docker
     pm2-runtime: bin/pm2-runtime
-  checksum: 10/e3a391778f0f2313b6587021761eedebeaaf956f9b7ab046bc9fcc30d666c36b92728b9b13fcd73ea080a15b80d1743cba58f28ab17ca00f36e5ea22eefa506a
+  checksum: 10/11d6485cc3ed12ded1f0adc8badd96c09482ae207dee8013826c3fa326c6607be732db47ccb3d20c47cda3bd814052e4e5b2e8a367f9d173d3327d19dc1a9e38
   languageName: node
   linkType: hard
 
@@ -5731,7 +5731,7 @@ __metadata:
     maxmind: "npm:4.3.10"
     nocache: "npm:4.0.0"
     opn: "npm:6.0.0"
-    pm2: "npm:6.0.10"
+    pm2: "npm:6.0.11"
     rimraf: "npm:6.0.1"
     typescript: "npm:5.6.3"
   languageName: unknown

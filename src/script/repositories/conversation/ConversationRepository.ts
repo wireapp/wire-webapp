@@ -345,6 +345,10 @@ export class ConversationRepository {
     }
   }
 
+  public getActiveConversation() {
+    return this.conversationState.activeConversation();
+  }
+
   public registerMLSConversationVerificationStateHandler = (
     domain: string,
     onConversationVerificationStateChange: OnConversationE2EIVerificationStateChange = () => {},
@@ -2902,8 +2906,8 @@ export class ConversationRepository {
     isoDate = this.serverTimeHandler.toServerTimestamp(),
   ) => {
     const userEntity = await this.userRepository.getUserById(userId);
-    const eventInjections = this.conversationState
-      .conversations()
+    const allConversations = this.conversationState.conversations();
+    const eventInjections = allConversations
       .filter(conversation => {
         const conversationInTeam = conversation.teamId === teamId;
         const userIsParticipant = UserFilter.isParticipant(conversation, userId);
@@ -2912,10 +2916,14 @@ export class ConversationRepository {
       .map(async conversation => {
         const leaveEvent = EventBuilder.buildTeamMemberLeave(conversation, userEntity, isoDate);
         await this.eventRepository.injectEvent(leaveEvent);
-        await this.clearUsersFromConversation(conversation, [userEntity]);
       });
-    userEntity.isDeleted = true;
-    return Promise.all(eventInjections);
+
+    // Clear user from all conversations they participate in
+    const userCleanup = allConversations
+      .filter(conversation => UserFilter.isParticipant(conversation, userId))
+      .map(conversation => this.clearUsersFromConversation(conversation, [userEntity]));
+
+    await Promise.all([...eventInjections, ...userCleanup]);
   };
 
   /**
