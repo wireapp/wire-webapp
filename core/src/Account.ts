@@ -737,6 +737,8 @@ export class Account extends TypedEventEmitter<Events> {
       this.apiClient.transport.ws.useAsyncNotificationsSocket();
     }
 
+    this.logger.info(`Client is using the ${useLegacy ? 'legacy' : 'async'} notification stream`);
+
     await this.service?.client.putClientCapabilities(this.currentClient.id, {capabilities});
 
     /*
@@ -773,6 +775,7 @@ export class Account extends TypedEventEmitter<Events> {
        */
       pauseProposalProcessing();
       pauseMessageSending(); // pause message sending while processing notifications, it will be resumed once the processing is done and we have the marker token
+      pauseRejoiningMLSConversations(); // We want to avoid triggering rejoins of out-of-sync MLS conversations while we are processing the notification stream
       /**
        * resume the notification processing queue
        * it will start processing notifications immediately and pause if web socket connection drops
@@ -788,6 +791,7 @@ export class Account extends TypedEventEmitter<Events> {
     });
 
     return () => {
+      this.logger.info('Disconnecting from backend as requested by consumer');
       flushProposalsQueue();
       this.pauseAndFlushNotificationQueue();
       this.apiClient.disconnect();
@@ -882,6 +886,7 @@ export class Account extends TypedEventEmitter<Events> {
     onConnectionStateChanged: (state: ConnectionState) => void,
   ) => {
     return async (notification: ConsumableNotification, source: NotificationSource): Promise<void> => {
+      this.logger.info(`Received consumable notification of type "${notification.type}"`, {notification});
       try {
         if (notification.type === ConsumableEvent.MISSED) {
           this.reactToMissedNotification();
@@ -927,11 +932,15 @@ export class Account extends TypedEventEmitter<Events> {
     notification: ConsumableNotificationSynchronization,
     onConnectionStateChanged: (state: ConnectionState) => void,
   ) => {
+    this.logger.info('acknowledging synchronization notification', {notification});
     this.acknowledgeSynchronizationNotification(notification);
 
     const markerId = notification.data.marker_id;
     const currentMarkerId = this.apiClient.transport.http.accessTokenStore.markerToken;
 
+    this.logger.info(
+      `Handling synchronization notification with marker ID: ${markerId} current marker ID: ${currentMarkerId}`,
+    );
     /**
      * There is a chance that there might be multiple synchronization notifications (markers)
      * in the queue in case websocket connection drops a few times
@@ -941,6 +950,7 @@ export class Account extends TypedEventEmitter<Events> {
     if (markerId === currentMarkerId) {
       resumeProposalProcessing();
       resumeMessageSending();
+      resumeRejoiningMLSConversations();
       onConnectionStateChanged(ConnectionState.LIVE);
     }
   };
@@ -952,6 +962,7 @@ export class Account extends TypedEventEmitter<Events> {
     onNotificationStreamProgress: (currentProcessingNotificationTimestamp: string) => void,
   ): Promise<void> => {
     try {
+      this.logger.info(`Sending consumable notification for decryption`, notification.data.event.id);
       const payloads = this.service!.notification.handleNotification(notification.data.event, source);
 
       const notificationTime = this.getNotificationEventTime(notification.data.event.payload[0]);
@@ -963,6 +974,7 @@ export class Account extends TypedEventEmitter<Events> {
         await handleEvent(payload, source);
       }
 
+      this.logger.info(`Acknowledging consumable notification on the backend "${notification.data.delivery_tag}"`);
       this.apiClient.transport.ws.acknowledgeNotification(notification);
     } catch (err) {
       this.logger.error(`Failed to process notification ${notification.data.delivery_tag}`, err);
@@ -1024,7 +1036,6 @@ export class Account extends TypedEventEmitter<Events> {
       this.apiClient.transport.ws.lock();
       pauseProposalProcessing();
       pauseMessageSending();
-      // We want to avoid triggering rejoins of out-of-sync MLS conversations while we are processing the notification stream
       pauseRejoiningMLSConversations();
       onConnectionStateChanged(ConnectionState.PROCESSING_NOTIFICATIONS);
 
@@ -1080,9 +1091,11 @@ export class Account extends TypedEventEmitter<Events> {
     handleNotification: (notification: ConsumableNotification, source: NotificationSource) => Promise<void>,
     handleLegacyNotification: (notification: Notification, source: NotificationSource) => Promise<void>,
   ) => {
+    this.logger.info('Setting up WebSocket listeners');
     this.apiClient.transport.ws.removeAllListeners(WebSocketClient.TOPIC.ON_MESSAGE);
 
     this.apiClient.transport.ws.on(WebSocketClient.TOPIC.ON_MESSAGE, notification => {
+      this.logger.info('Received new notification from backend', {notification});
       if (this.checkIsConsumable(notification)) {
         void handleNotification(notification, NotificationSource.WEBSOCKET);
         return;
@@ -1132,15 +1145,18 @@ export class Account extends TypedEventEmitter<Events> {
    * then we remove the flag.
    */
   private readonly reactToMissedNotification = () => {
+    this.logger.info('Reacting to missed notification from consumable async websocket');
     const localStorageKey = 'has_missing_notification';
 
     // First-time handling: set flag and reload to trigger full re-fetch of state.
     if (!AccountLocalStorageStore.has(localStorageKey)) {
+      this.logger.info('First missed notification detected, reloading to recover state');
       AccountLocalStorageStore.add(localStorageKey, 'true');
       window.location.reload();
       return;
     }
 
+    this.logger.info('Missed notification previously detected, acknowledging to resume updates');
     // After reload: acknowledge the missed notification so backend resumes notifications.
     this.apiClient.transport.ws.acknowledgeMissedNotification();
     AccountLocalStorageStore.remove(localStorageKey);
