@@ -111,7 +111,8 @@ test.describe('f2a for teams', () => {
 
       await pageManager.openMainPage();
       await loginUser(owner, pageManager);
-      const {components} = pageManager.webapp;
+      const {components, pages} = pageManager.webapp;
+      await pages.historyInfo().clickConfirmButton();
       await components.conversationSidebar().personalUserName.waitFor({state: 'visible', timeout: 60_000});
 
       await expect(components.conversationSidebar().personalUserName).toBeVisible();
