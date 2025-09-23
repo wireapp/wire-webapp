@@ -17,6 +17,7 @@
  *
  */
 
+import {CONVERSATION_CELLS_STATE} from '@wireapp/api-client/lib/conversation';
 import {RECEIPT_MODE} from '@wireapp/api-client/lib/conversation/data/';
 import {amplify} from 'amplify';
 
@@ -84,6 +85,7 @@ const ConversationDetailsOptions = ({
     firstUserEntity: firstParticipant,
     isChannel,
     isGroupOrChannel,
+    cellsState,
   } = useKoSubscribableChildren(activeConversation, [
     'isMutable',
     'receiptMode',
@@ -93,6 +95,7 @@ const ConversationDetailsOptions = ({
     'firstUserEntity',
     'isChannel',
     'isGroupOrChannel',
+    'cellsState',
   ]);
   const {isSelfDeletingMessagesEnabled, isTeam} = useKoSubscribableChildren(teamState, [
     'isSelfDeletingMessagesEnabled',
@@ -119,6 +122,7 @@ const ConversationDetailsOptions = ({
 
   const isActiveGroupParticipant = isGroupOrChannel && !isSelfUserRemoved;
   const isTeamConversation = !!teamId;
+  const isCellsConversation = !!cellsState && cellsState !== CONVERSATION_CELLS_STATE.DISABLED;
 
   const showOptionGuests = isActiveGroupParticipant && isTeamConversation;
   const showOptionNotificationsGroup = isMutable && isGroupOrChannel;
@@ -131,7 +135,7 @@ const ConversationDetailsOptions = ({
   const hasReceiptsEnabled = conversationRepository.expectReadReceipt(activeConversation);
 
   const canEditGuests = roleRepository.canToggleGuests(activeConversation);
-  const canEditTimeout = roleRepository.canToggleTimeout(activeConversation);
+  const canEditTimeout = roleRepository.canToggleTimeout(activeConversation) && !isCellsConversation;
   const canEditReadReceipts = roleRepository.canToggleReadReceipts(activeConversation);
 
   const openNotificationsPanel = () => togglePanel(PanelState.NOTIFICATIONS, activeConversation);
