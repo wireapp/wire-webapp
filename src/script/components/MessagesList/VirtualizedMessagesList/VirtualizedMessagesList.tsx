@@ -301,7 +301,6 @@ export const VirtualizedMessagesList = ({
                   }),
               }}
             >
-              <div style={{position: 'absolute', top: 0, left: 0, background: 'red'}}>{virtualItem.start}</div>
               {isMarker(item) ? (
                 <MarkerComponent marker={item} measureElement={virtualizer.measureElement} index={virtualItem.index} />
               ) : (
