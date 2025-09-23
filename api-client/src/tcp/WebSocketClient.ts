@@ -99,6 +99,11 @@ export class WebSocketClient extends EventEmitter {
   }
 
   private readonly onMessage = (data: string) => {
+    if (!data) {
+      this.logger.warn('Received empty message from WebSocket');
+      return;
+    }
+
     if (this.isLocked()) {
       this.bufferedMessages.push(data);
     } else {
