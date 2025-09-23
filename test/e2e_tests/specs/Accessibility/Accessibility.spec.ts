@@ -122,6 +122,8 @@ test.describe('Accessibility', () => {
 
         await typeAndCheckIndicator(memberPageManagerA, memberPageManagerB, textMessage, true);
       });
+
+      await memberContext.close();
     },
   );
 
@@ -130,10 +132,10 @@ test.describe('Accessibility', () => {
 
     await pageManager.openMainPage();
     await loginUser(memberA, pageManager);
-    const {components, modals} = pageManager.webapp;
+    const {components, pages} = pageManager.webapp;
 
+    await pages.historyInfo().clickConfirmButton();
     await components.conversationSidebar().sidebar.waitFor({state: 'visible', timeout: loginTimeOut});
-    await modals.dataShareConsent().clickDecline();
 
     await expect(components.conversationSidebar().sidebar).toHaveAttribute('data-is-collapsed', 'true');
   });
@@ -143,12 +145,12 @@ test.describe('Accessibility', () => {
     {tag: ['@TC-51', '@regression']},
     async ({pageManager}) => {
       const message = 'test';
-
+      const {components, modals, pages} = pageManager.webapp;
       await pageManager.openMainPage();
       await loginUser(memberA, pageManager);
-      const {components, modals, pages} = pageManager.webapp;
+
+      await pages.historyInfo().clickConfirmButton();
       await components.conversationSidebar().sidebar.waitFor({state: 'visible', timeout: loginTimeOut});
-      await modals.dataShareConsent().clickDecline();
 
       await createGroup(pageManager, conversationName, [memberB]);
 
