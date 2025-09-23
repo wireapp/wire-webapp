@@ -375,20 +375,20 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@aws-sdk/lib-storage@npm:3.888.0":
-  version: 3.888.0
-  resolution: "@aws-sdk/lib-storage@npm:3.888.0"
+"@aws-sdk/lib-storage@npm:3.893.0":
+  version: 3.893.0
+  resolution: "@aws-sdk/lib-storage@npm:3.893.0"
   dependencies:
-    "@smithy/abort-controller": "npm:^4.0.5"
-    "@smithy/middleware-endpoint": "npm:^4.2.1"
-    "@smithy/smithy-client": "npm:^4.6.1"
+    "@smithy/abort-controller": "npm:^4.1.1"
+    "@smithy/middleware-endpoint": "npm:^4.2.3"
+    "@smithy/smithy-client": "npm:^4.6.3"
     buffer: "npm:5.6.0"
     events: "npm:3.3.0"
     stream-browserify: "npm:3.0.0"
     tslib: "npm:^2.6.2"
   peerDependencies:
-    "@aws-sdk/client-s3": ^3.888.0
-  checksum: 10/923f3bb870002450495360b04bf031cd8a0e8ee7ce2ea35b3508f9d2591848a0f6bd385eb21fec628a0bd9eb5d5f1d1ba1ad2a3b8be738891a2006cc324e756c
+    "@aws-sdk/client-s3": ^3.893.0
+  checksum: 10/310e0cd0f592d7142dff5b1c7465fbd4e896cc6fe4ab9a6cb469a70d605ab7e8f2b981414e0f3a5fc03954ab032e09a54793a550b4639fcd4130c66af2558e3b
   languageName: node
   linkType: hard
 
@@ -6765,7 +6765,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@smithy/middleware-endpoint@npm:^4.2.1, @smithy/middleware-endpoint@npm:^4.2.3":
+"@smithy/middleware-endpoint@npm:^4.2.3":
   version: 4.2.3
   resolution: "@smithy/middleware-endpoint@npm:4.2.3"
   dependencies:
@@ -7033,7 +7033,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@smithy/smithy-client@npm:^4.6.1":
+"@smithy/smithy-client@npm:^4.6.3":
   version: 4.6.3
   resolution: "@smithy/smithy-client@npm:4.6.3"
   dependencies:
@@ -8521,12 +8521,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@wireapp/api-client@npm:^27.75.7":
-  version: 27.75.7
-  resolution: "@wireapp/api-client@npm:27.75.7"
+"@wireapp/api-client@npm:^27.75.8":
+  version: 27.75.8
+  resolution: "@wireapp/api-client@npm:27.75.8"
   dependencies:
     "@aws-sdk/client-s3": "npm:3.873.0"
-    "@aws-sdk/lib-storage": "npm:3.888.0"
+    "@aws-sdk/lib-storage": "npm:3.893.0"
     "@wireapp/commons": "npm:^5.4.4"
     "@wireapp/priority-queue": "npm:^2.1.11"
     "@wireapp/protocol-messaging": "npm:1.53.0"
@@ -8542,7 +8542,7 @@ __metadata:
     uuid: "npm:11.1.0"
     ws: "npm:8.18.1"
     zod: "npm:3.24.2"
-  checksum: 10/51200c8d5f9b08c3036bdd13c09079d26f7b0a0ee95fde328698ca425fbd949b538ad18e419796aa35c0844ea86b184885e963348d679d4eaeac06025234c5c8
+  checksum: 10/fbe8843de05ddbd576254e965d6f0de1b8dee28d27be16ac112f61f40d30d2687dc41b473823749c48362ce1531cdb7bf4cc2626579df0fac5e331a5ec1d1f56
   languageName: node
   linkType: hard
 
@@ -8607,11 +8607,11 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@wireapp/core@npm:46.34.11":
-  version: 46.34.11
-  resolution: "@wireapp/core@npm:46.34.11"
+"@wireapp/core@npm:46.34.13":
+  version: 46.34.13
+  resolution: "@wireapp/core@npm:46.34.13"
   dependencies:
-    "@wireapp/api-client": "npm:^27.75.7"
+    "@wireapp/api-client": "npm:^27.75.8"
     "@wireapp/commons": "npm:^5.4.4"
     "@wireapp/core-crypto": "npm:7.0.2"
     "@wireapp/cryptobox": "npm:12.8.0"
@@ -8629,7 +8629,7 @@ __metadata:
     long: "npm:^5.2.0"
     uuid: "npm:9.0.1"
     zod: "npm:3.24.2"
-  checksum: 10/9a99c15558077d1aa5be58c9180e761f4f37136e5f299f2de43df163dc6a318d30270a0ae99658acf8726387ce4a65d78b1cc86dbe7f86e7f301497fb28f5807
+  checksum: 10/2fa924184ed0f53762ac3aa3d56657a2aacd339faa1a9c72d4a411005a0d9e88587d29e3391f2adcb369d4f6befed1bf8a37618d1dc18d26c67bfe125e8c3ac2
   languageName: node
   linkType: hard
 
@@ -22440,7 +22440,7 @@ __metadata:
     "@wireapp/avs-debugger": "npm:0.0.7"
     "@wireapp/commons": "npm:5.4.4"
     "@wireapp/copy-config": "npm:2.3.2"
-    "@wireapp/core": "npm:46.34.11"
+    "@wireapp/core": "npm:46.34.13"
     "@wireapp/eslint-config": "npm:3.0.7"
     "@wireapp/kalium-backup": "npm:0.0.4"
     "@wireapp/prettier-config": "npm:0.6.4"
