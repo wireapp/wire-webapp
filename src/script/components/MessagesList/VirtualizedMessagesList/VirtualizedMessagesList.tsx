@@ -288,7 +288,6 @@ export const VirtualizedMessagesList = ({
                 minHeight: `${virtualItem.size}px`,
                 transform: `translate3d(0, ${virtualItem.start}px, 0)`,
                 willChange: 'transform',
-                contain: 'paint',
               }}
               css={{
                 position: 'absolute',
@@ -301,7 +300,6 @@ export const VirtualizedMessagesList = ({
                   }),
               }}
             >
-              <div style={{position: 'absolute', top: 0, left: 0, background: 'red'}}>{virtualItem.start}</div>
               {isMarker(item) ? (
                 <MarkerComponent marker={item} measureElement={virtualizer.measureElement} index={virtualItem.index} />
               ) : (
