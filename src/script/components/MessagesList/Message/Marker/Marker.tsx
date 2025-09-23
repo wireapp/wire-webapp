@@ -38,7 +38,7 @@ const markerStyles: Partial<Record<Marker['type'], SerializedStyles>> = {
 interface Props {
   marker: Marker;
   scrollTo?: ScrollToElement;
-  measureElement?: any;
+  measureElement?: (element: HTMLElement | null) => void;
   index?: number;
 }
 
