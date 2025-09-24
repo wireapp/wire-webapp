@@ -53,6 +53,7 @@ export const CellsFilePreviewModal = () => {
       isOpen={!!selectedFile}
       onClose={handleCloseFile}
       filePreviewUrl={getFileUrl()}
+      fileUrl={url}
       fileName={name}
       fileExtension={extension}
       status={!getFileUrl() ? 'unavailable' : 'success'}

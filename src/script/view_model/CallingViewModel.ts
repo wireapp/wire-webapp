@@ -26,7 +26,6 @@ import {REASON as CALL_REASON, STATE as CALL_STATE} from '@wireapp/avs';
 import {Availability} from '@wireapp/protocol-messaging';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
-import {ButtonGroupTab} from 'Components/calling/ButtonGroup';
 import 'Components/calling/ChooseScreen';
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import type {AudioRepository} from 'Repositories/audio/AudioRepository';
@@ -41,6 +40,7 @@ import type {Conversation} from 'Repositories/entity/Conversation';
 import type {User} from 'Repositories/entity/User';
 import type {ElectronDesktopCapturerSource, MediaDevicesHandler} from 'Repositories/media/MediaDevicesHandler';
 import type {MediaStreamHandler} from 'Repositories/media/MediaStreamHandler';
+import {mediaDevicesStore} from 'Repositories/media/useMediaDevicesStore';
 import type {PermissionRepository} from 'Repositories/permission/PermissionRepository';
 import {PermissionStatusState} from 'Repositories/permission/PermissionStatusState';
 import {PropertiesRepository} from 'Repositories/properties/PropertiesRepository';
@@ -72,11 +72,6 @@ export enum CallViewTab {
   SPEAKERS = 'speakers',
 }
 
-export const CallViewTabs: ButtonGroupTab[] = [
-  {getText: () => t('videoSpeakersTabSpeakers').toUpperCase(), value: CallViewTab.SPEAKERS},
-  {getText: substitute => t('videoSpeakersTabAll', substitute as unknown as {count: number}), value: CallViewTab.ALL},
-];
-
 declare global {
   interface HTMLAudioElement {
     setSinkId?: (sinkId: string) => Promise<void>;
@@ -102,6 +97,7 @@ export class CallingViewModel {
     readonly callState = container.resolve(CallState),
     private readonly teamState = container.resolve(TeamState),
   ) {
+    const {setVideoInputDeviceId, setScreenInputDeviceId} = mediaDevicesStore.getState();
     this.isSelfVerified = ko.pureComputed(() => selfUser().is_verified());
     this.activeCalls = ko.pureComputed(() =>
       this.callState.calls().filter(call => {
@@ -299,11 +295,11 @@ export class CallingViewModel {
         }
       },
       switchCameraInput: (deviceId: string) => {
-        this.mediaDevicesHandler.currentDeviceId.videoinput(deviceId);
+        setVideoInputDeviceId(deviceId);
         this.callingRepository.refreshVideoInput();
       },
       switchScreenInput: (deviceId: string) => {
-        this.mediaDevicesHandler.currentDeviceId.screeninput(deviceId);
+        setScreenInputDeviceId(deviceId);
       },
       toggleCamera: (call: Call) => {
         this.callingRepository.toggleCamera(call);
@@ -319,7 +315,7 @@ export class CallingViewModel {
           this.callState.desktopScreenShareMenu(desktopScreenShareMenu);
           return new Promise(resolve => {
             this.callingRepository.onChooseScreen = (deviceId: string): void => {
-              this.mediaDevicesHandler.currentDeviceId.screeninput(deviceId);
+              setScreenInputDeviceId(deviceId);
               this.callState.selectableScreens([]);
               this.callState.selectableWindows([]);
               resolve();

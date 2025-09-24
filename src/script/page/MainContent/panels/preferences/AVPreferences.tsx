@@ -17,12 +17,17 @@
  *
  */
 
+import {memo} from 'react';
+
+import {container} from 'tsyringe';
+
 import {useInitializeMediaDevices} from 'Hooks/useInitializeMediaDevices';
 import type {CallingRepository} from 'Repositories/calling/CallingRepository';
-import {MediaDeviceType} from 'Repositories/media/MediaDeviceType';
-import type {MediaRepository} from 'Repositories/media/MediaRepository';
+import {MediaConstraintsHandler} from 'Repositories/media/MediaConstraintsHandler';
+import {MediaDevicesHandler} from 'Repositories/media/MediaDevicesHandler';
+import type {MediaDeviceType} from 'Repositories/media/MediaDeviceType';
+import {MediaStreamHandler} from 'Repositories/media/MediaStreamHandler';
 import type {PropertiesRepository} from 'Repositories/properties/PropertiesRepository';
-import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 
 import {AudioOutPreferences} from './avPreferences/AudioOutPreferences';
@@ -35,42 +40,39 @@ import {useCameraReloadOnCallEnd} from './useCameraReloadOnCallEnd';
 
 interface AVPreferencesProps {
   callingRepository: CallingRepository;
-  mediaRepository: MediaRepository;
   propertiesRepository: PropertiesRepository;
+  deviceSupport: Pick<
+    Record<MediaDeviceType, boolean>,
+    MediaDeviceType.AUDIO_INPUT | MediaDeviceType.AUDIO_OUTPUT | MediaDeviceType.VIDEO_INPUT
+  >;
 }
 
-const AVPreferences = ({
-  mediaRepository: {devicesHandler, constraintsHandler, streamHandler},
-  propertiesRepository,
-  callingRepository,
-}: AVPreferencesProps) => {
+const AVPreferencesComponent = ({propertiesRepository, callingRepository, deviceSupport}: AVPreferencesProps) => {
+  const devicesHandler = container.resolve(MediaDevicesHandler);
+  const constraintsHandler = container.resolve(MediaConstraintsHandler);
+  const streamHandler = container.resolve(MediaStreamHandler);
   const {shouldReloadCamera} = useCameraReloadOnCallEnd(callingRepository);
-  const deviceSupport = useKoSubscribableChildren(devicesHandler?.deviceSupport, [
-    MediaDeviceType.AUDIO_INPUT,
-    MediaDeviceType.AUDIO_OUTPUT,
-    MediaDeviceType.VIDEO_INPUT,
-  ]);
-  const {isMediaDevicesAreInitialized} = useInitializeMediaDevices(devicesHandler, streamHandler);
+  const {areMediaDevicesInitialized} = useInitializeMediaDevices(devicesHandler, streamHandler);
 
   return (
     <PreferencesPage title={t('preferencesAV')}>
-      {isMediaDevicesAreInitialized && (
+      {!areMediaDevicesInitialized && (
         <div className="preferences-av-spinner-select">
           <div className="icon-spinner spin accent-text"></div>
         </div>
       )}
-      {!isMediaDevicesAreInitialized && deviceSupport.audioinput && (
+      {areMediaDevicesInitialized && deviceSupport.audioinput && (
         <MicrophonePreferences
           {...{devicesHandler, streamHandler}}
           refreshStream={() => callingRepository.refreshAudioInput()}
           hasActiveCall={callingRepository.hasActiveCall()}
         />
       )}
-      {!isMediaDevicesAreInitialized && deviceSupport.audiooutput && <AudioOutPreferences {...{devicesHandler}} />}
-      {!isMediaDevicesAreInitialized && deviceSupport.videoinput && (
+      {areMediaDevicesInitialized && deviceSupport.audiooutput && <AudioOutPreferences />}
+      {areMediaDevicesInitialized && deviceSupport.videoinput && (
         <CameraPreferences
           key={`camera-${shouldReloadCamera}`} // Force remount when call ends
-          {...{devicesHandler, streamHandler}}
+          {...{streamHandler}}
           refreshStream={() => callingRepository.refreshVideoInput()}
           hasActiveCameraStream={callingRepository.hasActiveCameraStream()}
         />
@@ -80,5 +82,4 @@ const AVPreferences = ({
     </PreferencesPage>
   );
 };
-
-export {AVPreferences};
+export const AVPreferences = memo(AVPreferencesComponent);
