@@ -36,6 +36,7 @@ interface FileFullscreenModalProps {
   filePreviewUrl?: string;
   fileName: string;
   fileExtension: string;
+  fileUrl?: string;
   status?: Status;
   senderName: string;
   timestamp: number;
@@ -47,6 +48,7 @@ export const FileFullscreenModal = ({
   isOpen,
   onClose,
   filePreviewUrl,
+  fileUrl,
   status = 'success',
   fileName,
   fileExtension,
@@ -59,15 +61,17 @@ export const FileFullscreenModal = ({
       <FileHeader
         onClose={onClose}
         fileName={fileName}
-        filePreviewUrl={filePreviewUrl}
         fileExtension={fileExtension}
+        fileUrl={fileUrl}
         senderName={senderName}
         timestamp={timestamp}
         badges={badges}
       />
       <ModalContent
+        fileExtension={fileExtension}
         filePreviewUrl={filePreviewUrl}
         fileName={fileName}
+        fileUrl={fileUrl}
         senderName={senderName}
         timestamp={timestamp}
         status={status}
@@ -77,20 +81,30 @@ export const FileFullscreenModal = ({
 };
 
 interface ModalContentProps {
-  filePreviewUrl?: string;
+  fileExtension: string;
   fileName: string;
   status: Status;
   senderName: string;
   timestamp: number;
+  filePreviewUrl?: string;
+  fileUrl?: string;
 }
 
-const ModalContent = ({filePreviewUrl, fileName, senderName, timestamp, status}: ModalContentProps) => {
+const ModalContent = ({
+  fileExtension,
+  filePreviewUrl,
+  fileName,
+  fileUrl,
+  senderName,
+  timestamp,
+  status,
+}: ModalContentProps) => {
   if (status === 'loading' && !filePreviewUrl) {
     return <FileLoader />;
   }
 
   if (status === 'unavailable' || !filePreviewUrl) {
-    return <NoPreviewAvailable fileUrl={filePreviewUrl} fileName={fileName} />;
+    return <NoPreviewAvailable fileUrl={fileUrl} fileName={fileName} fileExtension={fileExtension} />;
   }
 
   const extension = getFileExtensionFromUrl(filePreviewUrl);
@@ -104,5 +118,5 @@ const ModalContent = ({filePreviewUrl, fileName, senderName, timestamp, status}:
     return <ImageFileView src={filePreviewUrl} senderName={senderName} timestamp={timestamp} />;
   }
 
-  return <NoPreviewAvailable fileUrl={filePreviewUrl} fileName={fileName} />;
+  return <NoPreviewAvailable fileUrl={fileUrl} fileName={fileName} fileExtension={fileExtension} />;
 };

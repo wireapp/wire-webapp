@@ -49,6 +49,8 @@ export class ConversationPage {
   readonly pingButton: Locator;
   readonly messages: Locator;
   readonly filesTab: Locator;
+  readonly isTypingIndicator: Locator;
+
 
   readonly getImageAltText = (user: User) => `Image from ${user.fullName}`;
 
@@ -82,6 +84,7 @@ export class ConversationPage {
       `${selectByDataAttribute('item-message')} ${selectByClass('message-body')}:not(:has(p${selectByClass('text-foreground')})):has(${selectByClass('text')})`,
     );
     this.filesTab = page.locator('#conversation-tab-files');
+    this.isTypingIndicator = page.locator(selectByDataAttribute('typing-indicator-title'));
   }
 
   protected getImageLocator(user: User): Locator {
@@ -121,6 +124,14 @@ export class ConversationPage {
     await this.messageInput.fill(message);
     await this.messageInput.press('Enter');
     await this.page.waitForTimeout(5000); // Wait for the message to be sent
+  }
+
+  async typeMessage(message: string) {
+    await this.messageInput.click();
+    for (let i = 0; i < message.length; i++) {
+      await this.page.keyboard.press(message[i]);
+      await this.page.waitForTimeout(300); // sim user input
+    }
   }
 
   async createGroup(groupName: string) {
