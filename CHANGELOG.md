@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [46.35.1](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@46.35.0...@wireapp/core@46.35.1) (2025-09-24)
+
+### Bug Fixes
+
+* Do not lock the websocket when using async notifications [WPB-20395] ([#7375](https://github.com/wireapp/wire-web-packages/issues/7375)) ([815a32b](https://github.com/wireapp/wire-web-packages/commit/815a32ba3c5053f7d020dab4591841d1983e962c))
+
 # [46.35.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@46.34.13...@wireapp/core@46.35.0) (2025-09-23)
 
 ### Features
