@@ -55,6 +55,7 @@ export const Preference = () => {
     ? teamState.teamFeatures()?.mls?.config.defaultProtocol
     : ConversationProtocol.PROTEUS;
 
+  // Read receipts are temorarily disabled for MLS groups and channels until it is supported
   const areReadReceiptsEnabled = defaultProtocol !== ConversationProtocol.MLS;
 
   return (

@@ -104,6 +104,7 @@ const GroupCreationModal: React.FC<GroupCreationModalProps> = ({
 
   const initialProtocol = protocolOptions.find(protocol => protocol.value === defaultProtocol)!;
 
+  // Read receipts are temorarily disabled for MLS groups and channels until it is supported
   const areReadReceiptsEnabled = defaultProtocol !== ConversationProtocol.MLS;
 
   //both environment feature flag and team feature flag must be enabled to create conversations with cells
