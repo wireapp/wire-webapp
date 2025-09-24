@@ -18,6 +18,7 @@
  */
 
 import {getUser} from 'test/e2e_tests/data/user';
+import {PageManager} from 'test/e2e_tests/pageManager';
 import {setupBasicTestScenario, startUpApp} from 'test/e2e_tests/utils/setup.util';
 import {tearDownAll} from 'test/e2e_tests/utils/tearDown.util';
 
@@ -64,17 +65,34 @@ test.describe('Accessibility', () => {
   test(
     'Verify the conversation is not unarchived when there are new messages in this conversation',
     {tag: ['@TC-99', '@regression']},
-    async ({pageManager, browser}) => {
-      // get new context
+    async ({pageManager: pageManagerA, browser}) => {
+      const memberContext = await browser.newContext();
+      const memberPage = await memberContext.newPage();
+      const memberPageManagerB = new PageManager(memberPage);
 
-      await Promise.all([startUpApp(pageManager, memberA), startUpApp(pageManager, memberB)]);
-      // starts an 1o1
-      // write an message from user b
+      const {components, modals, pages} = pageManagerA.webapp;
+      const {pages: pagesB, components: componentsB} = memberPageManagerB.webapp;
 
-      // click archive
-      // check chat is there
-      // rightclick unarchive
-      // check if its in the all tab
+      await Promise.all([startUpApp(pageManagerA, memberA), startUpApp(memberPageManagerB, memberB)]);
+
+      await components.conversationSidebar().clickConnectButton();
+      await components.contactList().clickOnContact(memberB.fullName);
+      await modals.userProfile().clickStartConversation();
+
+      await pages.conversationList().clickConversationOptions(memberB.fullName);
+      await pages.conversationList().archiveConversation();
+      await components.conversationSidebar().clickArchive();
+
+      expect(await pages.conversationList().isConversationItemVisible(memberB.fullName)).toBeTruthy();
+
+      await componentsB.conversationSidebar().clickAllConversationsButton();
+      await pagesB.conversationList().openConversation(memberA.fullName);
+      await pagesB.conversation().sendMessage('test');
+      await components.conversationSidebar().clickArchive();
+
+      expect(await pages.conversationList().isConversationItemVisible(memberB.fullName)).toBeTruthy();
+
+      await memberContext.close();
     },
   );
 
