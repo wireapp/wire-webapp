@@ -30,6 +30,7 @@ export class ConversationSidebar {
   readonly allConverationsButton: Locator;
   readonly connectButton: Locator;
   readonly archiveButton: Locator;
+  readonly sidebar: Locator;
 
   constructor(page: Page) {
     this.page = page;
@@ -40,6 +41,7 @@ export class ConversationSidebar {
     this.allConverationsButton = page.locator(`${selectByDataAttribute('go-recent-view')}`);
     this.connectButton = page.locator(`button${selectByDataAttribute('go-people')}`);
     this.archiveButton = page.locator(selectByDataAttribute('go-archive'));
+    this.sidebar = page.locator(`.conversations-sidebar-items`);
   }
 
   async getPersonalStatusName() {

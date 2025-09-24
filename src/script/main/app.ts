@@ -36,6 +36,7 @@ import {container} from 'tsyringe';
 import {Runtime} from '@wireapp/commons';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
+import {useTypingIndicatorState} from 'Components/InputBar/TypingIndicator';
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {AssetRepository} from 'Repositories/assets/AssetRepository';
 import {AudioRepository} from 'Repositories/audio/AudioRepository';
@@ -564,7 +565,7 @@ export class App {
            * even when app is already loaded and in the main screen view
            */
           const message = this.config.FEATURE.SHOW_LOADING_INFORMATION
-            ? ` ${t('initProgress', {time: formatCoarseDuration(durationFrom(currentProcessingNotificationTimestamp))})}`
+            ? formatCoarseDuration(durationFrom(currentProcessingNotificationTimestamp))
             : '';
 
           totalNotifications++;
@@ -680,7 +681,7 @@ export class App {
           this.logger.warn(`Redirecting to login: ${message}`, error);
           return isReload
             ? this.redirectToLogin(SIGN_OUT_REASON.SESSION_EXPIRED)
-            : this.redirectToLogin(SIGN_OUT_REASON.CLIENT_REMOVED);
+            : this.logout(SIGN_OUT_REASON.CLIENT_REMOVED, true);
         }
         case AccessTokenError.TYPE.NOT_FOUND_IN_CACHE:
         case AccessTokenError.TYPE.RETRIES_EXCEEDED:
@@ -814,6 +815,18 @@ export class App {
     };
 
     const _logout = async () => {
+      // flush typing state remote and local before tearing down the socket
+      const activeConversation = this.repository.conversation.getActiveConversation();
+      if (activeConversation) {
+        try {
+          await this.repository.conversation.sendTypingStop(activeConversation);
+        } catch (error) {
+          this.logger.warn('Failed to send typing stop before logout.', error);
+        }
+      }
+      const {clearTypingUsers} = useTypingIndicatorState.getState();
+      clearTypingUsers();
+
       // Disconnect from our backend, end tracking and clear cached data
       this.repository.event.disconnectWebSocket();
 
