@@ -26,6 +26,7 @@ export enum CALL {
 export enum CONVERSATION {
   ASSET_ADD = 'conversation.asset-add',
   BUTTON_ACTION_CONFIRMATION = 'conversation.button-action-confirmation',
+  BUTTON_ACTION = 'conversation.button-action',
   CALL_TIME_OUT = 'conversation.call-time-out',
   FAILED_TO_ADD_USERS = 'conversation.failed-to-add-users',
   COMPOSITE_MESSAGE_ADD = 'conversation.composite-message-add',

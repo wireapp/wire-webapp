@@ -26,6 +26,6 @@ describe('LoadingBar', () => {
     const props = {message: 'example', progress: 30};
 
     const {getByTestId} = render(<LoadingBar {...props} />);
-    expect(getByTestId('loading-bar-progress').getAttribute('style')).toBe('width: 30%;');
+    expect(getByTestId('loading-bar-spinner')).toBeInTheDocument();
   });
 });

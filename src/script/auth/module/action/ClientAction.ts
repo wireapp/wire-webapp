@@ -79,9 +79,9 @@ export class ClientAction {
             isNew: true,
             client: await core.registerClient(
               {clientType, password, verificationCode},
-              clientAction.generateClientPayload(clientType),
               useLegacyNotificationStream,
               entropyData,
+              clientAction.generateClientPayload(clientType),
             ),
           };
 

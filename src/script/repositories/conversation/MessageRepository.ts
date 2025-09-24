@@ -1213,10 +1213,23 @@ export class MessageRepository {
     }
   }
 
-  sendButtonAction(conversation: Conversation, message: CompositeMessage, buttonId: string): void {
+  /**
+   * Sends a buttonAction confirmation, a button was clicked without targeted messages.
+   * @param conversation conversation where this button was clicked
+   * @param message the composite message
+   * @param buttonId the button selected id
+   * @returns
+   */
+  async sendButtonAction(conversation: Conversation, message: CompositeMessage, buttonId: string): Promise<void> {
     if (conversation.isSelfUserRemoved()) {
       return;
     }
+
+    const changes = message.getSelectionChange(buttonId);
+    if (!changes) {
+      return;
+    }
+
     const senderId = message.qualifiedFrom;
     const senderInConversation = conversation
       .participating_user_ets()
@@ -1235,10 +1248,10 @@ export class MessageRepository {
     try {
       this.sendAndInjectMessage(buttonMessage, conversation, {
         nativePush: false,
-        recipients: [message.qualifiedFrom],
         skipInjection: true,
-        targetMode: MessageTargetMode.USERS,
       });
+      const messageEntity = await this.getMessageInConversationById(conversation, message.id);
+      await this.eventService.updateEventSequentially({primary_key: messageEntity.primary_key, ...changes});
     } catch (error) {
       message.waitingButtonId(undefined);
       return message.setButtonError(buttonId, t('buttonActionError'));
