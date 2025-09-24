@@ -723,7 +723,7 @@ export class Account extends TypedEventEmitter<Events> {
       onConnectionStateChanged,
     });
 
-    this.setupWebSocketListeners(onConnectionStateChanged, handleNotification, handleLegacyNotification);
+    this.setupWebSocketListeners(onConnectionStateChanged, handleNotification, handleLegacyNotification, useLegacy);
 
     const isClientCapableOfConsumableNotifications = this.getClientCapabilities().includes(
       ClientCapability.CONSUMABLE_NOTIFICATIONS,
@@ -769,6 +769,8 @@ export class Account extends TypedEventEmitter<Events> {
       this.apiClient.transport.ws.lock();
     }
     this.apiClient.connect(async abortController => {
+      // this call back is called every single time the websocket connection is (re)established
+      this.logger.info('Connection established with websocket, starting notification stream processing');
       /**
        * This is to avoid passing proposals too early to core crypto
        * @See WPB-18995
@@ -1090,6 +1092,7 @@ export class Account extends TypedEventEmitter<Events> {
     onConnectionStateChanged: (state: ConnectionState) => void,
     handleNotification: (notification: ConsumableNotification, source: NotificationSource) => Promise<void>,
     handleLegacyNotification: (notification: Notification, source: NotificationSource) => Promise<void>,
+    useLegacy: boolean,
   ) => {
     this.logger.info('Setting up WebSocket listeners');
     this.apiClient.transport.ws.removeAllListeners(WebSocketClient.TOPIC.ON_MESSAGE);
@@ -1114,7 +1117,9 @@ export class Account extends TypedEventEmitter<Events> {
       if (connectionState === ConnectionState.CLOSED) {
         flushProposalsQueue();
         this.pauseAndFlushNotificationQueue();
-        this.apiClient.transport.ws.lock();
+        if (useLegacy) {
+          this.apiClient.transport.ws.lock();
+        }
       }
 
       if (connectionState) {
