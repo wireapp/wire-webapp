@@ -26,7 +26,6 @@ import {REASON as CALL_REASON, STATE as CALL_STATE} from '@wireapp/avs';
 import {Availability} from '@wireapp/protocol-messaging';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
-import {ButtonGroupTab} from 'Components/calling/ButtonGroup';
 import 'Components/calling/ChooseScreen';
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import type {AudioRepository} from 'Repositories/audio/AudioRepository';
@@ -72,11 +71,6 @@ export enum CallViewTab {
   ALL = 'all',
   SPEAKERS = 'speakers',
 }
-
-export const CallViewTabs: ButtonGroupTab[] = [
-  {getText: () => t('videoSpeakersTabSpeakers').toUpperCase(), value: CallViewTab.SPEAKERS},
-  {getText: substitute => t('videoSpeakersTabAll', substitute as unknown as {count: number}), value: CallViewTab.ALL},
-];
 
 declare global {
   interface HTMLAudioElement {
