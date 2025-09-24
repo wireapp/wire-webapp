@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [9.64.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/react-ui-kit@9.63.0...@wireapp/react-ui-kit@9.64.0) (2025-09-24)
+
+### Features
+
+* **api-client:** Do not ping async notifications socket ([#7192](https://github.com/wireapp/wire-web-packages/issues/7192)) ([629590f](https://github.com/wireapp/wire-web-packages/commit/629590fb9ba6270fba20e68f18e2943e01e06ffa))
+* update GroupButtonProps interface [WPB-20282]  ([#7373](https://github.com/wireapp/wire-web-packages/issues/7373)) ([cbb8b5f](https://github.com/wireapp/wire-web-packages/commit/cbb8b5fb2eec36ca2f3f77a79dbc129784521667))
+
 # [9.63.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/react-ui-kit@9.62.0...@wireapp/react-ui-kit@9.63.0) (2025-08-04)
 
 ### Features
