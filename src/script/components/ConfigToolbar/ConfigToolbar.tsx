@@ -33,15 +33,12 @@ import {wrapperStyles} from './ConfigToolbar.styles';
 export function ConfigToolbar() {
   const [showConfig, setShowConfig] = useState(false);
   const [configFeaturesState, setConfigFeaturesState] = useState<Configuration['FEATURE']>(Config.getConfig().FEATURE);
-  const [intervalId, setIntervalId] = useState<number | null>(null); // Stores active timeout id (renamed kept for minimal change)
-  const messageCountRef = useRef<number>(0); // For the message count
-  const [prefix, setPrefix] = useState('Message -'); // Prefix input
-  // Delay between automated messages in seconds (can be fractional). 0 = send back-to-back.
+  const [isMessageSendingActive, setIsMessageSendingActive] = useState(false);
+  const messageCountRef = useRef<number>(0);
+  const [prefix, setPrefix] = useState('Message -');
   const [messageDelaySec, setMessageDelaySec] = useState<number>(0);
-  // Ref to always access latest delay inside async loop without re-registering timers
-  const messageDelaySecRef = useRef<number>(messageDelaySec);
   const wrapperRef = useRef(null);
-  const [avsDebuggerEnabled, setAvsDebuggerEnabled] = useState(!!window.wire?.app?.debug?.isEnabledAvsDebugger()); //
+  const [avsDebuggerEnabled, setAvsDebuggerEnabled] = useState(!!window.wire?.app?.debug?.isEnabledAvsDebugger());
 
   // Toggle config tool on 'cmd/ctrl + shift + 2'
   useEffect(() => {
@@ -57,22 +54,25 @@ export function ConfigToolbar() {
   }, []);
 
   useEffect(() => {
-    messageDelaySecRef.current = messageDelaySec;
-  }, [messageDelaySec]);
-
-  const startSendingMessages = () => {
-    if (intervalId) {
+    if (!isMessageSendingActive) {
       return;
     }
 
-    const sendNext = async () => {
+    let timeoutId: number | null = null;
+    let isActive = true;
+
+    const sendMessage = async (): Promise<void> => {
+      if (!isActive) {
+        return;
+      }
+
       const conversationState = container.resolve(ConversationState);
       const activeConversation = conversationState?.activeConversation();
+
       if (!activeConversation) {
-        if (intervalId) {
+        if (isActive) {
           const MS_IN_SEC = 1000;
-          const retryId = window.setTimeout(sendNext, (messageDelaySecRef.current || 0) * MS_IN_SEC);
-          setIntervalId(retryId);
+          timeoutId = window.setTimeout(sendMessage, messageDelaySec * MS_IN_SEC);
         }
         return;
       }
@@ -89,22 +89,30 @@ export function ConfigToolbar() {
         console.error('Error sending message:', error);
       }
 
-      const MS_IN_SEC = 1000;
-      const delayMs = (messageDelaySecRef.current || 0) * MS_IN_SEC;
-      const nextId = window.setTimeout(sendNext, delayMs);
-      setIntervalId(nextId);
+      if (isActive) {
+        const MS_IN_SEC = 1000;
+        const delayMs = messageDelaySec * MS_IN_SEC;
+        timeoutId = window.setTimeout(sendMessage, delayMs);
+      }
     };
 
-    const firstId = window.setTimeout(sendNext, 0);
-    setIntervalId(firstId);
+    void sendMessage();
+
+    return () => {
+      isActive = false;
+      if (timeoutId !== null) {
+        clearTimeout(timeoutId);
+      }
+    };
+  }, [isMessageSendingActive, prefix, messageDelaySec]);
+
+  const startSendingMessages = () => {
+    messageCountRef.current = 0;
+    setIsMessageSendingActive(true);
   };
 
-  // Stop sending messages and reset the counter
   const stopSendingMessages = () => {
-    if (intervalId) {
-      clearTimeout(intervalId);
-      setIntervalId(null);
-    }
+    setIsMessageSendingActive(false);
     messageCountRef.current = 0;
   };
 
@@ -192,8 +200,6 @@ export function ConfigToolbar() {
     return null;
   }
 
-  const isSending = intervalId !== null;
-
   return (
     <div ref={wrapperRef} css={wrapperStyles}>
       <h3>Developer Menu</h3>
@@ -238,8 +244,8 @@ export function ConfigToolbar() {
           placeholder="0"
         />
       </div>
-      <Button onClick={isSending ? stopSendingMessages : startSendingMessages}>
-        {isSending ? 'Stop Sending Messages' : 'Send Incremented Messages'}
+      <Button onClick={isMessageSendingActive ? stopSendingMessages : startSendingMessages}>
+        {isMessageSendingActive ? 'Stop Sending Messages' : 'Send Incremented Messages'}
       </Button>
 
       <h3>Database dump & restore</h3>
