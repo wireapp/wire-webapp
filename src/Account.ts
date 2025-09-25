@@ -758,6 +758,7 @@ export class Account extends TypedEventEmitter<Events> {
     if (!isClientCapableOfConsumableNotifications && !useLegacy) {
       // do the last legacy sync without connecting to any websockets
       await legacyProcessNotificationStream();
+      this.logger.info('Completed final legacy notification stream processing after enabling async notifications');
     }
 
     if (useLegacy) {
