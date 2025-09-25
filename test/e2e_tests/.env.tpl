@@ -40,7 +40,3 @@ WEBAPP_URL=op://Test Automation/BackendConnection staging/webappUrl
 TEAM_MANAGEMENT_URL=op://Test Automation/BackendConnection staging/teamManagementUrl
 DOMAIN=op://Test Automation/BackendConnection staging/domain
 BASIC_AUTH=op://Test Automation/BackendConnection staging/basicAuth
-
-SSO_USERNAME=op://Test Automation/SSOUsername
-SSO_PASSWORD=op://Test Automation/SSOPassword
-SSO_EMAIL=op://Test Automation/SSOEmail

@@ -92,9 +92,9 @@ test.describe('account settings', () => {
       const {components, pages} = pageManager.webapp;
       // use an extra account
       const ssoUser: User = getUser({
-        email: process.env.SSO_USERNAME,
-        username: process.env.SSO_EMAIL,
-        password: process.env.SSO_PASSWORD,
+        email: process.env.SCIM_USER_SSO_CODE,
+        username: process.env.SCIM_USER_EMAIL,
+        password: process.env.SCIM_USER_PASSWORD,
       });
       await pageManager.openMainPage();
 
