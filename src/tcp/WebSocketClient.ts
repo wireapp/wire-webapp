@@ -267,13 +267,13 @@ export class WebSocketClient extends EventEmitter {
 
     const queryString = queryParams.toString();
 
-    this.logger.info(`WebSocket URL: ${this.baseUrl}${this.versionPrefix}/events?${queryString}`);
+    const websocketAddress = this.useLegacySocket
+      ? `${this.baseUrl}/await?${queryString}`
+      : `${this.baseUrl}${this.versionPrefix}/events?${queryString}`;
 
-    if (this.useLegacySocket) {
-      return `${this.baseUrl}/await?${queryString}`;
-    }
+    this.logger.info(`WebSocket URL: ${websocketAddress}`);
 
-    return `${this.baseUrl}${this.versionPrefix}/events?${queryString}`;
+    return websocketAddress;
   }
 
   public useAsyncNotificationsSocket() {
