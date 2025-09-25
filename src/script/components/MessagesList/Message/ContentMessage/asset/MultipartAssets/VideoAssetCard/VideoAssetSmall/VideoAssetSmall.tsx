@@ -85,6 +85,7 @@ export const VideoAssetSmall = ({
         filePreviewUrl={src}
         fileExtension={extension}
         fileName={fileName}
+        fileUrl={src}
         senderName={senderName}
         timestamp={timestamp}
       />
