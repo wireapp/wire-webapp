@@ -104,6 +104,9 @@ const GroupCreationModal: React.FC<GroupCreationModalProps> = ({
 
   const initialProtocol = protocolOptions.find(protocol => protocol.value === defaultProtocol)!;
 
+  // Read receipts are temorarily disabled for MLS groups and channels until it is supported
+  const areReadReceiptsEnabled = defaultProtocol !== ConversationProtocol.MLS;
+
   //both environment feature flag and team feature flag must be enabled to create conversations with cells
   const isCellsEnabledForEnvironment = Config.getConfig().FEATURE.ENABLE_CELLS;
   const enableCellsToggle = isCellsEnabledForEnvironment && isCellsEnabledForTeam;
@@ -513,15 +516,17 @@ const GroupCreationModal: React.FC<GroupCreationModalProps> = ({
                     info={t('servicesRoomToggleInfo')}
                   />
                 )}
-                <InfoToggle
-                  className="modal-style"
-                  dataUieName="read-receipts"
-                  info={t('readReceiptsToggleInfo')}
-                  isChecked={enableReadReceipts}
-                  setIsChecked={setEnableReadReceipts}
-                  isDisabled={false}
-                  name={t('readReceiptsToggleName')}
-                />
+                {areReadReceiptsEnabled && (
+                  <InfoToggle
+                    className="modal-style"
+                    dataUieName="read-receipts"
+                    info={t('readReceiptsToggleInfo')}
+                    isChecked={enableReadReceipts}
+                    setIsChecked={setEnableReadReceipts}
+                    isDisabled={false}
+                    name={t('readReceiptsToggleName')}
+                  />
+                )}
                 {enableCellsToggle && (
                   <InfoToggle
                     className="modal-style"

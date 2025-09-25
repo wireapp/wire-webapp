@@ -8607,9 +8607,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@wireapp/core@npm:46.34.13":
-  version: 46.34.13
-  resolution: "@wireapp/core@npm:46.34.13"
+"@wireapp/core@npm:46.35.1":
+  version: 46.35.1
+  resolution: "@wireapp/core@npm:46.35.1"
   dependencies:
     "@wireapp/api-client": "npm:^27.75.8"
     "@wireapp/commons": "npm:^5.4.4"
@@ -8629,7 +8629,7 @@ __metadata:
     long: "npm:^5.2.0"
     uuid: "npm:9.0.1"
     zod: "npm:3.24.2"
-  checksum: 10/2fa924184ed0f53762ac3aa3d56657a2aacd339faa1a9c72d4a411005a0d9e88587d29e3391f2adcb369d4f6befed1bf8a37618d1dc18d26c67bfe125e8c3ac2
+  checksum: 10/21ac86b01a738f5837be070dbc284c8d27daa3ce42bb2dcd14e62893e9053321434ead6781066efc982b607f14ebc1c1e6f802cd325d495f58605970c9459bf6
   languageName: node
   linkType: hard
 
@@ -8756,9 +8756,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@wireapp/react-ui-kit@npm:9.63.0":
-  version: 9.63.0
-  resolution: "@wireapp/react-ui-kit@npm:9.63.0"
+"@wireapp/react-ui-kit@npm:9.64.0":
+  version: 9.64.0
+  resolution: "@wireapp/react-ui-kit@npm:9.64.0"
   dependencies:
     "@radix-ui/react-accordion": "npm:1.2.11"
     "@radix-ui/react-dropdown-menu": "npm:2.1.14"
@@ -8775,7 +8775,7 @@ __metadata:
   peerDependenciesMeta:
     "@types/react":
       optional: true
-  checksum: 10/dd5f2b6d21737e4cec1eeebb23804d0e8329c9f9f806a3a9138d1fae466029e62f89a0da5bbd4b13e8d8d8b637209db4f14d6a83d9c904deb914568314df90f0
+  checksum: 10/6ce82d18b2ca1b14a22932d46bd9020eaaff690954486713146b3ef843ce5a9957450ceec9a1799f22a867755c65e4c7a6e5f3b6a93ba5632d11182a16e8f0a8
   languageName: node
   linkType: hard
 
@@ -22440,12 +22440,12 @@ __metadata:
     "@wireapp/avs-debugger": "npm:0.0.7"
     "@wireapp/commons": "npm:5.4.4"
     "@wireapp/copy-config": "npm:2.3.3"
-    "@wireapp/core": "npm:46.34.13"
+    "@wireapp/core": "npm:46.35.1"
     "@wireapp/eslint-config": "npm:3.0.7"
     "@wireapp/kalium-backup": "npm:0.0.4"
     "@wireapp/prettier-config": "npm:0.6.4"
     "@wireapp/promise-queue": "npm:2.4.4"
-    "@wireapp/react-ui-kit": "npm:9.63.0"
+    "@wireapp/react-ui-kit": "npm:9.64.0"
     "@wireapp/store-engine": "npm:5.1.11"
     "@wireapp/store-engine-dexie": "npm:2.1.15"
     "@wireapp/telemetry": "npm:0.3.1"

@@ -25,11 +25,12 @@ import {forcedDownloadFile} from 'Util/util';
 import {FilePlaceholder} from '../common/FilePlaceholder/FilePlaceholder';
 
 interface NoPreviewAvailableProps {
-  fileUrl?: string;
+  fileExtension: string;
   fileName: string;
+  fileUrl?: string;
 }
 
-export const NoPreviewAvailable = ({fileUrl, fileName}: NoPreviewAvailableProps) => {
+export const NoPreviewAvailable = ({fileUrl, fileName, fileExtension}: NoPreviewAvailableProps) => {
   return (
     <FilePlaceholder
       title={t('fileFullscreenModal.noPreviewAvailable.title')}
