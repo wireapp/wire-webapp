@@ -72,6 +72,10 @@ export const tearDownAll = async (api: ApiManagerE2E) => {
   }
   createdTeams.clear();
 
+  await removeAllUser(api);
+};
+
+export const removeAllUser = async (api: ApiManagerE2E) => {
   for (const [, user] of createdUsers.entries()) {
     await removeCreatedUser(api, user);
   }
