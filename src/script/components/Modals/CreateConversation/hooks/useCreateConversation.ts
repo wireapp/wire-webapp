@@ -77,6 +77,9 @@ export const useCreateConversation = () => {
     ? teamState.teamFeatures()?.mls?.config.defaultProtocol
     : ConversationProtocol.PROTEUS;
 
+  // Read receipts are temorarily disabled for MLS groups and channels until it is supported
+  const isGroupWithReadReceiptsEnabled = defaultProtocol !== ConversationProtocol.MLS && isReadReceiptsEnabled;
+
   const getAccessState = () => {
     let access = ACCESS_STATE.TEAM.TEAM_ONLY;
     if (isGuestsEnabled) {
@@ -150,7 +153,7 @@ export const useCreateConversation = () => {
         {
           add_permission: moderator === ADD_PERMISSION.ADMINS ? ADD_PERMISSION.ADMINS : ADD_PERMISSION.EVERYONE,
           protocol: defaultProtocol,
-          receipt_mode: isReadReceiptsEnabled ? RECEIPT_MODE.ON : RECEIPT_MODE.OFF,
+          receipt_mode: isGroupWithReadReceiptsEnabled ? RECEIPT_MODE.ON : RECEIPT_MODE.OFF,
           cells: isCellsEnabled,
           group_conv_type:
             conversationType === ConversationType.Channel
