@@ -21,6 +21,7 @@ import {getUser} from 'test/e2e_tests/data/user';
 import {PageManager} from 'test/e2e_tests/pageManager';
 import {setupBasicTestScenario, startUpApp} from 'test/e2e_tests/utils/setup.util';
 import {tearDownAll} from 'test/e2e_tests/utils/tearDown.util';
+import {createGroup} from 'test/e2e_tests/utils/userActions';
 
 import {test, expect} from '../../test.fixtures';
 
@@ -43,15 +44,14 @@ test.describe('Accessibility', () => {
     async ({pageManager}) => {
       const {components, modals, pages} = pageManager.webapp;
       await startUpApp(pageManager, memberA);
-      // starts an 1o1 // exclude to startup
+
       await components.conversationSidebar().clickConnectButton();
       await components.contactList().clickOnContact(memberB.fullName);
       await modals.userProfile().clickStartConversation();
-      // right click archive
       await pages.conversationList().clickConversationOptions(memberB.fullName);
       await pages.conversationList().archiveConversation();
-
       await components.conversationSidebar().clickArchive();
+
       expect(await pages.conversationList().isConversationItemVisible(memberB.fullName)).toBeTruthy();
 
       await pages.conversationList().clickConversationOptions(memberB.fullName);
@@ -71,27 +71,36 @@ test.describe('Accessibility', () => {
       const memberPageManagerB = new PageManager(memberPage);
 
       const {components, modals, pages} = pageManagerA.webapp;
-      const {pages: pagesB, components: componentsB} = memberPageManagerB.webapp;
+      const {pages: pagesB, components: componentsB, modals: modalsB} = memberPageManagerB.webapp;
 
       await Promise.all([startUpApp(pageManagerA, memberA), startUpApp(memberPageManagerB, memberB)]);
+      try {
+        await modalsB.acknowledge().modal.waitFor({state: 'visible', timeout: 2500});
+        if (await modalsB.acknowledge().isModalPresent()) {
+          await modalsB.acknowledge().clickAction();
+        }
+      } catch (err) {}
 
       await components.conversationSidebar().clickConnectButton();
       await components.contactList().clickOnContact(memberB.fullName);
-      await modals.userProfile().clickStartConversation();
-
+      await pageManagerA.waitForTimeout(500); // wait a moment to render the modal
+      if (await modals.userProfile().isVisible()) {
+        await modals.userProfile().clickStartConversation();
+      }
       await pages.conversationList().clickConversationOptions(memberB.fullName);
-      await pages.conversationList().archiveConversation();
-      await components.conversationSidebar().clickArchive();
 
       expect(await pages.conversationList().isConversationItemVisible(memberB.fullName)).toBeTruthy();
 
       await componentsB.conversationSidebar().clickAllConversationsButton();
       await pagesB.conversationList().openConversation(memberA.fullName);
       await pagesB.conversation().sendMessage('test');
+      await pages.conversationList().archiveConversation();
       await components.conversationSidebar().clickArchive();
 
       expect(await pages.conversationList().isConversationItemVisible(memberB.fullName)).toBeTruthy();
 
+      await pages.conversationList().clickConversationOptions(memberB.fullName);
+      await pages.conversationList().unarchiveConversation();
       await memberContext.close();
     },
   );
@@ -99,13 +108,20 @@ test.describe('Accessibility', () => {
   test(
     'I want to archive the group conversation from conversation details',
     {tag: ['@TC-104', '@regression']},
-    async ({pageManager, browser}) => {
+    async ({pageManager}) => {
+      const groupName = 'test';
+      const {components, pages} = pageManager.webapp;
       await startUpApp(pageManager, memberA);
-      // generate an group
-      // open sidebar
-      // click archive chat
-      // click archive tab
-      // check chat is there
+      await createGroup(pageManager, groupName, [memberB]);
+      await pages.conversation().clickConversationInfoButton();
+      await pages.conversationDetails().clickArchiveButton();
+      await pageManager.waitForTimeout(400);
+      await components.conversationSidebar().clickArchive();
+
+      expect(await pages.conversationList().isConversationItemVisible(groupName)).toBeTruthy();
+
+      await pages.conversationList().clickConversationOptions(groupName);
+      await pages.conversationList().unarchiveConversation();
     },
   );
 
@@ -113,12 +129,23 @@ test.describe('Accessibility', () => {
     'I want to archive the 1on1 conversation from conversation details',
     {tag: ['@TC-105', '@regression']},
     async ({pageManager}) => {
+      const {components, modals, pages} = pageManager.webapp;
       await startUpApp(pageManager, memberA);
-      // generate an group
-      // open sidebar
-      // click archive chat
-      // click archive tab
-      // check chat is there
+
+      await components.conversationSidebar().clickConnectButton();
+      await components.contactList().clickOnContact(memberB.fullName);
+      await pageManager.waitForTimeout(500); // wait a moment to render the modal
+      if (await modals.userProfile().isVisible()) {
+        await modals.userProfile().clickStartConversation();
+      }
+      await pages.conversation().clickConversationInfoButton();
+      await pages.conversationDetails().clickArchiveButton();
+      await components.conversationSidebar().clickArchive();
+
+      expect(await pages.conversationList().isConversationItemVisible(memberB.fullName)).toBeTruthy();
+
+      await pages.conversationList().clickConversationOptions(memberB.fullName);
+      await pages.conversationList().unarchiveConversation();
     },
   );
 

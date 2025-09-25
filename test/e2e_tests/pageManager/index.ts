@@ -28,6 +28,7 @@ import {TeamSignUpPage} from './team_management/pages/teamSignUp.page';
 import {ContactList} from './webapp/components/conversationList.component';
 import {ConversationSidebar} from './webapp/components/conversationSidebar.component';
 import {InputBarControls} from './webapp/components/inputBarControls.component';
+import {AcknowledgeModal} from './webapp/modals/acknowledge.modal';
 import {AppLockModal} from './webapp/modals/appLock.modal';
 import {BlockWarningModal} from './webapp/modals/blockWarning.modal';
 import {CallNotEstablishedModal} from './webapp/modals/callNotEstablished.modal';
@@ -197,6 +198,7 @@ export class PageManager {
       verifyEmail: () => this.getOrCreate('webapp.modals.verifyEmail', () => new VerifyEmailModal(this.page)),
       marketingConsent: () =>
         this.getOrCreate('webapp.modals.marketingConsent', () => new MarketingConsentModal(this.page)),
+      acknowledge: () => this.getOrCreate('webapp.modals.marketingConsent', () => new AcknowledgeModal(this.page)),
     },
     components: {
       contactList: () => this.getOrCreate('webapp.components.ContactList', () => new ContactList(this.page)),
