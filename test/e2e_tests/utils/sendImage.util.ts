@@ -27,7 +27,7 @@ import {readLocalFile} from './asset.util';
 const e2eRootDir = path.join(__dirname, '../');
 const fileTransferAssetsDir = path.join(e2eRootDir, 'assets/filetransfer');
 
-const ImageQRCodeFileName = 'qrcode.jpg';
+export const ImageQRCodeFileName = 'qrcode.jpg';
 
 const getQRCodeValue = async (imageBuffer: Buffer) => {
   const image = await Jimp.read(imageBuffer);

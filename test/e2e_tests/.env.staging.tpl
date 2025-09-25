@@ -16,8 +16,7 @@
 // along with this program. If not, see http://www.gnu.org/licenses/.
 //
 
-# Define browsers [chromium, firefox, webkit]
-BROWSERS=chromium
+# Playwright settings
 HEADLESS=true
 
 # Test service
@@ -26,6 +25,8 @@ TEST_SERVICE_URL=http://192.168.2.18:8080
 # Calling service
 CALLING_SERVICE_URL=op://Test Automation/CALLINGSERVICE_BASIC_AUTH/website
 CALLING_SERVICE_BASIC_AUTH=op://Test Automation/CALLINGSERVICE_BASIC_AUTH/basicAuth
+
+ENV_NAME=staging
 
 # SCIM user for e2e tests
 SCIM_USER_EMAIL=op://Test Automation/Staging SCIM user/okta username
