@@ -27,6 +27,7 @@ export class GroupCreationPage {
   readonly nextButton: Locator;
   readonly createGroupButton: Locator;
   readonly addMembersButton: Locator;
+  readonly filesCheckbox: Locator;
 
   constructor(page: Page) {
     this.page = page;
@@ -36,6 +37,7 @@ export class GroupCreationPage {
     this.nextButton = page.locator('[data-uie-name="go-next"]');
     this.createGroupButton = page.locator('[data-uie-name="do-create-group"]');
     this.addMembersButton = page.locator('[data-uie-name="do-create"]');
+    this.filesCheckbox = page.locator('[data-uie-name="do-toggle-cells"]');
   }
 
   async setGroupName(name: string) {
@@ -53,6 +55,10 @@ export class GroupCreationPage {
 
   async clickAddMembers() {
     await this.addMembersButton.click();
+  }
+
+  async isFilesCheckboxChecked() {
+    return this.filesCheckbox.isEnabled();
   }
 
   async waitForModalClose() {
