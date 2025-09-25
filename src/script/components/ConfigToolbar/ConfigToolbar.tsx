@@ -55,7 +55,7 @@ export function ConfigToolbar() {
 
   useEffect(() => {
     if (!isMessageSendingActive) {
-      return;
+      return () => {};
     }
 
     let timeoutId: number | null = null;
