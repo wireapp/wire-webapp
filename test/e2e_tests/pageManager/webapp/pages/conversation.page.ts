@@ -51,7 +51,6 @@ export class ConversationPage {
   readonly filesTab: Locator;
   readonly isTypingIndicator: Locator;
 
-
   readonly getImageAltText = (user: User) => `Image from ${user.fullName}`;
 
   constructor(page: Page) {
