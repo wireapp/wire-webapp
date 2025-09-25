@@ -29,8 +29,7 @@ export class CellsConversationFilesPage {
   }
 
   async clickFile(fileName: string) {
-    const file = this.filesList.locator(`text=${fileName}`);
-    // TODO: Somehow it resolves to multiple elements, further investigation is needed. It should be a problem with correct data-uie-name values, though.
-    await file.last().click();
+    const file = this.filesList.getByRole('button', {name: fileName});
+    await file.click();
   }
 }

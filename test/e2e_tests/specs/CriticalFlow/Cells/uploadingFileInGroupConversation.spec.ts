@@ -19,7 +19,7 @@
 
 import {getUser} from 'test/e2e_tests/data/user';
 import {PageManager} from 'test/e2e_tests/pageManager';
-import {getImageFilePath, getLocalQRCodeValue} from 'test/e2e_tests/utils/sendImage.util';
+import {getImageFilePath, getLocalQRCodeValue, ImageQRCodeFileName} from 'test/e2e_tests/utils/sendImage.util';
 import {addCreatedTeam, removeCreatedTeam} from 'test/e2e_tests/utils/tearDown.util';
 import {inviteMembers, loginUser} from 'test/e2e_tests/utils/userActions';
 
@@ -56,7 +56,7 @@ test(
       await api.createTeamOwner(userA, teamName).then(user => {
         userA = {...userA, ...user};
       });
-      addCreatedTeam(userA, userA.teamId!);
+      addCreatedTeam(userA, userA.teamId);
       await inviteMembers([userB], userA, api);
 
       await api.brig.unlockCellsFeature(userA.teamId);
@@ -118,10 +118,10 @@ test(
     await test.step('User A opens group conversation files and sees the image file there', async () => {
       await userAPages.conversation().clickFilesTab();
 
-      // TODO: There are no files displayed without this call
+      // TODO: Refresh needed for the Files list to be displayed after the conversation is created [WPB-19978]
       await userAPageManager.refreshPage({waitUntil: 'load'});
 
-      await userAPages.cellsConversationFiles().clickFile(imageFilePath.split('/').pop()!);
+      await userAPages.cellsConversationFiles().clickFile(ImageQRCodeFileName);
 
       expect(await userAModals.cellsFileDetailView().isImageVisible()).toBeTruthy();
     });
