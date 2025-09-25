@@ -23,7 +23,7 @@ import classNames from 'classnames';
 import {container} from 'tsyringe';
 
 import {CALL_TYPE} from '@wireapp/avs';
-import {TabIndex, EmojiIcon, GridIcon, MoreIcon, QUERY, RaiseHandIcon} from '@wireapp/react-ui-kit';
+import {EmojiIcon, GridIcon, MoreIcon, QUERY, RaiseHandIcon, TabIndex} from '@wireapp/react-ui-kit';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import * as Icon from 'Components/Icon';
@@ -34,7 +34,7 @@ import {CallingViewMode, CallState} from 'Repositories/calling/CallState';
 import {Participant} from 'Repositories/calling/Participant';
 import {Conversation} from 'Repositories/entity/Conversation';
 import {ElectronDesktopCapturerSource, MediaDevicesHandler} from 'Repositories/media/MediaDevicesHandler';
-import {MediaDeviceType} from 'Repositories/media/MediaDeviceType';
+import {useMediaDevicesStore} from 'Repositories/media/useMediaDevicesStore';
 import {PropertiesRepository} from 'Repositories/properties/PropertiesRepository';
 import {PROPERTIES_TYPE} from 'Repositories/properties/PropertiesType';
 import {TeamState} from 'Repositories/team/TeamState';
@@ -145,20 +145,20 @@ export const VideoControls: React.FC<VideoControlsProps> = ({
   const {isVideoCallingEnabled} = useKoSubscribableChildren(teamState, ['isVideoCallingEnabled']);
 
   const {
-    [MediaDeviceType.VIDEO_INPUT]: currentCameraDevice,
-    [MediaDeviceType.AUDIO_INPUT]: currentMicrophoneDevice,
-    [MediaDeviceType.AUDIO_OUTPUT]: currentSpeakerDevice,
-  } = useKoSubscribableChildren(mediaDevicesHandler.currentDeviceId, [
-    MediaDeviceType.VIDEO_INPUT,
-    MediaDeviceType.AUDIO_INPUT,
-    MediaDeviceType.AUDIO_OUTPUT,
-  ]);
-
-  const {videoinput, audioinput, audiooutput} = useKoSubscribableChildren(mediaDevicesHandler.availableDevices, [
-    MediaDeviceType.VIDEO_INPUT,
-    MediaDeviceType.AUDIO_INPUT,
-    MediaDeviceType.AUDIO_OUTPUT,
-  ]);
+    currentCameraDevice,
+    currentMicrophoneDevice,
+    currentSpeakerDevice,
+    videoInputDevices,
+    audioInputDevices,
+    audioOutputDevices,
+  } = useMediaDevicesStore(state => ({
+    currentCameraDevice: state.video.input.selectedId,
+    currentMicrophoneDevice: state.audio.input.selectedId,
+    currentSpeakerDevice: state.audio.output.selectedId,
+    videoInputDevices: state.video.input.devices,
+    audioInputDevices: state.audio.input.devices,
+    audioOutputDevices: state.audio.output.devices,
+  }));
 
   const isMobile = useActiveWindowMatchMedia(QUERY.mobile);
   const isDesktop = useActiveWindowMatchMedia(QUERY.desktop);
@@ -171,7 +171,7 @@ export const VideoControls: React.FC<VideoControlsProps> = ({
     isVideoCallingEnabled &&
     (call.initialType === CALL_TYPE.VIDEO || conversation.supportsVideoCall(call.isConference));
 
-  const showSwitchMicrophone = audioinput.length > 1;
+  const showSwitchMicrophone = audioInputDevices.length > 1;
 
   const callViewOptions = [
     {
@@ -195,7 +195,7 @@ export const VideoControls: React.FC<VideoControlsProps> = ({
   const audioOptions = [
     {
       label: t('videoCallaudioInputMicrophone'),
-      options: audioinput.map((device: MediaDeviceInfo | ElectronDesktopCapturerSource) => {
+      options: audioInputDevices.map((device: MediaDeviceInfo | ElectronDesktopCapturerSource) => {
         return isMediaDevice(device)
           ? {
               label: device.label,
@@ -213,7 +213,7 @@ export const VideoControls: React.FC<VideoControlsProps> = ({
     },
     {
       label: t('videoCallaudioOutputSpeaker'),
-      options: audiooutput.map((device: MediaDeviceInfo | ElectronDesktopCapturerSource) => {
+      options: audioOutputDevices.map((device: MediaDeviceInfo | ElectronDesktopCapturerSource) => {
         return isMediaDevice(device)
           ? {
               label: device.label,
@@ -233,16 +233,16 @@ export const VideoControls: React.FC<VideoControlsProps> = ({
 
   const [selectedAudioOptions, setSelectedAudioOptions] = useState(() =>
     [currentMicrophoneDevice, currentSpeakerDevice].flatMap(
-      (device, index) => audioOptions[index].options.find(item => item.id === device) ?? audioOptions[index].options[0],
+      (device, index) => audioOptions[index].options.find(({id}) => id === device) ?? audioOptions[index].options[0],
     ),
   );
 
   const updateAudioOptions = (selectedOption: string, input: boolean) => {
     const microphone = input
-      ? audioOptions[0].options.find(item => item.value === selectedOption) ?? selectedAudioOptions[0]
+      ? audioOptions[0].options.find(({value}) => value === selectedOption) ?? selectedAudioOptions[0]
       : selectedAudioOptions[0];
     const speaker = !input
-      ? audioOptions[1].options.find(item => item.value === selectedOption) ?? selectedAudioOptions[1]
+      ? audioOptions[1].options.find(({value}) => value === selectedOption) ?? selectedAudioOptions[1]
       : selectedAudioOptions[1];
 
     setSelectedAudioOptions([microphone, speaker]);
@@ -273,7 +273,7 @@ export const VideoControls: React.FC<VideoControlsProps> = ({
   const videoOptions = [
     {
       label: t('videoCallvideoInputCamera'),
-      options: videoinput.map((device: MediaDeviceInfo | ElectronDesktopCapturerSource) => {
+      options: videoInputDevices.map((device: MediaDeviceInfo | ElectronDesktopCapturerSource) => {
         return isMediaDevice(device)
           ? {
               label: device.label,
@@ -297,7 +297,7 @@ export const VideoControls: React.FC<VideoControlsProps> = ({
     .concat(hasBlurredBackground ? blurredBackgroundOptions.options[0] : blurredBackgroundOptions.options[1]);
 
   const updateVideoOptions = (selectedOption: string | BlurredBackgroundStatus) => {
-    const camera = videoOptions[0].options.find(item => item.value === selectedOption) ?? selectedVideoOptions[0];
+    const camera = videoOptions[0].options.find(({value}) => value === selectedOption) ?? selectedVideoOptions[0];
     if (selectedOption === BlurredBackgroundStatus.ON) {
       switchBlurredBackground(true);
     } else if (selectedOption === BlurredBackgroundStatus.OFF) {
@@ -472,7 +472,7 @@ export const VideoControls: React.FC<VideoControlsProps> = ({
         <li className="video-controls__item">
           <button
             className="video-controls__button"
-            data-uie-value={!isMuted ? 'inactive' : 'active'}
+            data-uie-value={isMuted ? 'inactive' : 'active'}
             onClick={() => toggleMute(call, !isMuted)}
             onKeyDown={event =>
               handleKeyDown({

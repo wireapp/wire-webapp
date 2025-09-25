@@ -72,6 +72,7 @@ export const FilePreviewModal = ({
     <FileFullscreenModal
       id={id}
       filePreviewUrl={getFileUrl()}
+      fileUrl={fileUrl}
       fileName={fileName}
       fileExtension={fileExtension}
       senderName={senderName}

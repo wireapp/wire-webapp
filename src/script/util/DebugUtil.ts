@@ -129,10 +129,9 @@ export class DebugUtil {
       const startTime = performance.now();
 
       for (const notification of notificationResponse.notifications) {
-        const events = this.core.service.notification.handleNotification(
+        const events = this.core.service!.notification.handleNotification(
           notification,
           NotificationSource.NOTIFICATION_STREAM,
-          false,
         );
 
         for await (const event of events) {

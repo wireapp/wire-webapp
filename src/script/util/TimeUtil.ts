@@ -329,31 +329,30 @@ export const formatDelayTime = (delayTimeInMS: number): string => {
 
 /**
  * Format duration into a coarse, human-readable unit:
- * - ≥ 1 day   → "X days"
- * - ≥ 1 hour  → "X hours"
- * - ≥ 1 min   → "X minutes"
- * - < 1 min   → "1 minute"
+ * update the comments:
+ * - > 1 day   → "Loading messages from the last X days"
+ * - > 24H     → "Loading messages from the last 1 day"
+ * - > 1 hour  → "Loading messages from the last X hours"
+ * - > 60 min  → "Loading messages from the last 1 hour"
+ * - > 1 min   → "Loading messages from the last X minutes"
+ * - > 60 sec  → "Loading messages from the last 1 minute"
  *
  * @param duration - Duration in milliseconds
  * @returns Localized string of the coarsest applicable unit
  */
-export const formatCoarseDuration = (duration: number): string => {
+export const formatCoarseDuration = (duration: number) => {
   if (duration >= TIME_IN_MILLIS.DAY) {
     const days = Math.floor(duration / TIME_IN_MILLIS.DAY);
-    return `${days} ${t(`ephemeralUnitsDay${days === 1 ? '' : 's'}`)}`;
+    return t(`initProgressDays${days === 1 ? 'Singular' : 'Plural'}`, {time: days});
   }
 
   if (duration >= TIME_IN_MILLIS.HOUR) {
     const hours = Math.floor(duration / TIME_IN_MILLIS.HOUR);
-    return `${hours} ${t(`ephemeralUnitsHour${hours === 1 ? '' : 's'}`)}`;
+    return t(`initProgressHours${hours === 1 ? 'Singular' : 'Plural'}`, {time: hours});
   }
 
-  if (duration >= TIME_IN_MILLIS.MINUTE) {
-    const minutes = Math.floor(duration / TIME_IN_MILLIS.MINUTE);
-    return `${minutes} ${t(`ephemeralUnitsMinute${minutes === 1 ? '' : 's'}`)}`;
-  }
-
-  return `1 ${t('ephemeralUnitsMinute')}`;
+  const minutes = Math.max(1, Math.floor(duration / TIME_IN_MILLIS.MINUTE));
+  return t(`initProgressMinutes${minutes === 1 ? 'Singular' : 'Plural'}`, {time: minutes});
 };
 
 /**

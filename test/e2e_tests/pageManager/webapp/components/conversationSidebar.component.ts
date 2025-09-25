@@ -32,6 +32,7 @@ export class ConversationSidebar {
   readonly connectButton: Locator;
   readonly archiveButton: Locator;
   readonly manageTeamButton: Locator;
+  readonly sidebar: Locator;
 
   constructor(page: Page) {
     this.page = page;
@@ -44,6 +45,7 @@ export class ConversationSidebar {
     this.connectButton = page.locator(`button${selectByDataAttribute('go-people')}`);
     this.archiveButton = page.locator(selectByDataAttribute('go-archive'));
     this.manageTeamButton = page.locator(selectByDataAttribute('go-team-management'));
+    this.sidebar = page.locator(`.conversations-sidebar-items`);
   }
 
   async getPersonalStatusName() {
