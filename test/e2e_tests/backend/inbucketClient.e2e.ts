@@ -48,7 +48,7 @@ export class InbucketClientE2E {
       const response = await this.getLatestEmail(email);
       if (response.status === 200) {
         const message = await response.data;
-        verificationCode = message.subject.substring(0, 6);
+        verificationCode = message.subject.slice(-6);
         if (verificationCode !== undefined) {
           break;
         }
@@ -61,7 +61,7 @@ export class InbucketClientE2E {
       throw new Error('Correct verification code not found in the email subject');
     }
 
-    return verificationCode;
+    return verificationCode as string;
   }
 
   async getAccountDeletionURL(email: string) {
