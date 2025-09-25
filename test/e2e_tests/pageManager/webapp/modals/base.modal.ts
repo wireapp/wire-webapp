@@ -24,16 +24,16 @@ export abstract class BaseModal {
   readonly modal: Locator;
   readonly modalTitle: Locator;
   readonly modalText: Locator;
-  readonly blockButton: Locator;
+  readonly actionButton: Locator;
   readonly cancelButton: Locator;
 
   constructor(page: Page, modalLocator: string) {
     this.page = page;
     this.modal = page.locator(modalLocator);
-    this.modalTitle = this.modal.locator("[data-uie-name='status-modal-title']");
-    this.modalText = this.modal.locator("[data-uie-name='status-modal-text']");
-    this.blockButton = this.modal.locator("[data-uie-name='do-action']");
-    this.cancelButton = this.modal.locator("[data-uie-name='do-secondary']");
+    this.modalTitle = this.modal.getByTestId('status-modal-title');
+    this.modalText = this.modal.getByTestId('status-modal-text');
+    this.actionButton = this.modal.getByTestId('do-action');
+    this.cancelButton = this.modal.getByTestId('do-secondary');
   }
 
   async isModalPresent() {
@@ -49,7 +49,7 @@ export abstract class BaseModal {
   }
 
   async isBlockButtonVisible() {
-    return await this.blockButton.isVisible();
+    return await this.actionButton.isVisible();
   }
 
   async clickCancel() {
@@ -57,6 +57,6 @@ export abstract class BaseModal {
   }
 
   async clickBlock() {
-    await this.blockButton.click();
+    await this.actionButton.click();
   }
 }

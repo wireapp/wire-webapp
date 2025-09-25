@@ -32,7 +32,7 @@ export class AccountPage {
   readonly restoreBackupButton: Locator;
   readonly logoutButton: Locator;
   readonly emailDisplay: Locator;
-  readonly displayNameDisplay: Locator;
+  readonly nameDisplay: Locator;
   readonly domainDisplay: Locator;
   readonly usernameDisplay: Locator;
   readonly editEmailButton: Locator;
@@ -57,7 +57,7 @@ export class AccountPage {
     this.emailInput = page.locator(selectByDataAttribute('enter-email-input'));
     this.displayNameInput = page.locator(selectByDataAttribute('enter-displayname-input'));
     this.emailDisplay = page.locator(selectByDataAttribute('email-display'));
-    this.displayNameDisplay = page.locator(selectByDataAttribute('displayname-display'));
+    this.nameDisplay = page.locator(selectByDataAttribute('displayname-display'));
     this.domainDisplay = page.locator(selectByDataAttribute('item-enriched-value'));
     this.usernameDisplay = page.locator(selectByDataAttribute('username-display'));
     this.resetPasswordButton = page.locator(selectByDataAttribute('do-reset-password'));

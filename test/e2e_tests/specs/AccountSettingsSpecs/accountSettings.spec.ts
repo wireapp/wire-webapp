@@ -19,7 +19,7 @@
 
 import {getUser, User} from 'test/e2e_tests/data/user';
 import {PageManager} from 'test/e2e_tests/pageManager';
-import {setupBasicTestScenario, startUpApp} from 'test/e2e_tests/utils/setup.utli';
+import {bootstrapTeamForTesting, completeLogin} from 'test/e2e_tests/utils/setup.util';
 import {tearDownAll} from 'test/e2e_tests/utils/tearDown.util';
 import {createChannel, createGroup, loginUser} from 'test/e2e_tests/utils/userActions';
 
@@ -32,18 +32,18 @@ test.describe('account settings', () => {
   test.slow();
 
   test.beforeAll(async ({api}) => {
-    const user = await setupBasicTestScenario(api, members, owner, 'test');
+    const user = await bootstrapTeamForTesting(api, members, owner, 'test');
     owner = {...owner, ...user};
   });
 
   test('Edit Profile', {tag: ['@TC-8770', '@regression']}, async ({pageManager}) => {
     const {components, pages} = pageManager.webapp;
 
-    await startUpApp(pageManager, memberA);
+    await completeLogin(pageManager, memberA);
     await components.conversationSidebar().clickPreferencesButton();
 
     await expect(pages.account().emailDisplay).toHaveText(memberA.email);
-    await expect(pages.account().displayNameDisplay).toHaveText(memberA.fullName);
+    await expect(pages.account().nameDisplay).toHaveText(memberA.fullName);
     await expect(pages.account().domainDisplay).toHaveText('staging.zinfra.io');
     await expect(pages.account().usernameDisplay).toHaveText(`@${memberA.username}@staging.zinfra.io`);
   });
@@ -54,7 +54,7 @@ test.describe('account settings', () => {
     async ({pageManager}) => {
       const {components, modals, pages} = pageManager.webapp;
 
-      await startUpApp(pageManager, memberA);
+      await completeLogin(pageManager, memberA);
       await components.conversationSidebar().clickPreferencesButton();
 
       await expect(pages.account().emailDisplay).toHaveText(memberA.email);
@@ -72,7 +72,7 @@ test.describe('account settings', () => {
       const incorrectEmail = 'nopewearezeta.com';
       const {components, modals, pages} = pageManager.webapp;
 
-      await startUpApp(pageManager, memberA);
+      await completeLogin(pageManager, memberA);
       await components.conversationSidebar().clickPreferencesButton();
 
       await expect(pages.account().emailDisplay).toHaveText(memberA.email);
@@ -124,7 +124,7 @@ test.describe('account settings', () => {
     async ({pageManager}) => {
       const {components, modals, pages} = pageManager.webapp;
 
-      await startUpApp(pageManager, memberA);
+      await completeLogin(pageManager, memberA);
       await components.conversationSidebar().clickPreferencesButton();
 
       await pages.settings().clickOptionsButton();
@@ -158,7 +158,7 @@ test.describe('account settings', () => {
     async ({pageManager}) => {
       const {components} = pageManager.webapp;
 
-      await startUpApp(pageManager, owner);
+      await completeLogin(pageManager, owner);
 
       await expect(components.conversationSidebar().manageTeamButton).toBeVisible();
       await expect(await components.conversationSidebar().manageTeamButton.getAttribute('href')).toBe(
@@ -173,7 +173,7 @@ test.describe('account settings', () => {
     async ({pageManager}) => {
       const {components} = pageManager.webapp;
 
-      await startUpApp(pageManager, memberA);
+      await completeLogin(pageManager, memberA);
       await expect(components.conversationSidebar().manageTeamButton).toHaveCount(0);
     },
   );
@@ -195,7 +195,7 @@ test.describe('account settings', () => {
         consoleMessages.push(msg.text());
       });
 
-      await Promise.all([startUpApp(memberPageManagerA, memberA), startUpApp(memberPageManagerB, memberB)]);
+      await Promise.all([completeLogin(memberPageManagerA, memberA), completeLogin(memberPageManagerB, memberB)]);
 
       await components.conversationSidebar().clickConnectButton();
       await components.contactList().clickOnContact(memberB.fullName);
@@ -229,7 +229,7 @@ test.describe('account settings', () => {
       const groupName = 'test group';
       const {components, pages} = pageManager.webapp;
 
-      await startUpApp(pageManager, memberA);
+      await completeLogin(pageManager, memberA);
 
       await expect(components.conversationSidebar().personalStatusLabel).toHaveText(memberA.fullName);
 
@@ -263,7 +263,7 @@ test.describe('account settings', () => {
 
       // go to settings
       await components.conversationSidebar().clickPreferencesButton();
-      await expect(pages.account().displayNameDisplay).toHaveText(memberA.fullName);
+      await expect(pages.account().nameDisplay).toHaveText(memberA.fullName);
     },
   );
 
