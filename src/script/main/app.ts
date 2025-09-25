@@ -573,6 +573,9 @@ export class App {
         },
       );
 
+      // Pause the notification queue until we've fully initialized
+      this.core.pauseNotificationQueue();
+
       eventLogger.log(AppInitializationStep.DecryptionCompleted, {count: totalNotifications});
 
       await conversationRepository.init1To1Conversations(connections, conversations);
@@ -636,6 +639,10 @@ export class App {
       this.logger.info(`App version ${Environment.version()} loaded in ${Date.now() - startTime}ms`);
 
       eventLogger.log(AppInitializationStep.AppInitCompleted);
+
+      // resume the notification queue now that we're fully initialized
+      this.core.resumeNotificationQueue();
+
       return selfUser;
     } catch (error) {
       if (error instanceof BaseError) {
