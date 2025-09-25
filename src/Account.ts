@@ -1082,6 +1082,16 @@ export class Account extends TypedEventEmitter<Events> {
     this.logger.info('Notification processing queue paused and flushed');
   };
 
+  public readonly pauseNotificationQueue = () => {
+    this.notificationProcessingQueue.pause();
+    this.logger.info('Notification processing queue paused');
+  };
+
+  public readonly resumeNotificationQueue = () => {
+    this.notificationProcessingQueue.resume();
+    this.logger.info('Notification processing queue resumed');
+  };
+
   /**
    * Sets up WebSocket event listeners for:
    * - Incoming backend messages
