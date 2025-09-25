@@ -33,9 +33,13 @@ import {wrapperStyles} from './ConfigToolbar.styles';
 export function ConfigToolbar() {
   const [showConfig, setShowConfig] = useState(false);
   const [configFeaturesState, setConfigFeaturesState] = useState<Configuration['FEATURE']>(Config.getConfig().FEATURE);
-  const [intervalId, setIntervalId] = useState<number | null>(null); // For managing setInterval
+  const [intervalId, setIntervalId] = useState<number | null>(null); // Stores active timeout id (renamed kept for minimal change)
   const messageCountRef = useRef<number>(0); // For the message count
   const [prefix, setPrefix] = useState('Message -'); // Prefix input
+  // Delay between automated messages in seconds (can be fractional). 0 = send back-to-back.
+  const [messageDelaySec, setMessageDelaySec] = useState<number>(0);
+  // Ref to always access latest delay inside async loop without re-registering timers
+  const messageDelaySecRef = useRef<number>(messageDelaySec);
   const wrapperRef = useRef(null);
   const [avsDebuggerEnabled, setAvsDebuggerEnabled] = useState(!!window.wire?.app?.debug?.isEnabledAvsDebugger()); //
 
@@ -52,25 +56,26 @@ export function ConfigToolbar() {
     };
   }, []);
 
+  useEffect(() => {
+    messageDelaySecRef.current = messageDelaySec;
+  }, [messageDelaySec]);
+
   const startSendingMessages = () => {
     if (intervalId) {
       return;
     }
 
-    let isRequestInProgress = false;
-
-    const id = window.setInterval(async () => {
-      if (isRequestInProgress) {
-        return;
-      }
-
+    const sendNext = async () => {
       const conversationState = container.resolve(ConversationState);
       const activeConversation = conversationState?.activeConversation();
       if (!activeConversation) {
+        if (intervalId) {
+          const MS_IN_SEC = 1000;
+          const retryId = window.setTimeout(sendNext, (messageDelaySecRef.current || 0) * MS_IN_SEC);
+          setIntervalId(retryId);
+        }
         return;
       }
-
-      isRequestInProgress = true;
 
       try {
         await window.wire.app.repository.message.sendTextWithLinkPreview({
@@ -79,25 +84,28 @@ export function ConfigToolbar() {
           mentions: [],
           quoteEntity: undefined,
         });
-
         messageCountRef.current++;
       } catch (error) {
         console.error('Error sending message:', error);
-      } finally {
-        isRequestInProgress = false;
       }
-    }, 100);
 
-    setIntervalId(id);
+      const MS_IN_SEC = 1000;
+      const delayMs = (messageDelaySecRef.current || 0) * MS_IN_SEC;
+      const nextId = window.setTimeout(sendNext, delayMs);
+      setIntervalId(nextId);
+    };
+
+    const firstId = window.setTimeout(sendNext, 0);
+    setIntervalId(firstId);
   };
 
   // Stop sending messages and reset the counter
   const stopSendingMessages = () => {
     if (intervalId) {
-      clearInterval(intervalId);
+      clearTimeout(intervalId);
       setIntervalId(null);
-      messageCountRef.current = 0;
     }
+    messageCountRef.current = 0;
   };
 
   // Update the config state when form input changes
@@ -184,6 +192,8 @@ export function ConfigToolbar() {
     return null;
   }
 
+  const isSending = intervalId !== null;
+
   return (
     <div ref={wrapperRef} css={wrapperStyles}>
       <h3>Developer Menu</h3>
@@ -191,7 +201,6 @@ export function ConfigToolbar() {
         Caution: Modifying these settings can affect the behavior of the application. Ensure you understand the
         implications of each change before proceeding. Changes may cause unexpected behavior.
       </h4>
-      <div>{renderConfig(configFeaturesState)}</div>
 
       <hr />
 
@@ -212,8 +221,26 @@ export function ConfigToolbar() {
         onChange={event => setPrefix(event.currentTarget.value)}
         placeholder="Prefix for the messages"
       />
-      <Button onClick={startSendingMessages}>Send Incremented Messages</Button>
-      <Button onClick={stopSendingMessages}>Stop Sending Messages</Button>
+      <div style={{marginTop: '8px'}}>
+        <label htmlFor="message-delay-input" style={{display: 'block', fontWeight: 'bold'}}>
+          Delay Between Messages (seconds)
+        </label>
+        <Input
+          id="message-delay-input"
+          type="number"
+          min={0}
+          step={0.1}
+          value={messageDelaySec}
+          onChange={event => {
+            const val = parseFloat(event.currentTarget.value);
+            setMessageDelaySec(Number.isNaN(val) || val < 0 ? 0 : val);
+          }}
+          placeholder="0"
+        />
+      </div>
+      <Button onClick={isSending ? stopSendingMessages : startSendingMessages}>
+        {isSending ? 'Stop Sending Messages' : 'Send Incremented Messages'}
+      </Button>
 
       <h3>Database dump & restore</h3>
       <h6 style={{color: 'red', fontWeight: 'bold'}}>
@@ -222,6 +249,9 @@ export function ConfigToolbar() {
       </h6>
       <Button onClick={() => window.wire?.app?.debug?.dumpIndexedDB()}>Dump IndexedDB</Button>
       <Button onClick={() => window.wire?.app?.debug?.restoreIndexedDB()}>Restore IndexedDB</Button>
+
+      <h3>Environment Variables</h3>
+      <div>{renderConfig(configFeaturesState)}</div>
     </div>
   );
 }
