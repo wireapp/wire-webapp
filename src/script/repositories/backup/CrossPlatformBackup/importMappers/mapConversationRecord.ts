@@ -23,6 +23,8 @@ import {ConversationRecord} from 'Repositories/storage';
 
 import {BackUpConversation} from '../CPB.library';
 
+const isGroupConversation = (name: string) => name.length > 0;
+
 export const mapConversationRecord = ({
   id: qualifiedId,
   name,
@@ -45,7 +47,7 @@ export const mapConversationRecord = ({
     // In the case of recovered conversations that a user has since left, the type will not be possible to obtain from the back-end.
     // Not having a type would prevent those to sisplay correctly in the UI.
     // 1 to 1 conversations do not have a name, so we can use that to determine the type.
-    type: name.length > 0 ? CONVERSATION_TYPE.REGULAR : CONVERSATION_TYPE.ONE_TO_ONE,
+    type: isGroupConversation(name) ? CONVERSATION_TYPE.REGULAR : CONVERSATION_TYPE.ONE_TO_ONE,
   } as ConversationRecord;
   return conversationRecord;
 };
