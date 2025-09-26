@@ -259,8 +259,10 @@ export const VirtualizedMessagesList = ({
     return () => clearTimeout(timeout);
   }, [isConversationLoaded, virtualItems]);
 
-  useEffect(() => {
-    virtualizer.measure();
+  useLayoutEffect(() => {
+    requestAnimationFrame(() => {
+      virtualizer.measure();
+    });
   }, [virtualizer, groupedMessages.length]);
 
   if (!isConversationLoaded) {
