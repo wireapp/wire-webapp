@@ -14,57 +14,23 @@ on:
         default: staging
 
   schedule:
-    # runs on all three of the environments (in the morning, 9:00 Berlin summer time)
+    # Berlin 9 AM = 7 AM UTC in summer
     - cron: '0 7 * * *'
 
 jobs:
-  smoke-tests:
-    name: Run Playwright Cells Critical Flow Tests
-    if: github.repository == 'wireapp/wire-webapp'
-    runs-on: [self-hosted, Linux, X64, office]
-
-    # Strategy is only used for scheduled runs, for manual runs the selected environment is used
+  # Scheduled: runs all 3 environments via matrix
+  cells-crit-flow-tests-scheduled:
+    if: github.event_name == 'schedule'
     strategy:
       matrix:
         environment: [imai, fulu, staging]
+    uses: ./.github/workflows/actions/run-cells-crit-flow-e2e-tests.yml
+    with:
+      environment: ${{ matrix.environment }}
 
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 18.16.x
-          cache: 'yarn'
-
-      - name: Install JS dependencies
-        run: yarn --immutable
-
-      - name: Install Playwright browsers
-        run: yarn playwright install --with-deps && yarn playwright install chrome
-
-      - name: Install 1Password
-        uses: 1password/install-cli-action@143a85f84a90555d121cde2ff5872e393a47ab9f
-
-      - name: Generate env file for manual run
-        if: github.event_name == 'workflow_dispatch'
-        run: op inject -i test/e2e_tests/.env.${{ github.event.inputs.environment }}.tpl -o test/e2e_tests/.env
-        env:
-          OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
-
-      - name: Generate env file for scheduled run
-        if: github.event_name == 'schedule'
-        run: op inject -i test/e2e_tests/.env.${{ matrix.environment }}.tpl -o test/e2e_tests/.env
-        env:
-          OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
-
-      - name: Run critical flow tests
-        run: yarn e2e-test --grep "@crit-flow-cells"
-
-      - name: Upload test report
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: playwright-report
-          path: playwright-report/
+  # Manual: runs single environment via input
+  cells-crit-flow-tests-manual:
+    if: github.event_name == 'workflow_dispatch'
+    uses: ./.github/workflows/actions/run-cells-crit-flow-e2e-tests.yml
+    with:
+      environment: ${{ github.event.inputs.environment }}
