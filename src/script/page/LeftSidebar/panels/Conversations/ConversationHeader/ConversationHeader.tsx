@@ -36,9 +36,9 @@ import {useChannelsFeatureFlag} from 'Util/useChannelsFeatureFlag';
 
 import {
   button,
+  closeIconStyles,
   header,
   label,
-  closeIconStyles,
   searchIconStyles,
   searchInputStyles,
   searchInputWrapperStyles,
@@ -84,6 +84,7 @@ export const ConversationHeaderComponent = ({
     [SidebarTabs.FOLDER]: t('folderViewTooltip'),
     [SidebarTabs.ARCHIVES]: t('conversationFooterArchive'),
     [SidebarTabs.CONNECT]: t('searchConnect'),
+    [SidebarTabs.MEETINGS]: t('meetings.navigation.title'),
   };
 
   const onKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {
