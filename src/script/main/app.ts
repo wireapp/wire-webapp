@@ -836,7 +836,7 @@ export class App {
   private readonly showClientCertificateRevokedWarning = async () => {
     const {modalOptions, modalType} = getModalOptions({
       type: ModalType.SELF_CERTIFICATE_REVOKED,
-      primaryActionFn: () => this.repository.lifeCycle.logout(SIGN_OUT_REASON.APP_INIT, false),
+      primaryActionFn: () => void this.repository.lifeCycle.logout(SIGN_OUT_REASON.APP_INIT, false),
     });
 
     PrimaryModal.show(modalType, modalOptions);
