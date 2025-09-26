@@ -1,36 +1,20 @@
-name: Playwright Cells Critical Flow Tests
+name: Run Cells Critical Flow E2E Tests
 
 on:
-  workflow_dispatch:
+  workflow_call:
     inputs:
       environment:
-        description: 'Select the environment'
         required: true
-        type: choice
-        options:
-          - imai
-          - fulu
-          - staging
-        default: staging
-
-  schedule:
-    # runs on all three of the environments (in the morning, 9:00 Berlin summer time)
-    - cron: '0 7 * * *'
+        type: string
+    secrets:
+      OP_SERVICE_ACCOUNT_TOKEN:
+        required: true
 
 jobs:
-  smoke-tests:
+  cells-crit-flow-e2e-tests:
     name: Run Playwright Cells Critical Flow Tests
     if: github.repository == 'wireapp/wire-webapp'
     runs-on: [self-hosted, Linux, X64, office]
-
-    # Strategy is only used for scheduled runs, for manual runs the selected environment is used
-    strategy:
-      matrix:
-        environment: >-
-          ${{ github.event_name == 'schedule'
-              && fromJson('["imai","fulu","staging"]')
-              || fromJson(format('["{0}"]', github.event.inputs.environment)) }}
-
 
     steps:
       - name: Checkout repository
@@ -55,7 +39,6 @@ jobs:
         run: op inject -i test/e2e_tests/.env.${{ github.event.inputs.environment }}.tpl -o test/e2e_tests/.env
         env:
           OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
-
       - name: Run critical flow tests
         run: yarn e2e-test --grep "@crit-flow-cells"
 
