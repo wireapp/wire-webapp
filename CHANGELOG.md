@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [9.65.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/react-ui-kit@9.64.1...@wireapp/react-ui-kit@9.65.0) (2025-09-26)
+
+### Features
+
+* update ButtonGroup to adapt colours according to dark/light theme ([#7378](https://github.com/wireapp/wire-web-packages/issues/7378)) ([77a19cc](https://github.com/wireapp/wire-web-packages/commit/77a19cc2840ba1498875205c1e13ec4ea3025dbc))
+
 ## [9.64.1](https://github.com/wireapp/wire-web-packages/compare/@wireapp/react-ui-kit@9.64.0...@wireapp/react-ui-kit@9.64.1) (2025-09-25)
 
 **Note:** Version bump only for package @wireapp/react-ui-kit
