@@ -27,12 +27,11 @@ import {createRoot} from 'react-dom/client';
 import {Runtime} from '@wireapp/commons';
 
 import {AppContainer} from 'Components/AppContainer/AppContainer';
+import {doSimpleRedirect} from 'Repositories/LifeCycleRepository/LifeCycleRepository';
 import {StorageKey} from 'Repositories/storage';
 import {enableLogging} from 'Util/LoggerUtil';
 import {loadValue} from 'Util/StorageUtil';
 import {exposeWrapperGlobals} from 'Util/wrapper';
-
-import {doRedirect} from './app';
 
 import {SIGN_OUT_REASON} from '../auth/SignOutReason';
 import {Config} from '../Config';
@@ -60,7 +59,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   const shouldPersist = loadValue<boolean>(StorageKey.AUTH.PERSIST);
 
   if (shouldPersist === undefined) {
-    return doRedirect(SIGN_OUT_REASON.NOT_SIGNED_IN);
+    return doSimpleRedirect(SIGN_OUT_REASON.NOT_SIGNED_IN);
   }
 
   createRoot(appContainer).render(
