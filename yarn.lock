@@ -15858,6 +15858,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"lexical@npm:0.36.1":
+  version: 0.36.1
+  resolution: "lexical@npm:0.36.1"
+  checksum: 10/391cf9f97ed0f3f5d5ad0ced8c33eb36c2fa1992fac8a069c2fe730ac6c9453e6b9d9d3e32c1e23e505958ddaa05eafeea8bb4f0ecae95d1667d919e802478b4
+  languageName: node
+  linkType: hard
+
 "libsodium-sumo@npm:^0.7.0":
   version: 0.7.15
   resolution: "libsodium-sumo@npm:0.7.15"
@@ -22518,7 +22525,7 @@ __metadata:
     knockout: "npm:3.5.1"
     less: "npm:4.4.1"
     less-loader: "npm:12.3.0"
-    lexical: "npm:0.27.2"
+    lexical: "npm:0.36.1"
     libsodium-wrappers: "npm:0.7.15"
     linkify-it: "npm:5.0.0"
     lint-staged: "npm:15.5.0"
