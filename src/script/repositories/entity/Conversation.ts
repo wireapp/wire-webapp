@@ -742,37 +742,39 @@ export class Conversation {
    * @returns If a message was replaced in the conversation
    */
   addMessage(messageEntity: Message): boolean | void {
-    if (messageEntity) {
-      const messageWithLinkPreview = () => this._findDuplicate(messageEntity.id, messageEntity.from);
-      const editedMessage = () =>
-        this._findDuplicate((messageEntity as ContentMessage).replacing_message_id, messageEntity.from);
-      const alreadyAdded = messageWithLinkPreview() || editedMessage();
-
-      if (messageEntity.isContent()) {
-        this.hasContentMessages(true);
-      }
-      if (alreadyAdded) {
-        return false;
-      }
-
-      const {contentState} = useAppState.getState();
-
-      // When the search tab is active, push message to incomming message and update the timestamps
-      if (contentState === ContentState.COLLECTION) {
-        this.incomingMessages.push(messageEntity);
-        this.updateTimestamps(messageEntity);
-      } else if (this.hasLastReceivedMessageLoaded()) {
-        this.updateTimestamps(messageEntity);
-        this.incomingMessages.remove(({id}) => messageEntity.id === id);
-        // If the last received message is currently in memory, we can add this message to the displayed messages
-        this.messages_unordered.push(messageEntity);
-      } else {
-        // If the conversation is not loaded, we will add this message to the incoming messages (but not to the messages displayed)
-        this.incomingMessages.push(messageEntity);
-      }
-      amplify.publish(WebAppEvents.CONVERSATION.MESSAGE.ADDED, messageEntity);
-      return true;
+    if (!messageEntity) {
+      return;
     }
+
+    const messageWithLinkPreview = () => this._findDuplicate(messageEntity.id, messageEntity.from);
+    const editedMessage = () =>
+      this._findDuplicate((messageEntity as ContentMessage).replacing_message_id, messageEntity.from);
+    const alreadyAdded = messageWithLinkPreview() || editedMessage();
+
+    if (messageEntity.isContent()) {
+      this.hasContentMessages(true);
+    }
+    if (alreadyAdded) {
+      return false;
+    }
+
+    const {contentState} = useAppState.getState();
+
+    // When the search tab is active, push message to incomming message and update the timestamps
+    if (contentState === ContentState.COLLECTION) {
+      this.incomingMessages.push(messageEntity);
+      this.updateTimestamps(messageEntity);
+    } else if (this.hasLastReceivedMessageLoaded()) {
+      this.updateTimestamps(messageEntity);
+      this.incomingMessages.remove(({id}) => messageEntity.id === id);
+      // If the last received message is currently in memory, we can add this message to the displayed messages
+      this.messages_unordered.push(messageEntity);
+    } else {
+      // If the conversation is not loaded, we will add this message to the incoming messages (but not to the messages displayed)
+      this.incomingMessages.push(messageEntity);
+    }
+    amplify.publish(WebAppEvents.CONVERSATION.MESSAGE.ADDED, messageEntity);
+    return true;
   }
 
   /**
