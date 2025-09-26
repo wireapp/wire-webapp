@@ -6,9 +6,7 @@ on:
     - cron: '0 7 * * *'
 
 jobs:
-  # Scheduled: runs all 3 environments via matrix
   cells-crit-flow-tests-scheduled:
-    if: github.event_name == 'schedule'
     strategy:
       matrix:
         environment: [imai, fulu, staging]
