@@ -6,6 +6,9 @@ on:
       environment:
         required: true
         type: string
+    secrets:
+      OP_SERVICE_ACCOUNT_TOKEN:
+        required: true
 
 jobs:
   cells-crit-flow-e2e-tests:
