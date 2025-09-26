@@ -278,6 +278,8 @@ const MainContent = ({
                 conversationRepository={repositories.conversation}
               />
             )}
+
+            {contentState === ContentState.MEETINGS && <span>Meetings View</span>}
           </>
         </Animated>
       </SwitchTransition>

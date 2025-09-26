@@ -18,7 +18,7 @@
  */
 
 import {create} from 'zustand';
-import {persist, createJSONStorage} from 'zustand/middleware';
+import {createJSONStorage, persist} from 'zustand/middleware';
 
 export enum SidebarTabs {
   RECENT,
@@ -31,6 +31,7 @@ export enum SidebarTabs {
   CONNECT,
   PREFERENCES,
   CELLS,
+  MEETINGS,
 }
 
 export enum ConversationFilter {
@@ -75,7 +76,9 @@ const useSidebarStore = create<SidebarStore>()(
       storage: createJSONStorage(() => localStorage),
       partialize: state => ({
         status: state.status,
-        currentTab: [SidebarTabs.PREFERENCES, SidebarTabs.CONNECT, SidebarTabs.CELLS].includes(state.currentTab)
+        currentTab: [SidebarTabs.PREFERENCES, SidebarTabs.CONNECT, SidebarTabs.CELLS, SidebarTabs.MEETINGS].includes(
+          state.currentTab,
+        )
           ? SidebarTabs.RECENT
           : state.currentTab,
         conversationFilter: state.conversationFilter,

@@ -1189,6 +1189,9 @@ declare module 'I18n/en-US.json' {
     'messageFailedToSendWillNotReceiveSingular': `won\'t get your message.`;
     'messageFailedToSendWillReceivePlural': `will get your message later.`;
     'messageFailedToSendWillReceiveSingular': `will get your message later.`;
+    'meetings.navigation.parent.label': `Meetings`;
+    'meetings.navigation.title': `Meetings`;
+    'meetings.navigation.label': `Meetings`;
     'mlsConversationRecovered': `You haven\'t used this device for a while, or an issue has occurred. Some older messages may not appear here.`;
     'mlsSignature': `MLS with {signature} Signature`;
     'mlsThumbprint': `MLS Thumbprint`;
