@@ -103,7 +103,7 @@ export class LifeCycleRepository {
    * Handles login redirect after connectivity verification.
    * Temporary guests are redirected to the main website instead of login.
    */
-  redirectToLogin = (signOutReason: SIGN_OUT_REASON): void => {
+  public redirectToLogin = (signOutReason: SIGN_OUT_REASON): void => {
     this.logger.info(`Redirecting to login after connectivity verification. Reason: ${signOutReason}`);
 
     const isTemporaryGuestSignOut = LifeCycleRepository.LOGOUT_CONFIG.TEMPORARY_GUEST_REASONS.includes(signOutReason);
