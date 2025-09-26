@@ -26,13 +26,12 @@ TEST_SERVICE_URL=http://192.168.2.18:8080
 CALLING_SERVICE_URL=op://Test Automation/CALLINGSERVICE_BASIC_AUTH/website
 CALLING_SERVICE_BASIC_AUTH=op://Test Automation/CALLINGSERVICE_BASIC_AUTH/basicAuth
 
-ENV_NAME=staging
-
 # SCIM user for e2e tests
 SCIM_USER_EMAIL=op://Test Automation/Staging SCIM user/okta username
 SCIM_USER_PASSWORD=op://Test Automation/Staging SCIM user/okta password
 SCIM_USER_SSO_CODE=op://Test Automation/Staging SCIM user/SSO code
 
+ENV_NAME=staging
 INBUCKET_USERNAME=op://Test Automation/BackendConnection staging/inbucketUsername
 INBUCKET_PASSWORD="{{ op://Test Automation/BackendConnection staging/inbucketPassword }}"
 INBUCKET_URL=op://Test Automation/BackendConnection staging/inbucketUrl
