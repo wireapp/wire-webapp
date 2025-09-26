@@ -20,15 +20,16 @@
 import {container} from 'tsyringe';
 
 import {
+  CallIcon,
+  ChannelIcon,
+  CollectionIcon,
+  ExternalLinkIcon,
   GroupIcon,
   MessageIcon,
   StarIcon,
-  ExternalLinkIcon,
-  Tooltip,
   SupportIcon,
-  ChannelIcon,
-  CollectionIcon,
   TeamIcon,
+  Tooltip,
 } from '@wireapp/react-ui-kit';
 
 import * as Icon from 'Components/Icon';
@@ -48,11 +49,12 @@ import {replaceLink, t} from 'Util/LocalizerUtil';
 import {useChannelsFeatureFlag} from 'Util/useChannelsFeatureFlag';
 
 import {
+  conversationsSidebarTitle,
+  conversationsTitleWrapper,
   footerDisclaimer,
   footerDisclaimerEllipsis,
   footerDisclaimerTooltip,
   iconStyle,
-  conversationsTitleWrapper,
 } from './ConversationTabs.styles';
 import {FolderIcon} from './FolderIcon';
 import {TeamCreationBanner} from './TeamCreation/TeamCreationBanner';
@@ -219,7 +221,7 @@ export const ConversationTabs = ({
 
         <div className="conversations-sidebar-divider" />
 
-        <div className="conversations-sidebar-title" css={{marginBlock: '32px 0'}}>
+        <div className="conversations-sidebar-title" css={conversationsSidebarTitle}>
           {t('conversationFooterContacts')}
         </div>
 
@@ -238,7 +240,7 @@ export const ConversationTabs = ({
           <>
             <div className="conversations-sidebar-divider" />
 
-            <div className="conversations-sidebar-title" css={{marginBlock: '32px 0'}}>
+            <div className="conversations-sidebar-title" css={conversationsSidebarTitle}>
               {t('cells.sidebar.heading')}
             </div>
 
@@ -254,6 +256,23 @@ export const ConversationTabs = ({
             />
           </>
         )}
+
+        <div className="conversations-sidebar-divider" />
+
+        <div className="conversations-sidebar-title" css={conversationsSidebarTitle}>
+          {t('meetings.navigation.parent.label')}
+        </div>
+
+        <ConversationTab
+          title={t('meetings.navigation.title')}
+          label={t('meetings.navigation.label')}
+          type={SidebarTabs.MEETINGS}
+          Icon={<CallIcon />}
+          onChangeTab={onChangeTab}
+          conversationTabIndex={conversationTabs.length + 1}
+          dataUieName="go-meetings"
+          isActive={currentTab === SidebarTabs.MEETINGS}
+        />
       </div>
 
       <div

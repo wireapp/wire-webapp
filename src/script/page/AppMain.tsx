@@ -227,6 +227,7 @@ export const AppMain = ({
       '/preferences/av': () => mainView.list.openPreferencesAudioVideo(),
       '/preferences/devices': () => mainView.list.openPreferencesDevices(),
       '/preferences/options': () => mainView.list.openPreferencesOptions(),
+      '/meetings': () => mainView.list.openMeetingsList(),
       '/user/:userId/:domain': showUserProfile,
       '/user/:domain/:userId': showUserProfile,
       '/user/:userId': showUserProfile,

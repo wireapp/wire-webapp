@@ -58,3 +58,7 @@ export const conversationsTitleWrapper: CSSObject = {
   alignItems: 'center',
   justifyContent: 'space-between',
 };
+
+export const conversationsSidebarTitle = {
+  marginBlock: '16px 0',
+};
