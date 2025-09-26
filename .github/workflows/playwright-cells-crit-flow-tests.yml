@@ -26,11 +26,7 @@ jobs:
     # Strategy is only used for scheduled runs, for manual runs the selected environment is used
     strategy:
       matrix:
-        environment: >-
-          ${{ github.event_name == 'schedule'
-              && fromJson('["imai","fulu","staging"]')
-              || fromJson(format('["{0}"]', github.event.inputs.environment)) }}
-
+        environment: [imai, fulu, staging]
 
     steps:
       - name: Checkout repository
@@ -51,8 +47,15 @@ jobs:
       - name: Install 1Password
         uses: 1password/install-cli-action@143a85f84a90555d121cde2ff5872e393a47ab9f
 
-      - name: Generate env file
+      - name: Generate env file for manual run
+        if: github.event_name == 'workflow_dispatch'
         run: op inject -i test/e2e_tests/.env.${{ github.event.inputs.environment }}.tpl -o test/e2e_tests/.env
+        env:
+          OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
+
+      - name: Generate env file for scheduled run
+        if: github.event_name == 'schedule'
+        run: op inject -i test/e2e_tests/.env.${{ matrix.environment }}.tpl -o test/e2e_tests/.env
         env:
           OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
 
