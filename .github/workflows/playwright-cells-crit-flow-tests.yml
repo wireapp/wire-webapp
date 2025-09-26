@@ -24,13 +24,13 @@ jobs:
     strategy:
       matrix:
         environment: [imai, fulu, staging]
-    uses: ./.github/workflows/actions/run-cells-crit-flow-e2e-tests.yml
+    uses: ./.github/workflows/run-cells-crit-flow-e2e-tests.yml
     with:
       environment: ${{ matrix.environment }}
 
   # Manual: runs single environment via input
   cells-crit-flow-tests-manual:
     if: github.event_name == 'workflow_dispatch'
-    uses: ./.github/workflows/actions/run-cells-crit-flow-e2e-tests.yml
+    uses: ./.github/workflows/run-cells-crit-flow-e2e-tests.yml
     with:
       environment: ${{ github.event.inputs.environment }}
