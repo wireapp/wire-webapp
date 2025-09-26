@@ -142,4 +142,30 @@ export class BrigRepositoryE2E {
       },
     );
   }
+
+  public async unlockCellsFeature(teamId: string) {
+    await this.axiosInstance.put(
+      `i/teams/${teamId}/features/cells/unlocked`,
+      {},
+      {
+        headers: {
+          Authorization: `Basic ${BASIC_AUTH}`,
+        },
+      },
+    );
+  }
+
+  public async enableCells(teamId: string) {
+    await this.axiosInstance.put(
+      `i/teams/${teamId}/features/cells`,
+      {
+        status: 'enabled',
+      },
+      {
+        headers: {
+          Authorization: `Basic ${BASIC_AUTH}`,
+        },
+      },
+    );
+  }
 }

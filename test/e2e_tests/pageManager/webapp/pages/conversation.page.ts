@@ -49,6 +49,7 @@ export class ConversationPage {
   readonly pingButton: Locator;
   readonly messages: Locator;
   readonly messageItems: Locator;
+  readonly filesTab: Locator;
   readonly isTypingIndicator: Locator;
 
   readonly getImageAltText = (user: User) => `Image from ${user.fullName}`;
@@ -83,10 +84,11 @@ export class ConversationPage {
     this.messages = page.locator(
       `${selectByDataAttribute('item-message')} ${selectByClass('message-body')}:not(:has(p${selectByClass('text-foreground')})):has(${selectByClass('text')})`,
     );
+    this.filesTab = page.locator('#conversation-tab-files');
     this.isTypingIndicator = page.locator(selectByDataAttribute('typing-indicator-title'));
   }
 
-  private getImageLocator(user: User): Locator {
+  protected getImageLocator(user: User): Locator {
     return this.page.locator(
       `${selectByDataAttribute('item-message')} ${selectByClass('message-body')} ${selectByDataAttribute('image-asset')} ${selectByDataAttribute('image-asset-img')}[alt^="${this.getImageAltText(user)}"]`,
     );
@@ -109,6 +111,10 @@ export class ConversationPage {
 
   async clickCallButton() {
     await this.callButton.click();
+  }
+
+  async clickFilesTab() {
+    await this.filesTab.click();
   }
 
   async isWatermarkVisible() {
