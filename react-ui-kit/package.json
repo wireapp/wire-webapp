@@ -29,7 +29,7 @@
     "@storybook/addon-essentials": "^8.5.2",
     "@storybook/addon-interactions": "^8.5.2",
     "@storybook/addon-onboarding": "^8.5.2",
-    "@storybook/addon-themes": "^8.5.2",
+    "@storybook/addon-themes": "^9.1.8",
     "@storybook/addon-webpack5-compiler-swc": "^3.0.0",
     "@storybook/blocks": "^8.5.2",
     "@storybook/react": "^9.1.0",
