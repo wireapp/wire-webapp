@@ -94,7 +94,7 @@ export const AppContainer = ({config, clientType}: AppProps) => {
     if (enableAutoLogin) {
       amplify.publish(WebAppEvents.LIFECYCLE.SIGN_OUT, SIGN_OUT_REASON.MULTIPLE_TABS);
     } else {
-      app.redirectToLogin(SIGN_OUT_REASON.MULTIPLE_TABS);
+      app.repository.lifeCycle.redirectToLogin(SIGN_OUT_REASON.MULTIPLE_TABS);
     }
 
     return null;

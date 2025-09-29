@@ -32,6 +32,7 @@ import type {CryptographyRepository} from 'Repositories/cryptography/Cryptograph
 import type {EventRepository} from 'Repositories/event/EventRepository';
 import type {GiphyRepository} from 'Repositories/extension/GiphyRepository';
 import type {IntegrationRepository} from 'Repositories/integration/IntegrationRepository';
+import type {LifeCycleRepository} from 'Repositories/LifeCycleRepository/LifeCycleRepository';
 import {MediaDevicesHandler} from 'Repositories/media/MediaDevicesHandler';
 import {MediaStreamHandler} from 'Repositories/media/MediaStreamHandler';
 import type {NotificationRepository} from 'Repositories/notification/NotificationRepository';
@@ -68,6 +69,7 @@ export interface ViewModelRepositories {
   eventTracker: EventTrackingRepository;
   giphy: GiphyRepository;
   integration: IntegrationRepository;
+  lifeCycle: LifeCycleRepository;
   message: MessageRepository;
   notification: NotificationRepository;
   permission: PermissionRepository;
