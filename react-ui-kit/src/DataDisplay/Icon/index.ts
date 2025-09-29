@@ -25,6 +25,7 @@ export * from './AttachmentIcon';
 export * from './AudioVideoIcon';
 export * from './BlockIcon';
 export * from './CopyIcon';
+export * from './CalendarIcon';
 export * from './CallIcon';
 export * from './CameraIcon';
 export * from './CamIcon';
