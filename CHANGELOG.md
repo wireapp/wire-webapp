@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [9.66.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/react-ui-kit@9.65.0...@wireapp/react-ui-kit@9.66.0) (2025-09-29)
+
+### Features
+
+* add calendar icon ([#7400](https://github.com/wireapp/wire-web-packages/issues/7400)) ([de197f7](https://github.com/wireapp/wire-web-packages/commit/de197f7fa12c2ad419d580f9ed1136ba31b740a3))
+
 # [9.65.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/react-ui-kit@9.64.1...@wireapp/react-ui-kit@9.65.0) (2025-09-26)
 
 ### Features
