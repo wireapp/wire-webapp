@@ -80,7 +80,7 @@ import {PropertiesService} from 'Repositories/properties/PropertiesService';
 import {SearchRepository} from 'Repositories/search/SearchRepository';
 import {SelfRepository} from 'Repositories/self/SelfRepository';
 import {SelfService} from 'Repositories/self/SelfService';
-import {StorageRepository, StorageService} from 'Repositories/storage';
+import {StorageKey, StorageRepository, StorageService} from 'Repositories/storage';
 import {TeamRepository} from 'Repositories/team/TeamRepository';
 import {TeamService} from 'Repositories/team/TeamService';
 import {EventTrackingRepository} from 'Repositories/tracking/EventTrackingRepository';
@@ -91,6 +91,7 @@ import {DebugUtil} from 'Util/DebugUtil';
 import {Environment} from 'Util/Environment';
 import {t} from 'Util/LocalizerUtil';
 import {getLogger, Logger} from 'Util/Logger';
+import {loadValue, resetStoreValue} from 'Util/StorageUtil';
 import {durationFrom, formatCoarseDuration, TIME_IN_MILLIS} from 'Util/TimeUtil';
 import {AppInitializationStep, checkIndexedDb, InitializationEventLogger} from 'Util/util';
 
@@ -405,6 +406,18 @@ export class App {
       await checkIndexedDb();
 
       telemetry.timeStep(AppInitTimingsStep.RECEIVED_ACCESS_TOKEN);
+
+      const showLoginAfterLogout = Boolean(loadValue<boolean>(StorageKey.AUTH.SHOW_LOGIN));
+      resetStoreValue(StorageKey.AUTH.SHOW_LOGIN);
+
+      if (showLoginAfterLogout) {
+        const hasAuthenticatedSession = this.apiClient.transport?.http?.hasValidAccessToken?.() ?? false;
+
+        if (!hasAuthenticatedSession) {
+          this.logger.info('User flagged as logged out without an authenticated session. Redirecting to login.');
+          return this.repository.lifeCycle.redirectToLogin(SIGN_OUT_REASON.NOT_SIGNED_IN);
+        }
+      }
 
       let selfUser: User;
 
