@@ -38,6 +38,7 @@ export function ConfigToolbar() {
   const [prefix, setPrefix] = useState('Message -'); // Prefix input
   const wrapperRef = useRef(null);
   const [avsDebuggerEnabled, setAvsDebuggerEnabled] = useState(!!window.wire?.app?.debug?.isEnabledAvsDebugger()); //
+  const [avsRustSftEnabled, setAvsRustSftEnabled] = useState(!!window.wire?.app?.debug?.isEnabledAvsRustSFT()); //
 
   // Toggle config tool on 'cmd/ctrl + shift + 2'
   useEffect(() => {
@@ -180,6 +181,24 @@ export function ConfigToolbar() {
     );
   };
 
+  const handleAvsRustSftEnable = (isChecked: boolean) => {
+    setAvsRustSftEnabled(!!window.wire?.app?.debug?.enableAvsRustSFT(isChecked));
+  };
+  const renderAvsRustSftSwitch = (value: boolean) => {
+    return (
+      <div style={{marginBottom: '10px'}}>
+        <label htmlFor="avs-rust-sft-checkbox" style={{display: 'block', fontWeight: 'bold'}}>
+          ENABLE AVS RUST SFT
+        </label>
+        <Switch
+          id="avs-rust-sft-checkbox"
+          checked={avsRustSftEnabled}
+          onToggle={isChecked => handleAvsRustSftEnable(isChecked)}
+        />
+      </div>
+    );
+  };
+
   if (!showConfig) {
     return null;
   }
@@ -202,6 +221,10 @@ export function ConfigToolbar() {
       <Button onClick={() => window.wire?.app?.debug?.disablePressSpaceToUnmute()}>disablePressSpaceToUnmute</Button>
 
       <div>{renderAvsSwitch(avsDebuggerEnabled)}</div>
+
+      <hr />
+
+      <div>{renderAvsRustSftSwitch(avsRustSftEnabled)}</div>
 
       <hr />
 

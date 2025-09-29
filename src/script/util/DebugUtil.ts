@@ -299,6 +299,27 @@ export class DebugUtil {
     return isEnabled === 'true';
   }
 
+  isEnabledAvsRustSFT(): boolean {
+    const storage = getStorage();
+
+    if (storage === undefined) {
+      return false;
+    }
+
+    const isEnabled = storage.getItem('avs-rust-sft-enabled');
+    return isEnabled === 'true';
+  }
+
+  enableAvsRustSFT(enable: boolean): boolean {
+    const storage = getStorage();
+
+    if (storage === undefined) {
+      return false;
+    }
+    storage.setItem('avs-rust-sft-enabled', `${enable}`);
+    return enable;
+  }
+
   /** Used by QA test automation. */
   blockAllConnections(): Promise<void[]> {
     const blockUsers = this.userState.users().map(userEntity => this.connectionRepository.blockUser(userEntity));
