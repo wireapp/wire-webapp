@@ -21,13 +21,11 @@ import {actionsStyles, headingStyles, wrapperStyles} from 'Components/Meeting/Me
 import {MeetNowMultiActionButton} from 'Components/Meeting/MeetNowMultiActionButton/MeetNowMultiActionButton';
 import {t} from 'Util/LocalizerUtil';
 
-export const MeetingHeader = () => {
-  return (
-    <header css={wrapperStyles}>
-      <h2 css={headingStyles}>{t('meetings.navigation.title')}</h2>
-      <div css={actionsStyles}>
-        <MeetNowMultiActionButton />
-      </div>
-    </header>
-  );
-};
+export const MeetingHeader = () => (
+  <header css={wrapperStyles}>
+    <h2 css={headingStyles}>{t('meetings.navigation.title')}</h2>
+    <div css={actionsStyles}>
+      <MeetNowMultiActionButton />
+    </div>
+  </header>
+);

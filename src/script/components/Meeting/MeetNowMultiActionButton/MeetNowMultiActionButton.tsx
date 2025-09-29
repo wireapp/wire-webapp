@@ -31,7 +31,7 @@ import {showContextMenu} from '../../../ui/ContextMenu';
 export const MeetNowMultiActionButton = () => {
   const [invertIcon, setInvertIcon] = useState(false);
 
-  const handleMeetingButton = (event: MouseEvent<HTMLElement>) => {
+  const handleMeetingOptionButton = (event: MouseEvent<HTMLElement>) => {
     setInvertIcon(val => !val);
     showContextMenu({
       event,
@@ -43,6 +43,7 @@ export const MeetNowMultiActionButton = () => {
           title: 'Meet Now',
           label: 'Meet Now',
           click: () => {
+            handleMeetingButton();
             resetIconInversion();
           },
         },
@@ -50,6 +51,7 @@ export const MeetNowMultiActionButton = () => {
           title: 'Schedule Meeting',
           label: 'Schedule Meeting',
           click: () => {
+            // add scheduling functionality here
             resetIconInversion();
           },
         },
@@ -59,16 +61,25 @@ export const MeetNowMultiActionButton = () => {
     });
   };
 
+  const handleMeetingButton = () => {
+    // add calling functionality here
+  };
+
   const resetIconInversion = () => setInvertIcon(false);
 
   return (
     <ButtonGroup>
-      <ButtonGroup.Button variant={ButtonVariant.TERTIARY} css={callingButtonGroupStyles} icon={<CallIcon />}>
+      <ButtonGroup.Button
+        variant={ButtonVariant.TERTIARY}
+        css={callingButtonGroupStyles}
+        icon={<CallIcon />}
+        onClick={handleMeetingButton}
+      >
         Meet now
       </ButtonGroup.Button>
       <ButtonGroup.Button
         css={callingButtonGroupStyles}
-        onClick={handleMeetingButton}
+        onClick={handleMeetingOptionButton}
         variant={ButtonVariant.TERTIARY}
         icon={<TriangleIcon height={10} width={10} css={dropdownIconStyles(invertIcon)} />}
       />

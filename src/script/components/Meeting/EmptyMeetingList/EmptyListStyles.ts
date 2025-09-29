@@ -17,7 +17,7 @@
  *
  */
 
-import {CSSObject} from '@emotion/react/dist/emotion-react.cjs';
+import {CSSObject} from '@emotion/react';
 
 export const emptyListStyles: CSSObject = {
   width: '550px',

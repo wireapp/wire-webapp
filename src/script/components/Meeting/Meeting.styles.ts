@@ -17,7 +17,7 @@
  *
  */
 
-import {CSSObject} from '@emotion/react/dist/emotion-react.cjs';
+import {CSSObject} from '@emotion/react';
 
 export const contentStyles: CSSObject = {
   display: 'flex',

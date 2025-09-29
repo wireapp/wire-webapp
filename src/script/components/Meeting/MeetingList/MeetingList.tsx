@@ -21,8 +21,17 @@ import {emptyListContainerStyles} from 'Components/Meeting/EmptyMeetingList/Empt
 import {EmptyMeetingList} from 'Components/Meeting/EmptyMeetingList/EmptyMeetingList';
 import {meetingListContainerStyles} from 'Components/Meeting/MeetingList/MeetingList.styles';
 
+interface Meeting {
+  // update the interface once finalized with the backend
+  start_date: string;
+  end_date: string;
+  schedule: string;
+  conversation_id: string;
+  title: String;
+}
+
 export const MeetingList = () => {
-  const meetings: any[] = [];
+  const meetings: Meeting[] = [];
 
   if (!meetings.length) {
     return (

@@ -21,13 +21,11 @@ import {contentStyles} from 'Components/Meeting/Meeting.styles';
 import {MeetingHeader} from 'Components/Meeting/MeetingHeader/MeetingHeader';
 import {MeetingList} from 'Components/Meeting/MeetingList/MeetingList';
 
-export const Meeting = () => {
-  return (
-    <div>
-      <MeetingHeader />
-      <div css={contentStyles}>
-        <MeetingList />
-      </div>
+export const Meeting = () => (
+  <>
+    <MeetingHeader />
+    <div css={contentStyles}>
+      <MeetingList />
     </div>
-  );
-};
+  </>
+);
