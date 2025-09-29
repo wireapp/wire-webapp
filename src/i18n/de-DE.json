@@ -789,7 +789,7 @@
   "conversationResume": "Beginnen Sie eine Unterhaltung mit {users}",
   "conversationSendFilesError": "Es ist ein Fehler aufgetreten. Bitte versuchen Sie es erneut.",
   "conversationSendPastedFile": "Bild eingefügt am {date}",
-  "conversationServicesWarning": "Apps have access to the content of this conversation",
+  "conversationServicesWarning": "Apps haben Zugriff auf den Inhalt dieser Unterhaltung",
   "conversationSomeone": "Jemand",
   "conversationStartNewConversation": "Eine Gruppe erstellen",
   "conversationTabs": "Conversation tabs",
