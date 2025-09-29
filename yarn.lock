@@ -8756,9 +8756,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@wireapp/react-ui-kit@npm:9.63.0":
-  version: 9.63.0
-  resolution: "@wireapp/react-ui-kit@npm:9.63.0"
+"@wireapp/react-ui-kit@npm:9.65.0":
+  version: 9.65.0
+  resolution: "@wireapp/react-ui-kit@npm:9.65.0"
   dependencies:
     "@radix-ui/react-accordion": "npm:1.2.11"
     "@radix-ui/react-dropdown-menu": "npm:2.1.14"
@@ -8775,7 +8775,7 @@ __metadata:
   peerDependenciesMeta:
     "@types/react":
       optional: true
-  checksum: 10/dd5f2b6d21737e4cec1eeebb23804d0e8329c9f9f806a3a9138d1fae466029e62f89a0da5bbd4b13e8d8d8b637209db4f14d6a83d9c904deb914568314df90f0
+  checksum: 10/2938ec67cd0257a6aca37b375ad0f108c79ed5c75ea92d84b05a5206c069f2d9c3a8884c44daf8b75f5b75db62ae0f3019225ddd8d9b83216bdaa29b68a99765
   languageName: node
   linkType: hard
 
@@ -22445,7 +22445,7 @@ __metadata:
     "@wireapp/kalium-backup": "npm:0.0.4"
     "@wireapp/prettier-config": "npm:0.6.4"
     "@wireapp/promise-queue": "npm:2.4.4"
-    "@wireapp/react-ui-kit": "npm:9.63.0"
+    "@wireapp/react-ui-kit": "npm:9.65.0"
     "@wireapp/store-engine": "npm:5.1.11"
     "@wireapp/store-engine-dexie": "npm:2.1.15"
     "@wireapp/telemetry": "npm:0.3.1"
