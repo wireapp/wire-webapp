@@ -24,7 +24,6 @@ export const wrapperStyles: CSSObject = {
   display: 'flex',
   alignItems: 'center',
   width: '100%',
-  marginBottom: 20,
   borderBottom: '1px solid var(--border-color)',
   minHeight: 'var(--content-title-bar-height)',
   padding: '0 8px',

@@ -22,7 +22,7 @@ import {CSSObject} from '@emotion/react/dist/emotion-react.cjs';
 export const contentStyles: CSSObject = {
   display: 'flex',
   flexDirection: 'column',
-  height: '100%',
+  height: 'calc(100vh - 47px)',
   overflowY: 'auto',
   flex: 1,
 };
