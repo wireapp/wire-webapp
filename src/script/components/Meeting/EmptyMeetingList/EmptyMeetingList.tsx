@@ -17,7 +17,7 @@
  *
  */
 
-import {Button, ButtonVariant, CallIcon} from '@wireapp/react-ui-kit';
+import {Button, ButtonVariant, CalendarIcon, CallIcon} from '@wireapp/react-ui-kit';
 
 import {
   emptyListActionButtonContainerStyles,
@@ -37,7 +37,7 @@ export const EmptyMeetingList = () => {
           <CallIcon css={emptyListActionButtonsStyles} /> Meet Now
         </Button>
         <Button variant={ButtonVariant.TERTIARY}>
-          <CallIcon css={emptyListActionButtonsStyles} /> Schedule Meeting
+          <CalendarIcon css={emptyListActionButtonsStyles} /> Schedule Meeting
         </Button>
       </div>
     </div>
