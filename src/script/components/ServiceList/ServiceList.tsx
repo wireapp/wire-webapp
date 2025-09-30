@@ -25,12 +25,12 @@ import {ServiceListItem} from 'Components/ServiceList/components/ServiceListItem
 import type {ServiceEntity} from 'Repositories/integration/ServiceEntity';
 import {t} from 'Util/LocalizerUtil';
 
-export enum MODE {
+enum MODE {
   COMPACT = 'ServiceList.MODE.COMPACT',
   DEFAULT = 'ServiceList.MODE.DEFAULT',
 }
 
-export interface ServiceListProps {
+interface ServiceListProps {
   services: ServiceEntity[];
   onServiceClick: (serviceEntity: ServiceEntity) => void;
   isSearching?: boolean;

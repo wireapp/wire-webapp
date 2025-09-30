@@ -51,7 +51,7 @@ import {ShortcutType} from '../../ui/ShortcutType';
 import {CallActions} from '../../view_model/CallingViewModel';
 import {ViewModelRepositories} from '../../view_model/MainViewModel';
 
-export interface TitleBarProps {
+interface TitleBarProps {
   callActions: CallActions;
   conversation: Conversation;
   openRightSidebar: (panelState: PanelState, params: RightSidebarParams, compareEntityId?: boolean) => void;

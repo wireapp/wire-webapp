@@ -42,7 +42,7 @@ import {AssetUrl, useAssetTransfer} from '../common/useAssetTransfer/useAssetTra
 
 const logger = getLogger('AudioAssetComponent');
 
-export interface AudioAssetProps {
+interface AudioAssetProps {
   className?: string;
   /* Does the asset have a visible header? */
   hasHeader?: boolean;

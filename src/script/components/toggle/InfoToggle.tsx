@@ -21,7 +21,7 @@ import React, {useId} from 'react';
 
 import cx from 'classnames';
 
-export interface InfoToggleProps {
+interface InfoToggleProps {
   dataUieName: string;
   info: string;
   isChecked: boolean;

@@ -28,7 +28,7 @@ import {formatTimeShort, fromUnixTime, TIME_IN_MILLIS} from 'Util/TimeUtil';
 import {MessageHeader} from './ContentMessage/MessageHeader';
 import {MessageTime} from './MessageTime';
 
-export interface DeleteMessageProps {
+interface DeleteMessageProps {
   message: DeleteMessageEntity;
   onClickAvatar?: (user: User | ServiceEntity) => void;
 }

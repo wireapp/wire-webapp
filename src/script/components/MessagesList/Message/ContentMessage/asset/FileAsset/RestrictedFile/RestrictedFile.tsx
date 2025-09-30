@@ -23,7 +23,7 @@ import {FileAsset} from 'Repositories/entity/message/FileAsset';
 import {t} from 'Util/LocalizerUtil';
 import {trimFileExtension} from 'Util/util';
 
-export interface RestrictedFileProps extends React.HTMLProps<HTMLDivElement> {
+interface RestrictedFileProps {
   asset?: FileAsset;
 }
 

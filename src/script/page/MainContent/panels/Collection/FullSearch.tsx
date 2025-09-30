@@ -39,7 +39,7 @@ const MAX_TEXT_LENGTH = 60;
 const MAX_OFFSET_INDEX = 30;
 const DEBOUNCE_TIME = 100;
 
-export interface FullSearchProps {
+interface FullSearchProps {
   change?: (query: string) => void;
   click?: (messageEntity: Message) => void;
   searchProvider: (query: string) => Promise<{messageEntities: Message[]; query: string}>;

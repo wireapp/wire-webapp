@@ -21,8 +21,10 @@ import React from 'react';
 
 import {formatDateNumeral, formatTimeShort, fromUnixTime, TIME_IN_MILLIS} from 'Util/TimeUtil';
 
-export interface MessageTimeProps extends React.HTMLProps<HTMLTimeElement> {
+interface MessageTimeProps {
   timestamp: number;
+  children?: React.ReactNode;
+  className?: string;
 }
 
 const MessageTime: React.FC<MessageTimeProps> = ({timestamp, children, ...props}) => {

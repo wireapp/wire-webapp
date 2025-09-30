@@ -22,7 +22,7 @@ import React from 'react';
 import {FileTypeRestrictedMessage as FileTypeRestrictedMessageEntity} from 'Repositories/entity/message/FileTypeRestrictedMessage';
 import {t} from 'Util/LocalizerUtil';
 
-export interface FileTypeRestrictedMessageProps {
+interface FileTypeRestrictedMessageProps {
   message: FileTypeRestrictedMessageEntity;
 }
 

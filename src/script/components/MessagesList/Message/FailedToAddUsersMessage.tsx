@@ -38,7 +38,7 @@ import {backendErrorLink, warning} from './ContentMessage/Warnings/Warnings.styl
 import {MessageTime} from './MessageTime';
 import {useMessageFocusedTabIndex} from './util';
 
-export interface FailedToAddUsersMessageProps {
+interface FailedToAddUsersMessageProps {
   isMessageFocused: boolean;
   message: FailedToAddUsersMessageEntity;
   userState?: UserState;

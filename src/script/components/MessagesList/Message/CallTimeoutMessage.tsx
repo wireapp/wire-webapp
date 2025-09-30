@@ -28,7 +28,7 @@ import {t} from 'Util/LocalizerUtil';
 
 import {MessageTime} from './MessageTime';
 
-export interface CallTimeoutMessageProps {
+interface CallTimeoutMessageProps {
   message: CallingTimeoutMessage;
 }
 

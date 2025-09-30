@@ -37,7 +37,7 @@ import {AssetHeader} from '../common/AssetHeader/AssetHeader';
 import {AssetLoader} from '../common/AssetLoader/AssetLoader';
 import {useAssetTransfer} from '../common/useAssetTransfer/useAssetTransfer';
 
-export interface FileAssetProps {
+interface FileAssetProps {
   hasHeader?: boolean;
   message: ContentMessage;
   teamState?: TeamState;

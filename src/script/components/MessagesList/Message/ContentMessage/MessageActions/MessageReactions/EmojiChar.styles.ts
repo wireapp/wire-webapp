@@ -38,14 +38,6 @@
 
 import {CSSObject} from '@emotion/react';
 
-export const messageReactionEmoji: CSSObject = {
-  display: 'inline-flex',
-  alignItems: 'center',
-  objectFit: 'contain',
-  overflow: 'hidden',
-  verticalAlign: 'top',
-};
-
-export const reactionImgSize = {
+export const reactionImgSize: CSSObject = {
   width: '16px',
 };

@@ -26,7 +26,7 @@ import {interpolate} from 'Util/ArrayUtil';
 import {clamp} from 'Util/NumberUtil';
 import {createUuid} from 'Util/uuid';
 
-export interface AudioSeekBarProps {
+interface AudioSeekBarProps {
   asset: FileAsset;
   audioElement: HTMLAudioElement;
   disabled: boolean;

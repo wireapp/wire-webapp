@@ -23,7 +23,7 @@ import type {Location} from 'Repositories/entity/message/Location';
 import {t} from 'Util/LocalizerUtil';
 import {getMapsUrl} from 'Util/LocationUtil';
 
-export interface LocationAssetProps {
+interface LocationAssetProps {
   asset: Location;
 }
 

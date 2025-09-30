@@ -23,7 +23,7 @@ import {Avatar, AVATAR_SIZE} from 'Components/Avatar';
 import type {ServiceEntity} from 'Repositories/integration/ServiceEntity';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 
-export interface ServiceDetailsProps {
+interface ServiceDetailsProps {
   service: ServiceEntity;
 }
 

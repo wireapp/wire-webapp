@@ -25,7 +25,7 @@ import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 
 import {MessageTime} from './MessageTime';
 
-export interface CallMessageProps {
+interface CallMessageProps {
   message: CallMessageEntity;
 }
 

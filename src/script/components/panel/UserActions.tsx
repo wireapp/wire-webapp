@@ -75,7 +75,7 @@ export const ActionIdentifier = {
   [Actions.UNBLOCK]: 'do-unblock',
 };
 
-export interface UserActionsProps {
+interface UserActionsProps {
   actionsViewModel: ActionsViewModel;
   conversation?: Conversation;
   conversationRoleRepository?: ConversationRoleRepository;

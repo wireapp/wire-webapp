@@ -125,7 +125,7 @@ export const useAppNotification = (props?: AppNotificationOptions) => {
   };
 };
 
-export const injectToaster = (activeWindow: Window) => {
+const injectToaster = (activeWindow: Window) => {
   const windowKey = activeWindow.name || 'default';
 
   if (roots[windowKey]) {

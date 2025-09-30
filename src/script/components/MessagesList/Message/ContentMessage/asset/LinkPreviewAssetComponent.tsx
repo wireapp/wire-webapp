@@ -35,7 +35,7 @@ import {AssetHeader} from './common/AssetHeader/AssetHeader';
 
 import {useMessageFocusedTabIndex} from '../../util';
 
-export interface LinkPreviewAssetProps {
+interface LinkPreviewAssetProps {
   /** Does the asset have a visible header? */
   header?: boolean;
   message: ContentMessage;
@@ -104,7 +104,7 @@ const LinkPreviewAsset: React.FC<LinkPreviewAssetProps> = ({header = false, mess
         )}
       </div>
       <div className="link-preview-info">
-        {header && <AssetHeader className="link-preview-info-header" message={message} />}
+        {header && <AssetHeader message={message} />}
         {preview && (
           <>
             <p

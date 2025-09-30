@@ -39,7 +39,7 @@ import {ElementType, MessageDetails} from './ContentMessage/asset/TextMessageRen
 import {MessageWrapper} from './MessageWrapper';
 import {useMessageFocusedTabIndex} from './util';
 
-export interface MessageActions {
+interface MessageActions {
   onClickAvatar: (user: User | ServiceEntity) => void;
   onClickCancelRequest: (message: MemberMessageEntity) => void;
   onClickImage: (message: ContentMessage, event: React.UIEvent) => void;
@@ -52,7 +52,7 @@ export interface MessageActions {
   onClickTimestamp: (messageId: string) => void;
 }
 
-export interface MessageParams extends MessageActions {
+interface MessageParams extends MessageActions {
   conversation: Conversation;
   hasReadReceiptsTurnedOn: boolean;
   isLastDeliveredMessage: boolean;

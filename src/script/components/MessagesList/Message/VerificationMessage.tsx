@@ -32,7 +32,7 @@ import {capitalizeFirstChar} from 'Util/StringUtil';
 
 import {VerificationMessageType} from '../../../message/VerificationMessageType';
 
-export interface VerificationMessageProps {
+interface VerificationMessageProps {
   message: VerificationMessageEntity;
 }
 

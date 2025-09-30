@@ -27,7 +27,7 @@ import {ConversationState} from 'Repositories/conversation/ConversationState';
 import {LegalHoldMessage as LegalHoldMessageEntity} from 'Repositories/entity/message/LegalHoldMessage';
 import {t} from 'Util/LocalizerUtil';
 
-export interface LegalHoldMessageProps {
+interface LegalHoldMessageProps {
   conversationState?: ConversationState;
   message: LegalHoldMessageEntity;
 }

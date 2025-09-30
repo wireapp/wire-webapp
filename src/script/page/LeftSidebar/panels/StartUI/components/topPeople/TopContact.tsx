@@ -29,7 +29,7 @@ import {User} from 'Repositories/entity/User';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {handleKeyDown, KEY} from 'Util/KeyboardUtil';
 
-export interface TopContactProps {
+interface TopContactProps {
   assetRepository: AssetRepository;
   clickOnUser?: (userEntity: User, event: React.UIEvent) => void;
   user: User;

@@ -24,7 +24,7 @@ import {TabIndex} from '@wireapp/react-ui-kit';
 import {CloseIcon} from 'Components/Icon';
 import {handleKeyDown, KEY} from 'Util/KeyboardUtil';
 
-export interface AssetLoaderProps {
+interface AssetLoaderProps {
   large?: boolean;
   loadProgress: number;
   onCancel: () => void;

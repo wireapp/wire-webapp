@@ -26,7 +26,7 @@ import {t} from 'Util/LocalizerUtil';
 
 import * as Icon from '../Icon';
 
-export interface ReceiptModeToggleProps {
+interface ReceiptModeToggleProps {
   onReceiptModeChanged: (receiptMode: RECEIPT_MODE) => void;
   receiptMode: RECEIPT_MODE;
   disabled?: boolean;

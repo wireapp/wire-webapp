@@ -24,9 +24,10 @@ import cx from 'classnames';
 import * as Icon from 'Components/Icon';
 import {t} from 'Util/LocalizerUtil';
 
-export interface RestrictedImageProps extends React.HTMLProps<HTMLDivElement> {
+interface RestrictedImageProps {
   isSmall?: boolean;
   showMessage?: boolean;
+  className?: string;
 }
 
 const RestrictedImage: React.FC<RestrictedImageProps> = ({showMessage = true, isSmall = false, className}) => {

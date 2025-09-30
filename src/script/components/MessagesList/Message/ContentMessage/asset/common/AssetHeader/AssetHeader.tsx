@@ -24,7 +24,7 @@ import cx from 'classnames';
 import type {Message} from 'Repositories/entity/message/Message';
 import {formatDayMonthNumeral, formatTimeShort} from 'Util/TimeUtil';
 
-export interface AssetHeaderProps extends Partial<HTMLDivElement> {
+interface AssetHeaderProps {
   message: Message;
 }
 

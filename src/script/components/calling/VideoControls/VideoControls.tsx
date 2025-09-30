@@ -63,7 +63,7 @@ enum BlurredBackgroundStatus {
   ON = 'bluron',
 }
 
-export interface VideoControlsProps {
+interface VideoControlsProps {
   activeCallViewTab: string;
   call: Call;
   propertiesRepository: PropertiesRepository;

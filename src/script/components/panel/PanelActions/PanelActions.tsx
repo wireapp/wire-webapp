@@ -26,7 +26,7 @@ export interface MenuItem {
   label: string;
 }
 
-export interface PanelActionsProps {
+interface PanelActionsProps {
   items: MenuItem[];
 }
 

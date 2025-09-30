@@ -30,7 +30,7 @@ import {messageBodyWrapper} from './ContentMessage/ContentMessage.styles';
 
 import {FormattedId} from '../../../page/MainContent/panels/preferences/DevicesPreferences/components/FormattedId';
 
-export interface DecryptErrorMessageProps {
+interface DecryptErrorMessageProps {
   message: DecryptErrorMessageEntity;
   onClickResetSession: (message: DecryptErrorMessageEntity) => void;
 }

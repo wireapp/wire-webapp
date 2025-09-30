@@ -21,7 +21,7 @@ import React, {useId} from 'react';
 
 import cx from 'classnames';
 
-export interface BaseToggleProps {
+interface BaseToggleProps {
   extendedInfo?: boolean;
   extendedInfoText?: string;
   className?: string;

@@ -30,7 +30,7 @@ import {t} from 'Util/LocalizerUtil';
 import {MessageTime} from './MessageTime';
 import {useMessageFocusedTabIndex} from './util';
 
-export interface FederationStopMessageProps {
+interface FederationStopMessageProps {
   message: FederationStopMessageEntity;
   isMessageFocused: boolean;
 }

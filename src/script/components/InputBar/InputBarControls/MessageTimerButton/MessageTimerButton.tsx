@@ -33,7 +33,7 @@ import {t} from 'Util/LocalizerUtil';
 import {DurationUnit, formatDuration} from 'Util/TimeUtil';
 import {setContextMenuPosition} from 'Util/util';
 
-export interface MessageTimerButtonProps {
+interface MessageTimerButtonProps {
   conversation: Conversation;
   teamState?: TeamState;
 }

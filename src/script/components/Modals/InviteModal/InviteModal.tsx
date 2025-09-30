@@ -29,7 +29,7 @@ import {renderElement} from 'Util/renderElement';
 
 import {Config} from '../../../Config';
 
-export interface InviteModalProps {
+interface InviteModalProps {
   readonly selfUser: User;
   onClose?: () => void;
 }

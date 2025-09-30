@@ -33,7 +33,7 @@ import {t} from 'Util/LocalizerUtil';
 
 import {Video} from './Video';
 
-export interface GroupVideoGridTileProps {
+interface GroupVideoGridTileProps {
   isMaximized: boolean;
   minimized: boolean;
   onTileDoubleClick: (userId: QualifiedId, clientId: string) => void;

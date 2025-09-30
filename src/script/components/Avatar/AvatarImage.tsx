@@ -30,7 +30,7 @@ import {CSS_FILL_PARENT} from 'Util/CSSMixin';
 
 import {AVATAR_SIZE} from '.';
 
-export interface AvatarImageProps {
+interface AvatarImageProps {
   assetRepository?: AssetRepository;
   avatarAlt: string;
   avatarSize: AVATAR_SIZE;

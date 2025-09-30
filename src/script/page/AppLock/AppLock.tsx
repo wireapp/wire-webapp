@@ -57,7 +57,7 @@ const passwordRegexLower = /(?=.*[a-z])/;
 const passwordRegexSpecial = /(?=.*[!@#$%^&*(),.?":{}|<>])/;
 const passwordRegexUpper = /(?=.*[A-Z])/;
 
-export interface AppLockProps {
+interface AppLockProps {
   appLockRepository?: AppLockRepository;
   appLockState?: AppLockState;
   clientRepository: ClientRepository;

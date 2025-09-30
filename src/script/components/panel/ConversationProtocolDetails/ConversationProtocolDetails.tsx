@@ -26,7 +26,7 @@ import {Ciphersuite} from '@wireapp/core';
 
 import {t} from 'Util/LocalizerUtil';
 
-export interface ConversationProtocolDetailsProps {
+interface ConversationProtocolDetailsProps {
   protocol: ConversationProtocol;
   cipherSuite?: number;
 }

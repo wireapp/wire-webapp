@@ -38,7 +38,7 @@ import {SystemMessageBase} from './SystemMessageBase';
 import {messageBodyWrapper} from '../ContentMessage/ContentMessage.styles';
 import {ProtocolUpdateMessage as ProtocolUpdateMessageComponent} from '../ProtocolUpdateMessage';
 
-export interface SystemMessageProps {
+interface SystemMessageProps {
   message: SystemMessageEntity;
 }
 

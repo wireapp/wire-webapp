@@ -19,7 +19,7 @@
 
 import {Quote} from '@wireapp/protocol-messaging';
 
-export interface QuoteEntityOptions {
+interface QuoteEntityOptions {
   error?: Error;
   hash?: ArrayBuffer;
   messageId: string;
