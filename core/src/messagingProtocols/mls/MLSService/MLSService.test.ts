@@ -29,7 +29,15 @@ import {TimeInMillis} from '@wireapp/commons/lib/util/TimeUtil';
 import {randomUUID} from 'crypto';
 
 import {APIClient} from '@wireapp/api-client';
-import {Ciphersuite, CoreCrypto, CoreCryptoContext, DecryptedMessage, WelcomeBundle} from '@wireapp/core-crypto';
+import {
+  Ciphersuite,
+  ClientId,
+  ConversationId,
+  CoreCrypto,
+  CoreCryptoContext,
+  DecryptedMessage,
+  WelcomeBundle,
+} from '@wireapp/core-crypto';
 
 import {CORE_CRYPTO_ERROR_NAMES} from './CoreCryptoMLSError';
 import {InitClientOptions, MLSService} from './MLSService';
@@ -357,7 +365,7 @@ describe('MLSService', () => {
       await mlsService.initClient(mockUserId, mockClient, config);
 
       expect(transactionContext.mlsInit).toHaveBeenCalledWith(
-        expect.any(Uint8Array),
+        expect.any(ClientId),
         [Ciphersuite.MLS_128_DHKEMX25519_AES128GCM_SHA256_Ed25519],
         100,
       );
@@ -385,7 +393,7 @@ describe('MLSService', () => {
       await mlsService.initClient(mockUserId, mockClient, config);
 
       expect(transactionContext.mlsInit).toHaveBeenCalledWith(
-        expect.any(Uint8Array),
+        expect.any(ClientId),
         [Ciphersuite.MLS_128_DHKEMX25519_AES128GCM_SHA256_Ed25519],
         config.nbKeyPackages,
       );
@@ -417,7 +425,7 @@ describe('MLSService', () => {
       await mlsService.initClient(mockUserId, mockClient, config);
 
       expect(transactionContext.mlsInit).toHaveBeenCalledWith(
-        expect.any(Uint8Array),
+        expect.any(ClientId),
         [Ciphersuite.MLS_128_DHKEMX25519_AES128GCM_SHA256_Ed25519],
         100,
       );
@@ -616,9 +624,10 @@ describe('MLSService', () => {
       jest.spyOn(transactionContext, 'clientValidKeypackagesCount').mockResolvedValue(numberOfKeysBelowThreshold);
 
       jest.spyOn(apiClient.api.client, 'uploadMLSKeyPackages').mockResolvedValueOnce(undefined);
-      jest
-        .spyOn(transactionContext, 'processWelcomeMessage')
-        .mockResolvedValue({id: new Uint8Array(), crlNewDistributionPoints: []} as unknown as WelcomeBundle);
+      jest.spyOn(transactionContext, 'processWelcomeMessage').mockResolvedValue({
+        id: new ConversationId(new Uint8Array()),
+        crlNewDistributionPoints: [],
+      } as unknown as WelcomeBundle);
 
       jest.spyOn(mlsService, 'scheduleKeyMaterialRenewal').mockImplementation(jest.fn());
 
@@ -652,9 +661,10 @@ describe('MLSService', () => {
       jest.spyOn(apiClient.api.client, 'getMLSKeyPackageCount').mockResolvedValueOnce(numberOfKeysAboveThreshold);
 
       jest.spyOn(apiClient.api.client, 'uploadMLSKeyPackages').mockResolvedValueOnce(undefined);
-      jest
-        .spyOn(transactionContext, 'processWelcomeMessage')
-        .mockResolvedValue({id: new Uint8Array(), crlNewDistributionPoints: []} as unknown as WelcomeBundle);
+      jest.spyOn(transactionContext, 'processWelcomeMessage').mockResolvedValue({
+        id: new ConversationId(new Uint8Array()),
+        crlNewDistributionPoints: [],
+      } as unknown as WelcomeBundle);
 
       jest.spyOn(mlsService, 'scheduleKeyMaterialRenewal').mockImplementation(jest.fn());
 
@@ -690,9 +700,10 @@ describe('MLSService', () => {
       jest.spyOn(apiClient.api.client, 'getMLSKeyPackageCount').mockResolvedValueOnce(numberOfKeysAboveThreshold);
 
       jest.spyOn(apiClient.api.client, 'uploadMLSKeyPackages').mockResolvedValueOnce(undefined);
-      jest
-        .spyOn(transactionContext, 'processWelcomeMessage')
-        .mockResolvedValue({id: new Uint8Array(), crlNewDistributionPoints: []} as unknown as WelcomeBundle);
+      jest.spyOn(transactionContext, 'processWelcomeMessage').mockResolvedValue({
+        id: new ConversationId(new Uint8Array()),
+        crlNewDistributionPoints: [],
+      } as unknown as WelcomeBundle);
 
       jest.spyOn(mlsService, 'scheduleKeyMaterialRenewal').mockImplementation(jest.fn());
 

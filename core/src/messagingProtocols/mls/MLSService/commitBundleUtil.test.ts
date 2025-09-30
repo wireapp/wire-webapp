@@ -20,7 +20,7 @@
 import {mls} from '@wireapp/protocol-messaging/web/mls';
 import {Encoder} from 'bazinga64';
 
-import {CommitBundle, RatchetTreeType, GroupInfoEncryptionType} from '@wireapp/core-crypto';
+import {CommitBundle, RatchetTreeType, GroupInfoEncryptionType, Welcome, GroupInfo} from '@wireapp/core-crypto';
 
 import {toProtobufCommitBundle} from './commitBundleUtil';
 
@@ -28,10 +28,10 @@ describe('toProtobufCommitBundle', () => {
   it('encode commit bundles', () => {
     const payload: CommitBundle = {
       commit: Uint8Array.from([0]),
-      welcome: Uint8Array.from([1]),
+      welcome: new Welcome(Uint8Array.from([1])),
       groupInfo: {
         ratchetTreeType: RatchetTreeType.Full,
-        payload: Uint8Array.from([2]),
+        payload: new GroupInfo(Uint8Array.from([2])),
         encryptionType: GroupInfoEncryptionType.Plaintext,
       },
     };
@@ -39,8 +39,10 @@ describe('toProtobufCommitBundle', () => {
     const {commit, welcome, groupInfoBundle} = mls.CommitBundle.decode(result);
 
     expect(Encoder.toBase64(commit)).toEqual(Encoder.toBase64(payload.commit));
-    expect(Encoder.toBase64(welcome)).toEqual(Encoder.toBase64(payload.welcome!));
-    expect(Encoder.toBase64(groupInfoBundle.groupInfo)).toEqual(Encoder.toBase64(payload.groupInfo.payload));
+    expect(Encoder.toBase64(welcome)).toEqual(Encoder.toBase64(payload.welcome?.copyBytes()!));
+    expect(Encoder.toBase64(groupInfoBundle.groupInfo)).toEqual(
+      Encoder.toBase64(payload.groupInfo.payload.copyBytes()),
+    );
     expect(groupInfoBundle.ratchetTreeType).toEqual(mls.RatchetTreeType.FULL);
     expect(groupInfoBundle.groupInfoType).toEqual(mls.GroupInfoType.PUBLIC_GROUP_STATE);
   });

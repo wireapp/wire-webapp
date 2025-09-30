@@ -28,7 +28,6 @@ function getLocalStorage() {
 const MIGRATION_READY_STATE = '1';
 
 const getQualifiedSessionsReadyKey = (dbName: string) => `${dbName}-qualified-sessions-ready` as const;
-const getCoreCryptoReadyKey = (dbName: string) => `${dbName}-corecrypto-ready` as const;
 
 const markMigrationReady = (getKey: (dbName: string) => string) => (dbName: string) => {
   const key = getKey(dbName);
@@ -47,9 +46,5 @@ export const cryptoMigrationStore = {
   qualifiedSessions: {
     isReady: isMigrationReady(getQualifiedSessionsReadyKey),
     markAsReady: markMigrationReady(getQualifiedSessionsReadyKey),
-  },
-  coreCrypto: {
-    isReady: isMigrationReady(getCoreCryptoReadyKey),
-    markAsReady: markMigrationReady(getCoreCryptoReadyKey),
   },
 };

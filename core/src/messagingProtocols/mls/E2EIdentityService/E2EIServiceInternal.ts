@@ -19,6 +19,7 @@
 
 import {APIClient} from '@wireapp/api-client';
 import {LogFactory} from '@wireapp/commons';
+import {ConversationId} from '@wireapp/core-crypto';
 
 import {AcmeService} from './Connection/AcmeServer';
 import {AcmeDirectory, Ciphersuite, CoreCrypto, CredentialType, E2eiEnrollment} from './E2EIService.types';
@@ -273,7 +274,7 @@ export class E2EIServiceInternal {
       for (const conversation of conversations) {
         if (Boolean(conversation.group_id?.length)) {
           const idAsBytes = new TextEncoder().encode(conversation.group_id);
-          await cx.e2eiRotate(idAsBytes);
+          await cx.e2eiRotate(new ConversationId(idAsBytes));
         } else {
           this.logger.error('No group id found in conversation');
         }

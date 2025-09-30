@@ -36,7 +36,7 @@ export const handleMLSWelcomeMessage = async ({
   // We extract the groupId from the welcome message and let coreCrypto store this group
 
   const newGroupId = await mlsService.processWelcomeMessage(data);
-  const groupIdStr = Encoder.toBase64(newGroupId).asString;
+  const groupIdStr = Encoder.toBase64(newGroupId.copyBytes()).asString;
   // The groupId can then be sent back to the consumer
 
   // After we were added to the group we need to schedule a periodic key material renewal

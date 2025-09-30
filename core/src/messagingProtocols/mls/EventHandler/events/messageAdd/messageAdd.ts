@@ -21,6 +21,7 @@ import {ConversationMLSMessageAddEvent} from '@wireapp/api-client/lib/event';
 import {Decoder} from 'bazinga64';
 
 import {LogFactory} from '@wireapp/commons';
+import {ConversationId} from '@wireapp/core-crypto';
 import {GenericMessage} from '@wireapp/protocol-messaging';
 
 import {queueProposal} from './IncomingProposalsQueue';
@@ -45,7 +46,7 @@ export const handleMLSMessageAdd = async ({
 
   const groupIdBytes = Decoder.fromBase64(groupId).asBytes;
 
-  const decryptedMessage = await mlsService.decryptMessage(groupIdBytes, encryptedData);
+  const decryptedMessage = await mlsService.decryptMessage(new ConversationId(groupIdBytes), encryptedData);
 
   if (!decryptedMessage) {
     // If the message is not decrypted, we return null
@@ -56,7 +57,7 @@ export const handleMLSMessageAdd = async ({
 
   if (encodedSenderClientId) {
     const decoder = new TextDecoder();
-    const senderClientId = decoder.decode(optionalToUint8Array(encodedSenderClientId));
+    const senderClientId = decoder.decode(optionalToUint8Array(encodedSenderClientId.copyBytes()));
     event.senderClientId = senderClientId;
   }
 
