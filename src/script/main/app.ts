@@ -36,13 +36,11 @@ import {container} from 'tsyringe';
 import {Runtime} from '@wireapp/commons';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
-import {useTypingIndicatorState} from 'Components/InputBar/TypingIndicator';
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {AssetRepository} from 'Repositories/assets/AssetRepository';
 import {AudioRepository} from 'Repositories/audio/AudioRepository';
 import {BackupRepository} from 'Repositories/backup/BackupRepository';
 import {BackupService} from 'Repositories/backup/BackupService';
-import {CacheRepository} from 'Repositories/cache/CacheRepository';
 import {CallingRepository} from 'Repositories/calling/CallingRepository';
 import {CellsRepository} from 'Repositories/cells/CellsRepository';
 import {ClientRepository, ClientService} from 'Repositories/client';
@@ -70,6 +68,7 @@ import {GiphyRepository} from 'Repositories/extension/GiphyRepository';
 import {GiphyService} from 'Repositories/extension/GiphyService';
 import {IntegrationRepository} from 'Repositories/integration/IntegrationRepository';
 import {IntegrationService} from 'Repositories/integration/IntegrationService';
+import {LifeCycleRepository} from 'Repositories/LifeCycleRepository/LifeCycleRepository';
 import {MediaConstraintsHandler} from 'Repositories/media/MediaConstraintsHandler';
 import {MediaDevicesHandler} from 'Repositories/media/MediaDevicesHandler';
 import {MediaStreamHandler} from 'Repositories/media/MediaStreamHandler';
@@ -81,7 +80,7 @@ import {PropertiesService} from 'Repositories/properties/PropertiesService';
 import {SearchRepository} from 'Repositories/search/SearchRepository';
 import {SelfRepository} from 'Repositories/self/SelfRepository';
 import {SelfService} from 'Repositories/self/SelfService';
-import {StorageKey, StorageRepository, StorageService} from 'Repositories/storage';
+import {StorageRepository, StorageService} from 'Repositories/storage';
 import {TeamRepository} from 'Repositories/team/TeamRepository';
 import {TeamService} from 'Repositories/team/TeamService';
 import {EventTrackingRepository} from 'Repositories/tracking/EventTrackingRepository';
@@ -92,14 +91,11 @@ import {DebugUtil} from 'Util/DebugUtil';
 import {Environment} from 'Util/Environment';
 import {t} from 'Util/LocalizerUtil';
 import {getLogger, Logger} from 'Util/Logger';
-import {includesString} from 'Util/StringUtil';
 import {durationFrom, formatCoarseDuration, TIME_IN_MILLIS} from 'Util/TimeUtil';
-import {appendParameter} from 'Util/UrlUtil';
 import {AppInitializationStep, checkIndexedDb, InitializationEventLogger} from 'Util/util';
 
 import '../../style/default.less';
 import {SIGN_OUT_REASON} from '../auth/SignOutReason';
-import {URLParameter} from '../auth/URLParameter';
 import {Config, Configuration} from '../Config';
 import {E2EIHandler} from '../E2EIdentity';
 import {getModalOptions, ModalType} from '../E2EIdentity/Modals';
@@ -108,7 +104,6 @@ import {AuthError} from '../error/AuthError';
 import {BaseError} from '../error/BaseError';
 import {CLIENT_ERROR_TYPE, ClientError} from '../error/ClientError';
 import {TeamError} from '../error/TeamError';
-import {externalUrl} from '../externalRoute';
 import {startNewVersionPolling} from '../lifecycle/newVersionHandler';
 import {scheduleApiVersionUpdate, updateApiVersion} from '../lifecycle/updateRemoteConfigs';
 import {initialiseSelfAndTeamConversations, initMLSGroupConversations} from '../mls';
@@ -128,25 +123,9 @@ import {Warnings} from '../view_model/WarningsContainer';
 // Initialize PDF.js worker for react-pdf package
 pdfjs.GlobalWorkerOptions.workerSrc = '/min/pdf.worker.mjs';
 
-export function doRedirect(signOutReason: SIGN_OUT_REASON) {
-  let url = `/auth/${location.search}`;
-
-  if (location.hash.startsWith('#/user/') && signOutReason === SIGN_OUT_REASON.NOT_SIGNED_IN) {
-    localStorage.setItem(App.LOCAL_STORAGE_LOGIN_REDIRECT_KEY, location.hash);
-  }
-
-  const isImmediateSignOutReason = App.CONFIG.SIGN_OUT_REASONS.IMMEDIATE.includes(signOutReason);
-  if (isImmediateSignOutReason) {
-    url = appendParameter(url, `${URLParameter.REASON}=${signOutReason}`);
-  }
-
-  window.location.replace(url);
-}
-
 export class App {
   static readonly LOCAL_STORAGE_LOGIN_REDIRECT_KEY = 'LOGIN_REDIRECT_KEY';
   static readonly LOCAL_STORAGE_LOGIN_CONVERSATION_KEY = 'LOGIN_CONVERSATION_KEY';
-  private isLoggingOut = false;
   logger: Logger;
   service: {
     conversation: ConversationService;
@@ -165,19 +144,6 @@ export class App {
         COOKIE_NAME: 'cookies_enabled',
       },
       NOTIFICATION_CHECK: TIME_IN_MILLIS.SECOND * 10,
-      SIGN_OUT_REASONS: {
-        IMMEDIATE: [
-          SIGN_OUT_REASON.NO_APP_CONFIG,
-          SIGN_OUT_REASON.ACCOUNT_DELETED,
-          SIGN_OUT_REASON.CLIENT_REMOVED,
-          SIGN_OUT_REASON.SESSION_EXPIRED,
-        ],
-        TEMPORARY_GUEST: [
-          SIGN_OUT_REASON.MULTIPLE_TABS,
-          SIGN_OUT_REASON.SESSION_EXPIRED,
-          SIGN_OUT_REASON.USER_REQUESTED,
-        ],
-      },
     };
   }
 
@@ -191,7 +157,9 @@ export class App {
     private readonly config: Configuration,
   ) {
     this.config = config;
-    this.apiClient.on(APIClient.TOPIC.ON_LOGOUT, () => this.logout(SIGN_OUT_REASON.SESSION_EXPIRED, false));
+    this.apiClient.on(APIClient.TOPIC.ON_LOGOUT, () =>
+      this.repository.lifeCycle.logout(SIGN_OUT_REASON.SESSION_EXPIRED, false),
+    );
     this.logger = getLogger('App');
 
     new WindowHandler();
@@ -262,7 +230,7 @@ export class App {
     repositories.team = new TeamRepository(
       repositories.user,
       repositories.asset,
-      () => this.logout(SIGN_OUT_REASON.ACCOUNT_DELETED, true),
+      () => this.repository.lifeCycle.logout(SIGN_OUT_REASON.ACCOUNT_DELETED, true),
       teamService,
     );
 
@@ -326,6 +294,16 @@ export class App {
 
     repositories.cells = container.resolve(CellsRepository);
 
+    // Initialize LifeCycleRepository with all required dependencies
+    repositories.lifeCycle = new LifeCycleRepository({
+      clientRepository: repositories.client,
+      conversationRepository: repositories.conversation,
+      eventRepository: repositories.event,
+      storageRepository: repositories.storage,
+      userRepository: repositories.user,
+      core: this.core,
+    });
+
     return repositories;
   }
 
@@ -356,7 +334,7 @@ export class App {
    * Subscribe to amplify events.
    */
   private _subscribeToEvents() {
-    amplify.subscribe(WebAppEvents.LIFECYCLE.SIGN_OUT, this.logout);
+    amplify.subscribe(WebAppEvents.LIFECYCLE.SIGN_OUT, this.repository.lifeCycle.logout);
   }
 
   private initializeCells({cellsRepository, selfUser}: {cellsRepository: CellsRepository; selfUser: User}) {
@@ -428,7 +406,15 @@ export class App {
 
       telemetry.timeStep(AppInitTimingsStep.RECEIVED_ACCESS_TOKEN);
 
-      const selfUser = await this.repository.user.getSelf([{position: 'App.initiateSelfUser', vendor: 'webapp'}]);
+      let selfUser: User;
+
+      try {
+        selfUser = await this.repository.user.getSelf([{position: 'App.initiateSelfUser', vendor: 'webapp'}]);
+      } catch (error) {
+        this.logger.error('Could not get self user', error);
+        await this.repository.lifeCycle.logout(SIGN_OUT_REASON.SESSION_EXPIRED, false);
+        return undefined;
+      }
 
       this.initializeCells({cellsRepository, selfUser});
 
@@ -678,7 +664,7 @@ export class App {
     if (isAuthError) {
       const isTypeMultipleTabs = type === AuthError.TYPE.MULTIPLE_TABS;
       const signOutReason = isTypeMultipleTabs ? SIGN_OUT_REASON.MULTIPLE_TABS : SIGN_OUT_REASON.INDEXED_DB;
-      return this.redirectToLogin(signOutReason);
+      return this.repository.lifeCycle.redirectToLogin(signOutReason);
     }
 
     if (navigator.onLine === true) {
@@ -687,20 +673,20 @@ export class App {
         case CLIENT_ERROR_TYPE.NO_VALID_CLIENT: {
           this.logger.warn(`Redirecting to login: ${message}`, error);
           return isReload
-            ? this.redirectToLogin(SIGN_OUT_REASON.SESSION_EXPIRED)
-            : this.logout(SIGN_OUT_REASON.CLIENT_REMOVED, true);
+            ? this.repository.lifeCycle.redirectToLogin(SIGN_OUT_REASON.SESSION_EXPIRED)
+            : this.repository.lifeCycle.logout(SIGN_OUT_REASON.CLIENT_REMOVED, true);
         }
         case AccessTokenError.TYPE.NOT_FOUND_IN_CACHE:
         case AccessTokenError.TYPE.RETRIES_EXCEEDED:
         case AccessTokenError.TYPE.REQUEST_FORBIDDEN: {
           this.logger.warn(`Redirecting to login: ${message}`, error);
           return isReload
-            ? this.redirectToLogin(SIGN_OUT_REASON.SESSION_EXPIRED)
-            : this.redirectToLogin(SIGN_OUT_REASON.NOT_SIGNED_IN);
+            ? this.repository.lifeCycle.redirectToLogin(SIGN_OUT_REASON.SESSION_EXPIRED)
+            : this.repository.lifeCycle.redirectToLogin(SIGN_OUT_REASON.NOT_SIGNED_IN);
         }
         case TeamError.TYPE.NO_APP_CONFIG: {
           this.logger.warn(`Logging out user: ${message}`, error);
-          return this.redirectToLogin(SIGN_OUT_REASON.NO_APP_CONFIG);
+          return this.repository.lifeCycle.redirectToLogin(SIGN_OUT_REASON.NO_APP_CONFIG);
         }
 
         default: {
@@ -711,7 +697,7 @@ export class App {
             this.logger.error(`Could not get access token: ${error.message}. Logging out user.`, error);
           }
 
-          return this.logout(SIGN_OUT_REASON.APP_INIT, false);
+          return this.repository.lifeCycle.logout(SIGN_OUT_REASON.APP_INIT, false);
         }
       }
     }
@@ -803,131 +789,6 @@ export class App {
   //##############################################################################
 
   /**
-   * Logs the user out on the backend and deletes cached data.
-   *
-   * @param signOutReason Cause for logout
-   * @param clearData Keep data in database
-   */
-  private readonly logout = async (signOutReason: SIGN_OUT_REASON, clearData: boolean) => {
-    if (this.isLoggingOut) {
-      // Avoid triggering another logout flow if we currently are logging out.
-      // This could happen if we trigger the logout flow while the user token is already invalid.
-      // This will cause the api to fail and to trigger the `logout` event
-      return;
-    }
-    this.isLoggingOut = true;
-    const _redirectToLogin = () => {
-      amplify.publish(WebAppEvents.LIFECYCLE.SIGNED_OUT, clearData);
-      this.redirectToLogin(signOutReason);
-    };
-
-    const _logout = async () => {
-      // flush typing state remote and local before tearing down the socket
-      const activeConversation = this.repository.conversation.getActiveConversation();
-      if (activeConversation) {
-        try {
-          await this.repository.conversation.sendTypingStop(activeConversation);
-        } catch (error) {
-          this.logger.warn('Failed to send typing stop before logout.', error);
-        }
-      }
-      const {clearTypingUsers} = useTypingIndicatorState.getState();
-      clearTypingUsers();
-
-      // Disconnect from our backend, end tracking and clear cached data
-      this.repository.event.disconnectWebSocket();
-
-      // Clear Local Storage (but don't delete the cookie label if you were logged in with a permanent client)
-      const keysToKeep = [StorageKey.AUTH.SHOW_LOGIN];
-
-      let keepPermanentDatabase = !clearData;
-
-      try {
-        keepPermanentDatabase = this.repository.client.isCurrentClientPermanent() && !clearData;
-      } catch (error) {
-        if (error instanceof ClientError && error.type === ClientError.TYPE.CLIENT_NOT_SET) {
-          keepPermanentDatabase = false;
-        }
-      }
-
-      if (keepPermanentDatabase) {
-        keysToKeep.push(StorageKey.AUTH.PERSIST);
-      }
-
-      const selfUser = this.repository.user['userState'].self();
-      if (selfUser) {
-        const cookieLabelKey = this.repository.client.constructCookieLabelKey(selfUser.email());
-
-        Object.keys(amplify.store()).forEach(keyInAmplifyStore => {
-          const isCookieLabelKey = keyInAmplifyStore === cookieLabelKey;
-          const deleteLabelKey = isCookieLabelKey && clearData;
-          const isCookieLabel = includesString(keyInAmplifyStore, StorageKey.AUTH.COOKIE_LABEL);
-
-          if (!deleteLabelKey && isCookieLabel) {
-            keysToKeep.push(keyInAmplifyStore);
-          }
-        });
-
-        const keepConversationInput = signOutReason === SIGN_OUT_REASON.SESSION_EXPIRED;
-        const deletedKeys = CacheRepository.clearLocalStorage(keepConversationInput, keysToKeep);
-        this.logger.debug(`Deleted "${deletedKeys.length}" keys from localStorage.`, deletedKeys);
-      }
-
-      const shouldWipeIdentity = clearData || signOutReason === SIGN_OUT_REASON.CLIENT_REMOVED;
-      const shouldWipeCrypto = signOutReason === SIGN_OUT_REASON.MLS_CLIENT_MISMATCH;
-      if (shouldWipeCrypto) {
-        this.logger.error('Client mismatch detected. Wiping crypto data and local client.');
-      }
-
-      if (shouldWipeIdentity || shouldWipeCrypto) {
-        localStorage.clear();
-      }
-
-      await this.core.logout({clearAllData: shouldWipeIdentity, clearCryptoData: shouldWipeCrypto});
-
-      if (clearData) {
-        // Info: This async call cannot be awaited in an "beforeunload" scenario, so we call it without waiting for it in order to delete the CacheStorage in the background.
-        CacheRepository.clearCacheStorage();
-
-        try {
-          await this.repository.storage.deleteDatabase();
-        } catch (error) {
-          this.logger.error('Failed to delete database before logout', error);
-        }
-      }
-
-      return _redirectToLogin();
-    };
-
-    const _logoutOnBackend = async () => {
-      this.logger.info(`Logout triggered by '${signOutReason}': Disconnecting user from the backend.`);
-      try {
-        await _logout();
-      } catch (e) {
-        _redirectToLogin();
-      }
-    };
-
-    if (App.CONFIG.SIGN_OUT_REASONS.IMMEDIATE.includes(signOutReason)) {
-      try {
-        return _logout();
-      } catch (error) {
-        if (error instanceof BaseError) {
-          this.logger.error(`Logout triggered by '${signOutReason}' and errored: ${error.message}.`);
-          _redirectToLogin();
-        }
-      }
-    }
-
-    if (navigator.onLine) {
-      return _logoutOnBackend();
-    }
-
-    this.logger.warn('No internet access. Continuing when internet connectivity regained.');
-    window.addEventListener('online', () => _logoutOnBackend());
-  };
-
-  /**
    * Refresh the web app or desktop wrapper
    */
   readonly refresh = (): void => {
@@ -948,27 +809,7 @@ export class App {
     Warnings.showWarning(Warnings.TYPE.LIFECYCLE_UPDATE);
   };
 
-  /**
-   * Redirect to the login page after internet connectivity has been verified.
-   * @param signOutReason Redirect triggered by session expiration
-   */
-  redirectToLogin(signOutReason: SIGN_OUT_REASON): void {
-    this.logger.info(`Redirecting to login after connectivity verification. Reason: ${signOutReason}`);
-    const isTemporaryGuestReason = App.CONFIG.SIGN_OUT_REASONS.TEMPORARY_GUEST.includes(signOutReason);
-    const isLeavingGuestRoom = isTemporaryGuestReason && this.repository.user['userState'].self()?.isTemporaryGuest();
-
-    if (isLeavingGuestRoom) {
-      const websiteUrl = externalUrl.website;
-
-      if (websiteUrl) {
-        return window.location.replace(websiteUrl);
-      }
-    }
-
-    doRedirect(signOutReason);
-  }
-
-  private updateConversationE2EIVerificationState: OnConversationE2EIVerificationStateChange = async ({
+  private readonly updateConversationE2EIVerificationState: OnConversationE2EIVerificationStateChange = async ({
     conversationEntity,
     conversationVerificationState,
     verificationMessageType,
@@ -992,17 +833,17 @@ export class App {
     }
   };
 
-  private showClientCertificateRevokedWarning = async () => {
+  private readonly showClientCertificateRevokedWarning = async () => {
     const {modalOptions, modalType} = getModalOptions({
       type: ModalType.SELF_CERTIFICATE_REVOKED,
-      primaryActionFn: () => this.logout(SIGN_OUT_REASON.APP_INIT, false),
+      primaryActionFn: () => void this.repository.lifeCycle.logout(SIGN_OUT_REASON.APP_INIT, false),
     });
 
     PrimaryModal.show(modalType, modalOptions);
   };
 
   // Todo: Move this to a separate hook or service
-  private showForceLogoutModal = (reason: SIGN_OUT_REASON) => {
+  private readonly showForceLogoutModal = (reason: SIGN_OUT_REASON) => {
     // ToDo: Extract the softlock logic to a separate hook instead of using the E2EIHandler directly
     // This is a temporary solution until we have a proper softlock implementation
     const e2eiHandler = E2EIHandler.getInstance();
@@ -1014,7 +855,7 @@ export class App {
       hideSecondary: true,
       primaryAction: {
         action: async () => {
-          await this.logout(reason, false);
+          await this.repository.lifeCycle.logout(reason, false);
         },
         text: t('modalAccountLogoutAction'),
       },
