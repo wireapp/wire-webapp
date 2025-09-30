@@ -50,6 +50,7 @@ import type {User} from 'Repositories/entity/User';
 import type {PermissionRepository} from 'Repositories/permission/PermissionRepository';
 import {PermissionStatusState} from 'Repositories/permission/PermissionStatusState';
 import {PermissionType} from 'Repositories/permission/PermissionType';
+import {normalizePermissionState} from 'Repositories/permission/usePermissionsStore';
 import {UserState} from 'Repositories/user/UserState';
 import {Declension, t, getUserName} from 'Util/LocalizerUtil';
 import {getLogger, Logger} from 'Util/Logger';
@@ -92,7 +93,6 @@ export class NotificationRepository {
   private readonly notifications: WebappNotifications[];
   private readonly notificationsPreference: ko.Observable<NotificationPreference>;
   private readonly permissionRepository: PermissionRepository;
-  private readonly permissionState: ko.Observable<PermissionState | PermissionStatusState | NotificationPermission>;
   private readonly assetRepository: AssetRepository;
   private isSoftLock = false;
 
@@ -141,8 +141,6 @@ export class NotificationRepository {
         this.checkPermission();
       }
     });
-
-    this.permissionState = this.permissionRepository.permissionState[PermissionType.NOTIFICATIONS];
   }
 
   subscribeToEvents(): void {
@@ -277,7 +275,9 @@ export class NotificationRepository {
    * @returns Resolves with `true` if notifications are enabled
    */
   readonly updatePermissionState = (permissionState: PermissionState | NotificationPermission): boolean | undefined => {
-    this.permissionState(permissionState);
+    // Normalize the permission state and set it in the store
+    const normalizedState = normalizePermissionState(permissionState);
+    this.permissionRepository.setPermissionState(PermissionType.NOTIFICATIONS, normalizedState);
     return this.checkPermissionState();
   };
 
@@ -704,7 +704,8 @@ export class NotificationRepository {
    * @returns Returns `true` if notifications are permitted
    */
   private checkPermissionState(): boolean | undefined {
-    switch (this.permissionState()) {
+    const permissionState = this.permissionRepository.getPermissionState(PermissionType.NOTIFICATIONS);
+    switch (permissionState) {
       case PermissionStatusState.GRANTED: {
         return true;
       }
@@ -824,7 +825,8 @@ export class NotificationRepository {
 
     const activeConversation = document.hasFocus() && inConversationView && inActiveConversation && !inMaximizedCall;
     const messageFromSelf = messageEntity.user().isMe;
-    const permissionDenied = this.permissionState() === PermissionStatusState.DENIED;
+    const permissionDenied =
+      this.permissionRepository.getPermissionState(PermissionType.NOTIFICATIONS) === PermissionStatusState.DENIED;
 
     // The in-app notification settings should be ignored for alerts (which are composite messages for now)
     const preferenceIsNone =

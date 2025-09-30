@@ -43,6 +43,7 @@ import type {MediaStreamHandler} from 'Repositories/media/MediaStreamHandler';
 import {mediaDevicesStore} from 'Repositories/media/useMediaDevicesStore';
 import type {PermissionRepository} from 'Repositories/permission/PermissionRepository';
 import {PermissionStatusState} from 'Repositories/permission/PermissionStatusState';
+import {PermissionType} from 'Repositories/permission/PermissionType';
 import {PropertiesRepository} from 'Repositories/properties/PropertiesRepository';
 import {PROPERTIES_TYPE} from 'Repositories/properties/PropertiesType';
 import type {TeamRepository} from 'Repositories/team/TeamRepository';
@@ -464,7 +465,7 @@ export class CallingViewModel {
   }
 
   hasAccessToCamera(): boolean {
-    return this.permissionRepository.permissionState.camera() === PermissionStatusState.GRANTED;
+    return this.permissionRepository.getPermissionState(PermissionType.CAMERA) === PermissionStatusState.GRANTED;
   }
 
   readonly onCancelScreenSelection = () => {

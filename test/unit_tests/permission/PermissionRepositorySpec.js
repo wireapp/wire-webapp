@@ -20,21 +20,33 @@
 import {PermissionRepository} from 'Repositories/permission/PermissionRepository';
 import {PermissionStatusState} from 'Repositories/permission/PermissionStatusState';
 import {PermissionType} from 'Repositories/permission/PermissionType';
+import {permissionsStore} from 'Repositories/permission/usePermissionsStore';
 
 describe('PermissionRepository', () => {
+  let permissionRepository;
+
+  beforeEach(() => {
+    // Reset the store before each test
+    permissionsStore.getState().setPermissionState(PermissionType.CAMERA, PermissionStatusState.PROMPT);
+    permissionsStore.getState().setPermissionState(PermissionType.GEO_LOCATION, PermissionStatusState.PROMPT);
+    permissionsStore.getState().setPermissionState(PermissionType.MICROPHONE, PermissionStatusState.PROMPT);
+    permissionsStore.getState().setPermissionState(PermissionType.NOTIFICATIONS, PermissionStatusState.PROMPT);
+  });
+
   describe('constructor', () => {
-    it('keep the default PROMPT value if permissionAPI is not available', done => {
+    it('should keep the default PROMPT value if permissionAPI is not available', async () => {
       spyOn(navigator, 'permissions').and.returnValue(undefined);
-      const permissionRepository = new PermissionRepository();
-      setTimeout(() => {
-        Object.values(permissionRepository.permissionState).forEach(state => {
-          expect(state()).toBe(PermissionStatusState.PROMPT);
-        });
-        done();
-      }, 0);
+      permissionRepository = new PermissionRepository();
+
+      // Wait for any async initialization to complete
+      await new Promise(resolve => setTimeout(resolve, 10));
+
+      Object.values(PermissionType).forEach(permissionType => {
+        expect(permissionRepository.getPermissionState(permissionType)).toBe(PermissionStatusState.PROMPT);
+      });
     });
 
-    it("queries the browser's permission if permissionAPI is available", done => {
+    it("should query the browser's permission if permissionAPI is available", async () => {
       const states = {
         [PermissionType.CAMERA]: {state: PermissionStatusState.GRANTED},
         [PermissionType.GEO_LOCATION]: {state: PermissionStatusState.PROMPT},
@@ -46,16 +58,17 @@ describe('PermissionRepository', () => {
         return Promise.resolve(states[type.name]);
       });
 
-      const permissionRepository = new PermissionRepository();
-      setTimeout(() => {
-        Object.entries(permissionRepository.permissionState).forEach(([type, state]) => {
-          expect(state()).toBe(states[type].state);
-        });
-        done();
-      }, 0);
+      permissionRepository = new PermissionRepository();
+
+      // Wait for async permission queries to complete
+      await new Promise(resolve => setTimeout(resolve, 10));
+
+      Object.entries(states).forEach(([type, expectedState]) => {
+        expect(permissionRepository.getPermissionState(type)).toBe(expectedState.state);
+      });
     });
 
-    it('keeps the default values if one permission type is not supported by the browser', done => {
+    it('should keep the default values if one permission type is not supported by the browser', async () => {
       const states = {
         [PermissionType.CAMERA]: {state: PermissionStatusState.GRANTED},
         [PermissionType.GEO_LOCATION]: {state: PermissionStatusState.GRANTED},
@@ -69,16 +82,157 @@ describe('PermissionRepository', () => {
         return Promise.resolve(states[type.name]);
       });
 
-      const permissionRepository = new PermissionRepository();
-      setTimeout(() => {
-        permissionRepository.getPermissionStates(Object.keys(states)).forEach(({state, type}) => {
-          expect(state).toBe(states[type].state);
-        });
-        const notificationPermissionState = permissionRepository.getPermissionState(PermissionType.NOTIFICATIONS);
+      permissionRepository = new PermissionRepository();
 
-        expect(notificationPermissionState).toBe(PermissionStatusState.PROMPT);
-        done();
-      }, 0);
+      // Wait for async permission queries to complete/fail
+      await new Promise(resolve => setTimeout(resolve, 10));
+
+      permissionRepository.getPermissionStates(Object.keys(states)).forEach(({state, type}) => {
+        expect(state).toBe(states[type].state);
+      });
+      const notificationPermissionState = permissionRepository.getPermissionState(PermissionType.NOTIFICATIONS);
+      expect(notificationPermissionState).toBe(PermissionStatusState.PROMPT);
+    });
+  });
+
+  describe('getPermissionState', () => {
+    beforeEach(() => {
+      spyOn(navigator, 'permissions').and.returnValue(undefined);
+      permissionRepository = new PermissionRepository();
+    });
+
+    it('should return the current permission state from the store', () => {
+      // Set a permission state directly in the store
+      permissionsStore.getState().setPermissionState(PermissionType.CAMERA, PermissionStatusState.GRANTED);
+
+      expect(permissionRepository.getPermissionState(PermissionType.CAMERA)).toBe(PermissionStatusState.GRANTED);
+    });
+
+    it('should return PROMPT by default for all permission types', () => {
+      Object.values(PermissionType).forEach(permissionType => {
+        expect(permissionRepository.getPermissionState(permissionType)).toBe(PermissionStatusState.PROMPT);
+      });
+    });
+  });
+
+  describe('setPermissionState', () => {
+    beforeEach(() => {
+      spyOn(navigator, 'permissions').and.returnValue(undefined);
+      permissionRepository = new PermissionRepository();
+    });
+
+    it('should update the permission state in the store', () => {
+      permissionRepository.setPermissionState(PermissionType.MICROPHONE, PermissionStatusState.DENIED);
+
+      expect(permissionRepository.getPermissionState(PermissionType.MICROPHONE)).toBe(PermissionStatusState.DENIED);
+      expect(permissionsStore.getState().permissions[PermissionType.MICROPHONE]).toBe(PermissionStatusState.DENIED);
+    });
+
+    it('should not affect other permission states when setting one', () => {
+      permissionRepository.setPermissionState(PermissionType.CAMERA, PermissionStatusState.GRANTED);
+
+      expect(permissionRepository.getPermissionState(PermissionType.CAMERA)).toBe(PermissionStatusState.GRANTED);
+      expect(permissionRepository.getPermissionState(PermissionType.MICROPHONE)).toBe(PermissionStatusState.PROMPT);
+      expect(permissionRepository.getPermissionState(PermissionType.NOTIFICATIONS)).toBe(PermissionStatusState.PROMPT);
+    });
+  });
+
+  describe('getPermissionStates', () => {
+    beforeEach(() => {
+      spyOn(navigator, 'permissions').and.returnValue(undefined);
+      permissionRepository = new PermissionRepository();
+    });
+
+    it('should return permission states for multiple types', () => {
+      // Set up different states
+      permissionRepository.setPermissionState(PermissionType.CAMERA, PermissionStatusState.GRANTED);
+      permissionRepository.setPermissionState(PermissionType.MICROPHONE, PermissionStatusState.DENIED);
+
+      const permissionTypes = [PermissionType.CAMERA, PermissionType.MICROPHONE, PermissionType.NOTIFICATIONS];
+      const results = permissionRepository.getPermissionStates(permissionTypes);
+
+      expect(results).toEqual([
+        {state: PermissionStatusState.GRANTED, type: PermissionType.CAMERA},
+        {state: PermissionStatusState.DENIED, type: PermissionType.MICROPHONE},
+        {state: PermissionStatusState.PROMPT, type: PermissionType.NOTIFICATIONS},
+      ]);
+    });
+
+    it('should return empty array for empty input', () => {
+      const results = permissionRepository.getPermissionStates([]);
+      expect(results).toEqual([]);
+    });
+  });
+
+  describe('store integration', () => {
+    beforeEach(() => {
+      spyOn(navigator, 'permissions').and.returnValue(undefined);
+      permissionRepository = new PermissionRepository();
+    });
+
+    it('should maintain consistency between repository and store', () => {
+      const newState = PermissionStatusState.GRANTED;
+
+      // Update via repository
+      permissionRepository.setPermissionState(PermissionType.CAMERA, newState);
+
+      // Verify consistency
+      expect(permissionRepository.getPermissionState(PermissionType.CAMERA)).toBe(newState);
+      expect(permissionsStore.getState().permissions[PermissionType.CAMERA]).toBe(newState);
+      expect(permissionsStore.getState().getPermissionState(PermissionType.CAMERA)).toBe(newState);
+    });
+
+    it('should reflect store changes made directly', () => {
+      const newState = PermissionStatusState.DENIED;
+
+      // Update store directly
+      permissionsStore.getState().setPermissionState(PermissionType.NOTIFICATIONS, newState);
+
+      // Verify repository reflects the change
+      expect(permissionRepository.getPermissionState(PermissionType.NOTIFICATIONS)).toBe(newState);
+    });
+  });
+
+  describe('browser permission API integration', () => {
+    it('should handle permission changes from browser', async () => {
+      const mockPermissionStatus = {
+        state: PermissionStatusState.GRANTED,
+        onchange: null,
+      };
+
+      spyOn(navigator.permissions, 'query').and.returnValue(Promise.resolve(mockPermissionStatus));
+
+      permissionRepository = new PermissionRepository();
+
+      // Wait for async initialization to complete
+      await new Promise(resolve => setTimeout(resolve, 10));
+
+      // Initial state should be set for notifications (the first permission type that gets processed)
+      expect(permissionRepository.getPermissionState(PermissionType.NOTIFICATIONS)).toBe(PermissionStatusState.GRANTED);
+
+      // Simulate browser permission change
+      mockPermissionStatus.state = PermissionStatusState.DENIED;
+
+      if (mockPermissionStatus.onchange) {
+        mockPermissionStatus.onchange();
+      }
+
+      // Should reflect the change immediately (Zustand updates are synchronous)
+      expect(permissionRepository.getPermissionState(PermissionType.NOTIFICATIONS)).toBe(PermissionStatusState.DENIED);
+    });
+
+    it('should handle permission query failures gracefully', async () => {
+      spyOn(navigator.permissions, 'query').and.returnValue(Promise.reject(new Error('Not supported')));
+
+      permissionRepository = new PermissionRepository();
+
+      // Wait for async initialization to complete/fail
+      await new Promise(resolve => setTimeout(resolve, 10));
+
+      // Should maintain default states when queries fail
+      Object.values(PermissionType).forEach(permissionType => {
+        expect(permissionRepository.getPermissionState(permissionType)).toBe(PermissionStatusState.PROMPT);
+      });
     });
   });
 });

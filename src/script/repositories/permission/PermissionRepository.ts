@@ -17,18 +17,11 @@
  *
  */
 
-import ko from 'knockout';
-
-import {PermissionState} from 'Repositories/notification/PermissionState';
 import {Logger, getLogger} from 'Util/Logger';
 
 import {PermissionStatusState} from './PermissionStatusState';
 import {PermissionType} from './PermissionType';
-
-interface PermissionStateResult {
-  state: PermissionState | PermissionStatusState;
-  type: PermissionType;
-}
+import {permissionsStore, PermissionStateResult, UnifiedPermissionState} from './usePermissionsStore';
 
 /**
  * Permission repository to check browser permissions.
@@ -37,19 +30,10 @@ interface PermissionStateResult {
  */
 export class PermissionRepository {
   private readonly logger: Logger;
-  readonly permissionState: Record<PermissionType, ko.Observable<PermissionState | PermissionStatusState>>;
 
   constructor() {
     this.logger = getLogger('PermissionRepository');
-
-    this.permissionState = {
-      [PermissionType.CAMERA]: ko.observable(PermissionStatusState.PROMPT),
-      [PermissionType.GEO_LOCATION]: ko.observable(PermissionStatusState.PROMPT),
-      [PermissionType.MICROPHONE]: ko.observable(PermissionStatusState.PROMPT),
-      [PermissionType.NOTIFICATIONS]: ko.observable(PermissionStatusState.PROMPT),
-    };
-
-    this.initPermissionState(Object.keys(this.permissionState) as PermissionType[]);
+    this.initPermissionState(Object.values(PermissionType));
   }
 
   private initPermissionState(permissions: PermissionType[]): void {
@@ -58,7 +42,7 @@ export class PermissionRepository {
     }
     permissions.forEach(permissionType => {
       const setPermissionState = (permissionState: PermissionStatusState): void =>
-        this.permissionState[permissionType](permissionState);
+        permissionsStore.getState().setPermissionState(permissionType, permissionState);
 
       return navigator.permissions
         .query({name: permissionType as any})
@@ -77,14 +61,15 @@ export class PermissionRepository {
     });
   }
 
-  getPermissionState(permissionType: PermissionType): PermissionState | PermissionStatusState {
-    return this.permissionState[permissionType]();
+  getPermissionState(permissionType: PermissionType): UnifiedPermissionState {
+    return permissionsStore.getState().getPermissionState(permissionType);
+  }
+
+  setPermissionState(permissionType: PermissionType, state: UnifiedPermissionState): void {
+    permissionsStore.getState().setPermissionState(permissionType, state);
   }
 
   getPermissionStates(permissionTypes: PermissionType[]): PermissionStateResult[] {
-    return permissionTypes.map(permissionType => ({
-      state: this.getPermissionState(permissionType),
-      type: permissionType,
-    }));
+    return permissionsStore.getState().getPermissionStates(permissionTypes);
   }
 }
