@@ -1192,6 +1192,8 @@ declare module 'I18n/en-US.json' {
     'meetings.navigation.parent.label': `Meetings`;
     'meetings.navigation.title': `Meetings`;
     'meetings.navigation.label': `Meetings`;
+    'meetings.noMeetingsText': `No Next or past meetings yet.`;
+    'meetings.startMeetingHelp': `Start a meeting with team members, guests, or external parties. Your communication is always end-to-end encrypted, offering the highest level of security.`;
     'mlsConversationRecovered': `You haven\'t used this device for a while, or an issue has occurred. Some older messages may not appear here.`;
     'mlsSignature': `MLS with {signature} Signature`;
     'mlsThumbprint': `MLS Thumbprint`;
