@@ -20,7 +20,7 @@
 import {TimeInMillis} from '@wireapp/commons/lib/util/TimeUtil';
 import axios from 'axios';
 
-import {CoreCrypto, CoreCryptoContext, CredentialType, WireIdentity} from '@wireapp/core-crypto';
+import {ClientId, CoreCrypto, CoreCryptoContext, CredentialType, WireIdentity} from '@wireapp/core-crypto';
 
 import {E2EIServiceExternal} from './E2EIServiceExternal';
 
@@ -148,7 +148,7 @@ describe('E2EIServiceExternal', () => {
         `${user1.id}:74a50c1f4352b41f@elna.wire.link`,
         `${user2.id}:452cb4c65f0369a8@elna.wire.link`,
       ];
-      coreCrypto.getClientIds.mockResolvedValue(allClients.map(clientId => encoder.encode(clientId)));
+      coreCrypto.getClientIds.mockResolvedValue(allClients.map(clientId => new ClientId(encoder.encode(clientId))));
 
       jest.spyOn(mlsService, 'conversationExists').mockResolvedValue(true);
 

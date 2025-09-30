@@ -77,3 +77,21 @@ export class CoreCrypto {
 export function version() {
   return '1.0.0';
 }
+
+class ByteContainer {
+  protected readonly bytes: Uint8Array;
+  constructor(bytes: Uint8Array) {
+    this.bytes = bytes;
+  }
+  copyBytes(): Uint8Array {
+    return Uint8Array.from(this.bytes);
+  }
+}
+
+export class Welcome extends ByteContainer {}
+export class GroupInfo extends ByteContainer {}
+export class ClientId extends ByteContainer {}
+export class ConversationId extends ByteContainer {}
+export class ExternalSenderKey extends ByteContainer {}
+export class KeyPackage extends ByteContainer {}
+export class SecretKey extends ByteContainer {}

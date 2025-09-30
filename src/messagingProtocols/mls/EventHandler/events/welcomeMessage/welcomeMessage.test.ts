@@ -19,6 +19,8 @@
 
 import {ConversationMLSWelcomeEvent, CONVERSATION_EVENT} from '@wireapp/api-client/lib/event';
 
+import {Welcome} from '@wireapp/core-crypto';
+
 import {handleMLSWelcomeMessage} from './welcomeMessage';
 
 import {NotificationSource} from '../../../../../notification';
@@ -44,7 +46,7 @@ const mockParams = {
   } as ConversationMLSWelcomeEvent,
   source: {} as NotificationSource,
   mlsService: {
-    processWelcomeMessage: jest.fn().mockResolvedValue('conversationId'),
+    processWelcomeMessage: jest.fn().mockResolvedValue(new Welcome(Uint8Array.from([1, 2, 3]))),
     scheduleKeyMaterialRenewal: jest.fn(),
     getEpoch: jest.fn(),
     emit: jest.fn(),
@@ -68,7 +70,7 @@ describe('MLS welcomeMessage eventHandler', () => {
     it('returns a eventHandlerResult', async () => {
       const eventHandlerResult = await handleMLSWelcomeMessage(mockParams);
       expect(eventHandlerResult).toBeDefined();
-      expect(eventHandlerResult!.event).toEqual({data: 'conversationId', type: 'conversation.mls-welcome'});
+      expect(eventHandlerResult!.event).toEqual({data: Uint8Array.from([1, 2, 3]), type: 'conversation.mls-welcome'});
     });
 
     it('emits new epoch event after processing a welcome message', async () => {
@@ -77,7 +79,7 @@ describe('MLS welcomeMessage eventHandler', () => {
       await handleMLSWelcomeMessage(mockParams);
 
       expect(mockParams.mlsService.emit).toHaveBeenCalledWith(MLSServiceEvents.NEW_EPOCH, {
-        groupId: 'conversationId',
+        groupId: Uint8Array.from([1, 2, 3]),
         epoch: 1,
       });
     });

@@ -47,6 +47,7 @@ import {Decoder} from 'bazinga64';
 
 import {APIClient} from '@wireapp/api-client';
 import {LogFactory, TypedEventEmitter} from '@wireapp/commons';
+import {ConversationId} from '@wireapp/core-crypto';
 import {GenericMessage} from '@wireapp/protocol-messaging';
 
 import {
@@ -337,7 +338,10 @@ export class ConversationService extends TypedEventEmitter<Events> {
     // immediately execute pending commits before sending the message
     await this.mlsService.commitPendingProposals(groupId);
 
-    const encrypted = await this.mlsService.encryptMessage(groupIdBytes, GenericMessage.encode(payload).finish());
+    const encrypted = await this.mlsService.encryptMessage(
+      new ConversationId(groupIdBytes),
+      GenericMessage.encode(payload).finish(),
+    );
 
     let response: PostMlsMessageResponse | null = null;
     let sentAt: string = '';

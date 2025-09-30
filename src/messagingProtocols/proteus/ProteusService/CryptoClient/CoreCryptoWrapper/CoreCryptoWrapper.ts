@@ -276,8 +276,4 @@ export class CoreCryptoWrapper implements CryptoClient {
     ];
     await this.coreCrypto.transaction(cx => cx.proteusSessionFromPrekey(sessionId, Uint8Array.from(fakePrekey)));
   }
-
-  async migrateFromCryptobox(dbName: string) {
-    return this.coreCrypto.transaction(cx => cx.proteusCryptoboxMigrate(dbName));
-  }
 }

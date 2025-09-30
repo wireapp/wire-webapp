@@ -27,6 +27,7 @@ import {APIClient} from '@wireapp/api-client';
 import {LogFactory, TimeUtil, TypedEventEmitter} from '@wireapp/commons';
 import {
   Ciphersuite,
+  ClientId as CoreCryptoClientId,
   CommitBundle,
   ConversationConfiguration,
   ConversationId,
@@ -37,6 +38,8 @@ import {
   MlsTransport,
   MlsTransportResponse,
   NewCrlDistributionPoints,
+  Welcome,
+  ExternalSenderKey,
 } from '@wireapp/core-crypto';
 
 import {ClientMLSError, ClientMLSErrorLabel} from './ClientMLSError';
@@ -131,11 +134,14 @@ export class MLSService extends TypedEventEmitter<Events> {
       sendMessage: async () => {
         return 'success';
       },
+      prepareForTransport: async () => {
+        throw new Error('Method not implemented.');
+      },
     };
 
     const epochObserver: EpochObserver = {
       epochChanged: async (groupId, epoch) => {
-        const groupIdStr = Encoder.toBase64(groupId).asString;
+        const groupIdStr = Encoder.toBase64(groupId.copyBytes()).asString;
         this.logger.info(`Epoch changed for group ${groupIdStr}, new epoch: ${epoch}`);
         this.emit(MLSServiceEvents.NEW_EPOCH, {epoch, groupId: groupIdStr});
       },
@@ -184,9 +190,10 @@ export class MLSService extends TypedEventEmitter<Events> {
       ...filteredMLSConfig,
     };
 
-    await this.coreCryptoClient.transaction(cx =>
-      cx.mlsInit(generateMLSDeviceId(userId, client.id), this.config.ciphersuites, this.config.nbKeyPackages),
-    );
+    await this.coreCryptoClient.transaction(cx => {
+      const clientId = new CoreCryptoClientId(generateMLSDeviceId(userId, client.id));
+      return cx.mlsInit(clientId, this.config.ciphersuites, this.config.nbKeyPackages);
+    });
 
     try {
       const ccClientSignature = await this.getCCClientSignatureString();
@@ -235,7 +242,11 @@ export class MLSService extends TypedEventEmitter<Events> {
     groupInfo,
     welcome,
   }: CommitBundle): Promise<MlsTransportResponse> => {
-    const bundlePayload = new Uint8Array([...commit, ...groupInfo.payload, ...(welcome || [])]);
+    const bundlePayload = new Uint8Array([
+      ...commit,
+      ...groupInfo.payload.copyBytes(),
+      ...(welcome?.copyBytes() || []),
+    ]);
     try {
       const response = await this.apiClient.api.conversation.postMlsCommitBundle(bundlePayload);
 
@@ -272,7 +283,7 @@ export class MLSService extends TypedEventEmitter<Events> {
     }
 
     const crlNewDistributionPoints = await this.coreCryptoClient.transaction(cx =>
-      cx.addClientsToConversation(groupIdBytes, keyPackages),
+      cx.addClientsToConversation(new ConversationId(groupIdBytes), keyPackages),
     );
     this.dispatchNewCrlDistributionPoints(crlNewDistributionPoints);
   }
@@ -287,10 +298,12 @@ export class MLSService extends TypedEventEmitter<Events> {
     const groupIdBytes = Decoder.fromBase64(groupId).asBytes;
     const currentClientIdsInGroup = [];
 
-    for (const clientId of await this.coreCryptoClient.getClientIds(groupIdBytes)) {
+    for (const clientId of await this.coreCryptoClient.getClientIds(new ConversationId(groupIdBytes))) {
       // [user-id]:[client-id]@[domain] -> [client-id]
       // example: fb880fac-b549-4d8b-9398-4246324c7b85:67f41928e2844b6c@staging.zinfra.io -> 67f41928e2844b6c
-      currentClientIdsInGroup.push(Converter.arrayBufferViewToStringUTF8(clientId).split('@')[0].split(':')[1]);
+      currentClientIdsInGroup.push(
+        Converter.arrayBufferViewToStringUTF8(clientId.copyBytes()).split('@')[0].split(':')[1],
+      );
     }
 
     return currentClientIdsInGroup;
@@ -375,7 +388,7 @@ export class MLSService extends TypedEventEmitter<Events> {
 
   public getEpoch(groupId: string | Uint8Array) {
     const groupIdBytes = typeof groupId === 'string' ? Decoder.fromBase64(groupId).asBytes : groupId;
-    return this.coreCryptoClient.conversationEpoch(groupIdBytes);
+    return this.coreCryptoClient.conversationEpoch(new ConversationId(groupIdBytes));
   }
 
   public async joinByExternalCommit(getGroupInfo: () => Promise<Uint8Array>) {
@@ -383,13 +396,13 @@ export class MLSService extends TypedEventEmitter<Events> {
 
     const groupInfo = await getGroupInfo();
     const welcomeBundle = await this.coreCryptoClient.transaction(cx =>
-      cx.joinByExternalCommit(groupInfo, credentialType),
+      cx.joinByExternalCommit(new ConversationId(groupInfo), credentialType),
     );
     await this.dispatchNewCrlDistributionPoints(welcomeBundle.crlNewDistributionPoints);
 
     if (welcomeBundle.id) {
       //after we've successfully joined via external commit, we schedule periodic key material renewal
-      const groupIdStr = Encoder.toBase64(welcomeBundle.id).asString;
+      const groupIdStr = Encoder.toBase64(welcomeBundle.id.copyBytes()).asString;
       const newEpoch = await this.getEpoch(groupIdStr);
 
       // Schedule the next key material renewal
@@ -403,7 +416,7 @@ export class MLSService extends TypedEventEmitter<Events> {
 
   public async exportSecretKey(groupId: string, keyLength: number): Promise<string> {
     const groupIdBytes = Decoder.fromBase64(groupId).asBytes;
-    const key = await this.coreCryptoClient.exportSecretKey(groupIdBytes, keyLength);
+    const key = await this.coreCryptoClient.exportSecretKey(new ConversationId(groupIdBytes), keyLength);
     return Encoder.toBase64(key).asString;
   }
 
@@ -414,7 +427,9 @@ export class MLSService extends TypedEventEmitter<Events> {
   }
 
   public async processWelcomeMessage(welcomeMessage: Uint8Array): Promise<ConversationId> {
-    const welcomeBundle = await this.coreCryptoClient.transaction(cx => cx.processWelcomeMessage(welcomeMessage));
+    const welcomeBundle = await this.coreCryptoClient.transaction(cx =>
+      cx.processWelcomeMessage(new Welcome(welcomeMessage)),
+    );
     this.dispatchNewCrlDistributionPoints(welcomeBundle.crlNewDistributionPoints);
     return welcomeBundle.id;
   }
@@ -451,7 +466,7 @@ export class MLSService extends TypedEventEmitter<Events> {
 
   private async updateKeyingMaterial(groupId: string) {
     const groupIdBytes = Decoder.fromBase64(groupId).asBytes;
-    await this.coreCryptoClient.transaction(cx => cx.updateKeyingMaterial(groupIdBytes));
+    await this.coreCryptoClient.transaction(cx => cx.updateKeyingMaterial(new ConversationId(groupIdBytes)));
   }
 
   /**
@@ -466,10 +481,12 @@ export class MLSService extends TypedEventEmitter<Events> {
   ): Promise<void> {
     const groupIdBytes = Decoder.fromBase64(groupId).asBytes;
 
-    let externalSenders: Uint8Array[] = [];
+    let externalSenders: ExternalSenderKey[] = [];
     if (parentGroupId) {
       const parentGroupIdBytes = Decoder.fromBase64(parentGroupId).asBytes;
-      externalSenders = [await this.coreCryptoClient.getExternalSender(parentGroupIdBytes)];
+      externalSenders = [
+        new ExternalSenderKey(await this.coreCryptoClient.getExternalSender(new ConversationId(parentGroupIdBytes))),
+      ];
     } else {
       const mlsKeys = (await this.apiClient.api.client.getPublicKeys()).removal;
       const ciphersuiteSignature = getSignatureAlgorithmForCiphersuite(this.config.defaultCiphersuite);
@@ -480,7 +497,7 @@ export class MLSService extends TypedEventEmitter<Events> {
           `Cannot create conversation: No backend removal key found for the signature ${ciphersuiteSignature}`,
         );
       }
-      externalSenders = [Decoder.fromBase64(removalKeyForSignature).asBytes];
+      externalSenders = [new ExternalSenderKey(Decoder.fromBase64(removalKeyForSignature).asBytes)];
     }
 
     const configuration: ConversationConfiguration = {
@@ -489,7 +506,9 @@ export class MLSService extends TypedEventEmitter<Events> {
     };
 
     const credentialType = await this.getCredentialType();
-    return this.coreCryptoClient.transaction(cx => cx.createConversation(groupIdBytes, credentialType, configuration));
+    return this.coreCryptoClient.transaction(cx =>
+      cx.createConversation(new ConversationId(groupIdBytes), credentialType, configuration),
+    );
   }
 
   /**
@@ -631,8 +650,8 @@ export class MLSService extends TypedEventEmitter<Events> {
 
     return this.coreCryptoClient.transaction(cx =>
       cx.removeClientsFromConversation(
-        groupIdBytes,
-        clientIds.map(id => this.textEncoder.encode(id)),
+        new ConversationId(groupIdBytes),
+        clientIds.map(id => new CoreCryptoClientId(this.textEncoder.encode(id))),
       ),
     );
   }
@@ -643,7 +662,7 @@ export class MLSService extends TypedEventEmitter<Events> {
    */
   public async conversationExists(groupId: string): Promise<boolean> {
     const groupIdBytes = Decoder.fromBase64(groupId).asBytes;
-    return this.coreCryptoClient.conversationExists(groupIdBytes);
+    return this.coreCryptoClient.conversationExists(new ConversationId(groupIdBytes));
   }
 
   /**
@@ -841,7 +860,7 @@ export class MLSService extends TypedEventEmitter<Events> {
     }
 
     const groupIdBytes = Decoder.fromBase64(groupId).asBytes;
-    return this.coreCryptoClient.transaction(cx => cx.wipeConversation(groupIdBytes));
+    return this.coreCryptoClient.transaction(cx => cx.wipeConversation(new ConversationId(groupIdBytes)));
   }
 
   /**
@@ -891,7 +910,7 @@ export class MLSService extends TypedEventEmitter<Events> {
     const groupIdBytes = Decoder.fromBase64(groupId).asBytes;
 
     try {
-      await this.coreCryptoClient.transaction(cx => cx.commitPendingProposals(groupIdBytes));
+      await this.coreCryptoClient.transaction(cx => cx.commitPendingProposals(new ConversationId(groupIdBytes)));
       await this.cancelPendingProposalsTask(groupId);
     } catch (error) {
       if (!shouldRetry) {
@@ -934,10 +953,10 @@ export class MLSService extends TypedEventEmitter<Events> {
   public async getClientIds(groupId: string): Promise<{userId: string; clientId: ClientId; domain: string}[]> {
     const groupIdBytes = Decoder.fromBase64(groupId).asBytes;
 
-    const rawClientIds = await this.coreCryptoClient.getClientIds(groupIdBytes);
+    const rawClientIds = await this.coreCryptoClient.getClientIds(new ConversationId(groupIdBytes));
 
     const clientIds = rawClientIds.map(id => {
-      const {user, client, domain} = parseFullQualifiedClientId(this.textDecoder.decode(id));
+      const {user, client, domain} = parseFullQualifiedClientId(this.textDecoder.decode(id.copyBytes()));
       return {userId: user, clientId: client, domain};
     });
     return clientIds;

@@ -22,7 +22,15 @@ import {TimeInMillis} from '@wireapp/commons/lib/util/TimeUtil';
 import {Decoder} from 'bazinga64';
 
 import {TypedEventEmitter} from '@wireapp/commons';
-import {CoreCrypto, E2eiConversationState, WireIdentity, DeviceStatus, CredentialType} from '@wireapp/core-crypto';
+import {
+  CoreCrypto,
+  E2eiConversationState,
+  WireIdentity,
+  DeviceStatus,
+  CredentialType,
+  ConversationId,
+  ClientId,
+} from '@wireapp/core-crypto';
 
 import {AcmeService} from './Connection';
 import {getE2EIClientId} from './Helper';
@@ -73,7 +81,7 @@ export class E2EIServiceExternal extends TypedEventEmitter<Events> {
   }
 
   public async getConversationState(conversationId: Uint8Array): Promise<E2eiConversationState> {
-    return this.coreCryptoClient.transaction(cx => cx.e2eiConversationState(conversationId));
+    return this.coreCryptoClient.transaction(cx => cx.e2eiConversationState(new ConversationId(conversationId)));
   }
 
   public isE2EIEnabled(): Promise<boolean> {
@@ -119,13 +127,13 @@ export class E2EIServiceExternal extends TypedEventEmitter<Events> {
 
     // we get all the devices that have an identity (either valid, expired or revoked)
     const userIdentities = await this.coreCryptoClient.getUserIdentities(
-      groupIdBytes,
+      new ConversationId(groupIdBytes),
       userIds.map(userId => userId.id),
     );
 
     // We get all the devices in the conversation (in order to get devices that have no identity)
-    const allUsersMLSDevices = (await this.coreCryptoClient.getClientIds(groupIdBytes))
-      .map(id => textDecoder.decode(id))
+    const allUsersMLSDevices = (await this.coreCryptoClient.getClientIds(new ConversationId(groupIdBytes)))
+      .map(id => textDecoder.decode(id.copyBytes()))
       .map(fullyQualifiedId => parseFullQualifiedClientId(fullyQualifiedId));
 
     const mappedUserIdentities = new Map<StringifiedQualifiedId, DeviceIdentity[]>();
@@ -169,11 +177,11 @@ export class E2EIServiceExternal extends TypedEventEmitter<Events> {
     groupId: string,
     userClientsMap: Record<string, QualifiedId>,
   ): Promise<DeviceIdentity[]> {
-    const clientIds = Object.entries(userClientsMap).map(
-      ([clientId, userId]) => getE2EIClientId(clientId, userId.id, userId.domain).asBytes,
+    const clientIds: Array<ClientId> = Object.entries(userClientsMap).map(
+      ([clientId, userId]) => new ClientId(getE2EIClientId(clientId, userId.id, userId.domain).asBytes),
     );
     const deviceIdentities = await this.coreCryptoClient.getDeviceIdentities(
-      Decoder.fromBase64(groupId).asBytes,
+      new ConversationId(Decoder.fromBase64(groupId).asBytes),
       clientIds,
     );
 
