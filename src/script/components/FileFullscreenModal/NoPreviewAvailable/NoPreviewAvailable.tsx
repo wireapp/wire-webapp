@@ -20,7 +20,7 @@
 import {Button} from '@wireapp/react-ui-kit';
 
 import {t} from 'Util/LocalizerUtil';
-import {forcedDownloadFile} from 'Util/util';
+import {forcedDownloadFile, getFileNameWithExtension} from 'Util/util';
 
 import {FilePlaceholder} from '../common/FilePlaceholder/FilePlaceholder';
 
@@ -31,12 +31,14 @@ interface NoPreviewAvailableProps {
 }
 
 export const NoPreviewAvailable = ({fileUrl, fileName, fileExtension}: NoPreviewAvailableProps) => {
+  const fileNameWithExtension = getFileNameWithExtension(fileName, fileExtension);
+
   return (
     <FilePlaceholder
       title={t('fileFullscreenModal.noPreviewAvailable.title')}
       description={t('fileFullscreenModal.noPreviewAvailable.description')}
       callToAction={
-        <Button onClick={() => forcedDownloadFile({url: fileUrl || '', name: fileName})}>
+        <Button onClick={() => forcedDownloadFile({url: fileUrl || '', name: fileNameWithExtension})}>
           {t('fileFullscreenModal.noPreviewAvailable.callToAction')}
         </Button>
       }
