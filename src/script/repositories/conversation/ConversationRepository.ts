@@ -593,7 +593,7 @@ export class ConversationRepository {
   /**
    * Get a conversation from the backend.
    */
-  public async fetchConversationById({id: conversationId, domain}: QualifiedId): Promise<Conversation> {
+  private async fetchConversationById({id: conversationId, domain}: QualifiedId): Promise<Conversation> {
     const qualifiedId = {domain, id: conversationId};
     const fetching_conversations: Record<string, FetchPromise[]> = {};
     if (fetching_conversations.hasOwnProperty(conversationId)) {
@@ -628,6 +628,19 @@ export class ConversationRepository {
       throw error;
     }
   }
+
+  /**
+   * Get a conversation from the backend without updating local storage
+   * @param qualifiedId qualified id of the conversation to fetch
+   * @returns the fetched backend conversation entity
+   */
+  public fetchBackendConversationEntityById = async (qualifiedId: QualifiedId): Promise<BackendConversation> => {
+    const backendConversationEntity = await this.conversationService.getConversationById(qualifiedId).catch(error => {
+      this.logger.error(`Failed to get conversation from backend: ${error.message}`);
+      throw error;
+    });
+    return backendConversationEntity;
+  };
 
   /**
    * Will load all the conversations in memory
