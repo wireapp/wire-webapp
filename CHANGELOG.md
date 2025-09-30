@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [46.36.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@46.35.4...@wireapp/core@46.36.0) (2025-09-30)
+
+### Features
+
+* **core:** Adopt core crypto 9 [WPB-20699] ([#7403](https://github.com/wireapp/wire-web-packages/issues/7403)) ([7456258](https://github.com/wireapp/wire-web-packages/commit/7456258d8cae6336852e50232bfc36ca388847de))
+
 ## [46.35.4](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@46.35.3...@wireapp/core@46.35.4) (2025-09-29)
 
 **Note:** Version bump only for package @wireapp/core
