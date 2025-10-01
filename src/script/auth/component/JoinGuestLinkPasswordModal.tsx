@@ -35,13 +35,13 @@ export interface JoinGuestLinkPasswordModalProps {
   onClose: () => void;
 }
 
-const JoinGuestLinkPasswordModal: React.FC<JoinGuestLinkPasswordModalProps> = ({
+const JoinGuestLinkPasswordModal = ({
   error,
   onClose,
   isLoading,
   conversationName,
   onSubmitPassword,
-}) => {
+}: JoinGuestLinkPasswordModalProps) => {
   const [passwordValue, setPasswordValue] = useState<string>('');
 
   const onSubmit = (event: React.FormEvent<HTMLFormElement | HTMLButtonElement>) => {

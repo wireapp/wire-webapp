@@ -17,8 +17,6 @@
  *
  */
 
-import React from 'react';
-
 import {CSSObject} from '@emotion/react';
 import {ConversationProtocol} from '@wireapp/api-client/lib/conversation/NewConversation';
 
@@ -50,7 +48,7 @@ const wrapperStyles: CSSObject = {
   paddingTop: 4,
 };
 
-export const ConversationProtocolDetails: React.FC<ConversationProtocolDetailsProps> = ({protocol, cipherSuite}) => (
+export const ConversationProtocolDetails = ({protocol, cipherSuite}: ConversationProtocolDetailsProps) => (
   <div>
     <h3 className="conversation-details__list-head">{t('conversationDetailsProtocolDetails')}</h3>
 

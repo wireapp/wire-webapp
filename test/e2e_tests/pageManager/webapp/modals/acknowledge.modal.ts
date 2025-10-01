@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2018 Wire Swiss GmbH
+ * Copyright (C) 2025 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,25 +17,12 @@
  *
  */
 
-import React from 'react';
+import {Page} from '@playwright/test';
 
-import {User} from 'Repositories/entity/User';
+import {BaseModal} from './base.modal';
 
-import {TopContact} from './topPeople/TopContact';
-
-interface TopPeopleProps {
-  clickOnUser: (user: User, event: React.UIEvent) => void;
-  max?: number;
-  users: User[];
+export class AcknowledgeModal extends BaseModal {
+  constructor(page: Page) {
+    super(page, "[data-uie-name='modal-template-acknowledge']");
+  }
 }
-
-const TopPeople = ({clickOnUser, max, users}: TopPeopleProps) => {
-  max ??= 9;
-  const displayedUsers = users.slice(0, max);
-  const searchListItems = displayedUsers.map(user => (
-    <TopContact clickOnUser={clickOnUser} key={user.id} user={user} />
-  ));
-  return <div className="search-list search-list-sm">{searchListItems}</div>;
-};
-
-export {TopPeople};
