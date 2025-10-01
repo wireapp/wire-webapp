@@ -32,6 +32,9 @@ import {
 } from 'Repositories/conversation/ConversationSelectors';
 import {Conversation} from 'Repositories/entity/Conversation';
 import {User} from 'Repositories/entity/User';
+import {getLogger} from 'Util/Logger';
+
+const logger = getLogger('Webapp/MLSConversations');
 
 /**
  * Will initialize all the MLS conversations that the user is member of but that are not yet locally established.
@@ -154,6 +157,10 @@ export async function initialiseSelfAndTeamConversations(
 
       // If the conversation is already established, we don't need to do anything.
       const isGroupAlreadyEstablished = await mlsService.isConversationEstablished(conversation.groupId);
+      logger.info('Checking if group is already established', {
+        isGroupAlreadyEstablished,
+        qualifiedId: conversation.qualifiedId,
+      });
       if (isGroupAlreadyEstablished) {
         return Promise.resolve();
       }
@@ -181,6 +188,7 @@ export async function addOtherSelfClientsToMLSConversation(
 ) {
   try {
     const {groupId, qualifiedId} = conversation;
+    logger.info('Adding other self clients to MLS conversation', {groupId, qualifiedId});
 
     if (!groupId) {
       throw new Error(`No group id found for MLS conversation ${conversation.id}`);
