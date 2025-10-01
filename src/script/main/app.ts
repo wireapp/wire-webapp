@@ -376,7 +376,7 @@ export class App {
    * @param config
    * @param onProgress
    */
-  async initApp(clientType: ClientType, onProgress: (message?: string) => void) {
+  async initApp(clientType: ClientType, onProgress: (message?: string) => void): Promise<User | undefined> {
     // add body information
     const startTime = Date.now();
     await updateApiVersion();
@@ -415,7 +415,8 @@ export class App {
 
         if (!hasAuthenticatedSession) {
           this.logger.info('User flagged as logged out without an authenticated session. Redirecting to login.');
-          return this.repository.lifeCycle.redirectToLogin(SIGN_OUT_REASON.NOT_SIGNED_IN);
+          this.repository.lifeCycle.redirectToLogin(SIGN_OUT_REASON.NOT_SIGNED_IN);
+          return undefined;
         }
       }
 
