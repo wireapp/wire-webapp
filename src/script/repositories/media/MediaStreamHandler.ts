@@ -23,7 +23,7 @@ import {Runtime} from '@wireapp/commons';
 
 import {CallingViewMode, CallState} from 'Repositories/calling/CallState';
 import {BrowserPermissionStatus} from 'Repositories/permission/BrowserPermissionStatus';
-import type {PermissionRepository} from 'Repositories/permission/PermissionRepository';
+import {getPermissionStates} from 'Repositories/permission/permissionHandlers';
 import {PermissionType} from 'Repositories/permission/PermissionType';
 import {getLogger, Logger} from 'Util/Logger';
 
@@ -46,10 +46,7 @@ export class MediaStreamHandler {
   private requestHintTimeout: number | undefined;
   private readonly screensharingMethod: ScreensharingMethods;
 
-  constructor(
-    private readonly constraintsHandler: MediaConstraintsHandler,
-    private readonly permissionRepository: PermissionRepository,
-  ) {
+  constructor(private readonly constraintsHandler: MediaConstraintsHandler) {
     this.logger = getLogger('MediaStreamHandler');
     this.requestHintTimeout = undefined;
 
@@ -106,7 +103,7 @@ export class MediaStreamHandler {
    */
   private hasPermissionToAccess(audio: boolean, video: boolean): boolean {
     const checkPermissionStates = (typesToCheck: PermissionType[]): boolean => {
-      const permissions = this.permissionRepository.getPermissionStates(typesToCheck);
+      const permissions = getPermissionStates(typesToCheck);
       for (const permission of permissions) {
         const {state, type} = permission;
         const isPermissionPrompt = state === BrowserPermissionStatus.PROMPT;

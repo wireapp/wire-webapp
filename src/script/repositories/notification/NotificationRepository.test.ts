@@ -52,7 +52,6 @@ import {Text} from 'Repositories/entity/message/Text';
 import {User} from 'Repositories/entity/User';
 import {NOTIFICATION_HANDLING_STATE} from 'Repositories/event/NotificationHandlingState';
 import {BrowserPermissionStatus} from 'Repositories/permission/BrowserPermissionStatus';
-import {PermissionRepository} from 'Repositories/permission/PermissionRepository';
 import {UserMapper} from 'Repositories/user/UserMapper';
 import {UserState} from 'Repositories/user/UserState';
 import 'src/script/localization/Localizer';
@@ -72,7 +71,6 @@ function buildNotificationRepository() {
   const userState = container.resolve(UserState);
   const notificationRepository = new NotificationRepository(
     {} as any,
-    new PermissionRepository(),
     new AudioRepository(),
     {} as CallingRepository,
     userState,

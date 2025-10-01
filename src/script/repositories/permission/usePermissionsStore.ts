@@ -82,10 +82,12 @@ export const permissionsStore = createStore<PermissionsState>()(
 
     getPermissionStates: (permissionTypes: PermissionType[]) => {
       const state = get();
-      return permissionTypes.map(permissionType => ({
-        state: state.permissions[permissionType],
-        type: permissionType,
-      }));
+      return permissionTypes
+        .filter(permissionType => Object.values(PermissionType).includes(permissionType))
+        .map(permissionType => ({
+          state: state.permissions[permissionType],
+          type: permissionType,
+        }));
     },
 
     // setters

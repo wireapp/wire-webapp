@@ -41,8 +41,7 @@ import type {User} from 'Repositories/entity/User';
 import type {ElectronDesktopCapturerSource, MediaDevicesHandler} from 'Repositories/media/MediaDevicesHandler';
 import type {MediaStreamHandler} from 'Repositories/media/MediaStreamHandler';
 import {mediaDevicesStore} from 'Repositories/media/useMediaDevicesStore';
-import {BrowserPermissionStatus} from 'Repositories/permission/BrowserPermissionStatus';
-import type {PermissionRepository} from 'Repositories/permission/PermissionRepository';
+import {isPermissionGranted} from 'Repositories/permission/permissionHandlers';
 import {PermissionType} from 'Repositories/permission/PermissionType';
 import {PropertiesRepository} from 'Repositories/properties/PropertiesRepository';
 import {PROPERTIES_TYPE} from 'Repositories/properties/PropertiesType';
@@ -90,7 +89,6 @@ export class CallingViewModel {
     readonly audioRepository: AudioRepository,
     readonly mediaDevicesHandler: MediaDevicesHandler,
     readonly mediaStreamHandler: MediaStreamHandler,
-    readonly permissionRepository: PermissionRepository,
     readonly teamRepository: TeamRepository,
     readonly propertiesRepository: PropertiesRepository,
     private readonly selfUser: ko.Observable<User>,
@@ -465,7 +463,7 @@ export class CallingViewModel {
   }
 
   hasAccessToCamera(): boolean {
-    return this.permissionRepository.getPermissionState(PermissionType.CAMERA) === BrowserPermissionStatus.GRANTED;
+    return isPermissionGranted(PermissionType.CAMERA);
   }
 
   readonly onCancelScreenSelection = () => {
