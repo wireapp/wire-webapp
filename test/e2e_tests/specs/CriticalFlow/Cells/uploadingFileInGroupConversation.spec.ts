@@ -117,10 +117,6 @@ test(
 
     await test.step('User A opens group conversation files and sees the image file there', async () => {
       await userAPages.conversation().clickFilesTab();
-
-      // TODO: Refresh needed for the Files list to be displayed after the conversation is created [WPB-19978]
-      await userAPageManager.refreshPage({waitUntil: 'load'});
-
       await userAPages.cellsConversationFiles().clickFile(ImageQRCodeFileName);
 
       expect(await userAModals.cellsFileDetailView().isImageVisible()).toBeTruthy();
