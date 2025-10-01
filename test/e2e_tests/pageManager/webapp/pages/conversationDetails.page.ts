@@ -27,14 +27,15 @@ export class ConversationDetailsPage {
   readonly addPeopleButton: Locator;
   readonly conversationDetails: Locator;
   readonly guestOptionsButton: Locator;
+  readonly archiveButton: Locator;
 
   constructor(page: Page) {
     this.page = page;
 
     this.addPeopleButton = page.locator(`${selectByDataAttribute('go-add-people')}`);
-
     this.conversationDetails = page.locator('#conversation-details');
     this.guestOptionsButton = this.conversationDetails.locator('[data-uie-name="go-guest-options"]');
+    this.archiveButton = this.conversationDetails.locator(selectByDataAttribute('do-archive'));
   }
 
   async isOpen(conversationName: string) {
@@ -90,5 +91,9 @@ export class ConversationDetailsPage {
     );
     await userLocator.waitFor({state: 'visible'});
     return userLocator;
+  }
+
+  async clickArchiveButton() {
+    await this.archiveButton.click();
   }
 }
