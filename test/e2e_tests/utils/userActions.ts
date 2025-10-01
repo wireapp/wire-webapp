@@ -127,6 +127,7 @@ export async function connectUsersManually(
   userB: User,
   userAPageManager: PageManager,
   userBPageManager: PageManager,
+  clickConnect?: boolean,
 ) {
   const {modals: userAModals, components: userAComponents, pages: userAPages} = userAPageManager.webapp;
   const {pages: userBPages} = userBPageManager.webapp;
@@ -139,8 +140,10 @@ export async function connectUsersManually(
   expect(await userAPages.conversationList().isConversationItemVisible(userB.fullName)).toBeTruthy();
   await expect(await userBPageManager.getPage()).toHaveTitle('(1) Wire');
 
-  await userBPages.conversationList().openPendingConnectionRequest();
-  await userBPages.connectRequest().clickConnectButton();
+  if (clickConnect) {
+    await userBPages.conversationList().openPendingConnectionRequest();
+    await userBPages.connectRequest().clickConnectButton();
+  }
 }
 
 /**

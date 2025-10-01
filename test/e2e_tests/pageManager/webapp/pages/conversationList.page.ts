@@ -22,6 +22,8 @@ import {Locator, Page} from '@playwright/test';
 import {selectById, selectByDataAttribute} from 'test/e2e_tests/utils/selector.util';
 import {escapeHtml} from 'test/e2e_tests/utils/userDataProcessor';
 
+import {User} from '../../../data/user';
+
 export class ConversationListPage {
   readonly page: Page;
 
@@ -33,6 +35,10 @@ export class ConversationListPage {
   readonly searchConversationsInput: Locator;
   readonly archiveConversationMenuButton: Locator;
   readonly unarchiveConversationMenuButton: Locator;
+  readonly statusLabel: Locator;
+  readonly blockedChip: Locator;
+  readonly profilePicture: Locator;
+  readonly unblockConversationMenuButton: Locator;
 
   constructor(page: Page) {
     this.page = page;
@@ -50,6 +56,12 @@ export class ConversationListPage {
     this.searchConversationsInput = page.locator(selectByDataAttribute('search-conversations'));
     this.archiveConversationMenuButton = page.locator(selectById('btn-archive'));
     this.unarchiveConversationMenuButton = page.locator(selectById('btn-unarchive'));
+    this.statusLabel = page.locator(selectByDataAttribute('status-label'));
+    this.blockedChip = page.locator(`span[data-uie-name="status-label"] + span`);
+    this.profilePicture = page.locator(selectByDataAttribute('element-avatar-user'));
+    this.unblockConversationMenuButton = page.locator(
+      `${selectById('btn-unblock')}${selectByDataAttribute('conversation-list-options-menu')}`,
+    );
   }
 
   async isConversationItemVisible(conversationName: string) {
@@ -122,5 +134,16 @@ export class ConversationListPage {
   async searchConversation(conversationName: string) {
     await this.searchConversationsInput.fill(conversationName);
     await this.openConversation(conversationName);
+  }
+
+  async getUserAvatarWrapper(user: User): Promise<Locator> {
+    return this.page
+      .locator(selectByDataAttribute('item-conversation'))
+      .filter({has: this.page.locator(selectByDataAttribute('status-label'), {hasText: user.fullName})})
+      .locator(selectByDataAttribute('element-avatar-user'));
+  }
+
+  async clickUnblockConversation() {
+    await this.unblockConversationMenuButton.click();
   }
 }
