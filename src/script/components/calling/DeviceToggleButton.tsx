@@ -17,7 +17,7 @@
  *
  */
 
-import React from 'react';
+import {UIEvent} from 'react';
 
 import {css, SerializedStyles} from '@emotion/react';
 
@@ -30,7 +30,7 @@ interface DeviceToggleButtonProps {
 }
 
 const DeviceToggleButton = ({currentDevice, devices, onChooseDevice, styles}: DeviceToggleButtonProps) => {
-  const selectNextDevice = (event: React.UIEvent) => {
+  const selectNextDevice = (event: UIEvent) => {
     event.preventDefault();
     event.stopPropagation();
     const currentDeviceIndex = devices.indexOf(currentDevice);

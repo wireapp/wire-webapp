@@ -17,7 +17,7 @@
  *
  */
 
-import React from 'react';
+import {MouseEvent, KeyboardEvent} from 'react';
 
 import cx from 'classnames';
 import {container} from 'tsyringe';
@@ -69,7 +69,7 @@ const MessageTimerButton = ({conversation, teamState = container.resolve(TeamSta
     );
 
   // Click on ephemeral button
-  const onClick = (event: React.MouseEvent<HTMLSpanElement>): void => {
+  const onClick = (event: MouseEvent<HTMLSpanElement>): void => {
     const entries = setEntries();
     showContextMenu({event, entries, identifier: 'message-timer-menu'});
   };
@@ -78,7 +78,7 @@ const MessageTimerButton = ({conversation, teamState = container.resolve(TeamSta
     return null;
   }
 
-  const handleContextKeyDown = (event: React.KeyboardEvent) => {
+  const handleContextKeyDown = (event: KeyboardEvent) => {
     if (isSpaceOrEnterKey(event.key)) {
       const newEvent = setContextMenuPosition(event);
       const entries = setEntries();

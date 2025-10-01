@@ -17,7 +17,7 @@
  *
  */
 
-import React, {useEffect, useState} from 'react';
+import {useEffect, useState, useRef, FormEvent} from 'react';
 
 import type {RegisterData} from '@wireapp/api-client/lib/auth';
 import {BackendErrorLabel} from '@wireapp/api-client/lib/http';
@@ -72,7 +72,7 @@ const ConversationJoinComponent = ({
   generalError,
   doGetAllClients,
 }: Props & ConnectedProps & DispatchProps) => {
-  const nameInput = React.useRef<HTMLInputElement>(null);
+  const nameInput = useRef<HTMLInputElement>(null);
 
   const conversationHasPassword = conversationInfo?.has_password;
 
@@ -205,7 +205,7 @@ const ConversationJoinComponent = ({
     }
   };
 
-  const checkNameValidity = async (event: React.FormEvent) => {
+  const checkNameValidity = async (event: FormEvent) => {
     setIsTemporaryGuest(true);
     event.preventDefault();
     if (!nameInput.current) {

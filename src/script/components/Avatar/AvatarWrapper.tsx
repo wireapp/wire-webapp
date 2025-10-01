@@ -17,7 +17,7 @@
  *
  */
 
-import React from 'react';
+import type {ReactNode, MouseEvent, KeyboardEvent} from 'react';
 
 import {CSS_SQUARE} from 'Util/CSSMixin';
 
@@ -27,9 +27,9 @@ interface AvatarWrapperProps {
   avatarSize: AVATAR_SIZE;
   color: string;
   isResponsive?: boolean;
-  children?: React.ReactNode;
-  onClick?: (event: React.MouseEvent<HTMLDivElement>) => void;
-  onKeyDown?: (event: React.KeyboardEvent<HTMLDivElement>) => void;
+  children?: ReactNode;
+  onClick?: (event: MouseEvent<HTMLDivElement>) => void;
+  onKeyDown?: (event: KeyboardEvent<HTMLDivElement>) => void;
   title?: string;
 }
 

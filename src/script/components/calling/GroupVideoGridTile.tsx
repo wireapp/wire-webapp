@@ -17,7 +17,7 @@
  *
  */
 
-import React from 'react';
+import {KeyboardEvent} from 'react';
 
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 
@@ -100,7 +100,7 @@ const GroupVideoGridTile = ({
 
   const handleTileClick = () => onTileDoubleClick(participant?.user.qualifiedId, participant?.clientId);
 
-  const handleEnterTileClick = (keyboardEvent: React.KeyboardEvent) => {
+  const handleEnterTileClick = (keyboardEvent: KeyboardEvent) => {
     if (isEnterKey(keyboardEvent)) {
       handleTileClick();
     }

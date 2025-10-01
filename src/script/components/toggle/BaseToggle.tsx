@@ -17,7 +17,7 @@
  *
  */
 
-import React, {useId} from 'react';
+import {useId, useRef} from 'react';
 
 import cx from 'classnames';
 
@@ -48,7 +48,7 @@ const BaseToggle = ({
 }: BaseToggleProps) => {
   const uuid = useId();
   const labelUuid = useId();
-  const inputRef = React.useRef<HTMLInputElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
   return (
     <div className={cx(defaultToggleName, className)}>
       <div className="info-toggle__row">

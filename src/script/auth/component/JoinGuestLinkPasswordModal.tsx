@@ -17,7 +17,7 @@
  *
  */
 
-import React, {useState} from 'react';
+import {FormEvent, useState} from 'react';
 
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 
@@ -44,7 +44,7 @@ const JoinGuestLinkPasswordModal = ({
 }: JoinGuestLinkPasswordModalProps) => {
   const [passwordValue, setPasswordValue] = useState<string>('');
 
-  const onSubmit = (event: React.FormEvent<HTMLFormElement | HTMLButtonElement>) => {
+  const onSubmit = (event: FormEvent<HTMLFormElement | HTMLButtonElement>) => {
     event.preventDefault();
     onSubmitPassword(passwordValue);
   };
@@ -70,7 +70,7 @@ const JoinGuestLinkPasswordModal = ({
         <Form
           name="guest-password-join-form"
           data-uie-name="guest-password-join-form"
-          onSubmit={(event: React.FormEvent<HTMLFormElement>) => onSubmit(event)}
+          onSubmit={(event: FormEvent<HTMLFormElement>) => onSubmit(event)}
           autoComplete="off"
         >
           <Input
@@ -98,7 +98,7 @@ const JoinGuestLinkPasswordModal = ({
           block
           type="button"
           disabled={!passwordValue}
-          onClick={(event: React.FormEvent<HTMLButtonElement>) => onSubmit(event)}
+          onClick={(event: FormEvent<HTMLButtonElement>) => onSubmit(event)}
           data-uie-name="guest-link-join-submit-button"
         >
           {t('guestLinkPasswordModal.joinConversation')}

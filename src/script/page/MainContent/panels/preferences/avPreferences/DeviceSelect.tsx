@@ -17,6 +17,8 @@
  *
  */
 
+import {ComponentType} from 'react';
+
 import cx from 'classnames';
 
 import {Select} from '@wireapp/react-ui-kit';
@@ -24,7 +26,7 @@ import {Select} from '@wireapp/react-ui-kit';
 interface DeviceSelectProps {
   defaultDeviceName?: string;
   devices: MediaDeviceInfo[];
-  icon: React.ComponentType;
+  icon: ComponentType;
   isRequesting?: boolean;
   onChange: (deviceId: string) => void;
   title: string;
