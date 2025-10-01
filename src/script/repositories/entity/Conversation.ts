@@ -277,7 +277,8 @@ export class Conversation {
       () =>
         this.isConversationWithBlockedUser() ||
         this.is1to1ConversationWithDeletedUser() ||
-        this.readOnlyState() !== null,
+        this.readOnlyState() !== null ||
+        this.accessState() === undefined,
     );
 
     this.isGroup = ko.pureComputed(() => {

@@ -23,7 +23,7 @@ import {FileTypeIcon} from 'Components/Conversation/common/FileTypeIcon/FileType
 import {MessageTime} from 'Components/MessagesList/Message/MessageTime';
 import {useRelativeTimestamp} from 'Hooks/useRelativeTimestamp';
 import {t} from 'Util/LocalizerUtil';
-import {forcedDownloadFile} from 'Util/util';
+import {forcedDownloadFile, getFileNameWithExtension} from 'Util/util';
 
 import {
   headerStyles,
@@ -56,6 +56,7 @@ export const FileHeader = ({
   badges,
 }: FileHeaderProps) => {
   const timeAgo = useRelativeTimestamp(timestamp);
+  const fileNameWithExtension = getFileNameWithExtension(fileName, fileExtension);
 
   return (
     <header css={headerStyles}>
@@ -82,7 +83,7 @@ export const FileHeader = ({
         <Button
           variant={ButtonVariant.TERTIARY}
           css={downloadButtonStyles}
-          onClick={() => forcedDownloadFile({url: fileUrl || '', name: fileName})}
+          onClick={() => forcedDownloadFile({url: fileUrl || '', name: fileNameWithExtension})}
           aria-label={t('cells.imageFullScreenModal.downloadButton')}
         >
           <DownloadIcon />
