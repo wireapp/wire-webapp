@@ -19,35 +19,16 @@
 
 import {Page, Locator} from '@playwright/test';
 
-import {selectByDataAttribute} from 'test/e2e_tests/utils/selector.util';
-
-export class UserProfileModal {
+export class ContactList {
   readonly page: Page;
-
-  readonly modal: Locator;
-  readonly connectButton: Locator;
-  readonly startConversationButton: Locator;
+  readonly searchList: Locator;
 
   constructor(page: Page) {
     this.page = page;
-    this.modal = page.locator(`${selectByDataAttribute('modal-user-profile')}`);
-    this.connectButton = page.locator(
-      `${selectByDataAttribute('modal-user-profile')} ${selectByDataAttribute('do-send-request')}`,
-    );
-    this.startConversationButton = page.locator(
-      `${selectByDataAttribute('modal-user-profile')} ${selectByDataAttribute('start-conversation')}`,
-    );
+    this.searchList = page.getByTestId('search-list');
   }
 
-  async isVisible() {
-    return await this.modal.isVisible();
-  }
-
-  async clickConnectButton() {
-    await this.connectButton.click();
-  }
-
-  async clickStartConversation() {
-    await this.startConversationButton.click();
+  async clickOnContact(name: string) {
+    await this.searchList.getByRole('button').getByText(name).click();
   }
 }

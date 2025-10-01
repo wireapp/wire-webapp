@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2018 Wire Swiss GmbH
+ * Copyright (C) 2025 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,6 +17,11 @@
  *
  */
 
+jest.mock('Util/StorageUtil', () => ({
+  storeValue: jest.fn(),
+  resetStoreValue: jest.fn(),
+}));
+
 import {amplify} from 'amplify';
 
 import {WebAppEvents} from '@wireapp/webapp-events';
@@ -30,6 +35,7 @@ import type {EventRepository} from 'Repositories/event/EventRepository';
 import {StorageKey} from 'Repositories/storage/StorageKey';
 import type {StorageRepository} from 'Repositories/storage/StorageRepository';
 import type {UserRepository} from 'Repositories/user/UserRepository';
+import {storeValue, resetStoreValue} from 'Util/StorageUtil';
 
 import {LifeCycleRepository, doSimpleRedirect, type LifeCycleDependencies} from './LifeCycleRepository';
 
@@ -598,6 +604,22 @@ describe('LifeCycleRepository', () => {
       await lifeCycleRepository.logout(SIGN_OUT_REASON.USER_REQUESTED, false);
 
       expect(mockDependencies.eventRepository.disconnectWebSocket).toHaveBeenCalled();
+    });
+
+    it('sets SHOW_LOGIN flag on USER_REQUESTED logout', async () => {
+      (mockDependencies.clientRepository.isCurrentClientPermanent as jest.Mock).mockReturnValue(true);
+
+      await lifeCycleRepository.logout(SIGN_OUT_REASON.USER_REQUESTED, true);
+
+      expect(storeValue).toHaveBeenCalledWith(StorageKey.AUTH.SHOW_LOGIN, true);
+    });
+
+    it('resets SHOW_LOGIN flag on non USER_REQUESTED logout like SESSION_EXPIRED)', async () => {
+      (mockDependencies.clientRepository.isCurrentClientPermanent as jest.Mock).mockReturnValue(true);
+
+      await lifeCycleRepository.logout(SIGN_OUT_REASON.SESSION_EXPIRED, false);
+
+      expect(resetStoreValue).toHaveBeenCalledWith(StorageKey.AUTH.SHOW_LOGIN);
     });
   });
 
