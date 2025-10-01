@@ -30,6 +30,7 @@ import {StorageKey} from 'Repositories/storage/StorageKey';
 import type {StorageRepository} from 'Repositories/storage/StorageRepository';
 import type {UserRepository} from 'Repositories/user/UserRepository';
 import {getLogger, Logger} from 'Util/Logger';
+import {resetStoreValue, storeValue} from 'Util/StorageUtil';
 import {includesString} from 'Util/StringUtil';
 import {appendParameter} from 'Util/UrlUtil';
 
@@ -128,6 +129,13 @@ export class LifeCycleRepository {
       return;
     }
     this.isCurrentlyLoggingOut = true;
+
+    const isUserRequestedLogout = signOutReason === SIGN_OUT_REASON.USER_REQUESTED;
+    if (isUserRequestedLogout) {
+      storeValue(StorageKey.AUTH.SHOW_LOGIN, true);
+    } else {
+      resetStoreValue(StorageKey.AUTH.SHOW_LOGIN);
+    }
 
     // Helper function to notify about logout completion and redirect
     const completeLogoutAndRedirect = (): void => {
