@@ -17,9 +17,11 @@
  *
  */
 
-/** @see https://developer.mozilla.org/en-US/docs/Web/API/PermissionStatus/state */
-export enum PermissionStatusState {
+/** @see https://developer.mozilla.org/en-US/docs/Web/API/Notification/permission */
+export enum AppPermissionState {
+  DEFAULT = 'default',
   DENIED = 'denied',
   GRANTED = 'granted',
-  PROMPT = 'prompt',
+  IGNORED = 'ignored',
+  UNSUPPORTED = 'unsupported',
 }

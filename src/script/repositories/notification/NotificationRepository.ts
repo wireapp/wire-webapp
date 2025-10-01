@@ -47,8 +47,8 @@ import type {MessageTimerUpdateMessage} from 'Repositories/entity/message/Messag
 import type {RenameMessage} from 'Repositories/entity/message/RenameMessage';
 import type {SystemMessage} from 'Repositories/entity/message/SystemMessage';
 import type {User} from 'Repositories/entity/User';
+import {BrowserPermissionStatus} from 'Repositories/permission/BrowserPermissionStatus';
 import type {PermissionRepository} from 'Repositories/permission/PermissionRepository';
-import {PermissionStatusState} from 'Repositories/permission/PermissionStatusState';
 import {PermissionType} from 'Repositories/permission/PermissionType';
 import {normalizePermissionState} from 'Repositories/permission/usePermissionsStore';
 import {UserState} from 'Repositories/user/UserState';
@@ -59,7 +59,7 @@ import {truncate} from 'Util/StringUtil';
 import {formatDuration, TIME_IN_MILLIS} from 'Util/TimeUtil';
 import {ValidationUtilError} from 'Util/ValidationUtil';
 
-import {PermissionState} from './PermissionState';
+import {AppPermissionState} from './AppPermissionState';
 
 import {SuperType} from '../../message/SuperType';
 import {SystemMessageType} from '../../message/SystemMessageType';
@@ -167,17 +167,17 @@ export class NotificationRepository {
     }
 
     if (!Runtime.isSupportingNotifications()) {
-      return this.updatePermissionState(PermissionState.UNSUPPORTED);
+      return this.updatePermissionState(AppPermissionState.UNSUPPORTED);
     }
 
     if (Runtime.isSupportingPermissions()) {
       const notificationState = this.permissionRepository.getPermissionState(PermissionType.NOTIFICATIONS);
-      const shouldRequestPermission = notificationState === PermissionStatusState.PROMPT;
+      const shouldRequestPermission = notificationState === BrowserPermissionStatus.PROMPT;
       return shouldRequestPermission ? this.requestPermission() : this.checkPermissionState();
     }
 
-    const currentPermission = window.Notification.permission as PermissionState;
-    const shouldRequestPermission = currentPermission === PermissionState.DEFAULT;
+    const currentPermission = window.Notification.permission as BrowserPermissionStatus;
+    const shouldRequestPermission = currentPermission === BrowserPermissionStatus.PROMPT;
     return shouldRequestPermission ? this.requestPermission() : this.updatePermissionState(currentPermission);
   }
 
@@ -274,7 +274,9 @@ export class NotificationRepository {
    * @param permissionState State of browser permission
    * @returns Resolves with `true` if notifications are enabled
    */
-  readonly updatePermissionState = (permissionState: PermissionState | NotificationPermission): boolean | undefined => {
+  readonly updatePermissionState = (
+    permissionState: AppPermissionState | BrowserPermissionStatus | NotificationPermission,
+  ): boolean | undefined => {
     // Normalize the permission state and set it in the store
     const normalizedState = normalizePermissionState(permissionState);
     this.permissionRepository.setPermissionState(PermissionType.NOTIFICATIONS, normalizedState);
@@ -706,13 +708,13 @@ export class NotificationRepository {
   private checkPermissionState(): boolean | undefined {
     const permissionState = this.permissionRepository.getPermissionState(PermissionType.NOTIFICATIONS);
     switch (permissionState) {
-      case PermissionStatusState.GRANTED: {
+      case BrowserPermissionStatus.GRANTED: {
         return true;
       }
 
-      case PermissionState.IGNORED:
-      case PermissionState.UNSUPPORTED:
-      case PermissionStatusState.DENIED: {
+      case AppPermissionState.IGNORED:
+      case AppPermissionState.UNSUPPORTED:
+      case BrowserPermissionStatus.DENIED: {
         return false;
       }
 
@@ -826,7 +828,7 @@ export class NotificationRepository {
     const activeConversation = document.hasFocus() && inConversationView && inActiveConversation && !inMaximizedCall;
     const messageFromSelf = messageEntity.user().isMe;
     const permissionDenied =
-      this.permissionRepository.getPermissionState(PermissionType.NOTIFICATIONS) === PermissionStatusState.DENIED;
+      this.permissionRepository.getPermissionState(PermissionType.NOTIFICATIONS) === BrowserPermissionStatus.DENIED;
 
     // The in-app notification settings should be ignored for alerts (which are composite messages for now)
     const preferenceIsNone =

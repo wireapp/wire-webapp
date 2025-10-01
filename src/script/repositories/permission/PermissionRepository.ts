@@ -19,7 +19,7 @@
 
 import {Logger, getLogger} from 'Util/Logger';
 
-import {PermissionStatusState} from './PermissionStatusState';
+import {BrowserPermissionStatus} from './BrowserPermissionStatus';
 import {PermissionType} from './PermissionType';
 import {permissionsStore, PermissionStateResult, UnifiedPermissionState} from './usePermissionsStore';
 
@@ -41,18 +41,18 @@ export class PermissionRepository {
       return;
     }
     permissions.forEach(permissionType => {
-      const setPermissionState = (permissionState: PermissionStatusState): void =>
+      const setPermissionState = (permissionState: BrowserPermissionStatus): void =>
         permissionsStore.getState().setPermissionState(permissionType, permissionState);
 
       return navigator.permissions
         .query({name: permissionType as any})
         .then(permissionStatus => {
           this.logger.debug(`Permission state for '${permissionType}' is '${permissionStatus.state}'`);
-          setPermissionState(permissionStatus.state as PermissionStatusState);
+          setPermissionState(permissionStatus.state as BrowserPermissionStatus);
 
           permissionStatus.onchange = () => {
             this.logger.debug(`Permission state for '${permissionType}' changed to '${permissionStatus.state}'`);
-            setPermissionState(permissionStatus.state as PermissionStatusState);
+            setPermissionState(permissionStatus.state as BrowserPermissionStatus);
           };
 
           return permissionStatus.state;

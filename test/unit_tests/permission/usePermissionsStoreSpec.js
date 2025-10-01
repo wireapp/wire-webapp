@@ -17,18 +17,18 @@
  *
  */
 
-import {PermissionState} from 'Repositories/notification/PermissionState';
-import {PermissionStatusState} from 'Repositories/permission/PermissionStatusState';
+import {AppPermissionState} from 'Repositories/notification/AppPermissionState';
+import {BrowserPermissionStatus} from 'Repositories/permission/BrowserPermissionStatus';
 import {PermissionType} from 'Repositories/permission/PermissionType';
 import {permissionsStore, normalizePermissionState} from 'Repositories/permission/usePermissionsStore';
 
 describe('usePermissionsStore', () => {
   beforeEach(() => {
     // Reset store to default state before each test
-    permissionsStore.getState().setPermissionState(PermissionType.CAMERA, PermissionStatusState.PROMPT);
-    permissionsStore.getState().setPermissionState(PermissionType.GEO_LOCATION, PermissionStatusState.PROMPT);
-    permissionsStore.getState().setPermissionState(PermissionType.MICROPHONE, PermissionStatusState.PROMPT);
-    permissionsStore.getState().setPermissionState(PermissionType.NOTIFICATIONS, PermissionStatusState.PROMPT);
+    permissionsStore.getState().setPermissionState(PermissionType.CAMERA, BrowserPermissionStatus.PROMPT);
+    permissionsStore.getState().setPermissionState(PermissionType.GEO_LOCATION, BrowserPermissionStatus.PROMPT);
+    permissionsStore.getState().setPermissionState(PermissionType.MICROPHONE, BrowserPermissionStatus.PROMPT);
+    permissionsStore.getState().setPermissionState(PermissionType.NOTIFICATIONS, BrowserPermissionStatus.PROMPT);
   });
 
   describe('initial state', () => {
@@ -36,7 +36,7 @@ describe('usePermissionsStore', () => {
       const state = permissionsStore.getState();
 
       Object.values(PermissionType).forEach(permissionType => {
-        expect(state.permissions[permissionType]).toBe(PermissionStatusState.PROMPT);
+        expect(state.permissions[permissionType]).toBe(BrowserPermissionStatus.PROMPT);
       });
     });
 
@@ -55,10 +55,10 @@ describe('usePermissionsStore', () => {
       const state = permissionsStore.getState();
 
       // Set a specific state
-      state.setPermissionState(PermissionType.CAMERA, PermissionStatusState.GRANTED);
+      state.setPermissionState(PermissionType.CAMERA, BrowserPermissionStatus.GRANTED);
 
-      expect(state.getPermissionState(PermissionType.CAMERA)).toBe(PermissionStatusState.GRANTED);
-      expect(state.getPermissionState(PermissionType.MICROPHONE)).toBe(PermissionStatusState.PROMPT);
+      expect(state.getPermissionState(PermissionType.CAMERA)).toBe(BrowserPermissionStatus.GRANTED);
+      expect(state.getPermissionState(PermissionType.MICROPHONE)).toBe(BrowserPermissionStatus.PROMPT);
     });
   });
 
@@ -66,35 +66,35 @@ describe('usePermissionsStore', () => {
     it('should update the permission state correctly', () => {
       const state = permissionsStore.getState();
 
-      state.setPermissionState(PermissionType.MICROPHONE, PermissionStatusState.DENIED);
+      state.setPermissionState(PermissionType.MICROPHONE, BrowserPermissionStatus.DENIED);
 
       // Get fresh state after mutation
       const updatedState = permissionsStore.getState();
-      expect(updatedState.permissions[PermissionType.MICROPHONE]).toBe(PermissionStatusState.DENIED);
-      expect(updatedState.getPermissionState(PermissionType.MICROPHONE)).toBe(PermissionStatusState.DENIED);
+      expect(updatedState.permissions[PermissionType.MICROPHONE]).toBe(BrowserPermissionStatus.DENIED);
+      expect(updatedState.getPermissionState(PermissionType.MICROPHONE)).toBe(BrowserPermissionStatus.DENIED);
     });
 
     it('should not affect other permission states', () => {
       const state = permissionsStore.getState();
 
-      state.setPermissionState(PermissionType.CAMERA, PermissionStatusState.GRANTED);
+      state.setPermissionState(PermissionType.CAMERA, BrowserPermissionStatus.GRANTED);
 
-      expect(state.getPermissionState(PermissionType.CAMERA)).toBe(PermissionStatusState.GRANTED);
-      expect(state.getPermissionState(PermissionType.MICROPHONE)).toBe(PermissionStatusState.PROMPT);
-      expect(state.getPermissionState(PermissionType.NOTIFICATIONS)).toBe(PermissionStatusState.PROMPT);
-      expect(state.getPermissionState(PermissionType.GEO_LOCATION)).toBe(PermissionStatusState.PROMPT);
+      expect(state.getPermissionState(PermissionType.CAMERA)).toBe(BrowserPermissionStatus.GRANTED);
+      expect(state.getPermissionState(PermissionType.MICROPHONE)).toBe(BrowserPermissionStatus.PROMPT);
+      expect(state.getPermissionState(PermissionType.NOTIFICATIONS)).toBe(BrowserPermissionStatus.PROMPT);
+      expect(state.getPermissionState(PermissionType.GEO_LOCATION)).toBe(BrowserPermissionStatus.PROMPT);
     });
 
     it('should accept both PermissionState and PermissionStatusState values', () => {
       const state = permissionsStore.getState();
 
       // Test PermissionStatusState
-      state.setPermissionState(PermissionType.CAMERA, PermissionStatusState.GRANTED);
-      expect(state.getPermissionState(PermissionType.CAMERA)).toBe(PermissionStatusState.GRANTED);
+      state.setPermissionState(PermissionType.CAMERA, BrowserPermissionStatus.GRANTED);
+      expect(state.getPermissionState(PermissionType.CAMERA)).toBe(BrowserPermissionStatus.GRANTED);
 
       // Test PermissionState
-      state.setPermissionState(PermissionType.NOTIFICATIONS, PermissionState.IGNORED);
-      expect(state.getPermissionState(PermissionType.NOTIFICATIONS)).toBe(PermissionState.IGNORED);
+      state.setPermissionState(PermissionType.NOTIFICATIONS, AppPermissionState.IGNORED);
+      expect(state.getPermissionState(PermissionType.NOTIFICATIONS)).toBe(AppPermissionState.IGNORED);
     });
   });
 
@@ -103,16 +103,16 @@ describe('usePermissionsStore', () => {
       const state = permissionsStore.getState();
 
       // Set up different states
-      state.setPermissionState(PermissionType.CAMERA, PermissionStatusState.GRANTED);
-      state.setPermissionState(PermissionType.MICROPHONE, PermissionStatusState.DENIED);
+      state.setPermissionState(PermissionType.CAMERA, BrowserPermissionStatus.GRANTED);
+      state.setPermissionState(PermissionType.MICROPHONE, BrowserPermissionStatus.DENIED);
 
       const permissionTypes = [PermissionType.CAMERA, PermissionType.MICROPHONE, PermissionType.NOTIFICATIONS];
       const results = state.getPermissionStates(permissionTypes);
 
       expect(results).toEqual([
-        {state: PermissionStatusState.GRANTED, type: PermissionType.CAMERA},
-        {state: PermissionStatusState.DENIED, type: PermissionType.MICROPHONE},
-        {state: PermissionStatusState.PROMPT, type: PermissionType.NOTIFICATIONS},
+        {state: BrowserPermissionStatus.GRANTED, type: PermissionType.CAMERA},
+        {state: BrowserPermissionStatus.DENIED, type: PermissionType.MICROPHONE},
+        {state: BrowserPermissionStatus.PROMPT, type: PermissionType.NOTIFICATIONS},
       ]);
     });
 
@@ -141,7 +141,7 @@ describe('usePermissionsStore', () => {
       const unsubscribe = permissionsStore.subscribe(subscriber);
 
       // Change a permission state
-      permissionsStore.getState().setPermissionState(PermissionType.CAMERA, PermissionStatusState.GRANTED);
+      permissionsStore.getState().setPermissionState(PermissionType.CAMERA, BrowserPermissionStatus.GRANTED);
 
       // Should have been called
       expect(subscriber).toHaveBeenCalled();
@@ -153,7 +153,7 @@ describe('usePermissionsStore', () => {
       const state = permissionsStore.getState();
 
       // Set a state
-      state.setPermissionState(PermissionType.MICROPHONE, PermissionStatusState.DENIED);
+      state.setPermissionState(PermissionType.MICROPHONE, BrowserPermissionStatus.DENIED);
 
       // New subscriber should get current state
       const subscriber = jest.fn();
@@ -161,7 +161,7 @@ describe('usePermissionsStore', () => {
 
       // Get current state
       const currentState = permissionsStore.getState();
-      expect(currentState.getPermissionState(PermissionType.MICROPHONE)).toBe(PermissionStatusState.DENIED);
+      expect(currentState.getPermissionState(PermissionType.MICROPHONE)).toBe(BrowserPermissionStatus.DENIED);
 
       unsubscribe();
     });
@@ -170,30 +170,30 @@ describe('usePermissionsStore', () => {
 
 describe('normalizePermissionState', () => {
   it('should normalize browser NotificationPermission values', () => {
-    expect(normalizePermissionState('default')).toBe(PermissionStatusState.PROMPT);
-    expect(normalizePermissionState('granted')).toBe(PermissionStatusState.GRANTED);
-    expect(normalizePermissionState('denied')).toBe(PermissionStatusState.DENIED);
+    expect(normalizePermissionState('default')).toBe(BrowserPermissionStatus.PROMPT);
+    expect(normalizePermissionState('granted')).toBe(BrowserPermissionStatus.GRANTED);
+    expect(normalizePermissionState('denied')).toBe(BrowserPermissionStatus.DENIED);
   });
 
   it('should pass through PermissionStatusState values unchanged', () => {
-    expect(normalizePermissionState(PermissionStatusState.PROMPT)).toBe(PermissionStatusState.PROMPT);
-    expect(normalizePermissionState(PermissionStatusState.GRANTED)).toBe(PermissionStatusState.GRANTED);
-    expect(normalizePermissionState(PermissionStatusState.DENIED)).toBe(PermissionStatusState.DENIED);
+    expect(normalizePermissionState(BrowserPermissionStatus.PROMPT)).toBe(BrowserPermissionStatus.PROMPT);
+    expect(normalizePermissionState(BrowserPermissionStatus.GRANTED)).toBe(BrowserPermissionStatus.GRANTED);
+    expect(normalizePermissionState(BrowserPermissionStatus.DENIED)).toBe(BrowserPermissionStatus.DENIED);
   });
 
   it('should pass through PermissionState values unchanged, except DEFAULT which maps to PROMPT', () => {
-    // PermissionState.DEFAULT ('default') should map to PermissionStatusState.PROMPT
+    // AppPermissionState.DEFAULT ('default') should map to BrowserPermissionStatus.PROMPT
     // because they represent the same logical state in our system
-    expect(normalizePermissionState(PermissionState.DEFAULT)).toBe(PermissionStatusState.PROMPT);
-    expect(normalizePermissionState(PermissionState.GRANTED)).toBe(PermissionStatusState.GRANTED);
-    expect(normalizePermissionState(PermissionState.DENIED)).toBe(PermissionStatusState.DENIED);
-    expect(normalizePermissionState(PermissionState.IGNORED)).toBe(PermissionState.IGNORED);
-    expect(normalizePermissionState(PermissionState.UNSUPPORTED)).toBe(PermissionState.UNSUPPORTED);
+    expect(normalizePermissionState(AppPermissionState.DEFAULT)).toBe(BrowserPermissionStatus.PROMPT);
+    expect(normalizePermissionState(AppPermissionState.GRANTED)).toBe(BrowserPermissionStatus.GRANTED);
+    expect(normalizePermissionState(AppPermissionState.DENIED)).toBe(BrowserPermissionStatus.DENIED);
+    expect(normalizePermissionState(AppPermissionState.IGNORED)).toBe(AppPermissionState.IGNORED);
+    expect(normalizePermissionState(AppPermissionState.UNSUPPORTED)).toBe(AppPermissionState.UNSUPPORTED);
   });
 
   it('should handle edge cases', () => {
     // Test with actual browser permission strings
-    expect(normalizePermissionState('default')).toBe(PermissionStatusState.PROMPT);
+    expect(normalizePermissionState('default')).toBe(BrowserPermissionStatus.PROMPT);
 
     // Test consistency - multiple calls should return same result
     const result1 = normalizePermissionState('default');

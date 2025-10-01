@@ -22,8 +22,8 @@ import {container} from 'tsyringe';
 import {Runtime} from '@wireapp/commons';
 
 import {CallingViewMode, CallState} from 'Repositories/calling/CallState';
+import {BrowserPermissionStatus} from 'Repositories/permission/BrowserPermissionStatus';
 import type {PermissionRepository} from 'Repositories/permission/PermissionRepository';
-import {PermissionStatusState} from 'Repositories/permission/PermissionStatusState';
 import {PermissionType} from 'Repositories/permission/PermissionType';
 import {getLogger, Logger} from 'Util/Logger';
 
@@ -109,13 +109,13 @@ export class MediaStreamHandler {
       const permissions = this.permissionRepository.getPermissionStates(typesToCheck);
       for (const permission of permissions) {
         const {state, type} = permission;
-        const isPermissionPrompt = state === PermissionStatusState.PROMPT;
+        const isPermissionPrompt = state === BrowserPermissionStatus.PROMPT;
         if (isPermissionPrompt) {
           this.logger.info(`Need to prompt for '${type}' permission`);
           return false;
         }
 
-        const isPermissionDenied = state === PermissionStatusState.DENIED;
+        const isPermissionDenied = state === BrowserPermissionStatus.DENIED;
         if (isPermissionDenied) {
           this.logger.warn(`Permission for '${type}' is denied`);
           return false;

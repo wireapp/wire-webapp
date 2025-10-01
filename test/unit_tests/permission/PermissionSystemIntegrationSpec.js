@@ -17,9 +17,9 @@
  *
  */
 
-import {PermissionState} from 'Repositories/notification/PermissionState';
+import {AppPermissionState} from 'Repositories/notification/AppPermissionState';
 import {PermissionRepository} from 'Repositories/permission/PermissionRepository';
-import {PermissionStatusState} from 'Repositories/permission/PermissionStatusState';
+import {BrowserPermissionStatus} from 'Repositories/permission/BrowserPermissionStatus';
 import {PermissionType} from 'Repositories/permission/PermissionType';
 import {permissionsStore, normalizePermissionState} from 'Repositories/permission/usePermissionsStore';
 
@@ -38,11 +38,11 @@ class MockNotificationRepository {
   checkPermissionState() {
     const permissionState = this.permissionRepository.getPermissionState(PermissionType.NOTIFICATIONS);
     switch (permissionState) {
-      case PermissionStatusState.GRANTED:
+      case BrowserPermissionStatus.GRANTED:
         return true;
-      case PermissionState.IGNORED:
-      case PermissionState.UNSUPPORTED:
-      case PermissionStatusState.DENIED:
+      case AppPermissionState.IGNORED:
+      case AppPermissionState.UNSUPPORTED:
+      case BrowserPermissionStatus.DENIED:
         return false;
       default:
         return undefined;
@@ -56,10 +56,10 @@ describe('Permission System Integration', () => {
 
   beforeEach(() => {
     // Reset store
-    permissionsStore.getState().setPermissionState(PermissionType.CAMERA, PermissionStatusState.PROMPT);
-    permissionsStore.getState().setPermissionState(PermissionType.GEO_LOCATION, PermissionStatusState.PROMPT);
-    permissionsStore.getState().setPermissionState(PermissionType.MICROPHONE, PermissionStatusState.PROMPT);
-    permissionsStore.getState().setPermissionState(PermissionType.NOTIFICATIONS, PermissionStatusState.PROMPT);
+    permissionsStore.getState().setPermissionState(PermissionType.CAMERA, BrowserPermissionStatus.PROMPT);
+    permissionsStore.getState().setPermissionState(PermissionType.GEO_LOCATION, BrowserPermissionStatus.PROMPT);
+    permissionsStore.getState().setPermissionState(PermissionType.MICROPHONE, BrowserPermissionStatus.PROMPT);
+    permissionsStore.getState().setPermissionState(PermissionType.NOTIFICATIONS, BrowserPermissionStatus.PROMPT);
 
     // Mock navigator.permissions
     spyOn(navigator, 'permissions').and.returnValue(undefined);
@@ -78,39 +78,51 @@ describe('Permission System Integration', () => {
   describe('PermissionRepository and NotificationRepository integration', () => {
     it('should work together for notification permissions', () => {
       // Test initial state
-      expect(permissionRepository.getPermissionState(PermissionType.NOTIFICATIONS)).toBe(PermissionStatusState.PROMPT);
+      expect(permissionRepository.getPermissionState(PermissionType.NOTIFICATIONS)).toBe(
+        BrowserPermissionStatus.PROMPT,
+      );
       expect(notificationRepository.checkPermissionState()).toBe(undefined);
 
       // Test granting permission via NotificationRepository
       const result = notificationRepository.updatePermissionState('granted');
       expect(result).toBe(true);
-      expect(permissionRepository.getPermissionState(PermissionType.NOTIFICATIONS)).toBe(PermissionStatusState.GRANTED);
+      expect(permissionRepository.getPermissionState(PermissionType.NOTIFICATIONS)).toBe(
+        BrowserPermissionStatus.GRANTED,
+      );
 
       // Test denying permission
       notificationRepository.updatePermissionState('denied');
-      expect(permissionRepository.getPermissionState(PermissionType.NOTIFICATIONS)).toBe(PermissionStatusState.DENIED);
+      expect(permissionRepository.getPermissionState(PermissionType.NOTIFICATIONS)).toBe(
+        BrowserPermissionStatus.DENIED,
+      );
       expect(notificationRepository.checkPermissionState()).toBe(false);
     });
 
     it('should handle browser notification permission normalization', () => {
       // Test browser's "default" permission maps to "prompt"
       notificationRepository.updatePermissionState('default');
-      expect(permissionRepository.getPermissionState(PermissionType.NOTIFICATIONS)).toBe(PermissionStatusState.PROMPT);
+      expect(permissionRepository.getPermissionState(PermissionType.NOTIFICATIONS)).toBe(
+        BrowserPermissionStatus.PROMPT,
+      );
 
       // Test other browser permission values
       notificationRepository.updatePermissionState('granted');
-      expect(permissionRepository.getPermissionState(PermissionType.NOTIFICATIONS)).toBe(PermissionStatusState.GRANTED);
+      expect(permissionRepository.getPermissionState(PermissionType.NOTIFICATIONS)).toBe(
+        BrowserPermissionStatus.GRANTED,
+      );
 
       notificationRepository.updatePermissionState('denied');
-      expect(permissionRepository.getPermissionState(PermissionType.NOTIFICATIONS)).toBe(PermissionStatusState.DENIED);
+      expect(permissionRepository.getPermissionState(PermissionType.NOTIFICATIONS)).toBe(
+        BrowserPermissionStatus.DENIED,
+      );
     });
 
     it('should handle Wire-specific permission states', () => {
       // Test setting Wire-specific states
-      permissionRepository.setPermissionState(PermissionType.NOTIFICATIONS, PermissionState.IGNORED);
+      permissionRepository.setPermissionState(PermissionType.NOTIFICATIONS, AppPermissionState.IGNORED);
       expect(notificationRepository.checkPermissionState()).toBe(false);
 
-      permissionRepository.setPermissionState(PermissionType.NOTIFICATIONS, PermissionState.UNSUPPORTED);
+      permissionRepository.setPermissionState(PermissionType.NOTIFICATIONS, AppPermissionState.UNSUPPORTED);
       expect(notificationRepository.checkPermissionState()).toBe(false);
     });
   });
@@ -118,24 +130,26 @@ describe('Permission System Integration', () => {
   describe('Multiple permission types coordination', () => {
     it('should manage different permission types independently', () => {
       // Set different states for different permissions
-      permissionRepository.setPermissionState(PermissionType.CAMERA, PermissionStatusState.GRANTED);
-      permissionRepository.setPermissionState(PermissionType.MICROPHONE, PermissionStatusState.DENIED);
-      permissionRepository.setPermissionState(PermissionType.NOTIFICATIONS, PermissionStatusState.PROMPT);
-      permissionRepository.setPermissionState(PermissionType.GEO_LOCATION, PermissionState.UNSUPPORTED);
+      permissionRepository.setPermissionState(PermissionType.CAMERA, BrowserPermissionStatus.GRANTED);
+      permissionRepository.setPermissionState(PermissionType.MICROPHONE, BrowserPermissionStatus.DENIED);
+      permissionRepository.setPermissionState(PermissionType.NOTIFICATIONS, BrowserPermissionStatus.PROMPT);
+      permissionRepository.setPermissionState(PermissionType.GEO_LOCATION, AppPermissionState.UNSUPPORTED);
 
       // Verify independence
-      expect(permissionRepository.getPermissionState(PermissionType.CAMERA)).toBe(PermissionStatusState.GRANTED);
-      expect(permissionRepository.getPermissionState(PermissionType.MICROPHONE)).toBe(PermissionStatusState.DENIED);
-      expect(permissionRepository.getPermissionState(PermissionType.NOTIFICATIONS)).toBe(PermissionStatusState.PROMPT);
-      expect(permissionRepository.getPermissionState(PermissionType.GEO_LOCATION)).toBe(PermissionState.UNSUPPORTED);
+      expect(permissionRepository.getPermissionState(PermissionType.CAMERA)).toBe(BrowserPermissionStatus.GRANTED);
+      expect(permissionRepository.getPermissionState(PermissionType.MICROPHONE)).toBe(BrowserPermissionStatus.DENIED);
+      expect(permissionRepository.getPermissionState(PermissionType.NOTIFICATIONS)).toBe(
+        BrowserPermissionStatus.PROMPT,
+      );
+      expect(permissionRepository.getPermissionState(PermissionType.GEO_LOCATION)).toBe(AppPermissionState.UNSUPPORTED);
 
       // Verify getPermissionStates works correctly
       const allStates = permissionRepository.getPermissionStates(Object.values(PermissionType));
       expect(allStates).toEqual([
-        {state: PermissionStatusState.GRANTED, type: PermissionType.CAMERA},
-        {state: PermissionState.UNSUPPORTED, type: PermissionType.GEO_LOCATION},
-        {state: PermissionStatusState.DENIED, type: PermissionType.MICROPHONE},
-        {state: PermissionStatusState.PROMPT, type: PermissionType.NOTIFICATIONS},
+        {state: BrowserPermissionStatus.GRANTED, type: PermissionType.CAMERA},
+        {state: AppPermissionState.UNSUPPORTED, type: PermissionType.GEO_LOCATION},
+        {state: BrowserPermissionStatus.DENIED, type: PermissionType.MICROPHONE},
+        {state: BrowserPermissionStatus.PROMPT, type: PermissionType.NOTIFICATIONS},
       ]);
     });
   });
@@ -143,13 +157,13 @@ describe('Permission System Integration', () => {
   describe('Store persistence and reactivity', () => {
     it('should maintain state consistency across repository instances', () => {
       // Set a state via first repository
-      permissionRepository.setPermissionState(PermissionType.CAMERA, PermissionStatusState.GRANTED);
+      permissionRepository.setPermissionState(PermissionType.CAMERA, BrowserPermissionStatus.GRANTED);
 
       // Create a new repository instance
       const secondRepository = new PermissionRepository();
 
       // Should get the same state (from store)
-      expect(secondRepository.getPermissionState(PermissionType.CAMERA)).toBe(PermissionStatusState.GRANTED);
+      expect(secondRepository.getPermissionState(PermissionType.CAMERA)).toBe(BrowserPermissionStatus.GRANTED);
     });
 
     it('should notify of state changes', () => {
@@ -157,7 +171,7 @@ describe('Permission System Integration', () => {
       const unsubscribe = permissionsStore.subscribe(subscriber);
 
       // Change state
-      permissionRepository.setPermissionState(PermissionType.MICROPHONE, PermissionStatusState.DENIED);
+      permissionRepository.setPermissionState(PermissionType.MICROPHONE, BrowserPermissionStatus.DENIED);
 
       // Should notify subscriber
       expect(subscriber).toHaveBeenCalled();
@@ -179,11 +193,11 @@ describe('Permission System Integration', () => {
 
       // Test all possible state transitions
       const states = [
-        PermissionStatusState.PROMPT,
-        PermissionStatusState.GRANTED,
-        PermissionStatusState.DENIED,
-        PermissionState.IGNORED,
-        PermissionState.UNSUPPORTED,
+        BrowserPermissionStatus.PROMPT,
+        BrowserPermissionStatus.GRANTED,
+        BrowserPermissionStatus.DENIED,
+        AppPermissionState.IGNORED,
+        AppPermissionState.UNSUPPORTED,
       ];
 
       states.forEach(state => {
@@ -205,7 +219,7 @@ describe('Permission System Integration', () => {
 
       // Should maintain default states when API fails
       Object.values(PermissionType).forEach(permissionType => {
-        expect(failingRepository.getPermissionState(permissionType)).toBe(PermissionStatusState.PROMPT);
+        expect(failingRepository.getPermissionState(permissionType)).toBe(BrowserPermissionStatus.PROMPT);
       });
     });
   });

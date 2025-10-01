@@ -41,8 +41,8 @@ import type {User} from 'Repositories/entity/User';
 import type {ElectronDesktopCapturerSource, MediaDevicesHandler} from 'Repositories/media/MediaDevicesHandler';
 import type {MediaStreamHandler} from 'Repositories/media/MediaStreamHandler';
 import {mediaDevicesStore} from 'Repositories/media/useMediaDevicesStore';
+import {BrowserPermissionStatus} from 'Repositories/permission/BrowserPermissionStatus';
 import type {PermissionRepository} from 'Repositories/permission/PermissionRepository';
-import {PermissionStatusState} from 'Repositories/permission/PermissionStatusState';
 import {PermissionType} from 'Repositories/permission/PermissionType';
 import {PropertiesRepository} from 'Repositories/properties/PropertiesRepository';
 import {PROPERTIES_TYPE} from 'Repositories/properties/PropertiesType';
@@ -465,7 +465,7 @@ export class CallingViewModel {
   }
 
   hasAccessToCamera(): boolean {
-    return this.permissionRepository.getPermissionState(PermissionType.CAMERA) === PermissionStatusState.GRANTED;
+    return this.permissionRepository.getPermissionState(PermissionType.CAMERA) === BrowserPermissionStatus.GRANTED;
   }
 
   readonly onCancelScreenSelection = () => {

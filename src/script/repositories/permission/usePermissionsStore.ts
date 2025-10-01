@@ -21,34 +21,34 @@ import {useStore} from 'zustand';
 import {immer} from 'zustand/middleware/immer';
 import {createStore} from 'zustand/vanilla';
 
-import {PermissionState} from 'Repositories/notification/PermissionState';
+import {AppPermissionState} from 'Repositories/notification/AppPermissionState';
 
-import {PermissionStatusState} from './PermissionStatusState';
+import {BrowserPermissionStatus} from './BrowserPermissionStatus';
 import {PermissionType} from './PermissionType';
 
 export interface PermissionStateResult {
-  state: PermissionState | PermissionStatusState;
+  state: AppPermissionState | BrowserPermissionStatus;
   type: PermissionType;
 }
 
 // Unified permission state type that covers all possible states
-export type UnifiedPermissionState = PermissionState | PermissionStatusState;
+export type UnifiedPermissionState = AppPermissionState | BrowserPermissionStatus;
 
 /**
  * Normalizes browser permission states to our unified permission type.
  * Maps browser API strings to our enum values while preserving typed enum values.
  */
 export function normalizePermissionState(
-  state: PermissionState | PermissionStatusState | NotificationPermission,
+  state: AppPermissionState | BrowserPermissionStatus | NotificationPermission,
 ): UnifiedPermissionState {
   switch (state) {
     case 'default':
     case 'prompt':
-      return PermissionStatusState.PROMPT;
+      return BrowserPermissionStatus.PROMPT;
     case 'granted':
-      return PermissionStatusState.GRANTED;
+      return BrowserPermissionStatus.GRANTED;
     case 'denied':
-      return PermissionStatusState.DENIED;
+      return BrowserPermissionStatus.DENIED;
     default:
       // Already a typed enum value or unknown - pass through as-is
       return state;
@@ -69,10 +69,10 @@ export type PermissionsState = {
 export const permissionsStore = createStore<PermissionsState>()(
   immer<PermissionsState>((set, get) => ({
     permissions: {
-      [PermissionType.CAMERA]: PermissionStatusState.PROMPT,
-      [PermissionType.GEO_LOCATION]: PermissionStatusState.PROMPT,
-      [PermissionType.MICROPHONE]: PermissionStatusState.PROMPT,
-      [PermissionType.NOTIFICATIONS]: PermissionStatusState.PROMPT,
+      [PermissionType.CAMERA]: BrowserPermissionStatus.PROMPT,
+      [PermissionType.GEO_LOCATION]: BrowserPermissionStatus.PROMPT,
+      [PermissionType.MICROPHONE]: BrowserPermissionStatus.PROMPT,
+      [PermissionType.NOTIFICATIONS]: BrowserPermissionStatus.PROMPT,
     },
 
     // getters
@@ -89,7 +89,7 @@ export const permissionsStore = createStore<PermissionsState>()(
     },
 
     // setters
-    setPermissionState: (permissionType: PermissionType, state: PermissionState | PermissionStatusState) =>
+    setPermissionState: (permissionType: PermissionType, state: AppPermissionState | BrowserPermissionStatus) =>
       set(draft => {
         draft.permissions[permissionType] = normalizePermissionState(state);
       }),
