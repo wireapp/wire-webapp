@@ -17,28 +17,12 @@
  *
  */
 
-import {Locator, Page} from '@playwright/test';
+import {Page} from '@playwright/test';
 
-import {selectByDataAttribute} from 'test/e2e_tests/utils/selector.util';
+import {BaseModal} from './base.modal';
 
-export class HistoryInfoPage {
-  readonly page: Page;
-  private readonly continueButton: Locator;
-
+export class AcknowledgeModal extends BaseModal {
   constructor(page: Page) {
-    this.page = page;
-    this.continueButton = this.page.locator(selectByDataAttribute('do-history-confirm'));
-  }
-  async isButtonVisible() {
-    try {
-      await this.continueButton.waitFor({state: 'visible', timeout: 10000});
-      return true;
-    } catch (err) {
-      return false;
-    }
-  }
-
-  async clickConfirmButton() {
-    await this.continueButton.click();
+    super(page, "[data-uie-name='modal-template-acknowledge']");
   }
 }
