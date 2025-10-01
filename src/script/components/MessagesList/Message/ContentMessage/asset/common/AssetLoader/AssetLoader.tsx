@@ -30,7 +30,7 @@ interface AssetLoaderProps {
   onCancel: () => void;
 }
 
-const AssetLoader: React.FC<AssetLoaderProps> = ({large, loadProgress, onCancel}) => {
+const AssetLoader = ({large, loadProgress, onCancel}: AssetLoaderProps) => {
   const elementScale = large ? 2 : 1;
   const progress = `${loadProgress * elementScale} ${100 * elementScale}`;
   const viewBoxSize = 32 * elementScale;

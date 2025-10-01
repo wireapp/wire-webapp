@@ -29,7 +29,7 @@ interface DeviceToggleButtonProps {
   styles?: SerializedStyles;
 }
 
-const DeviceToggleButton: React.FC<DeviceToggleButtonProps> = ({currentDevice, devices, onChooseDevice, styles}) => {
+const DeviceToggleButton = ({currentDevice, devices, onChooseDevice, styles}: DeviceToggleButtonProps) => {
   const selectNextDevice = (event: React.UIEvent) => {
     event.preventDefault();
     event.stopPropagation();

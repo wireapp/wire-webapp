@@ -60,14 +60,14 @@ const getParticipantNameColor = ({
   return 'var(--white)';
 };
 
-const GroupVideoGridTile: React.FC<GroupVideoGridTileProps> = ({
+const GroupVideoGridTile = ({
   minimized,
   participant,
   selfParticipant,
   participantCount,
   isMaximized,
   onTileDoubleClick,
-}) => {
+}: GroupVideoGridTileProps) => {
   const {
     isMuted,
     videoState,

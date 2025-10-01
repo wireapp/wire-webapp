@@ -17,8 +17,6 @@
  *
  */
 
-import React from 'react';
-
 import {DeleteMessage as DeleteMessageEntity} from 'Repositories/entity/message/DeleteMessage';
 import {User} from 'Repositories/entity/User';
 import {ServiceEntity} from 'Repositories/integration/ServiceEntity';
@@ -33,7 +31,7 @@ interface DeleteMessageProps {
   onClickAvatar?: (user: User | ServiceEntity) => void;
 }
 
-const DeleteMessage: React.FC<DeleteMessageProps> = ({message, onClickAvatar = () => {}}) => {
+const DeleteMessage = ({message, onClickAvatar = () => {}}: DeleteMessageProps) => {
   const deletedTimeStamp = message.deleted_timestamp || 0;
 
   const formattedDeletionTime = t('conversationDeleteTimestamp', {

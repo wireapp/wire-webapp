@@ -17,8 +17,6 @@
  *
  */
 
-import React from 'react';
-
 import {MLSVerified} from '@wireapp/react-ui-kit';
 
 import * as Icon from 'Components/Icon';
@@ -42,7 +40,7 @@ interface SystemMessageProps {
   message: SystemMessageEntity;
 }
 
-export const SystemMessage: React.FC<SystemMessageProps> = ({message}) => {
+export const SystemMessage = ({message}: SystemMessageProps) => {
   if (message instanceof RenameMessage) {
     return (
       <>

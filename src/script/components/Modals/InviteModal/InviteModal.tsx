@@ -36,7 +36,7 @@ interface InviteModalProps {
 
 const {BRAND_NAME: brandName} = Config.getConfig();
 
-const InviteModal: React.FC<InviteModalProps> = ({selfUser, onClose}) => {
+const InviteModal = ({selfUser, onClose}: InviteModalProps) => {
   const [isInviteMessageSelected, setIsInviteMessageSelected] = useState<boolean>(false);
   const userName = selfUser.username();
   const inviteMessage = userName

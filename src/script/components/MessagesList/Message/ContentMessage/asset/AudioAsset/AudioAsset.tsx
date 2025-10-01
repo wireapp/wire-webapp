@@ -17,7 +17,7 @@
  *
  */
 
-import React, {useEffect, useState} from 'react';
+import {useEffect, useState} from 'react';
 
 import cx from 'classnames';
 import {container} from 'tsyringe';
@@ -51,13 +51,13 @@ interface AudioAssetProps {
   isFocusable?: boolean;
 }
 
-export const AudioAsset: React.FC<AudioAssetProps> = ({
+export const AudioAsset = ({
   message,
   className,
   hasHeader = false,
   teamState = container.resolve(TeamState),
   isFocusable = true,
-}) => {
+}: AudioAssetProps) => {
   const asset = message.getFirstAsset() as FileAsset;
   const [audioElement, setAudioElement] = useEffectRef<HTMLMediaElement>();
   const {isFileSharingReceivingEnabled} = useKoSubscribableChildren(teamState, ['isFileSharingReceivingEnabled']);

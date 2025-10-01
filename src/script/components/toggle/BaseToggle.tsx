@@ -35,7 +35,7 @@ interface BaseToggleProps {
 
 const defaultToggleName = 'base-toggle';
 
-const BaseToggle: React.FC<BaseToggleProps> = ({
+const BaseToggle = ({
   extendedInfo,
   isChecked,
   isDisabled,
@@ -45,7 +45,7 @@ const BaseToggle: React.FC<BaseToggleProps> = ({
   toggleName = defaultToggleName,
   className,
   infoText,
-}) => {
+}: BaseToggleProps) => {
   const uuid = useId();
   const labelUuid = useId();
   const inputRef = React.useRef<HTMLInputElement>(null);

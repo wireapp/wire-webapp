@@ -17,7 +17,7 @@
  *
  */
 
-import React, {useState, useEffect} from 'react';
+import {useState, useEffect} from 'react';
 
 import {formatSeconds} from 'Util/TimeUtil';
 
@@ -25,7 +25,7 @@ interface DurationProps {
   startedAt?: number;
 }
 
-const Duration: React.FC<DurationProps> = ({startedAt}) => {
+const Duration = ({startedAt}: DurationProps) => {
   const [duration, setDuration] = useState('');
 
   useEffect(() => {

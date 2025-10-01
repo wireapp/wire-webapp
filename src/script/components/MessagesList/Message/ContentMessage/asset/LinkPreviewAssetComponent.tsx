@@ -17,7 +17,7 @@
  *
  */
 
-import React, {UIEvent, useRef} from 'react';
+import {UIEvent, useRef} from 'react';
 
 import cx from 'classnames';
 
@@ -42,7 +42,7 @@ interface LinkPreviewAssetProps {
   isFocusable?: boolean;
 }
 
-const LinkPreviewAsset: React.FC<LinkPreviewAssetProps> = ({header = false, message, isFocusable = true}) => {
+const LinkPreviewAsset = ({header = false, message, isFocusable = true}: LinkPreviewAssetProps) => {
   const {
     previews: [preview],
   } = useKoSubscribableChildren(message.getFirstAsset() as Text, ['previews']);

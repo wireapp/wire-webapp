@@ -97,10 +97,7 @@ const calculateRowsAndColumns = (params: CalculateRowsAndColumsParams): RowsAndC
   return {'--columns': columns, '--rows': rows};
 };
 
-const GroupVideoThumbnailWrapper: React.FC<{children?: React.ReactNode; minimized: boolean}> = ({
-  minimized,
-  children,
-}) => (
+const GroupVideoThumbnailWrapper = ({children, minimized}: {children?: React.ReactNode; minimized: boolean}) => (
   <div
     className="group-video__thumbnail"
     css={

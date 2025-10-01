@@ -17,8 +17,6 @@
  *
  */
 
-import React from 'react';
-
 import cx from 'classnames';
 import {container} from 'tsyringe';
 
@@ -44,12 +42,12 @@ interface FileAssetProps {
   isFocusable?: boolean;
 }
 
-const FileAsset: React.FC<FileAssetProps> = ({
+const FileAsset = ({
   message,
   hasHeader = false,
   teamState = container.resolve(TeamState),
   isFocusable = true,
-}) => {
+}: FileAssetProps) => {
   const asset = message.getFirstAsset() as FileAssetType;
 
   const {transferState, downloadAsset, uploadProgress, cancelUpload} = useAssetTransfer(message);

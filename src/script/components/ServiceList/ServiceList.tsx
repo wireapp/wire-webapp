@@ -17,8 +17,6 @@
  *
  */
 
-import React from 'react';
-
 import cx from 'classnames';
 
 import {ServiceListItem} from 'Components/ServiceList/components/ServiceListItem';
@@ -38,13 +36,13 @@ interface ServiceListProps {
   dataUieName?: string;
 }
 
-export const ServiceList: React.FC<ServiceListProps> = ({
+export const ServiceList = ({
   onServiceClick,
   isSearching = false,
   mode = MODE.DEFAULT,
   services,
   dataUieName = '',
-}) => (
+}: ServiceListProps) => (
   <>
     <ul
       className={cx('search-list', mode === MODE.COMPACT ? 'search-list-sm' : 'search-list-lg')}

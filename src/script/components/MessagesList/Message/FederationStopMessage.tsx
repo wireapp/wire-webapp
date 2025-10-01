@@ -17,8 +17,6 @@
  *
  */
 
-import React from 'react';
-
 import {Link, LinkVariant} from '@wireapp/react-ui-kit';
 
 import * as Icon from 'Components/Icon';
@@ -37,7 +35,7 @@ interface FederationStopMessageProps {
 
 const config = Config.getConfig();
 
-const FederationStopMessage: React.FC<FederationStopMessageProps> = ({message, isMessageFocused}) => {
+const FederationStopMessage = ({message, isMessageFocused}: FederationStopMessageProps) => {
   const {timestamp} = useKoSubscribableChildren(message, ['timestamp']);
   const {id, domains} = message;
   const messageFocusedTabIndex = useMessageFocusedTabIndex(isMessageFocused);

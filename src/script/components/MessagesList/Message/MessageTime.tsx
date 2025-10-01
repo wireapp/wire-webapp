@@ -27,7 +27,7 @@ interface MessageTimeProps {
   className?: string;
 }
 
-const MessageTime: React.FC<MessageTimeProps> = ({timestamp, children, ...props}) => {
+const MessageTime = ({timestamp, children, ...props}: MessageTimeProps) => {
   const date = fromUnixTime(timestamp / TIME_IN_MILLIS.SECOND);
   const formattedTime = formatTimeShort(date);
   const formattedDate = formatDateNumeral(date);

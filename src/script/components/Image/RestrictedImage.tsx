@@ -17,8 +17,6 @@
  *
  */
 
-import React from 'react';
-
 import cx from 'classnames';
 
 import * as Icon from 'Components/Icon';
@@ -30,7 +28,7 @@ interface RestrictedImageProps {
   className?: string;
 }
 
-const RestrictedImage: React.FC<RestrictedImageProps> = ({showMessage = true, isSmall = false, className}) => {
+const RestrictedImage = ({showMessage = true, isSmall = false, className}: RestrictedImageProps) => {
   return (
     <div className={cx('image-restricted', className, {'image-restricted--small': isSmall})}>
       <div className="image-restricted--container">

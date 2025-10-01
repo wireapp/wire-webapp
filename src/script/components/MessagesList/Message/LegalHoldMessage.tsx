@@ -17,8 +17,6 @@
  *
  */
 
-import React from 'react';
-
 import {container} from 'tsyringe';
 
 import {LegalHoldDot} from 'Components/LegalHoldDot';
@@ -32,10 +30,10 @@ interface LegalHoldMessageProps {
   message: LegalHoldMessageEntity;
 }
 
-const LegalHoldMessage: React.FC<LegalHoldMessageProps> = ({
+const LegalHoldMessage = ({
   message,
   conversationState = container.resolve(ConversationState),
-}) => {
+}: LegalHoldMessageProps) => {
   const {showUsers} = useLegalHoldModalState(state => state);
   const showLegalHold = () => showUsers(false, conversationState.activeConversation());
 

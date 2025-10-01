@@ -64,12 +64,12 @@ interface AppLockProps {
   clientState?: ClientState;
 }
 
-const AppLock: React.FC<AppLockProps> = ({
+const AppLock = ({
   clientRepository,
   clientState = container.resolve(ClientState),
   appLockState = container.resolve(AppLockState),
   appLockRepository = container.resolve(AppLockRepository),
-}) => {
+}: AppLockProps) => {
   const [state, setState] = useState<APPLOCK_STATE>(APPLOCK_STATE.NONE);
   const [wipeError, setWipeError] = useState('');
   const [unlockError, setUnlockError] = useState('');

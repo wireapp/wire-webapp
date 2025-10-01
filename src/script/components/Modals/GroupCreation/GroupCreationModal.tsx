@@ -69,10 +69,10 @@ enum GroupCreationModalState {
   PREFERENCES = 'GroupCreationModal.STATE.PREFERENCES',
 }
 
-const GroupCreationModal: React.FC<GroupCreationModalProps> = ({
+const GroupCreationModal = ({
   userState = container.resolve(UserState),
   teamState = container.resolve(TeamState),
-}) => {
+}: GroupCreationModalProps) => {
   const {
     isTeam,
     isMLSEnabled: isMLSEnabledForTeam,

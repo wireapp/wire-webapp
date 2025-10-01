@@ -32,7 +32,7 @@ interface AudioSeekBarProps {
   disabled: boolean;
 }
 
-const AudioSeekBar: React.FC<AudioSeekBarProps> = ({asset, audioElement, disabled}) => {
+const AudioSeekBar = ({asset, audioElement, disabled}: AudioSeekBarProps) => {
   const [svgWidth, setSvgWidth] = useState(0);
   const [path, setPath] = useState('');
   const [loudness, setLoudness] = useState<number[]>([]);

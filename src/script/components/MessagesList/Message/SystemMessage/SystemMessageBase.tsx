@@ -17,7 +17,7 @@
  *
  */
 
-import React, {ReactNode} from 'react';
+import {ReactNode} from 'react';
 
 import {SystemMessage} from 'Repositories/entity/message/SystemMessage';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
@@ -30,7 +30,7 @@ interface SystemMessageProps {
   icon?: ReactNode;
 }
 
-export const SystemMessageBase: React.FC<SystemMessageProps> = ({message, isSenderNameVisible = false, icon}) => {
+export const SystemMessageBase = ({message, isSenderNameVisible = false, icon}: SystemMessageProps) => {
   const {unsafeSenderName, timestamp} = useKoSubscribableChildren(message, ['unsafeSenderName', 'timestamp']);
 
   return (

@@ -38,10 +38,7 @@ interface MessageTimerButtonProps {
   teamState?: TeamState;
 }
 
-const MessageTimerButton: React.FC<MessageTimerButtonProps> = ({
-  conversation,
-  teamState = container.resolve(TeamState),
-}) => {
+const MessageTimerButton = ({conversation, teamState = container.resolve(TeamState)}: MessageTimerButtonProps) => {
   const {messageTimer, hasGlobalMessageTimer} = useKoSubscribableChildren(conversation, [
     'messageTimer',
     'hasGlobalMessageTimer',

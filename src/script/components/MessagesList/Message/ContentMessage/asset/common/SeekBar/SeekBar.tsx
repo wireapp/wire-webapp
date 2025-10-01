@@ -36,7 +36,7 @@ export interface SeekBarCSS extends CSSProperties {
   '--seek-bar-progress': string;
 }
 
-const SeekBar: React.FC<SeekBarProps> = ({
+const SeekBar = ({
   dark: darkMode,
   disabled,
   mediaElement,

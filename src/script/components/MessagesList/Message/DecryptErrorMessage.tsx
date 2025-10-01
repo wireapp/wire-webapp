@@ -17,7 +17,7 @@
  *
  */
 
-import React, {useState} from 'react';
+import {useState} from 'react';
 
 import * as Icon from 'Components/Icon';
 import {DecryptErrorMessage as DecryptErrorMessageEntity} from 'Repositories/entity/message/DecryptErrorMessage';
@@ -35,7 +35,7 @@ interface DecryptErrorMessageProps {
   onClickResetSession: (message: DecryptErrorMessageEntity) => void;
 }
 
-const DecryptErrorMessage: React.FC<DecryptErrorMessageProps> = ({message, onClickResetSession}) => {
+const DecryptErrorMessage = ({message, onClickResetSession}: DecryptErrorMessageProps) => {
   const [isResettingSession, setIsResettingSession] = useState(false);
 
   const link = Config.getConfig().URL.SUPPORT.DECRYPT_ERROR;
