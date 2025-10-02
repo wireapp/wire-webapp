@@ -18,12 +18,15 @@
  */
 
 import axios, {AxiosRequestConfig} from 'axios';
+import logdown from 'logdown';
 
+import {LogFactory} from '@wireapp/commons';
+import {QualifiedConversationId} from '@wireapp/protocol-messaging';
+
+import {AssetUploadData, PostAssetsResponseSchema} from './AssetAPI.schema';
 import {AssetRetentionPolicy} from './AssetRetentionPolicy';
-import {AssetUploadData} from './AssetUploadData';
 import {isValidToken, isValidUUID} from './AssetUtil';
 
-import {BackendFeatures} from '../APIClient';
 import {
   BackendError,
   handleProgressEvent,
@@ -43,11 +46,18 @@ export interface CipherOptions {
   hash?: Buffer;
 }
 
+export interface AssetAuditData {
+  conversationId: QualifiedConversationId;
+  filename: string;
+  filetype: string;
+}
 export interface AssetOptions extends CipherOptions {
   public?: boolean;
   retention?: AssetRetentionPolicy;
   /** If given, will upload an asset that can be shared in a federated env */
   domain?: string;
+  /** Used for identifying the conversation the asset belongs to */
+  auditData?: AssetAuditData;
 }
 
 export interface AssetResponse {
@@ -55,21 +65,12 @@ export interface AssetResponse {
   mimeType?: string;
 }
 
-const ASSET_URLS = {
-  ASSET_V3_URL: '/assets/v3',
-  ASSET_V4_URL: '/assets/v4',
-  ASSET_SERVICE_URL: '/bot/assets',
-  ASSET_V2_URL: '/otr/assets',
-  ASSET_V2_CONVERSATION_URL: '/conversations',
-  ASSET_V1_URL: '/assets',
-  ASSETS_URL: '/assets',
-} as const;
-
 export class AssetAPI {
-  constructor(
-    private readonly client: HttpClient,
-    private readonly backendFeatures: BackendFeatures,
-  ) {}
+  private readonly logger: logdown.Logger;
+
+  constructor(private readonly client: HttpClient) {
+    this.logger = LogFactory.getLogger('@wireapp/api-client/AssetAPI');
+  }
 
   private getAssetShared(
     assetUrl: string,
@@ -129,11 +130,26 @@ export class AssetAPI {
   ): RequestCancelable<AssetUploadData> {
     const BOUNDARY = `Frontier${unsafeAlphanumeric()}`;
 
-    const metadata = JSON.stringify({
+    const metadataObject: {
+      public: boolean;
+      retention: AssetRetentionPolicy;
+      domain?: string;
+      convId?: QualifiedConversationId;
+      filename?: string;
+      filetype?: string;
+    } = {
       public: options?.public ?? true,
       retention: options?.retention || AssetRetentionPolicy.PERSISTENT,
       domain: options?.domain,
-    });
+    };
+
+    if (options?.auditData) {
+      metadataObject.convId = options.auditData.conversationId;
+      metadataObject.filename = options.auditData.filename;
+      metadataObject.filetype = options.auditData.filetype;
+    }
+
+    const metadata = JSON.stringify(metadataObject);
 
     const body =
       `--${BOUNDARY}\r\n` +
@@ -166,6 +182,12 @@ export class AssetAPI {
     const handleRequest = async (): Promise<AssetUploadData> => {
       try {
         const response = await this.client.sendRequest<AssetUploadData>(config);
+        const validation = PostAssetsResponseSchema.safeParse(response.data);
+
+        if (!validation.success) {
+          this.logger.warn('Asset upload response validation failed:', validation.error);
+        }
+
         return response.data;
       } catch (error) {
         if ((error as BackendError).message === SyntheticErrorLabel.REQUEST_CANCELLED) {
@@ -181,128 +203,7 @@ export class AssetAPI {
     };
   }
 
-  getAssetV1(
-    assetId: string,
-    conversationId: string,
-    forceCaching: boolean = false,
-    progressCallback?: ProgressCallback,
-  ) {
-    if (!isValidUUID(assetId)) {
-      throw new TypeError(`Expected asset ID "${assetId}" to only contain alphanumeric values and dashes.`);
-    }
-    if (!isValidUUID(conversationId)) {
-      throw new TypeError(
-        `Expected conversation ID "${conversationId}" to only contain alphanumeric values and dashes.`,
-      );
-    }
-
-    const cancelSource = axios.CancelToken.source();
-    const config: AxiosRequestConfig = {
-      cancelToken: cancelSource.token,
-      method: 'get',
-      onDownloadProgress: handleProgressEvent(progressCallback),
-      onUploadProgress: handleProgressEvent(progressCallback),
-      params: {
-        conv_id: conversationId,
-      },
-      responseType: 'arraybuffer',
-      url: `${ASSET_URLS.ASSET_V1_URL}/${assetId}`,
-    };
-
-    if (forceCaching) {
-      config.params.forceCaching = forceCaching;
-    }
-
-    const handleRequest = async (): Promise<AssetResponse> => {
-      try {
-        const response = await this.client.sendRequest<ArrayBuffer>(config);
-        return {
-          buffer: response.data,
-          mimeType: response.headers['content-type'],
-        };
-      } catch (error) {
-        if ((error as BackendError).message === SyntheticErrorLabel.REQUEST_CANCELLED) {
-          throw new RequestCancellationError('Asset download got cancelled.');
-        }
-        throw error;
-      }
-    };
-
-    return {
-      cancel: () => cancelSource.cancel(SyntheticErrorLabel.REQUEST_CANCELLED),
-      response: handleRequest(),
-    };
-  }
-
-  getAssetV2(
-    assetId: string,
-    conversationId: string,
-    forceCaching: boolean = false,
-    progressCallback?: ProgressCallback,
-  ) {
-    if (!isValidUUID(assetId)) {
-      throw new TypeError(`Expected asset ID "${assetId}" to only contain alphanumeric values and dashes.`);
-    }
-    if (!isValidUUID(conversationId)) {
-      throw new TypeError(
-        `Expected conversation ID "${conversationId}" to only contain alphanumeric values and dashes.`,
-      );
-    }
-
-    const cancelSource = axios.CancelToken.source();
-    const config: AxiosRequestConfig = {
-      cancelToken: cancelSource.token,
-      method: 'get',
-      onDownloadProgress: handleProgressEvent(progressCallback),
-      onUploadProgress: handleProgressEvent(progressCallback),
-      params: {},
-      responseType: 'arraybuffer',
-      url: `${ASSET_URLS.ASSET_V2_CONVERSATION_URL}/${conversationId}${ASSET_URLS.ASSET_V2_URL}/${assetId}`,
-    };
-
-    if (forceCaching) {
-      config.params.forceCaching = forceCaching;
-    }
-
-    const handleRequest = async (): Promise<AssetResponse> => {
-      try {
-        const response = await this.client.sendRequest<ArrayBuffer>(config);
-        return {
-          buffer: response.data,
-          mimeType: response.headers['content-type'],
-        };
-      } catch (error) {
-        if ((error as BackendError).message === SyntheticErrorLabel.REQUEST_CANCELLED) {
-          throw new RequestCancellationError('Asset download got cancelled.');
-        }
-        throw error;
-      }
-    };
-
-    return {
-      cancel: () => cancelSource.cancel(SyntheticErrorLabel.REQUEST_CANCELLED),
-      response: handleRequest(),
-    };
-  }
-
-  getAssetV3(
-    assetId: string,
-    token?: string | null,
-    forceCaching: boolean = false,
-    progressCallback?: ProgressCallback,
-  ) {
-    const version2 = 2;
-
-    if (!isValidUUID(assetId)) {
-      throw new TypeError(`Expected asset ID "${assetId}" to only contain alphanumeric values and dashes.`);
-    }
-    if (this.backendFeatures.version >= version2) {
-      throw new TypeError('Asset v3 is not supported on backend version 2 or higher.');
-    }
-    return this.getAssetShared(`${ASSET_URLS.ASSET_V3_URL}/${assetId}`, token, forceCaching, progressCallback);
-  }
-
-  getAssetV4(
+  getAsset(
     assetId: string,
     assetDomain: string,
     token?: string | null,
@@ -319,8 +220,8 @@ export class AssetAPI {
     if (!isValidDomain(assetDomain)) {
       throw new TypeError(`Invalid asset domain ${assetDomain}`);
     }
-    const assetBaseUrl = this.backendFeatures.version >= 2 ? ASSET_URLS.ASSETS_URL : ASSET_URLS.ASSET_V4_URL;
-    return this.getAssetShared(`${assetBaseUrl}/${assetDomain}/${assetId}`, token, forceCaching, progressCallback);
+
+    return this.getAssetShared(`/assets/${assetDomain}/${assetId}`, token, forceCaching, progressCallback);
   }
 
   getServiceAsset(
@@ -333,7 +234,7 @@ export class AssetAPI {
       throw new TypeError(`Expected asset ID "${assetId}" to only contain alphanumeric values and dashes.`);
     }
 
-    const assetBaseUrl = `${ASSET_URLS.ASSET_SERVICE_URL}/${assetId}`;
+    const assetBaseUrl = `/bot/assets/${assetId}`;
     return this.getAssetShared(assetBaseUrl, token, forceCaching, progressCallback);
   }
 
@@ -345,12 +246,10 @@ export class AssetAPI {
    * @param progressCallback? Will be called at every progress of the upload
    */
   postAsset(asset: Uint8Array, options?: AssetOptions, progressCallback?: ProgressCallback) {
-    const baseUrl = this.backendFeatures.version >= 2 ? ASSET_URLS.ASSETS_URL : ASSET_URLS.ASSET_V3_URL;
-    return this.postAssetShared(baseUrl, asset, options, progressCallback);
+    return this.postAssetShared('/assets', asset, options, progressCallback);
   }
 
   postServiceAsset(asset: Uint8Array, options?: AssetOptions, progressCallback?: ProgressCallback) {
-    const assetBaseUrl = ASSET_URLS.ASSET_SERVICE_URL;
-    return this.postAssetShared(assetBaseUrl, asset, options, progressCallback);
+    return this.postAssetShared('/bot/assets', asset, options, progressCallback);
   }
 }
