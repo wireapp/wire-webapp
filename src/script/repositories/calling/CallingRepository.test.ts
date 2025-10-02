@@ -777,6 +777,7 @@ describe.skip('E2E audio call', () => {
           userId,
           clientid,
           CONV_TYPE.CONFERENCE,
+          0, // no meeting
         );
       },
     );
@@ -863,7 +864,8 @@ describe.skip('E2E audio call', () => {
         })
         .catch(done.fail);
     };
-    wCall.start(remoteWuser, conversationId.id, CALL_TYPE.NORMAL, CONV_TYPE.ONEONONE, 0);
+    const NO_MEETING = 0;
+    wCall.start(remoteWuser, conversationId.id, CALL_TYPE.NORMAL, CONV_TYPE.ONEONONE, 0, NO_MEETING);
   });
 });
 
