@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [46.37.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@46.36.0...@wireapp/core@46.37.0) (2025-10-02)
+
+### Features
+
+* update AssetAPI [WPB-20663] ([#7406](https://github.com/wireapp/wire-web-packages/issues/7406)) ([b8e3640](https://github.com/wireapp/wire-web-packages/commit/b8e36403d37f63af9d564bdf6ecbda2ae7dcb892))
+
 # [46.36.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@46.35.4...@wireapp/core@46.36.0) (2025-09-30)
 
 ### Features
