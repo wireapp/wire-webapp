@@ -163,6 +163,7 @@ export class BrigRepositoryE2E {
         status: 'enabled',
         config: {
           enforceAppLock: true,
+          inactivityTimeoutSecs: 30,
         },
       },
       {

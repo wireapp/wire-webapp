@@ -18,10 +18,11 @@
  */
 
 import {addCreatedTeam, addCreatedUser} from './tearDown.util';
-import {inviteMembers} from './userActions';
+import {inviteMembers, loginUser} from './userActions';
 
 import {ApiManagerE2E} from '../backend/apiManager.e2e';
 import {User} from '../data/user';
+import {PageManager} from '../pageManager';
 
 /**
  * add an team with one owner and 2 member
@@ -36,4 +37,19 @@ export const setupBasicTestScenario = async (api: ApiManagerE2E, member: User[],
     addCreatedUser(user);
   }
   return user;
+};
+
+export const completeLogin = async (pageManager: PageManager, user: User) => {
+  const {components, modals, pages} = pageManager.webapp;
+  await pageManager.openMainPage();
+  await loginUser(user, pageManager);
+
+  const hasLocalData = await pages.historyInfo().isButtonVisible();
+  if (hasLocalData) {
+    await pages.historyInfo().clickConfirmButton();
+  }
+  await components.conversationSidebar().isPageLoaded();
+  if (!hasLocalData) {
+    await modals.dataShareConsent().clickDecline();
+  }
 };

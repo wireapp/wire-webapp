@@ -36,7 +36,7 @@ export class AppLockModal {
     this.appLockModal = page.locator("[data-uie-name='applock-modal']");
     this.lockPasscodeInput = page.locator("[data-uie-name='applock-modal'] [data-uie-name='input-applock-set-a']");
     this.unlockPasscodeInput = page.locator("[data-uie-name='applock-modal'] [data-uie-name='input-applock-unlock']");
-    this.appLockActionButton = page.locator("[data-uie-name='applock-modal'] [data-uie-name='do-action']");
+    this.appLockActionButton = this.appLockModal.locator("[data-uie-name='do-action']");
     this.appLockModalHeader = page.locator("[data-uie-name='applock-modal'] [data-uie-name='applock-modal-header']");
     this.appLockModalText = page.locator("[data-uie-name='applock-modal'] [data-uie-name='label-applock-unlock-text']");
     this.loadingBar = page.locator('.progress-bar');
