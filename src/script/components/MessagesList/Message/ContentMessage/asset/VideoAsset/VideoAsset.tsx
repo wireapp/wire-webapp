@@ -17,7 +17,7 @@
  *
  */
 
-import React, {useCallback, useEffect, useState} from 'react';
+import {useCallback, useEffect, useState} from 'react';
 
 import {amplify} from 'amplify';
 import cx from 'classnames';
@@ -52,12 +52,12 @@ interface VideoAssetProps {
   isFocusable?: boolean;
 }
 
-const VideoAsset: React.FC<VideoAssetProps> = ({
+const VideoAsset = ({
   message,
   isQuote,
   teamState = container.resolve(TeamState),
   isFocusable = true,
-}) => {
+}: VideoAssetProps) => {
   const asset = message.getFirstAsset() as FileAssetType;
   const {isObfuscated} = useKoSubscribableChildren(message, ['isObfuscated']);
   const {preview_resource: assetPreviewResource} = useKoSubscribableChildren(asset, ['preview_resource']);

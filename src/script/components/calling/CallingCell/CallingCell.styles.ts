@@ -19,15 +19,6 @@
 
 import {CSSObject} from '@emotion/react';
 
-export const callingCellWrapper: CSSObject = {
-  backgroundColor: 'var(--app-bg-secondary)',
-  border: '1px solid 1px solid var(--border-color)',
-  borderRadius: '8px',
-  display: 'flex',
-  flexDirection: 'column',
-  padding: '12px 12px 16px',
-};
-
 export const callingContainer: CSSObject = {
   position: 'relative',
   display: 'flex',
@@ -35,15 +26,4 @@ export const callingContainer: CSSObject = {
   flexShrink: '0',
   padding: '10px 12px 20px',
   animation: 'show-call-ui var(--animation-timing-fast) ease-in-out 0s 1',
-};
-
-export const infoBar: CSSObject = {
-  backgroundColor: 'var(--accent-color)',
-  borderRadius: '8px',
-  color: 'var(--app-bg-secondary)',
-  fontSize: 'var(--line-height-xs)',
-  fontWeight: 'var(--font-weight-medium)',
-  margin: '8px 8px 0',
-  padding: '4px',
-  textAlign: 'center',
 };

@@ -44,8 +44,8 @@ export const includesOnlyEmojis = (text: string) =>
   isValidString(text) && removeEmojis(removeWhitespace(text)).length === 0;
 
 const emojiesFlatten = Object.values(emojies).flat();
-export const emojiesList = groupBy(emojiesFlatten, 'u');
-export const emojiDictionary: Map<string, string> = new Map();
+const emojiesList = groupBy(emojiesFlatten, 'u');
+const emojiDictionary: Map<string, string> = new Map();
 
 Object.keys(emojiesList).forEach(key => {
   // return if already existing in the dictionary

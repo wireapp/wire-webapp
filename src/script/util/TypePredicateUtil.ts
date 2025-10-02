@@ -22,7 +22,6 @@ import type {BackendError} from '@wireapp/api-client/lib/http';
 import {AxiosError} from 'axios';
 
 import {Conversation} from 'Repositories/entity/Conversation';
-import {User} from 'Repositories/entity/User';
 import {ClientRecord} from 'Repositories/storage/record/ClientRecord';
 
 import {isObject} from '../guards/common';
@@ -33,10 +32,6 @@ export function isAxiosError<T>(errorCandidate: any): errorCandidate is AxiosErr
 
 export function isBackendError(errorCandidate: any): errorCandidate is BackendError {
   return errorCandidate && typeof errorCandidate.label === 'string' && typeof errorCandidate.message === 'string';
-}
-
-export function isUser(userCandidate: any): userCandidate is User {
-  return userCandidate instanceof User;
 }
 
 export function isConversationEntity(conversation: any): conversation is Conversation {

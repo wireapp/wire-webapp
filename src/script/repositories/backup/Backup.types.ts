@@ -31,17 +31,17 @@ export interface Metadata {
 
 export type ProgressCallback = (done: number) => void;
 
-export type UserDescriptor = {
+type UserDescriptor = {
   entities: UserRecord[];
   filename: Filename.USERS;
 };
 
-export type EventDescriptor = {
+type EventDescriptor = {
   entities: EventRecord[];
   filename: Filename.EVENTS;
 };
 
-export type ConversationDescriptor = {
+type ConversationDescriptor = {
   entities: ConversationRecord[];
   filename: Filename.CONVERSATIONS;
 };

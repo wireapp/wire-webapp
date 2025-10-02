@@ -17,8 +17,6 @@
  *
  */
 
-import React from 'react';
-
 import {CSSObject} from '@emotion/serialize';
 import {amplify} from 'amplify';
 import cx from 'classnames';
@@ -42,7 +40,7 @@ const headerStyles: CSSObject = {
   textAlign: 'center',
 };
 
-const AvailabilityButtons: React.FC<AvailabilityInputProps> = ({availability}) => {
+const AvailabilityButtons = ({availability}: AvailabilityInputProps) => {
   const entries: ContextMenuEntry[] = [
     {
       availability: Availability.Type.AVAILABLE,

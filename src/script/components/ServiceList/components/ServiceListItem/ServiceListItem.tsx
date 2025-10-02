@@ -27,7 +27,7 @@ import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {handleKeyDown, KEY} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
 
-export interface ServiceListItemProps {
+interface ServiceListItemProps {
   service: ServiceEntity;
   onClick: (service: ServiceEntity) => void;
 }

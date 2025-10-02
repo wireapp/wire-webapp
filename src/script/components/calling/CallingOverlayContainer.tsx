@@ -38,7 +38,7 @@ import {FullscreenVideoCall} from './FullscreenVideoCall';
 
 import {CallViewTab} from '../../view_model/CallingViewModel';
 
-export interface CallingContainerProps {
+interface CallingContainerProps {
   readonly propertiesRepository: PropertiesRepository;
   readonly callingRepository: CallingRepository;
   readonly callState?: CallState;

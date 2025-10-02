@@ -34,7 +34,6 @@ import {NotificationSource} from '@wireapp/core/lib/notification';
 import {DatabaseKeys} from '@wireapp/core/lib/notification/NotificationDatabaseRepository';
 import Dexie from 'dexie';
 import keyboardjs from 'keyboardjs';
-import {observable} from 'knockout';
 import {$createTextNode, $getRoot, LexicalEditor} from 'lexical';
 import {container} from 'tsyringe';
 
@@ -626,22 +625,4 @@ export class DebugUtil {
   disableForcedErrorReporting() {
     return disableForcedErrorReporting();
   }
-}
-
-export function observableWithProxy(
-  initialValue: any,
-  name = 'unnamed',
-  extraInformation: Record<string, string> = {},
-) {
-  const obs = observable(initialValue);
-
-  return new Proxy(obs, {
-    apply(target, thisArg, args) {
-      if (args.length) {
-        // eslint-disable-next-line no-console
-        console.trace(`DEBUG: Proxy Observable "${name}" set to:`, {args: args[0], ...extraInformation});
-      }
-      return Reflect.apply(target, thisArg, args);
-    },
-  });
 }
