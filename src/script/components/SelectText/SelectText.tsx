@@ -25,7 +25,7 @@ import {TabIndex} from '@wireapp/react-ui-kit';
 
 import {handleKeyDown, KEY} from 'Util/KeyboardUtil';
 
-export interface SelectTextProps {
+interface SelectTextProps {
   text: string;
   className?: string;
   dataUieName?: string;

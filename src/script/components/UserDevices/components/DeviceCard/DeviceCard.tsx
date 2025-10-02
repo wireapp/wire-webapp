@@ -32,7 +32,7 @@ import {splitFingerprint} from 'Util/StringUtil';
 import {FormattedId} from '../../../../page/MainContent/panels/preferences/DevicesPreferences/components/FormattedId';
 import * as Icon from '../../../Icon';
 
-export interface DeviceCardProps {
+interface DeviceCardProps {
   click?: (device: ClientEntity) => void;
   getDeviceIdentity?: (deviceId: string) => WireIdentity | undefined;
   device: ClientEntity;

@@ -17,7 +17,7 @@
  *
  */
 
-import React, {useCallback, useEffect, useMemo, useRef} from 'react';
+import {useCallback, useEffect, useMemo, useRef} from 'react';
 
 import {amplify} from 'amplify';
 import cx from 'classnames';
@@ -51,7 +51,7 @@ import {ShortcutType} from '../../ui/ShortcutType';
 import {CallActions} from '../../view_model/CallingViewModel';
 import {ViewModelRepositories} from '../../view_model/MainViewModel';
 
-export interface TitleBarProps {
+interface TitleBarProps {
   callActions: CallActions;
   conversation: Conversation;
   openRightSidebar: (panelState: PanelState, params: RightSidebarParams, compareEntityId?: boolean) => void;
@@ -64,7 +64,7 @@ export interface TitleBarProps {
   withBottomDivider: boolean;
 }
 
-export const TitleBar: React.FC<TitleBarProps> = ({
+export const TitleBar = ({
   repositories,
   conversation,
   callActions,
@@ -75,7 +75,7 @@ export const TitleBar: React.FC<TitleBarProps> = ({
   teamState = container.resolve(TeamState),
   isReadOnlyConversation = false,
   withBottomDivider,
-}) => {
+}: TitleBarProps) => {
   const {
     is1to1,
     isRequest,

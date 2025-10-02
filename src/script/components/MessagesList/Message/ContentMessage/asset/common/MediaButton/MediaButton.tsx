@@ -17,7 +17,7 @@
  *
  */
 
-import React, {useEffect, useState} from 'react';
+import {useEffect, useState} from 'react';
 
 import cx from 'classnames';
 
@@ -42,7 +42,7 @@ export interface MediaButtonProps {
   isFocusable?: boolean;
 }
 
-const MediaButton: React.FC<MediaButtonProps> = ({
+const MediaButton = ({
   mediaElement,
   large,
   asset,
@@ -52,7 +52,7 @@ const MediaButton: React.FC<MediaButtonProps> = ({
   pause = noop,
   cancel = noop,
   isFocusable = true,
-}) => {
+}: MediaButtonProps) => {
   const [isPlaying, setIsPlaying] = useState<boolean>(false);
   const onPlay = () => setIsPlaying(true);
   const onPause = () => setIsPlaying(false);

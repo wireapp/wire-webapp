@@ -17,7 +17,7 @@
  *
  */
 
-import React, {CSSProperties, useEffect, useState} from 'react';
+import {ReactNode, CSSProperties, useEffect, useState} from 'react';
 
 import {css} from '@emotion/react';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
@@ -97,10 +97,7 @@ const calculateRowsAndColumns = (params: CalculateRowsAndColumsParams): RowsAndC
   return {'--columns': columns, '--rows': rows};
 };
 
-const GroupVideoThumbnailWrapper: React.FC<{children?: React.ReactNode; minimized: boolean}> = ({
-  minimized,
-  children,
-}) => (
+const GroupVideoThumbnailWrapper = ({children, minimized}: {children?: ReactNode; minimized: boolean}) => (
   <div
     className="group-video__thumbnail"
     css={
@@ -127,14 +124,14 @@ const HEIGHT_QUERIES = {
   TALL: 'min-height: 830px',
 };
 
-const GroupVideoGrid: React.FunctionComponent<GroupVideoGripProps> = ({
+const GroupVideoGrid = ({
   minimized = false,
   grid,
   selfParticipant,
   maximizedParticipant,
   call,
   setMaximizedParticipant,
-}) => {
+}: GroupVideoGripProps) => {
   const isMobile = useActiveWindowMatchMedia(QUERY.mobile);
   const isTablet = useActiveWindowMatchMedia(QUERY.tablet);
   const isDesktop = useActiveWindowMatchMedia(QUERY.desktop);

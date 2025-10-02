@@ -19,12 +19,6 @@
 
 import {CSSObject} from '@emotion/react';
 
-export const createConversationGroupCreationContainerCss: CSSObject = {
-  alignSelf: 'center',
-  textAlign: 'center',
-  flex: 1,
-};
-
 export const createConversationStepWrapperCss: CSSObject = {
   height: '456px',
 };

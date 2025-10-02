@@ -36,7 +36,7 @@ import {ImageUploadButton} from './ImageUploadButton/ImageUploadButton';
 import {MessageTimerButton} from './MessageTimerButton/MessageTimerButton';
 import {PingButton} from './PingButton/PingButton';
 
-export type ControlButtonsProps = {
+interface ControlButtonsProps {
   input: string;
   conversation: Conversation;
   disablePing?: boolean;
@@ -57,7 +57,7 @@ export type ControlButtonsProps = {
   onEmojiClick: (event: MouseEvent<HTMLButtonElement>) => void;
   onCellAssetUpload: () => void;
   onCellImageUpload: () => void;
-};
+}
 
 const ControlButtons = ({
   conversation,

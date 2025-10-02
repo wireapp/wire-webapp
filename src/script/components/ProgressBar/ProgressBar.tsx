@@ -21,7 +21,7 @@ import {FC} from 'react';
 
 import cx from 'classnames';
 
-export interface ProgressBarProps {
+interface ProgressBarProps {
   message?: string;
   className?: string;
   centerText?: boolean;

@@ -53,7 +53,7 @@ const LinkText = ({dataUieName, onClick, label}: LinkTextProps) => (
   </Link>
 );
 
-export interface E2EIVerificationMessageProps {
+interface E2EIVerificationMessageProps {
   message: E2EIVerificationMessageEntity;
   conversation: Conversation;
 }

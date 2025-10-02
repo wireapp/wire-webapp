@@ -57,16 +57,6 @@ export const inputWrapperStyles: CSSObject = {
   gap: '8px',
 };
 
-export const copyButtonStyles: CSSObject = {
-  display: 'flex',
-  alignItems: 'center',
-  gap: '8px',
-};
-
-export const copyIconStyles: CSSObject = {
-  overflow: 'visible !important',
-};
-
 export const loaderWrapperStyles: CSSObject = {
   display: 'flex',
   justifyContent: 'center',

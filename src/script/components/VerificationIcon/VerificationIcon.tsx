@@ -19,7 +19,7 @@
 
 import {VerifiedIcon, NotVerifiedIcon} from '../Icon';
 
-export interface VerificationIconProps {
+interface VerificationIconProps {
   className?: string;
   dataUieName?: string;
   isVerified: boolean;

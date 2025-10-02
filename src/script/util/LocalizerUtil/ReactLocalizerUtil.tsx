@@ -17,12 +17,12 @@
  *
  */
 
-import React from 'react';
+import {Fragment, ReactNode} from 'react';
 
 interface ComponentReplacement {
   start: string;
   end: string;
-  render: (text: string) => React.ReactNode;
+  render: (text: string) => ReactNode;
 }
 
 interface StringReplacement {
@@ -99,7 +99,7 @@ export function replaceReactComponents(html: string, replacements: Replacement[]
               return componentsReplacementMatch.render(node);
             })
             .filter(Boolean)
-            .map((node, index) => <React.Fragment key={index}>{node}</React.Fragment>);
+            .map((node, index) => <Fragment key={index}>{node}</Fragment>);
         }
 
         return componentsReplacementMatch.render(text);
@@ -114,5 +114,5 @@ export function replaceReactComponents(html: string, replacements: Replacement[]
       return node;
     })
     .filter(Boolean)
-    .map((node, index) => <React.Fragment key={index}>{node}</React.Fragment>); // Make sure we have a different key for each node.
+    .map((node, index) => <Fragment key={index}>{node}</Fragment>); // Make sure we have a different key for each node.
 }

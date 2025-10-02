@@ -20,9 +20,9 @@
 import * as Icon from 'Components/Icon';
 import {t} from 'Util/LocalizerUtil';
 
-export type GiphyButtonProps = {
+interface GiphyButtonProps {
   onGifClick: () => void;
-};
+}
 
 export const GiphyButton = ({onGifClick}: GiphyButtonProps) => {
   return (

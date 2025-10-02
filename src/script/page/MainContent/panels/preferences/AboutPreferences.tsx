@@ -17,7 +17,7 @@
  *
  */
 
-import React, {useMemo} from 'react';
+import {useMemo} from 'react';
 
 import {container} from 'tsyringe';
 
@@ -38,7 +38,7 @@ interface AboutPreferencesProps {
   teamState: TeamState;
 }
 
-const AboutPreferences: React.FC<AboutPreferencesProps> = ({selfUser, teamState = container.resolve(TeamState)}) => {
+const AboutPreferences = ({selfUser, teamState = container.resolve(TeamState)}: AboutPreferencesProps) => {
   const inTeam = teamState.isInTeam(selfUser);
   const config = Config.getConfig();
 

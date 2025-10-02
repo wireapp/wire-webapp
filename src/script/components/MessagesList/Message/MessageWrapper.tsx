@@ -17,8 +17,6 @@
  *
  */
 
-import React from 'react';
-
 import {ReactionType} from '@wireapp/core/lib/conversation';
 import {amplify} from 'amplify';
 import ko from 'knockout';
@@ -61,7 +59,7 @@ const isOutgoingQuote = (quoteEntity: QuoteEntity): quoteEntity is OutgoingQuote
   return quoteEntity.hash !== undefined;
 };
 
-export const MessageWrapper: React.FC<MessageParams> = ({
+export const MessageWrapper = ({
   message,
   conversation,
   selfId,
@@ -85,7 +83,7 @@ export const MessageWrapper: React.FC<MessageParams> = ({
   messageActions,
   teamState = container.resolve(TeamState),
   isMsgElementsFocusable,
-}) => {
+}: MessageParams) => {
   const findMessage = async (conversation: Conversation, messageId: string) => {
     const event =
       (await messageRepository.getMessageInConversationById(conversation, messageId)) ||
