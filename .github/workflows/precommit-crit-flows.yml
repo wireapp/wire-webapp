@@ -146,7 +146,7 @@ jobs:
       - uses: 1password/install-cli-action@143a85f84a90555d121cde2ff5872e393a47ab9f
 
       - name: Generate env file
-        run: op inject -i test/e2e_tests/.env.tpl -o test/e2e_tests/.env
+        run: op inject -i test/e2e_tests/.env.staging.tpl -o test/e2e_tests/.env
         env:
           OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
 

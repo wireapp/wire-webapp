@@ -17,11 +17,11 @@
  *
  */
 
-import React, {useId} from 'react';
+import {useId, useRef} from 'react';
 
 import cx from 'classnames';
 
-export interface BaseToggleProps {
+interface BaseToggleProps {
   extendedInfo?: boolean;
   extendedInfoText?: string;
   className?: string;
@@ -35,7 +35,7 @@ export interface BaseToggleProps {
 
 const defaultToggleName = 'base-toggle';
 
-const BaseToggle: React.FC<BaseToggleProps> = ({
+const BaseToggle = ({
   extendedInfo,
   isChecked,
   isDisabled,
@@ -45,10 +45,10 @@ const BaseToggle: React.FC<BaseToggleProps> = ({
   toggleName = defaultToggleName,
   className,
   infoText,
-}) => {
+}: BaseToggleProps) => {
   const uuid = useId();
   const labelUuid = useId();
-  const inputRef = React.useRef<HTMLInputElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
   return (
     <div className={cx(defaultToggleName, className)}>
       <div className="info-toggle__row">

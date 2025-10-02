@@ -31,7 +31,7 @@ import {t} from 'Util/LocalizerUtil';
 import {ViewModelRepositories} from '../../../view_model/MainViewModel';
 import {PanelHeader} from '../PanelHeader';
 
-export interface NotificationsProps {
+interface NotificationsProps {
   activeConversation: Conversation;
   onClose: () => void;
   onGoBack: () => void;

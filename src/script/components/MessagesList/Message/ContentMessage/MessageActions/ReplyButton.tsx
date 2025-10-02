@@ -25,7 +25,7 @@ import {t} from 'Util/LocalizerUtil';
 import {getActionsMenuCSS, getIconCSS, messageActionsMenuButton} from './MessageActions.styles';
 import {reactionImgSize} from './MessageReactions/EmojiChar.styles';
 
-export interface ReplyButtonProps {
+interface ReplyButtonProps {
   actionId: string;
   currentMsgActionName: string;
   messageFocusedTabIndex: number;

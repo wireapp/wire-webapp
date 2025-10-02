@@ -35,18 +35,6 @@ export const selectWrapperStyles: CSSObject = {
   justifyContent: 'center',
 };
 
-export const spinnerWrapperStyles: CSSObject = {
-  width: '32px',
-  height: '32px',
-  display: 'flex',
-  justifyContent: 'center',
-  alignItems: 'center',
-};
-
-export const spinnerStyles: CSSObject = {
-  color: 'var(--foreground)',
-};
-
 export const menuListCSS: CSSObject = {
   maxHeight: '200px',
 };

@@ -122,8 +122,7 @@ export const useCreateConversationModal = create<CreateConversationModalState>(s
     })),
   setModerator: (moderator: ADD_PERMISSION) => set({moderator}),
   setChatHistory: (history?: ChatHistory) => set({chatHistory: history || ChatHistory.Off}),
-  setConversationType: (conversationType: ConversationType) =>
-    set({conversationType, isReadReceiptsEnabled: conversationType === ConversationType.Group}),
+  setConversationType: (conversationType: ConversationType) => set({conversationType}),
   setConversationCreationStep: (step: ConversationCreationStep) => set({conversationCreationStep: step}),
   gotoNextStep: () => set(state => ({...state, conversationCreationStep: state.conversationCreationStep + 1})),
   gotoLastStep: () => set({conversationCreationStep: ConversationCreationStep.ParticipantsSelection}),

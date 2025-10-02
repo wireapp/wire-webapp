@@ -1,0 +1,53 @@
+name: Run Cells Critical Flow E2E Tests
+
+on:
+  workflow_call:
+    inputs:
+      environment:
+        required: true
+        type: string
+    secrets:
+      OP_SERVICE_ACCOUNT_TOKEN:
+        required: true
+
+jobs:
+  cells-crit-flow-e2e-tests:
+    name: Run Playwright Cells Critical Flow Tests
+    if: github.repository == 'wireapp/wire-webapp'
+    runs-on: [self-hosted, Linux, X64, office]
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18.16.x
+          cache: 'yarn'
+
+      - name: Install JS dependencies
+        run: yarn --immutable
+
+      - name: Install Playwright browsers
+        run: yarn playwright install --with-deps && yarn playwright install chrome
+
+      - name: Install 1Password
+        uses: 1password/install-cli-action@143a85f84a90555d121cde2ff5872e393a47ab9f
+
+      - name: Generate env file
+        run: op inject -i test/e2e_tests/.env.$ENV.tpl -o test/e2e_tests/.env
+        env:
+          ENV: ${{ inputs.environment }}
+          OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
+      - name: Run critical flow tests
+        run: yarn e2e-test --grep "@crit-flow-cells"
+
+      - name: Upload test report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report-$ENV
+          path: playwright-report-$ENV/
+        env:
+          ENV: ${{ inputs.environment }}

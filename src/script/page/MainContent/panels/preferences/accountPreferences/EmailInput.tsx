@@ -17,8 +17,6 @@
  *
  */
 
-import React from 'react';
-
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
@@ -36,7 +34,7 @@ interface EmailInputProps {
 
 const logger = getLogger('EmailInput');
 
-const EmailInput: React.FC<EmailInputProps> = ({email, canEditProfile, userRepository}) => {
+const EmailInput = ({email, canEditProfile, userRepository}: EmailInputProps) => {
   const emailInputDone = useInputDone();
 
   const changeEmail = async (enteredEmail: string): Promise<void> => {

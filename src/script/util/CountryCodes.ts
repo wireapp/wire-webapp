@@ -24,7 +24,7 @@ interface CountryCode {
   population: number;
 }
 
-export const COUNTRY_CODES: CountryCode[] = [
+const COUNTRY_CODES: CountryCode[] = [
   {
     code: 93,
     iso: 'AF',

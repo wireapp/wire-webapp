@@ -30,7 +30,7 @@ const ROBOTS_ALLOW_FILE = path.join(ROBOTS_DIR, 'robots.txt');
 const ROBOTS_DISALLOW_FILE = path.join(ROBOTS_DIR, 'robots-disallow.txt');
 
 const defaultCSP = {
-  connectSrc: ["'self'", 'blob:', 'data:', 'https://*.giphy.com', 'https://service.zeta.pydiocells.com'],
+  connectSrc: ["'self'", 'blob:', 'data:', 'https://*.giphy.com'],
   defaultSrc: ["'self'"],
   fontSrc: ["'self'", 'data:'],
   frameSrc: [
@@ -39,9 +39,9 @@ const defaultCSP = {
     'https://*.vimeo.com',
     'https://*.youtube-nocookie.com',
   ],
-  imgSrc: ["'self'", 'blob:', 'data:', 'https://*.giphy.com', 'https://service.zeta.pydiocells.com'],
+  imgSrc: ["'self'", 'blob:', 'data:', 'https://*.giphy.com'],
   manifestSrc: ["'self'"],
-  mediaSrc: ["'self'", 'blob:', 'data:', 'https://service.zeta.pydiocells.com'],
+  mediaSrc: ["'self'", 'blob:', 'data:'],
   scriptSrc: ["'self'", "'unsafe-eval'"],
   styleSrc: ["'self'", "'unsafe-inline'"],
   workerSrc: ["'self'", 'blob:', 'data:'],

@@ -17,7 +17,7 @@
  *
  */
 
-import {HTMLProps, useEffect} from 'react';
+import {useEffect} from 'react';
 
 import {SuccessShield} from '@wireapp/react-ui-kit/lib/Images/SuccessShield';
 
@@ -33,8 +33,6 @@ import {AccountRegistrationLayout} from '../component/AccountRegistrationLayout'
 import {EXTERNAL_ROUTE} from '../externalRoute';
 import {PageView, resetTelemetrySession, trackTelemetryPageView} from '../util/trackingUtil';
 import {pathWithParams} from '../util/urlUtil';
-
-export interface RegistrationSuccessProps extends HTMLProps<Document> {}
 
 export const Success = () => {
   const secureOpen = (url: string) => {

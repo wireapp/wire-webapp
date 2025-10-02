@@ -17,26 +17,27 @@
  *
  */
 
-import {FC, ReactNode} from 'react';
+import {ReactNode} from 'react';
 
 import {t} from 'Util/LocalizerUtil';
 
-export interface DownloadButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+interface DownloadButtonProps {
   actionId: string;
   messageFocusedTabIndex: number;
   onDownloadClick: (event: React.MouseEvent<HTMLButtonElement>) => void;
   onKeyPress: (event: React.KeyboardEvent<HTMLButtonElement>) => void;
   children: ReactNode;
+  className?: string;
 }
 
-const DownloadButton: FC<DownloadButtonProps> = ({
+const DownloadButton = ({
   actionId,
   messageFocusedTabIndex,
   onDownloadClick,
   onKeyPress,
   children,
   ...rest
-}) => {
+}: DownloadButtonProps) => {
   return (
     <button
       {...rest}

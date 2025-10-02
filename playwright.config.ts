@@ -50,6 +50,7 @@ module.exports = defineConfig({
     screenshot: 'only-on-failure',
     permissions: ['camera', 'microphone'],
     actionTimeout: 20_000, // 20 seconds
+    testIdAttribute: 'data-uie-name',
   },
   expect: {
     timeout: 10_000, // 10 seconds

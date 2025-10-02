@@ -37,7 +37,7 @@ export const QUERY_KEY = {
 };
 
 // These are the query keys that are in the redirect link from the OAuth server
-export const OAUTH_QUERY_KEYS = {
+const OAUTH_QUERY_KEYS = {
   CLIENT_ID: 'client_id',
   REDIRECT_URI: 'redirect_uri',
   RESPONSE_TYPE: 'response_type',

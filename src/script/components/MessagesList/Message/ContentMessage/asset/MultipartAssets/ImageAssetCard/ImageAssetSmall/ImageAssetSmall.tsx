@@ -77,6 +77,7 @@ export const ImageAssetSmall = ({
         filePreviewUrl={src}
         fileExtension={extension}
         fileName={name}
+        fileUrl={src}
         senderName={senderName}
         timestamp={timestamp}
       />

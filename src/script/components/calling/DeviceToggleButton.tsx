@@ -17,20 +17,20 @@
  *
  */
 
-import React from 'react';
+import {UIEvent} from 'react';
 
 import {css, SerializedStyles} from '@emotion/react';
 
 import {handleKeyDown, KEY} from 'Util/KeyboardUtil';
-export interface DeviceToggleButtonProps {
+interface DeviceToggleButtonProps {
   currentDevice: string;
   devices: string[];
   onChooseDevice: (deviceId: string) => void;
   styles?: SerializedStyles;
 }
 
-const DeviceToggleButton: React.FC<DeviceToggleButtonProps> = ({currentDevice, devices, onChooseDevice, styles}) => {
-  const selectNextDevice = (event: React.UIEvent) => {
+const DeviceToggleButton = ({currentDevice, devices, onChooseDevice, styles}: DeviceToggleButtonProps) => {
+  const selectNextDevice = (event: UIEvent) => {
     event.preventDefault();
     event.stopPropagation();
     const currentDeviceIndex = devices.indexOf(currentDevice);

@@ -17,8 +17,6 @@
  *
  */
 
-import React from 'react';
-
 import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
 
 import * as Icon from 'Components/Icon';
@@ -31,7 +29,7 @@ interface AccountLinkProps {
   value: string;
 }
 
-const AccountLink: React.FC<AccountLinkProps> = ({label, value, ...rest}) => {
+const AccountLink = ({label, value, ...rest}: AccountLinkProps) => {
   return (
     <div
       css={{

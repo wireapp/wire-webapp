@@ -25,13 +25,6 @@ import type {MediumImage as MediumImageAsset} from './MediumImage';
 import type {Multipart as MultipartAsset} from './Multipart';
 import type {Text as TextAsset} from './Text';
 
-export interface AssetPayload {
-  id: string;
-  key: string;
-  size: string;
-  type: string;
-}
-
 export class Asset {
   public file_type?: string;
   public file_name?: string;

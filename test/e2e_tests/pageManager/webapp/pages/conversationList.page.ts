@@ -73,7 +73,7 @@ export class ConversationListPage {
   }
 
   async openConversation(conversationName: string) {
-    await this.getConversationLocator(conversationName).click();
+    await this.getConversationLocator(conversationName).first().click();
   }
 
   async openPendingConnectionRequest() {

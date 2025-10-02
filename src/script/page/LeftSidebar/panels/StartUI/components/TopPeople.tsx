@@ -19,9 +19,6 @@
 
 import React from 'react';
 
-import {container} from 'tsyringe';
-
-import {AssetRepository} from 'Repositories/assets/AssetRepository';
 import {User} from 'Repositories/entity/User';
 
 import {TopContact} from './topPeople/TopContact';
@@ -32,12 +29,11 @@ interface TopPeopleProps {
   users: User[];
 }
 
-const TopPeople: React.FC<TopPeopleProps> = ({clickOnUser, max, users}) => {
-  const assetRepository = container.resolve(AssetRepository);
+const TopPeople = ({clickOnUser, max, users}: TopPeopleProps) => {
   max ??= 9;
   const displayedUsers = users.slice(0, max);
   const searchListItems = displayedUsers.map(user => (
-    <TopContact assetRepository={assetRepository} clickOnUser={clickOnUser} key={user.id} user={user} />
+    <TopContact clickOnUser={clickOnUser} key={user.id} user={user} />
   ));
   return <div className="search-list search-list-sm">{searchListItems}</div>;
 };

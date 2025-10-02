@@ -37,12 +37,6 @@ export const thumbnailWrapperStyles = (isActive: boolean): CSSObject => ({
   border: isActive ? '2px solid var(--accent-color)' : '2px solid transparent',
 });
 
-export const thumbnailStyles = (isActive: boolean): CSSObject => ({
-  opacity: isActive ? 1 : 0,
-  transition: 'opacity 0.2s var(--ease-in-out-quart)',
-  gap: '4px',
-});
-
 export const pageNumberStyle: CSSObject = {
   fontSize: '11px',
   color: '#666',

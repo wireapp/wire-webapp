@@ -24,7 +24,15 @@ import {t} from 'Util/LocalizerUtil';
 
 import {CollectionItem} from './CollectionItem';
 
-const CollectionSection: React.FC<{
+const CollectionSection = ({
+  messages,
+  limit,
+  uieName,
+  onSelect,
+  children,
+  label,
+  onImageClick,
+}: {
   children: React.ReactNode;
   label: string;
   limit: number;
@@ -32,7 +40,7 @@ const CollectionSection: React.FC<{
   onSelect: () => void;
   uieName: string;
   onImageClick?: (message: ContentMessage) => void;
-}> = ({messages, limit, uieName, onSelect, children, label, onImageClick}) => {
+}) => {
   if (messages.length === 0) {
     return null;
   }

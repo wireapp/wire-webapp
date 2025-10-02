@@ -29,6 +29,14 @@ export class HistoryInfoPage {
     this.page = page;
     this.continueButton = this.page.locator(selectByDataAttribute('do-history-confirm'));
   }
+  async isButtonVisible() {
+    try {
+      await this.continueButton.waitFor({state: 'visible', timeout: 10000});
+      return true;
+    } catch (err) {
+      return false;
+    }
+  }
 
   async clickConfirmButton() {
     await this.continueButton.click();

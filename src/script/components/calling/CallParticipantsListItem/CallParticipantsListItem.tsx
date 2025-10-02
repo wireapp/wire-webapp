@@ -39,7 +39,7 @@ import {
 } from './CallParticipantsListItem.styles';
 import {CallParticipantStatusIcons} from './CallParticipantStatusIcons';
 
-export interface CallParticipantsListItemProps {
+interface CallParticipantsListItemProps {
   callParticipant: Participant;
   showContextMenu: boolean;
   onContextMenu: (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => void;

@@ -63,12 +63,3 @@ export const conversationHasDraft = (conversation: Conversation): boolean => {
     return false;
   }
 };
-
-/**
- * Gets all conversations that have draft messages
- * @param conversations - Array of conversations to check
- * @returns Array of conversations with drafts
- */
-export const getConversationsWithDrafts = (conversations: Conversation[]): Conversation[] => {
-  return conversations.filter(conversationHasDraft);
-};
