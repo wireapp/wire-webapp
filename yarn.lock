@@ -8336,20 +8336,20 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@wireapp/core-crypto@npm:9.1.0":
-  version: 9.1.0
-  resolution: "@wireapp/core-crypto@npm:9.1.0"
-  checksum: 10/016cdc8cbd8adf6811f247c648aef7557aff99efcc7846bd65c48cf6f5dfc905bbf421eec23c62affa4fa0a85d5a4a8419d88bcb1b6ed4fc7a2928cb208ad60a
+"@wireapp/core-crypto@npm:9.0.1":
+  version: 9.0.1
+  resolution: "@wireapp/core-crypto@npm:9.0.1"
+  checksum: 10/38498dee43cc80d3b32e1ef601810c9fbd588dc7a7cbf55aaf75266824519d113eca29bcfcb6c29af94b3e79506410e4a717ec7475a1a7550e087100ec13e7a4
   languageName: node
   linkType: hard
 
-"@wireapp/core@file:.yalc/@wireapp/core::locator=wire-webapp%40workspace%3A.":
+"@wireapp/core@npm:46.36.0":
   version: 46.36.0
-  resolution: "@wireapp/core@file:.yalc/@wireapp/core#.yalc/@wireapp/core::hash=a1b929&locator=wire-webapp%40workspace%3A."
+  resolution: "@wireapp/core@npm:46.36.0"
   dependencies:
     "@wireapp/api-client": "npm:^27.75.10"
     "@wireapp/commons": "npm:^5.4.5"
-    "@wireapp/core-crypto": "npm:9.1.0"
+    "@wireapp/core-crypto": "npm:9.0.1"
     "@wireapp/cryptobox": "npm:12.8.0"
     "@wireapp/priority-queue": "npm:^2.1.12"
     "@wireapp/promise-queue": "npm:^2.4.5"
@@ -8365,7 +8365,7 @@ __metadata:
     long: "npm:^5.2.0"
     uuid: "npm:9.0.1"
     zod: "npm:3.24.2"
-  checksum: 10/729cc1698cfce0a907d8d4b98f05d96dd0e681c8da48abf0cfbbce2df03a9a9e77eb0552fdfe8340950dc1d6bc324b36dda2a19824ff43b29d20f63a2dd70de1
+  checksum: 10/c0861ecdef80ed57b81599a598cf8684fb7485e1d1dcc7cb31e9292e1cadb96e71f1598bbb49400182981692dd9332ae9182115faa37245751435225c84b9240
   languageName: node
   linkType: hard
 
@@ -22190,7 +22190,7 @@ __metadata:
     "@wireapp/avs-debugger": "npm:0.0.7"
     "@wireapp/commons": "npm:5.4.4"
     "@wireapp/copy-config": "npm:2.3.3"
-    "@wireapp/core": "file:.yalc/@wireapp/core"
+    "@wireapp/core": "npm:46.36.0"
     "@wireapp/eslint-config": "npm:3.0.7"
     "@wireapp/kalium-backup": "npm:0.0.4"
     "@wireapp/prettier-config": "npm:0.6.4"
