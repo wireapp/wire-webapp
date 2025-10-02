@@ -17,10 +17,21 @@
  *
  */
 
-export interface AssetUploadData {
-  /** ISO 8601 formatted date */
-  expires: string;
-  key: string;
-  domain?: string;
-  token: string;
-}
+import {z} from 'zod';
+
+/**
+ * Zod schema for validating POST /assets response (201 Created)
+ * Based on backend API specification
+ */
+export const PostAssetsResponseSchema = z.object({
+  /** Asset domain (example.com) */
+  domain: z.string().optional(),
+  /** ISO 8601 formatted expiration date */
+  expires: z.string().datetime(),
+  /** Asset key (e.g., "3-1-47de4580-ae51-4650-acbb-d10c028cb0ac") */
+  key: z.string().min(1),
+  /** Base64 encoded token (e.g., "aGVsbG8") */
+  token: z.string().min(1),
+});
+
+export type AssetUploadData = z.infer<typeof PostAssetsResponseSchema>;
