@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [27.76.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@27.75.10...@wireapp/api-client@27.76.0) (2025-10-02)
+
+### Features
+
+* update AssetAPI [WPB-20663] ([#7406](https://github.com/wireapp/wire-web-packages/issues/7406)) ([b8e3640](https://github.com/wireapp/wire-web-packages/commit/b8e36403d37f63af9d564bdf6ecbda2ae7dcb892))
+
 ## [27.75.10](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@27.75.9...@wireapp/api-client@27.75.10) (2025-09-29)
 
 **Note:** Version bump only for package @wireapp/api-client
