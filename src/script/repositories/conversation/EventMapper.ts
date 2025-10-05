@@ -158,7 +158,7 @@ export class EventMapper {
    * @returns the updated message entity
    */
   updateMessageEvent(originalEntity: ContentMessage, event: LegacyEventRecord): ContentMessage {
-    const {id, data: eventData, edited_time: editedTime, conversation, qualified_conversation} = event;
+    const {id, data: eventData, edited_time: editedTime, qualified_conversation} = event;
 
     if (eventData.quote) {
       const {hash, message_id: messageId, user_id: userId, error} = eventData.quote;
@@ -183,18 +183,22 @@ export class EventMapper {
       }
 
       const {
-        preview_id,
         preview_key,
         preview_domain = qualified_conversation?.domain || this.fallbackDomain,
         preview_otr_key,
         preview_sha256,
         preview_token,
       } = eventData as AssetData;
-      if (preview_otr_key) {
-        const remoteDataPreview = preview_key
-          ? AssetRemoteData.v3(preview_key, preview_domain, preview_otr_key, preview_sha256, preview_token, true)
-          : AssetRemoteData.v2(conversation, preview_id, preview_otr_key, preview_sha256, true);
-        (asset as FileAsset).preview_resource(remoteDataPreview);
+      if (preview_otr_key && preview_key && preview_domain) {
+        const assetRemoteData = new AssetRemoteData({
+          assetKey: preview_key,
+          assetDomain: preview_domain,
+          otrKey: preview_otr_key,
+          sha256: preview_sha256,
+          assetToken: preview_token,
+          forceCaching: true,
+        });
+        (asset as FileAsset).preview_resource(assetRemoteData);
       }
     }
 
@@ -902,26 +906,36 @@ export class EventMapper {
 
     // Remote data - full
     const {key, otr_key, sha256, token, domain = qualified_conversation?.domain} = eventData as AssetData;
-    const remoteData = key
-      ? AssetRemoteData.v3(key, domain, otr_key, sha256, token)
-      : AssetRemoteData.v2(conversationId, id, otr_key, sha256);
-    assetEntity.original_resource(remoteData);
+
+    if (key && domain) {
+      const assetRemoteData = new AssetRemoteData({
+        assetKey: key,
+        assetDomain: domain,
+        otrKey: otr_key,
+        sha256,
+        assetToken: token,
+      });
+      assetEntity.original_resource(assetRemoteData);
+    }
 
     // Remote data - preview
     const {
-      preview_id,
       preview_key,
       preview_domain = qualified_conversation?.domain || this.fallbackDomain,
       preview_otr_key,
       preview_sha256,
       preview_token,
     } = eventData as AssetData;
-    if (preview_otr_key) {
-      const remoteDataPreview =
-        key && preview_key
-          ? AssetRemoteData.v3(preview_key, preview_domain, preview_otr_key, preview_sha256, preview_token, true)
-          : AssetRemoteData.v2(conversationId, preview_id, preview_otr_key, preview_sha256, true);
-      assetEntity.preview_resource(remoteDataPreview);
+    if (preview_otr_key && preview_key && preview_domain) {
+      const assetRemoteData = new AssetRemoteData({
+        assetKey: preview_key,
+        assetDomain: preview_domain,
+        otrKey: preview_otr_key,
+        sha256: preview_sha256,
+        assetToken: preview_token,
+        forceCaching: true,
+      });
+      assetEntity.preview_resource(assetRemoteData);
     }
 
     assetEntity.status(status || AssetTransferState.UPLOAD_PENDING);
@@ -936,7 +950,11 @@ export class EventMapper {
    * @returns Medium image asset entity
    */
   private _mapAssetImage(event: LegacyEventRecord<AssetData>) {
-    const {data: eventData, conversation: conversationId, qualified_conversation} = event;
+    const {data: eventData, qualified_conversation} = event;
+    if (!eventData?.id) {
+      this.logger.warn('Event data => id is undefined, cannot map image asset.');
+      return new MediumImage(''); // Return an empty MediumImage to avoid further errors
+    }
     const {content_length, content_type, id: assetId, info} = eventData;
     const assetEntity = new MediumImage(assetId);
     assetEntity.file_size = content_length;
@@ -947,16 +965,28 @@ export class EventMapper {
       assetEntity.height = `${info.height}px`;
     }
 
-    const {key, otr_key, sha256, token, domain = qualified_conversation?.domain || this.fallbackDomain} = eventData;
-
-    if (!otr_key || !sha256) {
+    if (!eventData) {
+      this.logger.warn('Event data is undefined, cannot map image asset.');
       return assetEntity;
     }
-    const remoteData = key
-      ? AssetRemoteData.v3(key, domain, otr_key, sha256, token, true)
-      : AssetRemoteData.v2(conversationId, assetId, otr_key, sha256, true);
 
-    assetEntity.resource(remoteData);
+    const {key, otr_key, sha256, token, domain = qualified_conversation?.domain || this.fallbackDomain} = eventData;
+
+    if (!otr_key || !sha256 || !key || !domain) {
+      this.logger.warn('Required asset data is missing, cannot map remote image asset.');
+      return assetEntity;
+    }
+
+    const assetRemoteData = new AssetRemoteData({
+      assetKey: key,
+      assetDomain: domain,
+      otrKey: otr_key,
+      sha256,
+      assetToken: token,
+      forceCaching: true,
+    });
+
+    assetEntity.resource(assetRemoteData);
     return assetEntity;
   }
 
@@ -986,14 +1016,26 @@ export class EventMapper {
           otrKey = new Uint8Array(otrKey);
           sha256 = new Uint8Array(sha256);
 
-          const remoteData = AssetRemoteData.v3(
+          const domain = assetDomain || this.fallbackDomain;
+
+          if (!domain) {
+            this.logger.warn(`Missing asset domain for link preview with asset key. Cannot create remote data.`);
+            return;
+          }
+
+          if (!assetToken) {
+            this.logger.warn(`Missing asset token for link preview with asset key. Cannot create remote data.`);
+            return;
+          }
+
+          const remoteData = new AssetRemoteData({
             assetKey,
-            assetDomain || this.fallbackDomain,
+            assetDomain: domain,
             otrKey,
             sha256,
             assetToken,
-            true,
-          );
+            forceCaching: true,
+          });
           linkPreviewData.image = remoteData;
         }
       }

@@ -23,8 +23,11 @@ import {AssetError} from 'Repositories/assets/AssetError';
 import {AssetRemoteData} from 'Repositories/assets/AssetRemoteData';
 import {AssetTransferState} from 'Repositories/assets/AssetTransferState';
 import type {FileAsset} from 'Repositories/entity/message/FileAsset';
+import {getLogger} from 'Util/Logger';
 
 import {AssetUrl} from '../useAssetTransfer/useAssetTransfer';
+
+const logger = getLogger('useGetAssetUrl');
 
 interface UseGetAssetUrlProps {
   asset: FileAsset;
@@ -56,7 +59,7 @@ export const useGetAssetUrl = ({asset, isEnabled, getAssetUrl, onError, onSucces
         setIsError(true);
         onError?.(error);
       }
-      console.error(`Failed to load asset ${asset.id}`, error);
+      logger.error(`Failed to load asset ${asset.id}`, error);
     } finally {
       setIsLoading(false);
       asset.status(AssetTransferState.UPLOADED);

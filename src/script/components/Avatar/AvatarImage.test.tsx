@@ -34,7 +34,7 @@ describe('AvatarImage', () => {
     const assetRepo = assetRepoSpy as unknown as AssetRepository;
     const participant = new User('id');
     const resource = {
-      downloadProgress: () => 0,
+      downloadProgress: 0,
     } as AssetRemoteData;
     participant.mediumPictureResource(resource);
 
@@ -59,7 +59,7 @@ describe('AvatarImage', () => {
     const assetRepo = assetRepoSpy as unknown as AssetRepository;
     const participant = new User('id');
     const resource = {
-      downloadProgress: () => 0,
+      downloadProgress: 0,
     } as AssetRemoteData;
     participant.previewPictureResource(resource);
 
@@ -84,7 +84,7 @@ describe('AvatarImage', () => {
     const assetRepo = assetRepoSpy as unknown as AssetRepository;
     const participant = new User('id');
     participant.previewPictureResource({
-      downloadProgress: () => 0,
+      downloadProgress: 0,
     } as AssetRemoteData);
 
     const props = {

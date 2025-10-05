@@ -17,33 +17,44 @@
  *
  */
 
-import {renderHook} from '@testing-library/react';
+import {renderHook, waitFor} from '@testing-library/react';
 import ko from 'knockout';
 
 import {AssetRemoteData} from 'Repositories/assets/AssetRemoteData';
 import {AssetRepository} from 'Repositories/assets/AssetRepository';
+import {AssetTransferState} from 'Repositories/assets/AssetTransferState';
 import {ContentMessage} from 'Repositories/entity/message/ContentMessage';
+import {FileAsset} from 'Repositories/entity/message/FileAsset';
 import {createUuid} from 'Util/uuid';
 
 import {useAssetTransfer} from './useAssetTransfer';
 
 const assetRepository = {
-  getUploadProgress: jest.fn().mockReturnValue(ko.observable(0)),
+  getUploadProgress: jest.fn().mockReturnValue(ko.pureComputed(() => 0)),
   load: jest.fn().mockResolvedValue(new Blob([], {type: 'image/png'})),
+  cancelUpload: jest.fn(),
+  downloadFile: jest.fn().mockResolvedValue(undefined),
 } as unknown as jest.Mocked<AssetRepository>;
 
 describe('useAssetTransfer', () => {
   const message = new ContentMessage(createUuid());
-  const asset = new AssetRemoteData(createUuid(), {
+  const asset = new AssetRemoteData({
     assetKey: 'assetKey',
+    assetDomain: 'domain',
     assetToken: 'assetToken',
     forceCaching: false,
-    version: 3,
+  });
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+    assetRepository.getUploadProgress.mockReturnValue(ko.pureComputed(() => 0));
+    assetRepository.load.mockResolvedValue(new Blob([], {type: 'image/png'}));
   });
 
   describe('getAssetUrl', () => {
     beforeAll(() => {
       jest.spyOn(window.URL, 'createObjectURL').mockReturnValue('assetUrl');
+      jest.spyOn(window.URL, 'revokeObjectURL').mockImplementation(() => {});
     });
 
     it('should return the asset url', async () => {
@@ -69,6 +80,107 @@ describe('useAssetTransfer', () => {
       await expect(result.current.getAssetUrl(asset, ['image/jpeg'])).rejects.toThrow(
         'Mime type not accepted "image/png"',
       );
+    });
+
+    it('should revoke object URL when dispose is called', async () => {
+      const {result} = renderHook(() => useAssetTransfer(message, assetRepository));
+      const assetUrl = await result.current.getAssetUrl(asset);
+      assetUrl.dispose();
+      expect(window.URL.revokeObjectURL).toHaveBeenCalledWith('assetUrl');
+    });
+  });
+
+  describe('upload progress', () => {
+    it('should track upload progress changes', async () => {
+      const progressObservable = ko.observable(0);
+      const progressComputed = ko.pureComputed(() => progressObservable());
+      assetRepository.getUploadProgress.mockReturnValue(progressComputed);
+
+      const {result} = renderHook(() => useAssetTransfer(message, assetRepository));
+
+      expect(result.current.uploadProgress).toBe(0);
+
+      progressObservable(50);
+      await waitFor(() => {
+        expect(result.current.uploadProgress).toBe(50);
+      });
+
+      progressObservable(100);
+      await waitFor(() => {
+        expect(result.current.uploadProgress).toBe(100);
+      });
+    });
+
+    it('should indicate uploading state when upload progress is active', async () => {
+      const progressObservable = ko.observable(50);
+      const progressComputed = ko.pureComputed(() => progressObservable());
+      assetRepository.getUploadProgress.mockReturnValue(progressComputed);
+
+      const {result} = renderHook(() => useAssetTransfer(message, assetRepository));
+
+      await waitFor(() => {
+        expect(result.current.isUploading).toBe(true);
+      });
+      expect(result.current.transferState).toBe(AssetTransferState.UPLOADING);
+    });
+  });
+
+  describe('cancelUpload', () => {
+    it('should call assetRepository.cancelUpload with message id', () => {
+      const {result} = renderHook(() => useAssetTransfer(message, assetRepository));
+      result.current.cancelUpload();
+      expect(assetRepository.cancelUpload).toHaveBeenCalledWith(message.id);
+    });
+
+    it('should not throw when message is undefined', () => {
+      const {result} = renderHook(() => useAssetTransfer(undefined, assetRepository));
+      expect(() => result.current.cancelUpload()).not.toThrow();
+    });
+  });
+
+  describe('downloadAsset', () => {
+    it('should call assetRepository.downloadFile with the asset', async () => {
+      const fileAsset = new FileAsset();
+      const {result} = renderHook(() => useAssetTransfer(message, assetRepository));
+      await result.current.downloadAsset(fileAsset);
+      expect(assetRepository.downloadFile).toHaveBeenCalledWith(fileAsset);
+    });
+  });
+
+  describe('transfer state flags', () => {
+    it('should indicate uploaded state', () => {
+      const fileAsset = new FileAsset();
+      fileAsset.status(AssetTransferState.UPLOADED);
+      jest.spyOn(message, 'getFirstAsset').mockReturnValue(fileAsset);
+      assetRepository.getUploadProgress.mockReturnValue(ko.pureComputed(() => -1));
+
+      const {result} = renderHook(() => useAssetTransfer(message, assetRepository));
+      expect(result.current.isUploaded).toBe(true);
+      expect(result.current.isUploading).toBe(false);
+      expect(result.current.isDownloading).toBe(false);
+    });
+
+    it('should indicate downloading state', () => {
+      const fileAsset = new FileAsset();
+      fileAsset.status(AssetTransferState.DOWNLOADING);
+      jest.spyOn(message, 'getFirstAsset').mockReturnValue(fileAsset);
+      assetRepository.getUploadProgress.mockReturnValue(ko.pureComputed(() => -1));
+
+      const {result} = renderHook(() => useAssetTransfer(message, assetRepository));
+      expect(result.current.isDownloading).toBe(true);
+      expect(result.current.isUploading).toBe(false);
+      expect(result.current.isUploaded).toBe(false);
+    });
+
+    it('should indicate pending upload state', () => {
+      const fileAsset = new FileAsset();
+      fileAsset.status(AssetTransferState.UPLOAD_PENDING);
+      jest.spyOn(message, 'getFirstAsset').mockReturnValue(fileAsset);
+      assetRepository.getUploadProgress.mockReturnValue(ko.pureComputed(() => -1));
+
+      const {result} = renderHook(() => useAssetTransfer(message, assetRepository));
+      expect(result.current.isPendingUpload).toBe(true);
+      expect(result.current.isUploading).toBe(false);
     });
   });
 });

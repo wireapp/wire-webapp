@@ -159,7 +159,7 @@ export class MLSConversationVerificationStateHandler {
           break;
         }
 
-        const matchingName = identity.x509Identity?.display_name === user.name();
+        const matchingName = identity.x509Identity?.displayName === user.name();
         const matchingHandle = checkUserHandle(identity, user);
         if (!matchingHandle || !matchingName) {
           this.logger.warn(`User identity and user entity do not match for userId: ${stringifiedQualifiedId}`);
