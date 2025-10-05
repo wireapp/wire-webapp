@@ -8886,14 +8886,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@wireapp/store-engine@npm:5.1.11":
-  version: 5.1.11
-  resolution: "@wireapp/store-engine@npm:5.1.11"
-  checksum: 10/8259d645ff0a20fed754ce009c05e4d2390230da26d4822423745af81fc02ba7930d1e9b8cbb2264d85184dc0456cfc4ab77f2259ac8a66771052acd52750cac
-  languageName: node
-  linkType: hard
-
-"@wireapp/store-engine@npm:^5.1.12":
+"@wireapp/store-engine@npm:5.1.12, @wireapp/store-engine@npm:^5.1.12":
   version: 5.1.12
   resolution: "@wireapp/store-engine@npm:5.1.12"
   checksum: 10/c4add2afd11d7ae738461d8c6210ca7108a559c940e58b595fbe43c3c8229ac8c27f041a4fce70b5c04707494b3ddaa89b98a1d02e9aebd9d6ee7b1421f2460e
@@ -22542,7 +22535,7 @@ __metadata:
     "@wireapp/prettier-config": "npm:0.6.4"
     "@wireapp/promise-queue": "npm:2.4.4"
     "@wireapp/react-ui-kit": "npm:9.64.0"
-    "@wireapp/store-engine": "npm:5.1.11"
+    "@wireapp/store-engine": "npm:5.1.12"
     "@wireapp/store-engine-dexie": "npm:2.1.15"
     "@wireapp/telemetry": "npm:0.3.1"
     "@wireapp/webapp-events": "npm:0.28.0"
