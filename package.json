@@ -114,7 +114,7 @@
     "@types/uuid": "^10.0.0",
     "@types/webpack-bundle-analyzer": "^4",
     "@types/webpack-env": "1.18.8",
-    "@types/wicg-file-system-access": "^2023.10.5",
+    "@types/wicg-file-system-access": "^2023.10.7",
     "@wireapp/copy-config": "2.3.3",
     "@wireapp/eslint-config": "3.0.7",
     "@wireapp/prettier-config": "0.6.4",
