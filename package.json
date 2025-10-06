@@ -16,7 +16,7 @@
     "@wireapp/avs": "10.0.46",
     "@wireapp/avs-debugger": "0.0.7",
     "@wireapp/commons": "5.4.5",
-    "@wireapp/core": "46.35.3",
+    "@wireapp/core": "46.37.1",
     "@wireapp/kalium-backup": "0.0.4",
     "@wireapp/promise-queue": "2.4.5",
     "@wireapp/react-ui-kit": "9.66.0",
