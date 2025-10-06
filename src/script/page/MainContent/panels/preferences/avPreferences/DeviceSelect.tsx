@@ -17,7 +17,7 @@
  *
  */
 
-import React from 'react';
+import {ComponentType} from 'react';
 
 import cx from 'classnames';
 
@@ -26,7 +26,7 @@ import {Select} from '@wireapp/react-ui-kit';
 interface DeviceSelectProps {
   defaultDeviceName?: string;
   devices: MediaDeviceInfo[];
-  icon: React.ComponentType;
+  icon: ComponentType;
   isRequesting?: boolean;
   onChange: (deviceId: string) => void;
   title: string;
@@ -34,7 +34,7 @@ interface DeviceSelectProps {
   value: string;
 }
 
-const DeviceSelect: React.FC<DeviceSelectProps> = ({
+const DeviceSelect = ({
   isRequesting = false,
   devices,
   value,
@@ -43,7 +43,7 @@ const DeviceSelect: React.FC<DeviceSelectProps> = ({
   uieName,
   onChange,
   title,
-}) => {
+}: DeviceSelectProps) => {
   const devicesList = devices.map(({deviceId, label}) => ({
     label: label || defaultDeviceName,
     value: deviceId,

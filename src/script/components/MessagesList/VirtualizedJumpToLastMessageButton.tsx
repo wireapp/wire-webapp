@@ -17,8 +17,6 @@
  *
  */
 
-import {HTMLProps} from 'react';
-
 import {ChevronIcon, IconButton} from '@wireapp/react-ui-kit';
 
 import {
@@ -27,7 +25,7 @@ import {
 } from 'Components/MessagesList/MessageList.styles';
 import {t} from 'Util/LocalizerUtil';
 
-export interface VirtualizedJumpToLastMessageButtonProps extends HTMLProps<HTMLElement> {
+interface VirtualizedJumpToLastMessageButtonProps {
   onGoToLastMessage: () => void;
 }
 

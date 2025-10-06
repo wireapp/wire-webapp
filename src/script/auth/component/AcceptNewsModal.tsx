@@ -27,7 +27,7 @@ import {t} from 'Util/LocalizerUtil';
 
 import {Config} from '../../Config';
 
-export interface Props extends React.HTMLProps<HTMLDivElement> {
+interface Props {
   onConfirm: (event: React.MouseEvent<HTMLButtonElement>) => void;
   onDecline: (event: React.MouseEvent<HTMLButtonElement>) => void;
 }

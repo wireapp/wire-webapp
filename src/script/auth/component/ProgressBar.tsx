@@ -17,14 +17,15 @@
  *
  */
 
-import * as React from 'react';
+import type {CSSProperties} from 'react';
 
 interface ProgressProps {
-  error: boolean;
-  percent: number;
-  style?: React.CSSProperties;
   width: number;
+  percent: number;
+  error?: boolean;
+  style?: CSSProperties;
 }
+
 export const ProgressBar = ({width, percent, error, style}: ProgressProps) => {
   const progress = (percent / 100) * width;
 

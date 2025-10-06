@@ -28,7 +28,7 @@ import {t} from 'Util/LocalizerUtil';
 
 import {ReadReceiptStatus} from './ReadReceiptStatus';
 
-export interface PingMessageProps {
+interface PingMessageProps {
   message: PingMessageEntity;
   is1to1Conversation: boolean;
   isLastDeliveredMessage: boolean;

@@ -17,24 +17,23 @@
  *
  */
 
-import React from 'react';
+import type {ReactNode, MouseEvent, KeyboardEvent} from 'react';
 
 import {CSS_SQUARE} from 'Util/CSSMixin';
 
 import {DIAMETER, AVATAR_SIZE} from '.';
 
-export interface AvatarWrapperProps extends React.HTMLProps<HTMLDivElement> {
+interface AvatarWrapperProps {
   avatarSize: AVATAR_SIZE;
   color: string;
   isResponsive?: boolean;
+  children?: ReactNode;
+  onClick?: (event: MouseEvent<HTMLDivElement>) => void;
+  onKeyDown?: (event: KeyboardEvent<HTMLDivElement>) => void;
+  title?: string;
 }
 
-const AvatarWrapper: React.FunctionComponent<AvatarWrapperProps> = ({
-  color,
-  avatarSize,
-  isResponsive = false,
-  ...props
-}) => {
+const AvatarWrapper = ({color, avatarSize, isResponsive = false, ...props}: AvatarWrapperProps) => {
   const avatarDiameter = isResponsive ? `${DIAMETER[avatarSize] / 16}rem` : DIAMETER[avatarSize];
   return (
     <div
