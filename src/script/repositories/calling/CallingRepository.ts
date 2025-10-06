@@ -2029,8 +2029,10 @@ export class CallingRepository {
       const limit = Runtime.isFirefox() ? CallingRepository.CONFIG.MAX_FIREFOX_TURN_COUNT : undefined;
       const config = await this.fetchConfig(limit);
       if (useRustSft) {
-        (config as any).sft_servers = [{urls: ['https://rust-sft.stars.wire.link']}];
-        (config as any).sft_servers_all = [{urls: ['https://rust-sft.stars.wire.link']}];
+        // (config as any).sft_servers = [{urls: ['https://rust-sft.stars.wire.link']}];
+        // (config as any).sft_servers_all = [{urls: ['https://rust-sft.stars.wire.link']}];
+        (config as any).sft_servers = [{urls: ['https://127.0.0.1:8080']}];
+        (config as any).sft_servers_all = [{urls: ['https://127.0.0.1:8080']}];
       }
 
       this.wCall?.configUpdate(this.wUser, 0, JSON.stringify(config));
