@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [27.76.1](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@27.76.0...@wireapp/api-client@27.76.1) (2025-10-06)
+
+### Bug Fixes
+
+* User gets logged out while trying to delete a device - using a wrong password ([#7431](https://github.com/wireapp/wire-web-packages/issues/7431)) ([b124c27](https://github.com/wireapp/wire-web-packages/commit/b124c270afca04e307684abc9531df59a967a2a1))
+
 # [27.76.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@27.75.10...@wireapp/api-client@27.76.0) (2025-10-02)
 
 ### Features
