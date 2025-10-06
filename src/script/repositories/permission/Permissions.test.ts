@@ -18,22 +18,24 @@
  */
 
 import {AppPermissionState} from 'Repositories/notification/AppPermissionState';
+import {BrowserPermissionStatus} from 'Repositories/permission/BrowserPermissionStatus';
 import {
   getPermissionState,
   setPermissionState,
   getPermissionStates,
   initializePermissions,
 } from 'Repositories/permission/permissionHandlers';
-import {BrowserPermissionStatus} from 'Repositories/permission/BrowserPermissionStatus';
 import {PermissionType} from 'Repositories/permission/PermissionType';
-import {permissionsStore, normalizePermissionState} from 'Repositories/permission/usePermissionsStore';
+
+import {permissionsStore} from './Permissions.store';
+import {normalizePermissionState} from './Permissions.types';
 
 // Mock the NotificationRepository for integration testing
 class MockNotificationRepository {
   constructor() {}
 
-  updatePermissionState(permissionState) {
-    const normalizedState = normalizePermissionState(permissionState);
+  updatePermissionState(permissionState: string) {
+    const normalizedState = normalizePermissionState(permissionState as NotificationPermission);
     setPermissionState(PermissionType.NOTIFICATIONS, normalizedState);
     return this.checkPermissionState();
   }
@@ -54,7 +56,7 @@ class MockNotificationRepository {
 }
 
 describe('Permission System Integration', () => {
-  let notificationRepository;
+  let notificationRepository: MockNotificationRepository;
 
   beforeEach(() => {
     // Reset permissions store before each test
@@ -68,8 +70,9 @@ describe('Permission System Integration', () => {
 
   afterEach(() => {
     // Clean up spies after each test
-    if (navigator.permissions && navigator.permissions.isSpy) {
-      navigator.permissions.and.stub();
+    const permissions = navigator.permissions as Permissions & {isSpy?: boolean; and?: {stub: () => void}};
+    if (permissions?.isSpy) {
+      permissions.and?.stub();
     }
   });
 
@@ -169,7 +172,7 @@ describe('Permission System Integration', () => {
   describe('Error handling and edge cases', () => {
     it('should handle invalid permission types gracefully', () => {
       // This should not throw but return empty array for invalid types
-      const result = getPermissionStates(['invalid-permission']);
+      const result = getPermissionStates(['invalid-permission' as PermissionType]);
       expect(result).toEqual([]);
     });
 

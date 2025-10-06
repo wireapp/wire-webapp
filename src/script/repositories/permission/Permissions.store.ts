@@ -17,43 +17,14 @@
  *
  */
 
-import {useStore} from 'zustand';
 import {immer} from 'zustand/middleware/immer';
 import {createStore} from 'zustand/vanilla';
 
 import {AppPermissionState} from 'Repositories/notification/AppPermissionState';
 
 import {BrowserPermissionStatus} from './BrowserPermissionStatus';
+import {normalizePermissionState, PermissionStateResult, UnifiedPermissionState} from './Permissions.types';
 import {PermissionType} from './PermissionType';
-
-export interface PermissionStateResult {
-  state: AppPermissionState | BrowserPermissionStatus;
-  type: PermissionType;
-}
-
-// Unified permission state type that covers all possible states
-export type UnifiedPermissionState = AppPermissionState | BrowserPermissionStatus;
-
-/**
- * Normalizes browser permission states to our unified permission type.
- * Maps browser API strings to our enum values while preserving typed enum values.
- */
-export function normalizePermissionState(
-  state: AppPermissionState | BrowserPermissionStatus | NotificationPermission,
-): UnifiedPermissionState {
-  switch (state) {
-    case 'default':
-    case 'prompt':
-      return BrowserPermissionStatus.PROMPT;
-    case 'granted':
-      return BrowserPermissionStatus.GRANTED;
-    case 'denied':
-      return BrowserPermissionStatus.DENIED;
-    default:
-      // Already a typed enum value or unknown - pass through as-is
-      return state;
-  }
-}
 
 export type PermissionsState = {
   permissions: Record<PermissionType, UnifiedPermissionState>;
@@ -97,6 +68,3 @@ export const permissionsStore = createStore<PermissionsState>()(
       }),
   })),
 );
-
-export const usePermissionsStore = <T>(selector: (state: PermissionsState) => T): T =>
-  useStore(permissionsStore, selector);

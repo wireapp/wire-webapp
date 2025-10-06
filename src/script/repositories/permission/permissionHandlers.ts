@@ -20,8 +20,9 @@
 import {getLogger} from 'Util/Logger';
 
 import {BrowserPermissionStatus} from './BrowserPermissionStatus';
+import {permissionsStore} from './Permissions.store';
+import {PermissionStateResult, UnifiedPermissionState} from './Permissions.types';
 import {PermissionType} from './PermissionType';
-import {permissionsStore, PermissionStateResult, UnifiedPermissionState} from './usePermissionsStore';
 
 const logger = getLogger('PermissionHandlers');
 

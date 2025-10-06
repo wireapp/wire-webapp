@@ -20,7 +20,9 @@
 import {AppPermissionState} from 'Repositories/notification/AppPermissionState';
 import {BrowserPermissionStatus} from 'Repositories/permission/BrowserPermissionStatus';
 import {PermissionType} from 'Repositories/permission/PermissionType';
-import {permissionsStore, normalizePermissionState} from 'Repositories/permission/usePermissionsStore';
+
+import {permissionsStore} from './Permissions.store';
+import {normalizePermissionState} from './Permissions.types';
 
 describe('usePermissionsStore', () => {
   beforeEach(() => {
