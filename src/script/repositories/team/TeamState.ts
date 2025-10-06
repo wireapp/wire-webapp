@@ -120,7 +120,9 @@ export class TeamState {
     );
 
     // this feature is used to check if the customer is part of premium plan
-    this.isConferenceCallingEnabled = ko.pureComputed(() => true);
+    this.isConferenceCallingEnabled = ko.pureComputed(
+      () => this.teamFeatures()?.conferenceCalling?.status === FeatureStatus.ENABLED,
+    );
 
     this.isGuestLinkEnabled = ko.pureComputed(
       () => this.teamFeatures()?.conversationGuestLinks?.status === FeatureStatus.ENABLED,
