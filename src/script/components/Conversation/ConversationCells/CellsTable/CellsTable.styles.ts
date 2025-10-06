@@ -112,12 +112,3 @@ export const tableCellRow: CSSObject = {
     border: 'none',
   },
 };
-
-export const textWithEllipsisStyles: CSSObject = {
-  [`@media (min-width: ${styleBreakpoint}px)`]: {
-    display: 'block',
-    textOverflow: 'ellipsis',
-    overflow: 'hidden',
-    whiteSpace: 'nowrap',
-  },
-};

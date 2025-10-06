@@ -22,18 +22,3 @@ import {CSSObject} from '@emotion/react';
 export const wrapperStyles: CSSObject = {
   gridColumn: 'span 3',
 };
-
-export const controlStyles: CSSObject = {
-  position: 'relative',
-  display: 'flex',
-  width: '100%',
-  gap: '8px',
-  alignItems: 'flex-start',
-};
-
-export const playerWrapperStyles: CSSObject = {
-  display: 'flex',
-  flexDirection: 'column',
-  gap: '4px',
-  width: '100%',
-};

@@ -22,7 +22,7 @@ import {ServiceEntity} from 'Repositories/integration/ServiceEntity';
 
 import {PanelEntity} from '../page/RightSidebar/RightSidebar';
 
-export const isServiceEntity = (entity: PanelEntity): entity is ServiceEntity => {
+const isServiceEntity = (entity: PanelEntity): entity is ServiceEntity => {
   return 'isService' in entity && entity.isService;
 };
 

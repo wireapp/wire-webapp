@@ -46,7 +46,7 @@ export const mockCallingRepository = {
   supportsConferenceCalling: true,
 } as unknown as CallingRepository;
 
-export const mockMediaDevicesHandler = {
+const mockMediaDevicesHandler = {
   initializeMediaDevices: jest.fn(() => Promise.resolve()),
 } as unknown as MediaDevicesHandler;
 

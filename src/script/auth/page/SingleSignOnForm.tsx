@@ -48,7 +48,7 @@ import {getEnterpriseLoginV2FF} from '../util/helpers';
 import {logoutReasonStrings} from '../util/logoutUtil';
 import {getSearchParams, SSO_CODE_PREFIX} from '../util/urlUtil';
 
-export interface SingleSignOnFormProps extends React.HTMLAttributes<HTMLDivElement> {
+interface SingleSignOnFormProps {
   doLogin: (code: string) => Promise<void>;
   initialCode?: string;
 }

@@ -27,7 +27,7 @@ import {t} from 'Util/LocalizerUtil';
 
 import {cancelButtonCSS, containerCSS, errorMessageCSS, getIconCSS, getInputCSS, getLabelCSS} from './TextInput.styles';
 
-export interface UserInputProps {
+interface UserInputProps {
   autoFocus?: boolean;
   disabled?: boolean;
   errorMessage?: string;

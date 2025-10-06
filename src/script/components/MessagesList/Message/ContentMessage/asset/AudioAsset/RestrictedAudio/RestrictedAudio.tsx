@@ -17,14 +17,10 @@
  *
  */
 
-import React from 'react';
-
 import * as Icon from 'Components/Icon';
 import {t} from 'Util/LocalizerUtil';
 
-export type RestrictedAudioProps = React.HTMLProps<HTMLDivElement>;
-
-const RestrictedAudio: React.FC<RestrictedAudioProps> = ({}) => {
+const RestrictedAudio = () => {
   return (
     <div className="audio-restricted">
       <div className="audio-restricted__icon">

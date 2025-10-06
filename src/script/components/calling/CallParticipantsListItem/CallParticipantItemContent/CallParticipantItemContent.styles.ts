@@ -74,16 +74,6 @@ export const nameWrapper = (isAudioEstablished: boolean): CSSObject => ({
   paddingRight: '8px',
 });
 
-export const userAvailability: CSSObject = {
-  maxWidth: '100%',
-  whiteSpace: 'nowrap',
-};
-
-export const userName: CSSObject = {
-  maxWidth: '100%',
-  whiteSpace: 'nowrap',
-};
-
 export const selfIndicator: CSSObject = {
   marginLeft: '4px',
 };

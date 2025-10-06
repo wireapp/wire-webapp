@@ -17,7 +17,7 @@
  *
  */
 
-import React, {useContext, useEffect, useState} from 'react';
+import {useContext, useEffect, useState} from 'react';
 
 import cx from 'classnames';
 import {container} from 'tsyringe';
@@ -60,12 +60,7 @@ interface UserModalUserActionsSectionProps {
   selfUser: User;
 }
 
-const UserModalUserActionsSection: React.FC<UserModalUserActionsSectionProps> = ({
-  user,
-  onAction,
-  isSelfActivated,
-  selfUser,
-}) => {
+const UserModalUserActionsSection = ({user, onAction, isSelfActivated, selfUser}: UserModalUserActionsSectionProps) => {
   const {isBlockedLegalHold} = useKoSubscribableChildren(user, ['isBlockedLegalHold']);
   const mainViewModel = useContext(RootContext);
 
@@ -105,7 +100,7 @@ interface UnverifiedUserWarningProps {
   user?: User;
 }
 
-export const UnverifiedUserWarning: React.FC<UnverifiedUserWarningProps> = ({user}) => {
+export const UnverifiedUserWarning = ({user}: UnverifiedUserWarningProps) => {
   return (
     <div css={{display: 'flex', color: 'var(--danger-color)', fill: 'var(--danger-color)', margin: '1em 0'}}>
       <Icon.InfoIcon css={{height: '1rem', margin: '0.15em 1em', minWidth: '1rem'}} />
@@ -124,12 +119,12 @@ export const UnverifiedUserWarning: React.FC<UnverifiedUserWarningProps> = ({use
   );
 };
 
-const UserModal: React.FC<UserModalProps> = ({
+const UserModal = ({
   userRepository,
   selfUser,
   core = container.resolve(Core),
   teamState = container.resolve(TeamState),
-}) => {
+}: UserModalProps) => {
   const onClose = useUserModalState(state => state.onClose);
   const userId = useUserModalState(state => state.userId);
   const resetState = useUserModalState(state => state.resetState);

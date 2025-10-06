@@ -71,7 +71,7 @@ export const INITIALS_SIZE = {
   [AVATAR_SIZE.XXX_SMALL]: 8,
 };
 
-export interface AvatarProps extends HTMLProps<HTMLDivElement> {
+interface AvatarProps extends HTMLProps<HTMLDivElement> {
   participant: User | ServiceEntity;
   avatarSize?: AVATAR_SIZE;
   avatarAlt?: string;

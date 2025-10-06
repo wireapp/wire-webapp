@@ -40,7 +40,7 @@ import {
   wrapper,
 } from './ParticipantItem.styles';
 
-export interface ParticipantItemContentProps {
+interface ParticipantItemContentProps {
   /** the conversation context in which we are displaying the user (will enable e2ei verification badges) */
   groupId?: string;
   participant: User | ServiceEntity;
