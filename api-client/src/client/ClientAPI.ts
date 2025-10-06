@@ -116,6 +116,9 @@ export class ClientAPI {
       },
       method: 'delete',
       url: `${ClientAPI.URL.CLIENTS}/${clientId}`,
+      requestOptions: {
+        skipLogout: true,
+      },
     };
 
     await this.client.sendJSON(config);
