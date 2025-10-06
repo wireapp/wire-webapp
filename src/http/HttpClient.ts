@@ -145,6 +145,7 @@ export class HttpClient extends EventEmitter {
         Authorization: `${token_type} ${access_token}`,
       };
     }
+    const skipLogout = config.requestOptions?.skipLogout === true;
 
     try {
       const response = await this.client.request<T>({
@@ -188,9 +189,10 @@ export class HttpClient extends EventEmitter {
         }
 
         if (
-          mappedError instanceof InvalidTokenError ||
-          mappedError instanceof MissingCookieError ||
-          mappedError instanceof MissingCookieAndTokenError
+          !skipLogout &&
+          (mappedError instanceof InvalidTokenError ||
+            mappedError instanceof MissingCookieError ||
+            mappedError instanceof MissingCookieAndTokenError)
         ) {
           // On invalid cookie the application is supposed to logout.
           this.logger.warn(
