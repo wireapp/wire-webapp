@@ -20,12 +20,12 @@
 import {Message} from 'Repositories/entity/message/Message';
 import {isSameDay, fromUnixTime, TIME_IN_MILLIS} from 'Util/TimeUtil';
 
-export type MessagesGroup = {
+interface MessagesGroup {
   sender: string;
   firstMessageTimestamp: number;
   lastMessageTimestamp: number;
   messages: Message[];
-};
+}
 
 export type Marker = {
   type: 'unread' | 'day';

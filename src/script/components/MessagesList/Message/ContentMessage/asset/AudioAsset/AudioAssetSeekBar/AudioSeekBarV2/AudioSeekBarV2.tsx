@@ -25,7 +25,7 @@ import {createUuid} from 'Util/uuid';
 import {svgStyles, svgStylesDisabled} from './AudioSeekBar.styles';
 import {useAudioSeekBar} from './useAudioSeekBar/useAudioSeekBar';
 
-export interface AudioSeekBarNewProps {
+interface AudioSeekBarNewProps {
   asset: FileAsset;
   audioElement: HTMLAudioElement;
   disabled?: boolean;

@@ -17,8 +17,6 @@
  *
  */
 
-import React from 'react';
-
 import {keyframes} from '@emotion/react';
 
 import {MicOnIcon} from 'Components/Icon';
@@ -34,12 +32,12 @@ interface ParticipantMicOnIconProps {
   isActive?: boolean;
 }
 
-const ParticipantMicOnIcon: React.FC<ParticipantMicOnIconProps> = ({
+const ParticipantMicOnIcon = ({
   className,
   isActive = false,
   color = isActive ? 'var(--accent-color)' : 'currentColor',
   ...props
-}) => {
+}: ParticipantMicOnIconProps) => {
   return (
     <span
       css={{

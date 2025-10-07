@@ -17,7 +17,7 @@
  *
  */
 
-import React, {useCallback, useEffect, useRef, useState} from 'react';
+import {useCallback, useEffect, useRef, useState, Fragment, FormEvent} from 'react';
 
 import {amplify} from 'amplify';
 import cx from 'classnames';
@@ -57,19 +57,19 @@ const passwordRegexLower = /(?=.*[a-z])/;
 const passwordRegexSpecial = /(?=.*[!@#$%^&*(),.?":{}|<>])/;
 const passwordRegexUpper = /(?=.*[A-Z])/;
 
-export interface AppLockProps {
+interface AppLockProps {
   appLockRepository?: AppLockRepository;
   appLockState?: AppLockState;
   clientRepository: ClientRepository;
   clientState?: ClientState;
 }
 
-const AppLock: React.FC<AppLockProps> = ({
+const AppLock = ({
   clientRepository,
   clientState = container.resolve(ClientState),
   appLockState = container.resolve(AppLockState),
   appLockRepository = container.resolve(AppLockRepository),
-}) => {
+}: AppLockProps) => {
   const [state, setState] = useState<APPLOCK_STATE>(APPLOCK_STATE.NONE);
   const [wipeError, setWipeError] = useState('');
   const [unlockError, setUnlockError] = useState('');
@@ -181,7 +181,7 @@ const AppLock: React.FC<AppLockProps> = ({
     setIsVisible(true);
   };
 
-  const onUnlock = async (event: React.FormEvent) => {
+  const onUnlock = async (event: FormEvent) => {
     event.preventDefault();
     const target = event.target as HTMLFormElement & {password: HTMLInputElement};
     const isCorrectCode = await appLockRepository.checkCode(target.password.value);
@@ -200,14 +200,14 @@ const AppLock: React.FC<AppLockProps> = ({
     }
   };
 
-  const onSetCode = async (event: React.FormEvent) => {
+  const onSetCode = async (event: FormEvent) => {
     event.preventDefault();
     await appLockRepository.setCode(setupPassphrase);
     setIsVisible(false);
     startScheduledTimeout();
   };
 
-  const onWipeDatabase = async (event: React.FormEvent) => {
+  const onWipeDatabase = async (event: FormEvent) => {
     const target = event.target as HTMLFormElement & {password: HTMLInputElement};
     try {
       setIsLoading(true);
@@ -498,7 +498,7 @@ const AppLock: React.FC<AppLockProps> = ({
         )}
 
         {state === APPLOCK_STATE.FORGOT && (
-          <React.Fragment>
+          <Fragment>
             <div className="modal__text" data-uie-name="label-applock-forgot-text">
               {t('modalAppLockForgotMessage')}
             </div>
@@ -521,11 +521,11 @@ const AppLock: React.FC<AppLockProps> = ({
                 {t('modalAppLockForgotGoBackButton')}
               </button>
             </div>
-          </React.Fragment>
+          </Fragment>
         )}
 
         {state === APPLOCK_STATE.WIPE_CONFIRM && (
-          <React.Fragment>
+          <Fragment>
             <div className="modal__text" data-uie-name="label-applock-wipe-confirm-text">
               {t('modalAppLockWipeConfirmMessage')}
             </div>
@@ -543,7 +543,7 @@ const AppLock: React.FC<AppLockProps> = ({
                 {t('modalAppLockWipeConfirmConfirmButton')}
               </button>
             </div>
-          </React.Fragment>
+          </Fragment>
         )}
 
         {state === APPLOCK_STATE.WIPE_PASSWORD && (

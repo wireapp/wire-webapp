@@ -23,7 +23,7 @@ import {CSSObject, css} from '@emotion/react';
 
 import {getEmojiUnicode} from 'Util/EmojiUtil';
 
-export interface EmojiImgProps {
+interface EmojiImgProps {
   emoji: string;
   size?: number;
   styles?: CSSObject;

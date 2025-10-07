@@ -29,7 +29,7 @@ const AVAILABILITY_VALUES: Record<keyof typeof Availability.Type, string> = {
   NONE: 'none',
 };
 
-export const valueFromType = (availabilityType: Availability.Type): string => {
+const valueFromType = (availabilityType: Availability.Type): string => {
   const TYPE_VALUES = {
     [Availability.Type.AVAILABLE]: AVAILABILITY_VALUES.AVAILABLE,
     [Availability.Type.AWAY]: AVAILABILITY_VALUES.AWAY,

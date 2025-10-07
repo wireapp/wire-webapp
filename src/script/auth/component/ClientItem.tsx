@@ -43,7 +43,7 @@ import {splitFingerprint} from 'Util/StringUtil';
 import {ValidationError} from '../module/action/ValidationError';
 import {parseError, parseValidationErrors} from '../util/errorUtil';
 
-export interface Props extends HTMLProps<HTMLDivElement> {
+interface Props extends HTMLProps<HTMLDivElement> {
   client: RegisteredClient;
   onClick: (event: MouseEvent<HTMLDivElement> | KeyboardEvent) => void;
   onClientRemoval: (password?: string) => void;
