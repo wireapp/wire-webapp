@@ -64,8 +64,8 @@ BACKEND_WS="https://prod-nginz-ssl.wire.com"
 
 ```
 APP_BASE="https://local.zinfra.io:8081"
-BACKEND_REST="https://nginz-https.zinfra.io"
-BACKEND_WS="https://nginz-ssl.zinfra.io"
+BACKEND_REST="https://staging-nginz-https.zinfra.io"
+BACKEND_WS="wss://staging-nginz-ssl.zinfra.io"
 ```
 
 **Imai:**
@@ -79,9 +79,9 @@ BACKEND_WS="https://nginz-ssl.imai.wire.link"
 **Local:**
 
 ```
-APP_BASE="https://local.zinfra.io:8081"
-BACKEND_REST="https://staging-nginz-https.zinfra.io"
-BACKEND_WS="wss://staging-nginz-ssl.zinfra.io"
+APP_BASE="http://localhost:8081"
+BACKEND_REST="http://localhost:8080"
+BACKEND_WS="ws://localhost:8080"
 ```
 
 After updating the environment variables, the app will be available at the corresponding `APP_BASE` URL.
