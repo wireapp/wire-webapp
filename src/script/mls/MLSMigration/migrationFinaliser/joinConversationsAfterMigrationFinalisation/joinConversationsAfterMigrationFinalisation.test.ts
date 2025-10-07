@@ -28,6 +28,7 @@ import {container} from 'tsyringe';
 import {ConversationDatabaseData, ConversationMapper} from 'Repositories/conversation/ConversationMapper';
 import {User} from 'Repositories/entity/User';
 import {Core} from 'src/script/service/CoreSingleton';
+import {TestFactory} from 'test/helper/TestFactory';
 import {createUuid} from 'Util/uuid';
 
 import {joinConversationsAfterMigrationFinalisation} from '.';
@@ -119,6 +120,8 @@ const createConversation = (
 };
 
 describe('joinConversationsAfterMigrationFinalisation', () => {
+  const testFactory = new TestFactory();
+
   afterEach(() => {
     jest.clearAllMocks();
   });
@@ -144,10 +147,10 @@ describe('joinConversationsAfterMigrationFinalisation', () => {
     );
 
     const onSuccess = jest.fn();
-
+    const conversationRepository = await testFactory.exposeConversationActors();
     await joinConversationsAfterMigrationFinalisation({
       conversations: [mockedConversation],
-      selfUser,
+      conversationRepository,
       core: mockCore,
       onSuccess,
     });
@@ -182,9 +185,11 @@ describe('joinConversationsAfterMigrationFinalisation', () => {
 
     const onSuccess = jest.fn();
 
+    const conversationRepository = await testFactory.exposeConversationActors();
+
     await joinConversationsAfterMigrationFinalisation({
       conversations: [mockedConversations],
-      selfUser,
+      conversationRepository,
       core: mockCore,
       onSuccess,
     });
@@ -216,9 +221,11 @@ describe('joinConversationsAfterMigrationFinalisation', () => {
 
     const onSuccess = jest.fn();
 
+    const conversationRepository = await testFactory.exposeConversationActors();
+
     await joinConversationsAfterMigrationFinalisation({
       conversations: [mockedConversation],
-      selfUser,
+      conversationRepository,
       core: mockCore,
       onSuccess,
     });
@@ -250,9 +257,11 @@ describe('joinConversationsAfterMigrationFinalisation', () => {
 
     const onSuccess = jest.fn();
 
+    const conversationRepository = await testFactory.exposeConversationActors();
+
     await joinConversationsAfterMigrationFinalisation({
       conversations: [mockedConversation],
-      selfUser,
+      conversationRepository,
       core: mockCore,
       onSuccess,
     });
