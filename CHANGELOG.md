@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [9.68.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/react-ui-kit@9.67.0...@wireapp/react-ui-kit@9.68.0) (2025-10-07)
+
+### Features
+
+* **react-ui-kit:** update attribute from :first-child to :first-of-type ([#7433](https://github.com/wireapp/wire-web-packages/issues/7433)) ([e07b246](https://github.com/wireapp/wire-web-packages/commit/e07b24652ba77b901c783a2d6a5008e01a963a2f))
+
 # [9.67.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/react-ui-kit@9.66.1...@wireapp/react-ui-kit@9.67.0) (2025-10-07)
 
 ### Features
