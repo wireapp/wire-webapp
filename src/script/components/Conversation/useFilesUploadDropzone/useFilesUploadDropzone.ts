@@ -62,9 +62,7 @@ export const useFilesUploadDropzone = ({
 
   const [accept, setAccept] = useState<Accept | undefined>(undefined);
 
-  const CELLS_MAX_SIZE = CONFIG.MAXIMUM_ASSET_FILE_SIZE_CELLS;
-
-  const TEAM_MAX_SIZE = isCellsEnabled ? CELLS_MAX_SIZE : CONFIG.MAXIMUM_ASSET_FILE_SIZE_TEAM;
+  const TEAM_MAX_SIZE = isCellsEnabled ? CONFIG.MAXIMUM_ASSET_FILE_SIZE_CELLS : CONFIG.MAXIMUM_ASSET_FILE_SIZE_TEAM;
 
   const MAX_SIZE = isTeam ? TEAM_MAX_SIZE : CONFIG.MAXIMUM_ASSET_FILE_SIZE_PERSONAL;
 
