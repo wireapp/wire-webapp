@@ -18,8 +18,13 @@
  */
 
 import type {ClaimedKeyPackages, MLSPublicKeyRecord, RegisteredClient} from '@wireapp/api-client/lib/client';
-import {SUBCONVERSATION_ID} from '@wireapp/api-client/lib/conversation';
+import {
+  MLSInvalidLeafNodeIndexError,
+  MLSInvalidLeafNodeSignatureError,
+  SUBCONVERSATION_ID,
+} from '@wireapp/api-client/lib/conversation';
 import {ConversationMLSMessageAddEvent, ConversationMLSWelcomeEvent} from '@wireapp/api-client/lib/event';
+import {BackendError, BackendErrorMapper, HttpClient} from '@wireapp/api-client/lib/http';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {Converter, Decoder, Encoder} from 'bazinga64';
 
@@ -40,6 +45,8 @@ import {
   NewCrlDistributionPoints,
   Welcome,
   ExternalSenderKey,
+  isMlsMessageRejectedError,
+  GroupInfo,
 } from '@wireapp/core-crypto';
 
 import {ClientMLSError, ClientMLSErrorLabel} from './ClientMLSError';
@@ -94,7 +101,7 @@ export const optionalToUint8Array = (array: Uint8Array | []): Uint8Array => {
 };
 
 const defaultConfig = {
-  keyingMaterialUpdateThreshold: 1000 * 60 * 60 * 24 * 30, //30 days
+  keyingMaterialUpdateThreshold: TimeUtil.TimeInMillis.DAY * 30,
   nbKeyPackages: 100,
 };
 
@@ -119,6 +126,18 @@ export class MLSService extends TypedEventEmitter<Events> {
   private _config?: MLSConfig;
   private readonly textEncoder = new TextEncoder();
   private readonly textDecoder = new TextDecoder();
+
+  public static UPLOAD_COMMIT_BUNDLE_ABORT_REASONS = {
+    BROKEN_MLS_CONVERSATION: 'BROKEN_MLS_CONVERSATION',
+    OTHER: 'OTHER',
+  };
+
+  public static isBrokenMLSConversationError(error: unknown) {
+    return (
+      isMlsMessageRejectedError(error) &&
+      error.context.context.reason === MLSService.UPLOAD_COMMIT_BUNDLE_ABORT_REASONS.BROKEN_MLS_CONVERSATION
+    );
+  }
 
   constructor(
     private readonly apiClient: APIClient,
@@ -262,8 +281,22 @@ export class MLSService extends TypedEventEmitter<Events> {
       return 'success';
     } catch (error) {
       this.logger.error(`Failed to upload commit bundle`, error);
+      if (HttpClient.isBackendError(error)) {
+        const mappedError = BackendErrorMapper.map(
+          new BackendError(error.response.data.message, error.response.data.label, error.response.data.code),
+        );
+
+        if (
+          mappedError instanceof MLSInvalidLeafNodeSignatureError ||
+          mappedError instanceof MLSInvalidLeafNodeIndexError
+        ) {
+          return {
+            abort: {reason: MLSService.UPLOAD_COMMIT_BUNDLE_ABORT_REASONS.BROKEN_MLS_CONVERSATION},
+          };
+        }
+      }
       return {
-        abort: {reason: error instanceof Error ? error.message : 'unknown error'},
+        abort: {reason: error instanceof Error ? error.message : MLSService.UPLOAD_COMMIT_BUNDLE_ABORT_REASONS.OTHER},
       };
     }
   };
@@ -392,25 +425,34 @@ export class MLSService extends TypedEventEmitter<Events> {
   }
 
   public async joinByExternalCommit(getGroupInfo: () => Promise<Uint8Array>) {
-    const credentialType = await this.getCredentialType();
+    try {
+      this.logger.info('Trying to join MLS group via external commit');
+      const credentialType = await this.getCredentialType();
 
-    const groupInfo = await getGroupInfo();
-    const welcomeBundle = await this.coreCryptoClient.transaction(cx =>
-      cx.joinByExternalCommit(new ConversationId(groupInfo), credentialType),
-    );
-    await this.dispatchNewCrlDistributionPoints(welcomeBundle.crlNewDistributionPoints);
+      const groupInfo = await getGroupInfo();
 
-    if (welcomeBundle.id) {
-      //after we've successfully joined via external commit, we schedule periodic key material renewal
-      const groupIdStr = Encoder.toBase64(welcomeBundle.id.copyBytes()).asString;
-      const newEpoch = await this.getEpoch(groupIdStr);
+      const welcomeBundle = await this.coreCryptoClient.transaction(cx =>
+        cx.joinByExternalCommit(new GroupInfo(groupInfo), credentialType),
+      );
 
-      // Schedule the next key material renewal
-      await this.scheduleKeyMaterialRenewal(groupIdStr);
+      await this.dispatchNewCrlDistributionPoints(welcomeBundle.crlNewDistributionPoints);
 
-      // Notify subscribers about the new epoch
-      this.emit(MLSServiceEvents.NEW_EPOCH, {groupId: groupIdStr, epoch: newEpoch});
-      this.logger.info(`Joined MLS group with id ${groupIdStr} via external commit, new epoch: ${newEpoch}`);
+      this.logger.info('welcome bundle after joining via external commit');
+      if (welcomeBundle.id) {
+        //after we've successfully joined via external commit, we schedule periodic key material renewal
+        const groupIdStr = Encoder.toBase64(welcomeBundle.id.copyBytes()).asString;
+        const newEpoch = await this.getEpoch(groupIdStr);
+
+        // Schedule the next key material renewal
+        await this.scheduleKeyMaterialRenewal(groupIdStr);
+
+        // Notify subscribers about the new epoch
+        this.emit(MLSServiceEvents.NEW_EPOCH, {groupId: groupIdStr, epoch: newEpoch});
+        this.logger.info(`Joined MLS group with id ${groupIdStr} via external commit, new epoch: ${newEpoch}`);
+      }
+    } catch (error) {
+      this.logger.error('Failed to join MLS group via external commit', error);
+      throw error;
     }
   }
 
@@ -626,6 +668,7 @@ export class MLSService extends TypedEventEmitter<Events> {
       await this.registerConversation(groupId, []);
       return true;
     } catch (error) {
+      this.logger.warn("Couldn't establish the MLS group", error);
       // If conversation already existed, locally, nothing more to do, we've received a welcome message.
       if (isCoreCryptoMLSConversationAlreadyExistsError(error)) {
         this.logger.debug(`MLS Group with id ${groupId} already exists, skipping the initialisation.`);
@@ -906,7 +949,8 @@ export class MLSService extends TypedEventEmitter<Events> {
    *
    * @param groupId groupId of the conversation
    */
-  public async commitPendingProposals(groupId: string, shouldRetry = true): Promise<void> {
+  public async commitPendingProposals(groupId: string, shouldRetry = true, params?: any): Promise<void> {
+    this.logger.info(`Committing pending proposals for groupId ${groupId}`, {shouldRetry, params});
     const groupIdBytes = Decoder.fromBase64(groupId).asBytes;
 
     try {
@@ -917,7 +961,19 @@ export class MLSService extends TypedEventEmitter<Events> {
         throw error;
       }
 
-      this.logger.warn('Failed to commit proposals, clearing the pending commit and retrying', error);
+      if (isMlsMessageRejectedError(error)) {
+        this.logger.warn('Failed to commit proposals, conversation is broken, letting the error bubble up', {
+          error,
+          groupId,
+        });
+        throw error;
+      }
+
+      this.logger.warn('Failed to commit proposals, clearing the pending commit and retrying', {
+        error,
+        groupId,
+        shouldRetry,
+      });
 
       return this.commitPendingProposals(groupId, false);
     }

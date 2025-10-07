@@ -19,7 +19,13 @@
 
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 
-import {CoreCryptoError} from '@wireapp/core-crypto';
+import {
+  isProteusDuplicateMessageError,
+  isProteusRemoteIdentityChangedError,
+  isProteusSessionNotFoundError,
+  isProteusError,
+  ProteusErrorType,
+} from '@wireapp/core-crypto';
 
 import {DecryptionError} from '../../../../errors/DecryptionError';
 
@@ -34,53 +40,51 @@ export const ProteusErrors = {
 
 type CryptoboxError = Error & {code: number};
 
-const isCoreCryptoError = (error: any): error is CoreCryptoError => {
-  return 'proteusErrorCode' in error;
-};
+const isCryptoboxError = (error: unknown): error is CryptoboxError => typeof (error as any)?.code === 'number';
 
-const isCryptoboxError = (error: any): error is CryptoboxError => {
-  return 'code' in error;
-};
-
-export const CORE_CRYPTO_PROTEUS_ERROR_NAMES = {
-  ProteusErrorSessionNotFound: 'ProteusErrorSessionNotFound',
-  ProteusErrorRemoteIdentityChanged: 'ProteusErrorRemoteIdentityChanged',
-  ProteusErrorDuplicateMessage: 'ProteusErrorDuplicateMessage',
-};
+type LegacyProteusError = {proteusErrorCode: number};
+const hasProteusErrorCode = (error: unknown): error is LegacyProteusError =>
+  typeof (error as any)?.proteusErrorCode === 'number';
 
 type SenderInfo = {clientId: string; userId: QualifiedId};
 
-function getErrorCode(error: CoreCryptoError): number {
-  if (isCoreCryptoError(error) && typeof error.proteusErrorCode === 'number') {
-    return error.proteusErrorCode;
-  }
-
-  if (isCryptoboxError(error) && typeof error.code === 'number') {
-    return error.code;
-  }
-
-  if (error.name === CORE_CRYPTO_PROTEUS_ERROR_NAMES.ProteusErrorSessionNotFound) {
+function getErrorCode(error: unknown): number {
+  if (isProteusSessionNotFoundError(error)) {
     return ProteusErrors.SessionNotFound;
   }
 
-  if (error.name === CORE_CRYPTO_PROTEUS_ERROR_NAMES.ProteusErrorRemoteIdentityChanged) {
+  if (isProteusRemoteIdentityChangedError(error)) {
     return ProteusErrors.RemoteIdentityChanged;
   }
 
-  if (error.name === CORE_CRYPTO_PROTEUS_ERROR_NAMES.ProteusErrorDuplicateMessage) {
+  if (isProteusDuplicateMessageError(error)) {
     return ProteusErrors.DuplicateMessage;
+  }
+
+  if (isProteusError(error, ProteusErrorType.Other)) {
+    return ProteusErrors.Unknown;
+  }
+
+  if (hasProteusErrorCode(error)) {
+    return error.proteusErrorCode;
+  }
+
+  if (isCryptoboxError(error)) {
+    return error.code;
   }
 
   return ProteusErrors.Unknown;
 }
 
-export const generateDecryptionError = (senderInfo: SenderInfo, error: any): DecryptionError => {
+export const generateDecryptionError = (senderInfo: SenderInfo, error: unknown): DecryptionError => {
   const {clientId, userId} = senderInfo;
   const sender = `${userId.id} (${clientId})`;
 
   const code = getErrorCode(error);
 
-  const message = `Decryption error from ${sender} (name: ${error.name}) (message: ${error.message})`;
+  const name = (error as {name?: string})?.name;
+  const text = (error as {message?: string})?.message ?? String(error);
+  const message = `Decryption error from ${sender} (name: ${name}) (message: ${text})`;
 
   return new DecryptionError(message, code);
 };
