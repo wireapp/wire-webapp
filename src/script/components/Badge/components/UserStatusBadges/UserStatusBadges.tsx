@@ -17,7 +17,7 @@
  *
  */
 
-import React from 'react';
+import {Fragment} from 'react';
 
 import {Tooltip} from '@wireapp/react-ui-kit';
 
@@ -65,7 +65,7 @@ export const UserStatusBadges = ({config}: UserStatusBadgesProps) => {
   return (
     <div css={badgesWrapper(badgesCount)}>
       {badges.map(([badge]) => (
-        <React.Fragment key={badge}>{badgeToComponentMap[badge as BadgeKey]()}</React.Fragment>
+        <Fragment key={badge}>{badgeToComponentMap[badge as BadgeKey]()}</Fragment>
       ))}
     </div>
   );

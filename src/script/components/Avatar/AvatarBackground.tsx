@@ -21,7 +21,7 @@ import React from 'react';
 
 import {CSS_FILL_PARENT} from 'Util/CSSMixin';
 
-export interface AvatarBackgroundProps {
+interface AvatarBackgroundProps {
   backgroundColor?: string;
   borderRadius?: string;
 }

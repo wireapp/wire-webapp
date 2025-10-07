@@ -37,7 +37,7 @@ export enum LabelType {
   Favorite = 1,
 }
 
-export enum DefaultLabelIds {
+enum DefaultLabelIds {
   Contacts = 'contacts',
   Favorites = 'favorites',
   Groups = 'groups',

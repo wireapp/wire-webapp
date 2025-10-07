@@ -78,9 +78,6 @@ export const isMetaKey = (keyboardEvent: KeyboardEvent): boolean =>
 export const isPasteAction = (keyboardEvent: KeyboardEvent): boolean =>
   isMetaKey(keyboardEvent) && isKey(keyboardEvent, KEY.KEY_V);
 
-const removalKeys: string[] = [KEY.BACKSPACE, KEY.DELETE];
-export const isRemovalAction = (key: string): boolean => removalKeys.includes(key);
-
 export const isSpaceOrEnterKey = (key: string): boolean => key === KEY.SPACE || key === KEY.ENTER;
 
 export const handleKeyDown = ({

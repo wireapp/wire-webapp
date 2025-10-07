@@ -17,22 +17,17 @@
  *
  */
 
-import React from 'react';
+import {ReactNode} from 'react';
 
-interface PreferencesSectionProps extends React.HTMLProps<HTMLDivElement> {
+interface PreferencesSectionProps {
   className?: string;
   hasSeparator?: boolean;
   title?: string;
   uieName?: string;
+  children: ReactNode;
 }
 
-const PreferencesSection: React.FC<PreferencesSectionProps> = ({
-  title,
-  className = '',
-  uieName,
-  hasSeparator,
-  children,
-}) => (
+const PreferencesSection = ({title, className = '', uieName, hasSeparator, children}: PreferencesSectionProps) => (
   <>
     {hasSeparator && <hr className="preferences-separator" />}
     <fieldset className={`preferences-section ${className}`} data-uie-name={uieName}>

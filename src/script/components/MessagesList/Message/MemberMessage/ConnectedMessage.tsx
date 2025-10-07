@@ -17,8 +17,6 @@
  *
  */
 
-import React from 'react';
-
 import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
 
 import {Avatar, AVATAR_SIZE} from 'Components/Avatar';
@@ -37,12 +35,12 @@ interface ConnectedMessageProps {
   user: User;
 }
 
-export const ConnectedMessage: React.FC<ConnectedMessageProps> = ({
+export const ConnectedMessage = ({
   user,
   onClickCancelRequest,
   showServicesWarning = false,
   classifiedDomains,
-}) => {
+}: ConnectedMessageProps) => {
   const {name, providerName, isOutgoingRequest} = useKoSubscribableChildren(user, [
     'name',
     'providerName',

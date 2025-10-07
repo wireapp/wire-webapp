@@ -23,7 +23,7 @@ import type {CompositeMessage} from 'Repositories/entity/message/CompositeMessag
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {noop} from 'Util/util';
 
-export interface MessageButtonProps {
+interface MessageButtonProps {
   id: string;
   label: string;
   message: CompositeMessage;

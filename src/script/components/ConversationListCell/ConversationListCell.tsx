@@ -40,7 +40,7 @@ import {noop, setContextMenuPosition} from 'Util/util';
 
 import {StatusIcon} from './components/StatusIcon';
 
-export interface ConversationListCellProps {
+interface ConversationListCellProps {
   conversation: Conversation;
   dataUieName: string;
   isSelected?: (conversation: Conversation) => boolean;

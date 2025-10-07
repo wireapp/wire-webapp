@@ -15,6 +15,8 @@ jobs:
     name: Run Playwright Cells Critical Flow Tests
     if: github.repository == 'wireapp/wire-webapp'
     runs-on: [self-hosted, Linux, X64, office]
+    env:
+      ENV: ${{ inputs.environment }}
 
     steps:
       - name: Checkout repository
@@ -36,8 +38,9 @@ jobs:
         uses: 1password/install-cli-action@143a85f84a90555d121cde2ff5872e393a47ab9f
 
       - name: Generate env file
-        run: op inject -i test/e2e_tests/.env.${{ github.event.inputs.environment }}.tpl -o test/e2e_tests/.env
+        run: op inject -i test/e2e_tests/.env.$ENV.tpl -o test/e2e_tests/.env
         env:
+          ENV: ${{ inputs.environment }}
           OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
       - name: Run critical flow tests
         run: yarn e2e-test --grep "@crit-flow-cells"
@@ -46,5 +49,5 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: playwright-report
+          name: playwright-report-${{ env.ENV }}
           path: playwright-report/

@@ -27,7 +27,7 @@ import {Account} from '@wireapp/core';
 import {ActionRoot, actionRoot} from '../../module/action/';
 import type {RootState, ThunkDispatch} from '../../module/reducer';
 
-export interface MockStoreParameters {
+interface MockStoreParameters {
   actions?: TypeUtil.RecursivePartial<ActionRoot>;
   apiClient?: TypeUtil.RecursivePartial<APIClient>;
   core?: TypeUtil.RecursivePartial<Account>;

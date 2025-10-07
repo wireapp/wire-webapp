@@ -57,7 +57,7 @@ function createPlaceholderMessage() {
   return message;
 }
 
-export interface QuoteProps {
+interface QuoteProps {
   conversation: Conversation;
   findMessage: (conversation: Conversation, messageId: string) => Promise<ContentMessage | undefined>;
   focusMessage: (id: string) => void;

@@ -42,14 +42,14 @@ export enum UserlistMode {
   OTHERS = 'UserlistMode.OTHERS',
 }
 
-export enum UserListSections {
+enum UserListSections {
   CONTACTS = 'UserListSections.CONTACTS',
   SELECTED_CONTACTS = 'UserListSections.SELECTED_CONTACTS',
 }
 
 const USER_CHUNK_SIZE = 64;
 
-export interface UserListProps {
+interface UserListProps {
   conversation?: Conversation;
   conversationRepository?: ConversationRepository;
   conversationState?: ConversationState;

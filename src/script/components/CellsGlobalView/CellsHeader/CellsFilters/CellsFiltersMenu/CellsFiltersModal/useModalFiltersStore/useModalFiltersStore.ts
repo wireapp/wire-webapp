@@ -34,7 +34,7 @@ const initialState: Filters = {
   tags: [],
 };
 
-export const filtersStore = createStore<ModalFiltersState>(set => ({
+const filtersStore = createStore<ModalFiltersState>(set => ({
   ...initialState,
   setTags: tags => set({tags}),
   initialize: filters => set(filters),

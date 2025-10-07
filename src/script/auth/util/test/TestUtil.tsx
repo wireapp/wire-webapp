@@ -174,7 +174,7 @@ export const createSelfParticipant = () => {
   return new Participant(selfUser, 'client1');
 };
 
-export const mediaDevices = {
+const mediaDevices = {
   audioinput: ko.pureComputed(() => 'test'),
   audiooutput: ko.pureComputed(() => 'test'),
   screeninput: ko.pureComputed(() => 'test'),

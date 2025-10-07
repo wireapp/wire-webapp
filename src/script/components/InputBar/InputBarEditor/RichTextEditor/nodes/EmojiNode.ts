@@ -20,8 +20,6 @@
 import type {EditorConfig, SerializedTextNode} from 'lexical';
 import {$applyNodeReplacement, TextNode} from 'lexical';
 
-export type SerializedEmojiNode = SerializedTextNode;
-
 export class EmojiNode extends TextNode {
   static getType(): string {
     return 'emoji';
@@ -48,7 +46,7 @@ export class EmojiNode extends TextNode {
     return false;
   }
 
-  static importJSON(serializedNode: SerializedEmojiNode): EmojiNode {
+  static importJSON(serializedNode: SerializedTextNode): EmojiNode {
     const node = $createEmojiNode(serializedNode.text);
     node.setFormat(serializedNode.format);
     node.setDetail(serializedNode.detail);
@@ -57,7 +55,7 @@ export class EmojiNode extends TextNode {
     return node;
   }
 
-  exportJSON(): SerializedEmojiNode {
+  exportJSON(): SerializedTextNode {
     return {
       ...super.exportJSON(),
       type: 'emoji',

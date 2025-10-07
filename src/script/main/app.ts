@@ -74,13 +74,13 @@ import {MediaDevicesHandler} from 'Repositories/media/MediaDevicesHandler';
 import {MediaStreamHandler} from 'Repositories/media/MediaStreamHandler';
 import {NotificationRepository} from 'Repositories/notification/NotificationRepository';
 import {PreferenceNotificationRepository} from 'Repositories/notification/PreferenceNotificationRepository';
-import {PermissionRepository} from 'Repositories/permission/PermissionRepository';
+import {initializePermissions} from 'Repositories/permission/permissionHandlers';
 import {PropertiesRepository} from 'Repositories/properties/PropertiesRepository';
 import {PropertiesService} from 'Repositories/properties/PropertiesService';
 import {SearchRepository} from 'Repositories/search/SearchRepository';
 import {SelfRepository} from 'Repositories/self/SelfRepository';
 import {SelfService} from 'Repositories/self/SelfService';
-import {StorageRepository, StorageService} from 'Repositories/storage';
+import {StorageKey, StorageRepository, StorageService} from 'Repositories/storage';
 import {TeamRepository} from 'Repositories/team/TeamRepository';
 import {TeamService} from 'Repositories/team/TeamService';
 import {EventTrackingRepository} from 'Repositories/tracking/EventTrackingRepository';
@@ -91,6 +91,7 @@ import {DebugUtil} from 'Util/DebugUtil';
 import {Environment} from 'Util/Environment';
 import {t} from 'Util/LocalizerUtil';
 import {getLogger, Logger} from 'Util/Logger';
+import {loadValue, resetStoreValue} from 'Util/StorageUtil';
 import {durationFrom, formatCoarseDuration, TIME_IN_MILLIS} from 'Util/TimeUtil';
 import {AppInitializationStep, checkIndexedDb, InitializationEventLogger} from 'Util/util';
 
@@ -190,10 +191,12 @@ export class App {
     const repositories: ViewModelRepositories = {} as ViewModelRepositories;
     const selfService = new SelfService();
     const teamService = new TeamService();
-    const permissionRepository = new PermissionRepository();
+    // Initialize permissions
+    void initializePermissions();
+
     const mediaConstraintsHandler = new MediaConstraintsHandler();
 
-    const mediaStreamHandler = new MediaStreamHandler(mediaConstraintsHandler, permissionRepository);
+    const mediaStreamHandler = new MediaStreamHandler(mediaConstraintsHandler);
     const mediaDevicesHandler = new MediaDevicesHandler();
 
     container.registerInstance(MediaDevicesHandler, mediaDevicesHandler);
@@ -283,10 +286,8 @@ export class App {
       repositories.conversation,
       repositories.team,
     );
-    repositories.permission = permissionRepository;
     repositories.notification = new NotificationRepository(
       repositories.conversation,
-      repositories.permission,
       repositories.audio,
       repositories.calling,
     );
@@ -375,7 +376,7 @@ export class App {
    * @param config
    * @param onProgress
    */
-  async initApp(clientType: ClientType, onProgress: (message?: string) => void) {
+  async initApp(clientType: ClientType, onProgress: (message?: string) => void): Promise<User | undefined> {
     // add body information
     const startTime = Date.now();
     await updateApiVersion();
@@ -405,6 +406,19 @@ export class App {
       await checkIndexedDb();
 
       telemetry.timeStep(AppInitTimingsStep.RECEIVED_ACCESS_TOKEN);
+
+      const showLoginAfterLogout = Boolean(loadValue<boolean>(StorageKey.AUTH.SHOW_LOGIN));
+      resetStoreValue(StorageKey.AUTH.SHOW_LOGIN);
+
+      if (showLoginAfterLogout) {
+        const hasAuthenticatedSession = this.apiClient.transport?.http?.hasValidAccessToken?.() ?? false;
+
+        if (!hasAuthenticatedSession) {
+          this.logger.info('User flagged as logged out without an authenticated session. Redirecting to login.');
+          this.repository.lifeCycle.redirectToLogin(SIGN_OUT_REASON.NOT_SIGNED_IN);
+          return undefined;
+        }
+      }
 
       let selfUser: User;
 

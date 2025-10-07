@@ -3314,6 +3314,34 @@ describe('ConversationRepository', () => {
       });
     });
   });
+
+  describe('fetchBackendConversationEntityById', () => {
+    it('returns backend conversation entity on success', async () => {
+      const conversationRepository = await testFactory.exposeConversationActors();
+      const qualifiedId = {id: 'test-id', domain: 'test-domain'};
+      const backendConversation = generateAPIConversation({id: qualifiedId});
+
+      jest
+        .spyOn(conversationRepository['conversationService'], 'getConversationById')
+        .mockResolvedValueOnce(backendConversation);
+
+      const result = await conversationRepository.fetchBackendConversationEntityById(qualifiedId);
+      expect(result).toBe(backendConversation);
+    });
+
+    it('throws and logs error when backend call fails', async () => {
+      const conversationRepository = await testFactory.exposeConversationActors();
+      const qualifiedId = {id: 'test-id', domain: 'test-domain'};
+      const error = new Error('Backend error');
+
+      jest.spyOn(conversationRepository['conversationService'], 'getConversationById').mockRejectedValueOnce(error);
+
+      const loggerSpy = jest.spyOn(conversationRepository['logger'], 'error').mockImplementation(() => {});
+
+      await expect(conversationRepository.fetchBackendConversationEntityById(qualifiedId)).rejects.toThrow(error);
+      expect(loggerSpy).toHaveBeenCalledWith(expect.stringContaining('Failed to get conversation from backend'));
+    });
+  });
 });
 
 describe('leaveConversation', () => {

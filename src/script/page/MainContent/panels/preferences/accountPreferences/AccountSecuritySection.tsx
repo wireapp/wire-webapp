@@ -17,8 +17,6 @@
  *
  */
 
-import React from 'react';
-
 import {amplify} from 'amplify';
 import {container} from 'tsyringe';
 
@@ -45,12 +43,12 @@ interface AccountSecuritySectionProps {
   userRepository: UserRepository;
 }
 
-const AccountSecuritySection: React.FC<AccountSecuritySectionProps> = ({
+const AccountSecuritySection = ({
   selfUser,
   userRepository,
   appLockState = container.resolve(AppLockState),
   teamState = container.resolve(TeamState),
-}) => {
+}: AccountSecuritySectionProps) => {
   const createTeamUrl = externalUrl.createTeam;
   const manageTeamUrl = getManageTeamUrl('client_settings');
   const {teamRole} = useKoSubscribableChildren(selfUser, ['teamRole']);

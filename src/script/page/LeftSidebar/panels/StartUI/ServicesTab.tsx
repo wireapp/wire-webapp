@@ -17,7 +17,7 @@
  *
  */
 
-import React, {useState, useEffect} from 'react';
+import {useState, useEffect} from 'react';
 
 import {useDebouncedCallback} from 'use-debounce';
 
@@ -32,12 +32,17 @@ import {safeWindowOpen} from 'Util/SanitizationUtil';
 
 import {getManageServicesUrl} from '../../../../externalRoute';
 
-export const ServicesTab: React.FC<{
+export const ServicesTab = ({
+  searchQuery,
+  canManageServices,
+  integrationRepository,
+  onClickService,
+}: {
   canManageServices: boolean;
   integrationRepository: IntegrationRepository;
   onClickService: (service: ServiceEntity) => void;
   searchQuery: string;
-}> = ({searchQuery, canManageServices, integrationRepository, onClickService}) => {
+}) => {
   const isInitial = false;
   const [services, setServices] = useState<ServiceEntity[]>(integrationRepository.services());
   const manageServicesUrl = getManageServicesUrl('client_landing');
