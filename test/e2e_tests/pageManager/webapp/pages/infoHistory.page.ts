@@ -31,7 +31,7 @@ export class HistoryInfoPage {
   }
   async isButtonVisible() {
     try {
-      await this.continueButton.waitFor({state: 'visible', timeout: 10000});
+      await this.continueButton.waitFor({state: 'visible'});
       return true;
     } catch (err) {
       return false;
