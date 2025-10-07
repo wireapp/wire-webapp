@@ -44,6 +44,7 @@ const logger = getLogger('FileDropzone');
 
 interface UseFilesUploadDropzoneParams {
   isTeam: boolean;
+  isCellsEnabled: boolean;
   isDisabled: boolean;
   cellsRepository: CellsRepository;
   conversation?: Pick<Conversation, 'id' | 'qualifiedId'>;
@@ -52,6 +53,7 @@ interface UseFilesUploadDropzoneParams {
 export const useFilesUploadDropzone = ({
   isTeam,
   isDisabled,
+  isCellsEnabled,
   cellsRepository,
   conversation = {id: '', qualifiedId: {id: '', domain: ''}},
 }: UseFilesUploadDropzoneParams) => {
@@ -60,7 +62,11 @@ export const useFilesUploadDropzone = ({
 
   const [accept, setAccept] = useState<Accept | undefined>(undefined);
 
-  const MAX_SIZE = isTeam ? CONFIG.MAXIMUM_ASSET_FILE_SIZE_TEAM : CONFIG.MAXIMUM_ASSET_FILE_SIZE_PERSONAL;
+  const CELLS_MAX_SIZE = CONFIG.MAXIMUM_ASSET_FILE_SIZE_CELLS;
+
+  const TEAM_MAX_SIZE = isCellsEnabled ? CELLS_MAX_SIZE : CONFIG.MAXIMUM_ASSET_FILE_SIZE_TEAM;
+
+  const MAX_SIZE = isTeam ? TEAM_MAX_SIZE : CONFIG.MAXIMUM_ASSET_FILE_SIZE_PERSONAL;
 
   const {getRootProps, getInputProps, open, isDragAccept} = useDropzone({
     maxSize: MAX_SIZE,
