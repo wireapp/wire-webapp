@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [9.67.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/react-ui-kit@9.66.1...@wireapp/react-ui-kit@9.67.0) (2025-10-07)
+
+### Features
+
+* **react-ui-kit:** add ShareLink and CirclePlus icons [WPB-20283] ([#7432](https://github.com/wireapp/wire-web-packages/issues/7432)) ([371f1a2](https://github.com/wireapp/wire-web-packages/commit/371f1a2c48e0f4e13dbf71713062cb6f0a773b4c))
+
 ## [9.66.1](https://github.com/wireapp/wire-web-packages/compare/@wireapp/react-ui-kit@9.66.0...@wireapp/react-ui-kit@9.66.1) (2025-10-06)
 
 **Note:** Version bump only for package @wireapp/react-ui-kit
