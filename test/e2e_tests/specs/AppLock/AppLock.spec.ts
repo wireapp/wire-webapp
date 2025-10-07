@@ -57,6 +57,17 @@ test.describe('AppLock', () => {
     }
   };
 
+  const checkHistoryInfo = async (pageManager: PageManager) => {
+    const {modals, pages} = pageManager.webapp;
+    const hasLocalData = await pages.historyInfo().isButtonVisible();
+    if (hasLocalData) {
+      await pages.historyInfo().clickConfirmButton();
+    } else {
+      await modals.appLock().appLockModal.waitFor({state: 'visible', timeout: 60_000});
+    }
+    await modals.dataShareConsent().clickDecline();
+  };
+
   test(
     'I want to see app lock setup modal on login after app lock has been enforced for the team',
     {tag: ['@TC-2744', '@TC-2740', '@regression']},
@@ -109,19 +120,12 @@ test.describe('AppLock', () => {
     {tag: ['@TC-2754', '@regression']},
     async ({pageManager}) => {
       await pageManager.openMainPage();
-      const {modals, pages} = pageManager.webapp;
+      const {modals} = pageManager.webapp;
 
       await pageManager.openMainPage();
       await loginUser(memberA, pageManager);
 
-      const hasLocalData = await pages.historyInfo().isButtonVisible();
-      if (hasLocalData) {
-        await pages.historyInfo().clickConfirmButton();
-      } else {
-        await modals.appLock().appLockModal.waitFor({state: 'visible', timeout: 60_000});
-
-        await modals.dataShareConsent().clickDecline();
-      }
+      await checkHistoryInfo(pageManager);
 
       // wait for data share consent
       await setupAppLock(pageManager);
@@ -140,6 +144,7 @@ test.describe('AppLock', () => {
       await loginUser(memberA, pageManager);
 
       // setup
+      await setupAppLock(pageManager);
       // logout
       // login
       // input
