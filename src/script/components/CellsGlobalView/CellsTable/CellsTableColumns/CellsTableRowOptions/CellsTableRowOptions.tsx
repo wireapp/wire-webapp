@@ -59,7 +59,7 @@ export const CellsTableRowOptions = ({node, cellsRepository}: CellsTableRowOptio
         <DropdownMenu.Item onClick={() => showShareModal({type: node.type, uuid: node.id, cellsRepository})}>
           {t('cells.options.share')}
         </DropdownMenu.Item>
-        {url && (
+        {!!url && (
           <DropdownMenu.Item
             onClick={() =>
               forcedDownloadFile({
