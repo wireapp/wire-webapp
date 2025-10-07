@@ -17,7 +17,7 @@
  *
  */
 
-import React, {MouseEvent as ReactMouseEvent, KeyboardEvent as ReactKeyBoardEvent} from 'react';
+import {MouseEvent as ReactMouseEvent, KeyboardEvent as ReactKeyBoardEvent} from 'react';
 
 import {container} from 'tsyringe';
 
@@ -39,7 +39,7 @@ import {AvatarImage} from '../AvatarImage';
 import {AvatarInitials} from '../AvatarInitials';
 import {AvatarWrapper} from '../AvatarWrapper';
 
-export interface UserAvatarProps extends React.HTMLProps<HTMLDivElement> {
+interface UserAvatarProps {
   avatarSize: AVATAR_SIZE;
   avatarAlt?: string;
   noBadge?: boolean;

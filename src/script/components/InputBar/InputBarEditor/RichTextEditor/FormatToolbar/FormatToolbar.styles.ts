@@ -33,17 +33,3 @@ export const wrapperStyles: CSSObject = {
     display: 'none',
   },
 };
-
-export const separatorStyles: CSSObject = {
-  width: '2px',
-  height: '24px',
-  backgroundColor: 'var(--gray-40)',
-
-  'body.theme-dark &': {
-    backgroundColor: 'var(--gray-80)',
-  },
-};
-
-export const separatorStylesEditing: CSSObject = {
-  backgroundColor: 'var(--accent-color-200)',
-};

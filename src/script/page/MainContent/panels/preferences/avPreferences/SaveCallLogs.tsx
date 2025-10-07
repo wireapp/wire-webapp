@@ -17,8 +17,6 @@
  *
  */
 
-import React from 'react';
-
 import {container} from 'tsyringe';
 
 import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
@@ -40,7 +38,7 @@ interface SaveCallLogsProps {
 
 const OBFUSCATION_TRUNCATE_TO = 4;
 
-const SaveCallLogs: React.FC<SaveCallLogsProps> = ({callingRepository, userState = container.resolve(UserState)}) => {
+const SaveCallLogs = ({callingRepository, userState = container.resolve(UserState)}: SaveCallLogsProps) => {
   const brandName = Config.getConfig().BRAND_NAME;
   const saveCallLogs = () => {
     const messageLog = callingRepository.getCallLog();

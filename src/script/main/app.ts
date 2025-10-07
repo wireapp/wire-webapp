@@ -74,7 +74,7 @@ import {MediaDevicesHandler} from 'Repositories/media/MediaDevicesHandler';
 import {MediaStreamHandler} from 'Repositories/media/MediaStreamHandler';
 import {NotificationRepository} from 'Repositories/notification/NotificationRepository';
 import {PreferenceNotificationRepository} from 'Repositories/notification/PreferenceNotificationRepository';
-import {PermissionRepository} from 'Repositories/permission/PermissionRepository';
+import {initializePermissions} from 'Repositories/permission/permissionHandlers';
 import {PropertiesRepository} from 'Repositories/properties/PropertiesRepository';
 import {PropertiesService} from 'Repositories/properties/PropertiesService';
 import {SearchRepository} from 'Repositories/search/SearchRepository';
@@ -191,10 +191,12 @@ export class App {
     const repositories: ViewModelRepositories = {} as ViewModelRepositories;
     const selfService = new SelfService();
     const teamService = new TeamService();
-    const permissionRepository = new PermissionRepository();
+    // Initialize permissions
+    void initializePermissions();
+
     const mediaConstraintsHandler = new MediaConstraintsHandler();
 
-    const mediaStreamHandler = new MediaStreamHandler(mediaConstraintsHandler, permissionRepository);
+    const mediaStreamHandler = new MediaStreamHandler(mediaConstraintsHandler);
     const mediaDevicesHandler = new MediaDevicesHandler();
 
     container.registerInstance(MediaDevicesHandler, mediaDevicesHandler);
@@ -284,10 +286,8 @@ export class App {
       repositories.conversation,
       repositories.team,
     );
-    repositories.permission = permissionRepository;
     repositories.notification = new NotificationRepository(
       repositories.conversation,
-      repositories.permission,
       repositories.audio,
       repositories.calling,
     );

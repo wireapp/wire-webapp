@@ -24,7 +24,7 @@ import {FileWithPreview} from 'Components/Conversation/useFilesUploadState/useFi
 import {CellsRepository} from 'Repositories/cells/CellsRepository';
 import {t} from 'Util/LocalizerUtil';
 
-export type SendFilesStatus = 'idle' | 'loading' | 'success' | 'error';
+type SendFilesStatus = 'idle' | 'loading' | 'success' | 'error';
 
 interface UseSendFilesProps {
   files: FileWithPreview[];

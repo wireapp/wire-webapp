@@ -29,13 +29,13 @@ import {t} from 'Util/LocalizerUtil';
 import {Config} from '../../Config';
 import {EXTERNAL_ROUTE} from '../externalRoute';
 
-export interface Props extends React.HTMLAttributes<HTMLDivElement> {
+interface WirelessContainerProps {
   children: React.ReactNode;
   onCookiePolicyBannerClose?: (event: React.MouseEvent<HTMLElement>) => void;
   showCookiePolicyBanner?: boolean;
 }
 
-const WirelessContainer: React.FC<Props> = ({showCookiePolicyBanner, onCookiePolicyBannerClose, children}) => {
+const WirelessContainer = ({showCookiePolicyBanner, onCookiePolicyBannerClose, children}: WirelessContainerProps) => {
   return (
     <div
       style={{

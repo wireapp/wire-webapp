@@ -51,8 +51,7 @@ import {RenameMessage} from 'Repositories/entity/message/RenameMessage';
 import {Text} from 'Repositories/entity/message/Text';
 import {User} from 'Repositories/entity/User';
 import {NOTIFICATION_HANDLING_STATE} from 'Repositories/event/NotificationHandlingState';
-import {PermissionRepository} from 'Repositories/permission/PermissionRepository';
-import {PermissionStatusState} from 'Repositories/permission/PermissionStatusState';
+import {BrowserPermissionStatus} from 'Repositories/permission/BrowserPermissionStatus';
 import {UserMapper} from 'Repositories/user/UserMapper';
 import {UserState} from 'Repositories/user/UserState';
 import 'src/script/localization/Localizer';
@@ -72,7 +71,6 @@ function buildNotificationRepository() {
   const userState = container.resolve(UserState);
   const notificationRepository = new NotificationRepository(
     {} as any,
-    new PermissionRepository(),
     new AudioRepository(),
     {} as CallingRepository,
     userState,
@@ -132,7 +130,7 @@ describe('NotificationRepository', () => {
 
     // Mocks
     document.hasFocus = () => false;
-    notificationRepository.updatePermissionState(PermissionStatusState.GRANTED);
+    notificationRepository.updatePermissionState(BrowserPermissionStatus.GRANTED);
     spyOn(Runtime, 'isSupportingNotifications').and.returnValue(true);
     spyOn(notificationRepository['assetRepository'], 'getObjectUrl').and.returnValue(
       Promise.resolve('/image/logo/notification.png'),
@@ -310,7 +308,7 @@ describe('NotificationRepository', () => {
     });
 
     it('if the user permission was denied', () => {
-      notificationRepository.updatePermissionState(PermissionStatusState.DENIED);
+      notificationRepository.updatePermissionState(BrowserPermissionStatus.DENIED);
 
       return notificationRepository.notify(message, undefined, conversation).then(() => {
         expect(notificationRepository['showNotification']).not.toHaveBeenCalled();
@@ -347,7 +345,7 @@ describe('NotificationRepository', () => {
 
     it('filters all notifications (but composite) if user is "away"', () => {
       userState.self().availability(Availability.Type.AWAY);
-      notificationRepository.updatePermissionState(PermissionStatusState.GRANTED);
+      notificationRepository.updatePermissionState(BrowserPermissionStatus.GRANTED);
 
       const testPromises = Object.values(allMessageTypes).map(messageEntity => {
         return notificationRepository.notify(messageEntity, undefined, conversation).then(() => {
@@ -364,7 +362,7 @@ describe('NotificationRepository', () => {
 
     it('filters content and ping messages when user is "busy"', () => {
       userState.self().availability(Availability.Type.BUSY);
-      notificationRepository.updatePermissionState(PermissionStatusState.GRANTED);
+      notificationRepository.updatePermissionState(BrowserPermissionStatus.GRANTED);
 
       const ignoredMessages = Object.entries(allMessageTypes)
         .filter(([type]) => ['content', 'ping'].includes(type))
@@ -381,7 +379,7 @@ describe('NotificationRepository', () => {
 
     it('allows mentions, calls and composite when user is "busy"', () => {
       userState.self().availability(Availability.Type.BUSY);
-      notificationRepository.updatePermissionState(PermissionStatusState.GRANTED);
+      notificationRepository.updatePermissionState(BrowserPermissionStatus.GRANTED);
 
       const notifiedMessages = Object.entries(allMessageTypes)
         .filter(([type]) => ['mention', 'call', 'composite'].includes(type))

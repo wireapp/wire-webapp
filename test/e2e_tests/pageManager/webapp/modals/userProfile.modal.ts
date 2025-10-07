@@ -40,7 +40,7 @@ export class UserProfileModal {
   }
 
   async isVisible() {
-    await this.modal.isVisible();
+    return await this.modal.isVisible();
   }
 
   async clickConnectButton() {

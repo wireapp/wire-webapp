@@ -17,7 +17,7 @@
  *
  */
 
-export enum PERSONAL {
+enum PERSONAL {
   GROUP = 'z.conversation.ACCESS_STATE.PERSONAL.GROUP',
   ONE2ONE = 'z.conversation.ACCESS_STATE.PERSONAL.ONE2ONE',
 }
@@ -34,7 +34,7 @@ export enum TEAM {
   TEAM_ONLY = 'z.conversation.ACCESS_STATE.TEAM.TEAM_ONLY',
 }
 
-export enum OTHER {
+enum OTHER {
   SELF = 'z.conversation.ACCESS_STATE.SELF',
   UNKNOWN = 'z.conversation.ACCESS_STATE.UNKNOWN',
 }

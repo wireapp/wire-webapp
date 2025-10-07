@@ -68,7 +68,6 @@ import {entities} from '../api/payloads';
 import {MediaStreamHandler} from 'Repositories/media/MediaStreamHandler';
 import {MediaDevicesHandler} from 'Repositories/media/MediaDevicesHandler';
 import {MediaConstraintsHandler} from 'Repositories/media/MediaConstraintsHandler';
-import {PermissionRepository} from 'Repositories/permission/PermissionRepository';
 
 export class TestFactory {
   constructor() {
@@ -308,9 +307,8 @@ export class TestFactory {
    */
   async exposeCallingActors() {
     await this.exposeConversationActors();
-    const permissionRepository = new PermissionRepository();
     const mediaConstraintsHandler = new MediaConstraintsHandler();
-    const mediaStreamHandler = new MediaStreamHandler(mediaConstraintsHandler, permissionRepository);
+    const mediaStreamHandler = new MediaStreamHandler(mediaConstraintsHandler);
     const mediaDevicesHandler = new MediaDevicesHandler();
 
     this.calling_repository = new CallingRepository(

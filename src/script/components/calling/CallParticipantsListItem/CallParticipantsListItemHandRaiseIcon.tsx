@@ -28,7 +28,7 @@ import {formatDuration} from 'Util/TimeUtil';
 
 import {toolTipStyles} from './CallParticipantsListItemHandRaiseIcon.styles';
 
-export interface CallParticipantsListItemHandRaiseIconProps {
+interface CallParticipantsListItemHandRaiseIconProps {
   handRaisedAt: number;
 }
 

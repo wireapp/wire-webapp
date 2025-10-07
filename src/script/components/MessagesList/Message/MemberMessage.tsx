@@ -17,8 +17,6 @@
  *
  */
 
-import React from 'react';
-
 import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
 
 import * as Icon from 'Components/Icon';
@@ -45,7 +43,7 @@ interface MemberMessageProps {
   conversationName: string;
 }
 
-export const MemberMessage: React.FC<MemberMessageProps> = ({
+export const MemberMessage = ({
   message,
   shouldShowInvitePeople,
   isSelfTemporaryGuest,
@@ -55,7 +53,7 @@ export const MemberMessage: React.FC<MemberMessageProps> = ({
   onClickCancelRequest,
   classifiedDomains,
   conversationName,
-}) => {
+}: MemberMessageProps) => {
   const {otherUser, timestamp, user, htmlGroupCreationHeader, showNamedCreation, hasUsers} = useKoSubscribableChildren(
     message,
     ['otherUser', 'timestamp', 'user', 'htmlGroupCreationHeader', 'showNamedCreation', 'hasUsers'],

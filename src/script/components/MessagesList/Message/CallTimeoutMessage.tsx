@@ -17,8 +17,6 @@
  *
  */
 
-import React from 'react';
-
 import {REASON} from '@wireapp/avs';
 
 import * as Icon from 'Components/Icon';
@@ -28,11 +26,11 @@ import {t} from 'Util/LocalizerUtil';
 
 import {MessageTime} from './MessageTime';
 
-export interface CallTimeoutMessageProps {
+interface CallTimeoutMessageProps {
   message: CallingTimeoutMessage;
 }
 
-const CallTimeoutMessage: React.FC<CallTimeoutMessageProps> = ({message}) => {
+const CallTimeoutMessage = ({message}: CallTimeoutMessageProps) => {
   const reason = message.reason;
   const {timestamp} = useKoSubscribableChildren(message, ['timestamp']);
   const text = `${t('callWasEndedBecause')} `;

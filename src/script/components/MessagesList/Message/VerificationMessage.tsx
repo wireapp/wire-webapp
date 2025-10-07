@@ -17,7 +17,7 @@
  *
  */
 
-import React, {useMemo} from 'react';
+import {useMemo} from 'react';
 
 import {amplify} from 'amplify';
 
@@ -32,11 +32,11 @@ import {capitalizeFirstChar} from 'Util/StringUtil';
 
 import {VerificationMessageType} from '../../../message/VerificationMessageType';
 
-export interface VerificationMessageProps {
+interface VerificationMessageProps {
   message: VerificationMessageEntity;
 }
 
-const VerificationMessage: React.FC<VerificationMessageProps> = ({message}) => {
+const VerificationMessage = ({message}: VerificationMessageProps) => {
   const {userIds, userEntities, unsafeSenderName, verificationMessageType, isSelfClient} = useKoSubscribableChildren(
     message,
     ['userIds', 'userEntities', 'unsafeSenderName', 'verificationMessageType', 'isSelfClient'],

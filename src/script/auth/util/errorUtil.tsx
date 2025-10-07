@@ -24,8 +24,6 @@ import {ErrorMessage} from '@wireapp/react-ui-kit';
 import {errorHandlerStrings} from 'Util/ErrorUtil';
 import {validationErrorStrings} from 'Util/ValidationUtil';
 
-import {ValidationError} from '../module/action/ValidationError';
-
 export function parseError(error: any): JSX.Element | null {
   if (error) {
     if (errorHandlerStrings.hasOwnProperty(error.label)) {
@@ -56,7 +54,3 @@ export function parseValidationErrors(errors: any | any[]): JSX.Element[] {
     </ErrorMessage>
   ));
 }
-
-export const isValidationError = (error: any) => {
-  return error instanceof ValidationError;
-};

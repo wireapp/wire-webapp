@@ -36,7 +36,7 @@ import {
   wrapper,
 } from './CallParticipantItemContent.styles';
 
-export interface CallParticipantItemContentProps {
+interface CallParticipantItemContentProps {
   user: User;
   isAudioEstablished: boolean;
   isSelf?: boolean;

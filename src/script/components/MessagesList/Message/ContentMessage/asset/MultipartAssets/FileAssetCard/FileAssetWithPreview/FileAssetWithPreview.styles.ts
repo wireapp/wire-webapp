@@ -90,17 +90,3 @@ export const errorTextStyles: CSSObject = {
   lineHeight: 'var(--line-height-sm)',
   color: 'var(--main-color)',
 };
-
-export const moreButtonStyles: CSSObject = {
-  background: 'none',
-  border: 'none',
-  cursor: 'pointer',
-  padding: '0',
-  marginLeft: 'auto',
-  zIndex: '1',
-};
-
-export const moreIconStyles: CSSObject = {
-  fill: 'var(--main-color)',
-  display: 'block',
-};

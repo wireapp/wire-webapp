@@ -17,7 +17,7 @@
  *
  */
 
-import React, {UIEvent, useRef} from 'react';
+import {UIEvent, useRef} from 'react';
 
 import cx from 'classnames';
 
@@ -35,14 +35,14 @@ import {AssetHeader} from './common/AssetHeader/AssetHeader';
 
 import {useMessageFocusedTabIndex} from '../../util';
 
-export interface LinkPreviewAssetProps {
+interface LinkPreviewAssetProps {
   /** Does the asset have a visible header? */
   header?: boolean;
   message: ContentMessage;
   isFocusable?: boolean;
 }
 
-const LinkPreviewAsset: React.FC<LinkPreviewAssetProps> = ({header = false, message, isFocusable = true}) => {
+const LinkPreviewAsset = ({header = false, message, isFocusable = true}: LinkPreviewAssetProps) => {
   const {
     previews: [preview],
   } = useKoSubscribableChildren(message.getFirstAsset() as Text, ['previews']);
@@ -104,7 +104,7 @@ const LinkPreviewAsset: React.FC<LinkPreviewAssetProps> = ({header = false, mess
         )}
       </div>
       <div className="link-preview-info">
-        {header && <AssetHeader className="link-preview-info-header" message={message} />}
+        {header && <AssetHeader message={message} />}
         {preview && (
           <>
             <p

@@ -31,7 +31,7 @@ import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 import {noop} from 'Util/util';
 
-export interface EnrichedFieldsProps {
+interface EnrichedFieldsProps {
   onFieldsLoaded?: (richFields: RichInfoField[]) => void;
   richProfileRepository?: RichProfileRepository;
   showDomain?: boolean;

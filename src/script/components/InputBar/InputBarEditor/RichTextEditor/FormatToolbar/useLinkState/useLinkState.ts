@@ -40,7 +40,7 @@ import {useModalState} from './useModalState/useModalState';
 
 import {sanitizeUrl} from '../../utils/url';
 
-export const FORMAT_LINK_COMMAND = createCommand<void>();
+const FORMAT_LINK_COMMAND = createCommand<void>();
 
 interface SelectionPoint {
   key: string;
