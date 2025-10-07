@@ -22,7 +22,6 @@ import {container} from 'tsyringe';
 
 import {createUuid} from 'Util/uuid';
 
-import {AssetRemoteData} from './AssetRemoteData';
 import {AssetRepository, AssetUploadOptions} from './AssetRepository';
 
 import {Core} from '../../service/CoreSingleton';
@@ -36,51 +35,17 @@ describe('AssetRepository', () => {
 
   beforeEach(async () => {
     core = container.resolve(Core);
+
+    // Mock the asset service
+    core.service = {
+      asset: {
+        uploadAsset: jest.fn(),
+        downloadAsset: jest.fn(),
+        downloadRawAsset: jest.fn(),
+      },
+    } as any;
+
     assetRepository = new AssetRepository(core);
-  });
-
-  describe('load unencrypted v1 asset', () => {
-    let remote_data: AssetRemoteData;
-
-    const video_bytes = new Uint8Array([1, 2, 3, 4]);
-    const video_type = 'video/mp4';
-
-    beforeEach(() => {
-      const conversation_id = createUuid();
-      const asset_id = createUuid();
-      remote_data = AssetRemoteData.v1(conversation_id, asset_id);
-      jest.spyOn(assetRepository as any, 'loadBuffer').mockReturnValue({
-        response: Promise.resolve({buffer: video_bytes.buffer, mimeType: video_type}),
-      });
-    });
-
-    it('should load and decrypt v1 asset', async () => {
-      const blob = await assetRepository.load(remote_data);
-      expect<void | Blob>(new Blob([video_bytes], {type: video_type})).toEqual(blob);
-    });
-  });
-
-  describe('load encrypted v2 asset', () => {
-    let remote_data: AssetRemoteData;
-    const video_bytes = new Uint8Array([1, 2, 3, 4]);
-    const video_type = 'video/mp4';
-
-    beforeEach(async () => {
-      const cipherText = new Uint8Array();
-      const keyBytes = new Uint8Array();
-      const sha256 = new Uint8Array();
-      const conversation_id = createUuid();
-      const asset_id = createUuid();
-      remote_data = AssetRemoteData.v2(conversation_id, asset_id, new Uint8Array(keyBytes), new Uint8Array(sha256));
-      jest.spyOn(assetRepository as any, 'loadBuffer').mockReturnValue({
-        response: Promise.resolve({buffer: cipherText, mimeType: video_type}),
-      });
-    });
-
-    it('should load and decrypt v2 asset', async () => {
-      const blob = await assetRepository.load(remote_data);
-      expect<void | Blob>(new Blob([video_bytes], {type: video_type})).toEqual(blob);
-    });
   });
 
   it('keeps track of current uploads and removes it once finished', async () => {
@@ -139,5 +104,82 @@ describe('AssetRepository', () => {
       });
     });
     await assetRepository.uploadFile(file, messageId, options);
+  });
+
+  it('loads an encrypted asset and returns a blob', async () => {
+    const mockBuffer = new ArrayBuffer(8);
+    const mockMimeType = 'image/png';
+    const otrKey = new Uint8Array([1, 2, 3, 4]);
+    const sha256 = new Uint8Array([5, 6, 7, 8]);
+
+    const mockAsset = {
+      identifier: 'test-asset-id',
+      otrKey,
+      sha256,
+      urlData: {key: 'test-key', token: 'test-token'},
+      updateProgress: jest.fn(),
+      cancelDownload: null as (() => void) | null,
+    };
+
+    spyOn(core.service!.asset, 'downloadAsset').and.returnValue({
+      cancel: jest.fn(),
+      response: Promise.resolve({buffer: mockBuffer, mimeType: mockMimeType}),
+    });
+
+    const result = await assetRepository.load(mockAsset as any);
+
+    expect(core.service!.asset.downloadAsset).toHaveBeenCalledWith(
+      mockAsset.urlData,
+      otrKey,
+      sha256,
+      jasmine.any(Function),
+    );
+    expect(result).toBeInstanceOf(Blob);
+    expect(result?.type).toBe(mockMimeType);
+  });
+
+  it('loads an unencrypted asset and returns a blob', async () => {
+    const mockBuffer = new ArrayBuffer(8);
+    const mockMimeType = 'application/pdf';
+
+    const mockAsset = {
+      identifier: 'test-asset-id',
+      otrKey: undefined as Uint8Array | undefined,
+      sha256: undefined as Uint8Array | undefined,
+      urlData: {key: 'test-key', token: 'test-token'},
+      updateProgress: jest.fn(),
+      cancelDownload: null as (() => void) | null,
+    };
+
+    spyOn(core.service!.asset, 'downloadRawAsset').and.returnValue({
+      cancel: jest.fn(),
+      response: Promise.resolve({buffer: mockBuffer, mimeType: mockMimeType}),
+    });
+
+    const result = await assetRepository.load(mockAsset as any);
+
+    expect(core.service!.asset.downloadRawAsset).toHaveBeenCalledWith(mockAsset.urlData, jasmine.any(Function));
+    expect(result).toBeInstanceOf(Blob);
+    expect(result?.type).toBe(mockMimeType);
+  });
+
+  it('returns undefined when asset loading fails with 404', async () => {
+    const mockAsset = {
+      identifier: 'test-asset-id',
+      otrKey: new Uint8Array([1, 2, 3, 4]),
+      sha256: new Uint8Array([5, 6, 7, 8]),
+      urlData: {key: 'test-key', token: 'test-token'},
+      updateProgress: jest.fn(),
+      cancelDownload: null as (() => void) | null,
+    };
+
+    spyOn(core.service!.asset, 'downloadAsset').and.returnValue({
+      cancel: jest.fn(),
+      response: Promise.reject(new Error('Asset not found: 404')),
+    });
+
+    const result = await assetRepository.load(mockAsset as any);
+
+    expect(result).toBeUndefined();
   });
 });

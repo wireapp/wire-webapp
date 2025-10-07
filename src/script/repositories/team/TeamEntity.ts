@@ -20,7 +20,7 @@
 import ko from 'knockout';
 
 import {AssetRemoteData} from 'Repositories/assets/AssetRemoteData';
-import {assetV3} from 'Util/ValidationUtil';
+import {isValidAsset} from 'Util/ValidationUtil';
 
 export class TeamEntity {
   creator?: string;
@@ -43,11 +43,11 @@ export class TeamEntity {
     let hasIcon = false;
 
     try {
-      hasIcon = !!this.icon && assetV3(this.icon);
+      hasIcon = !!this.icon && isValidAsset(this.icon);
     } catch (error) {}
 
-    if (hasIcon) {
-      return AssetRemoteData.v3(this.icon, teamDomain);
+    if (hasIcon && teamDomain) {
+      return new AssetRemoteData({assetKey: this.icon, assetDomain: teamDomain});
     }
   }
 }

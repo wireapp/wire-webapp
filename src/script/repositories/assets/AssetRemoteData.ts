@@ -17,103 +17,99 @@
  *
  */
 
-import ko from 'knockout';
+import {AssetUrlData} from '@wireapp/core/lib/conversation/AssetService/AssetService';
 
-export type AssetUrlData = AssetUrlDataVersion1 | AssetUrlDataVersion2 | AssetUrlDataVersion3 | AssetUrlDataVersion4;
+/**
+ * Callback function that receives download progress updates.
+ * @param progress - Download progress as a percentage (0-100)
+ */
+export type ProgressCallback = (progress: number) => void;
 
-interface AssetUrlDataVersion3 {
+export type AssetRemoteDataParams = {
   assetKey: string;
-  assetToken: string;
-  forceCaching: boolean;
-  version: 3;
-}
-interface AssetUrlDataVersion4 extends Omit<AssetUrlDataVersion3, 'version'> {
   assetDomain: string;
-  version: 4;
-}
+  otrKey?: Uint8Array;
+  sha256?: Uint8Array;
+  assetToken?: string;
+  forceCaching?: boolean;
+};
 
-interface AssetUrlDataVersion2 {
-  assetId: string;
-  conversationId: string;
-  forceCaching: boolean;
-  version: 2;
-}
-
-interface AssetUrlDataVersion1 {
-  assetId: string;
-  conversationId: string;
-  forceCaching: boolean;
-  version: 1;
-}
-
+/**
+ * Represents remote asset data with encryption and download tracking capabilities.
+ */
 export class AssetRemoteData {
-  public cancelDownload: () => void;
-  public readonly downloadProgress: ko.Observable<number>;
+  public cancelDownload: () => void = () => {};
+  private progress: number = 0;
+  private progressCallback?: ProgressCallback;
+  public readonly forceCaching: boolean;
+  private readonly assetKey: string;
+  private readonly assetDomain: string;
+  public readonly otrKey?: Uint8Array;
+  public readonly sha256?: Uint8Array;
+  public readonly assetToken?: string;
 
-  constructor(
-    public readonly identifier: string,
-    public readonly urlData: AssetUrlData,
-    public readonly otrKey?: Uint8Array,
-    public readonly sha256?: Uint8Array,
-  ) {
-    this.downloadProgress = ko.observable(0);
-    this.cancelDownload = () => {};
+  /**
+   * Creates an instance of AssetRemoteData
+   *
+   * @param assetKey - Unique identifier for the asset
+   * @param assetDomain - Domain where the asset is hosted (for federated assets)
+   * @param otrKey - Optional OTR encryption key for decrypting the asset
+   * @param sha256 - Optional SHA-256 hash for integrity verification
+   * @param assetToken - Optional authentication token for accessing the asset
+   * @param forceCaching - Whether to force caching of the asset (default: false)
+   */
+  constructor(params: AssetRemoteDataParams) {
+    this.assetKey = params.assetKey;
+    this.assetDomain = params.assetDomain;
+    this.otrKey = params.otrKey;
+    this.sha256 = params.sha256;
+    this.assetToken = params.assetToken;
+    this.forceCaching = params.forceCaching ?? false;
   }
 
   /**
-   * Will generate a v3 or v4 (depending on the given domain) asset payload.
-   * Assets v3 and v4 only differ by the domain, so it doesn't make sense to split those into 2 different methods
+   * Returns the URL data needed to fetch this asset.
    */
-  static v3(
-    assetKey: string,
-    assetDomain?: string,
-    otrKey?: Uint8Array,
-    sha256?: Uint8Array,
-    assetToken?: string,
-    forceCaching: boolean = false,
-  ) {
-    const baseProperties: AssetUrlDataVersion3 = {
-      assetKey,
-      assetToken,
-      forceCaching,
-      version: 3,
+  get urlData(): AssetUrlData {
+    return {
+      assetKey: this.assetKey,
+      assetToken: this.assetToken,
+      assetDomain: this.assetDomain,
+      forceCaching: this.forceCaching,
     };
-    const urlData = assetDomain
-      ? ({
-          ...baseProperties,
-          assetDomain,
-          version: 4,
-        } as AssetUrlDataVersion4)
-      : baseProperties;
-    return new AssetRemoteData(assetKey, urlData, otrKey, sha256);
   }
 
-  static v2(
-    conversationId: string,
-    assetId: string,
-    otrKey: Uint8Array,
-    sha256: Uint8Array,
-    forceCaching: boolean = false,
-  ) {
-    return new AssetRemoteData(
-      `${conversationId}${assetId}`,
-      {
-        assetId,
-        conversationId,
-        forceCaching,
-        version: 2,
-      },
-      otrKey,
-      sha256,
-    );
+  /**
+   * Returns the identifier for this asset (same as assetKey).
+   */
+  get identifier(): string {
+    return this.assetKey;
   }
 
-  static v1(conversationId: string, assetId: string, forceCaching: boolean = false) {
-    return new AssetRemoteData(`${conversationId}${assetId}`, {
-      assetId,
-      conversationId,
-      forceCaching,
-      version: 1,
-    });
+  /**
+   * Sets a callback to be called when download progress changes.
+   * This replaces the KO observable pattern with a callback-based approach.
+   *
+   * @param callback - Function to call with progress updates (0-100)
+   */
+  public onProgressChange(callback: ProgressCallback): void {
+    this.progressCallback = callback;
+  }
+
+  /**
+   * Updates the download progress and notifies any registered callback.
+   * This is called internally by the AssetRepository during downloads.
+   *
+   * @param progress - Download progress as a percentage (0-100)
+   */
+  public updateProgress(progress: number): void {
+    this.progress = progress;
+    if (this.progressCallback) {
+      this.progressCallback(progress);
+    }
+  }
+
+  public get downloadProgress(): number {
+    return this.progress;
   }
 }

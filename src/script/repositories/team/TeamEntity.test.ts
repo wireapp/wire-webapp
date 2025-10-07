@@ -22,15 +22,16 @@ import {TeamEntity} from './TeamEntity';
 describe('TeamEntity', () => {
   it('returns an icon resource', () => {
     const teamEntity = new TeamEntity();
+    const teamDomain = 'test.domain.com';
 
-    expect(teamEntity.getIconResource()).not.toBeDefined();
+    expect(teamEntity.getIconResource(teamDomain)).not.toBeDefined();
 
     teamEntity.icon = 'invalid-icon';
 
-    expect(teamEntity.getIconResource()).not.toBeDefined();
+    expect(teamEntity.getIconResource(teamDomain)).not.toBeDefined();
 
     teamEntity.icon = '3-1-e705c3f5-7b4b-4136-a09b-01614cb355a1';
 
-    expect(teamEntity.getIconResource()).toBeDefined();
+    expect(teamEntity.getIconResource(teamDomain)).toBeDefined();
   });
 });

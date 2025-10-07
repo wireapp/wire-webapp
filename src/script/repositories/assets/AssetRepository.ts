@@ -124,7 +124,7 @@ export class AssetRepository {
   private loadBuffer(asset: AssetRemoteData) {
     const isEncryptedAsset = !!asset.otrKey && !!asset.sha256;
     const progressCallback = (fraction: number) => {
-      asset.downloadProgress(fraction * 100);
+      asset.updateProgress(fraction * 100);
     };
 
     if (!isEncryptedAsset) {
@@ -155,7 +155,7 @@ export class AssetRepository {
         throw new Error('No blob received.');
       }
       asset.status(AssetTransferState.UPLOADED);
-      return downloadBlob(blob, asset.file_name);
+      return downloadBlob(blob, asset.file_name ?? 'file');
     } catch (error) {
       if (error instanceof Error) {
         if (error.name === AssetError.CANCEL_ERROR) {

@@ -101,18 +101,22 @@ describe('Event Mapper', () => {
       expect(messageEntity).toBeDefined();
     });
 
-    it('maps v3 image asset', () => {
+    it('maps image asset', () => {
+      const otrKey = new Uint8Array([1, 2, 3]);
+      const sha256 = new Uint8Array([4, 5, 6]);
       const event = {
         category: 128,
         conversation: '6db80f23-fbdf-416f-a123-d279aebff011',
         data: {
           content_length: 47527,
           content_type: 'image/jpeg',
+          id: '72554b6b-edc3-4dde-a177-5552df09df43',
           info: {height: 905, nonce: '72554b6b-edc3-4dde-a177-5552df09df43', tag: 'medium', width: 1448},
           key: '3-2-dc080e34-72d8-478e-a1bf-fdda44b47872',
-          otr_key: {},
-          sha256: {},
+          otr_key: otrKey,
+          sha256: sha256,
           token: 'aV0TGxF3ugpawm3wAYPmew==',
+          domain: 'test.domain.com',
         },
         from: '9b47476f-974d-481c-af64-13f82ed98a5f',
         id: '72554b6b-edc3-4dde-a177-5552df09df43',
@@ -128,8 +132,8 @@ describe('Event Mapper', () => {
       expect(messageEntity.getFirstAsset().file_size).toBe(event.data.content_length);
       expect(messageEntity.getFirstAsset().file_type).toBe(event.data.content_type);
       expect(messageEntity.getFirstAsset().type).toBe(AssetType.IMAGE);
-      expect(messageEntity.getFirstAsset().resource().otrKey).toBe(event.data.otr_key);
-      expect(messageEntity.getFirstAsset().resource().sha256).toBe(event.data.sha256);
+      expect(messageEntity.getFirstAsset().resource().otrKey).toBe(otrKey);
+      expect(messageEntity.getFirstAsset().resource().sha256).toBe(sha256);
       expect(messageEntity).toBeDefined();
     });
 

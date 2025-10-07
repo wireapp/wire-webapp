@@ -70,20 +70,18 @@ export const legacyAsset = (assetId: string, conversationId: string): true => {
   return true;
 };
 
-// https://github.com/wireapp/wire-server/blob/dc3e9a8af5250c0d045e96a31aa23c255b4e01a3/libs/cargohold-types/src/CargoHold/Types/V3.hs#L156-L177
+// Asset retention policy validation
+// Reference: https://github.com/wireapp/wire-server/blob/dc3e9a8af5250c0d045e96a31aa23c255b4e01a3/libs/cargohold-types/src/CargoHold/Types/V3.hs#L156-L177
 export const assetRetentionPolicy = (policyId: number): boolean => policyId > 0 && policyId < 6;
 
-export const assetV3 = (assetKey: string, assetToken?: string): true => {
+export const isValidAsset = (assetKey: string, assetToken?: string): true => {
   if (!assetKey) {
     throw new ValidationUtilError('Asset key not defined');
   }
 
   const SEPARATOR = '-';
-  const [version, type, ...uuid] = assetKey.split(SEPARATOR);
+  const [, type, ...uuid] = assetKey.split(SEPARATOR);
 
-  if (version !== '3') {
-    throw new ValidationUtilError('Invalid asset key (version)');
-  }
   if (!assetRetentionPolicy(parseInt(type, 10))) {
     throw new ValidationUtilError('Invalid asset key (type)');
   }

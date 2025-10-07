@@ -18,6 +18,7 @@
  */
 
 import {TimeInMillis} from '@wireapp/commons/lib/util/TimeUtil';
+import {CredentialType} from '@wireapp/core/lib/messagingProtocols/mls';
 
 import {getEnrollmentTimer, messageRetentionTime} from './EnrollmentTimer';
 
@@ -46,9 +47,10 @@ describe('e2ei delays', () => {
   ])('should return a snoozable timer if device is still valid', (validityPeriod, grace, expectedTimer) => {
     const {firingDate, isSnoozable} = getEnrollmentTimer(
       {
+        credentialType: CredentialType.X509,
         x509Identity: {
           certificate: ' ',
-          not_after: (Date.now() + validityPeriod) / 1000,
+          notAfter: (Date.now() + validityPeriod) / 1000,
         },
       } as any,
       Date.now(),
@@ -65,9 +67,10 @@ describe('e2ei delays', () => {
 
     const {firingDate, isSnoozable} = getEnrollmentTimer(
       {
+        credentialType: CredentialType.X509,
         x509Identity: {
           certificate: ' ',
-          not_after: deadline / 1000,
+          notAfter: deadline / 1000,
         },
       } as any,
       Date.now(),
@@ -83,9 +86,10 @@ describe('e2ei delays', () => {
     const gracePeriodStartingPoint = deadline - gracePeriod;
     const {firingDate, isSnoozable} = getEnrollmentTimer(
       {
+        credentialType: CredentialType.X509,
         x509Identity: {
           certificate: ' ',
-          not_after: deadline / 1000,
+          notAfter: deadline / 1000,
         },
       } as any,
       Date.now(),
