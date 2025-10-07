@@ -29,7 +29,12 @@ import {
   MissingCookieError,
   TokenExpiredError,
 } from '../auth/';
-import {ConversationIsUnknownError, ConversationOperationError} from '../conversation/';
+import {
+  ConversationIsUnknownError,
+  ConversationOperationError,
+  MLSInvalidLeafNodeIndexError,
+  MLSInvalidLeafNodeSignatureError,
+} from '../conversation/';
 import {InvalidInvitationCodeError, InviteEmailInUseError, ServiceNotFoundError} from '../team/';
 import {UnconnectedUserError, UserIsUnknownError} from '../user/';
 
@@ -124,6 +129,13 @@ export class BackendErrorMapper {
             e.label,
             e.code,
           ),
+      },
+      [BackendErrorLabel.MLS_INVALID_LEAF_NODE_SIGNATURE]: {
+        'Invalid leaf node signature': e =>
+          new MLSInvalidLeafNodeSignatureError('Invalid leaf node signature', e.label, e.code),
+      },
+      [BackendErrorLabel.MLS_INVALID_LEAF_NODE_INDEX]: {
+        'Invalid leaf node index': e => new MLSInvalidLeafNodeIndexError('Invalid leaf node index', e.label, e.code),
       },
       [BackendErrorLabel.INVALID_OPERATION]: {
         'invalid operation for 1:1 conversations': e =>

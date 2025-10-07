@@ -86,3 +86,27 @@ export class ConversationFullError extends ConversationError {
     this.name = 'ConversationFullError';
   }
 }
+
+export class MLSInvalidLeafNodeSignatureError extends ConversationError {
+  constructor(
+    message: string,
+    label: BackendErrorLabel = BackendErrorLabel.MLS_INVALID_LEAF_NODE_SIGNATURE,
+    code: StatusCode = StatusCode.BAD_REQUEST,
+  ) {
+    super(message, label, code);
+    Object.setPrototypeOf(this, new.target.prototype);
+    this.name = 'MLSInvalidLeafNodeSignatureError';
+  }
+}
+
+export class MLSInvalidLeafNodeIndexError extends ConversationError {
+  constructor(
+    message: string,
+    label: BackendErrorLabel = BackendErrorLabel.MLS_INVALID_LEAF_NODE_INDEX,
+    code: StatusCode = StatusCode.BAD_REQUEST,
+  ) {
+    super(message, label, code);
+    Object.setPrototypeOf(this, new.target.prototype);
+    this.name = 'MLSInvalidLeafNodeIndexError';
+  }
+}

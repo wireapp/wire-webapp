@@ -305,6 +305,40 @@ export class ConversationService extends TypedEventEmitter<Events> {
   }
 
   /**
+   * Centralized handler for scenarios where an MLS conversation is detected as broken.
+   * It resets the conversation and then invokes the provided callback so callers can retry
+   * their original operation (e.g., re-adding/removing users, re-joining, etc.) with the new group id.
+   *
+   * Contract:
+   * - input: conversationId to reset; callback invoked after reset with the new group id
+   * - output: the value returned by the callback
+   * - error: throws if reset fails or new group id is missing
+   */
+  private async handleBrokenMLSConversation<T>(
+    conversationId: QualifiedId,
+    afterReset: (newGroupId: string) => Promise<T>,
+  ): Promise<T>;
+  private async handleBrokenMLSConversation(conversationId: QualifiedId): Promise<undefined>;
+  private async handleBrokenMLSConversation<T>(
+    conversationId: QualifiedId,
+    afterReset?: (newGroupId: string) => Promise<T>,
+  ): Promise<T | undefined> {
+    const {
+      conversation: {group_id: newGroupId},
+    } = await this.resetMLSConversation(conversationId);
+    if (!newGroupId) {
+      const errorMessage = 'Tried to reset MLS conversation but no group_id found in response';
+      this.logger.error(errorMessage, {conversationId});
+      throw new Error(errorMessage);
+    }
+    if (afterReset) {
+      return afterReset(newGroupId);
+    }
+
+    return undefined;
+  }
+
+  /**
    * Will create a conversation on backend and register it to CoreCrypto once created
    * @param conversationData
    */
@@ -336,7 +370,15 @@ export class ConversationService extends TypedEventEmitter<Events> {
     const groupIdBytes = Decoder.fromBase64(groupId).asBytes;
 
     // immediately execute pending commits before sending the message
-    await this.mlsService.commitPendingProposals(groupId);
+    await this.mlsService.commitPendingProposals(groupId, true, params).catch(async error => {
+      if (MLSService.isBrokenMLSConversationError(error)) {
+        this.logger.info('Failed to execute pending proposals because broken MLS conversation, triggering a reset', {
+          error,
+          groupId,
+        });
+        await this.handleBrokenMLSConversation(conversationId);
+      }
+    });
 
     const encrypted = await this.mlsService.encryptMessage(
       new ConversationId(groupIdBytes),
@@ -388,50 +430,169 @@ export class ConversationService extends TypedEventEmitter<Events> {
     qualifiedUsers,
     groupId,
     conversationId,
-  }: Required<AddUsersParams>): Promise<BaseCreateConversationResponse> {
-    const exisitingClientIdsInGroup = await this.mlsService.getClientIdsInGroup(groupId);
-    const conversation = await this.getConversation(conversationId);
+    shouldRetry = true,
+  }: Required<AddUsersParams> & {shouldRetry?: boolean}): Promise<BaseCreateConversationResponse> {
+    try {
+      const exisitingClientIdsInGroup = await this.mlsService.getClientIdsInGroup(groupId);
+      const conversation = await this.getConversation(conversationId);
 
-    const {keyPackages, failures: keysClaimingFailures} = await this.mlsService.getKeyPackagesPayload(
-      qualifiedUsers,
-      exisitingClientIdsInGroup,
-    );
+      const {keyPackages, failures: keysClaimingFailures} = await this.mlsService.getKeyPackagesPayload(
+        qualifiedUsers,
+        exisitingClientIdsInGroup,
+      );
 
-    // We had cases where did not get any key packages, but still used core-crypto to call the backend (which results in failure).
-    if (keyPackages && keyPackages.length > 0) {
-      await this.mlsService.addUsersToExistingConversation(groupId, keyPackages);
+      // We had cases where did not get any key packages, but still used core-crypto to call the backend (which results in failure).
+      if (keyPackages && keyPackages.length > 0) {
+        await this.mlsService.addUsersToExistingConversation(groupId, keyPackages);
 
-      //We store the info when user was added (and key material was created), so we will know when to renew it
-      await this.mlsService.resetKeyMaterialRenewal(groupId);
+        //We store the info when user was added (and key material was created), so we will know when to renew it
+        await this.mlsService.resetKeyMaterialRenewal(groupId);
+      }
+
+      return {
+        conversation,
+        failedToAdd: keysClaimingFailures,
+      };
+    } catch (error) {
+      if (MLSService.isBrokenMLSConversationError(error)) {
+        if (!shouldRetry) {
+          this.logger.warn("Tried to add users to MLS conversation but it's still broken after reset", error);
+          throw error;
+        }
+        this.logger.warn("Tried to add users to MLS conversation but it's broken, resetting the conversation", error);
+        return this.handleBrokenMLSConversation(conversationId, newGroupId =>
+          this.addUsersToMLSConversation({qualifiedUsers, groupId: newGroupId, conversationId, shouldRetry: false}),
+        );
+      }
+      throw error;
     }
-
-    return {
-      conversation,
-      failedToAdd: keysClaimingFailures,
-    };
   }
 
   public async removeUsersFromMLSConversation({
     groupId,
     conversationId,
     qualifiedUserIds,
-  }: RemoveUsersParams): Promise<Conversation> {
-    const clientsToRemove = await this.apiClient.api.user.postListClients({qualified_users: qualifiedUserIds});
+    shouldRetry = true,
+  }: RemoveUsersParams & {shouldRetry?: boolean}): Promise<Conversation> {
+    try {
+      const clientsToRemove = await this.apiClient.api.user.postListClients({qualified_users: qualifiedUserIds});
 
-    const fullyQualifiedClientIds = mapQualifiedUserClientIdsToFullyQualifiedClientIds(
-      clientsToRemove.qualified_user_map,
-    );
+      const fullyQualifiedClientIds = mapQualifiedUserClientIdsToFullyQualifiedClientIds(
+        clientsToRemove.qualified_user_map,
+      );
 
-    await this.mlsService.removeClientsFromConversation(groupId, fullyQualifiedClientIds);
+      await this.mlsService.removeClientsFromConversation(groupId, fullyQualifiedClientIds);
 
-    //key material gets updated after removing a user from the group, so we can reset last key update time value in the store
-    await this.mlsService.resetKeyMaterialRenewal(groupId);
+      // key material gets updated after removing a user from the group, so we can reset last key update time value in the store
+      await this.mlsService.resetKeyMaterialRenewal(groupId);
 
-    return await this.getConversation(conversationId);
+      return await this.getConversation(conversationId);
+    } catch (error) {
+      if (MLSService.isBrokenMLSConversationError(error)) {
+        if (!shouldRetry) {
+          this.logger.warn("Tried to remove users from MLS conversation but it's still broken after reset", error);
+          throw error;
+        }
+        this.logger.info(
+          "Tried to remove users from MLS conversation but it's broken, resetting the conversation",
+          error,
+        );
+        return this.handleBrokenMLSConversation(conversationId, newGroupId =>
+          this.removeUsersFromMLSConversation({
+            groupId: newGroupId,
+            conversationId,
+            qualifiedUserIds,
+            shouldRetry: false,
+          }),
+        );
+      }
+
+      throw error;
+    }
   }
 
-  public async joinByExternalCommit(conversationId: QualifiedId) {
-    return this.mlsService.joinByExternalCommit(() => this.apiClient.api.conversation.getGroupInfo(conversationId));
+  public async joinByExternalCommit(conversationId: QualifiedId, shouldRetry = true): Promise<void> {
+    try {
+      await this.mlsService.joinByExternalCommit(() => this.apiClient.api.conversation.getGroupInfo(conversationId));
+    } catch (error) {
+      if (MLSService.isBrokenMLSConversationError(error)) {
+        this.logger.info(
+          "Failed to join MLS conversation via external commit because it's broken, resetting the conversation",
+          error,
+        );
+        if (!shouldRetry) {
+          this.logger.warn("Tried to join MLS conversation but it's still broken after reset", error);
+          throw error;
+        }
+        return this.handleBrokenMLSConversation(conversationId);
+      }
+      throw error;
+    }
+  }
+
+  private async resetMLSConversation(conversationId: QualifiedId): Promise<BaseCreateConversationResponse> {
+    this.logger.info(`Resetting MLS conversation with id ${conversationId.id}`);
+
+    // STEP 1: Fetch the conversation to retrieve the group ID & epoch
+    const conversation = await this.apiClient.api.conversation.getConversation(conversationId);
+    const {group_id: groupId, epoch} = conversation;
+
+    if (!groupId || !epoch) {
+      const errorMessage = 'Could not find group id or epoch for the conversation';
+      this.logger.error(errorMessage, {conversationId});
+      throw new Error(errorMessage);
+    }
+
+    // STEP 2: Request backend to reset the conversation
+    this.logger.info(`Requesting backend to reset the conversation (group_id: ${groupId}, epoch: ${String(epoch)})`);
+    await this.apiClient.api.conversation.resetMLSConversation({
+      epoch,
+      groupId,
+    });
+
+    // STEP 3: fetch self user info
+    this.logger.info(
+      `Re-establishing the conversation by re-adding all members (conversation_id: ${conversationId.id})`,
+    );
+    const {validatedClientId: clientId, userId, domain} = this.apiClient;
+
+    if (!userId || !domain) {
+      const errorMessage = 'Could not find userId or domain of the self user';
+      this.logger.error(errorMessage, {conversationId});
+      throw new Error(errorMessage);
+    }
+
+    const selfUserQualifiedId = {id: userId, domain};
+
+    // STEP 4: Fetch the updated conversation data from backend to retrieve the new group ID
+    const updatedConversation = await this.apiClient.api.conversation.getConversation(conversationId);
+    const {group_id: newGroupId, members} = updatedConversation;
+
+    this.logger.info(`MLS conversation new group ID fetched from backend ${conversationId.id}`, {
+      newGroupId,
+    });
+
+    if (!newGroupId || !clientId) {
+      throw new Error(`Failed to recover MLS conversation: missing groupId (${newGroupId}), or clientId (${clientId})`);
+    }
+
+    const usersToReAdd = members.others.map(member => member.qualified_id).filter(userId => !!userId);
+
+    // STEP 5: Re-establish the conversation by re-adding all members
+    return await this.establishMLSGroupConversation(
+      newGroupId,
+      usersToReAdd,
+      selfUserQualifiedId,
+      clientId,
+      conversationId,
+    ).then(result => {
+      this.logger.info(`Successfully reset MLS conversation`, {
+        conversationId: conversationId.id,
+        oldGroupId: groupId,
+        newGroupId,
+      });
+      return result;
+    });
   }
 
   /**
@@ -658,30 +819,36 @@ export class ConversationService extends TypedEventEmitter<Events> {
     selfUserId: QualifiedId;
     qualifiedUsers: QualifiedId[];
   }): Promise<void> {
-    const wasGroupEstablishedBySelfClient = await this.mlsService.tryEstablishingMLSGroup(groupId);
+    try {
+      const wasGroupEstablishedBySelfClient = await this.mlsService.tryEstablishingMLSGroup(groupId);
 
-    if (!wasGroupEstablishedBySelfClient) {
-      this.logger.debug('Group was not established by self client, skipping adding users to the group.');
-      return;
-    }
+      if (!wasGroupEstablishedBySelfClient) {
+        this.logger.debug('Group was not established by self client, skipping adding users to the group.');
+        return;
+      }
 
-    this.logger.debug('Group was established by self client, adding other users to the group...');
-    const usersToAdd: KeyPackageClaimUser[] = [
-      ...qualifiedUsers,
-      {...selfUserId, skipOwnClientId: this.apiClient.validatedClientId},
-    ];
+      this.logger.debug('Group was established by self client, adding other users to the group...');
 
-    const {conversation} = await this.addUsersToMLSConversation({
-      conversationId,
-      groupId,
-      qualifiedUsers: usersToAdd,
-    });
+      const usersToAdd: KeyPackageClaimUser[] = [
+        ...qualifiedUsers,
+        {...selfUserId, skipOwnClientId: this.apiClient.validatedClientId},
+      ];
 
-    const addedUsers = conversation.members.others;
-    if (addedUsers.length > 0) {
-      this.logger.debug(`Successfully added ${addedUsers} users to the group.`);
-    } else {
-      this.logger.debug('No other users were added to the group.');
+      const {conversation} = await this.addUsersToMLSConversation({
+        conversationId,
+        groupId,
+        qualifiedUsers: usersToAdd,
+      });
+
+      const addedUsers = conversation.members.others;
+      if (addedUsers.length > 0) {
+        this.logger.debug(`Successfully added ${addedUsers} users to the group.`);
+      } else {
+        this.logger.debug('No other users were added to the group.');
+      }
+    } catch (error) {
+      this.logger.error('Failed to establish MLS group', error);
+      throw error;
     }
   }
 
@@ -698,7 +865,7 @@ export class ConversationService extends TypedEventEmitter<Events> {
           throw new Error('Qualified conversation id is missing in the event');
         }
 
-        queueConversationRejoin(conversationId.id, () =>
+        void queueConversationRejoin(conversationId.id, () =>
           this.recoverMLSGroupFromEpochMismatch(conversationId, subconv),
         );
         return null;

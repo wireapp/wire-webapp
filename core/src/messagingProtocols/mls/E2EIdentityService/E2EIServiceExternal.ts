@@ -44,7 +44,7 @@ import {StringifiedQualifiedId, stringifyQualifiedId} from '../../../util/qualif
 import {RecurringTaskScheduler} from '../../../util/RecurringTaskScheduler';
 import {MLSService, MLSServiceEvents} from '../MLSService';
 
-export type DeviceIdentity = Omit<WireIdentity, 'free' | 'status'> & {
+export type DeviceIdentity = Omit<WireIdentity, 'free' | 'status' | typeof Symbol.dispose> & {
   status?: DeviceStatus;
   deviceId: string;
   qualifiedUserId: QualifiedId;
