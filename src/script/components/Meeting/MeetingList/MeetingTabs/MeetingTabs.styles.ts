@@ -19,13 +19,29 @@
 
 import {CSSObject} from '@emotion/react';
 
-export const meetingListContainerStyles: CSSObject = {
-  marginTop: '24px',
-  width: '650px',
-  display: 'grid',
-  paddingLeft: 'auto',
+export const tabsWrapperStyles: CSSObject = {
+  display: 'flex',
+  alignItems: 'center',
+  gap: 24,
+  height: 46,
+  margin: '0 16px',
+  borderBottom: '1px solid var(--border-color)',
 };
 
-export const showAllButtonStyles: CSSObject = {
-  padding: '16px',
-};
+export const tabStyles = (active: boolean): CSSObject => ({
+  position: 'relative',
+  padding: '12px 16px',
+  color: active ? 'var(--main-color)' : 'var(--secondary-text-color)',
+  fontWeight: 'var(--font-weight-semibold)',
+  cursor: 'pointer',
+  userSelect: 'none',
+  ':after': {
+    content: '""',
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    bottom: -1,
+    height: 2,
+    background: active ? 'var(--main-color)' : 'transparent',
+  },
+});
