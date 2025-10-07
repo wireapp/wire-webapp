@@ -37,15 +37,15 @@ const groupedButtonStyle: <T>(theme: Theme, props: ButtonProps<T>) => CSSObject 
   cursor: 'pointer',
   display: 'flex',
   alignItems: 'center',
-  '&:not(:last-child)': {
+  '&:not(:last-of-type)': {
     borderTopRightRadius: '0',
     borderBottomRightRadius: '0',
   },
-  '&:not(:first-child)': {
+  '&:not(:first-of-type)': {
     borderTopLeftRadius: '0',
     borderBottomLeftRadius: '0',
   },
-  '&:first-child:last-child': {
+  '&:first-of-type:last-of-type': {
     borderRadius: '0',
   },
   ...buttonStyle(theme, props),
