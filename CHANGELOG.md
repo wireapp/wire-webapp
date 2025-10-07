@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [46.38.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@46.37.1...@wireapp/core@46.38.0) (2025-10-07)
+
+### Features
+
+* Initiate reset of broken MLS conversations [WPB-19701] ([#7405](https://github.com/wireapp/wire-web-packages/issues/7405)) ([71a34d8](https://github.com/wireapp/wire-web-packages/commit/71a34d87f084f3c14ce5a1ea247d3180635082cd))
+
 ## [46.37.1](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@46.37.0...@wireapp/core@46.37.1) (2025-10-06)
 
 **Note:** Version bump only for package @wireapp/core
