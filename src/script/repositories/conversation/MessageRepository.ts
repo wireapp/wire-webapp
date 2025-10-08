@@ -920,6 +920,13 @@ export class MessageRepository {
     }
 
     try {
+      if (isMLSConversation(conversation)) {
+        await this.conversationRepositoryProvider().ensureConversationExists({
+          conversationId: conversation.qualifiedId,
+          groupId: conversation.groupId,
+          epoch: conversation.epoch,
+        });
+      }
       const result = await this.conversationService.send(sendOptions);
 
       if (result.state === MessageSendingState.OUTGOING_SENT) {

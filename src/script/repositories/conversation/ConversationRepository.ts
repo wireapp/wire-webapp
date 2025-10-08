@@ -58,6 +58,7 @@ import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 import {container} from 'tsyringe';
 import {flatten} from 'underscore';
 
+import {Account} from '@wireapp/core';
 import {Asset as ProtobufAsset, Confirmation, LegalHoldStatus} from '@wireapp/protocol-messaging';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
@@ -2170,6 +2171,70 @@ export class ConversationRepository {
   };
 
   /**
+   * Ensures that a conversation exists by checking its group ID and conversation ID.
+   * If the conversation does not exist, it will try to establish it or join it by external commit.
+   *
+   * @param param0 conversationId and groupId
+   * @returns void
+   */
+  public ensureConversationExists = async ({
+    conversationId,
+    groupId,
+    epoch,
+    core = this.core,
+  }: {
+    conversationId: QualifiedId;
+    groupId: string;
+    epoch: number;
+    core?: Account;
+  }): Promise<void> => {
+    this.logger.info('Ensuring conversation exists', {conversationId, groupId, epoch});
+    console.info('Ensuring conversation exists', {conversationId, groupId, epoch});
+    if (await this.conversationService.mlsGroupExistsLocally(groupId)) {
+      this.logger.info('Conversation already exists locally', {conversationId, groupId, epoch});
+      console.info('Conversation already exists locally', {conversationId, groupId, epoch});
+      return;
+    }
+
+    // establish the conversation if epoch is 0
+    if (epoch === 0) {
+      this.logger.info('Establishing conversation', {conversationId, groupId, epoch});
+      console.info('Establishing conversation', {conversationId, groupId, epoch});
+      const selfUser = this.userState.self();
+      const conversation = this.conversationState.findConversation(conversationId);
+
+      if (!selfUser || !conversation) {
+        this.logger.error('Self user or conversation is not available!', {selfUser, conversation});
+        throw new Error('Self user or conversation is not available!');
+      }
+
+      const selfUserClientId = selfUser.localClient?.id;
+      if (!selfUserClientId) {
+        this.logger.error('Self user client id is not available!', {selfUserClientId});
+        throw new Error('Self user client id is not available!');
+      }
+
+      const members = conversation.participating_user_ids();
+      await core.service?.conversation?.establishMLSGroupConversation(
+        groupId,
+        members,
+        selfUser.qualifiedId,
+        selfUserClientId,
+        conversationId,
+      );
+      return;
+    }
+
+    // join by external commit
+    this.logger.info('Joining conversation by external commit', {conversationId, epoch});
+    console.info('Joining conversation by external commit', {conversationId, epoch});
+    if (epoch && epoch > 0) {
+      console.info('calling core', {core: this.core});
+      await this.core.service?.conversation?.joinByExternalCommit(conversationId);
+    }
+  };
+
+  /**
    * will locally delete conversations that no longer exist on backend side
    */
   async syncDeletedConversations() {
@@ -3756,7 +3821,7 @@ export class ConversationRepository {
 
       // If the group is not established yet, we need to establish it
       if (!isAlreadyEstablished) {
-        await initMLSGroupConversation(conversationEntity, selfUser.qualifiedId, {core: this.core});
+        await initMLSGroupConversation(conversationEntity, this, {core: this.core});
       }
     }
 
