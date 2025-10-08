@@ -207,7 +207,7 @@ export class APIClient extends EventEmitter {
   private configureApis(backendFeatures: BackendFeatures): Apis {
     this.logger.info('configuring APIs with config', backendFeatures);
 
-    const assetAPI = new AssetAPI(this.transport.http);
+    const assetAPI = new AssetAPI(this.transport.http, backendFeatures);
 
     // Prevents the CellsAPI from being initialized multiple times
     if (!this.cellsApi) {
