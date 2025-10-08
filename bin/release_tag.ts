@@ -80,9 +80,10 @@ if (commitId) {
 
   if (stage === DeploymentStage.PRODUCTION || stage === DeploymentStage.STAGING) {
     // If we're releasing to production, we need to ensure the commitId is part of the master branch.
-    const commitBranch = exec(`git branch --contains ${commitId}`)
+    const commitBranch = exec(`git branch --contains ${commitId} --format="%(refname:short)"`)
       .split('\n')
       .map(branch => branch.trim());
+    console.info(commitBranch);
     if (!commitBranch.includes(branch)) {
       logger.error(`Commit ID "${commitId}" is not part of the ${branch} branch. Aborting.`);
       process.exit(1);
