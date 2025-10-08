@@ -76,7 +76,7 @@ export const FileAssetWithPreview = ({
         <FileCard.Icon type={isError ? 'unavailable' : 'file'} />
         {!isError && <FileCard.Type />}
         <FileCard.Name variant={isError ? 'secondary' : 'primary'} />
-        <FileAssetOptions src={src} name={name} extension={extension} onOpen={() => setIsOpen(true)} />
+        {!isError && <FileAssetOptions src={src} name={name} extension={extension} onOpen={() => setIsOpen(true)} />}
       </FileCard.Header>
       <FileCard.Content>
         <button
@@ -86,6 +86,7 @@ export const FileAssetWithPreview = ({
           aria-controls={id}
           aria-haspopup="dialog"
           aria-expanded={isOpen}
+          disabled={isError}
         >
           <img
             src={imagePreviewUrl}
@@ -101,7 +102,9 @@ export const FileAssetWithPreview = ({
               {shouldDisplayPreviewError && (
                 <>
                   <AlertIcon css={errorIconStyles} width={14} height={14} />
-                  <p css={errorTextStyles}>{t('cells.unavailableFilePreview')}</p>
+                  <p css={errorTextStyles}>
+                    {isError ? t('cells.unavailableFile') : t('cells.unavailableFilePreview')}
+                  </p>
                 </>
               )}
             </div>

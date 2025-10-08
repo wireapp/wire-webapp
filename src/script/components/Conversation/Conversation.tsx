@@ -475,15 +475,16 @@ export const Conversation = ({
 
   const isFileTabActive = activeTabIndex === 1;
 
+  const isCellsEnabled =
+    Config.getConfig().FEATURE.ENABLE_CELLS && activeConversation?.cellsState() !== CONVERSATION_CELLS_STATE.DISABLED;
+
   const {getRootProps, getInputProps, openAllFilesView, openImageFilesView, isDragAccept} = useFilesUploadDropzone({
     isTeam: inTeam,
     cellsRepository: repositories.cells,
     conversation: activeConversation,
+    isCellsEnabled: isCellsEnabled,
     isDisabled: isFileTabActive,
   });
-
-  const isCellsEnabled =
-    Config.getConfig().FEATURE.ENABLE_CELLS && activeConversation?.cellsState() !== CONVERSATION_CELLS_STATE.DISABLED;
 
   return (
     <ConversationFileDropzone
