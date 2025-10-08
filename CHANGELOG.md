@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [27.77.1](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@27.77.0...@wireapp/api-client@27.77.1) (2025-10-08)
+
+### Reverts
+
+* Revert "feat: update AssetAPI [WPB-20663] (#7406)" (#7434) ([6c925b8](https://github.com/wireapp/wire-web-packages/commit/6c925b82ac99e704040748b8683931c4e117396a)), closes [#7406](https://github.com/wireapp/wire-web-packages/issues/7406) [#7434](https://github.com/wireapp/wire-web-packages/issues/7434)
+
 # [27.77.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@27.76.1...@wireapp/api-client@27.77.0) (2025-10-07)
 
 ### Features
