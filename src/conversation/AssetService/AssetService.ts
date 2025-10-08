@@ -25,13 +25,36 @@ import {APIClient} from '@wireapp/api-client';
 import {EncryptedAsset, EncryptedAssetUploaded} from '../../cryptography';
 import {decryptAsset, encryptAsset} from '../../cryptography/AssetCryptography/AssetCryptography';
 
-export {ProgressCallback};
-export type AssetUrlData = {
+interface AssetDataV4 {
   assetKey: string;
   assetToken: string;
   assetDomain: string;
   forceCaching: boolean;
-};
+  version: 4;
+}
+interface AssetDataV3 {
+  assetKey: string;
+  assetToken: string;
+  forceCaching: boolean;
+  version: 3;
+}
+
+interface AssetDataV2 {
+  assetId: string;
+  conversationId: string;
+  forceCaching: boolean;
+  version: 2;
+}
+
+interface AssetDataV1 {
+  assetId: string;
+  conversationId: string;
+  forceCaching: boolean;
+  version: 1;
+}
+
+export {ProgressCallback};
+export type AssetUrlData = AssetDataV1 | AssetDataV2 | AssetDataV3 | AssetDataV4;
 
 export class AssetService {
   constructor(private readonly apiClient: APIClient) {}
@@ -45,13 +68,39 @@ export class AssetService {
    * @return Resolves when the asset has been uploaded
    */
   public downloadRawAsset(assetData: AssetUrlData, progressCallback?: ProgressCallback) {
-    return this.apiClient.api.asset.getAsset(
-      assetData.assetKey,
-      assetData.assetDomain,
-      assetData.assetToken,
-      assetData.forceCaching,
-      progressCallback,
-    );
+    const {forceCaching} = assetData;
+
+    switch (assetData.version) {
+      case 1:
+        return this.apiClient.api.asset.getAssetV1(
+          assetData.assetId,
+          assetData.conversationId,
+          forceCaching,
+          progressCallback,
+        );
+      case 2:
+        return this.apiClient.api.asset.getAssetV2(
+          assetData.assetId,
+          assetData.conversationId,
+          forceCaching,
+          progressCallback,
+        );
+      case 3:
+        return this.apiClient.api.asset.getAssetV3(
+          assetData.assetKey,
+          assetData.assetToken,
+          forceCaching,
+          progressCallback,
+        );
+      case 4:
+        return this.apiClient.api.asset.getAssetV4(
+          assetData.assetKey,
+          assetData.assetDomain,
+          assetData.assetToken,
+          forceCaching,
+          progressCallback,
+        );
+    }
   }
 
   /**
