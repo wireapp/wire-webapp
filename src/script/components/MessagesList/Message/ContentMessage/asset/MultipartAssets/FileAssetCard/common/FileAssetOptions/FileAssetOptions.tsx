@@ -20,7 +20,7 @@
 import {DropdownMenu, MoreIcon} from '@wireapp/react-ui-kit';
 
 import {t} from 'Util/LocalizerUtil';
-import {forcedDownloadFile} from 'Util/util';
+import {forcedDownloadFile, getFileNameWithExtension} from 'Util/util';
 
 import {buttonStyles, iconStyles} from './FileAssetOptions.styles';
 
@@ -32,6 +32,8 @@ interface FileAssetOptionsProps {
 }
 
 export const FileAssetOptions = ({onOpen, src, name, extension}: FileAssetOptionsProps) => {
+  const fileNameWithExtension = getFileNameWithExtension(name, extension);
+
   return (
     <DropdownMenu>
       <DropdownMenu.Trigger asChild>
@@ -41,12 +43,11 @@ export const FileAssetOptions = ({onOpen, src, name, extension}: FileAssetOption
       </DropdownMenu.Trigger>
       <DropdownMenu.Content>
         <DropdownMenu.Item onClick={onOpen}>{t('cells.options.open')}</DropdownMenu.Item>
-        <DropdownMenu.Item
-          onClick={() => forcedDownloadFile({url: src || '', name: `${name}.${extension}`})}
-          aria-label={t('cells.options.download')}
-        >
-          {t('cells.options.download')}
-        </DropdownMenu.Item>
+        {!!src && (
+          <DropdownMenu.Item onClick={() => forcedDownloadFile({url: src, name: fileNameWithExtension})}>
+            {t('cells.options.download')}
+          </DropdownMenu.Item>
+        )}
       </DropdownMenu.Content>
     </DropdownMenu>
   );

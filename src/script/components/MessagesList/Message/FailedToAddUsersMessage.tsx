@@ -17,7 +17,7 @@
  *
  */
 
-import React, {useMemo, useState} from 'react';
+import {useMemo, useState} from 'react';
 
 import {AddUsersFailure, AddUsersFailureReasons} from '@wireapp/core/lib/conversation';
 import {container} from 'tsyringe';
@@ -38,7 +38,7 @@ import {backendErrorLink, warning} from './ContentMessage/Warnings/Warnings.styl
 import {MessageTime} from './MessageTime';
 import {useMessageFocusedTabIndex} from './util';
 
-export interface FailedToAddUsersMessageProps {
+interface FailedToAddUsersMessageProps {
   isMessageFocused: boolean;
   message: FailedToAddUsersMessageEntity;
   userState?: UserState;
@@ -166,11 +166,11 @@ const MessageDetails = ({failure, isMessageFocused, allUsers}: MessageDetailsPro
   );
 };
 
-const FailedToAddUsersMessage: React.FC<FailedToAddUsersMessageProps> = ({
+const FailedToAddUsersMessage = ({
   isMessageFocused,
   message,
   userState = container.resolve(UserState),
-}) => {
+}: FailedToAddUsersMessageProps) => {
   const messageFocusedTabIndex = useMessageFocusedTabIndex(isMessageFocused);
 
   const [isOpen, setIsOpen] = useState(false);

@@ -25,6 +25,7 @@ import {CALL_TYPE, CONV_TYPE, STATE as CALL_STATE} from '@wireapp/avs';
 import {Conversation} from 'Repositories/entity/Conversation';
 import {CanvasMediaStreamMixer} from 'Repositories/media/CanvasMediaStreamMixer';
 import type {MediaDevicesHandler} from 'Repositories/media/MediaDevicesHandler';
+import {mediaDevicesStore} from 'Repositories/media/useMediaDevicesStore';
 import {chunk, getDifference, partition} from 'Util/ArrayUtil';
 import {matchQualifiedIds} from 'Util/QualifiedId';
 import {sortUsersByPriority} from 'Util/StringUtil';
@@ -79,7 +80,6 @@ export class Call {
    * Maximum number of people joined in a call (used for analytics)
    */
   public analyticsMaximumParticipants: number = 0;
-  activeAudioOutput: string;
   public readonly canvasMixer: CanvasMediaStreamMixer;
 
   constructor(
@@ -88,6 +88,7 @@ export class Call {
     public readonly conversationType: CONV_TYPE,
     private readonly selfParticipant: Participant,
     callType: CALL_TYPE,
+    // @ts-ignore
     private readonly mediaDevicesHandler: MediaDevicesHandler,
     isMuted: boolean = false,
   ) {
@@ -100,12 +101,6 @@ export class Call {
         .sort((p1, p2) => p1.handRaisedAt()! - p2.handRaisedAt()!),
     );
     this.canvasMixer = new CanvasMediaStreamMixer();
-
-    this.activeAudioOutput = this.mediaDevicesHandler.currentAvailableDeviceId.audiooutput();
-    this.mediaDevicesHandler.currentAvailableDeviceId.audiooutput.subscribe((newActiveAudioOutput: string) => {
-      this.activeAudioOutput = newActiveAudioOutput;
-      this.updateAudioStreamsSink();
-    });
     this.maximizedParticipant = ko.observable(null);
     this.muteState(isMuted ? MuteState.SELF_MUTED : MuteState.NOT_MUTED);
     this.isConference = [CONV_TYPE.CONFERENCE, CONV_TYPE.CONFERENCE_MLS].includes(this.conversationType);
@@ -172,11 +167,14 @@ export class Call {
   }
 
   updateAudioStreamsSink() {
-    if (this.activeAudioOutput) {
-      Object.values(this.audios).forEach(audio => {
-        audio.audioElement?.setSinkId?.(this.activeAudioOutput).catch(console.warn);
-      });
+    const outputDeviceId = mediaDevicesStore.getState().audio.output.selectedId;
+    if (!outputDeviceId) {
+      return;
     }
+
+    Object.values(this.audios).forEach(audio => {
+      audio.audioElement?.setSinkId?.(outputDeviceId).catch(console.warn);
+    });
   }
 
   setActiveSpeakers(audioLevels: ActiveSpeaker[]): void {

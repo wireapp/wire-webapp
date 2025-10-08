@@ -58,6 +58,7 @@ import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 import {container} from 'tsyringe';
 import {flatten} from 'underscore';
 
+import {Account} from '@wireapp/core';
 import {Asset as ProtobufAsset, Confirmation, LegalHoldStatus} from '@wireapp/protocol-messaging';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
@@ -143,6 +144,7 @@ import {
 import {
   AssetAddEvent,
   ButtonActionConfirmationEvent,
+  ButtonActionEvent,
   ClientConversationEvent,
   DeleteEvent,
   EventBuilder,
@@ -592,7 +594,7 @@ export class ConversationRepository {
   /**
    * Get a conversation from the backend.
    */
-  public async fetchConversationById({id: conversationId, domain}: QualifiedId): Promise<Conversation> {
+  private async fetchConversationById({id: conversationId, domain}: QualifiedId): Promise<Conversation> {
     const qualifiedId = {domain, id: conversationId};
     const fetching_conversations: Record<string, FetchPromise[]> = {};
     if (fetching_conversations.hasOwnProperty(conversationId)) {
@@ -627,6 +629,19 @@ export class ConversationRepository {
       throw error;
     }
   }
+
+  /**
+   * Get a conversation from the backend without updating local storage
+   * @param qualifiedId qualified id of the conversation to fetch
+   * @returns the fetched backend conversation entity
+   */
+  public fetchBackendConversationEntityById = async (qualifiedId: QualifiedId): Promise<BackendConversation> => {
+    const backendConversationEntity = await this.conversationService.getConversationById(qualifiedId).catch(error => {
+      this.logger.error(`Failed to get conversation from backend: ${error.message}`);
+      throw error;
+    });
+    return backendConversationEntity;
+  };
 
   /**
    * Will load all the conversations in memory
@@ -2156,6 +2171,70 @@ export class ConversationRepository {
   };
 
   /**
+   * Ensures that a conversation exists by checking its group ID and conversation ID.
+   * If the conversation does not exist, it will try to establish it or join it by external commit.
+   *
+   * @param param0 conversationId and groupId
+   * @returns void
+   */
+  public ensureConversationExists = async ({
+    conversationId,
+    groupId,
+    epoch,
+    core = this.core,
+  }: {
+    conversationId: QualifiedId;
+    groupId: string;
+    epoch: number;
+    core?: Account;
+  }): Promise<void> => {
+    this.logger.info('Ensuring conversation exists', {conversationId, groupId, epoch});
+    console.info('Ensuring conversation exists', {conversationId, groupId, epoch});
+    if (await this.conversationService.mlsGroupExistsLocally(groupId)) {
+      this.logger.info('Conversation already exists locally', {conversationId, groupId, epoch});
+      console.info('Conversation already exists locally', {conversationId, groupId, epoch});
+      return;
+    }
+
+    // establish the conversation if epoch is 0
+    if (epoch === 0) {
+      this.logger.info('Establishing conversation', {conversationId, groupId, epoch});
+      console.info('Establishing conversation', {conversationId, groupId, epoch});
+      const selfUser = this.userState.self();
+      const conversation = this.conversationState.findConversation(conversationId);
+
+      if (!selfUser || !conversation) {
+        this.logger.error('Self user or conversation is not available!', {selfUser, conversation});
+        throw new Error('Self user or conversation is not available!');
+      }
+
+      const selfUserClientId = selfUser.localClient?.id;
+      if (!selfUserClientId) {
+        this.logger.error('Self user client id is not available!', {selfUserClientId});
+        throw new Error('Self user client id is not available!');
+      }
+
+      const members = conversation.participating_user_ids();
+      await core.service?.conversation?.establishMLSGroupConversation(
+        groupId,
+        members,
+        selfUser.qualifiedId,
+        selfUserClientId,
+        conversationId,
+      );
+      return;
+    }
+
+    // join by external commit
+    this.logger.info('Joining conversation by external commit', {conversationId, epoch});
+    console.info('Joining conversation by external commit', {conversationId, epoch});
+    if (epoch && epoch > 0) {
+      console.info('calling core', {core: this.core});
+      await this.core.service?.conversation?.joinByExternalCommit(conversationId);
+    }
+  };
+
+  /**
    * will locally delete conversations that no longer exist on backend side
    */
   async syncDeletedConversations() {
@@ -2905,8 +2984,8 @@ export class ConversationRepository {
     isoDate = this.serverTimeHandler.toServerTimestamp(),
   ) => {
     const userEntity = await this.userRepository.getUserById(userId);
-    const eventInjections = this.conversationState
-      .conversations()
+    const allConversations = this.conversationState.conversations();
+    const eventInjections = allConversations
       .filter(conversation => {
         const conversationInTeam = conversation.teamId === teamId;
         const userIsParticipant = UserFilter.isParticipant(conversation, userId);
@@ -2915,10 +2994,14 @@ export class ConversationRepository {
       .map(async conversation => {
         const leaveEvent = EventBuilder.buildTeamMemberLeave(conversation, userEntity, isoDate);
         await this.eventRepository.injectEvent(leaveEvent);
-        await this.clearUsersFromConversation(conversation, [userEntity]);
       });
-    userEntity.isDeleted = true;
-    return Promise.all(eventInjections);
+
+    // Clear user from all conversations they participate in
+    const userCleanup = allConversations
+      .filter(conversation => UserFilter.isParticipant(conversation, userId))
+      .map(conversation => this.clearUsersFromConversation(conversation, [userEntity]));
+
+    await Promise.all([...eventInjections, ...userCleanup]);
   };
 
   /**
@@ -3480,6 +3563,9 @@ export class ConversationRepository {
       case CONVERSATION_EVENT.ADD_PERMISSION_UPDATE:
         return this.onAddPermissionChanged(conversationEntity, eventJson);
 
+      case ClientEvent.CONVERSATION.BUTTON_ACTION:
+        return this.onButtonAction(conversationEntity, eventJson);
+
       case ClientEvent.CONVERSATION.BUTTON_ACTION_CONFIRMATION:
         return this.onButtonActionConfirmation(conversationEntity, eventJson);
 
@@ -3735,7 +3821,7 @@ export class ConversationRepository {
 
       // If the group is not established yet, we need to establish it
       if (!isAlreadyEstablished) {
-        await initMLSGroupConversation(conversationEntity, selfUser.qualifiedId, {core: this.core});
+        await initMLSGroupConversation(conversationEntity, this, {core: this.core});
       }
     }
 
@@ -4061,8 +4147,15 @@ export class ConversationRepository {
     }
   }
 
-  private async onButtonActionConfirmation(conversationEntity: Conversation, eventJson: ButtonActionConfirmationEvent) {
-    const {messageId, buttonId} = eventJson.data;
+  /**
+   * Common logic for handling button selections (both actions and confirmations)
+   *
+   * @param conversationEntity Conversation containing the message
+   * @param messageId ID of the message with the button
+   * @param buttonId ID of the button that was selected
+   * @returns Promise that resolves when the button selection has been processed
+   */
+  private async handleButtonSelection(conversationEntity: Conversation, messageId: string, buttonId: string) {
     try {
       const messageEntity = await this.messageRepository.getMessageInConversationById(conversationEntity, messageId);
       if (!messageEntity || !messageEntity.isComposite()) {
@@ -4085,6 +4178,23 @@ export class ConversationRepository {
         throw error;
       }
     }
+  }
+
+  private async onButtonAction(conversationEntity: Conversation, eventJson: ButtonActionEvent) {
+    const {messageId, buttonId} = eventJson.data;
+
+    const shouldSkipSelectionFromOtherUser = conversationEntity.selfUser()?.id !== eventJson.from;
+    if (shouldSkipSelectionFromOtherUser) {
+      this.logger.warn(`Skipping button action from other user in conversation '${conversationEntity.id}'`);
+      return;
+    }
+
+    await this.handleButtonSelection(conversationEntity, messageId, buttonId);
+  }
+
+  private async onButtonActionConfirmation(conversationEntity: Conversation, eventJson: ButtonActionConfirmationEvent) {
+    const {messageId, buttonId} = eventJson.data;
+    await this.handleButtonSelection(conversationEntity, messageId, buttonId);
   }
 
   /**

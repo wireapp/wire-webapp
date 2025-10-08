@@ -88,7 +88,7 @@ const getMLSStatuses = ({identities, user}: {identities?: WireIdentity[]; user?:
   }
 
   return identities.map(identity => {
-    const matchingName = identity.x509Identity?.display_name === user.name();
+    const matchingName = identity.x509Identity?.displayName === user.name();
     const matchingHandle = checkUserHandle(identity, user);
 
     if (!matchingName || !matchingHandle) {

@@ -17,7 +17,7 @@
  *
  */
 
-import {MutableRefObject, useEffect, useLayoutEffect, useMemo, useRef, useState} from 'react';
+import {MutableRefObject, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState} from 'react';
 
 import {useVirtualizer} from '@tanstack/react-virtual';
 import cx from 'classnames';
@@ -29,7 +29,7 @@ import {UploadAssets} from 'Components/MessagesList/UploadAssets';
 import {verticallyCenterMessage} from 'Components/MessagesList/utils/helpers';
 import {filterMessages} from 'Components/MessagesList/utils/messagesFilter';
 import {useLoadConversation} from 'Components/MessagesList/utils/useLoadConversation';
-import {useLoadInitialMessage} from 'Components/MessagesList/utils/useLoadInitialMessage';
+import {useScrollToLastUnreadMessage} from 'Components/MessagesList/utils/useScrollToLastUnreadMessage';
 import {groupMessagesBySenderAndTime, isMarker} from 'Components/MessagesList/utils/virtualizedMessagesGroup';
 import {useLoadMessages} from 'Components/MessagesList/VirtualizedMessagesList/useLoadMessages';
 import {useScrollMessages} from 'Components/MessagesList/VirtualizedMessagesList/useScrollMessages';
@@ -38,7 +38,8 @@ import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 
 import {VirtualizedJumpToLastMessageButton} from '../VirtualizedJumpToLastMessageButton';
 
-const ESTIMATED_ELEMENT_SIZE = 48;
+const ESTIMATED_ELEMENT_SIZE = 70;
+const MARKER_ESTIMATE = 56;
 
 interface Props extends Omit<MessagesListParams, 'isRightSidebarOpen' | 'onLoading'> {
   parentElement: HTMLDivElement;
@@ -101,17 +102,37 @@ export const VirtualizedMessagesList = ({
   }, [conversationLastReadTimestamp, filteredMessages]);
 
   const [highlightedMessage, setHighlightedMessage] = useState<string | undefined>(conversation.initialMessage()?.id);
-  const [loadingMessages, setLoadingMessages] = useState(false);
 
   const {focusedId, handleKeyDown, setFocusedId} = useRoveFocus(filteredMessages.map(message => message.id));
 
   const shouldShowInvitePeople = isActiveParticipant && inTeam && (isGuestRoom || isGuestAndServicesRoom);
 
+  const getItemKey = useCallback((index: number) => index, [groupedMessages]);
+
   const virtualizer = useVirtualizer({
     count: groupedMessages.length,
     getScrollElement: () => parentElement,
-    estimateSize: () => parentElement.clientHeight,
-    measureElement: element => element?.getBoundingClientRect().height || ESTIMATED_ELEMENT_SIZE,
+    estimateSize: index => {
+      const item = groupedMessages[index];
+      return isMarker(item) ? MARKER_ESTIMATE : ESTIMATED_ELEMENT_SIZE;
+    },
+    measureElement: (element, _entry, instance) => {
+      const direction = instance.scrollDirection;
+      if (direction === 'forward' || direction === null) {
+        // Allow remeasuring when scrolling down or direction is null
+        return element.getBoundingClientRect().height;
+      }
+      // When scrolling up, use cached measurement to prevent stuttering
+      const indexKey = Number(element.getAttribute('data-index'));
+      const cachedMeasurement = instance.measurementsCache[indexKey]?.size;
+
+      if (cachedMeasurement === ESTIMATED_ELEMENT_SIZE) {
+        return element.getBoundingClientRect().height;
+      }
+
+      return cachedMeasurement || element.getBoundingClientRect().height;
+    },
+    getItemKey,
   });
 
   // Hook for load current conversation
@@ -122,11 +143,10 @@ export const VirtualizedMessagesList = ({
     onLoading,
   });
 
-  // Hook for loading the initial message ( it takes initial message from search, last unread message or last message )
-  useLoadInitialMessage(virtualizer, {
-    conversation,
+  // Hook for scrolling to last unread message
+  useScrollToLastUnreadMessage(virtualizer, {
     isConversationLoaded,
-    allMessages,
+    groupedMessages,
     conversationLastReadTimestamp,
   });
 
@@ -134,10 +154,10 @@ export const VirtualizedMessagesList = ({
   useLoadMessages(virtualizer, {
     conversation,
     conversationRepository,
-    loadingMessages,
-    onLoadingMessages: setLoadingMessages,
     itemsLength: groupedMessages.length,
     shouldPullMessages: !isLoadingMessages && hasAdditionalMessages,
+    isConversationLoaded,
+    parentElement,
   });
 
   // Hook for scrolling messages when a new message is sent or received
@@ -187,14 +207,16 @@ export const VirtualizedMessagesList = ({
         msg => !isMarker(msg) && msg.message.id === highlightedMessage,
       );
 
-      virtualizer.scrollToIndex(highlightedMessageIndex, {align: 'center'});
-
-      const setScrolledToHighlightedMessageTimeout = setTimeout(() => {
+      if (highlightedMessageIndex !== -1) {
+        virtualizer.scrollToIndex(highlightedMessageIndex, {align: 'center'});
         scrolledToHighlightedMessage.current = true;
-        clearTimeout(setScrolledToHighlightedMessageTimeout);
-      }, 100);
+
+        const setScrolledToHighlightedMessageTimeout = setTimeout(() => {
+          clearTimeout(setScrolledToHighlightedMessageTimeout);
+        }, 100);
+      }
     }
-  }, [groupedMessages, highlightedMessage, virtualizer]);
+  }, [groupedMessages, highlightedMessage]);
 
   const onJumpToLastMessageClick = async () => {
     setHighlightedMessage(undefined);
@@ -210,7 +232,7 @@ export const VirtualizedMessagesList = ({
     conversationLastReadTimestamp.current = allMessages[allMessages.length - 1].timestamp();
 
     const scrollTimeout = setTimeout(() => {
-      virtualizer.scrollToIndex(allMessages.length - 1, {align: 'end'});
+      virtualizer.scrollToIndex(groupedMessages.length - 1, {align: 'end'});
       clearTimeout(scrollTimeout);
     }, 100);
   };
@@ -237,6 +259,12 @@ export const VirtualizedMessagesList = ({
     return () => clearTimeout(timeout);
   }, [isConversationLoaded, virtualItems]);
 
+  useLayoutEffect(() => {
+    requestAnimationFrame(() => {
+      virtualizer.measure();
+    });
+  }, [virtualizer, groupedMessages.length]);
+
   if (!isConversationLoaded) {
     return null;
   }
@@ -258,20 +286,28 @@ export const VirtualizedMessagesList = ({
           return (
             <div
               key={virtualItem.key}
-              data-index={virtualItem.index}
-              ref={virtualizer.measureElement}
               style={{
+                minHeight: `${virtualItem.size}px`,
+                transform: `translate3d(0, ${virtualItem.start}px, 0)`,
+                willChange: 'transform',
+              }}
+              css={{
                 position: 'absolute',
                 width: '100%',
-                transform: `translateY(${virtualItem.start}px)`,
-                paddingBottom: isLast && !currentConversationProcessQueue?.length ? '40px' : '0px',
+                ...(isLast &&
+                  !currentConversationProcessQueue?.length && {
+                    '.message': {
+                      paddingBottom: '40px',
+                    },
+                  }),
               }}
             >
               {isMarker(item) ? (
-                <MarkerComponent marker={item} />
+                <MarkerComponent marker={item} measureElement={virtualizer.measureElement} index={virtualItem.index} />
               ) : (
                 <Message
-                  key={`${item.message.id || 'message'}-${item.message.timestamp()}`}
+                  measureElement={virtualizer.measureElement}
+                  index={virtualItem.index}
                   message={item.message}
                   hideHeader={item.shouldGroup}
                   messageActions={messageActions}

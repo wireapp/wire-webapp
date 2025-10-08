@@ -23,7 +23,7 @@ import {create} from 'zustand';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
-import {PermissionState} from 'Repositories/notification/PermissionState';
+import {AppPermissionState} from 'Repositories/notification/AppPermissionState';
 import {t} from 'Util/LocalizerUtil';
 import {safeWindowOpen} from 'Util/SanitizationUtil';
 
@@ -110,7 +110,7 @@ const closeWarning = (): void => {
 
     case TYPE.REQUEST_NOTIFICATION: {
       // We block subsequent permission requests for notifications when the user ignores the request.
-      amplify.publish(WebAppEvents.NOTIFICATION.PERMISSION_STATE, PermissionState.IGNORED);
+      amplify.publish(WebAppEvents.NOTIFICATION.PERMISSION_STATE, AppPermissionState.IGNORED);
       break;
     }
   }

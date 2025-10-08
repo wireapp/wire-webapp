@@ -17,7 +17,7 @@
  *
  */
 
-import React, {FormEvent, useState} from 'react';
+import {FormEvent, useState} from 'react';
 
 import cx from 'classnames';
 
@@ -40,7 +40,7 @@ interface UsernameInputProps {
   userRepository: UserRepository;
 }
 
-const UsernameInput: React.FC<UsernameInputProps> = ({username, domain, userRepository, canEditProfile}) => {
+const UsernameInput = ({username, domain, userRepository, canEditProfile}: UsernameInputProps) => {
   const [errorState, setErrorState] = useState<string | null>(null);
   const [isEditing, setIsEditing] = useState<boolean>(false);
   const [requestedName, setRequestedName] = useState<string | null>(null);

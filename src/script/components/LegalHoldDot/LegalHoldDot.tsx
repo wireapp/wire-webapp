@@ -26,7 +26,7 @@ import {useLegalHoldModalState} from 'Components/Modals/LegalHoldModal/LegalHold
 import type {Conversation} from 'Repositories/entity/Conversation';
 import {t} from 'Util/LocalizerUtil';
 
-export interface LegalHoldDotProps {
+interface LegalHoldDotProps {
   isInteractive?: boolean;
   className?: string;
   conversation?: Conversation;

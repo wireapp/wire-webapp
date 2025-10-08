@@ -17,7 +17,7 @@
  *
  */
 
-import React, {Fragment} from 'react';
+import {Fragment} from 'react';
 
 import {FadingScrollbar} from 'Components/FadingScrollbar';
 import {Conversation} from 'Repositories/entity/Conversation';
@@ -56,12 +56,7 @@ const groupByDate = (messages: ContentMessage[]): GroupedCollection => {
   );
 };
 
-const CollectionDetails: React.FC<CollectionDetailsProps> = ({
-  conversation,
-  messages,
-  onClose = noop,
-  onImageClick,
-}) => {
+const CollectionDetails = ({conversation, messages, onClose = noop, onImageClick}: CollectionDetailsProps) => {
   const {display_name} = useKoSubscribableChildren(conversation, ['display_name']);
 
   return (

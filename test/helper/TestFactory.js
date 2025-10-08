@@ -46,8 +46,6 @@ import {User} from 'Repositories/entity/User';
 import {EventRepository} from 'Repositories/event/EventRepository';
 import {EventService} from 'Repositories/event/EventService';
 import {NotificationService} from 'Repositories/event/NotificationService';
-import {MediaRepository} from 'Repositories/media/MediaRepository';
-import {PermissionRepository} from 'Repositories/permission/PermissionRepository';
 import {PropertiesRepository} from 'Repositories/properties/PropertiesRepository';
 import {PropertiesService} from 'Repositories/properties/PropertiesService';
 import {SearchRepository} from 'Repositories/search/SearchRepository';
@@ -67,6 +65,9 @@ import {UserState} from 'Repositories/user/UserState';
 import {serverTimeHandler} from 'src/script/time/serverTimeHandler';
 
 import {entities} from '../api/payloads';
+import {MediaStreamHandler} from 'Repositories/media/MediaStreamHandler';
+import {MediaDevicesHandler} from 'Repositories/media/MediaDevicesHandler';
+import {MediaConstraintsHandler} from 'Repositories/media/MediaConstraintsHandler';
 
 export class TestFactory {
   constructor() {
@@ -306,15 +307,16 @@ export class TestFactory {
    */
   async exposeCallingActors() {
     await this.exposeConversationActors();
-
-    const mediaRepository = new MediaRepository(new PermissionRepository());
+    const mediaConstraintsHandler = new MediaConstraintsHandler();
+    const mediaStreamHandler = new MediaStreamHandler(mediaConstraintsHandler);
+    const mediaDevicesHandler = new MediaDevicesHandler();
 
     this.calling_repository = new CallingRepository(
       this.message_repository,
       this.event_repository,
       this.user_repository,
-      mediaRepository.streamHandler,
-      mediaRepository.devicesHandler,
+      mediaStreamHandler,
+      mediaDevicesHandler,
       serverTimeHandler,
       undefined,
       this.conversation_repository['conversationState'],

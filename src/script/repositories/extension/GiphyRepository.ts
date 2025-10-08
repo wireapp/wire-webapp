@@ -28,7 +28,7 @@ export interface Gif {
   title?: string;
 }
 
-export interface RandomGifOptions {
+interface RandomGifOptions {
   /** How many retries to get the correct size. Default is `3`. */
   maxRetries?: number;
   /** Maximum GIF size in bytes. */
@@ -37,7 +37,7 @@ export interface RandomGifOptions {
   tag: string;
 }
 
-export interface GetGifOptions {
+interface GetGifOptions {
   maxResults: number;
   /** Maximum GIF size in bytes. Default is 3 Megabytes. */
   maxSize: number;

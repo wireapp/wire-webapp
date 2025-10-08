@@ -25,6 +25,8 @@
 }
 
 .messages {
+  overflow-anchor: none;
+
   &.message-wrapper {
     transform: translateZ(0);
   }
@@ -48,10 +50,12 @@
   &.content-message {
     &:hover,
     &:focus-visible {
-      background-color: #fff;
+      .content-message-wrapper {
+        background-color: #fff;
 
-      body.theme-dark & {
-        background-color: var(--gray-90);
+        body.theme-dark & {
+          background-color: var(--gray-90);
+        }
       }
     }
   }
@@ -105,7 +109,7 @@
 
 .content-message {
   &:has(.message-header) {
-    margin-top: 6px;
+    padding-top: 6px;
   }
 }
 

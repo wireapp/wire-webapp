@@ -26,7 +26,7 @@ import {t} from 'Util/LocalizerUtil';
 
 import {wrapperStyles, playButtonStyles, wrapperStylesFullscreen} from './VideoPlayButton.styles';
 
-export interface VideoPlayButtonProps {
+interface VideoPlayButtonProps {
   mediaElement?: HTMLMediaElement;
   onPause: () => void;
   onPlay: () => void;

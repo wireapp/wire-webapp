@@ -17,7 +17,7 @@
  *
  */
 
-import {HTMLProps, useEffect, useState} from 'react';
+import {useEffect, useState} from 'react';
 
 import {useDebouncedCallback} from 'use-debounce';
 
@@ -30,7 +30,7 @@ import {
 import {Conversation} from 'Repositories/entity/Conversation';
 import {t} from 'Util/LocalizerUtil';
 
-export interface JumpToLastMessageButtonProps extends HTMLProps<HTMLElement> {
+interface JumpToLastMessageButtonProps {
   onGoToLastMessage: () => void;
   conversation: Conversation;
 }

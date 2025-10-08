@@ -77,22 +77,6 @@ export const textStyles: CSSObject = {
   },
 };
 
-export const infoWrapperStyles: CSSObject = {
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'center',
-  height: '100%',
-};
-
-export const loaderIconStyles: CSSObject = {
-  color: 'var(--gray-70)',
-  fontSize: 'var(--font-size-medium)',
-
-  'body.theme-dark &': {
-    color: 'var(--gray-40)',
-  },
-};
-
 export const actionButtonsStyles: CSSObject = {
   display: 'flex',
   alignItems: 'center',

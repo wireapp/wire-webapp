@@ -46,7 +46,7 @@ import {UserData} from './UserData';
 import {URLParameter} from '../../auth/URLParameter';
 import {Config} from '../../Config';
 
-export const TEAM_SIZE_THRESHOLD_VALUE = 6;
+const TEAM_SIZE_THRESHOLD_VALUE = 6;
 export class EventTrackingRepository {
   private isProductReportingActivated: boolean = false;
   private sendAppOpenEvent: boolean = true;

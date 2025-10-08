@@ -17,8 +17,6 @@
  *
  */
 
-import React from 'react';
-
 import {TabIndex, Button, ButtonVariant} from '@wireapp/react-ui-kit';
 
 import type {ClientRepository} from 'Repositories/client';
@@ -28,7 +26,7 @@ interface LogoutSectionProps {
   clientRepository: ClientRepository;
 }
 
-const LogoutSection: React.FC<LogoutSectionProps> = ({clientRepository}) => (
+const LogoutSection = ({clientRepository}: LogoutSectionProps) => (
   <section className="preferences-section">
     <Button
       tabIndex={TabIndex.FOCUSABLE}

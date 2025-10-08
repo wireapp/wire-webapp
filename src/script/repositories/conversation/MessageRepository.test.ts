@@ -32,6 +32,8 @@ import {ClientState} from 'Repositories/client/ClientState';
 import {ConnectionEntity} from 'Repositories/connection/ConnectionEntity';
 import {CryptographyRepository} from 'Repositories/cryptography/CryptographyRepository';
 import {Conversation} from 'Repositories/entity/Conversation';
+import {Button} from 'Repositories/entity/message/Button';
+import {CompositeMessage} from 'Repositories/entity/message/CompositeMessage';
 import {ContentMessage} from 'Repositories/entity/message/ContentMessage';
 import {Message} from 'Repositories/entity/message/Message';
 import {Text} from 'Repositories/entity/message/Text';
@@ -129,6 +131,7 @@ describe('MessageRepository', () => {
     conversation.legalHoldStatus(LegalHoldStatus.DISABLED);
 
     conversation.selfUser(selfUser);
+    conversation.participating_user_ets.push(selfUser);
 
     return conversation;
   };
@@ -183,6 +186,124 @@ describe('MessageRepository', () => {
         targetMode: undefined,
         userIds: expect.any(Object),
       });
+    });
+  });
+
+  describe('given a button action confirmation message', () => {
+    it('when the message is sent, then should send without targeted parameters and update local state of button', async () => {
+      // given
+      const [messageRepository, {core, eventRepository}] = await buildMessageRepository();
+      jest.spyOn(core.service!.conversation, 'send').mockResolvedValue(successPayload);
+      jest.spyOn(eventRepository, 'injectEvent').mockResolvedValue(undefined);
+
+      // Spy on the internal method that sendButtonAction actually calls
+      const sendAndInjectMessageSpy = jest
+        .spyOn(messageRepository as any, 'sendAndInjectMessage')
+        .mockResolvedValue(undefined);
+
+      // Create a mock message entity with primary_key for updateEventSequentially
+      const mockMessageEntity = new CompositeMessage(createUuid());
+      mockMessageEntity.primary_key = 'test-primary-key';
+
+      const getMessageInConversationIdSpy = jest
+        .spyOn(messageRepository as any, 'getMessageInConversationById')
+        .mockResolvedValue(mockMessageEntity);
+
+      // Mock the eventService.updateEventSequentially method
+      const updateEventSequentiallySpy = jest
+        .spyOn(eventRepository.eventService, 'updateEventSequentially')
+        .mockResolvedValue(1);
+
+      const buttonId = createUuid();
+      const theNewButton = [new Button(buttonId, 'Button 1')];
+      const originalMessage = new CompositeMessage(createUuid());
+
+      // Set the sender properly, as sendButtonAction expects the message to have a senderId check
+      originalMessage.user(selfUser);
+      originalMessage.from = selfUser.id;
+
+      originalMessage.errorButtonId(undefined);
+      originalMessage.assets.push(...theNewButton);
+
+      // Mock getSelectionChange to return changes (simulating that button selection creates changes)
+      const mockChanges = {selected_button_id: buttonId, version: 1};
+      jest.spyOn(originalMessage, 'getSelectionChange').mockReturnValue(mockChanges);
+
+      const conversation = generateConversation();
+      conversation.addMessage(originalMessage);
+
+      // when
+      await messageRepository.sendButtonAction(conversation, originalMessage, buttonId);
+
+      // then - send message is called without targetMode or recipients
+      expect(sendAndInjectMessageSpy).toHaveBeenCalledWith(
+        expect.objectContaining({
+          buttonAction: expect.objectContaining({
+            buttonId: buttonId,
+            referenceMessageId: originalMessage.id,
+          }),
+          messageId: expect.any(String),
+        }),
+        conversation,
+        expect.objectContaining({
+          nativePush: false,
+          skipInjection: true,
+        }),
+      );
+      expect(getMessageInConversationIdSpy).toHaveBeenCalledWith(conversation, originalMessage.id);
+
+      // Verify that updateEventSequentially is called with the expected parameters
+      expect(updateEventSequentiallySpy).toHaveBeenCalledWith({
+        primary_key: mockMessageEntity.primary_key,
+        ...mockChanges,
+      });
+    });
+
+    it('when no changes are returned, then no update should be called', async () => {
+      // given
+      const [messageRepository, {core, eventRepository}] = await buildMessageRepository();
+      jest.spyOn(core.service!.conversation, 'send').mockResolvedValue(successPayload);
+      jest.spyOn(eventRepository, 'injectEvent').mockResolvedValue(undefined);
+
+      // Spy on the internal method that sendButtonAction actually calls
+      const sendAndInjectMessageSpy = jest
+        .spyOn(messageRepository as any, 'sendAndInjectMessage')
+        .mockResolvedValue(undefined);
+
+      // Create a mock message entity with primary_key for updateEventSequentially
+      const mockMessageEntity = new CompositeMessage(createUuid());
+      mockMessageEntity.primary_key = 'test-primary-key';
+
+      jest.spyOn(messageRepository as any, 'getMessageInConversationById').mockResolvedValue(mockMessageEntity);
+
+      // Mock the eventService.updateEventSequentially method
+      const updateEventSequentiallySpy = jest
+        .spyOn(eventRepository.eventService, 'updateEventSequentially')
+        .mockResolvedValue(1);
+
+      const buttonId = createUuid();
+      const theNewButton = [new Button(buttonId, 'Button 1')];
+      const originalMessage = new CompositeMessage(createUuid());
+
+      // Set the sender properly, as sendButtonAction expects the message to have a senderId check
+      originalMessage.user(selfUser);
+      originalMessage.from = selfUser.id;
+
+      originalMessage.errorButtonId(undefined);
+      originalMessage.assets.push(...theNewButton);
+
+      // Mock getSelectionChange to return false (no changes)
+      jest.spyOn(originalMessage, 'getSelectionChange').mockReturnValue(false);
+
+      const conversation = generateConversation();
+      conversation.addMessage(originalMessage);
+
+      // when
+      await messageRepository.sendButtonAction(conversation, originalMessage, buttonId);
+
+      // then - verify updateEventSequentially is NOT called when there are no changes
+      expect(sendAndInjectMessageSpy).not.toHaveBeenCalled();
+      expect(updateEventSequentiallySpy).not.toHaveBeenCalled();
     });
   });
 

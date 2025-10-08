@@ -237,6 +237,17 @@ export const downloadFile = (url: string, fileName: string, mimeType?: string): 
 };
 
 /**
+ * Get the file name with the extension. If the file name already has the extension, it won't be added again.
+ * @param name The file name
+ * @param extension The file extension
+ * @returns The file name with the extension
+ */
+export const getFileNameWithExtension = (name: string, extension: string): string => {
+  const hasExtension = name.toLowerCase().endsWith(`.${extension.toLowerCase()}`);
+  return hasExtension ? name : `${name}.${extension}`;
+};
+
+/**
  * Forces file download instead of browser "preview".
  * We use fetch + blob because native <a download> doesn't work reliably across browsers and file types (especially PDFs and images).
  */

@@ -23,12 +23,11 @@ import {CredentialType} from '@wireapp/core/lib/messagingProtocols/mls';
 
 import {MLSStatuses, WireIdentity} from '../E2EIdentityVerification';
 
-export const ONE_MINUTE = TimeInMillis.MINUTE;
-export const FIVE_MINUTES = TimeInMillis.MINUTE * 5;
-export const FIFTEEN_MINUTES = TimeInMillis.MINUTE * 15;
-export const ONE_HOUR = TimeInMillis.HOUR;
-export const FOUR_HOURS = TimeInMillis.HOUR * 4;
-export const ONE_DAY = TimeInMillis.DAY;
+const FIVE_MINUTES = TimeInMillis.MINUTE * 5;
+const FIFTEEN_MINUTES = TimeInMillis.MINUTE * 15;
+const ONE_HOUR = TimeInMillis.HOUR;
+const FOUR_HOURS = TimeInMillis.HOUR * 4;
+const ONE_DAY = TimeInMillis.DAY;
 
 // message retention time on backend (hardcoded to 28 days)
 export const messageRetentionTime = 28 * TimeInMillis.DAY;
@@ -81,7 +80,7 @@ function getGracePeriod(
   // To be sure the device does not expire, we want to keep a safe delay
   const safeDelay = randomInt(TimeInMillis.DAY) + messageRetentionTime;
 
-  const end = Number(identity?.x509Identity?.not_after) * TimeInMillis.SECOND;
+  const end = Number(identity?.x509Identity?.notAfter) * TimeInMillis.SECOND;
   const start = Math.max(end - safeDelay, end - teamGracePeriodDuration);
 
   return {end, start};
