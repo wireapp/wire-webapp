@@ -19,16 +19,22 @@
 
 import {Locator, Page} from '@playwright/test';
 
+import {selectByDataAttribute} from 'test/e2e_tests/utils/selector.util';
+
 export class AppLockModal {
   readonly page: Page;
 
   readonly lockPasscodeInput: Locator;
   readonly unlockPasscodeInput: Locator;
+  readonly appLockWipeInput: Locator;
   readonly appLockModal: Locator;
   readonly appLockActionButton: Locator;
   readonly appLockModalHeader: Locator;
   readonly appLockModalText: Locator;
   readonly loadingBar: Locator;
+  readonly errorMessage: Locator;
+  readonly forgotPassphraseButton: Locator;
+  readonly wipeDatabaseButton: Locator;
 
   constructor(page: Page) {
     this.page = page;
@@ -36,10 +42,14 @@ export class AppLockModal {
     this.appLockModal = page.locator("[data-uie-name='applock-modal']");
     this.lockPasscodeInput = page.locator("[data-uie-name='applock-modal'] [data-uie-name='input-applock-set-a']");
     this.unlockPasscodeInput = page.locator("[data-uie-name='applock-modal'] [data-uie-name='input-applock-unlock']");
+    this.appLockWipeInput = this.appLockModal.locator(selectByDataAttribute('input-applock-wipe'));
     this.appLockActionButton = this.appLockModal.locator("[data-uie-name='do-action']");
     this.appLockModalHeader = page.locator("[data-uie-name='applock-modal'] [data-uie-name='applock-modal-header']");
     this.appLockModalText = page.locator("[data-uie-name='applock-modal'] [data-uie-name='label-applock-unlock-text']");
     this.loadingBar = page.locator('.progress-bar');
+    this.errorMessage = this.appLockModal.locator(selectByDataAttribute('label-applock-unlock-error'));
+    this.forgotPassphraseButton = this.appLockModal.locator(selectByDataAttribute('go-forgot-passphrase'));
+    this.wipeDatabaseButton = this.appLockModal.locator(selectByDataAttribute('go-wipe-database'));
   }
 
   async setPasscode(passcode: string) {
@@ -49,6 +59,11 @@ export class AppLockModal {
 
   async unlockAppWithPasscode(passcode: string) {
     await this.unlockPasscodeInput.fill(passcode);
+    await this.appLockActionButton.click();
+  }
+
+  async inputUserPassword(password: string) {
+    await this.appLockWipeInput.fill(password);
     await this.appLockActionButton.click();
   }
 
@@ -67,6 +82,16 @@ export class AppLockModal {
   }
 
   async getAppLockModalHeader() {
-    return (await this.appLockModalHeader.textContent()) ?? '';
+    return await this.appLockModalHeader.textContent();
+  }
+
+  async clickForgotPassphrase() {
+    await this.forgotPassphraseButton.click();
+  }
+  async clickReset() {
+    await this.appLockActionButton.click();
+  }
+  async clickWipeDB() {
+    await this.wipeDatabaseButton.click();
   }
 }
