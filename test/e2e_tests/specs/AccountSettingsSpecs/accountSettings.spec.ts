@@ -89,7 +89,7 @@ test.describe('account settings', () => {
     'I should not be able to change email of user managed by SCIM',
     {tag: ['@TC-60', '@regression']},
     async ({pageManager, context}) => {
-      const {components, pages} = pageManager.webapp;
+      const {components, pages, modals} = pageManager.webapp;
       // use an extra account
       const ssoUser: User = getUser({
         email: process.env.SCIM_USER_SSO_CODE,
@@ -110,9 +110,14 @@ test.describe('account settings', () => {
       await newPage.getByRole('textbox', {name: 'Password'}).fill(ssoUser.password);
       await newPage.getByRole('button', {name: 'Sign In'}).click();
 
-      await pages.historyInfo().clickConfirmButton();
+      if (await pages.historyInfo().isButtonVisible()) {
+        await pages.historyInfo().clickConfirmButton();
+      }
       await components.conversationSidebar().isPageLoaded();
-      await components.conversationSidebar().clickPreferencesButton();
+
+      if (await modals.dataShareConsent().isModalPresent()) {
+        await modals.dataShareConsent().clickDecline();
+      }
       await expect(pages.account().emailDisplay).toHaveCount(0);
     },
   );
