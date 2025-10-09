@@ -2189,17 +2189,14 @@ export class ConversationRepository {
     core?: Account;
   }): Promise<void> => {
     this.logger.info('Ensuring conversation exists', {conversationId, groupId, epoch});
-    console.info('Ensuring conversation exists', {conversationId, groupId, epoch});
     if (await this.conversationService.mlsGroupExistsLocally(groupId)) {
       this.logger.info('Conversation already exists locally', {conversationId, groupId, epoch});
-      console.info('Conversation already exists locally', {conversationId, groupId, epoch});
       return;
     }
 
     // establish the conversation if epoch is 0
     if (epoch === 0) {
       this.logger.info('Establishing conversation', {conversationId, groupId, epoch});
-      console.info('Establishing conversation', {conversationId, groupId, epoch});
       const selfUser = this.userState.self();
       const conversation = this.conversationState.findConversation(conversationId);
 
@@ -2227,9 +2224,7 @@ export class ConversationRepository {
 
     // join by external commit
     this.logger.info('Joining conversation by external commit', {conversationId, epoch});
-    console.info('Joining conversation by external commit', {conversationId, epoch});
     if (epoch && epoch > 0) {
-      console.info('calling core', {core: this.core});
       await this.core.service?.conversation?.joinByExternalCommit(conversationId);
     }
   };
