@@ -19,13 +19,19 @@
 
 import {CSSObject} from '@emotion/react';
 
-export const meetingListContainerStyles: CSSObject = {
-  marginTop: '24px',
-  width: '650px',
-  display: 'grid',
-  paddingLeft: 'auto',
+export const sectionStyles: CSSObject = {
+  padding: '16px 16px 0',
 };
 
-export const showAllButtonStyles: CSSObject = {
-  padding: '16px',
+export const sectionHeaderStyles: CSSObject = {
+  marginBottom: 8,
+  color: 'var(--main-color)',
+  fontWeight: 'var(--font-weight-semibold)',
+};
+
+export const hourLabelStyles: CSSObject = {
+  color: 'var(--secondary-text-color)',
+  fontSize: '12px',
+  marginTop: 12,
+  marginBottom: 8,
 };

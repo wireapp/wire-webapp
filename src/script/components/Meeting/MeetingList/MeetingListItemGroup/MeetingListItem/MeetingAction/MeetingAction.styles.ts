@@ -19,13 +19,22 @@
 
 import {CSSObject} from '@emotion/react';
 
-export const meetingListContainerStyles: CSSObject = {
-  marginTop: '24px',
-  width: '650px',
-  display: 'grid',
-  paddingLeft: 'auto',
+export const iconContainerStyle: CSSObject = {
+  padding: 0,
+  margin: 0,
+  width: '16px',
+  border: 0,
+  background: 'transparent',
 };
 
-export const showAllButtonStyles: CSSObject = {
-  padding: '16px',
+export const iconStyles: CSSObject = {
+  transform: 'rotate(90deg)',
+};
+
+export const contextMenuDangerItemStyles: CSSObject = {
+  color: 'var(--danger-color)',
+};
+
+export const contextMenuDangerItemIconStyles: CSSObject = {
+  fill: 'var(--danger-color)',
 };

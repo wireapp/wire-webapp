@@ -19,6 +19,7 @@
 
 import {ComponentType, CSSProperties, ReactNode, SVGProps, useEffect, useMemo, useRef, useState} from 'react';
 
+import {CSSObject} from '@emotion/react';
 import cx from 'classnames';
 import {createRoot, Root} from 'react-dom/client';
 
@@ -42,6 +43,7 @@ export interface ContextMenuEntry {
   isSeparator?: boolean;
   label?: string;
   title?: string;
+  css?: CSSObject;
 }
 
 type Placement =
@@ -275,6 +277,7 @@ const ContextMenu = ({
                   })}
                   role="menuitem"
                   aria-haspopup="true"
+                  {...(entry.css ? {css: entry.css} : {})}
                 >
                   <button
                     id={getButtonId(entry.label!)}
