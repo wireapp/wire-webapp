@@ -43,10 +43,14 @@ export const emptyListActionButtonContainerStyles: CSSObject = {
   marginTop: '30px',
 };
 
-export const emptyListContainerStyles: CSSObject = {
+export const emptyTabsListContainerStyles: CSSObject = {
   display: 'grid',
   placeItems: 'center',
+  padding: '24px',
+};
+
+export const emptyListContainerStyles: CSSObject = {
+  ...emptyTabsListContainerStyles,
   height: '100%',
   minHeight: '60vh',
-  padding: '24px',
 };
