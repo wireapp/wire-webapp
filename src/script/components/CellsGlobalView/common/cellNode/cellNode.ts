@@ -45,7 +45,7 @@ export interface CellFile {
   conversation?: Conversation;
 }
 
-export interface CellFolder {
+interface CellFolder {
   id: string;
   type: 'folder';
   url?: string;

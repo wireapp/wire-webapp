@@ -17,7 +17,7 @@
  *
  */
 
-import React from 'react';
+import {useRef} from 'react';
 
 import {RECEIPT_MODE} from '@wireapp/api-client/lib/conversation/data';
 import cx from 'classnames';
@@ -26,7 +26,7 @@ import {t} from 'Util/LocalizerUtil';
 
 import * as Icon from '../Icon';
 
-export interface ReceiptModeToggleProps {
+interface ReceiptModeToggleProps {
   onReceiptModeChanged: (receiptMode: RECEIPT_MODE) => void;
   receiptMode: RECEIPT_MODE;
   disabled?: boolean;
@@ -40,7 +40,7 @@ const ReceiptModeToggle = ({receiptMode, onReceiptModeChanged, disabled = false}
     }
   };
 
-  const inputRef = React.useRef<HTMLInputElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
   const isChecked = receiptMode !== RECEIPT_MODE.OFF;
 
   return (

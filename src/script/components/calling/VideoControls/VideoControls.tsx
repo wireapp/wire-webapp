@@ -63,7 +63,7 @@ enum BlurredBackgroundStatus {
   ON = 'bluron',
 }
 
-export interface VideoControlsProps {
+interface VideoControlsProps {
   activeCallViewTab: string;
   call: Call;
   propertiesRepository: PropertiesRepository;
@@ -90,7 +90,7 @@ export interface VideoControlsProps {
   sendEmoji: (emoji: string, call: Call) => void;
 }
 
-export const VideoControls: React.FC<VideoControlsProps> = ({
+export const VideoControls = ({
   activeCallViewTab,
   call,
   propertiesRepository,
@@ -99,7 +99,6 @@ export const VideoControls: React.FC<VideoControlsProps> = ({
   toggleParticipantsList,
   canShareScreen,
   conversation,
-  mediaDevicesHandler,
   minimize,
   leave,
   toggleMute,
@@ -115,7 +114,7 @@ export const VideoControls: React.FC<VideoControlsProps> = ({
   sendEmoji,
   teamState = container.resolve(TeamState),
   callState = container.resolve(CallState),
-}) => {
+}: VideoControlsProps) => {
   const selfParticipant = call.getSelfParticipant();
   const {
     sharesScreen: selfSharesScreen,

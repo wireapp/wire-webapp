@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2024 Wire Swiss GmbH
+ * Copyright (C) 2018 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,14 +17,9 @@
  *
  */
 
-import {CSSObject} from '@emotion/react';
-
-export const wrapperStyles: CSSObject = {
-  marginTop: 'auto',
-  width: '100%',
-};
-
-export const documentStyles: CSSObject = {
-  pointerEvents: 'none',
-  userSelect: 'none',
-};
+/** @see https://developer.mozilla.org/en-US/docs/Web/API/PermissionStatus/state */
+export enum BrowserPermissionStatus {
+  DENIED = 'denied',
+  GRANTED = 'granted',
+  PROMPT = 'prompt',
+}

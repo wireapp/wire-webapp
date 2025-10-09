@@ -38,7 +38,3 @@ export const imageWrapperStyles: CSSObject = {
   justifyContent: 'center',
   alignContent: 'center',
 };
-
-export const imageStyles: CSSObject = {
-  borderRadius: '10px',
-};

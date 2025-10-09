@@ -20,7 +20,7 @@
 import {getGroupAvatarColors} from 'Util/avatarUtil';
 import {CSS_SQUARE} from 'Util/CSSMixin';
 
-export interface GroupAvatarProps {
+interface GroupAvatarProps {
   size?: 'small' | 'large';
   className?: string;
   conversationID?: string;

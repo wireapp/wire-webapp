@@ -34,13 +34,6 @@ export const previousPageStyles: CSSObject = {
   flexBasis: '100%',
 };
 
-export const listPagesStyles: CSSObject = {
-  alignItems: 'flex-end',
-  display: 'flex',
-  flexDirection: 'row',
-  margin: '0 auto',
-};
-
 export const nextPageStyles: CSSObject = {
   display: 'flex',
   flexBasis: 100,

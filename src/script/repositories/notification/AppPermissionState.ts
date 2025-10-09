@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2025 Wire Swiss GmbH
+ * Copyright (C) 2018 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,20 +17,11 @@
  *
  */
 
-import {Locator, Page} from '@playwright/test';
-
-export class CreateGroupModal {
-  readonly page: Page;
-
-  readonly createGroupModal: Locator;
-  readonly createGroupNameInput: Locator;
-  readonly createGroupSubmitButton: Locator;
-
-  constructor(page: Page) {
-    this.page = page;
-
-    this.createGroupModal = page.locator('[data-uie-name="group-creation-label"]');
-    this.createGroupNameInput = this.createGroupModal.locator('[data-uie-name="enter-group-name"]');
-    this.createGroupSubmitButton = this.createGroupModal.locator('[data-uie-name="submit"]');
-  }
+/** @see https://developer.mozilla.org/en-US/docs/Web/API/Notification/permission */
+export enum AppPermissionState {
+  DEFAULT = 'default',
+  DENIED = 'denied',
+  GRANTED = 'granted',
+  IGNORED = 'ignored',
+  UNSUPPORTED = 'unsupported',
 }

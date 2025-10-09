@@ -25,7 +25,7 @@ import {channelAvatarContainerCss, channelAvatarIconCss, channelAvatarLockIconCs
 
 export type ChannelAvatarSize = 'small' | 'large';
 
-export interface ChannelAvatarProps {
+interface ChannelAvatarProps {
   className?: string;
   conversationID?: string;
   isLocked?: boolean;

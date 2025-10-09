@@ -228,9 +228,10 @@ describe('CallingRepository', () => {
       async protocol => {
         const conversation = createConversation(CONVERSATION_TYPE.ONE_TO_ONE, protocol);
         const callType = CALL_TYPE.NORMAL;
+        const NO_MEETING = 0;
         spyOn(wCall, 'start');
         await callingRepository.startCall(conversation);
-        expect(wCall.start).toHaveBeenCalledWith(wUser, conversation.id, callType, CONV_TYPE.ONEONONE, 0);
+        expect(wCall.start).toHaveBeenCalledWith(wUser, conversation.id, callType, CONV_TYPE.ONEONONE, 0, NO_MEETING);
       },
     );
 
@@ -238,18 +239,27 @@ describe('CallingRepository', () => {
       jest.spyOn(Runtime, 'isSupportingConferenceCalling').mockReturnValue(true);
       const conversation = createConversation(CONVERSATION_TYPE.REGULAR, ConversationProtocol.PROTEUS);
       const callType = CALL_TYPE.NORMAL;
+      const NO_MEETING = 0;
       spyOn(wCall, 'start');
       await callingRepository.startCall(conversation);
-      expect(wCall.start).toHaveBeenCalledWith(wUser, conversation.id, callType, CONV_TYPE.CONFERENCE, 0);
+      expect(wCall.start).toHaveBeenCalledWith(wUser, conversation.id, callType, CONV_TYPE.CONFERENCE, 0, NO_MEETING);
     });
 
     it('starts a MLS conference call in a group conversation for MLS', async () => {
       jest.spyOn(Runtime, 'isSupportingConferenceCalling').mockReturnValue(true);
       const conversation = createConversation(CONVERSATION_TYPE.REGULAR, ConversationProtocol.MLS);
       const callType = CALL_TYPE.NORMAL;
+      const NO_MEETING = 0;
       spyOn(wCall, 'start');
       await callingRepository.startCall(conversation);
-      expect(wCall.start).toHaveBeenCalledWith(wUser, conversation.id, callType, CONV_TYPE.CONFERENCE_MLS, 0);
+      expect(wCall.start).toHaveBeenCalledWith(
+        wUser,
+        conversation.id,
+        callType,
+        CONV_TYPE.CONFERENCE_MLS,
+        0,
+        NO_MEETING,
+      );
     });
 
     it('subscribes to epoch updates after initiating a mls conference call', async () => {
@@ -777,6 +787,7 @@ describe.skip('E2E audio call', () => {
           userId,
           clientid,
           CONV_TYPE.CONFERENCE,
+          0, // no meeting
         );
       },
     );
@@ -863,7 +874,8 @@ describe.skip('E2E audio call', () => {
         })
         .catch(done.fail);
     };
-    wCall.start(remoteWuser, conversationId.id, CALL_TYPE.NORMAL, CONV_TYPE.ONEONONE, 0);
+    const NO_MEETING = 0;
+    wCall.start(remoteWuser, conversationId.id, CALL_TYPE.NORMAL, CONV_TYPE.ONEONONE, 0, NO_MEETING);
   });
 });
 

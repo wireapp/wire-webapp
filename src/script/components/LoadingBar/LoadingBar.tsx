@@ -23,7 +23,7 @@ import cx from 'classnames';
 
 import {Loading} from '@wireapp/react-ui-kit';
 
-export interface LoadingBarProps {
+interface LoadingBarProps {
   message?: string;
   className?: string;
   centerText?: boolean;

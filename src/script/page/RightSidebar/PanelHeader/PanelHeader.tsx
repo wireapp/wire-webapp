@@ -28,7 +28,7 @@ import * as Icon from 'Components/Icon';
 import {t} from 'Util/LocalizerUtil';
 import {noop} from 'Util/util';
 
-export interface PanelHeaderProps {
+interface PanelHeaderProps {
   onClose: () => void;
   onGoBack?: () => void;
   className?: string;

@@ -37,7 +37,6 @@ import {MediaDevicesHandler} from 'Repositories/media/MediaDevicesHandler';
 import {MediaStreamHandler} from 'Repositories/media/MediaStreamHandler';
 import type {NotificationRepository} from 'Repositories/notification/NotificationRepository';
 import type {PreferenceNotificationRepository} from 'Repositories/notification/PreferenceNotificationRepository';
-import type {PermissionRepository} from 'Repositories/permission/PermissionRepository';
 import type {PropertiesRepository} from 'Repositories/properties/PropertiesRepository';
 import type {SearchRepository} from 'Repositories/search/SearchRepository';
 import type {SelfRepository} from 'Repositories/self/SelfRepository';
@@ -72,7 +71,6 @@ export interface ViewModelRepositories {
   lifeCycle: LifeCycleRepository;
   message: MessageRepository;
   notification: NotificationRepository;
-  permission: PermissionRepository;
   preferenceNotification: PreferenceNotificationRepository;
   properties: PropertiesRepository;
   search: SearchRepository;
@@ -123,7 +121,6 @@ export class MainViewModel {
       repositories.audio,
       mediaDevicesHandler,
       mediaStreamHandler,
-      repositories.permission,
       repositories.team,
       repositories.properties,
       userState.self,

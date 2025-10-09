@@ -17,7 +17,7 @@
  *
  */
 
-import React, {KeyboardEvent as ReactKeyBoardEvent, useCallback, useEffect, useMemo, useRef, useState} from 'react';
+import {KeyboardEvent as ReactKeyBoardEvent, useCallback, useEffect, useMemo, useRef, useState} from 'react';
 
 import {amplify} from 'amplify';
 import {container} from 'tsyringe';
@@ -83,7 +83,7 @@ type ConversationsProps = {
   userRepository: UserRepository;
 };
 
-export const Conversations: React.FC<ConversationsProps> = ({
+export const Conversations = ({
   integrationRepository,
   searchRepository,
   teamRepository,
@@ -97,7 +97,7 @@ export const Conversations: React.FC<ConversationsProps> = ({
   callState = container.resolve(CallState),
   userState = container.resolve(UserState),
   selfUser,
-}) => {
+}: ConversationsProps) => {
   const [conversationListRef, setConversationListRef] = useState<HTMLElement | null>(null);
   const searchInputRef = useRef<HTMLInputElement | null>(null);
 

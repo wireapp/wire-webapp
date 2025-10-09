@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2022 Wire Swiss GmbH
+ * Copyright (C) 2025 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,4 +17,9 @@
  *
  */
 
-export * from './AppContainer';
+import {useStore} from 'zustand';
+
+import {permissionsStore, PermissionsState} from './Permissions.store';
+
+export const usePermissionsStore = <T>(selector: (state: PermissionsState) => T): T =>
+  useStore(permissionsStore, selector);

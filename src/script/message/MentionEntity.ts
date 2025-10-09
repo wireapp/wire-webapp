@@ -25,7 +25,7 @@ import {PROTO_MESSAGE_TYPE} from 'Repositories/cryptography/ProtoMessageType';
 import {matchQualifiedIds} from 'Util/QualifiedId';
 import {isUUID} from 'Util/ValidationUtil';
 
-export enum ERROR {
+enum ERROR {
   INVALID_LENGTH = 'Invalid mention: Invalid length',
   INVALID_START_CHAR = 'Invalid mention: Mention does not start with @',
   INVALID_START_INDEX = 'Invalid mention: Invalid startIndex',

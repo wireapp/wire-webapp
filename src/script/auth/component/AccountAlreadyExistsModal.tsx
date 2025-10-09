@@ -24,7 +24,7 @@ import {t} from 'Util/LocalizerUtil';
 
 import {buttonCss, containerCss, headerCss, linkCss} from './AccountAlreadyExistsModal.styles';
 
-export interface AccountAlreadyExistsModalProps {
+interface AccountAlreadyExistsModalProps {
   onClose: () => void;
 }
 

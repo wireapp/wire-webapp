@@ -17,18 +17,17 @@
  *
  */
 
-import React from 'react';
-
 import cx from 'classnames';
 
 import {t} from 'Util/LocalizerUtil';
 
-export interface RestrictedVideoProps extends React.HTMLProps<HTMLDivElement> {
+interface RestrictedVideoProps {
   isSmall?: boolean;
   showMessage?: boolean;
+  className?: string;
 }
 
-const RestrictedVideo: React.FC<RestrictedVideoProps> = ({showMessage = true, isSmall = false, className}) => {
+const RestrictedVideo = ({showMessage = true, isSmall = false, className}: RestrictedVideoProps) => {
   return (
     <div
       className={cx('video-asset__restricted', className, {

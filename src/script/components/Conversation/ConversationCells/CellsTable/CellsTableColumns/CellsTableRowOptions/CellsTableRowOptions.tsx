@@ -180,7 +180,7 @@ const CellsTableRowOptionsContent = ({
           {t('cells.options.share')}
         </DropdownMenu.Item>
 
-        {url && (
+        {!!url && (
           <DropdownMenu.Item onClick={() => forcedDownloadFile({url, name})}>
             {t('cells.options.download')}
           </DropdownMenu.Item>

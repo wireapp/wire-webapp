@@ -17,8 +17,6 @@
  *
  */
 
-import React from 'react';
-
 import {DeleteMessage as DeleteMessageEntity} from 'Repositories/entity/message/DeleteMessage';
 import {User} from 'Repositories/entity/User';
 import {ServiceEntity} from 'Repositories/integration/ServiceEntity';
@@ -28,12 +26,12 @@ import {formatTimeShort, fromUnixTime, TIME_IN_MILLIS} from 'Util/TimeUtil';
 import {MessageHeader} from './ContentMessage/MessageHeader';
 import {MessageTime} from './MessageTime';
 
-export interface DeleteMessageProps {
+interface DeleteMessageProps {
   message: DeleteMessageEntity;
   onClickAvatar?: (user: User | ServiceEntity) => void;
 }
 
-const DeleteMessage: React.FC<DeleteMessageProps> = ({message, onClickAvatar = () => {}}) => {
+const DeleteMessage = ({message, onClickAvatar = () => {}}: DeleteMessageProps) => {
   const deletedTimeStamp = message.deleted_timestamp || 0;
 
   const formattedDeletionTime = t('conversationDeleteTimestamp', {
