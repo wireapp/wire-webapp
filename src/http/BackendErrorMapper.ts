@@ -110,6 +110,13 @@ export class BackendErrorMapper {
         "[path] 'usr' invalid: Failed reading: Invalid UUID": e =>
           new UserIsUnknownError('User ID is unknown.', e.label, e.code),
       },
+      [BackendErrorLabel.MLS_INVALID_LEAF_NODE_SIGNATURE]: {
+        'Invalid leaf node signature': e =>
+          new MLSInvalidLeafNodeSignatureError('Invalid leaf node signature', e.label, e.code),
+      },
+      [BackendErrorLabel.MLS_INVALID_LEAF_NODE_INDEX]: {
+        'Invalid leaf node index': e => new MLSInvalidLeafNodeIndexError('Invalid leaf node index', e.label, e.code),
+      },
     },
     [StatusCode.FORBIDDEN]: {
       [BackendErrorLabel.INVALID_CREDENTIALS]: {
@@ -129,13 +136,6 @@ export class BackendErrorMapper {
             e.label,
             e.code,
           ),
-      },
-      [BackendErrorLabel.MLS_INVALID_LEAF_NODE_SIGNATURE]: {
-        'Invalid leaf node signature': e =>
-          new MLSInvalidLeafNodeSignatureError('Invalid leaf node signature', e.label, e.code),
-      },
-      [BackendErrorLabel.MLS_INVALID_LEAF_NODE_INDEX]: {
-        'Invalid leaf node index': e => new MLSInvalidLeafNodeIndexError('Invalid leaf node index', e.label, e.code),
       },
       [BackendErrorLabel.INVALID_OPERATION]: {
         'invalid operation for 1:1 conversations': e =>
