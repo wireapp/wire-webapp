@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [27.77.2](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@27.77.1...@wireapp/api-client@27.77.2) (2025-10-09)
+
+### Bug Fixes
+
+* Use the 400 error code for mls invalid leaf node errors [WPB-20935] ([#7435](https://github.com/wireapp/wire-web-packages/issues/7435)) ([21e3ac9](https://github.com/wireapp/wire-web-packages/commit/21e3ac90cfe3669e313d4e3076f50f14361f2f27))
+
 ## [27.77.1](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@27.77.0...@wireapp/api-client@27.77.1) (2025-10-08)
 
 ### Reverts
