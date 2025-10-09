@@ -80,7 +80,7 @@ function getGracePeriod(
   // To be sure the device does not expire, we want to keep a safe delay
   const safeDelay = randomInt(TimeInMillis.DAY) + messageRetentionTime;
 
-  const end = Number(identity?.x509Identity?.not_after) * TimeInMillis.SECOND;
+  const end = Number(identity?.x509Identity?.notAfter) * TimeInMillis.SECOND;
   const start = Math.max(end - safeDelay, end - teamGracePeriodDuration);
 
   return {end, start};

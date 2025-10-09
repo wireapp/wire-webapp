@@ -44,9 +44,9 @@ Prerequisites:
 
 If you would like your browser to trust the certificate from "local.wire.com"/"local.zinfra.io"/"local.imai.wire.link":
 
-1. Download [mkcert](https://github.com/FiloSottile/mkcert/releases/latest)
-1. Set the `CAROOT` environment variable to `<WebApp Dir>/server/certificate`
-1. Run `mkcert -install`
+1. Download [mkcert](https://github.com/FiloSottile/mkcert/releases/latest) Installation on Mac `brew install mkcert` [refer to latest readme.md](https://github.com/FiloSottile/mkcert)
+2. Set the `CAROOT` environment variable to `<WebApp Dir>/server/certificate`
+3. Run `mkcert -install`
 
 #### Environment Configuration
 
@@ -64,8 +64,8 @@ BACKEND_WS="https://prod-nginz-ssl.wire.com"
 
 ```
 APP_BASE="https://local.zinfra.io:8081"
-BACKEND_REST="https://nginz-https.zinfra.io"
-BACKEND_WS="https://nginz-ssl.zinfra.io"
+BACKEND_REST="https://staging-nginz-https.zinfra.io"
+BACKEND_WS="wss://staging-nginz-ssl.zinfra.io"
 ```
 
 **Imai:**
