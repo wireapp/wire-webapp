@@ -24,7 +24,6 @@ import {
   SUBCONVERSATION_ID,
 } from '@wireapp/api-client/lib/conversation';
 import {ConversationMLSMessageAddEvent, ConversationMLSWelcomeEvent} from '@wireapp/api-client/lib/event';
-import {BackendError, BackendErrorMapper, HttpClient} from '@wireapp/api-client/lib/http';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {Converter, Decoder, Encoder} from 'bazinga64';
 
@@ -280,20 +279,12 @@ export class MLSService extends TypedEventEmitter<Events> {
 
       return 'success';
     } catch (error) {
-      this.logger.error(`Failed to upload commit bundle`, error);
-      if (HttpClient.isBackendError(error)) {
-        const mappedError = BackendErrorMapper.map(
-          new BackendError(error.response.data.message, error.response.data.label, error.response.data.code),
-        );
+      this.logger.warn(`Failed to upload commit bundle`, error);
 
-        if (
-          mappedError instanceof MLSInvalidLeafNodeSignatureError ||
-          mappedError instanceof MLSInvalidLeafNodeIndexError
-        ) {
-          return {
-            abort: {reason: MLSService.UPLOAD_COMMIT_BUNDLE_ABORT_REASONS.BROKEN_MLS_CONVERSATION},
-          };
-        }
+      if (error instanceof MLSInvalidLeafNodeSignatureError || error instanceof MLSInvalidLeafNodeIndexError) {
+        return {
+          abort: {reason: MLSService.UPLOAD_COMMIT_BUNDLE_ABORT_REASONS.BROKEN_MLS_CONVERSATION},
+        };
       }
       return {
         abort: {reason: error instanceof Error ? error.message : MLSService.UPLOAD_COMMIT_BUNDLE_ABORT_REASONS.OTHER},
@@ -451,7 +442,7 @@ export class MLSService extends TypedEventEmitter<Events> {
         this.logger.info(`Joined MLS group with id ${groupIdStr} via external commit, new epoch: ${newEpoch}`);
       }
     } catch (error) {
-      this.logger.error('Failed to join MLS group via external commit', error);
+      this.logger.warn('Failed to join MLS group via external commit', error);
       throw error;
     }
   }

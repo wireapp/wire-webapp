@@ -515,11 +515,9 @@ export class ConversationService extends TypedEventEmitter<Events> {
     try {
       await this.mlsService.joinByExternalCommit(() => this.apiClient.api.conversation.getGroupInfo(conversationId));
     } catch (error) {
+      this.logger.warn(`Failed to join MLS conversation ${conversationId.id} via external commit`, error);
       if (MLSService.isBrokenMLSConversationError(error)) {
-        this.logger.info(
-          "Failed to join MLS conversation via external commit because it's broken, resetting the conversation",
-          error,
-        );
+        this.logger.info('Resetting MLS conversation due to broken mls conversation error', error);
         if (!shouldRetry) {
           this.logger.warn("Tried to join MLS conversation but it's still broken after reset", error);
           throw error;
