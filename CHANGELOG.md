@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [46.39.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@46.38.1...@wireapp/core@46.39.0) (2025-10-09)
+
+### Bug Fixes
+
+* Use the 400 error code for mls invalid leaf node errors [WPB-20935] ([#7435](https://github.com/wireapp/wire-web-packages/issues/7435)) ([21e3ac9](https://github.com/wireapp/wire-web-packages/commit/21e3ac90cfe3669e313d4e3076f50f14361f2f27))
+
+### Features
+
+* **core:** Use feature flag for reseting mls conversations [WPB-20946] ([#7436](https://github.com/wireapp/wire-web-packages/issues/7436)) ([44a0c9c](https://github.com/wireapp/wire-web-packages/commit/44a0c9ceb118812ab35364bc15021c25793e4219))
+
 ## [46.38.1](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@46.38.0...@wireapp/core@46.38.1) (2025-10-08)
 
 ### Reverts
