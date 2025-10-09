@@ -523,6 +523,7 @@ export class Account extends TypedEventEmitter<Events> {
       this.db,
       this.groupIdFromConversationId,
       subconversationService,
+      this.isMLSConversationRecoveryEnabled,
       mlsService,
     );
     const notificationService = new NotificationService(this.apiClient, this.storeEngine, conversationService);
@@ -1249,5 +1250,10 @@ export class Account extends TypedEventEmitter<Events> {
     // Check if MLS is enabled for the public via backend feature flag
     const commonConfig = (await this.service?.team.getCommonFeatureConfig()) ?? {};
     return commonConfig[FEATURE_KEY.MLS]?.status === FeatureStatus.ENABLED;
+  };
+
+  private isMLSConversationRecoveryEnabled = async () => {
+    const commonConfig = (await this.service?.team.getCommonFeatureConfig()) ?? {};
+    return commonConfig[FEATURE_KEY.ALLOWED_GLOBAL_OPERATIONS]?.status === FeatureStatus.ENABLED;
   };
 }

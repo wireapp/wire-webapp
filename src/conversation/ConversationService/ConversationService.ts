@@ -95,6 +95,7 @@ export class ConversationService extends TypedEventEmitter<Events> {
       subconversationId?: SUBCONVERSATION_ID,
     ) => Promise<string | undefined>,
     private readonly subconversationService: SubconversationService,
+    private readonly isMLSConversationRecoveryEnabled: () => Promise<boolean>,
     private readonly _mlsService?: MLSService,
   ) {
     super();
@@ -323,6 +324,9 @@ export class ConversationService extends TypedEventEmitter<Events> {
     conversationId: QualifiedId,
     afterReset?: (newGroupId: string) => Promise<T>,
   ): Promise<T | undefined> {
+    if (!(await this.isMLSConversationRecoveryEnabled())) {
+      throw new Error('MLS conversation recovery is disabled');
+    }
     const {
       conversation: {group_id: newGroupId},
     } = await this.resetMLSConversation(conversationId);

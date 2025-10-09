@@ -156,6 +156,7 @@ describe('ConversationService', () => {
       mockedDb,
       groupIdFromConversationId,
       mockedSubconversationService,
+      () => Promise.resolve(true),
       mockedMLSService,
     );
 
