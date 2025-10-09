@@ -44,12 +44,12 @@ export const completeLogin = async (pageManager: PageManager, user: User) => {
   await pageManager.openMainPage();
   await loginUser(user, pageManager);
 
-  const hasLocalData = await pages.historyInfo().isButtonVisible();
-  if (hasLocalData) {
+  if (await pages.historyInfo().isButtonVisible()) {
     await pages.historyInfo().clickConfirmButton();
   }
   await components.conversationSidebar().isPageLoaded();
-  if (!hasLocalData) {
+
+  if (await modals.dataShareConsent().isModalPresent()) {
     await modals.dataShareConsent().clickDecline();
   }
 };

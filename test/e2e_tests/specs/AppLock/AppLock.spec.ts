@@ -18,9 +18,10 @@
  */
 
 import {getUser} from 'test/e2e_tests/data/user';
+import {checkAnyIndexedDBExists} from 'test/e2e_tests/utils/indexedDB.util';
 import {completeLogin, setupBasicTestScenario} from 'test/e2e_tests/utils/setup.util';
 import {tearDownAll} from 'test/e2e_tests/utils/tearDown.util';
-import {loginUser, setupAppLock} from 'test/e2e_tests/utils/userActions';
+import {handleAppLockState} from 'test/e2e_tests/utils/userActions';
 
 import {test, expect} from '../../test.fixtures';
 
@@ -32,10 +33,11 @@ test.describe('AppLock', () => {
   const [memberA] = members;
   const teamName = 'AppLock';
   const appLockPassCode = '1a3!567N4';
+
   test.beforeAll(async ({api}) => {
     const user = await setupBasicTestScenario(api, members, owner, teamName);
     owner = {...owner, ...user};
-    await api.brig.enableAppLock(owner.teamId);
+    await api.brig.toggleAppLock(owner.teamId, 'enabled', true);
   });
 
   test(
@@ -58,28 +60,29 @@ test.describe('AppLock', () => {
   );
 
   test(
-    'Web: I want the app to lock when I switch back to webapp tab after inactivity timeout expired',
-    {tag: ['@TC-2752', '@regression']},
-    async ({pageManager}) => {
-      await pageManager.openMainPage();
-
-      await loginUser(memberA, pageManager);
-
-      // open new tab and wait
-      // boost the browser time?
-      // open back the correct tab
-      // unlock the app
-    },
-  );
-
-  test(
     'Web: App should not lock if I switch back to webapp tab in time (during inactivity timeout)',
-    {tag: ['@TC-2753', '@regression']},
-    async ({pageManager}) => {
+    {tag: ['@TC-2752', '@TC-2753', '@regression']},
+    async ({pageManager, browser}) => {
+      const {modals} = pageManager.webapp;
+      const webappPageA = await pageManager.getPage();
+
       await completeLogin(pageManager, memberA);
-      // open new tab and wait
-      // boost the browser time?
-      // open back the correct tab
+      await handleAppLockState(pageManager, appLockPassCode);
+      const unrelatedPage = await browser.newPage();
+      await unrelatedPage.goto('about:blank');
+      await unrelatedPage.bringToFront();
+      await unrelatedPage.waitForTimeout(2_000); // open be only 2 sec in the other tab
+      await webappPageA.bringToFront();
+
+      await expect(modals.appLock().appLockModalHeader).not.toBeVisible();
+
+      await test.step('Web: I want the app to lock when I switch back to webapp tab after inactivity timeout expired', async () => {
+        await unrelatedPage.goto('about:blank');
+        await unrelatedPage.bringToFront();
+        await unrelatedPage.waitForTimeout(31_000);
+        await webappPageA.bringToFront();
+        await expect(modals.appLock().appLockModalHeader).toBeVisible();
+      });
     },
   );
 
@@ -87,110 +90,81 @@ test.describe('AppLock', () => {
     'Web: I want to unlock the app with passphrase after login',
     {tag: ['@TC-2754', '@TC-2755', '@TC-2758', '@TC-2763', '@regression']},
     async ({pageManager}) => {
-      await pageManager.openMainPage();
-      const {modals} = pageManager.webapp;
+      const {modals, pages} = pageManager.webapp;
 
-      await pageManager.openMainPage();
       await completeLogin(pageManager, memberA);
 
-      // wait for data share consent
-
       await test.step('Web: I want the app to automatically lock after refreshing the page', async () => {
-        await setupAppLock(pageManager, appLockPassCode);
+        await handleAppLockState(pageManager, appLockPassCode);
         await pageManager.refreshPage();
 
         expect(await modals.appLock().isVisible()).toBeTruthy();
       });
 
       await test.step('Web: I should not be able to unlock the app with wrong passphrase', async () => {
-        await setupAppLock(pageManager, 'wrongCredentials');
+        await handleAppLockState(pageManager, 'wrongCredentials');
         await expect(modals.appLock().errorMessage).toHaveText('Wrong passcode');
       });
 
       await test.step('Web: I should not be able to wipe database with wrong account password', async () => {
         await modals.appLock().clickForgotPassphrase();
-        await pageManager.waitForTimeout(1000);
         await modals.appLock().clickWipeDB();
         await modals.appLock().clickReset();
+        await modals.appLock().inputUserPassword('wrong password');
 
-        await pageManager.waitForTimeout(20_000);
-        // task: check if on start page
-        await expect(modals.appLock().errorMessage).toHaveText('Wrong passcode');
+        expect(await checkAnyIndexedDBExists(await pageManager.getPage())).toBeTruthy();
       });
 
       await test.step('I want to wipe database when I forgot my app lock passphrase', async () => {
         await modals.appLock().inputUserPassword(memberA.password);
-        await pageManager.waitForTimeout(50_000);
+
+        await expect(pages.singleSignOn().ssoCodeEmailInput).toBeVisible();
+        expect(await checkAnyIndexedDBExists(await pageManager.getPage())).toBeFalsy();
       });
     },
   );
 
   test(
-    'Web: I should not be able to wipe database with wrong account password',
-    {tag: ['@TC-2763', '@regression']},
+    'I should not be able to switch off app lock if it is enforced for the team',
+    {tag: ['@TC-2770', '@TC-2767', '@regression']},
     async ({pageManager}) => {
-      await pageManager.openMainPage();
+      const {components, pages} = pageManager.webapp;
+      await completeLogin(pageManager, memberA);
+      await handleAppLockState(pageManager, appLockPassCode);
+      await components.conversationSidebar().clickPreferencesButton();
+      const page = await pageManager.getPage();
 
-      await loginUser(memberA, pageManager);
+      await expect(pages.account().appLockCheckbox).toBeDisabled();
+      // check here string
 
-      // reload the app
-      // check lock modal
-      // click forget password in the modal?
-      // check if in browser the db is cleared?
+      await expect(
+        page.getByText('Lock Wire after 30 seconds in the background. Unlock with Touch ID or enter your passcode.'),
+      ).toHaveCount(1);
     },
   );
 
-  test(
-    'Web: Verify inactivity timeout set on a team level applies to team member accounts',
-    {tag: ['@TC-2767', '@regression']},
-    async ({pageManager}) => {
-      await pageManager.openMainPage();
+  test('I want to switch off app lock', {tag: ['@TC-2771', '@TC-2772', '@regression']}, async ({pageManager, api}) => {
+    await api.brig.toggleAppLock(owner.teamId, 'enabled', false);
 
-      await loginUser(memberA, pageManager);
+    const {components, pages, modals} = pageManager.webapp;
 
-      // reload the app
-      // check lock modal
-      // click forget password in the modal?
-      // check if in browser the db is cleared?
-    },
-  );
+    await completeLogin(pageManager, memberA);
+    await components.conversationSidebar().clickPreferencesButton();
+    await pages.account().toggleAppLock();
+    await handleAppLockState(pageManager, appLockPassCode);
 
-  test(
-    'I should not be able to switch off app lock if it is enforced for the team 0',
-    {tag: ['@TC-2770', '@regression']},
-    async ({pageManager}) => {
-      await pageManager.openMainPage();
+    await pages.account().toggleAppLock();
 
-      await loginUser(memberA, pageManager);
-
-      // reload the app
-      // go to settings try to disable the app lock
-    },
-  );
-
-  test('I want to switch off app lock 0', {tag: ['@TC-2771', '@regression']}, async ({pageManager}) => {
-    await pageManager.openMainPage();
-
-    await loginUser(memberA, pageManager);
-
-    // reload the app
-    // check lock modal
-    // click forget password in the modal?
-    // check if in browser the db is cleared?
+    await modals.removeMember().clickConfirm();
+    await expect(pages.account().appLockCheckbox).not.toBeChecked();
   });
 
-  test(
+  test.skip(
     'Web: Verify inactivity timeout can be set if app lock is not enforced on a team level',
     {tag: ['@TC-2772', '@regression']},
-    async ({pageManager}) => {
-      await pageManager.openMainPage();
-
-      await loginUser(memberA, pageManager);
-
-      // reload the app
-      // check lock modal
-      // click forget password in the modal?
-      // check if in browser the db is cleared?
+    async ({pageManager, api}) => {
+      await completeLogin(pageManager, memberA);
+      // ?
     },
   );
 

@@ -156,13 +156,13 @@ export class BrigRepositoryE2E {
     );
   }
 
-  public async enableAppLock(teamId: string) {
+  public async toggleAppLock(teamId: string, status: 'enabled' | 'disabled', enforceAppLock: boolean = true) {
     await this.axiosInstance.patch(
       `i/teams/${teamId}/features/appLock`,
       {
-        status: 'enabled',
+        status: status,
         config: {
-          enforceAppLock: true,
+          enforceAppLock: enforceAppLock,
           inactivityTimeoutSecs: 30,
         },
       },

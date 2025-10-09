@@ -92,7 +92,7 @@ export const createGroup = async (pageManager: PageManager, conversationName: st
   await pageManager.webapp.pages.groupCreation().clickCreateGroupButton();
 };
 
-export const setupAppLock = async (pageManager: PageManager, appLockPassCode: string) => {
+export const handleAppLockState = async (pageManager: PageManager, appLockPassCode: string) => {
   const {modals} = pageManager.webapp;
   const appLockModal = await modals.appLock();
   if (await appLockModal.isVisible()) {
