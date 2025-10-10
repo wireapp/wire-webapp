@@ -1254,6 +1254,6 @@ export class Account extends TypedEventEmitter<Events> {
 
   private isMLSConversationRecoveryEnabled = async () => {
     const commonConfig = (await this.service?.team.getCommonFeatureConfig()) ?? {};
-    return commonConfig[FEATURE_KEY.ALLOWED_GLOBAL_OPERATIONS]?.status === FeatureStatus.ENABLED;
+    return commonConfig[FEATURE_KEY.ALLOWED_GLOBAL_OPERATIONS]?.config?.mlsConversationReset === true;
   };
 }
