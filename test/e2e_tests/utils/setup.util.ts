@@ -39,17 +39,17 @@ export const setupBasicTestScenario = async (api: ApiManagerE2E, member: User[],
   return user;
 };
 
-export const startUpApp = async (pageManager: PageManager, user: User) => {
+export const completeLogin = async (pageManager: PageManager, user: User) => {
   const {components, modals, pages} = pageManager.webapp;
   await pageManager.openMainPage();
   await loginUser(user, pageManager);
 
-  const hasLocalData = await pages.historyInfo().isButtonVisible();
-  if (hasLocalData) {
+  if (await pages.historyInfo().isButtonVisible()) {
     await pages.historyInfo().clickConfirmButton();
   }
   await components.conversationSidebar().isPageLoaded();
-  if (!hasLocalData) {
+
+  if (await modals.dataShareConsent().isModalPresent()) {
     await modals.dataShareConsent().clickDecline();
   }
 };

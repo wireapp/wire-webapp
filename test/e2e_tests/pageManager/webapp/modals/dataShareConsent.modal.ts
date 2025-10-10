@@ -43,7 +43,7 @@ export class DataShareConsentModal {
   }
 
   async isModalPresent() {
-    return this.modal.isVisible();
+    return this.modalTitle.isVisible();
   }
 
   async getModalTitle() {
