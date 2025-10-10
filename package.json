@@ -72,7 +72,7 @@
     "webgl-utils.js": "1.1.0",
     "webrtc-adapter": "9.0.3",
     "zod": "^3.24.2",
-    "zustand": "4.5.5"
+    "zustand": "5.0.8"
   },
   "devDependencies": {
     "@babel/core": "7.28.4",
