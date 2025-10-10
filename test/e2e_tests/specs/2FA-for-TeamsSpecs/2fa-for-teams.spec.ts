@@ -18,7 +18,7 @@
  */
 
 import {getUser, User} from 'test/e2e_tests/data/user';
-import {setupBasicTestScenario} from 'test/e2e_tests/utils/setup.utli';
+import {setupBasicTestScenario} from 'test/e2e_tests/utils/setup.util';
 import {tearDownAll} from 'test/e2e_tests/utils/tearDown.util';
 import {loginUser} from 'test/e2e_tests/utils/userActions';
 
