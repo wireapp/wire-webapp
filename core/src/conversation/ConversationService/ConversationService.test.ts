@@ -35,6 +35,7 @@ import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 
 import {APIClient} from '@wireapp/api-client';
+import {ErrorType, MlsErrorType} from '@wireapp/core-crypto';
 import {GenericMessage} from '@wireapp/protocol-messaging';
 
 import {AddUsersFailure, AddUsersFailureReasons, ConversationService, MessageSendingState} from '..';
@@ -566,7 +567,9 @@ describe('ConversationService', () => {
       const mockMLSWelcomeMessageEvent = createMLSWelcomeMessageEventMock(conversationId);
 
       const orphanWelcomeMessageError = new Error();
-      orphanWelcomeMessageError.name = CORE_CRYPTO_ERROR_NAMES.MlsErrorOrphanWelcomeMessage;
+      orphanWelcomeMessageError.name = MlsErrorType.OrphanWelcome;
+      (orphanWelcomeMessageError as any).context = {type: MlsErrorType.OrphanWelcome};
+      (orphanWelcomeMessageError as any).type = ErrorType.Mls;
 
       jest.spyOn(mlsService, 'handleMLSWelcomeMessageEvent').mockRejectedValueOnce(orphanWelcomeMessageError);
 
