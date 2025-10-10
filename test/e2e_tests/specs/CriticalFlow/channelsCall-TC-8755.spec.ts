@@ -63,7 +63,7 @@ test(
       await api.brig.unlockChannelFeature(owner.teamId);
       await api.brig.enableChannelsFeature(owner.teamId);
       await api.enableConferenceCallingFeature(owner.teamId);
-      await ownerPageManager.waitForTimeout(3000);
+      await ownerPageManager.waitForTimeout(5000);
     });
 
     await test.step('Owner and member login', async () => {
@@ -73,6 +73,7 @@ test(
     await test.step('Team owner creates a channel with available member', async () => {
       await ownerPages.conversationList().clickCreateGroup();
       await ownerPages.groupCreation().setGroupName(channelName);
+      await ownerPages.groupCreation().clickNextButton();
       await ownerPages.startUI().selectUsers([member.username]);
       await ownerPages.groupCreation().clickCreateGroupButton();
       await ownerPages.groupCreation().waitForModalClose();
