@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [46.39.2](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@46.39.1...@wireapp/core@46.39.2) (2025-10-10)
+
+### Bug Fixes
+
+* **core:** Use core crypto provided utils to detect mls orphan welcome error [WPB-20967] ([#7438](https://github.com/wireapp/wire-web-packages/issues/7438)) ([7efcf61](https://github.com/wireapp/wire-web-packages/commit/7efcf6119bb17ad3b5ccb4a6e563338d074fa8d7))
+
 ## [46.39.1](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@46.39.0...@wireapp/core@46.39.1) (2025-10-10)
 
 ### Bug Fixes
