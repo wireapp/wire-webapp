@@ -111,6 +111,22 @@ export enum ProteusErrorType {
   Other = 'Other',
 }
 
+export enum MlsErrorType {
+  ConversationAlreadyExists = 'ConversationAlreadyExists',
+  DuplicateMessage = 'DuplicateMessage',
+  BufferedFutureMessage = 'BufferedFutureMessage',
+  WrongEpoch = 'WrongEpoch',
+  BufferedCommit = 'BufferedCommit',
+  MessageEpochTooOld = 'MessageEpochTooOld',
+  SelfCommitIgnored = 'SelfCommitIgnored',
+  UnmergedPendingGroup = 'UnmergedPendingGroup',
+  StaleProposal = 'StaleProposal',
+  StaleCommit = 'StaleCommit',
+  OrphanWelcome = 'OrphanWelcome',
+  MessageRejected = 'MessageRejected',
+  Other = 'Other',
+}
+
 type CcError<T extends ErrorType> = Error & {type: T; context?: {type: string}};
 
 export const isCcError = <E extends ErrorType>(error: unknown, errorType: E): error is CcError<E> => {
@@ -130,3 +146,6 @@ export const isProteusDuplicateMessageError = (error: unknown) =>
   isProteusError(error, ProteusErrorType.DuplicateMessage);
 export const isProteusRemoteIdentityChangedError = (error: unknown) =>
   isProteusError(error, ProteusErrorType.RemoteIdentityChanged);
+
+export const isMlsOrphanWelcomeError = (error: unknown) =>
+  isCcError(error, ErrorType.Mls) && (error as any).context?.type === MlsErrorType.OrphanWelcome;

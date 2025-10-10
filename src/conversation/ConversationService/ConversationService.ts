@@ -47,7 +47,7 @@ import {Decoder} from 'bazinga64';
 
 import {APIClient} from '@wireapp/api-client';
 import {LogFactory, TypedEventEmitter} from '@wireapp/commons';
-import {ConversationId} from '@wireapp/core-crypto';
+import {ConversationId, isMlsOrphanWelcomeError} from '@wireapp/core-crypto';
 import {GenericMessage} from '@wireapp/protocol-messaging';
 
 import {
@@ -61,10 +61,7 @@ import {
 import {MessageTimer, MessageSendingState, RemoveUsersParams} from '../../conversation/';
 import {MLSService, MLSServiceEvents} from '../../messagingProtocols/mls';
 import {queueConversationRejoin} from '../../messagingProtocols/mls/conversationRejoinQueue';
-import {
-  isCoreCryptoMLSOrphanWelcomeMessageError,
-  isCoreCryptoMLSWrongEpochError,
-} from '../../messagingProtocols/mls/MLSService/CoreCryptoMLSError';
+import {isCoreCryptoMLSWrongEpochError} from '../../messagingProtocols/mls/MLSService/CoreCryptoMLSError';
 import {getConversationQualifiedMembers, ProteusService} from '../../messagingProtocols/proteus';
 import {
   AddUsersToProteusConversationParams,
@@ -907,7 +904,8 @@ export class ConversationService extends TypedEventEmitter<Events> {
       return await this.mlsService.handleMLSWelcomeMessageEvent(event, this.apiClient.validatedClientId);
     } catch (error) {
       this.logger.warn('Failed to handle MLS welcome message event', {event, error});
-      if (isCoreCryptoMLSOrphanWelcomeMessageError(error)) {
+      if (isMlsOrphanWelcomeError(error)) {
+        this.logger.warn('Received an orphan welcome message, trying to join the conversation via external commit');
         const {qualified_conversation: conversationId} = event;
 
         // Note that we don't care about a subconversation here, as the welcome message is always for the parent conversation.

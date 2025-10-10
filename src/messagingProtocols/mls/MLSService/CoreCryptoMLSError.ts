@@ -30,7 +30,6 @@ export const CORE_CRYPTO_ERROR_NAMES = {
   ProteusErrorSessionNotFound: 'ProteusErrorSessionNotFound',
   ProteusErrorRemoteIdentityChanged: 'ProteusErrorRemoteIdentityChanged',
   MlsErrorWrongEpoch: 'MlsErrorWrongEpoch',
-  MlsErrorOrphanWelcomeMessage: 'MlsErrorOrphanWelcomeMessage',
 };
 
 export const isCoreCryptoMLSWrongEpochError = (error: unknown): boolean => {
@@ -39,10 +38,6 @@ export const isCoreCryptoMLSWrongEpochError = (error: unknown): boolean => {
 
 export const isCoreCryptoMLSConversationAlreadyExistsError = (error: unknown): boolean => {
   return error instanceof Error && error.name === CORE_CRYPTO_ERROR_NAMES.MlsErrorConversationAlreadyExists;
-};
-
-export const isCoreCryptoMLSOrphanWelcomeMessageError = (error: unknown): boolean => {
-  return error instanceof Error && error.name === CORE_CRYPTO_ERROR_NAMES.MlsErrorOrphanWelcomeMessage;
 };
 
 const mlsDecryptionErrorNamesToIgnore: string[] = [
