@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [46.39.1](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@46.39.0...@wireapp/core@46.39.1) (2025-10-10)
+
+### Bug Fixes
+
+* Use correct MLS conversation reset value in allowed global operations [WPB-20946] ([#7437](https://github.com/wireapp/wire-web-packages/issues/7437)) ([b4488c4](https://github.com/wireapp/wire-web-packages/commit/b4488c487406c7e8ae7cbe84fb84dae67f1be361))
+
 # [46.39.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@46.38.1...@wireapp/core@46.39.0) (2025-10-09)
 
 ### Bug Fixes
