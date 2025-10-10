@@ -20,8 +20,9 @@
 import {getUser} from 'test/e2e_tests/data/user';
 import {PageManager} from 'test/e2e_tests/pageManager';
 import {addMockCamerasToContext} from 'test/e2e_tests/utils/mockVideoDevice.util';
+import {completeLogin} from 'test/e2e_tests/utils/setup.util';
 import {addCreatedTeam, removeCreatedTeam} from 'test/e2e_tests/utils/tearDown.util';
-import {inviteMembers, loginUser} from 'test/e2e_tests/utils/userActions';
+import {inviteMembers} from 'test/e2e_tests/utils/userActions';
 
 import {test, expect} from '../../test.fixtures';
 
@@ -41,14 +42,13 @@ test(
   async ({browser, pageManager: ownerPageManager, api}) => {
     test.setTimeout(150_000);
 
-    const {pages: ownerPages, modals: ownerModals, components: ownerComponents} = ownerPageManager.webapp;
+    const {pages: ownerPages, components: ownerComponents} = ownerPageManager.webapp;
 
     await addMockCamerasToContext(ownerPageManager.getContext());
 
     const memberContext = await browser.newContext();
     const memberPage = await memberContext.newPage();
     const memberPageManager = PageManager.from(memberPage);
-    const {modals: memberModals} = memberPageManager.webapp;
 
     let callingServiceInstanceId: string;
 
@@ -67,25 +67,12 @@ test(
     });
 
     await test.step('Owner and member login', async () => {
-      await Promise.all([
-        (async () => {
-          await ownerPageManager.openMainPage();
-          await loginUser(owner, ownerPageManager);
-          await ownerModals.dataShareConsent().clickDecline();
-        })(),
-
-        (async () => {
-          await memberPageManager.openMainPage();
-          await loginUser(member, memberPageManager);
-          await memberModals.dataShareConsent().clickDecline();
-        })(),
-      ]);
+      await Promise.all([await completeLogin(ownerPageManager, owner), await completeLogin(memberPageManager, member)]);
     });
 
     await test.step('Team owner creates a channel with available member', async () => {
       await ownerPages.conversationList().clickCreateGroup();
       await ownerPages.groupCreation().setGroupName(channelName);
-      await ownerPages.groupCreation().clickNextButton();
       await ownerPages.startUI().selectUsers([member.username]);
       await ownerPages.groupCreation().clickCreateGroupButton();
       await ownerPages.groupCreation().waitForModalClose();
