@@ -82,7 +82,9 @@ if (commitId) {
     // If we're releasing to production, we need to ensure the commitId is part of the master branch.
     const commitBranch = exec(`git branch --contains ${commitId}`)
       .split('\n')
-      .map(branch => branch.trim());
+      // the branch name will have a star in front if it's the current branch
+      .map(branch => branch.replace('* ', '').trim());
+    logger.info(`Commit ID "${commitId}" is part of branches: ${commitBranch}`);
     if (!commitBranch.includes(branch)) {
       logger.error(`Commit ID "${commitId}" is not part of the ${branch} branch. Aborting.`);
       process.exit(1);
