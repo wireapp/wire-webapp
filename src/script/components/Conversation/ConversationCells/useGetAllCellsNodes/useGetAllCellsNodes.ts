@@ -69,7 +69,10 @@ export const useGetAllCellsNodes = ({
 
       const users = await getUsersFromNodes({nodes: result.Nodes, userRepository});
 
-      const transformedNodes = transformDataToCellsNodes({nodes: result.Nodes, users});
+      // filter out draft nodes from results
+      const filteredNodes = result.Nodes.filter(node => !node.IsDraft);
+
+      const transformedNodes = transformDataToCellsNodes({nodes: filteredNodes, users});
       setNodes({conversationId: id, nodes: transformedNodes});
 
       const pagination = result.Pagination ? transformToCellPagination(result.Pagination) : null;

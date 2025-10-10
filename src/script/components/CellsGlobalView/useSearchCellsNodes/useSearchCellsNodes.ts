@@ -81,8 +81,11 @@ export const useSearchCellsNodes = ({
           conversationRepository,
         });
 
+        // filter out draft nodes from results
+        const filteredNodes = result.Nodes?.filter(node => !node.IsDraft);
+
         const transformedNodes = transformCellsNodes({
-          nodes: result.Nodes || [],
+          nodes: filteredNodes || [],
           users,
           conversations,
         });
