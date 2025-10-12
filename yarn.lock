@@ -9717,21 +9717,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"browserslist@npm:^4.24.5, browserslist@npm:^4.26.0":
-  version: 4.26.3
-  resolution: "browserslist@npm:4.26.3"
-  dependencies:
-    baseline-browser-mapping: "npm:^2.8.9"
-    caniuse-lite: "npm:^1.0.30001746"
-    electron-to-chromium: "npm:^1.5.227"
-    node-releases: "npm:^2.0.21"
-    update-browserslist-db: "npm:^1.1.3"
-  bin:
-    browserslist: cli.js
-  checksum: 10/49add06fd753a2514d84c75a7de8d9fb3d70be675e53b72981d87f0c0ff40d8a8cd0bd92f77400381704be0bf1c9c5c65aef95d03843d69475ff55188aa12124
-  languageName: node
-  linkType: hard
-
 "browserslist@npm:^4.25.1":
   version: 4.25.2
   resolution: "browserslist@npm:4.25.2"
@@ -9743,6 +9728,21 @@ __metadata:
   bin:
     browserslist: cli.js
   checksum: 10/5a42c8728feffec8ace9fdf3dea52115e0329e0c423e2aec26f3e31e7bc0dea8e6267681a165d7e46cd867065e0fb3f042ef749f872c1ef912b62cacb7b84854
+  languageName: node
+  linkType: hard
+
+"browserslist@npm:^4.26.0, browserslist@npm:^4.26.3":
+  version: 4.26.3
+  resolution: "browserslist@npm:4.26.3"
+  dependencies:
+    baseline-browser-mapping: "npm:^2.8.9"
+    caniuse-lite: "npm:^1.0.30001746"
+    electron-to-chromium: "npm:^1.5.227"
+    node-releases: "npm:^2.0.21"
+    update-browserslist-db: "npm:^1.1.3"
+  bin:
+    browserslist: cli.js
+  checksum: 10/49add06fd753a2514d84c75a7de8d9fb3d70be675e53b72981d87f0c0ff40d8a8cd0bd92f77400381704be0bf1c9c5c65aef95d03843d69475ff55188aa12124
   languageName: node
   linkType: hard
 
@@ -19696,6 +19696,18 @@ __metadata:
   languageName: node
   linkType: hard
 
+"schema-utils@npm:^4.3.3":
+  version: 4.3.3
+  resolution: "schema-utils@npm:4.3.3"
+  dependencies:
+    "@types/json-schema": "npm:^7.0.9"
+    ajv: "npm:^8.9.0"
+    ajv-formats: "npm:^2.1.1"
+    ajv-keywords: "npm:^5.1.0"
+  checksum: 10/dba77a46ad7ff0c906f7f09a1a61109e6cb56388f15a68070b93c47a691f516c6a3eb454f81a8cceb0a0e55b87f8b05770a02bfb1f4e0a3143b5887488b2f900
+  languageName: node
+  linkType: hard
+
 "sdp@npm:^3.2.0":
   version: 3.2.0
   resolution: "sdp@npm:3.2.0"
@@ -20676,7 +20688,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"tapable@npm:^2.2.3":
+"tapable@npm:^2.3.0":
   version: 2.3.0
   resolution: "tapable@npm:2.3.0"
   checksum: 10/496a841039960533bb6e44816a01fffc2a1eb428bb2051ecab9e87adf07f19e1f937566cbbbb09dceff31163c0ffd81baafcad84db900b601f0155dd0b37e9f2
@@ -21999,9 +22011,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"webpack@npm:5.102.0":
-  version: 5.102.0
-  resolution: "webpack@npm:5.102.0"
+"webpack@npm:5.102.1":
+  version: 5.102.1
+  resolution: "webpack@npm:5.102.1"
   dependencies:
     "@types/eslint-scope": "npm:^3.7.7"
     "@types/estree": "npm:^1.0.8"
@@ -22011,7 +22023,7 @@ __metadata:
     "@webassemblyjs/wasm-parser": "npm:^1.14.1"
     acorn: "npm:^8.15.0"
     acorn-import-phases: "npm:^1.0.3"
-    browserslist: "npm:^4.24.5"
+    browserslist: "npm:^4.26.3"
     chrome-trace-event: "npm:^1.0.2"
     enhanced-resolve: "npm:^5.17.3"
     es-module-lexer: "npm:^1.2.1"
@@ -22023,8 +22035,8 @@ __metadata:
     loader-runner: "npm:^4.2.0"
     mime-types: "npm:^2.1.27"
     neo-async: "npm:^2.6.2"
-    schema-utils: "npm:^4.3.2"
-    tapable: "npm:^2.2.3"
+    schema-utils: "npm:^4.3.3"
+    tapable: "npm:^2.3.0"
     terser-webpack-plugin: "npm:^5.3.11"
     watchpack: "npm:^2.4.4"
     webpack-sources: "npm:^3.3.3"
@@ -22033,7 +22045,7 @@ __metadata:
       optional: true
   bin:
     webpack: bin/webpack.js
-  checksum: 10/a76f9136c1c470e75a870b0f52b91f819224b21edf9f1959e0501cd17d38c9689e0ccd3ee6d0f7f0b764866d5bc6a1c6c9a38b235d75e2bfbc7ac25c94796da8
+  checksum: 10/4ba737916c4b72812cdd1961ea82d0a6de8ac814134584b54d523a2c4b9e1d377490d63b2c74856e2b9146dbe6d09b05c8878439b0783c3e5195ca3e248b2131
   languageName: node
   linkType: hard
 
@@ -22419,7 +22431,7 @@ __metadata:
     use-debounce: "npm:^10.0.6"
     uuid: "npm:11.1.0"
     webgl-utils.js: "npm:1.1.0"
-    webpack: "npm:5.102.0"
+    webpack: "npm:5.102.1"
     webpack-bundle-analyzer: "npm:^4.10.2"
     webpack-cli: "npm:6.0.1"
     webpack-dev-middleware: "npm:7.4.5"
