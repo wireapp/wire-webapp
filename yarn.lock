@@ -12448,10 +12448,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"fake-indexeddb@npm:6.2.2":
-  version: 6.2.2
-  resolution: "fake-indexeddb@npm:6.2.2"
-  checksum: 10/b2dd94419ebc836bf8b68badf653fbba878a73ea775f4c0fbcc55ee1a5d67fbf4be469388fd8044c80e11e8c5be37bc697131ec2747191e3d4569e009e0bb403
+"fake-indexeddb@npm:6.2.3":
+  version: 6.2.3
+  resolution: "fake-indexeddb@npm:6.2.3"
+  checksum: 10/2a901838f4eb981ffc5c8e3e861daff0fd068812ec177d6a0cde221ef7d5d06718f70a968b464d230ddf141279d7bb55e2613ebd7cff01971f10d39bb0e30ebe
   languageName: node
   linkType: hard
 
@@ -22343,7 +22343,7 @@ __metadata:
     emoji-picker-react: "npm:4.14.0"
     eslint: "npm:8.57.0"
     eslint-plugin-prettier: "npm:5.1.3"
-    fake-indexeddb: "npm:6.2.2"
+    fake-indexeddb: "npm:6.2.3"
     generate-changelog: "npm:1.8.0"
     html-webpack-plugin: "npm:5.6.4"
     http-status-codes: "npm:2.3.0"
