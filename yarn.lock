@@ -21690,6 +21690,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"uuid@npm:13.0.0":
+  version: 13.0.0
+  resolution: "uuid@npm:13.0.0"
+  bin:
+    uuid: dist-node/bin/uuid
+  checksum: 10/2742b24d1e00257e60612572e4d28679423469998cafbaf1fe9f1482e3edf9c40754b31bfdb3d08d71b29239f227a304588f75210b3b48f2609f0673f1feccef
+  languageName: node
+  linkType: hard
+
 "uuid@npm:9.0.1":
   version: 9.0.1
   resolution: "uuid@npm:9.0.1"
@@ -22429,7 +22438,7 @@ __metadata:
     typescript: "npm:5.5.2"
     underscore: "npm:1.13.7"
     use-debounce: "npm:^10.0.6"
-    uuid: "npm:11.1.0"
+    uuid: "npm:13.0.0"
     webgl-utils.js: "npm:1.1.0"
     webpack: "npm:5.102.1"
     webpack-bundle-analyzer: "npm:^4.10.2"
