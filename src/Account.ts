@@ -1111,7 +1111,7 @@ export class Account extends TypedEventEmitter<Events> {
 
     this.apiClient.transport.ws.on(WebSocketClient.TOPIC.ON_MESSAGE, notification => {
       this.logger.info('Received new notification from backend', {notification});
-      if (this.checkIsConsumable(notification)) {
+      if (Account.checkIsConsumable(notification)) {
         void handleNotification(notification, NotificationSource.WEBSOCKET);
         return;
       }
@@ -1183,10 +1183,16 @@ export class Account extends TypedEventEmitter<Events> {
     return this.currentClient?.capabilities || [];
   };
 
-  public checkIsConsumable = (
+  public static checkIsConsumable = (
     notification: Notification | ConsumableNotification,
   ): notification is ConsumableNotification => {
     return 'type' in notification;
+  };
+
+  public static checkIsLegacyNotification = (
+    notification: Notification | ConsumableNotification,
+  ): notification is Notification => {
+    return !Account.checkIsConsumable(notification);
   };
 
   private readonly generateDbName = (context: Context) => {
