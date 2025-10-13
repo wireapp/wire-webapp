@@ -30,6 +30,7 @@ import {ReconnectingWebsocket, WEBSOCKET_STATE} from './ReconnectingWebsocket';
 import {InvalidTokenError, MissingCookieAndTokenError, MissingCookieError} from '../auth/';
 import {MINIMUM_API_VERSION} from '../Config';
 import {HttpClient, NetworkError} from '../http/';
+import {Notification} from '../notification';
 import {
   ConsumableNotification,
   ConsumableNotificationEvent,
@@ -47,7 +48,7 @@ enum TOPIC {
 export interface WebSocketClient {
   on(event: TOPIC.ON_ERROR, listener: (error: Error | ErrorEvent) => void): this;
   on(event: TOPIC.ON_INVALID_TOKEN, listener: (error: InvalidTokenError | MissingCookieError) => void): this;
-  on(event: TOPIC.ON_MESSAGE, listener: (notification: ConsumableNotification) => void): this;
+  on(event: TOPIC.ON_MESSAGE, listener: (notification: Notification | ConsumableNotification) => void): this;
   on(event: TOPIC.ON_STATE_CHANGE, listener: (state: WEBSOCKET_STATE) => void): this;
 }
 
