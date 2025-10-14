@@ -19,8 +19,6 @@
 
 import axios, {AxiosRequestConfig} from 'axios';
 
-import {QualifiedConversationId} from '@wireapp/protocol-messaging';
-
 import {AssetRetentionPolicy} from './AssetRetentionPolicy';
 import {AssetUploadData} from './AssetUploadData';
 import {isValidToken, isValidUUID} from './AssetUtil';
@@ -36,7 +34,7 @@ import {
 } from '../http/';
 import {base64MD5FromBuffer, concatToBuffer} from '../shims/node/buffer';
 import {unsafeAlphanumeric} from '../shims/node/random';
-import {RequestCancellationError} from '../user';
+import {QualifiedId, RequestCancellationError} from '../user';
 
 export interface CipherOptions {
   /** Set a custom algorithm for encryption */
@@ -46,7 +44,7 @@ export interface CipherOptions {
 }
 
 export interface AssetAuditData {
-  conversationId: QualifiedConversationId;
+  conversationId: QualifiedId;
   filename: string;
   filetype: string;
 }
@@ -142,7 +140,7 @@ export class AssetAPI {
       public: boolean;
       retention: AssetRetentionPolicy;
       domain?: string;
-      conversationId?: QualifiedConversationId;
+      conversationId?: QualifiedId;
       filename?: string;
       filetype?: string;
     } = {
