@@ -39,7 +39,8 @@ export const useFilePaste = ({onFilePasted}: UseFilePasteParams) => {
       const {lastModified} = pastedFile;
 
       const date = formatLocale(lastModified || new Date(), 'PP, pp');
-      const fileName = `${t('conversationSendPastedFile', {date})}.${getFileExtension(pastedFile.name)}`;
+      const fileName =
+        pastedFile.name ?? `${t('conversationSendPastedFile', {date})}.${getFileExtension(pastedFile.name)}`;
 
       const newFile = new File([pastedFile], fileName, {
         type: pastedFile.type,

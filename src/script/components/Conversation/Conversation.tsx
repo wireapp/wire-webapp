@@ -478,13 +478,14 @@ export const Conversation = ({
   const isCellsEnabled =
     Config.getConfig().FEATURE.ENABLE_CELLS && activeConversation?.cellsState() !== CONVERSATION_CELLS_STATE.DISABLED;
 
-  const {getRootProps, getInputProps, openAllFilesView, openImageFilesView, isDragAccept} = useFilesUploadDropzone({
-    isTeam: inTeam,
-    cellsRepository: repositories.cells,
-    conversation: activeConversation,
-    isCellsEnabled: isCellsEnabled,
-    isDisabled: isFileTabActive,
-  });
+  const {getRootProps, getInputProps, openAllFilesView, openImageFilesView, handlePastedFile, isDragAccept} =
+    useFilesUploadDropzone({
+      isTeam: inTeam,
+      cellsRepository: repositories.cells,
+      conversation: activeConversation,
+      isCellsEnabled: isCellsEnabled,
+      isDisabled: isFileTabActive,
+    });
 
   return (
     <ConversationFileDropzone
@@ -595,10 +596,12 @@ export const Conversation = ({
                   storageRepository={repositories.storage}
                   teamState={teamState}
                   selfUser={selfUser}
+                  isCellsEnabled={isCellsEnabled}
                   onShiftTab={() => setMsgElementsFocusable(false)}
                   uploadDroppedFiles={uploadDroppedFiles}
                   uploadImages={uploadImages}
                   uploadFiles={uploadFiles}
+                  uploadPastedFiles={handlePastedFile}
                   onCellImageUpload={openImageFilesView}
                   onCellAssetUpload={openAllFilesView}
                 />
