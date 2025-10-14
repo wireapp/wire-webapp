@@ -43,6 +43,10 @@ export class DetailViewModal {
     this.closeButton = this.mainWindow.locator(`header button${selectByDataAttribute('do-close-detail-view')}`);
   }
 
+  async waitForVisibility() {
+    await this.mainWindow.waitFor({state: 'visible'});
+  }
+
   async isVisible() {
     return await this.mainWindow.isVisible();
   }
