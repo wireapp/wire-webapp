@@ -20,6 +20,7 @@
 import {
   FeatureAllowedGlobalOperations,
   FeatureAppLock,
+  FeatureAssetAuditLog,
   FeatureChannels,
   FeatureClassifiedDomains,
   FeatureConferenceCalling,
@@ -43,6 +44,7 @@ import {FeatureConversationGuestLink} from '.';
 export enum FEATURE_KEY {
   APPLOCK = 'appLock',
   ALLOWED_GLOBAL_OPERATIONS = 'allowedGlobalOperations',
+  ASSET_AUDIT_LOG = 'assetAuditLog',
   CLASSIFIED_DOMAINS = 'classifiedDomains',
   CONFERENCE_CALLING = 'conferenceCalling',
   CONSUMABLE_NOTIFICATIONS = 'consumableNotifications',
@@ -68,6 +70,7 @@ export enum FEATURE_KEY {
 export type FeatureList = {
   [FEATURE_KEY.APPLOCK]?: FeatureAppLock;
   [FEATURE_KEY.ALLOWED_GLOBAL_OPERATIONS]?: FeatureAllowedGlobalOperations;
+  [FEATURE_KEY.ASSET_AUDIT_LOG]?: FeatureAssetAuditLog;
   [FEATURE_KEY.CLASSIFIED_DOMAINS]?: FeatureClassifiedDomains;
   [FEATURE_KEY.CONFERENCE_CALLING]?: FeatureConferenceCalling;
   [FEATURE_KEY.DIGITAL_SIGNATURES]?: FeatureDigitalSignature;

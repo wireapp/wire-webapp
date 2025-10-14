@@ -19,6 +19,8 @@
 
 import axios, {AxiosRequestConfig} from 'axios';
 
+import {QualifiedConversationId} from '@wireapp/protocol-messaging';
+
 import {AssetRetentionPolicy} from './AssetRetentionPolicy';
 import {AssetUploadData} from './AssetUploadData';
 import {isValidToken, isValidUUID} from './AssetUtil';
@@ -43,11 +45,18 @@ export interface CipherOptions {
   hash?: Buffer;
 }
 
+export interface AssetAuditData {
+  conversationId: QualifiedConversationId;
+  filename: string;
+  filetype: string;
+}
+
 export interface AssetOptions extends CipherOptions {
   public?: boolean;
   retention?: AssetRetentionPolicy;
   /** If given, will upload an asset that can be shared in a federated env */
   domain?: string;
+  auditData?: AssetAuditData;
 }
 
 export interface AssetResponse {
@@ -129,11 +138,26 @@ export class AssetAPI {
   ): RequestCancelable<AssetUploadData> {
     const BOUNDARY = `Frontier${unsafeAlphanumeric()}`;
 
-    const metadata = JSON.stringify({
+    const metadataObject: {
+      public: boolean;
+      retention: AssetRetentionPolicy;
+      domain?: string;
+      conversationId?: QualifiedConversationId;
+      filename?: string;
+      filetype?: string;
+    } = {
       public: options?.public ?? true,
       retention: options?.retention || AssetRetentionPolicy.PERSISTENT,
       domain: options?.domain,
-    });
+    };
+
+    if (options?.auditData) {
+      metadataObject.conversationId = options.auditData.conversationId;
+      metadataObject.filename = options.auditData.filename;
+      metadataObject.filetype = options.auditData.filetype;
+    }
+
+    const metadata = JSON.stringify(metadataObject);
 
     const body =
       `--${BOUNDARY}\r\n` +
