@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [27.78.1](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@27.78.0...@wireapp/api-client@27.78.1) (2025-10-14)
+
+### Bug Fixes
+
+* correct conversation type ([#7458](https://github.com/wireapp/wire-web-packages/issues/7458)) ([43b252d](https://github.com/wireapp/wire-web-packages/commit/43b252d923857f02c730780e95b6b40374b54889))
+
 # [27.78.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@27.77.3...@wireapp/api-client@27.78.0) (2025-10-14)
 
 ### Features
