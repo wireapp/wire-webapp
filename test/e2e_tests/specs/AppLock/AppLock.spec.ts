@@ -164,7 +164,7 @@ test.describe('AppLock', () => {
     {tag: ['@TC-2772', '@regression']},
     async ({pageManager, api}) => {
       await completeLogin(pageManager, memberA);
-      // ?
+      // not implemented
     },
   );
 
