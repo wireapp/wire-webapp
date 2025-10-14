@@ -17,7 +17,7 @@
  *
  */
 
-import {AssetOptions, AssetRetentionPolicy} from '@wireapp/api-client/lib/asset/';
+import {AssetAuditData, AssetOptions, AssetRetentionPolicy} from '@wireapp/api-client/lib/asset/';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 import ko from 'knockout';
 import {container, singleton} from 'tsyringe';
@@ -46,6 +46,7 @@ interface CompressedImage {
 }
 
 export interface AssetUploadOptions extends AssetOptions {
+  auditData?: AssetAuditData;
   domain?: string;
   legalHoldStatus?: LegalHoldStatus;
 }
