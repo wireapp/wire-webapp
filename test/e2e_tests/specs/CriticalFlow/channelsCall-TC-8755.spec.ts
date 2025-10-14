@@ -67,7 +67,7 @@ test(
     });
 
     await test.step('Owner and member login', async () => {
-      await Promise.all([await completeLogin(ownerPageManager, owner), await completeLogin(memberPageManager, member)]);
+      await Promise.all([completeLogin(ownerPageManager, owner), completeLogin(memberPageManager, member)]);
     });
 
     await test.step('Team owner creates a channel with available member', async () => {
