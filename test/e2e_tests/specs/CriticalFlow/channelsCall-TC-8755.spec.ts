@@ -71,8 +71,13 @@ test(
     });
 
     await test.step('Team owner creates a channel with available member', async () => {
+      const page = await ownerPageManager.getPage();
+      await page.screenshot({path: 'playwright-report/screenshots'});
       await ownerPages.conversationList().clickCreateGroup();
+      await page.screenshot({path: 'playwright-report/screenshots'});
       await ownerPages.groupCreation().setGroupName(channelName);
+      await ownerPageManager.waitForTimeout(3000);
+      await page.screenshot({path: 'playwright-report/screenshots'});
       await ownerPages.groupCreation().clickNextButton();
       await ownerPages.startUI().selectUsers([member.username]);
       await ownerPages.groupCreation().clickCreateGroupButton();
