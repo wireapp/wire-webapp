@@ -161,6 +161,7 @@ export class CallingRepository {
   private wUser: number = 0;
   private nextMuteState: MuteState = MuteState.SELF_MUTED;
   private isConferenceCallingSupported = false;
+  private isOnAvsRustSft = false;
 
   static EMOJI_TIME_OUT_DURATION = TIME_IN_MILLIS.SECOND * 4;
 
@@ -911,6 +912,7 @@ export class CallingRepository {
       this.serializeQualifiedId(userId),
       conversation && isMLSConversation(conversation) ? senderClientId : clientId,
       conversation && this.getConversationType(conversation),
+      0, // if call a meeting 1
     );
 
     if (res !== 0) {
@@ -980,6 +982,9 @@ export class CallingRepository {
       );
       this.storeCall(call);
 
+      // Temporary feature to toggle Rust SFT
+      this.setSetupSftConfig(call);
+
       if (this.isMLSConference(conversation)) {
         call.epochCache.enable();
         await this.joinMlsConferenceSubconversation(conversation);
@@ -991,7 +996,7 @@ export class CallingRepository {
        * Further info: https://wearezeta.atlassian.net/browse/SQCALL-551
        */
       this.wCall?.setMute(this.wUser, 0);
-      this.wCall?.start(this.wUser, convId, CALL_TYPE.NORMAL, conversationType, this.callState.cbrEncoding());
+      this.wCall?.start(this.wUser, convId, CALL_TYPE.NORMAL, conversationType, this.callState.cbrEncoding(), 0); // if call a meeting 1
       if (!!conversation && this.isMLSConference(conversation)) {
         this.setCachedEpochInfos(call);
       }
@@ -1009,6 +1014,25 @@ export class CallingRepository {
         await this.leaveMLSConferenceBecauseError(conversation);
       }
     }
+  }
+
+  /**
+   * We're fetching Rust SFT config in case user wants to use them.
+   * We also use a cache value to avoid unnecessarily fetching the config.
+   */
+  private setSetupSftConfig(call: Call) {
+    if (call.useAvsRustSFT()) {
+      if (!this.isOnAvsRustSft) {
+        this.isOnAvsRustSft = true;
+        this.requestConfig();
+        this.logger.info('SetupSftConfig: Switch SFT setup use Rust SFT: false->true');
+      }
+    } else if (this.isOnAvsRustSft) {
+      this.isOnAvsRustSft = false;
+      this.requestConfig();
+      this.logger.info('SetupSftConfig: Switch SFT setup use Rust SFT: true->false');
+    }
+    this.logger.info('SetupSftConfig: Use Rust SFT', this.isOnAvsRustSft);
   }
 
   private serializeQualifiedId(id: QualifiedId): string {
@@ -1308,6 +1332,10 @@ export class CallingRepository {
 
   async answerCall(call: Call, callType?: CALL_TYPE): Promise<void> {
     void this.setViewModeMinimized();
+
+    // Temporary feature to toggle Rust SFT
+    this.setSetupSftConfig(call);
+
     const {conversation} = call;
     try {
       callType ??= call.getSelfParticipant().sharesCamera() ? call.initialType : CALL_TYPE.NORMAL;
@@ -1996,9 +2024,15 @@ export class CallingRepository {
   };
 
   private readonly requestConfig = () => {
+    const useRustSft = this.isOnAvsRustSft;
     const _requestConfig = async () => {
       const limit = Runtime.isFirefox() ? CallingRepository.CONFIG.MAX_FIREFOX_TURN_COUNT : undefined;
       const config = await this.fetchConfig(limit);
+      if (useRustSft) {
+        (config as any).sft_servers = [{urls: ['https://rust-sft.stars.wire.link']}];
+        (config as any).sft_servers_all = [{urls: ['https://rust-sft.stars.wire.link']}];
+      }
+
       this.wCall?.configUpdate(this.wUser, 0, JSON.stringify(config));
     };
     _requestConfig().catch(error => {

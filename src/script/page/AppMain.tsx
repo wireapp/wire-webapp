@@ -253,7 +253,7 @@ export const AppMain = ({
     //after app is loaded, check mls migration configuration and start migration if needed
     await initialiseMLSMigrationFlow({
       selfUser,
-      conversationHandler: repositories.conversation,
+      conversationRepository: repositories.conversation,
       getTeamMLSMigrationStatus: repositories.team.getTeamMLSMigrationStatus,
       refreshAllKnownUsers: repositories.user.refreshAllKnownUsers,
     });
