@@ -21,6 +21,7 @@ import {AxiosRequestConfig} from 'axios';
 
 import {
   FeatureAppLock,
+  FeatureAssetAuditLog,
   FeatureVideoCalling,
   FeatureConferenceCalling,
   FeatureDigitalSignature,
@@ -52,6 +53,7 @@ export class FeatureAPI {
   public static readonly URL = {
     APPLOCK: 'appLock',
     ALLOWED_GLOBAL_OPERATIONS: 'allowedGlobalOperations',
+    AUDIT_LOG: 'assetAuditLog',
     CALLING_CONFERENCE: 'conferenceCalling',
     CALLING_VIDEO: 'videoCalling',
     CONSUMABLE_NOTIFICATIONS: 'consumableNotifications',
@@ -452,6 +454,16 @@ export class FeatureAPI {
     const config: AxiosRequestConfig = {
       method: 'get',
       url: `${FeatureAPI.URL.TEAMS}/${teamId}/${FeatureAPI.URL.FEATURES}/${FeatureAPI.URL.CELLS}`,
+    };
+
+    const response = await this.client.sendJSON<FeatureCells>(config);
+    return response.data;
+  }
+
+  public async getAssetAuditLog(teamId: string): Promise<FeatureAssetAuditLog> {
+    const config: AxiosRequestConfig = {
+      method: 'get',
+      url: `${FeatureAPI.URL.TEAMS}/${teamId}/${FeatureAPI.URL.FEATURES}/${FeatureAPI.URL.AUDIT_LOG}`,
     };
 
     const response = await this.client.sendJSON<FeatureCells>(config);
