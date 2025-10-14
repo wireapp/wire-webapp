@@ -65,6 +65,8 @@ test(
       await api.brig.enableMLSFeature(userA.teamId);
       await api.brig.unlockChannelFeature(userA.teamId);
       await api.brig.enableChannelsFeature(userA.teamId);
+      // timeout waiter
+
       await userAPageManager.waitForTimeout(3000);
     });
 
@@ -114,8 +116,8 @@ test(
     await test.step('User B can open the image preview and see the image', async () => {
       // Click on the image to open it in a preview
       await userBPages.conversation().clickImage(userA);
-
       // Verify that the detail view modal is visible
+      await userBModals.detailViewModal().waitForVisibility();
       expect(await userBModals.detailViewModal().isVisible()).toBeTruthy();
       expect(await userBModals.detailViewModal().isImageVisible()).toBeTruthy();
     });
@@ -135,9 +137,6 @@ test(
     });
 
     await test.step('User A can see the reaction', async () => {
-      // TODO: Bug [WPB-18226], remove this when fixed
-      await userAPageManager.refreshPage({waitUntil: 'load'});
-
       expect(await userAPages.conversation().isPlusOneReactionVisible()).toBeTruthy();
     });
 
@@ -161,7 +160,7 @@ test(
     await test.step('User B can play the audio file', async () => {
       await userBPages.conversation().playAudio();
       // Wait for 5 seconds to ensure audio starts playing
-      await userBPages.conversation().page.waitForTimeout(5000);
+      await userBPages.conversation().page.waitForTimeout(3000);
       expect(await userBPages.conversation().isAudioPlaying()).toBeTruthy();
     });
 
