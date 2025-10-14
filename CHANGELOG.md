@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [27.78.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@27.77.3...@wireapp/api-client@27.78.0) (2025-10-14)
+
+### Features
+
+* implement audit metadata in asset API [WPB-20665] ([#7457](https://github.com/wireapp/wire-web-packages/issues/7457)) ([2bb3a4e](https://github.com/wireapp/wire-web-packages/commit/2bb3a4edebbc62b6b57571e19cf495083927c9f2))
+
 ## [27.77.3](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@27.77.2...@wireapp/api-client@27.77.3) (2025-10-13)
 
 **Note:** Version bump only for package @wireapp/api-client
