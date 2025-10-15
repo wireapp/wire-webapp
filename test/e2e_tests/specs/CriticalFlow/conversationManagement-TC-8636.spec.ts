@@ -18,8 +18,9 @@
  */
 
 import {PageManager} from 'test/e2e_tests/pageManager';
+import {completeLogin} from 'test/e2e_tests/utils/setup.util';
 import {addCreatedTeam, removeCreatedTeam} from 'test/e2e_tests/utils/tearDown.util';
-import {inviteMembers, loginUser, sendTextMessageToConversation} from 'test/e2e_tests/utils/userActions';
+import {inviteMembers, sendTextMessageToConversation} from 'test/e2e_tests/utils/userActions';
 
 import {getUser} from '../../data/user';
 import {test, expect} from '../../test.fixtures';
@@ -31,6 +32,7 @@ const teamName = 'Conversation Management';
 const conversationName = 'Test Conversation';
 
 test('Conversation Management', {tag: ['@TC-8636', '@crit-flow-web']}, async ({pageManager, api, browser}) => {
+  test.setTimeout(150_000);
   const {pages, modals, components} = pageManager.webapp;
   test.slow(); // Increasing test timeout to 90 seconds to accommodate the full flow
 
@@ -42,9 +44,7 @@ test('Conversation Management', {tag: ['@TC-8636', '@crit-flow-web']}, async ({p
   });
 
   await test.step('Team owner signed in to the application', async () => {
-    await pageManager.openMainPage();
-    await loginUser(owner, pageManager);
-    await modals.dataShareConsent().clickDecline();
+    await completeLogin(pageManager, owner);
   });
 
   await test.step('Team owner creates a group with all the five members', async () => {
@@ -53,8 +53,6 @@ test('Conversation Management', {tag: ['@TC-8636', '@crit-flow-web']}, async ({p
     await pages.startUI().selectUsers(members.map(member => member.username));
     await pages.groupCreation().clickCreateGroupButton();
     expect(await pages.conversationList().isConversationItemVisible(conversationName)).toBeTruthy();
-    // TODO: Bug [WPB-18226], remove this when fixed
-    await pageManager.refreshPage({waitUntil: 'load'});
   });
 
   await test.step('Team owner sends a message in the conversation', async () => {
@@ -67,9 +65,7 @@ test('Conversation Management', {tag: ['@TC-8636', '@crit-flow-web']}, async ({p
         const memberContext = await browser.newContext();
         const memberPage = await memberContext.newPage();
         const memberPages = new PageManager(memberPage);
-        await memberPages.openMainPage();
-        await loginUser(member, memberPages);
-        await memberPages.webapp.modals.dataShareConsent().clickDecline();
+        await completeLogin(memberPages, member);
         await sendTextMessageToConversation(memberPages, conversationName, `Hello team! ${member.firstName} here.`);
       }),
     );
@@ -86,9 +82,11 @@ test('Conversation Management', {tag: ['@TC-8636', '@crit-flow-web']}, async ({p
     const textMessage = 'This message will self-destruct in 10 seconds.';
     await components.inputBarControls().setEphemeralTimerTo('10 seconds');
     await pages.conversation().sendMessage(textMessage);
+
     expect(await pages.conversation().isMessageVisible(textMessage)).toBeTruthy();
     // Wait for more than 10 seconds to ensure the message is deleted
     await pages.conversation().page.waitForTimeout(11000);
+
     expect(await pages.conversation().isMessageVisible(textMessage, false)).toBeFalsy();
     await components.inputBarControls().setEphemeralTimerTo('Off');
   });
