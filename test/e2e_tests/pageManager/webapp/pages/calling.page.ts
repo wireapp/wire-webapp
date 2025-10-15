@@ -93,7 +93,7 @@ export class CallingPage {
   }
 
   waitForGoFullScreen(): Promise<void> {
-    return this.goFullScreen.waitFor({state: 'visible'});
+    return this.fullScreen.waitFor({state: 'visible'});
   }
 
   waitForSelfVideoThumbnail(): Promise<void> {

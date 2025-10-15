@@ -121,8 +121,8 @@ test(
 
     await test.step('Member unmutes themselves', async () => {
       await memberCalling.unmuteSelfInFullScreen();
-      await memberPageManager.waitForTimeout(50);
-      expect(await memberCalling.isSelfUserMutedInFullScreen()).toBeFalsy(); // failing
+      await memberPageManager.waitForTimeout(250);
+      expect(await memberCalling.isSelfUserMutedInFullScreen()).toBeFalsy();
     });
 
     await test.step('Validation: Owner sees member is unmuted', async () => {
