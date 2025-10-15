@@ -199,6 +199,7 @@ export const InputBar = ({
   const fileHandling = useFileHandling({
     uploadDroppedFiles,
     uploadImages,
+    isFileNameKept: isCellsEnabled,
   });
 
   const showMarkdownPreview = useUserPropertyValue<boolean>(
