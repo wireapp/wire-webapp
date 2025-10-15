@@ -707,18 +707,20 @@ export class MessageRepository {
   ) {
     const isAuditLogEnabled = this.teamState.isAuditLogEnabled() && !getWebEnvironment().isProduction;
 
-    const auditData: AssetAuditData = {
-      conversationId: conversation.qualifiedId,
-      filename: meta.name,
-      filetype: meta.type,
-    };
+    const auditData: AssetAuditData | undefined = isAuditLogEnabled
+      ? {
+          conversationId: conversation.qualifiedId,
+          filename: meta.name,
+          filetype: meta.type,
+        }
+      : undefined;
 
     const retention = this.assetRepository.getAssetRetention(this.userState.self(), conversation);
     const options = {
       legalHoldStatus: conversation.legalHoldStatus(),
       public: true,
       retention,
-      auditData: isAuditLogEnabled ? auditData : undefined,
+      ...(isAuditLogEnabled && {auditData}),
     };
 
     const asset = await this.assetRepository.uploadFile(file, messageId, options);
