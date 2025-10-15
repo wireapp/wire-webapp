@@ -731,4 +731,18 @@ export class UserAPI {
     };
     await this.client.sendJSON(config);
   }
+
+  /**
+   * Mark a user as searchable / non-searchable
+   * @param userId
+   * @see https://staging-nginz-https.zinfra.io/api/swagger-ui/#/default/post_users__uid__searchable
+   */
+  public async postUserSearchable(userId: string): Promise<void> {
+    const config: AxiosRequestConfig = {
+      method: 'post',
+      url: `/${UserAPI.URL.USERS}/${userId}/searchable`,
+    };
+
+    await this.client.sendJSON(config);
+  }
 }
