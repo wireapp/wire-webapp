@@ -723,7 +723,7 @@ export class MessageRepository {
       ...(isAuditLogEnabled && {auditData}),
     };
 
-    const asset = await this.assetRepository.uploadFile(file, messageId, options);
+    const asset = await this.assetRepository.uploadFile(file, messageId, options, isAuditLogEnabled);
 
     const metadata = asImage ? ((await buildMetadata(file)) as ImageMetadata) : undefined;
     const commonMessageData = {
