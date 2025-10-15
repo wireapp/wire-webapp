@@ -107,6 +107,7 @@ test(
       await userBPages.conversation().clickImage(userA);
 
       // Verify that the detail view modal is visible
+      await userBPageManager.waitForTimeout(500);
       expect(await userBModals.detailViewModal().isVisible()).toBeTruthy();
       expect(await userBModals.detailViewModal().isImageVisible()).toBeTruthy();
     });
