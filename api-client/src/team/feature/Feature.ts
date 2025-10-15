@@ -126,3 +126,4 @@ export type FeatureValidateSAMLEmails = FeatureWithoutConfig;
 export type FeatureVideoCalling = FeatureWithoutConfig;
 export type FeatureChannels = Feature<FeatureChannelsConfig>;
 export type FeatureCells = FeatureWithoutConfig;
+export type FeatureStealthUsers = FeatureWithoutConfig;

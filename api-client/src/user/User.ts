@@ -38,5 +38,6 @@ export interface User {
   qualified_id: QualifiedId;
   service?: ServiceRef;
   team?: string;
+  searchable?: boolean;
   supported_protocols?: ConversationProtocol[];
 }
