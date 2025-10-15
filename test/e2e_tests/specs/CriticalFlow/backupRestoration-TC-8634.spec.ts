@@ -72,6 +72,7 @@ test('Setting up new device with a backup', {tag: ['@TC-8634', '@crit-flow-web']
   await test.step('User generates data', async () => {
     await pages.conversationList().openConversation(userB.fullName);
     await pages.conversation().sendMessage(personalMessage);
+
     expect(pages.conversation().isMessageVisible(personalMessage)).toBeTruthy();
 
     await pages.conversationList().clickCreateGroup();
@@ -80,9 +81,6 @@ test('Setting up new device with a backup', {tag: ['@TC-8634', '@crit-flow-web']
     await pages.groupCreation().clickCreateGroupButton();
     await pages.conversationList().openConversation(groupName);
     await pages.conversation().sendMessage(groupMessage);
-
-    // TODO: Bug [WPB-18226], remove this when fixed
-    await pageManager.refreshPage({waitUntil: 'load'});
 
     expect(pages.conversation().isMessageVisible(groupMessage)).toBeTruthy();
   });
