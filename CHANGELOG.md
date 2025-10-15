@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [27.79.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@27.78.1...@wireapp/api-client@27.79.0) (2025-10-15)
+
+### Features
+
+* **api-client:** add searchable attribute in the user model [WPB-20577] ([#7456](https://github.com/wireapp/wire-web-packages/issues/7456)) ([c2a66b2](https://github.com/wireapp/wire-web-packages/commit/c2a66b2b3e4df3eea74236895a67a86149c347b4))
+
 ## [27.78.1](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@27.78.0...@wireapp/api-client@27.78.1) (2025-10-14)
 
 ### Bug Fixes
