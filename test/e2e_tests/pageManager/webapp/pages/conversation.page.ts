@@ -121,7 +121,7 @@ export class ConversationPage {
 
   async sendMessage(message: string) {
     await this.messageInput.fill(message);
-    await this.messageInput.press('Enter');
+    await this.sendMessageButton.click();
     await this.page.waitForTimeout(5000); // Wait for the message to be sent
   }
 
