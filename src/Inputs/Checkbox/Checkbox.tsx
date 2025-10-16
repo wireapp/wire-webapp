@@ -44,7 +44,7 @@ const StyledLabel = ({
       css={(theme: Theme) => ({
         [`.${INPUT_CLASSNAME}:checked + &::before`]: {
           background: `${disabled ? theme.Checkbox.disablecheckedBgColor : theme.general.primaryColor}`,
-          borderColor: theme.general.primaryColor,
+          borderColor: disabled ? theme.Checkbox.disablecheckedBgColor : theme.general.primaryColor,
         },
         [`.${INPUT_CLASSNAME}:checked + & > svg`]: {
           fill: theme.general.backgroundColor,

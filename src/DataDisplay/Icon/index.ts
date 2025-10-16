@@ -105,6 +105,7 @@ export * from './ChannelIcon';
 export * from './UnlockedIcon';
 export * from './HistoryIcon';
 export * from './HamburgerIcon';
+export * from './MailIcon';
 
 // Brand Icons
 export * from './Brand/AndroidIcon';

@@ -219,7 +219,7 @@ export const themes: {[themeId in THEME_ID]: Theme} = {
       borderFocused: BASE_LIGHT_COLOR.BLUE,
       disableBgColor: COLOR_V2.GRAY_20,
       disableBorderColor: COLOR_V2.GRAY_60,
-      disablecheckedBgColor: COLOR_V2.GRAY_20,
+      disablecheckedBgColor: COLOR_V2.GRAY_60,
       invalidBorderColor: BASE_LIGHT_COLOR.RED,
     },
     IconButton: {

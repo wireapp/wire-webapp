@@ -423,8 +423,8 @@ exports[`"Checkbox" renders disabled 1`] = `
 }
 
 .wireinput:checked+.emotion-2::before {
-  background: #edeff0;
-  border-color: #0667c8;
+  background: #9fa1a7;
+  border-color: #9fa1a7;
 }
 
 .wireinput:checked+.emotion-2>svg {
