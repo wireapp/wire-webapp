@@ -2286,8 +2286,10 @@ export class ConversationRepository {
         throw new Error('Remote epoch is not available!');
       }
       if (remoteEpoch === epoch) {
-        this.logger.error('Remote epoch is the same as local epoch, something is wrong!', {remoteEpoch, epoch});
-        throw new Error('Remote epoch is the same as local epoch, something is wrong!');
+        const errorMessage =
+          'Cannot recover: both local and remote MLS group are at epoch 0, the conversation was never established on the backend';
+        this.logger.error(errorMessage, {remoteEpoch, epoch});
+        throw new Error(errorMessage);
       }
 
       return this.ensureConversationExists({conversationId, groupId, epoch: remoteEpoch, core, retry: false});
