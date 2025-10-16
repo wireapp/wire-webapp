@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [46.39.8](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@46.39.7...@wireapp/core@46.39.8) (2025-10-16)
+
+### Bug Fixes
+
+* **core:** Recover when mls conversation already exists when processing welcome message [WPB-21118] ([#7461](https://github.com/wireapp/wire-web-packages/issues/7461)) ([8a0354f](https://github.com/wireapp/wire-web-packages/commit/8a0354f81e1ca0a277f9120d5279c60acdd819e2))
+
 ## [46.39.7](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@46.39.6...@wireapp/core@46.39.7) (2025-10-15)
 
 **Note:** Version bump only for package @wireapp/core
