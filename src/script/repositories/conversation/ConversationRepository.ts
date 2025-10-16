@@ -2260,6 +2260,7 @@ export class ConversationRepository {
    * Recovers from local unestablished MLS conversations by refetching metadata and re-establishing the conversation.
    * This is typically needed when the local epoch is 0 but the epoch on backend is greater than 0
    * indicating that the conversation has not been properly established.
+   * throws error in case both local and remote MLS group are at epoch 0 or remote epoch is not available
    */
   private recoverFromLocalUnestblishedMLSConversations = async ({
     conversationId,
