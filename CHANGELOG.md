@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [9.69.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/react-ui-kit@9.68.0...@wireapp/react-ui-kit@9.69.0) (2025-10-16)
+
+### Features
+
+* add EP endpoints and update designs in ui-kit [WPB-10627] ([#7325](https://github.com/wireapp/wire-web-packages/issues/7325)) ([81d7a2f](https://github.com/wireapp/wire-web-packages/commit/81d7a2fd666060c34171aa7c5f95af097c157e62))
+
 # [9.68.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/react-ui-kit@9.67.0...@wireapp/react-ui-kit@9.68.0) (2025-10-07)
 
 ### Features
