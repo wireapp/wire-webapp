@@ -2282,7 +2282,7 @@ export class ConversationRepository {
       const remoteConversation = await this.conversationService.getConversationById(conversationId);
       const remoteEpoch = remoteConversation.epoch;
       if (!remoteEpoch) {
-        this.logger.error('Remote epoch is not available!', {remoteEpoch});
+        this.logger.error('Remote epoch is not available!', {remoteConversation});
         throw new Error('Remote epoch is not available!');
       }
       if (remoteEpoch === epoch) {
