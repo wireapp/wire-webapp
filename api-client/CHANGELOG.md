@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [27.80.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@27.79.1...@wireapp/api-client@27.80.0) (2025-10-16)
+
+### Features
+
+* add EP endpoints and update designs in ui-kit [WPB-10627] ([#7325](https://github.com/wireapp/wire-web-packages/issues/7325)) ([81d7a2f](https://github.com/wireapp/wire-web-packages/commit/81d7a2fd666060c34171aa7c5f95af097c157e62))
+
 ## [27.79.1](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@27.79.0...@wireapp/api-client@27.79.1) (2025-10-15)
 
 **Note:** Version bump only for package @wireapp/api-client
