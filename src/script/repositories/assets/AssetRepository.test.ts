@@ -32,6 +32,7 @@ describe('AssetRepository', () => {
   const messageId = createUuid();
   const file = new Blob();
   const options = {} as AssetUploadOptions;
+  let isAuditLogEnabled: boolean = false;
   let core: Core;
 
   beforeEach(async () => {
@@ -95,7 +96,7 @@ describe('AssetRepository', () => {
       });
     });
 
-    await assetRepository.uploadFile(file, messageId, options);
+    await assetRepository.uploadFile(file, messageId, options, isAuditLogEnabled);
     expect(assetRepository.getNumberOfOngoingUploads()).toBe(0);
   });
 
@@ -111,7 +112,7 @@ describe('AssetRepository', () => {
       });
     });
 
-    const uploadedPromise = assetRepository.uploadFile(file, messageId, options);
+    const uploadedPromise = assetRepository.uploadFile(file, messageId, options, isAuditLogEnabled);
 
     assetRepository.cancelUpload(messageId);
     expect(assetRepository.getNumberOfOngoingUploads()).toBe(0);
@@ -138,6 +139,50 @@ describe('AssetRepository', () => {
         } as AssetUploadData),
       });
     });
-    await assetRepository.uploadFile(file, messageId, options);
+    await assetRepository.uploadFile(file, messageId, options, isAuditLogEnabled);
+  });
+
+  it('uploads assets with audit log enabled when specified if required metadata is present', async () => {
+    isAuditLogEnabled = true;
+    const assetAuditData = {
+      conversationId: {domain: 'domain', id: 'id'},
+      filename: 'filename',
+      filetype: 'filetype',
+    };
+    options.auditData = assetAuditData;
+    const uploadAssetSpy = spyOn(core.service!.asset, 'uploadAsset').and.callFake(() => {
+      return Promise.resolve({
+        cancel: null,
+        response: Promise.resolve({
+          key: '',
+          token: '',
+        } as AssetUploadData),
+      });
+    });
+
+    await expect(assetRepository.uploadFile(file, messageId, options, isAuditLogEnabled)).resolves.toBeDefined();
+    expect(uploadAssetSpy).toHaveBeenCalled();
+  });
+
+  it('does not upload asset when audit log is enabled and required metadata is missing', async () => {
+    isAuditLogEnabled = true;
+    const assetAuditData = {
+      conversationId: {domain: 'domain', id: 'id'},
+      filename: 'filename',
+      filetype: '',
+    };
+    options.auditData = assetAuditData;
+
+    const uploadAssetSpy = spyOn(core.service!.asset, 'uploadAsset').and.callFake(() => {
+      return Promise.resolve({
+        cancel: null,
+        response: Promise.resolve({
+          key: '',
+          token: '',
+        } as AssetUploadData),
+      });
+    });
+    await expect(assetRepository.uploadFile(file, messageId, options, isAuditLogEnabled)).rejects.toThrow();
+    expect(uploadAssetSpy).not.toHaveBeenCalled();
   });
 });

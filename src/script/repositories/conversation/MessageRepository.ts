@@ -17,6 +17,7 @@
  *
  */
 
+import {AssetAuditData} from '@wireapp/api-client/lib/asset';
 import {ConversationProtocol, MessageSendingStatus, QualifiedUserClients} from '@wireapp/api-client/lib/conversation';
 import {BackendErrorLabel} from '@wireapp/api-client/lib/http/';
 import {QualifiedId, RequestCancellationError} from '@wireapp/api-client/lib/user';
@@ -78,6 +79,7 @@ import {Segmentation} from 'Repositories/tracking/Segmentation';
 import {protoFromType} from 'Repositories/user/AvailabilityMapper';
 import {UserRepository} from 'Repositories/user/UserRepository';
 import {UserState} from 'Repositories/user/UserState';
+import {getWebEnvironment} from 'Util/Environment';
 import {
   cancelSendingLinkPreview,
   clearLinkPreviewSendingState,
@@ -703,13 +705,25 @@ export class MessageRepository {
     asImage: boolean,
     meta: FileMetaDataContent,
   ) {
+    const isAuditLogEnabled = this.teamState.isAuditLogEnabled() && !getWebEnvironment().isProduction;
+
+    const auditData: AssetAuditData | undefined = isAuditLogEnabled
+      ? {
+          conversationId: conversation.qualifiedId,
+          filename: meta.name,
+          filetype: meta.type,
+        }
+      : undefined;
+
     const retention = this.assetRepository.getAssetRetention(this.userState.self(), conversation);
     const options = {
       legalHoldStatus: conversation.legalHoldStatus(),
       public: true,
       retention,
+      ...(isAuditLogEnabled && {auditData}),
     };
-    const asset = await this.assetRepository.uploadFile(file, messageId, options);
+
+    const asset = await this.assetRepository.uploadFile(file, messageId, options, isAuditLogEnabled);
 
     const metadata = asImage ? ((await buildMetadata(file)) as ImageMetadata) : undefined;
     const commonMessageData = {
