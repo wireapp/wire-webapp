@@ -889,6 +889,24 @@ export class ConversationAPI {
   }
 
   /**
+   * Add qualified members to an existing conversation.
+   * @param conversationId The conversation ID to add the users to
+   * @param users List of users to add to a conversation
+   */
+  public async putMembers(conversationId: QualifiedId, users: QualifiedId[]) {
+    const config: AxiosRequestConfig = {
+      data: {
+        conversation_role: DefaultConversationRoleName.WIRE_MEMBER,
+        qualified_users: users,
+      },
+      method: 'put',
+      url: `${this.generateBaseConversationUrl(conversationId)}/${ConversationAPI.URL.MEMBERS}`,
+    };
+
+    return this.client.sendJSON<ConversationMemberJoinEvent>(config);
+  }
+
+  /**
    * Update membership of the specified user in a certain conversation
    * @param userId The user qualified ID
    * @param conversationId The qualified ID of the conversation to change the user's membership in
