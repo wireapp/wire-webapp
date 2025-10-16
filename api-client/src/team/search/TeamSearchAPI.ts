@@ -19,6 +19,8 @@
 
 import Axios, {AxiosRequestConfig} from 'axios';
 
+import {ChannelSearchOptions} from './ChannelSearchOptions';
+import {ChannelSearchResult} from './ChannelSearchResult';
 import {TeamSearchOptions} from './TeamSearchOptions';
 import {TeamSearchResult} from './TeamSearchResult';
 
@@ -30,6 +32,7 @@ export class TeamSearchAPI {
   constructor(private readonly client: HttpClient) {}
 
   public static readonly URL = {
+    CHANNELS: 'channels',
     SEARCH: 'search',
   };
 
@@ -71,5 +74,29 @@ export class TeamSearchAPI {
       cancel: () => cancelSource.cancel(SyntheticErrorLabel.REQUEST_CANCELLED),
       response: handleRequest(),
     };
+  }
+
+  /**
+   * Search for channels in a team.
+   * @param teamId The team ID
+   * @param options Search options (query, sort order, pagination, discoverable filter, etc.)
+   * @see https://staging-nginz-https.zinfra.io/api/swagger-ui/#/default/get_teams__tid__channels_search
+   */
+  public async searchChannels(teamId: string, options: ChannelSearchOptions = {}): Promise<ChannelSearchResult> {
+    const config: AxiosRequestConfig = {
+      method: 'get',
+      params: {
+        q: options.q,
+        sort_order: options.sort_order,
+        page_size: options.page_size,
+        last_seen_name: options.last_seen_name,
+        last_seen_id: options.last_seen_id,
+        discoverable: options.discoverable,
+      },
+      url: `${TeamAPI.URL.TEAMS}/${teamId}/${TeamSearchAPI.URL.CHANNELS}/${TeamSearchAPI.URL.SEARCH}`,
+    };
+
+    const response = await this.client.sendJSON<ChannelSearchResult>(config);
+    return response.data;
   }
 }

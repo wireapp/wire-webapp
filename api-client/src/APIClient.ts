@@ -71,6 +71,7 @@ import {ScimAPI} from './team/scim/ScimAPI';
 import {TeamSearchAPI} from './team/search';
 import {SSOAPI} from './team/sso';
 import {UserAPI} from './user/';
+import {UserGroupAPI} from './userGroups/';
 
 const {version}: {version: string} = require('../package.json');
 
@@ -123,6 +124,7 @@ type Apis = {
     sso: SSOAPI;
     team: TeamAPI;
   };
+  userGroup: UserGroupAPI;
   user: UserAPI;
   generic: GenericAPI;
 };
@@ -247,6 +249,7 @@ export class APIClient extends EventEmitter {
         sso: new SSOAPI(this.transport.http),
         team: new TeamAPI(this.transport.http),
       },
+      userGroup: new UserGroupAPI(this.transport.http),
       user: new UserAPI(this.transport.http, backendFeatures),
       generic: new GenericAPI(this.transport.http),
     };

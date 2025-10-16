@@ -17,13 +17,15 @@
  *
  */
 
-import {CONVERSATION_EVENT} from './ConversationEvent';
-import {FEDERATION_EVENT} from './FederationEvent';
-import {TEAM_EVENT} from './TeamEvent';
-import {USER_EVENT} from './UserEvent';
-import {USER_GROUP_EVENT, UserGroupEvent} from './UserGroupEvent';
+import {SVGIcon, SVGIconProps} from './SVGIcon';
 
-import {ConversationEvent, TeamEvent, UserEvent, FederationEvent} from '.';
-
-export type BackendEvent = ConversationEvent | UserEvent | TeamEvent | FederationEvent | UserGroupEvent;
-export type BackendEventType = CONVERSATION_EVENT | USER_EVENT | TEAM_EVENT | FEDERATION_EVENT | USER_GROUP_EVENT;
+export const MailIcon = (props: SVGIconProps) => (
+  <SVGIcon realWidth={16} realHeight={16} {...props}>
+    <path
+      fillRule="evenodd"
+      clipRule="evenodd"
+      d="M15.9899 14H0.010139V4.0681L8 10.9252L15.9899 4.0681V14ZM8.0097 8.85752L16 2H0L8.0097 8.85752Z"
+      fill="black"
+    />
+  </SVGIcon>
+);

@@ -21,7 +21,7 @@ import {TeamContact} from './TeamContact';
 
 import {Role} from '..';
 
-export enum SearchOrder {
+export enum SortOrder {
   ASCENDING = 'asc',
   DESCENDING = 'desc',
 }
@@ -29,12 +29,14 @@ export enum SearchOrder {
 export interface TeamSearchOptions {
   /** Filter results by member role */
   frole?: Role[];
+  /** Filter results by searchable status */
+  searchable?: boolean;
   /** Max number of search results. Defaults to 15 results. Min 1, max 500. */
   size?: number;
   /** Sort results */
   sortby?: keyof Pick<TeamContact, 'email' | 'name' | 'handle' | 'created_at' | 'role' | 'managed_by' | 'saml_idp'>;
   /** Sort order (asc | desc | undefined) */
-  sortorder?: SearchOrder;
+  sortorder?: SortOrder;
   /** Paging state. returns next page when provided*/
   pagingState?: string;
 }

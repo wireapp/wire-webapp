@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2018 Wire Swiss GmbH
+ * Copyright (C) 2025 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,13 +17,7 @@
  *
  */
 
-import {CONVERSATION_EVENT} from './ConversationEvent';
-import {FEDERATION_EVENT} from './FederationEvent';
-import {TEAM_EVENT} from './TeamEvent';
-import {USER_EVENT} from './UserEvent';
-import {USER_GROUP_EVENT, UserGroupEvent} from './UserGroupEvent';
-
-import {ConversationEvent, TeamEvent, UserEvent, FederationEvent} from '.';
-
-export type BackendEvent = ConversationEvent | UserEvent | TeamEvent | FederationEvent | UserGroupEvent;
-export type BackendEventType = CONVERSATION_EVENT | USER_EVENT | TEAM_EVENT | FEDERATION_EVENT | USER_GROUP_EVENT;
+export interface UserGroupCreateRequest {
+  members: string[];
+  name: string;
+}
