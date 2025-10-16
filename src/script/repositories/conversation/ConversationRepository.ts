@@ -2198,7 +2198,7 @@ export class ConversationRepository {
           this.logger.error('Epoch is 0, but retry is false, not retrying again', {conversationId, groupId, epoch});
           return;
         }
-        return this.recoverFromLocalUnestblishedMLSConversations({conversationId, groupId, epoch, core});
+        return this.recoverFromLocalUnestablishedMLSConversations({conversationId, groupId, epoch, core});
       }
       return;
     }
@@ -2262,7 +2262,7 @@ export class ConversationRepository {
    * indicating that the conversation has not been properly established.
    * throws error in case both local and remote MLS group are at epoch 0 or remote epoch is not available
    */
-  private recoverFromLocalUnestblishedMLSConversations = async ({
+  private recoverFromLocalUnestablishedMLSConversations = async ({
     conversationId,
     groupId,
     epoch,
