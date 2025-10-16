@@ -601,7 +601,7 @@ export const Conversation = ({
                   uploadDroppedFiles={uploadDroppedFiles}
                   uploadImages={uploadImages}
                   uploadFiles={uploadFiles}
-                  uploadPastedFiles={handlePastedFile}
+                  uploadPastedFiles={checkFileSharingPermission(handlePastedFile)}
                   onCellImageUpload={openImageFilesView}
                   onCellAssetUpload={openAllFilesView}
                 />
