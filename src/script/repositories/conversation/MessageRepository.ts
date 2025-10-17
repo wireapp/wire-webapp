@@ -709,7 +709,7 @@ export class MessageRepository {
 
     const auditData: AssetAuditData | undefined = isAuditLogEnabled
       ? {
-          conversationId: conversation.qualifiedId,
+          convId: conversation.qualifiedId,
           filename: meta.name,
           filetype: meta.type,
         }
