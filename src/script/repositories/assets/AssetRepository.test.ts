@@ -145,7 +145,7 @@ describe('AssetRepository', () => {
   it('uploads assets with audit log enabled when specified if required metadata is present', async () => {
     isAuditLogEnabled = true;
     const assetAuditData = {
-      conversationId: {domain: 'domain', id: 'id'},
+      convId: {domain: 'domain', id: 'id'},
       filename: 'filename',
       filetype: 'filetype',
     };
@@ -167,7 +167,7 @@ describe('AssetRepository', () => {
   it('does not upload asset when audit log is enabled and required metadata is missing', async () => {
     isAuditLogEnabled = true;
     const assetAuditData = {
-      conversationId: {domain: 'domain', id: 'id'},
+      convId: {domain: 'domain', id: 'id'},
       filename: 'filename',
       filetype: '',
     };
