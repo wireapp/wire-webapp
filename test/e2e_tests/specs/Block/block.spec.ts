@@ -266,11 +266,11 @@ test.describe('Block', () => {
     async ({pageManager: userAPageManager, api, browser}) => {
       test.slow(); // Increasing test timeout to 90 seconds to accommodate the full flow
 
-      const {modals: userAModals, components: userAComponents} = userAPageManager.webapp;
+      const {modals: userAModals, components: userAComponents, pages: userAPages} = userAPageManager.webapp;
       const userBContext = await browser.newContext();
       const userBPage = await userBContext.newPage();
       const userBPageManager = PageManager.from(userBPage);
-      const {modals: userBModals, components: userBComponents} = userBPageManager.webapp;
+      const {modals: userBModals, components: userBComponents, pages: userBPages} = userBPageManager.webapp;
 
       const messageTextBeforeBlock = 'first message';
       const messageTextAfterBlock = 'second message';
@@ -300,7 +300,18 @@ test.describe('Block', () => {
           })(),
         ]);
 
-        await api.connectUsers(userA, userB);
+        await test.step('User A connects with User B', async () => {
+          await userAComponents.conversationSidebar().clickConnectButton();
+          await userAPages.startUI().searchInput.fill(userB.username);
+          await userAPages.startUI().selectUser(userB.username);
+          await userAModals.userProfile().clickConnectButton();
+
+          expect(await userAPages.conversationList().isConversationItemVisible(userB.fullName));
+          await expect(await userBPageManager.getPage()).toHaveTitle('(1) Wire');
+
+          await userBPages.conversationList().openPendingConnectionRequest();
+          await userBPages.connectRequest().clickConnectButton();
+        });
       });
 
       // TODO: click away new-device-modal
@@ -433,7 +444,6 @@ test.describe('Block', () => {
         await pages.groupCreation().setGroupName(conversationName);
         await pages.startUI().selectUsers([userB.username]);
         await pages.groupCreation().clickCreateGroupButton();
-
       });
 
       // Step 1: User B sends message to group chat with User A
