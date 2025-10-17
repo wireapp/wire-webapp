@@ -252,10 +252,7 @@ export class AssetRepository {
 
     if (isAuditLogEnabled) {
       const isIncompleteAuditData =
-        !options.auditData ||
-        !options.auditData.conversationId ||
-        !options.auditData.filename ||
-        !options.auditData.filetype;
+        !options.auditData || !options.auditData.convId || !options.auditData.filename || !options.auditData.filetype;
       if (isIncompleteAuditData) {
         this.removeFromUploadQueue(messageId);
         throw new Error('Audit data is incomplete, file cannot be uploaded');
