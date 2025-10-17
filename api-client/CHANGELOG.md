@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [27.80.1](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@27.80.0...@wireapp/api-client@27.80.1) (2025-10-17)
+
+### Bug Fixes
+
+* use correct key for conversation id [WPB-20663] ([#7462](https://github.com/wireapp/wire-web-packages/issues/7462)) ([e04d7e5](https://github.com/wireapp/wire-web-packages/commit/e04d7e5f08a825646bfc88860fc3277d660bb470))
+
 # [27.80.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@27.79.1...@wireapp/api-client@27.80.0) (2025-10-16)
 
 ### Features
