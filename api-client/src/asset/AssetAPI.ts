@@ -44,7 +44,7 @@ export interface CipherOptions {
 }
 
 export interface AssetAuditData {
-  conversationId: QualifiedId;
+  convId: QualifiedId;
   filename: string;
   filetype: string;
 }
@@ -140,7 +140,7 @@ export class AssetAPI {
       public: boolean;
       retention: AssetRetentionPolicy;
       domain?: string;
-      conversationId?: QualifiedId;
+      convId?: QualifiedId;
       filename?: string;
       filetype?: string;
     } = {
@@ -150,7 +150,7 @@ export class AssetAPI {
     };
 
     if (options?.auditData) {
-      metadataObject.conversationId = options.auditData.conversationId;
+      metadataObject.convId = options.auditData.convId;
       metadataObject.filename = options.auditData.filename;
       metadataObject.filetype = options.auditData.filetype;
     }
