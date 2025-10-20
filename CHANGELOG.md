@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [27.80.2](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@27.80.1...@wireapp/api-client@27.80.2) (2025-10-20)
+
+### Bug Fixes
+
+* Recover from MLS stale message error [WPB-21170] ([#7485](https://github.com/wireapp/wire-web-packages/issues/7485)) ([cf44d24](https://github.com/wireapp/wire-web-packages/commit/cf44d2417acfb039e97fad54da4f9263c0c357c7))
+
 ## [27.80.1](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@27.80.0...@wireapp/api-client@27.80.1) (2025-10-17)
 
 ### Bug Fixes
