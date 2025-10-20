@@ -666,6 +666,30 @@ export class MessageRepository {
   }
 
   /**
+   * Get Cells assets' attachments ids from a message.
+   *
+   * @param messageEntity Message to get attachments from
+   * @returns Array of attachment ids
+   */
+  public getCellsAssetAttachmentIds(messageEntity: Message): string[] {
+    if (!messageEntity.hasMultipartAsset || !messageEntity.isContent()) {
+      return [];
+    }
+
+    const multipartAsset = messageEntity.getFirstAsset();
+    if (!multipartAsset || !multipartAsset.isMultipart()) {
+      return [];
+    }
+
+    const attachments = multipartAsset.attachments?.() ?? [];
+    const cellsAttachmentsIds = attachments.flatMap(attachment =>
+      attachment.cellAsset?.uuid ? [attachment.cellAsset.uuid] : [],
+    );
+
+    return cellsAttachmentsIds;
+  }
+
+  /**
    * Create asset metadata message to specified conversation.
    */
   private async createAssetMetadata(
