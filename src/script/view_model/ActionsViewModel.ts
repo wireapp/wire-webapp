@@ -26,6 +26,7 @@ import {container} from 'tsyringe';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {PrimaryModal, removeCurrentModal, usePrimaryModalState} from 'Components/Modals/PrimaryModal';
+import {CellsRepository} from 'Repositories/cells/CellsRepository';
 import type {ClientEntity} from 'Repositories/client';
 import type {ConnectionRepository} from 'Repositories/connection/ConnectionRepository';
 import type {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
@@ -46,6 +47,7 @@ import type {MainViewModel} from './MainViewModel';
 export class ActionsViewModel {
   constructor(
     private readonly selfRepository: SelfRepository,
+    private readonly cellsRepository: CellsRepository,
     private readonly connectionRepository: ConnectionRepository,
     private readonly conversationRepository: ConversationRepository,
     private readonly integrationRepository: IntegrationRepository,
