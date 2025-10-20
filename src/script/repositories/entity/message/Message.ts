@@ -195,6 +195,10 @@ export class Message {
     return this.isContent() ? this.assets().some(assetEntity => assetEntity.isText()) : false;
   }
 
+  hasMultipartAsset(): boolean {
+    return this.isContent() ? this.assets().some(assetEntity => assetEntity.type === AssetType.MULTIPART) : false;
+  }
+
   /**
    * Check if message is a call message.
    * @returns Is message of type call

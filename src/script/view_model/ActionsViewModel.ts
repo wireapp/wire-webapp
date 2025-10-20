@@ -251,11 +251,20 @@ export class ActionsViewModel {
 
   readonly deleteMessageEveryone = (conversationEntity: Conversation, messageEntity: Message): Promise<void> => {
     if (conversationEntity && messageEntity) {
+      const cellsAssets = this.messageRepository.getCellsAssetAttachmentIds(messageEntity);
+
+      const deleteMessage = async () => {
+        if (cellsAssets.length > 0) {
+          await this.cellsRepository.deleteNodes({uuids: cellsAssets, permanently: true});
+        }
+        await this.messageRepository.deleteMessageForEveryone(conversationEntity, messageEntity);
+      };
+
       return new Promise(resolve => {
         PrimaryModal.show(PrimaryModal.type.CONFIRM, {
           primaryAction: {
             action: async () => {
-              await this.messageRepository.deleteMessageForEveryone(conversationEntity, messageEntity);
+              await deleteMessage();
               resolve();
             },
             text: t('modalConversationDeleteMessageEveryoneAction'),
