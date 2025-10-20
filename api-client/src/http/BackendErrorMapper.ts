@@ -34,6 +34,7 @@ import {
   ConversationOperationError,
   MLSInvalidLeafNodeIndexError,
   MLSInvalidLeafNodeSignatureError,
+  MLSStaleMessageError,
 } from '../conversation/';
 import {InvalidInvitationCodeError, InviteEmailInUseError, ServiceNotFoundError} from '../team/';
 import {UnconnectedUserError, UserIsUnknownError} from '../user/';
@@ -90,8 +91,9 @@ export class BackendErrorMapper {
 
       [BackendErrorLabel.KEY_EXISTS]: e =>
         new IdentifierExistsError('The given e-mail address is in use.', e.label, e.code),
+      [BackendErrorLabel.MLS_STALE_MESSAGE]: e =>
+        new MLSStaleMessageError('The conversation epoch in a message is too old', e.label, e.code),
     },
-
     [StatusCode.NOT_FOUND]: {
       [BackendErrorLabel.NOT_FOUND]: e => new ServiceNotFoundError('Service not found', e.label, e.code),
     },

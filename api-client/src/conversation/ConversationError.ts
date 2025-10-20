@@ -110,3 +110,15 @@ export class MLSInvalidLeafNodeIndexError extends ConversationError {
     this.name = 'MLSInvalidLeafNodeIndexError';
   }
 }
+
+export class MLSStaleMessageError extends ConversationError {
+  constructor(
+    message: string,
+    label: BackendErrorLabel = BackendErrorLabel.MLS_STALE_MESSAGE,
+    code: StatusCode = StatusCode.CONFLICT,
+  ) {
+    super(message, label, code);
+    Object.setPrototypeOf(this, new.target.prototype);
+    this.name = 'MLSStaleMessageError';
+  }
+}

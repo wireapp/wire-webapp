@@ -21,6 +21,7 @@ import type {ClaimedKeyPackages, MLSPublicKeyRecord, RegisteredClient} from '@wi
 import {
   MLSInvalidLeafNodeIndexError,
   MLSInvalidLeafNodeSignatureError,
+  MLSStaleMessageError,
   SUBCONVERSATION_ID,
 } from '@wireapp/api-client/lib/conversation';
 import {ConversationMLSMessageAddEvent, ConversationMLSWelcomeEvent} from '@wireapp/api-client/lib/event';
@@ -128,6 +129,7 @@ export class MLSService extends TypedEventEmitter<Events> {
 
   public static UPLOAD_COMMIT_BUNDLE_ABORT_REASONS = {
     BROKEN_MLS_CONVERSATION: 'BROKEN_MLS_CONVERSATION',
+    MLS_STALE_MESSAGE: 'MLS_STALE_MESSAGE',
     OTHER: 'OTHER',
   };
 
@@ -135,6 +137,13 @@ export class MLSService extends TypedEventEmitter<Events> {
     return (
       isMlsMessageRejectedError(error) &&
       error.context.context.reason === MLSService.UPLOAD_COMMIT_BUNDLE_ABORT_REASONS.BROKEN_MLS_CONVERSATION
+    );
+  }
+
+  public static isMLSStaleMessageError(error: unknown) {
+    return (
+      isMlsMessageRejectedError(error) &&
+      error.context.context.reason === MLSService.UPLOAD_COMMIT_BUNDLE_ABORT_REASONS.MLS_STALE_MESSAGE
     );
   }
 
@@ -282,10 +291,20 @@ export class MLSService extends TypedEventEmitter<Events> {
       this.logger.warn(`Failed to upload commit bundle`, error);
 
       if (error instanceof MLSInvalidLeafNodeSignatureError || error instanceof MLSInvalidLeafNodeIndexError) {
+        this.logger.info('Aborting commit bundle upload due to broken MLS conversation');
         return {
           abort: {reason: MLSService.UPLOAD_COMMIT_BUNDLE_ABORT_REASONS.BROKEN_MLS_CONVERSATION},
         };
       }
+
+      if (error instanceof MLSStaleMessageError) {
+        this.logger.info('Aborting commit bundle upload due to stale MLS message');
+        return {
+          abort: {reason: MLSService.UPLOAD_COMMIT_BUNDLE_ABORT_REASONS.MLS_STALE_MESSAGE},
+        };
+      }
+
+      this.logger.info('Aborting commit bundle upload due to unknown error');
       return {
         abort: {reason: error instanceof Error ? error.message : MLSService.UPLOAD_COMMIT_BUNDLE_ABORT_REASONS.OTHER},
       };
