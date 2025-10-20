@@ -149,3 +149,6 @@ export const isProteusRemoteIdentityChangedError = (error: unknown) =>
 
 export const isMlsOrphanWelcomeError = (error: unknown) =>
   isCcError(error, ErrorType.Mls) && (error as any).context?.type === MlsErrorType.OrphanWelcome;
+
+export const isMlsMessageRejectedError = (error: unknown) =>
+  isCcError(error, ErrorType.Mls) && (error as any).context?.type === MlsErrorType.MessageRejected;

@@ -22,6 +22,7 @@ import {
   Conversation,
   ConversationProtocol,
   MLSConversation,
+  MLSStaleMessageError,
   Subconversation,
   SUBCONVERSATION_ID,
 } from '@wireapp/api-client/lib/conversation';
@@ -30,7 +31,7 @@ import {
   ConversationMLSMessageAddEvent,
   ConversationMLSWelcomeEvent,
 } from '@wireapp/api-client/lib/event';
-import {BackendError, BackendErrorLabel} from '@wireapp/api-client/lib/http';
+import {BackendErrorLabel} from '@wireapp/api-client/lib/http';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 
@@ -230,9 +231,9 @@ describe('ConversationService', () => {
       const mockConversationId = {id: 'mockConversationId', domain: 'staging.zinfra.io'};
       const mockedMessage = MessageBuilder.buildTextMessage({text: 'test'});
 
-      jest
-        .spyOn(apiClient.api.conversation, 'postMlsMessage')
-        .mockRejectedValueOnce(new BackendError('', BackendErrorLabel.MLS_STALE_MESSAGE, HTTP_STATUS.CONFLICT));
+      const staleMessageError = new MLSStaleMessageError('', BackendErrorLabel.MLS_STALE_MESSAGE, HTTP_STATUS.CONFLICT);
+
+      jest.spyOn(apiClient.api.conversation, 'postMlsMessage').mockRejectedValueOnce(staleMessageError);
 
       const remoteEpoch = 5;
       const localEpoch = 4;

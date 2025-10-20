@@ -25,11 +25,11 @@ import {
   QualifiedUserClients,
   ConversationProtocol,
   RemoteConversations,
-  PostMlsMessageResponse,
   MLSConversation,
   SUBCONVERSATION_ID,
   Subconversation,
   isMLS1to1Conversation,
+  MLSStaleMessageError,
 } from '@wireapp/api-client/lib/conversation';
 import {CONVERSATION_TYPING, ConversationMemberUpdateData} from '@wireapp/api-client/lib/conversation/data';
 import {
@@ -40,7 +40,6 @@ import {
   ConversationMemberLeaveEvent,
   ConversationOtrMessageAddEvent,
 } from '@wireapp/api-client/lib/event';
-import {BackendError, BackendErrorLabel} from '@wireapp/api-client/lib/http';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {XOR} from '@wireapp/commons/lib/util/TypeUtil';
 import {Decoder, Encoder} from 'bazinga64';
@@ -378,54 +377,80 @@ export class ConversationService extends TypedEventEmitter<Events> {
     const {payload, groupId, conversationId} = params;
     const groupIdBytes = Decoder.fromBase64(groupId).asBytes;
 
-    // immediately execute pending commits before sending the message
-    await this.mlsService.commitPendingProposals(groupId, true, params).catch(async error => {
-      if (MLSService.isBrokenMLSConversationError(error)) {
-        this.logger.info('Failed to execute pending proposals because broken MLS conversation, triggering a reset', {
+    try {
+      // immediately execute pending commits before sending the message
+      await this.mlsService.commitPendingProposals(groupId, true, params);
+
+      const encrypted = await this.mlsService.encryptMessage(
+        new ConversationId(groupIdBytes),
+        GenericMessage.encode(payload).finish(),
+      );
+
+      const response = await this.apiClient.api.conversation.postMlsMessage(encrypted);
+      const sentAt = response.time?.length > 0 ? response.time : new Date().toISOString();
+
+      const failedToSend =
+        response?.failed || (response?.failed_to_send ?? []).length > 0
+          ? {
+              queued: response?.failed_to_send,
+              failed: response?.failed,
+            }
+          : undefined;
+
+      return {
+        id: payload.messageId,
+        sentAt,
+        failedToSend,
+        state: sentAt ? MessageSendingState.OUTGOING_SENT : MessageSendingState.CANCELED,
+      };
+    } catch (error) {
+      this.logger.error('Failed to send MLS message', {error, groupId});
+
+      if (!shouldRetry) {
+        this.logger.warn("Tried to send MLS message but it's still failing after recovery", {
           error,
           groupId,
         });
+        throw error;
+      }
+
+      /**
+       * Only thrown by core-crypto when we call commitPendingProposals
+       */
+      if (MLSService.isBrokenMLSConversationError(error)) {
+        this.logger.info('Failed to send MLS message because broken MLS conversation, triggering a reset', {
+          error,
+          groupId,
+        });
+
         await this.handleBrokenMLSConversation(conversationId);
+        return this.sendMLSMessage(params, false);
       }
-    });
 
-    const encrypted = await this.mlsService.encryptMessage(
-      new ConversationId(groupIdBytes),
-      GenericMessage.encode(payload).finish(),
-    );
+      /**
+       * We may have the same error from core-crypto or from the backend error mapper
+       * core-crypto throws its own error class when we call commitPendingProposals
+       * backend error mapper throws its own error class when we call postMlsMessage
+       */
+      if (MLSService.isMLSStaleMessageError(error) || error instanceof MLSStaleMessageError) {
+        this.logger.info(
+          'Failed to send MLS message because of stale message, recovering by joining with external commit',
+          {
+            error,
+            groupId,
+          },
+        );
 
-    let response: PostMlsMessageResponse | null = null;
-    let sentAt: string = '';
-    try {
-      response = await this.apiClient.api.conversation.postMlsMessage(encrypted);
-      sentAt = response.time?.length > 0 ? response.time : new Date().toISOString();
-    } catch (error) {
-      const isMLSStaleMessageError =
-        error instanceof BackendError && error.label === BackendErrorLabel.MLS_STALE_MESSAGE;
-      if (isMLSStaleMessageError) {
         await this.recoverMLSGroupFromEpochMismatch(conversationId);
-        if (shouldRetry) {
-          return this.sendMLSMessage(params, false);
-        }
+        return this.sendMLSMessage(params, false);
       }
 
+      this.logger.error('Failed to send MLS message, error did not match any known patterns, rethrowing the error', {
+        error,
+        groupId,
+      });
       throw error;
     }
-
-    const failedToSend =
-      response?.failed || (response?.failed_to_send ?? []).length > 0
-        ? {
-            queued: response?.failed_to_send,
-            failed: response?.failed,
-          }
-        : undefined;
-
-    return {
-      id: payload.messageId,
-      sentAt,
-      failedToSend,
-      state: sentAt ? MessageSendingState.OUTGOING_SENT : MessageSendingState.CANCELED,
-    };
   }
 
   /**
