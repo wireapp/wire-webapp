@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [46.39.11](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@46.39.10...@wireapp/core@46.39.11) (2025-10-20)
+
+### Bug Fixes
+
+* Recover from MLS stale message error [WPB-21170] ([#7485](https://github.com/wireapp/wire-web-packages/issues/7485)) ([cf44d24](https://github.com/wireapp/wire-web-packages/commit/cf44d2417acfb039e97fad54da4f9263c0c357c7))
+
 ## [46.39.10](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@46.39.9...@wireapp/core@46.39.10) (2025-10-17)
 
 **Note:** Version bump only for package @wireapp/core
