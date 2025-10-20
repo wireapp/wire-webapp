@@ -470,7 +470,7 @@ declare module 'I18n/en-US.json' {
     'cells.search.closeButton': `Close`;
     'cells.search.failed': `Something went wrong, please try again later.`;
     'cells.search.placeholder': `Search files and folders`;
-    'cells.selfDeletingMessage.info': `Self-deleting messages are currently not available for conversations with Cells.`;
+    'cells.selfDeletingMessage.info': `The feature is not available for conversations with Cells.`;
     'cells.shareModal.copyLink': `Copy Link`;
     'cells.shareModal.disablePublicLink': `Disable public link`;
     'cells.shareModal.disablePublicLink.description': `Disable public link`;
@@ -631,6 +631,7 @@ declare module 'I18n/en-US.json' {
     'conversationDetailsActionNotifications': `Notifications`;
     'conversationDetailsActionServicesOptions': `Apps`;
     'conversationDetailsActionTimedMessages': `Self-deleting messages`;
+    'conversationDetailsActionTimedMessagesDisabled': `Self-deleting messages are off`;
     'conversationDetailsActionUnblock': `Unblock`;
     'conversationDetailsCloseLabel': `Close image details view`;
     'conversationDetailsGroupAdmin': `Group Admin`;

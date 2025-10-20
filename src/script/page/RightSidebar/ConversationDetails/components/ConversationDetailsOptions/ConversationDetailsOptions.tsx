@@ -204,7 +204,11 @@ const ConversationDetailsOptions = ({
             onClick={canEditTimeout ? openTimedMessagePanel : undefined}
             dataUieName="go-timed-messages"
             icon={<Icon.TimerIcon />}
-            title={t('conversationDetailsActionTimedMessages')}
+            title={
+              isCellsConversation
+                ? t('conversationDetailsActionTimedMessagesDisabled')
+                : t('conversationDetailsActionTimedMessages')
+            }
             statusUieName="status-timed-messages"
             statusText={timedMessagesText}
             disabled={!canEditTimeout}
