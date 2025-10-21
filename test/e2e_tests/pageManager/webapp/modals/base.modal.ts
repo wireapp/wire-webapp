@@ -29,7 +29,7 @@ export abstract class BaseModal {
 
   constructor(page: Page, modalLocator: string) {
     this.page = page;
-    this.modal = page.locator(modalLocator);
+    this.modal = page.getByTestId(modalLocator);
     this.modalTitle = this.modal.getByTestId('status-modal-title');
     this.modalText = this.modal.getByTestId('status-modal-text');
     this.actionButton = this.modal.getByTestId('do-action');

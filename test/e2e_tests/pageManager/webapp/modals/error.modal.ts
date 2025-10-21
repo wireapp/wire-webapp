@@ -23,6 +23,6 @@ import {BaseModal} from './base.modal';
 
 export class ErrorModal extends BaseModal {
   constructor(page: Page) {
-    super(page, "[data-uie-name='primary-modals-container']");
+    super(page, 'primary-modals-container');
   }
 }
