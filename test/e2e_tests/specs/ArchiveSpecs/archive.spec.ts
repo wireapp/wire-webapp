@@ -19,7 +19,7 @@
 
 import {getUser} from 'test/e2e_tests/data/user';
 import {PageManager} from 'test/e2e_tests/pageManager';
-import {setupBasicTestScenario, startUpApp} from 'test/e2e_tests/utils/setup.util';
+import {setupBasicTestScenario, completeLogin} from 'test/e2e_tests/utils/setup.util';
 import {tearDownAll} from 'test/e2e_tests/utils/tearDown.util';
 import {createGroup} from 'test/e2e_tests/utils/userActions';
 
@@ -43,7 +43,7 @@ test.describe('Accessibility', () => {
     {tag: ['@TC-97', '@regression']},
     async ({pageManager}) => {
       const {components, modals, pages} = pageManager.webapp;
-      await startUpApp(pageManager, memberA);
+      await completeLogin(pageManager, memberA);
 
       await components.conversationSidebar().clickConnectButton();
       await components.contactList().clickOnContact(memberB.fullName);
@@ -73,7 +73,7 @@ test.describe('Accessibility', () => {
       const {components, modals, pages} = pageManagerA.webapp;
       const {pages: pagesB, components: componentsB, modals: modalsB} = memberPageManagerB.webapp;
 
-      await Promise.all([startUpApp(pageManagerA, memberA), startUpApp(memberPageManagerB, memberB)]);
+      await Promise.all([completeLogin(pageManagerA, memberA), completeLogin(memberPageManagerB, memberB)]);
       try {
         await modalsB.acknowledge().modal.waitFor({state: 'visible', timeout: 2500});
         if (await modalsB.acknowledge().isModalPresent()) {
@@ -111,7 +111,7 @@ test.describe('Accessibility', () => {
     async ({pageManager}) => {
       const groupName = 'test';
       const {components, pages} = pageManager.webapp;
-      await startUpApp(pageManager, memberA);
+      await completeLogin(pageManager, memberA);
       await createGroup(pageManager, groupName, [memberB]);
       await pages.conversation().clickConversationInfoButton();
       await pages.conversationDetails().clickArchiveButton();
@@ -130,7 +130,7 @@ test.describe('Accessibility', () => {
     {tag: ['@TC-105', '@regression']},
     async ({pageManager}) => {
       const {components, modals, pages} = pageManager.webapp;
-      await startUpApp(pageManager, memberA);
+      await completeLogin(pageManager, memberA);
 
       await components.conversationSidebar().clickConnectButton();
       await components.contactList().clickOnContact(memberB.fullName);
