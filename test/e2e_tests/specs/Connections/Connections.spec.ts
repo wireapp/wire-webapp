@@ -18,6 +18,7 @@
  */
 
 import {getUser} from 'test/e2e_tests/data/user';
+import {PageManager} from 'test/e2e_tests/pageManager';
 import {startUpApp} from 'test/e2e_tests/utils/setup.util';
 import {tearDownAll} from 'test/e2e_tests/utils/tearDown.util';
 
@@ -34,20 +35,40 @@ test.describe('Connections', () => {
     // const user = await setupBasicTestScenario(api, members, owner, teamName);
     // owner = {...owner, ...user};
     // add single user
+    // add user
+    await api.createPersonalUser(memberA);
+    await api.createPersonalUser(memberB);
   });
 
   test(
     'Verify 1on1 conversation is not created on the second end after you ignore connection request',
     {tag: ['@TC-365', '@TC-369', '@TC-370', '@TC-371', '@regression']},
-    async ({pageManager}) => {
-      const {pages} = pageManager.webapp;
-      await startUpApp(pageManager, memberA);
+    async ({pageManager: memberPageManagerA, browser}) => {
+      const {pages, components, modals} = memberPageManagerA.webapp;
+      const memberContext = await browser.newContext();
+      const memberPage = await memberContext.newPage();
+      const memberPageManagerB = PageManager.from(memberPage);
 
-      test.step('Verify sending a connection request to user from conversation view', () => {});
+      await Promise.all([startUpApp(memberPageManagerA, memberA), startUpApp(memberPageManagerB, memberB)]);
 
-      test.step('I want to cancel a pending request from conversation list', () => {});
+      await components.conversationSidebar().clickConnectButton();
+      await components.contactList().clickOnContact(memberB.fullName);
+      await modals.userProfile().clickStartConversation();
+      // check that user b has an request
 
-      test.step('I want to archive a pending request from conversation list', () => {});
+      // test.step('Verify sending a connection request to user from conversation view', () => {
+
+      // });
+
+      test.step('I want to cancel a pending request from conversation list', () => {
+        // cancel request
+        // expect that the conversaion is away
+      });
+
+      test.step('I want to archive a pending request from conversation list', () => {
+        // move current conversastion to archive
+        // check if the conversation is in the archive tab
+      });
 
       expect(await pages.conversationList().isConversationItemVisible(memberB.fullName)).toBeTruthy();
     },
