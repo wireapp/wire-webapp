@@ -28,15 +28,17 @@ import {useFilePaste} from './useFilePaste/useFilePaste';
 interface UseFileHandlingProps {
   uploadDroppedFiles: (files: File[]) => void;
   uploadImages: (images: File[]) => void;
+  isFileNameKept?: boolean;
 }
 
-export const useFileHandling = ({uploadDroppedFiles, uploadImages}: UseFileHandlingProps) => {
+export const useFileHandling = ({uploadDroppedFiles, uploadImages, isFileNameKept}: UseFileHandlingProps) => {
   const [pastedFile, setPastedFile] = useState<File | null>(null);
 
   useFilePaste({
     onFilePasted: file => {
       setPastedFile(file);
     },
+    isFileNameKept,
   });
 
   const clearPastedFile = () => setPastedFile(null);

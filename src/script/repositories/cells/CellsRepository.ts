@@ -113,6 +113,12 @@ export class CellsRepository {
     return this.apiClient.api.cells.deleteNode({uuid, permanently});
   }
 
+  async deleteNodes({uuids, permanently = false}: {uuids: string[]; permanently?: boolean}) {
+    uuids.forEach(async uuid => {
+      await this.deleteNode({uuid, permanently});
+    });
+  }
+
   async moveNode({currentPath, targetPath}: {currentPath: string; targetPath: string}) {
     return this.apiClient.api.cells.moveNode({currentPath, targetPath});
   }
