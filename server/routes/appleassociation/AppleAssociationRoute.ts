@@ -25,10 +25,10 @@ export const AppleAssociationRoute = () =>
       webcredentials: {
         apps: [
           'EDF3JCE8BC.com.wearezeta.zclient.ios',
-          'W5KEQBF9B5.com.wearezeta.zclient-alpha',
-          'W5KEQBF9B5.com.wearezeta.zclient.ios-development',
-          'W5KEQBF9B5.com.wearezeta.zclient.ios-internal',
-          'W5KEQBF9B5.com.wearezeta.zclient.ios-release',
+          'EDF3JCE8BC.com.wearezeta.zclient.alpha',
+          'EDF3JCE8BC.com.wearezeta.zclient.development',
+          'EDF3JCE8BC.com.wearezeta.zclient.ios.beta',
+          'EDF3JCE8BC.com.wearezeta.zclient.ios.edge',
         ],
       },
     };

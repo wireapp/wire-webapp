@@ -24,6 +24,10 @@ import {styleBreakpoint} from 'Components/Conversation/ConversationCells/common/
 export const wrapperStyles: CSSObject = {
   display: 'inline-flex',
 
+  '& > *': {
+    overflow: 'hidden',
+  },
+
   [`@media (min-width: ${styleBreakpoint}px)`]: {
     display: 'flex',
   },
