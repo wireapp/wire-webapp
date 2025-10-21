@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [27.81.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@27.80.2...@wireapp/api-client@27.81.0) (2025-10-21)
+
+### Features
+
+* **api-client:** add payload on the postUserSearchable endpoint ([#7487](https://github.com/wireapp/wire-web-packages/issues/7487)) ([c46a645](https://github.com/wireapp/wire-web-packages/commit/c46a64586b09bcf5c5b3b3e443ff7135a5477214))
+
 ## [27.80.2](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@27.80.1...@wireapp/api-client@27.80.2) (2025-10-20)
 
 ### Bug Fixes
