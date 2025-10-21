@@ -21,47 +21,42 @@ import {QualifiedId} from '@wireapp/api-client/lib/user';
 
 import {Account} from '@wireapp/core';
 
+import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
 import {isMixedConversation, MixedConversation} from 'Repositories/conversation/ConversationSelectors';
 import {Conversation} from 'Repositories/entity/Conversation';
 import {initMLSGroupConversation} from 'src/script/mls/MLSConversations';
 
 import {mlsMigrationLogger} from '../../MLSMigrationLogger';
 
-interface MigrationJoinMixedConversationHandler {
-  tryEstablishingMLSGroup: (params: {
-    groupId: string;
-    conversationId: QualifiedId;
-    selfUserId: QualifiedId;
-    qualifiedUsers: QualifiedId[];
-  }) => Promise<void>;
-}
-
 interface JoinUnestablishedMixedConversationsParams {
   core: Account;
-  conversationHandler: MigrationJoinMixedConversationHandler;
 }
 
 export const joinUnestablishedMixedConversations = async (
   conversations: Conversation[],
+  conversationRepository: ConversationRepository,
   selfUserId: QualifiedId,
-  {core, conversationHandler}: JoinUnestablishedMixedConversationsParams,
+  {core}: JoinUnestablishedMixedConversationsParams,
 ) => {
   const mixedConversations = conversations.filter(isMixedConversation);
   mlsMigrationLogger.info(`Found ${mixedConversations.length} "mixed" conversations, joining unestablished ones...`);
 
   for (const conversation of mixedConversations) {
-    await joinUnestablishedMixedConversation(conversation, selfUserId, {core, conversationHandler});
+    await joinUnestablishedMixedConversation(conversation, conversationRepository, selfUserId, {
+      core,
+    });
   }
 };
 
 export const joinUnestablishedMixedConversation = async (
   mixedConversation: MixedConversation,
+  conversationRepository: ConversationRepository,
   selfUserId: QualifiedId,
-  {core, conversationHandler}: JoinUnestablishedMixedConversationsParams,
+  {core}: JoinUnestablishedMixedConversationsParams,
   shouldRetry = true,
 ) => {
   if (mixedConversation.epoch > 0) {
-    return initMLSGroupConversation(mixedConversation, selfUserId, {
+    return initMLSGroupConversation(mixedConversation, conversationRepository, {
       core,
       onError: ({id}, error) =>
         mlsMigrationLogger.error(`Failed when joining a mls group of mixed conversation with id ${id}, error: `, error),
@@ -75,7 +70,7 @@ export const joinUnestablishedMixedConversation = async (
   const otherUsersToAdd = mixedConversation.participating_user_ids();
 
   try {
-    await conversationHandler.tryEstablishingMLSGroup({
+    await conversationRepository.tryEstablishingMLSGroup({
       conversationId: mixedConversation.qualifiedId,
       groupId: mixedConversation.groupId,
       qualifiedUsers: otherUsersToAdd,
@@ -91,6 +86,6 @@ export const joinUnestablishedMixedConversation = async (
     }
 
     mlsMigrationLogger.info(`Retrying to join unestablished mixed conversation with id ${mixedConversation.id}`);
-    await joinUnestablishedMixedConversation(mixedConversation, selfUserId, {core, conversationHandler}, false);
+    await joinUnestablishedMixedConversation(mixedConversation, conversationRepository, selfUserId, {core}, false);
   }
 };

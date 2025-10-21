@@ -26,9 +26,10 @@ import {getFileExtension} from 'Util/util';
 
 interface UseFilePasteParams {
   onFilePasted: (file: File) => void;
+  isFileNameKept?: boolean;
 }
 
-export const useFilePaste = ({onFilePasted}: UseFilePasteParams) => {
+export const useFilePaste = ({onFilePasted, isFileNameKept}: UseFilePasteParams) => {
   const processClipboardFiles = useCallback(
     (files: FileList): void => {
       const [pastedFile] = files;
@@ -39,7 +40,9 @@ export const useFilePaste = ({onFilePasted}: UseFilePasteParams) => {
       const {lastModified} = pastedFile;
 
       const date = formatLocale(lastModified || new Date(), 'PP, pp');
-      const fileName = `${t('conversationSendPastedFile', {date})}.${getFileExtension(pastedFile.name)}`;
+      const fileName = isFileNameKept
+        ? pastedFile.name
+        : `${t('conversationSendPastedFile', {date})}.${getFileExtension(pastedFile.name)}`;
 
       const newFile = new File([pastedFile], fileName, {
         type: pastedFile.type,
@@ -47,7 +50,7 @@ export const useFilePaste = ({onFilePasted}: UseFilePasteParams) => {
 
       onFilePasted(newFile);
     },
-    [onFilePasted],
+    [onFilePasted, isFileNameKept],
   );
 
   const handlePasteEvent = useCallback(

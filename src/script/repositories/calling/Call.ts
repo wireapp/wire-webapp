@@ -246,4 +246,12 @@ export class Call {
     this.currentPage(Math.min(this.currentPage(), newPages.length - 1));
     this.pages(newPages);
   }
+
+  public useAvsRustSFT(): boolean {
+    const conversationName = this.conversation.display_name();
+    if (!conversationName.includes('Sync - Calling')) {
+      return false;
+    }
+    return !!window.wire?.app?.debug?.isEnabledAvsRustSFT();
+  }
 }

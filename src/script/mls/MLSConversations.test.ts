@@ -26,6 +26,8 @@ import {Account} from '@wireapp/core';
 import {MLSConversation} from 'Repositories/conversation/ConversationSelectors';
 import {Conversation} from 'Repositories/entity/Conversation';
 import {User} from 'Repositories/entity/User';
+import {Core} from 'src/script/service/CoreSingleton';
+import {TestFactory} from 'test/helper/TestFactory';
 
 import {initMLSGroupConversations, initialiseSelfAndTeamConversations} from './MLSConversations';
 
@@ -44,20 +46,28 @@ function createMLSConversations(nbConversations: number, type?: CONVERSATION_TYP
 }
 
 describe('MLSConversations', () => {
+  const testFactory = new TestFactory();
+
+  afterEach(() => {
+    jest.clearAllMocks();
+  });
+
   describe('initMLSGroupConversations', () => {
-    it('joins all the unestablished MLS groups', async () => {
-      const core = new Account();
+    it('joins all the unestablished MLS groups (epoch > 0)', async () => {
       const nbMLSConversations = 5 + Math.ceil(Math.random() * 10);
-
       const mlsConversations = createMLSConversations(nbMLSConversations, CONVERSATION_TYPE.REGULAR);
+      // Force epoch > 0 to trigger join path instead of establish
+      mlsConversations.forEach(c => (c.epoch = 1));
 
-      jest.spyOn(core.service!.conversation, 'mlsGroupExistsLocally').mockResolvedValue(false);
-      jest.spyOn(core.service!.conversation, 'joinByExternalCommit');
+      const conversationRepository = await testFactory.exposeConversationActors();
+      const repositoryCore = (conversationRepository as any).core as Core;
+      jest.spyOn(repositoryCore.service!.conversation, 'mlsGroupExistsLocally').mockResolvedValue(false);
+      const joinSpy = jest.spyOn(repositoryCore.service!.conversation, 'joinByExternalCommit');
 
-      await initMLSGroupConversations(mlsConversations, new User(), {core});
+      await initMLSGroupConversations(mlsConversations, conversationRepository, {core: repositoryCore});
 
       for (const conversation of mlsConversations) {
-        expect(core.service?.conversation.joinByExternalCommit).toHaveBeenCalledWith(conversation.qualifiedId);
+        expect(joinSpy).toHaveBeenCalledWith(conversation.qualifiedId);
       }
     });
   });
@@ -71,7 +81,8 @@ describe('MLSConversations', () => {
     jest.spyOn(core.service!.conversation!, 'mlsGroupExistsLocally').mockResolvedValue(true);
     jest.spyOn(core.service!.mls!, 'scheduleKeyMaterialRenewal');
 
-    await initMLSGroupConversations(mlsConversations, new User(), {core});
+    const conversationRepository = await testFactory.exposeConversationActors();
+    await initMLSGroupConversations(mlsConversations, conversationRepository, {core});
 
     for (const conversation of mlsConversations) {
       expect(core.service!.mls!.scheduleKeyMaterialRenewal).toHaveBeenCalledWith(conversation.groupId);
@@ -92,7 +103,9 @@ describe('MLSConversations', () => {
       const mlsConversations = createMLSConversations(nbMLSConversations);
       const conversations = [teamConversation, ...mlsConversations, selfConversation];
 
-      await initialiseSelfAndTeamConversations(conversations, new User(), 'client-1', core);
+      const conversationRepository = await testFactory.exposeConversationActors();
+
+      await initialiseSelfAndTeamConversations(conversations, conversationRepository, new User(), 'client-1', core);
 
       expect(core.service!.mls!.registerConversation).toHaveBeenCalledTimes(2);
     });
@@ -112,13 +125,14 @@ describe('MLSConversations', () => {
       const mlsConversations = createMLSConversations(nbMLSConversations);
       const conversations = [teamConversation, ...mlsConversations, selfConversation];
 
-      await initialiseSelfAndTeamConversations(conversations, new User(), 'clientId', core);
+      const conversationRepository = await testFactory.exposeConversationActors();
+
+      await initialiseSelfAndTeamConversations(conversations, conversationRepository, new User(), 'clientId', core);
 
       expect(core.service!.mls!.registerConversation).toHaveBeenCalledTimes(0);
     });
 
     it('joins self and team conversation with external commit that have epoch > 0', async () => {
-      const core = new Account();
       const nbMLSConversations = 5 + Math.ceil(Math.random() * 10);
 
       const selfConversation = createMLSConversation();
@@ -132,13 +146,22 @@ describe('MLSConversations', () => {
       const mlsConversations = createMLSConversations(nbMLSConversations);
       const conversations = [teamConversation, ...mlsConversations, selfConversation];
 
+      const conversationRepository = await testFactory.exposeConversationActors();
+      const repositoryCore = (conversationRepository as any).core as Core;
       // MLS group is not yet established locally
-      jest.spyOn(core.service!.mls!, 'isConversationEstablished').mockResolvedValue(false);
+      jest.spyOn(repositoryCore.service!.mls!, 'isConversationEstablished').mockResolvedValue(false);
+      const joinSpy = jest.spyOn(repositoryCore.service!.conversation!, 'joinByExternalCommit');
 
-      await initialiseSelfAndTeamConversations(conversations, new User(), 'clientId', core);
+      await initialiseSelfAndTeamConversations(
+        conversations,
+        conversationRepository,
+        new User(),
+        'clientId',
+        repositoryCore,
+      );
 
-      expect(core.service!.mls!.registerConversation).toHaveBeenCalledTimes(0);
-      expect(core.service!.conversation!.joinByExternalCommit).toHaveBeenCalledTimes(2);
+      expect(repositoryCore.service!.mls!.registerConversation).toHaveBeenCalledTimes(0);
+      expect(joinSpy).toHaveBeenCalledTimes(2);
     });
 
     it('DOES NOT join self and team conversation with external commit that have epoch > 0, but is already established locally', async () => {
@@ -158,7 +181,8 @@ describe('MLSConversations', () => {
 
       jest.spyOn(core.service!.mls!, 'isConversationEstablished').mockResolvedValue(true);
 
-      await initialiseSelfAndTeamConversations(conversations, new User(), 'clientId', core);
+      const conversationRepository = await testFactory.exposeConversationActors();
+      await initialiseSelfAndTeamConversations(conversations, conversationRepository, new User(), 'clientId', core);
 
       expect(core.service!.mls!.registerConversation).not.toHaveBeenCalled();
       expect(core.service!.conversation!.joinByExternalCommit).not.toHaveBeenCalled();

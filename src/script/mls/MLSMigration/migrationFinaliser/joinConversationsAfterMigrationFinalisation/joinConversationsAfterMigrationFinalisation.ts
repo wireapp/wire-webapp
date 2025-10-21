@@ -21,9 +21,9 @@ import {ConversationProtocol} from '@wireapp/api-client/lib/conversation';
 
 import {Account} from '@wireapp/core';
 
+import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
 import {MLSConversation, isMLSConversation} from 'Repositories/conversation/ConversationSelectors';
 import {Conversation} from 'Repositories/entity/Conversation';
-import {User} from 'Repositories/entity/User';
 import {initMLSGroupConversations} from 'src/script/mls/MLSConversations';
 
 /**
@@ -36,13 +36,13 @@ import {initMLSGroupConversations} from 'src/script/mls/MLSConversations';
 export const joinConversationsAfterMigrationFinalisation = async ({
   conversations,
   core,
-  selfUser,
+  conversationRepository,
   onSuccess,
   onError,
 }: {
+  conversationRepository: ConversationRepository;
   conversations: Conversation[];
   core: Account;
-  selfUser: User;
   onSuccess: (conversation: Conversation) => void;
   onError?: (conversation: Conversation, error: unknown) => void;
 }) => {
@@ -52,7 +52,7 @@ export const joinConversationsAfterMigrationFinalisation = async ({
   //we have to join the conversation with external commit and let user know that they might have missed some messages
   const alreadyMigratedConversations = filterGroupConversationsAlreadyMigratedToMLS(conversations);
 
-  await initMLSGroupConversations(alreadyMigratedConversations, selfUser, {
+  await initMLSGroupConversations(alreadyMigratedConversations, conversationRepository, {
     core,
     onSuccessfulJoin: onSuccess,
     onError,

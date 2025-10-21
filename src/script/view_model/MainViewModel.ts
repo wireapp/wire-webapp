@@ -108,6 +108,7 @@ export class MainViewModel {
 
     this.actions = new ActionsViewModel(
       repositories.self,
+      repositories.cells,
       repositories.connection,
       repositories.conversation,
       repositories.integration,
