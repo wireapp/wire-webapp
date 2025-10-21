@@ -96,7 +96,6 @@ test(
       await memberCalling.clickAcceptCallButton();
       expect(await memberCalling.isCellVisible()).toBeTruthy();
 
-      await memberCalling.waitForGoFullScreen();
       expect(await memberCalling.isFullScreenVisible()).toBeFalsy();
 
       await memberCalling.maximizeCell();

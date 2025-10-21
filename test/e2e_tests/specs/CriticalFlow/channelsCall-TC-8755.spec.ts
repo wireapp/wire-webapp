@@ -98,7 +98,6 @@ test(
       // answering happens automatically calling service
       await ownerPages.calling().waitForCell();
       expect(await ownerPages.calling().isCellVisible()).toBeTruthy();
-      await ownerPages.calling().waitForGoFullScreen();
     });
 
     await test.step('Owner switches audio on and sends audio', async () => {
