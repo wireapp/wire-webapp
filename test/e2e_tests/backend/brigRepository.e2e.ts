@@ -109,6 +109,18 @@ export class BrigRepositoryE2E {
     );
   }
 
+  public async unlockAppLock(teamId: string) {
+    await this.axiosInstance.put(
+      `i/teams/${teamId}/features/appLock/unlocked`,
+      {},
+      {
+        headers: {
+          Authorization: `Basic ${BASIC_AUTH}`,
+        },
+      },
+    );
+  }
+
   public async enableChannelsFeature(teamId: string) {
     await this.axiosInstance.patch(
       `i/teams/${teamId}/features/channels`,
@@ -122,6 +134,7 @@ export class BrigRepositoryE2E {
       },
     );
   }
+
   public async enableMLSFeature(teamId: string) {
     await this.axiosInstance.patch(
       `i/teams/${teamId}/features/mls`,
@@ -133,6 +146,24 @@ export class BrigRepositoryE2E {
           defaultProtocol: 'mls',
           defaultCipherSuite: 2,
           supportedProtocols: ['mls', 'proteus'],
+        },
+      },
+      {
+        headers: {
+          Authorization: `Basic ${BASIC_AUTH}`,
+        },
+      },
+    );
+  }
+
+  public async toggleAppLock(teamId: string, status: 'enabled' | 'disabled', enforceAppLock: boolean = true) {
+    await this.axiosInstance.patch(
+      `i/teams/${teamId}/features/appLock`,
+      {
+        status: status,
+        config: {
+          enforceAppLock: enforceAppLock,
+          inactivityTimeoutSecs: 30,
         },
       },
       {

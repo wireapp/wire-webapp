@@ -232,6 +232,14 @@ export class DebugUtil {
     );
   }
 
+  isGzippingEnabled(): boolean {
+    return this.apiClient.transport.http.isGzipEnabled();
+  }
+
+  toggleGzipping(enabled: boolean) {
+    this.apiClient.transport.http.toggleGzip(enabled);
+  }
+
   enableCameraBlur(flag: boolean) {
     return this.callingRepository.switchVideoBackgroundBlur(flag);
   }
@@ -294,6 +302,27 @@ export class DebugUtil {
 
     const isEnabled = storage.getItem('avs-debugger-enabled');
     return isEnabled === 'true';
+  }
+
+  isEnabledAvsRustSFT(): boolean {
+    const storage = getStorage();
+
+    if (storage === undefined) {
+      return false;
+    }
+
+    const isEnabled = storage.getItem('avs-rust-sft-enabled');
+    return isEnabled === 'true';
+  }
+
+  enableAvsRustSFT(enable: boolean): boolean {
+    const storage = getStorage();
+
+    if (storage === undefined) {
+      return false;
+    }
+    storage.setItem('avs-rust-sft-enabled', `${enable}`);
+    return enable;
   }
 
   /** Used by QA test automation. */

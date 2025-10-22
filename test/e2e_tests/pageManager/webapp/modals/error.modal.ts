@@ -17,23 +17,12 @@
  *
  */
 
-import {addCreatedTeam, addCreatedUser} from './tearDown.util';
-import {inviteMembers} from './userActions';
+import {Page} from '@playwright/test';
 
-import {ApiManagerE2E} from '../backend/apiManager.e2e';
-import {User} from '../data/user';
+import {BaseModal} from './base.modal';
 
-/**
- * add an team with one owner and 2 member
- */
-export const setupBasicTestScenario = async (api: ApiManagerE2E, member: User[], owner: User, teamName: string) => {
-  const user = await api.createTeamOwner(owner, teamName);
-  // register credentials for cleanup later
-  addCreatedTeam(user, user.teamId);
-  await inviteMembers(member, user, api);
-
-  for (const [, user] of member.entries()) {
-    addCreatedUser(user);
+export class ErrorModal extends BaseModal {
+  constructor(page: Page) {
+    super(page, 'primary-modals-container');
   }
-  return user;
-};
+}
