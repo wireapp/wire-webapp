@@ -19,7 +19,7 @@
 
 import {getUser} from 'test/e2e_tests/data/user';
 import {PageManager} from 'test/e2e_tests/pageManager';
-import {setupBasicTestScenario} from 'test/e2e_tests/utils/setup.util';
+import {bootstrapTeamForTesting} from 'test/e2e_tests/utils/setup.util';
 import {tearDownAll} from 'test/e2e_tests/utils/tearDown.util';
 import {createGroup, loginUser} from 'test/e2e_tests/utils/userActions';
 
@@ -38,7 +38,7 @@ test.describe('Accessibility', () => {
   const loginTimeOut = 60_000;
 
   test.beforeAll(async ({api}) => {
-    const user = await setupBasicTestScenario(api, members, owner, teamName);
+    const user = await bootstrapTeamForTesting(api, members, owner, teamName);
     owner = {...owner, ...user};
   });
 

@@ -92,6 +92,15 @@ export const createGroup = async (pageManager: PageManager, conversationName: st
   await pageManager.webapp.pages.groupCreation().clickCreateGroupButton();
 };
 
+export const createChannel = async (pageManager: PageManager, conversationName: string, user: User[]) => {
+  await pageManager.webapp.pages.conversationList().clickCreateGroup();
+  await pageManager.webapp.pages.groupCreation().setGroupName(conversationName);
+  await pageManager.webapp.pages.groupCreation().clickNextButton();
+  // task: set params for testing
+  await pageManager.webapp.pages.startUI().selectUsers(user.flatMap(user => user.username));
+  await pageManager.webapp.pages.groupCreation().clickCreateGroupButton();
+};
+
 export const handleAppLockState = async (pageManager: PageManager, appLockPassCode: string) => {
   const {modals} = pageManager.webapp;
   const appLockModal = await modals.appLock();

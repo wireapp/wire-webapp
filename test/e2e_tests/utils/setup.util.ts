@@ -25,15 +25,15 @@ import {User} from '../data/user';
 import {PageManager} from '../pageManager';
 
 /**
- * add an team with one owner and 2 member
+ * add an team with owner and given members
  */
-export const setupBasicTestScenario = async (api: ApiManagerE2E, member: User[], owner: User, teamName: string) => {
+export const bootstrapTeamForTesting = async (api: ApiManagerE2E, members: User[], owner: User, teamName: string) => {
   const user = await api.createTeamOwner(owner, teamName);
   // register credentials for cleanup later
   addCreatedTeam(user, user.teamId);
-  await inviteMembers(member, user, api);
+  await inviteMembers(members, user, api);
 
-  for (const [, user] of member.entries()) {
+  for (const [, user] of members.entries()) {
     addCreatedUser(user);
   }
   return user;
