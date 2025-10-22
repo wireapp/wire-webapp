@@ -17,7 +17,7 @@
  *
  */
 
-import {MutableRefObject, useCallback, useEffect, useLayoutEffect, useMemo, useState} from 'react';
+import {MutableRefObject, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState} from 'react';
 
 import {useVirtualizer} from '@tanstack/react-virtual';
 import cx from 'classnames';
@@ -180,11 +180,15 @@ export const VirtualizedMessagesList = ({
     }
   }, []);
 
+  const scrolledToHighlightedMessage = useRef(false);
+
   const onTimestampClick = async (messageId: string) => {
+    scrolledToHighlightedMessage.current = false;
     setHighlightedMessage(messageId);
 
     const clearHighlightedMessage = setTimeout(() => {
       setHighlightedMessage(undefined);
+      scrolledToHighlightedMessage.current = false;
       clearTimeout(clearHighlightedMessage);
     }, 5000);
 
@@ -197,27 +201,21 @@ export const VirtualizedMessagesList = ({
     }
   };
 
-  useEffect(() => {
-    // setTimeout is a workaround for smoother scrolling in virtualizer
-    // also without, creates race condition with scrolledToHighlightedMessage
-    // https://github.com/TanStack/virtual/issues/216
-    const setScrolledToHighlightedMessageTimeout = setTimeout(() => {
-      // When we have a highlighted message, that is not visible yet, find the index
-      if (highlightedMessage) {
-        const highlightedMessageIndex = groupedMessages.findIndex(
-          msg => !isMarker(msg) && msg.message.id === highlightedMessage,
-        );
+  useLayoutEffect(() => {
+    if (highlightedMessage && !scrolledToHighlightedMessage.current) {
+      const highlightedMessageIndex = groupedMessages.findIndex(
+        msg => !isMarker(msg) && msg.message.id === highlightedMessage,
+      );
 
-        // scroll the index if the message is there and not a timestamp
-        if (highlightedMessageIndex !== -1) {
-          virtualizer.scrollToIndex(highlightedMessageIndex, {align: 'start'});
-        }
-        clearTimeout(setScrolledToHighlightedMessageTimeout);
-        setTimeout(() => {
-          setHighlightedMessage(undefined);
-        }, 1000); // set to time of animation of highlightedMessage - @todo create const for animation time
+      if (highlightedMessageIndex !== -1) {
+        virtualizer.scrollToIndex(highlightedMessageIndex, {align: 'center'});
+        scrolledToHighlightedMessage.current = true;
+
+        const setScrolledToHighlightedMessageTimeout = setTimeout(() => {
+          clearTimeout(setScrolledToHighlightedMessageTimeout);
+        }, 100);
       }
-    }, 100);
+    }
   }, [groupedMessages, highlightedMessage]);
 
   const onJumpToLastMessageClick = async () => {
