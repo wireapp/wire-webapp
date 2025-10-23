@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [27.82.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@27.81.0...@wireapp/api-client@27.82.0) (2025-10-23)
+
+### Features
+
+* Handle missing MLS users in a conversation [WPB-20863] ([#7488](https://github.com/wireapp/wire-web-packages/issues/7488)) ([66ce8f5](https://github.com/wireapp/wire-web-packages/commit/66ce8f549ce38f1d87311df6f041548078b78934))
+
 # [27.81.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@27.80.2...@wireapp/api-client@27.81.0) (2025-10-21)
 
 ### Features

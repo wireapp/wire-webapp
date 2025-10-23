@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [46.40.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@46.39.12...@wireapp/core@46.40.0) (2025-10-23)
+
+### Features
+
+* Handle missing MLS users in a conversation [WPB-20863] ([#7488](https://github.com/wireapp/wire-web-packages/issues/7488)) ([66ce8f5](https://github.com/wireapp/wire-web-packages/commit/66ce8f549ce38f1d87311df6f041548078b78934))
+
 ## [46.39.12](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@46.39.11...@wireapp/core@46.39.12) (2025-10-21)
 
 **Note:** Version bump only for package @wireapp/core
