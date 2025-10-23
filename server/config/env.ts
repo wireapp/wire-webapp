@@ -113,13 +113,16 @@ export type Env = {
    */
   FEATURE_ENABLE_ACCOUNT_REGISTRATION_ACCEPT_TERMS_AND_PRIVACY_POLICY: string;
 
+  /** Feature toggle for advanced filters */
+  FEATURE_ENABLE_ADVANCED_FILTERS: string;
+
   /** Feature toggle to blur the background during video call */
   FEATURE_ENABLE_BLUR_BACKGROUND: string;
 
   /** Feature toggle for debug utils. Can be set to true or false */
   FEATURE_ENABLE_DEBUG: string;
 
-  /** Feature to open a confirm modal before pinging large groups */
+  /** Feature to open a confirmation modal before pinging large groups */
   FEATURE_ENABLE_PING_CONFIRMATION: string;
 
   /**
@@ -201,6 +204,9 @@ export type Env = {
 
   /** Feature to enable rich text editor */
   FEATURE_ENABLE_MESSAGE_FORMAT_BUTTONS: string;
+
+  /** Feature to enable virtualized messages list */
+  FEATURE_ENABLE_VIRTUALIZED_MESSAGES_LIST: string;
 
   /** Feature to enable Cross Platform Backup export */
   FEATURE_ENABLE_CROSS_PLATFORM_BACKUP_EXPORT: string;

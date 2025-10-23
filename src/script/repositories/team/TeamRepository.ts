@@ -66,7 +66,7 @@ import {APIClient} from '../../service/APIClientSingleton';
 
 export const HAS_PERSISTED_SUPPORTED_PROTOCOLS = 'HAS_PERSISTED_SUPPORTED_PROTOCOLS';
 
-export interface AccountInfo {
+interface AccountInfo {
   accentID: number;
   availability?: Availability.Type;
   name: string;

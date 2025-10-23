@@ -31,6 +31,8 @@ export class ConversationListPage {
   readonly pendingConnectionRequest: Locator;
   readonly leaveConversationButton: Locator;
   readonly searchConversationsInput: Locator;
+  readonly archiveConversationMenuButton: Locator;
+  readonly unarchiveConversationMenuButton: Locator;
 
   constructor(page: Page) {
     this.page = page;
@@ -46,6 +48,8 @@ export class ConversationListPage {
     );
     this.leaveConversationButton = page.locator(selectByDataAttribute('conversation-leave'));
     this.searchConversationsInput = page.locator(selectByDataAttribute('search-conversations'));
+    this.archiveConversationMenuButton = page.locator(selectById('btn-archive'));
+    this.unarchiveConversationMenuButton = page.locator(selectById('btn-unarchive'));
   }
 
   async isConversationItemVisible(conversationName: string) {
@@ -60,8 +64,16 @@ export class ConversationListPage {
       .isVisible();
   }
 
+  async doesConversationHasMentionIndicator(conversationName: string) {
+    const mentionIndicator = this.getConversationLocator(conversationName).locator(
+      selectByDataAttribute('status-mention'),
+    );
+    await mentionIndicator.waitFor({state: 'visible'});
+    return await mentionIndicator.isVisible();
+  }
+
   async openConversation(conversationName: string) {
-    await this.getConversationLocator(conversationName).click();
+    await this.getConversationLocator(conversationName).first().click();
   }
 
   async openPendingConnectionRequest() {
@@ -78,6 +90,14 @@ export class ConversationListPage {
 
   async clickBlockConversation() {
     await this.blockConversationMenuButton.click();
+  }
+
+  async archiveConversation() {
+    await this.archiveConversationMenuButton.click();
+  }
+
+  async unarchiveConversation() {
+    await this.unarchiveConversationMenuButton.click();
   }
 
   async clickCreateGroup() {

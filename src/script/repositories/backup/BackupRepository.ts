@@ -453,19 +453,16 @@ export class BackupRepository {
         message = 'The user id in the backup file header does not match the expected one';
         this.logger.error(message);
         throw new DifferentAccountError(message);
-        break;
       }
       case ERROR_TYPES.INVALID_FORMAT:
         message = 'The provided backup version is lower than the minimum supported version';
         this.logger.error(message);
         throw new IncompatibleBackupError(message);
-        break;
 
       case ERROR_TYPES.INVALID_VERSION:
         message = 'The provided backup version is lower than the minimum supported version';
         this.logger.error('The provided backup format is not supported');
         throw new IncompatibleBackupFormatError(message);
-        break;
     }
   }
 }

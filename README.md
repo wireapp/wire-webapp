@@ -44,9 +44,9 @@ Prerequisites:
 
 If you would like your browser to trust the certificate from "local.wire.com"/"local.zinfra.io"/"local.imai.wire.link":
 
-1. Download [mkcert](https://github.com/FiloSottile/mkcert/releases/latest)
-1. Set the `CAROOT` environment variable to `<WebApp Dir>/server/certificate`
-1. Run `mkcert -install`
+1. Download [mkcert](https://github.com/FiloSottile/mkcert/releases/latest) Installation on Mac `brew install mkcert` [refer to latest readme.md](https://github.com/FiloSottile/mkcert)
+2. Set the `CAROOT` environment variable to `<WebApp Dir>/server/certificate`
+3. Run `mkcert -install`
 
 #### Environment Configuration
 
@@ -64,8 +64,8 @@ BACKEND_WS="https://prod-nginz-ssl.wire.com"
 
 ```
 APP_BASE="https://local.zinfra.io:8081"
-BACKEND_REST="https://nginz-https.zinfra.io"
-BACKEND_WS="https://nginz-ssl.zinfra.io"
+BACKEND_REST="https://staging-nginz-https.zinfra.io"
+BACKEND_WS="wss://staging-nginz-ssl.zinfra.io"
 ```
 
 **Imai:**
@@ -93,6 +93,8 @@ After updating the environment variables, the app will be available at the corre
 
 ## Testing
 
+[![codecov](https://codecov.io/gh/wireapp/wire-webapp/branch/dev/graph/badge.svg?token=9ELBEPM793)](https://codecov.io/gh/wireapp/wire-webapp)
+
 To launch the full test suite (types check + linting + server tests + app tests), simply run:
 
 `yarn test`
@@ -103,7 +105,7 @@ Alternatively, you can test specific parts of the app:
 
 ## CI Status
 
-[![CI](https://github.com/wireapp/wire-webapp/actions/workflows/test_build_deploy.yml/badge.svg?branch=dev)](https://github.com/wireapp/wire-webapp/actions/workflows/test_build_deploy.yml) [![Lint](https://github.com/wireapp/wire-webapp/actions/workflows/lint.yml/badge.svg?branch=dev)](https://github.com/wireapp/wire-webapp/actions/workflows/lint.yml) [![styled with prettier](https://img.shields.io/badge/styled_with-prettier-ff69b4.svg)](https://github.com/prettier/prettier)
+[![CI](https://github.com/wireapp/wire-webapp/actions/workflows/ci.yml/badge.svg?branch=dev)](https://github.com/wireapp/wire-webapp/actions/workflows/ci.yml) [![styled with prettier](https://img.shields.io/badge/styled_with-prettier-ff69b4.svg)](https://github.com/prettier/prettier)
 
 ## Translations
 

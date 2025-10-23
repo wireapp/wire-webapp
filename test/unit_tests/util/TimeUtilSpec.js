@@ -24,6 +24,7 @@ import {
   formatDuration,
   formatDurationCaption,
   formatSeconds,
+  formatCoarseDuration,
   isSameDay,
   isSameMonth,
   isThisYear,
@@ -313,6 +314,53 @@ describe('TimeUtil', () => {
       caption = formatDurationCaption(3 * ONE_WEEK_IN_MILLIS + ONE_DAY_IN_MILLIS);
 
       expect(caption).toEqual(`3 ${t('ephemeralUnitsWeeks')} and 1 ${t('ephemeralUnitsDay')}`);
+    });
+  });
+
+  describe('"formatCoarseDuration"', () => {
+    it('formats durations in days (singular & plural)', () => {
+      expect(formatCoarseDuration(ONE_DAY_IN_MILLIS)).toBe(t('initProgressDaysSingular', {time: 1}));
+
+      // Floor should keep it at 1 day
+      expect(formatCoarseDuration(ONE_DAY_IN_MILLIS + 11 * ONE_HOUR_IN_MILLIS)).toBe(
+        t('initProgressDaysSingular', {time: 1}),
+      );
+
+      expect(formatCoarseDuration(2 * ONE_DAY_IN_MILLIS)).toBe(t('initProgressDaysPlural', {time: 2}));
+      expect(formatCoarseDuration(2 * ONE_DAY_IN_MILLIS + 5 * ONE_HOUR_IN_MILLIS)).toBe(
+        t('initProgressDaysPlural', {time: 2}),
+      );
+    });
+
+    it('formats durations in hours (singular & plural)', () => {
+      expect(formatCoarseDuration(ONE_HOUR_IN_MILLIS)).toBe(t('initProgressHoursSingular', {time: 1}));
+
+      // Floor keeps it at 1 hour
+      expect(formatCoarseDuration(ONE_HOUR_IN_MILLIS + 59 * ONE_MINUTE_IN_MILLIS)).toBe(
+        t('initProgressHoursSingular', {time: 1}),
+      );
+
+      expect(formatCoarseDuration(2 * ONE_HOUR_IN_MILLIS)).toBe(t('initProgressHoursPlural', {time: 2}));
+      expect(formatCoarseDuration(2 * ONE_HOUR_IN_MILLIS + 30 * ONE_MINUTE_IN_MILLIS)).toBe(
+        t('initProgressHoursPlural', {time: 2}),
+      );
+    });
+
+    it('formats durations in minutes (singular & plural)', () => {
+      expect(formatCoarseDuration(ONE_MINUTE_IN_MILLIS)).toBe(t('initProgressMinutesSingular', {time: 1}));
+
+      // Floor keeps it at 1 minute
+      expect(formatCoarseDuration(ONE_MINUTE_IN_MILLIS + 59 * ONE_SECOND_IN_MILLIS)).toBe(
+        t('initProgressMinutesSingular', {time: 1}),
+      );
+
+      expect(formatCoarseDuration(2 * ONE_MINUTE_IN_MILLIS)).toBe(t('initProgressMinutesPlural', {time: 2}));
+
+      // Sub-minute durations should be treated as 1 minute (singular)
+      expect(formatCoarseDuration(59 * ONE_SECOND_IN_MILLIS)).toBe(t('initProgressMinutesSingular', {time: 1}));
+
+      // Explicit 30s case
+      expect(formatCoarseDuration(30 * ONE_SECOND_IN_MILLIS)).toBe(t('initProgressMinutesSingular', {time: 1}));
     });
   });
 

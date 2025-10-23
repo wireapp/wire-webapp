@@ -40,11 +40,11 @@ interface PrivacySectionProps {
   propertiesRepository: PropertiesRepository;
 }
 
-const PrivacySection: React.FC<PrivacySectionProps> = ({
+const PrivacySection = ({
   propertiesRepository,
   appLockRepository = container.resolve(AppLockRepository),
   appLockState = container.resolve(AppLockState),
-}) => {
+}: PrivacySectionProps) => {
   const {isAppLockEnabled, isAppLockAvailable, isAppLockEnforced, appLockInactivityTimeoutSecs} =
     useKoSubscribableChildren(appLockState, [
       'isAppLockEnabled',

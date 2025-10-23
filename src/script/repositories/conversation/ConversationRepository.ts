@@ -46,6 +46,7 @@ import {
   CONVERSATION_EVENT,
   ConversationProtocolUpdateEvent,
   ConversationAddPermissionUpdateEvent,
+  ConversationMLSResetEvent,
 } from '@wireapp/api-client/lib/event';
 import {BackendErrorLabel} from '@wireapp/api-client/lib/http/';
 import type {BackendError} from '@wireapp/api-client/lib/http/';
@@ -57,6 +58,7 @@ import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 import {container} from 'tsyringe';
 import {flatten} from 'underscore';
 
+import {Account} from '@wireapp/core';
 import {Asset as ProtobufAsset, Confirmation, LegalHoldStatus} from '@wireapp/protocol-messaging';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
@@ -142,6 +144,7 @@ import {
 import {
   AssetAddEvent,
   ButtonActionConfirmationEvent,
+  ButtonActionEvent,
   ClientConversationEvent,
   DeleteEvent,
   EventBuilder,
@@ -341,6 +344,10 @@ export class ConversationRepository {
     if (this.core.backendFeatures.isFederated) {
       this.scheduleMissingUsersAndConversationsMetadataRefresh();
     }
+  }
+
+  public getActiveConversation() {
+    return this.conversationState.activeConversation();
   }
 
   public registerMLSConversationVerificationStateHandler = (
@@ -587,7 +594,7 @@ export class ConversationRepository {
   /**
    * Get a conversation from the backend.
    */
-  public async fetchConversationById({id: conversationId, domain}: QualifiedId): Promise<Conversation> {
+  private async fetchConversationById({id: conversationId, domain}: QualifiedId): Promise<Conversation> {
     const qualifiedId = {domain, id: conversationId};
     const fetching_conversations: Record<string, FetchPromise[]> = {};
     if (fetching_conversations.hasOwnProperty(conversationId)) {
@@ -622,6 +629,19 @@ export class ConversationRepository {
       throw error;
     }
   }
+
+  /**
+   * Get a conversation from the backend without updating local storage
+   * @param qualifiedId qualified id of the conversation to fetch
+   * @returns the fetched backend conversation entity
+   */
+  public fetchBackendConversationEntityById = async (qualifiedId: QualifiedId): Promise<BackendConversation> => {
+    const backendConversationEntity = await this.conversationService.getConversationById(qualifiedId).catch(error => {
+      this.logger.error(`Failed to get conversation from backend: ${error.message}`);
+      throw error;
+    });
+    return backendConversationEntity;
+  };
 
   /**
    * Will load all the conversations in memory
@@ -1110,9 +1130,15 @@ export class ConversationRepository {
     return this.updateConversations(this.conversationState.archivedConversations());
   }
 
-  private async updateConversationFromBackend(conversationEntity: Conversation) {
+  private async updateConversationFromBackend(conversationEntity: Conversation): Promise<void> {
     const conversationData = await this.conversationService.getConversationById(conversationEntity);
-    const {name, message_timer, type} = conversationData;
+    const {name, message_timer, type, group_id: groupId, epoch} = conversationData;
+
+    if (groupId && typeof epoch === 'number') {
+      ConversationMapper.updateProperties(conversationEntity, {groupId, epoch});
+    }
+
+    ConversationMapper.updateProperties(conversationEntity, {name, type});
     ConversationMapper.updateProperties(conversationEntity, {name, type});
     ConversationMapper.updateSelfStatus(conversationEntity, {message_timer});
   }
@@ -2145,6 +2171,141 @@ export class ConversationRepository {
   };
 
   /**
+   * Ensures that a conversation exists by checking its group ID and conversation ID.
+   * If the conversation does not exist, it will try to establish it or join it by external commit.
+   *
+   * @param param0 conversationId and groupId
+   * @returns void
+   */
+  public ensureConversationExists = async ({
+    conversationId,
+    groupId,
+    epoch,
+    core = this.core,
+    retry = true,
+  }: {
+    conversationId: QualifiedId;
+    groupId: string;
+    epoch: number;
+    core?: Account;
+    retry?: boolean;
+  }): Promise<void> => {
+    this.logger.info('Ensuring conversation exists', {conversationId, groupId, epoch});
+    if (await this.conversationService.mlsGroupExistsLocally(groupId)) {
+      this.logger.info('Conversation already exists locally', {conversationId, groupId, epoch});
+      if (epoch === 0) {
+        if (!retry) {
+          this.logger.error('Epoch is 0, but retry is false, not retrying again', {conversationId, groupId, epoch});
+          return;
+        }
+        return this.recoverFromLocalUnestablishedMLSConversations({conversationId, groupId, epoch, core});
+      }
+      return;
+    }
+
+    // establish the conversation if epoch is 0
+    if (epoch === 0) {
+      this.logger.info('Establishing conversation as epoch is 0', {conversationId, groupId, epoch});
+      await this.establishMlsGroupConversation({conversationId, groupId, epoch, core});
+      return;
+    }
+
+    // join by external commit
+    this.logger.info('Joining conversation by external commit', {conversationId, epoch});
+    if (epoch && epoch > 0) {
+      await this.core.service?.conversation?.joinByExternalCommit(conversationId);
+    }
+  };
+
+  /**
+   * Establishes a MLS group conversation.
+   */
+  private establishMlsGroupConversation = async ({
+    conversationId,
+    groupId,
+    epoch,
+    core = this.core,
+  }: {
+    conversationId: QualifiedId;
+    groupId: string;
+    epoch: number;
+    core?: Account;
+  }) => {
+    this.logger.info('Establishing conversation', {conversationId, groupId, epoch});
+    const selfUser = this.userState.self();
+    const conversation = this.conversationState.findConversation(conversationId);
+
+    if (!selfUser || !conversation) {
+      this.logger.error('Self user or conversation is not available!', {selfUser, conversation});
+      throw new Error('Self user or conversation is not available!');
+    }
+
+    const selfUserClientId = selfUser.localClient?.id;
+    if (!selfUserClientId) {
+      this.logger.error('Self user client id is not available!', {selfUserClientId});
+      throw new Error('Self user client id is not available!');
+    }
+
+    const members = conversation.participating_user_ids();
+    await core.service?.conversation?.establishMLSGroupConversation(
+      groupId,
+      members,
+      selfUser.qualifiedId,
+      selfUserClientId,
+      conversationId,
+    );
+  };
+
+  /**
+   * Recovers from local unestablished MLS conversations by refetching metadata and re-establishing the conversation.
+   * This is typically needed when the local epoch is 0 but the epoch on backend is greater than 0
+   * indicating that the conversation has not been properly established.
+   * throws error in case both local and remote MLS group are at epoch 0 or remote epoch is not available
+   */
+  private recoverFromLocalUnestablishedMLSConversations = async ({
+    conversationId,
+    groupId,
+    epoch,
+    core = this.core,
+  }: {
+    conversationId: QualifiedId;
+    groupId: string;
+    epoch: number;
+    core?: Account;
+  }) => {
+    try {
+      this.logger.info('Epoch is 0, refetching conversation metadata and re-establishing', {
+        conversationId,
+        groupId,
+        epoch,
+      });
+      await core.service?.conversation?.wipeMLSConversation(groupId);
+      const remoteConversation = await this.conversationService.getConversationById(conversationId);
+      const remoteEpoch = remoteConversation.epoch;
+      if (!remoteEpoch) {
+        this.logger.error('Remote epoch is not available!', {remoteConversation});
+        throw new Error('Remote epoch is not available!');
+      }
+      if (remoteEpoch === epoch) {
+        const errorMessage =
+          'Cannot recover: both local and remote MLS group are at epoch 0, the conversation was never established on the backend';
+        this.logger.error(errorMessage, {remoteEpoch, epoch});
+        throw new Error(errorMessage);
+      }
+
+      return this.ensureConversationExists({conversationId, groupId, epoch: remoteEpoch, core, retry: false});
+    } catch (error) {
+      this.logger.error('Failed to recover from local unestablished MLS conversation', {
+        error,
+        conversationId,
+        groupId,
+        epoch,
+      });
+      throw error;
+    }
+  };
+
+  /**
    * will locally delete conversations that no longer exist on backend side
    */
   async syncDeletedConversations() {
@@ -2286,8 +2447,43 @@ export class ConversationRepository {
    * @returns Resolves when conversation was saved
    */
   saveConversation(conversationEntity: Conversation) {
-    this.conversationState.upsertConversation(conversationEntity);
+    // Look up an existing conversation with the same ID so we can merge if necessary
+    const existingConversation = this.conversationState.findConversation(conversationEntity.qualifiedId);
 
+    // Build a plain object copy of the entity, excluding methods
+    const conversationData: Partial<Record<keyof Conversation, unknown>> = {};
+    for (const key in conversationEntity) {
+      const value = conversationEntity[key as keyof Conversation];
+      if (typeof value !== 'function') {
+        conversationData[key as keyof Conversation] = value;
+      }
+    }
+
+    // Merge path: update the existing conversation with new fields
+    if (existingConversation) {
+      // Capture next and previous participant IDs
+      const nextParticipantIds = conversationEntity.participating_user_ids?.() || [];
+      const prevParticipantIds = existingConversation.participating_user_ids?.() || [];
+
+      // If the old conversation had participants and the new one doesn’t, drop the field
+      if (prevParticipantIds.length > 0 && nextParticipantIds.length === 0) {
+        delete conversationData.participating_user_ids;
+      }
+
+      // Apply merged data and persist the updated conversation
+      ConversationMapper.updateProperties(existingConversation, conversationData);
+      this.conversationState.upsertConversation(existingConversation);
+
+      // Save to storage
+      return this.saveConversationStateInDb(existingConversation);
+    }
+
+    // New conversation path: drop an empty participant list if present
+    if (conversationEntity.participating_user_ids().length === 0) {
+      delete conversationData.participating_user_ids;
+    }
+
+    this.conversationState.upsertConversation(conversationEntity);
     return this.saveConversationStateInDb(conversationEntity);
   }
 
@@ -2791,9 +2987,9 @@ export class ConversationRepository {
    * @returns Resolves with updated conversation entity
    */
   private async refreshConversationProtocolProperties(conversation: Conversation) {
-    //refetch the conversation to get all new fields (groupId, ciphersuite, epoch and new protocol)
+    // refetch the conversation to get all new fields (groupId, ciphersuite, epoch and new protocol)
     const remoteConversationData = await this.conversationService.getConversationById(conversation.qualifiedId);
-    //update fields that came after protocol update
+    // update fields that came after protocol update
     const {cipher_suite: cipherSuite, epoch, group_id: newGroupId, protocol: newProtocol} = remoteConversationData;
     const updatedConversation = ConversationMapper.updateProperties(conversation, {
       cipherSuite,
@@ -2859,8 +3055,8 @@ export class ConversationRepository {
     isoDate = this.serverTimeHandler.toServerTimestamp(),
   ) => {
     const userEntity = await this.userRepository.getUserById(userId);
-    const eventInjections = this.conversationState
-      .conversations()
+    const allConversations = this.conversationState.conversations();
+    const eventInjections = allConversations
       .filter(conversation => {
         const conversationInTeam = conversation.teamId === teamId;
         const userIsParticipant = UserFilter.isParticipant(conversation, userId);
@@ -2869,10 +3065,14 @@ export class ConversationRepository {
       .map(async conversation => {
         const leaveEvent = EventBuilder.buildTeamMemberLeave(conversation, userEntity, isoDate);
         await this.eventRepository.injectEvent(leaveEvent);
-        await this.clearUsersFromConversation(conversation, [userEntity]);
       });
-    userEntity.isDeleted = true;
-    return Promise.all(eventInjections);
+
+    // Clear user from all conversations they participate in
+    const userCleanup = allConversations
+      .filter(conversation => UserFilter.isParticipant(conversation, userId))
+      .map(conversation => this.clearUsersFromConversation(conversation, [userEntity]));
+
+    await Promise.all([...eventInjections, ...userCleanup]);
   };
 
   /**
@@ -3192,7 +3392,11 @@ export class ConversationRepository {
 
     const inSelfConversation = this.conversationState.isSelfConversation(conversationId);
     if (inSelfConversation) {
-      const typesInSelfConversation = [CONVERSATION_EVENT.MEMBER_UPDATE, ClientEvent.CONVERSATION.MESSAGE_HIDDEN];
+      const typesInSelfConversation = [
+        CONVERSATION_EVENT.MEMBER_UPDATE,
+        CONVERSATION_EVENT.MLS_RESET,
+        ClientEvent.CONVERSATION.MESSAGE_HIDDEN,
+      ];
 
       const isExpectedType = typesInSelfConversation.includes(type);
       if (!isExpectedType) {
@@ -3406,6 +3610,9 @@ export class ConversationRepository {
       case CONVERSATION_EVENT.MLS_WELCOME_MESSAGE:
         return this.onMLSWelcomeMessage(conversationEntity);
 
+      case CONVERSATION_EVENT.MLS_RESET:
+        return this.onMLSResetMessage(conversationEntity, eventJson);
+
       case ClientEvent.CONVERSATION.ASSET_ADD:
         return this.onAssetAdd(conversationEntity, eventJson);
 
@@ -3426,6 +3633,9 @@ export class ConversationRepository {
 
       case CONVERSATION_EVENT.ADD_PERMISSION_UPDATE:
         return this.onAddPermissionChanged(conversationEntity, eventJson);
+
+      case ClientEvent.CONVERSATION.BUTTON_ACTION:
+        return this.onButtonAction(conversationEntity, eventJson);
 
       case ClientEvent.CONVERSATION.BUTTON_ACTION_CONFIRMATION:
         return this.onButtonActionConfirmation(conversationEntity, eventJson);
@@ -3682,7 +3892,7 @@ export class ConversationRepository {
 
       // If the group is not established yet, we need to establish it
       if (!isAlreadyEstablished) {
-        await initMLSGroupConversation(conversationEntity, selfUser.qualifiedId, {core: this.core});
+        await initMLSGroupConversation(conversationEntity, this, {core: this.core});
       }
     }
 
@@ -4008,8 +4218,15 @@ export class ConversationRepository {
     }
   }
 
-  private async onButtonActionConfirmation(conversationEntity: Conversation, eventJson: ButtonActionConfirmationEvent) {
-    const {messageId, buttonId} = eventJson.data;
+  /**
+   * Common logic for handling button selections (both actions and confirmations)
+   *
+   * @param conversationEntity Conversation containing the message
+   * @param messageId ID of the message with the button
+   * @param buttonId ID of the button that was selected
+   * @returns Promise that resolves when the button selection has been processed
+   */
+  private async handleButtonSelection(conversationEntity: Conversation, messageId: string, buttonId: string) {
     try {
       const messageEntity = await this.messageRepository.getMessageInConversationById(conversationEntity, messageId);
       if (!messageEntity || !messageEntity.isComposite()) {
@@ -4032,6 +4249,23 @@ export class ConversationRepository {
         throw error;
       }
     }
+  }
+
+  private async onButtonAction(conversationEntity: Conversation, eventJson: ButtonActionEvent) {
+    const {messageId, buttonId} = eventJson.data;
+
+    const shouldSkipSelectionFromOtherUser = conversationEntity.selfUser()?.id !== eventJson.from;
+    if (shouldSkipSelectionFromOtherUser) {
+      this.logger.warn(`Skipping button action from other user in conversation '${conversationEntity.id}'`);
+      return;
+    }
+
+    await this.handleButtonSelection(conversationEntity, messageId, buttonId);
+  }
+
+  private async onButtonActionConfirmation(conversationEntity: Conversation, eventJson: ButtonActionConfirmationEvent) {
+    const {messageId, buttonId} = eventJson.data;
+    await this.handleButtonSelection(conversationEntity, messageId, buttonId);
   }
 
   /**
@@ -4099,6 +4333,28 @@ export class ConversationRepository {
     }
 
     await this.resolve1To1Conversation(otherUserId);
+  }
+
+  /**
+   * A user has reset an MLS Conversation.
+   * This means group id and epoch have changed, so we need to
+   * update the conversation to the latest group id and epoch.
+   *
+   * @param conversationEntity Conversation entity user has received a welcome message in
+   * @returns Resolves when the event was handled
+   */
+  private async onMLSResetMessage(conversationEntity: Conversation, eventJson: ConversationMLSResetEvent) {
+    try {
+      if (!isMLSConversation(conversationEntity)) {
+        return;
+      }
+
+      await this.core.service?.conversation.wipeMLSConversation(eventJson.data.group_id);
+
+      await this.refreshConversationProtocolProperties(conversationEntity);
+    } catch (error) {
+      this.logger.error(`Failed to reset MLS conversation ${conversationEntity.id}`, error);
+    }
   }
 
   /**

@@ -17,7 +17,7 @@
  *
  */
 
-import React, {Fragment, useEffect} from 'react';
+import {Fragment, useEffect} from 'react';
 
 import {container} from 'tsyringe';
 
@@ -28,7 +28,8 @@ import {CallingViewMode, CallState, DesktopScreenShareMenu, MuteState} from 'Rep
 import {LEAVE_CALL_REASON} from 'Repositories/calling/enum/LeaveCallReason';
 import {Participant} from 'Repositories/calling/Participant';
 import {useVideoGrid} from 'Repositories/calling/videoGridHandler';
-import {MediaRepository} from 'Repositories/media/MediaRepository';
+import {MediaDevicesHandler} from 'Repositories/media/MediaDevicesHandler';
+import {useMediaDevicesStore} from 'Repositories/media/useMediaDevicesStore';
 import {PropertiesRepository} from 'Repositories/properties/PropertiesRepository';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 
@@ -37,22 +38,20 @@ import {FullscreenVideoCall} from './FullscreenVideoCall';
 
 import {CallViewTab} from '../../view_model/CallingViewModel';
 
-export interface CallingContainerProps {
+interface CallingContainerProps {
   readonly propertiesRepository: PropertiesRepository;
   readonly callingRepository: CallingRepository;
-  readonly mediaRepository: MediaRepository;
   readonly callState?: CallState;
   readonly toggleScreenshare: (call: Call, desktopScreenShareMenu: DesktopScreenShareMenu) => void;
 }
 
-const CallingContainer: React.FC<CallingContainerProps> = ({
+const CallingContainer = ({
   propertiesRepository,
-  mediaRepository,
   callingRepository,
   callState = container.resolve(CallState),
   toggleScreenshare,
-}) => {
-  const {devicesHandler: mediaDevicesHandler} = mediaRepository;
+}: CallingContainerProps) => {
+  const mediaDevicesHandler = container.resolve(MediaDevicesHandler);
   const {activeCallViewTab, joinedCall, hasAvailableScreensToShare, desktopScreenShareMenu, viewMode} =
     useKoSubscribableChildren(callState, [
       'activeCallViewTab',
@@ -103,13 +102,19 @@ const CallingContainer: React.FC<CallingContainerProps> = ({
     }
   };
 
+  const {setVideoInputDeviceId, setAudioInputDeviceId, setAudioOutputDeviceId} = useMediaDevicesStore(state => ({
+    setVideoInputDeviceId: state.setVideoInputDeviceId,
+    setAudioInputDeviceId: state.setAudioInputDeviceId,
+    setAudioOutputDeviceId: state.setAudioOutputDeviceId,
+  }));
+
   const switchCameraInput = (deviceId: string) => {
-    mediaDevicesHandler.currentDeviceId.videoinput(deviceId);
+    setVideoInputDeviceId(deviceId);
     callingRepository.refreshVideoInput();
   };
 
   const switchMicrophoneInput = (deviceId: string) => {
-    mediaDevicesHandler.currentDeviceId.audioinput(deviceId);
+    setAudioInputDeviceId(deviceId);
     callingRepository.refreshAudioInput();
   };
 
@@ -122,7 +127,7 @@ const CallingContainer: React.FC<CallingContainerProps> = ({
   };
 
   const switchSpeakerOutput = (deviceId: string) => {
-    mediaDevicesHandler.currentDeviceId.audiooutput(deviceId);
+    setAudioOutputDeviceId(deviceId);
   };
 
   const toggleCamera = (call: Call) => callingRepository.toggleCamera(call);

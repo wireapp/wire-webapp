@@ -84,10 +84,12 @@ interface InputBarProps {
   readonly storageRepository: StorageRepository;
   readonly teamState: TeamState;
   readonly selfUser: User;
+  readonly isCellsEnabled: boolean;
   onShiftTab: () => void;
   uploadDroppedFiles: (droppedFiles: File[]) => void;
   uploadImages: (images: File[]) => void;
   uploadFiles: (files: File[]) => void;
+  uploadPastedFiles: (file: File) => void;
   onCellImageUpload: () => void;
   onCellAssetUpload: () => void;
 }
@@ -104,10 +106,12 @@ export const InputBar = ({
   storageRepository,
   selfUser,
   teamState = container.resolve(TeamState),
+  isCellsEnabled,
   onShiftTab,
   uploadDroppedFiles,
   uploadImages,
   uploadFiles,
+  uploadPastedFiles,
   onCellImageUpload,
   onCellAssetUpload,
 }: InputBarProps) => {
@@ -123,6 +127,7 @@ export const InputBar = ({
       'hasGlobalMessageTimer',
       'isSelfUserRemoved',
       'is1to1',
+      'cellsState',
     ]);
   const {isOutgoingRequest, isIncomingRequest} = useKoSubscribableChildren(connection!, [
     'isOutgoingRequest',
@@ -194,6 +199,7 @@ export const InputBar = ({
   const fileHandling = useFileHandling({
     uploadDroppedFiles,
     uploadImages,
+    isFileNameKept: isCellsEnabled,
   });
 
   const showMarkdownPreview = useUserPropertyValue<boolean>(
@@ -227,6 +233,11 @@ export const InputBar = ({
     pastedFile: fileHandling.pastedFile,
     sendPastedFile: fileHandling.sendPastedFile,
   });
+
+  if (fileHandling.pastedFile && !!isCellsEnabled) {
+    uploadPastedFiles(fileHandling.pastedFile);
+    fileHandling.clearPastedFile();
+  }
 
   const ping = usePing({
     conversation,
@@ -315,6 +326,7 @@ export const InputBar = ({
                   {!!files.length && <FilePreviews files={files} conversationQualifiedId={conversation.qualifiedId} />}
                   <InputBarControls
                     conversation={conversation}
+                    isCellsFeatureEnabled={isCellsEnabled}
                     isFileSharingSendingEnabled={isFileSharingSendingEnabled}
                     pingDisabled={ping.isPingDisabled}
                     messageContent={messageContent}
@@ -339,7 +351,7 @@ export const InputBar = ({
             </>
           )}
 
-          {fileHandling.pastedFile && (
+          {fileHandling.pastedFile && !isCellsEnabled && (
             <PastedFileControls
               pastedFile={fileHandling.pastedFile}
               onClear={fileHandling.clearPastedFile}

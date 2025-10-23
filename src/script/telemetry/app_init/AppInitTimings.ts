@@ -22,7 +22,7 @@ import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 
 import {AppInitTimingsStep} from './AppInitTimingsStep';
 
-export type AppTimings = Partial<Record<AppInitTimingsStep, number>>;
+type AppTimings = Partial<Record<AppInitTimingsStep, number>>;
 
 export class AppInitTimings {
   private readonly timings: AppTimings;

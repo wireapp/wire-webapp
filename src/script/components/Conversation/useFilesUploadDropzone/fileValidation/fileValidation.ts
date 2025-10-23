@@ -56,7 +56,7 @@ interface ValidateFileSizeParams {
   maxSize: number;
 }
 
-export const validateFileSize = ({files, maxSize}: ValidateFileSizeParams): ValidationResult => {
+const validateFileSize = ({files, maxSize}: ValidateFileSizeParams): ValidationResult => {
   const bytesMultiplier = 1024;
   const fileMaxSizeInMB = maxSize / bytesMultiplier / bytesMultiplier;
   const imageMaxSizeInMB = CONFIG.MAXIMUM_IMAGE_FILE_SIZE / bytesMultiplier / bytesMultiplier;
@@ -101,7 +101,7 @@ interface ValidateFileCountParams {
   maxFiles: number;
 }
 
-export const validateFileCount = ({currentFiles, newFiles, maxFiles}: ValidateFileCountParams): ValidationResult => {
+const validateFileCount = ({currentFiles, newFiles, maxFiles}: ValidateFileCountParams): ValidationResult => {
   if (currentFiles.length + newFiles.length > maxFiles) {
     return {
       isValid: false,

@@ -24,7 +24,7 @@ import cx from 'classnames';
 import {useMessageFocusedTabIndex} from 'Components/MessagesList/Message/util';
 import {clamp} from 'Util/NumberUtil';
 
-export interface SeekBarProps extends React.HTMLProps<HTMLDivElement> {
+interface SeekBarProps extends React.HTMLProps<HTMLDivElement> {
   dark?: boolean;
   ['data-uie-name']?: string;
   disabled?: boolean;
@@ -36,7 +36,7 @@ export interface SeekBarCSS extends CSSProperties {
   '--seek-bar-progress': string;
 }
 
-const SeekBar: React.FC<SeekBarProps> = ({
+const SeekBar = ({
   dark: darkMode,
   disabled,
   mediaElement,

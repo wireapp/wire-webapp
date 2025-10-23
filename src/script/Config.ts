@@ -17,6 +17,8 @@
  *
  */
 
+import {MINIMUM_API_VERSION} from '@wireapp/api-client/lib/Config';
+
 import {Runtime} from '@wireapp/commons';
 
 import {createUuid} from 'Util/uuid';
@@ -47,6 +49,9 @@ const config = {
 
   /** 100 megabyte upload limit for organizations (team members) */
   MAXIMUM_ASSET_FILE_SIZE_TEAM: 100 * 1024 * 1024,
+
+  /** 500 megabyte upload limit when Cells is enabled */
+  MAXIMUM_ASSET_FILE_SIZE_CELLS: 500 * 1024 * 1024,
 
   /** 15 megabyte image upload limit */
   MAXIMUM_IMAGE_FILE_SIZE: 15 * 1024 * 1024,
@@ -84,7 +89,7 @@ const config = {
   ALLOWED_IMAGE_TYPES: ['image/bmp', 'image/gif', 'image/jpeg', 'image/jpg', 'image/png', 'image/webp'],
 
   /** Which min and max version of the backend api do we support */
-  SUPPORTED_API_RANGE: [9, 9],
+  SUPPORTED_API_RANGE: [MINIMUM_API_VERSION, env.ENABLE_DEV_BACKEND_API ? Infinity : 12],
 
   /** DataDog client api keys access */
   dataDog: {

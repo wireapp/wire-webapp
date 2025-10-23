@@ -17,6 +17,7 @@
  *
  */
 
+import {CONVERSATION_CELLS_STATE} from '@wireapp/api-client/lib/conversation';
 import {RECEIPT_MODE} from '@wireapp/api-client/lib/conversation/data/';
 import {amplify} from 'amplify';
 
@@ -28,7 +29,7 @@ import {PanelActions} from 'Components/panel/PanelActions';
 import {ReceiptModeToggle} from 'Components/toggle/ReceiptModeToggle';
 import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
 import {ConversationRoleRepository} from 'Repositories/conversation/ConversationRoleRepository';
-import {isMLSConversation} from 'Repositories/conversation/ConversationSelectors';
+import {isGroupMLSConversation, isMLSConversation} from 'Repositories/conversation/ConversationSelectors';
 import {Conversation} from 'Repositories/entity/Conversation';
 import {User} from 'Repositories/entity/User';
 import {TeamState} from 'Repositories/team/TeamState';
@@ -84,6 +85,7 @@ const ConversationDetailsOptions = ({
     firstUserEntity: firstParticipant,
     isChannel,
     isGroupOrChannel,
+    cellsState,
   } = useKoSubscribableChildren(activeConversation, [
     'isMutable',
     'receiptMode',
@@ -93,6 +95,7 @@ const ConversationDetailsOptions = ({
     'firstUserEntity',
     'isChannel',
     'isGroupOrChannel',
+    'cellsState',
   ]);
   const {isSelfDeletingMessagesEnabled, isTeam} = useKoSubscribableChildren(teamState, [
     'isSelfDeletingMessagesEnabled',
@@ -119,19 +122,19 @@ const ConversationDetailsOptions = ({
 
   const isActiveGroupParticipant = isGroupOrChannel && !isSelfUserRemoved;
   const isTeamConversation = !!teamId;
-
+  const isCellsConversation = !!cellsState && cellsState !== CONVERSATION_CELLS_STATE.DISABLED;
   const showOptionGuests = isActiveGroupParticipant && isTeamConversation;
   const showOptionNotificationsGroup = isMutable && isGroupOrChannel;
   const showOptionTimedMessages = isActiveGroupParticipant && isSelfDeletingMessagesEnabled;
   const showOptionServices = isActiveGroupParticipant && isTeamConversation && !isMLSConversation(activeConversation);
   const showOptionNotifications1To1 = isMutable && !isGroupOrChannel;
-  const showOptionReadReceipts = isTeamConversation;
+  const showOptionReadReceipts = isTeamConversation && !isGroupMLSConversation(activeConversation);
   const showChannelOptions = isChannel && isChannelsEnabled;
 
   const hasReceiptsEnabled = conversationRepository.expectReadReceipt(activeConversation);
 
   const canEditGuests = roleRepository.canToggleGuests(activeConversation);
-  const canEditTimeout = roleRepository.canToggleTimeout(activeConversation);
+  const canEditTimeout = roleRepository.canToggleTimeout(activeConversation) && !isCellsConversation;
   const canEditReadReceipts = roleRepository.canToggleReadReceipts(activeConversation);
 
   const openNotificationsPanel = () => togglePanel(PanelState.NOTIFICATIONS, activeConversation);

@@ -46,6 +46,11 @@ export class ConversationPage {
   readonly systemMessages: Locator;
   readonly callButton: Locator;
   readonly conversationInfoButton: Locator;
+  readonly pingButton: Locator;
+  readonly messages: Locator;
+  readonly messageItems: Locator;
+  readonly filesTab: Locator;
+  readonly isTypingIndicator: Locator;
 
   readonly getImageAltText = (user: User) => `Image from ${user.fullName}`;
 
@@ -74,9 +79,16 @@ export class ConversationPage {
     );
     this.callButton = page.locator(selectByDataAttribute('do-call'));
     this.conversationInfoButton = page.locator(selectByDataAttribute('do-open-info'));
+    this.pingButton = page.locator(selectByDataAttribute('do-ping'));
+    this.messageItems = page.locator(selectByDataAttribute('item-message'));
+    this.messages = page.locator(
+      `${selectByDataAttribute('item-message')} ${selectByClass('message-body')}:not(:has(p${selectByClass('text-foreground')})):has(${selectByClass('text')})`,
+    );
+    this.filesTab = page.locator('#conversation-tab-files');
+    this.isTypingIndicator = page.locator(selectByDataAttribute('typing-indicator-title'));
   }
 
-  private getImageLocator(user: User): Locator {
+  protected getImageLocator(user: User): Locator {
     return this.page.locator(
       `${selectByDataAttribute('item-message')} ${selectByClass('message-body')} ${selectByDataAttribute('image-asset')} ${selectByDataAttribute('image-asset-img')}[alt^="${this.getImageAltText(user)}"]`,
     );
@@ -101,6 +113,10 @@ export class ConversationPage {
     await this.callButton.click();
   }
 
+  async clickFilesTab() {
+    await this.filesTab.click();
+  }
+
   async isWatermarkVisible() {
     return await this.watermark.isVisible();
   }
@@ -111,33 +127,46 @@ export class ConversationPage {
     await this.page.waitForTimeout(5000); // Wait for the message to be sent
   }
 
+  async typeMessage(message: string) {
+    await this.messageInput.click();
+    for (let i = 0; i < message.length; i++) {
+      await this.page.keyboard.press(message[i]);
+      await this.page.waitForTimeout(300); // sim user input
+    }
+  }
+
   async createGroup(groupName: string) {
     await this.createGroupButton.click();
     await this.createGroupNameInput.fill(groupName);
     await this.createGroupSubmitButton.click();
   }
 
-  async sendMention(memberId: string) {
+  async sendMessageWithUserMention(userFullName: string, messageText?: string) {
     await this.messageInput.fill(`@`);
     await this.page
-      .locator(`${selectByDataAttribute('item-mention-suggestion')}[data-uie-value="${memberId}"]`)
+      .locator(`${selectByDataAttribute('item-mention-suggestion')} ${selectByDataAttribute('status-name')}`, {
+        hasText: userFullName,
+      })
       .click({timeout: 1000});
+
+    if (messageText) {
+      await this.messageInput.pressSequentially(messageText);
+    }
 
     await this.messageInput.press('Enter');
   }
 
-  async isMessageVisible(messageText: string) {
-    const locator = this.page.locator(
-      `${selectByDataAttribute('item-message')} ${selectByClass('message-body')}:not(:has(p${selectByClass('text-foreground')}))`,
-    );
-
-    await locator.last().waitFor({state: 'visible', timeout: 20_000});
+  async isMessageVisible(messageText: string, waitForVisibility = true) {
+    if (waitForVisibility) {
+      // Wait for the last message to be visible
+      await this.messages.last().waitFor({state: 'visible', timeout: 20_000});
+    }
 
     // Then get all matching elements
-    const messages = await locator.all();
+    const messages = await this.messages.all();
 
     for (const message of messages) {
-      const messageTextContent = await message.textContent();
+      const messageTextContent = await message.locator(selectByClass('text')).textContent();
       if (messageTextContent?.trim() === messageText) {
         return true;
       }
@@ -145,7 +174,7 @@ export class ConversationPage {
     return false;
   }
 
-  async isImageVisible(user: User) {
+  async isImageFromUserVisible(user: User) {
     // Trying multiple times for the image to appear
     const locator = this.getImageLocator(user);
 
@@ -163,6 +192,11 @@ export class ConversationPage {
 
     // Take a screenshot of the image
     return await locator.screenshot();
+  }
+
+  async reactOnMessage(message: Locator) {
+    await message.hover();
+    await message.getByRole('group').getByRole('button').first().click();
   }
 
   async clickImage(user: User) {
@@ -309,5 +343,22 @@ export class ConversationPage {
 
   async clickAddMemberButton() {
     await this.addMemberButton.click();
+  }
+
+  async messageCount() {
+    return await this.messages.count();
+  }
+
+  async getTitle() {
+    return await this.conversationTitle.innerText();
+  }
+
+  async sendPing() {
+    await this.pingButton.click();
+  }
+
+  async getCurrentFocusedToolTip(message: Locator) {
+    await message.getByTestId('emoji-pill').first().hover();
+    return this.page.locator('[data-testid="tooltip-content"]');
   }
 }

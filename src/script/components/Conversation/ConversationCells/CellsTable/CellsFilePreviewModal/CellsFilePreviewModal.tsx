@@ -55,6 +55,7 @@ export const CellsFilePreviewModal = () => {
       filePreviewUrl={getFileUrl()}
       fileName={name}
       fileExtension={extension}
+      fileUrl={url}
       status={!getFileUrl() ? 'unavailable' : 'success'}
       senderName={owner}
       timestamp={uploadedAtTimestamp}

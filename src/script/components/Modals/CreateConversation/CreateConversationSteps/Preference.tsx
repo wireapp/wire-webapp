@@ -17,7 +17,13 @@
  *
  */
 
+import {ConversationProtocol} from '@wireapp/api-client/lib/conversation';
+import {container} from 'tsyringe';
+
 import {InfoToggle} from 'Components/toggle/InfoToggle';
+import {TeamState} from 'Repositories/team/TeamState';
+import {Config} from 'src/script/Config';
+import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 
 import {useCreateConversationModal} from '../hooks/useCreateConversationModal';
@@ -25,14 +31,32 @@ import {ConversationType} from '../types';
 
 export const Preference = () => {
   const {
+    isCellsEnabled,
     isGuestsEnabled,
     isReadReceiptsEnabled,
+    setIsCellsEnabled,
     setIsGuestsEnabled,
     setIsReadReceiptsEnabled,
     isServicesEnabled,
     setIsServicesEnabled,
     conversationType,
   } = useCreateConversationModal();
+
+  const teamState = container.resolve(TeamState);
+
+  const {isCellsEnabled: isCellsEnabledForTeam, isMLSEnabled} = useKoSubscribableChildren(teamState, [
+    'isCellsEnabled',
+    'isMLSEnabled',
+  ]);
+  const isCellsEnabledForEnvironment = Config.getConfig().FEATURE.ENABLE_CELLS;
+  const isCellsOptionEnabled = isCellsEnabledForEnvironment && isCellsEnabledForTeam;
+
+  const defaultProtocol = isMLSEnabled
+    ? teamState.teamFeatures()?.mls?.config.defaultProtocol
+    : ConversationProtocol.PROTEUS;
+
+  // Read receipts are temorarily disabled for MLS groups and channels until it is supported
+  const areReadReceiptsEnabled = defaultProtocol !== ConversationProtocol.MLS;
 
   return (
     <>
@@ -57,18 +81,29 @@ export const Preference = () => {
           isChecked={isServicesEnabled}
         />
       )}
+      {areReadReceiptsEnabled && (
+        <InfoToggle
+          className="modal-style"
+          dataUieName="read-receipts"
+          info={t('readReceiptsToggleInfo')}
+          isChecked={isReadReceiptsEnabled}
+          setIsChecked={setIsReadReceiptsEnabled}
+          isDisabled={false}
+          name={t('readReceiptsToggleName')}
+        />
+      )}
 
-      <InfoToggle
-        className="modal-style"
-        dataUieName="read-receipts"
-        info={t('readReceiptsToggleInfo')}
-        isChecked={isReadReceiptsEnabled}
-        setIsChecked={setIsReadReceiptsEnabled}
-        // Temporarily disabled read receipts toggle for channels
-        // until it is supported by MLS
-        isDisabled={conversationType === ConversationType.Channel}
-        name={t('readReceiptsToggleName')}
-      />
+      {isCellsOptionEnabled && (
+        <InfoToggle
+          className="modal-style"
+          dataUieName="cells"
+          isChecked={isCellsEnabled}
+          setIsChecked={setIsCellsEnabled}
+          isDisabled={false}
+          name={t('modalCreateGroupCellsToggleHeading')}
+          info={t('modalCreateGroupCellsToggleInfo')}
+        />
+      )}
     </>
   );
 };

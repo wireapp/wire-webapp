@@ -50,6 +50,7 @@ export const closeButtonStyles: CSSObject = {
 export const leftColumnStyles: CSSObject = {
   display: 'flex',
   alignItems: 'center',
+  flex: '1 1 auto',
 };
 
 export const metadataStyles: CSSObject = {
@@ -57,6 +58,7 @@ export const metadataStyles: CSSObject = {
   alignItems: 'center',
   gap: '16px',
   fontSize: 'var(--font-size-small)',
+  flex: '1 1 auto',
 };
 
 export const nameStyles: CSSObject = {
@@ -65,7 +67,7 @@ export const nameStyles: CSSObject = {
   whiteSpace: 'nowrap',
   overflow: 'hidden',
   textOverflow: 'ellipsis',
-  width: 'calc(100vw - 320px)',
+  flex: '1 1 auto',
 };
 
 export const textStyles: CSSObject = {
@@ -77,28 +79,12 @@ export const textStyles: CSSObject = {
   },
 };
 
-export const infoWrapperStyles: CSSObject = {
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'center',
-  height: '100%',
-};
-
-export const loaderIconStyles: CSSObject = {
-  color: 'var(--gray-70)',
-  fontSize: 'var(--font-size-medium)',
-
-  'body.theme-dark &': {
-    color: 'var(--gray-40)',
-  },
-};
-
 export const actionButtonsStyles: CSSObject = {
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'center',
   flexShrink: '0',
-  marginRight: '8px',
+  marginInline: '8px',
 };
 
 export const downloadButtonStyles: CSSObject = {

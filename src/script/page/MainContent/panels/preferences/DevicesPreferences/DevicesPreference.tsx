@@ -17,7 +17,7 @@
  *
  */
 
-import React, {useEffect, useState} from 'react';
+import {useEffect, useState} from 'react';
 
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {container} from 'tsyringe';
@@ -48,7 +48,7 @@ interface DevicesPreferencesProps {
   verifyDevice: (userId: QualifiedId, device: ClientEntity, isVerified: boolean) => void;
 }
 
-export const DevicesPreferences: React.FC<DevicesPreferencesProps> = ({
+export const DevicesPreferences = ({
   clientState = container.resolve(ClientState),
   conversationState = container.resolve(ConversationState),
   cryptographyRepository,
@@ -56,7 +56,7 @@ export const DevicesPreferences: React.FC<DevicesPreferencesProps> = ({
   removeDevice,
   verifyDevice,
   resetSession,
-}) => {
+}: DevicesPreferencesProps) => {
   const [selectedDevice, setSelectedDevice] = useState<ClientEntity | undefined>();
   const [localFingerprint, setLocalFingerprint] = useState('');
 

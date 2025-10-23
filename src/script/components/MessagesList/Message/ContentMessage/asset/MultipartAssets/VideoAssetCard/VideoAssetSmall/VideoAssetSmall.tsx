@@ -17,34 +17,78 @@
  *
  */
 
+import {useId, useState} from 'react';
+
+import {FileFullscreenModal} from 'Components/FileFullscreenModal/FileFullscreenModal';
 import {t} from 'Util/LocalizerUtil';
 
 import {iconWrapperStyles, videoStyles} from './VideoAssetSmall.styles';
 
 import {FilePreviewPlayButton} from '../../common/FilePreviewPlayButton/FilePreviewPlayButton';
 import {MediaFilePreviewCard} from '../../common/MediaFilePreviewCard/MediaFilePreviewCard';
+import {hollowWrapperButtonStyles} from '../../MultipartAssets.styles';
 
 interface VideoAssetSmallProps {
   src?: string;
   isLoading: boolean;
   isError: boolean;
+  extension: string;
+  fileName: string;
+  senderName: string;
+  timestamp: number;
 }
 
-export const VideoAssetSmall = ({src, isLoading, isError}: VideoAssetSmallProps) => {
+export const VideoAssetSmall = ({
+  src,
+  isLoading,
+  isError,
+  extension,
+  fileName,
+  senderName,
+  timestamp,
+}: VideoAssetSmallProps) => {
+  const id = useId();
+  const [isOpen, setIsOpen] = useState(false);
+
   return (
-    <MediaFilePreviewCard
-      label={src ? t('conversationFileVideoPreviewLabel', {src}) : ''}
-      isLoading={isLoading}
-      isError={isError}
-    >
-      {!isLoading && !isError && (
-        <>
-          <video src={src} preload="metadata" css={videoStyles} />
-          <div css={iconWrapperStyles}>
-            <FilePreviewPlayButton />
-          </div>
-        </>
-      )}
-    </MediaFilePreviewCard>
+    <>
+      <MediaFilePreviewCard
+        label={src ? t('conversationFileVideoPreviewLabel', {src}) : ''}
+        isLoading={isLoading}
+        isError={isError}
+      >
+        <button
+          css={hollowWrapperButtonStyles}
+          onClick={() => setIsOpen(true)}
+          aria-label={t('accessibility.conversationAssetImageAlt', {
+            username: senderName,
+            messageDate: timestamp,
+          })}
+          aria-haspopup="dialog"
+          aria-expanded={isOpen}
+          aria-controls={id}
+        >
+          {!isLoading && !isError && (
+            <>
+              <video src={src} preload="metadata" css={videoStyles} />
+              <div css={iconWrapperStyles}>
+                <FilePreviewPlayButton />
+              </div>
+            </>
+          )}
+        </button>
+      </MediaFilePreviewCard>
+      <FileFullscreenModal
+        id={id}
+        isOpen={isOpen}
+        onClose={() => setIsOpen(false)}
+        filePreviewUrl={src}
+        fileExtension={extension}
+        fileName={fileName}
+        fileUrl={src}
+        senderName={senderName}
+        timestamp={timestamp}
+      />
+    </>
   );
 };

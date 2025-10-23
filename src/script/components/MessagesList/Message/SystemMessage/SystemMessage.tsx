@@ -17,8 +17,6 @@
  *
  */
 
-import React from 'react';
-
 import {MLSVerified} from '@wireapp/react-ui-kit';
 
 import * as Icon from 'Components/Icon';
@@ -38,11 +36,11 @@ import {SystemMessageBase} from './SystemMessageBase';
 import {messageBodyWrapper} from '../ContentMessage/ContentMessage.styles';
 import {ProtocolUpdateMessage as ProtocolUpdateMessageComponent} from '../ProtocolUpdateMessage';
 
-export interface SystemMessageProps {
+interface SystemMessageProps {
   message: SystemMessageEntity;
 }
 
-export const SystemMessage: React.FC<SystemMessageProps> = ({message}) => {
+export const SystemMessage = ({message}: SystemMessageProps) => {
   if (message instanceof RenameMessage) {
     return (
       <>

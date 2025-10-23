@@ -52,12 +52,14 @@ import {
   footerDisclaimerEllipsis,
   footerDisclaimerTooltip,
   iconStyle,
+  conversationsTitleWrapper,
 } from './ConversationTabs.styles';
 import {FolderIcon} from './FolderIcon';
 import {TeamCreationBanner} from './TeamCreation/TeamCreationBanner';
 
 import {Config} from '../../../../../Config';
 import {ContentState} from '../../../../useAppState';
+import {ConversationFilterButton} from '../ConversationFilterButton';
 import {ConversationTab} from '../ConversationTab';
 
 interface ConversationTabsProps {
@@ -94,6 +96,7 @@ export const ConversationTabs = ({
   const teamState = container.resolve(TeamState);
   const totalUnreadConversations = unreadConversations.length;
   const {teamRole} = useKoSubscribableChildren(selfUser, ['teamRole']);
+  const {isCellsEnabled: isCellsEnabledForTeam} = useKoSubscribableChildren(teamState, ['isCellsEnabled']);
 
   const totalUnreadFavoriteConversations = favoriteConversations.filter(favoriteConversation =>
     favoriteConversation.hasUnread(),
@@ -173,6 +176,8 @@ export const ConversationTabs = ({
   const manageTeamUrl = getManageTeamUrl();
   const replaceWireLink = replaceLink('https://app.wire.com', '', '');
 
+  const showCellsTab = Config.getConfig().FEATURE.ENABLE_CELLS && isCellsEnabledForTeam;
+
   return (
     <>
       <div
@@ -181,7 +186,10 @@ export const ConversationTabs = ({
         aria-owns="tab-1 tab-2 tab-3 tab-4 tab-5 tab-6 tab-7"
         className="conversations-sidebar-list"
       >
-        <div className="conversations-sidebar-title">{t('videoCallOverlayConversations')}</div>
+        <div className="conversations-sidebar-title" css={conversationsTitleWrapper}>
+          <span>{t('videoCallOverlayConversations')}</span>
+          <ConversationFilterButton />
+        </div>
 
         {conversationTabs.map((conversationTab, index) => {
           if (conversationTab.type === SidebarTabs.FOLDER) {
@@ -226,7 +234,7 @@ export const ConversationTabs = ({
           isActive={currentTab === SidebarTabs.CONNECT}
         />
 
-        {Config.getConfig().FEATURE.ENABLE_CELLS && (
+        {showCellsTab && (
           <>
             <div className="conversations-sidebar-divider" />
 

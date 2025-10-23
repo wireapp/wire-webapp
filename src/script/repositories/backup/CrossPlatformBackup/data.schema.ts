@@ -26,6 +26,7 @@ export const QualifiedIdSchema = zod.object({
 
 export const ConversationTableEntrySchema = QualifiedIdSchema.extend({
   name: zod.string().nullable().optional(),
+  last_event_timestamp: zod.number(),
 });
 export type ConversationTableEntry = zod.infer<typeof ConversationTableEntrySchema>;
 
@@ -41,6 +42,7 @@ export const EventTableEntrySchema = zod.object({
   category: zod.number().int().optional(),
   conversation: zod.string().min(1, 'Conversation is required'),
   data: zod.any(),
+  edited_time: zod.string().optional(),
   from: zod.string().optional().nullable(),
   from_client_id: zod.string().optional(),
   id: zod.string().optional(),

@@ -44,8 +44,8 @@ export const includesOnlyEmojis = (text: string) =>
   isValidString(text) && removeEmojis(removeWhitespace(text)).length === 0;
 
 const emojiesFlatten = Object.values(emojies).flat();
-export const emojiesList = groupBy(emojiesFlatten, 'u');
-export const emojiDictionary: Map<string, string> = new Map();
+const emojiesList = groupBy(emojiesFlatten, 'u');
+const emojiDictionary: Map<string, string> = new Map();
 
 Object.keys(emojiesList).forEach(key => {
   // return if already existing in the dictionary
@@ -93,7 +93,5 @@ export function getEmojiUnicode(emojis: string) {
   const hexCode = 16;
   const padding = 4;
   const unicode = [...emojis].map(emoji => emoji.codePointAt(0)?.toString(hexCode).padStart(padding, '0')).join('-');
-  // TODO: This is a hack to fix the heart emoji for old android devices. It should be reevaluated at some point in the future and removed.
-  // See https://wearezeta.atlassian.net/browse/WPB-4736
-  return unicode === '2764' ? '2764-fe0f' : unicode;
+  return unicode;
 }

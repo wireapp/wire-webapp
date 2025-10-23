@@ -27,7 +27,7 @@ import {useMatchMedia} from '@wireapp/react-ui-kit';
 import {CallingCell} from 'Components/calling/CallingCell';
 import {Giphy} from 'Components/Giphy';
 import {InputBar} from 'Components/InputBar';
-import {MessagesList} from 'Components/MessagesList';
+import {MessageListWrapper} from 'Components/MessagesList/MessageListWrapper';
 import {showDetailViewModal} from 'Components/Modals/DetailViewModal';
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {showWarningModal} from 'Components/Modals/utils/showWarningModal';
@@ -90,6 +90,8 @@ export const Conversation = ({
 }: ConversationProps) => {
   const messageListLogger = getLogger('ConversationList');
 
+  const isVirtualizedMessagesListEnabled = CONFIG.FEATURE.ENABLE_VIRTUALIZED_MESSAGES_LIST;
+
   const mainViewModel = useMainViewModel();
   const {content: contentViewModel} = mainViewModel;
   const {conversationRepository, repositories} = contentViewModel;
@@ -133,10 +135,12 @@ export const Conversation = ({
   const {addReadReceiptToBatch} = useReadReceiptSender(repositories.message);
 
   useEffect(() => {
-    // When the component is mounted we want to make sure its conversation entity's last message is marked as visible
-    // not to display the jump to last message button initially
-    activeConversation?.isLastMessageVisible(true);
-  }, [activeConversation]);
+    if (!isVirtualizedMessagesListEnabled) {
+      // When the component is mounted we want to make sure its conversation entity's last message is marked as visible
+      // not to display the jump to last message button initially
+      activeConversation?.isLastMessageVisible(true);
+    }
+  }, [activeConversation, isVirtualizedMessagesListEnabled]);
 
   const uploadImages = useCallback(
     (images: File[]) => {
@@ -471,15 +475,17 @@ export const Conversation = ({
 
   const isFileTabActive = activeTabIndex === 1;
 
-  const {getRootProps, getInputProps, openAllFilesView, openImageFilesView, isDragAccept} = useFilesUploadDropzone({
-    isTeam: inTeam,
-    cellsRepository: repositories.cells,
-    conversation: activeConversation,
-    isDisabled: isFileTabActive,
-  });
-
   const isCellsEnabled =
     Config.getConfig().FEATURE.ENABLE_CELLS && activeConversation?.cellsState() !== CONVERSATION_CELLS_STATE.DISABLED;
+
+  const {getRootProps, getInputProps, openAllFilesView, openImageFilesView, handlePastedFile, isDragAccept} =
+    useFilesUploadDropzone({
+      isTeam: inTeam,
+      cellsRepository: repositories.cells,
+      conversation: activeConversation,
+      isCellsEnabled: isCellsEnabled,
+      isDisabled: isFileTabActive,
+    });
 
   return (
     <ConversationFileDropzone
@@ -547,7 +553,7 @@ export const Conversation = ({
               );
             })}
 
-            <MessagesList
+            <MessageListWrapper
               conversation={activeConversation}
               selfUser={selfUser}
               conversationRepository={conversationRepository}
@@ -563,6 +569,7 @@ export const Conversation = ({
               showImageDetails={showDetail}
               resetSession={onSessionResetClick}
               onClickMessage={handleClickOnMessage}
+              isConversationLoaded={isConversationLoaded}
               onLoading={loading => setIsConversationLoaded(!loading)}
               getVisibleCallback={getInViewportCallback}
               isMsgElementsFocusable={isMsgElementsFocusable}
@@ -589,10 +596,12 @@ export const Conversation = ({
                   storageRepository={repositories.storage}
                   teamState={teamState}
                   selfUser={selfUser}
+                  isCellsEnabled={isCellsEnabled}
                   onShiftTab={() => setMsgElementsFocusable(false)}
                   uploadDroppedFiles={uploadDroppedFiles}
                   uploadImages={uploadImages}
                   uploadFiles={uploadFiles}
+                  uploadPastedFiles={checkFileSharingPermission(handlePastedFile)}
                   onCellImageUpload={openImageFilesView}
                   onCellAssetUpload={openAllFilesView}
                 />

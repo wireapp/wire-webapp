@@ -37,17 +37,6 @@ export const buttonStyles: CSSObject = {
   margin: '0',
 };
 
-export const activeItemStyles: CSSObject = {
-  display: 'inline-flex',
-  alignItems: 'center',
-  gap: '8px',
-  padding: '0 8px',
-  fontSize: 'var(--font-size-medium)',
-  color: 'var(--main-color)',
-  height: '32px',
-  margin: '0',
-};
-
 export const iconStyles: CSSObject = {
   marginRight: '8px',
 };

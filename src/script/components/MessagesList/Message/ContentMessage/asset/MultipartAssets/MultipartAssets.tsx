@@ -84,7 +84,6 @@ const MultipartAsset = ({
   senderName,
   timestamp,
 }: MultipartAssetProps) => {
-  const name = getName(initialName!);
   const extension = getFileExtension(initialName!);
   const size = formatBytes(Number(initialSize));
 
@@ -96,12 +95,14 @@ const MultipartAsset = ({
   const isSingleAsset = assetsCount === 1;
   const variant = isSingleAsset ? 'large' : 'small';
 
-  const {src, isLoading, isError, imagePreviewUrl, pdfPreviewUrl} = useGetMultipartAsset({
+  const {src, isLoading, isError, imagePreviewUrl, pdfPreviewUrl, path} = useGetMultipartAsset({
     uuid,
     cellsRepository,
     isEnabled: hasBeenInView,
     retryPreviewUntilSuccess: isSingleAsset && !isImage && !isVideo,
   });
+
+  const name = path ? getName(path) : getName(initialName!);
 
   if (isImage) {
     return (

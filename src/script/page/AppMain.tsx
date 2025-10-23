@@ -17,7 +17,7 @@
  *
  */
 
-import {FC, useEffect, useLayoutEffect} from 'react';
+import {useEffect, useLayoutEffect} from 'react';
 
 import {amplify} from 'amplify';
 import cx from 'classnames';
@@ -59,7 +59,7 @@ import {MainContent} from './MainContent';
 import {PanelEntity, PanelState, RightSidebar} from './RightSidebar';
 import {RootProvider} from './RootProvider';
 import {useAppMainState, ViewType} from './state';
-import {useAppState, ContentState} from './useAppState';
+import {ContentState, useAppState} from './useAppState';
 
 import {App} from '../main/app';
 import {initialiseMLSMigrationFlow} from '../mls/MLSMigration';
@@ -84,14 +84,14 @@ interface AppMainProps {
   locked: boolean;
 }
 
-export const AppMain: FC<AppMainProps> = ({
+export const AppMain = ({
   app,
   mainView,
   selfUser,
   conversationState = container.resolve(ConversationState),
   callState = container.resolve(CallState),
   locked,
-}) => {
+}: AppMainProps) => {
   const apiContext = app.getAPIContext();
 
   useActiveWindow(window);
@@ -253,7 +253,7 @@ export const AppMain: FC<AppMainProps> = ({
     //after app is loaded, check mls migration configuration and start migration if needed
     await initialiseMLSMigrationFlow({
       selfUser,
-      conversationHandler: repositories.conversation,
+      conversationRepository: repositories.conversation,
       getTeamMLSMigrationStatus: repositories.team.getTeamMLSMigrationStatus,
       refreshAllKnownUsers: repositories.user.refreshAllKnownUsers,
     });
@@ -339,7 +339,6 @@ export const AppMain: FC<AppMainProps> = ({
                 <CallingContainer
                   propertiesRepository={repositories.properties}
                   callingRepository={repositories.calling}
-                  mediaRepository={repositories.media}
                   toggleScreenshare={mainView.calling.callActions.toggleScreenshare}
                 />
               )}

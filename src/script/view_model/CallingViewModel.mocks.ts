@@ -46,7 +46,7 @@ export const mockCallingRepository = {
   supportsConferenceCalling: true,
 } as unknown as CallingRepository;
 
-export const mockMediaDevicesHandler = {
+const mockMediaDevicesHandler = {
   initializeMediaDevices: jest.fn(() => Promise.resolve()),
 } as unknown as MediaDevicesHandler;
 
@@ -69,8 +69,8 @@ export function buildCallingViewModel() {
     {} as any,
     {} as any,
     {} as any,
-    undefined,
     callState,
+    {} as any,
   );
 
   return [callingViewModel, {core: mockCore}] as const;

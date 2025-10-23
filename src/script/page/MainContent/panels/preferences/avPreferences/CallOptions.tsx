@@ -17,7 +17,7 @@
  *
  */
 
-import React, {ChangeEvent, useCallback, useEffect, useRef, useState} from 'react';
+import {ChangeEvent, useCallback, useEffect, useRef, useState} from 'react';
 
 import type {WebappProperties} from '@wireapp/api-client/lib/user/data/';
 import {amplify} from 'amplify';
@@ -38,7 +38,7 @@ interface CallOptionsProps {
   propertiesRepository: PropertiesRepository;
 }
 
-const CallOptions: React.FC<CallOptionsProps> = ({constraintsHandler, propertiesRepository}) => {
+const CallOptions = ({constraintsHandler, propertiesRepository}: CallOptionsProps) => {
   const {current: isCbrEncodingEnforced} = useRef(Config.getConfig().FEATURE.ENFORCE_CONSTANT_BITRATE);
   const [vbrEncoding, setVbrEncoding] = useState(
     !isCbrEncodingEnforced && propertiesRepository.properties.settings.call.enable_vbr_encoding,

@@ -29,19 +29,6 @@ export const wrapperStyles: CSSObject = {
   width: '100%',
 };
 
-export const headingStyles: CSSObject = {
-  color: 'var(--main-color)',
-  fontWeight: 'var(--font-weight-semibold)',
-  fontSize: 'var(--font-size-medium)',
-  marginBottom: '8px',
-};
-
-export const searchWrapperStyles: CSSObject = {
-  display: 'flex',
-  alignItems: 'center',
-  gap: '8px',
-};
-
 export const contentStyles: CSSObject = {
   display: 'flex',
   alignItems: 'center',

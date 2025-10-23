@@ -26,7 +26,7 @@ import type {Conversation} from 'Repositories/entity/Conversation';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 
-export interface Props {
+interface Props {
   conversation: Conversation;
 }
 

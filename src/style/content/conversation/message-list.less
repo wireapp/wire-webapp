@@ -25,7 +25,12 @@
 }
 
 .messages {
-  transform: translateZ(0);
+  overflow-anchor: none;
+
+  &.message-wrapper {
+    transform: translateZ(0);
+  }
+
   &.flex-center {
     flex-wrap: wrap;
     margin: auto;
@@ -45,10 +50,12 @@
   &.content-message {
     &:hover,
     &:focus-visible {
-      background-color: #fff;
+      .content-message-wrapper {
+        background-color: #fff;
 
-      body.theme-dark & {
-        background-color: var(--gray-90);
+        body.theme-dark & {
+          background-color: var(--gray-90);
+        }
       }
     }
   }
@@ -57,7 +64,7 @@
     .accent-selection;
   }
 
-  &:last-child {
+  &.message-wrapper:last-child {
     margin-bottom: 40px;
   }
 
@@ -102,7 +109,7 @@
 
 .content-message {
   &:has(.message-header) {
-    margin-top: 6px;
+    padding-top: 6px;
   }
 }
 
@@ -263,29 +270,6 @@
 .message-header-label-icon {
   margin-left: 8px;
   font-size: var(--font-size-xxs);
-}
-
-.message-header-icon-guest,
-.message-header-icon-service,
-.message-header-icon-external {
-  display: inline-flex;
-  margin-top: -2px;
-  margin-left: 8px;
-  svg path {
-    fill: var(--background-fade-40);
-  }
-}
-.message-header-icon-guest,
-.message-header-icon-service {
-  svg {
-    width: 14px;
-    height: 14px;
-  }
-}
-
-.message-header-icon-external svg {
-  width: 16px;
-  height: 16px;
 }
 
 .message-mention {
@@ -548,10 +532,13 @@
   flex-direction: column;
   align-items: center;
   margin-top: 32px;
-  margin-bottom: 48px;
 
   .message-services-warning {
     margin-top: 32px;
+  }
+
+  &.message-wrapper {
+    margin-bottom: 48px;
   }
 }
 

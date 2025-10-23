@@ -37,6 +37,7 @@ export class BaseError extends Error {
     return {
       INVALID_PARAMETER: 'Invalid parameter passed',
       MISSING_PARAMETER: 'Required parameter is not defined',
+      MISSING_QUALIFIED_ID: 'Required qualified ID is not defined',
       UNKNOWN: 'Unknown',
     };
   }

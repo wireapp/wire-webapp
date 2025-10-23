@@ -17,8 +17,6 @@
  *
  */
 
-import React from 'react';
-
 import {ConnectionStatus} from '@wireapp/api-client/lib/connection';
 import {CONVERSATION_TYPE} from '@wireapp/api-client/lib/conversation';
 import {ClientMLSError, ClientMLSErrorLabel} from '@wireapp/core/lib/messagingProtocols/mls';
@@ -75,7 +73,7 @@ export const ActionIdentifier = {
   [Actions.UNBLOCK]: 'do-unblock',
 };
 
-export interface UserActionsProps {
+interface UserActionsProps {
   actionsViewModel: ActionsViewModel;
   conversation?: Conversation;
   conversationRoleRepository?: ConversationRoleRepository;
@@ -108,7 +106,7 @@ function createPlaceholder1to1Conversation(user: User, selfUser: User) {
   return conversation;
 }
 
-const UserActions: React.FC<UserActionsProps> = ({
+const UserActions = ({
   actionsViewModel,
   isSelfActivated,
   user,
@@ -119,7 +117,7 @@ const UserActions: React.FC<UserActionsProps> = ({
   isModal = false,
   teamState = container.resolve(TeamState),
   conversationState = container.resolve(ConversationState),
-}) => {
+}: UserActionsProps) => {
   const {
     isAvailable,
     isBlocked,

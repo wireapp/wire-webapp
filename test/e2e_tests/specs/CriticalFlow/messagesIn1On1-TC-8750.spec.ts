@@ -107,7 +107,7 @@ test('Messages in 1:1', {tag: ['@TC-8750', '@crit-flow-web']}, async ({pageManag
   await test.step('User A sends image', async () => {
     await pages.conversationList().openConversation(memberB.fullName);
     await components.inputBarControls().clickShareImage(imageFilePath);
-    expect(pages.conversation().isImageVisible(memberA)).toBeTruthy();
+    expect(pages.conversation().isImageFromUserVisible(memberA)).toBeTruthy();
   });
   await test.step('User B can see the image in the conversation', async () => {
     await memberBPM.webapp.pages.conversationList().openConversation(memberA.fullName);
@@ -116,7 +116,7 @@ test('Messages in 1:1', {tag: ['@TC-8750', '@crit-flow-web']}, async ({pageManag
     await memberBPM.refreshPage({waitUntil: 'load'});
 
     // Verify that the image is visible in the conversation
-    expect(await memberBPM.webapp.pages.conversation().isImageVisible(memberA)).toBeTruthy();
+    expect(await memberBPM.webapp.pages.conversation().isImageFromUserVisible(memberA)).toBeTruthy();
 
     // Verify QR Code in the image
     const localQRCodeValue = await getLocalQRCodeValue(imageFilePath);
@@ -189,8 +189,8 @@ test('Messages in 1:1', {tag: ['@TC-8750', '@crit-flow-web']}, async ({pageManag
     await memberBPM.webapp.pages.conversation().page.waitForTimeout(11_000);
   });
   await test.step('Both users see the message as removed', async () => {
-    expect(await memberBPM.webapp.pages.conversation().isMessageVisible(selfDestructMessageText)).toBeFalsy();
-    expect(await pages.conversation().isMessageVisible(selfDestructMessageText)).toBeFalsy();
+    expect(await memberBPM.webapp.pages.conversation().isMessageVisible(selfDestructMessageText, false)).toBeFalsy();
+    expect(await pages.conversation().isMessageVisible(selfDestructMessageText, false)).toBeFalsy();
 
     // Reset ephemeral timer to 'Off'
     await components.inputBarControls().setEphemeralTimerTo('Off');

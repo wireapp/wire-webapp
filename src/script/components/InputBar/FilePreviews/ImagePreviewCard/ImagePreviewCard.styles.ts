@@ -24,4 +24,5 @@ export const imageStyles: CSSObject = {
   height: '100%',
   objectFit: 'cover',
   borderRadius: '10px',
+  backgroundColor: 'var(--transparent-img-bg)',
 };

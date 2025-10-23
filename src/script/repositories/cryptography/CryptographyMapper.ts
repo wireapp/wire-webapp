@@ -52,6 +52,7 @@ import {
   Text,
   InCallEmoji,
   InCallHandRaise,
+  ButtonAction,
 } from '@wireapp/protocol-messaging';
 
 import {AssetTransferState} from 'Repositories/assets/AssetTransferState';
@@ -267,6 +268,11 @@ export class CryptographyMapper {
         break;
       }
 
+      case GenericMessageType.BUTTON_ACTION: {
+        specificContent = this._mapButtonAction(genericMessage.buttonAction as ButtonAction);
+        break;
+      }
+
       default: {
         const logMessage = `Skipped event '${genericMessage.messageId}' of unhandled type '${genericMessage.content}'`;
         this.logger.debug(logMessage, {event, generic_message: genericMessage});
@@ -315,6 +321,16 @@ export class CryptographyMapper {
     return {
       data: {items},
       type: ClientEvent.CONVERSATION.COMPOSITE_MESSAGE_ADD,
+    };
+  }
+
+  private _mapButtonAction(buttonAction: ButtonAction) {
+    return {
+      type: ClientEvent.CONVERSATION.BUTTON_ACTION,
+      data: {
+        buttonId: buttonAction.buttonId,
+        messageId: buttonAction.referenceMessageId,
+      },
     };
   }
 

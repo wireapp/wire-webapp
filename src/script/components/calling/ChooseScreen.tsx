@@ -26,7 +26,7 @@ import {ElectronDesktopCapturerSource} from 'Repositories/media/MediaDevicesHand
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 
-export interface ChooseScreenProps {
+interface ChooseScreenProps {
   choose: (screenId: string) => void;
   callState?: CallState;
 }

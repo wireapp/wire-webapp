@@ -17,7 +17,7 @@
  *
  */
 
-import React, {useEffect, useRef, useState} from 'react';
+import {useEffect, useRef, useState} from 'react';
 
 import {ConversationProtocol} from '@wireapp/api-client/lib/conversation';
 import cx from 'classnames';
@@ -67,7 +67,7 @@ const enum Tabs {
   SERVICES,
 }
 
-const StartUI: React.FC<StartUIProps> = ({
+const StartUI = ({
   userState = container.resolve(UserState),
   teamState = container.resolve(TeamState),
   conversationState = container.resolve(ConversationState),
@@ -79,7 +79,7 @@ const StartUI: React.FC<StartUIProps> = ({
   userRepository,
   isFederated,
   selfUser,
-}) => {
+}: StartUIProps) => {
   const brandName = Config.getConfig().BRAND_NAME;
   const {canInviteTeamMembers, canSearchUnconnectedUsers, canManageServices, canChatWithServices} =
     generatePermissionHelpers(selfUser.teamRole());

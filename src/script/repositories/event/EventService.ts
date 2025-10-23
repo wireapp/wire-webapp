@@ -37,18 +37,18 @@ import {StorageError} from '../../error/StorageError';
 import {categoryFromEvent} from '../../message/MessageCategorization';
 import {MessageCategory} from '../../message/MessageCategory';
 
-export type Includes = {includeFrom: boolean; includeTo: boolean};
+type Includes = {includeFrom: boolean; includeTo: boolean};
 type DexieCollection = Dexie.Collection<any, any>;
-export type DBEvents = DexieCollection | EventRecord[];
+type DBEvents = DexieCollection | EventRecord[];
 export type IdentifiedUpdatePayload = Partial<EventRecord> & Pick<EventRecord, 'primary_key'>;
 
-export const eventTimeToDate = (time: string) => new Date(time) || new Date(parseInt(time, 10));
+const eventTimeToDate = (time: string) => new Date(time) || new Date(parseInt(time, 10));
 
-export const compareEventsByConversation = (eventA: EventRecord, eventB: EventRecord) =>
+const compareEventsByConversation = (eventA: EventRecord, eventB: EventRecord) =>
   eventA.conversation.localeCompare(eventB.conversation);
 
 const compareEventsById = (eventA: EventRecord, eventB: EventRecord) => eventA.id.localeCompare(eventB.id);
-export const compareEventsByTime = (eventA: EventRecord, eventB: EventRecord) =>
+const compareEventsByTime = (eventA: EventRecord, eventB: EventRecord) =>
   eventTimeToDate(eventA.time).getTime() - eventTimeToDate(eventB.time).getTime();
 
 /** Handles all databases interactions related to events */

@@ -17,7 +17,7 @@
  *
  */
 
-import React, {KeyboardEvent as ReactKeyBoardEvent, useCallback, useEffect, useMemo, useRef, useState} from 'react';
+import {KeyboardEvent as ReactKeyBoardEvent, useCallback, useEffect, useMemo, useRef, useState} from 'react';
 
 import {amplify} from 'amplify';
 import {container} from 'tsyringe';
@@ -57,6 +57,7 @@ import {ConversationsList} from './ConversationsList';
 import {EmptyConversationList} from './EmptyConversationList';
 import {getGroupParticipantsConversations} from './getGroupParticipantsConversation';
 import {getTabConversations, scrollToConversation} from './helpers';
+import {useDraftConversations} from './hooks/useDraftConversations';
 import {useFolderStore} from './useFoldersStore';
 import {SidebarStatus, SidebarTabs, useSidebarStore} from './useSidebarStore';
 
@@ -82,7 +83,7 @@ type ConversationsProps = {
   userRepository: UserRepository;
 };
 
-export const Conversations: React.FC<ConversationsProps> = ({
+export const Conversations = ({
   integrationRepository,
   searchRepository,
   teamRepository,
@@ -96,7 +97,7 @@ export const Conversations: React.FC<ConversationsProps> = ({
   callState = container.resolve(CallState),
   userState = container.resolve(UserState),
   selfUser,
-}) => {
+}: ConversationsProps) => {
   const [conversationListRef, setConversationListRef] = useState<HTMLElement | null>(null);
   const searchInputRef = useRef<HTMLInputElement | null>(null);
 
@@ -105,6 +106,7 @@ export const Conversations: React.FC<ConversationsProps> = ({
     status: sidebarStatus,
     setStatus: setSidebarStatus,
     setCurrentTab,
+    conversationFilter,
   } = useSidebarStore(useShallow(state => state));
   const {isChannelsEnabled} = useChannelsFeatureFlag();
   const [conversationsFilter, setConversationsFilter] = useState<string>('');
@@ -178,6 +180,10 @@ export const Conversations: React.FC<ConversationsProps> = ({
     }
   }, [isScreenLessThanMdBreakpoint, setSidebarStatus]);
 
+  // Get conversations with drafts for the draft filter
+  const allConversations = [...conversations, ...archivedConversations];
+  const draftConversations = useDraftConversations(allConversations);
+
   const {conversations: currentTabConversations, searchInputPlaceholder} = getTabConversations({
     currentTab,
     conversations,
@@ -189,6 +195,8 @@ export const Conversations: React.FC<ConversationsProps> = ({
     channelConversations,
     isChannelsEnabled,
     channelAndGroupConversations,
+    conversationFilter,
+    draftConversations,
   });
 
   const currentFolder = labels

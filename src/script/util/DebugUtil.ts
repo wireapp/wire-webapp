@@ -28,13 +28,12 @@ import {
   USER_EVENT,
 } from '@wireapp/api-client/lib/event/';
 import type {Notification, NotificationList} from '@wireapp/api-client/lib/notification/';
-import {FeatureStatus} from '@wireapp/api-client/lib/team/feature/';
+import {FEATURE_KEY, FeatureStatus} from '@wireapp/api-client/lib/team/feature/';
 import type {QualifiedId} from '@wireapp/api-client/lib/user';
 import {NotificationSource} from '@wireapp/core/lib/notification';
 import {DatabaseKeys} from '@wireapp/core/lib/notification/NotificationDatabaseRepository';
 import Dexie from 'dexie';
 import keyboardjs from 'keyboardjs';
-import {observable} from 'knockout';
 import {$createTextNode, $getRoot, LexicalEditor} from 'lexical';
 import {container} from 'tsyringe';
 
@@ -128,10 +127,9 @@ export class DebugUtil {
       const startTime = performance.now();
 
       for (const notification of notificationResponse.notifications) {
-        const events = this.core.service.notification.handleNotification(
+        const events = this.core.service!.notification.handleNotification(
           notification,
           NotificationSource.NOTIFICATION_STREAM,
-          false,
         );
 
         for await (const event of events) {
@@ -234,12 +232,24 @@ export class DebugUtil {
     );
   }
 
+  isGzippingEnabled(): boolean {
+    return this.apiClient.transport.http.isGzipEnabled();
+  }
+
+  toggleGzipping(enabled: boolean) {
+    this.apiClient.transport.http.toggleGzip(enabled);
+  }
+
   enableCameraBlur(flag: boolean) {
     return this.callingRepository.switchVideoBackgroundBlur(flag);
   }
 
   reconnectWebSocket({dryRun} = {dryRun: false}) {
-    return this.eventRepository.connectWebSocket(this.core, () => {}, dryRun);
+    const teamFeatures = this.teamState.teamFeatures();
+    const useAsyncNotificationStream =
+      teamFeatures?.[FEATURE_KEY.CONSUMABLE_NOTIFICATIONS]?.status === FeatureStatus.ENABLED;
+    const useLegacyNotificationStream = !useAsyncNotificationStream;
+    return this.eventRepository.connectWebSocket(this.core, useLegacyNotificationStream, () => {}, dryRun);
   }
 
   async reconnectWebSocketWithLastNotificationIdFromBackend({dryRun} = {dryRun: false}) {
@@ -292,6 +302,27 @@ export class DebugUtil {
 
     const isEnabled = storage.getItem('avs-debugger-enabled');
     return isEnabled === 'true';
+  }
+
+  isEnabledAvsRustSFT(): boolean {
+    const storage = getStorage();
+
+    if (storage === undefined) {
+      return false;
+    }
+
+    const isEnabled = storage.getItem('avs-rust-sft-enabled');
+    return isEnabled === 'true';
+  }
+
+  enableAvsRustSFT(enable: boolean): boolean {
+    const storage = getStorage();
+
+    if (storage === undefined) {
+      return false;
+    }
+    storage.setItem('avs-rust-sft-enabled', `${enable}`);
+    return enable;
   }
 
   /** Used by QA test automation. */
@@ -623,22 +654,4 @@ export class DebugUtil {
   disableForcedErrorReporting() {
     return disableForcedErrorReporting();
   }
-}
-
-export function observableWithProxy(
-  initialValue: any,
-  name = 'unnamed',
-  extraInformation: Record<string, string> = {},
-) {
-  const obs = observable(initialValue);
-
-  return new Proxy(obs, {
-    apply(target, thisArg, args) {
-      if (args.length) {
-        // eslint-disable-next-line no-console
-        console.trace(`DEBUG: Proxy Observable "${name}" set to:`, {args: args[0], ...extraInformation});
-      }
-      return Reflect.apply(target, thisArg, args);
-    },
-  });
 }

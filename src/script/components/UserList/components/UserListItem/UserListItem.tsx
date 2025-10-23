@@ -32,7 +32,7 @@ import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 import {capitalizeFirstChar} from 'Util/StringUtil';
 
-export interface UserListItemProps {
+interface UserListItemProps {
   groupId?: string;
   canSelect: boolean;
   customInfo?: string;

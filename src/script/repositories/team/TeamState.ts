@@ -58,6 +58,8 @@ export class TeamState {
   readonly teamDomain: ko.PureComputed<string>;
   readonly teamSize: ko.PureComputed<number>;
   readonly selfRole: ko.PureComputed<Role | undefined>;
+  readonly isCellsEnabled: ko.PureComputed<boolean>;
+  readonly isAuditLogEnabled: ko.PureComputed<boolean>;
 
   constructor(private readonly userState = container.resolve(UserState)) {
     this.isTeam = ko.pureComputed(() => !!this.team()?.id);
@@ -131,6 +133,14 @@ export class TeamState {
       const roles = this.memberRoles();
       const userId = this.userState.self()?.id;
       return roles && userId ? roleMap[roles[userId]] : undefined;
+    });
+
+    this.isCellsEnabled = ko.pureComputed(() => {
+      return this.teamFeatures()?.cells?.status === FeatureStatus.ENABLED;
+    });
+
+    this.isAuditLogEnabled = ko.pureComputed(() => {
+      return this.teamFeatures()?.assetAuditLog?.status === FeatureStatus.ENABLED;
     });
   }
 

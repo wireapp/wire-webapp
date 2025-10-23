@@ -23,14 +23,14 @@ import {t} from 'Util/LocalizerUtil';
 
 import {singleActionButtonStyle} from './SingleAction.styles';
 
-export interface MenuItem {
+interface MenuItem {
   click: () => void;
   Icon: React.FC<React.SVGProps<SVGSVGElement>>;
   identifier: string;
   label: string;
 }
 
-export interface SingleActionProps {
+interface SingleActionProps {
   item: MenuItem;
   onCancel: (action: any) => void;
   oneButtonPerRow?: boolean;

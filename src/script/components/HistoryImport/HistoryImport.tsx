@@ -22,8 +22,8 @@ import {useEffect, useState} from 'react';
 import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
 
 import * as Icon from 'Components/Icon';
-import {LoadingBar} from 'Components/LoadingBar/LoadingBar';
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
+import {ProgressBar} from 'Components/ProgressBar/ProgressBar';
 import {BackupRepository} from 'Repositories/backup/BackupRepository';
 import {
   CancelError,
@@ -214,11 +214,11 @@ const HistoryImport = ({user, backupRepository, file, switchContent}: HistoryImp
       <h2 className="visually-hidden">{t('accessibility.headings.historyImport')}</h2>
 
       <div id="history-import">
-        {isPreparing && <LoadingBar progress={loadingProgress} message={loadingMessage} />}
+        {isPreparing && <ProgressBar progress={loadingProgress} message={loadingMessage} />}
 
         {isImporting && (
           <>
-            <LoadingBar progress={loadingProgress} message={loadingMessage} className="with-cancel" />
+            <ProgressBar progress={loadingProgress} message={loadingMessage} className="with-cancel" />
 
             <Button variant={ButtonVariant.SECONDARY} onClick={onCancel} data-uie-name="do-cancel-history-import">
               {t('backupCancel')}

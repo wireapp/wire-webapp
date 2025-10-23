@@ -75,6 +75,7 @@ export const ImageAssetLarge = ({
         aria-haspopup="dialog"
         aria-expanded={isOpen}
         aria-controls={id}
+        disabled={isError}
         style={
           {
             '--aspect-ratio': aspectRatio,
@@ -113,6 +114,7 @@ export const ImageAssetLarge = ({
         onClose={() => setIsOpen(false)}
         filePreviewUrl={src}
         fileExtension={extension}
+        fileUrl={src}
         fileName={name}
         senderName={senderName}
         timestamp={timestamp}

@@ -19,6 +19,8 @@
 
 import {MouseEvent} from 'react';
 
+import {CONVERSATION_CELLS_STATE} from '@wireapp/api-client/lib/conversation/';
+
 import {FormatSeparator} from 'Components/InputBar/common/FormatSeparator/FormatSeparator';
 import {Conversation} from 'Repositories/entity/Conversation';
 import {Config} from 'src/script/Config';
@@ -34,11 +36,12 @@ import {ImageUploadButton} from './ImageUploadButton/ImageUploadButton';
 import {MessageTimerButton} from './MessageTimerButton/MessageTimerButton';
 import {PingButton} from './PingButton/PingButton';
 
-export type ControlButtonsProps = {
+interface ControlButtonsProps {
   input: string;
   conversation: Conversation;
   disablePing?: boolean;
   disableFilesharing?: boolean;
+  isCellsFeatureEnabled?: boolean;
   isEditing?: boolean;
   isFormatActive: boolean;
   isEmojiActive: boolean;
@@ -54,13 +57,14 @@ export type ControlButtonsProps = {
   onEmojiClick: (event: MouseEvent<HTMLButtonElement>) => void;
   onCellAssetUpload: () => void;
   onCellImageUpload: () => void;
-};
+}
 
 const ControlButtons = ({
   conversation,
   disablePing,
   disableFilesharing,
   input,
+  isCellsFeatureEnabled,
   isEditing,
   isFormatActive,
   isEmojiActive,
@@ -77,7 +81,8 @@ const ControlButtons = ({
   onCellImageUpload,
   onCellAssetUpload,
 }: ControlButtonsProps) => {
-  const isCellsEnabled = Config.getConfig().FEATURE.ENABLE_CELLS;
+  const isCellsEnabled = Config.getConfig().FEATURE.ENABLE_CELLS && isCellsFeatureEnabled;
+  const isCellsConversation = isCellsEnabled && conversation.cellsState() !== CONVERSATION_CELLS_STATE.DISABLED;
 
   if (isEditing) {
     return (
@@ -122,7 +127,7 @@ const ControlButtons = ({
         {!disableFilesharing && (
           <>
             <li>
-              {isCellsEnabled ? (
+              {isCellsConversation ? (
                 <CellImageUploadButton onClick={onCellImageUpload} />
               ) : (
                 <ImageUploadButton
@@ -133,7 +138,7 @@ const ControlButtons = ({
             </li>
 
             <li>
-              {isCellsEnabled ? (
+              {isCellsConversation ? (
                 <CellAssetUploadButton onClick={onCellAssetUpload} />
               ) : (
                 <AssetUploadButton
@@ -150,7 +155,7 @@ const ControlButtons = ({
         <li>
           <PingButton isDisabled={!!disablePing} onClick={onClickPing} />
         </li>
-        {!isCellsEnabled && (
+        {!isCellsConversation && (
           <li>
             <MessageTimerButton conversation={conversation} />
           </li>
@@ -186,9 +191,7 @@ const ControlButtons = ({
           <li aria-hidden="true">
             <FormatSeparator />
           </li>
-          <li>
-            <GiphyButton onGifClick={onGifClick} />
-          </li>
+          <GiphyButton onGifClick={onGifClick} />
         </>
       )}
     </>

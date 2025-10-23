@@ -40,8 +40,8 @@ interface CellsConfig {
 // Currently, the cells backend doesn't specify the sortable fields (they're dynamic).
 // When backend will specify the exact fields, we'll update this type.
 // The "(string & {})" indicates that all strings are valid, but we get autocomplete for the union values.
-export type SortBy = 'mtime' | (string & {});
-export type SortDirection = 'asc' | 'desc';
+type SortBy = 'mtime' | (string & {});
+type SortDirection = 'asc' | 'desc';
 
 const DEFAULT_MAX_FILES_LIMIT = 100;
 
@@ -111,6 +111,12 @@ export class CellsRepository {
 
   async deleteNode({uuid, permanently = false}: {uuid: string; permanently?: boolean}) {
     return this.apiClient.api.cells.deleteNode({uuid, permanently});
+  }
+
+  async deleteNodes({uuids, permanently = false}: {uuids: string[]; permanently?: boolean}) {
+    uuids.forEach(async uuid => {
+      await this.deleteNode({uuid, permanently});
+    });
   }
 
   async moveNode({currentPath, targetPath}: {currentPath: string; targetPath: string}) {

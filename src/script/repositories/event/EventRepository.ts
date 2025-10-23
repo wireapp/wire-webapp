@@ -29,6 +29,7 @@ import ko from 'knockout';
 import {container} from 'tsyringe';
 
 import {Account, ConnectionState, ProcessedEventPayload} from '@wireapp/core';
+import {PromiseQueue} from '@wireapp/promise-queue';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {ClientConversationEvent, EventBuilder} from 'Repositories/conversation/EventBuilder';
@@ -36,7 +37,6 @@ import {CryptographyMapper} from 'Repositories/cryptography/CryptographyMapper';
 import {EventName} from 'Repositories/tracking/EventName';
 import {UserState} from 'Repositories/user/UserState';
 import {getLogger, Logger} from 'Util/Logger';
-import {queue} from 'Util/PromiseQueue';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 
 import {ClientEvent} from './Client';
@@ -62,6 +62,8 @@ export class EventRepository {
   private eventProcessMiddlewares: EventMiddleware[] = [];
   /** event processors are classes that are able to react and process an incoming event */
   private eventProcessors: EventProcessor[] = [];
+
+  private eventQueue: PromiseQueue = new PromiseQueue();
 
   static get CONFIG() {
     return {
@@ -160,17 +162,19 @@ export class EventRepository {
    * this function will process any incoming event. It is being queued in case 2 events arrive at the same time.
    * Processing events should happen sequentially (thus the queue)
    */
-  private readonly handleIncomingEvent = queue(async (payload: HandledEventPayload, source: NotificationSource) => {
-    try {
-      await this.handleEvent(payload, source);
-    } catch (error) {
-      if (source === EventSource.NOTIFICATION_STREAM) {
-        this.logger.warn(`Failed to handle event of type "${event.type}": ${error.message}`, error);
-      } else {
-        throw error;
+  private readonly handleIncomingEvent = async (payload: HandledEventPayload, source: NotificationSource) => {
+    return this.eventQueue.push(async () => {
+      try {
+        await this.handleEvent(payload, source);
+      } catch (error) {
+        if (source === EventSource.NOTIFICATION_STREAM) {
+          this.logger.warn(`Failed to handle event of type "${event.type}": ${error.message}`, error);
+        } else {
+          throw error;
+        }
       }
-    }
-  });
+    });
+  };
 
   /**
    * Import events coming from an external source. This is only useful useful for profiling or debugging.
@@ -193,6 +197,7 @@ export class EventRepository {
    */
   async connectWebSocket(
     account: Account,
+    useLegacy: boolean,
     onNotificationStreamProgress: (currentProcessingNotificationTimestamp: string) => void,
     dryRun = false,
   ): Promise<void> {
@@ -202,6 +207,7 @@ export class EventRepository {
       this.disconnectWebSocket?.();
       return new Promise<void>(async resolve => {
         this.disconnectWebSocket = await account.listen({
+          useLegacy,
           onConnectionStateChanged: connectionState => {
             this.updateConnectivitityStatus(connectionState);
             if (connectionState === ConnectionState.LIVE) {
@@ -322,7 +328,7 @@ export class EventRepository {
     }
 
     const conversationId = 'conversation' in event && event.conversation;
-    const inSelfConversation = conversationId === this.userState.self().id;
+    const inSelfConversation = conversationId === this.userState.self()?.id;
     if (!inSelfConversation) {
       return this.processEvent(event, source);
     }

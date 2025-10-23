@@ -19,20 +19,29 @@
 
 import {Locator, Page} from '@playwright/test';
 
+import {selectByDataAttribute} from 'test/e2e_tests/utils/selector.util';
+
 export class EmailVerificationPage {
+  readonly codeLength = 6;
   readonly page: Page;
 
   readonly verificationCodeInput: Locator;
+  readonly verificationCodeInputLabel: Locator;
+  readonly resendButton: Locator;
+  readonly errorLabel: Locator;
 
   constructor(page: Page) {
     this.page = page;
 
     this.verificationCodeInput = page.locator('input');
+    this.verificationCodeInputLabel = page.locator(selectByDataAttribute('label-with-email'));
+    this.errorLabel = page.locator(selectByDataAttribute('error-message'));
+    this.resendButton = page.locator(selectByDataAttribute('do-resend-code'));
   }
 
   // Doesn't work with headless chromium
   async enterVerificationCode(code: string) {
-    if (code.length !== 6) {
+    if (code.length !== this.codeLength) {
       throw new Error('Verification code must be exactly 6 characters long');
     }
 
@@ -42,5 +51,21 @@ export class EmailVerificationPage {
       await this.page.keyboard.press(code[i]);
     }
     await this.page.keyboard.press('Enter');
+  }
+
+  async clearCode() {
+    const inputs = await this.page.locator('input').all();
+    for (let i = 0; i < this.codeLength; i++) {
+      await inputs[i].focus();
+      await this.page.keyboard.press('Backspace');
+    }
+  }
+  async pressSubmit() {
+    await this.page.getByRole('button', {name: 'Submit'}).click();
+  }
+
+  async isEmailVerificationPageVisible() {
+    await this.verificationCodeInputLabel.waitFor({state: 'visible'});
+    return true;
   }
 }

@@ -17,62 +17,53 @@
  *
  */
 
-import {PermissionRepository} from 'Repositories/permission/PermissionRepository';
 import {UserState} from 'Repositories/user/UserState';
 
 import {MediaConstraintsHandler} from './MediaConstraintsHandler';
-import {CurrentAvailableDeviceId} from './MediaDevicesHandler';
 import {MediaStreamHandler} from './MediaStreamHandler';
 
 describe('MediaStreamHandler', () => {
   let streamHandler: MediaStreamHandler;
 
-  const availableDevices = {
-    audioinput: () => {},
-    audiooutput: () => {},
-    screeninput: () => {},
-    videoinput: () => {},
-  } as CurrentAvailableDeviceId;
-
   const userState = {
     self: () => ({id: ''}),
   } as UserState;
 
-  const mediaConstraintsHandler = new MediaConstraintsHandler(availableDevices, userState);
+  const mediaConstraintsHandler = new MediaConstraintsHandler(userState);
 
   beforeEach(() => {
-    streamHandler = new MediaStreamHandler(mediaConstraintsHandler, new PermissionRepository());
+    streamHandler = new MediaStreamHandler(mediaConstraintsHandler);
   });
 
   describe('requestMediaStream', () => {
-    it('requests audio streams', () => {
+    it('requests audio streams', async () => {
       spyOn(window.navigator.mediaDevices, 'getUserMedia').and.returnValue(Promise.resolve(new MediaStream()));
 
-      return streamHandler.requestMediaStream(true, false, false, true).then(() => {
-        expect(window.navigator.mediaDevices.getUserMedia).toHaveBeenCalledWith(
-          jasmine.objectContaining({audio: {autoGainControl: false}, video: undefined}),
-        );
-      });
+      await streamHandler.requestMediaStream(true, false, false, true);
+
+      expect(window.navigator.mediaDevices.getUserMedia).toHaveBeenCalledWith(
+        jasmine.objectContaining({audio: {autoGainControl: false}, video: undefined}),
+      );
     });
 
-    it('requests video streams', () => {
+    it('requests video streams', async () => {
       spyOn(window.navigator.mediaDevices, 'getUserMedia').and.returnValue(Promise.resolve(new MediaStream()));
 
-      return streamHandler.requestMediaStream(false, true, false, true).then(() => {
-        expect(window.navigator.mediaDevices.getUserMedia).toHaveBeenCalledWith(
-          jasmine.objectContaining({audio: undefined, video: jasmine.any(Object)}),
-        );
-      });
+      await streamHandler.requestMediaStream(false, true, false, true);
+
+      expect(window.navigator.mediaDevices.getUserMedia).toHaveBeenCalledWith(
+        jasmine.objectContaining({audio: undefined, video: jasmine.any(Object)}),
+      );
     });
 
-    it('requests audio and video streams', () => {
+    it('requests audio and video streams', async () => {
       spyOn(window.navigator.mediaDevices, 'getUserMedia').and.returnValue(Promise.resolve(new MediaStream()));
 
-      return streamHandler.requestMediaStream(true, true, false, true).then(() => {
-        expect(window.navigator.mediaDevices.getUserMedia).toHaveBeenCalledWith(
-          jasmine.objectContaining({audio: {autoGainControl: false}, video: jasmine.any(Object)}),
-        );
-      });
+      await streamHandler.requestMediaStream(true, true, false, true);
+
+      expect(window.navigator.mediaDevices.getUserMedia).toHaveBeenCalledWith(
+        jasmine.objectContaining({audio: {autoGainControl: false}, video: jasmine.any(Object)}),
+      );
     });
   });
 });

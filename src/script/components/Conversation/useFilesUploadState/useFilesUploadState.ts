@@ -19,7 +19,7 @@
 
 import {create} from 'zustand';
 
-export type FileUploadStatus = 'pending' | 'uploading' | 'success' | 'error';
+type FileUploadStatus = 'pending' | 'uploading' | 'success' | 'error';
 
 export interface FileWithPreview extends File {
   id: string;

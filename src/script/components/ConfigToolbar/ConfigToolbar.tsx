@@ -32,12 +32,15 @@ import {wrapperStyles} from './ConfigToolbar.styles';
 
 export function ConfigToolbar() {
   const [showConfig, setShowConfig] = useState(false);
+  const [isGzipEnabled, setIsGzipEnabled] = useState(window.wire?.app.debug?.isGzippingEnabled() || false);
   const [configFeaturesState, setConfigFeaturesState] = useState<Configuration['FEATURE']>(Config.getConfig().FEATURE);
-  const [intervalId, setIntervalId] = useState<number | null>(null); // For managing setInterval
-  const messageCountRef = useRef<number>(0); // For the message count
-  const [prefix, setPrefix] = useState('Message -'); // Prefix input
+  const [isMessageSendingActive, setIsMessageSendingActive] = useState(false);
+  const messageCountRef = useRef<number>(0);
+  const [prefix, setPrefix] = useState('Message -');
+  const [messageDelaySec, setMessageDelaySec] = useState<number>(0);
   const wrapperRef = useRef(null);
-  const [avsDebuggerEnabled, setAvsDebuggerEnabled] = useState(!!window.wire?.app?.debug?.isEnabledAvsDebugger()); //
+  const [avsDebuggerEnabled, setAvsDebuggerEnabled] = useState(!!window.wire?.app?.debug?.isEnabledAvsDebugger());
+  const [avsRustSftEnabled, setAvsRustSftEnabled] = useState(!!window.wire?.app?.debug?.isEnabledAvsRustSFT());
 
   // Toggle config tool on 'cmd/ctrl + shift + 2'
   useEffect(() => {
@@ -52,25 +55,29 @@ export function ConfigToolbar() {
     };
   }, []);
 
-  const startSendingMessages = () => {
-    if (intervalId) {
-      return;
+  useEffect(() => {
+    if (!isMessageSendingActive) {
+      return () => {};
     }
 
-    let isRequestInProgress = false;
+    let timeoutId: number | null = null;
+    let isActive = true;
 
-    const id = window.setInterval(async () => {
-      if (isRequestInProgress) {
+    const sendMessage = async (): Promise<void> => {
+      if (!isActive) {
         return;
       }
 
       const conversationState = container.resolve(ConversationState);
       const activeConversation = conversationState?.activeConversation();
+
       if (!activeConversation) {
+        if (isActive) {
+          const MS_IN_SEC = 1000;
+          timeoutId = window.setTimeout(sendMessage, messageDelaySec * MS_IN_SEC);
+        }
         return;
       }
-
-      isRequestInProgress = true;
 
       try {
         await window.wire.app.repository.message.sendTextWithLinkPreview({
@@ -79,25 +86,36 @@ export function ConfigToolbar() {
           mentions: [],
           quoteEntity: undefined,
         });
-
         messageCountRef.current++;
       } catch (error) {
         console.error('Error sending message:', error);
-      } finally {
-        isRequestInProgress = false;
       }
-    }, 100);
 
-    setIntervalId(id);
+      if (isActive) {
+        const MS_IN_SEC = 1000;
+        const delayMs = messageDelaySec * MS_IN_SEC;
+        timeoutId = window.setTimeout(sendMessage, delayMs);
+      }
+    };
+
+    void sendMessage();
+
+    return () => {
+      isActive = false;
+      if (timeoutId !== null) {
+        clearTimeout(timeoutId);
+      }
+    };
+  }, [isMessageSendingActive, prefix, messageDelaySec]);
+
+  const startSendingMessages = () => {
+    messageCountRef.current = 0;
+    setIsMessageSendingActive(true);
   };
 
-  // Stop sending messages and reset the counter
   const stopSendingMessages = () => {
-    if (intervalId) {
-      clearInterval(intervalId);
-      setIntervalId(null);
-      messageCountRef.current = 0;
-    }
+    setIsMessageSendingActive(false);
+    messageCountRef.current = 0;
   };
 
   // Update the config state when form input changes
@@ -165,7 +183,7 @@ export function ConfigToolbar() {
     setAvsDebuggerEnabled(!!window.wire?.app?.debug?.enableAvsDebugger(isChecked));
   };
 
-  const renderAvsSwitch = (value: boolean) => {
+  const renderAvsSwitch = () => {
     return (
       <div style={{marginBottom: '10px'}}>
         <label htmlFor="avs-debugger-checkbox" style={{display: 'block', fontWeight: 'bold'}}>
@@ -175,6 +193,44 @@ export function ConfigToolbar() {
           id="avs-debugger-checkbox"
           checked={avsDebuggerEnabled}
           onToggle={isChecked => handleAvsEnable(isChecked)}
+        />
+      </div>
+    );
+  };
+
+  const handleAvsRustSftEnable = (isChecked: boolean) => {
+    setAvsRustSftEnabled(!!window.wire?.app?.debug?.enableAvsRustSFT(isChecked));
+  };
+  const renderAvsRustSftSwitch = () => {
+    return (
+      <div style={{marginBottom: '10px'}}>
+        <label htmlFor="avs-rust-sft-checkbox" style={{display: 'block', fontWeight: 'bold'}}>
+          ENABLE AVS RUST SFT
+        </label>
+        <Switch
+          id="avs-rust-sft-checkbox"
+          checked={avsRustSftEnabled}
+          onToggle={isChecked => handleAvsRustSftEnable(isChecked)}
+        />
+      </div>
+    );
+  };
+
+  const renderGzipSwitch = () => {
+    return (
+      <div style={{marginBottom: '10px'}}>
+        <label htmlFor="gzip-checkbox" style={{display: 'block', fontWeight: 'bold'}}>
+          ENABLE GZIP
+        </label>
+        <Switch
+          id="gzip-checkbox"
+          checked={isGzipEnabled}
+          onToggle={() => {
+            setIsGzipEnabled(previousIsGzipEnabled => {
+              window.wire?.app?.debug?.toggleGzipping(!previousIsGzipEnabled);
+              return !previousIsGzipEnabled;
+            });
+          }}
         />
       </div>
     );
@@ -191,7 +247,6 @@ export function ConfigToolbar() {
         Caution: Modifying these settings can affect the behavior of the application. Ensure you understand the
         implications of each change before proceeding. Changes may cause unexpected behavior.
       </h4>
-      <div>{renderConfig(configFeaturesState)}</div>
 
       <hr />
 
@@ -201,7 +256,15 @@ export function ConfigToolbar() {
       <Button onClick={() => window.wire?.app?.debug?.enablePressSpaceToUnmute()}>enablePressSpaceToUnmute</Button>
       <Button onClick={() => window.wire?.app?.debug?.disablePressSpaceToUnmute()}>disablePressSpaceToUnmute</Button>
 
-      <div>{renderAvsSwitch(avsDebuggerEnabled)}</div>
+      <div>{renderAvsSwitch()}</div>
+
+      <hr />
+
+      <div>{renderAvsRustSftSwitch()}</div>
+
+      <hr />
+
+      <div>{renderGzipSwitch()}</div>
 
       <hr />
 
@@ -212,8 +275,30 @@ export function ConfigToolbar() {
         onChange={event => setPrefix(event.currentTarget.value)}
         placeholder="Prefix for the messages"
       />
-      <Button onClick={startSendingMessages}>Send Incremented Messages</Button>
-      <Button onClick={stopSendingMessages}>Stop Sending Messages</Button>
+      <div style={{marginTop: '8px'}}>
+        <label htmlFor="message-delay-input" style={{display: 'block', fontWeight: 'bold'}}>
+          Delay Between Messages (seconds)
+        </label>
+        <Input
+          id="message-delay-input"
+          type="number"
+          min={0}
+          step={0.1}
+          value={messageDelaySec}
+          onChange={event => {
+            const val = parseFloat(event.currentTarget.value);
+            setMessageDelaySec(Number.isNaN(val) || val < 0 ? 0 : val);
+          }}
+          placeholder="0"
+        />
+      </div>
+
+      <Button onClick={isMessageSendingActive ? stopSendingMessages : startSendingMessages}>
+        {isMessageSendingActive ? 'Stop Sending Messages' : 'Send Incremented Messages'}
+      </Button>
+
+      <h3>Environment Variables</h3>
+      <div>{renderConfig(configFeaturesState)}</div>
     </div>
   );
 }

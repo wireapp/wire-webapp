@@ -17,8 +17,6 @@
  *
  */
 
-import React from 'react';
-
 import {CallingCell} from 'Components/calling/CallingCell';
 import * as Icon from 'Components/Icon';
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
@@ -36,11 +34,7 @@ type TemporaryGuestConversations = {
   selfUser: User;
 };
 
-const TemporaryGuestConversations: React.FC<TemporaryGuestConversations> = ({
-  selfUser,
-  listViewModel,
-  callingViewModel,
-}) => {
+const TemporaryGuestConversations = ({selfUser, listViewModel, callingViewModel}: TemporaryGuestConversations) => {
   const {expirationIsUrgent, expirationRemainingText} = useKoSubscribableChildren(selfUser, [
     'expirationIsUrgent',
     'expirationRemainingText',
