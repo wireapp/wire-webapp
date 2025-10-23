@@ -23,6 +23,7 @@ import {
   ConversationProtocol,
   MLSConversation,
   MLSStaleMessageError,
+  MLSGroupOutOfSyncError,
   Subconversation,
   SUBCONVERSATION_ID,
 } from '@wireapp/api-client/lib/conversation';
@@ -258,6 +259,46 @@ describe('ConversationService', () => {
       expect(conversationService.joinByExternalCommit).toHaveBeenCalledWith(mockConversationId);
       expect(conversationService.emit).toHaveBeenCalledWith('MLSConversationRecovered', {
         conversationId: mockConversationId,
+      });
+      expect(apiClient.api.conversation.postMlsMessage).toHaveBeenCalledTimes(2);
+    });
+
+    it('adds missing users to MLS group and retries when group is out of sync during send', async () => {
+      const [conversationService, {apiClient}] = await buildConversationService();
+
+      const mockGroupId = 'AAEAAH87aajaQ011i+rNLmwpy0sAZGl5YS53aXJlamxpbms=';
+      const mockConversationId = {id: 'mockConversationId', domain: 'staging.zinfra.io'};
+      const mockedMessage = MessageBuilder.buildTextMessage({text: 'test'});
+
+      const missingUsers: QualifiedId[] = [
+        {id: 'user-1', domain: 'staging.zinfra.io'},
+        {id: 'user-2', domain: 'staging.zinfra.io'},
+      ];
+
+      const outOfSyncError = new MLSGroupOutOfSyncError(
+        HTTP_STATUS.CONFLICT,
+        missingUsers,
+        BackendErrorLabel.MLS_GROUP_OUT_OF_SYNC,
+      );
+
+      // First send fails with out-of-sync, second succeeds via default mock
+      jest.spyOn(apiClient.api.conversation, 'postMlsMessage').mockRejectedValueOnce(outOfSyncError);
+
+      const addUsersSpy = jest
+        .spyOn(conversationService, 'addUsersToMLSConversation')
+        .mockResolvedValueOnce({conversation: {members: {others: []}}} as any);
+
+      await conversationService.send({
+        protocol: ConversationProtocol.MLS,
+        groupId: mockGroupId,
+        payload: mockedMessage,
+        conversationId: mockConversationId,
+      });
+
+      expect(addUsersSpy).toHaveBeenCalledWith({
+        groupId: mockGroupId,
+        conversationId: mockConversationId,
+        qualifiedUsers: missingUsers,
       });
       expect(apiClient.api.conversation.postMlsMessage).toHaveBeenCalledTimes(2);
     });

@@ -30,6 +30,7 @@ import {
   Subconversation,
   isMLS1to1Conversation,
   MLSStaleMessageError,
+  MLSGroupOutOfSyncError,
 } from '@wireapp/api-client/lib/conversation';
 import {CONVERSATION_TYPING, ConversationMemberUpdateData} from '@wireapp/api-client/lib/conversation/data';
 import {
@@ -404,10 +405,10 @@ export class ConversationService extends TypedEventEmitter<Events> {
         state: sentAt ? MessageSendingState.OUTGOING_SENT : MessageSendingState.CANCELED,
       };
     } catch (error) {
-      this.logger.error('Failed to send MLS message', {error, groupId});
+      this.logger.warn('Failed to send MLS message', {error, groupId});
 
       if (!shouldRetry) {
-        this.logger.warn("Tried to send MLS message but it's still failing after recovery", {
+        this.logger.error("Tried to send MLS message but it's still failing after recovery", {
           error,
           groupId,
         });
@@ -424,7 +425,6 @@ export class ConversationService extends TypedEventEmitter<Events> {
         });
 
         await this.handleBrokenMLSConversation(conversationId);
-        return this.sendMLSMessage(params, false);
       }
 
       /**
@@ -442,14 +442,25 @@ export class ConversationService extends TypedEventEmitter<Events> {
         );
 
         await this.recoverMLSGroupFromEpochMismatch(conversationId);
-        return this.sendMLSMessage(params, false);
       }
 
-      this.logger.error('Failed to send MLS message, error did not match any known patterns, rethrowing the error', {
-        error,
-        groupId,
-      });
-      throw error;
+      if (error instanceof MLSGroupOutOfSyncError) {
+        this.logger.info(
+          'Failed to send MLS message because of group out of sync, recovering by adding missing users',
+          {
+            error,
+            groupId,
+          },
+        );
+
+        await this.addUsersToMLSConversation({
+          groupId,
+          conversationId,
+          qualifiedUsers: error.missing_users,
+        });
+      }
+
+      return this.sendMLSMessage(params, false);
     }
   }
 
@@ -467,6 +478,7 @@ export class ConversationService extends TypedEventEmitter<Events> {
     shouldRetry = true,
   }: Required<AddUsersParams> & {shouldRetry?: boolean}): Promise<BaseCreateConversationResponse> {
     try {
+      this.logger.info(`Adding users to MLS conversation`, {groupId, conversationId, qualifiedUsers});
       const exisitingClientIdsInGroup = await this.mlsService.getClientIdsInGroup(groupId);
       const conversation = await this.getConversation(conversationId);
 
@@ -488,6 +500,7 @@ export class ConversationService extends TypedEventEmitter<Events> {
         failedToAdd: keysClaimingFailures,
       };
     } catch (error) {
+      this.logger.warn('Failed to add users to MLS conversation', {error, groupId, conversationId});
       if (MLSService.isBrokenMLSConversationError(error)) {
         if (!shouldRetry) {
           this.logger.warn("Tried to add users to MLS conversation but it's still broken after reset", error);
@@ -743,8 +756,14 @@ export class ConversationService extends TypedEventEmitter<Events> {
     const isEstablished = await this.mlsGroupExistsLocally(groupId);
     const doesEpochMatch = isEstablished && (await this.matchesEpoch(groupId, epoch));
 
-    //if conversation is not established or epoch does not match -> try to rejoin
-    return !isEstablished || !doesEpochMatch;
+    // if conversation is not established or epoch does not match -> try to rejoin
+    const hasEpochMismatch = !isEstablished || !doesEpochMatch;
+    this.logger.info(`Conversation (group_id: ${groupId}) epoch mismatch check result: ${hasEpochMismatch}`, {
+      isEstablished,
+      doesEpochMatch,
+      epoch,
+    });
+    return hasEpochMismatch;
   }
 
   /**
@@ -907,6 +926,7 @@ export class ConversationService extends TypedEventEmitter<Events> {
   }
 
   private async recoverMLSGroupFromEpochMismatch(conversationId: QualifiedId, subconversationId?: SUBCONVERSATION_ID) {
+    this.logger.info(`Recovering MLS group from epoch mismatch`, {conversationId, subconversationId});
     if (subconversationId) {
       const parentGroupId = await this.groupIdFromConversationId(conversationId);
       const subconversation = await this.apiClient.api.conversation.getSubconversation(

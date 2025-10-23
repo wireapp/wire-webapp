@@ -18,6 +18,7 @@
  */
 
 import {BackendError, BackendErrorLabel, StatusCode} from '../http/';
+import {QualifiedId} from '../user';
 
 export class ConversationError extends BackendError {
   constructor(message: string, label: BackendErrorLabel, code: StatusCode) {
@@ -120,5 +121,21 @@ export class MLSStaleMessageError extends ConversationError {
     super(message, label, code);
     Object.setPrototypeOf(this, new.target.prototype);
     this.name = 'MLSStaleMessageError';
+  }
+}
+
+export class MLSGroupOutOfSyncError extends ConversationError {
+  public missing_users: QualifiedId[];
+
+  constructor(
+    code: StatusCode = StatusCode.CONFLICT,
+    missingUsers: QualifiedId[] = [],
+    message: string,
+    label: BackendErrorLabel = BackendErrorLabel.MLS_GROUP_OUT_OF_SYNC,
+  ) {
+    super(message, label, code);
+    Object.setPrototypeOf(this, new.target.prototype);
+    this.name = 'MLSGroupOutOfSyncError';
+    this.missing_users = missingUsers;
   }
 }
