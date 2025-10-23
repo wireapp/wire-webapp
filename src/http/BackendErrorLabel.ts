@@ -66,6 +66,7 @@ export enum BackendErrorLabel {
   NOT_CONNECTED = 'not-connected',
   INVALID_CONVERSATION_PASSWORD = 'invalid-conversation-password',
   MLS_STALE_MESSAGE = 'mls-stale-message',
+  MLS_GROUP_OUT_OF_SYNC = 'mls-group-out-of-sync',
   MLS_INVALID_LEAF_NODE_SIGNATURE = 'mls-invalid-leaf-node-signature',
   MLS_INVALID_LEAF_NODE_INDEX = 'mls-invalid-leaf-node-index',
 
