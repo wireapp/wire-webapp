@@ -426,6 +426,8 @@ declare module 'I18n/en-US.json' {
     'cells.newItemMenuModalForm.genericError': `Something went wrong. Please try again`;
     'cells.newItemMenuModalForm.nameRequired': `Name is required`;
     'cells.noNodes.description': `You\'ll find all files and folders shared in this conversation here.`;
+    'cells.noNodes.global.description': `For conversations that use file collaboration, you\'ll find shared files here.`;
+    'cells.noNodes.global.heading': `There are no files yet`;
     'cells.noNodes.heading': `There are no files or folders yet`;
     'cells.options.delete': `Delete`;
     'cells.options.deletePermanently': `Delete permanently`;
