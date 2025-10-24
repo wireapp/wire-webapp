@@ -206,7 +206,7 @@ const ConversationDetailsOptions = ({
             title={t('conversationDetailsActionCellsTitle')}
             statusUieName="status-cells-info"
             statusText={t('conversationDetailsActionCellsOption')}
-            disabled={true}
+            disabled
           />
         )}
 
