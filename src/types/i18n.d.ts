@@ -625,6 +625,8 @@ declare module 'I18n/en-US.json' {
     'conversationDetailsActionArchive': `Archive`;
     'conversationDetailsActionBlock': `Block`;
     'conversationDetailsActionCancelRequest': `Cancel request`;
+    'conversationDetailsActionCellsTitle': `File collaboration (Cells beta version) is on`;
+    'conversationDetailsActionCellsOption': `Permanently on for this conversation.`;
     'conversationDetailsActionClear': `Clear content`;
     'conversationDetailsActionConversationParticipants': `Show all ({number})`;
     'conversationDetailsActionCreateGroup': `Create group`;
