@@ -587,7 +587,7 @@ declare module 'I18n/en-US.json' {
     'conversationClassified': `Security level: VS-NfD`;
     'conversationCommonFeature1': `Up to [bold]{capacity}[/bold] people`;
     'conversationCommonFeature2': `Video conferencing`;
-    'conversationCommonFeature3': `Always end-to-end encrypted`;
+    'conversationCommonFeature3': `Messages and calls are always end-to-end encrypted`;
     'conversationConnectWithNewUsers': `Connect with People`;
     'conversationConnectionAccepted': `Connected`;
     'conversationConnectionBlocked': `Blocked`;
@@ -1378,8 +1378,8 @@ declare module 'I18n/en-US.json' {
     'modalCreateFolderHeadline': `Create new folder`;
     'modalCreateFolderMessage': `Move your conversation to a new folder.`;
     'modalCreateFolderPlaceholder': `Folder name`;
-    'modalCreateGroupCellsToggleHeading': `Files`;
-    'modalCreateGroupCellsToggleInfo': `Enable a shared Files section accessible to all group’s participants. This setting cannot be disabled once activated.`;
+    'modalCreateGroupCellsToggleHeading': `File collaboration (Cells beta version)`;
+    'modalCreateGroupCellsToggleInfo': `Enable participants to manage their documents and media files. Use folders, tags, and filters to work more efficiently. This can’t be undone.`;
     'modalCreateGroupProtocolHeading': `Protocol`;
     'modalCreateGroupProtocolInfo': `Select MLS to create a group conversation using the Messaging Layer Security protocol.`;
     'modalCreateGroupProtocolSelect.default': ` (default)`;
