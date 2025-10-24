@@ -93,7 +93,10 @@ export const CellsGlobalView = ({
       )}
       {showTable && <CellsTable nodes={nodes} cellsRepository={cellsRepository} />}
       {showNoFiles && (
-        <CellsStateInfo heading={t('cells.noNodes.heading')} description={t('cells.noNodes.description')} />
+        <CellsStateInfo
+          heading={t('cells.noNodes.global.heading')}
+          description={t('cells.noNodes.global.description')}
+        />
       )}
       {showLoader && <CellsLoader />}
       {isError && <CellsStateInfo heading={t('cells.error.heading')} description={t('cells.error.description')} />}

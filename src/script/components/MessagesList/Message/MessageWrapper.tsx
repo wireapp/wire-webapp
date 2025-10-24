@@ -17,6 +17,7 @@
  *
  */
 
+import {CONVERSATION_CELLS_STATE} from '@wireapp/api-client/lib/conversation';
 import {ReactionType} from '@wireapp/core/lib/conversation';
 import {amplify} from 'amplify';
 import ko from 'knockout';
@@ -123,6 +124,10 @@ export const MessageWrapper = ({
   };
   const {display_name: displayName} = useKoSubscribableChildren(conversation, ['display_name']);
   const isFileShareRestricted = !teamState.isFileSharingReceivingEnabled();
+
+  const isCellsConversation =
+    conversation.cellsState() === CONVERSATION_CELLS_STATE.READY ||
+    conversation.cellsState() === CONVERSATION_CELLS_STATE.PENDING;
 
   const contextMenuEntries = ko.pureComputed(() => {
     const entries: ContextMenuEntry[] = [];
@@ -255,6 +260,7 @@ export const MessageWrapper = ({
         shouldShowInvitePeople={shouldShowInvitePeople}
         isSelfTemporaryGuest={isSelfTemporaryGuest}
         classifiedDomains={teamState.classifiedDomains()}
+        isCellsConversation={isCellsConversation}
       />
     );
   }
