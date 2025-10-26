@@ -10816,7 +10816,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"cross-spawn@npm:^7.0.0, cross-spawn@npm:^7.0.1, cross-spawn@npm:^7.0.2, cross-spawn@npm:^7.0.3":
+"cross-spawn@npm:^7.0.0, cross-spawn@npm:^7.0.1, cross-spawn@npm:^7.0.2, cross-spawn@npm:^7.0.3, cross-spawn@npm:^7.0.6":
   version: 7.0.6
   resolution: "cross-spawn@npm:7.0.6"
   dependencies:
@@ -20487,7 +20487,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"string-argv@npm:^0.3.1, string-argv@npm:^0.3.2":
+"string-argv@npm:^0.3.2":
   version: 0.3.2
   resolution: "string-argv@npm:0.3.2"
   checksum: 10/f9d3addf887026b4b5f997a271149e93bf71efc8692e7dc0816e8807f960b18bcb9787b45beedf0f97ff459575ee389af3f189d8b649834cac602f2e857e75af
@@ -21374,19 +21374,19 @@ __metadata:
   languageName: node
   linkType: hard
 
-"tsc-watch@npm:6.2.1":
-  version: 6.2.1
-  resolution: "tsc-watch@npm:6.2.1"
+"tsc-watch@npm:7.2.0":
+  version: 7.2.0
+  resolution: "tsc-watch@npm:7.2.0"
   dependencies:
-    cross-spawn: "npm:^7.0.3"
+    cross-spawn: "npm:^7.0.6"
     node-cleanup: "npm:^2.1.2"
     ps-tree: "npm:^1.2.0"
-    string-argv: "npm:^0.3.1"
+    string-argv: "npm:^0.3.2"
   peerDependencies:
     typescript: "*"
   bin:
     tsc-watch: dist/lib/tsc-watch.js
-  checksum: 10/ba6dfa6cb9fd2a28e892e5a51a2027166cab7f83c7921e7d7b189014e0ea10eebdc39304800d589871765ff2328178c322696e5dc504b0025a2d112a95c8b51b
+  checksum: 10/988b4d0385f354423dba46b84699d1653c1e1e5af375c1745013ac4d6b4f6cacdc8c38b79774b676eef7a57ab9b6214aaea4a043b0d6eebfd1837224faeeace5
   languageName: node
   linkType: hard
 
@@ -22694,7 +22694,7 @@ __metadata:
     svg-inline-loader: "npm:0.8.2"
     text-encoding: "npm:0.7.0"
     ts-node: "npm:10.9.2"
-    tsc-watch: "npm:6.2.1"
+    tsc-watch: "npm:7.2.0"
     tsyringe: "npm:4.10.0"
     typescript: "npm:5.5.2"
     underscore: "npm:1.13.7"

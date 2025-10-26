@@ -167,7 +167,7 @@
     "svg-inline-loader": "0.8.2",
     "text-encoding": "0.7.0",
     "ts-node": "10.9.2",
-    "tsc-watch": "6.2.1",
+    "tsc-watch": "7.2.0",
     "typescript": "5.5.2",
     "webpack": "5.102.1",
     "webpack-bundle-analyzer": "^4.10.2",
