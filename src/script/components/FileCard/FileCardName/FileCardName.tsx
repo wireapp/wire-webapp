@@ -32,7 +32,7 @@ interface FileCardNameProps {
   variant?: 'primary' | 'secondary';
 }
 
-export const FileCardName = ({truncateAfterLines = 1, variant = 'primary'}: FileCardNameProps) => {
+export const FileCardName = ({truncateAfterLines = 2, variant = 'primary'}: FileCardNameProps) => {
   const {name} = useFileCardContext();
 
   return (
