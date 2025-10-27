@@ -225,7 +225,7 @@ test.describe('Block', () => {
           await userAPages.startUI().selectUser(userB.username);
           await userAModals.userProfile().clickConnectButton();
 
-          expect(await userAPages.conversationList().isConversationItemVisible(userB.fullName));
+          expect(await userAPages.conversationList().isConversationItemVisible(userB.fullName)).toBeTruthy();
           await expect(await userBPageManager.getPage()).toHaveTitle('(1) Wire');
 
           await userBPages.conversationList().openPendingConnectionRequest();
@@ -309,7 +309,7 @@ test.describe('Block', () => {
         await userAPages.groupCreation().clickCreateGroupButton();
 
         // Step 3: Modal 'modalConversationNotConnectedMessageOne' is visible
-        expect(userAModals.conversationNotConnected().isModalPresent());
+        expect(userAModals.conversationNotConnected().isModalPresent()).toBeTruthy();
       });
     },
   );
@@ -353,7 +353,7 @@ test.describe('Block', () => {
           await userAPages.startUI().selectUser(userB.username);
           await userAModals.userProfile().clickConnectButton();
 
-          expect(await userAPages.conversationList().isConversationItemVisible(userB.fullName));
+          expect(await userAPages.conversationList().isConversationItemVisible(userB.fullName)).toBeTruthy();
           await expect(await userBPageManager.getPage()).toHaveTitle('(1) Wire');
         });
       });
@@ -384,7 +384,7 @@ test.describe('Block', () => {
         // Step 3: User A opens modal and clicks 'Block' button
         await userAPages.conversationList().clickBlockConversation();
         // Step 4: Block Modal is visible
-        expect(userAModals.blockWarning().isModalPresent());
+        expect(userAModals.blockWarning().isModalPresent()).toBeTruthy();
         // Step 5: User A blocks User B
         await userAModals.blockWarning().clickBlock();
         // [Unwanted/current behavior] Conversation is still present, and User A can open it
