@@ -26,6 +26,7 @@ import {
   MessageSendingStatus,
   RemoteConversations,
   ADD_PERMISSION,
+  CONVERSATION_CELLS_STATE,
 } from '@wireapp/api-client/lib/conversation';
 import {
   MemberLeaveReason,
@@ -1283,6 +1284,19 @@ export class ConversationRepository {
    */
   public readonly getAllGroupConversations = (): Conversation[] => {
     return this.conversationState.conversations().filter(conversation => conversation.isGroupOrChannel());
+  };
+
+  /**
+   * Get all the group conversations with Cells enabled.
+   */
+  public readonly getAllCellEnabledGroupConversations = (): Conversation[] => {
+    return this.conversationState
+      .conversations()
+      .filter(
+        conversation =>
+          conversation.cellsState() === CONVERSATION_CELLS_STATE.READY ||
+          conversation.cellsState() === CONVERSATION_CELLS_STATE.PENDING,
+      );
   };
 
   /**
