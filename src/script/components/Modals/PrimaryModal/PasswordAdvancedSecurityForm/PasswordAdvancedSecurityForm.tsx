@@ -21,6 +21,8 @@ import type {ReactElement, ChangeEvent, FormEvent} from 'react';
 
 import {Input} from '@wireapp/react-ui-kit';
 
+import {t} from 'Util/LocalizerUtil';
+
 interface PasswordAdvancedSecurityFormProps {
   onSubmit: (event: FormEvent<HTMLFormElement>) => void;
   inputValue: string;
@@ -45,6 +47,7 @@ export const PasswordAdvancedSecurityForm = ({
       <Input
         id="modal_pswd_with_rules"
         type="password"
+        togglePasswordBtnLabel={t('passwordToggleBtn')}
         value={inputValue}
         placeholder={inputPlaceholder}
         required

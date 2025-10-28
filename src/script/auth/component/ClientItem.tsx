@@ -311,6 +311,7 @@ const ClientItem = ({selected, onClientRemoval, onClick, client, clientError, re
                     placeholder={t('clientItem.passwordPlaceholder')}
                     required
                     type="password"
+                    togglePasswordBtnLabel={t('passwordToggleBtn')}
                     value={password}
                   />
                 </FlexBox>
