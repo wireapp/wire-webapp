@@ -69,6 +69,7 @@ export const useSearchCellsNodes = ({
           tags: filters.tags,
           sortBy: shouldSort ? 'mtime' : undefined,
           sortDirection: shouldSort ? 'desc' : undefined,
+          type: 'file',
         });
 
         const users = await getUsersFromNodes({
