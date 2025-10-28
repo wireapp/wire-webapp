@@ -274,6 +274,7 @@ declare module 'I18n/en-US.json' {
     'authLoginTitle': `Log in`;
     'authPlaceholderEmail': `Email`;
     'authPlaceholderPassword': `Password`;
+    'passwordToggleBtn': `Password is shown`;
     'authPostedResend': `Resend to {email}`;
     'authPostedResendAction': `No email showing up?`;
     'authPostedResendDetail': `Check your email inbox and follow the instructions.`;
