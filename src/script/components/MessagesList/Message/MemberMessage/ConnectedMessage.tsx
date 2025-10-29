@@ -88,7 +88,7 @@ export const ConnectedMessage = ({
         </div>
       )}
 
-      {!isOutgoingRequest && <E2eEncryptionMessage />}
+      {!isOutgoingRequest && <E2eEncryptionMessage isCellsConversation={false} />}
     </div>
   );
 };

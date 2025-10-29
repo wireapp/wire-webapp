@@ -69,6 +69,7 @@ export const useSearchCellsNodes = ({
           tags: filters.tags,
           sortBy: shouldSort ? 'mtime' : undefined,
           sortDirection: shouldSort ? 'desc' : undefined,
+          type: 'file',
         });
 
         const users = await getUsersFromNodes({
@@ -103,7 +104,14 @@ export const useSearchCellsNodes = ({
 
         setStatus('success');
       } catch (error) {
-        setStatus('error');
+        // If the user isn't part of any cells-enabled conversations, the user will not exist in Cells database
+        // the search will return a 401 error
+        const hasCellsConversations = conversationRepository.getAllCellEnabledGroupConversations().length > 0;
+        if (!hasCellsConversations) {
+          setStatus('success');
+        } else {
+          setStatus('error');
+        }
         setNodes([]);
         setPagination(null);
       }
