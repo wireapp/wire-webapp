@@ -857,7 +857,7 @@ export class Account extends TypedEventEmitter<Events> {
           try {
             const start = Date.now();
             const notificationTime = this.getNotificationEventTime(notification.payload[0]);
-            this.logger.info(`Processing legacy notifwication "${notification.id}" at ${notificationTime}`, {
+            this.logger.info(`Processing legacy notification "${notification.id}" at ${notificationTime}`, {
               notification,
             });
             this.logger.info(`Total notifications queue length: ${this.notificationProcessingQueue.getLength()}`);
