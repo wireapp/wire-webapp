@@ -464,11 +464,17 @@ const LoginComponent = ({
                   <>
                     <div>
                       {isEnterpriseLoginV2Enabled ? (
-                        <div css={{fontWeight: '500', fontSize: '1.5rem', marginBottom: '2rem'}}>
+                        <div
+                          css={{fontWeight: '500', fontSize: '1.5rem', marginBottom: '2rem'}}
+                          role="heading"
+                          aria-level={1}
+                          data-page-title
+                          tabIndex={-1}
+                        >
                           {t('index.welcome', {brandName: Config.getConfig().BACKEND_NAME})}
                         </div>
                       ) : (
-                        <Heading level={embedded ? '2' : '1'} center>
+                        <Heading level={embedded ? '2' : '1'} center data-page-title tabIndex={-1}>
                           {t('login.headline')}
                         </Heading>
                       )}
