@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [27.84.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@27.83.0...@wireapp/api-client@27.84.0) (2025-10-30)
+
+### Features
+
+* **api-client:** update UserGroup.ts to include membersCount ([#7521](https://github.com/wireapp/wire-web-packages/issues/7521)) ([72139a9](https://github.com/wireapp/wire-web-packages/commit/72139a9bc9007351069c9c54410df6f593f8ad0e))
+
 # [27.83.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@27.82.4...@wireapp/api-client@27.83.0) (2025-10-30)
 
 ### Features
