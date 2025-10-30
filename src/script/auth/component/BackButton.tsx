@@ -27,12 +27,14 @@ export const BackButton = () => {
   const navigate = useNavigate();
 
   return (
-    <ArrowIcon
+    <button
+      type="button"
       onClick={() => navigate(-1)}
-      direction="left"
-      data-uie-name="go-index"
       aria-label={t('createPersonalAccount.goBack')}
-      color={COLOR.TEXT}
-    />
+      data-uie-name="go-index"
+      css={{background: 'none', border: 'none', cursor: 'pointer'}}
+    >
+      <ArrowIcon direction="left" aria-hidden="true" focusable="false" color={COLOR.TEXT} />
+    </button>
   );
 };
