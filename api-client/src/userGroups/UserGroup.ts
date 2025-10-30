@@ -24,5 +24,6 @@ export interface UserGroup {
   id: string;
   managedBy: UserGroupManagedBy;
   members: string[];
+  membersCount?: number;
   name: string;
 }
