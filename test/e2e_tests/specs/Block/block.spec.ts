@@ -25,6 +25,38 @@ import {addCreatedUser, tearDownAll} from 'test/e2e_tests/utils/tearDown.util';
 import {loginUser} from 'test/e2e_tests/utils/userActions';
 
 import {ApiManagerE2E} from '../../backend/apiManager.e2e';
+
+// Logs in a user and handles initial setup
+async function loginAndSetup(user: User, pageManager: PageManager) {
+  const {modals, components} = pageManager.webapp;
+  await pageManager.openMainPage();
+  await loginUser(user, pageManager);
+  await modals.dataShareConsent().clickDecline();
+  await components.conversationSidebar().isPageLoaded();
+}
+
+// Manually connects User A to user B via the UI
+async function connectUsersManually(
+  userA: User,
+  userB: User,
+  userAPageManager: PageManager,
+  userBPageManager: PageManager,
+) {
+  const {modals: userAModals, components: userAComponents, pages: userAPages} = userAPageManager.webapp;
+  const {pages: userBPages} = userBPageManager.webapp;
+
+  await userAComponents.conversationSidebar().clickConnectButton();
+  await userAPages.startUI().searchInput.fill(userB.username);
+  await userAPages.startUI().selectUser(userB.username);
+  await userAModals.userProfile().clickConnectButton();
+
+  expect(await userAPages.conversationList().isConversationItemVisible(userB.fullName)).toBeTruthy();
+  await expect(await userBPageManager.getPage()).toHaveTitle('(1) Wire');
+
+  await userBPages.conversationList().openPendingConnectionRequest();
+  await userBPages.connectRequest().clickConnectButton();
+}
+
 type testcaseFixtures = {
   pageManager: PageManager;
   api: ApiManagerE2E;
@@ -36,9 +68,7 @@ export const test = base.extend<testcaseFixtures>({
     await use(PageManager.from(page));
   },
 
-  api: async ({}, use) => {
-    await use(new ApiManagerE2E());
-  },
+  api: new ApiManagerE2E(),
 
   userBPageManager: async ({browser}, use) => {
     const context = await browser.newContext();
@@ -74,23 +104,7 @@ test.describe('Block', () => {
 
     // Login users
     await test.step('Preconditions: Signing in User A and User B', async () => {
-      const {modals: userAModals, components: userAComponents} = userAPageManager.webapp;
-      const {modals: userBModals, components: userBComponents} = userBPageManager.webapp;
-
-      await Promise.all([
-        (async () => {
-          await userAPageManager.openMainPage();
-          await loginUser(userA, userAPageManager);
-          await userAModals.dataShareConsent().clickDecline();
-          await userAComponents.conversationSidebar().isPageLoaded();
-        })(),
-        (async () => {
-          await userBPageManager.openMainPage();
-          await loginUser(userB, userBPageManager);
-          await userBModals.dataShareConsent().clickDecline();
-          await userBComponents.conversationSidebar().isPageLoaded();
-        })(),
-      ]);
+      await Promise.all([loginAndSetup(userA, userAPageManager), loginAndSetup(userB, userBPageManager)]);
 
       await api.connectUsers(userA, userB);
     });
@@ -191,8 +205,8 @@ test.describe('Block', () => {
     'Verify you can block and unblock user in 1on1 0',
     {tag: ['@TC-142', '@regression', '@no-setup']}, // @no-setup because otherwise 'New Device Modal' modal will show up which you cannot click away
     async ({pageManager: userAPageManager, userBPageManager, api}) => {
-      const {modals: userAModals, components: userAComponents, pages: userAPages} = userAPageManager.webapp;
-      const {modals: userBModals, components: userBComponents, pages: userBPages} = userBPageManager.webapp;
+      const {pages: userAPages} = userAPageManager.webapp;
+      const {modals: userBModals, pages: userBPages} = userBPageManager.webapp;
 
       await test.step('Preconditions: Creating preconditions for the test via API', async () => {
         await api.createPersonalUser(userA);
@@ -203,34 +217,11 @@ test.describe('Block', () => {
       });
 
       await test.step('Preconditions: Users A and B are signed in to the application', async () => {
-        await Promise.all([
-          (async () => {
-            await userAPageManager.openMainPage();
-            await loginUser(userA, userAPageManager);
-            await userAModals.dataShareConsent().clickDecline();
-            await userAComponents.conversationSidebar().isPageLoaded();
-          })(),
+        await Promise.all([loginAndSetup(userA, userAPageManager), loginAndSetup(userB, userBPageManager)]);
+      });
 
-          (async () => {
-            await userBPageManager.openMainPage();
-            await loginUser(userB, userBPageManager);
-            await userBModals.dataShareConsent().clickDecline();
-            await userBComponents.conversationSidebar().isPageLoaded();
-          })(),
-        ]);
-
-        await test.step('Preconditions: User A connects with User B', async () => {
-          await userAComponents.conversationSidebar().clickConnectButton();
-          await userAPages.startUI().searchInput.fill(userB.username);
-          await userAPages.startUI().selectUser(userB.username);
-          await userAModals.userProfile().clickConnectButton();
-
-          expect(await userAPages.conversationList().isConversationItemVisible(userB.fullName)).toBeTruthy();
-          await expect(await userBPageManager.getPage()).toHaveTitle('(1) Wire');
-
-          await userBPages.conversationList().openPendingConnectionRequest();
-          await userBPages.connectRequest().clickConnectButton();
-        });
+      await test.step('Preconditions: User A connects with User B', async () => {
+        await connectUsersManually(userA, userB, userAPageManager, userBPageManager);
       });
 
       // Step 1: User A sends message to chat with User B
@@ -318,8 +309,7 @@ test.describe('Block', () => {
     'Verify you can block a user you sent a connection request from conversation list 0',
     {tag: ['@TC-144', '@regression', '@no-setup']}, // @no-setup because connection request must be sent manually to satisfy test specs
     async ({pageManager: userAPageManager, userBPageManager, api}) => {
-      const {modals: userAModals, components: userAComponents, pages: userAPages} = userAPageManager.webapp;
-      const {modals: userBModals, components: userBComponents} = userBPageManager.webapp;
+      const {modals: userAModals, pages: userAPages} = userAPageManager.webapp;
 
       await test.step('Preconditions: Creating preconditions for the test via API', async () => {
         await api.createPersonalUser(userA);
@@ -330,32 +320,12 @@ test.describe('Block', () => {
       });
 
       await test.step('Preconditions: Users A and B are signed in to the application', async () => {
-        await Promise.all([
-          (async () => {
-            await userAPageManager.openMainPage();
-            await loginUser(userA, userAPageManager);
-            await userAModals.dataShareConsent().clickDecline();
-            await userAComponents.conversationSidebar().isPageLoaded();
-          })(),
+        await Promise.all([loginAndSetup(userA, userAPageManager), loginAndSetup(userB, userBPageManager)]);
+      });
 
-          (async () => {
-            await userBPageManager.openMainPage();
-            await loginUser(userB, userBPageManager);
-            await userBModals.dataShareConsent().clickDecline();
-            await userBComponents.conversationSidebar().isPageLoaded();
-          })(),
-        ]);
-
-        // Step 1: User A sends connection request to User B
-        await test.step('Preconditions: User A connects with User B', async () => {
-          await userAComponents.conversationSidebar().clickConnectButton();
-          await userAPages.startUI().searchInput.fill(userB.username);
-          await userAPages.startUI().selectUser(userB.username);
-          await userAModals.userProfile().clickConnectButton();
-
-          expect(await userAPages.conversationList().isConversationItemVisible(userB.fullName)).toBeTruthy();
-          await expect(await userBPageManager.getPage()).toHaveTitle('(1) Wire');
-        });
+      // Step 1: User A sends connection request to User B
+      await test.step('Preconditions: User A connects with User B', async () => {
+        await connectUsersManually(userA, userB, userAPageManager, userBPageManager);
       });
 
       // Step 2: User A blocks User B from conversation list
