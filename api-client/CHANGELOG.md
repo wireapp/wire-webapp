@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [27.83.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@27.82.4...@wireapp/api-client@27.83.0) (2025-10-30)
+
+### Features
+
+* **api-client:** add user_groups in User and TeamContact [WPB-16801] ([#7519](https://github.com/wireapp/wire-web-packages/issues/7519)) ([5db751e](https://github.com/wireapp/wire-web-packages/commit/5db751edf400bd6a31094c6ba41c5dd5e15a5d81))
+
 ## [27.82.4](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@27.82.3...@wireapp/api-client@27.82.4) (2025-10-23)
 
 **Note:** Version bump only for package @wireapp/api-client
