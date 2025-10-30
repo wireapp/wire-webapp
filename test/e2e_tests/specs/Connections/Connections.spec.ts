@@ -19,7 +19,7 @@
 
 import {getUser} from 'test/e2e_tests/data/user';
 import {PageManager} from 'test/e2e_tests/pageManager';
-import {startUpApp} from 'test/e2e_tests/utils/setup.util';
+import {completeLogin} from 'test/e2e_tests/utils/setup.util';
 import {tearDownAll} from 'test/e2e_tests/utils/tearDown.util';
 
 import {test, expect} from '../../test.fixtures';
@@ -27,15 +27,10 @@ import {test, expect} from '../../test.fixtures';
 test.describe('Connections', () => {
   test.slow();
 
-  //   let owner = getUser();
   const members = Array.from({length: 2}, () => getUser());
   const [memberA, memberB] = members;
 
   test.beforeAll(async ({api}) => {
-    // const user = await setupBasicTestScenario(api, members, owner, teamName);
-    // owner = {...owner, ...user};
-    // add single user
-    // add user
     await api.createPersonalUser(memberA);
     await api.createPersonalUser(memberB);
   });
@@ -44,33 +39,41 @@ test.describe('Connections', () => {
     'Verify 1on1 conversation is not created on the second end after you ignore connection request',
     {tag: ['@TC-365', '@TC-369', '@TC-370', '@TC-371', '@regression']},
     async ({pageManager: memberPageManagerA, browser}) => {
-      const {pages, components, modals} = memberPageManagerA.webapp;
       const memberContext = await browser.newContext();
       const memberPage = await memberContext.newPage();
       const memberPageManagerB = PageManager.from(memberPage);
 
-      await Promise.all([startUpApp(memberPageManagerA, memberA), startUpApp(memberPageManagerB, memberB)]);
+      const {pages, components, modals} = memberPageManagerA.webapp;
+      const {pages: pagesB} = memberPageManagerB.webapp;
+
+      await Promise.all([completeLogin(memberPageManagerA, memberA), completeLogin(memberPageManagerB, memberB)]);
 
       await components.conversationSidebar().clickConnectButton();
-      await components.contactList().clickOnContact(memberB.fullName);
-      await modals.userProfile().clickStartConversation();
-      // check that user b has an request
+      await pages.startUI().selectUser(memberB.username);
+      await modals.userProfile().clickConnectButton();
+      await pagesB.conversationList().openPendingConnectionRequest();
+      await pagesB.conversation().clickItemPendingRequest();
+      await pagesB.conversation().clickIgnoreButton();
 
-      // test.step('Verify sending a connection request to user from conversation view', () => {
+      await expect(pagesB.conversation().itemPendingRequest).toHaveCount(0);
 
-      // });
-
-      test.step('I want to cancel a pending request from conversation list', () => {
-        // cancel request
-        // expect that the conversaion is away
+      await test.step('I want to cancel a pending request from conversation list', async () => {
+        await pages.conversation().clickCancelRequest();
+        await modals.cancelRequest().clickAction();
       });
 
-      test.step('I want to archive a pending request from conversation list', () => {
-        // move current conversastion to archive
-        // check if the conversation is in the archive tab
-      });
+      await test.step('I want to archive a pending request from conversation list', async () => {
+        await components.conversationSidebar().clickConnectButton();
+        await pages.startUI().selectUser(memberB.username);
+        await modals.userProfile().clickConnectButton();
+        await pagesB.conversationList().openPendingConnectionRequest();
+        await pagesB.conversation().clickItemPendingRequest();
+        await pages.conversationList().clickConversationOptions(memberB.fullName);
+        await pages.conversationList().archiveConversation();
+        await components.conversationSidebar().clickArchive();
 
-      expect(await pages.conversationList().isConversationItemVisible(memberB.fullName)).toBeTruthy();
+        expect(await pages.conversationList().isConversationItemVisible(memberB.fullName)).toBeTruthy();
+      });
     },
   );
 
