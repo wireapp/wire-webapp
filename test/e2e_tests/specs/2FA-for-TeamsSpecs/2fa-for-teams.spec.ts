@@ -18,7 +18,7 @@
  */
 
 import {getUser, User} from 'test/e2e_tests/data/user';
-import {setupBasicTestScenario} from 'test/e2e_tests/utils/setup.util';
+import {bootstrapTeamForTesting} from 'test/e2e_tests/utils/setup.util';
 import {tearDownAll} from 'test/e2e_tests/utils/tearDown.util';
 import {loginUser} from 'test/e2e_tests/utils/userActions';
 
@@ -31,7 +31,7 @@ test.describe('f2a for teams', () => {
   const member1 = getUser();
 
   test.beforeAll(async ({api}) => {
-    const user = await setupBasicTestScenario(api, [member1], owner, teamName);
+    const user = await bootstrapTeamForTesting(api, [member1], owner, teamName);
     owner = {...owner, ...user};
 
     await api.brig.unlockSndFactorPasswordChallenge(owner.teamId);

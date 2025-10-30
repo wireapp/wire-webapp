@@ -29,11 +29,11 @@ export abstract class BaseModal {
 
   constructor(page: Page, modalLocator: string) {
     this.page = page;
-    this.modal = page.locator(modalLocator);
-    this.modalTitle = this.modal.locator("[data-uie-name='status-modal-title']");
-    this.modalText = this.modal.locator("[data-uie-name='status-modal-text']");
-    this.actionButton = this.modal.locator("[data-uie-name='do-action']");
-    this.cancelButton = this.modal.locator("[data-uie-name='do-secondary']");
+    this.modal = page.getByTestId(modalLocator);
+    this.modalTitle = this.modal.getByTestId('status-modal-title');
+    this.modalText = this.modal.getByTestId('status-modal-text');
+    this.actionButton = this.modal.getByTestId('do-action');
+    this.cancelButton = this.modal.getByTestId('do-secondary');
   }
 
   async isModalPresent() {

@@ -42,6 +42,7 @@ import {CreatGuestLinkModal} from './webapp/modals/createGuestLink.modal';
 import {DataShareConsentModal} from './webapp/modals/dataShareConsent.modal';
 import {DeleteAccountModal} from './webapp/modals/deleteAccount.modal';
 import {DetailViewModal} from './webapp/modals/detailView.modal';
+import {ErrorModal} from './webapp/modals/error.modal';
 import {ExportBackupModal} from './webapp/modals/exportBackup.modal';
 import {importBackupModal} from './webapp/modals/importBackup.modal';
 import {LeaveConversationModal} from './webapp/modals/leaveConversation.modal';
@@ -64,6 +65,7 @@ import {HistoryExportPage} from './webapp/pages/historyExport.page';
 import {HistoryImportPage} from './webapp/pages/historyImport.page';
 import {HistoryInfoPage} from './webapp/pages/infoHistory.page';
 import {LoginPage} from './webapp/pages/login.page';
+import {OptionsPage} from './webapp/pages/options.page';
 import {OutgoingConnectionPage} from './webapp/pages/outgoingConnection.page';
 import {ParticipantDetails} from './webapp/pages/participantDetails.page';
 import {RegisterSuccessPage} from './webapp/pages/registerSuccess.page';
@@ -162,6 +164,7 @@ export class PageManager {
       connectRequest: () => this.getOrCreate('webapp.pages.connectRequest', () => new ConnectRequestPage(this.page)),
       calling: () => this.getOrCreate('webapp.pages.calling', () => new CallingPage(this.page)),
       settings: () => this.getOrCreate('webapp.pages.settings', () => new SettingsPage(this.page)),
+      options: () => this.getOrCreate('webapp.pages.options', () => new OptionsPage(this.page)),
       audioVideoSettings: () =>
         this.getOrCreate('webapp.pages.audioVideoSettings', () => new AudioVideoSettingsPage(this.page)),
       outgoingConnection: () =>
@@ -183,6 +186,7 @@ export class PageManager {
       setUsername: () => this.getOrCreate('webapp.pages.setUsername', () => new SetUsernamePage(this.page)),
     },
     modals: {
+      errorModal: () => this.getOrCreate('webapp.modals.errorModal', () => new ErrorModal(this.page)),
       dataShareConsent: () =>
         this.getOrCreate('webapp.modals.dataShareConsent', () => new DataShareConsentModal(this.page)),
       appLock: () => this.getOrCreate('webapp.modals.appLock', () => new AppLockModal(this.page)),

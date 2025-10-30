@@ -33,8 +33,13 @@ export class AccountPage {
   readonly restoreBackupButton: Locator;
   readonly logoutButton: Locator;
   readonly emailDisplay: Locator;
+  readonly nameDisplay: Locator;
+  readonly domainDisplay: Locator;
+  readonly usernameDisplay: Locator;
   readonly editEmailButton: Locator;
+  readonly editDisplayNameButton: Locator;
   readonly emailInput: Locator;
+  readonly displayNameInput: Locator;
   readonly resetPasswordButton: Locator;
   readonly receiveNewsletterCheckbox: Locator;
   readonly typingIndicator: Locator;
@@ -51,8 +56,13 @@ export class AccountPage {
     this.restoreBackupButton = page.locator("[data-uie-name='do-backup-import']+button");
     this.logoutButton = page.locator(selectByDataAttribute('do-logout'));
     this.editEmailButton = page.locator(selectByDataAttribute('go-edit-email'));
+    this.editDisplayNameButton = page.locator(selectByDataAttribute('go-edit-email'));
     this.emailInput = page.locator(selectByDataAttribute('enter-email-input'));
+    this.displayNameInput = page.locator(selectByDataAttribute('enter-displayname-input'));
     this.emailDisplay = page.locator(selectByDataAttribute('email-display'));
+    this.nameDisplay = page.locator(selectByDataAttribute('displayname-display'));
+    this.domainDisplay = page.locator(selectByDataAttribute('item-enriched-value'));
+    this.usernameDisplay = page.locator(selectByDataAttribute('username-display'));
     this.resetPasswordButton = page.locator(selectByDataAttribute('do-reset-password'));
     this.receiveNewsletterCheckbox = page.locator("[data-uie-name='status-preference-marketing']+label");
     this.typingIndicator = page.locator("[data-uie-name='status-preference-typing-indicator']+label");
@@ -112,5 +122,11 @@ export class AccountPage {
     await this.editEmailButton.click();
     await this.emailInput.fill(newEmail);
     await this.emailInput.press('Enter');
+  }
+
+  async changeName(newName: string) {
+    await this.editDisplayNameButton.click();
+    await this.displayNameInput.fill(newName);
+    await this.displayNameInput.press('Enter');
   }
 }

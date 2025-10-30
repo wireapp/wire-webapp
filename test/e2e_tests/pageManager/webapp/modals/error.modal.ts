@@ -17,33 +17,12 @@
  *
  */
 
-import {CSSObject} from '@emotion/react';
+import {Page} from '@playwright/test';
 
-export const textStyles: CSSObject = {
-  fontSize: 'var(--font-size-medium)',
-  lineHeight: 'var(--line-height-md)',
-  margin: 0,
-  display: '-webkit-box',
-  WebkitLineClamp: 'var(--truncate-after-lines)',
-  WebkitBoxOrient: 'vertical',
-  overflow: 'hidden',
-  textOverflow: 'ellipsis',
-  marginTop: '4px',
+import {BaseModal} from './base.modal';
 
-  '[data-file-card="header"] &': {
-    marginTop: '0',
-  },
-};
-
-export const primaryStyles: CSSObject = {
-  fontWeight: 'var(--font-weight-medium)',
-};
-
-export const secondaryStyles: CSSObject = {
-  fontWeight: 'var(--font-weight-regular)',
-  color: 'var(--gray-70)',
-
-  'body.dark &': {
-    color: 'var(--gray-40)',
-  },
-};
+export class ErrorModal extends BaseModal {
+  constructor(page: Page) {
+    super(page, 'primary-modals-container');
+  }
+}

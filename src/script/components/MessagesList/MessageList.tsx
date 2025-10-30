@@ -307,6 +307,7 @@ export const MessagesList: FC<MessagesListParams> = ({
                 : undefined;
 
               const key = `${message.id || 'message'}-${message.timestamp()}`;
+
               const isHighlighted = !!highlightedMessage && highlightedMessage === message.id;
               const isFocused = !!focusedId && focusedId === message.id;
 
