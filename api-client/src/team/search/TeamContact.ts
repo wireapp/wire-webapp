@@ -20,7 +20,10 @@
 import {Role} from '..';
 import {User, ManagedSource} from '../../user/';
 
-export type TeamContact = Pick<User, 'id' | 'email' | 'accent_id' | 'handle' | 'name' | 'team' | 'searchable'> & {
+export type TeamContact = Pick<
+  User,
+  'id' | 'email' | 'accent_id' | 'handle' | 'name' | 'team' | 'searchable' | 'user_groups'
+> & {
   /** Timestamp of invitation creation. */
   created_at?: string;
   email_unvalidated: string | null;

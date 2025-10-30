@@ -27,4 +27,5 @@ export interface UserGroupSearchOptions {
   last_seen_name?: string;
   last_seen_created_at?: string;
   last_seen_id?: string;
+  include_member_count?: boolean;
 }

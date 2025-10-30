@@ -35,6 +35,7 @@ export interface User {
   id: string;
   name: string;
   picture?: Picture[];
+  user_groups?: string[];
   qualified_id: QualifiedId;
   service?: ServiceRef;
   team?: string;
