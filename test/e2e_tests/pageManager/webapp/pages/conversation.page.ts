@@ -51,6 +51,9 @@ export class ConversationPage {
   readonly messageItems: Locator;
   readonly filesTab: Locator;
   readonly isTypingIndicator: Locator;
+  readonly itemPendingRequest: Locator;
+  readonly ignoreButton: Locator;
+  readonly cancelRequest: Locator;
 
   readonly getImageAltText = (user: User) => `Image from ${user.fullName}`;
 
@@ -86,6 +89,9 @@ export class ConversationPage {
     );
     this.filesTab = page.locator('#conversation-tab-files');
     this.isTypingIndicator = page.locator(selectByDataAttribute('typing-indicator-title'));
+    this.itemPendingRequest = page.locator(selectByDataAttribute('item-pending-requests'));
+    this.ignoreButton = page.getByTestId('do-ignore');
+    this.cancelRequest = page.getByTestId('do-cancel-request');
   }
 
   protected getImageLocator(user: User): Locator {
@@ -99,6 +105,10 @@ export class ConversationPage {
       (await this.page.locator(selectByDataAttribute('status-conversation-title-bar-label')).textContent()) ===
       conversationName
     );
+  }
+
+  async clickItemPendingRequest() {
+    await this.itemPendingRequest.click();
   }
 
   async clickConversationTitle() {
@@ -115,6 +125,14 @@ export class ConversationPage {
 
   async clickFilesTab() {
     await this.filesTab.click();
+  }
+
+  async clickIgnoreButton() {
+    await this.ignoreButton.click();
+  }
+
+  async clickCancelRequest() {
+    await this.cancelRequest.click();
   }
 
   async isWatermarkVisible() {
