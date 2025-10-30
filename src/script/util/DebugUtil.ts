@@ -232,6 +232,14 @@ export class DebugUtil {
     );
   }
 
+  isGzippingEnabled(): boolean {
+    return this.apiClient.transport.http.isGzipEnabled();
+  }
+
+  toggleGzipping(enabled: boolean) {
+    this.apiClient.transport.http.toggleGzip(enabled);
+  }
+
   enableCameraBlur(flag: boolean) {
     return this.callingRepository.switchVideoBackgroundBlur(flag);
   }

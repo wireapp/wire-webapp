@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2018 Wire Swiss GmbH
+ * Copyright (C) 2025 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,21 +17,12 @@
  *
  */
 
-import {Router} from 'express';
+import {Page} from '@playwright/test';
 
-export const AppleAssociationRoute = () =>
-  Router().get('/apple-app-site-association', (_req, res) => {
-    const response = {
-      webcredentials: {
-        apps: [
-          'EDF3JCE8BC.com.wearezeta.zclient.ios',
-          'EDF3JCE8BC.com.wearezeta.zclient.alpha',
-          'EDF3JCE8BC.com.wearezeta.zclient.development',
-          'EDF3JCE8BC.com.wearezeta.zclient.ios.beta',
-          'EDF3JCE8BC.com.wearezeta.zclient.ios.edge',
-        ],
-      },
-    };
+import {BaseModal} from './base.modal';
 
-    res.send(response);
-  });
+export class ErrorModal extends BaseModal {
+  constructor(page: Page) {
+    super(page, 'primary-modals-container');
+  }
+}

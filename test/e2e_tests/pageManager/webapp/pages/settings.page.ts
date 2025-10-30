@@ -24,11 +24,13 @@ export class SettingsPage {
 
   readonly audioVideoSettingsButton: Locator;
   readonly accountButton: Locator;
+  readonly optionsButton: Locator;
 
   constructor(page: Page) {
     this.page = page;
     this.audioVideoSettingsButton = page.locator("[data-uie-name='go-audio-video']");
     this.accountButton = page.locator("[data-uie-name='go-account']");
+    this.optionsButton = page.locator("[data-uie-name='go-options']");
   }
 
   async clickAudioVideoSettingsButton() {
@@ -37,5 +39,9 @@ export class SettingsPage {
 
   async clickAccountButton() {
     await this.accountButton.click();
+  }
+
+  async clickOptionsButton() {
+    await this.optionsButton.click();
   }
 }

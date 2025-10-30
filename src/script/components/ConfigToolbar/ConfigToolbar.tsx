@@ -32,6 +32,7 @@ import {wrapperStyles} from './ConfigToolbar.styles';
 
 export function ConfigToolbar() {
   const [showConfig, setShowConfig] = useState(false);
+  const [isGzipEnabled, setIsGzipEnabled] = useState(window.wire?.app.debug?.isGzippingEnabled() || false);
   const [configFeaturesState, setConfigFeaturesState] = useState<Configuration['FEATURE']>(Config.getConfig().FEATURE);
   const [isMessageSendingActive, setIsMessageSendingActive] = useState(false);
   const messageCountRef = useRef<number>(0);
@@ -182,7 +183,7 @@ export function ConfigToolbar() {
     setAvsDebuggerEnabled(!!window.wire?.app?.debug?.enableAvsDebugger(isChecked));
   };
 
-  const renderAvsSwitch = (value: boolean) => {
+  const renderAvsSwitch = () => {
     return (
       <div style={{marginBottom: '10px'}}>
         <label htmlFor="avs-debugger-checkbox" style={{display: 'block', fontWeight: 'bold'}}>
@@ -200,7 +201,7 @@ export function ConfigToolbar() {
   const handleAvsRustSftEnable = (isChecked: boolean) => {
     setAvsRustSftEnabled(!!window.wire?.app?.debug?.enableAvsRustSFT(isChecked));
   };
-  const renderAvsRustSftSwitch = (value: boolean) => {
+  const renderAvsRustSftSwitch = () => {
     return (
       <div style={{marginBottom: '10px'}}>
         <label htmlFor="avs-rust-sft-checkbox" style={{display: 'block', fontWeight: 'bold'}}>
@@ -210,6 +211,26 @@ export function ConfigToolbar() {
           id="avs-rust-sft-checkbox"
           checked={avsRustSftEnabled}
           onToggle={isChecked => handleAvsRustSftEnable(isChecked)}
+        />
+      </div>
+    );
+  };
+
+  const renderGzipSwitch = () => {
+    return (
+      <div style={{marginBottom: '10px'}}>
+        <label htmlFor="gzip-checkbox" style={{display: 'block', fontWeight: 'bold'}}>
+          ENABLE GZIP
+        </label>
+        <Switch
+          id="gzip-checkbox"
+          checked={isGzipEnabled}
+          onToggle={() => {
+            setIsGzipEnabled(previousIsGzipEnabled => {
+              window.wire?.app?.debug?.toggleGzipping(!previousIsGzipEnabled);
+              return !previousIsGzipEnabled;
+            });
+          }}
         />
       </div>
     );
@@ -235,11 +256,15 @@ export function ConfigToolbar() {
       <Button onClick={() => window.wire?.app?.debug?.enablePressSpaceToUnmute()}>enablePressSpaceToUnmute</Button>
       <Button onClick={() => window.wire?.app?.debug?.disablePressSpaceToUnmute()}>disablePressSpaceToUnmute</Button>
 
-      <div>{renderAvsSwitch(avsDebuggerEnabled)}</div>
+      <div>{renderAvsSwitch()}</div>
 
       <hr />
 
-      <div>{renderAvsRustSftSwitch(avsRustSftEnabled)}</div>
+      <div>{renderAvsRustSftSwitch()}</div>
+
+      <hr />
+
+      <div>{renderGzipSwitch()}</div>
 
       <hr />
 
