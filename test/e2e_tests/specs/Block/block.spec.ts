@@ -22,40 +22,15 @@ import {test as base, expect} from '@playwright/test';
 import {getUser, User} from 'test/e2e_tests/data/user';
 import {PageManager} from 'test/e2e_tests/pageManager';
 import {addCreatedUser, tearDownAll} from 'test/e2e_tests/utils/tearDown.util';
-import {loginUser} from 'test/e2e_tests/utils/userActions';
+import {
+  loginAndSetup,
+  connectUsersManually,
+  blockUserFromConversationList,
+  blockUserFromProfileView,
+  blockUserFromOpenGroupProfileView,
+} from 'test/e2e_tests/utils/userActions';
 
 import {ApiManagerE2E} from '../../backend/apiManager.e2e';
-
-// Logs in a user and handles initial setup
-async function loginAndSetup(user: User, pageManager: PageManager) {
-  const {modals, components} = pageManager.webapp;
-  await pageManager.openMainPage();
-  await loginUser(user, pageManager);
-  await modals.dataShareConsent().clickDecline();
-  await components.conversationSidebar().isPageLoaded();
-}
-
-// Manually connects User A to user B via the UI
-async function connectUsersManually(
-  userA: User,
-  userB: User,
-  userAPageManager: PageManager,
-  userBPageManager: PageManager,
-) {
-  const {modals: userAModals, components: userAComponents, pages: userAPages} = userAPageManager.webapp;
-  const {pages: userBPages} = userBPageManager.webapp;
-
-  await userAComponents.conversationSidebar().clickConnectButton();
-  await userAPages.startUI().searchInput.fill(userB.username);
-  await userAPages.startUI().selectUser(userB.username);
-  await userAModals.userProfile().clickConnectButton();
-
-  expect(await userAPages.conversationList().isConversationItemVisible(userB.fullName)).toBeTruthy();
-  await expect(await userBPageManager.getPage()).toHaveTitle('(1) Wire');
-
-  await userBPages.conversationList().openPendingConnectionRequest();
-  await userBPages.connectRequest().clickConnectButton();
-}
 
 type testcaseFixtures = {
   pageManager: PageManager;
@@ -90,10 +65,7 @@ test.describe('Block', () => {
     userA = getUser();
     userB = getUser();
 
-    if (testInfo.tags.includes('@no-setup')) {
-      return;
-    }
-    // Create the users
+    // Step 1: Create and log in users
     await test.step('Preconditions: Creating test users via API', async () => {
       await api.createPersonalUser(userA);
       addCreatedUser(userA);
@@ -102,12 +74,17 @@ test.describe('Block', () => {
       addCreatedUser(userB);
     });
 
-    // Login users
     await test.step('Preconditions: Signing in User A and User B', async () => {
       await Promise.all([loginAndSetup(userA, userAPageManager), loginAndSetup(userB, userBPageManager)]);
-
-      await api.connectUsers(userA, userB);
     });
+
+    // Step 2: Connect users (Conditional)
+    // Skipped if '@no-setup' is present, as these tests require a manual connection
+    if (!testInfo.tags.includes('@no-setup')) {
+      await test.step('Preconditions: Connecting users via API', async () => {
+        await api.connectUsers(userA, userB);
+      });
+    }
   });
 
   test(
@@ -136,22 +113,13 @@ test.describe('Block', () => {
     'Verify you can block a person from profile view 0',
     {tag: ['@TC-140', '@regression']},
     async ({pageManager: userAPageManager}) => {
-      // TODO: conversation is still present in conversationList after blocking
       await test.step('User A wants to block User B from profile view 0', async () => {
-        const {pages, modals} = userAPageManager.webapp;
-        // Step 1: User A opens conversation with User B
-        await pages.conversationList().openConversation(userB.fullName);
-        // Step 2: User A clicks on profile view 0
-        await pages.conversation().clickConversationInfoButton();
-        // Step 3: User wants to block User B
-        await pages.participantDetails().blockUser();
-        // Step 4: 'Cancel' button is visible
-        await expect(modals.blockWarning().cancelButton).toBeVisible();
-        // Step 5: User A blocks User B via profile view 0
-        await modals.blockWarning().clickBlock();
+        await blockUserFromProfileView(userAPageManager, userB);
+
+        // TODO: Remaining steps/assertions of the test
         // Step 6: User A gets redirected back to conversation list
         // Step 7: Conversation with User B disappeared from main contact list
-        // Step 8: next contact of contact list from User A is selected
+        // Step 8: Next contact of contact list from User A is selected
       });
     },
   );
@@ -160,7 +128,7 @@ test.describe('Block', () => {
     'Verify you still receive messages from blocked person in a group chat 0',
     {tag: ['@TC-141', '@regression']},
     async ({pageManager: userAPageManager, userBPageManager}) => {
-      const {pages: userAPages, modals: userAModals, components: userAComponents} = userAPageManager.webapp;
+      const {pages: userAPages, components: userAComponents} = userAPageManager.webapp;
       const {pages: userBPages} = userBPageManager.webapp;
       const conversationName = 'Groupchat with User A and User B';
 
@@ -170,25 +138,23 @@ test.describe('Block', () => {
         await userAPages.groupCreation().setGroupName(conversationName);
         await userAPages.startUI().selectUsers([userB.username]);
         await userAPages.groupCreation().clickCreateGroupButton();
+        await userBPages.conversationList().openConversation(conversationName);
       });
 
       // Step 1: User B sends message to group chat with User A
       await test.step('User B sends messages to group', async () => {
-        await userBPages.conversationList().openConversation(conversationName);
         await userBPages.conversation().sendMessage('message before block');
       });
 
       // Step 2: User A blocks User B from group conversation
       await test.step('User A blocks User B from group conversation', async () => {
-        await userAPages.conversation().clickConversationTitle();
-        await userAPages.conversationDetails().openParticipantDetails(userB.fullName);
-        await userAPages.participantDetails().blockUser();
-        await userAModals.blockWarning().clickBlock();
+        // Ensures User A is in the group before blocking
+        await userAPages.conversationList().openConversation(conversationName);
+        await blockUserFromOpenGroupProfileView(userAPageManager, userB);
       });
 
       // Step 3: User B writes second message to the group chat after being blocked by User A
       await test.step('User B sends messages to group', async () => {
-        await userBPages.conversationList().openConversation(conversationName);
         await userBPages.conversation().sendMessage('message after block');
       });
 
@@ -204,21 +170,9 @@ test.describe('Block', () => {
     // TODO: Bug [WPB-18226] Message is not visible in the conversation after sending it
     'Verify you can block and unblock user in 1on1 0',
     {tag: ['@TC-142', '@regression', '@no-setup']}, // @no-setup because otherwise 'New Device Modal' modal will show up which you cannot click away
-    async ({pageManager: userAPageManager, userBPageManager, api}) => {
+    async ({pageManager: userAPageManager, userBPageManager}) => {
       const {pages: userAPages} = userAPageManager.webapp;
-      const {modals: userBModals, pages: userBPages} = userBPageManager.webapp;
-
-      await test.step('Preconditions: Creating preconditions for the test via API', async () => {
-        await api.createPersonalUser(userA);
-        addCreatedUser(userA);
-
-        await api.createPersonalUser(userB);
-        addCreatedUser(userB);
-      });
-
-      await test.step('Preconditions: Users A and B are signed in to the application', async () => {
-        await Promise.all([loginAndSetup(userA, userAPageManager), loginAndSetup(userB, userBPageManager)]);
-      });
+      const {pages: userBPages} = userBPageManager.webapp;
 
       await test.step('Preconditions: User A connects with User B', async () => {
         await connectUsersManually(userA, userB, userAPageManager, userBPageManager);
@@ -236,37 +190,35 @@ test.describe('Block', () => {
         expect(await userBPages.conversation().messageCount()).toBe(1);
       });
 
-      // Step 2: User B blocks User A 1:1
+      // Step 3: User B blocks User A 1:1
       await test.step('User B blocks User A in 1:1 conversation', async () => {
-        await userBPages.conversationList().clickConversationOptions(userA.fullName);
-        await userBPages.conversationList().clickBlockConversation();
-        await userBModals.blockWarning().clickBlock();
+        await blockUserFromConversationList(userBPageManager, userA);
       });
 
-      // Step 3: User A writes second message 1:1 to User B after being blocked by User B
+      // Step 4: User A writes second message 1:1 to User B after being blocked by User B
       await test.step('User A sends messages to chat with User B', async () => {
         await userAPages.conversationList().openConversation(userB.fullName);
         await userAPages.conversation().sendMessage('message after block');
       });
 
-      // Step 4: User B does not receive the message from User A
+      // Step 5: User B does not receive the message from User A
       await test.step('User B does not receive message from User A in 1:1', async () => {
         await userBPages.conversationList().openConversation(userA.fullName);
         expect(await userBPages.conversation().messageCount()).toBe(1);
       });
 
-      // Step 5: User B unblocks User A
+      // Step 6: User B unblocks User A
       await test.step('User B does not receive message from User A in 1:1', async () => {
         await userBPages.startUI().selectUser(userA.fullName);
       });
 
-      // Step 6 User A sends a message to User B
+      // Step 7: User A sends a message to User B
       await test.step('User A sends a message to User B after getting unblocked by User B', async () => {
         await userAPages.conversationList().openConversation(userB.fullName);
         await userAPages.conversation().sendMessage('message after unblock');
       });
 
-      // Step 4: User B unblocks User A
+      // Step 8: User B unblocks User A
       await test.step('User B receives message from User A in 1:1', async () => {
         await userBPages.conversationList().openConversation(userA.fullName);
         expect(await userBPages.conversation().messageCount()).toBe(2);
@@ -279,16 +231,11 @@ test.describe('Block', () => {
     {tag: ['@TC-143', '@regression']},
     async ({pageManager: userAPageManager, userBPageManager}) => {
       const {pages: userAPages, modals: userAModals, components: userAComponents} = userAPageManager.webapp;
-      const {pages: userBPages, modals: userBModals} = userBPageManager.webapp;
       const conversationName = 'Groupchat with User A and User B';
 
       // Step 1: User B blocks User A
       await test.step('User B blocks User A', async () => {
-        await userBPages.conversationList().openConversation(userA.fullName);
-        await userBPages.conversationList().clickConversationOptions(userA.fullName);
-        await userBPages.conversationList().clickBlockConversation();
-        await userBModals.blockWarning().clickBlock();
-        await userBModals.unableToOpenConversation().clickAcknowledge();
+        await blockUserFromConversationList(userBPageManager, userA, {handleUnableToOpenModal: true});
       });
 
       // Step 2: User A wants to add B to a group chat after being blocked by User B
@@ -308,21 +255,7 @@ test.describe('Block', () => {
   test(
     'Verify you can block a user you sent a connection request from conversation list 0',
     {tag: ['@TC-144', '@regression', '@no-setup']}, // @no-setup because connection request must be sent manually to satisfy test specs
-    async ({pageManager: userAPageManager, userBPageManager, api}) => {
-      const {modals: userAModals, pages: userAPages} = userAPageManager.webapp;
-
-      await test.step('Preconditions: Creating preconditions for the test via API', async () => {
-        await api.createPersonalUser(userA);
-        addCreatedUser(userA);
-
-        await api.createPersonalUser(userB);
-        addCreatedUser(userB);
-      });
-
-      await test.step('Preconditions: Users A and B are signed in to the application', async () => {
-        await Promise.all([loginAndSetup(userA, userAPageManager), loginAndSetup(userB, userBPageManager)]);
-      });
-
+    async ({pageManager: userAPageManager, userBPageManager}) => {
       // Step 1: User A sends connection request to User B
       await test.step('Preconditions: User A connects with User B', async () => {
         await connectUsersManually(userA, userB, userAPageManager, userBPageManager);
@@ -330,10 +263,7 @@ test.describe('Block', () => {
 
       // Step 2: User A blocks User B from conversation list
       await test.step('User A blocks User B from conversation list', async () => {
-        await userAPages.conversationList().openConversation(userB.fullName);
-        await userAPages.conversationList().clickConversationOptions(userB.fullName);
-        await userAPages.conversationList().clickBlockConversation();
-        await userAModals.blockWarning().clickBlock();
+        await blockUserFromConversationList(userAPageManager, userB);
       });
     },
   );
@@ -362,7 +292,7 @@ test.describe('Block', () => {
         // Step 6: User A gets redirected back to conversation list
         // Step 7: Conversation with User B disappeared from main contact list of User A
         // Step 8: Conversation with User B disappeared from archive list of User A
-        // Step 8: next contact of contact list from User A is selected
+        // Step 8: Next contact of contact list from User A is selected
         // Step 9: Conversation with User A is still in Conversation List of User B
         // Step 10: No leave message is displayed
       });
@@ -377,15 +307,8 @@ test.describe('Block', () => {
       const {pages: userAPages, modals: userAModals, components: userAComponents} = userAPageManager.webapp;
 
       await test.step('User A blocks User B', async () => {
-        await userAPages.conversationList().openConversation(userB.fullName);
-        await userAPages.conversationList().clickConversationOptions(userB.fullName);
-        await userAPages.conversationList().clickBlockConversation();
-        await userAModals.blockWarning().clickBlock();
-        // if-statement is needed because in some cases the modal shows up and in some not
-        // if the if-statement would be removed the test would be flaky
-        if (await userAModals.unableToOpenConversation().modal.isVisible({timeout: 3000})) {
-          await userAModals.unableToOpenConversation().acknowledgeButton.click();
-        }
+        // The 'handleUnableToOpenModal' option takes care of optional modal
+        await blockUserFromConversationList(userAPageManager, userB, {handleUnableToOpenModal: true});
       });
 
       await test.step('User A unblocks User B from Search List', async () => {
