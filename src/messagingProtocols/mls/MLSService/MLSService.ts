@@ -19,6 +19,7 @@
 
 import type {ClaimedKeyPackages, MLSPublicKeyRecord, RegisteredClient} from '@wireapp/api-client/lib/client';
 import {
+  MLSGroupOutOfSyncError,
   MLSInvalidLeafNodeIndexError,
   MLSInvalidLeafNodeSignatureError,
   MLSStaleMessageError,
@@ -50,7 +51,12 @@ import {
 } from '@wireapp/core-crypto';
 
 import {ClientMLSError, ClientMLSErrorLabel} from './ClientMLSError';
-import {isCoreCryptoMLSConversationAlreadyExistsError, shouldMLSDecryptionErrorBeIgnored} from './CoreCryptoMLSError';
+import {
+  isCoreCryptoMLSConversationAlreadyExistsError,
+  serializeAbortReason,
+  shouldMLSDecryptionErrorBeIgnored,
+  UPLOAD_COMMIT_BUNDLE_ABORT_REASONS,
+} from './CoreCryptoMLSError';
 
 import {AddUsersFailure, AddUsersFailureReasons, KeyPackageClaimUser} from '../../../conversation';
 import {CoreDatabase} from '../../../storage/CoreDB';
@@ -110,9 +116,11 @@ export enum MLSServiceEvents {
   MLS_CLIENT_MISMATCH = 'mlsClientMismatch',
   NEW_CRL_DISTRIBUTION_POINTS = 'newCrlDistributionPoints',
   MLS_EVENT_DISTRIBUTED = 'mlsEventDistributed',
+  KEY_MATERIAL_UPDATE_FAILURE = 'keyMaterialUpdateFailure',
 }
 
 type Events = {
+  [MLSServiceEvents.KEY_MATERIAL_UPDATE_FAILURE]: {error: unknown; groupId: string};
   [MLSServiceEvents.NEW_EPOCH]: {epoch: number; groupId: string};
   [MLSServiceEvents.NEW_CRL_DISTRIBUTION_POINTS]: string[];
   [MLSServiceEvents.MLS_CLIENT_MISMATCH]: void;
@@ -126,26 +134,6 @@ export class MLSService extends TypedEventEmitter<Events> {
   private _config?: MLSConfig;
   private readonly textEncoder = new TextEncoder();
   private readonly textDecoder = new TextDecoder();
-
-  public static UPLOAD_COMMIT_BUNDLE_ABORT_REASONS = {
-    BROKEN_MLS_CONVERSATION: 'BROKEN_MLS_CONVERSATION',
-    MLS_STALE_MESSAGE: 'MLS_STALE_MESSAGE',
-    OTHER: 'OTHER',
-  };
-
-  public static isBrokenMLSConversationError(error: unknown) {
-    return (
-      isMlsMessageRejectedError(error) &&
-      error.context.context.reason === MLSService.UPLOAD_COMMIT_BUNDLE_ABORT_REASONS.BROKEN_MLS_CONVERSATION
-    );
-  }
-
-  public static isMLSStaleMessageError(error: unknown) {
-    return (
-      isMlsMessageRejectedError(error) &&
-      error.context.context.reason === MLSService.UPLOAD_COMMIT_BUNDLE_ABORT_REASONS.MLS_STALE_MESSAGE
-    );
-  }
 
   constructor(
     private readonly apiClient: APIClient,
@@ -293,20 +281,42 @@ export class MLSService extends TypedEventEmitter<Events> {
       if (error instanceof MLSInvalidLeafNodeSignatureError || error instanceof MLSInvalidLeafNodeIndexError) {
         this.logger.info('Aborting commit bundle upload due to broken MLS conversation');
         return {
-          abort: {reason: MLSService.UPLOAD_COMMIT_BUNDLE_ABORT_REASONS.BROKEN_MLS_CONVERSATION},
+          abort: {
+            reason: serializeAbortReason({
+              message: UPLOAD_COMMIT_BUNDLE_ABORT_REASONS.BROKEN_MLS_CONVERSATION,
+            }),
+          },
         };
       }
 
       if (error instanceof MLSStaleMessageError) {
         this.logger.info('Aborting commit bundle upload due to stale MLS message');
         return {
-          abort: {reason: MLSService.UPLOAD_COMMIT_BUNDLE_ABORT_REASONS.MLS_STALE_MESSAGE},
+          abort: {
+            reason: serializeAbortReason({message: UPLOAD_COMMIT_BUNDLE_ABORT_REASONS.MLS_STALE_MESSAGE}),
+          },
+        };
+      }
+
+      if (error instanceof MLSGroupOutOfSyncError) {
+        this.logger.info('Aborting commit bundle upload due to group out of sync');
+        return {
+          abort: {
+            reason: serializeAbortReason({
+              message: UPLOAD_COMMIT_BUNDLE_ABORT_REASONS.MLS_GROUP_OUT_OF_SYNC,
+              missing_users: error.missing_users,
+            }),
+          },
         };
       }
 
       this.logger.info('Aborting commit bundle upload due to unknown error');
       return {
-        abort: {reason: error instanceof Error ? error.message : MLSService.UPLOAD_COMMIT_BUNDLE_ABORT_REASONS.OTHER},
+        abort: {
+          reason: serializeAbortReason({
+            message: error instanceof Error ? error.message : UPLOAD_COMMIT_BUNDLE_ABORT_REASONS.OTHER,
+          }),
+        },
       };
     }
   };
@@ -516,9 +526,33 @@ export class MLSService extends TypedEventEmitter<Events> {
     return this.coreCryptoClient.transaction(cx => cx.encryptMessage(conversationId, message));
   }
 
-  private async updateKeyingMaterial(groupId: string) {
-    const groupIdBytes = Decoder.fromBase64(groupId).asBytes;
-    await this.coreCryptoClient.transaction(cx => cx.updateKeyingMaterial(new ConversationId(groupIdBytes)));
+  private async updateKeyingMaterial(groupId: string, retry = true) {
+    try {
+      const groupIdBytes = Decoder.fromBase64(groupId).asBytes;
+      await this.coreCryptoClient.transaction(cx => cx.updateKeyingMaterial(new ConversationId(groupIdBytes)));
+    } catch (error) {
+      if (!retry) {
+        this.logger.error(`Failed to update keying material for group retrying did not fix the issue`, {
+          error,
+          groupId,
+        });
+        throw error;
+      }
+
+      this.logger.warn(`Failed to update keying material for group`, {error, groupId});
+      this.emit(MLSServiceEvents.KEY_MATERIAL_UPDATE_FAILURE, {error, groupId});
+
+      setTimeout(async () => {
+        try {
+          await this.updateKeyingMaterial(groupId, false);
+        } catch (error) {
+          this.logger.error(`Failed to update keying material for group on retry`, {
+            error,
+            groupId,
+          });
+        }
+      }, TimeUtil.TimeInMillis.SECOND * 10); // retry after 10 seconds
+    }
   }
 
   /**

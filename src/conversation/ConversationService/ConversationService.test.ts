@@ -42,7 +42,12 @@ import {GenericMessage} from '@wireapp/protocol-messaging';
 
 import {AddUsersFailure, AddUsersFailureReasons, ConversationService, MessageSendingState} from '..';
 import {MLSService} from '../../messagingProtocols/mls';
-import {CORE_CRYPTO_ERROR_NAMES} from '../../messagingProtocols/mls/MLSService/CoreCryptoMLSError';
+import {
+  CORE_CRYPTO_ERROR_NAMES,
+  serializeAbortReason,
+  UPLOAD_COMMIT_BUNDLE_ABORT_REASONS,
+} from '../../messagingProtocols/mls/MLSService/CoreCryptoMLSError';
+import {MLSServiceEvents} from '../../messagingProtocols/mls/MLSService/MLSService';
 import {ProteusService} from '../../messagingProtocols/proteus';
 import * as MessagingProtocols from '../../messagingProtocols/proteus';
 import {openDB} from '../../storage/CoreDB';
@@ -838,6 +843,191 @@ describe('ConversationService', () => {
       });
 
       expect(conversationService.addUsersToMLSConversation).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('reactToKeyMaterialUpdateFailure', () => {
+    function getKeyMaterialFailureHandler(mlsService: MLSService) {
+      const onMock = mlsService.on as jest.Mock;
+      const call = onMock.mock.calls.find(([event]) => event === MLSServiceEvents.KEY_MATERIAL_UPDATE_FAILURE);
+      expect(call).toBeTruthy();
+      return call[1] as (payload: {error: unknown; groupId: string}) => Promise<void>;
+    }
+
+    it('resets a broken MLS conversation', async () => {
+      const [conversationService, {apiClient, mlsService}] = await buildConversationService();
+      const groupId = 'group-1';
+      const qualified_id = {id: 'conv-1', domain: 'staging.zinfra.io'};
+
+      jest.spyOn(apiClient.api.conversation, 'getConversationList').mockResolvedValueOnce({
+        found: [{group_id: groupId, qualified_id, protocol: ConversationProtocol.MLS, epoch: 1}] as any,
+      });
+
+      const resetSpy = jest
+        .spyOn(conversationService as any, 'handleBrokenMLSConversation')
+        .mockResolvedValue(undefined);
+      const addUsersSpy = jest.spyOn(conversationService, 'addUsersToMLSConversation');
+
+      const handler = getKeyMaterialFailureHandler(mlsService);
+
+      const brokenErr = {
+        type: ErrorType.Mls,
+        context: {
+          type: MlsErrorType.MessageRejected,
+          context: {
+            reason: serializeAbortReason({message: UPLOAD_COMMIT_BUNDLE_ABORT_REASONS.BROKEN_MLS_CONVERSATION}),
+          },
+        },
+      };
+
+      await handler({error: brokenErr, groupId});
+
+      expect(resetSpy).toHaveBeenCalledWith(qualified_id);
+      expect(addUsersSpy).not.toHaveBeenCalled();
+    });
+
+    it('adds missing users when group is out of sync', async () => {
+      const [conversationService, {apiClient, mlsService}] = await buildConversationService();
+      const groupId = 'group-2';
+      const qualified_id = {id: 'conv-2', domain: 'staging.zinfra.io'};
+      const missingUsers: QualifiedId[] = [
+        {id: 'u1', domain: 'staging.zinfra.io'},
+        {id: 'u2', domain: 'staging.zinfra.io'},
+      ];
+
+      jest.spyOn(apiClient.api.conversation, 'getConversationList').mockResolvedValueOnce({
+        found: [{group_id: groupId, qualified_id, protocol: ConversationProtocol.MLS, epoch: 1}] as any,
+      });
+
+      const addUsersSpy = jest
+        .spyOn(conversationService, 'addUsersToMLSConversation')
+        .mockResolvedValue({conversation: {}} as any);
+      const resetSpy = jest
+        .spyOn(conversationService as any, 'handleBrokenMLSConversation')
+        .mockResolvedValue(undefined);
+
+      const handler = getKeyMaterialFailureHandler(mlsService);
+
+      const outOfSyncErr = {
+        type: ErrorType.Mls,
+        context: {
+          type: MlsErrorType.MessageRejected,
+          context: {
+            reason: serializeAbortReason({
+              message: UPLOAD_COMMIT_BUNDLE_ABORT_REASONS.MLS_GROUP_OUT_OF_SYNC,
+              missing_users: missingUsers,
+            }),
+          },
+        },
+      };
+
+      await handler({error: outOfSyncErr, groupId});
+
+      expect(addUsersSpy).toHaveBeenCalledWith({
+        groupId,
+        conversationId: qualified_id,
+        qualifiedUsers: missingUsers,
+      });
+      expect(resetSpy).not.toHaveBeenCalled();
+    });
+
+    it('deduplicates concurrent recoveries for the same group id', async () => {
+      const [conversationService, {apiClient, mlsService}] = await buildConversationService();
+      const groupId = 'group-dup';
+      const qualified_id = {id: 'conv-dup', domain: 'staging.zinfra.io'};
+
+      jest.spyOn(apiClient.api.conversation, 'getConversationList').mockResolvedValue({
+        found: [{group_id: groupId, qualified_id, protocol: ConversationProtocol.MLS, epoch: 1}] as any,
+      });
+
+      // Make the recovery hang until we resolve it, to simulate overlapping calls
+      let resolveDeferred: (() => void) | undefined;
+      const deferred = new Promise<void>(res => (resolveDeferred = res));
+      const resetSpy = jest
+        .spyOn(conversationService as any, 'handleBrokenMLSConversation')
+        .mockReturnValue(deferred as any);
+
+      const handler = getKeyMaterialFailureHandler(mlsService);
+
+      const brokenErr = {
+        type: ErrorType.Mls,
+        context: {
+          type: MlsErrorType.MessageRejected,
+          context: {
+            reason: serializeAbortReason({message: UPLOAD_COMMIT_BUNDLE_ABORT_REASONS.BROKEN_MLS_CONVERSATION}),
+          },
+        },
+      };
+
+      const p1 = handler({error: brokenErr, groupId});
+      const p2 = handler({error: brokenErr, groupId});
+
+      // Complete the first recovery
+      if (resolveDeferred) {
+        resolveDeferred();
+      }
+      await Promise.allSettled([p1, p2]);
+
+      expect(resetSpy).toHaveBeenCalledTimes(1);
+    });
+  });
+
+  describe('groupIdConversationMap cache', () => {
+    function makeConversation(group_id: string, id: string): Conversation {
+      return {
+        group_id,
+        qualified_id: {id, domain: 'staging.zinfra.io'},
+        protocol: ConversationProtocol.MLS,
+        epoch: 1,
+      } as unknown as Conversation;
+    }
+
+    it('refreshGroupIdConversationMap builds the cache from backend list', async () => {
+      const [conversationService, {apiClient}] = await buildConversationService();
+
+      const conv1 = makeConversation('g-1', 'c-1');
+      const conv2 = makeConversation('g-2', 'c-2');
+
+      const getListSpy = jest
+        .spyOn(apiClient.api.conversation, 'getConversationList')
+        .mockResolvedValueOnce({found: [conv1, conv2]});
+
+      await (conversationService as any).refreshGroupIdConversationMap();
+
+      expect(getListSpy).toHaveBeenCalledTimes(1);
+
+      // Validate through the private cache map
+      const cache: Map<string, Conversation> = (conversationService as any).groupIdConversationMap;
+      expect(cache.get('g-1')?.qualified_id.id).toBe('c-1');
+      expect(cache.get('g-2')?.qualified_id.id).toBe('c-2');
+    });
+
+    it('getConversationByGroupId uses cache when available without backend call', async () => {
+      const [conversationService, {apiClient}] = await buildConversationService();
+
+      const conv = makeConversation('g-hit', 'c-hit');
+      // Pre-populate cache
+      (conversationService as any).groupIdConversationMap.set('g-hit', conv);
+
+      const getListSpy = jest
+        .spyOn(apiClient.api.conversation, 'getConversationList')
+        .mockImplementation(() => Promise.reject(new Error('should not be called')));
+
+      const result: Conversation | undefined = await (conversationService as any).getConversationByGroupId('g-hit');
+      expect(result?.qualified_id.id).toBe('c-hit');
+      expect(getListSpy).not.toHaveBeenCalled();
+    });
+
+    it('getConversationByGroupId refreshes on cache miss and returns undefined if not found', async () => {
+      const [conversationService, {apiClient}] = await buildConversationService();
+
+      const getListSpy = jest
+        .spyOn(apiClient.api.conversation, 'getConversationList')
+        .mockResolvedValueOnce({found: [makeConversation('g-else', 'c-else')]});
+
+      const result: Conversation | undefined = await (conversationService as any).getConversationByGroupId('g-missing');
+      expect(result).toBeUndefined();
+      expect(getListSpy).toHaveBeenCalledTimes(1);
     });
   });
 });
