@@ -110,7 +110,7 @@ const GroupCreationModal = ({
   //both environment feature flag and team feature flag must be enabled to create conversations with cells
   const isCellsEnabledForEnvironment = Config.getConfig().FEATURE.ENABLE_CELLS;
   const enableCellsToggle = isCellsEnabledForEnvironment && isCellsEnabledForTeam;
-  const [isCellsOptionEnabled, setIsCellsOptionEnabled] = useState(enableCellsToggle);
+  const [isCellsOptionEnabled, setIsCellsOptionEnabled] = useState(false);
   const isCellsEnabledForGroup = isCellsEnabledForEnvironment && isCellsOptionEnabled;
 
   const [isShown, setIsShown] = useState<boolean>(false);
