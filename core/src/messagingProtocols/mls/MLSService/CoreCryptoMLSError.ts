@@ -17,6 +17,10 @@
  *
  */
 
+import {QualifiedId} from '@wireapp/api-client/lib/user';
+
+import {CoreCryptoError, ErrorContext, ErrorType, isMlsMessageRejectedError, MlsErrorType} from '@wireapp/core-crypto';
+
 export const CORE_CRYPTO_ERROR_NAMES = {
   MlsErrorConversationAlreadyExists: 'MlsErrorConversationAlreadyExists',
   MlsErrorDuplicateMessage: 'MlsErrorDuplicateMessage',
@@ -63,3 +67,83 @@ export const shouldMLSDecryptionErrorBeIgnored = (error: unknown): error is Erro
     error instanceof Error && (mlsDecryptionErrorNamesToIgnore.includes(error.name) || isOtherErrorToIgnore(error))
   );
 };
+
+export const UPLOAD_COMMIT_BUNDLE_ABORT_REASONS = {
+  BROKEN_MLS_CONVERSATION: 'BROKEN_MLS_CONVERSATION',
+  MLS_STALE_MESSAGE: 'MLS_STALE_MESSAGE',
+  MLS_GROUP_OUT_OF_SYNC: 'MLS_GROUP_OUT_OF_SYNC',
+  OTHER: 'OTHER',
+};
+
+type MessageRejectedError = CoreCryptoError<ErrorType.Mls> & {
+  context: Extract<
+    ErrorContext[ErrorType.Mls],
+    {
+      type: MlsErrorType.MessageRejected;
+    }
+  >;
+};
+
+export function isBrokenMLSConversationError(error: unknown): error is MessageRejectedError {
+  return (
+    isMlsMessageRejectedError(error) &&
+    deserializeAbortReason(error.context.context.reason).message ===
+      UPLOAD_COMMIT_BUNDLE_ABORT_REASONS.BROKEN_MLS_CONVERSATION
+  );
+}
+
+export function isMLSStaleMessageError(error: unknown): error is MessageRejectedError {
+  return (
+    isMlsMessageRejectedError(error) &&
+    deserializeAbortReason(error.context.context.reason).message ===
+      UPLOAD_COMMIT_BUNDLE_ABORT_REASONS.MLS_STALE_MESSAGE
+  );
+}
+
+export function isMLSGroupOutOfSyncError(error: unknown): error is MessageRejectedError {
+  return (
+    isMlsMessageRejectedError(error) &&
+    deserializeAbortReason(error.context.context.reason).message ===
+      UPLOAD_COMMIT_BUNDLE_ABORT_REASONS.MLS_GROUP_OUT_OF_SYNC
+  );
+}
+
+export function getMLSGroupOutOfSyncErrorMissingUsers(error: unknown): QualifiedId[] {
+  if (isMLSGroupOutOfSyncError(error)) {
+    const reason = deserializeAbortReason(error.context.context.reason);
+    return (reason as AbortReasonMLSGroupOutOfSync).missing_users;
+  }
+
+  throw new Error('Error is not MLSGroupOutOfSyncError');
+}
+
+type AbortReasonBrokenMLSConversation = {
+  message: typeof UPLOAD_COMMIT_BUNDLE_ABORT_REASONS.BROKEN_MLS_CONVERSATION;
+};
+
+type AbortReasonMLSStaleMessage = {
+  message: typeof UPLOAD_COMMIT_BUNDLE_ABORT_REASONS.MLS_STALE_MESSAGE;
+};
+
+type AbortReasonMLSGroupOutOfSync = {
+  message: typeof UPLOAD_COMMIT_BUNDLE_ABORT_REASONS.MLS_GROUP_OUT_OF_SYNC;
+  missing_users: QualifiedId[];
+};
+
+type AbortReasonOther = {
+  message: typeof UPLOAD_COMMIT_BUNDLE_ABORT_REASONS.OTHER;
+};
+
+type AbortReasons =
+  | AbortReasonBrokenMLSConversation
+  | AbortReasonMLSStaleMessage
+  | AbortReasonMLSGroupOutOfSync
+  | AbortReasonOther;
+
+export function serializeAbortReason(reason: AbortReasons): string {
+  return JSON.stringify(reason);
+}
+
+function deserializeAbortReason(reasonString: string): AbortReasons {
+  return JSON.parse(reasonString) as AbortReasons;
+}

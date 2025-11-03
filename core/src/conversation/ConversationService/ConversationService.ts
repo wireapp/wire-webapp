@@ -69,7 +69,13 @@ import {
 import {MessageTimer, MessageSendingState, RemoveUsersParams} from '../../conversation/';
 import {MLSService, MLSServiceEvents} from '../../messagingProtocols/mls';
 import {queueConversationRejoin} from '../../messagingProtocols/mls/conversationRejoinQueue';
-import {isCoreCryptoMLSWrongEpochError} from '../../messagingProtocols/mls/MLSService/CoreCryptoMLSError';
+import {
+  getMLSGroupOutOfSyncErrorMissingUsers,
+  isBrokenMLSConversationError,
+  isCoreCryptoMLSWrongEpochError,
+  isMLSGroupOutOfSyncError,
+  isMLSStaleMessageError,
+} from '../../messagingProtocols/mls/MLSService/CoreCryptoMLSError';
 import {getConversationQualifiedMembers, ProteusService} from '../../messagingProtocols/proteus';
 import {
   AddUsersToProteusConversationParams,
@@ -90,6 +96,9 @@ type Events = {
 export class ConversationService extends TypedEventEmitter<Events> {
   public readonly messageTimer: MessageTimer;
   private readonly logger = LogFactory.getLogger('@wireapp/core/ConversationService');
+  // Track groups currently undergoing recovery due to key material update failure to prevent duplicate work
+  private readonly recoveringKeyMaterialGroups: Set<string> = new Set();
+  private groupIdConversationMap: Map<string, Conversation> = new Map();
 
   constructor(
     private readonly apiClient: APIClient,
@@ -109,6 +118,10 @@ export class ConversationService extends TypedEventEmitter<Events> {
     if (this._mlsService) {
       this.mlsService.on(MLSServiceEvents.MLS_EVENT_DISTRIBUTED, data => {
         this.emit(MLSServiceEvents.MLS_EVENT_DISTRIBUTED, data);
+      });
+      this.mlsService.on(MLSServiceEvents.KEY_MATERIAL_UPDATE_FAILURE, ({error, groupId}) => {
+        this.logger.warn(`Key material update failure for group ${groupId}`, {error});
+        return this.reactToKeyMaterialUpdateFailure({error, groupId});
       });
     }
   }
@@ -418,7 +431,7 @@ export class ConversationService extends TypedEventEmitter<Events> {
       /**
        * Only thrown by core-crypto when we call commitPendingProposals
        */
-      if (MLSService.isBrokenMLSConversationError(error)) {
+      if (isBrokenMLSConversationError(error)) {
         this.logger.info('Failed to send MLS message because broken MLS conversation, triggering a reset', {
           error,
           groupId,
@@ -432,7 +445,7 @@ export class ConversationService extends TypedEventEmitter<Events> {
        * core-crypto throws its own error class when we call commitPendingProposals
        * backend error mapper throws its own error class when we call postMlsMessage
        */
-      if (MLSService.isMLSStaleMessageError(error) || error instanceof MLSStaleMessageError) {
+      if (isMLSStaleMessageError(error) || error instanceof MLSStaleMessageError) {
         this.logger.info(
           'Failed to send MLS message because of stale message, recovering by joining with external commit',
           {
@@ -444,7 +457,12 @@ export class ConversationService extends TypedEventEmitter<Events> {
         await this.recoverMLSGroupFromEpochMismatch(conversationId);
       }
 
-      if (error instanceof MLSGroupOutOfSyncError) {
+      /**
+       * We may have the same error from core-crypto or from the backend error mapper
+       * core-crypto throws its own error class when we call commitPendingProposals
+       * backend error mapper throws its own error class when we call postMlsMessage
+       */
+      if (isMLSGroupOutOfSyncError(error) || error instanceof MLSGroupOutOfSyncError) {
         this.logger.info(
           'Failed to send MLS message because of group out of sync, recovering by adding missing users',
           {
@@ -453,10 +471,20 @@ export class ConversationService extends TypedEventEmitter<Events> {
           },
         );
 
+        /**
+         * We may get the missing users either from core-crypto error or from the backend error mapper
+         */
+        let missingUsers: QualifiedId[] = [];
+        if (isMLSGroupOutOfSyncError(error)) {
+          missingUsers = getMLSGroupOutOfSyncErrorMissingUsers(error);
+        } else {
+          missingUsers = error.missing_users;
+        }
+
         await this.addUsersToMLSConversation({
           groupId,
           conversationId,
-          qualifiedUsers: error.missing_users,
+          qualifiedUsers: missingUsers,
         });
       }
 
@@ -501,15 +529,35 @@ export class ConversationService extends TypedEventEmitter<Events> {
       };
     } catch (error) {
       this.logger.warn('Failed to add users to MLS conversation', {error, groupId, conversationId});
-      if (MLSService.isBrokenMLSConversationError(error)) {
-        if (!shouldRetry) {
-          this.logger.warn("Tried to add users to MLS conversation but it's still broken after reset", error);
-          throw error;
-        }
+      if (!shouldRetry) {
+        this.logger.warn("Tried to add users to MLS conversation but it's still broken after reset", error);
+        throw error;
+      }
+
+      if (isBrokenMLSConversationError(error)) {
         this.logger.warn("Tried to add users to MLS conversation but it's broken, resetting the conversation", error);
         return this.handleBrokenMLSConversation(conversationId, newGroupId =>
           this.addUsersToMLSConversation({qualifiedUsers, groupId: newGroupId, conversationId, shouldRetry: false}),
         );
+      }
+
+      if (isMLSGroupOutOfSyncError(error)) {
+        this.logger.info(
+          'Failed to send MLS message because of group out of sync, recovering by adding missing users',
+          {
+            error,
+            groupId,
+          },
+        );
+
+        const missingUsers = getMLSGroupOutOfSyncErrorMissingUsers(error);
+
+        return this.addUsersToMLSConversation({
+          groupId,
+          conversationId,
+          qualifiedUsers: missingUsers,
+          shouldRetry: false,
+        });
       }
       throw error;
     }
@@ -535,11 +583,12 @@ export class ConversationService extends TypedEventEmitter<Events> {
 
       return await this.getConversation(conversationId);
     } catch (error) {
-      if (MLSService.isBrokenMLSConversationError(error)) {
-        if (!shouldRetry) {
-          this.logger.warn("Tried to remove users from MLS conversation but it's still broken after reset", error);
-          throw error;
-        }
+      if (!shouldRetry) {
+        this.logger.warn("Tried to remove users from MLS conversation but it's still broken", error);
+        throw error;
+      }
+
+      if (isBrokenMLSConversationError(error)) {
         this.logger.info(
           "Tried to remove users from MLS conversation but it's broken, resetting the conversation",
           error,
@@ -554,6 +603,31 @@ export class ConversationService extends TypedEventEmitter<Events> {
         );
       }
 
+      if (isMLSGroupOutOfSyncError(error)) {
+        this.logger.info(
+          'Failed to send MLS message because of group out of sync, recovering by adding missing users',
+          {
+            error,
+            groupId,
+          },
+        );
+
+        const missingUsers = getMLSGroupOutOfSyncErrorMissingUsers(error);
+
+        await this.addUsersToMLSConversation({
+          groupId,
+          conversationId,
+          qualifiedUsers: missingUsers,
+        });
+
+        return this.removeUsersFromMLSConversation({
+          groupId,
+          conversationId,
+          qualifiedUserIds,
+          shouldRetry: false,
+        });
+      }
+
       throw error;
     }
   }
@@ -562,18 +636,84 @@ export class ConversationService extends TypedEventEmitter<Events> {
     try {
       await this.mlsService.joinByExternalCommit(() => this.apiClient.api.conversation.getGroupInfo(conversationId));
     } catch (error) {
+      if (!shouldRetry) {
+        this.logger.warn("Tried to join MLS conversation but it's still broken after reset", error);
+        throw error;
+      }
+
       this.logger.warn(`Failed to join MLS conversation ${conversationId.id} via external commit`, error);
-      if (MLSService.isBrokenMLSConversationError(error)) {
+
+      if (isBrokenMLSConversationError(error)) {
         this.logger.info('Resetting MLS conversation due to broken mls conversation error', error);
-        if (!shouldRetry) {
-          this.logger.warn("Tried to join MLS conversation but it's still broken after reset", error);
-          throw error;
-        }
         return this.handleBrokenMLSConversation(conversationId);
       }
       throw error;
     }
   }
+
+  private async refreshGroupIdConversationMap(): Promise<void> {
+    const conversations = await this.apiClient.api.conversation.getConversationList();
+    this.groupIdConversationMap.clear();
+    for (const conversation of conversations.found || []) {
+      if (conversation.group_id) {
+        this.groupIdConversationMap.set(conversation.group_id, conversation);
+      }
+    }
+  }
+
+  private async getConversationByGroupId(groupId: string): Promise<Conversation | undefined> {
+    if (!this.groupIdConversationMap.has(groupId)) {
+      await this.refreshGroupIdConversationMap();
+    }
+    return this.groupIdConversationMap.get(groupId);
+  }
+
+  private reactToKeyMaterialUpdateFailure = async ({error, groupId}: {error: unknown; groupId: string}) => {
+    // Deduplicate concurrent recoveries for the same group
+    if (this.recoveringKeyMaterialGroups.has(groupId)) {
+      this.logger.info(`Recovery already in progress for group ${groupId}, skipping duplicate trigger`);
+      return;
+    }
+
+    this.recoveringKeyMaterialGroups.add(groupId);
+    try {
+      this.logger.info(`Reacting to key material update failure for group ${groupId}`);
+
+      const conversation = await this.getConversationByGroupId(groupId);
+
+      if (!conversation) {
+        this.logger.warn(`No conversation found for group ${groupId}`);
+        throw error;
+      }
+
+      if (isBrokenMLSConversationError(error)) {
+        this.logger.info('Tried to update key material for a broken MLS conversation, initiating reset', error);
+        return this.handleBrokenMLSConversation(conversation.qualified_id);
+      }
+
+      if (isMLSGroupOutOfSyncError(error)) {
+        this.logger.info(
+          'Tried to update key material for an out of sync conversation, recovering by adding missing users',
+          {
+            error,
+            groupId,
+          },
+        );
+
+        const missingUsers = getMLSGroupOutOfSyncErrorMissingUsers(error);
+
+        await this.addUsersToMLSConversation({
+          groupId,
+          conversationId: conversation.qualified_id,
+          qualifiedUsers: missingUsers,
+        });
+      }
+    } catch (error) {
+      this.logger.error('Failed to react to key material update failure', {error, groupId});
+    } finally {
+      this.recoveringKeyMaterialGroups.delete(groupId);
+    }
+  };
 
   private async resetMLSConversation(conversationId: QualifiedId): Promise<BaseCreateConversationResponse> {
     this.logger.info(`Resetting MLS conversation with id ${conversationId.id}`);
