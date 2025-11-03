@@ -127,7 +127,6 @@ export class LifeCycleRepository {
    * Handles different cleanup scenarios: normal logout, data wipe, client removal, crypto issues.
    */
   public logout = async (signOutReason: SIGN_OUT_REASON, shouldClearAllData: boolean): Promise<void> => {
-    debugger;
     // Prevent concurrent logout operations
     if (this.isCurrentlyLoggingOut) {
       this.logger.warn('Logout requested while another logout is already in progress. Ignoring duplicate request.');
