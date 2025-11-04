@@ -271,6 +271,12 @@ export class DebugUtil {
     this.propertiesRepository.savePreference(PROPERTIES_TYPE.CALL.ENABLE_PRESS_SPACE_TO_UNMUTE, false);
   }
 
+  async resetMLSConversation() {
+    return (this.core.service?.conversation as any).resetMLSConversation(
+      this.conversationState.activeConversation()?.qualifiedId,
+    );
+  }
+
   setupAvsDebugger() {
     if (this.isEnabledAvsDebugger()) {
       this.enableAvsDebugger(true);

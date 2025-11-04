@@ -32,6 +32,7 @@ import {wrapperStyles} from './ConfigToolbar.styles';
 
 export function ConfigToolbar() {
   const [showConfig, setShowConfig] = useState(false);
+  const [isResettingMLSConversation, setIsResettingMLSConversation] = useState(false);
   const [isGzipEnabled, setIsGzipEnabled] = useState(window.wire?.app.debug?.isGzippingEnabled() || false);
   const [configFeaturesState, setConfigFeaturesState] = useState<Configuration['FEATURE']>(Config.getConfig().FEATURE);
   const [isMessageSendingActive, setIsMessageSendingActive] = useState(false);
@@ -236,6 +237,17 @@ export function ConfigToolbar() {
     );
   };
 
+  const resetMLSConversation = async () => {
+    setIsResettingMLSConversation(true);
+    try {
+      await window.wire?.app?.debug?.resetMLSConversation();
+    } catch (error) {
+      console.error('Error resetting MLS conversation:', error);
+    } finally {
+      setIsResettingMLSConversation(false);
+    }
+  };
+
   if (!showConfig) {
     return null;
   }
@@ -252,9 +264,14 @@ export function ConfigToolbar() {
 
       <h3>Debug Functions</h3>
 
-      <Button onClick={() => window.wire?.app?.debug?.reconnectWebSocket()}>reconnectWebSocket</Button>
-      <Button onClick={() => window.wire?.app?.debug?.enablePressSpaceToUnmute()}>enablePressSpaceToUnmute</Button>
-      <Button onClick={() => window.wire?.app?.debug?.disablePressSpaceToUnmute()}>disablePressSpaceToUnmute</Button>
+      <Button onClick={() => window.wire?.app?.debug?.reconnectWebSocket()}>Reconnect WebSocket</Button>
+      <Button onClick={() => window.wire?.app?.debug?.enablePressSpaceToUnmute()}>Enable Press Space To Unmute</Button>
+      <Button onClick={() => window.wire?.app?.debug?.disablePressSpaceToUnmute()}>
+        Disable Press Space To Unmute
+      </Button>
+      <Button disabled={isResettingMLSConversation} onClick={resetMLSConversation}>
+        Reset MLS Conversation
+      </Button>
 
       <div>{renderAvsSwitch()}</div>
 
