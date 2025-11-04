@@ -57,8 +57,13 @@ export class GroupCreationPage {
     await this.addMembersButton.click();
   }
 
+  async enableFilesCheckbox() {
+    await this.filesCheckbox.click();
+  }
+
   async isFilesCheckboxChecked() {
-    return this.filesCheckbox.isEnabled();
+    const value = await this.filesCheckbox.getAttribute('data-uie-value');
+    return value === 'checked';
   }
 
   async waitForModalClose() {
