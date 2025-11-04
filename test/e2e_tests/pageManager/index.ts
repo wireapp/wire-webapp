@@ -35,6 +35,7 @@ import {AcknowledgeModal} from './webapp/modals/acknowledge.modal';
 import {AppLockModal} from './webapp/modals/appLock.modal';
 import {BlockWarningModal} from './webapp/modals/blockWarning.modal';
 import {CallNotEstablishedModal} from './webapp/modals/callNotEstablished.modal';
+import {ClearContentModal} from './webapp/modals/clearContent.modal';
 import {ConfirmLogoutModal} from './webapp/modals/confirmLogout.modal';
 import {CopyPasswordModal} from './webapp/modals/copyPassword.modal';
 import {CreatGuestLinkModal} from './webapp/modals/createGuestLink.modal';
@@ -212,6 +213,7 @@ export class PageManager {
       acknowledge: () => this.getOrCreate('webapp.modals.marketingConsent', () => new AcknowledgeModal(this.page)),
       cellsFileDetailView: () =>
         this.getOrCreate('webapp.modals.cellsFileDetailView', () => new CellsFileDetailViewModal(this.page)),
+      clearContent: () => this.getOrCreate('webapp.modals.clearContent', () => new ClearContentModal(this.page)),
     },
     components: {
       contactList: () => this.getOrCreate('webapp.components.ContactList', () => new ContactList(this.page)),

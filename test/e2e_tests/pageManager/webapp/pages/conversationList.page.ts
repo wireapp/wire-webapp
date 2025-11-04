@@ -33,6 +33,7 @@ export class ConversationListPage {
   readonly searchConversationsInput: Locator;
   readonly archiveConversationMenuButton: Locator;
   readonly unarchiveConversationMenuButton: Locator;
+  readonly clearContentButton: Locator;
 
   constructor(page: Page) {
     this.page = page;
@@ -50,6 +51,7 @@ export class ConversationListPage {
     this.searchConversationsInput = page.locator(selectByDataAttribute('search-conversations'));
     this.archiveConversationMenuButton = page.locator(selectById('btn-archive'));
     this.unarchiveConversationMenuButton = page.locator(selectById('btn-unarchive'));
+    this.clearContentButton = page.locator(selectById('btn-clear-content'));
   }
 
   async isConversationItemVisible(conversationName: string) {
@@ -102,6 +104,10 @@ export class ConversationListPage {
 
   async clickCreateGroup() {
     await this.createGroupButton.click();
+  }
+
+  async clearContent() {
+    await this.clearContentButton.click();
   }
 
   private getConversationLocator(conversationName: string) {
