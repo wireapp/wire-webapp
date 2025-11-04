@@ -224,6 +224,13 @@ export class ConversationPage {
     return await locator.screenshot();
   }
 
+  async editMessage(message: Locator) {
+    await message.hover();
+    await message.getByTestId('message-actions').getByTestId('go-options').click();
+    // The context menu containing the edit button is positioned globally as an overlay
+    await this.page.getByRole('menu').getByRole('button', {name: 'Edit'}).click();
+  }
+
   async reactOnMessage(message: Locator, emojiType: EmojiReaction) {
     await message.hover();
     const reactionButton = message.getByRole('group').getByRole('button').first();
