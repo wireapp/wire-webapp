@@ -120,7 +120,7 @@ export const handleAppLockState = async (pageManager: PageManager, appLockPassCo
 export async function loginAndSetup(user: User, pageManager: PageManager) {
   const {modals, components} = pageManager.webapp;
   await pageManager.openMainPage();
-  await loginUser(user, pageManager); // Verwendet die bestehende loginUser-Funktion
+  await loginUser(user, pageManager);
   await modals.dataShareConsent().clickDecline();
   await components.conversationSidebar().isPageLoaded();
 }

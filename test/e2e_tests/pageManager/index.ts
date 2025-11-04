@@ -40,6 +40,7 @@ import {ConfirmLogoutModal} from './webapp/modals/confirmLogout.modal';
 import {ConversationNotConnectedModal} from './webapp/modals/conversationNotConnected.modal';
 import {CopyPasswordModal} from './webapp/modals/copyPassword.modal';
 import {CreatGuestLinkModal} from './webapp/modals/createGuestLink.modal';
+import {CreateNewFolderModal} from './webapp/modals/createNewFolder.modal';
 import {DataShareConsentModal} from './webapp/modals/dataShareConsent.modal';
 import {DeleteAccountModal} from './webapp/modals/deleteAccount.modal';
 import {DetailViewModal} from './webapp/modals/detailView.modal';
@@ -218,6 +219,8 @@ export class PageManager {
         this.getOrCreate('webapp.modals.cancelRequestModal', () => new CancelRequestModal(this.page)),
       conversationNotConnected: () =>
         this.getOrCreate('webapp.modals.conversationNotConnected', () => new ConversationNotConnectedModal(this.page)),
+      createNewFolder: () =>
+        this.getOrCreate('webapp.modals.createNewFolder', () => new CreateNewFolderModal(this.page)),
     },
     components: {
       contactList: () => this.getOrCreate('webapp.components.ContactList', () => new ContactList(this.page)),
