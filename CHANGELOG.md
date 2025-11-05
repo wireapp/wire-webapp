@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [27.87.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@27.86.0...@wireapp/api-client@27.87.0) (2025-11-05)
+
+### Features
+
+* **api-client, core:** single source of truth for types in /team ([#7538](https://github.com/wireapp/wire-web-packages/issues/7538)) ([4285b4a](https://github.com/wireapp/wire-web-packages/commit/4285b4a9657a857bcd35b0e4dfa14e8134caad03))
+
 # [27.86.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@27.85.0...@wireapp/api-client@27.86.0) (2025-11-05)
 
 ### Features
