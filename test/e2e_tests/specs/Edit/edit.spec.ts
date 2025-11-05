@@ -125,4 +125,29 @@ test.describe('Edit', () => {
       await expect(messageOnDevice2).toContainText('Updated message from device 1');
     },
   );
+
+  test('I cannot edit another users message', {tag: ['@TC-683', '@regression']}, async ({browser, userA, userB}) => {
+    const [userAPages, userBPages] = await Promise.all([
+      (async () => {
+        const {pages, modals} = await createPagesForUser(browser, userA);
+        await modals.dataShareConsent().clickDecline();
+        return pages;
+      })(),
+      (async () => {
+        const {pages, modals} = await createPagesForUser(browser, userB);
+        await modals.dataShareConsent().clickDecline();
+        return pages;
+      })(),
+    ]);
+
+    await userAPages.conversationList().openConversation(userB.fullName);
+    await userBPages.conversationList().openConversation(userA.fullName);
+    await userAPages.conversation().sendMessage('Test Message');
+
+    const message = userBPages.conversation().getMessageFromUser(userA);
+    await expect(message).toContainText('Test Message');
+
+    const messageOptions = await userBPages.conversation().openMessageOptions(message);
+    await expect(messageOptions).not.toContainText('Edit');
+  });
 });
