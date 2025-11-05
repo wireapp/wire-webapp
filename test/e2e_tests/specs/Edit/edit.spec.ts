@@ -147,4 +147,18 @@ test.describe('Edit', () => {
     const messageOptions = await userBPages.conversation().openMessageOptions(message);
     await expect(messageOptions).not.toContainText('Edit');
   });
+
+  test(
+    'I can edit my last message by pressing the up arrow key',
+    {tag: ['@TC-686', '@regression']},
+    async ({browser, userA, userB}) => {
+      const {pages: userAPages, modals} = await createPagesForUser(browser, userA);
+      await modals.dataShareConsent().clickDecline();
+      await userAPages.conversationList().openConversation(userB.fullName);
+      await userAPages.conversation().sendMessage('Test Message');
+
+      await userAPages.conversation().messageInput.press('ArrowUp');
+      await expect(userAPages.conversation().messageInput).toContainText('Test Message');
+    },
+  );
 });
