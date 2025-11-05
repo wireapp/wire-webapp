@@ -26,10 +26,12 @@ import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 
 import {Core} from '../service/CoreSingleton';
 
-const accessTypeRoleMap = {
-  [ACCESS_TYPE.ADMINS]: [Role.ADMIN, Role.OWNER],
-  [ACCESS_TYPE.TEAM_MEMBERS]: [Role.ADMIN, Role.MEMBER, Role.OWNER],
-  [ACCESS_TYPE.EVERYONE]: [Role.ADMIN, Role.MEMBER, Role.EXTERNAL, Role.OWNER],
+const getAccessTypeRoleMap = (): Partial<Record<string, Role[]>> => {
+  return {
+    [ACCESS_TYPE.ADMINS]: [Role.ADMIN, Role.OWNER],
+    [ACCESS_TYPE.TEAM_MEMBERS]: [Role.ADMIN, Role.MEMBER, Role.OWNER],
+    [ACCESS_TYPE.EVERYONE]: [Role.ADMIN, Role.MEMBER, Role.EXTERNAL, Role.OWNER],
+  };
 };
 
 const useChannelFeature = () => {
@@ -42,13 +44,10 @@ const useCanCreateChannels = () => {
   const teamState = container.resolve(TeamState);
   const {selfRole} = useKoSubscribableChildren(teamState, ['selfRole']);
   const channelFeature = useChannelFeature();
+  const allowedAccessType = channelFeature?.config?.allowed_to_create_channels;
+  const allowedRoles = allowedAccessType ? getAccessTypeRoleMap()[allowedAccessType] : undefined;
 
-  if (
-    channelFeature &&
-    channelFeature.status === FEATURE_STATUS.ENABLED &&
-    selfRole &&
-    accessTypeRoleMap[channelFeature.config.allowed_to_create_channels].includes(selfRole)
-  ) {
+  if (channelFeature?.status === FEATURE_STATUS.ENABLED && selfRole && allowedRoles?.includes(selfRole)) {
     return true;
   }
 
@@ -59,12 +58,10 @@ const useCanCreatePublicChannels = () => {
   const teamState = container.resolve(TeamState);
   const {selfRole} = useKoSubscribableChildren(teamState, ['selfRole']);
   const channelFeature = useChannelFeature();
+  const allowedAccessType = channelFeature?.config?.allowed_to_open_channels;
+  const allowedRoles = allowedAccessType ? getAccessTypeRoleMap()[allowedAccessType] : undefined;
 
-  if (
-    channelFeature &&
-    selfRole &&
-    accessTypeRoleMap[channelFeature.config.allowed_to_open_channels].includes(selfRole)
-  ) {
+  if (channelFeature && selfRole && allowedRoles?.includes(selfRole)) {
     return true;
   }
 

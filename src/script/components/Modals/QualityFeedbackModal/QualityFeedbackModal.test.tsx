@@ -46,8 +46,6 @@ import {
   withTheme,
 } from '../../../auth/util/test/TestUtil';
 
-jest.mock('@wireapp/api-client/lib/team');
-
 jest.mock('Repositories/tracking/Telemetry.helpers', () => ({
   isTelemetryEnabledAtCurrentEnvironment: () => true,
 }));

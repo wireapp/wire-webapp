@@ -291,7 +291,7 @@ export function FeatureConfigChangeNotifier({teamState, selfUserId}: Props): nul
       const isEnforceDownloadPath = featureKey === FEATURE_KEY.ENFORCE_DOWNLOAD_PATH;
 
       if (!message) {
-        return;
+        continue;
       }
 
       logger.info(
