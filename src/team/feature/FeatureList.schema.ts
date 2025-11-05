@@ -19,7 +19,13 @@
 
 import {z} from 'zod';
 
-import {FEATURE_KEY} from './FeatureList.types';
+import {
+  ACCESS_TYPE,
+  CONVERSATION_PROTOCOL,
+  FEATURE_KEY,
+  FEATURE_LOCK_STATUS,
+  FEATURE_STATUS,
+} from './FeatureList.types';
 
 /**
  * Runtime validation schemas for the Wire backend feature flags API according to
@@ -36,10 +42,11 @@ import {FEATURE_KEY} from './FeatureList.types';
  */
 
 // Core feature flag field schemas
-const featureStatusSchema = z.enum(['enabled', 'disabled']);
-const featureLockStatusSchema = z.enum(['locked', 'unlocked']);
-const accessTypeSchema = z.enum(['team-members', 'everyone', 'admins']);
-const conversationProtocolSchema = z.enum(['proteus', 'mls']);
+
+const featureStatusSchema = z.nativeEnum(FEATURE_STATUS);
+const featureLockStatusSchema = z.nativeEnum(FEATURE_LOCK_STATUS);
+const accessTypeSchema = z.nativeEnum(ACCESS_TYPE);
+const conversationProtocolSchema = z.nativeEnum(CONVERSATION_PROTOCOL);
 
 /**
  * TTL (Time To Live) can be either:

@@ -21,14 +21,8 @@ import {Conversation} from './Conversation';
 import {DefaultConversationRoleName} from './ConversationRole';
 import {RECEIPT_MODE} from './data/ConversationReceiptModeUpdateData';
 
-import {TeamInfo} from '../team/';
+import {CONVERSATION_PROTOCOL, TeamInfo} from '../team/';
 import {QualifiedId} from '../user/';
-
-export enum ConversationProtocol {
-  MLS = 'mls',
-  PROTEUS = 'proteus',
-  MIXED = 'mixed',
-}
 
 export interface NewConversation
   extends Partial<
@@ -40,7 +34,7 @@ export interface NewConversation
   conversation_role?: DefaultConversationRoleName;
   qualified_users?: QualifiedId[];
   receipt_mode: RECEIPT_MODE | null;
-  protocol?: ConversationProtocol;
+  protocol?: CONVERSATION_PROTOCOL;
   team?: TeamInfo;
   /** users must be empty for creating MLS conversations */
   users?: string[];
