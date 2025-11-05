@@ -19,8 +19,9 @@
 
 import {getUser} from 'test/e2e_tests/data/user';
 import {PageManager} from 'test/e2e_tests/pageManager';
+import {completeLogin} from 'test/e2e_tests/utils/setup.util';
 import {addCreatedTeam, removeCreatedTeam} from 'test/e2e_tests/utils/tearDown.util';
-import {loginUser, sendTextMessageToUser} from 'test/e2e_tests/utils/userActions';
+import {sendTextMessageToUser} from 'test/e2e_tests/utils/userActions';
 
 import {test, expect} from '../../test.fixtures';
 
@@ -88,16 +89,8 @@ test(
       adminPageManager = new PageManager(adminPage);
     });
 
-    await test.step('A logs in', async () => {
-      await pageManager.openMainPage();
-      await loginUser(memberA, pageManager);
-      await modals.dataShareConsent().clickDecline();
-    });
-
-    await test.step('Owner logs in', async () => {
-      await adminPageManager.openMainPage();
-      await loginUser(owner, adminPageManager);
-      await adminPageManager.webapp.modals.dataShareConsent().clickDecline();
+    await test.step('Owner and member login', async () => {
+      await Promise.all([completeLogin(adminPageManager, owner), completeLogin(pageManager, memberA)]);
     });
 
     await test.step('A searches for Team Owner', async () => {
@@ -150,6 +143,7 @@ test(
     });
 
     await test.step('A sees the mention in the chat', async () => {
+      await pageManager.waitForTimeout(200); // wait to get the message
       await expect(pages.conversation().page.getByText(`@${memberA.fullName}`)).toBeVisible();
     });
   },

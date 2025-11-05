@@ -38,6 +38,10 @@ export class ConversationDetailsPage {
     this.archiveButton = this.conversationDetails.locator(selectByDataAttribute('do-archive'));
   }
 
+  async waitForSidebar() {
+    await this.conversationDetails.waitFor({state: 'visible'});
+  }
+
   async isOpen(conversationName: string) {
     return (
       (await this.page

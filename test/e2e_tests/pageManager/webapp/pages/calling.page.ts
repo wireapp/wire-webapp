@@ -93,7 +93,7 @@ export class CallingPage {
   }
 
   waitForGoFullScreen(): Promise<void> {
-    return this.goFullScreen.waitFor({state: 'visible'});
+    return this.fullScreen.waitFor({state: 'visible'});
   }
 
   waitForSelfVideoThumbnail(): Promise<void> {
@@ -106,8 +106,8 @@ export class CallingPage {
 
   // ─── Fullscreen Controls ────────────────────────────────────────────────
 
-  maximizeCell(): Promise<void> {
-    return this.goFullScreen.click();
+  async maximizeCell() {
+    await this.goFullScreen.click();
   }
 
   // ─── Mute Controls ──────────────────────────────────────────────────────
@@ -117,12 +117,12 @@ export class CallingPage {
     return state === 'active';
   }
 
-  muteSelfInFullScreen(): Promise<void> {
-    return this.fullScreenMuteButton.click();
+  async muteSelfInFullScreen() {
+    return await this.fullScreenMuteButton.click();
   }
 
-  unmuteSelfInFullScreen(): Promise<void> {
-    return this.fullScreenMuteButton.click();
+  async unmuteSelfInFullScreen() {
+    await this.fullScreenMuteButton.click();
   }
 
   isFullScreenMuteButtonVisible(): Promise<boolean> {
