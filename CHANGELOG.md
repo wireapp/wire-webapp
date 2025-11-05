@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [27.86.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@27.85.0...@wireapp/api-client@27.86.0) (2025-11-05)
+
+### Features
+
+* **api-client, core:** use zod for /features ([#7407](https://github.com/wireapp/wire-web-packages/issues/7407)) ([ee8c351](https://github.com/wireapp/wire-web-packages/commit/ee8c35161ad768d2af88431daca1e88deea9a818))
+
 # [27.85.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@27.84.0...@wireapp/api-client@27.85.0) (2025-11-05)
 
 ### Features
