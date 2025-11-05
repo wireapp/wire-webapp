@@ -541,6 +541,24 @@ export class ConversationService extends TypedEventEmitter<Events> {
         );
       }
 
+      if (isMLSStaleMessageError(error)) {
+        this.logger.info(
+          'Failed to add users to MLS conversation because of stale message, recovering by joining with external commit',
+          {
+            error,
+            groupId,
+          },
+        );
+
+        await this.recoverMLSGroupFromEpochMismatch(conversationId);
+        return this.addUsersToMLSConversation({
+          groupId,
+          conversationId,
+          qualifiedUsers,
+          shouldRetry: false,
+        });
+      }
+
       if (isMLSGroupOutOfSyncError(error)) {
         this.logger.info(
           'Failed to send MLS message because of group out of sync, recovering by adding missing users',
@@ -603,6 +621,18 @@ export class ConversationService extends TypedEventEmitter<Events> {
         );
       }
 
+      if (isMLSStaleMessageError(error)) {
+        this.logger.info(
+          'Failed to remove users from MLS conversation because of stale message, recovering by joining with external commit',
+          {
+            error,
+            groupId,
+          },
+        );
+
+        await this.recoverMLSGroupFromEpochMismatch(conversationId);
+      }
+
       if (isMLSGroupOutOfSyncError(error)) {
         this.logger.info(
           'Failed to send MLS message because of group out of sync, recovering by adding missing users',
@@ -619,16 +649,14 @@ export class ConversationService extends TypedEventEmitter<Events> {
           conversationId,
           qualifiedUsers: missingUsers,
         });
-
-        return this.removeUsersFromMLSConversation({
-          groupId,
-          conversationId,
-          qualifiedUserIds,
-          shouldRetry: false,
-        });
       }
 
-      throw error;
+      return this.removeUsersFromMLSConversation({
+        groupId,
+        conversationId,
+        qualifiedUserIds,
+        shouldRetry: false,
+      });
     }
   }
 
@@ -646,6 +674,16 @@ export class ConversationService extends TypedEventEmitter<Events> {
       if (isBrokenMLSConversationError(error)) {
         this.logger.info('Resetting MLS conversation due to broken mls conversation error', error);
         return this.handleBrokenMLSConversation(conversationId);
+      }
+
+      if (isMLSStaleMessageError(error)) {
+        this.logger.info(
+          'Failed to join MLS conversation with external commit because of stale message, recovering by joining with external commit',
+          {error, conversationId},
+        );
+
+        await this.recoverMLSGroupFromEpochMismatch(conversationId);
+        return;
       }
       throw error;
     }
@@ -689,6 +727,18 @@ export class ConversationService extends TypedEventEmitter<Events> {
       if (isBrokenMLSConversationError(error)) {
         this.logger.info('Tried to update key material for a broken MLS conversation, initiating reset', error);
         return this.handleBrokenMLSConversation(conversation.qualified_id);
+      }
+
+      if (isMLSStaleMessageError(error)) {
+        this.logger.info(
+          'Tried to update key material for a stale MLS conversation, recovering by joining with external commit',
+          {
+            error,
+            groupId,
+          },
+        );
+
+        await this.recoverMLSGroupFromEpochMismatch(conversation.qualified_id);
       }
 
       if (isMLSGroupOutOfSyncError(error)) {
