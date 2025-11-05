@@ -23,7 +23,7 @@ import {getUser, User} from 'test/e2e_tests/data/user';
 import {PageManager} from 'test/e2e_tests/pageManager';
 import {test as baseTest, expect} from 'test/e2e_tests/test.fixtures';
 import {removeCreatedUser} from 'test/e2e_tests/utils/tearDown.util';
-import {loginUser} from 'test/e2e_tests/utils/userActions';
+import {createGroup, loginUser} from 'test/e2e_tests/utils/userActions';
 
 const test = baseTest.extend<{userA: User; userB: User; setup: void}>({
   userA: async ({api}, use) => {
@@ -77,4 +77,25 @@ test.describe('Edit', () => {
     await userAPages.conversation().sendMessage('Edited Message');
     await expect(message).toContainText('Edited Message');
   });
+
+  test(
+    'I can edit my message in a group conversation',
+    {tag: ['@TC-680', '@regression']},
+    async ({browser, userA, userB}) => {
+      const userAPages = await createPagesForUser(browser, userA);
+      await createGroup(userAPages, 'Test Group', [userB]);
+      await userAPages.conversationList().openConversation('Test Group');
+      await userAPages.conversation().sendMessage('Test Message');
+
+      const message = userAPages.conversation().messageItems.filter({hasText: userA.fullName});
+      await expect(message).toContainText('Test Message');
+
+      await userAPages.conversation().editMessage(message);
+      await expect(userAPages.conversation().messageInput).toContainText('Test Message');
+
+      // Overwrite the text in the message input and send it
+      await userAPages.conversation().sendMessage('Edited Message');
+      await expect(message).toContainText('Edited Message');
+    },
+  );
 });
