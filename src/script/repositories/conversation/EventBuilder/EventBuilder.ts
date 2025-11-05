@@ -165,7 +165,7 @@ export type MultipartMessageAddEvent = ConversationEvent<
     attachments: MultiPartContent['attachments'];
     text: MultiPartContent['text'] & {mentions?: string[]; previews?: string[]};
   }
-> & {};
+>;
 export type MissedEvent = BaseEvent & {id: string; type: CONVERSATION.MISSED_MESSAGES};
 export type JoinedAfterMLSMigrationFinalisationEvent = BaseEvent & {
   type: CONVERSATION.JOINED_AFTER_MLS_MIGRATION;
