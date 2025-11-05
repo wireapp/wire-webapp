@@ -20,9 +20,10 @@
 import {RECEIPT_MODE} from './data';
 
 import {MLSPublicKeyRecord} from '../client';
+import {CONVERSATION_PROTOCOL} from '../team';
 import {QualifiedId} from '../user';
 
-import {ConversationMembers, ConversationProtocol} from './';
+import {ConversationMembers} from './';
 
 export enum CONVERSATION_TYPE {
   REGULAR = 0,
@@ -115,14 +116,14 @@ export interface Conversation {
   epoch?: number;
   cipher_suite?: number;
 
-  protocol: ConversationProtocol;
+  protocol: CONVERSATION_PROTOCOL;
 }
 
 export interface MLSConversation extends Conversation {
   group_id: string;
   epoch: number;
   cipher_suite: number;
-  protocol: ConversationProtocol.MLS;
+  protocol: CONVERSATION_PROTOCOL.MLS;
 }
 
 export interface MLS1to1Conversation {

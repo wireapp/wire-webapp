@@ -21,3 +21,4 @@ export * from './FeatureAPI';
 export * from './FeatureList.types';
 export * from './FeatureList.schema';
 export * from './FeatureError';
+export * from './FeatureList.helper';

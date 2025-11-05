@@ -89,23 +89,23 @@ export enum FEATURE_KEY {
   VIDEO_CALLING = 'videoCalling',
 }
 
-export enum FeatureStatus {
-  DISABLED = 'disabled',
-  ENABLED = 'enabled',
-}
-
-export enum FeatureLockStatus {
+export enum FEATURE_LOCK_STATUS {
   LOCKED = 'locked',
   UNLOCKED = 'unlocked',
 }
 
-export enum AccessType {
+export enum FEATURE_STATUS {
+  ENABLED = 'enabled',
+  DISABLED = 'disabled',
+}
+
+export enum ACCESS_TYPE {
   TEAM_MEMBERS = 'team-members',
   EVERYONE = 'everyone',
   ADMINS = 'admins',
 }
 
-export enum SelfDeletingTimeout {
+export enum SELF_DELETING_TIMEOUT {
   OFF = 0,
   SECONDS_10 = 10,
   MINUTES_5 = 300,
@@ -113,6 +113,12 @@ export enum SelfDeletingTimeout {
   DAYS_1 = 86_400,
   WEEKS_1 = 604_800,
   WEEKS_4 = 2_419_200,
+}
+
+export enum CONVERSATION_PROTOCOL {
+  MLS = 'mls',
+  PROTEUS = 'proteus',
+  MIXED = 'mixed',
 }
 
 /**

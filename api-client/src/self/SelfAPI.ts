@@ -19,8 +19,8 @@
 
 import {AxiosRequestConfig, AxiosResponse} from 'axios';
 
-import {ConversationProtocol} from '../conversation';
 import {HttpClient, TraceState} from '../http/';
+import {CONVERSATION_PROTOCOL} from '../team';
 import {UserUpdate} from '../user/';
 
 import {ChangePassword, Consent, ConsentResults, Delete, Name, Self} from './';
@@ -189,7 +189,7 @@ export class SelfAPI {
    * Update self user's list of supported-protocols
    * @param supportedProtocols The list of supported protocols
    */
-  public async putSupportedProtocols(supportedProtocols: ConversationProtocol[]) {
+  public async putSupportedProtocols(supportedProtocols: CONVERSATION_PROTOCOL[]) {
     const config: AxiosRequestConfig = {
       data: {supported_protocols: supportedProtocols},
       method: 'put',

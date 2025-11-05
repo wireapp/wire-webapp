@@ -25,7 +25,6 @@ import {
   ADD_PERMISSION,
   Conversation,
   ConversationCode,
-  ConversationProtocol,
   ConversationRolesList,
   DefaultConversationRoleName,
   Invite,
@@ -53,6 +52,7 @@ import {
   ConversationRenameEvent,
 } from '../../event';
 import {BackendError, BackendErrorLabel, HttpClient} from '../../http';
+import {CONVERSATION_PROTOCOL} from '../../team';
 import {QualifiedId} from '../../user';
 import {
   ConversationFullError,
@@ -983,7 +983,7 @@ export class ConversationAPI {
    */
   public async putConversationProtocol(
     conversationId: QualifiedId,
-    protocol: ConversationProtocol.MIXED | ConversationProtocol.MLS,
+    protocol: CONVERSATION_PROTOCOL.MIXED | CONVERSATION_PROTOCOL.MLS,
   ): Promise<ConversationProtocolUpdateEvent | null> {
     const config: AxiosRequestConfig = {
       data: {protocol},

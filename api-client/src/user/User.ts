@@ -21,8 +21,9 @@ import {AccentColor} from '@wireapp/commons';
 
 import {QualifiedId} from './QualifiedId';
 
-import {ConversationProtocol, ServiceRef} from '../conversation/';
+import {ServiceRef} from '../conversation/';
 import {Picture} from '../self/';
+import {CONVERSATION_PROTOCOL} from '../team';
 import {UserAsset} from '../user/';
 
 export interface User {
@@ -40,5 +41,5 @@ export interface User {
   service?: ServiceRef;
   team?: string;
   searchable?: boolean;
-  supported_protocols?: ConversationProtocol[];
+  supported_protocols?: CONVERSATION_PROTOCOL[];
 }

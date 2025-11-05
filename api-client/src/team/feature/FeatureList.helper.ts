@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2023 Wire Swiss GmbH
+ * Copyright (C) 2025 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,8 +17,20 @@
  *
  */
 
-import {CONVERSATION_PROTOCOL} from '../../team';
+import {CONVERSATION_PROTOCOL} from './FeatureList.types';
 
-export interface ConversationProtocolUpdateData {
-  protocol: CONVERSATION_PROTOCOL.MIXED | CONVERSATION_PROTOCOL.MLS;
-}
+export const mapToConversationProtocol = (protocol: unknown): CONVERSATION_PROTOCOL | undefined => {
+  if (typeof protocol !== 'string') {
+    return undefined;
+  }
+  switch (protocol) {
+    case CONVERSATION_PROTOCOL.MLS:
+      return CONVERSATION_PROTOCOL.MLS;
+    case CONVERSATION_PROTOCOL.PROTEUS:
+      return CONVERSATION_PROTOCOL.PROTEUS;
+    case CONVERSATION_PROTOCOL.MIXED:
+      return CONVERSATION_PROTOCOL.MIXED;
+    default:
+      return undefined;
+  }
+};

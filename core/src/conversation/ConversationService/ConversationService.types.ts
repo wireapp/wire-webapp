@@ -17,13 +17,9 @@
  *
  */
 
-import {
-  QualifiedUserClients,
-  ConversationProtocol,
-  MessageSendingStatus,
-  Conversation,
-} from '@wireapp/api-client/lib/conversation';
+import {QualifiedUserClients, MessageSendingStatus, Conversation} from '@wireapp/api-client/lib/conversation';
 import {ConversationEvent, ConversationMemberJoinEvent} from '@wireapp/api-client/lib/event';
+import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 
 import {GenericMessage} from '@wireapp/protocol-messaging';
@@ -82,7 +78,7 @@ export interface MessageSendingCallbacks {
  * The protocol to use to send the message (MLS or Proteus)
  */
 export type ProtocolParam = {
-  protocol: ConversationProtocol;
+  protocol: CONVERSATION_PROTOCOL;
 };
 
 /**
@@ -98,7 +94,7 @@ export type SendMlsMessageParams = SendCommonParams & {
    * The groupId of the conversation to send the message to (Needed only for MLS)
    */
   groupId: string;
-  protocol: ConversationProtocol.MLS;
+  protocol: CONVERSATION_PROTOCOL.MLS;
 };
 
 export type KeyPackageClaimUser = QualifiedId & {skipOwnClientId?: string};
