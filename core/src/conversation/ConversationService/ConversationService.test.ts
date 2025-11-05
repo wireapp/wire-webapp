@@ -146,6 +146,7 @@ describe('ConversationService', () => {
       getClientIdsInGroup: jest.fn(),
       getKeyPackagesPayload: jest.fn(),
       addUsersToExistingConversation: jest.fn(),
+      removeClientsFromConversation: jest.fn(),
       resetKeyMaterialRenewal: jest.fn(),
       handleMLSWelcomeMessageEvent: jest.fn(),
     } as unknown as MLSService;
@@ -204,6 +205,94 @@ describe('ConversationService', () => {
     });
   });
 
+  describe('removeUsersFromMLSConversation', () => {
+    it('recovers and retries when stale-message occurs during remove users commit upload', async () => {
+      const [conversationService, {apiClient, mlsService}] = await buildConversationService();
+
+      const mockGroupId = 'groupId-stale-remove';
+      const mockConversationId = {id: PayloadHelper.getUUID(), domain: 'staging.zinfra.io'};
+      const qualifiedUserIds: QualifiedId[] = [
+        {id: 'test-id-1', domain: 'test-domain'},
+        {id: 'test-id-2', domain: 'test-domain'},
+      ];
+
+      const staleMessageError = {
+        type: ErrorType.Mls,
+        context: {
+          type: MlsErrorType.MessageRejected,
+          context: {
+            reason: serializeAbortReason({message: UPLOAD_COMMIT_BUNDLE_ABORT_REASONS.MLS_STALE_MESSAGE}),
+          },
+        },
+      } as any;
+
+      // First removal attempt fails with stale, second succeeds
+      jest
+        .spyOn(mlsService, 'removeClientsFromConversation')
+        .mockRejectedValueOnce(staleMessageError)
+        .mockResolvedValueOnce(undefined as any);
+
+      const remoteEpoch = 6;
+      const localEpoch = 5;
+      jest.spyOn(mlsService, 'conversationExists').mockResolvedValueOnce(true);
+      jest.spyOn(mlsService, 'getEpoch').mockResolvedValueOnce(localEpoch);
+
+      jest.spyOn(apiClient.api.conversation, 'getConversation').mockResolvedValue({
+        qualified_id: mockConversationId,
+        protocol: ConversationProtocol.MLS,
+        epoch: remoteEpoch,
+        group_id: mockGroupId,
+      } as unknown as Conversation);
+
+      await conversationService.removeUsersFromMLSConversation({
+        groupId: mockGroupId,
+        conversationId: mockConversationId,
+        qualifiedUserIds,
+      });
+
+      expect(conversationService.joinByExternalCommit).toHaveBeenCalledWith(mockConversationId);
+      expect(mlsService.removeClientsFromConversation).toHaveBeenCalledTimes(2);
+      expect(mlsService.resetKeyMaterialRenewal).toHaveBeenCalledWith(mockGroupId);
+    });
+  });
+
+  describe('joinByExternalCommit', () => {
+    it('retries join when stale-message occurs during external commit join', async () => {
+      const [conversationService, {apiClient, mlsService}] = await buildConversationService();
+      const conversationId = {id: 'conv-join-stale', domain: 'staging.zinfra.io'};
+
+      const staleMessageError = {
+        type: ErrorType.Mls,
+        context: {
+          type: MlsErrorType.MessageRejected,
+          context: {
+            reason: serializeAbortReason({message: UPLOAD_COMMIT_BUNDLE_ABORT_REASONS.MLS_STALE_MESSAGE}),
+          },
+        },
+      } as any;
+
+      jest
+        .spyOn(mlsService, 'joinByExternalCommit')
+        .mockRejectedValueOnce(staleMessageError)
+        .mockResolvedValueOnce(undefined as any);
+
+      const remoteEpoch = 10;
+      const localEpoch = 9;
+      jest.spyOn(mlsService, 'conversationExists').mockResolvedValueOnce(true);
+      jest.spyOn(mlsService, 'getEpoch').mockResolvedValueOnce(localEpoch);
+      jest.spyOn(apiClient.api.conversation, 'getConversation').mockResolvedValueOnce({
+        qualified_id: conversationId,
+        protocol: ConversationProtocol.MLS,
+        epoch: remoteEpoch,
+        group_id: 'gid-join-stale',
+      } as unknown as Conversation);
+
+      await conversationService.joinByExternalCommit(conversationId);
+
+      expect(mlsService.joinByExternalCommit).toHaveBeenCalledTimes(2);
+    });
+  });
+
   describe('"send MLS"', () => {
     const groupId = PayloadHelper.getUUID();
     const messages = [
@@ -228,6 +317,53 @@ describe('ConversationService', () => {
         const result = await promise;
         expect(result.state).toBe(MessageSendingState.OUTGOING_SENT);
       });
+    });
+
+    it('rejoins a MLS group when stale-message error occurs during commit bundle upload', async () => {
+      const [conversationService, {apiClient, mlsService}] = await buildConversationService();
+
+      const mockGroupId = 'AAEAAH87aajaQ011i+rNLmwpy0sAZGl5YS53aXJlamxpbms=';
+      const mockConversationId = {id: 'mockConversationId', domain: 'staging.zinfra.io'};
+      const mockedMessage = MessageBuilder.buildTextMessage({text: 'test'});
+
+      const staleMessageError = new MLSStaleMessageError('', BackendErrorLabel.MLS_STALE_MESSAGE, HTTP_STATUS.CONFLICT);
+
+      // First attempt to upload commit bundle fails with stale-message, second attempt succeeds
+      jest
+        .spyOn(mlsService, 'commitPendingProposals')
+        .mockRejectedValueOnce(staleMessageError)
+        .mockResolvedValueOnce(undefined as unknown as void);
+
+      const remoteEpoch = 5;
+      const localEpoch = 4;
+
+      jest.spyOn(mlsService, 'conversationExists').mockResolvedValueOnce(true);
+      jest.spyOn(mlsService, 'getEpoch').mockResolvedValueOnce(localEpoch);
+
+      jest.spyOn(apiClient.api.conversation, 'getConversation').mockResolvedValueOnce({
+        qualified_id: mockConversationId,
+        protocol: ConversationProtocol.MLS,
+        epoch: remoteEpoch,
+        group_id: mockGroupId,
+      } as unknown as Conversation);
+
+      await conversationService.send({
+        protocol: ConversationProtocol.MLS,
+        groupId: mockGroupId,
+        payload: mockedMessage,
+        conversationId: mockConversationId,
+      });
+
+      // Recovery via external commit should have been triggered
+      expect(conversationService.joinByExternalCommit).toHaveBeenCalledWith(mockConversationId);
+      expect(conversationService.emit).toHaveBeenCalledWith('MLSConversationRecovered', {
+        conversationId: mockConversationId,
+      });
+
+      // Because the failure happened before posting the message, postMlsMessage should be called only once (after recovery)
+      expect(apiClient.api.conversation.postMlsMessage).toHaveBeenCalledTimes(1);
+      // commitPendingProposals is called twice: first fails, second succeeds
+      expect(mlsService.commitPendingProposals).toHaveBeenCalledTimes(2);
     });
 
     it('rejoins a MLS group when failed encrypting MLS message', async () => {
@@ -790,6 +926,62 @@ describe('ConversationService', () => {
 
       expect(failedToAdd).toEqual([keysClaimingFailure]);
     });
+
+    it('recovers and retries when stale-message occurs during add users commit upload', async () => {
+      const [conversationService, {apiClient, mlsService}] = await buildConversationService();
+
+      const mockGroupId = 'groupId-stale-add';
+      const mockConversationId = {id: PayloadHelper.getUUID(), domain: 'local.wire.com'};
+
+      const otherUsersToAdd = Array(2)
+        .fill(0)
+        .map(() => ({id: PayloadHelper.getUUID(), domain: 'local.wire.com'}));
+      const qualifiedUsers = [...otherUsersToAdd];
+
+      const staleMessageError = {
+        type: ErrorType.Mls,
+        context: {
+          type: MlsErrorType.MessageRejected,
+          context: {
+            reason: serializeAbortReason({message: UPLOAD_COMMIT_BUNDLE_ABORT_REASONS.MLS_STALE_MESSAGE}),
+          },
+        },
+      } as any;
+
+      const getKPSpy = jest.spyOn(mlsService, 'getKeyPackagesPayload');
+      getKPSpy.mockResolvedValue({
+        keyPackages: [new Uint8Array(0)],
+        failures: [],
+      });
+
+      // Simulate commit upload failing once with stale, then succeeding
+      jest
+        .spyOn(mlsService, 'addUsersToExistingConversation')
+        .mockRejectedValueOnce(staleMessageError)
+        .mockResolvedValueOnce(undefined as any);
+
+      const remoteEpoch = 5;
+      const localEpoch = 4;
+      jest.spyOn(mlsService, 'conversationExists').mockResolvedValueOnce(true);
+      jest.spyOn(mlsService, 'getEpoch').mockResolvedValueOnce(localEpoch);
+
+      const getConvSpy = jest.spyOn(apiClient.api.conversation, 'getConversation');
+      getConvSpy.mockResolvedValue({
+        qualified_id: mockConversationId,
+        protocol: ConversationProtocol.MLS,
+        epoch: remoteEpoch,
+        group_id: mockGroupId,
+      } as unknown as Conversation);
+
+      await conversationService.addUsersToMLSConversation({
+        qualifiedUsers,
+        groupId: mockGroupId,
+        conversationId: mockConversationId,
+      });
+
+      expect(conversationService.joinByExternalCommit).toHaveBeenCalledWith(mockConversationId);
+      expect(mlsService.addUsersToExistingConversation).toHaveBeenCalledTimes(2);
+    });
   });
 
   describe('tryEstablishingMLSGroup', () => {
@@ -969,6 +1161,47 @@ describe('ConversationService', () => {
       await Promise.allSettled([p1, p2]);
 
       expect(resetSpy).toHaveBeenCalledTimes(1);
+    });
+
+    it('handles stale-message by rejoining via external commit and emits recovery event', async () => {
+      const [conversationService, {apiClient, mlsService}] = await buildConversationService();
+      const groupId = 'group-stale';
+      const qualified_id = {id: 'conv-stale', domain: 'staging.zinfra.io'};
+
+      jest.spyOn(apiClient.api.conversation, 'getConversationList').mockResolvedValueOnce({
+        found: [{group_id: groupId, qualified_id, protocol: ConversationProtocol.MLS, epoch: 2}] as any,
+      });
+
+      const handler = getKeyMaterialFailureHandler(mlsService);
+
+      const staleMessageError = {
+        type: ErrorType.Mls,
+        context: {
+          type: MlsErrorType.MessageRejected,
+          context: {
+            reason: serializeAbortReason({message: UPLOAD_COMMIT_BUNDLE_ABORT_REASONS.MLS_STALE_MESSAGE}),
+          },
+        },
+      } as any;
+
+      const remoteEpoch = 3;
+      const localEpoch = 2;
+
+      jest.spyOn(mlsService, 'conversationExists').mockResolvedValueOnce(true);
+      jest.spyOn(mlsService, 'getEpoch').mockResolvedValueOnce(localEpoch);
+
+      jest.spyOn(apiClient.api.conversation, 'getConversation').mockResolvedValueOnce({
+        qualified_id,
+        protocol: ConversationProtocol.MLS,
+        epoch: remoteEpoch,
+        group_id: groupId,
+      } as unknown as Conversation);
+
+      await handler({error: staleMessageError, groupId});
+
+      // Expect a rejoin on stale and a recovery event
+      expect(conversationService.joinByExternalCommit).toHaveBeenCalledWith(qualified_id);
+      expect(conversationService.emit).toHaveBeenCalledWith('MLSConversationRecovered', {conversationId: qualified_id});
     });
   });
 
