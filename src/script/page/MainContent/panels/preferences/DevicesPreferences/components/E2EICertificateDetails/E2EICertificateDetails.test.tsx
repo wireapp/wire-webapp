@@ -42,6 +42,7 @@ const generateIdentity = (status: MLSStatuses, credentialType = CredentialType.X
     notAfter: BigInt(0),
     notBefore: BigInt(0),
     serialNumber: '',
+    [Symbol.dispose]: () => {},
   },
   credentialType,
   deviceId: '',

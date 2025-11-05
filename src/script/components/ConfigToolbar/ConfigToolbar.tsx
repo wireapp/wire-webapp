@@ -32,6 +32,8 @@ import {wrapperStyles} from './ConfigToolbar.styles';
 
 export function ConfigToolbar() {
   const [showConfig, setShowConfig] = useState(false);
+  const [isResettingMLSConversation, setIsResettingMLSConversation] = useState(false);
+  const [isGzipEnabled, setIsGzipEnabled] = useState(window.wire?.app.debug?.isGzippingEnabled() || false);
   const [configFeaturesState, setConfigFeaturesState] = useState<Configuration['FEATURE']>(Config.getConfig().FEATURE);
   const [isMessageSendingActive, setIsMessageSendingActive] = useState(false);
   const messageCountRef = useRef<number>(0);
@@ -39,6 +41,7 @@ export function ConfigToolbar() {
   const [messageDelaySec, setMessageDelaySec] = useState<number>(0);
   const wrapperRef = useRef(null);
   const [avsDebuggerEnabled, setAvsDebuggerEnabled] = useState(!!window.wire?.app?.debug?.isEnabledAvsDebugger());
+  const [avsRustSftEnabled, setAvsRustSftEnabled] = useState(!!window.wire?.app?.debug?.isEnabledAvsRustSFT());
 
   // Toggle config tool on 'cmd/ctrl + shift + 2'
   useEffect(() => {
@@ -181,7 +184,7 @@ export function ConfigToolbar() {
     setAvsDebuggerEnabled(!!window.wire?.app?.debug?.enableAvsDebugger(isChecked));
   };
 
-  const renderAvsSwitch = (value: boolean) => {
+  const renderAvsSwitch = () => {
     return (
       <div style={{marginBottom: '10px'}}>
         <label htmlFor="avs-debugger-checkbox" style={{display: 'block', fontWeight: 'bold'}}>
@@ -194,6 +197,55 @@ export function ConfigToolbar() {
         />
       </div>
     );
+  };
+
+  const handleAvsRustSftEnable = (isChecked: boolean) => {
+    setAvsRustSftEnabled(!!window.wire?.app?.debug?.enableAvsRustSFT(isChecked));
+  };
+  const renderAvsRustSftSwitch = () => {
+    return (
+      <div style={{marginBottom: '10px'}}>
+        <label htmlFor="avs-rust-sft-checkbox" style={{display: 'block', fontWeight: 'bold'}}>
+          ENABLE AVS RUST SFT
+        </label>
+        <Switch
+          id="avs-rust-sft-checkbox"
+          checked={avsRustSftEnabled}
+          onToggle={isChecked => handleAvsRustSftEnable(isChecked)}
+        />
+      </div>
+    );
+  };
+
+  const renderGzipSwitch = () => {
+    return (
+      <div style={{marginBottom: '10px'}}>
+        <label htmlFor="gzip-checkbox" style={{display: 'block', fontWeight: 'bold'}}>
+          ENABLE GZIP
+        </label>
+        <Switch
+          id="gzip-checkbox"
+          checked={isGzipEnabled}
+          onToggle={() => {
+            setIsGzipEnabled(previousIsGzipEnabled => {
+              window.wire?.app?.debug?.toggleGzipping(!previousIsGzipEnabled);
+              return !previousIsGzipEnabled;
+            });
+          }}
+        />
+      </div>
+    );
+  };
+
+  const resetMLSConversation = async () => {
+    setIsResettingMLSConversation(true);
+    try {
+      await window.wire?.app?.debug?.resetMLSConversation();
+    } catch (error) {
+      console.error('Error resetting MLS conversation:', error);
+    } finally {
+      setIsResettingMLSConversation(false);
+    }
   };
 
   if (!showConfig) {
@@ -212,11 +264,24 @@ export function ConfigToolbar() {
 
       <h3>Debug Functions</h3>
 
-      <Button onClick={() => window.wire?.app?.debug?.reconnectWebSocket()}>reconnectWebSocket</Button>
-      <Button onClick={() => window.wire?.app?.debug?.enablePressSpaceToUnmute()}>enablePressSpaceToUnmute</Button>
-      <Button onClick={() => window.wire?.app?.debug?.disablePressSpaceToUnmute()}>disablePressSpaceToUnmute</Button>
+      <Button onClick={() => window.wire?.app?.debug?.reconnectWebSocket()}>Reconnect WebSocket</Button>
+      <Button onClick={() => window.wire?.app?.debug?.enablePressSpaceToUnmute()}>Enable Press Space To Unmute</Button>
+      <Button onClick={() => window.wire?.app?.debug?.disablePressSpaceToUnmute()}>
+        Disable Press Space To Unmute
+      </Button>
+      <Button disabled={isResettingMLSConversation} onClick={resetMLSConversation}>
+        Reset MLS Conversation
+      </Button>
 
-      <div>{renderAvsSwitch(avsDebuggerEnabled)}</div>
+      <div>{renderAvsSwitch()}</div>
+
+      <hr />
+
+      <div>{renderAvsRustSftSwitch()}</div>
+
+      <hr />
+
+      <div>{renderGzipSwitch()}</div>
 
       <hr />
 

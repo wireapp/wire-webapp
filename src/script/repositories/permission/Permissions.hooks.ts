@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2018 Wire Swiss GmbH
+ * Copyright (C) 2025 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,9 +17,9 @@
  *
  */
 
-/** @see https://developer.mozilla.org/en-US/docs/Web/API/PermissionStatus/state */
-export enum PermissionStatusState {
-  DENIED = 'denied',
-  GRANTED = 'granted',
-  PROMPT = 'prompt',
-}
+import {useStore} from 'zustand';
+
+import {permissionsStore, PermissionsState} from './Permissions.store';
+
+export const usePermissionsStore = <T>(selector: (state: PermissionsState) => T): T =>
+  useStore(permissionsStore, selector);

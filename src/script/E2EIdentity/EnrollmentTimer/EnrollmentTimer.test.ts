@@ -81,7 +81,7 @@ describe('e2ei delays', () => {
     expect(firingDate).toBe(gracePeriodStartingPoint);
   });
 
-  it('should return a non snoozable timer if device is out of the grace period', () => {
+  it('should return a snoozable timer scheduled at the start of the grace period if we are not in it yet', () => {
     const deadline = Date.now() + gracePeriod + 1000;
     const gracePeriodStartingPoint = deadline - gracePeriod;
     const {firingDate, isSnoozable} = getEnrollmentTimer(

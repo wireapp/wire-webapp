@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2018 Wire Swiss GmbH
+ * Copyright (C) 2025 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,11 +17,12 @@
  *
  */
 
-/** @see https://developer.mozilla.org/en-US/docs/Web/API/Notification/permission */
-export enum PermissionState {
-  DEFAULT = 'default',
-  DENIED = 'denied',
-  GRANTED = 'granted',
-  IGNORED = 'ignored',
-  UNSUPPORTED = 'unsupported',
+import {Page} from '@playwright/test';
+
+import {BaseModal} from './base.modal';
+
+export class ConversationNotConnectedModal extends BaseModal {
+  constructor(page: Page) {
+    super(page, "[data-uie-name='modal-template-acknowledge']");
+  }
 }

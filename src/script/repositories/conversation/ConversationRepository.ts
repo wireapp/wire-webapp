@@ -26,6 +26,7 @@ import {
   MessageSendingStatus,
   RemoteConversations,
   ADD_PERMISSION,
+  CONVERSATION_CELLS_STATE,
 } from '@wireapp/api-client/lib/conversation';
 import {
   MemberLeaveReason,
@@ -58,6 +59,7 @@ import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 import {container} from 'tsyringe';
 import {flatten} from 'underscore';
 
+import {Account} from '@wireapp/core';
 import {Asset as ProtobufAsset, Confirmation, LegalHoldStatus} from '@wireapp/protocol-messaging';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
@@ -1285,6 +1287,19 @@ export class ConversationRepository {
   };
 
   /**
+   * Get all the group conversations with Cells enabled.
+   */
+  public readonly getAllCellEnabledGroupConversations = (): Conversation[] => {
+    return this.conversationState
+      .conversations()
+      .filter(
+        conversation =>
+          conversation.cellsState() === CONVERSATION_CELLS_STATE.READY ||
+          conversation.cellsState() === CONVERSATION_CELLS_STATE.PENDING,
+      );
+  };
+
+  /**
    * Get group conversations by name.
    *
    * @param query Query to be searched in group conversation names
@@ -2166,6 +2181,141 @@ export class ConversationRepository {
       }
 
       return undefined;
+    }
+  };
+
+  /**
+   * Ensures that a conversation exists by checking its group ID and conversation ID.
+   * If the conversation does not exist, it will try to establish it or join it by external commit.
+   *
+   * @param param0 conversationId and groupId
+   * @returns void
+   */
+  public ensureConversationExists = async ({
+    conversationId,
+    groupId,
+    epoch,
+    core = this.core,
+    retry = true,
+  }: {
+    conversationId: QualifiedId;
+    groupId: string;
+    epoch: number;
+    core?: Account;
+    retry?: boolean;
+  }): Promise<void> => {
+    this.logger.info('Ensuring conversation exists', {conversationId, groupId, epoch});
+    if (await this.conversationService.mlsGroupExistsLocally(groupId)) {
+      this.logger.info('Conversation already exists locally', {conversationId, groupId, epoch});
+      if (epoch === 0) {
+        if (!retry) {
+          this.logger.error('Epoch is 0, but retry is false, not retrying again', {conversationId, groupId, epoch});
+          return;
+        }
+        return this.recoverFromLocalUnestablishedMLSConversations({conversationId, groupId, epoch, core});
+      }
+      return;
+    }
+
+    // establish the conversation if epoch is 0
+    if (epoch === 0) {
+      this.logger.info('Establishing conversation as epoch is 0', {conversationId, groupId, epoch});
+      await this.establishMlsGroupConversation({conversationId, groupId, epoch, core});
+      return;
+    }
+
+    // join by external commit
+    this.logger.info('Joining conversation by external commit', {conversationId, epoch});
+    if (epoch && epoch > 0) {
+      await this.core.service?.conversation?.joinByExternalCommit(conversationId);
+    }
+  };
+
+  /**
+   * Establishes a MLS group conversation.
+   */
+  private establishMlsGroupConversation = async ({
+    conversationId,
+    groupId,
+    epoch,
+    core = this.core,
+  }: {
+    conversationId: QualifiedId;
+    groupId: string;
+    epoch: number;
+    core?: Account;
+  }) => {
+    this.logger.info('Establishing conversation', {conversationId, groupId, epoch});
+    const selfUser = this.userState.self();
+    const conversation = this.conversationState.findConversation(conversationId);
+
+    if (!selfUser || !conversation) {
+      this.logger.error('Self user or conversation is not available!', {selfUser, conversation});
+      throw new Error('Self user or conversation is not available!');
+    }
+
+    const selfUserClientId = selfUser.localClient?.id;
+    if (!selfUserClientId) {
+      this.logger.error('Self user client id is not available!', {selfUserClientId});
+      throw new Error('Self user client id is not available!');
+    }
+
+    const members = conversation.participating_user_ids();
+    await core.service?.conversation?.establishMLSGroupConversation(
+      groupId,
+      members,
+      selfUser.qualifiedId,
+      selfUserClientId,
+      conversationId,
+    );
+  };
+
+  /**
+   * Recovers from local unestablished MLS conversations by refetching metadata and re-establishing the conversation.
+   * This is typically needed when the local epoch is 0 but the epoch on backend is greater than 0
+   * indicating that the conversation has not been properly established.
+   * throws error in case both local and remote MLS group are at epoch 0 or remote epoch is not available
+   */
+  private recoverFromLocalUnestablishedMLSConversations = async ({
+    conversationId,
+    groupId,
+    epoch,
+    core = this.core,
+  }: {
+    conversationId: QualifiedId;
+    groupId: string;
+    epoch: number;
+    core?: Account;
+  }) => {
+    try {
+      this.logger.info('Epoch is 0, refetching conversation metadata and re-establishing', {
+        conversationId,
+        groupId,
+        epoch,
+      });
+      await core.service?.conversation?.wipeMLSConversation(groupId);
+      const remoteConversation = await this.conversationService.getConversationById(conversationId);
+      const remoteEpoch = remoteConversation.epoch;
+      if (!remoteEpoch) {
+        this.logger.error('Remote epoch is not available!', {remoteConversation});
+        throw new Error('Remote epoch is not available!');
+      }
+      if (remoteEpoch === epoch) {
+        const errorMessage =
+          'Cannot recover: both local and remote MLS group are at epoch 0, the conversation was never established on the backend';
+        this.logger.error(errorMessage, {remoteEpoch, epoch});
+        throw new Error(errorMessage);
+      }
+
+      return this.ensureConversationExists({conversationId, groupId, epoch: remoteEpoch, core, retry: false});
+    } catch (error) {
+      this.logger.error('Failed to recover from local unestablished MLS conversation', {
+        error,
+        conversationId,
+        groupId,
+        epoch,
+      });
+      throw error;
     }
   };
 
@@ -3756,7 +3906,7 @@ export class ConversationRepository {
 
       // If the group is not established yet, we need to establish it
       if (!isAlreadyEstablished) {
-        await initMLSGroupConversation(conversationEntity, selfUser.qualifiedId, {core: this.core});
+        await initMLSGroupConversation(conversationEntity, this, {core: this.core});
       }
     }
 

@@ -17,7 +17,7 @@
  *
  */
 
-import {AssetOptions, AssetRetentionPolicy} from '@wireapp/api-client/lib/asset/';
+import {AssetAuditData, AssetOptions, AssetRetentionPolicy} from '@wireapp/api-client/lib/asset/';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 import ko from 'knockout';
 import {container, singleton} from 'tsyringe';
@@ -46,6 +46,7 @@ interface CompressedImage {
 }
 
 export interface AssetUploadOptions extends AssetOptions {
+  auditData?: AssetAuditData;
   domain?: string;
   legalHoldStatus?: LegalHoldStatus;
 }
@@ -228,25 +229,40 @@ export class AssetRepository {
    * @param file The raw content of the file to upload
    * @param messageId The message the file is associated with
    * @param options
+   * @param isAuditLogEnabled Whether to attach audit log data to the upload
    * @param onCancel? Will be called if the upload has been canceled
    */
-  async uploadFile(file: Blob, messageId: string, options: AssetUploadOptions, onCancel?: () => void) {
+  async uploadFile(
+    file: Blob,
+    messageId: string,
+    options: AssetUploadOptions,
+    isAuditLogEnabled: boolean,
+    onCancel?: () => void,
+  ) {
     const bytes = await loadFileBuffer(file);
     const progressObservable = ko.observable(0);
     this.uploadProgressQueue.push({messageId, progress: progressObservable});
 
-    const request = await this.assetCoreService.uploadAsset(
-      Buffer.from(bytes),
-      {
-        domain: options.domain,
-        public: options.public,
-        retention: options.retention,
-      },
-      fraction => {
-        const percentage = fraction * 100;
-        progressObservable(percentage);
-      },
-    );
+    const assetOptions: AssetOptions = {
+      domain: options.domain,
+      public: options.public,
+      retention: options.retention,
+      ...(isAuditLogEnabled && {auditData: options.auditData}),
+    };
+
+    if (isAuditLogEnabled) {
+      const isIncompleteAuditData =
+        !options.auditData || !options.auditData.convId || !options.auditData.filename || !options.auditData.filetype;
+      if (isIncompleteAuditData) {
+        this.removeFromUploadQueue(messageId);
+        throw new Error('Audit data is incomplete, file cannot be uploaded');
+      }
+    }
+
+    const request = await this.assetCoreService.uploadAsset(Buffer.from(bytes), {...assetOptions}, fraction => {
+      const percentage = fraction * 100;
+      progressObservable(percentage);
+    });
 
     this.uploadCancelTokens[messageId] = () => {
       request.cancel();

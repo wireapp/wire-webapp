@@ -21,7 +21,7 @@ import {CONVERSATION_CELLS_STATE} from '@wireapp/api-client/lib/conversation';
 import {RECEIPT_MODE} from '@wireapp/api-client/lib/conversation/data/';
 import {amplify} from 'amplify';
 
-import {HideIcon, HistoryIcon, LockClosedIcon, UnlockedIcon} from '@wireapp/react-ui-kit';
+import {CollectionIcon, HideIcon, HistoryIcon, LockClosedIcon, UnlockedIcon} from '@wireapp/react-ui-kit';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import * as Icon from 'Components/Icon';
@@ -198,13 +198,29 @@ const ConversationDetailsOptions = ({
           />
         )}
 
+        {isCellsConversation && (
+          <ConversationDetailsOption
+            className="conversation-details__cells-info"
+            dataUieName="cells-info"
+            icon={<CollectionIcon />}
+            title={t('conversationDetailsActionCellsTitle')}
+            statusUieName="status-cells-info"
+            statusText={t('conversationDetailsActionCellsOption')}
+            disabled
+          />
+        )}
+
         {showOptionTimedMessages && (
           <ConversationDetailsOption
             className="conversation-details__timed-messages"
             onClick={canEditTimeout ? openTimedMessagePanel : undefined}
             dataUieName="go-timed-messages"
             icon={<Icon.TimerIcon />}
-            title={t('conversationDetailsActionTimedMessages')}
+            title={
+              isCellsConversation
+                ? t('conversationDetailsActionTimedMessagesDisabled')
+                : t('conversationDetailsActionTimedMessages')
+            }
             statusUieName="status-timed-messages"
             statusText={timedMessagesText}
             disabled={!canEditTimeout}

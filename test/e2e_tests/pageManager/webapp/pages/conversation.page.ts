@@ -48,8 +48,12 @@ export class ConversationPage {
   readonly conversationInfoButton: Locator;
   readonly pingButton: Locator;
   readonly messages: Locator;
+  readonly messageItems: Locator;
   readonly filesTab: Locator;
   readonly isTypingIndicator: Locator;
+  readonly itemPendingRequest: Locator;
+  readonly ignoreButton: Locator;
+  readonly cancelRequest: Locator;
 
   readonly getImageAltText = (user: User) => `Image from ${user.fullName}`;
 
@@ -79,11 +83,15 @@ export class ConversationPage {
     this.callButton = page.locator(selectByDataAttribute('do-call'));
     this.conversationInfoButton = page.locator(selectByDataAttribute('do-open-info'));
     this.pingButton = page.locator(selectByDataAttribute('do-ping'));
+    this.messageItems = page.locator(selectByDataAttribute('item-message'));
     this.messages = page.locator(
       `${selectByDataAttribute('item-message')} ${selectByClass('message-body')}:not(:has(p${selectByClass('text-foreground')})):has(${selectByClass('text')})`,
     );
     this.filesTab = page.locator('#conversation-tab-files');
     this.isTypingIndicator = page.locator(selectByDataAttribute('typing-indicator-title'));
+    this.itemPendingRequest = page.locator(selectByDataAttribute('item-pending-requests'));
+    this.ignoreButton = page.getByTestId('do-ignore');
+    this.cancelRequest = page.getByTestId('do-cancel-request');
   }
 
   protected getImageLocator(user: User): Locator {
@@ -97,6 +105,10 @@ export class ConversationPage {
       (await this.page.locator(selectByDataAttribute('status-conversation-title-bar-label')).textContent()) ===
       conversationName
     );
+  }
+
+  async clickItemPendingRequest() {
+    await this.itemPendingRequest.click();
   }
 
   async clickConversationTitle() {
@@ -113,6 +125,14 @@ export class ConversationPage {
 
   async clickFilesTab() {
     await this.filesTab.click();
+  }
+
+  async clickIgnoreButton() {
+    await this.ignoreButton.click();
+  }
+
+  async clickCancelRequest() {
+    await this.cancelRequest.click();
   }
 
   async isWatermarkVisible() {
@@ -190,6 +210,11 @@ export class ConversationPage {
 
     // Take a screenshot of the image
     return await locator.screenshot();
+  }
+
+  async reactOnMessage(message: Locator) {
+    await message.hover();
+    await message.getByRole('group').getByRole('button').first().click();
   }
 
   async clickImage(user: User) {
@@ -348,5 +373,10 @@ export class ConversationPage {
 
   async sendPing() {
     await this.pingButton.click();
+  }
+
+  async getCurrentFocusedToolTip(message: Locator) {
+    await message.getByTestId('emoji-pill').first().hover();
+    return this.page.locator('[data-testid="tooltip-content"]');
   }
 }

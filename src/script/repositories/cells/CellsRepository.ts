@@ -113,6 +113,12 @@ export class CellsRepository {
     return this.apiClient.api.cells.deleteNode({uuid, permanently});
   }
 
+  async deleteNodes({uuids, permanently = false}: {uuids: string[]; permanently?: boolean}) {
+    uuids.forEach(async uuid => {
+      await this.deleteNode({uuid, permanently});
+    });
+  }
+
   async moveNode({currentPath, targetPath}: {currentPath: string; targetPath: string}) {
     return this.apiClient.api.cells.moveNode({currentPath, targetPath});
   }
@@ -187,12 +193,14 @@ export class CellsRepository {
     query,
     limit = DEFAULT_MAX_FILES_LIMIT,
     tags,
+    type,
     sortBy,
     sortDirection,
   }: {
     query: string;
     limit?: number;
     tags?: string[];
+    type?: 'file' | 'folder';
     sortBy?: SortBy;
     sortDirection?: SortDirection;
   }) {
@@ -202,6 +210,7 @@ export class CellsRepository {
       sortBy,
       sortDirection,
       tags,
+      ...(type ? {type: type === 'file' ? 'LEAF' : 'COLLECTION'} : {}),
     });
   }
 

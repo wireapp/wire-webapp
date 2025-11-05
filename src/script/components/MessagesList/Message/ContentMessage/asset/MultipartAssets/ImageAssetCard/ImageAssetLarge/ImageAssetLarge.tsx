@@ -75,6 +75,7 @@ export const ImageAssetLarge = ({
         aria-haspopup="dialog"
         aria-expanded={isOpen}
         aria-controls={id}
+        disabled={isError}
         style={
           {
             '--aspect-ratio': aspectRatio,

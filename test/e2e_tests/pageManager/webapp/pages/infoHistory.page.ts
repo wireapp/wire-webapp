@@ -23,7 +23,7 @@ import {selectByDataAttribute} from 'test/e2e_tests/utils/selector.util';
 
 export class HistoryInfoPage {
   readonly page: Page;
-  private readonly continueButton: Locator;
+  readonly continueButton: Locator;
 
   constructor(page: Page) {
     this.page = page;
@@ -31,7 +31,7 @@ export class HistoryInfoPage {
   }
   async isButtonVisible() {
     try {
-      await this.continueButton.waitFor({state: 'visible', timeout: 10000});
+      await this.continueButton.waitFor({state: 'visible'});
       return true;
     } catch (err) {
       return false;

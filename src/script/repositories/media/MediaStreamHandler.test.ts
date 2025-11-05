@@ -17,7 +17,6 @@
  *
  */
 
-import {PermissionRepository} from 'Repositories/permission/PermissionRepository';
 import {UserState} from 'Repositories/user/UserState';
 
 import {MediaConstraintsHandler} from './MediaConstraintsHandler';
@@ -33,7 +32,7 @@ describe('MediaStreamHandler', () => {
   const mediaConstraintsHandler = new MediaConstraintsHandler(userState);
 
   beforeEach(() => {
-    streamHandler = new MediaStreamHandler(mediaConstraintsHandler, new PermissionRepository());
+    streamHandler = new MediaStreamHandler(mediaConstraintsHandler);
   });
 
   describe('requestMediaStream', () => {

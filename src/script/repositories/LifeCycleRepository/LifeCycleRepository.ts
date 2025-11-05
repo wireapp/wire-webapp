@@ -30,7 +30,6 @@ import {StorageKey} from 'Repositories/storage/StorageKey';
 import type {StorageRepository} from 'Repositories/storage/StorageRepository';
 import type {UserRepository} from 'Repositories/user/UserRepository';
 import {getLogger, Logger} from 'Util/Logger';
-import {resetStoreValue, storeValue} from 'Util/StorageUtil';
 import {includesString} from 'Util/StringUtil';
 import {appendParameter} from 'Util/UrlUtil';
 
@@ -105,7 +104,9 @@ export class LifeCycleRepository {
    * Temporary guests are redirected to the main website instead of login.
    */
   public redirectToLogin = (signOutReason: SIGN_OUT_REASON): void => {
-    this.logger.info(`Redirecting to login after connectivity verification. Reason: ${signOutReason}`);
+    this.logger.info(
+      `Initiating redirect to login. Sign-out reason: '${signOutReason}'. Checking for temporary guest and main website redirection.`,
+    );
 
     const isTemporaryGuestSignOut = LifeCycleRepository.LOGOUT_CONFIG.TEMPORARY_GUEST_REASONS.includes(signOutReason);
     const currentUser = this.dependencies.userRepository['userState'].self();
@@ -113,9 +114,11 @@ export class LifeCycleRepository {
 
     // Redirect temporary guests to main website instead of login page
     if (isTemporaryGuestSignOut && isTemporaryGuestUser && externalUrl.website) {
+      this.logger.info('User is a temporary guest. Redirecting to main website instead of login page.');
       return window.location.replace(externalUrl.website);
     }
 
+    this.logger.debug('Proceeding with simple redirect to login page.');
     doSimpleRedirect(signOutReason);
   };
 
@@ -126,16 +129,11 @@ export class LifeCycleRepository {
   public logout = async (signOutReason: SIGN_OUT_REASON, shouldClearAllData: boolean): Promise<void> => {
     // Prevent concurrent logout operations
     if (this.isCurrentlyLoggingOut) {
+      this.logger.warn('Logout requested while another logout is already in progress. Ignoring duplicate request.');
       return;
     }
+    this.logger.info(`Logout process started. Reason: '${signOutReason}', Clear all data: ${shouldClearAllData}`);
     this.isCurrentlyLoggingOut = true;
-
-    const isUserRequestedLogout = signOutReason === SIGN_OUT_REASON.USER_REQUESTED;
-    if (isUserRequestedLogout) {
-      storeValue(StorageKey.AUTH.SHOW_LOGIN, true);
-    } else {
-      resetStoreValue(StorageKey.AUTH.SHOW_LOGIN);
-    }
 
     // Helper function to notify about logout completion and redirect
     const completeLogoutAndRedirect = (): void => {
@@ -198,12 +196,16 @@ export class LifeCycleRepository {
    * Cleans up active conversation state and disconnects WebSocket connections.
    */
   private readonly cleanupActiveSession = async (): Promise<void> => {
+    this.logger.debug(
+      'Cleaning up active session: ending typing indicators, disconnecting events, and clearing conversation state.',
+    );
     const activeConversation = this.dependencies.conversationRepository.getActiveConversation();
 
     // Send typing stop notification for active conversation
     if (activeConversation) {
       try {
         await this.dependencies.conversationRepository.sendTypingStop(activeConversation);
+        this.logger.debug('Sent typing stop notification for active conversation during logout.');
       } catch (error) {
         this.logger.warn('Failed to send typing stop before logout.', error);
       }
@@ -212,9 +214,11 @@ export class LifeCycleRepository {
     // Clear all typing indicators
     const {clearTypingUsers} = useTypingIndicatorState.getState();
     clearTypingUsers();
+    this.logger.debug('Cleared all typing indicators.');
 
     // Disconnect from real-time events
     this.dependencies.eventRepository.disconnectWebSocket();
+    this.logger.debug('Disconnected from real-time event WebSocket.');
   };
 
   /**
@@ -225,6 +229,7 @@ export class LifeCycleRepository {
     signOutReason: SIGN_OUT_REASON,
     shouldClearAllData: boolean,
   ): Promise<void> => {
+    this.logger.debug('Starting selective localStorage cleanup. Evaluating which keys to preserve and what to wipe.');
     // Always preserve the login preference
     const storageKeysToPreserve = [StorageKey.AUTH.SHOW_LOGIN];
 
@@ -232,6 +237,7 @@ export class LifeCycleRepository {
     const shouldPreservePermanentClientData = this.shouldKeepPermanentClientData(shouldClearAllData);
     if (shouldPreservePermanentClientData) {
       storageKeysToPreserve.push(StorageKey.AUTH.PERSIST);
+      this.logger.debug('Permanent client data will be preserved in localStorage.');
     }
 
     // Handle cookie label preservation
@@ -243,12 +249,13 @@ export class LifeCycleRepository {
       // Clear localStorage selectively, keeping conversation input for session expiry
       const shouldPreserveConversationInput = signOutReason === SIGN_OUT_REASON.SESSION_EXPIRED;
       const deletedKeys = CacheRepository.clearLocalStorage(shouldPreserveConversationInput, storageKeysToPreserve);
-      this.logger.debug(`Deleted "${deletedKeys.length}" keys from localStorage.`, deletedKeys);
+      this.logger.debug(`Selective localStorage cleanup complete. Deleted ${deletedKeys.length} keys.`, deletedKeys);
     }
 
     // Perform complete localStorage wipe for specific scenarios
     const requiresCompleteLocalStorageWipe = this.shouldWipeLocalStorage(signOutReason, shouldClearAllData);
     if (requiresCompleteLocalStorageWipe) {
+      this.logger.warn('Performing full localStorage wipe due to sign-out reason or user request.');
       localStorage.clear();
     }
   };
@@ -257,6 +264,7 @@ export class LifeCycleRepository {
    * Determines whether to preserve permanent client data based on client type and user preferences.
    */
   private readonly shouldKeepPermanentClientData = (shouldClearAllData: boolean): boolean => {
+    this.logger.debug('Checking if permanent client data should be preserved during logout.');
     if (shouldClearAllData) {
       return false;
     }
@@ -278,6 +286,7 @@ export class LifeCycleRepository {
    * User's own cookie label is deleted only when explicitly clearing all data.
    */
   private readonly determineCookieLabelsToPreserve = (currentUser: any, shouldClearAllData: boolean): string[] => {
+    this.logger.debug('Determining which cookie labels to preserve during logout.');
     const userCookieLabelKey = this.dependencies.clientRepository.constructCookieLabelKey(currentUser.email());
     const allStorageKeys = Object.keys(amplify.store());
 
@@ -295,6 +304,7 @@ export class LifeCycleRepository {
    * Determines if localStorage should be completely wiped based on sign-out reason and user preferences.
    */
   private readonly shouldWipeLocalStorage = (signOutReason: SIGN_OUT_REASON, shouldClearAllData: boolean): boolean => {
+    this.logger.debug('Evaluating if a complete localStorage wipe is required.');
     const isClientRemoved = signOutReason === SIGN_OUT_REASON.CLIENT_REMOVED;
     const isCryptoIssue = signOutReason === SIGN_OUT_REASON.MLS_CLIENT_MISMATCH;
 
@@ -309,13 +319,14 @@ export class LifeCycleRepository {
     signOutReason: SIGN_OUT_REASON,
     shouldClearAllData: boolean,
   ): Promise<void> => {
+    this.logger.info('Performing core logout operation. Determining data wipe requirements.');
     // Determine what type of data clearing is needed - these flags are mutually exclusive
     const shouldWipeCryptoData = signOutReason === SIGN_OUT_REASON.MLS_CLIENT_MISMATCH;
     let shouldWipeIdentityData = shouldClearAllData || signOutReason === SIGN_OUT_REASON.CLIENT_REMOVED;
 
     // Log crypto mismatch for debugging
     if (shouldWipeCryptoData) {
-      this.logger.error('Client mismatch detected. Wiping crypto data and local client.');
+      this.logger.error('Client mismatch detected. Crypto data and local client will be wiped.');
       shouldWipeIdentityData = false; // Crypto wipe takes precedence
     }
 
@@ -324,6 +335,7 @@ export class LifeCycleRepository {
       clearAllData: shouldWipeIdentityData,
       clearCryptoData: shouldWipeCryptoData,
     });
+    this.logger.info('Core logout operation completed.');
   };
 
   /**
@@ -331,8 +343,10 @@ export class LifeCycleRepository {
    */
   private readonly cleanupPersistentStorage = async (shouldClearAllData: boolean): Promise<void> => {
     if (!shouldClearAllData) {
+      this.logger.debug('Persistent storage cleanup skipped: full data removal not requested.');
       return;
     }
+    this.logger.info('Initiating persistent storage cleanup: clearing cache and deleting database.');
 
     // Clear cache storage, not a blocking operation therefore not awaited
     void CacheRepository.clearCacheStorage();
@@ -340,6 +354,7 @@ export class LifeCycleRepository {
     // Delete database with error handling
     try {
       await this.dependencies.storageRepository.deleteDatabase();
+      this.logger.info('Database deleted successfully as part of persistent storage cleanup.');
     } catch (error) {
       this.logger.error('Failed to delete database before logout', error);
     }
@@ -354,6 +369,7 @@ export class LifeCycleRepository {
    * Resets the logout state.
    */
   resetLogoutState = (): void => {
+    this.logger.debug('Resetting logout state. Ready for new logout operations.');
     this.isCurrentlyLoggingOut = false;
   };
 }

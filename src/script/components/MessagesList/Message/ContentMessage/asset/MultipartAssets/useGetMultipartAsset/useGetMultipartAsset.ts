@@ -56,6 +56,7 @@ export const useGetMultipartAsset = ({
   retryDelay = DEFAULT_RETRY_DELAY,
 }: UseGetMultipartAssetPreviewProps) => {
   const uuidRef = useRef(uuid);
+  const [path, setPath] = useState<string | undefined>(undefined);
   const [src, setSrc] = useState<string | undefined>(undefined);
   const [imagePreviewUrl, setImagePreviewUrl] = useState<string | undefined>(undefined);
   const [pdfPreviewUrl, setPdfPreviewUrl] = useState<string | undefined>(undefined);
@@ -93,6 +94,7 @@ export const useGetMultipartAsset = ({
         setSrc(asset.PreSignedGET?.Url);
         setImagePreviewUrl(imagePreview?.PreSignedGET?.Url);
         setPdfPreviewUrl(pdfPreview?.PreSignedGET?.Url);
+        setPath(asset.Path);
         setStatus('success');
 
         return;
@@ -109,6 +111,7 @@ export const useGetMultipartAsset = ({
       setSrc(asset.PreSignedGET?.Url);
       setImagePreviewUrl(imagePreview?.PreSignedGET?.Url);
       setPdfPreviewUrl(pdfPreview?.PreSignedGET?.Url);
+      setPath(asset.Path);
       setStatus('success');
     } catch (err) {
       if (!isMounted.current) {
@@ -162,5 +165,6 @@ export const useGetMultipartAsset = ({
     pdfPreviewUrl,
     isLoading: ['loading', 'retrying', 'idle'].includes(status),
     isError: status === 'error',
+    path,
   };
 };

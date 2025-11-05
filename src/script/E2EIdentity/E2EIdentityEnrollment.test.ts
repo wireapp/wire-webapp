@@ -73,6 +73,7 @@ const generateWireIdentity = (
     notAfter: BigInt(0),
     notBefore: BigInt(0),
     serialNumber: '',
+    [Symbol.dispose]: () => {},
   },
   thumbprint: '',
   credentialType,
