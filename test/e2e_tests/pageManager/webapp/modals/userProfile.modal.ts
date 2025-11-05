@@ -27,6 +27,7 @@ export class UserProfileModal {
   readonly modal: Locator;
   readonly connectButton: Locator;
   readonly startConversationButton: Locator;
+  readonly unblockButton: Locator;
 
   constructor(page: Page) {
     this.page = page;
@@ -36,6 +37,9 @@ export class UserProfileModal {
     );
     this.startConversationButton = page.locator(
       `${selectByDataAttribute('modal-user-profile')} ${selectByDataAttribute('start-conversation')}`,
+    );
+    this.unblockButton = page.locator(
+      `${selectByDataAttribute('modal-user-profile')} ${selectByDataAttribute('do-unblock')}`,
     );
   }
 
