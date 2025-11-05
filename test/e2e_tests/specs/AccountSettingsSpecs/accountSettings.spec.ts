@@ -237,7 +237,7 @@ test.describe('account settings', () => {
 
       await expect(components.conversationSidebar().personalStatusLabel).toHaveText(memberA.fullName);
 
-      await createGroup(pageManager, groupName, [memberB]);
+      await createGroup(pages, groupName, [memberB]);
       // check that the chat is open
       expect(await pages.conversationList().isConversationItemVisible(groupName)).toBeTruthy();
       await pages.conversation().sendMessage('test');
@@ -260,7 +260,7 @@ test.describe('account settings', () => {
 
       await (await pageManager.getPage()).reload();
 
-      await createChannel(pageManager, 'test', [memberB]);
+      await createChannel(pages, 'test', [memberB]);
 
       await pages.conversation().clickConversationInfoButton();
       await expect(pages.conversationDetails().isUserPartOfConversationAsAdmin(memberA.fullName)).toBeTruthy();
