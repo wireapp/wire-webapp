@@ -17,75 +17,64 @@
  *
  */
 
-import {getUser} from 'test/e2e_tests/data/user';
+import {Browser} from '@playwright/test';
+
+import {getUser, User} from 'test/e2e_tests/data/user';
 import {PageManager} from 'test/e2e_tests/pageManager';
-import {test, expect} from 'test/e2e_tests/test.fixtures';
-import {addCreatedUser} from 'test/e2e_tests/utils/tearDown.util';
+import {test as baseTest, expect} from 'test/e2e_tests/test.fixtures';
+import {removeCreatedUser} from 'test/e2e_tests/utils/tearDown.util';
 import {loginUser} from 'test/e2e_tests/utils/userActions';
 
-const userA = getUser();
-const userB = getUser();
+const test = baseTest.extend<{userA: User; userB: User; setup: void}>({
+  userA: async ({api}, use) => {
+    const userA = getUser();
+    await api.createPersonalUser(userA);
+    await use(userA);
+    await removeCreatedUser(api, userA);
+  },
+  userB: async ({api}, use) => {
+    const userB = getUser();
+    await api.createPersonalUser(userB);
+    await use(userB);
+    await removeCreatedUser(api, userB);
+  },
+  setup: [
+    async ({api, userA, userB}, use) => {
+      await api.connectUsers(userA, userB);
+      await use();
+    },
+    {auto: true},
+  ],
+});
+
+const createPagesForUser = async (browser: Browser, user: User) => {
+  const context = await browser.newContext();
+  const page = await context.newPage();
+  const pageManager = PageManager.from(page);
+  const {pages, modals, components} = pageManager.webapp;
+
+  await pageManager.openMainPage();
+  await loginUser(user, pageManager);
+  await modals.dataShareConsent().clickDecline();
+  await components.conversationSidebar().isPageLoaded();
+
+  return pages;
+};
 
 test.describe('Edit', () => {
-  test(
-    'I can edit my message in 1:1',
-    {tag: ['@TC-679', '@regression']},
-    async ({pageManager: userAPageManager, page: userAPage, browser, api}) => {
-      test.slow();
+  test('I can edit my message in 1:1', {tag: ['@TC-679', '@regression']}, async ({browser, userA, userB}) => {
+    const userAPages = await createPagesForUser(browser, userA);
+    await userAPages.conversationList().openConversation(userB.fullName);
+    await userAPages.conversation().sendMessage('Test Message');
 
-      const {pages: userAPages, modals: userAModals, components: userAComponents} = userAPageManager.webapp;
-      const userBContext = await browser.newContext();
-      const userBPage = await userBContext.newPage();
-      const userBPageManager = PageManager.from(userBPage);
-      const {pages: userBPages, modals: userBModals, components: userBComponents} = userBPageManager.webapp;
+    const message = userAPages.conversation().messageItems.filter({hasText: userA.fullName});
+    await expect(message).toContainText('Test Message');
 
-      await test.step('Preconditions: Creating preconditions for the test via API', async () => {
-        await api.createPersonalUser(userA);
-        addCreatedUser(userA);
+    await userAPages.conversation().editMessage(message);
+    await expect(userAPages.conversation().messageInput).toContainText('Test Message');
 
-        await api.createPersonalUser(userB);
-        addCreatedUser(userB);
-
-        await api.connectUsers(userA, userB);
-      });
-
-      await test.step('Preconditions: Users A and B are signed in to the application', async () => {
-        await Promise.all([
-          (async () => {
-            await userAPageManager.openMainPage();
-            await loginUser(userA, userAPageManager);
-            await userAModals.dataShareConsent().clickDecline();
-            await userAComponents.conversationSidebar().isPageLoaded();
-          })(),
-
-          (async () => {
-            await userBPageManager.openMainPage();
-            await loginUser(userB, userBPageManager);
-            await userBModals.dataShareConsent().clickDecline();
-            await userBComponents.conversationSidebar().isPageLoaded();
-          })(),
-        ]);
-      });
-
-      await test.step('User A sends message to user B', async () => {
-        await userBPages.conversationList().openConversation(userA.fullName);
-        await userAPages.conversationList().openConversation(userB.fullName);
-        await userAPages.conversation().sendMessage('Test Message');
-
-        const message = userAPages.conversation().messageItems.filter({hasText: userA.fullName});
-        await expect(message).toContainText('Test Message');
-      });
-
-      await test.step('User A edits the previously sent message', async () => {
-        const message = userAPages.conversation().messageItems.filter({hasText: userA.fullName});
-        await userAPages.conversation().editMessage(message);
-        await expect(userAPages.conversation().messageInput).toContainText('Test Message');
-
-        await userAPages.conversation().sendMessage('Edited Message');
-        await expect(message).toContainText('Edited Message');
-      });
-
-      await userAPage.waitForTimeout(3000);
-    },
-  );
+    // Overwrite the text in the message input and send it
+    await userAPages.conversation().sendMessage('Edited Message');
+    await expect(message).toContainText('Edited Message');
+  });
 });
