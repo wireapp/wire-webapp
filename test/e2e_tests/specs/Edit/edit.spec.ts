@@ -25,7 +25,7 @@ import {test as baseTest, expect} from 'test/e2e_tests/test.fixtures';
 import {removeCreatedUser} from 'test/e2e_tests/utils/tearDown.util';
 import {createGroup, loginUser} from 'test/e2e_tests/utils/userActions';
 
-const test = baseTest.extend<{userA: User; userB: User; setup: void}>({
+const test = baseTest.extend<{userA: User; userB: User}>({
   userA: async ({api}, use) => {
     const userA = getUser();
     await api.createPersonalUser(userA);
@@ -38,13 +38,6 @@ const test = baseTest.extend<{userA: User; userB: User; setup: void}>({
     await use(userB);
     await removeCreatedUser(api, userB);
   },
-  setup: [
-    async ({api, userA, userB}, use) => {
-      await api.connectUsers(userA, userB);
-      await use();
-    },
-    {auto: true},
-  ],
 });
 
 const createPagesForUser = async (browser: Browser, user: User) => {
@@ -59,6 +52,10 @@ const createPagesForUser = async (browser: Browser, user: User) => {
 };
 
 test.describe('Edit', () => {
+  test.beforeEach(async ({api, userA, userB}) => {
+    await api.connectUsers(userA, userB);
+  });
+
   test('I can edit my message in 1:1', {tag: ['@TC-679', '@regression']}, async ({browser, userA, userB}) => {
     const {pages: userAPages, modals} = await createPagesForUser(browser, userA);
     await modals.dataShareConsent().clickDecline();
