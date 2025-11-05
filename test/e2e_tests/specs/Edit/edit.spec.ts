@@ -65,7 +65,7 @@ test.describe('Edit', () => {
     await userAPages.conversationList().openConversation(userB.fullName);
     await userAPages.conversation().sendMessage('Test Message');
 
-    const message = userAPages.conversation().messageItems.filter({hasText: userA.fullName});
+    const message = userAPages.conversation().getMessageFromUser(userA);
     await expect(message).toContainText('Test Message');
 
     await userAPages.conversation().editMessage(message);
@@ -86,7 +86,7 @@ test.describe('Edit', () => {
       await userAPages.conversationList().openConversation('Test Group');
       await userAPages.conversation().sendMessage('Test Message');
 
-      const message = userAPages.conversation().messageItems.filter({hasText: userA.fullName});
+      const message = userAPages.conversation().getMessageFromUser(userA);
       await expect(message).toContainText('Test Message');
 
       await userAPages.conversation().editMessage(message);
@@ -113,8 +113,8 @@ test.describe('Edit', () => {
 
       await device1.conversation().sendMessage('Message from device 1');
 
-      const messageOnDevice1 = device1.conversation().messageItems.filter({hasText: userA.fullName});
-      const messageOnDevice2 = device2.conversation().messageItems.filter({hasText: userA.fullName});
+      const messageOnDevice1 = device1.conversation().getMessageFromUser(userA);
+      const messageOnDevice2 = device2.conversation().getMessageFromUser(userA);
       await expect(messageOnDevice1).toContainText('Message from device 1');
       await expect(messageOnDevice2).toContainText('Message from device 1');
 

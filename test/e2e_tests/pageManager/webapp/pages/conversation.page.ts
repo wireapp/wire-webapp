@@ -224,11 +224,34 @@ export class ConversationPage {
     return await locator.screenshot();
   }
 
-  async editMessage(message: Locator) {
+  /**
+   * Util to get a message in the conversation sent by a given user
+   * @param messageContent Optional parameter to specify content the returned message should return. If undefined the last message sent by the user will be returned.
+   */
+  getMessageFromUser(user: User, messageContent?: string) {
+    const messagesFromUser = this.messageItems.filter({
+      has: this.page.getByTestId('sender-name').getByText(user.fullName),
+    });
+    if (messageContent !== undefined) {
+      return messagesFromUser.filter({hasText: messageContent});
+    }
+    return messagesFromUser.last();
+  }
+
+  /**
+   * Open the options associated with a message
+   * @returns the Locator of the now open context menu
+   */
+  async openMessageOptions(message: Locator) {
     await message.hover();
     await message.getByTestId('message-actions').getByTestId('go-options').click();
     // The context menu containing the edit button is positioned globally as an overlay
-    await this.page.getByRole('menu').getByRole('button', {name: 'Edit'}).click();
+    return this.page.getByRole('menu');
+  }
+
+  async editMessage(message: Locator) {
+    const menu = await this.openMessageOptions(message);
+    await menu.getByRole('button', {name: 'Edit'}).click();
   }
 
   async reactOnMessage(message: Locator, emojiType: EmojiReaction) {
