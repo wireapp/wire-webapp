@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [46.44.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@46.43.0...@wireapp/core@46.44.0) (2025-11-05)
+
+### Features
+
+* **core:** Recover when getting StaleMessageError upon trying to upload a commit bundle [WPB-21517] ([#7536](https://github.com/wireapp/wire-web-packages/issues/7536)) ([4c52a54](https://github.com/wireapp/wire-web-packages/commit/4c52a54288af0ac6f71fe9aa69654153f8a9f64b))
+
 # [46.43.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@46.42.0...@wireapp/core@46.43.0) (2025-11-05)
 
 ### Features
