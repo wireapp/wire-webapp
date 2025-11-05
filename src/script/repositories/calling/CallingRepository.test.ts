@@ -17,11 +17,8 @@
  *
  */
 
-import {
-  CONVERSATION_TYPE,
-  ConversationProtocol,
-  DefaultConversationRoleName,
-} from '@wireapp/api-client/lib/conversation';
+import {CONVERSATION_TYPE, DefaultConversationRoleName} from '@wireapp/api-client/lib/conversation';
+import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 import 'jsdom-worker';
 import {Subscription} from 'knockout';
 import {container} from 'tsyringe';
@@ -223,7 +220,7 @@ describe('CallingRepository', () => {
   });
 
   describe('startCall', () => {
-    it.each([ConversationProtocol.PROTEUS, ConversationProtocol.MLS])(
+    it.each([CONVERSATION_PROTOCOL.PROTEUS, CONVERSATION_PROTOCOL.MLS])(
       'starts a ONEONONE call for proteus or MLS 1:1 conversation',
       async protocol => {
         const conversation = createConversation(CONVERSATION_TYPE.ONE_TO_ONE, protocol);
@@ -237,7 +234,7 @@ describe('CallingRepository', () => {
 
     it('starts a conference call in a group conversation for proteus', async () => {
       jest.spyOn(Runtime, 'isSupportingConferenceCalling').mockReturnValue(true);
-      const conversation = createConversation(CONVERSATION_TYPE.REGULAR, ConversationProtocol.PROTEUS);
+      const conversation = createConversation(CONVERSATION_TYPE.REGULAR, CONVERSATION_PROTOCOL.PROTEUS);
       const callType = CALL_TYPE.NORMAL;
       const NO_MEETING = 0;
       spyOn(wCall, 'start');
@@ -247,7 +244,7 @@ describe('CallingRepository', () => {
 
     it('starts a MLS conference call in a group conversation for MLS', async () => {
       jest.spyOn(Runtime, 'isSupportingConferenceCalling').mockReturnValue(true);
-      const conversation = createConversation(CONVERSATION_TYPE.REGULAR, ConversationProtocol.MLS);
+      const conversation = createConversation(CONVERSATION_TYPE.REGULAR, CONVERSATION_PROTOCOL.MLS);
       const callType = CALL_TYPE.NORMAL;
       const NO_MEETING = 0;
       spyOn(wCall, 'start');
@@ -268,7 +265,7 @@ describe('CallingRepository', () => {
       const groupId = 'groupId';
       const mlsConversation = createConversation(
         CONVERSATION_TYPE.REGULAR,
-        ConversationProtocol.MLS,
+        CONVERSATION_PROTOCOL.MLS,
         conversationId,
         groupId,
       );
@@ -289,7 +286,7 @@ describe('CallingRepository', () => {
       const groupId = 'groupId';
       const mlsConversation = createConversation(
         CONVERSATION_TYPE.ONE_TO_ONE,
-        ConversationProtocol.MLS,
+        CONVERSATION_PROTOCOL.MLS,
         conversationId,
         groupId,
       );
@@ -309,7 +306,7 @@ describe('CallingRepository', () => {
       const groupId = 'groupId';
       const mlsConversation = createConversation(
         CONVERSATION_TYPE.REGULAR,
-        ConversationProtocol.MLS,
+        CONVERSATION_PROTOCOL.MLS,
         conversationId,
         groupId,
       );
@@ -344,7 +341,7 @@ describe('CallingRepository', () => {
       const groupId = 'groupId';
       const mlsConversation = createConversation(
         CONVERSATION_TYPE.ONE_TO_ONE,
-        ConversationProtocol.MLS,
+        CONVERSATION_PROTOCOL.MLS,
         conversationId,
         groupId,
       );

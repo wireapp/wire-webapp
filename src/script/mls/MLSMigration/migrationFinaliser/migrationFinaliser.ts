@@ -17,7 +17,7 @@
  *
  */
 
-import {ConversationProtocol} from '@wireapp/api-client/lib/conversation';
+import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 
 import {
   MixedConversation,
@@ -31,7 +31,7 @@ import {mlsMigrationLogger} from '../MLSMigrationLogger';
 
 type UpdateConversationProtocol = (
   conversation: Conversation,
-  protocol: ConversationProtocol.MLS | ConversationProtocol.MIXED,
+  protocol: CONVERSATION_PROTOCOL.MLS | CONVERSATION_PROTOCOL.MIXED,
 ) => Promise<Conversation>;
 
 export const finaliseMigrationOfMixedConversations = async (
@@ -68,7 +68,7 @@ const checkFinalisationCriteria = async (
 const doAllConversationParticipantsSupportMLS = (mixedConversation: MixedConversation): boolean => {
   return mixedConversation
     .participating_user_ets()
-    .every(user => user.supportedProtocols()?.includes(ConversationProtocol.MLS));
+    .every(user => user.supportedProtocols()?.includes(CONVERSATION_PROTOCOL.MLS));
 };
 
 const finaliseMigrationOfMixedConversation = async (
@@ -78,7 +78,7 @@ const finaliseMigrationOfMixedConversation = async (
   mlsMigrationLogger.info(`Finalising migration of mixed conversation ${mixedConversation.id}...`);
   try {
     // Update conversation protocol from "mixed" to "mls".
-    const updatedMLSConversation = await updateConversationProtocol(mixedConversation, ConversationProtocol.MLS);
+    const updatedMLSConversation = await updateConversationProtocol(mixedConversation, CONVERSATION_PROTOCOL.MLS);
 
     //we have to make sure that conversation's protocol has really changed to MLS
     if (!isMLSConversation(updatedMLSConversation)) {

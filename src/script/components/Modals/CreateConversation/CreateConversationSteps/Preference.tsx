@@ -17,7 +17,7 @@
  *
  */
 
-import {ConversationProtocol} from '@wireapp/api-client/lib/conversation';
+import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 import {container} from 'tsyringe';
 
 import {InfoToggle} from 'Components/toggle/InfoToggle';
@@ -53,10 +53,10 @@ export const Preference = () => {
 
   const defaultProtocol = isMLSEnabled
     ? teamState.teamFeatures()?.mls?.config.defaultProtocol
-    : ConversationProtocol.PROTEUS;
+    : CONVERSATION_PROTOCOL.PROTEUS;
 
   // Read receipts are temorarily disabled for MLS groups and channels until it is supported
-  const areReadReceiptsEnabled = defaultProtocol !== ConversationProtocol.MLS;
+  const areReadReceiptsEnabled = defaultProtocol !== CONVERSATION_PROTOCOL.MLS;
 
   return (
     <>

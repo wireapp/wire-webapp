@@ -23,7 +23,7 @@
 
 import {Context} from '@wireapp/api-client/lib/auth';
 import {ClientClassification, ClientType} from '@wireapp/api-client/lib/client/';
-import {FEATURE_KEY, FeatureList, FeatureStatus} from '@wireapp/api-client/lib/team';
+import {FEATURE_KEY, FEATURE_STATUS, FeatureList} from '@wireapp/api-client/lib/team';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {EVENTS as CoreEvents} from '@wireapp/core/lib/Account';
 import {MLSServiceEvents} from '@wireapp/core/lib/messagingProtocols/mls';
@@ -538,7 +538,7 @@ export class App {
 
       let totalNotifications = 0;
       const useAsyncNotificationStream =
-        teamFeatures[FEATURE_KEY.CONSUMABLE_NOTIFICATIONS]?.status === FeatureStatus.ENABLED;
+        teamFeatures[FEATURE_KEY.CONSUMABLE_NOTIFICATIONS]?.status === FEATURE_STATUS.ENABLED;
       const useLegacyNotificationStream = !useAsyncNotificationStream;
 
       await eventRepository.connectWebSocket(

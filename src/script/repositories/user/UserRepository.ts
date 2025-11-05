@@ -18,7 +18,6 @@
  */
 
 import type {AddedClient, PublicClient} from '@wireapp/api-client/lib/client';
-import {ConversationProtocol} from '@wireapp/api-client/lib/conversation';
 import {
   UserEvent,
   UserLegalHoldDisableEvent,
@@ -29,6 +28,7 @@ import {
 import type {BackendError, TraceState} from '@wireapp/api-client/lib/http';
 import {BackendErrorLabel} from '@wireapp/api-client/lib/http';
 import {ConsentType} from '@wireapp/api-client/lib/self/';
+import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 import type {QualifiedHandle, User as APIClientUser} from '@wireapp/api-client/lib/user';
 import {
   QualifiedId,
@@ -104,7 +104,7 @@ interface UserAvailabilityEvent {
   type: USER.AVAILABILITY;
 }
 
-type Events = {supportedProtocolsUpdated: {user: User; supportedProtocols: ConversationProtocol[]}};
+type Events = {supportedProtocolsUpdated: {user: User; supportedProtocols: CONVERSATION_PROTOCOL[]}};
 export class UserRepository extends TypedEventEmitter<Events> {
   private readonly logger: Logger;
   public readonly userMapper: UserMapper;
@@ -310,7 +310,7 @@ export class UserRepository extends TypedEventEmitter<Events> {
 
   private async onUserSupportedProtocolsUpdate(
     userId: QualifiedId,
-    newSupportedProtocols: ConversationProtocol[],
+    newSupportedProtocols: CONVERSATION_PROTOCOL[],
   ): Promise<void> {
     const localSupportedProtocols = this.findUserById(userId)?.supportedProtocols();
 
@@ -754,7 +754,7 @@ export class UserRepository extends TypedEventEmitter<Events> {
   public async getUserSupportedProtocols(
     userId: QualifiedId,
     shouldRefreshUser = false,
-  ): Promise<ConversationProtocol[]> {
+  ): Promise<CONVERSATION_PROTOCOL[]> {
     const localUser = this.findUserById(userId);
     const localSupportedProtocols = localUser?.supportedProtocols();
 
@@ -880,7 +880,7 @@ export class UserRepository extends TypedEventEmitter<Events> {
    * @param userId - id of the user to update
    * @param supportedProtocols - an array of new supported protocols
    */
-  async updateUserSupportedProtocols(userId: QualifiedId, supportedProtocols: ConversationProtocol[]): Promise<User> {
+  async updateUserSupportedProtocols(userId: QualifiedId, supportedProtocols: CONVERSATION_PROTOCOL[]): Promise<User> {
     return this.updateUser(userId, {supported_protocols: supportedProtocols});
   }
 

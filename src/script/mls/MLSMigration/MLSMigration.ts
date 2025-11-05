@@ -17,7 +17,7 @@
  *
  */
 
-import {ConversationProtocol} from '@wireapp/api-client/lib/conversation';
+import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {container} from 'tsyringe';
 
@@ -101,7 +101,7 @@ const checkMigrationConfig = async (
     return;
   }
 
-  const isMLSSupportedByUser = selfUser.supportedProtocols()?.includes(ConversationProtocol.MLS);
+  const isMLSSupportedByUser = selfUser.supportedProtocols()?.includes(CONVERSATION_PROTOCOL.MLS);
   if (!isMLSSupportedByUser) {
     return;
   }

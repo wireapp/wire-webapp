@@ -40,9 +40,11 @@ import {ClientEvent, CONVERSATION} from 'Repositories/event/Client';
 import {ReactionMap, ReadReceipt, UserReactionMap} from 'Repositories/storage';
 import {createUuid} from 'Util/uuid';
 
-import {E2EIVerificationMessageType} from '../../message/E2EIVerificationMessageType';
-import {StatusType} from '../../message/StatusType';
-import {VerificationMessageType} from '../../message/VerificationMessageType';
+import {BuildMessageAddParams} from './EventBuilder.types';
+
+import {E2EIVerificationMessageType} from '../../../message/E2EIVerificationMessageType';
+import {StatusType} from '../../../message/StatusType';
+import {VerificationMessageType} from '../../../message/VerificationMessageType';
 
 export interface BaseEvent {
   conversation: string;
@@ -575,12 +577,7 @@ export const EventBuilder = {
     };
   },
 
-  buildMessageAdd(
-    conversationEntity: Conversation,
-    currentTimestamp: number,
-    senderId: string,
-    clientId: string,
-  ): MessageAddEvent {
+  buildMessageAdd({conversationEntity, currentTimestamp, senderId, clientId}: BuildMessageAddParams): MessageAddEvent {
     return {
       ...buildQualifiedId(conversationEntity),
       data: {

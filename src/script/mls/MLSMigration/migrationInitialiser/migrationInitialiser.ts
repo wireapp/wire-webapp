@@ -17,7 +17,7 @@
  *
  */
 
-import {ConversationProtocol} from '@wireapp/api-client/lib/conversation';
+import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 
 import {
@@ -32,7 +32,7 @@ import {mlsMigrationLogger} from '../MLSMigrationLogger';
 interface MigrationInitConversationHandler {
   updateConversationProtocol: (
     conversation: Conversation,
-    protocol: ConversationProtocol.MLS | ConversationProtocol.MIXED,
+    protocol: CONVERSATION_PROTOCOL.MLS | CONVERSATION_PROTOCOL.MIXED,
   ) => Promise<Conversation>;
   tryEstablishingMLSGroup: (params: {
     groupId: string;
@@ -80,7 +80,7 @@ const initialiseMigrationOfProteusConversation = async (
 
   try {
     //update conversation protocol on both backend and local store
-    const updatedMixedConversation = await updateConversationProtocol(proteusConversation, ConversationProtocol.MIXED);
+    const updatedMixedConversation = await updateConversationProtocol(proteusConversation, CONVERSATION_PROTOCOL.MIXED);
 
     //we have to make sure that conversation's protocol has really changed to mixed and it contains groupId
     if (!isMixedConversation(updatedMixedConversation)) {

@@ -17,7 +17,7 @@
  *
  */
 
-import {ConversationProtocol} from '@wireapp/api-client/lib/conversation';
+import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 
 import * as Icon from 'Components/Icon';
 import {ProtocolUpdateMessage as ProtocolUpdateMessageEntity} from 'Repositories/entity/message/ProtocolUpdateMessage';
@@ -38,7 +38,7 @@ const createSystemMessage = (caption: string) => {
 };
 
 export const ProtocolUpdateMessage = ({message}: ProtocolUpdateMessageProps) => {
-  if (message.protocol === ConversationProtocol.MIXED) {
+  if (message.protocol === CONVERSATION_PROTOCOL.MIXED) {
     const captions = [
       t(
         'conversationProtocolUpdatedToMixedPart1',

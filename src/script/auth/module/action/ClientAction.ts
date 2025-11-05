@@ -18,7 +18,7 @@
  */
 
 import {ClientClassification, ClientType, RegisteredClient} from '@wireapp/api-client/lib/client/';
-import {FEATURE_KEY, FeatureStatus} from '@wireapp/api-client/lib/team';
+import {FEATURE_KEY, FEATURE_STATUS} from '@wireapp/api-client/lib/team';
 import {ClientInfo} from '@wireapp/core/lib/client/';
 
 import {Runtime} from '@wireapp/commons';
@@ -69,7 +69,7 @@ export class ClientAction {
       const commonConfig = (await core.service?.team.getCommonFeatureConfig()) ?? {};
 
       const useAsyncNotificationStream =
-        commonConfig[FEATURE_KEY.CONSUMABLE_NOTIFICATIONS]?.status === FeatureStatus.ENABLED;
+        commonConfig[FEATURE_KEY.CONSUMABLE_NOTIFICATIONS]?.status === FEATURE_STATUS.ENABLED;
 
       const useLegacyNotificationStream = !useAsyncNotificationStream;
 

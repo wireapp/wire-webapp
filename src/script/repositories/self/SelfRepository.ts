@@ -17,8 +17,7 @@
  *
  */
 
-import {ConversationProtocol} from '@wireapp/api-client/lib/conversation';
-import {FEATURE_KEY, FeatureStatus, FeatureList} from '@wireapp/api-client/lib/team/feature/';
+import {CONVERSATION_PROTOCOL, FEATURE_KEY, FEATURE_STATUS, FeatureList} from '@wireapp/api-client/lib/team/feature/';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {amplify} from 'amplify';
 import {container} from 'tsyringe';
@@ -43,7 +42,7 @@ import {evaluateSelfSupportedProtocols} from './SelfSupportedProtocols/SelfSuppo
 
 import {Core} from '../../service/CoreSingleton';
 
-type Events = {selfSupportedProtocolsUpdated: ConversationProtocol[]};
+type Events = {selfSupportedProtocolsUpdated: CONVERSATION_PROTOCOL[]};
 
 export class SelfRepository extends TypedEventEmitter<Events> {
   private readonly logger: Logger;
@@ -153,7 +152,7 @@ export class SelfRepository extends TypedEventEmitter<Events> {
     }
 
     this.handleDownloadPathUpdate(
-      next?.status === FeatureStatus.ENABLED ? next.config.enforcedDownloadLocation : undefined,
+      next?.status === FEATURE_STATUS.ENABLED ? next.config.enforcedDownloadLocation : undefined,
     );
   };
 
@@ -166,7 +165,7 @@ export class SelfRepository extends TypedEventEmitter<Events> {
    * It will send a request to the backend to change the supported protocols and then update the user in the local state.
    * @param supportedProtocols - an array of new supported protocols
    */
-  private async updateSelfSupportedProtocols(supportedProtocols: ConversationProtocol[]): Promise<void> {
+  private async updateSelfSupportedProtocols(supportedProtocols: CONVERSATION_PROTOCOL[]): Promise<void> {
     this.logger.info('Supported protocols will get updated to:', supportedProtocols);
     try {
       await this.selfService.putSupportedProtocols(supportedProtocols);
@@ -181,7 +180,7 @@ export class SelfRepository extends TypedEventEmitter<Events> {
    * Will re-evaluate self supported protocols and update them if necessary.
    * It will send a request to the backend to change the supported protocols and then update the user in the local state.
    */
-  public readonly refreshSelfSupportedProtocols = async (): Promise<ConversationProtocol[]> => {
+  public readonly refreshSelfSupportedProtocols = async (): Promise<CONVERSATION_PROTOCOL[]> => {
     const localSupportedProtocols = this.selfUser.supportedProtocols();
 
     this.logger.info('Evaluating self supported protocols, currently supported protocols:', localSupportedProtocols);
@@ -229,7 +228,7 @@ export class SelfRepository extends TypedEventEmitter<Events> {
     });
   }
 
-  public getSelfSupportedProtocols = async (): Promise<ConversationProtocol[]> => {
+  public getSelfSupportedProtocols = async (): Promise<CONVERSATION_PROTOCOL[]> => {
     const localSupportedProtocols = this.selfUser.supportedProtocols();
 
     if (localSupportedProtocols) {

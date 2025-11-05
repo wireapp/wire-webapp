@@ -200,7 +200,7 @@ export class AssetRepository {
     const buffer = await loadFileBuffer(image);
     let compressedBytes: ArrayBuffer;
     if (skipCompression === true) {
-      compressedBytes = new Uint8Array(buffer as ArrayBuffer);
+      compressedBytes = new Uint8Array(buffer);
     } else {
       const worker = new WebWorker(() => new Worker(new URL('./imageWorker', import.meta.url)));
       compressedBytes = await worker.post({buffer, useProfileImageSize});
@@ -252,7 +252,7 @@ export class AssetRepository {
 
     if (isAuditLogEnabled) {
       const isIncompleteAuditData =
-        !options.auditData || !options.auditData.convId || !options.auditData.filename || !options.auditData.filetype;
+        !options.auditData?.conversationId || !options.auditData.filename || !options.auditData.filetype;
       if (isIncompleteAuditData) {
         this.removeFromUploadQueue(messageId);
         throw new Error('Audit data is incomplete, file cannot be uploaded');
@@ -290,7 +290,7 @@ export class AssetRepository {
     return ko.pureComputed(() => this.findUploadStatus(messageId)?.progress() ?? -1);
   }
 
-  private findUploadStatus(messageId: string): UploadStatus {
+  private findUploadStatus(messageId: string): UploadStatus | undefined {
     return this.uploadProgressQueue().find(upload => upload.messageId === messageId);
   }
 

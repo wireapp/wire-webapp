@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2023 Wire Swiss GmbH
+ * Copyright (C) 2025 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,15 +17,11 @@
  *
  */
 
-import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
+import {Conversation} from 'Repositories/entity/Conversation';
 
-import {SystemMessageType} from 'src/script/message/SystemMessageType';
-
-import {SystemMessage} from './SystemMessage';
-
-export class ProtocolUpdateMessage extends SystemMessage {
-  constructor(public protocol: CONVERSATION_PROTOCOL.MIXED | CONVERSATION_PROTOCOL.MLS) {
-    super();
-    this.system_message_type = SystemMessageType.CONVERSATION_PROTOCOL_UPDATE;
-  }
-}
+export type BuildMessageAddParams = {
+  conversationEntity: Conversation;
+  currentTimestamp: number;
+  senderId: string;
+  clientId: string;
+};

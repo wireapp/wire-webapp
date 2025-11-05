@@ -20,7 +20,8 @@
 import React from 'react';
 
 import {render} from '@testing-library/react';
-import {CONVERSATION_TYPE, ConversationProtocol, QualifiedUserClients} from '@wireapp/api-client/lib/conversation';
+import {CONVERSATION_TYPE, QualifiedUserClients} from '@wireapp/api-client/lib/conversation';
+import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {RecursivePartial} from '@wireapp/commons/lib/util/TypeUtil';
 import ko from 'knockout';
@@ -155,14 +156,14 @@ export function generateQualifiedIds(nbUsers: number, domain: string) {
 
 export const createConversation = (
   type: CONVERSATION_TYPE = CONVERSATION_TYPE.ONE_TO_ONE,
-  protocol: ConversationProtocol = ConversationProtocol.PROTEUS,
+  protocol: CONVERSATION_PROTOCOL = CONVERSATION_PROTOCOL.PROTEUS,
   conversationId: QualifiedId = {id: createUuid(), domain: ''},
   groupId = 'group-id',
 ) => {
   const conversation = new Conversation(conversationId.id, conversationId.domain, protocol);
   conversation.participating_user_ets.push(new User(createUuid()));
   conversation.type(type);
-  if (protocol === ConversationProtocol.MLS) {
+  if (protocol === CONVERSATION_PROTOCOL.MLS) {
     conversation.groupId = groupId;
   }
   return conversation;

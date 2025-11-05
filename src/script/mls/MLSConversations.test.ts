@@ -17,7 +17,8 @@
  *
  */
 
-import {ConversationProtocol, CONVERSATION_TYPE} from '@wireapp/api-client/lib/conversation';
+import {CONVERSATION_TYPE} from '@wireapp/api-client/lib/conversation';
+import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 
 import {randomUUID} from 'crypto';
 
@@ -32,7 +33,7 @@ import {TestFactory} from 'test/helper/TestFactory';
 import {initMLSGroupConversations, initialiseSelfAndTeamConversations} from './MLSConversations';
 
 function createMLSConversation(type?: CONVERSATION_TYPE, epoch = 0): MLSConversation {
-  const conversation = new Conversation(randomUUID(), '', ConversationProtocol.MLS);
+  const conversation = new Conversation(randomUUID(), '', CONVERSATION_PROTOCOL.MLS);
   conversation.groupId = `groupid-${randomUUID()}`;
   conversation.epoch = epoch;
   if (type !== undefined) {
