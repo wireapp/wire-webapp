@@ -18,6 +18,6 @@
  */
 
 export * from './FeatureAPI';
-export * from './Feature';
-export * from './FeatureList';
+export * from './FeatureList.types';
+export * from './FeatureList.schema';
 export * from './FeatureError';
