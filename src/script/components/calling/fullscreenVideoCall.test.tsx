@@ -35,8 +35,6 @@ import {FullscreenVideoCall, FullscreenVideoCallProps} from './FullscreenVideoCa
 
 const useMatchMediaMock = useMatchMedia as jest.Mock;
 
-jest.mock('@wireapp/api-client/lib/team');
-
 jest.mock('@wireapp/react-ui-kit', () => ({
   ...(jest.requireActual('@wireapp/react-ui-kit') as any),
   useMatchMedia: jest.fn(),

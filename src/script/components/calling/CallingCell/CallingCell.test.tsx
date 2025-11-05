@@ -36,8 +36,6 @@ import {CallingCell, CallingCellProps} from './CallingCell';
 
 import {buildMediaDevicesHandler} from '../../../auth/util/test/TestUtil';
 
-jest.mock('@wireapp/api-client/lib/team');
-
 jest.mock('Components/InViewport', () => ({
   InViewport: ({onVisible, children}: {onVisible: () => void; children: any}) => {
     setTimeout(onVisible);
