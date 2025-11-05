@@ -17,12 +17,8 @@
  *
  */
 
-import {
-  QualifiedUserClients,
-  MessageSendingStatus,
-  ConversationProtocol,
-  NewConversation,
-} from '@wireapp/api-client/lib/conversation';
+import {QualifiedUserClients, MessageSendingStatus, NewConversation} from '@wireapp/api-client/lib/conversation';
+import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 
 import {AddUsersParams, MessageSendingOptions, SendCommonParams} from '../../../conversation';
@@ -45,7 +41,7 @@ export type SendProteusMessageParams = SendCommonParams &
      */
     userIds?: QualifiedId[] | QualifiedUserClients;
     onClientMismatch?: (status: MessageSendingStatus, wasSent: boolean) => void | boolean | Promise<boolean>;
-    protocol: ConversationProtocol.PROTEUS;
+    protocol: CONVERSATION_PROTOCOL.PROTEUS;
   };
 
 export type CreateProteusConversationParams = {

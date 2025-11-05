@@ -20,7 +20,6 @@
 import {ClientClassification, ClientType} from '@wireapp/api-client/lib/client';
 import {
   Conversation,
-  ConversationProtocol,
   MLSConversation,
   MLSStaleMessageError,
   MLSGroupOutOfSyncError,
@@ -33,6 +32,7 @@ import {
   ConversationMLSWelcomeEvent,
 } from '@wireapp/api-client/lib/event';
 import {BackendErrorLabel} from '@wireapp/api-client/lib/http';
+import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 
@@ -122,7 +122,7 @@ describe('ConversationService', () => {
 
     jest
       .spyOn(client.api.user, 'getUserSupportedProtocols')
-      .mockReturnValue(Promise.resolve([ConversationProtocol.MLS, ConversationProtocol.PROTEUS]));
+      .mockReturnValue(Promise.resolve([CONVERSATION_PROTOCOL.MLS, CONVERSATION_PROTOCOL.PROTEUS]));
 
     client.context = {
       clientType: ClientType.NONE,
@@ -194,7 +194,7 @@ describe('ConversationService', () => {
 
         mockedProteusService.sendMessage = jest.fn().mockResolvedValue({sentAt: sentTime});
         const promise = conversationService.send({
-          protocol: ConversationProtocol.PROTEUS,
+          protocol: CONVERSATION_PROTOCOL.PROTEUS,
           conversationId: {id: 'conv1', domain: ''},
           payload: message,
         });
@@ -239,7 +239,7 @@ describe('ConversationService', () => {
 
       jest.spyOn(apiClient.api.conversation, 'getConversation').mockResolvedValue({
         qualified_id: mockConversationId,
-        protocol: ConversationProtocol.MLS,
+        protocol: CONVERSATION_PROTOCOL.MLS,
         epoch: remoteEpoch,
         group_id: mockGroupId,
       } as unknown as Conversation);
@@ -282,7 +282,7 @@ describe('ConversationService', () => {
       jest.spyOn(mlsService, 'getEpoch').mockResolvedValueOnce(localEpoch);
       jest.spyOn(apiClient.api.conversation, 'getConversation').mockResolvedValueOnce({
         qualified_id: conversationId,
-        protocol: ConversationProtocol.MLS,
+        protocol: CONVERSATION_PROTOCOL.MLS,
         epoch: remoteEpoch,
         group_id: 'gid-join-stale',
       } as unknown as Conversation);
@@ -308,7 +308,7 @@ describe('ConversationService', () => {
       it(`calls callbacks when sending '${type}' message is starting and successful`, async () => {
         const [conversationService] = await buildConversationService();
         const promise = conversationService.send({
-          protocol: ConversationProtocol.MLS,
+          protocol: CONVERSATION_PROTOCOL.MLS,
           groupId,
           payload: message,
           conversationId: {id: '', domain: ''},
@@ -342,13 +342,13 @@ describe('ConversationService', () => {
 
       jest.spyOn(apiClient.api.conversation, 'getConversation').mockResolvedValueOnce({
         qualified_id: mockConversationId,
-        protocol: ConversationProtocol.MLS,
+        protocol: CONVERSATION_PROTOCOL.MLS,
         epoch: remoteEpoch,
         group_id: mockGroupId,
       } as unknown as Conversation);
 
       await conversationService.send({
-        protocol: ConversationProtocol.MLS,
+        protocol: CONVERSATION_PROTOCOL.MLS,
         groupId: mockGroupId,
         payload: mockedMessage,
         conversationId: mockConversationId,
@@ -385,13 +385,13 @@ describe('ConversationService', () => {
 
       jest.spyOn(apiClient.api.conversation, 'getConversation').mockResolvedValueOnce({
         qualified_id: mockConversationId,
-        protocol: ConversationProtocol.MLS,
+        protocol: CONVERSATION_PROTOCOL.MLS,
         epoch: remoteEpoch,
         group_id: mockGroupId,
       } as unknown as Conversation);
 
       await conversationService.send({
-        protocol: ConversationProtocol.MLS,
+        protocol: CONVERSATION_PROTOCOL.MLS,
         groupId: mockGroupId,
         payload: mockedMessage,
         conversationId: mockConversationId,
@@ -430,7 +430,7 @@ describe('ConversationService', () => {
         .mockResolvedValueOnce({conversation: {members: {others: []}}} as any);
 
       await conversationService.send({
-        protocol: ConversationProtocol.MLS,
+        protocol: CONVERSATION_PROTOCOL.MLS,
         groupId: mockGroupId,
         payload: mockedMessage,
         conversationId: mockConversationId,
@@ -454,7 +454,7 @@ describe('ConversationService', () => {
       return {
         group_id: 'group-id',
         qualified_id: {id: conversationId || 'conversation-id', domain: 'staging.zinfra.io'},
-        protocol: ConversationProtocol.MLS,
+        protocol: CONVERSATION_PROTOCOL.MLS,
         epoch,
       } as Conversation;
     };
@@ -526,7 +526,7 @@ describe('ConversationService', () => {
 
       jest.spyOn(apiClient.api.conversation, 'getMLS1to1Conversation').mockResolvedValueOnce({
         qualified_id: mockConversationId,
-        protocol: ConversationProtocol.MLS,
+        protocol: CONVERSATION_PROTOCOL.MLS,
         epoch: remoteEpoch,
         group_id: mockGroupId,
       } as unknown as MLSConversation);
@@ -553,7 +553,7 @@ describe('ConversationService', () => {
 
       jest.spyOn(apiClient.api.conversation, 'getMLS1to1Conversation').mockResolvedValueOnce({
         qualified_id: mockConversationId,
-        protocol: ConversationProtocol.MLS,
+        protocol: CONVERSATION_PROTOCOL.MLS,
         epoch: remoteEpoch,
         group_id: mockGroupId,
       } as unknown as MLSConversation);
@@ -561,7 +561,7 @@ describe('ConversationService', () => {
       // The 2nd request we make after joining the conversation with external commit
       jest.spyOn(apiClient.api.conversation, 'getMLS1to1Conversation').mockResolvedValueOnce({
         qualified_id: mockConversationId,
-        protocol: ConversationProtocol.MLS,
+        protocol: CONVERSATION_PROTOCOL.MLS,
         epoch: updatedEpoch,
         group_id: mockGroupId,
       } as unknown as MLSConversation);
@@ -594,7 +594,7 @@ describe('ConversationService', () => {
 
       jest.spyOn(apiClient.api.conversation, 'getMLS1to1Conversation').mockResolvedValueOnce({
         qualified_id: mockConversationId,
-        protocol: ConversationProtocol.MLS,
+        protocol: CONVERSATION_PROTOCOL.MLS,
         epoch: remoteEpoch,
         group_id: mockGroupId,
       } as unknown as MLSConversation);
@@ -602,7 +602,7 @@ describe('ConversationService', () => {
       // The 2nd request we make after successfully registering a group
       jest.spyOn(apiClient.api.conversation, 'getMLS1to1Conversation').mockResolvedValueOnce({
         qualified_id: mockConversationId,
-        protocol: ConversationProtocol.MLS,
+        protocol: CONVERSATION_PROTOCOL.MLS,
         epoch: updatedEpoch,
         group_id: mockGroupId,
       } as unknown as MLSConversation);
@@ -636,7 +636,7 @@ describe('ConversationService', () => {
 
       jest.spyOn(apiClient.api.conversation, 'getMLS1to1Conversation').mockResolvedValueOnce({
         qualified_id: mockConversationId,
-        protocol: ConversationProtocol.MLS,
+        protocol: CONVERSATION_PROTOCOL.MLS,
         epoch: remoteEpoch,
         group_id: mockGroupId,
       } as unknown as MLSConversation);
@@ -644,7 +644,7 @@ describe('ConversationService', () => {
       // The 2nd request we make when retrying to register the conversation
       jest.spyOn(apiClient.api.conversation, 'getMLS1to1Conversation').mockResolvedValueOnce({
         qualified_id: mockConversationId,
-        protocol: ConversationProtocol.MLS,
+        protocol: CONVERSATION_PROTOCOL.MLS,
         epoch: remoteEpoch,
         group_id: mockGroupId,
       } as unknown as MLSConversation);
@@ -652,7 +652,7 @@ describe('ConversationService', () => {
       // The 3rd request we make after successfully registering a group
       jest.spyOn(apiClient.api.conversation, 'getMLS1to1Conversation').mockResolvedValueOnce({
         qualified_id: mockConversationId,
-        protocol: ConversationProtocol.MLS,
+        protocol: CONVERSATION_PROTOCOL.MLS,
         epoch: updatedEpoch,
         group_id: mockGroupId,
       } as unknown as MLSConversation);
@@ -695,7 +695,7 @@ describe('ConversationService', () => {
 
       jest.spyOn(apiClient.api.conversation, 'getConversation').mockResolvedValueOnce({
         qualified_id: conversationId,
-        protocol: ConversationProtocol.MLS,
+        protocol: CONVERSATION_PROTOCOL.MLS,
         epoch: remoteEpoch,
         group_id: mockGroupId,
       } as unknown as Conversation);
@@ -758,7 +758,7 @@ describe('ConversationService', () => {
 
       jest.spyOn(apiClient.api.conversation, 'getConversation').mockResolvedValueOnce({
         qualified_id: conversationId,
-        protocol: ConversationProtocol.MLS,
+        protocol: CONVERSATION_PROTOCOL.MLS,
       } as unknown as Conversation);
 
       await conversationService.handleEvent(mockMLSWelcomeMessageEvent);
@@ -861,7 +861,7 @@ describe('ConversationService', () => {
 
       jest.spyOn(apiClient.api.conversation, 'getConversation').mockResolvedValueOnce({
         qualified_id: mockConversationId,
-        protocol: ConversationProtocol.MLS,
+        protocol: CONVERSATION_PROTOCOL.MLS,
         epoch: 1,
         group_id: mockGroupId,
       } as unknown as Conversation);
@@ -899,9 +899,9 @@ describe('ConversationService', () => {
 
       jest.spyOn(apiClient.api.user, 'getUserSupportedProtocols').mockImplementation(id => {
         if (id === otherUsersToAdd[2]) {
-          return Promise.resolve([ConversationProtocol.PROTEUS]);
+          return Promise.resolve([CONVERSATION_PROTOCOL.PROTEUS]);
         }
-        return Promise.resolve([ConversationProtocol.MLS, ConversationProtocol.PROTEUS]);
+        return Promise.resolve([CONVERSATION_PROTOCOL.MLS, CONVERSATION_PROTOCOL.PROTEUS]);
       });
 
       jest.spyOn(mlsService, 'getKeyPackagesPayload').mockResolvedValueOnce({
@@ -911,7 +911,7 @@ describe('ConversationService', () => {
 
       jest.spyOn(apiClient.api.conversation, 'getConversation').mockResolvedValueOnce({
         qualified_id: mockConversationId,
-        protocol: ConversationProtocol.MLS,
+        protocol: CONVERSATION_PROTOCOL.MLS,
         epoch: 1,
         group_id: mockGroupId,
       } as unknown as Conversation);
@@ -968,7 +968,7 @@ describe('ConversationService', () => {
       const getConvSpy = jest.spyOn(apiClient.api.conversation, 'getConversation');
       getConvSpy.mockResolvedValue({
         qualified_id: mockConversationId,
-        protocol: ConversationProtocol.MLS,
+        protocol: CONVERSATION_PROTOCOL.MLS,
         epoch: remoteEpoch,
         group_id: mockGroupId,
       } as unknown as Conversation);
@@ -1052,7 +1052,7 @@ describe('ConversationService', () => {
       const qualified_id = {id: 'conv-1', domain: 'staging.zinfra.io'};
 
       jest.spyOn(apiClient.api.conversation, 'getConversationList').mockResolvedValueOnce({
-        found: [{group_id: groupId, qualified_id, protocol: ConversationProtocol.MLS, epoch: 1}] as any,
+        found: [{group_id: groupId, qualified_id, protocol: CONVERSATION_PROTOCOL.MLS, epoch: 1}] as any,
       });
 
       const resetSpy = jest
@@ -1088,7 +1088,7 @@ describe('ConversationService', () => {
       ];
 
       jest.spyOn(apiClient.api.conversation, 'getConversationList').mockResolvedValueOnce({
-        found: [{group_id: groupId, qualified_id, protocol: ConversationProtocol.MLS, epoch: 1}] as any,
+        found: [{group_id: groupId, qualified_id, protocol: CONVERSATION_PROTOCOL.MLS, epoch: 1}] as any,
       });
 
       const addUsersSpy = jest
@@ -1129,7 +1129,7 @@ describe('ConversationService', () => {
       const qualified_id = {id: 'conv-dup', domain: 'staging.zinfra.io'};
 
       jest.spyOn(apiClient.api.conversation, 'getConversationList').mockResolvedValue({
-        found: [{group_id: groupId, qualified_id, protocol: ConversationProtocol.MLS, epoch: 1}] as any,
+        found: [{group_id: groupId, qualified_id, protocol: CONVERSATION_PROTOCOL.MLS, epoch: 1}] as any,
       });
 
       // Make the recovery hang until we resolve it, to simulate overlapping calls
@@ -1169,7 +1169,7 @@ describe('ConversationService', () => {
       const qualified_id = {id: 'conv-stale', domain: 'staging.zinfra.io'};
 
       jest.spyOn(apiClient.api.conversation, 'getConversationList').mockResolvedValueOnce({
-        found: [{group_id: groupId, qualified_id, protocol: ConversationProtocol.MLS, epoch: 2}] as any,
+        found: [{group_id: groupId, qualified_id, protocol: CONVERSATION_PROTOCOL.MLS, epoch: 2}] as any,
       });
 
       const handler = getKeyMaterialFailureHandler(mlsService);
@@ -1192,7 +1192,7 @@ describe('ConversationService', () => {
 
       jest.spyOn(apiClient.api.conversation, 'getConversation').mockResolvedValueOnce({
         qualified_id,
-        protocol: ConversationProtocol.MLS,
+        protocol: CONVERSATION_PROTOCOL.MLS,
         epoch: remoteEpoch,
         group_id: groupId,
       } as unknown as Conversation);
@@ -1210,7 +1210,7 @@ describe('ConversationService', () => {
       return {
         group_id,
         qualified_id: {id, domain: 'staging.zinfra.io'},
-        protocol: ConversationProtocol.MLS,
+        protocol: CONVERSATION_PROTOCOL.MLS,
         epoch: 1,
       } as unknown as Conversation;
     }

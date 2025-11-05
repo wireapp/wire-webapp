@@ -40,7 +40,7 @@ import {
 } from '@wireapp/api-client/lib/notification/ConsumableNotification';
 import {WebSocketClient} from '@wireapp/api-client/lib/tcp/';
 import {WEBSOCKET_STATE} from '@wireapp/api-client/lib/tcp/ReconnectingWebsocket';
-import {FEATURE_KEY, FeatureStatus} from '@wireapp/api-client/lib/team';
+import {FEATURE_KEY, FEATURE_STATUS} from '@wireapp/api-client/lib/team';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {TimeInMillis} from '@wireapp/commons/lib/util/TimeUtil';
 import logdown from 'logdown';
@@ -1255,10 +1255,11 @@ export class Account extends TypedEventEmitter<Events> {
 
     // Check if MLS is enabled for the public via backend feature flag
     const commonConfig = (await this.service?.team.getCommonFeatureConfig()) ?? {};
-    return commonConfig[FEATURE_KEY.MLS]?.status === FeatureStatus.ENABLED;
+
+    return commonConfig[FEATURE_KEY.MLS]?.status === FEATURE_STATUS.ENABLED;
   };
 
-  private isMLSConversationRecoveryEnabled = async () => {
+  private readonly isMLSConversationRecoveryEnabled = async () => {
     const commonConfig = (await this.service?.team.getCommonFeatureConfig()) ?? {};
     return commonConfig[FEATURE_KEY.ALLOWED_GLOBAL_OPERATIONS]?.config?.mlsConversationReset === true;
   };

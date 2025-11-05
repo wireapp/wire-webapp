@@ -21,11 +21,12 @@
 import * as GenericMessageParams from '../Utility/getGenericMessageParams';
 
 import {ClientClassification} from '@wireapp/api-client/lib/client';
-import {Conversation, ConversationProtocol, NewConversation} from '@wireapp/api-client/lib/conversation';
+import {Conversation, NewConversation} from '@wireapp/api-client/lib/conversation';
 
 import {MessageSendingState} from '../../../conversation';
 import {buildTextMessage} from '../../../conversation/message/MessageBuilder';
 import {buildProteusService} from './ProteusService.mocks';
+import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 
 jest.mock('../Utility/getGenericMessageParams', () => {
   return {
@@ -77,7 +78,7 @@ describe('sendGenericMessage', () => {
       const payloadBundle = await proteusService.sendMessage({
         payload: message,
         conversationId: {id: 'conv1', domain: ''},
-        protocol: ConversationProtocol.PROTEUS,
+        protocol: CONVERSATION_PROTOCOL.PROTEUS,
       });
 
       expect(payloadBundle.state).toBe(MessageSendingState.CANCELED);

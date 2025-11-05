@@ -25,7 +25,6 @@ import {
   CONVERSATION_ACCESS_ROLE,
   CONVERSATION_TYPE,
   Conversation,
-  ConversationProtocol,
   FederatedBackendsError,
   FederatedBackendsErrorLabel,
   QualifiedUserClients,
@@ -41,6 +40,7 @@ import {GenericMessage} from '@wireapp/protocol-messaging';
 import {ProteusService} from './ProteusService';
 import {NonFederatingBackendsError} from '../../../errors';
 import {generateQualifiedId, generateQualifiedIds} from '../../../testUtils';
+import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 
 jest.mock('./CryptoClient/CoreCryptoWrapper/PrekeysTracker', () => {
   return {
@@ -410,7 +410,7 @@ describe('ProteusService', () => {
         const params: SendProteusMessageParams = {
           conversationId: generateQualifiedId('domain'),
           payload: message,
-          protocol: ConversationProtocol.PROTEUS,
+          protocol: CONVERSATION_PROTOCOL.PROTEUS,
           targetMode: MessageTargetMode.USERS,
         };
 
@@ -437,7 +437,7 @@ describe('ProteusService', () => {
 
           jest.spyOn(proteusService['messageService'], 'sendMessage').mockReturnValue(Promise.resolve({} as any));
           await proteusService.sendMessage({
-            protocol: ConversationProtocol.PROTEUS,
+            protocol: CONVERSATION_PROTOCOL.PROTEUS,
             payload: message,
             targetMode: MessageTargetMode.USERS,
             userIds: recipients,
@@ -471,7 +471,7 @@ describe('ProteusService', () => {
           MockedRecipients.getRecipientsForConversation.mockResolvedValue({} as any);
           jest.spyOn(proteusService['messageService'], 'sendMessage').mockResolvedValue({} as any);
           await proteusService.sendMessage({
-            protocol: ConversationProtocol.PROTEUS,
+            protocol: CONVERSATION_PROTOCOL.PROTEUS,
             conversationId: {id: 'conv1', domain: 'domain1'},
             payload: message,
             targetMode: MessageTargetMode.USERS,
@@ -506,7 +506,7 @@ describe('ProteusService', () => {
           jest.spyOn(proteusService['messageService'], 'sendMessage').mockReturnValue(Promise.resolve({} as any));
           await proteusService.sendMessage({
             conversationId: {id: 'conv1', domain: ''},
-            protocol: ConversationProtocol.PROTEUS,
+            protocol: CONVERSATION_PROTOCOL.PROTEUS,
             payload: message,
             targetMode: MessageTargetMode.USERS_CLIENTS,
             userIds: recipients,
@@ -535,7 +535,7 @@ describe('ProteusService', () => {
           MockedRecipients.getRecipientsForConversation.mockResolvedValue({} as any);
           jest.spyOn(proteusService['messageService'], 'sendMessage').mockReturnValue(Promise.resolve({} as any));
           await proteusService.sendMessage({
-            protocol: ConversationProtocol.PROTEUS,
+            protocol: CONVERSATION_PROTOCOL.PROTEUS,
             conversationId: {id: 'conv1', domain: 'domain1'},
             payload: message,
             targetMode: MessageTargetMode.USERS_CLIENTS,
@@ -569,7 +569,7 @@ describe('ProteusService', () => {
         });
 
         const result = await proteusService.sendMessage({
-          protocol: ConversationProtocol.PROTEUS,
+          protocol: CONVERSATION_PROTOCOL.PROTEUS,
           conversationId: generateQualifiedId('domain'),
           payload: message,
           targetMode: MessageTargetMode.USERS_CLIENTS,
@@ -702,7 +702,7 @@ describe('ProteusService', () => {
           status_time: '',
         },
       },
-      protocol: ConversationProtocol.PROTEUS,
+      protocol: CONVERSATION_PROTOCOL.PROTEUS,
     };
 
     it('adds all requested users to a new conversation', async () => {

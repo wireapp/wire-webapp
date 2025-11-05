@@ -23,7 +23,6 @@ import {
   MutedStatus,
   NewConversation,
   QualifiedUserClients,
-  ConversationProtocol,
   RemoteConversations,
   MLSConversation,
   SUBCONVERSATION_ID,
@@ -41,6 +40,7 @@ import {
   ConversationMemberLeaveEvent,
   ConversationOtrMessageAddEvent,
 } from '@wireapp/api-client/lib/event';
+import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {XOR} from '@wireapp/commons/lib/util/TypeUtil';
 import {Decoder, Encoder} from 'bazinga64';
@@ -205,7 +205,7 @@ export class ConversationService extends TypedEventEmitter<Events> {
    */
   public async send(params: XOR<SendMlsMessageParams, SendProteusMessageParams>): Promise<SendResult> {
     function isMLS(params: SendProteusMessageParams | SendMlsMessageParams): params is SendMlsMessageParams {
-      return params.protocol === ConversationProtocol.MLS;
+      return params.protocol === CONVERSATION_PROTOCOL.MLS;
     }
     return sendMessage(() => (isMLS(params) ? this.sendMLSMessage(params) : this.proteusService.sendMessage(params)));
   }
