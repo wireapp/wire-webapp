@@ -51,19 +51,17 @@ const createPagesForUser = async (browser: Browser, user: User) => {
   const context = await browser.newContext();
   const page = await context.newPage();
   const pageManager = PageManager.from(page);
-  const {pages, modals, components} = pageManager.webapp;
 
   await pageManager.openMainPage();
   await loginUser(user, pageManager);
-  await modals.dataShareConsent().clickDecline();
-  await components.conversationSidebar().isPageLoaded();
 
-  return pages;
+  return pageManager.webapp;
 };
 
 test.describe('Edit', () => {
   test('I can edit my message in 1:1', {tag: ['@TC-679', '@regression']}, async ({browser, userA, userB}) => {
-    const userAPages = await createPagesForUser(browser, userA);
+    const {pages: userAPages, modals} = await createPagesForUser(browser, userA);
+    await modals.dataShareConsent().clickDecline();
     await userAPages.conversationList().openConversation(userB.fullName);
     await userAPages.conversation().sendMessage('Test Message');
 
@@ -82,7 +80,8 @@ test.describe('Edit', () => {
     'I can edit my message in a group conversation',
     {tag: ['@TC-680', '@regression']},
     async ({browser, userA, userB}) => {
-      const userAPages = await createPagesForUser(browser, userA);
+      const {pages: userAPages, modals} = await createPagesForUser(browser, userA);
+      await modals.dataShareConsent().clickDecline();
       await createGroup(userAPages, 'Test Group', [userB]);
       await userAPages.conversationList().openConversation('Test Group');
       await userAPages.conversation().sendMessage('Test Message');
@@ -96,6 +95,34 @@ test.describe('Edit', () => {
       // Overwrite the text in the message input and send it
       await userAPages.conversation().sendMessage('Edited Message');
       await expect(message).toContainText('Edited Message');
+    },
+  );
+
+  test(
+    'I see changed message if message was edited from another device',
+    {tag: ['@TC-682', '@regression']},
+    async ({browser, userA, userB}) => {
+      const {pages: device1, modals: device1Modals} = await createPagesForUser(browser, userA);
+      await device1Modals.dataShareConsent().clickDecline();
+      await device1.conversationList().openConversation(userB.fullName);
+
+      // Device 2 is intentionally created after device 1 to ensure the history info warning is confirmed
+      const {pages: device2} = await createPagesForUser(browser, userA);
+      await device2.historyInfo().clickConfirmButton();
+      await device2.conversationList().openConversation(userB.fullName);
+
+      await device1.conversation().sendMessage('Message from device 1');
+
+      const messageOnDevice1 = device1.conversation().messageItems.filter({hasText: userA.fullName});
+      const messageOnDevice2 = device2.conversation().messageItems.filter({hasText: userA.fullName});
+      await expect(messageOnDevice1).toContainText('Message from device 1');
+      await expect(messageOnDevice2).toContainText('Message from device 1');
+
+      await device1.conversation().editMessage(messageOnDevice1);
+      await device1.conversation().sendMessage('Updated message from device 1');
+
+      await expect(messageOnDevice1).toContainText('Updated message from device 1');
+      await expect(messageOnDevice2).toContainText('Updated message from device 1');
     },
   );
 });
