@@ -152,9 +152,7 @@ export class ConversationPage {
   async sendMessage(message: string) {
     await this.messageInput.fill(message);
     await this.sendMessageButton.click();
-    // Wait for the specific message to appear in the conversation
-    const messageLocator = this.messages.filter({hasText: message}).last();
-    await messageLocator.waitFor({state: 'visible', timeout: 20_000});
+    await this.isMessageVisible(message); // isMessageVisible not only checks for visibility but ensures the optimistic update was persisted
   }
 
   async typeMessage(message: string) {
