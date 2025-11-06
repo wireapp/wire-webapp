@@ -20,8 +20,8 @@
 import {getUser} from 'test/e2e_tests/data/user';
 import {PageManager} from 'test/e2e_tests/pageManager';
 import {addMockCamerasToContext} from 'test/e2e_tests/utils/mockVideoDevice.util';
+import {completeLogin} from 'test/e2e_tests/utils/setup.util';
 import {addCreatedTeam, removeCreatedTeam} from 'test/e2e_tests/utils/tearDown.util';
-import {loginUser} from 'test/e2e_tests/utils/userActions';
 
 import {test, expect} from '../../test.fixtures';
 
@@ -44,7 +44,7 @@ test(
     const ownerBContext = await browser.newContext();
     const ownerBPage = await ownerBContext.newPage();
     const ownerBPageManager = PageManager.from(ownerBPage);
-    const {pages: ownerBPages, modals: ownerBModals} = ownerBPageManager.webapp;
+    const {pages: ownerBPages} = ownerBPageManager.webapp;
 
     let callingServiceInstanceId: string;
 
@@ -61,19 +61,7 @@ test(
     });
 
     await test.step('Users A and B are logged in', async () => {
-      await Promise.all([
-        (async () => {
-          await ownerAPageManager.openMainPage();
-          await loginUser(ownerA, ownerAPageManager);
-          await ownerAModals.dataShareConsent().clickDecline();
-        })(),
-
-        (async () => {
-          await ownerBPageManager.openMainPage();
-          await loginUser(ownerB, ownerBPageManager);
-          await ownerBModals.dataShareConsent().clickDecline();
-        })(),
-      ]);
+      await Promise.all([completeLogin(ownerAPageManager, ownerA), completeLogin(ownerBPageManager, ownerB)]);
     });
 
     // user A finds user B and sends a connection request
@@ -108,7 +96,6 @@ test(
       // answering happens automatically calling service
       await ownerAPages.calling().waitForCell();
       expect(await ownerAPages.calling().isCellVisible()).toBeTruthy();
-      await ownerAPages.calling().waitForGoFullScreen();
     });
 
     await test.step('User A switches audio on and sends audio', async () => {

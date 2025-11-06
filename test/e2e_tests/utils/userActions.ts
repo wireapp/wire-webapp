@@ -79,8 +79,8 @@ export const sendTextMessageToConversation = async (
   await pages.conversation().sendMessage(message);
 
   // TODO: Bug [WPB-18226] Message is not visible in the conversation after sending it
-  await pages.conversation().page.waitForTimeout(3000); // Wait for the message to be sent
-  await pageManager.refreshPage({waitUntil: 'domcontentloaded'});
+  await pages.conversation().page.waitForTimeout(500); // Wait for the message to be sent
+  // await pageManager.refreshPage({waitUntil: 'domcontentloaded'}); // does not check if the page is loaded and time out!
   // End of TODO: Bug [WPB-18226]
 
   expect(await pages.conversation().isMessageVisible(message)).toBeTruthy();

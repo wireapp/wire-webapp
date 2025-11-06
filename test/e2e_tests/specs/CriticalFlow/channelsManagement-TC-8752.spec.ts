@@ -18,8 +18,9 @@
  */
 
 import {PageManager} from 'test/e2e_tests/pageManager';
+import {completeLogin} from 'test/e2e_tests/utils/setup.util';
 import {addCreatedTeam, removeCreatedTeam} from 'test/e2e_tests/utils/tearDown.util';
-import {inviteMembers, loginUser, sendTextMessageToConversation} from 'test/e2e_tests/utils/userActions';
+import {inviteMembers, sendTextMessageToConversation} from 'test/e2e_tests/utils/userActions';
 
 import {getUser} from '../../data/user';
 import {test, expect} from '../../test.fixtures';
@@ -54,16 +55,8 @@ test('Channels Management', {tag: ['@TC-8752', '@crit-flow-web']}, async ({pageM
     memberPages = new PageManager(memberPage);
   });
 
-  await test.step('Team owner signed in to the application', async () => {
-    await pageManager.openMainPage();
-    await loginUser(owner, pageManager);
-    await modals.dataShareConsent().clickDecline();
-  });
-
-  await test.step('Team member signed in to the application', async () => {
-    await memberPages.openMainPage();
-    await loginUser(member, memberPages);
-    await memberPages.webapp.modals.dataShareConsent().clickDecline();
+  await test.step('Owner and member login', async () => {
+    await Promise.all([completeLogin(pageManager, owner), completeLogin(memberPages, member)]);
   });
 
   await test.step('Team owner creates a channel with available member', async () => {
@@ -130,7 +123,8 @@ test('Channels Management', {tag: ['@TC-8752', '@crit-flow-web']}, async ({pageM
   await test.step('Team owner add member back to the same conversation', async () => {
     await pages.conversationList().openConversation(conversation2);
     await pages.conversation().toggleGroupInformation();
-    await pages.conversation().clickAddMemberButton();
+    await pages.conversationDetails().waitForSidebar();
+    await pages.conversationDetails().clickAddPeopleButton();
     await pages.startUI().selectUsers([member.username]);
     await pages.groupCreation().clickAddMembers();
   });
