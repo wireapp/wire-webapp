@@ -72,6 +72,7 @@ describe('SessionHandler', () => {
 
   afterAll(() => {
     jest.clearAllTimers();
+    apiClient.disconnect();
   });
 
   describe('constructSessionId', () => {

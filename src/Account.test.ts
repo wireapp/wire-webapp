@@ -52,8 +52,11 @@ const MOCK_BACKEND = {
   ws: `wss://${BASE_URL}`,
 };
 
+const apiClients: APIClient[] = [];
+
 async function createAccount(): Promise<{account: Account; apiClient: APIClient}> {
   const apiClient = new APIClient({urls: MOCK_BACKEND});
+  apiClients.push(apiClient);
   const account = new Account(apiClient);
   await account['initServices']({
     clientType: ClientType.TEMPORARY,
@@ -86,6 +89,10 @@ const waitFor = (assertion: () => void) => {
 
 describe('Account', () => {
   const CLIENT_ID = '4e37b32f57f6da55';
+
+  afterAll(() => {
+    apiClients.forEach(client => client.disconnect());
+  });
 
   // Fix for node 16, crypto.subtle.decrypt has a type problem
   jest.spyOn(global.crypto.subtle, 'decrypt').mockResolvedValue(new Uint8Array(32));
@@ -205,6 +212,9 @@ describe('Account', () => {
   describe('"init"', () => {
     it('initializes the Protocol buffers', async () => {
       const account = new Account();
+      if (account['apiClient']) {
+        apiClients.push(account['apiClient']);
+      }
 
       await account['initServices']({clientType: ClientType.TEMPORARY, userId: ''});
 
@@ -222,6 +232,7 @@ describe('Account', () => {
   describe('"login"', () => {
     it('logs in with correct credentials', async () => {
       const apiClient = new APIClient({urls: MOCK_BACKEND});
+      apiClients.push(apiClient);
       const account = new Account(apiClient);
 
       await account['initServices']({clientType: ClientType.TEMPORARY, userId: ''});
@@ -237,6 +248,7 @@ describe('Account', () => {
 
     it('does not log in with incorrect credentials', async () => {
       const apiClient = new APIClient({urls: MOCK_BACKEND});
+      apiClients.push(apiClient);
       const account = new Account(apiClient);
       let backendError;
 

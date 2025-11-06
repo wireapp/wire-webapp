@@ -27,5 +27,5 @@ export interface EncryptedAsset {
 export interface EncryptedAssetUploaded extends EncryptedAsset {
   key: string;
   domain?: string;
-  token: string;
+  token?: string;
 }

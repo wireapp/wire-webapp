@@ -35,13 +35,20 @@ const MOCK_BACKEND = {
 
 const mockedConversationService = {} as unknown as ConversationService;
 
+const apiClients: APIClient[] = [];
+
 describe('NotificationService', () => {
+  afterAll(() => {
+    apiClients.forEach(client => client.disconnect());
+  });
+
   describe('handleEvent', () => {
     it('propagates errors to the outer calling function', async () => {
       const storeEngine = new MemoryEngine();
       await storeEngine.init('NotificationService.test');
 
       const apiClient = new APIClient({urls: MOCK_BACKEND});
+      apiClients.push(apiClient);
 
       const notificationService = new NotificationService(apiClient, storeEngine, mockedConversationService);
 
@@ -76,6 +83,7 @@ describe('NotificationService', () => {
       await storeEngine.init('NotificationService.test');
 
       const apiClient = new APIClient({urls: MOCK_BACKEND});
+      apiClients.push(apiClient);
       const notificationService = new NotificationService(apiClient, storeEngine, mockedConversationService);
 
       jest.spyOn(notificationService as any, 'handleEvent').mockReturnValue({});
@@ -104,6 +112,7 @@ describe('NotificationService', () => {
       await storeEngine.init('NotificationService.test');
 
       const apiClient = new APIClient({urls: MOCK_BACKEND});
+      apiClients.push(apiClient);
       const notificationService = new NotificationService(apiClient, storeEngine, mockedConversationService);
 
       jest.spyOn(notificationService as any, 'handleEvent').mockReturnValue({});
@@ -131,6 +140,7 @@ describe('NotificationService', () => {
         await storeEngine.init('NotificationService.test');
 
         const apiClient = new APIClient({urls: MOCK_BACKEND});
+        apiClients.push(apiClient);
         const notificationService = new NotificationService(apiClient, storeEngine, mockedConversationService);
         notificationService.on(NotificationService.TOPIC.NOTIFICATION_ERROR, notificationError => {
           expect(notificationError.error.message).toBe('Test error');

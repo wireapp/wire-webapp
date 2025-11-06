@@ -61,8 +61,11 @@ const getSubconversationResponse = ({
   };
 };
 
+const apiClients: APIClient[] = [];
+
 const buildSubconversationService = async (isFederated = false) => {
   const apiClient = new APIClient({urls: APIClient.BACKEND.STAGING});
+  apiClients.push(apiClient);
   apiClient.backendFeatures.isFederated = isFederated;
 
   const mlsService = {
@@ -88,6 +91,10 @@ const buildSubconversationService = async (isFederated = false) => {
 };
 
 describe('SubconversationService', () => {
+  afterAll(() => {
+    apiClients.forEach(client => client.disconnect());
+  });
+
   describe('joinConferenceSubconversation', () => {
     afterEach(() => {
       jest.useRealTimers();

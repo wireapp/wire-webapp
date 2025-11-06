@@ -33,7 +33,7 @@ import {
 import {AddUsersFailureReasons, MessageSendingState, MessageTargetMode} from '../../../conversation';
 import {buildTextMessage} from '../../../conversation/message/MessageBuilder';
 import {SendProteusMessageParams} from './ProteusService.types';
-import {buildProteusService} from './ProteusService.mocks';
+import {buildProteusService, cleanupProteusServiceMocks} from './ProteusService.mocks';
 import {constructSessionId} from '../Utility/SessionHandler';
 import {CONVERSATION_EVENT, ConversationOtrMessageAddEvent} from '@wireapp/api-client/lib/event';
 import {GenericMessage} from '@wireapp/protocol-messaging';
@@ -126,6 +126,10 @@ const prepareDataForEncryption = async () => {
 };
 
 describe('ProteusService', () => {
+  afterAll(() => {
+    cleanupProteusServiceMocks();
+  });
+
   const domain1 = 'domain1';
   const domain2 = 'domain2';
   const domain3 = 'domain3';

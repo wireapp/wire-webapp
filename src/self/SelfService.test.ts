@@ -35,6 +35,10 @@ describe('SelfService', () => {
     const apiClient = new APIClient({urls: MOCK_BACKEND});
     apiClient.backendFeatures.supportsMLS = true;
 
+    afterAll(() => {
+      apiClient.disconnect();
+    });
+
     it('updates the list of self supported protocols', async () => {
       const selfService = new SelfService(apiClient);
 

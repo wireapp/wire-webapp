@@ -25,11 +25,18 @@ import {AssetService} from './AssetService';
 
 describe('AssetService', () => {
   describe('"uploadAsset"', () => {
+    let apiClient: APIClient;
+
+    afterEach(() => {
+      apiClient?.disconnect();
+    });
+
     it('builds an encrypted asset payload', async () => {
-      const apiClient = new APIClient();
+      apiClient = new APIClient();
       const assetService = new AssetService(apiClient);
 
       const assetServerData = {
+        domain: 'asset-server.test.wire.com',
         key: `3-2-${uuidv4()}`,
         token: uuidv4(),
         expires: '',
@@ -53,7 +60,7 @@ describe('AssetService', () => {
     });
 
     it('allows cancelling asset upload', async () => {
-      const apiClient = new APIClient();
+      apiClient = new APIClient();
       const assetService = new AssetService(apiClient);
 
       const apiUpload = {
@@ -69,7 +76,7 @@ describe('AssetService', () => {
     });
 
     it('exposes upload progress', async () => {
-      const apiClient = new APIClient();
+      apiClient = new APIClient();
       const assetService = new AssetService(apiClient);
 
       const apiUpload = {
