@@ -219,4 +219,36 @@ test.describe('Edit', () => {
       });
     },
   );
+
+  test(
+    'I can see the changed message was edited from another user',
+    {tag: ['@TC-692', '@regression']},
+    async ({browser, userA, userB}) => {
+      const [userAPages, userBPages] = await Promise.all([
+        (async () => {
+          const {pages, modals} = await createPagesForUser(browser, userA);
+          await modals.dataShareConsent().clickDecline();
+          return pages;
+        })(),
+        (async () => {
+          const {pages, modals} = await createPagesForUser(browser, userB);
+          await modals.dataShareConsent().clickDecline();
+          return pages;
+        })(),
+      ]);
+
+      await userAPages.conversationList().openConversation(userB.fullName);
+      await userBPages.conversationList().openConversation(userA.fullName);
+
+      await userAPages.conversation().sendMessage('Test');
+      const sentMessage = userAPages.conversation().getMessageFromUser(userA);
+
+      const receivedMessage = userBPages.conversation().getMessageFromUser(userA);
+      await expect(receivedMessage).toContainText('Test');
+
+      await userAPages.conversation().editMessage(sentMessage);
+      await userAPages.conversation().sendMessage('Edited');
+      await expect(receivedMessage).toContainText('Edited');
+    },
+  );
 });
