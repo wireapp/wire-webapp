@@ -161,4 +161,62 @@ test.describe('Edit', () => {
       await expect(userAPages.conversation().messageInput).toContainText('Test Message');
     },
   );
+
+  test(
+    'Editing a message does not create unread dot on receiver side',
+    {tag: ['@TC-690', '@regression']},
+    async ({browser, userA, userB}) => {
+      const [userAPages, userBPages] = await Promise.all([
+        (async () => {
+          const {pages, modals} = await createPagesForUser(browser, userA);
+          await modals.dataShareConsent().clickDecline();
+          return pages;
+        })(),
+        (async () => {
+          const {pages, modals} = await createPagesForUser(browser, userB);
+          await modals.dataShareConsent().clickDecline();
+          return pages;
+        })(),
+      ]);
+
+      await test.step('Create group as second conversation', async () => {
+        // We need to create a second conversation in order to switch to it to ensure the unread marker can be shown on the not open conversation
+        await createGroup(userAPages, 'Test Group', [userB]);
+        await userBPages.conversationList().openConversation('Test Group');
+      });
+
+      await test.step('Send message from user A to B', async () => {
+        await userAPages.conversationList().openConversation(userB.fullName);
+        await userAPages.conversation().sendMessage('Test Message');
+      });
+
+      await test.step('Check user B has a unread conversation with A containing the sent message', async () => {
+        const conversation = userBPages.conversationList().getConversationLocator(userA.fullName);
+        await expect(conversation.getByTestId('status-unread')).toBeVisible();
+
+        await userBPages.conversationList().openConversation(userA.fullName);
+        await expect(conversation).toContainText('Test Message');
+        await expect(conversation.getByTestId('status-unread')).not.toBeVisible();
+      });
+
+      await test.step("Open group conversation to ensure new messages won't be read immediately", async () => {
+        await userBPages.conversationList().openConversation('Test Group');
+        await expect(userBPages.conversation().conversationTitle).toHaveText('Test Group');
+      });
+
+      await test.step('Change message sent by A', async () => {
+        const message = userAPages.conversation().getMessageFromUser(userA);
+        await userAPages.conversation().editMessage(message);
+        await userAPages.conversation().sendMessage('Edited Message');
+      });
+
+      await test.step('Check B received the updated message without marking the conversation as unread', async () => {
+        const conversation = userBPages.conversationList().getConversationLocator(userA.fullName);
+        await expect(conversation.getByTestId('status-unread')).not.toBeVisible();
+
+        await userBPages.conversationList().openConversation(userA.fullName);
+        await expect(userBPages.conversation().getMessageFromUser(userA)).toContainText('Edited Message');
+      });
+    },
+  );
 });
