@@ -251,4 +251,52 @@ test.describe('Edit', () => {
       await expect(receivedMessage).toContainText('Edited');
     },
   );
+
+  test(
+    'I want to see the last edited text including a timestamp in message detail view if the message has been edited',
+    {tag: ['@TC-3563', '@regression']},
+    async ({browser, userA, userB}) => {
+      const [userAPages, userBPages] = await Promise.all([
+        (async () => {
+          const {pages, modals} = await createPagesForUser(browser, userA);
+          await modals.dataShareConsent().clickDecline();
+          await pages.conversationList().openConversation(userB.fullName);
+          return pages;
+        })(),
+        (async () => {
+          const {pages, modals} = await createPagesForUser(browser, userB);
+          await modals.dataShareConsent().clickDecline();
+          await pages.conversationList().openConversation(userA.fullName);
+          return pages;
+        })(),
+      ]);
+
+      await test.step('Send a message from user A to B', async () => {
+        await userAPages.conversation().sendMessage('Test message');
+      });
+
+      const message = userAPages.conversation().getMessageFromUser(userA);
+      const editIcon = message.locator('.message-header-label-icon');
+      await expect(editIcon).not.toBeAttached();
+
+      await test.step('User A edits the message', async () => {
+        const message = userAPages.conversation().getMessageFromUser(userA);
+        await userAPages.conversation().editMessage(message);
+        await userAPages.conversation().sendMessage('Edited message');
+      });
+
+      await test.step('The message is shown as edited to user A', async () => {
+        await expect(editIcon).toBeVisible();
+        await expect(editIcon).toHaveAttribute('title', /^Edited:/);
+      });
+
+      await test.step('The message is shown as edited to user B', async () => {
+        const message = userBPages.conversation().getMessageFromUser(userA);
+        const editIcon = message.locator('.message-header-label-icon');
+        await expect(message).toContainText('Edited message');
+        await expect(editIcon).toBeVisible();
+        await expect(editIcon).toHaveAttribute('title', /^Edited:/);
+      });
+    },
+  );
 });
