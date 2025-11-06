@@ -68,8 +68,11 @@ const defaultMLSInitConfig: InitClientOptions = {
 const mockGroupId = 'Z3JvdXAtdGVzdC0x';
 const mockedMLSWelcomeEventData = '';
 
+const apiClients: APIClient[] = [];
+
 const createMLSService = async () => {
   const apiClient = new APIClient();
+  apiClients.push(apiClient);
   const transactionContext = {
     mlsInit: jest.fn(),
     wipeConversation: jest.fn(),
@@ -116,6 +119,10 @@ afterAll(() => {
 });
 
 describe('MLSService', () => {
+  afterAll(() => {
+    apiClients.forEach(client => client.disconnect());
+  });
+
   describe('registerConversation', () => {
     let mlsService: MLSService;
     let apiClient: APIClient;

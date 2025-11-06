@@ -28,10 +28,13 @@ import {ProteusService} from './ProteusService';
 import {getUUID} from '../../../test/PayloadHelper';
 import {createMemoryEngine} from '../../../test/StoreHelper';
 
+const createdApiClients: APIClient[] = [];
+
 export const buildProteusService = async (): Promise<
   [ProteusService, {apiClient: APIClient; cryptoClient: CryptoClient}]
 > => {
   const apiClient = new APIClient({urls: APIClient.BACKEND.STAGING});
+  createdApiClients.push(apiClient);
 
   apiClient.context = {
     clientType: ClientType.NONE,
@@ -53,4 +56,9 @@ export const buildProteusService = async (): Promise<
   );
 
   return [proteusService, {apiClient, cryptoClient}];
+};
+
+export const cleanupProteusServiceMocks = () => {
+  createdApiClients.forEach(client => client.disconnect());
+  createdApiClients.length = 0;
 };

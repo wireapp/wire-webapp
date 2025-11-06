@@ -31,7 +31,10 @@ import {GenericMessage, Text} from '@wireapp/protocol-messaging';
 
 import {MessageService} from './MessageService';
 
-import {buildProteusService} from '../../messagingProtocols/proteus/ProteusService/ProteusService.mocks';
+import {
+  buildProteusService,
+  cleanupProteusServiceMocks,
+} from '../../messagingProtocols/proteus/ProteusService/ProteusService.mocks';
 import {getUUID} from '../../test/PayloadHelper';
 
 const baseMessageSendingStatus: MessageSendingStatus = {
@@ -86,8 +89,11 @@ function fakeEncrypt(_: unknown, recipients: QualifiedUserClients): Promise<{pay
   return Promise.resolve({payloads: encryptedPayload});
 }
 
+const apiClients: APIClient[] = [];
+
 const buildMessageService = async () => {
   const apiClient = new APIClient();
+  apiClients.push(apiClient);
   const [proteusService] = await buildProteusService();
   const messageService = new MessageService(apiClient, proteusService);
   jest.spyOn(proteusService, 'encrypt').mockImplementation(fakeEncrypt as any);
@@ -96,6 +102,10 @@ const buildMessageService = async () => {
 };
 
 describe('MessageService', () => {
+  afterAll(() => {
+    apiClients.forEach(client => client.disconnect());
+    cleanupProteusServiceMocks();
+  });
   describe('sendMessage', () => {
     const generateUsers = (userCount: number, clientsPerUser: number): TestUser[] => {
       return Array.from(Array(userCount)).map<TestUser>((_, i) => ({

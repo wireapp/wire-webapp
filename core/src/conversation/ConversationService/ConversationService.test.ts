@@ -96,9 +96,16 @@ const mockedProteusService = {
   sendProteusMessage: () => Promise.resolve({sentAt: new Date()}),
 } as unknown as ProteusService;
 
+const apiClients: APIClient[] = [];
+
 describe('ConversationService', () => {
+  afterAll(() => {
+    apiClients.forEach(client => client.disconnect());
+  });
+
   async function buildConversationService() {
     const client = new APIClient({urls: APIClient.BACKEND.STAGING});
+    apiClients.push(client);
     jest.spyOn(client.api.conversation, 'postMlsMessage').mockReturnValue(
       Promise.resolve({
         events: [],

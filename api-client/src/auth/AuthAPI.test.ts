@@ -24,6 +24,10 @@ import {StatusCode} from '../http';
 describe('AuthAPI', () => {
   const apiClient = new APIClient();
 
+  afterAll(() => {
+    apiClient.disconnect();
+  });
+
   it('sets the client to permanent', async () => {
     const data = {
       clientType: ClientType.PERMANENT,

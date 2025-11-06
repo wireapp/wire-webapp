@@ -20,13 +20,14 @@
 /* eslint-disable import/order */
 import * as GenericMessageParams from '../Utility/getGenericMessageParams';
 
+import {APIClient} from '@wireapp/api-client';
 import {ClientClassification} from '@wireapp/api-client/lib/client';
 import {Conversation, NewConversation} from '@wireapp/api-client/lib/conversation';
+import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 
 import {MessageSendingState} from '../../../conversation';
 import {buildTextMessage} from '../../../conversation/message/MessageBuilder';
-import {buildProteusService} from './ProteusService.mocks';
-import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
+import {buildProteusService, cleanupProteusServiceMocks} from './ProteusService.mocks';
 
 jest.mock('../Utility/getGenericMessageParams', () => {
   return {
@@ -35,8 +36,11 @@ jest.mock('../Utility/getGenericMessageParams', () => {
 });
 const MockedGenericMessageParams = GenericMessageParams as jest.Mocked<typeof GenericMessageParams>;
 
+const apiClients: APIClient[] = [];
+
 const prepareProteusService = async () => {
   const [proteusService, {apiClient}] = await buildProteusService();
+  apiClients.push(apiClient);
 
   jest.spyOn(apiClient.api.user, 'postListClients').mockImplementation(() =>
     Promise.resolve({
@@ -60,6 +64,8 @@ const prepareProteusService = async () => {
 
 afterAll(() => {
   jest.clearAllTimers();
+  apiClients.forEach(client => client.disconnect());
+  cleanupProteusServiceMocks();
 });
 
 describe('sendGenericMessage', () => {

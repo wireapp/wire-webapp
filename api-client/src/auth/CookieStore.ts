@@ -29,7 +29,7 @@ enum TOPIC {
 
 export class CookieStore {
   private static cookie?: Cookie;
-  public static emitter = new EventEmitter();
+  public static emitter = new EventEmitter().setMaxListeners(20);
 
   public static readonly TOPIC = TOPIC;
 

@@ -65,6 +65,11 @@ export class ReconnectingWebsocket {
   private onMessage?: (data: string) => void;
   private onError?: (error: ErrorEvent) => void;
   private onClose?: (event: CloseEvent) => void;
+  /**
+   * Cleanup function returned by onBackFromSleep to stop the sleep detection interval.
+   * This prevents memory leaks by ensuring the interval is cleared when the WebSocket is disconnected.
+   */
+  private readonly stopBackFromSleepHandler?: () => void;
 
   private isPingingEnabled = true;
 
@@ -86,8 +91,11 @@ export class ReconnectingWebsocket {
      * We won't receive the 'offline' event when the system goes to sleep (e.g. closing the lid of a laptop).
      * In this case navigator.onLine will still return true, but the WebSocket connection could be closed.
      * To handle this, we need a custom approach to detect when the system goes to sleep and when it wakes up.
+     *
+     * IMPORTANT: Store the cleanup function returned by onBackFromSleep. This function clears
+     * the internal setInterval and must be called when disconnecting to prevent memory leaks.
      * **/
-    onBackFromSleep({
+    this.stopBackFromSleepHandler = onBackFromSleep({
       callback: () => {
         if (this.socket) {
           this.logger.debug('Back from sleep, reconnecting WebSocket');
@@ -194,6 +202,22 @@ export class ReconnectingWebsocket {
       this.logger.info(`Disconnecting from WebSocket (reason: "${reason}")`);
       this.socket.close(CloseEventCode.NORMAL_CLOSURE, reason);
     }
+    // Always cleanup resources even if socket doesn't exist
+    this.cleanup();
+  }
+
+  /**
+   * Cleans up all active intervals and timers to prevent memory leaks.
+   * This includes:
+   * - The ping interval (via stopPinging)
+   * - The sleep detection interval (via stopBackFromSleepHandler)
+   *
+   * This method should be called whenever the WebSocket connection is terminated.
+   */
+  private cleanup(): void {
+    this.stopPinging();
+    // Clear the sleep detection interval if it exists
+    this.stopBackFromSleepHandler?.();
   }
 
   private getReconnectingWebsocket(): RWS {
