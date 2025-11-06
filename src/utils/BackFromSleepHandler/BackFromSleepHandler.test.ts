@@ -27,6 +27,7 @@ jest.useFakeTimers();
 describe('onBackFromSleep', () => {
   let originalDateNow: () => number;
   let now: number;
+  const stopFunctions: Array<() => void> = [];
 
   beforeEach(() => {
     originalDateNow = Date.now;
@@ -40,13 +41,17 @@ describe('onBackFromSleep', () => {
   });
 
   afterEach(() => {
+    // Clean up all intervals created during tests
+    stopFunctions.forEach(stop => stop());
+    stopFunctions.length = 0;
     jest.clearAllTimers();
     global.Date.now = originalDateNow;
   });
 
   it('should call the callback when system wakes up from sleep', () => {
     const callback = jest.fn();
-    onBackFromSleep({callback});
+    const stop = onBackFromSleep({callback});
+    stopFunctions.push(stop);
 
     // Simulate system sleep
     now += TOLERANCE + 1;
@@ -57,7 +62,8 @@ describe('onBackFromSleep', () => {
 
   it('should not call the callback for small delays', () => {
     const callback = jest.fn();
-    onBackFromSleep({callback});
+    const stop = onBackFromSleep({callback});
+    stopFunctions.push(stop);
 
     // Simulate small delay
     now += TOLERANCE - 1;
@@ -70,7 +76,8 @@ describe('onBackFromSleep', () => {
     const callback = jest.fn();
     const isDisconnected = jest.fn().mockReturnValue(true);
 
-    onBackFromSleep({callback, isDisconnected});
+    const stop = onBackFromSleep({callback, isDisconnected});
+    stopFunctions.push(stop);
 
     // Simulate system sleep
     now += TOLERANCE + 1;
@@ -83,7 +90,8 @@ describe('onBackFromSleep', () => {
     const callback = jest.fn();
     const isDisconnected = jest.fn().mockReturnValue(false);
 
-    onBackFromSleep({callback, isDisconnected});
+    const stop = onBackFromSleep({callback, isDisconnected});
+    stopFunctions.push(stop);
 
     // Simulate system sleep
     now += TOLERANCE + 1;
@@ -94,7 +102,8 @@ describe('onBackFromSleep', () => {
 
   it('should call the callback only once after sleep', () => {
     const callback = jest.fn();
-    onBackFromSleep({callback});
+    const stop = onBackFromSleep({callback});
+    stopFunctions.push(stop);
 
     // Simulate system sleep and wake up
     now += TOLERANCE + 1;
@@ -111,8 +120,9 @@ describe('onBackFromSleep', () => {
   it('should stop checking when returned function is called', () => {
     const callback = jest.fn();
     const stop = onBackFromSleep({callback});
+    stopFunctions.push(stop);
 
-    // Stop the interval
+    // Stop the interval manually for this specific test
     stop();
 
     // Simulate system sleep

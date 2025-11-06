@@ -35,7 +35,13 @@ const testConfig = {
   cells: cellsConfigMock,
 } as Config;
 
+const apiClients: APIClient[] = [];
+
 describe('APIClient', () => {
+  afterAll(() => {
+    apiClients.forEach(client => client.disconnect());
+  });
+
   const baseUrl = APIClient.BACKEND.PRODUCTION.rest;
 
   let accessTokenData = {
@@ -70,18 +76,21 @@ describe('APIClient', () => {
   describe('constructor', () => {
     it('constructs a client with production backend and StoreEngine by default', () => {
       const client = new APIClient(testConfig);
+      apiClients.push(client);
       expect(client.transport.http['client'].defaults.baseURL).toBe(APIClient.BACKEND.PRODUCTION.rest);
       expect(client.transport.ws['baseUrl']).toBe(APIClient.BACKEND.PRODUCTION.ws);
     });
 
     it('constructs StoreEngine when only the URLs is provided', () => {
       const client = new APIClient({urls: APIClient.BACKEND.PRODUCTION, cells: testConfig.cells});
+      apiClients.push(client);
       expect(client.transport.http['client'].defaults.baseURL).toBe(APIClient.BACKEND.PRODUCTION.rest);
       expect(client.transport.ws['baseUrl']).toBe(APIClient.BACKEND.PRODUCTION.ws);
     });
 
     it('constructs URLs when only the StoreEngine is provided', () => {
       const client = new APIClient(testConfig);
+      apiClients.push(client);
       expect(client.transport.http['client'].defaults.baseURL).toBe(APIClient.BACKEND.PRODUCTION.rest);
       expect(client.transport.ws['baseUrl']).toBe(APIClient.BACKEND.PRODUCTION.ws);
     });
@@ -93,6 +102,7 @@ describe('APIClient', () => {
         .get('/api-version')
         .reply(200, {supported: [MINIMUM_API_VERSION, MINIMUM_API_VERSION + 1]});
       const client = new APIClient(testConfig);
+      apiClients.push(client);
       let errorMessage;
       try {
         await client.useVersion(MINIMUM_API_VERSION + 2, MINIMUM_API_VERSION + 3);
@@ -106,6 +116,7 @@ describe('APIClient', () => {
     it("throws error if backend doesn't support /api-version endpoint", async () => {
       nock(baseUrl).get('/api-version').reply(404);
       const client = new APIClient(testConfig);
+      apiClients.push(client);
       let errorMessage;
       try {
         await client.useVersion(0, 3);
@@ -118,6 +129,7 @@ describe('APIClient', () => {
 
     it('uses highest common version', async () => {
       const client = new APIClient(testConfig);
+      apiClients.push(client);
       jest
         .spyOn(client.transport.http, 'sendRequest')
         .mockReturnValue({data: {supported: [MINIMUM_API_VERSION, MINIMUM_API_VERSION + 1]}} as any);
@@ -132,6 +144,7 @@ describe('APIClient', () => {
 
     it('uses dev version if available and requested', async () => {
       const client = new APIClient(testConfig);
+      apiClients.push(client);
       jest.spyOn(client.transport.http, 'sendRequest').mockReturnValue({
         data: {supported: [MINIMUM_API_VERSION, MINIMUM_API_VERSION + 1], development: [MINIMUM_API_VERSION + 2]},
       } as any);
@@ -147,6 +160,7 @@ describe('APIClient', () => {
 
     it('ignores dev version if not requested', async () => {
       const client = new APIClient(testConfig);
+      apiClients.push(client);
       jest.spyOn(client.transport.http, 'sendRequest').mockReturnValue({
         data: {supported: [MINIMUM_API_VERSION, MINIMUM_API_VERSION + 1], development: [MINIMUM_API_VERSION + 2]},
       } as any);
@@ -162,6 +176,7 @@ describe('APIClient', () => {
 
     it('ignores dev version if not listed in the supported versions', async () => {
       const client = new APIClient(testConfig);
+      apiClients.push(client);
       jest.spyOn(client.transport.http, 'sendRequest').mockReturnValue({
         data: {supported: [MINIMUM_API_VERSION, MINIMUM_API_VERSION + 1], development: [MINIMUM_API_VERSION + 2]},
       } as any);
@@ -177,6 +192,7 @@ describe('APIClient', () => {
 
     it('returns the backend federation state', async () => {
       const client = new APIClient(testConfig);
+      apiClients.push(client);
       jest
         .spyOn(client.transport.http, 'sendRequest')
         .mockReturnValue({data: {supported: [MINIMUM_API_VERSION, MINIMUM_API_VERSION + 1], federation: true}} as any);
@@ -260,6 +276,7 @@ describe('APIClient', () => {
 
     it('creates a context from a successful login', async () => {
       const client = new APIClient(testConfig);
+      apiClients.push(client);
       const context = await client.login(loginData);
       expect(context.userId).toBe(accessTokenData.user);
       expect(client['accessTokenStore'].accessTokenData?.access_token).toBe(accessTokenData.access_token);
@@ -268,6 +285,7 @@ describe('APIClient', () => {
     // eslint-disable-next-line jest/expect-expect
     it('can login after a logout', async () => {
       const client = new APIClient(testConfig);
+      apiClients.push(client);
       await client.login(loginData);
       return client.logout();
     });
@@ -286,6 +304,7 @@ describe('APIClient', () => {
       nock(baseUrl).post(AuthAPI.URL.ACCESS).reply(StatusCode.OK, accessTokenData);
 
       const client = new APIClient(testConfig);
+      apiClients.push(client);
       const context = await client.login(loginData);
       expect(context.userId).toBe(accessTokenData.user);
       // Make access token invalid
@@ -304,6 +323,7 @@ describe('APIClient', () => {
     // eslint-disable-next-line jest/expect-expect
     it('can logout a user', async () => {
       const client = new APIClient(testConfig);
+      apiClients.push(client);
 
       client.context = await client['createContext']('3721e5d3-558d-45ac-b476-b4a64a8f74c1', ClientType.TEMPORARY);
 
@@ -312,27 +332,35 @@ describe('APIClient', () => {
 
     it('ignores errors', async () => {
       const client = new APIClient(testConfig);
+      apiClients.push(client);
       const testError = new Error('Test rejection');
 
       jest.spyOn(client.api.auth, 'postLogout').mockReturnValue(Promise.reject(testError));
-      jest.spyOn(client, 'disconnect').mockReturnValue();
+      const disconnectSpy = jest.spyOn(client, 'disconnect').mockReturnValue();
       jest.spyOn(client['accessTokenStore'], 'delete').mockReturnValue(Promise.resolve(undefined));
-      jest.spyOn(client['logger'], 'warn').mockReturnValue();
+      jest.spyOn(client['logger'], 'warn').mockImplementation(() => {});
 
       await client.logout();
       expect(client['logger'].warn).toHaveBeenCalledWith(testError);
+
+      // Restore the mock so afterAll can properly clean up
+      disconnectSpy.mockRestore();
     });
 
     it('skips request when told to', async () => {
       const client = new APIClient(testConfig);
+      apiClients.push(client);
 
       jest.spyOn(client.api.auth, 'postLogout');
-      jest.spyOn(client, 'disconnect').mockReturnValue();
+      const disconnectSpy = jest.spyOn(client, 'disconnect').mockReturnValue();
       jest.spyOn(client['accessTokenStore'], 'delete').mockReturnValue(Promise.resolve(undefined));
-      jest.spyOn(client['logger'], 'warn').mockReturnValue();
+      jest.spyOn(client['logger'], 'warn').mockImplementation(() => {});
 
       await client.logout({skipLogoutRequest: true});
       expect(client['logger'].warn).not.toHaveBeenCalled();
+
+      // Restore the mock so afterAll can properly clean up
+      disconnectSpy.mockRestore();
     });
   });
 
@@ -355,6 +383,7 @@ describe('APIClient', () => {
 
     it('automatically gets an access token after registration', async () => {
       const client = new APIClient(testConfig);
+      apiClients.push(client);
 
       const context = await client.register(registerData);
       expect(context.userId).toBe(registerData.id);

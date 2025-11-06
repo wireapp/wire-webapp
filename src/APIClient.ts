@@ -165,6 +165,9 @@ export class APIClient extends EventEmitter {
   public config: Config;
   public backendFeatures: BackendFeatures;
 
+  // Store reference to cookie listener for cleanup
+  private cookieRefreshListener?: (cookie?: Cookie) => void;
+
   public static BACKEND = Backend;
 
   public static readonly TOPIC = TOPIC;
@@ -178,9 +181,9 @@ export class APIClient extends EventEmitter {
     this.accessTokenStore.on(AccessTokenStore.TOPIC.ACCESS_TOKEN_REFRESH, (accessToken: AccessTokenData) =>
       this.emit(APIClient.TOPIC.ACCESS_TOKEN_REFRESH, accessToken),
     );
-    CookieStore.emitter.on(CookieStore.TOPIC.COOKIE_REFRESH, (cookie?: Cookie) =>
-      this.emit(APIClient.TOPIC.COOKIE_REFRESH, cookie),
-    );
+    // Store the listener reference so we can remove it on disconnect
+    this.cookieRefreshListener = (cookie?: Cookie) => this.emit(APIClient.TOPIC.COOKIE_REFRESH, cookie);
+    CookieStore.emitter.on(CookieStore.TOPIC.COOKIE_REFRESH, this.cookieRefreshListener);
 
     this.logger = LogFactory.getLogger('@wireapp/api-client/Client');
 
@@ -413,6 +416,10 @@ export class APIClient extends EventEmitter {
 
   public disconnect(reason?: string): void {
     this.transport.ws.disconnect(reason);
+    // Remove the cookie refresh listener to prevent memory leaks
+    if (this.cookieRefreshListener) {
+      CookieStore.emitter.off(CookieStore.TOPIC.COOKIE_REFRESH, this.cookieRefreshListener);
+    }
   }
 
   public get clientId(): string | undefined {
