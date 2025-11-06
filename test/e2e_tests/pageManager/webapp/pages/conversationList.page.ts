@@ -35,6 +35,7 @@ export class ConversationListPage {
   readonly unarchiveConversationMenuButton: Locator;
   readonly moveConversationToFolderButton: Locator;
   readonly createNewFolderButton: Locator;
+  readonly customFolderButton: Locator;
 
   constructor(page: Page) {
     this.page = page;
@@ -54,6 +55,7 @@ export class ConversationListPage {
     this.unarchiveConversationMenuButton = page.locator(selectById('btn-unarchive'));
     this.moveConversationToFolderButton = page.locator(selectById('btn-move-to'));
     this.createNewFolderButton = page.locator(selectById('btn-create-new-folder'));
+    this.customFolderButton = page.locator(selectByDataAttribute('conversation-label-context-menu'));
   }
 
   async isConversationItemVisible(conversationName: string) {

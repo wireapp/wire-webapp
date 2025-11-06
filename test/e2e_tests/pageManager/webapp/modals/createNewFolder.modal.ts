@@ -22,10 +22,14 @@ import {Locator, Page} from '@playwright/test';
 import {BaseModal} from './base.modal';
 
 export class CreateNewFolderModal extends BaseModal {
+  readonly cancelButton: Locator;
+  readonly createButton: Locator;
   readonly folderNameInput: Locator;
 
   constructor(page: Page) {
-    super(page, "[data-uie-name='modal-template-option']");
-    this.folderNameInput = this.modal.locator("[id='modal-input']");
+    super(page, 'modal-template-option');
+    this.folderNameInput = this.modal.getByLabel('Folder name');
+    this.cancelButton = this.modal.getByLabel('do-secondary');
+    this.createButton = this.modal.getByTestId('do-action');
   }
 }

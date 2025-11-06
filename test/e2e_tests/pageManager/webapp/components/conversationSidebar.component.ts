@@ -33,6 +33,7 @@ export class ConversationSidebar {
   readonly archiveButton: Locator;
   readonly manageTeamButton: Locator;
   readonly sidebar: Locator;
+  readonly foldersButton: Locator;
 
   constructor(page: Page) {
     this.page = page;
@@ -46,6 +47,7 @@ export class ConversationSidebar {
     this.archiveButton = page.locator(selectByDataAttribute('go-archive'));
     this.manageTeamButton = page.locator(selectByDataAttribute('go-team-management'));
     this.sidebar = page.locator(`.conversations-sidebar-items`);
+    this.foldersButton = page.locator(selectByDataAttribute('go-folders-view'));
   }
 
   async getPersonalStatusName() {
@@ -74,5 +76,22 @@ export class ConversationSidebar {
 
   async clickArchive() {
     await this.archiveButton.click();
+  }
+
+  async clickFolders() {
+    await this.foldersButton.click();
+  }
+
+  /**
+   * Gets the locator for a specific folder button in the sidebar.
+   * @param folderName The exact name of the folder
+   * @returns A Playwright Locator
+   */
+  getFolderButtonByName(folderName: string): Locator {
+    return this.page.getByRole('tab', {name: folderName});
+  }
+
+  async clickFolderByName(folderName: string) {
+    await this.getFolderButtonByName(folderName).click();
   }
 }
