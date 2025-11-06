@@ -949,13 +949,18 @@ export class EventMapper {
    * @param event Asset data received as JSON
    * @returns Medium image asset entity
    */
-  private _mapAssetImage(event: LegacyEventRecord<AssetData>) {
+  private _mapAssetImage(event: LegacyEventRecord<AssetData>): MediumImage | undefined {
     const {data: eventData, qualified_conversation} = event;
-    if (!eventData?.id) {
-      this.logger.warn('Event data => id is undefined, cannot map image asset.');
-      return new MediumImage(''); // Return an empty MediumImage to avoid further errors
+
+    if (!eventData) {
+      this.logger.warn('Event data is undefined, cannot map image asset.');
+      return undefined;
     }
-    const {content_length, content_type, id: assetId, info} = eventData;
+
+    if (!eventData?.id) {
+      this.logger.warn('Event data => id is undefined');
+    }
+    const {content_length, content_type, id: assetId = '', info} = eventData;
     const assetEntity = new MediumImage(assetId);
     assetEntity.file_size = content_length;
     assetEntity.file_type = content_type;
@@ -963,11 +968,6 @@ export class EventMapper {
     if (info) {
       assetEntity.width = `${info.width}px`;
       assetEntity.height = `${info.height}px`;
-    }
-
-    if (!eventData) {
-      this.logger.warn('Event data is undefined, cannot map image asset.');
-      return assetEntity;
     }
 
     const {key, otr_key, sha256, token, domain = qualified_conversation?.domain || this.fallbackDomain} = eventData;
