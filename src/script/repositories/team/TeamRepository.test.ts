@@ -17,8 +17,7 @@
  *
  */
 
-import {ConversationProtocol} from '@wireapp/api-client/lib/conversation';
-import {FeatureList, FeatureStatus} from '@wireapp/api-client/lib/team/feature/';
+import {FeatureList, FEATURE_STATUS, CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team/feature/';
 
 import {randomUUID} from 'crypto';
 
@@ -94,8 +93,8 @@ describe('TeamRepository', () => {
 
       const localFeatures = {
         mls: {
-          config: {supportedProtocols: [ConversationProtocol.PROTEUS]},
-          status: FeatureStatus.ENABLED,
+          config: {supportedProtocols: [CONVERSATION_PROTOCOL.PROTEUS]},
+          status: FEATURE_STATUS.ENABLED,
         },
       } as FeatureList;
 
@@ -103,8 +102,8 @@ describe('TeamRepository', () => {
 
       const featuresFromBackend = {
         mls: {
-          config: {supportedProtocols: [ConversationProtocol.PROTEUS, ConversationProtocol.MLS]},
-          status: FeatureStatus.ENABLED,
+          config: {supportedProtocols: [CONVERSATION_PROTOCOL.PROTEUS, CONVERSATION_PROTOCOL.MLS]},
+          status: FEATURE_STATUS.ENABLED,
         },
       } as FeatureList;
 
@@ -138,10 +137,10 @@ describe('TeamRepository', () => {
     it('returns team supported protocols from mls feature config', async () => {
       const [teamRepo, {teamState}] = buildConnectionRepository();
 
-      const mockedTeamProtocols = [ConversationProtocol.PROTEUS, ConversationProtocol.MLS];
+      const mockedTeamProtocols = [CONVERSATION_PROTOCOL.PROTEUS, CONVERSATION_PROTOCOL.MLS];
 
       const mockedFeatureList = {
-        mls: {config: {supportedProtocols: mockedTeamProtocols}, status: FeatureStatus.ENABLED},
+        mls: {config: {supportedProtocols: mockedTeamProtocols}, status: FEATURE_STATUS.ENABLED},
       } as FeatureList;
 
       teamState.teamFeatures(mockedFeatureList);
@@ -154,17 +153,17 @@ describe('TeamRepository', () => {
     it('returns proteus if mls feature is disabled', async () => {
       const [teamRepo, {teamState}] = buildConnectionRepository();
 
-      const mockedTeamProtocols = [ConversationProtocol.PROTEUS, ConversationProtocol.MLS];
+      const mockedTeamProtocols = [CONVERSATION_PROTOCOL.PROTEUS, CONVERSATION_PROTOCOL.MLS];
 
       const mockedFeatureList = {
-        mls: {config: {supportedProtocols: mockedTeamProtocols}, status: FeatureStatus.DISABLED},
+        mls: {config: {supportedProtocols: mockedTeamProtocols}, status: FEATURE_STATUS.DISABLED},
       } as FeatureList;
 
       teamState.teamFeatures(mockedFeatureList);
 
       const protocols = teamRepo.getTeamSupportedProtocols();
 
-      expect(protocols).toEqual([ConversationProtocol.PROTEUS]);
+      expect(protocols).toEqual([CONVERSATION_PROTOCOL.PROTEUS]);
     });
 
     it('returns proteus if mls feature does not exist in team features', async () => {
@@ -178,35 +177,35 @@ describe('TeamRepository', () => {
 
       const protocols = teamRepo.getTeamSupportedProtocols();
 
-      expect(protocols).toEqual([ConversationProtocol.PROTEUS]);
+      expect(protocols).toEqual([CONVERSATION_PROTOCOL.PROTEUS]);
     });
 
     it('returns proteus if supported protocols field does not exist on mls feature', async () => {
       const [teamRepo, {teamState}] = buildConnectionRepository();
 
       const mockedFeatureList = {
-        mls: {config: {supportedProtocols: undefined}, status: FeatureStatus.ENABLED},
+        mls: {config: {supportedProtocols: undefined}, status: FEATURE_STATUS.ENABLED},
       } as unknown as FeatureList;
 
       teamState.teamFeatures(mockedFeatureList);
 
       const protocols = teamRepo.getTeamSupportedProtocols();
 
-      expect(protocols).toEqual([ConversationProtocol.PROTEUS]);
+      expect(protocols).toEqual([CONVERSATION_PROTOCOL.PROTEUS]);
     });
 
     it('returns proteus if supported protocols on mls feature config is an empty list', async () => {
       const [teamRepo, {teamState}] = buildConnectionRepository();
 
       const mockedFeatureList = {
-        mls: {config: {supportedProtocols: []}, status: FeatureStatus.ENABLED},
+        mls: {config: {supportedProtocols: []}, status: FEATURE_STATUS.ENABLED},
       } as unknown as FeatureList;
 
       teamState.teamFeatures(mockedFeatureList);
 
       const protocols = teamRepo.getTeamSupportedProtocols();
 
-      expect(protocols).toEqual([ConversationProtocol.PROTEUS]);
+      expect(protocols).toEqual([CONVERSATION_PROTOCOL.PROTEUS]);
     });
   });
 });

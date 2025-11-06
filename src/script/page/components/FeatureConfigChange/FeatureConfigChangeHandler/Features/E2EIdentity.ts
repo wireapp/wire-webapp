@@ -17,7 +17,7 @@
  *
  */
 
-import {FeatureStatus, FEATURE_KEY, FeatureList} from '@wireapp/api-client/lib/team';
+import {FEATURE_STATUS, FEATURE_KEY, FeatureList} from '@wireapp/api-client/lib/team';
 
 import {E2EIHandler} from 'src/script/E2EIdentity';
 import {supportsMLS} from 'Util/util';
@@ -37,12 +37,12 @@ export const getE2EIConfig = (config: FeatureList): FeatureList[FEATURE_KEY.MLSE
   }
 
   // Check if E2EIdentity feature is enabled
-  if (e2eiConfig?.status !== FeatureStatus.ENABLED) {
+  if (e2eiConfig?.status !== FEATURE_STATUS.ENABLED) {
     return undefined;
   }
 
   // Check if MLS feature is enabled
-  if (mlsConfig?.status !== FeatureStatus.ENABLED) {
+  if (mlsConfig?.status !== FEATURE_STATUS.ENABLED) {
     return undefined;
   }
   // Check if E2EIdentity feature has a server discoveryUrl

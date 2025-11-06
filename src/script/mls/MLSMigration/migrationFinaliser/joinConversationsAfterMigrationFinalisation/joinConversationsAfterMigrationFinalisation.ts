@@ -17,7 +17,7 @@
  *
  */
 
-import {ConversationProtocol} from '@wireapp/api-client/lib/conversation';
+import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 
 import {Account} from '@wireapp/core';
 
@@ -65,6 +65,6 @@ const filterGroupConversationsAlreadyMigratedToMLS = (conversations: Conversatio
       return false;
     }
 
-    return isMLSConversation(conversation) && conversation.initialProtocol !== ConversationProtocol.MLS;
+    return isMLSConversation(conversation) && conversation.initialProtocol !== CONVERSATION_PROTOCOL.MLS;
   });
 };

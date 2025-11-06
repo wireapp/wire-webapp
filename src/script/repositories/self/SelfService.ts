@@ -17,9 +17,9 @@
  *
  */
 
-import type {ConversationProtocol} from '@wireapp/api-client/lib/conversation';
 import type {TraceState} from '@wireapp/api-client/lib/http/';
 import type {Consent, Self} from '@wireapp/api-client/lib/self/';
+import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 import type {UserUpdate} from '@wireapp/api-client/lib/user/';
 import {container} from 'tsyringe';
 
@@ -78,7 +78,7 @@ export class SelfService {
     return this.apiClient.api.self.putPassword({new_password: newPassword, old_password: oldPassword});
   }
 
-  public async putSupportedProtocols(supportedProtocols: ConversationProtocol[]): Promise<void> {
+  public async putSupportedProtocols(supportedProtocols: CONVERSATION_PROTOCOL[]): Promise<void> {
     return this.coreSelfService.putSupportedProtocols(supportedProtocols);
   }
 }

@@ -17,7 +17,6 @@
  *
  */
 
-import type {Picture as APIClientPicture} from '@wireapp/api-client/lib/self/';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 import type {UserAsset as APIClientUserAsset} from '@wireapp/api-client/lib/user/';
 
@@ -26,7 +25,7 @@ import {AssetRemoteData} from './AssetRemoteData';
 import type {User} from 'Repositories/entity/User';
 import type {ServiceEntity} from 'Repositories/integration/ServiceEntity';
 
-export type MappedAsset = {[index: string]: AssetRemoteData};
+export type MappedAsset = Record<string, AssetRemoteData>;
 
 export const mapProfileAssets = (userId: QualifiedId, assets: APIClientUserAsset[]): MappedAsset => {
   const sizeMap: {[index: string]: string} = {
@@ -38,17 +37,9 @@ export const mapProfileAssets = (userId: QualifiedId, assets: APIClientUserAsset
     .filter(asset => asset.type === 'image')
     .reduce((mappedAssets, asset) => {
       const domain = asset.domain ?? userId.domain;
-      const assetRemoteData = AssetRemoteData.v3(asset.key, domain, new Uint8Array());
+      const assetRemoteData = new AssetRemoteData({assetKey: asset.key, assetDomain: domain, otrKey: new Uint8Array()});
       return !sizeMap[asset.size] ? mappedAssets : {...mappedAssets, [sizeMap[asset.size]]: assetRemoteData};
     }, {});
-};
-
-export const mapProfileAssetsV1 = (userId: string, pictures: APIClientPicture[]): MappedAsset => {
-  const [previewPicture, mediumPicture] = pictures;
-  const previewAsset = previewPicture ? AssetRemoteData.v1(userId, previewPicture.id, true) : undefined;
-  const mediumAsset = mediumPicture ? AssetRemoteData.v1(userId, mediumPicture.id, true) : undefined;
-
-  return {medium: mediumAsset, preview: previewAsset};
 };
 
 export const updateUserEntityAssets = (userEntity: User | ServiceEntity, mappedAssets: MappedAsset = {}) => {

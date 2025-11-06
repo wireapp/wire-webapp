@@ -18,7 +18,7 @@
  */
 
 import {act, render, waitFor} from '@testing-library/react';
-import {FeatureStatus, FEATURE_KEY, FeatureList} from '@wireapp/api-client/lib/team/feature';
+import {FEATURE_STATUS, FEATURE_KEY, FeatureList} from '@wireapp/api-client/lib/team/feature';
 import {Runtime} from '@wireapp/commons/lib/util/Runtime';
 
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
@@ -42,24 +42,24 @@ describe('FeatureConfigChangeNotifier', () => {
 
   const baseConfig: FeatureList = {
     [FEATURE_KEY.FILE_SHARING]: {
-      status: FeatureStatus.DISABLED,
+      status: FEATURE_STATUS.DISABLED,
     },
     [FEATURE_KEY.VIDEO_CALLING]: {
-      status: FeatureStatus.DISABLED,
+      status: FEATURE_STATUS.DISABLED,
     },
     [FEATURE_KEY.SELF_DELETING_MESSAGES]: {
-      status: FeatureStatus.DISABLED,
+      status: FEATURE_STATUS.DISABLED,
       config: {enforcedTimeoutSeconds: 0},
     },
     [FEATURE_KEY.CONFERENCE_CALLING]: {
       config: {useSFTForOneToOneCalls: false},
-      status: FeatureStatus.DISABLED,
+      status: FEATURE_STATUS.DISABLED,
     },
     [FEATURE_KEY.CONVERSATION_GUEST_LINKS]: {
-      status: FeatureStatus.DISABLED,
+      status: FEATURE_STATUS.DISABLED,
     },
     [FEATURE_KEY.ENFORCE_DOWNLOAD_PATH]: {
-      status: FeatureStatus.DISABLED,
+      status: FEATURE_STATUS.DISABLED,
       config: {enforcedDownloadLocation: ''},
     },
   };
@@ -97,7 +97,7 @@ describe('FeatureConfigChangeNotifier', () => {
       teamState.teamFeatures({
         ...baseConfig,
         [feature]: {
-          status: FeatureStatus.ENABLED,
+          status: FEATURE_STATUS.ENABLED,
           ...(feature === FEATURE_KEY.ENFORCE_DOWNLOAD_PATH && {config: {enforcedDownloadLocation: 'dlpath'}}),
         },
       });
@@ -119,7 +119,7 @@ describe('FeatureConfigChangeNotifier', () => {
       teamState.teamFeatures({
         ...baseConfig,
         [feature]: {
-          status: FeatureStatus.DISABLED,
+          status: FEATURE_STATUS.DISABLED,
           ...(feature === FEATURE_KEY.ENFORCE_DOWNLOAD_PATH && {config: {enforcedDownloadLocation: ''}}),
         },
       });
@@ -151,30 +151,30 @@ describe('FeatureConfigChangeNotifier', () => {
     unmount();
     expect(showModalSpy).not.toHaveBeenCalled();
 
-    teamState.teamFeatures({...baseConfig, [FEATURE_KEY.FILE_SHARING]: {status: FeatureStatus.ENABLED}});
+    teamState.teamFeatures({...baseConfig, [FEATURE_KEY.FILE_SHARING]: {status: FEATURE_STATUS.ENABLED}});
     render(<FeatureConfigChangeNotifier selfUserId={'self'} teamState={teamState} />);
     expect(showModalSpy).toHaveBeenCalledTimes(1);
   });
 
   it.each([
     [
-      {status: FeatureStatus.DISABLED, config: {enforcedTimeoutSeconds: 0}},
-      {status: FeatureStatus.ENABLED, config: {enforcedTimeoutSeconds: 10}},
+      {status: FEATURE_STATUS.DISABLED, config: {enforcedTimeoutSeconds: 0}},
+      {status: FEATURE_STATUS.ENABLED, config: {enforcedTimeoutSeconds: 10}},
       'Self-deleting messages are now mandatory. New messages will self-delete after 10 seconds.',
     ],
     [
-      {status: FeatureStatus.DISABLED, config: {enforcedTimeoutSeconds: 0}},
-      {status: FeatureStatus.ENABLED, config: {enforcedTimeoutSeconds: 0}},
+      {status: FEATURE_STATUS.DISABLED, config: {enforcedTimeoutSeconds: 0}},
+      {status: FEATURE_STATUS.ENABLED, config: {enforcedTimeoutSeconds: 0}},
       'Self-deleting messages are enabled. You can set a timer before writing a message.',
     ],
     [
-      {status: FeatureStatus.ENABLED, config: {enforcedTimeoutSeconds: 0}},
-      {status: FeatureStatus.ENABLED, config: {enforcedTimeoutSeconds: 10}},
+      {status: FEATURE_STATUS.ENABLED, config: {enforcedTimeoutSeconds: 0}},
+      {status: FEATURE_STATUS.ENABLED, config: {enforcedTimeoutSeconds: 10}},
       'Self-deleting messages are now mandatory. New messages will self-delete after 10 seconds.',
     ],
     [
-      {status: FeatureStatus.ENABLED, config: {enforcedTimeoutSeconds: 10}},
-      {status: FeatureStatus.DISABLED, config: {enforcedTimeoutSeconds: 0}},
+      {status: FEATURE_STATUS.ENABLED, config: {enforcedTimeoutSeconds: 10}},
+      {status: FEATURE_STATUS.DISABLED, config: {enforcedTimeoutSeconds: 0}},
       'Self-deleting messages are disabled',
     ],
   ])(

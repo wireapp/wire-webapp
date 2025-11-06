@@ -17,10 +17,14 @@
  *
  */
 
-import {FeatureMLSMigration, FeatureStatus} from '@wireapp/api-client/lib/team';
+import {FeatureMLSMigration, FEATURE_STATUS} from '@wireapp/api-client/lib/team';
 
 const hasMigrationStartTimeArrived = (mlsMigrationFeature: FeatureMLSMigration): boolean => {
-  if (mlsMigrationFeature.status === FeatureStatus.DISABLED) {
+  if (!mlsMigrationFeature) {
+    return false;
+  }
+
+  if (mlsMigrationFeature.status === FEATURE_STATUS.DISABLED) {
     return false;
   }
 
@@ -31,7 +35,11 @@ const hasMigrationStartTimeArrived = (mlsMigrationFeature: FeatureMLSMigration):
 };
 
 const hasMigrationFinaliseRegardlessAfterDateArrived = (mlsMigrationFeature: FeatureMLSMigration): boolean => {
-  if (mlsMigrationFeature.status === FeatureStatus.DISABLED) {
+  if (!mlsMigrationFeature) {
+    return false;
+  }
+
+  if (mlsMigrationFeature.status === FEATURE_STATUS.DISABLED) {
     return false;
   }
 
@@ -49,7 +57,7 @@ export enum MLSMigrationStatus {
 }
 
 export const getMLSMigrationStatus = (mlsMigrationFeature?: FeatureMLSMigration): MLSMigrationStatus => {
-  if (!mlsMigrationFeature || mlsMigrationFeature.status === FeatureStatus.DISABLED) {
+  if (!mlsMigrationFeature || mlsMigrationFeature.status === FEATURE_STATUS.DISABLED) {
     return MLSMigrationStatus.DISABLED;
   }
 

@@ -67,7 +67,7 @@ export class FileAsset extends Asset {
 
     this.downloadProgress = ko.pureComputed(() => {
       if (this.original_resource()) {
-        return this.original_resource().downloadProgress();
+        return this.original_resource().downloadProgress;
       }
 
       return undefined;

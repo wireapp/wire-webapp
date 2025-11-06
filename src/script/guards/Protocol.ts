@@ -17,18 +17,17 @@
  *
  */
 
-import {ConversationProtocol} from '@wireapp/api-client/lib/conversation/NewConversation';
-import {FeatureMLS, FeatureMLSE2EId} from '@wireapp/api-client/lib/team';
+import {CONVERSATION_PROTOCOL, FeatureMLS, FeatureMLSE2EId} from '@wireapp/api-client/lib/team';
 
 import {isObject} from './common';
 
 export interface ProtocolOption {
   label: string;
-  value: ConversationProtocol;
+  value: CONVERSATION_PROTOCOL;
 }
 
 export const isProtocolOption = (option: any): option is ProtocolOption => {
-  const protocols = Object.values(ConversationProtocol) as string[];
+  const protocols = Object.values(CONVERSATION_PROTOCOL);
   return typeof option?.value === 'string' && protocols.includes(option.value);
 };
 

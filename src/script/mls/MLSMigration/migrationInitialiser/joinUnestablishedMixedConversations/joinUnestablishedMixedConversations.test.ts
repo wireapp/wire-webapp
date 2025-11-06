@@ -17,7 +17,8 @@
  *
  */
 
-import {ConversationProtocol, CONVERSATION_TYPE} from '@wireapp/api-client/lib/conversation';
+import {CONVERSATION_TYPE} from '@wireapp/api-client/lib/conversation';
+import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 
 import {MixedConversation} from 'Repositories/conversation/ConversationSelectors';
 import {Conversation} from 'Repositories/entity/Conversation';
@@ -29,7 +30,7 @@ import {createUuid} from 'Util/uuid';
 import {joinUnestablishedMixedConversations} from '.';
 
 const createMixedConversation = (mockGroupId: string, epoch = 5): MixedConversation => {
-  const conversation = new Conversation(createUuid(), '', ConversationProtocol.MIXED);
+  const conversation = new Conversation(createUuid(), '', CONVERSATION_PROTOCOL.MIXED);
   conversation.groupId = mockGroupId;
   conversation.type(CONVERSATION_TYPE.REGULAR);
   conversation.epoch = epoch;

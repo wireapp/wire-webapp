@@ -17,7 +17,7 @@
  *
  */
 
-import {mapProfileAssets, mapProfileAssetsV1, updateUserEntityAssets} from 'Repositories/assets/AssetMapper';
+import {MappedAsset, mapProfileAssets, updateUserEntityAssets} from 'Repositories/assets/AssetMapper';
 import {User} from 'Repositories/entity/User';
 import {UserRecord} from 'Repositories/storage';
 import {getLogger, Logger} from 'Util/Logger';
@@ -105,7 +105,6 @@ export class UserMapper {
       expires_at: expirationDate,
       handle,
       name,
-      picture,
       service,
       team: teamId,
       supported_protocols: supportedProtocols,
@@ -120,11 +119,9 @@ export class UserMapper {
       userEntity.availability(availability);
     }
 
-    let mappedAssets;
+    let mappedAssets: MappedAsset = {};
     if (assets?.length) {
       mappedAssets = mapProfileAssets(userEntity.qualifiedId, assets);
-    } else if (picture?.length) {
-      mappedAssets = mapProfileAssetsV1(userEntity.id, picture);
     }
     updateUserEntityAssets(userEntity, mappedAssets);
 

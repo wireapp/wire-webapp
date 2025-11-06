@@ -28,7 +28,7 @@ import {
   CONVERSATION_CELLS_STATE,
 } from '@wireapp/api-client/lib/conversation/';
 import {RECEIPT_MODE} from '@wireapp/api-client/lib/conversation/data';
-import {ConversationProtocol} from '@wireapp/api-client/lib/conversation/NewConversation';
+import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {amplify} from 'amplify';
 import ko from 'knockout';
@@ -116,7 +116,7 @@ export class Conversation {
   public epoch: number = -1;
   public cipherSuite: number = 1;
   // Initial protocol is a protocol that was known by a webapp before any protocol update happened. For newly created conversations it is the same as protocol.
-  public initialProtocol: ConversationProtocol;
+  public initialProtocol: CONVERSATION_PROTOCOL;
   public readonly display_name: ko.PureComputed<string>;
   public readonly firstUserEntity: ko.PureComputed<User | undefined>;
   public readonly globalMessageTimer: ko.Observable<number | null>;
@@ -201,7 +201,7 @@ export class Conversation {
   constructor(
     conversation_id: string = '',
     domain: string = '',
-    public readonly protocol = ConversationProtocol.PROTEUS,
+    public readonly protocol = CONVERSATION_PROTOCOL.PROTEUS,
     teamState = container.resolve(TeamState),
   ) {
     this.teamState = teamState;

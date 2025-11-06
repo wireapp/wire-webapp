@@ -17,7 +17,7 @@
  *
  */
 
-import {FeatureStatus} from '@wireapp/api-client/lib/team/feature/';
+import {FEATURE_STATUS} from '@wireapp/api-client/lib/team/feature/';
 import ko from 'knockout';
 import {container, singleton} from 'tsyringe';
 
@@ -40,11 +40,11 @@ export class AppLockState {
 
   constructor(teamState = container.resolve(TeamState)) {
     this.isAppLockDisabledOnTeam = ko.pureComputed(
-      () => teamState.isTeam() && teamState.teamFeatures()?.appLock?.status !== FeatureStatus.ENABLED,
+      () => teamState.isTeam() && teamState.teamFeatures()?.appLock?.status !== FEATURE_STATUS.ENABLED,
     );
 
     this.isAppLockAvailable = ko.pureComputed(() =>
-      teamState.isTeam() ? teamState.teamFeatures()?.appLock?.status === FeatureStatus.ENABLED : defaultEnabled,
+      teamState.isTeam() ? teamState.teamFeatures()?.appLock?.status === FEATURE_STATUS.ENABLED : defaultEnabled,
     );
 
     this.isAppLockEnforced = ko.pureComputed(

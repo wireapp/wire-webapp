@@ -17,8 +17,14 @@
  *
  */
 
-import {ConversationProtocol} from '@wireapp/api-client/lib/conversation';
-import {FEATURE_KEY, FeatureStatus, FeatureMLS, FeatureMLSE2EId, FeatureList} from '@wireapp/api-client/lib/team';
+import {
+  FEATURE_KEY,
+  FEATURE_STATUS,
+  FeatureMLS,
+  FeatureMLSE2EId,
+  FeatureList,
+  CONVERSATION_PROTOCOL,
+} from '@wireapp/api-client/lib/team';
 
 import {FeatureUpdateType, detectTeamFeatureUpdate} from './TeamFeatureConfigChangeDetector';
 
@@ -27,7 +33,7 @@ describe('TeamFeatureUtil', () => {
     it(`returns "unchanged" if feature list didn't exist before and it was added with feature disabled`, () => {
       const prevFeatureList: FeatureList | undefined = undefined;
       const newFeatureList = {
-        [FEATURE_KEY.MLS]: {status: FeatureStatus.DISABLED} as unknown as FeatureMLS,
+        [FEATURE_KEY.MLS]: {status: FEATURE_STATUS.DISABLED} as unknown as FeatureMLS,
       };
 
       expect(detectTeamFeatureUpdate({prevFeatureList, newFeatureList}, FEATURE_KEY.MLS)).toEqual({
@@ -39,7 +45,7 @@ describe('TeamFeatureUtil', () => {
     it(`returns "unchanged" if feature list didn't exist before and it was added without the feature`, () => {
       const prevFeatureList: FeatureList | undefined = undefined;
       const newFeatureList = {
-        [FEATURE_KEY.MLSE2EID]: {status: FeatureStatus.DISABLED} as unknown as FeatureMLSE2EId,
+        [FEATURE_KEY.MLSE2EID]: {status: FEATURE_STATUS.DISABLED} as unknown as FeatureMLSE2EId,
       };
 
       expect(detectTeamFeatureUpdate({prevFeatureList, newFeatureList}, FEATURE_KEY.MLS)).toEqual({
@@ -50,8 +56,8 @@ describe('TeamFeatureUtil', () => {
     it(`returns "unchanged" if feature list didn't exist before and it was added without a feature`, () => {
       const prevFeatureList: FeatureList | undefined = undefined;
       const newFeatureList = {
-        [FEATURE_KEY.MLS]: {status: FeatureStatus.DISABLED} as unknown as FeatureMLS,
-        [FEATURE_KEY.MLSE2EID]: {status: FeatureStatus.DISABLED} as unknown as FeatureMLSE2EId,
+        [FEATURE_KEY.MLS]: {status: FEATURE_STATUS.DISABLED} as unknown as FeatureMLS,
+        [FEATURE_KEY.MLSE2EID]: {status: FEATURE_STATUS.DISABLED} as unknown as FeatureMLSE2EId,
       };
 
       expect(detectTeamFeatureUpdate({prevFeatureList, newFeatureList}, FEATURE_KEY.MLS)).toEqual({
@@ -62,11 +68,11 @@ describe('TeamFeatureUtil', () => {
 
     it(`returns "unchanged" if the feature was not in the list before and it was added with disabled status`, () => {
       const prevFeatureList = {
-        [FEATURE_KEY.MLSE2EID]: {status: FeatureStatus.ENABLED} as unknown as FeatureMLSE2EId,
+        [FEATURE_KEY.MLSE2EID]: {status: FEATURE_STATUS.ENABLED} as unknown as FeatureMLSE2EId,
       };
       const newFeatureList = {
-        [FEATURE_KEY.MLSE2EID]: {status: FeatureStatus.ENABLED} as unknown as FeatureMLSE2EId,
-        [FEATURE_KEY.MLS]: {status: FeatureStatus.DISABLED} as unknown as FeatureMLS,
+        [FEATURE_KEY.MLSE2EID]: {status: FEATURE_STATUS.ENABLED} as unknown as FeatureMLSE2EId,
+        [FEATURE_KEY.MLS]: {status: FEATURE_STATUS.DISABLED} as unknown as FeatureMLS,
       };
 
       expect(detectTeamFeatureUpdate({prevFeatureList, newFeatureList}, FEATURE_KEY.MLS)).toEqual({
@@ -87,14 +93,14 @@ describe('TeamFeatureUtil', () => {
     it("should return 'unchanged' if the feature config has changed but it's still disabled", () => {
       const prevFeatureList = {
         [FEATURE_KEY.MLS]: {
-          status: FeatureStatus.DISABLED,
-          config: {defaultProtocol: ConversationProtocol.PROTEUS},
+          status: FEATURE_STATUS.DISABLED,
+          config: {defaultProtocol: CONVERSATION_PROTOCOL.PROTEUS},
         } as unknown as FeatureMLS,
       };
       const newFeatureList = {
         [FEATURE_KEY.MLS]: {
-          status: FeatureStatus.DISABLED,
-          config: {defaultProtocol: ConversationProtocol.MLS},
+          status: FEATURE_STATUS.DISABLED,
+          config: {defaultProtocol: CONVERSATION_PROTOCOL.MLS},
         } as unknown as FeatureMLS,
       };
 
@@ -108,7 +114,7 @@ describe('TeamFeatureUtil', () => {
     it(`returns "enabled" if the feature list didn't exist before and it was added with feature enabled`, () => {
       const prevFeatureList: FeatureList | undefined = undefined;
       const newFeatureList = {
-        [FEATURE_KEY.MLS]: {status: FeatureStatus.ENABLED} as unknown as FeatureMLS,
+        [FEATURE_KEY.MLS]: {status: FEATURE_STATUS.ENABLED} as unknown as FeatureMLS,
       };
 
       expect(detectTeamFeatureUpdate({prevFeatureList, newFeatureList}, FEATURE_KEY.MLS)).toEqual({
@@ -120,7 +126,7 @@ describe('TeamFeatureUtil', () => {
     it(`returns "enabled" if feature didn't exist before and it was added with feature enabled`, () => {
       const prevFeatureList = {};
       const newFeatureList = {
-        [FEATURE_KEY.MLS]: {status: FeatureStatus.ENABLED} as unknown as FeatureMLS,
+        [FEATURE_KEY.MLS]: {status: FEATURE_STATUS.ENABLED} as unknown as FeatureMLS,
       };
 
       expect(detectTeamFeatureUpdate({prevFeatureList, newFeatureList}, FEATURE_KEY.MLS)).toEqual({
@@ -131,10 +137,10 @@ describe('TeamFeatureUtil', () => {
 
     it(`returns "enabled" if feature's status has changed from disabled to enabled`, () => {
       const prevFeatureList = {
-        [FEATURE_KEY.MLS]: {status: FeatureStatus.DISABLED} as unknown as FeatureMLS,
+        [FEATURE_KEY.MLS]: {status: FEATURE_STATUS.DISABLED} as unknown as FeatureMLS,
       };
       const newFeatureList = {
-        [FEATURE_KEY.MLS]: {status: FeatureStatus.ENABLED} as unknown as FeatureMLS,
+        [FEATURE_KEY.MLS]: {status: FEATURE_STATUS.ENABLED} as unknown as FeatureMLS,
       };
 
       expect(detectTeamFeatureUpdate({prevFeatureList, newFeatureList}, FEATURE_KEY.MLS)).toEqual({
@@ -146,7 +152,7 @@ describe('TeamFeatureUtil', () => {
 
     it(`returns "disabled" if feature config was removed from the feature list`, () => {
       const prevFeatureList = {
-        [FEATURE_KEY.MLS]: {status: FeatureStatus.DISABLED} as unknown as FeatureMLS,
+        [FEATURE_KEY.MLS]: {status: FEATURE_STATUS.DISABLED} as unknown as FeatureMLS,
       };
       const newFeatureList = {};
 
@@ -158,10 +164,10 @@ describe('TeamFeatureUtil', () => {
 
     it(`returns "disabled" after feature status was changed from enabled to disabled`, () => {
       const prevFeatureList = {
-        [FEATURE_KEY.MLS]: {status: FeatureStatus.ENABLED} as unknown as FeatureMLS,
+        [FEATURE_KEY.MLS]: {status: FEATURE_STATUS.ENABLED} as unknown as FeatureMLS,
       };
       const newFeatureList = {
-        [FEATURE_KEY.MLS]: {status: FeatureStatus.DISABLED} as unknown as FeatureMLS,
+        [FEATURE_KEY.MLS]: {status: FEATURE_STATUS.DISABLED} as unknown as FeatureMLS,
       };
 
       expect(detectTeamFeatureUpdate({prevFeatureList, newFeatureList}, FEATURE_KEY.MLS)).toEqual({
@@ -174,18 +180,18 @@ describe('TeamFeatureUtil', () => {
     it('should return "config changed" when feature config has changed and feature is still enabled', () => {
       const prevFeatureList = {
         [FEATURE_KEY.MLS]: {
-          status: FeatureStatus.ENABLED,
+          status: FEATURE_STATUS.ENABLED,
           config: {
-            defaultProtocol: ConversationProtocol.PROTEUS,
+            defaultProtocol: CONVERSATION_PROTOCOL.PROTEUS,
           },
         } as unknown as FeatureMLS,
       };
 
       const newFeatureList = {
         [FEATURE_KEY.MLS]: {
-          status: FeatureStatus.ENABLED,
+          status: FEATURE_STATUS.ENABLED,
           config: {
-            defaultProtocol: ConversationProtocol.MLS,
+            defaultProtocol: CONVERSATION_PROTOCOL.MLS,
           },
         } as unknown as FeatureMLS,
         [FEATURE_KEY.MLSE2EID]: {} as unknown as FeatureMLSE2EId,

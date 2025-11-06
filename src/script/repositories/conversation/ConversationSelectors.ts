@@ -18,31 +18,28 @@
  */
 
 import {ConnectionStatus} from '@wireapp/api-client/lib/connection/';
-import {
-  CONVERSATION_TYPE,
-  ConversationProtocol,
-  Conversation as BackendConversation,
-} from '@wireapp/api-client/lib/conversation/';
+import {CONVERSATION_TYPE, Conversation as BackendConversation} from '@wireapp/api-client/lib/conversation/';
+import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 import {QualifiedId} from '@wireapp/api-client/lib/user/';
 
 import {Conversation} from 'Repositories/entity/Conversation';
 import {matchQualifiedIds} from 'Util/QualifiedId';
 
-export type ProteusConversation = Conversation & {protocol: ConversationProtocol.PROTEUS};
-export type MixedConversation = Conversation & {groupId: string; protocol: ConversationProtocol.MIXED};
-export type MLSConversation = Conversation & {groupId: string; protocol: ConversationProtocol.MLS};
+export type ProteusConversation = Conversation & {protocol: CONVERSATION_PROTOCOL.PROTEUS};
+export type MixedConversation = Conversation & {groupId: string; protocol: CONVERSATION_PROTOCOL.MIXED};
+export type MLSConversation = Conversation & {groupId: string; protocol: CONVERSATION_PROTOCOL.MLS};
 export type MLSCapableConversation = MixedConversation | MLSConversation;
 
 export function isProteusConversation(conversation: Conversation): conversation is ProteusConversation {
-  return !conversation.groupId && conversation.protocol === ConversationProtocol.PROTEUS;
+  return !conversation.groupId && conversation.protocol === CONVERSATION_PROTOCOL.PROTEUS;
 }
 
 export function isMixedConversation(conversation: Conversation): conversation is MixedConversation {
-  return !!conversation.groupId && conversation.protocol === ConversationProtocol.MIXED;
+  return !!conversation.groupId && conversation.protocol === CONVERSATION_PROTOCOL.MIXED;
 }
 
 export function isMLSConversation(conversation: Conversation): conversation is MLSConversation {
-  return !!conversation.groupId && conversation.protocol === ConversationProtocol.MLS;
+  return !!conversation.groupId && conversation.protocol === CONVERSATION_PROTOCOL.MLS;
 }
 
 export function isMLSCapableConversation(conversation: Conversation): conversation is MLSCapableConversation {
@@ -79,7 +76,7 @@ export function isProteusTeam1to1Conversation({
 
 export function isBackendProteus1to1Conversation(conversation: BackendConversation): boolean {
   const isProteus1to1 =
-    conversation.protocol === ConversationProtocol.PROTEUS && conversation.type === CONVERSATION_TYPE.ONE_TO_ONE;
+    conversation.protocol === CONVERSATION_PROTOCOL.PROTEUS && conversation.type === CONVERSATION_TYPE.ONE_TO_ONE;
 
   const {name, type, team, members} = conversation;
 
@@ -98,15 +95,20 @@ export function isConnectionRequestConversation(conversation: Conversation): boo
 }
 
 interface ProtocolToConversationType {
-  [ConversationProtocol.PROTEUS]: ProteusConversation;
-  [ConversationProtocol.MLS]: MLSConversation;
+  [CONVERSATION_PROTOCOL.PROTEUS]: ProteusConversation;
+  [CONVERSATION_PROTOCOL.MLS]: MLSConversation;
 }
 
 const is1to1ConversationWithUser =
-  <Protocol extends ConversationProtocol.PROTEUS | ConversationProtocol.MLS>(userId: QualifiedId, protocol: Protocol) =>
+  <Protocol extends CONVERSATION_PROTOCOL.PROTEUS | CONVERSATION_PROTOCOL.MLS>(
+    userId: QualifiedId,
+    protocol: Protocol,
+  ) =>
   (conversation: Conversation): conversation is ProtocolToConversationType[Protocol] => {
     const doesProtocolMatch =
-      protocol === ConversationProtocol.PROTEUS ? isProteusConversation(conversation) : isMLSConversation(conversation);
+      protocol === CONVERSATION_PROTOCOL.PROTEUS
+        ? isProteusConversation(conversation)
+        : isMLSConversation(conversation);
 
     if (!doesProtocolMatch) {
       return false;
@@ -118,7 +120,7 @@ const is1to1ConversationWithUser =
     }
 
     const isProteusConnectType =
-      protocol === ConversationProtocol.PROTEUS && isConnectionRequestConversation(conversation);
+      protocol === CONVERSATION_PROTOCOL.PROTEUS && isConnectionRequestConversation(conversation);
 
     if (!conversation.is1to1() && !isProteusConnectType) {
       return false;
@@ -132,10 +134,10 @@ const is1to1ConversationWithUser =
   };
 
 export const isProteus1to1ConversationWithUser = (userId: QualifiedId) =>
-  is1to1ConversationWithUser(userId, ConversationProtocol.PROTEUS);
+  is1to1ConversationWithUser(userId, CONVERSATION_PROTOCOL.PROTEUS);
 
 export const isMLS1to1ConversationWithUser = (userId: QualifiedId) =>
-  is1to1ConversationWithUser(userId, ConversationProtocol.MLS);
+  is1to1ConversationWithUser(userId, CONVERSATION_PROTOCOL.MLS);
 
 export const isReadableConversation = (conversation: Conversation): boolean => {
   const states_to_filter = [

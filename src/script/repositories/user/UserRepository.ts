@@ -18,7 +18,6 @@
  */
 
 import type {AddedClient, PublicClient} from '@wireapp/api-client/lib/client';
-import {ConversationProtocol} from '@wireapp/api-client/lib/conversation';
 import {
   UserEvent,
   UserLegalHoldDisableEvent,
@@ -28,7 +27,8 @@ import {
 } from '@wireapp/api-client/lib/event';
 import type {BackendError, TraceState} from '@wireapp/api-client/lib/http';
 import {BackendErrorLabel} from '@wireapp/api-client/lib/http';
-import {ConsentType, Self as APIClientSelf} from '@wireapp/api-client/lib/self/';
+import {ConsentType} from '@wireapp/api-client/lib/self/';
+import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 import type {QualifiedHandle, User as APIClientUser} from '@wireapp/api-client/lib/user';
 import {
   QualifiedId,
@@ -45,7 +45,6 @@ import {Availability} from '@wireapp/protocol-messaging';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {useLegalHoldModalState} from 'Components/Modals/LegalHoldModal/LegalHoldModal.state';
-import {mapProfileAssetsV1} from 'Repositories/assets/AssetMapper';
 import {AssetRepository} from 'Repositories/assets/AssetRepository';
 import type {ClientRepository, QualifiedUserClientEntityMap} from 'Repositories/client';
 import {ClientEntity} from 'Repositories/client/ClientEntity';
@@ -105,7 +104,7 @@ interface UserAvailabilityEvent {
   type: USER.AVAILABILITY;
 }
 
-type Events = {supportedProtocolsUpdated: {user: User; supportedProtocols: ConversationProtocol[]}};
+type Events = {supportedProtocolsUpdated: {user: User; supportedProtocols: CONVERSATION_PROTOCOL[]}};
 export class UserRepository extends TypedEventEmitter<Events> {
   private readonly logger: Logger;
   public readonly userMapper: UserMapper;
@@ -311,7 +310,7 @@ export class UserRepository extends TypedEventEmitter<Events> {
 
   private async onUserSupportedProtocolsUpdate(
     userId: QualifiedId,
-    newSupportedProtocols: ConversationProtocol[],
+    newSupportedProtocols: CONVERSATION_PROTOCOL[],
   ): Promise<void> {
     const localSupportedProtocols = this.findUserById(userId)?.supportedProtocols();
 
@@ -677,8 +676,7 @@ export class UserRepository extends TypedEventEmitter<Events> {
     try {
       traceStates.push({position: 'UserRepository.getSelf', vendor: 'webapp'});
       const userData = await this.selfService.getSelf(traceStates);
-      const response = this.upgradePictureAsset(userData);
-      const userEntity = this.userMapper.mapSelfUserFromJson(response);
+      const userEntity = this.userMapper.mapSelfUserFromJson(userData);
       this.saveUser(userEntity, true);
       await this.initMarketingConsent();
       return userEntity;
@@ -686,27 +684,6 @@ export class UserRepository extends TypedEventEmitter<Events> {
       this.logger.error(`Unable to load self user: ${error.message || error}`, [error]);
       throw error;
     }
-  }
-
-  /**
-   * Detects if the user has a profile picture that uses the outdated picture API.
-   * Will migrate the picture to the newer assets API if so.
-   */
-  private upgradePictureAsset(userData: APIClientSelf): APIClientSelf {
-    const hasPicture = userData.picture.length;
-    const hasAsset = userData.assets.length;
-
-    if (hasPicture) {
-      if (!hasAsset) {
-        // if there are no assets, just upload the old picture to the new api
-        const {medium} = mapProfileAssetsV1(userData.id, userData.picture);
-        this.assetRepository.load(medium).then(imageBlob => this.changePicture(imageBlob as Blob));
-      } else {
-        // if an asset is already there, remove the pointer to the old picture
-        this.selfService.putSelf({picture: []} as any);
-      }
-    }
-    return userData;
   }
 
   private async fetchUser(userId: QualifiedId): Promise<User> {
@@ -777,7 +754,7 @@ export class UserRepository extends TypedEventEmitter<Events> {
   public async getUserSupportedProtocols(
     userId: QualifiedId,
     shouldRefreshUser = false,
-  ): Promise<ConversationProtocol[]> {
+  ): Promise<CONVERSATION_PROTOCOL[]> {
     const localUser = this.findUserById(userId);
     const localSupportedProtocols = localUser?.supportedProtocols();
 
@@ -903,7 +880,7 @@ export class UserRepository extends TypedEventEmitter<Events> {
    * @param userId - id of the user to update
    * @param supportedProtocols - an array of new supported protocols
    */
-  async updateUserSupportedProtocols(userId: QualifiedId, supportedProtocols: ConversationProtocol[]): Promise<User> {
+  async updateUserSupportedProtocols(userId: QualifiedId, supportedProtocols: CONVERSATION_PROTOCOL[]): Promise<User> {
     return this.updateUser(userId, {supported_protocols: supportedProtocols});
   }
 
