@@ -50,6 +50,7 @@ export class ConversationPage {
   readonly conversationInfoButton: Locator;
   readonly pingButton: Locator;
   readonly messages: Locator;
+  readonly messageDetails: Locator;
   readonly messageItems: Locator;
   readonly filesTab: Locator;
   readonly isTypingIndicator: Locator;
@@ -95,6 +96,7 @@ export class ConversationPage {
     this.messages = page.locator(
       `${selectByDataAttribute('item-message')} ${selectByClass('message-body')}:not(:has(p${selectByClass('text-foreground')})):has(${selectByClass('text')})`,
     );
+    this.messageDetails = page.locator('#message-details');
     this.filesTab = page.locator('#conversation-tab-files');
     this.isTypingIndicator = page.locator(selectByDataAttribute('typing-indicator-title'));
     this.itemPendingRequest = page.locator(selectByDataAttribute('item-pending-requests'));
@@ -252,6 +254,11 @@ export class ConversationPage {
   async editMessage(message: Locator) {
     const menu = await this.openMessageOptions(message);
     await menu.getByRole('button', {name: 'Edit'}).click();
+  }
+
+  async openMessageDetails(message: Locator) {
+    const menu = await this.openMessageOptions(message);
+    await menu.getByRole('button', {name: 'Details'}).click();
   }
 
   async reactOnMessage(message: Locator, emojiType: EmojiReaction) {
