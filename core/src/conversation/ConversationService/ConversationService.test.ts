@@ -1287,6 +1287,7 @@ function generateImage() {
       keyBytes: Buffer.from([]),
       sha256: Buffer.from([]),
       token: '',
+      domain: 'example.com',
     },
   };
 }

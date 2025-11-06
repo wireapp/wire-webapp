@@ -25,13 +25,13 @@ import {z} from 'zod';
  */
 export const PostAssetsResponseSchema = z.object({
   /** Asset domain (example.com) */
-  domain: z.string().optional(),
+  domain: z.string().min(1),
   /** ISO 8601 formatted expiration date */
-  expires: z.string().datetime(),
+  expires: z.string().datetime().optional(),
   /** Asset key (e.g., "3-1-47de4580-ae51-4650-acbb-d10c028cb0ac") */
   key: z.string().min(1),
   /** Base64 encoded token (e.g., "aGVsbG8") */
-  token: z.string().min(1),
+  token: z.string().min(1).optional(),
 });
 
 export type AssetUploadData = z.infer<typeof PostAssetsResponseSchema>;

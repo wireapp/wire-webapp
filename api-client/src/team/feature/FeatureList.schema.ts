@@ -86,7 +86,7 @@ const selfDeletingMessagesConfigSchema = z.object({
 });
 
 const enforceFileDownloadLocationConfigSchema = z.object({
-  enforcedDownloadLocation: z.string(),
+  enforcedDownloadLocation: z.string().optional(),
 });
 
 const classifiedDomainsConfigSchema = z.object({
