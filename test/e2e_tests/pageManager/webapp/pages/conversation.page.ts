@@ -251,6 +251,7 @@ export class ConversationPage {
     return this.page.getByRole('menu');
   }
 
+  /** Click the "Edit" option within a messages options putting it into the message input so it can be updated */
   async editMessage(message: Locator) {
     const menu = await this.openMessageOptions(message);
     await menu.getByRole('button', {name: 'Edit'}).click();
