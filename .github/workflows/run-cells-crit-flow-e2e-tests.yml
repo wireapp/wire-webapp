@@ -17,6 +17,7 @@ jobs:
     runs-on: [self-hosted, Linux, X64, office]
     env:
       ENV: ${{ inputs.environment }}
+      SLACK_WEBHOOK_URL: ${{ secrets.WIRE_CELLS_E2E_TEST_BOT_WEBHOOK_URL }}
 
     steps:
       - name: Checkout repository
@@ -51,3 +52,26 @@ jobs:
         with:
           name: playwright-report-${{ env.ENV }}
           path: playwright-report/
+
+      - name: Notify on Wire if succeeded
+        if: success()
+        continue-on-error: true
+        uses: 8398a7/action-slack@59b127a91e89ce70980e1bc926dca351ad0a1b32
+        with:
+          status: ${{ job.status }}
+          text: |
+            "✅ Cells Critical Flow E2E Tests on **${{ env.ENV }}** environment succeeded ✅"
+            **CHANGELOG:** ${{ needs.changelog.outputs.changelog-url }}
+            **Triggered by:** ${{ github.triggering_actor }}
+            **Build log:** ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+      - name: Notify on Wire if failed
+        if: failure()
+        continue-on-error: true
+        uses: 8398a7/action-slack@59b127a91e89ce70980e1bc926dca351ad0a1b32
+        with:
+          status: ${{ job.status }}
+          text: |
+            "❌ Cells Critical Flow E2E Tests on **${{ env.ENV }}** environment failed ❌"
+            **CHANGELOG:** ${{ needs.changelog.outputs.changelog-url }}
+            **Triggered by:** ${{ github.triggering_actor }}
+            **Build log:** ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
