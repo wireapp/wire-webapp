@@ -30,13 +30,6 @@ import {RequestCancellationError} from '../user/UserError';
 export class UserGroupAPI {
   constructor(private readonly client: HttpClient) {}
 
-  private static readonly ENDPOINTS = {
-    base: '/user-groups',
-    byId: (gid: string) => `/user-groups/${gid}`,
-    users: (gid: string) => `/user-groups/${gid}/users`,
-    channels: (gid: string) => `/user-groups/${gid}/channels`,
-  };
-
   /**
    * Search for user groups (cancelable).
    */
@@ -46,7 +39,7 @@ export class UserGroupAPI {
     const controller = new AbortController();
 
     const config: AxiosRequestConfig = {
-      url: UserGroupAPI.ENDPOINTS.base,
+      url: '/user-groups',
       method: 'get',
       params: {q: query, ...options},
       signal: controller.signal,
@@ -78,7 +71,7 @@ export class UserGroupAPI {
    */
   public async createUserGroup(body: UserGroupCreateRequest): Promise<UserGroup> {
     const config: AxiosRequestConfig = {
-      url: UserGroupAPI.ENDPOINTS.base,
+      url: '/user-groups',
       method: 'post',
       data: body,
     };
@@ -92,7 +85,7 @@ export class UserGroupAPI {
    */
   public async getUserGroup(gid: string): Promise<UserGroup> {
     const config: AxiosRequestConfig = {
-      url: UserGroupAPI.ENDPOINTS.byId(gid),
+      url: `/user-groups/${gid}`,
       method: 'get',
     };
 
@@ -105,7 +98,7 @@ export class UserGroupAPI {
    */
   public async updateUserGroup(gid: string, name: string): Promise<void> {
     const config: AxiosRequestConfig = {
-      url: UserGroupAPI.ENDPOINTS.byId(gid),
+      url: `/user-groups/${gid}`,
       method: 'put',
       data: {name},
     };
@@ -118,7 +111,7 @@ export class UserGroupAPI {
    */
   public async deleteUserGroup(gid: string): Promise<void> {
     const config: AxiosRequestConfig = {
-      url: UserGroupAPI.ENDPOINTS.byId(gid),
+      url: `/user-groups/${gid}`,
       method: 'delete',
     };
 
@@ -130,8 +123,8 @@ export class UserGroupAPI {
    */
   public async updateUsersInGroup(gid: string, body: {members: string[]}): Promise<void> {
     const config: AxiosRequestConfig = {
-      url: UserGroupAPI.ENDPOINTS.users(gid),
-      method: 'post',
+      url: `/user-groups/${gid}/users`,
+      method: 'put',
       data: body,
     };
 
@@ -143,7 +136,7 @@ export class UserGroupAPI {
    */
   public async updateChannelsInGroup(gid: string, body: {channels: string[]}): Promise<void> {
     const config: AxiosRequestConfig = {
-      url: UserGroupAPI.ENDPOINTS.channels(gid),
+      url: `/user-groups/${gid}/channels`,
       method: 'post',
       data: body,
     };
