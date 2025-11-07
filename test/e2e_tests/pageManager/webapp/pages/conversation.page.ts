@@ -152,7 +152,6 @@ export class ConversationPage {
   async sendMessage(message: string) {
     await this.messageInput.fill(message);
     await this.sendMessageButton.click();
-    await this.isMessageVisible(message); // isMessageVisible not only checks for visibility but ensures the optimistic update was persisted
   }
 
   async typeMessage(message: string) {
@@ -182,28 +181,6 @@ export class ConversationPage {
     await this.messageInput.press('Enter');
   }
 
-  async isMessageVisible(messageText: string, waitForVisibility = true) {
-    if (waitForVisibility) {
-      // Wait for the last message to be visible
-      await this.messages.last().waitFor({state: 'visible', timeout: 20_000});
-    }
-
-    // Then get all matching elements
-    const messages = await this.messages.all();
-
-    for (const message of messages) {
-      const messageTextContent = await message.locator(selectByClass('text')).textContent();
-      if (messageTextContent?.trim() === messageText) {
-        return true;
-      }
-    }
-    return false;
-  }
-
-  getMessageByText(messageText: string): Locator {
-    return this.messageItems.filter({hasText: messageText});
-  }
-
   async isImageFromUserVisible(user: User) {
     // Trying multiple times for the image to appear
     const locator = this.getImageLocator(user);
@@ -226,16 +203,16 @@ export class ConversationPage {
 
   /**
    * Util to get a message in the conversation sent by a given user
-   * @param messageContent Optional parameter to specify content the message should contain. If undefined the last message sent by the user will be returned.
+   * @param user Optional parameter to specify user who sent the message. If undefined the last message matching the content will be returned.
    */
-  getMessageFromUser(user: User, messageContent?: string) {
-    const messagesFromUser = this.messageItems.filter({
-      has: this.page.getByTestId('sender-name').getByText(user.fullName),
-    });
-    if (messageContent !== undefined) {
-      return messagesFromUser.filter({hasText: messageContent});
+  getMessage(messageContent: string, user?: User) {
+    const message = this.messageItems.filter({hasText: messageContent});
+
+    if (user !== undefined) {
+      return message.filter({has: this.page.getByTestId('sender-name').getByText(user.fullName)});
     }
-    return messagesFromUser.last();
+
+    return message.last();
   }
 
   /**

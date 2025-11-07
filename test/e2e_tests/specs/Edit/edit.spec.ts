@@ -80,7 +80,7 @@ test.describe('Edit', () => {
     });
     await pages.conversation().sendMessage('Test Message');
 
-    const message = pages.conversation().getMessageFromUser(userA);
+    const message = pages.conversation().getMessage('', userA);
     await expect(message).toContainText('Test Message');
 
     await pages.conversation().editMessage(message);
@@ -100,7 +100,7 @@ test.describe('Edit', () => {
       await pages.conversationList().openConversation('Test Group');
       await pages.conversation().sendMessage('Test Message');
 
-      const message = pages.conversation().getMessageFromUser(userA);
+      const message = pages.conversation().getMessage('', userA);
       await expect(message).toContainText('Test Message');
 
       await pages.conversation().editMessage(message);
@@ -129,8 +129,8 @@ test.describe('Edit', () => {
 
       await device1.conversation().sendMessage('Message from device 1');
 
-      const messageOnDevice1 = device1.conversation().getMessageFromUser(userA);
-      const messageOnDevice2 = device2.conversation().getMessageFromUser(userA);
+      const messageOnDevice1 = device1.conversation().getMessage('', userA);
+      const messageOnDevice2 = device2.conversation().getMessage('', userA);
       await expect(messageOnDevice1).toContainText('Message from device 1');
       await expect(messageOnDevice2).toContainText('Message from device 1');
 
@@ -150,7 +150,7 @@ test.describe('Edit', () => {
     ]);
     await userAPages.conversation().sendMessage('Test Message');
 
-    const message = userBPages.conversation().getMessageFromUser(userA);
+    const message = userBPages.conversation().getMessage('', userA);
     await expect(message).toContainText('Test Message');
 
     const messageOptions = await userBPages.conversation().openMessageOptions(message);
@@ -207,7 +207,7 @@ test.describe('Edit', () => {
       });
 
       await test.step('Change message sent by A', async () => {
-        const message = userAPages.conversation().getMessageFromUser(userA);
+        const message = userAPages.conversation().getMessage('', userA);
         await userAPages.conversation().editMessage(message);
         await expect(userAPages.conversation().messageInput).toContainText('Test Message');
         await userAPages.conversation().sendMessage('Edited Message');
@@ -218,7 +218,7 @@ test.describe('Edit', () => {
         await expect(conversation.getByTestId('status-unread')).not.toBeVisible();
 
         await userBPages.conversationList().openConversation(userA.fullName);
-        await expect(userBPages.conversation().getMessageFromUser(userA)).toContainText('Edited Message');
+        await expect(userBPages.conversation().getMessage('', userA)).toContainText('Edited Message');
       });
     },
   );
@@ -233,9 +233,9 @@ test.describe('Edit', () => {
       ]);
 
       await userAPages.conversation().sendMessage('Test');
-      const sentMessage = userAPages.conversation().getMessageFromUser(userA);
+      const sentMessage = userAPages.conversation().getMessage('', userA);
 
-      const receivedMessage = userBPages.conversation().getMessageFromUser(userA);
+      const receivedMessage = userBPages.conversation().getMessage('', userA);
       await expect(receivedMessage).toContainText('Test');
 
       await userAPages.conversation().editMessage(sentMessage);
@@ -256,7 +256,7 @@ test.describe('Edit', () => {
       await pages.conversationList().openConversation('Test Group');
       await pages.conversation().sendMessage('Test message');
 
-      const message = pages.conversation().getMessageFromUser(userA);
+      const message = pages.conversation().getMessage('', userA);
       await pages.conversation().openMessageDetails(message);
 
       const timeEdited = pages.messageDetails().timeEdited;
