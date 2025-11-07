@@ -57,6 +57,9 @@ jobs:
         if: success()
         continue-on-error: true
         uses: 8398a7/action-slack@v3
+        env:
+          ENV: ${{ inputs.environment }}
+          SLACK_WEBHOOK_URL: ${{ secrets.WIRE_CELLS_E2E_TEST_BOT_WEBHOOK_URL }}
         with:
           status: ${{ job.status }}
           text: |
@@ -68,6 +71,9 @@ jobs:
         if: failure()
         continue-on-error: true
         uses: 8398a7/action-slack@v3
+        env:
+          ENV: ${{ inputs.environment }}
+          SLACK_WEBHOOK_URL: ${{ secrets.WIRE_CELLS_E2E_TEST_BOT_WEBHOOK_URL }}
         with:
           status: ${{ job.status }}
           text: |
