@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [27.88.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@27.87.1...@wireapp/api-client@27.88.0) (2025-11-07)
+
+### Features
+
+* **api-client:** add channelsCount in UserGroup.ts [WPB-21266] ([#7543](https://github.com/wireapp/wire-web-packages/issues/7543)) ([f4135d8](https://github.com/wireapp/wire-web-packages/commit/f4135d8a524695461ed0a93271479abc27479c62))
+
 ## [27.87.1](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@27.87.0...@wireapp/api-client@27.87.1) (2025-11-06)
 
 ### Bug Fixes
