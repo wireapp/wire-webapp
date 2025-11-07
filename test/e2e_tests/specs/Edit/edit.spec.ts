@@ -40,15 +40,32 @@ const test = baseTest.extend<{userA: User; userB: User}>({
   },
 });
 
-const createPagesForUser = async (browser: Browser, user: User) => {
+const createPagesForUser = async (
+  browser: Browser,
+  user: User,
+  options?: {confirmHistoryWarning?: boolean; declineDataShareConsent?: boolean; openConversationWith?: User},
+) => {
   const context = await browser.newContext();
   const page = await context.newPage();
   const pageManager = PageManager.from(page);
 
   await pageManager.openMainPage();
   await loginUser(user, pageManager);
+  const {pages, modals} = pageManager.webapp;
 
-  return pageManager.webapp;
+  if (options?.confirmHistoryWarning) {
+    await pages.historyInfo().clickConfirmButton();
+  }
+
+  if (options?.declineDataShareConsent) {
+    await modals.dataShareConsent().clickDecline();
+  }
+
+  if (options?.openConversationWith) {
+    await pages.conversationList().openConversation(options.openConversationWith.fullName);
+  }
+
+  return pages;
 };
 
 test.describe('Edit', () => {
@@ -57,19 +74,20 @@ test.describe('Edit', () => {
   });
 
   test('I can edit my message in 1:1', {tag: ['@TC-679', '@regression']}, async ({browser, userA, userB}) => {
-    const {pages: userAPages, modals} = await createPagesForUser(browser, userA);
-    await modals.dataShareConsent().clickDecline();
-    await userAPages.conversationList().openConversation(userB.fullName);
-    await userAPages.conversation().sendMessage('Test Message');
+    const pages = await createPagesForUser(browser, userA, {
+      declineDataShareConsent: true,
+      openConversationWith: userB,
+    });
+    await pages.conversation().sendMessage('Test Message');
 
-    const message = userAPages.conversation().getMessageFromUser(userA);
+    const message = pages.conversation().getMessageFromUser(userA);
     await expect(message).toContainText('Test Message');
 
-    await userAPages.conversation().editMessage(message);
-    await expect(userAPages.conversation().messageInput).toContainText('Test Message');
+    await pages.conversation().editMessage(message);
+    await expect(pages.conversation().messageInput).toContainText('Test Message');
 
     // Overwrite the text in the message input and send it
-    await userAPages.conversation().sendMessage('Edited Message');
+    await pages.conversation().sendMessage('Edited Message');
     await expect(message).toContainText('Edited Message');
   });
 
@@ -77,20 +95,19 @@ test.describe('Edit', () => {
     'I can edit my message in a group conversation',
     {tag: ['@TC-680', '@regression']},
     async ({browser, userA, userB}) => {
-      const {pages: userAPages, modals} = await createPagesForUser(browser, userA);
-      await modals.dataShareConsent().clickDecline();
-      await createGroup(userAPages, 'Test Group', [userB]);
-      await userAPages.conversationList().openConversation('Test Group');
-      await userAPages.conversation().sendMessage('Test Message');
+      const pages = await createPagesForUser(browser, userA, {declineDataShareConsent: true});
+      await createGroup(pages, 'Test Group', [userB]);
+      await pages.conversationList().openConversation('Test Group');
+      await pages.conversation().sendMessage('Test Message');
 
-      const message = userAPages.conversation().getMessageFromUser(userA);
+      const message = pages.conversation().getMessageFromUser(userA);
       await expect(message).toContainText('Test Message');
 
-      await userAPages.conversation().editMessage(message);
-      await expect(userAPages.conversation().messageInput).toContainText('Test Message');
+      await pages.conversation().editMessage(message);
+      await expect(pages.conversation().messageInput).toContainText('Test Message');
 
       // Overwrite the text in the message input and send it
-      await userAPages.conversation().sendMessage('Edited Message');
+      await pages.conversation().sendMessage('Edited Message');
       await expect(message).toContainText('Edited Message');
     },
   );
@@ -99,14 +116,16 @@ test.describe('Edit', () => {
     'I see changed message if message was edited from another device',
     {tag: ['@TC-682', '@regression']},
     async ({browser, userA, userB}) => {
-      const {pages: device1, modals: device1Modals} = await createPagesForUser(browser, userA);
-      await device1Modals.dataShareConsent().clickDecline();
-      await device1.conversationList().openConversation(userB.fullName);
+      const device1 = await createPagesForUser(browser, userA, {
+        declineDataShareConsent: true,
+        openConversationWith: userB,
+      });
 
       // Device 2 is intentionally created after device 1 to ensure the history info warning is confirmed
-      const {pages: device2} = await createPagesForUser(browser, userA);
-      await device2.historyInfo().clickConfirmButton();
-      await device2.conversationList().openConversation(userB.fullName);
+      const device2 = await createPagesForUser(browser, userA, {
+        confirmHistoryWarning: true,
+        openConversationWith: userB,
+      });
 
       await device1.conversation().sendMessage('Message from device 1');
 
@@ -125,20 +144,9 @@ test.describe('Edit', () => {
 
   test('I cannot edit another users message', {tag: ['@TC-683', '@regression']}, async ({browser, userA, userB}) => {
     const [userAPages, userBPages] = await Promise.all([
-      (async () => {
-        const {pages, modals} = await createPagesForUser(browser, userA);
-        await modals.dataShareConsent().clickDecline();
-        return pages;
-      })(),
-      (async () => {
-        const {pages, modals} = await createPagesForUser(browser, userB);
-        await modals.dataShareConsent().clickDecline();
-        return pages;
-      })(),
+      createPagesForUser(browser, userA, {declineDataShareConsent: true, openConversationWith: userB}),
+      createPagesForUser(browser, userB, {declineDataShareConsent: true, openConversationWith: userA}),
     ]);
-
-    await userAPages.conversationList().openConversation(userB.fullName);
-    await userBPages.conversationList().openConversation(userA.fullName);
     await userAPages.conversation().sendMessage('Test Message');
 
     const message = userBPages.conversation().getMessageFromUser(userA);
@@ -152,13 +160,14 @@ test.describe('Edit', () => {
     'I can edit my last message by pressing the up arrow key',
     {tag: ['@TC-686', '@regression']},
     async ({browser, userA, userB}) => {
-      const {pages: userAPages, modals} = await createPagesForUser(browser, userA);
-      await modals.dataShareConsent().clickDecline();
-      await userAPages.conversationList().openConversation(userB.fullName);
-      await userAPages.conversation().sendMessage('Test Message');
+      const pages = await createPagesForUser(browser, userA, {
+        declineDataShareConsent: true,
+        openConversationWith: userB,
+      });
+      await pages.conversation().sendMessage('Test Message');
 
-      await userAPages.conversation().messageInput.press('ArrowUp');
-      await expect(userAPages.conversation().messageInput).toContainText('Test Message');
+      await pages.conversation().messageInput.press('ArrowUp');
+      await expect(pages.conversation().messageInput).toContainText('Test Message');
     },
   );
 
@@ -167,16 +176,8 @@ test.describe('Edit', () => {
     {tag: ['@TC-690', '@regression']},
     async ({browser, userA, userB}) => {
       const [userAPages, userBPages] = await Promise.all([
-        (async () => {
-          const {pages, modals} = await createPagesForUser(browser, userA);
-          await modals.dataShareConsent().clickDecline();
-          return pages;
-        })(),
-        (async () => {
-          const {pages, modals} = await createPagesForUser(browser, userB);
-          await modals.dataShareConsent().clickDecline();
-          return pages;
-        })(),
+        createPagesForUser(browser, userA, {declineDataShareConsent: true}),
+        createPagesForUser(browser, userB, {declineDataShareConsent: true}),
       ]);
 
       await test.step('Create group as second conversation', async () => {
@@ -225,20 +226,9 @@ test.describe('Edit', () => {
     {tag: ['@TC-692', '@regression']},
     async ({browser, userA, userB}) => {
       const [userAPages, userBPages] = await Promise.all([
-        (async () => {
-          const {pages, modals} = await createPagesForUser(browser, userA);
-          await modals.dataShareConsent().clickDecline();
-          return pages;
-        })(),
-        (async () => {
-          const {pages, modals} = await createPagesForUser(browser, userB);
-          await modals.dataShareConsent().clickDecline();
-          return pages;
-        })(),
+        createPagesForUser(browser, userA, {declineDataShareConsent: true, openConversationWith: userB}),
+        createPagesForUser(browser, userB, {declineDataShareConsent: true, openConversationWith: userA}),
       ]);
-
-      await userAPages.conversationList().openConversation(userB.fullName);
-      await userBPages.conversationList().openConversation(userA.fullName);
 
       await userAPages.conversation().sendMessage('Test');
       const sentMessage = userAPages.conversation().getMessageFromUser(userA);
@@ -256,8 +246,7 @@ test.describe('Edit', () => {
     'I want to see the last edited text including a timestamp in message detail view if the message has been edited',
     {tag: ['@TC-3563', '@regression']},
     async ({browser, userA, userB}) => {
-      const {pages, modals} = await createPagesForUser(browser, userA);
-      await modals.dataShareConsent().clickDecline();
+      const pages = await createPagesForUser(browser, userA, {declineDataShareConsent: true});
       await createGroup(pages, 'Test Group', [userB]); // The message detail view is only available for group conversations
 
       await pages.conversationList().openConversation('Test Group');
