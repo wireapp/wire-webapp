@@ -228,7 +228,7 @@ export class ConversationPage {
 
   /**
    * Util to get a message in the conversation sent by a given user
-   * @param messageContent Optional parameter to specify content the returned message should return. If undefined the last message sent by the user will be returned.
+   * @param messageContent Optional parameter to specify content the message should contain. If undefined the last message sent by the user will be returned.
    */
   getMessageFromUser(user: User, messageContent?: string) {
     const messagesFromUser = this.messageItems.filter({
