@@ -135,6 +135,7 @@ test.describe('Edit', () => {
       await expect(messageOnDevice2).toContainText('Message from device 1');
 
       await device1.conversation().editMessage(messageOnDevice1);
+      await expect(device1.conversation().messageInput).toContainText('Message from device 1');
       await device1.conversation().sendMessage('Updated message from device 1');
 
       await expect(messageOnDevice1).toContainText('Updated message from device 1');
@@ -208,6 +209,7 @@ test.describe('Edit', () => {
       await test.step('Change message sent by A', async () => {
         const message = userAPages.conversation().getMessageFromUser(userA);
         await userAPages.conversation().editMessage(message);
+        await expect(userAPages.conversation().messageInput).toContainText('Test Message');
         await userAPages.conversation().sendMessage('Edited Message');
       });
 
@@ -237,7 +239,9 @@ test.describe('Edit', () => {
       await expect(receivedMessage).toContainText('Test');
 
       await userAPages.conversation().editMessage(sentMessage);
+      await expect(userAPages.conversation().messageInput).toContainText('Test');
       await userAPages.conversation().sendMessage('Edited');
+
       await expect(receivedMessage).toContainText('Edited');
     },
   );
@@ -259,7 +263,9 @@ test.describe('Edit', () => {
       await expect(timeEdited).not.toBeAttached();
 
       await pages.conversation().editMessage(message);
+      await expect(pages.conversation().messageInput).toContainText('Test message');
       await pages.conversation().sendMessage('Edited message');
+
       await expect(timeEdited).toBeVisible();
       await expect(timeEdited).toContainText(/^Edited:/);
     },
