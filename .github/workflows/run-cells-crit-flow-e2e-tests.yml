@@ -56,7 +56,7 @@ jobs:
       - name: Notify on Wire if succeeded
         if: success()
         continue-on-error: true
-        uses: 8398a7/action-slack@59b127a91e89ce70980e1bc926dca351ad0a1b32
+        uses: 8398a7/action-slack@v3
         with:
           status: ${{ job.status }}
           text: |
@@ -67,7 +67,7 @@ jobs:
       - name: Notify on Wire if failed
         if: failure()
         continue-on-error: true
-        uses: 8398a7/action-slack@59b127a91e89ce70980e1bc926dca351ad0a1b32
+        uses: 8398a7/action-slack@v3
         with:
           status: ${{ job.status }}
           text: |
