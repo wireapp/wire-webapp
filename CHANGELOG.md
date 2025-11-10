@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [46.46.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@46.45.3...@wireapp/core@46.46.0) (2025-11-10)
+
+### Features
+
+* **core:** Expose core crypto log level set function [WPB-21565] ([#7568](https://github.com/wireapp/wire-web-packages/issues/7568)) ([8efd84b](https://github.com/wireapp/wire-web-packages/commit/8efd84bf6f41b98bcf8e8e0d461dd2bb4209e2c4))
+
 ## [46.45.3](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@46.45.2...@wireapp/core@46.45.3) (2025-11-10)
 
 **Note:** Version bump only for package @wireapp/core
