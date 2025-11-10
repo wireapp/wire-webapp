@@ -35,6 +35,7 @@ export class ConversationPage {
   readonly createGroupSubmitButton: Locator;
   readonly messageInput: Locator;
   readonly sendMessageButton: Locator;
+  readonly searchButton: Locator;
   readonly conversationTitle: Locator;
   readonly watermark: Locator;
   readonly timerMessageButton: Locator;
@@ -77,6 +78,7 @@ export class ConversationPage {
     this.messageInput = page.locator(selectByDataAttribute('input-message'));
     this.watermark = page.locator(`${selectByDataAttribute('no-conversation')} svg`);
     this.sendMessageButton = page.locator(selectByDataAttribute('do-send-message'));
+    this.searchButton = page.getByRole('button', {name: 'Search'});
     this.conversationTitle = page.locator('[data-uie-name="status-conversation-title-bar-label"]');
     this.openGroupInformationViaName = page.locator(selectByDataAttribute('status-conversation-title-bar-label'));
     this.timerMessageButton = page.locator(selectByDataAttribute('do-set-ephemeral-timer'));

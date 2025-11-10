@@ -55,6 +55,7 @@ import {VerifyEmailModal} from './webapp/modals/verifyEmail.modal';
 import {AccountPage} from './webapp/pages/account.page';
 import {AudioVideoSettingsPage} from './webapp/pages/audioVideoSettings.page';
 import {CallingPage} from './webapp/pages/calling.page';
+import {CollectionPage} from './webapp/pages/collection.page';
 import {ConnectRequestPage} from './webapp/pages/connectRequest.page';
 import {ConversationPage} from './webapp/pages/conversation.page';
 import {ConversationDetailsPage} from './webapp/pages/conversationDetails.page';
@@ -166,6 +167,7 @@ export class PageManager {
       conversationDetails: () =>
         this.getOrCreate('webapp.pages.conversationDetails', () => new ConversationDetailsPage(this.page)),
       conversation: () => this.getOrCreate('webapp.pages.conversation', () => new ConversationPage(this.page)),
+      collection: () => this.getOrCreate('webapp.pages.collection', () => new CollectionPage(this.page)),
       cellsConversation: () =>
         this.getOrCreate('webapp.pages.cellsConversation', () => new CellsConversationPage(this.page)),
       cellsConversationFiles: () =>

@@ -119,4 +119,24 @@ test.describe('Reply', () => {
       await expect(replyMessage.getByTestId('quote-item')).toContainText('You cannot see this message');
     },
   );
+
+  test(
+    'I should not see the quoted message when searching for original message in collections',
+    {tag: ['@TC-2996', '@regression']},
+    async ({browser, userA, userB}) => {
+      const pages = await createPagesForUser(browser, userA, {openConversationWith: userB});
+      await pages.conversation().sendMessage('Test');
+
+      const messageToReplyTo = pages.conversation().getMessage({content: 'Test'});
+      await pages.conversation().replyToMessage(messageToReplyTo);
+      await pages.conversation().sendMessage('Reply');
+
+      await pages.conversation().searchButton.click();
+      await pages.collection().searchForMessages('Test');
+
+      // Only the original message should be shown since the reply doesn't contain the search term
+      await expect(pages.collection().searchItems).toHaveCount(1);
+      await expect(pages.collection().searchItems).not.toContainText('Reply');
+    },
+  );
 });
