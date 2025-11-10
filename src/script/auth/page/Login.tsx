@@ -49,8 +49,8 @@ import {
   QUERY,
   QueryKeys,
   Text,
-  TextLink,
   useMatchMedia,
+  ActionLink,
 } from '@wireapp/react-ui-kit';
 
 import {LogoFullIcon} from 'Components/Icon';
@@ -61,6 +61,7 @@ import {isBackendError} from 'Util/TypePredicateUtil';
 import {EntropyContainer} from './EntropyContainer';
 import {separator} from './Login.styles';
 import {Page} from './Page';
+import {styles} from './VerifyEmailCode.styles';
 
 import {Config} from '../../Config';
 import {AccountAlreadyExistsModal} from '../component/AccountAlreadyExistsModal';
@@ -444,9 +445,13 @@ const LoginComponent = ({
                       {isSendingTwoFactorCode ? (
                         <Loading size={20} />
                       ) : (
-                        <TextLink onClick={resendTwoFactorCode} center data-uie-name="do-resend-code">
+                        <ActionLink
+                          onClick={resendTwoFactorCode}
+                          data-uie-name="do-resend-code"
+                          css={styles.resendLink}
+                        >
                           {t('verify.resendCode')}
-                        </TextLink>
+                        </ActionLink>
                       )}
                     </div>
                     <FlexBox justify="center">
