@@ -17,6 +17,8 @@
  *
  */
 
+import {BrowserContext} from '@playwright/test';
+
 import {addCreatedTeam, removeCreatedTeam} from 'test/e2e_tests/utils/tearDown.util';
 
 import {Services} from '../../data/serviceInfo';
@@ -31,6 +33,12 @@ const member1 = getUser();
 const member2 = getUser();
 const teamName = 'Critical';
 const conversationName = 'Crits';
+
+// Browser contexts for cleanup
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+let member1Context: BrowserContext | undefined;
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+let member2Context: BrowserContext | undefined;
 
 test(
   'Team owner adds whole team to an all team chat',
@@ -92,7 +100,7 @@ test(
 
     await test.step('All group participants send messages in a group', async () => {
       // Member1 logs in and opens the conversation (establish encrypted session)
-      const member1Context = await browser.newContext();
+      member1Context = await browser.newContext();
       const member1Page = await member1Context.newPage();
       member1PageManager = new PageManager(member1Page);
       await member1PageManager.openMainPage();
@@ -101,7 +109,7 @@ test(
       await member1PageManager.webapp.pages.conversationList().openConversation(conversationName);
 
       // Member2 logs in and opens the conversation (establish encrypted session)
-      const member2Context = await browser.newContext();
+      member2Context = await browser.newContext();
       const member2Page = await member2Context.newPage();
       member2PageManager = new PageManager(member2Page);
       await member2PageManager.openMainPage();
@@ -234,5 +242,7 @@ test(
 );
 
 test.afterAll(async ({api}) => {
+  await member1Context?.close();
+  await member2Context?.close();
   await removeCreatedTeam(api, owner);
 });
