@@ -62,7 +62,8 @@ export class ConversationDetailsPage {
         `${selectById('add-participants')} ${selectByDataAttribute('search-list')} [aria-label="Open profile of ${fullName}"]`,
       );
       await userLocator.click();
-      await this.page.waitForTimeout(1000); // Wait for the UI to update after selecting user
+      // Wait for the user to be selected (checkbox should be checked)
+      await userLocator.locator('input[type="checkbox"]').waitFor({state: 'attached'});
     }
 
     await this.page.locator(`${selectById('add-participants')} ${selectByDataAttribute('do-create')}`).click();
@@ -107,20 +108,24 @@ export class ConversationDetailsPage {
       `${selectById('add-participants')} ${selectByDataAttribute('do-add-services')}`,
     );
     await servicesTab.click();
-    await this.page.waitForTimeout(500); // Wait for services tab to load
+
+    // Wait for search input to be ready
+    const searchInput = this.page.locator(`${selectById('add-participants')} input[type="text"]`);
+    await searchInput.waitFor({state: 'visible'});
 
     // Search for the service
-    const searchInput = this.page.locator(`${selectById('add-participants')} input[type="text"]`);
     await searchInput.fill(serviceName);
-    await this.page.waitForTimeout(500); // Wait for search results
 
-    // Click on the service in search results - services have item-service test id
+    // Wait for service to appear in search results
     const serviceLocator = this.page.getByTestId('item-service').first();
-    await serviceLocator.click();
-    await this.page.waitForTimeout(500); // Wait for service details to load
+    await serviceLocator.waitFor({state: 'visible'});
 
-    // Click the "Add Service" button
+    // Click on the service in search results
+    await serviceLocator.click();
+
+    // Wait for "Add Service" button to be ready
     const addServiceButton = this.page.getByTestId('do-add-service');
+    await addServiceButton.waitFor({state: 'visible'});
     await addServiceButton.click();
   }
 
@@ -131,10 +136,10 @@ export class ConversationDetailsPage {
       .getByTestId('item-service')
       .filter({hasText: serviceName});
     await serviceLocator.click();
-    await this.page.waitForTimeout(500); // Wait for service details to load
 
-    // Click the "Remove Service" button
+    // Wait for "Remove Service" button to be visible and enabled
     const removeServiceButton = this.page.getByTestId('do-remove');
+    await removeServiceButton.waitFor({state: 'visible'});
     await removeServiceButton.click();
   }
 

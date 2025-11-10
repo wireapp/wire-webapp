@@ -150,15 +150,15 @@ export class ConversationPage {
   async sendMessage(message: string) {
     await this.messageInput.fill(message);
     await this.sendMessageButton.click();
-    await this.page.waitForTimeout(5000); // Wait for the message to be sent
+    // Wait for the specific message to appear in the conversation
+    const messageLocator = this.messages.filter({hasText: message}).last();
+    await messageLocator.waitFor({state: 'visible', timeout: 20_000});
   }
 
   async typeMessage(message: string) {
     await this.messageInput.click();
-    for (let i = 0; i < message.length; i++) {
-      await this.page.keyboard.press(message[i]);
-      await this.page.waitForTimeout(300); // sim user input
-    }
+    // Use pressSequentially which simulates realistic typing with built-in delays
+    await this.messageInput.pressSequentially(message, {delay: 100});
   }
 
   async createGroup(groupName: string) {
