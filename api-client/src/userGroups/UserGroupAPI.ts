@@ -82,11 +82,13 @@ export class UserGroupAPI {
 
   /**
    * Get a user group by ID.
+   * @param includeChannels Whether to include the channels in the response (default: true).
    */
-  public async getUserGroup(gid: string): Promise<UserGroup> {
+  public async getUserGroup(gid: string, includeChannels = true): Promise<UserGroup> {
     const config: AxiosRequestConfig = {
       url: `/user-groups/${gid}`,
       method: 'get',
+      params: {include_channels: includeChannels},
     };
 
     const {data} = await this.client.sendJSON<UserGroup>(config);
