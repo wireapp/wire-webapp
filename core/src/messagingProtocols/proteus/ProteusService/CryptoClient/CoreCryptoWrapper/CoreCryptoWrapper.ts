@@ -229,6 +229,10 @@ export class CoreCryptoWrapper implements CryptoClient {
     };
   }
 
+  public setMaxLogLevel(level: CoreCryptoLogLevel) {
+    setMaxLogLevel(level);
+  }
+
   getFingerprint() {
     return this.coreCrypto.proteusFingerprint();
   }
