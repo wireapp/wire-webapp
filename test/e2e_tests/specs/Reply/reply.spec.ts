@@ -78,4 +78,18 @@ test.describe('Reply', () => {
       await expect(ping.getByTestId('do-reply-message')).not.toBeAttached();
     },
   );
+
+  test(
+    'I should not be able to reply to timed messages',
+    {tag: ['@TC-8039', '@regression']},
+    async ({browser, userA, userB}) => {
+      const pages = await createPagesForUser(browser, userA, {openConversationWith: userB});
+
+      await pages.conversation().sendTimedMessage('Gone in 10s');
+      const message = pages.conversation().getMessage({content: 'Gone in 10s'});
+      await message.hover();
+
+      await expect(message.getByTestId('do-reply-message')).not.toBeAttached();
+    },
+  );
 });

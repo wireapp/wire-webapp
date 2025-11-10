@@ -162,6 +162,12 @@ export class ConversationPage {
     await this.createGroupSubmitButton.click();
   }
 
+  async sendTimedMessage(message: string) {
+    await this.timerMessageButton.click();
+    await this.timerTenSecondsButton.click();
+    await this.sendMessage(message);
+  }
+
   async sendMessageWithUserMention(userFullName: string, messageText?: string) {
     await this.messageInput.fill(`@`);
     await this.page
