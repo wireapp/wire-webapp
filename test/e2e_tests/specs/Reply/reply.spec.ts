@@ -92,4 +92,31 @@ test.describe('Reply', () => {
       await expect(message.getByTestId('do-reply-message')).not.toBeAttached();
     },
   );
+
+  test(
+    'I want to see a placeholder text as quote when original message is not available anymore',
+    {tag: ['@TC-2994', '@regression']},
+    async ({browser, userA, userB}) => {
+      test.slow();
+
+      const [userAPages, userBPages] = await Promise.all([
+        createPagesForUser(browser, userA, {openConversationWith: userB}),
+        createPagesForUser(browser, userB, {openConversationWith: userA}),
+      ]);
+
+      await userAPages.conversation().sendMessage('Test');
+
+      const messageToReplyTo = userBPages.conversation().getMessage({content: 'Test'});
+      await userBPages.conversation().replyToMessage(messageToReplyTo);
+      await userBPages.conversation().sendMessage('Reply');
+
+      const replyMessage = userBPages.conversation().getMessage({content: 'Reply'});
+      await expect(replyMessage.getByTestId('quote-item')).toContainText('Test');
+
+      const messageToDelete = userAPages.conversation().getMessage({content: 'Test', sender: userA});
+      await userAPages.conversation().deleteMessage(messageToDelete, 'Everyone');
+
+      await expect(replyMessage.getByTestId('quote-item')).toContainText('You cannot see this message');
+    },
+  );
 });

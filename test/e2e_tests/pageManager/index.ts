@@ -36,6 +36,7 @@ import {AppLockModal} from './webapp/modals/appLock.modal';
 import {BlockWarningModal} from './webapp/modals/blockWarning.modal';
 import {CallNotEstablishedModal} from './webapp/modals/callNotEstablished.modal';
 import {CancelRequestModal} from './webapp/modals/cancelRequest.modal';
+import {ConfirmModal} from './webapp/modals/confirm.modal';
 import {ConfirmLogoutModal} from './webapp/modals/confirmLogout.modal';
 import {ConversationNotConnectedModal} from './webapp/modals/conversationNotConnected.modal';
 import {CopyPasswordModal} from './webapp/modals/copyPassword.modal';
@@ -220,6 +221,7 @@ export class PageManager {
       marketingConsent: () =>
         this.getOrCreate('webapp.modals.marketingConsent', () => new MarketingConsentModal(this.page)),
       acknowledge: () => this.getOrCreate('webapp.modals.marketingConsent', () => new AcknowledgeModal(this.page)),
+      confirm: () => this.getOrCreate('webapp.modals.confirm', () => new ConfirmModal(this.page)),
       cellsFileDetailView: () =>
         this.getOrCreate('webapp.modals.cellsFileDetailView', () => new CellsFileDetailViewModal(this.page)),
       cancelRequest: () =>
