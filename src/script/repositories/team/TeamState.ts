@@ -114,8 +114,9 @@ export class TeamState {
       () => true || this.teamFeatures()?.videoCalling?.status === FEATURE_STATUS.ENABLED,
     );
 
-    const isMLSEnabled = this.teamFeatures()?.mls?.status === FEATURE_STATUS.ENABLED;
-    this.isMLSEnabled = ko.pureComputed(() => isMLSEnabled ?? false);
+    this.isMLSEnabled = ko.pureComputed(() => {
+      return this.teamFeatures()?.mls?.status === FEATURE_STATUS.ENABLED;
+    });
 
     this.isProtocolToggleEnabledForUser = ko.pureComputed(
       () => this.teamFeatures()?.mls?.config.protocolToggleUsers.includes(this.userState.self().id) ?? false,
