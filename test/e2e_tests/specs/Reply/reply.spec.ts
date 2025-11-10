@@ -22,7 +22,7 @@ import {Browser} from '@playwright/test';
 import {getUser, User} from 'test/e2e_tests/data/user';
 import {PageManager} from 'test/e2e_tests/pageManager';
 import {test as baseTest, expect} from 'test/e2e_tests/test.fixtures';
-import {shareAssetHelper} from 'test/e2e_tests/utils/asset.util';
+import {getAudioFilePath, shareAssetHelper} from 'test/e2e_tests/utils/asset.util';
 import {getImageFilePath} from 'test/e2e_tests/utils/sendImage.util';
 import {removeCreatedUser} from 'test/e2e_tests/utils/tearDown.util';
 import {loginUser} from 'test/e2e_tests/utils/userActions';
@@ -173,5 +173,18 @@ test.describe('Reply', () => {
 
     const reply = pages.conversation().getMessage({content: 'Reply'});
     await expect(reply.getByTestId('quote-item').getByTestId('image-asset-img')).toBeVisible();
+  });
+
+  test('I want to reply to an audio message', {tag: ['@TC-3003', '@regression']}, async ({browser, userA, userB}) => {
+    const pages = await createPagesForUser(browser, userA, {openConversationWith: userB});
+    const {page} = pages.conversation();
+    await shareAssetHelper(getAudioFilePath(), page, page.getByRole('button', {name: 'Add file'}));
+
+    const messageWithAudio = pages.conversation().getMessage({sender: userA});
+    await pages.conversation().replyToMessage(messageWithAudio);
+    await pages.conversation().sendMessage('Reply');
+
+    const reply = pages.conversation().getMessage({content: 'Reply'});
+    await expect(reply.getByTestId('quote-item').getByTestId('audio-asset')).toBeVisible();
   });
 });
