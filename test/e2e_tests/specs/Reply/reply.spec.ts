@@ -225,4 +225,20 @@ test.describe('Reply', () => {
     const reply = pages.conversation().getMessage({content: 'Reply'});
     await expect(reply.getByTestId('quote-item').getByTestId('file-asset')).toBeVisible();
   });
+
+  test('I want to reply to a reply', {tag: ['@TC-3007', '@regression']}, async ({browser, userA, userB}) => {
+    const pages = await createPagesForUser(browser, userA, {openConversationWith: userB});
+    await pages.conversation().sendMessage('Message');
+
+    const message = pages.conversation().getMessage({content: 'Message'});
+    await pages.conversation().replyToMessage(message);
+    await pages.conversation().sendMessage('Reply 1');
+
+    const reply1 = pages.conversation().getMessage({content: 'Reply 1'});
+    await pages.conversation().replyToMessage(reply1);
+    await pages.conversation().sendMessage('Reply 2');
+
+    const reply = pages.conversation().getMessage({content: 'Reply 2'});
+    await expect(reply.getByTestId('quote-item')).toContainText('Reply 1');
+  });
 });
