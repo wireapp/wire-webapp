@@ -139,4 +139,24 @@ test.describe('Reply', () => {
       await expect(pages.collection().searchItems).not.toContainText('Reply');
     },
   );
+
+  test(
+    'I want to see truncated quote preview if quote is too long',
+    {tag: ['@TC-2997', '@regression']},
+    async ({browser, userA, userB}) => {
+      const longMessage =
+        'This is a very long message which should be truncated within the UI since it is as already stated very long.';
+
+      const pages = await createPagesForUser(browser, userA, {openConversationWith: userB});
+      await pages.conversation().sendMessage(longMessage);
+
+      const messageToReplyTo = pages.conversation().getMessage({content: longMessage});
+      await pages.conversation().replyToMessage(messageToReplyTo);
+      await pages.conversation().sendMessage('Reply');
+
+      // Since the text is truncated using CSS the only reliable way for testing it is truncated is to assert the existence of the show more button
+      const quoteInReply = pages.conversation().getMessage({content: 'Reply'}).getByTestId('quote-item');
+      await expect(quoteInReply.getByRole('button', {name: 'Show more'})).toBeVisible();
+    },
+  );
 });
