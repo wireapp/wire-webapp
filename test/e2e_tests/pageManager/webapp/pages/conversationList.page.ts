@@ -106,7 +106,7 @@ export class ConversationListPage {
 
   private getConversationLocator(conversationName: string) {
     return this.page.locator(
-      `${selectByDataAttribute('item-conversation')}[data-uie-value='${escapeHtml(conversationName)}']`,
+      `${selectByDataAttribute('item-conversation')}${selectByDataAttribute(escapeHtml(conversationName), 'value')}`,
     );
   }
 

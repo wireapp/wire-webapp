@@ -70,7 +70,7 @@ export class ConversationDetailsPage {
 
   async isUserPartOfConversationAsAdmin(fullName: string) {
     const userLocator = this.page.locator(
-      `${selectById('conversation-details')} ${selectByDataAttribute('list-admins')} ${selectByDataAttribute('item-user')}[data-uie-value="${fullName}"]`,
+      `${selectById('conversation-details')} ${selectByDataAttribute('list-admins')} ${selectByDataAttribute('item-user')}${selectByDataAttribute(fullName, 'value')}`,
     );
     await userLocator.waitFor({state: 'visible'});
     return userLocator.isVisible();
@@ -78,7 +78,7 @@ export class ConversationDetailsPage {
 
   async isUserPartOfConversationAsMember(fullName: string) {
     const userLocator = this.page.locator(
-      `${selectById('conversation-details')} ${selectByDataAttribute('list-members')} ${selectByDataAttribute('item-user')}[data-uie-value="${fullName}"]`,
+      `${selectById('conversation-details')} ${selectByDataAttribute('list-members')} ${selectByDataAttribute('item-user')}${selectByDataAttribute(fullName, 'value')}`,
     );
     await userLocator.waitFor({state: 'visible'});
     return userLocator.isVisible();
@@ -91,7 +91,7 @@ export class ConversationDetailsPage {
 
   async getLocatorByUser(fullName: string) {
     const userLocator = this.page.locator(
-      `${selectById('conversation-details')} ${selectByDataAttribute('list-members')} ${selectByDataAttribute('item-user')}[data-uie-value="${fullName}"]`,
+      `${selectById('conversation-details')} ${selectByDataAttribute('list-members')} ${selectByDataAttribute('item-user')}${selectByDataAttribute(fullName, 'value')}`,
     );
     await userLocator.waitFor({state: 'visible'});
     return userLocator;
@@ -99,5 +99,51 @@ export class ConversationDetailsPage {
 
   async clickArchiveButton() {
     await this.archiveButton.click();
+  }
+
+  async addServiceToConversation(serviceName: string) {
+    // Click on the Services/Apps tab
+    const servicesTab = this.page.locator(
+      `${selectById('add-participants')} ${selectByDataAttribute('do-add-services')}`,
+    );
+    await servicesTab.click();
+    await this.page.waitForTimeout(500); // Wait for services tab to load
+
+    // Search for the service
+    const searchInput = this.page.locator(`${selectById('add-participants')} input[type="text"]`);
+    await searchInput.fill(serviceName);
+    await this.page.waitForTimeout(500); // Wait for search results
+
+    // Click on the service in search results - services have item-service test id
+    const serviceLocator = this.page.getByTestId('item-service').first();
+    await serviceLocator.click();
+    await this.page.waitForTimeout(500); // Wait for service details to load
+
+    // Click the "Add Service" button
+    const addServiceButton = this.page.getByTestId('do-add-service');
+    await addServiceButton.click();
+  }
+
+  async removeServiceFromConversation(serviceName: string) {
+    // Services appear in the members list with item-service test id
+    const serviceLocator = this.page
+      .locator(`${selectById('conversation-details')}`)
+      .getByTestId('item-service')
+      .filter({hasText: serviceName});
+    await serviceLocator.click();
+    await this.page.waitForTimeout(500); // Wait for service details to load
+
+    // Click the "Remove Service" button
+    const removeServiceButton = this.page.getByTestId('do-remove');
+    await removeServiceButton.click();
+  }
+
+  async isServicePartOfConversation(serviceName: string) {
+    const serviceLocator = this.page
+      .locator(`${selectById('conversation-details')}`)
+      .getByTestId('item-service')
+      .filter({hasText: serviceName});
+    await serviceLocator.waitFor({state: 'visible'});
+    return serviceLocator.isVisible();
   }
 }
