@@ -241,4 +241,21 @@ test.describe('Reply', () => {
     const reply = pages.conversation().getMessage({content: 'Reply 2'});
     await expect(reply.getByTestId('quote-item')).toContainText('Reply 1');
   });
+
+  test(
+    'I want to reply to a link mixed with text',
+    {tag: ['@TC-3008', '@regression']},
+    async ({browser, userA, userB}) => {
+      const pages = await createPagesForUser(browser, userA, {openConversationWith: userB});
+      await pages.conversation().sendMessage('Link: https://www.lidl.de/');
+
+      const messageWithLink = pages.conversation().getMessage({sender: userA});
+      await pages.conversation().replyToMessage(messageWithLink);
+      await pages.conversation().sendMessage('Reply');
+
+      const reply = pages.conversation().getMessage({content: 'Reply'});
+      await expect(reply.getByTestId('quote-item')).toContainText('Link: https://www.lidl.de');
+      await expect(reply.getByTestId('quote-item').getByTestId('markdown-link')).toBeVisible();
+    },
+  );
 });
