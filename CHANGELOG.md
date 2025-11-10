@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [27.89.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@27.88.0...@wireapp/api-client@27.89.0) (2025-11-10)
+
+### Features
+
+* add include_channels attribute in getUserGroup call [WPB-16719] ([#7567](https://github.com/wireapp/wire-web-packages/issues/7567)) ([3bca0bd](https://github.com/wireapp/wire-web-packages/commit/3bca0bd2ea1287cf17700f6705c09ec423f62155))
+
 # [27.88.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@27.87.1...@wireapp/api-client@27.88.0) (2025-11-07)
 
 ### Features
