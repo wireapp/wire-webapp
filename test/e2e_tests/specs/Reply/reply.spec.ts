@@ -200,4 +200,16 @@ test.describe('Reply', () => {
     const reply = pages.conversation().getMessage({content: 'Reply'});
     await expect(reply.getByTestId('quote-item').getByTestId('video-asset')).toBeVisible();
   });
+
+  test('I want to reply to a link', {tag: ['@TC-3005', '@regression']}, async ({browser, userA, userB}) => {
+    const pages = await createPagesForUser(browser, userA, {openConversationWith: userB});
+    await pages.conversation().sendMessage('https://www.lidl.de/');
+
+    const messageWithLink = pages.conversation().getMessage({sender: userA});
+    await pages.conversation().replyToMessage(messageWithLink);
+    await pages.conversation().sendMessage('Reply');
+
+    const reply = pages.conversation().getMessage({content: 'Reply'});
+    await expect(reply.getByTestId('quote-item').getByTestId('markdown-link')).toBeVisible();
+  });
 });
