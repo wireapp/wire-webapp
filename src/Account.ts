@@ -47,6 +47,7 @@ import logdown from 'logdown';
 
 import {APIClient, BackendFeatures} from '@wireapp/api-client';
 import {LogFactory, TypedEventEmitter} from '@wireapp/commons';
+import type {CoreCryptoLogLevel} from '@wireapp/core-crypto';
 import {PromiseQueue} from '@wireapp/promise-queue';
 import {CRUDEngine, MemoryEngine} from '@wireapp/store-engine';
 
@@ -169,6 +170,8 @@ export class Account extends TypedEventEmitter<Events> {
     name: 'notification-processing-queue',
     paused: true,
   });
+
+  public setMaxCoreCryptoLogLevel: (level: CoreCryptoLogLevel) => void = () => undefined;
 
   public service?: {
     mls?: MLSService;
@@ -453,6 +456,7 @@ export class Account extends TypedEventEmitter<Events> {
         },
         this.options.coreCryptoConfig,
       );
+      this.setMaxCoreCryptoLogLevel = client.setMaxLogLevel;
       return [CryptoClientType.CORE_CRYPTO, client] as const;
     }
 
