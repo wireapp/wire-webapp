@@ -19,6 +19,8 @@
 
 import {Locator, Page} from '@playwright/test';
 
+import {selectByDataAttribute} from 'test/e2e_tests/utils/selector.util';
+
 export class TeamSignUpPage {
   readonly page: Page;
 
@@ -173,22 +175,32 @@ export class TeamSignUpPage {
   }
 
   private getCompanySizeOption(size: string): Locator {
-    return this.page.locator(`[data-uie-name="option-select-company-size"][data-uie-value="${size}"]`);
+    return this.page.locator(
+      `${selectByDataAttribute('option-select-company-size')}${selectByDataAttribute(size, 'value')}`,
+    );
   }
 
   private getReasonOption(reason: string): Locator {
-    return this.page.locator(`[data-uie-name="option-select-reason"][data-uie-value="${reason}"]`);
+    return this.page.locator(
+      `${selectByDataAttribute('option-select-reason')}${selectByDataAttribute(reason, 'value')}`,
+    );
   }
 
   private getIndustryOption(industry: string): Locator {
-    return this.page.locator(`[data-uie-name="option-select-company-industry"][data-uie-value="${industry}"]`);
+    return this.page.locator(
+      `${selectByDataAttribute('option-select-company-industry')}${selectByDataAttribute(industry, 'value')}`,
+    );
   }
 
   private getFocusOption(focus: string): Locator {
-    return this.page.locator(`[data-uie-name="option-select-company-focus"][data-uie-value="${focus}"]`);
+    return this.page.locator(
+      `${selectByDataAttribute('option-select-company-focus')}${selectByDataAttribute(focus, 'value')}`,
+    );
   }
 
   private getRoleOption(role: string): Locator {
-    return this.page.locator(`[data-uie-name="option-select-company-role"][data-uie-value="${role}"]`);
+    return this.page.locator(
+      `${selectByDataAttribute('option-select-company-role')}${selectByDataAttribute(role, 'value')}`,
+    );
   }
 }
