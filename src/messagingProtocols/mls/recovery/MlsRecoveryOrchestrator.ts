@@ -182,6 +182,7 @@ export class MlsRecoveryOrchestratorImpl implements MlsRecoveryOrchestrator {
   public async execute<T>(params: executeParams<T>): Promise<T>;
   public async execute<T>({context, callBack, retry = true}: executeParams<T>): Promise<T | void> {
     try {
+      this.logger.info('Executing MLS operation with recovery orchestration', {context});
       return await callBack();
     } catch (rawError) {
       this.logger.info('Operation failed, invoking MLS recovery orchestrator', {rawError});
