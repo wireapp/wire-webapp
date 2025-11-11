@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [46.46.1](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@46.46.0...@wireapp/core@46.46.1) (2025-11-11)
+
+### Bug Fixes
+
+* Recover from MlsErrorWrongEpoch when decrypting messages [WPB-21618] ([#7541](https://github.com/wireapp/wire-web-packages/issues/7541)) ([d9816f7](https://github.com/wireapp/wire-web-packages/commit/d9816f78fb6943dcf9eb7e87cb75be0c21ea50e2))
+
 # [46.46.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@46.45.3...@wireapp/core@46.46.0) (2025-11-10)
 
 ### Features
