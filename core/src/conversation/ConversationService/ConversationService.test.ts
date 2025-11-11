@@ -433,7 +433,7 @@ describe('ConversationService', () => {
       jest.spyOn(apiClient.api.conversation, 'postMlsMessage').mockRejectedValueOnce(outOfSyncError);
 
       const addUsersSpy = jest
-        .spyOn(conversationService, 'addUsersToMLSConversation')
+        .spyOn(conversationService as any, 'performAddUsersToMLSConversationAPI')
         .mockResolvedValueOnce({conversation: {members: {others: []}}} as any);
 
       await conversationService.send({
@@ -751,28 +751,62 @@ describe('ConversationService', () => {
     });
 
     it('joins a MLS conversation if it was sent an orphan welcome message', async () => {
-      const [conversationService, {apiClient, mlsService}] = await buildConversationService();
+      const [conversationService, {mlsService}] = await buildConversationService();
       const conversationId = {id: 'conversationId', domain: 'staging.zinfra.io'};
 
       const mockMLSWelcomeMessageEvent = createMLSWelcomeMessageEventMock(conversationId);
 
       const orphanWelcomeMessageError = new Error();
-      orphanWelcomeMessageError.name = MlsErrorType.OrphanWelcome;
+      // Simulate core-crypto orphan welcome classification for mapper
+      orphanWelcomeMessageError.name = MlsErrorType.OrphanWelcome as unknown as string;
       (orphanWelcomeMessageError as any).context = {type: MlsErrorType.OrphanWelcome};
       (orphanWelcomeMessageError as any).type = ErrorType.Mls;
 
       jest.spyOn(mlsService, 'handleMLSWelcomeMessageEvent').mockRejectedValueOnce(orphanWelcomeMessageError);
 
-      jest.spyOn(apiClient.api.conversation, 'getConversation').mockResolvedValueOnce({
-        qualified_id: conversationId,
-        protocol: CONVERSATION_PROTOCOL.MLS,
-      } as unknown as Conversation);
+      // Ensure welcome processing is attempted (succeeds after recovery join)
+      jest.spyOn(mlsService, 'handleMLSWelcomeMessageEvent').mockResolvedValueOnce(undefined as any);
 
       await conversationService.handleEvent(mockMLSWelcomeMessageEvent);
 
       await new Promise(resolve => setImmediate(resolve));
 
-      expect(conversationService.joinByExternalCommit).toHaveBeenCalledWith(conversationId);
+      // Orchestrator triggers a low-level join (performJoinByExternalCommitAPI -> mlsService.joinByExternalCommit)
+      expect(mlsService.joinByExternalCommit).toHaveBeenCalled();
+    });
+
+    it('wipes local MLS state and retries when welcome fails with ConversationAlreadyExists', async () => {
+      const [conversationService, {mlsService}] = await buildConversationService();
+      const conversationId = {id: 'conversationId', domain: 'staging.zinfra.io'};
+      const mockMLSWelcomeMessageEvent = createMLSWelcomeMessageEventMock(conversationId);
+
+      // Create a base64 group id and its byte-array form to simulate core-crypto error context
+      const expectedGroupId = 'AXNhbXBsZQ=='; // base64 for '\u0001sample'
+      const conversationIdArray = Array.from(Buffer.from(expectedGroupId, 'base64'));
+
+      const existsError: any = {};
+      // Simulate core-crypto "conversation already exists" classification for the mapper
+      existsError.type = ErrorType.Mls;
+      existsError.context = {
+        type: MlsErrorType.ConversationAlreadyExists,
+        context: {conversationId: conversationIdArray},
+      };
+
+      const welcomeSpy = jest
+        .spyOn(mlsService, 'handleMLSWelcomeMessageEvent')
+        .mockRejectedValueOnce(existsError)
+        .mockResolvedValueOnce(undefined as any);
+
+      const wipeSpy = jest.spyOn(conversationService, 'wipeMLSConversation').mockResolvedValueOnce();
+
+      await conversationService.handleEvent(mockMLSWelcomeMessageEvent);
+
+      await new Promise(resolve => setImmediate(resolve));
+
+      // Expect a single wipe with the extracted group id, and a single retry of welcome handling
+      expect(wipeSpy).toHaveBeenCalledTimes(1);
+      expect(wipeSpy).toHaveBeenCalledWith(expectedGroupId);
+      expect(welcomeSpy).toHaveBeenCalledTimes(2);
     });
   });
 
@@ -1099,7 +1133,7 @@ describe('ConversationService', () => {
       });
 
       const addUsersSpy = jest
-        .spyOn(conversationService, 'addUsersToMLSConversation')
+        .spyOn(conversationService as any, 'performAddUsersToMLSConversationAPI')
         .mockResolvedValue({conversation: {}} as any);
       const resetSpy = jest
         .spyOn(conversationService as any, 'handleBrokenMLSConversation')

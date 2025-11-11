@@ -518,7 +518,7 @@ export class MLSService extends TypedEventEmitter<Events> {
           isActive: false,
         };
       }
-      return undefined;
+      throw error;
     }
   }
 
