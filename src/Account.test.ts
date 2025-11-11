@@ -42,6 +42,20 @@ import {APIClient} from '@wireapp/api-client';
 import {AccentColor, ValidationUtil} from '@wireapp/commons';
 import {GenericMessage, Text} from '@wireapp/protocol-messaging';
 
+// Mock ConversationService to avoid requiring MLSService in constructor during tests
+jest.mock('./conversation', () => {
+  const actual = jest.requireActual('./conversation');
+  class FakeConversationService {
+    constructor(..._args: any[]) {}
+    // Return unhandled so NotificationService falls back to generic handling in tests
+    handleEvent = jest.fn(async () => ({status: 'unhandled' as const}));
+  }
+  return {
+    ...actual,
+    ConversationService: FakeConversationService,
+  };
+});
+
 import {Account, ConnectionState} from './Account';
 import {NotificationSource} from './notification';
 

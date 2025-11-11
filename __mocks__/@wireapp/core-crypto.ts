@@ -127,17 +127,20 @@ export enum MlsErrorType {
   Other = 'Other',
 }
 
-type CcError<T extends ErrorType> = Error & {type: T; context?: {type: string}};
+type CoreCryptoError<T extends ErrorType> = Error & {
+  type: T;
+  context?: {type: string; context: {conversationId?: Uint8Array}};
+};
 
-export const isCcError = <E extends ErrorType>(error: unknown, errorType: E): error is CcError<E> => {
+export const isCoreCryptoError = <E extends ErrorType>(error: unknown, errorType: E): error is CoreCryptoError<E> => {
   return typeof error === 'object' && error !== null && (error as any).type === errorType;
 };
 
 export const isProteusError = <E extends ProteusErrorType>(
   error: unknown,
   errorType: E,
-): error is CcError<ErrorType.Proteus> & {context: {type: E}} => {
-  return isCcError(error, ErrorType.Proteus) && (error as any).context?.type === errorType;
+): error is CoreCryptoError<ErrorType.Proteus> & {context: {type: E}} => {
+  return isCoreCryptoError(error, ErrorType.Proteus) && (error as any).context?.type === errorType;
 };
 
 export const isProteusSessionNotFoundError = (error: unknown) =>
@@ -148,7 +151,13 @@ export const isProteusRemoteIdentityChangedError = (error: unknown) =>
   isProteusError(error, ProteusErrorType.RemoteIdentityChanged);
 
 export const isMlsOrphanWelcomeError = (error: unknown) =>
-  isCcError(error, ErrorType.Mls) && (error as any).context?.type === MlsErrorType.OrphanWelcome;
+  isCoreCryptoError(error, ErrorType.Mls) && (error as any).context?.type === MlsErrorType.OrphanWelcome;
+
+// Added to support tests that rely on the core-crypto guard for ConversationAlreadyExists classification
+export const isMlsConversationAlreadyExistsError = (error: unknown) =>
+  isCoreCryptoError(error, ErrorType.Mls) &&
+  error.context?.type === MlsErrorType.ConversationAlreadyExists &&
+  Array.isArray(error.context?.context?.conversationId);
 
 export const isMlsMessageRejectedError = (error: unknown) =>
-  isCcError(error, ErrorType.Mls) && (error as any).context?.type === MlsErrorType.MessageRejected;
+  isCoreCryptoError(error, ErrorType.Mls) && error.context?.type === MlsErrorType.MessageRejected;

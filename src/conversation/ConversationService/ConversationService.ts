@@ -28,8 +28,6 @@ import {
   SUBCONVERSATION_ID,
   Subconversation,
   isMLS1to1Conversation,
-  MLSStaleMessageError,
-  MLSGroupOutOfSyncError,
 } from '@wireapp/api-client/lib/conversation';
 import {CONVERSATION_TYPING, ConversationMemberUpdateData} from '@wireapp/api-client/lib/conversation/data';
 import {
@@ -43,19 +41,11 @@ import {
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {XOR} from '@wireapp/commons/lib/util/TypeUtil';
-import {Decoder, Encoder} from 'bazinga64';
+import {Decoder} from 'bazinga64';
 
 import {APIClient} from '@wireapp/api-client';
 import {LogFactory, TypedEventEmitter} from '@wireapp/commons';
-import {
-  ConversationId,
-  CoreCryptoError,
-  ErrorContext,
-  ErrorType,
-  isMlsConversationAlreadyExistsError,
-  isMlsOrphanWelcomeError,
-  MlsErrorType,
-} from '@wireapp/core-crypto';
+import {ConversationId} from '@wireapp/core-crypto';
 import {GenericMessage} from '@wireapp/protocol-messaging';
 
 import {
@@ -68,14 +58,13 @@ import {
 
 import {MessageTimer, MessageSendingState, RemoveUsersParams} from '../../conversation/';
 import {MLSService, MLSServiceEvents} from '../../messagingProtocols/mls';
-import {queueConversationRejoin} from '../../messagingProtocols/mls/conversationRejoinQueue';
 import {
-  getMLSGroupOutOfSyncErrorMissingUsers,
-  isBrokenMLSConversationError,
-  isCoreCryptoMLSWrongEpochError,
-  isMLSGroupOutOfSyncError,
-  isMLSStaleMessageError,
-} from '../../messagingProtocols/mls/MLSService/CoreCryptoMLSError';
+  MlsRecoveryOrchestrator,
+  MlsRecoveryOrchestratorImpl,
+  OperationName,
+  createDefaultMlsErrorMapper,
+  minimalDefaultPolicies,
+} from '../../messagingProtocols/mls/recovery';
 import {getConversationQualifiedMembers, ProteusService} from '../../messagingProtocols/proteus';
 import {
   AddUsersToProteusConversationParams,
@@ -97,8 +86,8 @@ export class ConversationService extends TypedEventEmitter<Events> {
   public readonly messageTimer: MessageTimer;
   private readonly logger = LogFactory.getLogger('@wireapp/core/ConversationService');
   // Track groups currently undergoing recovery due to key material update failure to prevent duplicate work
-  private readonly recoveringKeyMaterialGroups: Set<string> = new Set();
   private groupIdConversationMap: Map<string, Conversation> = new Map();
+  private MLSRecoveryOrchestrator: MlsRecoveryOrchestrator;
 
   constructor(
     private readonly apiClient: APIClient,
@@ -115,15 +104,31 @@ export class ConversationService extends TypedEventEmitter<Events> {
     super();
     this.messageTimer = new MessageTimer();
 
-    if (this._mlsService) {
-      this.mlsService.on(MLSServiceEvents.MLS_EVENT_DISTRIBUTED, data => {
-        this.emit(MLSServiceEvents.MLS_EVENT_DISTRIBUTED, data);
-      });
-      this.mlsService.on(MLSServiceEvents.KEY_MATERIAL_UPDATE_FAILURE, ({error, groupId}) => {
-        this.logger.warn(`Key material update failure for group ${groupId}`, {error});
-        return this.reactToKeyMaterialUpdateFailure({error, groupId});
-      });
+    // Make MLS recovery orchestrator mandatory in this service
+    if (!this._mlsService) {
+      throw new Error('MLSService is required to construct ConversationService with MLS capabilities');
     }
+
+    this.mlsService.on(MLSServiceEvents.MLS_EVENT_DISTRIBUTED, data => {
+      this.emit(MLSServiceEvents.MLS_EVENT_DISTRIBUTED, data);
+    });
+    this.mlsService.on(MLSServiceEvents.KEY_MATERIAL_UPDATE_FAILURE, ({error, groupId}) => {
+      this.logger.warn(`Key material update failure for group ${groupId}`, {error});
+      return this.reactToKeyMaterialUpdateFailure({error, groupId});
+    });
+
+    // Initialize MLS recovery orchestrator with default policies and single-flight de-duplication
+    const mapper = createDefaultMlsErrorMapper();
+    this.MLSRecoveryOrchestrator = new MlsRecoveryOrchestratorImpl(mapper, minimalDefaultPolicies, {
+      // Call the low-level API to avoid nested recovery when orchestrator triggers an external commit join
+      joinViaExternalCommit: (conversationId: QualifiedId) => this.performJoinByExternalCommitAPI(conversationId),
+      resetAndReestablish: (conversationId: QualifiedId) => this.handleBrokenMLSConversation(conversationId),
+      recoverFromEpochMismatch: (conversationId: QualifiedId, subconvId?: SUBCONVERSATION_ID) =>
+        this.recoverMLSGroupFromEpochMismatch(conversationId, subconvId),
+      addMissingUsers: (conversationId: QualifiedId, groupId: string, users: QualifiedId[]) =>
+        this.performAddUsersToMLSConversationAPI({conversationId, groupId, qualifiedUsers: users}),
+      wipeMLSConversation: (groupId: string) => this.wipeMLSConversation(groupId),
+    });
   }
 
   get mlsService(): MLSService {
@@ -333,15 +338,7 @@ export class ConversationService extends TypedEventEmitter<Events> {
    * - output: the value returned by the callback
    * - error: throws if reset fails or new group id is missing
    */
-  private async handleBrokenMLSConversation<T>(
-    conversationId: QualifiedId,
-    afterReset: (newGroupId: string) => Promise<T>,
-  ): Promise<T>;
-  private async handleBrokenMLSConversation(conversationId: QualifiedId): Promise<undefined>;
-  private async handleBrokenMLSConversation<T>(
-    conversationId: QualifiedId,
-    afterReset?: (newGroupId: string) => Promise<T>,
-  ): Promise<T | undefined> {
+  private async handleBrokenMLSConversation(conversationId: QualifiedId): Promise<void> {
     if (!(await this.isMLSConversationRecoveryEnabled())) {
       throw new Error('MLS conversation recovery is disabled');
     }
@@ -353,11 +350,6 @@ export class ConversationService extends TypedEventEmitter<Events> {
       this.logger.error(errorMessage, {conversationId});
       throw new Error(errorMessage);
     }
-    if (afterReset) {
-      return afterReset(newGroupId);
-    }
-
-    return undefined;
   }
 
   /**
@@ -387,306 +379,159 @@ export class ConversationService extends TypedEventEmitter<Events> {
     };
   }
 
-  private async sendMLSMessage(params: SendMlsMessageParams, shouldRetry = true): Promise<SendResult> {
-    const {payload, groupId, conversationId} = params;
+  /**
+   * Send an MLS message wrapped with recovery.
+   *
+   * Uses the MLS recovery orchestrator to handle transient MLS errors (for example, wrong epoch)
+   * according to per-operation policies. When configured, the original send is retried once
+   * after a successful recovery. Unrecoverable errors are re-thrown by the orchestrator.
+   * The low-level send logic lives in {@link performSendMLSMessageAPI}.
+   */
+  private async sendMLSMessage(params: SendMlsMessageParams): Promise<SendResult> {
+    const {groupId, conversationId} = params;
+
+    return this.MLSRecoveryOrchestrator.execute({
+      context: {operationName: OperationName.send, qualifiedConversationId: conversationId, groupId},
+      callBack: () => this.performSendMLSMessageAPI(params),
+    });
+  }
+
+  // Low-level API for sending an MLS message without any recovery logic
+  private async performSendMLSMessageAPI(params: SendMlsMessageParams): Promise<SendResult> {
+    const {payload, groupId} = params;
     const groupIdBytes = Decoder.fromBase64(groupId).asBytes;
 
-    try {
-      // immediately execute pending commits before sending the message
-      await this.mlsService.commitPendingProposals(groupId, true, params);
+    // immediately execute pending commits before sending the message
+    await this.mlsService.commitPendingProposals(groupId, true, params);
 
-      const encrypted = await this.mlsService.encryptMessage(
-        new ConversationId(groupIdBytes),
-        GenericMessage.encode(payload).finish(),
-      );
+    const encrypted = await this.mlsService.encryptMessage(
+      new ConversationId(groupIdBytes),
+      GenericMessage.encode(payload).finish(),
+    );
 
-      const response = await this.apiClient.api.conversation.postMlsMessage(encrypted);
-      const sentAt = response.time?.length > 0 ? response.time : new Date().toISOString();
+    const response = await this.apiClient.api.conversation.postMlsMessage(encrypted);
+    const sentAt = response.time?.length > 0 ? response.time : new Date().toISOString();
 
-      const failedToSend =
-        response?.failed || (response?.failed_to_send ?? []).length > 0
-          ? {
-              queued: response?.failed_to_send,
-              failed: response?.failed,
-            }
-          : undefined;
+    const failedToSend =
+      response?.failed || (response?.failed_to_send ?? []).length > 0
+        ? {
+            queued: response?.failed_to_send,
+            failed: response?.failed,
+          }
+        : undefined;
 
-      return {
-        id: payload.messageId,
-        sentAt,
-        failedToSend,
-        state: sentAt ? MessageSendingState.OUTGOING_SENT : MessageSendingState.CANCELED,
-      };
-    } catch (error) {
-      this.logger.warn('Failed to send MLS message', {error, groupId});
-
-      if (!shouldRetry) {
-        this.logger.error("Tried to send MLS message but it's still failing after recovery", {
-          error,
-          groupId,
-        });
-        throw error;
-      }
-
-      /**
-       * Only thrown by core-crypto when we call commitPendingProposals
-       */
-      if (isBrokenMLSConversationError(error)) {
-        this.logger.info('Failed to send MLS message because broken MLS conversation, triggering a reset', {
-          error,
-          groupId,
-        });
-
-        await this.handleBrokenMLSConversation(conversationId);
-      }
-
-      /**
-       * We may have the same error from core-crypto or from the backend error mapper
-       * core-crypto throws its own error class when we call commitPendingProposals
-       * backend error mapper throws its own error class when we call postMlsMessage
-       */
-      if (isMLSStaleMessageError(error) || error instanceof MLSStaleMessageError) {
-        this.logger.info(
-          'Failed to send MLS message because of stale message, recovering by joining with external commit',
-          {
-            error,
-            groupId,
-          },
-        );
-
-        await this.recoverMLSGroupFromEpochMismatch(conversationId);
-      }
-
-      /**
-       * We may have the same error from core-crypto or from the backend error mapper
-       * core-crypto throws its own error class when we call commitPendingProposals
-       * backend error mapper throws its own error class when we call postMlsMessage
-       */
-      if (isMLSGroupOutOfSyncError(error) || error instanceof MLSGroupOutOfSyncError) {
-        this.logger.info(
-          'Failed to send MLS message because of group out of sync, recovering by adding missing users',
-          {
-            error,
-            groupId,
-          },
-        );
-
-        /**
-         * We may get the missing users either from core-crypto error or from the backend error mapper
-         */
-        let missingUsers: QualifiedId[] = [];
-        if (isMLSGroupOutOfSyncError(error)) {
-          missingUsers = getMLSGroupOutOfSyncErrorMissingUsers(error);
-        } else {
-          missingUsers = error.missing_users;
-        }
-
-        await this.addUsersToMLSConversation({
-          groupId,
-          conversationId,
-          qualifiedUsers: missingUsers,
-        });
-      }
-
-      return this.sendMLSMessage(params, false);
-    }
+    return {
+      id: payload.messageId,
+      sentAt,
+      failedToSend,
+      state: sentAt ? MessageSendingState.OUTGOING_SENT : MessageSendingState.CANCELED,
+    };
   }
 
   /**
-   * Will add users to existing MLS group by claiming their key packages and passing them to CoreCrypto.addClientsToConversation
+   * Add users to an existing MLS group with recovery.
    *
-   * @param qualifiedUsers List of qualified user ids (with optional skipOwnClientId field - if provided we will not claim key package for this self client)
-   * @param groupId Id of the group to which we want to add users
-   * @param conversationId Id of the conversation to which we want to add users
+   * Claims key packages and passes them to CoreCrypto.addClientsToConversation. The MLS recovery
+   * orchestrator handles recoverable failures (e.g., wrong epoch) and may retry the operation once
+   * depending on policy. The optional shouldRetry flag is ignored; retries are governed by policies.
+   *
+   * @param qualifiedUsers List of qualified user ids (use skipOwnClientId on self to avoid claiming its key package)
+   * @param groupId Id of the MLS group to add users to
+   * @param conversationId Qualified id of the conversation
    */
   public async addUsersToMLSConversation({
     qualifiedUsers,
     groupId,
     conversationId,
-    shouldRetry = true,
   }: Required<AddUsersParams> & {shouldRetry?: boolean}): Promise<BaseCreateConversationResponse> {
-    try {
-      this.logger.info(`Adding users to MLS conversation`, {groupId, conversationId, qualifiedUsers});
-      const exisitingClientIdsInGroup = await this.mlsService.getClientIdsInGroup(groupId);
-      const conversation = await this.getConversation(conversationId);
-
-      const {keyPackages, failures: keysClaimingFailures} = await this.mlsService.getKeyPackagesPayload(
-        qualifiedUsers,
-        exisitingClientIdsInGroup,
-      );
-
-      // We had cases where did not get any key packages, but still used core-crypto to call the backend (which results in failure).
-      if (keyPackages && keyPackages.length > 0) {
-        await this.mlsService.addUsersToExistingConversation(groupId, keyPackages);
-
-        //We store the info when user was added (and key material was created), so we will know when to renew it
-        await this.mlsService.resetKeyMaterialRenewal(groupId);
-      }
-
-      return {
-        conversation,
-        failedToAdd: keysClaimingFailures,
-      };
-    } catch (error) {
-      this.logger.warn('Failed to add users to MLS conversation', {error, groupId, conversationId});
-      if (!shouldRetry) {
-        this.logger.warn("Tried to add users to MLS conversation but it's still broken after reset", error);
-        throw error;
-      }
-
-      if (isBrokenMLSConversationError(error)) {
-        this.logger.warn("Tried to add users to MLS conversation but it's broken, resetting the conversation", error);
-        return this.handleBrokenMLSConversation(conversationId, newGroupId =>
-          this.addUsersToMLSConversation({qualifiedUsers, groupId: newGroupId, conversationId, shouldRetry: false}),
-        );
-      }
-
-      if (isMLSStaleMessageError(error)) {
-        this.logger.info(
-          'Failed to add users to MLS conversation because of stale message, recovering by joining with external commit',
-          {
-            error,
-            groupId,
-          },
-        );
-
-        await this.recoverMLSGroupFromEpochMismatch(conversationId);
-        return this.addUsersToMLSConversation({
-          groupId,
-          conversationId,
-          qualifiedUsers,
-          shouldRetry: false,
-        });
-      }
-
-      if (isMLSGroupOutOfSyncError(error)) {
-        this.logger.info(
-          'Failed to send MLS message because of group out of sync, recovering by adding missing users',
-          {
-            error,
-            groupId,
-          },
-        );
-
-        const missingUsers = getMLSGroupOutOfSyncErrorMissingUsers(error);
-
-        return this.addUsersToMLSConversation({
-          groupId,
-          conversationId,
-          qualifiedUsers: missingUsers,
-          shouldRetry: false,
-        });
-      }
-      throw error;
-    }
+    return this.MLSRecoveryOrchestrator.execute({
+      context: {operationName: OperationName.addUsers, qualifiedConversationId: conversationId, groupId},
+      callBack: () => this.performAddUsersToMLSConversationAPI({qualifiedUsers, groupId, conversationId}),
+    });
   }
 
+  // Low-level API to add users without any recovery logic; used by orchestrator and direct callers
+  private async performAddUsersToMLSConversationAPI({
+    qualifiedUsers,
+    groupId,
+    conversationId,
+  }: Required<AddUsersParams>): Promise<BaseCreateConversationResponse> {
+    this.logger.info(`Adding users to MLS conversation`, {groupId, conversationId, qualifiedUsers});
+    const exisitingClientIdsInGroup = await this.mlsService.getClientIdsInGroup(groupId);
+    const conversation = await this.getConversation(conversationId);
+
+    const {keyPackages, failures: keysClaimingFailures} = await this.mlsService.getKeyPackagesPayload(
+      qualifiedUsers,
+      exisitingClientIdsInGroup,
+    );
+
+    // We had cases where did not get any key packages, but still used core-crypto to call the backend (which results in failure).
+    if (keyPackages && keyPackages?.length > 0) {
+      await this.mlsService.addUsersToExistingConversation(groupId, keyPackages);
+
+      // We store the info when user was added (and key material was created), so we will know when to renew it
+      await this.mlsService.resetKeyMaterialRenewal(groupId);
+    }
+
+    return {
+      conversation,
+      failedToAdd: keysClaimingFailures,
+    };
+  }
+
+  /**
+   * Remove users from an existing MLS group with recovery.
+   *
+   * The MLS recovery orchestrator handles recoverable failures and may retry the operation once
+   * depending on policy. The optional shouldRetry flag is ignored; retries are policy-driven.
+   */
   public async removeUsersFromMLSConversation({
     groupId,
     conversationId,
     qualifiedUserIds,
-    shouldRetry = true,
   }: RemoveUsersParams & {shouldRetry?: boolean}): Promise<Conversation> {
-    try {
-      const clientsToRemove = await this.apiClient.api.user.postListClients({qualified_users: qualifiedUserIds});
-
-      const fullyQualifiedClientIds = mapQualifiedUserClientIdsToFullyQualifiedClientIds(
-        clientsToRemove.qualified_user_map,
-      );
-
-      await this.mlsService.removeClientsFromConversation(groupId, fullyQualifiedClientIds);
-
-      // key material gets updated after removing a user from the group, so we can reset last key update time value in the store
-      await this.mlsService.resetKeyMaterialRenewal(groupId);
-
-      return await this.getConversation(conversationId);
-    } catch (error) {
-      if (!shouldRetry) {
-        this.logger.warn("Tried to remove users from MLS conversation but it's still broken", error);
-        throw error;
-      }
-
-      if (isBrokenMLSConversationError(error)) {
-        this.logger.info(
-          "Tried to remove users from MLS conversation but it's broken, resetting the conversation",
-          error,
-        );
-        return this.handleBrokenMLSConversation(conversationId, newGroupId =>
-          this.removeUsersFromMLSConversation({
-            groupId: newGroupId,
-            conversationId,
-            qualifiedUserIds,
-            shouldRetry: false,
-          }),
-        );
-      }
-
-      if (isMLSStaleMessageError(error)) {
-        this.logger.info(
-          'Failed to remove users from MLS conversation because of stale message, recovering by joining with external commit',
-          {
-            error,
-            groupId,
-          },
-        );
-
-        await this.recoverMLSGroupFromEpochMismatch(conversationId);
-      }
-
-      if (isMLSGroupOutOfSyncError(error)) {
-        this.logger.info(
-          'Failed to send MLS message because of group out of sync, recovering by adding missing users',
-          {
-            error,
-            groupId,
-          },
-        );
-
-        const missingUsers = getMLSGroupOutOfSyncErrorMissingUsers(error);
-
-        await this.addUsersToMLSConversation({
-          groupId,
-          conversationId,
-          qualifiedUsers: missingUsers,
-        });
-      }
-
-      return this.removeUsersFromMLSConversation({
-        groupId,
-        conversationId,
-        qualifiedUserIds,
-        shouldRetry: false,
-      });
-    }
+    return this.MLSRecoveryOrchestrator.execute({
+      context: {operationName: OperationName.removeUsers, qualifiedConversationId: conversationId, groupId},
+      callBack: () => this.performRemoveUsersFromMLSConversationAPI({groupId, conversationId, qualifiedUserIds}),
+    });
   }
 
-  public async joinByExternalCommit(conversationId: QualifiedId, shouldRetry = true): Promise<void> {
-    try {
-      await this.mlsService.joinByExternalCommit(() => this.apiClient.api.conversation.getGroupInfo(conversationId));
-    } catch (error) {
-      if (!shouldRetry) {
-        this.logger.warn("Tried to join MLS conversation but it's still broken after reset", error);
-        throw error;
-      }
+  // Low-level API to remove users without recovery logic; used by orchestrator and direct callers
+  private async performRemoveUsersFromMLSConversationAPI({
+    groupId,
+    conversationId,
+    qualifiedUserIds,
+  }: RemoveUsersParams): Promise<Conversation> {
+    const clientsToRemove = await this.apiClient.api.user.postListClients({qualified_users: qualifiedUserIds});
 
-      this.logger.warn(`Failed to join MLS conversation ${conversationId.id} via external commit`, error);
+    const fullyQualifiedClientIds = mapQualifiedUserClientIdsToFullyQualifiedClientIds(
+      clientsToRemove.qualified_user_map,
+    );
 
-      if (isBrokenMLSConversationError(error)) {
-        this.logger.info('Resetting MLS conversation due to broken mls conversation error', error);
-        return this.handleBrokenMLSConversation(conversationId);
-      }
+    await this.mlsService.removeClientsFromConversation(groupId, fullyQualifiedClientIds);
 
-      if (isMLSStaleMessageError(error)) {
-        this.logger.info(
-          'Failed to join MLS conversation with external commit because of stale message, recovering by joining with external commit',
-          {error, conversationId},
-        );
+    // key material gets updated after removing a user from the group, so we can reset last key update time value in the store
+    await this.mlsService.resetKeyMaterialRenewal(groupId);
 
-        await this.recoverMLSGroupFromEpochMismatch(conversationId);
-        return;
-      }
-      throw error;
-    }
+    return await this.getConversation(conversationId);
+  }
+
+  /**
+   * Join an MLS conversation via external commit with recovery.
+   *
+   * If the group is not established or is out of date, the orchestrator recovers accordingly.
+   * The join operation itself is not automatically re-run by policy.
+   */
+  public async joinByExternalCommit(conversationId: QualifiedId): Promise<void> {
+    await this.MLSRecoveryOrchestrator.execute({
+      context: {operationName: OperationName.joinExternalCommit, qualifiedConversationId: conversationId},
+      callBack: () => this.performJoinByExternalCommitAPI(conversationId),
+    });
+  }
+
+  // Low-level API call for joining via external commit (no recovery logic)
+  private async performJoinByExternalCommitAPI(conversationId: QualifiedId): Promise<void> {
+    await this.mlsService.joinByExternalCommit(() => this.apiClient.api.conversation.getGroupInfo(conversationId));
   }
 
   private async refreshGroupIdConversationMap(): Promise<void> {
@@ -706,62 +551,37 @@ export class ConversationService extends TypedEventEmitter<Events> {
     return this.groupIdConversationMap.get(groupId);
   }
 
+  /**
+   * React to a key material update failure using the recovery orchestrator.
+   *
+   * The original error is forwarded to the orchestrator under the 'keyMaterialUpdate' operation
+   * so it can map and apply the configured recovery policy. Unrecoverable errors are logged.
+   */
   private reactToKeyMaterialUpdateFailure = async ({error, groupId}: {error: unknown; groupId: string}) => {
-    // Deduplicate concurrent recoveries for the same group
-    if (this.recoveringKeyMaterialGroups.has(groupId)) {
-      this.logger.info(`Recovery already in progress for group ${groupId}, skipping duplicate trigger`);
+    this.logger.info(`Reacting to key material update failure for group ${groupId}`);
+
+    const conversation = await this.getConversationByGroupId(groupId);
+
+    if (!conversation) {
+      this.logger.warn(`No conversation found for group ${groupId}`, {error});
       return;
     }
 
-    this.recoveringKeyMaterialGroups.add(groupId);
     try {
-      this.logger.info(`Reacting to key material update failure for group ${groupId}`);
-
-      const conversation = await this.getConversationByGroupId(groupId);
-
-      if (!conversation) {
-        this.logger.warn(`No conversation found for group ${groupId}`);
-        throw error;
-      }
-
-      if (isBrokenMLSConversationError(error)) {
-        this.logger.info('Tried to update key material for a broken MLS conversation, initiating reset', error);
-        return this.handleBrokenMLSConversation(conversation.qualified_id);
-      }
-
-      if (isMLSStaleMessageError(error)) {
-        this.logger.info(
-          'Tried to update key material for a stale MLS conversation, recovering by joining with external commit',
-          {
-            error,
-            groupId,
-          },
-        );
-
-        await this.recoverMLSGroupFromEpochMismatch(conversation.qualified_id);
-      }
-
-      if (isMLSGroupOutOfSyncError(error)) {
-        this.logger.info(
-          'Tried to update key material for an out of sync conversation, recovering by adding missing users',
-          {
-            error,
-            groupId,
-          },
-        );
-
-        const missingUsers = getMLSGroupOutOfSyncErrorMissingUsers(error);
-
-        await this.addUsersToMLSConversation({
+      await this.MLSRecoveryOrchestrator.execute({
+        context: {
+          operationName: OperationName.keyMaterialUpdate,
+          qualifiedConversationId: conversation.qualified_id,
           groupId,
-          conversationId: conversation.qualified_id,
-          qualifiedUsers: missingUsers,
-        });
-      }
-    } catch (error) {
-      this.logger.error('Failed to react to key material update failure', {error, groupId});
-    } finally {
-      this.recoveringKeyMaterialGroups.delete(groupId);
+        },
+        callBack: async () => {
+          // Surface the ORIGINAL error to the orchestrator for mapping & policy resolution
+          // Deliberately throwing the raw value so mapper can recognize core-crypto/API error shapes
+          throw error;
+        },
+      });
+    } catch (e) {
+      this.logger.error('Failed to react to key material update failure', {error: e, groupId});
     }
   };
 
@@ -1093,25 +913,37 @@ export class ConversationService extends TypedEventEmitter<Events> {
     }
   }
 
+  /**
+   * Handle an inbound MLS message-add event with recovery.
+   *
+   * Policies (see MlsRecoveryOrchestrator):
+   * - WrongEpoch.handleMessageAdd → recover from epoch mismatch and re-run once.
+   * - GroupOutOfSync.handleMessageAdd → not handled here; the error bubbles.
+   *
+   * Returns the decrypted payload when available. Unknown or unrecoverable errors are logged
+   * and result in null so event processing can continue safely.
+   */
   private async handleMLSMessageAddEvent(event: ConversationMLSMessageAddEvent): Promise<HandledEventPayload | null> {
     try {
-      return await this.mlsService.handleMLSMessageAddEvent(event, this.groupIdFromConversationId);
-    } catch (error) {
-      if (isCoreCryptoMLSWrongEpochError(error)) {
-        this.logger.warn(
-          `Received message for the wrong epoch in conversation ${event.conversation}, handling epoch mismatch...`,
-        );
-        const {qualified_conversation: conversationId, subconv} = event;
-        if (!conversationId) {
-          throw new Error('Qualified conversation id is missing in the event');
-        }
-
-        void queueConversationRejoin(conversationId.id, () =>
-          this.recoverMLSGroupFromEpochMismatch(conversationId, subconv),
-        );
-        return null;
+      const {qualified_conversation: qualifiedConversationId, subconv} = event;
+      if (!qualifiedConversationId) {
+        throw new Error('Qualified conversation id is missing in the MLS message-add event');
       }
-      throw error;
+      return await this.MLSRecoveryOrchestrator.execute<HandledEventPayload | null>({
+        context: {
+          operationName: OperationName.handleMessageAdd,
+          qualifiedConversationId,
+          subconvId: subconv,
+        },
+        callBack: async () => {
+          return this.mlsService.handleMLSMessageAddEvent(event, this.groupIdFromConversationId);
+        },
+      });
+    } catch (error) {
+      // For unmapped or unrecoverable errors, avoid surfacing exceptions from event handling
+      // and instead log and return null so the event processing queue can continue safely.
+      this.logger.error('Failed to handle MLS message-add event after recovery; returning null', {error, event});
+      return null;
     }
   }
 
@@ -1141,82 +973,25 @@ export class ConversationService extends TypedEventEmitter<Events> {
     );
   }
 
-  private async handleMLSWelcomeMessageEvent(
-    event: ConversationMLSWelcomeEvent,
-    retry = true,
-  ): Promise<HandledEventPayload | null> {
-    try {
-      this.logger.info('Handling MLS welcome message event', {event});
-      return await this.mlsService.handleMLSWelcomeMessageEvent(event, this.apiClient.validatedClientId);
-    } catch (error) {
-      if (!retry) {
-        this.logger.error('Failed to handle MLS welcome message event and unable to recover', {event, error});
-        throw error;
-      }
-
-      this.logger.warn('Failed to handle MLS welcome message event', {event, error});
-
-      if (isMlsOrphanWelcomeError(error)) {
-        return this.handleMlsOrphanWelcomeEvent(event);
-      }
-
-      if (isMlsConversationAlreadyExistsError(error)) {
-        return this.handleMlsConversationAlreadyExistsEvent(event, error);
-      }
-
-      throw error;
-    }
-  }
-
-  private handleMlsOrphanWelcomeEvent(event: ConversationMLSWelcomeEvent) {
-    this.logger.warn('Received an orphan welcome message, trying to join the conversation via external commit');
-    const {qualified_conversation: conversationId} = event;
-
-    // Note that we don't care about a subconversation here, as the welcome message is always for the parent conversation.
-    // Subconversations are always joined via external commit.
-
-    if (!conversationId) {
-      throw new Error('Qualified conversation id is missing in the event');
-    }
-
-    this.logger.warn(
-      `Received an orphan welcome message, joining the conversation (${conversationId.id}) via external commit...`,
-    );
-
-    void queueConversationRejoin(conversationId.id, () => this.joinByExternalCommit(conversationId));
-    return null;
-  }
-
   /**
-   * In case of an "MLS conversation already exists" error, we have to wipe the conversation from core-crypto
-   * and retry processing the welcome message.
+   * Handle an MLS welcome event with recovery.
+   *
+   * Policies (see MlsRecoveryOrchestrator):
+   * - OrphanWelcome → join via external commit (no auto re-run).
+   * - ConversationAlreadyExists → wipe local state and re-run welcome once.
+   *
+   * Always resolves to null; the effects are applied to local state.
    */
-  private async handleMlsConversationAlreadyExistsEvent(
-    event: ConversationMLSWelcomeEvent,
-    error: CoreCryptoError<ErrorType.Mls> & {
-      context: Extract<
-        ErrorContext[ErrorType.Mls],
-        {
-          type: MlsErrorType.ConversationAlreadyExists;
-        }
-      >;
-    },
-  ) {
-    try {
-      const conversationIdArray = error.context?.context?.conversationId;
-      const groupId = Encoder.toBase64(new Uint8Array(conversationIdArray)).asString;
-      this.logger.info(
-        'Conversation already exists error when processing welcome message, wiping the local conversation and retrying',
-        {
-          extractedGroupIdFromError: groupId,
-        },
-      );
-      await this.wipeMLSConversation(groupId);
-      return this.handleMLSWelcomeMessageEvent(event, false);
-    } catch (error) {
-      this.logger.error('Failed to handle MLS conversation already exists event', {event, error});
-      throw error;
-    }
+  private async handleMLSWelcomeMessageEvent(event: ConversationMLSWelcomeEvent): Promise<HandledEventPayload | null> {
+    this.logger.info('Handling MLS welcome message event (orchestrated)', {event});
+    await this.MLSRecoveryOrchestrator.execute({
+      context: {
+        operationName: OperationName.handleWelcome,
+        qualifiedConversationId: event.qualified_conversation,
+      },
+      callBack: () => this.mlsService.handleMLSWelcomeMessageEvent(event, this.apiClient.validatedClientId),
+    });
+    return null;
   }
 
   private async handleOtrMessageAddEvent(event: ConversationOtrMessageAddEvent) {

@@ -75,6 +75,15 @@ export const UPLOAD_COMMIT_BUNDLE_ABORT_REASONS = {
   OTHER: 'OTHER',
 };
 
+export type ConversationAlreadyExistsError = CoreCryptoError<ErrorType.Mls> & {
+  context: Extract<
+    ErrorContext[ErrorType.Mls],
+    {
+      type: MlsErrorType.ConversationAlreadyExists;
+    }
+  >;
+};
+
 type MessageRejectedError = CoreCryptoError<ErrorType.Mls> & {
   context: Extract<
     ErrorContext[ErrorType.Mls],
