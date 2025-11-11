@@ -331,4 +331,28 @@ test.describe('Reply', () => {
       await expect(message.getByTestId('do-reply-message')).not.toBeAttached();
     },
   );
+
+  test(
+    'I want to reply with mention and tap on the mention in the reply opens the user profile',
+    {tag: ['@TC-3016', '@regression']},
+    async ({browser, userA, userB}) => {
+      const pages = await createPagesForUser(browser, userA, {openConversationWith: userB});
+
+      await pages.conversation().sendMessageWithUserMention(userB.fullName, 'Message');
+      const message = pages.conversation().getMessage({content: 'Message'});
+
+      await pages.conversation().replyToMessage(message);
+      await pages.conversation().sendMessage('Reply');
+
+      const reply = pages.conversation().getMessage({content: 'Reply'});
+
+      await reply
+        .getByTestId('quote-item')
+        .getByRole('button', {name: `@${userB.fullName}`})
+        // There seems to be a bug where clicking the "@" in front of the mention won't do anything, so we have to move the position a bit to the right to hit the name
+        .click({position: {x: 16, y: 8}});
+
+      await expect(pages.conversationDetails().conversationDetails).toBeVisible();
+    },
+  );
 });
