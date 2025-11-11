@@ -258,4 +258,20 @@ test.describe('Reply', () => {
       await expect(reply.getByTestId('quote-item').getByTestId('markdown-link')).toBeVisible();
     },
   );
+
+  test(
+    'I want to send a timed message as a reply to any type of a message',
+    {tag: ['@TC-3011', '@regression']},
+    async ({browser, userA, userB}) => {
+      const pages = await createPagesForUser(browser, userA, {openConversationWith: userB});
+      await pages.conversation().sendMessage('Message');
+
+      const message = pages.conversation().getMessage({sender: userA});
+      await pages.conversation().replyToMessage(message);
+      await pages.conversation().sendTimedMessage('Timed Reply');
+
+      const reply = pages.conversation().getMessage({content: 'Timed Reply'});
+      await expect(reply.getByTestId('quote-item')).toContainText('Message');
+    },
+  );
 });
