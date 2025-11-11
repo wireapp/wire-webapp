@@ -100,8 +100,6 @@ test.describe('Reply', () => {
     'I want to see a placeholder text as quote when original message is not available anymore',
     {tag: ['@TC-2994', '@regression']},
     async ({browser, userA, userB}) => {
-      test.slow();
-
       const [userAPages, userBPages] = await Promise.all([
         createPagesForUser(browser, userA, {openConversationWith: userB}),
         createPagesForUser(browser, userB, {openConversationWith: userA}),
@@ -280,8 +278,6 @@ test.describe('Reply', () => {
     'I want to click the quoted message to jump to the original message',
     {tag: ['@TC-3013', '@regression']},
     async ({browser, userA, userB}) => {
-      test.slow();
-
       const pages = await createPagesForUser(browser, userA, {openConversationWith: userB});
       await pages.conversation().sendMessage('Message');
       await pages.conversation().sendMessage('Line\n'.repeat(50)); // Send a message with a lot of lines to test the scrolling behavior
