@@ -21,11 +21,12 @@ import {Browser} from '@playwright/test';
 
 import {getUser, User} from 'test/e2e_tests/data/user';
 import {PageManager} from 'test/e2e_tests/pageManager';
+import {ConfirmModal} from 'test/e2e_tests/pageManager/webapp/modals/confirm.modal';
 import {test as baseTest, expect} from 'test/e2e_tests/test.fixtures';
 import {getAudioFilePath, getTextFilePath, getVideoFilePath, shareAssetHelper} from 'test/e2e_tests/utils/asset.util';
 import {getImageFilePath} from 'test/e2e_tests/utils/sendImage.util';
 import {removeCreatedUser} from 'test/e2e_tests/utils/tearDown.util';
-import {loginUser} from 'test/e2e_tests/utils/userActions';
+import {createGroup, loginUser} from 'test/e2e_tests/utils/userActions';
 
 const test = baseTest.extend<{userA: User; userB: User}>({
   userA: async ({api}, use) => {
@@ -299,6 +300,35 @@ test.describe('Reply', () => {
 
       // Validate the chat scrolled up, bringing the original message back into view
       await expect(message).toBeInViewport();
+    },
+  );
+
+  test(
+    'I should not be able to send a reply after I got removed from the conversation',
+    {tag: ['@TC-3014', '@regression']},
+    async ({browser, userA, userB}) => {
+      const [userAPages, userBPages] = await Promise.all([
+        createPagesForUser(browser, userA),
+        createPagesForUser(browser, userB),
+      ]);
+      await createGroup(userAPages, 'Test Group', [userB]);
+
+      await Promise.all([
+        userAPages.conversationList().openConversation('Test Group'),
+        userBPages.conversationList().openConversation('Test Group'),
+      ]);
+
+      await userAPages.conversation().sendMessage('Message');
+      const message = userBPages.conversation().getMessage({content: 'Message', sender: userA});
+      await expect(message).toBeVisible();
+
+      await userAPages.conversation().clickConversationInfoButton();
+      await userAPages.conversation().removeMemberFromGroup(userB.fullName);
+      await new ConfirmModal(userAPages.conversation().page).clickAction();
+      await expect(userBPages.conversation().getMessage({content: `${userA.fullName} removed you`})).toBeVisible();
+
+      await message.hover();
+      await expect(message.getByTestId('do-reply-message')).not.toBeAttached();
     },
   );
 });
