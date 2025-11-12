@@ -4370,9 +4370,9 @@ export class ConversationRepository {
       const {new_group_id: newGroupId, group_id: oldGroupId} = eventJson.data;
 
       await this.core.service?.conversation.wipeMLSConversation(oldGroupId);
-      const exisitingConversation = this.core.service?.conversation.mlsGroupExistsLocally(newGroupId);
+      const existingConversation = this.core.service?.conversation.mlsGroupExistsLocally(newGroupId);
 
-      if (exisitingConversation) {
+      if (existingConversation) {
         this.logger.info(
           'An MLS conversation with the new group ID already exists on core crypto. no need to update epoch',
         );
