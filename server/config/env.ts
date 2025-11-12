@@ -78,6 +78,9 @@ export type Env = {
   /** Allows a client to use a development version of the api (if present) */
   ENABLE_DEV_BACKEND_API?: string;
 
+  /** Sets the custom SSO code for the backend */
+  CUSTOM_SSO_CODE?: string;
+
   SSL_CERTIFICATE_KEY_PATH?: string;
   SSL_CERTIFICATE_PATH?: string;
 

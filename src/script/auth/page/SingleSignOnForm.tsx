@@ -25,7 +25,7 @@ import {pathWithParams} from '@wireapp/commons/lib/util/UrlUtil';
 import {isValidEmail, PATTERN} from '@wireapp/commons/lib/util/ValidationUtil';
 import {FormattedMessage} from 'react-intl';
 import {connect} from 'react-redux';
-import {Navigate, useNavigate} from 'react-router-dom';
+import {Navigate, useLocation, useNavigate} from 'react-router-dom';
 import {AnyAction, Dispatch} from 'redux';
 
 import {Runtime, UrlUtil} from '@wireapp/commons';
@@ -77,6 +77,8 @@ const SingleSignOnFormComponent = ({
   const [codeOrMail, setCodeOrMail] = useState(account.email || '');
   const [disableInput, setDisableInput] = useState(false);
   const navigate = useNavigate();
+  const {state} = useLocation();
+  const shouldLogin = state?.shouldLogin as boolean;
   const [clientType, setClientType] = useState<ClientType | null>(null);
   const [ssoError, setSsoError] = useState<BackendError | null>(null);
   const [isCodeOrMailInputValid, setIsCodeOrMailInputValid] = useState(true);
@@ -176,6 +178,15 @@ const SingleSignOnFormComponent = ({
       handleSubmit();
     }
   }, [shouldAutoLogin, clientType, initialCode, codeOrMail]);
+
+  useEffect(() => {
+    if (codeOrMail && shouldLogin) {
+      handleSubmit().catch(error => {
+        setIsLoading(false);
+        setSsoError(error);
+      });
+    }
+  }, [shouldLogin, codeOrMail]);
 
   const onCodeChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setCodeOrMail(event.target.value);

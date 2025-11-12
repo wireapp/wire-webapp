@@ -1102,6 +1102,7 @@
   "index.or": "oder",
   "index.ssoLogin": "Anmelden mit SSO",
   "index.welcome": "Willkommen bei {brandName}!",
+  "index.loginWithBundID": "Anmeldung mit BundID",
   "initDecryption": "Entschlüssele Events",
   "initEvents": "Nachrichten werden geladen",
   "initProgressDaysPlural": "Nachrichten der letzten {time} Tage werden geladen",

@@ -1106,6 +1106,7 @@ declare module 'I18n/en-US.json' {
     'index.or': `or`;
     'index.ssoLogin': `Log in with SSO`;
     'index.welcome': `Welcome to {brandName}!`;
+    'index.loginWithBundID': `Login with BundID`;
     'initDecryption': `Decrypting messages`;
     'initEvents': `Loading messages`;
     'initProgressDaysPlural': `Loading messages from the last {time} days`;
