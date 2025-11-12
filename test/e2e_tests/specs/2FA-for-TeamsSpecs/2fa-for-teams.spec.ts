@@ -25,7 +25,6 @@ import {loginUser} from 'test/e2e_tests/utils/userActions';
 import {test, expect} from '../../test.fixtures';
 
 test.describe('f2a for teams', () => {
-  test.slow();
   const teamName = 'Critical';
   let owner: User = getUser();
   const member1 = getUser();

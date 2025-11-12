@@ -24,9 +24,6 @@ import {addCreatedUser, removeCreatedUser} from 'test/e2e_tests/utils/tearDown.u
 import {test, expect} from '../../test.fixtures';
 
 test.describe('registration personal account', () => {
-  // Helper function to handle common registration steps
-  test.slow();
-
   test.describe('email registration used', () => {
     const userA = getUser();
 
