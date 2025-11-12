@@ -37,6 +37,7 @@ import {
   ConversationMemberJoinEvent,
   CONVERSATION_EVENT,
   ConversationMLSWelcomeEvent,
+  ConversationMLSResetEvent,
 } from '@wireapp/api-client/lib/event/';
 import {BackendError, BackendErrorLabel} from '@wireapp/api-client/lib/http';
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
@@ -110,6 +111,7 @@ function buildConversationRepository() {
     wipeMLSCapableConversation: () => {},
     postBots: () => {},
     saveConversationStateInDb: () => {},
+    wipeMLSConversation: () => {},
   } as ConversationService;
   const messageRepository = {setClientMismatchHandler: () => {}} as unknown as MessageRepository;
   // @ts-ignore
@@ -3418,5 +3420,75 @@ describe('deleteConversation', () => {
     expect(conversationState.conversations()).toEqual([]);
     expect(deleteConversationFromDbSpy).toHaveBeenCalledWith(conversation.id);
     expect(wipeMLSCapableConversationSpy).toHaveBeenCalledWith(conversation);
+  });
+});
+
+describe('onMLSResetMessage', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
+  it('should handle MLS reset message by updating groupId & epoch of the conversation and deleting the old groupId from core crypto', async () => {
+    const [conversationRepository, {conversationState, conversationService, core}] = buildConversationRepository();
+
+    const conversation = _generateConversation({protocol: CONVERSATION_PROTOCOL.MLS, groupId: 'old-group-id'});
+
+    conversationState.conversations([conversation]);
+
+    const mlsResetEvent: ConversationMLSResetEvent = {
+      type: CONVERSATION_EVENT.MLS_RESET,
+      time: new Date().toISOString(),
+      from: 'user-id',
+      conversation: conversation.id,
+      qualified_conversation: conversation.qualifiedId,
+      data: {
+        new_group_id: 'new-group-id',
+        group_id: 'old-group-id',
+      },
+    };
+
+    spyOn(core.service!.conversation, 'wipeMLSConversation').and.returnValue(Promise.resolve(undefined));
+    spyOn(core.service!.conversation, 'mlsGroupExistsLocally').and.returnValue(Promise.resolve(false));
+    const updatePropertiesSpy = jest.spyOn(ConversationMapper, 'updateProperties');
+    const saveConversationStateInDbSpy = jest.spyOn(conversationService, 'saveConversationStateInDb');
+
+    await (conversationRepository as any).onMLSResetMessage(conversation, mlsResetEvent);
+
+    expect(updatePropertiesSpy).toHaveBeenCalledWith(conversation, {
+      groupId: 'new-group-id',
+      epoch: 0,
+    });
+    expect(saveConversationStateInDbSpy).toHaveBeenCalledWith(conversation);
+  });
+
+  it('Should skip updating conversation if new groupId already exists locally', async () => {
+    const [conversationRepository, {conversationState, conversationService, core}] = buildConversationRepository();
+
+    const conversation = _generateConversation({protocol: CONVERSATION_PROTOCOL.MLS, groupId: 'old-group-id'});
+
+    conversationState.conversations([conversation]);
+
+    const mlsResetEvent: ConversationMLSResetEvent = {
+      type: CONVERSATION_EVENT.MLS_RESET,
+      time: new Date().toISOString(),
+      from: 'user-id',
+      conversation: conversation.id,
+      qualified_conversation: conversation.qualifiedId,
+      data: {
+        new_group_id: 'new-group-id',
+        group_id: 'old-group-id',
+      },
+    };
+
+    spyOn(core.service!.conversation, 'wipeMLSConversation').and.returnValue(Promise.resolve(undefined));
+    spyOn(core.service!.conversation, 'mlsGroupExistsLocally').and.returnValue(Promise.resolve(true));
+
+    const updatePropertiesSpy = jest.spyOn(ConversationMapper, 'updateProperties');
+    const saveConversationStateInDbSpy = jest.spyOn(conversationService, 'saveConversationStateInDb');
+
+    await (conversationRepository as any).onMLSResetMessage(conversation, mlsResetEvent);
+
+    expect(updatePropertiesSpy).not.toHaveBeenCalled();
+    expect(saveConversationStateInDbSpy).not.toHaveBeenCalled();
   });
 });
