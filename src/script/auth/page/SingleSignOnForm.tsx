@@ -25,11 +25,21 @@ import {pathWithParams} from '@wireapp/commons/lib/util/UrlUtil';
 import {isValidEmail, PATTERN} from '@wireapp/commons/lib/util/ValidationUtil';
 import {FormattedMessage} from 'react-intl';
 import {connect} from 'react-redux';
-import {Navigate, useLocation, useNavigate} from 'react-router-dom';
+import {Navigate, useNavigate} from 'react-router-dom';
 import {AnyAction, Dispatch} from 'redux';
 
 import {Runtime, UrlUtil} from '@wireapp/commons';
-import {Button, Checkbox, CheckboxLabel, ErrorMessage, Form, Input, InputBlock, Loading} from '@wireapp/react-ui-kit';
+import {
+  Button,
+  ButtonVariant,
+  Checkbox,
+  CheckboxLabel,
+  ErrorMessage,
+  Form,
+  Input,
+  InputBlock,
+  Loading,
+} from '@wireapp/react-ui-kit';
 
 import {t} from 'Util/LocalizerUtil';
 import {isBackendError} from 'Util/TypePredicateUtil';
@@ -46,7 +56,7 @@ import {QUERY_KEY, ROUTE} from '../route';
 import {parseError, parseValidationErrors} from '../util/errorUtil';
 import {getEnterpriseLoginV2FF} from '../util/helpers';
 import {logoutReasonStrings} from '../util/logoutUtil';
-import {getSearchParams, SSO_CODE_PREFIX} from '../util/urlUtil';
+import {getPrefixedSSOCode, getSearchParams, SSO_CODE_PREFIX} from '../util/urlUtil';
 
 interface SingleSignOnFormProps {
   doLogin: (code: string) => Promise<void>;
@@ -77,8 +87,6 @@ const SingleSignOnFormComponent = ({
   const [codeOrMail, setCodeOrMail] = useState(account.email || '');
   const [disableInput, setDisableInput] = useState(false);
   const navigate = useNavigate();
-  const {state} = useLocation();
-  const shouldLogin = state?.shouldLogin as boolean;
   const [clientType, setClientType] = useState<ClientType | null>(null);
   const [ssoError, setSsoError] = useState<BackendError | null>(null);
   const [isCodeOrMailInputValid, setIsCodeOrMailInputValid] = useState(true);
@@ -99,17 +107,21 @@ const SingleSignOnFormComponent = ({
   const isEnterpriseLoginV2Enabled = getEnterpriseLoginV2FF();
 
   const loginWithSSO = async (code = codeOrMail, password?: string) => {
-    setIsLoading(true);
-    const strippedCode = stripPrefix(code);
-    await validateSSOCode(strippedCode);
-    await doLogin(strippedCode);
-    await doFinalizeSSOLogin({clientType});
-    const hasKeyAndCode = conversationKey && conversationCode;
-    if (hasKeyAndCode) {
-      await doJoinConversationByCode(conversationKey, conversationCode, undefined, password);
-    }
+    try {
+      setIsLoading(true);
+      const strippedCode = stripPrefix(code);
+      await validateSSOCode(strippedCode);
+      await doLogin(strippedCode);
+      await doFinalizeSSOLogin({clientType});
+      const hasKeyAndCode = conversationKey && conversationCode;
+      if (hasKeyAndCode) {
+        await doJoinConversationByCode(conversationKey, conversationCode, undefined, password);
+      }
 
-    navigate(ROUTE.HISTORY_INFO);
+      navigate(ROUTE.HISTORY_INFO);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const {loginV2} = useEnterpriseLoginV2({
@@ -178,15 +190,6 @@ const SingleSignOnFormComponent = ({
       handleSubmit();
     }
   }, [shouldAutoLogin, clientType, initialCode, codeOrMail]);
-
-  useEffect(() => {
-    if (codeOrMail && shouldLogin) {
-      handleSubmit().catch(error => {
-        setIsLoading(false);
-        setSsoError(error);
-      });
-    }
-  }, [shouldLogin, codeOrMail]);
 
   const onCodeChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setCodeOrMail(event.target.value);
@@ -362,6 +365,17 @@ const SingleSignOnFormComponent = ({
           data-uie-name="do-sso-sign-in"
         >
           {t('login.headline')}
+        </Button>
+        <Button
+          type="button"
+          variant={ButtonVariant.SECONDARY}
+          onClick={async () => {
+            await loginWithSSO(getPrefixedSSOCode(Config.getConfig().CUSTOM_SSO_CODE));
+          }}
+          block
+          data-uie-name="go-bund-id-login"
+        >
+          {t('index.loginWithBundID')}
         </Button>
         {validationError
           ? parseValidationErrors([validationError])
