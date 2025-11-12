@@ -18,23 +18,23 @@
  */
 
 import {render, waitFor} from '@testing-library/react';
-import {CONVERSATION_TYPE, ConversationProtocol} from '@wireapp/api-client/lib/conversation';
+import {CONVERSATION_TYPE} from '@wireapp/api-client/lib/conversation';
+import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 import {container} from 'tsyringe';
 
 import {randomUUID} from 'crypto';
 
+import {ClientEntity} from 'Repositories/client/ClientEntity';
+import {ClientState} from 'Repositories/client/ClientState';
+import {ConversationState} from 'Repositories/conversation/ConversationState';
+import {CryptographyRepository} from 'Repositories/cryptography/CryptographyRepository';
+import {Conversation} from 'Repositories/entity/Conversation';
+import {User} from 'Repositories/entity/User';
 import {withTheme} from 'src/script/auth/util/test/TestUtil';
-import {ClientEntity} from 'src/script/client/ClientEntity';
-import {ClientState} from 'src/script/client/ClientState';
-import {ConversationState} from 'src/script/conversation/ConversationState';
-import {CryptographyRepository} from 'src/script/cryptography/CryptographyRepository';
-import {User} from 'src/script/entity/User';
 import {Core} from 'src/script/service/CoreSingleton';
 import {createUuid} from 'Util/uuid';
 
 import {DevicesPreferences} from './DevicesPreference';
-
-import {Conversation} from '../../../../../entity/Conversation';
 
 function createDevice(): ClientEntity {
   const device = new ClientEntity(true, '', createUuid());
@@ -43,9 +43,9 @@ function createDevice(): ClientEntity {
   return device;
 }
 
-function createConversation(protocol?: ConversationProtocol, type?: CONVERSATION_TYPE) {
+function createConversation(protocol?: CONVERSATION_PROTOCOL, type?: CONVERSATION_TYPE) {
   const conversation = new Conversation(randomUUID(), '', protocol);
-  if (protocol === ConversationProtocol.MLS) {
+  if (protocol === CONVERSATION_PROTOCOL.MLS) {
     conversation.groupId = `groupid-${randomUUID()}`;
     conversation.epoch = 0;
   }
@@ -56,8 +56,8 @@ function createConversation(protocol?: ConversationProtocol, type?: CONVERSATION
 }
 
 describe('DevicesPreferences', () => {
-  const selfProteusConversation = createConversation(ConversationProtocol.PROTEUS, CONVERSATION_TYPE.SELF);
-  const selfMLSConversation = createConversation(ConversationProtocol.MLS, CONVERSATION_TYPE.SELF);
+  const selfProteusConversation = createConversation(CONVERSATION_PROTOCOL.PROTEUS, CONVERSATION_TYPE.SELF);
+  const selfMLSConversation = createConversation(CONVERSATION_PROTOCOL.MLS, CONVERSATION_TYPE.SELF);
   const regularConversation = createConversation();
 
   const coreMock = container.resolve(Core);

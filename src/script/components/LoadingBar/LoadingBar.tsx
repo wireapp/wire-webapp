@@ -21,19 +21,18 @@ import {FC} from 'react';
 
 import cx from 'classnames';
 
-export interface LoadingBarProps {
+import {Loading} from '@wireapp/react-ui-kit';
+
+interface LoadingBarProps {
   message?: string;
-  progress: number;
   className?: string;
   centerText?: boolean;
 }
 
-const LoadingBar: FC<LoadingBarProps> = ({progress, message, className = '', centerText = true}) => (
-  <div className={cx('loading-bar', {'text-center': centerText}, className)}>
+const LoadingBar: FC<LoadingBarProps> = ({message, className = '', centerText = true}) => (
+  <div data-uie-name="loading-bar" className={cx('loading-bar', {'text-center': centerText}, className)}>
     {message && <div className="progress-console">{message}</div>}
-    <div className="progress-bar">
-      <div data-uie-name="loading-bar-progress" style={{width: `${progress}%`}}></div>
-    </div>
+    <Loading data-uie-name="loading-bar-spinner" size={16} />
   </div>
 );
 

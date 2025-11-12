@@ -22,13 +22,14 @@ import {container} from 'tsyringe';
 
 import {CALL_TYPE, CONV_TYPE} from '@wireapp/avs';
 
+import {Call} from 'Repositories/calling/Call';
+import {CallingRepository} from 'Repositories/calling/CallingRepository';
+import {CallState} from 'Repositories/calling/CallState';
+import {Conversation} from 'Repositories/entity/Conversation';
+import {MediaDevicesHandler} from 'Repositories/media/MediaDevicesHandler';
+
 import {CallingViewModel} from './CallingViewModel';
 
-import {Call} from '../calling/Call';
-import {CallingRepository} from '../calling/CallingRepository';
-import {CallState} from '../calling/CallState';
-import {Conversation} from '../entity/Conversation';
-import {MediaDevicesHandler} from '../media/MediaDevicesHandler';
 import {Core} from '../service/CoreSingleton';
 
 export const mockCallingRepository = {
@@ -45,7 +46,7 @@ export const mockCallingRepository = {
   supportsConferenceCalling: true,
 } as unknown as CallingRepository;
 
-export const mockMediaDevicesHandler = {
+const mockMediaDevicesHandler = {
   initializeMediaDevices: jest.fn(() => Promise.resolve()),
 } as unknown as MediaDevicesHandler;
 
@@ -68,8 +69,8 @@ export function buildCallingViewModel() {
     {} as any,
     {} as any,
     {} as any,
-    undefined,
     callState,
+    {} as any,
   );
 
   return [callingViewModel, {core: mockCore}] as const;

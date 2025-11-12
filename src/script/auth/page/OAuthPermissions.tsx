@@ -41,8 +41,8 @@ import {
 } from '@wireapp/react-ui-kit';
 
 import * as Icon from 'Components/Icon';
-import {AssetRemoteData} from 'src/script/assets/AssetRemoteData';
-import {AssetRepository} from 'src/script/assets/AssetRepository';
+import {AssetRemoteData} from 'Repositories/assets/AssetRemoteData';
+import {AssetRepository} from 'Repositories/assets/AssetRepository';
 import {handleEscDown, handleKeyDown, KEY} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
 import {loadDataUrl} from 'Util/util';
@@ -122,7 +122,7 @@ const OAuthPermissionsComponent = ({
       await getSelf();
       if (selfTeamId) {
         const team = await getTeam(selfTeamId);
-        const teamIcon = AssetRemoteData.v3(team.icon, selfUser.qualified_id?.domain);
+        const teamIcon = new AssetRemoteData({assetKey: team.icon, assetDomain: selfUser.qualified_id?.domain});
         if (teamIcon.identifier === 'default') {
           setTeamImage(`${Config.getConfig().APP_BASE}/image/logo/wire-logo-120.png`);
         } else {

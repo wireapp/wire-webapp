@@ -17,26 +17,26 @@
  *
  */
 
-import React, {useMemo} from 'react';
+import {useMemo} from 'react';
 
 import {amplify} from 'amplify';
 
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {VerificationIcon} from 'Components/VerificationIcon';
+import {VerificationMessage as VerificationMessageEntity} from 'Repositories/entity/message/VerificationMessage';
 import {SidebarTabs, useSidebarStore} from 'src/script/page/LeftSidebar/panels/Conversations/useSidebarStore';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {Declension, joinNames, t} from 'Util/LocalizerUtil';
 import {capitalizeFirstChar} from 'Util/StringUtil';
 
-import {VerificationMessage as VerificationMessageEntity} from '../../../entity/message/VerificationMessage';
 import {VerificationMessageType} from '../../../message/VerificationMessageType';
 
-export interface VerificationMessageProps {
+interface VerificationMessageProps {
   message: VerificationMessageEntity;
 }
 
-const VerificationMessage: React.FC<VerificationMessageProps> = ({message}) => {
+const VerificationMessage = ({message}: VerificationMessageProps) => {
   const {userIds, userEntities, unsafeSenderName, verificationMessageType, isSelfClient} = useKoSubscribableChildren(
     message,
     ['userIds', 'userEntities', 'unsafeSenderName', 'verificationMessageType', 'isSelfClient'],

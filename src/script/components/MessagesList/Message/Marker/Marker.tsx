@@ -21,34 +21,55 @@ import {useLayoutEffect, useRef} from 'react';
 
 import {SerializedStyles, css} from '@emotion/react';
 
+import {ScrollToElement} from 'Components/MessagesList/Message/types';
 import {useRelativeTimestamp} from 'src/script/hooks/useRelativeTimestamp';
 
-import {dayMarkerStyle, baseMarkerStyle} from './Marker.styles';
+import {dayMarkerStyle, baseMarkerStyle, notVirtualizedMarkerStyle} from './Marker.styles';
+import {getMessagesGroupLabel} from './Marker.utils';
 
+import {Config} from '../../../../Config';
 import {Marker} from '../../utils/messagesGroup';
 import {MessageTime} from '../MessageTime';
-import {ScrollToElement} from '../types';
 
 const markerStyles: Partial<Record<Marker['type'], SerializedStyles>> = {
   day: dayMarkerStyle,
 };
 
-export function MarkerComponent({marker, scrollTo}: {marker: Marker; scrollTo: ScrollToElement}) {
-  const timeAgo = useRelativeTimestamp(marker.timestamp, marker.type === 'day');
-  const elementRef = useRef<HTMLDivElement>(null);
+interface Props {
+  marker: Marker;
+  scrollTo?: ScrollToElement;
+  measureElement?: (element: HTMLElement | null) => void;
+  index?: number;
+}
+
+export const MarkerComponent = ({marker, scrollTo, measureElement, index}: Props) => {
+  const elementRef = useRef<HTMLDivElement | null>(null);
+
+  const isDay = marker.type === 'day';
+  const timeAgo = useRelativeTimestamp(marker.timestamp, isDay, isDay ? getMessagesGroupLabel : undefined);
+
+  const isVirtualizedMessagesListEnabled = Config.getConfig().FEATURE.ENABLE_VIRTUALIZED_MESSAGES_LIST;
 
   const style = css`
-    ${baseMarkerStyle} ${markerStyles[marker.type]}
+    ${baseMarkerStyle} ${markerStyles[marker.type]} ${isVirtualizedMessagesListEnabled ? notVirtualizedMarkerStyle : ''}
   `;
 
   useLayoutEffect(() => {
-    if (marker.type === 'unread' && elementRef.current) {
-      scrollTo({element: elementRef.current}, true);
+    if (!isVirtualizedMessagesListEnabled && marker.type === 'unread' && elementRef.current) {
+      scrollTo?.({element: elementRef.current}, true);
     }
-  }, []);
+  }, [isVirtualizedMessagesListEnabled]);
 
   return (
-    <div className="message-header" css={style} ref={elementRef}>
+    <div
+      className="message-header"
+      css={style}
+      data-index={index}
+      ref={ref => {
+        measureElement?.(ref);
+        elementRef.current = ref;
+      }}
+    >
       <div className="message-header-icon">
         {marker.type === 'unread' && <span className="message-unread-dot dot-md" />}
       </div>
@@ -56,12 +77,12 @@ export function MarkerComponent({marker, scrollTo}: {marker: Marker; scrollTo: S
       <h3 className="message-header-label">
         <MessageTime
           timestamp={marker.timestamp}
-          data-timestamp-type={marker.type === 'day' ? 'day' : 'normal'}
-          className={marker.type === 'day' ? 'label-bold-xs' : 'label-xs'}
+          data-timestamp-type={isDay ? 'day' : 'normal'}
+          className={isDay ? 'label-bold-xs' : 'label-xs'}
         >
           {timeAgo}
         </MessageTime>
       </h3>
     </div>
   );
-}
+};

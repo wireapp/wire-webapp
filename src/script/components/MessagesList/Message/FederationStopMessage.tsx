@@ -17,11 +17,10 @@
  *
  */
 
-import React from 'react';
-
 import {Link, LinkVariant} from '@wireapp/react-ui-kit';
 
 import * as Icon from 'Components/Icon';
+import {FederationStopMessage as FederationStopMessageEntity} from 'Repositories/entity/message/FederationStopMessage';
 import {Config} from 'src/script/Config';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
@@ -29,16 +28,14 @@ import {t} from 'Util/LocalizerUtil';
 import {MessageTime} from './MessageTime';
 import {useMessageFocusedTabIndex} from './util';
 
-import {FederationStopMessage as FederationStopMessageEntity} from '../../../entity/message/FederationStopMessage';
-
-export interface FederationStopMessageProps {
+interface FederationStopMessageProps {
   message: FederationStopMessageEntity;
   isMessageFocused: boolean;
 }
 
 const config = Config.getConfig();
 
-const FederationStopMessage: React.FC<FederationStopMessageProps> = ({message, isMessageFocused}) => {
+const FederationStopMessage = ({message, isMessageFocused}: FederationStopMessageProps) => {
   const {timestamp} = useKoSubscribableChildren(message, ['timestamp']);
   const {id, domains} = message;
   const messageFocusedTabIndex = useMessageFocusedTabIndex(isMessageFocused);

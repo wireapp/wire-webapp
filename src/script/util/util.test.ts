@@ -17,7 +17,7 @@
  *
  */
 
-import {Conversation} from 'src/script/entity/Conversation';
+import {Conversation} from 'Repositories/entity/Conversation';
 import {
   arrayToBase64,
   base64ToArray,
@@ -30,6 +30,7 @@ import {
   stripUrlWrapper,
   trimFileExtension,
   zeroPadding,
+  getFileNameWithExtension,
 } from 'Util/util';
 
 import {createUuid} from './uuid';
@@ -264,5 +265,15 @@ describe('zeroPadding', () => {
 
   it('can transform 666 to a string', () => {
     expect(zeroPadding(666)).toEqual('666');
+  });
+});
+
+describe('getFileNameWithExtension', () => {
+  it('adds the extension if not present', () => {
+    expect(getFileNameWithExtension('file', 'jpg')).toBe('file.jpg');
+  });
+
+  it('does not add the extension if already present', () => {
+    expect(getFileNameWithExtension('file.jpg', 'jpg')).toBe('file.jpg');
   });
 });

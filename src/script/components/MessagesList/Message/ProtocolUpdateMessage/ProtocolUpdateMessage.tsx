@@ -17,12 +17,12 @@
  *
  */
 
-import {ConversationProtocol} from '@wireapp/api-client/lib/conversation';
+import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 
 import * as Icon from 'Components/Icon';
+import {ProtocolUpdateMessage as ProtocolUpdateMessageEntity} from 'Repositories/entity/message/ProtocolUpdateMessage';
+import {SystemMessage} from 'Repositories/entity/message/SystemMessage';
 import {Config} from 'src/script/Config';
-import {ProtocolUpdateMessage as ProtocolUpdateMessageEntity} from 'src/script/entity/message/ProtocolUpdateMessage';
-import {SystemMessage} from 'src/script/entity/message/SystemMessage';
 import {replaceLink, t} from 'Util/LocalizerUtil';
 
 import {SystemMessageBase} from '../SystemMessage/SystemMessageBase';
@@ -38,7 +38,7 @@ const createSystemMessage = (caption: string) => {
 };
 
 export const ProtocolUpdateMessage = ({message}: ProtocolUpdateMessageProps) => {
-  if (message.protocol === ConversationProtocol.MIXED) {
+  if (message.protocol === CONVERSATION_PROTOCOL.MIXED) {
     const captions = [
       t(
         'conversationProtocolUpdatedToMixedPart1',

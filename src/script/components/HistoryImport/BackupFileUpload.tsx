@@ -19,9 +19,7 @@
 
 import {useRef} from 'react';
 
-import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
-
-import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
+import {TabIndex, Button, ButtonVariant} from '@wireapp/react-ui-kit';
 
 import {CONFIG as HistoryExportConfig} from 'Components/HistoryExport';
 import {handleKeyDown, KEY} from 'Util/KeyboardUtil';
@@ -51,7 +49,7 @@ const BackupFileUpload = ({
           ref={fileInputRef}
           tabIndex={TabIndex.UNFOCUSABLE}
           type="file"
-          accept={`.${HistoryExportConfig.FILE_EXTENSION}`}
+          accept={`.${HistoryExportConfig.LEGACY_FILE_EXTENSION},.${HistoryExportConfig.UNIVERSAL_FILE_EXTENSION}`}
           onChange={onFileChange}
           onFocus={({target}) => target.blur()}
           data-uie-name="input-import-file"

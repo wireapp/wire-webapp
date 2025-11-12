@@ -17,7 +17,7 @@
  *
  */
 
-export type Emoticon = {
+type Emoticon = {
   name: string;
   emoji: string;
   tags: string[];

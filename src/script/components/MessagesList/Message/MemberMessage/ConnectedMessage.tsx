@@ -17,14 +17,12 @@
  *
  */
 
-import React from 'react';
-
 import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
 
 import {Avatar, AVATAR_SIZE} from 'Components/Avatar';
 import {UserClassifiedBar} from 'Components/ClassifiedBar/ClassifiedBar';
 import {UnverifiedUserWarning} from 'Components/Modals/UserModal';
-import {User} from 'src/script/entity/User';
+import {User} from 'Repositories/entity/User';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 
@@ -37,12 +35,12 @@ interface ConnectedMessageProps {
   user: User;
 }
 
-export const ConnectedMessage: React.FC<ConnectedMessageProps> = ({
+export const ConnectedMessage = ({
   user,
   onClickCancelRequest,
   showServicesWarning = false,
   classifiedDomains,
-}) => {
+}: ConnectedMessageProps) => {
   const {name, providerName, isOutgoingRequest} = useKoSubscribableChildren(user, [
     'name',
     'providerName',
@@ -90,7 +88,7 @@ export const ConnectedMessage: React.FC<ConnectedMessageProps> = ({
         </div>
       )}
 
-      {!isOutgoingRequest && <E2eEncryptionMessage />}
+      {!isOutgoingRequest && <E2eEncryptionMessage isCellsConversation={false} />}
     </div>
   );
 };

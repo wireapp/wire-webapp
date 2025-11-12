@@ -17,76 +17,63 @@
  *
  */
 
-import {useCallback, useMemo} from 'react';
-
 import {container} from 'tsyringe';
 
-import {useAppNotification} from 'Components/AppNotification/AppNotification';
-import {CellsRepository} from 'src/script/cells/CellsRepository';
+import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
+
+import {CellsRepository} from 'Repositories/cells/CellsRepository';
+import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
+import {UserRepository} from 'Repositories/user/UserRepository';
 import {t} from 'Util/LocalizerUtil';
 
-import {wrapperStyles} from './CellsGlobalView.styles';
+import {loadMoreWrapperStyles, wrapperStyles} from './CellsGlobalView.styles';
 import {CellsHeader} from './CellsHeader/CellsHeader';
 import {CellsLoader} from './CellsLoader/CellsLoader';
 import {CellsStateInfo} from './CellsStateInfo/CellsStateInfo';
 import {CellsTable} from './CellsTable/CellsTable';
 import {useCellsStore} from './common/useCellsStore/useCellsStore';
-import {useGetAllCellsFiles} from './useGetAllCellsFiles/useGetAllCellsFiles';
-import {useSearchCellsFiles} from './useSearchCellsFiles/useSearchCellsFiles';
+import {useOnPresignedUrlExpired} from './useOnPresignedUrlExpired/useOnPresignedUrlExpired';
+import {useSearchCellsNodes} from './useSearchCellsNodes/useSearchCellsNodes';
 
 interface CellsGlobalViewProps {
   cellsRepository?: CellsRepository;
+  userRepository?: UserRepository;
+  conversationRepository?: ConversationRepository;
 }
 
-export const CellsGlobalView = ({cellsRepository = container.resolve(CellsRepository)}: CellsGlobalViewProps) => {
-  const {files, status: filesStatus, clearAll, removeFile} = useCellsStore();
-  const {refresh} = useGetAllCellsFiles({cellsRepository});
-  const {
-    searchValue,
-    searchResults,
-    status: searchStatus,
-    handleSearch,
-    handleClearSearch,
-  } = useSearchCellsFiles({
+export const CellsGlobalView = ({
+  cellsRepository = container.resolve(CellsRepository),
+  userRepository = container.resolve(UserRepository),
+  conversationRepository = container.resolve(ConversationRepository),
+}: CellsGlobalViewProps) => {
+  const {nodes, status: nodesStatus, pagination} = useCellsStore();
+
+  const {searchValue, handleSearch, handleClearSearch, handleReload, increasePageSize} = useSearchCellsNodes({
     cellsRepository,
+    userRepository,
+    conversationRepository,
   });
 
-  const deleteFileFailedNotification = useAppNotification({
-    message: t('cellsGlobalView.deleteModalError'),
-  });
+  useOnPresignedUrlExpired({refreshCallback: handleReload});
 
-  const handleDeleteFile = useCallback(
-    async (uuid: string) => {
-      try {
-        removeFile(uuid);
-        await cellsRepository.deleteFile({uuid});
-      } catch (error) {
-        deleteFileFailedNotification.show();
-        console.error(error);
-      }
-    },
-    // cellsRepository is not a dependency because it's a singleton
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [refresh],
-  );
+  const isLoading = nodesStatus === 'loading';
+  const isFetchingMore = nodesStatus === 'fetchingMore';
+  const isError = nodesStatus === 'error';
+  const isSuccess = nodesStatus === 'success';
+  const hasFiles = !!nodes.length;
+  const emptySearchResults = searchValue && nodesStatus === 'success' && !nodes.length;
 
-  const handleRefresh = useCallback(async () => {
-    clearAll();
-    await refresh();
-  }, [refresh, clearAll]);
+  const showTable = (isSuccess || (pagination && isFetchingMore)) && !emptySearchResults;
+  const showNoFiles = !isLoading && !isFetchingMore && !isError && !hasFiles && !emptySearchResults;
+  const showLoader = isFetchingMore && nodes && nodes.length > 0;
 
-  const filteredFiles = useMemo(() => {
-    if (!searchValue || !searchResults.length) {
-      return files;
-    }
-    return files.filter(file => searchResults.includes(file.id));
-  }, [files, searchValue, searchResults]);
-
-  const isLoading = filesStatus === 'loading';
-  const isError = filesStatus === 'error';
-  const isSuccess = filesStatus === 'success';
-  const hasFiles = !!filteredFiles.length;
-  const emptySearchResults = searchStatus === 'success' && !searchResults.length;
+  const showLoadMore =
+    !isLoading &&
+    !isFetchingMore &&
+    !emptySearchResults &&
+    isSuccess &&
+    pagination &&
+    pagination.currentPage < pagination.totalPages;
 
   return (
     <div css={wrapperStyles}>
@@ -94,30 +81,31 @@ export const CellsGlobalView = ({cellsRepository = container.resolve(CellsReposi
         searchValue={searchValue}
         onSearch={handleSearch}
         onClearSearch={handleClearSearch}
-        onRefresh={handleRefresh}
-        searchStatus={searchStatus}
+        onRefresh={handleReload}
+        searchStatus={nodesStatus}
+        cellsRepository={cellsRepository}
       />
       {emptySearchResults && (
         <CellsStateInfo
-          heading={t('cellsGlobalView.emptySearchResultsHeading')}
-          description={t('cellsGlobalView.emptySearchResultsDescription')}
+          heading={t('cells.emptySearchResults.heading')}
+          description={t('cells.emptySearchResults.description')}
         />
       )}
-      {isSuccess && !emptySearchResults && hasFiles && (
-        <CellsTable files={filteredFiles} cellsRepository={cellsRepository} onDeleteFile={handleDeleteFile} />
-      )}
-      {!isLoading && !isError && !hasFiles && (
+      {showTable && <CellsTable nodes={nodes} cellsRepository={cellsRepository} />}
+      {showNoFiles && (
         <CellsStateInfo
-          heading={t('cellsGlobalView.noFilesHeading')}
-          description={t('cellsGlobalView.noFilesDescription')}
+          heading={t('cells.noNodes.global.heading')}
+          description={t('cells.noNodes.global.description')}
         />
       )}
-      {isLoading && <CellsLoader />}
-      {isError && (
-        <CellsStateInfo
-          heading={t('cellsGlobalView.errorHeading')}
-          description={t('cellsGlobalView.errorDescription')}
-        />
+      {showLoader && <CellsLoader />}
+      {isError && <CellsStateInfo heading={t('cells.error.heading')} description={t('cells.error.description')} />}
+      {showLoadMore && (
+        <div css={loadMoreWrapperStyles}>
+          <Button variant={ButtonVariant.TERTIARY} onClick={increasePageSize}>
+            {t('cells.pagination.loadMoreResults')}
+          </Button>
+        </div>
       )}
     </div>
   );

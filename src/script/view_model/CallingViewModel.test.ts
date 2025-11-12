@@ -17,15 +17,14 @@
  *
  */
 
-import {CALL_TYPE, STATE} from '@wireapp/avs';
+import {STATE} from '@wireapp/avs';
 
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
+import {LEAVE_CALL_REASON} from 'Repositories/calling/enum/LeaveCallReason';
+import {Conversation} from 'Repositories/entity/Conversation';
 import {createUuid} from 'Util/uuid';
 
 import {buildCall, buildCallingViewModel, callState, mockCallingRepository} from './CallingViewModel.mocks';
-
-import {LEAVE_CALL_REASON} from '../calling/enum/LeaveCallReason';
-import {Conversation} from '../entity/Conversation';
 
 describe('CallingViewModel', () => {
   afterEach(() => {
@@ -68,7 +67,7 @@ describe('CallingViewModel', () => {
       const [callingViewModel] = buildCallingViewModel();
       const conversation = new Conversation(createUuid());
       await callingViewModel.callActions.startAudio(conversation);
-      expect(mockCallingRepository.startCall).toHaveBeenCalledWith(conversation, CALL_TYPE.NORMAL);
+      expect(mockCallingRepository.startCall).toHaveBeenCalledWith(conversation);
     });
 
     it('lets the user leave previous call before starting a new one', async () => {
@@ -88,7 +87,7 @@ describe('CallingViewModel', () => {
         joinedCall.conversation.qualifiedId,
         LEAVE_CALL_REASON.MANUAL_LEAVE_TO_JOIN_ANOTHER_CALL,
       );
-      expect(mockCallingRepository.startCall).toHaveBeenCalledWith(conversation, CALL_TYPE.NORMAL);
+      expect(mockCallingRepository.startCall).toHaveBeenCalledWith(conversation);
     });
   });
 

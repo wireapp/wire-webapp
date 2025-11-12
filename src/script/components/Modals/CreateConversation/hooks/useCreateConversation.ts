@@ -19,27 +19,28 @@
 
 import {useState, useContext} from 'react';
 
-import {ADD_PERMISSION, ConversationProtocol, GROUP_CONVERSATION_TYPE} from '@wireapp/api-client/lib/conversation';
+import {ADD_PERMISSION, GROUP_CONVERSATION_TYPE} from '@wireapp/api-client/lib/conversation/Conversation';
 import {RECEIPT_MODE} from '@wireapp/api-client/lib/conversation/data';
+import {CONVERSATION_PROTOCOL, mapToConversationProtocol} from '@wireapp/api-client/lib/team';
 import {isNonFederatingBackendsError} from '@wireapp/core/lib/errors';
 import {amplify} from 'amplify';
 import {container} from 'tsyringe';
 
 import {WebAppEvents} from '@wireapp/webapp-events';
 
-import {Config} from 'src/script/Config';
-import {ACCESS_STATE} from 'src/script/conversation/AccessState';
+import {ACCESS_STATE} from 'Repositories/conversation/AccessState';
 import {
   toggleFeature,
   teamPermissionsForAccessState,
   ACCESS_TYPES,
   ACCESS_MODES,
-} from 'src/script/conversation/ConversationAccessPermission';
+} from 'Repositories/conversation/ConversationAccessPermission';
+import {TeamState} from 'Repositories/team/TeamState';
+import {Config} from 'src/script/Config';
 import {useSidebarStore, SidebarTabs} from 'src/script/page/LeftSidebar/panels/Conversations/useSidebarStore';
 import {RootContext} from 'src/script/page/RootProvider';
 import {generateConversationUrl} from 'src/script/router/routeGenerator';
 import {createNavigateKeyboard, createNavigate} from 'src/script/router/routerBindings';
-import {TeamState} from 'src/script/team/TeamState';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {isKeyboardEvent} from 'Util/KeyboardUtil';
 import {replaceLink, t} from 'Util/LocalizerUtil';
@@ -57,6 +58,7 @@ export const useCreateConversation = () => {
     selectedContacts,
     setConversationName,
     setConversationCreationStep,
+    isCellsEnabled,
     isReadReceiptsEnabled,
     isServicesEnabled,
     isGuestsEnabled,
@@ -72,9 +74,12 @@ export const useCreateConversation = () => {
   const teamState = container.resolve(TeamState);
   const {isTeam, isMLSEnabled} = useKoSubscribableChildren(teamState, ['isTeam', 'isMLSEnabled']);
 
-  const defaultProtocol = isMLSEnabled
-    ? teamState.teamFeatures()?.mls?.config.defaultProtocol
-    : ConversationProtocol.PROTEUS;
+  const defaultProtocol: CONVERSATION_PROTOCOL | undefined = isMLSEnabled
+    ? mapToConversationProtocol(teamState.teamFeatures()?.mls?.config.defaultProtocol)
+    : CONVERSATION_PROTOCOL.PROTEUS;
+
+  // Read receipts are temorarily disabled for MLS groups and channels until it is supported
+  const isGroupWithReadReceiptsEnabled = defaultProtocol !== CONVERSATION_PROTOCOL.MLS && isReadReceiptsEnabled;
 
   const getAccessState = () => {
     let access = ACCESS_STATE.TEAM.TEAM_ONLY;
@@ -149,7 +154,8 @@ export const useCreateConversation = () => {
         {
           add_permission: moderator === ADD_PERMISSION.ADMINS ? ADD_PERMISSION.ADMINS : ADD_PERMISSION.EVERYONE,
           protocol: defaultProtocol,
-          receipt_mode: isReadReceiptsEnabled ? RECEIPT_MODE.ON : RECEIPT_MODE.OFF,
+          receipt_mode: isGroupWithReadReceiptsEnabled ? RECEIPT_MODE.ON : RECEIPT_MODE.OFF,
+          cells: isCellsEnabled,
           group_conv_type:
             conversationType === ConversationType.Channel
               ? GROUP_CONVERSATION_TYPE.CHANNEL

@@ -29,10 +29,7 @@ describe('when entering account data', () => {
   let wrapper: RenderResult;
 
   const nameInput = () => wrapper.getByTestId('enter-name') as HTMLInputElement;
-  const emailInput = () => wrapper.getByTestId('enter-email') as HTMLInputElement;
-  const passwordInput = () => wrapper.getByTestId('enter-password') as HTMLInputElement;
   const doNextButton = () => wrapper.getByTestId('do-next') as HTMLButtonElement;
-  const doTermsCheckbox = () => wrapper.getByTestId('do-terms') as HTMLInputElement;
   const validationErrorMessage = () => wrapper.getByTestId('error-message');
 
   describe('the submit button', () => {
@@ -50,11 +47,6 @@ describe('when entering account data', () => {
           },
         }),
       );
-
-      expect(nameInput().required).toBe(true);
-      expect(emailInput().required).toBe(true);
-      expect(passwordInput().required).toBe(true);
-      expect(doTermsCheckbox().required).toBe(true);
 
       expect(doNextButton().disabled).toBe(true);
     });
@@ -110,8 +102,8 @@ describe('when entering account data', () => {
     });
 
     it('appears when input gets trimmed', () => {
-      const actualName = '  ';
-      const expectedName = '  ';
+      const actualName = 'M ';
+      const expectedName = 'M ';
       const expectedErrorMessage = 'Enter a name with at least 2 characters';
 
       wrapper = mountComponent(

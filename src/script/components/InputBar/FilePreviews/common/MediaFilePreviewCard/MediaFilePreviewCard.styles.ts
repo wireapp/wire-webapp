@@ -31,20 +31,6 @@ export const wrapperStyles: CSSObject = {
   },
 };
 
-export const imageStyles: CSSObject = {
-  width: '100%',
-  height: '100%',
-  objectFit: 'cover',
-  borderRadius: '10px',
-};
-
-export const controlStyles: CSSObject = {
-  position: 'absolute',
-  top: '50%',
-  left: '50%',
-  transform: 'translate(-50%, -50%)',
-};
-
 export const iconWrapperStyles: CSSObject = {
   position: 'absolute',
   top: '50%',

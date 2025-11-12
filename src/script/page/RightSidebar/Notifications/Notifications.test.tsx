@@ -20,9 +20,9 @@
 import {render, screen, fireEvent} from '@testing-library/react';
 import ko from 'knockout';
 
-import {ConversationRepository} from 'src/script/conversation/ConversationRepository';
-import {NOTIFICATION_STATE} from 'src/script/conversation/NotificationSetting';
-import {Conversation} from 'src/script/entity/Conversation';
+import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
+import {NOTIFICATION_STATE} from 'Repositories/conversation/NotificationSetting';
+import {Conversation} from 'Repositories/entity/Conversation';
 import {TestFactory} from 'test/helper/TestFactory';
 
 import {Notifications} from './Notifications';

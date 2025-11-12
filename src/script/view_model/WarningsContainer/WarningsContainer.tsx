@@ -17,7 +17,7 @@
  *
  */
 
-import React, {useEffect} from 'react';
+import {useEffect} from 'react';
 
 import cx from 'classnames';
 
@@ -36,7 +36,7 @@ interface WarningProps {
   onRefresh: () => void;
 }
 
-const WarningsContainer: React.FC<WarningProps> = ({onRefresh}) => {
+const WarningsContainer = ({onRefresh}: WarningProps) => {
   const name = useWarningsState(state => state.name);
   const warnings = useWarningsState(state => state.warnings);
   const type = TYPE;

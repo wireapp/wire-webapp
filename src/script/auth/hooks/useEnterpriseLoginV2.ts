@@ -17,13 +17,18 @@
  *
  */
 
+import {useCallback} from 'react';
+
 import {DomainRedirect} from '@wireapp/api-client/lib/account/DomainRedirect';
+import {useDispatch} from 'react-redux';
 import {useNavigate} from 'react-router';
+import {UnknownAction} from 'redux';
 import {container} from 'tsyringe';
 
 import {APIClient} from '../../service/APIClientSingleton';
+import {actionRoot as ROOT_ACTIONS} from '../module/action/';
+import {RegistrationDataState} from '../module/reducer/authReducer';
 import {ROUTE} from '../route';
-import {getRedirectURL} from '../util/configUtil';
 
 export const useEnterpriseLoginV2 = ({
   loginWithSSO,
@@ -32,48 +37,55 @@ export const useEnterpriseLoginV2 = ({
 }) => {
   const apiClient = container.resolve(APIClient);
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
-  const loginV2 = async (email: string, password?: string) => {
-    const response = await apiClient.api.account.getDomainRegistration(email);
+  const updateRegistrationData = useCallback(
+    (data: Partial<RegistrationDataState>) => {
+      dispatch(ROOT_ACTIONS.authAction.pushAccountRegistrationData(data) as unknown as UnknownAction);
+    },
+    [dispatch],
+  );
 
-    switch (response.domain_redirect) {
-      case DomainRedirect.NONE:
-      case DomainRedirect.NO_REGISTRATION:
-      case DomainRedirect.LOCKED:
-      case DomainRedirect.PRE_AUTHORIZED: {
-        navigate(ROUTE.LOGIN, {
-          state: {
-            email,
+  const loginV2 = useCallback(
+    async (email: string, password?: string) => {
+      const response = await apiClient.api.account.getDomainRegistration(email);
+
+      switch (response.domain_redirect) {
+        case DomainRedirect.NONE:
+        case DomainRedirect.NO_REGISTRATION:
+        case DomainRedirect.LOCKED:
+        case DomainRedirect.PRE_AUTHORIZED: {
+          updateRegistrationData({
             accountCreationEnabled: response.domain_redirect !== DomainRedirect.NO_REGISTRATION,
             shouldDisplayWarning:
               response.domain_redirect === DomainRedirect.NO_REGISTRATION && response.due_to_existing_account,
-          },
-        });
+          });
 
-        break;
+          navigate(ROUTE.LOGIN);
+
+          break;
+        }
+
+        case DomainRedirect.SSO: {
+          await loginWithSSO(response.sso_code, password);
+          break;
+        }
+
+        case DomainRedirect.BACKEND: {
+          const url = response.backend.webapp_url;
+          updateRegistrationData({
+            customBackendURL: url,
+          });
+          navigate(ROUTE.CUSTOM_BACKEND);
+          break;
+        }
+
+        default:
+          break;
       }
-
-      case DomainRedirect.SSO: {
-        await loginWithSSO(response.sso_code, password);
-        break;
-      }
-
-      case DomainRedirect.BACKEND: {
-        const url = await getRedirectURL(response.backend_url);
-
-        navigate(ROUTE.CUSTOM_BACKEND, {
-          state: {
-            email,
-            url,
-          },
-        });
-        break;
-      }
-
-      default:
-        break;
-    }
-  };
+    },
+    [apiClient.api.account, loginWithSSO, navigate, updateRegistrationData],
+  );
 
   return {
     loginV2,

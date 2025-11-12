@@ -22,12 +22,12 @@ import {useEffect, useState} from 'react';
 import cx from 'classnames';
 
 import {ReadIcon} from 'Components/Icon';
-import {Message} from 'src/script/entity/message/Message';
+import {Message} from 'Repositories/entity/message/Message';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 import {formatTimeShort} from 'Util/TimeUtil';
 
-export interface ReadReceiptStatusProps {
+interface ReadReceiptStatusProps {
   is1to1Conversation: boolean;
   message: Message;
   onClickDetails?: (message: Message) => void;

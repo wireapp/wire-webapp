@@ -22,11 +22,11 @@ import {CONVERSATION_TYPE, MLSConversation} from '@wireapp/api-client/lib/conver
 import {CredentialType} from '@wireapp/core/lib/messagingProtocols/mls';
 import {container} from 'tsyringe';
 
+import {User} from 'Repositories/entity/User';
+import {UserState} from 'Repositories/user/UserState';
 import {withTheme} from 'src/script/auth/util/test/TestUtil';
 import {E2EIHandler, MLSStatuses, WireIdentity} from 'src/script/E2EIdentity';
-import {User} from 'src/script/entity/User';
 import {Core} from 'src/script/service/CoreSingleton';
-import {UserState} from 'src/script/user/UserState';
 import {generateAPIConversation} from 'test/helper/ConversationGenerator';
 
 import {E2EICertificateDetails} from './E2EICertificateDetails';
@@ -34,13 +34,15 @@ import {E2EICertificateDetails} from './E2EICertificateDetails';
 const generateIdentity = (status: MLSStatuses, credentialType = CredentialType.X509): WireIdentity => ({
   status,
   x509Identity: {
+    free: jest.fn(),
     certificate: 'certificate',
     displayName: '',
     domain: '',
     handle: '',
-    notBefore: BigInt(0),
     notAfter: BigInt(0),
+    notBefore: BigInt(0),
     serialNumber: '',
+    [Symbol.dispose]: () => {},
   },
   credentialType,
   deviceId: '',

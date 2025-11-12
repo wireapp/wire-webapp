@@ -22,12 +22,12 @@ import React from 'react';
 import {act, render} from '@testing-library/react';
 import {observable} from 'knockout';
 
+import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
+import {User} from 'Repositories/entity/User';
+import {SearchRepository} from 'Repositories/search/SearchRepository';
+import {UserRepository} from 'Repositories/user/UserRepository';
 import {withTheme} from 'src/script/auth/util/test/TestUtil';
-import {ConversationRepository} from 'src/script/conversation/ConversationRepository';
-import {User} from 'src/script/entity/User';
 import {ListState} from 'src/script/page/useAppState';
-import {SearchRepository} from 'src/script/search/SearchRepository';
-import {UserRepository} from 'src/script/user/UserRepository';
 import {TestFactory} from 'test/helper/TestFactory';
 
 import {Conversations} from './';

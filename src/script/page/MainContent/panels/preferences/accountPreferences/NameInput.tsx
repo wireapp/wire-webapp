@@ -17,14 +17,11 @@
  *
  */
 
-import React from 'react';
-
+import {UserRepository} from 'Repositories/user/UserRepository';
 import {t} from 'Util/LocalizerUtil';
 import {getLogger} from 'Util/Logger';
 
 import {AccountInput, useInputDone} from './AccountInput';
-
-import {UserRepository} from '../../../../../user/UserRepository';
 
 interface NameInputProps {
   canEditProfile: boolean;
@@ -33,7 +30,7 @@ interface NameInputProps {
 }
 const logger = getLogger('NameInput');
 
-const NameInput: React.FC<NameInputProps> = ({name, userRepository, canEditProfile}) => {
+const NameInput = ({name, userRepository, canEditProfile}: NameInputProps) => {
   const nameInputDone = useInputDone();
 
   const changeName = async (newName: string): Promise<void> => {

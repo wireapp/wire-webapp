@@ -17,13 +17,13 @@
  *
  */
 
-import React, {useEffect, useState} from 'react';
+import {useEffect, useState} from 'react';
 
 import cx from 'classnames';
 
 import {useMessageFocusedTabIndex} from 'Components/MessagesList/Message/util';
-import {AssetTransferState} from 'src/script/assets/AssetTransferState';
-import type {FileAsset} from 'src/script/entity/message/FileAsset';
+import {AssetTransferState} from 'Repositories/assets/AssetTransferState';
+import type {FileAsset} from 'Repositories/entity/message/FileAsset';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 import {noop} from 'Util/util';
@@ -42,7 +42,7 @@ export interface MediaButtonProps {
   isFocusable?: boolean;
 }
 
-const MediaButton: React.FC<MediaButtonProps> = ({
+const MediaButton = ({
   mediaElement,
   large,
   asset,
@@ -52,7 +52,7 @@ const MediaButton: React.FC<MediaButtonProps> = ({
   pause = noop,
   cancel = noop,
   isFocusable = true,
-}) => {
+}: MediaButtonProps) => {
   const [isPlaying, setIsPlaying] = useState<boolean>(false);
   const onPlay = () => setIsPlaying(true);
   const onPause = () => setIsPlaying(false);

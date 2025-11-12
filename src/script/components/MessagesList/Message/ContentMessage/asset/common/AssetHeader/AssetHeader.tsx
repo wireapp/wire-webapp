@@ -17,18 +17,16 @@
  *
  */
 
-import React from 'react';
-
 import cx from 'classnames';
 
-import type {Message} from 'src/script/entity/message/Message';
+import type {Message} from 'Repositories/entity/message/Message';
 import {formatDayMonthNumeral, formatTimeShort} from 'Util/TimeUtil';
 
-export interface AssetHeaderProps extends Partial<HTMLDivElement> {
+interface AssetHeaderProps {
   message: Message;
 }
 
-const AssetHeader: React.FC<AssetHeaderProps> = ({message}) => {
+const AssetHeader = ({message}: AssetHeaderProps) => {
   const timestamp = message.timestamp();
   const timeText = `${formatDayMonthNumeral(timestamp)} ${formatTimeShort(timestamp)}`;
 

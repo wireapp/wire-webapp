@@ -23,12 +23,14 @@ import {AVATAR_SIZE, Avatar} from 'Components/Avatar';
 import {UserBlockedBadge} from 'Components/Badge';
 import * as Icon from 'Components/Icon';
 import {UserName} from 'Components/UserName';
-import {ContentMessage} from 'src/script/entity/message/ContentMessage';
-import {DeleteMessage} from 'src/script/entity/message/DeleteMessage';
-import {User} from 'src/script/entity/User';
-import {ServiceEntity} from 'src/script/integration/ServiceEntity';
+import {ContentMessage} from 'Repositories/entity/message/ContentMessage';
+import {DeleteMessage} from 'Repositories/entity/message/DeleteMessage';
+import {User} from 'Repositories/entity/User';
+import {ServiceEntity} from 'Repositories/integration/ServiceEntity';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
+
+import {headerIconBadge, headerLabelBadge, headerIconSizeM, headerIconSizeS} from './MessageHeader.styles';
 
 type MessageHeaderParams = {
   message: ContentMessage | DeleteMessage;
@@ -46,21 +48,37 @@ function BadgeSection({sender}: {sender: User}) {
   return (
     <>
       {sender.isService && (
-        <span className="message-header-icon-service">
-          <Icon.ServiceIcon />
+        <span className="message-header-icon-service" css={headerIconBadge}>
+          <Icon.ServiceIcon css={headerIconSizeS} />
         </span>
       )}
 
       {sender.isExternal() && (
-        <Tooltip body={t('rolePartner')} data-uie-name="sender-external" className="message-header-icon-external">
-          <Icon.ExternalIcon />
+        <Tooltip
+          body={t('rolePartner')}
+          data-uie-name="sender-external"
+          className="message-header-icon-external"
+          css={headerIconBadge}
+        >
+          <Icon.ExternalIcon css={headerIconSizeM} />
         </Tooltip>
       )}
 
       {sender.isFederated && (
-        <Tooltip className="message-header-icon-guest" body={sender.handle} data-uie-name="sender-federated">
-          <Icon.FederationIcon />
+        <Tooltip
+          className="message-header-icon-guest"
+          body={sender.handle}
+          data-uie-name="sender-federated"
+          css={headerIconBadge}
+        >
+          <Icon.FederationIcon css={headerIconSizeM} />
         </Tooltip>
+      )}
+
+      {sender.isDeleted && (
+        <p data-uie-name="sender-deleted" css={headerLabelBadge}>
+          {t('deletedUserBadge')}
+        </p>
       )}
 
       {sender.isDirectGuest() && !sender.isFederated && (
@@ -68,8 +86,9 @@ function BadgeSection({sender}: {sender: User}) {
           className="message-header-icon-guest"
           body={t('conversationGuestIndicator')}
           data-uie-name="sender-guest"
+          css={headerIconBadge}
         >
-          <Icon.GuestIcon />
+          <Icon.GuestIcon css={headerIconSizeS} />
         </Tooltip>
       )}
     </>

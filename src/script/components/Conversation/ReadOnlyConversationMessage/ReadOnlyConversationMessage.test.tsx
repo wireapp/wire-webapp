@@ -21,11 +21,11 @@ import {render} from '@testing-library/react';
 import {ConnectionStatus} from '@wireapp/api-client/lib/connection';
 import {CONVERSATION_TYPE} from '@wireapp/api-client/lib/conversation';
 
+import {ConnectionEntity} from 'Repositories/connection/ConnectionEntity';
+import {CONVERSATION_READONLY_STATE} from 'Repositories/conversation/ConversationRepository';
+import {Conversation} from 'Repositories/entity/Conversation';
+import {User} from 'Repositories/entity/User';
 import {withTheme} from 'src/script/auth/util/test/TestUtil';
-import {ConnectionEntity} from 'src/script/connection/ConnectionEntity';
-import {CONVERSATION_READONLY_STATE} from 'src/script/conversation/ConversationRepository';
-import {Conversation} from 'src/script/entity/Conversation';
-import {User} from 'src/script/entity/User';
 
 import {ReadOnlyConversationMessage} from './ReadOnlyConversationMessage';
 

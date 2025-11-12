@@ -20,22 +20,20 @@
 import React, {useEffect, useState} from 'react';
 
 import {ConnectionStatus} from '@wireapp/api-client/lib/connection';
-import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
+
+import {TabIndex} from '@wireapp/react-ui-kit';
 
 import {Avatar, AVATAR_SIZE} from 'Components/Avatar';
+import {User} from 'Repositories/entity/User';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {handleKeyDown, KEY} from 'Util/KeyboardUtil';
 
-import {AssetRepository} from '../../../../../../assets/AssetRepository';
-import {User} from '../../../../../../entity/User';
-
-export interface TopContactProps {
-  assetRepository: AssetRepository;
+interface TopContactProps {
   clickOnUser?: (userEntity: User, event: React.UIEvent) => void;
   user: User;
 }
 
-const TopContact: React.FC<TopContactProps> = ({assetRepository, user, clickOnUser}) => {
+const TopContact = ({user, clickOnUser}: TopContactProps) => {
   const {name, connection} = useKoSubscribableChildren(user, ['name', 'connection']);
   const [connectionStatus, setConnectionStatus] = useState<ConnectionStatus>();
 

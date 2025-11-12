@@ -21,10 +21,10 @@ import {useCallback, useState} from 'react';
 
 import {useAppNotification} from 'Components/AppNotification';
 import {FileWithPreview} from 'Components/Conversation/useFilesUploadState/useFilesUploadState';
-import {CellsRepository} from 'src/script/cells/CellsRepository';
+import {CellsRepository} from 'Repositories/cells/CellsRepository';
 import {t} from 'Util/LocalizerUtil';
 
-export type SendFilesStatus = 'idle' | 'loading' | 'success' | 'error';
+type SendFilesStatus = 'idle' | 'loading' | 'success' | 'error';
 
 interface UseSendFilesProps {
   files: FileWithPreview[];
@@ -41,7 +41,7 @@ export const useSendFiles = ({files, clearAllFiles, cellsRepository, conversatio
   });
 
   const sendFile = useCallback(async (file: FileWithPreview) => {
-    return cellsRepository.promoteFileDraft({uuid: file.remoteUuid, versionId: file.remoteVersionId});
+    return cellsRepository.promoteNodeDraft({uuid: file.remoteUuid, versionId: file.remoteVersionId});
     // cellsRepository is not a dependency because it's a singleton
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);

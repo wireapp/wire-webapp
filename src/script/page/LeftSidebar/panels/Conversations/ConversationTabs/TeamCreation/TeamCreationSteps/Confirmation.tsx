@@ -25,8 +25,8 @@ import {container} from 'tsyringe';
 import {Button, ButtonVariant, Checkbox, Link} from '@wireapp/react-ui-kit';
 
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
+import {TeamService} from 'Repositories/team/TeamService';
 import {Config} from 'src/script/Config';
-import {TeamService} from 'src/script/team/TeamService';
 import {t} from 'Util/LocalizerUtil';
 
 import {StepProps} from './StepProps';

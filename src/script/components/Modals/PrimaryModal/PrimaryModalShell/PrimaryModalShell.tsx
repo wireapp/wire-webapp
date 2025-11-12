@@ -21,6 +21,10 @@ import {ReactNode, useEffect, useRef} from 'react';
 
 import {ModalComponent} from 'Components/Modals/ModalComponent';
 
+import {largeModalStyles} from './PrimaryModalShell.styles';
+
+import {ModalSize} from '../PrimaryModalTypes';
+
 interface PrimaryModalShellProps {
   title: string;
   isShown: boolean;
@@ -28,6 +32,7 @@ interface PrimaryModalShellProps {
   dataUieName: string;
   onClose: () => void;
   onBgClick: () => void;
+  size?: ModalSize;
 }
 
 export const PrimaryModalShell = ({
@@ -37,6 +42,7 @@ export const PrimaryModalShell = ({
   children,
   onClose,
   onBgClick,
+  size,
 }: PrimaryModalShellProps) => {
   const modalsRef = useRef<HTMLDivElement | null>(null);
 
@@ -56,7 +62,13 @@ export const PrimaryModalShell = ({
       tabIndex={-1}
       ref={modalsRef}
     >
-      <ModalComponent isShown={isShown} onClosed={onClose} onBgClick={onBgClick} data-uie-name={dataUieName}>
+      <ModalComponent
+        isShown={isShown}
+        onClosed={onClose}
+        onBgClick={onBgClick}
+        data-uie-name={dataUieName}
+        wrapperCSS={size === 'large' ? largeModalStyles : undefined}
+      >
         {isShown && children}
       </ModalComponent>
     </div>

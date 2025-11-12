@@ -17,7 +17,7 @@
  *
  */
 
-import React, {CSSProperties, useEffect, useState} from 'react';
+import {ReactNode, CSSProperties, useEffect, useState} from 'react';
 
 import {css} from '@emotion/react';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
@@ -27,15 +27,14 @@ import {QUERY} from '@wireapp/react-ui-kit';
 import {Avatar, AVATAR_SIZE} from 'Components/Avatar';
 import * as Icon from 'Components/Icon';
 import {useActiveWindowMatchMedia} from 'Hooks/useActiveWindowMatchMedia';
-import {Call} from 'src/script/calling/Call';
+import {Call} from 'Repositories/calling/Call';
+import type {Participant} from 'Repositories/calling/Participant';
+import type {Grid} from 'Repositories/calling/videoGridHandler';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 
 import {GroupVideoGridTile} from './GroupVideoGridTile';
 import {Video} from './Video';
-
-import type {Participant} from '../../calling/Participant';
-import type {Grid} from '../../calling/videoGridHandler';
 
 const PARTICIPANTS_LIMITS = {
   TABLET: {SHORT: 2, MEDIUM: 4, TALL: 8},
@@ -98,10 +97,7 @@ const calculateRowsAndColumns = (params: CalculateRowsAndColumsParams): RowsAndC
   return {'--columns': columns, '--rows': rows};
 };
 
-const GroupVideoThumbnailWrapper: React.FC<{children?: React.ReactNode; minimized: boolean}> = ({
-  minimized,
-  children,
-}) => (
+const GroupVideoThumbnailWrapper = ({children, minimized}: {children?: ReactNode; minimized: boolean}) => (
   <div
     className="group-video__thumbnail"
     css={
@@ -128,14 +124,14 @@ const HEIGHT_QUERIES = {
   TALL: 'min-height: 830px',
 };
 
-const GroupVideoGrid: React.FunctionComponent<GroupVideoGripProps> = ({
+const GroupVideoGrid = ({
   minimized = false,
   grid,
   selfParticipant,
   maximizedParticipant,
   call,
   setMaximizedParticipant,
-}) => {
+}: GroupVideoGripProps) => {
   const isMobile = useActiveWindowMatchMedia(QUERY.mobile);
   const isTablet = useActiveWindowMatchMedia(QUERY.tablet);
   const isDesktop = useActiveWindowMatchMedia(QUERY.desktop);

@@ -17,7 +17,7 @@
  *
  */
 
-import React, {ChangeEvent, useCallback, useEffect, useRef, useState} from 'react';
+import {ChangeEvent, useCallback, useEffect, useRef, useState} from 'react';
 
 import type {WebappProperties} from '@wireapp/api-client/lib/user/data/';
 import {amplify} from 'amplify';
@@ -25,12 +25,12 @@ import {amplify} from 'amplify';
 import {Checkbox, CheckboxLabel} from '@wireapp/react-ui-kit';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
+import type {MediaConstraintsHandler} from 'Repositories/media/MediaConstraintsHandler';
+import type {PropertiesRepository} from 'Repositories/properties/PropertiesRepository';
+import {PROPERTIES_TYPE} from 'Repositories/properties/PropertiesType';
 import {t} from 'Util/LocalizerUtil';
 
 import {Config} from '../../../../../Config';
-import type {MediaConstraintsHandler} from '../../../../../media/MediaConstraintsHandler';
-import type {PropertiesRepository} from '../../../../../properties/PropertiesRepository';
-import {PROPERTIES_TYPE} from '../../../../../properties/PropertiesType';
 import {PreferencesSection} from '../components/PreferencesSection';
 
 interface CallOptionsProps {
@@ -38,7 +38,7 @@ interface CallOptionsProps {
   propertiesRepository: PropertiesRepository;
 }
 
-const CallOptions: React.FC<CallOptionsProps> = ({constraintsHandler, propertiesRepository}) => {
+const CallOptions = ({constraintsHandler, propertiesRepository}: CallOptionsProps) => {
   const {current: isCbrEncodingEnforced} = useRef(Config.getConfig().FEATURE.ENFORCE_CONSTANT_BITRATE);
   const [vbrEncoding, setVbrEncoding] = useState(
     !isCbrEncodingEnforced && propertiesRepository.properties.settings.call.enable_vbr_encoding,

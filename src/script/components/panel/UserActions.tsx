@@ -17,8 +17,6 @@
  *
  */
 
-import React from 'react';
-
 import {ConnectionStatus} from '@wireapp/api-client/lib/connection';
 import {CONVERSATION_TYPE} from '@wireapp/api-client/lib/conversation';
 import {ClientMLSError, ClientMLSErrorLabel} from '@wireapp/core/lib/messagingProtocols/mls';
@@ -30,9 +28,13 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 import * as Icon from 'Components/Icon';
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {listCSS} from 'Components/panel/PanelActions/PanelActions.styles';
-import {ConversationState} from 'src/script/conversation/ConversationState';
+import {ACCESS_STATE} from 'Repositories/conversation/AccessState';
+import type {ConversationRoleRepository} from 'Repositories/conversation/ConversationRoleRepository';
+import {ConversationState} from 'Repositories/conversation/ConversationState';
+import {Conversation} from 'Repositories/entity/Conversation';
+import type {User} from 'Repositories/entity/User';
+import {TeamState} from 'Repositories/team/TeamState';
 import {SidebarTabs, useSidebarStore} from 'src/script/page/LeftSidebar/panels/Conversations/useSidebarStore';
-import {TeamState} from 'src/script/team/TeamState';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 import {matchQualifiedIds} from 'Util/QualifiedId';
@@ -41,10 +43,6 @@ import type {MenuItem} from './PanelActions';
 import {PanelActions} from './PanelActions';
 import {SingleAction} from './SingleAction/SingleAction';
 
-import {ACCESS_STATE} from '../../conversation/AccessState';
-import type {ConversationRoleRepository} from '../../conversation/ConversationRoleRepository';
-import {Conversation} from '../../entity/Conversation';
-import type {User} from '../../entity/User';
 import type {ActionsViewModel} from '../../view_model/ActionsViewModel';
 
 export enum Actions {
@@ -75,7 +73,7 @@ export const ActionIdentifier = {
   [Actions.UNBLOCK]: 'do-unblock',
 };
 
-export interface UserActionsProps {
+interface UserActionsProps {
   actionsViewModel: ActionsViewModel;
   conversation?: Conversation;
   conversationRoleRepository?: ConversationRoleRepository;
@@ -108,7 +106,7 @@ function createPlaceholder1to1Conversation(user: User, selfUser: User) {
   return conversation;
 }
 
-const UserActions: React.FC<UserActionsProps> = ({
+const UserActions = ({
   actionsViewModel,
   isSelfActivated,
   user,
@@ -119,7 +117,7 @@ const UserActions: React.FC<UserActionsProps> = ({
   isModal = false,
   teamState = container.resolve(TeamState),
   conversationState = container.resolve(ConversationState),
-}) => {
+}: UserActionsProps) => {
   const {
     isAvailable,
     isBlocked,

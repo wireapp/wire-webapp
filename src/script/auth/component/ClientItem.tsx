@@ -20,9 +20,9 @@
 import {ChangeEvent, FormEvent, HTMLProps, useEffect, useRef, useState, MouseEvent, KeyboardEvent} from 'react';
 
 import {RegisteredClient} from '@wireapp/api-client/lib/client/index';
-import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
 
 import {
+  TabIndex,
   COLOR,
   ContainerXS,
   DeviceIcon,
@@ -43,7 +43,7 @@ import {splitFingerprint} from 'Util/StringUtil';
 import {ValidationError} from '../module/action/ValidationError';
 import {parseError, parseValidationErrors} from '../util/errorUtil';
 
-export interface Props extends HTMLProps<HTMLDivElement> {
+interface Props extends HTMLProps<HTMLDivElement> {
   client: RegisteredClient;
   onClick: (event: MouseEvent<HTMLDivElement> | KeyboardEvent) => void;
   onClientRemoval: (password?: string) => void;

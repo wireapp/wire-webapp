@@ -19,11 +19,14 @@
 
 import {useState, useRef} from 'react';
 
-import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
 import cx from 'classnames';
+
+import {TabIndex} from '@wireapp/react-ui-kit';
 
 import {Avatar, AVATAR_SIZE} from 'Components/Avatar';
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
+import {User} from 'Repositories/entity/User';
+import {UserRepository} from 'Repositories/user/UserRepository';
 import {handleKeyDown, KEY} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
 import {getLogger} from 'Util/Logger';
@@ -32,9 +35,7 @@ import {validateProfileImageResolution} from 'Util/util';
 import {FileInput} from './FileInput';
 
 import {Config} from '../../../../../Config';
-import {User} from '../../../../../entity/User';
 import {UserError} from '../../../../../error/UserError';
-import {UserRepository} from '../../../../../user/UserRepository';
 
 interface AvatarInputProps {
   isActivatedAccount: boolean;

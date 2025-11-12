@@ -17,16 +17,14 @@
  *
  */
 
-import React from 'react';
-
 import {CallingCell} from 'Components/calling/CallingCell';
 import * as Icon from 'Components/Icon';
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
+import {User} from 'Repositories/entity/User';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 
 import {Config} from '../../../Config';
-import {User} from '../../../entity/User';
 import {CallingViewModel} from '../../../view_model/CallingViewModel';
 import {ListViewModel} from '../../../view_model/ListViewModel';
 
@@ -36,11 +34,7 @@ type TemporaryGuestConversations = {
   selfUser: User;
 };
 
-const TemporaryGuestConversations: React.FC<TemporaryGuestConversations> = ({
-  selfUser,
-  listViewModel,
-  callingViewModel,
-}) => {
+const TemporaryGuestConversations = ({selfUser, listViewModel, callingViewModel}: TemporaryGuestConversations) => {
   const {expirationIsUrgent, expirationRemainingText} = useKoSubscribableChildren(selfUser, [
     'expirationIsUrgent',
     'expirationRemainingText',

@@ -22,9 +22,17 @@ import {useEffect, useState} from 'react';
 import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
 
 import * as Icon from 'Components/Icon';
-import {LoadingBar} from 'Components/LoadingBar/LoadingBar';
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
-import {User} from 'src/script/entity/User';
+import {ProgressBar} from 'Components/ProgressBar/ProgressBar';
+import {BackupRepository} from 'Repositories/backup/BackupRepository';
+import {
+  CancelError,
+  DifferentAccountError,
+  IncompatibleBackupError,
+  IncompatibleBackupFormatError,
+  InvalidPassword,
+} from 'Repositories/backup/Error';
+import {User} from 'Repositories/entity/User';
 import {ContentState} from 'src/script/page/useAppState';
 import {checkBackupEncryption} from 'Util/BackupUtil';
 import {t} from 'Util/LocalizerUtil';
@@ -33,14 +41,6 @@ import {loadFileBuffer} from 'Util/util';
 
 import {BackupFileUpload} from './BackupFileUpload';
 
-import {BackupRepository} from '../../backup/BackupRepository';
-import {
-  CancelError,
-  DifferentAccountError,
-  IncompatibleBackupError,
-  IncompatibleBackupFormatError,
-  InvalidPassword,
-} from '../../backup/Error';
 import {Config} from '../../Config';
 import {MotionDuration} from '../../motion/MotionDuration';
 
@@ -214,11 +214,11 @@ const HistoryImport = ({user, backupRepository, file, switchContent}: HistoryImp
       <h2 className="visually-hidden">{t('accessibility.headings.historyImport')}</h2>
 
       <div id="history-import">
-        {isPreparing && <LoadingBar progress={loadingProgress} message={loadingMessage} />}
+        {isPreparing && <ProgressBar progress={loadingProgress} message={loadingMessage} />}
 
         {isImporting && (
           <>
-            <LoadingBar progress={loadingProgress} message={loadingMessage} className="with-cancel" />
+            <ProgressBar progress={loadingProgress} message={loadingMessage} className="with-cancel" />
 
             <Button variant={ButtonVariant.SECONDARY} onClick={onCancel} data-uie-name="do-cancel-history-import">
               {t('backupCancel')}

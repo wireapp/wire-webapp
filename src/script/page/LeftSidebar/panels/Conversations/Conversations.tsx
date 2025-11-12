@@ -17,7 +17,7 @@
  *
  */
 
-import React, {KeyboardEvent as ReactKeyBoardEvent, useCallback, useEffect, useMemo, useRef, useState} from 'react';
+import {KeyboardEvent as ReactKeyBoardEvent, useCallback, useEffect, useMemo, useRef, useState} from 'react';
 
 import {amplify} from 'amplify';
 import {container} from 'tsyringe';
@@ -27,15 +27,25 @@ import {useMatchMedia} from '@wireapp/react-ui-kit';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {useConversationFocus} from 'Hooks/useConversationFocus';
-import {IntegrationRepository} from 'src/script/integration/IntegrationRepository';
+import {CallState} from 'Repositories/calling/CallState';
+import {createLabel} from 'Repositories/conversation/ConversationLabelRepository';
+import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
+import {ConversationState} from 'Repositories/conversation/ConversationState';
+import type {Conversation} from 'Repositories/entity/Conversation';
+import {User} from 'Repositories/entity/User';
+import {IntegrationRepository} from 'Repositories/integration/IntegrationRepository';
+import {PreferenceNotificationRepository} from 'Repositories/notification/PreferenceNotificationRepository';
+import {PropertiesRepository} from 'Repositories/properties/PropertiesRepository';
+import {SearchRepository} from 'Repositories/search/SearchRepository';
+import {TeamRepository} from 'Repositories/team/TeamRepository';
+import {TeamState} from 'Repositories/team/TeamState';
+import {EventName} from 'Repositories/tracking/EventName';
+import {UserRepository} from 'Repositories/user/UserRepository';
+import {UserState} from 'Repositories/user/UserState';
 import {Preferences} from 'src/script/page/LeftSidebar/panels/Preferences';
 import {ANIMATED_PAGE_TRANSITION_DURATION} from 'src/script/page/MainContent';
 import {useAppMainState, ViewType} from 'src/script/page/state';
 import {ContentState, ListState} from 'src/script/page/useAppState';
-import {SearchRepository} from 'src/script/search/SearchRepository';
-import {TeamRepository} from 'src/script/team/TeamRepository';
-import {EventName} from 'src/script/tracking/EventName';
-import {UserRepository} from 'src/script/user/UserRepository';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {useChannelsFeatureFlag} from 'Util/useChannelsFeatureFlag';
 
@@ -47,21 +57,12 @@ import {ConversationsList} from './ConversationsList';
 import {EmptyConversationList} from './EmptyConversationList';
 import {getGroupParticipantsConversations} from './getGroupParticipantsConversation';
 import {getTabConversations, scrollToConversation} from './helpers';
+import {useDraftConversations} from './hooks/useDraftConversations';
 import {useFolderStore} from './useFoldersStore';
 import {SidebarStatus, SidebarTabs, useSidebarStore} from './useSidebarStore';
 
-import {CallState} from '../../../../calling/CallState';
-import {createLabel} from '../../../../conversation/ConversationLabelRepository';
-import {ConversationRepository} from '../../../../conversation/ConversationRepository';
-import {ConversationState} from '../../../../conversation/ConversationState';
-import type {Conversation} from '../../../../entity/Conversation';
-import {User} from '../../../../entity/User';
-import {PreferenceNotificationRepository} from '../../../../notification/PreferenceNotificationRepository';
-import {PropertiesRepository} from '../../../../properties/PropertiesRepository';
 import {generateConversationUrl} from '../../../../router/routeGenerator';
 import {createNavigateKeyboard} from '../../../../router/routerBindings';
-import {TeamState} from '../../../../team/TeamState';
-import {UserState} from '../../../../user/UserState';
 import {ListViewModel} from '../../../../view_model/ListViewModel';
 import {ListWrapper} from '../ListWrapper';
 import {StartUI} from '../StartUI';
@@ -82,7 +83,7 @@ type ConversationsProps = {
   userRepository: UserRepository;
 };
 
-export const Conversations: React.FC<ConversationsProps> = ({
+export const Conversations = ({
   integrationRepository,
   searchRepository,
   teamRepository,
@@ -96,7 +97,7 @@ export const Conversations: React.FC<ConversationsProps> = ({
   callState = container.resolve(CallState),
   userState = container.resolve(UserState),
   selfUser,
-}) => {
+}: ConversationsProps) => {
   const [conversationListRef, setConversationListRef] = useState<HTMLElement | null>(null);
   const searchInputRef = useRef<HTMLInputElement | null>(null);
 
@@ -105,6 +106,7 @@ export const Conversations: React.FC<ConversationsProps> = ({
     status: sidebarStatus,
     setStatus: setSidebarStatus,
     setCurrentTab,
+    conversationFilter,
   } = useSidebarStore(useShallow(state => state));
   const {isChannelsEnabled} = useChannelsFeatureFlag();
   const [conversationsFilter, setConversationsFilter] = useState<string>('');
@@ -178,6 +180,10 @@ export const Conversations: React.FC<ConversationsProps> = ({
     }
   }, [isScreenLessThanMdBreakpoint, setSidebarStatus]);
 
+  // Get conversations with drafts for the draft filter
+  const allConversations = [...conversations, ...archivedConversations];
+  const draftConversations = useDraftConversations(allConversations);
+
   const {conversations: currentTabConversations, searchInputPlaceholder} = getTabConversations({
     currentTab,
     conversations,
@@ -189,6 +195,8 @@ export const Conversations: React.FC<ConversationsProps> = ({
     channelConversations,
     isChannelsEnabled,
     channelAndGroupConversations,
+    conversationFilter,
+    draftConversations,
   });
 
   const currentFolder = labels
@@ -390,8 +398,6 @@ export const Conversations: React.FC<ConversationsProps> = ({
               conversationRepository={conversationRepository}
               onClickPreferences={onClickPreferences}
               showNotificationsBadge={notifications.length > 0}
-              userRepository={userRepository}
-              teamRepository={teamRepository}
               channelConversations={channelConversations}
             />
           )

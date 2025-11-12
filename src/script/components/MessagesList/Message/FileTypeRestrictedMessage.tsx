@@ -17,17 +17,14 @@
  *
  */
 
-import React from 'react';
-
+import {FileTypeRestrictedMessage as FileTypeRestrictedMessageEntity} from 'Repositories/entity/message/FileTypeRestrictedMessage';
 import {t} from 'Util/LocalizerUtil';
 
-import {FileTypeRestrictedMessage as FileTypeRestrictedMessageEntity} from '../../../entity/message/FileTypeRestrictedMessage';
-
-export interface FileTypeRestrictedMessageProps {
+interface FileTypeRestrictedMessageProps {
   message: FileTypeRestrictedMessageEntity;
 }
 
-const FileTypeRestrictedMessage: React.FC<FileTypeRestrictedMessageProps> = ({message}) => {
+const FileTypeRestrictedMessage = ({message}: FileTypeRestrictedMessageProps) => {
   return (
     <div className="message-header" data-uie-name="filetype-restricted-message">
       <div className="message-header-icon">

@@ -17,18 +17,16 @@
  *
  */
 
-import React from 'react';
-
 import {Avatar, AVATAR_SIZE} from 'Components/Avatar';
 import * as Icon from 'Components/Icon';
 import {ModalComponent} from 'Components/Modals/ModalComponent';
+import {IntegrationRepository} from 'Repositories/integration/IntegrationRepository';
+import {ServiceEntity} from 'Repositories/integration/ServiceEntity';
 import {SidebarTabs, useSidebarStore} from 'src/script/page/LeftSidebar/panels/Conversations/useSidebarStore';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 import {renderElement} from 'Util/renderElement';
 
-import {IntegrationRepository} from '../../../integration/IntegrationRepository';
-import {ServiceEntity} from '../../../integration/ServiceEntity';
 import {ActionsViewModel} from '../../../view_model/ActionsViewModel';
 
 interface ServiceModalProps {
@@ -39,12 +37,7 @@ interface ServiceModalProps {
   readonly avatarSize?: AVATAR_SIZE;
 }
 
-const ServiceModal: React.FC<ServiceModalProps> = ({
-  service,
-  avatarSize = AVATAR_SIZE.LARGE,
-  actionsViewModel,
-  onClose,
-}) => {
+const ServiceModal = ({service, avatarSize = AVATAR_SIZE.LARGE, actionsViewModel, onClose}: ServiceModalProps) => {
   const {setCurrentTab: setCurrentSidebarTab} = useSidebarStore();
 
   const onOpenService = () => {

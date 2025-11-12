@@ -24,14 +24,14 @@ import {container} from 'tsyringe';
 
 import {Checkbox, CheckboxLabel} from '@wireapp/react-ui-kit';
 
+import {PropertiesRepository} from 'Repositories/properties/PropertiesRepository';
+import {AppLockRepository} from 'Repositories/user/AppLockRepository';
+import {AppLockState} from 'Repositories/user/AppLockState';
+import {CONVERSATION_TYPING_INDICATOR_MODE} from 'Repositories/user/TypingIndicatorMode';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 import {formatDurationCaption} from 'Util/TimeUtil';
 
-import {PropertiesRepository} from '../../../../../properties/PropertiesRepository';
-import {AppLockRepository} from '../../../../../user/AppLockRepository';
-import {AppLockState} from '../../../../../user/AppLockState';
-import {CONVERSATION_TYPING_INDICATOR_MODE} from '../../../../../user/TypingIndicatorMode';
 import {PreferencesSection} from '../components/PreferencesSection';
 
 interface PrivacySectionProps {
@@ -40,11 +40,11 @@ interface PrivacySectionProps {
   propertiesRepository: PropertiesRepository;
 }
 
-const PrivacySection: React.FC<PrivacySectionProps> = ({
+const PrivacySection = ({
   propertiesRepository,
   appLockRepository = container.resolve(AppLockRepository),
   appLockState = container.resolve(AppLockState),
-}) => {
+}: PrivacySectionProps) => {
   const {isAppLockEnabled, isAppLockAvailable, isAppLockEnforced, appLockInactivityTimeoutSecs} =
     useKoSubscribableChildren(appLockState, [
       'isAppLockEnabled',

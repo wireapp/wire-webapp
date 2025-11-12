@@ -17,13 +17,11 @@
  *
  */
 
-import React from 'react';
-
-import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
+import {Button, ButtonVariant, CollectionIcon} from '@wireapp/react-ui-kit';
 
 import * as Icon from 'Components/Icon';
-import {MemberMessage as MemberMessageEntity} from 'src/script/entity/message/MemberMessage';
-import {User} from 'src/script/entity/User';
+import {MemberMessage as MemberMessageEntity} from 'Repositories/entity/message/MemberMessage';
+import {User} from 'Repositories/entity/User';
 import {SystemMessageType} from 'src/script/message/SystemMessageType';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
@@ -43,9 +41,10 @@ interface MemberMessageProps {
   onClickParticipants: (participants: User[]) => void;
   shouldShowInvitePeople: boolean;
   conversationName: string;
+  isCellsConversation: boolean;
 }
 
-export const MemberMessage: React.FC<MemberMessageProps> = ({
+export const MemberMessage = ({
   message,
   shouldShowInvitePeople,
   isSelfTemporaryGuest,
@@ -55,7 +54,8 @@ export const MemberMessage: React.FC<MemberMessageProps> = ({
   onClickCancelRequest,
   classifiedDomains,
   conversationName,
-}) => {
+  isCellsConversation,
+}: MemberMessageProps) => {
   const {otherUser, timestamp, user, htmlGroupCreationHeader, showNamedCreation, hasUsers} = useKoSubscribableChildren(
     message,
     ['otherUser', 'timestamp', 'user', 'htmlGroupCreationHeader', 'showNamedCreation', 'hasUsers'],
@@ -147,6 +147,17 @@ export const MemberMessage: React.FC<MemberMessageProps> = ({
         </div>
       )}
 
+      {isGroupCreation && isCellsConversation && (
+        <div className="message-header" data-uie-name="label-cells-conversation">
+          <div className="message-header-icon message-header-icon--svg text-foreground">
+            <CollectionIcon />
+          </div>
+          <p className="message-header-label">
+            <span className="ellipsis">{t('conversationCellsConversationEnabled')}</span>
+          </p>
+        </div>
+      )}
+
       {isGroupCreation && hasReadReceiptsTurnedOn && (
         <div className="message-header" data-uie-name="label-group-creation-receipts">
           <div className="message-header-icon message-header-icon--svg text-foreground">
@@ -164,7 +175,7 @@ export const MemberMessage: React.FC<MemberMessageProps> = ({
         </div>
       )}
 
-      {isGroupCreation && <E2eEncryptionMessage />}
+      {isGroupCreation && <E2eEncryptionMessage isCellsConversation={isCellsConversation} />}
     </>
   );
 };

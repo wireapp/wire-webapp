@@ -19,7 +19,7 @@
 
 import {handleEscDown} from 'Util/KeyboardUtil';
 
-import {ConfirmConversationTypeModal} from './ConversationType/ConfirmConversationTypeModal';
+import {ConfirmDiscardModal} from './ConversationType/ConfirmDiscardModal';
 import {createConversationModalWrapperCss} from './CreateConversation.styles';
 import {CreateConversationHeader} from './CreateConversationHeader';
 import {CreateTeamModal} from './CreateConversationSteps/ConversationDetails/CreateTeamModal';
@@ -27,11 +27,27 @@ import {CustomHistoryModal} from './CreateConversationSteps/ConversationDetails/
 import {UpgradePlanModal} from './CreateConversationSteps/ConversationDetails/UpgradePlanModal';
 import {CreateConversationSteps} from './CreateConversationSteps/CreateConversationSteps';
 import {useCreateConversationModal} from './hooks/useCreateConversationModal';
+import {ConversationType} from './types';
 
 import {ModalComponent} from '../ModalComponent';
 
 export const CreateConversationModal = () => {
-  const {isOpen, hideModal} = useCreateConversationModal();
+  const {isOpen, hideModal, setIsConfirmDiscardModalOpen, setConversationType, gotoPreviousStep, discardTrigger} =
+    useCreateConversationModal();
+
+  const onCancel = () => {
+    setIsConfirmDiscardModalOpen(false);
+  };
+
+  const onSubmit = () => {
+    if (discardTrigger === 'modalClose') {
+      hideModal();
+      return;
+    }
+    setConversationType(ConversationType.Group);
+    setIsConfirmDiscardModalOpen(false);
+    gotoPreviousStep();
+  };
 
   return (
     <>
@@ -47,7 +63,7 @@ export const CreateConversationModal = () => {
         <CreateConversationSteps />
       </ModalComponent>
       <CustomHistoryModal />
-      <ConfirmConversationTypeModal />
+      <ConfirmDiscardModal onCancel={onCancel} onSubmit={onSubmit} />
       <UpgradePlanModal />
       <CreateTeamModal />
     </>

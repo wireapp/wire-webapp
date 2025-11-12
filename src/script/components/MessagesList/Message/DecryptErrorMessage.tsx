@@ -17,9 +17,10 @@
  *
  */
 
-import React, {useState} from 'react';
+import {useState} from 'react';
 
 import * as Icon from 'Components/Icon';
+import {DecryptErrorMessage as DecryptErrorMessageEntity} from 'Repositories/entity/message/DecryptErrorMessage';
 import {Config} from 'src/script/Config';
 import {MotionDuration} from 'src/script/motion/MotionDuration';
 import {t} from 'Util/LocalizerUtil';
@@ -27,15 +28,14 @@ import {splitFingerprint} from 'Util/StringUtil';
 
 import {messageBodyWrapper} from './ContentMessage/ContentMessage.styles';
 
-import {DecryptErrorMessage as DecryptErrorMessageEntity} from '../../../entity/message/DecryptErrorMessage';
 import {FormattedId} from '../../../page/MainContent/panels/preferences/DevicesPreferences/components/FormattedId';
 
-export interface DecryptErrorMessageProps {
+interface DecryptErrorMessageProps {
   message: DecryptErrorMessageEntity;
   onClickResetSession: (message: DecryptErrorMessageEntity) => void;
 }
 
-const DecryptErrorMessage: React.FC<DecryptErrorMessageProps> = ({message, onClickResetSession}) => {
+const DecryptErrorMessage = ({message, onClickResetSession}: DecryptErrorMessageProps) => {
   const [isResettingSession, setIsResettingSession] = useState(false);
 
   const link = Config.getConfig().URL.SUPPORT.DECRYPT_ERROR;

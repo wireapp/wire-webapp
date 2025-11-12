@@ -25,7 +25,7 @@ import {pathWithParams} from '@wireapp/commons/lib/util/UrlUtil';
 import {isValidEmail, PATTERN} from '@wireapp/commons/lib/util/ValidationUtil';
 import {FormattedMessage} from 'react-intl';
 import {connect} from 'react-redux';
-import {Navigate, useNavigate} from 'react-router-dom';
+import {Navigate, useLocation, useNavigate} from 'react-router-dom';
 import {AnyAction, Dispatch} from 'redux';
 
 import {Runtime, UrlUtil} from '@wireapp/commons';
@@ -48,7 +48,7 @@ import {getEnterpriseLoginV2FF} from '../util/helpers';
 import {logoutReasonStrings} from '../util/logoutUtil';
 import {getSearchParams, SSO_CODE_PREFIX} from '../util/urlUtil';
 
-export interface SingleSignOnFormProps extends React.HTMLAttributes<HTMLDivElement> {
+interface SingleSignOnFormProps {
   doLogin: (code: string) => Promise<void>;
   initialCode?: string;
 }
@@ -70,11 +70,15 @@ const SingleSignOnFormComponent = ({
   doJoinConversationByCode,
   doGetConversationInfoByCode,
   doNavigate,
+  pushAccountRegistrationData,
+  account,
 }: SingleSignOnFormProps & ConnectedProps & DispatchProps) => {
   const codeOrMailInput = useRef<HTMLInputElement>();
-  const [codeOrMail, setCodeOrMail] = useState('');
+  const [codeOrMail, setCodeOrMail] = useState(account.email || '');
   const [disableInput, setDisableInput] = useState(false);
   const navigate = useNavigate();
+  const {state} = useLocation();
+  const shouldLogin = state?.shouldLogin as boolean;
   const [clientType, setClientType] = useState<ClientType | null>(null);
   const [ssoError, setSsoError] = useState<BackendError | null>(null);
   const [isCodeOrMailInputValid, setIsCodeOrMailInputValid] = useState(true);
@@ -175,6 +179,15 @@ const SingleSignOnFormComponent = ({
     }
   }, [shouldAutoLogin, clientType, initialCode, codeOrMail]);
 
+  useEffect(() => {
+    if (codeOrMail && shouldLogin) {
+      handleSubmit().catch(error => {
+        setIsLoading(false);
+        setSsoError(error);
+      });
+    }
+  }, [shouldLogin, codeOrMail]);
+
   const onCodeChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setCodeOrMail(event.target.value);
     setIsCodeOrMailInputValid(true);
@@ -219,6 +232,7 @@ const SingleSignOnFormComponent = ({
       }
       const email = codeOrMail.trim();
       if (isValidEmail(email)) {
+        await pushAccountRegistrationData({email});
         if (isEnterpriseLoginV2Enabled) {
           await loginV2(email, password);
         } else {
@@ -389,6 +403,7 @@ const SingleSignOnFormComponent = ({
 type ConnectedProps = ReturnType<typeof mapStateToProps>;
 const mapStateToProps = (state: RootState) => ({
   isFetching: AuthSelector.isFetching(state),
+  account: AuthSelector.getAccount(state),
   authError: AuthSelector.getError(state),
   conversationError: ConversationSelector.getError(state),
   conversationInfo: ConversationSelector.conversationInfo(state),
@@ -407,6 +422,7 @@ const mapDispatchToProps = (dispatch: Dispatch<AnyAction>) =>
       doNavigate: ROOT_ACTIONS.navigationAction.doNavigate,
       resetAuthError: ROOT_ACTIONS.authAction.resetAuthError,
       validateSSOCode: ROOT_ACTIONS.authAction.validateSSOCode,
+      pushAccountRegistrationData: ROOT_ACTIONS.authAction.pushAccountRegistrationData,
     },
     dispatch,
   );

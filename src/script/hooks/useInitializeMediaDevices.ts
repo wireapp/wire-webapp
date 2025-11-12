@@ -17,38 +17,34 @@
  *
  */
 
-import {useEffect, useState} from 'react';
+import {useCallback, useEffect, useState} from 'react';
 
+import {MediaDevicesHandler} from 'Repositories/media/MediaDevicesHandler';
+import {MediaStreamHandler} from 'Repositories/media/MediaStreamHandler';
 import {getLogger} from 'Util/Logger';
-
-import {MediaDevicesHandler} from '../media/MediaDevicesHandler';
-import {MediaStreamHandler} from '../media/MediaStreamHandler';
 
 const logger = getLogger('useInitializeMediaDevices');
 
 export const useInitializeMediaDevices = (devicesHandler: MediaDevicesHandler, streamHandler: MediaStreamHandler) => {
-  const [isMediaDevicesAreInitialized, setCheckingPermissions] = useState(false);
+  const [areMediaDevicesInitialized, setAreMediaDevicesInitialized] = useState(false);
 
-  const initializeMediaDevices = async () => {
-    setCheckingPermissions(true);
+  const initializeMediaDevices = useCallback(async () => {
     try {
-      await streamHandler.requestMediaStreamAccess(true).then((stream: MediaStream | void) => {
-        devicesHandler?.initializeMediaDevices().then(() => {
-          if (stream) {
-            stream.getTracks().forEach(track => track.stop());
-          }
-        });
-      });
+      const stream = await streamHandler.requestMediaStreamAccess(true);
+      await devicesHandler?.initializeMediaDevices();
+      if (stream) {
+        stream.getTracks().forEach(track => track.stop());
+      }
+      setAreMediaDevicesInitialized(true);
     } catch (error) {
       logger.warn(`Initialization of media devices failed:`, error);
-    } finally {
-      setCheckingPermissions(false);
+      setAreMediaDevicesInitialized(false);
     }
-  };
+  }, [devicesHandler, streamHandler]);
 
   useEffect(() => {
     initializeMediaDevices();
-  }, []);
+  }, [initializeMediaDevices]);
 
-  return {isMediaDevicesAreInitialized: isMediaDevicesAreInitialized};
+  return {areMediaDevicesInitialized};
 };

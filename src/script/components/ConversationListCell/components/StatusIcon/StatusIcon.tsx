@@ -20,14 +20,13 @@
 import {useMemo} from 'react';
 
 import * as Icon from 'Components/Icon';
+import {generateCellState} from 'Repositories/conversation/ConversationCellState';
+import {ConversationStatusIcon} from 'Repositories/conversation/ConversationStatusIcon';
+import type {Conversation} from 'Repositories/entity/Conversation';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 
-import {generateCellState} from '../../../../conversation/ConversationCellState';
-import {ConversationStatusIcon} from '../../../../conversation/ConversationStatusIcon';
-import type {Conversation} from '../../../../entity/Conversation';
-
-export interface Props {
+interface Props {
   conversation: Conversation;
 }
 

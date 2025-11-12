@@ -161,11 +161,6 @@ module.exports = {
     new CopyPlugin({
       patterns: [
         {
-          context: 'node_modules/@wireapp/core-crypto/platforms/web',
-          from: '*.wasm',
-          to: `${dist}/min/core-crypto.wasm`,
-        },
-        {
           context: 'node_modules/@mediapipe/tasks-vision/wasm',
           from: '*',
           to: `${dist}/min/mediapipe/wasm`,
@@ -175,6 +170,18 @@ module.exports = {
         {from: `assets`, to: `${dist}/assets`},
         {from: 'src/page/basicBrowserFeatureCheck.js', to: `${dist}/min/`},
         {from: 'src/page/loader.js', to: `${dist}/min/`},
+        // Copy PDF worker for react-pdf package
+        {
+          from: path.dirname(require.resolve('pdfjs-dist/package.json')) + '/build/pdf.worker.mjs',
+          to: `${dist}/min/pdf.worker.mjs`,
+          // Prevents content hashing
+          info: {minimized: true},
+        },
+        // Copy and flatten everything from core-crypto src
+        {
+          from: 'node_modules/@wireapp/core-crypto/src/**/*',
+          to: `${dist}/min/[name][ext]`,
+        },
       ],
     }),
     new webpack.IgnorePlugin({resourceRegExp: /.*\.wasm/}),
@@ -201,6 +208,7 @@ module.exports = {
     alias: {
       Components: path.resolve(srcScript, 'components'),
       Hooks: path.resolve(srcScript, 'hooks'),
+      Repositories: path.resolve(srcScript, 'repositories'),
       I18n: path.resolve(SRC_PATH, 'i18n'),
       Resource: path.resolve(ROOT_PATH, 'resource'),
       Util: path.resolve(srcScript, 'util'),

@@ -17,19 +17,19 @@
  *
  */
 
+import {AssetRepository} from 'Repositories/assets/AssetRepository';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 
 import {UploadAssetItem} from './components/UploadAssetItem';
 import {uploadAssetsContainer} from './UploadAssets.styles';
 
-import {AssetRepository} from '../../../assets/AssetRepository';
-
 interface Props {
   assetRepository: AssetRepository;
   conversationId: string;
+  scrollToEnd?: () => void;
 }
 
-export const UploadAssets = ({assetRepository, conversationId}: Props) => {
+export const UploadAssets = ({assetRepository, conversationId, scrollToEnd}: Props) => {
   const {processQueue, uploadProgressQueue} = useKoSubscribableChildren(assetRepository, [
     'processQueue',
     'uploadProgressQueue',
@@ -61,6 +61,7 @@ export const UploadAssets = ({assetRepository, conversationId}: Props) => {
             assetRepository={assetRepository}
             message={processingMessage.message}
             key={processingMessage.message.messageId}
+            scrollToEnd={scrollToEnd}
           />
         );
       })}

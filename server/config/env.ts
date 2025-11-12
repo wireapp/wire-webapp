@@ -48,6 +48,7 @@ export type Env = {
 
   /** Specifies configuration for Cells */
   FEATURE_ENABLE_CELLS: string;
+  FEATURE_CELLS_INIT_WITH_ZAUTH_TOKEN: string;
   CELLS_TOKEN_SHARED_SECRET: string;
   CELLS_PYDIO_SEGMENT: string;
   CELLS_PYDIO_URL: string;
@@ -77,6 +78,9 @@ export type Env = {
   /** Allows a client to use a development version of the api (if present) */
   ENABLE_DEV_BACKEND_API?: string;
 
+  /** Sets the custom SSO code for the backend */
+  CUSTOM_SSO_CODE?: string;
+
   SSL_CERTIFICATE_KEY_PATH?: string;
   SSL_CERTIFICATE_PATH?: string;
 
@@ -86,6 +90,8 @@ export type Env = {
 
   /** Accepted file extensions for asset upload (e.g. ".txt,.jpg" or "*") */
   FEATURE_ALLOWED_FILE_UPLOAD_EXTENSIONS: string;
+
+  FEATURE_ALLOW_LINK_PREVIEWS: string;
 
   /** will enable the MLS protocol */
   FEATURE_USE_CORE_CRYPTO?: string;
@@ -110,13 +116,16 @@ export type Env = {
    */
   FEATURE_ENABLE_ACCOUNT_REGISTRATION_ACCEPT_TERMS_AND_PRIVACY_POLICY: string;
 
+  /** Feature toggle for advanced filters */
+  FEATURE_ENABLE_ADVANCED_FILTERS: string;
+
   /** Feature toggle to blur the background during video call */
   FEATURE_ENABLE_BLUR_BACKGROUND: string;
 
   /** Feature toggle for debug utils. Can be set to true or false */
   FEATURE_ENABLE_DEBUG: string;
 
-  /** Feature to open a confirm modal before pinging large groups */
+  /** Feature to open a confirmation modal before pinging large groups */
   FEATURE_ENABLE_PING_CONFIRMATION: string;
 
   /**
@@ -181,9 +190,6 @@ export type Env = {
   /** Feature to enable calling popout window */
   FEATURE_ENABLE_DETACHED_CALLING_WINDOW: string;
 
-  /** Feature to enable Enterprise login v2 */
-  FEATURE_ENABLE_ENTERPRISE_LOGIN_V2: string;
-
   /** Feature to enable channels */
   FEATURE_ENABLE_CHANNELS: string;
 
@@ -201,6 +207,9 @@ export type Env = {
 
   /** Feature to enable rich text editor */
   FEATURE_ENABLE_MESSAGE_FORMAT_BUTTONS: string;
+
+  /** Feature to enable virtualized messages list */
+  FEATURE_ENABLE_VIRTUALIZED_MESSAGES_LIST: string;
 
   /** Feature to enable Cross Platform Backup export */
   FEATURE_ENABLE_CROSS_PLATFORM_BACKUP_EXPORT: string;
@@ -333,6 +342,8 @@ export type Env = {
   URL_SUPPORT_FEDERATION_STOP: string;
 
   URL_SUPPORT_E2EI_VERIFICATION: string;
+
+  URL_SUPPORT_E2EI_VERIFICATION_CERTIFICATE: string;
 
   URL_SUPPORT_DECRYPT_ERROR: string;
 

@@ -59,6 +59,26 @@ const markdownit = new MarkdownIt('zero', {
   'blockquote',
 ]);
 
+markdownit.linkify.add('wire:', {
+  validate: (text, pos) => {
+    // Typical linkify schema: valid url chars to first whitespace or control char
+    const tail = text.slice(pos);
+
+    // A simple matcher: up to the first space, <, or a parenthesis.
+    const match = /^[^\s<>()]+/.exec(tail);
+    if (match) {
+      return match[0].length;
+    }
+    return 0;
+  },
+  normalize: match => {
+    // match.url has the form ‘wire:/...’; replace it with ‘wire://...’ if needed
+    if (match.url.startsWith('wire:/') && !match.url.startsWith('wire://')) {
+      match.url = match.url.replace('wire:/', 'wire://');
+    }
+  },
+});
+
 const originalFenceRule = markdownit.renderer.rules.fence!;
 
 markdownit.renderer.rules.heading_open = (tokens, idx) => {

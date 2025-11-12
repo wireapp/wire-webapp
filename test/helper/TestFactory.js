@@ -28,45 +28,46 @@ import {ClientClassification, ClientType} from '@wireapp/api-client/lib/client/'
 import ko from 'knockout';
 import {container} from 'tsyringe';
 
-import {AssetRepository} from 'src/script/assets/AssetRepository';
-import {CallingRepository} from 'src/script/calling/CallingRepository';
-import {ClientEntity} from 'src/script/client/ClientEntity';
-import {ClientRepository} from 'src/script/client/ClientRepository';
-import {ClientService} from 'src/script/client/ClientService';
-import {ClientState} from 'src/script/client/ClientState';
-import {ConnectionRepository} from 'src/script/connection/ConnectionRepository';
-import {ConnectionService} from 'src/script/connection/ConnectionService';
-import {ConversationRepository} from 'src/script/conversation/ConversationRepository';
-import {ConversationService} from 'src/script/conversation/ConversationService';
-import {ConversationState} from 'src/script/conversation/ConversationState';
-import {MessageRepository} from 'src/script/conversation/MessageRepository';
-import {CryptographyRepository} from 'src/script/cryptography/CryptographyRepository';
-import {User} from 'src/script/entity/User';
-import {EventRepository} from 'src/script/event/EventRepository';
-import {EventService} from 'src/script/event/EventService';
-import {NotificationService} from 'src/script/event/NotificationService';
-import {MediaRepository} from 'src/script/media/MediaRepository';
-import {PermissionRepository} from 'src/script/permission/PermissionRepository';
-import {PropertiesRepository} from 'src/script/properties/PropertiesRepository';
-import {PropertiesService} from 'src/script/properties/PropertiesService';
-import {SearchRepository} from 'src/script/search/SearchRepository';
-import {SelfService} from 'src/script/self/SelfService';
+import {AssetRepository} from 'Repositories/assets/AssetRepository';
+import {AudioRepository} from 'Repositories/audio/AudioRepository';
+import {CallingRepository} from 'Repositories/calling/CallingRepository';
+import {ClientEntity} from 'Repositories/client/ClientEntity';
+import {ClientRepository} from 'Repositories/client/ClientRepository';
+import {ClientService} from 'Repositories/client/ClientService';
+import {ClientState} from 'Repositories/client/ClientState';
+import {ConnectionRepository} from 'Repositories/connection/ConnectionRepository';
+import {ConnectionService} from 'Repositories/connection/ConnectionService';
+import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
+import {ConversationService} from 'Repositories/conversation/ConversationService';
+import {ConversationState} from 'Repositories/conversation/ConversationState';
+import {MessageRepository} from 'Repositories/conversation/MessageRepository';
+import {CryptographyRepository} from 'Repositories/cryptography/CryptographyRepository';
+import {User} from 'Repositories/entity/User';
+import {EventRepository} from 'Repositories/event/EventRepository';
+import {EventService} from 'Repositories/event/EventService';
+import {NotificationService} from 'Repositories/event/NotificationService';
+import {PropertiesRepository} from 'Repositories/properties/PropertiesRepository';
+import {PropertiesService} from 'Repositories/properties/PropertiesService';
+import {SearchRepository} from 'Repositories/search/SearchRepository';
+import {SelfService} from 'Repositories/self/SelfService';
+import {SelfRepository} from 'Repositories/self/SelfRepository';
 import {Core} from 'src/script/service/CoreSingleton';
 import {createStorageEngine, DatabaseTypes} from 'src/script/service/StoreEngineProvider';
-import {StorageService} from 'src/script/storage';
-import {StorageRepository} from 'src/script/storage/StorageRepository';
-import {TeamRepository} from 'src/script/team/TeamRepository';
-import {TeamService} from 'src/script/team/TeamService';
-import {TeamState} from 'src/script/team/TeamState';
+import {StorageService} from 'Repositories/storage';
+import {StorageRepository} from 'Repositories/storage/StorageRepository';
+import {TeamRepository} from 'Repositories/team/TeamRepository';
+import {TeamService} from 'Repositories/team/TeamService';
+import {TeamState} from 'Repositories/team/TeamState';
+import {EventTrackingRepository} from 'Repositories/tracking/EventTrackingRepository';
+import {UserRepository} from 'Repositories/user/UserRepository';
+import {UserService} from 'Repositories/user/UserService';
+import {UserState} from 'Repositories/user/UserState';
 import {serverTimeHandler} from 'src/script/time/serverTimeHandler';
-import {EventTrackingRepository} from 'src/script/tracking/EventTrackingRepository';
-import {UserRepository} from 'src/script/user/UserRepository';
-import {UserService} from 'src/script/user/UserService';
-import {UserState} from 'src/script/user/UserState';
 
 import {entities} from '../api/payloads';
-import {SelfRepository} from 'src/script/self/SelfRepository';
-import {AudioRepository} from 'src/script/audio/AudioRepository';
+import {MediaStreamHandler} from 'Repositories/media/MediaStreamHandler';
+import {MediaDevicesHandler} from 'Repositories/media/MediaDevicesHandler';
+import {MediaConstraintsHandler} from 'Repositories/media/MediaConstraintsHandler';
 
 export class TestFactory {
   constructor() {
@@ -306,15 +307,16 @@ export class TestFactory {
    */
   async exposeCallingActors() {
     await this.exposeConversationActors();
-
-    const mediaRepository = new MediaRepository(new PermissionRepository());
+    const mediaConstraintsHandler = new MediaConstraintsHandler();
+    const mediaStreamHandler = new MediaStreamHandler(mediaConstraintsHandler);
+    const mediaDevicesHandler = new MediaDevicesHandler();
 
     this.calling_repository = new CallingRepository(
       this.message_repository,
       this.event_repository,
       this.user_repository,
-      mediaRepository.streamHandler,
-      mediaRepository.devicesHandler,
+      mediaStreamHandler,
+      mediaDevicesHandler,
       serverTimeHandler,
       undefined,
       this.conversation_repository['conversationState'],

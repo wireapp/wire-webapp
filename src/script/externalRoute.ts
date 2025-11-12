@@ -22,6 +22,8 @@ import {Config} from './Config';
 
 const URL = Config.getConfig().URL;
 
+const isProductionWebsite = URL.WEBSITE_BASE && URL.WEBSITE_BASE === 'https://wire.com';
+
 const getTeamSettingsUrl = (path: string = '', utmSource?: string): string | undefined => {
   const query = utmSource ? `?utm_source=${utmSource}&utm_term=desktop` : '';
   const teamSettingsUrl = `${URL.TEAMS_BASE}${path}${query}`;
@@ -68,9 +70,12 @@ export const getManageTeamUrl = (utmSource?: string): string | undefined =>
 const getCreateTeamUrl = (): string | undefined =>
   Config.getConfig().FEATURE.ENABLE_ACCOUNT_REGISTRATION ? `${URL.TEAMS_BASE}${URL.URL_PATH.CREATE_TEAM}` : undefined;
 
-export const addLocaleToUrl = (url?: string): string | undefined => {
+const addLocaleToUrl = (url?: string): string | undefined => {
   if (!url) {
     return undefined;
+  }
+  if (!isProductionWebsite) {
+    return url;
   }
   const language = currentLanguage().slice(0, 2);
   const websiteLanguage = language == 'de' ? language : 'en';

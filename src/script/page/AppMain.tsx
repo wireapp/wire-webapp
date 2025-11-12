@@ -17,7 +17,7 @@
  *
  */
 
-import {FC, useEffect, useLayoutEffect} from 'react';
+import {useEffect, useLayoutEffect} from 'react';
 
 import {amplify} from 'amplify';
 import cx from 'classnames';
@@ -36,6 +36,15 @@ import {GroupCreationModal} from 'Components/Modals/GroupCreation/GroupCreationM
 import {LegalHoldModal} from 'Components/Modals/LegalHoldModal/LegalHoldModal';
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {showUserModal, UserModal} from 'Components/Modals/UserModal';
+import {useActiveWindow} from 'Hooks/useActiveWindow';
+import {useInitializeRootFontSize} from 'Hooks/useRootFontSize';
+import {CallingViewMode, CallState, DesktopScreenShareMenu} from 'Repositories/calling/CallState';
+import {ConversationState} from 'Repositories/conversation/ConversationState';
+import {User} from 'Repositories/entity/User';
+import {TeamState} from 'Repositories/team/TeamState';
+import {showInitialModal} from 'Repositories/user/AvailabilityModal';
+import {UserState} from 'Repositories/user/UserState';
+import {isUUID} from 'src/script/auth/util/stringUtil';
 import {Config} from 'src/script/Config';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 
@@ -44,25 +53,18 @@ import {useE2EIFeatureConfigUpdate} from './components/FeatureConfigChange/Featu
 import {FeatureConfigChangeNotifier} from './components/FeatureConfigChange/FeatureConfigChangeNotifier';
 import {WindowTitleUpdater} from './components/WindowTitleUpdater';
 import {LeftSidebar} from './LeftSidebar';
+import {TeamCreationModalContainer} from './LeftSidebar/panels/Conversations/ConversationTabs/TeamCreation/TeamCreationModalContainer';
 import {SidebarTabs, useSidebarStore} from './LeftSidebar/panels/Conversations/useSidebarStore';
 import {MainContent} from './MainContent';
 import {PanelEntity, PanelState, RightSidebar} from './RightSidebar';
 import {RootProvider} from './RootProvider';
 import {useAppMainState, ViewType} from './state';
-import {useAppState, ContentState} from './useAppState';
+import {ContentState, useAppState} from './useAppState';
 
-import {CallingViewMode, CallState, DesktopScreenShareMenu} from '../calling/CallState';
-import {ConversationState} from '../conversation/ConversationState';
-import {User} from '../entity/User';
-import {useActiveWindow} from '../hooks/useActiveWindow';
-import {useInitializeRootFontSize} from '../hooks/useRootFontSize';
 import {App} from '../main/app';
 import {initialiseMLSMigrationFlow} from '../mls/MLSMigration';
 import {generateConversationUrl} from '../router/routeGenerator';
 import {configureRoutes, navigate} from '../router/Router';
-import {TeamState} from '../team/TeamState';
-import {showInitialModal} from '../user/AvailabilityModal';
-import {UserState} from '../user/UserState';
 import {MainViewModel} from '../view_model/MainViewModel';
 import {WarningsContainer} from '../view_model/WarningsContainer/WarningsContainer';
 
@@ -82,14 +84,14 @@ interface AppMainProps {
   locked: boolean;
 }
 
-export const AppMain: FC<AppMainProps> = ({
+export const AppMain = ({
   app,
   mainView,
   selfUser,
   conversationState = container.resolve(ConversationState),
   callState = container.resolve(CallState),
   locked,
-}) => {
+}: AppMainProps) => {
   const apiContext = app.getAPIContext();
 
   useActiveWindow(window);
@@ -181,19 +183,53 @@ export const AppMain: FC<AppMainProps> = ({
       window.history.replaceState(historyState, '', window.location.hash);
     }
 
+    const showConversationMessages = (conversationId: string, domain = apiContext.domain ?? '') => {
+      void mainView.content.showConversation({id: conversationId, domain});
+    };
+
+    const showConversationFiles = async (
+      conversationId: string,
+      domain = apiContext.domain ?? '',
+      path: string | string[] = '',
+    ) => {
+      const pathString = Array.isArray(path) ? path.join('/') : path;
+
+      await mainView.content.showConversation(
+        {id: conversationId, domain},
+        {filePath: `files${pathString ? `/${pathString}` : ''}`},
+      );
+    };
+
+    const showUserProfile = (param1: string, param2?: string) => {
+      // If param1 is a UUID, it's the userId, otherwise param2 must be the userId
+      const userId = isUUID(param1) ? param1 : param2;
+      const domain = isUUID(param1) ? param2 || apiContext.domain || '' : param1;
+
+      if (!userId) {
+        navigate('/');
+        return;
+      }
+
+      showMostRecentConversation();
+      showUserModal({domain, id: userId}, () => navigate('/'));
+    };
+
     configureRoutes({
       '/': showMostRecentConversation,
-      '/conversation/:conversationId(/:domain)': (conversationId: string, domain: string = apiContext.domain ?? '') =>
-        mainView.content.showConversation({id: conversationId, domain}),
+      '/conversation/:conversationId/:domain': showConversationMessages,
+      '/conversation/:conversationId': showConversationMessages,
+      '/conversation/:conversationId/:domain/files': showConversationFiles,
+      '/conversation/:conversationId/files': showConversationFiles,
+      '/conversation/:conversationId/:domain/files/*path': showConversationFiles,
+      '/conversation/:conversationId/files/*path': showConversationFiles,
       '/preferences/about': () => mainView.list.openPreferencesAbout(),
       '/preferences/account': () => mainView.list.openPreferencesAccount(),
       '/preferences/av': () => mainView.list.openPreferencesAudioVideo(),
       '/preferences/devices': () => mainView.list.openPreferencesDevices(),
       '/preferences/options': () => mainView.list.openPreferencesOptions(),
-      '/user/:userId(/:domain)': (userId: string, domain: string = apiContext.domain ?? '') => {
-        showMostRecentConversation();
-        showUserModal({domain, id: userId}, () => navigate('/'));
-      },
+      '/user/:userId/:domain': showUserProfile,
+      '/user/:domain/:userId': showUserProfile,
+      '/user/:userId': showUserProfile,
     });
 
     const redirect = localStorage.getItem(App.LOCAL_STORAGE_LOGIN_REDIRECT_KEY);
@@ -217,7 +253,7 @@ export const AppMain: FC<AppMainProps> = ({
     //after app is loaded, check mls migration configuration and start migration if needed
     await initialiseMLSMigrationFlow({
       selfUser,
-      conversationHandler: repositories.conversation,
+      conversationRepository: repositories.conversation,
       getTeamMLSMigrationStatus: repositories.team.getTeamMLSMigrationStatus,
       refreshAllKnownUsers: repositories.user.refreshAllKnownUsers,
     });
@@ -303,7 +339,6 @@ export const AppMain: FC<AppMainProps> = ({
                 <CallingContainer
                   propertiesRepository={repositories.properties}
                   callingRepository={repositories.calling}
-                  mediaRepository={repositories.media}
                   toggleScreenshare={mainView.calling.callActions.toggleScreenshare}
                 />
               )}
@@ -326,6 +361,11 @@ export const AppMain: FC<AppMainProps> = ({
           <UserModal selfUser={selfUser} userRepository={repositories.user} />
           <GroupCreationModal userState={userState} teamState={teamState} />
           <CreateConversationModal />
+          <TeamCreationModalContainer
+            selfUser={selfUser}
+            teamRepository={repositories.team}
+            userRepository={repositories.user}
+          />
         </ErrorBoundary>
       </RootProvider>
 

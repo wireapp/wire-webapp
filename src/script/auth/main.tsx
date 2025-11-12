@@ -28,6 +28,8 @@ import {createRoot} from 'react-dom/client';
 import {Provider} from 'react-redux';
 import {container} from 'tsyringe';
 
+import {Runtime} from '@wireapp/commons';
+
 import {initializeDataDog} from 'Util/DataDog';
 import {enableLogging} from 'Util/LoggerUtil';
 import {exposeWrapperGlobals} from 'Util/wrapper';
@@ -91,4 +93,12 @@ async function runApp() {
 }
 
 enableLogging(config);
+
+const enforceDesktopApplication = config.FEATURE.ENABLE_ENFORCE_DESKTOP_APPLICATION_ONLY && !Runtime.isDesktopApp();
+
+if (enforceDesktopApplication) {
+  const unSupportedPageUrl = `${window.location.origin}/unsupported`;
+  window.location.replace(unSupportedPageUrl);
+}
+
 runApp();

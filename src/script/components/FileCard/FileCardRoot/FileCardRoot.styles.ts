@@ -34,8 +34,8 @@ const wrapperStyles: CSSObject = {
 
 export const wrapperStylesSmall: CSSObject = {
   ...wrapperStyles,
-  height: '76px',
-  width: '268px',
+  height: '74px',
+  width: '254px',
 };
 
 export const wrapperStylesLarge: CSSObject = {
@@ -46,7 +46,6 @@ export const wrapperStylesLarge: CSSObject = {
 };
 
 export const contentStyles: CSSObject = {
-  alignItems: 'flex-start',
   display: 'flex',
   flexDirection: 'column',
   minHeight: '60px',

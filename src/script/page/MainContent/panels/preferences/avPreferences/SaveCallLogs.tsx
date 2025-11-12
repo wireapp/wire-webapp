@@ -17,20 +17,18 @@
  *
  */
 
-import React from 'react';
-
 import {container} from 'tsyringe';
 
 import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
 
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
+import type {CallingRepository} from 'Repositories/calling/CallingRepository';
+import {UserState} from 'Repositories/user/UserState';
 import {t} from 'Util/LocalizerUtil';
 import {getCurrentDate} from 'Util/TimeUtil';
 import {downloadBlob} from 'Util/util';
 
-import type {CallingRepository} from '../../../../../calling/CallingRepository';
 import {Config} from '../../../../../Config';
-import {UserState} from '../../../../../user/UserState';
 import {PreferencesSection} from '../components/PreferencesSection';
 
 interface SaveCallLogsProps {
@@ -40,7 +38,7 @@ interface SaveCallLogsProps {
 
 const OBFUSCATION_TRUNCATE_TO = 4;
 
-const SaveCallLogs: React.FC<SaveCallLogsProps> = ({callingRepository, userState = container.resolve(UserState)}) => {
+const SaveCallLogs = ({callingRepository, userState = container.resolve(UserState)}: SaveCallLogsProps) => {
   const brandName = Config.getConfig().BRAND_NAME;
   const saveCallLogs = () => {
     const messageLog = callingRepository.getCallLog();

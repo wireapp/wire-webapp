@@ -46,10 +46,10 @@ export const MediaFilePreviewCard = ({label, isLoading, isError, children}: Medi
       {isError && (
         <>
           <UnavailableFileIcon css={errorIconStyles} width={14} height={14} />
-          <p css={errorTextStyles}>{t('cellsUnavailableFile')}</p>
+          <p css={errorTextStyles}>{t('cells.unavailableFile')}</p>
         </>
       )}
-      {isLoading && (
+      {isLoading && !isError && (
         <div css={loadingWrapperStyles}>
           <div className="icon-spinner spin" css={loadingIconStyles} />
         </div>

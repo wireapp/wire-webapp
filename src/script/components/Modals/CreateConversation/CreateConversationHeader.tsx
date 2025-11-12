@@ -22,7 +22,7 @@ import {container} from 'tsyringe';
 import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
 
 import * as Icon from 'Components/Icon';
-import {UserState} from 'src/script/user/UserState';
+import {UserState} from 'Repositories/user/UserState';
 import {t} from 'Util/LocalizerUtil';
 
 import {createConversationHeaderContainerCss} from './CreateConversation.styles';
@@ -32,7 +32,6 @@ import {ConversationType, ConversationCreationStep} from './types';
 
 export const CreateConversationHeader = () => {
   const {
-    hideModal,
     error,
     gotoNextStep,
     conversationName,
@@ -41,6 +40,9 @@ export const CreateConversationHeader = () => {
     conversationType,
     gotoLastStep,
     gotoFirstStep,
+    setDiscardTrigger,
+    setIsConfirmDiscardModalOpen,
+    hideModal,
   } = useCreateConversationModal();
   const userState = container.resolve(UserState);
   const selfUser = userState.self();
@@ -63,6 +65,15 @@ export const CreateConversationHeader = () => {
     gotoPreviousStep();
   };
 
+  const onModalClose = () => {
+    if (conversationCreationStep !== ConversationCreationStep.ConversationDetails) {
+      setDiscardTrigger('modalClose');
+      setIsConfirmDiscardModalOpen(true);
+      return;
+    }
+    hideModal();
+  };
+
   const isNextButtonDisabled =
     !!error || !conversationName || (selfUser?.isExternal() && conversationType === ConversationType.Group);
 
@@ -71,14 +82,14 @@ export const CreateConversationHeader = () => {
       <button
         className="button-reset-default"
         type="button"
-        onClick={hideModal}
+        onClick={onModalClose}
         aria-label={t('accessibility.groupCreationActionCloseModal')}
         data-uie-name="do-close"
       >
         <Icon.CloseIcon aria-hidden="true" className="modal__header__button" />
       </button>
 
-      <h2 id="group-creation-label" className="modal__header__title">
+      <h2 id="group-creation-label" className="modal__header__title" data-uie-name="status-people-selected">
         {t('createConversationModalHeader')}
       </h2>
 

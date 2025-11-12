@@ -37,7 +37,7 @@ export const QUERY_KEY = {
 };
 
 // These are the query keys that are in the redirect link from the OAuth server
-export const OAUTH_QUERY_KEYS = {
+const OAUTH_QUERY_KEYS = {
   CLIENT_ID: 'client_id',
   REDIRECT_URI: 'redirect_uri',
   RESPONSE_TYPE: 'response_type',
@@ -74,11 +74,9 @@ export const ROUTE = {
   CONVERSATION_JOIN_INVALID: '/join-conversation-invalid',
   CREATE_ACCOUNT: '/createaccount',
   CREATE_TEAM: '/createteam',
-  CREATE_TEAM_ACCOUNT: '/createteamaccount',
   CUSTOM_ENV_REDIRECT: '/custom-env-redirect',
   HISTORY_INFO: '/historyinfo',
   INDEX: '/',
-  INITIAL_INVITE: '/teaminvite',
   LOGIN: '/login',
   CUSTOM_BACKEND: '/custom-backend',
   SET_ACCOUNT_TYPE: '/setaccounttype',
@@ -90,4 +88,5 @@ export const ROUTE = {
   VERIFY_EMAIL_CODE: '/verifyemailcode',
   VERIFY_EMAIL_LINK: '/verifyemaillink',
   E2EI_OAUTH_REDIRECT: '/e2ei-redirect',
+  SUCCESS: '/success',
 };

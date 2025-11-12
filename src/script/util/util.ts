@@ -22,10 +22,11 @@ import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 
 import {Runtime} from '@wireapp/commons';
 
+import type {Conversation} from 'Repositories/entity/Conversation';
+
 import {isTabKey} from './KeyboardUtil';
 import {getLogger} from './Logger';
 
-import type {Conversation} from '../entity/Conversation';
 import {AuthError} from '../error/AuthError';
 
 export const checkIndexedDb = (): Promise<void> => {
@@ -142,6 +143,11 @@ export const getFileExtension = (filename: string): string => {
   return foundExtension || '';
 };
 
+export const getFileExtensionFromUrl = (url: string): string => {
+  const cleanUrl = url.split(/[?#]/)[0];
+  return getFileExtension(cleanUrl);
+};
+
 export const trimFileExtension = (filename?: string): string => {
   if (typeof filename === 'string') {
     if (filename.endsWith('.tar.gz')) {
@@ -228,6 +234,17 @@ export const downloadFile = (url: string, fileName: string, mimeType?: string): 
     document.body.removeChild(anchor);
     window.URL.revokeObjectURL(objectURL);
   }, 100);
+};
+
+/**
+ * Get the file name with the extension. If the file name already has the extension, it won't be added again.
+ * @param name The file name
+ * @param extension The file extension
+ * @returns The file name with the extension
+ */
+export const getFileNameWithExtension = (name: string, extension: string): string => {
+  const hasExtension = name.toLowerCase().endsWith(`.${extension.toLowerCase()}`);
+  return hasExtension ? name : `${name}.${extension}`;
 };
 
 /**

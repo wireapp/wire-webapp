@@ -19,7 +19,8 @@
 
 import {act, render, screen, waitFor} from '@testing-library/react';
 
-import {User} from 'src/script/entity/User';
+import {User} from 'Repositories/entity/User';
+import {ElectronDesktopCapturerSource, MediaDevicesHandler} from 'Repositories/media/MediaDevicesHandler';
 import {ContentViewModel} from 'src/script/view_model/ContentViewModel';
 
 import {MainContent} from './MainContent';
@@ -39,10 +40,19 @@ jest.mock('@formkit/auto-animate/react', () => ({
   useAutoAnimate: jest.fn(),
 }));
 
+const mockDevicesHandler = {
+  availableDevices: (): (MediaDeviceInfo | ElectronDesktopCapturerSource)[] => [],
+  currentDeviceId: () => 'mock-device-id',
+} as unknown as MediaDevicesHandler;
+
 describe('Preferences', () => {
   const mainViewModel = {
     content: {
-      repositories: {} as any,
+      repositories: {
+        media: {
+          devicesHandler: mockDevicesHandler,
+        },
+      } as any,
     } as ContentViewModel,
   } as MainViewModel;
 

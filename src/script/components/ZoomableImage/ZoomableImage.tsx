@@ -19,6 +19,8 @@
 
 import React, {HTMLProps, RefObject, useEffect, useRef, useState} from 'react';
 
+import {CSSObject} from '@emotion/react';
+
 import {containerStyle, imageStyle} from './ZoomableImage.style';
 
 import {isHTMLImageElement} from '../../guards/HTMLElement';
@@ -66,7 +68,7 @@ function calculateMaxOffset(containerRef: RefObject<HTMLDivElement>, imgRef: Ref
   };
 }
 
-type ZoomableImageProps = HTMLProps<HTMLImageElement>;
+type ZoomableImageProps = {imageCSS?: CSSObject} & HTMLProps<HTMLImageElement>;
 
 export const ZoomableImage = (props: ZoomableImageProps) => {
   const imageRef = useRef<HTMLImageElement | null>(null);
@@ -245,7 +247,7 @@ export const ZoomableImage = (props: ZoomableImageProps) => {
         {...props}
         alt={props.alt}
         ref={imageRef}
-        css={imageStyle}
+        css={[imageStyle, props.imageCSS]}
         style={{
           transform: `translate3d(${translateOffset.x}px, ${translateOffset.y}px, 0) scale(${zoomScale}, ${zoomScale})`,
         }}

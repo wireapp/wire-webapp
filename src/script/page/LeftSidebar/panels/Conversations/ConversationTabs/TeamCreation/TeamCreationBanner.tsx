@@ -26,8 +26,8 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {BannerPortal} from 'Components/BannerPortal/BannerPortal';
 import * as Icon from 'Components/Icon';
-import {EventName} from 'src/script/tracking/EventName';
-import {Segmentation} from 'src/script/tracking/Segmentation';
+import {EventName} from 'Repositories/tracking/EventName';
+import {Segmentation} from 'Repositories/tracking/Segmentation';
 import {t} from 'Util/LocalizerUtil';
 
 import {
@@ -39,6 +39,7 @@ import {
   teamUpgradeBannerContentCss,
   teamUpgradeBannerHeaderCss,
 } from './TeamCreation.styles';
+import {useTeamCreationModal} from './useTeamCreationModal';
 
 import {SidebarStatus, useSidebarStore} from '../../useSidebarStore';
 
@@ -63,7 +64,8 @@ const Banner = ({onClick}: {onClick: () => void}) => {
 
 const PADDING_Y = 34;
 
-export const TeamCreationBanner = ({onClick}: {onClick: () => void}) => {
+export const TeamCreationBanner = () => {
+  const {showModal} = useTeamCreationModal();
   const [isBannerVisible, setIsBannerVisible] = useState(false);
   const [position, setPosition] = useState<{x: number; y: number}>({x: 0, y: 0});
   const {status: sidebarStatus} = useSidebarStore();
@@ -79,7 +81,7 @@ export const TeamCreationBanner = ({onClick}: {onClick: () => void}) => {
     amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.UI.CLICKED.PERSONAL_MIGRATION_CTA, {
       step: Segmentation.TEAM_CREATION_STEP.CLICKED_CREATE_TEAM,
     });
-    onClick();
+    showModal();
   };
 
   const portalCloseHandler = () => {

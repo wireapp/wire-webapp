@@ -19,19 +19,19 @@
 
 import {useState, FC} from 'react';
 
-import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
+import {TabIndex} from '@wireapp/react-ui-kit';
 
 import {FadingScrollbar} from 'Components/FadingScrollbar';
 import {RadioGroup} from 'Components/Radio';
+import {NOTIFICATION_STATE, getNotificationText} from 'Repositories/conversation/NotificationSetting';
+import {Conversation} from 'Repositories/entity/Conversation';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 
-import {NOTIFICATION_STATE, getNotificationText} from '../../../conversation/NotificationSetting';
-import {Conversation} from '../../../entity/Conversation';
 import {ViewModelRepositories} from '../../../view_model/MainViewModel';
 import {PanelHeader} from '../PanelHeader';
 
-export interface NotificationsProps {
+interface NotificationsProps {
   activeConversation: Conversation;
   onClose: () => void;
   onGoBack: () => void;

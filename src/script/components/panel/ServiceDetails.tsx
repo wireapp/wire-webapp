@@ -17,18 +17,15 @@
  *
  */
 
-import React from 'react';
-
 import {Avatar, AVATAR_SIZE} from 'Components/Avatar';
+import type {ServiceEntity} from 'Repositories/integration/ServiceEntity';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 
-import type {ServiceEntity} from '../../integration/ServiceEntity';
-
-export interface ServiceDetailsProps {
+interface ServiceDetailsProps {
   service: ServiceEntity;
 }
 
-const ServiceDetails: React.FC<ServiceDetailsProps> = ({service}) => {
+const ServiceDetails = ({service}: ServiceDetailsProps) => {
   const {providerName, name} = useKoSubscribableChildren(service, ['providerName', 'name']);
 
   return (

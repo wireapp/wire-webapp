@@ -17,27 +17,69 @@
  *
  */
 
-import {FileCard} from 'Components/FileCard/FileCard';
 import {t} from 'Util/LocalizerUtil';
 
+import {FileAssetSmall} from './FileAssetSmall/FileAssetSmall';
+import {FileAssetWithPreview} from './FileAssetWithPreview/FileAssetWithPreview';
+
 interface FileAssetCardProps {
+  src?: string;
+  variant: 'large' | 'small';
   extension: string;
   name: string;
   size: string;
   isLoading: boolean;
   isError: boolean;
+  imagePreviewUrl?: string;
+  pdfPreviewUrl?: string;
+  senderName: string;
+  timestamp: number;
 }
 
-export const FileAssetCard = ({extension, name, size, isLoading, isError}: FileAssetCardProps) => {
-  const formattedName = isError ? t('cellsUnavailableFile') : name;
+export const FileAssetCard = ({
+  src,
+  variant,
+  extension,
+  name,
+  size,
+  isLoading,
+  isError,
+  imagePreviewUrl,
+  pdfPreviewUrl,
+  senderName,
+  timestamp,
+}: FileAssetCardProps) => {
+  const formattedName = isError ? t('cells.unavailableFile') : name;
+
+  if (variant === 'large') {
+    return (
+      <FileAssetWithPreview
+        src={src}
+        extension={extension}
+        name={formattedName}
+        size={size}
+        isError={isError}
+        isLoading={isLoading}
+        imagePreviewUrl={imagePreviewUrl}
+        pdfPreviewUrl={pdfPreviewUrl}
+        senderName={senderName}
+        timestamp={timestamp}
+      />
+    );
+  }
 
   return (
-    <FileCard.Root extension={extension} name={formattedName} size={size}>
-      <FileCard.Header>
-        <FileCard.Icon type={isError ? 'unavailable' : 'file'} />
-        {!isError && <FileCard.Type />}
-      </FileCard.Header>
-      <FileCard.Name variant={isError ? 'secondary' : 'primary'} />
-    </FileCard.Root>
+    <FileAssetSmall
+      src={src}
+      extension={extension}
+      name={formattedName}
+      size={size}
+      isError={isError}
+      senderName={senderName}
+      timestamp={timestamp}
+      pdfPreviewUrl={pdfPreviewUrl}
+      imagePreviewUrl={imagePreviewUrl}
+      isLoading={isLoading}
+    />
   );
 };

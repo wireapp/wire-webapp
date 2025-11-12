@@ -27,10 +27,12 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 import {useCallAlertState} from 'Components/calling/useCallAlertState';
 import {CALL_QUALITY_FEEDBACK_KEY} from 'Components/Modals/QualityFeedbackModal/constants';
 import {RatingListLabel} from 'Components/Modals/QualityFeedbackModal/typings';
-import {Call} from 'src/script/calling/Call';
-import {CallingRepository} from 'src/script/calling/CallingRepository';
-import {User} from 'src/script/entity/User';
-import {UserState} from 'src/script/user/UserState';
+import {Call} from 'Repositories/calling/Call';
+import {CallingRepository} from 'Repositories/calling/CallingRepository';
+import {User} from 'Repositories/entity/User';
+import {EventName} from 'Repositories/tracking/EventName';
+import {Segmentation} from 'Repositories/tracking/Segmentation';
+import {UserState} from 'Repositories/user/UserState';
 import {TestFactory} from 'test/helper/TestFactory';
 import {t} from 'Util/LocalizerUtil';
 
@@ -43,10 +45,8 @@ import {
   withIntl,
   withTheme,
 } from '../../../auth/util/test/TestUtil';
-import {EventName} from '../../../tracking/EventName';
-import {Segmentation} from '../../../tracking/Segmentation';
 
-jest.mock('../../../tracking/Telemetry.helpers', () => ({
+jest.mock('Repositories/tracking/Telemetry.helpers', () => ({
   isTelemetryEnabledAtCurrentEnvironment: () => true,
 }));
 

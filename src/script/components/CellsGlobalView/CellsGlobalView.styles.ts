@@ -23,3 +23,9 @@ export const wrapperStyles: CSSObject = {
   padding: '20px',
   overflowY: 'auto',
 };
+
+export const loadMoreWrapperStyles: CSSObject = {
+  padding: '20px',
+  display: 'flex',
+  justifyContent: 'center',
+};

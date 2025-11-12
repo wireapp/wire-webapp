@@ -22,9 +22,9 @@ import {amplify} from 'amplify';
 
 import {WebAppEvents} from '@wireapp/webapp-events';
 
-import {useCameraReloadOnCallEnd} from './useCameraReloadOnCallEnd';
+import {EventName} from 'Repositories/tracking/EventName';
 
-import {EventName} from '../../../../tracking/EventName';
+import {useCameraReloadOnCallEnd} from './useCameraReloadOnCallEnd';
 
 jest.mock('amplify');
 

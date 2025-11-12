@@ -27,7 +27,8 @@ export const wrapperStyles: CSSObject = {
   position: 'relative',
 
   'body.theme-dark &': {
-    border: '1px solid transparent',
+    backgroundColor: 'var(--foreground-fade-8)',
+    border: 'none',
   },
 };
 
@@ -42,15 +43,8 @@ export const wrapperErrorStyles: CSSObject = {
 
   'body.theme-dark &': {
     backgroundColor: 'var(--foreground-fade-8)',
-    border: '1px solid transparent',
+    border: 'none',
   },
-};
-
-export const imageStyles: CSSObject = {
-  width: '100%',
-  height: '100%',
-  objectFit: 'cover',
-  borderRadius: '10px',
 };
 
 export const loadingWrapperStyles: CSSObject = {
@@ -60,20 +54,20 @@ export const loadingWrapperStyles: CSSObject = {
   transform: 'translate(-50%, -50%)',
   padding: '0',
   margin: '0',
-  cursor: 'pointer',
   width: '24px',
   height: '24px',
-  background: 'var(--icon-button-primary-enabled-bg)',
-  border: '1px solid var(--icon-button-primary-border)',
-  borderRadius: '100%',
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'center',
 };
 
 export const loadingIconStyles: CSSObject = {
+  color: 'var(--gray-70)',
   fontSize: 'var(--font-size-medium)',
-  color: 'var(--main)',
+
+  'body.theme-dark &': {
+    color: 'var(--gray-40)',
+  },
 };
 
 export const errorIconStyles: CSSObject = {
@@ -85,6 +79,7 @@ export const errorTextStyles: CSSObject = {
   fontWeight: 'var(--line-height-md)',
   lineHeight: 'var(--line-height-sm)',
   color: 'var(--gray-70)',
+  textAlign: 'left',
 
   'body.dark &': {
     color: 'var(--gray-40)',

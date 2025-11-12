@@ -20,7 +20,7 @@
 import {render, fireEvent} from '@testing-library/react';
 import {container} from 'tsyringe';
 
-import {CallState} from 'src/script/calling/CallState';
+import {CallState} from 'Repositories/calling/CallState';
 
 import {ChooseScreen} from './ChooseScreen';
 

@@ -24,15 +24,15 @@ import cx from 'classnames';
 import {container} from 'tsyringe';
 
 import {InViewport} from 'Components/InViewport';
+import {AssetRemoteData} from 'Repositories/assets/AssetRemoteData';
+import {MediumImage} from 'Repositories/entity/message/MediumImage';
+import {TeamState} from 'Repositories/team/TeamState';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 
 import {getImageStyle, getWrapperStyles} from './Image.styles';
 import {RestrictedImage} from './RestrictedImage';
 
-import {AssetRemoteData} from '../../assets/AssetRemoteData';
 import {Config} from '../../Config';
-import {MediumImage} from '../../entity/message/MediumImage';
-import {TeamState} from '../../team/TeamState';
 import {
   AssetUrl,
   useAssetTransfer,
@@ -49,7 +49,7 @@ interface RemoteDataImageProps extends BaseImageProps {
   image: AssetRemoteData;
   imageSizes?: {width: string; height: string; ratio: number};
 }
-export interface AssetImageProps extends BaseImageProps {
+interface AssetImageProps extends BaseImageProps {
   image: MediumImage;
 }
 

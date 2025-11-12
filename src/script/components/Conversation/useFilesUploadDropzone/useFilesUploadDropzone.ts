@@ -17,23 +17,26 @@
  *
  */
 
-import {FileRejection, useDropzone} from 'react-dropzone';
+import {useState} from 'react';
 
-import {CellsRepository} from 'src/script/cells/CellsRepository';
+import {Accept, FileRejection, useDropzone} from 'react-dropzone';
+
+import {CellsRepository} from 'Repositories/cells/CellsRepository';
+import {Conversation} from 'Repositories/entity/Conversation';
 import {Config} from 'src/script/Config';
-import {Conversation} from 'src/script/entity/Conversation';
 import {t} from 'Util/LocalizerUtil';
 import {getLogger} from 'Util/Logger';
-import {createUuid} from 'Util/uuid';
 
 import {buildCellFileMetadata} from './buildCellFileMetadata/buildCellFileMetadata';
 import {validateFiles, ValidationResult} from './fileValidation/fileValidation';
 import {showFileDropzoneErrorModal} from './showFileDropzoneErrorModal/showFileDropzoneErrorModal';
+import {transformAcceptedFiles} from './transformAcceptedFiles/transformAcceptedFiles';
 
 import {FileWithPreview, useFileUploadState} from '../useFilesUploadState/useFilesUploadState';
 import {checkFileSharingPermission} from '../utils/checkFileSharingPermission';
 
 const MAX_FILES = 10;
+const IMAGE_FILE_TYPES = ['.png', '.jpg', '.jpeg', '.gif', '.webp'];
 
 const CONFIG = Config.getConfig();
 
@@ -41,51 +44,36 @@ const logger = getLogger('FileDropzone');
 
 interface UseFilesUploadDropzoneParams {
   isTeam: boolean;
+  isCellsEnabled: boolean;
+  isDisabled: boolean;
   cellsRepository: CellsRepository;
   conversation?: Pick<Conversation, 'id' | 'qualifiedId'>;
 }
 
 export const useFilesUploadDropzone = ({
   isTeam,
+  isDisabled,
+  isCellsEnabled,
   cellsRepository,
   conversation = {id: '', qualifiedId: {id: '', domain: ''}},
 }: UseFilesUploadDropzoneParams) => {
   const {addFiles, getFiles, updateFile} = useFileUploadState();
   const files = getFiles({conversationId: conversation.id});
 
-  const MAX_SIZE = isTeam ? CONFIG.MAXIMUM_ASSET_FILE_SIZE_TEAM : CONFIG.MAXIMUM_ASSET_FILE_SIZE_PERSONAL;
+  const [accept, setAccept] = useState<Accept | undefined>(undefined);
+
+  const TEAM_MAX_SIZE = isCellsEnabled ? CONFIG.MAXIMUM_ASSET_FILE_SIZE_CELLS : CONFIG.MAXIMUM_ASSET_FILE_SIZE_TEAM;
+
+  const MAX_SIZE = isTeam ? TEAM_MAX_SIZE : CONFIG.MAXIMUM_ASSET_FILE_SIZE_PERSONAL;
 
   const {getRootProps, getInputProps, open, isDragAccept} = useDropzone({
     maxSize: MAX_SIZE,
     noClick: true,
     noKeyboard: true,
+    disabled: isDisabled,
+    accept,
     onDrop: checkFileSharingPermission(async (acceptedFiles: File[], rejectedFiles: FileRejection[]) => {
-      const newFiles = [...acceptedFiles, ...rejectedFiles.map(file => file.file)];
-
-      const validationResult = validateFiles({
-        newFiles,
-        currentFiles: files,
-        maxSize: MAX_SIZE,
-        maxFiles: MAX_FILES,
-      });
-
-      if (!validationResult.isValid) {
-        const {error, invalidFiles} = validationResult as Extract<ValidationResult, {isValid: false}>;
-        showFileDropzoneErrorModal({
-          title: error.title,
-          message: error.message,
-          invalidFiles,
-        });
-        return;
-      }
-
-      const transformedAcceptedFiles = transformAcceptedFiles(acceptedFiles);
-
-      addFiles({conversationId: conversation.id, files: transformedAcceptedFiles});
-
-      await attatchMetadataToFiles(transformedAcceptedFiles);
-
-      await uploadFiles(transformedAcceptedFiles);
+      await processIncomingFiles(acceptedFiles, rejectedFiles, files, MAX_SIZE, MAX_FILES, conversation.id);
     }),
     onError: (error: Error) => {
       logger.error('Dropping files failed', error);
@@ -95,7 +83,53 @@ export const useFilesUploadDropzone = ({
         invalidFiles: [],
       });
     },
+    onFileDialogOpen() {
+      // Once the modal is open, we know what files it will accept.
+      // After it closes/selects files, we want to reset the state immediately.
+      // By resetting the state already at this stage, we are assured that the accept state will not be stale.
+      setAccept(undefined);
+    },
   });
+
+  const processIncomingFiles = async (
+    acceptedFiles: File[],
+    rejectedFiles: FileRejection[],
+    files: FileWithPreview[],
+    maxSize: number,
+    maxFiles: number,
+    conversationId: string,
+  ) => {
+    const newFiles = [...acceptedFiles, ...rejectedFiles.map(file => file.file)];
+
+    const validationResult = validateFiles({
+      newFiles,
+      currentFiles: files,
+      maxSize,
+      maxFiles,
+    });
+
+    if (!validationResult.isValid) {
+      const {error, invalidFiles} = validationResult as Extract<ValidationResult, {isValid: false}>;
+      showFileDropzoneErrorModal({
+        title: error.title,
+        message: error.message,
+        invalidFiles,
+      });
+      return;
+    }
+
+    const transformedAcceptedFiles = transformAcceptedFiles(acceptedFiles);
+
+    addFiles({conversationId, files: transformedAcceptedFiles});
+
+    await attatchMetadataToFiles(transformedAcceptedFiles);
+
+    await uploadFiles(transformedAcceptedFiles);
+  };
+
+  const handlePastedFile = async (file: File) => {
+    await processIncomingFiles([file], [], files, MAX_SIZE, MAX_FILES, conversation.id);
+  };
 
   const uploadFile = async (file: FileWithPreview) => {
     // Temporary solution to handle the local development
@@ -108,7 +142,7 @@ export const useFilesUploadDropzone = ({
     const decimalMultiplier = 100;
 
     try {
-      const {uuid, versionId} = await cellsRepository.uploadFile({
+      const {uuid, versionId} = await cellsRepository.uploadNodeDraft({
         uuid: file.id,
         file,
         path,
@@ -163,18 +197,23 @@ export const useFilesUploadDropzone = ({
     );
   };
 
-  const transformAcceptedFiles = (files: File[]) => {
-    return files.map(file => {
-      return Object.assign(file, {
-        id: createUuid(),
-        preview: URL.createObjectURL(file),
-        remoteUuid: '',
-        remoteVersionId: '',
-        uploadStatus: 'uploading' as const,
-        uploadProgress: 0,
-      });
-    });
+  // Using setTimeout to ensure state update is processed before opening the file dialog
+  // This is necessary because react-dropzone's open() function needs the updated accept state
+  const delayedOpen = () => {
+    setTimeout(open, 0);
   };
 
-  return {getRootProps, getInputProps, open, isDragAccept};
+  const openAllFilesView = () => {
+    setAccept(undefined);
+    delayedOpen();
+  };
+
+  const openImageFilesView = () => {
+    setAccept({
+      'image/*': IMAGE_FILE_TYPES,
+    });
+    delayedOpen();
+  };
+
+  return {getRootProps, getInputProps, openAllFilesView, openImageFilesView, handlePastedFile, isDragAccept};
 };

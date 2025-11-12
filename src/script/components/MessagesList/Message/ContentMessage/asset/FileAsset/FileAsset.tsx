@@ -17,16 +17,14 @@
  *
  */
 
-import React from 'react';
-
 import cx from 'classnames';
 import {container} from 'tsyringe';
 
 import {RestrictedFile} from 'Components/MessagesList/Message/ContentMessage/asset/FileAsset/RestrictedFile/RestrictedFile';
-import {AssetTransferState} from 'src/script/assets/AssetTransferState';
-import type {ContentMessage} from 'src/script/entity/message/ContentMessage';
-import type {FileAsset as FileAssetType} from 'src/script/entity/message/FileAsset';
-import {TeamState} from 'src/script/team/TeamState';
+import {AssetTransferState} from 'Repositories/assets/AssetTransferState';
+import type {ContentMessage} from 'Repositories/entity/message/ContentMessage';
+import type {FileAsset as FileAssetType} from 'Repositories/entity/message/FileAsset';
+import {TeamState} from 'Repositories/team/TeamState';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {handleKeyDown, KEY} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
@@ -37,19 +35,19 @@ import {AssetHeader} from '../common/AssetHeader/AssetHeader';
 import {AssetLoader} from '../common/AssetLoader/AssetLoader';
 import {useAssetTransfer} from '../common/useAssetTransfer/useAssetTransfer';
 
-export interface FileAssetProps {
+interface FileAssetProps {
   hasHeader?: boolean;
   message: ContentMessage;
   teamState?: TeamState;
   isFocusable?: boolean;
 }
 
-const FileAsset: React.FC<FileAssetProps> = ({
+const FileAsset = ({
   message,
   hasHeader = false,
   teamState = container.resolve(TeamState),
   isFocusable = true,
-}) => {
+}: FileAssetProps) => {
   const asset = message.getFirstAsset() as FileAssetType;
 
   const {transferState, downloadAsset, uploadProgress, cancelUpload} = useAssetTransfer(message);

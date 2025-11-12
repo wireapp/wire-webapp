@@ -17,20 +17,20 @@
  *
  */
 
-import React, {useMemo} from 'react';
+import {useMemo} from 'react';
 
 import {container} from 'tsyringe';
 
 import {Link, LinkVariant} from '@wireapp/react-ui-kit';
 
-import {TeamState} from 'src/script/team/TeamState';
+import {User} from 'Repositories/entity/User';
+import {TeamState} from 'Repositories/team/TeamState';
 import {t} from 'Util/LocalizerUtil';
 
 import {PreferencesPage} from './components/PreferencesPage';
 import {PreferencesSection} from './components/PreferencesSection';
 
 import {Config} from '../../../../Config';
-import {User} from '../../../../entity/User';
 import {externalUrl} from '../../../../externalRoute';
 
 interface AboutPreferencesProps {
@@ -38,7 +38,7 @@ interface AboutPreferencesProps {
   teamState: TeamState;
 }
 
-const AboutPreferences: React.FC<AboutPreferencesProps> = ({selfUser, teamState = container.resolve(TeamState)}) => {
+const AboutPreferences = ({selfUser, teamState = container.resolve(TeamState)}: AboutPreferencesProps) => {
   const inTeam = teamState.isInTeam(selfUser);
   const config = Config.getConfig();
 

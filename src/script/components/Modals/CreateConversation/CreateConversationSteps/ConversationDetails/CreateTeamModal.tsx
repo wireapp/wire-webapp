@@ -20,10 +20,9 @@
 import {Button, Text} from '@wireapp/react-ui-kit';
 
 import {ModalComponent} from 'Components/Modals/ModalComponent';
-import {Config} from 'src/script/Config';
+import {useTeamCreationModal} from 'src/script/page/LeftSidebar/panels/Conversations/ConversationTabs/TeamCreation/useTeamCreationModal';
 import {handleEscDown, handleKeyDown, KEY} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
-import {safeWindowOpen} from 'Util/SanitizationUtil';
 
 import {
   salesModalBodyButtonCss,
@@ -37,7 +36,12 @@ import {
 import {useCreateConversationModal} from '../../hooks/useCreateConversationModal';
 
 export const CreateTeamModal = () => {
-  const {isCreateTeamModalOpen, setIsCreateTeamModalOpen} = useCreateConversationModal();
+  const {
+    isCreateTeamModalOpen,
+    setIsCreateTeamModalOpen,
+    hideModal: hideConversationCreationModal,
+  } = useCreateConversationModal();
+  const {showModal: showTeamCreationModal} = useTeamCreationModal();
 
   const onCancel = () => {
     setIsCreateTeamModalOpen(false);
@@ -45,7 +49,8 @@ export const CreateTeamModal = () => {
 
   const onSubmit = () => {
     setIsCreateTeamModalOpen(false);
-    safeWindowOpen(Config.getConfig().URL.TEAMS_BASE);
+    hideConversationCreationModal();
+    showTeamCreationModal();
   };
 
   return (

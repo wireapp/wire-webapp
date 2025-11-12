@@ -20,16 +20,17 @@
 import {ADD_PERMISSION} from '@wireapp/api-client/lib/conversation';
 import {container} from 'tsyringe';
 
-import {TeamState} from 'src/script/team/TeamState';
+import {TeamState} from 'Repositories/team/TeamState';
 import {t} from 'Util/LocalizerUtil';
 
 import {ChatHistory, ConversationAccess, ConversationType, HistorySharingUnit} from './types';
 
-export const getConversationAccessOptions = () => {
+export const getConversationAccessOptions = (isPublicOptionEnabled = true) => {
   return [
     {
       value: ConversationAccess.Public,
       label: t('createConversationAccessOptionPublic'),
+      isDisabled: !isPublicOptionEnabled,
     },
     {
       value: ConversationAccess.Private,

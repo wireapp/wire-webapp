@@ -326,3 +326,46 @@ export const formatDelayTime = (delayTimeInMS: number): string => {
   const seconds = Math.floor(delayTimeInMS / TIME_IN_MILLIS.SECOND);
   return `${seconds} ${t(`ephemeralUnitsSecond${seconds === 1 ? '' : 's'}`)}`;
 };
+
+/**
+ * Format duration into a coarse, human-readable unit:
+ * update the comments:
+ * - > 1 day   → "Loading messages from the last X days"
+ * - > 24H     → "Loading messages from the last 1 day"
+ * - > 1 hour  → "Loading messages from the last X hours"
+ * - > 60 min  → "Loading messages from the last 1 hour"
+ * - > 1 min   → "Loading messages from the last X minutes"
+ * - > 60 sec  → "Loading messages from the last 1 minute"
+ *
+ * @param duration - Duration in milliseconds
+ * @returns Localized string of the coarsest applicable unit
+ */
+export const formatCoarseDuration = (duration: number) => {
+  if (duration >= TIME_IN_MILLIS.DAY) {
+    const days = Math.floor(duration / TIME_IN_MILLIS.DAY);
+    return t(`initProgressDays${days === 1 ? 'Singular' : 'Plural'}`, {time: days});
+  }
+
+  if (duration >= TIME_IN_MILLIS.HOUR) {
+    const hours = Math.floor(duration / TIME_IN_MILLIS.HOUR);
+    return t(`initProgressHours${hours === 1 ? 'Singular' : 'Plural'}`, {time: hours});
+  }
+
+  const minutes = Math.max(1, Math.floor(duration / TIME_IN_MILLIS.MINUTE));
+  return t(`initProgressMinutes${minutes === 1 ? 'Singular' : 'Plural'}`, {time: minutes});
+};
+
+/**
+ * Returns the duration in milliseconds from the given date to the current time.
+ *
+ * @example
+ * ```ts
+ * const startedAt = "2025-06-01T00:00:00Z";
+ * const elapsed = durationFrom(startedAt); // e.g. 2592000000 (30 days in ms)
+ * formatDuration(elapsed);                // e.g. "1 month"
+ * ```
+ *
+ * @param date - The past date to compare (Date or timestamp).
+ * @returns Duration in milliseconds between now and the given date.
+ */
+export const durationFrom = (date: Date | number | string) => Date.now() - new Date(date).getTime();

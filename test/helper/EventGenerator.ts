@@ -20,7 +20,7 @@
 import {MemberLeaveReason} from '@wireapp/api-client/lib/conversation/data/';
 import {CONVERSATION_EVENT} from '@wireapp/api-client/lib/event';
 
-import {AssetTransferState} from 'src/script/assets/AssetTransferState';
+import {AssetTransferState} from 'Repositories/assets/AssetTransferState';
 import {
   AssetAddEvent,
   DeleteEvent,
@@ -29,9 +29,9 @@ import {
   MemberLeaveEvent,
   MessageAddEvent,
   ReactionEvent,
-} from 'src/script/conversation/EventBuilder';
-import {Conversation} from 'src/script/entity/Conversation';
-import {CONVERSATION} from 'src/script/event/Client';
+} from 'Repositories/conversation/EventBuilder';
+import {Conversation} from 'Repositories/entity/Conversation';
+import {CONVERSATION} from 'Repositories/event/Client';
 import {createUuid} from 'Util/uuid';
 
 export function createMessageAddEvent({
@@ -45,7 +45,12 @@ export function createMessageAddEvent({
 } = {}): MessageAddEvent {
   const from = createUuid();
   const conversation = new Conversation(createUuid(), 'domain');
-  const baseEvent = EventBuilder.buildMessageAdd(conversation, Date.now(), createUuid(), 'clientId');
+  const baseEvent = EventBuilder.buildMessageAdd({
+    conversationEntity: conversation,
+    currentTimestamp: Date.now(),
+    senderId: createUuid(),
+    clientId: 'clientId',
+  });
   return {
     ...baseEvent,
     data: {

@@ -21,25 +21,28 @@ import {useEffect, useState} from 'react';
 
 import {GenericMessage} from '@wireapp/protocol-messaging';
 
-import {LoadingBar} from 'Components/LoadingBar';
+import {ProgressBar} from 'Components/ProgressBar';
+import {AssetRepository} from 'Repositories/assets/AssetRepository';
 import {t} from 'Util/LocalizerUtil';
 
 import {uploadingProgressText} from './UploadAssetItem.styles';
 
-import {AssetRepository} from '../../../../../assets/AssetRepository';
-
 interface Props {
   assetRepository: AssetRepository;
   message: GenericMessage;
+  scrollToEnd?: () => void;
 }
 
-export const UploadAssetItem = ({assetRepository, message}: Props) => {
+export const UploadAssetItem = ({assetRepository, message, scrollToEnd}: Props) => {
   const [uploadProgress, setUploadProgress] = useState(0);
 
   useEffect(() => {
     const progressSubscribable = assetRepository.getUploadProgress(message.messageId);
     setUploadProgress(progressSubscribable());
     const subscription = progressSubscribable.subscribe(value => setUploadProgress(value));
+
+    scrollToEnd?.();
+
     return () => {
       subscription.dispose();
     };
@@ -55,7 +58,7 @@ export const UploadAssetItem = ({assetRepository, message}: Props) => {
         {t('conversationAssetUploading')} {message.asset?.original?.name || ''} - {Math.trunc(uploadProgress)}%
       </span>
 
-      <LoadingBar className="uploading-asset" progress={uploadProgress} centerText={false} />
+      <ProgressBar className="uploading-asset" progress={uploadProgress} centerText={false} />
 
       <button
         data-uie-name="cancel-asset-item-upload"

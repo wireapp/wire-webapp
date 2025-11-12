@@ -17,17 +17,14 @@
  *
  */
 
-import React from 'react';
-
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
+import {UserRepository} from 'Repositories/user/UserRepository';
 import {t} from 'Util/LocalizerUtil';
 import {getLogger} from 'Util/Logger';
 
 import {AccountInput, useInputDone} from './AccountInput';
-
-import {UserRepository} from '../../../../../user/UserRepository';
 
 interface EmailInputProps {
   canEditProfile: boolean;
@@ -37,7 +34,7 @@ interface EmailInputProps {
 
 const logger = getLogger('EmailInput');
 
-const EmailInput: React.FC<EmailInputProps> = ({email, canEditProfile, userRepository}) => {
+const EmailInput = ({email, canEditProfile, userRepository}: EmailInputProps) => {
   const emailInputDone = useInputDone();
 
   const changeEmail = async (enteredEmail: string): Promise<void> => {

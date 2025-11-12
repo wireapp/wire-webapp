@@ -17,17 +17,16 @@
  *
  */
 
-import React from 'react';
+import {CSSProperties} from 'react';
 
+import type {Message} from 'Repositories/entity/message/Message';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 
-import type {Message} from '../../../entity/message/Message';
-
-export interface EphemeralTimerProps {
+interface EphemeralTimerProps {
   message: Message;
 }
 
-const EphemeralTimer: React.FC<EphemeralTimerProps> = ({message}) => {
+const EphemeralTimer = ({message}: EphemeralTimerProps) => {
   const {
     ephemeral_remaining: remaining,
     ephemeral_started: started,
@@ -45,7 +44,7 @@ const EphemeralTimer: React.FC<EphemeralTimerProps> = ({message}) => {
         cx={4}
         cy={4}
         r={2}
-        style={{'--offset': remaining / duration || 0} as React.CSSProperties}
+        style={{'--offset': remaining / duration || 0} as CSSProperties}
         transform="rotate(-90 4 4)"
       />
     </svg>

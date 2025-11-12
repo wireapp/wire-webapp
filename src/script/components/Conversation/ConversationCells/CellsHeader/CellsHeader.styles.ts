@@ -25,20 +25,8 @@ export const wrapperStyles: CSSObject = {
   alignItems: 'flex-start',
   flexDirection: 'column',
   marginBottom: '20px',
+  paddingRight: '8px',
   width: '100%',
-};
-
-export const headingStyles: CSSObject = {
-  color: 'var(--main-color)',
-  fontWeight: 'var(--font-weight-semibold)',
-  fontSize: 'var(--font-size-medium)',
-  marginBottom: '8px',
-};
-
-export const searchWrapperStyles: CSSObject = {
-  display: 'flex',
-  alignItems: 'center',
-  gap: '8px',
 };
 
 export const contentStyles: CSSObject = {
@@ -47,4 +35,10 @@ export const contentStyles: CSSObject = {
   justifyContent: 'space-between',
   gap: '8px',
   width: '100%',
+};
+
+export const actionsStyles: CSSObject = {
+  display: 'flex',
+  alignItems: 'center',
+  gap: '8px',
 };

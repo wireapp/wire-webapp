@@ -17,13 +17,12 @@
  *
  */
 
-import React, {useContext, useEffect, useState} from 'react';
+import {useContext, useEffect, useState} from 'react';
 
-import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
 import cx from 'classnames';
 import {container} from 'tsyringe';
 
-import {Link, LinkVariant} from '@wireapp/react-ui-kit';
+import {TabIndex, Link, LinkVariant} from '@wireapp/react-ui-kit';
 
 import {FadingScrollbar} from 'Components/FadingScrollbar';
 import * as Icon from 'Components/Icon';
@@ -31,6 +30,9 @@ import {ModalComponent} from 'Components/Modals/ModalComponent';
 import {EnrichedFields} from 'Components/panel/EnrichedFields';
 import {UserActions} from 'Components/panel/UserActions';
 import {UserDetails} from 'Components/panel/UserDetails';
+import {User} from 'Repositories/entity/User';
+import {TeamState} from 'Repositories/team/TeamState';
+import {UserRepository} from 'Repositories/user/UserRepository';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {handleKeyDown, KEY} from 'Util/KeyboardUtil';
 import {replaceLink, t} from 'Util/LocalizerUtil';
@@ -39,11 +41,8 @@ import {useUserModalState} from './UserModal.state';
 import {userModalStyle, userModalWrapperStyle} from './UserModal.styles';
 
 import {Config} from '../../../Config';
-import {User} from '../../../entity/User';
 import {RootContext} from '../../../page/RootProvider';
 import {Core} from '../../../service/CoreSingleton';
-import {TeamState} from '../../../team/TeamState';
-import {UserRepository} from '../../../user/UserRepository';
 
 export interface UserModalProps {
   userRepository: UserRepository;
@@ -61,12 +60,7 @@ interface UserModalUserActionsSectionProps {
   selfUser: User;
 }
 
-const UserModalUserActionsSection: React.FC<UserModalUserActionsSectionProps> = ({
-  user,
-  onAction,
-  isSelfActivated,
-  selfUser,
-}) => {
+const UserModalUserActionsSection = ({user, onAction, isSelfActivated, selfUser}: UserModalUserActionsSectionProps) => {
   const {isBlockedLegalHold} = useKoSubscribableChildren(user, ['isBlockedLegalHold']);
   const mainViewModel = useContext(RootContext);
 
@@ -106,7 +100,7 @@ interface UnverifiedUserWarningProps {
   user?: User;
 }
 
-export const UnverifiedUserWarning: React.FC<UnverifiedUserWarningProps> = ({user}) => {
+export const UnverifiedUserWarning = ({user}: UnverifiedUserWarningProps) => {
   return (
     <div css={{display: 'flex', color: 'var(--danger-color)', fill: 'var(--danger-color)', margin: '1em 0'}}>
       <Icon.InfoIcon css={{height: '1rem', margin: '0.15em 1em', minWidth: '1rem'}} />
@@ -125,12 +119,12 @@ export const UnverifiedUserWarning: React.FC<UnverifiedUserWarningProps> = ({use
   );
 };
 
-const UserModal: React.FC<UserModalProps> = ({
+const UserModal = ({
   userRepository,
   selfUser,
   core = container.resolve(Core),
   teamState = container.resolve(TeamState),
-}) => {
+}: UserModalProps) => {
   const onClose = useUserModalState(state => state.onClose);
   const userId = useUserModalState(state => state.userId);
   const resetState = useUserModalState(state => state.resetState);

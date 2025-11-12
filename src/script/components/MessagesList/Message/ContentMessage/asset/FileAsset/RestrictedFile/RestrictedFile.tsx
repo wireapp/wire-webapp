@@ -17,17 +17,15 @@
  *
  */
 
-import React from 'react';
-
-import {FileAsset} from 'src/script/entity/message/FileAsset';
+import {FileAsset} from 'Repositories/entity/message/FileAsset';
 import {t} from 'Util/LocalizerUtil';
 import {trimFileExtension} from 'Util/util';
 
-export interface RestrictedFileProps extends React.HTMLProps<HTMLDivElement> {
+interface RestrictedFileProps {
   asset?: FileAsset;
 }
 
-const RestrictedFile: React.FC<RestrictedFileProps> = ({asset}) => {
+const RestrictedFile = ({asset}: RestrictedFileProps) => {
   const fileName = asset?.file_name && trimFileExtension(asset.file_name);
   return (
     <div className="file">

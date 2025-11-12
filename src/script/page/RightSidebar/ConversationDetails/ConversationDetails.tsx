@@ -19,9 +19,10 @@
 
 import {forwardRef, useEffect, useMemo, useState} from 'react';
 
-import {CONVERSATION_ACCESS} from '@wireapp/api-client/lib/conversation';
+import {CONVERSATION_ACCESS, CONVERSATION_CELLS_STATE} from '@wireapp/api-client/lib/conversation';
 import {RECEIPT_MODE} from '@wireapp/api-client/lib/conversation/data/';
-import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
+
+import {TabIndex} from '@wireapp/react-ui-kit';
 
 import {FadingScrollbar} from 'Components/FadingScrollbar';
 import * as Icon from 'Components/Icon';
@@ -29,6 +30,15 @@ import {ConversationProtocolDetails} from 'Components/panel/ConversationProtocol
 import {EnrichedFields} from 'Components/panel/EnrichedFields';
 import {ServiceDetails} from 'Components/panel/ServiceDetails';
 import {UserDetails} from 'Components/panel/UserDetails';
+import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
+import {ConversationVerificationState} from 'Repositories/conversation/ConversationVerificationState';
+import {getNotificationText} from 'Repositories/conversation/NotificationSetting';
+import {Conversation} from 'Repositories/entity/Conversation';
+import {User} from 'Repositories/entity/User';
+import {IntegrationRepository} from 'Repositories/integration/IntegrationRepository';
+import {ServiceEntity} from 'Repositories/integration/ServiceEntity';
+import {TeamRepository} from 'Repositories/team/TeamRepository';
+import {TeamState} from 'Repositories/team/TeamState';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 import {sortUsersByPriority} from 'Util/StringUtil';
@@ -38,16 +48,7 @@ import {ConversationDetailsHeader} from './components/ConversationDetailsHeader'
 import {ConversationDetailsOptions} from './components/ConversationDetailsOptions';
 import {ConversationDetailsParticipants} from './components/ConversationDetailsParticipants';
 
-import {ConversationRepository} from '../../../conversation/ConversationRepository';
-import {ConversationVerificationState} from '../../../conversation/ConversationVerificationState';
-import {getNotificationText} from '../../../conversation/NotificationSetting';
-import {Conversation} from '../../../entity/Conversation';
-import {User} from '../../../entity/User';
 import {isServiceEntity} from '../../../guards/Service';
-import {IntegrationRepository} from '../../../integration/IntegrationRepository';
-import {ServiceEntity} from '../../../integration/ServiceEntity';
-import {TeamRepository} from '../../../team/TeamRepository';
-import {TeamState} from '../../../team/TeamState';
 import {Shortcut} from '../../../ui/Shortcut';
 import {ShortcutType} from '../../../ui/ShortcutType';
 import {ActionsViewModel} from '../../../view_model/ActionsViewModel';
@@ -108,6 +109,7 @@ const ConversationDetails = forwardRef<HTMLDivElement, ConversationDetailsProps>
       participating_user_ets: participatingUserEts,
       firstUserEntity: firstParticipant,
       isGroupOrChannel,
+      cellsState,
     } = useKoSubscribableChildren(activeConversation, [
       'isMutable',
       'showNotificationsNothing',
@@ -125,6 +127,7 @@ const ConversationDetails = forwardRef<HTMLDivElement, ConversationDetailsProps>
       'participating_user_ets',
       'firstUserEntity',
       'isGroupOrChannel',
+      'cellsState',
     ]);
 
     const {isTemporaryGuest} = useKoSubscribableChildren(firstParticipant!, ['isTemporaryGuest']);
@@ -151,12 +154,23 @@ const ConversationDetails = forwardRef<HTMLDivElement, ConversationDetailsProps>
     const servicesOptionsText = isServicesRoom ? t('conversationDetailsOn') : t('conversationDetailsOff');
     const isChannelPublic = activeConversation.accessModes?.includes(CONVERSATION_ACCESS.LINK);
 
+    const isCellsConversation = !!cellsState && cellsState !== CONVERSATION_CELLS_STATE.DISABLED;
+
     const notificationStatusText = getNotificationText(notificationState);
-    const timedMessagesText = isSelfDeletingMessagesEnforced
-      ? formatDuration(getEnforcedSelfDeletingMessagesTimeout).text
-      : hasTimer && globalMessageTimer
-        ? formatDuration(globalMessageTimer).text
-        : t('ephemeralUnitsNone');
+    function getTimedMessagesText(): string {
+      if (isCellsConversation) {
+        return t('cells.selfDeletingMessage.info');
+      }
+      if (isSelfDeletingMessagesEnforced) {
+        return formatDuration(getEnforcedSelfDeletingMessagesTimeout).text;
+      }
+      if (hasTimer && globalMessageTimer) {
+        return formatDuration(globalMessageTimer).text;
+      }
+      return t('ephemeralUnitsNone');
+    }
+
+    const timedMessagesText = getTimedMessagesText();
 
     const showActionMute = isMutable && !isTeam;
     const isVerified = verificationState === ConversationVerificationState.VERIFIED;

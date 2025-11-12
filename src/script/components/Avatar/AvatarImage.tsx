@@ -24,14 +24,13 @@ import {Transition} from 'react-transition-group';
 import {container} from 'tsyringe';
 
 import {InViewport} from 'Components/InViewport';
+import {AssetRemoteData} from 'Repositories/assets/AssetRemoteData';
+import {AssetRepository} from 'Repositories/assets/AssetRepository';
 import {CSS_FILL_PARENT} from 'Util/CSSMixin';
-
-import {AssetRemoteData} from '../../assets/AssetRemoteData';
-import {AssetRepository} from '../../assets/AssetRepository';
 
 import {AVATAR_SIZE} from '.';
 
-export interface AvatarImageProps {
+interface AvatarImageProps {
   assetRepository?: AssetRepository;
   avatarAlt: string;
   avatarSize: AVATAR_SIZE;
@@ -69,7 +68,7 @@ const AvatarImage: React.FunctionComponent<AvatarImageProps> = ({
 
       (async () => {
         if (pictureResource) {
-          const isCached = pictureResource.downloadProgress() === 100;
+          const isCached = pictureResource.downloadProgress === 100;
           setShowTransition(!isCached && !isSmall);
           try {
             const url = await assetRepository.getObjectUrl(pictureResource);

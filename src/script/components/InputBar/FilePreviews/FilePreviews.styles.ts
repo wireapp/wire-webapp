@@ -24,7 +24,7 @@ export const wrapperStyles: CSSObject = {
   display: 'grid',
   gridTemplateColumns: 'repeat(auto-fill, 74px)',
   gridAutoFlow: 'dense',
-  gap: '24px',
+  gap: '16px',
   maxHeight: '166px',
   width: '100%',
   overflowY: 'auto',

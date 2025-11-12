@@ -1,9 +1,9 @@
 name: precommit
 
-on:
-  pull_request:
-    # we want to run the CI on every PR targetting those branches
-    branches: [dev]
+#on:
+#  pull_request:
+#    # we want to run the CI on every PR targetting those branches
+#    branches: [dev]
 
 concurrency:
   group: precommit-deploy
@@ -53,24 +53,20 @@ jobs:
           name: 'build-artifact'
           path: '${{env.BUILD_DIR}}${{env.BUILD_ARTIFACT}}'
 
-      - name: Fetch PR details
-        id: pr_details
-        uses: octokit/request-action@v2.x
-        with:
-          route: GET /repos/${{ github.repository }}/pulls/${{ github.event.pull_request.number }}
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
       - name: Check total PR additions
         id: check_additions
         run: |
-          # Store response data in variable
-          response='${{ steps.pr_details.outputs.data }}'
-          # Parse additions from response
-          total_additions=$(echo "$response" | jq -r '.additions')
+          total_additions=$(gh api -H "Accept: application/vnd.github.v3+json" \
+                                "repos/${{ github.repository }}/pulls/${{ github.event.pull_request.number }}" \
+                                | jq -r '.additions')
+          if [ -z "$total_additions" ] || [ "$total_additions" = "null" ]; then
+            echo "Error: Could not extract additions"
+            exit 1
+          fi
           echo "Found total additions: $total_additions"
-          # Output for subsequent steps
           echo "total_additions=$total_additions" >> $GITHUB_OUTPUT
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   deploy_to_aws:
     name: 'Deploy to live environments'

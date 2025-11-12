@@ -25,7 +25,7 @@ export const listStyles: CSSObject = {
   display: 'grid',
   gridTemplateColumns: 'repeat(auto-fill, 74px)',
   gridAutoFlow: 'dense',
-  gap: '24px',
+  gap: '16px',
   width: '100%',
   padding: '8px 8px 8px 0',
   margin: '0',
@@ -36,14 +36,38 @@ export const listSingleItemStyles: CSSObject = {
   alignItems: 'flex-start',
   justifyContent: 'flex-start',
   listStyle: 'none',
+  padding: '8px 8px 8px 0',
   margin: '0',
-  padding: '0',
 };
 
-export const largeCardStyles: CSSObject = {
+const largeCardStyles: CSSObject = {
   gridColumn: 'span 3',
+  width: '100%',
 };
 
-export const smallCardStyles: CSSObject = {
+const smallCardStyles: CSSObject = {
   gridColumn: 'span 1',
+};
+
+export const imageCardStyles: CSSObject = {
+  ...smallCardStyles,
+};
+
+export const videoCardStyles = (isSingleAsset: boolean) => ({
+  ...(isSingleAsset ? largeCardStyles : smallCardStyles),
+});
+
+export const fileCardStyles = {
+  ...largeCardStyles,
+};
+
+export const hollowWrapperButtonStyles: CSSObject = {
+  padding: '0',
+  position: 'absolute',
+  left: '0',
+  width: '100%',
+  height: '100%',
+  border: 'none',
+  background: 'none',
+  cursor: 'pointer',
 };

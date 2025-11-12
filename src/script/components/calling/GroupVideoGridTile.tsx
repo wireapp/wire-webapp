@@ -17,24 +17,23 @@
  *
  */
 
-import React from 'react';
+import {KeyboardEvent} from 'react';
 
 import {QualifiedId} from '@wireapp/api-client/lib/user';
-import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
 
 import {VIDEO_STATE} from '@wireapp/avs';
+import {TabIndex} from '@wireapp/react-ui-kit';
 
 import {Avatar, AVATAR_SIZE} from 'Components/Avatar';
 import * as Icon from 'Components/Icon';
+import type {Participant} from 'Repositories/calling/Participant';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {isEnterKey} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
 
 import {Video} from './Video';
 
-import type {Participant} from '../../calling/Participant';
-
-export interface GroupVideoGridTileProps {
+interface GroupVideoGridTileProps {
   isMaximized: boolean;
   minimized: boolean;
   onTileDoubleClick: (userId: QualifiedId, clientId: string) => void;
@@ -61,14 +60,14 @@ const getParticipantNameColor = ({
   return 'var(--white)';
 };
 
-const GroupVideoGridTile: React.FC<GroupVideoGridTileProps> = ({
+const GroupVideoGridTile = ({
   minimized,
   participant,
   selfParticipant,
   participantCount,
   isMaximized,
   onTileDoubleClick,
-}) => {
+}: GroupVideoGridTileProps) => {
   const {
     isMuted,
     videoState,
@@ -94,13 +93,14 @@ const GroupVideoGridTile: React.FC<GroupVideoGridTileProps> = ({
   const sharesScreen = videoState === VIDEO_STATE.SCREENSHARE;
   const sharesCamera = [VIDEO_STATE.STARTED, VIDEO_STATE.PAUSED].includes(videoState);
   const hasPausedVideo = videoState === VIDEO_STATE.PAUSED;
+  const doVideoReconnecting = videoState === VIDEO_STATE.RECONNECTING;
   const hasActiveVideo = (sharesCamera || sharesScreen) && !!videoStream;
   const activelySpeakingBoxShadow = `inset 0px 0px 0px 1px var(--group-video-bg), inset 0px 0px 0px 4px var(--accent-color), inset 0px 0px 0px 7px var(--app-bg-secondary)`;
   const groupVideoBoxShadow = participantCount > 1 ? 'inset 0px 0px 0px 2px var(--group-video-bg)' : 'initial';
 
   const handleTileClick = () => onTileDoubleClick(participant?.user.qualifiedId, participant?.clientId);
 
-  const handleEnterTileClick = (keyboardEvent: React.KeyboardEvent) => {
+  const handleEnterTileClick = (keyboardEvent: KeyboardEvent) => {
     if (isEnterKey(keyboardEvent)) {
       handleTileClick();
     }
@@ -124,6 +124,7 @@ const GroupVideoGridTile: React.FC<GroupVideoGridTileProps> = ({
         }}
       >
         <span
+          data-uie-value={participant?.user.id}
           data-uie-name="call-participant-name"
           css={{
             textOverflow: 'ellipsis',
@@ -213,7 +214,7 @@ const GroupVideoGridTile: React.FC<GroupVideoGridTileProps> = ({
 
       {!minimized && isMuted && (
         <span className="group-video-grid__element__label__icon">
-          <Icon.MicOffIcon data-uie-name="mic-icon-off" />
+          <Icon.MicOffIcon data-uie-name="mic-icon-off" data-uie-value={participant?.user.id} />
         </span>
       )}
 
@@ -233,7 +234,7 @@ const GroupVideoGridTile: React.FC<GroupVideoGridTileProps> = ({
 
       {nameContainer}
 
-      {(hasPausedVideo || isSwitchingVideoResolution) && (
+      {(hasPausedVideo || isSwitchingVideoResolution || doVideoReconnecting) && (
         <div className="group-video-grid__pause-overlay">
           <div className="background">
             <div className="background-image"></div>

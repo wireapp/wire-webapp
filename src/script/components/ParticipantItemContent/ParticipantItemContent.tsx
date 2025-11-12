@@ -24,8 +24,8 @@ import ko from 'knockout';
 import {UserBlockedBadge, UserVerificationBadges} from 'Components/Badge';
 import * as Icon from 'Components/Icon';
 import {UserInfo} from 'Components/UserInfo';
-import {User} from 'src/script/entity/User';
-import {ServiceEntity} from 'src/script/integration/ServiceEntity';
+import {User} from 'Repositories/entity/User';
+import {ServiceEntity} from 'Repositories/integration/ServiceEntity';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 
 import {
@@ -40,7 +40,7 @@ import {
   wrapper,
 } from './ParticipantItem.styles';
 
-export interface ParticipantItemContentProps {
+interface ParticipantItemContentProps {
   /** the conversation context in which we are displaying the user (will enable e2ei verification badges) */
   groupId?: string;
   participant: User | ServiceEntity;

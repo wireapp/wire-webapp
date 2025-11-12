@@ -28,7 +28,7 @@ import {customHistorySharingInputCss} from 'Components/Modals/CreateConversation
 import {ChatHistory, HistorySharingUnit} from 'Components/Modals/CreateConversation/types';
 import {getChatHistoryOptions, getChatHistorySharingUnitOptions} from 'Components/Modals/CreateConversation/utils';
 import {RadioGroup} from 'Components/Radio';
-import {TeamState} from 'src/script/team/TeamState';
+import {TeamState} from 'Repositories/team/TeamState';
 import {t} from 'Util/LocalizerUtil';
 
 import {

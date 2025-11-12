@@ -22,37 +22,37 @@ import {amplify} from 'amplify';
 import ko from 'knockout';
 import {container} from 'tsyringe';
 
-import {CALL_TYPE, REASON as CALL_REASON, STATE as CALL_STATE} from '@wireapp/avs';
+import {REASON as CALL_REASON, STATE as CALL_STATE} from '@wireapp/avs';
 import {Availability} from '@wireapp/protocol-messaging';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
-import {ButtonGroupTab} from 'Components/calling/ButtonGroup';
 import 'Components/calling/ChooseScreen';
+import {PrimaryModal} from 'Components/Modals/PrimaryModal';
+import type {AudioRepository} from 'Repositories/audio/AudioRepository';
+import {AudioType} from 'Repositories/audio/AudioType';
+import type {Call} from 'Repositories/calling/Call';
+import {CallingRepository} from 'Repositories/calling/CallingRepository';
+import {CallState, DesktopScreenShareMenu} from 'Repositories/calling/CallState';
+import {LEAVE_CALL_REASON} from 'Repositories/calling/enum/LeaveCallReason';
+import {ConversationState} from 'Repositories/conversation/ConversationState';
+import {ConversationVerificationState} from 'Repositories/conversation/ConversationVerificationState';
+import type {Conversation} from 'Repositories/entity/Conversation';
+import type {User} from 'Repositories/entity/User';
+import type {ElectronDesktopCapturerSource, MediaDevicesHandler} from 'Repositories/media/MediaDevicesHandler';
+import type {MediaStreamHandler} from 'Repositories/media/MediaStreamHandler';
+import {mediaDevicesStore} from 'Repositories/media/useMediaDevicesStore';
+import {isPermissionGranted} from 'Repositories/permission/permissionHandlers';
+import {PermissionType} from 'Repositories/permission/PermissionType';
+import {PropertiesRepository} from 'Repositories/properties/PropertiesRepository';
+import {PROPERTIES_TYPE} from 'Repositories/properties/PropertiesType';
+import type {TeamRepository} from 'Repositories/team/TeamRepository';
+import {TeamState} from 'Repositories/team/TeamState';
+import {ROLE} from 'Repositories/user/UserPermission';
 import {replaceLink, t} from 'Util/LocalizerUtil';
 import {matchQualifiedIds} from 'Util/QualifiedId';
 import {safeWindowOpen} from 'Util/SanitizationUtil';
 
-import type {AudioRepository} from '../audio/AudioRepository';
-import {AudioType} from '../audio/AudioType';
-import type {Call} from '../calling/Call';
-import {CallingRepository} from '../calling/CallingRepository';
-import {CallState, DesktopScreenShareMenu} from '../calling/CallState';
-import {LEAVE_CALL_REASON} from '../calling/enum/LeaveCallReason';
-import {PrimaryModal} from '../components/Modals/PrimaryModal';
 import {Config} from '../Config';
-import {ConversationState} from '../conversation/ConversationState';
-import {ConversationVerificationState} from '../conversation/ConversationVerificationState';
-import type {Conversation} from '../entity/Conversation';
-import type {User} from '../entity/User';
-import type {ElectronDesktopCapturerSource, MediaDevicesHandler} from '../media/MediaDevicesHandler';
-import type {MediaStreamHandler} from '../media/MediaStreamHandler';
-import type {PermissionRepository} from '../permission/PermissionRepository';
-import {PermissionStatusState} from '../permission/PermissionStatusState';
-import {PropertiesRepository} from '../properties/PropertiesRepository';
-import {PROPERTIES_TYPE} from '../properties/PropertiesType';
-import type {TeamRepository} from '../team/TeamRepository';
-import {TeamState} from '../team/TeamState';
-import {ROLE} from '../user/UserPermission';
 
 export interface CallActions {
   answer: (call: Call) => Promise<void>;
@@ -60,7 +60,6 @@ export interface CallActions {
   leave: (call: Call) => void;
   reject: (call: Call) => void;
   startAudio: (conversationEntity: Conversation) => Promise<void>;
-  startVideo: (conversationEntity: Conversation) => Promise<void>;
   switchCameraInput: (deviceId: string) => void;
   switchScreenInput: (deviceId: string) => void;
   toggleCamera: (call: Call) => void;
@@ -72,11 +71,6 @@ export enum CallViewTab {
   ALL = 'all',
   SPEAKERS = 'speakers',
 }
-
-export const CallViewTabs: ButtonGroupTab[] = [
-  {getText: () => t('videoSpeakersTabSpeakers').toUpperCase(), value: CallViewTab.SPEAKERS},
-  {getText: substitute => t('videoSpeakersTabAll', substitute as unknown as {count: number}), value: CallViewTab.ALL},
-];
 
 declare global {
   interface HTMLAudioElement {
@@ -95,7 +89,6 @@ export class CallingViewModel {
     readonly audioRepository: AudioRepository,
     readonly mediaDevicesHandler: MediaDevicesHandler,
     readonly mediaStreamHandler: MediaStreamHandler,
-    readonly permissionRepository: PermissionRepository,
     readonly teamRepository: TeamRepository,
     readonly propertiesRepository: PropertiesRepository,
     private readonly selfUser: ko.Observable<User>,
@@ -103,6 +96,7 @@ export class CallingViewModel {
     readonly callState = container.resolve(CallState),
     private readonly teamState = container.resolve(TeamState),
   ) {
+    const {setVideoInputDeviceId, setScreenInputDeviceId} = mediaDevicesStore.getState();
     this.isSelfVerified = ko.pureComputed(() => selfUser().is_verified());
     this.activeCalls = ko.pureComputed(() =>
       this.callState.calls().filter(call => {
@@ -115,18 +109,17 @@ export class CallingViewModel {
       }),
     );
 
-    const toggleState = async (withVideo: boolean): Promise<void> => {
+    const toggleState = async (): Promise<void> => {
       const conversation = this.conversationState.activeConversation();
       if (conversation) {
         const isActiveCall = this.callingRepository.findCall(conversation.qualifiedId);
-        const callType = withVideo ? CALL_TYPE.VIDEO : CALL_TYPE.NORMAL;
 
         if (isActiveCall) {
           this.callingRepository.leaveCall(conversation.qualifiedId, LEAVE_CALL_REASON.ELECTRON_TRAY_MENU_MESSAGE);
           return;
         }
 
-        await handleCallAction(conversation, callType);
+        await handleCallAction(conversation);
       }
     };
 
@@ -155,7 +148,7 @@ export class CallingViewModel {
       });
     };
 
-    const startCall = async (conversation: Conversation, callType: CALL_TYPE): Promise<void> => {
+    const startCall = async (conversation: Conversation): Promise<void> => {
       const canStart = await this.canInitiateCall(conversation.qualifiedId, {
         action: t('modalCallSecondOutgoingAction'),
         message: t('modalCallSecondOutgoingMessage'),
@@ -166,7 +159,7 @@ export class CallingViewModel {
         return;
       }
 
-      const call = await this.callingRepository.startCall(conversation, callType);
+      const call = await this.callingRepository.startCall(conversation);
       if (!call) {
         return;
       }
@@ -202,7 +195,7 @@ export class CallingViewModel {
       }
     });
 
-    const showE2EICallModal = (conversationEntity: Conversation, callType: CALL_TYPE) => {
+    const showE2EICallModal = (conversationEntity: Conversation) => {
       const memberCount = conversationEntity.participating_user_ets().length;
 
       PrimaryModal.show(PrimaryModal.type.CONFIRM, {
@@ -211,9 +204,9 @@ export class CallingViewModel {
             conversationEntity.mlsVerificationState(ConversationVerificationState.UNVERIFIED);
 
             if (memberCount > MAX_USERS_TO_CALL_WITHOUT_CONFIRM) {
-              showMaxUsersToCallModalWithoutConfirm(conversationEntity, callType);
+              showMaxUsersToCallModalWithoutConfirm(conversationEntity);
             } else {
-              await startCall(conversationEntity, callType);
+              await startCall(conversationEntity);
             }
           },
           text: t('conversation.E2EICallAnyway'),
@@ -229,13 +222,13 @@ export class CallingViewModel {
       });
     };
 
-    const showMaxUsersToCallModalWithoutConfirm = (conversationEntity: Conversation, callType: CALL_TYPE) => {
+    const showMaxUsersToCallModalWithoutConfirm = (conversationEntity: Conversation) => {
       const memberCount = conversationEntity.participating_user_ets().length;
 
       PrimaryModal.show(PrimaryModal.type.WITHOUT_TITLE, {
         preventClose: true,
         primaryAction: {
-          action: async () => await startCall(conversationEntity, callType),
+          action: async () => await startCall(conversationEntity),
           text: t('groupCallModalPrimaryBtnName'),
         },
         secondaryAction: {
@@ -250,16 +243,16 @@ export class CallingViewModel {
       });
     };
 
-    const handleCallAction = async (conversationEntity: Conversation, callType: CALL_TYPE): Promise<void> => {
+    const handleCallAction = async (conversationEntity: Conversation): Promise<void> => {
       const memberCount = conversationEntity.participating_user_ets().length;
       const isE2EIDegraded = conversationEntity.mlsVerificationState() === ConversationVerificationState.DEGRADED;
 
       if (isE2EIDegraded) {
-        showE2EICallModal(conversationEntity, callType);
+        showE2EICallModal(conversationEntity);
       } else if (memberCount > MAX_USERS_TO_CALL_WITHOUT_CONFIRM) {
-        showMaxUsersToCallModalWithoutConfirm(conversationEntity, callType);
+        showMaxUsersToCallModalWithoutConfirm(conversationEntity);
       } else {
-        await startCall(conversationEntity, callType);
+        await startCall(conversationEntity);
       }
     };
 
@@ -297,22 +290,15 @@ export class CallingViewModel {
         if (conversationEntity.isGroupOrChannel() && !this.teamState.isConferenceCallingEnabled()) {
           this.showRestrictedConferenceCallingModal();
         } else {
-          await handleCallAction(conversationEntity, CALL_TYPE.NORMAL);
-        }
-      },
-      startVideo: async (conversationEntity: Conversation) => {
-        if (conversationEntity.isGroupOrChannel() && !this.teamState.isConferenceCallingEnabled()) {
-          this.showRestrictedConferenceCallingModal();
-        } else {
-          await handleCallAction(conversationEntity, CALL_TYPE.VIDEO);
+          await handleCallAction(conversationEntity);
         }
       },
       switchCameraInput: (deviceId: string) => {
-        this.mediaDevicesHandler.currentDeviceId.videoinput(deviceId);
+        setVideoInputDeviceId(deviceId);
         this.callingRepository.refreshVideoInput();
       },
       switchScreenInput: (deviceId: string) => {
-        this.mediaDevicesHandler.currentDeviceId.screeninput(deviceId);
+        setScreenInputDeviceId(deviceId);
       },
       toggleCamera: (call: Call) => {
         this.callingRepository.toggleCamera(call);
@@ -328,7 +314,7 @@ export class CallingViewModel {
           this.callState.desktopScreenShareMenu(desktopScreenShareMenu);
           return new Promise(resolve => {
             this.callingRepository.onChooseScreen = (deviceId: string): void => {
-              this.mediaDevicesHandler.currentDeviceId.screeninput(deviceId);
+              setScreenInputDeviceId(deviceId);
               this.callState.selectableScreens([]);
               this.callState.selectableWindows([]);
               resolve();
@@ -477,7 +463,7 @@ export class CallingViewModel {
   }
 
   hasAccessToCamera(): boolean {
-    return this.permissionRepository.permissionState.camera() === PermissionStatusState.GRANTED;
+    return isPermissionGranted(PermissionType.CAMERA);
   }
 
   readonly onCancelScreenSelection = () => {

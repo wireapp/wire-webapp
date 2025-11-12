@@ -19,12 +19,12 @@
 
 import React from 'react';
 
-import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
+import {TabIndex} from '@wireapp/react-ui-kit';
 
 import {Avatar, AVATAR_SIZE} from 'Components/Avatar';
 import {UserStatusBadges} from 'Components/Badge';
 import {CallParticipantsListItemHandRaiseIcon} from 'Components/calling/CallParticipantsListItem/CallParticipantsListItemHandRaiseIcon';
-import {Participant} from 'src/script/calling/Participant';
+import {Participant} from 'Repositories/calling/Participant';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {handleKeyDown, KEY} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
@@ -39,7 +39,7 @@ import {
 } from './CallParticipantsListItem.styles';
 import {CallParticipantStatusIcons} from './CallParticipantStatusIcons';
 
-export interface CallParticipantsListItemProps {
+interface CallParticipantsListItemProps {
   callParticipant: Participant;
   showContextMenu: boolean;
   onContextMenu: (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => void;

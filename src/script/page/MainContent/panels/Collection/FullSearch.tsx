@@ -17,12 +17,15 @@
  *
  */
 
-import React, {useEffect, useMemo, useRef, useState} from 'react';
+import {useEffect, useMemo, useRef, useState} from 'react';
 
 import {useDebouncedCallback} from 'use-debounce';
 
 import {CloseIcon, Input, InputSubmitCombo, SearchIcon} from '@wireapp/react-ui-kit';
 
+import {ContentMessage} from 'Repositories/entity/message/ContentMessage';
+import type {Message} from 'Repositories/entity/message/Message';
+import {getSearchRegex} from 'Repositories/search/FullTextSearch';
 import {t} from 'Util/LocalizerUtil';
 import {isScrolledBottom} from 'Util/scroll-helpers';
 import {useEffectRef} from 'Util/useEffectRef';
@@ -30,23 +33,19 @@ import {noop} from 'Util/util';
 
 import {FullSearchItem} from './fullSearch/FullSearchItem';
 
-import {ContentMessage} from '../../../../entity/message/ContentMessage';
-import type {Message} from '../../../../entity/message/Message';
-import {getSearchRegex} from '../../../../search/FullTextSearch';
-
 const MAX_VISIBLE_MESSAGES = 30;
 const PRE_MARKED_OFFSET = 20;
 const MAX_TEXT_LENGTH = 60;
 const MAX_OFFSET_INDEX = 30;
 const DEBOUNCE_TIME = 100;
 
-export interface FullSearchProps {
+interface FullSearchProps {
   change?: (query: string) => void;
   click?: (messageEntity: Message) => void;
   searchProvider: (query: string) => Promise<{messageEntities: Message[]; query: string}>;
 }
 
-const FullSearch: React.FC<FullSearchProps> = ({searchProvider, click = noop, change = noop}) => {
+const FullSearch = ({searchProvider, click = noop, change = noop}: FullSearchProps) => {
   const [searchValue, setSearchValue] = useState('');
   const inputRef = useRef<HTMLInputElement>(null);
   const [messages, setMessages] = useState<ContentMessage[]>([]);

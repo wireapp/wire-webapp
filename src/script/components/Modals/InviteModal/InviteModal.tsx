@@ -23,20 +23,20 @@ import {Runtime} from '@wireapp/commons';
 
 import * as Icon from 'Components/Icon';
 import {ModalComponent} from 'Components/Modals/ModalComponent';
-import {User} from 'src/script/entity/User';
+import {User} from 'Repositories/entity/User';
 import {t} from 'Util/LocalizerUtil';
 import {renderElement} from 'Util/renderElement';
 
 import {Config} from '../../../Config';
 
-export interface InviteModalProps {
+interface InviteModalProps {
   readonly selfUser: User;
   onClose?: () => void;
 }
 
 const {BRAND_NAME: brandName} = Config.getConfig();
 
-const InviteModal: React.FC<InviteModalProps> = ({selfUser, onClose}) => {
+const InviteModal = ({selfUser, onClose}: InviteModalProps) => {
   const [isInviteMessageSelected, setIsInviteMessageSelected] = useState<boolean>(false);
   const userName = selfUser.username();
   const inviteMessage = userName

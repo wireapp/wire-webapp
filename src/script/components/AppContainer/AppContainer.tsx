@@ -17,7 +17,7 @@
  *
  */
 
-import {FC, useEffect, useMemo} from 'react';
+import {useEffect, useMemo} from 'react';
 
 import {ClientType} from '@wireapp/api-client/lib/client/';
 import {amplify} from 'amplify';
@@ -29,10 +29,10 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 import {DetachedCallingCell} from 'Components/calling/DetachedCallingCell';
 import {PrimaryModalComponent} from 'Components/Modals/PrimaryModal/PrimaryModal';
 import {QualityFeedbackModal} from 'Components/Modals/QualityFeedbackModal';
+import {PROPERTIES_TYPE} from 'Repositories/properties/PropertiesType';
 import {SIGN_OUT_REASON} from 'src/script/auth/SignOutReason';
 import {useAppSoftLock} from 'src/script/hooks/useAppSoftLock';
 import {useSingleInstance} from 'src/script/hooks/useSingleInstance';
-import {PROPERTIES_TYPE} from 'src/script/properties/PropertiesType';
 import {isDetachedCallingFeatureEnabled} from 'Util/isDetachedCallingFeatureEnabled';
 
 import {useAccentColor} from './hooks/useAccentColor';
@@ -52,7 +52,7 @@ interface AppProps {
   clientType: ClientType;
 }
 
-export const AppContainer: FC<AppProps> = ({config, clientType}) => {
+export const AppContainer = ({config, clientType}: AppProps) => {
   setAppLocale();
   const app = useMemo(() => new App(container.resolve(Core), container.resolve(APIClient), config), []);
   const enableAutoLogin = Config.getConfig().FEATURE.ENABLE_AUTO_LOGIN;
@@ -94,7 +94,7 @@ export const AppContainer: FC<AppProps> = ({config, clientType}) => {
     if (enableAutoLogin) {
       amplify.publish(WebAppEvents.LIFECYCLE.SIGN_OUT, SIGN_OUT_REASON.MULTIPLE_TABS);
     } else {
-      app.redirectToLogin(SIGN_OUT_REASON.MULTIPLE_TABS);
+      app.repository.lifeCycle.redirectToLogin(SIGN_OUT_REASON.MULTIPLE_TABS);
     }
 
     return null;
@@ -117,7 +117,6 @@ export const AppContainer: FC<AppProps> = ({config, clientType}) => {
         <DetachedCallingCell
           propertiesRepository={app.repository.properties}
           callingRepository={app.repository.calling}
-          mediaRepository={app.repository.media}
           toggleScreenshare={mainView.calling.callActions.toggleScreenshare}
         />
       )}

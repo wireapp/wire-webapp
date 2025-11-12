@@ -19,18 +19,19 @@
 
 import {memo} from 'react';
 
-import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
 import cx from 'classnames';
+
+import {TabIndex} from '@wireapp/react-ui-kit';
 
 import {Avatar, AVATAR_SIZE} from 'Components/Avatar';
 import {UserVerificationBadges} from 'Components/Badge';
 import {LegalHoldDot} from 'Components/LegalHoldDot';
+import {User} from 'Repositories/entity/User';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 
 import * as styles from './UserDetails.styles';
 
-import {User} from '../../../entity/User';
 import {AvailabilityContextMenu} from '../../../ui/AvailabilityContextMenu';
 
 interface AvailabilityStateButtonWrapperProps {

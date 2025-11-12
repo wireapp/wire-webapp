@@ -21,8 +21,8 @@ import {useEffect} from 'react';
 
 import {container} from 'tsyringe';
 
-import {TeamState} from 'src/script/team/TeamState';
-import {UserState} from 'src/script/user/UserState';
+import {TeamState} from 'Repositories/team/TeamState';
+import {UserState} from 'Repositories/user/UserState';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 
 import {ConversationFeature} from './ConversationFeature';
@@ -41,8 +41,9 @@ export const ConversationTypeContainer = () => {
     conversationType,
     setConversationType,
     conversationCreationStep,
-    setIsConfirmConversationTypeModalOpen,
     setIsCreateTeamModalOpen,
+    setDiscardTrigger,
+    setIsConfirmDiscardModalOpen,
   } = useCreateConversationModal();
 
   const isInTeam = teamState.isInTeam(self!);
@@ -59,7 +60,8 @@ export const ConversationTypeContainer = () => {
       conversationType === ConversationType.Group &&
       conversationCreationStep === ConversationCreationStep.Preference
     ) {
-      setIsConfirmConversationTypeModalOpen(true);
+      setDiscardTrigger('conversationTypeChange');
+      setIsConfirmDiscardModalOpen(true);
       return;
     }
     if (conversationType === ConversationType.Channel && !isInTeam) {

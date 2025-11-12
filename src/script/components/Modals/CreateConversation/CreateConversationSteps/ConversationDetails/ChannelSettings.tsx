@@ -23,7 +23,7 @@ import {container} from 'tsyringe';
 import {Muted, Option, Select} from '@wireapp/react-ui-kit';
 
 import {RadioGroup} from 'Components/Radio';
-import {TeamState} from 'src/script/team/TeamState';
+import {TeamState} from 'Repositories/team/TeamState';
 import {t} from 'Util/LocalizerUtil';
 import {useChannelsFeatureFlag} from 'Util/useChannelsFeatureFlag';
 
@@ -75,10 +75,9 @@ export const ChannelSettings = () => {
         onChange={setAccess}
         horizontal
         selectedValue={access}
-        options={getConversationAccessOptions()}
+        options={getConversationAccessOptions(isPublicChannelsEnabled)}
         ariaLabelledBy="conversation-access"
         name="conversation-access"
-        disabled={!isPublicChannelsEnabled}
       />
 
       <Muted block muted={access === ConversationAccess.Public} css={channelSettingsTextCss}>

@@ -20,8 +20,8 @@
 import {render, waitFor} from '@testing-library/react';
 import type {RichInfo} from '@wireapp/api-client/lib/user/';
 
-import {User} from 'src/script/entity/User';
-import {RichProfileRepository} from 'src/script/user/RichProfileRepository';
+import {User} from 'Repositories/entity/User';
+import {RichProfileRepository} from 'Repositories/user/RichProfileRepository';
 import {createUuid} from 'Util/uuid';
 
 import {EnrichedFields} from './EnrichedFields';

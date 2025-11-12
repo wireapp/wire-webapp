@@ -19,18 +19,18 @@
 
 import React from 'react';
 
-import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
+import {TabIndex} from '@wireapp/react-ui-kit';
 
 import {CloseIcon} from 'Components/Icon';
 import {handleKeyDown, KEY} from 'Util/KeyboardUtil';
 
-export interface AssetLoaderProps {
+interface AssetLoaderProps {
   large?: boolean;
   loadProgress: number;
   onCancel: () => void;
 }
 
-const AssetLoader: React.FC<AssetLoaderProps> = ({large, loadProgress, onCancel}) => {
+const AssetLoader = ({large, loadProgress, onCancel}: AssetLoaderProps) => {
   const elementScale = large ? 2 : 1;
   const progress = `${loadProgress * elementScale} ${100 * elementScale}`;
   const viewBoxSize = 32 * elementScale;

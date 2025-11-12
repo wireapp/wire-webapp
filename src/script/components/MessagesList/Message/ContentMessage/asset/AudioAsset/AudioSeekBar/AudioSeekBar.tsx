@@ -21,18 +21,18 @@ import React, {useEffect, useRef, useState} from 'react';
 
 import cx from 'classnames';
 
-import {FileAsset} from 'src/script/entity/message/FileAsset';
+import {FileAsset} from 'Repositories/entity/message/FileAsset';
 import {interpolate} from 'Util/ArrayUtil';
 import {clamp} from 'Util/NumberUtil';
 import {createUuid} from 'Util/uuid';
 
-export interface AudioSeekBarProps {
+interface AudioSeekBarProps {
   asset: FileAsset;
   audioElement: HTMLAudioElement;
   disabled: boolean;
 }
 
-const AudioSeekBar: React.FC<AudioSeekBarProps> = ({asset, audioElement, disabled}) => {
+const AudioSeekBar = ({asset, audioElement, disabled}: AudioSeekBarProps) => {
   const [svgWidth, setSvgWidth] = useState(0);
   const [path, setPath] = useState('');
   const [loudness, setLoudness] = useState<number[]>([]);

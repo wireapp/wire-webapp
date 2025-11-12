@@ -17,16 +17,16 @@
  *
  */
 
-import React, {useEffect, useState} from 'react';
+import {useEffect, useState} from 'react';
 
 import cx from 'classnames';
 import {container} from 'tsyringe';
 
 import * as Icon from 'Components/Icon';
-import {AssetTransferState} from 'src/script/assets/AssetTransferState';
-import type {ContentMessage} from 'src/script/entity/message/ContentMessage';
-import type {FileAsset} from 'src/script/entity/message/FileAsset';
-import {TeamState} from 'src/script/team/TeamState';
+import {AssetTransferState} from 'Repositories/assets/AssetTransferState';
+import type {ContentMessage} from 'Repositories/entity/message/ContentMessage';
+import type {FileAsset} from 'Repositories/entity/message/FileAsset';
+import {TeamState} from 'Repositories/team/TeamState';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {getLogger} from 'Util/Logger';
 import {formatSeconds} from 'Util/TimeUtil';
@@ -42,7 +42,7 @@ import {AssetUrl, useAssetTransfer} from '../common/useAssetTransfer/useAssetTra
 
 const logger = getLogger('AudioAssetComponent');
 
-export interface AudioAssetProps {
+interface AudioAssetProps {
   className?: string;
   /* Does the asset have a visible header? */
   hasHeader?: boolean;
@@ -51,13 +51,13 @@ export interface AudioAssetProps {
   isFocusable?: boolean;
 }
 
-export const AudioAsset: React.FC<AudioAssetProps> = ({
+export const AudioAsset = ({
   message,
   className,
   hasHeader = false,
   teamState = container.resolve(TeamState),
   isFocusable = true,
-}) => {
+}: AudioAssetProps) => {
   const asset = message.getFirstAsset() as FileAsset;
   const [audioElement, setAudioElement] = useEffectRef<HTMLMediaElement>();
   const {isFileSharingReceivingEnabled} = useKoSubscribableChildren(teamState, ['isFileSharingReceivingEnabled']);

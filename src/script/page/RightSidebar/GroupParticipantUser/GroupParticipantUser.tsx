@@ -20,9 +20,9 @@
 import {FC, useEffect} from 'react';
 
 import {DefaultConversationRoleName as DefaultRole} from '@wireapp/api-client/lib/conversation/';
-import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
 import {amplify} from 'amplify';
 
+import {TabIndex} from '@wireapp/react-ui-kit';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {FadingScrollbar} from 'Components/FadingScrollbar';
@@ -31,17 +31,17 @@ import {EnrichedFields} from 'Components/panel/EnrichedFields';
 import {UserActions, Actions} from 'Components/panel/UserActions';
 import {UserDetails} from 'Components/panel/UserDetails';
 import {BaseToggle} from 'Components/toggle/BaseToggle';
+import {ConversationRoleRepository} from 'Repositories/conversation/ConversationRoleRepository';
+import {MemberLeaveEvent, TeamMemberLeaveEvent} from 'Repositories/conversation/EventBuilder';
+import {Conversation} from 'Repositories/entity/Conversation';
+import {User} from 'Repositories/entity/User';
+import {ClientEvent} from 'Repositories/event/Client';
+import {TeamRepository} from 'Repositories/team/TeamRepository';
+import {TeamState} from 'Repositories/team/TeamState';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {handleKeyDown, KEY} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
 
-import {ConversationRoleRepository} from '../../../conversation/ConversationRoleRepository';
-import {MemberLeaveEvent, TeamMemberLeaveEvent} from '../../../conversation/EventBuilder';
-import {Conversation} from '../../../entity/Conversation';
-import {User} from '../../../entity/User';
-import {ClientEvent} from '../../../event/Client';
-import {TeamRepository} from '../../../team/TeamRepository';
-import {TeamState} from '../../../team/TeamState';
 import {ActionsViewModel} from '../../../view_model/ActionsViewModel';
 import {PanelHeader} from '../PanelHeader';
 import {PanelEntity} from '../RightSidebar';

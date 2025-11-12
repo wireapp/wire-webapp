@@ -20,7 +20,8 @@
 import React from 'react';
 
 import {render} from '@testing-library/react';
-import {CONVERSATION_TYPE, ConversationProtocol, QualifiedUserClients} from '@wireapp/api-client/lib/conversation';
+import {CONVERSATION_TYPE, QualifiedUserClients} from '@wireapp/api-client/lib/conversation';
+import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {RecursivePartial} from '@wireapp/commons/lib/util/TypeUtil';
 import ko from 'knockout';
@@ -56,10 +57,10 @@ import sk from 'I18n/sk-SK.json';
 import sl from 'I18n/sl-SI.json';
 import tr from 'I18n/tr-TR.json';
 import uk from 'I18n/uk-UA.json';
-import {Participant} from 'src/script/calling/Participant';
-import {Conversation} from 'src/script/entity/Conversation';
-import {User} from 'src/script/entity/User';
-import {MediaDevicesHandler} from 'src/script/media/MediaDevicesHandler';
+import {Participant} from 'Repositories/calling/Participant';
+import {Conversation} from 'Repositories/entity/Conversation';
+import {User} from 'Repositories/entity/User';
+import {MediaDevicesHandler} from 'Repositories/media/MediaDevicesHandler';
 import {setStrings} from 'Util/LocalizerUtil';
 import {createUuid} from 'Util/uuid';
 
@@ -155,14 +156,14 @@ export function generateQualifiedIds(nbUsers: number, domain: string) {
 
 export const createConversation = (
   type: CONVERSATION_TYPE = CONVERSATION_TYPE.ONE_TO_ONE,
-  protocol: ConversationProtocol = ConversationProtocol.PROTEUS,
+  protocol: CONVERSATION_PROTOCOL = CONVERSATION_PROTOCOL.PROTEUS,
   conversationId: QualifiedId = {id: createUuid(), domain: ''},
   groupId = 'group-id',
 ) => {
   const conversation = new Conversation(conversationId.id, conversationId.domain, protocol);
   conversation.participating_user_ets.push(new User(createUuid()));
   conversation.type(type);
-  if (protocol === ConversationProtocol.MLS) {
+  if (protocol === CONVERSATION_PROTOCOL.MLS) {
     conversation.groupId = groupId;
   }
   return conversation;
@@ -174,7 +175,7 @@ export const createSelfParticipant = () => {
   return new Participant(selfUser, 'client1');
 };
 
-export const mediaDevices = {
+const mediaDevices = {
   audioinput: ko.pureComputed(() => 'test'),
   audiooutput: ko.pureComputed(() => 'test'),
   screeninput: ko.pureComputed(() => 'test'),

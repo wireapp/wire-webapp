@@ -22,28 +22,45 @@ import {container} from 'tsyringe';
 import {ICellAsset} from '@wireapp/protocol-messaging';
 
 import {useInView} from 'Hooks/useInView/useInView';
-import {CellsRepository} from 'src/script/cells/CellsRepository';
+import {CellsRepository} from 'Repositories/cells/CellsRepository';
 import {formatBytes, getFileExtension, trimFileExtension} from 'Util/util';
 
 import {FileAssetCard} from './FileAssetCard/FileAssetCard';
 import {ImageAssetCard} from './ImageAssetCard/ImageAssetCard';
-import {largeCardStyles, listSingleItemStyles, listStyles, smallCardStyles} from './MultipartAssets.styles';
-import {useGetMultipartAssetPreview} from './useGetMultipartAssetPreview/useGetMultipartAssetPreview';
+import {
+  fileCardStyles,
+  imageCardStyles,
+  listSingleItemStyles,
+  listStyles,
+  videoCardStyles,
+} from './MultipartAssets.styles';
+import {useGetMultipartAsset} from './useGetMultipartAsset/useGetMultipartAsset';
 import {VideoAssetCard} from './VideoAssetCard/VideoAssetCard';
 
 interface MultipartAssetsProps {
   assets: ICellAsset[];
   cellsRepository?: CellsRepository;
+  senderName: string;
+  timestamp: number;
 }
 
 export const MultipartAssets = ({
   assets,
   cellsRepository = container.resolve(CellsRepository),
+  senderName,
+  timestamp,
 }: MultipartAssetsProps) => {
   return (
     <ul css={assets.length === 1 ? listSingleItemStyles : listStyles}>
       {assets.map(asset => (
-        <MultipartAsset key={asset.uuid} cellsRepository={cellsRepository} assetsCount={assets.length} {...asset} />
+        <MultipartAsset
+          key={asset.uuid}
+          cellsRepository={cellsRepository}
+          assetsCount={assets.length}
+          senderName={senderName}
+          timestamp={timestamp}
+          {...asset}
+        />
       ))}
     </ul>
   );
@@ -52,6 +69,8 @@ export const MultipartAssets = ({
 interface MultipartAssetProps extends ICellAsset {
   cellsRepository: CellsRepository;
   assetsCount: number;
+  senderName: string;
+  timestamp: number;
 }
 
 const MultipartAsset = ({
@@ -62,8 +81,9 @@ const MultipartAsset = ({
   cellsRepository,
   assetsCount,
   image: imageMetadata,
+  senderName,
+  timestamp,
 }: MultipartAssetProps) => {
-  const name = trimFileExtension(initialName!);
   const extension = getFileExtension(initialName!);
   const size = formatBytes(Number(initialSize));
 
@@ -72,27 +92,31 @@ const MultipartAsset = ({
   const isImage = contentType.startsWith('image');
   const isVideo = contentType.startsWith('video');
 
-  const {src, status} = useGetMultipartAssetPreview({
+  const isSingleAsset = assetsCount === 1;
+  const variant = isSingleAsset ? 'large' : 'small';
+
+  const {src, isLoading, isError, imagePreviewUrl, pdfPreviewUrl, path} = useGetMultipartAsset({
     uuid,
     cellsRepository,
     isEnabled: hasBeenInView,
-    retryUntilSuccess: isImage || isVideo,
+    retryPreviewUntilSuccess: isSingleAsset && !isImage && !isVideo,
   });
 
-  const isLoading = status === 'loading';
-  const isError = status === 'error';
-
-  const isSingleAsset = assetsCount === 1;
+  const name = path ? getName(path) : getName(initialName!);
 
   if (isImage) {
     return (
-      <li ref={elementRef} css={smallCardStyles}>
+      <li ref={elementRef} css={imageCardStyles}>
         <ImageAssetCard
           src={src}
-          size={isSingleAsset ? 'large' : 'small'}
+          name={name}
+          extension={extension}
+          variant={variant}
           metadata={imageMetadata}
           isLoading={isLoading}
           isError={isError}
+          senderName={senderName}
+          timestamp={timestamp}
         />
       </li>
     );
@@ -100,15 +124,43 @@ const MultipartAsset = ({
 
   if (isVideo) {
     return (
-      <li ref={elementRef} css={smallCardStyles}>
-        <VideoAssetCard src={src} isLoading={isLoading} isError={isError} />
+      <li ref={elementRef} css={videoCardStyles(isSingleAsset)}>
+        <VideoAssetCard
+          variant={variant}
+          src={src}
+          extension={extension}
+          name={name}
+          size={size}
+          isLoading={isLoading}
+          isError={isError}
+          senderName={senderName}
+          timestamp={timestamp}
+        />
       </li>
     );
   }
 
   return (
-    <li ref={elementRef} css={largeCardStyles}>
-      <FileAssetCard extension={extension} name={name} size={size} isLoading={isLoading} isError={isError} />
+    <li ref={elementRef} css={fileCardStyles}>
+      <FileAssetCard
+        src={src}
+        variant={variant}
+        extension={extension}
+        name={name}
+        size={size}
+        imagePreviewUrl={imagePreviewUrl}
+        pdfPreviewUrl={pdfPreviewUrl}
+        isLoading={isLoading}
+        isError={isError}
+        senderName={senderName}
+        timestamp={timestamp}
+      />
     </li>
   );
+};
+
+const getName = (name: string): string => {
+  const parts = name.split('/');
+  const lastPart = parts[parts.length - 1];
+  return trimFileExtension(lastPart);
 };

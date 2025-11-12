@@ -17,17 +17,11 @@
  *
  */
 
-import {useCallback, useMemo} from 'react';
+import {flexRender, getCoreRowModel, useReactTable} from '@tanstack/react-table';
 
-import {createColumnHelper, flexRender, getCoreRowModel, useReactTable} from '@tanstack/react-table';
+import {CellsRepository} from 'Repositories/cells/CellsRepository';
 
-import {PrimaryModal} from 'Components/Modals/PrimaryModal';
-import {CellsRepository} from 'src/script/cells/CellsRepository';
-import {t} from 'Util/LocalizerUtil';
-import {forcedDownloadFile} from 'Util/util';
-
-import {showCellsImagePreviewModal} from './CellsImagePreviewModal/CellsImagePreviewModal';
-import {showShareFileModal} from './CellsShareFileModal/CellsShareFileModal';
+import {CellsFilePreviewModal} from './CellsFilePreviewModal/CellsFilePreviewModal';
 import {
   headerCellStyles,
   tableActionsCellStyles,
@@ -36,134 +30,70 @@ import {
   tableStyles,
   wrapperStyles,
 } from './CellsTable.styles';
-import {CellsTableDateColumn} from './CellsTableDateColumn/CellsTableDateColumn';
-import {CellsTableNameColumn} from './CellsTableNameColumn/CellsTableNameColumn';
-import {CellsTableRowOptions} from './CellsTableRowOptions/CellsTableRowOptions';
-import {CellsTableSharedColumn} from './CellsTableSharedColumn/CellsTableSharedColumn';
+import {getCellsTableColumns} from './CellsTableColumns/CellsTableColumns';
+import {FilePreviewProvider} from './common/CellsFilePreviewModalContext/CellsFilePreviewModalContext';
 
-import {CellFile} from '../common/cellFile/cellFile';
+import {CellNode} from '../common/cellNode/cellNode';
 
 interface CellsTableProps {
-  files: CellFile[];
+  nodes: CellNode[];
   cellsRepository: CellsRepository;
-  onDeleteFile: (uuid: string) => void;
 }
 
-const columnHelper = createColumnHelper<CellFile>();
-
-export const CellsTable = ({files, cellsRepository, onDeleteFile}: CellsTableProps) => {
-  const showDeleteFileModal = useCallback(
-    ({uuid, name}: {uuid: string; name: string}) => {
-      PrimaryModal.show(PrimaryModal.type.CONFIRM, {
-        primaryAction: {action: () => onDeleteFile(uuid), text: t('cellsGlobalView.optionDelete')},
-        text: {
-          message: t('cellsGlobalView.deleteModalDescription', {name}),
-          title: t('cellsGlobalView.deleteModalHeading'),
-        },
-      });
-    },
-    [onDeleteFile],
-  );
-
-  const columns = useMemo(
-    () => [
-      columnHelper.accessor('name', {
-        header: t('cellsGlobalView.tableRowName'),
-        cell: info => (
-          <CellsTableNameColumn
-            name={info.getValue()}
-            previewUrl={info.row.original.previewImageUrl}
-            mimeType={info.row.original.mimeType}
-          />
-        ),
-      }),
-      columnHelper.accessor('conversationName', {
-        header: t('cellsGlobalView.tableRowConversationName'),
-        cell: info => info.getValue(),
-      }),
-      columnHelper.accessor('owner', {
-        header: t('cellsGlobalView.tableRowOwner'),
-        cell: info => info.getValue(),
-      }),
-      columnHelper.accessor('sizeMb', {
-        header: t('cellsGlobalView.tableRowSize'),
-        cell: info => info.getValue(),
-      }),
-      columnHelper.accessor('uploadedAtTimestamp', {
-        header: t('cellsGlobalView.tableRowCreated'),
-        cell: info => <CellsTableDateColumn timestamp={info.getValue()} />,
-      }),
-      columnHelper.accessor('publicLink', {
-        header: t('cellsGlobalView.tableRowPublicLink'),
-        cell: info => <CellsTableSharedColumn isShared={!!info.getValue()?.alreadyShared} />,
-      }),
-      columnHelper.accessor('id', {
-        header: () => <span className="visually-hidden">{t('cellsGlobalView.tableRowActions')}</span>,
-        cell: info => {
-          const {previewImageUrl, fileUrl} = info.row.original;
-          const uuid = info.getValue();
-          return (
-            <CellsTableRowOptions
-              onOpen={
-                previewImageUrl
-                  ? () => {
-                      showCellsImagePreviewModal({imageSrc: previewImageUrl});
-                    }
-                  : undefined
-              }
-              onShare={() => showShareFileModal({uuid, cellsRepository})}
-              onDownload={fileUrl ? () => forcedDownloadFile({url: fileUrl, name: info.row.original.name}) : undefined}
-              onDelete={() => showDeleteFileModal({uuid, name: info.row.original.name})}
-            />
-          );
-        },
-      }),
-    ],
-    // cellsRepository is not a dependency because it's a singleton
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [showDeleteFileModal],
-  );
-
+export const CellsTable = ({nodes, cellsRepository}: CellsTableProps) => {
   const table = useReactTable({
-    data: files,
-    columns,
+    data: nodes,
+    columns: getCellsTableColumns({cellsRepository}),
     getCoreRowModel: getCoreRowModel(),
   });
 
   const rows = table.getRowModel().rows;
 
   return (
-    <div css={wrapperStyles}>
-      <table css={tableStyles}>
-        <thead>
-          {table.getHeaderGroups().map(headerGroup => (
-            <tr key={headerGroup.id}>
-              {headerGroup.headers.map(header => (
-                <th key={header.id} css={headerCellStyles}>
-                  {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
-                </th>
-              ))}
-            </tr>
-          ))}
-        </thead>
-        {rows.length > 0 && (
-          <tbody>
-            {rows.map(row => (
-              <tr key={row.id} css={tableCellRow}>
-                {row.getVisibleCells().map(cell => (
-                  <td
-                    key={cell.id}
-                    css={cell.column.id === 'id' ? tableActionsCellStyles : tableCellStyles}
-                    data-cell={cell.column.id === 'id' ? undefined : cell.column.columnDef.header}
+    <FilePreviewProvider>
+      <div css={wrapperStyles}>
+        <table css={tableStyles}>
+          <thead>
+            {table.getHeaderGroups().map(headerGroup => (
+              <tr key={headerGroup.id}>
+                {headerGroup.headers.map(header => (
+                  <th
+                    key={header.id}
+                    css={headerCellStyles}
+                    colSpan={header.colSpan}
+                    style={{
+                      width: header.id == 'name' ? undefined : header.getSize(),
+                    }}
                   >
-                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                  </td>
+                    {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
+                  </th>
                 ))}
               </tr>
             ))}
-          </tbody>
-        )}
-      </table>
-    </div>
+          </thead>
+          {rows.length > 0 && (
+            <tbody>
+              {rows.map(row => (
+                <tr key={row.id} css={tableCellRow}>
+                  {row.getVisibleCells().map(cell => (
+                    <td
+                      key={cell.id}
+                      css={cell.column.id === 'id' ? tableActionsCellStyles : tableCellStyles}
+                      data-cell={cell.column.id === 'id' ? undefined : cell.column.columnDef.header}
+                      style={{
+                        width: cell.column.id == 'name' ? undefined : cell.column.getSize(),
+                      }}
+                    >
+                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                    </td>
+                  ))}
+                </tr>
+              ))}
+            </tbody>
+          )}
+        </table>
+      </div>
+      <CellsFilePreviewModal />
+    </FilePreviewProvider>
   );
 };

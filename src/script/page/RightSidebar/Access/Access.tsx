@@ -20,15 +20,16 @@
 import {useState} from 'react';
 
 import {ADD_PERMISSION, CONVERSATION_ACCESS} from '@wireapp/api-client/lib/conversation/';
-import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
+
+import {TabIndex} from '@wireapp/react-ui-kit';
 
 import {FadingScrollbar} from 'Components/FadingScrollbar';
 import {ConversationAccess} from 'Components/Modals/CreateConversation/types';
 import {getConversationAccessOptions, getConversationManagerOptions} from 'Components/Modals/CreateConversation/utils';
 import {RadioGroup} from 'Components/Radio';
-import {ConversationRepository} from 'src/script/conversation/ConversationRepository';
-import {ConversationRoleRepository} from 'src/script/conversation/ConversationRoleRepository';
-import {Conversation} from 'src/script/entity/Conversation';
+import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
+import {ConversationRoleRepository} from 'Repositories/conversation/ConversationRoleRepository';
+import {Conversation} from 'Repositories/entity/Conversation';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 import {useChannelsFeatureFlag} from 'Util/useChannelsFeatureFlag';
@@ -89,10 +90,9 @@ export const Access = ({
         <RadioGroup<ConversationAccess>
           onChange={setAccess}
           selectedValue={access}
-          options={getConversationAccessOptions()}
+          options={getConversationAccessOptions(isPublicChannelsEnabled)}
           ariaLabelledBy="conversation-access"
           name="conversation-access"
-          disabled={!isPublicChannelsEnabled}
         />
 
         <p className="panel__info-text" tabIndex={TabIndex.FOCUSABLE} css={conversationAccessContentCss}>

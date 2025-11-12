@@ -25,13 +25,13 @@ import {
   isTweetUrl,
   legacyAsset,
   assetRetentionPolicy,
-  assetV3,
+  isValidAsset,
   ValidationUtilError,
 } from 'Util/ValidationUtil';
 
 describe('ValidationUtil', () => {
   describe('"asset.legacy"', () => {
-    it('detects a valid asset below v3', () => {
+    it('detects a valid legacy asset', () => {
       const assetId = createUuid();
       const conversationId = createUuid();
 
@@ -40,7 +40,7 @@ describe('ValidationUtil', () => {
       expect(actual).toBe(true);
     });
 
-    it('detects an invalid asset below v3', async () => {
+    it('detects an invalid legacy asset', async () => {
       const assetId = createUuid();
       const conversationId = 'e13f9940-819c-477b-9391-b04234ae84af"*';
       expect(() => {
@@ -49,38 +49,38 @@ describe('ValidationUtil', () => {
     });
   });
 
-  describe('"asset.v3"', () => {
-    it('detects a valid v3 asset (assetKey only)', () => {
+  describe('"asset.isValid"', () => {
+    it('detects a valid asset (assetKey only)', () => {
       const assetKey = `3-1-${createUuid()}`;
 
-      const actual = assetV3(assetKey);
+      const actual = isValidAsset(assetKey);
 
       expect(actual).toBe(true);
     });
 
-    it('detects a valid v3 asset (assetKey & assetToken)', () => {
+    it('detects a valid asset (assetKey & assetToken)', () => {
       const assetKey = `3-1-${createUuid()}`;
       const assetToken = 'aV0TGxF3ugpawm3wAYPmew==';
 
-      const actual = assetV3(assetKey, assetToken);
+      const actual = isValidAsset(assetKey, assetToken);
 
       expect(actual).toBe(true);
     });
 
-    it('detects an invalid v3 asset (assetKey)', async () => {
+    it('detects an invalid asset (assetKey)', async () => {
       const assetKey = `3-6-${createUuid()}`;
 
       expect(() => {
-        assetV3(assetKey);
+        isValidAsset(assetKey);
       }).toThrow(ValidationUtilError);
     });
 
-    it('detects an invalid v3 asset (assetToken)', async () => {
+    it('detects an invalid asset (assetToken)', async () => {
       const assetKey = `3-1-${createUuid()}`;
       const assetToken = 'a3wAY4%$@#$@%)!@-pOe==';
 
       expect(() => {
-        assetV3(assetKey, assetToken);
+        isValidAsset(assetKey, assetToken);
       }).toThrow(ValidationUtilError);
     });
   });

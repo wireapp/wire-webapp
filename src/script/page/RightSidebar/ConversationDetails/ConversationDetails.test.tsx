@@ -20,25 +20,26 @@
 import {act, render} from '@testing-library/react';
 import {CONVERSATION_TYPE} from '@wireapp/api-client/lib/conversation';
 
-import {Conversation} from 'src/script/entity/Conversation';
+import {CellsRepository} from 'Repositories/cells/CellsRepository';
+import {ConnectionRepository} from 'Repositories/connection/ConnectionRepository';
+import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
+import {ConversationRoleRepository} from 'Repositories/conversation/ConversationRoleRepository';
+import {MessageRepository} from 'Repositories/conversation/MessageRepository';
+import {Conversation} from 'Repositories/entity/Conversation';
+import {User} from 'Repositories/entity/User';
+import {IntegrationRepository} from 'Repositories/integration/IntegrationRepository';
+import {SearchRepository} from 'Repositories/search/SearchRepository';
+import {SelfRepository} from 'Repositories/self/SelfRepository';
+import {TeamEntity} from 'Repositories/team/TeamEntity';
+import {TeamRepository} from 'Repositories/team/TeamRepository';
+import {TeamState} from 'Repositories/team/TeamState';
+import {UserState} from 'Repositories/user/UserState';
 import 'src/script/util/test/mock/LocalStorageMock';
 import {createUuid} from 'Util/uuid';
 
 import {ConversationDetails} from './ConversationDetails';
 
 import {TestFactory} from '../../../../../test/helper/TestFactory';
-import {ConnectionRepository} from '../../../connection/ConnectionRepository';
-import {ConversationRepository} from '../../../conversation/ConversationRepository';
-import {ConversationRoleRepository} from '../../../conversation/ConversationRoleRepository';
-import {MessageRepository} from '../../../conversation/MessageRepository';
-import {User} from '../../../entity/User';
-import {IntegrationRepository} from '../../../integration/IntegrationRepository';
-import {SearchRepository} from '../../../search/SearchRepository';
-import {SelfRepository} from '../../../self/SelfRepository';
-import {TeamEntity} from '../../../team/TeamEntity';
-import {TeamRepository} from '../../../team/TeamRepository';
-import {TeamState} from '../../../team/TeamState';
-import {UserState} from '../../../user/UserState';
 import {ActionsViewModel} from '../../../view_model/ActionsViewModel';
 import {MainViewModel} from '../../../view_model/MainViewModel';
 
@@ -85,6 +86,7 @@ const getDefaultParams = () => {
   return {
     actionsViewModel: new ActionsViewModel(
       {} as SelfRepository,
+      {} as CellsRepository,
       {} as ConnectionRepository,
       conversationRepository,
       {} as IntegrationRepository,

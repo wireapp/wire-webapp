@@ -24,18 +24,17 @@ import {container} from 'tsyringe';
 
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {PrimaryModalType} from 'Components/Modals/PrimaryModal/PrimaryModalTypes';
+import {ConversationState} from 'Repositories/conversation/ConversationState';
+import {Conversation} from 'Repositories/entity/Conversation';
+import {User} from 'Repositories/entity/User';
+import {UserState} from 'Repositories/user/UserState';
 import {Core} from 'src/script/service/CoreSingleton';
-import {UserState} from 'src/script/user/UserState';
 import * as util from 'Util/util';
 
 import {E2EIHandler} from './E2EIdentityEnrollment';
 import * as e2EIdentityVerification from './E2EIdentityVerification';
 import {getEnrollmentStore} from './Enrollment.store';
 import {OIDCServiceStore} from './OIDCService/OIDCServiceStorage';
-
-import {ConversationState} from '../conversation/ConversationState';
-import {Conversation} from '../entity/Conversation';
-import {User} from '../entity/User';
 
 jest.mock('./OIDCService', () => {
   return {
@@ -64,8 +63,9 @@ const generateWireIdentity = (
   selfClientId: string,
   credentialType: CredentialType = CredentialType.X509,
   status: e2EIdentityVerification.MLSStatuses = e2EIdentityVerification.MLSStatuses.NOT_ACTIVATED,
-) => ({
+): e2EIdentityVerification.WireIdentity => ({
   x509Identity: {
+    free: jest.fn(),
     certificate: '',
     displayName: 'John Doe',
     domain: 'domain',
@@ -73,6 +73,7 @@ const generateWireIdentity = (
     notAfter: BigInt(0),
     notBefore: BigInt(0),
     serialNumber: '',
+    [Symbol.dispose]: () => {},
   },
   thumbprint: '',
   credentialType,

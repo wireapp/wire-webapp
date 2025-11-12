@@ -17,12 +17,13 @@
  *
  */
 
-import {ConversationProtocol} from '@wireapp/api-client/lib/conversation';
+import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 
 import {Account} from '@wireapp/core';
 
-import {MLSConversation, isMLSConversation} from 'src/script/conversation/ConversationSelectors';
-import {Conversation} from 'src/script/entity/Conversation';
+import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
+import {MLSConversation, isMLSConversation} from 'Repositories/conversation/ConversationSelectors';
+import {Conversation} from 'Repositories/entity/Conversation';
 import {initMLSGroupConversations} from 'src/script/mls/MLSConversations';
 
 /**
@@ -35,9 +36,11 @@ import {initMLSGroupConversations} from 'src/script/mls/MLSConversations';
 export const joinConversationsAfterMigrationFinalisation = async ({
   conversations,
   core,
+  conversationRepository,
   onSuccess,
   onError,
 }: {
+  conversationRepository: ConversationRepository;
   conversations: Conversation[];
   core: Account;
   onSuccess: (conversation: Conversation) => void;
@@ -49,7 +52,11 @@ export const joinConversationsAfterMigrationFinalisation = async ({
   //we have to join the conversation with external commit and let user know that they might have missed some messages
   const alreadyMigratedConversations = filterGroupConversationsAlreadyMigratedToMLS(conversations);
 
-  await initMLSGroupConversations(alreadyMigratedConversations, {core, onSuccessfulJoin: onSuccess, onError});
+  await initMLSGroupConversations(alreadyMigratedConversations, conversationRepository, {
+    core,
+    onSuccessfulJoin: onSuccess,
+    onError,
+  });
 };
 
 const filterGroupConversationsAlreadyMigratedToMLS = (conversations: Conversation[]) => {
@@ -58,6 +65,6 @@ const filterGroupConversationsAlreadyMigratedToMLS = (conversations: Conversatio
       return false;
     }
 
-    return isMLSConversation(conversation) && conversation.initialProtocol !== ConversationProtocol.MLS;
+    return isMLSConversation(conversation) && conversation.initialProtocol !== CONVERSATION_PROTOCOL.MLS;
   });
 };

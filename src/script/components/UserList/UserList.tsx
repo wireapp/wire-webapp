@@ -25,17 +25,16 @@ import {container} from 'tsyringe';
 import * as Icon from 'Components/Icon';
 import {InViewport} from 'Components/InViewport';
 import {collapseButton, collapseIcon} from 'Components/UserList/UserList.styles';
+import type {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
+import {ConversationState} from 'Repositories/conversation/ConversationState';
+import type {Conversation} from 'Repositories/entity/Conversation';
+import type {User} from 'Repositories/entity/User';
+import {TeamState} from 'Repositories/team/TeamState';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {isEnterKey, isSpaceKey} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
 
 import {UserListItem} from './components/UserListItem';
-
-import type {ConversationRepository} from '../../conversation/ConversationRepository';
-import {ConversationState} from '../../conversation/ConversationState';
-import type {Conversation} from '../../entity/Conversation';
-import type {User} from '../../entity/User';
-import {TeamState} from '../../team/TeamState';
 
 export enum UserlistMode {
   COMPACT = 'UserlistMode.COMPACT',
@@ -43,14 +42,14 @@ export enum UserlistMode {
   OTHERS = 'UserlistMode.OTHERS',
 }
 
-export enum UserListSections {
+enum UserListSections {
   CONTACTS = 'UserListSections.CONTACTS',
   SELECTED_CONTACTS = 'UserListSections.SELECTED_CONTACTS',
 }
 
 const USER_CHUNK_SIZE = 64;
 
-export interface UserListProps {
+interface UserListProps {
   conversation?: Conversation;
   conversationRepository?: ConversationRepository;
   conversationState?: ConversationState;

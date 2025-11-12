@@ -25,6 +25,16 @@ import {Runtime} from '@wireapp/commons';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {PrimaryModal, usePrimaryModalState} from 'Components/Modals/PrimaryModal';
+import type {CallingRepository} from 'Repositories/calling/CallingRepository';
+import type {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
+import {ConversationState} from 'Repositories/conversation/ConversationState';
+import type {Conversation} from 'Repositories/entity/Conversation';
+import type {User} from 'Repositories/entity/User';
+import {PropertiesRepository} from 'Repositories/properties/PropertiesRepository';
+import {SearchRepository} from 'Repositories/search/SearchRepository';
+import type {TeamRepository} from 'Repositories/team/TeamRepository';
+import {TeamState} from 'Repositories/team/TeamState';
+import {UserState} from 'Repositories/user/UserState';
 import {iterateItem} from 'Util/ArrayUtil';
 import {isEscapeKey} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
@@ -34,25 +44,15 @@ import {CallingViewModel} from './CallingViewModel';
 import {ContentViewModel} from './ContentViewModel';
 import type {MainViewModel, ViewModelRepositories} from './MainViewModel';
 
-import type {CallingRepository} from '../calling/CallingRepository';
 import {Config} from '../Config';
-import type {ConversationRepository} from '../conversation/ConversationRepository';
-import {ConversationState} from '../conversation/ConversationState';
-import type {Conversation} from '../entity/Conversation';
-import type {User} from '../entity/User';
 import {SidebarTabs, useSidebarStore} from '../page/LeftSidebar/panels/Conversations/useSidebarStore';
 import {PanelState} from '../page/RightSidebar';
 import {useAppMainState} from '../page/state';
 import {ContentState, ListState, useAppState} from '../page/useAppState';
-import {PropertiesRepository} from '../properties/PropertiesRepository';
-import {SearchRepository} from '../search/SearchRepository';
-import type {TeamRepository} from '../team/TeamRepository';
-import {TeamState} from '../team/TeamState';
 import {showContextMenu} from '../ui/ContextMenu';
 import {showLabelContextMenu} from '../ui/LabelContextMenu';
 import {Shortcut} from '../ui/Shortcut';
 import {ShortcutType} from '../ui/ShortcutType';
-import {UserState} from '../user/UserState';
 
 export class ListViewModel {
   private readonly userState: UserState;
@@ -242,36 +242,39 @@ export class ListViewModel {
     }
   };
 
+  private switchListAndSetTab = (listState: ListState, tab: SidebarTabs) => {
+    useSidebarStore.getState().setCurrentTab(tab);
+    this.switchList(listState);
+  };
+
   openPreferencesAccount = async (): Promise<void> => {
     await this.teamRepository.getTeam();
 
-    const {setCurrentTab} = useSidebarStore.getState();
-    setCurrentTab(SidebarTabs.PREFERENCES);
+    this.switchListAndSetTab(ListState.PREFERENCES, SidebarTabs.PREFERENCES);
 
-    this.switchList(ListState.PREFERENCES);
     this.contentViewModel.switchContent(ContentState.PREFERENCES_ACCOUNT);
   };
 
   readonly openPreferencesDevices = (): void => {
-    this.switchList(ListState.PREFERENCES);
+    this.switchListAndSetTab(ListState.PREFERENCES, SidebarTabs.PREFERENCES);
 
     return this.contentViewModel.switchContent(ContentState.PREFERENCES_DEVICES);
   };
 
   readonly openPreferencesAbout = (): void => {
-    this.switchList(ListState.PREFERENCES);
+    this.switchListAndSetTab(ListState.PREFERENCES, SidebarTabs.PREFERENCES);
 
     return this.contentViewModel.switchContent(ContentState.PREFERENCES_ABOUT);
   };
 
   readonly openPreferencesAudioVideo = (): void => {
-    this.switchList(ListState.PREFERENCES);
+    this.switchListAndSetTab(ListState.PREFERENCES, SidebarTabs.PREFERENCES);
 
     return this.contentViewModel.switchContent(ContentState.PREFERENCES_AV);
   };
 
   readonly openPreferencesOptions = (): void => {
-    this.switchList(ListState.PREFERENCES);
+    this.switchListAndSetTab(ListState.PREFERENCES, SidebarTabs.PREFERENCES);
 
     return this.contentViewModel.switchContent(ContentState.PREFERENCES_OPTIONS);
   };
@@ -448,6 +451,7 @@ export class ListViewModel {
       entries.push({
         click: () => this.clickToLeave(conversationEntity),
         label: conversationEntity.isChannel() ? t('channelsPopoverLeave') : t('groupsPopoverLeave'),
+        identifier: 'conversation-leave',
       });
     }
 

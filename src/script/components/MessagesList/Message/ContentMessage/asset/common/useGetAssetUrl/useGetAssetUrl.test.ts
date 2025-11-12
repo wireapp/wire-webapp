@@ -19,17 +19,23 @@
 
 import {act, renderHook} from '@testing-library/react';
 
-import {AssetError} from 'src/script/assets/AssetError';
-import {AssetRemoteData} from 'src/script/assets/AssetRemoteData';
-import {AssetTransferState} from 'src/script/assets/AssetTransferState';
-import type {FileAsset} from 'src/script/entity/message/FileAsset';
+import {AssetError} from 'Repositories/assets/AssetError';
+import {AssetRemoteData} from 'Repositories/assets/AssetRemoteData';
+import {AssetTransferState} from 'Repositories/assets/AssetTransferState';
+import type {FileAsset} from 'Repositories/entity/message/FileAsset';
 
 import {useGetAssetUrl} from './useGetAssetUrl';
+
+jest.mock('Util/Logger', () => ({
+  getLogger: jest.fn(() => ({
+    error: jest.fn(),
+  })),
+}));
 
 type Result = {current: {url: string | undefined; isLoading: boolean; isError: boolean}} | undefined;
 
 describe('useGetAssetUrl', () => {
-  const mockAssetUrl = {url: 'mock-asset-url'};
+  const mockAssetUrl = {url: 'mock-asset-url', dispose: jest.fn()};
   const mockGetAssetUrl = jest.fn().mockResolvedValue(mockAssetUrl);
   const mockOnSuccess = jest.fn();
   const mockOnError = jest.fn();
@@ -38,12 +44,11 @@ describe('useGetAssetUrl', () => {
     id: 'mock-asset-id',
     status: jest.fn(),
     original_resource: jest.fn().mockReturnValue(
-      new AssetRemoteData('mock-asset-id', {
-        assetDomain: 'mock-asset-domain',
+      new AssetRemoteData({
         assetKey: 'mock-asset-key',
+        assetDomain: 'mock-asset-domain',
         assetToken: 'mock-asset-token',
         forceCaching: true,
-        version: 4,
       }),
     ),
   } as unknown as FileAsset;
@@ -269,5 +274,57 @@ describe('useGetAssetUrl', () => {
     });
 
     expect(mockOnError).not.toHaveBeenCalled();
+  });
+
+  it('sets isLoading to true during fetch and false after completion', async () => {
+    let loadingStateBeforeCompletion = false;
+    const mockGetAssetUrlSlow = jest.fn(async () => {
+      // Delay to allow checking the loading state
+      await new Promise(resolve => setTimeout(resolve, 10));
+      return mockAssetUrl;
+    });
+
+    const {result} = renderHook(() =>
+      useGetAssetUrl({
+        asset: mockAsset,
+        isEnabled: true,
+        getAssetUrl: mockGetAssetUrlSlow,
+      }),
+    );
+
+    // Immediately check loading state after render
+    await act(async () => {
+      await Promise.resolve();
+      loadingStateBeforeCompletion = result.current.isLoading;
+    });
+
+    // Wait for the fetch to complete
+    await act(async () => {
+      await new Promise(resolve => setTimeout(resolve, 20));
+    });
+
+    expect(loadingStateBeforeCompletion).toBe(true);
+    expect(result.current.isLoading).toBe(false);
+  });
+
+  it('sets asset status to UPLOADED even when an error occurs', async () => {
+    const mockError = new Error('Failed to fetch asset');
+    const mockGetAssetUrlWithError = jest.fn().mockRejectedValue(mockError);
+
+    await act(async () => {
+      renderHook(() =>
+        useGetAssetUrl({
+          asset: mockAsset,
+          isEnabled: true,
+          getAssetUrl: mockGetAssetUrlWithError,
+        }),
+      );
+      await Promise.resolve();
+    });
+
+    // Verify status was set to DOWNLOADING first, then UPLOADED in finally block
+    expect(mockAsset.status).toHaveBeenCalledWith(AssetTransferState.DOWNLOADING);
+    expect(mockAsset.status).toHaveBeenCalledWith(AssetTransferState.UPLOADED);
+    expect(mockAsset.status).toHaveBeenCalledTimes(2);
   });
 });

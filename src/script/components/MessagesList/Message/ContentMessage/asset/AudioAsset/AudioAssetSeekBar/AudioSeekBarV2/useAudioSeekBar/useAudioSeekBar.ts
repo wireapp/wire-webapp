@@ -19,7 +19,7 @@
 
 import {MouseEvent, useCallback, useEffect, useMemo, useState} from 'react';
 
-import {FileAsset} from 'src/script/entity/message/FileAsset';
+import {FileAsset} from 'Repositories/entity/message/FileAsset';
 import {interpolate} from 'Util/ArrayUtil';
 import {clamp} from 'Util/NumberUtil';
 

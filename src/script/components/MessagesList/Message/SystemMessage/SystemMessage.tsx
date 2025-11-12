@@ -17,32 +17,30 @@
  *
  */
 
-import React from 'react';
-
 import {MLSVerified} from '@wireapp/react-ui-kit';
 
 import * as Icon from 'Components/Icon';
-import {E2EIVerificationMessage} from 'src/script/entity/message/E2EIVerificationMessage';
-import {JoinedAfterMLSMigrationFinalisationMessage} from 'src/script/entity/message/JoinedAfterMLSMigrationFinalisationMessage';
-import {MessageTimerUpdateMessage} from 'src/script/entity/message/MessageTimerUpdateMessage';
-import {MLSConversationRecoveredMessage} from 'src/script/entity/message/MLSConversationRecoveredMessage';
-import {MLSMigrationFinalisationOngoingCallMessage} from 'src/script/entity/message/MLSMigrationFinalisationOngoingCallMessage';
-import {OneToOneMigratedToMlsMessage} from 'src/script/entity/message/OneToOneMigratedToMlsMessage';
-import {ProtocolUpdateMessage} from 'src/script/entity/message/ProtocolUpdateMessage';
-import {ReceiptModeUpdateMessage} from 'src/script/entity/message/ReceiptModeUpdateMessage';
-import {RenameMessage} from 'src/script/entity/message/RenameMessage';
-import {SystemMessage as SystemMessageEntity} from 'src/script/entity/message/SystemMessage';
+import {E2EIVerificationMessage} from 'Repositories/entity/message/E2EIVerificationMessage';
+import {JoinedAfterMLSMigrationFinalisationMessage} from 'Repositories/entity/message/JoinedAfterMLSMigrationFinalisationMessage';
+import {MessageTimerUpdateMessage} from 'Repositories/entity/message/MessageTimerUpdateMessage';
+import {MLSConversationRecoveredMessage} from 'Repositories/entity/message/MLSConversationRecoveredMessage';
+import {MLSMigrationFinalisationOngoingCallMessage} from 'Repositories/entity/message/MLSMigrationFinalisationOngoingCallMessage';
+import {OneToOneMigratedToMlsMessage} from 'Repositories/entity/message/OneToOneMigratedToMlsMessage';
+import {ProtocolUpdateMessage} from 'Repositories/entity/message/ProtocolUpdateMessage';
+import {ReceiptModeUpdateMessage} from 'Repositories/entity/message/ReceiptModeUpdateMessage';
+import {RenameMessage} from 'Repositories/entity/message/RenameMessage';
+import {SystemMessage as SystemMessageEntity} from 'Repositories/entity/message/SystemMessage';
 
 import {SystemMessageBase} from './SystemMessageBase';
 
 import {messageBodyWrapper} from '../ContentMessage/ContentMessage.styles';
 import {ProtocolUpdateMessage as ProtocolUpdateMessageComponent} from '../ProtocolUpdateMessage';
 
-export interface SystemMessageProps {
+interface SystemMessageProps {
   message: SystemMessageEntity;
 }
 
-export const SystemMessage: React.FC<SystemMessageProps> = ({message}) => {
+export const SystemMessage = ({message}: SystemMessageProps) => {
   if (message instanceof RenameMessage) {
     return (
       <>

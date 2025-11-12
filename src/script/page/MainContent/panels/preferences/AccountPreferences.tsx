@@ -26,11 +26,16 @@ import {UserVerificationBadges} from 'Components/Badge';
 import {ErrorFallback} from 'Components/ErrorFallback';
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {useEnrichedFields} from 'Components/panel/EnrichedFields';
-import {ConversationState} from 'src/script/conversation/ConversationState';
-import {TeamCreation} from 'src/script/page/LeftSidebar/panels/Conversations/ConversationTabs/TeamCreation/TeamCreation';
+import {ClientRepository} from 'Repositories/client';
+import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
+import {ConversationState} from 'Repositories/conversation/ConversationState';
+import {User} from 'Repositories/entity/User';
+import {PropertiesRepository} from 'Repositories/properties/PropertiesRepository';
+import {TeamState} from 'Repositories/team/TeamState';
+import type {UserRepository} from 'Repositories/user/UserRepository';
+import {TeamCreationAccountHeader} from 'src/script/page/LeftSidebar/panels/Conversations/ConversationTabs/TeamCreation/TeamCreationAccountHeader';
 import {ContentState} from 'src/script/page/useAppState';
 import {Core} from 'src/script/service/CoreSingleton';
-import {TeamRepository} from 'src/script/team/TeamRepository';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 import {getLogger} from 'Util/Logger';
@@ -50,14 +55,7 @@ import {UsernameInput} from './accountPreferences/UsernameInput';
 import {PreferencesPage} from './components/PreferencesPage';
 import {PreferencesSection} from './components/PreferencesSection';
 
-import {ClientRepository} from '../../../../client';
 import {Config} from '../../../../Config';
-import {ConversationRepository} from '../../../../conversation/ConversationRepository';
-import {User} from '../../../../entity/User';
-import {PropertiesRepository} from '../../../../properties/PropertiesRepository';
-import {TeamState} from '../../../../team/TeamState';
-import {RichProfileRepository} from '../../../../user/RichProfileRepository';
-import type {UserRepository} from '../../../../user/UserRepository';
 import {AccentColorPicker} from '../../../AccentColorPicker';
 
 interface AccountPreferencesProps {
@@ -66,12 +64,10 @@ interface AccountPreferencesProps {
   conversationRepository: ConversationRepository;
   propertiesRepository: PropertiesRepository;
   switchContent: (contentState: ContentState) => void;
-  richProfileRepository?: RichProfileRepository;
   /** Should the domain be displayed */
   showDomain?: boolean;
   teamState?: TeamState;
   userRepository: UserRepository;
-  teamRepository: TeamRepository;
   selfUser: User;
   isActivatedAccount?: boolean;
   conversationState?: ConversationState;
@@ -83,7 +79,6 @@ export const AccountPreferences = ({
   importFile,
   clientRepository,
   userRepository,
-  teamRepository,
   propertiesRepository,
   switchContent,
   conversationRepository,
@@ -143,14 +138,7 @@ export const AccountPreferences = ({
   return (
     <PreferencesPage title={t('preferencesAccount')}>
       <div className="preferences-wrapper">
-        {isTeamCreationEnabled && !teamState.isInTeam(selfUser) && (
-          <TeamCreation
-            teamRepository={teamRepository}
-            userRepository={userRepository}
-            selfUser={selfUser}
-            isAccountPage
-          />
-        )}
+        {isTeamCreationEnabled && !teamState.isInTeam(selfUser) && <TeamCreationAccountHeader />}
         <div className="preferences-account-name">
           <h3 className="heading-h3 text-center" title={name}>
             {name}
@@ -221,7 +209,7 @@ export const AccountPreferences = ({
 
           <AccountLink
             label={t('preferencesAccountLink')}
-            value={`${Config.getConfig().URL.ACCOUNT_BASE}/user-profile/?id=${selfUser.id}`}
+            value={`${Config.getConfig().URL.ACCOUNT_BASE}/user-profile/?id=${selfUser.id}@${selfUser.domain}`}
             data-uie-name="element-profile-link"
           />
         </PreferencesSection>

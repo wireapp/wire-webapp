@@ -25,8 +25,8 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 
 import * as Icon from 'Components/Icon';
 import {ModalComponent} from 'Components/Modals/ModalComponent';
-import {EventName} from 'src/script/tracking/EventName';
-import {Segmentation} from 'src/script/tracking/Segmentation';
+import {EventName} from 'Repositories/tracking/EventName';
+import {Segmentation} from 'Repositories/tracking/Segmentation';
 import {t} from 'Util/LocalizerUtil';
 
 import {teamCreationModalBodyCss, teamCreationModalWrapperCss} from './TeamCreation.styles';
@@ -34,6 +34,7 @@ import {Confirmation} from './TeamCreationSteps/Confirmation';
 import {Form} from './TeamCreationSteps/Form';
 import {Introduction} from './TeamCreationSteps/Introduction';
 import {Success} from './TeamCreationSteps/Success';
+import {useTeamCreationModal} from './useTeamCreationModal';
 
 enum Step {
   Introduction = 'Introduction',
@@ -72,6 +73,7 @@ export const TeamCreationModal = ({onClose, onSuccess, userName}: Props) => {
   const stepsSequence = Object.values(Step);
   const [currentStep, setCurrentStep] = useState<Step>(Step.Introduction);
   const [teamName, setTeamName] = useState('');
+  const {isModalOpen} = useTeamCreationModal();
 
   const nextStepHandler = () => {
     const currentStepIndex = stepsSequence.indexOf(currentStep);
@@ -119,7 +121,7 @@ export const TeamCreationModal = ({onClose, onSuccess, userName}: Props) => {
 
   return (
     <ModalComponent
-      isShown
+      isShown={isModalOpen}
       onBgClick={closeModalHandler}
       onClosed={closeModalHandler}
       data-uie-name="team-creation-modal"

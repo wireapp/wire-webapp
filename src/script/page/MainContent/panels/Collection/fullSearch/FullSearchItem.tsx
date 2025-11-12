@@ -17,17 +17,14 @@
  *
  */
 
-import React from 'react';
-
-import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
+import {TabIndex} from '@wireapp/react-ui-kit';
 
 import {Avatar, AVATAR_SIZE} from 'Components/Avatar';
+import type {ContentMessage} from 'Repositories/entity/message/ContentMessage';
+import type {Text} from 'Repositories/entity/message/Text';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {handleKeyDown, KEY} from 'Util/KeyboardUtil';
 import {formatDateShort} from 'Util/TimeUtil';
-
-import type {ContentMessage} from '../../../../../entity/message/ContentMessage';
-import type {Text} from '../../../../../entity/message/Text';
 
 interface FullSearchItemProps {
   formatText: (text: string) => {matches: number; parts: string[]};
@@ -35,7 +32,7 @@ interface FullSearchItemProps {
   onClick: () => void;
 }
 
-const FullSearchItem: React.FC<FullSearchItemProps> = ({message, onClick, formatText}) => {
+const FullSearchItem = ({message, onClick, formatText}: FullSearchItemProps) => {
   const {user, timestamp} = useKoSubscribableChildren(message, ['user', 'timestamp']);
   const {name} = useKoSubscribableChildren(user, ['name']);
   const {parts, matches} = formatText((message.getFirstAsset() as Text).text);

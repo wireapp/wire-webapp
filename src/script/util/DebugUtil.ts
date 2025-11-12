@@ -18,7 +18,6 @@
  */
 
 import {ConnectionStatus} from '@wireapp/api-client/lib/connection';
-import {ConversationProtocol} from '@wireapp/api-client/lib/conversation';
 import {MemberLeaveReason} from '@wireapp/api-client/lib/conversation/data/';
 import {
   BackendEvent,
@@ -28,7 +27,7 @@ import {
   USER_EVENT,
 } from '@wireapp/api-client/lib/event/';
 import type {Notification, NotificationList} from '@wireapp/api-client/lib/notification/';
-import {FeatureStatus} from '@wireapp/api-client/lib/team/feature/';
+import {CONVERSATION_PROTOCOL, FEATURE_KEY, FEATURE_STATUS} from '@wireapp/api-client/lib/team/feature/';
 import type {QualifiedId} from '@wireapp/api-client/lib/user';
 import {NotificationSource} from '@wireapp/core/lib/notification';
 import {DatabaseKeys} from '@wireapp/core/lib/notification/NotificationDatabaseRepository';
@@ -39,36 +38,36 @@ import {container} from 'tsyringe';
 
 import {AvsDebugger} from '@wireapp/avs-debugger';
 
+import {CallingRepository} from 'Repositories/calling/CallingRepository';
+import {CallState} from 'Repositories/calling/CallState';
+import {Participant} from 'Repositories/calling/Participant';
+import {ClientRepository} from 'Repositories/client';
+import {ClientState} from 'Repositories/client/ClientState';
+import {ConnectionRepository} from 'Repositories/connection/ConnectionRepository';
+import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
+import {isMLSCapableConversation} from 'Repositories/conversation/ConversationSelectors';
+import {ConversationState} from 'Repositories/conversation/ConversationState';
+import type {MessageRepository} from 'Repositories/conversation/MessageRepository';
+import {Conversation} from 'Repositories/entity/Conversation';
+import {User} from 'Repositories/entity/User';
+import {EventRepository} from 'Repositories/event/EventRepository';
+import {PropertiesRepository} from 'Repositories/properties/PropertiesRepository';
+import {PROPERTIES_TYPE} from 'Repositories/properties/PropertiesType';
+import {EventRecord, StorageRepository, StorageSchemata} from 'Repositories/storage';
+import {TeamState} from 'Repositories/team/TeamState';
+import {disableForcedErrorReporting} from 'Repositories/tracking/Telemetry.helpers';
+import {UserRepository} from 'Repositories/user/UserRepository';
+import {UserState} from 'Repositories/user/UserState';
 import {getStorage} from 'Util/localStorage';
 import {getLogger, Logger} from 'Util/Logger';
 
 import {TIME_IN_MILLIS} from './TimeUtil';
 import {createUuid} from './uuid';
 
-import {CallingRepository} from '../calling/CallingRepository';
-import {CallState} from '../calling/CallState';
-import {Participant} from '../calling/Participant';
-import {ClientRepository} from '../client';
-import {ClientState} from '../client/ClientState';
-import {ConnectionRepository} from '../connection/ConnectionRepository';
-import {ConversationRepository} from '../conversation/ConversationRepository';
-import {isMLSCapableConversation} from '../conversation/ConversationSelectors';
-import {ConversationState} from '../conversation/ConversationState';
-import type {MessageRepository} from '../conversation/MessageRepository';
 import {E2EIHandler} from '../E2EIdentity';
-import {Conversation} from '../entity/Conversation';
-import {User} from '../entity/User';
-import {EventRepository} from '../event/EventRepository';
 import {checkVersion} from '../lifecycle/newVersionHandler';
-import {PropertiesRepository} from '../properties/PropertiesRepository';
-import {PROPERTIES_TYPE} from '../properties/PropertiesType';
 import {APIClient} from '../service/APIClientSingleton';
 import {Core} from '../service/CoreSingleton';
-import {EventRecord, StorageRepository, StorageSchemata} from '../storage';
-import {TeamState} from '../team/TeamState';
-import {disableForcedErrorReporting} from '../tracking/Telemetry.helpers';
-import {UserRepository} from '../user/UserRepository';
-import {UserState} from '../user/UserState';
 import {ViewModelRepositories} from '../view_model/MainViewModel';
 
 export class DebugUtil {
@@ -127,10 +126,9 @@ export class DebugUtil {
       const startTime = performance.now();
 
       for (const notification of notificationResponse.notifications) {
-        const events = this.core.service.notification.handleNotification(
+        const events = this.core.service!.notification.handleNotification(
           notification,
           NotificationSource.NOTIFICATION_STREAM,
-          false,
         );
 
         for await (const event of events) {
@@ -233,16 +231,27 @@ export class DebugUtil {
     );
   }
 
+  isGzippingEnabled(): boolean {
+    return this.apiClient.transport.http.isGzipEnabled();
+  }
+
+  toggleGzipping(enabled: boolean) {
+    this.apiClient.transport.http.toggleGzip(enabled);
+  }
+
   enableCameraBlur(flag: boolean) {
     return this.callingRepository.switchVideoBackgroundBlur(flag);
   }
 
   reconnectWebSocket({dryRun} = {dryRun: false}) {
-    return this.eventRepository.connectWebSocket(this.core, () => {}, dryRun);
+    const teamFeatures = this.teamState.teamFeatures();
+    const useAsyncNotificationStream =
+      teamFeatures?.[FEATURE_KEY.CONSUMABLE_NOTIFICATIONS]?.status === FEATURE_STATUS.ENABLED;
+    const useLegacyNotificationStream = !useAsyncNotificationStream;
+    return this.eventRepository.connectWebSocket(this.core, useLegacyNotificationStream, () => {}, dryRun);
   }
 
   async reconnectWebSocketWithLastNotificationIdFromBackend({dryRun} = {dryRun: false}) {
-    await this.core.service?.notification.initializeNotificationStream(this.clientState.currentClient!.id);
     return this.reconnectWebSocket({dryRun});
   }
 
@@ -259,6 +268,12 @@ export class DebugUtil {
 
   async disablePressSpaceToUnmute() {
     this.propertiesRepository.savePreference(PROPERTIES_TYPE.CALL.ENABLE_PRESS_SPACE_TO_UNMUTE, false);
+  }
+
+  async resetMLSConversation() {
+    return (this.core.service?.conversation as any).resetMLSConversation(
+      this.conversationState.activeConversation()?.qualifiedId,
+    );
   }
 
   setupAvsDebugger() {
@@ -294,6 +309,27 @@ export class DebugUtil {
     return isEnabled === 'true';
   }
 
+  isEnabledAvsRustSFT(): boolean {
+    const storage = getStorage();
+
+    if (storage === undefined) {
+      return false;
+    }
+
+    const isEnabled = storage.getItem('avs-rust-sft-enabled');
+    return isEnabled === 'true';
+  }
+
+  enableAvsRustSFT(enable: boolean): boolean {
+    const storage = getStorage();
+
+    if (storage === undefined) {
+      return false;
+    }
+    storage.setItem('avs-rust-sft-enabled', `${enable}`);
+    return enable;
+  }
+
   /** Used by QA test automation. */
   blockAllConnections(): Promise<void[]> {
     const blockUsers = this.userState.users().map(userEntity => this.connectionRepository.blockUser(userEntity));
@@ -312,7 +348,10 @@ export class DebugUtil {
     await proteusService['cryptoClient'].debugBreakSession(sessionId);
   }
 
-  async setTeamSupportedProtocols(supportedProtocols: ConversationProtocol[], defaultProtocol?: ConversationProtocol) {
+  async setTeamSupportedProtocols(
+    supportedProtocols: CONVERSATION_PROTOCOL[],
+    defaultProtocol?: CONVERSATION_PROTOCOL,
+  ) {
     const {teamId} = await this.userRepository.getSelf();
     if (!teamId) {
       throw new Error('teamId of self user is undefined');
@@ -326,7 +365,7 @@ export class DebugUtil {
 
     const response = await this.apiClient.api.teams.feature.putMLSFeature(teamId, {
       config: {...mlsFeature.config, supportedProtocols, defaultProtocol: defaultProtocol || supportedProtocols[0]},
-      status: FeatureStatus.ENABLED,
+      status: FEATURE_STATUS.ENABLED,
     });
 
     return response;
@@ -348,7 +387,7 @@ export class DebugUtil {
 
     const response = await this.apiClient.api.teams.feature.putMLSMigrationFeature(teamId, {
       config,
-      status: isEnabled ? FeatureStatus.ENABLED : FeatureStatus.DISABLED,
+      status: isEnabled ? FEATURE_STATUS.ENABLED : FEATURE_STATUS.DISABLED,
     });
 
     return response;

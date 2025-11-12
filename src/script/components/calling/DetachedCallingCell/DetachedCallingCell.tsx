@@ -19,12 +19,11 @@
 
 import {container} from 'tsyringe';
 
-import {Call} from 'src/script/calling/Call';
-import {CallingRepository} from 'src/script/calling/CallingRepository';
-import {CallState, CallingViewMode, DesktopScreenShareMenu} from 'src/script/calling/CallState';
-import {MediaRepository} from 'src/script/media/MediaRepository';
-import {PropertiesRepository} from 'src/script/properties/PropertiesRepository';
-import {UserState} from 'src/script/user/UserState';
+import {Call} from 'Repositories/calling/Call';
+import {CallingRepository} from 'Repositories/calling/CallingRepository';
+import {CallingViewMode, CallState, DesktopScreenShareMenu} from 'Repositories/calling/CallState';
+import {PropertiesRepository} from 'Repositories/properties/PropertiesRepository';
+import {UserState} from 'Repositories/user/UserState';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 
 import {DetachedWindow} from './components/DetachedWindow';
@@ -35,7 +34,6 @@ import {WindowContextProvider} from '../useWindow';
 interface DetachedCallingCellProps {
   propertiesRepository: PropertiesRepository;
   callingRepository: CallingRepository;
-  mediaRepository: MediaRepository;
   toggleScreenshare: (call: Call, desktopScreenShareMenu: DesktopScreenShareMenu) => void;
   callState?: CallState;
   userState?: UserState;
@@ -44,7 +42,6 @@ interface DetachedCallingCellProps {
 export const DetachedCallingCell = ({
   propertiesRepository,
   callingRepository,
-  mediaRepository,
   toggleScreenshare,
   callState = container.resolve(CallState),
   userState = container.resolve(UserState),
@@ -68,7 +65,6 @@ export const DetachedCallingCell = ({
         <CallingContainer
           propertiesRepository={propertiesRepository}
           callingRepository={callingRepository}
-          mediaRepository={mediaRepository}
           toggleScreenshare={toggleScreenshare}
         />
       </WindowContextProvider>

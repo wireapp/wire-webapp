@@ -19,7 +19,7 @@
 
 import {create} from 'zustand';
 
-import {User} from '../../../../entity/User';
+import {User} from 'Repositories/entity/User';
 
 type TypingUser = {
   conversationId: string;

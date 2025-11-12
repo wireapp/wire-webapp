@@ -17,26 +17,23 @@
  *
  */
 
-import React from 'react';
-
 import {container} from 'tsyringe';
 
 import {LegalHoldDot} from 'Components/LegalHoldDot';
 import {useLegalHoldModalState} from 'Components/Modals/LegalHoldModal/LegalHoldModal.state';
+import {ConversationState} from 'Repositories/conversation/ConversationState';
+import {LegalHoldMessage as LegalHoldMessageEntity} from 'Repositories/entity/message/LegalHoldMessage';
 import {t} from 'Util/LocalizerUtil';
 
-import {ConversationState} from '../../../conversation/ConversationState';
-import {LegalHoldMessage as LegalHoldMessageEntity} from '../../../entity/message/LegalHoldMessage';
-
-export interface LegalHoldMessageProps {
+interface LegalHoldMessageProps {
   conversationState?: ConversationState;
   message: LegalHoldMessageEntity;
 }
 
-const LegalHoldMessage: React.FC<LegalHoldMessageProps> = ({
+const LegalHoldMessage = ({
   message,
   conversationState = container.resolve(ConversationState),
-}) => {
+}: LegalHoldMessageProps) => {
   const {showUsers} = useLegalHoldModalState(state => state);
   const showLegalHold = () => showUsers(false, conversationState.activeConversation());
 

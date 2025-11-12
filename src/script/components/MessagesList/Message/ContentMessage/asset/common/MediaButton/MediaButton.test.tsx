@@ -20,8 +20,8 @@
 import {fireEvent, render} from '@testing-library/react';
 import ko from 'knockout';
 
-import {AssetTransferState} from 'src/script/assets/AssetTransferState';
-import {FileAsset} from 'src/script/entity/message/FileAsset';
+import {AssetTransferState} from 'Repositories/assets/AssetTransferState';
+import {FileAsset} from 'Repositories/entity/message/FileAsset';
 
 import {MediaButton, MediaButtonProps} from './MediaButton';
 

@@ -17,11 +17,11 @@
  *
  */
 
-import React, {useEffect, useState} from 'react';
+import {useEffect, useState} from 'react';
 
 import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
 
-import {ClientEntity} from 'src/script/client/ClientEntity';
+import {ClientEntity} from 'Repositories/client/ClientEntity';
 import {WireIdentity} from 'src/script/E2EIdentity';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
@@ -47,7 +47,7 @@ enum SessionResetState {
   RESET = 'reset',
 }
 
-export const DeviceDetailsPreferences: React.FC<DevicesPreferencesProps> = ({
+export const DeviceDetailsPreferences = ({
   device,
   getFingerprint,
   getDeviceIdentity,
@@ -55,7 +55,7 @@ export const DeviceDetailsPreferences: React.FC<DevicesPreferencesProps> = ({
   onRemove,
   onClose,
   onResetSession,
-}) => {
+}: DevicesPreferencesProps) => {
   const {isVerified} = useKoSubscribableChildren(device.meta, ['isVerified']);
   const [resetState, setResetState] = useState<SessionResetState>(SessionResetState.RESET);
   const [fingerprint, setFingerprint] = useState<string | undefined>();

@@ -19,6 +19,8 @@
 
 import {HTMLProps, MouseEvent as ReactMouseEvent, KeyboardEvent as ReactKeyBoardEvent} from 'react';
 
+import {User} from 'Repositories/entity/User';
+import {ServiceEntity} from 'Repositories/integration/ServiceEntity';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {handleKeyDown, isKeyboardEvent, KEY} from 'Util/KeyboardUtil';
 
@@ -27,9 +29,7 @@ import {ServiceAvatar} from './ServiceAvatar';
 import {TemporaryGuestAvatar} from './TemporaryGuestAvatar';
 import {UserAvatar} from './UserAvatar';
 
-import {User} from '../../entity/User';
 import {isServiceEntity} from '../../guards/Service';
-import {ServiceEntity} from '../../integration/ServiceEntity';
 
 export enum AVATAR_SIZE {
   LARGE = 'avatar-l',
@@ -71,7 +71,7 @@ export const INITIALS_SIZE = {
   [AVATAR_SIZE.XXX_SMALL]: 8,
 };
 
-export interface AvatarProps extends HTMLProps<HTMLDivElement> {
+interface AvatarProps extends HTMLProps<HTMLDivElement> {
   participant: User | ServiceEntity;
   avatarSize?: AVATAR_SIZE;
   avatarAlt?: string;

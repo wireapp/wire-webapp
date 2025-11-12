@@ -17,7 +17,7 @@
  *
  */
 
-import React, {useMemo, useState} from 'react';
+import {useMemo, useState} from 'react';
 
 import {AddUsersFailure, AddUsersFailureReasons} from '@wireapp/core/lib/conversation';
 import {container} from 'tsyringe';
@@ -26,9 +26,10 @@ import {Button, ButtonVariant, Link, LinkVariant} from '@wireapp/react-ui-kit';
 
 import * as Icon from 'Components/Icon';
 import {getUserName} from 'Components/UserName';
+import {FailedToAddUsersMessage as FailedToAddUsersMessageEntity} from 'Repositories/entity/message/FailedToAddUsersMessage';
+import {User} from 'Repositories/entity/User';
+import {UserState} from 'Repositories/user/UserState';
 import {Config} from 'src/script/Config';
-import {User} from 'src/script/entity/User';
-import {UserState} from 'src/script/user/UserState';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 import {matchQualifiedIds} from 'Util/QualifiedId';
@@ -37,9 +38,7 @@ import {backendErrorLink, warning} from './ContentMessage/Warnings/Warnings.styl
 import {MessageTime} from './MessageTime';
 import {useMessageFocusedTabIndex} from './util';
 
-import {FailedToAddUsersMessage as FailedToAddUsersMessageEntity} from '../../../entity/message/FailedToAddUsersMessage';
-
-export interface FailedToAddUsersMessageProps {
+interface FailedToAddUsersMessageProps {
   isMessageFocused: boolean;
   message: FailedToAddUsersMessageEntity;
   userState?: UserState;
@@ -167,11 +166,11 @@ const MessageDetails = ({failure, isMessageFocused, allUsers}: MessageDetailsPro
   );
 };
 
-const FailedToAddUsersMessage: React.FC<FailedToAddUsersMessageProps> = ({
+const FailedToAddUsersMessage = ({
   isMessageFocused,
   message,
   userState = container.resolve(UserState),
-}) => {
+}: FailedToAddUsersMessageProps) => {
   const messageFocusedTabIndex = useMessageFocusedTabIndex(isMessageFocused);
 
   const [isOpen, setIsOpen] = useState(false);

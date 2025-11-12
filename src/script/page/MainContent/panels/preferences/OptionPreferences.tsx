@@ -20,25 +20,24 @@
 import React, {useEffect, useState} from 'react';
 
 import {AudioPreference, NotificationPreference, WebappProperties} from '@wireapp/api-client/lib/user/data/';
-import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
 import {amplify} from 'amplify';
 
-import {Checkbox, CheckboxLabel, IndicatorRangeInput} from '@wireapp/react-ui-kit';
+import {TabIndex, Checkbox, CheckboxLabel, IndicatorRangeInput} from '@wireapp/react-ui-kit';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {Theme} from 'Components/AppContainer/hooks/useTheme';
 import {RadioGroup} from 'Components/Radio';
+import {RootFontSize, useRootFontSize} from 'Hooks/useRootFontSize';
+import {User} from 'Repositories/entity/User';
+import {PropertiesRepository} from 'Repositories/properties/PropertiesRepository';
+import {PROPERTIES_TYPE} from 'Repositories/properties/PropertiesType';
 import {Config} from 'src/script/Config';
-import {User} from 'src/script/entity/User';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 
 import {PreferencesPage} from './components/PreferencesPage';
 import {PreferencesSection} from './components/PreferencesSection';
 
-import {RootFontSize, useRootFontSize} from '../../../../hooks/useRootFontSize';
-import {PropertiesRepository} from '../../../../properties/PropertiesRepository';
-import {PROPERTIES_TYPE} from '../../../../properties/PropertiesType';
 interface OptionPreferencesProps {
   propertiesRepository: PropertiesRepository;
   selfUser: User;
@@ -136,6 +135,7 @@ const OptionPreferences = ({propertiesRepository, selfUser}: OptionPreferencesPr
   ];
 
   const isMessageFormatButtonsFlagEnabled = Config.getConfig().FEATURE.ENABLE_MESSAGE_FORMAT_BUTTONS;
+  const isLinkPreviewsEnabled = Config.getConfig().FEATURE.ALLOW_LINK_PREVIEWS;
 
   return (
     <PreferencesPage title={t('preferencesOptions')}>
@@ -270,24 +270,26 @@ const OptionPreferences = ({propertiesRepository, selfUser}: OptionPreferencesPr
               </div>
             )}
 
-            <div className="checkbox-margin">
-              <Checkbox
-                tabIndex={TabIndex.FOCUSABLE}
-                onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-                  saveOptionSendPreviewsPreference(event.target.checked);
-                }}
-                checked={optionSendPreviews}
-                data-uie-name="status-preference-previews-send"
-              >
-                <CheckboxLabel htmlFor="status-preference-previews-send">
-                  {t('preferencesOptionsPreviewsSendCheckbox')}
-                </CheckboxLabel>
-              </Checkbox>
+            {isLinkPreviewsEnabled && (
+              <div className="checkbox-margin">
+                <Checkbox
+                  tabIndex={TabIndex.FOCUSABLE}
+                  onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                    saveOptionSendPreviewsPreference(event.target.checked);
+                  }}
+                  checked={optionSendPreviews}
+                  data-uie-name="status-preference-previews-send"
+                >
+                  <CheckboxLabel htmlFor="status-preference-previews-send">
+                    {t('preferencesOptionsPreviewsSendCheckbox')}
+                  </CheckboxLabel>
+                </Checkbox>
 
-              <p className="preferences-detail preferences-detail-intended">
-                {t('preferencesOptionsPreviewsSendDetail')}
-              </p>
-            </div>
+                <p className="preferences-detail preferences-detail-intended">
+                  {t('preferencesOptionsPreviewsSendDetail')}
+                </p>
+              </div>
+            )}
           </>
         )}
       </PreferencesSection>

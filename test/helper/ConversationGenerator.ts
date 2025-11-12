@@ -23,24 +23,25 @@ import {
   CONVERSATION_ACCESS_ROLE,
   Conversation as BackendConversation,
   Member,
+  CONVERSATION_CELLS_STATE,
 } from '@wireapp/api-client/lib/conversation/';
 import {RECEIPT_MODE} from '@wireapp/api-client/lib/conversation/data';
-import {ConversationProtocol} from '@wireapp/api-client/lib/conversation/NewConversation';
+import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {LegalHoldStatus} from '@wireapp/core/lib/conversation/content';
 
-import {ConnectionEntity} from 'src/script/connection/ConnectionEntity';
-import {ConversationDatabaseData, ConversationMapper} from 'src/script/conversation/ConversationMapper';
-import {ConversationStatus} from 'src/script/conversation/ConversationStatus';
-import {ConversationVerificationState} from 'src/script/conversation/ConversationVerificationState';
-import {Conversation} from 'src/script/entity/Conversation';
-import {User} from 'src/script/entity/User';
+import {ConnectionEntity} from 'Repositories/connection/ConnectionEntity';
+import {ConversationDatabaseData, ConversationMapper} from 'Repositories/conversation/ConversationMapper';
+import {ConversationStatus} from 'Repositories/conversation/ConversationStatus';
+import {ConversationVerificationState} from 'Repositories/conversation/ConversationVerificationState';
+import {Conversation} from 'Repositories/entity/Conversation';
+import {User} from 'Repositories/entity/User';
 import {createUuid} from 'Util/uuid';
 
 interface GenerateAPIConversationParams {
   id?: QualifiedId;
   type?: CONVERSATION_TYPE;
-  protocol?: ConversationProtocol;
+  protocol?: CONVERSATION_PROTOCOL;
   overwites?: Partial<ConversationDatabaseData>;
   name?: string;
   groupId?: string;
@@ -49,7 +50,7 @@ interface GenerateAPIConversationParams {
 export function generateAPIConversation({
   id = {id: createUuid(), domain: 'test.wire.link'},
   type = CONVERSATION_TYPE.REGULAR,
-  protocol = ConversationProtocol.PROTEUS,
+  protocol = CONVERSATION_PROTOCOL.PROTEUS,
   overwites = {},
   name,
 }: GenerateAPIConversationParams): BackendConversation {
@@ -58,7 +59,7 @@ export function generateAPIConversation({
     name,
     type: type,
     protocol: protocol,
-    qualified_id: id,
+    qualified_id: overwites.id && overwites.domain ? {id: overwites.id, domain: overwites.domain} : id,
     access: [],
     verification_state: ConversationVerificationState.UNVERIFIED,
     mlsVerificationState: ConversationVerificationState.UNVERIFIED,
@@ -88,6 +89,7 @@ export function generateAPIConversation({
     creator: '',
     access_role: [CONVERSATION_ACCESS_ROLE.TEAM_MEMBER],
     members: {others: [], self: {} as Member},
+    cells_state: CONVERSATION_CELLS_STATE.DISABLED,
     ...overwites,
   };
 }
@@ -100,7 +102,7 @@ interface GenerateConversationParams extends GenerateAPIConversationParams {
 export function generateConversation({
   type = CONVERSATION_TYPE.REGULAR,
   status = ConnectionStatus.ACCEPTED,
-  protocol = ConversationProtocol.PROTEUS,
+  protocol = CONVERSATION_PROTOCOL.PROTEUS,
   id,
   name,
   groupId = 'groupId',
@@ -116,7 +118,7 @@ export function generateConversation({
   conversation.connection(connectionEntity);
   conversation.type(type);
 
-  if ([ConversationProtocol.MLS, ConversationProtocol.MIXED].includes(protocol)) {
+  if ([CONVERSATION_PROTOCOL.MLS, CONVERSATION_PROTOCOL.MIXED].includes(protocol)) {
     conversation.groupId = groupId;
   }
 

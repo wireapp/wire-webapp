@@ -187,9 +187,8 @@ describe('SingleSignOnForm', () => {
 
     fireEvent.submit(container.querySelector('form')!);
 
-    expect(actionRoot.authAction.doGetDomainInfo).toHaveBeenCalledTimes(1);
-
     await waitFor(() => {
+      expect(actionRoot.authAction.doGetDomainInfo).toHaveBeenCalledTimes(1);
       expect(actionRoot.navigationAction.doNavigate).toHaveBeenCalledWith(expectedHost);
     });
   });
@@ -229,9 +228,8 @@ describe('SingleSignOnForm', () => {
 
     fireEvent.submit(container.querySelector('form')!);
 
-    expect(actionRoot.authAction.doGetDomainInfo).toHaveBeenCalledTimes(1);
-
     await waitFor(() => {
+      expect(actionRoot.authAction.doGetDomainInfo).toHaveBeenCalledTimes(1);
       expect(actionRoot.navigationAction.doNavigate).toHaveBeenCalledWith(expectedHost);
     });
   });

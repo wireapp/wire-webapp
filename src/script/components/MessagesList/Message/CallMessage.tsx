@@ -17,20 +17,17 @@
  *
  */
 
-import React from 'react';
-
 import * as Icon from 'Components/Icon';
+import {CallMessage as CallMessageEntity} from 'Repositories/entity/message/CallMessage';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 
 import {MessageTime} from './MessageTime';
 
-import {CallMessage as CallMessageEntity} from '../../../entity/message/CallMessage';
-
-export interface CallMessageProps {
+interface CallMessageProps {
   message: CallMessageEntity;
 }
 
-const CallMessage: React.FC<CallMessageProps> = ({message}) => {
+const CallMessage = ({message}: CallMessageProps) => {
   const {caption, unsafeSenderName, timestamp} = useKoSubscribableChildren(message, [
     'caption',
     'unsafeSenderName',

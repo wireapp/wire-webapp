@@ -19,60 +19,88 @@
 
 import {create} from 'zustand';
 
-import {CellFile} from '../cellFile/cellFile';
+import {CellNode} from '../cellNode/cellNode';
+import {CellPagination} from '../cellPagination/cellPagination';
 
 type Status = 'idle' | 'loading' | 'success' | 'error';
 
+const DEFAULT_PAGE_SIZE = 50;
+
 interface CellsState {
-  filesByConversation: Record<string, CellFile[]>;
+  nodesByConversation: Record<string, CellNode[]>;
+  paginationByConversation: Record<string, CellPagination | null>;
   status: Status;
   error: Error | null;
-  setFiles: (params: {conversationId: string; files: CellFile[]}) => void;
+  pageSize: number;
+  setPageSize: (pageSize: number) => void;
+  setNodes: (params: {conversationId: string; nodes: CellNode[]}) => void;
+  setPagination: (params: {conversationId: string; pagination: CellPagination | null}) => void;
   setStatus: (status: Status) => void;
   setError: (error: Error | null) => void;
-  updateFile: (params: {conversationId: string; fileId: string; updates: Partial<CellFile>}) => void;
-  removeFile: (params: {conversationId: string; fileId: string}) => void;
+  setPublicLink: (params: {conversationId: string; nodeId: string; data: CellNode['publicLink']}) => void;
+  removeNode: (params: {conversationId: string; nodeId: string}) => void;
   clearAll: (params: {conversationId: string}) => void;
-  getFiles: (params: {conversationId: string}) => CellFile[];
+  getNodes: (params: {conversationId: string}) => CellNode[];
+  getPagination: (params: {conversationId: string}) => CellPagination | null;
 }
 
 export const useCellsStore = create<CellsState>((set, get) => ({
-  filesByConversation: {},
+  nodesByConversation: {},
+  paginationByConversation: {},
   status: 'idle',
   error: null,
-  setFiles: ({conversationId, files}) =>
+  pageSize: DEFAULT_PAGE_SIZE,
+  setNodes: ({conversationId, nodes}) =>
     set(state => ({
-      filesByConversation: {
-        ...state.filesByConversation,
-        [conversationId]: files,
+      nodesByConversation: {
+        ...state.nodesByConversation,
+        [conversationId]: nodes,
+      },
+    })),
+  setPageSize: pageSize => set({pageSize}),
+  setPagination: ({conversationId, pagination}) =>
+    set(state => ({
+      paginationByConversation: {
+        ...state.paginationByConversation,
+        [conversationId]: pagination,
       },
     })),
   setStatus: status => set({status}),
   setError: error => set({error}),
-  updateFile: ({conversationId, fileId, updates}) =>
+  setPublicLink: ({conversationId, nodeId, data}) =>
     set(state => ({
-      filesByConversation: {
-        ...state.filesByConversation,
+      nodesByConversation: {
+        ...state.nodesByConversation,
         [conversationId]:
-          state.filesByConversation[conversationId]?.map(file => (file.id === fileId ? {...file, ...updates} : file)) ||
-          [],
+          state.nodesByConversation[conversationId]?.map(node =>
+            node.id === nodeId
+              ? {
+                  ...node,
+                  publicLink: data,
+                }
+              : node,
+          ) || [],
       },
     })),
-  removeFile: ({conversationId, fileId}) =>
+  removeNode: ({conversationId, nodeId}) =>
     set(state => ({
-      filesByConversation: {
-        ...state.filesByConversation,
-        [conversationId]: state.filesByConversation[conversationId]?.filter(file => file.id !== fileId) || [],
+      nodesByConversation: {
+        ...state.nodesByConversation,
+        [conversationId]: state.nodesByConversation[conversationId]?.filter(node => node.id !== nodeId) || [],
       },
     })),
   clearAll: ({conversationId}) => {
     const state = get();
-    const updatedFilesByConversation = {...state.filesByConversation};
-    delete updatedFilesByConversation[conversationId];
-    set({filesByConversation: updatedFilesByConversation, status: 'idle', error: null});
+    const updatedNodesByConversation = {...state.nodesByConversation};
+    delete updatedNodesByConversation[conversationId];
+    set({nodesByConversation: updatedNodesByConversation, status: 'idle', error: null});
   },
-  getFiles: ({conversationId}) => {
-    const state = get().filesByConversation;
+  getNodes: ({conversationId}) => {
+    const state = get().nodesByConversation;
+    return state[conversationId] || [];
+  },
+  getPagination: ({conversationId}) => {
+    const state = get().paginationByConversation;
     return state[conversationId] || [];
   },
 }));

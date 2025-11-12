@@ -17,8 +17,9 @@
  *
  */
 
-import React, {useEffect, useRef, useState} from 'react';
+import {useEffect, useRef, useState} from 'react';
 
+import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 import cx from 'classnames';
 import {container} from 'tsyringe';
 
@@ -26,11 +27,18 @@ import {showInviteModal} from 'Components/Modals/InviteModal';
 import {showServiceModal} from 'Components/Modals/ServiceModal';
 import {showUserModal} from 'Components/Modals/UserModal';
 import {SearchInput} from 'Components/SearchInput';
-import {User} from 'src/script/entity/User';
-import {IntegrationRepository} from 'src/script/integration/IntegrationRepository';
-import {ServiceEntity} from 'src/script/integration/ServiceEntity';
+import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
+import {ConversationState} from 'Repositories/conversation/ConversationState';
+import {User} from 'Repositories/entity/User';
+import {IntegrationRepository} from 'Repositories/integration/IntegrationRepository';
+import {ServiceEntity} from 'Repositories/integration/ServiceEntity';
+import {SearchRepository} from 'Repositories/search/SearchRepository';
+import {TeamRepository} from 'Repositories/team/TeamRepository';
+import {TeamState} from 'Repositories/team/TeamState';
+import {generatePermissionHelpers} from 'Repositories/user/UserPermission';
+import {UserRepository} from 'Repositories/user/UserRepository';
+import {UserState} from 'Repositories/user/UserState';
 import {SidebarTabs, useSidebarStore} from 'src/script/page/LeftSidebar/panels/Conversations/useSidebarStore';
-import {UserRepository} from 'src/script/user/UserRepository';
 import {MainViewModel} from 'src/script/view_model/MainViewModel';
 import {t} from 'Util/LocalizerUtil';
 
@@ -38,13 +46,6 @@ import {PeopleTab, SearchResultsData} from './PeopleTab';
 import {ServicesTab} from './ServicesTab';
 
 import {Config} from '../../../../Config';
-import {ConversationRepository} from '../../../../conversation/ConversationRepository';
-import {ConversationState} from '../../../../conversation/ConversationState';
-import {SearchRepository} from '../../../../search/SearchRepository';
-import {TeamRepository} from '../../../../team/TeamRepository';
-import {TeamState} from '../../../../team/TeamState';
-import {generatePermissionHelpers} from '../../../../user/UserPermission';
-import {UserState} from '../../../../user/UserState';
 import {ListWrapper} from '../ListWrapper';
 
 type StartUIProps = {
@@ -66,7 +67,7 @@ const enum Tabs {
   SERVICES,
 }
 
-const StartUI: React.FC<StartUIProps> = ({
+const StartUI = ({
   userState = container.resolve(UserState),
   teamState = container.resolve(TeamState),
   conversationState = container.resolve(ConversationState),
@@ -78,7 +79,7 @@ const StartUI: React.FC<StartUIProps> = ({
   userRepository,
   isFederated,
   selfUser,
-}) => {
+}: StartUIProps) => {
   const brandName = Config.getConfig().BRAND_NAME;
   const {canInviteTeamMembers, canSearchUnconnectedUsers, canManageServices, canChatWithServices} =
     generatePermissionHelpers(selfUser.teamRole());
@@ -89,7 +90,9 @@ const StartUI: React.FC<StartUIProps> = ({
 
   const actions = mainViewModel.actions;
   const isTeam = teamState.isTeam();
-  const isMLSEnabled = teamState.isMLSEnabled();
+  const defaultProtocol = teamState.teamFeatures()?.mls?.config.defaultProtocol;
+  const areServicesSupportedByProtocol = defaultProtocol !== CONVERSATION_PROTOCOL.MLS;
+  const showServiceTab = isTeam && canChatWithServices() && areServicesSupportedByProtocol;
 
   const [searchQuery, setSearchQuery] = useState('');
   const [activeTab, setActiveTab] = useState(Tabs.PEOPLE);
@@ -149,7 +152,7 @@ const StartUI: React.FC<StartUIProps> = ({
           forceDark
         />
       </div>
-      {isTeam && canChatWithServices() && !isMLSEnabled && (
+      {showServiceTab && (
         <ul className="start-ui-list-tabs">
           <li className={`start-ui-list-tab ${activeTab === Tabs.PEOPLE ? 'active' : ''}`}>
             <button

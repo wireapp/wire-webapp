@@ -27,17 +27,17 @@ import * as uiKit from '@wireapp/react-ui-kit';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {TitleBar} from 'Components/TitleBar';
+import {CallingRepository} from 'Repositories/calling/CallingRepository';
+import {CallState} from 'Repositories/calling/CallState';
+import {ConversationVerificationState} from 'Repositories/conversation/ConversationVerificationState';
+import {Conversation} from 'Repositories/entity/Conversation';
+import {User} from 'Repositories/entity/User';
+import {TeamState} from 'Repositories/team/TeamState';
 import {withTheme} from 'src/script/auth/util/test/TestUtil';
 import {ContentState} from 'src/script/page/useAppState';
 
 import {TestFactory} from '../../../../test/helper/TestFactory';
-import {CallingRepository} from '../../calling/CallingRepository';
-import {CallState} from '../../calling/CallState';
-import {ConversationVerificationState} from '../../conversation/ConversationVerificationState';
-import {Conversation} from '../../entity/Conversation';
-import {User} from '../../entity/User';
 import {PanelState} from '../../page/RightSidebar/RightSidebar';
-import {TeamState} from '../../team/TeamState';
 import {ViewModelRepositories} from '../../view_model/MainViewModel';
 
 jest.mock('@wireapp/react-ui-kit', () => ({
@@ -263,31 +263,6 @@ describe('TitleBar', () => {
 
     const videoCallButton = queryByLabelText('tooltipConversationVideoCall');
     expect(videoCallButton).toBeNull();
-  });
-
-  it('starts video call on video call button click', async () => {
-    mockedUiKit.useMatchMedia.mockReturnValue(false);
-
-    const firstUser = new User();
-    const teamState = createTeamState({isVideoCallingEnabled: ko.pureComputed(() => true)});
-    const conversation = createConversationEntity({
-      firstUserEntity: ko.pureComputed(() => firstUser),
-      is1to1: ko.pureComputed(() => true),
-      participating_user_ids: ko.observableArray([
-        {domain: '', id: ''},
-        {domain: '', id: ''},
-      ] as QualifiedId[]),
-    });
-
-    const {getByLabelText} = render(
-      withTheme(<TitleBar {...getDefaultProps(callingRepository, conversation)} teamState={teamState} />),
-    );
-
-    const videoCallButton = getByLabelText('tooltipConversationVideoCall');
-    expect(videoCallButton).toBeDefined();
-
-    fireEvent.click(videoCallButton);
-    expect(callActions.startVideo).toHaveBeenCalledWith(conversation);
   });
 
   it('displays warning badge', async () => {

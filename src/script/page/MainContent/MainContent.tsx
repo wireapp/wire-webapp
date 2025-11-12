@@ -17,7 +17,7 @@
  *
  */
 
-import {FC, ReactNode, useContext, useEffect, useState} from 'react';
+import {ReactNode, useContext, useEffect, useState} from 'react';
 
 import cx from 'classnames';
 import {CSSTransition, SwitchTransition} from 'react-transition-group';
@@ -30,7 +30,13 @@ import {HistoryExport} from 'Components/HistoryExport';
 import {HistoryImport} from 'Components/HistoryImport';
 import * as Icon from 'Components/Icon';
 import {useLegalHoldModalState} from 'Components/Modals/LegalHoldModal/LegalHoldModal.state';
-import {User} from 'src/script/entity/User';
+import {ClientState} from 'Repositories/client/ClientState';
+import {ConversationState} from 'Repositories/conversation/ConversationState';
+import {User} from 'Repositories/entity/User';
+import {MediaDeviceType} from 'Repositories/media/MediaDeviceType';
+import {useMediaDevicesStore} from 'Repositories/media/useMediaDevicesStore';
+import {TeamState} from 'Repositories/team/TeamState';
+import {UserState} from 'Repositories/user/UserState';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 import {incomingCssClass, removeAnimationsClass} from 'Util/util';
@@ -42,10 +48,6 @@ import {AVPreferences} from './panels/preferences/AVPreferences';
 import {DevicesPreferences} from './panels/preferences/DevicesPreferences';
 import {OptionPreferences} from './panels/preferences/OptionPreferences';
 
-import {ClientState} from '../../client/ClientState';
-import {ConversationState} from '../../conversation/ConversationState';
-import {TeamState} from '../../team/TeamState';
-import {UserState} from '../../user/UserState';
 import {RightSidebarParams} from '../AppMain';
 import {PanelState} from '../RightSidebar';
 import {RootContext} from '../RootProvider';
@@ -53,7 +55,7 @@ import {ContentState, useAppState} from '../useAppState';
 
 export const ANIMATED_PAGE_TRANSITION_DURATION = 500;
 
-const Animated: FC<{children: ReactNode}> = ({children, ...rest}) => (
+const Animated = ({children, ...rest}: {children: ReactNode}) => (
   <CSSTransition classNames="slide-in-left" timeout={{enter: ANIMATED_PAGE_TRANSITION_DURATION}} {...rest}>
     {children}
   </CSSTransition>
@@ -67,13 +69,13 @@ interface MainContentProps {
   reloadApp: () => void;
 }
 
-const MainContent: FC<MainContentProps> = ({
+const MainContent = ({
   openRightSidebar,
   isRightSidebarOpen = false,
   selfUser,
   conversationState = container.resolve(ConversationState),
   reloadApp,
-}) => {
+}: MainContentProps) => {
   const [uploadedFile, setUploadedFile] = useState<File | null>(null);
   const mainViewModel = useContext(RootContext);
 
@@ -106,8 +108,19 @@ const MainContent: FC<MainContentProps> = ({
   const {content: contentViewModel} = mainViewModel;
   const {isFederated, repositories, switchContent} = contentViewModel;
 
-  // eslint-disable-next-line react-hooks/rules-of-hooks
+  /* eslint-disable react-hooks/rules-of-hooks */
+  const {audioInputSupported, audioOutputSupported, videoInputSupported} = useMediaDevicesStore(state => ({
+    audioInputSupported: state.audio.input.supported,
+    audioOutputSupported: state.audio.output.supported,
+    videoInputSupported: state.video.input.supported,
+  }));
+  const deviceSupport = {
+    [MediaDeviceType.AUDIO_INPUT]: audioInputSupported,
+    [MediaDeviceType.AUDIO_OUTPUT]: audioOutputSupported,
+    [MediaDeviceType.VIDEO_INPUT]: videoInputSupported,
+  };
   const {activeConversation} = useKoSubscribableChildren(conversationState, ['activeConversation']);
+  /* eslint-enable react-hooks/rules-of-hooks */
 
   const statesTitle: Partial<Record<ContentState, string>> = {
     [ContentState.CONNECTION_REQUESTS]: t('accessibility.headings.connectionRequests'),
@@ -171,7 +184,6 @@ const MainContent: FC<MainContentProps> = ({
                   conversationRepository={repositories.conversation}
                   propertiesRepository={repositories.properties}
                   userRepository={repositories.user}
-                  teamRepository={repositories.team}
                   selfUser={selfUser}
                   isActivatedAccount={isActivatedAccount}
                 />
@@ -186,8 +198,8 @@ const MainContent: FC<MainContentProps> = ({
               >
                 <AVPreferences
                   callingRepository={repositories.calling}
-                  mediaRepository={repositories.media}
                   propertiesRepository={repositories.properties}
+                  deviceSupport={deviceSupport}
                 />
               </div>
             )}
@@ -259,7 +271,13 @@ const MainContent: FC<MainContentProps> = ({
               />
             )}
 
-            {contentState === ContentState.CELLS && <CellsGlobalView />}
+            {contentState === ContentState.CELLS && (
+              <CellsGlobalView
+                cellsRepository={repositories.cells}
+                userRepository={repositories.user}
+                conversationRepository={repositories.conversation}
+              />
+            )}
           </>
         </Animated>
       </SwitchTransition>

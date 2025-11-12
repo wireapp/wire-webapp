@@ -17,8 +17,10 @@
  *
  */
 
+import {CellsRepository} from 'Repositories/cells/CellsRepository';
 import {t} from 'Util/LocalizerUtil';
 
+import {CellsFilters} from './CellsFilters/CellsFilters';
 import {contentStyles, headingStyles, searchWrapperStyles, wrapperStyles} from './CellsHeader.styles';
 import {CellsRefresh} from './CellsRefresh/CellsRefresh';
 import {CellsSearch} from './CellsSearch/CellsSeach';
@@ -30,18 +32,27 @@ interface CellsHeaderProps {
   onSearch: (value: string) => void;
   onClearSearch: () => void;
   onRefresh: () => void;
-  searchStatus: 'idle' | 'loading' | 'success' | 'error';
+  searchStatus: 'idle' | 'loading' | 'fetchingMore' | 'success' | 'error';
+  cellsRepository: CellsRepository;
 }
 
-export const CellsHeader = ({searchValue, onSearch, onClearSearch, onRefresh, searchStatus}: CellsHeaderProps) => {
+export const CellsHeader = ({
+  searchValue,
+  onSearch,
+  onClearSearch,
+  onRefresh,
+  searchStatus,
+  cellsRepository,
+}: CellsHeaderProps) => {
   return (
     <header css={wrapperStyles}>
-      <h2 css={headingStyles}>{t('cellsGlobalView.heading')}</h2>
+      <h2 css={headingStyles}>{t('cells.heading')}</h2>
       <div css={contentStyles}>
         <div css={searchWrapperStyles}>
           <CellsSearch searchValue={searchValue} onSearch={onSearch} onClearSearch={onClearSearch} />
+          <CellsFilters cellsRepository={cellsRepository} />
           {searchStatus === 'loading' && <CellsTableLoader />}
-          {searchStatus === 'error' && <p>{t('cellsGlobalView.searchFailed')}</p>}
+          {searchStatus === 'error' && <p>{t('cells.search.failed')}</p>}
         </div>
         <CellsRefresh onRefresh={onRefresh} />
       </div>

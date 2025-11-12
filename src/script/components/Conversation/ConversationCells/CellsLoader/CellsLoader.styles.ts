@@ -23,6 +23,7 @@ export const wrapperStyles: CSSObject = {
   display: 'flex',
   justifyContent: 'center',
   alignItems: 'center',
-  marginTop: '48px',
   width: '100%',
+  maxHeight: '100%',
+  flex: 1,
 };

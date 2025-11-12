@@ -17,21 +17,19 @@
  *
  */
 
-import {render, waitFor, act} from '@testing-library/react';
-import ko from 'knockout';
+import {act, render, waitFor} from '@testing-library/react';
 
-import {useMatchMedia, QUERY} from '@wireapp/react-ui-kit';
+import {QUERY, useMatchMedia} from '@wireapp/react-ui-kit';
 
-import {withTheme} from 'src/script/auth/util/test/TestUtil';
-import {Call} from 'src/script/calling/Call';
-import {Participant} from 'src/script/calling/Participant';
-import {Grid} from 'src/script/calling/videoGridHandler';
-import {Conversation} from 'src/script/entity/Conversation';
-import {User} from 'src/script/entity/User';
-import {MediaDevicesHandler} from 'src/script/media/MediaDevicesHandler';
-import {PropertiesRepository} from 'src/script/properties/PropertiesRepository';
-import {PropertiesService} from 'src/script/properties/PropertiesService';
-import {SelfService} from 'src/script/self/SelfService';
+import {Call} from 'Repositories/calling/Call';
+import {Participant} from 'Repositories/calling/Participant';
+import {Grid} from 'Repositories/calling/videoGridHandler';
+import {Conversation} from 'Repositories/entity/Conversation';
+import {User} from 'Repositories/entity/User';
+import {PropertiesRepository} from 'Repositories/properties/PropertiesRepository';
+import {PropertiesService} from 'Repositories/properties/PropertiesService';
+import {SelfService} from 'Repositories/self/SelfService';
+import {buildMediaDevicesHandler, withTheme} from 'src/script/auth/util/test/TestUtil';
 
 import {FullscreenVideoCall, FullscreenVideoCallProps} from './FullscreenVideoCall';
 
@@ -48,11 +46,14 @@ describe('fullscreenVideoCall', () => {
     spyOn(conversation, 'supportsVideoCall').and.returnValue(true);
     const selfUser = new User('');
     selfUser.isMe = true;
-    const call = new Call({domain: '', id: ''}, new Conversation('', ''), 0, new Participant(selfUser, ''), 0, {
-      currentAvailableDeviceId: {
-        audiooutput: ko.pureComputed(() => 'test'),
-      },
-    } as MediaDevicesHandler);
+    const call = new Call(
+      {domain: '', id: ''},
+      new Conversation('', ''),
+      0,
+      new Participant(selfUser, ''),
+      0,
+      buildMediaDevicesHandler(),
+    );
     const props: Partial<FullscreenVideoCallProps> = {
       call,
       canShareScreen: false,
@@ -60,19 +61,7 @@ describe('fullscreenVideoCall', () => {
       isChoosingScreen: false,
       isMuted: false,
       propertiesRepository: new PropertiesRepository({} as PropertiesService, {} as SelfService),
-      mediaDevicesHandler: {
-        availableDevices: {
-          audioinput: ko.observableArray(),
-          videoinput: ko.observableArray(),
-          audiooutput: ko.observableArray(),
-        },
-        currentDeviceId: {
-          audioinput: ko.observable(''),
-          audiooutput: ko.observable(''),
-          screeninput: ko.observable(''),
-          videoinput: ko.observable(''),
-        },
-      } as MediaDevicesHandler,
+      mediaDevicesHandler: buildMediaDevicesHandler(),
       videoGrid: {grid: [], thumbnail: null} as Grid,
     };
     return props as FullscreenVideoCallProps;
