@@ -34,6 +34,8 @@ module.exports = defineConfig({
   fullyParallel: true,
   /* Fail the build on CI if you accidentally left test.only in the source code. */
   forbidOnly: !!process.env.CI,
+  /* Due to the tests usually requiring registration and login of a new user the default 30s timeout isn't sufficient */
+  timeout: 90_000,
   /* Retry on CI only */
   retries: process.env.CI ? numberOfRetriesOnCI : 0,
   /* Opt out of parallel tests on CI. */
