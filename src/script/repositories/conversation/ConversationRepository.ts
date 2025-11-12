@@ -4369,8 +4369,14 @@ export class ConversationRepository {
 
       const {new_group_id: newGroupId, group_id: oldGroupId} = eventJson.data;
 
-      await this.core.service?.conversation.wipeMLSConversation(oldGroupId);
-      const existingConversation = this.core.service?.conversation.mlsGroupExistsLocally(newGroupId);
+      const conversationService = this.core.service?.conversation;
+
+      if (!conversationService) {
+        throw new Error('Conversation service is not available!');
+      }
+
+      await conversationService.wipeMLSConversation(oldGroupId);
+      const existingConversation = await conversationService.mlsGroupExistsLocally(newGroupId);
 
       if (existingConversation) {
         this.logger.info(
