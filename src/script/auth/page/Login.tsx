@@ -23,6 +23,7 @@ import {LoginData} from '@wireapp/api-client/lib/auth';
 import {ClientType} from '@wireapp/api-client/lib/client/index';
 import {BackendError, BackendErrorLabel, SyntheticErrorLabel} from '@wireapp/api-client/lib/http/';
 import {StatusCodes} from 'http-status-codes';
+import {FormattedMessage} from 'react-intl';
 import {connect} from 'react-redux';
 import {useNavigate} from 'react-router-dom';
 import {AnyAction, Dispatch} from 'redux';
@@ -71,6 +72,7 @@ import {Exception} from '../component/Exception';
 import {JoinGuestLinkPasswordModal} from '../component/JoinGuestLinkPasswordModal';
 import {LoginForm} from '../component/LoginForm';
 import {EXTERNAL_ROUTE} from '../externalRoute';
+import {useRouteA11y} from '../hooks/useRouteA11y';
 import {actionRoot} from '../module/action/';
 import {LabeledError} from '../module/action/LabeledError';
 import {ValidationError} from '../module/action/ValidationError';
@@ -129,6 +131,11 @@ const LoginComponent = ({
   const isEnterpriseLoginV2Enabled = getEnterpriseLoginV2FF();
 
   const isOauth = UrlUtil.hasURLParameter(QUERY_KEY.SCOPE, window.location.hash);
+
+  const [screen, setScreen] = useState<'login' | 'verify'>('login');
+
+  // this triggers the hook every time screen changes under the same route
+  useRouteA11y(screen);
 
   const {
     ENABLE_ACCOUNT_REGISTRATION: isAccountRegistrationEnabled,
@@ -297,6 +304,7 @@ const LoginComponent = ({
             if (login.email || login.handle) {
               await doSendTwoFactorCode(login.email || login.handle || '');
               setTwoFactorLoginData(login);
+              setScreen('verify');
               await doSetLocalStorage(QUERY_KEY.JOIN_EXPIRES, Date.now() + 1000 * 60 * 10);
             }
             break;
@@ -424,11 +432,26 @@ const LoginComponent = ({
               >
                 {twoFactorLoginData ? (
                   <div>
-                    <Text fontSize="1.5rem" css={{fontWeight: '500'}} center block>
+                    <Text
+                      fontSize="1.5rem"
+                      css={{fontWeight: '500'}}
+                      center
+                      block
+                      role="heading"
+                      aria-level={1}
+                      data-page-title
+                      tabIndex={-1}
+                    >
                       {t('login.twoFactorLoginTitle')}
                     </Text>
-                    <Text data-uie-name="label-with-email" fontSize="1rem">
-                      {t('login.twoFactorLoginSubHead', {email: twoFactorLoginData.email as string})}
+                    <Text block data-uie-name="label-with-email" fontSize="1rem" css={styles.subhead}>
+                      <FormattedMessage
+                        id="login.twoFactorLoginSubHead"
+                        values={{
+                          email: twoFactorLoginData.email as string,
+                          newline: <br />,
+                        }}
+                      />
                     </Text>
                     <Label markInvalid={!!twoFactorSubmitError}>
                       <CodeInput
@@ -436,6 +459,8 @@ const LoginComponent = ({
                         style={{marginTop: '1rem'}}
                         onCodeComplete={submitTwoFactorLogin}
                         data-uie-name="enter-code"
+                        codeInputLabel={t('verify.codeLabel')}
+                        codePlaceholder={t('verify.codePlaceholder')}
                       />
                     </Label>
                     <div style={{display: 'flex', justifyContent: 'center', marginTop: 10}}>

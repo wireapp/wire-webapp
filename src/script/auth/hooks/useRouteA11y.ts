@@ -21,7 +21,7 @@ import {useEffect} from 'react';
 
 import {useLocation} from 'react-router-dom';
 
-export function useRouteA11y() {
+export function useRouteA11y(screenKey?: string) {
   const location = useLocation();
 
   useEffect(() => {
@@ -49,5 +49,5 @@ export function useRouteA11y() {
       element.removeEventListener('blur', handleBlur);
     };
     element.addEventListener('blur', handleBlur);
-  }, [location.key]);
+  }, [location.key, screenKey]);
 }

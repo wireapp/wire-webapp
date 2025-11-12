@@ -1968,6 +1968,8 @@ declare module 'I18n/en-US.json' {
     'verify.headline': `You’ve got mail`;
     'verify.resendCode': `Resend code`;
     'verify.subhead': `Enter the six-digit verification code we sent to{newline}{email}`;
+    'verify.codeLabel': `Six-digit code`;
+    'verify.codePlaceholder': `Input field, enter digit`;
     'videoCallMenuMoreAddReaction': `Add reaction`;
     'videoCallMenuMoreAudioSettings': `Audio Settings`;
     'videoCallMenuMoreChangeView': `Change view`;
