@@ -35,7 +35,6 @@ Prerequisites:
 
 1. Rename `.env.localhost` to `.env` in order to configure the application. This configuration can override/extend the configuration from the previous step.
 1. Add the following entries to your hosts file (macOS / Linux: `/etc/hosts`, Windows 10: `%WINDIR%\system32\drivers\etc\hosts`):
-   - `127.0.0.1 local.wire.com` (to connect with production backend)
    - `127.0.0.1 local.zinfra.io` (to connect with staging backend)
    - `127.0.0.1 local.imai.wire.link` (to connect with imai backend)
 1. Run `yarn start` and Wire's web app will be available at: https://local.zinfra.io:8081/auth/
@@ -51,14 +50,6 @@ If you would like your browser to trust the certificate from "local.wire.com"/"l
 #### Environment Configuration
 
 The application can be configured to connect to different environments by modifying the following environment variables in your `.env` file:
-
-**Production:**
-
-```
-APP_BASE="https://local.wire.com:8081"
-BACKEND_REST="https://prod-nginz-https.wire.com"
-BACKEND_WS="https://prod-nginz-ssl.wire.com"
-```
 
 **Staging:**
 
