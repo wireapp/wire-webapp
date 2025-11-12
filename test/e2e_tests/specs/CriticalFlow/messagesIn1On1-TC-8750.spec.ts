@@ -176,11 +176,11 @@ test('Messages in 1:1', {tag: ['@TC-8750', '@crit-flow-web']}, async ({pageManag
   await test.step('User A sends a quick (10 sec) self deleting message', async () => {
     await components.inputBarControls().setEphemeralTimerTo('10 seconds');
     await pages.conversation().sendMessage(selfDestructMessageText);
-    await expect(pages.conversation().getMessage(selfDestructMessageText)).toBeVisible();
+    await expect(pages.conversation().getMessage({content: selfDestructMessageText})).toBeVisible();
   });
 
   await test.step('User B sees the message', async () => {
-    await expect(memberBPM.webapp.pages.conversation().getMessage(selfDestructMessageText)).toBeVisible();
+    await expect(memberBPM.webapp.pages.conversation().getMessage({content: selfDestructMessageText})).toBeVisible();
   });
 
   // Step 7: Message removal
@@ -188,8 +188,10 @@ test('Messages in 1:1', {tag: ['@TC-8750', '@crit-flow-web']}, async ({pageManag
     await memberBPM.webapp.pages.conversation().page.waitForTimeout(11_000);
   });
   await test.step('Both users see the message as removed', async () => {
-    await expect(memberBPM.webapp.pages.conversation().getMessage(selfDestructMessageText)).not.toBeVisible();
-    await expect(pages.conversation().getMessage(selfDestructMessageText)).not.toBeVisible();
+    await expect(
+      memberBPM.webapp.pages.conversation().getMessage({content: selfDestructMessageText}),
+    ).not.toBeVisible();
+    await expect(pages.conversation().getMessage({content: selfDestructMessageText})).not.toBeVisible();
 
     // Reset ephemeral timer to 'Off'
     await components.inputBarControls().setEphemeralTimerTo('Off');

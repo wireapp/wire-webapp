@@ -101,7 +101,7 @@ test(
       await userBPageManager.refreshPage({waitUntil: 'load'});
 
       await userBPages.conversationList().openConversation(channelName);
-      await expect(userBPages.conversation().getMessage(`@${userB.fullName} ${messageText}`)).toBeVisible();
+      await expect(userBPages.conversation().getMessage({content: `@${userB.fullName} ${messageText}`})).toBeVisible();
     });
 
     await test.step('User A sends image', async () => {
@@ -165,11 +165,11 @@ test(
     await test.step('User A sends a quick (10 sec) self deleting message', async () => {
       await userAComponents.inputBarControls().setEphemeralTimerTo('10 seconds');
       await userAPages.conversation().sendMessage(selfDestructMessageText);
-      await expect(userAPages.conversation().getMessage(selfDestructMessageText)).toBeVisible();
+      await expect(userAPages.conversation().getMessage({content: selfDestructMessageText})).toBeVisible();
     });
 
     await test.step('User B sees the message', async () => {
-      await expect(userBPages.conversation().getMessage(selfDestructMessageText)).toBeVisible();
+      await expect(userBPages.conversation().getMessage({content: selfDestructMessageText})).toBeVisible();
     });
 
     await test.step('User B waits 10 seconds', async () => {
@@ -177,8 +177,8 @@ test(
     });
 
     await test.step('Both users see the message as removed', async () => {
-      await expect(userBPages.conversation().getMessage(selfDestructMessageText)).not.toBeVisible();
-      await expect(userAPages.conversation().getMessage(selfDestructMessageText)).not.toBeVisible();
+      await expect(userBPages.conversation().getMessage({content: selfDestructMessageText})).not.toBeVisible();
+      await expect(userAPages.conversation().getMessage({content: selfDestructMessageText})).not.toBeVisible();
 
       // Reset ephemeral timer to 'Off'
       await userAComponents.inputBarControls().setEphemeralTimerTo('Off');

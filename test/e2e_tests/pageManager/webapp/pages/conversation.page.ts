@@ -202,17 +202,26 @@ export class ConversationPage {
   }
 
   /**
-   * Util to get a message in the conversation sent by a given user
-   * @param user Optional parameter to specify user who sent the message. If undefined the last message matching the content will be returned.
+   * Util to get a message in the conversation
+   * @param options.content Only match messages containing this text
+   * @param options.sender Only match messages send by this user
+   * @returns a Locator to the matching message(s)
    */
-  getMessage(messageContent: string, user?: User) {
-    const message = this.messageItems.filter({hasText: messageContent});
+  getMessage(options?: {content?: string | RegExp; sender?: User}): Locator {
+    let message = this.messageItems;
 
-    if (user !== undefined) {
-      return message.filter({has: this.page.getByTestId('sender-name').getByText(user.fullName)});
+    if (options?.content) {
+      message = message.filter({hasText: options.content});
     }
 
-    return message.last();
+    if (options?.sender?.fullName) {
+      message = message.filter({
+        // Using getByLabel doesn't work here as the aria label is just placed on a div with no input inside which could be located
+        has: this.page.locator(`.content-message-wrapper[aria-label*="${options.sender.fullName}"]`),
+      });
+    }
+
+    return message;
   }
 
   /**

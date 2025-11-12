@@ -74,7 +74,7 @@ test('Conversation Management', {tag: ['@TC-8636', '@crit-flow-web']}, async ({p
     await pages.conversationList().openConversation(conversationName);
     await Promise.all(
       members.map(async member => {
-        const message = pages.conversation().getMessage(`Hello team! ${member.firstName} here.`);
+        const message = pages.conversation().getMessage({content: `Hello team! ${member.firstName} here.`});
         await expect(message).toBeVisible();
       }),
     );
@@ -85,11 +85,11 @@ test('Conversation Management', {tag: ['@TC-8636', '@crit-flow-web']}, async ({p
     await components.inputBarControls().setEphemeralTimerTo('10 seconds');
     await pages.conversation().sendMessage(textMessage);
 
-    await expect(pages.conversation().getMessage(textMessage)).toBeVisible();
+    await expect(pages.conversation().getMessage({content: textMessage})).toBeVisible();
     // Wait for more than 10 seconds to ensure the message is deleted
     await pages.conversation().page.waitForTimeout(11000);
 
-    await expect(pages.conversation().getMessage(textMessage)).not.toBeVisible();
+    await expect(pages.conversation().getMessage({content: textMessage})).not.toBeVisible();
     await components.inputBarControls().setEphemeralTimerTo('Off');
   });
 
