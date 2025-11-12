@@ -27,7 +27,7 @@ import {
   ADD_PERMISSION,
 } from '@wireapp/api-client/lib/conversation';
 import {RECEIPT_MODE} from '@wireapp/api-client/lib/conversation/data';
-import {ConversationProtocol} from '@wireapp/api-client/lib/conversation/NewConversation';
+import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 import type {QualifiedId} from '@wireapp/api-client/lib/user/';
 
 import {LegalHoldStatus} from '@wireapp/protocol-messaging';
@@ -53,7 +53,7 @@ export interface ConversationRecord {
   add_permission?: ADD_PERMISSION;
   epoch: number;
   id: string;
-  initial_protocol?: ConversationProtocol;
+  initial_protocol?: CONVERSATION_PROTOCOL;
   is_guest: boolean;
   last_event_timestamp: number;
   last_read_timestamp: number;
@@ -63,7 +63,7 @@ export interface ConversationRecord {
   muted_timestamp: number;
   name: string;
   others: string[];
-  protocol: ConversationProtocol;
+  protocol: CONVERSATION_PROTOCOL;
   qualified_others: QualifiedId[];
   receipt_mode: RECEIPT_MODE | null;
   roles: {[userId: string]: DefaultConversationRoleName | string};

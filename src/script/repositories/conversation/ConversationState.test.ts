@@ -17,7 +17,8 @@
  *
  */
 
-import {ConversationProtocol, CONVERSATION_TYPE} from '@wireapp/api-client/lib/conversation';
+import {CONVERSATION_TYPE} from '@wireapp/api-client/lib/conversation';
+import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 
 import {randomUUID} from 'crypto';
 
@@ -31,9 +32,9 @@ function createConversationState() {
   return new ConversationState(new UserState(), new TeamState());
 }
 
-function createConversation(protocol?: ConversationProtocol, type?: CONVERSATION_TYPE) {
+function createConversation(protocol?: CONVERSATION_PROTOCOL, type?: CONVERSATION_TYPE) {
   const conversation = new Conversation(randomUUID(), '', protocol);
-  if (protocol === ConversationProtocol.MLS) {
+  if (protocol === CONVERSATION_PROTOCOL.MLS) {
     conversation.groupId = `groupid-${randomUUID()}`;
     conversation.epoch = 0;
   }
@@ -44,8 +45,8 @@ function createConversation(protocol?: ConversationProtocol, type?: CONVERSATION
 }
 
 describe('ConversationState', () => {
-  const selfProteusConversation = createConversation(ConversationProtocol.PROTEUS, CONVERSATION_TYPE.SELF);
-  const selfMLSConversation = createConversation(ConversationProtocol.MLS, CONVERSATION_TYPE.SELF);
+  const selfProteusConversation = createConversation(CONVERSATION_PROTOCOL.PROTEUS, CONVERSATION_TYPE.SELF);
+  const selfMLSConversation = createConversation(CONVERSATION_PROTOCOL.MLS, CONVERSATION_TYPE.SELF);
   const regularConversation = createConversation();
 
   describe('getSelfProteusConversation', () => {
@@ -105,7 +106,7 @@ describe('ConversationState', () => {
       const conversationState = createConversationState();
 
       const conversations = [
-        createConversation(ConversationProtocol.MLS),
+        createConversation(CONVERSATION_PROTOCOL.MLS),
         regularConversation,
         selfProteusConversation,
         selfMLSConversation,

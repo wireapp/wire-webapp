@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2020 Wire Swiss GmbH
+ * Copyright (C) 2025 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,8 +17,12 @@
  *
  */
 
-// Prevent animations delaying ui changes
-jest.mock('@wireapp/react-ui-kit', () => {
-  const uiKit = jest.requireActual('@wireapp/react-ui-kit');
-  return {...uiKit, Transition: ({children}: any) => children, TransitionContainer: ({children}: any) => children};
-});
+import {Page} from '@playwright/test';
+
+import {BaseModal} from './base.modal';
+
+export class CancelRequestModal extends BaseModal {
+  constructor(page: Page) {
+    super(page, "[data-uie-name='primary-modals-container']");
+  }
+}

@@ -19,6 +19,8 @@
 
 import {Page, Locator} from '@playwright/test';
 
+import {selectByDataAttribute} from 'test/e2e_tests/utils/selector.util';
+
 export class CallingPage {
   readonly page: Page;
 
@@ -93,7 +95,7 @@ export class CallingPage {
   }
 
   waitForGoFullScreen(): Promise<void> {
-    return this.goFullScreen.waitFor({state: 'visible'});
+    return this.fullScreen.waitFor({state: 'visible'});
   }
 
   waitForSelfVideoThumbnail(): Promise<void> {
@@ -106,8 +108,8 @@ export class CallingPage {
 
   // ─── Fullscreen Controls ────────────────────────────────────────────────
 
-  maximizeCell(): Promise<void> {
-    return this.goFullScreen.click();
+  async maximizeCell() {
+    await this.goFullScreen.click();
   }
 
   // ─── Mute Controls ──────────────────────────────────────────────────────
@@ -117,12 +119,12 @@ export class CallingPage {
     return state === 'active';
   }
 
-  muteSelfInFullScreen(): Promise<void> {
-    return this.fullScreenMuteButton.click();
+  async muteSelfInFullScreen() {
+    return await this.fullScreenMuteButton.click();
   }
 
-  unmuteSelfInFullScreen(): Promise<void> {
-    return this.fullScreenMuteButton.click();
+  async unmuteSelfInFullScreen() {
+    await this.fullScreenMuteButton.click();
   }
 
   isFullScreenMuteButtonVisible(): Promise<boolean> {
@@ -154,10 +156,10 @@ export class CallingPage {
   // ─── Dynamic Selector Generators ─────────────────────────────────────────
 
   static selectorForParticipantName(userId: string): string {
-    return `[data-uie-name="call-participant-name"][data-uie-value="${userId}"]`;
+    return `${selectByDataAttribute('call-participant-name')}${selectByDataAttribute(userId, 'value')}`;
   }
 
   static selectorForMuteIcon(userId: string): string {
-    return `[data-uie-name="mic-icon-off"][data-uie-value="${userId}"]`;
+    return `${selectByDataAttribute('mic-icon-off')}${selectByDataAttribute(userId, 'value')}`;
   }
 }

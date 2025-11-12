@@ -18,9 +18,9 @@
  */
 
 import {generateUUID} from '@datadog/browser-core';
-import {ConversationProtocol} from '@wireapp/api-client/lib/conversation';
 import {RECEIPT_MODE} from '@wireapp/api-client/lib/conversation/data';
 import {USER_EVENT, UserUpdateEvent} from '@wireapp/api-client/lib/event';
+import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 import type {User as APIClientUser} from '@wireapp/api-client/lib/user';
 import {amplify} from 'amplify';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
@@ -396,8 +396,8 @@ describe('UserRepository', () => {
       const user = new User(generateUUID());
       userState.users.push(user);
       userState.self(user);
-      const initialSupportedProtocols = [ConversationProtocol.PROTEUS];
-      const newSupportedProtocols = [ConversationProtocol.PROTEUS, ConversationProtocol.MLS];
+      const initialSupportedProtocols = [CONVERSATION_PROTOCOL.PROTEUS];
+      const newSupportedProtocols = [CONVERSATION_PROTOCOL.PROTEUS, CONVERSATION_PROTOCOL.MLS];
       user.supportedProtocols(initialSupportedProtocols);
       const userUpdateEvent: UserUpdateEvent = {
         type: USER_EVENT.UPDATE,
@@ -422,8 +422,8 @@ describe('UserRepository', () => {
       userState.users.push(user);
       userState.self(selfUser);
 
-      const initialSupportedProtocols = [ConversationProtocol.PROTEUS];
-      const newSupportedProtocols = [ConversationProtocol.PROTEUS, ConversationProtocol.MLS];
+      const initialSupportedProtocols = [CONVERSATION_PROTOCOL.PROTEUS];
+      const newSupportedProtocols = [CONVERSATION_PROTOCOL.PROTEUS, CONVERSATION_PROTOCOL.MLS];
 
       user.supportedProtocols(initialSupportedProtocols);
 
@@ -455,8 +455,8 @@ describe('UserRepository', () => {
       const selfUser = new User(generateUUID());
       userState.self(selfUser);
 
-      const initialSupportedProtocols = [ConversationProtocol.PROTEUS, ConversationProtocol.MLS];
-      const newSupportedProtocols = [ConversationProtocol.PROTEUS, ConversationProtocol.MLS];
+      const initialSupportedProtocols = [CONVERSATION_PROTOCOL.PROTEUS, CONVERSATION_PROTOCOL.MLS];
+      const newSupportedProtocols = [CONVERSATION_PROTOCOL.PROTEUS, CONVERSATION_PROTOCOL.MLS];
 
       user.supportedProtocols(initialSupportedProtocols);
 
@@ -485,7 +485,7 @@ describe('UserRepository', () => {
       const selfUser = new User(generateUUID());
       userState.self(selfUser);
 
-      const initialSupportedProtocols = [ConversationProtocol.PROTEUS, ConversationProtocol.MLS];
+      const initialSupportedProtocols = [CONVERSATION_PROTOCOL.PROTEUS, CONVERSATION_PROTOCOL.MLS];
 
       user.supportedProtocols(initialSupportedProtocols);
 

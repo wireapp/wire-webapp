@@ -23,7 +23,6 @@ import type {
   ConversationCode,
   CONVERSATION_ACCESS,
   RemoteConversations,
-  ConversationProtocol,
   ADD_PERMISSION,
 } from '@wireapp/api-client/lib/conversation';
 import type {
@@ -43,6 +42,7 @@ import type {
   ConversationReceiptModeUpdateEvent,
   ConversationRenameEvent,
 } from '@wireapp/api-client/lib/event';
+import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {MLSServiceEvents} from '@wireapp/core/lib/messagingProtocols/mls';
 import {container} from 'tsyringe';
@@ -144,7 +144,7 @@ export class ConversationService {
    */
   updateConversationProtocol(
     conversationId: QualifiedId,
-    protocol: ConversationProtocol.MIXED | ConversationProtocol.MLS,
+    protocol: CONVERSATION_PROTOCOL.MIXED | CONVERSATION_PROTOCOL.MLS,
   ): Promise<ConversationProtocolUpdateEvent | null> {
     return this.apiClient.api.conversation.putConversationProtocol(conversationId, protocol);
   }

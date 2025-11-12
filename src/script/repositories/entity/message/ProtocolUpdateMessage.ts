@@ -17,14 +17,14 @@
  *
  */
 
-import {ConversationProtocol} from '@wireapp/api-client/lib/conversation';
+import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 
 import {SystemMessageType} from 'src/script/message/SystemMessageType';
 
 import {SystemMessage} from './SystemMessage';
 
 export class ProtocolUpdateMessage extends SystemMessage {
-  constructor(public protocol: ConversationProtocol.MIXED | ConversationProtocol.MLS) {
+  constructor(public protocol: CONVERSATION_PROTOCOL.MIXED | CONVERSATION_PROTOCOL.MLS) {
     super();
     this.system_message_type = SystemMessageType.CONVERSATION_PROTOCOL_UPDATE;
   }

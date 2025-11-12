@@ -18,7 +18,7 @@
  */
 
 import {ConnectionStatus} from '@wireapp/api-client/lib/connection/';
-import {ConversationProtocol} from '@wireapp/api-client/lib/conversation';
+import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {amplify} from 'amplify';
 import ko from 'knockout';
@@ -103,7 +103,7 @@ export class User {
   /** The federated domain (when the user is on a federated server) */
   public domain: string;
   public readonly isBlockedLegalHold: ko.PureComputed<boolean>;
-  public readonly supportedProtocols: ko.Observable<null | ConversationProtocol[]>;
+  public readonly supportedProtocols: ko.Observable<null | CONVERSATION_PROTOCOL[]>;
 
   public static get ACCENT_COLOR() {
     return {
@@ -151,7 +151,7 @@ export class User {
 
     this.name = ko.observable('');
 
-    this.supportedProtocols = ko.observable<null | ConversationProtocol[]>(null);
+    this.supportedProtocols = ko.observable<null | CONVERSATION_PROTOCOL[]>(null);
 
     this.managedBy = ko.observable(User.CONFIG.MANAGED_BY.WIRE);
 

@@ -28,8 +28,6 @@ import {User} from 'Repositories/entity/User';
 import {TestFactory} from '../../../../test/helper/TestFactory';
 import {withTheme} from '../../auth/util/test/TestUtil';
 
-jest.mock('@wireapp/api-client/lib/team');
-
 const testFactory = new TestFactory();
 let conversationRepository: ConversationRepository;
 

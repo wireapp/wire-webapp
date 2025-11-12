@@ -17,7 +17,7 @@
  *
  */
 
-import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
+import {Button, ButtonVariant, CollectionIcon} from '@wireapp/react-ui-kit';
 
 import * as Icon from 'Components/Icon';
 import {MemberMessage as MemberMessageEntity} from 'Repositories/entity/message/MemberMessage';
@@ -41,6 +41,7 @@ interface MemberMessageProps {
   onClickParticipants: (participants: User[]) => void;
   shouldShowInvitePeople: boolean;
   conversationName: string;
+  isCellsConversation: boolean;
 }
 
 export const MemberMessage = ({
@@ -53,6 +54,7 @@ export const MemberMessage = ({
   onClickCancelRequest,
   classifiedDomains,
   conversationName,
+  isCellsConversation,
 }: MemberMessageProps) => {
   const {otherUser, timestamp, user, htmlGroupCreationHeader, showNamedCreation, hasUsers} = useKoSubscribableChildren(
     message,
@@ -145,6 +147,17 @@ export const MemberMessage = ({
         </div>
       )}
 
+      {isGroupCreation && isCellsConversation && (
+        <div className="message-header" data-uie-name="label-cells-conversation">
+          <div className="message-header-icon message-header-icon--svg text-foreground">
+            <CollectionIcon />
+          </div>
+          <p className="message-header-label">
+            <span className="ellipsis">{t('conversationCellsConversationEnabled')}</span>
+          </p>
+        </div>
+      )}
+
       {isGroupCreation && hasReadReceiptsTurnedOn && (
         <div className="message-header" data-uie-name="label-group-creation-receipts">
           <div className="message-header-icon message-header-icon--svg text-foreground">
@@ -162,7 +175,7 @@ export const MemberMessage = ({
         </div>
       )}
 
-      {isGroupCreation && <E2eEncryptionMessage />}
+      {isGroupCreation && <E2eEncryptionMessage isCellsConversation={isCellsConversation} />}
     </>
   );
 };

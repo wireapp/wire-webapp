@@ -18,9 +18,8 @@
  */
 
 import {waitFor} from '@testing-library/react';
-import {ConversationProtocol} from '@wireapp/api-client/lib/conversation';
-import {FeatureList, FeatureStatus} from '@wireapp/api-client/lib/team';
-import {FEATURE_KEY} from '@wireapp/api-client/lib/team/feature';
+import {FeatureList} from '@wireapp/api-client/lib/team';
+import {CONVERSATION_PROTOCOL, FEATURE_KEY, FEATURE_STATUS} from '@wireapp/api-client/lib/team/feature';
 import {container} from 'tsyringe';
 
 import {ClientEntity} from 'Repositories/client';
@@ -34,11 +33,11 @@ import {Core} from '../../service/CoreSingleton';
 
 const testFactory = new TestFactory();
 
-const generateMLSFeatureConfig = (supportedProtocols: ConversationProtocol[]) => {
+const generateMLSFeatureConfig = (supportedProtocols: CONVERSATION_PROTOCOL[]) => {
   return {
     allowedCipherSuites: [1],
     defaultCipherSuite: 1,
-    defaultProtocol: ConversationProtocol.PROTEUS,
+    defaultProtocol: CONVERSATION_PROTOCOL.PROTEUS,
     protocolToggleUsers: [] as string[],
     supportedProtocols,
   };
@@ -55,9 +54,9 @@ describe('SelfRepository', () => {
     });
 
     it.each([
-      [[ConversationProtocol.PROTEUS], [ConversationProtocol.PROTEUS, ConversationProtocol.MLS]],
-      [[ConversationProtocol.PROTEUS, ConversationProtocol.MLS], [ConversationProtocol.PROTEUS]],
-      [[ConversationProtocol.PROTEUS], [ConversationProtocol.MLS]],
+      [[CONVERSATION_PROTOCOL.PROTEUS], [CONVERSATION_PROTOCOL.PROTEUS, CONVERSATION_PROTOCOL.MLS]],
+      [[CONVERSATION_PROTOCOL.PROTEUS, CONVERSATION_PROTOCOL.MLS], [CONVERSATION_PROTOCOL.PROTEUS]],
+      [[CONVERSATION_PROTOCOL.PROTEUS], [CONVERSATION_PROTOCOL.MLS]],
     ])('Updates the list of supported protocols', async (initialProtocols, evaluatedProtocols) => {
       const selfRepository = await testFactory.exposeSelfActors();
 
@@ -87,10 +86,10 @@ describe('SelfRepository', () => {
 
       const selfUser = selfRepository['userState'].self()!;
 
-      const initialProtocols = [ConversationProtocol.PROTEUS];
+      const initialProtocols = [CONVERSATION_PROTOCOL.PROTEUS];
       selfUser.supportedProtocols(initialProtocols);
 
-      const evaluatedProtocols = [ConversationProtocol.PROTEUS];
+      const evaluatedProtocols = [CONVERSATION_PROTOCOL.PROTEUS];
 
       jest.spyOn(SelfSupportedProtocols, 'evaluateSelfSupportedProtocols').mockResolvedValueOnce(evaluatedProtocols);
       jest.spyOn(selfRepository['selfService'], 'putSupportedProtocols');
@@ -113,10 +112,10 @@ describe('SelfRepository', () => {
 
       const selfUser = selfRepository['userState'].self()!;
 
-      const initialProtocols = [ConversationProtocol.PROTEUS];
+      const initialProtocols = [CONVERSATION_PROTOCOL.PROTEUS];
       selfUser.supportedProtocols(initialProtocols);
 
-      const evaluatedProtocols = [ConversationProtocol.PROTEUS];
+      const evaluatedProtocols = [CONVERSATION_PROTOCOL.PROTEUS];
 
       jest.spyOn(SelfSupportedProtocols, 'evaluateSelfSupportedProtocols').mockResolvedValueOnce(evaluatedProtocols);
       jest.spyOn(core.recurringTaskScheduler, 'registerTask');
@@ -173,10 +172,10 @@ describe('SelfRepository', () => {
 
       const selfUser = selfRepository['userState'].self()!;
 
-      const initialProtocols = [ConversationProtocol.PROTEUS];
+      const initialProtocols = [CONVERSATION_PROTOCOL.PROTEUS];
       selfUser.supportedProtocols(initialProtocols);
 
-      const evaluatedProtocols = [ConversationProtocol.PROTEUS, ConversationProtocol.MLS];
+      const evaluatedProtocols = [CONVERSATION_PROTOCOL.PROTEUS, CONVERSATION_PROTOCOL.MLS];
 
       jest.spyOn(SelfSupportedProtocols, 'evaluateSelfSupportedProtocols').mockResolvedValueOnce(evaluatedProtocols);
       jest.spyOn(selfRepository['selfService'], 'putSupportedProtocols');
@@ -198,10 +197,10 @@ describe('SelfRepository', () => {
 
       const selfUser = selfRepository['userState'].self()!;
 
-      const initialProtocols = [ConversationProtocol.PROTEUS, ConversationProtocol.MLS];
+      const initialProtocols = [CONVERSATION_PROTOCOL.PROTEUS, CONVERSATION_PROTOCOL.MLS];
       selfUser.supportedProtocols(initialProtocols);
 
-      const evaluatedProtocols = [ConversationProtocol.PROTEUS, ConversationProtocol.MLS];
+      const evaluatedProtocols = [CONVERSATION_PROTOCOL.PROTEUS, CONVERSATION_PROTOCOL.MLS];
 
       jest.spyOn(SelfSupportedProtocols, 'evaluateSelfSupportedProtocols').mockResolvedValueOnce(evaluatedProtocols);
       jest.spyOn(selfRepository['selfService'], 'putSupportedProtocols');
@@ -221,20 +220,20 @@ describe('SelfRepository', () => {
     it('refreshes self supported protocols on team supported protocols update', async () => {
       const selfRepository = await testFactory.exposeSelfActors();
 
-      const currentSupportedProtocols = [ConversationProtocol.PROTEUS];
-      const newSupportedProtocols = [ConversationProtocol.PROTEUS, ConversationProtocol.MLS];
+      const currentSupportedProtocols = [CONVERSATION_PROTOCOL.PROTEUS];
+      const newSupportedProtocols = [CONVERSATION_PROTOCOL.PROTEUS, CONVERSATION_PROTOCOL.MLS];
 
       const mockedFeatureList: FeatureList = {
         [FEATURE_KEY.MLS]: {
           config: generateMLSFeatureConfig(currentSupportedProtocols),
-          status: FeatureStatus.ENABLED,
+          status: FEATURE_STATUS.ENABLED,
         },
       };
 
       const mockedNewFeatureList: FeatureList = {
         [FEATURE_KEY.MLS]: {
           config: generateMLSFeatureConfig(newSupportedProtocols),
-          status: FeatureStatus.ENABLED,
+          status: FEATURE_STATUS.ENABLED,
         },
       };
 
@@ -251,11 +250,11 @@ describe('SelfRepository', () => {
     it('refreshes self supported protocols after mls feature is enabled', async () => {
       const selfRepository = await testFactory.exposeSelfActors();
 
-      const currentSupportedProtocols = [ConversationProtocol.PROTEUS, ConversationProtocol.MLS];
-      const currentFeatureStatus = FeatureStatus.DISABLED;
+      const currentSupportedProtocols = [CONVERSATION_PROTOCOL.PROTEUS, CONVERSATION_PROTOCOL.MLS];
+      const currentFeatureStatus = FEATURE_STATUS.DISABLED;
 
-      const newSupportedProtocols = [ConversationProtocol.PROTEUS, ConversationProtocol.MLS];
-      const newFeatureStatus = FeatureStatus.ENABLED;
+      const newSupportedProtocols = [CONVERSATION_PROTOCOL.PROTEUS, CONVERSATION_PROTOCOL.MLS];
+      const newFeatureStatus = FEATURE_STATUS.ENABLED;
 
       const mockedFeatureList: FeatureList = {
         [FEATURE_KEY.MLS]: {
@@ -286,20 +285,20 @@ describe('SelfRepository', () => {
     it('does not refresh self supported protocols if mls feature is updated without supported protocols change', async () => {
       const selfRepository = await testFactory.exposeSelfActors();
 
-      const currentSupportedProtocols = [ConversationProtocol.PROTEUS, ConversationProtocol.MLS];
-      const newSupportedProtocols = [ConversationProtocol.PROTEUS, ConversationProtocol.MLS];
+      const currentSupportedProtocols = [CONVERSATION_PROTOCOL.PROTEUS, CONVERSATION_PROTOCOL.MLS];
+      const newSupportedProtocols = [CONVERSATION_PROTOCOL.PROTEUS, CONVERSATION_PROTOCOL.MLS];
 
       const mockedFeatureList: FeatureList = {
         [FEATURE_KEY.MLS]: {
           config: generateMLSFeatureConfig(currentSupportedProtocols),
-          status: FeatureStatus.ENABLED,
+          status: FEATURE_STATUS.ENABLED,
         },
       };
 
       const mockedNewFeatureList: FeatureList = {
         [FEATURE_KEY.MLS]: {
           config: generateMLSFeatureConfig(newSupportedProtocols),
-          status: FeatureStatus.ENABLED,
+          status: FEATURE_STATUS.ENABLED,
         },
       };
 
@@ -320,14 +319,14 @@ describe('SelfRepository', () => {
       const mockedFeatureList: FeatureList = {
         [FEATURE_KEY.MLS_MIGRATION]: {
           config: {},
-          status: FeatureStatus.DISABLED,
+          status: FEATURE_STATUS.DISABLED,
         },
       };
 
       const mockedNewFeatureList: FeatureList = {
         [FEATURE_KEY.MLS_MIGRATION]: {
           config: {},
-          status: FeatureStatus.ENABLED,
+          status: FEATURE_STATUS.ENABLED,
         },
       };
 

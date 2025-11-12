@@ -28,7 +28,8 @@ import {VerificationMessageType} from 'src/script/message/VerificationMessageTyp
 import {createUuid} from 'Util/uuid';
 
 import {EventBuilder} from './EventBuilder';
-import {EventMapper} from './EventMapper';
+
+import {EventMapper} from '../EventMapper';
 
 describe('EventBuilder', () => {
   let event_mapper: EventMapper = undefined;

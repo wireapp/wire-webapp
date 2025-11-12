@@ -428,6 +428,8 @@ declare module 'I18n/en-US.json' {
     'cells.newItemMenuModalForm.genericError': `Something went wrong. Please try again`;
     'cells.newItemMenuModalForm.nameRequired': `Name is required`;
     'cells.noNodes.description': `You\'ll find all files and folders shared in this conversation here.`;
+    'cells.noNodes.global.description': `For conversations that use file collaboration, you\'ll find shared files here.`;
+    'cells.noNodes.global.heading': `There are no files yet`;
     'cells.noNodes.heading': `There are no files or folders yet`;
     'cells.options.delete': `Delete`;
     'cells.options.deletePermanently': `Delete permanently`;
@@ -472,7 +474,7 @@ declare module 'I18n/en-US.json' {
     'cells.search.closeButton': `Close`;
     'cells.search.failed': `Something went wrong, please try again later.`;
     'cells.search.placeholder': `Search files and folders`;
-    'cells.selfDeletingMessage.info': `Self-deleting messages are currently not available for conversations with Cells.`;
+    'cells.selfDeletingMessage.info': `The feature is not available for conversations with Cells.`;
     'cells.shareModal.copyLink': `Copy Link`;
     'cells.shareModal.disablePublicLink': `Disable public link`;
     'cells.shareModal.disablePublicLink.description': `Disable public link`;
@@ -587,7 +589,7 @@ declare module 'I18n/en-US.json' {
     'conversationClassified': `Security level: VS-NfD`;
     'conversationCommonFeature1': `Up to [bold]{capacity}[/bold] people`;
     'conversationCommonFeature2': `Video conferencing`;
-    'conversationCommonFeature3': `Always end-to-end encrypted`;
+    'conversationCommonFeature3': `Messages and calls are always end-to-end encrypted`;
     'conversationConnectWithNewUsers': `Connect with People`;
     'conversationConnectionAccepted': `Connected`;
     'conversationConnectionBlocked': `Blocked`;
@@ -602,6 +604,7 @@ declare module 'I18n/en-US.json' {
     'conversationContextMenuLike': `Like`;
     'conversationContextMenuReply': `Reply`;
     'conversationContextMenuUnlike': `Unlike`;
+    'conversationCellsConversationEnabled': `File collaboration (Cells beta) is on`;
     'conversationCreateReceiptsEnabled': `Read receipts are on`;
     'conversationCreateTeam': `with [showmore]all team members[/showmore]`;
     'conversationCreateTeamGuest': `with [showmore]all team members and one guest[/showmore]`;
@@ -624,6 +627,8 @@ declare module 'I18n/en-US.json' {
     'conversationDetailsActionArchive': `Archive`;
     'conversationDetailsActionBlock': `Block`;
     'conversationDetailsActionCancelRequest': `Cancel request`;
+    'conversationDetailsActionCellsTitle': `File collaboration (Cells beta version) is on`;
+    'conversationDetailsActionCellsOption': `Permanently on for this conversation.`;
     'conversationDetailsActionClear': `Clear content`;
     'conversationDetailsActionConversationParticipants': `Show all ({number})`;
     'conversationDetailsActionCreateGroup': `Create group`;
@@ -633,6 +638,7 @@ declare module 'I18n/en-US.json' {
     'conversationDetailsActionNotifications': `Notifications`;
     'conversationDetailsActionServicesOptions': `Apps`;
     'conversationDetailsActionTimedMessages': `Self-deleting messages`;
+    'conversationDetailsActionTimedMessagesDisabled': `Self-deleting messages are off`;
     'conversationDetailsActionUnblock': `Unblock`;
     'conversationDetailsCloseLabel': `Close image details view`;
     'conversationDetailsGroupAdmin': `Group Admin`;
@@ -766,6 +772,7 @@ declare module 'I18n/en-US.json' {
     'conversationMultipleMembersRemovedMissingLegalHoldConsent': `{users} were removed from this conversation because legal hold has been activated. [link]Learn more[/link]`;
     'conversationMultipleMembersRemovedMissingLegalHoldConsentMore': `{users} and {count} more were removed from this conversation because legal hold has been activated. [link]Learn more[/link]`;
     'conversationNameInput': `{type} name`;
+    'conversationNewCellsConversation': `Messages and calls are always end-to-end encrypted, whereas files and folders are secured in transit and encrypted at rest. `;
     'conversationNewConversation': `Communication in Wire is always end-to-end encrypted. Everything you send and receive in this conversation is only accessible to you and your contact.`;
     'conversationNotClassified': `Security level: Unclassified`;
     'conversationNotFoundMessage': `You may not have permission with this account or it no longer exists.`;
@@ -1375,8 +1382,8 @@ declare module 'I18n/en-US.json' {
     'modalCreateFolderHeadline': `Create new folder`;
     'modalCreateFolderMessage': `Move your conversation to a new folder.`;
     'modalCreateFolderPlaceholder': `Folder name`;
-    'modalCreateGroupCellsToggleHeading': `Files`;
-    'modalCreateGroupCellsToggleInfo': `Enable a shared Files section accessible to all group’s participants. This setting cannot be disabled once activated.`;
+    'modalCreateGroupCellsToggleHeading': `File collaboration (Cells beta version)`;
+    'modalCreateGroupCellsToggleInfo': `Enable participants to manage their documents and media files. Use folders, tags, and filters to work more efficiently. This can’t be undone.`;
     'modalCreateGroupProtocolHeading': `Protocol`;
     'modalCreateGroupProtocolInfo': `Select MLS to create a group conversation using the Messaging Layer Security protocol.`;
     'modalCreateGroupProtocolSelect.default': ` (default)`;

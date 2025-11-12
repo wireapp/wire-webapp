@@ -19,7 +19,7 @@
 
 import {ConnectionStatus} from '@wireapp/api-client/lib/connection/';
 import {CONVERSATION_TYPE} from '@wireapp/api-client/lib/conversation/';
-import {ConversationProtocol} from '@wireapp/api-client/lib/conversation/NewConversation';
+import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 import {MessageSendingState} from '@wireapp/core/lib/conversation';
 
 import {Account} from '@wireapp/core';
@@ -61,7 +61,7 @@ selfUser.isMe = true;
 
 const commonSendResponse = {
   onClientMismatch: expect.any(Function),
-  protocol: ConversationProtocol.PROTEUS,
+  protocol: CONVERSATION_PROTOCOL.PROTEUS,
 };
 
 type MessageRepositoryDependencies = {

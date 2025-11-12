@@ -58,7 +58,6 @@ test(
       addCreatedUser(userA);
       addCreatedUser(userB);
       await api.connectUsers(userA, userB);
-      await new Promise(resolve => setTimeout(resolve, 2000)); // Wait for connection to be updated
     });
 
     await test.step('Both users log in and open the group', async () => {
@@ -108,6 +107,7 @@ test(
       await userBPages.conversation().clickImage(userA);
 
       // Verify that the detail view modal is visible
+      await userBPageManager.waitForTimeout(500);
       expect(await userBModals.detailViewModal().isVisible()).toBeTruthy();
       expect(await userBModals.detailViewModal().isImageVisible()).toBeTruthy();
     });
@@ -127,9 +127,6 @@ test(
     });
 
     await test.step('User A can see the reaction', async () => {
-      // TODO: Bug [WPB-18226], remove this when fixed
-      await userAPageManager.refreshPage({waitUntil: 'load'});
-
       expect(await userAPages.conversation().isPlusOneReactionVisible()).toBeTruthy();
     });
 

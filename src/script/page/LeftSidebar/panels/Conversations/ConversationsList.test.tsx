@@ -20,7 +20,8 @@
 import {createRef} from 'react';
 
 import {render} from '@testing-library/react';
-import {ConversationProtocol, CONVERSATION_TYPE} from '@wireapp/api-client/lib/conversation';
+import {CONVERSATION_TYPE} from '@wireapp/api-client/lib/conversation';
+import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 import ko from 'knockout';
 
 import {CallState} from 'Repositories/calling/CallState';
@@ -33,7 +34,7 @@ import {ListViewModel} from 'src/script/view_model/ListViewModel';
 import {ConversationsList} from './ConversationsList';
 
 const create1to1Conversation = (userName: string) => {
-  const conversation = new Conversation('id', 'domain', ConversationProtocol.PROTEUS);
+  const conversation = new Conversation('id', 'domain', CONVERSATION_PROTOCOL.PROTEUS);
   const user = new User('id', 'domain');
   user.name(userName);
   conversation.type(CONVERSATION_TYPE.ONE_TO_ONE);

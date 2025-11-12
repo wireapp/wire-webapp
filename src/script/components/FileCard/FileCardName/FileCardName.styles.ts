@@ -28,7 +28,6 @@ export const textStyles: CSSObject = {
   WebkitBoxOrient: 'vertical',
   overflow: 'hidden',
   textOverflow: 'ellipsis',
-  whiteSpace: 'nowrap',
   marginTop: '4px',
 
   '[data-file-card="header"] &': {

@@ -18,8 +18,9 @@
  */
 
 import {AssetAuditData} from '@wireapp/api-client/lib/asset';
-import {ConversationProtocol, MessageSendingStatus, QualifiedUserClients} from '@wireapp/api-client/lib/conversation';
+import {MessageSendingStatus, QualifiedUserClients} from '@wireapp/api-client/lib/conversation';
 import {BackendErrorLabel} from '@wireapp/api-client/lib/http/';
+import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 import {QualifiedId, RequestCancellationError} from '@wireapp/api-client/lib/user';
 import {
   GenericMessageType,
@@ -733,7 +734,7 @@ export class MessageRepository {
 
     const auditData: AssetAuditData | undefined = isAuditLogEnabled
       ? {
-          convId: conversation.qualifiedId,
+          conversationId: conversation.qualifiedId,
           filename: meta.name,
           filetype: meta.type,
         }
@@ -896,14 +897,20 @@ export class MessageRepository {
 
     const injectOptimisticEvent = async () => {
       if (!skipInjection) {
-        const senderId = this.clientState.currentClient?.id;
+        const clientId = this.clientState.currentClient?.id;
+
+        if (!clientId) {
+          this.logger.error('No current client id found, cannot send message optimistically');
+          return true;
+        }
+
         const currentTimestamp = this.serverTimeHandler.toServerTimestamp();
-        const optimisticEvent = EventBuilder.buildMessageAdd(
-          conversation,
+        const optimisticEvent = EventBuilder.buildMessageAdd({
+          conversationEntity: conversation,
           currentTimestamp,
-          this.userState.self()!.id,
-          senderId,
-        );
+          senderId: this.userState.self()!.id,
+          clientId,
+        });
         this.trackContributed(conversation, payload);
         const mappedEvent = await this.cryptography_repository.cryptographyMapper.mapGenericMessage(
           payload,
@@ -938,7 +945,7 @@ export class MessageRepository {
       ? {
           groupId: conversation.groupId,
           payload,
-          protocol: ConversationProtocol.MLS,
+          protocol: CONVERSATION_PROTOCOL.MLS,
           conversationId: conversation.qualifiedId,
         }
       : {
@@ -946,7 +953,7 @@ export class MessageRepository {
           nativePush,
           onClientMismatch: mismatch => this.onClientMismatch?.(mismatch, conversation, silentDegradationWarning),
           payload,
-          protocol: ConversationProtocol.PROTEUS,
+          protocol: CONVERSATION_PROTOCOL.PROTEUS,
           targetMode,
           userIds: await this.generateRecipients(conversation, recipients, skipSelf),
         };
@@ -1049,7 +1056,7 @@ export class MessageRepository {
     await this.conversationService.send({
       conversationId: conversation.qualifiedId,
       payload: sessionReset,
-      protocol: ConversationProtocol.PROTEUS,
+      protocol: CONVERSATION_PROTOCOL.PROTEUS,
       targetMode: MessageTargetMode.USERS_CLIENTS,
       userIds: userClient, // we target this message to the specific client of the user (no need for mismatch handling here)
     });

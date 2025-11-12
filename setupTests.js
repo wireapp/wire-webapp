@@ -19,13 +19,22 @@
 
 /* eslint-disable import/order */
 
-// Polyfill for "tsyringe" dependency injection
+/**
+ * ---------------------------------------------------------------------------
+ * Global polyfills required by the application runtime inside the Jest env
+ * ---------------------------------------------------------------------------
+ */
 import 'core-js/full/reflect';
 import 'intersection-observer';
 import 'core-js/stable/structured-clone';
 import 'fake-indexeddb/auto';
 import '@testing-library/jest-dom';
 
+/**
+ * ---------------------------------------------------------------------------
+ * Wire specific side-effect mocks (mutate global objects when imported)
+ * ---------------------------------------------------------------------------
+ */
 import 'src/script/util/test/mock/createObjectURLMock';
 import 'src/script/util/test/mock/cryptoMock';
 import 'src/script/util/test/mock/matchMediaMock';
@@ -35,49 +44,30 @@ import 'src/script/util/test/mock/ResponseMock';
 import 'src/script/util/test/mock/WebRTCMock';
 import 'src/script/util/test/mock/resizeObserver.mock';
 import 'src/script/util/test/mock/wireEnvMock';
+import 'src/script/util/test/mock/browserApiMock';
 
-import encoding from 'text-encoding';
-
-jest.mock('axios', () => {
-  return {
-    create: () => {
-      return {
-        interceptors: {
-          request: {eject: jest.fn(), use: jest.fn()},
-          response: {eject: jest.fn(), use: jest.fn()},
-        },
-        request: jest.fn(),
-      };
-    },
-  };
-});
-
-window.TextEncoder = encoding.TextEncoder;
-window.TextDecoder = encoding.TextDecoder;
-
-window.z = {userPermission: {}};
-
-window.URL.createObjectURL = jest.fn();
-window.URL.revokeObjectURL = jest.fn();
-
-Object.defineProperty(document, 'elementFromPoint', {
-  writable: true,
-  value: jest.fn().mockImplementation((x, y) => {
-    return null;
-  }),
-});
-
+/**
+ * ---------------------------------------------------------------------------
+ * Testing library configuration
+ * ---------------------------------------------------------------------------
+ */
 const testLib = require('@testing-library/react');
 testLib.configure({testIdAttribute: 'data-uie-name'});
 
-jest.mock('@formkit/auto-animate/react', () => ({
-  useAutoAnimate: () => [null, () => {}],
-}));
+/**
+ * ---------------------------------------------------------------------------
+ * Third-party module mocks (implementations live in __mocks__)
+ * ---------------------------------------------------------------------------
+ */
+jest.mock('axios');
+jest.mock('@formkit/auto-animate/react');
+jest.mock('react-pdf');
+jest.mock('@wireapp/react-ui-kit');
+jest.mock('@wireapp/api-client/lib/team/feature/FeatureAPI');
+jest.mock('@wireapp/core');
+jest.mock('@wireapp/core-crypto');
 
-jest.mock('react-pdf', () => ({
-  pdfjs: {
-    GlobalWorkerOptions: {
-      workerSrc: 'pdf.worker.js',
-    },
-  },
-}));
+// Important: the team module re-exports FeatureAPI. Requiring both modules here
+// ensures Node's module cache captures the mocked constructors instead of the real ones.
+require('@wireapp/api-client/lib/team/feature/FeatureAPI');
+require('@wireapp/api-client/lib/team');

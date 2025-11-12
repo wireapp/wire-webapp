@@ -17,7 +17,7 @@
  *
  */
 
-import {ConversationProtocol} from '@wireapp/api-client/lib/conversation/NewConversation';
+import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 import {E2eiConversationState} from '@wireapp/core/lib/messagingProtocols/mls';
 
 import {Conversation} from 'Repositories/entity/Conversation';
@@ -46,7 +46,7 @@ describe('MLSConversationVerificationStateHandler', () => {
   let core: Core;
   const e2eiHandler = e2eIdentity.E2EIHandler.getInstance();
   const groupId = 'AAEAAKA0LuGtiU7NjqqlZIE2dQUAZWxuYS53aXJlLmxpbms=';
-  const conversation = new Conversation(createUuid(), '', ConversationProtocol.MLS);
+  const conversation = new Conversation(createUuid(), '', CONVERSATION_PROTOCOL.MLS);
   conversationState.conversations.push(conversation);
   conversation.groupId = groupId;
 
@@ -227,7 +227,7 @@ describe('MLSConversationVerificationStateHandler', () => {
 
       jest.spyOn(core.service!.mls!, 'conversationExists').mockResolvedValueOnce(true);
 
-      const newConversation = new Conversation(createUuid(), '', ConversationProtocol.MLS);
+      const newConversation = new Conversation(createUuid(), '', CONVERSATION_PROTOCOL.MLS);
       newConversation.groupId = 'AAEAAAOygT3TL0wljoaNabgK4yIAZWxuYS53aXJlLmxpbms=';
 
       jest.spyOn(e2eIdentity, 'getConversationVerificationState').mockResolvedValue(E2eiConversationState.Verified);

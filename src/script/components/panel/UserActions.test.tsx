@@ -19,7 +19,8 @@
 
 import {act, render} from '@testing-library/react';
 import {ConnectionStatus} from '@wireapp/api-client/lib/connection/';
-import {ConversationProtocol, CONVERSATION_TYPE} from '@wireapp/api-client/lib/conversation/';
+import {CONVERSATION_TYPE} from '@wireapp/api-client/lib/conversation/';
+import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 import {ClientMLSError, ClientMLSErrorLabel} from '@wireapp/core/lib/messagingProtocols/mls';
 import ko from 'knockout';
 import {container} from 'tsyringe';
@@ -300,7 +301,7 @@ describe('UserActions', () => {
     const conversation = new Conversation();
     jest.spyOn(conversation, 'participating_user_ids').mockImplementation(ko.observableArray([user]));
 
-    const one2oneConversation = new Conversation('123', 'domain', ConversationProtocol.PROTEUS);
+    const one2oneConversation = new Conversation('123', 'domain', CONVERSATION_PROTOCOL.PROTEUS);
     one2oneConversation.type(CONVERSATION_TYPE.ONE_TO_ONE);
     one2oneConversation.participating_user_ids.push(user.qualifiedId);
     one2oneConversation.participating_user_ets.push(user);
