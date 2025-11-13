@@ -64,7 +64,7 @@ jobs:
         with:
           status: ${{ job.status }}
           text: |
-            "✅ Cells Critical Flow E2E Tests on **${{ env.ENV }}** environment succeeded ✅"
+            ✅ Cells Critical Flow E2E Tests on **${{ env.ENV }}** environment succeeded ✅
             **CHANGELOG:** ${{ needs.changelog.outputs.changelog-url }}
             **Triggered by:** ${{ github.triggering_actor }}
             **Build log:** ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
@@ -78,7 +78,7 @@ jobs:
         with:
           status: ${{ job.status }}
           text: |
-            "❌ Cells Critical Flow E2E Tests on **${{ env.ENV }}** environment failed ❌"
+            ❌ Cells Critical Flow E2E Tests on **${{ env.ENV }}** environment failed ❌
             **CHANGELOG:** ${{ needs.changelog.outputs.changelog-url }}
             **Triggered by:** ${{ github.triggering_actor }}
             **Build log:** ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
