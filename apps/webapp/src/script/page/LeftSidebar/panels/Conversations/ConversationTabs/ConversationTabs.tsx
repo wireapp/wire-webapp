@@ -120,15 +120,17 @@ export const ConversationTabs = ({
   const channelConversationsLength = channelConversations.filter(filterUnreadAndArchivedConversations).length;
   const groupConversationsLength = groupConversations.filter(filterUnreadAndArchivedConversations).length;
 
-  const unreadCount = conversations.filter(conv => !conv.is_archived() && conv.hasUnread()).length;
-  const mentionsCount = conversations.filter(
+  const unreadCount = unreadConversations.filter(conv => !conv.is_archived()).length;
+  const mentionsCount = unreadConversations.filter(
     conv => !conv.is_archived() && conv.unreadState().selfMentions.length > 0,
   ).length;
-  const repliesCount = conversations.filter(
+  const repliesCount = unreadConversations.filter(
     conv => !conv.is_archived() && conv.unreadState().selfReplies.length > 0,
   ).length;
   const draftsCount = draftConversations.filter(conv => !conv.is_archived()).length;
-  const pingsCount = conversations.filter(conv => !conv.is_archived() && conv.unreadState().pings.length > 0).length;
+  const pingsCount = unreadConversations.filter(
+    conv => !conv.is_archived() && conv.unreadState().pings.length > 0,
+  ).length;
 
   const conversationTabs = [
     {
