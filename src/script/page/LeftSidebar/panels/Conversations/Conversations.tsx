@@ -106,7 +106,6 @@ export const Conversations = ({
     status: sidebarStatus,
     setStatus: setSidebarStatus,
     setCurrentTab,
-    conversationFilter,
   } = useSidebarStore(useShallow(state => state));
   const {isChannelsEnabled} = useChannelsFeatureFlag();
   const [conversationsFilter, setConversationsFilter] = useState<string>('');
@@ -200,7 +199,6 @@ export const Conversations = ({
     channelConversations,
     isChannelsEnabled,
     channelAndGroupConversations,
-    conversationFilter,
     draftConversations,
   });
 
