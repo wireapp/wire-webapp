@@ -169,6 +169,65 @@ export function getTabConversations({
     };
   }
 
+  if (currentTab === SidebarTabs.UNREAD) {
+    const filteredConversations = conversations
+      .filter(conversationArchivedFilter)
+      .filter(conv => conv.hasUnread())
+      .filter(conversationSearchFilter);
+
+    return {
+      conversations: filteredConversations,
+      searchInputPlaceholder: t('searchUnreadConversations'),
+    };
+  }
+
+  if (currentTab === SidebarTabs.MENTIONS) {
+    const filteredConversations = conversations
+      .filter(conversationArchivedFilter)
+      .filter(conv => conv.unreadState().selfMentions.length > 0)
+      .filter(conversationSearchFilter);
+
+    return {
+      conversations: filteredConversations,
+      searchInputPlaceholder: t('searchMentionsConversations'),
+    };
+  }
+
+  if (currentTab === SidebarTabs.REPLIES) {
+    const filteredConversations = conversations
+      .filter(conversationArchivedFilter)
+      .filter(conv => conv.unreadState().selfReplies.length > 0)
+      .filter(conversationSearchFilter);
+
+    return {
+      conversations: filteredConversations,
+      searchInputPlaceholder: t('searchRepliesConversations'),
+    };
+  }
+
+  if (currentTab === SidebarTabs.DRAFTS) {
+    const filteredConversations = draftConversations
+      .filter(conversationArchivedFilter)
+      .filter(conversationSearchFilter);
+
+    return {
+      conversations: filteredConversations,
+      searchInputPlaceholder: t('searchDraftsConversations'),
+    };
+  }
+
+  if (currentTab === SidebarTabs.PINGS) {
+    const filteredConversations = conversations
+      .filter(conversationArchivedFilter)
+      .filter(conv => conv.unreadState().pings.length > 0)
+      .filter(conversationSearchFilter);
+
+    return {
+      conversations: filteredConversations,
+      searchInputPlaceholder: t('searchPingsConversations'),
+    };
+  }
+
   return {
     conversations: [],
     searchInputPlaceholder: '',

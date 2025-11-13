@@ -584,6 +584,7 @@ declare module 'I18n/en-US.json' {
     'conversationAudioAssetUploadFailed': `Upload failed: {name}`;
     'conversationAudioAssetUploading': `Uploading: {name}`;
     'conversationButtonSeparator': `or`;
+    'conversationCellsConversationEnabled': `File collaboration (Cells beta) is on`;
     'conversationClassified': `Security level: VS-NfD`;
     'conversationCommonFeature1': `Up to [bold]{capacity}[/bold] people`;
     'conversationCommonFeature2': `Video conferencing`;
@@ -602,7 +603,6 @@ declare module 'I18n/en-US.json' {
     'conversationContextMenuLike': `Like`;
     'conversationContextMenuReply': `Reply`;
     'conversationContextMenuUnlike': `Unlike`;
-    'conversationCellsConversationEnabled': `File collaboration (Cells beta) is on`;
     'conversationCreateReceiptsEnabled': `Read receipts are on`;
     'conversationCreateTeam': `with [showmore]all team members[/showmore]`;
     'conversationCreateTeamGuest': `with [showmore]all team members and one guest[/showmore]`;
@@ -625,8 +625,8 @@ declare module 'I18n/en-US.json' {
     'conversationDetailsActionArchive': `Archive`;
     'conversationDetailsActionBlock': `Block`;
     'conversationDetailsActionCancelRequest': `Cancel request`;
-    'conversationDetailsActionCellsTitle': `File collaboration (Cells beta version) is on`;
     'conversationDetailsActionCellsOption': `Permanently on for this conversation.`;
+    'conversationDetailsActionCellsTitle': `File collaboration (Cells beta version) is on`;
     'conversationDetailsActionClear': `Clear content`;
     'conversationDetailsActionConversationParticipants': `Show all ({number})`;
     'conversationDetailsActionCreateGroup': `Create group`;
@@ -740,9 +740,14 @@ declare module 'I18n/en-US.json' {
     'conversationJustNow': `Just now`;
     'conversationLabelChannels': `Channels`;
     'conversationLabelDirects': `1:1 Conversations`;
+    'conversationLabelDrafts': `Drafts`;
     'conversationLabelFavorites': `Favorites`;
     'conversationLabelGroups': `Groups`;
+    'conversationLabelMentions': `Mentions`;
     'conversationLabelPeople': `People`;
+    'conversationLabelPings': `Pings`;
+    'conversationLabelReplies': `Replies`;
+    'conversationLabelUnread': `Unread`;
     'conversationLearnMoreChannels': `Learn more about channels`;
     'conversationLikesCaptionPlural': `[bold]{firstUser}[/bold] and [bold]{secondUser}[/bold]`;
     'conversationLikesCaptionPluralMoreThan2': `[bold]{userNames}[/bold] and [showmore]{number} more[/showmore]`;
@@ -1750,6 +1755,11 @@ declare module 'I18n/en-US.json' {
     'searchConversations': `Search conversations`;
     'searchConversationsNoResult': `No results found`;
     'searchConversationsNoResultConnectSuggestion': `Connect with new users or start a new conversation`;
+    'searchDraftsConversations': `Search in drafts`;
+    'searchMentionsConversations': `Search in mentions`;
+    'searchPingsConversations': `Search in pings`;
+    'searchRepliesConversations': `Search in replies`;
+    'searchUnreadConversations': `Search in unread`;
     'searchCreateGroup': `Create group`;
     'searchCreateGuestRoom': `Create guest room`;
     'searchDirectConversations': `Search 1:1 conversations`;
