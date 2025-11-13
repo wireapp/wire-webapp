@@ -23,6 +23,14 @@ import {replaceAccents} from 'Util/StringUtil';
 
 import {SidebarTabs} from './useSidebarStore';
 
+export const conversationFilters = {
+  hasUnread: (conv: Conversation) => conv.hasUnread(),
+  hasMentions: (conv: Conversation) => conv.unreadState().selfMentions.length > 0,
+  hasReplies: (conv: Conversation) => conv.unreadState().selfReplies.length > 0,
+  hasPings: (conv: Conversation) => conv.unreadState().pings.length > 0,
+  notArchived: (conv: Conversation) => !conv.is_archived(),
+};
+
 interface GetTabConversationsProps {
   currentTab: SidebarTabs;
 
@@ -143,7 +151,7 @@ export function getTabConversations({
   if (currentTab === SidebarTabs.UNREAD) {
     const filteredConversations = conversations
       .filter(conversationArchivedFilter)
-      .filter(conv => conv.hasUnread())
+      .filter(conversationFilters.hasUnread)
       .filter(conversationSearchFilter);
 
     return {
@@ -155,7 +163,7 @@ export function getTabConversations({
   if (currentTab === SidebarTabs.MENTIONS) {
     const filteredConversations = conversations
       .filter(conversationArchivedFilter)
-      .filter(conv => conv.unreadState().selfMentions.length > 0)
+      .filter(conversationFilters.hasMentions)
       .filter(conversationSearchFilter);
 
     return {
@@ -167,7 +175,7 @@ export function getTabConversations({
   if (currentTab === SidebarTabs.REPLIES) {
     const filteredConversations = conversations
       .filter(conversationArchivedFilter)
-      .filter(conv => conv.unreadState().selfReplies.length > 0)
+      .filter(conversationFilters.hasReplies)
       .filter(conversationSearchFilter);
 
     return {
@@ -190,7 +198,7 @@ export function getTabConversations({
   if (currentTab === SidebarTabs.PINGS) {
     const filteredConversations = conversations
       .filter(conversationArchivedFilter)
-      .filter(conv => conv.unreadState().pings.length > 0)
+      .filter(conversationFilters.hasPings)
       .filter(conversationSearchFilter);
 
     return {
