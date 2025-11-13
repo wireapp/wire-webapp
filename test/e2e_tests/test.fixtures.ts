@@ -28,7 +28,7 @@ type Fixtures = {
   api: ApiManagerE2E;
   pageManager: PageManager;
   createPage: () => Promise<Page>;
-  createUser: () => Promise<User>;
+  createUser: (options?: {disableTelemetry?: boolean}) => Promise<User>;
 };
 
 export const test = baseTest.extend<Fixtures>({
@@ -56,9 +56,16 @@ export const test = baseTest.extend<Fixtures>({
   createUser: async ({api}, use) => {
     const users: User[] = [];
 
-    await use(async () => {
+    await use(async options => {
+      const {disableTelemetry = true} = options ?? {};
+
       const user = getUser();
       await api.createPersonalUser(user);
+
+      if (disableTelemetry) {
+        await api.properties.putProperty({settings: {privacy: {telemetry_data_sharing: false}}}, user.token);
+      }
+
       users.push(user);
       return user;
     });

@@ -27,6 +27,7 @@ import {ConnectionRepositoryE2E} from './connectionRepository.e2e';
 import {ConversationRepositoryE2E} from './ConversationRepository';
 import {FeatureConfigRepositoryE2E} from './featureConfigRepository.e2e';
 import {InbucketClientE2E} from './inbucketClient.e2e';
+import {PropertiesRepositoryE2E} from './propertiesRepostitory.e2e';
 import {TeamRepositoryE2E} from './teamRepository.e2e';
 import {TestServiceClientE2E} from './testServiceClient.e2e';
 import {UserRepositoryE2E} from './userRepository.e2e';
@@ -44,6 +45,7 @@ export class ApiManagerE2E {
   inbucket: InbucketClientE2E;
   connection: ConnectionRepositoryE2E;
   callingService: CallingServiceClientE2E;
+  properties: PropertiesRepositoryE2E;
 
   constructor() {
     this.user = new UserRepositoryE2E();
@@ -56,6 +58,7 @@ export class ApiManagerE2E {
     this.inbucket = new InbucketClientE2E();
     this.connection = new ConnectionRepositoryE2E();
     this.callingService = new CallingServiceClientE2E();
+    this.properties = new PropertiesRepositoryE2E();
   }
 
   async addDevicesToUser(user: User, numberOfDevices: number) {
