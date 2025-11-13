@@ -39,6 +39,11 @@ export const useDraftConversations = (conversations: Conversation[]): Conversati
   }, [conversations]);
 
   const checkForDrafts = useCallback(() => {
+    // Early return if no conversations to check
+    if (!conversationsRef.current.length) {
+      return;
+    }
+
     const storageKeyPrefix = `__amplify__${StorageKey.CONVERSATION.INPUT}|`;
     const conversationsWithDrafts: Conversation[] = [];
     const currentCheck: {[key: string]: string} = {};
