@@ -102,7 +102,13 @@ const VerifyEmailCodeComponent = ({
               }}
             />
           </Text>
-          <CodeInput style={styles.codeInput} onCodeComplete={createAccount} data-uie-name="enter-code" />
+          <CodeInput
+            style={styles.codeInput}
+            onCodeComplete={createAccount}
+            data-uie-name="enter-code"
+            codeInputLabel={t('verify.codeLabel')}
+            codePlaceholder={t('verify.codePlaceholder')}
+          />
           {parseError(authError)}
           <ActionLink onClick={resendCode} data-uie-name="do-resend-code" css={styles.resendLink}>
             {t('verify.resendCode')}

@@ -248,7 +248,8 @@ const AccountFormComponent = ({
           placeholder={t('accountForm.passwordPlaceholder')}
           pattern={ValidationUtil.getNewPasswordPattern(Config.getConfig().NEW_PASSWORD_MINIMUM_LENGTH)}
           data-uie-name="enter-password"
-          togglePasswordBtnLabel={t('passwordToggleBtn')}
+          togglePasswordShowLabel={t('togglePasswordShowLabel')}
+          togglePasswordHideLabel={t('togglePasswordHideLabel')}
         />
         <Text muted css={styles.passwordInfo(!!validationErrors.length)} data-uie-name="element-password-help">
           {t('accountForm.passwordHelp', {minPasswordLength: String(Config.getConfig().NEW_PASSWORD_MINIMUM_LENGTH)})}
@@ -270,7 +271,8 @@ const AccountFormComponent = ({
           placeholder={t('accountForm.confirmPasswordPlaceholder')}
           pattern={`^${registrationData.password?.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`}
           data-uie-name="enter-confirm-password"
-          togglePasswordBtnLabel={t('passwordToggleBtn')}
+          togglePasswordShowLabel={t('togglePasswordShowLabel')}
+          togglePasswordHideLabel={t('togglePasswordHideLabel')}
         />
 
         <Exception errors={[authError, ...validationErrors]} />
