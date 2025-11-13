@@ -8598,9 +8598,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@wireapp/api-client@npm:^27.88.0":
-  version: 27.88.0
-  resolution: "@wireapp/api-client@npm:27.88.0"
+"@wireapp/api-client@npm:^27.89.0":
+  version: 27.89.0
+  resolution: "@wireapp/api-client@npm:27.89.0"
   dependencies:
     "@aws-sdk/client-s3": "npm:3.908.0"
     "@aws-sdk/lib-storage": "npm:3.908.0"
@@ -8619,7 +8619,7 @@ __metadata:
     uuid: "npm:11.1.0"
     ws: "npm:8.18.1"
     zod: "npm:3.24.2"
-  checksum: 10/e47475c5e833120919fc411be0592b5ac0dfeab6884731cafd232f2e3d2559e84bedbe87ce2bffcc1dc7baf63e1b8db29fb0911360a70aef5f074c5e0fd9ada5
+  checksum: 10/bc6a6d578b46cddb051ff97da1256d6466bfa24f4a3d7afa2e0b7d0899e45c6a084a83da306cf63ed0a3f20e5f5bd3dde136fc086ad90ea90151bdc91aebfd85
   languageName: node
   linkType: hard
 
@@ -8634,10 +8634,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@wireapp/avs@npm:10.2.7":
-  version: 10.2.7
-  resolution: "@wireapp/avs@npm:10.2.7"
-  checksum: 10/63525727473039fc0832dca1d0df6d8daeb0bf66c382266bc8929754e0df96d76081e1063efff61e302c366221fc42dfc77b2775706369f8a2130e447368540a
+"@wireapp/avs@npm:10.2.17":
+  version: 10.2.17
+  resolution: "@wireapp/avs@npm:10.2.17"
+  checksum: 10/ac68345f919e4a7f62f6ccdee7be903cb567306588f43d93883c321e4813e1f4698ac12f5ad428dc6afb87d12367a6ff3aa0375838f63aaf21a70e46caf8e7c7
   languageName: node
   linkType: hard
 
@@ -8684,11 +8684,11 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@wireapp/core@npm:46.45.2":
-  version: 46.45.2
-  resolution: "@wireapp/core@npm:46.45.2"
+"@wireapp/core@npm:46.46.1":
+  version: 46.46.1
+  resolution: "@wireapp/core@npm:46.46.1"
   dependencies:
-    "@wireapp/api-client": "npm:^27.88.0"
+    "@wireapp/api-client": "npm:^27.89.0"
     "@wireapp/commons": "npm:^5.4.9"
     "@wireapp/core-crypto": "npm:9.1.2"
     "@wireapp/cryptobox": "npm:12.8.0"
@@ -8706,7 +8706,7 @@ __metadata:
     long: "npm:^5.2.0"
     uuid: "npm:9.0.1"
     zod: "npm:3.24.2"
-  checksum: 10/7f71be7d1a70bb05ac25510f9186cb1c180521831ed1359ead126929f6a19f61ff8a25633134c730450bf6b2bac9965d2aa6b57fc7a52942044406812719833e
+  checksum: 10/bf24fb3e9c9b41a8e092ca3d7839e15c2a33a8a3727cc8d1145a6b34f9b381e8a34d6cbded9f8132e4de1accdd71b39c000f93a299e12ec8fb31ae8d5ee1dea0
   languageName: node
   linkType: hard
 
@@ -12756,10 +12756,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"fake-indexeddb@npm:6.2.4":
-  version: 6.2.4
-  resolution: "fake-indexeddb@npm:6.2.4"
-  checksum: 10/5160c3f4209c0c785aa30e4efdd6d49496dadd9bffbc2bc7d65f68aa94fbcdd0611c7bc0fcf82a64e514d38e8708b336ccf358dc784672787630653a7417c8a7
+"fake-indexeddb@npm:6.2.5":
+  version: 6.2.5
+  resolution: "fake-indexeddb@npm:6.2.5"
+  checksum: 10/a0b6a81413a8dd40d3ae31d6158ffa8a3d113981b11644e206874847c454d5a1519a9fe2b6008d8f66d5630ba96b3da43789a20b6462a0e7cadc008caea15ae8
   languageName: node
   linkType: hard
 
@@ -22649,11 +22649,11 @@ __metadata:
     "@types/webpack-bundle-analyzer": "npm:^4"
     "@types/webpack-env": "npm:1.18.8"
     "@types/wicg-file-system-access": "npm:^2023.10.7"
-    "@wireapp/avs": "npm:10.2.7"
+    "@wireapp/avs": "npm:10.2.17"
     "@wireapp/avs-debugger": "npm:0.0.7"
     "@wireapp/commons": "npm:5.4.9"
     "@wireapp/copy-config": "npm:2.3.4"
-    "@wireapp/core": "npm:46.45.2"
+    "@wireapp/core": "npm:46.46.1"
     "@wireapp/eslint-config": "npm:3.0.7"
     "@wireapp/kalium-backup": "npm:0.0.4"
     "@wireapp/prettier-config": "npm:0.6.9"
@@ -22684,7 +22684,7 @@ __metadata:
     emoji-picker-react: "npm:4.15.0"
     eslint: "npm:8.57.0"
     eslint-plugin-prettier: "npm:5.1.3"
-    fake-indexeddb: "npm:6.2.4"
+    fake-indexeddb: "npm:6.2.5"
     generate-changelog: "npm:1.8.0"
     html-webpack-plugin: "npm:5.6.4"
     http-status-codes: "npm:2.3.0"

@@ -43,8 +43,6 @@ test(
   'Messages in Groups',
   {tag: ['@TC-8751', '@crit-flow-web']},
   async ({pageManager: userAPageManager, api, browser}) => {
-    test.slow(); // Increasing test timeout to 90 seconds to accommodate the full flow
-
     const {pages: userAPages, modals: userAModals, components: userAComponents} = userAPageManager.webapp;
 
     const userBContext = await browser.newContext();

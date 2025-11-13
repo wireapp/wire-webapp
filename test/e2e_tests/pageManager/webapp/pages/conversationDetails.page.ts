@@ -62,7 +62,8 @@ export class ConversationDetailsPage {
         `${selectById('add-participants')} ${selectByDataAttribute('search-list')} [aria-label="Open profile of ${fullName}"]`,
       );
       await userLocator.click();
-      await this.page.waitForTimeout(1000); // Wait for the UI to update after selecting user
+      // Wait for the user to be selected (checkbox should be checked)
+      await userLocator.locator('input[type="checkbox"]').waitFor({state: 'attached'});
     }
 
     await this.page.locator(`${selectById('add-participants')} ${selectByDataAttribute('do-create')}`).click();
@@ -70,7 +71,7 @@ export class ConversationDetailsPage {
 
   async isUserPartOfConversationAsAdmin(fullName: string) {
     const userLocator = this.page.locator(
-      `${selectById('conversation-details')} ${selectByDataAttribute('list-admins')} ${selectByDataAttribute('item-user')}[data-uie-value="${fullName}"]`,
+      `${selectById('conversation-details')} ${selectByDataAttribute('list-admins')} ${selectByDataAttribute('item-user')}${selectByDataAttribute(fullName, 'value')}`,
     );
     await userLocator.waitFor({state: 'visible'});
     return userLocator.isVisible();
@@ -78,7 +79,7 @@ export class ConversationDetailsPage {
 
   async isUserPartOfConversationAsMember(fullName: string) {
     const userLocator = this.page.locator(
-      `${selectById('conversation-details')} ${selectByDataAttribute('list-members')} ${selectByDataAttribute('item-user')}[data-uie-value="${fullName}"]`,
+      `${selectById('conversation-details')} ${selectByDataAttribute('list-members')} ${selectByDataAttribute('item-user')}${selectByDataAttribute(fullName, 'value')}`,
     );
     await userLocator.waitFor({state: 'visible'});
     return userLocator.isVisible();
@@ -91,7 +92,7 @@ export class ConversationDetailsPage {
 
   async getLocatorByUser(fullName: string) {
     const userLocator = this.page.locator(
-      `${selectById('conversation-details')} ${selectByDataAttribute('list-members')} ${selectByDataAttribute('item-user')}[data-uie-value="${fullName}"]`,
+      `${selectById('conversation-details')} ${selectByDataAttribute('list-members')} ${selectByDataAttribute('item-user')}${selectByDataAttribute(fullName, 'value')}`,
     );
     await userLocator.waitFor({state: 'visible'});
     return userLocator;
@@ -99,5 +100,55 @@ export class ConversationDetailsPage {
 
   async clickArchiveButton() {
     await this.archiveButton.click();
+  }
+
+  async addServiceToConversation(serviceName: string) {
+    // Click on the Services/Apps tab
+    const servicesTab = this.page.locator(
+      `${selectById('add-participants')} ${selectByDataAttribute('do-add-services')}`,
+    );
+    await servicesTab.click();
+
+    // Wait for search input to be ready
+    const searchInput = this.page.locator(`${selectById('add-participants')} input[type="text"]`);
+    await searchInput.waitFor({state: 'visible'});
+
+    // Search for the service
+    await searchInput.fill(serviceName);
+
+    // Wait for service to appear in search results
+    const serviceLocator = this.page.getByTestId('item-service').first();
+    await serviceLocator.waitFor({state: 'visible'});
+
+    // Click on the service in search results
+    await serviceLocator.click();
+
+    // Wait for "Add Service" button to be ready
+    const addServiceButton = this.page.getByTestId('do-add-service');
+    await addServiceButton.waitFor({state: 'visible'});
+    await addServiceButton.click();
+  }
+
+  async removeServiceFromConversation(serviceName: string) {
+    // Services appear in the members list with item-service test id
+    const serviceLocator = this.page
+      .locator(`${selectById('conversation-details')}`)
+      .getByTestId('item-service')
+      .filter({hasText: serviceName});
+    await serviceLocator.click();
+
+    // Wait for "Remove Service" button to be visible and enabled
+    const removeServiceButton = this.page.getByTestId('do-remove');
+    await removeServiceButton.waitFor({state: 'visible'});
+    await removeServiceButton.click();
+  }
+
+  async isServicePartOfConversation(serviceName: string) {
+    const serviceLocator = this.page
+      .locator(`${selectById('conversation-details')}`)
+      .getByTestId('item-service')
+      .filter({hasText: serviceName});
+    await serviceLocator.waitFor({state: 'visible'});
+    return serviceLocator.isVisible();
   }
 }

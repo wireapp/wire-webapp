@@ -45,8 +45,6 @@ let memberBPM: PageManager;
 const selfDestructMessageText = 'This message will self-destruct in 10 seconds.';
 
 test('Messages in 1:1', {tag: ['@TC-8750', '@crit-flow-web']}, async ({pageManager, api, browser}) => {
-  test.slow(); // Increasing test timeout to 90 seconds to accommodate the full flow
-
   const {pages, modals, components} = pageManager.webapp;
 
   // Step 0: Preconditions

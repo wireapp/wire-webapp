@@ -42,8 +42,6 @@ test(
   'Uploading an file in a group conversation',
   {tag: ['@crit-flow-cells']},
   async ({pageManager: userAPageManager, browser, api}) => {
-    test.slow(); // This test involves file upload and download, which can be slow
-
     const {pages: userAPages, modals: userAModals, components: userAComponents} = userAPageManager.webapp;
 
     const userBContext = await browser.newContext();
