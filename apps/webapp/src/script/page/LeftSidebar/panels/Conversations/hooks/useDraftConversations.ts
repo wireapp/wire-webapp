@@ -19,8 +19,10 @@
 
 import {useEffect, useState, useRef, useCallback} from 'react';
 
+import {amplify} from 'amplify';
 import {useDebouncedCallback} from 'use-debounce';
 
+import {DRAFT_STATE_CHANGED_EVENT} from 'Components/InputBar/common/draftState/draftState';
 import {Conversation} from 'Repositories/entity/Conversation';
 import {StorageKey} from 'Repositories/storage';
 
@@ -73,22 +75,33 @@ export const useDraftConversations = (conversations: Conversation[]): Conversati
     // Initial check
     checkForDrafts();
 
+    // Listen for draft changes in the current tab
+    const handleDraftChange = () => {
+      debouncedCheck();
+    };
+
     // Listen for storage changes from other tabs
     const handleStorageChange = (event: StorageEvent) => {
       if (event.key?.includes(StorageKey.CONVERSATION.INPUT)) {
+        debouncedCheck();
+      }
+    };
+
+    // Listen for visibility changes to check when tab becomes active
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible') {
         checkForDrafts();
       }
     };
 
-    // Check periodically but less frequently
-    // This matches the draft save debounce of 800ms
-    const interval = setInterval(debouncedCheck, 1000);
-
+    amplify.subscribe(DRAFT_STATE_CHANGED_EVENT, handleDraftChange);
     window.addEventListener('storage', handleStorageChange);
+    document.addEventListener('visibilitychange', handleVisibilityChange);
 
     return () => {
+      amplify.unsubscribe(DRAFT_STATE_CHANGED_EVENT, handleDraftChange);
       window.removeEventListener('storage', handleStorageChange);
-      clearInterval(interval);
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
       debouncedCheck.cancel();
     };
   }, [checkForDrafts, debouncedCheck]);
