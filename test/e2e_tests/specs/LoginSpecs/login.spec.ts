@@ -17,6 +17,8 @@
  *
  */
 
+import {generateRandomPassword} from 'Util/StringUtil';
+
 import {test, expect} from '../../test.fixtures';
 
 test(
@@ -26,7 +28,7 @@ test(
     const {pages} = pageManager.webapp;
 
     await pageManager.openLoginPage();
-    await pages.login().login({email: 'incorrect-email@wire.engineering', password: 'incorrectPassword'});
+    await pages.login().login({email: 'incorrect-email@wire.engineering', password: generateRandomPassword()});
 
     const errorMessage = pages.login().loginErrorText;
     await expect(errorMessage).toHaveText('Please verify your details and try again');
