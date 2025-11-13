@@ -29,55 +29,49 @@ import {test, expect} from '../../test.fixtures';
 const userB = getUser();
 const userA = getUser();
 
-test(
-  'Block from search specs',
-  {tag: ['@TC-144', '@regression']},
-  async ({pageManager: userAPageManager, api, browser}) => {
-    test.slow(); // Increasing test timeout to 90 seconds to accommodate the full flow
+test('Block from search specs', {tag: ['@TC-144', '@regression']}, async ({api, browser}) => {
+  const userBContext = await browser.newContext();
+  const userBPage = await userBContext.newPage();
+  const userBPageManager = PageManager.from(userBPage);
+  const {pages: userBPages, modals: userBModals, components: userBComponents} = userBPageManager.webapp;
 
-    const userBContext = await browser.newContext();
-    const userBPage = await userBContext.newPage();
-    const userBPageManager = PageManager.from(userBPage);
-    const {pages: userBPages, modals: userBModals, components: userBComponents} = userBPageManager.webapp;
+  await test.step('Preconditions: Creating preconditions for the test via API', async () => {
+    await api.createPersonalUser(userA);
+    addCreatedUser(userA);
 
-    await test.step('Preconditions: Creating preconditions for the test via API', async () => {
-      await api.createPersonalUser(userA);
-      addCreatedUser(userA);
+    await api.createPersonalUser(userB);
+    addCreatedUser(userB);
+  });
 
-      await api.createPersonalUser(userB);
-      addCreatedUser(userB);
-    });
+  await test.step('Precondition: Users A and B are signed in to the application', async () => {
+    await Promise.all([
+      (async () => {
+        await userBPageManager.openMainPage();
+        await loginUser(userB, userBPageManager);
+        await userBModals.dataShareConsent().clickDecline();
+        await userBComponents.conversationSidebar().isPageLoaded();
+      })(),
+    ]);
+  });
 
-    await test.step('Precondition: Users A and B are signed in to the application', async () => {
-      await Promise.all([
-        (async () => {
-          await userBPageManager.openMainPage();
-          await loginUser(userB, userBPageManager);
-          await userBModals.dataShareConsent().clickDecline();
-          await userBComponents.conversationSidebar().isPageLoaded();
-        })(),
-      ]);
-    });
+  // Test steps
+  await test.step('User B sends User A a connection request', async () => {
+    await userBComponents.conversationSidebar().clickConnectButton();
+    await userBPages.startUI().selectUser(userA.username);
+    expect(await userBModals.userProfile().isVisible());
+    await userBModals.userProfile().clickConnectButton();
+  });
 
-    // Test steps
-    await test.step('User B sends User A a connection request', async () => {
-      await userBComponents.conversationSidebar().clickConnectButton();
-      await userBPages.startUI().selectUser(userA.username);
-      expect(await userBModals.userProfile().isVisible());
-      await userBModals.userProfile().clickConnectButton();
-    });
+  await test.step('User B blocks User A from connection request', async () => {
+    await userBPages.conversationList().openContextMenu(userA.fullName);
+    await userBPages.conversationList().clickBlockConversation();
+    await userBModals.blockWarning().clickBlock();
+  });
 
-    await test.step('User B blocks User A from connection request', async () => {
-      await userBPages.conversationList().openContextMenu(userA.fullName);
-      await userBPages.conversationList().clickBlockConversation();
-      await userBModals.blockWarning().clickBlock();
-    });
-
-    await test.step('User B sees User A as blocked', async () => {
-      await expect(userBPages.conversationList().isConversationBlocked(userA.fullName)).toBeTruthy();
-    });
-  },
-);
+  await test.step('User B sees User A as blocked', async () => {
+    await expect(userBPages.conversationList().isConversationBlocked(userA.fullName)).toBeTruthy();
+  });
+});
 
 test.afterAll(async ({api}) => {
   await removeCreatedUser(api, userA);

@@ -29,7 +29,6 @@ test.describe('account settings', () => {
   let owner = getUser();
   const members = Array.from({length: 2}, () => getUser());
   const [memberA, memberB] = members;
-  test.slow();
 
   test.beforeAll(async ({api}) => {
     const user = await bootstrapTeamForTesting(api, members, owner, 'test');
