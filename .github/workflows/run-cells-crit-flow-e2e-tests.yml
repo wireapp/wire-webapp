@@ -9,6 +9,8 @@ on:
     secrets:
       OP_SERVICE_ACCOUNT_TOKEN:
         required: true
+      WIRE_CELLS_E2E_TEST_BOT_WEBHOOK_URL:
+        required: true
 
 jobs:
   cells-crit-flow-e2e-tests:
