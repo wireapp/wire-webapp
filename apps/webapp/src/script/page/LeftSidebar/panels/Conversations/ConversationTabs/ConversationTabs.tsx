@@ -39,7 +39,11 @@ import {TeamState} from 'Repositories/team/TeamState';
 import {FEATURES, hasAccessToFeature} from 'Repositories/user/UserPermission';
 import {getManageTeamUrl} from 'src/script/externalRoute';
 import {ConversationFolderTab} from 'src/script/page/LeftSidebar/panels/Conversations/ConversationTab/ConversationFolderTab';
-import {SidebarTabs, useSidebarStore} from 'src/script/page/LeftSidebar/panels/Conversations/useSidebarStore';
+import {
+  SidebarTabs,
+  useSidebarStore,
+  isTabVisible,
+} from 'src/script/page/LeftSidebar/panels/Conversations/useSidebarStore';
 import {Core} from 'src/script/service/CoreSingleton';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {isDataDogEnabled} from 'Util/DataDog';
@@ -227,10 +231,8 @@ export const ConversationTabs = ({
     });
   }
 
-  // filter tabs based on visibility prefs (RECENT should always bevisible)
-  const visibleConversationTabs = conversationTabs.filter(
-    tab => tab.type === SidebarTabs.RECENT || visibleTabs.includes(tab.type),
-  );
+  // Filter tabs based on visibility preferences
+  const visibleConversationTabs = conversationTabs.filter(tab => isTabVisible(tab.type, visibleTabs));
 
   const manageTeamUrl = getManageTeamUrl();
   const replaceWireLink = replaceLink('https://app.wire.com', '', '');
