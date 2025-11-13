@@ -57,7 +57,7 @@ jobs:
       - name: Notify on Wire if succeeded
         if: success()
         continue-on-error: true
-        uses: 8398a7/action-slack@v3
+        uses: 8398a7/action-slack@293f8dc0f9731ac35321056641cdef895f4f65f8
         env:
           ENV: ${{ inputs.environment }}
           SLACK_WEBHOOK_URL: ${{ secrets.WIRE_CELLS_E2E_TEST_BOT_WEBHOOK_URL }}
@@ -71,7 +71,7 @@ jobs:
       - name: Notify on Wire if failed
         if: failure()
         continue-on-error: true
-        uses: 8398a7/action-slack@v3
+        uses: 8398a7/action-slack@293f8dc0f9731ac35321056641cdef895f4f65f8
         env:
           ENV: ${{ inputs.environment }}
           SLACK_WEBHOOK_URL: ${{ secrets.WIRE_CELLS_E2E_TEST_BOT_WEBHOOK_URL }}
