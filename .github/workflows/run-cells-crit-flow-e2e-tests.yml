@@ -54,6 +54,7 @@ jobs:
           path: playwright-report/
 
       - name: TMP test
+        if: always()
         run: |
           echo "SLACK WEBHOOK URL:"
           echo "${{ secrets.SLACK_WEBHOOK_URL }}"
