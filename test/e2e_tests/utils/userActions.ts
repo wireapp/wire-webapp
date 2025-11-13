@@ -27,8 +27,8 @@ export const loginUser = async (user: User, pageManager: PageManager) => {
   const {pages} = pageManager.webapp;
   await pages.singleSignOn().isSSOPageVisible();
   await pages.singleSignOn().enterEmailOnSSOPage(user.email);
-  await pages.login().inputPassword(user.password);
-  await pages.login().clickSignInButton();
+  await pages.login().passwordInput.fill(user.password);
+  await pages.login().signInButton.click();
 };
 
 export const sendTextMessageToUser = async (pageManager: PageManager, recipient: User, text: string) => {

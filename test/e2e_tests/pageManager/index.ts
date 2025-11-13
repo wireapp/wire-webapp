@@ -108,6 +108,10 @@ export class PageManager {
     return this.page.goto(webAppPath, {waitUntil: 'networkidle'});
   };
 
+  openLoginPage = async () => {
+    await this.page.goto(`${webAppPath}auth/#/login`);
+  };
+
   openUrl = (url: string) => {
     return this.page.goto(url, {waitUntil: 'networkidle'});
   };

@@ -48,14 +48,6 @@ export class ConversationSidebar {
     this.sidebar = page.locator(`.conversations-sidebar-items`);
   }
 
-  async getPersonalStatusName() {
-    return (await this.personalStatusName.textContent()) ?? '';
-  }
-
-  async getPersonalUserName() {
-    return (await this.personalUserName.textContent()) ?? '';
-  }
-
   async clickPreferencesButton() {
     await this.preferencesButton.click();
   }
