@@ -54,15 +54,6 @@ jobs:
         with:
           name: playwright-report-${{ env.ENV }}
           path: playwright-report/
-
-      - name: TMP test
-        if: always()
-        run: |
-          echo "SLACK WEBHOOK URL:"
-          echo "${{ secrets.SLACK_WEBHOOK_URL }}"
-          echo "WIRE CELLS E2E TEST BOT WEBHOOK URL:"
-          echo "${{ secrets.WIRE_CELLS_E2E_TEST_BOT_WEBHOOK_URL }}"
-
       - name: Notify on Wire if succeeded
         if: success()
         continue-on-error: true
