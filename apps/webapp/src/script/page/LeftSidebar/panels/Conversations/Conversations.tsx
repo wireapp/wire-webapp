@@ -225,12 +225,12 @@ export const Conversations = ({
   const showConnectionRequests = [SidebarTabs.RECENT, SidebarTabs.DIRECTS].includes(currentTab);
   const hasVisibleConnectionRequests = connectRequests.length > 0 && showConnectionRequests;
   const hasVisibleConversations = currentTabConversations.length > 0;
-  const hasNoVisbleConversations = !hasVisibleConversations && !hasVisibleConnectionRequests;
+  const hasNoVisibleConversations = !hasVisibleConversations && !hasVisibleConnectionRequests;
 
   const hasEmptyConversationsList =
     !isGroupParticipantsVisible &&
-    ((showSearchInput && hasNoVisbleConversations) ||
-      (hasNoVisbleConversations && currentTab !== SidebarTabs.ARCHIVES));
+    ((showSearchInput && hasNoVisibleConversations) ||
+      (hasNoVisibleConversations && currentTab !== SidebarTabs.ARCHIVES));
 
   const toggleSidebar = useCallback(() => {
     if (isFoldersTabOpen) {
@@ -256,7 +256,7 @@ export const Conversations = ({
         setCurrentTab(SidebarTabs.RECENT);
       }
     });
-  }, [currentTabConversations]);
+  }, [currentTabConversations, setCurrentTab]);
 
   useEffect(() => {
     if (activeConversation && !conversationState.isVisible(activeConversation)) {
@@ -275,15 +275,7 @@ export const Conversations = ({
     return () => {
       amplify.unsubscribe(WebAppEvents.CONTENT.EXPAND_FOLDER, openFolder);
     };
-  }, [activeConversation]);
-
-  useEffect(() => {
-    const openFavorites = () => changeTab(SidebarTabs.FAVORITES);
-    conversationLabelRepository.addEventListener('conversation-favorited', openFavorites);
-    return () => {
-      conversationLabelRepository.removeEventListener('conversation-favorited', openFavorites);
-    };
-  }, []);
+  }, [activeConversation, openFolder]);
 
   const clearConversationFilter = useCallback(() => setConversationsFilter(''), []);
 
@@ -294,7 +286,7 @@ export const Conversations = ({
     setCurrentView(ViewType.MOBILE_LEFT_SIDEBAR);
     switchList(ListState.CONVERSATIONS);
     switchContent(ContentState.CONVERSATION);
-  }, []);
+  }, [setCurrentView, switchList, switchContent]);
 
   const changeTab = useCallback(
     (nextTab: SidebarTabs, folderId?: string) => {
@@ -319,20 +311,39 @@ export const Conversations = ({
       clearConversationFilter();
       setCurrentTab(nextTab);
     },
-    [conversationRepository],
+    [
+      conversationRepository,
+      closeFolder,
+      onExitPreferences,
+      switchList,
+      switchContent,
+      clearConversationFilter,
+      setCurrentTab,
+    ],
   );
 
-  const onClickPreferences = useCallback((itemId: ContentState) => {
-    switchList(ListState.PREFERENCES);
-    setCurrentView(ViewType.MOBILE_CENTRAL_COLUMN);
-    switchContent(itemId);
+  useEffect(() => {
+    const openFavorites = () => changeTab(SidebarTabs.FAVORITES);
+    conversationLabelRepository.addEventListener('conversation-favorited', openFavorites);
+    return () => {
+      conversationLabelRepository.removeEventListener('conversation-favorited', openFavorites);
+    };
+  }, [changeTab, conversationLabelRepository]);
 
-    setTimeout(() => {
-      const centerColumn = document.getElementById('center-column');
-      const nextElementToFocus = centerColumn?.querySelector("[tabindex='0']") as HTMLElement | null;
-      nextElementToFocus?.focus();
-    }, ANIMATED_PAGE_TRANSITION_DURATION + 1);
-  }, []);
+  const onClickPreferences = useCallback(
+    (itemId: ContentState) => {
+      switchList(ListState.PREFERENCES);
+      setCurrentView(ViewType.MOBILE_CENTRAL_COLUMN);
+      switchContent(itemId);
+
+      setTimeout(() => {
+        const centerColumn = document.getElementById('center-column');
+        const nextElementToFocus = centerColumn?.querySelector("[tabindex='0']") as HTMLElement | null;
+        nextElementToFocus?.focus();
+      }, ANIMATED_PAGE_TRANSITION_DURATION + 1);
+    },
+    [switchList, setCurrentView, switchContent],
+  );
 
   const handleEnterSearchClick = useCallback(
     (event: ReactKeyBoardEvent<HTMLDivElement>) => {
@@ -358,7 +369,7 @@ export const Conversations = ({
   const jumpToRecentSearch = useCallback(() => {
     switchList(ListState.CONVERSATIONS);
     setCurrentTab(SidebarTabs.RECENT);
-  }, []);
+  }, [switchList, setCurrentTab]);
 
   return (
     <div className="conversations-wrapper">
