@@ -97,6 +97,10 @@ export class ApiManagerE2E {
     await this.user.setUniqueUsername(user.username, user.token);
   }
 
+  async deletePersonalUser(user: User) {
+    await this.user.deleteUser(user.password, user.token);
+  }
+
   /**
    * Long polling to see if a conference calling feature is available for a given team.
    * This is to wait until stripe/ibis has set free account restrictions after team creation.
