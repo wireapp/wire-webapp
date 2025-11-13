@@ -73,7 +73,6 @@ test(
     tag: ['@crit-flow-tm', '@TC-2166', '@TC-2173', '@TC-2176', '@TC-2177', '@teamManagement-regression'],
   },
   async ({api, pageManager}) => {
-    test.slow();
     const {pages, modals} = pageManager.tm;
 
     // Creating test data

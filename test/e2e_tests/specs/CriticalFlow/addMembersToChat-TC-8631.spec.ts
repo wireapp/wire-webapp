@@ -44,8 +44,6 @@ test(
   'Team owner adds whole team to an all team chat',
   {tag: ['@TC-8631', '@crit-flow-web']},
   async ({pageManager, api, browser}) => {
-    test.slow(); // Increasing test timeout to 90 seconds to accommodate the full flow
-
     const {pages, modals} = pageManager.webapp;
 
     // Create page managers for members that will be reused across steps

@@ -303,7 +303,6 @@ test.describe('Block', () => {
     'Verify you can unblock someone from search list',
     {tag: ['@TC-148', '@regression']},
     async ({pageManager: userAPageManager}) => {
-      test.slow();
       const {pages: userAPages, modals: userAModals, components: userAComponents} = userAPageManager.webapp;
 
       await test.step('User A blocks User B', async () => {

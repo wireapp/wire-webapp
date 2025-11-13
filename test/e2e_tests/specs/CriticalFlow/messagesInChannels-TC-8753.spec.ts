@@ -45,8 +45,6 @@ test(
   'Messages in Channels',
   {tag: ['@TC-8753', '@crit-flow-web']},
   async ({pageManager: userAPageManager, browser, api}) => {
-    test.slow(); // Increasing test timeout to 90 seconds to accommodate the full flow
-
     const {pages: userAPages, modals: userAModals, components: userAComponents} = userAPageManager.webapp;
 
     const userBContext = await browser.newContext();

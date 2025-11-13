@@ -37,8 +37,6 @@ let memberPages: PageManager;
 test('Channels Management', {tag: ['@TC-8752', '@crit-flow-web']}, async ({pageManager, api, browser}) => {
   const {pages, modals} = pageManager.webapp;
 
-  test.slow(); // Increasing test timeout to 90 seconds to accommodate the full flow
-
   await test.step('Preconditions: Team owner create a channels enabled team', async () => {
     const user = await api.createTeamOwner(owner, teamName);
     owner = {...owner, ...user};
