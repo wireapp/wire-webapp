@@ -4370,23 +4370,26 @@ export class ConversationRepository {
       const {new_group_id: newGroupId, group_id: oldGroupId} = eventJson.data;
 
       const conversationService = this.core.service?.conversation;
+      const mlsService = this.core.service?.mls;
 
-      if (!conversationService) {
-        throw new Error('Conversation service is not available!');
+      if (!conversationService || !mlsService) {
+        throw new Error('Conversation or Mls service is not available!');
       }
 
       await conversationService.wipeMLSConversation(oldGroupId);
       const existingConversation = await conversationService.mlsGroupExistsLocally(newGroupId);
 
+      let epoch = 0;
       if (existingConversation) {
-        this.logger.info(
-          'An MLS conversation with the new group ID already exists on core crypto. no need to update epoch',
-        );
-        return;
+        const newEpoch: number = await mlsService.getEpoch(newGroupId);
+        this.logger.info('An MLS conversation with the new group ID already exists fetched epoch from core crypto', {
+          newEpoch,
+        });
+        epoch = newEpoch;
       }
 
       const updatedConversation = ConversationMapper.updateProperties(conversationEntity, {
-        epoch: 0,
+        epoch,
         groupId: newGroupId,
       });
 
