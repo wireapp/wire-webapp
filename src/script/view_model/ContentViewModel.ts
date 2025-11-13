@@ -22,6 +22,7 @@ import {QualifiedId} from '@wireapp/api-client/lib/user/';
 import {amplify} from 'amplify';
 import ko from 'knockout';
 import {container} from 'tsyringe';
+import {isError} from 'underscore';
 
 import {WebAppEvents} from '@wireapp/webapp-events';
 
@@ -218,8 +219,25 @@ export class ContentViewModel {
     );
   }
 
-  private isConversationNotFoundError(error: any): boolean {
-    return error.type === ConversationError.TYPE.CONVERSATION_NOT_FOUND;
+  private isConversationNotFoundError(error: unknown): boolean {
+    return isError(error) && 'type' in error && error.type === ConversationError.TYPE.CONVERSATION_NOT_FOUND;
+  }
+
+  private async retryFetchConversationWithBackoff(
+    conversationId: QualifiedId,
+    maxRetries: number = 3,
+    initialDelayMs: number = 100,
+  ): Promise<boolean> {
+    for (let attempt = 0; attempt < maxRetries; attempt++) {
+      try {
+        await new Promise(resolve => setTimeout(resolve, initialDelayMs * (attempt + 1)));
+        await this.conversationRepository.fetchBackendConversationEntityById(conversationId);
+        return true;
+      } catch (error) {
+        this.logger.warn(`Retry attempt ${attempt + 1}/${maxRetries} failed for conversation fetch`, error);
+      }
+    }
+    return false;
   }
 
   /**
@@ -264,7 +282,6 @@ export class ContentViewModel {
       }
 
       const isOpenedConversation = this.isConversationOpen(conversationEntity, isActiveConversation);
-
       this.handleConversationState(isOpenedConversation, openNotificationSettings, conversationEntity);
       if (!isActiveConversation) {
         this.conversationState.activeConversation(conversationEntity);
@@ -274,8 +291,17 @@ export class ContentViewModel {
       const messageEntity = openFirstSelfMention ? conversationEntity.getFirstUnreadSelfMention() : exposeMessageEntity;
       this.changeConversation(conversationEntity, messageEntity);
       this.showAndNavigate(conversationEntity, openNotificationSettings, filePath);
-    } catch (error: any) {
+    } catch (error: unknown) {
       if (this.isConversationNotFoundError(error)) {
+        // Retry fetching the conversation to handle race conditions
+        const fetchSucceeded = await this.retryFetchConversationWithBackoff(conversation, 5);
+
+        if (fetchSucceeded) {
+          // Conversation was found after retry, attempt to show it again
+          return this.showConversation(conversation, options);
+        }
+
+        // All retries failed, show the error modal
         return this.showConversationNotFoundErrorModal();
       }
 
