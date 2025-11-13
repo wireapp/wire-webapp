@@ -63,12 +63,14 @@ import {ConversationFilterButton} from '../ConversationFilterButton';
 import {ConversationTab} from '../ConversationTab';
 
 interface ConversationTabsProps {
+  conversations: Conversation[];
   unreadConversations: Conversation[];
   favoriteConversations: Conversation[];
   archivedConversations: Conversation[];
   groupConversations: Conversation[];
   directConversations: Conversation[];
   channelConversations: Conversation[];
+  draftConversations: Conversation[];
   conversationRepository: ConversationRepository;
   onChangeTab: (tab: SidebarTabs, folderId?: string) => void;
   currentTab: SidebarTabs;
@@ -78,12 +80,14 @@ interface ConversationTabsProps {
 }
 
 export const ConversationTabs = ({
+  conversations,
   unreadConversations,
   favoriteConversations,
   archivedConversations,
   groupConversations,
   conversationRepository,
   directConversations,
+  draftConversations,
   onChangeTab,
   currentTab,
   onClickPreferences,
@@ -116,6 +120,16 @@ export const ConversationTabs = ({
   const channelConversationsLength = channelConversations.filter(filterUnreadAndArchivedConversations).length;
   const groupConversationsLength = groupConversations.filter(filterUnreadAndArchivedConversations).length;
 
+  const unreadCount = conversations.filter(conv => !conv.is_archived() && conv.hasUnread()).length;
+  const mentionsCount = conversations.filter(
+    conv => !conv.is_archived() && conv.unreadState().selfMentions.length > 0,
+  ).length;
+  const repliesCount = conversations.filter(
+    conv => !conv.is_archived() && conv.unreadState().selfReplies.length > 0,
+  ).length;
+  const draftsCount = draftConversations.filter(conv => !conv.is_archived()).length;
+  const pingsCount = conversations.filter(conv => !conv.is_archived() && conv.unreadState().pings.length > 0).length;
+
   const conversationTabs = [
     {
       type: SidebarTabs.RECENT,
@@ -146,6 +160,41 @@ export const ConversationTabs = ({
       dataUieName: 'go-directs-view',
       Icon: <Icon.PeopleIcon />,
       unreadConversations: directConversations.filter(filterUnreadAndArchivedConversations).length,
+    },
+    {
+      type: SidebarTabs.UNREAD,
+      title: t('conversationLabelUnread'),
+      dataUieName: 'go-unread-view',
+      Icon: <Icon.NotificationIcon />,
+      unreadConversations: unreadCount,
+    },
+    {
+      type: SidebarTabs.MENTIONS,
+      title: t('conversationLabelMentions'),
+      dataUieName: 'go-mentions-view',
+      Icon: <Icon.MentionIcon />,
+      unreadConversations: mentionsCount,
+    },
+    {
+      type: SidebarTabs.REPLIES,
+      title: t('conversationLabelReplies'),
+      dataUieName: 'go-replies-view',
+      Icon: <Icon.ReplyIcon />,
+      unreadConversations: repliesCount,
+    },
+    {
+      type: SidebarTabs.DRAFTS,
+      title: t('conversationLabelDrafts'),
+      dataUieName: 'go-drafts-view',
+      Icon: <Icon.EditIcon />,
+      unreadConversations: draftsCount,
+    },
+    {
+      type: SidebarTabs.PINGS,
+      title: t('conversationLabelPings'),
+      dataUieName: 'go-pings-view',
+      Icon: <Icon.PingIcon />,
+      unreadConversations: pingsCount,
     },
     {
       type: SidebarTabs.FOLDER,
