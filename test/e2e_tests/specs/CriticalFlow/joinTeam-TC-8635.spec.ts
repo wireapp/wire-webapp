@@ -39,8 +39,6 @@ test(
   'New person joins team and setups up device',
   {tag: ['@TC-8635', '@crit-flow-web']},
   async ({pageManager, api, browser}) => {
-    test.slow(); // Increasing test timeout to 90 seconds to accommodate the full flow
-
     const {pages, components, modals} = pageManager.webapp;
 
     await test.step('Preconditions: Creating preconditions for the test via API', async () => {

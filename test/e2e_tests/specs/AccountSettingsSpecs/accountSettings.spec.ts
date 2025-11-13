@@ -29,7 +29,6 @@ test.describe('account settings', () => {
   let owner = getUser();
   const members = Array.from({length: 2}, () => getUser());
   const [memberA, memberB] = members;
-  test.slow();
 
   test.beforeAll(async ({api}) => {
     const user = await bootstrapTeamForTesting(api, members, owner, 'test');
@@ -166,7 +165,7 @@ test.describe('account settings', () => {
       await completeLogin(pageManager, owner);
 
       await expect(components.conversationSidebar().manageTeamButton).toBeVisible();
-      await expect(await components.conversationSidebar().manageTeamButton.getAttribute('href')).toBe(
+      expect(await components.conversationSidebar().manageTeamButton.getAttribute('href')).toBe(
         'https://wire-teams-dev.zinfra.io/login/',
       );
     },
@@ -246,7 +245,7 @@ test.describe('account settings', () => {
 
       await expect(message.getByTestId('sender-name')).toHaveText(memberA.fullName);
 
-      await pages.conversation().reactOnMessage(message);
+      await pages.conversation().reactOnMessage(message, 'plus-one');
 
       await expect(await pages.conversation().getCurrentFocusedToolTip(message)).toHaveText(
         `${memberA.fullName} reacted with +1`,

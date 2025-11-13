@@ -40,7 +40,6 @@ test('Personal Account Lifecycle', {tag: ['@TC-8638', '@crit-flow-web']}, async 
   const [pageManagerB, pageManagerC] = pageManagers;
 
   const {pages, modals, components} = pageManager.webapp;
-  test.slow(); // Increasing test timeout to 90 seconds to accommodate the full flow
 
   await test.step('Preconditions: Creating preconditions for the test via API', async () => {
     await Promise.all(

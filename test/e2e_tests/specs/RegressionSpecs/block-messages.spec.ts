@@ -30,8 +30,6 @@ const userB = getUser();
 const userA = getUser();
 
 test('Block specs', {tag: ['@TC-141', '@regression']}, async ({pageManager: userAPageManager, api, browser}) => {
-  test.slow(); // Increasing test timeout to 90 seconds to accommodate the full flow
-
   const {pages: userAPages, modals: userAModals, components: userAComponents} = userAPageManager.webapp;
   const userBContext = await browser.newContext();
   const userBPage = await userBContext.newPage();

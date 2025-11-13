@@ -70,6 +70,15 @@ import {APIClient} from '../service/APIClientSingleton';
 import {Core} from '../service/CoreSingleton';
 import {ViewModelRepositories} from '../view_model/MainViewModel';
 
+export enum CoreCryptoLogLevel {
+  Off = 1,
+  Trace = 2,
+  Debug = 3,
+  Info = 4,
+  Warn = 5,
+  Error = 6,
+}
+
 export class DebugUtil {
   private readonly logger: Logger;
   private readonly callingRepository: CallingRepository;
@@ -268,6 +277,10 @@ export class DebugUtil {
 
   async disablePressSpaceToUnmute() {
     this.propertiesRepository.savePreference(PROPERTIES_TYPE.CALL.ENABLE_PRESS_SPACE_TO_UNMUTE, false);
+  }
+
+  async setCoreCryptoMaxLogLevel(level: CoreCryptoLogLevel) {
+    return this.core.setMaxCoreCryptoLogLevel(level);
   }
 
   async resetMLSConversation() {

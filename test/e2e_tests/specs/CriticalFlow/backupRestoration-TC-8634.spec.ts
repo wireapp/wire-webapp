@@ -33,8 +33,6 @@ let backupName: string;
 let passwordProtectedBackupName: string;
 
 test('Setting up new device with a backup', {tag: ['@TC-8634', '@crit-flow-web']}, async ({pageManager, api}) => {
-  test.slow(); // Increasing test timeout to 90 seconds to accommodate the full flow
-
   const {pages, modals, components} = pageManager.webapp;
 
   const createAndSaveBackup = async (password?: string, filenamePrefix?: string): Promise<string> => {
