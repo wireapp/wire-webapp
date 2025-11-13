@@ -17,7 +17,7 @@
  *
  */
 
-import {useState, useRef, useEffect} from 'react';
+import {useState, useRef, useEffect, useId} from 'react';
 
 import {container} from 'tsyringe';
 
@@ -28,6 +28,7 @@ import {TeamState} from 'Repositories/team/TeamState';
 import {Config} from 'src/script/Config';
 import {SidebarTabs, useSidebarStore} from 'src/script/page/LeftSidebar/panels/Conversations/useSidebarStore';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
+import {handleEscDown} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
 import {useChannelsFeatureFlag} from 'Util/useChannelsFeatureFlag';
 
@@ -38,6 +39,7 @@ export const TabsFilterButton = () => {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const buttonRef = useRef<HTMLButtonElement>(null);
+  const menuId = useId();
 
   const {isChannelsEnabled} = useChannelsFeatureFlag();
   const teamState = container.resolve(TeamState);
@@ -61,6 +63,23 @@ export const TabsFilterButton = () => {
 
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [isOpen]);
+
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      handleEscDown(event, () => {
+        setIsOpen(false);
+        buttonRef.current?.focus();
+      });
+    };
+
+    if (isOpen) {
+      document.addEventListener('keydown', handleKeyDown);
+    }
+
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown);
     };
   }, [isOpen]);
 
@@ -98,16 +117,32 @@ export const TabsFilterButton = () => {
         onClick={() => setIsOpen(!isOpen)}
         data-uie-name="tabs-filter-button"
         title={t('tabsFilterTooltip')}
-        css={filterButton(false)}
+        css={filterButton(isOpen)}
         type="button"
+        aria-label={t('tabsFilterTooltip')}
+        aria-expanded={isOpen}
+        aria-haspopup="menu"
+        aria-controls={menuId}
       >
         <Icon.SettingsIcon width={12} height={12} />
       </button>
 
       {isOpen && (
-        <div ref={dropdownRef} css={dropdown} data-uie-name="tabs-filter-dropdown">
+        <div
+          ref={dropdownRef}
+          css={dropdown}
+          data-uie-name="tabs-filter-dropdown"
+          id={menuId}
+          role="menu"
+          aria-label={t('tabsFilterTooltip')}
+        >
           {availableTabs.map(tab => (
-            <div key={tab.type} css={dropdownCheckboxItem}>
+            <div
+              key={tab.type}
+              css={dropdownCheckboxItem}
+              role="menuitemcheckbox"
+              aria-checked={visibleTabs.includes(tab.type)}
+            >
               <Checkbox checked={visibleTabs.includes(tab.type)} onChange={() => toggleTabVisibility(tab.type)}>
                 <CheckboxLabel>{tab.label}</CheckboxLabel>
               </Checkbox>
