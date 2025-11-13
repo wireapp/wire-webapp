@@ -3461,10 +3461,11 @@ describe('onMLSResetMessage', () => {
     expect(saveConversationStateInDbSpy).toHaveBeenCalledWith(conversation);
   });
 
-  it('Should skip updating conversation if new groupId already exists locally', async () => {
+  it('Should get epoch from core crypto if new groupId already exists locally', async () => {
     const [conversationRepository, {conversationState, conversationService, core}] = buildConversationRepository();
 
     const conversation = _generateConversation({protocol: CONVERSATION_PROTOCOL.MLS, groupId: 'old-group-id'});
+    conversation.epoch = 1;
 
     conversationState.conversations([conversation]);
 
@@ -3482,13 +3483,18 @@ describe('onMLSResetMessage', () => {
 
     spyOn(core.service!.conversation, 'wipeMLSConversation').and.returnValue(Promise.resolve(undefined));
     spyOn(core.service!.conversation, 'mlsGroupExistsLocally').and.returnValue(Promise.resolve(true));
+    spyOn(core.service!.mls!, 'getEpoch').and.returnValue(Promise.resolve(5));
 
     const updatePropertiesSpy = jest.spyOn(ConversationMapper, 'updateProperties');
     const saveConversationStateInDbSpy = jest.spyOn(conversationService, 'saveConversationStateInDb');
 
     await (conversationRepository as any).onMLSResetMessage(conversation, mlsResetEvent);
 
-    expect(updatePropertiesSpy).not.toHaveBeenCalled();
-    expect(saveConversationStateInDbSpy).not.toHaveBeenCalled();
+    expect(updatePropertiesSpy).toHaveBeenCalledWith(conversation, {
+      groupId: 'new-group-id',
+      epoch: 5,
+    });
+    expect(saveConversationStateInDbSpy).toHaveBeenCalledWith(conversation);
+    expect(conversation.epoch).toBe(5);
   });
 });
