@@ -238,21 +238,12 @@ describe('mapBackendError', () => {
     });
 
     it('maps MLS invalid leaf node signature variant', () => {
-      const error = new BackendError(
-        'Invalid leaf node signature',
-        BackendErrorLabel.MLS_INVALID_LEAF_NODE_SIGNATURE,
-        StatusCode.BAD_REQUEST,
-      );
+      const error = new BackendError('', BackendErrorLabel.MLS_INVALID_LEAF_NODE_SIGNATURE, StatusCode.BAD_REQUEST);
       const mapped = mapBackendError(error);
       expect(mapped).toBeInstanceOf(MLSInvalidLeafNodeSignatureError);
     });
-
     it('maps MLS invalid leaf node index variant', () => {
-      const error = new BackendError(
-        'Invalid leaf node index',
-        BackendErrorLabel.MLS_INVALID_LEAF_NODE_INDEX,
-        StatusCode.BAD_REQUEST,
-      );
+      const error = new BackendError('', BackendErrorLabel.MLS_INVALID_LEAF_NODE_INDEX, StatusCode.BAD_REQUEST);
       const mapped = mapBackendError(error);
       expect(mapped).toBeInstanceOf(MLSInvalidLeafNodeIndexError);
     });
