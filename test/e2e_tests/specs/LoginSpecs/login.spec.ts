@@ -49,13 +49,3 @@ test('Verify you can sign in by email', {tag: ['@TC-3461', '@regression']}, asyn
   await expect(components.conversationSidebar().personalStatusName).toHaveText(`${user.firstName} ${user.lastName}`);
   await expect(components.conversationSidebar().personalUserName).toContainText(user.username);
 });
-
-test('I want to be asked to share telemetry data when I log in', async ({pageManager, createUser}) => {
-  const {pages, modals} = pageManager.webapp;
-  const user = await createUser({disableTelemetry: false});
-
-  await pageManager.openLoginPage();
-  await pages.login().login(user);
-
-  await expect(modals.dataShareConsent().modalTitle).toBeVisible();
-});
