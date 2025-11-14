@@ -4359,13 +4359,45 @@ export class ConversationRepository {
    */
   private async onMLSResetMessage(conversationEntity: Conversation, eventJson: ConversationMLSResetEvent) {
     try {
+      this.logger.info(`Handling MLS reset event for conversation ${conversationEntity.id}`, {eventJson});
       if (!isMLSConversation(conversationEntity)) {
+        this.logger.warn(
+          `Received MLS reset event for a conversation that is not MLS capable: ${conversationEntity.id}`,
+        );
         return;
       }
 
-      await this.core.service?.conversation.wipeMLSConversation(eventJson.data.group_id);
+      const {new_group_id: newGroupId, group_id: oldGroupId} = eventJson.data;
 
-      await this.refreshConversationProtocolProperties(conversationEntity);
+      const conversationService = this.core.service?.conversation;
+      const mlsService = this.core.service?.mls;
+
+      if (!conversationService || !mlsService) {
+        throw new Error('Conversation or Mls service is not available!');
+      }
+
+      await conversationService.wipeMLSConversation(oldGroupId);
+      const existingConversation = await conversationService.mlsGroupExistsLocally(newGroupId);
+
+      let epoch = 0;
+      if (existingConversation) {
+        const newEpoch: number = await mlsService.getEpoch(newGroupId);
+        this.logger.info('An MLS conversation with the new group ID already exists fetched epoch from core crypto', {
+          newEpoch,
+        });
+        epoch = newEpoch;
+      }
+
+      const updatedConversation = ConversationMapper.updateProperties(conversationEntity, {
+        epoch,
+        groupId: newGroupId,
+      });
+
+      await this.saveConversationStateInDb(updatedConversation);
+
+      this.logger.info(
+        `Updated conversation group ID from ${oldGroupId} to ${newGroupId} for conversation ${conversationEntity.id} and set epoch to 0`,
+      );
     } catch (error) {
       this.logger.error(`Failed to reset MLS conversation ${conversationEntity.id}`, error);
     }
