@@ -611,7 +611,9 @@ export class ConversationRepository {
       await this.updateParticipatingUserEntities(conversationEntity);
       await this.saveConversation(conversationEntity);
 
-      fetching_conversations[conversationId].forEach(({resolveFn}) => resolveFn(conversationEntity));
+      for (const {resolveFn} of fetching_conversations[conversationId]) {
+        resolveFn(conversationEntity);
+      }
       delete fetching_conversations[conversationId];
 
       return conversationEntity;
@@ -628,11 +630,15 @@ export class ConversationRepository {
           ConversationError.MESSAGE.CONVERSATION_NOT_FOUND,
           originalError,
         );
-        fetching_conversations[conversationId].forEach(({rejectFn}) => rejectFn(error));
-        delete fetching_conversations[conversationId];
 
+        for (const {rejectFn} of fetching_conversations[conversationId]) {
+          rejectFn(error);
+        }
+
+        delete fetching_conversations[conversationId];
         throw error;
       }
+      throw new Error('unkown error encountered', {cause: originalError});
     }
   }
 

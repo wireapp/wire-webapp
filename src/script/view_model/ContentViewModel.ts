@@ -294,7 +294,10 @@ export class ContentViewModel {
     } catch (error: unknown) {
       if (this.isConversationNotFoundError(error)) {
         // Retry fetching the conversation to handle race conditions
-        const fetchSucceeded = await this.retryFetchConversationWithBackoff(conversation, 5);
+        const fetchSucceeded = await this.retryFetchConversationWithBackoff({
+          id: conversation.domain,
+          domain: conversation.domain,
+        });
 
         if (fetchSucceeded) {
           // Conversation was found after retry, attempt to show it again
