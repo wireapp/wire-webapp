@@ -62,9 +62,6 @@ const logger = LogFactory.getLogger('@wireapp/api-client/http/BackendErrorMapper
 const MESSAGE_BAD_REQUEST_SATISFY = 'Error in $: Failed reading: satisfy';
 const MESSAGE_INVALID_CONVERSATION_UUID = "[path] 'cnv' invalid: Failed reading: Invalid UUID";
 const MESSAGE_INVALID_USER_UUID = "[path] 'usr' invalid: Failed reading: Invalid UUID";
-// BAD_REQUEST / MLS
-const MESSAGE_MLS_INVALID_LEAF_NODE_SIGNATURE = 'Invalid leaf node signature';
-const MESSAGE_MLS_INVALID_LEAF_NODE_INDEX = 'Invalid leaf node index';
 // FORBIDDEN / INVALID_CREDENTIALS and related variants
 const MESSAGE_INVALID_ZAUTH_TOKEN = 'Invalid zauth token';
 const MESSAGE_INVALID_TOKEN = 'Invalid token';
@@ -93,6 +90,11 @@ const defaultHandlers: StatusCodeToLabelMap = {
 
     [BackendErrorLabel.INVALID_INVITATION_CODE]: e =>
       new InvalidInvitationCodeError('Invalid invitation code.', e.label, e.code),
+    [BackendErrorLabel.MLS_INVALID_LEAF_NODE_SIGNATURE]: e =>
+      new MLSInvalidLeafNodeSignatureError('Invalid leaf node signature', e.label, e.code),
+
+    [BackendErrorLabel.MLS_INVALID_LEAF_NODE_INDEX]: e =>
+      new MLSInvalidLeafNodeIndexError('Invalid leaf node index', e.label, e.code),
   },
 
   [StatusCode.FORBIDDEN]: {
@@ -152,14 +154,6 @@ const messageVariantHandlers: StatusCodeToMessageVariantMap = {
         new ConversationIsUnknownError('Conversation ID is unknown.', e.label, e.code),
       [MESSAGE_INVALID_USER_UUID]: e => new UserIsUnknownError('User ID is unknown.', e.label, e.code),
     },
-    [BackendErrorLabel.MLS_INVALID_LEAF_NODE_SIGNATURE]: {
-      [MESSAGE_MLS_INVALID_LEAF_NODE_SIGNATURE]: e =>
-        new MLSInvalidLeafNodeSignatureError('Invalid leaf node signature', e.label, e.code),
-    },
-    [BackendErrorLabel.MLS_INVALID_LEAF_NODE_INDEX]: {
-      [MESSAGE_MLS_INVALID_LEAF_NODE_INDEX]: e =>
-        new MLSInvalidLeafNodeIndexError('Invalid leaf node index', e.label, e.code),
-    },
   },
   [StatusCode.FORBIDDEN]: {
     [BackendErrorLabel.INVALID_CREDENTIALS]: {
@@ -190,17 +184,6 @@ const messageVariantHandlers: StatusCodeToMessageVariantMap = {
     },
   },
 };
-
-function logUnmapped(error: BackendError, reason: string) {
-  if (process.env.NODE_ENV === 'development') {
-    logger.warn('[BackendErrorMapper] Unmapped error:', {
-      code: error.code,
-      label: error.label,
-      message: error.message,
-      reason,
-    });
-  }
-}
 
 export function isMlsGroupOutOfSyncError(error: BackendError): error is MLSGroupOutOfSyncError {
   return (
@@ -236,16 +219,20 @@ export function mapBackendError(error: BackendError): BackendError {
   // 1) Message-specific variant
   const messageVariantHandler = messageVariantHandlers[code]?.[label]?.[message];
   if (messageVariantHandler) {
-    return messageVariantHandler({...error, label} as BackendErrorWithLabel);
+    const mapped = messageVariantHandler({...error, label});
+    logger.info('Mapped backend error with message variant', {error, mapped});
+    return mapped;
   }
 
   // 2) Default fallback for this (code,label)
   const fallbackHandler = defaultHandlers[code]?.[label];
   if (fallbackHandler) {
-    return fallbackHandler({...error, label} as BackendErrorWithLabel);
+    const mapped = fallbackHandler({...error, label});
+    logger.info('Mapped backend error with default handler', {error, mapped});
+    return mapped;
   }
 
   // 3) Unknown (code,label) — keep original but log in dev
-  logUnmapped(error, 'No mapping for code+label (+message)');
+  logger.warn('Failed to map backend error; returning original', {error});
   return error;
 }
