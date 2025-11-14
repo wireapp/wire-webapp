@@ -50,6 +50,7 @@ export class ConversationPage {
   readonly conversationInfoButton: Locator;
   readonly pingButton: Locator;
   readonly messages: Locator;
+  readonly messageDetails: Locator;
   readonly messageItems: Locator;
   readonly filesTab: Locator;
   readonly isTypingIndicator: Locator;
@@ -95,6 +96,7 @@ export class ConversationPage {
     this.messages = page.locator(
       `${selectByDataAttribute('item-message')} ${selectByClass('message-body')}:not(:has(p${selectByClass('text-foreground')})):has(${selectByClass('text')})`,
     );
+    this.messageDetails = page.locator('#message-details');
     this.filesTab = page.locator('#conversation-tab-files');
     this.isTypingIndicator = page.locator(selectByDataAttribute('typing-indicator-title'));
     this.itemPendingRequest = page.locator(selectByDataAttribute('item-pending-requests'));
@@ -222,6 +224,42 @@ export class ConversationPage {
 
     // Take a screenshot of the image
     return await locator.screenshot();
+  }
+
+  /**
+   * Util to get a message in the conversation sent by a given user
+   * @param messageContent Optional parameter to specify content the message should contain. If undefined the last message sent by the user will be returned.
+   */
+  getMessageFromUser(user: User, messageContent?: string) {
+    const messagesFromUser = this.messageItems.filter({
+      has: this.page.getByTestId('sender-name').getByText(user.fullName),
+    });
+    if (messageContent !== undefined) {
+      return messagesFromUser.filter({hasText: messageContent});
+    }
+    return messagesFromUser.last();
+  }
+
+  /**
+   * Open the options associated with a message
+   * @returns the Locator of the now open context menu
+   */
+  async openMessageOptions(message: Locator) {
+    await message.hover();
+    await message.getByTestId('message-actions').getByTestId('go-options').click();
+    // The context menu containing the edit button is positioned globally as an overlay
+    return this.page.getByRole('menu');
+  }
+
+  /** Click the "Edit" option within a messages options putting it into the message input so it can be updated */
+  async editMessage(message: Locator) {
+    const menu = await this.openMessageOptions(message);
+    await menu.getByRole('button', {name: 'Edit'}).click();
+  }
+
+  async openMessageDetails(message: Locator) {
+    const menu = await this.openMessageOptions(message);
+    await menu.getByRole('button', {name: 'Details'}).click();
   }
 
   async reactOnMessage(message: Locator, emojiType: EmojiReaction) {
