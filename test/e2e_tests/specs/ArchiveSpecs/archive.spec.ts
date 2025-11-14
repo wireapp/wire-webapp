@@ -26,8 +26,6 @@ import {createGroup} from 'test/e2e_tests/utils/userActions';
 import {test, expect} from '../../test.fixtures';
 
 test.describe('Accessibility', () => {
-  test.slow();
-
   let owner = getUser();
   const members = Array.from({length: 2}, () => getUser());
   const [memberA, memberB] = members;
@@ -112,7 +110,7 @@ test.describe('Accessibility', () => {
       const groupName = 'test';
       const {components, pages} = pageManager.webapp;
       await completeLogin(pageManager, memberA);
-      await createGroup(pageManager, groupName, [memberB]);
+      await createGroup(pages, groupName, [memberB]);
       await pages.conversation().clickConversationInfoButton();
       await pages.conversationDetails().clickArchiveButton();
       await pageManager.waitForTimeout(400);

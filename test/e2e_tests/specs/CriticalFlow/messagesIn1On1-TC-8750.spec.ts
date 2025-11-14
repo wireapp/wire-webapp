@@ -45,8 +45,6 @@ let memberBPM: PageManager;
 const selfDestructMessageText = 'This message will self-destruct in 10 seconds.';
 
 test('Messages in 1:1', {tag: ['@TC-8750', '@crit-flow-web']}, async ({pageManager, api, browser}) => {
-  test.slow(); // Increasing test timeout to 90 seconds to accommodate the full flow
-
   const {pages, modals, components} = pageManager.webapp;
 
   // Step 0: Preconditions
@@ -178,10 +176,11 @@ test('Messages in 1:1', {tag: ['@TC-8750', '@crit-flow-web']}, async ({pageManag
   await test.step('User A sends a quick (10 sec) self deleting message', async () => {
     await components.inputBarControls().setEphemeralTimerTo('10 seconds');
     await pages.conversation().sendMessage(selfDestructMessageText);
-    expect(await pages.conversation().isMessageVisible(selfDestructMessageText)).toBeTruthy();
+    await expect(pages.conversation().getMessage({content: selfDestructMessageText})).toBeVisible();
   });
+
   await test.step('User B sees the message', async () => {
-    expect(await memberBPM.webapp.pages.conversation().isMessageVisible(selfDestructMessageText)).toBeTruthy();
+    await expect(memberBPM.webapp.pages.conversation().getMessage({content: selfDestructMessageText})).toBeVisible();
   });
 
   // Step 7: Message removal
@@ -189,8 +188,10 @@ test('Messages in 1:1', {tag: ['@TC-8750', '@crit-flow-web']}, async ({pageManag
     await memberBPM.webapp.pages.conversation().page.waitForTimeout(11_000);
   });
   await test.step('Both users see the message as removed', async () => {
-    expect(await memberBPM.webapp.pages.conversation().isMessageVisible(selfDestructMessageText, false)).toBeFalsy();
-    expect(await pages.conversation().isMessageVisible(selfDestructMessageText, false)).toBeFalsy();
+    await expect(
+      memberBPM.webapp.pages.conversation().getMessage({content: selfDestructMessageText}),
+    ).not.toBeVisible();
+    await expect(pages.conversation().getMessage({content: selfDestructMessageText})).not.toBeVisible();
 
     // Reset ephemeral timer to 'Off'
     await components.inputBarControls().setEphemeralTimerTo('Off');

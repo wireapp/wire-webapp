@@ -37,8 +37,6 @@ let memberPages: PageManager;
 test('Channels Management', {tag: ['@TC-8752', '@crit-flow-web']}, async ({pageManager, api, browser}) => {
   const {pages, modals} = pageManager.webapp;
 
-  test.slow(); // Increasing test timeout to 90 seconds to accommodate the full flow
-
   await test.step('Preconditions: Team owner create a channels enabled team', async () => {
     const user = await api.createTeamOwner(owner, teamName);
     owner = {...owner, ...user};
@@ -153,7 +151,9 @@ test('Channels Management', {tag: ['@TC-8752', '@crit-flow-web']}, async ({pageM
   });
 
   await test.step('Team member sees the message', async () => {
-    expect(await memberPages.webapp.pages.conversation().isMessageVisible('Hello team! Admin here.')).toBeTruthy();
+    await expect(
+      memberPages.webapp.pages.conversation().getMessage({content: 'Hello team! Admin here.'}),
+    ).toBeVisible();
   });
 });
 
