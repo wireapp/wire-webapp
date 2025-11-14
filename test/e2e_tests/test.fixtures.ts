@@ -23,11 +23,17 @@ import {ApiManagerE2E} from './backend/apiManager.e2e';
 import {getUser, User} from './data/user';
 import {PageManager} from './pageManager';
 
+type PagePlugin = (page: Page) => void | Promise<void>;
+
 // Define custom test type with axios fixture
 type Fixtures = {
   api: ApiManagerE2E;
   pageManager: PageManager;
-  createPage: () => Promise<Page>;
+  /**
+   * Create a new page within a new browser context - The context and it's pages will be removed after the test automatically
+   * @param setup Array of PagePlugins, effectively functions which will be applied to the page in the given order
+   */
+  createPage: (...setup: PagePlugin[]) => Promise<Page>;
   createUser: (options?: {disableTelemetry?: boolean}) => Promise<User>;
 };
 
@@ -43,10 +49,15 @@ export const test = baseTest.extend<Fixtures>({
   createPage: async ({browser}, use) => {
     const contexts: BrowserContext[] = [];
 
-    await use(async () => {
+    await use(async (...setup) => {
       const context = await browser.newContext();
       const page = await context.newPage();
       contexts.push(context);
+
+      for (const setupFn of setup) {
+        await setupFn(page);
+      }
+
       return page;
     });
 
@@ -73,5 +84,21 @@ export const test = baseTest.extend<Fixtures>({
     await Promise.all(users.map(user => api.deletePersonalUser(user)));
   },
 });
+
+/** PagePlugin to log in as the given user */
+export const withLogin =
+  (user: User): PagePlugin =>
+  async page => {
+    const pageManager = PageManager.from(page);
+    await pageManager.openLoginPage();
+    await pageManager.webapp.pages.login().login(user);
+  };
+
+/** PagePlugin to open a conversation with the given user */
+export const withConversation =
+  (user: Pick<User, 'fullName'>): PagePlugin =>
+  async page => {
+    await PageManager.from(page).webapp.pages.conversationList().openConversation(user.fullName);
+  };
 
 export {expect} from '@playwright/test';
