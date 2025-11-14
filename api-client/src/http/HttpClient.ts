@@ -37,7 +37,7 @@ import {
   TokenExpiredError,
 } from '../auth/';
 import {Config} from '../Config';
-import {BackendError, BackendErrorMapper, ConnectionState, ContentType, StatusCode} from '../http/';
+import {BackendError, ConnectionState, ContentType, StatusCode, mapBackendError} from '../http/';
 import {ObfuscationUtil} from '../obfuscation/';
 import {sendRequestWithCookie} from '../shims/node/cookie';
 
@@ -191,7 +191,7 @@ export class HttpClient extends EventEmitter {
       }
 
       if (HttpClient.isBackendError(error)) {
-        const mappedError = BackendErrorMapper.map(
+        const mappedError = mapBackendError(
           new BackendError(error.response.data.message, error.response.data.label, error.response.data.code),
         );
 
