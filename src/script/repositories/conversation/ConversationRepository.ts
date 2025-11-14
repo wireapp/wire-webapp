@@ -57,7 +57,7 @@ import {ClientMLSError, ClientMLSErrorLabel} from '@wireapp/core/lib/messagingPr
 import {amplify} from 'amplify';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 import {container} from 'tsyringe';
-import {flatten} from 'underscore';
+import {flatten, isError} from 'underscore';
 
 import {Account} from '@wireapp/core';
 import {Asset as ProtobufAsset, Confirmation, LegalHoldStatus} from '@wireapp/protocol-messaging';
@@ -611,23 +611,34 @@ export class ConversationRepository {
       await this.updateParticipatingUserEntities(conversationEntity);
       await this.saveConversation(conversationEntity);
 
-      fetching_conversations[conversationId].forEach(({resolveFn}) => resolveFn(conversationEntity));
+      for (const {resolveFn} of fetching_conversations[conversationId]) {
+        resolveFn(conversationEntity);
+      }
       delete fetching_conversations[conversationId];
 
       return conversationEntity;
-    } catch (originalError) {
-      if (originalError.code === HTTP_STATUS.NOT_FOUND) {
-        this.deleteConversationLocally(qualifiedId, false);
-      }
-      const error = new ConversationError(
-        ConversationError.TYPE.CONVERSATION_NOT_FOUND,
-        ConversationError.MESSAGE.CONVERSATION_NOT_FOUND,
-        originalError,
-      );
-      fetching_conversations[conversationId].forEach(({rejectFn}) => rejectFn(error));
-      delete fetching_conversations[conversationId];
+    } catch (originalError: unknown) {
+      if (isError(originalError)) {
+        const code =
+          originalError && typeof originalError === 'object' && 'code' in originalError ? originalError.code : null;
+        this.logger.error(originalError.message);
+        if (code === HTTP_STATUS.NOT_FOUND) {
+          await this.deleteConversationLocally(qualifiedId, false);
+        }
+        const error = new ConversationError(
+          ConversationError.TYPE.CONVERSATION_NOT_FOUND,
+          ConversationError.MESSAGE.CONVERSATION_NOT_FOUND,
+          originalError,
+        );
 
-      throw error;
+        for (const {rejectFn} of fetching_conversations[conversationId]) {
+          rejectFn(error);
+        }
+
+        delete fetching_conversations[conversationId];
+        throw error;
+      }
+      throw new Error('unkown error encountered', {cause: originalError});
     }
   }
 
