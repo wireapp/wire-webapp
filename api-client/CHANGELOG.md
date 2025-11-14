@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [27.89.2](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@27.89.1...@wireapp/api-client@27.89.2) (2025-11-14)
+
+### Bug Fixes
+
+* **api-client:** Do not rely on error message when mapping MLS leaf node errors [WPB-21751] ([#7571](https://github.com/wireapp/wire-web-packages/issues/7571)) ([0757305](https://github.com/wireapp/wire-web-packages/commit/075730539cdc85485735986bac3ffd052964a5ef))
+
 ## [27.89.1](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@27.89.0...@wireapp/api-client@27.89.1) (2025-11-14)
 
 **Note:** Version bump only for package @wireapp/api-client
