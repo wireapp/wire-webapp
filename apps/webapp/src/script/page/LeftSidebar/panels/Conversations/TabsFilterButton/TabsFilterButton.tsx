@@ -32,7 +32,16 @@ import {handleEscDown} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
 import {useChannelsFeatureFlag} from 'Util/useChannelsFeatureFlag';
 
-import {dropdown, dropdownCheckboxItem, filterButton, filterButtonWrapper} from './TabsFilterButton.styles';
+import {
+  checkboxLabel,
+  dropdown,
+  dropdownCheckboxItem,
+  dropdownDivider,
+  dropdownHeader,
+  filterButton,
+  filterButtonWrapper,
+  roundCheckbox,
+} from './TabsFilterButton.styles';
 
 export const TabsFilterButton = () => {
   const {visibleTabs, toggleTabVisibility} = useSidebarStore();
@@ -140,16 +149,20 @@ export const TabsFilterButton = () => {
           role="menu"
           aria-label={t('tabsFilterTooltip')}
         >
-          {availableTabs.map(tab => (
-            <div
-              key={tab.type}
-              css={dropdownCheckboxItem}
-              role="menuitemcheckbox"
-              aria-checked={visibleTabs.includes(tab.type)}
-            >
-              <Checkbox checked={visibleTabs.includes(tab.type)} onChange={() => toggleTabVisibility(tab.type)}>
-                <CheckboxLabel>{tab.label}</CheckboxLabel>
-              </Checkbox>
+          <div css={dropdownHeader}>{t('tabsFilterHeader')}</div>
+          <div css={dropdownDivider} />
+          {availableTabs.map((tab, index) => (
+            <div key={tab.type}>
+              <div css={dropdownCheckboxItem} role="menuitemcheckbox" aria-checked={visibleTabs.includes(tab.type)}>
+                <Checkbox
+                  wrapperCSS={roundCheckbox}
+                  checked={visibleTabs.includes(tab.type)}
+                  onChange={() => toggleTabVisibility(tab.type)}
+                >
+                  <CheckboxLabel css={checkboxLabel}>{tab.label}</CheckboxLabel>
+                </Checkbox>
+              </div>
+              {index < availableTabs.length - 1 && <div css={dropdownDivider} />}
             </div>
           ))}
         </div>
