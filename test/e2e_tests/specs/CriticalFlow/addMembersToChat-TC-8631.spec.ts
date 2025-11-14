@@ -122,72 +122,68 @@ test(
       // Now all members can send and receive encrypted messages
       // Team owner sends a message
       await pages.conversation().sendMessage(`Hello from ${owner.firstName}!`);
-      expect(await pages.conversation().isMessageVisible(`Hello from ${owner.firstName}!`)).toBeTruthy();
+      await expect(pages.conversation().getMessage({content: `Hello from ${owner.firstName}!`})).toBeVisible();
 
       // Member1 sends a message
       await member1PageManager.webapp.pages.conversation().sendMessage(`Hello from ${member1.firstName}!`);
-      expect(
-        await member1PageManager.webapp.pages.conversation().isMessageVisible(`Hello from ${member1.firstName}!`),
-      ).toBeTruthy();
+      await expect(
+        member1PageManager.webapp.pages.conversation().getMessage({content: `Hello from ${member1.firstName}!`}),
+      ).toBeVisible();
 
       // Member2 sends a message
       await member2PageManager.webapp.pages.conversation().sendMessage(`Hello from ${member2.firstName}!`);
-      expect(
-        await member2PageManager.webapp.pages.conversation().isMessageVisible(`Hello from ${member2.firstName}!`),
-      ).toBeTruthy();
+      await expect(
+        member2PageManager.webapp.pages.conversation().getMessage({content: `Hello from ${member2.firstName}!`}),
+      ).toBeVisible();
 
       // Owner verifies all messages are visible
       await pages.conversationList().openConversation(conversationName);
-      expect(await pages.conversation().isMessageVisible(`Hello from ${member1.firstName}!`)).toBeTruthy();
-      expect(await pages.conversation().isMessageVisible(`Hello from ${member2.firstName}!`)).toBeTruthy();
+      await expect(pages.conversation().getMessage({content: `Hello from ${member1.firstName}!`})).toBeVisible();
+      await expect(pages.conversation().getMessage({content: `Hello from ${member2.firstName}!`})).toBeVisible();
     });
 
     await test.step('Team owner and group members react on received messages with reactions', async () => {
       // Owner reacts to member1's message with +1 (thumbs up)
       await pages.conversationList().openConversation(conversationName);
-      const member1MessageForOwner = pages.conversation().getMessageByText(`Hello from ${member1.firstName}!`).first();
+      const member1MessageForOwner = pages.conversation().getMessage({content: `Hello from ${member1.firstName}!`});
       await member1MessageForOwner.waitFor({state: 'visible'}); // Wait for message to be ready
       await pages.conversation().reactOnMessage(member1MessageForOwner, 'plus-one');
 
       // Owner reacts to member2's message with +1 (thumbs up)
-      const member2MessageForOwner = pages.conversation().getMessageByText(`Hello from ${member2.firstName}!`).first();
+      const member2MessageForOwner = pages.conversation().getMessage({content: `Hello from ${member2.firstName}!`});
       await pages.conversation().reactOnMessage(member2MessageForOwner, 'plus-one');
 
       // Member1 reacts to owner's message with heart (❤️)
       await member1PageManager.webapp.pages.conversationList().openConversation(conversationName);
       const ownerMessageForMember1 = member1PageManager.webapp.pages
         .conversation()
-        .getMessageByText(`Hello from ${owner.firstName}!`)
-        .first();
+        .getMessage({content: `Hello from ${owner.firstName}!`});
       await member1PageManager.webapp.pages.conversation().reactOnMessage(ownerMessageForMember1, 'heart');
 
       // Member1 reacts to member2's message with heart (❤️)
       const member2MessageForMember1 = member1PageManager.webapp.pages
         .conversation()
-        .getMessageByText(`Hello from ${member2.firstName}!`)
-        .first();
+        .getMessage({content: `Hello from ${member2.firstName}!`});
       await member1PageManager.webapp.pages.conversation().reactOnMessage(member2MessageForMember1, 'heart');
 
       // Member2 reacts to owner's message with joy (😂)
       await member2PageManager.webapp.pages.conversationList().openConversation(conversationName);
       const ownerMessageForMember2 = member2PageManager.webapp.pages
         .conversation()
-        .getMessageByText(`Hello from ${owner.firstName}!`)
-        .first();
+        .getMessage({content: `Hello from ${owner.firstName}!`});
       await member2PageManager.webapp.pages.conversation().reactOnMessage(ownerMessageForMember2, 'joy');
 
       // Member2 reacts to member1's message with joy (😂)
       const member1MessageForMember2 = member2PageManager.webapp.pages
         .conversation()
-        .getMessageByText(`Hello from ${member1.firstName}!`)
-        .first();
+        .getMessage({content: `Hello from ${member1.firstName}!`});
       await member2PageManager.webapp.pages.conversation().reactOnMessage(member1MessageForMember2, 'joy');
     });
 
     await test.step('All group participants make sure they see reactions from other group participants', async () => {
       // Owner verifies they can see heart (❤️) and joy (😂) reactions on their message from member1 and member2
       await pages.conversationList().openConversation(conversationName);
-      const ownerMessage = pages.conversation().getMessageByText(`Hello from ${owner.firstName}!`);
+      const ownerMessage = pages.conversation().getMessage({content: `Hello from ${owner.firstName}!`});
       await expect(pages.conversation().getReactionOnMessage(ownerMessage, 'heart')).toBeVisible();
       await expect(pages.conversation().getReactionOnMessage(ownerMessage, 'joy')).toBeVisible();
 
@@ -195,7 +191,7 @@ test(
       await member1PageManager.webapp.pages.conversationList().openConversation(conversationName);
       const member1Message = member1PageManager.webapp.pages
         .conversation()
-        .getMessageByText(`Hello from ${member1.firstName}!`);
+        .getMessage({content: `Hello from ${member1.firstName}!`});
       await expect(
         member1PageManager.webapp.pages.conversation().getReactionOnMessage(member1Message, 'plus-one'),
       ).toBeVisible();
@@ -207,7 +203,7 @@ test(
       await member2PageManager.webapp.pages.conversationList().openConversation(conversationName);
       const member2Message = member2PageManager.webapp.pages
         .conversation()
-        .getMessageByText(`Hello from ${member2.firstName}!`);
+        .getMessage({content: `Hello from ${member2.firstName}!`});
       await expect(
         member2PageManager.webapp.pages.conversation().getReactionOnMessage(member2Message, 'plus-one'),
       ).toBeVisible();

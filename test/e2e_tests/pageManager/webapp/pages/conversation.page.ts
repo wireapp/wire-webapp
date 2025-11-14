@@ -152,9 +152,6 @@ export class ConversationPage {
   async sendMessage(message: string) {
     await this.messageInput.fill(message);
     await this.sendMessageButton.click();
-    // Wait for the specific message to appear in the conversation
-    const messageLocator = this.messages.filter({hasText: message}).last();
-    await messageLocator.waitFor({state: 'visible', timeout: 20_000});
   }
 
   async typeMessage(message: string) {
@@ -184,28 +181,6 @@ export class ConversationPage {
     await this.messageInput.press('Enter');
   }
 
-  async isMessageVisible(messageText: string, waitForVisibility = true) {
-    if (waitForVisibility) {
-      // Wait for the last message to be visible
-      await this.messages.last().waitFor({state: 'visible', timeout: 20_000});
-    }
-
-    // Then get all matching elements
-    const messages = await this.messages.all();
-
-    for (const message of messages) {
-      const messageTextContent = await message.locator(selectByClass('text')).textContent();
-      if (messageTextContent?.trim() === messageText) {
-        return true;
-      }
-    }
-    return false;
-  }
-
-  getMessageByText(messageText: string): Locator {
-    return this.messageItems.filter({hasText: messageText});
-  }
-
   async isImageFromUserVisible(user: User) {
     // Trying multiple times for the image to appear
     const locator = this.getImageLocator(user);
@@ -227,17 +202,26 @@ export class ConversationPage {
   }
 
   /**
-   * Util to get a message in the conversation sent by a given user
-   * @param messageContent Optional parameter to specify content the message should contain. If undefined the last message sent by the user will be returned.
+   * Util to get a message in the conversation
+   * @param options.content Only match messages containing this text
+   * @param options.sender Only match messages send by this user
+   * @returns a Locator to the matching message(s)
    */
-  getMessageFromUser(user: User, messageContent?: string) {
-    const messagesFromUser = this.messageItems.filter({
-      has: this.page.getByTestId('sender-name').getByText(user.fullName),
-    });
-    if (messageContent !== undefined) {
-      return messagesFromUser.filter({hasText: messageContent});
+  getMessage(options?: {content?: string | RegExp; sender?: User}): Locator {
+    let message = this.messageItems;
+
+    if (options?.content) {
+      message = message.filter({hasText: options.content});
     }
-    return messagesFromUser.last();
+
+    if (options?.sender?.fullName) {
+      message = message.filter({
+        // Using getByLabel doesn't work here as the aria label is just placed on a div with no input inside which could be located
+        has: this.page.locator(`.content-message-wrapper[aria-label*="${options.sender.fullName}"]`),
+      });
+    }
+
+    return message;
   }
 
   /**

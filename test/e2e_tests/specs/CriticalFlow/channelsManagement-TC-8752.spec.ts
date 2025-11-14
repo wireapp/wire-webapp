@@ -151,7 +151,9 @@ test('Channels Management', {tag: ['@TC-8752', '@crit-flow-web']}, async ({pageM
   });
 
   await test.step('Team member sees the message', async () => {
-    expect(await memberPages.webapp.pages.conversation().isMessageVisible('Hello team! Admin here.')).toBeTruthy();
+    await expect(
+      memberPages.webapp.pages.conversation().getMessage({content: 'Hello team! Admin here.'}),
+    ).toBeVisible();
   });
 });
 
