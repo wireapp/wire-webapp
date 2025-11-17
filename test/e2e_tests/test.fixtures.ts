@@ -87,11 +87,11 @@ export const test = baseTest.extend<Fixtures>({
 
 /** PagePlugin to log in as the given user */
 export const withLogin =
-  (user: User): PagePlugin =>
+  (user: User | Promise<User>): PagePlugin =>
   async page => {
     const pageManager = PageManager.from(page);
     await pageManager.openLoginPage();
-    await pageManager.webapp.pages.login().login(user);
+    await pageManager.webapp.pages.login().login(await user);
   };
 
 /** PagePlugin to open a conversation with the given user */
