@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2018 Wire Swiss GmbH
+ * Copyright (C) 2025 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,12 +17,4 @@
  *
  */
 
-export * from './Heading';
-export * from './Label';
-export * from './Line';
-export * from './Link';
-export * from './Paragraph';
-export * from './Text';
-export * from './TextLink';
 export * from './ActionLink';
-export * from './Title';

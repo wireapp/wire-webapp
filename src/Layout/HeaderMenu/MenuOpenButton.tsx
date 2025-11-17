@@ -22,14 +22,29 @@ import * as React from 'react';
 import {CSSObject} from '@emotion/react';
 
 import {Theme} from '../../Identity';
+import {COLOR_V2} from '../../Identity/colors-v2/colors-v2';
 import {QueryKeys, media, filterProps} from '../../utils';
 
 export interface MenuOpenButtonProps<T = HTMLDivElement> extends React.HTMLProps<T> {
   open?: boolean;
+  openMenuLabel?: string;
+  closeMenuLabel?: string;
 }
 
 export const menuOpenButtonStyle: <T>(theme: Theme, props: MenuOpenButtonProps<T>) => CSSObject = (theme, {open}) => ({
   display: 'block',
+  cursor: 'pointer',
+  width: 40,
+  height: 32,
+  padding: '5px 8px',
+
+  '&:focus-visible': {
+    background: theme.Button?.secondaryActiveBg ?? COLOR_V2.BLUE_LIGHT_50,
+    border: `1px solid ${theme.Button?.secondaryActiveBorder ?? COLOR_V2.BLUE_LIGHT_300}`,
+    borderRadius: 12,
+    boxShadow: `0 0 0 2px ${theme.general?.focusColor ?? COLOR_V2.BLUE_LIGHT_300}`,
+    outline: 'none',
+  },
   div: {
     backgroundColor: theme.general.color,
     height: '2px',
@@ -55,10 +70,29 @@ export const menuOpenButtonStyle: <T>(theme: Theme, props: MenuOpenButtonProps<T
 
 const filterMenuOpenButtonProps = (props: MenuOpenButtonProps) => filterProps(props, ['open']);
 
-export const MenuOpenButton = (props: MenuOpenButtonProps) => (
-  <div css={(theme: Theme) => menuOpenButtonStyle(theme, props)} {...filterMenuOpenButtonProps(props)}>
-    <div />
-    <div />
-    <div />
-  </div>
-);
+export const MenuOpenButton = ({
+  open,
+  onClick,
+  onKeyDown,
+  openMenuLabel,
+  closeMenuLabel,
+  ...menuBtnProps
+}: MenuOpenButtonProps) => {
+  return (
+    <div
+      role="button"
+      tabIndex={0}
+      aria-haspopup="menu"
+      aria-expanded={open}
+      aria-label={open ? closeMenuLabel : openMenuLabel}
+      css={(theme: Theme) => menuOpenButtonStyle(theme, menuBtnProps)}
+      onKeyDown={onKeyDown}
+      onClick={onClick}
+      {...filterMenuOpenButtonProps(menuBtnProps)}
+    >
+      <div />
+      <div />
+      <div />
+    </div>
+  );
+};

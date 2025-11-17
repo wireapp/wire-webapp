@@ -39,6 +39,8 @@ export interface InputProps<T = HTMLInputElement> extends TextProps<T> {
   inputCSS?: CSSObject;
   startContent?: React.ReactNode;
   endContent?: React.ReactNode;
+  showTogglePasswordLabel?: string;
+  hideTogglePasswordLabel?: string;
 }
 
 export const inputStyle: <T>(theme: Theme, props: InputProps<T>, hasError?: boolean) => CSSObject = (
@@ -138,13 +140,15 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps<HTMLInputElem
     },
     ref,
   ) => {
-    const [togglePassword, setTogglePassword] = useState<boolean>(false);
+    const [isPasswordVisible, setTogglePassword] = useState<boolean>(false);
 
     const hasError = !!error;
     const isPasswordInput = type === 'password';
-    const toggledPasswordType = togglePassword ? 'text' : 'password';
+    const toggledPasswordType = isPasswordVisible ? 'text' : 'password';
 
     const toggleSetPassword = () => setTogglePassword(prevState => !prevState);
+
+    const togglepasswordLabel = isPasswordVisible ? props.hideTogglePasswordLabel : props.showTogglePasswordLabel;
 
     return (
       <div
@@ -188,14 +192,15 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps<HTMLInputElem
           {isPasswordInput && (
             <button
               type="button"
-              data-uie-name={!togglePassword ? 'do-show-password' : 'do-hide-password'}
+              data-uie-name={!isPasswordVisible ? 'do-show-password' : 'do-hide-password'}
               css={{...centerInputAction, background: 'transparent', border: 'none', cursor: 'pointer', padding: 0}}
               onClick={toggleSetPassword}
-              title="Toggle password visibility"
+              title={togglepasswordLabel}
+              aria-label={togglepasswordLabel}
               aria-controls={props.id}
-              aria-expanded={togglePassword}
+              aria-expanded={isPasswordVisible}
             >
-              {togglePassword ? <ShowIcon /> : <HideIcon />}
+              {isPasswordVisible ? <ShowIcon /> : <HideIcon />}
             </button>
           )}
         </div>

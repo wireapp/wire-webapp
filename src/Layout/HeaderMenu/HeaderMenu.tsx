@@ -28,6 +28,8 @@ import {MenuScrollableItems} from './MenuScrollableItems';
 export interface HeaderMenuProps<T = HTMLDivElement> extends React.HTMLProps<T> {
   centerElement?: React.ReactNode;
   logoElement?: React.ReactNode;
+  openMenuLabel?: string;
+  closeMenuLabel?: string;
 }
 
 export const HeaderMenu = ({children, logoElement = null, centerElement = null, ...props}: HeaderMenuProps) => {
@@ -42,6 +44,13 @@ export const HeaderMenu = ({children, logoElement = null, centerElement = null, 
 
   const closeMenu = () => setIsOpen(false);
 
+  const onKeyDown: React.KeyboardEventHandler<HTMLDivElement> = e => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      toggleMenu();
+    }
+  };
+
   return (
     <div css={{height: '64px'}} {...props} data-uie-name="element-header-menu">
       <MenuContent open={isOpen}>
@@ -51,7 +60,10 @@ export const HeaderMenu = ({children, logoElement = null, centerElement = null, 
         <div css={{alignSelf: 'center', display: 'flex'}}>{centerElement}</div>
         <MenuOpenButton
           onClick={toggleMenu}
+          onKeyDown={onKeyDown}
           open={isOpen}
+          openMenuLabel={props.openMenuLabel}
+          closeMenuLabel={props.closeMenuLabel}
           style={{justifySelf: 'end', position: isOpen ? 'fixed' : undefined, right: '16px', top: '21px'}}
           data-uie-name="do-toggle-header-menu"
         />
