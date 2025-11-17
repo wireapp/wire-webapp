@@ -9523,7 +9523,25 @@ __metadata:
   languageName: node
   linkType: hard
 
-"autoprefixer@npm:10.4.21, autoprefixer@npm:^10.4.21":
+"autoprefixer@npm:10.4.22":
+  version: 10.4.22
+  resolution: "autoprefixer@npm:10.4.22"
+  dependencies:
+    browserslist: "npm:^4.27.0"
+    caniuse-lite: "npm:^1.0.30001754"
+    fraction.js: "npm:^5.3.4"
+    normalize-range: "npm:^0.1.2"
+    picocolors: "npm:^1.1.1"
+    postcss-value-parser: "npm:^4.2.0"
+  peerDependencies:
+    postcss: ^8.1.0
+  bin:
+    autoprefixer: bin/autoprefixer
+  checksum: 10/752ce73887364a47fb7b2fedb66cb5a4905f5a2f522fd07c0f63a9a401dbb7fc8a368424b5728073be5c2806356cbe90eb75d5ccdec596f90d6987fac78adcb5
+  languageName: node
+  linkType: hard
+
+"autoprefixer@npm:^10.4.21":
   version: 10.4.21
   resolution: "autoprefixer@npm:10.4.21"
   dependencies:
@@ -10255,6 +10273,13 @@ __metadata:
   version: 1.0.30001754
   resolution: "caniuse-lite@npm:1.0.30001754"
   checksum: 10/6061032b8e799913f6db01ad190bc6885369c0be7853fbe542a36f0d114f193fac6e812d73657526b4d5a6b7add8c56bb629913237f9097b6e6438dcac703965
+  languageName: node
+  linkType: hard
+
+"caniuse-lite@npm:^1.0.30001754":
+  version: 1.0.30001755
+  resolution: "caniuse-lite@npm:1.0.30001755"
+  checksum: 10/67f3b87bfd8f4da6fd69df185f54ab5409171f62185a52c916e1eb2f70f853aa374b0ce75d1742cc0215ca61e4bd1da8aa5557081bb2b6bb7220bf03a19b3b6e
   languageName: node
   linkType: hard
 
@@ -11727,14 +11752,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"emoji-picker-react@npm:4.15.0":
-  version: 4.15.0
-  resolution: "emoji-picker-react@npm:4.15.0"
+"emoji-picker-react@npm:4.15.1":
+  version: 4.15.1
+  resolution: "emoji-picker-react@npm:4.15.1"
   dependencies:
     flairup: "npm:1.0.0"
   peerDependencies:
     react: ">=16"
-  checksum: 10/74b1f3451b2d9669c6cf07b56d61a8750aee05b258e0fdf957927597e4885108512614f489699242acd2d82ab02e3b33790999bd269e4fbfdced662fefb2b5b6
+  checksum: 10/8d7616116ec943b83218176d6d05730d5421e1de43be8231078b3a9f7e4d0b59a5276cb427cd535ddcefcb5e304f9888eba396a87136b177994b6cf7c48e0d36
   languageName: node
   linkType: hard
 
@@ -13118,6 +13143,13 @@ __metadata:
   version: 4.3.7
   resolution: "fraction.js@npm:4.3.7"
   checksum: 10/bb5ebcdeeffcdc37b68ead3bdfc244e68de188e0c64e9702197333c72963b95cc798883ad16adc21588088b942bca5b6a6ff4aeb1362d19f6f3b629035dc15f5
+  languageName: node
+  linkType: hard
+
+"fraction.js@npm:^5.3.4":
+  version: 5.3.4
+  resolution: "fraction.js@npm:5.3.4"
+  checksum: 10/ef2c4bc81b2484065f8f7e4c2498f3fdfe6d233b8e7c7f75e3683ed10698536129b2c2dbd6c3f788ca4a020ec07116dd909a91036a364c98dc802b5003bfc613
   languageName: node
   linkType: hard
 
@@ -17260,12 +17292,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"oidc-client-ts@npm:3.3.0":
-  version: 3.3.0
-  resolution: "oidc-client-ts@npm:3.3.0"
+"oidc-client-ts@npm:3.4.0":
+  version: 3.4.0
+  resolution: "oidc-client-ts@npm:3.4.0"
   dependencies:
     jwt-decode: "npm:^4.0.0"
-  checksum: 10/356940cb12075cc80c1b48ac5e67e2676542fa13664214c650fdf70f1f5a9f753bda8bfaf11182eb257a5ae564feefb165397ab44afa7138ba4846b63ecc6f0e
+  checksum: 10/d6e4dd5e2f4cd7da0ede9cf1bca131ea9811f030706d5322409b476047746e3c8f2d117804eb488187cc3c2253f986f8a1e053ae2c943b525c6e4d2a1c1b8094
   languageName: node
   linkType: hard
 
@@ -22665,7 +22697,7 @@ __metadata:
     "@wireapp/webapp-events": "npm:0.28.1"
     amplify: "https://github.com/wireapp/amplify#head=master"
     archiver: "npm:7.0.1"
-    autoprefixer: "npm:10.4.21"
+    autoprefixer: "npm:10.4.22"
     babel-loader: "npm:10.0.0"
     babel-plugin-transform-import-meta: "npm:2.3.3"
     beautiful-react-hooks: "npm:5.0.3"
@@ -22681,7 +22713,7 @@ __metadata:
     dexie-encrypted: "npm:2.0.0"
     dotenv: "npm:16.4.7"
     dpdm: "npm:3.14.0"
-    emoji-picker-react: "npm:4.15.0"
+    emoji-picker-react: "npm:4.15.1"
     eslint: "npm:8.57.0"
     eslint-plugin-prettier: "npm:5.1.3"
     fake-indexeddb: "npm:6.2.5"
@@ -22712,7 +22744,7 @@ __metadata:
     long: "npm:5.3.2"
     markdown-it: "npm:14.0.0"
     murmurhash: "npm:2.0.1"
-    oidc-client-ts: "npm:3.3.0"
+    oidc-client-ts: "npm:3.4.0"
     os-browserify: "npm:0.3.0"
     path-browserify: "npm:1.0.1"
     path-to-regexp: "npm:8.3.0"

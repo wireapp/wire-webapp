@@ -241,7 +241,7 @@ test.describe('account settings', () => {
       // check that the chat is open
       expect(await pages.conversationList().isConversationItemVisible(groupName)).toBeTruthy();
       await pages.conversation().sendMessage('test');
-      const message = await pages.conversation().messageItems.nth(1); // skip the system messages
+      const message = pages.conversation().getMessage({content: 'test', sender: memberA});
 
       await expect(message.getByTestId('sender-name')).toHaveText(memberA.fullName);
 

@@ -72,9 +72,12 @@ test('Conversation Management', {tag: ['@TC-8636', '@crit-flow-web']}, async ({p
 
   await test.step('Team owner signed in to the application and verify messages', async () => {
     await pages.conversationList().openConversation(conversationName);
-    for (const member of members) {
-      expect(await pages.conversation().isMessageVisible(`Hello team! ${member.firstName} here.`)).toBeTruthy();
-    }
+    await Promise.all(
+      members.map(async member => {
+        const message = pages.conversation().getMessage({content: `Hello team! ${member.firstName} here.`});
+        await expect(message).toBeVisible();
+      }),
+    );
   });
 
   await test.step('Team owner send self-destructing messages', async () => {
@@ -82,11 +85,11 @@ test('Conversation Management', {tag: ['@TC-8636', '@crit-flow-web']}, async ({p
     await components.inputBarControls().setEphemeralTimerTo('10 seconds');
     await pages.conversation().sendMessage(textMessage);
 
-    expect(await pages.conversation().isMessageVisible(textMessage)).toBeTruthy();
+    await expect(pages.conversation().getMessage({content: textMessage})).toBeVisible();
     // Wait for more than 10 seconds to ensure the message is deleted
     await pages.conversation().page.waitForTimeout(11000);
 
-    expect(await pages.conversation().isMessageVisible(textMessage, false)).toBeFalsy();
+    await expect(pages.conversation().getMessage({content: textMessage})).not.toBeVisible();
     await components.inputBarControls().setEphemeralTimerTo('Off');
   });
 
