@@ -195,11 +195,14 @@ test.describe('Edit', () => {
     {tag: ['@TC-692', '@regression']},
     async ({createPage, userA, userB}) => {
       const [userAPage, userBPage] = await Promise.all([
-        createPage(withLogin(userA), withConversation(userB)),
-        createPage(withLogin(userB), withConversation(userA)),
+        PageManager.from(createPage(withLogin(userA), withConversation(userB))),
+        PageManager.from(createPage(withLogin(userB), withConversation(userA))),
       ]);
-      const userAPages = PageManager.from(userAPage).webapp.pages;
-      const userBPages = PageManager.from(userBPage).webapp.pages;
+
+      // ToDo: Can this boiler plate be abstracted? E.g. overload Pagemanager.from to accept a promise?
+      // Maybe it would be best to split the PageManager a bit, since the .webapp.pages often prevents optimization?
+      const userAPages = userAPage.webapp.pages;
+      const userBPages = userBPage.webapp.pages;
 
       await userAPages.conversation().sendMessage('Test');
       const sentMessage = userAPages.conversation().getMessage({sender: userA});
