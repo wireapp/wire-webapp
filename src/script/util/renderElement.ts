@@ -25,6 +25,8 @@ import {getLogger} from './Logger';
 
 const logger = getLogger('renderElement');
 
+type RootRenderParam = Parameters<Root['render']>[0];
+
 const roots = new Map<
   string,
   {
@@ -93,7 +95,7 @@ const renderElement =
       props.onClose?.();
     };
 
-    const element = React.createElement(Component, {...props, onClose});
+    const element = React.createElement(Component, {...props, onClose}) as RootRenderParam;
     reactRoot.render(element);
   };
 
