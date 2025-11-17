@@ -37,8 +37,7 @@ test.describe('Edit', () => {
   });
 
   test('I can edit my message in 1:1', {tag: ['@TC-679', '@regression']}, async ({createPage, userA, userB}) => {
-    const page = await createPage(withLogin(userA), withConversation(userB));
-    const {pages} = PageManager.from(page).webapp;
+    const pages = (await PageManager.from(createPage(withLogin(userA), withConversation(userB)))).webapp.pages;
 
     await pages.conversation().sendMessage('Test Message');
 
@@ -57,8 +56,7 @@ test.describe('Edit', () => {
     'I can edit my message in a group conversation',
     {tag: ['@TC-680', '@regression']},
     async ({createPage, userA, userB}) => {
-      const page = await createPage(withLogin(userA));
-      const {pages} = PageManager.from(page).webapp;
+      const pages = (await PageManager.from(createPage(withLogin(userA)))).webapp.pages;
 
       await createGroup(pages, 'Test Group', [userB]);
       await pages.conversationList().openConversation('Test Group');
@@ -80,11 +78,9 @@ test.describe('Edit', () => {
     'I see changed message if message was edited from another device',
     {tag: ['@TC-682', '@regression']},
     async ({createPage, userA, userB}) => {
-      const deviceAPage = await createPage(withLogin(userA), withConversation(userB));
-      const deviceA = PageManager.from(deviceAPage).webapp.pages;
+      const deviceA = (await PageManager.from(createPage(withLogin(userA), withConversation(userB)))).webapp.pages;
       // Device 2 is intentionally created after device 1 to ensure the history info warning is confirmed
-      const deviceBPage = await createPage(withLogin(userA));
-      const deviceB = PageManager.from(deviceBPage).webapp.pages;
+      const deviceB = (await PageManager.from(createPage(withLogin(userA)))).webapp.pages;
 
       await deviceB.historyInfo().clickConfirmButton();
       await deviceB.conversationList().openConversation(userB.fullName);
@@ -106,12 +102,10 @@ test.describe('Edit', () => {
   );
 
   test('I cannot edit another users message', {tag: ['@TC-683', '@regression']}, async ({createPage, userA, userB}) => {
-    const [userAPage, userBPage] = await Promise.all([
-      createPage(withLogin(userA), withConversation(userB)),
-      createPage(withLogin(userB), withConversation(userA)),
+    const [userAPages, userBPages] = await Promise.all([
+      PageManager.from(createPage(withLogin(userA), withConversation(userB))).then(pm => pm.webapp.pages),
+      PageManager.from(createPage(withLogin(userB), withConversation(userA))).then(pm => pm.webapp.pages),
     ]);
-    const userAPages = PageManager.from(userAPage).webapp.pages;
-    const userBPages = PageManager.from(userBPage).webapp.pages;
 
     await userAPages.conversation().sendMessage('Test Message');
 
@@ -126,8 +120,7 @@ test.describe('Edit', () => {
     'I can edit my last message by pressing the up arrow key',
     {tag: ['@TC-686', '@regression']},
     async ({createPage, userA, userB}) => {
-      const page = await createPage(withLogin(userA), withConversation(userB));
-      const pages = PageManager.from(page).webapp.pages;
+      const pages = (await PageManager.from(createPage(withLogin(userA), withConversation(userB)))).webapp.pages;
 
       await pages.conversation().sendMessage('Test Message');
       await expect(pages.conversation().getMessage({content: 'Test Message'})).toBeVisible();
@@ -141,12 +134,10 @@ test.describe('Edit', () => {
     'Editing a message does not create unread dot on receiver side',
     {tag: ['@TC-690', '@regression']},
     async ({createPage, userA, userB}) => {
-      const [userAPage, userBPage] = await Promise.all([
-        createPage(withLogin(userA), withConversation(userB)),
-        createPage(withLogin(userB), withConversation(userA)),
+      const [userAPages, userBPages] = await Promise.all([
+        PageManager.from(createPage(withLogin(userA), withConversation(userB))).then(pm => pm.webapp.pages),
+        PageManager.from(createPage(withLogin(userB), withConversation(userA))).then(pm => pm.webapp.pages),
       ]);
-      const userAPages = PageManager.from(userAPage).webapp.pages;
-      const userBPages = PageManager.from(userBPage).webapp.pages;
 
       await test.step('Create group as second conversation', async () => {
         // We need to create a second conversation in order to switch to it to ensure the unread marker can be shown on the not open conversation
@@ -194,15 +185,10 @@ test.describe('Edit', () => {
     'I can see the changed message was edited from another user',
     {tag: ['@TC-692', '@regression']},
     async ({createPage, userA, userB}) => {
-      const [userAPage, userBPage] = await Promise.all([
-        PageManager.from(createPage(withLogin(userA), withConversation(userB))),
-        PageManager.from(createPage(withLogin(userB), withConversation(userA))),
+      const [userAPages, userBPages] = await Promise.all([
+        PageManager.from(createPage(withLogin(userA), withConversation(userB))).then(pm => pm.webapp.pages),
+        PageManager.from(createPage(withLogin(userB), withConversation(userA))).then(pm => pm.webapp.pages),
       ]);
-
-      // ToDo: Can this boiler plate be abstracted? E.g. overload Pagemanager.from to accept a promise?
-      // Maybe it would be best to split the PageManager a bit, since the .webapp.pages often prevents optimization?
-      const userAPages = userAPage.webapp.pages;
-      const userBPages = userBPage.webapp.pages;
 
       await userAPages.conversation().sendMessage('Test');
       const sentMessage = userAPages.conversation().getMessage({sender: userA});
@@ -223,8 +209,7 @@ test.describe('Edit', () => {
     'I want to see the last edited text including a timestamp in message detail view if the message has been edited',
     {tag: ['@TC-3563', '@regression']},
     async ({createPage, userA, userB}) => {
-      const page = await createPage(withLogin(userA));
-      const pages = PageManager.from(page).webapp.pages;
+      const pages = await PageManager.from(createPage(withLogin(userA))).then(pm => pm.webapp.pages);
       await createGroup(pages, 'Test Group', [userB]); // The message detail view is only available for group conversations
 
       await pages.conversationList().openConversation('Test Group');
