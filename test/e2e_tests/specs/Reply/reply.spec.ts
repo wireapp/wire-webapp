@@ -259,6 +259,38 @@ test.describe('Reply', () => {
   );
 
   test(
+    'I want to reply to a location share',
+    {tag: ['@TC-3009', '@regression']},
+    async ({browser, api, userA, userB}) => {
+      const pages = await createPagesForUser(browser, userA, {openConversationWith: userB});
+
+      await test.step('Prerequisite: Send location via TestService', async () => {
+        const {instanceId} = await api.testService.createInstance(
+          userA.password,
+          userA.email,
+          'Test Service Device',
+          false,
+        );
+        const conversationId = await api.conversation.getConversationWithUser(userA.token, userB.id!);
+        await api.testService.sendLocation(instanceId, conversationId, {
+          locationName: 'Test Location',
+          latitude: 52.5170365,
+          longitude: 13.404954,
+          zoom: 42,
+        });
+      });
+
+      const messageWithLink = pages.conversation().getMessage({sender: userA});
+      await pages.conversation().replyToMessage(messageWithLink);
+      await pages.conversation().sendMessage('Reply');
+
+      const reply = pages.conversation().getMessage({content: 'Reply'});
+      await expect(reply.getByTestId('quote-item')).toContainText('Test Location');
+      await expect(reply.getByTestId('quote-item').getByRole('link', {name: 'Open Map'})).toBeVisible();
+    },
+  );
+
+  test(
     'I want to send a timed message as a reply to any type of a message',
     {tag: ['@TC-3011', '@regression']},
     async ({browser, userA, userB}) => {
