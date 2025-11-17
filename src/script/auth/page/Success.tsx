@@ -21,7 +21,7 @@ import {useEffect} from 'react';
 
 import {SuccessShield} from '@wireapp/react-ui-kit/lib/Images/SuccessShield';
 
-import {ActionLink, FlexBox, Text} from '@wireapp/react-ui-kit';
+import {ActionLinkButton, FlexBox, Text} from '@wireapp/react-ui-kit';
 
 import {Config} from 'src/script/Config';
 import {t} from 'Util/LocalizerUtil';
@@ -56,21 +56,21 @@ export const Success = () => {
             {t('success.subheader')}
           </Text>
 
-          <ActionLink
+          <ActionLinkButton
             data-uie-name="do-download-wire"
             onClick={() => secureOpen(pathWithParams(Config.getConfig().GET_WIRE_URL))}
             css={styles.link}
           >
             {t('success.downloadButton')}
-          </ActionLink>
+          </ActionLinkButton>
 
-          <ActionLink
+          <ActionLinkButton
             data-uie-name="do-open-wire-web"
             onClick={() => secureOpen(pathWithParams(EXTERNAL_ROUTE.WEBAPP))}
             css={styles.link}
           >
             {t('success.openWebAppText')}
-          </ActionLink>
+          </ActionLinkButton>
         </FlexBox>
       </AccountRegistrationLayout>
     </Page>

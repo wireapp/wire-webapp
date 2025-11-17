@@ -91,8 +91,8 @@ const SetPasswordComponent = ({
             name="password"
             placeholder={t('setPassword.passwordPlaceholder')}
             type="password"
-            togglePasswordShowLabel={t('togglePasswordShowLabel')}
-            togglePasswordHideLabel={t('togglePasswordHideLabel')}
+            showTogglePasswordLabel={t('showTogglePasswordLabel')}
+            hideTogglePasswordLabel={t('hideTogglePasswordLabel')}
             markInvalid={!isValidPassword}
             onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
               passwordInput.current.setCustomValidity('');

@@ -25,7 +25,7 @@ import {connect} from 'react-redux';
 import {useNavigate} from 'react-router-dom';
 import {AnyAction, Dispatch} from 'redux';
 
-import {ActionLink, CodeInput, FlexBox, Text} from '@wireapp/react-ui-kit';
+import {ActionLinkButton, CodeInput, FlexBox, Text} from '@wireapp/react-ui-kit';
 
 import {t} from 'Util/LocalizerUtil';
 import {getLogger} from 'Util/Logger';
@@ -110,9 +110,9 @@ const VerifyEmailCodeComponent = ({
             codePlaceholder={t('verify.codePlaceholder')}
           />
           {parseError(authError)}
-          <ActionLink onClick={resendCode} data-uie-name="do-resend-code" css={styles.resendLink}>
+          <ActionLinkButton onClick={resendCode} data-uie-name="do-resend-code" css={styles.resendLink}>
             {t('verify.resendCode')}
-          </ActionLink>
+          </ActionLinkButton>
         </FlexBox>
       </AccountRegistrationLayout>
     </Page>

@@ -47,8 +47,8 @@ export const PasswordAdvancedSecurityForm = ({
       <Input
         id="modal_pswd_with_rules"
         type="password"
-        togglePasswordShowLabel={t('togglePasswordShowLabel')}
-        togglePasswordHideLabel={t('togglePasswordHideLabel')}
+        showTogglePasswordLabel={t('showTogglePasswordLabel')}
+        hideTogglePasswordLabel={t('hideTogglePasswordLabel')}
         value={inputValue}
         placeholder={inputPlaceholder}
         required

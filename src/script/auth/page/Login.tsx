@@ -30,6 +30,7 @@ import {AnyAction, Dispatch} from 'redux';
 
 import {Runtime, UrlUtil} from '@wireapp/commons';
 import {
+  ActionLinkButton,
   Button,
   ButtonVariant,
   Checkbox,
@@ -51,7 +52,6 @@ import {
   QueryKeys,
   Text,
   useMatchMedia,
-  ActionLink,
 } from '@wireapp/react-ui-kit';
 
 import {LogoFullIcon} from 'Components/Icon';
@@ -470,13 +470,13 @@ const LoginComponent = ({
                       {isSendingTwoFactorCode ? (
                         <Loading size={20} />
                       ) : (
-                        <ActionLink
+                        <ActionLinkButton
                           onClick={resendTwoFactorCode}
                           data-uie-name="do-resend-code"
                           css={styles.resendLink}
                         >
                           {t('verify.resendCode')}
-                        </ActionLink>
+                        </ActionLinkButton>
                       )}
                     </div>
                     <FlexBox justify="center">
