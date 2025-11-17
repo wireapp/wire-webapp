@@ -57,7 +57,7 @@ import {ClientMLSError, ClientMLSErrorLabel} from '@wireapp/core/lib/messagingPr
 import {amplify} from 'amplify';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 import {container} from 'tsyringe';
-import {flatten} from 'underscore';
+import {flatten, isError} from 'underscore';
 
 import {Account} from '@wireapp/core';
 import {Asset as ProtobufAsset, Confirmation, LegalHoldStatus} from '@wireapp/protocol-messaging';
@@ -611,23 +611,34 @@ export class ConversationRepository {
       await this.updateParticipatingUserEntities(conversationEntity);
       await this.saveConversation(conversationEntity);
 
-      fetching_conversations[conversationId].forEach(({resolveFn}) => resolveFn(conversationEntity));
+      for (const {resolveFn} of fetching_conversations[conversationId]) {
+        resolveFn(conversationEntity);
+      }
       delete fetching_conversations[conversationId];
 
       return conversationEntity;
-    } catch (originalError) {
-      if (originalError.code === HTTP_STATUS.NOT_FOUND) {
-        this.deleteConversationLocally(qualifiedId, false);
-      }
-      const error = new ConversationError(
-        ConversationError.TYPE.CONVERSATION_NOT_FOUND,
-        ConversationError.MESSAGE.CONVERSATION_NOT_FOUND,
-        originalError,
-      );
-      fetching_conversations[conversationId].forEach(({rejectFn}) => rejectFn(error));
-      delete fetching_conversations[conversationId];
+    } catch (originalError: unknown) {
+      if (isError(originalError)) {
+        const code =
+          originalError && typeof originalError === 'object' && 'code' in originalError ? originalError.code : null;
+        this.logger.error(originalError.message);
+        if (code === HTTP_STATUS.NOT_FOUND) {
+          await this.deleteConversationLocally(qualifiedId, false);
+        }
+        const error = new ConversationError(
+          ConversationError.TYPE.CONVERSATION_NOT_FOUND,
+          ConversationError.MESSAGE.CONVERSATION_NOT_FOUND,
+          originalError,
+        );
 
-      throw error;
+        for (const {rejectFn} of fetching_conversations[conversationId]) {
+          rejectFn(error);
+        }
+
+        delete fetching_conversations[conversationId];
+        throw error;
+      }
+      throw new Error('unkown error encountered', {cause: originalError});
     }
   }
 
@@ -4359,13 +4370,45 @@ export class ConversationRepository {
    */
   private async onMLSResetMessage(conversationEntity: Conversation, eventJson: ConversationMLSResetEvent) {
     try {
+      this.logger.info(`Handling MLS reset event for conversation ${conversationEntity.id}`, {eventJson});
       if (!isMLSConversation(conversationEntity)) {
+        this.logger.warn(
+          `Received MLS reset event for a conversation that is not MLS capable: ${conversationEntity.id}`,
+        );
         return;
       }
 
-      await this.core.service?.conversation.wipeMLSConversation(eventJson.data.group_id);
+      const {new_group_id: newGroupId, group_id: oldGroupId} = eventJson.data;
 
-      await this.refreshConversationProtocolProperties(conversationEntity);
+      const conversationService = this.core.service?.conversation;
+      const mlsService = this.core.service?.mls;
+
+      if (!conversationService || !mlsService) {
+        throw new Error('Conversation or Mls service is not available!');
+      }
+
+      await conversationService.wipeMLSConversation(oldGroupId);
+      const existingConversation = await conversationService.mlsGroupExistsLocally(newGroupId);
+
+      let epoch = 0;
+      if (existingConversation) {
+        const newEpoch: number = await mlsService.getEpoch(newGroupId);
+        this.logger.info('An MLS conversation with the new group ID already exists fetched epoch from core crypto', {
+          newEpoch,
+        });
+        epoch = newEpoch;
+      }
+
+      const updatedConversation = ConversationMapper.updateProperties(conversationEntity, {
+        epoch,
+        groupId: newGroupId,
+      });
+
+      await this.saveConversationStateInDb(updatedConversation);
+
+      this.logger.info(
+        `Updated conversation group ID from ${oldGroupId} to ${newGroupId} for conversation ${conversationEntity.id} and set epoch to 0`,
+      );
     } catch (error) {
       this.logger.error(`Failed to reset MLS conversation ${conversationEntity.id}`, error);
     }

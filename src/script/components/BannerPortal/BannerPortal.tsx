@@ -47,10 +47,14 @@ export const BannerPortal = ({onClose, positionX = 0, positionY = 0, children}: 
     element.style.top = `${positionY - element.clientHeight}px`;
   };
 
-  return createPortal(
-    <div ref={updateRef} onMouseLeave={onClose} css={{...portalContainerCss, left: positionX}}>
-      {children}
-    </div>,
-    activeWindow.document.body,
+  return (
+    <>
+      {createPortal(
+        <div ref={updateRef} onMouseLeave={onClose} css={{...portalContainerCss, left: positionX}}>
+          {children}
+        </div>,
+        activeWindow.document.body,
+      )}
+    </>
   );
 };

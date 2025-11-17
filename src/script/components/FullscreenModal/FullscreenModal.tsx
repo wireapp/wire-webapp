@@ -100,10 +100,14 @@ export const FullscreenModal = ({id, isOpen, children, onClose}: FullscreenModal
     return null;
   }
 
-  return createPortal(
-    <div role="dialog" aria-modal="true" id={id} css={modalStyles(isAnimating)}>
-      <div css={contentStyles(isAnimating)}>{children}</div>
-    </div>,
-    document.body,
+  return (
+    <>
+      {createPortal(
+        <div role="dialog" aria-modal="true" id={id} css={modalStyles(isAnimating)}>
+          <div css={contentStyles(isAnimating)}>{children}</div>
+        </div>,
+        document.body,
+      )}
+    </>
   );
 };

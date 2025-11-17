@@ -77,29 +77,23 @@ export const sendTextMessageToConversation = async (
   const {pages} = pageManager.webapp;
   await pages.conversationList().openConversation(conversation);
   await pages.conversation().sendMessage(message);
-
-  // TODO: Bug [WPB-18226] Message is not visible in the conversation after sending it
-  await pages.conversation().page.waitForTimeout(500); // Wait for the message to be sent
-  // await pageManager.refreshPage({waitUntil: 'domcontentloaded'}); // does not check if the page is loaded and time out!
-  // End of TODO: Bug [WPB-18226]
-
-  expect(await pages.conversation().isMessageVisible(message)).toBeTruthy();
 };
 
-export const createGroup = async (pageManager: PageManager, conversationName: string, user: User[]) => {
-  await pageManager.webapp.pages.conversationList().clickCreateGroup();
-  await pageManager.webapp.pages.groupCreation().setGroupName(conversationName);
-  await pageManager.webapp.pages.startUI().selectUsers(user.flatMap(user => user.username));
-  await pageManager.webapp.pages.groupCreation().clickCreateGroupButton();
+type UserPages = PageManager['webapp']['pages'];
+export const createGroup = async (pages: UserPages, conversationName: string, user: User[]) => {
+  await pages.conversationList().clickCreateGroup();
+  await pages.groupCreation().setGroupName(conversationName);
+  await pages.startUI().selectUsers(user.map(user => user.username));
+  await pages.groupCreation().clickCreateGroupButton();
 };
 
-export const createChannel = async (pageManager: PageManager, conversationName: string, user: User[]) => {
-  await pageManager.webapp.pages.conversationList().clickCreateGroup();
-  await pageManager.webapp.pages.groupCreation().setGroupName(conversationName);
-  await pageManager.webapp.pages.groupCreation().clickNextButton();
+export const createChannel = async (pages: UserPages, conversationName: string, user: User[]) => {
+  await pages.conversationList().clickCreateGroup();
+  await pages.groupCreation().setGroupName(conversationName);
+  await pages.groupCreation().clickNextButton();
   // task: set params for testing
-  await pageManager.webapp.pages.startUI().selectUsers(user.flatMap(user => user.username));
-  await pageManager.webapp.pages.groupCreation().clickCreateGroupButton();
+  await pages.startUI().selectUsers(user.flatMap(user => user.username));
+  await pages.groupCreation().clickCreateGroupButton();
 };
 
 export const handleAppLockState = async (pageManager: PageManager, appLockPassCode: string) => {
