@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [9.69.5](https://github.com/wireapp/wire-web-packages/compare/@wireapp/react-ui-kit@9.69.4...@wireapp/react-ui-kit@9.69.5) (2025-11-17)
+
+### Bug Fixes
+
+* make all login screen accessible(WPB-21228) ([#7517](https://github.com/wireapp/wire-web-packages/issues/7517)) ([557485c](https://github.com/wireapp/wire-web-packages/commit/557485c13e552d616bf6daa415f45d884395f0c3))
+
 ## [9.69.4](https://github.com/wireapp/wire-web-packages/compare/@wireapp/react-ui-kit@9.69.3...@wireapp/react-ui-kit@9.69.4) (2025-10-23)
 
 **Note:** Version bump only for package @wireapp/react-ui-kit
