@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [27.90.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@27.89.2...@wireapp/api-client@27.90.0) (2025-11-17)
+
+### Features
+
+* update /user-groups/${gid}/channels to PUT [WPB-21779] ([e6774cb](https://github.com/wireapp/wire-web-packages/commit/e6774cb647d22b8e6860176c4bcfde91687e1fd5))
+
 ## [27.89.2](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@27.89.1...@wireapp/api-client@27.89.2) (2025-11-14)
 
 ### Bug Fixes
