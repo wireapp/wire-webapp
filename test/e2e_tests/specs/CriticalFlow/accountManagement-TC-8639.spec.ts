@@ -35,8 +35,6 @@ const conversationName = 'Tracking';
 const appLockPassphrase = generateSecurePassword();
 
 test('Account Management', {tag: ['@TC-8639', '@crit-flow-web']}, async ({pageManager, api}) => {
-  test.slow(); // Increasing test timeout to 90 seconds to accommodate the full flow
-
   // Add fake video devices to the browser context
   await addMockCamerasToContext(pageManager.getContext());
 

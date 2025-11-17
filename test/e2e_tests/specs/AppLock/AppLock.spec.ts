@@ -26,8 +26,6 @@ import {handleAppLockState} from 'test/e2e_tests/utils/userActions';
 import {test, expect} from '../../test.fixtures';
 
 test.describe('AppLock', () => {
-  test.slow();
-
   let owner = getUser();
   const members = Array.from({length: 2}, () => getUser());
   const [memberA] = members;

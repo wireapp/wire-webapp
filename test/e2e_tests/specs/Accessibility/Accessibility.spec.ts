@@ -26,8 +26,6 @@ import {createGroup, loginUser} from 'test/e2e_tests/utils/userActions';
 import {test, expect} from '../../test.fixtures';
 
 test.describe('Accessibility', () => {
-  test.slow();
-
   let owner = getUser();
   const members = Array.from({length: 2}, () => getUser());
   const [memberA, memberB] = members;
@@ -86,7 +84,7 @@ test.describe('Accessibility', () => {
       await memberPageManagerA.webapp.modals.dataShareConsent().clickDecline();
       await memberPageManagerB.webapp.modals.dataShareConsent().clickDecline();
 
-      await createGroup(memberPageManagerA, conversationName, [memberB]);
+      await createGroup(memberPageManagerA.webapp.pages, conversationName, [memberB]);
 
       await navigateToConversation(memberPageManagerA, conversationName);
       await navigateToConversation(memberPageManagerB, conversationName);
@@ -152,7 +150,7 @@ test.describe('Accessibility', () => {
       await pages.historyInfo().clickConfirmButton();
       await components.conversationSidebar().sidebar.waitFor({state: 'visible', timeout: loginTimeOut});
 
-      await createGroup(pageManager, conversationName, [memberB]);
+      await createGroup(pages, conversationName, [memberB]);
 
       await pages.conversation().typeMessage(message);
       const page = await pageManager.getPage();

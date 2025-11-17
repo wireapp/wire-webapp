@@ -25,8 +25,6 @@ import {tearDownAll} from 'test/e2e_tests/utils/tearDown.util';
 import {test, expect} from '../../test.fixtures';
 
 test.describe('Connections', () => {
-  test.slow();
-
   const members = Array.from({length: 2}, () => getUser());
   const [memberA, memberB] = members;
 
