@@ -31,7 +31,7 @@ export interface MenuItemsProps<T = HTMLDivElement> extends React.HTMLProps<T> {
 export const menuItemsStyle: <T>(theme: Theme, props: MenuItemsProps<T>) => CSSObject = (theme, props) => ({
   alignSelf: 'center',
   display: 'flex',
-  justifySelf: 'end',
+  justifySelf: 'stretch',
   [media[QueryKeys.TABLET_DOWN]]: {
     backgroundColor: theme.general.backgroundColor,
     bottom: 0,
