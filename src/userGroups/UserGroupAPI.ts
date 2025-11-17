@@ -139,7 +139,7 @@ export class UserGroupAPI {
   public async updateChannelsInGroup(gid: string, body: {channels: string[]}): Promise<void> {
     const config: AxiosRequestConfig = {
       url: `/user-groups/${gid}/channels`,
-      method: 'post',
+      method: 'put',
       data: body,
     };
 
