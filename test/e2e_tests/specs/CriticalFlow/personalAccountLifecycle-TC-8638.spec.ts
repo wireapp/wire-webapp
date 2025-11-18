@@ -116,9 +116,9 @@ test('Personal Account Lifecycle', {tag: ['@TC-8638', '@crit-flow-web']}, async 
   await test.step('Personal user B can see the message from user A', async () => {
     await pageManagerB.refreshPage({waitUntil: 'domcontentloaded'});
     await pageManagerB.webapp.pages.conversationList().openConversation(userA.fullName);
-    expect(
-      await pageManagerB.webapp.pages.conversation().isMessageVisible(`Hello! ${userA.firstName} here.`),
-    ).toBeTruthy();
+    await expect(
+      pageManagerB.webapp.pages.conversation().getMessage({content: `Hello! ${userA.firstName} here.`}),
+    ).toBeVisible();
   });
 
   await test.step('Personal user A blocks personal user B', async () => {
@@ -157,9 +157,9 @@ test('Personal Account Lifecycle', {tag: ['@TC-8638', '@crit-flow-web']}, async 
 
   await test.step('Personal user C can see the message from user A', async () => {
     await pageManagerC.webapp.pages.conversationList().openConversation(userA.fullName);
-    expect(
-      await pageManagerC.webapp.pages.conversation().isMessageVisible(`Hello! ${userA.firstName} here.`),
-    ).toBeTruthy();
+    await expect(
+      pageManagerC.webapp.pages.conversation().getMessage({content: `Hello! ${userA.firstName} here.`}),
+    ).toBeVisible();
   });
 
   await test.step('Personal User A deletes their account', async () => {
