@@ -16,7 +16,7 @@
 
 ## Standards Acknowledgement (required)
 
-- [ ] I have read and this PR **upholds** our [Coding Standards](https://github.com/wireapp/wire-webapp/docs/coding-standards.md) and [Tech Radar Choices](https://github.com/wireapp/wire-webapp/docs/tech-radar.md).
+- [ ] I have read and this PR **upholds** our [Coding Standards](https://github.com/wireapp/wire-webapp/tree/docs/coding-standards.md) and [Tech Radar Choices](https://github.com/wireapp/wire-webapp/tree/docs/tech-radar.md).
 
 ---
 
