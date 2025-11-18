@@ -36,6 +36,7 @@ import {
   iconContainerStyle,
   iconStyles,
 } from 'Components/Meeting/MeetingList/MeetingListItemGroup/MeetingListItem/MeetingAction/MeetingAction.styles';
+import {t} from 'Util/LocalizerUtil';
 
 import {showContextMenu} from '../../../../../../ui/ContextMenu';
 
@@ -46,29 +47,29 @@ export const MeetingAction = () => {
       entries: [
         {
           icon: () => <CallIcon />,
-          label: 'Start meeting',
+          label: t('meetings.action.startMeeting'),
         },
         {
           icon: () => <CirclePlusIcon />,
-          label: 'Create conversation',
+          label: t('meetings.action.createConversation'),
         },
         {
           icon: () => <ShareLinkIcon />,
-          label: 'Copy link',
+          label: t('meetings.action.copyLink'),
         },
         {
           icon: () => <EditIcon />,
-          label: 'Edit meeting',
+          label: t('meetings.action.editMeeting'),
         },
         {
           css: contextMenuDangerItemStyles,
           icon: () => <CloseIcon css={contextMenuDangerItemIconStyles} />,
-          label: 'Remove meeting for me',
+          label: t('meetings.action.deleteMeetingForMe'),
         },
         {
           css: contextMenuDangerItemStyles,
           icon: () => <TrashIcon css={contextMenuDangerItemIconStyles} />,
-          label: 'Delete meeting for everyone',
+          label: t('meetings.action.deleteMeetingForAll'),
         },
       ],
       identifier: 'message-options-menu',

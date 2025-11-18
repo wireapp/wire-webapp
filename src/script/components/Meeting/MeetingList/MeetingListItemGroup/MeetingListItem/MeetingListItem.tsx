@@ -36,6 +36,7 @@ import {
 } from 'Components/Meeting/MeetingList/MeetingListItemGroup/MeetingListItem/MeetingListItem.styles';
 import {MeetingStatus} from 'Components/Meeting/MeetingList/MeetingListItemGroup/MeetingListItem/MeetingStatus/MeetingStatus';
 import {getMeetingStatusAt, MeetingStatuses} from 'Components/Meeting/utils/MeetingStatusUtil';
+import {t} from 'Util/LocalizerUtil';
 import {formatLocale} from 'Util/TimeUtil';
 
 const MeetingListItemComponent = ({title, start_date, end_date, schedule, attending}: Meeting) => {
@@ -55,7 +56,7 @@ const MeetingListItemComponent = ({title, start_date, end_date, schedule, attend
       const day = formatLocale(start, 'd');
       const time = formatLocale(start, 'h:mm a');
       return {
-        time: `${dayOfWeek}, ${month} ${day} • Started ${time}`,
+        time: `${dayOfWeek}, ${month} ${day} • ${t('meetings.meetingStatus.startedAt', {time})}`,
         showCalendarIcon: false,
       };
     }
@@ -63,7 +64,7 @@ const MeetingListItemComponent = ({title, start_date, end_date, schedule, attend
     if (isOngoing) {
       const time = formatLocale(start, 'h:mm a');
       return {
-        time: `Started at ${time}`,
+        time: t('meetings.meetingStatus.startedAt', {time}),
         showCalendarIcon: false,
       };
     }

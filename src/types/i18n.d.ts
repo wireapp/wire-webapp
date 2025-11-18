@@ -1207,7 +1207,16 @@ declare module 'I18n/en-US.json' {
     'meetings.list.tomorrow': `Tomorrow`;
     'meetings.meetingStatus.participating': `Attending`;
     'meetings.meetingStatus.startingIn': `Starting in {countdown}`;
+    'meetings.meetingStatus.startedAt': `Started at {time}`;
     'meetings.startMeetingHelp': `Start a meeting with team members, guests, or external parties. Your communication is always end-to-end encrypted, offering the highest level of security.`;
+    'meetings.action.meetNow': `Meet Now`;
+    'meetings.action.scheduleMeeting': `Schedule Meeting`;
+    'meetings.action.startMeeting': `Start meeting`;
+    'meetings.action.createConversation': `Create conversation`;
+    'meetings.action.copyLink': `Copy link`;
+    'meetings.action.editMeeting': `Edit meeting`;
+    'meetings.action.deleteMeetingForMe': `Delete meeting for me`;
+    'meetings.action.deleteMeetingForAll': `Delete meeting for everyone`;
     'mlsConversationRecovered': `You haven\'t used this device for a while, or an issue has occurred. Some older messages may not appear here.`;
     'mlsSignature': `MLS with {signature} Signature`;
     'mlsThumbprint': `MLS Thumbprint`;

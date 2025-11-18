@@ -25,6 +25,7 @@ import {
   callingButtonGroupStyles,
   dropdownIconStyles,
 } from 'Components/Meeting/MeetNowMultiActionButton/MeetNowMultiActionButton.styles';
+import {t} from 'Util/LocalizerUtil';
 
 import {showContextMenu} from '../../../ui/ContextMenu';
 
@@ -40,16 +41,16 @@ export const MeetNowMultiActionButton = () => {
       offset: 0,
       entries: [
         {
-          title: 'Meet Now',
-          label: 'Meet Now',
+          title: t('meetings.action.meetNow'),
+          label: t('meetings.action.meetNow'),
           click: () => {
             handleMeetingButton();
             resetIconInversion();
           },
         },
         {
-          title: 'Schedule Meeting',
-          label: 'Schedule Meeting',
+          title: t('meetings.action.scheduleMeeting'),
+          label: t('meetings.action.scheduleMeeting'),
           click: () => {
             // add scheduling functionality here
             resetIconInversion();
@@ -75,7 +76,7 @@ export const MeetNowMultiActionButton = () => {
         icon={<CallIcon />}
         onClick={handleMeetingButton}
       >
-        Meet now
+        {t('meetings.action.meetNow')}
       </ButtonGroup.Button>
       <ButtonGroup.Button
         css={callingButtonGroupStyles}
