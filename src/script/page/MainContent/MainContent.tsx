@@ -29,7 +29,7 @@ import {Conversation} from 'Components/Conversation';
 import {HistoryExport} from 'Components/HistoryExport';
 import {HistoryImport} from 'Components/HistoryImport';
 import * as Icon from 'Components/Icon';
-import {Meeting} from 'Components/Meeting/Meeting';
+import {Meetings} from 'Components/Meeting/Meetings';
 import {useLegalHoldModalState} from 'Components/Modals/LegalHoldModal/LegalHoldModal.state';
 import {ClientState} from 'Repositories/client/ClientState';
 import {ConversationState} from 'Repositories/conversation/ConversationState';
@@ -280,7 +280,7 @@ const MainContent = ({
               />
             )}
 
-            {contentState === ContentState.MEETINGS && <Meeting />}
+            {contentState === ContentState.MEETINGS && <Meetings />}
           </>
         </Animated>
       </SwitchTransition>

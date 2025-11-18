@@ -17,10 +17,11 @@
  *
  */
 
-import {ReactNode, useState} from 'react';
+import {ReactNode, useCallback, useState} from 'react';
 
 import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
 
+import {ClockProvider} from 'Components/Meeting/ClockContext';
 import {
   emptyListContainerStyles,
   emptyTabsListContainerStyles,
@@ -29,7 +30,9 @@ import {EmptyMeetingList} from 'Components/Meeting/EmptyMeetingList/EmptyMeeting
 import {meetingListContainerStyles, showAllButtonStyles} from 'Components/Meeting/MeetingList/MeetingList.styles';
 import {MeetingListItemGroup} from 'Components/Meeting/MeetingList/MeetingListItemGroup/MeetingListItemGroup';
 import {MeetingTab, MeetingTabs} from 'Components/Meeting/MeetingList/MeetingTabs/MeetingTabs';
-import {getTodayTomorrowLabels, groupByStartHour} from 'Components/Meeting/utils/MeetingDatesHandler';
+import {TodayAndOngoingSection} from 'Components/Meeting/MeetingList/TodayAndOngoingSection/TodayAndOngoingSection';
+import {MEETINGS_PAST, MEETINGS_TODAY, MEETINGS_TOMORROW} from 'Components/Meeting/mocks/MeetingMocks';
+import {getTodayTomorrowLabels, groupByStartHour} from 'Components/Meeting/utils/MeetingDatesUtil';
 import {t} from 'Util/LocalizerUtil';
 
 export interface Meeting {
@@ -38,6 +41,8 @@ export interface Meeting {
   schedule: string;
   conversation_id: string;
   title: string;
+  // Ask iOS and Android about how to identify this status
+  attending?: boolean;
 }
 
 export enum MeetingTabsTitle {
@@ -45,75 +50,27 @@ export enum MeetingTabsTitle {
   PAST = 'past',
 }
 
+export interface TodayAndOngoingSectionProps {
+  meetingsToday: Meeting[];
+  headerForOnGoing: string;
+  headerForToday: string;
+}
+
 export const MeetingList = () => {
-  // Temporary mocked data to visualize the UI until the backend is wired
-  const meetingsToday: Meeting[] = [
-    {
-      start_date: '2025-06-03T07:30:00',
-      end_date: '2025-06-03T07:40:00',
-      schedule: 'Single',
-      conversation_id: '1',
-      title: 'Meeting 1',
-    },
-    {
-      start_date: '2025-06-03T07:45:00',
-      end_date: '2025-06-03T10:15:00',
-      schedule: 'Single',
-      conversation_id: '2',
-      title: 'Meeting 2',
-    },
-    {
-      start_date: '2025-06-03T08:00:00',
-      end_date: '2025-06-03T10:15:00',
-      schedule: 'Daily',
-      conversation_id: '3',
-      title: 'Meeting 3',
-    },
-  ];
-
-  const meetingsTomorrow: Meeting[] = [
-    {
-      start_date: '2025-06-04T07:00:00',
-      end_date: '2025-06-04T15:15:00',
-      schedule: 'Single',
-      conversation_id: '4',
-      title: 'Meeting 4',
-    },
-    {
-      start_date: '2025-06-04T08:00:00',
-      end_date: '2025-06-04T08:15:00',
-      schedule: 'Monthly',
-      conversation_id: '5',
-      title: 'Meeting 5',
-    },
-    {
-      start_date: '2025-06-04T17:00:00',
-      end_date: '2025-06-04T18:15:00',
-      schedule: 'Monthly',
-      conversation_id: '6',
-      title: 'Meeting 6',
-    },
-    {
-      start_date: '2025-06-04T09:00:00',
-      end_date: '2025-06-04T10:15:00',
-      schedule: 'Monthly',
-      conversation_id: '7',
-      title: 'Meeting 7',
-    },
-  ];
-
   const [activeTab, setActiveTab] = useState<MeetingTab>(MeetingTabsTitle.NEXT);
 
   const {today, tomorrow} = getTodayTomorrowLabels();
+  const headerForOnGoing = `${t('meetings.list.onGoing.header')}`;
   const headerForToday = `${t('meetings.list.today')} (${today})`;
   const headerForTomorrow = `${t('meetings.list.tomorrow')} (${tomorrow})`;
 
-  const groupedMeetingsToday = groupByStartHour(meetingsToday);
-  const groupedMeetingsTomorrow = groupByStartHour(meetingsTomorrow);
+  const groupedMeetingsTomorrow = groupByStartHour(MEETINGS_TOMORROW);
 
-  const hasMeetingsToday = meetingsToday.length > 0;
-  const hasMeetingsTomorrow = meetingsTomorrow.length > 0;
+  const hasMeetingsToday = MEETINGS_TODAY.length > 0;
+  const hasMeetingsTomorrow = MEETINGS_TOMORROW.length > 0;
   const isNextTab = activeTab === MeetingTabsTitle.NEXT;
+
+  const handleTabChange = useCallback((tab: MeetingTab) => setActiveTab(tab), []);
 
   let content: ReactNode;
 
@@ -126,10 +83,14 @@ export const MeetingList = () => {
   }
 
   if (isNextTab) {
-    // Next tab
     content = hasMeetingsToday ? (
       <>
-        <MeetingListItemGroup header={headerForToday} groupedMeetings={groupedMeetingsToday} />
+        <TodayAndOngoingSection
+          meetingsToday={MEETINGS_TODAY}
+          headerForOnGoing={headerForOnGoing}
+          headerForToday={headerForToday}
+        />
+
         <MeetingListItemGroup header={headerForTomorrow} groupedMeetings={groupedMeetingsTomorrow} />
         <div css={showAllButtonStyles}>
           <Button variant={ButtonVariant.TERTIARY}>{t('meetings.showAllLabel')}</Button>
@@ -141,9 +102,8 @@ export const MeetingList = () => {
       </div>
     );
   } else {
-    // Past tab
     content = hasMeetingsTomorrow ? (
-      <MeetingListItemGroup view={MeetingTabsTitle.PAST} groupedMeetings={{0: meetingsTomorrow}} />
+      <MeetingListItemGroup view={MeetingTabsTitle.PAST} groupedMeetings={{0: MEETINGS_PAST}} />
     ) : (
       <div css={emptyTabsListContainerStyles}>
         <EmptyMeetingList
@@ -157,8 +117,8 @@ export const MeetingList = () => {
 
   return (
     <div css={meetingListContainerStyles}>
-      <MeetingTabs active={activeTab} onChange={setActiveTab} />
-      {content}
+      <MeetingTabs active={activeTab} onChange={handleTabChange} />
+      <ClockProvider>{content}</ClockProvider>
     </div>
   );
 };

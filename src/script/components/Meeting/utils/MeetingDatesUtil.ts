@@ -20,9 +20,20 @@
 import {Meeting} from 'Components/Meeting/MeetingList/MeetingList';
 import {FnDate, formatLocale} from 'Util/TimeUtil';
 
-const formatWeekdayMonthDay = (date: FnDate | string | number) => formatLocale(date, 'EEEE, MMMM d');
+/**
+ * Formats a given date into a string with the pattern "Weekday, Month Day".
+ *
+ * @param {FnDate | string | number} date - The date to format. Can be a `FnDate`, string, or timestamp.
+ * @returns {string} - The formatted date string.
+ */
+const formatWeekdayMonthDay = (date: FnDate | string | number): string => formatLocale(date, 'EEEE, MMMM d');
 
-export const getTodayTomorrowLabels = () => {
+/**
+ * Generates labels for "today" and "tomorrow" with their respective formatted dates.
+ *
+ * @returns {{today: string, tomorrow: string}} - An object containing the formatted labels for today and tomorrow.
+ */
+export const getTodayTomorrowLabels = (): {today: string; tomorrow: string} => {
   const today = new Date();
   const tomorrow = new Date();
   tomorrow.setDate(today.getDate() + 1);
@@ -33,7 +44,13 @@ export const getTodayTomorrowLabels = () => {
   };
 };
 
-export const groupByStartHour = (meetings: Meeting[]) => {
+/**
+ * Groups a list of meetings by their start hour.
+ *
+ * @param {Meeting[]} meetings - The list of meetings to group.
+ * @returns {Record<number, Meeting[]>} - An object where the keys are the start hours (0-23) and the values are arrays of meetings.
+ */
+export const groupByStartHour = (meetings: Meeting[]): Record<number, Meeting[]> => {
   const groupedMeetings: Record<number, Meeting[]> = {};
   for (const meeting of meetings) {
     const hour = new Date(meeting.start_date).getHours();

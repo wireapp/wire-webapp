@@ -17,6 +17,8 @@
  *
  */
 
+import {memo} from 'react';
+
 import {set} from 'date-fns';
 
 import {Meeting, MeetingTabsTitle} from 'Components/Meeting/MeetingList/MeetingList';
@@ -40,7 +42,7 @@ export enum MeetingGroupBy {
   HOUR = 'hour',
 }
 
-export const MeetingListItemGroup = ({
+const MeetingListItemGroupComponent = ({
   header,
   groupedMeetings,
   view = MeetingTabsTitle.NEXT,
@@ -53,8 +55,8 @@ export const MeetingListItemGroup = ({
       minute: '2-digit',
     });
 
-  // Sort by hour key (string -> number), then drop empty buckets
-  const groups = Object.entries(groupedMeetings).sort(([a], [b]) => +a - +b);
+  // Sort by hour key
+  const groups = Object.entries(groupedMeetings).sort(([meetingA], [meetingB]) => +meetingA - +meetingB);
   const nonEmptyGroups = groups.filter(([, items]) => items?.length);
   const isEmpty = nonEmptyGroups.length === 0;
 
@@ -95,3 +97,6 @@ export const MeetingListItemGroup = ({
     </section>
   );
 };
+
+export const MeetingListItemGroup = memo(MeetingListItemGroupComponent);
+MeetingListItemGroup.displayName = 'MeetingListItemGroup';

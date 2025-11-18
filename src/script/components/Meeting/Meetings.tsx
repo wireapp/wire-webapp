@@ -21,7 +21,7 @@ import {contentStyles} from 'Components/Meeting/Meeting.styles';
 import {MeetingHeader} from 'Components/Meeting/MeetingHeader/MeetingHeader';
 import {MeetingList} from 'Components/Meeting/MeetingList/MeetingList';
 
-export const Meeting = () => (
+export const Meetings = () => (
   <>
     <MeetingHeader />
     <div css={contentStyles}>

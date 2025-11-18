@@ -17,8 +17,11 @@
  *
  */
 
+import {memo, useContext, useMemo} from 'react';
+
 import {CalendarIcon, CallIcon} from '@wireapp/react-ui-kit';
 
+import {ClockContext} from 'Components/Meeting/ClockContext';
 import {Meeting} from 'Components/Meeting/MeetingList/MeetingList';
 import {MeetingAction} from 'Components/Meeting/MeetingList/MeetingListItemGroup/MeetingListItem/MeetingAction/MeetingAction';
 import {
@@ -27,23 +30,63 @@ import {
   itemStyles,
   leftStyles,
   metaStyles,
+  onGoingMeetingStyles,
   rightStyles,
   titleStyles,
 } from 'Components/Meeting/MeetingList/MeetingListItemGroup/MeetingListItem/MeetingListItem.styles';
+import {MeetingStatus} from 'Components/Meeting/MeetingList/MeetingListItemGroup/MeetingListItem/MeetingStatus/MeetingStatus';
+import {getMeetingStatusAt, MeetingStatuses} from 'Components/Meeting/utils/MeetingStatusUtil';
 import {formatLocale} from 'Util/TimeUtil';
 
-export const MeetingListItem = ({title, start_date, end_date, schedule}: Meeting) => {
-  const start = new Date(start_date);
-  const end = new Date(end_date);
+const MeetingListItemComponent = ({title, start_date, end_date, schedule, attending}: Meeting) => {
+  const nowMs = useContext(ClockContext);
 
-  const sameMeridiem = formatLocale(start, 'a') === formatLocale(end, 'a');
+  const {time, showCalendarIcon} = useMemo(() => {
+    const start = new Date(start_date);
+    const end = new Date(end_date);
+    const startMs = start.getTime();
+    const endMs = end.getTime();
+    const isPast = nowMs > endMs;
+    const isOngoing = nowMs >= startMs && nowMs < endMs;
 
-  const time = sameMeridiem
-    ? `${formatLocale(start, 'h:mm')} – ${formatLocale(end, 'h:mm a')}`
-    : `${formatLocale(start, 'h:mm a')} – ${formatLocale(end, 'h:mm a')}`;
+    if (isPast) {
+      const dayOfWeek = formatLocale(start, 'EEEE');
+      const month = formatLocale(start, 'MMMM');
+      const day = formatLocale(start, 'd');
+      const time = formatLocale(start, 'h:mm a');
+      return {
+        time: `${dayOfWeek}, ${month} ${day} • Started ${time}`,
+        showCalendarIcon: false,
+      };
+    }
+
+    if (isOngoing) {
+      const time = formatLocale(start, 'h:mm a');
+      return {
+        time: `Started at ${time}`,
+        showCalendarIcon: false,
+      };
+    }
+
+    const sameMeridiem = formatLocale(start, 'a') === formatLocale(end, 'a');
+    const timeRange = sameMeridiem
+      ? `${formatLocale(start, 'h:mm')} – ${formatLocale(end, 'h:mm a')}`
+      : `${formatLocale(start, 'h:mm a')} – ${formatLocale(end, 'h:mm a')}`;
+    return {
+      time: timeRange,
+      showCalendarIcon: true,
+    };
+  }, [start_date, end_date, nowMs]);
+
+  const meetingStatus = useMemo(
+    () => getMeetingStatusAt(nowMs, start_date, end_date, attending),
+    [nowMs, start_date, end_date, attending],
+  );
+
+  const isOngoing = meetingStatus === MeetingStatuses.ON_GOING || meetingStatus === MeetingStatuses.PARTICIPATING;
 
   return (
-    <div css={itemStyles}>
+    <div css={[itemStyles, isOngoing && onGoingMeetingStyles]}>
       <div css={leftStyles}>
         <div css={callingIconStyles}>
           <CallIcon />
@@ -51,7 +94,8 @@ export const MeetingListItem = ({title, start_date, end_date, schedule}: Meeting
         <div>
           <div css={titleStyles}>{title}</div>
           <div css={metaStyles}>
-            <CalendarIcon css={{marginRight: '4px'}} height={12} /> {time}
+            {showCalendarIcon && <CalendarIcon css={{marginRight: '4px'}} height={12} />}
+            {time}
             {schedule && (
               <div css={badgeWrapperStyles}>
                 <span>{schedule}</span>
@@ -61,8 +105,12 @@ export const MeetingListItem = ({title, start_date, end_date, schedule}: Meeting
         </div>
       </div>
       <div css={rightStyles}>
+        <MeetingStatus start_date={start_date} end_date={end_date} attending={attending} />
         <MeetingAction />
       </div>
     </div>
   );
 };
+
+export const MeetingListItem = memo(MeetingListItemComponent);
+MeetingListItem.displayName = 'MeetingListItem';
