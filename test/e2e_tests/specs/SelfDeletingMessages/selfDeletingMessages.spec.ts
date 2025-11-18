@@ -20,6 +20,7 @@
 import {User} from 'test/e2e_tests/data/user';
 import {PageManager} from 'test/e2e_tests/pageManager';
 import {test as baseTest, expect, withConversation, withLogin} from 'test/e2e_tests/test.fixtures';
+import {createGroup} from 'test/e2e_tests/utils/userActions';
 
 const test = baseTest.extend<{userA: User; userB: User}>({
   userA: async ({createUser}, use) => use(await createUser()),
@@ -41,6 +42,27 @@ test.describe('Self Deleting Messages', () => {
       ]);
       const userAPages = PageManager.from(userAPage).webapp.pages;
       const userBPages = PageManager.from(userBPage).webapp.pages;
+
+      await userAPages.conversation().sendTimedMessage('Gone in 10s');
+      await expect(userAPages.conversation().getMessage({content: 'Gone in 10s'})).toBeVisible();
+      await expect(userBPages.conversation().getMessage({content: 'Gone in 10s'})).toBeVisible();
+
+      await userBPage.waitForTimeout(10_000); // Wait for 10s so the message is deleted
+      await expect(userAPages.conversation().getMessage({content: 'Gone in 10s'})).not.toBeVisible();
+      await expect(userBPages.conversation().getMessage({content: 'Gone in 10s'})).not.toBeVisible();
+    },
+  );
+
+  test(
+    'Verify sending ephemeral text message in group',
+    {tag: ['@TC-658', '@regression']},
+    async ({createPage, userA, userB}) => {
+      const [userAPage, userBPage] = await Promise.all([createPage(withLogin(userA)), createPage(withLogin(userB))]);
+      const userAPages = PageManager.from(userAPage).webapp.pages;
+      const userBPages = PageManager.from(userBPage).webapp.pages;
+
+      await createGroup(userAPages, 'Test Group', [userB]);
+      await userBPages.conversationList().openConversation('Test Group');
 
       await userAPages.conversation().sendTimedMessage('Gone in 10s');
       await expect(userAPages.conversation().getMessage({content: 'Gone in 10s'})).toBeVisible();
