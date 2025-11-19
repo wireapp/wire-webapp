@@ -189,6 +189,41 @@ export const ConversationTabs = ({
       unreadConversations: totalUnreadFavoriteConversations,
     },
     {
+      type: SidebarTabs.UNREAD,
+      title: t('conversationLabelUnread'),
+      dataUieName: 'go-unread-view',
+      Icon: <Icon.MarkAsUnreadIcon />,
+      unreadConversations: unreadCount,
+    },
+    {
+      type: SidebarTabs.MENTIONS,
+      title: t('conversationLabelMentions'),
+      dataUieName: 'go-mentions-view',
+      Icon: <Icon.MentionIcon />,
+      unreadConversations: mentionsCount,
+    },
+    {
+      type: SidebarTabs.PINGS,
+      title: t('conversationLabelPings'),
+      dataUieName: 'go-pings-view',
+      Icon: <Icon.PingIcon />,
+      unreadConversations: pingsCount,
+    },
+    {
+      type: SidebarTabs.REPLIES,
+      title: t('conversationLabelReplies'),
+      dataUieName: 'go-replies-view',
+      Icon: <Icon.ReplyIcon />,
+      unreadConversations: repliesCount,
+    },
+    {
+      type: SidebarTabs.DRAFTS,
+      title: t('conversationLabelDrafts'),
+      dataUieName: 'go-drafts-view',
+      Icon: <Icon.DraftMessageIcon />,
+      unreadConversations: draftsCount,
+    },
+    {
       type: SidebarTabs.GROUPS,
       title: t('conversationLabelGroups'),
       dataUieName: 'go-groups-view',
@@ -203,41 +238,6 @@ export const ConversationTabs = ({
       dataUieName: 'go-directs-view',
       Icon: <Icon.PeopleIcon />,
       unreadConversations: directConversationsLength,
-    },
-    {
-      type: SidebarTabs.UNREAD,
-      title: t('conversationLabelUnread'),
-      dataUieName: 'go-unread-view',
-      Icon: <Icon.MessageUnreadIcon />,
-      unreadConversations: unreadCount,
-    },
-    {
-      type: SidebarTabs.MENTIONS,
-      title: t('conversationLabelMentions'),
-      dataUieName: 'go-mentions-view',
-      Icon: <Icon.MentionIcon />,
-      unreadConversations: mentionsCount,
-    },
-    {
-      type: SidebarTabs.REPLIES,
-      title: t('conversationLabelReplies'),
-      dataUieName: 'go-replies-view',
-      Icon: <Icon.ReplyIcon />,
-      unreadConversations: repliesCount,
-    },
-    {
-      type: SidebarTabs.DRAFTS,
-      title: t('conversationLabelDrafts'),
-      dataUieName: 'go-drafts-view',
-      Icon: <Icon.EditIcon />,
-      unreadConversations: draftsCount,
-    },
-    {
-      type: SidebarTabs.PINGS,
-      title: t('conversationLabelPings'),
-      dataUieName: 'go-pings-view',
-      Icon: <Icon.PingIcon />,
-      unreadConversations: pingsCount,
     },
     {
       type: SidebarTabs.FOLDER,
@@ -257,7 +257,7 @@ export const ConversationTabs = ({
   ];
 
   if (shouldShowChannelTab) {
-    conversationTabs.splice(2, 0, {
+    conversationTabs.splice(7, 0, {
       type: SidebarTabs.CHANNELS,
       title: t('conversationLabelChannels'),
       dataUieName: 'go-channels-view',
