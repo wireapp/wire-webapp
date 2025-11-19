@@ -87,9 +87,11 @@ export class PageManager {
 
   constructor(private readonly page: Page) {}
 
-  static from = (page: Page): PageManager => {
-    return new PageManager(page);
-  };
+  static from(page: Page): PageManager;
+  static from(page: Promise<Page>): Promise<PageManager>;
+  static from(page: Page | Promise<Page>): PageManager | Promise<PageManager> {
+    return 'then' in page ? page.then(p => new PageManager(p)) : new PageManager(page);
+  }
 
   openNewTab = async <T>(url?: string, handler?: (tab: PageManager) => Promise<T>): Promise<T> => {
     const newPage = await this.page.context().newPage();
@@ -106,6 +108,10 @@ export class PageManager {
 
   openMainPage = () => {
     return this.page.goto(webAppPath, {waitUntil: 'networkidle'});
+  };
+
+  openLoginPage = async () => {
+    await this.page.goto(`${webAppPath}auth/#/login`);
   };
 
   openUrl = (url: string) => {

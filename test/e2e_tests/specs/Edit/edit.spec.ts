@@ -17,67 +17,28 @@
  *
  */
 
-import {Browser} from '@playwright/test';
-
-import {getUser, User} from 'test/e2e_tests/data/user';
+import {User} from 'test/e2e_tests/data/user';
 import {PageManager} from 'test/e2e_tests/pageManager';
-import {test as baseTest, expect} from 'test/e2e_tests/test.fixtures';
-import {removeCreatedUser} from 'test/e2e_tests/utils/tearDown.util';
-import {createGroup, loginUser} from 'test/e2e_tests/utils/userActions';
+import {test as baseTest, expect, withConversation, withLogin} from 'test/e2e_tests/test.fixtures';
+import {createGroup} from 'test/e2e_tests/utils/userActions';
 
 const test = baseTest.extend<{userA: User; userB: User}>({
-  userA: async ({api}, use) => {
-    const userA = getUser();
-    await api.createPersonalUser(userA);
-    await use(userA);
-    await removeCreatedUser(api, userA);
+  userA: async ({createUser}, use) => {
+    await use(await createUser());
   },
-  userB: async ({api}, use) => {
-    const userB = getUser();
-    await api.createPersonalUser(userB);
-    await use(userB);
-    await removeCreatedUser(api, userB);
+  userB: async ({createUser}, use) => {
+    await use(await createUser());
   },
 });
-
-const createPagesForUser = async (
-  browser: Browser,
-  user: User,
-  options?: {confirmHistoryWarning?: boolean; declineDataShareConsent?: boolean; openConversationWith?: User},
-) => {
-  const context = await browser.newContext();
-  const page = await context.newPage();
-  const pageManager = PageManager.from(page);
-
-  await pageManager.openMainPage();
-  await loginUser(user, pageManager);
-  const {pages, modals} = pageManager.webapp;
-
-  if (options?.confirmHistoryWarning) {
-    await pages.historyInfo().clickConfirmButton();
-  }
-
-  if (options?.declineDataShareConsent) {
-    await modals.dataShareConsent().clickDecline();
-  }
-
-  if (options?.openConversationWith) {
-    await pages.conversationList().openConversation(options.openConversationWith.fullName);
-  }
-
-  return pages;
-};
 
 test.describe('Edit', () => {
   test.beforeEach(async ({api, userA, userB}) => {
     await api.connectUsers(userA, userB);
   });
 
-  test('I can edit my message in 1:1', {tag: ['@TC-679', '@regression']}, async ({browser, userA, userB}) => {
-    const pages = await createPagesForUser(browser, userA, {
-      declineDataShareConsent: true,
-      openConversationWith: userB,
-    });
+  test('I can edit my message in 1:1', {tag: ['@TC-679', '@regression']}, async ({createPage, userA, userB}) => {
+    const pages = (await PageManager.from(createPage(withLogin(userA), withConversation(userB)))).webapp.pages;
+
     await pages.conversation().sendMessage('Test Message');
 
     const message = pages.conversation().getMessage({sender: userA});
@@ -94,8 +55,9 @@ test.describe('Edit', () => {
   test(
     'I can edit my message in a group conversation',
     {tag: ['@TC-680', '@regression']},
-    async ({browser, userA, userB}) => {
-      const pages = await createPagesForUser(browser, userA, {declineDataShareConsent: true});
+    async ({createPage, userA, userB}) => {
+      const pages = (await PageManager.from(createPage(withLogin(userA)))).webapp.pages;
+
       await createGroup(pages, 'Test Group', [userB]);
       await pages.conversationList().openConversation('Test Group');
       await pages.conversation().sendMessage('Test Message');
@@ -115,39 +77,36 @@ test.describe('Edit', () => {
   test(
     'I see changed message if message was edited from another device',
     {tag: ['@TC-682', '@regression']},
-    async ({browser, userA, userB}) => {
-      const device1 = await createPagesForUser(browser, userA, {
-        declineDataShareConsent: true,
-        openConversationWith: userB,
-      });
-
+    async ({createPage, userA, userB}) => {
+      const deviceA = (await PageManager.from(createPage(withLogin(userA), withConversation(userB)))).webapp.pages;
       // Device 2 is intentionally created after device 1 to ensure the history info warning is confirmed
-      const device2 = await createPagesForUser(browser, userA, {
-        confirmHistoryWarning: true,
-        openConversationWith: userB,
-      });
+      const deviceB = (await PageManager.from(createPage(withLogin(userA)))).webapp.pages;
 
-      await device1.conversation().sendMessage('Message from device 1');
+      await deviceB.historyInfo().clickConfirmButton();
+      await deviceB.conversationList().openConversation(userB.fullName);
 
-      const messageOnDevice1 = device1.conversation().getMessage({sender: userA});
-      const messageOnDevice2 = device2.conversation().getMessage({sender: userA});
-      await expect(messageOnDevice1).toContainText('Message from device 1');
-      await expect(messageOnDevice2).toContainText('Message from device 1');
+      await deviceA.conversation().sendMessage('Message from device 1');
 
-      await device1.conversation().editMessage(messageOnDevice1);
-      await expect(device1.conversation().messageInput).toContainText('Message from device 1');
-      await device1.conversation().sendMessage('Updated message from device 1');
+      const messageOnDeviceA = deviceA.conversation().getMessage({sender: userA});
+      const messageOnDeviceB = deviceB.conversation().getMessage({sender: userA});
+      await expect(messageOnDeviceA).toContainText('Message from device 1');
+      await expect(messageOnDeviceB).toContainText('Message from device 1');
 
-      await expect(messageOnDevice1).toContainText('Updated message from device 1');
-      await expect(messageOnDevice2).toContainText('Updated message from device 1');
+      await deviceA.conversation().editMessage(messageOnDeviceA);
+      await expect(deviceA.conversation().messageInput).toContainText('Message from device 1');
+      await deviceA.conversation().sendMessage('Updated message from device 1');
+
+      await expect(messageOnDeviceA).toContainText('Updated message from device 1');
+      await expect(messageOnDeviceB).toContainText('Updated message from device 1');
     },
   );
 
-  test('I cannot edit another users message', {tag: ['@TC-683', '@regression']}, async ({browser, userA, userB}) => {
+  test('I cannot edit another users message', {tag: ['@TC-683', '@regression']}, async ({createPage, userA, userB}) => {
     const [userAPages, userBPages] = await Promise.all([
-      createPagesForUser(browser, userA, {declineDataShareConsent: true, openConversationWith: userB}),
-      createPagesForUser(browser, userB, {declineDataShareConsent: true, openConversationWith: userA}),
+      PageManager.from(createPage(withLogin(userA), withConversation(userB))).then(pm => pm.webapp.pages),
+      PageManager.from(createPage(withLogin(userB), withConversation(userA))).then(pm => pm.webapp.pages),
     ]);
+
     await userAPages.conversation().sendMessage('Test Message');
 
     const message = userBPages.conversation().getMessage({sender: userA});
@@ -160,11 +119,9 @@ test.describe('Edit', () => {
   test(
     'I can edit my last message by pressing the up arrow key',
     {tag: ['@TC-686', '@regression']},
-    async ({browser, userA, userB}) => {
-      const pages = await createPagesForUser(browser, userA, {
-        declineDataShareConsent: true,
-        openConversationWith: userB,
-      });
+    async ({createPage, userA, userB}) => {
+      const pages = (await PageManager.from(createPage(withLogin(userA), withConversation(userB)))).webapp.pages;
+
       await pages.conversation().sendMessage('Test Message');
       await expect(pages.conversation().getMessage({content: 'Test Message'})).toBeVisible();
 
@@ -176,10 +133,10 @@ test.describe('Edit', () => {
   test(
     'Editing a message does not create unread dot on receiver side',
     {tag: ['@TC-690', '@regression']},
-    async ({browser, userA, userB}) => {
+    async ({createPage, userA, userB}) => {
       const [userAPages, userBPages] = await Promise.all([
-        createPagesForUser(browser, userA, {declineDataShareConsent: true}),
-        createPagesForUser(browser, userB, {declineDataShareConsent: true}),
+        PageManager.from(createPage(withLogin(userA), withConversation(userB))).then(pm => pm.webapp.pages),
+        PageManager.from(createPage(withLogin(userB), withConversation(userA))).then(pm => pm.webapp.pages),
       ]);
 
       await test.step('Create group as second conversation', async () => {
@@ -227,10 +184,10 @@ test.describe('Edit', () => {
   test(
     'I can see the changed message was edited from another user',
     {tag: ['@TC-692', '@regression']},
-    async ({browser, userA, userB}) => {
+    async ({createPage, userA, userB}) => {
       const [userAPages, userBPages] = await Promise.all([
-        createPagesForUser(browser, userA, {declineDataShareConsent: true, openConversationWith: userB}),
-        createPagesForUser(browser, userB, {declineDataShareConsent: true, openConversationWith: userA}),
+        PageManager.from(createPage(withLogin(userA), withConversation(userB))).then(pm => pm.webapp.pages),
+        PageManager.from(createPage(withLogin(userB), withConversation(userA))).then(pm => pm.webapp.pages),
       ]);
 
       await userAPages.conversation().sendMessage('Test');
@@ -251,8 +208,8 @@ test.describe('Edit', () => {
   test(
     'I want to see the last edited text including a timestamp in message detail view if the message has been edited',
     {tag: ['@TC-3563', '@regression']},
-    async ({browser, userA, userB}) => {
-      const pages = await createPagesForUser(browser, userA, {declineDataShareConsent: true});
+    async ({createPage, userA, userB}) => {
+      const pages = await PageManager.from(createPage(withLogin(userA))).then(pm => pm.webapp.pages);
       await createGroup(pages, 'Test Group', [userB]); // The message detail view is only available for group conversations
 
       await pages.conversationList().openConversation('Test Group');
