@@ -53,7 +53,7 @@ export class ConversationPage {
   readonly callButton: Locator;
   readonly conversationInfoButton: Locator;
   readonly pingButton: Locator;
-  readonly messages: Locator;
+  readonly messages: Locator; // Only contains message items which have been sent successfully
   readonly messageDetails: Locator;
   readonly messageItems: Locator;
   readonly filesTab: Locator;
@@ -100,7 +100,8 @@ export class ConversationPage {
     this.pingButton = page.locator(selectByDataAttribute('do-ping'));
     this.messageItems = page.locator(selectByDataAttribute('item-message'));
     this.messages = page.locator(
-      `${selectByDataAttribute('item-message')} ${selectByClass('message-body')}:not(:has(p${selectByClass('text-foreground')})):has(${selectByClass('text')})`,
+      // The attribute 'send-status' indicates whether the optimistic update for sending the message was successful
+      `${selectByDataAttribute('item-message')}${selectByDataAttribute('2', 'send-status')}`,
     );
     this.messageDetails = page.locator('#message-details');
     this.filesTab = page.locator('#conversation-tab-files');
@@ -225,7 +226,7 @@ export class ConversationPage {
    * @returns a Locator to the matching message(s)
    */
   getMessage(options?: {content?: string | RegExp; sender?: User}): Locator {
-    let message = this.messageItems;
+    let message = this.messages;
 
     if (options?.content) {
       message = message.filter({hasText: options.content});
