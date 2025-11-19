@@ -21,7 +21,7 @@ import {Locator, Page} from '@playwright/test';
 
 import {User} from 'test/e2e_tests/data/user';
 import {downloadAssetAndGetFilePath} from 'test/e2e_tests/utils/asset.util';
-import {selectById, selectByClass, selectByDataAttribute} from 'test/e2e_tests/utils/selector.util';
+import {selectByClass, selectByDataAttribute} from 'test/e2e_tests/utils/selector.util';
 
 import {ConfirmModal} from '../modals/confirm.modal';
 
@@ -40,6 +40,7 @@ export class ConversationPage {
   readonly conversationTitle: Locator;
   readonly watermark: Locator;
   readonly timerMessageButton: Locator;
+  readonly timerOffButton: Locator;
   readonly timerTenSecondsButton: Locator;
   readonly openGroupInformationViaName: Locator;
   readonly membersList: Locator;
@@ -83,7 +84,8 @@ export class ConversationPage {
     this.conversationTitle = page.locator('[data-uie-name="status-conversation-title-bar-label"]');
     this.openGroupInformationViaName = page.locator(selectByDataAttribute('status-conversation-title-bar-label'));
     this.timerMessageButton = page.locator(selectByDataAttribute('do-set-ephemeral-timer'));
-    this.timerTenSecondsButton = page.locator(selectById('btn-10-seconds'));
+    this.timerOffButton = page.getByRole('button', {name: 'Off'});
+    this.timerTenSecondsButton = page.getByRole('button', {name: '10 seconds'});
     this.membersList = page.locator(selectByDataAttribute('list-members'));
     this.adminsList = page.locator(selectByDataAttribute('list-admins'));
     this.leaveConversationButton = page.locator(selectByDataAttribute('do-leave-item-text'));
@@ -171,10 +173,14 @@ export class ConversationPage {
     await message.getByRole('group').getByTestId('do-reply-message').click();
   }
 
-  async sendTimedMessage(message: string) {
+  async enableSelfDeletingMessages() {
     await this.timerMessageButton.click();
     await this.timerTenSecondsButton.click();
-    await this.sendMessage(message);
+  }
+
+  async disableSelfDeletingMessages() {
+    await this.timerMessageButton.click();
+    await this.timerOffButton.click();
   }
 
   async sendMessageWithUserMention(userFullName: string, messageText?: string) {

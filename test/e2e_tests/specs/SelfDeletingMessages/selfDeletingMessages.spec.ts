@@ -43,8 +43,8 @@ test.describe('Self Deleting Messages', () => {
       const userAPages = PageManager.from(userAPage).webapp.pages;
       const userBPages = PageManager.from(userBPage).webapp.pages;
 
-      await userAPages.conversation().sendTimedMessage('Gone in 10s');
-      await expect(userAPages.conversation().getMessage({content: 'Gone in 10s'})).toBeVisible();
+      await userAPages.conversation().enableSelfDeletingMessages();
+      await userAPages.conversation().sendMessage('Gone in 10s');
       await expect(userBPages.conversation().getMessage({content: 'Gone in 10s'})).toBeVisible();
 
       await userBPage.waitForTimeout(10_000); // Wait for 10s so the message is deleted
@@ -64,8 +64,8 @@ test.describe('Self Deleting Messages', () => {
       await createGroup(userAPages, 'Test Group', [userB]);
       await userBPages.conversationList().openConversation('Test Group');
 
-      await userAPages.conversation().sendTimedMessage('Gone in 10s');
-      await expect(userAPages.conversation().getMessage({content: 'Gone in 10s'})).toBeVisible();
+      await userAPages.conversation().enableSelfDeletingMessages();
+      await userAPages.conversation().sendMessage('Gone in 10s');
       await expect(userBPages.conversation().getMessage({content: 'Gone in 10s'})).toBeVisible();
 
       await userBPage.waitForTimeout(10_000); // Wait for 10s so the message is deleted
