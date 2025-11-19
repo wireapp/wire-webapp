@@ -17,49 +17,18 @@
  *
  */
 
-import {Browser} from '@playwright/test';
-
-import {getUser, User} from 'test/e2e_tests/data/user';
+import {User} from 'test/e2e_tests/data/user';
 import {PageManager} from 'test/e2e_tests/pageManager';
 import {ConfirmModal} from 'test/e2e_tests/pageManager/webapp/modals/confirm.modal';
-import {test as baseTest, expect} from 'test/e2e_tests/test.fixtures';
+import {test as baseTest, expect, withConversation, withLogin} from 'test/e2e_tests/test.fixtures';
 import {getAudioFilePath, getTextFilePath, getVideoFilePath, shareAssetHelper} from 'test/e2e_tests/utils/asset.util';
 import {getImageFilePath} from 'test/e2e_tests/utils/sendImage.util';
-import {removeCreatedUser} from 'test/e2e_tests/utils/tearDown.util';
-import {createGroup, loginUser} from 'test/e2e_tests/utils/userActions';
+import {createGroup} from 'test/e2e_tests/utils/userActions';
 
 const test = baseTest.extend<{userA: User; userB: User}>({
-  userA: async ({api}, use) => {
-    const userA = getUser();
-    await api.createPersonalUser(userA);
-    await use(userA);
-    await removeCreatedUser(api, userA);
-  },
-  userB: async ({api}, use) => {
-    const userB = getUser();
-    await api.createPersonalUser(userB);
-    await use(userB);
-    await removeCreatedUser(api, userB);
-  },
+  userA: async ({createUser}, use) => await use(await createUser()),
+  userB: async ({createUser}, use) => await use(await createUser()),
 });
-
-const createPagesForUser = async (browser: Browser, user: User, options?: {openConversationWith?: User}) => {
-  const context = await browser.newContext();
-  const page = await context.newPage();
-  const pageManager = PageManager.from(page);
-
-  await pageManager.openMainPage();
-  await loginUser(user, pageManager);
-  const {pages, modals} = pageManager.webapp;
-
-  await modals.dataShareConsent().clickDecline();
-
-  if (options?.openConversationWith) {
-    await pages.conversationList().openConversation(options.openConversationWith.fullName);
-  }
-
-  return pages;
-};
 
 test.describe('Reply', () => {
   test.beforeEach(async ({api, userA, userB}) => {
@@ -69,11 +38,10 @@ test.describe('Reply', () => {
   test(
     'I should not be able to reply to a ping',
     {tag: ['@TC-8038', '@regression']},
-    async ({browser, userA, userB}) => {
-      const pages = await createPagesForUser(browser, userA, {openConversationWith: userB});
+    async ({createPage, userA, userB}) => {
+      const pages = (await PageManager.from(createPage(withLogin(userA), withConversation(userB)))).webapp.pages;
 
       await pages.conversation().sendPing();
-
       const ping = pages.conversation().systemMessages.last();
       await expect(pages.conversation().systemMessages.last()).toContainText('pinged');
 
@@ -85,8 +53,8 @@ test.describe('Reply', () => {
   test(
     'I should not be able to reply to timed messages',
     {tag: ['@TC-8039', '@regression']},
-    async ({browser, userA, userB}) => {
-      const pages = await createPagesForUser(browser, userA, {openConversationWith: userB});
+    async ({createPage, userA, userB}) => {
+      const pages = (await PageManager.from(createPage(withLogin(userA), withConversation(userB)))).webapp.pages;
 
       await pages.conversation().sendTimedMessage('Gone in 10s');
       const message = pages.conversation().getMessage({content: 'Gone in 10s'});
@@ -99,12 +67,13 @@ test.describe('Reply', () => {
   test(
     'I want to see a placeholder text as quote when original message is not available anymore',
     {tag: ['@TC-2994', '@regression']},
-    async ({browser, userA, userB}) => {
+    async ({createPage, userA, userB}) => {
       const [userAPages, userBPages] = await Promise.all([
-        createPagesForUser(browser, userA, {openConversationWith: userB}),
-        createPagesForUser(browser, userB, {openConversationWith: userA}),
+        PageManager.from(createPage(withLogin(userA), withConversation(userB))).then(pm => pm.webapp.pages),
+        PageManager.from(createPage(withLogin(userB), withConversation(userA))).then(pm => pm.webapp.pages),
       ]);
 
+      await userAPages.conversation().page.waitForTimeout(3000); // ToDo: remove this and replace with api.connect users after login
       await userAPages.conversation().sendMessage('Test');
 
       const messageToReplyTo = userBPages.conversation().getMessage({content: 'Test'});
@@ -124,8 +93,8 @@ test.describe('Reply', () => {
   test(
     'I should not see the quoted message when searching for original message in collections',
     {tag: ['@TC-2996', '@regression']},
-    async ({browser, userA, userB}) => {
-      const pages = await createPagesForUser(browser, userA, {openConversationWith: userB});
+    async ({createPage, userA, userB}) => {
+      const pages = (await PageManager.from(createPage(withLogin(userA), withConversation(userB)))).webapp.pages;
       await pages.conversation().sendMessage('Test');
 
       const messageToReplyTo = pages.conversation().getMessage({content: 'Test'});
@@ -144,11 +113,11 @@ test.describe('Reply', () => {
   test(
     'I want to see truncated quote preview if quote is too long',
     {tag: ['@TC-2997', '@regression']},
-    async ({browser, userA, userB}) => {
+    async ({createPage, userA, userB}) => {
       const longMessage =
         'This is a very long message which should be truncated within the UI since it is as already stated very long.';
 
-      const pages = await createPagesForUser(browser, userA, {openConversationWith: userB});
+      const pages = (await PageManager.from(createPage(withLogin(userA), withConversation(userB)))).webapp.pages;
       await pages.conversation().sendMessage(longMessage);
 
       const messageToReplyTo = pages.conversation().getMessage({content: longMessage});
@@ -161,8 +130,8 @@ test.describe('Reply', () => {
     },
   );
 
-  test('I want to reply to a picture', {tag: ['@TC-3002', '@regression']}, async ({browser, userA, userB}) => {
-    const pages = await createPagesForUser(browser, userA, {openConversationWith: userB});
+  test('I want to reply to a picture', {tag: ['@TC-3002', '@regression']}, async ({createPage, userA, userB}) => {
+    const pages = (await PageManager.from(createPage(withLogin(userA), withConversation(userB)))).webapp.pages;
     const {page} = pages.conversation();
     await shareAssetHelper(getImageFilePath(), page, page.getByRole('button', {name: 'Add picture'}));
 
@@ -174,21 +143,25 @@ test.describe('Reply', () => {
     await expect(reply.getByTestId('quote-item').getByTestId('image-asset-img')).toBeVisible();
   });
 
-  test('I want to reply to an audio message', {tag: ['@TC-3003', '@regression']}, async ({browser, userA, userB}) => {
-    const pages = await createPagesForUser(browser, userA, {openConversationWith: userB});
-    const {page} = pages.conversation();
-    await shareAssetHelper(getAudioFilePath(), page, page.getByRole('button', {name: 'Add file'}));
+  test(
+    'I want to reply to an audio message',
+    {tag: ['@TC-3003', '@regression']},
+    async ({createPage, userA, userB}) => {
+      const pages = (await PageManager.from(createPage(withLogin(userA), withConversation(userB)))).webapp.pages;
+      const {page} = pages.conversation();
+      await shareAssetHelper(getAudioFilePath(), page, page.getByRole('button', {name: 'Add file'}));
 
-    const messageWithAudio = pages.conversation().getMessage({sender: userA});
-    await pages.conversation().replyToMessage(messageWithAudio);
-    await pages.conversation().sendMessage('Reply');
+      const messageWithAudio = pages.conversation().getMessage({sender: userA});
+      await pages.conversation().replyToMessage(messageWithAudio);
+      await pages.conversation().sendMessage('Reply');
 
-    const reply = pages.conversation().getMessage({content: 'Reply'});
-    await expect(reply.getByTestId('quote-item').getByTestId('audio-asset')).toBeVisible();
-  });
+      const reply = pages.conversation().getMessage({content: 'Reply'});
+      await expect(reply.getByTestId('quote-item').getByTestId('audio-asset')).toBeVisible();
+    },
+  );
 
-  test('I want to reply to a video message', {tag: ['@TC-3004', '@regression']}, async ({browser, userA, userB}) => {
-    const pages = await createPagesForUser(browser, userA, {openConversationWith: userB});
+  test('I want to reply to a video message', {tag: ['@TC-3004', '@regression']}, async ({createPage, userA, userB}) => {
+    const pages = (await PageManager.from(createPage(withLogin(userA), withConversation(userB)))).webapp.pages;
     const {page} = pages.conversation();
     await shareAssetHelper(getVideoFilePath(), page, page.getByRole('button', {name: 'Add file'}));
 
@@ -200,8 +173,8 @@ test.describe('Reply', () => {
     await expect(reply.getByTestId('quote-item').getByTestId('video-asset')).toBeVisible();
   });
 
-  test('I want to reply to a link', {tag: ['@TC-3005', '@regression']}, async ({browser, userA, userB}) => {
-    const pages = await createPagesForUser(browser, userA, {openConversationWith: userB});
+  test('I want to reply to a link', {tag: ['@TC-3005', '@regression']}, async ({createPage, userA, userB}) => {
+    const pages = (await PageManager.from(createPage(withLogin(userA), withConversation(userB)))).webapp.pages;
     await pages.conversation().sendMessage('https://www.lidl.de/');
 
     const messageWithLink = pages.conversation().getMessage({sender: userA});
@@ -212,8 +185,8 @@ test.describe('Reply', () => {
     await expect(reply.getByTestId('quote-item').getByTestId('markdown-link')).toBeVisible();
   });
 
-  test('I want to reply to a file', {tag: ['@TC-3006', '@regression']}, async ({browser, userA, userB}) => {
-    const pages = await createPagesForUser(browser, userA, {openConversationWith: userB});
+  test('I want to reply to a file', {tag: ['@TC-3006', '@regression']}, async ({createPage, userA, userB}) => {
+    const pages = (await PageManager.from(createPage(withLogin(userA), withConversation(userB)))).webapp.pages;
     const {page} = pages.conversation();
     await shareAssetHelper(getTextFilePath(), page, page.getByRole('button', {name: 'Add file'}));
 
@@ -225,8 +198,8 @@ test.describe('Reply', () => {
     await expect(reply.getByTestId('quote-item').getByTestId('file-asset')).toBeVisible();
   });
 
-  test('I want to reply to a reply', {tag: ['@TC-3007', '@regression']}, async ({browser, userA, userB}) => {
-    const pages = await createPagesForUser(browser, userA, {openConversationWith: userB});
+  test('I want to reply to a reply', {tag: ['@TC-3007', '@regression']}, async ({createPage, userA, userB}) => {
+    const pages = (await PageManager.from(createPage(withLogin(userA), withConversation(userB)))).webapp.pages;
     await pages.conversation().sendMessage('Message');
 
     const message = pages.conversation().getMessage({content: 'Message'});
@@ -244,8 +217,8 @@ test.describe('Reply', () => {
   test(
     'I want to reply to a link mixed with text',
     {tag: ['@TC-3008', '@regression']},
-    async ({browser, userA, userB}) => {
-      const pages = await createPagesForUser(browser, userA, {openConversationWith: userB});
+    async ({createPage, userA, userB}) => {
+      const pages = (await PageManager.from(createPage(withLogin(userA), withConversation(userB)))).webapp.pages;
       await pages.conversation().sendMessage('Link: https://www.lidl.de/');
 
       const messageWithLink = pages.conversation().getMessage({sender: userA});
@@ -261,8 +234,8 @@ test.describe('Reply', () => {
   test(
     'I want to reply to a location share',
     {tag: ['@TC-3009', '@regression']},
-    async ({browser, api, userA, userB}) => {
-      const pages = await createPagesForUser(browser, userA, {openConversationWith: userB});
+    async ({createPage, api, userA, userB}) => {
+      const pages = (await PageManager.from(createPage(withLogin(userA), withConversation(userB)))).webapp.pages;
 
       await test.step('Prerequisite: Send location via TestService', async () => {
         const {instanceId} = await api.testService.createInstance(
@@ -293,8 +266,8 @@ test.describe('Reply', () => {
   test(
     'I want to send a timed message as a reply to any type of a message',
     {tag: ['@TC-3011', '@regression']},
-    async ({browser, userA, userB}) => {
-      const pages = await createPagesForUser(browser, userA, {openConversationWith: userB});
+    async ({createPage, userA, userB}) => {
+      const pages = (await PageManager.from(createPage(withLogin(userA), withConversation(userB)))).webapp.pages;
       await pages.conversation().sendMessage('Message');
 
       const message = pages.conversation().getMessage({sender: userA});
@@ -309,8 +282,8 @@ test.describe('Reply', () => {
   test(
     'I want to click the quoted message to jump to the original message',
     {tag: ['@TC-3013', '@regression']},
-    async ({browser, userA, userB}) => {
-      const pages = await createPagesForUser(browser, userA, {openConversationWith: userB});
+    async ({createPage, userA, userB}) => {
+      const pages = (await PageManager.from(createPage(withLogin(userA), withConversation(userB)))).webapp.pages;
       await pages.conversation().sendMessage('Message');
       await pages.conversation().sendMessage('Line\n'.repeat(50)); // Send a message with a lot of lines to test the scrolling behavior
 
@@ -334,10 +307,10 @@ test.describe('Reply', () => {
   test(
     'I should not be able to send a reply after I got removed from the conversation',
     {tag: ['@TC-3014', '@regression']},
-    async ({browser, userA, userB}) => {
+    async ({createPage, userA, userB}) => {
       const [userAPages, userBPages] = await Promise.all([
-        createPagesForUser(browser, userA),
-        createPagesForUser(browser, userB),
+        PageManager.from(createPage(withLogin(userA))).then(pm => pm.webapp.pages),
+        PageManager.from(createPage(withLogin(userB))).then(pm => pm.webapp.pages),
       ]);
       await createGroup(userAPages, 'Test Group', [userB]);
 
@@ -363,8 +336,8 @@ test.describe('Reply', () => {
   test(
     'I want to reply with mention and tap on the mention in the reply opens the user profile',
     {tag: ['@TC-3016', '@regression']},
-    async ({browser, userA, userB}) => {
-      const pages = await createPagesForUser(browser, userA, {openConversationWith: userB});
+    async ({createPage, userA, userB}) => {
+      const pages = (await PageManager.from(createPage(withLogin(userA), withConversation(userB)))).webapp.pages;
 
       await pages.conversation().sendMessageWithUserMention(userB.fullName, 'Message');
       const message = pages.conversation().getMessage({content: 'Message'});
