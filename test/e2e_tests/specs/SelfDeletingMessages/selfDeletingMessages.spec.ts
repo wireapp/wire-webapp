@@ -73,4 +73,32 @@ test.describe('Self Deleting Messages', () => {
       await expect(userBPages.conversation().getMessage({content: 'Gone in 10s'})).not.toBeVisible();
     },
   );
+
+  test(
+    'Verify timer is applied to all messages until turning it off in 1:1',
+    {tag: ['@TC-662', '@regression']},
+    async ({createPage, userA, userB}) => {
+      const page = await createPage(withLogin(userA), withConversation(userB));
+      const pages = PageManager.from(page).webapp.pages;
+
+      await pages.conversation().enableSelfDeletingMessages();
+      await pages.conversation().sendMessage('First Message');
+      await pages.conversation().sendMessage('Second Message');
+
+      await pages.conversation().disableSelfDeletingMessages();
+      await pages.conversation().sendMessage('Third Message');
+
+      const firstMessage = pages.conversation().getMessage({content: 'First Message'});
+      const secondMessage = pages.conversation().getMessage({content: 'Second Message'});
+      const thirdMessage = pages.conversation().getMessage({content: 'Third Message'});
+      await expect(firstMessage).toBeVisible();
+      await expect(secondMessage).toBeVisible();
+      await expect(thirdMessage).toBeVisible();
+
+      await page.waitForTimeout(10_000);
+      await expect(firstMessage).not.toBeVisible();
+      await expect(secondMessage).not.toBeVisible();
+      await expect(thirdMessage).toBeVisible(); // Third message should still be visible since the timer was turned off before sending it
+    },
+  );
 });
