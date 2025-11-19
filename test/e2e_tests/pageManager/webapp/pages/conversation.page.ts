@@ -145,10 +145,6 @@ export class ConversationPage {
     await this.cancelRequest.click();
   }
 
-  async isWatermarkVisible() {
-    return await this.watermark.isVisible();
-  }
-
   async sendMessage(message: string) {
     await this.messageInput.fill(message);
     await this.sendMessageButton.click();

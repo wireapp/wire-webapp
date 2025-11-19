@@ -85,9 +85,11 @@ test('Personal Account Lifecycle', {tag: ['@TC-8638', '@crit-flow-web']}, async 
   });
 
   await test.step('Personal user A checks that username was set correctly', async () => {
-    expect(await components.conversationSidebar().getPersonalStatusName()).toBe(`${userA.firstName} ${userA.lastName}`);
-    expect(await components.conversationSidebar().getPersonalUserName()).toContain(userA.username);
-    expect(await pages.conversation().isWatermarkVisible());
+    await expect(components.conversationSidebar().personalStatusName).toHaveText(
+      `${userA.firstName} ${userA.lastName}`,
+    );
+    await expect(components.conversationSidebar().personalUserName).toContainText(userA.username);
+    await expect(pages.conversation().watermark).toBeVisible();
   });
 
   await test.step('Personal user A searches for other personal user B', async () => {
