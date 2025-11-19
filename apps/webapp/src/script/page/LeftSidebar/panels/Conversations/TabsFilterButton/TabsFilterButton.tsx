@@ -50,7 +50,7 @@ export const TabsFilterButton = () => {
   const buttonRef = useRef<HTMLButtonElement>(null);
   const menuId = useId();
 
-  const {isChannelsEnabled} = useChannelsFeatureFlag();
+  const {shouldShowChannelTab} = useChannelsFeatureFlag();
   const teamState = container.resolve(TeamState);
   const {isCellsEnabled: isCellsEnabledForTeam} = useKoSubscribableChildren(teamState, ['isCellsEnabled']);
 
@@ -115,7 +115,7 @@ export const TabsFilterButton = () => {
     {type: SidebarTabs.PINGS, label: t('conversationLabelPings')},
   ];
 
-  if (isChannelsEnabled) {
+  if (shouldShowChannelTab) {
     availableTabs.splice(2, 0, {type: SidebarTabs.CHANNELS, label: t('conversationLabelChannels')});
   }
 

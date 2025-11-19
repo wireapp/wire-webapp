@@ -103,7 +103,7 @@ export const ConversationTabs = ({
   channelConversations,
 }: ConversationTabsProps) => {
   const {visibleTabs} = useSidebarStore();
-  const {isChannelsEnabled, isChannelsFeatureEnabled} = useChannelsFeatureFlag();
+  const {isChannelsEnabled, shouldShowChannelTab} = useChannelsFeatureFlag();
   const core = container.resolve(Core);
   const teamState = container.resolve(TeamState);
   const totalUnreadConversations = unreadConversations.length;
@@ -256,7 +256,7 @@ export const ConversationTabs = ({
     },
   ];
 
-  if (isChannelsEnabled && (channelConversations.some(channel => !channel.is_archived()) || isChannelsFeatureEnabled)) {
+  if (shouldShowChannelTab) {
     conversationTabs.splice(2, 0, {
       type: SidebarTabs.CHANNELS,
       title: t('conversationLabelChannels'),
