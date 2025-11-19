@@ -105,9 +105,8 @@ test.describe('Self Deleting Messages', () => {
   test(
     'Verify that message with previous timer are deleted on start-up when the timeout passed in 1:1',
     {tag: ['@TC-664', '@regression']},
-    async ({createPage, userA, userB}) => {
-      let page = await createPage(withLogin(userA), withConversation(userB));
-      const ctx = page.context();
+    async ({context, createPage, userA, userB}) => {
+      let page = await createPage(context, withLogin(userA), withConversation(userB));
       let pages = PageManager.from(page).webapp.pages;
 
       await pages.conversation().enableSelfDeletingMessages();
@@ -118,9 +117,8 @@ test.describe('Self Deleting Messages', () => {
       await new Promise(res => setTimeout(res, 10_000)); // Wait 10s before logging in again to ensure the message has should be deleted by now
 
       // Re-open page reusing the same context so the login is not happening on a new device
-      page = await ctx.newPage();
+      page = await createPage(context, withLogin(userA), withConversation(userB));
       pages = PageManager.from(page).webapp.pages;
-      await withLogin(userA)(page);
 
       const selfDeletingMessage = pages.conversation().getMessage({sender: userA});
       await expect(selfDeletingMessage).toBeVisible();
