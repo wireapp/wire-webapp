@@ -22,7 +22,7 @@ import {memo, useContext, useMemo} from 'react';
 import {CalendarIcon, CallIcon} from '@wireapp/react-ui-kit';
 
 import {ClockContext} from 'Components/Meeting/ClockContext';
-import {Meeting} from 'Components/Meeting/MeetingList/MeetingList';
+import {MeetingEntity} from 'Components/Meeting/MeetingList/MeetingList';
 import {MeetingAction} from 'Components/Meeting/MeetingList/MeetingListItemGroup/MeetingListItem/MeetingAction/MeetingAction';
 import {
   badgeWrapperStyles,
@@ -35,11 +35,11 @@ import {
   titleStyles,
 } from 'Components/Meeting/MeetingList/MeetingListItemGroup/MeetingListItem/MeetingListItem.styles';
 import {MeetingStatus} from 'Components/Meeting/MeetingList/MeetingListItemGroup/MeetingListItem/MeetingStatus/MeetingStatus';
-import {getMeetingStatusAt, MeetingStatuses} from 'Components/Meeting/utils/MeetingStatusUtil';
+import {getMeetingStatusAt, MEETING_STATUS} from 'Components/Meeting/utils/MeetingStatusUtil';
 import {t} from 'Util/LocalizerUtil';
 import {formatLocale} from 'Util/TimeUtil';
 
-const MeetingListItemComponent = ({title, start_date, end_date, schedule, attending}: Meeting) => {
+const MeetingListItemComponent = ({title, start_date, end_date, schedule, attending}: MeetingEntity) => {
   const nowMs = useContext(ClockContext);
 
   const {time, showCalendarIcon} = useMemo(() => {
@@ -84,10 +84,12 @@ const MeetingListItemComponent = ({title, start_date, end_date, schedule, attend
     [nowMs, start_date, end_date, attending],
   );
 
-  const isOngoing = meetingStatus === MeetingStatuses.ON_GOING || meetingStatus === MeetingStatuses.PARTICIPATING;
+  const isOngoing = meetingStatus === MEETING_STATUS.ON_GOING || meetingStatus === MEETING_STATUS.PARTICIPATING;
+
+  const meetingItemStyles = isOngoing ? [itemStyles, onGoingMeetingStyles] : [itemStyles];
 
   return (
-    <div css={[itemStyles, isOngoing && onGoingMeetingStyles]}>
+    <div css={meetingItemStyles}>
       <div css={leftStyles}>
         <div css={callingIconStyles}>
           <CallIcon />

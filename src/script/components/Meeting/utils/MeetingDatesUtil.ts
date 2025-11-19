@@ -17,7 +17,7 @@
  *
  */
 
-import {Meeting} from 'Components/Meeting/MeetingList/MeetingList';
+import {MeetingEntity} from 'Components/Meeting/MeetingList/MeetingList';
 import {FnDate, formatLocale} from 'Util/TimeUtil';
 
 /**
@@ -47,11 +47,11 @@ export const getTodayTomorrowLabels = (): {today: string; tomorrow: string} => {
 /**
  * Groups a list of meetings by their start hour.
  *
- * @param {Meeting[]} meetings - The list of meetings to group.
- * @returns {Record<number, Meeting[]>} - An object where the keys are the start hours (0-23) and the values are arrays of meetings.
+ * @param {MeetingEntity[]} meetings - The list of meetings to group.
+ * @returns {Record<number, MeetingEntity[]>} - An object where the keys are the start hours (0-23) and the values are arrays of meetings.
  */
-export const groupByStartHour = (meetings: Meeting[]): Record<number, Meeting[]> => {
-  const groupedMeetings: Record<number, Meeting[]> = {};
+export const groupByStartHour = (meetings: MeetingEntity[]): Record<number, MeetingEntity[]> => {
+  const groupedMeetings: Record<number, MeetingEntity[]> = {};
   for (const meeting of meetings) {
     const hour = new Date(meeting.start_date).getHours();
     (groupedMeetings[hour] ??= []).push(meeting);

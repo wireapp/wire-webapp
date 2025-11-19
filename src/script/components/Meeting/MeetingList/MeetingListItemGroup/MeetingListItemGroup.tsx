@@ -21,7 +21,7 @@ import {memo} from 'react';
 
 import {set} from 'date-fns';
 
-import {Meeting, MeetingTabsTitle} from 'Components/Meeting/MeetingList/MeetingList';
+import {MEETING_TABS_TITLE, MeetingEntity} from 'Components/Meeting/MeetingList/MeetingList';
 import {MeetingListItem} from 'Components/Meeting/MeetingList/MeetingListItemGroup/MeetingListItem/MeetingListItem';
 import {
   hourLabelStyles,
@@ -33,7 +33,7 @@ import {t} from 'Util/LocalizerUtil';
 
 interface MeetingListItemGroupProps {
   header?: string;
-  groupedMeetings: Record<number, Meeting[]>;
+  groupedMeetings: Record<number, MeetingEntity[]>;
   view?: MeetingTab;
 }
 
@@ -45,9 +45,9 @@ export enum MeetingGroupBy {
 const MeetingListItemGroupComponent = ({
   header,
   groupedMeetings,
-  view = MeetingTabsTitle.NEXT,
+  view = MEETING_TABS_TITLE.UPCOMING,
 }: MeetingListItemGroupProps) => {
-  const groupBy = view === MeetingTabsTitle.PAST ? MeetingGroupBy.NONE : MeetingGroupBy.HOUR;
+  const groupBy = view === MEETING_TABS_TITLE.PAST ? MeetingGroupBy.NONE : MeetingGroupBy.HOUR;
 
   const formatHourLabel = (date: string) =>
     set(new Date(date), {minutes: 0, seconds: 0, milliseconds: 0}).toLocaleTimeString([], {

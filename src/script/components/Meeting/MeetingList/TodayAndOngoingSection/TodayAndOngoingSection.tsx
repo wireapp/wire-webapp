@@ -20,7 +20,7 @@
 import {memo, useContext, useMemo} from 'react';
 
 import {ClockContext} from 'Components/Meeting/ClockContext';
-import {MeetingTabsTitle, TodayAndOngoingSectionProps} from 'Components/Meeting/MeetingList/MeetingList';
+import {MEETING_TABS_TITLE, TodayAndOngoingSectionProps} from 'Components/Meeting/MeetingList/MeetingList';
 import {MeetingListItemGroup} from 'Components/Meeting/MeetingList/MeetingListItemGroup/MeetingListItemGroup';
 import {groupByStartHour} from 'Components/Meeting/utils/MeetingDatesUtil';
 import {getOnGoingMeetingsAt} from 'Components/Meeting/utils/MeetingStatusUtil';
@@ -40,18 +40,27 @@ const TodayAndOngoingSectionComponent = ({
     () => meetingsToday.filter(meeting => !ongoingIds.has(meeting.conversation_id)),
     [meetingsToday, ongoingIds],
   );
+
   const groupedMeetingsToday = useMemo(() => groupByStartHour(todayNotOngoing), [todayNotOngoing]);
+
+  if (meetingsToday.length === 0) {
+    return <MeetingListItemGroup header={headerForToday} groupedMeetings={{0: []}} />;
+  }
+
+  const meetingForToday = <MeetingListItemGroup header={headerForToday} groupedMeetings={groupedMeetingsToday} />;
+
+  if (onGoingMeetings.length === 0) {
+    return meetingForToday;
+  }
 
   return (
     <>
-      {onGoingMeetings.length > 0 && (
-        <MeetingListItemGroup
-          header={headerForOnGoing}
-          view={MeetingTabsTitle.PAST}
-          groupedMeetings={{0: onGoingMeetings}}
-        />
-      )}
-      <MeetingListItemGroup header={headerForToday} groupedMeetings={groupedMeetingsToday} />
+      <MeetingListItemGroup
+        header={headerForOnGoing}
+        view={MEETING_TABS_TITLE.PAST}
+        groupedMeetings={{0: onGoingMeetings}}
+      />
+      {meetingForToday}
     </>
   );
 };

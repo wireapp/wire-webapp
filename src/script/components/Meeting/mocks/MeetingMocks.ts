@@ -20,7 +20,7 @@
 // This whole file is just for mocking purposes, so we can use the MeetingList component
 // Once the backend is ready, we can remove this file
 
-import {Meeting} from 'Components/Meeting/MeetingList/MeetingList';
+import {MeetingEntity} from 'Components/Meeting/MeetingList/MeetingList';
 
 const now = new Date();
 const toISO = (d: Date) => d.toISOString();
@@ -49,7 +49,7 @@ const addDay = (d: Date, s: number) => {
   return copy;
 };
 
-export const MEETINGS_TODAY: Meeting[] = [
+export const MEETINGS_TODAY: MeetingEntity[] = [
   {
     start_date: toISO(addSeconds(now, 5)),
     end_date: toISO(addMinutes(now, 33)),
@@ -81,7 +81,7 @@ export const MEETINGS_TODAY: Meeting[] = [
   },
 ];
 
-export const MEETINGS_TOMORROW: Meeting[] = [
+export const MEETINGS_TOMORROW: MeetingEntity[] = [
   {
     start_date: toISO(addDay(addMinutes(now, -120), 1)),
     end_date: toISO(addDay(addMinutes(now, -30), 1)),
@@ -112,7 +112,7 @@ export const MEETINGS_TOMORROW: Meeting[] = [
   },
 ];
 
-export const MEETINGS_PAST: Meeting[] = [
+export const MEETINGS_PAST: MeetingEntity[] = [
   {
     start_date: toISO(addDay(addMinutes(now, -120), -1)),
     end_date: toISO(addDay(addMinutes(now, -20), -1)),

@@ -17,10 +17,10 @@
  *
  */
 
-import {Meeting} from 'Components/Meeting/MeetingList/MeetingList';
+import {MeetingEntity} from 'Components/Meeting/MeetingList/MeetingList';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 
-export enum MeetingStatuses {
+export enum MEETING_STATUS {
   ON_GOING = 'on_going',
   STARTING_SOON = 'starting_soon',
   PARTICIPATING = 'participating',
@@ -36,11 +36,11 @@ export const STARTING_SOON_THRESHOLD_MS = 5 * TIME_IN_MILLIS.MINUTE;
 /**
  * Filters the list of meetings to return only those that are ongoing at the specified time.
  *
- * @param {Meeting[]} meetings - The list of meetings to filter.
+ * @param {MeetingEntity[]} meetings - The list of meetings to filter.
  * @param {number} nowMs - The current time in milliseconds.
- * @returns {Meeting[]} - The list of ongoing meetings.
+ * @returns {MeetingEntity[]} - The list of ongoing meetings.
  */
-export const getOnGoingMeetingsAt = (meetings: Meeting[], nowMs: number): Meeting[] =>
+export const getOnGoingMeetingsAt = (meetings: MeetingEntity[], nowMs: number): MeetingEntity[] =>
   meetings.filter(meeting => {
     const startMs = new Date(meeting.start_date).getTime();
     const endMs = new Date(meeting.end_date).getTime();
@@ -54,30 +54,30 @@ export const getOnGoingMeetingsAt = (meetings: Meeting[], nowMs: number): Meetin
  * @param {string} start_date - The start date of the meeting in ISO format.
  * @param {string} end_date - The end date of the meeting in ISO format.
  * @param {boolean} [attending=false] - Whether the user is attending the meeting.
- * @returns {MeetingStatuses} - The status of the meeting.
+ * @returns {MEETING_STATUS} - The status of the meeting.
  */
 export const getMeetingStatusAt = (
   nowMs: number,
   start_date: string,
   end_date: string,
   attending: boolean = false,
-): MeetingStatuses => {
+): MEETING_STATUS => {
   const startMs = new Date(start_date).getTime();
   const endMs = new Date(end_date).getTime();
 
   if (nowMs > endMs) {
-    return MeetingStatuses.PAST;
+    return MEETING_STATUS.PAST;
   }
 
   if (nowMs >= startMs) {
-    return attending ? MeetingStatuses.PARTICIPATING : MeetingStatuses.ON_GOING;
+    return attending ? MEETING_STATUS.PARTICIPATING : MEETING_STATUS.ON_GOING;
   }
 
   if (startMs <= nowMs + STARTING_SOON_THRESHOLD_MS) {
-    return MeetingStatuses.STARTING_SOON;
+    return MEETING_STATUS.STARTING_SOON;
   }
 
-  return MeetingStatuses.UPCOMING;
+  return MEETING_STATUS.UPCOMING;
 };
 
 /**

@@ -20,7 +20,7 @@
 import {CSSObject} from '@emotion/react';
 
 export const itemStyles: CSSObject = {
-  fontSize: '14px',
+  fontSize: 'var(--font-size-medium)',
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'space-between',
@@ -60,7 +60,7 @@ export const titleStyles: CSSObject = {
 
 export const metaStyles: CSSObject = {
   color: 'var(--secondary-text-color)',
-  fontSize: 12,
+  fontSize: 'var(--font-size-small)',
   marginTop: 4,
   display: 'flex',
   alignItems: 'center',

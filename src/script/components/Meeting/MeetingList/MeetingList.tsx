@@ -35,7 +35,7 @@ import {MEETINGS_PAST, MEETINGS_TODAY, MEETINGS_TOMORROW} from 'Components/Meeti
 import {getTodayTomorrowLabels, groupByStartHour} from 'Components/Meeting/utils/MeetingDatesUtil';
 import {t} from 'Util/LocalizerUtil';
 
-export interface Meeting {
+export interface MeetingEntity {
   start_date: string;
   end_date: string;
   schedule: string;
@@ -45,19 +45,19 @@ export interface Meeting {
   attending?: boolean;
 }
 
-export enum MeetingTabsTitle {
-  NEXT = 'next',
+export enum MEETING_TABS_TITLE {
+  UPCOMING = 'upcoming',
   PAST = 'past',
 }
 
 export interface TodayAndOngoingSectionProps {
-  meetingsToday: Meeting[];
+  meetingsToday: MeetingEntity[];
   headerForOnGoing: string;
   headerForToday: string;
 }
 
 export const MeetingList = () => {
-  const [activeTab, setActiveTab] = useState<MeetingTab>(MeetingTabsTitle.NEXT);
+  const [activeTab, setActiveTab] = useState<MeetingTab>(MEETING_TABS_TITLE.UPCOMING);
 
   const {today, tomorrow} = getTodayTomorrowLabels();
   const headerForOnGoing = `${t('meetings.list.onGoing.header')}`;
@@ -68,7 +68,7 @@ export const MeetingList = () => {
 
   const hasMeetingsToday = MEETINGS_TODAY.length > 0;
   const hasMeetingsTomorrow = MEETINGS_TOMORROW.length > 0;
-  const isNextTab = activeTab === MeetingTabsTitle.NEXT;
+  const isUpcomingTab = activeTab === MEETING_TABS_TITLE.UPCOMING;
 
   const handleTabChange = useCallback((tab: MeetingTab) => setActiveTab(tab), []);
 
@@ -82,8 +82,16 @@ export const MeetingList = () => {
     );
   }
 
-  if (isNextTab) {
-    content = hasMeetingsToday ? (
+  if (isUpcomingTab) {
+    if (!hasMeetingsToday) {
+      return (
+        <div css={emptyTabsListContainerStyles}>
+          <EmptyMeetingList text={t('meetings.noUpcomingMeetingsText')} />
+        </div>
+      );
+    }
+
+    content = (
       <>
         <TodayAndOngoingSection
           meetingsToday={MEETINGS_TODAY}
@@ -96,23 +104,21 @@ export const MeetingList = () => {
           <Button variant={ButtonVariant.TERTIARY}>{t('meetings.showAllLabel')}</Button>
         </div>
       </>
-    ) : (
-      <div css={emptyTabsListContainerStyles}>
-        <EmptyMeetingList text={t('meetings.noUpcomingMeetingsText')} />
-      </div>
     );
   } else {
-    content = hasMeetingsTomorrow ? (
-      <MeetingListItemGroup view={MeetingTabsTitle.PAST} groupedMeetings={{0: MEETINGS_PAST}} />
-    ) : (
-      <div css={emptyTabsListContainerStyles}>
-        <EmptyMeetingList
-          showCallingButton={false}
-          text={t('meetings.noPastMeetingsText')}
-          helperText={t('meetings.noPastMeetingsHelperText')}
-        />
-      </div>
-    );
+    if (!hasMeetingsTomorrow) {
+      return (
+        <div css={emptyTabsListContainerStyles}>
+          <EmptyMeetingList
+            showCallingButton={false}
+            text={t('meetings.noPastMeetingsText')}
+            helperText={t('meetings.noPastMeetingsHelperText')}
+          />
+        </div>
+      );
+    }
+
+    content = <MeetingListItemGroup view={MEETING_TABS_TITLE.PAST} groupedMeetings={{0: MEETINGS_PAST}} />;
   }
 
   return (

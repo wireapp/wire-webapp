@@ -21,7 +21,7 @@ import {CSSObject} from '@emotion/react/dist/emotion-react.cjs';
 
 export const participatingStatusStyles = {
   color: 'var(--accent-color)',
-  fontSize: '14px',
+  fontSize: 'var(--font-size-medium)',
   fontWeight: 'var(--font-weight-semibold)',
   display: 'flex',
   alignItems: 'center',
@@ -47,7 +47,7 @@ export const joinButtonContainerStyles = {
 export const joinButtonStyles = {
   height: '32px',
   borderRadius: '8px',
-  fontSize: '14px',
+  fontSize: 'var(--font-size-medium)',
   fontWeight: 'var(--font-weight-semibold)',
   minWidth: '83px',
   color: 'var(--white)',

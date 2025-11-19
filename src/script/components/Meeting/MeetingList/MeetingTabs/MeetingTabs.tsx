@@ -17,11 +17,11 @@
  *
  */
 
-import {MeetingTabsTitle} from 'Components/Meeting/MeetingList/MeetingList';
+import {MEETING_TABS_TITLE} from 'Components/Meeting/MeetingList/MeetingList';
 import {tabStyles, tabsWrapperStyles} from 'Components/Meeting/MeetingList/MeetingTabs/MeetingTabs.styles';
 import {t} from 'Util/LocalizerUtil';
 
-export type MeetingTab = MeetingTabsTitle.NEXT | MeetingTabsTitle.PAST;
+export type MeetingTab = MEETING_TABS_TITLE.UPCOMING | MEETING_TABS_TITLE.PAST;
 
 interface MeetingTabsProps {
   active: MeetingTab;
@@ -32,21 +32,21 @@ export const MeetingTabs = ({active, onChange}: MeetingTabsProps) => (
   <div css={tabsWrapperStyles} role="tablist" aria-label={t('meetings.tabs.ariaLabel')}>
     <div
       role="tab"
-      aria-selected={active === MeetingTabsTitle.NEXT}
+      aria-selected={active === MEETING_TABS_TITLE.UPCOMING}
       tabIndex={0}
-      css={tabStyles(active === MeetingTabsTitle.NEXT)}
-      onClick={() => onChange(MeetingTabsTitle.NEXT)}
-      onKeyDown={event => (event.key === 'Enter' || event.key === ' ') && onChange(MeetingTabsTitle.NEXT)}
+      css={tabStyles(active === MEETING_TABS_TITLE.UPCOMING)}
+      onClick={() => onChange(MEETING_TABS_TITLE.UPCOMING)}
+      onKeyDown={event => (event.key === 'Enter' || event.key === ' ') && onChange(MEETING_TABS_TITLE.UPCOMING)}
     >
       {t('meetings.tabs.next')}
     </div>
     <div
       role="tab"
-      aria-selected={active === MeetingTabsTitle.PAST}
+      aria-selected={active === MEETING_TABS_TITLE.PAST}
       tabIndex={0}
-      css={tabStyles(active === MeetingTabsTitle.PAST)}
-      onClick={() => onChange(MeetingTabsTitle.PAST)}
-      onKeyDown={event => (event.key === 'Enter' || event.key === ' ') && onChange(MeetingTabsTitle.PAST)}
+      css={tabStyles(active === MEETING_TABS_TITLE.PAST)}
+      onClick={() => onChange(MEETING_TABS_TITLE.PAST)}
+      onKeyDown={event => (event.key === 'Enter' || event.key === ' ') && onChange(MEETING_TABS_TITLE.PAST)}
     >
       {t('meetings.tabs.past')}
     </div>
