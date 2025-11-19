@@ -21,6 +21,7 @@ import {ACCESS_TYPE, FEATURE_KEY, FEATURE_STATUS, Role} from '@wireapp/api-clien
 import {container} from 'tsyringe';
 
 import {Config} from 'src/script/Config';
+import {ConversationState} from 'src/script/repositories/conversation/ConversationState';
 import {TeamState} from 'src/script/repositories/team/TeamState';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 
@@ -74,16 +75,25 @@ export const useChannelsFeatureFlag = () => {
   const canCreatePublicChannels = useCanCreatePublicChannels();
   const channelFeature = useChannelFeature();
   const core = container.resolve(Core);
+  const conversationState = container.resolve(ConversationState);
+  const {channelConversations} = useKoSubscribableChildren(conversationState, ['channelConversations']);
+
   const isChannelsEnabled =
     Config.getConfig().FEATURE.ENABLE_CHANNELS &&
     core.backendFeatures.version >= Config.getConfig().MIN_ENTERPRISE_LOGIN_V2_AND_CHANNELS_SUPPORTED_API_VERSION;
   const canCreateChannels = useCanCreateChannels();
+  const isChannelsFeatureEnabled = channelFeature?.status === FEATURE_STATUS.ENABLED;
+
+  // Determine if the channel tab should be shown based on the same logic used in ConversationTabs
+  const shouldShowChannelTab =
+    isChannelsEnabled && (channelConversations.some(channel => !channel.is_archived()) || isChannelsFeatureEnabled);
 
   return {
     canCreateChannels,
     isChannelsEnabled,
-    isChannelsFeatureEnabled: channelFeature?.status === FEATURE_STATUS.ENABLED,
+    isChannelsFeatureEnabled,
     isChannelsHistorySharingEnabled: Config.getConfig().FEATURE.ENABLE_CHANNELS_HISTORY_SHARING,
     isPublicChannelsEnabled: canCreatePublicChannels && Config.getConfig().FEATURE.ENABLE_PUBLIC_CHANNELS,
+    shouldShowChannelTab,
   };
 };
