@@ -31,7 +31,7 @@ export const sectionHeaderStyles: CSSObject = {
 
 export const hourLabelStyles: CSSObject = {
   color: 'var(--secondary-text-color)',
-  fontSize: '12px',
+  fontSize: 'var(--font-size-small)',
   marginTop: 12,
   marginBottom: 8,
 };

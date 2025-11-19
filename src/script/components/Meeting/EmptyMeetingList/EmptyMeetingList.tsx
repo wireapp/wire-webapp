@@ -41,10 +41,10 @@ export const EmptyMeetingList = ({text, helperText, showCallingButton = true}: E
       {showCallingButton && (
         <div css={emptyListActionButtonContainerStyles}>
           <Button variant={ButtonVariant.TERTIARY}>
-            <CallIcon css={emptyListActionButtonsStyles} /> Meet Now
+            <CallIcon css={emptyListActionButtonsStyles} /> {t('meetings.action.meetNow')}
           </Button>
           <Button variant={ButtonVariant.TERTIARY}>
-            <CalendarIcon css={emptyListActionButtonsStyles} /> Schedule Meeting
+            <CalendarIcon css={emptyListActionButtonsStyles} /> {t('meetings.action.scheduleMeeting')}
           </Button>
         </div>
       )}

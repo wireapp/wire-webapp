@@ -20,6 +20,7 @@
 import {CSSObject} from '@emotion/react';
 
 export const itemStyles: CSSObject = {
+  fontSize: 'var(--font-size-medium)',
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'space-between',
@@ -42,6 +43,11 @@ export const itemStyles: CSSObject = {
   },
 };
 
+export const onGoingMeetingStyles: CSSObject = {
+  background: 'var(--accent-color-highlight)',
+  border: '1px solid var(--accent-color)',
+};
+
 export const leftStyles: CSSObject = {
   display: 'flex',
   alignItems: 'center',
@@ -54,7 +60,7 @@ export const titleStyles: CSSObject = {
 
 export const metaStyles: CSSObject = {
   color: 'var(--secondary-text-color)',
-  fontSize: 12,
+  fontSize: 'var(--font-size-small)',
   marginTop: 4,
   display: 'flex',
   alignItems: 'center',

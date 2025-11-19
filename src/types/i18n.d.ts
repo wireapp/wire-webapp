@@ -584,6 +584,7 @@ declare module 'I18n/en-US.json' {
     'conversationAudioAssetUploadFailed': `Upload failed: {name}`;
     'conversationAudioAssetUploading': `Uploading: {name}`;
     'conversationButtonSeparator': `or`;
+    'conversationCellsConversationEnabled': `File collaboration (Cells beta) is on`;
     'conversationClassified': `Security level: VS-NfD`;
     'conversationCommonFeature1': `Up to [bold]{capacity}[/bold] people`;
     'conversationCommonFeature2': `Video conferencing`;
@@ -602,7 +603,6 @@ declare module 'I18n/en-US.json' {
     'conversationContextMenuLike': `Like`;
     'conversationContextMenuReply': `Reply`;
     'conversationContextMenuUnlike': `Unlike`;
-    'conversationCellsConversationEnabled': `File collaboration (Cells beta) is on`;
     'conversationCreateReceiptsEnabled': `Read receipts are on`;
     'conversationCreateTeam': `with [showmore]all team members[/showmore]`;
     'conversationCreateTeamGuest': `with [showmore]all team members and one guest[/showmore]`;
@@ -625,8 +625,8 @@ declare module 'I18n/en-US.json' {
     'conversationDetailsActionArchive': `Archive`;
     'conversationDetailsActionBlock': `Block`;
     'conversationDetailsActionCancelRequest': `Cancel request`;
-    'conversationDetailsActionCellsTitle': `File collaboration (Cells beta version) is on`;
     'conversationDetailsActionCellsOption': `Permanently on for this conversation.`;
+    'conversationDetailsActionCellsTitle': `File collaboration (Cells beta version) is on`;
     'conversationDetailsActionClear': `Clear content`;
     'conversationDetailsActionConversationParticipants': `Show all ({number})`;
     'conversationDetailsActionCreateGroup': `Create group`;
@@ -1202,8 +1202,21 @@ declare module 'I18n/en-US.json' {
     'meetings.tabs.next': `Next`;
     'meetings.tabs.past': `Past`;
     'meetings.list.today': `Today`;
+    'meetings.list.onGoing': `Ongoing`;
+    'meetings.list.onGoing.header': `Now`;
     'meetings.list.tomorrow': `Tomorrow`;
+    'meetings.meetingStatus.participating': `Attending`;
+    'meetings.meetingStatus.startingIn': `Starting in {countdown}`;
+    'meetings.meetingStatus.startedAt': `Started at {time}`;
     'meetings.startMeetingHelp': `Start a meeting with team members, guests, or external parties. Your communication is always end-to-end encrypted, offering the highest level of security.`;
+    'meetings.action.meetNow': `Meet Now`;
+    'meetings.action.scheduleMeeting': `Schedule Meeting`;
+    'meetings.action.startMeeting': `Start meeting`;
+    'meetings.action.createConversation': `Create conversation`;
+    'meetings.action.copyLink': `Copy link`;
+    'meetings.action.editMeeting': `Edit meeting`;
+    'meetings.action.deleteMeetingForMe': `Delete meeting for me`;
+    'meetings.action.deleteMeetingForAll': `Delete meeting for everyone`;
     'mlsConversationRecovered': `You haven\'t used this device for a while, or an issue has occurred. Some older messages may not appear here.`;
     'mlsSignature': `MLS with {signature} Signature`;
     'mlsThumbprint': `MLS Thumbprint`;
