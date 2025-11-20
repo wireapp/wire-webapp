@@ -7,10 +7,17 @@
 - Use severities: **[Blocker]**, **[Important]**, **[Suggestion]**.
 - Do **not** nitpick items handled by automation (formatting, lint rules).
 
-Related docs:
+Related docs (important):
 
-- **Coding Standards:** https://github.com/wireapp/wire-webapp/tree/docs/coding-standards.md
-- **Tech Radar:** https://github.com/wireapp/wire-webapp/tree/docs/tech-radar.md
+- **Coding Standards:** docs/coding-standards.md
+- **Tech Radar:** docs/tech-radar.md
+
+**Additional rules (open when relevant)**
+
+- Security: `.github/instructions/security.instructions.md`
+- Accessibility: `.github/instructions/accessibility.instructions.md`
+- React/UX: `.github/instructions/react.instructions.md`
+- TypeScript: `.github/instructions/typescript.instructions.md`
 
 ---
 
@@ -50,12 +57,12 @@ Related docs:
 
 ### Everything else
 
-- For imports/TS/React/testing/naming/readability: **refer to** the [Coding Standards](https://github.com/wireapp/wire-webapp/tree/docs/coding-standards.md).
+- For imports/TS/React/testing/naming/readability: **refer to** the [Coding Standards](docs/coding-standards.md).
   - If a standard is violated, link the relevant section and suggest a minimal change.
 
 ### Technology choices
 
-- Compare any new dependencies in `package.json`/lockfiles to the [Tech Radar](https://github.com/wireapp/wire-webapp/tree/docs/tech-radar.md).
+- Compare any new dependencies in `package.json`/lockfiles to the [Tech Radar](docs/tech-radar.md).
   - If not **Adopt**/**Trial**, mark **[Blocker]** and request an RFC/approval link.
   - For **Trial**, ensure usage is narrowly scoped and success criteria exist.
 
