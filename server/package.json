@@ -36,6 +36,9 @@
     "rimraf": "6.1.0",
     "typescript": "5.6.3"
   },
+  "resolutions": {
+    "glob": "11.1.0"
+  },
   "engines": {
     "node": ">= 20.14.0"
   },
