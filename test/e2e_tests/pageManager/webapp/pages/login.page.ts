@@ -17,14 +17,14 @@
  *
  */
 
-import {Page, Locator} from '@playwright/test';
+import type {Page, Locator} from '@playwright/test';
+
+import type {User} from 'test/e2e_tests/data/user';
 
 export class LoginPage {
   readonly page: Page;
 
-  readonly backButton: Locator;
   readonly signInButton: Locator;
-  readonly loginForm: Locator;
   readonly emailInput: Locator;
   readonly passwordInput: Locator;
   readonly loginErrorText: Locator;
@@ -32,31 +32,15 @@ export class LoginPage {
   constructor(page: Page) {
     this.page = page;
 
-    this.backButton = page.locator('[data-uie-name="go-index"]');
     this.signInButton = page.locator('[data-uie-name="do-sign-in"]');
-    this.loginForm = page.locator('[data-uie-name="login"]');
     this.emailInput = page.locator('[data-uie-name="enter-email"]');
     this.passwordInput = page.locator('[data-uie-name="enter-password"]');
     this.loginErrorText = page.locator('[data-uie-name="error-message"]');
   }
 
-  async isEmailFieldVisible() {
-    return await this.emailInput.isVisible();
-  }
-
-  async inputEmail(email: string) {
-    await this.emailInput.fill(email);
-  }
-
-  async inputPassword(password: string) {
-    await this.passwordInput.fill(password);
-  }
-
-  async clickSignInButton() {
+  async login(user: Pick<User, 'email' | 'password'>) {
+    await this.emailInput.fill(user.email);
+    await this.passwordInput.fill(user.password);
     await this.signInButton.click();
-  }
-
-  async getErrorMessage() {
-    return (await this.loginErrorText.textContent()) ?? '';
   }
 }
