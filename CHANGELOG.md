@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [9.69.6](https://github.com/wireapp/wire-web-packages/compare/@wireapp/react-ui-kit@9.69.5...@wireapp/react-ui-kit@9.69.6) (2025-11-20)
+
+### Bug Fixes
+
+* add selectMenuPortalCSS for select component [WPB-21824] ([#7590](https://github.com/wireapp/wire-web-packages/issues/7590)) ([9167235](https://github.com/wireapp/wire-web-packages/commit/9167235c0a36dc372042c8aaeb397d561f1028f0))
+
 ## [9.69.5](https://github.com/wireapp/wire-web-packages/compare/@wireapp/react-ui-kit@9.69.4...@wireapp/react-ui-kit@9.69.5) (2025-11-17)
 
 ### Bug Fixes
