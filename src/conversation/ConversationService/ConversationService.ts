@@ -127,7 +127,7 @@ export class ConversationService extends TypedEventEmitter<Events> {
         this.recoverMLSGroupFromEpochMismatch(conversationId, subconvId),
       addMissingUsers: (conversationId: QualifiedId, groupId: string, users: QualifiedId[]) =>
         this.performAddUsersToMLSConversationAPI({conversationId, groupId, qualifiedUsers: users}),
-      wipeMLSConversation: (groupId: string) => this.wipeMLSConversation(groupId),
+      wipeMLSConversation: this.wipeMLSConversation,
     });
   }
 
@@ -667,9 +667,9 @@ export class ConversationService extends TypedEventEmitter<Events> {
     return this.mlsService.isConversationEstablished(groupId);
   }
 
-  public async wipeMLSConversation(groupId: string): Promise<void> {
+  public wipeMLSConversation = async (groupId: string): Promise<void> => {
     return this.mlsService.wipeConversation(groupId);
-  }
+  };
 
   private async matchesEpoch(groupId: string, backendEpoch: number): Promise<boolean> {
     const localEpoch = await this.mlsService.getEpoch(groupId);

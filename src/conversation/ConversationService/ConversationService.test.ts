@@ -797,15 +797,13 @@ describe('ConversationService', () => {
         .mockRejectedValueOnce(existsError)
         .mockResolvedValueOnce(undefined as any);
 
-      const wipeSpy = jest.spyOn(conversationService, 'wipeMLSConversation').mockResolvedValueOnce();
-
       await conversationService.handleEvent(mockMLSWelcomeMessageEvent);
 
       await new Promise(resolve => setImmediate(resolve));
 
       // Expect a single wipe with the extracted group id, and a single retry of welcome handling
-      expect(wipeSpy).toHaveBeenCalledTimes(1);
-      expect(wipeSpy).toHaveBeenCalledWith(expectedGroupId);
+      expect(mlsService.wipeConversation).toHaveBeenCalledTimes(1);
+      expect(mlsService.wipeConversation).toHaveBeenCalledWith(expectedGroupId);
       expect(welcomeSpy).toHaveBeenCalledTimes(2);
     });
   });
