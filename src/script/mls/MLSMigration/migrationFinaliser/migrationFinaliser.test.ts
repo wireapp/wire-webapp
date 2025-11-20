@@ -17,8 +17,8 @@
  *
  */
 
-import {ConversationProtocol, CONVERSATION_TYPE} from '@wireapp/api-client/lib/conversation';
-import {FeatureStatus} from '@wireapp/api-client/lib/team';
+import {CONVERSATION_TYPE} from '@wireapp/api-client/lib/conversation';
+import {CONVERSATION_PROTOCOL, FEATURE_STATUS} from '@wireapp/api-client/lib/team';
 
 import {MixedConversation, MLSConversation} from 'Repositories/conversation/ConversationSelectors';
 import {Conversation} from 'Repositories/entity/Conversation';
@@ -29,7 +29,7 @@ import {createUuid} from 'Util/uuid';
 import {finaliseMigrationOfMixedConversations} from './migrationFinaliser';
 
 const createMixedConversation = (): MixedConversation => {
-  const conversation = new Conversation(createUuid(), '', ConversationProtocol.MIXED);
+  const conversation = new Conversation(createUuid(), '', CONVERSATION_PROTOCOL.MIXED);
   const mockGroupId = 'groupId';
   conversation.groupId = mockGroupId;
   conversation.type(CONVERSATION_TYPE.REGULAR);
@@ -39,7 +39,7 @@ const createMixedConversation = (): MixedConversation => {
 const changeConversationProtocolToMLS = (conversation: MixedConversation): MLSConversation => {
   return {
     ...conversation,
-    protocol: ConversationProtocol.MLS,
+    protocol: CONVERSATION_PROTOCOL.MLS,
   } as MLSConversation;
 };
 
@@ -51,13 +51,13 @@ const injectParticipantsIntoConversation = (
     .fill(0)
     .map(() => {
       const user = generateUser({id: createUuid(), domain: 'test.wire.test'});
-      user.supportedProtocols([ConversationProtocol.PROTEUS, ConversationProtocol.MLS]);
+      user.supportedProtocols([CONVERSATION_PROTOCOL.PROTEUS, CONVERSATION_PROTOCOL.MLS]);
       return user;
     });
 
   if (!doAllSupportMLS) {
     const userNotSupportingMLS = generateUser({id: createUuid(), domain: 'test.wire.test'});
-    userNotSupportingMLS.supportedProtocols([ConversationProtocol.PROTEUS]);
+    userNotSupportingMLS.supportedProtocols([CONVERSATION_PROTOCOL.PROTEUS]);
     return conversation.participating_user_ets([...usersSupportingMLS, userNotSupportingMLS]);
   }
 
@@ -76,7 +76,7 @@ describe('finaliseMigrationOfMixedConversations', () => {
 
     jest.spyOn(teamRepository['teamState'], 'teamFeatures').mockReturnValueOnce({
       mlsMigration: {
-        status: FeatureStatus.ENABLED,
+        status: FEATURE_STATUS.ENABLED,
         config: {
           startTime: new Date(Date.now() - 1000 * 60 * 60 * 24 * 7).toISOString(), //week before
           finaliseRegardlessAfter: new Date().toISOString(),
@@ -94,7 +94,7 @@ describe('finaliseMigrationOfMixedConversations', () => {
 
     expect(conversationRepository.updateConversationProtocol).toHaveBeenCalledWith(
       mixedConversation,
-      ConversationProtocol.MLS,
+      CONVERSATION_PROTOCOL.MLS,
     );
   });
 
@@ -109,7 +109,7 @@ describe('finaliseMigrationOfMixedConversations', () => {
 
     jest.spyOn(teamRepository['teamState'], 'teamFeatures').mockReturnValueOnce({
       mlsMigration: {
-        status: FeatureStatus.ENABLED,
+        status: FEATURE_STATUS.ENABLED,
         config: {
           startTime: new Date(Date.now() - 1000 * 60 * 60 * 24 * 7).toISOString(), //week before
           finaliseRegardlessAfter: new Date(Date.now() + 1000 * 60 * 60 * 24 * 7).toISOString(), //week after
@@ -127,7 +127,7 @@ describe('finaliseMigrationOfMixedConversations', () => {
 
     expect(conversationRepository.updateConversationProtocol).toHaveBeenCalledWith(
       mixedConversation,
-      ConversationProtocol.MLS,
+      CONVERSATION_PROTOCOL.MLS,
     );
   });
 
@@ -140,7 +140,7 @@ describe('finaliseMigrationOfMixedConversations', () => {
 
     jest.spyOn(teamRepository['teamState'], 'teamFeatures').mockReturnValueOnce({
       mlsMigration: {
-        status: FeatureStatus.ENABLED,
+        status: FEATURE_STATUS.ENABLED,
         config: {
           startTime: new Date(Date.now() - 1000 * 60 * 60 * 24 * 7).toISOString(), //week before
           finaliseRegardlessAfter: new Date(Date.now() + 1000 * 60 * 60 * 24 * 7).toISOString(), //week after

@@ -22,7 +22,7 @@ import {
   CONVERSATION_LEGACY_ACCESS_ROLE,
   CONVERSATION_TYPE,
 } from '@wireapp/api-client/lib/conversation';
-import {ConversationProtocol} from '@wireapp/api-client/lib/conversation/NewConversation';
+import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 
 import {Conversation} from 'Repositories/entity/Conversation';
 
@@ -65,8 +65,8 @@ describe('ConversationFilter', () => {
         muted_timestamp: 0,
         name: 'Florian@Staging11',
         others: ['71e25be1-5433-4647-964d-03a5d9e7c970'],
-        protocol: ConversationProtocol.PROTEUS,
-        initial_protocol: ConversationProtocol.PROTEUS,
+        protocol: CONVERSATION_PROTOCOL.PROTEUS,
+        initial_protocol: CONVERSATION_PROTOCOL.PROTEUS,
         qualified_others: undefined,
         receipt_mode: null,
         roles: {},
@@ -117,8 +117,8 @@ describe('ConversationFilter', () => {
         muted_timestamp: 0,
         name: 'Florian@Staging11',
         others: ['71e25be1-5433-4647-964d-03a5d9e7c970'],
-        initial_protocol: ConversationProtocol.PROTEUS,
-        protocol: ConversationProtocol.PROTEUS,
+        initial_protocol: CONVERSATION_PROTOCOL.PROTEUS,
+        protocol: CONVERSATION_PROTOCOL.PROTEUS,
         qualified_others: undefined,
         receipt_mode: null,
         roles: {

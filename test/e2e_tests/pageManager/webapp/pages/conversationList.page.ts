@@ -104,9 +104,9 @@ export class ConversationListPage {
     await this.createGroupButton.click();
   }
 
-  private getConversationLocator(conversationName: string) {
+  getConversationLocator(conversationName: string) {
     return this.page.locator(
-      `${selectByDataAttribute('item-conversation')}[data-uie-value='${escapeHtml(conversationName)}']`,
+      `${selectByDataAttribute('item-conversation')}${selectByDataAttribute(escapeHtml(conversationName), 'value')}`,
     );
   }
 

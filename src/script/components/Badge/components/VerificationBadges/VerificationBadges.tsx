@@ -20,7 +20,7 @@
 import {CSSProperties, useEffect, useMemo, useRef, useState} from 'react';
 
 import {CSSObject} from '@emotion/react';
-import {ConversationProtocol} from '@wireapp/api-client/lib/conversation';
+import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 import {stringifyQualifiedId} from '@wireapp/core/lib/util/qualifiedIdUtil';
 import {container} from 'tsyringe';
 
@@ -49,7 +49,7 @@ import {waitFor} from 'Util/waitFor';
 type VerificationBadgeContext = 'user' | 'conversation' | 'device';
 
 interface VerificationBadgesProps {
-  conversationProtocol?: ConversationProtocol;
+  conversationProtocol?: CONVERSATION_PROTOCOL;
   isProteusVerified?: boolean;
   MLSStatus?: MLSStatuses;
   displayTitle?: boolean;
@@ -270,11 +270,11 @@ export const VerificationBadges = ({
   const conversationHasProtocol = !!conversationProtocol;
 
   const showMLSBadge = conversationHasProtocol
-    ? conversationProtocol === ConversationProtocol.MLS && !!MLSStatus
+    ? conversationProtocol === CONVERSATION_PROTOCOL.MLS && !!MLSStatus
     : !!MLSStatus;
 
   const showProteusBadge = conversationHasProtocol
-    ? conversationProtocol === ConversationProtocol.PROTEUS && isProteusVerified
+    ? conversationProtocol === CONVERSATION_PROTOCOL.PROTEUS && isProteusVerified
     : isProteusVerified;
 
   const mlsTooltipId = `mls-verified-tooltip_${id.current}`;

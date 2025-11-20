@@ -17,7 +17,8 @@
  *
  */
 
-import {ConversationProtocol, CONVERSATION_TYPE} from '@wireapp/api-client/lib/conversation';
+import {CONVERSATION_TYPE} from '@wireapp/api-client/lib/conversation';
+import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {container} from 'tsyringe';
 
@@ -32,7 +33,7 @@ import {initialiseMigrationOfProteusConversations} from '.';
 const selfUserId = {id: 'self-user-id', domain: 'local.wire.link'};
 
 const createProteusConversation = (userIds: QualifiedId[] = []): ProteusConversation => {
-  const conversation = new Conversation(createUuid(), 'local.wire.link', ConversationProtocol.PROTEUS);
+  const conversation = new Conversation(createUuid(), 'local.wire.link', CONVERSATION_PROTOCOL.PROTEUS);
   conversation.participating_user_ids.push(...userIds);
   conversation.type(CONVERSATION_TYPE.REGULAR);
   return conversation as ProteusConversation;
@@ -43,7 +44,7 @@ const changeConversationProtocolToMixed = (conversation: Conversation, groupId: 
     ...conversation,
     qualifiedId: conversation.qualifiedId,
     groupId,
-    protocol: ConversationProtocol.MIXED,
+    protocol: CONVERSATION_PROTOCOL.MIXED,
   } as MixedConversation;
 };
 
@@ -83,7 +84,7 @@ describe('initialiseMigrationOfProteusConversations', () => {
     expect(mockedConversationRepository.updateConversationProtocol).toHaveBeenCalledTimes(1);
     expect(mockedConversationRepository.updateConversationProtocol).toHaveBeenCalledWith(
       proteusConversation,
-      ConversationProtocol.MIXED,
+      CONVERSATION_PROTOCOL.MIXED,
     );
 
     expect(container.resolve(Core).service?.conversation.tryEstablishingMLSGroup).toHaveBeenCalled();

@@ -17,7 +17,7 @@
  *
  */
 
-import {FeatureList, FEATURE_KEY, FeatureStatus} from '@wireapp/api-client/lib/team';
+import {FeatureList, FEATURE_KEY, FEATURE_STATUS} from '@wireapp/api-client/lib/team';
 
 export enum FeatureUpdateType {
   ENABLED = 'ENABLED', // Feature was enabled or didn't exist before and now it was added and is enabled
@@ -64,7 +64,7 @@ export const detectTeamFeatureUpdate = <Key extends FEATURE_KEY>(
 
   if (!prevFeatureList) {
     // Feature was added and is enabled
-    if (newFeature && newFeature.status === FeatureStatus.ENABLED) {
+    if (newFeature && newFeature.status === FEATURE_STATUS.ENABLED) {
       return {type: FeatureUpdateType.ENABLED, next: newFeature};
     }
 
@@ -78,7 +78,7 @@ export const detectTeamFeatureUpdate = <Key extends FEATURE_KEY>(
 
   if (wasFeatureAdded) {
     // Feature was added and is enabled
-    if (newFeature.status === FeatureStatus.ENABLED) {
+    if (newFeature.status === FEATURE_STATUS.ENABLED) {
       return {type: FeatureUpdateType.ENABLED, next: newFeature};
     }
 
@@ -105,7 +105,7 @@ export const detectTeamFeatureUpdate = <Key extends FEATURE_KEY>(
   const hasFeatureStatusChanged = prevFeature.status !== newFeature.status;
 
   if (hasFeatureStatusChanged) {
-    if (newFeature.status === FeatureStatus.ENABLED) {
+    if (newFeature.status === FEATURE_STATUS.ENABLED) {
       return {type: FeatureUpdateType.ENABLED, prev: prevFeature, next: newFeature};
     }
 
@@ -113,7 +113,7 @@ export const detectTeamFeatureUpdate = <Key extends FEATURE_KEY>(
   }
 
   const hasFeatureConfigChanged =
-    newFeature.status === FeatureStatus.ENABLED &&
+    newFeature.status === FEATURE_STATUS.ENABLED &&
     'config' in prevFeature &&
     'config' in newFeature &&
     JSON.stringify(prevFeature.config) !== JSON.stringify(newFeature.config);

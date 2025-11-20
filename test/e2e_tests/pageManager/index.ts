@@ -35,7 +35,9 @@ import {AcknowledgeModal} from './webapp/modals/acknowledge.modal';
 import {AppLockModal} from './webapp/modals/appLock.modal';
 import {BlockWarningModal} from './webapp/modals/blockWarning.modal';
 import {CallNotEstablishedModal} from './webapp/modals/callNotEstablished.modal';
+import {CancelRequestModal} from './webapp/modals/cancelRequest.modal';
 import {ConfirmLogoutModal} from './webapp/modals/confirmLogout.modal';
+import {ConversationNotConnectedModal} from './webapp/modals/conversationNotConnected.modal';
 import {CopyPasswordModal} from './webapp/modals/copyPassword.modal';
 import {CreatGuestLinkModal} from './webapp/modals/createGuestLink.modal';
 import {DataShareConsentModal} from './webapp/modals/dataShareConsent.modal';
@@ -64,6 +66,7 @@ import {HistoryExportPage} from './webapp/pages/historyExport.page';
 import {HistoryImportPage} from './webapp/pages/historyImport.page';
 import {HistoryInfoPage} from './webapp/pages/infoHistory.page';
 import {LoginPage} from './webapp/pages/login.page';
+import {MessageDetailsPage} from './webapp/pages/messageDetails.page';
 import {OptionsPage} from './webapp/pages/options.page';
 import {OutgoingConnectionPage} from './webapp/pages/outgoingConnection.page';
 import {ParticipantDetails} from './webapp/pages/participantDetails.page';
@@ -84,9 +87,11 @@ export class PageManager {
 
   constructor(private readonly page: Page) {}
 
-  static from = (page: Page): PageManager => {
-    return new PageManager(page);
-  };
+  static from(page: Page): PageManager;
+  static from(page: Promise<Page>): Promise<PageManager>;
+  static from(page: Page | Promise<Page>): PageManager | Promise<PageManager> {
+    return 'then' in page ? page.then(p => new PageManager(p)) : new PageManager(page);
+  }
 
   openNewTab = async <T>(url?: string, handler?: (tab: PageManager) => Promise<T>): Promise<T> => {
     const newPage = await this.page.context().newPage();
@@ -103,6 +108,10 @@ export class PageManager {
 
   openMainPage = () => {
     return this.page.goto(webAppPath, {waitUntil: 'networkidle'});
+  };
+
+  openLoginPage = async () => {
+    await this.page.goto(`${webAppPath}auth/#/login`);
   };
 
   openUrl = (url: string) => {
@@ -174,6 +183,7 @@ export class PageManager {
       historyInfo: () => this.getOrCreate('webapp.pages.infoHostory', () => new HistoryInfoPage(this.page)),
       historyExport: () => this.getOrCreate('webapp.pages.historyExport', () => new HistoryExportPage(this.page)),
       historyImport: () => this.getOrCreate('webapp.pages.historyImport', () => new HistoryImportPage(this.page)),
+      messageDetails: () => this.getOrCreate('webapp.pages.messageDetails', () => new MessageDetailsPage(this.page)),
       participantDetails: () =>
         this.getOrCreate('webapp.pages.participantsDetails', () => new ParticipantDetails(this.page)),
       requestResetPassword: () =>
@@ -212,6 +222,10 @@ export class PageManager {
       acknowledge: () => this.getOrCreate('webapp.modals.marketingConsent', () => new AcknowledgeModal(this.page)),
       cellsFileDetailView: () =>
         this.getOrCreate('webapp.modals.cellsFileDetailView', () => new CellsFileDetailViewModal(this.page)),
+      cancelRequest: () =>
+        this.getOrCreate('webapp.modals.cancelRequestModal', () => new CancelRequestModal(this.page)),
+      conversationNotConnected: () =>
+        this.getOrCreate('webapp.modals.conversationNotConnected', () => new ConversationNotConnectedModal(this.page)),
     },
     components: {
       contactList: () => this.getOrCreate('webapp.components.ContactList', () => new ContactList(this.page)),

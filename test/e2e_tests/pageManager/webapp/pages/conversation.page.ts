@@ -23,6 +23,8 @@ import {User} from 'test/e2e_tests/data/user';
 import {downloadAssetAndGetFilePath} from 'test/e2e_tests/utils/asset.util';
 import {selectById, selectByClass, selectByDataAttribute} from 'test/e2e_tests/utils/selector.util';
 
+type EmojiReaction = 'plus-one' | 'heart' | 'joy';
+
 export class ConversationPage {
   readonly page: Page;
 
@@ -48,11 +50,21 @@ export class ConversationPage {
   readonly conversationInfoButton: Locator;
   readonly pingButton: Locator;
   readonly messages: Locator;
+  readonly messageDetails: Locator;
   readonly messageItems: Locator;
   readonly filesTab: Locator;
   readonly isTypingIndicator: Locator;
+  readonly itemPendingRequest: Locator;
+  readonly ignoreButton: Locator;
+  readonly cancelRequest: Locator;
 
   readonly getImageAltText = (user: User) => `Image from ${user.fullName}`;
+
+  readonly emojiTitleMap: Record<EmojiReaction, string> = {
+    'plus-one': '+1',
+    heart: 'heart',
+    joy: 'joy',
+  };
 
   constructor(page: Page) {
     this.page = page;
@@ -84,8 +96,12 @@ export class ConversationPage {
     this.messages = page.locator(
       `${selectByDataAttribute('item-message')} ${selectByClass('message-body')}:not(:has(p${selectByClass('text-foreground')})):has(${selectByClass('text')})`,
     );
+    this.messageDetails = page.locator('#message-details');
     this.filesTab = page.locator('#conversation-tab-files');
     this.isTypingIndicator = page.locator(selectByDataAttribute('typing-indicator-title'));
+    this.itemPendingRequest = page.locator(selectByDataAttribute('item-pending-requests'));
+    this.ignoreButton = page.getByTestId('do-ignore');
+    this.cancelRequest = page.getByTestId('do-cancel-request');
   }
 
   protected getImageLocator(user: User): Locator {
@@ -99,6 +115,10 @@ export class ConversationPage {
       (await this.page.locator(selectByDataAttribute('status-conversation-title-bar-label')).textContent()) ===
       conversationName
     );
+  }
+
+  async clickItemPendingRequest() {
+    await this.itemPendingRequest.click();
   }
 
   async clickConversationTitle() {
@@ -117,22 +137,23 @@ export class ConversationPage {
     await this.filesTab.click();
   }
 
-  async isWatermarkVisible() {
-    return await this.watermark.isVisible();
+  async clickIgnoreButton() {
+    await this.ignoreButton.click();
+  }
+
+  async clickCancelRequest() {
+    await this.cancelRequest.click();
   }
 
   async sendMessage(message: string) {
     await this.messageInput.fill(message);
-    await this.messageInput.press('Enter');
-    await this.page.waitForTimeout(5000); // Wait for the message to be sent
+    await this.sendMessageButton.click();
   }
 
   async typeMessage(message: string) {
     await this.messageInput.click();
-    for (let i = 0; i < message.length; i++) {
-      await this.page.keyboard.press(message[i]);
-      await this.page.waitForTimeout(300); // sim user input
-    }
+    // Use pressSequentially which simulates realistic typing with built-in delays
+    await this.messageInput.pressSequentially(message, {delay: 100});
   }
 
   async createGroup(groupName: string) {
@@ -156,24 +177,6 @@ export class ConversationPage {
     await this.messageInput.press('Enter');
   }
 
-  async isMessageVisible(messageText: string, waitForVisibility = true) {
-    if (waitForVisibility) {
-      // Wait for the last message to be visible
-      await this.messages.last().waitFor({state: 'visible', timeout: 20_000});
-    }
-
-    // Then get all matching elements
-    const messages = await this.messages.all();
-
-    for (const message of messages) {
-      const messageTextContent = await message.locator(selectByClass('text')).textContent();
-      if (messageTextContent?.trim() === messageText) {
-        return true;
-      }
-    }
-    return false;
-  }
-
   async isImageFromUserVisible(user: User) {
     // Trying multiple times for the image to appear
     const locator = this.getImageLocator(user);
@@ -194,9 +197,80 @@ export class ConversationPage {
     return await locator.screenshot();
   }
 
-  async reactOnMessage(message: Locator) {
+  /**
+   * Util to get a message in the conversation
+   * @param options.content Only match messages containing this text
+   * @param options.sender Only match messages send by this user
+   * @returns a Locator to the matching message(s)
+   */
+  getMessage(options?: {content?: string | RegExp; sender?: User}): Locator {
+    let message = this.messageItems;
+
+    if (options?.content) {
+      message = message.filter({hasText: options.content});
+    }
+
+    if (options?.sender?.fullName) {
+      message = message.filter({
+        // Using getByLabel doesn't work here as the aria label is just placed on a div with no input inside which could be located
+        has: this.page.locator(`.content-message-wrapper[aria-label*="${options.sender.fullName}"]`),
+      });
+    }
+
+    return message;
+  }
+
+  /**
+   * Open the options associated with a message
+   * @returns the Locator of the now open context menu
+   */
+  async openMessageOptions(message: Locator) {
     await message.hover();
-    await message.getByRole('group').getByRole('button').first().click();
+    await message.getByTestId('message-actions').getByTestId('go-options').click();
+    // The context menu containing the edit button is positioned globally as an overlay
+    return this.page.getByRole('menu');
+  }
+
+  /** Click the "Edit" option within a messages options putting it into the message input so it can be updated */
+  async editMessage(message: Locator) {
+    const menu = await this.openMessageOptions(message);
+    await menu.getByRole('button', {name: 'Edit'}).click();
+  }
+
+  async openMessageDetails(message: Locator) {
+    const menu = await this.openMessageOptions(message);
+    await menu.getByRole('button', {name: 'Details'}).click();
+  }
+
+  async reactOnMessage(message: Locator, emojiType: EmojiReaction) {
+    await message.hover();
+    const reactionButton = message.getByRole('group').getByRole('button').first();
+    await reactionButton.click();
+
+    switch (emojiType) {
+      case 'plus-one':
+        // The first quick reaction button is +1 (thumbs up), so we just clicked it
+        break;
+      case 'heart':
+        await this.page.getByTestId('reactwith-love-message').click();
+        break;
+      case 'joy':
+        await this.page.getByTestId('reactwith-emoji-message').click();
+        await this.page.getByRole('listitem', {name: 'Smileys & People'}).getByLabel('joy').first().click();
+        break;
+    }
+
+    // Wait for the reaction to appear on the message
+    const reactionPill = message
+      .locator(selectByDataAttribute('message-reactions'))
+      .locator(`${selectByDataAttribute('emoji-pill')}[title="${this.emojiTitleMap[emojiType]}"]`);
+    await reactionPill.waitFor({state: 'visible', timeout: 5000});
+  }
+
+  getReactionOnMessage(message: Locator, emojiType: EmojiReaction): Locator {
+    const emojiTitle = this.emojiTitleMap[emojiType];
+    const messageReactions = message.locator(selectByDataAttribute('message-reactions'));
+    return messageReactions.locator(`${selectByDataAttribute('emoji-pill')}[title="${emojiTitle}"]`);
   }
 
   async clickImage(user: User) {
@@ -312,28 +386,30 @@ export class ConversationPage {
   }
 
   async isUserGroupMember(name: string) {
-    return this.membersList.locator(`${selectByDataAttribute('item-user')}[data-uie-value="${name}"]`).isVisible();
+    return this.membersList
+      .locator(`${selectByDataAttribute('item-user')}${selectByDataAttribute(name, 'value')}`)
+      .isVisible();
   }
 
   async isUserGroupAdmin(name: string) {
     await this.adminsList
-      .locator(`${selectByDataAttribute('item-user')}[data-uie-value="${name}"]`)
+      .locator(`${selectByDataAttribute('item-user')}${selectByDataAttribute(name, 'value')}`)
       .waitFor({state: 'visible'});
     return true;
   }
 
   async makeUserAdmin(name: string) {
-    await this.membersList.locator(`[data-uie-value="${name}"]`).click();
+    await this.membersList.locator(selectByDataAttribute(name, 'value')).click();
     return this.makeAdminToggle.click();
   }
 
   async removeMemberFromGroup(name: string) {
-    await this.membersList.locator(`[data-uie-value="${name}"]`).click();
+    await this.membersList.locator(selectByDataAttribute(name, 'value')).click();
     return this.removeUserButton.click();
   }
 
   async removeAdminFromGroup(name: string) {
-    await this.adminsList.locator(`[data-uie-value="${name}"]`).click();
+    await this.adminsList.locator(selectByDataAttribute(name, 'value')).click();
     return this.removeUserButton.click();
   }
 

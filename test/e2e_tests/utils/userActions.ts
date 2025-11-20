@@ -17,17 +17,18 @@
  *
  */
 
+import {expect} from 'playwright/test';
+
 import {ApiManagerE2E} from '../backend/apiManager.e2e';
 import {User} from '../data/user';
 import {PageManager} from '../pageManager';
-import {expect} from '../test.fixtures';
 
 export const loginUser = async (user: User, pageManager: PageManager) => {
   const {pages} = pageManager.webapp;
   await pages.singleSignOn().isSSOPageVisible();
   await pages.singleSignOn().enterEmailOnSSOPage(user.email);
-  await pages.login().inputPassword(user.password);
-  await pages.login().clickSignInButton();
+  await pages.login().passwordInput.fill(user.password);
+  await pages.login().signInButton.click();
 };
 
 export const sendTextMessageToUser = async (pageManager: PageManager, recipient: User, text: string) => {
@@ -76,29 +77,23 @@ export const sendTextMessageToConversation = async (
   const {pages} = pageManager.webapp;
   await pages.conversationList().openConversation(conversation);
   await pages.conversation().sendMessage(message);
-
-  // TODO: Bug [WPB-18226] Message is not visible in the conversation after sending it
-  await pages.conversation().page.waitForTimeout(3000); // Wait for the message to be sent
-  await pageManager.refreshPage({waitUntil: 'domcontentloaded'});
-  // End of TODO: Bug [WPB-18226]
-
-  expect(await pages.conversation().isMessageVisible(message)).toBeTruthy();
 };
 
-export const createGroup = async (pageManager: PageManager, conversationName: string, user: User[]) => {
-  await pageManager.webapp.pages.conversationList().clickCreateGroup();
-  await pageManager.webapp.pages.groupCreation().setGroupName(conversationName);
-  await pageManager.webapp.pages.startUI().selectUsers(user.flatMap(user => user.username));
-  await pageManager.webapp.pages.groupCreation().clickCreateGroupButton();
+type UserPages = PageManager['webapp']['pages'];
+export const createGroup = async (pages: UserPages, conversationName: string, user: User[]) => {
+  await pages.conversationList().clickCreateGroup();
+  await pages.groupCreation().setGroupName(conversationName);
+  await pages.startUI().selectUsers(user.map(user => user.username));
+  await pages.groupCreation().clickCreateGroupButton();
 };
 
-export const createChannel = async (pageManager: PageManager, conversationName: string, user: User[]) => {
-  await pageManager.webapp.pages.conversationList().clickCreateGroup();
-  await pageManager.webapp.pages.groupCreation().setGroupName(conversationName);
-  await pageManager.webapp.pages.groupCreation().clickNextButton();
+export const createChannel = async (pages: UserPages, conversationName: string, user: User[]) => {
+  await pages.conversationList().clickCreateGroup();
+  await pages.groupCreation().setGroupName(conversationName);
+  await pages.groupCreation().clickNextButton();
   // task: set params for testing
-  await pageManager.webapp.pages.startUI().selectUsers(user.flatMap(user => user.username));
-  await pageManager.webapp.pages.groupCreation().clickCreateGroupButton();
+  await pages.startUI().selectUsers(user.flatMap(user => user.username));
+  await pages.groupCreation().clickCreateGroupButton();
 };
 
 export const handleAppLockState = async (pageManager: PageManager, appLockPassCode: string) => {
@@ -112,3 +107,92 @@ export const handleAppLockState = async (pageManager: PageManager, appLockPassCo
     }
   }
 };
+
+/**
+ * Logs in a user and handles initial setup
+ */
+export async function loginAndSetup(user: User, pageManager: PageManager) {
+  const {modals, components} = pageManager.webapp;
+  await pageManager.openMainPage();
+  await loginUser(user, pageManager); // Verwendet die bestehende loginUser-Funktion
+  await modals.dataShareConsent().clickDecline();
+  await components.conversationSidebar().isPageLoaded();
+}
+
+/**
+ * Manually connects User A to user B via the UI
+ */
+export async function connectUsersManually(
+  userA: User,
+  userB: User,
+  userAPageManager: PageManager,
+  userBPageManager: PageManager,
+) {
+  const {modals: userAModals, components: userAComponents, pages: userAPages} = userAPageManager.webapp;
+  const {pages: userBPages} = userBPageManager.webapp;
+
+  await userAComponents.conversationSidebar().clickConnectButton();
+  await userAPages.startUI().searchInput.fill(userB.username);
+  await userAPages.startUI().selectUser(userB.username);
+  await userAModals.userProfile().clickConnectButton();
+
+  expect(await userAPages.conversationList().isConversationItemVisible(userB.fullName)).toBeTruthy();
+  await expect(await userBPageManager.getPage()).toHaveTitle('(1) Wire');
+
+  await userBPages.conversationList().openPendingConnectionRequest();
+  await userBPages.connectRequest().clickConnectButton();
+}
+
+/**
+ * Blocks a user from the conversation list
+ * @param pageManager PageManager of the blocking user
+ * @param userToBlock User object of the user to be blocked
+ * @param options Optional parameters, e.g. to handle additional modals
+ */
+export async function blockUserFromConversationList(
+  pageManager: PageManager,
+  userToBlock: User,
+  options: {handleUnableToOpenModal?: boolean} = {},
+) {
+  const {pages, modals} = pageManager.webapp;
+  const {handleUnableToOpenModal = false} = options;
+
+  await pages.conversationList().openConversation(userToBlock.fullName);
+  await pages.conversationList().clickConversationOptions(userToBlock.fullName);
+  await pages.conversationList().clickBlockConversation();
+  await modals.blockWarning().clickBlock();
+
+  // Optional handling for modals that appear after blocking
+  if (handleUnableToOpenModal) {
+    if (await modals.unableToOpenConversation().modal.isVisible({timeout: 3000})) {
+      await modals.unableToOpenConversation().clickAcknowledge();
+    }
+  }
+}
+
+/**
+ * Blocks a user from their profile view (from a 1:1 conversation)
+ * @param pageManager PageManager of the blocking user
+ * @param userToBlock User object of the user to be blocked
+ */
+export async function blockUserFromProfileView(pageManager: PageManager, userToBlock: User) {
+  const {pages, modals} = pageManager.webapp;
+  await pages.conversationList().openConversation(userToBlock.fullName);
+  await pages.conversation().clickConversationInfoButton();
+  await pages.participantDetails().blockUser();
+  await modals.blockWarning().clickBlock();
+}
+
+/**
+ * Blocks a user via the participant details in a group chat
+ * Assumes that the group conversation is already open
+ * @param pageManager PageManager of the blocking user
+ * @param userToBlock User object of the user to be blocked
+ */
+export async function blockUserFromOpenGroupProfileView(pageManager: PageManager, userToBlock: User) {
+  const {pages, modals} = pageManager.webapp;
+  await pages.conversation().clickConversationTitle();
+  await pages.conversationDetails().openParticipantDetails(userToBlock.fullName);
+  await pages.participantDetails().blockUser();
+  await modals.blockWarning().clickBlock();
+}

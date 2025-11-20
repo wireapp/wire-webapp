@@ -29,7 +29,6 @@ test.describe('account settings', () => {
   let owner = getUser();
   const members = Array.from({length: 2}, () => getUser());
   const [memberA, memberB] = members;
-  test.slow();
 
   test.beforeAll(async ({api}) => {
     const user = await bootstrapTeamForTesting(api, members, owner, 'test');
@@ -166,7 +165,7 @@ test.describe('account settings', () => {
       await completeLogin(pageManager, owner);
 
       await expect(components.conversationSidebar().manageTeamButton).toBeVisible();
-      await expect(await components.conversationSidebar().manageTeamButton.getAttribute('href')).toBe(
+      expect(await components.conversationSidebar().manageTeamButton.getAttribute('href')).toBe(
         'https://wire-teams-dev.zinfra.io/login/',
       );
     },
@@ -238,15 +237,15 @@ test.describe('account settings', () => {
 
       await expect(components.conversationSidebar().personalStatusLabel).toHaveText(memberA.fullName);
 
-      await createGroup(pageManager, groupName, [memberB]);
+      await createGroup(pages, groupName, [memberB]);
       // check that the chat is open
       expect(await pages.conversationList().isConversationItemVisible(groupName)).toBeTruthy();
       await pages.conversation().sendMessage('test');
-      const message = await pages.conversation().messageItems.nth(1); // skip the system messages
+      const message = pages.conversation().getMessage({content: 'test', sender: memberA});
 
       await expect(message.getByTestId('sender-name')).toHaveText(memberA.fullName);
 
-      await pages.conversation().reactOnMessage(message);
+      await pages.conversation().reactOnMessage(message, 'plus-one');
 
       await expect(await pages.conversation().getCurrentFocusedToolTip(message)).toHaveText(
         `${memberA.fullName} reacted with +1`,
@@ -261,7 +260,7 @@ test.describe('account settings', () => {
 
       await (await pageManager.getPage()).reload();
 
-      await createChannel(pageManager, 'test', [memberB]);
+      await createChannel(pages, 'test', [memberB]);
 
       await pages.conversation().clickConversationInfoButton();
       await expect(pages.conversationDetails().isUserPartOfConversationAsAdmin(memberA.fullName)).toBeTruthy();

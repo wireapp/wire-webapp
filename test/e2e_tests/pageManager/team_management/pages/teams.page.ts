@@ -19,6 +19,8 @@
 
 import {Page, Locator} from '@playwright/test';
 
+import {selectByDataAttribute} from 'test/e2e_tests/utils/selector.util';
+
 export class TeamsPage {
   readonly page: Page;
 
@@ -40,17 +42,17 @@ export class TeamsPage {
     await this.peopleButton.click();
   }
 
-  async isUserVisibleAsSelf(name: string) {
+  async isUserVisibleAsSelf(value: string) {
     const selfUserLocator = this.page.locator(
-      `[data-uie-name='member-list-item'][data-uie-value='${name}'] [data-uie-name='member-list-item-you']`,
+      `${selectByDataAttribute('member-list-item')}${selectByDataAttribute(value, 'value')} ${selectByDataAttribute('member-list-item-you')}`,
     );
     await selfUserLocator.waitFor({state: 'visible'});
     return await selfUserLocator.isVisible();
   }
 
-  async getUserRole(name: string) {
+  async getUserRole(value: string) {
     const userRoleLocator = this.page.locator(
-      `[data-uie-name='member-list-item'][data-uie-value='${name}'] [data-uie-name='select-member-role']`,
+      `${selectByDataAttribute('member-list-item')}${selectByDataAttribute(value, 'value')} ${selectByDataAttribute('select-member-role')}`,
     );
     return (await userRoleLocator.textContent()) ?? '';
   }

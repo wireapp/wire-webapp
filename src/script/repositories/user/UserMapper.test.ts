@@ -210,7 +210,7 @@ describe('User Mapper', () => {
       expect(user.availability()).toBe(to);
     });
 
-    it('can update user with v3 assets', () => {
+    it('can update user with assets', () => {
       const user_et = new User();
       user_et.id = entities.user.john_doe.id;
       const data = {

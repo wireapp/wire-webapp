@@ -18,14 +18,14 @@
  */
 
 import {CSSObject} from '@emotion/react';
-import {ConversationProtocol} from '@wireapp/api-client/lib/conversation/NewConversation';
+import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 
 import {Ciphersuite} from '@wireapp/core';
 
 import {t} from 'Util/LocalizerUtil';
 
 interface ConversationProtocolDetailsProps {
-  protocol: ConversationProtocol;
+  protocol: CONVERSATION_PROTOCOL;
   cipherSuite?: number;
 }
 
@@ -59,7 +59,7 @@ export const ConversationProtocolDetails = ({protocol, cipherSuite}: Conversatio
         {protocol.toUpperCase()}
       </p>
 
-      {protocol === ConversationProtocol.MLS && cipherSuite && (
+      {protocol === CONVERSATION_PROTOCOL.MLS && cipherSuite && (
         <>
           <div css={titleStyles}>Cipher Suite</div>
           <p css={subTitleStyles} data-uie-name="cipher-suite">

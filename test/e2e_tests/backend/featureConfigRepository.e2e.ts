@@ -17,7 +17,7 @@
  *
  */
 
-import {FeatureList, FEATURE_KEY, FeatureStatus} from '@wireapp/api-client/lib/team/feature';
+import {FeatureList, FEATURE_KEY, FEATURE_STATUS} from '@wireapp/api-client/lib/team/feature';
 
 import {BackendClientE2E} from './backendClient.e2e';
 
@@ -31,7 +31,7 @@ export class FeatureConfigRepositoryE2E extends BackendClientE2E {
       },
     });
 
-    return response.data[FeatureKey]?.status === FeatureStatus.ENABLED;
+    return response.data[FeatureKey]?.status === FEATURE_STATUS.ENABLED;
   }
 
   async changeStateSndFactorPasswordChallenge(user: User, teamId: string, status: string) {

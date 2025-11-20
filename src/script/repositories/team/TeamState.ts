@@ -18,7 +18,7 @@
  */
 
 import {Role} from '@wireapp/api-client/lib/team';
-import {FeatureList, FeatureStatus, SelfDeletingTimeout} from '@wireapp/api-client/lib/team/feature/';
+import {FeatureList, FEATURE_STATUS, SELF_DELETING_TIMEOUT} from '@wireapp/api-client/lib/team/feature/';
 import ko from 'knockout';
 import {container, singleton} from 'tsyringe';
 
@@ -48,7 +48,7 @@ export class TeamState {
   public readonly isGuestLinkEnabled: ko.PureComputed<boolean>;
   public readonly isSelfDeletingMessagesEnabled: ko.PureComputed<boolean>;
   public readonly isSelfDeletingMessagesEnforced: ko.PureComputed<boolean>;
-  public readonly getEnforcedSelfDeletingMessagesTimeout: ko.PureComputed<SelfDeletingTimeout>;
+  public readonly getEnforcedSelfDeletingMessagesTimeout: ko.PureComputed<SELF_DELETING_TIMEOUT>;
   /** all the members of the team */
   readonly teamMembers: ko.PureComputed<User[]>;
   /** all the members of the team + the users the selfUser is connected with */
@@ -85,36 +85,38 @@ export class TeamState {
 
     this.isFileSharingSendingEnabled = ko.pureComputed(() => {
       const status = this.teamFeatures()?.fileSharing?.status;
-      return status ? status === FeatureStatus.ENABLED : true;
+      return status ? status === FEATURE_STATUS.ENABLED : true;
     });
     this.isFileSharingReceivingEnabled = ko.pureComputed(() => {
       const status = this.teamFeatures()?.fileSharing?.status;
-      return status ? status === FeatureStatus.ENABLED : true;
+      return status ? status === FEATURE_STATUS.ENABLED : true;
     });
 
     this.classifiedDomains = ko.pureComputed(() => {
-      return this.teamFeatures()?.classifiedDomains?.status === FeatureStatus.ENABLED
+      return this.teamFeatures()?.classifiedDomains?.status === FEATURE_STATUS.ENABLED
         ? this.teamFeatures()?.classifiedDomains?.config.domains
         : undefined;
     });
 
     this.isSelfDeletingMessagesEnabled = ko.pureComputed(
-      () => this.teamFeatures()?.selfDeletingMessages?.status === FeatureStatus.ENABLED,
+      () => this.teamFeatures()?.selfDeletingMessages?.status === FEATURE_STATUS.ENABLED,
     );
     this.getEnforcedSelfDeletingMessagesTimeout = ko.pureComputed(
       () =>
-        (this.teamFeatures()?.selfDeletingMessages?.config?.enforcedTimeoutSeconds || SelfDeletingTimeout.OFF) * 1000,
+        (this.teamFeatures()?.selfDeletingMessages?.config?.enforcedTimeoutSeconds || SELF_DELETING_TIMEOUT.OFF) * 1000,
     );
     this.isSelfDeletingMessagesEnforced = ko.pureComputed(
-      () => this.getEnforcedSelfDeletingMessagesTimeout() > SelfDeletingTimeout.OFF,
+      () => this.getEnforcedSelfDeletingMessagesTimeout() > SELF_DELETING_TIMEOUT.OFF,
     );
 
     this.isVideoCallingEnabled = ko.pureComputed(
       // TODO connect to video calling feature config
-      () => true || this.teamFeatures()?.videoCalling?.status === FeatureStatus.ENABLED,
+      () => true || this.teamFeatures()?.videoCalling?.status === FEATURE_STATUS.ENABLED,
     );
 
-    this.isMLSEnabled = ko.pureComputed(() => this.teamFeatures()?.mls?.status === FeatureStatus.ENABLED ?? false);
+    this.isMLSEnabled = ko.pureComputed(() => {
+      return this.teamFeatures()?.mls?.status === FEATURE_STATUS.ENABLED;
+    });
 
     this.isProtocolToggleEnabledForUser = ko.pureComputed(
       () => this.teamFeatures()?.mls?.config.protocolToggleUsers.includes(this.userState.self().id) ?? false,
@@ -122,11 +124,11 @@ export class TeamState {
 
     // this feature is used to check if the customer is part of premium plan
     this.isConferenceCallingEnabled = ko.pureComputed(
-      () => this.teamFeatures()?.conferenceCalling?.status === FeatureStatus.ENABLED,
+      () => this.teamFeatures()?.conferenceCalling?.status === FEATURE_STATUS.ENABLED,
     );
 
     this.isGuestLinkEnabled = ko.pureComputed(
-      () => this.teamFeatures()?.conversationGuestLinks?.status === FeatureStatus.ENABLED,
+      () => this.teamFeatures()?.conversationGuestLinks?.status === FEATURE_STATUS.ENABLED,
     );
 
     this.selfRole = ko.pureComputed(() => {
@@ -136,11 +138,11 @@ export class TeamState {
     });
 
     this.isCellsEnabled = ko.pureComputed(() => {
-      return this.teamFeatures()?.cells?.status === FeatureStatus.ENABLED;
+      return this.teamFeatures()?.cells?.status === FEATURE_STATUS.ENABLED;
     });
 
     this.isAuditLogEnabled = ko.pureComputed(() => {
-      return this.teamFeatures()?.assetAuditLog?.status === FeatureStatus.ENABLED;
+      return this.teamFeatures()?.assetAuditLog?.status === FEATURE_STATUS.ENABLED;
     });
   }
 

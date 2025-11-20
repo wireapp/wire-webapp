@@ -18,7 +18,6 @@
  */
 
 import {ConnectionStatus} from '@wireapp/api-client/lib/connection';
-import {ConversationProtocol} from '@wireapp/api-client/lib/conversation';
 import {MemberLeaveReason} from '@wireapp/api-client/lib/conversation/data/';
 import {
   BackendEvent,
@@ -28,7 +27,7 @@ import {
   USER_EVENT,
 } from '@wireapp/api-client/lib/event/';
 import type {Notification, NotificationList} from '@wireapp/api-client/lib/notification/';
-import {FEATURE_KEY, FeatureStatus} from '@wireapp/api-client/lib/team/feature/';
+import {CONVERSATION_PROTOCOL, FEATURE_KEY, FEATURE_STATUS} from '@wireapp/api-client/lib/team/feature/';
 import type {QualifiedId} from '@wireapp/api-client/lib/user';
 import {NotificationSource} from '@wireapp/core/lib/notification';
 import {DatabaseKeys} from '@wireapp/core/lib/notification/NotificationDatabaseRepository';
@@ -70,6 +69,15 @@ import {checkVersion} from '../lifecycle/newVersionHandler';
 import {APIClient} from '../service/APIClientSingleton';
 import {Core} from '../service/CoreSingleton';
 import {ViewModelRepositories} from '../view_model/MainViewModel';
+
+export enum CoreCryptoLogLevel {
+  Off = 1,
+  Trace = 2,
+  Debug = 3,
+  Info = 4,
+  Warn = 5,
+  Error = 6,
+}
 
 export class DebugUtil {
   private readonly logger: Logger;
@@ -247,7 +255,7 @@ export class DebugUtil {
   reconnectWebSocket({dryRun} = {dryRun: false}) {
     const teamFeatures = this.teamState.teamFeatures();
     const useAsyncNotificationStream =
-      teamFeatures?.[FEATURE_KEY.CONSUMABLE_NOTIFICATIONS]?.status === FeatureStatus.ENABLED;
+      teamFeatures?.[FEATURE_KEY.CONSUMABLE_NOTIFICATIONS]?.status === FEATURE_STATUS.ENABLED;
     const useLegacyNotificationStream = !useAsyncNotificationStream;
     return this.eventRepository.connectWebSocket(this.core, useLegacyNotificationStream, () => {}, dryRun);
   }
@@ -269,6 +277,16 @@ export class DebugUtil {
 
   async disablePressSpaceToUnmute() {
     this.propertiesRepository.savePreference(PROPERTIES_TYPE.CALL.ENABLE_PRESS_SPACE_TO_UNMUTE, false);
+  }
+
+  async setCoreCryptoMaxLogLevel(level: CoreCryptoLogLevel) {
+    return this.core.setMaxCoreCryptoLogLevel(level);
+  }
+
+  async resetMLSConversation() {
+    return (this.core.service?.conversation as any).resetMLSConversation(
+      this.conversationState.activeConversation()?.qualifiedId,
+    );
   }
 
   setupAvsDebugger() {
@@ -343,7 +361,10 @@ export class DebugUtil {
     await proteusService['cryptoClient'].debugBreakSession(sessionId);
   }
 
-  async setTeamSupportedProtocols(supportedProtocols: ConversationProtocol[], defaultProtocol?: ConversationProtocol) {
+  async setTeamSupportedProtocols(
+    supportedProtocols: CONVERSATION_PROTOCOL[],
+    defaultProtocol?: CONVERSATION_PROTOCOL,
+  ) {
     const {teamId} = await this.userRepository.getSelf();
     if (!teamId) {
       throw new Error('teamId of self user is undefined');
@@ -357,7 +378,7 @@ export class DebugUtil {
 
     const response = await this.apiClient.api.teams.feature.putMLSFeature(teamId, {
       config: {...mlsFeature.config, supportedProtocols, defaultProtocol: defaultProtocol || supportedProtocols[0]},
-      status: FeatureStatus.ENABLED,
+      status: FEATURE_STATUS.ENABLED,
     });
 
     return response;
@@ -379,7 +400,7 @@ export class DebugUtil {
 
     const response = await this.apiClient.api.teams.feature.putMLSMigrationFeature(teamId, {
       config,
-      status: isEnabled ? FeatureStatus.ENABLED : FeatureStatus.DISABLED,
+      status: isEnabled ? FEATURE_STATUS.ENABLED : FEATURE_STATUS.DISABLED,
     });
 
     return response;

@@ -42,8 +42,6 @@ test(
   'Uploading an file in a group conversation',
   {tag: ['@crit-flow-cells']},
   async ({pageManager: userAPageManager, browser, api}) => {
-    test.slow(); // This test involves file upload and download, which can be slow
-
     const {pages: userAPages, modals: userAModals, components: userAComponents} = userAPageManager.webapp;
 
     const userBContext = await browser.newContext();
@@ -71,10 +69,11 @@ test(
           await userAModals.dataShareConsent().clickDecline();
         }
         await userAPages.conversationList().clickCreateGroup();
-        // Files should be enabled by default
-        expect(await userAPages.groupCreation().isFilesCheckboxChecked()).toBeTruthy();
-        await userAPages.groupCreation().setGroupName(conversationName);
+        // Files should be disabled by default
+        expect(await userAPages.groupCreation().isFilesCheckboxChecked()).toBeFalsy();
 
+        await userAPages.groupCreation().enableFilesCheckbox();
+        await userAPages.groupCreation().setGroupName(conversationName);
         await userAPages.startUI().selectUsers([userB.username]);
         await userAPages.groupCreation().clickCreateGroupButton();
       };

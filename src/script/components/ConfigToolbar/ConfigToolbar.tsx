@@ -27,11 +27,13 @@ import {Button, Input, Switch} from '@wireapp/react-ui-kit';
 import {ConversationState} from 'Repositories/conversation/ConversationState';
 import {Config, Configuration} from 'src/script/Config';
 import {useClickOutside} from 'src/script/hooks/useClickOutside';
+import {CoreCryptoLogLevel} from 'Util/DebugUtil';
 
 import {wrapperStyles} from './ConfigToolbar.styles';
 
 export function ConfigToolbar() {
   const [showConfig, setShowConfig] = useState(false);
+  const [isResettingMLSConversation, setIsResettingMLSConversation] = useState(false);
   const [isGzipEnabled, setIsGzipEnabled] = useState(window.wire?.app.debug?.isGzippingEnabled() || false);
   const [configFeaturesState, setConfigFeaturesState] = useState<Configuration['FEATURE']>(Config.getConfig().FEATURE);
   const [isMessageSendingActive, setIsMessageSendingActive] = useState(false);
@@ -41,6 +43,7 @@ export function ConfigToolbar() {
   const wrapperRef = useRef(null);
   const [avsDebuggerEnabled, setAvsDebuggerEnabled] = useState(!!window.wire?.app?.debug?.isEnabledAvsDebugger());
   const [avsRustSftEnabled, setAvsRustSftEnabled] = useState(!!window.wire?.app?.debug?.isEnabledAvsRustSFT());
+  const [coreCryptoLevel, setCoreCryptoLevel] = useState<CoreCryptoLogLevel>(CoreCryptoLogLevel.Info);
 
   // Toggle config tool on 'cmd/ctrl + shift + 2'
   useEffect(() => {
@@ -236,6 +239,52 @@ export function ConfigToolbar() {
     );
   };
 
+  const renderCoreCryptoLogLevelSelect = () => {
+    const options: Array<{label: string; value: CoreCryptoLogLevel}> = [
+      {label: 'Off', value: CoreCryptoLogLevel.Off},
+      {label: 'Trace', value: CoreCryptoLogLevel.Trace},
+      {label: 'Debug', value: CoreCryptoLogLevel.Debug},
+      {label: 'Info', value: CoreCryptoLogLevel.Info},
+      {label: 'Warn', value: CoreCryptoLogLevel.Warn},
+      {label: 'Error', value: CoreCryptoLogLevel.Error},
+    ];
+
+    return (
+      <div style={{marginBottom: '10px'}}>
+        <label htmlFor="core-crypto-loglevel" style={{display: 'block', fontWeight: 'bold'}}>
+          CORE CRYPTO LOG LEVEL
+        </label>
+        <select
+          id="core-crypto-loglevel"
+          value={coreCryptoLevel}
+          onChange={event => {
+            const val = Number(event.currentTarget.value) as CoreCryptoLogLevel;
+            setCoreCryptoLevel(val);
+            void window.wire?.app?.debug?.setCoreCryptoMaxLogLevel(val);
+          }}
+          style={{padding: '6px 8px'}}
+        >
+          {options.map(option => (
+            <option key={option.value} value={option.value}>
+              {option.label}
+            </option>
+          ))}
+        </select>
+      </div>
+    );
+  };
+
+  const resetMLSConversation = async () => {
+    setIsResettingMLSConversation(true);
+    try {
+      await window.wire?.app?.debug?.resetMLSConversation();
+    } catch (error) {
+      console.error('Error resetting MLS conversation:', error);
+    } finally {
+      setIsResettingMLSConversation(false);
+    }
+  };
+
   if (!showConfig) {
     return null;
   }
@@ -252,9 +301,14 @@ export function ConfigToolbar() {
 
       <h3>Debug Functions</h3>
 
-      <Button onClick={() => window.wire?.app?.debug?.reconnectWebSocket()}>reconnectWebSocket</Button>
-      <Button onClick={() => window.wire?.app?.debug?.enablePressSpaceToUnmute()}>enablePressSpaceToUnmute</Button>
-      <Button onClick={() => window.wire?.app?.debug?.disablePressSpaceToUnmute()}>disablePressSpaceToUnmute</Button>
+      <Button onClick={() => window.wire?.app?.debug?.reconnectWebSocket()}>Reconnect WebSocket</Button>
+      <Button onClick={() => window.wire?.app?.debug?.enablePressSpaceToUnmute()}>Enable Press Space To Unmute</Button>
+      <Button onClick={() => window.wire?.app?.debug?.disablePressSpaceToUnmute()}>
+        Disable Press Space To Unmute
+      </Button>
+      <Button disabled={isResettingMLSConversation} onClick={resetMLSConversation}>
+        Reset MLS Conversation
+      </Button>
 
       <div>{renderAvsSwitch()}</div>
 
@@ -265,6 +319,10 @@ export function ConfigToolbar() {
       <hr />
 
       <div>{renderGzipSwitch()}</div>
+
+      <hr />
+
+      <div>{renderCoreCryptoLogLevelSelect()}</div>
 
       <hr />
 

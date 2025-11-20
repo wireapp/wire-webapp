@@ -19,7 +19,6 @@
 
 import {
   Conversation as BackendConversation,
-  ConversationProtocol,
   CONVERSATION_TYPE,
   DefaultConversationRoleName as DefaultRole,
   NewConversation,
@@ -51,13 +50,14 @@ import {
 } from '@wireapp/api-client/lib/event';
 import {BackendErrorLabel} from '@wireapp/api-client/lib/http/';
 import type {BackendError} from '@wireapp/api-client/lib/http/';
+import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 import type {QualifiedId} from '@wireapp/api-client/lib/user/';
 import {BaseCreateConversationResponse} from '@wireapp/core/lib/conversation';
 import {ClientMLSError, ClientMLSErrorLabel} from '@wireapp/core/lib/messagingProtocols/mls';
 import {amplify} from 'amplify';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 import {container} from 'tsyringe';
-import {flatten} from 'underscore';
+import {flatten, isError} from 'underscore';
 
 import {Account} from '@wireapp/core';
 import {Asset as ProtobufAsset, Confirmation, LegalHoldStatus} from '@wireapp/protocol-messaging';
@@ -487,7 +487,7 @@ export class ConversationRepository {
        * Needs to be done to receive the latest epoch and avoid epoch mismatch errors
        */
       let response: BaseCreateConversationResponse;
-      const isMLSConversation = payload.protocol === ConversationProtocol.MLS;
+      const isMLSConversation = payload.protocol === CONVERSATION_PROTOCOL.MLS;
       if (isMLSConversation) {
         response = await this.core.service!.conversation.createMLSConversation(
           payload,
@@ -611,23 +611,34 @@ export class ConversationRepository {
       await this.updateParticipatingUserEntities(conversationEntity);
       await this.saveConversation(conversationEntity);
 
-      fetching_conversations[conversationId].forEach(({resolveFn}) => resolveFn(conversationEntity));
+      for (const {resolveFn} of fetching_conversations[conversationId]) {
+        resolveFn(conversationEntity);
+      }
       delete fetching_conversations[conversationId];
 
       return conversationEntity;
-    } catch (originalError) {
-      if (originalError.code === HTTP_STATUS.NOT_FOUND) {
-        this.deleteConversationLocally(qualifiedId, false);
-      }
-      const error = new ConversationError(
-        ConversationError.TYPE.CONVERSATION_NOT_FOUND,
-        ConversationError.MESSAGE.CONVERSATION_NOT_FOUND,
-        originalError,
-      );
-      fetching_conversations[conversationId].forEach(({rejectFn}) => rejectFn(error));
-      delete fetching_conversations[conversationId];
+    } catch (originalError: unknown) {
+      if (isError(originalError)) {
+        const code =
+          originalError && typeof originalError === 'object' && 'code' in originalError ? originalError.code : null;
+        this.logger.error(originalError.message);
+        if (code === HTTP_STATUS.NOT_FOUND) {
+          await this.deleteConversationLocally(qualifiedId, false);
+        }
+        const error = new ConversationError(
+          ConversationError.TYPE.CONVERSATION_NOT_FOUND,
+          ConversationError.MESSAGE.CONVERSATION_NOT_FOUND,
+          originalError,
+        );
 
-      throw error;
+        for (const {rejectFn} of fetching_conversations[conversationId]) {
+          rejectFn(error);
+        }
+
+        delete fetching_conversations[conversationId];
+        throw error;
+      }
+      throw new Error('unkown error encountered', {cause: originalError});
     }
   }
 
@@ -698,7 +709,7 @@ export class ConversationRepository {
     // we will blacklist proteus 1:1 (so it's never refetched) conversation and remove it from the list of remote conversations
 
     const mls1to1Conversations = remoteConversations.found.filter(
-      ({protocol, type}) => protocol === ConversationProtocol.MLS && type === CONVERSATION_TYPE.ONE_TO_ONE,
+      ({protocol, type}) => protocol === CONVERSATION_PROTOCOL.MLS && type === CONVERSATION_TYPE.ONE_TO_ONE,
     );
 
     const {abandonedProteus1to1Conversations, allConversations} = remoteConversations.found.reduce(
@@ -1413,7 +1424,7 @@ export class ConversationRepository {
 
     const localMLSConversation = this.conversationState.findMLS1to1Conversation(userId);
 
-    if (protocol === ConversationProtocol.MLS || localMLSConversation) {
+    if (protocol === CONVERSATION_PROTOCOL.MLS || localMLSConversation) {
       /**
        * When mls 1:1 conversation initialisation is triggered by some live update (e.g other user updates their supported protocols), it's very likely that we will also receive a welcome message shortly.
        * We have to add a delay to make sure the welcome message is not wasted, in case the self client would establish mls group themselves before receiving the welcome.
@@ -1612,7 +1623,7 @@ export class ConversationRepository {
     otherUserId: QualifiedId,
     shouldRefreshUser = false,
   ): Promise<{
-    protocol: ConversationProtocol.PROTEUS | ConversationProtocol.MLS;
+    protocol: CONVERSATION_PROTOCOL.PROTEUS | CONVERSATION_PROTOCOL.MLS;
     isMLSSupportedByTheOtherUser: boolean;
     isProteusSupportedByTheOtherUser: boolean;
   }> => {
@@ -1622,25 +1633,25 @@ export class ConversationRepository {
     );
     const selfUserSupportedProtocols = await this.selfRepository.getSelfSupportedProtocols();
 
-    const isMLSSupportedByTheOtherUser = otherUserSupportedProtocols.includes(ConversationProtocol.MLS);
-    const isProteusSupportedByTheOtherUser = otherUserSupportedProtocols.includes(ConversationProtocol.PROTEUS);
+    const isMLSSupportedByTheOtherUser = otherUserSupportedProtocols.includes(CONVERSATION_PROTOCOL.MLS);
+    const isProteusSupportedByTheOtherUser = otherUserSupportedProtocols.includes(CONVERSATION_PROTOCOL.PROTEUS);
 
     const commonProtocols = otherUserSupportedProtocols.filter(protocol =>
       selfUserSupportedProtocols.includes(protocol),
     );
 
-    if (commonProtocols.includes(ConversationProtocol.MLS)) {
-      return {protocol: ConversationProtocol.MLS, isMLSSupportedByTheOtherUser, isProteusSupportedByTheOtherUser};
+    if (commonProtocols.includes(CONVERSATION_PROTOCOL.MLS)) {
+      return {protocol: CONVERSATION_PROTOCOL.MLS, isMLSSupportedByTheOtherUser, isProteusSupportedByTheOtherUser};
     }
 
-    if (commonProtocols.includes(ConversationProtocol.PROTEUS)) {
-      return {protocol: ConversationProtocol.PROTEUS, isMLSSupportedByTheOtherUser, isProteusSupportedByTheOtherUser};
+    if (commonProtocols.includes(CONVERSATION_PROTOCOL.PROTEUS)) {
+      return {protocol: CONVERSATION_PROTOCOL.PROTEUS, isMLSSupportedByTheOtherUser, isProteusSupportedByTheOtherUser};
     }
 
     //if common protocol can't be found, we use preferred protocol of the self user
-    const preferredProtocol = selfUserSupportedProtocols.includes(ConversationProtocol.MLS)
-      ? ConversationProtocol.MLS
-      : ConversationProtocol.PROTEUS;
+    const preferredProtocol = selfUserSupportedProtocols.includes(CONVERSATION_PROTOCOL.MLS)
+      ? CONVERSATION_PROTOCOL.MLS
+      : CONVERSATION_PROTOCOL.PROTEUS;
 
     return {protocol: preferredProtocol, isMLSSupportedByTheOtherUser, isProteusSupportedByTheOtherUser};
   };
@@ -2109,14 +2120,14 @@ export class ConversationRepository {
       this.logger.debug(
         `Connection with user ${otherUserId.id} is accepted, using protocol ${protocol} for 1:1 conversation`,
       );
-      if (protocol === ConversationProtocol.MLS || localMLSConversation) {
+      if (protocol === CONVERSATION_PROTOCOL.MLS || localMLSConversation) {
         return this.initMLS1to1Conversation(otherUserId, {
           isMLSSupportedByTheOtherUser,
           shouldDelayGroupEstablishment: shouldDelayMLSGroupEstablishment,
         });
       }
 
-      if (protocol === ConversationProtocol.PROTEUS) {
+      if (protocol === CONVERSATION_PROTOCOL.PROTEUS) {
         return this.initProteus1to1Conversation(proteusConversationId, isProteusSupportedByTheOtherUser);
       }
     }
@@ -2140,7 +2151,7 @@ export class ConversationRepository {
       `Connection with user ${otherUserId.id} is not accepted, defaulting to local proteus 1:1 conversation ${proteusConversationId.id}`,
     );
 
-    return protocol === ConversationProtocol.PROTEUS ? localProteusConversation : null;
+    return protocol === CONVERSATION_PROTOCOL.PROTEUS ? localProteusConversation : null;
   };
 
   /**
@@ -2955,7 +2966,7 @@ export class ConversationRepository {
    */
   public readonly updateConversationProtocol = async (
     conversation: Conversation,
-    protocol: ConversationProtocol.MIXED | ConversationProtocol.MLS,
+    protocol: CONVERSATION_PROTOCOL.MIXED | CONVERSATION_PROTOCOL.MLS,
   ): Promise<Conversation> => {
     const protocolUpdateEventResponse = await this.conversationService.updateConversationProtocol(
       conversation.qualifiedId,
@@ -2965,7 +2976,7 @@ export class ConversationRepository {
     if (protocolUpdateEventResponse) {
       await this.eventRepository.injectEvent(protocolUpdateEventResponse, EventRepository.SOURCE.BACKEND_RESPONSE);
 
-      if (protocolUpdateEventResponse.data.protocol === ConversationProtocol.MLS) {
+      if (protocolUpdateEventResponse.data.protocol === CONVERSATION_PROTOCOL.MLS) {
         await this.handleConversationProtocolUpdatedToMLS(conversation);
       }
     }
@@ -4312,7 +4323,7 @@ export class ConversationRepository {
     const updatedConversation = await this.refreshConversationProtocolProperties(conversation);
     await this.addEventToConversation(updatedConversation, eventJson);
 
-    if (eventJson.data.protocol === ConversationProtocol.MLS) {
+    if (eventJson.data.protocol === CONVERSATION_PROTOCOL.MLS) {
       await this.handleConversationProtocolUpdatedToMLS(updatedConversation);
     }
   }
@@ -4359,13 +4370,45 @@ export class ConversationRepository {
    */
   private async onMLSResetMessage(conversationEntity: Conversation, eventJson: ConversationMLSResetEvent) {
     try {
+      this.logger.info(`Handling MLS reset event for conversation ${conversationEntity.id}`, {eventJson});
       if (!isMLSConversation(conversationEntity)) {
+        this.logger.warn(
+          `Received MLS reset event for a conversation that is not MLS capable: ${conversationEntity.id}`,
+        );
         return;
       }
 
-      await this.core.service?.conversation.wipeMLSConversation(eventJson.data.group_id);
+      const {new_group_id: newGroupId, group_id: oldGroupId} = eventJson.data;
 
-      await this.refreshConversationProtocolProperties(conversationEntity);
+      const conversationService = this.core.service?.conversation;
+      const mlsService = this.core.service?.mls;
+
+      if (!conversationService || !mlsService) {
+        throw new Error('Conversation or Mls service is not available!');
+      }
+
+      await conversationService.wipeMLSConversation(oldGroupId);
+      const existingConversation = await conversationService.mlsGroupExistsLocally(newGroupId);
+
+      let epoch = 0;
+      if (existingConversation) {
+        const newEpoch: number = await mlsService.getEpoch(newGroupId);
+        this.logger.info('An MLS conversation with the new group ID already exists fetched epoch from core crypto', {
+          newEpoch,
+        });
+        epoch = newEpoch;
+      }
+
+      const updatedConversation = ConversationMapper.updateProperties(conversationEntity, {
+        epoch,
+        groupId: newGroupId,
+      });
+
+      await this.saveConversationStateInDb(updatedConversation);
+
+      this.logger.info(
+        `Updated conversation group ID from ${oldGroupId} to ${newGroupId} for conversation ${conversationEntity.id} and set epoch to 0`,
+      );
     } catch (error) {
       this.logger.error(`Failed to reset MLS conversation ${conversationEntity.id}`, error);
     }

@@ -26,7 +26,7 @@ import {
   CONVERSATION_CELLS_STATE,
 } from '@wireapp/api-client/lib/conversation/';
 import {RECEIPT_MODE} from '@wireapp/api-client/lib/conversation/data';
-import {ConversationProtocol} from '@wireapp/api-client/lib/conversation/NewConversation';
+import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {LegalHoldStatus} from '@wireapp/core/lib/conversation/content';
 
@@ -41,7 +41,7 @@ import {createUuid} from 'Util/uuid';
 interface GenerateAPIConversationParams {
   id?: QualifiedId;
   type?: CONVERSATION_TYPE;
-  protocol?: ConversationProtocol;
+  protocol?: CONVERSATION_PROTOCOL;
   overwites?: Partial<ConversationDatabaseData>;
   name?: string;
   groupId?: string;
@@ -50,7 +50,7 @@ interface GenerateAPIConversationParams {
 export function generateAPIConversation({
   id = {id: createUuid(), domain: 'test.wire.link'},
   type = CONVERSATION_TYPE.REGULAR,
-  protocol = ConversationProtocol.PROTEUS,
+  protocol = CONVERSATION_PROTOCOL.PROTEUS,
   overwites = {},
   name,
 }: GenerateAPIConversationParams): BackendConversation {
@@ -102,7 +102,7 @@ interface GenerateConversationParams extends GenerateAPIConversationParams {
 export function generateConversation({
   type = CONVERSATION_TYPE.REGULAR,
   status = ConnectionStatus.ACCEPTED,
-  protocol = ConversationProtocol.PROTEUS,
+  protocol = CONVERSATION_PROTOCOL.PROTEUS,
   id,
   name,
   groupId = 'groupId',
@@ -118,7 +118,7 @@ export function generateConversation({
   conversation.connection(connectionEntity);
   conversation.type(type);
 
-  if ([ConversationProtocol.MLS, ConversationProtocol.MIXED].includes(protocol)) {
+  if ([CONVERSATION_PROTOCOL.MLS, CONVERSATION_PROTOCOL.MIXED].includes(protocol)) {
     conversation.groupId = groupId;
   }
 
