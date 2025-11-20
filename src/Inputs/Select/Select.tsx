@@ -56,6 +56,7 @@ export interface SelectProps<IsMulti extends boolean, Group extends GroupBase<Op
   selectMenuCSS?: CSSObject;
   selectGroupCSS?: CSSObject;
   selectGroupHeadingCSS?: CSSObject;
+  selectMenuPortalCSS?: CSSObject;
   label?: string;
   helperText?: string;
   error?: ReactElement;
@@ -84,6 +85,7 @@ export const Select = <IsMulti extends boolean = false, Group extends GroupBase<
   selectMenuCSS = {},
   selectGroupCSS = {},
   selectGroupHeadingCSS = {},
+  selectMenuPortalCSS = {},
   markInvalid = false,
   required = false,
   isSearchable = false,
@@ -127,6 +129,7 @@ export const Select = <IsMulti extends boolean = false, Group extends GroupBase<
             menuCSS: selectMenuCSS,
             groupCSS: selectGroupCSS,
             groupHeadingCSS: selectGroupHeadingCSS,
+            menuPortalCSS: selectMenuPortalCSS,
           }) as StylesConfig
         }
         components={{

@@ -43,6 +43,7 @@ interface CustomStylesParams {
   menuCSS: CSSObject;
   groupCSS: CSSObject;
   groupHeadingCSS: CSSObject;
+  menuPortalCSS: CSSObject;
 }
 
 export const customStyles = ({
@@ -54,6 +55,7 @@ export const customStyles = ({
   menuCSS,
   groupCSS,
   groupHeadingCSS,
+  menuPortalCSS,
 }: CustomStylesParams): StylesConfig<Option, false, GroupBase<Option>> => ({
   indicatorSeparator: baseIndicatorSeparatorStyles,
   indicatorsContainer: provided => provided,
@@ -137,4 +139,5 @@ export const customStyles = ({
     backgroundColor: theme.Input.backgroundColor,
     ...groupCSS,
   }),
+  menuPortal: provided => ({...provided, ...menuPortalCSS}),
 });
