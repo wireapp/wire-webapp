@@ -17,10 +17,9 @@
  *
  */
 
-import {MINIMUM_API_VERSION} from '@wireapp/api-client/lib/Config';
 import axios, {AxiosInstance} from 'axios';
 
-const TEST_API_VERSION = `v${MINIMUM_API_VERSION}`;
+const TEST_API_VERSION = `v13`;
 export class BackendClientE2E {
   readonly axiosInstance: AxiosInstance;
 

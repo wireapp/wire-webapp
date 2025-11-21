@@ -17,48 +17,45 @@
  *
  */
 
-import {User} from 'test/e2e_tests/data/user';
 import {PageManager} from 'test/e2e_tests/pageManager';
-import {test as baseTest, expect, withConversation, withLogin} from 'test/e2e_tests/test.fixtures';
+import {test, expect, withConnectedUser, withLogin} from 'test/e2e_tests/test.fixtures';
 import {createGroup} from 'test/e2e_tests/utils/userActions';
 
-const test = baseTest.extend<{userA: User; userB: User}>({
-  userA: async ({createUser}, use) => {
-    await use(await createUser());
-  },
-  userB: async ({createUser}, use) => {
-    await use(await createUser());
-  },
-});
-
 test.describe('Edit', () => {
-  test.beforeEach(async ({api, userA, userB}) => {
-    await api.connectUsers(userA, userB);
-  });
+  test(
+    'I can edit my message in 1:1',
+    {tag: ['@TC-679', '@regression']},
+    async ({createPage, createUser, createTeamOwner}) => {
+      const userB = await createUser();
+      const userA = await createTeamOwner('Test Team 3', {addMembers: [userB]});
 
-  test('I can edit my message in 1:1', {tag: ['@TC-679', '@regression']}, async ({createPage, userA, userB}) => {
-    const pages = (await PageManager.from(createPage(withLogin(userA), withConversation(userB)))).webapp.pages;
+      const userAPageManager = await PageManager.from(createPage(withLogin(userA), withConnectedUser(userB)));
+      const {pages: userAPages} = userAPageManager.webapp;
 
-    await pages.conversation().sendMessage('Test Message');
+      await userAPages.conversation().sendMessage('Test Message');
 
-    const message = pages.conversation().getMessage({sender: userA});
-    await expect(message).toContainText('Test Message');
+      const message = userAPages.conversation().getMessage({sender: userA});
+      await expect(message).toContainText('Test Message');
 
-    await pages.conversation().editMessage(message);
-    await expect(pages.conversation().messageInput).toContainText('Test Message');
+      await userAPages.conversation().editMessage(message);
+      await expect(userAPages.conversation().messageInput).toContainText('Test Message');
 
-    // Overwrite the text in the message input and send it
-    await pages.conversation().sendMessage('Edited Message');
-    await expect(message).toContainText('Edited Message');
-  });
+      // Overwrite the text in the message input and send it
+      await userAPages.conversation().sendMessage('Edited Message');
+      await expect(message).toContainText('Edited Message');
+    },
+  );
 
   test(
     'I can edit my message in a group conversation',
     {tag: ['@TC-680', '@regression']},
-    async ({createPage, userA, userB}) => {
-      const pages = (await PageManager.from(createPage(withLogin(userA)))).webapp.pages;
+    async ({createUser, createTeamOwner, createPage}) => {
+      const userB = await createUser();
+      const userA = await createTeamOwner('Test Team', {addMembers: [userB]});
 
+      const pages = (await PageManager.from(createPage(withLogin(userA)))).webapp.pages;
       await createGroup(pages, 'Test Group', [userB]);
+
       await pages.conversationList().openConversation('Test Group');
       await pages.conversation().sendMessage('Test Message');
 
@@ -77,11 +74,14 @@ test.describe('Edit', () => {
   test(
     'I see changed message if message was edited from another device',
     {tag: ['@TC-682', '@regression']},
-    async ({createPage, userA, userB}) => {
-      const deviceA = (await PageManager.from(createPage(withLogin(userA), withConversation(userB)))).webapp.pages;
+    async ({createTeamOwner, createUser, createPage}) => {
+      const userB = await createUser();
+      const userA = await createTeamOwner('Test Team', {addMembers: [userB]});
+
+      const deviceA = (await PageManager.from(createPage(withLogin(userA), withConnectedUser(userB)))).webapp.pages;
+
       // Device 2 is intentionally created after device 1 to ensure the history info warning is confirmed
       const deviceB = (await PageManager.from(createPage(withLogin(userA)))).webapp.pages;
-
       await deviceB.historyInfo().clickConfirmButton();
       await deviceB.conversationList().openConversation(userB.fullName);
 
@@ -101,26 +101,35 @@ test.describe('Edit', () => {
     },
   );
 
-  test('I cannot edit another users message', {tag: ['@TC-683', '@regression']}, async ({createPage, userA, userB}) => {
-    const [userAPages, userBPages] = await Promise.all([
-      PageManager.from(createPage(withLogin(userA), withConversation(userB))).then(pm => pm.webapp.pages),
-      PageManager.from(createPage(withLogin(userB), withConversation(userA))).then(pm => pm.webapp.pages),
-    ]);
+  test(
+    'I cannot edit another users message',
+    {tag: ['@TC-683', '@regression']},
+    async ({createTeamOwner, createUser, createPage}) => {
+      const userB = await createUser();
+      const userA = await createTeamOwner('Test Team', {addMembers: [userB]});
 
-    await userAPages.conversation().sendMessage('Test Message');
+      const [userAPages, userBPages] = await Promise.all([
+        PageManager.from(createPage(withLogin(userA), withConnectedUser(userB))).then(pm => pm.webapp.pages),
+        PageManager.from(createPage(withLogin(userB), withConnectedUser(userA))).then(pm => pm.webapp.pages),
+      ]);
 
-    const message = userBPages.conversation().getMessage({sender: userA});
-    await expect(message).toContainText('Test Message');
+      await userAPages.conversation().sendMessage('Test Message');
 
-    const messageOptions = await userBPages.conversation().openMessageOptions(message);
-    await expect(messageOptions).not.toContainText('Edit');
-  });
+      const message = userBPages.conversation().getMessage({sender: userA});
+      await expect(message).toContainText('Test Message');
+
+      const messageOptions = await userBPages.conversation().openMessageOptions(message);
+      await expect(messageOptions).not.toContainText('Edit');
+    },
+  );
 
   test(
     'I can edit my last message by pressing the up arrow key',
     {tag: ['@TC-686', '@regression']},
-    async ({createPage, userA, userB}) => {
-      const pages = (await PageManager.from(createPage(withLogin(userA), withConversation(userB)))).webapp.pages;
+    async ({createTeamOwner, createUser, createPage}) => {
+      const userB = await createUser();
+      const userA = await createTeamOwner('Test Team', {addMembers: [userB]});
+      const pages = (await PageManager.from(createPage(withLogin(userA), withConnectedUser(userB)))).webapp.pages;
 
       await pages.conversation().sendMessage('Test Message');
       await expect(pages.conversation().getMessage({content: 'Test Message'})).toBeVisible();
@@ -133,10 +142,12 @@ test.describe('Edit', () => {
   test(
     'Editing a message does not create unread dot on receiver side',
     {tag: ['@TC-690', '@regression']},
-    async ({createPage, userA, userB}) => {
+    async ({createTeamOwner, createUser, createPage}) => {
+      const userB = await createUser();
+      const userA = await createTeamOwner('Test Team', {addMembers: [userB]});
       const [userAPages, userBPages] = await Promise.all([
-        PageManager.from(createPage(withLogin(userA), withConversation(userB))).then(pm => pm.webapp.pages),
-        PageManager.from(createPage(withLogin(userB), withConversation(userA))).then(pm => pm.webapp.pages),
+        PageManager.from(createPage(withLogin(userA), withConnectedUser(userB))).then(pm => pm.webapp.pages),
+        PageManager.from(createPage(withLogin(userB), withConnectedUser(userA))).then(pm => pm.webapp.pages),
       ]);
 
       await test.step('Create group as second conversation', async () => {
@@ -184,10 +195,12 @@ test.describe('Edit', () => {
   test(
     'I can see the changed message was edited from another user',
     {tag: ['@TC-692', '@regression']},
-    async ({createPage, userA, userB}) => {
+    async ({createTeamOwner, createUser, createPage}) => {
+      const userB = await createUser();
+      const userA = await createTeamOwner('Test Team', {addMembers: [userB]});
       const [userAPages, userBPages] = await Promise.all([
-        PageManager.from(createPage(withLogin(userA), withConversation(userB))).then(pm => pm.webapp.pages),
-        PageManager.from(createPage(withLogin(userB), withConversation(userA))).then(pm => pm.webapp.pages),
+        PageManager.from(createPage(withLogin(userA), withConnectedUser(userB))).then(pm => pm.webapp.pages),
+        PageManager.from(createPage(withLogin(userB), withConnectedUser(userA))).then(pm => pm.webapp.pages),
       ]);
 
       await userAPages.conversation().sendMessage('Test');
@@ -208,7 +221,10 @@ test.describe('Edit', () => {
   test(
     'I want to see the last edited text including a timestamp in message detail view if the message has been edited',
     {tag: ['@TC-3563', '@regression']},
-    async ({createPage, userA, userB}) => {
+    async ({createTeamOwner, createUser, createPage}) => {
+      const userB = await createUser();
+      const userA = await createTeamOwner('Test Team', {addMembers: [userB]});
+
       const pages = await PageManager.from(createPage(withLogin(userA))).then(pm => pm.webapp.pages);
       await createGroup(pages, 'Test Group', [userB]); // The message detail view is only available for group conversations
 

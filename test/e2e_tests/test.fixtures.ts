@@ -22,6 +22,7 @@ import {test as baseTest, type BrowserContext, type Page} from '@playwright/test
 import {ApiManagerE2E} from './backend/apiManager.e2e';
 import {getUser, User} from './data/user';
 import {PageManager} from './pageManager';
+import {connectWithUser} from './utils/userActions';
 
 type PagePlugin = (page: Page) => void | Promise<void>;
 
@@ -34,8 +35,14 @@ type Fixtures = {
    * @param setup Array of PagePlugins, effectively functions which will be applied to the page in the given order
    */
   createPage: (...setup: PagePlugin[]) => Promise<Page>;
-  createUser: (options?: {disableTelemetry?: boolean}) => Promise<User>;
+  createUser: (options?: Parameters<typeof createUser>[1]) => Promise<User>;
+  createTeamOwner: (
+    teamName: string,
+    options?: Parameters<typeof createUser>[1] & {addMembers?: User[]},
+  ) => Promise<User>;
 };
+
+export {expect} from '@playwright/test';
 
 export const test = baseTest.extend<Fixtures>({
   api: async ({}, use) => {
@@ -68,20 +75,37 @@ export const test = baseTest.extend<Fixtures>({
     const users: User[] = [];
 
     await use(async options => {
-      const {disableTelemetry = true} = options ?? {};
-
-      const user = getUser();
-      await api.createPersonalUser(user);
-
-      if (disableTelemetry) {
-        await api.properties.putProperty({settings: {privacy: {telemetry_data_sharing: false}}}, user.token);
-      }
-
+      const user = await createUser(api, options);
       users.push(user);
       return user;
     });
 
     await Promise.all(users.map(user => api.deletePersonalUser(user)));
+  },
+  createTeamOwner: async ({api}, use) => {
+    const teamOwners: User[] = [];
+
+    await use(async (teamName, {addMembers, ...options} = {}) => {
+      const user = await createUser(api, options);
+      const {teamId} = await api.auth.upgradeUserToTeamOwner(user, teamName);
+
+      user.teamId = teamId;
+      teamOwners.push(user);
+
+      if (addMembers?.length) {
+        await Promise.all(
+          addMembers.map(async member => {
+            const invitationId = await api.team.inviteUserToTeam(member.email, user);
+            const invitationCode = await api.brig.getTeamInvitationCodeForEmail(user.teamId, invitationId);
+            await api.team.acceptTeamInvitation(invitationCode, member);
+          }),
+        );
+      }
+
+      return user;
+    });
+
+    await Promise.all(teamOwners.map(owner => api.team.deleteTeam(owner, owner.teamId)));
   },
 });
 
@@ -94,6 +118,17 @@ export const withLogin =
     await pageManager.webapp.pages.login().login(await user);
   };
 
+/**
+ * PagePlugin to connect with the given user
+ * Note: This plugin only works if the users are in the same team
+ */
+export const withConnectedUser =
+  (user: User | Promise<User>): PagePlugin =>
+  async page => {
+    const pageManager = PageManager.from(page);
+    await connectWithUser(pageManager, await user);
+  };
+
 /** PagePlugin to open a conversation with the given user */
 export const withConversation =
   (user: Pick<User, 'fullName'>): PagePlugin =>
@@ -101,4 +136,15 @@ export const withConversation =
     await PageManager.from(page).webapp.pages.conversationList().openConversation(user.fullName);
   };
 
-export {expect} from '@playwright/test';
+const createUser = async (api: ApiManagerE2E, options?: {disableTelemetry?: boolean}) => {
+  const {disableTelemetry = true} = options ?? {};
+
+  const user = getUser();
+  await api.createPersonalUser(user);
+
+  if (disableTelemetry) {
+    await api.properties.putProperty({settings: {privacy: {telemetry_data_sharing: false}}}, user.token);
+  }
+
+  return user;
+};
