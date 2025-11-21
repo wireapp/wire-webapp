@@ -25,7 +25,7 @@ export enum LEAVE_CALL_REASON {
   MANUAL_LEAVE_TO_JOIN_ANOTHER_CALL = 'manual_leave_to_join_another_call',
   MANUAL_LEAVE_BY_UI_CLICK = 'manual_leave_by_ui_click',
   USER_MANUALY_LEFT_CONVERSATION = 'user_manualy_left_conversation',
-  USER_IS_REMOVED_BY_AN_ADMIN_OR_LEFT_ON_ANOTHER_CLIENT = 'user_is_removed_by_an_admin_or_left_on_another_client',
+  USER_IS_REMOVED_FROM_CONVERSATION = 'user_is_removed_from_conversation',
   ABORTED_BECAUSE_FAILED_TO_UPDATE_MISSING_CLIENTS = 'abort_failed_to_update_missing_clients',
   ABORTED_BECAUSE_FAILED_TO_SEND_CALLING_MESSAGE = 'abort_failed_to_update_missing_clients',
   ABORTED_BECAUSE_USER_CANCELLED_MESSAGE_SENDING_BECAUSE_OF_A_DEGRADATION_WARNING = 'abort_failed_because_user_cancelled_message_sending_because_of_a_degradation_warning',
