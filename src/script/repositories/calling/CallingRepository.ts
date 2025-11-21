@@ -35,16 +35,16 @@ import 'webrtc-adapter';
 
 import {
   AUDIO_STATE,
-  ENV as AVS_ENV,
-  STATE as CALL_STATE,
   CALL_TYPE,
   CONV_TYPE,
+  ENV as AVS_ENV,
   ERROR,
   getAvsInstance,
   LOG_LEVEL,
   QUALITY,
   REASON,
   RESOLUTION,
+  STATE as CALL_STATE,
   VIDEO_STATE,
   VSTREAMS,
   Wcall,
@@ -1666,6 +1666,12 @@ export class CallingRepository {
     }
   };
 
+  /**
+   * Leaves the call in the given conversation and on the basis of the given reason,
+   * Remove the call from the call state.
+   * @param conversationId
+   * @param reason
+   */
   readonly leaveCall = (conversationId: QualifiedId, reason: LEAVE_CALL_REASON): void => {
     const call = this.findCall(conversationId);
     if (call) {
@@ -1673,6 +1679,11 @@ export class CallingRepository {
       // Stop screen sharing if active
       if (call.getSelfParticipant().sharesScreen()) {
         this.stopScreenShare(call.getSelfParticipant(), call.conversation, call);
+      }
+
+      // If the user is not part of the conversation, the call must be removed from the state
+      if (reason === LEAVE_CALL_REASON.USER_IS_REMOVED_FROM_CONVERSATION) {
+        this.removeCall(call);
       }
     }
 

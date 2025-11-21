@@ -18,38 +18,38 @@
  */
 
 import {
+  ADD_PERMISSION,
   Conversation as BackendConversation,
+  CONVERSATION_CELLS_STATE,
   CONVERSATION_TYPE,
   DefaultConversationRoleName as DefaultRole,
-  NewConversation,
   MessageSendingStatus,
+  NewConversation,
   RemoteConversations,
-  ADD_PERMISSION,
-  CONVERSATION_CELLS_STATE,
 } from '@wireapp/api-client/lib/conversation';
 import {
-  MemberLeaveReason,
   ConversationReceiptModeUpdateData,
+  MemberLeaveReason,
   RECEIPT_MODE,
 } from '@wireapp/api-client/lib/conversation/data';
 import {CONVERSATION_TYPING} from '@wireapp/api-client/lib/conversation/data/ConversationTypingData';
 import {
+  CONVERSATION_EVENT,
+  ConversationAddPermissionUpdateEvent,
   ConversationCreateEvent,
   ConversationEvent,
   ConversationMemberJoinEvent,
   ConversationMemberLeaveEvent,
   ConversationMemberUpdateEvent,
   ConversationMessageTimerUpdateEvent,
+  ConversationMLSResetEvent,
+  ConversationProtocolUpdateEvent,
   ConversationReceiptModeUpdateEvent,
   ConversationRenameEvent,
   ConversationTypingEvent,
-  CONVERSATION_EVENT,
-  ConversationProtocolUpdateEvent,
-  ConversationAddPermissionUpdateEvent,
-  ConversationMLSResetEvent,
 } from '@wireapp/api-client/lib/event';
-import {BackendErrorLabel} from '@wireapp/api-client/lib/http/';
 import type {BackendError} from '@wireapp/api-client/lib/http/';
+import {BackendErrorLabel} from '@wireapp/api-client/lib/http/';
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 import type {QualifiedId} from '@wireapp/api-client/lib/user/';
 import {BaseCreateConversationResponse} from '@wireapp/core/lib/conversation';
@@ -118,16 +118,16 @@ import {ConversationLabelRepository} from './ConversationLabelRepository';
 import {ConversationDatabaseData, ConversationMapper} from './ConversationMapper';
 import {ConversationRoleRepository} from './ConversationRoleRepository';
 import {
+  isBackendProteus1to1Conversation,
+  isConnectionRequestConversation,
   isMixedConversation,
   isMLSCapableConversation,
   isMLSConversation,
+  isProteus1to1ConversationWithUser,
   isProteusConversation,
   MLSCapableConversation,
   MLSConversation,
-  isProteus1to1ConversationWithUser,
   ProteusConversation,
-  isConnectionRequestConversation,
-  isBackendProteus1to1Conversation,
 } from './ConversationSelectors';
 import {ConversationService} from './ConversationService';
 import {ConversationState} from './ConversationState';
@@ -160,7 +160,7 @@ import {MessageRepository} from './MessageRepository';
 import {NOTIFICATION_STATE} from './NotificationSetting';
 
 import {Config} from '../../Config';
-import {BaseError, BASE_ERROR_TYPE} from '../../error/BaseError';
+import {BASE_ERROR_TYPE, BaseError} from '../../error/BaseError';
 import {ConversationError} from '../../error/ConversationError';
 import {isMemberMessage} from '../../guards/Message';
 import * as LegalHoldEvaluator from '../../legal-hold/LegalHoldEvaluator';
@@ -4026,7 +4026,7 @@ export class ConversationRepository {
       conversationEntity.status(ConversationStatus.PAST_MEMBER);
       this.callingRepository.leaveCall(
         conversationEntity.qualifiedId,
-        LEAVE_CALL_REASON.USER_IS_REMOVED_BY_AN_ADMIN_OR_LEFT_ON_ANOTHER_CLIENT,
+        LEAVE_CALL_REASON.USER_IS_REMOVED_FROM_CONVERSATION,
       );
 
       if (this.userState.self().isTemporaryGuest()) {
