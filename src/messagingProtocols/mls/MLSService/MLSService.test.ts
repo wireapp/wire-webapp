@@ -612,6 +612,31 @@ describe('MLSService', () => {
       jest.advanceTimersByTime(commitDelay);
       expect(transactionContext.decryptMessage).toHaveBeenCalled();
     });
+
+    it('Throws if decryption fails', async () => {
+      const [mlsService, {transactionContext}] = await createMLSService();
+
+      const mockGroupId = 'mXOagqRIX/RFd7QyXJA8/Ed8X+hvQgLXIiwYHm3OQFc=';
+      const getGroupIdFromConversationId = () => Promise.resolve(mockGroupId);
+      jest
+        .spyOn(transactionContext, 'decryptMessage')
+        .mockRejectedValueOnce(new Error(CORE_CRYPTO_ERROR_NAMES.MlsErrorWrongEpoch));
+
+      const mockedMLSMessageAddEvent: ConversationMLSMessageAddEvent = {
+        type: CONVERSATION_EVENT.MLS_MESSAGE_ADD,
+        senderClientId: '',
+        conversation: '',
+        data: mockedMLSWelcomeEventData,
+        from: '',
+        time: '',
+      };
+
+      await expect(
+        mlsService.handleMLSMessageAddEvent(mockedMLSMessageAddEvent, getGroupIdFromConversationId),
+      ).rejects.toThrow(CORE_CRYPTO_ERROR_NAMES.MlsErrorWrongEpoch);
+
+      expect(transactionContext.decryptMessage).toHaveBeenCalled();
+    });
   });
 
   describe('handleMLSWelcomeMessageEvent', () => {
