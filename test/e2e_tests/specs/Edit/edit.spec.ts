@@ -26,9 +26,10 @@ test.describe('Edit', () => {
   let userA: User;
   let userB: User;
 
-  test.beforeEach(async ({createTeamOwner, createUser}) => {
-    userB = await createUser();
-    userA = await createTeamOwner('Test Team', {addMembers: [userB]});
+  test.beforeEach(async ({createTeam}) => {
+    const team = await createTeam('Test Team', {withMembers: 1});
+    userA = team.owner;
+    userB = team.members[0];
   });
 
   test('I can edit my message in 1:1', {tag: ['@TC-679', '@regression']}, async ({createPage}) => {

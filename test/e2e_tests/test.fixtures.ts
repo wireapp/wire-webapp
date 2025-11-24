@@ -35,11 +35,21 @@ type Fixtures = {
    * @param setup Array of PagePlugins, effectively functions which will be applied to the page in the given order
    */
   createPage: (...setup: PagePlugin[]) => Promise<Page>;
+  /**
+   * Create a new user
+   * Note: The created user will be deleted automatically once the test is finished
+   * @param options Options to set on the new user e.g. declining telemetry
+   */
   createUser: (options?: Parameters<typeof createUser>[1]) => Promise<User>;
-  createTeamOwner: (
+  /**
+   * Creates a team and the associated owner, optionally adding members to it
+   * @param options.withMembers Can either be the number of team members to create or an array of existing members to add to the team
+   * @returns an object containing the teams owner and an array of members. The size of the members array matches the number or array length passed to `withMembers`
+   */
+  createTeam: (
     teamName: string,
-    options?: Parameters<typeof createUser>[1] & {addMembers?: User[]},
-  ) => Promise<User>;
+    options?: Parameters<typeof createUser>[1] & {withMembers?: number | User[]},
+  ) => Promise<{owner: User; members: User[]}>;
 };
 
 export {expect} from '@playwright/test';
@@ -82,29 +92,37 @@ export const test = baseTest.extend<Fixtures>({
 
     await Promise.all(users.map(user => api.deletePersonalUser(user)));
   },
-  createTeamOwner: async ({api}, use) => {
+  createTeam: async ({api}, use) => {
     const teamOwners: User[] = [];
 
-    await use(async (teamName, {addMembers, ...options} = {}) => {
-      const user = await createUser(api, options);
-      const {teamId} = await api.auth.upgradeUserToTeamOwner(user, teamName);
+    await use(async (teamName, {withMembers, ...options} = {}) => {
+      const owner = await createUser(api, options);
+      const {teamId} = await api.auth.upgradeUserToTeamOwner(owner, teamName);
 
-      user.teamId = teamId;
-      teamOwners.push(user);
+      owner.teamId = teamId;
+      teamOwners.push(owner);
 
-      if (addMembers?.length) {
+      let members: User[] = [];
+      if (withMembers !== undefined) {
+        // Depending on the type of withMembers, either create the number of users or use the given array of users
+        members =
+          typeof withMembers === 'number'
+            ? await Promise.all(Array.from({length: withMembers}, () => createUser(api, options)))
+            : withMembers;
+
         await Promise.all(
-          addMembers.map(async member => {
-            const invitationId = await api.team.inviteUserToTeam(member.email, user);
-            const invitationCode = await api.brig.getTeamInvitationCodeForEmail(user.teamId, invitationId);
+          members.map(async member => {
+            const invitationId = await api.team.inviteUserToTeam(member.email, owner);
+            const invitationCode = await api.brig.getTeamInvitationCodeForEmail(owner.teamId, invitationId);
             await api.team.acceptTeamInvitation(invitationCode, member);
           }),
         );
       }
 
-      return user;
+      return {owner, members};
     });
 
+    // Deletes each created team and the owner / members associated with it
     await Promise.all(teamOwners.map(owner => api.team.deleteTeam(owner, owner.teamId)));
   },
 });
@@ -142,6 +160,7 @@ const createUser = async (api: ApiManagerE2E, options?: {disableTelemetry?: bool
   const user = getUser();
   await api.createPersonalUser(user);
 
+  // Optionally decline to send telemetry via the api. This avoids the user being prompted for it in the UI upon first login
   if (disableTelemetry) {
     await api.properties.putProperty({settings: {privacy: {telemetry_data_sharing: false}}}, user.token);
   }
