@@ -230,9 +230,13 @@ test.describe('Folders', () => {
     },
   );
 
-  test('I should not see any traces of a deleted custom folder', {tag: ['@TC-568', '@regression']});
+  test('I should not see any traces of a deleted custom folder', {tag: ['@TC-568', '@regression']}, async () => {});
 
-  test('I want to see 1:1 and group conversations in Favorites folder', {tag: ['@TC-742', '@regression']});
+  test(
+    'I want to see 1:1 and group conversations in Favorites folder',
+    {tag: ['@TC-742', '@regression']},
+    async () => {},
+  );
 
   test.afterAll(async ({api}) => {
     await tearDownAll(api);
