@@ -226,7 +226,7 @@ export class Account extends TypedEventEmitter<Events> {
         try {
           await this.persistCookie(this.storeEngine, cookie);
         } catch (error) {
-          this.logger.error(`Failed to save cookie: ${(error as Error).message}`, error);
+          this.logger.error('Failed to save cookie:', error);
         }
       }
     });

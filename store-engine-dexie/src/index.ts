@@ -196,7 +196,7 @@ export class IndexedDBEngine implements CRUDEngine {
     const granted = await navigator.storage.persist();
 
     if (granted) {
-      this.logger.info('Storage will not be cleared except by explicit user action');
+      this.logger.info('Storage will not be cleared except by explicit user action.');
       return true;
     }
 
