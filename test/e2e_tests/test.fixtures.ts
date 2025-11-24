@@ -148,13 +148,6 @@ export const withConnectedUser =
     await connectWithUser(pageManager, await user);
   };
 
-/** PagePlugin to open a conversation with the given user */
-export const withConversation =
-  (user: Pick<User, 'fullName'>): PagePlugin =>
-  async page => {
-    await PageManager.from(page).webapp.pages.conversationList().openConversation(user.fullName);
-  };
-
 const createUser = async (api: ApiManagerE2E, options?: {disableTelemetry?: boolean}) => {
   const {disableTelemetry = true} = options ?? {};
 

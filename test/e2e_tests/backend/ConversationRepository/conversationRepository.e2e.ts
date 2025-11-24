@@ -68,58 +68,41 @@ export class ConversationRepositoryE2E extends BackendClientE2E {
     }
   }
 
-  async getMLSConversationWithUser(token: string, conversationPartnerId: string, timeout = 10000) {
-    const retryDelay = 1000;
-    const maxRetries = timeout / retryDelay;
-    let mlsConversationId = null;
-
-    for (let attempt = 0; attempt < maxRetries && !mlsConversationId; attempt++) {
-      const listIdsResponse = await this.axiosInstance.post(
-        'conversations/list-ids',
-        {},
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
+  async getConversationWithUser(token: string, conversationPartnerId: string) {
+    const listIdsResponse = await this.axiosInstance.post(
+      'conversations/list-ids',
+      {},
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
         },
-      );
+      },
+    );
 
-      const qualifiedIds = listIdsResponse.data.qualified_conversations;
+    const qualifiedIds = listIdsResponse.data.qualified_conversations;
 
-      if (!qualifiedIds) {
-        throw new Error('No qualified conversations found');
-      }
-
-      const response = await this.axiosInstance.post(
-        'conversations/list',
-        {
-          qualified_ids: qualifiedIds,
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            'Content-Type': 'application/json',
-          },
-        },
-      );
-
-      // Filtering out conversations that are not MLS;
-      const responseData = response.data;
-      mlsConversationId =
-        responseData.found.find(
-          (conversation: {protocol: string; members: {others: {conversation_role: string; id: string}[]}}) =>
-            conversation.protocol === 'mls' &&
-            conversation.members.others.some(
-              (member: {conversation_role: string; id: string}) =>
-                member.conversation_role === 'wire_member' && member.id === conversationPartnerId,
-            ),
-        )?.qualified_id?.id ?? null;
-
-      await new Promise(resolve => setTimeout(resolve, retryDelay));
+    if (!qualifiedIds) {
+      throw new Error('No qualified conversations found');
     }
-    if (!mlsConversationId) {
-      throw new Error(`No MLS conversation found with user ID: ${conversationPartnerId}`);
-    }
-    return mlsConversationId;
+
+    const response = await this.axiosInstance.post(
+      'conversations/list/v2',
+      {
+        qualified_ids: qualifiedIds,
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+      },
+    );
+
+    // Find a conversation with the given user
+    const conversation = response.data.found.find(
+      (conversation: {members: {others: {conversation_role: string; id: string}[]}}) =>
+        conversation.members.others.some((member: {id: string}) => member.id === conversationPartnerId),
+    );
+    return conversation?.qualified_id?.id;
   }
 }
