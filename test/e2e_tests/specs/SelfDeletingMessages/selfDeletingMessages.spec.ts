@@ -190,4 +190,19 @@ test.describe('Self Deleting Messages', () => {
       await expect(pages.conversation().timerMessageButton).toBeDisabled();
     },
   );
+
+  test(
+    'I want to see the ephemeral indicator is updated in the input field if someone sets a global timer in conversation options',
+    {tag: ['@TC-3719', '@regression']},
+    async ({createPage}) => {
+      const pages = PageManager.from(await createPage(withLogin(userA))).webapp.pages;
+      await createGroup(pages, 'Test Group', [userB]);
+
+      await pages.conversationList().openConversation('Test Group');
+      await pages.conversation().toggleGroupInformation();
+      await pages.conversationDetails().setSelfDeletingMessages('10 seconds');
+
+      await expect(pages.conversation().timerMessageButton).toContainText('s10');
+    },
+  );
 });
