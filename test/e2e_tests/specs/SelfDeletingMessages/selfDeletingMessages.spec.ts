@@ -175,4 +175,19 @@ test.describe('Self Deleting Messages', () => {
       await expect(pages.conversationDetails().selfDeletingMessageButton).toContainText('10 seconds');
     },
   );
+
+  test(
+    'I want to see timed message disable in an input bar when global settings conversation options are set',
+    {tag: ['@TC-3718', '@regression']},
+    async ({createPage}) => {
+      const pages = PageManager.from(await createPage(withLogin(userA))).webapp.pages;
+      await createGroup(pages, 'Test Group', [userB]);
+
+      await pages.conversationList().openConversation('Test Group');
+      await pages.conversation().toggleGroupInformation();
+      await pages.conversationDetails().setSelfDeletingMessages('10 seconds');
+
+      await expect(pages.conversation().timerMessageButton).toBeDisabled();
+    },
+  );
 });
