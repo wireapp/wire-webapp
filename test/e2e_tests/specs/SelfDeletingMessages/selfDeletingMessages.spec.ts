@@ -19,66 +19,58 @@
 
 import {User} from 'test/e2e_tests/data/user';
 import {PageManager} from 'test/e2e_tests/pageManager';
-import {test as baseTest, expect, withConversation, withLogin} from 'test/e2e_tests/test.fixtures';
+import {test, expect, withLogin, withConnectedUser} from 'test/e2e_tests/test.fixtures';
 import {createGroup} from 'test/e2e_tests/utils/userActions';
 
-const test = baseTest.extend<{userA: User; userB: User}>({
-  userA: async ({createUser}, use) => use(await createUser()),
-  userB: async ({createUser}, use) => use(await createUser()),
-});
-
 test.describe('Self Deleting Messages', () => {
-  test.beforeEach(async ({api, userA, userB}) => {
-    await api.connectUsers(userA, userB);
+  let userA: User;
+  let userB: User;
+
+  test.beforeEach(async ({createTeam}) => {
+    const team = await createTeam('Test Team', {withMembers: 1});
+    userA = team.owner;
+    userB = team.members[0];
   });
 
-  test(
-    'Verify sending ephemeral text message in 1:1',
-    {tag: ['@TC-657', '@regression']},
-    async ({createPage, userA, userB}) => {
-      const [userAPage, userBPage] = await Promise.all([
-        createPage(withLogin(userA), withConversation(userB)),
-        createPage(withLogin(userB), withConversation(userA)),
-      ]);
-      const userAPages = PageManager.from(userAPage).webapp.pages;
-      const userBPages = PageManager.from(userBPage).webapp.pages;
+  test('Verify sending ephemeral text message in 1:1', {tag: ['@TC-657', '@regression']}, async ({createPage}) => {
+    const [userAPage, userBPage] = await Promise.all([
+      createPage(withLogin(userA), withConnectedUser(userB)),
+      createPage(withLogin(userB), withConnectedUser(userA)),
+    ]);
+    const userAPages = PageManager.from(userAPage).webapp.pages;
+    const userBPages = PageManager.from(userBPage).webapp.pages;
 
-      await userAPages.conversation().enableSelfDeletingMessages();
-      await userAPages.conversation().sendMessage('Gone in 10s');
-      await expect(userBPages.conversation().getMessage({content: 'Gone in 10s'})).toBeVisible();
+    await userAPages.conversation().enableSelfDeletingMessages();
+    await userAPages.conversation().sendMessage('Gone in 10s');
+    await expect(userBPages.conversation().getMessage({content: 'Gone in 10s'})).toBeVisible();
 
-      await userBPage.waitForTimeout(10_000); // Wait for 10s so the message is deleted
-      await expect(userAPages.conversation().getMessage({content: 'Gone in 10s'})).not.toBeVisible();
-      await expect(userBPages.conversation().getMessage({content: 'Gone in 10s'})).not.toBeVisible();
-    },
-  );
+    await userBPage.waitForTimeout(10_000); // Wait for 10s so the message is deleted
+    await expect(userAPages.conversation().getMessage({content: 'Gone in 10s'})).not.toBeVisible();
+    await expect(userBPages.conversation().getMessage({content: 'Gone in 10s'})).not.toBeVisible();
+  });
 
-  test(
-    'Verify sending ephemeral text message in group',
-    {tag: ['@TC-658', '@regression']},
-    async ({createPage, userA, userB}) => {
-      const [userAPage, userBPage] = await Promise.all([createPage(withLogin(userA)), createPage(withLogin(userB))]);
-      const userAPages = PageManager.from(userAPage).webapp.pages;
-      const userBPages = PageManager.from(userBPage).webapp.pages;
+  test('Verify sending ephemeral text message in group', {tag: ['@TC-658', '@regression']}, async ({createPage}) => {
+    const [userAPage, userBPage] = await Promise.all([createPage(withLogin(userA)), createPage(withLogin(userB))]);
+    const userAPages = PageManager.from(userAPage).webapp.pages;
+    const userBPages = PageManager.from(userBPage).webapp.pages;
 
-      await createGroup(userAPages, 'Test Group', [userB]);
-      await userBPages.conversationList().openConversation('Test Group');
+    await createGroup(userAPages, 'Test Group', [userB]);
+    await userBPages.conversationList().openConversation('Test Group');
 
-      await userAPages.conversation().enableSelfDeletingMessages();
-      await userAPages.conversation().sendMessage('Gone in 10s');
-      await expect(userBPages.conversation().getMessage({content: 'Gone in 10s'})).toBeVisible();
+    await userAPages.conversation().enableSelfDeletingMessages();
+    await userAPages.conversation().sendMessage('Gone in 10s');
+    await expect(userBPages.conversation().getMessage({content: 'Gone in 10s'})).toBeVisible();
 
-      await userBPage.waitForTimeout(10_000); // Wait for 10s so the message is deleted
-      await expect(userAPages.conversation().getMessage({content: 'Gone in 10s'})).not.toBeVisible();
-      await expect(userBPages.conversation().getMessage({content: 'Gone in 10s'})).not.toBeVisible();
-    },
-  );
+    await userBPage.waitForTimeout(10_000); // Wait for 10s so the message is deleted
+    await expect(userAPages.conversation().getMessage({content: 'Gone in 10s'})).not.toBeVisible();
+    await expect(userBPages.conversation().getMessage({content: 'Gone in 10s'})).not.toBeVisible();
+  });
 
   test(
     'Verify timer is applied to all messages until turning it off in 1:1',
     {tag: ['@TC-662', '@regression']},
-    async ({createPage, userA, userB}) => {
-      const page = await createPage(withLogin(userA), withConversation(userB));
+    async ({createPage}) => {
+      const page = await createPage(withLogin(userA), withConnectedUser(userB));
       const pages = PageManager.from(page).webapp.pages;
 
       await pages.conversation().enableSelfDeletingMessages();
@@ -105,8 +97,8 @@ test.describe('Self Deleting Messages', () => {
   test(
     'Verify that message with previous timer are deleted on start-up when the timeout passed in 1:1',
     {tag: ['@TC-664', '@regression']},
-    async ({context, createPage, userA, userB}) => {
-      let page = await createPage(context, withLogin(userA), withConversation(userB));
+    async ({context, createPage}) => {
+      let page = await createPage(context, withLogin(userA), withConnectedUser(userB));
       let pages = PageManager.from(page).webapp.pages;
 
       await pages.conversation().enableSelfDeletingMessages();
@@ -114,11 +106,12 @@ test.describe('Self Deleting Messages', () => {
       await expect(pages.conversation().getMessage({sender: userA})).toBeVisible(); // Ensure message was sent before closing the page
 
       await page.close();
-      await new Promise(res => setTimeout(res, 10_000)); // Wait 10s before logging in again to ensure the message has should be deleted by now
+      await new Promise(res => setTimeout(res, 10_000)); // Wait 10s before logging in again to ensure the message has been deleted by now
 
       // Re-open page reusing the same context so the login is not happening on a new device
-      page = await createPage(context, withLogin(userA), withConversation(userB));
+      page = await createPage(context, withLogin(userA));
       pages = PageManager.from(page).webapp.pages;
+      await pages.conversationList().openConversation(userB.fullName);
 
       const selfDeletingMessage = pages.conversation().getMessage({sender: userA});
       await expect(selfDeletingMessage).toBeVisible();
