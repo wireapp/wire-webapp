@@ -29,7 +29,7 @@ test.describe('Reply', () => {
   let userA: User;
   let userB: User;
 
-  test.beforeEach(async ({createTeam, createUser}) => {
+  test.beforeEach(async ({createTeam}) => {
     const team = await createTeam('Test Team', {withMembers: 1});
     userA = team.owner;
     userB = team.members[0];
