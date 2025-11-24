@@ -205,4 +205,26 @@ test.describe('Self Deleting Messages', () => {
       await expect(pages.conversation().timerMessageButton).toContainText('s10');
     },
   );
+
+  test(
+    'I want to see a system message that a global timer was set or changed or removed in conversation options',
+    {tag: ['@TC-3720', '@regression']},
+    async ({createPage}) => {
+      const [userAPage, userBPage] = await Promise.all([createPage(withLogin(userA)), createPage(withLogin(userB))]);
+      const [userAPages, userBPages] = [userAPage, userBPage].map(page => PageManager.from(page).webapp.pages);
+      await createGroup(userAPages, 'Test Group', [userB]);
+
+      await userAPages.conversationList().openConversation('Test Group');
+      await userAPages.conversation().toggleGroupInformation();
+      await userAPages.conversationDetails().setSelfDeletingMessages('10 seconds');
+
+      await userBPages.conversationList().openConversation('Test Group');
+      await expect(
+        userBPages.conversation().systemMessages.getByText('set the message timer to 10 seconds'),
+      ).toBeAttached();
+
+      await userAPages.conversationDetails().setSelfDeletingMessages('Off');
+      await expect(userBPages.conversation().systemMessages.getByText('turned off the message timer')).toBeAttached();
+    },
+  );
 });
