@@ -43,6 +43,7 @@ type Fixtures = {
   createUser: (options?: Parameters<typeof createUser>[1]) => Promise<User>;
   /**
    * Creates a team and the associated owner, optionally adding members to it
+   * Note: The team and owner are automatically deleted when the test completes.
    * @param options.withMembers Can either be the number of team members to create or an array of existing members to add to the team
    * @returns an object containing the teams owner and an array of members. The size of the members array matches the number or array length passed to `withMembers`
    */
