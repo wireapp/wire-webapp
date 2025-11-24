@@ -118,4 +118,29 @@ test.describe('Self Deleting Messages', () => {
       await expect(selfDeletingMessage).not.toContainText('Test Message');
     },
   );
+
+  test(
+    "Verify the message is not deleted for users that didn't read the message",
+    {tag: ['@TC-675', '@regression']},
+    async ({createPage}) => {
+      const [userAPage, userBPage] = await Promise.all([
+        createPage(withLogin(userA), withConnectedUser(userB)),
+        createPage(withLogin(userB), withConnectedUser(userA)),
+      ]);
+      const [userAPages, userBPages] = [userAPage, userBPage].map(page => PageManager.from(page).webapp.pages);
+      await createGroup(userAPages, 'Test Group', [userB]);
+
+      await userAPages.conversationList().openConversation('Test Group');
+      await userBPages.conversationList().openConversation(userA.fullName); // User B should not read the message sent into the group immediately
+
+      await userAPages.conversation().enableSelfDeletingMessages();
+      await userAPages.conversation().sendMessage('Test Message');
+      await expect(userAPages.conversation().getMessage({sender: userA})).toBeVisible();
+
+      await userBPage.waitForTimeout(10_000); // Wait 10s before user B opens the group chat
+
+      await userBPages.conversationList().openConversation('Test Group');
+      await expect(userBPages.conversation().getMessage({content: 'Test Message'})).toBeVisible();
+    },
+  );
 });
