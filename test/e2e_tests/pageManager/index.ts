@@ -36,6 +36,7 @@ import {AppLockModal} from './webapp/modals/appLock.modal';
 import {BlockWarningModal} from './webapp/modals/blockWarning.modal';
 import {CallNotEstablishedModal} from './webapp/modals/callNotEstablished.modal';
 import {CancelRequestModal} from './webapp/modals/cancelRequest.modal';
+import {ConfirmModal} from './webapp/modals/confirm.modal';
 import {ConfirmLogoutModal} from './webapp/modals/confirmLogout.modal';
 import {ConversationNotConnectedModal} from './webapp/modals/conversationNotConnected.modal';
 import {CopyPasswordModal} from './webapp/modals/copyPassword.modal';
@@ -54,6 +55,7 @@ import {VerifyEmailModal} from './webapp/modals/verifyEmail.modal';
 import {AccountPage} from './webapp/pages/account.page';
 import {AudioVideoSettingsPage} from './webapp/pages/audioVideoSettings.page';
 import {CallingPage} from './webapp/pages/calling.page';
+import {CollectionPage} from './webapp/pages/collection.page';
 import {ConnectRequestPage} from './webapp/pages/connectRequest.page';
 import {ConversationPage} from './webapp/pages/conversation.page';
 import {ConversationDetailsPage} from './webapp/pages/conversationDetails.page';
@@ -165,6 +167,7 @@ export class PageManager {
       conversationDetails: () =>
         this.getOrCreate('webapp.pages.conversationDetails', () => new ConversationDetailsPage(this.page)),
       conversation: () => this.getOrCreate('webapp.pages.conversation', () => new ConversationPage(this.page)),
+      collection: () => this.getOrCreate('webapp.pages.collection', () => new CollectionPage(this.page)),
       cellsConversation: () =>
         this.getOrCreate('webapp.pages.cellsConversation', () => new CellsConversationPage(this.page)),
       cellsConversationFiles: () =>
@@ -220,6 +223,7 @@ export class PageManager {
       marketingConsent: () =>
         this.getOrCreate('webapp.modals.marketingConsent', () => new MarketingConsentModal(this.page)),
       acknowledge: () => this.getOrCreate('webapp.modals.marketingConsent', () => new AcknowledgeModal(this.page)),
+      confirm: () => this.getOrCreate('webapp.modals.confirm', () => new ConfirmModal(this.page)),
       cellsFileDetailView: () =>
         this.getOrCreate('webapp.modals.cellsFileDetailView', () => new CellsFileDetailViewModal(this.page)),
       cancelRequest: () =>

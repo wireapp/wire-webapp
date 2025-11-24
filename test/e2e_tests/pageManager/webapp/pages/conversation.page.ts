@@ -23,6 +23,8 @@ import {User} from 'test/e2e_tests/data/user';
 import {downloadAssetAndGetFilePath} from 'test/e2e_tests/utils/asset.util';
 import {selectById, selectByClass, selectByDataAttribute} from 'test/e2e_tests/utils/selector.util';
 
+import {ConfirmModal} from '../modals/confirm.modal';
+
 type EmojiReaction = 'plus-one' | 'heart' | 'joy';
 
 export class ConversationPage {
@@ -34,6 +36,7 @@ export class ConversationPage {
   readonly createGroupSubmitButton: Locator;
   readonly messageInput: Locator;
   readonly sendMessageButton: Locator;
+  readonly searchButton: Locator;
   readonly conversationTitle: Locator;
   readonly watermark: Locator;
   readonly timerMessageButton: Locator;
@@ -76,6 +79,7 @@ export class ConversationPage {
     this.messageInput = page.locator(selectByDataAttribute('input-message'));
     this.watermark = page.locator(`${selectByDataAttribute('no-conversation')} svg`);
     this.sendMessageButton = page.locator(selectByDataAttribute('do-send-message'));
+    this.searchButton = page.getByRole('button', {name: 'Search'});
     this.conversationTitle = page.locator('[data-uie-name="status-conversation-title-bar-label"]');
     this.openGroupInformationViaName = page.locator(selectByDataAttribute('status-conversation-title-bar-label'));
     this.timerMessageButton = page.locator(selectByDataAttribute('do-set-ephemeral-timer'));
@@ -162,6 +166,17 @@ export class ConversationPage {
     await this.createGroupSubmitButton.click();
   }
 
+  async replyToMessage(message: Locator) {
+    await message.hover();
+    await message.getByRole('group').getByTestId('do-reply-message').click();
+  }
+
+  async sendTimedMessage(message: string) {
+    await this.timerMessageButton.click();
+    await this.timerTenSecondsButton.click();
+    await this.sendMessage(message);
+  }
+
   async sendMessageWithUserMention(userFullName: string, messageText?: string) {
     await this.messageInput.fill(`@`);
     await this.page
@@ -240,6 +255,12 @@ export class ConversationPage {
   async openMessageDetails(message: Locator) {
     const menu = await this.openMessageOptions(message);
     await menu.getByRole('button', {name: 'Details'}).click();
+  }
+
+  async deleteMessage(message: Locator, deleteFor: 'Me' | 'Everyone') {
+    const menu = await this.openMessageOptions(message);
+    await menu.getByRole('button', {name: `Delete for ${deleteFor}…`}).click();
+    await new ConfirmModal(this.page).clickAction();
   }
 
   async reactOnMessage(message: Locator, emojiType: EmojiReaction) {
