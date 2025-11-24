@@ -247,4 +247,28 @@ test.describe('Self Deleting Messages', () => {
       await expect(searchResults).toContainText('Test');
     },
   );
+
+  // Currently the message isn't removed from the search results after its specified lifetime
+  test.skip(
+    'I want to to see ephemeral messages disappear from search results when their timer runs out',
+    {tag: ['@TC-3731', '@regression']},
+    async ({createPage}) => {
+      const page = await createPage(withLogin(userA), withConnectedUser(userB));
+      const pages = PageManager.from(page).webapp.pages;
+
+      await pages.conversation().enableSelfDeletingMessages();
+      await pages.conversation().sendMessage('Test');
+      await expect(pages.conversation().getMessage({content: 'Test'})).toBeVisible();
+
+      await pages.conversation().searchButton.click();
+      await pages.collection().searchForMessages('Test');
+
+      const searchResults = pages.collection().searchItems;
+      await expect(searchResults).toHaveCount(1);
+
+      await page.waitForTimeout(10_000);
+
+      await expect(searchResults).toHaveCount(0);
+    },
+  );
 });
