@@ -143,4 +143,21 @@ test.describe('Self Deleting Messages', () => {
       await expect(userBPages.conversation().getMessage({content: 'Test Message'})).toBeVisible();
     },
   );
+
+  test('I want to set a global group conversation timer', {tag: ['@TC-3715', '@regression']}, async ({createPage}) => {
+    const page = await createPage(withLogin(userA));
+    const pages = PageManager.from(page).webapp.pages;
+    await createGroup(pages, 'Test Group', [userB]);
+
+    await pages.conversationList().openConversation('Test Group');
+    await pages.conversation().toggleGroupInformation();
+    await pages.conversationDetails().setSelfDeletingMessages('10 seconds');
+
+    await pages.conversation().sendMessage('Message');
+    const message = pages.conversation().getMessage({content: 'Message'});
+    await expect(message).toBeAttached();
+
+    await page.waitForTimeout(10_000);
+    await expect(message).not.toBeAttached();
+  });
 });
