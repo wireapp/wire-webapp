@@ -160,4 +160,19 @@ test.describe('Self Deleting Messages', () => {
     await page.waitForTimeout(10_000);
     await expect(message).not.toBeAttached();
   });
+
+  test(
+    'I want to see the current timer in conversation details',
+    {tag: ['@TC-3716', '@regression']},
+    async ({createPage}) => {
+      const pages = PageManager.from(await createPage(withLogin(userA))).webapp.pages;
+      await createGroup(pages, 'Test Group', [userB]);
+
+      await pages.conversationList().openConversation('Test Group');
+      await pages.conversation().toggleGroupInformation();
+      await pages.conversationDetails().setSelfDeletingMessages('10 seconds');
+
+      await expect(pages.conversationDetails().selfDeletingMessageButton).toContainText('10 seconds');
+    },
+  );
 });
