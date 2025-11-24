@@ -42,6 +42,22 @@ export class TeamRepositoryE2E extends BackendClientE2E {
     return (await response).data.id;
   }
 
+  async acceptTeamInvitation(teamInvitationCode: string, user: Pick<User, 'password' | 'token'>) {
+    await this.axiosInstance.post(
+      'teams/invitations/accept',
+      {
+        code: teamInvitationCode,
+        password: user.password,
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${user.token}`,
+          'Content-Type': 'application/json',
+        },
+      },
+    );
+  }
+
   async addServiceToTeamWhitelist(teamId: string, service: Service, token: string) {
     await this.axiosInstance.post(
       `teams/${teamId}/services/whitelist`,

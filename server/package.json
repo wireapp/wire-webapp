@@ -33,8 +33,11 @@
     "@types/node": "22.5.5",
     "browserslist": "^4.28.0",
     "jest": "29.7.0",
-    "rimraf": "6.1.0",
+    "rimraf": "6.1.2",
     "typescript": "5.6.3"
+  },
+  "resolutions": {
+    "glob": "11.1.0"
   },
   "engines": {
     "node": ">= 20.14.0"

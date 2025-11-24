@@ -19,6 +19,7 @@
 
 import {Navigate, useNavigate} from 'react-router-dom';
 
+import {Runtime} from '@wireapp/commons';
 import {Button, ButtonVariant, CheckRoundIcon, FlexBox} from '@wireapp/react-ui-kit';
 
 import {t} from 'Util/LocalizerUtil';
@@ -47,20 +48,28 @@ export const SetAccountType = () => {
     return <Navigate to={pathWithParams(ROUTE.INDEX)} replace data-uie-name="redirect-login" />;
   }
 
+  const isMacDesktopApp = Runtime.isDesktopApp() && Runtime.isMacOS();
+
   const accountTypeOptions = [
     {
       heading: t('selectTeamAccountTypeOptionHeading'),
       description: t('selectTeamAccountTypeOptionDescription'),
       buttonText: t('selectTeamAccountTypeOptionButtonText'),
       action: onCreateTeamAccount,
-      features: [t('selectTeamAccountTypeOptionFeature1'), t('selectTeamAccountTypeOptionFeature2')],
+      features: [
+        t('selectTeamAccountTypeOptionFeature1'),
+        ...(!isMacDesktopApp ? [t('selectTeamAccountTypeOptionFeature2')] : []),
+      ],
       isPrimary: true,
     },
     {
       heading: t('selectPersonalAccountTypeOptionHeading'),
       description: t('selectPersonalAccountTypeOptionDescription'),
       buttonText: t('selectPersonalAccountTypeOptionButtonText'),
-      features: [t('selectPersonalAccountTypeOptionFeature1'), t('selectPersonalAccountTypeOptionFeature2')],
+      features: [
+        t('selectPersonalAccountTypeOptionFeature1'),
+        ...(!isMacDesktopApp ? [t('selectPersonalAccountTypeOptionFeature2')] : []),
+      ],
       action: onCreatePersonalAccount,
     },
   ];

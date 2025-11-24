@@ -27,8 +27,8 @@ export const loginUser = async (user: User, pageManager: PageManager) => {
   const {pages} = pageManager.webapp;
   await pages.singleSignOn().isSSOPageVisible();
   await pages.singleSignOn().enterEmailOnSSOPage(user.email);
-  await pages.login().inputPassword(user.password);
-  await pages.login().clickSignInButton();
+  await pages.login().passwordInput.fill(user.password);
+  await pages.login().signInButton.click();
 };
 
 export const sendTextMessageToUser = async (pageManager: PageManager, recipient: User, text: string) => {
@@ -114,7 +114,7 @@ export const handleAppLockState = async (pageManager: PageManager, appLockPassCo
 export async function loginAndSetup(user: User, pageManager: PageManager) {
   const {modals, components} = pageManager.webapp;
   await pageManager.openMainPage();
-  await loginUser(user, pageManager); // Verwendet die bestehende loginUser-Funktion
+  await loginUser(user, pageManager);
   await modals.dataShareConsent().clickDecline();
   await components.conversationSidebar().isPageLoaded();
 }
@@ -141,6 +141,18 @@ export async function connectUsersManually(
 
   await userBPages.conversationList().openPendingConnectionRequest();
   await userBPages.connectRequest().clickConnectButton();
+}
+
+/**
+ * Opens the connections tab, searches for the given user and starts a conversation with him
+ * Note: This util only works if both users are part of the same team.
+ */
+export async function connectWithUser(senderPageManager: PageManager, receiver: Pick<User, 'username'>) {
+  const {pages, modals, components} = senderPageManager.webapp;
+  await components.conversationSidebar().clickConnectButton();
+  await pages.startUI().searchInput.fill(receiver.username);
+  await pages.startUI().selectUser(receiver.username);
+  await modals.userProfile().clickStartConversation();
 }
 
 /**

@@ -17,20 +17,20 @@
  *
  */
 
-import axios, {AxiosInstance} from 'axios';
+import {test, expect} from 'test/e2e_tests/test.fixtures';
 
-// ToDo: Fix via export from api-client
-const TEST_API_VERSION = `v13`;
-export class BackendClientE2E {
-  readonly axiosInstance: AxiosInstance;
+test.describe('Authentication', () => {
+  test(
+    'I want to be asked to share telemetry data when I log in',
+    {tag: ['@TC-8780', '@regression']},
+    async ({pageManager, createUser}) => {
+      const {pages, modals} = pageManager.webapp;
+      const user = await createUser({disableTelemetry: false});
 
-  constructor() {
-    this.axiosInstance = axios.create({
-      baseURL: `${process.env.BACKEND_URL}${TEST_API_VERSION}/`,
-      withCredentials: true,
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    });
-  }
-}
+      await pageManager.openLoginPage();
+      await pages.login().login(user);
+
+      await expect(modals.dataShareConsent().modalTitle).toBeVisible();
+    },
+  );
+});

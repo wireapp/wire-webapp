@@ -17,18 +17,18 @@
  *
  */
 
-import axios, {AxiosInstance} from 'axios';
+import type {WebappProperties} from '@wireapp/api-client/lib/user/data/';
 
-// ToDo: Fix via export from api-client
-const TEST_API_VERSION = `v13`;
-export class BackendClientE2E {
-  readonly axiosInstance: AxiosInstance;
+import {TypeUtil} from '@wireapp/commons';
 
-  constructor() {
-    this.axiosInstance = axios.create({
-      baseURL: `${process.env.BACKEND_URL}${TEST_API_VERSION}/`,
-      withCredentials: true,
+import {BackendClientE2E} from './backendClient.e2e';
+
+export class PropertiesRepositoryE2E extends BackendClientE2E {
+  /** Update a property of a user, e.g. to decline sharing telemetry */
+  async putProperty(data: TypeUtil.RecursivePartial<WebappProperties>, token: string) {
+    await this.axiosInstance.put('properties/webapp', data, {
       headers: {
+        Authorization: `Bearer ${token}`,
         'Content-Type': 'application/json',
       },
     });
