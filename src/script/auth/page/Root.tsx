@@ -74,6 +74,8 @@ const RootComponent: FC<RootProps & ConnectedProps & DispatchProps> = ({
   isFetchingSSOSettings,
   doGetSSOSettings,
 }) => {
+  // Injects the helper class used by useRouteA11y so programmatic focus targets (for screen readers)
+  // lose their outlines while the focus trap is active.
   useEffect(() => {
     const style = document.createElement('style');
     style.textContent = `.sr-only-focus:focus, .sr-only-focus:focus-visible { outline: none !important; }`;

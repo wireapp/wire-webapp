@@ -25,10 +25,10 @@ export function useRouteA11y(screenKey?: string) {
   const location = useLocation();
 
   useEffect(() => {
-    const focusTarget =
-      document.querySelector('[data-page-title]') ||
-      document.querySelector('main,[role="main"]') ||
-      document.querySelector('h1');
+    const focusTarget: HTMLElement | null =
+      document.querySelector<HTMLElement>('[data-page-title]') ||
+      document.querySelector<HTMLElement>('main,[role="main"]') ||
+      document.querySelector<HTMLElement>('h1');
 
     if (!focusTarget) {
       return;
@@ -37,7 +37,7 @@ export function useRouteA11y(screenKey?: string) {
     // scroll to top on each route change
     window.scrollTo({top: 0, left: 0});
 
-    const element = focusTarget as HTMLElement;
+    const element = focusTarget;
     element.setAttribute('tabindex', '-1');
     element.classList.add('sr-only-focus');
     element.focus({preventScroll: true});

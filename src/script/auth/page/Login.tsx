@@ -132,10 +132,10 @@ const LoginComponent = ({
 
   const isOauth = UrlUtil.hasURLParameter(QUERY_KEY.SCOPE, window.location.hash);
 
-  const [screen, setScreen] = useState<'login' | 'verify'>('login');
+  const [routeAction, setRouteAction] = useState<'login' | 'verify'>('login');
 
   // this triggers the hook every time screen changes under the same route
-  useRouteA11y(screen);
+  useRouteA11y(routeAction);
 
   const {
     ENABLE_ACCOUNT_REGISTRATION: isAccountRegistrationEnabled,
@@ -304,7 +304,7 @@ const LoginComponent = ({
             if (login.email || login.handle) {
               await doSendTwoFactorCode(login.email || login.handle || '');
               setTwoFactorLoginData(login);
-              setScreen('verify');
+              setRouteAction('verify');
               await doSetLocalStorage(QUERY_KEY.JOIN_EXPIRES, Date.now() + 1000 * 60 * 10);
             }
             break;

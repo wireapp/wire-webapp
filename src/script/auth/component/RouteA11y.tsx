@@ -19,7 +19,7 @@
 
 import {useRouteA11y} from '../hooks/useRouteA11y';
 
-export const RouteA11y: React.FC = () => {
+export const RouteA11y: React.FC = (): null => {
   useRouteA11y();
   return null;
 };
