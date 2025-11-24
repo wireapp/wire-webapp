@@ -55,7 +55,7 @@ let userA: User;
 let userB: User;
 
 test.describe('Folders', () => {
-  test.beforeEach(async ({pageManager: userAPageManager, api}, testInfo) => {
+  test.beforeEach(async ({pageManager: userAPageManager, api}) => {
     userA = getUser();
     userB = getUser();
 
@@ -209,7 +209,7 @@ test.describe('Folders', () => {
   test(
     'I want to see custom folder removed when last conversation is removed',
     {tag: ['@TC-553', '@regression']},
-    async ({pageManager: userAPageManager}) => {},
+    async () => {},
   );
 
   test(
