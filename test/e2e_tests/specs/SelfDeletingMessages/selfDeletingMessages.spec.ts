@@ -144,6 +144,7 @@ test.describe('Self Deleting Messages', () => {
     },
   );
 
+  // ToDo: Put all the tests for global setting into describe with same beforeEach
   test('I want to set a global group conversation timer', {tag: ['@TC-3715', '@regression']}, async ({createPage}) => {
     const page = await createPage(withLogin(userA));
     const pages = PageManager.from(page).webapp.pages;
@@ -225,6 +226,25 @@ test.describe('Self Deleting Messages', () => {
 
       await userAPages.conversationDetails().setSelfDeletingMessages('Off');
       await expect(userBPages.conversation().systemMessages.getByText('turned off the message timer')).toBeAttached();
+    },
+  );
+
+  test(
+    'I want to see ephemeral messages in the search results',
+    {tag: ['@TC-3717', '@regression']},
+    async ({createPage}) => {
+      const page = await createPage(withLogin(userA), withConnectedUser(userB));
+      const pages = PageManager.from(page).webapp.pages;
+
+      await pages.conversation().enableSelfDeletingMessages();
+      await pages.conversation().sendMessage('Test');
+
+      await pages.conversation().searchButton.click();
+      await pages.collection().searchForMessages('Test');
+
+      const searchResults = pages.collection().searchItems;
+      await expect(searchResults).toHaveCount(1);
+      await expect(searchResults).toContainText('Test');
     },
   );
 });
