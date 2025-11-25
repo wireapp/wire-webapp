@@ -163,20 +163,36 @@ jobs:
 
   e2e_crit_flow:
     name: Playwright Critical Flow (precommit)
-    if: ${{ github.repository == 'wireapp/wire-webapp' && github.actor != 'dependabot[bot]' && github.actor != 'dependabot' }}
-    runs-on: [self-hosted, Linux, X64, office]
-    needs: [deploy_to_aws]
+    if: ${{ !cancelled() && github.repository == 'wireapp/wire-webapp' && github.actor != 'dependabot[bot]' && github.actor != 'dependabot' }}
+    runs-on: ubuntu-latest
+    needs: [deploy_to_aws, build_testservice]
     timeout-minutes: 35
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [1, 2, 3, 4]
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           ref: ${{ github.event.pull_request.head.sha }}
 
-      - uses: actions/setup-node@v4
+      - name: Set up JDK
+        uses: actions/setup-java@v4
         with:
-          node-version: 18.16.x
+          java-version: '17'
+          distribution: 'temurin'
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version-file: .nvmrc
           cache: yarn
+
+      - name: Download Testservice Jar
+        uses: actions/download-artifact@v5
+        with:
+          name: kalium-testservice
+          path: testservice
 
       - run: yarn --immutable
       - run: yarn playwright install --with-deps && yarn playwright install chrome
@@ -193,12 +209,49 @@ jobs:
           echo "Using precommit URL: https://wire-webapp-precommit.zinfra.io/"
           curl -s -o /dev/null -w "HTTP %{http_code}\n" https://wire-webapp-precommit.zinfra.io/
 
+      - name: Start Testservice in background
+        run: java -jar testservice/build/libs/testservice-*-all.jar server testservice/config.yml &
+
       - name: Run critical flow tests
         env:
           # TODO: remove hardcoded precommit env in the future when ephemeral PR envs will exist
           # Overrides URL from .env file
           WEBAPP_URL: https://wire-webapp-precommit.zinfra.io/
-        run: yarn e2e-test --grep "@crit-flow-web"
+          TEST_SERVICE_URL: http://localhost:8080 # Run tests against locally running test service
+        run: yarn e2e-test --shard=${{ matrix.shard }}/${{ strategy.job-total }} --grep "@crit-flow-web"
+
+      - name: Upload blob report
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: blob-report-${{ matrix.shard }}
+          path: blob-report
+          retention-days: 1
+
+  e2e-report:
+    runs-on: ubuntu-latest
+    if: ${{ !cancelled() }}
+    needs: [e2e_crit_flow]
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version-file: .nvmrc
+          cache: yarn
+      - run: yarn --immutable
+
+      - name: Download blob reports
+        uses: actions/download-artifact@v5
+        with:
+          path: all-blob-reports
+          pattern: blob-report-*
+          merge-multiple: true
+
+      - name: Merge playwright reports
+        run: yarn playwright merge-reports --reporter html ./all-blob-reports
 
       - name: Upload test report
         if: always()

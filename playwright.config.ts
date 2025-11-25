@@ -17,7 +17,7 @@
  *
  */
 
-import {defineConfig, devices} from '@playwright/test';
+import {defineConfig, devices, ReporterDescription} from '@playwright/test';
 import {config} from 'dotenv';
 
 config({path: './test/e2e_tests/.env'});
@@ -44,6 +44,7 @@ module.exports = defineConfig({
   reporter: [
     ['html', {outputFolder: 'playwright-report', open: 'never'}],
     ['json', {outputFile: 'playwright-report/report.json'}],
+    ...(process.env.CI ? [['blob'] satisfies ReporterDescription] : []),
   ],
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
   use: {
