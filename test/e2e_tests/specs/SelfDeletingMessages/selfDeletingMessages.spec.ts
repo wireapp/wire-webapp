@@ -232,7 +232,7 @@ test.describe('Self Deleting Messages', () => {
       await expect(searchResults).toContainText('Test');
     });
 
-    // Currently the message isn't removed from the search results after its specified lifetime
+    // WPB-21980 - Currently the message isn't removed from the search results after its specified lifetime
     test.skip(
       'I want to to see ephemeral messages disappear from search results when their timer runs out',
       {tag: ['@TC-3731', '@regression']},
