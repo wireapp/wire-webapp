@@ -53,7 +53,8 @@ export class ConversationPage {
   readonly callButton: Locator;
   readonly conversationInfoButton: Locator;
   readonly pingButton: Locator;
-  readonly messages: Locator; // Only contains message items which have been sent successfully
+  /** Messages in conversation, only contains message items which have been sent successfully */
+  readonly messages: Locator;
   readonly messageDetails: Locator;
   readonly messageItems: Locator;
   readonly filesTab: Locator;

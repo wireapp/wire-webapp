@@ -108,7 +108,7 @@ export class ConversationDetailsPage {
   async setSelfDeletingMessages(value: 'Off' | '10 seconds') {
     await this.selfDeletingMessageButton.click();
     const selfDeletingMessagesPanel = this.page.locator('#timed-messages');
-    // I tried to use accessible locators but the radio options are currently not accessible
+    // The radio options are currently not accessible so accessible locators can't be used
     await selfDeletingMessagesPanel.getByRole('radiogroup').locator('label', {hasText: value}).click();
     await selfDeletingMessagesPanel.getByRole('button', {name: 'Go back'}).click();
   }
