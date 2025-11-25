@@ -17,24 +17,9 @@
  *
  */
 
-import {useNavigate} from 'react-router';
+import {useRouteA11y} from '../hooks/useRouteA11y';
 
-import {ArrowIcon, COLOR} from '@wireapp/react-ui-kit';
-
-import {t} from 'Util/LocalizerUtil';
-
-export const BackButton = () => {
-  const navigate = useNavigate();
-
-  return (
-    <button
-      type="button"
-      onClick={() => navigate(-1)}
-      aria-label={t('createPersonalAccount.goBack')}
-      data-uie-name="go-index"
-      css={{background: 'none', border: 'none', cursor: 'pointer'}}
-    >
-      <ArrowIcon direction="left" aria-hidden="true" focusable="false" color={COLOR.TEXT} />
-    </button>
-  );
+export const RouteA11y: React.FC = (): null => {
+  useRouteA11y();
+  return null;
 };
