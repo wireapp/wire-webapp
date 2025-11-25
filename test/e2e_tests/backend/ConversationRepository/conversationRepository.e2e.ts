@@ -86,10 +86,8 @@ export class ConversationRepositoryE2E extends BackendClientE2E {
     }
 
     const response = await this.axiosInstance.post(
-      'conversations/list/v2',
-      {
-        qualified_ids: qualifiedIds,
-      },
+      'conversations/list',
+      {qualified_ids: qualifiedIds},
       {
         headers: {
           Authorization: `Bearer ${token}`,
