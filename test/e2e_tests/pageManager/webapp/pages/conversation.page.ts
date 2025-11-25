@@ -21,7 +21,7 @@ import {Locator, Page} from '@playwright/test';
 
 import {User} from 'test/e2e_tests/data/user';
 import {downloadAssetAndGetFilePath} from 'test/e2e_tests/utils/asset.util';
-import {selectById, selectByClass, selectByDataAttribute} from 'test/e2e_tests/utils/selector.util';
+import {selectByClass, selectByDataAttribute} from 'test/e2e_tests/utils/selector.util';
 
 import {ConfirmModal} from '../modals/confirm.modal';
 
@@ -40,6 +40,7 @@ export class ConversationPage {
   readonly conversationTitle: Locator;
   readonly watermark: Locator;
   readonly timerMessageButton: Locator;
+  readonly timerOffButton: Locator;
   readonly timerTenSecondsButton: Locator;
   readonly openGroupInformationViaName: Locator;
   readonly membersList: Locator;
@@ -52,6 +53,7 @@ export class ConversationPage {
   readonly callButton: Locator;
   readonly conversationInfoButton: Locator;
   readonly pingButton: Locator;
+  /** Messages in conversation, only contains message items which have been sent successfully */
   readonly messages: Locator;
   readonly messageDetails: Locator;
   readonly messageItems: Locator;
@@ -83,7 +85,8 @@ export class ConversationPage {
     this.conversationTitle = page.locator('[data-uie-name="status-conversation-title-bar-label"]');
     this.openGroupInformationViaName = page.locator(selectByDataAttribute('status-conversation-title-bar-label'));
     this.timerMessageButton = page.locator(selectByDataAttribute('do-set-ephemeral-timer'));
-    this.timerTenSecondsButton = page.locator(selectById('btn-10-seconds'));
+    this.timerOffButton = page.getByRole('button', {name: 'Off'});
+    this.timerTenSecondsButton = page.getByRole('button', {name: '10 seconds'});
     this.membersList = page.locator(selectByDataAttribute('list-members'));
     this.adminsList = page.locator(selectByDataAttribute('list-admins'));
     this.leaveConversationButton = page.locator(selectByDataAttribute('do-leave-item-text'));
@@ -98,7 +101,8 @@ export class ConversationPage {
     this.pingButton = page.locator(selectByDataAttribute('do-ping'));
     this.messageItems = page.locator(selectByDataAttribute('item-message'));
     this.messages = page.locator(
-      `${selectByDataAttribute('item-message')} ${selectByClass('message-body')}:not(:has(p${selectByClass('text-foreground')})):has(${selectByClass('text')})`,
+      // The attribute 'send-status' indicates whether the optimistic update for sending the message was successful
+      `${selectByDataAttribute('item-message')}${selectByDataAttribute('2', 'send-status')}`,
     );
     this.messageDetails = page.locator('#message-details');
     this.filesTab = page.locator('#conversation-tab-files');
@@ -171,10 +175,14 @@ export class ConversationPage {
     await message.getByRole('group').getByTestId('do-reply-message').click();
   }
 
-  async sendTimedMessage(message: string) {
+  async enableSelfDeletingMessages() {
     await this.timerMessageButton.click();
     await this.timerTenSecondsButton.click();
-    await this.sendMessage(message);
+  }
+
+  async disableSelfDeletingMessages() {
+    await this.timerMessageButton.click();
+    await this.timerOffButton.click();
   }
 
   async sendMessageWithUserMention(userFullName: string, messageText?: string) {
@@ -219,7 +227,7 @@ export class ConversationPage {
    * @returns a Locator to the matching message(s)
    */
   getMessage(options?: {content?: string | RegExp; sender?: User}): Locator {
-    let message = this.messageItems;
+    let message = this.messages;
 
     if (options?.content) {
       message = message.filter({hasText: options.content});

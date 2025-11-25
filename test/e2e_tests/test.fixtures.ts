@@ -32,9 +32,10 @@ type Fixtures = {
   pageManager: PageManager;
   /**
    * Create a new page within a new browser context - The context and it's pages will be removed after the test automatically
+   * @param ctx BrowserContext - optional browser context to reuse, if not provided, a new one will be created
    * @param setup Array of PagePlugins, effectively functions which will be applied to the page in the given order
    */
-  createPage: (...setup: PagePlugin[]) => Promise<Page>;
+  createPage: {(...setup: PagePlugin[]): Promise<Page>; (ctx: BrowserContext, ...setup: PagePlugin[]): Promise<Page>};
   /**
    * Create a new user
    * Note: The created user will be deleted automatically once the test is finished
@@ -67,12 +68,25 @@ export const test = baseTest.extend<Fixtures>({
   createPage: async ({browser}, use) => {
     const contexts: BrowserContext[] = [];
 
-    await use(async (...setup) => {
-      const context = await browser.newContext();
-      const page = await context.newPage();
-      contexts.push(context);
+    // Due to the function overload firstParam can be either a PagePlugin or a BrowserContext to reuse
+    await use(async (firstParam, ...plugins) => {
+      let context: BrowserContext;
+      let setupFns: PagePlugin[];
 
-      for (const setupFn of setup) {
+      // Check if firstParam is a browser context or PagePlugin
+      if (typeof firstParam === 'function') {
+        // Create a new context, add it to the created contexts and treat firstParam as page plugin
+        context = await browser.newContext();
+        contexts.push(context);
+        setupFns = [firstParam, ...plugins];
+      } else {
+        // Otherwise reuse existing context if provided
+        context = firstParam;
+        setupFns = plugins;
+      }
+
+      const page = await context.newPage();
+      for (const setupFn of setupFns) {
         await setupFn(page);
       }
 

@@ -93,6 +93,7 @@ const MessageTimerButton = ({conversation, teamState = container.resolve(TeamSta
       onClick={isTimerDisabled ? undefined : onClick}
       onKeyDown={handleContextKeyDown}
       title={t('tooltipConversationEphemeral')}
+      disabled={isTimerDisabled}
       data-uie-value={isTimerDisabled ? 'disabled' : 'enabled'}
       data-uie-name="do-set-ephemeral-timer"
       type="button"
