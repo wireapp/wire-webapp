@@ -71,15 +71,6 @@ export class ApiManagerE2E {
     }
   }
 
-  async sendMessageToPersonalConversation(sender: User, receiver: User, text: string) {
-    const senderToken = sender.token ?? (await this.auth.loginUser(sender)).data.access_token;
-    const receiverId = receiver.id ?? (await this.auth.loginUser(receiver)).data.user;
-    const conversationId = await this.conversation.getMLSConversationWithUser(senderToken, receiverId);
-
-    // Using the first device from the list of devices
-    await this.testService.sendText(sender.devices[0], conversationId, text);
-  }
-
   async createPersonalUser(user: User, invitationCode?: string) {
     // 1. Register
     const registerResponse = await this.auth.registerUser(user, invitationCode);
