@@ -251,7 +251,7 @@ jobs:
           merge-multiple: true
 
       - name: Merge playwright reports
-        run: yarn playwright merge-reports --reporter html,json ./all-blob-reports
+        run: yarn playwright merge-reports --config ./playwright.config.ts ./all-blob-reports
 
       - name: Upload test report
         if: always()

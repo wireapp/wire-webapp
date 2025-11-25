@@ -17,7 +17,7 @@
  *
  */
 
-import {defineConfig, devices} from '@playwright/test';
+import {defineConfig, devices, ReporterDescription} from '@playwright/test';
 import {config} from 'dotenv';
 
 config({path: './test/e2e_tests/.env'});
@@ -41,12 +41,12 @@ module.exports = defineConfig({
   /* Opt out of parallel tests on CI. */
   workers: process.env.CI ? numberOfParallelWorkersOnCI : undefined,
   /* Reporter to use. See https://playwright.dev/docs/test-reporters */
-  reporter: process.env.CI
-    ? [['github'], ['blob']] // During CI only blob reports will be generated to later merge and convert to html and json
-    : [
-        ['html', {outputFolder: 'playwright-report', open: 'never'}],
-        ['json', {outputFile: 'playwright-report/report.json'}],
-      ],
+  reporter: [
+    ['html', {outputFolder: 'playwright-report', open: 'never'}],
+    ['json', {outputFile: 'playwright-report/report.json'}],
+    // Add github and blob reporters in CI otherwise html and json are enough
+    ...(process.env.CI ? ([['github'], ['blob']] satisfies ReporterDescription[]) : []),
+  ],
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
   use: {
     /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
