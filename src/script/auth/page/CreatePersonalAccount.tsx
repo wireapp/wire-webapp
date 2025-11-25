@@ -51,7 +51,9 @@ export const CreatePersonalAccount = () => {
             <div css={styles.backButtonContainer}>
               <BackButton />
             </div>
-            <p css={styles.header}>{t('createPersonalAccount.headLine')}</p>
+            <p css={styles.header} role="heading" aria-level={1} data-page-title tabIndex={-1}>
+              {t('createPersonalAccount.headLine')}
+            </p>
             <AccountForm onSubmit={onSubmit} />
             <p css={styles.footer}>{t('createPersonalAccount.subHeader')}</p>
             <a css={styles.teamCreateButton} href={EXTERNAL_ROUTE.WIRE_TEAMS_SIGNUP} target="_blank" rel="noreferrer">

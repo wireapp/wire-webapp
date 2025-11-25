@@ -237,7 +237,8 @@
     "xml2js": "0.5.0",
     "@stablelib/utf8": "1.0.2",
     "dexie-encrypted@2.0.0": "patch:dexie-encrypted@npm%3A2.0.0#./.yarn/patches/dexie-encrypted-npm-2.0.0-eb61eb5975.patch",
-    "axios": "^1.9.0"
+    "axios": "^1.9.0",
+    "js-yaml": "^4.1.0"
   },
   "version": "0.27.0",
   "packageManager": "yarn@4.1.1"

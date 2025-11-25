@@ -81,7 +81,9 @@ export const SetAccountType = () => {
           <FlexBox css={styles.headerIcon}>
             <BackButton />
           </FlexBox>
-          <FlexBox css={styles.headerText}>{t('selectAccountTypeHeading')}</FlexBox>
+          <FlexBox css={styles.headerText} role="heading" aria-level={1} data-page-title tabIndex={-1}>
+            {t('selectAccountTypeHeading')}
+          </FlexBox>
         </FlexBox>
         <FlexBox css={styles.optionWrapper}>
           {accountTypeOptions.map((option, index) => (

@@ -259,7 +259,13 @@ const SingleSignOnComponent = ({hasDefaultSSOCode}: Props & ConnectedProps & Dis
               <div>
                 {isEnterpriseLoginV2Enabled ? (
                   <>
-                    <div css={{fontWeight: '500', fontSize: '1.5rem'}}>
+                    <div
+                      css={{fontWeight: '500', fontSize: '1.5rem'}}
+                      role="heading"
+                      aria-level={1}
+                      data-page-title
+                      tabIndex={-1}
+                    >
                       {t('index.welcome', {brandName: Config.getConfig().BACKEND_NAME})}
                     </div>
 

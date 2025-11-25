@@ -25,7 +25,7 @@ import {connect} from 'react-redux';
 import {useNavigate} from 'react-router-dom';
 import {AnyAction, Dispatch} from 'redux';
 
-import {CodeInput, FlexBox, Text} from '@wireapp/react-ui-kit';
+import {ActionLinkButton, CodeInput, FlexBox, Text} from '@wireapp/react-ui-kit';
 
 import {t} from 'Util/LocalizerUtil';
 import {getLogger} from 'Util/Logger';
@@ -35,7 +35,6 @@ import {styles} from './VerifyEmailCode.styles';
 
 import {AccountRegistrationLayout} from '../component/AccountRegistrationLayout';
 import {BackButton} from '../component/BackButton';
-import {LinkButton} from '../component/LinkButton';
 import {actionRoot as ROOT_ACTIONS} from '../module/action';
 import {RootState, bindActionCreators} from '../module/reducer';
 import * as AuthSelector from '../module/selector/AuthSelector';
@@ -103,11 +102,17 @@ const VerifyEmailCodeComponent = ({
               }}
             />
           </Text>
-          <CodeInput style={styles.codeInput} onCodeComplete={createAccount} data-uie-name="enter-code" />
+          <CodeInput
+            style={styles.codeInput}
+            onCodeComplete={createAccount}
+            data-uie-name="enter-code"
+            codeInputLabel={t('verify.codeLabel')}
+            codePlaceholder={t('verify.codePlaceholder')}
+          />
           {parseError(authError)}
-          <LinkButton onClick={resendCode} data-uie-name="do-resend-code" css={styles.resendLink}>
+          <ActionLinkButton onClick={resendCode} data-uie-name="do-resend-code" css={styles.resendLink}>
             {t('verify.resendCode')}
-          </LinkButton>
+          </ActionLinkButton>
         </FlexBox>
       </AccountRegistrationLayout>
     </Page>

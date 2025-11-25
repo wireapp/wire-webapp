@@ -274,6 +274,8 @@ declare module 'I18n/en-US.json' {
     'authLoginTitle': `Log in`;
     'authPlaceholderEmail': `Email`;
     'authPlaceholderPassword': `Password`;
+    'showTogglePasswordLabel': `Show password`;
+    'hideTogglePasswordLabel': `Hide password`;
     'authPostedResend': `Resend to {email}`;
     'authPostedResendAction': `No email showing up?`;
     'authPostedResendDetail': `Check your email inbox and follow the instructions.`;
@@ -584,6 +586,7 @@ declare module 'I18n/en-US.json' {
     'conversationAudioAssetUploadFailed': `Upload failed: {name}`;
     'conversationAudioAssetUploading': `Uploading: {name}`;
     'conversationButtonSeparator': `or`;
+    'conversationCellsConversationEnabled': `File collaboration (Cells beta) is on`;
     'conversationClassified': `Security level: VS-NfD`;
     'conversationCommonFeature1': `Up to [bold]{capacity}[/bold] people`;
     'conversationCommonFeature2': `Video conferencing`;
@@ -602,7 +605,6 @@ declare module 'I18n/en-US.json' {
     'conversationContextMenuLike': `Like`;
     'conversationContextMenuReply': `Reply`;
     'conversationContextMenuUnlike': `Unlike`;
-    'conversationCellsConversationEnabled': `File collaboration (Cells beta) is on`;
     'conversationCreateReceiptsEnabled': `Read receipts are on`;
     'conversationCreateTeam': `with [showmore]all team members[/showmore]`;
     'conversationCreateTeamGuest': `with [showmore]all team members and one guest[/showmore]`;
@@ -625,8 +627,8 @@ declare module 'I18n/en-US.json' {
     'conversationDetailsActionArchive': `Archive`;
     'conversationDetailsActionBlock': `Block`;
     'conversationDetailsActionCancelRequest': `Cancel request`;
-    'conversationDetailsActionCellsTitle': `File collaboration (Cells beta version) is on`;
     'conversationDetailsActionCellsOption': `Permanently on for this conversation.`;
+    'conversationDetailsActionCellsTitle': `File collaboration (Cells beta version) is on`;
     'conversationDetailsActionClear': `Clear content`;
     'conversationDetailsActionConversationParticipants': `Show all ({number})`;
     'conversationDetailsActionCreateGroup': `Create group`;
@@ -1973,6 +1975,8 @@ declare module 'I18n/en-US.json' {
     'verify.headline': `You’ve got mail`;
     'verify.resendCode': `Resend code`;
     'verify.subhead': `Enter the six-digit verification code we sent to{newline}{email}`;
+    'verify.codeLabel': `Six-digit code`;
+    'verify.codePlaceholder': `Input field, enter digit`;
     'videoCallMenuMoreAddReaction': `Add reaction`;
     'videoCallMenuMoreAudioSettings': `Audio Settings`;
     'videoCallMenuMoreChangeView': `Change view`;

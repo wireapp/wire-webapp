@@ -140,6 +140,8 @@ const LoginForm = ({isFetching, onSubmit}: LoginFormProps) => {
         pattern={'.{1,1024}'}
         required
         data-uie-name="enter-password"
+        showTogglePasswordLabel={t('showTogglePasswordLabel')}
+        hideTogglePasswordLabel={t('hideTogglePasswordLabel')}
       />
 
       {isFetching ? (

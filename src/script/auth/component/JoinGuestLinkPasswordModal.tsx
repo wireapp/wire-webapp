@@ -83,6 +83,8 @@ const JoinGuestLinkPasswordModal = ({
             id="guest_link_join_password"
             className="modal__input"
             type="password"
+            showTogglePasswordLabel={t('showTogglePasswordLabel')}
+            hideTogglePasswordLabel={t('hideTogglePasswordLabel')}
             autoComplete="off"
             value={passwordValue}
             onChange={event => setPasswordValue(event.currentTarget.value)}
