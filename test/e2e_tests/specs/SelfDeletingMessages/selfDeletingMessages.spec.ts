@@ -17,6 +17,8 @@
  *
  */
 
+import {Locator} from '@playwright/test';
+
 import {User} from 'test/e2e_tests/data/user';
 import {PageManager} from 'test/e2e_tests/pageManager';
 import {test, expect, withLogin, withConnectedUser} from 'test/e2e_tests/test.fixtures';
@@ -230,21 +232,24 @@ test.describe('Self Deleting Messages', () => {
   );
 
   test.describe('in search results', () => {
-    let pages: PageManager['webapp']['pages'];
+    let searchResults: Locator;
 
     test.beforeEach(async ({createPage}) => {
-      pages = PageManager.from(await createPage(withLogin(userA), withConnectedUser(userB))).webapp.pages;
+      const [userAPages, userBPages] = await Promise.all([
+        PageManager.from(createPage(withLogin(userA), withConnectedUser(userB))).then(pm => pm.webapp.pages),
+        PageManager.from(createPage(withLogin(userB), withConnectedUser(userA))).then(pm => pm.webapp.pages),
+      ]);
 
-      await pages.conversation().enableSelfDeletingMessages();
-      await pages.conversation().sendMessage('Test');
+      await userAPages.conversation().enableSelfDeletingMessages();
+      await userAPages.conversation().sendMessage('Test');
+      await expect(userBPages.conversation().getMessage({content: 'Test'})).toBeVisible();
 
-      await pages.conversation().searchButton.click();
-      await pages.collection().searchForMessages('Test');
+      await userBPages.conversation().searchButton.click();
+      await userBPages.collection().searchForMessages('Test');
+      searchResults = userBPages.collection().searchItems;
     });
 
     test('I want to see ephemeral messages in the search results', {tag: ['@TC-3717', '@regression']}, async () => {
-      const searchResults = pages.collection().searchItems;
-
       await expect(searchResults).toHaveCount(1);
       await expect(searchResults).toContainText('Test');
     });
@@ -254,7 +259,6 @@ test.describe('Self Deleting Messages', () => {
       'I want to to see ephemeral messages disappear from search results when their timer runs out',
       {tag: ['@TC-3731', '@regression']},
       async () => {
-        const searchResults = pages.collection().searchItems;
         await expect(searchResults).toHaveCount(1);
 
         await new Promise(res => setTimeout(res, 10_000)); // Wait 10s for the message to expire
