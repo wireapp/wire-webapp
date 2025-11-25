@@ -146,9 +146,6 @@ jobs:
         uses: gradle/actions/wrapper-validation@v3
 
       - name: Build the testservice
-        env:
-          GITHUB_USER: ${{ github.actor }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: ./gradlew :testservice:shadowJar
 
       - name: Upload jar
