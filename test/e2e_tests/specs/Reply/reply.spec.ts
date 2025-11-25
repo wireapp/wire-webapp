@@ -29,7 +29,7 @@ test.describe('Reply', () => {
   let userA: User;
   let userB: User;
 
-  test.beforeEach(async ({createTeam, createUser}) => {
+  test.beforeEach(async ({createTeam}) => {
     const team = await createTeam('Test Team', {withMembers: 1});
     userA = team.owner;
     userB = team.members[0];
@@ -49,7 +49,8 @@ test.describe('Reply', () => {
   test('I should not be able to reply to timed messages', {tag: ['@TC-8039', '@regression']}, async ({createPage}) => {
     const pages = (await PageManager.from(createPage(withLogin(userA), withConnectedUser(userB)))).webapp.pages;
 
-    await pages.conversation().sendTimedMessage('Gone in 10s');
+    await pages.conversation().enableSelfDeletingMessages();
+    await pages.conversation().sendMessage('Gone in 10s');
     const message = pages.conversation().getMessage({content: 'Gone in 10s'});
     await message.hover();
 
@@ -251,7 +252,8 @@ test.describe('Reply', () => {
 
       const message = pages.conversation().getMessage({sender: userA});
       await pages.conversation().replyToMessage(message);
-      await pages.conversation().sendTimedMessage('Timed Reply');
+      await pages.conversation().enableSelfDeletingMessages();
+      await pages.conversation().sendMessage('Timed Reply');
 
       const reply = pages.conversation().getMessage({content: 'Timed Reply'});
       await expect(reply.getByTestId('quote-item')).toContainText('Message');

@@ -27,6 +27,7 @@ export class ConversationDetailsPage {
   readonly addPeopleButton: Locator;
   readonly conversationDetails: Locator;
   readonly guestOptionsButton: Locator;
+  readonly selfDeletingMessageButton: Locator;
   readonly archiveButton: Locator;
 
   constructor(page: Page) {
@@ -35,6 +36,7 @@ export class ConversationDetailsPage {
     this.addPeopleButton = page.locator(`${selectByDataAttribute('go-add-people')}`);
     this.conversationDetails = page.locator('#conversation-details');
     this.guestOptionsButton = this.conversationDetails.locator('[data-uie-name="go-guest-options"]');
+    this.selfDeletingMessageButton = this.conversationDetails.getByRole('button', {name: 'Self-deleting messages'});
     this.archiveButton = this.conversationDetails.locator(selectByDataAttribute('do-archive'));
   }
 
@@ -100,6 +102,15 @@ export class ConversationDetailsPage {
 
   async clickArchiveButton() {
     await this.archiveButton.click();
+  }
+
+  /** Opens the self deleting messages panel, selects the given value and closes it again */
+  async setSelfDeletingMessages(value: 'Off' | '10 seconds') {
+    await this.selfDeletingMessageButton.click();
+    const selfDeletingMessagesPanel = this.page.locator('#timed-messages');
+    // The radio options are currently not accessible so accessible locators can't be used
+    await selfDeletingMessagesPanel.getByRole('radiogroup').locator('label', {hasText: value}).click();
+    await selfDeletingMessagesPanel.getByRole('button', {name: 'Go back'}).click();
   }
 
   async addServiceToConversation(serviceName: string) {
