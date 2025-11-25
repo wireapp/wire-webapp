@@ -270,7 +270,7 @@ jobs:
         if: always()
         id: generate_comment
         run: |
-          node test/e2e_tests/scripts/create-playwright-report-summary.js
+          node --experimental-strip-types test/e2e_tests/scripts/create-playwright-report-summary.ts
           COMMENT=$(cat playwright-report-summary.txt)
           echo "comment<<EOF" >> $GITHUB_OUTPUT
           echo "$COMMENT" >> $GITHUB_OUTPUT
