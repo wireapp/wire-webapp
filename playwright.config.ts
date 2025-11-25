@@ -42,7 +42,7 @@ module.exports = defineConfig({
   workers: process.env.CI ? numberOfParallelWorkersOnCI : undefined,
   /* Reporter to use. See https://playwright.dev/docs/test-reporters */
   reporter: process.env.CI
-    ? 'blob' // During CI only blob reports will be generated to later merge and convert to html and json
+    ? [['github'], ['blob']] // During CI only blob reports will be generated to later merge and convert to html and json
     : [
         ['html', {outputFolder: 'playwright-report', open: 'never'}],
         ['json', {outputFile: 'playwright-report/report.json'}],
