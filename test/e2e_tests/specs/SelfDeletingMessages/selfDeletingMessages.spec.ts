@@ -146,90 +146,68 @@ test.describe('Self Deleting Messages', () => {
     },
   );
 
-  // ToDo: Put all the tests for global setting into describe with same beforeEach
-  test('I want to set a global group conversation timer', {tag: ['@TC-3715', '@regression']}, async ({createPage}) => {
-    const page = await createPage(withLogin(userA));
-    const pages = PageManager.from(page).webapp.pages;
-    await createGroup(pages, 'Test Group', [userB]);
+  test.describe('set globally in group conversation', () => {
+    let userAPages: PageManager['webapp']['pages'];
+    let userBPages: PageManager['webapp']['pages'];
 
-    await pages.conversationList().openConversation('Test Group');
-    await pages.conversation().toggleGroupInformation();
-    await pages.conversationDetails().setSelfDeletingMessages('10 seconds');
-
-    await pages.conversation().sendMessage('Message');
-    const message = pages.conversation().getMessage({content: 'Message'});
-    await expect(message).toBeAttached();
-
-    await page.waitForTimeout(10_000);
-    await expect(message).not.toBeAttached();
-  });
-
-  test(
-    'I want to see the current timer in conversation details',
-    {tag: ['@TC-3716', '@regression']},
-    async ({createPage}) => {
-      const pages = PageManager.from(await createPage(withLogin(userA))).webapp.pages;
-      await createGroup(pages, 'Test Group', [userB]);
-
-      await pages.conversationList().openConversation('Test Group');
-      await pages.conversation().toggleGroupInformation();
-      await pages.conversationDetails().setSelfDeletingMessages('10 seconds');
-
-      await expect(pages.conversationDetails().selfDeletingMessageButton).toContainText('10 seconds');
-    },
-  );
-
-  test(
-    'I want to see timed message disable in an input bar when global settings conversation options are set',
-    {tag: ['@TC-3718', '@regression']},
-    async ({createPage}) => {
-      const pages = PageManager.from(await createPage(withLogin(userA))).webapp.pages;
-      await createGroup(pages, 'Test Group', [userB]);
-
-      await pages.conversationList().openConversation('Test Group');
-      await pages.conversation().toggleGroupInformation();
-      await pages.conversationDetails().setSelfDeletingMessages('10 seconds');
-
-      await expect(pages.conversation().timerMessageButton).toBeDisabled();
-    },
-  );
-
-  test(
-    'I want to see the ephemeral indicator is updated in the input field if someone sets a global timer in conversation options',
-    {tag: ['@TC-3719', '@regression']},
-    async ({createPage}) => {
-      const pages = PageManager.from(await createPage(withLogin(userA))).webapp.pages;
-      await createGroup(pages, 'Test Group', [userB]);
-
-      await pages.conversationList().openConversation('Test Group');
-      await pages.conversation().toggleGroupInformation();
-      await pages.conversationDetails().setSelfDeletingMessages('10 seconds');
-
-      await expect(pages.conversation().timerMessageButton).toContainText('s10');
-    },
-  );
-
-  test(
-    'I want to see a system message that a global timer was set or changed or removed in conversation options',
-    {tag: ['@TC-3720', '@regression']},
-    async ({createPage}) => {
-      const [userAPage, userBPage] = await Promise.all([createPage(withLogin(userA)), createPage(withLogin(userB))]);
-      const [userAPages, userBPages] = [userAPage, userBPage].map(page => PageManager.from(page).webapp.pages);
+    test.beforeEach(async ({createPage}) => {
+      [userAPages, userBPages] = await Promise.all([
+        PageManager.from(createPage(withLogin(userA))).then(pm => pm.webapp.pages),
+        PageManager.from(createPage(withLogin(userB))).then(pm => pm.webapp.pages),
+      ]);
       await createGroup(userAPages, 'Test Group', [userB]);
 
       await userAPages.conversationList().openConversation('Test Group');
+      await userBPages.conversationList().openConversation('Test Group');
+
       await userAPages.conversation().toggleGroupInformation();
       await userAPages.conversationDetails().setSelfDeletingMessages('10 seconds');
+      await userAPages.conversation().toggleGroupInformation();
+    });
 
-      await userBPages.conversationList().openConversation('Test Group');
-      await expect(
-        userBPages.conversation().systemMessages.getByText('set the message timer to 10 seconds'),
-      ).toBeAttached();
+    test('I want to set a global group conversation timer', {tag: ['@TC-3715', '@regression']}, async () => {
+      await userAPages.conversation().sendMessage('Message');
+      const message = userBPages.conversation().getMessage({content: 'Message'});
+      await expect(message).toBeAttached();
 
-      await userAPages.conversationDetails().setSelfDeletingMessages('Off');
-      await expect(userBPages.conversation().systemMessages.getByText('turned off the message timer')).toBeAttached();
-    },
-  );
+      await new Promise(res => setTimeout(res, 10_000));
+      await expect(message).not.toBeAttached();
+    });
+
+    test('I want to see the current timer in conversation details', {tag: ['@TC-3716', '@regression']}, async () => {
+      await userBPages.conversation().toggleGroupInformation();
+      await expect(userBPages.conversationDetails().selfDeletingMessageButton).toContainText('10 seconds');
+    });
+
+    test(
+      'I want to see timed message disable in an input bar when global settings conversation options are set',
+      {tag: ['@TC-3718', '@regression']},
+      async () => {
+        await expect(userBPages.conversation().timerMessageButton).toBeDisabled();
+      },
+    );
+
+    test(
+      'I want to see the ephemeral indicator is updated in the input field if someone sets a global timer in conversation options',
+      {tag: ['@TC-3719', '@regression']},
+      async () => {
+        await expect(userBPages.conversation().timerMessageButton).toContainText('s10');
+      },
+    );
+
+    test(
+      'I want to see a system message that a global timer was set or changed or removed in conversation options',
+      {tag: ['@TC-3720', '@regression']},
+      async () => {
+        const userBSystemMessages = userBPages.conversation().systemMessages;
+        await expect(userBSystemMessages.getByText('set the message timer to 10 seconds')).toBeAttached();
+
+        await userAPages.conversation().toggleGroupInformation();
+        await userAPages.conversationDetails().setSelfDeletingMessages('Off');
+        await expect(userBSystemMessages.getByText('turned off the message timer')).toBeAttached();
+      },
+    );
+  });
 
   test.describe('in search results', () => {
     let searchResults: Locator;
