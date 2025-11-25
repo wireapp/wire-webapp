@@ -195,7 +195,7 @@ jobs:
           path: testservice
 
       - run: yarn --immutable
-      - run: yarn playwright install --with-deps && yarn playwright install chrome
+      - run: yarn playwright install --with-deps chrome
       - uses: 1password/install-cli-action@143a85f84a90555d121cde2ff5872e393a47ab9f
 
       - name: Generate env file
