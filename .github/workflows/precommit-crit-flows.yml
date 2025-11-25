@@ -35,9 +35,9 @@ jobs:
           fetch-depth: 0
           ref: ${{ github.event.pull_request.head.sha }}
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v6
         with:
-          node-version: 18.16.x
+          node-version-file: .nvmrc
           cache: yarn
 
       - run: yarn --immutable
