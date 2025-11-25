@@ -45,7 +45,7 @@ module.exports = defineConfig({
     ['html', {outputFolder: 'playwright-report', open: 'never'}],
     ['json', {outputFile: 'playwright-report/report.json'}],
     // Add github and blob reporters in CI otherwise html and json are enough
-    ...(process.env.CI ? ([['github'], ['blob']] satisfies ReporterDescription[]) : []),
+    ...(process.env.CI ? ([['line'], ['blob']] satisfies ReporterDescription[]) : []),
   ],
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
   use: {
