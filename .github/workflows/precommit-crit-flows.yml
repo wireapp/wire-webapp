@@ -124,6 +124,43 @@ jobs:
             echo "❌ Deployment failed"; exit 1
           fi
 
+  build_testservice:
+    name: Build Kalium Test Service
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          repository: wireapp/kalium
+          ref: main
+
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Gradle Cache
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Validate Gradle wrapper
+        uses: gradle/actions/wrapper-validation@v3
+
+      - name: Build the testservice
+        env:
+          GITHUB_USER: ${{ github.actor }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: ./gradlew :testservice:jar
+
+      - name: Upload jar
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: kalium-testservice
+          path: |
+            testservice/build/libs/
+            testservice/config.yml
+          retention-days: 1
+
   e2e_crit_flow:
     name: Playwright Critical Flow (precommit)
     if: ${{ github.repository == 'wireapp/wire-webapp' && github.actor != 'dependabot[bot]' && github.actor != 'dependabot' }}
