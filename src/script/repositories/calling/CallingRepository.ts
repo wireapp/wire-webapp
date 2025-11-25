@@ -1703,7 +1703,7 @@ export class CallingRepository {
       call.muteState(shouldMute ? MuteState.SELF_MUTED : MuteState.NOT_MUTED);
       return;
     }
-    if (call.hasWorkingAudioInput === false && call.muteState() !== MuteState.NOT_MUTED) {
+    if (!shouldMute && call.hasWorkingAudioInput === false && call.muteState() !== MuteState.NOT_MUTED) {
       this.showNoAudioInputModal();
       return;
     }
