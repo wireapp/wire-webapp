@@ -229,46 +229,38 @@ test.describe('Self Deleting Messages', () => {
     },
   );
 
-  test(
-    'I want to see ephemeral messages in the search results',
-    {tag: ['@TC-3717', '@regression']},
-    async ({createPage}) => {
-      const page = await createPage(withLogin(userA), withConnectedUser(userB));
-      const pages = PageManager.from(page).webapp.pages;
+  test.describe('in search results', () => {
+    let pages: PageManager['webapp']['pages'];
+
+    test.beforeEach(async ({createPage}) => {
+      pages = PageManager.from(await createPage(withLogin(userA), withConnectedUser(userB))).webapp.pages;
 
       await pages.conversation().enableSelfDeletingMessages();
       await pages.conversation().sendMessage('Test');
 
       await pages.conversation().searchButton.click();
       await pages.collection().searchForMessages('Test');
+    });
 
+    test('I want to see ephemeral messages in the search results', {tag: ['@TC-3717', '@regression']}, async () => {
       const searchResults = pages.collection().searchItems;
+
       await expect(searchResults).toHaveCount(1);
       await expect(searchResults).toContainText('Test');
-    },
-  );
+    });
 
-  // Currently the message isn't removed from the search results after its specified lifetime
-  test.skip(
-    'I want to to see ephemeral messages disappear from search results when their timer runs out',
-    {tag: ['@TC-3731', '@regression']},
-    async ({createPage}) => {
-      const page = await createPage(withLogin(userA), withConnectedUser(userB));
-      const pages = PageManager.from(page).webapp.pages;
+    // Currently the message isn't removed from the search results after its specified lifetime
+    test.skip(
+      'I want to to see ephemeral messages disappear from search results when their timer runs out',
+      {tag: ['@TC-3731', '@regression']},
+      async () => {
+        const searchResults = pages.collection().searchItems;
+        await expect(searchResults).toHaveCount(1);
 
-      await pages.conversation().enableSelfDeletingMessages();
-      await pages.conversation().sendMessage('Test');
-      await expect(pages.conversation().getMessage({content: 'Test'})).toBeVisible();
+        await new Promise(res => setTimeout(res, 10_000)); // Wait 10s for the message to expire
 
-      await pages.conversation().searchButton.click();
-      await pages.collection().searchForMessages('Test');
-
-      const searchResults = pages.collection().searchItems;
-      await expect(searchResults).toHaveCount(1);
-
-      await page.waitForTimeout(10_000);
-
-      await expect(searchResults).toHaveCount(0);
-    },
-  );
+        await expect(searchResults).toHaveCount(0);
+      },
+    );
+  });
 });
