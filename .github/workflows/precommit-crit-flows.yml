@@ -207,7 +207,10 @@ jobs:
           curl -s -o /dev/null -w "HTTP %{http_code}\n" https://wire-webapp-precommit.zinfra.io/
 
       - name: Start Testservice in background
-        run: java -jar testservice/build/libs/testservice-*-all.jar server testservice/config.yml &
+        id: start-testservice
+        run: |
+          java -jar testservice/build/libs/testservice-*-all.jar server testservice/config.yml &
+          echo TESTSERVICE_PID=$! >> "$GITHUB_OUTPUT"
 
       - name: Run critical flow tests
         env:
@@ -224,6 +227,11 @@ jobs:
           name: blob-report-${{ matrix.shard }}
           path: blob-report
           retention-days: 1
+
+      - name: Stop Testservice
+        run: kill -SIGKILL $TESTSERVICE_PID
+        env:
+          TESTSERVICE_PID: ${{ steps.start-testservice.outputs.TESTSERVICE_PID }}
 
   e2e-report:
     runs-on: ubuntu-latest
