@@ -52,4 +52,18 @@ test.describe('Authentication', () => {
       await expect(modals.dataShareConsent().modalTitle).toBeVisible();
     },
   );
+
+  test(
+    'Verify sign in error appearance in case of suspended team account',
+    {tag: ['@TC-3468', '@regression']},
+    async ({pageManager}) => {
+      const {pages} = pageManager.webapp;
+      await pageManager.openLoginPage();
+
+      const userOfSuspendedTeam = {email: 'sven+team6@wire.com', password: '12345678'};
+      await pages.login().login(userOfSuspendedTeam);
+
+      await expect(pages.login().loginErrorText).toHaveText('This account is no longer authorized to log in');
+    },
+  );
 });
