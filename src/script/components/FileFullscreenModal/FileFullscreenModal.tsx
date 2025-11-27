@@ -17,11 +17,14 @@
  *
  */
 
+import {useState} from 'react';
+
 import {PDFViewer} from 'Components/FileFullscreenModal/PdfViewer/PdfViewer';
 import {FullscreenModal} from 'Components/FullscreenModal/FullscreenModal';
 import {getFileTypeFromExtension} from 'Util/getFileTypeFromExtension/getFileTypeFromExtension';
 import {getFileExtensionFromUrl} from 'Util/util';
 
+import {FileEditor} from './FileEditor/FileEditor';
 import {FileHeader} from './FileHeader/FileHeader';
 import {FileLoader} from './FileLoader/FileLoader';
 import {ImageFileView} from './ImageFileView/ImageFileView';
@@ -41,7 +44,10 @@ interface FileFullscreenModalProps {
   senderName: string;
   timestamp: number;
   badges?: string[];
+  isEditMode?: boolean;
 }
+
+const EDITABLE_FILE_EXTENSIONS = ['odf', 'docx', 'xlsx', 'pptx'];
 
 export const FileFullscreenModal = ({
   id,
@@ -55,7 +61,11 @@ export const FileFullscreenModal = ({
   senderName,
   timestamp,
   badges,
+  isEditMode,
 }: FileFullscreenModalProps) => {
+  const [isEditableState, setIsEditableState] = useState(isEditMode);
+  const isEditable = EDITABLE_FILE_EXTENSIONS.includes(fileExtension.toLowerCase());
+
   return (
     <FullscreenModal id={id} isOpen={isOpen} onClose={onClose}>
       <FileHeader
@@ -66,16 +76,23 @@ export const FileFullscreenModal = ({
         senderName={senderName}
         timestamp={timestamp}
         badges={badges}
+        isInEditMode={isEditableState}
+        onEditModeChange={setIsEditableState}
+        isEditable={isEditable}
       />
-      <ModalContent
-        fileExtension={fileExtension}
-        filePreviewUrl={filePreviewUrl}
-        fileName={fileName}
-        fileUrl={fileUrl}
-        senderName={senderName}
-        timestamp={timestamp}
-        status={status}
-      />
+      {isEditableState && isEditable ? (
+        <FileEditor id={id} />
+      ) : (
+        <ModalContent
+          fileExtension={fileExtension}
+          filePreviewUrl={filePreviewUrl}
+          fileName={fileName}
+          fileUrl={fileUrl}
+          senderName={senderName}
+          timestamp={timestamp}
+          status={status}
+        />
+      )}
     </FullscreenModal>
   );
 };

@@ -17,6 +17,7 @@
  *
  */
 
+import {NodeFlags, RequestConfig} from '@wireapp/api-client/lib/cells';
 import {container, singleton} from 'tsyringe';
 
 import {createUuid} from 'Util/uuid';
@@ -151,8 +152,8 @@ export class CellsRepository {
     });
   }
 
-  async getNode({uuid}: {uuid: string}) {
-    return this.apiClient.api.cells.getNode({id: uuid});
+  async getNode({uuid, flags, options}: {uuid: string; flags?: NodeFlags[]; options?: RequestConfig}) {
+    return this.apiClient.api.cells.getNode({id: uuid, flags, options});
   }
 
   async lookupNodeByPath({path}: {path: string}) {

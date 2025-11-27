@@ -17,7 +17,7 @@
  *
  */
 
-import {CSSProperties, useId, useState} from 'react';
+import {CSSProperties, useState} from 'react';
 
 import {AlertIcon} from '@wireapp/react-ui-kit';
 
@@ -48,9 +48,11 @@ interface FileAssetWithPreviewProps {
   isError: boolean;
   senderName: string;
   timestamp: number;
+  id: string;
 }
 
 export const FileAssetWithPreview = ({
+  id,
   src,
   extension,
   name,
@@ -68,7 +70,9 @@ export const FileAssetWithPreview = ({
   const shouldDisplayLoading = (imagePreviewUrl ? !isImageLoaded : isLoading) && !isError;
   const shouldDisplayPreviewError = isError || (!isLoading && !imagePreviewUrl);
 
-  const id = useId();
+  const handleModalClose = () => {
+    setIsOpen(false);
+  };
 
   return (
     <FileCard.Root variant="large" extension={extension} name={name} size={size}>
@@ -121,7 +125,7 @@ export const FileAssetWithPreview = ({
         senderName={senderName}
         timestamp={timestamp}
         isOpen={isOpen}
-        onClose={() => setIsOpen(false)}
+        onClose={handleModalClose}
         isLoading={isLoading}
         isError={isError}
       />

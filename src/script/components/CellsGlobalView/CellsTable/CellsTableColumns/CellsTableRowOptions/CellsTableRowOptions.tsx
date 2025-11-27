@@ -36,11 +36,14 @@ interface CellsTableRowOptionsProps {
   cellsRepository: CellsRepository;
 }
 
+const EDITABLE_FILE_EXTENSIONS = ['odf', 'docx', 'xlsx', 'pptx'];
+
 export const CellsTableRowOptions = ({node, cellsRepository}: CellsTableRowOptionsProps) => {
   const {handleOpenFile} = useCellsFilePreviewModal();
 
   const url = node.url;
   const name = node.type === 'folder' ? `${node.name}.zip` : node.name;
+  const isEditable = node.type === 'file' && EDITABLE_FILE_EXTENSIONS.includes(node.extension.toLowerCase());
 
   return (
     <DropdownMenu>
@@ -59,6 +62,9 @@ export const CellsTableRowOptions = ({node, cellsRepository}: CellsTableRowOptio
         <DropdownMenu.Item onClick={() => showShareModal({type: node.type, uuid: node.id, cellsRepository})}>
           {t('cells.options.share')}
         </DropdownMenu.Item>
+        {isEditable && (
+          <DropdownMenu.Item onClick={() => handleOpenFile(node, true)}>{t('cells.options.edit')}</DropdownMenu.Item>
+        )}
         {!!url && (
           <DropdownMenu.Item
             onClick={() =>

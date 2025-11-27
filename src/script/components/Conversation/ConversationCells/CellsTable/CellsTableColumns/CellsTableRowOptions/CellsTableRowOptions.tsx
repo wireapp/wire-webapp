@@ -82,6 +82,7 @@ export const CellsTableRowOptions = ({
     </DropdownMenu>
   );
 };
+const EDITABLE_FILE_EXTENSIONS = ['odf', 'docx', 'xlsx', 'pptx'];
 
 const CellsTableRowOptionsContent = ({
   node,
@@ -123,6 +124,8 @@ const CellsTableRowOptionsContent = ({
 
   const isRootRecycleBin = isRootRecycleBinPath();
   const isNestedRecycleBin = isInRecycleBin();
+
+  const isEditable = node.type === 'file' && EDITABLE_FILE_EXTENSIONS.includes(node.extension.toLowerCase());
 
   if (isRootRecycleBin || isNestedRecycleBin) {
     return (
@@ -190,6 +193,9 @@ const CellsTableRowOptionsContent = ({
         </DropdownMenu.Item>
         <DropdownMenu.Item onClick={() => setIsMoveNodeModalOpen(true)}>{t('cells.options.move')}</DropdownMenu.Item>
         <DropdownMenu.Item onClick={() => setIsTagsModalOpen(true)}>{t('cells.options.tags')}</DropdownMenu.Item>
+        {isEditable && (
+          <DropdownMenu.Item onClick={() => handleOpenFile(node, true)}>{t('cells.options.edit')}</DropdownMenu.Item>
+        )}
         <DropdownMenu.Item
           onClick={() =>
             showMoveToRecycleBinModal({

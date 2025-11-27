@@ -17,7 +17,7 @@
  *
  */
 
-import {useId, useState} from 'react';
+import {useState} from 'react';
 
 import {FileCard} from 'Components/FileCard/FileCard';
 import {t} from 'Util/LocalizerUtil';
@@ -37,6 +37,7 @@ interface FileAssetSmallProps {
   senderName: string;
   timestamp: number;
   isLoading: boolean;
+  id: string;
 }
 
 export const FileAssetSmall = ({
@@ -50,9 +51,9 @@ export const FileAssetSmall = ({
   imagePreviewUrl,
   isLoading,
   isError,
+  id,
 }: FileAssetSmallProps) => {
   const [isOpen, setIsOpen] = useState(false);
-  const id = useId();
 
   const showModal = () => {
     setIsOpen(true);

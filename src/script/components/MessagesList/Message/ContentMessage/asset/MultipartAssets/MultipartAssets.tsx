@@ -108,6 +108,7 @@ const MultipartAsset = ({
     return (
       <li ref={elementRef} css={imageCardStyles}>
         <ImageAssetCard
+          id={uuid}
           src={src}
           name={name}
           extension={extension}
@@ -126,6 +127,7 @@ const MultipartAsset = ({
     return (
       <li ref={elementRef} css={videoCardStyles(isSingleAsset)}>
         <VideoAssetCard
+          id={uuid}
           variant={variant}
           src={src}
           extension={extension}
@@ -143,6 +145,7 @@ const MultipartAsset = ({
   return (
     <li ref={elementRef} css={fileCardStyles}>
       <FileAssetCard
+        id={uuid}
         src={src}
         variant={variant}
         extension={extension}
