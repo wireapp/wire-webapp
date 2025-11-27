@@ -21,6 +21,25 @@ import {test, expect} from 'test/e2e_tests/test.fixtures';
 
 test.describe('Authentication', () => {
   test(
+    'Verify sign in button is disabled in case of empty credentials',
+    {tag: ['@TC-3457', '@regression']},
+    async ({pageManager}) => {
+      const {pages} = pageManager.webapp;
+      const {emailInput, passwordInput, signInButton} = pages.login();
+      await pageManager.openLoginPage();
+
+      await expect(signInButton).toBeDisabled();
+
+      await emailInput.fill('invalid@email');
+      await passwordInput.fill('invalidPassword');
+      await expect(signInButton).not.toBeDisabled();
+
+      await passwordInput.clear();
+      await expect(signInButton).toBeDisabled();
+    },
+  );
+
+  test(
     'I want to be asked to share telemetry data when I log in',
     {tag: ['@TC-8780', '@regression']},
     async ({pageManager, createUser}) => {
