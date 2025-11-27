@@ -67,10 +67,10 @@ interface AccordionComponent extends ForwardRefExoticComponent<AccordionProps & 
  * ```tsx
  * <Accordion type="multiple">
  *   <Accordion.Item title="What is Wire?" value="item-1">
- *     <Text>Wire is a secure messaging platform...</Text>
+ *     <Text>Wire is a secure messaging platform</Text>
  *   </Accordion.Item>
  *   <Accordion.Item title="Is Wire secure?" value="item-2">
- *     <Text>Yes, Wire uses end-to-end encryption...</Text>
+ *     <Text>Yes, Wire uses end-to-end encryption</Text>
  *   </Accordion.Item>
  * </Accordion>
  * ```

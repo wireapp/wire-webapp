@@ -224,8 +224,7 @@ export const WebAppEvents = {
     PICTURE: 'wire.webapp.shortcut.picture',
     PING: 'wire.webapp.shortcut.ping',
     PREV: 'wire.webapp.shortcut.prev',
-    SILENCE: 'wire.webapp.shortcut.silence', // todo: deprecated - remove when user base of wrappers version >= 3.4 is
-    // large enough
+    SILENCE: 'wire.webapp.shortcut.silence', // todo: deprecated - remove when user base of wrappers version >= 3.4 is large enough
     START: 'wire.webapp.shortcut.start',
     SEARCH: 'wire.webapp.shortcut.search',
   },
