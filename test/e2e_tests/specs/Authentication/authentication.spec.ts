@@ -109,4 +109,17 @@ test.describe('Authentication', () => {
       });
     },
   );
+
+  test(
+    'Verify sign in error appearance in case of wrong credentials',
+    {tag: ['@TC-3465', '@regression']},
+    async ({pageManager}) => {
+      const {pages} = pageManager.webapp;
+      await pageManager.openLoginPage();
+
+      await pages.login().login({email: 'invalid@wire.com', password: 'invalid'});
+
+      await expect(pages.login().loginErrorText).toHaveText('Please verify your details and try again');
+    },
+  );
 });
