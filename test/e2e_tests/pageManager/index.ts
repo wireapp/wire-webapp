@@ -61,6 +61,7 @@ import {ConversationPage} from './webapp/pages/conversation.page';
 import {ConversationDetailsPage} from './webapp/pages/conversationDetails.page';
 import {ConversationListPage} from './webapp/pages/conversationList.page';
 import {DeleteAccountPage} from './webapp/pages/deleteAccount.page';
+import {DevicesPage} from './webapp/pages/devices.page';
 import {EmailVerificationPage} from './webapp/pages/emailVerification.page';
 import {GroupCreationPage} from './webapp/pages/groupCreation.page';
 import {GuestOptionsPage} from './webapp/pages/guestOptions.page';
@@ -175,6 +176,7 @@ export class PageManager {
       connectRequest: () => this.getOrCreate('webapp.pages.connectRequest', () => new ConnectRequestPage(this.page)),
       calling: () => this.getOrCreate('webapp.pages.calling', () => new CallingPage(this.page)),
       settings: () => this.getOrCreate('webapp.pages.settings', () => new SettingsPage(this.page)),
+      devices: () => this.getOrCreate('webapp.pages.devices', () => new DevicesPage(this.page)),
       options: () => this.getOrCreate('webapp.pages.options', () => new OptionsPage(this.page)),
       audioVideoSettings: () =>
         this.getOrCreate('webapp.pages.audioVideoSettings', () => new AudioVideoSettingsPage(this.page)),

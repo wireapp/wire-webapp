@@ -66,4 +66,47 @@ test.describe('Authentication', () => {
       await expect(pages.login().loginErrorText).toHaveText('This account is no longer authorized to log in');
     },
   );
+
+  test(
+    'Verify current browser is set as temporary device',
+    {tag: ['@TC-3460', '@regression']},
+    async ({pageManager, createUser}) => {
+      const user = await createUser();
+      const {pages, components} = pageManager.webapp;
+
+      await test.step('Log in with public computer checked', async () => {
+        await pageManager.openLoginPage();
+        await pages.login().publicComputerCheckbox.click();
+        await pages.login().login(user);
+        await pages.historyInfo().clickConfirmButton();
+      });
+
+      let proteusId: string;
+      await test.step('Open device settings and get current proteus id', async () => {
+        await components.conversationSidebar().clickPreferencesButton();
+        await pages.settings().devicesButton.click();
+
+        proteusId = (await pages.devices().proteusId.textContent()) ?? '';
+        expect(proteusId).toBeTruthy();
+      });
+
+      await test.step('Log out of public computer', async () => {
+        await pages.settings().accountButton.click();
+        await pages.account().clickLogoutButton();
+      });
+
+      await test.step('Log in again on non public computer', async () => {
+        await pageManager.openLoginPage();
+        await pages.login().login(user);
+      });
+
+      await test.step("Open device settings and ensure the public computer isn't active and the ID was re-generated", async () => {
+        await components.conversationSidebar().clickPreferencesButton();
+        await pages.settings().devicesButton.click();
+
+        await expect(pages.devices().activeDevices).toHaveCount(0);
+        await expect(pages.devices().proteusId).not.toContainText(proteusId);
+      });
+    },
+  );
 });
