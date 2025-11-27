@@ -169,7 +169,7 @@ export class CopyConfig {
     }
 
     if (stderrVersion) {
-      this.logger?.error(`No git installation found: (error: "${stderrVersion}"). Trying to download the zip file ...`);
+      this.logger?.error(`No git installation found: (error: "${stderrVersion}"). Trying to download the zip file...`);
     }
 
     if (stderrVersion || this.options.forceDownload) {
