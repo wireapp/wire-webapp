@@ -21,6 +21,7 @@ import {useState} from 'react';
 
 import {PDFViewer} from 'Components/FileFullscreenModal/PdfViewer/PdfViewer';
 import {FullscreenModal} from 'Components/FullscreenModal/FullscreenModal';
+import {isFileEditable} from 'Util/FileTypeUtil';
 import {getFileTypeFromExtension} from 'Util/getFileTypeFromExtension/getFileTypeFromExtension';
 import {getFileExtensionFromUrl} from 'Util/util';
 
@@ -47,8 +48,6 @@ interface FileFullscreenModalProps {
   isEditMode?: boolean;
 }
 
-const EDITABLE_FILE_EXTENSIONS = ['odf', 'docx', 'xlsx', 'pptx'];
-
 export const FileFullscreenModal = ({
   id,
   isOpen,
@@ -64,7 +63,7 @@ export const FileFullscreenModal = ({
   isEditMode,
 }: FileFullscreenModalProps) => {
   const [isEditableState, setIsEditableState] = useState(isEditMode);
-  const isEditable = EDITABLE_FILE_EXTENSIONS.includes(fileExtension.toLowerCase());
+  const isEditable = isFileEditable(fileExtension);
 
   const onCloseModal = () => {
     setIsEditableState(false);

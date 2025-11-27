@@ -21,6 +21,7 @@ import {DropdownMenu, MoreIcon} from '@wireapp/react-ui-kit';
 
 import {openFolder} from 'Components/CellsGlobalView/common/openFolder/openFolder';
 import {CellsRepository} from 'Repositories/cells/CellsRepository';
+import {isFileEditable} from 'Util/FileTypeUtil';
 import {t} from 'Util/LocalizerUtil';
 import {forcedDownloadFile} from 'Util/util';
 
@@ -36,14 +37,12 @@ interface CellsTableRowOptionsProps {
   cellsRepository: CellsRepository;
 }
 
-const EDITABLE_FILE_EXTENSIONS = ['odf', 'docx', 'xlsx', 'pptx'];
-
 export const CellsTableRowOptions = ({node, cellsRepository}: CellsTableRowOptionsProps) => {
   const {handleOpenFile} = useCellsFilePreviewModal();
 
   const url = node.url;
   const name = node.type === 'folder' ? `${node.name}.zip` : node.name;
-  const isEditable = node.type === 'file' && EDITABLE_FILE_EXTENSIONS.includes(node.extension.toLowerCase());
+  const isEditable = node.type === 'file' && isFileEditable(node.extension);
 
   return (
     <DropdownMenu>

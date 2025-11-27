@@ -31,6 +31,7 @@ import {
   isRootRecycleBinPath,
 } from 'Components/Conversation/ConversationCells/common/recycleBin/recycleBin';
 import {CellsRepository} from 'Repositories/cells/CellsRepository';
+import {isFileEditable} from 'Util/FileTypeUtil';
 import {t} from 'Util/LocalizerUtil';
 import {forcedDownloadFile} from 'Util/util';
 
@@ -82,7 +83,6 @@ export const CellsTableRowOptions = ({
     </DropdownMenu>
   );
 };
-const EDITABLE_FILE_EXTENSIONS = ['odf', 'docx', 'xlsx', 'pptx'];
 
 const CellsTableRowOptionsContent = ({
   node,
@@ -125,7 +125,7 @@ const CellsTableRowOptionsContent = ({
   const isRootRecycleBin = isRootRecycleBinPath();
   const isNestedRecycleBin = isInRecycleBin();
 
-  const isEditable = node.type === 'file' && EDITABLE_FILE_EXTENSIONS.includes(node.extension.toLowerCase());
+  const isEditable = node.type === 'file' && isFileEditable(node.extension);
 
   if (isRootRecycleBin || isNestedRecycleBin) {
     return (
