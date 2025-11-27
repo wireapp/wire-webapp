@@ -17,7 +17,7 @@
  *
  */
 
-import {useState} from 'react';
+import {useEffect, useState} from 'react';
 
 import {PDFViewer} from 'Components/FileFullscreenModal/PdfViewer/PdfViewer';
 import {FullscreenModal} from 'Components/FullscreenModal/FullscreenModal';
@@ -70,6 +70,10 @@ export const FileFullscreenModal = ({
     onClose();
   };
 
+  useEffect(() => {
+    setIsEditableState(!!isEditMode);
+  }, [isEditMode]);
+
   return (
     <FullscreenModal id={id} isOpen={isOpen} onClose={onCloseModal}>
       <FileHeader
@@ -83,6 +87,7 @@ export const FileFullscreenModal = ({
         isInEditMode={isEditableState}
         onEditModeChange={setIsEditableState}
         isEditable={isEditable}
+        id={id}
       />
       {isEditableState && isEditable ? (
         <FileEditor id={id} />

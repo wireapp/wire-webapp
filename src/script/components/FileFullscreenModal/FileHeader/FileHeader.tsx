@@ -17,12 +17,15 @@
  *
  */
 
+import {container} from 'tsyringe';
+
 import {BadgesWithTooltip, Button, ButtonVariant, CloseIcon, DownloadIcon, ShowIcon} from '@wireapp/react-ui-kit';
 
 import {FileTypeIcon} from 'Components/Conversation/common/FileTypeIcon/FileTypeIcon';
 import {EditIcon} from 'Components/Icon';
 import {MessageTime} from 'Components/MessagesList/Message/MessageTime';
 import {useRelativeTimestamp} from 'Hooks/useRelativeTimestamp';
+import {CellsRepository} from 'Repositories/cells/CellsRepository';
 import {t} from 'Util/LocalizerUtil';
 import {forcedDownloadFile, getFileNameWithExtension} from 'Util/util';
 
@@ -39,6 +42,7 @@ import {
 } from './FileHeader.styles';
 
 interface FileHeaderProps {
+  id: string;
   onClose: () => void;
   fileName: string;
   fileExtension: string;
@@ -52,6 +56,7 @@ interface FileHeaderProps {
 }
 
 export const FileHeader = ({
+  id,
   onClose,
   fileUrl,
   fileName,
@@ -65,6 +70,14 @@ export const FileHeader = ({
 }: FileHeaderProps) => {
   const timeAgo = useRelativeTimestamp(timestamp);
   const fileNameWithExtension = getFileNameWithExtension(fileName, fileExtension);
+  const cellsRepository = container.resolve(CellsRepository);
+
+  const handleFileDownload = async () => {
+    if (fileUrl) {
+      const node = await cellsRepository.getNode({uuid: id, flags: []});
+      await forcedDownloadFile({url: node.PreSignedGET?.Url || fileUrl, name: fileNameWithExtension});
+    }
+  };
 
   return (
     <header css={headerStyles}>
@@ -113,7 +126,7 @@ export const FileHeader = ({
         <Button
           variant={ButtonVariant.TERTIARY}
           css={downloadButtonStyles}
-          onClick={() => forcedDownloadFile({url: fileUrl || '', name: fileNameWithExtension})}
+          onClick={handleFileDownload}
           disabled={!fileUrl}
           aria-label={t('cells.imageFullScreenModal.downloadButton')}
         >

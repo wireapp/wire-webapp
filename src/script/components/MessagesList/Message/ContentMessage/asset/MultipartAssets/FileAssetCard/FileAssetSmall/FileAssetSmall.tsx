@@ -54,15 +54,22 @@ export const FileAssetSmall = ({
   id,
 }: FileAssetSmallProps) => {
   const [isOpen, setIsOpen] = useState(false);
+  const [isInEditMode, setIsInEditMode] = useState(false);
 
-  const showModal = () => {
+  const showModal = (isEditMode?: boolean) => {
     setIsOpen(true);
+    setIsInEditMode(!!isEditMode);
+  };
+
+  const hideModal = () => {
+    setIsOpen(false);
+    setIsInEditMode(false);
   };
 
   return (
     <FileCard.Root extension={extension} name={name} size={size}>
       <button
-        onClick={showModal}
+        onClick={() => showModal()}
         css={hollowWrapperButtonStyles}
         aria-label={t('cells.filePreviewButton.ariaLabel', {name})}
       />
@@ -82,9 +89,10 @@ export const FileAssetSmall = ({
         senderName={senderName}
         timestamp={timestamp}
         isOpen={isOpen}
-        onClose={() => setIsOpen(false)}
+        onClose={hideModal}
         isError={isError}
         isLoading={isLoading}
+        isEditMode={isInEditMode}
       />
     </FileCard.Root>
   );
