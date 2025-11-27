@@ -66,10 +66,15 @@ export const FileFullscreenModal = ({
   const [isEditableState, setIsEditableState] = useState(isEditMode);
   const isEditable = EDITABLE_FILE_EXTENSIONS.includes(fileExtension.toLowerCase());
 
+  const onCloseModal = () => {
+    setIsEditableState(false);
+    onClose();
+  };
+
   return (
-    <FullscreenModal id={id} isOpen={isOpen} onClose={onClose}>
+    <FullscreenModal id={id} isOpen={isOpen} onClose={onCloseModal}>
       <FileHeader
-        onClose={onClose}
+        onClose={onCloseModal}
         fileName={fileName}
         fileExtension={fileExtension}
         fileUrl={fileUrl}
