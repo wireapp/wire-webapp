@@ -93,7 +93,7 @@ export class ConversationListPage {
   }
 
   async clickConversationOptions(conversationName: string) {
-    await this.getConversationLocator(conversationName).locator(selectByDataAttribute('go-options')).click();
+    await this.getConversationLocator(conversationName).locator(selectByDataAttribute('go-options')).first().click();
   }
 
   async clickConnectWithPeople() {

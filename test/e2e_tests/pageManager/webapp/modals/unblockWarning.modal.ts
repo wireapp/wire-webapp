@@ -38,22 +38,6 @@ export class UnblockWarningModal {
     this.cancelButton = this.modal.locator("[data-uie-name='do-secondary']");
   }
 
-  async isModalPresent() {
-    return await this.modal.isVisible();
-  }
-
-  async getModalTitle() {
-    return (await this.modalTitle.textContent()) ?? '';
-  }
-
-  async getModalText() {
-    return (await this.modalText.textContent()) ?? '';
-  }
-
-  async isBlockButtonVisible() {
-    return await this.unblockButton.isVisible();
-  }
-
   async clickCancel() {
     await this.cancelButton.click();
   }
