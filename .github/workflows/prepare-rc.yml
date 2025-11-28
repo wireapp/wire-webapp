@@ -1,0 +1,72 @@
+name: Prepare RC
+
+on:
+  workflow_dispatch:
+    inputs:
+      rc_branch:
+        description: 'RC branch name (e.g. rc/2025-11-27)'
+        required: true
+        type: string
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  prepare_rc:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Ensure workflow is run from dev branch
+        if: github.ref_name != 'dev'
+        run: |
+          echo "This workflow can only be run when 'dev' is selected as the workflow ref (current: '${{ github.ref_name }}')." >&2
+          exit 1
+
+      - name: Checkout dev
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: dev
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22.x
+          cache: yarn
+
+      - name: Install JS dependencies (dev state)
+        run: yarn --immutable
+
+      # set -euo pipefail ensures the script fails on error
+      - name: Update @wireapp/* to latest stable
+        run: |
+          set -euo pipefail
+          yarn add \
+            @wireapp/store-engine@$(npm view @wireapp/store-engine dist-tags.latest) \
+            @wireapp/commons@$(npm view @wireapp/commons dist-tags.latest) \
+            @wireapp/core@$(npm view @wireapp/core dist-tags.latest) \
+            @wireapp/promise-queue@$(npm view @wireapp/promise-queue dist-tags.latest) \
+            @wireapp/react-ui-kit@$(npm view @wireapp/react-ui-kit dist-tags.latest) \
+            @wireapp/store-engine-dexie@$(npm view @wireapp/store-engine-dexie dist-tags.latest) \
+            @wireapp/telemetry@$(npm view @wireapp/telemetry dist-tags.latest) \
+            @wireapp/webapp-events@$(npm view @wireapp/webapp-events dist-tags.latest) \
+            @wireapp/copy-config@$(npm view @wireapp/copy-config dist-tags.latest) \
+            @wireapp/eslint-config@$(npm view @wireapp/eslint-config dist-tags.latest) \
+            @wireapp/prettier-config@$(npm view @wireapp/prettier-config dist-tags.latest)
+
+      - name: Show diff
+        run: git diff
+
+      - name: Create RC pull request
+        uses: peter-evans/create-pull-request@v7
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          commit-message: 'chore: ${{ inputs.rc_branch }}'
+          branch: ${{ inputs.rc_branch }}
+          base: master
+          title: 'chore: ${{ inputs.rc_branch }}'
+          body: |
+            Automated RC creation from `dev`.
+            @wireapp/* dependencies have been bumped to dist-tags.latest (stable) on this branch.
+          sign-commits: true
