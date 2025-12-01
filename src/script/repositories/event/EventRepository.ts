@@ -240,9 +240,11 @@ export class EventRepository {
       if (activeConnectionAttempt) {
         return activeConnectionAttempt;
       }
-
-      // Disconnect existing connection if not already in LIVE state
-      if (this.latestConnectionState !== ConnectionState.LIVE) {
+      // We make sure there is only one active connection to the WebSocket.
+      if (
+        this.latestConnectionState !== ConnectionState.LIVE &&
+        this.latestConnectionState !== ConnectionState.CONNECTING
+      ) {
         this.disconnectWebSocket?.();
       }
 
