@@ -224,7 +224,7 @@ export class EventRepository {
       if (pendingReconnect) {
         return pendingReconnect;
       }
-      // We make sure there is only be a single active connection to the WebSocket.
+      // We make sure there is only one active connection to the WebSocket.
       if (this.latestConnectionState !== ConnectionState.LIVE) {
         this.disconnectWebSocket?.();
       }
