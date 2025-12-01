@@ -74,7 +74,7 @@ export const FileHeader = ({
 
   const handleFileDownload = async () => {
     if (fileUrl) {
-      const node = await cellsRepository.getNode({uuid: id, flags: []});
+      const node = await cellsRepository.getNode({uuid: id});
       await forcedDownloadFile({url: node.PreSignedGET?.Url || fileUrl, name: fileNameWithExtension});
     }
   };
