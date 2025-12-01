@@ -28,6 +28,7 @@ export class LoginPage {
   readonly emailInput: Locator;
   readonly passwordInput: Locator;
   readonly loginErrorText: Locator;
+  readonly publicComputerCheckbox: Locator;
 
   constructor(page: Page) {
     this.page = page;
@@ -36,6 +37,7 @@ export class LoginPage {
     this.emailInput = page.locator('[data-uie-name="enter-email"]');
     this.passwordInput = page.locator('[data-uie-name="enter-password"]');
     this.loginErrorText = page.locator('[data-uie-name="error-message"]');
+    this.publicComputerCheckbox = page.getByText('This is a public computer');
   }
 
   async login(user: Pick<User, 'email' | 'password'>) {
