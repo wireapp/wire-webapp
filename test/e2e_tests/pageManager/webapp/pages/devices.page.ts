@@ -17,33 +17,19 @@
  *
  */
 
-import {Page, Locator} from '@playwright/test';
+import {Locator, Page} from '@playwright/test';
 
-export class SettingsPage {
+export class DevicesPage {
   readonly page: Page;
 
-  readonly accountButton: Locator;
-  readonly devicesButton: Locator;
-  readonly optionsButton: Locator;
-  readonly audioVideoButton: Locator;
+  readonly proteusId: Locator;
+  readonly activeDevices: Locator;
 
   constructor(page: Page) {
     this.page = page;
-    this.accountButton = page.getByRole('button', {name: 'Account'});
-    this.devicesButton = page.getByRole('button', {name: 'Devices'});
-    this.optionsButton = page.getByRole('button', {name: 'Options'});
-    this.audioVideoButton = page.getByRole('button', {name: 'Audio / Video'});
-  }
 
-  async clickAudioVideoSettingsButton() {
-    await this.audioVideoButton.click();
-  }
-
-  async clickAccountButton() {
-    await this.accountButton.click();
-  }
-
-  async clickOptionsButton() {
-    await this.optionsButton.click();
+    // The id is not using any label or similar but just multiple paragraphs beneath each other
+    this.proteusId = page.locator("p:text('Proteus ID') + p");
+    this.activeDevices = page.getByRole('group', {name: 'Active'}).getByRole('button', {name: /device details/});
   }
 }
