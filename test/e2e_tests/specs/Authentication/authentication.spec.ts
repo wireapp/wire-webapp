@@ -18,6 +18,7 @@
  */
 
 import {test, expect} from 'test/e2e_tests/test.fixtures';
+import {connectWithUser} from 'test/e2e_tests/utils/userActions';
 
 test.describe('Authentication', () => {
   test(
@@ -120,6 +121,38 @@ test.describe('Authentication', () => {
       await pages.login().login({email: 'invalid@wire.com', password: 'invalid'});
 
       await expect(pages.login().loginErrorText).toHaveText('Please verify your details and try again');
+    },
+  );
+
+  test(
+    'I want to keep my history after refreshing the page on permanent device',
+    {tag: ['@TC-3472', '@regression']},
+    async ({pageManager, createTeam}) => {
+      const {pages} = pageManager.webapp;
+      const team = await createTeam('Test Team', {withMembers: 1});
+      const userA = team.owner;
+      const userB = team.members[0];
+
+      await test.step('Log in and connect with user B', async () => {
+        await pageManager.openLoginPage();
+        await pages.login().login(userA);
+        await connectWithUser(pageManager, userB);
+      });
+
+      await test.step('Send a message', async () => {
+        await pages.conversationList().openConversation(userB.fullName);
+        await pages.conversation().sendMessage('Before refresh');
+      });
+
+      await test.step('Ensure message is still visible after page refresh', async () => {
+        const message = pages.conversation().getMessage({content: 'Before refresh'});
+        await expect(message).toBeVisible();
+
+        await pageManager.refreshPage();
+
+        await pages.conversationList().openConversation(userB.fullName);
+        await expect(message).toBeVisible();
+      });
     },
   );
 });
