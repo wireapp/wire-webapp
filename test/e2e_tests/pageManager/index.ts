@@ -50,7 +50,6 @@ import {LeaveConversationModal} from './webapp/modals/leaveConversation.modal';
 import {PasswordModal} from './webapp/modals/password.modal';
 import {RemoveMemberModal} from './webapp/modals/removeMember.modal';
 import {UnableToOpenConversationModal} from './webapp/modals/unableToOpenConversation.modal';
-import {UnblockWarningModal} from './webapp/modals/unblockWarning.modal';
 import {UserProfileModal} from './webapp/modals/userProfile.modal';
 import {VerifyEmailModal} from './webapp/modals/verifyEmail.modal';
 import {AccountPage} from './webapp/pages/account.page';
@@ -232,8 +231,6 @@ export class PageManager {
         this.getOrCreate('webapp.modals.cellsFileDetailView', () => new CellsFileDetailViewModal(this.page)),
       cancelRequest: () =>
         this.getOrCreate('webapp.modals.cancelRequestModal', () => new CancelRequestModal(this.page)),
-      unblockWarningModal: () =>
-        this.getOrCreate('webapp.modals.unblockWarningModal', () => new UnblockWarningModal(this.page)),
     },
     components: {
       contactList: () => this.getOrCreate('webapp.components.ContactList', () => new ContactList(this.page)),

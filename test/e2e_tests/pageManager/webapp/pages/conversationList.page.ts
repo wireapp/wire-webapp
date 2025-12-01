@@ -35,9 +35,7 @@ export class ConversationListPage {
   readonly searchConversationsInput: Locator;
   readonly archiveConversationMenuButton: Locator;
   readonly unarchiveConversationMenuButton: Locator;
-  readonly statusLabel: Locator;
   readonly blockedChip: Locator;
-  readonly profilePicture: Locator;
   readonly unblockConversationMenuButton: Locator;
 
   constructor(page: Page) {
@@ -56,9 +54,7 @@ export class ConversationListPage {
     this.searchConversationsInput = page.locator(selectByDataAttribute('search-conversations'));
     this.archiveConversationMenuButton = page.locator(selectById('btn-archive'));
     this.unarchiveConversationMenuButton = page.locator(selectById('btn-unarchive'));
-    this.statusLabel = page.locator(selectByDataAttribute('status-label'));
     this.blockedChip = page.locator(`span[data-uie-name="status-label"] + span`);
-    this.profilePicture = page.locator(selectByDataAttribute('element-avatar-user'));
     this.unblockConversationMenuButton = page.locator(
       `${selectById('btn-unblock')}${selectByDataAttribute('conversation-list-options-menu')}`,
     );
@@ -137,10 +133,7 @@ export class ConversationListPage {
   }
 
   async getUserAvatarWrapper(user: User): Promise<Locator> {
-    return this.page
-      .locator(selectByDataAttribute('item-conversation'))
-      .filter({has: this.page.locator(selectByDataAttribute('status-label'), {hasText: user.fullName})})
-      .locator(selectByDataAttribute('element-avatar-user'));
+    return this.getConversationLocator(user.fullName).locator(selectByDataAttribute('element-avatar-user'));
   }
 
   async clickUnblockConversation() {

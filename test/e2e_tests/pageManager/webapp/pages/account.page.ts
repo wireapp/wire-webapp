@@ -43,7 +43,6 @@ export class AccountPage {
   readonly resetPasswordButton: Locator;
   readonly receiveNewsletterCheckbox: Locator;
   readonly typingIndicator: Locator;
-  readonly teamName: Locator;
 
   constructor(page: Page) {
     this.page = page;
@@ -67,7 +66,6 @@ export class AccountPage {
     this.resetPasswordButton = page.locator(selectByDataAttribute('do-reset-password'));
     this.receiveNewsletterCheckbox = page.locator("[data-uie-name='status-preference-marketing']+label");
     this.typingIndicator = page.locator("[data-uie-name='status-preference-typing-indicator']+label");
-    this.teamName = page.locator(selectByDataAttribute('status-team-display'));
   }
 
   async clickBackUpButton() {
