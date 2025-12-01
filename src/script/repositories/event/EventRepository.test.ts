@@ -735,9 +735,16 @@ describe('EventRepository', () => {
 
         const connectPromise = eventRepo.connectWebSocket(mockAccount, false, jest.fn());
 
+        // Prevent unhandled rejection error during timer advancement
+        const catchUnhandled = connectPromise.catch(() => {});
+
         // Advance past the 30 second timeout
         await jest.advanceTimersByTimeAsync(30000);
 
+        // Wait for the catch handler to process
+        await catchUnhandled;
+
+        // The promise should have already rejected by now
         await expect(connectPromise).rejects.toThrow('WebSocket connection timeout');
       });
     });
