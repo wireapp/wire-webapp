@@ -33,8 +33,13 @@ import {
   RestNodeLocator,
   RestActionOptionsCopyMove,
   RestNamespaceValuesResponse,
+  GetByUuidFlagsEnum,
 } from 'cells-sdk-ts';
+import logdown from 'logdown';
 
+import {LogFactory} from '@wireapp/commons';
+
+import {Node, RestNodeSchema} from './CellsAPI.schema';
 import {CellsStorage} from './CellsStorage/CellsStorage';
 import {S3Service} from './CellsStorage/S3Service';
 
@@ -65,6 +70,7 @@ interface CellsConfig {
 }
 
 export class CellsAPI {
+  private readonly logger: logdown.Logger;
   private accessTokenStore: AccessTokenStore;
   private httpClientConfig: HttpClient['config'];
   private storageService: CellsStorage | null;
@@ -77,6 +83,7 @@ export class CellsAPI {
     accessTokenStore: AccessTokenStore;
     httpClientConfig: HttpClient['config'];
   }) {
+    this.logger = LogFactory.getLogger('@wireapp/api-client/CellsAPI');
     this.accessTokenStore = accessTokenStore;
     this.httpClientConfig = httpClientConfig;
     this.storageService = null;
@@ -318,12 +325,18 @@ export class CellsAPI {
     return result.data.Versions;
   }
 
-  async getNode({id}: {id: string}): Promise<RestNode> {
+  async getNode({id, flags}: {id: string; flags?: Array<GetByUuidFlagsEnum>}): Promise<Node> {
     if (!this.client || !this.storageService) {
       throw new Error(CONFIGURATION_ERROR);
     }
 
-    const result = await this.client.getByUuid(id);
+    const result = await this.client.getByUuid(id, flags);
+
+    const validation = RestNodeSchema.safeParse(result.data);
+
+    if (!validation.success) {
+      this.logger.warn('Get node response validation failed:', validation.error);
+    }
 
     return result.data;
   }

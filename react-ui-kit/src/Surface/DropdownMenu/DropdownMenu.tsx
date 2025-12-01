@@ -99,3 +99,7 @@ const DropdownMenuItem = ({children, onClick}: {children: ReactNode; onClick: ()
 };
 
 DropdownMenu.Item = DropdownMenuItem;
+
+DropdownMenu.SubContent = DropdownMenuPrimitive.SubContent;
+DropdownMenu.SubTrigger = DropdownMenuPrimitive.SubTrigger;
+DropdownMenu.Sub = DropdownMenuPrimitive.Sub;
