@@ -72,6 +72,7 @@ export class ReconnectingWebsocket {
   private readonly stopBackFromSleepHandler?: () => void;
 
   private isPingingEnabled = true;
+  private readonly pendingHealthChecks = new Set<(isHealthy: boolean) => void>();
 
   constructor(
     private readonly onReconnect: () => Promise<string>,
@@ -97,12 +98,14 @@ export class ReconnectingWebsocket {
      * **/
     this.stopBackFromSleepHandler = onBackFromSleep({
       callback: () => {
-        if (this.socket) {
-          this.logger.debug('Back from sleep, reconnecting WebSocket');
-          this.socket?.reconnect();
+        if (!this.socket) {
+          this.logger.debug('WebSocket instance does not exist, skipping reconnect after sleep');
+          return;
         }
+        this.logger.debug('Back from sleep, reconnecting WebSocket');
+        // Force reconnect even if the browser keeps the socket in OPEN state after sleep.
+        this.socket.reconnect();
       },
-      isDisconnected: () => this.getState() === WEBSOCKET_STATE.CLOSED,
     });
   }
 
@@ -121,6 +124,7 @@ export class ReconnectingWebsocket {
     if (data === PingMessage.PONG) {
       this.logger.debug('Received pong from WebSocket');
       this.hasUnansweredPing = false;
+      this.resolvePendingHealthChecks(true);
 
       return;
     }
@@ -151,6 +155,7 @@ export class ReconnectingWebsocket {
   private readonly internalOnClose = (event: CloseEvent) => {
     this.logger.debug(`WebSocket closed with code: ${event?.code}${event?.reason ? `Reason: ${event?.reason}` : ''}`);
     this.stopPinging();
+    this.resolvePendingHealthChecks(false);
     if (this.onClose) {
       this.onClose(event);
     }
@@ -169,16 +174,21 @@ export class ReconnectingWebsocket {
   }
 
   private readonly sendPing = (): void => {
-    if (this.socket) {
-      if (this.hasUnansweredPing) {
-        this.logger.warn('Ping interval check failed');
-        this.stopPinging();
-        this.socket.reconnect();
-        return;
-      }
-      this.hasUnansweredPing = true;
-      this.send(PingMessage.PING);
+    if (!this.socket) {
+      this.logger.debug('WebSocket instance does not exist, skipping ping');
+      return;
     }
+
+    if (this.hasUnansweredPing) {
+      this.logger.warn('Ping interval check failed');
+      this.stopPinging();
+      // Closing here intentionally triggers reconnecting-websocket's retry loop; it will call
+      // internalOnReconnect to build a fresh URL and re-open the socket.
+      this.socket.close(CloseEventCode.NORMAL_CLOSURE, 'Ping timeout');
+      return;
+    }
+    this.hasUnansweredPing = true;
+    this.send(PingMessage.PING);
   };
 
   public connect(): void {
@@ -195,6 +205,31 @@ export class ReconnectingWebsocket {
 
   public getState(): WEBSOCKET_STATE {
     return this.socket ? this.socket.readyState : WEBSOCKET_STATE.CLOSED;
+  }
+
+  /**
+   * Lightweight health probe that sends a single ping and resolves with whether a pong was received in time.
+   * Does not close or reconnect the socket; callers can decide how to react to failures.
+   */
+  public checkHealth(timeoutMs = TimeUtil.TimeInMillis.SECOND * 5): Promise<boolean> {
+    if (!this.socket || this.getState() !== WEBSOCKET_STATE.OPEN) {
+      return Promise.resolve(false);
+    }
+
+    return new Promise<boolean>(resolve => {
+      const timeoutId = setTimeout(() => {
+        this.pendingHealthChecks.delete(resolveHealthCheck);
+        resolve(false);
+      }, timeoutMs);
+
+      const resolveHealthCheck = (isHealthy: boolean) => {
+        clearTimeout(timeoutId);
+        resolve(isHealthy);
+      };
+
+      this.pendingHealthChecks.add(resolveHealthCheck);
+      this.send(PingMessage.PING);
+    });
   }
 
   public disconnect(reason = 'Closed by client'): void {
@@ -222,6 +257,11 @@ export class ReconnectingWebsocket {
 
   private getReconnectingWebsocket(): RWS {
     return new RWS(this.internalOnReconnect, undefined, ReconnectingWebsocket.RECONNECTING_OPTIONS);
+  }
+
+  private resolvePendingHealthChecks(isHealthy: boolean) {
+    this.pendingHealthChecks.forEach(resolve => resolve(isHealthy));
+    this.pendingHealthChecks.clear();
   }
 
   public setOnOpen(onOpen: (event: Event) => void): void {
