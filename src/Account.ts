@@ -1267,4 +1267,19 @@ export class Account extends TypedEventEmitter<Events> {
     const commonConfig = (await this.service?.team.getCommonFeatureConfig()) ?? {};
     return commonConfig[FEATURE_KEY.ALLOWED_GLOBAL_OPERATIONS]?.config?.mlsConversationReset === true;
   };
+
+  /**
+   * Checks the health of the WebSocket connection by sending a ping and waiting for a pong response.
+   * This is a non-disruptive check that does not close or reconnect the socket.
+   * @returns A promise that resolves to true if the socket responds with a pong within the timeout, false otherwise.
+   *
+   * @example
+   * const healthy = await account.isWebsocketHealthy();
+   * if (!healthy) {
+   *   // handle unhealthy websocket
+   * }
+   */
+  public isWebsocketHealthy = async (): Promise<boolean> => {
+    return this.apiClient.transport.ws.checkHealth();
+  };
 }
