@@ -17,7 +17,11 @@
  *
  */
 
-import {PageManager} from 'test/e2e_tests/pageManager';
+import {IncomingMessage} from 'node:http';
+import https from 'node:https';
+import {SecureVersion} from 'node:tls';
+
+import {PageManager, webAppPath} from 'test/e2e_tests/pageManager';
 import {test, expect, withLogin} from 'test/e2e_tests/test.fixtures';
 import {connectWithUser} from 'test/e2e_tests/utils/userActions';
 
@@ -169,6 +173,21 @@ test.describe('Authentication', () => {
       },
     );
   });
+
+  // Bug: Connecting using TLSv1.2 should not be allowed but succeeds
+  test.skip(
+    'I want to make sure i connect to webapp only through TLS >= 1.3 connection',
+    {tag: ['@TC-3480', '@regression']},
+    async () => {
+      const requestWithTlsVersion = (versions: {min?: SecureVersion; max?: SecureVersion}) =>
+        new Promise<IncomingMessage>((res, rej) => {
+          https.get(webAppPath, {minVersion: versions.min, maxVersion: versions.max}, res).on('error', rej);
+        });
+
+      await expect(requestWithTlsVersion({max: 'TLSv1.2'})).rejects.toBeDefined();
+      await expect(requestWithTlsVersion({min: 'TLSv1.3'})).resolves.toBeDefined();
+    },
+  );
 
   test(
     'Verify session expired info is visible on login page',
