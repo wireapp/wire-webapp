@@ -228,26 +228,28 @@ export class EventRepository {
       if (this.latestConnectionState !== ConnectionState.LIVE) {
         this.disconnectWebSocket?.();
       }
-      pendingReconnect = new Promise<void>(async (resolve, reject) => {
-        try {
-          this.disconnectWebSocket = await account.listen({
-            useLegacy,
-            onConnectionStateChanged: connectionState => {
-              this.updateConnectivitityStatus(connectionState);
-              if (connectionState === ConnectionState.LIVE) {
-                resolve();
-              }
-            },
-            onEvent: this.handleIncomingEvent,
-            onMissedNotifications: this.triggerMissedSystemEventMessageRendering,
-            onNotificationStreamProgress: onNotificationStreamProgress,
-            dryRun,
-          });
-        } catch (error) {
+      pendingReconnect = new Promise<void>((resolve, reject) => {
+        account.listen({
+          useLegacy,
+          onConnectionStateChanged: connectionState => {
+            this.updateConnectivitityStatus(connectionState);
+            if (connectionState === ConnectionState.LIVE) {
+              resolve();
+            }
+          },
+          onEvent: this.handleIncomingEvent,
+          onMissedNotifications: this.triggerMissedSystemEventMessageRendering,
+          onNotificationStreamProgress: onNotificationStreamProgress,
+          dryRun,
+        })
+        .then(disconnect => {
+          this.disconnectWebSocket = disconnect;
+        })
+        .catch(error => {
           this.logger.error('Failed to establish WebSocket connection', error);
           scheduleReconnect();
           reject(error);
-        }
+        });
       }).finally(() => {
         pendingReconnect = undefined;
       });
