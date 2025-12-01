@@ -28,7 +28,6 @@ import {createGroup} from '../../utils/userActions';
  * Blocks a user from the conversation list
  * @param pageManager PageManager of the blocking user
  * @param userToBlock User object of the user to be blocked
- * @param options Optional parameters, e.g. to handle additional modals
  */
 export async function blockUserFromConversationList(pageManager: PageManager, userToBlock: User) {
   const {pages, modals} = pageManager.webapp;
