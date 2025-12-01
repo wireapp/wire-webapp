@@ -300,7 +300,7 @@ describe('CellsAPI', () => {
 
       const result = await cellsAPI.getNode({id: fileId});
 
-      expect(mockNodeServiceApi.getByUuid).toHaveBeenCalledWith(fileId);
+      expect(mockNodeServiceApi.getByUuid).toHaveBeenCalledWith(fileId, undefined);
       expect(result).toEqual(mockNode);
     });
 
