@@ -129,7 +129,7 @@ export class EventRepository {
   // WebSocket handling
   //##############################################################################
 
-  private readonly updateConnectivitityStatus = (state: ConnectionState) => {
+  private readonly updateConnectivityStatus = (state: ConnectionState) => {
     this.latestConnectionState = state;
     this.logger.log('Websocket connection state changed to', state);
     switch (state) {
@@ -216,7 +216,9 @@ export class EventRepository {
       }
       this.reconnectRetryTimeout = window.setTimeout(() => {
         this.reconnectRetryTimeout = undefined;
-        void connectWebSocketOnce();
+        connectWebSocketOnce().catch(error => {
+          this.logger.error('Scheduled reconnection failed', error);
+        });
       }, retryDelay);
     };
 
@@ -229,27 +231,28 @@ export class EventRepository {
         this.disconnectWebSocket?.();
       }
       pendingReconnect = new Promise<void>((resolve, reject) => {
-        account.listen({
-          useLegacy,
-          onConnectionStateChanged: connectionState => {
-            this.updateConnectivitityStatus(connectionState);
-            if (connectionState === ConnectionState.LIVE) {
-              resolve();
-            }
-          },
-          onEvent: this.handleIncomingEvent,
-          onMissedNotifications: this.triggerMissedSystemEventMessageRendering,
-          onNotificationStreamProgress: onNotificationStreamProgress,
-          dryRun,
-        })
-        .then(disconnect => {
-          this.disconnectWebSocket = disconnect;
-        })
-        .catch(error => {
-          this.logger.error('Failed to establish WebSocket connection', error);
-          scheduleReconnect();
-          reject(error);
-        });
+        account
+          .listen({
+            useLegacy,
+            onConnectionStateChanged: connectionState => {
+              this.updateConnectivityStatus(connectionState);
+              if (connectionState === ConnectionState.LIVE) {
+                resolve();
+              }
+            },
+            onEvent: this.handleIncomingEvent,
+            onMissedNotifications: this.triggerMissedSystemEventMessageRendering,
+            onNotificationStreamProgress: onNotificationStreamProgress,
+            dryRun,
+          })
+          .then(disconnect => {
+            this.disconnectWebSocket = disconnect;
+          })
+          .catch(error => {
+            this.logger.error('Failed to establish WebSocket connection', error);
+            scheduleReconnect();
+            reject(error);
+          });
       }).finally(() => {
         pendingReconnect = undefined;
       });
@@ -258,7 +261,9 @@ export class EventRepository {
 
     const handleOnline = () => {
       this.logger.info('Internet connection regained. Re-establishing WebSocket connection...');
-      void connectWebSocketOnce();
+      connectWebSocketOnce().catch(error => {
+        this.logger.error('Failed to reconnect on online event', error);
+      });
     };
 
     const handleOffline = () => {
@@ -275,15 +280,21 @@ export class EventRepository {
     window.addEventListener('offline', handleOffline);
     // Fallback: periodically attempt reconnect in case 'online' never fires after sleep.
     this.fallbackReconnectIntervalId = window.setInterval(async () => {
-      // Use the API client's heartbeat to probe without tearing down the socket.
-      const isWebsocketHealthy = await account.isWebsocketHealthy();
-      if (isWebsocketHealthy) {
-        this.logger.debug('Periodic WebSocket health check: heartbeat succeeded, skipping reconnect');
-        return;
-      }
+      try {
+        // Use the API client's heartbeat to probe without tearing down the socket.
+        const isWebsocketHealthy = await account.isWebsocketHealthy();
+        if (isWebsocketHealthy) {
+          this.logger.debug('Periodic WebSocket health check: heartbeat succeeded, skipping reconnect');
+          return;
+        }
 
-      this.logger.info('Periodic WebSocket health check: attempting reconnect (heartbeat failed)');
-      void connectWebSocketOnce();
+        this.logger.info('Periodic WebSocket health check: attempting reconnect (heartbeat failed)');
+        connectWebSocketOnce().catch(error => {
+          this.logger.error('Periodic health check reconnection failed', error);
+        });
+      } catch (error) {
+        this.logger.error('Error during periodic WebSocket health check', error);
+      }
     }, fallbackReconnectInterval);
 
     this.removeConnectivityListeners = () => {

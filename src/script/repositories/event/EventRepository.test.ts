@@ -435,20 +435,20 @@ describe('EventRepository', () => {
     });
   });
 
-  describe('updateConnectivitityStatus', () => {
+  describe('updateConnectivityStatus', () => {
     beforeEach(() => {
       testFactory.event_repository!['latestConnectionState'] = ConnectionState.CLOSED;
     });
 
     describe('notification handling state changes', () => {
       it('should update notification handling state to STREAM when PROCESSING_NOTIFICATIONS', () => {
-        testFactory.event_repository!['updateConnectivitityStatus'](ConnectionState.PROCESSING_NOTIFICATIONS);
+        testFactory.event_repository!['updateConnectivityStatus'](ConnectionState.PROCESSING_NOTIFICATIONS);
 
         expect(testFactory.event_repository!.notificationHandlingState()).toBe(NOTIFICATION_HANDLING_STATE.STREAM);
       });
 
       it('should update notification handling state to WEB_SOCKET when LIVE', () => {
-        testFactory.event_repository!['updateConnectivitityStatus'](ConnectionState.LIVE);
+        testFactory.event_repository!['updateConnectivityStatus'](ConnectionState.LIVE);
 
         expect(testFactory.event_repository!.notificationHandlingState()).toBe(NOTIFICATION_HANDLING_STATE.WEB_SOCKET);
       });
@@ -456,10 +456,10 @@ describe('EventRepository', () => {
 
     describe('connection state tracking', () => {
       it('should track latest connection state', () => {
-        testFactory.event_repository!['updateConnectivitityStatus'](ConnectionState.CONNECTING);
+        testFactory.event_repository!['updateConnectivityStatus'](ConnectionState.CONNECTING);
         expect(testFactory.event_repository!['latestConnectionState']).toBe(ConnectionState.CONNECTING);
 
-        testFactory.event_repository!['updateConnectivitityStatus'](ConnectionState.LIVE);
+        testFactory.event_repository!['updateConnectivityStatus'](ConnectionState.LIVE);
         expect(testFactory.event_repository!['latestConnectionState']).toBe(ConnectionState.LIVE);
       });
     });
@@ -687,6 +687,58 @@ describe('EventRepository', () => {
         await jest.advanceTimersByTimeAsync(5000);
 
         expect(attemptCount).toBeGreaterThan(1);
+      });
+
+      it('should reject and retry if connection moves to CLOSED state', async () => {
+        const mockNotificationService = {getServerTime: jest.fn().mockResolvedValue('2023-01-01T00:00:00.000Z')};
+        const eventRepo = new EventRepository(
+          {} as any,
+          mockNotificationService as any,
+          {computeTimeOffset: jest.fn()} as any,
+          {} as any,
+        );
+        let attemptCount = 0;
+
+        mockAccount.listen = jest.fn().mockImplementation(async ({onConnectionStateChanged}: any) => {
+          attemptCount++;
+          if (attemptCount === 1) {
+            onConnectionStateChanged(ConnectionState.CLOSED);
+          } else {
+            onConnectionStateChanged(ConnectionState.LIVE);
+          }
+          return jest.fn();
+        });
+
+        const connectPromise = eventRepo.connectWebSocket(mockAccount, false, jest.fn());
+
+        await expect(connectPromise).rejects.toThrow('WebSocket connection closed');
+
+        await jest.advanceTimersByTimeAsync(5000);
+
+        expect(attemptCount).toBeGreaterThan(1);
+      });
+
+      it('should timeout if connection does not reach LIVE state', async () => {
+        const mockNotificationService = {getServerTime: jest.fn().mockResolvedValue('2023-01-01T00:00:00.000Z')};
+        const eventRepo = new EventRepository(
+          {} as any,
+          mockNotificationService as any,
+          {computeTimeOffset: jest.fn()} as any,
+          {} as any,
+        );
+
+        mockAccount.listen = jest.fn().mockImplementation(async ({onConnectionStateChanged}: any) => {
+          // Stay in CONNECTING state indefinitely
+          onConnectionStateChanged(ConnectionState.CONNECTING);
+          return jest.fn();
+        });
+
+        const connectPromise = eventRepo.connectWebSocket(mockAccount, false, jest.fn());
+
+        // Advance past the 30 second timeout
+        await jest.advanceTimersByTimeAsync(30000);
+
+        await expect(connectPromise).rejects.toThrow('WebSocket connection timeout');
       });
     });
 
