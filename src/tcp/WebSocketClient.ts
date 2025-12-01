@@ -319,4 +319,15 @@ export class WebSocketClient extends EventEmitter {
 
     this.socket.send(jsonEvent);
   }
+
+  /**
+   * Performs a lightweight health check on the WebSocket connection.
+   * Sends a ping and waits for a pong response without closing or reconnecting the socket.
+   * The default timeout is 5 seconds; this may be configurable depending on the socket implementation.
+   * This method does not disrupt the existing connection.
+   * @returns A promise that resolves to true if a pong is received within the timeout, false otherwise.
+   */
+  public checkHealth(): Promise<boolean> {
+    return this.socket.checkHealth();
+  }
 }
