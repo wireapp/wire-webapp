@@ -130,6 +130,7 @@ export class EventRepository {
   //##############################################################################
 
   private readonly updateConnectivitityStatus = (state: ConnectionState) => {
+    this.latestConnectionState = state;
     this.logger.log('Websocket connection state changed to', state);
     switch (state) {
       case ConnectionState.CONNECTING: {
@@ -201,45 +202,112 @@ export class EventRepository {
     onNotificationStreamProgress: (currentProcessingNotificationTimestamp: string) => void,
     dryRun = false,
   ): Promise<void> {
+    // Clean up previous listeners if any
+    this.removeConnectivityListeners?.();
     await this.handleTimeDrift();
-    const connect = () => {
-      // We make sure there is only be a single active connection to the WebSocket.
-      this.disconnectWebSocket?.();
-      return new Promise<void>(async resolve => {
-        this.disconnectWebSocket = await account.listen({
-          useLegacy,
-          onConnectionStateChanged: connectionState => {
-            this.updateConnectivitityStatus(connectionState);
-            if (connectionState === ConnectionState.LIVE) {
-              resolve();
-            }
-          },
-          onEvent: this.handleIncomingEvent,
-          onMissedNotifications: this.triggerMissedSystemEventMessageRendering,
-          onNotificationStreamProgress: onNotificationStreamProgress,
-          dryRun,
-        });
-      });
+    // We use this variable to prevent overlapping connection attempts.
+    let pendingReconnect: Promise<void> | undefined;
+    const retryDelay = TIME_IN_MILLIS.SECOND * 5;
+    const fallbackReconnectInterval = TIME_IN_MILLIS.MINUTE;
+
+    const scheduleReconnect = () => {
+      if (this.reconnectRetryTimeout) {
+        return;
+      }
+      this.reconnectRetryTimeout = window.setTimeout(() => {
+        this.reconnectRetryTimeout = undefined;
+        void connectWebSocketOnce();
+      }, retryDelay);
     };
 
-    window.addEventListener('online', () => {
-      this.logger.info('Internet connection regained. Re-establishing WebSocket connection...');
-      connect();
-    });
+    const connectWebSocketOnce = () => {
+      if (pendingReconnect) {
+        return pendingReconnect;
+      }
+      // We make sure there is only be a single active connection to the WebSocket.
+      if (this.latestConnectionState !== ConnectionState.LIVE) {
+        this.disconnectWebSocket?.();
+      }
+      pendingReconnect = new Promise<void>(async (resolve, reject) => {
+        try {
+          this.disconnectWebSocket = await account.listen({
+            useLegacy,
+            onConnectionStateChanged: connectionState => {
+              this.updateConnectivitityStatus(connectionState);
+              if (connectionState === ConnectionState.LIVE) {
+                resolve();
+              }
+            },
+            onEvent: this.handleIncomingEvent,
+            onMissedNotifications: this.triggerMissedSystemEventMessageRendering,
+            onNotificationStreamProgress: onNotificationStreamProgress,
+            dryRun,
+          });
+        } catch (error) {
+          this.logger.error('Failed to establish WebSocket connection', error);
+          scheduleReconnect();
+          reject(error);
+        }
+      }).finally(() => {
+        pendingReconnect = undefined;
+      });
+      return pendingReconnect;
+    };
 
-    window.addEventListener('offline', () => {
+    const handleOnline = () => {
+      this.logger.info('Internet connection regained. Re-establishing WebSocket connection...');
+      void connectWebSocketOnce();
+    };
+
+    const handleOffline = () => {
       this.logger.warn('Internet connection lost');
       this.disconnectWebSocket();
       Warnings.showWarning(Warnings.TYPE.NO_INTERNET);
-    });
+      if (this.reconnectRetryTimeout) {
+        window.clearTimeout(this.reconnectRetryTimeout);
+        this.reconnectRetryTimeout = undefined;
+      }
+    };
 
-    return connect();
+    window.addEventListener('online', handleOnline);
+    window.addEventListener('offline', handleOffline);
+    // Fallback: periodically attempt reconnect in case 'online' never fires after sleep.
+    this.fallbackReconnectIntervalId = window.setInterval(async () => {
+      // Use the API client's heartbeat to probe without tearing down the socket.
+      const isWebsocketHealthy = await account.isWebsocketHealthy();
+      if (isWebsocketHealthy) {
+        this.logger.debug('Periodic WebSocket health check: heartbeat succeeded, skipping reconnect');
+        return;
+      }
+
+      this.logger.info('Periodic WebSocket health check: attempting reconnect (heartbeat failed)');
+      void connectWebSocketOnce();
+    }, fallbackReconnectInterval);
+
+    this.removeConnectivityListeners = () => {
+      window.removeEventListener('online', handleOnline);
+      window.removeEventListener('offline', handleOffline);
+      if (this.reconnectRetryTimeout) {
+        window.clearTimeout(this.reconnectRetryTimeout);
+        this.reconnectRetryTimeout = undefined;
+      }
+      if (this.fallbackReconnectIntervalId) {
+        window.clearInterval(this.fallbackReconnectIntervalId);
+        this.fallbackReconnectIntervalId = undefined;
+      }
+    };
+
+    return connectWebSocketOnce();
   }
 
   /**
    * Close the WebSocket connection. (will be set only once the connectWebSocket is called)
    */
-  disconnectWebSocket: () => void = () => {};
+  public disconnectWebSocket: () => void = () => {};
+  private removeConnectivityListeners: () => void = () => {};
+  private reconnectRetryTimeout?: number;
+  private fallbackReconnectIntervalId?: number;
+  private latestConnectionState: ConnectionState = ConnectionState.CLOSED;
 
   //##############################################################################
   // Notification Stream handling
