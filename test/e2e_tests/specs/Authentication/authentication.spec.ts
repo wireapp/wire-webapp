@@ -190,6 +190,47 @@ test.describe('Authentication', () => {
   );
 
   test(
+    'Make sure user does not see data of user of previous sessions on same browser',
+    {tag: ['@TC-1311', '@regression']},
+    async ({pageManager, createTeam}) => {
+      const {pages, components} = pageManager.webapp;
+      const team = await createTeam('Test Team', {withMembers: 1});
+      const userA = team.owner;
+      const userB = team.members[0];
+
+      await test.step('Log in with public computer checked', async () => {
+        await pageManager.openLoginPage();
+        await pages.login().publicComputerCheckbox.click();
+        await pages.login().login(userA);
+        await pages.historyInfo().clickConfirmButton();
+      });
+
+      await test.step('Connect with and send message to userB', async () => {
+        await connectWithUser(pageManager, userB);
+        await pages.conversationList().openConversation(userB.fullName);
+        await pages.conversation().sendMessage('Test message');
+      });
+
+      await test.step('Log out of public computer', async () => {
+        await components.conversationSidebar().clickPreferencesButton();
+        await pages.settings().accountButton.click();
+        await pages.account().clickLogoutButton();
+      });
+
+      await test.step('Log in again', async () => {
+        await pageManager.openLoginPage();
+        await pages.login().login(userA);
+        await pages.historyInfo().clickConfirmButton();
+      });
+
+      await test.step('Verify previously sent message is gone', async () => {
+        await pages.conversationList().openConversation(userB.fullName);
+        await expect(pages.conversation().getMessage({content: 'Test message'})).not.toBeAttached();
+      });
+    },
+  );
+
+  test(
     'Verify session expired info is visible on login page',
     {tag: ['@TC-1311', '@regression']},
     async ({createPage, createUser}) => {
