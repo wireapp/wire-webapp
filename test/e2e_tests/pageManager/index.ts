@@ -48,6 +48,7 @@ import {ErrorModal} from './webapp/modals/error.modal';
 import {ExportBackupModal} from './webapp/modals/exportBackup.modal';
 import {importBackupModal} from './webapp/modals/importBackup.modal';
 import {LeaveConversationModal} from './webapp/modals/leaveConversation.modal';
+import {PasswordModal} from './webapp/modals/password.modal';
 import {RemoveMemberModal} from './webapp/modals/removeMember.modal';
 import {UnableToOpenConversationModal} from './webapp/modals/unableToOpenConversation.modal';
 import {UserProfileModal} from './webapp/modals/userProfile.modal';
@@ -226,6 +227,7 @@ export class PageManager {
         this.getOrCreate('webapp.modals.marketingConsent', () => new MarketingConsentModal(this.page)),
       acknowledge: () => this.getOrCreate('webapp.modals.marketingConsent', () => new AcknowledgeModal(this.page)),
       confirm: () => this.getOrCreate('webapp.modals.confirm', () => new ConfirmModal(this.page)),
+      password: () => this.getOrCreate('webapp.modals.password', () => new PasswordModal(this.page)),
       cellsFileDetailView: () =>
         this.getOrCreate('webapp.modals.cellsFileDetailView', () => new CellsFileDetailViewModal(this.page)),
       cancelRequest: () =>

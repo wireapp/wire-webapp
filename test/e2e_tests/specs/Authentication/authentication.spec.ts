@@ -17,7 +17,8 @@
  *
  */
 
-import {test, expect} from 'test/e2e_tests/test.fixtures';
+import {PageManager} from 'test/e2e_tests/pageManager';
+import {test, expect, withLogin} from 'test/e2e_tests/test.fixtures';
 import {connectWithUser} from 'test/e2e_tests/utils/userActions';
 
 test.describe('Authentication', () => {
@@ -168,4 +169,31 @@ test.describe('Authentication', () => {
       },
     );
   });
+
+  test(
+    'Verify session expired info is visible on login page',
+    {tag: ['@TC-1311', '@regression']},
+    async ({createPage, createUser}) => {
+      const user = await createUser();
+      const device1Pages = PageManager.from(await createPage(withLogin(user))).webapp.pages;
+
+      const {
+        pages: device2Pages,
+        modals: device2Modals,
+        components: device2Components,
+      } = PageManager.from(await createPage(withLogin(user))).webapp;
+      await device2Pages.historyInfo().clickConfirmButton();
+
+      await device2Components.conversationSidebar().clickPreferencesButton();
+      await device2Pages.settings().devicesButton.click();
+      await device2Pages.devices().activeDevices.getByRole('button', {name: 'Remove Device'}).click();
+
+      await device2Modals.password().passwordInput.fill(user.password);
+      await device2Modals.password().clickAction();
+
+      await expect(
+        device1Pages.singleSignOn().page.getByText('You were signed out because your device was deleted'),
+      ).toBeVisible();
+    },
+  );
 });
