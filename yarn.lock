@@ -7180,12 +7180,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@wireapp/telemetry@npm:0.3.1":
-  version: 0.3.1
-  resolution: "@wireapp/telemetry@npm:0.3.1"
+"@wireapp/telemetry@npm:0.3.6":
+  version: 0.3.6
+  resolution: "@wireapp/telemetry@npm:0.3.6"
   dependencies:
     countly-sdk-web: "npm:24.11.4"
-  checksum: 10/1e96f68103c0850c7709ceb5651672a0b14f6bc4492a4f940950de8922b496d046589252ebdef836f131be09b1e3531db9470b1b37d27596821e64573521a9eb
+  checksum: 10/51d9db4a97bdb6e4285ae5c08d58657a2b0e540361e2e2944b04ed74e647836976d31d14ecb084fb2a4b3696a6665fef077c5290fba4be490ea287decbe5077d
   languageName: node
   linkType: hard
 
@@ -20200,7 +20200,7 @@ __metadata:
     "@wireapp/react-ui-kit": "npm:9.69.6"
     "@wireapp/store-engine": "npm:5.1.16"
     "@wireapp/store-engine-dexie": "npm:2.1.16"
-    "@wireapp/telemetry": "npm:0.3.1"
+    "@wireapp/telemetry": "npm:0.3.6"
     "@wireapp/webapp-events": "npm:0.28.1"
     amplify: "https://github.com/wireapp/amplify#head=master"
     archiver: "npm:7.0.1"
