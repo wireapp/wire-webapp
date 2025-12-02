@@ -58,7 +58,7 @@ for (const spec of specs) {
         if (lastResult.errors?.length) {
           failureInfo += `\n**Errors:**\n`;
           lastResult.errors.forEach(e => {
-            failureInfo += `\n\`\`\`\n${stripAnsi(e.message)}\n\`\`\``;
+            failureInfo += `\n\`\`\`\n${stripAnsi(e?.message ?? '')}\n\`\`\``;
           });
         }
 
