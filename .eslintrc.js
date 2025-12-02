@@ -58,10 +58,20 @@ module.exports = {
   },
   overrides: [
     {
-      files: ['**/*.test.tsx', '**/*.test.ts', '**/test/**/*', '**/mocks/**/*'],
+      files: ['**/*.test.tsx', '**/*.test.ts', '**/*.spec.tsx', '**/*.spec.ts', '**/test/**/*', '**/mocks/**/*'],
       rules: {
         'no-magic-numbers': 'off',
         'id-length': 'off',
+      },
+    },
+    /**
+     * Disable react-hooks rules for test files as there is no react context in there
+     */
+    {
+      files: ['**/*.spec.ts', '**/*.test.ts'],
+      rules: {
+        'react-hooks/rules-of-hooks': 'off',
+        'react-hooks/exhaustive-deps': 'off',
       },
     },
   ],
