@@ -21,7 +21,7 @@ import {DropdownMenu, MoreIcon} from '@wireapp/react-ui-kit';
 
 import {openFolder} from 'Components/CellsGlobalView/common/openFolder/openFolder';
 import {CellsRepository} from 'Repositories/cells/CellsRepository';
-import {CellNode, CellNodeType} from 'src/types/cellNode';
+import {CellNode, CellNodeType} from 'src/script/types/cellNode';
 import {isFileEditable} from 'Util/FileTypeUtil';
 import {t} from 'Util/LocalizerUtil';
 import {forcedDownloadFile} from 'Util/util';

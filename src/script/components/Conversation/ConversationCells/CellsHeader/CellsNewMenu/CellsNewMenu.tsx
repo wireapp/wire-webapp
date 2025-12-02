@@ -24,7 +24,7 @@ import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {Button, ButtonVariant, DropdownMenu, PlusIcon} from '@wireapp/react-ui-kit';
 
 import {CellsRepository} from 'Repositories/cells/CellsRepository';
-import {CellNodeType} from 'src/types/cellNode';
+import {CellNodeType} from 'src/script/types/cellNode';
 import {t} from 'Util/LocalizerUtil';
 
 import {CellsNewItemModal} from './CellsNewItemModal/CellsNewItemModal';

@@ -27,7 +27,7 @@ import {
 } from 'Components/Conversation/ConversationCells/common/recycleBin/recycleBin';
 import {useCellsStore} from 'Components/Conversation/ConversationCells/common/useCellsStore/useCellsStore';
 import {CellsRepository} from 'Repositories/cells/CellsRepository';
-import {CellNode} from 'src/types/cellNode';
+import {CellNode} from 'src/script/types/cellNode';
 
 interface UseRestoreParentNodeProps {
   childNode: CellNode;

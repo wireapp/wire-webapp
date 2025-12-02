@@ -20,7 +20,7 @@
 import {createColumnHelper} from '@tanstack/react-table';
 
 import {CellsRepository} from 'Repositories/cells/CellsRepository';
-import {CellNode} from 'src/types/cellNode';
+import {CellNode} from 'src/script/types/cellNode';
 import {t} from 'Util/LocalizerUtil';
 
 import {CellsConversationColumn} from './CellsConversationColumn/CellsConversationColumn';

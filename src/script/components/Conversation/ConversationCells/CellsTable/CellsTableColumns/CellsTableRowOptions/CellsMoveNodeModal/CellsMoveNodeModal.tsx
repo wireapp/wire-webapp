@@ -26,7 +26,7 @@ import {CellsNewNodeForm} from 'Components/Conversation/ConversationCells/common
 import {getCellsFilesPath} from 'Components/Conversation/ConversationCells/common/getCellsFilesPath/getCellsFilesPath';
 import {useCellsNewItemForm} from 'Components/Conversation/ConversationCells/common/useCellsNewNodeForm/useCellsNewNodeForm';
 import {CellsRepository} from 'Repositories/cells/CellsRepository';
-import {CellNode, CellNodeType} from 'src/types/cellNode';
+import {CellNode, CellNodeType} from 'src/script/types/cellNode';
 import {t} from 'Util/LocalizerUtil';
 
 import {CellsFoldersListModalContent} from './CellsFoldersListModalContent/CellsFoldersListModalContent';

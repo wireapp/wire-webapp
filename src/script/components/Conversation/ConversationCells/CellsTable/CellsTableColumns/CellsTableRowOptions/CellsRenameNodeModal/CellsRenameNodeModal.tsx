@@ -19,7 +19,7 @@
 
 import {CellsModal} from 'Components/Conversation/ConversationCells/common/CellsModal/CellsModal';
 import {CellsRepository} from 'Repositories/cells/CellsRepository';
-import {CellNode, CellNodeType} from 'src/types/cellNode';
+import {CellNode, CellNodeType} from 'src/script/types/cellNode';
 import {t} from 'Util/LocalizerUtil';
 
 import {CellsRenameForm} from './CellsRenameForm/CellsRenameForm';

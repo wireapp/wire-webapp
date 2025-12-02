@@ -30,7 +30,7 @@ import {
   isRootRecycleBinPath,
 } from 'Components/Conversation/ConversationCells/common/recycleBin/recycleBin';
 import {CellsRepository} from 'Repositories/cells/CellsRepository';
-import {CellNode, CellNodeType} from 'src/types/cellNode';
+import {CellNode, CellNodeType} from 'src/script/types/cellNode';
 import {isFileEditable} from 'Util/FileTypeUtil';
 import {t} from 'Util/LocalizerUtil';
 import {forcedDownloadFile} from 'Util/util';

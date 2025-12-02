@@ -21,7 +21,7 @@ import {createColumnHelper} from '@tanstack/react-table';
 import {QualifiedId} from '@wireapp/api-client/lib/user/';
 
 import {CellsRepository} from 'Repositories/cells/CellsRepository';
-import {CellNode} from 'src/types/cellNode';
+import {CellNode} from 'src/script/types/cellNode';
 import {t} from 'Util/LocalizerUtil';
 
 import {CellsTableDateColumn} from './CellsTableDateColumn/CellsTableDateColumn';

@@ -18,7 +18,7 @@
  */
 
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
-import {CellNodeType, CellNode} from 'src/types/cellNode';
+import {CellNodeType, CellNode} from 'src/script/types/cellNode';
 import {t} from 'Util/LocalizerUtil';
 import {replaceReactComponents} from 'Util/LocalizerUtil/ReactLocalizerUtil';
 
