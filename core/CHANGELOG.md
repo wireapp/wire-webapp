@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [46.46.8](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@46.46.5...@wireapp/core@46.46.8) (2025-12-02)
+
+### Bug Fixes
+
+* **core, api-client:** logic error in websocket reconnect, add heartbeat functionality [WPB-21950] ([#7652](https://github.com/wireapp/wire-web-packages/issues/7652)) ([457c85a](https://github.com/wireapp/wire-web-packages/commit/457c85ad6738d1f5ac746bdc1a7bdfb2cc9f9ad7))
+
 ## [46.46.7](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@46.46.6...@wireapp/core@46.46.7) (2025-12-02)
 
 **Note:** Version bump only for package @wireapp/core

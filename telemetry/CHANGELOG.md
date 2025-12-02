@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.3.7](https://github.com/wireapp/wire-web-packages/compare/@wireapp/telemetry@0.3.6...@wireapp/telemetry@0.3.7) (2025-12-02)
+
+**Note:** Version bump only for package @wireapp/telemetry
+
 ## [0.3.6](https://github.com/wireapp/wire-web-packages/compare/@wireapp/telemetry@0.3.5...@wireapp/telemetry@0.3.6) (2025-10-23)
 
 **Note:** Version bump only for package @wireapp/telemetry

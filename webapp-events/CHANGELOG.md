@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.28.6](https://github.com/wireapp/wire-web-packages/compare/@wireapp/webapp-events@0.28.5...@wireapp/webapp-events@0.28.6) (2025-12-02)
+
+**Note:** Version bump only for package @wireapp/webapp-events
+
 ## [0.28.5](https://github.com/wireapp/wire-web-packages/compare/@wireapp/webapp-events@0.28.4...@wireapp/webapp-events@0.28.5) (2025-10-23)
 
 **Note:** Version bump only for package @wireapp/webapp-events

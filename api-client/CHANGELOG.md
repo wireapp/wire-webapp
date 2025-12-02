@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [27.93.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@27.90.0...@wireapp/api-client@27.93.0) (2025-12-02)
+
+### Bug Fixes
+
+* **core, api-client:** logic error in websocket reconnect, add heartbeat functionality [WPB-21950] ([#7652](https://github.com/wireapp/wire-web-packages/issues/7652)) ([457c85a](https://github.com/wireapp/wire-web-packages/commit/457c85ad6738d1f5ac746bdc1a7bdfb2cc9f9ad7))
+
+### Features
+
+* update cells-sdk and add api wrappers for collabora [WPB-21650] ([#7651](https://github.com/wireapp/wire-web-packages/issues/7651)) ([d7a6c4c](https://github.com/wireapp/wire-web-packages/commit/d7a6c4c5342038b51cb09a95e8781aad094a42b6))
+* update cellsAPI getNode schema [WPB-21650] ([#7660](https://github.com/wireapp/wire-web-packages/issues/7660)) ([9d30344](https://github.com/wireapp/wire-web-packages/commit/9d3034481a7af4b150fb91fefcb290b4af621b9e))
+
 # [27.92.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@27.91.0...@wireapp/api-client@27.92.0) (2025-12-02)
 
 ### Features
