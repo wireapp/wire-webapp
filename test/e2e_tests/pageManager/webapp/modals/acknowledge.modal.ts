@@ -23,6 +23,6 @@ import {BaseModal} from './base.modal';
 
 export class AcknowledgeModal extends BaseModal {
   constructor(page: Page) {
-    super(page, "[data-uie-name='modal-template-acknowledge']");
+    super(page, 'modal-template-acknowledge');
   }
 }

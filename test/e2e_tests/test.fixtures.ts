@@ -22,7 +22,7 @@ import {test as baseTest, type BrowserContext, type Page} from '@playwright/test
 import {ApiManagerE2E} from './backend/apiManager.e2e';
 import {getUser, User} from './data/user';
 import {PageManager} from './pageManager';
-import {connectWithUser} from './utils/userActions';
+import {connectWithUser, sendConnectionRequest} from './utils/userActions';
 
 type PagePlugin = (page: Page) => void | Promise<void>;
 
@@ -160,6 +160,17 @@ export const withConnectedUser =
   async page => {
     const pageManager = PageManager.from(page);
     await connectWithUser(pageManager, await user);
+  };
+
+/**
+ * PagePlugin to connect with the given user
+ * Note: This plugin only works if the users are NOT in the same team
+ */
+export const withConnectionRequest =
+  (user: User | Promise<User>): PagePlugin =>
+  async page => {
+    const pageManager = PageManager.from(page);
+    await sendConnectionRequest(pageManager, await user);
   };
 
 const createUser = async (api: ApiManagerE2E, options?: {disableTelemetry?: boolean}) => {

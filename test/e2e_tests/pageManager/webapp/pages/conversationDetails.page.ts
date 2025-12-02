@@ -29,6 +29,7 @@ export class ConversationDetailsPage {
   readonly guestOptionsButton: Locator;
   readonly selfDeletingMessageButton: Locator;
   readonly archiveButton: Locator;
+  readonly blockConversationButton: Locator;
 
   constructor(page: Page) {
     this.page = page;
@@ -38,6 +39,7 @@ export class ConversationDetailsPage {
     this.guestOptionsButton = this.conversationDetails.locator('[data-uie-name="go-guest-options"]');
     this.selfDeletingMessageButton = this.conversationDetails.getByRole('button', {name: 'Self-deleting messages'});
     this.archiveButton = this.conversationDetails.locator(selectByDataAttribute('do-archive'));
+    this.blockConversationButton = this.conversationDetails.locator(selectByDataAttribute('do-block'));
   }
 
   async waitForSidebar() {
@@ -161,5 +163,9 @@ export class ConversationDetailsPage {
       .filter({hasText: serviceName});
     await serviceLocator.waitFor({state: 'visible'});
     return serviceLocator.isVisible();
+  }
+
+  async clickBlockConversationButton() {
+    await this.blockConversationButton.click();
   }
 }
