@@ -6876,9 +6876,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@wireapp/api-client@npm:^27.90.0":
-  version: 27.90.0
-  resolution: "@wireapp/api-client@npm:27.90.0"
+"@wireapp/api-client@npm:^27.92.0":
+  version: 27.92.0
+  resolution: "@wireapp/api-client@npm:27.92.0"
   dependencies:
     "@aws-sdk/client-s3": "npm:3.908.0"
     "@aws-sdk/lib-storage": "npm:3.908.0"
@@ -6887,7 +6887,7 @@ __metadata:
     "@wireapp/protocol-messaging": "npm:1.53.0"
     axios: "npm:1.12.2"
     axios-retry: "npm:4.5.0"
-    cells-sdk-ts: "npm:0.1.1-alpha14"
+    cells-sdk-ts: "npm:0.1.1-alpha17"
     http-status-codes: "npm:2.3.0"
     logdown: "npm:3.3.1"
     pako: "npm:2.1.0"
@@ -6897,7 +6897,7 @@ __metadata:
     uuid: "npm:11.1.0"
     ws: "npm:8.18.1"
     zod: "npm:3.24.2"
-  checksum: 10/b5c7e88f4308947c72fd8a55b5ca9cad278e8d4468d7fe9273f804d201da8f48a611821c71d97728f9b8d7afc2b0f42dd874f808cd7408ae1985f5331da657e5
+  checksum: 10/a4a7909cd909f7aa205a30fee58229f884c23e7085dfb27ddcb8d2cdb421d7a8ec275f21658b8e11064abeb47ba41014c5e022c3653b85ab86a5c8b2985e4c2c
   languageName: node
   linkType: hard
 
@@ -6962,11 +6962,11 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@wireapp/core@npm:46.46.5":
-  version: 46.46.5
-  resolution: "@wireapp/core@npm:46.46.5"
+"@wireapp/core@npm:46.46.7":
+  version: 46.46.7
+  resolution: "@wireapp/core@npm:46.46.7"
   dependencies:
-    "@wireapp/api-client": "npm:^27.90.0"
+    "@wireapp/api-client": "npm:^27.92.0"
     "@wireapp/commons": "npm:^5.4.9"
     "@wireapp/core-crypto": "npm:9.1.2"
     "@wireapp/cryptobox": "npm:12.8.0"
@@ -6984,7 +6984,7 @@ __metadata:
     long: "npm:^5.2.0"
     uuid: "npm:9.0.1"
     zod: "npm:3.24.2"
-  checksum: 10/596853da6c0dd5993407e1e31bd7c18dc0acf9e161b036651a899b99b7393677d31eee822d63823686eaafeb00628e52e5b982668dc2d0387d7ba7268291e296
+  checksum: 10/5282742b767c43f544a02d6f179288d08e36013a6c75118def35d2fc5b88f06cc85a70907936c26d2def9e3fef3086a53f004e1edcbd75fd94f63af44b56715c
   languageName: node
   linkType: hard
 
@@ -8383,12 +8383,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"cells-sdk-ts@npm:0.1.1-alpha14":
-  version: 0.1.1-alpha14
-  resolution: "cells-sdk-ts@npm:0.1.1-alpha14"
+"cells-sdk-ts@npm:0.1.1-alpha17":
+  version: 0.1.1-alpha17
+  resolution: "cells-sdk-ts@npm:0.1.1-alpha17"
   dependencies:
     axios: "npm:^1.9.0"
-  checksum: 10/0b530d83bd56d3b3a63f8dd3f99014268bdafc9d3af32a3c45910b0529552ce4af3d7d8f9c5533c53cf3fcaccc8ac83be2f44639abcd622fb9f036f1d7fac17d
+  checksum: 10/6dcea3f86f1d391c1a9367152c542b4c299f533d16a6ba5af0e840a6eaa3703152b62dc0efa38104f69bb0a130f168573d783c35f6b9c9b6a880cacb48240339
   languageName: node
   linkType: hard
 
@@ -20173,7 +20173,7 @@ __metadata:
     "@wireapp/avs-debugger": "npm:0.0.7"
     "@wireapp/commons": "npm:5.4.9"
     "@wireapp/copy-config": "npm:2.3.4"
-    "@wireapp/core": "npm:46.46.5"
+    "@wireapp/core": "npm:46.46.7"
     "@wireapp/eslint-config": "npm:3.0.7"
     "@wireapp/kalium-backup": "npm:0.0.4"
     "@wireapp/prettier-config": "npm:0.6.9"

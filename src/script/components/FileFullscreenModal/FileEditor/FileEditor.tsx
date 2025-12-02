@@ -63,7 +63,7 @@ export const FileEditor = ({id}: FileEditorProps) => {
   // Auto-refresh mechanism before expiry
   useEffect(() => {
     if (!node?.EditorURLs?.collabora.ExpiresAt) {
-      return;
+      return undefined;
     }
 
     const expiresInSeconds = Number(node.EditorURLs.collabora.ExpiresAt);
