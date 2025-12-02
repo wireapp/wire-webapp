@@ -24,12 +24,12 @@ import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {Button, ButtonVariant, DropdownMenu, PlusIcon} from '@wireapp/react-ui-kit';
 
 import {CellsRepository} from 'Repositories/cells/CellsRepository';
+import {CellNodeType} from 'src/types/cellNode';
 import {t} from 'Util/LocalizerUtil';
 
 import {CellsNewItemModal} from './CellsNewItemModal/CellsNewItemModal';
 import {buttonStyles, iconStyles} from './CellsNewMenu.styles';
 
-import {CellNode} from '../../common/cellNode/cellNode';
 import {getCellsFilesPath} from '../../common/getCellsFilesPath/getCellsFilesPath';
 
 interface CellsNewMenuProps {
@@ -40,9 +40,9 @@ interface CellsNewMenuProps {
 
 export const CellsNewMenu = ({cellsRepository, conversationQualifiedId, onRefresh}: CellsNewMenuProps) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [modalType, setModalType] = useState<CellNode['type']>('file');
+  const [modalType, setModalType] = useState<CellNodeType>(CellNodeType.FILE);
 
-  const openModal = (type: CellNode['type']) => {
+  const openModal = (type: CellNodeType) => {
     setModalType(type);
     setIsModalOpen(true);
   };
@@ -57,7 +57,9 @@ export const CellsNewMenu = ({cellsRepository, conversationQualifiedId, onRefres
           </Button>
         </DropdownMenu.Trigger>
         <DropdownMenu.Content>
-          <DropdownMenu.Item onClick={() => openModal('folder')}>{t('cells.newItemMenu.folder')}</DropdownMenu.Item>
+          <DropdownMenu.Item onClick={() => openModal(CellNodeType.FOLDER)}>
+            {t('cells.newItemMenu.folder')}
+          </DropdownMenu.Item>
         </DropdownMenu.Content>
       </DropdownMenu>
       {isModalOpen && (

@@ -21,9 +21,9 @@ import {useCallback, useEffect, useState} from 'react';
 
 import {QualifiedId} from '@wireapp/api-client/lib/user/';
 
-import {CellNode} from 'Components/Conversation/ConversationCells/common/cellNode/cellNode';
 import {getCellsApiPath} from 'Components/Conversation/ConversationCells/common/getCellsApiPath/getCellsApiPath';
 import {CellsRepository} from 'Repositories/cells/CellsRepository';
+import {CellNode} from 'src/types/cellNode';
 
 import {transformNodesToCellsFolders} from './transformNodesToCellsFolders';
 

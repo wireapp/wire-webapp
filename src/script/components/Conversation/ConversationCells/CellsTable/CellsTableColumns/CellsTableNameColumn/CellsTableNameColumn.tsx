@@ -22,8 +22,8 @@ import {QualifiedId} from '@wireapp/api-client/lib/user/';
 import {FolderIcon, PlayIcon} from '@wireapp/react-ui-kit';
 
 import {FileTypeIcon} from 'Components/Conversation/common/FileTypeIcon/FileTypeIcon';
-import {CellFile, CellNode} from 'Components/Conversation/ConversationCells/common/cellNode/cellNode';
 import {openFolder} from 'Components/Conversation/ConversationCells/common/openFolder/openFolder';
+import {CellFile, CellNode, CellNodeType} from 'src/types/cellNode';
 import {getFileExtension} from 'Util/util';
 
 import {
@@ -47,7 +47,7 @@ export const CellsTableNameColumn = ({node, conversationQualifiedId}: CellsTable
     <>
       <span css={mobileNameStyles}>{node.name}</span>
       <div css={wrapperStyles}>
-        {node.type === 'file' ? (
+        {node.type === CellNodeType.FILE ? (
           <FileNameColumn file={node} />
         ) : (
           <FolderNameColumn name={node.name} conversationQualifiedId={conversationQualifiedId} />

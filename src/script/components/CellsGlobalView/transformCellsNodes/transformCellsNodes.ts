@@ -22,10 +22,10 @@ import {RestNode} from 'cells-sdk-ts';
 
 import {Conversation} from 'Repositories/entity/Conversation';
 import {User} from 'Repositories/entity/User';
+import {CellNode, CellNodeType} from 'src/types/cellNode';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 import {formatBytes, getFileExtension} from 'Util/util';
 
-import {CellNode} from '../common/cellNode/cellNode';
 import {getUserQualifiedIdFromNode} from '../common/getUserQualifiedIdFromNode/getUserQualifiedIdFromNode';
 
 export const transformCellsNodes = ({
@@ -65,12 +65,13 @@ export const transformCellsNodes = ({
     if (node.Type === 'COLLECTION') {
       return {
         id,
-        type: 'folder' as const,
+        type: CellNodeType.FOLDER,
         url,
         path,
         owner,
         conversationName,
         name,
+        extension: '',
         sizeMb,
         uploadedAtTimestamp,
         publicLink,
@@ -83,7 +84,7 @@ export const transformCellsNodes = ({
 
     return {
       id,
-      type: 'file' as const,
+      type: CellNodeType.FILE,
       url,
       path,
       owner,

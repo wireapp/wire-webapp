@@ -24,12 +24,12 @@ import {container} from 'tsyringe';
 
 import {CellsRepository} from 'Repositories/cells/CellsRepository';
 import {t} from 'Util/LocalizerUtil';
+import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 
 import * as styles from './FileEditor.styles';
 
 import {FileLoader} from '../FileLoader/FileLoader';
 
-const MILLISECONDS_IN_SECOND = 1000;
 const REFRESH_BUFFER_SECONDS = 10; // Refresh 10 seconds before expiry for safety
 
 interface FileEditorProps {
@@ -72,7 +72,7 @@ export const FileEditor = ({id}: FileEditorProps) => {
     // Set timeout to refresh before expiry
     const timeoutId = setTimeout(() => {
       void fetchNode();
-    }, refreshInSeconds * MILLISECONDS_IN_SECOND);
+    }, refreshInSeconds * TIME_IN_MILLIS.SECOND);
 
     return () => {
       clearTimeout(timeoutId);

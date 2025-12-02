@@ -21,11 +21,11 @@ import {ChangeEvent, FormEvent} from 'react';
 
 import {ErrorMessage, Input, Label} from '@wireapp/react-ui-kit';
 
+import {CellNode} from 'src/types/cellNode';
 import {t} from 'Util/LocalizerUtil';
 
 import {inputWrapperStyles} from './CellsNewNodeForm.styles';
 
-import {CellNode} from '../cellNode/cellNode';
 import {useInputAutoFocus} from '../useInputAutoFocus/useInputAutoFocus';
 
 interface CellsNewNodeFormProps {

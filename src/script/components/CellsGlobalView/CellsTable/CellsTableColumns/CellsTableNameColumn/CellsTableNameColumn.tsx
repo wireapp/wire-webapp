@@ -21,6 +21,7 @@ import {FolderIcon, PlayIcon} from '@wireapp/react-ui-kit';
 
 import {openFolder} from 'Components/CellsGlobalView/common/openFolder/openFolder';
 import {FileTypeIcon} from 'Components/Conversation/common/FileTypeIcon/FileTypeIcon';
+import {CellFile, CellNode, CellNodeType} from 'src/types/cellNode';
 import {getFileExtension} from 'Util/util';
 
 import {
@@ -32,7 +33,6 @@ import {
   wrapperStyles,
 } from './CellsTableNameColumn.styles';
 
-import {CellFile, CellNode} from '../../../common/cellNode/cellNode';
 import {useCellsFilePreviewModal} from '../../common/CellsFilePreviewModalContext/CellsFilePreviewModalContext';
 interface CellsTableNameColumnProps {
   node: CellNode;
@@ -43,7 +43,11 @@ export const CellsTableNameColumn = ({node}: CellsTableNameColumnProps) => {
     <>
       <span css={mobileNameStyles}>{node.name}</span>
       <div css={wrapperStyles}>
-        {node.type === 'file' ? <FileNameColumn file={node} /> : <FolderNameColumn name={node.name} path={node.path} />}
+        {node.type === CellNodeType.FILE ? (
+          <FileNameColumn file={node} />
+        ) : (
+          <FolderNameColumn name={node.name} path={node.path} />
+        )}
       </div>
     </>
   );
