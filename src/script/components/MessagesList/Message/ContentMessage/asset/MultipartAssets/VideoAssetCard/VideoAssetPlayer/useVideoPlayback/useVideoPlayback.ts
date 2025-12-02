@@ -19,12 +19,6 @@
 
 import {useState, useCallback, useRef, SyntheticEvent} from 'react';
 
-import {amplify} from 'amplify';
-
-import {WebAppEvents} from '@wireapp/webapp-events';
-
-import {EventName} from 'Repositories/tracking/EventName';
-
 import {isVideoPlayable} from './isVideoPlayable/isVideoPlayable';
 
 interface UseVideoPlaybackProps {
@@ -59,8 +53,9 @@ export const useVideoPlayback = ({url, videoElement, isEnabled}: UseVideoPlaybac
     if (!playable) {
       const status = 'unplayable';
 
-      amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.MESSAGES.VIDEO.PLAY_FAILED);
-      amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.MESSAGES.VIDEO.UNPLAYABLE_ERROR);
+      // Todo: This needs to be revisited
+      // amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.MESSAGES.VIDEO.PLAY_FAILED);
+      // amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.MESSAGES.VIDEO.UNPLAYABLE_ERROR);
       setIsError(true);
       playabilityStatusRef.current = status;
       return status;
@@ -108,7 +103,8 @@ export const useVideoPlayback = ({url, videoElement, isEnabled}: UseVideoPlaybac
 
   const handleError = useCallback((event: SyntheticEvent<HTMLVideoElement>) => {
     setIsError(true);
-    amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.MESSAGES.VIDEO.PLAY_FAILED);
+    // Todo: This needs to be revisited
+    //amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.MESSAGES.VIDEO.PLAY_FAILED);
     console.error('Video cannot be played', event);
   }, []);
 
