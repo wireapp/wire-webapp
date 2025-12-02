@@ -2,17 +2,33 @@ name: Link and Lint PR with Jira Ticket Number
 on:
   pull_request:
     types: [opened, edited, synchronize]
+
+permissions:
+  contents: read
+  pull-requests: write
+
 jobs:
-  add-jira-description:
-    # avoid triggering this action on dependabot PRs
-    if: ${{ github.actor != 'dependabot[bot]' }}
+  get-version:
     runs-on: ubuntu-latest
+    # Run only if the PR is not from a Fork / external contributor
+    if: ${{ github.repository_owner == 'wireapp' }}
+    outputs:
+      version_name: ${{ steps.version.outputs.version_name }}
     steps:
-      - uses: cakeinpanic/jira-description-action@master
-        name: jira-description-action
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          jira-token: ${{ secrets.JIRA_TOKEN }}
-          jira-base-url: https://wearezeta.atlassian.net
-          skip-branches: '^(dev|master|release\/*)$'
-          fail-when-jira-issue-not-found: true
+      - name: Get version name from source
+        id: version
+        run: |
+          VERSION=$(curl -s https://raw.githubusercontent.com/${{ github.repository }}/${{ github.head_ref || github.ref_name }}/package.json | grep -o '"version": *"[^"]*"' | sed 's/"version": *"\(.*\)"/\1/')
+          echo "version_name=$VERSION" >> $GITHUB_OUTPUT
+
+  add-jira-description:
+    needs: get-version
+    uses: wireapp/.github/.github/workflows/jira-link-pr-reusable.yml@mo/ci/jira-linking-gh-action # TODO: replace with commit hash
+    with:
+      skip-branches: '^(dev|master|release\/*)$'
+      skip-actors: 'dependabot[bot]'
+      version-name: ${{ needs.get-version.outputs.version_name }}
+      fix-version-regex: '(?:^|[\s\-_])(v?\d+\.\d+(?:\.\d+)?(?:[\-\+][\w\.\-]*)?)'
+    secrets:
+      github-token: ${{ secrets.GITHUB_TOKEN }}
+      jira-token: ${{ secrets.JIRA_TOKEN }}
