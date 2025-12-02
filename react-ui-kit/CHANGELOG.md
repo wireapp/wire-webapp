@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [9.70.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/react-ui-kit@9.69.6...@wireapp/react-ui-kit@9.70.0) (2025-12-02)
+
+### Features
+
+* update cells-sdk and add api wrappers for collabora [WPB-21650] ([#7651](https://github.com/wireapp/wire-web-packages/issues/7651)) ([#7659](https://github.com/wireapp/wire-web-packages/issues/7659)) ([5fc0d09](https://github.com/wireapp/wire-web-packages/commit/5fc0d092d3d5669869a043b0f8755f48011e3576))
+
 ## [9.69.6](https://github.com/wireapp/wire-web-packages/compare/@wireapp/react-ui-kit@9.69.5...@wireapp/react-ui-kit@9.69.6) (2025-11-20)
 
 ### Bug Fixes
