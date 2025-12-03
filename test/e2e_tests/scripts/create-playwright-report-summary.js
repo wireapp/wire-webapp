@@ -29,57 +29,65 @@ const ansiRegex = new RegExp(`${ESC}\\[[0-?]*[ -/]*[@-~]`, 'g');
 
 const stripAnsi = str => str.replace(ansiRegex, '');
 
-for (const suite of report.suites) {
-  for (const spec of suite.specs) {
-    for (const test of spec.tests) {
-      const title = `${spec.title} (tags: ${spec.tags.join(', ')})`;
-      const specLocation = `${spec.file}:${spec.line}`;
-      const retries = test.results.length - 1;
-      const hasPassed = test.results.some(r => r.status === 'passed');
-      const hasRetries = retries > 0;
+// Recursively get all specs no matter in how many suites they are nested
+const getSpecs = suite => {
+  if (suite.suites?.length) {
+    return [...suite.suites.flatMap(suite => getSpecs(suite)), ...(suite.specs ?? [])];
+  } else {
+    return suite.specs ?? [];
+  }
+};
 
-      // Only include in failures if no retries succeeded
-      if (!hasPassed) {
-        const lastResult = test.results[test.results.length - 1];
+const specs = getSpecs(report);
+for (const spec of specs) {
+  for (const test of spec.tests) {
+    const title = `${spec.title} (tags: ${spec.tags.join(', ')})`;
+    const specLocation = `${spec.file}:${spec.line}`;
+    const retries = test.results.length - 1;
+    const hasPassed = test.results.some(r => r.status === 'passed');
+    const hasRetries = retries > 0;
 
-        if (lastResult.status !== 'passed' && lastResult.status !== 'skipped') {
-          // Show only the last (final) failure
-          let failureInfo = `<details> \n <summary> ❌ ${title} </summary><br> \n\n  Location: **${specLocation}**\n  Duration: **${lastResult.duration}ms**\n`;
+    // Only include in failures if no retries succeeded
+    if (!hasPassed) {
+      const lastResult = test.results[test.results.length - 1];
 
-          if (lastResult.errors?.length) {
-            failureInfo += `\n**Errors:**\n`;
-            lastResult.errors.forEach(e => {
-              failureInfo += `\n\`\`\`\n${stripAnsi(e.message)}\n\`\`\``;
-            });
-          }
+      if (lastResult.status !== 'passed' && lastResult.status !== 'skipped') {
+        // Show only the last (final) failure
+        let failureInfo = `<details> \n <summary> ❌ ${title} </summary><br> \n\n  Location: **${specLocation}**\n  Duration: **${lastResult.duration}ms**\n`;
 
-          failureInfo += `\n</details>`;
-          failures.push(failureInfo);
+        if (lastResult.errors?.length) {
+          failureInfo += `\n**Errors:**\n`;
+          lastResult.errors.forEach(e => {
+            failureInfo += `\n\`\`\`\n${stripAnsi(e?.message ?? '')}\n\`\`\``;
+          });
         }
+
+        failureInfo += `\n</details>`;
+        failures.push(failureInfo);
       }
+    }
 
-      // Test is flaky if it passed after retries
-      if (hasRetries && hasPassed) {
-        const retryDetails = test.results
-          .map((result, index) => {
-            const errors = (result.errors || [])
-              .map((err, i) => {
-                const clean = stripAnsi(err.message || '');
-                return `\n\`\`\`\n${clean}\n\`\`\``;
-              })
-              .join('\n\n');
+    // Test is flaky if it passed after retries
+    if (hasRetries && hasPassed) {
+      const retryDetails = test.results
+        .map((result, index) => {
+          const errors = (result.errors || [])
+            .map((err, i) => {
+              const clean = stripAnsi(err.message || '');
+              return `\n\`\`\`\n${clean}\n\`\`\``;
+            })
+            .join('\n\n');
 
-            if (!errors) {
-              return `**Attempt ${index + 1}** \n Result: ✅ **Passed** \n Duration: **${result.duration}ms**`;
-            }
-            return `**Attempt ${index + 1}** \n Result: ❌ **Failed** \n Duration: **${result.duration}ms** \n\n **Errors:** \n ${errors}`.trim();
-          })
-          .join('\n\n');
+          if (!errors) {
+            return `**Attempt ${index + 1}** \n Result: ✅ **Passed** \n Duration: **${result.duration}ms**`;
+          }
+          return `**Attempt ${index + 1}** \n Result: ❌ **Failed** \n Duration: **${result.duration}ms** \n\n **Errors:** \n ${errors}`.trim();
+        })
+        .join('\n\n');
 
-        flakyTests.push(
-          `<details> \n <summary> ⚠️ ${title} </summary><br> \n\n  Location: **${specLocation}**\n\n${retryDetails}\n</details>`,
-        );
-      }
+      flakyTests.push(
+        `<details> \n <summary> ⚠️ ${title} </summary><br> \n\n  Location: **${specLocation}**\n\n${retryDetails}\n</details>`,
+      );
     }
   }
 }
