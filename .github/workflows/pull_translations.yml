@@ -9,7 +9,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Cancel Previous Runs
         uses: styfle/cancel-workflow-action@0.12.1
