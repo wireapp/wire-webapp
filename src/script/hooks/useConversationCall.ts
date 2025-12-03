@@ -55,7 +55,7 @@ export const useConversationCall = (conversation: Conversation): ConversationCal
   useEffect(() => {
     if (!call) {
       setCurrentCallState(null);
-      return;
+      return () => {};
     }
 
     setCurrentCallState(call.state());
