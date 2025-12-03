@@ -181,7 +181,7 @@ describe('renderMessage', () => {
 
   it('renders an emoticon of someone shrugging', () => {
     /* eslint-disable no-useless-escape */
-    expect(renderMessage('¯_(ツ)_/¯')).toBe('¯_(ツ)_/¯');
+    expect(renderMessage('¯_(ツ)_/¯')).toBe('¯<em>(ツ)</em>/¯');
   });
   /* eslint-enable no-useless-escape */
 
