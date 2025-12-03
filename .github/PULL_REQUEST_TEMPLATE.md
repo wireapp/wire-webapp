@@ -1,20 +1,29 @@
-## Description
+# Pull Request
 
-<!-- Uncomment this section if your PR has UI changes -->
-<!--
-## Screenshots/Screencast (for UI changes)
--->
+## Summary
 
-## Checklist
+- What did I change and why?
+- Risks and how to roll out / roll back (e.g. feature flags):
 
-- [ ] mentions the JIRA issue in the PR name (Ex. [WPB-XXXX])
-- [ ] PR has been self reviewed by the author;
-- [ ] Hard-to-understand areas of the code have been commented;
-- [ ] If it is a core feature, unit tests have been added;
+---
 
-<!-- Uncomment this section if it is necessary to understand the PR -->
-<!-- ## Important Details for the Reviewers
+## Security Checklist (required)
 
-- use (x) data
-- can be reviewed commit-by-commit
-- be sure to look at ... -->
+- [ ] **External inputs are validated & sanitized** on client and/or server where applicable.
+- [ ] **API responses are validated**; unexpected shapes are handled safely (fallbacks or errors).
+- [ ] **No unsafe HTML is rendered**; if unavoidable, sanitization is applied **and** documented where it happens.
+- [ ] **Injection risks (XSS/SQL/command) are prevented** via safe APIs and/or escaping.
+
+## Standards Acknowledgement (required)
+
+- [ ] I have read and this PR **upholds** our [Coding Standards](https://github.com/wireapp/wire-webapp/tree/docs/coding-standards.md) and [Tech Radar Choices](https://github.com/wireapp/wire-webapp/tree/docs/tech-radar.md).
+
+---
+
+## Screenshots or demo (if the user interface changed)
+
+## Notes for reviewers
+
+- Trade-offs:
+- Follow-ups (linked issues):
+- Linked PRs (e.g. web-packages):

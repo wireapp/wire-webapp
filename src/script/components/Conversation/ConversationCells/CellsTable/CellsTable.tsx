@@ -21,6 +21,7 @@ import {flexRender, getCoreRowModel, useReactTable} from '@tanstack/react-table'
 import {QualifiedId} from '@wireapp/api-client/lib/user/';
 
 import {CellsRepository} from 'Repositories/cells/CellsRepository';
+import {CellNode} from 'src/script/types/cellNode';
 
 import {CellsFilePreviewModal} from './CellsFilePreviewModal/CellsFilePreviewModal';
 import {
@@ -33,8 +34,6 @@ import {
 } from './CellsTable.styles';
 import {getCellsTableColumns} from './CellsTableColumns/CellsTableColumns';
 import {CellsFilePreviewModalProvider} from './common/CellsFilePreviewModalContext/CellsFilePreviewModalContext';
-
-import {CellNode} from '../common/cellNode/cellNode';
 
 interface CellsTableProps {
   nodes: Array<CellNode>;

@@ -17,7 +17,7 @@
  *
  */
 
-import {forwardRef, ReactNode, useId, useState} from 'react';
+import {forwardRef, ReactNode, useState} from 'react';
 
 import {FileCard} from 'Components/FileCard/FileCard';
 import {t} from 'Util/LocalizerUtil';
@@ -37,12 +37,12 @@ interface VideoAssetCardProps {
   isError?: boolean;
   isLoading?: boolean;
   children: ReactNode;
+  id: string;
 }
 
 export const VideoAssetCard = forwardRef<HTMLDivElement, VideoAssetCardProps>(
-  ({extension, name, size, isError, children, src, senderName, timestamp}, ref) => {
+  ({extension, name, size, isError, children, src, senderName, timestamp, id}, ref) => {
     const [isOpen, setIsOpen] = useState(false);
-    const id = useId();
     const formattedName = isError ? t('cells.unavailableFile') : name;
 
     return (

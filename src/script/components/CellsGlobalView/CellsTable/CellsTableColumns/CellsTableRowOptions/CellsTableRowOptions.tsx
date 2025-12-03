@@ -21,12 +21,13 @@ import {DropdownMenu, MoreIcon} from '@wireapp/react-ui-kit';
 
 import {openFolder} from 'Components/CellsGlobalView/common/openFolder/openFolder';
 import {CellsRepository} from 'Repositories/cells/CellsRepository';
+import {CellNode, CellNodeType} from 'src/script/types/cellNode';
+import {isFileEditable} from 'Util/FileTypeUtil';
 import {t} from 'Util/LocalizerUtil';
 import {forcedDownloadFile} from 'Util/util';
 
 import {buttonStyles, iconStyles, textStyles} from './CellsTableRowOptions.styles';
 
-import {CellNode} from '../../../common/cellNode/cellNode';
 import {useCellsFilePreviewModal} from '../../common/CellsFilePreviewModalContext/CellsFilePreviewModalContext';
 import {showShareModal} from '../CellsShareModal/CellsShareModal';
 
@@ -40,7 +41,8 @@ export const CellsTableRowOptions = ({node, cellsRepository}: CellsTableRowOptio
   const {handleOpenFile} = useCellsFilePreviewModal();
 
   const url = node.url;
-  const name = node.type === 'folder' ? `${node.name}.zip` : node.name;
+  const name = node.type === CellNodeType.FOLDER ? `${node.name}.zip` : node.name;
+  const isEditable = node.type === CellNodeType.FILE && isFileEditable(node.extension!);
 
   return (
     <DropdownMenu>
@@ -52,13 +54,16 @@ export const CellsTableRowOptions = ({node, cellsRepository}: CellsTableRowOptio
       </DropdownMenu.Trigger>
       <DropdownMenu.Content>
         <DropdownMenu.Item
-          onClick={() => (node.type === 'folder' ? openFolder({path: node.path}) : handleOpenFile(node))}
+          onClick={() => (node.type === CellNodeType.FOLDER ? openFolder({path: node.path}) : handleOpenFile(node))}
         >
           {t('cells.options.open')}
         </DropdownMenu.Item>
         <DropdownMenu.Item onClick={() => showShareModal({type: node.type, uuid: node.id, cellsRepository})}>
           {t('cells.options.share')}
         </DropdownMenu.Item>
+        {isEditable && (
+          <DropdownMenu.Item onClick={() => handleOpenFile(node, true)}>{t('cells.options.edit')}</DropdownMenu.Item>
+        )}
         {!!url && (
           <DropdownMenu.Item
             onClick={() =>

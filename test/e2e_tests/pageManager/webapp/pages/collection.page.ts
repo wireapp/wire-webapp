@@ -17,12 +17,25 @@
  *
  */
 
-import {Page} from '@playwright/test';
+import {Locator, Page} from '@playwright/test';
 
-import {BaseModal} from './base.modal';
+/** POM for the "collection". This page is accessible by searching for a message within a conversation. */
+export class CollectionPage {
+  readonly page: Locator;
 
-export class ConversationNotConnectedModal extends BaseModal {
   constructor(page: Page) {
-    super(page, "[data-uie-name='modal-template-acknowledge']");
+    this.page = page.locator('#collection');
+  }
+
+  get searchInput() {
+    return this.page.getByRole('textbox', {name: 'Search text messages'});
+  }
+
+  get searchItems() {
+    return this.page.getByTestId('full-search-item');
+  }
+
+  async searchForMessages(search: string) {
+    await this.searchInput.fill(search);
   }
 }

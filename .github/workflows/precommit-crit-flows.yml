@@ -35,9 +35,9 @@ jobs:
           fetch-depth: 0
           ref: ${{ github.event.pull_request.head.sha }}
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v6
         with:
-          node-version: 18.16.x
+          node-version-file: .nvmrc
           cache: yarn
 
       - run: yarn --immutable
@@ -124,25 +124,76 @@ jobs:
             echo "❌ Deployment failed"; exit 1
           fi
 
+  build_testservice:
+    name: Build Kalium Test Service
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          repository: wireapp/kalium
+          ref: main
+
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Gradle Cache
+        uses: gradle/actions/setup-gradle@4d9f0ba0025fe599b4ebab900eb7f3a1d93ef4c2 # SHA of tag v5.0.0
+
+      - name: Validate Gradle wrapper
+        uses: gradle/actions/wrapper-validation@4d9f0ba0025fe599b4ebab900eb7f3a1d93ef4c2 # SHA of tag v5.0.0
+
+      - name: Build the testservice
+        run: ./gradlew :testservice:shadowJar
+
+      - name: Upload jar
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: kalium-testservice
+          path: |
+            testservice/build/libs/
+            testservice/config.yml
+          retention-days: 1
+
   e2e_crit_flow:
     name: Playwright Critical Flow (precommit)
-    if: ${{ github.repository == 'wireapp/wire-webapp' && github.actor != 'dependabot[bot]' && github.actor != 'dependabot' }}
-    runs-on: [self-hosted, Linux, X64, office]
-    needs: [deploy_to_aws]
+    if: ${{ !cancelled() && github.repository == 'wireapp/wire-webapp' && github.actor != 'dependabot[bot]' && github.actor != 'dependabot' }}
+    runs-on: ubuntu-latest
+    needs: [deploy_to_aws, build_testservice]
     timeout-minutes: 35
+    strategy:
+      fail-fast: false
+      matrix:
+        # prettier-ignore
+        shard: [ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32]
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           ref: ${{ github.event.pull_request.head.sha }}
 
-      - uses: actions/setup-node@v4
+      - name: Set up JDK
+        uses: actions/setup-java@v4
         with:
-          node-version: 18.16.x
+          java-version: '17'
+          distribution: 'temurin'
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version-file: .nvmrc
           cache: yarn
 
+      - name: Download Testservice Jar
+        uses: actions/download-artifact@v5
+        with:
+          name: kalium-testservice
+          path: testservice
+
       - run: yarn --immutable
-      - run: yarn playwright install --with-deps && yarn playwright install chrome
+      - run: yarn playwright install --with-deps chrome
       - uses: 1password/install-cli-action@143a85f84a90555d121cde2ff5872e393a47ab9f
 
       - name: Generate env file
@@ -156,14 +207,60 @@ jobs:
           echo "Using precommit URL: https://wire-webapp-precommit.zinfra.io/"
           curl -s -o /dev/null -w "HTTP %{http_code}\n" https://wire-webapp-precommit.zinfra.io/
 
+      - name: Start Testservice in background
+        id: start-testservice
+        run: |
+          java -jar testservice/build/libs/testservice-*-all.jar server testservice/config.yml &
+          echo TESTSERVICE_PID=$! >> "$GITHUB_OUTPUT"
+
       - name: Run critical flow tests
         env:
           # TODO: remove hardcoded precommit env in the future when ephemeral PR envs will exist
           # Overrides URL from .env file
           WEBAPP_URL: https://wire-webapp-precommit.zinfra.io/
-        run: yarn e2e-test --grep "@crit-flow-web"
+          TEST_SERVICE_URL: http://localhost:8080 # Run tests against locally running test service
+        run: yarn e2e-test --shard=${{ matrix.shard }}/${{ strategy.job-total }} --grep "@crit-flow-web|@regression"
+
+      - name: Upload blob report
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: blob-report-${{ matrix.shard }}
+          path: blob-report
+          retention-days: 1
+
+      - name: Stop Testservice
+        run: kill -SIGKILL $TESTSERVICE_PID
+        env:
+          TESTSERVICE_PID: ${{ steps.start-testservice.outputs.TESTSERVICE_PID }}
+
+  e2e-report:
+    runs-on: ubuntu-latest
+    if: ${{ !cancelled() }}
+    needs: [e2e_crit_flow]
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version-file: .nvmrc
+          cache: yarn
+      - run: yarn --immutable
+
+      - name: Download blob reports
+        uses: actions/download-artifact@v5
+        with:
+          path: all-blob-reports
+          pattern: blob-report-*
+          merge-multiple: true
+
+      - name: Merge playwright reports
+        run: yarn playwright merge-reports --config ./playwright.config.ts ./all-blob-reports
 
       - name: Upload test report
+        id: upload_playwright_report
         if: always()
         uses: actions/upload-artifact@v4
         with:
@@ -174,7 +271,7 @@ jobs:
         if: always()
         id: generate_comment
         run: |
-          node test/e2e_tests/scripts/create-playwright-report-summary.js
+          node --experimental-strip-types test/e2e_tests/scripts/create-playwright-report-summary.ts
           COMMENT=$(cat playwright-report-summary.txt)
           echo "comment<<EOF" >> $GITHUB_OUTPUT
           echo "$COMMENT" >> $GITHUB_OUTPUT
@@ -186,7 +283,7 @@ jobs:
         with:
           header: playwright-summary
           message: |
-            🔗 [Download Full Report Artifact](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})
+            🔗 [Download Full Report Artifact](${{ steps.upload_playwright_report.outputs.artifact-url }})
 
             ${{ steps.generate_comment.outputs.comment }}
         env:

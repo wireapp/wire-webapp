@@ -36,8 +36,8 @@ import {AppLockModal} from './webapp/modals/appLock.modal';
 import {BlockWarningModal} from './webapp/modals/blockWarning.modal';
 import {CallNotEstablishedModal} from './webapp/modals/callNotEstablished.modal';
 import {CancelRequestModal} from './webapp/modals/cancelRequest.modal';
+import {ConfirmModal} from './webapp/modals/confirm.modal';
 import {ConfirmLogoutModal} from './webapp/modals/confirmLogout.modal';
-import {ConversationNotConnectedModal} from './webapp/modals/conversationNotConnected.modal';
 import {CopyPasswordModal} from './webapp/modals/copyPassword.modal';
 import {CreatGuestLinkModal} from './webapp/modals/createGuestLink.modal';
 import {DataShareConsentModal} from './webapp/modals/dataShareConsent.modal';
@@ -47,6 +47,7 @@ import {ErrorModal} from './webapp/modals/error.modal';
 import {ExportBackupModal} from './webapp/modals/exportBackup.modal';
 import {importBackupModal} from './webapp/modals/importBackup.modal';
 import {LeaveConversationModal} from './webapp/modals/leaveConversation.modal';
+import {PasswordModal} from './webapp/modals/password.modal';
 import {RemoveMemberModal} from './webapp/modals/removeMember.modal';
 import {UnableToOpenConversationModal} from './webapp/modals/unableToOpenConversation.modal';
 import {UserProfileModal} from './webapp/modals/userProfile.modal';
@@ -54,11 +55,13 @@ import {VerifyEmailModal} from './webapp/modals/verifyEmail.modal';
 import {AccountPage} from './webapp/pages/account.page';
 import {AudioVideoSettingsPage} from './webapp/pages/audioVideoSettings.page';
 import {CallingPage} from './webapp/pages/calling.page';
+import {CollectionPage} from './webapp/pages/collection.page';
 import {ConnectRequestPage} from './webapp/pages/connectRequest.page';
 import {ConversationPage} from './webapp/pages/conversation.page';
 import {ConversationDetailsPage} from './webapp/pages/conversationDetails.page';
 import {ConversationListPage} from './webapp/pages/conversationList.page';
 import {DeleteAccountPage} from './webapp/pages/deleteAccount.page';
+import {DevicesPage} from './webapp/pages/devices.page';
 import {EmailVerificationPage} from './webapp/pages/emailVerification.page';
 import {GroupCreationPage} from './webapp/pages/groupCreation.page';
 import {GuestOptionsPage} from './webapp/pages/guestOptions.page';
@@ -87,9 +90,11 @@ export class PageManager {
 
   constructor(private readonly page: Page) {}
 
-  static from = (page: Page): PageManager => {
-    return new PageManager(page);
-  };
+  static from(page: Page): PageManager;
+  static from(page: Promise<Page>): Promise<PageManager>;
+  static from(page: Page | Promise<Page>): PageManager | Promise<PageManager> {
+    return 'then' in page ? page.then(p => new PageManager(p)) : new PageManager(page);
+  }
 
   openNewTab = async <T>(url?: string, handler?: (tab: PageManager) => Promise<T>): Promise<T> => {
     const newPage = await this.page.context().newPage();
@@ -106,6 +111,10 @@ export class PageManager {
 
   openMainPage = () => {
     return this.page.goto(webAppPath, {waitUntil: 'networkidle'});
+  };
+
+  openLoginPage = async () => {
+    await this.page.goto(`${webAppPath}auth/#/login`);
   };
 
   openUrl = (url: string) => {
@@ -159,6 +168,7 @@ export class PageManager {
       conversationDetails: () =>
         this.getOrCreate('webapp.pages.conversationDetails', () => new ConversationDetailsPage(this.page)),
       conversation: () => this.getOrCreate('webapp.pages.conversation', () => new ConversationPage(this.page)),
+      collection: () => this.getOrCreate('webapp.pages.collection', () => new CollectionPage(this.page)),
       cellsConversation: () =>
         this.getOrCreate('webapp.pages.cellsConversation', () => new CellsConversationPage(this.page)),
       cellsConversationFiles: () =>
@@ -166,6 +176,7 @@ export class PageManager {
       connectRequest: () => this.getOrCreate('webapp.pages.connectRequest', () => new ConnectRequestPage(this.page)),
       calling: () => this.getOrCreate('webapp.pages.calling', () => new CallingPage(this.page)),
       settings: () => this.getOrCreate('webapp.pages.settings', () => new SettingsPage(this.page)),
+      devices: () => this.getOrCreate('webapp.pages.devices', () => new DevicesPage(this.page)),
       options: () => this.getOrCreate('webapp.pages.options', () => new OptionsPage(this.page)),
       audioVideoSettings: () =>
         this.getOrCreate('webapp.pages.audioVideoSettings', () => new AudioVideoSettingsPage(this.page)),
@@ -214,12 +225,12 @@ export class PageManager {
       marketingConsent: () =>
         this.getOrCreate('webapp.modals.marketingConsent', () => new MarketingConsentModal(this.page)),
       acknowledge: () => this.getOrCreate('webapp.modals.marketingConsent', () => new AcknowledgeModal(this.page)),
+      confirm: () => this.getOrCreate('webapp.modals.confirm', () => new ConfirmModal(this.page)),
+      password: () => this.getOrCreate('webapp.modals.password', () => new PasswordModal(this.page)),
       cellsFileDetailView: () =>
         this.getOrCreate('webapp.modals.cellsFileDetailView', () => new CellsFileDetailViewModal(this.page)),
       cancelRequest: () =>
         this.getOrCreate('webapp.modals.cancelRequestModal', () => new CancelRequestModal(this.page)),
-      conversationNotConnected: () =>
-        this.getOrCreate('webapp.modals.conversationNotConnected', () => new ConversationNotConnectedModal(this.page)),
     },
     components: {
       contactList: () => this.getOrCreate('webapp.components.ContactList', () => new ContactList(this.page)),

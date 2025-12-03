@@ -274,6 +274,8 @@ declare module 'I18n/en-US.json' {
     'authLoginTitle': `Log in`;
     'authPlaceholderEmail': `Email`;
     'authPlaceholderPassword': `Password`;
+    'showTogglePasswordLabel': `Show password`;
+    'hideTogglePasswordLabel': `Hide password`;
     'authPostedResend': `Resend to {email}`;
     'authPostedResendAction': `No email showing up?`;
     'authPostedResendDetail': `Check your email inbox and follow the instructions.`;
@@ -439,6 +441,7 @@ declare module 'I18n/en-US.json' {
     'cells.options.restore': `Restore`;
     'cells.options.share': `Share`;
     'cells.options.tags': `Add or Remove Tags`;
+    'cells.options.edit': `Edit`;
     'cells.pagination.loadMoreResults': `Load More Items`;
     'cells.pagination.nextPage': `Next Page`;
     'cells.pagination.previousPage': `Previous Page`;
@@ -983,6 +986,8 @@ declare module 'I18n/en-US.json' {
     'federationConnectionRemove': `The backends [bold]{backendUrlOne}[/bold] and [bold]{backendUrlTwo}[/bold] stopped federating.`;
     'federationDelete': `[bold]Your backend[/bold] stopped federating with [bold]{backendUrl}.[/bold]`;
     'fileCardDefaultCloseButtonLabel': `Close`;
+    'fileFullscreenModal.editor.error': `Failed to load edit preview`;
+    'fileFullscreenModal.editor.iframeTitle': `Document editor`;
     'fileFullscreenModal.noPreviewAvailable.callToAction': `Download File`;
     'fileFullscreenModal.noPreviewAvailable.description': `There is no preview available for this file. Download the file instead.`;
     'fileFullscreenModal.noPreviewAvailable.title': `File without preview`;
@@ -1978,6 +1983,8 @@ declare module 'I18n/en-US.json' {
     'verify.headline': `You’ve got mail`;
     'verify.resendCode': `Resend code`;
     'verify.subhead': `Enter the six-digit verification code we sent to{newline}{email}`;
+    'verify.codeLabel': `Six-digit code`;
+    'verify.codePlaceholder': `Input field, enter digit`;
     'videoCallMenuMoreAddReaction': `Add reaction`;
     'videoCallMenuMoreAudioSettings': `Audio Settings`;
     'videoCallMenuMoreChangeView': `Change view`;

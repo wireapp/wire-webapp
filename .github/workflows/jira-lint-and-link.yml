@@ -8,11 +8,11 @@ jobs:
     if: ${{ github.actor != 'dependabot[bot]' }}
     runs-on: ubuntu-latest
     steps:
-      - uses: cakeinpanic/jira-description-action@v0.9.0
+      - uses: cakeinpanic/jira-description-action@master
         name: jira-description-action
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           jira-token: ${{ secrets.JIRA_TOKEN }}
           jira-base-url: https://wearezeta.atlassian.net
           skip-branches: '^(dev|master|release\/*)$'
-          fail-when-jira-issue-not-found: false
+          fail-when-jira-issue-not-found: true

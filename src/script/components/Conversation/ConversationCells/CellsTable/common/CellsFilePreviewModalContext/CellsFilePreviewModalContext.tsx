@@ -19,12 +19,13 @@
 
 import {createContext, ReactNode, useContext, useId, useMemo, useState} from 'react';
 
-import {CellFile} from '../../../common/cellNode/cellNode';
+import {CellFile} from 'src/script/types/cellNode';
 
 interface CellsFilePreviewModalContextValue {
   id: string;
+  isEditMode: boolean;
   selectedFile: CellFile | null;
-  handleOpenFile: (file: CellFile) => void;
+  handleOpenFile: (file: CellFile, isEditMode?: boolean) => void;
   handleCloseFile: () => void;
 }
 
@@ -36,6 +37,7 @@ interface FilePreviewProviderProps {
 
 export const CellsFilePreviewModalProvider = ({children}: FilePreviewProviderProps) => {
   const [selectedFile, setSelectedFile] = useState<CellFile | null>(null);
+  const [isEditMode, setIsEditMode] = useState(false);
 
   const id = useId();
 
@@ -43,10 +45,14 @@ export const CellsFilePreviewModalProvider = ({children}: FilePreviewProviderPro
     () => ({
       id,
       selectedFile,
-      handleOpenFile: (file: CellFile) => setSelectedFile(file),
+      isEditMode,
+      handleOpenFile: (file: CellFile, isEditMode?: boolean) => {
+        setSelectedFile(file);
+        setIsEditMode(!!isEditMode);
+      },
       handleCloseFile: () => setSelectedFile(null),
     }),
-    [id, selectedFile],
+    [id, selectedFile, isEditMode],
   );
 
   return <CellsFilePreviewModalContext.Provider value={value}>{children}</CellsFilePreviewModalContext.Provider>;

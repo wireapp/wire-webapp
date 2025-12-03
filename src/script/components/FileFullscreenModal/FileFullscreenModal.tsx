@@ -17,11 +17,15 @@
  *
  */
 
+import {useEffect, useState} from 'react';
+
 import {PDFViewer} from 'Components/FileFullscreenModal/PdfViewer/PdfViewer';
 import {FullscreenModal} from 'Components/FullscreenModal/FullscreenModal';
+import {isFileEditable} from 'Util/FileTypeUtil';
 import {getFileTypeFromExtension} from 'Util/getFileTypeFromExtension/getFileTypeFromExtension';
 import {getFileExtensionFromUrl} from 'Util/util';
 
+import {FileEditor} from './FileEditor/FileEditor';
 import {FileHeader} from './FileHeader/FileHeader';
 import {FileLoader} from './FileLoader/FileLoader';
 import {ImageFileView} from './ImageFileView/ImageFileView';
@@ -41,6 +45,7 @@ interface FileFullscreenModalProps {
   senderName: string;
   timestamp: number;
   badges?: string[];
+  isEditMode?: boolean;
 }
 
 export const FileFullscreenModal = ({
@@ -55,27 +60,48 @@ export const FileFullscreenModal = ({
   senderName,
   timestamp,
   badges,
+  isEditMode,
 }: FileFullscreenModalProps) => {
+  const [isEditableState, setIsEditableState] = useState(isEditMode);
+  const isEditable = isFileEditable(fileExtension);
+
+  const onCloseModal = () => {
+    setIsEditableState(false);
+    onClose();
+  };
+
+  useEffect(() => {
+    setIsEditableState(!!isEditMode);
+  }, [isEditMode]);
+
   return (
-    <FullscreenModal id={id} isOpen={isOpen} onClose={onClose}>
+    <FullscreenModal id={id} isOpen={isOpen} onClose={onCloseModal}>
       <FileHeader
-        onClose={onClose}
+        onClose={onCloseModal}
         fileName={fileName}
         fileExtension={fileExtension}
         fileUrl={fileUrl}
         senderName={senderName}
         timestamp={timestamp}
         badges={badges}
+        isInEditMode={isEditableState}
+        onEditModeChange={setIsEditableState}
+        isEditable={isEditable}
+        id={id}
       />
-      <ModalContent
-        fileExtension={fileExtension}
-        filePreviewUrl={filePreviewUrl}
-        fileName={fileName}
-        fileUrl={fileUrl}
-        senderName={senderName}
-        timestamp={timestamp}
-        status={status}
-      />
+      {isEditableState && isEditable ? (
+        <FileEditor id={id} />
+      ) : (
+        <ModalContent
+          fileExtension={fileExtension}
+          filePreviewUrl={filePreviewUrl}
+          fileName={fileName}
+          fileUrl={fileUrl}
+          senderName={senderName}
+          timestamp={timestamp}
+          status={status}
+        />
+      )}
     </FullscreenModal>
   );
 };

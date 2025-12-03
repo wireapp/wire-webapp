@@ -27,7 +27,9 @@ export class ConversationDetailsPage {
   readonly addPeopleButton: Locator;
   readonly conversationDetails: Locator;
   readonly guestOptionsButton: Locator;
+  readonly selfDeletingMessageButton: Locator;
   readonly archiveButton: Locator;
+  readonly blockConversationButton: Locator;
 
   constructor(page: Page) {
     this.page = page;
@@ -35,7 +37,9 @@ export class ConversationDetailsPage {
     this.addPeopleButton = page.locator(`${selectByDataAttribute('go-add-people')}`);
     this.conversationDetails = page.locator('#conversation-details');
     this.guestOptionsButton = this.conversationDetails.locator('[data-uie-name="go-guest-options"]');
+    this.selfDeletingMessageButton = this.conversationDetails.getByRole('button', {name: 'Self-deleting messages'});
     this.archiveButton = this.conversationDetails.locator(selectByDataAttribute('do-archive'));
+    this.blockConversationButton = this.conversationDetails.locator(selectByDataAttribute('do-block'));
   }
 
   async waitForSidebar() {
@@ -102,6 +106,15 @@ export class ConversationDetailsPage {
     await this.archiveButton.click();
   }
 
+  /** Opens the self deleting messages panel, selects the given value and closes it again */
+  async setSelfDeletingMessages(value: 'Off' | '10 seconds') {
+    await this.selfDeletingMessageButton.click();
+    const selfDeletingMessagesPanel = this.page.locator('#timed-messages');
+    // The radio options are currently not accessible so accessible locators can't be used
+    await selfDeletingMessagesPanel.getByRole('radiogroup').locator('label', {hasText: value}).click();
+    await selfDeletingMessagesPanel.getByRole('button', {name: 'Go back'}).click();
+  }
+
   async addServiceToConversation(serviceName: string) {
     // Click on the Services/Apps tab
     const servicesTab = this.page.locator(
@@ -150,5 +163,9 @@ export class ConversationDetailsPage {
       .filter({hasText: serviceName});
     await serviceLocator.waitFor({state: 'visible'});
     return serviceLocator.isVisible();
+  }
+
+  async clickBlockConversationButton() {
+    await this.blockConversationButton.click();
   }
 }

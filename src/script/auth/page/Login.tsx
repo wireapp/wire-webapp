@@ -23,12 +23,14 @@ import {LoginData} from '@wireapp/api-client/lib/auth';
 import {ClientType} from '@wireapp/api-client/lib/client/index';
 import {BackendError, BackendErrorLabel, SyntheticErrorLabel} from '@wireapp/api-client/lib/http/';
 import {StatusCodes} from 'http-status-codes';
+import {FormattedMessage} from 'react-intl';
 import {connect} from 'react-redux';
 import {useNavigate} from 'react-router-dom';
 import {AnyAction, Dispatch} from 'redux';
 
 import {Runtime, UrlUtil} from '@wireapp/commons';
 import {
+  ActionLinkButton,
   Button,
   ButtonVariant,
   Checkbox,
@@ -49,7 +51,6 @@ import {
   QUERY,
   QueryKeys,
   Text,
-  TextLink,
   useMatchMedia,
 } from '@wireapp/react-ui-kit';
 
@@ -61,6 +62,7 @@ import {isBackendError} from 'Util/TypePredicateUtil';
 import {EntropyContainer} from './EntropyContainer';
 import {separator} from './Login.styles';
 import {Page} from './Page';
+import {styles} from './VerifyEmailCode.styles';
 
 import {Config} from '../../Config';
 import {AccountAlreadyExistsModal} from '../component/AccountAlreadyExistsModal';
@@ -70,6 +72,7 @@ import {Exception} from '../component/Exception';
 import {JoinGuestLinkPasswordModal} from '../component/JoinGuestLinkPasswordModal';
 import {LoginForm} from '../component/LoginForm';
 import {EXTERNAL_ROUTE} from '../externalRoute';
+import {useRouteA11y} from '../hooks/useRouteA11y';
 import {actionRoot} from '../module/action/';
 import {LabeledError} from '../module/action/LabeledError';
 import {ValidationError} from '../module/action/ValidationError';
@@ -128,6 +131,11 @@ const LoginComponent = ({
   const isEnterpriseLoginV2Enabled = getEnterpriseLoginV2FF();
 
   const isOauth = UrlUtil.hasURLParameter(QUERY_KEY.SCOPE, window.location.hash);
+
+  const [routeAction, setRouteAction] = useState<'login' | 'verify'>('login');
+
+  // this triggers the hook every time screen changes under the same route
+  useRouteA11y(routeAction);
 
   const {
     ENABLE_ACCOUNT_REGISTRATION: isAccountRegistrationEnabled,
@@ -296,6 +304,7 @@ const LoginComponent = ({
             if (login.email || login.handle) {
               await doSendTwoFactorCode(login.email || login.handle || '');
               setTwoFactorLoginData(login);
+              setRouteAction('verify');
               await doSetLocalStorage(QUERY_KEY.JOIN_EXPIRES, Date.now() + 1000 * 60 * 10);
             }
             break;
@@ -423,11 +432,26 @@ const LoginComponent = ({
               >
                 {twoFactorLoginData ? (
                   <div>
-                    <Text fontSize="1.5rem" css={{fontWeight: '500'}} center block>
+                    <Text
+                      fontSize="1.5rem"
+                      css={{fontWeight: '500'}}
+                      center
+                      block
+                      role="heading"
+                      aria-level={1}
+                      data-page-title
+                      tabIndex={-1}
+                    >
                       {t('login.twoFactorLoginTitle')}
                     </Text>
-                    <Text data-uie-name="label-with-email" fontSize="1rem">
-                      {t('login.twoFactorLoginSubHead', {email: twoFactorLoginData.email as string})}
+                    <Text block data-uie-name="label-with-email" fontSize="1rem" css={styles.subhead}>
+                      <FormattedMessage
+                        id="login.twoFactorLoginSubHead"
+                        values={{
+                          email: twoFactorLoginData.email as string,
+                          newline: <br />,
+                        }}
+                      />
                     </Text>
                     <Label markInvalid={!!twoFactorSubmitError}>
                       <CodeInput
@@ -435,6 +459,8 @@ const LoginComponent = ({
                         style={{marginTop: '1rem'}}
                         onCodeComplete={submitTwoFactorLogin}
                         data-uie-name="enter-code"
+                        codeInputLabel={t('verify.codeLabel')}
+                        codePlaceholder={t('verify.codePlaceholder')}
                       />
                     </Label>
                     <div style={{display: 'flex', justifyContent: 'center', marginTop: 10}}>
@@ -444,9 +470,13 @@ const LoginComponent = ({
                       {isSendingTwoFactorCode ? (
                         <Loading size={20} />
                       ) : (
-                        <TextLink onClick={resendTwoFactorCode} center data-uie-name="do-resend-code">
+                        <ActionLinkButton
+                          onClick={resendTwoFactorCode}
+                          data-uie-name="do-resend-code"
+                          css={styles.resendLink}
+                        >
                           {t('verify.resendCode')}
-                        </TextLink>
+                        </ActionLinkButton>
                       )}
                     </div>
                     <FlexBox justify="center">
@@ -464,11 +494,17 @@ const LoginComponent = ({
                   <>
                     <div>
                       {isEnterpriseLoginV2Enabled ? (
-                        <div css={{fontWeight: '500', fontSize: '1.5rem', marginBottom: '2rem'}}>
+                        <div
+                          css={{fontWeight: '500', fontSize: '1.5rem', marginBottom: '2rem'}}
+                          role="heading"
+                          aria-level={1}
+                          data-page-title
+                          tabIndex={-1}
+                        >
                           {t('index.welcome', {brandName: Config.getConfig().BACKEND_NAME})}
                         </div>
                       ) : (
-                        <Heading level={embedded ? '2' : '1'} center>
+                        <Heading level={embedded ? '2' : '1'} center data-page-title tabIndex={-1}>
                           {t('login.headline')}
                         </Heading>
                       )}
