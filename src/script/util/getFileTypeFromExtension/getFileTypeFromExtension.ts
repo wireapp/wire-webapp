@@ -21,7 +21,7 @@ import {FileType} from './fileType';
 
 const extensions: Record<Exclude<FileType, 'other'>, string[]> = {
   pdf: ['pdf'],
-  document: ['docx', 'doc', 'dotx', 'dot', 'odt', 'ott', 'rtf', 'pages', 'wps', 'tex'],
+  document: ['docx', 'doc', 'dotx', 'dot', 'odt', 'ott', 'rtf', 'pages', 'wps', 'tex', 'odf'],
   archive: ['zip', 'rar', '7z', 'tar', 'gz', 'bz2', 'xz', 'iso'],
   audio: ['mp3', 'wav', 'ogg', 'm4a', 'flac', 'aac', 'wma', 'aiff', 'opus'],
   video: ['mov', 'mp4', 'm4v', 'ogv', 'webm', 'avi', 'wmv'],

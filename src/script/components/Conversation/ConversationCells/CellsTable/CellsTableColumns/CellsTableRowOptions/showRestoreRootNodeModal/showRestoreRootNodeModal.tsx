@@ -17,8 +17,8 @@
  *
  */
 
-import {CellNode} from 'Components/Conversation/ConversationCells/common/cellNode/cellNode';
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
+import {CellNode, CellNodeType} from 'src/script/types/cellNode';
 import {t} from 'Util/LocalizerUtil';
 import {replaceReactComponents} from 'Util/LocalizerUtil/ReactLocalizerUtil';
 
@@ -31,7 +31,7 @@ export const showRestoreRootNodeModal = ({node, onRestoreNode}: {node: CellNode;
     text: {
       message: replaceReactComponents(
         t(
-          node.type === 'file'
+          node.type === CellNodeType.FILE
             ? 'cells.restoreRootNodeModal.file.description'
             : 'cells.restoreRootNodeModal.folder.description',
           {
@@ -46,7 +46,7 @@ export const showRestoreRootNodeModal = ({node, onRestoreNode}: {node: CellNode;
         ],
       ),
       title:
-        node.type === 'file'
+        node.type === CellNodeType.FILE
           ? t('cells.restoreRootNodeModal.file.headline')
           : t('cells.restoreRootNodeModal.folder.headline'),
     },

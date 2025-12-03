@@ -25,7 +25,7 @@ import {useCellsFilePreviewModal} from '../common/CellsFilePreviewModalContext/C
 // This component is duplicated across global view and conversation view
 // TODO: Abstract when it starts to grow / feels right
 export const CellsFilePreviewModal = () => {
-  const {id, selectedFile, handleCloseFile} = useCellsFilePreviewModal();
+  const {selectedFile, handleCloseFile, isEditMode} = useCellsFilePreviewModal();
 
   if (!selectedFile) {
     return null;
@@ -49,7 +49,7 @@ export const CellsFilePreviewModal = () => {
 
   return (
     <FileFullscreenModal
-      id={id}
+      id={selectedFile.id}
       isOpen={!!selectedFile}
       onClose={handleCloseFile}
       filePreviewUrl={getFileUrl()}
@@ -60,6 +60,7 @@ export const CellsFilePreviewModal = () => {
       senderName={owner}
       timestamp={uploadedAtTimestamp}
       badges={tags}
+      isEditMode={isEditMode}
     />
   );
 };

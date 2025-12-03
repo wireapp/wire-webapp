@@ -21,6 +21,7 @@ import {createColumnHelper} from '@tanstack/react-table';
 import {QualifiedId} from '@wireapp/api-client/lib/user/';
 
 import {CellsRepository} from 'Repositories/cells/CellsRepository';
+import {CellNode} from 'src/script/types/cellNode';
 import {t} from 'Util/LocalizerUtil';
 
 import {CellsTableDateColumn} from './CellsTableDateColumn/CellsTableDateColumn';
@@ -29,8 +30,6 @@ import {CellsTableOwnerColumn} from './CellsTableOwnerColumn/CellsTableOwnerColu
 import {CellsTableRowOptions} from './CellsTableRowOptions/CellsTableRowOptions';
 import {CellsTableSharedColumn} from './CellsTableSharedColumn/CellsTableSharedColumn';
 import {CellsTagsColumn} from './CellsTagsColumn/CellsTagsColumn';
-
-import {CellNode} from '../../common/cellNode/cellNode';
 
 const columnHelper = createColumnHelper<CellNode>();
 
