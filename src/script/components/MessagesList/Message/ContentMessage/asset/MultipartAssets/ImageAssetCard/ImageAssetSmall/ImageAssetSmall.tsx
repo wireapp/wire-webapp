@@ -17,7 +17,7 @@
  *
  */
 
-import {useId, useState} from 'react';
+import {useState} from 'react';
 
 import {t} from 'Util/LocalizerUtil';
 
@@ -34,9 +34,11 @@ interface ImageAssetSmallProps {
   isError: boolean;
   senderName: string;
   timestamp: number;
+  id: string;
 }
 
 export const ImageAssetSmall = ({
+  id,
   src,
   name,
   extension,
@@ -47,7 +49,6 @@ export const ImageAssetSmall = ({
 }: ImageAssetSmallProps) => {
   const [isLoaded, setIsLoaded] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
-  const id = useId();
 
   return (
     <>

@@ -21,12 +21,12 @@ import {useEffect, useState} from 'react';
 
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 
-import {CellNode} from 'Components/Conversation/ConversationCells/common/cellNode/cellNode';
 import {CellsModal} from 'Components/Conversation/ConversationCells/common/CellsModal/CellsModal';
 import {CellsNewNodeForm} from 'Components/Conversation/ConversationCells/common/CellsNewNodeForm/CellsNewNodeForm';
 import {getCellsFilesPath} from 'Components/Conversation/ConversationCells/common/getCellsFilesPath/getCellsFilesPath';
 import {useCellsNewItemForm} from 'Components/Conversation/ConversationCells/common/useCellsNewNodeForm/useCellsNewNodeForm';
 import {CellsRepository} from 'Repositories/cells/CellsRepository';
+import {CellNode, CellNodeType} from 'src/script/types/cellNode';
 import {t} from 'Util/LocalizerUtil';
 
 import {CellsFoldersListModalContent} from './CellsFoldersListModalContent/CellsFoldersListModalContent';
@@ -80,7 +80,7 @@ export const CellsMoveNodeModal = ({
     handleSubmit: handleCreateNewFolder,
     handleChange,
   } = useCellsNewItemForm({
-    type: 'folder',
+    type: CellNodeType.FOLDER,
     cellsRepository,
     conversationQualifiedId,
     onSuccess: () => {
@@ -130,7 +130,7 @@ export const CellsMoveNodeModal = ({
       ) : (
         <>
           <CellsNewNodeForm
-            type="folder"
+            type={CellNodeType.FOLDER}
             onSubmit={handleCreateNewFolder}
             inputValue={name}
             onChange={handleChange}

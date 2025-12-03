@@ -34,6 +34,7 @@ interface FileAssetCardProps {
   pdfPreviewUrl?: string;
   senderName: string;
   timestamp: number;
+  id: string;
 }
 
 export const FileAssetCard = ({
@@ -48,12 +49,14 @@ export const FileAssetCard = ({
   pdfPreviewUrl,
   senderName,
   timestamp,
+  id,
 }: FileAssetCardProps) => {
   const formattedName = isError ? t('cells.unavailableFile') : name;
 
   if (variant === 'large') {
     return (
       <FileAssetWithPreview
+        id={id}
         src={src}
         extension={extension}
         name={formattedName}
@@ -70,6 +73,7 @@ export const FileAssetCard = ({
 
   return (
     <FileAssetSmall
+      id={id}
       src={src}
       extension={extension}
       name={formattedName}

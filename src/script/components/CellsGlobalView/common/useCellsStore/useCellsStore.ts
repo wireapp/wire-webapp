@@ -19,7 +19,8 @@
 
 import {create} from 'zustand';
 
-import {CellNode} from '../cellNode/cellNode';
+import {CellNode} from 'src/script/types/cellNode';
+
 import {CellPagination} from '../cellPagination/cellPagination';
 
 export type Status = 'idle' | 'loading' | 'fetchingMore' | 'success' | 'error';

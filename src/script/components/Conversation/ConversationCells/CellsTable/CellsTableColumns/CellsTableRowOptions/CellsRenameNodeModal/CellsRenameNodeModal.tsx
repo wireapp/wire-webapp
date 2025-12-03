@@ -17,9 +17,9 @@
  *
  */
 
-import {CellNode} from 'Components/Conversation/ConversationCells/common/cellNode/cellNode';
 import {CellsModal} from 'Components/Conversation/ConversationCells/common/CellsModal/CellsModal';
 import {CellsRepository} from 'Repositories/cells/CellsRepository';
+import {CellNode, CellNodeType} from 'src/script/types/cellNode';
 import {t} from 'Util/LocalizerUtil';
 
 import {CellsRenameForm} from './CellsRenameForm/CellsRenameForm';
@@ -52,7 +52,11 @@ export const CellsRenameNodeModal = ({
   return (
     <CellsModal isOpen={isOpen} onClose={onClose} size="large">
       <CellsModal.Header>
-        {t(node.type === 'file' ? 'cells.renameNodeModal.headline.file' : 'cells.renameNodeModal.headline.folder')}
+        {t(
+          node.type === CellNodeType.FILE
+            ? 'cells.renameNodeModal.headline.file'
+            : 'cells.renameNodeModal.headline.folder',
+        )}
       </CellsModal.Header>
       <CellsRenameForm
         isOpen={isOpen}

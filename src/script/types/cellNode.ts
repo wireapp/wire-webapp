@@ -20,14 +20,17 @@
 import {Conversation} from 'Repositories/entity/Conversation';
 import {User} from 'Repositories/entity/User';
 
-export interface CellFile {
+export enum CellNodeType {
+  FILE = 'file',
+  FOLDER = 'folder',
+}
+
+interface CellNodeGeneral {
   id: string;
-  type: 'file';
   url?: string;
   path: string;
   mimeType?: string;
   name: string;
-  extension: string;
   sizeMb: string;
   previewImageUrl?: string;
   previewPdfUrl?: string;
@@ -45,26 +48,13 @@ export interface CellFile {
   conversation?: Conversation;
 }
 
-interface CellFolder {
-  id: string;
-  type: 'folder';
-  url?: string;
-  path: string;
-  mimeType?: string;
-  name: string;
-  sizeMb: string;
-  uploadedAtTimestamp: number;
-  conversationName: string;
-  owner: string;
-  publicLink?: {
-    alreadyShared: boolean;
-    uuid?: string;
-    url?: string;
-  };
-  tags: string[];
-  presignedUrlExpiresAt: Date | null;
-  user: User | null;
-  conversation?: Conversation;
+export interface CellFolder extends CellNodeGeneral {
+  extension: string;
+  type: CellNodeType;
+}
+export interface CellFile extends CellNodeGeneral {
+  extension: string;
+  type: CellNodeType;
 }
 
 export type CellNode = CellFile | CellFolder;

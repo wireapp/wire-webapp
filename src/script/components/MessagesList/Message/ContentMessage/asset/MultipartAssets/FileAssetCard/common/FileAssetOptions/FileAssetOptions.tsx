@@ -19,6 +19,7 @@
 
 import {DropdownMenu, MoreIcon} from '@wireapp/react-ui-kit';
 
+import {isFileEditable} from 'Util/FileTypeUtil';
 import {t} from 'Util/LocalizerUtil';
 import {forcedDownloadFile, getFileNameWithExtension} from 'Util/util';
 
@@ -28,11 +29,12 @@ interface FileAssetOptionsProps {
   src?: string;
   name: string;
   extension: string;
-  onOpen: () => void;
+  onOpen: (isEditMode?: boolean) => void;
 }
 
 export const FileAssetOptions = ({onOpen, src, name, extension}: FileAssetOptionsProps) => {
   const fileNameWithExtension = getFileNameWithExtension(name, extension);
+  const isEditable = isFileEditable(extension);
 
   return (
     <DropdownMenu>
@@ -43,6 +45,7 @@ export const FileAssetOptions = ({onOpen, src, name, extension}: FileAssetOption
       </DropdownMenu.Trigger>
       <DropdownMenu.Content>
         <DropdownMenu.Item onClick={onOpen}>{t('cells.options.open')}</DropdownMenu.Item>
+        {isEditable && <DropdownMenu.Item onClick={() => onOpen(true)}>{t('cells.options.edit')}</DropdownMenu.Item>}
         {!!src && (
           <DropdownMenu.Item onClick={() => forcedDownloadFile({url: src, name: fileNameWithExtension})}>
             {t('cells.options.download')}

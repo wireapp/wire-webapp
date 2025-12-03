@@ -19,8 +19,8 @@
 
 import {ChangeEvent, FormEvent, MouseEvent, useState} from 'react';
 
-import {CellNode} from 'Components/Conversation/ConversationCells/common/cellNode/cellNode';
 import {CellsRepository} from 'Repositories/cells/CellsRepository';
+import {CellNode} from 'src/script/types/cellNode';
 import {t} from 'Util/LocalizerUtil';
 import {getFileExtension, trimFileExtension} from 'Util/util';
 

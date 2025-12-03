@@ -17,8 +17,8 @@
  *
  */
 
-import {CellNode} from 'Components/Conversation/ConversationCells/common/cellNode/cellNode';
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
+import {CellNodeType, CellNode} from 'src/script/types/cellNode';
 import {t} from 'Util/LocalizerUtil';
 import {replaceReactComponents} from 'Util/LocalizerUtil/ReactLocalizerUtil';
 
@@ -59,7 +59,7 @@ export const showRestoreNestedNodeModal = ({
         </div>
       ),
       title:
-        node.type === 'file'
+        node.type === CellNodeType.FILE
           ? t('cells.restoreNestedNodeModal.file.headline')
           : t('cells.restoreNestedNodeModal.folder.headline'),
     },

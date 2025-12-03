@@ -30,6 +30,7 @@ interface VideoAssetCardProps {
   isError: boolean;
   senderName: string;
   timestamp: number;
+  id: string;
 }
 
 export const VideoAssetCard = ({
@@ -42,10 +43,12 @@ export const VideoAssetCard = ({
   isError,
   senderName,
   timestamp,
+  id,
 }: VideoAssetCardProps) => {
   if (variant === 'large') {
     return (
       <VideoAssetPlayer
+        id={id}
         url={src}
         isFileShareRestricted={false}
         extension={extension}
@@ -61,6 +64,7 @@ export const VideoAssetCard = ({
 
   return (
     <VideoAssetSmall
+      id={id}
       extension={extension}
       fileName={name}
       senderName={senderName}

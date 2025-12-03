@@ -22,11 +22,11 @@ import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {CellsNewNodeForm} from 'Components/Conversation/ConversationCells/common/CellsNewNodeForm/CellsNewNodeForm';
 import {useCellsNewItemForm} from 'Components/Conversation/ConversationCells/common/useCellsNewNodeForm/useCellsNewNodeForm';
 import {CellsRepository} from 'Repositories/cells/CellsRepository';
+import {CellNode} from 'src/script/types/cellNode';
 import {t} from 'Util/LocalizerUtil';
 
 import {descriptionStyles} from './CellsNewItemModal.styles';
 
-import {CellNode} from '../../../common/cellNode/cellNode';
 import {CellsModal} from '../../../common/CellsModal/CellsModal';
 
 interface CellsNewItemModalProps {

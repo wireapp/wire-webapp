@@ -17,7 +17,7 @@
  *
  */
 
-import {CSSProperties, useState, useId} from 'react';
+import {CSSProperties, useState} from 'react';
 
 import {ICellAsset} from '@wireapp/protocol-messaging';
 import {UnavailableFileIcon} from '@wireapp/react-ui-kit';
@@ -45,9 +45,11 @@ interface ImageAssetLargeProps {
   isError: boolean;
   senderName: string;
   timestamp: number;
+  id: string;
 }
 
 export const ImageAssetLarge = ({
+  id,
   src,
   name,
   extension,
@@ -56,7 +58,6 @@ export const ImageAssetLarge = ({
   senderName,
   timestamp,
 }: ImageAssetLargeProps) => {
-  const id = useId();
   const [isLoaded, setIsLoaded] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
 
