@@ -69,7 +69,9 @@ const testDetails = Object.values(testFilesToReport).reduce((acc, testFile) => {
 <details>
   <summary>${testFile[0].file} (❌ ${failedTests.length} failed, ⚠️ ${flakyTests.length} flaky)</summary>
 
-  ${[...failedTests, ...flakyTests].join('\n  ')}
+  <ul>
+    ${[...failedTests, ...flakyTests].map(s => `<li>${s}</li>`).join('\n  ')}
+  </ul>
 </details>
 `;
 
