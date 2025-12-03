@@ -29,6 +29,7 @@ import {ChannelAvatar} from 'Components/Avatar/ChannelAvatar';
 import {UserBlockedBadge} from 'Components/Badge';
 import {CellDescription} from 'Components/ConversationListCell/components/CellDescription';
 import {UserInfo} from 'Components/UserInfo';
+import {useConversationCall} from 'Hooks/useConversationCall';
 import {useNoInternetCallGuard} from 'Hooks/useNoInternetCallGuard/useNoInternetCallGuard';
 import type {Conversation} from 'Repositories/entity/Conversation';
 import {MediaType} from 'Repositories/media/MediaType';
@@ -45,7 +46,7 @@ interface ConversationListCellProps {
   dataUieName: string;
   isSelected?: (conversation: Conversation) => boolean;
   onClick: (event: ReactMouseEvent<HTMLDivElement, MouseEvent> | ReactKeyBoardEvent<HTMLDivElement>) => void;
-  onJoinCall: (conversation: Conversation, mediaType: MediaType) => void;
+  onJoinCall: (conversation: Conversation, mediaType: MediaType) => Promise<void>;
   rightClick: (conversation: Conversation, event: MouseEvent | React.MouseEvent<Element, MouseEvent>) => void;
   showJoinButton: boolean;
   handleArrowKeyDown: (e: React.KeyboardEvent) => void;
@@ -93,6 +94,7 @@ export const ConversationListCell = ({
   ]);
 
   const guardCall = useNoInternetCallGuard();
+  const {isCallConnecting} = useConversationCall(conversation);
 
   const {isChannelsEnabled} = useChannelsFeatureFlag();
   const isActive = isSelected(conversation);
@@ -103,17 +105,38 @@ export const ConversationListCell = ({
   const [isContextMenuOpen, setContextMenuOpen] = useState(false);
   const contextMenuKeyboardShortcut = `keyboard-shortcut-${conversation.id}`;
 
+  // Ref for immediate synchronous protection from multiple clicks
+  const isJoiningCallRef = useRef(false);
+
+  // Button is disabled if either local state or call state indicates joining
+  const isButtonDisabled = isJoiningCallRef.current || isCallConnecting;
+
   const openContextMenu = (event: MouseEvent | React.MouseEvent<Element, MouseEvent>) => {
     event.stopPropagation();
     event.preventDefault();
     rightClick(conversation, event);
   };
 
-  const onClickJoinCall = (event: React.MouseEvent) => {
+  const handleJoinCall = async (event: React.MouseEvent) => {
     event.preventDefault();
-    guardCall(() => {
-      onJoinCall(conversation, MediaType.AUDIO);
-    });
+
+    // Check ref first for immediate synchronous protection
+    if (isJoiningCallRef.current || isButtonDisabled) {
+      return;
+    }
+
+    // Immediately disable synchronously
+    isJoiningCallRef.current = true;
+
+    try {
+      await guardCall(async () => {
+        await onJoinCall(conversation, MediaType.AUDIO);
+        isJoiningCallRef.current = false;
+      });
+    } catch (error) {
+      // Re-enable on error
+      isJoiningCallRef.current = false;
+    }
   };
 
   const handleDivKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
@@ -241,10 +264,11 @@ export const ConversationListCell = ({
 
         {showJoinButton && (
           <button
-            onClick={onClickJoinCall}
+            onClick={handleJoinCall}
             type="button"
             className="call-ui__button call-ui__button--green call-ui__button--join"
             data-uie-name="do-call-controls-call-join"
+            disabled={isButtonDisabled}
           >
             {t('callJoin')}
           </button>
