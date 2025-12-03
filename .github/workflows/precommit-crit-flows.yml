@@ -260,6 +260,7 @@ jobs:
         run: yarn playwright merge-reports --config ./playwright.config.ts ./all-blob-reports
 
       - name: Upload test report
+        id: upload_playwright_report
         if: always()
         uses: actions/upload-artifact@v4
         with:
@@ -282,7 +283,7 @@ jobs:
         with:
           header: playwright-summary
           message: |
-            🔗 [Download Full Report Artifact](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})
+            🔗 [Download Full Report Artifact](${{ steps.upload_playwright_report.outputs.artifact-url }})
 
             ${{ steps.generate_comment.outputs.comment }}
         env:
