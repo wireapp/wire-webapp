@@ -166,8 +166,8 @@ test.describe('Self Deleting Messages', () => {
     });
 
     test('I want to set a global group conversation timer', {tag: ['@TC-3715', '@regression']}, async () => {
-      await userAPages.conversation().sendMessage('Message');
-      const message = userBPages.conversation().getMessage({content: 'Message'});
+      await userAPages.conversation().sendMessage('Test Message');
+      const message = userBPages.conversation().getMessage({content: 'Test Message'});
       await expect(message).toBeAttached();
 
       await new Promise(res => setTimeout(res, 10_000));
