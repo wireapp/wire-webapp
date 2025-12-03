@@ -78,6 +78,8 @@ export type Env = {
   /** Allows a client to use a development version of the api (if present) */
   ENABLE_DEV_BACKEND_API?: string;
 
+  MAX_API_VERSION?: string;
+
   SSL_CERTIFICATE_KEY_PATH?: string;
   SSL_CERTIFICATE_PATH?: string;
 
