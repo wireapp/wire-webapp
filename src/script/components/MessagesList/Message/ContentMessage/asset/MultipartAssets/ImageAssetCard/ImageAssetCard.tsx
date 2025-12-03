@@ -32,9 +32,11 @@ interface ImageAssetCardProps {
   variant: 'small' | 'large';
   isLoading: boolean;
   isError: boolean;
+  id: string;
 }
 
 export const ImageAssetCard = ({
+  id,
   src,
   name,
   extension,
@@ -48,6 +50,7 @@ export const ImageAssetCard = ({
   if (variant === 'large') {
     return (
       <ImageAssetLarge
+        id={id}
         src={src}
         name={name}
         extension={extension}
@@ -61,6 +64,7 @@ export const ImageAssetCard = ({
 
   return (
     <ImageAssetSmall
+      id={id}
       src={src}
       name={name}
       extension={extension}

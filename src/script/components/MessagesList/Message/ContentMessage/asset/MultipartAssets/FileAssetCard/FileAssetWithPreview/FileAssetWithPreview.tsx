@@ -17,7 +17,7 @@
  *
  */
 
-import {CSSProperties, useId, useState} from 'react';
+import {CSSProperties, useState} from 'react';
 
 import {AlertIcon} from '@wireapp/react-ui-kit';
 
@@ -48,9 +48,11 @@ interface FileAssetWithPreviewProps {
   isError: boolean;
   senderName: string;
   timestamp: number;
+  id: string;
 }
 
 export const FileAssetWithPreview = ({
+  id,
   src,
   extension,
   name,
@@ -64,24 +66,32 @@ export const FileAssetWithPreview = ({
 }: FileAssetWithPreviewProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const [isImageLoaded, setIsImageLoaded] = useState(false);
+  const [isInEditMode, setIsInEditMode] = useState(false);
 
   const shouldDisplayLoading = (imagePreviewUrl ? !isImageLoaded : isLoading) && !isError;
   const shouldDisplayPreviewError = isError || (!isLoading && !imagePreviewUrl);
 
-  const id = useId();
+  const showModal = (isEditMode?: boolean) => {
+    setIsOpen(true);
+    setIsInEditMode(!!isEditMode);
+  };
 
+  const hideModal = () => {
+    setIsOpen(false);
+    setIsInEditMode(false);
+  };
   return (
     <FileCard.Root variant="large" extension={extension} name={name} size={size}>
       <FileCard.Header>
         <FileCard.Icon type={isError ? 'unavailable' : 'file'} />
         {!isError && <FileCard.Type />}
         <FileCard.Name variant={isError ? 'secondary' : 'primary'} />
-        {!isError && <FileAssetOptions src={src} name={name} extension={extension} onOpen={() => setIsOpen(true)} />}
+        {!isError && <FileAssetOptions src={src} name={name} extension={extension} onOpen={showModal} />}
       </FileCard.Header>
       <FileCard.Content>
         <button
           css={contentWrapperStyles}
-          onClick={() => setIsOpen(true)}
+          onClick={() => showModal()}
           aria-label={t('cells.options.open')}
           aria-controls={id}
           aria-haspopup="dialog"
@@ -121,9 +131,10 @@ export const FileAssetWithPreview = ({
         senderName={senderName}
         timestamp={timestamp}
         isOpen={isOpen}
-        onClose={() => setIsOpen(false)}
+        onClose={hideModal}
         isLoading={isLoading}
         isError={isError}
+        isEditMode={isInEditMode}
       />
     </FileCard.Root>
   );
