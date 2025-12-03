@@ -17,7 +17,7 @@
  *
  */
 
-import {useId, useState} from 'react';
+import {useState} from 'react';
 
 import {FileCard} from 'Components/FileCard/FileCard';
 import {t} from 'Util/LocalizerUtil';
@@ -37,6 +37,7 @@ interface FileAssetSmallProps {
   senderName: string;
   timestamp: number;
   isLoading: boolean;
+  id: string;
 }
 
 export const FileAssetSmall = ({
@@ -50,18 +51,25 @@ export const FileAssetSmall = ({
   imagePreviewUrl,
   isLoading,
   isError,
+  id,
 }: FileAssetSmallProps) => {
   const [isOpen, setIsOpen] = useState(false);
-  const id = useId();
+  const [isInEditMode, setIsInEditMode] = useState(false);
 
-  const showModal = () => {
+  const showModal = (isEditMode?: boolean) => {
     setIsOpen(true);
+    setIsInEditMode(!!isEditMode);
+  };
+
+  const hideModal = () => {
+    setIsOpen(false);
+    setIsInEditMode(false);
   };
 
   return (
     <FileCard.Root extension={extension} name={name} size={size}>
       <button
-        onClick={showModal}
+        onClick={() => showModal()}
         css={hollowWrapperButtonStyles}
         aria-label={t('cells.filePreviewButton.ariaLabel', {name})}
       />
@@ -81,9 +89,10 @@ export const FileAssetSmall = ({
         senderName={senderName}
         timestamp={timestamp}
         isOpen={isOpen}
-        onClose={() => setIsOpen(false)}
+        onClose={hideModal}
         isError={isError}
         isLoading={isLoading}
+        isEditMode={isInEditMode}
       />
     </FileCard.Root>
   );

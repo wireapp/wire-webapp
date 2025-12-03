@@ -41,6 +41,7 @@ interface VideoAssetPlayerProps {
   isFileShareRestricted: boolean;
   senderName: string;
   timestamp: number;
+  id: string;
 }
 
 /**
@@ -60,6 +61,7 @@ export const VideoAssetPlayer = ({
   isError,
   senderName,
   timestamp,
+  id,
 }: VideoAssetPlayerProps) => {
   const [videoElement, setVideoElement] = useEffectRef<HTMLVideoElement>();
 
@@ -86,6 +88,7 @@ export const VideoAssetPlayer = ({
   if (isError || isFileShareRestricted || isPlaybackError) {
     return (
       <VideoAssetCard
+        id={id}
         ref={wrapperRef}
         extension={extension}
         name={name}
@@ -102,6 +105,7 @@ export const VideoAssetPlayer = ({
   if (isLoading || !url) {
     return (
       <VideoAssetCard
+        id={id}
         ref={wrapperRef}
         extension={extension}
         name={name}
@@ -117,6 +121,7 @@ export const VideoAssetPlayer = ({
 
   return (
     <VideoAssetCard
+      id={id}
       src={url}
       ref={wrapperRef}
       extension={extension}
