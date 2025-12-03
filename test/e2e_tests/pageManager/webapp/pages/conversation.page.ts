@@ -100,9 +100,9 @@ export class ConversationPage {
     this.conversationInfoButton = page.locator(selectByDataAttribute('do-open-info'));
     this.pingButton = page.locator(selectByDataAttribute('do-ping'));
     this.messageItems = page.locator(selectByDataAttribute('item-message'));
+    /** The attribute 'send-status' will be 1 while the message is being sent, since we only want to assert on sent messages these messages will be excluded. See: {@see StatusTypes} */
     this.messages = page.locator(
-      // The attribute 'send-status' indicates whether the optimistic update for sending the message was successful
-      `${selectByDataAttribute('item-message')}${selectByDataAttribute('2', 'send-status')}`,
+      `${selectByDataAttribute('item-message')}:not(${selectByDataAttribute('1', 'send-status')})`,
     );
     this.messageDetails = page.locator('#message-details');
     this.filesTab = page.locator('#conversation-tab-files');
