@@ -6260,17 +6260,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/markdown-it@npm:14.1.1":
-  version: 14.1.1
-  resolution: "@types/markdown-it@npm:14.1.1"
-  dependencies:
-    "@types/linkify-it": "npm:^5"
-    "@types/mdurl": "npm:^2"
-  checksum: 10/78d6aae11cda6878b9190f9b65095b1d09de77e054148efb6876fca7b3f19505384ec9dd0ceeaf2a52455691c6a55b9baee92e14899994100121a7bebc58df14
-  languageName: node
-  linkType: hard
-
-"@types/markdown-it@npm:^14.1.1":
+"@types/markdown-it@npm:14.1.2, @types/markdown-it@npm:^14.1.1":
   version: 14.1.2
   resolution: "@types/markdown-it@npm:14.1.2"
   dependencies:
@@ -14383,23 +14373,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"markdown-it@npm:14.0.0":
-  version: 14.0.0
-  resolution: "markdown-it@npm:14.0.0"
-  dependencies:
-    argparse: "npm:^2.0.1"
-    entities: "npm:^4.4.0"
-    linkify-it: "npm:^5.0.0"
-    mdurl: "npm:^2.0.0"
-    punycode.js: "npm:^2.3.1"
-    uc.micro: "npm:^2.0.0"
-  bin:
-    markdown-it: bin/markdown-it.mjs
-  checksum: 10/ae319aa4dd02b79d305fa0ff55020f8a3f728793938de5c8849c265a62a558f3968a3c023709d3a25aa0ce3287dc5a1faf33201f41efaf578dcf5d75b20462e8
-  languageName: node
-  linkType: hard
-
-"markdown-it@npm:^14.1.0":
+"markdown-it@npm:14.1.0, markdown-it@npm:^14.1.0":
   version: 14.1.0
   resolution: "markdown-it@npm:14.1.0"
   dependencies:
@@ -16611,12 +16585,21 @@ __metadata:
   languageName: node
   linkType: hard
 
-"prettier@npm:*, prettier@npm:3.3.2, prettier@npm:^3":
+"prettier@npm:*, prettier@npm:^3":
   version: 3.3.2
   resolution: "prettier@npm:3.3.2"
   bin:
     prettier: bin/prettier.cjs
   checksum: 10/83214e154afa5aa9b664c2506640212323eb1376b13379b2413dc351b7de0687629dca3f00ff2ec895ebd7e3a2adb7d7e231b6c77606e2358137f2150807405b
+  languageName: node
+  linkType: hard
+
+"prettier@npm:3.7.4":
+  version: 3.7.4
+  resolution: "prettier@npm:3.7.4"
+  bin:
+    prettier: bin/prettier.cjs
+  checksum: 10/b4d00ea13baed813cb777c444506632fb10faaef52dea526cacd03085f01f6db11fc969ccebedf05bf7d93c3960900994c6adf1b150e28a31afd5cfe7089b313
   languageName: node
   linkType: hard
 
@@ -19566,15 +19549,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"use-sync-external-store@npm:1.2.2":
-  version: 1.2.2
-  resolution: "use-sync-external-store@npm:1.2.2"
-  peerDependencies:
-    react: ^16.8.0 || ^17.0.0 || ^18.0.0
-  checksum: 10/671e9c190aab9a8374a5d468c6ba17f52c38b6fae970110bc196fc1e2b57204149aea9619be49a1bb5207fb6e51d8afd19c3bcb94afe61813fed039821461dc0
-  languageName: node
-  linkType: hard
-
 "use-sync-external-store@npm:^1.4.0":
   version: 1.4.0
   resolution: "use-sync-external-store@npm:1.4.0"
@@ -20220,7 +20194,7 @@ __metadata:
     "@types/keyboardjs": "npm:2.5.3"
     "@types/libsodium-wrappers": "npm:0"
     "@types/linkify-it": "npm:5.0.0"
-    "@types/markdown-it": "npm:14.1.1"
+    "@types/markdown-it": "npm:14.1.2"
     "@types/node": "npm:22.9.0"
     "@types/open-graph": "npm:0.2.6"
     "@types/platform": "npm:1.3.6"
@@ -20300,7 +20274,7 @@ __metadata:
     linkify-it: "npm:5.0.0"
     lint-staged: "npm:15.5.0"
     long: "npm:5.3.2"
-    markdown-it: "npm:14.0.0"
+    markdown-it: "npm:14.1.0"
     murmurhash: "npm:2.0.1"
     oidc-client-ts: "npm:3.4.1"
     os-browserify: "npm:0.3.0"
@@ -20313,7 +20287,7 @@ __metadata:
     postcss-loader: "npm:8.2.0"
     postcss-preset-env: "npm:10.4.0"
     postcss-scss: "npm:4.0.9"
-    prettier: "npm:3.3.2"
+    prettier: "npm:3.7.4"
     prism-themes: "npm:^1.9.0"
     prismjs: "npm:^1.29.0"
     qrcode-reader: "npm:1.0.4"
@@ -20358,7 +20332,7 @@ __metadata:
     webrtc-adapter: "npm:9.0.3"
     workbox-webpack-plugin: "npm:7.4.0"
     zod: "npm:^3.24.2"
-    zustand: "npm:4.5.5"
+    zustand: "npm:5.0.9"
   languageName: unknown
   linkType: soft
 
@@ -20826,15 +20800,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"zustand@npm:4.5.5":
-  version: 4.5.5
-  resolution: "zustand@npm:4.5.5"
-  dependencies:
-    use-sync-external-store: "npm:1.2.2"
+"zustand@npm:5.0.9":
+  version: 5.0.9
+  resolution: "zustand@npm:5.0.9"
   peerDependencies:
-    "@types/react": ">=16.8"
+    "@types/react": ">=18.0.0"
     immer: ">=9.0.6"
-    react: ">=16.8"
+    react: ">=18.0.0"
+    use-sync-external-store: ">=1.2.0"
   peerDependenciesMeta:
     "@types/react":
       optional: true
@@ -20842,6 +20815,8 @@ __metadata:
       optional: true
     react:
       optional: true
-  checksum: 10/481b8210187b69678074a1ca51107654c2379688e90407bfcb7961e0803a259742bfd0d77171c3f07e290896ad55fe9659b3863f30d34cb2572650ead1249f25
+    use-sync-external-store:
+      optional: true
+  checksum: 10/af24d8cc07383b85bf713d1be55a788d4559c5b20980852095c2352bfd0a3bc64d0ba1f08f2f440d5c298ea2856d34d67e5e74fafe29d8796e8b4a09781ca86c
   languageName: node
   linkType: hard
