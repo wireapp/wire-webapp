@@ -48,7 +48,7 @@ jobs:
       - name: Build
         run: yarn build:prod
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v5
         with:
           name: 'build-artifact'
           path: '${{env.BUILD_DIR}}${{env.BUILD_ARTIFACT}}'
