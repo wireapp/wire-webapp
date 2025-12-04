@@ -27,7 +27,9 @@ test.beforeEach(async ({browser, page}) => {
 
 test.afterEach(async ({browser}, testInfo) => {
   const trace = await browser.stopTracing();
-  await testInfo.attach(`performance-trace-${testInfo.testId}.json`, {body: trace});
+  if (testInfo.status === 'failed') {
+    await testInfo.attach(`performance-trace-${testInfo.testId}.json`, {body: trace});
+  }
 });
 
 test(
