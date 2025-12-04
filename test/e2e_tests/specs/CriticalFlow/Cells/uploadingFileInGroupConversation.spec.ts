@@ -40,7 +40,7 @@ const imageFilePath = getImageFilePath();
 
 test(
   'Uploading an file in a group conversation',
-  {tag: ['@crit-flow-cells']},
+  {tag: ['@crit-flow-cells', '@regression']},
   async ({pageManager: userAPageManager, browser, api}) => {
     const {pages: userAPages, modals: userAModals, components: userAComponents} = userAPageManager.webapp;
 
