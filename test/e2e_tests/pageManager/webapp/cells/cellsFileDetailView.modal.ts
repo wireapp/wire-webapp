@@ -31,7 +31,7 @@ export class CellsFileDetailViewModal {
     this.page = page;
     this.closeButton = page.locator("[aria-label='Close']");
     this.downloadButton = page.locator("[aria-label='Download']");
-    this.image = page.locator("[role='dialog'][aria-modal='true'][id^=':'][id$=':'] img");
+    this.image = page.locator("[role='dialog'][aria-modal='true'] img");
   }
 
   async isImageVisible() {
