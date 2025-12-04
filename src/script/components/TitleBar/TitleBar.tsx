@@ -30,6 +30,7 @@ import {ConversationVerificationBadges} from 'Components/Badge';
 import {useCallAlertState} from 'Components/calling/useCallAlertState';
 import * as Icon from 'Components/Icon';
 import {LegalHoldDot} from 'Components/LegalHoldDot';
+import {useConversationCall} from 'Hooks/useConversationCall';
 import {useNoInternetCallGuard} from 'Hooks/useNoInternetCallGuard/useNoInternetCallGuard';
 import {CallState} from 'Repositories/calling/CallState';
 import {ConversationFilter} from 'Repositories/conversation/ConversationFilter';
@@ -103,11 +104,23 @@ export const TitleBar = ({
   ]);
 
   const guardCall = useNoInternetCallGuard();
+  const {isCallConnecting, isCallActive} = useConversationCall(conversation);
 
   const {isActivatedAccount} = useKoSubscribableChildren(selfUser, ['isActivatedAccount']);
   const {joinedCall, activeCalls} = useKoSubscribableChildren(callState, ['joinedCall', 'activeCalls']);
 
   const currentFocusedElementRef = useRef<HTMLButtonElement | null>(null);
+
+  // using ref for immediate double-click protection
+  const isStartingCallRef = useRef(false);
+
+  // Reset local state when a call becomes active or cleared
+  if (isStartingCallRef && (isCallActive || activeCalls.length === 0)) {
+    isStartingCallRef.current = false;
+  }
+
+  // Button is disabled if starting, connecting, or already active
+  const isCallButtonDisabled = isReadOnlyConversation || isStartingCallRef.current || isCallConnecting || isCallActive;
 
   const badgeLabelCopy = useMemo(() => {
     if (is1to1 && isRequest) {
@@ -200,9 +213,21 @@ export const TitleBar = ({
   const onClickDetails = () => showDetails(false);
 
   const startCallAndShowAlert = () => {
-    guardCall(() => {
-      callActions.startAudio(conversation);
-      showStartedCallAlert(isGroupOrChannel);
+    if (isStartingCallRef.current || isCallButtonDisabled) {
+      return;
+    }
+
+    isStartingCallRef.current = true;
+
+    guardCall(async () => {
+      try {
+        await callActions.startAudio(conversation);
+        isStartingCallRef.current = false;
+        showStartedCallAlert(isGroupOrChannel);
+      } catch (error) {
+        // Re-enable on error
+        isStartingCallRef.current = false;
+      }
     });
   };
 
@@ -306,7 +331,7 @@ export const TitleBar = ({
               startCallAndShowAlert();
             }}
             data-uie-name="do-call"
-            disabled={isReadOnlyConversation}
+            disabled={isCallButtonDisabled}
           >
             <CallIcon />
           </button>
@@ -331,7 +356,7 @@ export const TitleBar = ({
                 css={{marginBottom: 0}}
                 onClick={onClickStartAudio}
                 data-uie-name="do-call"
-                disabled={isReadOnlyConversation}
+                disabled={isCallButtonDisabled}
               >
                 <CallIcon />
               </IconButton>
