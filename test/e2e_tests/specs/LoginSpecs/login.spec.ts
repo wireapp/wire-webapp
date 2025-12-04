@@ -21,6 +21,15 @@ import {generateRandomPassword} from 'Util/StringUtil';
 
 import {test, expect} from '../../test.fixtures';
 
+test.beforeEach(async ({browser, page}) => {
+  await browser.startTracing(page, {screenshots: true});
+});
+
+test.afterEach(async ({browser}, testInfo) => {
+  const trace = await browser.stopTracing();
+  await testInfo.attach(`performance-trace-${testInfo.testId}.json`, {body: trace});
+});
+
 test(
   'Verify sign in error appearance in case of wrong credentials',
   {tag: ['@TC-3465', '@smoke']},
@@ -39,12 +48,8 @@ test('Verify you can sign in by email', {tag: ['@TC-3461', '@regression']}, asyn
   const {components, pages} = pageManager.webapp;
   const user = await createUser();
 
-  await pageManager.openMainPage();
-  await pages.singleSignOn().enterEmailOnSSOPage(user.email);
-  await expect(pages.login().emailInput).toHaveValue(user.email);
-
-  await pages.login().passwordInput.fill(user.password);
-  await pages.login().signInButton.click();
+  await pageManager.openLoginPage();
+  await pages.login().login(user);
 
   await expect(components.conversationSidebar().personalStatusName).toHaveText(`${user.firstName} ${user.lastName}`);
   await expect(components.conversationSidebar().personalUserName).toContainText(user.username);
