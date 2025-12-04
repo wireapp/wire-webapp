@@ -148,7 +148,7 @@ export class ListViewModel {
     amplify.subscribe(WebAppEvents.SHORTCUT.SILENCE, this.changeNotificationSetting); // todo: deprecated - remove when user base of wrappers version >= 3.4 is large enough
   };
 
-  readonly answerCall = (conversationEntity: Conversation): void => {
+  readonly answerCall = async (conversationEntity: Conversation): Promise<void> => {
     const call = this.callingRepository.findCall(conversationEntity.qualifiedId);
 
     if (!call) {
@@ -156,15 +156,15 @@ export class ListViewModel {
     }
 
     if (call.isConference && !this.callingRepository.supportsConferenceCalling) {
-      PrimaryModal.show(PrimaryModal.type.ACKNOWLEDGE, {
+      return PrimaryModal.show(PrimaryModal.type.ACKNOWLEDGE, {
         text: {
           message: `${t('modalConferenceCallNotSupportedMessage')} ${t('modalConferenceCallNotSupportedJoinMessage')}`,
           title: t('modalConferenceCallNotSupportedHeadline'),
         },
       });
-    } else {
-      this.callingViewModel.callActions.answer(call);
     }
+
+    return this.callingViewModel.callActions.answer(call);
   };
 
   readonly changeNotificationSetting = () => {

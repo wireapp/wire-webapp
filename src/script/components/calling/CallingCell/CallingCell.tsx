@@ -17,7 +17,7 @@
  *
  */
 
-import React, {useCallback, useEffect} from 'react';
+import React, {useCallback, useEffect, useRef} from 'react';
 
 import {container} from 'tsyringe';
 
@@ -33,6 +33,7 @@ import {GroupVideoGrid} from 'Components/calling/GroupVideoGrid';
 import {useCallAlertState} from 'Components/calling/useCallAlertState';
 import {ConversationClassifiedBar} from 'Components/ClassifiedBar/ClassifiedBar';
 import * as Icon from 'Components/Icon';
+import {useConversationCall} from 'Hooks/useConversationCall';
 import {useNoInternetCallGuard} from 'Hooks/useNoInternetCallGuard/useNoInternetCallGuard';
 import type {Call} from 'Repositories/calling/Call';
 import type {CallingRepository} from 'Repositories/calling/CallingRepository';
@@ -114,6 +115,10 @@ export const CallingCell = ({
   const {activeCallViewTab, viewMode} = useKoSubscribableChildren(callState, ['activeCallViewTab', 'viewMode']);
 
   const guardCall = useNoInternetCallGuard();
+  const {isCallConnecting} = useConversationCall(conversation);
+
+  // Ref for immediate synchronous protection from multiple clicks
+  const isAnsweringRef = useRef(false);
 
   const selfParticipant = call.getSelfParticipant();
 
@@ -137,6 +142,14 @@ export const CallingCell = ({
   const isIncoming = state === CALL_STATE.INCOMING;
   const isConnecting = state === CALL_STATE.ANSWERED;
   const isOngoing = state === CALL_STATE.MEDIA_ESTAB;
+
+  // Reset local state when call state changes from incoming
+  if (isAnsweringRef.current && !isIncoming) {
+    isAnsweringRef.current = false;
+  }
+
+  // Button is disabled if either local state or call state indicates answering
+  const isAnswerButtonDisabled = isAnsweringRef.current || isCallConnecting;
 
   const callStatus: Partial<Record<CALL_STATE, CallLabel>> = {
     [CALL_STATE.OUTGOING]: {
@@ -222,9 +235,23 @@ export const CallingCell = ({
   const {showAlert, clearShowAlert} = useCallAlertState();
 
   const answerCall = () => {
-    guardCall(() => {
-      callActions.answer(call);
-      setCurrentView(ViewType.MOBILE_LEFT_SIDEBAR);
+    // Check ref first for immediate synchronous protection
+    if (isAnsweringRef.current || isAnswerButtonDisabled) {
+      return;
+    }
+
+    // Immediately disable synchronously
+    isAnsweringRef.current = true;
+
+    guardCall(async () => {
+      try {
+        await callActions.answer(call);
+        isAnsweringRef.current = false;
+        setCurrentView(ViewType.MOBILE_LEFT_SIDEBAR);
+      } catch (error) {
+        // Re-enable on error
+        isAnsweringRef.current = false;
+      }
     });
   };
 
@@ -404,6 +431,7 @@ export const CallingCell = ({
             disableScreenButton={!callingRepository.supportsScreenSharing}
             teamState={teamState}
             supportsVideoCall={conversation.supportsVideoCall(call.isConference)}
+            isAnswerButtonDisabled={isAnswerButtonDisabled}
           />
         </div>
       )}
