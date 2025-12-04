@@ -84,6 +84,8 @@ function ChooseScreen({choose, callState = container.resolve(CallState)}: Choose
           className="choose-screen-controls-button button-round button-round-dark button-round-md icon-close"
           data-uie-name="do-choose-screen-cancel"
           onClick={cancel}
+          aria-label={t('callChooseScreenCancel')}
+          title={t('callChooseScreenCancel')}
         ></button>
       </div>
     </div>

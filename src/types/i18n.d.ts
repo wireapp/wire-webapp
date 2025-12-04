@@ -274,8 +274,6 @@ declare module 'I18n/en-US.json' {
     'authLoginTitle': `Log in`;
     'authPlaceholderEmail': `Email`;
     'authPlaceholderPassword': `Password`;
-    'showTogglePasswordLabel': `Show password`;
-    'hideTogglePasswordLabel': `Hide password`;
     'authPostedResend': `Resend to {email}`;
     'authPostedResendAction': `No email showing up?`;
     'authPostedResendDetail': `Check your email inbox and follow the instructions.`;
@@ -335,6 +333,7 @@ declare module 'I18n/en-US.json' {
     'callAccept': `Accept`;
     'callChooseSharedScreen': `Choose a screen to share`;
     'callChooseSharedWindow': `Choose a window to share`;
+    'callChooseScreenCancel': `Close-screen sharing`;
     'callConversationAcceptOrDecline': `{conversationName} is calling. Press control + enter to accept the call or press control + shift + enter to decline the call.`;
     'callDecline': `Decline`;
     'callDegradationAction': `OK`;
@@ -434,6 +433,7 @@ declare module 'I18n/en-US.json' {
     'cells.options.delete': `Delete`;
     'cells.options.deletePermanently': `Delete permanently`;
     'cells.options.download': `Download`;
+    'cells.options.edit': `Edit`;
     'cells.options.label': `More options`;
     'cells.options.move': `Move to folder`;
     'cells.options.open': `Open`;
@@ -441,7 +441,6 @@ declare module 'I18n/en-US.json' {
     'cells.options.restore': `Restore`;
     'cells.options.share': `Share`;
     'cells.options.tags': `Add or Remove Tags`;
-    'cells.options.edit': `Edit`;
     'cells.pagination.loadMoreResults': `Load More Items`;
     'cells.pagination.nextPage': `Next Page`;
     'cells.pagination.previousPage': `Previous Page`;
@@ -1094,6 +1093,7 @@ declare module 'I18n/en-US.json' {
     'guestRoomToggleInfoExtended': `Open this conversation to people outside your team. You can always change it later.`;
     'guestRoomToggleInfoHead': `Guest Links`;
     'guestRoomToggleName': `Allow Guests`;
+    'hideTogglePasswordLabel': `Hide password`;
     'historyInfo.learnMore': `Learn more`;
     'historyInfo.noHistoryHeadline': `It’s the first time you’re using {brandName} on this device.`;
     'historyInfo.noHistoryInfo': `For privacy reasons, your history will not appear here.`;
@@ -1825,6 +1825,7 @@ declare module 'I18n/en-US.json' {
     'setPassword.button': `Set password`;
     'setPassword.headline': `Set password`;
     'setPassword.passwordPlaceholder': `Password`;
+    'showTogglePasswordLabel': `Show password`;
     'ssoLogin.codeInputPlaceholder': `SSO code`;
     'ssoLogin.codeOrMailInputPlaceholder': `Email or SSO code`;
     'ssoLogin.headline': `Company log in`;
@@ -1975,11 +1976,11 @@ declare module 'I18n/en-US.json' {
     'userRemainingTimeHours': `{time}h left`;
     'userRemainingTimeMinutes': `Less than {time}m left`;
     'verify.changeEmail': `Change email`;
+    'verify.codeLabel': `Six-digit code`;
+    'verify.codePlaceholder': `Input field, enter digit`;
     'verify.headline': `You’ve got mail`;
     'verify.resendCode': `Resend code`;
     'verify.subhead': `Enter the six-digit verification code we sent to{newline}{email}`;
-    'verify.codeLabel': `Six-digit code`;
-    'verify.codePlaceholder': `Input field, enter digit`;
     'videoCallMenuMoreAddReaction': `Add reaction`;
     'videoCallMenuMoreAudioSettings': `Audio Settings`;
     'videoCallMenuMoreChangeView': `Change view`;
