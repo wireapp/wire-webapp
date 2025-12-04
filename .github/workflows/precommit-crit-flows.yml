@@ -219,7 +219,7 @@ jobs:
           # Overrides URL from .env file
           WEBAPP_URL: https://wire-webapp-precommit.zinfra.io/
           TEST_SERVICE_URL: http://localhost:8080 # Run tests against locally running test service
-        run: yarn e2e-test --shard=${{ matrix.shard }}/${{ strategy.job-total }} --grep "@TC-3461" --trace "retain-on-failure" --repeat-each 32 --max-failures 1
+        run: yarn e2e-test --shard=${{ matrix.shard }}/${{ strategy.job-total }} --grep "@TC-3461" --trace "off" --repeat-each 32 --retries 0
 
       - name: Upload blob report
         if: ${{ !cancelled() }}
