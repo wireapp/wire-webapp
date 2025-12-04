@@ -35,8 +35,8 @@ Prerequisites:
 
 ## 1. Install deps & fetch configuration
 
-1. Run `yarn` (uses Yarn 4 workspaces)
-   - This will install all dependencies and fetch a [configuration](https://github.com/wireapp/wire-web-config-wire/) for the application into `apps/webapp/resource/`
+1. Run `yarn`
+   - This will install all dependencies and fetch a [configuration](https://github.com/wireapp/wire-web-config-wire/) for the application.
 
 ## 2. Build & run
 
