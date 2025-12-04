@@ -51,6 +51,6 @@ export class LoginPage {
      * Since the login may take up to 40s we manually wait for it to finish here instead of increasing the timeout on all actions / assertions after this util
      * This is an exception to the general best practice of using playwrights web assertions. (See: https://playwright.dev/docs/best-practices#use-web-first-assertions)
      */
-    await this.page.waitForURL(new RegExp(`^${webAppPath}$`), {timeout: 40_000, waitUntil: 'networkidle'});
+    await this.page.waitForURL(new RegExp(`^${webAppPath}$`), {timeout: 20_000, waitUntil: 'networkidle'});
   }
 }
