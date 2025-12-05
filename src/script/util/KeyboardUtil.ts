@@ -90,7 +90,15 @@ export const handleKeyDown = ({
   keys: Array<(typeof KEY)[keyof typeof KEY]>;
 }) => {
   if (keys.includes(event.key as (typeof KEY)[keyof typeof KEY])) {
+    if ('preventDefault' in event) {
+      event.preventDefault();
+    }
+    if ('stopPropagation' in event) {
+      event.stopPropagation();
+    }
+
     callback(event);
+    return true;
   }
   return true;
 };
