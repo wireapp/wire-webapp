@@ -48,12 +48,13 @@ test.describe('Authentication', () => {
   test(
     'I want to be asked to share telemetry data when I log in',
     {tag: ['@TC-8780', '@regression']},
-    async ({pageManager, createUser}) => {
+    async ({page, pageManager, createUser}) => {
       const {pages, modals} = pageManager.webapp;
       const user = await createUser({disableTelemetry: false});
 
       await pageManager.openLoginPage();
       await pages.login().login(user);
+      await page.waitForURL(webAppPath, {timeout: 30_000, waitUntil: 'networkidle'});
 
       await expect(modals.dataShareConsent().modalTitle).toBeVisible();
     },
@@ -76,7 +77,7 @@ test.describe('Authentication', () => {
   test(
     'Verify current browser is set as temporary device',
     {tag: ['@TC-3460', '@regression']},
-    async ({pageManager, createUser}) => {
+    async ({page, pageManager, createUser}) => {
       const user = await createUser();
       const {pages, components} = pageManager.webapp;
 
@@ -85,6 +86,7 @@ test.describe('Authentication', () => {
         await pages.login().publicComputerCheckbox.click();
         await pages.login().login(user);
         await pages.historyInfo().clickConfirmButton();
+        await page.waitForURL(webAppPath, {timeout: 30_000, waitUntil: 'networkidle'});
       });
 
       let proteusId: string;
@@ -104,6 +106,7 @@ test.describe('Authentication', () => {
       await test.step('Log in again on non public computer', async () => {
         await pageManager.openLoginPage();
         await pages.login().login(user);
+        await page.waitForURL(webAppPath, {timeout: 30_000, waitUntil: 'networkidle'});
       });
 
       await test.step("Open device settings and ensure the public computer isn't active and the ID was re-generated", async () => {
@@ -136,7 +139,7 @@ test.describe('Authentication', () => {
     test(
       `I want to keep my history after refreshing the page on ${deviceType} device`,
       {tag: [tag, '@regression']},
-      async ({pageManager, createTeam}) => {
+      async ({page, pageManager, createTeam}) => {
         const {pages} = pageManager.webapp;
         const team = await createTeam('Test Team', {withMembers: 1});
         const userA = team.owner;
@@ -153,6 +156,7 @@ test.describe('Authentication', () => {
             await pages.login().login(userA);
           }
 
+          await page.waitForURL(webAppPath, {timeout: 30_000, waitUntil: 'networkidle'});
           await connectWithUser(pageManager, userB);
         });
 
@@ -192,7 +196,7 @@ test.describe('Authentication', () => {
   test(
     'Make sure user does not see data of user of previous sessions on same browser',
     {tag: ['@TC-1311', '@regression']},
-    async ({pageManager, createTeam}) => {
+    async ({page, pageManager, createTeam}) => {
       const {pages, components} = pageManager.webapp;
       const team = await createTeam('Test Team', {withMembers: 1});
       const userA = team.owner;
@@ -203,6 +207,7 @@ test.describe('Authentication', () => {
         await pages.login().publicComputerCheckbox.click();
         await pages.login().login(userA);
         await pages.historyInfo().clickConfirmButton();
+        await page.waitForURL(webAppPath, {timeout: 30_000, waitUntil: 'networkidle'});
       });
 
       await test.step('Connect with and send message to userB', async () => {
@@ -221,6 +226,7 @@ test.describe('Authentication', () => {
         await pageManager.openLoginPage();
         await pages.login().login(userA);
         await pages.historyInfo().clickConfirmButton();
+        await page.waitForURL(webAppPath, {timeout: 30_000, waitUntil: 'networkidle'});
       });
 
       await test.step('Verify previously sent message is gone', async () => {
@@ -241,8 +247,7 @@ test.describe('Authentication', () => {
         pages: device2Pages,
         modals: device2Modals,
         components: device2Components,
-      } = PageManager.from(await createPage(withLogin(user))).webapp;
-      await device2Pages.historyInfo().clickConfirmButton();
+      } = PageManager.from(await createPage(withLogin(user, {confirmNewHistory: true}))).webapp;
 
       await device2Components.conversationSidebar().clickPreferencesButton();
       await device2Pages.settings().devicesButton.click();
