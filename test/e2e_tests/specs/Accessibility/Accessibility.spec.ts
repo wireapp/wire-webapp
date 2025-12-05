@@ -125,23 +125,27 @@ test.describe('Accessibility', () => {
     },
   );
 
-  test('I want to see collapsed view when app is narrow', {tag: ['@TC-48', '@regression']}, async ({pageManager}) => {
-    await (await pageManager.getPage()).setViewportSize(narrowViewport);
+  test(
+    'I want to see collapsed view when app is narrow',
+    {tag: ['@TC-48', '@regression']},
+    async ({page, pageManager}) => {
+      await page.setViewportSize(narrowViewport);
 
-    await pageManager.openMainPage();
-    await loginUser(memberA, pageManager);
-    const {components, pages} = pageManager.webapp;
+      await pageManager.openMainPage();
+      await loginUser(memberA, pageManager);
+      const {components, pages} = pageManager.webapp;
 
-    await pages.historyInfo().clickConfirmButton();
-    await components.conversationSidebar().sidebar.waitFor({state: 'visible', timeout: loginTimeOut});
+      await pages.historyInfo().clickConfirmButton();
+      await components.conversationSidebar().sidebar.waitFor({state: 'visible', timeout: loginTimeOut});
 
-    await expect(components.conversationSidebar().sidebar).toHaveAttribute('data-is-collapsed', 'true');
-  });
+      await expect(components.conversationSidebar().sidebar).toHaveAttribute('data-is-collapsed', 'true');
+    },
+  );
 
   test(
     'I should not lose a drafted message when switching between conversations in collapsed view',
     {tag: ['@TC-51', '@regression']},
-    async ({pageManager}) => {
+    async ({page, pageManager}) => {
       const message = 'test';
       const {components, modals, pages} = pageManager.webapp;
       await pageManager.openMainPage();
@@ -153,7 +157,6 @@ test.describe('Accessibility', () => {
       await createGroup(pages, conversationName, [memberB]);
 
       await pages.conversation().typeMessage(message);
-      const page = await pageManager.getPage();
 
       await components.conversationSidebar().clickConnectButton();
 

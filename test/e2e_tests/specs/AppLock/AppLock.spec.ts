@@ -41,7 +41,7 @@ test.describe('AppLock', () => {
   test(
     'I want to see app lock setup modal on login after app lock has been enforced for the team',
     {tag: ['@TC-2744', '@TC-2740', '@regression']},
-    async ({pageManager}) => {
+    async ({page, pageManager}) => {
       const {modals} = pageManager.webapp;
 
       await completeLogin(pageManager, memberA);
@@ -49,7 +49,6 @@ test.describe('AppLock', () => {
 
       await test.step('Web: I should not be able to close app lock setup modal if app lock is enforced', async () => {
         // click outside the modal
-        const page = await pageManager.getPage();
         await page.mouse.click(200, 350);
         // check if the modal still there
         expect(await modals.appLock().isVisible()).toBeTruthy();
@@ -60,9 +59,8 @@ test.describe('AppLock', () => {
   test(
     'Web: App should not lock if I switch back to webapp tab in time (during inactivity timeout)',
     {tag: ['@TC-2752', '@TC-2753', '@regression']},
-    async ({pageManager, browser}) => {
+    async ({page: webappPageA, pageManager, browser}) => {
       const {modals} = pageManager.webapp;
-      const webappPageA = await pageManager.getPage();
 
       await completeLogin(pageManager, memberA);
       await handleAppLockState(pageManager, appLockPassCode);
@@ -87,7 +85,7 @@ test.describe('AppLock', () => {
   test(
     'Web: I want to unlock the app with passphrase after login',
     {tag: ['@TC-2754', '@TC-2755', '@TC-2758', '@TC-2763', '@regression']},
-    async ({pageManager}) => {
+    async ({page, pageManager}) => {
       const {modals, pages} = pageManager.webapp;
 
       await completeLogin(pageManager, memberA);
@@ -110,14 +108,14 @@ test.describe('AppLock', () => {
         await modals.appLock().clickReset();
         await modals.appLock().inputUserPassword('wrong password');
 
-        expect(await checkAnyIndexedDBExists(await pageManager.getPage())).toBeTruthy();
+        expect(await checkAnyIndexedDBExists(page)).toBeTruthy();
       });
 
       await test.step('I want to wipe database when I forgot my app lock passphrase', async () => {
         await modals.appLock().inputUserPassword(memberA.password);
 
         await expect(pages.singleSignOn().ssoCodeEmailInput).toBeVisible();
-        expect(await checkAnyIndexedDBExists(await pageManager.getPage())).toBeFalsy();
+        expect(await checkAnyIndexedDBExists(page)).toBeFalsy();
       });
     },
   );
@@ -125,12 +123,11 @@ test.describe('AppLock', () => {
   test(
     'I should not be able to switch off app lock if it is enforced for the team',
     {tag: ['@TC-2770', '@TC-2767', '@regression']},
-    async ({pageManager}) => {
+    async ({page, pageManager}) => {
       const {components, pages} = pageManager.webapp;
       await completeLogin(pageManager, memberA);
       await handleAppLockState(pageManager, appLockPassCode);
       await components.conversationSidebar().clickPreferencesButton();
-      const page = await pageManager.getPage();
 
       await expect(pages.account().appLockCheckbox).toBeDisabled();
       // check here string

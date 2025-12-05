@@ -114,7 +114,7 @@ test(
       await ownerPages.startUI().selectUser(guestUser.username);
       await ownerModals.userProfile().clickConnectButton();
       expect(await ownerPages.conversationList().isConversationItemVisible(guestUser.fullName));
-      await expect(await guestPageManager.getPage()).toHaveTitle('(1) Wire');
+      await expect(guestPage).toHaveTitle('(1) Wire');
 
       await guestPages.conversationList().openPendingConnectionRequest();
       await guestPages.connectRequest().clickConnectButton();

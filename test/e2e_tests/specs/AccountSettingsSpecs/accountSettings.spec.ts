@@ -185,15 +185,13 @@ test.describe('account settings', () => {
   test(
     'Verify I can retrieve calling logs',
     {tag: ['@TC-1725', '@regression']},
-    async ({pageManager: memberPageManagerA, browser, api}) => {
+    async ({page, pageManager: memberPageManagerA, browser}) => {
       const consoleMessages: string[] = [];
 
       const memberContext = await browser.newContext();
       const memberPage = await memberContext.newPage();
       const memberPageManagerB = new PageManager(memberPage);
       const {pages, components, modals} = memberPageManagerA.webapp;
-
-      const page = await memberPageManagerA.getPage();
 
       page.on('console', msg => {
         consoleMessages.push(msg.text());
@@ -229,7 +227,7 @@ test.describe('account settings', () => {
   test(
     'I want to see the Full Name wherever my name gets displayed',
     {tag: ['@TC-1948', '@regression']},
-    async ({pageManager, api}) => {
+    async ({page, pageManager, api}) => {
       const groupName = 'test group';
       const {components, pages} = pageManager.webapp;
 
@@ -258,7 +256,7 @@ test.describe('account settings', () => {
       await api.brig.unlockChannelFeature(owner.teamId);
       await api.brig.enableChannelsFeature(owner.teamId);
 
-      await (await pageManager.getPage()).reload();
+      await page.reload();
 
       await createChannel(pages, 'test', [memberB]);
 
