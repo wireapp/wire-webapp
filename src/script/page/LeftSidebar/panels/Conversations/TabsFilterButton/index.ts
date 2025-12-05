@@ -17,4 +17,4 @@
  *
  */
 
-export * from './ConversationFilterButton';
+export {TabsFilterButton} from './TabsFilterButton';
