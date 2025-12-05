@@ -126,8 +126,10 @@ const GroupVideoGridTile = ({
       onDoubleClick={handleTileClick}
       onKeyDown={handleEnterTileClick}
       role="button"
-      // minimized is passed only from CallingCell where we dont want to focus individual the tile on the tab press
-      tabIndex={!minimized || isMaximized ? TabIndex.FOCUSABLE : TabIndex.UNFOCUSABLE}
+      // minimized is passed only from CallingCell where we don't want to focus individual the tile on the tab press
+      tabIndex={
+        (!minimized || isMaximized) && participant !== selfParticipant ? TabIndex.FOCUSABLE : TabIndex.UNFOCUSABLE
+      }
       aria-label={`Focus video ${participant?.user.id}`}
     >
       {hasActiveVideo ? (
