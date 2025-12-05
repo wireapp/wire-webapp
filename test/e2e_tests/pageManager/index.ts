@@ -88,7 +88,7 @@ const teamManagementPath = process.env.TEAM_MANAGEMENT_URL ?? '';
 export class PageManager {
   private readonly cache = new Map<string, any>();
 
-  constructor(private readonly page: Page) {}
+  constructor(readonly page: Page) {}
 
   static from(page: Page): PageManager;
   static from(page: Promise<Page>): Promise<PageManager>;
@@ -135,10 +135,6 @@ export class PageManager {
 
   getContext = () => {
     return this.page.context();
-  };
-
-  getPage = async () => {
-    return await this.page;
   };
 
   waitForRequest = (url: string) => {
