@@ -21,17 +21,6 @@ import {generateRandomPassword} from 'Util/StringUtil';
 
 import {test, expect} from '../../test.fixtures';
 
-test.beforeEach(async ({browser, page}) => {
-  await browser.startTracing(page, {screenshots: true});
-});
-
-test.afterEach(async ({browser}, testInfo) => {
-  const trace = await browser.stopTracing();
-  if (testInfo.status === 'failed') {
-    await testInfo.attach(`performance-trace-${testInfo.testId}.json`, {body: trace});
-  }
-});
-
 test(
   'Verify sign in error appearance in case of wrong credentials',
   {tag: ['@TC-3465', '@smoke']},
