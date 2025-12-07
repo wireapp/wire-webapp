@@ -9,6 +9,7 @@
 /package-lock.json
 /resource
 /temp
+/apps/webapp/resource
 CHANGELOG.md
 node_modules
 npm-debug.log

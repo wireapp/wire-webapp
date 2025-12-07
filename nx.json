@@ -3,20 +3,20 @@
   "targetDefaults": {
     "build": {
       "cache": true,
-      "inputs": ["production"],
+      "inputs": ["production"], // skip test-only files when hashing builds
       "outputs": ["{projectRoot}/dist"]
     },
     "test": {
       "cache": true,
-      "inputs": ["default", "^production", "{workspaceRoot}/jest.preset.js"]
+      "inputs": ["default", "^production", "{workspaceRoot}/jest.preset.js"] // include shared preset in cache key
     },
     "lint": {
       "cache": true,
-      "inputs": ["default", "{workspaceRoot}/.eslintrc.js"]
+      "inputs": ["default", "{workspaceRoot}/.eslintrc.js"] // workspace lint config in hash
     }
   },
   "namedInputs": {
-    "default": ["{projectRoot}/**/*", "sharedGlobals"],
+    "default": ["{projectRoot}/**/*", "sharedGlobals"], // everything under the project by default
     "production": [
       "default",
       "!{projectRoot}/**/?(*.)+(spec|test).[jt]s?(x)?(.snap)",
@@ -26,7 +26,7 @@
       "!{projectRoot}/src/test-setup.[jt]s",
       "!{projectRoot}/test-setup.[jt]s"
     ],
-    "sharedGlobals": []
+    "sharedGlobals": [] // hook for root-level shared files if needed
   },
   "defaultProject": "webapp"
 }

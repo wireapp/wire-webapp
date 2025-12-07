@@ -17,7 +17,10 @@
  *
  */
 
-const pkg = require('./package.json');
+const path = require('path');
+
+const rootDir = path.join(__dirname, '..', '..');
+const pkg = require(path.join(rootDir, 'package.json'));
 const appConfigPkg = require('./app-config/package.json');
 const {execSync} = require('child_process');
 require('dotenv').config();
@@ -61,7 +64,7 @@ console.log('Repo URL', repositoryUrl);
 module.exports = {
   files: {
     [`${pkg.name}/content/**`]: 'resource/',
-    [`${pkg.name}/.env.defaults`]: `${__dirname}/.env.defaults`,
+    [`${pkg.name}/.env.defaults`]: path.join(rootDir, '.env.defaults'),
   },
   repositoryUrl,
 };
