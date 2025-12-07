@@ -1,46 +1,78 @@
 {
   "name": "webapp",
-  "$schema": "{projectRoot}/node_modules/nx/schemas/project-schema.json",
-  "sourceRoot": "{projectRoot}/src",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "apps/webapp/src",
   "projectType": "application",
   "targets": {
     "build": {
-      "executor": "nx:run-commands",
-      "outputs": ["{workspaceRoot}/apps/server/dist/static"], // web assets land in server dist/static
+      "executor": "@nx/webpack:webpack",
+      "outputs": ["{options.outputPath}"],
       "defaultConfiguration": "production",
-      "dependsOn": ["server:build"], // ensure server build before bundling webapp
       "options": {
-        "command": "yarn build:prod",
-        "cwd": "{projectRoot}"
+        "compiler": "babel",
+        "outputPath": "dist/apps/webapp",
+        "index": "apps/webapp/src/page/index.ejs",
+        "baseHref": "/",
+        "main": "apps/webapp/src/script/main/index.tsx",
+        "polyfills": [],
+        "tsConfig": "apps/webapp/tsconfig.json",
+        "assets": [
+          "apps/webapp/resource",
+          "apps/webapp/assets"
+        ],
+        "styles": [],
+        "scripts": [],
+        "webpackConfig": "apps/webapp/webpack.config.js"
       },
       "configurations": {
         "development": {
-          "command": "yarn build:dev"
+          "extractLicenses": false,
+          "optimization": false,
+          "sourceMap": true,
+          "vendorChunk": true,
+          "webpackConfig": "apps/webapp/webpack.config.dev.js"
         },
         "production": {
-          "command": "yarn build:prod"
+          "fileReplacements": [],
+          "optimization": true,
+          "outputHashing": "all",
+          "sourceMap": false,
+          "namedChunks": false,
+          "extractLicenses": true,
+          "vendorChunk": false,
+          "webpackConfig": "apps/webapp/webpack.config.js"
         }
       }
     },
     "serve": {
-      "executor": "nx:run-commands",
+      "executor": "@nx/webpack:dev-server",
       "defaultConfiguration": "development",
       "options": {
-        "command": "echo 'Use yarn start from the root to run the dev server with webpack-dev-middleware'" // served via root start
+        "buildTarget": "webapp:build:development",
+        "hmr": true,
+        "port": 8080
+      },
+      "configurations": {
+        "development": {
+          "buildTarget": "webapp:build:development"
+        },
+        "production": {
+          "buildTarget": "webapp:build:production",
+          "hmr": false
+        }
       }
     },
     "test": {
       "executor": "@nx/jest:jest",
       "outputs": ["{workspaceRoot}/coverage/apps/webapp"],
       "options": {
-        "jestConfig": "{projectRoot}/jest.config.ts",
+        "jestConfig": "apps/webapp/jest.config.ts",
         "passWithNoTests": false
       },
       "configurations": {
         "ci": {
           "ci": true,
-          "coverage": true,
-          "coverageReporters": ["lcov", "text"]
+          "coverage": true
         }
       }
     },
@@ -48,61 +80,14 @@
       "executor": "@nx/playwright:playwright",
       "outputs": ["{workspaceRoot}/dist/.playwright/apps/webapp"],
       "options": {
-        "config": "{projectRoot}/playwright.config.ts"
+        "playwrightConfig": "apps/webapp/playwright.config.ts"
       }
     },
     "lint": {
-      "executor": "nx:run-commands",
-      "dependsOn": ["webapp:stylelint", "webapp:type-check"],
+      "executor": "@nx/linter:eslint",
+      "outputs": ["{options.outputFile}"],
       "options": {
-        "command": "eslint --quiet --ext .js,.ts,.tsx {projectRoot}" // typed linting via root eslintrc
-      }
-    },
-    "stylelint": {
-      "executor": "nx:run-commands",
-      "options": {
-        "command": "prettier --ignore-path {projectRoot}/.prettierignore --write \"**/*.less\" && stylelint --ignore-path {projectRoot}/.gitignore \"**/*.less\"", // format+lint Less assets
-        "cwd": "{projectRoot}"
-      }
-    },
-    "type-check": {
-      "executor": "nx:run-commands",
-      "options": {
-        "command": "tsc --project {projectRoot}/tsconfig.build.json --noEmit"
-      }
-    },
-    "check-circular": {
-      "executor": "nx:run-commands",
-      "options": {
-        "command": "dpdm --no-warning --no-tree -T {projectRoot}/src/script/auth/main.tsx {projectRoot}/src/script/main/app.ts" // detect circular deps in entrypoints
-      }
-    },
-    "translate-extract": {
-      "executor": "nx:run-commands",
-      "options": {
-        "command": "i18next-scanner 'src/{page,script}/**/*.{js,html,htm}'",
-        "cwd": "{projectRoot}"
-      }
-    },
-    "translate-merge": {
-      "executor": "nx:run-commands",
-      "options": {
-        "command": "formatjs extract --format './bin/translations_extract_formatter.js' --out-file './src/i18n/en-US.json'",
-        "cwd": "{projectRoot}"
-      }
-    },
-    "translate-generate-types": {
-      "executor": "nx:run-commands",
-      "options": {
-        "command": "node ./bin/transalations_generate_types.js",
-        "cwd": "{projectRoot}"
-      }
-    },
-    "configure": {
-      "executor": "nx:run-commands",
-      "options": {
-        "command": "copy-config ./.copyconfigrc.js && ts-node ./bin/generate_react_icons.ts", // fetch env config + generate icons
-        "cwd": "{projectRoot}"
+        "lintFilePatterns": ["apps/webapp/**/*.{ts,tsx,js,jsx}"]
       }
     }
   },
