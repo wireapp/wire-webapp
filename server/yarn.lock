@@ -1123,15 +1123,15 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@wireapp/commons@npm:5.4.9":
-  version: 5.4.9
-  resolution: "@wireapp/commons@npm:5.4.9"
+"@wireapp/commons@npm:5.4.10":
+  version: 5.4.10
+  resolution: "@wireapp/commons@npm:5.4.10"
   dependencies:
     ansi-regex: "npm:5.0.1"
     fs-extra: "npm:11.3.1"
     logdown: "npm:3.3.1"
     platform: "npm:1.3.6"
-  checksum: 10/10804e146e7dbe3f87ad2473a066eafe17faf0e2f8c2e89e378b844e2ff72777b8cb640aa76adb52f17d8ad46bcb37cfb4cffb8311fdea3102d653ff1e49bfa0
+  checksum: 10/35832d8da7eeb07dae12ed3489780f302b861841683505ba07ccb10eed3e139af56ccf6245ed4c6a8ee16bddfbc374b145634ea37ff6257d86ed944bd3dc06c6
   languageName: node
   linkType: hard
 
@@ -5652,7 +5652,7 @@ __metadata:
     "@types/hbs": "npm:4.0.5"
     "@types/jest": "npm:^29.5.14"
     "@types/node": "npm:22.5.5"
-    "@wireapp/commons": "npm:5.4.9"
+    "@wireapp/commons": "npm:5.4.10"
     browserslist: "npm:^4.28.0"
     dotenv: "npm:16.5.0"
     dotenv-extended: "npm:2.9.0"
