@@ -53,7 +53,7 @@
     "bundle:dev": "nx build webapp --configuration=development",
     "bundle:prod": "nx build webapp --configuration=production",
     "clean:jest": "nx reset && nx run workspace-tools:clean-jest",
-    "clean:yarn": "rm -rf node_modules && yarn cache clean",
+    "clean:yarn": "find . -name node_modules -type d -prune -exec rm -rf '{}' + && yarn cache clean",
     "changelog:production": "nx run workspace-tools:changelog-production",
     "changelog:staging": "nx run workspace-tools:changelog-staging",
     "changelog:rc": "nx run workspace-tools:changelog-rc",

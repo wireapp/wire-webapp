@@ -35,8 +35,8 @@ Prerequisites:
 
 ## 1. Install deps & fetch configuration
 
-1. Run `yarn`
-   - This will install all dependencies and fetch a [configuration](https://github.com/wireapp/wire-web-config-wire/) for the application.
+1. Run `yarn` (uses Yarn 4 workspaces)
+2. Run `yarn nx run webapp:configure` to fetch the active config bundle into `apps/webapp/resource/`
 
 ## 2. Build & run
 
@@ -89,11 +89,8 @@ After updating the environment variables, the app will be available at the corre
 
 ### Production
 
-1. Build and package for production: `yarn nx run server:package` (or `yarn build:prod`)
-   - This builds both server and webapp (in production mode) and creates the deployment package at `apps/server/dist/s3/ebs.zip`
+1. Build both apps: `yarn nx run-many -t build --all`
 1. Start the server output from `apps/server/dist` (or build a Docker image with `yarn docker <tag>`)
-
-**Note:** The `yarn zip` command has been deprecated. Packaging is now integrated into the build process via `yarn build:prod` or `yarn nx run server:package`.
 
 ## Testing
 

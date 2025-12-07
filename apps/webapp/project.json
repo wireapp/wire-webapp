@@ -6,9 +6,9 @@
   "targets": {
     "build": {
       "executor": "nx:run-commands",
-      "outputs": ["{projectRoot}/../../apps/server/dist/static"],
+      "outputs": ["{projectRoot}/../../apps/server/dist/static"], // web assets land in server dist/static
       "defaultConfiguration": "production",
-      "dependsOn": ["server:build"],
+      "dependsOn": ["server:build"], // ensure server build before bundling webapp
       "options": {
         "command": "yarn build:prod",
         "cwd": "apps/webapp"
@@ -26,7 +26,7 @@
       "executor": "nx:run-commands",
       "defaultConfiguration": "development",
       "options": {
-        "command": "echo 'Use yarn start from the root to run the dev server with webpack-dev-middleware'"
+        "command": "echo 'Use yarn start from the root to run the dev server with webpack-dev-middleware'" // served via root start
       }
     },
     "test": {
@@ -54,13 +54,13 @@
       "executor": "nx:run-commands",
       "dependsOn": ["webapp:stylelint", "webapp:type-check"],
       "options": {
-        "command": "eslint --ext .js,.ts,.tsx apps/webapp"
+        "command": "eslint --ext .js,.ts,.tsx apps/webapp" // typed linting via root eslintrc
       }
     },
     "stylelint": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "prettier --ignore-path ../../.prettierignore --write \"**/*.less\" && stylelint --ignore-path ../../.gitignore \"**/*.less\"",
+        "command": "prettier --ignore-path ../../.prettierignore --write \"**/*.less\" && stylelint --ignore-path ../../.gitignore \"**/*.less\"", // format+lint Less assets
         "cwd": "apps/webapp"
       }
     },
@@ -73,7 +73,7 @@
     "check-circular": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "dpdm --no-warning --no-tree -T apps/webapp/src/script/auth/main.tsx apps/webapp/src/script/main/app.ts"
+        "command": "dpdm --no-warning --no-tree -T apps/webapp/src/script/auth/main.tsx apps/webapp/src/script/main/app.ts" // detect circular deps in entrypoints
       }
     },
     "translate-extract": {
@@ -100,8 +100,8 @@
     "configure": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "copy-config && ts-node ./bin/generate_react_icons.ts",
-        "cwd": "."
+        "command": "copy-config --config ./.copyconfigrc.js && ts-node ../../bin/generate_react_icons.ts", // fetch env config + generate icons
+        "cwd": "apps/webapp"
       }
     }
   },

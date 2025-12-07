@@ -85,6 +85,12 @@
       "options": {
         "command": "echo \"workspace-tools has no e2e\""
       }
+    },
+     "type-check": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "echo \"workspace-tools has no type-check\""
+      }
     }
   },
   "tags": ["scope:tooling"]
