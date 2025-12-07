@@ -24,7 +24,7 @@ const path = require('path');
 
 const srcFolder = '../';
 const distFolder = '../dist/';
-const npmModulesFolder = '../../node_modules/';
+const npmModulesFolder = '../../../node_modules/';
 
 const assetFolders = ['.ebextensions/', 'robots/', 'templates/', 'certificate'];
 

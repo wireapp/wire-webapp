@@ -43,7 +43,7 @@ Prerequisites:
 If you would like your browser to trust the certificate from "local.wire.com"/"local.zinfra.io"/"local.imai.wire.link":
 
 1. Download [mkcert](https://github.com/FiloSottile/mkcert/releases/latest) Installation on Mac `brew install mkcert` [refer to latest readme.md](https://github.com/FiloSottile/mkcert)
-2. Set the `CAROOT` environment variable to `<WebApp Dir>/server/certificate`
+2. Set the `CAROOT` environment variable to `<WebApp Dir>/apps/server/certificate`
 3. Run `mkcert -install`
 
 #### Environment Configuration

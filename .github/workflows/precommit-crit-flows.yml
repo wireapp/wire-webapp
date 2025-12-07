@@ -24,7 +24,7 @@ jobs:
       committer: ${{ steps.meta.outputs.committer }}
 
     env:
-      BUILD_DIR: server/dist/s3/
+      BUILD_DIR: apps/server/dist/s3/
       BUILD_ARTIFACT: ebs.zip
       CHANGELOG_FILE: ./changelog.md
       UNIT_TEST_REPORT_FILE: ./unit-tests.log

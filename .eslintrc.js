@@ -15,9 +15,9 @@ module.exports = {
     '**/node_modules/',
     'assets/',
     'resource/',
-    'server/bin/',
-    'server/dist/',
-    'server/node_modules/',
+    'apps/server/bin/',
+    'apps/server/dist/',
+    'apps/server/node_modules/',
     'src/ext/',
     'src/script/localization/**/webapp*.js',
     'src/worker/',
@@ -26,7 +26,7 @@ module.exports = {
     'src/types/i18n.d.ts',
   ],
   parserOptions: {
-    project: ['./tsconfig.build.json', './server/tsconfig.json'],
+    project: ['./tsconfig.build.json', './apps/server/tsconfig.json'],
     tsconfigRootDir: __dirname,
   },
   plugins: ['@emotion', 'import'],
@@ -52,7 +52,11 @@ module.exports = {
   settings: {
     'import/resolver': {
       typescript: {
-        project: [__dirname + '/tsconfig.build.json', __dirname + './server/tsconfig.json'],
+        alwaysTryTypes: true,
+        project: [__dirname + '/tsconfig.build.json', __dirname + '/apps/server/tsconfig.json'],
+      },
+      node: {
+        extensions: ['.js', '.jsx', '.ts', '.tsx'],
       },
     },
   },

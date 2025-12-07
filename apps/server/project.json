@@ -1,38 +1,27 @@
 {
   "name": "server",
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
-  "sourceRoot": "apps/server/src",
+  "sourceRoot": "apps/server",
   "projectType": "application",
   "targets": {
     "build": {
-      "executor": "@nx/js:tsc",
-      "outputs": ["{options.outputPath}"],
+      "executor": "nx:run-commands",
+      "outputs": ["{projectRoot}/dist"],
       "options": {
-        "outputPath": "apps/server/dist",
-        "main": "apps/server/src/index.ts",
-        "tsConfig": "apps/server/tsconfig.json",
-        "assets": ["apps/server/templates", "apps/server/libs"]
-      },
-      "configurations": {
-        "production": {
-          "optimization": true,
-          "sourceMap": false
-        },
-        "development": {
-          "optimization": false,
-          "sourceMap": true
-        }
+        "commands": ["yarn clean", "tsc", "yarn generate-version-file", "yarn copy-assets"],
+        "parallel": false,
+        "cwd": "apps/server"
       }
     },
     "serve": {
       "executor": "@nx/js:node",
       "options": {
-        "buildTarget": "server:build:development",
+        "buildTarget": "server:build",
         "watch": true
       },
       "configurations": {
         "production": {
-          "buildTarget": "server:build:production"
+          "buildTarget": "server:build"
         }
       }
     },
@@ -40,7 +29,7 @@
       "executor": "@nx/jest:jest",
       "outputs": ["{workspaceRoot}/coverage/apps/server"],
       "options": {
-        "jestConfig": "apps/server/jest.config.ts",
+        "jestConfig": "apps/server/jest.config.js",
         "passWithNoTests": true
       }
     }

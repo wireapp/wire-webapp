@@ -22,7 +22,7 @@ jobs:
     env:
       DEPLOYMENT_RECOVERY_TIMEOUT_SECONDS: 150
       AWS_APPLICATION_NAME: Webapp
-      AWS_BUILD_ZIP_PATH: server/dist/s3/ebs.zip
+      AWS_BUILD_ZIP_PATH: apps/server/dist/s3/ebs.zip
 
     steps:
       - name: Print environment variables

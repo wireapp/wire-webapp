@@ -226,7 +226,7 @@ class Server {
           url: '/',
         },
       ];
-      this.app.use(expressSitemapXml(pages, config.APP_BASE));
+      this.app.use(expressSitemapXml(pages, config.APP_BASE) as unknown as express.RequestHandler);
     }
   }
 

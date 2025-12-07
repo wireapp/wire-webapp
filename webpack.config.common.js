@@ -23,7 +23,7 @@ const CopyPlugin = require('copy-webpack-plugin');
 const WorkboxPlugin = require('workbox-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 
-const DIST_PATH = path.resolve(__dirname, 'server/dist');
+const DIST_PATH = path.resolve(__dirname, 'apps/server/dist');
 const ROOT_PATH = path.resolve(__dirname);
 const SRC_PATH = path.resolve(__dirname, 'src');
 

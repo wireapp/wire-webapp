@@ -40,5 +40,5 @@
     "strict": true
   },
   "types": ["@types/wicg-file-system-access", "jest", "@testing-library/jest-dom"],
-  "exclude": ["node_modules", "server/", "src/sw.js", "src/worker/"]
+  "exclude": ["node_modules", "apps/server/", "src/sw.js", "src/worker/"]
 }

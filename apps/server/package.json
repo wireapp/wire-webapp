@@ -5,9 +5,12 @@
   "main": "dist/index.js",
   "license": "GPL-3.0",
   "scripts": {
-    "build": "nx build server",
-    "serve": "nx serve server",
-    "test": "nx test server"
+    "build": "yarn clean && tsc && yarn generate-version-file && yarn copy-assets",
+    "copy-assets": "node ./bin/copy_server_assets.js",
+    "generate-version-file": "node ./bin/generateVersionFile.js",
+    "clean": "rimraf ./dist/",
+    "start:prod": "pm2 start \"./index.js\" --name \"Webapp\" && pm2 logs",
+    "test": "jest"
   },
   "dependencies": {
     "@wireapp/commons": "5.4.9",
@@ -38,6 +41,7 @@
     "@types/jest": "^29.5.14",
     "@types/node": "22.5.5",
     "jest": "29.7.0",
+    "rimraf": "6.1.2",
     "typescript": "5.6.3"
   }
 }
