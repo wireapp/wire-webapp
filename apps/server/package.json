@@ -39,6 +39,24 @@
     "@types/geolite2": "2.0.0",
     "@types/hbs": "4.0.5",
     "@types/jest": "^29.5.14",
-    "jest": "29.7.0"
+    "@types/node": "22.5.5",
+    "browserslist": "^4.28.1",
+    "jest": "29.7.0",
+    "rimraf": "6.1.2",
+    "typescript": "5.6.3"
+  },
+  "resolutions": {
+    "glob": "11.1.0"
+  },
+  "engines": {
+    "node": ">= 20.14.0"
+  },
+  "scripts": {
+    "build": "yarn clean && tsc && yarn generate-version-file && yarn copy-assets",
+    "copy-assets": "node ./bin/copy_server_assets.js",
+    "generate-version-file": "node ./bin/generateVersionFile.js",
+    "clean": "rimraf ./dist/",
+    "start:prod": "pm2 start \"./index.js\" --name \"Webapp\" && pm2 logs",
+    "test": "jest"
   }
 }
