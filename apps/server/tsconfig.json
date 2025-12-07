@@ -1,22 +1,17 @@
 {
+  "extends": "../../tsconfig.base.json",
   "compilerOptions": {
-    "alwaysStrict": true,
-    "esModuleInterop": true,
     "module": "commonjs",
-    "outDir": "dist",
-    "removeComments": true,
-    "lib": ["esnext"],
-    "downlevelIteration": true,
-    "forceConsistentCasingInFileNames": true,
-    "moduleResolution": "node",
-    "noEmitOnError": true,
-    "noImplicitAny": true,
-    "noImplicitReturns": true,
-    "noUnusedLocals": true,
-    "sourceMap": true,
-    "target": "es2017"
+    "target": "ES2020",
+    "outDir": "./dist",
+    "rootDir": "./src",
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "strict": true,
+    "resolveJsonModule": true,
+    "declaration": true,
+    "types": ["node", "jest"]
   },
-  "files": ["index.ts"],
-  "include": ["./**/*.test.ts"],
-  "exclude": ["node_modules"]
+  "include": ["src/**/*"],
+  "exclude": ["node_modules", "dist", "**/*.spec.ts", "**/*.test.ts"]
 }
