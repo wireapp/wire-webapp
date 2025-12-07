@@ -1,0 +1,70 @@
+/*
+ * Wire
+ * Copyright (C) 2018 Wire Swiss GmbH
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ *
+ */
+
+.conversation-input-bar-messages-timer {
+  position: relative;
+}
+
+.controls-right-button-ephemeral-context {
+  .square(32px);
+
+  position: absolute;
+  top: 0;
+  left: 0;
+  outline: 0;
+}
+
+.message-timer-button {
+  .circle(22px);
+
+  position: relative;
+  border-width: 2px;
+  border-style: solid;
+  margin: 4px;
+  font-size: var(--font-size-xsmall);
+  font-weight: var(--font-weight-bold);
+  letter-spacing: -1px;
+  line-height: 1.125rem;
+  text-align: center;
+
+  svg path {
+    fill: currentColor;
+  }
+
+  &--disabled {
+    border-color: var(--foreground-fade-24);
+    color: var(--foreground);
+  }
+
+  &--enabled {
+    color: var(--accent-color);
+    cursor: pointer;
+  }
+}
+
+.message-timer-button-unit {
+  .circle(14px);
+
+  position: absolute;
+  top: -4px;
+  right: -9px;
+  background-color: var(--app-bg-secondary);
+  letter-spacing: 0;
+  line-height: var(--line-height-xs);
+}

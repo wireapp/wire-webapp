@@ -1,0 +1,50 @@
+/*
+ * Wire
+ * Copyright (C) 2019 Wire Swiss GmbH
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ *
+ */
+
+.enriched-fields {
+  margin: 32px 0;
+
+  &__entry {
+    width: 100%;
+    padding: 8px 16px;
+    font-weight: var(--font-weight-regular);
+    line-height: 1.5;
+    text-align: left;
+
+    &__key {
+      .label;
+      margin: 0;
+      color: var(--text-input-label);
+    }
+
+    &__value {
+      .text-light;
+      margin: 0;
+      word-break: break-word;
+
+      &.availability-status {
+        display: flex;
+        margin-top: 8px;
+        font-size: var(--font-size-small);
+        font-weight: var(--font-weight-semibold);
+        line-height: var(--line-height-small);
+      }
+    }
+  }
+}

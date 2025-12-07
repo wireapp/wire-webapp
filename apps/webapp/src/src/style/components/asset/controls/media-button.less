@@ -1,0 +1,111 @@
+/*
+ * Wire
+ * Copyright (C) 2018 Wire Swiss GmbH
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ *
+ */
+
+// vars
+
+@keyframes progress-animation {
+  to {
+    stroke-dasharray: 100 100;
+  }
+}
+
+@keyframes progress-animation-lg {
+  to {
+    stroke-dasharray: 200 200;
+  }
+}
+
+// Buttons
+.media-button {
+  .circle(var(--media-button-size));
+
+  position: relative;
+  flex: 0 0 auto;
+  background-color: fade(#000, 40%);
+  color: #fff;
+  cursor: pointer;
+  font-size: var(--font-size-base);
+  line-height: var(--media-button-size);
+  text-align: center;
+
+  & svg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    border-radius: 50%;
+    transform: rotate(-90deg);
+  }
+
+  & circle {
+    fill: none;
+    stroke-dasharray: 0 100; // radius * 2 + pi
+    stroke-width: 4px;
+    transform-origin: center;
+  }
+
+  &__icon {
+    display: flex;
+    height: 100%;
+    align-items: center;
+    justify-content: center;
+
+    svg {
+      position: relative;
+      width: 16px;
+      height: 16px;
+
+      path {
+        fill: #fff;
+      }
+    }
+  }
+
+  &.media-button-error {
+    background-color: fade(@w-red, 24%);
+  }
+
+  &.media-button-progress-animation {
+    & circle {
+      animation: progress-animation calc(var(--animation-timing-slower) * 3) linear infinite;
+    }
+  }
+
+  .media-button-lg & {
+    .circle(var(--media-button-size-lg));
+
+    font-size: var(--font-size-xxl);
+    line-height: var(--media-button-size-lg);
+
+    & circle {
+      stroke-dasharray: 0 200;
+    }
+
+    &.media-button-progress-animation {
+      & circle {
+        animation: progress-animation-lg calc(var(--animation-timing-slower) * 3) linear infinite;
+      }
+    }
+  }
+
+  &.media-button:focus-visible {
+    .focus-outline;
+    .focus-offset;
+    .focus-border-radius;
+  }
+}

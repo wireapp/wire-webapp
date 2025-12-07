@@ -1,0 +1,114 @@
+/*
+ * Wire
+ * Copyright (C) 2018 Wire Swiss GmbH
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ *
+ */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+* {
+  --scrollbar-color: @gray-60;
+  scrollbar-color: var(--scrollbar-color) transparent;
+  scrollbar-width: thin;
+  &::-webkit-scrollbar {
+    width: var(--scrollbar-size);
+    height: var(--scrollbar-size);
+  }
+
+  &::-webkit-scrollbar-track {
+    background: none;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    border-radius: var(--scrollbar-size);
+    background-color: var(--scrollbar-color);
+    transition: background-color 1s;
+  }
+}
+
+body {
+  color: var(--main-color);
+  font-family: var(--font-family-base);
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-regular);
+  overflow-x: hidden;
+  overflow-y: hidden !important;
+  text-rendering: optimizeLegibility;
+}
+
+// Set default icon size
+[class^='icon-'],
+[class*=' icon-'] {
+  font-size: var(--icon-size-sm);
+}
+
+// common focus indicator for all the focusable elements
+* {
+  outline: none;
+
+  &:focus-visible {
+    outline: 1px solid #9bc2e9;
+    .focus-outline;
+    .focus-border-radius;
+  }
+}
+
+input[type='radio']:focus-visible + label {
+  .focus-outline;
+  .focus-offset;
+  .focus-border-radius;
+}
+
+a {
+  text-decoration: none;
+}
+
+input[type='text']::-ms-clear {
+  display: none;
+}
+
+pre {
+  direction: ltr;
+
+  code {
+    display: block;
+    overflow: auto;
+  }
+}
+
+// Set the right background color for bubbles
+.bubble {
+  &:after {
+    background: linear-gradient(
+      -45deg,
+      var(--app-bg-secondary),
+      var(--app-bg-secondary) 50%,
+      transparent 0,
+      transparent
+    );
+  }
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background-color: transparent;
+}
+
+b,
+strong {
+  font-weight: var(--font-weight-bold);
+}

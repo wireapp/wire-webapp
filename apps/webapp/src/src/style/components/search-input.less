@@ -1,0 +1,168 @@
+/*
+ * Wire
+ * Copyright (C) 2018 Wire Swiss GmbH
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ *
+ */
+
+.search-outer {
+  overflow: hidden;
+}
+
+.user-list-light {
+  padding: 0 !important;
+}
+
+.search-inner-wrap {
+  overflow-x: hidden;
+}
+
+.search-inner {
+  .hide-scrollbar;
+  position: relative;
+
+  display: flex;
+  max-height: 84px;
+  flex-wrap: wrap;
+  align-items: center;
+  overflow-y: auto;
+}
+
+.search-inner > span {
+  .label-bold-xs;
+
+  position: relative;
+  flex: 0 0 auto;
+  padding-right: 16px;
+  line-height: var(--line-height-lg);
+
+  &::before {
+    .dot-size(2px);
+
+    position: absolute;
+    top: 11px;
+    right: 7px;
+    background-color: var(--foreground-fade-40);
+    content: '';
+
+    .user-list-light & {
+      background-color: var(--background-fade-40);
+    }
+  }
+
+  &:last-child {
+    margin-right: 8px;
+  }
+}
+
+.search-inner > input {
+  .label-1;
+
+  width: 100%;
+  min-width: 65px;
+  height: 32px;
+  flex: 1 1;
+  padding: 20px 20px 20px 40px;
+  border: 1px solid var(--text-input-border);
+  border-radius: 12px;
+  appearance: none;
+  background: var(--text-input-background);
+  color: currentColor;
+  outline: none;
+
+  &:invalid {
+    box-shadow: none;
+  }
+
+  &::placeholder {
+    &:invalid {
+      color: var(--gray-50);
+    }
+    color: var(--gray-70);
+  }
+
+  &:placeholder-shown {
+    .ellipsis-nowrap;
+    font-size: 14px;
+  }
+
+  // hack for chrome to fix line height issue
+  &::-webkit-input-placeholder {
+    transform: translateY(-1px);
+  }
+
+  .user-list-light & {
+    &::placeholder {
+      color: var(--background-fade-40);
+    }
+  }
+
+  &:hover {
+    border-color: var(--text-input-border-hover);
+  }
+
+  &:focus,
+  &:focus-visible,
+  &:active {
+    border-color: var(--accent-color-500);
+  }
+}
+
+body.theme-dark {
+  .search-inner > input {
+    &::placeholder {
+      color: var(--gray-60);
+    }
+  }
+}
+
+.search-icon {
+  position: absolute;
+  z-index: 1;
+  left: 16px;
+  height: var(--avatar-diameter-xs);
+  line-height: var(--avatar-diameter-xs);
+}
+
+.search-input-cancel {
+  position: absolute;
+  top: 50%;
+  right: 16px;
+  bottom: 17px;
+  display: flex;
+  width: 16px;
+  height: 16px;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  margin: 0;
+  background: var(--text-input-color);
+  transform: translateY(-50%);
+}
+
+.search-input-selected {
+  margin-top: 10px;
+
+  & > span {
+    margin-right: 8px;
+    margin-bottom: 6px;
+  }
+}
+
+.search-input-padding {
+  padding: 0 40px !important;
+}

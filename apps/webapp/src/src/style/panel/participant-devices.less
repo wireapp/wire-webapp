@@ -1,0 +1,89 @@
+/*
+ * Wire
+ * Copyright (C) 2018 Wire Swiss GmbH
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ *
+ */
+
+.participant-devices {
+  &__fingerprint {
+    width: 230px;
+    margin-bottom: 32px;
+  }
+
+  &__header {
+    &--padding {
+      padding: 16px;
+    }
+  }
+
+  &__link {
+    color: var(--black);
+    cursor: pointer;
+    font-weight: var(--font-weight-medium);
+    letter-spacing: 0.05px;
+    text-decoration: underline;
+
+    body.theme-dark & {
+      color: var(--gray-50);
+    }
+  }
+
+  &__device-list {
+    padding: 0;
+    margin-top: 8px;
+  }
+
+  &__device-item {
+    display: flex;
+    height: 64px;
+    align-items: center;
+    border-bottom: 1px solid var(--background-fade-8);
+    cursor: pointer;
+
+    &--padding {
+      margin: 0 16px;
+    }
+
+    .device-card {
+      flex-grow: 1;
+    }
+  }
+
+  &__single-client {
+    margin-top: 40px;
+  }
+
+  &__verify {
+    display: flex;
+    justify-content: space-between;
+
+    margin-bottom: 16px;
+  }
+
+  .device-details__reset-fingerprint {
+    margin-bottom: 8px;
+  }
+
+  .device-proteus-details {
+    padding-top: 24px;
+  }
+
+  .device-details-title,
+  .panel__info-text,
+  .participant-devices__fingerprint {
+    margin-bottom: 16px;
+  }
+}

@@ -1,0 +1,84 @@
+/*
+ * Wire
+ * Copyright (C) 2018 Wire Swiss GmbH
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ *
+ */
+
+.connect-request-wrapper {
+  .full-screen;
+
+  overflow-x: hidden;
+}
+
+.connect-requests {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  max-height: 100%;
+}
+
+.connect-requests-inner {
+  display: flex;
+  width: 100%;
+  max-width: var(--conversation-max-width);
+  min-height: 100vh;
+  flex-direction: column;
+  align-items: center;
+}
+
+.connect-request {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-top: 40px;
+  padding-bottom: 40px;
+
+  > * {
+    flex-shrink: 0;
+  }
+
+  & + & {
+    border-top: 1px solid fade(#000, 8%);
+  }
+
+  &:only-child {
+    justify-content: center;
+    margin: auto;
+  }
+}
+
+.connect-request-name {
+  max-width: 100%;
+  font-size: var(--font-size-xlarge);
+  line-height: 2.625rem;
+}
+
+.connect-request-username {
+  color: var(--foreground);
+  font-size: var(--font-size-xsmall);
+  line-height: var(--line-height-sm);
+}
+
+.connect-request-avatar {
+  margin-top: 24px;
+  margin-bottom: 32px;
+}
+
+.connect-request-button-group {
+  display: flex;
+  width: var(--screen-sm-min);
+  justify-content: space-around;
+}

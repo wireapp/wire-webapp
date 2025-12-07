@@ -1,0 +1,137 @@
+/*
+ * Wire
+ * Copyright (C) 2018 Wire Swiss GmbH
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ *
+ */
+
+// texts
+.text(@color) {
+  color: @color !important;
+}
+
+.text-red {
+  .text(@w-red);
+}
+
+.text-foreground {
+  .text(var(--foreground));
+}
+.text-background {
+  .text(var(--background));
+}
+.text-white {
+  .text(#fff);
+}
+
+.fill-svg(@color) {
+  svg > path {
+    fill: @color !important;
+  }
+}
+
+.svg-green {
+  .fill-svg(var(--green-500));
+}
+
+.svg-red {
+  .fill-svg(var(--red-500));
+}
+
+// fonts
+.font-size(@size) {
+  font-size: @size !important;
+}
+
+.font-size-xxs {
+  .font-size(var(--font-size-xxs));
+}
+.font-size-xs {
+  .font-size(var(--font-size-xsmall));
+}
+.font-size-sm {
+  .font-size(var(--font-size-base));
+}
+.font-size-md {
+  .font-size(var(--font-size-large));
+}
+.font-size-lg {
+  .font-size(var(--font-size-xlarge));
+}
+.font-size-xl {
+  .font-size(var(--font-size-xxl));
+}
+.font-size-xxl {
+  .font-size(var(--font-size-xxxl));
+}
+
+.font-weight(@weight) {
+  font-weight: @weight !important;
+}
+
+.font-weight-bold {
+  .font-weight(var(--font-weight-bold));
+}
+.font-weight-regular {
+  .font-weight(var(--font-weight-regular));
+}
+.font-weight-light {
+  .font-weight(var(--font-weight-light));
+}
+
+// accent colors
+.accent-color-service {
+  color: #fff;
+}
+.accent-color-temporary {
+  color: var(--background-fade-8);
+}
+
+// background colors
+
+.bg-color-ephemeral {
+  background-color: var(--accent-color-fade-16);
+}
+
+@white: #fff;
+@black: #000;
+@gray-10: #fafafa;
+@gray-20: #edeff0;
+@gray-30: #e5e8ea;
+@gray-40: #dce0e3;
+@gray-50: #cbced1;
+@gray-60: #9fa1a7;
+@gray-70: #676b71;
+@gray-80: #54585f;
+@gray-90: #34373d;
+@gray-95: #26272c;
+@gray-100: #17181a;
+
+// New design colors
+body {
+  --white: @white;
+  --black: @black;
+  --gray-10: @gray-10;
+  --gray-20: @gray-20;
+  --gray-30: @gray-30;
+  --gray-40: @gray-40;
+  --gray-50: @gray-50;
+  --gray-60: @gray-60;
+  --gray-70: @gray-70;
+  --gray-80: @gray-80;
+  --gray-90: @gray-90;
+  --gray-95: @gray-95;
+  --gray-100: @gray-100;
+}

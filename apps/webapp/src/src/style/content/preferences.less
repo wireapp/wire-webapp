@@ -1,0 +1,195 @@
+/*
+ * Wire
+ * Copyright (C) 2018 Wire Swiss GmbH
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ *
+ */
+
+.preferences-page {
+  display: flex;
+  height: 100%;
+  flex-direction: column;
+}
+
+.preferences-titlebar {
+  .heading-h3;
+  .flex-center;
+  position: relative;
+  width: 100%;
+  min-height: var(--content-title-bar-height);
+  padding: 0;
+  border-bottom: 1px solid var(--border-color);
+  margin: 0;
+
+  background-color: var(--app-bg);
+  color: var(--main-color);
+}
+
+.preferences-button {
+  margin-top: 8px;
+}
+
+.preferences-detail {
+  margin-top: 10px;
+  font-size: var(--font-size-small);
+
+  &-intended {
+    margin-left: 30px;
+  }
+
+  body.theme-dark & {
+    color: var(--gray-20);
+  }
+}
+
+.preferences-detail-bold {
+  font-weight: var(--font-weight-bold);
+}
+
+.preferences-detail-emoji {
+  display: flex;
+  align-items: center;
+  white-space: pre;
+}
+
+.preferences-header {
+  .heading-h4;
+  margin-bottom: 16px;
+  color: var(--background);
+  line-height: var(--line-height-sm);
+}
+
+.preferences-hint {
+  color: var(--foreground);
+}
+
+.preferences-label {
+  color: var(--text-input-label);
+}
+
+.preferences-info {
+  line-height: var(--line-height-lg);
+}
+
+.preferences-link {
+  .button-reset-default;
+
+  display: inline-block;
+  margin-bottom: 10px;
+  color: var(--main-color);
+  cursor: pointer;
+  font-size: var(--font-size-base);
+  line-height: var(--line-height-lg);
+
+  &:hover {
+    .accent-text;
+    text-decoration: underline;
+  }
+}
+
+.preferences-option {
+  position: relative;
+  display: flex;
+
+  input:disabled {
+    &,
+    & + label {
+      cursor: default;
+      opacity: 0.5;
+    }
+  }
+
+  & ~ & {
+    margin-top: 24px;
+  }
+}
+
+.checkbox-margin {
+  margin-top: 1.5rem;
+}
+
+.preferences-option-pointer {
+  cursor: pointer;
+}
+
+.preferences-option-icon {
+  height: var(--line-height-sm);
+  padding-right: 18px;
+  margin: 0;
+  font-size: var(--font-size-base);
+  line-height: var(--line-height-sm);
+
+  div,
+  svg {
+    display: inline;
+    width: var(--line-height-sm);
+    height: var(--line-height-sm);
+
+    path {
+      fill: currentColor;
+    }
+  }
+}
+
+.preferences-option-label {
+  display: inline;
+  height: var(--line-height-sm);
+  cursor: pointer;
+  line-height: var(--line-height-sm);
+}
+
+.preferences-section {
+  display: flex;
+  max-width: var(--preferences-width);
+  flex-direction: column;
+  align-items: flex-start;
+  padding: 0;
+  border: none;
+  margin: 0;
+  margin-bottom: 32px;
+
+  .preferences-device-details & {
+    margin: 0;
+  }
+}
+
+.preferences-reset-session {
+  margin-top: 12px;
+}
+
+.preferences-separator {
+  max-width: var(--preferences-width);
+  height: 1px;
+  border: 0;
+  margin: 22px 0 22px;
+  background: var(--gray-50);
+}
+
+.preferences-about-list {
+  .list-unstyled;
+  margin: 0;
+}
+
+.preferences-history-restore-button {
+  margin-top: 20px;
+}
+
+.preferences-wrapper {
+  max-width: var(--preferences-width);
+
+  .buttons-group {
+    justify-content: center;
+  }
+}

@@ -1,0 +1,130 @@
+/*
+ * Wire
+ * Copyright (C) 2018 Wire Swiss GmbH
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ *
+ */
+
+.app {
+  .font-antialiasing;
+  .full-screen;
+
+  display: flex;
+  min-width: var(--screen-sm-min);
+  background-color: var(--app-bg);
+  transition: filter 0.3s;
+
+  .left-column {
+    position: relative;
+    display: flex;
+    min-width: var(--conversation-list-width);
+    flex: 0 0 auto;
+    border-right: 1px solid var(--border-color);
+    background-color: var(--sidebar-bg);
+    color: var(--main-color);
+    fill: var(--main-color);
+
+    &--light-theme {
+      color: var(--black);
+      fill: var(--black);
+    }
+
+    &--shrinked {
+      min-width: auto;
+      border-right: none;
+    }
+
+    .team-mode & {
+      width: calc(var(--conversation-list-width) + var(--teams-width));
+    }
+  }
+
+  .center-column {
+    position: relative;
+    min-width: var(--screen-sm-min);
+    flex: 1 1 auto;
+    overflow-x: hidden;
+    overflow-y: auto;
+
+    &__overlay {
+      position: absolute;
+      top: 0;
+      right: 0;
+      bottom: 0;
+      left: 0;
+      display: none;
+      opacity: 0;
+    }
+
+    #conversation-input-bar,
+    #conversation-title-bar,
+    #message-list {
+      width: 100%;
+      transition: width var(--animation-timing-fast) var(--ease-out-quart);
+
+      @media (min-width: 1000px) {
+        &.is-right-panel-open {
+          width: calc(100% - var(--right-width));
+        }
+      }
+    }
+  }
+
+  .right-column {
+    position: absolute;
+    z-index: @z-index-panel;
+    right: 0;
+    right: 0;
+    overflow: hidden;
+    width: var(--right-width);
+    //width: 0;
+    height: 100vh;
+    max-height: 100%;
+    border-left: 1px solid var(--border-color);
+    background-color: var(--sidebar-bg);
+    transform: scale(1, 1);
+
+    .center-column__overlay {
+      display: block;
+    }
+
+    @media (min-width: 1000px) {
+      .right-column {
+        position: relative;
+      }
+
+      .center-column__overlay {
+        display: none;
+      }
+    }
+  }
+
+  &--small-offset {
+    top: 32px;
+  }
+  &--large-offset {
+    top: 64px;
+  }
+
+  &--hide-main-content-on-mobile {
+    @media (max-width: 720px) {
+      .left-column,
+      .conversations,
+      .conversations-wrapper {
+        width: 100%;
+      }
+    }
+  }
+}

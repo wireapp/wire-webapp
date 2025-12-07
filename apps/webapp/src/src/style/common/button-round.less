@@ -1,0 +1,212 @@
+/*
+ * Wire
+ * Copyright (C) 2018 Wire Swiss GmbH
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ *
+ */
+
+// Button round base class
+//
+// example:
+// <div class="button-round icon-plus"></div>
+//
+.button-round {
+  .circle(var(--button-round-size));
+
+  position: relative;
+  display: inline-block;
+  border: 1px solid var(--background-fade-40);
+  color: var(--background);
+  cursor: pointer;
+  line-height: calc(var(--button-round-size) - 2px);
+  text-align: center;
+  user-select: none;
+
+  > input {
+    position: absolute;
+    left: -9999px;
+  }
+
+  > svg {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+  }
+
+  &.hover,
+  &:hover {
+    background: var(--background-fade-16);
+  }
+
+  &.active,
+  &:active {
+    background: var(--background-fade-40);
+  }
+
+  &.toggled {
+    border-color: transparent;
+    background: var(--background-fade-72);
+    color: #fff;
+  }
+
+  &.disabled {
+    border: 1px solid var(--background-fade-40);
+    background: transparent;
+    color: var(--background-fade-72);
+    cursor: default;
+  }
+}
+
+.button-round-color() {
+  border: none;
+  color: #fff;
+  line-height: var(--button-round-size);
+  &.toggled {
+    background: #fff;
+  }
+  &.disabled {
+    background: transparent;
+  }
+}
+
+// example:
+// <div class="button-round button-round-theme icon-plus"></div>
+//
+.button-round-theme {
+  background-color: var(--accent-color);
+  .button-round-color;
+  &.toggled {
+    color: var(--accent-color);
+  }
+  &.disabled {
+    color: var(--accent-color-fade-24);
+  }
+}
+
+// overwrite global theme
+//
+// example:
+// <div class="button-round button-round-theme icon-plus"></div>
+//
+.button-round-theme-color(@color) {
+  .button-round-color;
+
+  background-color: @color !important;
+  &.toggled {
+    color: @color !important;
+  }
+  &.disabled {
+    color: fade(@color, 24%) !important;
+  }
+}
+
+.button-round-theme-blue {
+  .button-round-theme-color(@w-blue);
+}
+.button-round-theme-green {
+  .button-round-theme-color(@w-green);
+}
+.button-round-theme-yellow {
+  .button-round-theme-color(@w-yellow);
+}
+.button-round-theme-red {
+  .button-round-theme-color(@w-red);
+}
+.button-round-theme-orange {
+  .button-round-theme-color(@w-orange);
+}
+.button-round-theme-pink {
+  .button-round-theme-color(@w-pink);
+}
+.button-round-theme-purple {
+  .button-round-theme-color(@w-purple);
+}
+
+// example:
+// <div class="button-round button-round-dark icon-plus"></div>
+//
+.button-round-dark {
+  border: 1px solid fade(#fff, 24%);
+  color: #fff;
+
+  &.hover,
+  &:hover {
+    background: fade(#fff, 8%);
+  }
+
+  &.active,
+  &:active {
+    background: fade(#fff, 24%);
+  }
+
+  &.toggled {
+    border-color: transparent;
+    background: #fff;
+    color: var(--background);
+  }
+
+  &.disabled {
+    border: 1px solid fade(#fff, 24%);
+    background: transparent;
+    color: fade(#fff, 40%);
+  }
+}
+
+// example:
+// <div class="button-round button-round-text">GIF</div>
+//
+.button-round-text {
+  .label-xs;
+}
+
+// example:
+// <div class="button-round-label">
+//  <div class="button-round icon-plus"></div>
+//  <span>add people</span>
+// </div>
+//
+.button-round-label {
+  cursor: pointer;
+
+  > .button-round,
+  > span {
+    float: left;
+  }
+
+  > span {
+    .label-xs;
+
+    height: 28px;
+    margin-left: 10px;
+    color: var(--background);
+    line-height: 1.75rem;
+  }
+}
+
+// example:
+// <div class="button-round button-round-lg icon-plus"></div>
+//
+.button-round-md {
+  .square(var(--button-round-size-md));
+
+  line-height: var(--button-round-size-md);
+}
+
+.button-round-lg {
+  .square(var(--button-round-size-lg));
+
+  line-height: var(--button-round-size-lg);
+}

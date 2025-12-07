@@ -1,0 +1,126 @@
+/*
+ * Wire
+ * Copyright (C) 2018 Wire Swiss GmbH
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ *
+ */
+
+.preferences-av-detail {
+  margin: 16px 0 8px;
+}
+.preferences-av-spinner-select {
+  display: flex;
+
+  width: var(--icon-size-sm);
+  height: 150px;
+  align-items: center;
+  justify-content: center;
+  margin: auto;
+  text-align: center;
+}
+
+.preferences-av-spinner {
+  width: var(--icon-size-sm);
+  height: var(--icon-size-sm);
+  margin: 0 auto;
+}
+
+.preferences-av-header {
+  margin-bottom: 0;
+}
+
+.preferences-av-label {
+  top: 17px !important;
+  width: 48px;
+  height: 48px;
+  line-height: 3rem !important;
+}
+
+.preferences-av-meter {
+  width: 100%;
+  height: 16px;
+  margin-top: 10px;
+  margin-bottom: 16px;
+}
+
+.preferences-av-select {
+  width: 560px;
+  height: 48px;
+  box-sizing: border-box;
+  padding-left: 16px;
+  border: 1px solid var(--gray-40);
+  border-radius: 12px;
+  background: var(--white);
+  color: var(--black);
+  font-size: var(--font-size-base);
+  outline: none;
+
+  option {
+    color: #323639;
+  }
+}
+
+body.theme-dark {
+  .preferences-av-select {
+    border-color: var(--gray-80);
+    background: var(--black);
+    color: var(--white);
+  }
+}
+
+.preferences-av-select-disabled {
+  border-color: var(--foreground-fade-16);
+  color: var(--foreground-fade-48);
+  cursor: default !important;
+}
+
+.preferences-av-select-icon {
+  align-self: center;
+  padding-top: 2px;
+}
+
+.preferences-av-video,
+.preferences-av-video-disabled {
+  width: 100%;
+  height: 100%;
+  min-height: 316px;
+  margin-top: 16px;
+}
+
+.preferences-av-video {
+  background-color: var(--background);
+  object-fit: cover;
+}
+
+.preferences-av-video-disabled {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--foreground-fade-16);
+  font-size: var(--font-size-small);
+  font-weight: 600;
+  text-align: center;
+
+  &__try-again {
+    padding: 4px 16px;
+    border-radius: 4px;
+    margin-top: 16px;
+    background-color: var(--separator-color);
+    cursor: pointer;
+    font-size: var(--font-size-medium);
+    font-weight: 600;
+  }
+}

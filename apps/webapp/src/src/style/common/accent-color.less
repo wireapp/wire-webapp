@@ -1,0 +1,408 @@
+/*
+ * Wire
+ * Copyright (C) 2018 Wire Swiss GmbH
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ *
+ */
+
+@w-black: #000000;
+@w-white: #ffffff;
+
+@w-gray-10: #fafafa;
+@w-gray-20: #edeff0;
+@w-gray-30: #e5e8ea;
+@w-gray-40: #dce0e3;
+@w-gray-50: #cbced1;
+@w-gray-60: #9fa1a7;
+@w-gray-70: #676b71;
+@w-gray-80: #54585f;
+@w-gray-90: #34373d;
+@w-gray-95: #26272c;
+@w-gray-100: #17181a;
+
+@w-blue: #2391d3;
+@w-green: #00c800;
+@w-gray: #bac8d1;
+@w-orange: #ff8900;
+@w-pink: #fe5ebd;
+@w-purple: #9c00fe;
+@w-red: #fb0807;
+@w-yellow: #febf02;
+
+@accent_colors-0: transparent;
+@accent_colors-1: @w-blue;
+@accent_colors-2: @w-green;
+@accent_colors-3: @w-yellow;
+@accent_colors-4: @w-red;
+@accent_colors-5: @w-orange;
+@accent_colors-6: @w-pink;
+@accent_colors-7: @w-purple;
+
+@blue-50: #e7f0fa;
+@blue-100: #cde1f4;
+@blue-200: #9bc2e9;
+@blue-300: #6aa4de;
+@blue-400: #3885d3;
+@blue-500: #0667c8;
+@blue-600: #0552a0;
+@blue-700: #043e78;
+@blue-800: #022950;
+@blue-900: #021f3c;
+
+@blue-dark-50: #eef7ff;
+@blue-dark-100: #ddedff;
+@blue-dark-200: #bbdbff;
+@blue-dark-300: #98caff;
+@blue-dark-400: #76b8ff;
+@blue-dark-500: #54a6ff;
+@blue-dark-600: #4385cc;
+@blue-dark-700: #326499;
+@blue-dark-800: #224266;
+@blue-dark-900: #19324d;
+
+@black-50: @w-gray-30;
+@black-100: @w-gray-40;
+@black-500: @w-gray-80;
+
+@black-dark-500: @w-gray-40;
+@black-dark-800: @w-gray-80;
+@black-dark-900: @w-gray-90;
+
+@green-50: #e8f1ea;
+@green-100: #d2e4d6;
+@green-200: #a5c9ad;
+@green-300: #77ae85;
+@green-400: #4a935c;
+@green-500: #1d7833;
+@green-600: #176029;
+@green-700: #11481f;
+@green-800: #0c3014;
+@green-900: #09240f;
+
+@green-dark-50: #ebfcef;
+@green-dark-100: #d6f8de;
+@green-dark-200: #acf1bd;
+@green-dark-300: #83e99d;
+@green-dark-400: #59e27c;
+@green-dark-500: #30db5b;
+@green-dark-600: #26af49;
+@green-dark-700: #1d8337;
+@green-dark-800: #135824;
+@green-dark-900: #0e421b;
+
+@turquoise-50: #e5f1f3;
+@turquoise-100: #cce2e7;
+@turquoise-200: #99c6d0;
+@turquoise-300: #67a9b8;
+@turquoise-400: #348da1;
+@turquoise-500: #01718e;
+@turquoise-600: #015a6e;
+@turquoise-700: #014352;
+@turquoise-800: #002d37;
+@turquoise-900: #002229;
+
+@turquoise-dark-50: #effdff;
+@turquoise-dark-100: #dffaff;
+@turquoise-dark-200: #bef5ff;
+@turquoise-dark-300: #9ef0ff;
+@turquoise-dark-400: #7debff;
+@turquoise-dark-500: #5de6ff;
+@turquoise-dark-600: #4ab8cc;
+@turquoise-dark-700: #388a99;
+@turquoise-dark-800: #255c66;
+@turquoise-dark-900: #1c454d;
+
+@purple-50: #f4edf7;
+@purple-100: #e7daee;
+@purple-200: #d0b4dd;
+@purple-300: #b88fcd;
+@purple-400: #a169bc;
+@purple-500: #8944ab;
+@purple-600: #6e3689;
+@purple-700: #522967;
+@purple-800: #371b44;
+@purple-900: #291433;
+
+@purple-dark-50: #fcf4ff;
+@purple-dark-100: #f8e9ff;
+@purple-dark-200: #f0d2ff;
+@purple-dark-300: #e9bcff;
+@purple-dark-400: #e1a5ff;
+@purple-dark-500: #da8fff;
+@purple-dark-600: #ae72cc;
+@purple-dark-700: #835699;
+@purple-dark-800: #573966;
+@purple-dark-900: #412b4d;
+
+@red-50: #f9e6e8;
+@red-100: #f3ccd0;
+@red-200: #e799a1;
+@red-300: #da6671;
+@red-400: #ce3342;
+@red-500: #c20013;
+@red-600: #9b000f;
+@red-700: #74000b;
+@red-800: #4e0008;
+@red-900: #3a0006;
+
+@red-dark-50: #fff2f1;
+@red-dark-100: #ffe4e2;
+@red-dark-200: #ffc9c6;
+@red-dark-300: #ffada9;
+@red-dark-400: #ff928d;
+@red-dark-500: #ff7770;
+@red-dark-600: #cc5f5a;
+@red-dark-700: #994743;
+@red-dark-800: #66302d;
+@red-dark-900: #4d2422;
+
+@amber-50: #f6eee8;
+@amber-100: #ecded0;
+@amber-200: #dabda1;
+@amber-300: #c79b73;
+@amber-400: #b57a44;
+@amber-500: #a25915;
+@amber-600: #824711;
+@amber-700: #61350d;
+@amber-800: #412408;
+@amber-900: #412408;
+
+@amber-dark-50: #fffbea;
+@amber-dark-100: #fff6d4;
+@amber-dark-200: #ffeea8;
+@amber-dark-300: #ffe57d;
+@amber-dark-400: #ffdd51;
+@amber-dark-500: #ffd426;
+@amber-dark-600: #ccaa1e;
+@amber-dark-700: #997f17;
+@amber-dark-800: #66550f;
+@amber-dark-900: #4d400b;
+
+.colors() {
+  amber: 5;
+  blue: 1;
+  green: 2;
+  purple: 7;
+  red: 4;
+  turquoise: 6;
+}
+
+@colors: amber, blue, green, purple, red, turquoise;
+@colorsWithBlack: amber, blue, green, purple, red, turquoise, black;
+
+@color-index: 50, 100, 200, 300, 400, 500, 600, 700, 800, 900;
+
+body {
+  &.theme-default {
+    each(@colors, {
+      @accent-color: "@{value}-500";
+      --@{value}-500: @@accent-color;
+    });
+    each(@colorsWithBlack, {
+      @border-color: "@{value}-100";
+      @background-color: "@{value}-50";
+      @color: "@{value}-500";
+      --@{value}-border: @@border-color;
+      --@{value}-background: @@background-color;
+      --@{value}-color: @@color;
+    });
+  }
+  &.theme-dark {
+    each(@colors, {
+      @accent-dark-color: "@{value}-dark-500";
+      --@{value}-500: @@accent-dark-color;
+    });
+    each(@colorsWithBlack, {
+      @border-color: "@{value}-dark-900";
+      @background-color: "@{value}-dark-800";
+      @color: "@{value}-dark-500";
+      --@{value}-border: @@border-color;
+      --@{value}-background: @@background-color;
+      --@{value}-color: @@color;
+    });
+  }
+}
+
+each(.colors(), .(@color-key, @color-name) {
+  @name: @color-name;
+  @accent-color: '@{name}-500';
+  @accent-color-highlight: '@{name}-50';
+  @accent-color-highlight-inversed: '@{name}-800';
+  @accent-color-border: '@{name}-500';
+  @accent-color-focus: '@{name}-400';
+  @accent-color-selection: '@{name}-300';
+  @accent-color-self-mention: '@{name}-200';
+  @button-primary-hover: '@{name}-600';
+  @button-primary-focus-border: '@{name}-700';
+  @button-primary-active: '@{name}-800';
+  @button-primary-active-bg: '@{name}-50';
+  @button-primary-active-border: '@{name}-800';
+  @button-secondary-hover-border: '@{name}-500';
+  @button-secondary-active-bg: '@{name}-50';
+  @button-secondary-active-border: '@{name}-500';
+  @list-item-selected-bg: '@{name}-500';
+  @message-actions-active-border: '@{name}-300';
+  @message-actions-active-background: '@{name}-50';
+  @message-reactions-active-border: '@{name}-300';
+  @message-reactions-active-background: '@{name}-50';
+  @message-reactions-background: 'w-gray-20';
+  @message-reactions-border: 'w-gray-50';
+  @message-reactions-focus-border: '@{name}-500';
+  @message-reactions-count: 'w-gray-80';
+  @toggle-button-hover-bg: '@{name}-700';
+  @icon-primary-active-fill: '@{name}-500';
+  @icon-secondary-active-border: 'accent_colors-0';
+  @indicator-range-input-thumb: '@{name}-700';
+  @toggle-button-unselected-bg: '@{name}-100';
+  @content-message-timestamp: 'w-gray-70';
+
+  .main-accent-color-@{color-key} {
+    --button-primary-hover: @@button-primary-hover;
+    --button-primary-focus-border: @@button-primary-focus-border;
+    --button-primary-active: @@button-primary-active;
+    --button-primary-active-bg: @@button-primary-active-bg;
+    --button-primary-active-border: @@button-primary-active-border;
+    --button-secondary-hover-border: @@button-secondary-hover-border;
+    --button-secondary-active-bg: @@button-secondary-active-bg;
+    --button-secondary-active-border: @@button-secondary-active-border;
+    --list-item-selected-bg: @@list-item-selected-bg;
+    --message-actions-active-border:@@message-actions-active-border;
+    --message-actions-active-background:@@message-actions-active-background;
+    --message-reactions-active-border:@@message-reactions-active-border;
+    --message-reactions-active-background:@@message-reactions-active-background;
+    --message-reactions-background: @@message-reactions-background;
+    --message-reactions-border: @@message-reactions-border;
+    --message-reactions-focus-border: @@message-reactions-focus-border;
+    --message-reactions-count: @@message-reactions-count;
+    --content-message-timestamp:@@content-message-timestamp;
+    --toggle-button-hover-bg: @@toggle-button-hover-bg;
+    --icon-primary-active-fill: @@icon-primary-active-fill;
+    --icon-secondary-active-border: @@icon-secondary-active-border;
+    --indicator-range-input-thumb: @@indicator-range-input-thumb;
+    --toggle-button-unselected-bg: @@toggle-button-unselected-bg;
+    --accent-color: @@accent-color;
+    --accent-color-highlight: @@accent-color-highlight;
+    --accent-color-highlight-inversed: @@accent-color-highlight-inversed;
+    --accent-color-border: @@accent-color-border;
+    --accent-color-focus: @@accent-color-focus;
+    --accent-color-selection: @@accent-color-selection;
+    --accent-color-self-mention: @@accent-color-self-mention;
+    --accent-color-fade-16: fade(@@accent-color, 16%);
+    --accent-color-fade-24: fade(@@accent-color, 24%);
+    --accent-color-darken-16: darken(@@accent-color, 16%);
+    each(@color-index, {
+      @accent-color: '@{name}-@{value}';
+      --accent-color-@{value}: @@accent-color;
+    })
+  }
+
+  .accent-color-@{color-key} {
+    color: @@accent-color;
+  }
+
+  body.theme-dark {
+    @accent-color-dark: '@{name}-dark-500';
+    @accent-color-highlight-dark: '@{name}-dark-800';
+    @accent-color-highlight-inversed-dark: '@{name}-50';
+    @accent-color-border-dark: '@{name}-dark-600';
+    @accent-color-focus-dark: '@{name}-dark-600';
+    @accent-color-selection-dark: '@{name}-dark-700';
+    @accent-color-self-mention-dark: '@{name}-dark-800';
+    @button-primary-hover-dark: '@{name}-dark-400';
+    @button-primary-focus-border-dark: '@{name}-dark-100';
+    @button-primary-active-dark: '@{name}-dark-800';
+    @button-primary-active-bg-dark: '@{name}-dark-800';
+    @button-primary-active-border-dark: '@{name}-dark-600';
+    @button-secondary-hover-border-dark: 'w-gray-70';
+    @button-secondary-active-bg-dark: 'w-gray-95';
+    @button-secondary-active-border-dark: '@{name}-dark-800';
+    @list-item-selected-bg-dark: '@{name}-dark-600';
+    @message-actions-active-border-dark: '@{name}-dark-600';
+    @message-actions-active-background-dark: '@{name}-dark-800';
+    @message-reactions-active-border-dark: '@{name}-dark-700';
+    @message-reactions-active-background-dark: '@{name}-dark-900';
+    @message-reactions-background-dark: 'w-gray-90';
+    @message-reactions-border-dark: 'w-gray-80';
+    @message-reactions-focus-border-dark: '@{name}-dark-500';
+    @message-reactions-count-dark: 'w-gray-20';
+    @content-message-timestamp-dark: 'w-gray-60';
+    @toggle-button-hover-bg-dark: '@{name}-dark-300';
+    @icon-primary-active-fill-dark: 'w-white';
+    @icon-secondary-active-border-dark: '@{name}-dark-800' ;
+    @indicator-range-input-thumb-dark: '@{name}-dark-300';
+    @toggle-button-unselected-bg-dark: '@{name}-dark-800';
+    &.main-accent-color-@{color-key} {
+      --button-primary-hover: @@button-primary-hover-dark;
+      --button-primary-focus-border: @@button-primary-focus-border-dark;
+      --button-primary-active: @@button-primary-active-dark;
+      --button-primary-active-bg: @@button-primary-active-bg-dark;
+      --button-primary-active-border: @@button-primary-active-border-dark;
+      --button-secondary-hover-border: @@button-secondary-hover-border-dark;
+      --button-secondary-active-bg: @@button-secondary-active-bg-dark;
+      --button-secondary-active-border: @@button-secondary-active-border-dark;
+      --list-item-selected-bg: @@list-item-selected-bg-dark;
+      --message-actions-active-border: @@message-actions-active-border-dark;
+      --message-actions-active-background: @@message-actions-active-background-dark;
+      --message-reactions-active-border: @@message-reactions-active-border-dark;
+      --message-reactions-active-background: @@message-reactions-active-background-dark;
+      --message-reactions-background: @@message-reactions-background-dark;
+      --message-reactions-border: @@message-reactions-border-dark;
+      --message-reactions-focus-border: @@message-reactions-focus-border-dark;
+      --message-reactions-count: @@message-reactions-count-dark;
+      --content-message-timestamp:@@content-message-timestamp-dark;
+      --icon-primary-active-fill: @@icon-primary-active-fill-dark;
+      --icon-secondary-active-border: @@icon-secondary-active-border-dark;
+      --indicator-range-input-thumb: @@indicator-range-input-thumb-dark;
+      --toggle-button-hover-bg: @@toggle-button-hover-bg-dark;
+      --toggle-button-unselected-bg: @@toggle-button-unselected-bg-dark;
+      --accent-color: @@accent-color-dark;
+      --accent-color-highlight: @@accent-color-highlight-dark;
+      --accent-color-highlight-inversed: @@accent-color-highlight-inversed-dark;
+      --accent-color-border: @@accent-color-border-dark;
+      --accent-color-focus: @@accent-color-focus-dark;
+      --accent-color-selection: @@accent-color-selection-dark;
+      --accent-color-self-mention: @@accent-color-self-mention-dark;
+      each(@color-index, {
+        @accent-color: '@{name}-dark-@{value}';
+        --accent-color-@{value}: @@accent-color;
+      })
+    }
+
+    .accent-color-@{color-key} {
+      color: @@accent-color-dark;
+    }
+  }
+})
+  .accent-selection() {
+  &::-moz-selection {
+    background-color: var(--accent-color-selection);
+  }
+  &::selection {
+    background-color: var(--accent-color-selection);
+  }
+}
+
+a,
+.accent-text {
+  color: var(--accent-color);
+}
+
+.accent-fill {
+  fill: var(--accent-color);
+}
+
+.accent-stroke {
+  stroke: var(--accent-color);
+}

@@ -1,0 +1,303 @@
+/*
+ * Wire
+ * Copyright (C) 2018 Wire Swiss GmbH
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ *
+ */
+
+.left-list-container {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  display: flex;
+  flex-direction: column;
+
+  .team-mode & {
+    left: var(--teams-width);
+  }
+}
+
+.left-list {
+  .left-list-container;
+
+  &:not(.left-list-is-visible) {
+    .start-ui-transition-fadeout;
+  }
+
+  &.left-list-is-visible {
+    .start-ui-transition-fadein;
+  }
+}
+
+.left-list-header {
+  padding-inline: 16px;
+}
+
+.left-list-header-preferences {
+  display: flex;
+  min-height: var(--content-title-bar-height);
+  flex-direction: column;
+
+  .left-list-header-close-button {
+    min-width: auto;
+  }
+
+  .left-list-header-title-wrapper {
+    display: flex;
+    align-items: center;
+  }
+}
+
+body.theme-dark {
+  .left-list-header {
+    border-bottom-color: var(--gray-95);
+  }
+}
+
+.left-list-header-text {
+  .ellipsis-nowrap;
+  .heading-h3;
+  .text;
+  display: inline-block;
+  width: 100%;
+
+  align-self: center;
+  padding-block: 8px;
+}
+
+.left-list-header-close-button {
+  .button-reset-default;
+}
+
+.slow-connection-indicator {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px 0px 4px 0px;
+  border-radius: 24px;
+  margin-top: 8px;
+  background-color: var(--sidebar-bg);
+  color: var(--main-color);
+  font-size: var(--font-size-small);
+  font-weight: var(--font-weight-semibold);
+  gap: 8px;
+}
+
+.slow-connection-indicator svg,
+.slow-connection-indicator svg * {
+  fill: var(--main-color);
+}
+
+.left-list-center {
+  position: relative;
+  flex: 1 1 auto;
+}
+
+.left-list-center-border-bottom {
+  border-bottom: 1px solid fade(#fff, 16%);
+}
+.left-list-center-border-top {
+  border-top: 1px solid fade(#fff, 16%);
+}
+
+.left-list-items {
+  .full-screen;
+  .list-unstyled;
+
+  padding: 0 0 16px;
+  margin: 0;
+  overflow-x: hidden;
+  overflow-y: scroll;
+  &.no-scroll {
+    position: relative;
+    overflow-y: visible;
+  }
+}
+
+.left-list-item {
+  position: relative;
+  display: flex;
+  width: 100%;
+  height: 56px;
+  align-items: center;
+  line-height: var(--left-list-item-height);
+  user-select: none;
+
+  &.left-list-item-clickable {
+    cursor: pointer;
+  }
+
+  .left-list-item-button {
+    .button-reset-default;
+    display: flex;
+    width: 100%;
+    height: 100%;
+    text-align: left;
+    transition: background-color 0.15s ease-in-out;
+
+    &::after {
+      position: absolute;
+      right: 0;
+      bottom: 0;
+      left: var(--left-list-item-left-width);
+      height: 1px;
+      background-color: var(--border-color);
+      content: '';
+    }
+
+    &--active:after {
+      opacity: 0;
+    }
+
+    &:hover,
+    &:focus-visible,
+    &--active:focus-visible {
+      background: @white;
+      color: @black;
+    }
+
+    &:focus-visible,
+    &--active:focus-visible {
+      outline: 1px solid var(--accent-color);
+      outline-offset: -2px;
+
+      .left-column-icon > svg {
+        fill: @black;
+      }
+    }
+
+    &--active,
+    &--active:hover {
+      background-color: var(--accent-color);
+      color: @white;
+
+      .left-column-icon > svg {
+        fill: @white;
+      }
+    }
+  }
+
+  > .left-column-icon,
+  > .left-list-item-button > .left-column-icon {
+    .flex-center;
+
+    width: var(--left-list-item-left-width);
+    height: 100%;
+    > svg {
+      max-width: 16px;
+      max-height: 16px;
+    }
+  }
+
+  > .column-center,
+  > .left-list-item-button > .column-center {
+    .ellipsis;
+
+    position: relative;
+    display: flex;
+    height: 100%;
+    flex: 1 1;
+    align-items: center;
+    margin-right: -8px;
+    cursor: pointer;
+    font-size: var(--font-size-medium);
+    font-weight: var(--font-weight-medium);
+  }
+
+  > .right-column {
+    position: relative;
+    display: flex;
+    width: var(--left-list-item-right-width);
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+
+    > .icon-silence,
+    > .icon-more {
+      opacity: 0;
+      transition-property: opacity;
+      transition-timing-function: var(--ease-out-quart);
+    }
+
+    > .icon-more {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      margin-top: -8px;
+      margin-left: -8px;
+    }
+
+    > .icon-silence {
+      pointer-events: none;
+    }
+  }
+
+  &.hover,
+  &:hover {
+    .right-column > .icon-more {
+      opacity: 1;
+      transition-delay: calc(var(--animation-timing-faster) + 0.05s);
+      transition-duration: var(--animation-timing-slow);
+    }
+
+    .right-column > .icon-silence {
+      opacity: 0;
+      transition-duration: var(--animation-timing-fast);
+    }
+  }
+}
+
+body.theme-dark {
+  .left-list-item {
+    > .column-center,
+    > .left-list-item-button > .column-center {
+      border-bottom-color: var(--gray-90);
+    }
+  }
+
+  .left-list-item-button {
+    &:hover,
+    &:focus-visible,
+    &--active:focus-visible {
+      background: @black;
+      color: @white;
+    }
+    &:focus-visible,
+    &--active:focus-visible {
+      outline: 1px solid var(--accent-color);
+      outline-offset: -2px;
+
+      .left-column-icon > svg {
+        fill: @white;
+      }
+    }
+    &--active,
+    &--active:hover {
+      background-color: var(--accent-color-600);
+      color: var(--black);
+
+      .left-column-icon > svg {
+        fill: var(--black);
+      }
+    }
+  }
+}
+
+.empty-conversations-list:has(~ .group-participants-conversations) {
+  height: auto;
+  padding-block: 64px;
+}

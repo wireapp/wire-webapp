@@ -1,0 +1,81 @@
+/*
+ * Wire
+ * Copyright (C) 2018 Wire Swiss GmbH
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ *
+ */
+
+// input mixin
+.input-box {
+  display: block;
+  width: 100%;
+  height: var(--button-height);
+  padding: 0 16px;
+  border-radius: var(--button-border-radius);
+  margin-bottom: 8px;
+  color: #fff;
+  line-height: var(--button-height);
+  outline: 0;
+
+  &::-ms-clear {
+    display: none;
+  }
+}
+
+// input
+.input {
+  .input-box;
+
+  border: none;
+  background-color: fade(#000, 40%);
+
+  &::placeholder {
+    .label-xs;
+
+    color: fade(#fff, 56%);
+  }
+}
+
+.input-select {
+  position: relative;
+
+  select {
+    appearance: none;
+    cursor: pointer;
+
+    // fixes firefox outline
+    // http://stackoverflow.com/questions/3773430/remove-outline-from-select-box-in-ff
+    &:-moz-focusring {
+      color: transparent;
+      text-shadow: 0 0 0 #fff;
+    }
+
+    // hide select box arrow in IE
+    &::-ms-expand {
+      display: none;
+    }
+  }
+
+  span {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: var(--button-height);
+    height: var(--button-height);
+    line-height: var(--button-height);
+    pointer-events: none;
+    text-align: center;
+  }
+}

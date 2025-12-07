@@ -1,0 +1,175 @@
+/*
+ * Wire
+ * Copyright (C) 2022 Wire Swiss GmbH
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ *
+ */
+.heading-h1 {
+  font-size: var(--font-size-xlarge);
+  font-weight: var(--font-weight-medium);
+}
+.heading-h2 {
+  font-size: var(--font-size-large);
+  font-weight: var(--font-weight-semibold);
+}
+.heading-h3 {
+  font-size: var(--font-size-medium);
+  font-weight: var(--font-weight-semibold);
+}
+.heading-h4 {
+  font-size: var(--font-size-small);
+  font-weight: var(--font-weight-bold);
+}
+
+.text {
+  font-size: var(--font-size-base);
+  letter-spacing: 0.05px;
+}
+
+.text-light {
+  .text;
+
+  font-weight: var(--font-weight-light);
+}
+
+.text-regular {
+  .text;
+
+  font-weight: var(--font-weight-regular);
+}
+.text-medium {
+  .text;
+
+  font-weight: var(--font-weight-medium);
+}
+.text-bold {
+  .text;
+
+  font-weight: var(--font-weight-bold);
+}
+.text-bold-small {
+  font-size: var(--font-size-medium);
+  font-weight: var(--font-weight-bold);
+  letter-spacing: 0.35px;
+}
+
+.link {
+  .text;
+
+  font-weight: var(--font-weight-regular);
+  text-decoration: underline;
+}
+
+.subline {
+  font-size: var(--font-size-small);
+  font-weight: var(--font-weight-regular);
+}
+
+.label {
+  font-size: var(--font-size-small);
+  font-weight: var(--font-weight-regular);
+}
+
+.label-small {
+  font-size: var(--font-size-xsmall);
+}
+
+.label-medium {
+  font-size: var(--font-size-medium);
+  font-weight: var(--font-weight-regular);
+  line-height: var(--line-height-sm);
+}
+
+.label-bold {
+  font-weight: var(--font-weight-bold);
+}
+
+.label-base {
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-regular);
+  line-height: var(--line-height-lg);
+}
+
+.label-small-medium {
+  font-size: var(--font-size-xsmall);
+  font-weight: var(--font-weight-medium);
+}
+
+.label-small-medium--spacing {
+  font-size: var(--font-size-xsmall);
+  font-weight: var(--font-weight-medium);
+  letter-spacing: 0.5px;
+}
+
+.text-input {
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-regular);
+  line-height: var(--line-height-lg);
+}
+
+.button-small {
+  font-size: var(--font-size-small);
+  font-weight: var(--font-weight-medium);
+  line-height: var(--line-height-sm);
+}
+
+.focus-outline {
+  outline: 1px solid var(--accent-color-focus);
+}
+
+.focus-offset {
+  outline-offset: 0.4rem;
+}
+
+.focus-border-radius {
+  border-radius: 4px;
+}
+
+.focus-default {
+  &:focus-visible {
+    .focus-outline;
+    .focus-offset;
+    .focus-border-radius;
+  }
+}
+
+// NEW Typography
+.paragraph-body-1 {
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-medium);
+  letter-spacing: 0.05px;
+  line-height: var(--line-height-lg);
+}
+
+.paragraph-body-3 {
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-semibold);
+  letter-spacing: 0.05px;
+  line-height: var(--line-height-lg);
+}
+
+.label-1 {
+  font-size: var(--font-size-medium);
+  font-weight: var(--font-weight-regular);
+  line-height: var(--line-height-sm);
+}
+
+.label-2 {
+  color: var(--text-input-label);
+  font-size: var(--font-size-small);
+  font-weight: var(--font-weight-semibold);
+  letter-spacing: 0.25px;
+  line-height: var(--line-height-md);
+}

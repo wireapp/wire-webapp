@@ -1,0 +1,196 @@
+/*
+ * Wire
+ * Copyright (C) 2018 Wire Swiss GmbH
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ *
+ */
+
+.search-list {
+  .list-unstyled;
+  margin: 0;
+
+  .search-list-sm& {
+    flex-wrap: wrap;
+  }
+
+  .search-list-button {
+    .button-reset-default;
+
+    width: 100%;
+  }
+}
+
+.search-list-item {
+  overflow: hidden;
+  margin-bottom: 16px;
+  cursor: pointer;
+
+  .search-list-sm & {
+    text-align: center;
+
+    &:nth-of-type(3n) {
+      margin-right: 0;
+    }
+  }
+
+  .search-list-lg & {
+    display: flex;
+    height: 56px;
+    margin: 0;
+  }
+}
+
+.search-list-item-image {
+  .search-list-sm & {
+    .square(var(--avatar-diameter-l));
+
+    position: relative;
+    margin-bottom: 3px;
+  }
+
+  .search-list-lg & {
+    position: relative;
+    display: flex;
+    height: var(--avatar-diameter-m);
+    flex: 0 0 auto;
+    align-items: center;
+  }
+}
+
+.search-list-item-image-guest-indicator-badge {
+  .guest-badge;
+
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.search-list-item-image-overlay {
+  .full-screen;
+  .flex-center;
+
+  .background {
+    .full-screen;
+
+    border-radius: 50%;
+    opacity: 0;
+  }
+}
+
+.search-list-item-content {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+
+  .search-list-sm & {
+    width: var(--avatar-diameter-l);
+  }
+
+  .search-list-lg & {
+    min-width: 0; // this will ensure that ellipses is working
+    height: var(--avatar-diameter-m);
+    flex: 1 1;
+    margin-left: 16px;
+  }
+}
+
+.search-list-item-content-name {
+  .ellipsis;
+
+  width: 100%;
+
+  .search-list-sm & {
+    .label-xs;
+  }
+}
+
+.search-list-item-content-info {
+  display: flex;
+  font-size: var(--font-size-xsmall);
+  line-height: var(--line-height-sm);
+  opacity: 0.56;
+}
+
+.search-list-item-header {
+  .ellipsis;
+
+  max-width: 184px;
+  height: var(--avatar-diameter-m);
+  margin-left: 16px;
+  font-size: var(--font-size-medium);
+  font-weight: var(--font-weight-medium);
+  line-height: var(--avatar-diameter-m);
+}
+
+.search-list-theme-black .image.state-badge::before {
+  background-color: #000;
+  color: #fff;
+}
+
+.search-list-item-guest-indicator {
+  display: flex;
+  height: var(--avatar-diameter-m);
+  align-items: center;
+  font-size: var(--font-size-xsmall);
+}
+
+.search-list-item-select {
+  .square(22px);
+
+  display: block;
+  border: 2px solid var(--gray-80);
+  border-radius: 3px;
+  margin: 8px 0 8px 16px;
+
+  &:hover {
+    border-color: var(--accent-color-500);
+  }
+
+  body.theme-dark & {
+    border: 1.5px solid var(--gray-60);
+    background-color: var(--gray-90);
+  }
+
+  &::before {
+    margin-left: 3px;
+    color: var(--white);
+    font-size: var(--font-size-medium);
+    opacity: 0;
+  }
+
+  &.selected {
+    border: 1.5px solid var(--accent-color-500);
+    background-color: var(--accent-color-500);
+
+    body.theme-dark & {
+      border: 1.5px solid var(--accent-color-600);
+      background-color: var(--accent-color-600);
+    }
+
+    &::before {
+      opacity: 1;
+    }
+  }
+}
+
+.search-list-item-guest-indicator-badge {
+  .guest-badge;
+
+  .user-list-light & {
+    .cell-badge-dark;
+  }
+}

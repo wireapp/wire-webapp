@@ -1,0 +1,400 @@
+/*
+ * Wire
+ * Copyright (C) 2018 Wire Swiss GmbH
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ *
+ */
+
+// ----------------------------------------------------------------------------
+// THEMES
+// ----------------------------------------------------------------------------
+
+.applyTheme() {
+  @iterateIndexEach: 8;
+  .setColorFade (@name, @fadeOver, @index: 0) when (@index < 96 + @iterateIndexEach) {
+    --@{name}-fade-@{index}: fade(@fadeOver, @index);
+    .setColorFade(@name, @fadeOver, @index + @iterateIndexEach);
+  }
+
+  .setVariables(@list) {
+    .iter(length(@list));
+    .iter(@i) when (@i > 0) {
+      .iter(@i - 1);
+      @pair: extract(@list, @i);
+      @key: extract(@pair, 1);
+      --@{key}: ~'@{@{key}}';
+    }
+  }
+
+  .setVariables(foreground background);
+  .setColorFade(foreground, @foreground);
+  .setColorFade(background, @background);
+  .setVariables(app-bg sidebar-bg input-bar-bg transparent-img-bg sidebar-border-color sidebar-folder-selected-bg main-color border-color app-bg-secondary conversation-list-bg-opacity group-icon-bg);
+  .setVariables(group-video-bg group-video-tile-bg participant-audio-connecting-color inactive-call-button-bg inactive-call-button-border inactive-call-button-hover-bg inactive-call-button-hover-border disabled-call-button-bg disabled-call-button-border disabled-call-button-svg button-group-left-hover button-group-right-hover toggle-button-unselected-hover-border toggle-button-unselected-hover-bg);
+  .setVariables(modal-bg modal-border-color);
+  .setVariables(preference-account-input-bg);
+  .setVariables(text-input-editing text-input-background text-input-border text-input-border-hover text-input-placeholder text-input-color text-input-alert text-input-disabled text-input-label text-input-success);
+  .setVariables(checkbox-background checkbox-background-selected checkbox-background-disabled checkbox-background-disabled-selected checkbox-border checkbox-border-hover checkbox-border-disabled checkbox-alert);
+  .setVariables(message-quote-bg);
+  .setVariables(group-creation-modal-teamname-input-bg);
+  .setVariables(message-actions-background message-actions-border message-actions-background-hover message-actions-border-hover);
+}
+
+// ----------------------------------------------------------------------------
+// TEXT
+// ----------------------------------------------------------------------------
+
+.ellipsis {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: pre; // TODO should be nowrap
+}
+
+.ellipsis-nowrap {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ellipsis-multiline(@lines) {
+  display: -webkit-box;
+  overflow: hidden;
+  /* autoprefixer: ignore next */
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: @lines;
+}
+
+.text-nowrap {
+  white-space: nowrap;
+}
+
+.text-center {
+  text-align: center;
+}
+
+.text-left {
+  text-align: left;
+}
+
+.text-right {
+  text-align: right;
+}
+
+.text-uppercase {
+  text-transform: uppercase;
+}
+
+.text-capitalize {
+  text-transform: capitalize;
+}
+
+.text-underline {
+  text-decoration: underline;
+}
+
+.no-text-selection() {
+  cursor: default;
+  user-select: none;
+}
+
+.text-selection() {
+  cursor: text;
+  user-select: initial;
+}
+
+.font-antialiasing {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.no-font-antialiasing {
+  -webkit-font-smoothing: subpixel-antialiased;
+  -moz-osx-font-smoothing: auto;
+}
+
+.cursor-pointer {
+  cursor: pointer;
+}
+
+.cursor-default {
+  cursor: default !important;
+}
+
+// ----------------------------------------------------------------------------
+// Animations
+// ----------------------------------------------------------------------------
+
+@keyframes spin {
+  to {
+    transform: rotate(1turn);
+  }
+}
+
+.spin {
+  animation: spin 1s infinite linear;
+}
+
+.spin-slow:extend(.spin) {
+  animation-duration: 2.5s;
+}
+
+// ----------------------------------------------------------------------------
+// GEOM
+// ----------------------------------------------------------------------------
+
+.size(@width; @height) {
+  width: @width;
+  height: @height;
+}
+
+.square(@size) {
+  .size(@size; @size);
+}
+
+.circle(@size) {
+  .square(@size);
+
+  border-radius: 50%;
+}
+
+.arrow-down::before {
+  .icon-mixin('\e111');
+
+  display: inline-block;
+  transform: rotate(90deg);
+}
+
+// ----------------------------------------------------------------------------
+// ALIGNMENT
+// ----------------------------------------------------------------------------
+
+.absolute-center {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.flex-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.pull-left {
+  float: left;
+}
+
+.pull-right {
+  float: right;
+}
+
+// ----------------------------------------------------------------------------
+// MISC
+// ----------------------------------------------------------------------------
+
+.clear {
+  &::after {
+    display: table;
+    clear: both;
+    content: '';
+  }
+}
+
+.see-through {
+  pointer-events: none;
+}
+
+.not-see-through {
+  pointer-events: auto;
+}
+
+.full-screen {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+}
+
+.translucent {
+  opacity: 0.4;
+}
+
+.element-disabled {
+  .translucent;
+
+  pointer-events: none;
+}
+
+.no-transition() {
+  transition: none !important;
+}
+
+.hardware-acc {
+  -webkit-backface-visibility: hidden;
+  // Note: Using perspective (with a value different from `0` or `none`) creates a new stacking context which will cause the browser to take advantage of GPU rendering.
+  // @see https://css-tricks.com/almanac/properties/p/perspective/
+  -webkit-perspective: revert;
+}
+
+.mirror {
+  transform: scaleX(-1);
+}
+
+// ----------------------------------------------------------------------------
+// VISIBILITY
+// ----------------------------------------------------------------------------
+
+.none,
+.off,
+.hide {
+  display: none;
+}
+
+.block,
+.on,
+.show {
+  display: block;
+}
+
+.hidden {
+  visibility: hidden;
+}
+
+.visually-hidden {
+  position: absolute;
+  left: -10000px;
+  overflow: hidden;
+  width: 1px;
+  height: 1px;
+}
+
+// ----------------------------------------------------------------------------
+// BACKGROUND HELPERS
+// ----------------------------------------------------------------------------
+
+.bg-size(@size) {
+  background-position: 50%;
+  background-repeat: no-repeat;
+  background-size: @size;
+}
+
+.bg-cover() {
+  .bg-size(cover);
+}
+
+.bg-contain() {
+  .bg-size(contain);
+}
+
+// ----------------------------------------------------------------------------
+// BUBBLE
+// ----------------------------------------------------------------------------
+
+.bubble-content() {
+  display: flex;
+  width: var(--bubble-width);
+  height: var(--bubble-height);
+  flex-direction: column;
+}
+
+// ----------------------------------------------------------------------------
+// ICON MIXINS
+// ----------------------------------------------------------------------------
+
+.icon-mixin (@code, @icon-size: 16px) {
+  content: @code;
+  font-family: Wire;
+  font-size: @icon-size;
+
+  /* Better Font Rendering =========== */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-style: normal;
+  font-variant: normal;
+  font-weight: normal;
+  line-height: 1;
+  speak: none;
+  text-transform: none;
+}
+
+// ----------------------------------------------------------------------------
+// ELEMENT RESETS
+// ----------------------------------------------------------------------------
+
+.reset-textarea {
+  padding: 0;
+  border: none;
+  margin: 0;
+  outline: 0;
+  resize: none;
+}
+
+.list-unstyled() {
+  padding-left: 0;
+  list-style-type: none;
+}
+
+// ----------------------------------------------------------------------------
+// SCROLLBARS
+// ----------------------------------------------------------------------------
+
+.hide-scrollbar() {
+  overflow: -moz-scrollbars-none;
+  -ms-overflow-style: none;
+
+  &::-webkit-scrollbar {
+    display: none !important;
+  }
+}
+
+// ----------------------------------------------------------------------------
+// PANEL
+// ----------------------------------------------------------------------------
+
+.panel-header {
+  .heading-h4;
+  padding: 0 20px 4px;
+  border-bottom: 1px solid var(--gray-60);
+  margin-top: 24px;
+  color: var(--gray-70);
+
+  body.theme-dark & {
+    border-bottom-color: var(--gray-70);
+    color: var(--gray-50);
+  }
+}
+
+.button-active() {
+  background-color: var(--accent-color-500) !important;
+
+  body.theme-dark & {
+    background-color: var(--accent-color-600) !important;
+  }
+}
+
+.button-states() {
+  transition: background-color 0.15s ease-in-out;
+
+  &:hover {
+    background-color: var(--app-bg-secondary);
+  }
+
+  &:focus-visible {
+    background-color: var(--app-bg-secondary);
+    outline: 1px solid var(--accent-color-focus);
+  }
+}

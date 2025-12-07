@@ -1,0 +1,242 @@
+/*
+ * Wire
+ * Copyright (C) 2018 Wire Swiss GmbH
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ *
+ */
+
+// This class not used anywhere, TODO: Check where previously was used this class
+.preferences-section-account-profile {
+  position: relative;
+  display: flex;
+  width: 536px;
+  justify-content: space-between;
+
+  .edit-icon,
+  .animated-check-icon {
+    position: absolute;
+    top: 0;
+    right: 12px;
+    display: flex;
+    height: 100%;
+    align-items: center;
+    pointer-events: none;
+    transition: opacity var(--animation-timing-faster);
+
+    svg {
+      width: 12px;
+    }
+  }
+
+  .edit-icon {
+    opacity: 0;
+
+    svg path {
+      fill: currentColor;
+    }
+  }
+
+  animated-check-icon {
+    svg path {
+      stroke: currentColor;
+    }
+  }
+}
+
+.preferences-section-data-usage {
+  .preferences-detail {
+    margin-bottom: 16px;
+  }
+}
+
+.preferences-section-account-security {
+  margin-top: 32px;
+  margin-bottom: 32px;
+}
+
+.preferences-section-account-space-before {
+  margin-top: var(--line-height-lg);
+}
+
+.preferences-section-account-space-after {
+  margin-bottom: var(--line-height-lg);
+}
+
+.preferences-section-info {
+  margin-bottom: 16px;
+
+  .enriched-fields {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    margin: 0;
+
+    &__entry {
+      width: 264px;
+      padding: 0;
+      margin-bottom: 16px;
+    }
+  }
+}
+
+.preferences-account-user-data {
+  line-height: var(--line-height-xl);
+}
+
+.preferences-account-user-data-temporary {
+  width: 300px;
+
+  .preferences-separator {
+    width: 256px;
+    margin: 24px 0;
+  }
+
+  .preferences-leave-disclaimer {
+    margin-top: 16px;
+    font-size: var(--font-size-small);
+    font-weight: var(--font-weight-regular);
+    line-height: initial;
+  }
+}
+
+.preferences-account-accent-color {
+  width: 300px;
+}
+
+.preferences-account-mail {
+  .no-text-selection;
+}
+
+.preferences-account-picture-button {
+  .square(var(--avatar-diameter-xl));
+
+  position: relative;
+  display: inline-block;
+  cursor: pointer;
+
+  > span {
+    .full-screen;
+    .flex-center;
+
+    color: #fff;
+    font-size: var(--font-size-xxl);
+    opacity: 0;
+    pointer-events: none;
+
+    &::before {
+      text-shadow: 0 0 40px fade(#000, 80%);
+    }
+  }
+
+  &:hover {
+    > span {
+      opacity: 1;
+    }
+  }
+
+  > input {
+    position: absolute;
+    left: var(--offscreen-left);
+  }
+
+  &.loading {
+    cursor: progress;
+  }
+}
+
+.preferences-history-backup-import-field {
+  cursor: pointer;
+  > input {
+    position: absolute;
+    left: var(--offscreen-left);
+  }
+}
+
+.preferences-account-name-wrapper {
+  position: relative;
+  width: 256px;
+}
+
+.preferences-account-email-wrapper {
+  position: relative;
+  width: 330px;
+}
+
+.preferences-account-username-wrapper {
+  position: relative;
+  width: 256px;
+  min-height: calc(var(--line-height-xl) * 2);
+
+  .edit-icon,
+  .animated-check-icon {
+    height: 50%;
+  }
+}
+
+.preferences-account-input {
+  .reset-textarea;
+
+  width: 100%;
+  height: var(--line-height-xl);
+  padding-right: 28px;
+  padding-left: 4px;
+  margin-left: -4px;
+  background: transparent;
+  line-height: var(--line-height-xl);
+
+  &::placeholder {
+    .label-xs;
+  }
+
+  &:hover + .edit-icon {
+    opacity: 1;
+  }
+
+  &:not([readonly]):focus,
+  &:not([readonly]):hover {
+    background-color: var(--preference-account-input-bg);
+  }
+}
+
+.preferences-account-name {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 16px;
+
+  .conversation-badges {
+    padding-left: 4px;
+  }
+}
+
+.preferences-account-username-atsign {
+  position: absolute;
+  top: 0;
+  left: 0;
+  color: var(--foreground);
+  line-height: var(--line-height-xl);
+}
+
+.preferences-account-username {
+  padding-left: 22px;
+}
+
+.preferences-account-image {
+  text-align: center;
+}
+
+.preferences-accent-color-picker {
+  text-align: center;
+}

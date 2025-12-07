@@ -1,0 +1,90 @@
+/*
+ * Wire
+ * Copyright (C) 2019 Wire Swiss GmbH
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ *
+ */
+
+.legal-hold-dot-button {
+  .button-reset-default;
+  display: flex;
+  align-items: center;
+  padding: 8px;
+
+  cursor: default;
+  grid-column: 3 / span 2;
+
+  &--interactive {
+    cursor: pointer;
+  }
+
+  &.legal-hold-dot-element {
+    display: block;
+  }
+}
+
+.legal-hold-dot {
+  position: relative;
+  display: flex;
+  width: 12px;
+  height: 12px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background-color: rgba(@w-red, 0.24);
+
+  &--interactive {
+    cursor: pointer;
+  }
+
+  &--large {
+    width: 48px;
+    height: 48px;
+  }
+
+  &--message {
+    width: 16px;
+    height: 16px;
+  }
+
+  &--active::after {
+    display: block;
+    width: 50%;
+    height: 50%;
+    border-radius: 50%;
+    background-color: @w-red;
+    content: '';
+  }
+
+  &--text {
+    margin-left: 6px;
+    font-size: var(--font-size-xsmall);
+    line-height: 0.8125rem;
+  }
+
+  .pending-icon {
+    position: relative;
+
+    svg {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+
+      path {
+        fill: @w-red;
+      }
+    }
+  }
+}

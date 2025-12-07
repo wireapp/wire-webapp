@@ -1,0 +1,170 @@
+/*
+ * Wire
+ * Copyright (C) 2018 Wire Swiss GmbH
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ *
+ */
+
+@keyframes loading {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+// Video asset component
+.video-asset {
+  .asset-container-style;
+  position: relative;
+  display: block;
+  flex: 1 1 auto;
+
+  &__container {
+    .asset-container-style;
+    .full-screen;
+
+    video {
+      width: 100%;
+      height: 100%;
+    }
+
+    &__sizer {
+      display: block;
+      padding-bottom: 75%; // video ratio 4:3
+      content: '';
+    }
+
+    &--small {
+      overflow: hidden;
+      width: fit-content;
+      max-height: 88px;
+      border-radius: 4px;
+      cursor: pointer;
+
+      video {
+        width: auto;
+        max-height: 88px;
+      }
+    }
+    &--small + &__sizer {
+      padding-bottom: 88px;
+    }
+  }
+
+  &__placeholder {
+    .full-screen;
+    .flex-center;
+
+    z-index: -1;
+    color: var(--separator-color);
+    font-size: var(--font-size-xxl);
+  }
+
+  &__playback-error {
+    .full-screen;
+    .flex-center;
+
+    flex-direction: column;
+    background-color: var(--background-fade-8);
+    color: var(--main-color);
+    gap: 16px;
+  }
+
+  &__controls {
+    .full-screen;
+    .flex-center;
+
+    // Video controls center
+    &__center {
+      .full-screen;
+      .flex-center;
+    }
+
+    // Video controls bottom bar
+    &__bottom {
+      position: absolute;
+      bottom: 0;
+      display: flex;
+      width: 100%;
+      height: 56px;
+      align-items: center;
+      padding-right: 24px;
+      padding-left: 24px;
+      color: #fff;
+
+      &__time {
+        width: 56px;
+        text-align: center;
+      }
+
+      &__seekbar {
+        margin-right: 24px;
+        margin-left: 24px;
+      }
+
+      &::before {
+        .full-screen;
+
+        z-index: -1;
+        background: linear-gradient(to bottom, fade(#fff, 0), fade(#000, 40%));
+        content: '';
+      }
+    }
+
+    &--hidden {
+      opacity: 0;
+      transition: opacity var(--animation-timing-fast) ease-in-out;
+    }
+  }
+
+  &__restricted {
+    display: flex;
+    width: 200px;
+    height: 113px;
+    border-radius: 4px;
+    background-color: var(--foreground-fade-8);
+
+    &--small {
+      width: 100px;
+      height: 56px;
+    }
+
+    &--container {
+      padding: 8px;
+      margin: auto;
+    }
+
+    &__play-button {
+      .circle(var(--play-button-size));
+      .text-foreground;
+
+      position: relative;
+      flex: 0 0 auto;
+      margin: auto;
+      background-color: white;
+      font-size: var(--font-size-base);
+      line-height: var(--play-button-size);
+      text-align: center;
+    }
+
+    &--message {
+      .label-xs;
+      .text-foreground;
+      .text-center;
+
+      margin-top: 8px;
+      line-height: 1.3em;
+    }
+  }
+}

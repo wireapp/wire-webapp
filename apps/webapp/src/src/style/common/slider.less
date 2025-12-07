@@ -1,0 +1,90 @@
+/*
+ * Wire
+ * Copyright (C) 2018 Wire Swiss GmbH
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ *
+ */
+
+.slider {
+  cursor: pointer;
+  user-select: none;
+}
+
+.slider-input {
+  position: absolute;
+  opacity: 0;
+
+  & + button,
+  & + label {
+    display: flex;
+    align-items: center;
+
+    .button-label__switch {
+      position: relative;
+      display: block;
+      width: 48px;
+      height: 24px;
+      border-radius: 12px;
+      background-color: var(--gray-70);
+      transition: var(--animation-timing-faster) ease-in-out;
+
+      &::after {
+        position: absolute;
+        top: 50%;
+        left: 4px;
+        display: block;
+        width: 16px;
+        height: 16px;
+        border: 0.5px solid rgba(0, 0, 0, 0.1);
+        border-radius: 50%;
+        background-color: var(--white);
+        box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.16);
+        content: '';
+        transform: translateY(-50%);
+        transition: var(--animation-timing-faster) ease-in-out;
+      }
+
+      body.theme-dark & {
+        border: 1px solid var(--gray-60);
+      }
+    }
+
+    .button-label__text {
+      margin-left: 8px;
+    }
+  }
+
+  &:checked + button,
+  &:checked + label {
+    .button-label__switch {
+      background-color: var(--green-500);
+
+      body.theme-dark & {
+        border: 1px solid var(--green-500);
+        background-color: @green-dark-700;
+      }
+
+      &::after {
+        left: 27px;
+      }
+    }
+  }
+
+  &:focus-visible + label {
+    .focus-outline;
+    .focus-offset;
+    .focus-border-radius;
+  }
+}

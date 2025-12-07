@@ -1,0 +1,154 @@
+/*
+ * Wire
+ * Copyright (C) 2018 Wire Swiss GmbH
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ *
+ */
+
+@keyframes loading-spinner-fade-in {
+  0% {
+    opacity: 0;
+  }
+  99% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+.conversation {
+  .full-screen;
+
+  display: flex;
+  flex-direction: column;
+}
+
+.conversation-loading {
+  .full-screen;
+  .flex-center;
+  display: none;
+
+  max-width: var(--conversation-max-width);
+  animation-duration: 1s;
+  animation-name: loading-spinner-fade-in;
+
+  .loading & {
+    display: flex;
+  }
+}
+
+.conversation-title-bar,
+.message-list,
+.conversation-input-bar {
+  opacity: 1;
+
+  .loading & {
+    opacity: 0;
+  }
+}
+
+.readonly-message-container {
+  margin-bottom: 16px;
+}
+
+.readonly-message-header {
+  position: relative;
+  display: flex;
+  max-width: 800px;
+  padding-top: 6px;
+  line-height: 24px;
+}
+
+.readonly-message-header-icon {
+  display: flex;
+  width: 56px;
+  max-height: 24px;
+  align-items: center;
+  align-self: top;
+  justify-content: center;
+}
+
+.readonly-message-header-icon--svg {
+  line-height: 0;
+
+  svg path {
+    fill: var(--foreground);
+  }
+}
+
+.readonly-message-header-label {
+  min-width: 0;
+  flex: 1;
+  font-size: 0.75rem;
+  font-weight: var(--font-weight-regular);
+  white-space: normal;
+}
+
+.conversation-tabs {
+  width: 100%;
+
+  &__list {
+    display: flex;
+    padding-left: 6px;
+    border-bottom: 1px solid var(--border-color);
+    gap: 24px;
+  }
+
+  &__button {
+    position: relative;
+    padding: 8px 0;
+    border: 2px solid transparent;
+    margin: 0;
+    background: none;
+    cursor: pointer;
+    font-size: var(--font-size-medium);
+
+    &:focus {
+      outline: none;
+    }
+
+    &[aria-selected='true'] {
+      &:after {
+        position: absolute;
+        bottom: -2px;
+        left: 0;
+        display: block;
+        width: 100%;
+        height: 2px;
+        background: var(--accent-color);
+        content: '';
+      }
+    }
+  }
+}
+
+.conversation-tabpanel {
+  &--messages {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+    overflow-y: auto;
+  }
+
+  &--files {
+    height: 100%;
+    overflow-y: auto;
+  }
+
+  &--hidden {
+    display: none;
+  }
+}

@@ -1,0 +1,421 @@
+/*
+ * Wire
+ * Copyright (C) 2018 Wire Swiss GmbH
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ *
+ */
+
+.conversations {
+  width: 320px;
+  background-color: var(--app-bg);
+}
+
+.conversations-sidebar {
+  position: relative;
+  height: 100%;
+
+  &:hover {
+    .conversations-sidebar-handle {
+      display: block;
+    }
+  }
+
+  .conversations-sidebar-items {
+    display: flex;
+    overflow: auto;
+    width: 220px;
+    height: 100%;
+    flex-direction: column;
+    padding: 8px;
+    padding-top: 14px;
+    border-right: 1px solid var(--border-color);
+    background: var(--sidebar-bg);
+    transition: width 0.3s ease-in-out;
+
+    &[data-is-collapsed='true'] {
+      width: 64px;
+      align-items: center;
+      padding: 16px 8px;
+
+      .conversations-sidebar-btn--text,
+      .conversations-sidebar-folders,
+      .conversations-sidebar-title {
+        display: none;
+      }
+
+      .conversations-sidebar-divider {
+        display: block;
+      }
+
+      .conversations-sidebar-btn svg {
+        width: 16px;
+        height: 16px;
+      }
+
+      .conversations-sidebar-btn[data-uie-name='go-groups-view'] svg {
+        width: 22px;
+        height: 22px;
+      }
+
+      .conversations-sidebar-btn span {
+        justify-content: center;
+      }
+
+      .conversations-sidebar-btn .folder-icon {
+        display: flex;
+        align-items: center;
+
+        svg:last-child {
+          width: 7px;
+          height: 7px;
+          margin-left: 2px;
+          transform: rotate(-90deg);
+        }
+      }
+
+      .folders-open-indicator,
+      .external-link-icon {
+        display: none;
+      }
+    }
+  }
+}
+
+.conversations-sidebar-list {
+  .list-unstyled;
+
+  .conversations-sidebar-items {
+    width: 100%;
+  }
+
+  .conversations-sidebar-items[data-is-collapsed='true'] & {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    border-top: 1px solid var(--border-color);
+    padding-block: 8px;
+
+    .conversations-sidebar-btn {
+      flex: 0;
+    }
+  }
+
+  .conversations-sidebar-items[data-is-collapsed='false'] & {
+    display: flex;
+
+    flex-direction: column;
+    margin: 0;
+  }
+
+  .conversations-sidebar-contacts-label {
+    .label-xs;
+
+    margin-left: 16px;
+    color: #fff;
+  }
+
+  .conversations-sidebar-title {
+    .text-bold-small;
+    .text-uppercase;
+    .label-2;
+
+    margin-bottom: 8px;
+  }
+}
+
+.conversations-sidebar-divider {
+  display: none;
+  width: 100%;
+  height: 1px;
+  border-top: 1px solid var(--border-color);
+  margin: 8px 0;
+}
+
+.conversations-sidebar-list-footer {
+  margin-top: auto;
+}
+
+.conversations-sidebar-list-item {
+  height: 100%;
+  flex: 1;
+  padding: 2px 0;
+}
+
+.conversations-sidebar-folders-wrapper {
+  svg {
+    transition: transform 0.15s ease-in-out;
+  }
+
+  &.active {
+    border-radius: 10px;
+    background-color: var(--sidebar-folder-selected-bg);
+
+    svg.folders-open-indicator {
+      transform: rotate(180deg);
+    }
+  }
+}
+
+.conversations-sidebar-folders {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 0.3s ease-in-out;
+
+  &.active {
+    padding-bottom: 0.5rem;
+    grid-template-rows: 1fr;
+  }
+
+  &--empty {
+    display: flex;
+    flex-direction: column;
+    font-size: 0.75rem;
+    font-weight: 400;
+    line-height: 0.875rem;
+  }
+
+  &--inner-wrapper {
+    display: flex;
+    overflow: hidden;
+    flex-direction: column;
+    align-items: start;
+    justify-content: center;
+    padding: 0 0.5rem 0 2rem;
+    gap: 4px;
+  }
+
+  &--item {
+    .button-reset-default;
+    position: relative;
+    display: flex;
+    width: 100%;
+    height: 28px;
+    flex-shrink: 0;
+    align-items: center;
+    justify-content: space-between;
+    padding: 6px 8px 6px 12px;
+    padding-left: 1.5rem;
+    border-radius: 8px;
+
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: 400;
+
+    > span {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .conversations-sidebar-btn--badge {
+      top: 8px;
+      left: 8px;
+    }
+
+    &:hover {
+      background-color: var(--app-bg-secondary);
+    }
+  }
+
+  &--item.active {
+    background-color: var(--list-item-selected-bg);
+    color: var(--app-bg-secondary) !important;
+  }
+}
+
+.conversations-sidebar-btn {
+  .button-reset-default;
+  display: flex;
+  width: 100%;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px;
+  border-radius: 6px;
+  gap: 12px;
+
+  &:not(:last-child) {
+    margin-bottom: 4px;
+  }
+
+  .external-link-icon {
+    margin-left: auto;
+    path {
+      fill: var(--text-input-placeholder);
+    }
+  }
+
+  &--text-wrapper {
+    position: relative;
+    display: flex;
+    width: 100%;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .button-states();
+
+  &:focus-visible {
+    .focus-border-radius;
+    outline-offset: -2px;
+  }
+
+  .conversations-sidebar-btn--text {
+    .text-bold-small;
+    overflow: hidden;
+    color: var(--main-color);
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  &.active {
+    background-color: var(--list-item-selected-bg);
+    color: var(--accent-color-500);
+
+    svg {
+      color: var(--app-bg-secondary);
+      fill: var(--app-bg-secondary) !important;
+    }
+
+    .conversations-sidebar-btn--text {
+      color: var(--app-bg-secondary) !important;
+    }
+  }
+}
+
+.conversations-sidebar-btn--badge {
+  position: absolute;
+  top: -3px;
+  left: 10px;
+  width: 6px;
+  height: 6px;
+  box-sizing: content-box;
+  border: 2px solid var(--app-bg-secondary);
+  border-radius: 6px;
+  background: var(--accent-color-500);
+  font-size: var(--font-size-small);
+  font-weight: var(--font-weight-semibold);
+
+  &.active {
+    border: 2px solid var(--accent-color-500);
+    background: var(--app-bg-secondary);
+  }
+}
+
+.conversations-sidebar-btn {
+  svg {
+    width: 20px;
+    height: 14px;
+    flex-shrink: 0;
+  }
+
+  &[data-uie-name='go-groups-view'] svg {
+    width: 20px;
+    height: 20px;
+  }
+
+  svg.folders-open-indicator {
+    width: 8px;
+    margin-left: auto;
+  }
+}
+
+.conversations-hint {
+  position: absolute;
+  bottom: 0;
+  margin-right: 24px;
+  margin-left: 20px;
+}
+
+.conversations-hint-text {
+  margin-bottom: 24px;
+  color: var(--main-color);
+  font-size: var(--font-size-xlarge);
+  font-weight: var(--font-weight-regular);
+}
+
+.conversations-hint-arrow {
+  opacity: 0.4;
+}
+
+.conversations-all-archived {
+  .full-screen;
+  .flex-center;
+  .label-xs;
+  .text-center;
+
+  flex-direction: column;
+}
+
+.conversations-wrapper {
+  display: flex;
+}
+
+.conversation-folder-list {
+  .list-unstyled;
+  margin: 0;
+}
+
+.conversation-folder {
+  &__head {
+    .button-reset-default;
+    display: flex;
+    width: 100%;
+    align-items: center;
+    padding: 0.4rem 0;
+    margin: 20px 0;
+    cursor: pointer;
+    text-align: left;
+
+    .disclose-icon {
+      display: flex;
+      align-items: center;
+      margin: 0 8px 0 15px;
+
+      svg {
+        transform: rotate(0);
+        transition: transform var(--animation-timing-fast) var(--ease-out-expo);
+      }
+    }
+
+    &__name {
+      .ellipsis;
+      .text-medium;
+      flex: 1;
+      font-size: var(--font-size-medium);
+      font-weight: var(--font-weight-medium);
+    }
+
+    &__badge {
+      flex-shrink: 1;
+      margin: -3px 16px -4px 8px;
+    }
+
+    &--open {
+      .disclose-icon svg {
+        transform: rotate(90deg);
+      }
+    }
+
+    &:focus-visible {
+      .focus-outline;
+      .focus-border-radius;
+      outline-offset: -0.1rem;
+    }
+  }
+  & + & {
+    margin-top: 40px;
+  }
+}

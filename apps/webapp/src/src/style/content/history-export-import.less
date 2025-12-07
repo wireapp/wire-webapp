@@ -1,0 +1,56 @@
+#history-export,
+#history-import {
+  display: flex;
+  height: 100%;
+  flex-direction: column;
+  align-items: center;
+  background-color: var(--app-bg);
+
+  .loading-bar {
+    margin: auto;
+
+    &.with-cancel {
+      padding-top: 72px;
+    }
+  }
+
+  .history-message {
+    margin: auto;
+    text-align: center;
+
+    svg {
+      width: 32px;
+      height: 32px;
+      margin-bottom: 16px;
+
+      path {
+        fill: var(--success-color);
+      }
+    }
+
+    &__headline {
+      padding: 0;
+      margin: 0;
+      font-size: var(--font-size-medium);
+      font-weight: var(--font-weight-bold);
+      line-height: var(--line-height-lg);
+    }
+
+    &__info {
+      margin: 8px 0 0;
+      font-size: var(--font-size-medium);
+      font-weight: var(--font-weight-regular);
+      line-height: var(--line-height-lg);
+    }
+
+    &__buttons {
+      display: flex;
+      justify-content: center;
+      margin-top: 32px;
+
+      button ~ button {
+        margin-left: 16px;
+      }
+    }
+  }
+}

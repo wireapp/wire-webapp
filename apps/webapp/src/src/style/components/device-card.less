@@ -1,0 +1,98 @@
+/*
+ * Wire
+ * Copyright (C) 2018 Wire Swiss GmbH
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ *
+ */
+
+.device-card {
+  position: relative;
+  display: flex;
+  flex-grow: 1;
+  align-items: center;
+
+  &:not(:last-child) {
+    margin-bottom: 8px;
+  }
+
+  &:not(&__no-hover) {
+    cursor: pointer;
+  }
+
+  .disclose-icon {
+    display: flex;
+    height: 16px;
+    align-self: center;
+
+    path {
+      fill: var(--gray-90);
+    }
+  }
+
+  &__info {
+    width: 100%;
+    padding-right: 16px;
+    line-height: var(--line-height-sm);
+  }
+
+  &__name {
+    display: flex;
+    align-items: center;
+
+    .conversation-badges {
+      margin-left: 4px;
+    }
+  }
+
+  &__label,
+  &__model {
+    font-size: var(--font-size-medium);
+    font-weight: var(--font-weight-bold);
+    line-height: var(--line-height-md);
+  }
+
+  .verified-icon,
+  .not-verified-icon {
+    margin-right: 16px;
+  }
+
+  &__icon {
+    svg path {
+      fill: currentColor;
+    }
+    margin-right: 16px;
+  }
+}
+
+.device-card__legal_hold_icon {
+  min-width: 16px;
+  min-height: 16px;
+}
+
+.device-card__id {
+  display: grid;
+  font-size: var(--font-size-small);
+  grid-template-columns: auto 1fr;
+  line-height: var(--line-height-sm);
+  text-transform: uppercase;
+
+  .formatted-id {
+    overflow: hidden;
+
+    margin-left: 2px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+}

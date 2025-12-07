@@ -1,0 +1,99 @@
+/*
+ * Wire
+ * Copyright (C) 2018 Wire Swiss GmbH
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ *
+ */
+
+@import (less) 'fonts/zeta-neue.css';
+
+@import 'common/variables';
+
+html {
+  box-sizing: border-box;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: inherit;
+}
+
+body,
+html {
+  display: table;
+  overflow: hidden;
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  margin: 0;
+  font-family: var(--font-family-base);
+  font-size: var(--font-size-base);
+  font-weight: 300;
+}
+
+svg {
+  width: 32px;
+  height: 26.5px;
+  fill: #000;
+}
+
+a {
+  color: #000;
+  text-decoration: none;
+}
+
+p {
+  margin-top: 0;
+  margin-bottom: 12px;
+}
+
+.container {
+  display: table-cell;
+  width: 100%;
+  height: 100%;
+  vertical-align: middle;
+
+  .content {
+    width: 100%;
+    max-width: 400px;
+    padding: 16px;
+    margin: 0 auto;
+  }
+}
+
+.header {
+  margin-bottom: 96px;
+}
+
+.footer {
+  margin-top: 96px;
+  font-size: var(--font-size-medium);
+
+  p {
+    margin-bottom: 4px;
+  }
+}
+
+.support {
+  .btn {
+    text-transform: initial;
+
+    &.hover,
+    &:hover {
+      color: #fff !important;
+    }
+  }
+}

@@ -1,0 +1,185 @@
+/*
+ * Wire
+ * Copyright (C) 2018 Wire Swiss GmbH
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ *
+ */
+
+/* container */
+.conversation-list-cell {
+  position: relative;
+  display: flex;
+  width: 100%;
+  height: 56px;
+  cursor: pointer;
+  font-weight: var(--font-weight-regular);
+
+  .button-states();
+
+  &:focus-visible {
+    .conversation-list-cell-center,
+    .conversation-list-cell-right {
+      border-bottom: 0 !important;
+    }
+  }
+
+  &::after {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    left: var(--left-list-item-left-width);
+    height: 1px;
+    background-color: #fff;
+    content: '';
+    opacity: 0.06;
+  }
+
+  &--active {
+    .button-active();
+
+    .conversation-list-cell-center,
+    .conversation-list-cell-right {
+      border-bottom: 0 !important;
+    }
+    .call-ui__button--join {
+      outline: 1px solid var(--app-bg-secondary);
+    }
+  }
+}
+
+.conversation-list-cell-main-button {
+  display: flex;
+  overflow: hidden;
+  width: 100%;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+
+  &:focus-visible {
+    outline-offset: -0.2rem;
+  }
+}
+
+.conversation-list-cell-left {
+  .flex-center;
+
+  width: var(--left-list-item-left-width);
+  flex: 0 0 auto;
+}
+
+.conversation-list-cell-center {
+  display: flex;
+  min-width: 0;
+  flex: 1 1 auto;
+  flex-direction: column;
+  justify-content: center;
+  border-bottom: 1px solid var(--border-color);
+
+  &.conversation-list-cell-center-no-left {
+    padding-left: 16px;
+  }
+}
+
+.conversation-list-cell-right {
+  .flex-center;
+
+  padding-right: 16px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.conversation-recent-view-list {
+  .list-unstyled;
+  margin: 0;
+}
+
+/* elements */
+.conversation-list-cell-name {
+  .ellipsis-nowrap;
+  padding-bottom: 2px;
+  margin-right: 4px;
+  margin-bottom: -2px;
+  font-size: var(--font-size-medium);
+  font-weight: var(--font-weight-medium);
+
+  &--active {
+    color: var(--app-bg-secondary);
+  }
+}
+
+.conversation-list-cell-description {
+  .ellipsis-nowrap;
+  .subline;
+
+  margin-top: 2px;
+  margin-right: 4px;
+  color: var(--background);
+
+  &--active {
+    color: var(--white);
+  }
+}
+
+body.theme-dark {
+  .conversation-list-cell-description {
+    &--active {
+      color: var(--black);
+    }
+  }
+  .conversation-list-cell-name {
+    &--active {
+      color: var(--black);
+    }
+  }
+}
+
+.conversation-list-cell-badge {
+  font-size: var(--font-size-small);
+}
+
+.conversation-list-cell-context-menu {
+  .button-reset-default;
+  .flex-center;
+  .square(20px);
+
+  &::before {
+    width: 0;
+    height: 0;
+    border-top: 4px solid var(--main-color);
+    border-right: 4px solid transparent;
+    border-left: 4px solid transparent;
+    content: '';
+    opacity: 0;
+    transition: opacity var(--animation-timing-slow) var(--ease-out-quart) calc(var(--animation-timing-faster) + 0.05s);
+
+    .conversation-list-cell:hover &,
+    :focus-visible & {
+      opacity: 1;
+    }
+  }
+
+  &:focus-visible {
+    &::before {
+      opacity: 1;
+    }
+    .focus-default;
+  }
+
+  &--active {
+    &::before {
+      border-top-color: var(--app-bg-secondary);
+    }
+  }
+}
+
+/* states */
