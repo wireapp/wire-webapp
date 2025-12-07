@@ -17,6 +17,7 @@
  *
  */
 
+import {ClientConfig} from 'apps/server/config';
 import {WireModule} from 'src/types/Wire.types';
 
 import {ClientConfig} from '../../../../../../server/config';

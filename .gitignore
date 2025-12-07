@@ -39,5 +39,3 @@ yalc.lock
 # Nx
 .nx/
 apps/server/dist/
-dist/
-*.tsbuildinfo
