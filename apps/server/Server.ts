@@ -83,7 +83,7 @@ class Server {
       return;
     }
 
-    const webpackCompiler = require('webpack')(require('../../webpack.config.dev'));
+    const webpackCompiler = require('webpack')(require('../../webapp/webpack.config.dev'));
     const webpackDevMiddleware = require('webpack-dev-middleware');
     const webpackHotMiddleware = require('webpack-hot-middleware');
 

@@ -18,8 +18,8 @@
  */
 
 module.exports = {
+  preset: '../../jest.preset.js',
   moduleDirectories: ['node_modules', __dirname],
   testEnvironment: 'node',
   testPathIgnorePatterns: ['<rootDir>/dist'],
-  testRegex: '(test|Spec)\\.[tj]sx?$',
 };

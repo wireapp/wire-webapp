@@ -18,9 +18,17 @@
  */
 
 import type {Config} from 'jest';
+import {fileURLToPath} from 'url';
+import {dirname} from 'path';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+
 process.env.TZ = 'UTC';
 
 const config: Config = {
+  displayName: 'webapp',
+  preset: '../../jest.preset.js',
   collectCoverageFrom: ['src/script/**/*.{ts,tsx}', '!src/script/util/test/**/*.*'],
   moduleDirectories: ['node_modules', __dirname],
   // Must be in sync with tsconfig.json >> paths
@@ -31,7 +39,7 @@ const config: Config = {
     'Repositories/(.*)': '<rootDir>/src/script/repositories/$1',
     'Resource/(.*)': '<rootDir>/resource/$1',
     'Util/(.*)': '<rootDir>/src/script/util/$1',
-    '^react(.*)$': '<rootDir>/node_modules/react$1',
+    '^react(.*)$': '<rootDir>/../../node_modules/react$1',
     '.*\\.glsl': 'jest-transform-stub',
   },
   reporters: ['default', 'github-actions'],
@@ -40,8 +48,7 @@ const config: Config = {
   testEnvironmentOptions: {
     customExportConditions: ['node', 'node-addons'],
   },
-  testPathIgnorePatterns: ['<rootDir>/server', '<rootDir>/.yalc'],
-  testRegex: '(test|Spec)\\.[tj]sx?$',
+  testPathIgnorePatterns: ['<rootDir>/server', '<rootDir>/.yalc', '<rootDir>/test/e2e_tests'],
   testRunner: 'jest-jasmine2',
 };
 

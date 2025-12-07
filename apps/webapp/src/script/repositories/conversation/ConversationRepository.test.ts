@@ -189,7 +189,7 @@ describe('ConversationRepository', () => {
       JSON.stringify(payload.conversations.knock.post),
     ]);
 
-    server.respondWith('GET', `${Config.getConfig().BACKEND_REST}/users?ids=${messageSenderId}`, [
+    server.respondWith('GET', new RegExp(`${Config.getConfig().BACKEND_REST}/users\\?ids=${messageSenderId}`), [
       HTTP_STATUS.OK,
       {'Content-Type': 'application/json'},
       '',

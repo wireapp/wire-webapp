@@ -36,7 +36,7 @@
     },
     "skipLibCheck": true,
     "resolveJsonModule": true,
-    "rootDirs": ["src/script"],
+    "rootDirs": ["src"],
     "target": "ESNext",
     "strict": true
   },

@@ -5,61 +5,28 @@
   "projectType": "application",
   "targets": {
     "build": {
-      "executor": "@nx/webpack:webpack",
-      "outputs": ["{options.outputPath}"],
+      "executor": "nx:run-commands",
+      "outputs": ["{projectRoot}/../../apps/server/dist/static"],
       "defaultConfiguration": "production",
+      "dependsOn": ["server:build"],
       "options": {
-        "compiler": "babel",
-        "outputPath": "dist/apps/webapp",
-        "index": "apps/webapp/src/page/index.ejs",
-        "baseHref": "/",
-        "main": "apps/webapp/src/script/main/index.tsx",
-        "polyfills": [],
-        "tsConfig": "apps/webapp/tsconfig.json",
-        "assets": [
-          "apps/webapp/resource",
-          "apps/webapp/assets"
-        ],
-        "styles": [],
-        "scripts": [],
-        "webpackConfig": "apps/webapp/webpack.config.js"
+        "command": "yarn build:prod",
+        "cwd": "apps/webapp"
       },
       "configurations": {
         "development": {
-          "extractLicenses": false,
-          "optimization": false,
-          "sourceMap": true,
-          "vendorChunk": true,
-          "webpackConfig": "apps/webapp/webpack.config.dev.js"
+          "command": "yarn build:dev"
         },
         "production": {
-          "fileReplacements": [],
-          "optimization": true,
-          "outputHashing": "all",
-          "sourceMap": false,
-          "namedChunks": false,
-          "extractLicenses": true,
-          "vendorChunk": false,
-          "webpackConfig": "apps/webapp/webpack.config.js"
+          "command": "yarn build:prod"
         }
       }
     },
     "serve": {
-      "executor": "@nx/webpack:dev-server",
+      "executor": "nx:run-commands",
       "defaultConfiguration": "development",
       "options": {
-        "buildTarget": "webapp:build:development",
-        "hmr": true,
-        "port": 8080
-      },
-      "configurations": {
-        "development": {
-          "buildTarget": "webapp:build:development"
-        },
-        "production": {
-          "buildTarget": "webapp:build:production",
-          "hmr": false
-        }
+        "command": "echo 'Use yarn start from the root to run the dev server with webpack-dev-middleware'"
       }
     },
     "test": {

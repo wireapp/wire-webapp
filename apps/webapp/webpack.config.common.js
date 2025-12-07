@@ -72,6 +72,10 @@ module.exports = {
         exclude: /node_modules/,
         include: srcScript,
         loader: 'babel-loader',
+        options: {
+          // Ensure we use the app-specific babel config for TS/JSX support
+          configFile: path.resolve(__dirname, 'babel.config.js'),
+        },
         test: /\.[tj]sx?$/,
       },
       {
@@ -212,8 +216,8 @@ module.exports = {
       I18n: path.resolve(SRC_PATH, 'i18n'),
       Resource: path.resolve(ROOT_PATH, 'resource'),
       Util: path.resolve(srcScript, 'util'),
-      src: path.resolve(ROOT_PATH, 'src'),
-      test: path.resolve(ROOT_PATH, 'test'),
+      src: path.resolve(__dirname, 'src'),
+      test: path.resolve(__dirname, 'test'),
     },
     extensions: ['.js', '.jsx', '.ts', '.tsx', '.svg'],
     fallback: {

@@ -73,9 +73,9 @@ const reactComponents = svgIcons.map(({name, content}) => {
   };`;
 });
 
-const dir = 'src/script/components';
+const dir = 'apps/webapp/src/script/components';
 
 if (!fs.existsSync(dir)) {
-  fs.mkdirSync(dir);
+  fs.mkdirSync(dir, {recursive: true});
 }
 fs.writeFileSync(`${dir}/Icon.tsx`, [disclaimer, iconPropsType, ...reactComponents].join('\n'));
