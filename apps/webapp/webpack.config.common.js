@@ -22,8 +22,8 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 const webpack = require('webpack');
 const WorkboxPlugin = require('workbox-webpack-plugin');
 
-const DIST_PATH = path.resolve(__dirname, 'apps/server/dist');
-const ROOT_PATH = path.resolve(__dirname);
+const DIST_PATH = path.resolve(__dirname, '../../apps/server/dist');
+const ROOT_PATH = path.resolve(__dirname, '../..');
 const SRC_PATH = path.resolve(__dirname, 'src');
 
 const dist = path.resolve(DIST_PATH, 'static');
@@ -169,7 +169,7 @@ module.exports = {
           to: `${dist}/min/mediapipe/wasm`,
         },
         // copying all static resources (audio, images, fonts...)
-        {from: path.resolve(__dirname, 'resource'), to: dist},
+        {from: path.resolve(ROOT_PATH, 'resource'), to: dist},
         {from: path.resolve(__dirname, 'assets'), to: `${dist}/assets`},
         {from: path.resolve(SRC_PATH, 'page/basicBrowserFeatureCheck.js'), to: `${dist}/min/`},
         {from: path.resolve(SRC_PATH, 'page/loader.js'), to: `${dist}/min/`},
