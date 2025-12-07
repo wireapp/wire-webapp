@@ -1,6 +1,4 @@
 {
-  "extends": "../../tsconfig.base.json",
-  "references": [{"path": "../server"}],
   "ts-node": {
     "compilerOptions": {
       "module": "commonjs"
@@ -8,13 +6,25 @@
   },
   "compilerOptions": {
     "allowJs": true,
+    "allowSyntheticDefaultImports": true,
+    "alwaysStrict": true,
     "baseUrl": ".",
+    "declaration": false,
+    "downlevelIteration": true,
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
     "jsx": "react-jsx",
     "jsxImportSource": "@emotion/react",
     "module": "esnext",
     "lib": ["esnext", "dom", "dom.iterable"],
+    "moduleResolution": "node",
     "noEmitOnError": true,
-    "outDir": "../../dist/apps/webapp",
+    "noImplicitAny": true,
+    "noImplicitReturns": true,
+    "noUnusedLocals": true,
+    "outDir": "src/script/auth",
     "paths": {
       "Components/*": ["./src/script/components/*"],
       "Hooks/*": ["./src/script/hooks/*"],
@@ -23,11 +33,12 @@
       "Resource/*": ["./resource/*"],
       "Util/*": ["./src/script/util/*"]
     },
-    "rootDirs": ["src"],
+    "skipLibCheck": true,
+    "resolveJsonModule": true,
+    "rootDirs": ["src/script"],
     "target": "ESNext",
     "strict": true
   },
   "types": ["@types/wicg-file-system-access", "jest", "@testing-library/jest-dom"],
-  "include": ["src/**/*", "test/**/*"],
-  "exclude": ["node_modules", "../server/", "src/sw.js", "src/worker/"]
+  "exclude": ["node_modules", "apps/server/", "src/sw.js", "src/worker/"]
 }
