@@ -19,32 +19,36 @@
 
 import {Locator, Page} from '@playwright/test';
 
-export class CallNotEstablishedModal {
-  readonly page: Page;
+import {PrimaryModalType} from 'Components/Modals/PrimaryModal/PrimaryModalTypes';
 
-  readonly modal: Locator;
-  readonly modalTitle: Locator;
-  readonly modalText: Locator;
-  readonly okButton: Locator;
+import {BaseModal} from './base.modal';
+
+export class PasswordAdvancedSecurityModal extends BaseModal {
+  readonly passwordInput: Locator;
 
   constructor(page: Page) {
-    this.page = page;
+    super(page, PrimaryModalType.PASSWORD_ADVANCED_SECURITY);
 
-    this.modal = page.locator("[data-uie-name='primary-modals-container'][aria-label='Call not established']");
-    this.modalTitle = this.modal.locator("[data-uie-name='status-modal-title']");
-    this.modalText = this.modal.locator("[data-uie-name='status-modal-text']");
-    this.okButton = this.modal.locator("[data-uie-name='do-action']");
+    this.passwordInput = this.modal.getByRole('textbox');
   }
 
-  async isModalPresent() {
-    return await this.modal.isVisible();
+  async isTitleVisible() {
+    await this.modalTitle.waitFor({state: 'visible'});
   }
 
-  async getModalTitle() {
-    return (await this.modalTitle.textContent()) ?? '';
+  async isTitleHidden() {
+    await this.modalTitle.waitFor({state: 'hidden'});
   }
 
-  async clickOk() {
-    await this.okButton.click();
+  async clickBackUpNow() {
+    await this.actionButton.click();
+  }
+
+  async clickCancel() {
+    await this.cancelButton.click();
+  }
+
+  async enterPassword(password: string) {
+    await this.passwordInput.fill(password);
   }
 }

@@ -17,16 +17,54 @@
  *
  */
 
-import {Page} from '@playwright/test';
+import {Page, Locator} from '@playwright/test';
 
-import {ConfirmModal} from './confirm.modal';
+import {selectByDataAttribute} from 'test/e2e_tests/utils/selector.util';
 
-export class DataShareConsentModal extends ConfirmModal {
+export class DataShareConsentModal {
+  readonly page: Page;
+
+  readonly modal: Locator;
+  readonly modalTitle: Locator;
+  readonly modalText: Locator;
+  readonly agreeButton: Locator;
+  readonly declineButton: Locator;
+
   constructor(page: Page) {
-    super(page);
+    this.page = page;
+
+    this.modal = page.locator(
+      `${selectByDataAttribute('primary-modals-container')}[aria-label='Consent to share user data']`,
+    );
+    this.modalTitle = this.modal.locator(`${selectByDataAttribute('status-modal-title')}`);
+    this.modalText = this.modal.locator(`${selectByDataAttribute('status-modal-text')}`);
+    this.agreeButton = this.modal.locator(`${selectByDataAttribute('do-action')}`);
+    this.declineButton = this.modal.locator(`${selectByDataAttribute('do-secondary')}`);
+  }
+
+  async isModalPresent() {
+    return this.modalTitle.isVisible();
+  }
+
+  async getModalTitle() {
+    return (await this.modalTitle.textContent()) ?? '';
+  }
+
+  async getModalText() {
+    return (await this.modalText.textContent()) ?? '';
+  }
+
+  async isActionButtonVisible() {
+    return await this.agreeButton.isVisible();
   }
 
   async clickDecline() {
-    await this.clickCancel();
+    await this.declineButton.isVisible();
+    await this.declineButton.click();
+  }
+
+  async clickConfirm() {
+    await this.agreeButton.isVisible();
+    await this.agreeButton.click();
   }
 }

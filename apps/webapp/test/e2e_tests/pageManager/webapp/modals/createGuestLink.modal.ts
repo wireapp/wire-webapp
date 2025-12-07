@@ -17,23 +17,27 @@
  *
  */
 
-import {Locator, Page} from '@playwright/test';
+import {Page, Locator} from '@playwright/test';
 
-export class CallNotEstablishedModal {
+export class CreatGuestLinkModal {
   readonly page: Page;
 
   readonly modal: Locator;
   readonly modalTitle: Locator;
   readonly modalText: Locator;
-  readonly okButton: Locator;
+  readonly guestLinkPasswordInput: Locator;
+  readonly guestLinkPasswordConfirmInput: Locator;
+  readonly createLinkButton: Locator;
 
   constructor(page: Page) {
     this.page = page;
 
-    this.modal = page.locator("[data-uie-name='primary-modals-container'][aria-label='Call not established']");
-    this.modalTitle = this.modal.locator("[data-uie-name='status-modal-title']");
-    this.modalText = this.modal.locator("[data-uie-name='status-modal-text']");
-    this.okButton = this.modal.locator("[data-uie-name='do-action']");
+    this.modal = page.locator("[data-uie-name='primary-modals-container']");
+    this.modalTitle = this.modal.locator('#modal-title');
+    this.modalText = this.modal.locator('#modal-description-text');
+    this.guestLinkPasswordInput = this.modal.locator("[data-uie-name='guest-link-password']");
+    this.guestLinkPasswordConfirmInput = this.modal.locator("[data-uie-name='guest-link-password-confirm']");
+    this.createLinkButton = this.modal.locator("[data-uie-name='do-action']");
   }
 
   async isModalPresent() {
@@ -44,7 +48,13 @@ export class CallNotEstablishedModal {
     return (await this.modalTitle.textContent()) ?? '';
   }
 
-  async clickOk() {
-    await this.okButton.click();
+  async getModalText() {
+    return (await this.modalText.textContent()) ?? '';
+  }
+
+  async setGuestLinkPassword(password: string) {
+    await this.guestLinkPasswordInput.fill(password);
+    await this.guestLinkPasswordConfirmInput.fill(password);
+    await this.createLinkButton.click();
   }
 }

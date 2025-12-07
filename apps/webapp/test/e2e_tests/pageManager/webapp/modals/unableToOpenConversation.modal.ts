@@ -17,34 +17,35 @@
  *
  */
 
-import {Locator, Page} from '@playwright/test';
+import {Page, Locator} from '@playwright/test';
 
-export class CallNotEstablishedModal {
+import {selectByDataAttribute} from 'test/e2e_tests/utils/selector.util';
+
+export class UnableToOpenConversationModal {
   readonly page: Page;
 
   readonly modal: Locator;
-  readonly modalTitle: Locator;
-  readonly modalText: Locator;
-  readonly okButton: Locator;
+  readonly acknowledgeButton: Locator;
 
   constructor(page: Page) {
     this.page = page;
 
-    this.modal = page.locator("[data-uie-name='primary-modals-container'][aria-label='Call not established']");
-    this.modalTitle = this.modal.locator("[data-uie-name='status-modal-title']");
-    this.modalText = this.modal.locator("[data-uie-name='status-modal-text']");
-    this.okButton = this.modal.locator("[data-uie-name='do-action']");
+    this.modal = page.locator(
+      `${selectByDataAttribute('primary-modals-container')}[aria-label='Wire can’t open this conversation.']`,
+    );
+    this.acknowledgeButton = this.modal.locator(`${selectByDataAttribute('do-action')}`);
   }
 
   async isModalPresent() {
-    return await this.modal.isVisible();
+    return this.modal.isVisible();
   }
 
-  async getModalTitle() {
-    return (await this.modalTitle.textContent()) ?? '';
+  async isActionButtonVisible() {
+    return await this.acknowledgeButton.isVisible();
   }
 
-  async clickOk() {
-    await this.okButton.click();
+  async clickAcknowledge() {
+    await this.acknowledgeButton.isVisible();
+    await this.acknowledgeButton.click();
   }
 }
