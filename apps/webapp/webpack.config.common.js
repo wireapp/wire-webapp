@@ -23,8 +23,8 @@ const CopyPlugin = require('copy-webpack-plugin');
 const WorkboxPlugin = require('workbox-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 
-const DIST_PATH = path.resolve(__dirname, 'apps/server/dist');
-const ROOT_PATH = path.resolve(__dirname);
+const DIST_PATH = path.resolve(__dirname, '../../apps/server/dist');
+const ROOT_PATH = path.resolve(__dirname, '../..');
 const SRC_PATH = path.resolve(__dirname, 'src');
 
 const dist = path.resolve(DIST_PATH, 'static');
@@ -161,15 +161,15 @@ module.exports = {
     new CopyPlugin({
       patterns: [
         {
-          context: 'node_modules/@mediapipe/tasks-vision/wasm',
+          context: path.resolve(ROOT_PATH, 'node_modules/@mediapipe/tasks-vision/wasm'),
           from: '*',
           to: `${dist}/min/mediapipe/wasm`,
         },
         // copying all static resources (audio, images, fonts...)
-        {from: 'resource', to: dist},
-        {from: `assets`, to: `${dist}/assets`},
-        {from: 'src/page/basicBrowserFeatureCheck.js', to: `${dist}/min/`},
-        {from: 'src/page/loader.js', to: `${dist}/min/`},
+        {from: path.resolve(ROOT_PATH, 'resource'), to: dist},
+        {from: path.resolve(__dirname, 'assets'), to: `${dist}/assets`},
+        {from: path.resolve(SRC_PATH, 'page/basicBrowserFeatureCheck.js'), to: `${dist}/min/`},
+        {from: path.resolve(SRC_PATH, 'page/loader.js'), to: `${dist}/min/`},
         // Copy PDF worker for react-pdf package
         {
           from: path.dirname(require.resolve('pdfjs-dist/package.json')) + '/build/pdf.worker.mjs',
@@ -179,7 +179,7 @@ module.exports = {
         },
         // Copy and flatten everything from core-crypto src
         {
-          from: 'node_modules/@wireapp/core-crypto/src/**/*',
+          from: path.resolve(ROOT_PATH, 'node_modules/@wireapp/core-crypto/src/**/*'),
           to: `${dist}/min/[name][ext]`,
         },
       ],
