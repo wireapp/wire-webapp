@@ -17,10 +17,10 @@
  *
  */
 
-import * as telemetry from '@wireapp/telemetry';
-
 import {Config} from 'src/script/Config';
 import {createUuid} from 'Util/uuid';
+
+import * as telemetry from '@wireapp/telemetry';
 
 let telemetryInitialized = false;
 

@@ -18,7 +18,6 @@
  */
 
 import {render} from '@testing-library/react';
-
 import {User} from 'Repositories/entity/User';
 import {t} from 'Util/LocalizerUtil';
 import {createUuid} from 'Util/uuid';

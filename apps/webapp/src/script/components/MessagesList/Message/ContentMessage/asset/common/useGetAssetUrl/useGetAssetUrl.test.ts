@@ -18,7 +18,6 @@
  */
 
 import {act, renderHook} from '@testing-library/react';
-
 import {AssetError} from 'Repositories/assets/AssetError';
 import {AssetRemoteData} from 'Repositories/assets/AssetRemoteData';
 import {AssetTransferState} from 'Repositories/assets/AssetTransferState';

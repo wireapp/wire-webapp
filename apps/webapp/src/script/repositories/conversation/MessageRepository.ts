@@ -43,14 +43,8 @@ import {OtrMessage} from '@wireapp/core/lib/conversation/message/OtrMessage';
 import {TextContentBuilder} from '@wireapp/core/lib/conversation/message/TextContentBuilder';
 import {isQualifiedUserClients} from '@wireapp/core/lib/util';
 import {amplify} from 'amplify';
-import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
-import {container} from 'tsyringe';
-import {partition} from 'underscore';
-
-import {Asset, Availability, Confirmation, GenericMessage} from '@wireapp/protocol-messaging';
-import {WebAppEvents} from '@wireapp/webapp-events';
-
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
+import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 import {buildMetadata, ImageMetadata, isAudio, isImage, isVideo} from 'Repositories/assets/AssetMetaDataBuilder';
 import {AssetRepository} from 'Repositories/assets/AssetRepository';
 import {AssetTransferState} from 'Repositories/assets/AssetTransferState';
@@ -80,6 +74,9 @@ import {Segmentation} from 'Repositories/tracking/Segmentation';
 import {protoFromType} from 'Repositories/user/AvailabilityMapper';
 import {UserRepository} from 'Repositories/user/UserRepository';
 import {UserState} from 'Repositories/user/UserState';
+import {container} from 'tsyringe';
+import {partition} from 'underscore';
+import {getWebEnvironment} from 'Util/Environment';
 import {
   cancelSendingLinkPreview,
   clearLinkPreviewSendingState,
@@ -96,6 +93,9 @@ import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 import {isBackendError} from 'Util/TypePredicateUtil';
 import {loadUrlBlob, supportsMLS} from 'Util/util';
 import {createUuid} from 'Util/uuid';
+
+import {Asset, Availability, Confirmation, GenericMessage} from '@wireapp/protocol-messaging';
+import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {findDeletedClients} from './ClientMismatchUtil';
 import {ConversationRepository} from './ConversationRepository';

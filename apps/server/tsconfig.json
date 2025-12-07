@@ -1,21 +1,12 @@
 {
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
-    "alwaysStrict": true,
-    "esModuleInterop": true,
     "module": "commonjs",
     "outDir": "dist",
     "removeComments": true,
     "lib": ["esnext"],
-    "downlevelIteration": true,
-    "forceConsistentCasingInFileNames": true,
-    "moduleResolution": "node",
     "noEmitOnError": true,
-    "noImplicitAny": true,
-    "noImplicitReturns": true,
-    "noUnusedLocals": true,
     "rootDir": ".",
-    "sourceMap": true,
     "target": "es2017",
     "types": ["node", "jest"]
   },

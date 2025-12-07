@@ -20,12 +20,6 @@
 import {KeyboardEvent as ReactKeyBoardEvent, useCallback, useEffect, useMemo, useRef, useState} from 'react';
 
 import {amplify} from 'amplify';
-import {container} from 'tsyringe';
-import {useShallow} from 'zustand/react/shallow';
-
-import {useMatchMedia} from '@wireapp/react-ui-kit';
-import {WebAppEvents} from '@wireapp/webapp-events';
-
 import {useConversationFocus} from 'Hooks/useConversationFocus';
 import {CallState} from 'Repositories/calling/CallState';
 import {createLabel} from 'Repositories/conversation/ConversationLabelRepository';
@@ -46,8 +40,13 @@ import {Preferences} from 'src/script/page/LeftSidebar/panels/Preferences';
 import {ANIMATED_PAGE_TRANSITION_DURATION} from 'src/script/page/MainContent';
 import {useAppMainState, ViewType} from 'src/script/page/state';
 import {ContentState, ListState} from 'src/script/page/useAppState';
+import {container} from 'tsyringe';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {useChannelsFeatureFlag} from 'Util/useChannelsFeatureFlag';
+import {useShallow} from 'zustand/react/shallow';
+
+import {useMatchMedia} from '@wireapp/react-ui-kit';
+import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {ConversationCallingView} from './ConversationCallingView/ConversationCallingView';
 import {ConversationHeader} from './ConversationHeader';

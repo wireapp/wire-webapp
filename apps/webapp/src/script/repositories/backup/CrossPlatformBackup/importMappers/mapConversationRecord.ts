@@ -18,7 +18,6 @@
  */
 
 import {CONVERSATION_TYPE} from '@wireapp/api-client/lib/conversation/';
-
 import {ConversationRecord} from 'Repositories/storage';
 
 import {BackUpConversation} from '../CPB.library';

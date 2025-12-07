@@ -22,10 +22,9 @@ import React, {useRef, useState} from 'react';
 import {connect} from 'react-redux';
 import {Navigate, useNavigate} from 'react-router-dom';
 import {AnyAction, Dispatch} from 'redux';
+import {t} from 'Util/LocalizerUtil';
 
 import {Button, ContainerXS, Form, H1, Input} from '@wireapp/react-ui-kit';
-
-import {t} from 'Util/LocalizerUtil';
 
 import {Page} from './Page';
 

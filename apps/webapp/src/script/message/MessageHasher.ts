@@ -18,7 +18,6 @@
  */
 
 import Long from 'long';
-
 import {ClientEvent} from 'Repositories/event/Client';
 import {LegacyEventRecord} from 'Repositories/storage/record/EventRecord';
 import {utf8ToUtf16BE} from 'Util/StringUtil';

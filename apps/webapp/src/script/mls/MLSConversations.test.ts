@@ -19,16 +19,15 @@
 
 import {CONVERSATION_TYPE} from '@wireapp/api-client/lib/conversation';
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
-
-import {randomUUID} from 'crypto';
-
-import {Account} from '@wireapp/core';
-
 import {MLSConversation} from 'Repositories/conversation/ConversationSelectors';
 import {Conversation} from 'Repositories/entity/Conversation';
 import {User} from 'Repositories/entity/User';
 import {Core} from 'src/script/service/CoreSingleton';
 import {TestFactory} from 'test/helper/TestFactory';
+
+import {randomUUID} from 'crypto';
+
+import {Account} from '@wireapp/core';
 
 import {initMLSGroupConversations, initialiseSelfAndTeamConversations} from './MLSConversations';
 

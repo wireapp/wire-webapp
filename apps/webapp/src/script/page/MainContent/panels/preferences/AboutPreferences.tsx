@@ -19,13 +19,12 @@
 
 import {useMemo} from 'react';
 
-import {container} from 'tsyringe';
-
-import {Link, LinkVariant} from '@wireapp/react-ui-kit';
-
 import {User} from 'Repositories/entity/User';
 import {TeamState} from 'Repositories/team/TeamState';
+import {container} from 'tsyringe';
 import {t} from 'Util/LocalizerUtil';
+
+import {Link, LinkVariant} from '@wireapp/react-ui-kit';
 
 import {PreferencesPage} from './components/PreferencesPage';
 import {PreferencesSection} from './components/PreferencesSection';

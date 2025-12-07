@@ -17,18 +17,13 @@
  *
  */
 
-import {useEffect} from 'react';
-
+import {useInView} from 'Hooks/useInView/useInView';
+import {CellsRepository} from 'Repositories/cells/CellsRepository';
 import {container} from 'tsyringe';
+import {formatBytes, getFileExtension, trimFileExtension} from 'Util/util';
 
 import {ICellAsset} from '@wireapp/protocol-messaging';
 
-import {useInView} from 'Hooks/useInView/useInView';
-import {CellsRepository} from 'Repositories/cells/CellsRepository';
-import {t} from 'Util/LocalizerUtil';
-import {formatBytes, getFileExtension, trimFileExtension} from 'Util/util';
-
-import {MediaFilePreviewCard} from './common/MediaFilePreviewCard/MediaFilePreviewCard';
 import {FileAssetCard} from './FileAssetCard/FileAssetCard';
 import {ImageAssetCard} from './ImageAssetCard/ImageAssetCard';
 import {

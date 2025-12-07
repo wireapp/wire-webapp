@@ -19,12 +19,11 @@
 
 import {CONVERSATION_TYPE, CONVERSATION_ACCESS, CONVERSATION_ACCESS_ROLE} from '@wireapp/api-client/lib/conversation';
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
-import {container} from 'tsyringe';
-
 import {ConversationDatabaseData, ConversationMapper} from 'Repositories/conversation/ConversationMapper';
 import {User} from 'Repositories/entity/User';
 import {Core} from 'src/script/service/CoreSingleton';
 import {TestFactory} from 'test/helper/TestFactory';
+import {container} from 'tsyringe';
 import {createUuid} from 'Util/uuid';
 
 import {joinConversationsAfterMigrationFinalisation} from '.';

@@ -17,11 +17,11 @@
  *
  */
 
-import {Asset as ProtobufAsset} from '@wireapp/protocol-messaging';
-
 import {AssetTransferState} from 'Repositories/assets/AssetTransferState';
 import {AssetAddEvent} from 'Repositories/conversation/EventBuilder';
 import {StoredEvent} from 'Repositories/storage';
+
+import {Asset as ProtobufAsset} from '@wireapp/protocol-messaging';
 
 import {EventValidationError} from './EventValidationError';
 

@@ -19,16 +19,15 @@
 
 import {useState, useEffect} from 'react';
 
-import {useDebouncedCallback} from 'use-debounce';
-
-import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
-
 import * as Icon from 'Components/Icon';
 import {ServiceList} from 'Components/ServiceList/ServiceList';
 import {IntegrationRepository} from 'Repositories/integration/IntegrationRepository';
 import {ServiceEntity} from 'Repositories/integration/ServiceEntity';
+import {useDebouncedCallback} from 'use-debounce';
 import {t} from 'Util/LocalizerUtil';
 import {safeWindowOpen} from 'Util/SanitizationUtil';
+
+import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
 
 import {getManageServicesUrl} from '../../../../externalRoute';
 

@@ -22,10 +22,8 @@ import {ConnectionStatus} from '@wireapp/api-client/lib/connection/';
 import {CONVERSATION_TYPE} from '@wireapp/api-client/lib/conversation/';
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 import {ClientMLSError, ClientMLSErrorLabel} from '@wireapp/core/lib/messagingProtocols/mls';
-import ko from 'knockout';
-import {container} from 'tsyringe';
-
 import {PrimaryModalComponent} from 'Components/Modals/PrimaryModal/PrimaryModal';
+import ko from 'knockout';
 import {ConnectionEntity} from 'Repositories/connection/ConnectionEntity';
 import {ConversationRoleRepository} from 'Repositories/conversation/ConversationRoleRepository';
 import {ConversationState} from 'Repositories/conversation/ConversationState';
@@ -36,6 +34,7 @@ import {TeamState} from 'Repositories/team/TeamState';
 import {UserState} from 'Repositories/user/UserState';
 import {withTheme} from 'src/script/auth/util/test/TestUtil';
 import {ActionsViewModel} from 'src/script/view_model/ActionsViewModel';
+import {container} from 'tsyringe';
 import {noop} from 'Util/util';
 
 import {ActionIdentifier, Actions, UserActions} from './UserActions';

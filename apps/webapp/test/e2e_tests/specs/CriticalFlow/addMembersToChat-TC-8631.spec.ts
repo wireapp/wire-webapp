@@ -17,7 +17,8 @@
  *
  */
 
-import {User} from 'test/e2e_tests/data/user';
+import {BrowserContext} from '@playwright/test';
+import {addCreatedTeam, removeCreatedTeam} from 'test/e2e_tests/utils/tearDown.util';
 
 import {Services} from '../../data/serviceInfo';
 import {PageManager} from '../../pageManager';

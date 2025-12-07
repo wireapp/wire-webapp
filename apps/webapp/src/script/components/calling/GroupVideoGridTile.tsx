@@ -20,10 +20,6 @@
 import {KeyboardEvent} from 'react';
 
 import {QualifiedId} from '@wireapp/api-client/lib/user';
-
-import {VIDEO_STATE} from '@wireapp/avs';
-import {TabIndex} from '@wireapp/react-ui-kit';
-
 import {Avatar, AVATAR_SIZE} from 'Components/Avatar';
 import {
   groupVideoActiveSpeaker,
@@ -40,6 +36,9 @@ import type {Participant} from 'Repositories/calling/Participant';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {isEnterKey} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
+
+import {VIDEO_STATE} from '@wireapp/avs';
+import {TabIndex} from '@wireapp/react-ui-kit';
 
 import {Video} from './Video';
 

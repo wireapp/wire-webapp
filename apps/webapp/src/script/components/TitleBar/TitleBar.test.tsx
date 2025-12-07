@@ -20,13 +20,8 @@
 import {fireEvent, render, waitFor} from '@testing-library/react';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {amplify} from 'amplify';
-import ko from 'knockout';
-
-import {Runtime} from '@wireapp/commons';
-import * as uiKit from '@wireapp/react-ui-kit';
-import {WebAppEvents} from '@wireapp/webapp-events';
-
 import {TitleBar} from 'Components/TitleBar';
+import ko from 'knockout';
 import {CallingRepository} from 'Repositories/calling/CallingRepository';
 import {CallState} from 'Repositories/calling/CallState';
 import {ConversationVerificationState} from 'Repositories/conversation/ConversationVerificationState';
@@ -35,6 +30,10 @@ import {User} from 'Repositories/entity/User';
 import {TeamState} from 'Repositories/team/TeamState';
 import {withTheme} from 'src/script/auth/util/test/TestUtil';
 import {ContentState} from 'src/script/page/useAppState';
+
+import {Runtime} from '@wireapp/commons';
+import * as uiKit from '@wireapp/react-ui-kit';
+import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {TestFactory} from '../../../../test/helper/TestFactory';
 import {PanelState} from '../../page/RightSidebar/RightSidebar';

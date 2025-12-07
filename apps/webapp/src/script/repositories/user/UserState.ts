@@ -18,9 +18,8 @@
  */
 
 import ko from 'knockout';
-import {singleton} from 'tsyringe';
-
 import {User} from 'Repositories/entity/User';
+import {singleton} from 'tsyringe';
 import {sortUsersByPriority} from 'Util/StringUtil';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 

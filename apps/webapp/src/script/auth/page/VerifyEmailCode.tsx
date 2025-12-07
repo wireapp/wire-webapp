@@ -24,11 +24,10 @@ import {FormattedMessage} from 'react-intl';
 import {connect} from 'react-redux';
 import {useNavigate} from 'react-router-dom';
 import {AnyAction, Dispatch} from 'redux';
-
-import {ActionLinkButton, CodeInput, FlexBox, Text} from '@wireapp/react-ui-kit';
-
 import {t} from 'Util/LocalizerUtil';
 import {getLogger} from 'Util/Logger';
+
+import {ActionLinkButton, CodeInput, FlexBox, Text} from '@wireapp/react-ui-kit';
 
 import {Page} from './Page';
 import {styles} from './VerifyEmailCode.styles';

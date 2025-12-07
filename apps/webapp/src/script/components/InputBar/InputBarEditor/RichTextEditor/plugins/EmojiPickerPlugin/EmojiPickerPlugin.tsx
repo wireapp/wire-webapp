@@ -25,7 +25,6 @@ import {MenuOption, MenuRenderFn, MenuTextMatch} from '@lexical/react/LexicalTyp
 import emojiList from 'emoji-picker-react/src/data/emojis.json';
 import {$createTextNode, TextNode} from 'lexical';
 import * as ReactDOM from 'react-dom';
-
 import {StorageKey} from 'Repositories/storage';
 import {loadValue, storeValue} from 'Util/StorageUtil';
 import {sortByPriority} from 'Util/StringUtil';

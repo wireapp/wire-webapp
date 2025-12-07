@@ -17,9 +17,14 @@
  *
  */
 
-import {Page} from '@playwright/test';
+import {Page, Locator} from '@playwright/test';
+import {selectByDataAttribute} from 'test/e2e_tests/utils/selector.util';
 
-import {ConfirmModal} from './confirm.modal';
+export class VerifyEmailModal {
+  readonly page: Page;
+
+  readonly modal: Locator;
+  readonly okButton: Locator;
 
 export class BlockWarningModal extends ConfirmModal {
   constructor(page: Page) {

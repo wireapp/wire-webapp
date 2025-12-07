@@ -18,11 +18,10 @@
  */
 
 import type {QualifiedId, SearchResult} from '@wireapp/api-client/lib/user/';
-import {container} from 'tsyringe';
-
 import type {User} from 'Repositories/entity/User';
 import {validateHandle} from 'Repositories/user/UserHandleGenerator';
 import type {UserRepository} from 'Repositories/user/UserRepository';
+import {container} from 'tsyringe';
 import {EMOJI_RANGES} from 'Util/EmojiUtil';
 import {
   computeTransliteration,

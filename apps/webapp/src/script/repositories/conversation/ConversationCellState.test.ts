@@ -18,7 +18,6 @@
  */
 
 import {CONVERSATION_TYPE} from '@wireapp/api-client/lib/conversation';
-
 import {Conversation} from 'Repositories/entity/Conversation';
 import {CallMessage} from 'Repositories/entity/message/CallMessage';
 import {ContentMessage} from 'Repositories/entity/message/ContentMessage';

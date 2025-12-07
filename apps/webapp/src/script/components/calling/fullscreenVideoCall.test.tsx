@@ -18,9 +18,6 @@
  */
 
 import {act, render, waitFor} from '@testing-library/react';
-
-import {QUERY, useMatchMedia} from '@wireapp/react-ui-kit';
-
 import {Call} from 'Repositories/calling/Call';
 import {Participant} from 'Repositories/calling/Participant';
 import {Grid} from 'Repositories/calling/videoGridHandler';
@@ -30,6 +27,8 @@ import {PropertiesRepository} from 'Repositories/properties/PropertiesRepository
 import {PropertiesService} from 'Repositories/properties/PropertiesService';
 import {SelfService} from 'Repositories/self/SelfService';
 import {buildMediaDevicesHandler, withTheme} from 'src/script/auth/util/test/TestUtil';
+
+import {QUERY, useMatchMedia} from '@wireapp/react-ui-kit';
 
 import {FullscreenVideoCall, FullscreenVideoCallProps} from './FullscreenVideoCall';
 

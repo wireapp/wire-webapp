@@ -18,9 +18,8 @@
  */
 
 import {render, fireEvent} from '@testing-library/react';
-import {container} from 'tsyringe';
-
 import {CallState} from 'Repositories/calling/CallState';
+import {container} from 'tsyringe';
 
 import {ChooseScreen} from './ChooseScreen';
 

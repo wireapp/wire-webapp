@@ -17,9 +17,9 @@
  *
  */
 
-import {Button, ButtonVariant, CloseIcon} from '@wireapp/react-ui-kit';
-
 import {t} from 'Util/LocalizerUtil';
+
+import {Button, ButtonVariant, CloseIcon} from '@wireapp/react-ui-kit';
 
 import {buttonStyles} from './CellsClearFilters.styles';
 

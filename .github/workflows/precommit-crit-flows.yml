@@ -42,7 +42,7 @@ jobs:
 
       - run: yarn --immutable
       - run: yarn nx run webapp:configure
-      - run: yarn nx run server:package
+      - run: yarn nx run-many -t build --all
 
       - name: Derive PR commit metadata
         id: meta

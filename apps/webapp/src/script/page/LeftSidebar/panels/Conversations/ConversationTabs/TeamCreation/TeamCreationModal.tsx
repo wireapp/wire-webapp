@@ -20,14 +20,13 @@
 import {useEffect, useState} from 'react';
 
 import {amplify} from 'amplify';
-
-import {WebAppEvents} from '@wireapp/webapp-events';
-
 import * as Icon from 'Components/Icon';
 import {ModalComponent} from 'Components/Modals/ModalComponent';
 import {EventName} from 'Repositories/tracking/EventName';
 import {Segmentation} from 'Repositories/tracking/Segmentation';
 import {t} from 'Util/LocalizerUtil';
+
+import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {teamCreationModalBodyCss, teamCreationModalWrapperCss} from './TeamCreation.styles';
 import {Confirmation} from './TeamCreationSteps/Confirmation';

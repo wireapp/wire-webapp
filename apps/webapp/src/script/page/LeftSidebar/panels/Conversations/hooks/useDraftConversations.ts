@@ -19,10 +19,9 @@
 
 import {useEffect, useState, useRef, useCallback} from 'react';
 
-import {useDebouncedCallback} from 'use-debounce';
-
 import {Conversation} from 'Repositories/entity/Conversation';
 import {StorageKey} from 'Repositories/storage';
+import {useDebouncedCallback} from 'use-debounce';
 
 import {conversationHasDraft} from '../utils/draftUtils';
 

@@ -23,12 +23,11 @@ import type {RegisterData} from '@wireapp/api-client/lib/auth';
 import {BackendErrorLabel} from '@wireapp/api-client/lib/http';
 import {connect} from 'react-redux';
 import {Navigate} from 'react-router-dom';
+import {t} from 'Util/LocalizerUtil';
+import {noop} from 'Util/util';
 
 import {UrlUtil} from '@wireapp/commons';
 import {Column, Columns, H1, Muted} from '@wireapp/react-ui-kit';
-
-import {t} from 'Util/LocalizerUtil';
-import {noop} from 'Util/util';
 
 import {GuestLoginColumn, IsLoggedInColumn, Separator} from './ConversationJoinComponents';
 import {ConversationJoinFull} from './ConversationJoinInvalid';

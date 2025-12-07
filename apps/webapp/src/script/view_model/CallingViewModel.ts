@@ -20,12 +20,6 @@
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {amplify} from 'amplify';
 import ko from 'knockout';
-import {container} from 'tsyringe';
-
-import {REASON as CALL_REASON, STATE as CALL_STATE} from '@wireapp/avs';
-import {Availability} from '@wireapp/protocol-messaging';
-import {WebAppEvents} from '@wireapp/webapp-events';
-
 import 'Components/calling/ChooseScreen';
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import type {AudioRepository} from 'Repositories/audio/AudioRepository';
@@ -48,9 +42,14 @@ import {PROPERTIES_TYPE} from 'Repositories/properties/PropertiesType';
 import type {TeamRepository} from 'Repositories/team/TeamRepository';
 import {TeamState} from 'Repositories/team/TeamState';
 import {ROLE} from 'Repositories/user/UserPermission';
+import {container} from 'tsyringe';
 import {replaceLink, t} from 'Util/LocalizerUtil';
 import {matchQualifiedIds} from 'Util/QualifiedId';
 import {safeWindowOpen} from 'Util/SanitizationUtil';
+
+import {REASON as CALL_REASON, STATE as CALL_STATE} from '@wireapp/avs';
+import {Availability} from '@wireapp/protocol-messaging';
+import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {Config} from '../Config';
 

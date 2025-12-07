@@ -18,7 +18,6 @@
  */
 
 import {render, fireEvent} from '@testing-library/react';
-
 import {CopyIcon, EditIcon, PickupIcon} from 'Components/Icon';
 
 import {PanelActions, MenuItem} from './PanelActions';

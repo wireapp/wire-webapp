@@ -18,7 +18,6 @@
  */
 
 import ko from 'knockout';
-
 import {ReactionMap} from 'Repositories/storage';
 import {t} from 'Util/LocalizerUtil';
 

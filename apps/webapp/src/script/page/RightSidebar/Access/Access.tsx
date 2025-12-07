@@ -20,9 +20,6 @@
 import {useState} from 'react';
 
 import {ADD_PERMISSION, CONVERSATION_ACCESS} from '@wireapp/api-client/lib/conversation/';
-
-import {TabIndex} from '@wireapp/react-ui-kit';
-
 import {FadingScrollbar} from 'Components/FadingScrollbar';
 import {ConversationAccess} from 'Components/Modals/CreateConversation/types';
 import {getConversationAccessOptions, getConversationManagerOptions} from 'Components/Modals/CreateConversation/utils';
@@ -33,6 +30,8 @@ import {Conversation} from 'Repositories/entity/Conversation';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 import {useChannelsFeatureFlag} from 'Util/useChannelsFeatureFlag';
+
+import {TabIndex} from '@wireapp/react-ui-kit';
 
 import {conversationAccessContainerCss, conversationAccessContentCss} from './Access.styles';
 

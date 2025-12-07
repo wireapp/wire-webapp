@@ -18,7 +18,6 @@
  */
 
 import {fireEvent, render} from '@testing-library/react';
-
 import {User} from 'Repositories/entity/User';
 import {ServiceEntity} from 'Repositories/integration/ServiceEntity';
 

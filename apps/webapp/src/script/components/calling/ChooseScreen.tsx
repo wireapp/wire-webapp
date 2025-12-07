@@ -19,10 +19,9 @@
 
 import {Fragment, useCallback, useEffect} from 'react';
 
-import {container} from 'tsyringe';
-
 import {CallState} from 'Repositories/calling/CallState';
 import {ElectronDesktopCapturerSource} from 'Repositories/media/MediaDevicesHandler';
+import {container} from 'tsyringe';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 

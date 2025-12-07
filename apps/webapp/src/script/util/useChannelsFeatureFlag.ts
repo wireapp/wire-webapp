@@ -18,10 +18,9 @@
  */
 
 import {ACCESS_TYPE, FEATURE_KEY, FEATURE_STATUS, Role} from '@wireapp/api-client/lib/team';
-import {container} from 'tsyringe';
-
 import {Config} from 'src/script/Config';
 import {TeamState} from 'src/script/repositories/team/TeamState';
+import {container} from 'tsyringe';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 
 import {Core} from '../service/CoreSingleton';

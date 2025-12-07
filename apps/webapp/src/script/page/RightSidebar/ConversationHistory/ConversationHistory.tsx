@@ -19,17 +19,16 @@
 
 import {useState} from 'react';
 
-import {container} from 'tsyringe';
-
-import {FlexBox, Input, Select} from '@wireapp/react-ui-kit';
-
 import {FadingScrollbar} from 'Components/FadingScrollbar';
 import {customHistorySharingInputCss} from 'Components/Modals/CreateConversation/CreateConversationSteps/CreateConversationSteps.styles';
 import {ChatHistory, HistorySharingUnit} from 'Components/Modals/CreateConversation/types';
 import {getChatHistoryOptions, getChatHistorySharingUnitOptions} from 'Components/Modals/CreateConversation/utils';
 import {RadioGroup} from 'Components/Radio';
 import {TeamState} from 'Repositories/team/TeamState';
+import {container} from 'tsyringe';
 import {t} from 'Util/LocalizerUtil';
+
+import {FlexBox, Input, Select} from '@wireapp/react-ui-kit';
 
 import {
   conversationHistoryContainerCss,

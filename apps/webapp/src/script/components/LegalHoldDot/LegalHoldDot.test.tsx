@@ -18,7 +18,6 @@
  */
 
 import {render} from '@testing-library/react';
-
 import {LegalHoldDot} from 'Components/LegalHoldDot';
 
 describe('LegalHoldDot', () => {

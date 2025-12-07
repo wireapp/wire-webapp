@@ -20,7 +20,6 @@
 import {useCallback, useEffect, useRef, useState} from 'react';
 
 import {Virtualizer} from '@tanstack/react-virtual';
-
 import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
 import {Conversation} from 'Repositories/entity/Conversation';
 import {isLastReceivedMessage} from 'Util/conversationMessages';

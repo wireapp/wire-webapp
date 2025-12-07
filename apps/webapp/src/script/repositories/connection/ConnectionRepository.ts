@@ -23,10 +23,6 @@ import {BackendErrorLabel} from '@wireapp/api-client/lib/http/';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 import type {UserConnectionData, UserUpdateData} from '@wireapp/api-client/lib/user/data/';
 import {amplify} from 'amplify';
-import {container} from 'tsyringe';
-
-import {WebAppEvents} from '@wireapp/webapp-events';
-
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import type {Conversation} from 'Repositories/entity/Conversation';
 import {MemberMessage} from 'Repositories/entity/message/MemberMessage';
@@ -37,10 +33,13 @@ import {SelfService} from 'Repositories/self/SelfService';
 import {TeamService} from 'Repositories/team/TeamService';
 import type {UserRepository} from 'Repositories/user/UserRepository';
 import {UserState} from 'Repositories/user/UserState';
+import {container} from 'tsyringe';
 import {replaceLink, t} from 'Util/LocalizerUtil';
 import {getLogger, Logger} from 'Util/Logger';
 import {matchQualifiedIds} from 'Util/QualifiedId';
 import {isBackendError} from 'Util/TypePredicateUtil';
+
+import {WebAppEvents} from '@wireapp/webapp-events';
 
 import type {ConnectionEntity} from './ConnectionEntity';
 import {ConnectionMapper} from './ConnectionMapper';

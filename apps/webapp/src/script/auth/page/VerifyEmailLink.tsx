@@ -21,10 +21,9 @@ import React, {useEffect} from 'react';
 
 import {connect} from 'react-redux';
 import {useNavigate} from 'react-router-dom';
+import {t} from 'Util/LocalizerUtil';
 
 import {ContainerXS, H1, H3, Muted} from '@wireapp/react-ui-kit';
-
-import {t} from 'Util/LocalizerUtil';
 
 import {Page} from './Page';
 

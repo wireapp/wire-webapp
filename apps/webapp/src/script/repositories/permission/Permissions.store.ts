@@ -17,10 +17,9 @@
  *
  */
 
+import {AppPermissionState} from 'Repositories/notification/AppPermissionState';
 import {immer} from 'zustand/middleware/immer';
 import {createStore} from 'zustand/vanilla';
-
-import {AppPermissionState} from 'Repositories/notification/AppPermissionState';
 
 import {BrowserPermissionStatus} from './BrowserPermissionStatus';
 import {normalizePermissionState, PermissionStateResult, UnifiedPermissionState} from './Permissions.types';

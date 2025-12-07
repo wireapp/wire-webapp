@@ -21,10 +21,14 @@ import React, {useRef, useState} from 'react';
 
 import {BackendError, SyntheticErrorLabel} from '@wireapp/api-client/lib/http';
 import {amplify} from 'amplify';
+import {LogoFullIcon} from 'Components/Icon';
 import {StatusCodes as HTTP_STATUS, StatusCodes} from 'http-status-codes';
 import {connect} from 'react-redux';
 import {useParams} from 'react-router-dom';
 import {AnyAction, Dispatch} from 'redux';
+import {calculateChildWindowPosition} from 'Util/DOM/caculateChildWindowPosition';
+import {t} from 'Util/LocalizerUtil';
+import {getLogger} from 'Util/Logger';
 
 import {
   COLOR,
@@ -44,11 +48,6 @@ import {
   useMatchMedia,
 } from '@wireapp/react-ui-kit';
 import {WebAppEvents} from '@wireapp/webapp-events';
-
-import {LogoFullIcon} from 'Components/Icon';
-import {calculateChildWindowPosition} from 'Util/DOM/caculateChildWindowPosition';
-import {t} from 'Util/LocalizerUtil';
-import {getLogger} from 'Util/Logger';
 
 import {Page} from './Page';
 import {SingleSignOnForm} from './SingleSignOnForm';

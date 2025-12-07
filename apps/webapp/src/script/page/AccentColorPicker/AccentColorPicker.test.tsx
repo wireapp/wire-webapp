@@ -19,10 +19,9 @@
 
 import {act, render} from '@testing-library/react';
 import ko from 'knockout';
+import {User} from 'Repositories/entity/User';
 
 import {AccentColor} from '@wireapp/commons';
-
-import {User} from 'Repositories/entity/User';
 
 import {AccentColorPicker, AccentColorPickerProps} from './AccentColorPicker';
 

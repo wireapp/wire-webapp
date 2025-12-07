@@ -21,11 +21,10 @@ import React, {useEffect} from 'react';
 
 import {connect} from 'react-redux';
 import {AnyAction, Dispatch} from 'redux';
+import {t} from 'Util/LocalizerUtil';
 
 import {UrlUtil, StringUtil, Runtime} from '@wireapp/commons';
 import {Button, ButtonVariant, ContainerXS, Muted, QUERY, Text, useMatchMedia, useTimeout} from '@wireapp/react-ui-kit';
-
-import {t} from 'Util/LocalizerUtil';
 
 import {Page} from './Page';
 

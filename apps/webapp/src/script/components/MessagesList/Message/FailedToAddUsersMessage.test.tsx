@@ -20,7 +20,6 @@
 import {act, render} from '@testing-library/react';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {AddUsersFailure, AddUsersFailureReasons} from '@wireapp/core/lib/conversation';
-
 import en from 'I18n/en-US.json';
 import {FailedToAddUsersMessage as FailedToAddUsersMessageEntity} from 'Repositories/entity/message/FailedToAddUsersMessage';
 import {User} from 'Repositories/entity/User';

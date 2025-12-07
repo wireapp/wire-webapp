@@ -21,11 +21,6 @@ import {useCallback, useEffect, useMemo, useRef} from 'react';
 
 import {amplify} from 'amplify';
 import cx from 'classnames';
-import {container} from 'tsyringe';
-
-import {CallIcon, IconButton, IconButtonVariant, QUERY, TabIndex, useMatchMedia} from '@wireapp/react-ui-kit';
-import {WebAppEvents} from '@wireapp/webapp-events';
-
 import {ConversationVerificationBadges} from 'Components/Badge';
 import {useCallAlertState} from 'Components/calling/useCallAlertState';
 import * as Icon from 'Components/Icon';
@@ -39,11 +34,15 @@ import {User} from 'Repositories/entity/User';
 import {TeamState} from 'Repositories/team/TeamState';
 import {useAppMainState, ViewType} from 'src/script/page/state';
 import {ContentState} from 'src/script/page/useAppState';
+import {container} from 'tsyringe';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {handleKeyDown, KEY} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
 import {matchQualifiedIds} from 'Util/QualifiedId';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
+
+import {CallIcon, IconButton, IconButtonVariant, QUERY, TabIndex, useMatchMedia} from '@wireapp/react-ui-kit';
+import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {RightSidebarParams} from '../../page/AppMain';
 import {PanelState} from '../../page/RightSidebar';

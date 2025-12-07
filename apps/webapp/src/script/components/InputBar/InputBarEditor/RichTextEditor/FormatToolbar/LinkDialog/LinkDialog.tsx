@@ -19,11 +19,11 @@
 
 import {useCallback, useEffect, useRef, useState, FormEvent} from 'react';
 
-import {Input, ErrorMessage, Button, ButtonVariant} from '@wireapp/react-ui-kit';
-
 import * as Icon from 'Components/Icon';
 import {ModalComponent} from 'Components/Modals/ModalComponent';
 import {t} from 'Util/LocalizerUtil';
+
+import {Input, ErrorMessage, Button, ButtonVariant} from '@wireapp/react-ui-kit';
 
 import {
   buttonGroupStyles,

@@ -18,9 +18,8 @@
  */
 
 import {render} from '@testing-library/react';
-import {ErrorBoundary} from 'react-error-boundary';
-
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
+import {ErrorBoundary} from 'react-error-boundary';
 
 import {ErrorFallback} from './ErrorFallback';
 

@@ -19,10 +19,10 @@
 
 import type {FormEvent} from 'react';
 
-import {COLOR, Form, Link, Text} from '@wireapp/react-ui-kit';
-
 import {Config} from 'src/script/Config';
 import {t} from 'Util/LocalizerUtil';
+
+import {COLOR, Form, Link, Text} from '@wireapp/react-ui-kit';
 
 import {labelStyles, inputStyles, linkStyles, linkTextStyles} from './JoinGuestLinkPasswordForm.styles';
 

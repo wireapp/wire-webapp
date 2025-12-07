@@ -20,10 +20,9 @@
 import type {MouseEvent} from 'react';
 
 import cx from 'classnames';
+import {t} from 'Util/LocalizerUtil';
 
 import {EmojiIcon} from '@wireapp/react-ui-kit';
-
-import {t} from 'Util/LocalizerUtil';
 
 interface EmojiButtonProps {
   isActive: boolean;

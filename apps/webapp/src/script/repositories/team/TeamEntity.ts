@@ -18,7 +18,6 @@
  */
 
 import ko from 'knockout';
-
 import {AssetRemoteData} from 'Repositories/assets/AssetRemoteData';
 import {isValidAsset} from 'Util/ValidationUtil';
 

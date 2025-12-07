@@ -19,10 +19,10 @@
 
 import React from 'react';
 
-import {TabIndex} from '@wireapp/react-ui-kit';
-
 import {CloseIcon} from 'Components/Icon';
 import {handleKeyDown, KEY} from 'Util/KeyboardUtil';
+
+import {TabIndex} from '@wireapp/react-ui-kit';
 
 interface AssetLoaderProps {
   large?: boolean;

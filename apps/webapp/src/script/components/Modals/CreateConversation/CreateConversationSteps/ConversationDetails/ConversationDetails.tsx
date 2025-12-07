@@ -17,9 +17,8 @@
  *
  */
 
-import {container} from 'tsyringe';
-
 import {UserState} from 'Repositories/user/UserState';
+import {container} from 'tsyringe';
 import {t} from 'Util/LocalizerUtil';
 
 import {ChannelSettings} from './ChannelSettings';

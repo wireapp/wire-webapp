@@ -19,12 +19,12 @@
 
 import {KeyboardEvent, MouseEvent as ReactMouseEvent} from 'react';
 
-import {MoreIcon} from '@wireapp/react-ui-kit';
-
 import {showContextMenu} from 'src/script/ui/ContextMenu';
 import {isSpaceOrEnterKey} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
 import {setContextMenuPosition} from 'Util/util';
+
+import {MoreIcon} from '@wireapp/react-ui-kit';
 
 import {buttonStyles, iconStyles} from './FilePreviewErrorMoreButton.styles';
 

@@ -19,8 +19,6 @@
 
 import {Fragment, useEffect} from 'react';
 
-import {container} from 'tsyringe';
-
 import {useCallAlertState} from 'Components/calling/useCallAlertState';
 import {Call} from 'Repositories/calling/Call';
 import {CallingRepository} from 'Repositories/calling/CallingRepository';
@@ -31,6 +29,7 @@ import {useVideoGrid} from 'Repositories/calling/videoGridHandler';
 import {MediaDevicesHandler} from 'Repositories/media/MediaDevicesHandler';
 import {useMediaDevicesStore} from 'Repositories/media/useMediaDevicesStore';
 import {PropertiesRepository} from 'Repositories/properties/PropertiesRepository';
+import {container} from 'tsyringe';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 
 import {ChooseScreen} from './ChooseScreen';

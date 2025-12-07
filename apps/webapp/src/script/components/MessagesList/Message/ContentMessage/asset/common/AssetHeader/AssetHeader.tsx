@@ -18,7 +18,6 @@
  */
 
 import cx from 'classnames';
-
 import type {Message} from 'Repositories/entity/message/Message';
 import {formatDayMonthNumeral, formatTimeShort} from 'Util/TimeUtil';
 

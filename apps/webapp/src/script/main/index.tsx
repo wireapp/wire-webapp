@@ -23,16 +23,15 @@ import 'core-js/full/reflect';
 // eslint-disable-next-line import/order
 import {ClientType} from '@wireapp/api-client/lib/client/';
 
-import {createRoot} from 'react-dom/client';
-
-import {Runtime} from '@wireapp/commons';
-
 import {AppContainer} from 'Components/AppContainer/AppContainer';
+import {createRoot} from 'react-dom/client';
 import {doSimpleRedirect} from 'Repositories/LifeCycleRepository/LifeCycleRepository';
 import {StorageKey} from 'Repositories/storage';
 import {enableLogging} from 'Util/LoggerUtil';
 import {loadValue} from 'Util/StorageUtil';
 import {exposeWrapperGlobals} from 'Util/wrapper';
+
+import {Runtime} from '@wireapp/commons';
 
 import {SIGN_OUT_REASON} from '../auth/SignOutReason';
 import {Config} from '../Config';

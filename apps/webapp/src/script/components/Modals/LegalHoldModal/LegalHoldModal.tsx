@@ -21,14 +21,13 @@ import {FC, useCallback, useEffect, useRef, useState} from 'react';
 
 import {LegalHoldMemberStatus} from '@wireapp/api-client/lib/team/legalhold/';
 import cx from 'classnames';
-import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
-
 import * as Icon from 'Components/Icon';
 import {LegalHoldDot} from 'Components/LegalHoldDot';
 import {ModalComponent} from 'Components/Modals/ModalComponent';
 import {UserDevicesState, UserDevices} from 'Components/UserDevices';
 import {UserSearchableList} from 'Components/UserSearchableList';
 import {useUserDevicesHistory} from 'Hooks/useUserDevicesHistory';
+import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 import {ClientRepository} from 'Repositories/client';
 import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
 import {MessageRepository} from 'Repositories/conversation/MessageRepository';

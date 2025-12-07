@@ -29,10 +29,9 @@ import {ListPlugin} from '@lexical/react/LexicalListPlugin';
 import {MarkdownShortcutPlugin} from '@lexical/react/LexicalMarkdownShortcutPlugin';
 import {OnChangePlugin} from '@lexical/react/LexicalOnChangePlugin';
 import {RichTextPlugin} from '@lexical/react/LexicalRichTextPlugin';
-import {LexicalEditor, EditorState} from 'lexical';
-
 import {DraftState} from 'Components/InputBar/common/draftState/draftState';
 import {MessageContent} from 'Components/InputBar/common/messageContent/messageContent';
+import {LexicalEditor, EditorState} from 'lexical';
 import {ContentMessage} from 'Repositories/entity/message/ContentMessage';
 import {User} from 'Repositories/entity/User';
 

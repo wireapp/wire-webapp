@@ -19,7 +19,6 @@
 
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 import ko from 'knockout';
-
 import {AssetType} from 'Repositories/assets/AssetType';
 import {containsOnlyLink} from 'Repositories/conversation/linkPreviews/helpers';
 import {mediaParser} from 'Repositories/media/MediaParser';

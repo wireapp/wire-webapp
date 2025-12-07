@@ -20,7 +20,6 @@
 import {useState} from 'react';
 
 import {QualifiedId} from '@wireapp/api-client/lib/user';
-
 import {getCellsApiPath} from 'Components/Conversation/ConversationCells/common/getCellsApiPath/getCellsApiPath';
 import {openBreadcrumb} from 'Components/Conversation/ConversationCells/common/openBreadcrumb/openBreadcrumb';
 import {CellsRepository} from 'Repositories/cells/CellsRepository';

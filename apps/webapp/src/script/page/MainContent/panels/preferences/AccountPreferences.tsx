@@ -17,15 +17,11 @@
  *
  */
 
-import {ErrorBoundary} from 'react-error-boundary';
-import {container} from 'tsyringe';
-
-import {Runtime} from '@wireapp/commons';
-
 import {UserVerificationBadges} from 'Components/Badge';
 import {ErrorFallback} from 'Components/ErrorFallback';
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {useEnrichedFields} from 'Components/panel/EnrichedFields';
+import {ErrorBoundary} from 'react-error-boundary';
 import {ClientRepository} from 'Repositories/client';
 import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
 import {ConversationState} from 'Repositories/conversation/ConversationState';
@@ -36,9 +32,12 @@ import type {UserRepository} from 'Repositories/user/UserRepository';
 import {TeamCreationAccountHeader} from 'src/script/page/LeftSidebar/panels/Conversations/ConversationTabs/TeamCreation/TeamCreationAccountHeader';
 import {ContentState} from 'src/script/page/useAppState';
 import {Core} from 'src/script/service/CoreSingleton';
+import {container} from 'tsyringe';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 import {getLogger} from 'Util/Logger';
+
+import {Runtime} from '@wireapp/commons';
 
 import {AccountInput} from './accountPreferences/AccountInput';
 import {AccountLink} from './accountPreferences/AccountLink';

@@ -19,7 +19,6 @@
 
 import {render, screen} from '@testing-library/react';
 import ko from 'knockout';
-
 import {CallMessage as CallMessageEntity} from 'Repositories/entity/message/CallMessage';
 
 import {CallMessage} from './CallMessage';

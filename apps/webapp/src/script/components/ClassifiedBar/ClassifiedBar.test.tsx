@@ -18,7 +18,6 @@
  */
 
 import {render} from '@testing-library/react';
-
 import {Conversation} from 'Repositories/entity/Conversation';
 import {User} from 'Repositories/entity/User';
 import {createUuid} from 'Util/uuid';

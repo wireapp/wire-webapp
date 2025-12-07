@@ -21,8 +21,6 @@ import {useEffect, useRef, useState} from 'react';
 
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 import cx from 'classnames';
-import {container} from 'tsyringe';
-
 import {showInviteModal} from 'Components/Modals/InviteModal';
 import {showServiceModal} from 'Components/Modals/ServiceModal';
 import {showUserModal} from 'Components/Modals/UserModal';
@@ -40,6 +38,7 @@ import {UserRepository} from 'Repositories/user/UserRepository';
 import {UserState} from 'Repositories/user/UserState';
 import {SidebarTabs, useSidebarStore} from 'src/script/page/LeftSidebar/panels/Conversations/useSidebarStore';
 import {MainViewModel} from 'src/script/view_model/MainViewModel';
+import {container} from 'tsyringe';
 import {t} from 'Util/LocalizerUtil';
 
 import {PeopleTab, SearchResultsData} from './PeopleTab';

@@ -17,9 +17,9 @@
  *
  */
 
-import {AlertIcon, UnavailableFileIcon} from '@wireapp/react-ui-kit';
-
 import {FileTypeIcon} from 'Components/Conversation/common/FileTypeIcon/FileTypeIcon';
+
+import {AlertIcon, UnavailableFileIcon} from '@wireapp/react-ui-kit';
 
 import {errorIconStyles, unavailableIconStyles} from './FileCardIcon.styles';
 

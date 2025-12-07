@@ -19,9 +19,6 @@
 
 import {ConversationMessageTimerUpdateEvent, CONVERSATION_EVENT} from '@wireapp/api-client/lib/event/';
 import ko from 'knockout';
-
-import {Article, LinkPreview} from '@wireapp/protocol-messaging';
-
 import type {Conversation} from 'Repositories/entity/Conversation';
 import type {ContentMessage} from 'Repositories/entity/message/ContentMessage';
 import {MediumImage} from 'Repositories/entity/message/MediumImage';
@@ -34,6 +31,8 @@ import {clamp} from 'Util/NumberUtil';
 import {obfuscate} from 'Util/StringUtil';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 import {arrayToBase64, noop} from 'Util/util';
+
+import {Article, LinkPreview} from '@wireapp/protocol-messaging';
 
 import {AbstractConversationEventHandler} from './AbstractConversationEventHandler';
 import {ConversationMapper} from './ConversationMapper';

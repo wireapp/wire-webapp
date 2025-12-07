@@ -20,10 +20,6 @@
 import {FC, useCallback, useEffect, useMemo, useState} from 'react';
 
 import cx from 'classnames';
-import {container} from 'tsyringe';
-
-import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
-
 import * as Icon from 'Components/Icon';
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {RadioGroup} from 'Components/Radio';
@@ -35,9 +31,12 @@ import {ConversationRepository} from 'Repositories/conversation/ConversationRepo
 import {Conversation} from 'Repositories/entity/Conversation';
 import {TeamRepository} from 'Repositories/team/TeamRepository';
 import {TeamState} from 'Repositories/team/TeamState';
+import {container} from 'tsyringe';
 import {copyText} from 'Util/ClipboardUtil';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
+
+import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
 
 import {Config} from '../../../../../Config';
 

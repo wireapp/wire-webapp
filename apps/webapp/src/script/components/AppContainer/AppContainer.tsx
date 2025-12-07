@@ -21,11 +21,6 @@ import {useEffect, useMemo} from 'react';
 
 import {ClientType} from '@wireapp/api-client/lib/client/';
 import {amplify} from 'amplify';
-import {container} from 'tsyringe';
-
-import {StyledApp, THEME_ID} from '@wireapp/react-ui-kit';
-import {WebAppEvents} from '@wireapp/webapp-events';
-
 import {DetachedCallingCell} from 'Components/calling/DetachedCallingCell';
 import {PrimaryModalComponent} from 'Components/Modals/PrimaryModal/PrimaryModal';
 import {QualityFeedbackModal} from 'Components/Modals/QualityFeedbackModal';
@@ -33,7 +28,11 @@ import {PROPERTIES_TYPE} from 'Repositories/properties/PropertiesType';
 import {SIGN_OUT_REASON} from 'src/script/auth/SignOutReason';
 import {useAppSoftLock} from 'src/script/hooks/useAppSoftLock';
 import {useSingleInstance} from 'src/script/hooks/useSingleInstance';
+import {container} from 'tsyringe';
 import {isDetachedCallingFeatureEnabled} from 'Util/isDetachedCallingFeatureEnabled';
+
+import {StyledApp, THEME_ID} from '@wireapp/react-ui-kit';
+import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {useAccentColor} from './hooks/useAccentColor';
 import {useTheme} from './hooks/useTheme';

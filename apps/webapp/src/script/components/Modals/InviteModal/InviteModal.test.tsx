@@ -18,7 +18,6 @@
  */
 
 import {render, screen, waitFor} from '@testing-library/react';
-
 import {User} from 'Repositories/entity/User';
 import {t} from 'Util/LocalizerUtil';
 

@@ -19,11 +19,10 @@
 
 import {useCallback, useEffect, useRef, useState} from 'react';
 
-import {useDebouncedCallback} from 'use-debounce';
-
 import {CellsRepository} from 'Repositories/cells/CellsRepository';
 import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
 import {UserRepository} from 'Repositories/user/UserRepository';
+import {useDebouncedCallback} from 'use-debounce';
 
 import {getConversationsFromNodes} from './getConversationsFromNodes';
 import {getUsersFromNodes} from './getUsersFromNodes';

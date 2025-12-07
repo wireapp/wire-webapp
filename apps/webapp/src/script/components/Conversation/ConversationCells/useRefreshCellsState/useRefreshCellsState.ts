@@ -21,7 +21,6 @@ import {useCallback, useEffect, useRef, useState} from 'react';
 
 import {CONVERSATION_CELLS_STATE} from '@wireapp/api-client/lib/conversation';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
-
 import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
 
 const REFRESH_INTERVAL_MS = 10000;

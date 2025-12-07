@@ -19,7 +19,6 @@
 
 import {render, waitFor} from '@testing-library/react';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
-
 import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
 import {Conversation} from 'Repositories/entity/Conversation';
 import {ContentMessage} from 'Repositories/entity/message/ContentMessage';

@@ -22,12 +22,6 @@ import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 import {amplify} from 'amplify';
 import 'jsdom-worker';
 import {Subscription} from 'knockout';
-import {container} from 'tsyringe';
-
-import {CALL_TYPE, CONV_TYPE, REASON, STATE as CALL_STATE, VIDEO_STATE, Wcall} from '@wireapp/avs';
-import {Runtime} from '@wireapp/commons';
-import {WebAppEvents} from '@wireapp/webapp-events';
-
 import {Conversation} from 'Repositories/entity/Conversation';
 import {User} from 'Repositories/entity/User';
 import {CallingEvent} from 'Repositories/event/CallingEvent';
@@ -38,7 +32,11 @@ import {MediaType} from 'Repositories/media/MediaType';
 import {UserRepository} from 'Repositories/user/UserRepository';
 import {serverTimeHandler} from 'src/script/time/serverTimeHandler';
 import {TestFactory} from 'test/helper/TestFactory';
+import {container} from 'tsyringe';
 import {createUuid} from 'Util/uuid';
+
+import {CALL_TYPE, CONV_TYPE, REASON, STATE as CALL_STATE, VIDEO_STATE, Wcall} from '@wireapp/avs';
+import {Runtime} from '@wireapp/commons';
 
 import {Call} from './Call';
 import {CallingRepository} from './CallingRepository';

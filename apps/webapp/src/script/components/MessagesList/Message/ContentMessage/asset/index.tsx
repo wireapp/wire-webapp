@@ -19,7 +19,6 @@
 
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 import cx from 'classnames';
-
 import {AssetType} from 'Repositories/assets/AssetType';
 import {Asset} from 'Repositories/entity/message/Asset';
 import {Button} from 'Repositories/entity/message/Button';

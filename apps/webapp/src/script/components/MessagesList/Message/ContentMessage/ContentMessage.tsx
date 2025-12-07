@@ -21,12 +21,9 @@ import {useMemo, useState, useEffect, useRef} from 'react';
 
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 import cx from 'classnames';
-import ko from 'knockout';
-
-import {OutlineCheck} from '@wireapp/react-ui-kit';
-
 import {ReadIndicator} from 'Components/MessagesList/Message/ReadIndicator';
 import {useClickOutside} from 'Hooks/useClickOutside';
+import ko from 'knockout';
 import {Conversation} from 'Repositories/entity/Conversation';
 import {CompositeMessage} from 'Repositories/entity/message/CompositeMessage';
 import {ContentMessage} from 'Repositories/entity/message/ContentMessage';
@@ -36,6 +33,8 @@ import {StatusType} from 'src/script/message/StatusType';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {getMessageAriaLabel} from 'Util/conversationMessages';
 import {t} from 'Util/LocalizerUtil';
+
+import {OutlineCheck} from '@wireapp/react-ui-kit';
 
 import {ContentAsset} from './asset';
 import {deliveredMessageIndicator, messageBodyWrapper, messageEphemeralTimer} from './ContentMessage.styles';

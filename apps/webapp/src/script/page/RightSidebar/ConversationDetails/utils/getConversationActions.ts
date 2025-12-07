@@ -18,15 +18,14 @@
  */
 
 import {amplify} from 'amplify';
-
-import {WebAppEvents} from '@wireapp/webapp-events';
-
 import * as Icon from 'Components/Icon';
 import {MenuItem} from 'Components/panel/PanelActions';
 import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
 import {Conversation} from 'Repositories/entity/Conversation';
 import * as UserPermission from 'Repositories/user/UserPermission';
 import {t} from 'Util/LocalizerUtil';
+
+import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {Config} from '../../../../Config';
 import {ActionsViewModel} from '../../../../view_model/ActionsViewModel';

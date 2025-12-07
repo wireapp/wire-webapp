@@ -20,14 +20,13 @@
 import {CONVERSATION_EVENT} from '@wireapp/api-client/lib/event/';
 import {QualifiedId} from '@wireapp/api-client/lib/user/';
 import type {Dexie} from 'dexie';
-import {container} from 'tsyringe';
-
-import {Asset as ProtobufAsset} from '@wireapp/protocol-messaging';
-
 import {AssetTransferState} from 'Repositories/assets/AssetTransferState';
 import {StorageService, DatabaseListenerCallback, LegacyEventRecord, EventRecord} from 'Repositories/storage';
 import {StorageSchemata} from 'Repositories/storage/StorageSchemata';
+import {container} from 'tsyringe';
 import {getLogger, Logger} from 'Util/Logger';
+
+import {Asset as ProtobufAsset} from '@wireapp/protocol-messaging';
 
 import {ClientEvent, CONVERSATION as CLIENT_CONVERSATION_EVENT} from './Client';
 

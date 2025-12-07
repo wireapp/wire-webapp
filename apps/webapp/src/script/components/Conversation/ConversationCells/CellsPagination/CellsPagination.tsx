@@ -19,10 +19,10 @@
 
 import {useCallback} from 'react';
 
-import {FlexBox, IconButton} from '@wireapp/react-ui-kit';
-
 import * as Icon from 'Components/Icon';
 import {t} from 'Util/LocalizerUtil';
+
+import {FlexBox, IconButton} from '@wireapp/react-ui-kit';
 
 import {CellsPageList} from './CellsPageList/CellsPageList';
 import {CellsPageSizeSelect} from './CellsPageSizeSelect/CellsPageSizeSelect';

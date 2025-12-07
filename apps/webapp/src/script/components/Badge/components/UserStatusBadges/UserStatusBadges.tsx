@@ -19,10 +19,10 @@
 
 import {Fragment} from 'react';
 
-import {Tooltip} from '@wireapp/react-ui-kit';
-
 import * as Icon from 'Components/Icon';
 import {t} from 'Util/LocalizerUtil';
+
+import {Tooltip} from '@wireapp/react-ui-kit';
 
 import {badgesWrapper, icon} from './UserStatusBadges.styles';
 

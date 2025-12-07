@@ -24,7 +24,15 @@ import {
 } from '@wireapp/api-client/lib/event';
 import {GenericMessageType} from '@wireapp/core/lib/conversation';
 import {MultiPartContent} from '@wireapp/core/lib/conversation/content';
+import {AssetTransferState} from 'Repositories/assets/AssetTransferState';
+import {CALL_MESSAGE_TYPE} from 'Repositories/calling/enum/CallMessageType';
+import {ConversationEphemeralHandler} from 'Repositories/conversation/ConversationEphemeralHandler';
+import {MessageAddEvent} from 'Repositories/conversation/EventBuilder';
+import {ClientEvent, CONVERSATION} from 'Repositories/event/Client';
 import {container} from 'tsyringe';
+import {getLogger, Logger} from 'Util/Logger';
+import {TIME_IN_MILLIS} from 'Util/TimeUtil';
+import {base64ToArray, arrayToBase64} from 'Util/util';
 
 import {
   Asset,
@@ -54,15 +62,6 @@ import {
   InCallHandRaise,
   ButtonAction,
 } from '@wireapp/protocol-messaging';
-
-import {AssetTransferState} from 'Repositories/assets/AssetTransferState';
-import {CALL_MESSAGE_TYPE} from 'Repositories/calling/enum/CallMessageType';
-import {ConversationEphemeralHandler} from 'Repositories/conversation/ConversationEphemeralHandler';
-import {MessageAddEvent} from 'Repositories/conversation/EventBuilder';
-import {ClientEvent, CONVERSATION} from 'Repositories/event/Client';
-import {getLogger, Logger} from 'Util/Logger';
-import {TIME_IN_MILLIS} from 'Util/TimeUtil';
-import {base64ToArray, arrayToBase64} from 'Util/util';
 
 import {PROTO_MESSAGE_TYPE} from './ProtoMessageType';
 

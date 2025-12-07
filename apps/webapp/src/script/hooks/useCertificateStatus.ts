@@ -20,7 +20,6 @@
 import {useCallback, useEffect, useState} from 'react';
 
 import {CredentialType} from '@wireapp/core/lib/messagingProtocols/mls';
-
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 
 import {E2EIHandler, MLSStatuses, WireIdentity} from '../E2EIdentity';

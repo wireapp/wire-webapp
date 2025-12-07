@@ -18,10 +18,9 @@
  */
 
 import {useNavigate} from 'react-router-dom';
+import {t} from 'Util/LocalizerUtil';
 
 import {FlexBox} from '@wireapp/react-ui-kit';
-
-import {t} from 'Util/LocalizerUtil';
 
 import {styles} from './CreatePersonalAccount.styles';
 import {Page} from './Page';

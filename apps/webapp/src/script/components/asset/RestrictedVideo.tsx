@@ -18,7 +18,6 @@
  */
 
 import cx from 'classnames';
-
 import {t} from 'Util/LocalizerUtil';
 
 interface RestrictedVideoProps {

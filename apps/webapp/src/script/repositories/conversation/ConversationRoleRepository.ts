@@ -23,13 +23,12 @@ import {
   ADD_PERMISSION,
 } from '@wireapp/api-client/lib/conversation/';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
-import {container} from 'tsyringe';
-
 import type {Conversation} from 'Repositories/entity/Conversation';
 import type {User} from 'Repositories/entity/User';
 import type {TeamRepository} from 'Repositories/team/TeamRepository';
 import {TeamState} from 'Repositories/team/TeamState';
 import {UserState} from 'Repositories/user/UserState';
+import {container} from 'tsyringe';
 import {Logger, getLogger} from 'Util/Logger';
 
 import type {ConversationService} from './ConversationService';

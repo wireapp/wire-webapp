@@ -17,6 +17,9 @@
  *
  */
 
+import {ZoomInIcon, ZoomOutIcon} from 'Components/Icon';
+import {t} from 'Util/LocalizerUtil';
+
 import {
   ButtonsGroup,
   ChevronDownIcon,
@@ -25,9 +28,6 @@ import {
   SidebarActiveIcon,
   SidebarInactiveIcon,
 } from '@wireapp/react-ui-kit';
-
-import {ZoomInIcon, ZoomOutIcon} from 'Components/Icon';
-import {t} from 'Util/LocalizerUtil';
 
 import {buttonStyles, pageNumberStyles, wrapperStyles} from './PdfControls.styles';
 

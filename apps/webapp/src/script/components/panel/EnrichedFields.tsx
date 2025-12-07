@@ -20,16 +20,15 @@
 import {useEffect, useState} from 'react';
 
 import type {RichInfoField} from '@wireapp/api-client/lib/user/RichInfo';
-import {container} from 'tsyringe';
-
-import {Availability} from '@wireapp/protocol-messaging';
-
 import type {User} from 'Repositories/entity/User';
 import {RichProfileRepository} from 'Repositories/user/RichProfileRepository';
+import {container} from 'tsyringe';
 import {availabilityStatus, availabilityTranslationKeys} from 'Util/AvailabilityStatus';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 import {noop} from 'Util/util';
+
+import {Availability} from '@wireapp/protocol-messaging';
 
 interface EnrichedFieldsProps {
   onFieldsLoaded?: (richFields: RichInfoField[]) => void;

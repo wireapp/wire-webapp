@@ -20,7 +20,6 @@
 import {useMemo} from 'react';
 
 import cx from 'classnames';
-
 import * as Icon from 'Components/Icon';
 import {DraftState, generateConversationInputStorageKey} from 'Components/InputBar/common/draftState/draftState';
 import {useLocalStorage} from 'Hooks/useLocalStorage';

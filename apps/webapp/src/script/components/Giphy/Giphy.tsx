@@ -21,14 +21,13 @@ import {FC, useEffect, useState} from 'react';
 
 import {amplify} from 'amplify';
 import cx from 'classnames';
-
-import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
-import {WebAppEvents} from '@wireapp/webapp-events';
-
 import {GifImage} from 'Components/Giphy/GifImage';
 import * as Icon from 'Components/Icon';
 import {Gif, GiphyRepository} from 'Repositories/extension/GiphyRepository';
 import {t} from 'Util/LocalizerUtil';
+
+import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
+import {WebAppEvents} from '@wireapp/webapp-events';
 
 const GIPHY_CLOSE_TIMEOUT = 350;
 

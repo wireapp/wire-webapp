@@ -19,8 +19,6 @@
 
 import React, {ChangeEvent, useId} from 'react';
 
-import {TabIndex, Checkbox, CheckboxLabel} from '@wireapp/react-ui-kit';
-
 import {Avatar, AVATAR_SIZE} from 'Components/Avatar';
 import {UserStatusBadges} from 'Components/Badge';
 import {ParticipantItemContent} from 'Components/ParticipantItemContent';
@@ -31,6 +29,8 @@ import {User} from 'Repositories/entity/User';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 import {capitalizeFirstChar} from 'Util/StringUtil';
+
+import {TabIndex, Checkbox, CheckboxLabel} from '@wireapp/react-ui-kit';
 
 interface UserListItemProps {
   groupId?: string;

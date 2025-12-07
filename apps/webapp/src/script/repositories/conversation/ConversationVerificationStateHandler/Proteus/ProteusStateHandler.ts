@@ -19,14 +19,13 @@
 
 import type {QualifiedId} from '@wireapp/api-client/lib/user/';
 import {amplify} from 'amplify';
-import {container} from 'tsyringe';
-
-import {WebAppEvents} from '@wireapp/webapp-events';
-
 import {Conversation} from 'Repositories/entity/Conversation';
 import {UserState} from 'Repositories/user/UserState';
 import {VerificationMessageType} from 'src/script/message/VerificationMessageType';
+import {container} from 'tsyringe';
 import {getLogger, Logger} from 'Util/Logger';
+
+import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {isMixedConversation, isProteusConversation} from '../../ConversationSelectors';
 import {ConversationState} from '../../ConversationState';

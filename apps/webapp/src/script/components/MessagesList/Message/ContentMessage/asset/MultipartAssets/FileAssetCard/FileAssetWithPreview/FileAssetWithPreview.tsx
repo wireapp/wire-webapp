@@ -19,10 +19,10 @@
 
 import {CSSProperties, useState} from 'react';
 
-import {AlertIcon} from '@wireapp/react-ui-kit';
-
 import {FileCard} from 'Components/FileCard/FileCard';
 import {t} from 'Util/LocalizerUtil';
+
+import {AlertIcon} from '@wireapp/react-ui-kit';
 
 import {
   contentWrapperStyles,

@@ -20,17 +20,16 @@
 import React from 'react';
 
 import {RECEIPT_MODE} from '@wireapp/api-client/lib/conversation/data';
-import {container} from 'tsyringe';
-
-import {Checkbox, CheckboxLabel} from '@wireapp/react-ui-kit';
-
 import {PropertiesRepository} from 'Repositories/properties/PropertiesRepository';
 import {AppLockRepository} from 'Repositories/user/AppLockRepository';
 import {AppLockState} from 'Repositories/user/AppLockState';
 import {CONVERSATION_TYPING_INDICATOR_MODE} from 'Repositories/user/TypingIndicatorMode';
+import {container} from 'tsyringe';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 import {formatDurationCaption} from 'Util/TimeUtil';
+
+import {Checkbox, CheckboxLabel} from '@wireapp/react-ui-kit';
 
 import {PreferencesSection} from '../components/PreferencesSection';
 

@@ -18,7 +18,6 @@
  */
 
 import getSlug from 'speakingurl';
-
 import {randomElement} from 'Util/ArrayUtil';
 import {getRandomNumber} from 'Util/NumberUtil';
 

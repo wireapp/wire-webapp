@@ -18,13 +18,12 @@
  */
 
 import cx from 'classnames';
-import {container} from 'tsyringe';
-
 import {RestrictedFile} from 'Components/MessagesList/Message/ContentMessage/asset/FileAsset/RestrictedFile/RestrictedFile';
 import {AssetTransferState} from 'Repositories/assets/AssetTransferState';
 import type {ContentMessage} from 'Repositories/entity/message/ContentMessage';
 import type {FileAsset as FileAssetType} from 'Repositories/entity/message/FileAsset';
 import {TeamState} from 'Repositories/team/TeamState';
+import {container} from 'tsyringe';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {handleKeyDown, KEY} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';

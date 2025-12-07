@@ -24,11 +24,10 @@ import {FormattedMessage} from 'react-intl';
 import {connect} from 'react-redux';
 import {Navigate, useNavigate} from 'react-router-dom';
 import {AnyAction, Dispatch} from 'redux';
-
-import {Button, ContainerXS, Link, Paragraph, Text} from '@wireapp/react-ui-kit';
-
 import {handleEnterDown} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
+
+import {Button, ContainerXS, Link, Paragraph, Text} from '@wireapp/react-ui-kit';
 
 import {Page} from './Page';
 

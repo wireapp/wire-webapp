@@ -18,7 +18,6 @@
  */
 
 import {render, screen} from '@testing-library/react';
-
 import {MessageTimerUpdateMessage} from 'Repositories/entity/message/MessageTimerUpdateMessage';
 import {ReceiptModeUpdateMessage} from 'Repositories/entity/message/ReceiptModeUpdateMessage';
 import {RenameMessage} from 'Repositories/entity/message/RenameMessage';

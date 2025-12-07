@@ -19,10 +19,9 @@
 
 import {Decoder, Encoder} from 'bazinga64';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
+import type {Conversation} from 'Repositories/entity/Conversation';
 
 import {Runtime} from '@wireapp/commons';
-
-import type {Conversation} from 'Repositories/entity/Conversation';
 
 import {isTabKey} from './KeyboardUtil';
 import {getLogger} from './Logger';

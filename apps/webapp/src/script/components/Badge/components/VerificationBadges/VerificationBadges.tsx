@@ -22,7 +22,18 @@ import {CSSProperties, useEffect, useMemo, useRef, useState} from 'react';
 import {CSSObject} from '@emotion/react';
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 import {stringifyQualifiedId} from '@wireapp/core/lib/util/qualifiedIdUtil';
+import {useUserIdentity} from 'Hooks/useDeviceIdentities';
+import {ClientEntity} from 'Repositories/client';
+import {ConversationVerificationState} from 'Repositories/conversation/ConversationVerificationState';
+import {checkUserHandle} from 'Repositories/conversation/ConversationVerificationStateHandler';
+import {Conversation} from 'Repositories/entity/Conversation';
+import {User} from 'Repositories/entity/User';
+import {UserState} from 'Repositories/user/UserState';
+import {MLSStatuses, WireIdentity} from 'src/script/E2EIdentity/E2EIdentityVerification';
 import {container} from 'tsyringe';
+import {useKoSubscribableChildren} from 'Util/ComponentUtil';
+import {t} from 'Util/LocalizerUtil';
+import {waitFor} from 'Util/waitFor';
 
 import {
   TabIndex,
@@ -33,18 +44,6 @@ import {
   ProteusVerified,
   Tooltip,
 } from '@wireapp/react-ui-kit';
-
-import {useUserIdentity} from 'Hooks/useDeviceIdentities';
-import {ClientEntity} from 'Repositories/client';
-import {ConversationVerificationState} from 'Repositories/conversation/ConversationVerificationState';
-import {checkUserHandle} from 'Repositories/conversation/ConversationVerificationStateHandler';
-import {Conversation} from 'Repositories/entity/Conversation';
-import {User} from 'Repositories/entity/User';
-import {UserState} from 'Repositories/user/UserState';
-import {MLSStatuses, WireIdentity} from 'src/script/E2EIdentity/E2EIdentityVerification';
-import {useKoSubscribableChildren} from 'Util/ComponentUtil';
-import {t} from 'Util/LocalizerUtil';
-import {waitFor} from 'Util/waitFor';
 
 type VerificationBadgeContext = 'user' | 'conversation' | 'device';
 

@@ -20,9 +20,6 @@
 import React from 'react';
 
 import cx from 'classnames';
-
-import {Tooltip} from '@wireapp/react-ui-kit';
-
 import {CallParticipantsListItem} from 'Components/calling/CallParticipantsListItem';
 import {FadingScrollbar} from 'Components/FadingScrollbar';
 import * as Icon from 'Components/Icon';
@@ -31,6 +28,8 @@ import {Participant} from 'Repositories/calling/Participant';
 import {Conversation} from 'Repositories/entity/Conversation';
 import {t} from 'Util/LocalizerUtil';
 import {sortUsersByPriority} from 'Util/StringUtil';
+
+import {Tooltip} from '@wireapp/react-ui-kit';
 
 import {
   headerStyles,

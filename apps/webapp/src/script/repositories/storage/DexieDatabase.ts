@@ -18,7 +18,6 @@
  */
 
 import {Dexie, Table, Transaction} from 'dexie';
-
 import {getLogger, Logger} from 'Util/Logger';
 
 import {AmplifyRecord, ConversationRecord, CryptoboxRecord, EventRecord, UserRecord} from './record';

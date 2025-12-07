@@ -19,7 +19,6 @@
 
 import {ClientClassification, ClientType} from '@wireapp/api-client/lib/client/';
 import ko from 'knockout';
-
 import {ClientRecord} from 'Repositories/storage';
 import {splitFingerprint} from 'Util/StringUtil';
 

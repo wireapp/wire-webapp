@@ -24,16 +24,6 @@ import {CONVERSATION_TYPE, QualifiedUserClients} from '@wireapp/api-client/lib/c
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {RecursivePartial} from '@wireapp/commons/lib/util/TypeUtil';
-import ko from 'knockout';
-import {IntlProvider} from 'react-intl';
-import {Provider} from 'react-redux';
-import {HashRouter as Router} from 'react-router-dom';
-import {AnyAction} from 'redux';
-import {MockStoreEnhanced} from 'redux-mock-store';
-import {ThunkDispatch} from 'redux-thunk';
-
-import {StyledApp, THEME_ID} from '@wireapp/react-ui-kit';
-
 import cs from 'I18n/cs-CZ.json';
 import da from 'I18n/da-DK.json';
 import de from 'I18n/de-DE.json';
@@ -57,12 +47,21 @@ import sk from 'I18n/sk-SK.json';
 import sl from 'I18n/sl-SI.json';
 import tr from 'I18n/tr-TR.json';
 import uk from 'I18n/uk-UA.json';
+import ko from 'knockout';
+import {IntlProvider} from 'react-intl';
+import {Provider} from 'react-redux';
+import {HashRouter as Router} from 'react-router-dom';
+import {AnyAction} from 'redux';
+import {MockStoreEnhanced} from 'redux-mock-store';
+import {ThunkDispatch} from 'redux-thunk';
 import {Participant} from 'Repositories/calling/Participant';
 import {Conversation} from 'Repositories/entity/Conversation';
 import {User} from 'Repositories/entity/User';
 import {MediaDevicesHandler} from 'Repositories/media/MediaDevicesHandler';
 import {setStrings} from 'Util/LocalizerUtil';
 import {createUuid} from 'Util/uuid';
+
+import {StyledApp, THEME_ID} from '@wireapp/react-ui-kit';
 
 import {mapLanguage} from '../../localeConfig';
 import {Api, RootState} from '../../module/reducer';

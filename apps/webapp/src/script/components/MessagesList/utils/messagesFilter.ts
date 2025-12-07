@@ -18,7 +18,6 @@
  */
 
 import {CONVERSATION_EVENT} from '@wireapp/api-client/lib/event/';
-
 import {Message as MessageEntity} from 'Repositories/entity/message/Message';
 import {ProtocolUpdateMessage} from 'Repositories/entity/message/ProtocolUpdateMessage';
 import {SystemMessage} from 'Repositories/entity/message/SystemMessage';

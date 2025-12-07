@@ -20,12 +20,11 @@
 import {CSSObject} from '@emotion/serialize';
 import {amplify} from 'amplify';
 import cx from 'classnames';
+import {availabilityStatus} from 'Util/AvailabilityStatus';
+import {t} from 'Util/LocalizerUtil';
 
 import {Availability} from '@wireapp/protocol-messaging';
 import {WebAppEvents} from '@wireapp/webapp-events';
-
-import {availabilityStatus} from 'Util/AvailabilityStatus';
-import {t} from 'Util/LocalizerUtil';
 
 import {ContextMenuEntry} from '../../../../../ui/ContextMenu';
 

@@ -18,7 +18,6 @@
  */
 
 import {render} from '@testing-library/react';
-
 import {Message} from 'Repositories/entity/message/Message';
 
 import {EphemeralTimer} from './EphemeralTimer';

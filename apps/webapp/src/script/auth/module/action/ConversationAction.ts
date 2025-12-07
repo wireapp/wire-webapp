@@ -20,13 +20,12 @@
 import type {ConversationJoinData} from '@wireapp/api-client/lib/conversation/data/ConversationJoinData';
 import type {ConversationEvent} from '@wireapp/api-client/lib/event/';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
-import {isError} from 'underscore';
-
 import {isBackendError} from 'Util/TypePredicateUtil';
 
 import {ConversationActionCreator} from './creator/';
 
 import type {ThunkAction} from '../reducer';
+import {isError} from 'underscore';
 
 export class ConversationAction {
   doCheckConversationCode = (key: string, code: string, uri?: string): ThunkAction => {

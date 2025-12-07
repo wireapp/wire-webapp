@@ -20,13 +20,11 @@
 import {Role} from '@wireapp/api-client/lib/team';
 import {FeatureList, FEATURE_STATUS, SELF_DELETING_TIMEOUT} from '@wireapp/api-client/lib/team/feature/';
 import ko from 'knockout';
-import {container, singleton} from 'tsyringe';
-
 import {Conversation} from 'Repositories/entity/Conversation';
 import {User} from 'Repositories/entity/User';
 import {ROLE, roleMap} from 'Repositories/user/UserPermission';
 import {UserState} from 'Repositories/user/UserState';
-import {Config} from 'src/script/Config';
+import {container, singleton} from 'tsyringe';
 import {sortUsersByPriority} from 'Util/StringUtil';
 
 import {TeamEntity} from './TeamEntity';

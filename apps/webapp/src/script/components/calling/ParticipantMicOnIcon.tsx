@@ -18,7 +18,6 @@
  */
 
 import {keyframes} from '@emotion/react';
-
 import {MicOnIcon} from 'Components/Icon';
 
 const fadeAnimation = keyframes`

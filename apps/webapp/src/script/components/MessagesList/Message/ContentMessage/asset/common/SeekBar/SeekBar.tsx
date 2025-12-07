@@ -20,7 +20,6 @@
 import React, {CSSProperties, useEffect, useState} from 'react';
 
 import cx from 'classnames';
-
 import {useMessageFocusedTabIndex} from 'Components/MessagesList/Message/util';
 import {clamp} from 'Util/NumberUtil';
 

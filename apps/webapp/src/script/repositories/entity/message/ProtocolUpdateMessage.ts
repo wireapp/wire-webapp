@@ -18,7 +18,6 @@
  */
 
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
-
 import {SystemMessageType} from 'src/script/message/SystemMessageType';
 
 import {SystemMessage} from './SystemMessage';

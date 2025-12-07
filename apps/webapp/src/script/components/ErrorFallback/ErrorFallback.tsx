@@ -19,9 +19,8 @@
 
 import {useEffect} from 'react';
 
-import {FallbackProps} from 'react-error-boundary';
-
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
+import {FallbackProps} from 'react-error-boundary';
 import {t} from 'Util/LocalizerUtil';
 import {getLogger} from 'Util/Logger';
 

@@ -17,11 +17,11 @@
  *
  */
 
-import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
-
 import * as Icon from 'Components/Icon';
 import {t} from 'Util/LocalizerUtil';
 import {generateRandomPassword} from 'Util/StringUtil';
+
+import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
 
 interface PasswordGeneratorButtonProps {
   passwordLength?: number;

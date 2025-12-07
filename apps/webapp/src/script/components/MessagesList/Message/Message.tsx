@@ -21,7 +21,6 @@ import React, {useLayoutEffect, useRef, useEffect} from 'react';
 
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 import cx from 'classnames';
-
 import {InViewport} from 'Components/InViewport';
 import type {MessageRepository} from 'Repositories/conversation/MessageRepository';
 import type {Conversation} from 'Repositories/entity/Conversation';

@@ -33,7 +33,6 @@ import {
   ArchiveFileIcon,
   OtherFileIcon,
 } from '@wireapp/react-ui-kit/lib';
-
 import {FileType} from 'Util/getFileTypeFromExtension/fileType';
 import {getFileTypeFromExtension} from 'Util/getFileTypeFromExtension/getFileTypeFromExtension';
 

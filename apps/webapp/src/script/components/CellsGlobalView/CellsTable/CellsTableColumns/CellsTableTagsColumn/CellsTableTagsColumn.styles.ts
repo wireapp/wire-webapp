@@ -18,7 +18,6 @@
  */
 
 import {CSSObject} from '@emotion/react';
-
 import {styleBreakpoint} from 'Components/Conversation/ConversationCells/common/styleBreakpoint/styleBreakpoint';
 
 export const wrapperStyles: CSSObject = {

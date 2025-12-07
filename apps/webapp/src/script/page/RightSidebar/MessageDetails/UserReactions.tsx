@@ -20,7 +20,6 @@
 import {Fragment} from 'react';
 
 import type {QualifiedId} from '@wireapp/api-client/lib/user';
-
 import {EmojiChar} from 'Components/MessagesList/Message/ContentMessage/MessageActions/MessageReactions/EmojiChar';
 import {
   messageReactionDetailsMargin,

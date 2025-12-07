@@ -19,21 +19,20 @@
 
 import React, {useCallback, useEffect, useState} from 'react';
 
+import {LogoFullIcon} from 'Components/Icon';
+import {useSingleInstance} from 'Hooks/useSingleInstance';
 import {FormattedMessage} from 'react-intl';
 import {connect} from 'react-redux';
 import {Navigate, useNavigate} from 'react-router-dom';
 import {AnyAction, Dispatch} from 'redux';
-import {container} from 'tsyringe';
-
-import {UrlUtil} from '@wireapp/commons';
-import {Button, ButtonVariant, ContainerXS, ErrorMessage, Text} from '@wireapp/react-ui-kit';
-
-import {LogoFullIcon} from 'Components/Icon';
-import {useSingleInstance} from 'Hooks/useSingleInstance';
 import {Core} from 'src/script/service/CoreSingleton';
+import {container} from 'tsyringe';
 import {isDataDogEnabled} from 'Util/DataDog';
 import {getWebEnvironment} from 'Util/Environment';
 import {t} from 'Util/LocalizerUtil';
+
+import {UrlUtil} from '@wireapp/commons';
+import {Button, ButtonVariant, ContainerXS, ErrorMessage, Text} from '@wireapp/react-ui-kit';
 
 import {Page} from './Page';
 

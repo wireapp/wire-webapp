@@ -20,19 +20,18 @@
 import {CredentialType} from '@wireapp/core/lib/messagingProtocols/mls';
 import {LowPrecisionTaskScheduler} from '@wireapp/core/lib/util/LowPrecisionTaskScheduler';
 import {amplify} from 'amplify';
-import {SigninResponse} from 'oidc-client-ts';
-import {container} from 'tsyringe';
-
-import {TypedEventEmitter} from '@wireapp/commons';
-import {WebAppEvents} from '@wireapp/webapp-events';
-
 import {PrimaryModal, removeCurrentModal} from 'Components/Modals/PrimaryModal';
+import {SigninResponse} from 'oidc-client-ts';
 import {ConversationState} from 'Repositories/conversation/ConversationState';
 import {UserState} from 'Repositories/user/UserState';
 import {Core} from 'src/script/service/CoreSingleton';
+import {container} from 'tsyringe';
 import {getLogger} from 'Util/Logger';
 import {formatDelayTime, TIME_IN_MILLIS} from 'Util/TimeUtil';
 import {removeUrlParameters} from 'Util/UrlUtil';
+
+import {TypedEventEmitter} from '@wireapp/commons';
+import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {
   hasActiveCertificate,

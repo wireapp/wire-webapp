@@ -20,7 +20,6 @@
 import {useEffect, useRef, useState} from 'react';
 
 import EmojiPicker, {EmojiClickData, EmojiStyle} from 'emoji-picker-react';
-
 import {CallingRepository} from 'Repositories/calling/CallingRepository';
 import {t} from 'Util/LocalizerUtil';
 

@@ -18,7 +18,6 @@
  */
 
 import {render} from '@testing-library/react';
-
 import {Conversation} from 'Repositories/entity/Conversation';
 import {withTheme} from 'src/script/auth/util/test/TestUtil';
 

@@ -19,10 +19,10 @@
 
 import {ChangeEvent, FormEvent} from 'react';
 
-import {ErrorMessage, Input, Label} from '@wireapp/react-ui-kit';
-
 import {CellNode} from 'src/script/types/cellNode';
 import {t} from 'Util/LocalizerUtil';
+
+import {ErrorMessage, Input, Label} from '@wireapp/react-ui-kit';
 
 import {inputWrapperStyles} from './CellsNewNodeForm.styles';
 

@@ -18,7 +18,6 @@
  */
 
 import {DefaultConversationRoleName as DefaultRole} from '@wireapp/api-client/lib/conversation/';
-
 import {Conversation} from 'Repositories/entity/Conversation';
 import {User} from 'Repositories/entity/User';
 import {TeamEntity} from 'Repositories/team/TeamEntity';

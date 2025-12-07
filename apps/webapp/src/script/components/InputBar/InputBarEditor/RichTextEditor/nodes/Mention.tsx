@@ -42,7 +42,6 @@ import {
   $createRangeSelection,
   BaseSelection,
 } from 'lexical';
-
 import {KEY} from 'Util/KeyboardUtil';
 
 import {$isMentionNode} from './MentionNode';
