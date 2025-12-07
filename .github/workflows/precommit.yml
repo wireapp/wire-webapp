@@ -43,10 +43,10 @@ jobs:
         run: yarn --immutable
 
       - name: Update configuration
-        run: yarn configure
+        run: yarn nx run webapp:configure
 
       - name: Build
-        run: yarn build:prod
+        run: yarn nx run-many -t build --all
 
       - uses: actions/upload-artifact@v4
         with:

@@ -19,10 +19,9 @@
 
 import {useEffect} from 'react';
 
-import {container} from 'tsyringe';
-
 import {TeamState} from 'Repositories/team/TeamState';
 import {UserState} from 'Repositories/user/UserState';
+import {container} from 'tsyringe';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 
 import {ConversationFeature} from './ConversationFeature';

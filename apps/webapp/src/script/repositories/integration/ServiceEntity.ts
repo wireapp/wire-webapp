@@ -19,7 +19,6 @@
 
 import type {UserAsset as APIClientUserAsset} from '@wireapp/api-client/lib/user/';
 import ko from 'knockout';
-
 import {AssetRemoteData} from 'Repositories/assets/AssetRemoteData';
 
 export interface ServiceData {

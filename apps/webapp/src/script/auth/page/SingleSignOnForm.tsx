@@ -26,20 +26,18 @@ import {isValidEmail, PATTERN} from '@wireapp/commons/lib/util/ValidationUtil';
 import {FormattedMessage} from 'react-intl';
 import {connect} from 'react-redux';
 import {Navigate, useNavigate} from 'react-router-dom';
-import {AnyAction, Dispatch} from 'redux';
+import {t} from 'Util/LocalizerUtil';
+import {isBackendError} from 'Util/TypePredicateUtil';
 
 import {Runtime, UrlUtil} from '@wireapp/commons';
 import {Button, Checkbox, CheckboxLabel, ErrorMessage, Form, Input, InputBlock, Loading} from '@wireapp/react-ui-kit';
-
-import {t} from 'Util/LocalizerUtil';
-import {isBackendError} from 'Util/TypePredicateUtil';
 
 import {Config} from '../../Config';
 import {JoinGuestLinkPasswordModal} from '../component/JoinGuestLinkPasswordModal';
 import {useEnterpriseLoginV2} from '../hooks/useEnterpriseLoginV2';
 import {actionRoot as ROOT_ACTIONS} from '../module/action/';
 import {ValidationError} from '../module/action/ValidationError';
-import {bindActionCreators, RootState} from '../module/reducer';
+import {RootState, ThunkDispatch} from '../module/reducer';
 import * as AuthSelector from '../module/selector/AuthSelector';
 import * as ConversationSelector from '../module/selector/ConversationSelector';
 import {QUERY_KEY, ROUTE} from '../route';
@@ -400,21 +398,27 @@ const mapStateToProps = (state: RootState) => ({
 });
 
 type DispatchProps = ReturnType<typeof mapDispatchToProps>;
-const mapDispatchToProps = (dispatch: Dispatch<AnyAction>) =>
-  bindActionCreators(
-    {
-      doCheckConversationCode: ROOT_ACTIONS.conversationAction.doCheckConversationCode,
-      doFinalizeSSOLogin: ROOT_ACTIONS.authAction.doFinalizeSSOLogin,
-      doGetDomainInfo: ROOT_ACTIONS.authAction.doGetDomainInfo,
-      doJoinConversationByCode: ROOT_ACTIONS.conversationAction.doJoinConversationByCode,
-      doGetConversationInfoByCode: ROOT_ACTIONS.conversationAction.doGetConversationInfoByCode,
-      doNavigate: ROOT_ACTIONS.navigationAction.doNavigate,
-      resetAuthError: ROOT_ACTIONS.authAction.resetAuthError,
-      validateSSOCode: ROOT_ACTIONS.authAction.validateSSOCode,
-      pushAccountRegistrationData: ROOT_ACTIONS.authAction.pushAccountRegistrationData,
-    },
-    dispatch,
-  );
+const mapDispatchToProps = (dispatch: ThunkDispatch) => ({
+  doCheckConversationCode: (...args: Parameters<typeof ROOT_ACTIONS.conversationAction.doCheckConversationCode>) =>
+    dispatch(ROOT_ACTIONS.conversationAction.doCheckConversationCode(...args)),
+  doFinalizeSSOLogin: (...args: Parameters<typeof ROOT_ACTIONS.authAction.doFinalizeSSOLogin>) =>
+    dispatch(ROOT_ACTIONS.authAction.doFinalizeSSOLogin(...args)),
+  doGetDomainInfo: (...args: Parameters<typeof ROOT_ACTIONS.authAction.doGetDomainInfo>) =>
+    dispatch(ROOT_ACTIONS.authAction.doGetDomainInfo(...args)),
+  doJoinConversationByCode: (...args: Parameters<typeof ROOT_ACTIONS.conversationAction.doJoinConversationByCode>) =>
+    dispatch(ROOT_ACTIONS.conversationAction.doJoinConversationByCode(...args)),
+  doGetConversationInfoByCode: (
+    ...args: Parameters<typeof ROOT_ACTIONS.conversationAction.doGetConversationInfoByCode>
+  ) => dispatch(ROOT_ACTIONS.conversationAction.doGetConversationInfoByCode(...args)),
+  doNavigate: (...args: Parameters<typeof ROOT_ACTIONS.navigationAction.doNavigate>) =>
+    dispatch(ROOT_ACTIONS.navigationAction.doNavigate(...args)),
+  resetAuthError: (...args: Parameters<typeof ROOT_ACTIONS.authAction.resetAuthError>) =>
+    dispatch(ROOT_ACTIONS.authAction.resetAuthError(...args)),
+  validateSSOCode: (...args: Parameters<typeof ROOT_ACTIONS.authAction.validateSSOCode>) =>
+    dispatch(ROOT_ACTIONS.authAction.validateSSOCode(...args)),
+  pushAccountRegistrationData: (...args: Parameters<typeof ROOT_ACTIONS.authAction.pushAccountRegistrationData>) =>
+    dispatch(ROOT_ACTIONS.authAction.pushAccountRegistrationData(...args)),
+});
 
 const SingleSignOnForm = connect(mapStateToProps, mapDispatchToProps)(SingleSignOnFormComponent);
 

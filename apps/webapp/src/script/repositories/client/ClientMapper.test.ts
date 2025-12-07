@@ -18,7 +18,6 @@
  */
 
 import {ClientType, ClientClassification} from '@wireapp/api-client/lib/client/';
-
 import {ClientRecord} from 'Repositories/storage';
 import {entities, payload} from 'test/api/payloads';
 

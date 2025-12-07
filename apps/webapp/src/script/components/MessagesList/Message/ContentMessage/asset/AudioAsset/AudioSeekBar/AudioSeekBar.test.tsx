@@ -18,7 +18,6 @@
  */
 
 import {act, fireEvent, render} from '@testing-library/react';
-
 import {FileAsset} from 'Repositories/entity/message/FileAsset';
 
 import {AudioSeekBar} from './AudioSeekBar';

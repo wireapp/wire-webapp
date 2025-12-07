@@ -20,7 +20,6 @@
 import {FC, useMemo, useState} from 'react';
 
 import cx from 'classnames';
-
 import {FadingScrollbar} from 'Components/FadingScrollbar';
 import * as Icon from 'Components/Icon';
 import {UserList} from 'Components/UserList';

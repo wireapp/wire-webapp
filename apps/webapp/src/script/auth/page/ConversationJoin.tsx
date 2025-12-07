@@ -23,13 +23,11 @@ import type {RegisterData} from '@wireapp/api-client/lib/auth';
 import {BackendErrorLabel} from '@wireapp/api-client/lib/http';
 import {connect} from 'react-redux';
 import {Navigate} from 'react-router-dom';
-import {AnyAction, Dispatch} from 'redux';
+import {t} from 'Util/LocalizerUtil';
+import {noop} from 'Util/util';
 
 import {UrlUtil} from '@wireapp/commons';
 import {Column, Columns, H1, Muted} from '@wireapp/react-ui-kit';
-
-import {t} from 'Util/LocalizerUtil';
-import {noop} from 'Util/util';
 
 import {GuestLoginColumn, IsLoggedInColumn, Separator} from './ConversationJoinComponents';
 import {ConversationJoinFull} from './ConversationJoinInvalid';
@@ -44,7 +42,7 @@ import {WirelessContainer} from '../component/WirelessContainer';
 import {EXTERNAL_ROUTE} from '../externalRoute';
 import {actionRoot as ROOT_ACTIONS} from '../module/action';
 import {ValidationError} from '../module/action/ValidationError';
-import {bindActionCreators, RootState} from '../module/reducer';
+import {RootState, ThunkDispatch} from '../module/reducer';
 import * as AuthSelector from '../module/selector/AuthSelector';
 import * as ClientSelector from '../module/selector/ClientSelector';
 import * as ConversationSelector from '../module/selector/ConversationSelector';
@@ -323,20 +321,25 @@ const mapStateToProps = (state: RootState) => ({
 });
 
 type DispatchProps = ReturnType<typeof mapDispatchToProps>;
-const mapDispatchToProps = (dispatch: Dispatch<AnyAction>) =>
-  bindActionCreators(
-    {
-      doGetAllClients: ROOT_ACTIONS.clientAction.doGetAllClients,
-      doCheckConversationCode: ROOT_ACTIONS.conversationAction.doCheckConversationCode,
-      doGetConversationInfoByCode: ROOT_ACTIONS.conversationAction.doGetConversationInfoByCode,
-      doInit: ROOT_ACTIONS.authAction.doInit,
-      doJoinConversationByCode: ROOT_ACTIONS.conversationAction.doJoinConversationByCode,
-      doLogout: ROOT_ACTIONS.authAction.doLogout,
-      doRegisterWireless: ROOT_ACTIONS.authAction.doRegisterWireless,
-      setLastEventDate: ROOT_ACTIONS.notificationAction.setLastEventDate,
-    },
-    dispatch,
-  );
+const mapDispatchToProps = (dispatch: ThunkDispatch) => ({
+  doGetAllClients: (...args: Parameters<typeof ROOT_ACTIONS.clientAction.doGetAllClients>) =>
+    dispatch(ROOT_ACTIONS.clientAction.doGetAllClients(...args)),
+  doCheckConversationCode: (...args: Parameters<typeof ROOT_ACTIONS.conversationAction.doCheckConversationCode>) =>
+    dispatch(ROOT_ACTIONS.conversationAction.doCheckConversationCode(...args)),
+  doGetConversationInfoByCode: (
+    ...args: Parameters<typeof ROOT_ACTIONS.conversationAction.doGetConversationInfoByCode>
+  ) => dispatch(ROOT_ACTIONS.conversationAction.doGetConversationInfoByCode(...args)),
+  doInit: (...args: Parameters<typeof ROOT_ACTIONS.authAction.doInit>) =>
+    dispatch(ROOT_ACTIONS.authAction.doInit(...args)),
+  doJoinConversationByCode: (...args: Parameters<typeof ROOT_ACTIONS.conversationAction.doJoinConversationByCode>) =>
+    dispatch(ROOT_ACTIONS.conversationAction.doJoinConversationByCode(...args)),
+  doLogout: (...args: Parameters<typeof ROOT_ACTIONS.authAction.doLogout>) =>
+    dispatch(ROOT_ACTIONS.authAction.doLogout(...args)),
+  doRegisterWireless: (...args: Parameters<typeof ROOT_ACTIONS.authAction.doRegisterWireless>) =>
+    dispatch(ROOT_ACTIONS.authAction.doRegisterWireless(...args)),
+  setLastEventDate: (...args: Parameters<typeof ROOT_ACTIONS.notificationAction.setLastEventDate>) =>
+    dispatch(ROOT_ACTIONS.notificationAction.setLastEventDate(...args)),
+});
 
 const ConversationJoin = connect(mapStateToProps, mapDispatchToProps)(ConversationJoinComponent);
 

@@ -20,10 +20,9 @@
 import React from 'react';
 
 import {FormattedMessage} from 'react-intl';
+import {t} from 'Util/LocalizerUtil';
 
 import {ContainerXS, H2, Text} from '@wireapp/react-ui-kit';
-
-import {t} from 'Util/LocalizerUtil';
 
 import {Config} from '../../Config';
 import {WirelessContainer} from '../component/WirelessContainer';

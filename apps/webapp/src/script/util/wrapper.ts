@@ -18,11 +18,10 @@
  */
 
 import {amplify} from 'amplify';
+import {ROLE} from 'Repositories/user/UserPermission';
 
 import {Runtime} from '@wireapp/commons';
 import {WebAppEvents} from '@wireapp/webapp-events';
-
-import {ROLE} from 'Repositories/user/UserPermission';
 
 import {Environment} from './Environment';
 

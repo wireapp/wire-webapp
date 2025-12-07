@@ -18,8 +18,6 @@
  */
 
 import cx from 'classnames';
-import {container} from 'tsyringe';
-
 import {
   cellControlsList,
   cellControlsWrapper,
@@ -30,6 +28,7 @@ import {Call} from 'Repositories/calling/Call';
 import {DesktopScreenShareMenu} from 'Repositories/calling/CallState';
 import {Participant} from 'Repositories/calling/Participant';
 import {TeamState} from 'Repositories/team/TeamState';
+import {container} from 'tsyringe';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 

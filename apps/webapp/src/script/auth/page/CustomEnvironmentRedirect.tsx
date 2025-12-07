@@ -19,20 +19,18 @@
 
 import {useEffect, useState} from 'react';
 
+import {LogoIcon} from 'Components/Icon';
 import {connect} from 'react-redux';
-import {AnyAction, Dispatch} from 'redux';
+import {t} from 'Util/LocalizerUtil';
+import {afterRender} from 'Util/util';
 
 import {Runtime, UrlUtil} from '@wireapp/commons';
 import {COLOR, ContainerXS, FlexBox, Text} from '@wireapp/react-ui-kit';
 
-import {LogoIcon} from 'Components/Icon';
-import {t} from 'Util/LocalizerUtil';
-import {afterRender} from 'Util/util';
-
 import {Page} from './Page';
 
 import {actionRoot} from '../module/action';
-import {bindActionCreators} from '../module/reducer';
+import {ThunkDispatch} from '../module/reducer';
 import {QUERY_KEY} from '../route';
 import {getEnterpriseLoginV2FF} from '../util/helpers';
 
@@ -127,14 +125,12 @@ const CustomEnvironmentRedirectComponent = ({doNavigate, doSendNavigationEvent}:
 };
 
 type DispatchProps = ReturnType<typeof mapDispatchToProps>;
-const mapDispatchToProps = (dispatch: Dispatch<AnyAction>) =>
-  bindActionCreators(
-    {
-      doNavigate: actionRoot.navigationAction.doNavigate,
-      doSendNavigationEvent: actionRoot.wrapperEventAction.doSendNavigationEvent,
-    },
-    dispatch,
-  );
+const mapDispatchToProps = (dispatch: ThunkDispatch) => ({
+  doNavigate: (...args: Parameters<typeof actionRoot.navigationAction.doNavigate>) =>
+    dispatch(actionRoot.navigationAction.doNavigate(...args)),
+  doSendNavigationEvent: (...args: Parameters<typeof actionRoot.wrapperEventAction.doSendNavigationEvent>) =>
+    dispatch(actionRoot.wrapperEventAction.doSendNavigationEvent(...args)),
+});
 
 const CustomEnvironmentRedirect = connect(null, mapDispatchToProps)(CustomEnvironmentRedirectComponent);
 

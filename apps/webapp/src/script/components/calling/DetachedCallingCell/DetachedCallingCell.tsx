@@ -17,13 +17,12 @@
  *
  */
 
-import {container} from 'tsyringe';
-
 import {Call} from 'Repositories/calling/Call';
 import {CallingRepository} from 'Repositories/calling/CallingRepository';
 import {CallingViewMode, CallState, DesktopScreenShareMenu} from 'Repositories/calling/CallState';
 import {PropertiesRepository} from 'Repositories/properties/PropertiesRepository';
 import {UserState} from 'Repositories/user/UserState';
+import {container} from 'tsyringe';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 
 import {DetachedWindow} from './components/DetachedWindow';

@@ -19,7 +19,6 @@
 
 import {MemberLeaveReason} from '@wireapp/api-client/lib/conversation/data/';
 import {CONVERSATION_EVENT} from '@wireapp/api-client/lib/event';
-
 import {AssetTransferState} from 'Repositories/assets/AssetTransferState';
 import {
   AssetAddEvent,

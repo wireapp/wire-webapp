@@ -20,17 +20,16 @@
 import {FC, useCallback, useRef, useState} from 'react';
 
 import {amplify} from 'amplify';
-import ko from 'knockout';
-
-import {WebAppEvents} from '@wireapp/webapp-events';
-
 import {useClickOutside} from 'Hooks/useClickOutside';
+import ko from 'knockout';
 import {ContentMessage} from 'Repositories/entity/message/ContentMessage';
 import {ContextMenuEntry, showContextMenu} from 'src/script/ui/ContextMenu';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {isSpaceOrEnterKey, isTabKey} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
 import {setContextMenuPosition} from 'Util/util';
+
+import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {useMessageActionsState} from './MessageActions.state';
 import {

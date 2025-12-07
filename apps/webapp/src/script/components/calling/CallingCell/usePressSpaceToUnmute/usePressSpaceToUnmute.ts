@@ -18,9 +18,6 @@
  */
 
 import {amplify} from 'amplify';
-
-import {WebAppEvents} from '@wireapp/webapp-events';
-
 import {useAppNotification} from 'Components/AppNotification';
 import {MicOnIcon} from 'Components/Icon';
 import {useActiveWindowState} from 'Hooks/useActiveWindow';
@@ -29,6 +26,8 @@ import {CallingViewMode, CallState} from 'Repositories/calling/CallState';
 import {EventName} from 'Repositories/tracking/EventName';
 import {KEY} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
+
+import {WebAppEvents} from '@wireapp/webapp-events';
 
 interface UsePressSpaceToUnmuteParams {
   callState: CallState;

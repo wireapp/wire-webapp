@@ -21,9 +21,8 @@ import type {MessageSendingStatus, QualifiedUserClients, UserClients} from '@wir
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {flattenUserMap} from '@wireapp/core/lib/conversation/message/UserClientsUtil';
 import {isQualifiedUserClients} from '@wireapp/core/lib/util';
-import {difference, intersection} from 'underscore';
-
 import {User} from 'Repositories/entity/User';
+import {difference, intersection} from 'underscore';
 import {matchQualifiedIds} from 'Util/QualifiedId';
 
 type UserClient = {clients: string[]; userId: QualifiedId};

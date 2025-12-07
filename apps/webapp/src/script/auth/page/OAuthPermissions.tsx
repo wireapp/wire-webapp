@@ -20,10 +20,15 @@
 import React, {useState} from 'react';
 
 import {OAuthClient} from '@wireapp/api-client/lib/oauth/OAuthClient';
+import * as Icon from 'Components/Icon';
 import {FormattedMessage} from 'react-intl';
 import {connect} from 'react-redux';
-import {AnyAction, Dispatch} from 'redux';
+import {AssetRemoteData} from 'Repositories/assets/AssetRemoteData';
+import {AssetRepository} from 'Repositories/assets/AssetRepository';
 import {container} from 'tsyringe';
+import {handleEscDown, handleKeyDown, KEY} from 'Util/KeyboardUtil';
+import {t} from 'Util/LocalizerUtil';
+import {loadDataUrl} from 'Util/util';
 
 import {
   Button,
@@ -39,13 +44,6 @@ import {
   QUERY,
   useMatchMedia,
 } from '@wireapp/react-ui-kit';
-
-import * as Icon from 'Components/Icon';
-import {AssetRemoteData} from 'Repositories/assets/AssetRemoteData';
-import {AssetRepository} from 'Repositories/assets/AssetRepository';
-import {handleEscDown, handleKeyDown, KEY} from 'Util/KeyboardUtil';
-import {t} from 'Util/LocalizerUtil';
-import {loadDataUrl} from 'Util/util';
 
 import {
   boxCSS,
@@ -64,7 +62,7 @@ import {Page} from './Page';
 
 import {Config} from '../../Config';
 import {actionRoot} from '../module/action';
-import {bindActionCreators, RootState} from '../module/reducer';
+import {RootState, ThunkDispatch} from '../module/reducer';
 import * as SelfSelector from '../module/selector/SelfSelector';
 import {oAuthParams, oAuthScope, oAuthScopesToString} from '../util/oauthUtil';
 
@@ -264,17 +262,18 @@ const mapStateToProps = (state: RootState) => ({
 });
 
 type DispatchProps = ReturnType<typeof mapDispatchToProps>;
-const mapDispatchToProps = (dispatch: Dispatch<AnyAction>) =>
-  bindActionCreators(
-    {
-      getSelf: actionRoot.selfAction.fetchSelf,
-      getOAuthApp: actionRoot.authAction.doGetOAuthApplication,
-      doLogout: actionRoot.authAction.doLogout,
-      getTeam: actionRoot.authAction.doGetTeamData,
-      postOauthCode: actionRoot.authAction.doPostOAuthCode,
-    },
-    dispatch,
-  );
+const mapDispatchToProps = (dispatch: ThunkDispatch) => ({
+  getSelf: (...args: Parameters<typeof actionRoot.selfAction.fetchSelf>) =>
+    dispatch(actionRoot.selfAction.fetchSelf(...args)),
+  getOAuthApp: (...args: Parameters<typeof actionRoot.authAction.doGetOAuthApplication>) =>
+    dispatch(actionRoot.authAction.doGetOAuthApplication(...args)),
+  doLogout: (...args: Parameters<typeof actionRoot.authAction.doLogout>) =>
+    dispatch(actionRoot.authAction.doLogout(...args)),
+  getTeam: (...args: Parameters<typeof actionRoot.authAction.doGetTeamData>) =>
+    dispatch(actionRoot.authAction.doGetTeamData(...args)),
+  postOauthCode: (...args: Parameters<typeof actionRoot.authAction.doPostOAuthCode>) =>
+    dispatch(actionRoot.authAction.doPostOAuthCode(...args)),
+});
 
 const OAuthPermissions = connect(mapStateToProps, mapDispatchToProps)(OAuthPermissionsComponent);
 

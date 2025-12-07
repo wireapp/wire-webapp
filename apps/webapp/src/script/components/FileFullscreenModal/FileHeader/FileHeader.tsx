@@ -17,17 +17,16 @@
  *
  */
 
-import {container} from 'tsyringe';
-
-import {BadgesWithTooltip, Button, ButtonVariant, CloseIcon, DownloadIcon, ShowIcon} from '@wireapp/react-ui-kit';
-
 import {FileTypeIcon} from 'Components/Conversation/common/FileTypeIcon/FileTypeIcon';
 import {EditIcon} from 'Components/Icon';
 import {MessageTime} from 'Components/MessagesList/Message/MessageTime';
 import {useRelativeTimestamp} from 'Hooks/useRelativeTimestamp';
 import {CellsRepository} from 'Repositories/cells/CellsRepository';
+import {container} from 'tsyringe';
 import {t} from 'Util/LocalizerUtil';
 import {forcedDownloadFile, getFileNameWithExtension} from 'Util/util';
+
+import {BadgesWithTooltip, Button, ButtonVariant, CloseIcon, DownloadIcon, ShowIcon} from '@wireapp/react-ui-kit';
 
 import {
   headerStyles,

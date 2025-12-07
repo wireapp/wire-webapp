@@ -20,19 +20,18 @@
 import {useEffect, CSSProperties} from 'react';
 
 import {amplify} from 'amplify';
-import {ErrorBoundary} from 'react-error-boundary';
-
-import {WebAppEvents} from '@wireapp/webapp-events';
-
 import {Avatar, AVATAR_SIZE} from 'Components/Avatar';
 import {UserBlockedBadge, UserVerificationBadges} from 'Components/Badge';
 import {UserClassifiedBar} from 'Components/ClassifiedBar/ClassifiedBar';
 import {ErrorFallback} from 'Components/ErrorFallback';
 import * as Icon from 'Components/Icon';
 import {UserInfo} from 'Components/UserInfo';
+import {ErrorBoundary} from 'react-error-boundary';
 import {User} from 'Repositories/entity/User';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
+
+import {WebAppEvents} from '@wireapp/webapp-events';
 
 interface UserDetailsProps {
   badge?: string;

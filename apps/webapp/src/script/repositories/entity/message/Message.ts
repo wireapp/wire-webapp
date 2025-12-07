@@ -19,14 +19,13 @@
 
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 import ko from 'knockout';
-
-import type {LegalHoldStatus} from '@wireapp/protocol-messaging';
-
 import {AssetTransferState} from 'Repositories/assets/AssetTransferState';
 import {AssetType} from 'Repositories/assets/AssetType';
 import type {ReadReceipt} from 'Repositories/storage/record/EventRecord';
 import {t, getUserName} from 'Util/LocalizerUtil';
 import {formatDateNumeral, formatDurationCaption, formatTimeShort, fromUnixTime, TIME_IN_MILLIS} from 'Util/TimeUtil';
+
+import type {LegalHoldStatus} from '@wireapp/protocol-messaging';
 
 import {CallingTimeoutMessage} from './CallingTimeoutMessage';
 import type {CallMessage} from './CallMessage';

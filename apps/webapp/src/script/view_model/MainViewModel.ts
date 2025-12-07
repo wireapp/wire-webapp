@@ -17,8 +17,6 @@
  *
  */
 
-import {container} from 'tsyringe';
-
 import type {AssetRepository} from 'Repositories/assets/AssetRepository';
 import type {AudioRepository} from 'Repositories/audio/AudioRepository';
 import type {BackupRepository} from 'Repositories/backup/BackupRepository';
@@ -45,6 +43,7 @@ import type {TeamRepository} from 'Repositories/team/TeamRepository';
 import type {EventTrackingRepository} from 'Repositories/tracking/EventTrackingRepository';
 import type {UserRepository} from 'Repositories/user/UserRepository';
 import {UserState} from 'Repositories/user/UserState';
+import {container} from 'tsyringe';
 
 import {ActionsViewModel} from './ActionsViewModel';
 import {CallingViewModel} from './CallingViewModel';

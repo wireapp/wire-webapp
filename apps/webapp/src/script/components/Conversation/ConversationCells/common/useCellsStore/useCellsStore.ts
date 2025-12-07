@@ -17,9 +17,8 @@
  *
  */
 
-import {create} from 'zustand';
-
 import {CellNode} from 'src/script/types/cellNode';
+import {create} from 'zustand';
 
 import {CellPagination} from '../cellPagination/cellPagination';
 

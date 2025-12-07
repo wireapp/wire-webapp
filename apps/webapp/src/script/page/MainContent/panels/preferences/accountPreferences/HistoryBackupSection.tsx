@@ -19,12 +19,12 @@
 
 import {FC} from 'react';
 
-import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
-
 import {BackupFileUpload} from 'Components/HistoryImport/BackupFileUpload';
 import {Config} from 'src/script/Config';
 import {ContentState} from 'src/script/page/useAppState';
 import {t} from 'Util/LocalizerUtil';
+
+import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
 
 import {PreferencesSection} from '../components/PreferencesSection';
 

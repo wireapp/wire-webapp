@@ -18,11 +18,10 @@
  */
 
 import {CSSObject} from '@emotion/react';
-
-import {Availability as AvailabilityProp} from '@wireapp/protocol-messaging';
-
 import {AVATAR_SIZE} from 'Components/Avatar';
 import {CSS_SQUARE} from 'Util/CSSMixin';
+
+import {Availability as AvailabilityProp} from '@wireapp/protocol-messaging';
 
 const availabilityStateColors: Partial<Record<AvailabilityProp.Type, string>> = {
   [AvailabilityProp.Type.AVAILABLE]: 'var(--green-500)',

@@ -17,15 +17,14 @@
  *
  */
 
-import {container} from 'tsyringe';
-
-import {Runtime} from '@wireapp/commons';
-
 import {CallingViewMode, CallState} from 'Repositories/calling/CallState';
 import {BrowserPermissionStatus} from 'Repositories/permission/BrowserPermissionStatus';
 import {getPermissionStates} from 'Repositories/permission/permissionHandlers';
 import {PermissionType} from 'Repositories/permission/PermissionType';
+import {container} from 'tsyringe';
 import {getLogger, Logger} from 'Util/Logger';
+
+import {Runtime} from '@wireapp/commons';
 
 import {MediaConstraintsHandler, ScreensharingMethods} from './MediaConstraintsHandler';
 import {MEDIA_STREAM_ERROR} from './MediaStreamError';

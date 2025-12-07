@@ -18,7 +18,6 @@
  */
 
 import type {Page, Locator} from '@playwright/test';
-
 import type {User} from 'test/e2e_tests/data/user';
 
 import {webAppPath} from '../..';

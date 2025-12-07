@@ -18,7 +18,6 @@
  */
 
 import {Locator, Page} from '@playwright/test';
-
 import {selectByDataAttribute} from 'test/e2e_tests/utils/selector.util';
 import {escapeHtml} from 'test/e2e_tests/utils/userDataProcessor';
 

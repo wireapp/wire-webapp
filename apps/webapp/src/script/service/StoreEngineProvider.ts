@@ -18,13 +18,12 @@
  */
 
 import {applyEncryptionMiddleware, NON_INDEXED_FIELDS} from 'dexie-encrypted';
+import {DexieDatabase} from 'Repositories/storage/DexieDatabase';
+import {getLogger} from 'Util/Logger';
 
 import type {CRUDEngine} from '@wireapp/store-engine';
 import {MemoryEngine} from '@wireapp/store-engine';
 import {IndexedDBEngine} from '@wireapp/store-engine-dexie';
-
-import {DexieDatabase} from 'Repositories/storage/DexieDatabase';
-import {getLogger} from 'Util/Logger';
 
 const logger = getLogger('StoreEngineProvider');
 
@@ -50,6 +49,7 @@ const providePermanentEngine = async (
     logger.info('DB encyption config has changed'),
   );
   const engine = new IndexedDBEngine();
+
   try {
     await engine.initWithDb(db, requestPersistentStorage);
   } catch (error) {

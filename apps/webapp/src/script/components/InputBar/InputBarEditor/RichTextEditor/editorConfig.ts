@@ -23,7 +23,6 @@ import {ListItemNode, ListNode} from '@lexical/list';
 import {InitialConfigType} from '@lexical/react/LexicalComposer';
 import {HorizontalRuleNode} from '@lexical/react/LexicalHorizontalRuleNode';
 import {HeadingNode, QuoteNode} from '@lexical/rich-text';
-
 import {getLogger} from 'Util/Logger';
 
 import {EmojiNode} from './nodes/EmojiNode';

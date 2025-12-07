@@ -20,7 +20,6 @@
 import {useCallback, KeyboardEvent, MouseEvent, useEffect} from 'react';
 
 import {QualifiedId} from '@wireapp/api-client/lib/user';
-
 import {generateConversationUrl} from 'src/script/router/routeGenerator';
 import {createNavigate, createNavigateKeyboard} from 'src/script/router/routerBindings';
 import {KEY} from 'Util/KeyboardUtil';

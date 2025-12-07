@@ -19,12 +19,12 @@
 
 import type {FormEvent} from 'react';
 
-import {ValidationUtil} from '@wireapp/commons';
-import {Form, Input, ErrorMessage} from '@wireapp/react-ui-kit';
-
 import {PasswordGeneratorButton} from 'Components/PasswordGeneratorButton';
 import {Config} from 'src/script/Config';
 import {t} from 'Util/LocalizerUtil';
+
+import {ValidationUtil} from '@wireapp/commons';
+import {Form, Input, ErrorMessage} from '@wireapp/react-ui-kit';
 
 import {errorMessageStyles} from './GuestLinkPasswordForm.styles';
 

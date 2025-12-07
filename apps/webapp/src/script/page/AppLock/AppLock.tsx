@@ -21,22 +21,21 @@ import {useCallback, useEffect, useRef, useState, Fragment, FormEvent} from 'rea
 
 import {amplify} from 'amplify';
 import cx from 'classnames';
-import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
-import {container} from 'tsyringe';
-
-import {ValidationUtil} from '@wireapp/commons';
-import {WebAppEvents} from '@wireapp/webapp-events';
-
 import * as Icon from 'Components/Icon';
 import {ModalComponent} from 'Components/Modals/ModalComponent';
+import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 import {ClientRepository} from 'Repositories/client';
 import {ClientState} from 'Repositories/client/ClientState';
 import {AppLockRepository} from 'Repositories/user/AppLockRepository';
 import {AppLockState} from 'Repositories/user/AppLockState';
 import {SIGN_OUT_REASON} from 'src/script/auth/SignOutReason';
 import {Config} from 'src/script/Config';
+import {container} from 'tsyringe';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
+
+import {ValidationUtil} from '@wireapp/commons';
+import {WebAppEvents} from '@wireapp/webapp-events';
 
 export enum APPLOCK_STATE {
   FORGOT = 'applock.forgot',

@@ -1,4 +1,4 @@
-src/i18n/
+apps/webapp/src/i18n/
 .vscode/
 /config
 /docs/auth-coverage
@@ -6,9 +6,11 @@ src/i18n/
 /package-lock.json
 /resource
 /assets
-/src/ext
+apps/webapp/assets/
+/apps/webapp/src/ext
+apps/webapp/src/worker/
 CHANGELOG.md
 node_modules
 npm-debug.log
 yarn-error.log
-src/types/i18n.d.ts
+apps/webapp/src/types/i18n.d.ts

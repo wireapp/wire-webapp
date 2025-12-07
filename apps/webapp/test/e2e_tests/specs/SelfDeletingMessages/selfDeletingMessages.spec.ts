@@ -18,7 +18,6 @@
  */
 
 import {Locator} from '@playwright/test';
-
 import {User} from 'test/e2e_tests/data/user';
 import {PageManager} from 'test/e2e_tests/pageManager';
 import {test, expect, withLogin, withConnectedUser} from 'test/e2e_tests/test.fixtures';

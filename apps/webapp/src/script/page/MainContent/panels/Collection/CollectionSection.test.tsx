@@ -18,7 +18,6 @@
  */
 
 import {fireEvent, render} from '@testing-library/react';
-
 import {ContentMessage} from 'Repositories/entity/message/ContentMessage';
 import {createUuid} from 'Util/uuid';
 

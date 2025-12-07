@@ -17,11 +17,15 @@
  *
  */
 
-import {StringIdentifer} from 'Util/LocalizerUtil';
+import {StringIdentifer, TranslationStrings} from 'Util/LocalizerUtil';
+
+type TranslationKeyWithoutPlaceholders = {
+  [Key in StringIdentifer]: TranslationStrings[Key] extends `${string}{${string}}${string}` ? never : Key;
+}[StringIdentifer];
 
 export type RatingListItem = {
   value: number;
-  headingTranslationKey?: StringIdentifer;
+  headingTranslationKey?: TranslationKeyWithoutPlaceholders;
 };
 
 export enum RatingListLabel {

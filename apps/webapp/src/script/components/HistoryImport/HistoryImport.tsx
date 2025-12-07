@@ -19,8 +19,6 @@
 
 import {useEffect, useState} from 'react';
 
-import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
-
 import * as Icon from 'Components/Icon';
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {ProgressBar} from 'Components/ProgressBar/ProgressBar';
@@ -38,6 +36,8 @@ import {checkBackupEncryption} from 'Util/BackupUtil';
 import {t} from 'Util/LocalizerUtil';
 import {getLogger} from 'Util/Logger';
 import {loadFileBuffer} from 'Util/util';
+
+import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
 
 import {BackupFileUpload} from './BackupFileUpload';
 
@@ -123,10 +123,10 @@ const HistoryImport = ({user, backupRepository, file, switchContent}: HistoryImp
       setErrorSecondary(t('backupImportAccountErrorSecondary'));
     } else if (error instanceof IncompatibleBackupError) {
       setErrorHeadline(t('backupImportVersionErrorHeadline'));
-      //@ts-expect-error
       //the "brandname" should be provided
       //the correct syntax is suspected to create issues with electron's console see https://wearezeta.atlassian.net/browse/WPB-15317
       //TODO: figure out the issue with the electron console
+      //@ts-expect-error
       setErrorSecondary(t('backupImportVersionErrorSecondary', Config.getConfig().BRAND_NAME));
     } else if (error instanceof IncompatibleBackupFormatError) {
       setErrorHeadline(t('backupImportFormatErrorHeadline'));

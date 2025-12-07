@@ -17,13 +17,13 @@
  *
  */
 
-import {IncomingMessage} from 'node:http';
-import https from 'node:https';
-import {SecureVersion} from 'node:tls';
-
 import {PageManager, webAppPath} from 'test/e2e_tests/pageManager';
 import {test, expect, withLogin} from 'test/e2e_tests/test.fixtures';
 import {connectWithUser} from 'test/e2e_tests/utils/userActions';
+
+import {IncomingMessage} from 'node:http';
+import https from 'node:https';
+import {SecureVersion} from 'node:tls';
 
 test.describe('Authentication', () => {
   test(

@@ -20,12 +20,11 @@
 import React, {useEffect, useState} from 'react';
 
 import {CSSObject} from '@emotion/serialize';
-import {Transition} from 'react-transition-group';
-import {container} from 'tsyringe';
-
 import {InViewport} from 'Components/InViewport';
+import {Transition} from 'react-transition-group';
 import {AssetRemoteData} from 'Repositories/assets/AssetRemoteData';
 import {AssetRepository} from 'Repositories/assets/AssetRepository';
+import {container} from 'tsyringe';
 import {CSS_FILL_PARENT} from 'Util/CSSMixin';
 
 import {AVATAR_SIZE} from '.';

@@ -18,7 +18,6 @@
  */
 
 import {render, fireEvent} from '@testing-library/react';
-
 import {GifImage} from 'Components/Giphy/GifImage';
 
 const staticImage = 'https://mock.image/500/300';

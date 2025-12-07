@@ -20,7 +20,6 @@
 import React from 'react';
 
 import {CSSObject} from '@emotion/react';
-
 import * as Icon from 'Components/Icon';
 import {AssetImage} from 'Components/Image';
 import {ContentMessage} from 'Repositories/entity/message/ContentMessage';

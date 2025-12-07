@@ -21,7 +21,6 @@ import {useState, useEffect, useRef, RefObject} from 'react';
 
 import EmojiPickerReact, {EmojiClickData, EmojiStyle, SkinTones} from 'emoji-picker-react';
 import {createPortal} from 'react-dom';
-
 import {useClickOutside} from 'src/script/hooks/useClickOutside';
 import {isEnterKey, isEscapeKey} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';

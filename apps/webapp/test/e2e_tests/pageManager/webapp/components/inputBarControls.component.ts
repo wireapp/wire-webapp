@@ -18,7 +18,6 @@
  */
 
 import {Page, Locator} from '@playwright/test';
-
 import {shareAssetHelper} from 'test/e2e_tests/utils/asset.util';
 import {selectByDataAttribute} from 'test/e2e_tests/utils/selector.util';
 

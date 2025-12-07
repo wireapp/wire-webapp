@@ -47,14 +47,61 @@
       "executor": "@nx/playwright:playwright",
       "outputs": ["{workspaceRoot}/dist/.playwright/apps/webapp"],
       "options": {
-        "playwrightConfig": "apps/webapp/playwright.config.ts"
+        "config": "apps/webapp/playwright.config.ts"
       }
     },
     "lint": {
-      "executor": "@nx/linter:eslint",
-      "outputs": ["{options.outputFile}"],
+      "executor": "nx:run-commands",
+      "dependsOn": ["webapp:stylelint", "webapp:type-check"],
       "options": {
-        "lintFilePatterns": ["apps/webapp/**/*.{ts,tsx,js,jsx}"]
+        "command": "eslint --ext .js,.ts,.tsx apps/webapp"
+      }
+    },
+    "stylelint": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "prettier --ignore-path ../../.prettierignore --write \"**/*.less\" && stylelint --ignore-path ../../.gitignore \"**/*.less\"",
+        "cwd": "apps/webapp"
+      }
+    },
+    "type-check": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "tsc --project apps/webapp/tsconfig.build.json --noEmit"
+      }
+    },
+    "check-circular": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "dpdm --no-warning --no-tree -T apps/webapp/src/script/auth/main.tsx apps/webapp/src/script/main/app.ts"
+      }
+    },
+    "translate-extract": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "i18next-scanner 'src/{page,script}/**/*.{js,html,htm}'",
+        "cwd": "apps/webapp"
+      }
+    },
+    "translate-merge": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "formatjs extract --format '../../bin/translations_extract_formatter.js' --out-file './src/i18n/en-US.json'",
+        "cwd": "apps/webapp"
+      }
+    },
+    "translate-generate-types": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "node ../../bin/transalations_generate_types.js",
+        "cwd": "apps/webapp"
+      }
+    },
+    "configure": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "copy-config && ts-node ./bin/generate_react_icons.ts",
+        "cwd": "."
       }
     }
   },

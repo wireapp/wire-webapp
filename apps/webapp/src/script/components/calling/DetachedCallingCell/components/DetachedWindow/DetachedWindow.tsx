@@ -21,13 +21,12 @@ import createCache from '@emotion/cache';
 import {CacheProvider} from '@emotion/react';
 import weakMemoize from '@emotion/weak-memoize';
 import {createPortal} from 'react-dom';
-import {container} from 'tsyringe';
-
-import {StyledApp, THEME_ID} from '@wireapp/react-ui-kit';
-
 import {CallState} from 'Repositories/calling/CallState';
 import {useActiveWindow} from 'src/script/hooks/useActiveWindow';
+import {container} from 'tsyringe';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
+
+import {StyledApp, THEME_ID} from '@wireapp/react-ui-kit';
 
 import '../../../../../../style/default.less';
 

@@ -19,14 +19,13 @@
 
 import {useEffect, useMemo, useState} from 'react';
 
-import {container} from 'tsyringe';
-
-import {STATE as CALL_STATE} from '@wireapp/avs';
-
 import {CallState} from 'Repositories/calling/CallState';
 import type {Conversation} from 'Repositories/entity/Conversation';
+import {container} from 'tsyringe';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {matchQualifiedIds} from 'Util/QualifiedId';
+
+import {STATE as CALL_STATE} from '@wireapp/avs';
 
 interface ConversationCallState {
   /** connecting/joining */

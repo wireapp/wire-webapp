@@ -19,10 +19,6 @@
 
 import React, {useState} from 'react';
 
-import {container} from 'tsyringe';
-
-import {Button, ButtonVariant, Checkbox, CheckboxLabel} from '@wireapp/react-ui-kit';
-
 import {useAppNotification} from 'Components/AppNotification';
 import {useCallAlertState} from 'Components/calling/useCallAlertState';
 import {ModalComponent} from 'Components/Modals/ModalComponent';
@@ -30,9 +26,12 @@ import {RatingListLabel} from 'Components/Modals/QualityFeedbackModal/typings';
 import {CallingRepository} from 'Repositories/calling/CallingRepository';
 import {trackCallQualityFeedback} from 'Repositories/tracking/Helpers';
 import {UserState} from 'Repositories/user/UserState';
+import {container} from 'tsyringe';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 import {getLogger} from 'Util/Logger';
+
+import {Button, ButtonVariant, Checkbox, CheckboxLabel} from '@wireapp/react-ui-kit';
 
 import {CALL_QUALITY_FEEDBACK_KEY, CALL_SURVEY_MUTE_INTERVAL, ratingListItems} from './constants';
 import {
@@ -123,7 +122,6 @@ export const QualityFeedbackModal = ({callingRepository}: Props) => {
           {ratingListItems.map(ratingItem => (
             <li key={ratingItem.value}>
               {ratingItem?.headingTranslationKey && (
-                // @ts-expect-error
                 // headingTranslationKey has to broad type to specify it
                 // TODO: narrow down the type
                 <div css={ratingItemHeading}>{t(ratingItem.headingTranslationKey)}</div>

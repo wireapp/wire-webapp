@@ -18,7 +18,6 @@
  */
 
 import {BrowserContext} from '@playwright/test';
-
 import {addCreatedTeam, removeCreatedTeam} from 'test/e2e_tests/utils/tearDown.util';
 
 import {Services} from '../../data/serviceInfo';

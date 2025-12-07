@@ -17,8 +17,6 @@
  *
  */
 
-import {omit} from 'underscore';
-
 import type {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
 import {isReadableConversation} from 'Repositories/conversation/ConversationSelectors';
 import type {Conversation} from 'Repositories/entity/Conversation';
@@ -26,6 +24,7 @@ import {User} from 'Repositories/entity/User';
 import {EventRecord, UserRecord} from 'Repositories/storage';
 import {ConversationRecord} from 'Repositories/storage/record/ConversationRecord';
 import {StorageSchemata} from 'Repositories/storage/StorageSchemata';
+import {omit} from 'underscore';
 import {chunk} from 'Util/ArrayUtil';
 import {Logger, getLogger} from 'Util/Logger';
 import {constructUserPrimaryKey} from 'Util/StorageUtil';

@@ -19,15 +19,15 @@
 
 import {FC, FormEvent, MouseEvent, useState, useRef, ChangeEvent, useEffect, useMemo} from 'react';
 
-import {ValidationUtil} from '@wireapp/commons';
-import {ErrorMessage} from '@wireapp/react-ui-kit';
-
 import {CopyToClipboardButton} from 'Components/CopyToClipboardButton';
 import {FadingScrollbar} from 'Components/FadingScrollbar';
 import {Config} from 'src/script/Config';
 import {isEnterKey, isEscapeKey} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
 import {isValidPassword} from 'Util/StringUtil';
+
+import {ValidationUtil} from '@wireapp/commons';
+import {ErrorMessage} from '@wireapp/react-ui-kit';
 
 import {CheckboxOption} from './CheckboxOption/CheckboxOption';
 import {MessageContent} from './Content/MessageContent';

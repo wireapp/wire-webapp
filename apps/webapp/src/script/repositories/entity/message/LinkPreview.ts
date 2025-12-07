@@ -17,10 +17,10 @@
  *
  */
 
-import type {ITweet} from '@wireapp/protocol-messaging';
-
 import type {AssetRemoteData} from 'Repositories/assets/AssetRemoteData';
 import {obfuscate} from 'Util/StringUtil';
+
+import type {ITweet} from '@wireapp/protocol-messaging';
 
 export type LinkPreviewData = {
   image?: AssetRemoteData;

@@ -17,10 +17,10 @@
  *
  */
 
-import {ChevronIcon, IconButton, IconButtonVariant} from '@wireapp/react-ui-kit';
-
 import {handleKeyDown, KEY} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
+
+import {ChevronIcon, IconButton, IconButtonVariant} from '@wireapp/react-ui-kit';
 
 import {chevronLeftStyles, chevronRightStyles, iconButtonStyles} from './Pagination.styles';
 

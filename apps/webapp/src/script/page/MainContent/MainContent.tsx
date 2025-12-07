@@ -20,9 +20,6 @@
 import {ReactNode, useContext, useEffect, useState} from 'react';
 
 import cx from 'classnames';
-import {CSSTransition, SwitchTransition} from 'react-transition-group';
-import {container} from 'tsyringe';
-
 import {CellsGlobalView} from 'Components/CellsGlobalView/CellsGlobalView';
 import {ConnectRequests} from 'Components/ConnectRequests';
 import {Conversation} from 'Components/Conversation';
@@ -30,6 +27,7 @@ import {HistoryExport} from 'Components/HistoryExport';
 import {HistoryImport} from 'Components/HistoryImport';
 import * as Icon from 'Components/Icon';
 import {useLegalHoldModalState} from 'Components/Modals/LegalHoldModal/LegalHoldModal.state';
+import {CSSTransition, SwitchTransition} from 'react-transition-group';
 import {ClientState} from 'Repositories/client/ClientState';
 import {ConversationState} from 'Repositories/conversation/ConversationState';
 import {User} from 'Repositories/entity/User';
@@ -37,6 +35,7 @@ import {MediaDeviceType} from 'Repositories/media/MediaDeviceType';
 import {useMediaDevicesStore} from 'Repositories/media/useMediaDevicesStore';
 import {TeamState} from 'Repositories/team/TeamState';
 import {UserState} from 'Repositories/user/UserState';
+import {container} from 'tsyringe';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 import {incomingCssClass, removeAnimationsClass} from 'Util/util';

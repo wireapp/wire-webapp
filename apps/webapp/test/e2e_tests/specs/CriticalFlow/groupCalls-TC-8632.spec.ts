@@ -19,7 +19,6 @@
 
 import {BrowserContext} from '@playwright/test';
 import {FEATURE_KEY} from '@wireapp/api-client/lib/team/feature';
-
 import {PageManager} from 'test/e2e_tests/pageManager';
 import {completeLogin} from 'test/e2e_tests/utils/setup.util';
 import {addCreatedTeam, removeCreatedTeam} from 'test/e2e_tests/utils/tearDown.util';

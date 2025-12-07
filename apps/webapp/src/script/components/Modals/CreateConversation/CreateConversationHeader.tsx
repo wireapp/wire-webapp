@@ -17,13 +17,12 @@
  *
  */
 
-import {container} from 'tsyringe';
-
-import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
-
 import * as Icon from 'Components/Icon';
 import {UserState} from 'Repositories/user/UserState';
+import {container} from 'tsyringe';
 import {t} from 'Util/LocalizerUtil';
+
+import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
 
 import {createConversationHeaderContainerCss} from './CreateConversation.styles';
 import {CreateConversationSubmit} from './CreateConversationSubmit';

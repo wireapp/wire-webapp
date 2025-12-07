@@ -24,10 +24,6 @@ import {RECEIPT_MODE} from '@wireapp/api-client/lib/conversation/data';
 import {CONVERSATION_PROTOCOL, mapToConversationProtocol} from '@wireapp/api-client/lib/team';
 import {isNonFederatingBackendsError} from '@wireapp/core/lib/errors';
 import {amplify} from 'amplify';
-import {container} from 'tsyringe';
-
-import {WebAppEvents} from '@wireapp/webapp-events';
-
 import {ACCESS_STATE} from 'Repositories/conversation/AccessState';
 import {
   toggleFeature,
@@ -41,9 +37,12 @@ import {useSidebarStore, SidebarTabs} from 'src/script/page/LeftSidebar/panels/C
 import {RootContext} from 'src/script/page/RootProvider';
 import {generateConversationUrl} from 'src/script/router/routeGenerator';
 import {createNavigateKeyboard, createNavigate} from 'src/script/router/routerBindings';
+import {container} from 'tsyringe';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {isKeyboardEvent} from 'Util/KeyboardUtil';
 import {replaceLink, t} from 'Util/LocalizerUtil';
+
+import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {PrimaryModal} from '../../PrimaryModal';
 import {useCreateConversationModal} from '../hooks/useCreateConversationModal';

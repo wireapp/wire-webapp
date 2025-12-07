@@ -18,12 +18,11 @@
  */
 
 import {CONVERSATION_EVENT} from '@wireapp/api-client/lib/event';
-import {container} from 'tsyringe';
-
 import {ConversationState} from 'Repositories/conversation/ConversationState';
 import {User} from 'Repositories/entity/User';
 import type {EventRecord} from 'Repositories/storage';
 import {UserFilter} from 'Repositories/user/UserFilter';
+import {container} from 'tsyringe';
 import {matchQualifiedIds} from 'Util/QualifiedId';
 
 import {handleLinkPreviewEvent, handleEditEvent, handleAssetEvent, handleReactionEvent} from './eventHandlers';

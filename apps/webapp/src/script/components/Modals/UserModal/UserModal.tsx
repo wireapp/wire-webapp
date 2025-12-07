@@ -20,10 +20,6 @@
 import {useContext, useEffect, useState} from 'react';
 
 import cx from 'classnames';
-import {container} from 'tsyringe';
-
-import {TabIndex, Link, LinkVariant} from '@wireapp/react-ui-kit';
-
 import {FadingScrollbar} from 'Components/FadingScrollbar';
 import * as Icon from 'Components/Icon';
 import {ModalComponent} from 'Components/Modals/ModalComponent';
@@ -33,9 +29,12 @@ import {UserDetails} from 'Components/panel/UserDetails';
 import {User} from 'Repositories/entity/User';
 import {TeamState} from 'Repositories/team/TeamState';
 import {UserRepository} from 'Repositories/user/UserRepository';
+import {container} from 'tsyringe';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {handleKeyDown, KEY} from 'Util/KeyboardUtil';
 import {replaceLink, t} from 'Util/LocalizerUtil';
+
+import {TabIndex, Link, LinkVariant} from '@wireapp/react-ui-kit';
 
 import {useUserModalState} from './UserModal.state';
 import {userModalStyle, userModalWrapperStyle} from './UserModal.styles';

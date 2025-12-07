@@ -1,0 +1,19 @@
+{
+  "extends": "./tsconfig.base.json",
+  "compilerOptions": {
+    "noEmit": true
+  },
+  "include": [
+    "apps/webapp/src/**/*",
+    "apps/webapp/test/**/*",
+    "apps/server/**/*.ts"
+  ],
+  "exclude": [
+    "node_modules",
+    "dist",
+    "coverage",
+    "tmp",
+    "apps/server/dist",
+    "apps/webapp/dist"
+  ]
+}

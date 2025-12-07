@@ -19,10 +19,10 @@
 
 import {ChangeEvent, FormEvent} from 'react';
 
-import {CircleCloseIcon, ErrorMessage, Input, Label} from '@wireapp/react-ui-kit';
-
 import {useInputAutoFocus} from 'Components/Conversation/ConversationCells/common/useInputAutoFocus/useInputAutoFocus';
 import {t} from 'Util/LocalizerUtil';
+
+import {CircleCloseIcon, ErrorMessage, Input, Label} from '@wireapp/react-ui-kit';
 
 import {closeIconStyles, formStyles} from './CellsRenameForm.styles';
 

@@ -18,7 +18,6 @@
  */
 
 import {act, render, screen, waitFor} from '@testing-library/react';
-
 import {User} from 'Repositories/entity/User';
 import {ElectronDesktopCapturerSource, MediaDevicesHandler} from 'Repositories/media/MediaDevicesHandler';
 import {ContentViewModel} from 'src/script/view_model/ContentViewModel';

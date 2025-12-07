@@ -20,7 +20,6 @@
 import React, {useEffect, useLayoutEffect, useRef} from 'react';
 
 import cx from 'classnames';
-
 import type {User} from 'Repositories/entity/User';
 import {MAX_HANDLE_LENGTH} from 'Repositories/user/UserHandleGenerator';
 import {isEnterKey} from 'Util/KeyboardUtil';

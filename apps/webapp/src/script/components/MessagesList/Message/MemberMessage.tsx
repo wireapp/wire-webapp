@@ -17,14 +17,14 @@
  *
  */
 
-import {Button, ButtonVariant, CollectionIcon} from '@wireapp/react-ui-kit';
-
 import * as Icon from 'Components/Icon';
 import {MemberMessage as MemberMessageEntity} from 'Repositories/entity/message/MemberMessage';
 import {User} from 'Repositories/entity/User';
 import {SystemMessageType} from 'src/script/message/SystemMessageType';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
+
+import {Button, ButtonVariant, CollectionIcon} from '@wireapp/react-ui-kit';
 
 import {E2eEncryptionMessage} from './E2eEncryptionMessage/E2eEncryptionMessage';
 import {ConnectedMessage} from './MemberMessage/ConnectedMessage';

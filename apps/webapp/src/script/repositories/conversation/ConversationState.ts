@@ -19,12 +19,11 @@
 
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 import ko from 'knockout';
-import {container, singleton} from 'tsyringe';
-
 import {Conversation} from 'Repositories/entity/Conversation';
 import {User} from 'Repositories/entity/User';
 import {TeamState} from 'Repositories/team/TeamState';
 import {UserState} from 'Repositories/user/UserState';
+import {container, singleton} from 'tsyringe';
 import {matchQualifiedIds} from 'Util/QualifiedId';
 import {sortGroupsByLastEvent} from 'Util/util';
 

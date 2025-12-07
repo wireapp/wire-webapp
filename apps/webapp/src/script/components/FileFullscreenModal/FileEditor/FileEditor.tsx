@@ -20,9 +20,8 @@
 import {useCallback, useEffect, useState} from 'react';
 
 import {Node} from '@wireapp/api-client/lib/cells';
-import {container} from 'tsyringe';
-
 import {CellsRepository} from 'Repositories/cells/CellsRepository';
+import {container} from 'tsyringe';
 import {t} from 'Util/LocalizerUtil';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 

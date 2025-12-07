@@ -19,10 +19,9 @@
 
 import {useEffect, useRef} from 'react';
 
+import {CloseIcon} from 'Components/Icon';
 import {createRoot, Root} from 'react-dom/client';
 import {toast, Toaster} from 'sonner';
-
-import {CloseIcon} from 'Components/Icon';
 
 interface AppNotificationOptions {
   message?: string;

@@ -17,7 +17,7 @@
  *
  */
 
-import {ActionCreatorsMapObject, AnyAction, Dispatch, bindActionCreators as bindActionCreatorsRedux} from 'redux';
+import {AnyAction, bindActionCreators as bindActionCreatorsRedux} from 'redux';
 import type {ThunkAction as ReduxThunkAction, ThunkDispatch as ReduxThunkDispatch} from 'redux-thunk';
 
 import type {APIClient} from '@wireapp/api-client';
@@ -62,15 +62,7 @@ export const initialRootState: RootState = {
 export type ThunkAction<T = Promise<void>> = ReduxThunkAction<T, RootState, Api, AnyAction>;
 export type ThunkDispatch = ReduxThunkDispatch<RootState, Api, AnyAction>;
 
-export type BindActionCreators = <M extends ActionCreatorsMapObject<any>>(
-  actionCreators: M,
-  dispatch: Dispatch,
-) => {
-  [N in keyof M]: ReturnType<M[N]> extends ReduxThunkAction<any, any, any, any>
-    ? (...args: Parameters<M[N]>) => ReturnType<ReturnType<M[N]>>
-    : M[N];
-};
-
+export type BindActionCreators = typeof bindActionCreatorsRedux;
 export const bindActionCreators: BindActionCreators = bindActionCreatorsRedux;
 
 export const reducers = {

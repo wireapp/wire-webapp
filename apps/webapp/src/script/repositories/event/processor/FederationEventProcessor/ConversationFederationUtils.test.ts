@@ -18,7 +18,6 @@
  */
 
 import {CONVERSATION_TYPE} from '@wireapp/api-client/lib/conversation/';
-
 import {Conversation} from 'Repositories/entity/Conversation';
 import {generateConversation} from 'test/helper/ConversationGenerator';
 import {generateUser} from 'test/helper/UserGenerator';

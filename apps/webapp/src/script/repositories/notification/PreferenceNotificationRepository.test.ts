@@ -20,13 +20,12 @@
 import {USER_EVENT} from '@wireapp/api-client/lib/event/';
 import {amplify} from 'amplify';
 import ko from 'knockout';
-
-import {WebAppEvents} from '@wireapp/webapp-events';
-
 import {ClientEntity} from 'Repositories/client/ClientEntity';
 import {User} from 'Repositories/entity/User';
 import {PropertiesRepository} from 'Repositories/properties/PropertiesRepository';
 import {createUuid} from 'Util/uuid';
+
+import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {Notification, PreferenceNotificationRepository} from './PreferenceNotificationRepository';
 

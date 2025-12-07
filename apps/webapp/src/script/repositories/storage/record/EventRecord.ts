@@ -21,7 +21,6 @@ import type {QualifiedUserClients} from '@wireapp/api-client/lib/conversation';
 import type {ConversationEvent} from '@wireapp/api-client/lib/event';
 import type {QualifiedId} from '@wireapp/api-client/lib/user';
 import type {ReactionType} from '@wireapp/core/lib/conversation/';
-
 import {ClientConversationEvent} from 'Repositories/conversation/EventBuilder';
 
 import {StatusType} from '../../../message/StatusType';

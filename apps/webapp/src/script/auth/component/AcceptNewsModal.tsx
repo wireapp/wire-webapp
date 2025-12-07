@@ -20,10 +20,9 @@
 import React from 'react';
 
 import {FormattedMessage} from 'react-intl';
+import {t} from 'Util/LocalizerUtil';
 
 import {Button, COLOR, Column, Columns, Container, H3, Link, Modal, Text} from '@wireapp/react-ui-kit';
-
-import {t} from 'Util/LocalizerUtil';
 
 import {Config} from '../../Config';
 

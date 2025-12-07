@@ -18,9 +18,8 @@
  */
 
 import {CONVERSATION_EVENT} from '@wireapp/api-client/lib/event/';
-import {container} from 'tsyringe';
-
 import {UserState} from 'Repositories/user/UserState';
+import {container} from 'tsyringe';
 import {t} from 'Util/LocalizerUtil';
 import {matchQualifiedIds} from 'Util/QualifiedId';
 

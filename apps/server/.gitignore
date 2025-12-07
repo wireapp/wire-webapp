@@ -1,5 +1,13 @@
 node_modules/
 dist/*
+coverage/
+.env
+.env.defaults
+.DS_Store
+.idea
+.vscode
+npm-debug.log
+yarn-error.log
 
 # yarn 2 - not using zero-installs
 .pnp.*
@@ -9,3 +17,5 @@ dist/*
 !.yarn/releases
 !.yarn/sdks
 !.yarn/versions
+yalc.lock
+.yalc

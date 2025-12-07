@@ -14,19 +14,20 @@ module.exports = {
     'bin/',
     '**/node_modules/',
     'assets/',
+    'apps/webapp/assets/',
     'resource/',
     'apps/server/bin/',
     'apps/server/dist/',
     'apps/server/node_modules/',
-    'src/ext/',
-    'src/script/localization/**/webapp*.js',
-    'src/worker/',
-    'src/script/components/Icon.tsx',
+    'apps/webapp/src/ext/',
+    'apps/webapp/src/script/localization/**/webapp*.js',
+    'apps/webapp/src/worker/',
+    'apps/webapp/src/script/components/Icon.tsx',
     '*.js',
-    'src/types/i18n.d.ts',
+    'apps/webapp/src/types/i18n.d.ts',
   ],
   parserOptions: {
-    project: ['./tsconfig.build.json', './apps/server/tsconfig.json'],
+    project: ['./tsconfig.eslint.json'],
     tsconfigRootDir: __dirname,
   },
   plugins: ['@emotion', 'import'],
@@ -53,7 +54,7 @@ module.exports = {
     'import/resolver': {
       typescript: {
         alwaysTryTypes: true,
-        project: [__dirname + '/tsconfig.build.json', __dirname + '/apps/server/tsconfig.json'],
+        project: [__dirname + '/tsconfig.eslint.json'],
       },
       node: {
         extensions: ['.js', '.jsx', '.ts', '.tsx'],
@@ -62,7 +63,7 @@ module.exports = {
   },
   overrides: [
     {
-      files: ['**/*.test.tsx', '**/*.test.ts', '**/test/**/*', '**/mocks/**/*'],
+      files: ['**/*.test.tsx', '**/*.test.ts', '**/*.spec.tsx', '**/*.spec.ts', '**/test/**/*', '**/mocks/**/*'],
       rules: {
         'no-magic-numbers': 'off',
         'id-length': 'off',

@@ -18,7 +18,6 @@
  */
 
 import {act, renderHook} from '@testing-library/react';
-
 import * as checkFileSharingPermissionModule from 'Components/Conversation/utils/checkFileSharingPermission';
 import * as LocalizerUtil from 'Util/LocalizerUtil';
 import * as TimeUtil from 'Util/TimeUtil';

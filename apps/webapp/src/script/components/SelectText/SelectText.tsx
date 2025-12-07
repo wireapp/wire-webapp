@@ -20,10 +20,9 @@
 import React from 'react';
 
 import cx from 'classnames';
+import {handleKeyDown, KEY} from 'Util/KeyboardUtil';
 
 import {TabIndex} from '@wireapp/react-ui-kit';
-
-import {handleKeyDown, KEY} from 'Util/KeyboardUtil';
 
 interface SelectTextProps {
   text: string;

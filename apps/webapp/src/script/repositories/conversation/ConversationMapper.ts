@@ -32,12 +32,11 @@ import {
 } from '@wireapp/api-client/lib/conversation';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 import ko from 'knockout';
+import {Conversation} from 'Repositories/entity/Conversation';
+import {ConversationRecord} from 'Repositories/storage/record/ConversationRecord';
 import {isObject} from 'underscore';
 
 import {LegalHoldStatus} from '@wireapp/protocol-messaging';
-
-import {Conversation} from 'Repositories/entity/Conversation';
-import {ConversationRecord} from 'Repositories/storage/record/ConversationRecord';
 
 import {ACCESS_STATE} from './AccessState';
 import {ConversationStatus} from './ConversationStatus';

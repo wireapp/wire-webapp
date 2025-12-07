@@ -21,9 +21,6 @@ import {useCallback, useEffect} from 'react';
 
 import {amplify} from 'amplify';
 import {LexicalEditor} from 'lexical';
-
-import {WebAppEvents} from '@wireapp/webapp-events';
-
 import {CellsRepository} from 'Repositories/cells/CellsRepository';
 import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
 import {MessageRepository} from 'Repositories/conversation/MessageRepository';
@@ -31,6 +28,8 @@ import {Conversation} from 'Repositories/entity/Conversation';
 import {ContentMessage} from 'Repositories/entity/message/ContentMessage';
 import {EventRepository} from 'Repositories/event/EventRepository';
 import {StorageRepository} from 'Repositories/storage';
+
+import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {useDraftState} from './useDraftState/useDraftState';
 import {useMessageEditing} from './useMessageEditing/useMessageEditing';

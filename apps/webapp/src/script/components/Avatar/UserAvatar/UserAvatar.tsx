@@ -19,17 +19,16 @@
 
 import {MouseEvent as ReactMouseEvent, KeyboardEvent as ReactKeyBoardEvent} from 'react';
 
-import {container} from 'tsyringe';
-
-import {Availability as AvailabilityType} from '@wireapp/protocol-messaging';
-import {COLOR} from '@wireapp/react-ui-kit';
-
 import {AvailabilityIcon} from 'Components/AvailabilityIcon';
 import {useUserName} from 'Components/UserName';
 import {User} from 'Repositories/entity/User';
 import {TeamState} from 'Repositories/team/TeamState';
+import {container} from 'tsyringe';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
+
+import {Availability as AvailabilityType} from '@wireapp/protocol-messaging';
+import {COLOR} from '@wireapp/react-ui-kit';
 
 import {AVATAR_SIZE, STATE} from '../Avatar';
 import {AvatarBackground} from '../AvatarBackground';

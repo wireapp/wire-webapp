@@ -20,10 +20,9 @@
 import {ClientClassification, ClientType, RegisteredClient} from '@wireapp/api-client/lib/client/';
 import {FEATURE_KEY, FEATURE_STATUS} from '@wireapp/api-client/lib/team';
 import {ClientInfo} from '@wireapp/core/lib/client/';
+import {getClientMLSConfig} from 'Repositories/client/clientMLSConfig';
 
 import {Runtime} from '@wireapp/commons';
-
-import {getClientMLSConfig} from 'Repositories/client/clientMLSConfig';
 
 import {ClientActionCreator} from './creator/';
 

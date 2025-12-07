@@ -19,7 +19,6 @@
 
 import {fireEvent, render} from '@testing-library/react';
 import ko from 'knockout';
-
 import {AssetTransferState} from 'Repositories/assets/AssetTransferState';
 import {FileAsset} from 'Repositories/entity/message/FileAsset';
 

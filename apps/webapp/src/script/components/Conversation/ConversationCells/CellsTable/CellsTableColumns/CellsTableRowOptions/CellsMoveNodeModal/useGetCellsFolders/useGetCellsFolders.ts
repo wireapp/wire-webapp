@@ -20,7 +20,6 @@
 import {useCallback, useEffect, useState} from 'react';
 
 import {QualifiedId} from '@wireapp/api-client/lib/user/';
-
 import {getCellsApiPath} from 'Components/Conversation/ConversationCells/common/getCellsApiPath/getCellsApiPath';
 import {CellsRepository} from 'Repositories/cells/CellsRepository';
 import {CellNode} from 'src/script/types/cellNode';

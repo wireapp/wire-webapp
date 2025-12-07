@@ -21,9 +21,6 @@ import {FC, useMemo, useState} from 'react';
 
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 import cx from 'classnames';
-
-import {TabIndex, Button, ButtonVariant} from '@wireapp/react-ui-kit';
-
 import {FadingScrollbar} from 'Components/FadingScrollbar';
 import * as Icon from 'Components/Icon';
 import {SearchInput} from 'Components/SearchInput';
@@ -44,6 +41,8 @@ import {handleKeyDown, KEY} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
 import {safeWindowOpen} from 'Util/SanitizationUtil';
 import {sortUsersByPriority} from 'Util/StringUtil';
+
+import {TabIndex, Button, ButtonVariant} from '@wireapp/react-ui-kit';
 
 import {getManageServicesUrl} from '../../../externalRoute';
 import {PanelHeader} from '../PanelHeader';

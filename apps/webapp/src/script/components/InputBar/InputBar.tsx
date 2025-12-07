@@ -21,16 +21,12 @@ import {useCallback, useRef, useState} from 'react';
 
 import {amplify} from 'amplify';
 import cx from 'classnames';
-import {LexicalEditor, $createTextNode, $insertNodes} from 'lexical';
-import {container} from 'tsyringe';
-
-import {WebAppEvents} from '@wireapp/webapp-events';
-
 import {Avatar, AVATAR_SIZE} from 'Components/Avatar';
 import {ConversationClassifiedBar} from 'Components/ClassifiedBar/ClassifiedBar';
 import {useFileUploadState} from 'Components/Conversation/useFilesUploadState/useFilesUploadState';
 import {EmojiPicker} from 'Components/EmojiPicker/EmojiPicker';
 import {useUserPropertyValue} from 'Hooks/useUserProperty';
+import {LexicalEditor, $createTextNode, $insertNodes} from 'lexical';
 import {CellsRepository} from 'Repositories/cells/CellsRepository';
 import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
 import {MessageRepository} from 'Repositories/conversation/MessageRepository';
@@ -44,9 +40,12 @@ import {StorageRepository} from 'Repositories/storage';
 import {TeamState} from 'Repositories/team/TeamState';
 import {EventName} from 'Repositories/tracking/EventName';
 import {CONVERSATION_TYPING_INDICATOR_MODE} from 'Repositories/user/TypingIndicatorMode';
+import {container} from 'tsyringe';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
+
+import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {MessageContent} from './common/messageContent/messageContent';
 import {FilePreviews} from './FilePreviews/FilePreviews';

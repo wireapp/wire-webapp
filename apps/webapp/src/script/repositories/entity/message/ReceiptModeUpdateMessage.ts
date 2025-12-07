@@ -18,7 +18,6 @@
  */
 
 import {CONVERSATION_EVENT} from '@wireapp/api-client/lib/event/';
-
 import {t} from 'Util/LocalizerUtil';
 
 import {SystemMessage} from './SystemMessage';

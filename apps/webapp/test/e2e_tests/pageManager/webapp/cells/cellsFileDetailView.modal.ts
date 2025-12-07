@@ -18,7 +18,6 @@
  */
 
 import {Locator, Page} from '@playwright/test';
-
 import {downloadAssetAndGetFilePath} from 'test/e2e_tests/utils/asset.util';
 
 export class CellsFileDetailViewModal {

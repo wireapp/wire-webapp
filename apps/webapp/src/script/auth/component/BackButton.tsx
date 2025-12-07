@@ -18,10 +18,9 @@
  */
 
 import {useNavigate} from 'react-router';
+import {t} from 'Util/LocalizerUtil';
 
 import {ArrowIcon, COLOR} from '@wireapp/react-ui-kit';
-
-import {t} from 'Util/LocalizerUtil';
 
 export const BackButton = () => {
   const navigate = useNavigate();

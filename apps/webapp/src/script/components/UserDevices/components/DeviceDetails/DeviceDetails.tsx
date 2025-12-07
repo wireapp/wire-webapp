@@ -21,10 +21,6 @@ import {useEffect, useMemo, useState} from 'react';
 
 import cx from 'classnames';
 import type {DexieError} from 'dexie';
-import {container} from 'tsyringe';
-
-import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
-
 import type {ClientRepository, ClientEntity} from 'Repositories/client';
 import {isMLSConversation} from 'Repositories/conversation/ConversationSelectors';
 import {ConversationState} from 'Repositories/conversation/ConversationState';
@@ -33,10 +29,13 @@ import type {CryptographyRepository} from 'Repositories/cryptography/Cryptograph
 import type {User} from 'Repositories/entity/User';
 import {WireIdentity} from 'src/script/E2EIdentity';
 import {MLSDeviceDetails} from 'src/script/page/MainContent/panels/preferences/DevicesPreferences/components/MLSDeviceDetails';
+import {container} from 'tsyringe';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 import type {Logger} from 'Util/Logger';
 import {splitFingerprint} from 'Util/StringUtil';
+
+import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
 
 import {Config} from '../../../../Config';
 import {MotionDuration} from '../../../../motion/MotionDuration';

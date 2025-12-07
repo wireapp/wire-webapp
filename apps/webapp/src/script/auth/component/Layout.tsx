@@ -20,10 +20,9 @@
 import {ReactNode} from 'react';
 
 import {WavesPattern} from '@wireapp/react-ui-kit/lib/Images/WavesPattern';
+import {t} from 'Util/LocalizerUtil';
 
 import {Bold, COLOR_V2, FlexBox, Link, Logo, Text} from '@wireapp/react-ui-kit';
-
-import {t} from 'Util/LocalizerUtil';
 
 import {bodyCss, contentContainerCss, leftSectionCss, whiteFontCss} from './Layout.styles';
 

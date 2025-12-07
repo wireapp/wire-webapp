@@ -19,7 +19,11 @@
 
 import {CONVERSATION_EVENT} from '@wireapp/api-client/lib/event/';
 import {GenericMessageType} from '@wireapp/core/lib/conversation';
+import {ClientEvent} from 'Repositories/event/Client';
+import {CryptographyError} from 'src/script/error/CryptographyError';
 import {isObject} from 'underscore';
+import {arrayToBase64} from 'Util/util';
+import {createUuid} from 'Util/uuid';
 
 import {
   Asset,
@@ -38,11 +42,6 @@ import {
   Reaction,
   Text,
 } from '@wireapp/protocol-messaging';
-
-import {ClientEvent} from 'Repositories/event/Client';
-import {CryptographyError} from 'src/script/error/CryptographyError';
-import {arrayToBase64} from 'Util/util';
-import {createUuid} from 'Util/uuid';
 
 import {CryptographyMapper} from './CryptographyMapper';
 import {PROTO_MESSAGE_TYPE} from './ProtoMessageType';

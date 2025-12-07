@@ -17,8 +17,6 @@
  *
  */
 
-import {Tooltip} from '@wireapp/react-ui-kit';
-
 import {AVATAR_SIZE, Avatar} from 'Components/Avatar';
 import {UserBlockedBadge} from 'Components/Badge';
 import * as Icon from 'Components/Icon';
@@ -29,6 +27,8 @@ import {User} from 'Repositories/entity/User';
 import {ServiceEntity} from 'Repositories/integration/ServiceEntity';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
+
+import {Tooltip} from '@wireapp/react-ui-kit';
 
 import {headerIconBadge, headerLabelBadge, headerIconSizeM, headerIconSizeS} from './MessageHeader.styles';
 

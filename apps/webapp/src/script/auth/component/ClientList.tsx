@@ -22,18 +22,16 @@ import {HTMLProps, useEffect, useState} from 'react';
 import {ClientType} from '@wireapp/api-client/lib/client/index';
 import {connect} from 'react-redux';
 import {useNavigate} from 'react-router-dom';
-import {AnyAction, Dispatch} from 'redux';
+import {getLogger} from 'Util/Logger';
 
 import {UrlUtil} from '@wireapp/commons';
 import {ContainerXS, Loading} from '@wireapp/react-ui-kit';
-
-import {getLogger} from 'Util/Logger';
 
 import {ClientItem} from './ClientItem';
 
 import {actionRoot as ROOT_ACTIONS} from '../module/action/';
 import * as LocalStorageAction from '../module/action/LocalStorageAction';
-import {bindActionCreators, RootState} from '../module/reducer';
+import {RootState, ThunkDispatch} from '../module/reducer';
 import {getEntropy} from '../module/selector/AuthSelector';
 import * as ClientSelector from '../module/selector/ClientSelector';
 import * as SelfSelector from '../module/selector/SelfSelector';
@@ -137,18 +135,18 @@ const mapStateToProps = (state: RootState) => ({
 });
 
 type DispatchProps = ReturnType<typeof mapDispatchToProps>;
-const mapDispatchToProps = (dispatch: Dispatch<AnyAction>) =>
-  bindActionCreators(
-    {
-      doInitializeClient: ROOT_ACTIONS.clientAction.doInitializeClient,
-      doRemoveClient: ROOT_ACTIONS.clientAction.doRemoveClient,
-      getLocalStorage: ROOT_ACTIONS.localStorageAction.getLocalStorage,
-      removeLocalStorage: ROOT_ACTIONS.localStorageAction.deleteLocalStorage,
-      resetAuthError: ROOT_ACTIONS.authAction.resetAuthError,
-      resetClientError: ROOT_ACTIONS.clientAction.resetClientError,
-    },
-    dispatch,
-  );
+const mapDispatchToProps = (dispatch: ThunkDispatch) => ({
+  doInitializeClient: (...args: Parameters<typeof ROOT_ACTIONS.clientAction.doInitializeClient>) =>
+    dispatch(ROOT_ACTIONS.clientAction.doInitializeClient(...args)),
+  doRemoveClient: (...args: Parameters<typeof ROOT_ACTIONS.clientAction.doRemoveClient>) =>
+    dispatch(ROOT_ACTIONS.clientAction.doRemoveClient(...args)),
+  getLocalStorage: (...args: Parameters<typeof ROOT_ACTIONS.localStorageAction.getLocalStorage>) =>
+    dispatch(ROOT_ACTIONS.localStorageAction.getLocalStorage(...args)),
+  removeLocalStorage: (...args: Parameters<typeof ROOT_ACTIONS.localStorageAction.deleteLocalStorage>) =>
+    dispatch(ROOT_ACTIONS.localStorageAction.deleteLocalStorage(...args)),
+  resetAuthError: () => dispatch(ROOT_ACTIONS.authAction.resetAuthError()),
+  resetClientError: () => dispatch(ROOT_ACTIONS.clientAction.resetClientError()),
+});
 
 const ClientList = connect(mapStateToProps, mapDispatchToProps)(ClientListComponent);
 

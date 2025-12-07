@@ -17,10 +17,10 @@
  *
  */
 
-import {Button, CheckRoundIcon, Link} from '@wireapp/react-ui-kit';
-
 import {Config} from 'src/script/Config';
 import {t} from 'Util/LocalizerUtil';
+
+import {Button, CheckRoundIcon, Link} from '@wireapp/react-ui-kit';
 
 import {StepProps} from './StepProps';
 import {

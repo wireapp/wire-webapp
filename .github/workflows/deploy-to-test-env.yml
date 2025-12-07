@@ -45,7 +45,7 @@ jobs:
         run: yarn --immutable
 
       - name: Build
-        run: yarn build:prod
+        run: yarn nx run-many -t build --all
 
       - name: Deploy to Elastic Beanstalk
         uses: einaregilsson/beanstalk-deploy@v22

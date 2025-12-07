@@ -17,9 +17,9 @@
  *
  */
 
-import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
-
 import {t} from 'Util/LocalizerUtil';
+
+import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
 
 import {buttonStyles, wrapperStyles} from './CellsFiltersModalActions.styles';
 

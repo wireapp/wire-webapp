@@ -18,10 +18,9 @@
  */
 
 import {QualifiedId} from '@wireapp/api-client/lib/user';
+import {t} from 'Util/LocalizerUtil';
 
 import {DropdownMenu, IconButton, IconButtonVariant, MoreIcon, TrashIcon} from '@wireapp/react-ui-kit';
-
-import {t} from 'Util/LocalizerUtil';
 
 import {buttonStyles, itemStyles} from './CellsMoreMenu.styles';
 

@@ -18,7 +18,6 @@
  */
 
 import {Locator, Page} from '@playwright/test';
-
 import {selectByDataAttribute, selectById, selectByClass} from 'test/e2e_tests/utils/selector.util';
 
 export class ConversationDetailsPage {

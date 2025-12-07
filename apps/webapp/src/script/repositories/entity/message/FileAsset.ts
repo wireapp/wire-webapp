@@ -18,13 +18,12 @@
  */
 
 import ko from 'knockout';
-
-import type {Asset as ProtobufAsset} from '@wireapp/protocol-messaging';
-
 import type {AssetRemoteData} from 'Repositories/assets/AssetRemoteData';
 import {AssetTransferState} from 'Repositories/assets/AssetTransferState';
 import {AssetType} from 'Repositories/assets/AssetType';
 import {Logger, getLogger} from 'Util/Logger';
+
+import type {Asset as ProtobufAsset} from '@wireapp/protocol-messaging';
 
 import {Asset} from './Asset';
 

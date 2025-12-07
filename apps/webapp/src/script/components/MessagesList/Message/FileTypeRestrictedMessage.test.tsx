@@ -18,7 +18,6 @@
  */
 
 import {render} from '@testing-library/react';
-
 import {FileTypeRestrictedMessage as FileTypeRestrictedMessageEntity} from 'Repositories/entity/message/FileTypeRestrictedMessage';
 
 import {FileTypeRestrictedMessage} from './FileTypeRestrictedMessage';

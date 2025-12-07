@@ -20,9 +20,6 @@
 import {useState} from 'react';
 
 import {QualifiedId} from '@wireapp/api-client/lib/user';
-
-import {DropdownMenu, MoreIcon} from '@wireapp/react-ui-kit';
-
 import {useAppNotification} from 'Components/AppNotification/AppNotification';
 import {openFolder} from 'Components/Conversation/ConversationCells/common/openFolder/openFolder';
 import {
@@ -34,6 +31,8 @@ import {CellNode, CellNodeType} from 'src/script/types/cellNode';
 import {isFileEditable} from 'Util/FileTypeUtil';
 import {t} from 'Util/LocalizerUtil';
 import {forcedDownloadFile} from 'Util/util';
+
+import {DropdownMenu, MoreIcon} from '@wireapp/react-ui-kit';
 
 import {CellsMoveNodeModal} from './CellsMoveNodeModal/CellsMoveNodeModal';
 import {CellsRenameNodeModal} from './CellsRenameNodeModal/CellsRenameNodeModal';

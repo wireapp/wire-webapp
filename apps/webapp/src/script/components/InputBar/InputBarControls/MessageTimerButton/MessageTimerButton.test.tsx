@@ -19,7 +19,6 @@
 
 import {fireEvent, render} from '@testing-library/react';
 import ko from 'knockout';
-
 import type {Conversation} from 'Repositories/entity/Conversation';
 import {TeamState} from 'Repositories/team/TeamState';
 import * as Context from 'src/script/ui/ContextMenu';

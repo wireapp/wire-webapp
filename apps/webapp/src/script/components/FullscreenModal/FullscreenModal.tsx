@@ -20,7 +20,6 @@
 import {useEffect, useCallback, ReactNode, useState} from 'react';
 
 import {createPortal} from 'react-dom';
-
 import {handleEscDown} from 'Util/KeyboardUtil';
 import {preventFocusOutside} from 'Util/util';
 

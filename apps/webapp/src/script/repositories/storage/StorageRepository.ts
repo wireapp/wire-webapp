@@ -18,7 +18,6 @@
  */
 
 import {container} from 'tsyringe';
-
 import {Logger, getLogger} from 'Util/Logger';
 
 import {StorageService} from './StorageService';

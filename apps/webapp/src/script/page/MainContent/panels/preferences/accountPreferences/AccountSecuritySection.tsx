@@ -18,20 +18,19 @@
  */
 
 import {amplify} from 'amplify';
-import {container} from 'tsyringe';
-
-import {Runtime} from '@wireapp/commons';
-import {TabIndex, Link, LinkVariant} from '@wireapp/react-ui-kit';
-import {WebAppEvents} from '@wireapp/webapp-events';
-
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {User} from 'Repositories/entity/User';
 import {TeamState} from 'Repositories/team/TeamState';
 import {AppLockState} from 'Repositories/user/AppLockState';
 import {FEATURES, hasAccessToFeature} from 'Repositories/user/UserPermission';
 import {UserRepository} from 'Repositories/user/UserRepository';
+import {container} from 'tsyringe';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
+
+import {Runtime} from '@wireapp/commons';
+import {TabIndex, Link, LinkVariant} from '@wireapp/react-ui-kit';
+import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {externalUrl, getManageTeamUrl} from '../../../../../externalRoute';
 import {PreferencesSection} from '../components/PreferencesSection';

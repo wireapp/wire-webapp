@@ -34,7 +34,7 @@ jobs:
         run: yarn --immutable
 
       - name: Merge translations
-        run: yarn translate:merge
+        run: yarn nx run webapp:translate-merge
 
       - name: Download translations
         uses: crowdin/github-action@v2.13.0
@@ -56,4 +56,4 @@ jobs:
           token: ${{secrets.WEBTEAM_CROWDIN_TOKEN}}
           source: '/src/i18n/en-US.json'
           translation: '/src/i18n/%locale%.json'
-          base_path: '.'
+          base_path: 'apps/webapp'

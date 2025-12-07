@@ -19,8 +19,6 @@
 
 import {MouseEvent, KeyboardEvent} from 'react';
 
-import {TabIndex} from '@wireapp/react-ui-kit';
-
 import {DeviceVerificationBadges} from 'Components/Badge';
 import * as Icon from 'Components/Icon';
 import {ClientEntity} from 'Repositories/client';
@@ -29,6 +27,8 @@ import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {handleKeyDown, KEY} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
 import {splitFingerprint} from 'Util/StringUtil';
+
+import {TabIndex} from '@wireapp/react-ui-kit';
 
 import {FormattedId} from '../FormattedId';
 

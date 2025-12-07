@@ -20,7 +20,6 @@
 import {ReactNode} from 'react';
 
 import cx from 'classnames';
-
 import {useAppMainState} from 'src/script/page/state';
 
 import {IgnoreOutsideClickWrapper} from '../util/clickHandlers';

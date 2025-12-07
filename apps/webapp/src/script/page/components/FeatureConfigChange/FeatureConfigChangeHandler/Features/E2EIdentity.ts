@@ -18,7 +18,6 @@
  */
 
 import {FEATURE_STATUS, FEATURE_KEY, FeatureList} from '@wireapp/api-client/lib/team';
-
 import {E2EIHandler} from 'src/script/E2EIdentity';
 import {supportsMLS} from 'Util/util';
 

@@ -20,10 +20,9 @@
 import {waitFor} from '@testing-library/react';
 import {FeatureList} from '@wireapp/api-client/lib/team';
 import {CONVERSATION_PROTOCOL, FEATURE_KEY, FEATURE_STATUS} from '@wireapp/api-client/lib/team/feature';
-import {container} from 'tsyringe';
-
 import {ClientEntity} from 'Repositories/client';
 import {TestFactory} from 'test/helper/TestFactory';
+import {container} from 'tsyringe';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 
 import {SelfRepository} from './SelfRepository';

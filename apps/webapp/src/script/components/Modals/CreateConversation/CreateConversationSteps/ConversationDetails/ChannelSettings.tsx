@@ -18,14 +18,13 @@
  */
 
 import {ADD_PERMISSION} from '@wireapp/api-client/lib/conversation';
-import {container} from 'tsyringe';
-
-import {Muted, Option, Select} from '@wireapp/react-ui-kit';
-
 import {RadioGroup} from 'Components/Radio';
 import {TeamState} from 'Repositories/team/TeamState';
+import {container} from 'tsyringe';
 import {t} from 'Util/LocalizerUtil';
 import {useChannelsFeatureFlag} from 'Util/useChannelsFeatureFlag';
+
+import {Muted, Option, Select} from '@wireapp/react-ui-kit';
 
 import {channelSettingsTextCss} from './ConversationDetails.styles';
 import {CustomHistorySharingOption} from './CustomHistorySharingOption';

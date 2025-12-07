@@ -19,9 +19,6 @@
 
 import {render} from '@testing-library/react';
 import {CONVERSATION_EVENT} from '@wireapp/api-client/lib/event';
-
-import {randomInt} from 'crypto';
-
 import en from 'I18n/en-US.json';
 import {MemberMessage as MemberMessageEntity} from 'Repositories/entity/message/MemberMessage';
 import {User} from 'Repositories/entity/User';
@@ -29,6 +26,8 @@ import {withTheme} from 'src/script/auth/util/test/TestUtil';
 import {SystemMessageType} from 'src/script/message/SystemMessageType';
 import {generateUser} from 'test/helper/UserGenerator';
 import {setStrings} from 'Util/LocalizerUtil';
+
+import {randomInt} from 'crypto';
 
 import {MemberMessage} from './MemberMessage';
 import {CONFIG} from './MemberMessage/MessageContent';

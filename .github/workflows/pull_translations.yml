@@ -46,4 +46,4 @@ jobs:
           token: ${{secrets.WEBTEAM_CROWDIN_TOKEN}}
           source: '/src/i18n/en-US.json'
           translation: '/src/i18n/%locale%.json'
-          base_path: '.'
+          base_path: 'apps/webapp'

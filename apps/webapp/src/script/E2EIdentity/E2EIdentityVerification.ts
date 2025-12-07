@@ -20,10 +20,9 @@
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {DeviceIdentity} from '@wireapp/core/lib/messagingProtocols/mls';
 import {StringifiedQualifiedId, stringifyQualifiedId} from '@wireapp/core/lib/util/qualifiedIdUtil';
-import {container} from 'tsyringe';
-
 import {ConversationState} from 'Repositories/conversation/ConversationState';
 import {Core} from 'src/script/service/CoreSingleton';
+import {container} from 'tsyringe';
 import {base64ToArray} from 'Util/util';
 
 import {mapMLSStatus, MLSStatuses} from './mlsStatus';

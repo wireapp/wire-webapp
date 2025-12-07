@@ -18,7 +18,6 @@
  */
 
 import {QualifiedId} from '@wireapp/api-client/lib/user';
-
 import {useSidebarStore, SidebarTabs} from 'src/script/page/LeftSidebar/panels/Conversations/useSidebarStore';
 import {generateConversationUrl} from 'src/script/router/routeGenerator';
 import {createNavigate} from 'src/script/router/routerBindings';

@@ -17,10 +17,9 @@
  *
  */
 
-import {container} from 'tsyringe';
-
 import {showWarningModal} from 'Components/Modals/utils/showWarningModal';
 import {TeamState} from 'Repositories/team/TeamState';
+import {container} from 'tsyringe';
 import {t} from 'Util/LocalizerUtil';
 
 /**

@@ -21,20 +21,6 @@ import React, {useEffect, useState} from 'react';
 
 import {DefaultConversationRoleName} from '@wireapp/api-client/lib/conversation/';
 import cx from 'classnames';
-import {container} from 'tsyringe';
-
-import {
-  TabIndex,
-  Checkbox,
-  CheckboxLabel,
-  CloseDetachedWindowIcon,
-  IconButton,
-  IconButtonVariant,
-  OpenDetachedWindowIcon,
-  QUERY,
-} from '@wireapp/react-ui-kit';
-import {WebAppEvents} from '@wireapp/webapp-events';
-
 import {useAppNotification} from 'Components/AppNotification/AppNotification';
 import {useCallAlertState} from 'Components/calling/useCallAlertState';
 import {ConversationClassifiedBar} from 'Components/ClassifiedBar/ClassifiedBar';
@@ -52,11 +38,24 @@ import {TeamState} from 'Repositories/team/TeamState';
 import {useActiveWindowMatchMedia} from 'src/script/hooks/useActiveWindowMatchMedia';
 import {useToggleState} from 'src/script/hooks/useToggleState';
 import {CallViewTab} from 'src/script/view_model/CallingViewModel';
+import {container} from 'tsyringe';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {isDetachedCallingFeatureEnabled} from 'Util/isDetachedCallingFeatureEnabled';
 import {handleKeyDown, KEY} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
 import {preventFocusOutside} from 'Util/util';
+
+import {
+  TabIndex,
+  Checkbox,
+  CheckboxLabel,
+  CloseDetachedWindowIcon,
+  IconButton,
+  IconButtonVariant,
+  OpenDetachedWindowIcon,
+  QUERY,
+} from '@wireapp/react-ui-kit';
+import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {CallingParticipantList} from './CallingCell/CallIngParticipantList';
 import {Duration} from './Duration';

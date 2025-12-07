@@ -19,9 +19,6 @@
 
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 import ko from 'knockout';
-
-import {CALL_TYPE, CONV_TYPE, STATE as CALL_STATE} from '@wireapp/avs';
-
 import {Conversation} from 'Repositories/entity/Conversation';
 import {CanvasMediaStreamMixer} from 'Repositories/media/CanvasMediaStreamMixer';
 import type {MediaDevicesHandler} from 'Repositories/media/MediaDevicesHandler';
@@ -29,6 +26,8 @@ import {mediaDevicesStore} from 'Repositories/media/useMediaDevicesStore';
 import {chunk, getDifference, partition} from 'Util/ArrayUtil';
 import {matchQualifiedIds} from 'Util/QualifiedId';
 import {sortUsersByPriority} from 'Util/StringUtil';
+
+import {CALL_TYPE, CONV_TYPE, STATE as CALL_STATE} from '@wireapp/avs';
 
 import {CallingEpochCache} from './CallingEpochCache';
 import {MuteState} from './CallState';

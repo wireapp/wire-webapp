@@ -19,15 +19,14 @@
 
 import {useState} from 'react';
 
-import {StatusCodes} from 'http-status-codes';
-import {container} from 'tsyringe';
-
-import {Button, ButtonVariant, Checkbox, Link} from '@wireapp/react-ui-kit';
-
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
+import {StatusCodes} from 'http-status-codes';
 import {TeamService} from 'Repositories/team/TeamService';
 import {Config} from 'src/script/Config';
+import {container} from 'tsyringe';
 import {t} from 'Util/LocalizerUtil';
+
+import {Button, ButtonVariant, Checkbox, Link} from '@wireapp/react-ui-kit';
 
 import {StepProps} from './StepProps';
 import {

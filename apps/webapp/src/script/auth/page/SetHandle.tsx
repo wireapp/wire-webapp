@@ -23,16 +23,14 @@ import {BackendErrorLabel, SyntheticErrorLabel} from '@wireapp/api-client/lib/ht
 import {ConsentType} from '@wireapp/api-client/lib/self/index';
 import {connect} from 'react-redux';
 import {useLocation} from 'react-router';
-import {AnyAction, Dispatch} from 'redux';
-
-import {Runtime} from '@wireapp/commons';
-import {Button, ContainerXS, Form, Input, InputBlock, InputSubmitCombo, Text} from '@wireapp/react-ui-kit';
-
 import {StorageKey} from 'Repositories/storage';
 import {navigate} from 'src/script/router/Router';
 import {t} from 'Util/LocalizerUtil';
 import {storeValue} from 'Util/StorageUtil';
 import {isBackendError} from 'Util/TypePredicateUtil';
+
+import {Runtime} from '@wireapp/commons';
+import {Button, ContainerXS, Form, Input, InputBlock, InputSubmitCombo, Text} from '@wireapp/react-ui-kit';
 
 import {Page} from './Page';
 
@@ -40,7 +38,7 @@ import {AcceptNewsModal} from '../component/AcceptNewsModal';
 import {AccountRegistrationLayout} from '../component/AccountRegistrationLayout';
 import {EXTERNAL_ROUTE} from '../externalRoute';
 import {actionRoot as ROOT_ACTIONS} from '../module/action';
-import {bindActionCreators, RootState} from '../module/reducer';
+import {RootState, ThunkDispatch} from '../module/reducer';
 import * as SelfSelector from '../module/selector/SelfSelector';
 import {QUERY_KEY, ROUTE} from '../route';
 import {parseError} from '../util/errorUtil';
@@ -179,17 +177,18 @@ const mapStateToProps = (state: RootState) => ({
 });
 
 type DispatchProps = ReturnType<typeof mapDispatchToProps>;
-const mapDispatchToProps = (dispatch: Dispatch<AnyAction>) =>
-  bindActionCreators(
-    {
-      checkHandles: ROOT_ACTIONS.userAction.checkHandles,
-      doGetConsents: ROOT_ACTIONS.selfAction.doGetConsents,
-      doSetConsent: ROOT_ACTIONS.selfAction.doSetConsent,
-      doSetHandle: ROOT_ACTIONS.selfAction.setHandle,
-      removeLocalStorage: ROOT_ACTIONS.localStorageAction.deleteLocalStorage,
-    },
-    dispatch,
-  );
+const mapDispatchToProps = (dispatch: ThunkDispatch) => ({
+  checkHandles: (...args: Parameters<typeof ROOT_ACTIONS.userAction.checkHandles>) =>
+    dispatch(ROOT_ACTIONS.userAction.checkHandles(...args)),
+  doGetConsents: (...args: Parameters<typeof ROOT_ACTIONS.selfAction.doGetConsents>) =>
+    dispatch(ROOT_ACTIONS.selfAction.doGetConsents(...args)),
+  doSetConsent: (...args: Parameters<typeof ROOT_ACTIONS.selfAction.doSetConsent>) =>
+    dispatch(ROOT_ACTIONS.selfAction.doSetConsent(...args)),
+  doSetHandle: (...args: Parameters<typeof ROOT_ACTIONS.selfAction.setHandle>) =>
+    dispatch(ROOT_ACTIONS.selfAction.setHandle(...args)),
+  removeLocalStorage: (...args: Parameters<typeof ROOT_ACTIONS.localStorageAction.deleteLocalStorage>) =>
+    dispatch(ROOT_ACTIONS.localStorageAction.deleteLocalStorage(...args)),
+});
 
 const SetHandle = connect(mapStateToProps, mapDispatchToProps)(SetHandleComponent);
 

@@ -18,7 +18,6 @@
  */
 
 import {act, render, waitFor} from '@testing-library/react';
-
 import {ClientEntity} from 'Repositories/client/ClientEntity';
 import {withTheme} from 'src/script/auth/util/test/TestUtil';
 import {createUuid} from 'Util/uuid';

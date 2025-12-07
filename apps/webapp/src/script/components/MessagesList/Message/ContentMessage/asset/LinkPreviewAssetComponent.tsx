@@ -20,7 +20,6 @@
 import {UIEvent, useRef} from 'react';
 
 import cx from 'classnames';
-
 import {Image} from 'Components/Image';
 import type {ContentMessage} from 'Repositories/entity/message/ContentMessage';
 import type {Text} from 'Repositories/entity/message/Text';

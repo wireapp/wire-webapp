@@ -18,7 +18,6 @@
  */
 
 import {QualifiedId} from '@wireapp/api-client/lib/user/';
-
 import {CellsRepository} from 'Repositories/cells/CellsRepository';
 
 import {actionsStyles, contentStyles, wrapperStyles} from './CellsHeader.styles';

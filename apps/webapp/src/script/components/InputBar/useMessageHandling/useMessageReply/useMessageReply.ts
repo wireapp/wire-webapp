@@ -20,10 +20,9 @@
 import {useCallback, useEffect, useState} from 'react';
 
 import {amplify} from 'amplify';
+import {ContentMessage} from 'Repositories/entity/message/ContentMessage';
 
 import {WebAppEvents} from '@wireapp/webapp-events';
-
-import {ContentMessage} from 'Repositories/entity/message/ContentMessage';
 
 export const useMessageReply = () => {
   const [replyMessageEntity, setReplyMessageEntity] = useState<ContentMessage | null>(null);

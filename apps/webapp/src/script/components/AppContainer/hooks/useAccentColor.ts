@@ -20,9 +20,8 @@
 import {useEffect} from 'react';
 
 import ko from 'knockout';
-import {container} from 'tsyringe';
-
 import {UserState} from 'Repositories/user/UserState';
+import {container} from 'tsyringe';
 
 function setAccentColor(accentColor?: number) {
   if (!accentColor) {

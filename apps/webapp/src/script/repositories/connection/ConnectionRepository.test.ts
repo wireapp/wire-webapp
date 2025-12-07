@@ -22,15 +22,14 @@ import {BackendError, BackendErrorLabel} from '@wireapp/api-client/lib/http';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {amplify} from 'amplify';
 import {StatusCodes} from 'http-status-codes';
-
-import {WebAppEvents} from '@wireapp/webapp-events';
-
 import {Conversation} from 'Repositories/entity/Conversation';
 import {SelfService} from 'Repositories/self/SelfService';
 import {TeamService} from 'Repositories/team/TeamService';
 import {UserRepository} from 'Repositories/user/UserRepository';
 import {generateUser} from 'test/helper/UserGenerator';
 import {createUuid} from 'Util/uuid';
+
+import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {ConnectionEntity} from './ConnectionEntity';
 import {ConnectionRepository} from './ConnectionRepository';

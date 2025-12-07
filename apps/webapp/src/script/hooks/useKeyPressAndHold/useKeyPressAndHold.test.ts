@@ -18,7 +18,6 @@
  */
 
 import {act, renderHook} from '@testing-library/react';
-
 import {KEY} from 'Util/KeyboardUtil';
 
 import {useKeyPressAndHold} from './useKeyPressAndHold';

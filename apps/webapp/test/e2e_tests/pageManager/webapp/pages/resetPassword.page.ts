@@ -18,7 +18,6 @@
  */
 
 import {Locator, Page} from '@playwright/test';
-
 import {selectByDataAttribute} from 'test/e2e_tests/utils/selector.util';
 
 export class ResetPasswordPage {

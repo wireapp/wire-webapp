@@ -20,7 +20,6 @@
 import React from 'react';
 
 import cx from 'classnames';
-
 import * as Icon from 'Components/Icon';
 import {useLegalHoldModalState} from 'Components/Modals/LegalHoldModal/LegalHoldModal.state';
 import type {Conversation} from 'Repositories/entity/Conversation';

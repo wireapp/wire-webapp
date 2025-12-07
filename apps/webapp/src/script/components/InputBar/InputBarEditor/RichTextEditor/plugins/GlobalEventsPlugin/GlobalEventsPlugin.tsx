@@ -31,7 +31,6 @@ import {
   BLUR_COMMAND,
   COMMAND_PRIORITY_EDITOR,
 } from 'lexical';
-
 import {isTabKey} from 'Util/KeyboardUtil';
 
 const ON_SHIFT_TAB: LexicalCommand<KeyboardEvent> = createCommand('ON_SHIFT_TAB');

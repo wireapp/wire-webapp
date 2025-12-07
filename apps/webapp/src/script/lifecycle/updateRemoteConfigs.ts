@@ -19,7 +19,6 @@
 
 import {TaskParams} from '@wireapp/core/lib/util/RecurringTaskScheduler';
 import {container} from 'tsyringe';
-
 import {getLogger} from 'Util/Logger';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 
