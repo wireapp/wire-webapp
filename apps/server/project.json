@@ -1,38 +1,38 @@
 {
   "name": "server",
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
-  "sourceRoot": "{projectRoot}",
+  "sourceRoot": "apps/server/src",
   "projectType": "application",
   "targets": {
     "build": {
-      "executor": "nx:run-commands",
-      "outputs": ["{projectRoot}/dist"], // compiled server + assets
+      "executor": "@nx/js:tsc",
+      "outputs": ["{options.outputPath}"],
       "options": {
-        "commands": ["rimraf {projectRoot}/dist", "tsc -p {projectRoot}/tsconfig.json", "node {projectRoot}/bin/generateVersionFile.js", "node {projectRoot}/bin/copy_server_assets.js"],
-        "parallel": false // run in order, artifacts depend on ts output
-      }
-    },
-    "package": {
-      "executor": "nx:run-commands",
-      "outputs": ["{projectRoot}/dist/s3"],
-      "options": {
-        "commands": ["rimraf {projectRoot}/dist", "nx run server:build", "nx run webapp:build:production", "node bin/zip.js"],
-        "parallel": false
+        "outputPath": "apps/server/dist",
+        "main": "apps/server/src/index.ts",
+        "tsConfig": "apps/server/tsconfig.json",
+        "assets": ["apps/server/templates", "apps/server/libs"]
+      },
+      "configurations": {
+        "production": {
+          "optimization": true,
+          "sourceMap": false
+        },
+        "development": {
+          "optimization": false,
+          "sourceMap": true
+        }
       }
     },
     "serve": {
       "executor": "@nx/js:node",
       "options": {
-        "buildTarget": "server:build",
-        "buildTargetOptions": {
-          "outputPath": "{projectRoot}/dist",
-          "outputFileName": "index.js"
-        },
-        "watch": true // rebuild & restart on change
+        "buildTarget": "server:build:development",
+        "watch": true
       },
       "configurations": {
         "production": {
-          "buildTarget": "server:build"
+          "buildTarget": "server:build:production"
         }
       }
     },
@@ -40,21 +40,8 @@
       "executor": "@nx/jest:jest",
       "outputs": ["{workspaceRoot}/coverage/apps/server"],
       "options": {
-        "jestConfig": "{projectRoot}/jest.config.js",
+        "jestConfig": "apps/server/jest.config.ts",
         "passWithNoTests": true
-      },
-      "configurations": {
-        "ci": {
-          "ci": true,
-          "coverage": true,
-          "coverageReporters": ["lcov", "text"]
-        }
-      }
-    },
-    "type-check": {
-      "executor": "nx:run-commands",
-      "options": {
-        "command": "tsc --project {projectRoot}/tsconfig.json --noEmit"
       }
     }
   },
