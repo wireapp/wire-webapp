@@ -197,8 +197,6 @@
     "url": "https://github.com/wireapp/wire-webapp.git"
   },
   "scripts": {
-    "build:prod": "yarn build:server && yarn bundle:prod && yarn zip",
-    "build:server": "cd server && yarn build",
     "bundle:dev": "webpack --config webpack.config.dev.js --progress",
     "bundle:prod": "webpack --config webpack.config.js",
     "clean:jest": "jest --clearCache",
@@ -228,15 +226,18 @@
     "watch:server": "tsc-watch -P server/tsconfig.json --onSuccess \"yarn start:server:dev\"",
     "start:server:dev": "cross-env NODE_ENV=development node ./server/dist/index.js",
     "stylelint": "prettier --ignore-path .prettierignore --write \"**/*.less\" && stylelint --ignore-path .gitignore \"**/*.less\"",
-    "test": "yarn test:types && yarn test:server && yarn test:app",
     "e2e-test": "playwright test",
     "e2e-ui": "playwright test --ui",
     "test:app": "jest --forceExit --verbose",
-    "test:server": "cd server && yarn test",
     "test:types": "tsc --project tsconfig.build.json --noEmit && cd server && tsc --noEmit",
     "translate:extract": "i18next-scanner 'src/{page,script}/**/*.{js,html,htm}'",
     "translate:merge": "formatjs extract --format './bin/translations_extract_formatter.js' --out-file './src/i18n/en-US.json'",
-    "translate:generate-types": "node ./bin/transalations_generate_types.js"
+    "translate:generate-types": "node ./bin/transalations_generate_types.js",
+    "build:server": "nx build server",
+    "serve:server": "nx serve server",
+    "test:server": "nx test server",
+    "build:prod": "nx run-many -t build --all",
+    "test": "nx run-many -t test --all"
   },
   "resolutions": {
     "libsodium": "0.7.10",
