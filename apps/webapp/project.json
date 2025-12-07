@@ -1,0 +1,95 @@
+{
+  "name": "webapp",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "apps/webapp/src",
+  "projectType": "application",
+  "targets": {
+    "build": {
+      "executor": "@nx/webpack:webpack",
+      "outputs": ["{options.outputPath}"],
+      "defaultConfiguration": "production",
+      "options": {
+        "compiler": "babel",
+        "outputPath": "dist/apps/webapp",
+        "index": "apps/webapp/src/page/index.ejs",
+        "baseHref": "/",
+        "main": "apps/webapp/src/script/main/index.tsx",
+        "polyfills": [],
+        "tsConfig": "apps/webapp/tsconfig.json",
+        "assets": [
+          "apps/webapp/resource",
+          "apps/webapp/assets"
+        ],
+        "styles": [],
+        "scripts": [],
+        "webpackConfig": "apps/webapp/webpack.config.js"
+      },
+      "configurations": {
+        "development": {
+          "extractLicenses": false,
+          "optimization": false,
+          "sourceMap": true,
+          "vendorChunk": true,
+          "webpackConfig": "apps/webapp/webpack.config.dev.js"
+        },
+        "production": {
+          "fileReplacements": [],
+          "optimization": true,
+          "outputHashing": "all",
+          "sourceMap": false,
+          "namedChunks": false,
+          "extractLicenses": true,
+          "vendorChunk": false,
+          "webpackConfig": "apps/webapp/webpack.config.js"
+        }
+      }
+    },
+    "serve": {
+      "executor": "@nx/webpack:dev-server",
+      "defaultConfiguration": "development",
+      "options": {
+        "buildTarget": "webapp:build:development",
+        "hmr": true,
+        "port": 8080
+      },
+      "configurations": {
+        "development": {
+          "buildTarget": "webapp:build:development"
+        },
+        "production": {
+          "buildTarget": "webapp:build:production",
+          "hmr": false
+        }
+      }
+    },
+    "test": {
+      "executor": "@nx/jest:jest",
+      "outputs": ["{workspaceRoot}/coverage/apps/webapp"],
+      "options": {
+        "jestConfig": "apps/webapp/jest.config.ts",
+        "passWithNoTests": false
+      },
+      "configurations": {
+        "ci": {
+          "ci": true,
+          "coverage": true
+        }
+      }
+    },
+    "e2e": {
+      "executor": "@nx/playwright:playwright",
+      "outputs": ["{workspaceRoot}/dist/.playwright/apps/webapp"],
+      "options": {
+        "playwrightConfig": "apps/webapp/playwright.config.ts"
+      }
+    },
+    "lint": {
+      "executor": "@nx/linter:eslint",
+      "outputs": ["{options.outputFile}"],
+      "options": {
+        "lintFilePatterns": ["apps/webapp/**/*.{ts,tsx,js,jsx}"]
+      }
+    }
+  },
+  "tags": ["type:app", "scope:frontend"]
+}
