@@ -2,9 +2,8 @@
   "$schema": "./node_modules/nx/schemas/nx-schema.json",
   "targetDefaults": {
     "build": {
-      "dependsOn": ["^build"],
       "cache": true,
-      "inputs": ["production", "^production"],
+      "inputs": ["production"],
       "outputs": ["{projectRoot}/dist"]
     },
     "test": {
@@ -29,17 +28,5 @@
     ],
     "sharedGlobals": []
   },
-  "plugins": [
-    {
-      "plugin": "@nx/vite/plugin",
-      "options": {
-        "buildTargetName": "build",
-        "previewTargetName": "preview",
-        "testTargetName": "test",
-        "serveTargetName": "serve",
-        "serveStaticTargetName": "serve-static"
-      }
-    }
-  ],
   "defaultProject": "webapp"
 }

@@ -19,7 +19,6 @@
 
 module.exports = {
   preset: '../../jest.preset.js',
-  collectCoverageFrom: ['src/**/*.{js,ts}', '!src/**/*.d.ts', '!src/**/*.test.{js,ts}'],
   moduleDirectories: ['node_modules', __dirname],
   testEnvironment: 'node',
   testPathIgnorePatterns: ['<rootDir>/dist'],

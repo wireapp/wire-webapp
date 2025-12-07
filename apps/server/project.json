@@ -8,9 +8,13 @@
       "executor": "nx:run-commands",
       "outputs": ["{projectRoot}/dist"],
       "options": {
-        "commands": ["yarn clean", "tsc", "yarn generate-version-file", "yarn copy-assets"],
-        "parallel": false,
-        "cwd": "apps/server"
+        "commands": [
+          "rimraf apps/server/dist",
+          "tsc -p apps/server/tsconfig.json",
+          "node apps/server/bin/generateVersionFile.js",
+          "node apps/server/bin/copy_server_assets.js"
+        ],
+        "parallel": false
       }
     },
     "serve": {

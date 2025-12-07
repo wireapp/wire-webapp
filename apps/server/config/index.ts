@@ -29,18 +29,12 @@ import {generateConfig as generateServerConfig} from './server.config';
 const versionData = readFileSync(path.resolve(__dirname, './version.json'), 'utf8');
 const version = versionData ? JSON.parse(versionData) : {version: 'unknown', commit: 'unknown'};
 
-// Determine the correct root path based on the directory structure
-// In monorepo (dev/CI): go up from apps/server/dist/config to workspace root
-// In AWS EB deployment: go up from dist/config to deployment root
-// Check if we're in a monorepo structure by testing if .env.defaults exists at workspace root
-const monorepoRootPath = path.resolve(__dirname, '../../../..');
-const deploymentRootPath = path.resolve(__dirname, '..');
-const isMonorepo = require('fs').existsSync(path.join(monorepoRootPath, '.env.defaults'));
-const rootPath = isMonorepo ? monorepoRootPath : deploymentRootPath;
+// Find workspace root (go up from apps/server/dist/config to workspace root)
+const workspaceRoot = path.resolve(__dirname, '../../../..');
 
 const env = dotenv.load({
-  path: path.join(rootPath, '.env'),
-  defaults: path.join(rootPath, '.env.defaults'),
+  path: path.join(workspaceRoot, '.env'),
+  defaults: path.join(workspaceRoot, '.env.defaults'),
   includeProcessEnv: true,
 }) as Env;
 
