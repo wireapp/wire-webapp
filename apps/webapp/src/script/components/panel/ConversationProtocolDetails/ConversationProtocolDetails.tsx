@@ -19,9 +19,10 @@
 
 import {CSSObject} from '@emotion/react';
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
-import {t} from 'Util/LocalizerUtil';
 
 import {Ciphersuite} from '@wireapp/core';
+
+import {t} from 'Util/LocalizerUtil';
 
 interface ConversationProtocolDetailsProps {
   protocol: CONVERSATION_PROTOCOL;

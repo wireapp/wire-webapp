@@ -20,6 +20,7 @@
 import {useState} from 'react';
 
 import {Accept, FileRejection, useDropzone} from 'react-dropzone';
+
 import {CellsRepository} from 'Repositories/cells/CellsRepository';
 import {Conversation} from 'Repositories/entity/Conversation';
 import {Config} from 'src/script/Config';

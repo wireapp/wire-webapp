@@ -20,6 +20,7 @@
 import {HTMLProps, useEffect, useRef, useState} from 'react';
 
 import cx from 'classnames';
+
 import {t} from 'Util/LocalizerUtil';
 import {getLogger} from 'Util/Logger';
 

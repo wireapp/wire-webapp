@@ -18,12 +18,13 @@
  */
 
 import {QualifiedId} from '@wireapp/api-client/lib/user';
+
+import {Account} from '@wireapp/core';
+
 import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
 import {isMixedConversation, MixedConversation} from 'Repositories/conversation/ConversationSelectors';
 import {Conversation} from 'Repositories/entity/Conversation';
 import {initMLSGroupConversation} from 'src/script/mls/MLSConversations';
-
-import {Account} from '@wireapp/core';
 
 import {mlsMigrationLogger} from '../../MLSMigrationLogger';
 

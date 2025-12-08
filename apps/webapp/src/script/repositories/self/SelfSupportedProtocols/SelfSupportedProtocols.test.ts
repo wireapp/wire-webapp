@@ -19,6 +19,7 @@
 
 import {RegisteredClient} from '@wireapp/api-client/lib/client';
 import {CONVERSATION_PROTOCOL, FEATURE_STATUS, FeatureList} from '@wireapp/api-client/lib/team';
+
 import {MLSMigrationStatus} from 'src/script/mls/MLSMigration/migrationStatus';
 import {TestFactory} from 'test/helper/TestFactory';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';

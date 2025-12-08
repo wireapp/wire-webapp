@@ -18,10 +18,11 @@
  */
 
 import {render} from '@testing-library/react';
-import {User} from 'Repositories/entity/User';
-import {TeamState} from 'Repositories/team/TeamState';
 
 import {Availability} from '@wireapp/protocol-messaging';
+
+import {User} from 'Repositories/entity/User';
+import {TeamState} from 'Repositories/team/TeamState';
 
 import {UserAvatar} from './UserAvatar';
 

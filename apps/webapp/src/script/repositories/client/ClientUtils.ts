@@ -18,6 +18,7 @@
  */
 
 import {RegisteredClient} from '@wireapp/api-client/lib/client';
+
 import {weeksPassedSinceDate} from 'Util/TimeUtil';
 
 export const wasClientActiveWithinLast4Weeks = ({last_active: lastActiveISODate}: RegisteredClient): boolean => {

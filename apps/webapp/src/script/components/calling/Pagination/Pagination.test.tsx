@@ -18,6 +18,7 @@
  */
 
 import {render, fireEvent} from '@testing-library/react';
+
 import {withTheme} from 'src/script/auth/util/test/TestUtil';
 
 import {Pagination} from './Pagination';

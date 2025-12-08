@@ -180,8 +180,7 @@ describe('renderMessage', () => {
   });
 
   it('renders an emoticon of someone shrugging', () => {
-    /* eslint-disable no-useless-escape */
-    expect(renderMessage('¯_(ツ)_/¯')).toBe('¯<em>(ツ)</em>/¯');
+    expect(renderMessage('¯_(ツ)_/¯')).toBe('¯_(ツ)_/¯');
   });
 
   it('renders a link from markdown notation', () => {

@@ -17,9 +17,9 @@
  *
  */
 
-import {t} from 'Util/LocalizerUtil';
-
 import {TrashIcon} from '@wireapp/react-ui-kit';
+
+import {t} from 'Util/LocalizerUtil';
 
 import {RECYCLE_BIN_PATH} from '../recycleBin/recycleBin';
 

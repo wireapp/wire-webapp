@@ -19,6 +19,7 @@
 
 import {ClientClassification} from '@wireapp/api-client/lib/client';
 import cx from 'classnames';
+
 import {DeviceVerificationBadges} from 'Components/Badge';
 import {LegalHoldDot} from 'Components/LegalHoldDot';
 import {useMessageFocusedTabIndex} from 'Components/MessagesList/Message/util';

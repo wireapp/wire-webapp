@@ -19,9 +19,10 @@
 
 import Dexie from 'dexie';
 import DexieBatch from 'dexie-batch';
+import {container} from 'tsyringe';
+
 import {CONVERSATION} from 'Repositories/event/Client';
 import {StorageService} from 'Repositories/storage';
-import {container} from 'tsyringe';
 import {Logger, getLogger} from 'Util/Logger';
 
 export class BackupService {

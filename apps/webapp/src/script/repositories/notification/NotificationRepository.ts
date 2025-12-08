@@ -21,6 +21,12 @@ import type {QualifiedId} from '@wireapp/api-client/lib/user/';
 import {NotificationPreference, WebappProperties} from '@wireapp/api-client/lib/user/data/';
 import {amplify} from 'amplify';
 import ko from 'knockout';
+import {container} from 'tsyringe';
+
+import {Runtime} from '@wireapp/commons';
+import {Availability} from '@wireapp/protocol-messaging';
+import {WebAppEvents} from '@wireapp/webapp-events';
+
 import {AssetRepository} from 'Repositories/assets/AssetRepository';
 import {AudioRepository} from 'Repositories/audio/AudioRepository';
 import {AudioType} from 'Repositories/audio/AudioType';
@@ -46,17 +52,12 @@ import {getPermissionState, setPermissionState} from 'Repositories/permission/pe
 import {normalizePermissionState} from 'Repositories/permission/Permissions.types';
 import {PermissionType} from 'Repositories/permission/PermissionType';
 import {UserState} from 'Repositories/user/UserState';
-import {container} from 'tsyringe';
 import {Declension, t, getUserName} from 'Util/LocalizerUtil';
 import {getLogger, Logger} from 'Util/Logger';
 import {getRenderedTextContent} from 'Util/messageRenderer';
 import {truncate} from 'Util/StringUtil';
 import {formatDuration, TIME_IN_MILLIS} from 'Util/TimeUtil';
 import {ValidationUtilError} from 'Util/ValidationUtil';
-
-import {Runtime} from '@wireapp/commons';
-import {Availability} from '@wireapp/protocol-messaging';
-import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {AppPermissionState} from './AppPermissionState';
 

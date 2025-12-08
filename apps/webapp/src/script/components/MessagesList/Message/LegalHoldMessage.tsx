@@ -17,11 +17,12 @@
  *
  */
 
+import {container} from 'tsyringe';
+
 import {LegalHoldDot} from 'Components/LegalHoldDot';
 import {useLegalHoldModalState} from 'Components/Modals/LegalHoldModal/LegalHoldModal.state';
 import {ConversationState} from 'Repositories/conversation/ConversationState';
 import {LegalHoldMessage as LegalHoldMessageEntity} from 'Repositories/entity/message/LegalHoldMessage';
-import {container} from 'tsyringe';
 import {t} from 'Util/LocalizerUtil';
 
 interface LegalHoldMessageProps {

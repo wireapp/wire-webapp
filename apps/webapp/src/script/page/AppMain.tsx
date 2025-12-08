@@ -21,6 +21,12 @@ import {useEffect, useLayoutEffect} from 'react';
 
 import {amplify} from 'amplify';
 import cx from 'classnames';
+import {ErrorBoundary} from 'react-error-boundary';
+import {container} from 'tsyringe';
+
+import {QUERY, StyledApp, THEME_ID, useMatchMedia} from '@wireapp/react-ui-kit';
+import {WebAppEvents} from '@wireapp/webapp-events';
+
 import {CallingContainer} from 'Components/calling/CallingOverlayContainer';
 import {ChooseScreen} from 'Components/calling/ChooseScreen';
 import {ConfigToolbar} from 'Components/ConfigToolbar/ConfigToolbar';
@@ -33,7 +39,6 @@ import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {showUserModal, UserModal} from 'Components/Modals/UserModal';
 import {useActiveWindow} from 'Hooks/useActiveWindow';
 import {useInitializeRootFontSize} from 'Hooks/useRootFontSize';
-import {ErrorBoundary} from 'react-error-boundary';
 import {CallingViewMode, CallState, DesktopScreenShareMenu} from 'Repositories/calling/CallState';
 import {ConversationState} from 'Repositories/conversation/ConversationState';
 import {User} from 'Repositories/entity/User';
@@ -42,11 +47,7 @@ import {showInitialModal} from 'Repositories/user/AvailabilityModal';
 import {UserState} from 'Repositories/user/UserState';
 import {isUUID} from 'src/script/auth/util/stringUtil';
 import {Config} from 'src/script/Config';
-import {container} from 'tsyringe';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
-
-import {QUERY, StyledApp, THEME_ID, useMatchMedia} from '@wireapp/react-ui-kit';
-import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {AppLock} from './AppLock';
 import {useE2EIFeatureConfigUpdate} from './components/FeatureConfigChange/FeatureConfigChangeHandler/Features/useE2EIFeatureConfigUpdate';

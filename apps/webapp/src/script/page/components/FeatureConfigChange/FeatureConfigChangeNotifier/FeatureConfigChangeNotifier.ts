@@ -27,6 +27,10 @@ import {
   SELF_DELETING_TIMEOUT,
 } from '@wireapp/api-client/lib/team/feature/';
 import {amplify} from 'amplify';
+
+import {Runtime} from '@wireapp/commons';
+import {WebAppEvents} from '@wireapp/webapp-events';
+
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {ButtonAction} from 'Components/Modals/PrimaryModal/PrimaryModalTypes';
 import {TeamState} from 'Repositories/team/TeamState';
@@ -34,9 +38,6 @@ import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {replaceLink, t} from 'Util/LocalizerUtil';
 import {getLogger} from 'Util/Logger';
 import {formatDuration} from 'Util/TimeUtil';
-
-import {Runtime} from '@wireapp/commons';
-import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {loadFeatureConfig, saveFeatureConfig} from './FeatureConfigChangeNotifier.store';
 

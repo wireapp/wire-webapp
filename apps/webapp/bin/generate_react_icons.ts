@@ -73,7 +73,7 @@ const reactComponents = svgIcons.map(({name, content}) => {
   };`;
 });
 
-const dir = 'apps/webapp/src/script/components';
+const dir = '../src/script/components';
 
 if (!fs.existsSync(dir)) {
   fs.mkdirSync(dir, {recursive: true});

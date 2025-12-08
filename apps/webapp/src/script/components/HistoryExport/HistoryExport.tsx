@@ -20,6 +20,11 @@
 import {useContext, useEffect, useState} from 'react';
 
 import {amplify} from 'amplify';
+import {container} from 'tsyringe';
+
+import {Button, ButtonVariant, FlexBox} from '@wireapp/react-ui-kit';
+import {WebAppEvents} from '@wireapp/webapp-events';
+
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {ProgressBar} from 'Components/ProgressBar/ProgressBar';
 import {CancelError} from 'Repositories/backup/Error';
@@ -28,14 +33,10 @@ import {User} from 'Repositories/entity/User';
 import {EventName} from 'Repositories/tracking/EventName';
 import {Segmentation} from 'Repositories/tracking/Segmentation';
 import {ContentState} from 'src/script/page/useAppState';
-import {container} from 'tsyringe';
 import {t} from 'Util/LocalizerUtil';
 import {getLogger} from 'Util/Logger';
 import {getCurrentDate} from 'Util/TimeUtil';
 import {downloadBlob} from 'Util/util';
-
-import {Button, ButtonVariant, FlexBox} from '@wireapp/react-ui-kit';
-import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {Config} from '../../Config';
 import {RootContext} from '../../page/RootProvider';

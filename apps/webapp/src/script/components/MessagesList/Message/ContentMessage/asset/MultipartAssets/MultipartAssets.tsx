@@ -17,12 +17,13 @@
  *
  */
 
-import {useInView} from 'Hooks/useInView/useInView';
-import {CellsRepository} from 'Repositories/cells/CellsRepository';
 import {container} from 'tsyringe';
-import {formatBytes, getFileExtension, trimFileExtension} from 'Util/util';
 
 import {ICellAsset} from '@wireapp/protocol-messaging';
+
+import {useInView} from 'Hooks/useInView/useInView';
+import {CellsRepository} from 'Repositories/cells/CellsRepository';
+import {formatBytes, getFileExtension, trimFileExtension} from 'Util/util';
 
 import {FileAssetCard} from './FileAssetCard/FileAssetCard';
 import {ImageAssetCard} from './ImageAssetCard/ImageAssetCard';

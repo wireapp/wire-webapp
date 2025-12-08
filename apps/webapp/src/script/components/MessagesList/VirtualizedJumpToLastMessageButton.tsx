@@ -17,13 +17,13 @@
  *
  */
 
+import {ChevronIcon, IconButton} from '@wireapp/react-ui-kit';
+
 import {
   jumpToLastMessageButtonStyles,
   jumpToLastMessageChevronStyles,
 } from 'Components/MessagesList/MessageList.styles';
 import {t} from 'Util/LocalizerUtil';
-
-import {ChevronIcon, IconButton} from '@wireapp/react-ui-kit';
 
 interface VirtualizedJumpToLastMessageButtonProps {
   onGoToLastMessage: () => void;

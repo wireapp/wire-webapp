@@ -55,9 +55,16 @@ import type {QualifiedId} from '@wireapp/api-client/lib/user/';
 import {BaseCreateConversationResponse} from '@wireapp/core/lib/conversation';
 import {ClientMLSError, ClientMLSErrorLabel} from '@wireapp/core/lib/messagingProtocols/mls';
 import {amplify} from 'amplify';
+import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
+import {container} from 'tsyringe';
+import {flatten, isError} from 'underscore';
+
+import {Account} from '@wireapp/core';
+import {Asset as ProtobufAsset, Confirmation, LegalHoldStatus} from '@wireapp/protocol-messaging';
+import {WebAppEvents} from '@wireapp/webapp-events';
+
 import {TYPING_TIMEOUT, useTypingIndicatorState} from 'Components/InputBar/TypingIndicator';
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
-import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 import {AssetTransferState} from 'Repositories/assets/AssetTransferState';
 import {CallingRepository} from 'Repositories/calling/CallingRepository';
 import {LEAVE_CALL_REASON} from 'Repositories/calling/enum/LeaveCallReason';
@@ -85,8 +92,6 @@ import {TeamState} from 'Repositories/team/TeamState';
 import {UserFilter} from 'Repositories/user/UserFilter';
 import {UserRepository} from 'Repositories/user/UserRepository';
 import {UserState} from 'Repositories/user/UserState';
-import {container} from 'tsyringe';
-import {flatten, isError} from 'underscore';
 import {getNextItem} from 'Util/ArrayUtil';
 import {allowsAllFiles, getFileExtensionOrName, isAllowedFile} from 'Util/FileTypeUtil';
 import {replaceLink, t} from 'Util/LocalizerUtil';
@@ -103,10 +108,6 @@ import {
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 import {isBackendError} from 'Util/TypePredicateUtil';
 import {createUuid} from 'Util/uuid';
-
-import {Account} from '@wireapp/core';
-import {Asset as ProtobufAsset, Confirmation, LegalHoldStatus} from '@wireapp/protocol-messaging';
-import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {ACCESS_STATE} from './AccessState';
 import {extractClientDiff} from './ClientMismatchUtil';

@@ -26,11 +26,12 @@ import {isValidEmail, PATTERN} from '@wireapp/commons/lib/util/ValidationUtil';
 import {FormattedMessage} from 'react-intl';
 import {connect} from 'react-redux';
 import {Navigate, useNavigate} from 'react-router-dom';
-import {t} from 'Util/LocalizerUtil';
-import {isBackendError} from 'Util/TypePredicateUtil';
 
 import {Runtime, UrlUtil} from '@wireapp/commons';
 import {Button, Checkbox, CheckboxLabel, ErrorMessage, Form, Input, InputBlock, Loading} from '@wireapp/react-ui-kit';
+
+import {t} from 'Util/LocalizerUtil';
+import {isBackendError} from 'Util/TypePredicateUtil';
 
 import {Config} from '../../Config';
 import {JoinGuestLinkPasswordModal} from '../component/JoinGuestLinkPasswordModal';

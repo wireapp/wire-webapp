@@ -20,11 +20,12 @@
 import {useEffect} from 'react';
 
 import cx from 'classnames';
+
+import {Runtime} from '@wireapp/commons';
+
 import * as Icon from 'Components/Icon';
 import {t} from 'Util/LocalizerUtil';
 import {afterRender} from 'Util/util';
-
-import {Runtime} from '@wireapp/commons';
 
 import {closeWarning, useWarningsState} from './WarningsState';
 import {CONFIG, TYPE} from './WarningsTypes';

@@ -18,6 +18,7 @@
  */
 
 import {$createParagraphNode, $createTextNode} from 'lexical';
+
 import {ContentMessage} from 'Repositories/entity/message/ContentMessage';
 import {Text} from 'Repositories/entity/message/Text';
 

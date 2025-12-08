@@ -18,6 +18,8 @@
  */
 
 import {fireEvent, render, waitFor, act} from '@testing-library/react';
+import {container} from 'tsyringe';
+
 import {AssetRepository} from 'Repositories/assets/AssetRepository';
 import {MessageRepository} from 'Repositories/conversation/MessageRepository';
 import {Conversation} from 'Repositories/entity/Conversation';
@@ -29,7 +31,6 @@ import {Text} from 'Repositories/entity/message/Text';
 import {User} from 'Repositories/entity/User';
 import {withTheme} from 'src/script/auth/util/test/TestUtil';
 import {MessageCategory} from 'src/script/message/MessageCategory';
-import {container} from 'tsyringe';
 import {createUuid} from 'Util/uuid';
 
 import {Collection} from './Collection';

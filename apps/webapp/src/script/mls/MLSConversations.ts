@@ -17,6 +17,8 @@
  *
  */
 
+import {Account} from '@wireapp/core';
+
 import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
 import {
   isMLSCapableConversation,
@@ -29,8 +31,6 @@ import {
 import {Conversation} from 'Repositories/entity/Conversation';
 import {User} from 'Repositories/entity/User';
 import {getLogger} from 'Util/Logger';
-
-import {Account} from '@wireapp/core';
 
 const logger = getLogger('Webapp/MLSConversations');
 

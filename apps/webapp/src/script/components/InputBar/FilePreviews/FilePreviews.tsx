@@ -19,10 +19,11 @@
 
 import {useAutoAnimate} from '@formkit/auto-animate/react';
 import {QualifiedId} from '@wireapp/api-client/lib/user/';
+import {container} from 'tsyringe';
+
 import {FileWithPreview} from 'Components/Conversation/useFilesUploadState/useFilesUploadState';
 import {isAudio, isVideo, isImage} from 'Repositories/assets/AssetMetaDataBuilder';
 import {CellsRepository} from 'Repositories/cells/CellsRepository';
-import {container} from 'tsyringe';
 
 import {AudioPreviewCard} from './AudioPreviewCard/AudioPreviewCard';
 import {FilePreviewCard} from './FilePreviewCard/FilePreviewCard';

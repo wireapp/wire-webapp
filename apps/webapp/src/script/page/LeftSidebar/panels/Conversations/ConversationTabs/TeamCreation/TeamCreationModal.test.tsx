@@ -18,6 +18,7 @@
  */
 
 import {render, fireEvent, waitFor} from '@testing-library/react';
+
 import en from 'I18n/en-US.json';
 import {withTheme} from 'src/script/auth/util/test/TestUtil';
 import {setStrings} from 'Util/LocalizerUtil';

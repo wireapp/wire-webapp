@@ -17,10 +17,10 @@
  *
  */
 
+import {TabIndex} from '@wireapp/react-ui-kit';
+
 import {useInView} from 'src/script/hooks/useInView/useInView';
 import {useEffectRef} from 'Util/useEffectRef';
-
-import {TabIndex} from '@wireapp/react-ui-kit';
 
 import {useVideoPlayback} from './useVideoPlayback/useVideoPlayback';
 import {VideoAssetCard} from './VideoAssetCard/VideoAssetCard';

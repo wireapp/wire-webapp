@@ -18,10 +18,11 @@
  */
 
 import {FEATURE_KEY, FeatureList} from '@wireapp/api-client/lib/team';
-import {PrimaryModal} from 'Components/Modals/PrimaryModal';
-import {ModalType, getModalOptions} from 'src/script/E2EIdentity/Modals';
 
 import {Runtime} from '@wireapp/commons';
+
+import {PrimaryModal} from 'Components/Modals/PrimaryModal';
+import {ModalType, getModalOptions} from 'src/script/E2EIdentity/Modals';
 
 export const configureDownloadPath = (teamFeatures: FeatureList) => {
   const downloadPathNotifier =

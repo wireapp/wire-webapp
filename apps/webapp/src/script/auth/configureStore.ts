@@ -19,6 +19,7 @@
 
 import {applyMiddleware, combineReducers, legacy_createStore as createStore} from 'redux';
 import {withExtraArgument} from 'redux-thunk';
+
 import {LOGGER_NAMESPACE} from 'Util/Logger';
 
 import {reducers} from './module/reducer';

@@ -31,8 +31,14 @@ import {RECEIPT_MODE} from '@wireapp/api-client/lib/conversation/data';
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {amplify} from 'amplify';
-import {useLegalHoldModalState} from 'Components/Modals/LegalHoldModal/LegalHoldModal.state';
 import ko from 'knockout';
+import {container} from 'tsyringe';
+import {Cancelable, debounce} from 'underscore';
+
+import {LegalHoldStatus} from '@wireapp/protocol-messaging';
+import {WebAppEvents} from '@wireapp/webapp-events';
+
+import {useLegalHoldModalState} from 'Components/Modals/LegalHoldModal/LegalHoldModal.state';
 import {ClientRepository} from 'Repositories/client';
 import {ConnectionEntity} from 'Repositories/connection/ConnectionEntity';
 import {ACCESS_STATE} from 'Repositories/conversation/AccessState';
@@ -43,15 +49,10 @@ import {ConversationVerificationState} from 'Repositories/conversation/Conversat
 import {NOTIFICATION_STATE} from 'Repositories/conversation/NotificationSetting';
 import {ConversationRecord} from 'Repositories/storage/record/ConversationRecord';
 import {TeamState} from 'Repositories/team/TeamState';
-import {container} from 'tsyringe';
-import {Cancelable, debounce} from 'underscore';
 import {t} from 'Util/LocalizerUtil';
 import {getLogger, Logger} from 'Util/Logger';
 import {matchQualifiedIds} from 'Util/QualifiedId';
 import {truncate} from 'Util/StringUtil';
-
-import {LegalHoldStatus} from '@wireapp/protocol-messaging';
-import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {CallMessage} from './message/CallMessage';
 import type {ContentMessage} from './message/ContentMessage';

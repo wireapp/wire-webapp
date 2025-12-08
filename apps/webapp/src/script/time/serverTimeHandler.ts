@@ -18,6 +18,7 @@
  */
 
 import ko from 'knockout';
+
 import {getLogger} from 'Util/Logger';
 
 export const serverTimeHandler = {

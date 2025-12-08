@@ -18,6 +18,7 @@
  */
 
 import {CSSObject} from '@emotion/serialize';
+
 import {MLSStatuses} from 'src/script/E2EIdentity';
 
 const MLSStatusColor = {

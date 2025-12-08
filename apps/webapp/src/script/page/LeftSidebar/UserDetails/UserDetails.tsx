@@ -20,14 +20,15 @@
 import {memo} from 'react';
 
 import cx from 'classnames';
+
+import {TabIndex} from '@wireapp/react-ui-kit';
+
 import {Avatar, AVATAR_SIZE} from 'Components/Avatar';
 import {UserVerificationBadges} from 'Components/Badge';
 import {LegalHoldDot} from 'Components/LegalHoldDot';
 import {User} from 'Repositories/entity/User';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
-
-import {TabIndex} from '@wireapp/react-ui-kit';
 
 import * as styles from './UserDetails.styles';
 

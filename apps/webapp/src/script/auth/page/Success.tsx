@@ -20,10 +20,11 @@
 import {useEffect} from 'react';
 
 import {SuccessShield} from '@wireapp/react-ui-kit/lib/Images/SuccessShield';
-import {Config} from 'src/script/Config';
-import {t} from 'Util/LocalizerUtil';
 
 import {ActionLinkButton, FlexBox, Text} from '@wireapp/react-ui-kit';
+
+import {Config} from 'src/script/Config';
+import {t} from 'Util/LocalizerUtil';
 
 import {Page} from './Page';
 import {styles} from './Success.styles.';

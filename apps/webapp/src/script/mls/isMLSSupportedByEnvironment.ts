@@ -18,6 +18,7 @@
  */
 
 import {container} from 'tsyringe';
+
 import {supportsMLS} from 'Util/util';
 
 import {APIClient} from '../service/APIClientSingleton';

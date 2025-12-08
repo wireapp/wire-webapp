@@ -20,6 +20,9 @@
 import {useEffect, useState} from 'react';
 
 import {amplify} from 'amplify';
+
+import {WebAppEvents} from '@wireapp/webapp-events';
+
 import * as Icon from 'Components/Icon';
 import {showDetailViewModal} from 'Components/Modals/DetailViewModal';
 import {AssetRepository} from 'Repositories/assets/AssetRepository';
@@ -32,8 +35,6 @@ import {generateConversationUrl} from 'src/script/router/routeGenerator';
 import {createNavigate} from 'src/script/router/routerBindings';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
-
-import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {CollectionDetails} from './CollectionDetails';
 import {CollectionSection} from './CollectionSection';

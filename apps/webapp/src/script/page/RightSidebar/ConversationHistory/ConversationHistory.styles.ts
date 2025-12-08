@@ -18,6 +18,7 @@
  */
 
 import {CSSObject} from '@emotion/react';
+
 import {
   salesModalWrapperCss,
   salesModalBodyCss,

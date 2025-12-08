@@ -18,10 +18,11 @@
  */
 
 import {Navigate, useNavigate} from 'react-router-dom';
-import {t} from 'Util/LocalizerUtil';
 
 import {Runtime} from '@wireapp/commons';
 import {Button, ButtonVariant, CheckRoundIcon, FlexBox} from '@wireapp/react-ui-kit';
+
+import {t} from 'Util/LocalizerUtil';
 
 import {Page} from './Page';
 import {styles} from './SetAccountType.styles';

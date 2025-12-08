@@ -18,12 +18,13 @@
  */
 
 import {QualifiedId} from '@wireapp/api-client/lib/user/';
+
+import {FolderIcon, PlayIcon} from '@wireapp/react-ui-kit';
+
 import {FileTypeIcon} from 'Components/Conversation/common/FileTypeIcon/FileTypeIcon';
 import {openFolder} from 'Components/Conversation/ConversationCells/common/openFolder/openFolder';
 import {CellFile, CellNode, CellNodeType} from 'src/script/types/cellNode';
 import {getFileExtension} from 'Util/util';
-
-import {FolderIcon, PlayIcon} from '@wireapp/react-ui-kit';
 
 import {
   desktopNameStyles,

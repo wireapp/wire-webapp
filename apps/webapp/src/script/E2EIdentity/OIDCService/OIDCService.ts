@@ -19,6 +19,7 @@
 
 import {KeyAuth} from '@wireapp/core/lib/messagingProtocols/mls';
 import {UserManager, UserManagerSettings, WebStorageStateStore} from 'oidc-client-ts';
+
 import {clearKeysStartingWith} from 'Util/localStorage';
 
 import {EncryptedStorage} from './OauthEncryptedStore';

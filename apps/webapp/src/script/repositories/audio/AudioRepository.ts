@@ -19,11 +19,12 @@
 
 import {AudioPreference, WebappProperties} from '@wireapp/api-client/lib/user/data/';
 import {amplify} from 'amplify';
+
+import {WebAppEvents} from '@wireapp/webapp-events';
+
 import {NOTIFICATION_HANDLING_STATE} from 'Repositories/event/NotificationHandlingState';
 import {mediaDevicesStore} from 'Repositories/media/useMediaDevicesStore';
 import {getLogger, Logger} from 'Util/Logger';
-
-import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {AudioPlayingType} from './AudioPlayingType';
 import {AudioType} from './AudioType';

@@ -18,6 +18,7 @@
  */
 
 import {render} from '@testing-library/react';
+
 import {ServiceEntity} from 'Repositories/integration/ServiceEntity';
 
 import {ServiceDetails} from './ServiceDetails';

@@ -19,6 +19,7 @@
 
 import {Role} from '@wireapp/api-client/lib/team';
 import type {PermissionsData} from '@wireapp/api-client/lib/team/member/PermissionsData';
+
 import {capitalizeFirstChar} from 'Util/StringUtil';
 
 import {TeamError} from '../../error/TeamError';

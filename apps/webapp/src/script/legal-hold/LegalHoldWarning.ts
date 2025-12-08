@@ -18,6 +18,7 @@
  */
 
 import {amplify} from 'amplify';
+
 import {useLegalHoldModalState} from 'Components/Modals/LegalHoldModal/LegalHoldModal.state';
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {ConversationVerificationState} from 'Repositories/conversation/ConversationVerificationState';

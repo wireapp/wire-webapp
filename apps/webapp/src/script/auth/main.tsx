@@ -27,11 +27,12 @@ import {FC} from 'react';
 import {createRoot} from 'react-dom/client';
 import {Provider} from 'react-redux';
 import {container} from 'tsyringe';
+
+import {Runtime} from '@wireapp/commons';
+
 import {initializeDataDog} from 'Util/DataDog';
 import {enableLogging} from 'Util/LoggerUtil';
 import {exposeWrapperGlobals} from 'Util/wrapper';
-
-import {Runtime} from '@wireapp/commons';
 
 import './configureEnvironment';
 import {configureStore} from './configureStore';

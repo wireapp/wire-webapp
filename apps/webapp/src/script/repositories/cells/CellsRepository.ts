@@ -19,6 +19,7 @@
 
 import {NodeFlags} from '@wireapp/api-client/lib/cells';
 import {container, singleton} from 'tsyringe';
+
 import {createUuid} from 'Util/uuid';
 
 import {APIClient} from '../../service/APIClientSingleton';

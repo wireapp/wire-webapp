@@ -21,9 +21,10 @@ import {useEffect} from 'react';
 
 import {amplify} from 'amplify';
 import cx from 'classnames';
-import {User} from 'Repositories/entity/User';
 
 import {WebAppEvents} from '@wireapp/webapp-events';
+
+import {User} from 'Repositories/entity/User';
 
 import {Conversations} from './panels/Conversations';
 import {TemporaryGuestConversations} from './panels/TemporatyGuestConversations';

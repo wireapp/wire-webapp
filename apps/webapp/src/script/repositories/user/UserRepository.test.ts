@@ -24,6 +24,10 @@ import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 import type {User as APIClientUser} from '@wireapp/api-client/lib/user';
 import {amplify} from 'amplify';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
+
+import {Availability} from '@wireapp/protocol-messaging';
+import {WebAppEvents} from '@wireapp/webapp-events';
+
 import {AssetRepository} from 'Repositories/assets/AssetRepository';
 import {ClientRepository} from 'Repositories/client';
 import {ClientMapper} from 'Repositories/client/ClientMapper';
@@ -37,9 +41,6 @@ import {entities} from 'test/api/payloads';
 import {TestFactory} from 'test/helper/TestFactory';
 import {generateAPIUser} from 'test/helper/UserGenerator';
 import {matchQualifiedIds} from 'Util/QualifiedId';
-
-import {Availability} from '@wireapp/protocol-messaging';
-import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {ConsentValue} from './ConsentValue';
 import {UserRepository} from './UserRepository';

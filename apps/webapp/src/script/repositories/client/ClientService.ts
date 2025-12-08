@@ -19,9 +19,10 @@
 
 import type {RegisteredClient, QualifiedUserClientMap} from '@wireapp/api-client/lib/client';
 import type {QualifiedId} from '@wireapp/api-client/lib/user';
+import {container} from 'tsyringe';
+
 import {type ClientRecord, StorageService} from 'Repositories/storage';
 import {StorageSchemata} from 'Repositories/storage/StorageSchemata';
-import {container} from 'tsyringe';
 
 import {APIClient} from '../../service/APIClientSingleton';
 

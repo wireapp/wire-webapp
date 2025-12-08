@@ -21,10 +21,11 @@ import {MutableRefObject, useCallback, useState} from 'react';
 
 import {useLexicalComposerContext} from '@lexical/react/LexicalComposerContext';
 import {MenuOption as _MenuOption, MenuRenderFn, MenuTextMatch} from '@lexical/react/LexicalTypeaheadMenuPlugin';
-import {FadingScrollbar} from 'Components/FadingScrollbar';
-import {IgnoreOutsideClickWrapper} from 'Components/InputBar/util/clickHandlers';
 import {$createTextNode, TextNode} from 'lexical';
 import * as ReactDOM from 'react-dom';
+
+import {FadingScrollbar} from 'Components/FadingScrollbar';
+import {IgnoreOutsideClickWrapper} from 'Components/InputBar/util/clickHandlers';
 import {User} from 'Repositories/entity/User';
 
 import {MentionSuggestionsItem} from './MentionSuggestionsItem';

@@ -18,6 +18,7 @@
  */
 
 import {TimeInMillis} from '@wireapp/commons/lib/util/TimeUtil';
+
 import {getLogger} from 'Util/Logger';
 
 const logger = getLogger('ConnectionQualityListener');

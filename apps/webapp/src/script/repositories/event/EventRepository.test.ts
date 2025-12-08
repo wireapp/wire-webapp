@@ -18,9 +18,10 @@
  */
 
 import {BackendEvent, CONVERSATION_EVENT, USER_EVENT} from '@wireapp/api-client/lib/event/';
-import {ClientConversationEvent} from 'Repositories/conversation/EventBuilder';
 
 import {ConnectionState} from '@wireapp/core';
+
+import {ClientConversationEvent} from 'Repositories/conversation/EventBuilder';
 
 import {ClientEvent} from './Client';
 import {EventRepository} from './EventRepository';

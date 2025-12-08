@@ -24,9 +24,10 @@ import {IntlProvider} from 'react-intl';
 import {connect} from 'react-redux';
 import {HashRouter as Router, Navigate, Route, Routes} from 'react-router-dom';
 import {AnyAction, Dispatch} from 'redux';
-import {t} from 'Util/LocalizerUtil';
 
 import {ContainerXS, Loading, StyledApp, THEME_ID} from '@wireapp/react-ui-kit';
+
+import {t} from 'Util/LocalizerUtil';
 
 import {ClientManager} from './ClientManager';
 import {ConversationJoin} from './ConversationJoin';

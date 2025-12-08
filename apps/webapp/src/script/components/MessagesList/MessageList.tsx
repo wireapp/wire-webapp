@@ -20,6 +20,9 @@
 import React, {FC, useCallback, useEffect, useLayoutEffect, useRef, useState} from 'react';
 
 import cx from 'classnames';
+
+import {TabIndex} from '@wireapp/react-ui-kit';
+
 import {FadingScrollbar} from 'Components/FadingScrollbar';
 import {JumpToLastMessageButton} from 'Components/MessagesList/JumpToLastMessageButton';
 import {filterMessages} from 'Components/MessagesList/utils/messagesFilter';
@@ -38,8 +41,6 @@ import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {isLastReceivedMessage} from 'Util/conversationMessages';
 import {onHitTopOrBottom} from 'Util/DOM/onHitTopOrBottom';
 import {useResizeObserver} from 'Util/DOM/resizeObserver';
-
-import {TabIndex} from '@wireapp/react-ui-kit';
 
 import {Message, MessageActions} from './Message';
 import {MarkerComponent} from './Message/Marker';

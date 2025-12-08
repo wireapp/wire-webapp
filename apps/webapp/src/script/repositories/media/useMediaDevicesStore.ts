@@ -17,10 +17,11 @@
  *
  */
 
-import {ElectronDesktopCapturerSource} from 'Repositories/media/MediaDevicesHandler';
 import {useStore} from 'zustand';
 import {immer} from 'zustand/middleware/immer';
 import {createStore} from 'zustand/vanilla';
+
+import {ElectronDesktopCapturerSource} from 'Repositories/media/MediaDevicesHandler';
 
 export const defaultAudioInputId = 'default';
 export const defaultAudioOutputId = 'default';

@@ -22,14 +22,15 @@ import {UserEvent, USER_EVENT} from '@wireapp/api-client/lib/event';
 import type {QualifiedId} from '@wireapp/api-client/lib/user';
 import {amplify} from 'amplify';
 import ko from 'knockout';
+import {groupBy} from 'underscore';
+
+import {WebAppEvents} from '@wireapp/webapp-events';
+
 import type {ClientEntity} from 'Repositories/client/ClientEntity';
 import type {User} from 'Repositories/entity/User';
 import {PropertiesRepository} from 'Repositories/properties/PropertiesRepository';
-import {groupBy} from 'underscore';
 import {matchQualifiedIds} from 'Util/QualifiedId';
 import {loadValue, resetStoreValue, storeValue} from 'Util/StorageUtil';
-
-import {WebAppEvents} from '@wireapp/webapp-events';
 
 export type ClientNotificationData = {
   domain?: string;

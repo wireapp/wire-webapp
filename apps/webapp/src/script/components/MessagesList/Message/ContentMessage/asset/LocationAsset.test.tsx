@@ -18,6 +18,7 @@
  */
 
 import {render} from '@testing-library/react';
+
 import type {Location} from 'Repositories/entity/message/Location';
 
 import {LocationAsset} from './LocationAsset';

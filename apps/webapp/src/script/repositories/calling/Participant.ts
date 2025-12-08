@@ -19,12 +19,13 @@
 
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 import ko, {computed, observable, pureComputed} from 'knockout';
-import {User} from 'Repositories/entity/User';
-import {applyBlur} from 'Repositories/media/VideoBackgroundBlur';
-import {matchQualifiedIds} from 'Util/QualifiedId';
 
 import {VIDEO_STATE} from '@wireapp/avs';
 import {AvsDebugger} from '@wireapp/avs-debugger';
+
+import {User} from 'Repositories/entity/User';
+import {applyBlur} from 'Repositories/media/VideoBackgroundBlur';
+import {matchQualifiedIds} from 'Util/QualifiedId';
 
 export type UserId = string;
 export type ClientId = string;

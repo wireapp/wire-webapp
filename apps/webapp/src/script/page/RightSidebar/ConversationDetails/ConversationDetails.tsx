@@ -21,6 +21,9 @@ import {forwardRef, useEffect, useMemo, useState} from 'react';
 
 import {CONVERSATION_ACCESS, CONVERSATION_CELLS_STATE} from '@wireapp/api-client/lib/conversation';
 import {RECEIPT_MODE} from '@wireapp/api-client/lib/conversation/data/';
+
+import {TabIndex} from '@wireapp/react-ui-kit';
+
 import {FadingScrollbar} from 'Components/FadingScrollbar';
 import * as Icon from 'Components/Icon';
 import {ConversationProtocolDetails} from 'Components/panel/ConversationProtocolDetails/ConversationProtocolDetails';
@@ -40,8 +43,6 @@ import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 import {sortUsersByPriority} from 'Util/StringUtil';
 import {formatDuration} from 'Util/TimeUtil';
-
-import {TabIndex} from '@wireapp/react-ui-kit';
 
 import {ConversationDetailsHeader} from './components/ConversationDetailsHeader';
 import {ConversationDetailsOptions} from './components/ConversationDetailsOptions';

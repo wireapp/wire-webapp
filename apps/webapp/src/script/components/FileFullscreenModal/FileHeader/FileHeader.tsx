@@ -17,6 +17,10 @@
  *
  */
 
+import {container} from 'tsyringe';
+
+import {BadgesWithTooltip, Button, ButtonVariant, CloseIcon, DownloadIcon, ShowIcon} from '@wireapp/react-ui-kit';
+
 import {FileTypeIcon} from 'Components/Conversation/common/FileTypeIcon/FileTypeIcon';
 import {EditIcon} from 'Components/Icon';
 import {iconStyles} from 'Components/MessagesList/Message/ContentMessage/asset/MultipartAssets/FileAssetCard/common/FileAssetOptions/FileAssetOptions.styles';
@@ -24,11 +28,8 @@ import {MessageTime} from 'Components/MessagesList/Message/MessageTime';
 import {useFileHistoryModal} from 'Components/Modals/FileHistoryModal/hooks/useFileHistoryModal';
 import {useRelativeTimestamp} from 'Hooks/useRelativeTimestamp';
 import {CellsRepository} from 'Repositories/cells/CellsRepository';
-import {container} from 'tsyringe';
 import {t} from 'Util/LocalizerUtil';
 import {forcedDownloadFile, getFileNameWithExtension} from 'Util/util';
-
-import {BadgesWithTooltip, Button, ButtonVariant, CloseIcon, DownloadIcon, ShowIcon} from '@wireapp/react-ui-kit';
 
 import {
   headerStyles,

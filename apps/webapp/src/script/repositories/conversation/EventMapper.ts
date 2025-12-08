@@ -18,6 +18,10 @@
  */
 
 import {CONVERSATION_EVENT, ConversationEvent, ConversationProtocolUpdateEvent} from '@wireapp/api-client/lib/event/';
+import {container} from 'tsyringe';
+
+import {LinkPreview, Mention} from '@wireapp/protocol-messaging';
+
 import {AssetRemoteData} from 'Repositories/assets/AssetRemoteData';
 import {AssetTransferState} from 'Repositories/assets/AssetTransferState';
 import {TERMINATION_REASON} from 'Repositories/calling/enum/TerminationReason';
@@ -57,13 +61,10 @@ import type {Text as TextAsset} from 'Repositories/entity/message/Text';
 import {VerificationMessage} from 'Repositories/entity/message/VerificationMessage';
 import {ClientEvent} from 'Repositories/event/Client';
 import type {EventRecord, LegacyEventRecord} from 'Repositories/storage';
-import {container} from 'tsyringe';
 import {t} from 'Util/LocalizerUtil';
 import {getLogger, Logger} from 'Util/Logger';
 import {userReactionMapToReactionMap} from 'Util/ReactionUtil';
 import {base64ToArray} from 'Util/util';
-
-import {LinkPreview, Mention} from '@wireapp/protocol-messaging';
 
 import {
   MemberJoinEvent,

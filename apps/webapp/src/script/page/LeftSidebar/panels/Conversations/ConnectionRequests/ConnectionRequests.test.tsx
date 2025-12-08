@@ -18,6 +18,7 @@
  */
 
 import {render, screen} from '@testing-library/react';
+
 import {createUuid} from 'Util/uuid';
 
 import {ConnectionRequests} from './ConnectionRequests';

@@ -20,6 +20,7 @@
 import {useLayoutEffect, useRef} from 'react';
 
 import {SerializedStyles, css} from '@emotion/react';
+
 import {ScrollToElement} from 'Components/MessagesList/Message/types';
 import {useRelativeTimestamp} from 'src/script/hooks/useRelativeTimestamp';
 

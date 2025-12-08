@@ -20,6 +20,7 @@
 import {useEffect, useMemo, useState} from 'react';
 
 import {ClientClassification} from '@wireapp/api-client/lib/client/';
+
 import {useUserIdentity} from 'Hooks/useDeviceIdentities';
 import {ClientRepository, ClientEntity} from 'Repositories/client';
 import {MessageRepository} from 'Repositories/conversation/MessageRepository';

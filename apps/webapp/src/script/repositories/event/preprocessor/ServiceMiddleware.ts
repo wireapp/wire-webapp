@@ -19,6 +19,7 @@
 
 import {CONVERSATION_EVENT, ConversationMemberJoinEvent} from '@wireapp/api-client/lib/event/';
 import type {QualifiedId} from '@wireapp/api-client/lib/user/';
+
 import type {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
 import {MemberJoinEvent, OneToOneCreationEvent} from 'Repositories/conversation/EventBuilder';
 import {User} from 'Repositories/entity/User';

@@ -21,6 +21,7 @@ import {MutableRefObject, useCallback, useEffect, useLayoutEffect, useMemo, useR
 
 import {useVirtualizer} from '@tanstack/react-virtual';
 import cx from 'classnames';
+
 import {MarkerComponent} from 'Components/MessagesList/Message/Marker';
 import {Message} from 'Components/MessagesList/Message/VirtualizedMessage';
 import {MessagesListParams} from 'Components/MessagesList/MessageList.types';

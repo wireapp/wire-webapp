@@ -18,6 +18,7 @@
  */
 
 import {render} from '@testing-library/react';
+
 import {Conversation} from 'Repositories/entity/Conversation';
 import {E2EIVerificationMessage as VerificationMessageEntity} from 'Repositories/entity/message/E2EIVerificationMessage';
 import {User} from 'Repositories/entity/User';

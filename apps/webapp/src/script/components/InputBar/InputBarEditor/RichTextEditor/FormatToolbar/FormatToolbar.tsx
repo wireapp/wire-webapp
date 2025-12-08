@@ -18,9 +18,7 @@
  */
 
 import {useLexicalComposerContext} from '@lexical/react/LexicalComposerContext';
-import {FormatSeparator} from 'Components/InputBar/common/FormatSeparator/FormatSeparator';
 import {FORMAT_TEXT_COMMAND, TextFormatType} from 'lexical';
-import {t} from 'Util/LocalizerUtil';
 
 import {
   CodeBlockIcon,
@@ -34,6 +32,9 @@ import {
   HeadingIcon,
   LinkIcon,
 } from '@wireapp/react-ui-kit';
+
+import {FormatSeparator} from 'Components/InputBar/common/FormatSeparator/FormatSeparator';
+import {t} from 'Util/LocalizerUtil';
 
 import {FormatButton} from './FormatButton/FormatButton';
 import {wrapperStyles} from './FormatToolbar.styles';

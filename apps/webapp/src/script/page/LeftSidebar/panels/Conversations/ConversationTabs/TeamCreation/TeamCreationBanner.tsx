@@ -20,14 +20,15 @@
 import {useState} from 'react';
 
 import {amplify} from 'amplify';
+
+import {Button, ButtonVariant, IconButton} from '@wireapp/react-ui-kit';
+import {WebAppEvents} from '@wireapp/webapp-events';
+
 import {BannerPortal} from 'Components/BannerPortal/BannerPortal';
 import * as Icon from 'Components/Icon';
 import {EventName} from 'Repositories/tracking/EventName';
 import {Segmentation} from 'Repositories/tracking/Segmentation';
 import {t} from 'Util/LocalizerUtil';
-
-import {Button, ButtonVariant, IconButton} from '@wireapp/react-ui-kit';
-import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {
   bannerHeaderContainerCss,

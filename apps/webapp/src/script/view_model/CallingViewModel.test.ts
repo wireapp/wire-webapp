@@ -17,12 +17,12 @@
  *
  */
 
+import {STATE} from '@wireapp/avs';
+
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {LEAVE_CALL_REASON} from 'Repositories/calling/enum/LeaveCallReason';
 import {Conversation} from 'Repositories/entity/Conversation';
 import {createUuid} from 'Util/uuid';
-
-import {STATE} from '@wireapp/avs';
 
 import {buildCall, buildCallingViewModel, callState, mockCallingRepository} from './CallingViewModel.mocks';
 

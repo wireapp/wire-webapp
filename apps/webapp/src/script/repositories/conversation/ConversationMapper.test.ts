@@ -31,6 +31,7 @@ import {
 import {RECEIPT_MODE} from '@wireapp/api-client/lib/conversation/data';
 import type {QualifiedId} from '@wireapp/api-client/lib/user/';
 import ko from 'knockout';
+
 import {Conversation} from 'Repositories/entity/Conversation';
 import {BaseError} from 'src/script/error/BaseError';
 import {createUuid} from 'Util/uuid';

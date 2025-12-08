@@ -17,9 +17,9 @@
  *
  */
 
-import {useWindow} from 'Components/calling/useWindow';
-
 import {useMatchMedia} from '@wireapp/react-ui-kit';
+
+import {useWindow} from 'Components/calling/useWindow';
 
 export const useActiveWindowMatchMedia = (mediaQuery: string) => {
   const activeWindow = useWindow();

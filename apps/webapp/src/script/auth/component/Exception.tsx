@@ -20,10 +20,11 @@
 import {Fragment} from 'react';
 
 import {FormattedMessage} from 'react-intl';
-import {errorHandlerStrings} from 'Util/ErrorUtil';
-import {validationErrorStrings} from 'Util/ValidationUtil';
 
 import {ErrorMessage, Link} from '@wireapp/react-ui-kit';
+
+import {errorHandlerStrings} from 'Util/ErrorUtil';
+import {validationErrorStrings} from 'Util/ValidationUtil';
 
 import {Config} from '../../Config';
 

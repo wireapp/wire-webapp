@@ -20,10 +20,11 @@
 import {useEffect, useRef, useState} from 'react';
 
 import Cookies from 'js-cookie';
-import {TIME_IN_MILLIS} from 'Util/TimeUtil';
-import {createUuid} from 'Util/uuid';
 
 import {Runtime} from '@wireapp/commons';
+
+import {TIME_IN_MILLIS} from 'Util/TimeUtil';
+import {createUuid} from 'Util/uuid';
 
 const CONFIG = {
   COOKIE_NAME: 'app_opened',

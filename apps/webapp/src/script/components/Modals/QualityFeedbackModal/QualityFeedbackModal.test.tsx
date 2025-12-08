@@ -19,6 +19,11 @@
 
 import {render, fireEvent, act} from '@testing-library/react';
 import {amplify} from 'amplify';
+import {container} from 'tsyringe';
+
+import {CALL_TYPE, CONV_TYPE} from '@wireapp/avs';
+import {WebAppEvents} from '@wireapp/webapp-events';
+
 import {useCallAlertState} from 'Components/calling/useCallAlertState';
 import {CALL_QUALITY_FEEDBACK_KEY} from 'Components/Modals/QualityFeedbackModal/constants';
 import {RatingListLabel} from 'Components/Modals/QualityFeedbackModal/typings';
@@ -29,11 +34,7 @@ import {EventName} from 'Repositories/tracking/EventName';
 import {Segmentation} from 'Repositories/tracking/Segmentation';
 import {UserState} from 'Repositories/user/UserState';
 import {TestFactory} from 'test/helper/TestFactory';
-import {container} from 'tsyringe';
 import {t} from 'Util/LocalizerUtil';
-
-import {CALL_TYPE, CONV_TYPE} from '@wireapp/avs';
-import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {QualityFeedbackModal} from './QualityFeedbackModal';
 

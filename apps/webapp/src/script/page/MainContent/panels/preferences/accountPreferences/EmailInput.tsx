@@ -17,8 +17,9 @@
  *
  */
 
-import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
+
+import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {UserRepository} from 'Repositories/user/UserRepository';
 import {t} from 'Util/LocalizerUtil';
 import {getLogger} from 'Util/Logger';

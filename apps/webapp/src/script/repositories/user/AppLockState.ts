@@ -19,8 +19,9 @@
 
 import {FEATURE_STATUS} from '@wireapp/api-client/lib/team/feature/';
 import ko from 'knockout';
-import {TeamState} from 'Repositories/team/TeamState';
 import {container, singleton} from 'tsyringe';
+
+import {TeamState} from 'Repositories/team/TeamState';
 
 const defaultEnabled = true;
 const defaultEnforced = false;

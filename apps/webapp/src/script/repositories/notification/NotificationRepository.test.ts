@@ -22,6 +22,12 @@ import {CONVERSATION_TYPE} from '@wireapp/api-client/lib/conversation';
 import {CONVERSATION_EVENT} from '@wireapp/api-client/lib/event';
 import {NotificationPreference} from '@wireapp/api-client/lib/user/data';
 import {amplify} from 'amplify';
+import {container} from 'tsyringe';
+
+import {Runtime} from '@wireapp/commons';
+import {Availability} from '@wireapp/protocol-messaging';
+import {WebAppEvents} from '@wireapp/webapp-events';
+
 import {AudioRepository} from 'Repositories/audio/AudioRepository';
 import {CallingRepository} from 'Repositories/calling/CallingRepository';
 import {CallingViewMode, CallState} from 'Repositories/calling/CallState';
@@ -55,14 +61,9 @@ import {QuoteEntity} from 'src/script/message/QuoteEntity';
 import {SystemMessageType} from 'src/script/message/SystemMessageType';
 import {ContentState, useAppState} from 'src/script/page/useAppState';
 import {entities, payload} from 'test/api/payloads';
-import {container} from 'tsyringe';
 import {t} from 'Util/LocalizerUtil';
 import {truncate} from 'Util/StringUtil';
 import {createUuid} from 'Util/uuid';
-
-import {Runtime} from '@wireapp/commons';
-import {Availability} from '@wireapp/protocol-messaging';
-import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {NotificationRepository} from './NotificationRepository';
 

@@ -20,13 +20,14 @@
 import {useState, useEffect, useRef} from 'react';
 
 import keyboardjs from 'keyboardjs';
+import {container} from 'tsyringe';
+
+import {Button, Input, Switch} from '@wireapp/react-ui-kit';
+
 import {ConversationState} from 'Repositories/conversation/ConversationState';
 import {Config, Configuration} from 'src/script/Config';
 import {useClickOutside} from 'src/script/hooks/useClickOutside';
-import {container} from 'tsyringe';
 import {CoreCryptoLogLevel} from 'Util/DebugUtil';
-
-import {Button, Input, Switch} from '@wireapp/react-ui-kit';
 
 import {wrapperStyles} from './ConfigToolbar.styles';
 

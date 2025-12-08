@@ -18,6 +18,7 @@
  */
 
 import {render} from '@testing-library/react';
+
 import {ContentMessage} from 'Repositories/entity/message/ContentMessage';
 import {LinkPreview} from 'Repositories/entity/message/LinkPreview';
 import {Text} from 'Repositories/entity/message/Text';

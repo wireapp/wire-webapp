@@ -21,6 +21,9 @@ import React, {KeyboardEvent as ReactKeyBoardEvent, MouseEvent as ReactMouseEven
 
 import {CONVERSATION_ACCESS} from '@wireapp/api-client/lib/conversation/';
 import cx from 'classnames';
+
+import {TabIndex} from '@wireapp/react-ui-kit';
+
 import {Avatar, AVATAR_SIZE, GroupAvatar} from 'Components/Avatar';
 import {ChannelAvatar} from 'Components/Avatar/ChannelAvatar';
 import {UserBlockedBadge} from 'Components/Badge';
@@ -35,8 +38,6 @@ import {isKey, isOneOfKeys, KEY} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
 import {useChannelsFeatureFlag} from 'Util/useChannelsFeatureFlag';
 import {noop, setContextMenuPosition} from 'Util/util';
-
-import {TabIndex} from '@wireapp/react-ui-kit';
 
 import {StatusIcon} from './components/StatusIcon';
 

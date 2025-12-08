@@ -21,22 +21,23 @@ import {ClientType, PublicClient, RegisteredClient} from '@wireapp/api-client/li
 import {UserClientAddEvent, UserClientRemoveEvent, USER_EVENT} from '@wireapp/api-client/lib/event';
 import {QualifiedId} from '@wireapp/api-client/lib/user/';
 import {amplify} from 'amplify';
-import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 import ko from 'knockout';
 import murmurhash from 'murmurhash';
+import {container} from 'tsyringe';
+
+import {Runtime} from '@wireapp/commons';
+import {WebAppEvents} from '@wireapp/webapp-events';
+
+import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import type {CryptographyRepository} from 'Repositories/cryptography/CryptographyRepository';
 import type {User} from 'Repositories/entity/User';
 import {ClientRecord} from 'Repositories/storage';
 import {StorageKey} from 'Repositories/storage/StorageKey';
-import {container} from 'tsyringe';
 import {t} from 'Util/LocalizerUtil';
 import {getLogger, Logger} from 'Util/Logger';
 import {matchQualifiedIds} from 'Util/QualifiedId';
 import {loadValue} from 'Util/StorageUtil';
-
-import {Runtime} from '@wireapp/commons';
-import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {ClientEntity} from './ClientEntity';
 import {constructClientId, parseClientId} from './ClientIdUtil';

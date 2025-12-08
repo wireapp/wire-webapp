@@ -20,6 +20,7 @@
 import {FC} from 'react';
 
 import {CSSObject, css} from '@emotion/react';
+
 import {getEmojiUnicode} from 'Util/EmojiUtil';
 
 interface EmojiImgProps {

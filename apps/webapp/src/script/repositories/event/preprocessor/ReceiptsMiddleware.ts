@@ -18,6 +18,7 @@
  */
 
 import {RECEIPT_MODE} from '@wireapp/api-client/lib/conversation/data';
+
 import type {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
 import {ConfirmationEvent} from 'Repositories/conversation/EventBuilder';
 import {User} from 'Repositories/entity/User';

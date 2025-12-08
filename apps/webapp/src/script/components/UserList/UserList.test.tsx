@@ -20,6 +20,7 @@
 import React from 'react';
 
 import {fireEvent, render} from '@testing-library/react';
+
 import {UserList} from 'Components/UserList/UserList';
 import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
 import {User} from 'Repositories/entity/User';

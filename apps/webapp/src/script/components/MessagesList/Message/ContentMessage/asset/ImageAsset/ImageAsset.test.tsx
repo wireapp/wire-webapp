@@ -18,12 +18,13 @@
  */
 
 import {fireEvent, render, screen, waitFor} from '@testing-library/react';
+import {container} from 'tsyringe';
+
 import {AssetRemoteData} from 'Repositories/assets/AssetRemoteData';
 import {AssetRepository} from 'Repositories/assets/AssetRepository';
 import {ContentMessage} from 'Repositories/entity/message/ContentMessage';
 import {MediumImage} from 'Repositories/entity/message/MediumImage';
 import {User} from 'Repositories/entity/User';
-import {container} from 'tsyringe';
 
 import {ImageAsset, ImageAssetProps} from './ImageAsset';
 

@@ -21,6 +21,9 @@ import {ReactNode, CSSProperties, useEffect, useState} from 'react';
 
 import {css} from '@emotion/react';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
+
+import {QUERY} from '@wireapp/react-ui-kit';
+
 import {Avatar, AVATAR_SIZE} from 'Components/Avatar';
 import * as Icon from 'Components/Icon';
 import {useActiveWindowMatchMedia} from 'Hooks/useActiveWindowMatchMedia';
@@ -29,8 +32,6 @@ import type {Participant} from 'Repositories/calling/Participant';
 import type {Grid} from 'Repositories/calling/videoGridHandler';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
-
-import {QUERY} from '@wireapp/react-ui-kit';
 
 import {GroupVideoGridTile} from './GroupVideoGridTile';
 import {Video} from './Video';

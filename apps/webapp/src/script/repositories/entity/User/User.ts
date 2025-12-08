@@ -22,6 +22,10 @@ import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {amplify} from 'amplify';
 import ko from 'knockout';
+
+import {Availability} from '@wireapp/protocol-messaging';
+import {WebAppEvents} from '@wireapp/webapp-events';
+
 import type {AssetRemoteData} from 'Repositories/assets/AssetRemoteData';
 import type {ClientEntity} from 'Repositories/client/ClientEntity';
 import {ConnectionEntity} from 'Repositories/connection/ConnectionEntity';
@@ -30,9 +34,6 @@ import {t} from 'Util/LocalizerUtil';
 import {clamp} from 'Util/NumberUtil';
 import {getFirstChar} from 'Util/StringUtil';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
-
-import {Availability} from '@wireapp/protocol-messaging';
-import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {ACCENT_ID} from '../../../Config';
 

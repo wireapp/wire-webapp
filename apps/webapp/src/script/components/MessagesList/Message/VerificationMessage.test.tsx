@@ -19,11 +19,12 @@
 
 import {render} from '@testing-library/react';
 import ko from 'knockout';
+
+import {QualifiedUserId} from '@wireapp/protocol-messaging';
+
 import {VerificationMessage as VerificationMessageEntity} from 'Repositories/entity/message/VerificationMessage';
 import {User} from 'Repositories/entity/User';
 import {VerificationMessageType} from 'src/script/message/VerificationMessageType';
-
-import {QualifiedUserId} from '@wireapp/protocol-messaging';
 
 import {VerificationMessage} from './VerificationMessage';
 

@@ -20,13 +20,14 @@
 import {render, waitFor} from '@testing-library/react';
 import {CONVERSATION_TYPE, MLSConversation} from '@wireapp/api-client/lib/conversation';
 import {CredentialType} from '@wireapp/core/lib/messagingProtocols/mls';
+import {container} from 'tsyringe';
+
 import {User} from 'Repositories/entity/User';
 import {UserState} from 'Repositories/user/UserState';
 import {withTheme} from 'src/script/auth/util/test/TestUtil';
 import {E2EIHandler, MLSStatuses, WireIdentity} from 'src/script/E2EIdentity';
 import {Core} from 'src/script/service/CoreSingleton';
 import {generateAPIConversation} from 'test/helper/ConversationGenerator';
-import {container} from 'tsyringe';
 
 import {E2EICertificateDetails} from './E2EICertificateDetails';
 

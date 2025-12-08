@@ -19,6 +19,7 @@
 
 import {act, render} from '@testing-library/react';
 import type {QualifiedId} from '@wireapp/api-client/lib/user/';
+
 import {useLegalHoldModalState} from 'Components/Modals/LegalHoldModal/LegalHoldModal.state';
 import {CallingRepository} from 'Repositories/calling/CallingRepository';
 import {ClientRepository} from 'Repositories/client';

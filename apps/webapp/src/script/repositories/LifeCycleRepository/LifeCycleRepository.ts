@@ -18,6 +18,9 @@
  */
 
 import {amplify} from 'amplify';
+
+import {WebAppEvents} from '@wireapp/webapp-events';
+
 import {useTypingIndicatorState} from 'Components/InputBar/TypingIndicator';
 import {CacheRepository} from 'Repositories/cache/CacheRepository';
 import type {ClientRepository} from 'Repositories/client/ClientRepository';
@@ -29,8 +32,6 @@ import type {UserRepository} from 'Repositories/user/UserRepository';
 import {getLogger, Logger} from 'Util/Logger';
 import {includesString} from 'Util/StringUtil';
 import {appendParameter} from 'Util/UrlUtil';
-
-import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {SIGN_OUT_REASON} from '../../auth/SignOutReason';
 import {URLParameter} from '../../auth/URLParameter';

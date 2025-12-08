@@ -20,6 +20,7 @@
 import {MutableRefObject, useEffect} from 'react';
 
 import {Virtualizer} from '@tanstack/react-virtual';
+
 import {GroupedMessage, isMarker, Marker} from 'Components/MessagesList/utils/virtualizedMessagesGroup';
 
 interface Props {

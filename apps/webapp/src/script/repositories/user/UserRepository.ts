@@ -36,8 +36,15 @@ import {
   UserAssetType as APIClientUserAssetType,
 } from '@wireapp/api-client/lib/user';
 import {amplify} from 'amplify';
-import {useLegalHoldModalState} from 'Components/Modals/LegalHoldModal/LegalHoldModal.state';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
+import {container} from 'tsyringe';
+import {flatten, uniq} from 'underscore';
+
+import {TypedEventEmitter, type AccentColor} from '@wireapp/commons';
+import {Availability} from '@wireapp/protocol-messaging';
+import {WebAppEvents} from '@wireapp/webapp-events';
+
+import {useLegalHoldModalState} from 'Components/Modals/LegalHoldModal/LegalHoldModal.state';
 import {AssetRepository} from 'Repositories/assets/AssetRepository';
 import type {ClientRepository, QualifiedUserClientEntityMap} from 'Repositories/client';
 import {ClientEntity} from 'Repositories/client/ClientEntity';
@@ -54,18 +61,12 @@ import {PROPERTIES_TYPE} from 'Repositories/properties/PropertiesType';
 import type {SelfService} from 'Repositories/self/SelfService';
 import {UserRecord} from 'Repositories/storage';
 import {TeamState} from 'Repositories/team/TeamState';
-import {container} from 'tsyringe';
-import {flatten, uniq} from 'underscore';
 import {chunk, partition} from 'Util/ArrayUtil';
 import {t} from 'Util/LocalizerUtil';
 import {getLogger, Logger} from 'Util/Logger';
 import {matchQualifiedIds} from 'Util/QualifiedId';
 import {fixWebsocketString} from 'Util/StringUtil';
 import {isAxiosError, isBackendError} from 'Util/TypePredicateUtil';
-
-import {TypedEventEmitter, type AccentColor} from '@wireapp/commons';
-import {Availability} from '@wireapp/protocol-messaging';
-import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {showAvailabilityModal} from './AvailabilityModal';
 import {ConsentValue} from './ConsentValue';

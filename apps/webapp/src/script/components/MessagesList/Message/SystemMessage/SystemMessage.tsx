@@ -17,6 +17,8 @@
  *
  */
 
+import {MLSVerified} from '@wireapp/react-ui-kit';
+
 import * as Icon from 'Components/Icon';
 import {E2EIVerificationMessage} from 'Repositories/entity/message/E2EIVerificationMessage';
 import {JoinedAfterMLSMigrationFinalisationMessage} from 'Repositories/entity/message/JoinedAfterMLSMigrationFinalisationMessage';
@@ -28,8 +30,6 @@ import {ProtocolUpdateMessage} from 'Repositories/entity/message/ProtocolUpdateM
 import {ReceiptModeUpdateMessage} from 'Repositories/entity/message/ReceiptModeUpdateMessage';
 import {RenameMessage} from 'Repositories/entity/message/RenameMessage';
 import {SystemMessage as SystemMessageEntity} from 'Repositories/entity/message/SystemMessage';
-
-import {MLSVerified} from '@wireapp/react-ui-kit';
 
 import {SystemMessageBase} from './SystemMessageBase';
 

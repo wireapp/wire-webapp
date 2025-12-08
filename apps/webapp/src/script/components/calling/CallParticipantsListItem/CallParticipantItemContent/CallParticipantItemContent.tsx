@@ -19,13 +19,13 @@
 
 import React from 'react';
 
+import {TabIndex} from '@wireapp/react-ui-kit';
+
 import * as Icon from 'Components/Icon';
 import {UserInfo} from 'Components/UserInfo';
 import {User} from 'Repositories/entity/User';
 import {t} from 'Util/LocalizerUtil';
 import {capitalizeFirstChar} from 'Util/StringUtil';
-
-import {TabIndex} from '@wireapp/react-ui-kit';
 
 import {
   selfIndicator,

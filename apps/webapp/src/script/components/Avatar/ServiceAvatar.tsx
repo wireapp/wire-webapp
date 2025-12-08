@@ -19,8 +19,9 @@
 
 import React from 'react';
 
-import * as Icon from 'Components/Icon';
 import ko from 'knockout';
+
+import * as Icon from 'Components/Icon';
 import {ServiceEntity} from 'Repositories/integration/ServiceEntity';
 import {CSS_FILL_PARENT} from 'Util/CSSMixin';
 

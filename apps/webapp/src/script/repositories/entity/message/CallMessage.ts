@@ -18,6 +18,7 @@
  */
 
 import ko from 'knockout';
+
 import type {TERMINATION_REASON} from 'Repositories/calling/enum/TerminationReason';
 import {t} from 'Util/LocalizerUtil';
 

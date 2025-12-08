@@ -18,6 +18,7 @@
  */
 
 import {render} from '@testing-library/react';
+
 import {Message} from 'Repositories/entity/message/Message';
 import {User} from 'Repositories/entity/User';
 import * as TimeUtil from 'Util/TimeUtil';

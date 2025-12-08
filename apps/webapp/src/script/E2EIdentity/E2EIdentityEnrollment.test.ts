@@ -20,6 +20,8 @@
 import {waitFor} from '@testing-library/react';
 import {CredentialType} from '@wireapp/core/lib/messagingProtocols/mls';
 import {LowPrecisionTaskScheduler} from '@wireapp/core/lib/util/LowPrecisionTaskScheduler';
+import {container} from 'tsyringe';
+
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {PrimaryModalType} from 'Components/Modals/PrimaryModal/PrimaryModalTypes';
 import {ConversationState} from 'Repositories/conversation/ConversationState';
@@ -27,7 +29,6 @@ import {Conversation} from 'Repositories/entity/Conversation';
 import {User} from 'Repositories/entity/User';
 import {UserState} from 'Repositories/user/UserState';
 import {Core} from 'src/script/service/CoreSingleton';
-import {container} from 'tsyringe';
 import * as util from 'Util/util';
 
 import {E2EIHandler} from './E2EIdentityEnrollment';

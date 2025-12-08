@@ -19,6 +19,7 @@
 
 import {parseQualifiedId} from '@wireapp/core/lib/util/qualifiedIdUtil';
 import {RestNode} from 'cells-sdk-ts';
+
 import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
 
 export const getConversationsFromNodes = async ({

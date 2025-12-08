@@ -21,6 +21,7 @@ import {ConnectionStatus} from '@wireapp/api-client/lib/connection/';
 import {CONVERSATION_TYPE, Conversation as BackendConversation} from '@wireapp/api-client/lib/conversation/';
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 import {QualifiedId} from '@wireapp/api-client/lib/user/';
+
 import {Conversation} from 'Repositories/entity/Conversation';
 import {matchQualifiedIds} from 'Util/QualifiedId';
 

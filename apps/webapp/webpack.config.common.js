@@ -22,6 +22,8 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 const webpack = require('webpack');
 const WorkboxPlugin = require('workbox-webpack-plugin');
 
+const path = require('path');
+
 const DIST_PATH = path.resolve(__dirname, '../../apps/server/dist');
 const ROOT_PATH = path.resolve(__dirname, '../..');
 const SRC_PATH = path.resolve(__dirname, 'src');

@@ -18,6 +18,7 @@
  */
 
 import type {QualifiedId} from '@wireapp/api-client/lib/user/';
+
 import {Conversation} from 'Repositories/entity/Conversation';
 import {VerificationMessage} from 'Repositories/entity/message/VerificationMessage';
 import {User} from 'Repositories/entity/User';

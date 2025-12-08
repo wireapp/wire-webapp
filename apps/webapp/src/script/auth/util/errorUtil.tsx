@@ -18,10 +18,11 @@
  */
 
 import {FormattedMessage} from 'react-intl';
-import {errorHandlerStrings} from 'Util/ErrorUtil';
-import {validationErrorStrings} from 'Util/ValidationUtil';
 
 import {ErrorMessage} from '@wireapp/react-ui-kit';
+
+import {errorHandlerStrings} from 'Util/ErrorUtil';
+import {validationErrorStrings} from 'Util/ValidationUtil';
 
 export function parseError(error: any): JSX.Element | null {
   if (error) {

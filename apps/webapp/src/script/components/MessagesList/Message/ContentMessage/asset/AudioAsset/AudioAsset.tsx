@@ -20,12 +20,13 @@
 import {useEffect, useState} from 'react';
 
 import cx from 'classnames';
+import {container} from 'tsyringe';
+
 import * as Icon from 'Components/Icon';
 import {AssetTransferState} from 'Repositories/assets/AssetTransferState';
 import type {ContentMessage} from 'Repositories/entity/message/ContentMessage';
 import type {FileAsset} from 'Repositories/entity/message/FileAsset';
 import {TeamState} from 'Repositories/team/TeamState';
-import {container} from 'tsyringe';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {getLogger} from 'Util/Logger';
 import {formatSeconds} from 'Util/TimeUtil';

@@ -18,6 +18,7 @@
  */
 
 import {act, fireEvent, render, waitFor} from '@testing-library/react';
+
 import {FileWithPreview} from 'Components/Conversation/useFilesUploadState/useFilesUploadState';
 import {InputBar} from 'Components/InputBar/index';
 import {AssetRepository} from 'Repositories/assets/AssetRepository';

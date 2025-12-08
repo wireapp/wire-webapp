@@ -22,14 +22,10 @@ import React, {useEffect, useRef, useState} from 'react';
 import {LoginData} from '@wireapp/api-client/lib/auth';
 import {ClientType} from '@wireapp/api-client/lib/client/index';
 import {BackendError, BackendErrorLabel, SyntheticErrorLabel} from '@wireapp/api-client/lib/http/';
-import {LogoFullIcon} from 'Components/Icon';
 import {StatusCodes} from 'http-status-codes';
 import {FormattedMessage} from 'react-intl';
 import {connect} from 'react-redux';
 import {useNavigate} from 'react-router-dom';
-import {t} from 'Util/LocalizerUtil';
-import {getLogger} from 'Util/Logger';
-import {isBackendError} from 'Util/TypePredicateUtil';
 
 import {Runtime, UrlUtil} from '@wireapp/commons';
 import {
@@ -56,6 +52,11 @@ import {
   Text,
   useMatchMedia,
 } from '@wireapp/react-ui-kit';
+
+import {LogoFullIcon} from 'Components/Icon';
+import {t} from 'Util/LocalizerUtil';
+import {getLogger} from 'Util/Logger';
+import {isBackendError} from 'Util/TypePredicateUtil';
 
 import {EntropyContainer} from './EntropyContainer';
 import {separator} from './Login.styles';
@@ -605,8 +606,7 @@ type DispatchProps = ReturnType<typeof mapDispatchToProps>;
 const mapDispatchToProps = (dispatch: ThunkDispatch) => ({
   doCheckConversationCode: (...args: Parameters<typeof actionRoot.conversationAction.doCheckConversationCode>) =>
     dispatch(actionRoot.conversationAction.doCheckConversationCode(...args)),
-  doInit: (...args: Parameters<typeof actionRoot.authAction.doInit>) =>
-    dispatch(actionRoot.authAction.doInit(...args)),
+  doInit: (...args: Parameters<typeof actionRoot.authAction.doInit>) => dispatch(actionRoot.authAction.doInit(...args)),
   doInitializeClient: (...args: Parameters<typeof actionRoot.clientAction.doInitializeClient>) =>
     dispatch(actionRoot.clientAction.doInitializeClient(...args)),
   doLogin: (...args: Parameters<typeof actionRoot.authAction.doLogin>) =>
@@ -623,8 +623,9 @@ const mapDispatchToProps = (dispatch: ThunkDispatch) => ({
     dispatch(actionRoot.authAction.pushLoginData(...args)),
   resetAuthError: (...args: Parameters<typeof actionRoot.authAction.resetAuthError>) =>
     dispatch(actionRoot.authAction.resetAuthError(...args)),
-  doGetConversationInfoByCode: (...args: Parameters<typeof actionRoot.conversationAction.doGetConversationInfoByCode>) =>
-    dispatch(actionRoot.conversationAction.doGetConversationInfoByCode(...args)),
+  doGetConversationInfoByCode: (
+    ...args: Parameters<typeof actionRoot.conversationAction.doGetConversationInfoByCode>
+  ) => dispatch(actionRoot.conversationAction.doGetConversationInfoByCode(...args)),
 });
 
 const Login = connect(mapStateToProps, mapDispatchToProps)(LoginComponent);

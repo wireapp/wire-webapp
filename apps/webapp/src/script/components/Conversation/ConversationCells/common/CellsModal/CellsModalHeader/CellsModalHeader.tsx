@@ -19,9 +19,9 @@
 
 import {ReactNode} from 'react';
 
-import {t} from 'Util/LocalizerUtil';
-
 import {CloseIcon, IconButton, IconButtonVariant} from '@wireapp/react-ui-kit';
+
+import {t} from 'Util/LocalizerUtil';
 
 import {headerStyles, headingStyles, closeButtonStyles} from './CellsModalHeader.styles';
 

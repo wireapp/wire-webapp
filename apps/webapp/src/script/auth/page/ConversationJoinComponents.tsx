@@ -19,9 +19,6 @@
 
 import React, {useState} from 'react';
 
-import {Config} from 'src/script/Config';
-import {t} from 'Util/LocalizerUtil';
-
 import {
   useMatchMedia,
   QUERY,
@@ -39,6 +36,9 @@ import {
   Loading,
   Checkbox,
 } from '@wireapp/react-ui-kit';
+
+import {Config} from 'src/script/Config';
+import {t} from 'Util/LocalizerUtil';
 
 import {parseValidationErrors, parseError} from '../util/errorUtil';
 

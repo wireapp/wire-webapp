@@ -21,6 +21,9 @@ import {KeyboardEvent as ReactKeyboardEvent, useEffect, useRef, useState} from '
 
 import {amplify} from 'amplify';
 import cx from 'classnames';
+
+import {WebAppEvents} from '@wireapp/webapp-events';
+
 import {ZoomableImage} from 'Components/ZoomableImage';
 import {AssetRepository} from 'Repositories/assets/AssetRepository';
 import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
@@ -34,8 +37,6 @@ import {t} from 'Util/LocalizerUtil';
 import {renderElement} from 'Util/renderElement';
 import {preventFocusOutside} from 'Util/util';
 import {waitFor} from 'Util/waitFor';
-
-import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {DetailViewModalFooter} from './DetailViewModalFooter';
 import {DetailViewModalHeader} from './DetailViewModalHeader';

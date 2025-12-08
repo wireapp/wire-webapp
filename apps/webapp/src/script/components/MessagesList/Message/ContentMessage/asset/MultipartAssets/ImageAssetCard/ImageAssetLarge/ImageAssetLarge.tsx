@@ -19,10 +19,10 @@
 
 import {CSSProperties, useState} from 'react';
 
-import {t} from 'Util/LocalizerUtil';
-
 import {ICellAsset} from '@wireapp/protocol-messaging';
 import {UnavailableFileIcon} from '@wireapp/react-ui-kit';
+
+import {t} from 'Util/LocalizerUtil';
 
 import {
   containerStyles,

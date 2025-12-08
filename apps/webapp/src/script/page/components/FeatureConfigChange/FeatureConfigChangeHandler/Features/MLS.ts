@@ -18,6 +18,7 @@
  */
 
 import {FEATURE_KEY, FeatureList} from '@wireapp/api-client/lib/team';
+
 import {supportsMLS} from 'Util/util';
 
 export const getMLSConfig = (config: FeatureList): FeatureList[FEATURE_KEY.MLS] | undefined => {
