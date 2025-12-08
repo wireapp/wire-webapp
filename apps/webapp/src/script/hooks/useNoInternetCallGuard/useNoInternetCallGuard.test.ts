@@ -18,6 +18,7 @@
  */
 
 import {act, renderHook} from '@testing-library/react';
+
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 
 import {useNoInternetCallGuard} from './useNoInternetCallGuard';

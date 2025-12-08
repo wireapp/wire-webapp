@@ -18,13 +18,14 @@
  */
 
 import {amplify} from 'amplify';
+import {create} from 'zustand';
+
+import {WebAppEvents} from '@wireapp/webapp-events';
+
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {AppPermissionState} from 'Repositories/notification/AppPermissionState';
 import {t} from 'Util/LocalizerUtil';
 import {safeWindowOpen} from 'Util/SanitizationUtil';
-import {create} from 'zustand';
-
-import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {TYPE} from './WarningsTypes';
 

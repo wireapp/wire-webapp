@@ -19,6 +19,7 @@
 
 import {parseQualifiedId} from '@wireapp/core/lib/util/qualifiedIdUtil';
 import {RestNode} from 'cells-sdk-ts';
+
 import {Conversation} from 'Repositories/entity/Conversation';
 import {User} from 'Repositories/entity/User';
 import {CellNode, CellNodeType} from 'src/script/types/cellNode';

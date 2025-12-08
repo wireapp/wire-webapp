@@ -20,6 +20,7 @@
 import {useEffect, useState} from 'react';
 
 import useLocalStorage from 'beautiful-react-hooks/useLocalStorage';
+
 import {ROOT_FONT_SIZE_KEY} from 'Repositories/storage';
 
 export enum RootFontSize {

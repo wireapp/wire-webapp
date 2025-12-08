@@ -18,12 +18,13 @@
  */
 
 import {pathWithParams} from '@wireapp/commons/lib/util/UrlUtil';
-import {LogoFullIcon} from 'Components/Icon';
 import {useSelector} from 'react-redux';
 import {useNavigate} from 'react-router-dom';
-import {t} from 'Util/LocalizerUtil';
 
 import {Button, ButtonVariant, Container, Text} from '@wireapp/react-ui-kit';
+
+import {LogoFullIcon} from 'Components/Icon';
+import {t} from 'Util/LocalizerUtil';
 
 import {buttonContainerCss, containerCss, headerCss, logoCss, paragraphCss} from './CustomBackend.styles';
 import {Page} from './Page';

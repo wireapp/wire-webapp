@@ -19,6 +19,8 @@
 
 import {memo} from 'react';
 
+import {container} from 'tsyringe';
+
 import {useInitializeMediaDevices} from 'Hooks/useInitializeMediaDevices';
 import type {CallingRepository} from 'Repositories/calling/CallingRepository';
 import {MediaConstraintsHandler} from 'Repositories/media/MediaConstraintsHandler';
@@ -26,7 +28,6 @@ import {MediaDevicesHandler} from 'Repositories/media/MediaDevicesHandler';
 import type {MediaDeviceType} from 'Repositories/media/MediaDeviceType';
 import {MediaStreamHandler} from 'Repositories/media/MediaStreamHandler';
 import type {PropertiesRepository} from 'Repositories/properties/PropertiesRepository';
-import {container} from 'tsyringe';
 import {t} from 'Util/LocalizerUtil';
 
 import {AudioOutPreferences} from './avPreferences/AudioOutPreferences';

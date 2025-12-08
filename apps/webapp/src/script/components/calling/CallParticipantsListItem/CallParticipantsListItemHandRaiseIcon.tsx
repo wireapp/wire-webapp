@@ -20,10 +20,11 @@
 import {useEffect, useState} from 'react';
 
 import {TimeInMillis} from '@wireapp/commons/lib/util/TimeUtil';
-import {t} from 'Util/LocalizerUtil';
-import {formatDuration} from 'Util/TimeUtil';
 
 import {InviteIcon, Tooltip} from '@wireapp/react-ui-kit';
+
+import {t} from 'Util/LocalizerUtil';
+import {formatDuration} from 'Util/TimeUtil';
 
 import {toolTipStyles} from './CallParticipantsListItemHandRaiseIcon.styles';
 

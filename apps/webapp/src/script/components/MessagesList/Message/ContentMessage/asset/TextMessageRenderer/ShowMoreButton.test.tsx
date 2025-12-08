@@ -18,6 +18,7 @@
  */
 
 import {fireEvent, render} from '@testing-library/react';
+
 import {t} from 'Util/LocalizerUtil';
 
 import {ShowMoreButton} from './ShowMoreButton';

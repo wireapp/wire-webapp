@@ -20,12 +20,13 @@
 import {FC, useEffect, useRef} from 'react';
 
 import cx from 'classnames';
+
+import {TabIndex} from '@wireapp/react-ui-kit';
+
 import {DraggableClickWrapper} from 'Components/DraggableClickWrapper';
 import * as Icon from 'Components/Icon';
 import {t} from 'Util/LocalizerUtil';
 import {noop} from 'Util/util';
-
-import {TabIndex} from '@wireapp/react-ui-kit';
 
 interface PanelHeaderProps {
   onClose: () => void;

@@ -19,9 +19,9 @@
 
 import {ReactNode} from 'react';
 
-import {AVATAR_SIZE} from 'Components/Avatar';
-
 import {Availability as AvailabilityProp} from '@wireapp/protocol-messaging';
+
+import {AVATAR_SIZE} from 'Components/Avatar';
 
 import * as styles from './Availability.styles';
 

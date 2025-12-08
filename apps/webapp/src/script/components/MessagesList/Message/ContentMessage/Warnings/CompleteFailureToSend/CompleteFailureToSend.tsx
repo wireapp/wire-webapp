@@ -17,11 +17,11 @@
  *
  */
 
+import {Button, ButtonVariant, Link, LinkVariant} from '@wireapp/react-ui-kit';
+
 import {useMessageFocusedTabIndex} from 'Components/MessagesList/Message/util';
 import {Config} from 'src/script/Config';
 import {t} from 'Util/LocalizerUtil';
-
-import {Button, ButtonVariant, Link, LinkVariant} from '@wireapp/react-ui-kit';
 
 import {backendErrorLink, button, warning, wrapper} from '../Warnings.styles';
 

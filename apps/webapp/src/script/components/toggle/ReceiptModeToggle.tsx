@@ -21,6 +21,7 @@ import {useRef} from 'react';
 
 import {RECEIPT_MODE} from '@wireapp/api-client/lib/conversation/data';
 import cx from 'classnames';
+
 import {t} from 'Util/LocalizerUtil';
 
 import * as Icon from '../Icon';

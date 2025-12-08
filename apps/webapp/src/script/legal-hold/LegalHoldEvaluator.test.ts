@@ -18,11 +18,12 @@
  */
 
 import {GenericMessageType} from '@wireapp/core/lib/conversation';
+
+import {GenericMessage, LegalHoldStatus, Text} from '@wireapp/protocol-messaging';
+
 import {CryptographyMapper} from 'Repositories/cryptography/CryptographyMapper';
 import {createMessageAddEvent} from 'test/helper/EventGenerator';
 import {createUuid} from 'Util/uuid';
-
-import {GenericMessage, LegalHoldStatus, Text} from '@wireapp/protocol-messaging';
 
 import * as LegalHoldEvaluator from './LegalHoldEvaluator';
 

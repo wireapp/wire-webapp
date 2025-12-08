@@ -19,6 +19,10 @@
 
 import {useContext, useEffect, useRef} from 'react';
 
+import {container} from 'tsyringe';
+
+import {Button, ButtonVariant, IconButton, IconButtonVariant, useMatchMedia} from '@wireapp/react-ui-kit';
+
 import {Avatar, AVATAR_SIZE} from 'Components/Avatar';
 import {UserClassifiedBar} from 'Components/ClassifiedBar/ClassifiedBar';
 import {UnverifiedUserWarning} from 'Components/Modals/UserModal';
@@ -28,11 +32,8 @@ import {TeamState} from 'Repositories/team/TeamState';
 import {UserState} from 'Repositories/user/UserState';
 import {SidebarTabs, useSidebarStore} from 'src/script/page/LeftSidebar/panels/Conversations/useSidebarStore';
 import {useAppMainState, ViewType} from 'src/script/page/state';
-import {container} from 'tsyringe';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
-
-import {Button, ButtonVariant, IconButton, IconButtonVariant, useMatchMedia} from '@wireapp/react-ui-kit';
 
 import {RootContext} from '../../page/RootProvider';
 

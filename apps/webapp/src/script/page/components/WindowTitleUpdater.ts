@@ -20,15 +20,16 @@
 import {useCallback, useEffect, useState} from 'react';
 
 import {amplify} from 'amplify';
+import {container} from 'tsyringe';
+
+import {WebAppEvents} from '@wireapp/webapp-events';
+
 import {ConversationState} from 'Repositories/conversation/ConversationState';
 import {NOTIFICATION_HANDLING_STATE} from 'Repositories/event/NotificationHandlingState';
 import {UserState} from 'Repositories/user/UserState';
-import {container} from 'tsyringe';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 import {getLogger} from 'Util/Logger';
-
-import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {Config} from '../../Config';
 import {ContentState, useAppState} from '../useAppState';

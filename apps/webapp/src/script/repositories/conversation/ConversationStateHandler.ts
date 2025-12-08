@@ -20,8 +20,9 @@
 import {ConversationCode} from '@wireapp/api-client/lib/conversation/';
 import {ConversationAccessUpdateData} from '@wireapp/api-client/lib/conversation/data/';
 import {CONVERSATION_EVENT} from '@wireapp/api-client/lib/event/';
-import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
+
+import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import type {Conversation} from 'Repositories/entity/Conversation';
 import {t} from 'Util/LocalizerUtil';
 

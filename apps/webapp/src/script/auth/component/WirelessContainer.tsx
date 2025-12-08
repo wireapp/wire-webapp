@@ -19,11 +19,12 @@
 
 import React from 'react';
 
-import {LogoFullIcon} from 'Components/Icon';
 import {FormattedMessage} from 'react-intl';
-import {t} from 'Util/LocalizerUtil';
 
 import {CloseIcon, Content, Footer, Header, Link, Small} from '@wireapp/react-ui-kit';
+
+import {LogoFullIcon} from 'Components/Icon';
+import {t} from 'Util/LocalizerUtil';
 
 import {Config} from '../../Config';
 import {EXTERNAL_ROUTE} from '../externalRoute';

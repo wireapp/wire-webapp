@@ -18,10 +18,11 @@
  */
 
 import {CSSObject} from '@emotion/serialize';
-import * as Icon from 'Components/Icon';
-import {CSS_SQUARE} from 'Util/CSSMixin';
 
 import {Availability} from '@wireapp/protocol-messaging';
+
+import * as Icon from 'Components/Icon';
+import {CSS_SQUARE} from 'Util/CSSMixin';
 
 const iconStyles: CSSObject = {
   ...CSS_SQUARE(10),

@@ -18,10 +18,11 @@
  */
 
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
+import {container} from 'tsyringe';
+
 import {InfoToggle} from 'Components/toggle/InfoToggle';
 import {TeamState} from 'Repositories/team/TeamState';
 import {Config} from 'src/script/Config';
-import {container} from 'tsyringe';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 

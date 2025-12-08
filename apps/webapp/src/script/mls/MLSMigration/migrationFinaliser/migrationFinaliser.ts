@@ -18,6 +18,7 @@
  */
 
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
+
 import {
   MixedConversation,
   isMLSConversation,

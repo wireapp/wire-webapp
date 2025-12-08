@@ -19,13 +19,14 @@
 
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
+import {container} from 'tsyringe';
+
+import {Account} from '@wireapp/core';
+
 import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
 import {User} from 'Repositories/entity/User';
 import {Core as CoreSingleton} from 'src/script/service/CoreSingleton';
-import {container} from 'tsyringe';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
-
-import {Account} from '@wireapp/core';
 
 import {finaliseMigrationOfMixedConversations} from './migrationFinaliser';
 import {initialiseMigrationOfProteusConversations, joinUnestablishedMixedConversations} from './migrationInitialiser';

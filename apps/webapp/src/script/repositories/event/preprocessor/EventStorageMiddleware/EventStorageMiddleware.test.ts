@@ -17,6 +17,8 @@
  *
  */
 
+import {Asset as ProtobufAsset} from '@wireapp/protocol-messaging';
+
 import {AssetTransferState} from 'Repositories/assets/AssetTransferState';
 import {ConversationState} from 'Repositories/conversation/ConversationState';
 import {Conversation} from 'Repositories/entity/Conversation';
@@ -29,8 +31,6 @@ import {
   toSavedEvent,
 } from 'test/helper/EventGenerator';
 import {createUuid} from 'Util/uuid';
-
-import {Asset as ProtobufAsset} from '@wireapp/protocol-messaging';
 
 import {EventStorageMiddleware} from './EventStorageMiddleware';
 

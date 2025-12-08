@@ -19,16 +19,17 @@
 
 import {useEffect, useMemo, useRef, useState} from 'react';
 
+import {useDebouncedCallback} from 'use-debounce';
+
+import {CloseIcon, Input, InputSubmitCombo, SearchIcon} from '@wireapp/react-ui-kit';
+
 import {ContentMessage} from 'Repositories/entity/message/ContentMessage';
 import type {Message} from 'Repositories/entity/message/Message';
 import {getSearchRegex} from 'Repositories/search/FullTextSearch';
-import {useDebouncedCallback} from 'use-debounce';
 import {t} from 'Util/LocalizerUtil';
 import {isScrolledBottom} from 'Util/scroll-helpers';
 import {useEffectRef} from 'Util/useEffectRef';
 import {noop} from 'Util/util';
-
-import {CloseIcon, Input, InputSubmitCombo, SearchIcon} from '@wireapp/react-ui-kit';
 
 import {FullSearchItem} from './fullSearch/FullSearchItem';
 

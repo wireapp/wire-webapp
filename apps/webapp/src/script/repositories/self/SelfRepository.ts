@@ -20,6 +20,11 @@
 import {CONVERSATION_PROTOCOL, FEATURE_KEY, FEATURE_STATUS, FeatureList} from '@wireapp/api-client/lib/team/feature/';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {amplify} from 'amplify';
+import {container} from 'tsyringe';
+
+import {TypedEventEmitter} from '@wireapp/commons';
+import {WebAppEvents} from '@wireapp/webapp-events';
+
 import {ClientEntity, ClientRepository} from 'Repositories/client';
 import {EventSource} from 'Repositories/event/EventSource';
 import {
@@ -29,12 +34,8 @@ import {
 import {TeamRepository} from 'Repositories/team/TeamRepository';
 import {UserRepository} from 'Repositories/user/UserRepository';
 import {UserState} from 'Repositories/user/UserState';
-import {container} from 'tsyringe';
 import {Logger, getLogger} from 'Util/Logger';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
-
-import {TypedEventEmitter} from '@wireapp/commons';
-import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {SelfService} from './SelfService';
 import {evaluateSelfSupportedProtocols} from './SelfSupportedProtocols/SelfSupportedProtocols';

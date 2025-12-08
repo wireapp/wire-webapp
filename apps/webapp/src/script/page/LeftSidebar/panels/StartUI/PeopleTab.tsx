@@ -20,9 +20,12 @@
 import {useEffect, useRef, useState} from 'react';
 
 import {BackendErrorLabel} from '@wireapp/api-client/lib/http';
+import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
+import {partition} from 'underscore';
+import {useDebouncedCallback} from 'use-debounce';
+
 import * as Icon from 'Components/Icon';
 import {UserList, UserlistMode} from 'Components/UserList';
-import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
 import {ConversationState} from 'Repositories/conversation/ConversationState';
 import {User} from 'Repositories/entity/User';
@@ -31,8 +34,6 @@ import {TeamRepository} from 'Repositories/team/TeamRepository';
 import {TeamState} from 'Repositories/team/TeamState';
 import {UserRepository} from 'Repositories/user/UserRepository';
 import {UserState} from 'Repositories/user/UserState';
-import {partition} from 'underscore';
-import {useDebouncedCallback} from 'use-debounce';
 import {t} from 'Util/LocalizerUtil';
 import {getLogger} from 'Util/Logger';
 import {safeWindowOpen} from 'Util/SanitizationUtil';

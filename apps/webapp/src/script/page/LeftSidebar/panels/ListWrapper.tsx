@@ -20,10 +20,11 @@
 import React, {memo, ReactElement, ReactNode} from 'react';
 
 import {css} from '@emotion/react';
+import {throttle} from 'underscore';
+
 import {FadingScrollbar} from 'Components/FadingScrollbar';
 import * as Icon from 'Components/Icon';
 import {useConnectionQuality} from 'src/script/hooks/useConnectionQuality';
-import {throttle} from 'underscore';
 import {t} from 'Util/LocalizerUtil';
 import {isScrollable, isScrolledBottom, isScrolledTop} from 'Util/scroll-helpers';
 

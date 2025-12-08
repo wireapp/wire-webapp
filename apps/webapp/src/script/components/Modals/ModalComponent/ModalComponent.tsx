@@ -20,9 +20,10 @@
 import React, {useEffect, useId, useRef, useState, useCallback, HTMLProps} from 'react';
 
 import {CSSObject} from '@emotion/react';
-import {noop, preventFocusOutside} from 'Util/util';
 
 import {TabIndex} from '@wireapp/react-ui-kit';
+
+import {noop, preventFocusOutside} from 'Util/util';
 
 import {
   ModalContentStyles,

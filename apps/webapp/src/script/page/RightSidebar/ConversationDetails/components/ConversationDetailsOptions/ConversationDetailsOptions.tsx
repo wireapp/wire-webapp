@@ -20,6 +20,10 @@
 import {CONVERSATION_CELLS_STATE} from '@wireapp/api-client/lib/conversation';
 import {RECEIPT_MODE} from '@wireapp/api-client/lib/conversation/data/';
 import {amplify} from 'amplify';
+
+import {CollectionIcon, HideIcon, HistoryIcon, LockClosedIcon, UnlockedIcon} from '@wireapp/react-ui-kit';
+import {WebAppEvents} from '@wireapp/webapp-events';
+
 import * as Icon from 'Components/Icon';
 import {PanelActions} from 'Components/panel/PanelActions';
 import {ReceiptModeToggle} from 'Components/toggle/ReceiptModeToggle';
@@ -33,9 +37,6 @@ import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 import {replaceReactComponents} from 'Util/LocalizerUtil/ReactLocalizerUtil';
 import {useChannelsFeatureFlag} from 'Util/useChannelsFeatureFlag';
-
-import {CollectionIcon, HideIcon, HistoryIcon, LockClosedIcon, UnlockedIcon} from '@wireapp/react-ui-kit';
-import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {ConversationDetailsOption} from './ConversationDetailsOption';
 

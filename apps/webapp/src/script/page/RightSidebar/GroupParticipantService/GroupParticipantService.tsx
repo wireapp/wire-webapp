@@ -19,6 +19,8 @@
 
 import {FC, useEffect} from 'react';
 
+import {TabIndex} from '@wireapp/react-ui-kit';
+
 import {FadingScrollbar} from 'Components/FadingScrollbar';
 import * as Icon from 'Components/Icon';
 import {ServiceDetails} from 'Components/panel/ServiceDetails';
@@ -30,8 +32,6 @@ import {generatePermissionHelpers} from 'Repositories/user/UserPermission';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {handleKeyDown, KEY} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
-
-import {TabIndex} from '@wireapp/react-ui-kit';
 
 import {ActionsViewModel} from '../../../view_model/ActionsViewModel';
 import {PanelHeader} from '../PanelHeader';

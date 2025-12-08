@@ -18,6 +18,7 @@
  */
 
 import type {Data as OpenGraphResult} from 'open-graph';
+
 import {deArrayify} from 'Util/ArrayUtil';
 import {getLogger} from 'Util/Logger';
 import {truncate} from 'Util/StringUtil';

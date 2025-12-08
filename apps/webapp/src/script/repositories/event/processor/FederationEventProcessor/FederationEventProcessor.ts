@@ -18,14 +18,15 @@
  */
 
 import {FEDERATION_EVENT} from '@wireapp/api-client/lib/event';
+import {container} from 'tsyringe';
+import {debounce} from 'underscore';
+
 import {ConversationState} from 'Repositories/conversation/ConversationState';
 import {ConversationStatus} from 'Repositories/conversation/ConversationStatus';
 import {EventBuilder} from 'Repositories/conversation/EventBuilder';
 import {Conversation} from 'Repositories/entity/Conversation';
 import {User} from 'Repositories/entity/User';
 import {ServerTimeHandler} from 'src/script/time/serverTimeHandler';
-import {container} from 'tsyringe';
-import {debounce} from 'underscore';
 
 import {
   getUsersToDeleteFromFederatedConversations,

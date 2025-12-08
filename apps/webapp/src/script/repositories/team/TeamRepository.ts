@@ -31,6 +31,12 @@ import type {PermissionsData} from '@wireapp/api-client/lib/team/member/Permissi
 import type {TeamData} from '@wireapp/api-client/lib/team/team/TeamData';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {amplify} from 'amplify';
+import {container} from 'tsyringe';
+
+import {Runtime, TypedEventEmitter} from '@wireapp/commons';
+import {Availability} from '@wireapp/protocol-messaging';
+import {WebAppEvents} from '@wireapp/webapp-events';
+
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {AssetRepository} from 'Repositories/assets/AssetRepository';
 import {User} from 'Repositories/entity/User';
@@ -42,16 +48,11 @@ import {ROLE, ROLE as TEAM_ROLE, roleFromTeamPermissions} from 'Repositories/use
 import {UserRepository} from 'Repositories/user/UserRepository';
 import {UserState} from 'Repositories/user/UserState';
 import {Config} from 'src/script/Config';
-import {container} from 'tsyringe';
 import {Environment} from 'Util/Environment';
 import {replaceLink, t} from 'Util/LocalizerUtil';
 import {getLogger, Logger} from 'Util/Logger';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 import {loadDataUrl} from 'Util/util';
-
-import {Runtime, TypedEventEmitter} from '@wireapp/commons';
-import {Availability} from '@wireapp/protocol-messaging';
-import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {TeamEntity} from './TeamEntity';
 import {TeamMapper} from './TeamMapper';

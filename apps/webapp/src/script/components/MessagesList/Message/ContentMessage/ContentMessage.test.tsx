@@ -19,6 +19,7 @@
 
 import {render, waitFor} from '@testing-library/react';
 import ko from 'knockout';
+
 import {Conversation} from 'Repositories/entity/Conversation';
 import {ContentMessage} from 'Repositories/entity/message/ContentMessage';
 import {LinkPreview} from 'Repositories/entity/message/LinkPreview';

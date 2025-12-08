@@ -18,6 +18,7 @@
  */
 
 import {render} from '@testing-library/react';
+
 import {User} from 'Repositories/entity/User';
 
 import {TemporaryGuestAvatar} from './TemporaryGuestAvatar';

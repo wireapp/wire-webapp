@@ -20,6 +20,7 @@
 import {render} from '@testing-library/react';
 import {ConnectionStatus} from '@wireapp/api-client/lib/connection';
 import {CONVERSATION_TYPE} from '@wireapp/api-client/lib/conversation';
+
 import {ConnectionEntity} from 'Repositories/connection/ConnectionEntity';
 import {CONVERSATION_READONLY_STATE} from 'Repositories/conversation/ConversationRepository';
 import {Conversation} from 'Repositories/entity/Conversation';

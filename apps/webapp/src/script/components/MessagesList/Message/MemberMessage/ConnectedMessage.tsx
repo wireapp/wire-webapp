@@ -17,14 +17,14 @@
  *
  */
 
+import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
+
 import {Avatar, AVATAR_SIZE} from 'Components/Avatar';
 import {UserClassifiedBar} from 'Components/ClassifiedBar/ClassifiedBar';
 import {UnverifiedUserWarning} from 'Components/Modals/UserModal';
 import {User} from 'Repositories/entity/User';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
-
-import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
 
 import {E2eEncryptionMessage} from '../E2eEncryptionMessage/E2eEncryptionMessage';
 

@@ -21,13 +21,14 @@ import {useState} from 'react';
 
 import type {QualifiedUserClients} from '@wireapp/api-client/lib/conversation';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
-import {useMessageFocusedTabIndex} from 'Components/MessagesList/Message/util';
-import {Config} from 'src/script/Config';
 import {countBy, map} from 'underscore';
-import {t} from 'Util/LocalizerUtil';
-import {matchQualifiedIds} from 'Util/QualifiedId';
 
 import {Bold, Button, ButtonVariant, Link, LinkVariant} from '@wireapp/react-ui-kit';
+
+import {useMessageFocusedTabIndex} from 'Components/MessagesList/Message/util';
+import {Config} from 'src/script/Config';
+import {t} from 'Util/LocalizerUtil';
+import {matchQualifiedIds} from 'Util/QualifiedId';
 
 import {backendErrorLink, button, warning, wrapper} from '../Warnings.styles';
 

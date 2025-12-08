@@ -21,6 +21,7 @@ import React from 'react';
 
 import {CSSObject} from '@emotion/react';
 import cx from 'classnames';
+
 import {selfIndicator} from 'Components/ParticipantItemContent/ParticipantItem.styles';
 import {UserName} from 'Components/UserName';
 import {User} from 'Repositories/entity/User';

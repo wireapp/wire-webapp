@@ -19,11 +19,12 @@
 
 import {ClientClassification, ClientType} from '@wireapp/api-client/lib/client/';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
+
+import {Runtime} from '@wireapp/commons';
+
 import {User} from 'Repositories/entity/User';
 import {ClientRecord} from 'Repositories/storage/record/ClientRecord';
 import {ClientError} from 'src/script/error/ClientError';
-
-import {Runtime} from '@wireapp/commons';
 
 import {ClientRepository, ClientMapper, ClientEntity} from './.';
 

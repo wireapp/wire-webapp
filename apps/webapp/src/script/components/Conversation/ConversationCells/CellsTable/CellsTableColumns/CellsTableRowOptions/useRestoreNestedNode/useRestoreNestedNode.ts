@@ -18,6 +18,7 @@
  */
 
 import {QualifiedId} from '@wireapp/api-client/lib/user';
+
 import {useCellsStore} from 'Components/Conversation/ConversationCells/common/useCellsStore/useCellsStore';
 import {CellsRepository} from 'Repositories/cells/CellsRepository';
 import {CellNode} from 'src/script/types/cellNode';

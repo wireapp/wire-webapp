@@ -17,9 +17,9 @@
  *
  */
 
-import {t} from 'Util/LocalizerUtil';
-
 import {Button, ButtonVariant, ReloadIcon} from '@wireapp/react-ui-kit';
+
+import {t} from 'Util/LocalizerUtil';
 
 import {buttonStyles, iconStyles} from './CellsRefresh.styles';
 

@@ -22,6 +22,9 @@ import {FC, Fragment, MouseEvent as ReactMouseEvent, useEffect, useState} from '
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {amplify} from 'amplify';
 import cx from 'classnames';
+
+import {WebAppEvents} from '@wireapp/webapp-events';
+
 import * as Icon from 'Components/Icon';
 import {AssetImage} from 'Components/Image';
 import type {Conversation} from 'Repositories/entity/Conversation';
@@ -32,8 +35,6 @@ import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {includesOnlyEmojis} from 'Util/EmojiUtil';
 import {t} from 'Util/LocalizerUtil';
 import {formatDateNumeral, formatTimeShort, isBeforeToday} from 'Util/TimeUtil';
-
-import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {AudioAsset} from './asset/AudioAsset/AudioAsset';
 import {FileAsset} from './asset/FileAsset/FileAsset';

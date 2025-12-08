@@ -19,9 +19,10 @@
 
 import {act, renderHook} from '@testing-library/react';
 import {amplify} from 'amplify';
-import {EventName} from 'Repositories/tracking/EventName';
 
 import {WebAppEvents} from '@wireapp/webapp-events';
+
+import {EventName} from 'Repositories/tracking/EventName';
 
 import {useCameraReloadOnCallEnd} from './useCameraReloadOnCallEnd';
 

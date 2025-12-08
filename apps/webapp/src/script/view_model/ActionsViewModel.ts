@@ -21,6 +21,10 @@ import {ConnectionStatus} from '@wireapp/api-client/lib/connection/';
 import {BackendErrorLabel} from '@wireapp/api-client/lib/http';
 import {QualifiedId} from '@wireapp/api-client/lib/user/';
 import {amplify} from 'amplify';
+import {container} from 'tsyringe';
+
+import {WebAppEvents} from '@wireapp/webapp-events';
+
 import {PrimaryModal, removeCurrentModal, usePrimaryModalState} from 'Components/Modals/PrimaryModal';
 import {CellsRepository} from 'Repositories/cells/CellsRepository';
 import type {ClientEntity} from 'Repositories/client';
@@ -35,11 +39,8 @@ import type {IntegrationRepository} from 'Repositories/integration/IntegrationRe
 import type {ServiceEntity} from 'Repositories/integration/ServiceEntity';
 import {SelfRepository} from 'Repositories/self/SelfRepository';
 import {UserState} from 'Repositories/user/UserState';
-import {container} from 'tsyringe';
 import {t} from 'Util/LocalizerUtil';
 import {isBackendError} from 'Util/TypePredicateUtil';
-
-import {WebAppEvents} from '@wireapp/webapp-events';
 
 import type {MainViewModel} from './MainViewModel';
 

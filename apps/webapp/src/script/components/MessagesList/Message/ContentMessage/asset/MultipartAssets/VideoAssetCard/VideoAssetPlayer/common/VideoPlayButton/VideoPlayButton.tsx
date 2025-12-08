@@ -19,10 +19,10 @@
 
 import {ReactNode, useEffect} from 'react';
 
+import {PauseIcon, PlayIcon} from '@wireapp/react-ui-kit';
+
 import {useMessageFocusedTabIndex} from 'Components/MessagesList/Message/util';
 import {t} from 'Util/LocalizerUtil';
-
-import {PauseIcon, PlayIcon} from '@wireapp/react-ui-kit';
 
 import {wrapperStyles, playButtonStyles, wrapperStylesFullscreen} from './VideoPlayButton.styles';
 

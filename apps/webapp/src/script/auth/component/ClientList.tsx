@@ -22,10 +22,11 @@ import {HTMLProps, useEffect, useState} from 'react';
 import {ClientType} from '@wireapp/api-client/lib/client/index';
 import {connect} from 'react-redux';
 import {useNavigate} from 'react-router-dom';
-import {getLogger} from 'Util/Logger';
 
 import {UrlUtil} from '@wireapp/commons';
 import {ContainerXS, Loading} from '@wireapp/react-ui-kit';
+
+import {getLogger} from 'Util/Logger';
 
 import {ClientItem} from './ClientItem';
 
@@ -113,7 +114,7 @@ const ClientListComponent = ({
       {sortedClients.map(client => (
         <ClientItem
           client={client}
-          clientError={isSelectedClient(client.id) ? clientError ?? undefined : undefined}
+          clientError={isSelectedClient(client.id) ? (clientError ?? undefined) : undefined}
           key={client.id}
           onClick={() => setSelectedClient(client.id)}
           onClientRemoval={(password?: string) => removeClient(client.id, password)}

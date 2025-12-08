@@ -20,6 +20,10 @@
 import {useCallback, useEffect, useState} from 'react';
 
 import cx from 'classnames';
+import {container} from 'tsyringe';
+
+import {TabIndex, Button, ButtonVariant, useTimeout} from '@wireapp/react-ui-kit';
+
 import {RestrictedVideo} from 'Components/asset/RestrictedVideo';
 import {AssetError} from 'Repositories/assets/AssetError';
 import {AssetRepository} from 'Repositories/assets/AssetRepository';
@@ -27,13 +31,10 @@ import {AssetTransferState} from 'Repositories/assets/AssetTransferState';
 import type {ContentMessage} from 'Repositories/entity/message/ContentMessage';
 import type {FileAsset as FileAssetType} from 'Repositories/entity/message/FileAsset';
 import {TeamState} from 'Repositories/team/TeamState';
-import {container} from 'tsyringe';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 import {formatSeconds} from 'Util/TimeUtil';
 import {useEffectRef} from 'Util/useEffectRef';
-
-import {TabIndex, Button, ButtonVariant, useTimeout} from '@wireapp/react-ui-kit';
 
 import {MediaButton} from '../common/MediaButton/MediaButton';
 import {SeekBar} from '../common/SeekBar/SeekBar';

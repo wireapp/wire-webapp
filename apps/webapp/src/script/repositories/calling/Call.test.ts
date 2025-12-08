@@ -18,12 +18,13 @@
  */
 
 import ko from 'knockout';
+
+import {CALL_TYPE, CONV_TYPE, Wcall} from '@wireapp/avs';
+
 import {Conversation} from 'Repositories/entity/Conversation';
 import {User} from 'Repositories/entity/User';
 import {MediaDevicesHandler} from 'Repositories/media/MediaDevicesHandler';
 import {generateConversation} from 'test/helper/ConversationGenerator';
-
-import {CALL_TYPE, CONV_TYPE, Wcall} from '@wireapp/avs';
 
 import {Call} from './Call';
 import {CallingRepository} from './CallingRepository';

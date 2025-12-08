@@ -17,9 +17,9 @@
  *
  */
 
-import {t} from 'Util/LocalizerUtil';
-
 import {Button, ButtonVariant, FlexBox} from '@wireapp/react-ui-kit';
+
+import {t} from 'Util/LocalizerUtil';
 
 import {singleActionButtonStyle} from './SingleAction.styles';
 

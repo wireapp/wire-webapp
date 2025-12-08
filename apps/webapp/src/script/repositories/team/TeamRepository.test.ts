@@ -18,13 +18,14 @@
  */
 
 import {FeatureList, FEATURE_STATUS, CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team/feature/';
+
+import {randomUUID} from 'crypto';
+
 import {AssetRepository} from 'Repositories/assets/AssetRepository';
 import {User} from 'Repositories/entity/User';
 import {ROLE} from 'Repositories/user/UserPermission';
 import {UserRepository} from 'Repositories/user/UserRepository';
 import {UserState} from 'Repositories/user/UserState';
-
-import {randomUUID} from 'crypto';
 
 import {TeamEntity} from './TeamEntity';
 import {TeamMemberEntity} from './TeamMemberEntity';

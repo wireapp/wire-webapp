@@ -17,9 +17,9 @@
  *
  */
 
-import {t} from 'Util/LocalizerUtil';
-
 import {CloseIcon, IconButton, IconButtonVariant} from '@wireapp/react-ui-kit';
+
+import {t} from 'Util/LocalizerUtil';
 
 import {closeButtonStyles, headerStyles, headingStyles} from './CellsFilterModalHeader.styles';
 

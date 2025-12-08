@@ -180,10 +180,8 @@ describe('renderMessage', () => {
   });
 
   it('renders an emoticon of someone shrugging', () => {
-    /* eslint-disable no-useless-escape */
     expect(renderMessage('¯_(ツ)_/¯')).toBe('¯_(ツ)_/¯');
   });
-  /* eslint-enable no-useless-escape */
 
   it('renders a link from markdown notation', () => {
     expect(renderMessage('[doop](http://www.example.com)')).toBe(

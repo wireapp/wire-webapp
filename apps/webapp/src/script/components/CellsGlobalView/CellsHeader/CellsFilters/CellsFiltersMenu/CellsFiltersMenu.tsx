@@ -19,9 +19,9 @@
 
 import {useState} from 'react';
 
-import {CellsRepository} from 'Repositories/cells/CellsRepository';
-
 import {IconButton, IconButtonVariant, OptionsIcon} from '@wireapp/react-ui-kit';
+
+import {CellsRepository} from 'Repositories/cells/CellsRepository';
 
 import {buttonStyles, counterStyles} from './CellsFiltersMenu.styles';
 import {CellsFiltersModal} from './CellsFiltersModal/CellsFiltersModal';

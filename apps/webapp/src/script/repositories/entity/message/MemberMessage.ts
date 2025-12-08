@@ -21,6 +21,7 @@ import {MemberLeaveReason} from '@wireapp/api-client/lib/conversation/data/';
 import {CONVERSATION_EVENT} from '@wireapp/api-client/lib/event/';
 import type {QualifiedId} from '@wireapp/api-client/lib/user/';
 import ko from 'knockout';
+
 import {ClientEvent} from 'Repositories/event/Client';
 import {Declension, getUserName, t} from 'Util/LocalizerUtil';
 import {matchQualifiedIds} from 'Util/QualifiedId';

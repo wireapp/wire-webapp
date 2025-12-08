@@ -19,9 +19,9 @@
 
 import React from 'react';
 
-import {selectGroupStyles} from 'Components/calling/VideoControls/VideoControlsSelect/VideoControlsSelect.styles';
-
 import {Select} from '@wireapp/react-ui-kit';
+
+import {selectGroupStyles} from 'Components/calling/VideoControls/VideoControlsSelect/VideoControlsSelect.styles';
 
 type VideoControlsSelectProps = Pick<
   React.ComponentProps<typeof Select<false>>,

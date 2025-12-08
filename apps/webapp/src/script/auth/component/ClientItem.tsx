@@ -20,9 +20,6 @@
 import {ChangeEvent, FormEvent, HTMLProps, useEffect, useRef, useState, MouseEvent, KeyboardEvent} from 'react';
 
 import {RegisteredClient} from '@wireapp/api-client/lib/client/index';
-import {isEnterKey} from 'Util/KeyboardUtil';
-import {t} from 'Util/LocalizerUtil';
-import {splitFingerprint} from 'Util/StringUtil';
 
 import {
   TabIndex,
@@ -38,6 +35,10 @@ import {
   Text,
   TrashIcon,
 } from '@wireapp/react-ui-kit';
+
+import {isEnterKey} from 'Util/KeyboardUtil';
+import {t} from 'Util/LocalizerUtil';
+import {splitFingerprint} from 'Util/StringUtil';
 
 import {ValidationError} from '../module/action/ValidationError';
 import {parseError, parseValidationErrors} from '../util/errorUtil';

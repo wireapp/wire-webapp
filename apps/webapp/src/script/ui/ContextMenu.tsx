@@ -20,14 +20,15 @@
 import {ComponentType, CSSProperties, ReactNode, SVGProps, useEffect, useMemo, useRef, useState} from 'react';
 
 import cx from 'classnames';
-import * as Icon from 'Components/Icon';
-import {IgnoreOutsideClickWrapper} from 'Components/InputBar/util/clickHandlers';
-import {useMessageActionsState} from 'Components/MessagesList/Message/ContentMessage/MessageActions/MessageActions.state';
 import {createRoot, Root} from 'react-dom/client';
-import {isEnterKey, isEscapeKey, isKey, isOneOfKeys, isSpaceKey, KEY} from 'Util/KeyboardUtil';
 
 import {Availability} from '@wireapp/protocol-messaging';
 import {StyledApp, THEME_ID} from '@wireapp/react-ui-kit';
+
+import * as Icon from 'Components/Icon';
+import {IgnoreOutsideClickWrapper} from 'Components/InputBar/util/clickHandlers';
+import {useMessageActionsState} from 'Components/MessagesList/Message/ContentMessage/MessageActions/MessageActions.state';
+import {isEnterKey, isEscapeKey, isKey, isOneOfKeys, isSpaceKey, KEY} from 'Util/KeyboardUtil';
 
 import {useActiveWindowState} from '../hooks/useActiveWindow';
 

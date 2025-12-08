@@ -21,6 +21,10 @@ import {cloneElement, FC, ReactNode, useCallback, useEffect, useState} from 'rea
 
 import {amplify} from 'amplify';
 import {CSSTransition, TransitionGroup} from 'react-transition-group';
+import {container} from 'tsyringe';
+
+import {WebAppEvents} from '@wireapp/webapp-events';
+
 import {ConversationState} from 'Repositories/conversation/ConversationState';
 import {Conversation} from 'Repositories/entity/Conversation';
 import {Message} from 'Repositories/entity/message/Message';
@@ -28,10 +32,7 @@ import {User} from 'Repositories/entity/User';
 import {ServiceEntity} from 'Repositories/integration/ServiceEntity';
 import {TeamState} from 'Repositories/team/TeamState';
 import {UserState} from 'Repositories/user/UserState';
-import {container} from 'tsyringe';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
-
-import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {Access} from './Access/Access';
 import {AddParticipants} from './AddParticipants';

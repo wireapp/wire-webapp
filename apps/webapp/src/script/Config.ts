@@ -18,9 +18,10 @@
  */
 
 import {MINIMUM_API_VERSION} from '@wireapp/api-client/lib/Config';
-import {createUuid} from 'Util/uuid';
 
 import {Runtime} from '@wireapp/commons';
+
+import {createUuid} from 'Util/uuid';
 
 import packageJson from '../../package.json';
 const env = window.wire.env;

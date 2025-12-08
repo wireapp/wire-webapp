@@ -45,13 +45,14 @@ import type {
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {MLSServiceEvents} from '@wireapp/core/lib/messagingProtocols/mls';
+import {container} from 'tsyringe';
+
 import type {Conversation as ConversationEntity} from 'Repositories/entity/Conversation';
 import type {EventService} from 'Repositories/event/EventService';
 import {search as fullTextSearch} from 'Repositories/search/FullTextSearch';
 import {StorageService} from 'Repositories/storage';
 import {ConversationRecord} from 'Repositories/storage/record/ConversationRecord';
 import {StorageSchemata} from 'Repositories/storage/StorageSchemata';
-import {container} from 'tsyringe';
 
 import {MLSCapableConversation} from './ConversationSelectors';
 

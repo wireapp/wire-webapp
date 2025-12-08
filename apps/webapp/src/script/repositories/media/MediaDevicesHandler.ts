@@ -17,10 +17,10 @@
  *
  */
 
+import {Runtime} from '@wireapp/commons';
+
 import {getLogger, Logger} from 'Util/Logger';
 import {loadValue, storeValue} from 'Util/StorageUtil';
-
-import {Runtime} from '@wireapp/commons';
 
 import {MediaDeviceType} from './MediaDeviceType';
 import {MediaDevicesState, mediaDevicesStore} from './useMediaDevicesStore';

@@ -18,6 +18,7 @@
  */
 
 import {render} from '@testing-library/react';
+
 import * as Icon from 'Components/Icon';
 import {createLabel, LabelType} from 'Repositories/conversation/ConversationLabelRepository';
 import {Conversation} from 'Repositories/entity/Conversation';

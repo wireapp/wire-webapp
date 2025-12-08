@@ -21,14 +21,15 @@ import {act, render} from '@testing-library/react';
 import {FEATURE_STATUS} from '@wireapp/api-client/lib/team/feature/';
 import {amplify} from 'amplify';
 import ko from 'knockout';
+
+import {WebAppEvents} from '@wireapp/webapp-events';
+
 import type {ClientRepository} from 'Repositories/client';
 import {TeamState} from 'Repositories/team/TeamState';
 import {AppLockRepository} from 'Repositories/user/AppLockRepository';
 import {AppLockState} from 'Repositories/user/AppLockState';
 import {UserState} from 'Repositories/user/UserState';
 import {createUuid} from 'Util/uuid';
-
-import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {AppLock, APPLOCK_STATE} from './AppLock';
 

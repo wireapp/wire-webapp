@@ -30,6 +30,7 @@ import {
   $isTextNode,
   BaseSelection,
 } from 'lexical';
+
 import {User} from 'Repositories/entity/User';
 
 import {$createMentionNode} from '../../nodes/MentionNode';

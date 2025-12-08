@@ -20,6 +20,7 @@
 import {useEffect, useState} from 'react';
 
 import cx from 'classnames';
+
 import {useMessageFocusedTabIndex} from 'Components/MessagesList/Message/util';
 import {AssetTransferState} from 'Repositories/assets/AssetTransferState';
 import type {FileAsset} from 'Repositories/entity/message/FileAsset';

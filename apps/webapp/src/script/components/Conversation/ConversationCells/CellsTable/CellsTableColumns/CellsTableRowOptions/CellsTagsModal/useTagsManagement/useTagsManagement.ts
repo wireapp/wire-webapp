@@ -19,10 +19,10 @@
 
 import {useCallback, useState} from 'react';
 
+import {ComboboxSelectOption} from '@wireapp/react-ui-kit';
+
 import {CellsRepository} from 'Repositories/cells/CellsRepository';
 import {t} from 'Util/LocalizerUtil';
-
-import {ComboboxSelectOption} from '@wireapp/react-ui-kit';
 
 import {transformTagToSelectOption} from './transformTagToSelectOption/transformTagToSelectOption';
 import {useGetAllTags} from './useGetAllTags/useGetAllTags';

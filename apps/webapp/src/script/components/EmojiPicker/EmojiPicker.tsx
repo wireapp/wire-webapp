@@ -21,6 +21,7 @@ import {useState, useEffect, useRef, RefObject} from 'react';
 
 import EmojiPickerReact, {EmojiClickData, EmojiStyle, SkinTones} from 'emoji-picker-react';
 import {createPortal} from 'react-dom';
+
 import {useClickOutside} from 'src/script/hooks/useClickOutside';
 import {isEnterKey, isEscapeKey} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
@@ -115,7 +116,7 @@ export const EmojiPicker = ({
             }
           }}
         >
-          {/* eslint-disable-next-line jsx-a11y/no-static-element-interactions, jsx-a11y/click-events-have-key-events, jsx-a11y/no-noninteractive-element-interactions */}
+          {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-noninteractive-element-interactions */}
           <div
             ref={emojiRef}
             style={{maxHeight: window.innerHeight, ...style}}

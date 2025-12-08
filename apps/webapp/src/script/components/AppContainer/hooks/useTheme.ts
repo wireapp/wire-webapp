@@ -18,9 +18,10 @@
  */
 
 import type {WebappProperties} from '@wireapp/api-client/lib/user/data';
-import {useUserPropertyChange} from 'src/script/hooks/useUserProperty';
 
 import {WebAppEvents} from '@wireapp/webapp-events';
+
+import {useUserPropertyChange} from 'src/script/hooks/useUserProperty';
 
 const THEMES_CLASS_PREFIX = 'theme-';
 

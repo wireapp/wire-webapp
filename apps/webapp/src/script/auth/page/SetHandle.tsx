@@ -23,14 +23,15 @@ import {BackendErrorLabel, SyntheticErrorLabel} from '@wireapp/api-client/lib/ht
 import {ConsentType} from '@wireapp/api-client/lib/self/index';
 import {connect} from 'react-redux';
 import {useLocation} from 'react-router';
+
+import {Runtime} from '@wireapp/commons';
+import {Button, ContainerXS, Form, Input, InputBlock, InputSubmitCombo, Text} from '@wireapp/react-ui-kit';
+
 import {StorageKey} from 'Repositories/storage';
 import {navigate} from 'src/script/router/Router';
 import {t} from 'Util/LocalizerUtil';
 import {storeValue} from 'Util/StorageUtil';
 import {isBackendError} from 'Util/TypePredicateUtil';
-
-import {Runtime} from '@wireapp/commons';
-import {Button, ContainerXS, Form, Input, InputBlock, InputSubmitCombo, Text} from '@wireapp/react-ui-kit';
 
 import {Page} from './Page';
 

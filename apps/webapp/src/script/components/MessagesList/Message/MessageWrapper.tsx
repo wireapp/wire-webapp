@@ -20,8 +20,12 @@
 import {CONVERSATION_CELLS_STATE} from '@wireapp/api-client/lib/conversation';
 import {ReactionType} from '@wireapp/core/lib/conversation';
 import {amplify} from 'amplify';
-import {E2EIVerificationMessage} from 'Components/MessagesList/Message/E2EIVerificationMessage';
 import ko from 'knockout';
+import {container} from 'tsyringe';
+
+import {WebAppEvents} from '@wireapp/webapp-events';
+
+import {E2EIVerificationMessage} from 'Components/MessagesList/Message/E2EIVerificationMessage';
 import {AssetRepository} from 'Repositories/assets/AssetRepository';
 import {OutgoingQuote} from 'Repositories/conversation/MessageRepository';
 import {Conversation} from 'Repositories/entity/Conversation';
@@ -30,11 +34,8 @@ import {ContentMessage} from 'Repositories/entity/message/ContentMessage';
 import {Text} from 'Repositories/entity/message/Text';
 import {TeamState} from 'Repositories/team/TeamState';
 import {QuoteEntity} from 'src/script/message/QuoteEntity';
-import {container} from 'tsyringe';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
-
-import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {CallMessage} from './CallMessage';
 import {CallTimeoutMessage} from './CallTimeoutMessage';

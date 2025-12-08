@@ -20,6 +20,8 @@
 import {useEffect, useState} from 'react';
 
 import {QualifiedId} from '@wireapp/api-client/lib/user';
+import {container} from 'tsyringe';
+
 import {ClientEntity} from 'Repositories/client/ClientEntity';
 import {ClientState} from 'Repositories/client/ClientState';
 import {ConversationState} from 'Repositories/conversation/ConversationState';
@@ -27,7 +29,6 @@ import {CryptographyRepository} from 'Repositories/cryptography/CryptographyRepo
 import {Conversation} from 'Repositories/entity/Conversation';
 import {User} from 'Repositories/entity/User';
 import {useUserIdentity} from 'src/script/hooks/useDeviceIdentities';
-import {container} from 'tsyringe';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 

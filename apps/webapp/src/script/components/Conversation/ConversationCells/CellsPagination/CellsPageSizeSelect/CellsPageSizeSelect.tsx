@@ -19,9 +19,9 @@
 
 import {useMemo} from 'react';
 
-import {t} from 'Util/LocalizerUtil';
-
 import {Select} from '@wireapp/react-ui-kit';
+
+import {t} from 'Util/LocalizerUtil';
 
 import {wrapperStyles, labelStyles, selectWrapperStyles, selectStyles} from './CellsPageSizeSelect.styles';
 

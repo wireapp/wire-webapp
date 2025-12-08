@@ -19,6 +19,8 @@
 
 import {FC, useEffect, useState} from 'react';
 
+import {TabIndex} from '@wireapp/react-ui-kit';
+
 import {FadingScrollbar} from 'Components/FadingScrollbar';
 import {RadioGroup} from 'Components/Radio';
 import {Conversation} from 'Repositories/entity/Conversation';
@@ -26,8 +28,6 @@ import {TeamState} from 'Repositories/team/TeamState';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 import {formatDuration} from 'Util/TimeUtil';
-
-import {TabIndex} from '@wireapp/react-ui-kit';
 
 import {EphemeralTimings} from '../../../ephemeral/EphemeralTimings';
 import {ViewModelRepositories} from '../../../view_model/MainViewModel';
@@ -66,7 +66,7 @@ const TimedMessages: FC<TimedMessagesPanelProps> = ({
   useEffect(() => {
     const messageTimer = isSelfDeletingMessagesEnforced
       ? getEnforcedSelfDeletingMessagesTimeout
-      : globalMessageTimer ?? 0;
+      : (globalMessageTimer ?? 0);
     setCurrentMessageTimer(messageTimer);
 
     const mappedTimes = EphemeralTimings.VALUES.map(time => ({

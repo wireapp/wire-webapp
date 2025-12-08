@@ -19,6 +19,7 @@
 
 import {renderHook, waitFor} from '@testing-library/react';
 import ko from 'knockout';
+
 import {AssetRemoteData} from 'Repositories/assets/AssetRemoteData';
 import {AssetRepository} from 'Repositories/assets/AssetRepository';
 import {AssetTransferState} from 'Repositories/assets/AssetTransferState';

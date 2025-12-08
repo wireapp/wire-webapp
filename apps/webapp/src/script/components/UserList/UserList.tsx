@@ -20,6 +20,8 @@
 import {ChangeEvent, useCallback, useMemo, useState} from 'react';
 
 import cx from 'classnames';
+import {container} from 'tsyringe';
+
 import * as Icon from 'Components/Icon';
 import {InViewport} from 'Components/InViewport';
 import {collapseButton, collapseIcon} from 'Components/UserList/UserList.styles';
@@ -28,7 +30,6 @@ import {ConversationState} from 'Repositories/conversation/ConversationState';
 import type {Conversation} from 'Repositories/entity/Conversation';
 import type {User} from 'Repositories/entity/User';
 import {TeamState} from 'Repositories/team/TeamState';
-import {container} from 'tsyringe';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {isEnterKey, isSpaceKey} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';

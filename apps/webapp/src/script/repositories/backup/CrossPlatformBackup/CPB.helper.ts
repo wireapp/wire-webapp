@@ -18,6 +18,7 @@
  */
 
 import Dexie from 'dexie';
+
 import {ClientEvent} from 'Repositories/event/Client';
 import {getLogger} from 'Util/Logger';
 

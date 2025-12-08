@@ -20,12 +20,13 @@
 import {MouseEvent, KeyboardEvent} from 'react';
 
 import cx from 'classnames';
+import {container} from 'tsyringe';
+
 import * as Icon from 'Components/Icon';
 import {Conversation} from 'Repositories/entity/Conversation';
 import {TeamState} from 'Repositories/team/TeamState';
 import {EphemeralTimings} from 'src/script/ephemeral/EphemeralTimings';
 import {showContextMenu} from 'src/script/ui/ContextMenu';
-import {container} from 'tsyringe';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {isSpaceOrEnterKey} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';

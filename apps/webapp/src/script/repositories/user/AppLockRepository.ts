@@ -17,9 +17,10 @@
  *
  */
 
-import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import sodium from 'libsodium-wrappers';
 import {container, singleton} from 'tsyringe';
+
+import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {t} from 'Util/LocalizerUtil';
 
 import {AppLockState} from './AppLockState';

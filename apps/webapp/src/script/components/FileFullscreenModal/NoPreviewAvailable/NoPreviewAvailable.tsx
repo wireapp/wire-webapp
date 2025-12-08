@@ -17,10 +17,10 @@
  *
  */
 
+import {Button} from '@wireapp/react-ui-kit';
+
 import {t} from 'Util/LocalizerUtil';
 import {forcedDownloadFile, getFileNameWithExtension} from 'Util/util';
-
-import {Button} from '@wireapp/react-ui-kit';
 
 import {FilePlaceholder} from '../common/FilePlaceholder/FilePlaceholder';
 

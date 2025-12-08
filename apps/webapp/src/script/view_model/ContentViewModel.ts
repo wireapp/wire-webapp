@@ -20,8 +20,13 @@
 import {ConnectionStatus} from '@wireapp/api-client/lib/connection/';
 import {QualifiedId} from '@wireapp/api-client/lib/user/';
 import {amplify} from 'amplify';
-import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import ko from 'knockout';
+import {container} from 'tsyringe';
+import {isError} from 'underscore';
+
+import {WebAppEvents} from '@wireapp/webapp-events';
+
+import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import type {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
 import {ConversationState} from 'Repositories/conversation/ConversationState';
 import {MessageRepository} from 'Repositories/conversation/MessageRepository';
@@ -29,13 +34,9 @@ import {Conversation} from 'Repositories/entity/Conversation';
 import type {Message} from 'Repositories/entity/message/Message';
 import type {UserRepository} from 'Repositories/user/UserRepository';
 import {UserState} from 'Repositories/user/UserState';
-import {container} from 'tsyringe';
-import {isError} from 'underscore';
 import {t} from 'Util/LocalizerUtil';
 import {getLogger, Logger} from 'Util/Logger';
 import {isConversationEntity} from 'Util/TypePredicateUtil';
-
-import {WebAppEvents} from '@wireapp/webapp-events';
 
 import type {MainViewModel, ViewModelRepositories} from './MainViewModel';
 

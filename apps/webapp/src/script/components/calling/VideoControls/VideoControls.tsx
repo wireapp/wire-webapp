@@ -20,6 +20,12 @@
 import React, {useState} from 'react';
 
 import classNames from 'classnames';
+import {container} from 'tsyringe';
+
+import {CALL_TYPE} from '@wireapp/avs';
+import {EmojiIcon, GridIcon, MoreIcon, QUERY, RaiseHandIcon, TabIndex} from '@wireapp/react-ui-kit';
+import {WebAppEvents} from '@wireapp/webapp-events';
+
 import * as Icon from 'Components/Icon';
 import {useActiveWindowMatchMedia} from 'Hooks/useActiveWindowMatchMedia';
 import {useUserPropertyValue} from 'Hooks/useUserProperty';
@@ -37,14 +43,9 @@ import {isCallViewOption} from 'src/script/guards/CallView';
 import {isMediaDevice} from 'src/script/guards/MediaDevice';
 import {ContextMenuEntry, showContextMenu} from 'src/script/ui/ContextMenu';
 import {CallViewTab} from 'src/script/view_model/CallingViewModel';
-import {container} from 'tsyringe';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {handleKeyDown, isEscapeKey, KEY} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
-
-import {CALL_TYPE} from '@wireapp/avs';
-import {EmojiIcon, GridIcon, MoreIcon, QUERY, RaiseHandIcon, TabIndex} from '@wireapp/react-ui-kit';
-import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {EmojisBar} from './EmojisBar/EmojisBar';
 import {VideoCallCancelButton} from './VideoCallCancelButton/VideoCallCancelButton';
@@ -237,10 +238,10 @@ export const VideoControls = ({
 
   const updateAudioOptions = (selectedOption: string, input: boolean) => {
     const microphone = input
-      ? audioOptions[0].options.find(({value}) => value === selectedOption) ?? selectedAudioOptions[0]
+      ? (audioOptions[0].options.find(({value}) => value === selectedOption) ?? selectedAudioOptions[0])
       : selectedAudioOptions[0];
     const speaker = !input
-      ? audioOptions[1].options.find(({value}) => value === selectedOption) ?? selectedAudioOptions[1]
+      ? (audioOptions[1].options.find(({value}) => value === selectedOption) ?? selectedAudioOptions[1])
       : selectedAudioOptions[1];
 
     setSelectedAudioOptions([microphone, speaker]);

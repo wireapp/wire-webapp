@@ -19,13 +19,14 @@
 
 import {useEffect, useState} from 'react';
 
-import {LogoIcon} from 'Components/Icon';
 import {connect} from 'react-redux';
-import {t} from 'Util/LocalizerUtil';
-import {afterRender} from 'Util/util';
 
 import {Runtime, UrlUtil} from '@wireapp/commons';
 import {COLOR, ContainerXS, FlexBox, Text} from '@wireapp/react-ui-kit';
+
+import {LogoIcon} from 'Components/Icon';
+import {t} from 'Util/LocalizerUtil';
+import {afterRender} from 'Util/util';
 
 import {Page} from './Page';
 

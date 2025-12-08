@@ -19,11 +19,14 @@
 
 import {useCallback, useMemo} from 'react';
 
+import {LexicalEditor} from 'lexical';
+
+import {IAttachment} from '@wireapp/protocol-messaging';
+
 import {useFileUploadState} from 'Components/Conversation/useFilesUploadState/useFilesUploadState';
 import {MessageContent} from 'Components/InputBar/common/messageContent/messageContent';
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {showWarningModal} from 'Components/Modals/utils/showWarningModal';
-import {LexicalEditor} from 'lexical';
 import {CellsRepository} from 'Repositories/cells/CellsRepository';
 import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
 import {ConversationVerificationState} from 'Repositories/conversation/ConversationVerificationState';
@@ -37,8 +40,6 @@ import {MentionEntity} from 'src/script/message/MentionEntity';
 import {MessageHasher} from 'src/script/message/MessageHasher';
 import {QuoteEntity} from 'src/script/message/QuoteEntity';
 import {t} from 'Util/LocalizerUtil';
-
-import {IAttachment} from '@wireapp/protocol-messaging';
 
 import {useSendFiles} from './useSendFiles/useSendFiles';
 

@@ -32,6 +32,29 @@ import axios from 'axios';
 import ko from 'knockout';
 import {container} from 'tsyringe';
 import 'webrtc-adapter';
+
+import {
+  AUDIO_STATE,
+  CALL_TYPE,
+  CONV_TYPE,
+  ENV as AVS_ENV,
+  ERROR,
+  getAvsInstance,
+  LOG_LEVEL,
+  QUALITY,
+  REASON,
+  RESOLUTION,
+  STATE as CALL_STATE,
+  VIDEO_STATE,
+  VSTREAMS,
+  Wcall,
+  WcallClient,
+  WcallMember,
+} from '@wireapp/avs';
+import {AvsDebugger} from '@wireapp/avs-debugger';
+import {Runtime} from '@wireapp/commons';
+import {WebAppEvents} from '@wireapp/webapp-events';
+
 import {useCallAlertState} from 'Components/calling/useCallAlertState';
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {CALL_QUALITY_FEEDBACK_KEY} from 'Components/Modals/QualityFeedbackModal/constants';
@@ -65,28 +88,6 @@ import {matchQualifiedIds} from 'Util/QualifiedId';
 import {copyStyles} from 'Util/renderElement';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 import {createUuid} from 'Util/uuid';
-
-import {
-  AUDIO_STATE,
-  CALL_TYPE,
-  CONV_TYPE,
-  ENV as AVS_ENV,
-  ERROR,
-  getAvsInstance,
-  LOG_LEVEL,
-  QUALITY,
-  REASON,
-  RESOLUTION,
-  STATE as CALL_STATE,
-  VIDEO_STATE,
-  VSTREAMS,
-  Wcall,
-  WcallClient,
-  WcallMember,
-} from '@wireapp/avs';
-import {AvsDebugger} from '@wireapp/avs-debugger';
-import {Runtime} from '@wireapp/commons';
-import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {Call, SerializedConversationId} from './Call';
 import {CallingEpochData} from './CallingEpochCache';
@@ -807,7 +808,7 @@ export class CallingRepository {
             id: `${Date.now()}-${id}`,
             emoji,
             left: Math.random() * 500,
-            from: isSelf ? t('conversationYouAccusative') : senderParticipant?.user.name() ?? '',
+            from: isSelf ? t('conversationYouAccusative') : (senderParticipant?.user.name() ?? ''),
           };
         });
 

@@ -143,7 +143,6 @@ export const exportCPBHistoryFromDatabase = async ({
 
   eventRecords.forEach((record, index) => {
     if (record.ephemeral_expires) {
-      // eslint-disable-next-line no-console
       CPBLogger.warn('Ephemeral events are not supported in backups');
       return;
     }
@@ -152,13 +151,11 @@ export const exportCPBHistoryFromDatabase = async ({
       const {edited_time, from, from_client_id, id, qualified_conversation, qualified_from, primary_key, time, type} =
         eventData;
       if (!id) {
-        // eslint-disable-next-line no-console
         CPBLogger.log('Event without id', eventData);
         return;
       }
       // ToDo: Add support for other types of messages and different types of content. Also figure out which fields are required.
       if (!isSupportedEventType(type)) {
-        // eslint-disable-next-line no-console
         CPBLogger.log('Unsupported message type', type);
         return;
       }

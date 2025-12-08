@@ -17,8 +17,9 @@
  *
  */
 
-import {ClientConfig} from '../../../../../../server/config';
 import {WireModule} from 'src/types/Wire.types';
+
+import {ClientConfig} from '../../../../../../server/config';
 
 const wire: WireModule = {
   app: {} as any,

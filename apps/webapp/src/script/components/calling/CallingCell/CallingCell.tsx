@@ -19,6 +19,12 @@
 
 import React, {useCallback, useEffect, useRef} from 'react';
 
+import {container} from 'tsyringe';
+
+import {CALL_TYPE, REASON as CALL_REASON, STATE as CALL_STATE} from '@wireapp/avs';
+import {TabIndex} from '@wireapp/react-ui-kit';
+import {WebAppEvents} from '@wireapp/webapp-events';
+
 import {useAppNotification} from 'Components/AppNotification';
 import {callingContainer} from 'Components/calling/CallingCell/CallingCell.styles';
 import {CallingControls} from 'Components/calling/CallingCell/CallingControls';
@@ -40,14 +46,9 @@ import {TeamState} from 'Repositories/team/TeamState';
 import {Config} from 'src/script/Config';
 import {useUserPropertyValue} from 'src/script/hooks/useUserProperty';
 import {useAppMainState, ViewType} from 'src/script/page/state';
-import {container} from 'tsyringe';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {isEnterKey, isSpaceOrEnterKey} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
-
-import {CALL_TYPE, REASON as CALL_REASON, STATE as CALL_STATE} from '@wireapp/avs';
-import {TabIndex} from '@wireapp/react-ui-kit';
-import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {usePressSpaceToUnmute} from './usePressSpaceToUnmute/usePressSpaceToUnmute';
 

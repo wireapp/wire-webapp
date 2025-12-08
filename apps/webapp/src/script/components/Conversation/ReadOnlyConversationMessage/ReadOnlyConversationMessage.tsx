@@ -19,15 +19,16 @@
 
 import {FC, ReactNode} from 'react';
 
-import * as Icon from 'Components/Icon';
 import ko from 'knockout';
+
+import {Link, LinkVariant} from '@wireapp/react-ui-kit';
+
+import * as Icon from 'Components/Icon';
 import {CONVERSATION_READONLY_STATE} from 'Repositories/conversation/ConversationRepository';
 import {Conversation} from 'Repositories/entity/Conversation';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 import {replaceReactComponents} from 'Util/LocalizerUtil/ReactLocalizerUtil';
-
-import {Link, LinkVariant} from '@wireapp/react-ui-kit';
 
 interface ReadOnlyConversationMessageProps {
   reloadApp: () => void;

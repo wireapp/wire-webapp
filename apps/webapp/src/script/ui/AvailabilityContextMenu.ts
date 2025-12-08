@@ -18,10 +18,11 @@
  */
 
 import {amplify} from 'amplify';
-import {t} from 'Util/LocalizerUtil';
 
 import {Availability} from '@wireapp/protocol-messaging';
 import {WebAppEvents} from '@wireapp/webapp-events';
+
+import {t} from 'Util/LocalizerUtil';
 
 import {ContextMenuEntry, showContextMenu} from './ContextMenu';
 

@@ -18,6 +18,7 @@
  */
 
 import {render} from '@testing-library/react';
+
 import {DeleteMessage as DeleteMessageEntity} from 'Repositories/entity/message/DeleteMessage';
 import {User} from 'Repositories/entity/User';
 import {createUuid} from 'Util/uuid';

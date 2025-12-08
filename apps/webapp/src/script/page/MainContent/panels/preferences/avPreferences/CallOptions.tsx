@@ -21,13 +21,14 @@ import {ChangeEvent, useCallback, useEffect, useRef, useState} from 'react';
 
 import type {WebappProperties} from '@wireapp/api-client/lib/user/data/';
 import {amplify} from 'amplify';
+
+import {Checkbox, CheckboxLabel} from '@wireapp/react-ui-kit';
+import {WebAppEvents} from '@wireapp/webapp-events';
+
 import type {MediaConstraintsHandler} from 'Repositories/media/MediaConstraintsHandler';
 import type {PropertiesRepository} from 'Repositories/properties/PropertiesRepository';
 import {PROPERTIES_TYPE} from 'Repositories/properties/PropertiesType';
 import {t} from 'Util/LocalizerUtil';
-
-import {Checkbox, CheckboxLabel} from '@wireapp/react-ui-kit';
-import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {Config} from '../../../../../Config';
 import {PreferencesSection} from '../components/PreferencesSection';

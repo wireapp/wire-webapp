@@ -21,6 +21,7 @@
 
 import {ConnectionStatus} from '@wireapp/api-client/lib/connection/';
 import {CONVERSATION_TYPE} from '@wireapp/api-client/lib/conversation/';
+
 import {ClientEntity} from 'Repositories/client/ClientEntity';
 import {ConnectionMapper} from 'Repositories/connection/ConnectionMapper';
 import {ConversationMapper} from 'Repositories/conversation/ConversationMapper';

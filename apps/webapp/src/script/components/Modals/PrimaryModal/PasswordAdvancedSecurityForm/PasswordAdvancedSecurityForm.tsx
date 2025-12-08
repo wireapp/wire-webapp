@@ -19,9 +19,9 @@
 
 import type {ReactElement, ChangeEvent, FormEvent} from 'react';
 
-import {t} from 'Util/LocalizerUtil';
-
 import {Input} from '@wireapp/react-ui-kit';
+
+import {t} from 'Util/LocalizerUtil';
 
 interface PasswordAdvancedSecurityFormProps {
   onSubmit: (event: FormEvent<HTMLFormElement>) => void;

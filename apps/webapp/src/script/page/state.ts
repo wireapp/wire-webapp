@@ -17,9 +17,10 @@
  *
  */
 
+import {create} from 'zustand';
+
 import {Message} from 'Repositories/entity/message/Message';
 import {User} from 'Repositories/entity/User';
-import {create} from 'zustand';
 
 import {PanelEntity, PanelState} from './RightSidebar';
 

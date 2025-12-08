@@ -19,6 +19,9 @@
 
 import {render, waitFor} from '@testing-library/react';
 import {act} from 'react-dom/test-utils';
+
+import {CALL_TYPE, STATE as CALL_STATE} from '@wireapp/avs';
+
 import {Call} from 'Repositories/calling/Call';
 import {CallingRepository} from 'Repositories/calling/CallingRepository';
 import {Participant} from 'Repositories/calling/Participant';
@@ -28,8 +31,6 @@ import {PropertiesRepository} from 'Repositories/properties/PropertiesRepository
 import {TeamState} from 'Repositories/team/TeamState';
 import {CallActions} from 'src/script/view_model/CallingViewModel';
 import {createUuid} from 'Util/uuid';
-
-import {CALL_TYPE, STATE as CALL_STATE} from '@wireapp/avs';
 
 import {CallingCell, CallingCellProps} from './CallingCell';
 

@@ -18,14 +18,15 @@
  */
 
 import {isValid} from 'date-fns';
-import {ClientNotificationData} from 'Repositories/notification/PreferenceNotificationRepository';
 import {escape} from 'underscore';
+import {create} from 'zustand';
+
+import {ClientNotificationData} from 'Repositories/notification/PreferenceNotificationRepository';
 import {replaceLink, t} from 'Util/LocalizerUtil';
 import {getLogger} from 'Util/Logger';
 import {formatLocale} from 'Util/TimeUtil';
 import {noop} from 'Util/util';
 import {createUuid} from 'Util/uuid';
-import {create} from 'zustand';
 
 import {
   ButtonAction,

@@ -17,22 +17,7 @@
  *
  */
 
-import * as Icon from 'Components/Icon';
-import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
-import {Conversation} from 'Repositories/entity/Conversation';
-import {User} from 'Repositories/entity/User';
-import {TeamState} from 'Repositories/team/TeamState';
-import {FEATURES, hasAccessToFeature} from 'Repositories/user/UserPermission';
-import {getManageTeamUrl} from 'src/script/externalRoute';
-import {ConversationFolderTab} from 'src/script/page/LeftSidebar/panels/Conversations/ConversationTab/ConversationFolderTab';
-import {SidebarTabs} from 'src/script/page/LeftSidebar/panels/Conversations/useSidebarStore';
-import {Core} from 'src/script/service/CoreSingleton';
 import {container} from 'tsyringe';
-import {useKoSubscribableChildren} from 'Util/ComponentUtil';
-import {isDataDogEnabled} from 'Util/DataDog';
-import {getWebEnvironment} from 'Util/Environment';
-import {replaceLink, t} from 'Util/LocalizerUtil';
-import {useChannelsFeatureFlag} from 'Util/useChannelsFeatureFlag';
 
 import {
   GroupIcon,
@@ -45,6 +30,22 @@ import {
   CollectionIcon,
   TeamIcon,
 } from '@wireapp/react-ui-kit';
+
+import * as Icon from 'Components/Icon';
+import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
+import {Conversation} from 'Repositories/entity/Conversation';
+import {User} from 'Repositories/entity/User';
+import {TeamState} from 'Repositories/team/TeamState';
+import {FEATURES, hasAccessToFeature} from 'Repositories/user/UserPermission';
+import {getManageTeamUrl} from 'src/script/externalRoute';
+import {ConversationFolderTab} from 'src/script/page/LeftSidebar/panels/Conversations/ConversationTab/ConversationFolderTab';
+import {SidebarTabs} from 'src/script/page/LeftSidebar/panels/Conversations/useSidebarStore';
+import {Core} from 'src/script/service/CoreSingleton';
+import {useKoSubscribableChildren} from 'Util/ComponentUtil';
+import {isDataDogEnabled} from 'Util/DataDog';
+import {getWebEnvironment} from 'Util/Environment';
+import {replaceLink, t} from 'Util/LocalizerUtil';
+import {useChannelsFeatureFlag} from 'Util/useChannelsFeatureFlag';
 
 import {
   footerDisclaimer,

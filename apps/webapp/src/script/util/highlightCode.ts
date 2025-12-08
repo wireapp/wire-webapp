@@ -38,9 +38,7 @@ interface HighlightCodeParams {
 }
 
 export const highlightCode = ({code, grammar, lang}: HighlightCodeParams) => {
-  // eslint-disable-next-line import/no-named-as-default-member
   return Prism.highlight(code, grammar, lang);
 };
 
-// eslint-disable-next-line import/no-named-as-default-member
 export const languages = Prism.languages;

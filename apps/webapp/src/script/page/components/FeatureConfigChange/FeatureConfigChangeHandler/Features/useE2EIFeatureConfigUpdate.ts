@@ -20,6 +20,7 @@
 import {useEffect} from 'react';
 
 import {FEATURE_KEY, FeatureList} from '@wireapp/api-client/lib/team';
+
 import {
   FeatureUpdateType,
   detectTeamFeatureUpdate,

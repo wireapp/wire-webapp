@@ -19,6 +19,7 @@
 
 import {act, render} from '@testing-library/react';
 import {CONVERSATION_TYPE} from '@wireapp/api-client/lib/conversation';
+
 import {CellsRepository} from 'Repositories/cells/CellsRepository';
 import {ConnectionRepository} from 'Repositories/connection/ConnectionRepository';
 import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';

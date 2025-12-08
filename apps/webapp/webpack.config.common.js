@@ -17,11 +17,12 @@
  *
  */
 
-const path = require('path');
-const webpack = require('webpack');
 const CopyPlugin = require('copy-webpack-plugin');
-const WorkboxPlugin = require('workbox-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
+const webpack = require('webpack');
+const WorkboxPlugin = require('workbox-webpack-plugin');
+
+const path = require('path');
 
 const DIST_PATH = path.resolve(__dirname, '../../apps/server/dist');
 const ROOT_PATH = path.resolve(__dirname, '../..');
@@ -176,7 +177,7 @@ module.exports = {
         {from: path.resolve(SRC_PATH, 'page/loader.js'), to: `${dist}/min/`},
         // Copy PDF worker for react-pdf package
         {
-          from: path.dirname(require.resolve('pdfjs-dist/package.json')) + '/build/pdf.worker.mjs',
+          from: `${path.dirname(require.resolve('pdfjs-dist/package.json'))}/build/pdf.worker.mjs`,
           to: `${dist}/min/pdf.worker.mjs`,
           // Prevents content hashing
           info: {minimized: true},

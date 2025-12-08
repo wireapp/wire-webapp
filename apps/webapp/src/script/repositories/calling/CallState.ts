@@ -20,14 +20,15 @@
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {amplify} from 'amplify';
 import ko from 'knockout';
-import type {ElectronDesktopCapturerSource} from 'Repositories/media/MediaDevicesHandler';
-import {EventName} from 'Repositories/tracking/EventName';
-import {Segmentation} from 'Repositories/tracking/Segmentation';
 import {singleton} from 'tsyringe';
-import {matchQualifiedIds} from 'Util/QualifiedId';
 
 import {REASON as CALL_REASON, STATE as CALL_STATE} from '@wireapp/avs';
 import {WebAppEvents} from '@wireapp/webapp-events';
+
+import type {ElectronDesktopCapturerSource} from 'Repositories/media/MediaDevicesHandler';
+import {EventName} from 'Repositories/tracking/EventName';
+import {Segmentation} from 'Repositories/tracking/Segmentation';
+import {matchQualifiedIds} from 'Util/QualifiedId';
 
 import {Call} from './Call';
 

@@ -18,6 +18,9 @@
  */
 
 import {amplify} from 'amplify';
+
+import {WebAppEvents} from '@wireapp/webapp-events';
+
 import {useTypingIndicatorState} from 'Components/InputBar/TypingIndicator';
 import {CacheRepository} from 'Repositories/cache/CacheRepository';
 import type {ClientRepository} from 'Repositories/client/ClientRepository';
@@ -27,8 +30,6 @@ import type {EventRepository} from 'Repositories/event/EventRepository';
 import {StorageKey} from 'Repositories/storage/StorageKey';
 import type {StorageRepository} from 'Repositories/storage/StorageRepository';
 import type {UserRepository} from 'Repositories/user/UserRepository';
-
-import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {LifeCycleRepository, doSimpleRedirect, type LifeCycleDependencies} from './LifeCycleRepository';
 

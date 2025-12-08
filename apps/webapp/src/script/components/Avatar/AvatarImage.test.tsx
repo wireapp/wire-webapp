@@ -18,6 +18,7 @@
  */
 
 import {render, waitFor} from '@testing-library/react';
+
 import {AVATAR_SIZE} from 'Components/Avatar';
 import {AssetRemoteData} from 'Repositories/assets/AssetRemoteData';
 import {AssetRepository} from 'Repositories/assets/AssetRepository';

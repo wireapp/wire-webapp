@@ -19,9 +19,9 @@
 
 import {FormEvent} from 'react';
 
-import {t} from 'Util/LocalizerUtil';
-
 import {CircleCloseIcon, Input, SearchIcon} from '@wireapp/react-ui-kit';
+
+import {t} from 'Util/LocalizerUtil';
 
 import {
   closeButtonStyles,

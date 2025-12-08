@@ -12,7 +12,7 @@
     },
     "lint": {
       "cache": true,
-      "inputs": ["default", "{workspaceRoot}/.eslintrc.js"] // workspace lint config in hash
+      "inputs": ["default", "{workspaceRoot}/eslint.config.ts"] // workspace lint config in hash
     }
   },
   "namedInputs": {

@@ -19,11 +19,11 @@
 
 import {useEffect, useState} from 'react';
 
+import {GenericMessage} from '@wireapp/protocol-messaging';
+
 import {ProgressBar} from 'Components/ProgressBar';
 import {AssetRepository} from 'Repositories/assets/AssetRepository';
 import {t} from 'Util/LocalizerUtil';
-
-import {GenericMessage} from '@wireapp/protocol-messaging';
 
 import {uploadingProgressText} from './UploadAssetItem.styles';
 

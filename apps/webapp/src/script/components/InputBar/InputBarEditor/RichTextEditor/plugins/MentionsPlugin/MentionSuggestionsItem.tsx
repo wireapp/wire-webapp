@@ -20,13 +20,14 @@
 import React, {forwardRef} from 'react';
 
 import cx from 'classnames';
+
+import {TabIndex} from '@wireapp/react-ui-kit';
+
 import {Avatar, AVATAR_SIZE} from 'Components/Avatar';
 import * as Icon from 'Components/Icon';
 import {User} from 'Repositories/entity/User';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {handleKeyDown, KEY} from 'Util/KeyboardUtil';
-
-import {TabIndex} from '@wireapp/react-ui-kit';
 
 type MentionSuggestionsItemProps = {
   isSelected: boolean;

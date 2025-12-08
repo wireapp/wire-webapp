@@ -18,6 +18,7 @@
  */
 
 import type {QualifiedId} from '@wireapp/api-client/lib/user';
+
 import {ReactionMap, UserReactionMap} from 'Repositories/storage';
 
 import {matchQualifiedIds} from './QualifiedId';

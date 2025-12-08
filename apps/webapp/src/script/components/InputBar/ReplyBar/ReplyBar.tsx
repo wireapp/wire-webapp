@@ -17,7 +17,7 @@
  *
  */
 
-/* eslint-disable jsx-a11y/no-noninteractive-tabindex */
+import {TabIndex} from '@wireapp/react-ui-kit';
 
 import {RestrictedVideo} from 'Components/asset/RestrictedVideo';
 import {ParticipantMicOnIcon} from 'Components/calling/ParticipantMicOnIcon';
@@ -27,8 +27,6 @@ import {ContentMessage} from 'Repositories/entity/message/ContentMessage';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 import {renderMessage} from 'Util/messageRenderer';
-
-import {TabIndex} from '@wireapp/react-ui-kit';
 
 interface ReplyBarProps {
   replyMessageEntity: ContentMessage;
@@ -45,7 +43,7 @@ export const ReplyBar = ({replyMessageEntity, onCancel}: ReplyBarProps) => {
 
   const isMultipart = replyAsset?.isMultipart();
 
-  const attachmentsCount = isMultipart ? replyAsset.attachments?.()?.length ?? 0 : 0;
+  const attachmentsCount = isMultipart ? (replyAsset.attachments?.()?.length ?? 0) : 0;
 
   const attachmentsCountCopy =
     attachmentsCount === 1

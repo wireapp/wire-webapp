@@ -76,7 +76,6 @@ function isMinimumSupported() {
 }
 
 if (!isMinimumSupported()) {
-  // eslint-disable-next-line no-console
   console.error('The minimum browser features are not supported to run the Wire app!');
   location.href = '/unsupported/';
 }

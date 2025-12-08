@@ -20,6 +20,7 @@
 import {useCallback, useEffect} from 'react';
 
 import {useLexicalComposerContext} from '@lexical/react/LexicalComposerContext';
+
 import {DraftState} from 'Components/InputBar/common/draftState/draftState';
 
 interface DraftStatePluginProps {

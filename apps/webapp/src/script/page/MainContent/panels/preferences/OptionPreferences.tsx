@@ -21,6 +21,10 @@ import React, {useEffect, useState} from 'react';
 
 import {AudioPreference, NotificationPreference, WebappProperties} from '@wireapp/api-client/lib/user/data/';
 import {amplify} from 'amplify';
+
+import {TabIndex, Checkbox, CheckboxLabel, IndicatorRangeInput} from '@wireapp/react-ui-kit';
+import {WebAppEvents} from '@wireapp/webapp-events';
+
 import {Theme} from 'Components/AppContainer/hooks/useTheme';
 import {RadioGroup} from 'Components/Radio';
 import {RootFontSize, useRootFontSize} from 'Hooks/useRootFontSize';
@@ -30,9 +34,6 @@ import {PROPERTIES_TYPE} from 'Repositories/properties/PropertiesType';
 import {Config} from 'src/script/Config';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
-
-import {TabIndex, Checkbox, CheckboxLabel, IndicatorRangeInput} from '@wireapp/react-ui-kit';
-import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {PreferencesPage} from './components/PreferencesPage';
 import {PreferencesSection} from './components/PreferencesSection';

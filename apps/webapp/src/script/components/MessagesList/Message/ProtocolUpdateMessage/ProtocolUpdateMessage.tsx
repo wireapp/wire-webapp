@@ -18,6 +18,7 @@
  */
 
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
+
 import * as Icon from 'Components/Icon';
 import {ProtocolUpdateMessage as ProtocolUpdateMessageEntity} from 'Repositories/entity/message/ProtocolUpdateMessage';
 import {SystemMessage} from 'Repositories/entity/message/SystemMessage';

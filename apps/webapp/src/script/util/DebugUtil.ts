@@ -34,6 +34,10 @@ import {DatabaseKeys} from '@wireapp/core/lib/notification/NotificationDatabaseR
 import Dexie from 'dexie';
 import keyboardjs from 'keyboardjs';
 import {$createTextNode, $getRoot, LexicalEditor} from 'lexical';
+import {container} from 'tsyringe';
+
+import {AvsDebugger} from '@wireapp/avs-debugger';
+
 import {CallingRepository} from 'Repositories/calling/CallingRepository';
 import {CallState} from 'Repositories/calling/CallState';
 import {Participant} from 'Repositories/calling/Participant';
@@ -54,11 +58,8 @@ import {TeamState} from 'Repositories/team/TeamState';
 import {disableForcedErrorReporting} from 'Repositories/tracking/Telemetry.helpers';
 import {UserRepository} from 'Repositories/user/UserRepository';
 import {UserState} from 'Repositories/user/UserState';
-import {container} from 'tsyringe';
 import {getStorage} from 'Util/localStorage';
 import {getLogger, Logger} from 'Util/Logger';
-
-import {AvsDebugger} from '@wireapp/avs-debugger';
 
 import {TIME_IN_MILLIS} from './TimeUtil';
 import {createUuid} from './uuid';

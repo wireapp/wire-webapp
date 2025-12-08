@@ -20,6 +20,7 @@
 import {MouseEvent} from 'react';
 
 import {CONVERSATION_CELLS_STATE} from '@wireapp/api-client/lib/conversation/';
+
 import {FormatSeparator} from 'Components/InputBar/common/FormatSeparator/FormatSeparator';
 import {Conversation} from 'Repositories/entity/Conversation';
 import {Config} from 'src/script/Config';

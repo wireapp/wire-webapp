@@ -19,10 +19,10 @@
 
 import {useRef} from 'react';
 
+import {TabIndex, Button, ButtonVariant} from '@wireapp/react-ui-kit';
+
 import {CONFIG as HistoryExportConfig} from 'Components/HistoryExport';
 import {handleKeyDown, KEY} from 'Util/KeyboardUtil';
-
-import {TabIndex, Button, ButtonVariant} from '@wireapp/react-ui-kit';
 
 interface BackupFileUploadProps {
   onFileChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
@@ -43,7 +43,28 @@ const BackupFileUpload = ({
 
   return (
     <>
-      <label className="preferences-history-backup-import-field" data-uie-name="do-backup-import" id="do-backup-import">
+      <label
+        className="preferences-history-backup-import-field"
+        data-uie-name="do-backup-import"
+        id="do-backup-import"
+        aria-label={backupImportHeadLine}
+      >
+        <span
+          aria-hidden="false"
+          style={{
+            position: 'absolute',
+            width: 1,
+            height: 1,
+            padding: 0,
+            margin: -1,
+            overflow: 'hidden',
+            clip: 'rect(0, 0, 0, 0)',
+            whiteSpace: 'nowrap',
+            border: 0,
+          }}
+        >
+          {backupImportHeadLine}
+        </span>
         <input
           id="file-import-input"
           ref={fileInputRef}
@@ -56,7 +77,6 @@ const BackupFileUpload = ({
           aria-describedby="preferences-history-describe-2"
         />
       </label>
-
       <Button
         variant={variant}
         className={cssClassName}

@@ -18,6 +18,7 @@
  */
 
 import {render} from '@testing-library/react';
+
 import {Conversation} from 'Repositories/entity/Conversation';
 import {ContentMessage} from 'Repositories/entity/message/ContentMessage';
 import {FileAsset} from 'Repositories/entity/message/FileAsset';

@@ -18,19 +18,20 @@
  */
 
 import {amplify} from 'amplify';
+import {container} from 'tsyringe';
+
+import * as telemetry from '@wireapp/telemetry';
+import {WebAppEvents} from '@wireapp/webapp-events';
+
 import type {ContributedSegmentations, MessageRepository} from 'Repositories/conversation/MessageRepository';
 import {ClientEvent} from 'Repositories/event/Client';
 import {TeamState} from 'Repositories/team/TeamState';
 import {UserState} from 'Repositories/user/UserState';
-import {container} from 'tsyringe';
 import {getLogger, Logger} from 'Util/Logger';
 import {loadValue, storeValue, resetStoreValue} from 'Util/StorageUtil';
 import {includesString} from 'Util/StringUtil';
 import {getParameter} from 'Util/UrlUtil';
 import {createUuid} from 'Util/uuid';
-
-import * as telemetry from '@wireapp/telemetry';
-import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {EventName} from './EventName';
 import {getPlatform} from './Helpers';

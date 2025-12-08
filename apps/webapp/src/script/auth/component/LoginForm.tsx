@@ -21,10 +21,11 @@ import React, {useRef, useState} from 'react';
 
 import {LoginData} from '@wireapp/api-client/lib/auth';
 import {useSelector} from 'react-redux';
-import {t} from 'Util/LocalizerUtil';
-import {isValidEmail, isValidUsername} from 'Util/ValidationUtil';
 
 import {Button, Input, Loading} from '@wireapp/react-ui-kit';
+
+import {t} from 'Util/LocalizerUtil';
+import {isValidEmail, isValidUsername} from 'Util/ValidationUtil';
 
 import {useAutoFocus} from '../hooks/useAutoFocus';
 import {ValidationError} from '../module/action/ValidationError';

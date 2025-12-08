@@ -28,6 +28,10 @@ import {AddUsersFailure} from '@wireapp/core/lib/conversation';
 import {MultiPartContent} from '@wireapp/core/lib/conversation/content';
 import {ReactionType} from '@wireapp/core/lib/conversation/ReactionType';
 import {DecryptionError} from '@wireapp/core/lib/errors/DecryptionError';
+
+import type {REASON as AVS_REASON} from '@wireapp/avs';
+import type {Asset, LegalHoldStatus} from '@wireapp/protocol-messaging';
+
 import {AssetTransferState} from 'Repositories/assets/AssetTransferState';
 import type {Conversation} from 'Repositories/entity/Conversation';
 import type {Message} from 'Repositories/entity/message/Message';
@@ -35,9 +39,6 @@ import type {User} from 'Repositories/entity/User';
 import {ClientEvent, CONVERSATION} from 'Repositories/event/Client';
 import {ReactionMap, ReadReceipt, UserReactionMap} from 'Repositories/storage';
 import {createUuid} from 'Util/uuid';
-
-import type {REASON as AVS_REASON} from '@wireapp/avs';
-import type {Asset, LegalHoldStatus} from '@wireapp/protocol-messaging';
 
 import {BuildMessageAddParams} from './EventBuilder.types';
 
@@ -230,8 +231,9 @@ export type CallingTimeoutEvent = ConversationEvent<
 >;
 export type FailedToAddUsersMessageEvent = ConversationEvent<CONVERSATION.FAILED_TO_ADD_USERS, AddUsersFailure[]>;
 
-export interface ErrorEvent
-  extends ConversationEvent<CONVERSATION.UNABLE_TO_DECRYPT | CONVERSATION.INCOMING_MESSAGE_TOO_BIG> {
+export interface ErrorEvent extends ConversationEvent<
+  CONVERSATION.UNABLE_TO_DECRYPT | CONVERSATION.INCOMING_MESSAGE_TOO_BIG
+> {
   error: string;
   error_code: number | string;
   id: string;

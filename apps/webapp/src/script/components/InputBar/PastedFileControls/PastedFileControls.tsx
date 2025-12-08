@@ -19,10 +19,10 @@
 
 import {FC} from 'react';
 
+import {TabIndex} from '@wireapp/react-ui-kit';
+
 import * as Icon from 'Components/Icon';
 import {t} from 'Util/LocalizerUtil';
-
-import {TabIndex} from '@wireapp/react-ui-kit';
 
 import {Config} from '../../../Config';
 
@@ -59,7 +59,7 @@ export const PastedFileControls: FC<PastedFileControlsProps> = ({pastedFile, onC
           </span>
         )}
 
-        {/* eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex */}
+        {}
         <span tabIndex={TabIndex.FOCUSABLE}>{pastedFile.name}</span>
       </div>
 

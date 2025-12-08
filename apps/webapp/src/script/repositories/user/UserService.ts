@@ -19,10 +19,11 @@
 
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 import type {User as APIClientUser, QualifiedHandle, QualifiedId} from '@wireapp/api-client/lib/user';
+import {container} from 'tsyringe';
+
 import {UserRecord} from 'Repositories/storage';
 import {StorageSchemata} from 'Repositories/storage/StorageSchemata';
 import {StorageService} from 'Repositories/storage/StorageService';
-import {container} from 'tsyringe';
 import {constructUserPrimaryKey} from 'Util/StorageUtil';
 
 import {APIClient} from '../../service/APIClientSingleton';

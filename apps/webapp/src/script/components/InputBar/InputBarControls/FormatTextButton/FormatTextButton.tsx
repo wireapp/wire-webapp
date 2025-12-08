@@ -20,6 +20,7 @@
 import type {MouseEvent} from 'react';
 
 import cx from 'classnames';
+
 import * as Icon from 'Components/Icon';
 import {t} from 'Util/LocalizerUtil';
 

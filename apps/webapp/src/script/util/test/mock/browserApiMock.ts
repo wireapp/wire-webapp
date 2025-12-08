@@ -17,7 +17,6 @@
  *
  */
 
-// eslint-disable-next-line @typescript-eslint/no-var-requires
 const encoding = require('text-encoding');
 
 window.TextEncoder = encoding.TextEncoder;

@@ -19,8 +19,6 @@
 
 // Polyfill for "tsyringe" dependency injection
 
-// eslint-disable-next-line import/order
-
 import {Context} from '@wireapp/api-client/lib/auth';
 import {ClientClassification, ClientType} from '@wireapp/api-client/lib/client/';
 import {FEATURE_KEY, FEATURE_STATUS, FeatureList} from '@wireapp/api-client/lib/team';
@@ -28,10 +26,15 @@ import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {EVENTS as CoreEvents} from '@wireapp/core/lib/Account';
 import {MLSServiceEvents} from '@wireapp/core/lib/messagingProtocols/mls';
 import {amplify} from 'amplify';
-import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import 'core-js/full/reflect';
 import platform from 'platform';
 import {pdfjs} from 'react-pdf';
+import {container} from 'tsyringe';
+
+import {Runtime} from '@wireapp/commons';
+import {WebAppEvents} from '@wireapp/webapp-events';
+
+import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {AssetRepository} from 'Repositories/assets/AssetRepository';
 import {AudioRepository} from 'Repositories/audio/AudioRepository';
 import {BackupRepository} from 'Repositories/backup/BackupRepository';
@@ -81,7 +84,6 @@ import {TeamService} from 'Repositories/team/TeamService';
 import {EventTrackingRepository} from 'Repositories/tracking/EventTrackingRepository';
 import {UserRepository} from 'Repositories/user/UserRepository';
 import {UserService} from 'Repositories/user/UserService';
-import {container} from 'tsyringe';
 import {initializeDataDog} from 'Util/DataDog';
 import {DebugUtil} from 'Util/DebugUtil';
 import {Environment} from 'Util/Environment';
@@ -89,9 +91,6 @@ import {t} from 'Util/LocalizerUtil';
 import {getLogger, Logger} from 'Util/Logger';
 import {durationFrom, formatCoarseDuration, TIME_IN_MILLIS} from 'Util/TimeUtil';
 import {AppInitializationStep, checkIndexedDb, InitializationEventLogger} from 'Util/util';
-
-import {Runtime} from '@wireapp/commons';
-import {WebAppEvents} from '@wireapp/webapp-events';
 
 import '../../style/default.less';
 import {SIGN_OUT_REASON} from '../auth/SignOutReason';

@@ -18,6 +18,7 @@
  */
 
 import type {Dexie, Transaction} from 'dexie';
+
 import {base64ToArray} from 'Util/util';
 
 import {ConversationRecord} from './record';

@@ -20,12 +20,13 @@
 import {useState} from 'react';
 
 import {amplify} from 'amplify';
+
+import {WebAppEvents} from '@wireapp/webapp-events';
+
 import {StorageKey} from 'Repositories/storage';
 import {EventName} from 'Repositories/tracking/EventName';
 import {Config} from 'src/script/Config';
 import {loadValue, storeValue} from 'Util/StorageUtil';
-
-import {WebAppEvents} from '@wireapp/webapp-events';
 
 export const useFormatToolbar = () => {
   const [open, setOpen] = useState(() => {

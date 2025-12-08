@@ -21,6 +21,10 @@ import {FC, useEffect} from 'react';
 
 import {DefaultConversationRoleName as DefaultRole} from '@wireapp/api-client/lib/conversation/';
 import {amplify} from 'amplify';
+
+import {TabIndex} from '@wireapp/react-ui-kit';
+import {WebAppEvents} from '@wireapp/webapp-events';
+
 import {FadingScrollbar} from 'Components/FadingScrollbar';
 import * as Icon from 'Components/Icon';
 import {EnrichedFields} from 'Components/panel/EnrichedFields';
@@ -37,9 +41,6 @@ import {TeamState} from 'Repositories/team/TeamState';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {handleKeyDown, KEY} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
-
-import {TabIndex} from '@wireapp/react-ui-kit';
-import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {ActionsViewModel} from '../../../view_model/ActionsViewModel';
 import {PanelHeader} from '../PanelHeader';

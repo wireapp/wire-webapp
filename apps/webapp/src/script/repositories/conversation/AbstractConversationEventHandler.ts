@@ -18,6 +18,7 @@
  */
 
 import {ConversationEvent, FederationEvent} from '@wireapp/api-client/lib/event';
+
 import type {Conversation} from 'Repositories/entity/Conversation';
 
 import {ClientConversationEvent} from './EventBuilder';

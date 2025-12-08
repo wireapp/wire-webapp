@@ -20,6 +20,7 @@
 import type {QualifiedUserClients} from '@wireapp/api-client/lib/conversation';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 import ko from 'knockout';
+
 import {AssetRepository} from 'Repositories/assets/AssetRepository';
 import {ReactionMap, ReadReceipt} from 'Repositories/storage';
 import {copyText} from 'Util/ClipboardUtil';

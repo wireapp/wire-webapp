@@ -18,6 +18,7 @@
  */
 
 import {fireEvent, render, waitFor} from '@testing-library/react';
+
 import {GiphyRepository} from 'Repositories/extension/GiphyRepository';
 import {withTheme} from 'src/script/auth/util/test/TestUtil';
 

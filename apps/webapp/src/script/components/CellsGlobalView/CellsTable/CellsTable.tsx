@@ -18,6 +18,7 @@
  */
 
 import {flexRender, getCoreRowModel, useReactTable} from '@tanstack/react-table';
+
 import {CellsRepository} from 'Repositories/cells/CellsRepository';
 import {CellNode} from 'src/script/types/cellNode';
 

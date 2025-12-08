@@ -29,6 +29,10 @@ import React, {
 
 import {useVirtualizer} from '@tanstack/react-virtual';
 import {TimeInMillis} from '@wireapp/commons/lib/util/TimeUtil';
+import {useDebouncedCallback} from 'use-debounce';
+
+import {WIDTH} from '@wireapp/react-ui-kit';
+
 import {ConversationListCell} from 'Components/ConversationListCell';
 import {Call} from 'Repositories/calling/Call';
 import {CallState} from 'Repositories/calling/CallState';
@@ -37,14 +41,11 @@ import {ConversationState} from 'Repositories/conversation/ConversationState';
 import {Conversation} from 'Repositories/entity/Conversation';
 import {User} from 'Repositories/entity/User';
 import {SidebarTabs, useSidebarStore} from 'src/script/page/LeftSidebar/panels/Conversations/useSidebarStore';
-import {useDebouncedCallback} from 'use-debounce';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {isKeyboardEvent} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
 import {matchQualifiedIds} from 'Util/QualifiedId';
 import {isConversationEntity} from 'Util/TypePredicateUtil';
-
-import {WIDTH} from '@wireapp/react-ui-kit';
 
 import {ConnectionRequests} from './ConnectionRequests';
 import {conversationsList, headingTitle, noResultsMessage, virtualizationStyles} from './ConversationsList.styles';

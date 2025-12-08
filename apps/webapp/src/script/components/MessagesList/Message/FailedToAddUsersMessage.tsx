@@ -20,18 +20,19 @@
 import {useMemo, useState} from 'react';
 
 import {AddUsersFailure, AddUsersFailureReasons} from '@wireapp/core/lib/conversation';
+import {container} from 'tsyringe';
+
+import {Button, ButtonVariant, Link, LinkVariant} from '@wireapp/react-ui-kit';
+
 import * as Icon from 'Components/Icon';
 import {getUserName} from 'Components/UserName';
 import {FailedToAddUsersMessage as FailedToAddUsersMessageEntity} from 'Repositories/entity/message/FailedToAddUsersMessage';
 import {User} from 'Repositories/entity/User';
 import {UserState} from 'Repositories/user/UserState';
 import {Config} from 'src/script/Config';
-import {container} from 'tsyringe';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 import {matchQualifiedIds} from 'Util/QualifiedId';
-
-import {Button, ButtonVariant, Link, LinkVariant} from '@wireapp/react-ui-kit';
 
 import {backendErrorLink, warning} from './ContentMessage/Warnings/Warnings.styles';
 import {MessageTime} from './MessageTime';

@@ -21,9 +21,12 @@ import {RECEIPT_MODE} from '@wireapp/api-client/lib/conversation/data';
 import {ConsentType} from '@wireapp/api-client/lib/self/';
 import {AudioPreference, NotificationPreference, WebappProperties} from '@wireapp/api-client/lib/user/data/';
 import {amplify} from 'amplify';
+import ko from 'knockout';
+
+import {WebAppEvents} from '@wireapp/webapp-events';
+
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {PrimaryModalType} from 'Components/Modals/PrimaryModal/PrimaryModalTypes';
-import ko from 'knockout';
 import type {User} from 'Repositories/entity/User';
 import type {SelfService} from 'Repositories/self/SelfService';
 import {StorageKey} from 'Repositories/storage';
@@ -36,8 +39,6 @@ import {Environment} from 'Util/Environment';
 import {replaceLink, t} from 'Util/LocalizerUtil';
 import {getLogger, Logger} from 'Util/Logger';
 import {loadValue} from 'Util/StorageUtil';
-
-import {WebAppEvents} from '@wireapp/webapp-events';
 
 import type {PropertiesService} from './PropertiesService';
 import {PROPERTIES_TYPE, UserConsentStatus} from './PropertiesType';

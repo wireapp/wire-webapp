@@ -46,6 +46,11 @@ import {ClientMLSError, ClientMLSErrorLabel} from '@wireapp/core/lib/messagingPr
 import {amplify} from 'amplify';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 import ko from 'knockout';
+import sinon from 'sinon';
+import {container} from 'tsyringe';
+
+import {WebAppEvents} from '@wireapp/webapp-events';
+
 import {CallingRepository} from 'Repositories/calling/CallingRepository';
 import {ClientEntity} from 'Repositories/client/ClientEntity';
 import {ConnectionEntity} from 'Repositories/connection/ConnectionEntity';
@@ -65,7 +70,6 @@ import {TeamRepository} from 'Repositories/team/TeamRepository';
 import {TeamState} from 'Repositories/team/TeamState';
 import {UserRepository} from 'Repositories/user/UserRepository';
 import {UserState} from 'Repositories/user/UserState';
-import sinon from 'sinon';
 import {Config} from 'src/script/Config';
 import {ConversationError} from 'src/script/error/ConversationError';
 import {
@@ -73,12 +77,9 @@ import {
   generateAPIConversation,
 } from 'test/helper/ConversationGenerator';
 import {createDeleteEvent} from 'test/helper/EventGenerator';
-import {container} from 'tsyringe';
 import {matchQualifiedIds} from 'Util/QualifiedId';
 import {escapeRegex} from 'Util/SanitizationUtil';
 import {createUuid} from 'Util/uuid';
-
-import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {ConversationDatabaseData, ConversationMapper} from './ConversationMapper';
 import {CONVERSATION_READONLY_STATE, ConversationRepository} from './ConversationRepository';
