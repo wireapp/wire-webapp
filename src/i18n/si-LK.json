@@ -327,6 +327,7 @@
   "backupTryAgain": "නැවත",
   "buttonActionError": "උත්තරය යැවීමට නොහැකිය, යළි උත්සාහ කරන්න",
   "callAccept": "පිළිගන්න",
+  "callChooseScreenCancel": "Close-screen sharing",
   "callChooseSharedScreen": "බෙදාගැනීමට තිරයක් තෝරන්න",
   "callChooseSharedWindow": "බෙදාගැනීමට කවුළුවක් තෝරන්න",
   "callConversationAcceptOrDecline": "{conversationName} අමතමින්. ඇමතුම පිළිගැනීමට පාලන + ඇතුල් කරන්න (ctrl + enter) ඔබන්න හෝ ඇමතුම ඉවතලීමට පාලන + මාරුව + ඇතුල් කරන්න (ctrl + shift + enter) ඔබන්න.",
