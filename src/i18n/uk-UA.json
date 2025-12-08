@@ -327,6 +327,7 @@
   "backupTryAgain": "Спробувати ще раз",
   "buttonActionError": "Your answer can't be sent, please retry",
   "callAccept": "Прийняти",
+  "callChooseScreenCancel": "Close-screen sharing",
   "callChooseSharedScreen": "Оберіть робочий стіл, скріншотами якого ви хочете поділитися",
   "callChooseSharedWindow": "Choose a window to share",
   "callConversationAcceptOrDecline": "{conversationName} is calling. Press control + enter to accept the call or press control + shift + enter to decline the call.",

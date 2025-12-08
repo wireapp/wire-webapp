@@ -25,6 +25,16 @@ import {VIDEO_STATE} from '@wireapp/avs';
 import {TabIndex} from '@wireapp/react-ui-kit';
 
 import {Avatar, AVATAR_SIZE} from 'Components/Avatar';
+import {
+  groupVideoActiveSpeaker,
+  groupVideoActiveSpeakerTile,
+  groupVideoElementVideo,
+  groupVideoParticipantAudioStatus,
+  groupVideoParticipantName,
+  groupVideoParticipantNameWrapper,
+  groupVideoPauseOverlayLabel,
+  groupVideoTileWrapper,
+} from 'Components/calling/GroupVideoGridTile.styles';
 import * as Icon from 'Components/Icon';
 import type {Participant} from 'Repositories/calling/Participant';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
@@ -41,24 +51,6 @@ interface GroupVideoGridTileProps {
   participantCount: number;
   selfParticipant: Participant;
 }
-
-const getParticipantNameColor = ({
-  isActivelySpeaking,
-  isAudioEstablished,
-}: {
-  isActivelySpeaking: boolean;
-  isAudioEstablished: boolean;
-}) => {
-  if (!isAudioEstablished) {
-    return 'var(--gray-60)';
-  }
-
-  if (isActivelySpeaking) {
-    return 'var(--app-bg-secondary)';
-  }
-
-  return 'var(--white)';
-};
 
 const GroupVideoGridTile = ({
   minimized,
@@ -95,8 +87,6 @@ const GroupVideoGridTile = ({
   const hasPausedVideo = videoState === VIDEO_STATE.PAUSED;
   const doVideoReconnecting = videoState === VIDEO_STATE.RECONNECTING;
   const hasActiveVideo = (sharesCamera || sharesScreen) && !!videoStream;
-  const activelySpeakingBoxShadow = `inset 0px 0px 0px 1px var(--group-video-bg), inset 0px 0px 0px 4px var(--accent-color), inset 0px 0px 0px 7px var(--app-bg-secondary)`;
-  const groupVideoBoxShadow = participantCount > 1 ? 'inset 0px 0px 0px 2px var(--group-video-bg)' : 'initial';
 
   const handleTileClick = () => onTileDoubleClick(participant?.user.qualifiedId, participant?.clientId);
 
@@ -106,45 +96,21 @@ const GroupVideoGridTile = ({
     }
   };
 
-  const participantNameColor = getParticipantNameColor({isActivelySpeaking, isAudioEstablished});
-
   const nameContainer = !minimized && (
-    <div
-      className="group-video-grid__element__label"
-      css={{
-        backgroundColor: isActivelySpeaking ? 'var(--accent-color)' : 'var(--black)',
-      }}
-    >
+    <div className="group-video-grid__element__label" css={groupVideoActiveSpeaker(isActivelySpeaking)}>
       <span
         data-uie-name={isActivelySpeaking ? 'status-active-speaking' : isMuted ? 'status-audio-off' : 'status-audio-on'}
-        css={{
-          overflow: 'hidden',
-          display: 'flex',
-          color: participantNameColor,
-        }}
+        css={groupVideoParticipantNameWrapper(isActivelySpeaking, isAudioEstablished)}
       >
         <span
           data-uie-value={participant?.user.id}
           data-uie-name="call-participant-name"
-          css={{
-            textOverflow: 'ellipsis',
-            overflow: 'hidden',
-          }}
+          css={groupVideoParticipantName}
         >
           {name}
         </span>
         {!isAudioEstablished && (
-          <span
-            css={{
-              color: 'var(--participant-audio-connecting-color)',
-              flexShrink: 0,
-              '&::before': {
-                content: "' • '",
-                whiteSpace: 'pre',
-                color: participantNameColor,
-              },
-            }}
-          >
+          <span css={groupVideoParticipantAudioStatus(isActivelySpeaking, isAudioEstablished)}>
             {t('videoCallParticipantConnecting')}
           </span>
         )}
@@ -153,13 +119,18 @@ const GroupVideoGridTile = ({
   );
 
   return (
-    <button
+    <div
       data-uie-name="item-grid"
       data-user-id={participant?.user.id}
       className="group-video-grid__element"
       onDoubleClick={handleTileClick}
       onKeyDown={handleEnterTileClick}
-      tabIndex={isMaximized ? TabIndex.FOCUSABLE : TabIndex.UNFOCUSABLE}
+      role="button"
+      // minimized is passed only from CallingCell where we don't want to focus individual the tile on the tab press
+      tabIndex={
+        (!minimized || isMaximized) && participant !== selfParticipant ? TabIndex.FOCUSABLE : TabIndex.UNFOCUSABLE
+      }
+      aria-label={`Focus video ${participant?.user.id}`}
     >
       {hasActiveVideo ? (
         <div className="tile-wrapper">
@@ -173,24 +144,11 @@ const GroupVideoGridTile = ({
             muted
             srcObject={blurredVideoStream?.stream ?? videoStream}
             className="group-video-grid__element-video"
-            css={{
-              objectFit: isMaximized || sharesScreen ? 'contain' : 'cover',
-              transform: participant === selfParticipant && sharesCamera ? 'rotateY(180deg)' : 'initial',
-            }}
+            css={groupVideoElementVideo(isMaximized || sharesScreen, participant === selfParticipant && sharesCamera)}
           />
         </div>
       ) : (
-        <div
-          css={{
-            alignItems: 'center',
-            backgroundColor: 'var(--group-video-tile-bg)',
-            borderRadius: '10px',
-            display: 'flex',
-            height: '100%',
-            justifyContent: 'center',
-            width: '100%',
-          }}
-        >
+        <div css={groupVideoTileWrapper}>
           <Avatar
             avatarSize={minimized ? AVATAR_SIZE.MEDIUM : AVATAR_SIZE.LARGE}
             participant={participant?.user}
@@ -199,18 +157,7 @@ const GroupVideoGridTile = ({
         </div>
       )}
 
-      <div
-        css={{
-          borderRadius: '8px',
-          bottom: 0,
-          boxShadow: isActivelySpeaking ? activelySpeakingBoxShadow : groupVideoBoxShadow,
-          left: 0,
-          position: 'absolute',
-          right: 0,
-          top: 0,
-          transition: 'box-shadow 0.3s ease-in-out',
-        }}
-      />
+      <div css={groupVideoActiveSpeakerTile(isActivelySpeaking, participantCount)} />
 
       {!minimized && isMuted && (
         <span className="group-video-grid__element__label__icon">
@@ -243,7 +190,7 @@ const GroupVideoGridTile = ({
 
           <div
             className="group-video-grid__pause-overlay__label"
-            css={{fontsize: minimized ? '0.6875rem' : '0.875rem'}}
+            css={groupVideoPauseOverlayLabel(minimized)}
             data-uie-name="status-video-paused"
           >
             {hasPausedVideo ? t('videoCallPaused') : t('videoCallParticipantConnecting')}
@@ -251,7 +198,7 @@ const GroupVideoGridTile = ({
           {nameContainer}
         </div>
       )}
-    </button>
+    </div>
   );
 };
 

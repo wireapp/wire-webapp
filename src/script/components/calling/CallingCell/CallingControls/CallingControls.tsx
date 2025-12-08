@@ -54,6 +54,7 @@ interface CallingControlsProps {
   disableScreenButton: boolean;
   teamState: TeamState;
   supportsVideoCall: boolean;
+  isAnswerButtonDisabled?: boolean;
 }
 
 export const CallingControls = ({
@@ -75,6 +76,7 @@ export const CallingControls = ({
   selfParticipant,
   teamState = container.resolve(TeamState),
   supportsVideoCall,
+  isAnswerButtonDisabled = false,
 }: CallingControlsProps) => {
   const {isVideoCallingEnabled} = useKoSubscribableChildren(teamState, ['isVideoCallingEnabled']);
   const {sharesScreen: selfSharesScreen, sharesCamera: selfSharesCamera} = useKoSubscribableChildren(selfParticipant, [
@@ -190,6 +192,7 @@ export const CallingControls = ({
                 onClick={answerCall}
                 type="button"
                 data-uie-name="do-call-controls-call-join"
+                disabled={isAnswerButtonDisabled}
               >
                 {t('callJoin')}
               </button>
@@ -201,6 +204,7 @@ export const CallingControls = ({
                 title={t('callAccept')}
                 aria-label={t('callAccept')}
                 data-uie-name="do-call-controls-call-accept"
+                disabled={isAnswerButtonDisabled}
               >
                 <Icon.PickupIcon className="small-icon" />
               </button>

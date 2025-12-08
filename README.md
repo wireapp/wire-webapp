@@ -26,7 +26,6 @@ Prerequisites:
 ## 1. Fetching dependencies and configurations
 
 1. Run `yarn`
-
    - This will install all dependencies and fetch a [configuration](https://github.com/wireapp/wire-web-config-wire/) for the application.
 
 ## 2. Build & run

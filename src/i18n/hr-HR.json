@@ -327,6 +327,7 @@
   "backupTryAgain": "Pokušajte ponovno",
   "buttonActionError": "Your answer can't be sent, please retry",
   "callAccept": "Prihvati",
+  "callChooseScreenCancel": "Close-screen sharing",
   "callChooseSharedScreen": "Odaberite zaslon za zajedničko korištenje",
   "callChooseSharedWindow": "Choose a window to share",
   "callConversationAcceptOrDecline": "{conversationName} is calling. Press control + enter to accept the call or press control + shift + enter to decline the call.",

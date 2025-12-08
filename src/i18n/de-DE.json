@@ -327,6 +327,7 @@
   "backupTryAgain": "Erneut versuchen",
   "buttonActionError": "Ihre Antwort wurde nicht gesendet, bitte erneut versuchen.",
   "callAccept": "Annehmen",
+  "callChooseScreenCancel": "Bildschirmfreigabe schließen",
   "callChooseSharedScreen": "Wählen Sie einen Bildschirm aus",
   "callChooseSharedWindow": "Wählen Sie ein Fenster zur Freigabe aus",
   "callConversationAcceptOrDecline": "{conversationName} ruft an. Drücken Sie Steuerung + Eingabe, um den Anruf anzunehmen, oder drücken Sie Steuerung + Umschalt + Eingabe, um den Anruf abzulehnen.",
