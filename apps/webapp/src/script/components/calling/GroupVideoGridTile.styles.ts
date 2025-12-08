@@ -56,7 +56,7 @@ export const groupVideoActiveSpeakerTile = (isActivelySpeaking: boolean, partici
 });
 
 export const groupVideoActiveSpeaker = (isActivelySpeaking: boolean): CSSObject => ({
-  backgroundColor: isActivelySpeaking ? 'var(--accent-color)' : 'var(--black)',
+  filter: isActivelySpeaking ? 'brightness(0.8)' : 'none',
 });
 
 export const groupVideoParticipantNameWrapper = (
