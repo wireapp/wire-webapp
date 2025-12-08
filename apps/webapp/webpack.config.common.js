@@ -171,7 +171,7 @@ module.exports = {
           to: `${dist}/min/mediapipe/wasm`,
         },
         // copying all static resources (audio, images, fonts...)
-        {from: path.resolve(ROOT_PATH, 'resource'), to: dist},
+        {from: path.resolve(__dirname, 'resource'), to: dist},
         {from: path.resolve(__dirname, 'assets'), to: `${dist}/assets`},
         {from: path.resolve(SRC_PATH, 'page/basicBrowserFeatureCheck.js'), to: `${dist}/min/`},
         {from: path.resolve(SRC_PATH, 'page/loader.js'), to: `${dist}/min/`},
@@ -215,7 +215,7 @@ module.exports = {
       Hooks: path.resolve(srcScript, 'hooks'),
       Repositories: path.resolve(srcScript, 'repositories'),
       I18n: path.resolve(SRC_PATH, 'i18n'),
-      Resource: path.resolve(ROOT_PATH, 'resource'),
+      Resource: path.resolve(__dirname, 'resource'),
       Util: path.resolve(srcScript, 'util'),
       src: path.resolve(__dirname, 'src'),
       test: path.resolve(__dirname, 'test'),
