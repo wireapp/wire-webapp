@@ -124,7 +124,7 @@
     "babel-loader": "10.0.0",
     "babel-plugin-transform-import-meta": "2.3.3",
     "baseline-browser-mapping": "^2.8.32",
-    "browserslist": "^4.28.0",
+    "browserslist": "^4.28.1",
     "cross-env": "7.0.3",
     "css-loader": "7.1.2",
     "cssnano": "7.1.2",
