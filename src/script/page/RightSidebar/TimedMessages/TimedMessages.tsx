@@ -66,7 +66,7 @@ const TimedMessages: FC<TimedMessagesPanelProps> = ({
   useEffect(() => {
     const messageTimer = isSelfDeletingMessagesEnforced
       ? getEnforcedSelfDeletingMessagesTimeout
-      : globalMessageTimer ?? 0;
+      : (globalMessageTimer ?? 0);
     setCurrentMessageTimer(messageTimer);
 
     const mappedTimes = EphemeralTimings.VALUES.map(time => ({
