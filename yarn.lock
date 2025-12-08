@@ -7121,14 +7121,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@wireapp/promise-queue@npm:2.4.9":
-  version: 2.4.9
-  resolution: "@wireapp/promise-queue@npm:2.4.9"
-  checksum: 10/0c056306b037bcf692f380a2fd34cc372596341c971c1ca494c36a5f54bf8312fc24f9392c40965c07ecc2b122903e8bcf261a8f51052f446740a7cf47c28a86
-  languageName: node
-  linkType: hard
-
-"@wireapp/promise-queue@npm:^2.4.10":
+"@wireapp/promise-queue@npm:2.4.10, @wireapp/promise-queue@npm:^2.4.10":
   version: 2.4.10
   resolution: "@wireapp/promise-queue@npm:2.4.10"
   checksum: 10/ae3fcab34448cad870c3f9c668e654b01fdeac7d88c038c218c90f790b8236aff027f58382b71db2f792189d16394905df62d751f2e93177091dc6e178e2e869
@@ -20285,7 +20278,7 @@ __metadata:
     "@wireapp/eslint-config": "npm:3.0.7"
     "@wireapp/kalium-backup": "npm:0.0.4"
     "@wireapp/prettier-config": "npm:0.6.9"
-    "@wireapp/promise-queue": "npm:2.4.9"
+    "@wireapp/promise-queue": "npm:2.4.10"
     "@wireapp/react-ui-kit": "npm:9.69.6"
     "@wireapp/store-engine": "npm:5.1.16"
     "@wireapp/store-engine-dexie": "npm:2.1.16"
