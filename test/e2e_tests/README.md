@@ -1,6 +1,6 @@
 ## Please refer to [Playwright doc](https://playwright.dev/docs/intro) for detailed overview of the framework, troubleshooting, and best practices.
 
-# Requirements beyond the base project
+## Requirements beyond the base project
 
 Have 1Password's cli installed (op)
 
@@ -12,13 +12,22 @@ op inject -i test/e2e_tests/.env.staging.tpl -o test/e2e_tests/.env
 
 It will generate .env file with variables from 1Password
 
-# Tests
+### Running the Testservice
+
+Some of the E2E tests require a connection to a running [Testservice](https://github.com/wireapp/kalium/tree/develop/tools/testservice). The default address stored in 1Password is for an instance running on prem. If you're within the Wire VPN you can just use it.
+
+If you're not in the Wire VPN you can run it locally as a docker container:
+
+1. Start it by running `docker run -d --platform linux/amd64 -p 8080:8080 -p 8081:8081 quay.io/wire/testservice`
+2. Update the env var `TEST_SERVICE_URL` in `test/e2e_tests/.env` to point to it: `TEST_SERVICE_URL=http://localhost:8080``
+
+## Tests
 
 E2E tests can be found inside [test folder](/test/e2e_tests/). The folder contains [page objects](/test/e2e_tests/pages), [backend classes](/test/e2e_tests/backend), and [credentialsReader.ts](/test//e2e_tests/utils/credentialsReader.ts) for access 1Password credentials.
 
 [Playwright config can be found in the root folder of the repo](/playwright.config.ts)
 
-## Running the tests
+### Running the tests
 
 E2E tests can be run via
 
