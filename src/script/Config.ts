@@ -99,7 +99,7 @@ const config = {
 
   AVS_VERSION: packageJson.dependencies['@wireapp/avs'],
 
-  COUNTLY_SERVER_URL: 'http://wire.count.ly/',
+  COUNTLY_SERVER_URL: 'https://wire.count.ly/',
   GET_WIRE_URL: 'https://get.wire.com',
 } as const;
 
