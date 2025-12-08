@@ -231,8 +231,9 @@ export type CallingTimeoutEvent = ConversationEvent<
 >;
 export type FailedToAddUsersMessageEvent = ConversationEvent<CONVERSATION.FAILED_TO_ADD_USERS, AddUsersFailure[]>;
 
-export interface ErrorEvent
-  extends ConversationEvent<CONVERSATION.UNABLE_TO_DECRYPT | CONVERSATION.INCOMING_MESSAGE_TOO_BIG> {
+export interface ErrorEvent extends ConversationEvent<
+  CONVERSATION.UNABLE_TO_DECRYPT | CONVERSATION.INCOMING_MESSAGE_TOO_BIG
+> {
   error: string;
   error_code: number | string;
   id: string;

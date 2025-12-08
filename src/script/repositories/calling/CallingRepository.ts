@@ -808,7 +808,7 @@ export class CallingRepository {
             id: `${Date.now()}-${id}`,
             emoji,
             left: Math.random() * 500,
-            from: isSelf ? t('conversationYouAccusative') : senderParticipant?.user.name() ?? '',
+            from: isSelf ? t('conversationYouAccusative') : (senderParticipant?.user.name() ?? ''),
           };
         });
 

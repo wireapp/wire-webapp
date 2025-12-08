@@ -148,7 +148,7 @@ export const TitleBar = ({
 
   const showCallControls = ConversationFilter.showCallControls(conversation, hasCall);
 
-  const conversationSubtitle = is1to1 && firstUserEntity?.isFederated ? firstUserEntity?.handle ?? '' : '';
+  const conversationSubtitle = is1to1 && firstUserEntity?.isFederated ? (firstUserEntity?.handle ?? '') : '';
 
   const shortcut = Shortcut.getShortcutTooltip(ShortcutType.PEOPLE);
   const peopleTooltip = t('tooltipConversationPeople', {shortcut});
