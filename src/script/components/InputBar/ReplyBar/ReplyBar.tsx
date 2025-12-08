@@ -45,7 +45,7 @@ export const ReplyBar = ({replyMessageEntity, onCancel}: ReplyBarProps) => {
 
   const isMultipart = replyAsset?.isMultipart();
 
-  const attachmentsCount = isMultipart ? replyAsset.attachments?.()?.length ?? 0 : 0;
+  const attachmentsCount = isMultipart ? (replyAsset.attachments?.()?.length ?? 0) : 0;
 
   const attachmentsCountCopy =
     attachmentsCount === 1
