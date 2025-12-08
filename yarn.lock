@@ -8617,10 +8617,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@wireapp/promise-queue@npm:2.4.11, @wireapp/promise-queue@npm:^2.4.11":
-  version: 2.4.11
-  resolution: "@wireapp/promise-queue@npm:2.4.11"
-  checksum: 10/d4006fdfe948183d86a725292fd86129466b074bf67c76c1391806ec7ccc6e3d8ff5739340de890aa443bd7538c5d4faee1840c44d8461d907adb8bdd0d4ebcb
+"@wireapp/promise-queue@npm:2.4.10, @wireapp/promise-queue@npm:^2.4.10":
+  version: 2.4.10
+  resolution: "@wireapp/promise-queue@npm:2.4.10"
+  checksum: 10/ae3fcab34448cad870c3f9c668e654b01fdeac7d88c038c218c90f790b8236aff027f58382b71db2f792189d16394905df62d751f2e93177091dc6e178e2e869
   languageName: node
   linkType: hard
 
@@ -26798,6 +26798,13 @@ __metadata:
     "@wireapp/copy-config": "npm:2.3.4"
     "@wireapp/eslint-config": "npm:3.1.7"
     "@wireapp/prettier-config": "npm:0.6.9"
+    "@wireapp/promise-queue": "npm:2.4.10"
+    "@wireapp/react-ui-kit": "npm:9.69.6"
+    "@wireapp/store-engine": "npm:5.1.16"
+    "@wireapp/store-engine-dexie": "npm:2.1.16"
+    "@wireapp/telemetry": "npm:0.3.1"
+    "@wireapp/webapp-events": "npm:0.28.1"
+    amplify: "https://github.com/wireapp/amplify#head=master"
     archiver: "npm:7.0.1"
     autoprefixer: "npm:10.4.22"
     babel-loader: "npm:10.0.0"
