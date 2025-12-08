@@ -327,6 +327,7 @@
   "backupTryAgain": "Zkusit znovu",
   "buttonActionError": "Your answer can't be sent, please retry",
   "callAccept": "Přijmout",
+  "callChooseScreenCancel": "Close-screen sharing",
   "callChooseSharedScreen": "Vybrat obrazovku ke sdílení",
   "callChooseSharedWindow": "Choose a window to share",
   "callConversationAcceptOrDecline": "{conversationName} is calling. Press control + enter to accept the call or press control + shift + enter to decline the call.",
