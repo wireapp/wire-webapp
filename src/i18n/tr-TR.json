@@ -327,6 +327,7 @@
   "backupTryAgain": "Tekrar Deneyin",
   "buttonActionError": "Your answer can't be sent, please retry",
   "callAccept": "Kabul et",
+  "callChooseScreenCancel": "Close-screen sharing",
   "callChooseSharedScreen": "Paylaşmak için bir ekran seçin",
   "callChooseSharedWindow": "Choose a window to share",
   "callConversationAcceptOrDecline": "{conversationName} is calling. Press control + enter to accept the call or press control + shift + enter to decline the call.",

@@ -327,6 +327,7 @@
   "backupTryAgain": "Повторить попытку",
   "buttonActionError": "Ваш ответ не может быть отправлен, пожалуйста, повторите попытку",
   "callAccept": "Принять",
+  "callChooseScreenCancel": "Close-screen sharing",
   "callChooseSharedScreen": "Выберите экран для совместного использования",
   "callChooseSharedWindow": "Выберите окно для совместного использования",
   "callConversationAcceptOrDecline": "Вызывает {conversationName}. Нажмите control + enter, чтобы принять или control + shift + enter, чтобы отклонить вызов.",

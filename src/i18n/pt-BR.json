@@ -327,6 +327,7 @@
   "backupTryAgain": "Tentar novamente",
   "buttonActionError": "Sua resposta não pode ser enviada, por favor tente novamente",
   "callAccept": "Aceitar",
+  "callChooseScreenCancel": "Close-screen sharing",
   "callChooseSharedScreen": "Escolha uma tela para compartilhar",
   "callChooseSharedWindow": "Escolha uma janela para compartilhar",
   "callConversationAcceptOrDecline": "{conversationName} is calling. Press control + enter to accept the call or press control + shift + enter to decline the call.",
