@@ -31,10 +31,11 @@ async function createCustomFolder(
   conversationName: string,
   folderName: string,
 ) {
-  await pageManager.webapp.pages.conversationList().openContextMenu(conversationName);
-  await pageManager.webapp.pages.conversationList().moveConversationButton.click();
+  const pages = pageManager.webapp.pages;
+  await pages.conversationList().openContextMenu(conversationName);
+  await pages.conversationList().moveConversationButton.click();
 
-  await pageManager.webapp.pages.conversationList().createNewFolderButton.click();
+  await pages.conversationList().createNewFolderButton.click();
 
   await optionModal.modal.getByPlaceholder('Folder Name').fill(folderName);
   await optionModal.clickAction();
@@ -203,8 +204,11 @@ test.describe('Folders', () => {
 
       // Step 1: User A opens 1:1 conversation with User B
       await userAPages.conversationList().openConversation(userB.fullName);
-      // Step 2: User A moves 1:1 conversation with User B into new custom folder
-      await createCustomFolder(userAPageManagerInstance, userAModals.optionModal(), userB.fullName, '');
+      // Step 2: User A wants to move 1:1 conversation with User B into custom folder
+      await userAPages.conversationList().openContextMenu(userB.fullName);
+      await userAPages.conversationList().moveConversationButton.click();
+      await userAPages.conversationList().createNewFolderButton.click();
+
       // Step 3: 'Create Conversation Modal' should still be visible after click on create
       await expect(userAModals.optionModal().actionButton).toBeDisabled();
     },
