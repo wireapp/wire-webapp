@@ -144,7 +144,7 @@ const renderPrimaryModal = (
   secondaryAction = () => {},
   hideCloseBtn = false,
 ) => {
-  const {getByTestId, queryByTestId} = render(withTheme(<PrimaryModalComponent />));
+  const {getByTestId, queryByTestId, getByLabelText} = render(withTheme(<PrimaryModalComponent />));
   act(() => {
     PrimaryModal.show(type, {
       primaryAction: {
@@ -158,6 +158,7 @@ const renderPrimaryModal = (
       text: {
         message: 'test-message',
         title: 'test-title',
+        input: 'test-input',
       },
       hideCloseBtn,
       copyPassword: true,
@@ -172,7 +173,7 @@ const renderPrimaryModal = (
     getCloseButton: () => queryByTestId('do-close'),
     getErrorMessage: () => getByTestId('primary-modals-error-message'),
     getPasswordInput: () => getByTestId('guest-link-password'),
-    getInput: () => getByTestId('modal-input'),
+    getInput: () => getByLabelText('test-input'),
     getGeneratePasswordButton: () => getByTestId('do-generate-password'),
     getConfirmPasswordInput: () => getByTestId('guest-link-password-confirm'),
   };

@@ -37,7 +37,6 @@ export const InputForm = ({onSubmit, inputValue, inputPlaceholder, onInputChange
         ref={ref => ref?.focus()}
         maxLength={64}
         className="modal__input"
-        data-uie-name="modal-input"
         id="modal-input"
         value={inputValue}
         placeholder={inputPlaceholder}
