@@ -26,7 +26,7 @@ describe('useFileHistoryModal', () => {
     const {result} = renderHook(() => useFileHistoryModal());
 
     expect(result.current.isOpen).toBe(false);
-    expect(result.current.nodeUuid).toBeNull();
+    expect(result.current.nodeUuid).toBeUndefined();
   });
 
   it('should open modal with provided node UUID', () => {
@@ -59,7 +59,7 @@ describe('useFileHistoryModal', () => {
     });
 
     expect(result.current.isOpen).toBe(false);
-    expect(result.current.nodeUuid).toBeNull();
+    expect(result.current.nodeUuid).toBeUndefined();
   });
 
   it('should update node UUID when opening modal multiple times', () => {

@@ -52,7 +52,6 @@ export const fileHistoryHeaderTitleCss: CSSObject = {
   fontSize: '20px',
   fontWeight: 600,
   margin: 0,
-  alignSelf: 'flex-end',
 };
 
 export const fileHeaderInfoWrapperCss: CSSObject = {
