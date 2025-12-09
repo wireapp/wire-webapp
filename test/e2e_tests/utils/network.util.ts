@@ -25,7 +25,7 @@ import {PageManager} from '../pageManager';
  * @param pageManager
  */
 export const makeNetworkOffline = async (pageManager: PageManager) => {
-  const cdpSession = await pageManager.getContext().newCDPSession(await pageManager.getPage());
+  const cdpSession = await pageManager.getContext().newCDPSession(pageManager.page);
   await cdpSession.send('Network.emulateNetworkConditions', {
     offline: true,
     latency: 0,
@@ -40,7 +40,7 @@ export const makeNetworkOffline = async (pageManager: PageManager) => {
  * @param pageManager
  */
 export const makeNetworkOnline = async (pageManager: PageManager) => {
-  const cdpSession = await pageManager.getContext().newCDPSession(await pageManager.getPage());
+  const cdpSession = await pageManager.getContext().newCDPSession(pageManager.page);
   await cdpSession.send('Network.emulateNetworkConditions', {
     offline: false,
     latency: 0,

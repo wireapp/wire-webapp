@@ -43,7 +43,7 @@ let member2Context: BrowserContext | undefined;
 test(
   'Team owner adds whole team to an all team chat',
   {tag: ['@TC-8631', '@crit-flow-web']},
-  async ({pageManager, api, browser}) => {
+  async ({page, pageManager, api, browser}) => {
     const {pages, modals} = pageManager.webapp;
 
     // Create page managers for members that will be reused across steps
@@ -92,7 +92,6 @@ test(
       await pages.conversationDetails().clickAddPeopleButton();
       await pages.conversationDetails().addServiceToConversation('Poll');
       // Verify service was added by checking for system message
-      const page = await pageManager.getPage();
       await expect(page.getByText('You added Poll Bot to the')).toBeVisible();
     });
 
