@@ -30,11 +30,10 @@ const conversationName = 'Crits';
 test(
   'Team owner adds whole team to an all team chat',
   {tag: ['@TC-8631', '@crit-flow-web']},
-  async ({createTeam, createPage, api}) => {
-    let owner: User;
-    let member1: User;
-    let member2: User;
-    let ownerPageManager: PageManager;
+  async ({page, pageManager, api, browser}) => {
+    const {pages, modals} = pageManager.webapp;
+
+    // Create page managers for members that will be reused across steps
     let member1PageManager: PageManager;
     let member2PageManager: PageManager;
 
@@ -72,7 +71,7 @@ test(
       await pages.conversationDetails().clickAddPeopleButton();
       await pages.conversationDetails().addServiceToConversation('Poll');
       // Verify service was added by checking for system message
-      await expect(ownerPageManager.page.getByText('You added Poll Bot to the')).toBeVisible();
+      await expect(page.getByText('You added Poll Bot to the')).toBeVisible();
     });
 
     await test.step('All group participants send messages in a group', async () => {

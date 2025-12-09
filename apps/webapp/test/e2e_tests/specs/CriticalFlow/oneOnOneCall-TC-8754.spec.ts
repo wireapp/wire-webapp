@@ -72,7 +72,7 @@ test(
       await ownerAModals.userProfile().clickConnectButton();
 
       expect(await ownerAPages.conversationList().isConversationItemVisible(ownerB.fullName));
-      await expect(await ownerBPageManager.getPage()).toHaveTitle('(1) Wire');
+      await expect(ownerBPage).toHaveTitle('(1) Wire');
 
       await ownerBPages.conversationList().openPendingConnectionRequest();
       await ownerBPages.connectRequest().clickConnectButton();

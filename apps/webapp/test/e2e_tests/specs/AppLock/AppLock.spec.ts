@@ -41,9 +41,8 @@ test.describe('AppLock', () => {
   test(
     'I want to see app lock setup modal on login after app lock has been enforced for the team',
     {tag: ['@TC-2744', '@TC-2740', '@regression']},
-    async ({createPage}) => {
-      const page = await createPage(withLogin(memberA));
-      const {modals} = PageManager.from(page).webapp;
+    async ({page, pageManager}) => {
+      const {modals} = pageManager.webapp;
 
       await expect(modals.appLock().appLockModal).toBeVisible();
 
@@ -59,9 +58,7 @@ test.describe('AppLock', () => {
   test(
     'Web: App should not lock if I switch back to webapp tab in time (during inactivity timeout)',
     {tag: ['@TC-2752', '@TC-2753', '@regression']},
-    async ({browser, createPage}) => {
-      const page = await createPage(withLogin(memberA));
-      const pageManager = PageManager.from(page);
+    async ({page: webappPageA, pageManager, browser}) => {
       const {modals} = pageManager.webapp;
 
       await handleAppLockState(pageManager, appLockPassCode);
@@ -86,9 +83,7 @@ test.describe('AppLock', () => {
   test(
     'Web: I want to unlock the app with passphrase after login',
     {tag: ['@TC-2754', '@TC-2755', '@TC-2758', '@TC-2763', '@regression']},
-    async ({createPage}) => {
-      const page = await createPage(withLogin(memberA));
-      const pageManager = PageManager.from(page);
+    async ({page, pageManager}) => {
       const {modals, pages} = pageManager.webapp;
 
       await test.step('Web: I want the app to automatically lock after refreshing the page', async () => {
@@ -124,9 +119,7 @@ test.describe('AppLock', () => {
   test(
     'I should not be able to switch off app lock if it is enforced for the team',
     {tag: ['@TC-2770', '@TC-2767', '@regression']},
-    async ({createPage}) => {
-      const page = await createPage(withLogin(memberA));
-      const pageManager = PageManager.from(page);
+    async ({page, pageManager}) => {
       const {components, pages} = pageManager.webapp;
       await handleAppLockState(pageManager, appLockPassCode);
       await components.conversationSidebar().clickPreferencesButton();
