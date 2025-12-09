@@ -32,6 +32,7 @@ import {ChooseScreen} from 'Components/calling/ChooseScreen';
 import {ConfigToolbar} from 'Components/ConfigToolbar/ConfigToolbar';
 import {ErrorFallback} from 'Components/ErrorFallback';
 import {CreateConversationModal} from 'Components/Modals/CreateConversation/CreateConversaionModal';
+import {FileHistoryModal} from 'Components/Modals/FileHistoryModal/FileHistoryModal';
 import {GroupCreationModal} from 'Components/Modals/GroupCreation/GroupCreationModal';
 import {LegalHoldModal} from 'Components/Modals/LegalHoldModal/LegalHoldModal';
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
@@ -361,6 +362,7 @@ export const AppMain = ({
           <UserModal selfUser={selfUser} userRepository={repositories.user} />
           <GroupCreationModal userState={userState} teamState={teamState} />
           <CreateConversationModal />
+          <FileHistoryModal />
           <TeamCreationModalContainer
             selfUser={selfUser}
             teamRepository={repositories.team}

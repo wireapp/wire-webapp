@@ -29,6 +29,7 @@ import {
   isInRecycleBin,
   isRootRecycleBinPath,
 } from 'Components/Conversation/ConversationCells/common/recycleBin/recycleBin';
+import {useFileHistoryModal} from 'Components/Modals/FileHistoryModal/hooks/useFileHistoryModal';
 import {CellsRepository} from 'Repositories/cells/CellsRepository';
 import {CellNode, CellNodeType} from 'src/script/types/cellNode';
 import {isFileEditable} from 'Util/FileTypeUtil';
@@ -95,6 +96,7 @@ const CellsTableRowOptionsContent = ({
   const [isMoveNodeModalOpen, setIsMoveNodeModalOpen] = useState(false);
   const [isTagsModalOpen, setIsTagsModalOpen] = useState(false);
   const [isRenameNodeModalOpen, setIsRenameNodeModalOpen] = useState(false);
+  const {showModal} = useFileHistoryModal();
 
   const url = node.url;
   const name = node.type === CellNodeType.FOLDER ? `${node.name}.zip` : node.name;
@@ -172,6 +174,7 @@ const CellsTableRowOptionsContent = ({
         >
           {t('cells.options.open')}
         </DropdownMenu.Item>
+        <DropdownMenu.Item onClick={() => showModal(node.id)}>{t('cells.options.versionHistory')}</DropdownMenu.Item>
         <DropdownMenu.Item
           onClick={() =>
             showShareModal({

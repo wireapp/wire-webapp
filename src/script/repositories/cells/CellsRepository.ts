@@ -156,6 +156,10 @@ export class CellsRepository {
     return this.apiClient.api.cells.getNode({id: uuid, flags});
   }
 
+  async getNodeVersions({uuid, flags}: {uuid: string; flags?: NodeFlags[]}) {
+    return this.apiClient.api.cells.getNodeVersions({uuid, flags});
+  }
+
   async lookupNodeByPath({path}: {path: string}) {
     return this.apiClient.api.cells.lookupNodeByPath({path});
   }
