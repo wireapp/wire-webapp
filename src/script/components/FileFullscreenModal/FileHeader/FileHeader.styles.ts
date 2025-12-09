@@ -87,6 +87,7 @@ export const actionButtonsStyles: CSSObject = {
   justifyContent: 'center',
   flexShrink: '0',
   marginInline: '8px',
+  gap: '8px',
 };
 
 export const downloadButtonStyles: CSSObject = {
@@ -122,4 +123,8 @@ export const editModeButtonStyles: CSSObject = {
       transition: 'color 0.3s ease-in-out',
     },
   },
+};
+
+export const restoreIconCss: CSSObject = {
+  transform: 'scaleY(-1) rotate(180deg)',
 };

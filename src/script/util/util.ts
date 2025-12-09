@@ -143,6 +143,11 @@ export const getFileExtension = (filename: string): string => {
   return foundExtension || '';
 };
 
+export const getName = (nodePath: string): string => {
+  const parts = nodePath.split('/');
+  return parts[parts.length - 1];
+};
+
 export const getFileExtensionFromUrl = (url: string): string => {
   const cleanUrl = url.split(/[?#]/)[0];
   return getFileExtension(cleanUrl);

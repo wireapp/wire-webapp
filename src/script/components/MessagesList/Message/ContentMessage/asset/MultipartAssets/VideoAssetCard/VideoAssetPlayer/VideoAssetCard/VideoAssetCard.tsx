@@ -51,7 +51,7 @@ export const VideoAssetCard = forwardRef<HTMLDivElement, VideoAssetCardProps>(
           <FileCard.Icon type={isError ? 'unavailable' : 'file'} />
           {!isError && <FileCard.Type />}
           <FileCard.Name variant={isError ? 'secondary' : 'primary'} />
-          <FileAssetOptions src={src} name={name} extension={extension} onOpen={() => setIsOpen(true)} />
+          <FileAssetOptions id={id} src={src} name={name} extension={extension} onOpen={() => setIsOpen(true)} />
         </FileCard.Header>
         <FileCard.Content>
           <div ref={ref} css={contentWrapperStyles}>
