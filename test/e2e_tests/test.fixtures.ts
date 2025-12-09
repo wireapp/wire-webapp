@@ -21,7 +21,7 @@ import {test as baseTest, type BrowserContext, type Page} from '@playwright/test
 
 import {ApiManagerE2E} from './backend/apiManager.e2e';
 import {getUser, User} from './data/user';
-import {PageManager} from './pageManager';
+import {PageManager, webAppPath} from './pageManager';
 import {connectWithUser, sendConnectionRequest} from './utils/userActions';
 
 type PagePlugin = (page: Page) => void | Promise<void>;
@@ -144,11 +144,21 @@ export const test = baseTest.extend<Fixtures>({
 
 /** PagePlugin to log in as the given user */
 export const withLogin =
-  (user: User | Promise<User>): PagePlugin =>
+  (user: User | Promise<User>, options?: {confirmNewHistory?: boolean}): PagePlugin =>
   async page => {
     const pageManager = PageManager.from(page);
     await pageManager.openLoginPage();
     await pageManager.webapp.pages.login().login(await user);
+
+    if (options?.confirmNewHistory) {
+      await pageManager.webapp.pages.historyInfo().clickConfirmButton();
+    }
+
+    /**
+     * Since the login may take up to 40s we manually wait for it to finish here instead of increasing the timeout on all actions / assertions after this util
+     * This is an exception to the general best practice of using playwrights web assertions. (See: https://playwright.dev/docs/best-practices#use-web-first-assertions)
+     */
+    await page.waitForURL(new RegExp(`^${webAppPath}$`), {timeout: 40_000, waitUntil: 'networkidle'});
   };
 
 /**

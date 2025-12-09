@@ -21,8 +21,6 @@ import type {Page, Locator} from '@playwright/test';
 
 import type {User} from 'test/e2e_tests/data/user';
 
-import {webAppPath} from '../..';
-
 export class LoginPage {
   readonly page: Page;
 
@@ -46,11 +44,5 @@ export class LoginPage {
     await this.emailInput.fill(user.email);
     await this.passwordInput.fill(user.password);
     await this.signInButton.click();
-
-    /**
-     * Since the login may take up to 40s we manually wait for it to finish here instead of increasing the timeout on all actions / assertions after this util
-     * This is an exception to the general best practice of using playwrights web assertions. (See: https://playwright.dev/docs/best-practices#use-web-first-assertions)
-     */
-    await this.page.waitForURL(new RegExp(`^${webAppPath}$`), {timeout: 40_000, waitUntil: 'networkidle'});
   }
 }
