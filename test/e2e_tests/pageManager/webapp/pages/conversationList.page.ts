@@ -37,6 +37,9 @@ export class ConversationListPage {
   readonly unarchiveConversationMenuButton: Locator;
   readonly blockedChip: Locator;
   readonly unblockConversationMenuButton: Locator;
+  readonly moveConversationButton: Locator;
+  readonly moveToMenu: Locator;
+  readonly createNewFolderButton: Locator;
 
   constructor(page: Page) {
     this.page = page;
@@ -58,6 +61,11 @@ export class ConversationListPage {
     this.unblockConversationMenuButton = page.locator(
       `${selectById('btn-unblock')}${selectByDataAttribute('conversation-list-options-menu')}`,
     );
+    this.moveConversationButton = page.locator(selectById('btn-move-to'));
+    this.moveToMenu = page.locator('ul.ctx-menu', {
+      has: page.locator(selectById('btn-create-new-folder')),
+    });
+    this.createNewFolderButton = this.moveToMenu.locator(selectById('btn-create-new-folder'));
   }
 
   async isConversationItemVisible(conversationName: string) {
@@ -138,5 +146,13 @@ export class ConversationListPage {
 
   async clickUnblockConversation() {
     await this.unblockConversationMenuButton.click();
+  }
+
+  getRemoveConversationFromFolderButton(folderName: string) {
+    return this.page.getByRole('button', {name: `Remove from "${folderName}"`});
+  }
+
+  getMoveToFolderButton(folderName: string) {
+    return this.moveToMenu.getByRole('button', {name: folderName, exact: true});
   }
 }
