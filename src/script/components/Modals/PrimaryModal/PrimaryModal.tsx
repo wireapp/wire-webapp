@@ -143,6 +143,9 @@ export const PrimaryModalComponent: FC = () => {
     if (isConfirm) {
       return false;
     }
+    if (isInput) {
+      return !inputActionEnabled;
+    }
     return !inputActionEnabled && !actionEnabled;
   };
 

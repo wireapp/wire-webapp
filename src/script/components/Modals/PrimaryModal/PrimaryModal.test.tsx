@@ -74,6 +74,16 @@ describe('PrimaryModal', () => {
     });
   });
 
+  describe('Input', () => {
+    it('should disable the primary button while the input is empty', async () => {
+      const {getPrimaryActionButton, getInput} = renderPrimaryModal(PrimaryModalType.INPUT);
+      expect(getPrimaryActionButton()).toHaveProperty('disabled', true);
+
+      fireEvent.change(getInput(), {target: {value: 'Test'}});
+      expect(getPrimaryActionButton()).toHaveProperty('disabled', false);
+    });
+  });
+
   describe('GuestLinkPassword', () => {
     const action = jest.fn().mockImplementation();
 
@@ -134,7 +144,7 @@ const renderPrimaryModal = (
   secondaryAction = () => {},
   hideCloseBtn = false,
 ) => {
-  const {getByTestId, queryByTestId} = render(withTheme(<PrimaryModalComponent />));
+  const {getByTestId, queryByTestId, getByLabelText} = render(withTheme(<PrimaryModalComponent />));
   act(() => {
     PrimaryModal.show(type, {
       primaryAction: {
@@ -148,6 +158,7 @@ const renderPrimaryModal = (
       text: {
         message: 'test-message',
         title: 'test-title',
+        input: 'test-input',
       },
       hideCloseBtn,
       copyPassword: true,
@@ -162,6 +173,7 @@ const renderPrimaryModal = (
     getCloseButton: () => queryByTestId('do-close'),
     getErrorMessage: () => getByTestId('primary-modals-error-message'),
     getPasswordInput: () => getByTestId('guest-link-password'),
+    getInput: () => getByLabelText('test-input'),
     getGeneratePasswordButton: () => getByTestId('do-generate-password'),
     getConfirmPasswordInput: () => getByTestId('guest-link-password-confirm'),
   };
