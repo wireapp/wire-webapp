@@ -174,7 +174,6 @@ const CellsTableRowOptionsContent = ({
         >
           {t('cells.options.open')}
         </DropdownMenu.Item>
-        <DropdownMenu.Item onClick={() => showModal(node.id)}>{t('cells.options.versionHistory')}</DropdownMenu.Item>
         <DropdownMenu.Item
           onClick={() =>
             showShareModal({
@@ -199,7 +198,12 @@ const CellsTableRowOptionsContent = ({
         <DropdownMenu.Item onClick={() => setIsMoveNodeModalOpen(true)}>{t('cells.options.move')}</DropdownMenu.Item>
         <DropdownMenu.Item onClick={() => setIsTagsModalOpen(true)}>{t('cells.options.tags')}</DropdownMenu.Item>
         {isEditable && (
-          <DropdownMenu.Item onClick={() => handleOpenFile(node, true)}>{t('cells.options.edit')}</DropdownMenu.Item>
+          <>
+            <DropdownMenu.Item onClick={() => handleOpenFile(node, true)}>{t('cells.options.edit')}</DropdownMenu.Item>
+            <DropdownMenu.Item onClick={() => showModal(node.id, () => handleOpenFile(node, false))}>
+              {t('cells.options.versionHistory')}
+            </DropdownMenu.Item>
+          </>
         )}
         <DropdownMenu.Item
           onClick={() =>

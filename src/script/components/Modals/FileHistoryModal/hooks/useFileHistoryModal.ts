@@ -25,7 +25,8 @@ import {create} from 'zustand';
 type FileHistoryModalState = {
   isOpen: boolean;
   nodeUuid?: string;
-  showModal: (nodeUuid: string) => void;
+  onRestore?: () => void;
+  showModal: (nodeUuid: string, onRestore?: () => void) => void;
   hideModal: () => void;
 };
 
@@ -35,6 +36,7 @@ type FileHistoryModalState = {
 const initialState: Omit<FileHistoryModalState, 'showModal' | 'hideModal'> = {
   isOpen: false,
   nodeUuid: undefined,
+  onRestore: undefined,
 };
 
 /**
@@ -42,10 +44,11 @@ const initialState: Omit<FileHistoryModalState, 'showModal' | 'hideModal'> = {
  */
 export const useFileHistoryModal = create<FileHistoryModalState>(set => ({
   ...initialState,
-  showModal: (nodeUuid: string) =>
+  showModal: (nodeUuid: string, onRestore?: () => void) =>
     set({
       isOpen: true,
       nodeUuid,
+      onRestore,
     }),
-  hideModal: () => set({...initialState}),
+  hideModal: () => set(() => ({...initialState})),
 }));

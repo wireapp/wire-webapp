@@ -30,7 +30,7 @@ import {useFileVersions} from './hooks/useFileVersions';
 import {ModalComponent} from '../ModalComponent';
 
 export const FileHistoryModal = () => {
-  const {isOpen, hideModal, nodeUuid} = useFileHistoryModal();
+  const {isOpen, hideModal, nodeUuid, onRestore} = useFileHistoryModal();
   const {
     fileVersions,
     isLoading,
@@ -39,7 +39,7 @@ export const FileHistoryModal = () => {
     toBeRestoredVersionId,
     setToBeRestoredVersionId,
     handleRestore,
-  } = useFileVersions(nodeUuid, hideModal);
+  } = useFileVersions(nodeUuid, hideModal, onRestore);
 
   return (
     <ModalComponent

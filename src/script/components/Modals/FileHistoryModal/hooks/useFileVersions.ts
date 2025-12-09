@@ -31,7 +31,7 @@ import {groupVersionsByDate} from '../utils/fileVersionUtils';
 /**
  * Hook to fetch and manage file versions for a given node UUID.
  */
-export const useFileVersions = (nodeUuid?: string, onRestore?: () => void) => {
+export const useFileVersions = (nodeUuid?: string, onClose?: () => void, onRestore?: () => void) => {
   const [fileInfo, setFileInfo] = useState<FileInfo>();
   const [fileVersions, setFileVersions] = useState<Record<string, FileVersion[]>>({});
   const [isLoading, setIsLoading] = useState(false);
@@ -92,8 +92,9 @@ export const useFileVersions = (nodeUuid?: string, onRestore?: () => void) => {
     setIsLoading(false);
     setError(undefined);
     setToBeRestoredVersionId(undefined);
+    onClose?.();
     onRestore?.();
-  }, [onRestore]);
+  }, [onClose, onRestore]);
 
   const handleDownload = useCallback(
     async (url: string) => {

@@ -20,6 +20,7 @@
 import React, {useEffect, useId, useRef, useState, useCallback, HTMLProps} from 'react';
 
 import {CSSObject} from '@emotion/react';
+import {createPortal} from 'react-dom';
 
 import {TabIndex} from '@wireapp/react-ui-kit';
 
@@ -105,33 +106,38 @@ const ModalComponent = ({
   }
 
   return (
-    // eslint-disable-next-line jsx-a11y/click-events-have-key-events,jsx-a11y/no-noninteractive-element-interactions
-    <div
-      role="dialog"
-      aria-modal="true"
-      onClick={onBgClick}
-      id={id}
-      css={hasVisibleClass ? ModalOverlayVisibleStyles : ModalOverlayStyles}
-      style={{display: 'flex'}}
-      tabIndex={TabIndex.FOCUSABLE}
-      className={className}
-      {...rest}
-    >
-      {showLoading ? (
-        <LoadingIcon width="48" height="48" css={{path: {fill: 'var(--modal-bg)'}}} />
-      ) : (
+    <>
+      {createPortal(
+        // eslint-disable-next-line jsx-a11y/click-events-have-key-events,jsx-a11y/no-noninteractive-element-interactions
         <div
-          id={trapId}
-          onClick={event => event.stopPropagation()}
-          role="button"
-          tabIndex={TabIndex.UNFOCUSABLE}
-          onKeyDown={event => (onKeyDown ? onKeyDown(event) : event.stopPropagation())}
-          css={{...(hasVisibleClass ? ModalContentVisibleStyles : ModalContentStyles), ...wrapperCSS}}
+          role="dialog"
+          aria-modal="true"
+          onClick={onBgClick}
+          id={id}
+          css={hasVisibleClass ? ModalOverlayVisibleStyles : ModalOverlayStyles}
+          style={{display: 'flex'}}
+          tabIndex={TabIndex.FOCUSABLE}
+          className={className}
+          {...rest}
         >
-          {hasVisibleClass ? children : null}
-        </div>
+          {showLoading ? (
+            <LoadingIcon width="48" height="48" css={{path: {fill: 'var(--modal-bg)'}}} />
+          ) : (
+            <div
+              id={trapId}
+              onClick={event => event.stopPropagation()}
+              role="button"
+              tabIndex={TabIndex.UNFOCUSABLE}
+              onKeyDown={event => (onKeyDown ? onKeyDown(event) : event.stopPropagation())}
+              css={{...(hasVisibleClass ? ModalContentVisibleStyles : ModalContentStyles), ...wrapperCSS}}
+            >
+              {hasVisibleClass ? children : null}
+            </div>
+          )}
+        </div>,
+        document.body,
       )}
-    </div>
+    </>
   );
 };
 

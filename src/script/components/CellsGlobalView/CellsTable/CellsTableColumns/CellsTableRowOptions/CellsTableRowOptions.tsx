@@ -20,6 +20,7 @@
 import {DropdownMenu, MoreIcon} from '@wireapp/react-ui-kit';
 
 import {openFolder} from 'Components/CellsGlobalView/common/openFolder/openFolder';
+import {useFileHistoryModal} from 'Components/Modals/FileHistoryModal/hooks/useFileHistoryModal';
 import {CellsRepository} from 'Repositories/cells/CellsRepository';
 import {CellNode, CellNodeType} from 'src/script/types/cellNode';
 import {isFileEditable} from 'Util/FileTypeUtil';
@@ -39,6 +40,7 @@ interface CellsTableRowOptionsProps {
 
 export const CellsTableRowOptions = ({node, cellsRepository}: CellsTableRowOptionsProps) => {
   const {handleOpenFile} = useCellsFilePreviewModal();
+  const {showModal} = useFileHistoryModal();
 
   const url = node.url;
   const name = node.type === CellNodeType.FOLDER ? `${node.name}.zip` : node.name;
@@ -62,7 +64,12 @@ export const CellsTableRowOptions = ({node, cellsRepository}: CellsTableRowOptio
           {t('cells.options.share')}
         </DropdownMenu.Item>
         {isEditable && (
-          <DropdownMenu.Item onClick={() => handleOpenFile(node, true)}>{t('cells.options.edit')}</DropdownMenu.Item>
+          <>
+            <DropdownMenu.Item onClick={() => handleOpenFile(node, true)}>{t('cells.options.edit')}</DropdownMenu.Item>
+            <DropdownMenu.Item onClick={() => showModal(node.id, () => handleOpenFile(node, false))}>
+              {t('cells.options.versionHistory')}
+            </DropdownMenu.Item>
+          </>
         )}
         {!!url && (
           <DropdownMenu.Item
