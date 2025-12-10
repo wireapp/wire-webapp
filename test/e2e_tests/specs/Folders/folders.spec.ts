@@ -31,8 +31,7 @@ import {createGroup} from '../../utils/userActions';
  * @param folderName Name of the new folder to create
  */
 async function createCustomFolder(pageManager: PageManager, conversationName: string, folderName: string) {
-  const pages = pageManager.webapp.pages;
-  const modals = pageManager.webapp.modals;
+  const {pages, modals} = pageManager.webapp;
   await pages.conversationList().openContextMenu(conversationName);
   await pages.conversationList().moveConversationButton.click();
 
@@ -207,6 +206,7 @@ test.describe('Folders', () => {
     // Step 2: User A tries to move conversation with User B back into the folder, custom folder name should no longer be visible in the folder menu
     await userAPages.conversationList().openConversation(userB.fullName);
     await userAPages.conversationList().openContextMenu(userB.fullName);
+    await userAPages.conversationList().moveConversationButton.click();
     await expect(userAPages.conversationList().getMoveToFolderButton(customFolderName)).not.toBeVisible();
   });
 });
