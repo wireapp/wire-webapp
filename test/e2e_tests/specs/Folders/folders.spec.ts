@@ -53,68 +53,54 @@ async function moveConversationToFolder(pageManager: PageManager, conversationNa
 test.describe('Folders', () => {
   let userA: User;
   let userB: User;
+  let userAPageManagerInstance: PageManager;
+  let userAPageManager: PageManager['webapp'];
 
-  test.beforeEach(async ({createTeam}) => {
+  test.beforeEach(async ({createTeam, createPage}) => {
     const team = await createTeam('Team', {withMembers: 1});
     userA = team.owner;
     userB = team.members[0];
+    userAPageManagerInstance = await PageManager.from(createPage(withLogin(userA), withConnectedUser(userB)));
+    userAPageManager = userAPageManagerInstance.webapp;
   });
 
-  test(
-    'I want to move a 1:1 conversation to a new custom folder',
-    {tag: ['@TC-545', '@regression']},
-    async ({createPage}) => {
-      const userAPageManagerInstance = await PageManager.from(createPage(withLogin(userA), withConnectedUser(userB)));
-      const userAPageManager = userAPageManagerInstance.webapp;
-      const {pages: userAPages, modals: userAModals} = userAPageManager;
+  test('I want to move a 1:1 conversation to a new custom folder', {tag: ['@TC-545', '@regression']}, async () => {
+    const {pages: userAPages, modals: userAModals} = userAPageManager;
 
-      const customFolderName = 'Custom-Folder';
+    const customFolderName = 'Custom-Folder';
 
-      // Step 1: User A opens 1:1 conversation with User B
-      await userAPages.conversationList().openConversation(userB.fullName);
-      // Step 2: User A moves 1:1 conversation with User B into new custom folder
-      await createCustomFolder(userAPageManagerInstance, userAModals.optionModal(), userB.fullName, customFolderName);
-      // Step 3: 1:1 conversation with User B is in the custom folder
-      const actualTitle = userAPages
-        .conversationList()
-        .page.locator('[data-uie-name="conversation-list-header-title"]');
+    // Step 1: User A opens 1:1 conversation with User B
+    await userAPages.conversationList().openConversation(userB.fullName);
+    // Step 2: User A moves 1:1 conversation with User B into new custom folder
+    await createCustomFolder(userAPageManagerInstance, userAModals.optionModal(), userB.fullName, customFolderName);
+    // Step 3: 1:1 conversation with User B is in the custom folder
+    const actualTitle = userAPages.conversationList().page.locator('[data-uie-name="conversation-list-header-title"]');
 
-      await expect(actualTitle).toHaveText(customFolderName);
-    },
-  );
+    await expect(actualTitle).toHaveText(customFolderName);
+  });
 
-  test(
-    'I want to move a group conversation to a new custom folder',
-    {tag: ['@TC-546', '@regression']},
-    async ({createPage}) => {
-      const userAPageManagerInstance = await PageManager.from(createPage(withLogin(userA), withConnectedUser(userB)));
-      const userAPageManager = userAPageManagerInstance.webapp;
-      const {pages: userAPages, modals: userAModals} = userAPageManager;
+  test('I want to move a group conversation to a new custom folder', {tag: ['@TC-546', '@regression']}, async () => {
+    const {pages: userAPages, modals: userAModals} = userAPageManager;
 
-      const customFolderName = 'Custom-Folder';
-      const conversationName = 'Group Conversation with User A and User B';
+    const customFolderName = 'Custom-Folder';
+    const conversationName = 'Group Conversation with User A and User B';
 
-      await createGroup(userAPages, conversationName, [userB]);
+    await createGroup(userAPages, conversationName, [userB]);
 
-      // Step 1: User A opens group conversation with User B
-      await userAPages.conversationList().openConversation(conversationName);
-      // Step 2: User A moves group conversation with User B in new custom folder
-      await createCustomFolder(userAPageManagerInstance, userAModals.optionModal(), conversationName, customFolderName);
-      // Step 3: Group conversation with User B is in the custom folder
-      const actualTitle = userAPages
-        .conversationList()
-        .page.locator('[data-uie-name="conversation-list-header-title"]');
+    // Step 1: User A opens group conversation with User B
+    await userAPages.conversationList().openConversation(conversationName);
+    // Step 2: User A moves group conversation with User B in new custom folder
+    await createCustomFolder(userAPageManagerInstance, userAModals.optionModal(), conversationName, customFolderName);
+    // Step 3: Group conversation with User B is in the custom folder
+    const actualTitle = userAPages.conversationList().page.locator('[data-uie-name="conversation-list-header-title"]');
 
-      await expect(actualTitle).toHaveText(customFolderName);
-    },
-  );
+    await expect(actualTitle).toHaveText(customFolderName);
+  });
 
   test(
     'I want to move a 1:1 conversation to an existing custom folder',
     {tag: ['@TC-547', '@regression']},
-    async ({createPage}) => {
-      const userAPageManagerInstance = await PageManager.from(createPage(withLogin(userA), withConnectedUser(userB)));
-      const userAPageManager = userAPageManagerInstance.webapp;
+    async () => {
       const {pages: userAPages, modals: userAModals, components: userAComponents} = userAPageManager;
 
       const customFolderName = 'Custom-Folder';
@@ -140,9 +126,7 @@ test.describe('Folders', () => {
   test(
     'I want to move a group conversation to an existing custom folder',
     {tag: ['@TC-548', '@regression']},
-    async ({createPage}) => {
-      const userAPageManagerInstance = await PageManager.from(createPage(withLogin(userA), withConnectedUser(userB)));
-      const userAPageManager = userAPageManagerInstance.webapp;
+    async () => {
       const {pages: userAPages, modals: userAModals, components: userAComponents} = userAPageManager;
 
       const customFolderName = 'Custom-Folder';
@@ -169,9 +153,7 @@ test.describe('Folders', () => {
   test.skip(
     'I want to see custom folder removed when last conversation is removed',
     {tag: ['@TC-553', '@regression']},
-    async ({createPage}) => {
-      const userAPageManagerInstance = await PageManager.from(createPage(withLogin(userA), withConnectedUser(userB)));
-      const userAPageManager = userAPageManagerInstance.webapp;
+    async () => {
       const {pages: userAPages, modals: userAModals} = userAPageManager;
 
       const customFolderName = 'Custom-Folder';
@@ -194,49 +176,37 @@ test.describe('Folders', () => {
     },
   );
 
-  test(
-    'I should not be able to create a custom folder without a name',
-    {tag: ['@TC-560', '@regression']},
-    async ({createPage}) => {
-      const userAPageManagerInstance = await PageManager.from(createPage(withLogin(userA), withConnectedUser(userB)));
-      const userAPageManager = userAPageManagerInstance.webapp;
-      const {pages: userAPages, modals: userAModals} = userAPageManager;
+  test('I should not be able to create a custom folder without a name', {tag: ['@TC-560', '@regression']}, async () => {
+    const {pages: userAPages, modals: userAModals} = userAPageManager;
 
-      // Step 1: User A opens 1:1 conversation with User B
-      await userAPages.conversationList().openConversation(userB.fullName);
-      // Step 2: User A wants to move 1:1 conversation with User B into custom folder
-      await userAPages.conversationList().openContextMenu(userB.fullName);
-      await userAPages.conversationList().moveConversationButton.click();
-      await userAPages.conversationList().createNewFolderButton.click();
+    // Step 1: User A opens 1:1 conversation with User B
+    await userAPages.conversationList().openConversation(userB.fullName);
+    // Step 2: User A wants to move 1:1 conversation with User B into custom folder
+    await userAPages.conversationList().openContextMenu(userB.fullName);
+    await userAPages.conversationList().moveConversationButton.click();
+    await userAPages.conversationList().createNewFolderButton.click();
 
-      // Step 3: 'Create Conversation Modal' should still be visible after click on create
-      await expect(userAModals.optionModal().actionButton).toBeDisabled();
-    },
-  );
+    // Step 3: 'Create Conversation Modal' should still be visible after click on create
+    await expect(userAModals.optionModal().actionButton).toBeDisabled();
+  });
 
-  test(
-    'I should not see any traces of a deleted custom folder',
-    {tag: ['@TC-568', '@regression']},
-    async ({createPage}) => {
-      const userAPageManagerInstance = await PageManager.from(createPage(withLogin(userA), withConnectedUser(userB)));
-      const userAPageManager = userAPageManagerInstance.webapp;
-      const {pages: userAPages, modals: userAModals} = userAPageManager;
+  test('I should not see any traces of a deleted custom folder', {tag: ['@TC-568', '@regression']}, async () => {
+    const {pages: userAPages, modals: userAModals} = userAPageManager;
 
-      const customFolderName = 'Custom-Folder';
+    const customFolderName = 'Custom-Folder';
 
-      // Preconditions: Conversation is in custom folder
-      await userAPages.conversationList().openConversation(userB.fullName);
-      await createCustomFolder(userAPageManagerInstance, userAModals.optionModal(), userB.fullName, customFolderName);
+    // Preconditions: Conversation is in custom folder
+    await userAPages.conversationList().openConversation(userB.fullName);
+    await createCustomFolder(userAPageManagerInstance, userAModals.optionModal(), userB.fullName, customFolderName);
 
-      // Step 1: User A removes conversation with User B from custom folder
-      await userAPages.conversationList().openContextMenu(userB.fullName);
-      await userAPages.conversationList().getRemoveConversationFromFolderButton(customFolderName).click();
+    // Step 1: User A removes conversation with User B from custom folder
+    await userAPages.conversationList().openContextMenu(userB.fullName);
+    await userAPages.conversationList().getRemoveConversationFromFolderButton(customFolderName).click();
 
-      // Step 2: User A tries to move conversation with User B back into the folder, custom folder name should no longer be visible in the folder menu
-      await userAPages.conversationList().openConversation(userB.fullName);
+    // Step 2: User A tries to move conversation with User B back into the folder, custom folder name should no longer be visible in the folder menu
+    await userAPages.conversationList().openConversation(userB.fullName);
 
-      // Step 3: Custom Folder Name is no longer visible in the Move-To-Menu
-      await expect(userAPages.conversationList().getMoveToFolderButton(customFolderName)).not.toBeVisible();
-    },
-  );
+    // Step 3: Custom Folder Name is no longer visible in the Move-To-Menu
+    await expect(userAPages.conversationList().getMoveToFolderButton(customFolderName)).not.toBeVisible();
+  });
 });
