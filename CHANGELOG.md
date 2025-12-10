@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [27.94.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@27.93.0...@wireapp/api-client@27.94.0) (2025-12-10)
+
+### Features
+
+* update getNodeVersions, add flags param [WPB-22003] ([#7681](https://github.com/wireapp/wire-web-packages/issues/7681)) ([80e0504](https://github.com/wireapp/wire-web-packages/commit/80e05046c0a95b6b6aab8b4f9779f3b3bcb825b5))
+
 # [27.93.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@27.90.0...@wireapp/api-client@27.93.0) (2025-12-02)
 
 ### Bug Fixes
