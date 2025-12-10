@@ -33,6 +33,7 @@ export const ModalOverlayStyles: CSSObject = {
   top: 0,
   transition: 'opacity 0.15s cubic-bezier(0.165, 0.84, 0.44, 1)',
   zIndex: 10000000,
+  display: 'flex',
 };
 
 export const ModalOverlayVisibleStyles: CSSObject = {

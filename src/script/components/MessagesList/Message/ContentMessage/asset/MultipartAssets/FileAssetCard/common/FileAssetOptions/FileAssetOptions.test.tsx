@@ -38,6 +38,7 @@ describe('FileAssetOptions', () => {
     extension: 'pdf',
     onOpen: mockOnOpen,
     src: 'https://example.com/file.pdf',
+    id: 'file-id-123',
   };
 
   beforeEach(() => {

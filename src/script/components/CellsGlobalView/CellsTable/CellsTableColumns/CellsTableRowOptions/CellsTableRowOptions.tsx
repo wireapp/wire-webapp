@@ -22,7 +22,6 @@ import {DropdownMenu, MoreIcon} from '@wireapp/react-ui-kit';
 import {openFolder} from 'Components/CellsGlobalView/common/openFolder/openFolder';
 import {CellsRepository} from 'Repositories/cells/CellsRepository';
 import {CellNode, CellNodeType} from 'src/script/types/cellNode';
-import {isFileEditable} from 'Util/FileTypeUtil';
 import {t} from 'Util/LocalizerUtil';
 import {forcedDownloadFile} from 'Util/util';
 
@@ -33,7 +32,6 @@ import {showShareModal} from '../CellsShareModal/CellsShareModal';
 
 interface CellsTableRowOptionsProps {
   node: CellNode;
-
   cellsRepository: CellsRepository;
 }
 
@@ -42,7 +40,6 @@ export const CellsTableRowOptions = ({node, cellsRepository}: CellsTableRowOptio
 
   const url = node.url;
   const name = node.type === CellNodeType.FOLDER ? `${node.name}.zip` : node.name;
-  const isEditable = node.type === CellNodeType.FILE && isFileEditable(node.extension!);
 
   return (
     <DropdownMenu>
@@ -61,9 +58,6 @@ export const CellsTableRowOptions = ({node, cellsRepository}: CellsTableRowOptio
         <DropdownMenu.Item onClick={() => showShareModal({type: node.type, uuid: node.id, cellsRepository})}>
           {t('cells.options.share')}
         </DropdownMenu.Item>
-        {isEditable && (
-          <DropdownMenu.Item onClick={() => handleOpenFile(node, true)}>{t('cells.options.edit')}</DropdownMenu.Item>
-        )}
         {!!url && (
           <DropdownMenu.Item
             onClick={() =>
