@@ -19,57 +19,10 @@
 
 import {RestVersion} from 'cells-sdk-ts';
 
-import {t} from 'Util/LocalizerUtil';
-import {TIME_IN_MILLIS} from 'Util/TimeUtil';
+import {calculateDaysDifference, formatDateKey, formatTime, getDayPrefix, TIME_IN_MILLIS} from 'Util/TimeUtil';
 import {formatBytes} from 'Util/util';
 
 import {FileVersion} from '../types';
-
-/**
- * Calculate the number of days between two dates
- */
-export const calculateDaysDifference = (date1: Date, date2: Date): number => {
-  const day1 = new Date(date1.getFullYear(), date1.getMonth(), date1.getDate());
-  const day2 = new Date(date2.getFullYear(), date2.getMonth(), date2.getDate());
-  return Math.floor((day1.getTime() - day2.getTime()) / TIME_IN_MILLIS.DAY);
-};
-
-/**
- * Get the day prefix for a version based on days difference
- */
-export const getDayPrefix = (daysDiff: number, timestamp: number): string => {
-  if (daysDiff === 0) {
-    return t('fileHistoryModal.today');
-  }
-  if (daysDiff === 1) {
-    return t('fileHistoryModal.yesterday');
-  }
-  return new Intl.DateTimeFormat(navigator.language, {
-    weekday: 'long',
-  }).format(timestamp);
-};
-
-/**
- * Format a date key for grouping file versions
- */
-export const formatDateKey = (timestamp: number, dayPrefix: string): string => {
-  const formattedDate = new Intl.DateTimeFormat(navigator.language, {
-    day: 'numeric',
-    month: 'short',
-    year: 'numeric',
-  }).format(timestamp);
-  return `${dayPrefix}, ${formattedDate}`;
-};
-
-/**
- * Format time from timestamp
- */
-export const formatTime = (timestamp: number): string => {
-  return new Intl.DateTimeFormat(navigator.language, {
-    hour: 'numeric',
-    minute: '2-digit',
-  }).format(timestamp);
-};
 
 /**
  * Transform a RestVersion to FileVersion

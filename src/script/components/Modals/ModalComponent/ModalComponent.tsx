@@ -115,7 +115,6 @@ const ModalComponent = ({
           onClick={onBgClick}
           id={id}
           css={hasVisibleClass ? ModalOverlayVisibleStyles : ModalOverlayStyles}
-          style={{display: 'flex'}}
           tabIndex={TabIndex.FOCUSABLE}
           className={className}
           {...rest}

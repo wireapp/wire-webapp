@@ -52,8 +52,6 @@ export const useFileVersions = (nodeUuid?: string, onClose?: () => void, onResto
       setError(undefined);
 
       try {
-        const cellsRepository = container.resolve(CellsRepository);
-
         // Fetch the node details and versions in parallel
         const [node, versions] = await Promise.all([
           cellsRepository.getNode({uuid: nodeUuid}),
@@ -84,7 +82,7 @@ export const useFileVersions = (nodeUuid?: string, onClose?: () => void, onResto
     };
 
     void loadFileVersions();
-  }, [nodeUuid]);
+  }, [cellsRepository, nodeUuid]);
 
   const reset = useCallback(() => {
     setFileInfo(undefined);

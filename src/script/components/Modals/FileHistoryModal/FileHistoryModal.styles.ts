@@ -49,8 +49,8 @@ export const fileHistoryHeaderContainerCss: CSSObject = {
 };
 
 export const fileHistoryHeaderTitleCss: CSSObject = {
-  fontSize: '20px',
-  fontWeight: 600,
+  fontSize: 'var(--font-size-large)',
+  fontWeight: 'var(--font-weight-semibold)',
   margin: 0,
 };
 
@@ -154,8 +154,8 @@ export const versionInfoContainerCss: CSSObject = {
 };
 
 export const versionTimeTextCss: CSSObject = {
-  fontWeight: '400',
-  fontSize: '16px',
+  fontWeight: 'var(--font-weight-regular)',
+  fontSize: 'var(--font-size-base)',
   margin: 0,
 };
 

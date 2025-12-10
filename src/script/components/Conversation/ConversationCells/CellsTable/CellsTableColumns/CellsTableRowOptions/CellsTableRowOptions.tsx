@@ -17,7 +17,7 @@
  *
  */
 
-import {useState} from 'react';
+import {useCallback, useState} from 'react';
 
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 
@@ -129,6 +129,11 @@ const CellsTableRowOptionsContent = ({
 
   const isEditable = node.type === CellNodeType.FILE && isFileEditable(node.extension);
 
+  const onConfirmRestore = useCallback(() => {
+    onRefresh();
+    handleOpenFile(node, false);
+  }, [handleOpenFile, node, onRefresh]);
+
   if (isRootRecycleBin || isNestedRecycleBin) {
     return (
       <DropdownMenu.Content>
@@ -200,7 +205,7 @@ const CellsTableRowOptionsContent = ({
         {isEditable && (
           <>
             <DropdownMenu.Item onClick={() => handleOpenFile(node, true)}>{t('cells.options.edit')}</DropdownMenu.Item>
-            <DropdownMenu.Item onClick={() => showModal(node.id, () => handleOpenFile(node, false))}>
+            <DropdownMenu.Item onClick={() => showModal(node.id, onConfirmRestore)}>
               {t('cells.options.versionHistory')}
             </DropdownMenu.Item>
           </>
