@@ -36,7 +36,7 @@ jobs:
       - name: Test
         run: yarn nx run-many -t test --all -- --coverage --coverage-reporters=lcov --detectOpenHandles=false
 
-      - name: Upload webapp coverage to Codecov
+      - name: Monitor coverage
         uses: codecov/codecov-action@v5.5.2
         with:
           fail_ci_if_error: false
