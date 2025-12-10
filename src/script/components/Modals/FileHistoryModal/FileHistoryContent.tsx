@@ -32,7 +32,6 @@ export const FileHistoryContent = ({
   handleRestore,
 }: {
   fileVersions: Record<string, FileVersion[]>;
-  isLoading: boolean;
   handleDownload: (url: string) => Promise<void>;
   handleRestore: (versionId: string) => void;
 }) => {
