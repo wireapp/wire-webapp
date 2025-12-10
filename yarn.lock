@@ -8082,21 +8082,21 @@ __metadata:
   languageName: node
   linkType: hard
 
-"baseline-browser-mapping@npm:^2.8.32":
-  version: 2.8.32
-  resolution: "baseline-browser-mapping@npm:2.8.32"
-  bin:
-    baseline-browser-mapping: dist/cli.js
-  checksum: 10/d3223faeb8a5d5aa0c2aecc7ecff85e0f2452ba79f8a1ab170a828a1b0efd5eabf38a5264f8ea223cfdee526cf9df689cefbef2f4f22825fc462c37b3483c607
-  languageName: node
-  linkType: hard
-
 "baseline-browser-mapping@npm:^2.9.0":
   version: 2.9.4
   resolution: "baseline-browser-mapping@npm:2.9.4"
   bin:
     baseline-browser-mapping: dist/cli.js
   checksum: 10/71cf80f822e74e0f0109a9ed69d87fdb128d01bf06670a2ef91166a3eb636034e0a013d76cd9915a9d38594f649848c8c1ef6cbe39ed417f38314ff5bd22e393
+  languageName: node
+  linkType: hard
+
+"baseline-browser-mapping@npm:^2.9.6":
+  version: 2.9.6
+  resolution: "baseline-browser-mapping@npm:2.9.6"
+  bin:
+    baseline-browser-mapping: dist/cli.js
+  checksum: 10/f187cb6420908a4374db07b5c54116e15f7d4742f81b3f0390e0b07105ddbca23df630104d37c8d7c34ac3da9d0bf90caddbd0c943b76ef816623461269bdc96
   languageName: node
   linkType: hard
 
@@ -20288,7 +20288,7 @@ __metadata:
     autoprefixer: "npm:10.4.22"
     babel-loader: "npm:10.0.0"
     babel-plugin-transform-import-meta: "npm:2.3.3"
-    baseline-browser-mapping: "npm:^2.8.32"
+    baseline-browser-mapping: "npm:^2.9.6"
     beautiful-react-hooks: "npm:5.0.3"
     browserslist: "npm:^4.28.1"
     classnames: "npm:2.5.1"
