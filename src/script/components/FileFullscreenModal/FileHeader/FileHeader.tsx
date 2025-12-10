@@ -146,18 +146,20 @@ export const FileHeader = ({
         >
           <DownloadIcon />
         </Button>
-        <DropdownMenu>
-          <DropdownMenu.Trigger asChild>
-            <Button variant={ButtonVariant.TERTIARY} css={downloadButtonStyles} aria-label={t('cells.options.label')}>
-              <MoreIcon css={iconStyles} />
-            </Button>
-          </DropdownMenu.Trigger>
-          <DropdownMenu.Content>
-            <DropdownMenu.Item onClick={() => showModal(id, () => onFileContentRefresh())}>
-              {t('cells.options.versionHistory')}
-            </DropdownMenu.Item>
-          </DropdownMenu.Content>
-        </DropdownMenu>
+        {isEditable && (
+          <DropdownMenu>
+            <DropdownMenu.Trigger asChild>
+              <Button variant={ButtonVariant.TERTIARY} css={downloadButtonStyles} aria-label={t('cells.options.label')}>
+                <MoreIcon css={iconStyles} />
+              </Button>
+            </DropdownMenu.Trigger>
+            <DropdownMenu.Content>
+              <DropdownMenu.Item onClick={() => showModal(id, () => onFileContentRefresh())}>
+                {t('cells.options.versionHistory')}
+              </DropdownMenu.Item>
+            </DropdownMenu.Content>
+          </DropdownMenu>
+        )}
       </div>
     </header>
   );
