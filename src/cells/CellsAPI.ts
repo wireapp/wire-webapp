@@ -28,7 +28,6 @@ import {
   RestPromoteVersionResponse,
   RestPublicLinkDeleteSuccess,
   RestShareLink,
-  RestVersion,
   RestIncomingNode,
   RestNodeLocator,
   RestActionOptionsCopyMove,
@@ -39,7 +38,7 @@ import logdown from 'logdown';
 
 import {LogFactory} from '@wireapp/commons';
 
-import {Node, RestNodeSchema} from './CellsAPI.schema';
+import {Node, NodeVersions, RestNodeSchema, RestNodeVersionsSchema} from './CellsAPI.schema';
 import {CellsStorage} from './CellsStorage/CellsStorage';
 import {S3Service} from './CellsStorage/S3Service';
 
@@ -315,14 +314,20 @@ export class CellsAPI {
     return node;
   }
 
-  async getNodeVersions({uuid}: {uuid: string}): Promise<RestVersion[] | undefined> {
+  async getNodeVersions({uuid, flags}: {uuid: string; flags?: Array<GetByUuidFlagsEnum>}): Promise<NodeVersions> {
     if (!this.client || !this.storageService) {
       throw new Error(CONFIGURATION_ERROR);
     }
 
-    const result = await this.client.nodeVersions(uuid, {FilterBy: 'VersionsAll'});
+    const result = await this.client.nodeVersions(uuid, {FilterBy: 'VersionsAll', Flags: flags});
 
-    return result.data.Versions;
+    const validation = RestNodeVersionsSchema.safeParse(result.data.Versions);
+
+    if (!validation.success) {
+      this.logger.warn('Get node versions response validation failed:', validation.error);
+    }
+
+    return result.data.Versions || [];
   }
 
   async getNode({id, flags}: {id: string; flags?: Array<GetByUuidFlagsEnum>}): Promise<Node> {
