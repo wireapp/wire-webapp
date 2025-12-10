@@ -123,7 +123,7 @@ export const useFileVersions = (nodeUuid?: string, onClose?: () => void, onResto
         versionId: toBeRestoredVersionId,
       });
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Failed to restore file version';
+      const errorMessage = err instanceof Error ? err.message : t('fileHistoryModal.failedToRestore');
       setError(errorMessage);
     } finally {
       reset();
