@@ -125,6 +125,3 @@ export const editModeButtonStyles: CSSObject = {
   },
 };
 
-export const restoreIconCss: CSSObject = {
-  transform: 'scaleY(-1) rotate(180deg)',
-};
