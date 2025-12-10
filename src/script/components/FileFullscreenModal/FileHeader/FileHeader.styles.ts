@@ -87,6 +87,7 @@ export const actionButtonsStyles: CSSObject = {
   justifyContent: 'center',
   flexShrink: '0',
   marginInline: '8px',
+  gap: '8px',
 };
 
 export const downloadButtonStyles: CSSObject = {

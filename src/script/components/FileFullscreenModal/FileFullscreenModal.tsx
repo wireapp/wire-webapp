@@ -63,7 +63,12 @@ export const FileFullscreenModal = ({
   isEditMode,
 }: FileFullscreenModalProps) => {
   const [isEditableState, setIsEditableState] = useState(isEditMode);
+  const [refreshKey, setRefreshKey] = useState(0);
   const isEditable = isFileEditable(fileExtension);
+
+  const refreshModalContent = () => {
+    setRefreshKey(prev => prev + 1);
+  };
 
   const onCloseModal = () => {
     setIsEditableState(false);
@@ -88,11 +93,13 @@ export const FileFullscreenModal = ({
         onEditModeChange={setIsEditableState}
         isEditable={isEditable}
         id={id}
+        onFileContentRefresh={refreshModalContent}
       />
       {isEditableState && isEditable ? (
-        <FileEditor id={id} />
+        <FileEditor key={refreshKey} id={id} />
       ) : (
         <ModalContent
+          key={refreshKey}
           fileExtension={fileExtension}
           filePreviewUrl={filePreviewUrl}
           fileName={fileName}
