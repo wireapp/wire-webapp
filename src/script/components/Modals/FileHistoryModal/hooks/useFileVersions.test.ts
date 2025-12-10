@@ -51,7 +51,7 @@ jest.mock('Util/util', () => ({
   },
   getName: (path: string) => {
     const parts = path.split('/');
-    return parts[parts.length - 1].replace(/\.[^.]+$/, '');
+    return parts[parts.length - 1];
   },
 }));
 

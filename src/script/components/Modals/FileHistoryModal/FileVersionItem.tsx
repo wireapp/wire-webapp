@@ -51,7 +51,7 @@ interface FileVersionItemProps {
 export const FileVersionItem = ({version, isCurrentVersion, onDownload, onRestore}: FileVersionItemProps) => {
   return (
     <div key={version.versionId} css={fileVersionItemWrapperCss}>
-      <div css={isCurrentVersion ? versionDotCurrentCss : versionDotOldCss} />
+      <div css={isCurrentVersion ? versionDotCurrentCss : versionDotOldCss} aria-hidden="true" />
       <div css={versionInfoContainerCss}>
         <p css={versionTimeTextCss}>
           {version.time} {isCurrentVersion && t('cells.versionHistory.current')}

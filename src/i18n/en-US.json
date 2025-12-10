@@ -472,6 +472,7 @@
   "fileHistoryModal.yesterday": "Yesterday",
   "fileHistoryModal.failedToLoadVersions": "Failed to load versions",
   "fileHistoryModal.invalidNodeData": "Invalid file data",
+  "fileHistoryModal.failedToRestore": "Failed to restore file version",
   "cells.restore.error": "Something went wrong, please try again later and refresh the list.",
   "cells.restoreNestedNodeModal.button": "Restore Parent Folder",
   "cells.restoreNestedNodeModal.description1": "You can’t restore folders or files from a deleted folder. To reuse the desired item, you must restore its parent folder.",
