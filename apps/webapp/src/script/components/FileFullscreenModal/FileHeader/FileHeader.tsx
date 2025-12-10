@@ -19,7 +19,16 @@
 
 import {container} from 'tsyringe';
 
-import {BadgesWithTooltip, Button, ButtonVariant, CloseIcon, DownloadIcon, ShowIcon} from '@wireapp/react-ui-kit';
+import {
+  BadgesWithTooltip,
+  Button,
+  ButtonVariant,
+  CloseIcon,
+  DownloadIcon,
+  DropdownMenu,
+  MoreIcon,
+  ShowIcon,
+} from '@wireapp/react-ui-kit';
 
 import {FileTypeIcon} from 'Components/Conversation/common/FileTypeIcon/FileTypeIcon';
 import {EditIcon} from 'Components/Icon';

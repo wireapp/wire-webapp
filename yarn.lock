@@ -8425,9 +8425,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@wireapp/api-client@npm:^27.95.2":
-  version: 27.95.2
-  resolution: "@wireapp/api-client@npm:27.95.2"
+"@wireapp/api-client@npm:^27.94.0":
+  version: 27.94.0
+  resolution: "@wireapp/api-client@npm:27.94.0"
   dependencies:
     "@aws-sdk/client-s3": "npm:3.962.0"
     "@aws-sdk/lib-storage": "npm:3.962.0"
@@ -8446,7 +8446,7 @@ __metadata:
     uuid: "npm:11.1.0"
     ws: "npm:8.18.1"
     zod: "npm:3.24.2"
-  checksum: 10/bcdc64f7247bd4c06bd92d510e08077d8e0cb2b2a37ba061e7e242cd1116080c2905432baba9c8771dae89b489d9effd1617388df4a3e8fa154e44a0446ce78d
+  checksum: 10/df9b3aba04a392086f4bba64c33723ec881febb6cd05271ab1ace48a544c073ab4b2966ab6b975e91a0c11a8c6dbf732816059c3f3cc3300aa277814a4d8a283
   languageName: node
   linkType: hard
 
@@ -8499,12 +8499,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@wireapp/core@npm:46.47.3":
-  version: 46.47.3
-  resolution: "@wireapp/core@npm:46.47.3"
+"@wireapp/core@npm:46.46.9":
+  version: 46.46.9
+  resolution: "@wireapp/core@npm:46.46.9"
   dependencies:
-    "@wireapp/api-client": "npm:^27.95.2"
-    "@wireapp/commons": "npm:^5.4.11"
+    "@wireapp/api-client": "npm:^27.94.0"
+    "@wireapp/commons": "npm:^5.4.10"
     "@wireapp/core-crypto": "npm:9.1.2"
     "@wireapp/cryptobox": "npm:12.8.0"
     "@wireapp/priority-queue": "npm:^2.1.17"
@@ -8521,7 +8521,7 @@ __metadata:
     long: "npm:^5.2.0"
     uuid: "npm:9.0.1"
     zod: "npm:3.24.2"
-  checksum: 10/65309c7d1a81b6272c140aa420774d07bcd16b692cf4abb070483ba8eba09efaaef8c9c7beeafcac55feb07ff7b633dbff9159600b86387e3a56113d2a2d840d
+  checksum: 10/ee1134775d4ba837bb06b2b2faf6469fad880f3e82812ac54cb4be07afcc537a47a2675e41aae19174e83eea06255b0e0232a3fefb13b41715e22b4fb597a666
   languageName: node
   linkType: hard
 
@@ -26805,7 +26805,9 @@ __metadata:
     "@wireapp/avs-debugger": "npm:0.0.7"
     "@wireapp/commons": "npm:5.4.10"
     "@wireapp/copy-config": "npm:2.3.4"
-    "@wireapp/eslint-config": "npm:3.1.7"
+    "@wireapp/core": "npm:46.46.9"
+    "@wireapp/eslint-config": "npm:3.0.7"
+    "@wireapp/kalium-backup": "npm:0.0.4"
     "@wireapp/prettier-config": "npm:0.6.9"
     "@wireapp/promise-queue": "npm:2.4.10"
     "@wireapp/react-ui-kit": "npm:9.69.6"

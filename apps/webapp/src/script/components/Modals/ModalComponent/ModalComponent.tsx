@@ -20,6 +20,7 @@
 import React, {useEffect, useId, useRef, useState, HTMLProps} from 'react';
 
 import {CSSObject} from '@emotion/react';
+import {createPortal} from 'react-dom';
 
 import {TabIndex} from '@wireapp/react-ui-kit';
 
@@ -138,7 +139,7 @@ const ModalComponent = ({
             </div>
           )}
         </div>,
-        container || document.body,
+        document.body,
       )}
     </>
   );

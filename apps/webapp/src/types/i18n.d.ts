@@ -335,7 +335,6 @@ declare module 'I18n/en-US.json' {
     'callChooseScreenCancel': `Close-screen sharing`;
     'callChooseSharedScreen': `Choose a screen to share`;
     'callChooseSharedWindow': `Choose a window to share`;
-    'callChooseScreenCancel': `Close-screen sharing`;
     'callConversationAcceptOrDecline': `{conversationName} is calling. Press control + enter to accept the call or press control + shift + enter to decline the call.`;
     'callDecline': `Decline`;
     'callDegradationAction': `OK`;
