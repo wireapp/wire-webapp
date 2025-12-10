@@ -21,6 +21,8 @@ import {Page, Locator} from '@playwright/test';
 
 import {selectByDataAttribute} from 'test/e2e_tests/utils/selector.util';
 
+import {FullScreenCallPage} from './fullScreenCall.page';
+
 export class CallingPage {
   readonly page: Page;
 
@@ -110,6 +112,7 @@ export class CallingPage {
 
   async maximizeCell() {
     await this.goFullScreen.click();
+    return FullScreenCallPage(this.page);
   }
 
   // ─── Mute Controls ──────────────────────────────────────────────────────

@@ -62,4 +62,24 @@ test.describe('Calling', () => {
       await expect(userBPages.calling().callCell).not.toBeVisible();
     },
   );
+
+  test('Verify in call reactions', {tag: ['@TC-8774', '@regression']}, async ({createPage}) => {
+    const [userAPages, userBPages] = await Promise.all([
+      PageManager.from(createPage(withLogin(userA), withConnectedUser(userB))).then(pm => pm.webapp.pages),
+      PageManager.from(createPage(withLogin(userB))).then(pm => pm.webapp.pages),
+    ]);
+
+    await userAPages.conversationList().openConversation(userB.fullName);
+    await userAPages.conversation().clickCallButton();
+    await userBPages.calling().clickAcceptCallButton();
+
+    const [userACall, userBCall] = await Promise.all([
+      userAPages.calling().maximizeCell(),
+      userBPages.calling().maximizeCell(),
+    ]);
+
+    const reactionAssertion = expect(userBCall.getReaction({emoji: '👍', sender: userA})).toBeVisible();
+    await userACall.sendReaction('👍');
+    await reactionAssertion;
+  });
 });
