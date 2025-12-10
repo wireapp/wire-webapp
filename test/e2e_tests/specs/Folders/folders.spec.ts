@@ -25,6 +25,13 @@ import {OptionModal} from '../../pageManager/webapp/modals/option.modal';
 import {createGroup} from '../../utils/userActions';
 
 /* ===== Helper Functions ===== */
+/**
+ * Creates a custom folder and moves a conversation into it
+ * @param pageManager PageManager instance
+ * @param optionModal OptionModal instance for folder creation
+ * @param conversationName Name of the conversation to move into the folder
+ * @param folderName Name of the new folder to create
+ */
 async function createCustomFolder(
   pageManager: PageManager,
   optionModal: OptionModal,
@@ -41,6 +48,12 @@ async function createCustomFolder(
   await optionModal.clickAction();
 }
 
+/**
+ * Moves a conversation to an existing custom folder
+ * @param pageManager PageManager instance
+ * @param conversationName Name of the conversation to move into existing folder
+ * @param folderName Name of the folder to move to
+ */
 async function moveConversationToFolder(pageManager: PageManager, conversationName: string, folderName: string) {
   const pages = pageManager.webapp.pages;
   await pages.conversationList().openContextMenu(conversationName);
@@ -186,7 +199,7 @@ test.describe('Folders', () => {
     await userAPages.conversationList().moveConversationButton.click();
     await userAPages.conversationList().createNewFolderButton.click();
 
-    // Step 3: 'Create Conversation Modal' should still be visible after click on create
+    // Step 3: 'Create Folder Modal' should still be visible after click on create
     await expect(userAModals.optionModal().actionButton).toBeDisabled();
   });
 
@@ -205,8 +218,6 @@ test.describe('Folders', () => {
 
     // Step 2: User A tries to move conversation with User B back into the folder, custom folder name should no longer be visible in the folder menu
     await userAPages.conversationList().openConversation(userB.fullName);
-
-    // Step 3: Custom Folder Name is no longer visible in the Move-To-Menu
     await expect(userAPages.conversationList().getMoveToFolderButton(customFolderName)).not.toBeVisible();
   });
 });
