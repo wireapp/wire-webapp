@@ -22,6 +22,8 @@ import {Locator, Page} from '@playwright/test';
 import {selectById, selectByDataAttribute} from 'test/e2e_tests/utils/selector.util';
 import {escapeHtml} from 'test/e2e_tests/utils/userDataProcessor';
 
+import {User} from '../../../data/user';
+
 export class ConversationListPage {
   readonly page: Page;
 
@@ -33,6 +35,8 @@ export class ConversationListPage {
   readonly searchConversationsInput: Locator;
   readonly archiveConversationMenuButton: Locator;
   readonly unarchiveConversationMenuButton: Locator;
+  readonly blockedChip: Locator;
+  readonly unblockConversationMenuButton: Locator;
 
   constructor(page: Page) {
     this.page = page;
@@ -50,6 +54,10 @@ export class ConversationListPage {
     this.searchConversationsInput = page.locator(selectByDataAttribute('search-conversations'));
     this.archiveConversationMenuButton = page.locator(selectById('btn-archive'));
     this.unarchiveConversationMenuButton = page.locator(selectById('btn-unarchive'));
+    this.blockedChip = page.locator(`span[data-uie-name="status-label"] + span`);
+    this.unblockConversationMenuButton = page.locator(
+      `${selectById('btn-unblock')}${selectByDataAttribute('conversation-list-options-menu')}`,
+    );
   }
 
   async isConversationItemVisible(conversationName: string) {
@@ -73,7 +81,7 @@ export class ConversationListPage {
   }
 
   async openConversation(conversationName: string) {
-    await this.getConversationLocator(conversationName).click();
+    await this.getConversationLocator(conversationName).first().click();
   }
 
   async openPendingConnectionRequest() {
@@ -81,7 +89,7 @@ export class ConversationListPage {
   }
 
   async clickConversationOptions(conversationName: string) {
-    await this.getConversationLocator(conversationName).locator(selectByDataAttribute('go-options')).click();
+    await this.getConversationLocator(conversationName).locator(selectByDataAttribute('go-options')).first().click();
   }
 
   async clickConnectWithPeople() {
@@ -104,9 +112,9 @@ export class ConversationListPage {
     await this.createGroupButton.click();
   }
 
-  private getConversationLocator(conversationName: string) {
+  getConversationLocator(conversationName: string) {
     return this.page.locator(
-      `${selectByDataAttribute('item-conversation')}[data-uie-value='${escapeHtml(conversationName)}']`,
+      `${selectByDataAttribute('item-conversation')}${selectByDataAttribute(escapeHtml(conversationName), 'value')}`,
     );
   }
 
@@ -122,5 +130,13 @@ export class ConversationListPage {
   async searchConversation(conversationName: string) {
     await this.searchConversationsInput.fill(conversationName);
     await this.openConversation(conversationName);
+  }
+
+  async getUserAvatarWrapper(user: User): Promise<Locator> {
+    return this.getConversationLocator(user.fullName).locator(selectByDataAttribute('element-avatar-user'));
+  }
+
+  async clickUnblockConversation() {
+    await this.unblockConversationMenuButton.click();
   }
 }

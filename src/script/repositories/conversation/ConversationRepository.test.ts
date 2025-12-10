@@ -31,15 +31,16 @@ import {
   CONVERSATION_CELLS_STATE,
 } from '@wireapp/api-client/lib/conversation';
 import {RECEIPT_MODE} from '@wireapp/api-client/lib/conversation/data';
-import {ConversationProtocol} from '@wireapp/api-client/lib/conversation/NewConversation';
 import {
   ConversationProtocolUpdateEvent,
   ConversationCreateEvent,
   ConversationMemberJoinEvent,
   CONVERSATION_EVENT,
   ConversationMLSWelcomeEvent,
+  ConversationMLSResetEvent,
 } from '@wireapp/api-client/lib/event/';
 import {BackendError, BackendErrorLabel} from '@wireapp/api-client/lib/http';
+import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {ClientMLSError, ClientMLSErrorLabel} from '@wireapp/core/lib/messagingProtocols/mls';
 import {amplify} from 'amplify';
@@ -55,6 +56,7 @@ import {ClientEntity} from 'Repositories/client/ClientEntity';
 import {ConnectionEntity} from 'Repositories/connection/ConnectionEntity';
 import {ConnectionRepository} from 'Repositories/connection/ConnectionRepository';
 import {Conversation} from 'Repositories/entity/Conversation';
+import {CompositeMessage} from 'Repositories/entity/message/CompositeMessage';
 import {Message} from 'Repositories/entity/message/Message';
 import {User} from 'Repositories/entity/User';
 import {ClientEvent, CONVERSATION} from 'Repositories/event/Client';
@@ -84,7 +86,13 @@ import {CONVERSATION_READONLY_STATE, ConversationRepository} from './Conversatio
 import {ConversationService} from './ConversationService';
 import {ConversationState} from './ConversationState';
 import {ConversationStatus} from './ConversationStatus';
-import {DeleteEvent, EventBuilder, MessageHiddenEvent} from './EventBuilder';
+import {
+  ButtonActionConfirmationEvent,
+  ButtonActionEvent,
+  DeleteEvent,
+  EventBuilder,
+  MessageHiddenEvent,
+} from './EventBuilder';
 import {MessageRepository} from './MessageRepository';
 import {NOTIFICATION_STATE} from './NotificationSetting';
 
@@ -103,6 +111,7 @@ function buildConversationRepository() {
     wipeMLSCapableConversation: () => {},
     postBots: () => {},
     saveConversationStateInDb: () => {},
+    wipeMLSConversation: () => {},
   } as ConversationService;
   const messageRepository = {setClientMismatchHandler: () => {}} as unknown as MessageRepository;
   // @ts-ignore
@@ -329,7 +338,7 @@ describe('ConversationRepository', () => {
 
       const conversation = _generateConversation({
         type: CONVERSATION_TYPE.ONE_TO_ONE,
-        protocol: ConversationProtocol.MLS,
+        protocol: CONVERSATION_PROTOCOL.MLS,
       });
 
       const conversationEntity = await conversationRepository.init1to1Conversation(conversation, true);
@@ -347,7 +356,7 @@ describe('ConversationRepository', () => {
 
       const conversation = _generateConversation({
         type: CONVERSATION_TYPE.ONE_TO_ONE,
-        protocol: ConversationProtocol.MLS,
+        protocol: CONVERSATION_PROTOCOL.MLS,
       });
 
       const connection = new ConnectionEntity();
@@ -370,18 +379,18 @@ describe('ConversationRepository', () => {
       const otherUser = new User(otherUserId.id, otherUserId.domain);
       otherUser.isDeleted = true;
 
-      otherUser.supportedProtocols([ConversationProtocol.PROTEUS, ConversationProtocol.MLS]);
+      otherUser.supportedProtocols([CONVERSATION_PROTOCOL.PROTEUS, CONVERSATION_PROTOCOL.MLS]);
 
       userRepository['userState'].users.push(otherUser);
 
       const selfUserId = {id: '109da9ca-a495-47a870-9ffbe924b2d1', domain: 'test-domain'};
       const selfUser = new User(selfUserId.id, selfUserId.domain);
-      selfUser.supportedProtocols([ConversationProtocol.PROTEUS, ConversationProtocol.MLS]);
+      selfUser.supportedProtocols([CONVERSATION_PROTOCOL.PROTEUS, CONVERSATION_PROTOCOL.MLS]);
       jest.spyOn(conversationRepository['userState'], 'self').mockReturnValueOnce(selfUser);
 
       const proteus1to1Conversation = _generateConversation({
         type: CONVERSATION_TYPE.ONE_TO_ONE,
-        protocol: ConversationProtocol.PROTEUS,
+        protocol: CONVERSATION_PROTOCOL.PROTEUS,
       });
 
       const connection = new ConnectionEntity();
@@ -407,26 +416,26 @@ describe('ConversationRepository', () => {
       const otherUser = new User(otherUserId.id, otherUserId.domain);
       otherUser.teamId = teamId;
 
-      otherUser.supportedProtocols([ConversationProtocol.PROTEUS]);
+      otherUser.supportedProtocols([CONVERSATION_PROTOCOL.PROTEUS]);
 
       conversationRepository['userState'].users.push(otherUser);
 
       const selfUserId = {id: '109da91a-a495-47a870-9ffbe924b2d1', domain};
       const selfUser = new User(selfUserId.id, selfUserId.domain);
       selfUser.teamId = teamId;
-      selfUser.supportedProtocols([ConversationProtocol.PROTEUS]);
+      selfUser.supportedProtocols([CONVERSATION_PROTOCOL.PROTEUS]);
       jest.spyOn(conversationRepository['userState'], 'self').mockReturnValue(selfUser);
 
       const proteus1to1Conversation = _generateConversation({
         type: CONVERSATION_TYPE.ONE_TO_ONE,
-        protocol: ConversationProtocol.PROTEUS,
+        protocol: CONVERSATION_PROTOCOL.PROTEUS,
         users: [otherUser],
         overwites: {team_id: teamId, domain},
       });
 
       const proteus1to1Conversation2 = _generateConversation({
         type: CONVERSATION_TYPE.ONE_TO_ONE,
-        protocol: ConversationProtocol.PROTEUS,
+        protocol: CONVERSATION_PROTOCOL.PROTEUS,
         users: [otherUser],
         overwites: {team_id: teamId, domain},
       });
@@ -444,18 +453,18 @@ describe('ConversationRepository', () => {
       const otherUserId = {id: 'f718410c-1733-479d-bd80-af03f38416', domain: 'test-domain'};
       const otherUser = new User(otherUserId.id, otherUserId.domain);
       otherUser.isService = true;
-      otherUser.supportedProtocols([ConversationProtocol.PROTEUS]);
+      otherUser.supportedProtocols([CONVERSATION_PROTOCOL.PROTEUS]);
 
       userRepository['userState'].users.push(otherUser);
 
       const selfUserId = {id: '109da9ca-a417-47a870-9ffbe924b2d1', domain: 'test-domain'};
       const selfUser = new User(selfUserId.id, selfUserId.domain);
-      selfUser.supportedProtocols([ConversationProtocol.PROTEUS, ConversationProtocol.MLS]);
+      selfUser.supportedProtocols([CONVERSATION_PROTOCOL.PROTEUS, CONVERSATION_PROTOCOL.MLS]);
       jest.spyOn(conversationRepository['userState'], 'self').mockReturnValueOnce(selfUser);
 
       const proteus1to1Conversation = _generateConversation({
         type: CONVERSATION_TYPE.REGULAR,
-        protocol: ConversationProtocol.PROTEUS,
+        protocol: CONVERSATION_PROTOCOL.PROTEUS,
         overwites: {team_id: 'teamId'},
       });
 
@@ -512,7 +521,7 @@ describe('ConversationRepository', () => {
           },
         },
         name: '',
-        protocol: ConversationProtocol.PROTEUS,
+        protocol: CONVERSATION_PROTOCOL.PROTEUS,
         team: 'cf162e22-20b8-4533-a5ab-d3f5dde39d2c',
         type: 0,
       };
@@ -532,12 +541,12 @@ describe('ConversationRepository', () => {
       userEntity.teamId = teamId;
       userEntity.isTeamMember(true);
       userEntity.teamId = teamId;
-      userEntity.supportedProtocols([ConversationProtocol.PROTEUS]);
+      userEntity.supportedProtocols([CONVERSATION_PROTOCOL.PROTEUS]);
 
       userRepository['userState'].users.push(userEntity);
 
       selfUser.teamId = teamId;
-      selfUser.supportedProtocols([ConversationProtocol.PROTEUS]);
+      selfUser.supportedProtocols([CONVERSATION_PROTOCOL.PROTEUS]);
 
       jest.spyOn(conversationRepository['userState'], 'self').mockReturnValue(selfUser);
 
@@ -552,18 +561,18 @@ describe('ConversationRepository', () => {
 
       const otherUserId = {id: 'f718410c-3833-479d-bd80-a5df03f38414', domain: 'test-domain'};
       const otherUser = new User(otherUserId.id, otherUserId.domain);
-      otherUser.supportedProtocols([ConversationProtocol.PROTEUS]);
+      otherUser.supportedProtocols([CONVERSATION_PROTOCOL.PROTEUS]);
       userRepository['userState'].users.push(otherUser);
 
       const selfUserId = {id: '109da9ca-a495-47a8-ac70-9ffbe924b2d0', domain: 'test-domain'};
       const selfUser = new User(selfUserId.id, selfUserId.domain);
-      selfUser.supportedProtocols([ConversationProtocol.PROTEUS, ConversationProtocol.MLS]);
+      selfUser.supportedProtocols([CONVERSATION_PROTOCOL.PROTEUS, CONVERSATION_PROTOCOL.MLS]);
       jest.spyOn(conversationRepository['userState'], 'self').mockReturnValue(selfUser);
 
       const proteus1to1ConversationResponse = generateAPIConversation({
         id: {id: '04ab891e-ccf1-4dba-9d74-bacec64b5b1e', domain: 'test-domain'},
         type: CONVERSATION_TYPE.ONE_TO_ONE,
-        protocol: ConversationProtocol.PROTEUS,
+        protocol: CONVERSATION_PROTOCOL.PROTEUS,
       }) as BackendConversation;
 
       const connection = new ConnectionEntity();
@@ -594,18 +603,18 @@ describe('ConversationRepository', () => {
 
       const otherUserId = {id: 'f718410c-3833-479d-bd80-a5df03f38414', domain: 'test-domain'};
       const otherUser = new User(otherUserId.id, otherUserId.domain);
-      otherUser.supportedProtocols([ConversationProtocol.MLS]);
+      otherUser.supportedProtocols([CONVERSATION_PROTOCOL.MLS]);
       userRepository['userState'].users.push(otherUser);
 
       const selfUserId = {id: '109da9ca-a495-47a8-ac70-9ffbe924b2d0', domain: 'test-domain'};
       const selfUser = new User(selfUserId.id, selfUserId.domain);
-      selfUser.supportedProtocols([ConversationProtocol.PROTEUS]);
+      selfUser.supportedProtocols([CONVERSATION_PROTOCOL.PROTEUS]);
       jest.spyOn(conversationRepository['userState'], 'self').mockReturnValue(selfUser);
 
       const proteus1to1ConversationResponse = generateAPIConversation({
         id: {id: '04ab891e-ccf1-4dba-9d74-bacec64b5b1e', domain: 'test-domain'},
         type: CONVERSATION_TYPE.ONE_TO_ONE,
-        protocol: ConversationProtocol.PROTEUS,
+        protocol: CONVERSATION_PROTOCOL.PROTEUS,
       }) as BackendConversation;
 
       const connection = new ConnectionEntity();
@@ -635,18 +644,18 @@ describe('ConversationRepository', () => {
 
       const otherUserId = {id: 'f718410c-3833-479d-bd80-a5df03f38414', domain: 'test-domain'};
       const otherUser = new User(otherUserId.id, otherUserId.domain);
-      otherUser.supportedProtocols([ConversationProtocol.PROTEUS, ConversationProtocol.MLS]);
+      otherUser.supportedProtocols([CONVERSATION_PROTOCOL.PROTEUS, CONVERSATION_PROTOCOL.MLS]);
       userRepository['userState'].users.push(otherUser);
 
       const selfUserId = {id: '109da9ca-a495-47a8-ac70-9ffbe924b2d0', domain: 'test-domain'};
       const selfUser = new User(selfUserId.id, selfUserId.domain);
-      selfUser.supportedProtocols([ConversationProtocol.PROTEUS, ConversationProtocol.MLS]);
+      selfUser.supportedProtocols([CONVERSATION_PROTOCOL.PROTEUS, CONVERSATION_PROTOCOL.MLS]);
       jest.spyOn(conversationRepository['userState'], 'self').mockReturnValue(selfUser);
 
       const mls1to1ConversationResponse = generateAPIConversation({
         id: {id: '04ab891e-ccf1-4dba-9d74-bacec64b5b1e', domain: 'test-domain'},
         type: CONVERSATION_TYPE.ONE_TO_ONE,
-        protocol: ConversationProtocol.MLS,
+        protocol: CONVERSATION_PROTOCOL.MLS,
         overwites: {group_id: 'groupId', others: [otherUserId.id], qualified_others: [otherUserId]},
       }) as BackendMLSConversation;
 
@@ -673,25 +682,25 @@ describe('ConversationRepository', () => {
 
       const otherUserId = {id: 'f718410c-3833-479d-bd80-a5df03f38414', domain: 'test-domain'};
       const otherUser = new User(otherUserId.id, otherUserId.domain);
-      otherUser.supportedProtocols([ConversationProtocol.PROTEUS, ConversationProtocol.MLS]);
+      otherUser.supportedProtocols([CONVERSATION_PROTOCOL.PROTEUS, CONVERSATION_PROTOCOL.MLS]);
       userRepository['userState'].users.push(otherUser);
 
       const selfUserId = {id: '109da9ca-a495-47a8-ac70-9ffbe924b2d0', domain: 'test-domain'};
       const selfUser = new User(selfUserId.id, selfUserId.domain);
-      selfUser.supportedProtocols([ConversationProtocol.PROTEUS, ConversationProtocol.MLS]);
+      selfUser.supportedProtocols([CONVERSATION_PROTOCOL.PROTEUS, CONVERSATION_PROTOCOL.MLS]);
       jest.spyOn(conversationRepository['userState'], 'self').mockReturnValue(selfUser);
 
       const mls1to1ConversationResponse = generateAPIConversation({
         id: {id: '04ab891e-ccf1-4dba-9d74-bacec64b5b1e', domain: 'test-domain'},
         type: CONVERSATION_TYPE.ONE_TO_ONE,
-        protocol: ConversationProtocol.MLS,
+        protocol: CONVERSATION_PROTOCOL.MLS,
         overwites: {group_id: 'groupId', archived_state: false, muted_state: NOTIFICATION_STATE.NOTHING},
       }) as BackendMLSConversation;
 
       const proteus1to1ConversationResponse = generateAPIConversation({
         id: {id: '04ab891e-ccf1-4dba-9d74-bacec64b123e', domain: 'test-domain'},
         type: CONVERSATION_TYPE.ONE_TO_ONE,
-        protocol: ConversationProtocol.PROTEUS,
+        protocol: CONVERSATION_PROTOCOL.PROTEUS,
         overwites: {archived_state: true, muted_state: NOTIFICATION_STATE.EVERYTHING},
       }) as BackendMLSConversation;
 
@@ -720,7 +729,7 @@ describe('ConversationRepository', () => {
       const establishedMls1to1ConversationResponse = generateAPIConversation({
         id: {id: '04ab891e-ccf1-4dba-9d74-bacec64b5b1e', domain: 'test-domain'},
         type: CONVERSATION_TYPE.ONE_TO_ONE,
-        protocol: ConversationProtocol.MLS,
+        protocol: CONVERSATION_PROTOCOL.MLS,
         overwites: {
           group_id: mockedGroupId,
           epoch: 1,
@@ -778,19 +787,19 @@ describe('ConversationRepository', () => {
 
       const otherUserId = {id: 'f718410c-3833-479d-bd80-a5df03f38414', domain: 'test-domain'};
       const otherUser = new User(otherUserId.id, otherUserId.domain);
-      otherUser.supportedProtocols([ConversationProtocol.PROTEUS, ConversationProtocol.MLS]);
+      otherUser.supportedProtocols([CONVERSATION_PROTOCOL.PROTEUS, CONVERSATION_PROTOCOL.MLS]);
       userRepository['userState'].users.push(otherUser);
 
       const mockSelfClientId = 'client-id';
       const selfUserId = {id: '109da9ca-a495-47a8-ac70-9ffbe924b2d0', domain: 'test-domain'};
       const selfUser = new User(selfUserId.id, selfUserId.domain);
-      selfUser.supportedProtocols([ConversationProtocol.PROTEUS, ConversationProtocol.MLS]);
+      selfUser.supportedProtocols([CONVERSATION_PROTOCOL.PROTEUS, CONVERSATION_PROTOCOL.MLS]);
       jest.spyOn(conversationRepository['userState'], 'self').mockReturnValue(selfUser);
 
       const mls1to1ConversationResponse = generateAPIConversation({
         id: {id: '04ab891e-ccf1-4dba-9d74-bacec64b5b1e', domain: 'test-domain'},
         type: CONVERSATION_TYPE.ONE_TO_ONE,
-        protocol: ConversationProtocol.MLS,
+        protocol: CONVERSATION_PROTOCOL.MLS,
         overwites: {group_id: mockedGroupId},
       }) as BackendMLSConversation;
 
@@ -804,7 +813,7 @@ describe('ConversationRepository', () => {
       const establishedMls1to1ConversationResponse = generateAPIConversation({
         id: {id: '04ab891e-ccf1-4dba-9d74-bacec64b5b1e', domain: 'test-domain'},
         type: CONVERSATION_TYPE.ONE_TO_ONE,
-        protocol: ConversationProtocol.MLS,
+        protocol: CONVERSATION_PROTOCOL.MLS,
         overwites: {
           group_id: mockedGroupId,
           epoch: 1,
@@ -846,7 +855,7 @@ describe('ConversationRepository', () => {
       const otherUserId = {id: 'f71840c-3833-479d-bd80-a5dk03f38414', domain: 'testt-domain'};
       const otherUser = new User(otherUserId.id, otherUserId.domain);
       otherUser.teamId = teamId;
-      otherUser.supportedProtocols([ConversationProtocol.PROTEUS, ConversationProtocol.MLS]);
+      otherUser.supportedProtocols([CONVERSATION_PROTOCOL.PROTEUS, CONVERSATION_PROTOCOL.MLS]);
       userRepository['userState'].users.push(otherUser);
 
       const selfUserId = {id: '109da9ca-a495asd47a8-ac70-9kfbe924b2d0', domain: 'testt-domain'};
@@ -856,7 +865,7 @@ describe('ConversationRepository', () => {
       const mls1to1ConversationResponse = generateAPIConversation({
         id: {id: '04ab891e-ccf1-4dba-9d74-bacec64b5b1e', domain: 'test-domain'},
         type: CONVERSATION_TYPE.ONE_TO_ONE,
-        protocol: ConversationProtocol.MLS,
+        protocol: CONVERSATION_PROTOCOL.MLS,
         overwites: {group_id: mockedGroupId},
       }) as BackendMLSConversation;
 
@@ -871,7 +880,7 @@ describe('ConversationRepository', () => {
       const establishedMls1to1ConversationResponse = generateAPIConversation({
         id: {id: '04ab891e-ccf1-4dba-9d74-bacec64b5b1e', domain: 'test-domain'},
         type: CONVERSATION_TYPE.ONE_TO_ONE,
-        protocol: ConversationProtocol.MLS,
+        protocol: CONVERSATION_PROTOCOL.MLS,
         overwites: {
           group_id: mockedGroupId,
           epoch: 1,
@@ -890,7 +899,7 @@ describe('ConversationRepository', () => {
         .spyOn(container.resolve(Core).service!.conversation, 'establishMLS1to1Conversation')
         .mockResolvedValueOnce(establishedMls1to1ConversationResponse);
 
-      selfUser.supportedProtocols([ConversationProtocol.PROTEUS, ConversationProtocol.MLS]);
+      selfUser.supportedProtocols([CONVERSATION_PROTOCOL.PROTEUS, CONVERSATION_PROTOCOL.MLS]);
       jest.spyOn(conversationRepository['userState'], 'self').mockReturnValueOnce(selfUser);
 
       await conversationRepository.resolve1To1Conversation(otherUser.qualifiedId);
@@ -906,12 +915,12 @@ describe('ConversationRepository', () => {
 
       const otherUserId = {id: 'f718410c-3833-479d-bd80-a5df03aa8414', domain: 'test-domain'};
       const otherUser = new User(otherUserId.id, otherUserId.domain);
-      otherUser.supportedProtocols([ConversationProtocol.PROTEUS, ConversationProtocol.MLS]);
+      otherUser.supportedProtocols([CONVERSATION_PROTOCOL.PROTEUS, CONVERSATION_PROTOCOL.MLS]);
       userRepository['userState'].users.push(otherUser);
 
       const selfUserId = {id: '109da9ca-a495-47a8-ac70-9ffbeaa4b2d0', domain: 'test-domain'};
       const selfUser = new User(selfUserId.id, selfUserId.domain);
-      selfUser.supportedProtocols([ConversationProtocol.PROTEUS, ConversationProtocol.MLS]);
+      selfUser.supportedProtocols([CONVERSATION_PROTOCOL.PROTEUS, CONVERSATION_PROTOCOL.MLS]);
       jest.spyOn(conversationRepository['userState'], 'self').mockReturnValue(selfUser);
 
       selfUser.teamId = teamId;
@@ -920,7 +929,7 @@ describe('ConversationRepository', () => {
       const establishedMls1to1ConversationResponse = generateAPIConversation({
         id: {id: '04ab891e-ccf1-4dba-9d74-bacec64b5b1e', domain: 'test-domain'},
         type: CONVERSATION_TYPE.ONE_TO_ONE,
-        protocol: ConversationProtocol.MLS,
+        protocol: CONVERSATION_PROTOCOL.MLS,
         overwites: {
           group_id: mockedGroupId,
           epoch: 1,
@@ -959,18 +968,18 @@ describe('ConversationRepository', () => {
 
       const otherUserId = {id: 'f718410c-3833-479d-bd80-a5df03f38414', domain: 'test-domain'};
       const otherUser = new User(otherUserId.id, otherUserId.domain);
-      otherUser.supportedProtocols([ConversationProtocol.PROTEUS]);
+      otherUser.supportedProtocols([CONVERSATION_PROTOCOL.PROTEUS]);
       userRepository['userState'].users.push(otherUser);
 
       const selfUserId = {id: '109da9ca-a495-47a8-ac70-9ffbe924b2d0', domain: 'test-domain'};
       const selfUser = new User(selfUserId.id, selfUserId.domain);
-      selfUser.supportedProtocols([ConversationProtocol.PROTEUS, ConversationProtocol.MLS]);
+      selfUser.supportedProtocols([CONVERSATION_PROTOCOL.PROTEUS, CONVERSATION_PROTOCOL.MLS]);
       jest.spyOn(conversationRepository['userState'], 'self').mockReturnValue(selfUser);
 
       const mls1to1ConversationResponse = generateAPIConversation({
         id: {id: '04ab891e-ccf1-4dba-9d74-bacec64b5b1e', domain: 'test-domain'},
         type: CONVERSATION_TYPE.ONE_TO_ONE,
-        protocol: ConversationProtocol.MLS,
+        protocol: CONVERSATION_PROTOCOL.MLS,
         overwites: {group_id: 'groupId'},
       }) as BackendMLSConversation;
 
@@ -999,18 +1008,18 @@ describe('ConversationRepository', () => {
 
       const otherUserId = {id: 'f718410c-3833-479d-bd80-a5df03f38414', domain: 'test-domain'};
       const otherUser = new User(otherUserId.id, otherUserId.domain);
-      otherUser.supportedProtocols([ConversationProtocol.PROTEUS]);
+      otherUser.supportedProtocols([CONVERSATION_PROTOCOL.PROTEUS]);
       userRepository['userState'].users.push(otherUser);
 
       const selfUserId = {id: '109da9ca-a495-47a8-ac70-9ffbe924b2d0', domain: 'test-domain'};
       const selfUser = new User(selfUserId.id, selfUserId.domain);
-      selfUser.supportedProtocols([ConversationProtocol.MLS]);
+      selfUser.supportedProtocols([CONVERSATION_PROTOCOL.MLS]);
       jest.spyOn(conversationRepository['userState'], 'self').mockReturnValue(selfUser);
 
       const mls1to1ConversationResponse = generateAPIConversation({
         id: {id: '04ab891e-ccf1-4dba-9d74-bacec64b5b1e', domain: 'test-domain'},
         type: CONVERSATION_TYPE.ONE_TO_ONE,
-        protocol: ConversationProtocol.MLS,
+        protocol: CONVERSATION_PROTOCOL.MLS,
         overwites: {group_id: 'groupId'},
       }) as BackendMLSConversation;
 
@@ -1042,18 +1051,18 @@ describe('ConversationRepository', () => {
 
       const otherUserId = {id: 'a718410c-3833-479d-bd80-a5df03f38414', domain: 'test-domain'};
       const otherUser = new User(otherUserId.id, otherUserId.domain);
-      otherUser.supportedProtocols([ConversationProtocol.MLS]);
+      otherUser.supportedProtocols([CONVERSATION_PROTOCOL.MLS]);
       userRepository['userState'].users.push(otherUser);
 
       const selfUserId = {id: '1a9da9ca-a495-47a8-ac70-9ffbe924b2d0', domain: 'test-domain'};
       const selfUser = new User(selfUserId.id, selfUserId.domain);
-      selfUser.supportedProtocols([ConversationProtocol.MLS]);
+      selfUser.supportedProtocols([CONVERSATION_PROTOCOL.MLS]);
       jest.spyOn(conversationRepository['userState'], 'self').mockReturnValue(selfUser);
 
       const mls1to1ConversationResponse = generateAPIConversation({
         id: {id: '0aab891e-ccf1-4dba-9d74-bacec64b5b1e', domain: 'test-domain'},
         type: CONVERSATION_TYPE.ONE_TO_ONE,
-        protocol: ConversationProtocol.MLS,
+        protocol: CONVERSATION_PROTOCOL.MLS,
         overwites: {group_id: 'groupId'},
       }) as BackendMLSConversation;
 
@@ -1091,18 +1100,18 @@ describe('ConversationRepository', () => {
 
       const otherUserId = {id: 'f718410c-3833-479d-bd80-a5df03f38414', domain: 'test-domain'};
       const otherUser = new User(otherUserId.id, otherUserId.domain);
-      otherUser.supportedProtocols([ConversationProtocol.PROTEUS]);
+      otherUser.supportedProtocols([CONVERSATION_PROTOCOL.PROTEUS]);
       userRepository['userState'].users.push(otherUser);
 
       const selfUserId = {id: '109da9ca-a495-47a8-ac70-9ffbe924b2d0', domain: 'test-domain'};
       const selfUser = new User(selfUserId.id, selfUserId.domain);
-      selfUser.supportedProtocols([ConversationProtocol.MLS]);
+      selfUser.supportedProtocols([CONVERSATION_PROTOCOL.MLS]);
       jest.spyOn(conversationRepository['userState'], 'self').mockReturnValue(selfUser);
 
       const mls1to1ConversationResponse = generateAPIConversation({
         id: {id: '04ab891e-ccf1-4dba-9d74-bacec64b5b1e', domain: 'test-domain'},
         type: CONVERSATION_TYPE.ONE_TO_ONE,
-        protocol: ConversationProtocol.MLS,
+        protocol: CONVERSATION_PROTOCOL.MLS,
         overwites: {group_id: 'groupId'},
       }) as BackendMLSConversation;
 
@@ -1133,19 +1142,19 @@ describe('ConversationRepository', () => {
 
       const otherUserId = {id: 'f718410c-3833-479d-bd80-a5df03f38414', domain: 'test-domain'};
       const otherUser = new User(otherUserId.id, otherUserId.domain);
-      otherUser.supportedProtocols([ConversationProtocol.PROTEUS, ConversationProtocol.MLS]);
+      otherUser.supportedProtocols([CONVERSATION_PROTOCOL.PROTEUS, CONVERSATION_PROTOCOL.MLS]);
       userRepository['userState'].users.push(otherUser);
 
       const mockSelfClientId = 'client-id';
       const selfUserId = {id: '109da9ca-a495-47a8-ac70-9ffbe924b2d0', domain: 'test-domain'};
       const selfUser = new User(selfUserId.id, selfUserId.domain);
-      selfUser.supportedProtocols([ConversationProtocol.PROTEUS, ConversationProtocol.MLS]);
+      selfUser.supportedProtocols([CONVERSATION_PROTOCOL.PROTEUS, CONVERSATION_PROTOCOL.MLS]);
       jest.spyOn(conversationRepository['userState'], 'self').mockReturnValue(selfUser);
 
       const mls1to1ConversationResponse = generateAPIConversation({
         id: {id: '04ab891e-ccf1-4dba-9d74-bacec64b5b1e', domain: 'test-domain'},
         type: CONVERSATION_TYPE.ONE_TO_ONE,
-        protocol: ConversationProtocol.MLS,
+        protocol: CONVERSATION_PROTOCOL.MLS,
         overwites: {group_id: mockedGroupId},
       }) as BackendMLSConversation;
 
@@ -1170,7 +1179,7 @@ describe('ConversationRepository', () => {
       const establishedMls1to1ConversationResponse = generateAPIConversation({
         id: {id: '04ab891e-ccf1-4dba-9d74-bacec64b5b1e', domain: 'test-domain'},
         type: CONVERSATION_TYPE.ONE_TO_ONE,
-        protocol: ConversationProtocol.MLS,
+        protocol: CONVERSATION_PROTOCOL.MLS,
         overwites: {
           group_id: mockedGroupId,
           epoch: 1,
@@ -1194,7 +1203,7 @@ describe('ConversationRepository', () => {
 
       userRepository.emit('supportedProtocolsUpdated', {
         user: otherUser,
-        supportedProtocols: [ConversationProtocol.PROTEUS, ConversationProtocol.MLS],
+        supportedProtocols: [CONVERSATION_PROTOCOL.PROTEUS, CONVERSATION_PROTOCOL.MLS],
       });
 
       await waitFor(() => {
@@ -1217,7 +1226,7 @@ describe('ConversationRepository', () => {
 
       userRepository.emit('supportedProtocolsUpdated', {
         user: otherUser,
-        supportedProtocols: [ConversationProtocol.PROTEUS, ConversationProtocol.MLS],
+        supportedProtocols: [CONVERSATION_PROTOCOL.PROTEUS, CONVERSATION_PROTOCOL.MLS],
       });
 
       await waitFor(() => {
@@ -1283,12 +1292,12 @@ describe('ConversationRepository', () => {
 
       const otherUserId = {id: 'f718410c-3833-479d-bd80-a5df03f38414', domain: 'test-domain'};
       const otherUser = new User(otherUserId.id, otherUserId.domain);
-      otherUser.supportedProtocols([ConversationProtocol.PROTEUS]);
+      otherUser.supportedProtocols([CONVERSATION_PROTOCOL.PROTEUS]);
       userRepository['userState'].users.push(otherUser);
 
       const selfUserId = {id: '109da9ca-a495-47a8-ac70-9ffbe924b2d0', domain: 'test-domain'};
       const selfUser = new User(selfUserId.id, selfUserId.domain);
-      selfUser.supportedProtocols([ConversationProtocol.PROTEUS, ConversationProtocol.MLS]);
+      selfUser.supportedProtocols([CONVERSATION_PROTOCOL.PROTEUS, CONVERSATION_PROTOCOL.MLS]);
       jest.spyOn(conversationRepository['userState'], 'self').mockReturnValue(selfUser);
 
       const conversation = _generateConversation({type: CONVERSATION_TYPE.ONE_TO_ONE});
@@ -1483,8 +1492,8 @@ describe('ConversationRepository', () => {
       } as ConversationDatabaseData;
 
       spyOn(testFactory.conversation_repository as any, 'fetchConversationById').and.callThrough();
-      spyOn(testFactory.user_repository, 'getUserSupportedProtocols').and.returnValue([ConversationProtocol.PROTEUS]);
-      spyOn(testFactory.self_repository, 'getSelfSupportedProtocols').and.returnValue([ConversationProtocol.PROTEUS]);
+      spyOn(testFactory.user_repository, 'getUserSupportedProtocols').and.returnValue([CONVERSATION_PROTOCOL.PROTEUS]);
+      spyOn(testFactory.self_repository, 'getSelfSupportedProtocols').and.returnValue([CONVERSATION_PROTOCOL.PROTEUS]);
       spyOn(testFactory.conversation_service, 'getConversationById').and.returnValue(
         Promise.resolve(conversation_payload),
       );
@@ -1593,12 +1602,12 @@ describe('ConversationRepository', () => {
         const conversation = _generateConversation({
           groupId: mockedGroupId,
           type: CONVERSATION_TYPE.ONE_TO_ONE,
-          protocol: ConversationProtocol.MLS,
+          protocol: CONVERSATION_PROTOCOL.MLS,
         });
 
         const otherUserId = {id: 'f718410c-3833-479d-bd80-a5df01138411', domain: 'test-domain'};
         const otherUser = new User(otherUserId.id, otherUserId.domain);
-        otherUser.supportedProtocols([ConversationProtocol.PROTEUS, ConversationProtocol.MLS]);
+        otherUser.supportedProtocols([CONVERSATION_PROTOCOL.PROTEUS, CONVERSATION_PROTOCOL.MLS]);
 
         conversationRepository['userState'].users.push(otherUser);
         conversation.participating_user_ids.push(otherUserId);
@@ -1620,7 +1629,7 @@ describe('ConversationRepository', () => {
         const establishedMls1to1ConversationResponse = generateAPIConversation({
           id: {id: '04ab891e-ccf1-4dba-9d74-bacec64b5b1e', domain: 'test-domain'},
           type: CONVERSATION_TYPE.ONE_TO_ONE,
-          protocol: ConversationProtocol.MLS,
+          protocol: CONVERSATION_PROTOCOL.MLS,
           overwites: {
             group_id: mockedGroupId,
             epoch: 1,
@@ -1866,7 +1875,7 @@ describe('ConversationRepository', () => {
             },
             message_timer: null,
             name: '-, benny_bella',
-            protocol: ConversationProtocol.PROTEUS,
+            protocol: CONVERSATION_PROTOCOL.PROTEUS,
             qualified_id: {
               domain: 'bella.wire.link',
               id: 'c9405f98-e25a-4b1f-ade7-227ea765dff7',
@@ -1942,7 +1951,7 @@ describe('ConversationRepository', () => {
         });
       });
 
-      it.each([ConversationProtocol.MIXED, ConversationProtocol.MLS])(
+      it.each([CONVERSATION_PROTOCOL.MIXED, CONVERSATION_PROTOCOL.MLS])(
         'should add other self clients to mls/mixed conversation MLS group if user was event creator',
         async protocol => {
           const mockDomain = 'example.com';
@@ -2448,6 +2457,128 @@ describe('ConversationRepository', () => {
     });
   });
 
+  describe('given a composite message event in a conversation', () => {
+    it('when the event is ButtonActionConfirmationEvent from another user, then marks the button as selected', async () => {
+      // given
+      const selfUser = generateUser();
+      const botUserId = generateUser();
+      spyOn(testFactory.conversation_repository['userState'], 'self').and.returnValue(selfUser);
+      spyOn(testFactory.conversation_repository['eventService'], 'updateEventSequentially').and.returnValue(
+        Promise.resolve(),
+      );
+
+      const conversationEntity = _generateConversation({type: CONVERSATION_TYPE.GLOBAL_TEAM});
+
+      // Make sure the conversation is in the conversation state
+      testFactory.conversation_repository['conversationState'].conversations.push(conversationEntity);
+
+      // Set the self user on the conversation entity (for consistency)
+      conversationEntity.selfUser(selfUser);
+
+      const buttonActionConfirmationEvent: ButtonActionConfirmationEvent = {
+        conversation: conversationEntity.id,
+        data: {
+          buttonId: 'button-id',
+          messageId: 'message-id',
+        },
+        from: botUserId.id,
+        id: createUuid(),
+        qualified_conversation: conversationEntity.qualifiedId,
+        time: new Date().toISOString(),
+        type: ClientEvent.CONVERSATION.BUTTON_ACTION_CONFIRMATION,
+      };
+
+      const message = new CompositeMessage(buttonActionConfirmationEvent.data.messageId);
+      conversationEntity.addMessage(message);
+
+      expect(message.selectedButtonId()).toBeFalsy();
+
+      // when
+      await testFactory.conversation_repository['handleConversationEvent'](buttonActionConfirmationEvent);
+
+      // then - button is selected
+      const retrievedMessage = conversationEntity.getMessage(
+        buttonActionConfirmationEvent.data.messageId,
+      ) as CompositeMessage;
+      expect(retrievedMessage.selectedButtonId()).toBe(buttonActionConfirmationEvent.data.buttonId);
+    });
+
+    it('when the event is ButtonActionEvent from the self user, then marks the button as selected', async () => {
+      // given
+      const selfUser = generateUser();
+      spyOn(testFactory.conversation_repository['userState'], 'self').and.returnValue(selfUser);
+      spyOn(testFactory.conversation_repository['eventService'], 'updateEventSequentially').and.returnValue(
+        Promise.resolve(),
+      );
+
+      const conversationEntity = _generateConversation({type: CONVERSATION_TYPE.GLOBAL_TEAM});
+
+      // Make sure the conversation is in the conversation state
+      testFactory.conversation_repository['conversationState'].conversations.push(conversationEntity);
+
+      // Set the self user on the conversation entity
+      conversationEntity.selfUser(selfUser);
+
+      const buttonActionEvent: ButtonActionEvent = {
+        conversation: conversationEntity.id,
+        data: {
+          buttonId: 'button-id',
+          messageId: 'message-id',
+        },
+        from: selfUser.id,
+        id: createUuid(),
+        qualified_conversation: conversationEntity.qualifiedId,
+        time: new Date().toISOString(),
+        type: ClientEvent.CONVERSATION.BUTTON_ACTION,
+      };
+
+      const message = new CompositeMessage(buttonActionEvent.data.messageId);
+      conversationEntity.addMessage(message);
+
+      expect(message.selectedButtonId()).toBeFalsy();
+
+      // when
+      await testFactory.conversation_repository['handleConversationEvent'](buttonActionEvent);
+
+      // then - button is selected
+      const retrievedMessage = conversationEntity.getMessage(buttonActionEvent.data.messageId) as CompositeMessage;
+      expect(retrievedMessage.selectedButtonId()).toBe(buttonActionEvent.data.buttonId);
+    });
+
+    it('when the event is ButtonActionEvent from another user, then ignores the event and no button is selected', async () => {
+      // given
+      const selfUser = generateUser();
+      const otherUser = generateUser();
+      spyOn(testFactory.conversation_repository['userState'], 'self').and.returnValue(selfUser);
+      const conversationEntity = _generateConversation({type: CONVERSATION_TYPE.GLOBAL_TEAM});
+
+      const buttonActionEvent: ButtonActionEvent = {
+        conversation: conversationEntity.id,
+        data: {
+          buttonId: 'button-id',
+          messageId: 'message-id',
+        },
+        from: otherUser.id, // Event from another user should be ignored
+        id: createUuid(),
+        qualified_conversation: conversationEntity.qualifiedId,
+        time: new Date().toISOString(),
+        type: ClientEvent.CONVERSATION.BUTTON_ACTION,
+      };
+
+      const message = new CompositeMessage(buttonActionEvent.data.messageId);
+      conversationEntity.addMessage(message);
+
+      expect(message.selectedButtonId()).toBeFalsy();
+
+      // when
+      await testFactory.conversation_repository['handleConversationEvent'](buttonActionEvent);
+
+      // then - should remain unchanged since the event was from another user
+      const retrievedMessage = conversationEntity.getMessage(buttonActionEvent.data.messageId) as CompositeMessage;
+      expect(retrievedMessage.selectedButtonId()).toBeFalsy();
+    });
+  });
+
   describe('shouldSendReadReceipt', () => {
     it('uses the account preference for 1:1 conversations', () => {
       // Set a receipt mode on account-level
@@ -2511,7 +2642,7 @@ describe('ConversationRepository', () => {
     id: QualifiedId,
     name: string,
     otherMembers: QualifiedId[] = [],
-    protocol = ConversationProtocol.PROTEUS,
+    protocol = CONVERSATION_PROTOCOL.PROTEUS,
     type = CONVERSATION_TYPE.REGULAR,
   ) {
     return {
@@ -2584,7 +2715,7 @@ describe('ConversationRepository', () => {
             },
             'conv1',
             [userId],
-            ConversationProtocol.PROTEUS,
+            CONVERSATION_PROTOCOL.PROTEUS,
             CONVERSATION_TYPE.ONE_TO_ONE,
           ),
 
@@ -2595,7 +2726,7 @@ describe('ConversationRepository', () => {
             },
             'conv2',
             [userId],
-            ConversationProtocol.MLS,
+            CONVERSATION_PROTOCOL.MLS,
             CONVERSATION_TYPE.ONE_TO_ONE,
           ),
         ],
@@ -2627,7 +2758,7 @@ describe('ConversationRepository', () => {
         },
         'conv2',
         [userId],
-        ConversationProtocol.MLS,
+        CONVERSATION_PROTOCOL.MLS,
         CONVERSATION_TYPE.ONE_TO_ONE,
       );
 
@@ -2638,7 +2769,7 @@ describe('ConversationRepository', () => {
         },
         'conv1',
         [userId],
-        ConversationProtocol.PROTEUS,
+        CONVERSATION_PROTOCOL.PROTEUS,
         CONVERSATION_TYPE.ONE_TO_ONE,
       );
 
@@ -2672,7 +2803,7 @@ describe('ConversationRepository', () => {
         },
         'conv2',
         [userId],
-        ConversationProtocol.PROTEUS,
+        CONVERSATION_PROTOCOL.PROTEUS,
         CONVERSATION_TYPE.CONNECT,
       );
 
@@ -2913,7 +3044,7 @@ describe('ConversationRepository', () => {
 
       const mockedProtocolUpdateEventResponse = {
         data: {
-          protocol: ConversationProtocol.MIXED,
+          protocol: CONVERSATION_PROTOCOL.MIXED,
         },
         qualified_conversation: {
           domain: 'anta.wire.link',
@@ -2930,7 +3061,7 @@ describe('ConversationRepository', () => {
         .spyOn(conversationRepository['conversationService'], 'updateConversationProtocol')
         .mockResolvedValueOnce(mockedProtocolUpdateEventResponse);
 
-      const newProtocol = ConversationProtocol.MIXED;
+      const newProtocol = CONVERSATION_PROTOCOL.MIXED;
       const newCipherSuite = 1;
       const newEpoch = 2;
       const mockedConversationResponse = generateAPIConversation({
@@ -2948,7 +3079,7 @@ describe('ConversationRepository', () => {
 
       const updatedConversation = await conversationRepository.updateConversationProtocol(
         conversation,
-        ConversationProtocol.MIXED,
+        CONVERSATION_PROTOCOL.MIXED,
       );
 
       expect(injectEventSpy).toHaveBeenCalledWith(
@@ -2956,7 +3087,7 @@ describe('ConversationRepository', () => {
         EventRepository.SOURCE.BACKEND_RESPONSE,
       );
 
-      expect(updatedConversation.protocol).toEqual(ConversationProtocol.MIXED);
+      expect(updatedConversation.protocol).toEqual(CONVERSATION_PROTOCOL.MIXED);
       expect(updatedConversation.cipherSuite).toEqual(newCipherSuite);
       expect(updatedConversation.epoch).toEqual(newEpoch);
     });
@@ -2967,7 +3098,7 @@ describe('ConversationRepository', () => {
       const selfUser = generateUser();
       conversation.selfUser(selfUser);
       const conversationRepository = await testFactory.exposeConversationActors();
-      const newProtocol = ConversationProtocol.MLS;
+      const newProtocol = CONVERSATION_PROTOCOL.MLS;
 
       const mockedProtocolUpdateEventResponse = {
         data: {
@@ -3016,7 +3147,7 @@ describe('ConversationRepository', () => {
       const selfUser = generateUser();
       conversation.selfUser(selfUser);
       const conversationRepository = await testFactory.exposeConversationActors();
-      const newProtocol = ConversationProtocol.MLS;
+      const newProtocol = CONVERSATION_PROTOCOL.MLS;
 
       const mockedProtocolUpdateEventResponse = {
         data: {
@@ -3082,7 +3213,7 @@ describe('ConversationRepository', () => {
     it('should add users to mls group of mixed conversation', async () => {
       const mockedGroupId = `mockedGroupId`;
       const conversation = _generateConversation({
-        protocol: ConversationProtocol.MIXED,
+        protocol: CONVERSATION_PROTOCOL.MIXED,
         groupId: mockedGroupId,
       });
       const conversationRepository = await testFactory.exposeConversationActors();
@@ -3107,7 +3238,7 @@ describe('ConversationRepository', () => {
 
     it('should add users to mls group of mls conversation', async () => {
       const mockedGroupId = `mockedGroupId`;
-      const conversation = _generateConversation({protocol: ConversationProtocol.MLS, groupId: mockedGroupId});
+      const conversation = _generateConversation({protocol: CONVERSATION_PROTOCOL.MLS, groupId: mockedGroupId});
       const conversationRepository = await testFactory.exposeConversationActors();
 
       const usersToAdd = [generateUser(), generateUser()];
@@ -3125,7 +3256,7 @@ describe('ConversationRepository', () => {
   });
 
   describe('removeMembers', () => {
-    it.each([ConversationProtocol.PROTEUS, ConversationProtocol.MIXED])(
+    it.each([CONVERSATION_PROTOCOL.PROTEUS, CONVERSATION_PROTOCOL.MIXED])(
       'should remove member from %s conversation',
       async protocol => {
         const conversationRepository = await testFactory.exposeConversationActors();
@@ -3156,7 +3287,7 @@ describe('ConversationRepository', () => {
     it('should remove member from mls conversation', async () => {
       const conversationRepository = await testFactory.exposeConversationActors();
 
-      const conversation = _generateConversation({protocol: ConversationProtocol.MLS});
+      const conversation = _generateConversation({protocol: CONVERSATION_PROTOCOL.MLS});
 
       const selfUser = generateUser();
       conversation.selfUser(selfUser);
@@ -3185,10 +3316,38 @@ describe('ConversationRepository', () => {
       });
     });
   });
+
+  describe('fetchBackendConversationEntityById', () => {
+    it('returns backend conversation entity on success', async () => {
+      const conversationRepository = await testFactory.exposeConversationActors();
+      const qualifiedId = {id: 'test-id', domain: 'test-domain'};
+      const backendConversation = generateAPIConversation({id: qualifiedId});
+
+      jest
+        .spyOn(conversationRepository['conversationService'], 'getConversationById')
+        .mockResolvedValueOnce(backendConversation);
+
+      const result = await conversationRepository.fetchBackendConversationEntityById(qualifiedId);
+      expect(result).toBe(backendConversation);
+    });
+
+    it('throws and logs error when backend call fails', async () => {
+      const conversationRepository = await testFactory.exposeConversationActors();
+      const qualifiedId = {id: 'test-id', domain: 'test-domain'};
+      const error = new Error('Backend error');
+
+      jest.spyOn(conversationRepository['conversationService'], 'getConversationById').mockRejectedValueOnce(error);
+
+      const loggerSpy = jest.spyOn(conversationRepository['logger'], 'error').mockImplementation(() => {});
+
+      await expect(conversationRepository.fetchBackendConversationEntityById(qualifiedId)).rejects.toThrow(error);
+      expect(loggerSpy).toHaveBeenCalledWith(expect.stringContaining('Failed to get conversation from backend'));
+    });
+  });
 });
 
 describe('leaveConversation', () => {
-  it.each([ConversationProtocol.PROTEUS, ConversationProtocol.MIXED, ConversationProtocol.MLS])(
+  it.each([CONVERSATION_PROTOCOL.PROTEUS, CONVERSATION_PROTOCOL.MIXED, CONVERSATION_PROTOCOL.MLS])(
     'should leave %s conversation',
     async protocol => {
       const [conversationRepository, {userState, core, eventRepository}] = buildConversationRepository();
@@ -3220,7 +3379,7 @@ describe('deleteConversation', () => {
     const teamId = createUuid();
 
     teamState.team({id: teamId} as any);
-    const conversation = _generateConversation({protocol: ConversationProtocol.MLS});
+    const conversation = _generateConversation({protocol: CONVERSATION_PROTOCOL.MLS});
 
     const deleteConversationSpy = jest.spyOn(conversationService, 'deleteConversation');
     const deleteConversationFromDbSpy = jest.spyOn(conversationService, 'deleteConversationFromDb');
@@ -3242,7 +3401,7 @@ describe('deleteConversation', () => {
 
     jest.spyOn(conversationRepository['teamState'], 'team').mockReturnValue({id: teamId} as any);
 
-    const conversation = _generateConversation({protocol: ConversationProtocol.MLS});
+    const conversation = _generateConversation({protocol: CONVERSATION_PROTOCOL.MLS});
 
     const deleteConversationSpy = jest
       .spyOn(conversationService, 'deleteConversation')
@@ -3261,5 +3420,81 @@ describe('deleteConversation', () => {
     expect(conversationState.conversations()).toEqual([]);
     expect(deleteConversationFromDbSpy).toHaveBeenCalledWith(conversation.id);
     expect(wipeMLSCapableConversationSpy).toHaveBeenCalledWith(conversation);
+  });
+});
+
+describe('onMLSResetMessage', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
+  it('should handle MLS reset message by updating groupId & epoch of the conversation and deleting the old groupId from core crypto', async () => {
+    const [conversationRepository, {conversationState, conversationService, core}] = buildConversationRepository();
+
+    const conversation = _generateConversation({protocol: CONVERSATION_PROTOCOL.MLS, groupId: 'old-group-id'});
+
+    conversationState.conversations([conversation]);
+
+    const mlsResetEvent: ConversationMLSResetEvent = {
+      type: CONVERSATION_EVENT.MLS_RESET,
+      time: new Date().toISOString(),
+      from: 'user-id',
+      conversation: conversation.id,
+      qualified_conversation: conversation.qualifiedId,
+      data: {
+        new_group_id: 'new-group-id',
+        group_id: 'old-group-id',
+      },
+    };
+
+    spyOn(core.service!.conversation, 'wipeMLSConversation').and.returnValue(Promise.resolve(undefined));
+    spyOn(core.service!.conversation, 'mlsGroupExistsLocally').and.returnValue(Promise.resolve(false));
+    const updatePropertiesSpy = jest.spyOn(ConversationMapper, 'updateProperties');
+    const saveConversationStateInDbSpy = jest.spyOn(conversationService, 'saveConversationStateInDb');
+
+    await (conversationRepository as any).onMLSResetMessage(conversation, mlsResetEvent);
+
+    expect(updatePropertiesSpy).toHaveBeenCalledWith(conversation, {
+      groupId: 'new-group-id',
+      epoch: 0,
+    });
+    expect(saveConversationStateInDbSpy).toHaveBeenCalledWith(conversation);
+  });
+
+  it('Should get epoch from core crypto if new groupId already exists locally', async () => {
+    const [conversationRepository, {conversationState, conversationService, core}] = buildConversationRepository();
+
+    const conversation = _generateConversation({protocol: CONVERSATION_PROTOCOL.MLS, groupId: 'old-group-id'});
+    conversation.epoch = 1;
+
+    conversationState.conversations([conversation]);
+
+    const mlsResetEvent: ConversationMLSResetEvent = {
+      type: CONVERSATION_EVENT.MLS_RESET,
+      time: new Date().toISOString(),
+      from: 'user-id',
+      conversation: conversation.id,
+      qualified_conversation: conversation.qualifiedId,
+      data: {
+        new_group_id: 'new-group-id',
+        group_id: 'old-group-id',
+      },
+    };
+
+    spyOn(core.service!.conversation, 'wipeMLSConversation').and.returnValue(Promise.resolve(undefined));
+    spyOn(core.service!.conversation, 'mlsGroupExistsLocally').and.returnValue(Promise.resolve(true));
+    spyOn(core.service!.mls!, 'getEpoch').and.returnValue(Promise.resolve(5));
+
+    const updatePropertiesSpy = jest.spyOn(ConversationMapper, 'updateProperties');
+    const saveConversationStateInDbSpy = jest.spyOn(conversationService, 'saveConversationStateInDb');
+
+    await (conversationRepository as any).onMLSResetMessage(conversation, mlsResetEvent);
+
+    expect(updatePropertiesSpy).toHaveBeenCalledWith(conversation, {
+      groupId: 'new-group-id',
+      epoch: 5,
+    });
+    expect(saveConversationStateInDbSpy).toHaveBeenCalledWith(conversation);
+    expect(conversation.epoch).toBe(5);
   });
 });

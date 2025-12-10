@@ -51,4 +51,15 @@ export class TestServiceClientE2E {
       text,
     });
   }
+
+  async sendLocation(
+    instanceId: string,
+    conversationId: string,
+    message: {locationName: string; latitude: number; longitude: number; zoom: number},
+  ) {
+    return await this.axiosInstance.post(`/api/v1/instance/${instanceId}/sendLocation`, {
+      conversationId,
+      ...message,
+    });
+  }
 }

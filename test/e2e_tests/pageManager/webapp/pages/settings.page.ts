@@ -22,20 +22,28 @@ import {Page, Locator} from '@playwright/test';
 export class SettingsPage {
   readonly page: Page;
 
-  readonly audioVideoSettingsButton: Locator;
   readonly accountButton: Locator;
+  readonly devicesButton: Locator;
+  readonly optionsButton: Locator;
+  readonly audioVideoButton: Locator;
 
   constructor(page: Page) {
     this.page = page;
-    this.audioVideoSettingsButton = page.locator("[data-uie-name='go-audio-video']");
-    this.accountButton = page.locator("[data-uie-name='go-account']");
+    this.accountButton = page.getByRole('button', {name: 'Account'});
+    this.devicesButton = page.getByRole('button', {name: 'Devices'});
+    this.optionsButton = page.getByRole('button', {name: 'Options'});
+    this.audioVideoButton = page.getByRole('button', {name: 'Audio / Video'});
   }
 
   async clickAudioVideoSettingsButton() {
-    await this.audioVideoSettingsButton.click();
+    await this.audioVideoButton.click();
   }
 
   async clickAccountButton() {
     await this.accountButton.click();
+  }
+
+  async clickOptionsButton() {
+    await this.optionsButton.click();
   }
 }

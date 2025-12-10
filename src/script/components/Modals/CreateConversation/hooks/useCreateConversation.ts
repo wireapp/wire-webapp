@@ -19,8 +19,9 @@
 
 import {useState, useContext} from 'react';
 
-import {ADD_PERMISSION, ConversationProtocol, GROUP_CONVERSATION_TYPE} from '@wireapp/api-client/lib/conversation';
+import {ADD_PERMISSION, GROUP_CONVERSATION_TYPE} from '@wireapp/api-client/lib/conversation/Conversation';
 import {RECEIPT_MODE} from '@wireapp/api-client/lib/conversation/data';
+import {CONVERSATION_PROTOCOL, mapToConversationProtocol} from '@wireapp/api-client/lib/team';
 import {isNonFederatingBackendsError} from '@wireapp/core/lib/errors';
 import {amplify} from 'amplify';
 import {container} from 'tsyringe';
@@ -73,9 +74,12 @@ export const useCreateConversation = () => {
   const teamState = container.resolve(TeamState);
   const {isTeam, isMLSEnabled} = useKoSubscribableChildren(teamState, ['isTeam', 'isMLSEnabled']);
 
-  const defaultProtocol = isMLSEnabled
-    ? teamState.teamFeatures()?.mls?.config.defaultProtocol
-    : ConversationProtocol.PROTEUS;
+  const defaultProtocol: CONVERSATION_PROTOCOL | undefined = isMLSEnabled
+    ? mapToConversationProtocol(teamState.teamFeatures()?.mls?.config.defaultProtocol)
+    : CONVERSATION_PROTOCOL.PROTEUS;
+
+  // Read receipts are temorarily disabled for MLS groups and channels until it is supported
+  const isGroupWithReadReceiptsEnabled = defaultProtocol !== CONVERSATION_PROTOCOL.MLS && isReadReceiptsEnabled;
 
   const getAccessState = () => {
     let access = ACCESS_STATE.TEAM.TEAM_ONLY;
@@ -150,7 +154,7 @@ export const useCreateConversation = () => {
         {
           add_permission: moderator === ADD_PERMISSION.ADMINS ? ADD_PERMISSION.ADMINS : ADD_PERMISSION.EVERYONE,
           protocol: defaultProtocol,
-          receipt_mode: isReadReceiptsEnabled ? RECEIPT_MODE.ON : RECEIPT_MODE.OFF,
+          receipt_mode: isGroupWithReadReceiptsEnabled ? RECEIPT_MODE.ON : RECEIPT_MODE.OFF,
           cells: isCellsEnabled,
           group_conv_type:
             conversationType === ConversationType.Channel

@@ -17,7 +17,7 @@
  *
  */
 
-import {useId, useState} from 'react';
+import {useState} from 'react';
 
 import {t} from 'Util/LocalizerUtil';
 
@@ -34,9 +34,11 @@ interface ImageAssetSmallProps {
   isError: boolean;
   senderName: string;
   timestamp: number;
+  id: string;
 }
 
 export const ImageAssetSmall = ({
+  id,
   src,
   name,
   extension,
@@ -47,7 +49,6 @@ export const ImageAssetSmall = ({
 }: ImageAssetSmallProps) => {
   const [isLoaded, setIsLoaded] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
-  const id = useId();
 
   return (
     <>
@@ -61,6 +62,7 @@ export const ImageAssetSmall = ({
         aria-haspopup="dialog"
         aria-expanded={isOpen}
         aria-controls={id}
+        disabled={isError}
       >
         <MediaFilePreviewCard
           label={src ? t('conversationFileImagePreviewLabel', {src}) : ''}
@@ -77,6 +79,7 @@ export const ImageAssetSmall = ({
         filePreviewUrl={src}
         fileExtension={extension}
         fileName={name}
+        fileUrl={src}
         senderName={senderName}
         timestamp={timestamp}
       />

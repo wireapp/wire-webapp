@@ -50,6 +50,7 @@ import {VerifyEmailCode} from './VerifyEmailCode';
 import {VerifyEmailLink} from './VerifyEmailLink';
 
 import {Config} from '../../Config';
+import {RouteA11y} from '../component/RouteA11y';
 import {mapLanguage, normalizeLanguage} from '../localeConfig';
 import {actionRoot as ROOT_ACTIONS} from '../module/action/';
 import {bindActionCreators, RootState} from '../module/reducer';
@@ -73,6 +74,15 @@ const RootComponent: FC<RootProps & ConnectedProps & DispatchProps> = ({
   isFetchingSSOSettings,
   doGetSSOSettings,
 }) => {
+  // Injects the helper class used by useRouteA11y so programmatic focus targets (for screen readers)
+  // lose their outlines while the focus trap is active.
+  useEffect(() => {
+    const style = document.createElement('style');
+    style.textContent = `.sr-only-focus:focus, .sr-only-focus:focus-visible { outline: none !important; }`;
+    document.head.appendChild(style);
+    return () => style.remove();
+  }, []);
+
   useEffect(() => {
     // Force the hash url to have a initial `/` (see https://stackoverflow.com/a/71864506)
     const forceSlashAfterHash = () => {
@@ -146,6 +156,7 @@ const RootComponent: FC<RootProps & ConnectedProps & DispatchProps> = ({
           </ContainerXS>
         ) : (
           <Router>
+            <RouteA11y />
             <Routes>
               <Route
                 path={ROUTE.INDEX}

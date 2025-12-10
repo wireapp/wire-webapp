@@ -18,7 +18,6 @@
  */
 
 import {ConnectionStatus} from '@wireapp/api-client/lib/connection';
-import {ConversationProtocol} from '@wireapp/api-client/lib/conversation';
 import {MemberLeaveReason} from '@wireapp/api-client/lib/conversation/data/';
 import {
   BackendEvent,
@@ -28,14 +27,12 @@ import {
   USER_EVENT,
 } from '@wireapp/api-client/lib/event/';
 import type {Notification, NotificationList} from '@wireapp/api-client/lib/notification/';
-import {FEATURE_KEY, FeatureStatus} from '@wireapp/api-client/lib/team/feature/';
+import {CONVERSATION_PROTOCOL, FEATURE_KEY, FEATURE_STATUS} from '@wireapp/api-client/lib/team/feature/';
 import type {QualifiedId} from '@wireapp/api-client/lib/user';
 import {NotificationSource} from '@wireapp/core/lib/notification';
 import {DatabaseKeys} from '@wireapp/core/lib/notification/NotificationDatabaseRepository';
-import {Encoder, Decoder} from 'bazinga64';
 import Dexie from 'dexie';
 import keyboardjs from 'keyboardjs';
-import {observable} from 'knockout';
 import {$createTextNode, $getRoot, LexicalEditor} from 'lexical';
 import {container} from 'tsyringe';
 
@@ -72,6 +69,15 @@ import {checkVersion} from '../lifecycle/newVersionHandler';
 import {APIClient} from '../service/APIClientSingleton';
 import {Core} from '../service/CoreSingleton';
 import {ViewModelRepositories} from '../view_model/MainViewModel';
+
+export enum CoreCryptoLogLevel {
+  Off = 1,
+  Trace = 2,
+  Debug = 3,
+  Info = 4,
+  Warn = 5,
+  Error = 6,
+}
 
 export class DebugUtil {
   private readonly logger: Logger;
@@ -234,6 +240,14 @@ export class DebugUtil {
     );
   }
 
+  isGzippingEnabled(): boolean {
+    return this.apiClient.transport.http.isGzipEnabled();
+  }
+
+  toggleGzipping(enabled: boolean) {
+    this.apiClient.transport.http.toggleGzip(enabled);
+  }
+
   enableCameraBlur(flag: boolean) {
     return this.callingRepository.switchVideoBackgroundBlur(flag);
   }
@@ -241,7 +255,7 @@ export class DebugUtil {
   reconnectWebSocket({dryRun} = {dryRun: false}) {
     const teamFeatures = this.teamState.teamFeatures();
     const useAsyncNotificationStream =
-      teamFeatures?.[FEATURE_KEY.CONSUMABLE_NOTIFICATIONS]?.status === FeatureStatus.ENABLED;
+      teamFeatures?.[FEATURE_KEY.CONSUMABLE_NOTIFICATIONS]?.status === FEATURE_STATUS.ENABLED;
     const useLegacyNotificationStream = !useAsyncNotificationStream;
     return this.eventRepository.connectWebSocket(this.core, useLegacyNotificationStream, () => {}, dryRun);
   }
@@ -263,6 +277,16 @@ export class DebugUtil {
 
   async disablePressSpaceToUnmute() {
     this.propertiesRepository.savePreference(PROPERTIES_TYPE.CALL.ENABLE_PRESS_SPACE_TO_UNMUTE, false);
+  }
+
+  async setCoreCryptoMaxLogLevel(level: CoreCryptoLogLevel) {
+    return this.core.setMaxCoreCryptoLogLevel(level);
+  }
+
+  async resetMLSConversation() {
+    return (this.core.service?.conversation as any).resetMLSConversation(
+      this.conversationState.activeConversation()?.qualifiedId,
+    );
   }
 
   setupAvsDebugger() {
@@ -298,6 +322,27 @@ export class DebugUtil {
     return isEnabled === 'true';
   }
 
+  isEnabledAvsRustSFT(): boolean {
+    const storage = getStorage();
+
+    if (storage === undefined) {
+      return false;
+    }
+
+    const isEnabled = storage.getItem('avs-rust-sft-enabled');
+    return isEnabled === 'true';
+  }
+
+  enableAvsRustSFT(enable: boolean): boolean {
+    const storage = getStorage();
+
+    if (storage === undefined) {
+      return false;
+    }
+    storage.setItem('avs-rust-sft-enabled', `${enable}`);
+    return enable;
+  }
+
   /** Used by QA test automation. */
   blockAllConnections(): Promise<void[]> {
     const blockUsers = this.userState.users().map(userEntity => this.connectionRepository.blockUser(userEntity));
@@ -316,7 +361,10 @@ export class DebugUtil {
     await proteusService['cryptoClient'].debugBreakSession(sessionId);
   }
 
-  async setTeamSupportedProtocols(supportedProtocols: ConversationProtocol[], defaultProtocol?: ConversationProtocol) {
+  async setTeamSupportedProtocols(
+    supportedProtocols: CONVERSATION_PROTOCOL[],
+    defaultProtocol?: CONVERSATION_PROTOCOL,
+  ) {
     const {teamId} = await this.userRepository.getSelf();
     if (!teamId) {
       throw new Error('teamId of self user is undefined');
@@ -330,7 +378,7 @@ export class DebugUtil {
 
     const response = await this.apiClient.api.teams.feature.putMLSFeature(teamId, {
       config: {...mlsFeature.config, supportedProtocols, defaultProtocol: defaultProtocol || supportedProtocols[0]},
-      status: FeatureStatus.ENABLED,
+      status: FEATURE_STATUS.ENABLED,
     });
 
     return response;
@@ -352,7 +400,7 @@ export class DebugUtil {
 
     const response = await this.apiClient.api.teams.feature.putMLSMigrationFeature(teamId, {
       config,
-      status: isEnabled ? FeatureStatus.ENABLED : FeatureStatus.DISABLED,
+      status: isEnabled ? FEATURE_STATUS.ENABLED : FEATURE_STATUS.DISABLED,
     });
 
     return response;
@@ -627,364 +675,4 @@ export class DebugUtil {
   disableForcedErrorReporting() {
     return disableForcedErrorReporting();
   }
-
-  /**
-   * Export all data from an IndexedDB database
-   *
-   * @param {IDBDatabase} idbDatabase The database to export from
-   * @return {Promise<string>}
-   */
-  static exportToJson(idbDatabase: IDBDatabase) {
-    return new Promise<string>((resolve, reject) => {
-      const exportObject: Record<string, any[]> = {};
-
-      if (idbDatabase.objectStoreNames.length === 0) {
-        resolve(JSON.stringify(exportObject, DebugUtil.jsonReplacer));
-        return;
-      }
-
-      const tx = idbDatabase.transaction(idbDatabase.objectStoreNames, 'readonly');
-      tx.addEventListener('error', reject);
-
-      let doneStores = 0;
-
-      for (const storeName of idbDatabase.objectStoreNames) {
-        const store = tx.objectStore(storeName);
-        const isOutOfLine = store.keyPath === null; // out-of-line keys
-        const all: any[] = [];
-
-        store.openCursor().addEventListener('success', ev => {
-          const cursor = (ev.target as any)?.result as IDBCursorWithValue | null;
-          if (cursor) {
-            if (isOutOfLine) {
-              all.push({__key: cursor.key, __value: cursor.value});
-            } else {
-              all.push(cursor.value);
-            }
-            cursor.continue();
-          } else {
-            exportObject[storeName] = all;
-            doneStores++;
-            if (doneStores === idbDatabase.objectStoreNames.length) {
-              resolve(JSON.stringify(exportObject, DebugUtil.jsonReplacer));
-            }
-          }
-        });
-      }
-    });
-  }
-
-  /**
-   * Import data from JSON into an IndexedDB database.
-   * This does not delete any existing data from the database, so keys may clash.
-   *
-   * @param {IDBDatabase} idbDatabase Database to import into
-   * @param {string}      json        Data to import, one key per object store
-   * @return {Promise<void>}
-   */
-  static importFromJson(idbDatabase: IDBDatabase, json: string) {
-    return new Promise<void>((resolve, reject) => {
-      // const importObject: Record<string, any[]> = JSON.parse(json) || {};
-      const importObject = JSON.parse(json, DebugUtil.jsonReviver);
-
-      const storeNames = Array.from(idbDatabase.objectStoreNames || []);
-
-      // If nothing to do, resolve
-      if (storeNames.length === 0) {
-        resolve();
-        return;
-      }
-
-      const tx = idbDatabase.transaction(storeNames, 'readwrite');
-      tx.addEventListener('error', reject);
-
-      let remainingStores = storeNames.length;
-
-      for (const storeName of storeNames) {
-        const store = tx.objectStore(storeName);
-        const items = importObject[storeName] || [];
-
-        // Detect mode
-        const isOutOfLine = store.keyPath === null;
-        const hasKeyGenerator = (store as any).autoIncrement === true; // spec allows reading this
-
-        if (items.length === 0) {
-          // Done with this store
-          if (--remainingStores === 0) {
-            resolve();
-          }
-          continue;
-        }
-
-        let processed = 0;
-
-        for (const entry of items) {
-          try {
-            if (isOutOfLine) {
-              if (hasKeyGenerator) {
-                // key generator: we can omit explicit key
-                store.add(entry.__value ?? entry);
-              } else {
-                // no key generator: MUST provide key
-                const key = entry?.__key;
-                const val = entry?.__value ?? entry;
-                // use put to avoid DuplicateKeyError if data already exists
-                store.put(val, key);
-              }
-            } else {
-              // inline keyPath: key is inside value object
-              const val = entry?.__value ?? entry;
-              store.put(val);
-            }
-          } catch (e) {
-            // Let the transaction onerror catch anything unexpected
-            // but keep flowing—IndexedDB will queue requests anyway.
-            // You can log e here if you want finer granularity.
-          } finally {
-            processed++;
-            if (processed === items.length) {
-              // Finished this store
-              if (--remainingStores === 0) {
-                resolve();
-              }
-            }
-          }
-        }
-      }
-    });
-  }
-
-  /**
-   * Clear a database
-   *
-   * @param {IDBDatabase} idbDatabase The database to delete all data from
-   * @return {Promise<void>}
-   */
-  static clearDatabase(idbDatabase: IDBDatabase) {
-    return new Promise<void>((resolve, reject) => {
-      const transaction = idbDatabase.transaction(idbDatabase.objectStoreNames, 'readwrite');
-      transaction.addEventListener('error', reject);
-
-      let count = 0;
-      for (const storeName of idbDatabase.objectStoreNames) {
-        transaction
-          .objectStore(storeName)
-          .clear()
-          .addEventListener('success', () => {
-            count++;
-            if (count === idbDatabase.objectStoreNames.length) {
-              // Cleared all object stores
-              resolve();
-            }
-          });
-      }
-      // If DB has zero stores, resolve immediately
-      if (idbDatabase.objectStoreNames.length === 0) {
-        resolve();
-      }
-    });
-  }
-
-  // ================== Minimal private utilities ==================
-
-  private async _listDbNames(): Promise<string[]> {
-    let names: string[] = [];
-    try {
-      if (typeof indexedDB.databases === 'function') {
-        const metas = await indexedDB.databases();
-        names = (metas || []).map(m => m?.name).filter((n): n is string => !!n);
-      } else {
-        names = await this.Dexie.getDatabaseNames();
-      }
-    } catch (e) {
-      this.logger.error('Failed to enumerate IndexedDB databases', e);
-      names = [];
-    }
-
-    // 🚫 Ignore secrets-* DBs
-    const filtered = names.filter(n => !n.startsWith('secrets-'));
-    return filtered;
-  }
-
-  private _openDb(name: string, version?: number): Promise<IDBDatabase> {
-    return new Promise((resolve, reject) => {
-      const req = indexedDB.open(name, version);
-      req.onsuccess = () => resolve(req.result);
-      req.onerror = () => reject(req.error || new Error(`Failed to open DB ${name}`));
-      req.onupgradeneeded = () => resolve(req.result); // we’re not changing schema
-    });
-  }
-
-  /** Dump ALL databases of the origin into one JSON file (using exportToJson per DB). */
-  public async dumpIndexedDB(): Promise<void> {
-    const dbNames = await this._listDbNames();
-    if (!dbNames.length) {
-      this.logger.info('No IndexedDB databases found for this origin.');
-      return;
-    }
-
-    const bundle: {
-      format: 'SimpleMultiDBDump';
-      version: 1;
-      origin: string;
-      createdAt: string;
-      databases: Array<{name: string; data: string}>;
-    } = {
-      format: 'SimpleMultiDBDump',
-      version: 1,
-      origin: location.origin,
-      createdAt: new Date().toISOString(),
-      databases: [],
-    };
-
-    for (const name of dbNames) {
-      const db = await this._openDb(name);
-      try {
-        const json = await DebugUtil.exportToJson(db);
-        bundle.databases.push({name: db.name, data: json});
-      } finally {
-        try {
-          db.close();
-        } catch {}
-      }
-    }
-
-    const fileName = `wire-idb-dump-${new Date().toISOString().replace(/[:.]/g, '-')}.json`;
-    const blob = new Blob([JSON.stringify(bundle)], {type: 'application/json'});
-    const url = URL.createObjectURL(blob);
-    const anchor = document.createElement('a');
-    anchor.href = url;
-    anchor.download = fileName;
-    document.body.appendChild(anchor);
-    anchor.click();
-    anchor.remove();
-    URL.revokeObjectURL(url);
-
-    this.logger.info(`IndexedDB dump complete: ${fileName} (DBs: ${bundle.databases.length})`);
-  }
-
-  /**
-   * Restore from a JSON dump:
-   * - Clears ALL stores in ALL existing DBs
-   * - Imports matching DB data via importFromJson
-   * (No schema creation, no cross-origin.)
-   */
-  public async restoreIndexedDB(): Promise<void> {
-    const [handle] = await (window as any).showOpenFilePicker({
-      types: [{description: 'JSON', accept: {'application/json': ['.json']}}],
-      excludeAcceptAllOption: false,
-      multiple: false,
-    });
-    const file = await handle.getFile();
-    const text = await file.text();
-
-    const parsed = JSON.parse(text);
-    if (parsed?.format !== 'SimpleMultiDBDump' || parsed?.version !== 1) {
-      throw new Error('Unsupported dump format/version (expected SimpleMultiDBDump v1).');
-    }
-
-    if (
-      !window.confirm('This will ERASE all local IndexedDB data for this origin and then import the dump. Continue?')
-    ) {
-      return;
-    }
-
-    const existing = await this._listDbNames();
-
-    // 1) Clear everything first
-    for (const name of existing) {
-      const db = await this._openDb(name);
-      try {
-        await DebugUtil.clearDatabase(db);
-      } finally {
-        try {
-          db.close();
-        } catch {}
-      }
-    }
-
-    // 2) Import per-DB (only into DBs that exist today; no schema creation)
-    for (const dbEntry of parsed.databases as Array<{name: string; data: string}>) {
-      if (!existing.includes(dbEntry.name)) {
-        this.logger.warn(`[restore] Skipping DB not present locally: ${dbEntry.name}`);
-        continue;
-      }
-      const db = await this._openDb(dbEntry.name);
-      try {
-        await DebugUtil.importFromJson(db, dbEntry.data);
-        this.logger.info(`[restore] Imported ${dbEntry.name}`);
-      } finally {
-        try {
-          db.close();
-        } catch {}
-      }
-    }
-
-    this.logger.info('IndexedDB restore complete.');
-    // eslint-disable-next-line no-alert
-    alert('IndexedDB restore complete.');
-    window.location.reload();
-  }
-
-  /** Erase ALL databases (all stores) for this origin (no import). */
-  public async eraseIndexedDB(): Promise<void> {
-    const names = await this._listDbNames();
-    let wipedStores = 0;
-    for (const name of names) {
-      const db = await this._openDb(name);
-      try {
-        // count stores before clearing
-        wipedStores += db.objectStoreNames.length;
-        await DebugUtil.clearDatabase(db);
-        this.logger.info(`[erase] Cleared ${name}`);
-      } finally {
-        try {
-          db.close();
-        } catch {}
-      }
-    }
-    this.logger.info(`IndexedDB erase complete. Databases: ${names.length}, Stores cleared: ${wipedStores}`);
-    // eslint-disable-next-line no-alert
-    alert(`IndexedDB erased.\nDBs: ${names.length}\nStores cleared: ${wipedStores}`);
-  }
-
-  // --- Replacer: only ArrayBuffer & Uint8Array -> base64 wrappers ---
-  static jsonReplacer(_key: string, value: any) {
-    if (value instanceof Uint8Array) {
-      return {__type: 'Uint8Array', __b64: Encoder.toBase64(value).asString};
-    }
-    if (value instanceof ArrayBuffer) {
-      return {__type: 'ArrayBuffer', __b64: Encoder.toBase64(value).asString};
-    }
-    return value;
-  }
-
-  // --- Reviver: restore those wrappers back to real binaries ---
-  static jsonReviver(_key: string, value: any) {
-    if (value && value.__b64 && value.__type === 'Uint8Array') {
-      return Decoder.fromBase64(value.__b64).asBytes;
-    }
-    if (value && value.__b64 && value.__type === 'ArrayBuffer') {
-      return Decoder.fromBase64(value.__b64).asBytes;
-    }
-    return value;
-  }
-}
-
-export function observableWithProxy(
-  initialValue: any,
-  name = 'unnamed',
-  extraInformation: Record<string, string> = {},
-) {
-  const obs = observable(initialValue);
-
-  return new Proxy(obs, {
-    apply(target, thisArg, args) {
-      if (args.length) {
-        // eslint-disable-next-line no-console
-        console.trace(`DEBUG: Proxy Observable "${name}" set to:`, {args: args[0], ...extraInformation});
-      }
-      return Reflect.apply(target, thisArg, args);
-    },
-  });
 }

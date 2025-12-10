@@ -18,7 +18,7 @@
  */
 
 import {act, render} from '@testing-library/react';
-import {FeatureStatus} from '@wireapp/api-client/lib/team/feature/';
+import {FEATURE_STATUS} from '@wireapp/api-client/lib/team/feature/';
 import {amplify} from 'amplify';
 import ko from 'knockout';
 
@@ -82,7 +82,7 @@ const createAppLockRepository = (appLockState?: AppLockState) => {
 describe('AppLock', () => {
   describe('disabled feature', () => {
     it('does not shows up if applock is disabled', () => {
-      const appLockState = createAppLockState(createTeamState({status: FeatureStatus.DISABLED}));
+      const appLockState = createAppLockState(createTeamState({status: FEATURE_STATUS.DISABLED}));
       const appLockRepository = createAppLockRepository(appLockState);
 
       const props = {

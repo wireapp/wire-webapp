@@ -45,7 +45,12 @@ export function createMessageAddEvent({
 } = {}): MessageAddEvent {
   const from = createUuid();
   const conversation = new Conversation(createUuid(), 'domain');
-  const baseEvent = EventBuilder.buildMessageAdd(conversation, Date.now(), createUuid(), 'clientId');
+  const baseEvent = EventBuilder.buildMessageAdd({
+    conversationEntity: conversation,
+    currentTimestamp: Date.now(),
+    senderId: createUuid(),
+    clientId: 'clientId',
+  });
   return {
     ...baseEvent,
     data: {

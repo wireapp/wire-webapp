@@ -17,6 +17,7 @@
  *
  */
 
+import {NodeFlags} from '@wireapp/api-client/lib/cells';
 import {container, singleton} from 'tsyringe';
 
 import {createUuid} from 'Util/uuid';
@@ -40,8 +41,8 @@ interface CellsConfig {
 // Currently, the cells backend doesn't specify the sortable fields (they're dynamic).
 // When backend will specify the exact fields, we'll update this type.
 // The "(string & {})" indicates that all strings are valid, but we get autocomplete for the union values.
-export type SortBy = 'mtime' | (string & {});
-export type SortDirection = 'asc' | 'desc';
+type SortBy = 'mtime' | (string & {});
+type SortDirection = 'asc' | 'desc';
 
 const DEFAULT_MAX_FILES_LIMIT = 100;
 
@@ -113,6 +114,12 @@ export class CellsRepository {
     return this.apiClient.api.cells.deleteNode({uuid, permanently});
   }
 
+  async deleteNodes({uuids, permanently = false}: {uuids: string[]; permanently?: boolean}) {
+    uuids.forEach(async uuid => {
+      await this.deleteNode({uuid, permanently});
+    });
+  }
+
   async moveNode({currentPath, targetPath}: {currentPath: string; targetPath: string}) {
     return this.apiClient.api.cells.moveNode({currentPath, targetPath});
   }
@@ -145,8 +152,8 @@ export class CellsRepository {
     });
   }
 
-  async getNode({uuid}: {uuid: string}) {
-    return this.apiClient.api.cells.getNode({id: uuid});
+  async getNode({uuid, flags}: {uuid: string; flags?: NodeFlags[]}) {
+    return this.apiClient.api.cells.getNode({id: uuid, flags});
   }
 
   async lookupNodeByPath({path}: {path: string}) {
@@ -187,12 +194,14 @@ export class CellsRepository {
     query,
     limit = DEFAULT_MAX_FILES_LIMIT,
     tags,
+    type,
     sortBy,
     sortDirection,
   }: {
     query: string;
     limit?: number;
     tags?: string[];
+    type?: 'file' | 'folder';
     sortBy?: SortBy;
     sortDirection?: SortDirection;
   }) {
@@ -202,6 +211,7 @@ export class CellsRepository {
       sortBy,
       sortDirection,
       tags,
+      ...(type ? {type: type === 'file' ? 'LEAF' : 'COLLECTION'} : {}),
     });
   }
 

@@ -17,14 +17,12 @@
  *
  */
 
-import React, {useCallback, useEffect, useState} from 'react';
+import {useCallback, useEffect, useState} from 'react';
 
-import {amplify} from 'amplify';
 import cx from 'classnames';
 import {container} from 'tsyringe';
 
 import {TabIndex, Button, ButtonVariant, useTimeout} from '@wireapp/react-ui-kit';
-import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {RestrictedVideo} from 'Components/asset/RestrictedVideo';
 import {AssetError} from 'Repositories/assets/AssetError';
@@ -33,7 +31,6 @@ import {AssetTransferState} from 'Repositories/assets/AssetTransferState';
 import type {ContentMessage} from 'Repositories/entity/message/ContentMessage';
 import type {FileAsset as FileAssetType} from 'Repositories/entity/message/FileAsset';
 import {TeamState} from 'Repositories/team/TeamState';
-import {EventName} from 'Repositories/tracking/EventName';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 import {formatSeconds} from 'Util/TimeUtil';
@@ -52,12 +49,12 @@ interface VideoAssetProps {
   isFocusable?: boolean;
 }
 
-const VideoAsset: React.FC<VideoAssetProps> = ({
+const VideoAsset = ({
   message,
   isQuote,
   teamState = container.resolve(TeamState),
   isFocusable = true,
-}) => {
+}: VideoAssetProps) => {
   const asset = message.getFirstAsset() as FileAssetType;
   const {isObfuscated} = useKoSubscribableChildren(message, ['isObfuscated']);
   const {preview_resource: assetPreviewResource} = useKoSubscribableChildren(asset, ['preview_resource']);
@@ -94,10 +91,11 @@ const VideoAsset: React.FC<VideoAssetProps> = ({
     const video = document.createElement('video');
     const canPlay = video.canPlayType(mimeType) !== '';
 
-    if (!canPlay) {
-      amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.MESSAGES.VIDEO.PLAY_FAILED);
-      amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.MESSAGES.VIDEO.UNSUPPORTED_MIME_TYPE);
-    }
+    // ToDo: This needs to be revisited
+    // if (!canPlay) {
+    //   amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.MESSAGES.VIDEO.PLAY_FAILED);
+    //   amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.MESSAGES.VIDEO.UNSUPPORTED_MIME_TYPE);
+    // }
 
     return canPlay;
   };
@@ -136,22 +134,25 @@ const VideoAsset: React.FC<VideoAssetProps> = ({
           const playable = await isVideoPlayable(assetUrl.url);
 
           if (!playable) {
-            amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.MESSAGES.VIDEO.PLAY_FAILED);
-            amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.MESSAGES.VIDEO.UNPLAYABLE_ERROR);
+            // ToDo: This needs to be revisited
+            // amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.MESSAGES.VIDEO.PLAY_FAILED);
+            // amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.MESSAGES.VIDEO.UNPLAYABLE_ERROR);
             setVideoPlaybackError(true);
             return;
           }
 
           setVideoSrc(assetUrl);
           setIsVideoLoaded(true);
-          amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.MESSAGES.VIDEO.PLAY_SUCCESS);
+          // ToDo: This needs to be revisited
+          //amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.MESSAGES.VIDEO.PLAY_SUCCESS);
         } catch (error) {
           if (error instanceof Error) {
             if (error.name !== AssetError.CANCEL_ERROR) {
               setVideoPlaybackError(true);
             }
           }
-          amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.MESSAGES.VIDEO.PLAY_FAILED);
+          // ToDo: This needs to be revisited
+          //amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.MESSAGES.VIDEO.PLAY_FAILED);
           console.error('Failed to load video asset ', error);
         }
 
@@ -216,7 +217,8 @@ const VideoAsset: React.FC<VideoAssetProps> = ({
               poster={videoPreview?.url}
               onError={event => {
                 setVideoPlaybackError(true);
-                amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.MESSAGES.VIDEO.PLAY_FAILED);
+                // ToDo: This needs to be revisited
+                //amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.MESSAGES.VIDEO.PLAY_FAILED);
                 console.error('Video cannot be played', event);
               }}
               onPlaying={onVideoPlaying}

@@ -17,7 +17,7 @@
  *
  */
 
-import {useId, useState} from 'react';
+import {useState} from 'react';
 
 import {FileFullscreenModal} from 'Components/FileFullscreenModal/FileFullscreenModal';
 import {t} from 'Util/LocalizerUtil';
@@ -36,6 +36,7 @@ interface VideoAssetSmallProps {
   fileName: string;
   senderName: string;
   timestamp: number;
+  id: string;
 }
 
 export const VideoAssetSmall = ({
@@ -46,8 +47,8 @@ export const VideoAssetSmall = ({
   fileName,
   senderName,
   timestamp,
+  id,
 }: VideoAssetSmallProps) => {
-  const id = useId();
   const [isOpen, setIsOpen] = useState(false);
 
   return (
@@ -85,6 +86,7 @@ export const VideoAssetSmall = ({
         filePreviewUrl={src}
         fileExtension={extension}
         fileName={fileName}
+        fileUrl={src}
         senderName={senderName}
         timestamp={timestamp}
       />

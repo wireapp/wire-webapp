@@ -19,6 +19,8 @@
 
 import {CSSObject} from '@emotion/react';
 
+import {COLOR_V2} from '@wireapp/react-ui-kit';
+
 import {fileHeaderHeight} from '../common/fileHeaderHeight';
 
 export const headerStyles: CSSObject = {
@@ -50,6 +52,7 @@ export const closeButtonStyles: CSSObject = {
 export const leftColumnStyles: CSSObject = {
   display: 'flex',
   alignItems: 'center',
+  flex: '1 1 auto',
 };
 
 export const metadataStyles: CSSObject = {
@@ -57,6 +60,7 @@ export const metadataStyles: CSSObject = {
   alignItems: 'center',
   gap: '16px',
   fontSize: 'var(--font-size-small)',
+  flex: '1 1 auto',
 };
 
 export const nameStyles: CSSObject = {
@@ -65,7 +69,7 @@ export const nameStyles: CSSObject = {
   whiteSpace: 'nowrap',
   overflow: 'hidden',
   textOverflow: 'ellipsis',
-  width: 'calc(100vw - 320px)',
+  flex: '1 1 auto',
 };
 
 export const textStyles: CSSObject = {
@@ -77,28 +81,12 @@ export const textStyles: CSSObject = {
   },
 };
 
-export const infoWrapperStyles: CSSObject = {
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'center',
-  height: '100%',
-};
-
-export const loaderIconStyles: CSSObject = {
-  color: 'var(--gray-70)',
-  fontSize: 'var(--font-size-medium)',
-
-  'body.theme-dark &': {
-    color: 'var(--gray-40)',
-  },
-};
-
 export const actionButtonsStyles: CSSObject = {
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'center',
   flexShrink: '0',
-  marginRight: '8px',
+  marginInline: '8px',
 };
 
 export const downloadButtonStyles: CSSObject = {
@@ -106,4 +94,32 @@ export const downloadButtonStyles: CSSObject = {
   flexShrink: '0',
   width: '40px',
   height: '32px',
+};
+
+export const editModeButtonStyles: CSSObject = {
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  flexShrink: '0',
+  marginRight: '8px',
+  marginLeft: '16px',
+  backgroundColor: COLOR_V2.GRAY_20,
+  padding: '4px',
+  borderRadius: '12px',
+
+  button: {
+    padding: '4px 18px',
+    borderRadius: '8px',
+    backgroundColor: 'transparent',
+    border: 'none',
+    transition: 'background-color 0.3s ease-in-out, color 0.3s ease-in-out',
+
+    '&.active': {
+      backgroundColor: COLOR_V2.WHITE,
+    },
+    svg: {
+      marginRight: '8px',
+      transition: 'color 0.3s ease-in-out',
+    },
+  },
 };

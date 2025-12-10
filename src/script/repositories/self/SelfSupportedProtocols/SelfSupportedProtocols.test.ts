@@ -18,8 +18,7 @@
  */
 
 import {RegisteredClient} from '@wireapp/api-client/lib/client';
-import {ConversationProtocol} from '@wireapp/api-client/lib/conversation';
-import {FeatureStatus, FeatureList} from '@wireapp/api-client/lib/team';
+import {CONVERSATION_PROTOCOL, FEATURE_STATUS, FeatureList} from '@wireapp/api-client/lib/team';
 
 import {MLSMigrationStatus} from 'src/script/mls/MLSMigration/migrationStatus';
 import {TestFactory} from 'test/helper/TestFactory';
@@ -33,26 +32,29 @@ const testFactory = new TestFactory();
 
 jest.spyOn(mlsSupport, 'isMLSSupportedByEnvironment').mockResolvedValue(true);
 
-const generateMLSFeaturesConfig = (migrationStatus: MLSMigrationStatus, supportedProtocols: ConversationProtocol[]) => {
+const generateMLSFeaturesConfig = (
+  migrationStatus: MLSMigrationStatus,
+  supportedProtocols: CONVERSATION_PROTOCOL[],
+) => {
   const now = Date.now();
 
   switch (migrationStatus) {
     case MLSMigrationStatus.DISABLED:
       return {
         mls: {
-          status: FeatureStatus.ENABLED,
+          status: FEATURE_STATUS.ENABLED,
           config: {supportedProtocols},
         },
-        mlsMigration: {status: FeatureStatus.DISABLED, config: {}},
+        mlsMigration: {status: FEATURE_STATUS.DISABLED, config: {}},
       };
     case MLSMigrationStatus.NOT_STARTED:
       return {
         mls: {
-          status: FeatureStatus.ENABLED,
+          status: FEATURE_STATUS.ENABLED,
           config: {supportedProtocols},
         },
         mlsMigration: {
-          status: FeatureStatus.ENABLED,
+          status: FEATURE_STATUS.ENABLED,
           config: {
             startTime: new Date(now + 1 * TIME_IN_MILLIS.DAY).toISOString(),
             finaliseRegardlessAfter: new Date(now + 2 * TIME_IN_MILLIS.DAY).toISOString(),
@@ -62,11 +64,11 @@ const generateMLSFeaturesConfig = (migrationStatus: MLSMigrationStatus, supporte
     case MLSMigrationStatus.ONGOING:
       return {
         mls: {
-          status: FeatureStatus.ENABLED,
+          status: FEATURE_STATUS.ENABLED,
           config: {supportedProtocols},
         },
         mlsMigration: {
-          status: FeatureStatus.ENABLED,
+          status: FEATURE_STATUS.ENABLED,
           config: {
             startTime: new Date(now - 1 * TIME_IN_MILLIS.DAY).toISOString(),
             finaliseRegardlessAfter: new Date(now + 1 * TIME_IN_MILLIS.DAY).toISOString(),
@@ -76,11 +78,11 @@ const generateMLSFeaturesConfig = (migrationStatus: MLSMigrationStatus, supporte
     case MLSMigrationStatus.FINALISED:
       return {
         mls: {
-          status: FeatureStatus.ENABLED,
+          status: FEATURE_STATUS.ENABLED,
           config: {supportedProtocols},
         },
         mlsMigration: {
-          status: FeatureStatus.ENABLED,
+          status: FEATURE_STATUS.ENABLED,
           config: {
             startTime: new Date(now - 2 * TIME_IN_MILLIS.DAY).toISOString(),
             finaliseRegardlessAfter: new Date(now - 1 * TIME_IN_MILLIS.DAY).toISOString(),
@@ -113,68 +115,71 @@ const generateListOfSelfClients = ({allActiveClientsMLSCapable}: {allActiveClien
 const evaluateProtocolsScenarios = [
   [
     //with given config
-    generateMLSFeaturesConfig(MLSMigrationStatus.DISABLED, [ConversationProtocol.PROTEUS]),
+    generateMLSFeaturesConfig(MLSMigrationStatus.DISABLED, [CONVERSATION_PROTOCOL.PROTEUS]),
 
     //we expect the following result based on whether all active clients are MLS capable or not
     {
-      allActiveClientsMLSCapable: [ConversationProtocol.PROTEUS],
-      someActiveClientsNotMLSCapable: [ConversationProtocol.PROTEUS],
+      allActiveClientsMLSCapable: [CONVERSATION_PROTOCOL.PROTEUS],
+      someActiveClientsNotMLSCapable: [CONVERSATION_PROTOCOL.PROTEUS],
     },
   ],
   [
-    generateMLSFeaturesConfig(MLSMigrationStatus.DISABLED, [ConversationProtocol.PROTEUS, ConversationProtocol.MLS]),
+    generateMLSFeaturesConfig(MLSMigrationStatus.DISABLED, [CONVERSATION_PROTOCOL.PROTEUS, CONVERSATION_PROTOCOL.MLS]),
     {
-      allActiveClientsMLSCapable: [ConversationProtocol.PROTEUS, ConversationProtocol.MLS],
-      someActiveClientsNotMLSCapable: [ConversationProtocol.PROTEUS],
+      allActiveClientsMLSCapable: [CONVERSATION_PROTOCOL.PROTEUS, CONVERSATION_PROTOCOL.MLS],
+      someActiveClientsNotMLSCapable: [CONVERSATION_PROTOCOL.PROTEUS],
     },
   ],
   [
-    generateMLSFeaturesConfig(MLSMigrationStatus.DISABLED, [ConversationProtocol.MLS]),
+    generateMLSFeaturesConfig(MLSMigrationStatus.DISABLED, [CONVERSATION_PROTOCOL.MLS]),
     {
-      allActiveClientsMLSCapable: [ConversationProtocol.MLS],
-      someActiveClientsNotMLSCapable: [ConversationProtocol.MLS],
+      allActiveClientsMLSCapable: [CONVERSATION_PROTOCOL.MLS],
+      someActiveClientsNotMLSCapable: [CONVERSATION_PROTOCOL.MLS],
     },
   ],
   [
-    generateMLSFeaturesConfig(MLSMigrationStatus.NOT_STARTED, [ConversationProtocol.PROTEUS, ConversationProtocol.MLS]),
+    generateMLSFeaturesConfig(MLSMigrationStatus.NOT_STARTED, [
+      CONVERSATION_PROTOCOL.PROTEUS,
+      CONVERSATION_PROTOCOL.MLS,
+    ]),
     {
-      allActiveClientsMLSCapable: [ConversationProtocol.PROTEUS, ConversationProtocol.MLS],
-      someActiveClientsNotMLSCapable: [ConversationProtocol.PROTEUS],
+      allActiveClientsMLSCapable: [CONVERSATION_PROTOCOL.PROTEUS, CONVERSATION_PROTOCOL.MLS],
+      someActiveClientsNotMLSCapable: [CONVERSATION_PROTOCOL.PROTEUS],
     },
   ],
   [
-    generateMLSFeaturesConfig(MLSMigrationStatus.NOT_STARTED, [ConversationProtocol.MLS]),
+    generateMLSFeaturesConfig(MLSMigrationStatus.NOT_STARTED, [CONVERSATION_PROTOCOL.MLS]),
     {
-      allActiveClientsMLSCapable: [ConversationProtocol.PROTEUS, ConversationProtocol.MLS],
-      someActiveClientsNotMLSCapable: [ConversationProtocol.PROTEUS],
+      allActiveClientsMLSCapable: [CONVERSATION_PROTOCOL.PROTEUS, CONVERSATION_PROTOCOL.MLS],
+      someActiveClientsNotMLSCapable: [CONVERSATION_PROTOCOL.PROTEUS],
     },
   ],
   [
-    generateMLSFeaturesConfig(MLSMigrationStatus.ONGOING, [ConversationProtocol.PROTEUS, ConversationProtocol.MLS]),
+    generateMLSFeaturesConfig(MLSMigrationStatus.ONGOING, [CONVERSATION_PROTOCOL.PROTEUS, CONVERSATION_PROTOCOL.MLS]),
     {
-      allActiveClientsMLSCapable: [ConversationProtocol.PROTEUS, ConversationProtocol.MLS],
-      someActiveClientsNotMLSCapable: [ConversationProtocol.PROTEUS],
+      allActiveClientsMLSCapable: [CONVERSATION_PROTOCOL.PROTEUS, CONVERSATION_PROTOCOL.MLS],
+      someActiveClientsNotMLSCapable: [CONVERSATION_PROTOCOL.PROTEUS],
     },
   ],
   [
-    generateMLSFeaturesConfig(MLSMigrationStatus.ONGOING, [ConversationProtocol.MLS]),
+    generateMLSFeaturesConfig(MLSMigrationStatus.ONGOING, [CONVERSATION_PROTOCOL.MLS]),
     {
-      allActiveClientsMLSCapable: [ConversationProtocol.PROTEUS, ConversationProtocol.MLS],
-      someActiveClientsNotMLSCapable: [ConversationProtocol.PROTEUS],
+      allActiveClientsMLSCapable: [CONVERSATION_PROTOCOL.PROTEUS, CONVERSATION_PROTOCOL.MLS],
+      someActiveClientsNotMLSCapable: [CONVERSATION_PROTOCOL.PROTEUS],
     },
   ],
   [
-    generateMLSFeaturesConfig(MLSMigrationStatus.FINALISED, [ConversationProtocol.PROTEUS, ConversationProtocol.MLS]),
+    generateMLSFeaturesConfig(MLSMigrationStatus.FINALISED, [CONVERSATION_PROTOCOL.PROTEUS, CONVERSATION_PROTOCOL.MLS]),
     {
-      allActiveClientsMLSCapable: [ConversationProtocol.PROTEUS, ConversationProtocol.MLS],
-      someActiveClientsNotMLSCapable: [ConversationProtocol.PROTEUS, ConversationProtocol.MLS],
+      allActiveClientsMLSCapable: [CONVERSATION_PROTOCOL.PROTEUS, CONVERSATION_PROTOCOL.MLS],
+      someActiveClientsNotMLSCapable: [CONVERSATION_PROTOCOL.PROTEUS, CONVERSATION_PROTOCOL.MLS],
     },
   ],
   [
-    generateMLSFeaturesConfig(MLSMigrationStatus.FINALISED, [ConversationProtocol.MLS]),
+    generateMLSFeaturesConfig(MLSMigrationStatus.FINALISED, [CONVERSATION_PROTOCOL.MLS]),
     {
-      allActiveClientsMLSCapable: [ConversationProtocol.MLS],
-      someActiveClientsNotMLSCapable: [ConversationProtocol.MLS],
+      allActiveClientsMLSCapable: [CONVERSATION_PROTOCOL.MLS],
+      someActiveClientsNotMLSCapable: [CONVERSATION_PROTOCOL.MLS],
     },
   ],
 ] as const;

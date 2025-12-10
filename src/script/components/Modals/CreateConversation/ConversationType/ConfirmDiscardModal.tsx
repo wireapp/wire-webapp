@@ -33,7 +33,7 @@ import {
 
 import {useCreateConversationModal} from '../hooks/useCreateConversationModal';
 
-export interface ConfirmDiscardModalProps {
+interface ConfirmDiscardModalProps {
   onCancel: () => void;
   onSubmit: () => void;
 }

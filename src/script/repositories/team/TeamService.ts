@@ -19,7 +19,7 @@
 
 import type {ConversationRolesList} from '@wireapp/api-client/lib/conversation/ConversationRole';
 import type {FeatureList} from '@wireapp/api-client/lib/team/feature/';
-import {FeatureStatus, FEATURE_KEY} from '@wireapp/api-client/lib/team/feature/';
+import {FEATURE_STATUS, FEATURE_KEY} from '@wireapp/api-client/lib/team/feature/';
 import {TeamMigrationPayload} from '@wireapp/api-client/lib/team/invitation/TeamMigrationPayload';
 import type {LegalHoldMemberData} from '@wireapp/api-client/lib/team/legalhold/';
 import type {MemberData, Members} from '@wireapp/api-client/lib/team/member/';
@@ -82,39 +82,39 @@ export class TeamService {
             enforceAppLock: false,
             inactivityTimeoutSecs: 60,
           },
-          status: FeatureStatus.ENABLED,
+          status: FEATURE_STATUS.ENABLED,
         },
         [FEATURE_KEY.CLASSIFIED_DOMAINS]: {
           config: {
             domains: [],
           },
-          status: FeatureStatus.DISABLED,
+          status: FEATURE_STATUS.DISABLED,
         },
         [FEATURE_KEY.CONFERENCE_CALLING]: {
           config: {useSFTForOneToOneCalls: false},
-          status: FeatureStatus.ENABLED,
+          status: FEATURE_STATUS.ENABLED,
         },
         [FEATURE_KEY.DIGITAL_SIGNATURES]: {
-          status: FeatureStatus.ENABLED,
+          status: FEATURE_STATUS.ENABLED,
         },
         [FEATURE_KEY.FILE_SHARING]: {
-          status: FeatureStatus.ENABLED,
+          status: FEATURE_STATUS.ENABLED,
         },
         [FEATURE_KEY.LEGALHOLD]: {
-          status: FeatureStatus.ENABLED,
+          status: FEATURE_STATUS.ENABLED,
         },
         [FEATURE_KEY.SEARCH_VISIBILITY]: {
-          status: FeatureStatus.ENABLED,
+          status: FEATURE_STATUS.ENABLED,
         },
         [FEATURE_KEY.SSO]: {
-          status: FeatureStatus.ENABLED,
+          status: FEATURE_STATUS.ENABLED,
         },
         [FEATURE_KEY.MLS]: undefined,
         [FEATURE_KEY.VALIDATE_SAML_EMAILS]: {
-          status: FeatureStatus.ENABLED,
+          status: FEATURE_STATUS.ENABLED,
         },
         [FEATURE_KEY.VIDEO_CALLING]: {
-          status: FeatureStatus.ENABLED,
+          status: FEATURE_STATUS.ENABLED,
         },
       };
       return defaultFeatures;

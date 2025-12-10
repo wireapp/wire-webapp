@@ -19,8 +19,6 @@
 
 import {$getSelection, $isRangeSelection, $isTextNode, LexicalNode, RangeSelection} from 'lexical';
 
-export const LENGTH_LIMIT = 75;
-
 const PUNCTUATION = '\\.,\\*\\?\\$\\|#{}\\(\\)\\^\\[\\]\\\\/!%\'"~=<>_:;\\s';
 
 const VALID_CHARS = (triggers: string[]) => `(?!${triggers.join('|')})[^${PUNCTUATION}]`;

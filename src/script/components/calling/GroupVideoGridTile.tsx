@@ -17,7 +17,7 @@
  *
  */
 
-import React from 'react';
+import {KeyboardEvent} from 'react';
 
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 
@@ -33,7 +33,7 @@ import {t} from 'Util/LocalizerUtil';
 
 import {Video} from './Video';
 
-export interface GroupVideoGridTileProps {
+interface GroupVideoGridTileProps {
   isMaximized: boolean;
   minimized: boolean;
   onTileDoubleClick: (userId: QualifiedId, clientId: string) => void;
@@ -60,14 +60,14 @@ const getParticipantNameColor = ({
   return 'var(--white)';
 };
 
-const GroupVideoGridTile: React.FC<GroupVideoGridTileProps> = ({
+const GroupVideoGridTile = ({
   minimized,
   participant,
   selfParticipant,
   participantCount,
   isMaximized,
   onTileDoubleClick,
-}) => {
+}: GroupVideoGridTileProps) => {
   const {
     isMuted,
     videoState,
@@ -100,7 +100,7 @@ const GroupVideoGridTile: React.FC<GroupVideoGridTileProps> = ({
 
   const handleTileClick = () => onTileDoubleClick(participant?.user.qualifiedId, participant?.clientId);
 
-  const handleEnterTileClick = (keyboardEvent: React.KeyboardEvent) => {
+  const handleEnterTileClick = (keyboardEvent: KeyboardEvent) => {
     if (isEnterKey(keyboardEvent)) {
       handleTileClick();
     }

@@ -17,39 +17,28 @@
  *
  */
 
-import React from 'react';
-
 import * as Icon from 'Components/Icon';
-import {MediaDevicesHandler} from 'Repositories/media/MediaDevicesHandler';
-import {MediaDeviceType} from 'Repositories/media/MediaDeviceType';
-import {useKoSubscribableChildren} from 'Util/ComponentUtil';
+import {useMediaDevicesStore} from 'Repositories/media/useMediaDevicesStore';
 import {t} from 'Util/LocalizerUtil';
 
 import {DeviceSelect} from './DeviceSelect';
 
 import {PreferencesSection} from '../components/PreferencesSection';
 
-interface AudioOutPreferencesProps {
-  devicesHandler: MediaDevicesHandler;
-}
-
-const AudioOutPreferences: React.FC<AudioOutPreferencesProps> = ({devicesHandler}) => {
-  const {[MediaDeviceType.AUDIO_OUTPUT]: availableDevices} = useKoSubscribableChildren(
-    devicesHandler?.availableDevices,
-    [MediaDeviceType.AUDIO_OUTPUT],
-  );
-
-  const {[MediaDeviceType.AUDIO_OUTPUT]: currentDeviceId} = useKoSubscribableChildren(devicesHandler?.currentDeviceId, [
-    MediaDeviceType.AUDIO_OUTPUT,
-  ]);
+const AudioOutPreferences = () => {
+  const {audioOutputDeviceId, setAudioOutputDeviceId, audioOutputDevices} = useMediaDevicesStore(state => ({
+    audioOutputDeviceId: state.audio.output.selectedId,
+    setAudioOutputDeviceId: state.setAudioOutputDeviceId,
+    audioOutputDevices: state.audio.output.devices,
+  }));
 
   return (
     <PreferencesSection title={t('preferencesAVSpeakers')}>
       <DeviceSelect
         uieName="enter-speaker"
-        onChange={deviceId => devicesHandler.currentDeviceId[MediaDeviceType.AUDIO_OUTPUT](deviceId)}
-        devices={availableDevices as MediaDeviceInfo[]}
-        value={currentDeviceId}
+        onChange={deviceId => setAudioOutputDeviceId(deviceId)}
+        devices={audioOutputDevices}
+        value={audioOutputDeviceId}
         icon={Icon.SpeakerIcon}
         defaultDeviceName={t('preferencesAVSpeakers')}
         title={t('preferencesAVSpeakers')}

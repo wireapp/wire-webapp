@@ -17,17 +17,18 @@
  *
  */
 
+import {expect} from 'playwright/test';
+
 import {ApiManagerE2E} from '../backend/apiManager.e2e';
 import {User} from '../data/user';
 import {PageManager} from '../pageManager';
-import {expect} from '../test.fixtures';
 
 export const loginUser = async (user: User, pageManager: PageManager) => {
   const {pages} = pageManager.webapp;
   await pages.singleSignOn().isSSOPageVisible();
   await pages.singleSignOn().enterEmailOnSSOPage(user.email);
-  await pages.login().inputPassword(user.password);
-  await pages.login().clickSignInButton();
+  await pages.login().passwordInput.fill(user.password);
+  await pages.login().signInButton.click();
 };
 
 export const sendTextMessageToUser = async (pageManager: PageManager, recipient: User, text: string) => {
@@ -76,11 +77,57 @@ export const sendTextMessageToConversation = async (
   const {pages} = pageManager.webapp;
   await pages.conversationList().openConversation(conversation);
   await pages.conversation().sendMessage(message);
-
-  // TODO: Bug [WPB-18226] Message is not visible in the conversation after sending it
-  await pages.conversation().page.waitForTimeout(3000); // Wait for the message to be sent
-  await pageManager.refreshPage({waitUntil: 'domcontentloaded'});
-  // End of TODO: Bug [WPB-18226]
-
-  expect(await pages.conversation().isMessageVisible(message)).toBeTruthy();
 };
+
+type UserPages = PageManager['webapp']['pages'];
+export const createGroup = async (pages: UserPages, conversationName: string, user: User[]) => {
+  await pages.conversationList().clickCreateGroup();
+  await pages.groupCreation().setGroupName(conversationName);
+  await pages.startUI().selectUsers(user.map(user => user.username));
+  await pages.groupCreation().clickCreateGroupButton();
+};
+
+export const createChannel = async (pages: UserPages, conversationName: string, user: User[]) => {
+  await pages.conversationList().clickCreateGroup();
+  await pages.groupCreation().setGroupName(conversationName);
+  await pages.groupCreation().clickNextButton();
+  // task: set params for testing
+  await pages.startUI().selectUsers(user.flatMap(user => user.username));
+  await pages.groupCreation().clickCreateGroupButton();
+};
+
+export const handleAppLockState = async (pageManager: PageManager, appLockPassCode: string) => {
+  const {modals} = pageManager.webapp;
+  const appLockModal = await modals.appLock();
+  if (await appLockModal.isVisible()) {
+    if (await appLockModal.lockPasscodeInput.isVisible()) {
+      await appLockModal.setPasscode(appLockPassCode);
+    } else {
+      await appLockModal.unlockAppWithPasscode(appLockPassCode);
+    }
+  }
+};
+
+/**
+ * Opens the connections tab, searches for the given user and starts a conversation with him
+ * Note: This util only works if both users are part of the same team.
+ */
+export async function connectWithUser(senderPageManager: PageManager, receiver: Pick<User, 'username'>) {
+  const {pages, modals, components} = senderPageManager.webapp;
+  await components.conversationSidebar().clickConnectButton();
+  await pages.startUI().searchInput.fill(receiver.username);
+  await pages.startUI().selectUser(receiver.username);
+  await modals.userProfile().clickStartConversation();
+}
+
+/**
+ * Opens the connections tab, searches for the given user and sends a connection request
+ * Note: This util only works if both users are NOT in the same team
+ */
+export async function sendConnectionRequest(senderPageManager: PageManager, receiver: User) {
+  const {pages, modals, components} = senderPageManager.webapp;
+  await components.conversationSidebar().clickConnectButton();
+  await pages.startUI().searchInput.fill(receiver.username);
+  await pages.startUI().selectUser(receiver.username);
+  await modals.userProfile().clickConnectButton();
+}

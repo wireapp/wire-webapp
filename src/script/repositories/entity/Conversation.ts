@@ -28,7 +28,7 @@ import {
   CONVERSATION_CELLS_STATE,
 } from '@wireapp/api-client/lib/conversation/';
 import {RECEIPT_MODE} from '@wireapp/api-client/lib/conversation/data';
-import {ConversationProtocol} from '@wireapp/api-client/lib/conversation/NewConversation';
+import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {amplify} from 'amplify';
 import ko from 'knockout';
@@ -116,7 +116,7 @@ export class Conversation {
   public epoch: number = -1;
   public cipherSuite: number = 1;
   // Initial protocol is a protocol that was known by a webapp before any protocol update happened. For newly created conversations it is the same as protocol.
-  public initialProtocol: ConversationProtocol;
+  public initialProtocol: CONVERSATION_PROTOCOL;
   public readonly display_name: ko.PureComputed<string>;
   public readonly firstUserEntity: ko.PureComputed<User | undefined>;
   public readonly globalMessageTimer: ko.Observable<number | null>;
@@ -201,7 +201,7 @@ export class Conversation {
   constructor(
     conversation_id: string = '',
     domain: string = '',
-    public readonly protocol = ConversationProtocol.PROTEUS,
+    public readonly protocol = CONVERSATION_PROTOCOL.PROTEUS,
     teamState = container.resolve(TeamState),
   ) {
     this.teamState = teamState;
@@ -277,7 +277,8 @@ export class Conversation {
       () =>
         this.isConversationWithBlockedUser() ||
         this.is1to1ConversationWithDeletedUser() ||
-        this.readOnlyState() !== null,
+        this.readOnlyState() !== null ||
+        this.accessState() === undefined,
     );
 
     this.isGroup = ko.pureComputed(() => {
@@ -420,7 +421,9 @@ export class Conversation {
 
     this.receiptMode = ko.observable(RECEIPT_MODE.OFF);
 
-    // The team configuration for self-deleting messages has
+    // Self-deleting messages are not available for conversations
+    // with Cells enabled.
+    // Otherwise the team configuration for self-deleting messages has
     // always precedence over conversation or local settings.
     // https://wearezeta.atlassian.net/wiki/spaces/SER/pages/474873953/Tech+spec+Self-deleting+messages+feature+config
     //
@@ -429,13 +432,29 @@ export class Conversation {
     // messages are disabled for the users team, the user will
     // send normal messages (not self-deleting) and ignore the
     // setting of the conversation.
-    this.messageTimer = ko.pureComputed(
-      () =>
-        this.teamState.isSelfDeletingMessagesEnabled() &&
-        (this.teamState.getEnforcedSelfDeletingMessagesTimeout() ||
-          this.globalMessageTimer() ||
-          this.localMessageTimer()),
-    );
+    this.messageTimer = ko.pureComputed(() => {
+      // If cells is enabled for a conversation, always return 0
+      if (!!this.cellsState && this.cellsState() !== CONVERSATION_CELLS_STATE.DISABLED) {
+        return 0;
+      }
+      // If team does not allow self-deleting messages, return 0
+      if (!this.teamState.isSelfDeletingMessagesEnabled()) {
+        return 0;
+      }
+      // If team enforces a timeout, use it
+      const enforcedTimeout = this.teamState.getEnforcedSelfDeletingMessagesTimeout();
+      if (enforcedTimeout) {
+        return enforcedTimeout;
+      }
+      // Otherwise, use global or local timer if available
+      if (this.globalMessageTimer() !== null) {
+        return this.globalMessageTimer();
+      }
+      if (this.localMessageTimer()) {
+        return this.localMessageTimer();
+      }
+      return 0;
+    });
     this.hasGlobalMessageTimer = ko.pureComputed(() => this.globalMessageTimer() > 0);
 
     this.messages_unordered = ko.observableArray();
@@ -724,37 +743,39 @@ export class Conversation {
    * @returns If a message was replaced in the conversation
    */
   addMessage(messageEntity: Message): boolean | void {
-    if (messageEntity) {
-      const messageWithLinkPreview = () => this._findDuplicate(messageEntity.id, messageEntity.from);
-      const editedMessage = () =>
-        this._findDuplicate((messageEntity as ContentMessage).replacing_message_id, messageEntity.from);
-      const alreadyAdded = messageWithLinkPreview() || editedMessage();
-
-      if (messageEntity.isContent()) {
-        this.hasContentMessages(true);
-      }
-      if (alreadyAdded) {
-        return false;
-      }
-
-      const {contentState} = useAppState.getState();
-
-      // When the search tab is active, push message to incomming message and update the timestamps
-      if (contentState === ContentState.COLLECTION) {
-        this.incomingMessages.push(messageEntity);
-        this.updateTimestamps(messageEntity);
-      } else if (this.hasLastReceivedMessageLoaded()) {
-        this.updateTimestamps(messageEntity);
-        this.incomingMessages.remove(({id}) => messageEntity.id === id);
-        // If the last received message is currently in memory, we can add this message to the displayed messages
-        this.messages_unordered.push(messageEntity);
-      } else {
-        // If the conversation is not loaded, we will add this message to the incoming messages (but not to the messages displayed)
-        this.incomingMessages.push(messageEntity);
-      }
-      amplify.publish(WebAppEvents.CONVERSATION.MESSAGE.ADDED, messageEntity);
-      return true;
+    if (!messageEntity) {
+      return;
     }
+
+    const messageWithLinkPreview = () => this._findDuplicate(messageEntity.id, messageEntity.from);
+    const editedMessage = () =>
+      this._findDuplicate((messageEntity as ContentMessage).replacing_message_id, messageEntity.from);
+    const alreadyAdded = messageWithLinkPreview() || editedMessage();
+
+    if (messageEntity.isContent()) {
+      this.hasContentMessages(true);
+    }
+    if (alreadyAdded) {
+      return false;
+    }
+
+    const {contentState} = useAppState.getState();
+
+    // When the search tab is active, push message to incomming message and update the timestamps
+    if (contentState === ContentState.COLLECTION) {
+      this.incomingMessages.push(messageEntity);
+      this.updateTimestamps(messageEntity);
+    } else if (this.hasLastReceivedMessageLoaded()) {
+      this.updateTimestamps(messageEntity);
+      this.incomingMessages.remove(({id}) => messageEntity.id === id);
+      // If the last received message is currently in memory, we can add this message to the displayed messages
+      this.messages_unordered.push(messageEntity);
+    } else {
+      // If the conversation is not loaded, we will add this message to the incoming messages (but not to the messages displayed)
+      this.incomingMessages.push(messageEntity);
+    }
+    amplify.publish(WebAppEvents.CONVERSATION.MESSAGE.ADDED, messageEntity);
+    return true;
   }
 
   /**

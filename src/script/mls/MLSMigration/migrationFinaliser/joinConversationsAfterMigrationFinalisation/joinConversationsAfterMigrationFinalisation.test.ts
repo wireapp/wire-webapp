@@ -17,17 +17,14 @@
  *
  */
 
-import {
-  ConversationProtocol,
-  CONVERSATION_TYPE,
-  CONVERSATION_ACCESS,
-  CONVERSATION_ACCESS_ROLE,
-} from '@wireapp/api-client/lib/conversation';
+import {CONVERSATION_TYPE, CONVERSATION_ACCESS, CONVERSATION_ACCESS_ROLE} from '@wireapp/api-client/lib/conversation';
+import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 import {container} from 'tsyringe';
 
 import {ConversationDatabaseData, ConversationMapper} from 'Repositories/conversation/ConversationMapper';
 import {User} from 'Repositories/entity/User';
 import {Core} from 'src/script/service/CoreSingleton';
+import {TestFactory} from 'test/helper/TestFactory';
 import {createUuid} from 'Util/uuid';
 
 import {joinConversationsAfterMigrationFinalisation} from '.';
@@ -35,8 +32,8 @@ import {joinConversationsAfterMigrationFinalisation} from '.';
 const createMockedDBConversationEntry = (
   id: string,
   domain: string,
-  initialProtocol: ConversationProtocol,
-  protocol: ConversationProtocol,
+  initialProtocol: CONVERSATION_PROTOCOL,
+  protocol: CONVERSATION_PROTOCOL,
   type: CONVERSATION_TYPE,
 ): ConversationDatabaseData => ({
   access: [CONVERSATION_ACCESS.INVITE, CONVERSATION_ACCESS.CODE],
@@ -98,8 +95,8 @@ const createMockedDBConversationEntry = (
 const createConversation = (
   id: string,
   domain: string,
-  initialProtocol: ConversationProtocol,
-  protocol: ConversationProtocol,
+  initialProtocol: CONVERSATION_PROTOCOL,
+  protocol: CONVERSATION_PROTOCOL,
   type: CONVERSATION_TYPE,
   selfUser: User,
   groupId?: string,
@@ -109,7 +106,7 @@ const createConversation = (
   const [conversation] = ConversationMapper.mapConversations([conversationRecord]);
   conversation.type(type);
 
-  if (protocol === ConversationProtocol.MLS) {
+  if (protocol === CONVERSATION_PROTOCOL.MLS) {
     conversation.groupId = groupId;
   }
 
@@ -119,6 +116,8 @@ const createConversation = (
 };
 
 describe('joinConversationsAfterMigrationFinalisation', () => {
+  const testFactory = new TestFactory();
+
   afterEach(() => {
     jest.clearAllMocks();
   });
@@ -136,18 +135,18 @@ describe('joinConversationsAfterMigrationFinalisation', () => {
     const mockedConversation = createConversation(
       conversationId,
       mockDomain,
-      ConversationProtocol.PROTEUS,
-      ConversationProtocol.MLS,
+      CONVERSATION_PROTOCOL.PROTEUS,
+      CONVERSATION_PROTOCOL.MLS,
       CONVERSATION_TYPE.REGULAR,
       selfUser,
       conversationGroupId,
     );
 
     const onSuccess = jest.fn();
-
+    const conversationRepository = await testFactory.exposeConversationActors();
     await joinConversationsAfterMigrationFinalisation({
       conversations: [mockedConversation],
-      selfUser,
+      conversationRepository,
       core: mockCore,
       onSuccess,
     });
@@ -173,8 +172,8 @@ describe('joinConversationsAfterMigrationFinalisation', () => {
     const mockedConversations = createConversation(
       conversationId,
       mockDomain,
-      ConversationProtocol.PROTEUS,
-      ConversationProtocol.MLS,
+      CONVERSATION_PROTOCOL.PROTEUS,
+      CONVERSATION_PROTOCOL.MLS,
       CONVERSATION_TYPE.ONE_TO_ONE,
       selfUser,
       conversationGroupId,
@@ -182,9 +181,11 @@ describe('joinConversationsAfterMigrationFinalisation', () => {
 
     const onSuccess = jest.fn();
 
+    const conversationRepository = await testFactory.exposeConversationActors();
+
     await joinConversationsAfterMigrationFinalisation({
       conversations: [mockedConversations],
-      selfUser,
+      conversationRepository,
       core: mockCore,
       onSuccess,
     });
@@ -207,8 +208,8 @@ describe('joinConversationsAfterMigrationFinalisation', () => {
     const mockedConversation = createConversation(
       conversationId,
       mockDomain,
-      ConversationProtocol.MLS,
-      ConversationProtocol.MLS,
+      CONVERSATION_PROTOCOL.MLS,
+      CONVERSATION_PROTOCOL.MLS,
       CONVERSATION_TYPE.REGULAR,
       selfUser,
       conversationGroupId,
@@ -216,9 +217,11 @@ describe('joinConversationsAfterMigrationFinalisation', () => {
 
     const onSuccess = jest.fn();
 
+    const conversationRepository = await testFactory.exposeConversationActors();
+
     await joinConversationsAfterMigrationFinalisation({
       conversations: [mockedConversation],
-      selfUser,
+      conversationRepository,
       core: mockCore,
       onSuccess,
     });
@@ -241,8 +244,8 @@ describe('joinConversationsAfterMigrationFinalisation', () => {
     const mockedConversation = createConversation(
       conversationId,
       mockDomain,
-      ConversationProtocol.PROTEUS,
-      ConversationProtocol.PROTEUS,
+      CONVERSATION_PROTOCOL.PROTEUS,
+      CONVERSATION_PROTOCOL.PROTEUS,
       CONVERSATION_TYPE.REGULAR,
       selfUser,
       conversationGroupId,
@@ -250,9 +253,11 @@ describe('joinConversationsAfterMigrationFinalisation', () => {
 
     const onSuccess = jest.fn();
 
+    const conversationRepository = await testFactory.exposeConversationActors();
+
     await joinConversationsAfterMigrationFinalisation({
       conversations: [mockedConversation],
-      selfUser,
+      conversationRepository,
       core: mockCore,
       onSuccess,
     });

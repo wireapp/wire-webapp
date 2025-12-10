@@ -21,8 +21,8 @@ import {BrowserContext} from '@playwright/test';
 import {FEATURE_KEY} from '@wireapp/api-client/lib/team/feature';
 
 import {PageManager} from 'test/e2e_tests/pageManager';
+import {completeLogin} from 'test/e2e_tests/utils/setup.util';
 import {addCreatedTeam, removeCreatedTeam} from 'test/e2e_tests/utils/tearDown.util';
-import {loginUser} from 'test/e2e_tests/utils/userActions';
 
 import {getUser} from '../../data/user';
 import {test, expect} from '../../test.fixtures';
@@ -67,14 +67,8 @@ test(
       await api.waitForFeatureToBeEnabled(FEATURE_KEY.CONFERENCE_CALLING, owner.teamId!, owner.token);
     });
 
-    await test.step('Login: Owner and member sign in', async () => {
-      await ownerPageManager.openMainPage();
-      await loginUser(owner, ownerPageManager);
-      await ownerPageManager.webapp.modals.dataShareConsent().clickDecline();
-
-      await memberPageManager.openMainPage();
-      await loginUser(member, memberPageManager);
-      await memberPageManager.webapp.modals.dataShareConsent().clickDecline();
+    await test.step('Owner and member login', async () => {
+      await Promise.all([completeLogin(ownerPageManager, owner), completeLogin(memberPageManager, member)]);
     });
 
     await test.step('Owner creates group and adds the member', async () => {
@@ -90,6 +84,7 @@ test(
       await ownerPages.conversationList().openConversation(conversationName);
       await ownerPages.conversation().startCall();
       await ownerCalling.waitForCell();
+
       expect(await ownerCalling.isCellVisible()).toBeTruthy();
     });
 
@@ -101,15 +96,16 @@ test(
       await memberCalling.clickAcceptCallButton();
       expect(await memberCalling.isCellVisible()).toBeTruthy();
 
-      await memberCalling.waitForGoFullScreen();
       expect(await memberCalling.isFullScreenVisible()).toBeFalsy();
 
       await memberCalling.maximizeCell();
+      await memberCalling.waitForGoFullScreen();
       expect(await memberCalling.isFullScreenVisible()).toBeTruthy();
     });
 
     await test.step('Owner goes full screen', async () => {
       await ownerCalling.maximizeCell();
+      await ownerCalling.waitForGoFullScreen();
       expect(await ownerCalling.isFullScreenVisible()).toBeTruthy();
     });
 
@@ -124,6 +120,7 @@ test(
 
     await test.step('Member unmutes themselves', async () => {
       await memberCalling.unmuteSelfInFullScreen();
+      await memberPageManager.waitForTimeout(250);
       expect(await memberCalling.isSelfUserMutedInFullScreen()).toBeFalsy();
     });
 

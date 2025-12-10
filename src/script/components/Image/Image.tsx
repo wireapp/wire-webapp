@@ -49,7 +49,7 @@ interface RemoteDataImageProps extends BaseImageProps {
   image: AssetRemoteData;
   imageSizes?: {width: string; height: string; ratio: number};
 }
-export interface AssetImageProps extends BaseImageProps {
+interface AssetImageProps extends BaseImageProps {
   image: MediumImage;
 }
 

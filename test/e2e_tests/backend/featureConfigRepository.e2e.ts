@@ -17,9 +17,11 @@
  *
  */
 
-import {FeatureList, FEATURE_KEY, FeatureStatus} from '@wireapp/api-client/lib/team/feature';
+import {FeatureList, FEATURE_KEY, FEATURE_STATUS} from '@wireapp/api-client/lib/team/feature';
 
 import {BackendClientE2E} from './backendClient.e2e';
+
+import {User} from '../data/user';
 
 export class FeatureConfigRepositoryE2E extends BackendClientE2E {
   async isFeatureEnabled(token: string, FeatureKey: FEATURE_KEY): Promise<boolean> {
@@ -29,6 +31,20 @@ export class FeatureConfigRepositoryE2E extends BackendClientE2E {
       },
     });
 
-    return response.data[FeatureKey]?.status === FeatureStatus.ENABLED;
+    return response.data[FeatureKey]?.status === FEATURE_STATUS.ENABLED;
+  }
+
+  async changeStateSndFactorPasswordChallenge(user: User, teamId: string, status: string) {
+    await this.axiosInstance.request({
+      url: `teams/${teamId}/features/sndFactorPasswordChallenge`,
+      method: 'PUT',
+      headers: {
+        Authorization: `Bearer ${user.token}`,
+      },
+      data: {
+        status: status,
+        lockStatus: 'locked',
+      },
+    });
   }
 }

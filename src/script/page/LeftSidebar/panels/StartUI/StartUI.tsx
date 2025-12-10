@@ -17,9 +17,9 @@
  *
  */
 
-import React, {useEffect, useRef, useState} from 'react';
+import {useEffect, useRef, useState} from 'react';
 
-import {ConversationProtocol} from '@wireapp/api-client/lib/conversation';
+import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 import cx from 'classnames';
 import {container} from 'tsyringe';
 
@@ -67,7 +67,7 @@ const enum Tabs {
   SERVICES,
 }
 
-const StartUI: React.FC<StartUIProps> = ({
+const StartUI = ({
   userState = container.resolve(UserState),
   teamState = container.resolve(TeamState),
   conversationState = container.resolve(ConversationState),
@@ -79,7 +79,7 @@ const StartUI: React.FC<StartUIProps> = ({
   userRepository,
   isFederated,
   selfUser,
-}) => {
+}: StartUIProps) => {
   const brandName = Config.getConfig().BRAND_NAME;
   const {canInviteTeamMembers, canSearchUnconnectedUsers, canManageServices, canChatWithServices} =
     generatePermissionHelpers(selfUser.teamRole());
@@ -91,7 +91,7 @@ const StartUI: React.FC<StartUIProps> = ({
   const actions = mainViewModel.actions;
   const isTeam = teamState.isTeam();
   const defaultProtocol = teamState.teamFeatures()?.mls?.config.defaultProtocol;
-  const areServicesSupportedByProtocol = defaultProtocol !== ConversationProtocol.MLS;
+  const areServicesSupportedByProtocol = defaultProtocol !== CONVERSATION_PROTOCOL.MLS;
   const showServiceTab = isTeam && canChatWithServices() && areServicesSupportedByProtocol;
 
   const [searchQuery, setSearchQuery] = useState('');

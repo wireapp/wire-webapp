@@ -32,6 +32,7 @@ interface FilePreviewModalProps {
   onClose: () => void;
   isLoading: boolean;
   isError: boolean;
+  isEditMode?: boolean;
 }
 
 export const FilePreviewModal = ({
@@ -47,6 +48,7 @@ export const FilePreviewModal = ({
   onClose,
   isLoading,
   isError,
+  isEditMode,
 }: FilePreviewModalProps) => {
   const getFileUrl = () => {
     if (fileExtension === 'pdf') {
@@ -72,6 +74,7 @@ export const FilePreviewModal = ({
     <FileFullscreenModal
       id={id}
       filePreviewUrl={getFileUrl()}
+      fileUrl={fileUrl}
       fileName={fileName}
       fileExtension={fileExtension}
       senderName={senderName}
@@ -79,6 +82,7 @@ export const FilePreviewModal = ({
       isOpen={isOpen}
       onClose={onClose}
       status={getStatus()}
+      isEditMode={isEditMode}
     />
   );
 };

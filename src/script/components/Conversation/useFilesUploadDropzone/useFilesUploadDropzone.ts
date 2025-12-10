@@ -44,6 +44,7 @@ const logger = getLogger('FileDropzone');
 
 interface UseFilesUploadDropzoneParams {
   isTeam: boolean;
+  isCellsEnabled: boolean;
   isDisabled: boolean;
   cellsRepository: CellsRepository;
   conversation?: Pick<Conversation, 'id' | 'qualifiedId'>;
@@ -52,6 +53,7 @@ interface UseFilesUploadDropzoneParams {
 export const useFilesUploadDropzone = ({
   isTeam,
   isDisabled,
+  isCellsEnabled,
   cellsRepository,
   conversation = {id: '', qualifiedId: {id: '', domain: ''}},
 }: UseFilesUploadDropzoneParams) => {
@@ -60,7 +62,9 @@ export const useFilesUploadDropzone = ({
 
   const [accept, setAccept] = useState<Accept | undefined>(undefined);
 
-  const MAX_SIZE = isTeam ? CONFIG.MAXIMUM_ASSET_FILE_SIZE_TEAM : CONFIG.MAXIMUM_ASSET_FILE_SIZE_PERSONAL;
+  const TEAM_MAX_SIZE = isCellsEnabled ? CONFIG.MAXIMUM_ASSET_FILE_SIZE_CELLS : CONFIG.MAXIMUM_ASSET_FILE_SIZE_TEAM;
+
+  const MAX_SIZE = isTeam ? TEAM_MAX_SIZE : CONFIG.MAXIMUM_ASSET_FILE_SIZE_PERSONAL;
 
   const {getRootProps, getInputProps, open, isDragAccept} = useDropzone({
     maxSize: MAX_SIZE,
@@ -69,32 +73,7 @@ export const useFilesUploadDropzone = ({
     disabled: isDisabled,
     accept,
     onDrop: checkFileSharingPermission(async (acceptedFiles: File[], rejectedFiles: FileRejection[]) => {
-      const newFiles = [...acceptedFiles, ...rejectedFiles.map(file => file.file)];
-
-      const validationResult = validateFiles({
-        newFiles,
-        currentFiles: files,
-        maxSize: MAX_SIZE,
-        maxFiles: MAX_FILES,
-      });
-
-      if (!validationResult.isValid) {
-        const {error, invalidFiles} = validationResult as Extract<ValidationResult, {isValid: false}>;
-        showFileDropzoneErrorModal({
-          title: error.title,
-          message: error.message,
-          invalidFiles,
-        });
-        return;
-      }
-
-      const transformedAcceptedFiles = transformAcceptedFiles(acceptedFiles);
-
-      addFiles({conversationId: conversation.id, files: transformedAcceptedFiles});
-
-      await attatchMetadataToFiles(transformedAcceptedFiles);
-
-      await uploadFiles(transformedAcceptedFiles);
+      await processIncomingFiles(acceptedFiles, rejectedFiles, files, MAX_SIZE, MAX_FILES, conversation.id);
     }),
     onError: (error: Error) => {
       logger.error('Dropping files failed', error);
@@ -111,6 +90,46 @@ export const useFilesUploadDropzone = ({
       setAccept(undefined);
     },
   });
+
+  const processIncomingFiles = async (
+    acceptedFiles: File[],
+    rejectedFiles: FileRejection[],
+    files: FileWithPreview[],
+    maxSize: number,
+    maxFiles: number,
+    conversationId: string,
+  ) => {
+    const newFiles = [...acceptedFiles, ...rejectedFiles.map(file => file.file)];
+
+    const validationResult = validateFiles({
+      newFiles,
+      currentFiles: files,
+      maxSize,
+      maxFiles,
+    });
+
+    if (!validationResult.isValid) {
+      const {error, invalidFiles} = validationResult as Extract<ValidationResult, {isValid: false}>;
+      showFileDropzoneErrorModal({
+        title: error.title,
+        message: error.message,
+        invalidFiles,
+      });
+      return;
+    }
+
+    const transformedAcceptedFiles = transformAcceptedFiles(acceptedFiles);
+
+    addFiles({conversationId, files: transformedAcceptedFiles});
+
+    await attatchMetadataToFiles(transformedAcceptedFiles);
+
+    await uploadFiles(transformedAcceptedFiles);
+  };
+
+  const handlePastedFile = async (file: File) => {
+    await processIncomingFiles([file], [], files, MAX_SIZE, MAX_FILES, conversation.id);
+  };
 
   const uploadFile = async (file: FileWithPreview) => {
     // Temporary solution to handle the local development
@@ -196,5 +215,5 @@ export const useFilesUploadDropzone = ({
     delayedOpen();
   };
 
-  return {getRootProps, getInputProps, openAllFilesView, openImageFilesView, isDragAccept};
+  return {getRootProps, getInputProps, openAllFilesView, openImageFilesView, handlePastedFile, isDragAccept};
 };

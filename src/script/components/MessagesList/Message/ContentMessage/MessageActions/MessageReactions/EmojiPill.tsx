@@ -38,7 +38,7 @@ import {
   userBoldStyle,
 } from './MessageReactions.styles';
 
-export interface EmojiPillProps {
+interface EmojiPillProps {
   emoji: string;
   emojiUnicode: string;
   handleReactionClick: (emoji: string) => void;

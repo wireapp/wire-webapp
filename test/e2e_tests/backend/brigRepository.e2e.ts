@@ -97,6 +97,30 @@ export class BrigRepositoryE2E {
     );
   }
 
+  public async unlockSndFactorPasswordChallenge(teamId: string) {
+    await this.axiosInstance.put(
+      `i/teams/${teamId}/features/sndFactorPasswordChallenge/unlocked`,
+      {},
+      {
+        headers: {
+          Authorization: `Basic ${BASIC_AUTH}`,
+        },
+      },
+    );
+  }
+
+  public async unlockAppLock(teamId: string) {
+    await this.axiosInstance.put(
+      `i/teams/${teamId}/features/appLock/unlocked`,
+      {},
+      {
+        headers: {
+          Authorization: `Basic ${BASIC_AUTH}`,
+        },
+      },
+    );
+  }
+
   public async enableChannelsFeature(teamId: string) {
     await this.axiosInstance.patch(
       `i/teams/${teamId}/features/channels`,
@@ -110,6 +134,7 @@ export class BrigRepositoryE2E {
       },
     );
   }
+
   public async enableMLSFeature(teamId: string) {
     await this.axiosInstance.patch(
       `i/teams/${teamId}/features/mls`,
@@ -122,6 +147,50 @@ export class BrigRepositoryE2E {
           defaultCipherSuite: 2,
           supportedProtocols: ['mls', 'proteus'],
         },
+      },
+      {
+        headers: {
+          Authorization: `Basic ${BASIC_AUTH}`,
+        },
+      },
+    );
+  }
+
+  public async toggleAppLock(teamId: string, status: 'enabled' | 'disabled', enforceAppLock: boolean = true) {
+    await this.axiosInstance.patch(
+      `i/teams/${teamId}/features/appLock`,
+      {
+        status: status,
+        config: {
+          enforceAppLock: enforceAppLock,
+          inactivityTimeoutSecs: 30,
+        },
+      },
+      {
+        headers: {
+          Authorization: `Basic ${BASIC_AUTH}`,
+        },
+      },
+    );
+  }
+
+  public async unlockCellsFeature(teamId: string) {
+    await this.axiosInstance.put(
+      `i/teams/${teamId}/features/cells/unlocked`,
+      {},
+      {
+        headers: {
+          Authorization: `Basic ${BASIC_AUTH}`,
+        },
+      },
+    );
+  }
+
+  public async enableCells(teamId: string) {
+    await this.axiosInstance.put(
+      `i/teams/${teamId}/features/cells`,
+      {
+        status: 'enabled',
       },
       {
         headers: {

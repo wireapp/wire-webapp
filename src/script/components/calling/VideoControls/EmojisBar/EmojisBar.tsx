@@ -26,7 +26,7 @@ import {t} from 'Util/LocalizerUtil';
 
 import {styles} from './EmojisBar.styles';
 
-export interface EmojisBarProps {
+interface EmojisBarProps {
   onEmojiClick: (emoji: string) => void;
   onPickerEmojiClick: () => void;
   targetWindow: Window;

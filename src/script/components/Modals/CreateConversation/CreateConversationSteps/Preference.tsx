@@ -17,6 +17,7 @@
  *
  */
 
+import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 import {container} from 'tsyringe';
 
 import {InfoToggle} from 'Components/toggle/InfoToggle';
@@ -43,9 +44,19 @@ export const Preference = () => {
 
   const teamState = container.resolve(TeamState);
 
-  const {isCellsEnabled: isCellsEnabledForTeam} = useKoSubscribableChildren(teamState, ['isCellsEnabled']);
+  const {isCellsEnabled: isCellsEnabledForTeam, isMLSEnabled} = useKoSubscribableChildren(teamState, [
+    'isCellsEnabled',
+    'isMLSEnabled',
+  ]);
   const isCellsEnabledForEnvironment = Config.getConfig().FEATURE.ENABLE_CELLS;
   const isCellsOptionEnabled = isCellsEnabledForEnvironment && isCellsEnabledForTeam;
+
+  const defaultProtocol = isMLSEnabled
+    ? teamState.teamFeatures()?.mls?.config.defaultProtocol
+    : CONVERSATION_PROTOCOL.PROTEUS;
+
+  // Read receipts are temorarily disabled for MLS groups and channels until it is supported
+  const areReadReceiptsEnabled = defaultProtocol !== CONVERSATION_PROTOCOL.MLS;
 
   return (
     <>
@@ -70,18 +81,17 @@ export const Preference = () => {
           isChecked={isServicesEnabled}
         />
       )}
-
-      <InfoToggle
-        className="modal-style"
-        dataUieName="read-receipts"
-        info={t('readReceiptsToggleInfo')}
-        isChecked={isReadReceiptsEnabled}
-        setIsChecked={setIsReadReceiptsEnabled}
-        // Temporarily disabled read receipts toggle for channels
-        // until it is supported by MLS
-        isDisabled={conversationType === ConversationType.Channel}
-        name={t('readReceiptsToggleName')}
-      />
+      {areReadReceiptsEnabled && (
+        <InfoToggle
+          className="modal-style"
+          dataUieName="read-receipts"
+          info={t('readReceiptsToggleInfo')}
+          isChecked={isReadReceiptsEnabled}
+          setIsChecked={setIsReadReceiptsEnabled}
+          isDisabled={false}
+          name={t('readReceiptsToggleName')}
+        />
+      )}
 
       {isCellsOptionEnabled && (
         <InfoToggle

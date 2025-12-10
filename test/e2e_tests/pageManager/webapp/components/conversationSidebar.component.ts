@@ -22,32 +22,30 @@ import {Page, Locator} from '@playwright/test';
 import {selectByDataAttribute} from 'test/e2e_tests/utils/selector.util';
 
 export class ConversationSidebar {
+  readonly pageLoadingTimeout = 60_000;
   readonly page: Page;
-
+  readonly personalStatusLabel: Locator;
   readonly personalStatusName: Locator;
   readonly personalUserName: Locator;
   readonly preferencesButton: Locator;
   readonly allConverationsButton: Locator;
   readonly connectButton: Locator;
   readonly archiveButton: Locator;
+  readonly manageTeamButton: Locator;
+  readonly sidebar: Locator;
 
   constructor(page: Page) {
     this.page = page;
 
+    this.personalStatusLabel = page.getByTestId('status-availability');
     this.personalStatusName = page.locator(`${selectByDataAttribute('status-name')}`);
     this.personalUserName = page.locator(`${selectByDataAttribute('user-handle')}`);
     this.preferencesButton = page.locator(`${selectByDataAttribute('go-preferences')}`);
     this.allConverationsButton = page.locator(`${selectByDataAttribute('go-recent-view')}`);
     this.connectButton = page.locator(`button${selectByDataAttribute('go-people')}`);
     this.archiveButton = page.locator(selectByDataAttribute('go-archive'));
-  }
-
-  async getPersonalStatusName() {
-    return (await this.personalStatusName.textContent()) ?? '';
-  }
-
-  async getPersonalUserName() {
-    return (await this.personalUserName.textContent()) ?? '';
+    this.manageTeamButton = page.locator(selectByDataAttribute('go-team-management'));
+    this.sidebar = page.locator(`.conversations-sidebar-items`);
   }
 
   async clickPreferencesButton() {
@@ -63,7 +61,7 @@ export class ConversationSidebar {
   }
 
   async isPageLoaded() {
-    await this.preferencesButton.waitFor({state: 'visible'});
+    await this.preferencesButton.waitFor({state: 'visible', timeout: this.pageLoadingTimeout});
   }
 
   async clickArchive() {

@@ -17,7 +17,7 @@
  *
  */
 
-import {defineConfig, devices} from '@playwright/test';
+import {defineConfig, devices, ReporterDescription} from '@playwright/test';
 import {config} from 'dotenv';
 
 config({path: './test/e2e_tests/.env'});
@@ -34,6 +34,8 @@ module.exports = defineConfig({
   fullyParallel: true,
   /* Fail the build on CI if you accidentally left test.only in the source code. */
   forbidOnly: !!process.env.CI,
+  /* Due to the tests usually requiring registration and login of a new user the default 30s timeout isn't sufficient */
+  timeout: 90_000,
   /* Retry on CI only */
   retries: process.env.CI ? numberOfRetriesOnCI : 0,
   /* Opt out of parallel tests on CI. */
@@ -42,6 +44,8 @@ module.exports = defineConfig({
   reporter: [
     ['html', {outputFolder: 'playwright-report', open: 'never'}],
     ['json', {outputFile: 'playwright-report/report.json'}],
+    // Add github and blob reporters in CI otherwise html and json are enough
+    ...(process.env.CI ? ([['line'], ['blob']] satisfies ReporterDescription[]) : []),
   ],
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
   use: {
@@ -50,6 +54,7 @@ module.exports = defineConfig({
     screenshot: 'only-on-failure',
     permissions: ['camera', 'microphone'],
     actionTimeout: 20_000, // 20 seconds
+    testIdAttribute: 'data-uie-name',
   },
   expect: {
     timeout: 10_000, // 10 seconds

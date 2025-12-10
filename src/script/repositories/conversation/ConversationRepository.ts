@@ -18,46 +18,48 @@
  */
 
 import {
+  ADD_PERMISSION,
   Conversation as BackendConversation,
-  ConversationProtocol,
+  CONVERSATION_CELLS_STATE,
   CONVERSATION_TYPE,
   DefaultConversationRoleName as DefaultRole,
-  NewConversation,
   MessageSendingStatus,
+  NewConversation,
   RemoteConversations,
-  ADD_PERMISSION,
 } from '@wireapp/api-client/lib/conversation';
 import {
-  MemberLeaveReason,
   ConversationReceiptModeUpdateData,
+  MemberLeaveReason,
   RECEIPT_MODE,
 } from '@wireapp/api-client/lib/conversation/data';
 import {CONVERSATION_TYPING} from '@wireapp/api-client/lib/conversation/data/ConversationTypingData';
 import {
+  CONVERSATION_EVENT,
+  ConversationAddPermissionUpdateEvent,
   ConversationCreateEvent,
   ConversationEvent,
   ConversationMemberJoinEvent,
   ConversationMemberLeaveEvent,
   ConversationMemberUpdateEvent,
   ConversationMessageTimerUpdateEvent,
+  ConversationMLSResetEvent,
+  ConversationProtocolUpdateEvent,
   ConversationReceiptModeUpdateEvent,
   ConversationRenameEvent,
   ConversationTypingEvent,
-  CONVERSATION_EVENT,
-  ConversationProtocolUpdateEvent,
-  ConversationAddPermissionUpdateEvent,
-  ConversationMLSResetEvent,
 } from '@wireapp/api-client/lib/event';
-import {BackendErrorLabel} from '@wireapp/api-client/lib/http/';
 import type {BackendError} from '@wireapp/api-client/lib/http/';
+import {BackendErrorLabel} from '@wireapp/api-client/lib/http/';
+import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 import type {QualifiedId} from '@wireapp/api-client/lib/user/';
 import {BaseCreateConversationResponse} from '@wireapp/core/lib/conversation';
 import {ClientMLSError, ClientMLSErrorLabel} from '@wireapp/core/lib/messagingProtocols/mls';
 import {amplify} from 'amplify';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 import {container} from 'tsyringe';
-import {flatten} from 'underscore';
+import {flatten, isError} from 'underscore';
 
+import {Account} from '@wireapp/core';
 import {Asset as ProtobufAsset, Confirmation, LegalHoldStatus} from '@wireapp/protocol-messaging';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
@@ -116,16 +118,16 @@ import {ConversationLabelRepository} from './ConversationLabelRepository';
 import {ConversationDatabaseData, ConversationMapper} from './ConversationMapper';
 import {ConversationRoleRepository} from './ConversationRoleRepository';
 import {
+  isBackendProteus1to1Conversation,
+  isConnectionRequestConversation,
   isMixedConversation,
   isMLSCapableConversation,
   isMLSConversation,
+  isProteus1to1ConversationWithUser,
   isProteusConversation,
   MLSCapableConversation,
   MLSConversation,
-  isProteus1to1ConversationWithUser,
   ProteusConversation,
-  isConnectionRequestConversation,
-  isBackendProteus1to1Conversation,
 } from './ConversationSelectors';
 import {ConversationService} from './ConversationService';
 import {ConversationState} from './ConversationState';
@@ -143,6 +145,7 @@ import {
 import {
   AssetAddEvent,
   ButtonActionConfirmationEvent,
+  ButtonActionEvent,
   ClientConversationEvent,
   DeleteEvent,
   EventBuilder,
@@ -157,7 +160,7 @@ import {MessageRepository} from './MessageRepository';
 import {NOTIFICATION_STATE} from './NotificationSetting';
 
 import {Config} from '../../Config';
-import {BaseError, BASE_ERROR_TYPE} from '../../error/BaseError';
+import {BASE_ERROR_TYPE, BaseError} from '../../error/BaseError';
 import {ConversationError} from '../../error/ConversationError';
 import {isMemberMessage} from '../../guards/Message';
 import * as LegalHoldEvaluator from '../../legal-hold/LegalHoldEvaluator';
@@ -484,7 +487,7 @@ export class ConversationRepository {
        * Needs to be done to receive the latest epoch and avoid epoch mismatch errors
        */
       let response: BaseCreateConversationResponse;
-      const isMLSConversation = payload.protocol === ConversationProtocol.MLS;
+      const isMLSConversation = payload.protocol === CONVERSATION_PROTOCOL.MLS;
       if (isMLSConversation) {
         response = await this.core.service!.conversation.createMLSConversation(
           payload,
@@ -592,7 +595,7 @@ export class ConversationRepository {
   /**
    * Get a conversation from the backend.
    */
-  public async fetchConversationById({id: conversationId, domain}: QualifiedId): Promise<Conversation> {
+  private async fetchConversationById({id: conversationId, domain}: QualifiedId): Promise<Conversation> {
     const qualifiedId = {domain, id: conversationId};
     const fetching_conversations: Record<string, FetchPromise[]> = {};
     if (fetching_conversations.hasOwnProperty(conversationId)) {
@@ -608,25 +611,49 @@ export class ConversationRepository {
       await this.updateParticipatingUserEntities(conversationEntity);
       await this.saveConversation(conversationEntity);
 
-      fetching_conversations[conversationId].forEach(({resolveFn}) => resolveFn(conversationEntity));
+      for (const {resolveFn} of fetching_conversations[conversationId]) {
+        resolveFn(conversationEntity);
+      }
       delete fetching_conversations[conversationId];
 
       return conversationEntity;
-    } catch (originalError) {
-      if (originalError.code === HTTP_STATUS.NOT_FOUND) {
-        this.deleteConversationLocally(qualifiedId, false);
-      }
-      const error = new ConversationError(
-        ConversationError.TYPE.CONVERSATION_NOT_FOUND,
-        ConversationError.MESSAGE.CONVERSATION_NOT_FOUND,
-        originalError,
-      );
-      fetching_conversations[conversationId].forEach(({rejectFn}) => rejectFn(error));
-      delete fetching_conversations[conversationId];
+    } catch (originalError: unknown) {
+      if (isError(originalError)) {
+        const code =
+          originalError && typeof originalError === 'object' && 'code' in originalError ? originalError.code : null;
+        this.logger.error(originalError.message);
+        if (code === HTTP_STATUS.NOT_FOUND) {
+          await this.deleteConversationLocally(qualifiedId, false);
+        }
+        const error = new ConversationError(
+          ConversationError.TYPE.CONVERSATION_NOT_FOUND,
+          ConversationError.MESSAGE.CONVERSATION_NOT_FOUND,
+          originalError,
+        );
 
-      throw error;
+        for (const {rejectFn} of fetching_conversations[conversationId]) {
+          rejectFn(error);
+        }
+
+        delete fetching_conversations[conversationId];
+        throw error;
+      }
+      throw new Error('unkown error encountered', {cause: originalError});
     }
   }
+
+  /**
+   * Get a conversation from the backend without updating local storage
+   * @param qualifiedId qualified id of the conversation to fetch
+   * @returns the fetched backend conversation entity
+   */
+  public fetchBackendConversationEntityById = async (qualifiedId: QualifiedId): Promise<BackendConversation> => {
+    const backendConversationEntity = await this.conversationService.getConversationById(qualifiedId).catch(error => {
+      this.logger.error(`Failed to get conversation from backend: ${error.message}`);
+      throw error;
+    });
+    return backendConversationEntity;
+  };
 
   /**
    * Will load all the conversations in memory
@@ -682,7 +709,7 @@ export class ConversationRepository {
     // we will blacklist proteus 1:1 (so it's never refetched) conversation and remove it from the list of remote conversations
 
     const mls1to1Conversations = remoteConversations.found.filter(
-      ({protocol, type}) => protocol === ConversationProtocol.MLS && type === CONVERSATION_TYPE.ONE_TO_ONE,
+      ({protocol, type}) => protocol === CONVERSATION_PROTOCOL.MLS && type === CONVERSATION_TYPE.ONE_TO_ONE,
     );
 
     const {abandonedProteus1to1Conversations, allConversations} = remoteConversations.found.reduce(
@@ -1271,6 +1298,19 @@ export class ConversationRepository {
   };
 
   /**
+   * Get all the group conversations with Cells enabled.
+   */
+  public readonly getAllCellEnabledGroupConversations = (): Conversation[] => {
+    return this.conversationState
+      .conversations()
+      .filter(
+        conversation =>
+          conversation.cellsState() === CONVERSATION_CELLS_STATE.READY ||
+          conversation.cellsState() === CONVERSATION_CELLS_STATE.PENDING,
+      );
+  };
+
+  /**
    * Get group conversations by name.
    *
    * @param query Query to be searched in group conversation names
@@ -1384,7 +1424,7 @@ export class ConversationRepository {
 
     const localMLSConversation = this.conversationState.findMLS1to1Conversation(userId);
 
-    if (protocol === ConversationProtocol.MLS || localMLSConversation) {
+    if (protocol === CONVERSATION_PROTOCOL.MLS || localMLSConversation) {
       /**
        * When mls 1:1 conversation initialisation is triggered by some live update (e.g other user updates their supported protocols), it's very likely that we will also receive a welcome message shortly.
        * We have to add a delay to make sure the welcome message is not wasted, in case the self client would establish mls group themselves before receiving the welcome.
@@ -1583,7 +1623,7 @@ export class ConversationRepository {
     otherUserId: QualifiedId,
     shouldRefreshUser = false,
   ): Promise<{
-    protocol: ConversationProtocol.PROTEUS | ConversationProtocol.MLS;
+    protocol: CONVERSATION_PROTOCOL.PROTEUS | CONVERSATION_PROTOCOL.MLS;
     isMLSSupportedByTheOtherUser: boolean;
     isProteusSupportedByTheOtherUser: boolean;
   }> => {
@@ -1593,25 +1633,25 @@ export class ConversationRepository {
     );
     const selfUserSupportedProtocols = await this.selfRepository.getSelfSupportedProtocols();
 
-    const isMLSSupportedByTheOtherUser = otherUserSupportedProtocols.includes(ConversationProtocol.MLS);
-    const isProteusSupportedByTheOtherUser = otherUserSupportedProtocols.includes(ConversationProtocol.PROTEUS);
+    const isMLSSupportedByTheOtherUser = otherUserSupportedProtocols.includes(CONVERSATION_PROTOCOL.MLS);
+    const isProteusSupportedByTheOtherUser = otherUserSupportedProtocols.includes(CONVERSATION_PROTOCOL.PROTEUS);
 
     const commonProtocols = otherUserSupportedProtocols.filter(protocol =>
       selfUserSupportedProtocols.includes(protocol),
     );
 
-    if (commonProtocols.includes(ConversationProtocol.MLS)) {
-      return {protocol: ConversationProtocol.MLS, isMLSSupportedByTheOtherUser, isProteusSupportedByTheOtherUser};
+    if (commonProtocols.includes(CONVERSATION_PROTOCOL.MLS)) {
+      return {protocol: CONVERSATION_PROTOCOL.MLS, isMLSSupportedByTheOtherUser, isProteusSupportedByTheOtherUser};
     }
 
-    if (commonProtocols.includes(ConversationProtocol.PROTEUS)) {
-      return {protocol: ConversationProtocol.PROTEUS, isMLSSupportedByTheOtherUser, isProteusSupportedByTheOtherUser};
+    if (commonProtocols.includes(CONVERSATION_PROTOCOL.PROTEUS)) {
+      return {protocol: CONVERSATION_PROTOCOL.PROTEUS, isMLSSupportedByTheOtherUser, isProteusSupportedByTheOtherUser};
     }
 
     //if common protocol can't be found, we use preferred protocol of the self user
-    const preferredProtocol = selfUserSupportedProtocols.includes(ConversationProtocol.MLS)
-      ? ConversationProtocol.MLS
-      : ConversationProtocol.PROTEUS;
+    const preferredProtocol = selfUserSupportedProtocols.includes(CONVERSATION_PROTOCOL.MLS)
+      ? CONVERSATION_PROTOCOL.MLS
+      : CONVERSATION_PROTOCOL.PROTEUS;
 
     return {protocol: preferredProtocol, isMLSSupportedByTheOtherUser, isProteusSupportedByTheOtherUser};
   };
@@ -2080,14 +2120,14 @@ export class ConversationRepository {
       this.logger.debug(
         `Connection with user ${otherUserId.id} is accepted, using protocol ${protocol} for 1:1 conversation`,
       );
-      if (protocol === ConversationProtocol.MLS || localMLSConversation) {
+      if (protocol === CONVERSATION_PROTOCOL.MLS || localMLSConversation) {
         return this.initMLS1to1Conversation(otherUserId, {
           isMLSSupportedByTheOtherUser,
           shouldDelayGroupEstablishment: shouldDelayMLSGroupEstablishment,
         });
       }
 
-      if (protocol === ConversationProtocol.PROTEUS) {
+      if (protocol === CONVERSATION_PROTOCOL.PROTEUS) {
         return this.initProteus1to1Conversation(proteusConversationId, isProteusSupportedByTheOtherUser);
       }
     }
@@ -2111,7 +2151,7 @@ export class ConversationRepository {
       `Connection with user ${otherUserId.id} is not accepted, defaulting to local proteus 1:1 conversation ${proteusConversationId.id}`,
     );
 
-    return protocol === ConversationProtocol.PROTEUS ? localProteusConversation : null;
+    return protocol === CONVERSATION_PROTOCOL.PROTEUS ? localProteusConversation : null;
   };
 
   /**
@@ -2152,6 +2192,141 @@ export class ConversationRepository {
       }
 
       return undefined;
+    }
+  };
+
+  /**
+   * Ensures that a conversation exists by checking its group ID and conversation ID.
+   * If the conversation does not exist, it will try to establish it or join it by external commit.
+   *
+   * @param param0 conversationId and groupId
+   * @returns void
+   */
+  public ensureConversationExists = async ({
+    conversationId,
+    groupId,
+    epoch,
+    core = this.core,
+    retry = true,
+  }: {
+    conversationId: QualifiedId;
+    groupId: string;
+    epoch: number;
+    core?: Account;
+    retry?: boolean;
+  }): Promise<void> => {
+    this.logger.info('Ensuring conversation exists', {conversationId, groupId, epoch});
+    if (await this.conversationService.mlsGroupExistsLocally(groupId)) {
+      this.logger.info('Conversation already exists locally', {conversationId, groupId, epoch});
+      if (epoch === 0) {
+        if (!retry) {
+          this.logger.error('Epoch is 0, but retry is false, not retrying again', {conversationId, groupId, epoch});
+          return;
+        }
+        return this.recoverFromLocalUnestablishedMLSConversations({conversationId, groupId, epoch, core});
+      }
+      return;
+    }
+
+    // establish the conversation if epoch is 0
+    if (epoch === 0) {
+      this.logger.info('Establishing conversation as epoch is 0', {conversationId, groupId, epoch});
+      await this.establishMlsGroupConversation({conversationId, groupId, epoch, core});
+      return;
+    }
+
+    // join by external commit
+    this.logger.info('Joining conversation by external commit', {conversationId, epoch});
+    if (epoch && epoch > 0) {
+      await this.core.service?.conversation?.joinByExternalCommit(conversationId);
+    }
+  };
+
+  /**
+   * Establishes a MLS group conversation.
+   */
+  private establishMlsGroupConversation = async ({
+    conversationId,
+    groupId,
+    epoch,
+    core = this.core,
+  }: {
+    conversationId: QualifiedId;
+    groupId: string;
+    epoch: number;
+    core?: Account;
+  }) => {
+    this.logger.info('Establishing conversation', {conversationId, groupId, epoch});
+    const selfUser = this.userState.self();
+    const conversation = this.conversationState.findConversation(conversationId);
+
+    if (!selfUser || !conversation) {
+      this.logger.error('Self user or conversation is not available!', {selfUser, conversation});
+      throw new Error('Self user or conversation is not available!');
+    }
+
+    const selfUserClientId = selfUser.localClient?.id;
+    if (!selfUserClientId) {
+      this.logger.error('Self user client id is not available!', {selfUserClientId});
+      throw new Error('Self user client id is not available!');
+    }
+
+    const members = conversation.participating_user_ids();
+    await core.service?.conversation?.establishMLSGroupConversation(
+      groupId,
+      members,
+      selfUser.qualifiedId,
+      selfUserClientId,
+      conversationId,
+    );
+  };
+
+  /**
+   * Recovers from local unestablished MLS conversations by refetching metadata and re-establishing the conversation.
+   * This is typically needed when the local epoch is 0 but the epoch on backend is greater than 0
+   * indicating that the conversation has not been properly established.
+   * throws error in case both local and remote MLS group are at epoch 0 or remote epoch is not available
+   */
+  private recoverFromLocalUnestablishedMLSConversations = async ({
+    conversationId,
+    groupId,
+    epoch,
+    core = this.core,
+  }: {
+    conversationId: QualifiedId;
+    groupId: string;
+    epoch: number;
+    core?: Account;
+  }) => {
+    try {
+      this.logger.info('Epoch is 0, refetching conversation metadata and re-establishing', {
+        conversationId,
+        groupId,
+        epoch,
+      });
+      await core.service?.conversation?.wipeMLSConversation(groupId);
+      const remoteConversation = await this.conversationService.getConversationById(conversationId);
+      const remoteEpoch = remoteConversation.epoch;
+      if (!remoteEpoch) {
+        this.logger.error('Remote epoch is not available!', {remoteConversation});
+        throw new Error('Remote epoch is not available!');
+      }
+      if (remoteEpoch === epoch) {
+        const errorMessage =
+          'Cannot recover: both local and remote MLS group are at epoch 0, the conversation was never established on the backend';
+        this.logger.error(errorMessage, {remoteEpoch, epoch});
+        throw new Error(errorMessage);
+      }
+
+      return this.ensureConversationExists({conversationId, groupId, epoch: remoteEpoch, core, retry: false});
+    } catch (error) {
+      this.logger.error('Failed to recover from local unestablished MLS conversation', {
+        error,
+        conversationId,
+        groupId,
+        epoch,
+      });
+      throw error;
     }
   };
 
@@ -2791,7 +2966,7 @@ export class ConversationRepository {
    */
   public readonly updateConversationProtocol = async (
     conversation: Conversation,
-    protocol: ConversationProtocol.MIXED | ConversationProtocol.MLS,
+    protocol: CONVERSATION_PROTOCOL.MIXED | CONVERSATION_PROTOCOL.MLS,
   ): Promise<Conversation> => {
     const protocolUpdateEventResponse = await this.conversationService.updateConversationProtocol(
       conversation.qualifiedId,
@@ -2801,7 +2976,7 @@ export class ConversationRepository {
     if (protocolUpdateEventResponse) {
       await this.eventRepository.injectEvent(protocolUpdateEventResponse, EventRepository.SOURCE.BACKEND_RESPONSE);
 
-      if (protocolUpdateEventResponse.data.protocol === ConversationProtocol.MLS) {
+      if (protocolUpdateEventResponse.data.protocol === CONVERSATION_PROTOCOL.MLS) {
         await this.handleConversationProtocolUpdatedToMLS(conversation);
       }
     }
@@ -2905,8 +3080,8 @@ export class ConversationRepository {
     isoDate = this.serverTimeHandler.toServerTimestamp(),
   ) => {
     const userEntity = await this.userRepository.getUserById(userId);
-    const eventInjections = this.conversationState
-      .conversations()
+    const allConversations = this.conversationState.conversations();
+    const eventInjections = allConversations
       .filter(conversation => {
         const conversationInTeam = conversation.teamId === teamId;
         const userIsParticipant = UserFilter.isParticipant(conversation, userId);
@@ -2915,10 +3090,14 @@ export class ConversationRepository {
       .map(async conversation => {
         const leaveEvent = EventBuilder.buildTeamMemberLeave(conversation, userEntity, isoDate);
         await this.eventRepository.injectEvent(leaveEvent);
-        await this.clearUsersFromConversation(conversation, [userEntity]);
       });
-    userEntity.isDeleted = true;
-    return Promise.all(eventInjections);
+
+    // Clear user from all conversations they participate in
+    const userCleanup = allConversations
+      .filter(conversation => UserFilter.isParticipant(conversation, userId))
+      .map(conversation => this.clearUsersFromConversation(conversation, [userEntity]));
+
+    await Promise.all([...eventInjections, ...userCleanup]);
   };
 
   /**
@@ -3480,6 +3659,9 @@ export class ConversationRepository {
       case CONVERSATION_EVENT.ADD_PERMISSION_UPDATE:
         return this.onAddPermissionChanged(conversationEntity, eventJson);
 
+      case ClientEvent.CONVERSATION.BUTTON_ACTION:
+        return this.onButtonAction(conversationEntity, eventJson);
+
       case ClientEvent.CONVERSATION.BUTTON_ACTION_CONFIRMATION:
         return this.onButtonActionConfirmation(conversationEntity, eventJson);
 
@@ -3735,7 +3917,7 @@ export class ConversationRepository {
 
       // If the group is not established yet, we need to establish it
       if (!isAlreadyEstablished) {
-        await initMLSGroupConversation(conversationEntity, selfUser.qualifiedId, {core: this.core});
+        await initMLSGroupConversation(conversationEntity, this, {core: this.core});
       }
     }
 
@@ -3844,7 +4026,7 @@ export class ConversationRepository {
       conversationEntity.status(ConversationStatus.PAST_MEMBER);
       this.callingRepository.leaveCall(
         conversationEntity.qualifiedId,
-        LEAVE_CALL_REASON.USER_IS_REMOVED_BY_AN_ADMIN_OR_LEFT_ON_ANOTHER_CLIENT,
+        LEAVE_CALL_REASON.USER_IS_REMOVED_FROM_CONVERSATION,
       );
 
       if (this.userState.self().isTemporaryGuest()) {
@@ -4061,8 +4243,15 @@ export class ConversationRepository {
     }
   }
 
-  private async onButtonActionConfirmation(conversationEntity: Conversation, eventJson: ButtonActionConfirmationEvent) {
-    const {messageId, buttonId} = eventJson.data;
+  /**
+   * Common logic for handling button selections (both actions and confirmations)
+   *
+   * @param conversationEntity Conversation containing the message
+   * @param messageId ID of the message with the button
+   * @param buttonId ID of the button that was selected
+   * @returns Promise that resolves when the button selection has been processed
+   */
+  private async handleButtonSelection(conversationEntity: Conversation, messageId: string, buttonId: string) {
     try {
       const messageEntity = await this.messageRepository.getMessageInConversationById(conversationEntity, messageId);
       if (!messageEntity || !messageEntity.isComposite()) {
@@ -4085,6 +4274,23 @@ export class ConversationRepository {
         throw error;
       }
     }
+  }
+
+  private async onButtonAction(conversationEntity: Conversation, eventJson: ButtonActionEvent) {
+    const {messageId, buttonId} = eventJson.data;
+
+    const shouldSkipSelectionFromOtherUser = conversationEntity.selfUser()?.id !== eventJson.from;
+    if (shouldSkipSelectionFromOtherUser) {
+      this.logger.warn(`Skipping button action from other user in conversation '${conversationEntity.id}'`);
+      return;
+    }
+
+    await this.handleButtonSelection(conversationEntity, messageId, buttonId);
+  }
+
+  private async onButtonActionConfirmation(conversationEntity: Conversation, eventJson: ButtonActionConfirmationEvent) {
+    const {messageId, buttonId} = eventJson.data;
+    await this.handleButtonSelection(conversationEntity, messageId, buttonId);
   }
 
   /**
@@ -4117,7 +4323,7 @@ export class ConversationRepository {
     const updatedConversation = await this.refreshConversationProtocolProperties(conversation);
     await this.addEventToConversation(updatedConversation, eventJson);
 
-    if (eventJson.data.protocol === ConversationProtocol.MLS) {
+    if (eventJson.data.protocol === CONVERSATION_PROTOCOL.MLS) {
       await this.handleConversationProtocolUpdatedToMLS(updatedConversation);
     }
   }
@@ -4164,13 +4370,45 @@ export class ConversationRepository {
    */
   private async onMLSResetMessage(conversationEntity: Conversation, eventJson: ConversationMLSResetEvent) {
     try {
+      this.logger.info(`Handling MLS reset event for conversation ${conversationEntity.id}`, {eventJson});
       if (!isMLSConversation(conversationEntity)) {
+        this.logger.warn(
+          `Received MLS reset event for a conversation that is not MLS capable: ${conversationEntity.id}`,
+        );
         return;
       }
 
-      await this.core.service?.conversation.wipeMLSConversation(eventJson.data.group_id);
+      const {new_group_id: newGroupId, group_id: oldGroupId} = eventJson.data;
 
-      await this.refreshConversationProtocolProperties(conversationEntity);
+      const conversationService = this.core.service?.conversation;
+      const mlsService = this.core.service?.mls;
+
+      if (!conversationService || !mlsService) {
+        throw new Error('Conversation or Mls service is not available!');
+      }
+
+      await conversationService.wipeMLSConversation(oldGroupId);
+      const existingConversation = await conversationService.mlsGroupExistsLocally(newGroupId);
+
+      let epoch = 0;
+      if (existingConversation) {
+        const newEpoch: number = await mlsService.getEpoch(newGroupId);
+        this.logger.info('An MLS conversation with the new group ID already exists fetched epoch from core crypto', {
+          newEpoch,
+        });
+        epoch = newEpoch;
+      }
+
+      const updatedConversation = ConversationMapper.updateProperties(conversationEntity, {
+        epoch,
+        groupId: newGroupId,
+      });
+
+      await this.saveConversationStateInDb(updatedConversation);
+
+      this.logger.info(
+        `Updated conversation group ID from ${oldGroupId} to ${newGroupId} for conversation ${conversationEntity.id} and set epoch to 0`,
+      );
     } catch (error) {
       this.logger.error(`Failed to reset MLS conversation ${conversationEntity.id}`, error);
     }

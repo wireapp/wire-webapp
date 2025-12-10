@@ -26,6 +26,7 @@ import {container} from 'tsyringe';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {PrimaryModal, removeCurrentModal, usePrimaryModalState} from 'Components/Modals/PrimaryModal';
+import {CellsRepository} from 'Repositories/cells/CellsRepository';
 import type {ClientEntity} from 'Repositories/client';
 import type {ConnectionRepository} from 'Repositories/connection/ConnectionRepository';
 import type {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
@@ -46,6 +47,7 @@ import type {MainViewModel} from './MainViewModel';
 export class ActionsViewModel {
   constructor(
     private readonly selfRepository: SelfRepository,
+    private readonly cellsRepository: CellsRepository,
     private readonly connectionRepository: ConnectionRepository,
     private readonly conversationRepository: ConversationRepository,
     private readonly integrationRepository: IntegrationRepository,
@@ -249,11 +251,20 @@ export class ActionsViewModel {
 
   readonly deleteMessageEveryone = (conversationEntity: Conversation, messageEntity: Message): Promise<void> => {
     if (conversationEntity && messageEntity) {
+      const cellsAssets = this.messageRepository.getCellsAssetAttachmentIds(messageEntity);
+
+      const deleteMessage = async () => {
+        if (cellsAssets.length > 0) {
+          await this.cellsRepository.deleteNodes({uuids: cellsAssets, permanently: true});
+        }
+        await this.messageRepository.deleteMessageForEveryone(conversationEntity, messageEntity);
+      };
+
       return new Promise(resolve => {
         PrimaryModal.show(PrimaryModal.type.CONFIRM, {
           primaryAction: {
             action: async () => {
-              await this.messageRepository.deleteMessageForEveryone(conversationEntity, messageEntity);
+              await deleteMessage();
               resolve();
             },
             text: t('modalConversationDeleteMessageEveryoneAction'),

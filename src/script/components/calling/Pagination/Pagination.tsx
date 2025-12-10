@@ -25,7 +25,7 @@ import {paginationContainerStyles, paginationDotsContainerStyles} from './Pagina
 import {PaginationArrow} from './PaginationArrow';
 import {PaginationDot} from './PaginationDot';
 
-export interface PaginationProps {
+interface PaginationProps {
   currentPage: number;
   totalPages: number;
   onChangePage: (newPage: number) => void;
@@ -34,7 +34,7 @@ export interface PaginationProps {
 
 const DEFAULT_VISIBLE_DOTS = 5;
 
-const Pagination = ({totalPages, currentPage, onChangePage, className}: PaginationProps) => {
+export const Pagination = ({totalPages, currentPage, onChangePage, className}: PaginationProps) => {
   const visibleDots = Math.min(DEFAULT_VISIBLE_DOTS, totalPages);
 
   const calculateStartPosition = (page: number) => {
@@ -106,5 +106,3 @@ const Pagination = ({totalPages, currentPage, onChangePage, className}: Paginati
     </div>
   );
 };
-
-export {Pagination};

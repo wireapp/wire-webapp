@@ -32,14 +32,20 @@ import {
   e2eMessageContentLinkCss,
 } from './E2eEncryptionMessage.styles';
 
-export const E2eEncryptionMessage = () => {
+interface E2eEncryptionMessageProps {
+  isCellsConversation: boolean;
+}
+
+export const E2eEncryptionMessage = ({isCellsConversation}: E2eEncryptionMessageProps) => {
   return (
     <div css={e2eMessageContainerCss}>
       <div css={e2eMessageIconContainerCss}>
         <ShieldIcon css={e2eMessageIconCss} />
       </div>
       <div css={e2eMessageContentContainerCss}>
-        <p css={e2eMessageContentParagraphCss}>{t('conversationNewConversation')}</p>
+        <p css={e2eMessageContentParagraphCss}>
+          {isCellsConversation ? t('conversationNewCellsConversation') : t('conversationNewConversation')}
+        </p>
         <p css={e2eMessageContentParagraphWithMarginCss}>{t('conversationUnverifiedUserWarning')}</p>
         <Link
           css={e2eMessageContentLinkCss}

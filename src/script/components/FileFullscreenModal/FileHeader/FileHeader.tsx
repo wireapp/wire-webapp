@@ -17,13 +17,17 @@
  *
  */
 
-import {BadgesWithTooltip, Button, ButtonVariant, CloseIcon, DownloadIcon} from '@wireapp/react-ui-kit';
+import {container} from 'tsyringe';
+
+import {BadgesWithTooltip, Button, ButtonVariant, CloseIcon, DownloadIcon, ShowIcon} from '@wireapp/react-ui-kit';
 
 import {FileTypeIcon} from 'Components/Conversation/common/FileTypeIcon/FileTypeIcon';
+import {EditIcon} from 'Components/Icon';
 import {MessageTime} from 'Components/MessagesList/Message/MessageTime';
 import {useRelativeTimestamp} from 'Hooks/useRelativeTimestamp';
+import {CellsRepository} from 'Repositories/cells/CellsRepository';
 import {t} from 'Util/LocalizerUtil';
-import {forcedDownloadFile} from 'Util/util';
+import {forcedDownloadFile, getFileNameWithExtension} from 'Util/util';
 
 import {
   headerStyles,
@@ -34,28 +38,46 @@ import {
   textStyles,
   downloadButtonStyles,
   actionButtonsStyles,
+  editModeButtonStyles,
 } from './FileHeader.styles';
 
 interface FileHeaderProps {
+  id: string;
   onClose: () => void;
-  filePreviewUrl?: string;
   fileName: string;
   fileExtension: string;
   senderName: string;
   timestamp: number;
   badges?: string[];
+  fileUrl?: string;
+  isEditable?: boolean;
+  isInEditMode?: boolean;
+  onEditModeChange: (isEditable: boolean) => void;
 }
 
 export const FileHeader = ({
+  id,
   onClose,
-  filePreviewUrl,
+  fileUrl,
   fileName,
   fileExtension,
   senderName,
   timestamp,
   badges,
+  isEditable,
+  isInEditMode,
+  onEditModeChange,
 }: FileHeaderProps) => {
   const timeAgo = useRelativeTimestamp(timestamp);
+  const fileNameWithExtension = getFileNameWithExtension(fileName, fileExtension);
+  const cellsRepository = container.resolve(CellsRepository);
+
+  const handleFileDownload = async () => {
+    if (fileUrl) {
+      const node = await cellsRepository.getNode({uuid: id});
+      await forcedDownloadFile({url: node.PreSignedGET?.Url || fileUrl, name: fileNameWithExtension});
+    }
+  };
 
   return (
     <header css={headerStyles}>
@@ -78,11 +100,34 @@ export const FileHeader = ({
           {badges && badges.length > 0 && <BadgesWithTooltip items={badges} />}
         </div>
       </div>
+      {isEditable && (
+        <div css={editModeButtonStyles}>
+          <button
+            title="Viewing"
+            aria-label="Viewing"
+            className={!isInEditMode ? 'active' : ''}
+            onClick={() => onEditModeChange(false)}
+          >
+            <ShowIcon width={16} height={16} />
+            Viewing
+          </button>
+          <button
+            title="Editing"
+            aria-label="Editing"
+            className={isInEditMode ? 'active' : ''}
+            onClick={() => onEditModeChange(true)}
+          >
+            <EditIcon width={14} height={14} />
+            Editing
+          </button>
+        </div>
+      )}
       <div css={actionButtonsStyles}>
         <Button
           variant={ButtonVariant.TERTIARY}
           css={downloadButtonStyles}
-          onClick={() => forcedDownloadFile({url: filePreviewUrl || '', name: `${fileName}.${fileExtension}`})}
+          onClick={handleFileDownload}
+          disabled={!fileUrl}
           aria-label={t('cells.imageFullScreenModal.downloadButton')}
         >
           <DownloadIcon />

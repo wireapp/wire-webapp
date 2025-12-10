@@ -17,7 +17,7 @@
  *
  */
 
-import React from 'react';
+import {MouseEvent, KeyboardEvent} from 'react';
 
 import cx from 'classnames';
 import {container} from 'tsyringe';
@@ -33,15 +33,12 @@ import {t} from 'Util/LocalizerUtil';
 import {DurationUnit, formatDuration} from 'Util/TimeUtil';
 import {setContextMenuPosition} from 'Util/util';
 
-export interface MessageTimerButtonProps {
+interface MessageTimerButtonProps {
   conversation: Conversation;
   teamState?: TeamState;
 }
 
-const MessageTimerButton: React.FC<MessageTimerButtonProps> = ({
-  conversation,
-  teamState = container.resolve(TeamState),
-}) => {
+const MessageTimerButton = ({conversation, teamState = container.resolve(TeamState)}: MessageTimerButtonProps) => {
   const {messageTimer, hasGlobalMessageTimer} = useKoSubscribableChildren(conversation, [
     'messageTimer',
     'hasGlobalMessageTimer',
@@ -72,7 +69,7 @@ const MessageTimerButton: React.FC<MessageTimerButtonProps> = ({
     );
 
   // Click on ephemeral button
-  const onClick = (event: React.MouseEvent<HTMLSpanElement>): void => {
+  const onClick = (event: MouseEvent<HTMLSpanElement>): void => {
     const entries = setEntries();
     showContextMenu({event, entries, identifier: 'message-timer-menu'});
   };
@@ -81,7 +78,7 @@ const MessageTimerButton: React.FC<MessageTimerButtonProps> = ({
     return null;
   }
 
-  const handleContextKeyDown = (event: React.KeyboardEvent) => {
+  const handleContextKeyDown = (event: KeyboardEvent) => {
     if (isSpaceOrEnterKey(event.key)) {
       const newEvent = setContextMenuPosition(event);
       const entries = setEntries();
@@ -96,6 +93,7 @@ const MessageTimerButton: React.FC<MessageTimerButtonProps> = ({
       onClick={isTimerDisabled ? undefined : onClick}
       onKeyDown={handleContextKeyDown}
       title={t('tooltipConversationEphemeral')}
+      disabled={isTimerDisabled}
       data-uie-value={isTimerDisabled ? 'disabled' : 'enabled'}
       data-uie-name="do-set-ephemeral-timer"
       type="button"

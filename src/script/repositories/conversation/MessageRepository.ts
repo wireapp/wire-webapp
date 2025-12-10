@@ -17,8 +17,10 @@
  *
  */
 
-import {ConversationProtocol, MessageSendingStatus, QualifiedUserClients} from '@wireapp/api-client/lib/conversation';
+import {AssetAuditData} from '@wireapp/api-client/lib/asset';
+import {MessageSendingStatus, QualifiedUserClients} from '@wireapp/api-client/lib/conversation';
 import {BackendErrorLabel} from '@wireapp/api-client/lib/http/';
+import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 import {QualifiedId, RequestCancellationError} from '@wireapp/api-client/lib/user';
 import {
   GenericMessageType,
@@ -78,6 +80,7 @@ import {Segmentation} from 'Repositories/tracking/Segmentation';
 import {protoFromType} from 'Repositories/user/AvailabilityMapper';
 import {UserRepository} from 'Repositories/user/UserRepository';
 import {UserState} from 'Repositories/user/UserState';
+import {getWebEnvironment} from 'Util/Environment';
 import {
   cancelSendingLinkPreview,
   clearLinkPreviewSendingState,
@@ -664,6 +667,30 @@ export class MessageRepository {
   }
 
   /**
+   * Get Cells assets' attachments ids from a message.
+   *
+   * @param messageEntity Message to get attachments from
+   * @returns Array of attachment ids
+   */
+  public getCellsAssetAttachmentIds(messageEntity: Message): string[] {
+    if (!messageEntity.hasMultipartAsset || !messageEntity.isContent()) {
+      return [];
+    }
+
+    const multipartAsset = messageEntity.getFirstAsset();
+    if (!multipartAsset || !multipartAsset.isMultipart()) {
+      return [];
+    }
+
+    const attachments = multipartAsset.attachments?.() ?? [];
+    const cellsAttachmentsIds = attachments.flatMap(attachment =>
+      attachment.cellAsset?.uuid ? [attachment.cellAsset.uuid] : [],
+    );
+
+    return cellsAttachmentsIds;
+  }
+
+  /**
    * Create asset metadata message to specified conversation.
    */
   private async createAssetMetadata(
@@ -703,13 +730,25 @@ export class MessageRepository {
     asImage: boolean,
     meta: FileMetaDataContent,
   ) {
+    const isAuditLogEnabled = this.teamState.isAuditLogEnabled() && !getWebEnvironment().isProduction;
+
+    const auditData: AssetAuditData | undefined = isAuditLogEnabled
+      ? {
+          conversationId: conversation.qualifiedId,
+          filename: meta.name,
+          filetype: meta.type,
+        }
+      : undefined;
+
     const retention = this.assetRepository.getAssetRetention(this.userState.self(), conversation);
     const options = {
       legalHoldStatus: conversation.legalHoldStatus(),
       public: true,
       retention,
+      ...(isAuditLogEnabled && {auditData}),
     };
-    const asset = await this.assetRepository.uploadFile(file, messageId, options);
+
+    const asset = await this.assetRepository.uploadFile(file, messageId, options, isAuditLogEnabled);
 
     const metadata = asImage ? ((await buildMetadata(file)) as ImageMetadata) : undefined;
     const commonMessageData = {
@@ -858,14 +897,20 @@ export class MessageRepository {
 
     const injectOptimisticEvent = async () => {
       if (!skipInjection) {
-        const senderId = this.clientState.currentClient?.id;
+        const clientId = this.clientState.currentClient?.id;
+
+        if (!clientId) {
+          this.logger.error('No current client id found, cannot send message optimistically');
+          return true;
+        }
+
         const currentTimestamp = this.serverTimeHandler.toServerTimestamp();
-        const optimisticEvent = EventBuilder.buildMessageAdd(
-          conversation,
+        const optimisticEvent = EventBuilder.buildMessageAdd({
+          conversationEntity: conversation,
           currentTimestamp,
-          this.userState.self()!.id,
-          senderId,
-        );
+          senderId: this.userState.self()!.id,
+          clientId,
+        });
         this.trackContributed(conversation, payload);
         const mappedEvent = await this.cryptography_repository.cryptographyMapper.mapGenericMessage(
           payload,
@@ -900,7 +945,7 @@ export class MessageRepository {
       ? {
           groupId: conversation.groupId,
           payload,
-          protocol: ConversationProtocol.MLS,
+          protocol: CONVERSATION_PROTOCOL.MLS,
           conversationId: conversation.qualifiedId,
         }
       : {
@@ -908,7 +953,7 @@ export class MessageRepository {
           nativePush,
           onClientMismatch: mismatch => this.onClientMismatch?.(mismatch, conversation, silentDegradationWarning),
           payload,
-          protocol: ConversationProtocol.PROTEUS,
+          protocol: CONVERSATION_PROTOCOL.PROTEUS,
           targetMode,
           userIds: await this.generateRecipients(conversation, recipients, skipSelf),
         };
@@ -920,6 +965,13 @@ export class MessageRepository {
     }
 
     try {
+      if (isMLSConversation(conversation)) {
+        await this.conversationRepositoryProvider().ensureConversationExists({
+          conversationId: conversation.qualifiedId,
+          groupId: conversation.groupId,
+          epoch: conversation.epoch,
+        });
+      }
       const result = await this.conversationService.send(sendOptions);
 
       if (result.state === MessageSendingState.OUTGOING_SENT) {
@@ -1004,7 +1056,7 @@ export class MessageRepository {
     await this.conversationService.send({
       conversationId: conversation.qualifiedId,
       payload: sessionReset,
-      protocol: ConversationProtocol.PROTEUS,
+      protocol: CONVERSATION_PROTOCOL.PROTEUS,
       targetMode: MessageTargetMode.USERS_CLIENTS,
       userIds: userClient, // we target this message to the specific client of the user (no need for mismatch handling here)
     });
@@ -1213,10 +1265,23 @@ export class MessageRepository {
     }
   }
 
-  sendButtonAction(conversation: Conversation, message: CompositeMessage, buttonId: string): void {
+  /**
+   * Sends a buttonAction confirmation, a button was clicked without targeted messages.
+   * @param conversation conversation where this button was clicked
+   * @param message the composite message
+   * @param buttonId the button selected id
+   * @returns
+   */
+  async sendButtonAction(conversation: Conversation, message: CompositeMessage, buttonId: string): Promise<void> {
     if (conversation.isSelfUserRemoved()) {
       return;
     }
+
+    const changes = message.getSelectionChange(buttonId);
+    if (!changes) {
+      return;
+    }
+
     const senderId = message.qualifiedFrom;
     const senderInConversation = conversation
       .participating_user_ets()
@@ -1235,10 +1300,10 @@ export class MessageRepository {
     try {
       this.sendAndInjectMessage(buttonMessage, conversation, {
         nativePush: false,
-        recipients: [message.qualifiedFrom],
         skipInjection: true,
-        targetMode: MessageTargetMode.USERS,
       });
+      const messageEntity = await this.getMessageInConversationById(conversation, message.id);
+      await this.eventService.updateEventSequentially({primary_key: messageEntity.primary_key, ...changes});
     } catch (error) {
       message.waitingButtonId(undefined);
       return message.setButtonError(buttonId, t('buttonActionError'));

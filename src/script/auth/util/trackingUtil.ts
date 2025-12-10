@@ -79,7 +79,7 @@ export const initializeTelemetry = () => {
       serverUrl: COUNTLY_SERVER_URL,
       enableLogging: false,
       autoClickTracking: true,
-      autoErrorTracking: true,
+      autoErrorTracking: false,
       autoPageViewTracking: false,
     },
   });

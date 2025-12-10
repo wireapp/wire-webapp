@@ -17,8 +17,8 @@
  *
  */
 
-import {ConversationProtocol, CONVERSATION_TYPE} from '@wireapp/api-client/lib/conversation';
-import {container} from 'tsyringe';
+import {CONVERSATION_TYPE} from '@wireapp/api-client/lib/conversation';
+import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 
 import {MixedConversation} from 'Repositories/conversation/ConversationSelectors';
 import {Conversation} from 'Repositories/entity/Conversation';
@@ -29,15 +29,13 @@ import {createUuid} from 'Util/uuid';
 
 import {joinUnestablishedMixedConversations} from '.';
 
-const createMixedConversation = (mockGroupId: string, epoch = 1): MixedConversation => {
-  const conversation = new Conversation(createUuid(), '', ConversationProtocol.MIXED);
+const createMixedConversation = (mockGroupId: string, epoch = 5): MixedConversation => {
+  const conversation = new Conversation(createUuid(), '', CONVERSATION_PROTOCOL.MIXED);
   conversation.groupId = mockGroupId;
   conversation.type(CONVERSATION_TYPE.REGULAR);
   conversation.epoch = epoch;
   return conversation as MixedConversation;
 };
-
-const mockCore = container.resolve(Core);
 
 describe('joinUnestablishedMixedConversations', () => {
   const testFactory = new TestFactory();
@@ -53,27 +51,30 @@ describe('joinUnestablishedMixedConversations', () => {
     const mixedConversation4 = createMixedConversation('unestablishedGroup4');
 
     const selfUser = new User(createUuid(), 'domain');
+    const mockedConversationRepository = await testFactory.exposeConversationActors();
 
-    jest.spyOn(mockCore.service!.conversation!, 'mlsGroupExistsLocally').mockImplementation(groupId => {
+    // Use the exact same core instance the repository was constructed with to avoid mismatched spies
+    const repositoryCore = (mockedConversationRepository as any).core as Core; // core is a private ctor arg
+
+    jest.spyOn(repositoryCore.service!.conversation!, 'mlsGroupExistsLocally').mockImplementation(groupId => {
       return Promise.resolve(!groupId.includes('unestablished'));
     });
 
-    const mockedConversationRepository = await testFactory.exposeConversationActors();
+    // Spy on joinByExternalCommit of the repository's core instance
+    const joinSpy = jest.spyOn(repositoryCore.service!.conversation!, 'joinByExternalCommit');
 
     await joinUnestablishedMixedConversations(
       [mixedConversation1, mixedConversation2, mixedConversation3, mixedConversation4],
+      mockedConversationRepository,
       selfUser.qualifiedId,
       {
-        core: mockCore,
-        conversationHandler: mockedConversationRepository,
+        core: repositoryCore,
       },
     );
-
-    expect(mockCore.service?.conversation?.mlsGroupExistsLocally).toHaveBeenCalledTimes(4);
-    expect(mockCore.service?.conversation?.joinByExternalCommit).toHaveBeenCalledTimes(2);
-
-    expect(mockCore.service?.conversation?.joinByExternalCommit).toHaveBeenCalledWith(mixedConversation3.qualifiedId);
-    expect(mockCore.service?.conversation?.joinByExternalCommit).toHaveBeenCalledWith(mixedConversation4.qualifiedId);
+    expect(repositoryCore.service?.conversation?.mlsGroupExistsLocally).toHaveBeenCalledTimes(6);
+    expect(joinSpy).toHaveBeenCalledTimes(2);
+    expect(joinSpy).toHaveBeenCalledWith(mixedConversation3.qualifiedId);
+    expect(joinSpy).toHaveBeenCalledWith(mixedConversation4.qualifiedId);
   });
 
   it('Should establish not initialised (epoch 0) mls groups for known "mixed" conversations', async () => {
@@ -83,26 +84,23 @@ describe('joinUnestablishedMixedConversations', () => {
     const mixedConversation4 = createMixedConversation('unestablishedGroup4', 0);
 
     const selfUser = new User(createUuid(), 'domain');
-
-    jest.spyOn(mockCore.service!.conversation!, 'mlsGroupExistsLocally').mockImplementation(groupId => {
+    const mockedConversationRepository = await testFactory.exposeConversationActors();
+    const repositoryCore = (mockedConversationRepository as any).core as Core;
+    jest.spyOn(repositoryCore.service!.conversation!, 'mlsGroupExistsLocally').mockImplementation(groupId => {
       return Promise.resolve(!groupId.includes('unestablished'));
     });
-
-    const mockedConversationRepository = await testFactory.exposeConversationActors();
     jest.spyOn(mockedConversationRepository, 'tryEstablishingMLSGroup');
 
     await joinUnestablishedMixedConversations(
       [mixedConversation1, mixedConversation2, mixedConversation3, mixedConversation4],
+      mockedConversationRepository,
       selfUser.qualifiedId,
       {
-        core: mockCore,
-        conversationHandler: mockedConversationRepository,
+        core: repositoryCore,
       },
     );
-
-    expect(mockCore.service?.conversation?.mlsGroupExistsLocally).toHaveBeenCalledTimes(2);
-    expect(mockCore.service?.conversation?.joinByExternalCommit).not.toHaveBeenCalled();
-
+    expect(repositoryCore.service?.conversation?.mlsGroupExistsLocally).toHaveBeenCalledTimes(2);
+    expect(repositoryCore.service?.conversation?.joinByExternalCommit).not.toHaveBeenCalled();
     expect(mockedConversationRepository.tryEstablishingMLSGroup).toHaveBeenCalledTimes(2);
   });
 });

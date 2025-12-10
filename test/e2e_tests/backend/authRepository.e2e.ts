@@ -63,6 +63,23 @@ export class AuthRepositoryE2E extends BackendClientE2E {
     });
   }
 
+  async upgradeUserToTeamOwner(user: User, teamName: string) {
+    const res = this.axiosInstance.post(
+      'upgrade-personal-to-team',
+      {
+        name: teamName,
+        icon: 'default',
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${user.token}`,
+        },
+      },
+    );
+    const data = (await res).data;
+    return {teamId: data.team_id, teamName: data.team_name};
+  }
+
   public async activateAccount(email: string, code: string) {
     await this.axiosInstance.post('activate', {
       code,

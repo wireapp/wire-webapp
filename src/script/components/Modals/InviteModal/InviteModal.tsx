@@ -29,14 +29,14 @@ import {renderElement} from 'Util/renderElement';
 
 import {Config} from '../../../Config';
 
-export interface InviteModalProps {
+interface InviteModalProps {
   readonly selfUser: User;
   onClose?: () => void;
 }
 
 const {BRAND_NAME: brandName} = Config.getConfig();
 
-const InviteModal: React.FC<InviteModalProps> = ({selfUser, onClose}) => {
+const InviteModal = ({selfUser, onClose}: InviteModalProps) => {
   const [isInviteMessageSelected, setIsInviteMessageSelected] = useState<boolean>(false);
   const userName = selfUser.username();
   const inviteMessage = userName

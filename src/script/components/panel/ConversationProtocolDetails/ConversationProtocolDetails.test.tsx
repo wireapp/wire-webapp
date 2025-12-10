@@ -18,7 +18,7 @@
  */
 
 import {render} from '@testing-library/react';
-import {ConversationProtocol} from '@wireapp/api-client/lib/conversation/NewConversation';
+import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 
 import {Ciphersuite} from '@wireapp/core';
 
@@ -28,7 +28,7 @@ describe('ConversationProtocolDetails', () => {
   it('renders the correct infos for the conversation with mls protocol', () => {
     const props = {
       cipherSuite: Ciphersuite.MLS_128_DHKEMP256_AES128GCM_SHA256_P256,
-      protocol: ConversationProtocol.MLS,
+      protocol: CONVERSATION_PROTOCOL.MLS,
     };
 
     const {queryByText} = render(<ConversationProtocolDetails {...props} />);
@@ -39,7 +39,7 @@ describe('ConversationProtocolDetails', () => {
 
   it('renders the correct infos for the conversation with proteus protocol', () => {
     const props = {
-      protocol: ConversationProtocol.PROTEUS,
+      protocol: CONVERSATION_PROTOCOL.PROTEUS,
     };
 
     const {queryByText} = render(<ConversationProtocolDetails {...props} />);

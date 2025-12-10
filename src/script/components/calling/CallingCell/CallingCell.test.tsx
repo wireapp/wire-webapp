@@ -18,7 +18,6 @@
  */
 
 import {render, waitFor} from '@testing-library/react';
-import ko from 'knockout';
 import {act} from 'react-dom/test-utils';
 
 import {CALL_TYPE, STATE as CALL_STATE} from '@wireapp/avs';
@@ -28,7 +27,6 @@ import {CallingRepository} from 'Repositories/calling/CallingRepository';
 import {Participant} from 'Repositories/calling/Participant';
 import {Conversation} from 'Repositories/entity/Conversation';
 import {User} from 'Repositories/entity/User';
-import {MediaDevicesHandler} from 'Repositories/media/MediaDevicesHandler';
 import {PropertiesRepository} from 'Repositories/properties/PropertiesRepository';
 import {TeamState} from 'Repositories/team/TeamState';
 import {CallActions} from 'src/script/view_model/CallingViewModel';
@@ -36,7 +34,7 @@ import {createUuid} from 'Util/uuid';
 
 import {CallingCell, CallingCellProps} from './CallingCell';
 
-jest.mock('@wireapp/api-client/lib/team');
+import {buildMediaDevicesHandler} from '../../../auth/util/test/TestUtil';
 
 jest.mock('Components/InViewport', () => ({
   InViewport: ({onVisible, children}: {onVisible: () => void; children: any}) => {
@@ -48,11 +46,14 @@ jest.mock('Components/InViewport', () => ({
 
 const createCall = (state: CALL_STATE, selfUser = new User(createUuid()), selfClientId = createUuid()) => {
   const selfParticipant = new Participant(selfUser, selfClientId);
-  const call = new Call({domain: '', id: ''}, new Conversation('', ''), 0, selfParticipant, CALL_TYPE.NORMAL, {
-    currentAvailableDeviceId: {
-      audiooutput: ko.pureComputed(() => 'test'),
-    },
-  } as MediaDevicesHandler);
+  const call = new Call(
+    {domain: '', id: ''},
+    new Conversation('', ''),
+    0,
+    selfParticipant,
+    CALL_TYPE.NORMAL,
+    buildMediaDevicesHandler(),
+  );
   call.state(state);
   return call;
 };

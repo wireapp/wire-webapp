@@ -17,17 +17,15 @@
  *
  */
 
-import React from 'react';
-
 import {CSSObject} from '@emotion/react';
-import {ConversationProtocol} from '@wireapp/api-client/lib/conversation/NewConversation';
+import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 
 import {Ciphersuite} from '@wireapp/core';
 
 import {t} from 'Util/LocalizerUtil';
 
-export interface ConversationProtocolDetailsProps {
-  protocol: ConversationProtocol;
+interface ConversationProtocolDetailsProps {
+  protocol: CONVERSATION_PROTOCOL;
   cipherSuite?: number;
 }
 
@@ -50,7 +48,7 @@ const wrapperStyles: CSSObject = {
   paddingTop: 4,
 };
 
-export const ConversationProtocolDetails: React.FC<ConversationProtocolDetailsProps> = ({protocol, cipherSuite}) => (
+export const ConversationProtocolDetails = ({protocol, cipherSuite}: ConversationProtocolDetailsProps) => (
   <div>
     <h3 className="conversation-details__list-head">{t('conversationDetailsProtocolDetails')}</h3>
 
@@ -61,7 +59,7 @@ export const ConversationProtocolDetails: React.FC<ConversationProtocolDetailsPr
         {protocol.toUpperCase()}
       </p>
 
-      {protocol === ConversationProtocol.MLS && cipherSuite && (
+      {protocol === CONVERSATION_PROTOCOL.MLS && cipherSuite && (
         <>
           <div css={titleStyles}>Cipher Suite</div>
           <p css={subTitleStyles} data-uie-name="cipher-suite">

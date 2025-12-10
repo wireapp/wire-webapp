@@ -65,6 +65,7 @@ const baseProps = {
   onClickParticipants: jest.fn(),
   shouldShowInvitePeople: false,
   conversationName: 'group 1',
+  isCellsConversation: false,
 };
 
 describe('MemberMessage', () => {

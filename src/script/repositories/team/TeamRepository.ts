@@ -17,7 +17,7 @@
  *
  */
 
-import {ConversationProtocol, ConversationRolesList} from '@wireapp/api-client/lib/conversation';
+import {ConversationRolesList} from '@wireapp/api-client/lib/conversation';
 import type {
   TeamConversationDeleteEvent,
   TeamDeleteEvent,
@@ -26,7 +26,7 @@ import type {
   TeamMemberLeaveEvent,
 } from '@wireapp/api-client/lib/event';
 import {TEAM_EVENT} from '@wireapp/api-client/lib/event/TeamEvent';
-import {FEATURE_KEY, FeatureList, FeatureStatus} from '@wireapp/api-client/lib/team/feature/';
+import {FEATURE_KEY, FeatureList, CONVERSATION_PROTOCOL, FEATURE_STATUS} from '@wireapp/api-client/lib/team/feature/';
 import type {PermissionsData} from '@wireapp/api-client/lib/team/member/PermissionsData';
 import type {TeamData} from '@wireapp/api-client/lib/team/team/TeamData';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
@@ -66,7 +66,7 @@ import {APIClient} from '../../service/APIClientSingleton';
 
 export const HAS_PERSISTED_SUPPORTED_PROTOCOLS = 'HAS_PERSISTED_SUPPORTED_PROTOCOLS';
 
-export interface AccountInfo {
+interface AccountInfo {
   accentID: number;
   availability?: Availability.Type;
   name: string;
@@ -143,14 +143,14 @@ export class TeamRepository extends TypedEventEmitter<Events> {
 
     this.teamState.teamFeatures(newFeatureList);
 
-    if (newFeatureList[FEATURE_KEY.MLS]?.config?.supportedProtocols?.includes(ConversationProtocol.MLS)) {
+    if (newFeatureList[FEATURE_KEY.MLS]?.config?.supportedProtocols?.includes(CONVERSATION_PROTOCOL.MLS)) {
       this.updatePersistedSupportedProtocols();
     }
 
     if (this.hasPersistedSupportedProtocols && newFeatureList?.[FEATURE_KEY.MLS]?.config.supportedProtocols) {
       newFeatureList[FEATURE_KEY.MLS].config.supportedProtocols = [
-        ConversationProtocol.MLS,
-        ConversationProtocol.PROTEUS,
+        CONVERSATION_PROTOCOL.MLS,
+        CONVERSATION_PROTOCOL.PROTEUS,
       ];
     }
 
@@ -183,13 +183,13 @@ export class TeamRepository extends TypedEventEmitter<Events> {
       newFeatureList?.[FEATURE_KEY.MLS]?.config.supportedProtocols
     ) {
       prevFeatureList[FEATURE_KEY.MLS].config.supportedProtocols = [
-        ConversationProtocol.MLS,
-        ConversationProtocol.PROTEUS,
+        CONVERSATION_PROTOCOL.MLS,
+        CONVERSATION_PROTOCOL.PROTEUS,
       ];
 
       newFeatureList[FEATURE_KEY.MLS].config.supportedProtocols = [
-        ConversationProtocol.MLS,
-        ConversationProtocol.PROTEUS,
+        CONVERSATION_PROTOCOL.MLS,
+        CONVERSATION_PROTOCOL.PROTEUS,
       ];
     }
 
@@ -198,8 +198,8 @@ export class TeamRepository extends TypedEventEmitter<Events> {
     this.emit('featureConfigUpdated', {prevFeatureList, newFeatureList});
 
     if (
-      prevFeatureList?.[FEATURE_KEY.MLS]?.status === FeatureStatus.DISABLED &&
-      newFeatureList?.[FEATURE_KEY.MLS]?.status === FeatureStatus.ENABLED
+      prevFeatureList?.[FEATURE_KEY.MLS]?.status === FEATURE_STATUS.DISABLED &&
+      newFeatureList?.[FEATURE_KEY.MLS]?.status === FEATURE_STATUS.ENABLED
     ) {
       this.updatePersistedSupportedProtocols();
       this.showReloadAppModal();
@@ -318,7 +318,7 @@ export class TeamRepository extends TypedEventEmitter<Events> {
   };
 
   public async filterRemoteDomainUsers(users: User[]): Promise<User[]> {
-    const isMLS = this.teamState.teamFeatures()?.mls?.config.defaultProtocol === ConversationProtocol.MLS;
+    const isMLS = this.teamState.teamFeatures()?.mls?.config.defaultProtocol === CONVERSATION_PROTOCOL.MLS;
 
     // IF MLS is enabled, THEN return all users
     if (isMLS) {
@@ -545,24 +545,24 @@ export class TeamRepository extends TypedEventEmitter<Events> {
     this.logger.log(`Received '${eventJson.type}' event from backend which is not yet handled`, eventJson);
   }
 
-  public getTeamSupportedProtocols(): ConversationProtocol[] {
+  public getTeamSupportedProtocols(): CONVERSATION_PROTOCOL[] {
     const mlsFeature = this.teamState.teamFeatures()?.mls;
 
-    if (!mlsFeature || mlsFeature.status === FeatureStatus.DISABLED) {
-      return [ConversationProtocol.PROTEUS];
+    if (!mlsFeature || mlsFeature.status === FEATURE_STATUS.DISABLED) {
+      return [CONVERSATION_PROTOCOL.PROTEUS];
     }
 
     const teamSupportedProtocols = mlsFeature.config.supportedProtocols;
 
     if (this.hasPersistedSupportedProtocols && teamSupportedProtocols?.length > 0) {
-      return [...new Set([...teamSupportedProtocols, ConversationProtocol.MLS])];
+      return [...new Set([...teamSupportedProtocols, CONVERSATION_PROTOCOL.MLS])];
     }
 
     // For old teams (created on some older backend versions) supportedProtocols field might not exist or be empty,
     // we fallback to proteus in this case.
     return teamSupportedProtocols && teamSupportedProtocols.length > 0
       ? teamSupportedProtocols
-      : [ConversationProtocol.PROTEUS];
+      : [CONVERSATION_PROTOCOL.PROTEUS];
   }
 
   public readonly getTeamMLSMigrationStatus = (): MLSMigrationStatus => {

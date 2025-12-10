@@ -23,7 +23,6 @@ import cx from 'classnames';
 
 import {TabIndex} from '@wireapp/react-ui-kit';
 
-import {FadingScrollbar} from 'Components/FadingScrollbar';
 import {VirtualizedMessagesList} from 'Components/MessagesList/VirtualizedMessagesList/VirtualizedMessagesList';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 
@@ -59,12 +58,11 @@ export const VirtualizedMessageListWrapper = ({
   const conversationLastReadTimestamp = useRef<number>(lastReadTimestamp);
 
   return (
-    <FadingScrollbar
+    <div
       ref={parentRef}
       id="message-list"
       className={cx('message-list', {'is-right-panel-open': isRightSidebarOpen})}
       tabIndex={TabIndex.UNFOCUSABLE}
-      style={{height: '100%', overflow: 'auto', position: 'relative'}}
     >
       {!isConversationLoaded && (
         <div className="conversation-loading">
@@ -99,6 +97,6 @@ export const VirtualizedMessageListWrapper = ({
           isConversationLoaded={isConversationLoaded}
         />
       )}
-    </FadingScrollbar>
+    </div>
   );
 };

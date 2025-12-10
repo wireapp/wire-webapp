@@ -17,13 +17,13 @@
  *
  */
 
-import {ConversationProtocol} from '@wireapp/api-client/lib/conversation';
+import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {container} from 'tsyringe';
 
 import {Account} from '@wireapp/core';
 
-import {Conversation} from 'Repositories/entity/Conversation';
+import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
 import {User} from 'Repositories/entity/User';
 import {Core as CoreSingleton} from 'src/script/service/CoreSingleton';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
@@ -37,24 +37,9 @@ import {isMLSSupportedByEnvironment} from '../isMLSSupportedByEnvironment';
 
 const MIGRATION_TASK_KEY = 'mls-migration';
 
-interface MLSMigrationConversationHandler {
-  getAllGroupConversations: () => Conversation[];
-  getAllTeamGroupConversations: () => Conversation[];
-  updateConversationProtocol: (
-    conversation: Conversation,
-    protocol: ConversationProtocol.MLS | ConversationProtocol.MIXED,
-  ) => Promise<Conversation>;
-  tryEstablishingMLSGroup: (params: {
-    groupId: string;
-    conversationId: QualifiedId;
-    selfUserId: QualifiedId;
-    qualifiedUsers: QualifiedId[];
-  }) => Promise<void>;
-}
-
 interface InitialiseMLSMigrationFlowParams {
   selfUser: User;
-  conversationHandler: MLSMigrationConversationHandler;
+  conversationRepository: ConversationRepository;
   getTeamMLSMigrationStatus: () => MLSMigrationStatus;
   refreshAllKnownUsers: () => Promise<void>;
 }
@@ -66,7 +51,7 @@ interface InitialiseMLSMigrationFlowParams {
  */
 export const initialiseMLSMigrationFlow = async ({
   selfUser,
-  conversationHandler,
+  conversationRepository,
   getTeamMLSMigrationStatus,
   refreshAllKnownUsers,
 }: InitialiseMLSMigrationFlowParams) => {
@@ -79,7 +64,7 @@ export const initialiseMLSMigrationFlow = async ({
       migrateConversationsToMLS({
         core,
         selfUserId: selfUser.qualifiedId,
-        conversationHandler,
+        conversationRepository,
         getTeamMLSMigrationStatus,
         refreshAllKnownUsers,
       }),
@@ -116,7 +101,7 @@ const checkMigrationConfig = async (
     return;
   }
 
-  const isMLSSupportedByUser = selfUser.supportedProtocols()?.includes(ConversationProtocol.MLS);
+  const isMLSSupportedByUser = selfUser.supportedProtocols()?.includes(CONVERSATION_PROTOCOL.MLS);
   if (!isMLSSupportedByUser) {
     return;
   }
@@ -147,9 +132,9 @@ const checkMigrationConfig = async (
 };
 
 interface MigrateConversationsToMLSParams {
+  conversationRepository: ConversationRepository;
   core: Account;
   selfUserId: QualifiedId;
-  conversationHandler: MLSMigrationConversationHandler;
   refreshAllKnownUsers: () => Promise<void>;
   getTeamMLSMigrationStatus: () => MLSMigrationStatus;
 }
@@ -157,26 +142,25 @@ interface MigrateConversationsToMLSParams {
 const migrateConversationsToMLS = async ({
   core,
   selfUserId,
-  conversationHandler,
+  conversationRepository,
   refreshAllKnownUsers,
   getTeamMLSMigrationStatus,
 }: MigrateConversationsToMLSParams) => {
   //refetch all known users so we have the latest lists of the protocols they support
   await refreshAllKnownUsers();
 
-  const selfTeamGroupConversations = conversationHandler.getAllGroupConversations();
+  const selfTeamGroupConversations = conversationRepository.getAllGroupConversations();
 
-  await initialiseMigrationOfProteusConversations(selfTeamGroupConversations, selfUserId, conversationHandler);
+  await initialiseMigrationOfProteusConversations(selfTeamGroupConversations, selfUserId, conversationRepository);
 
-  const allGroupConversations = conversationHandler.getAllGroupConversations();
-  await joinUnestablishedMixedConversations(allGroupConversations, selfUserId, {
+  const allGroupConversations = conversationRepository.getAllGroupConversations();
+  await joinUnestablishedMixedConversations(allGroupConversations, conversationRepository, selfUserId, {
     core,
-    conversationHandler,
   });
 
   await finaliseMigrationOfMixedConversations(
     selfTeamGroupConversations,
-    conversationHandler.updateConversationProtocol,
+    conversationRepository.updateConversationProtocol,
     getTeamMLSMigrationStatus,
   );
 };

@@ -30,7 +30,7 @@ import {CSS_FILL_PARENT} from 'Util/CSSMixin';
 
 import {AVATAR_SIZE} from '.';
 
-export interface AvatarImageProps {
+interface AvatarImageProps {
   assetRepository?: AssetRepository;
   avatarAlt: string;
   avatarSize: AVATAR_SIZE;
@@ -68,7 +68,7 @@ const AvatarImage: React.FunctionComponent<AvatarImageProps> = ({
 
       (async () => {
         if (pictureResource) {
-          const isCached = pictureResource.downloadProgress() === 100;
+          const isCached = pictureResource.downloadProgress === 100;
           setShowTransition(!isCached && !isSmall);
           try {
             const url = await assetRepository.getObjectUrl(pictureResource);

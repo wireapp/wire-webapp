@@ -17,8 +17,7 @@
  *
  */
 
-import React from 'react';
-
+import {CONVERSATION_CELLS_STATE} from '@wireapp/api-client/lib/conversation';
 import {ReactionType} from '@wireapp/core/lib/conversation';
 import {amplify} from 'amplify';
 import ko from 'knockout';
@@ -61,7 +60,7 @@ const isOutgoingQuote = (quoteEntity: QuoteEntity): quoteEntity is OutgoingQuote
   return quoteEntity.hash !== undefined;
 };
 
-export const MessageWrapper: React.FC<MessageParams> = ({
+export const MessageWrapper = ({
   message,
   conversation,
   selfId,
@@ -85,17 +84,17 @@ export const MessageWrapper: React.FC<MessageParams> = ({
   messageActions,
   teamState = container.resolve(TeamState),
   isMsgElementsFocusable,
-}) => {
+}: MessageParams) => {
   const findMessage = async (conversation: Conversation, messageId: string) => {
     const event =
       (await messageRepository.getMessageInConversationById(conversation, messageId)) ||
       (await messageRepository.getMessageInConversationByReplacementId(conversation, messageId));
     return await messageRepository.ensureMessageSender(event);
   };
-  const clickButton = (message: CompositeMessage, buttonId: string) => {
+  const clickButton = async (message: CompositeMessage, buttonId: string) => {
     if (message.selectedButtonId() !== buttonId && message.waitingButtonId() !== buttonId) {
       message.waitingButtonId(buttonId);
-      messageRepository.sendButtonAction(conversation, message, buttonId);
+      await messageRepository.sendButtonAction(conversation, message, buttonId);
     }
   };
 
@@ -125,6 +124,10 @@ export const MessageWrapper: React.FC<MessageParams> = ({
   };
   const {display_name: displayName} = useKoSubscribableChildren(conversation, ['display_name']);
   const isFileShareRestricted = !teamState.isFileSharingReceivingEnabled();
+
+  const isCellsConversation =
+    conversation.cellsState() === CONVERSATION_CELLS_STATE.READY ||
+    conversation.cellsState() === CONVERSATION_CELLS_STATE.PENDING;
 
   const contextMenuEntries = ko.pureComputed(() => {
     const entries: ContextMenuEntry[] = [];
@@ -257,6 +260,7 @@ export const MessageWrapper: React.FC<MessageParams> = ({
         shouldShowInvitePeople={shouldShowInvitePeople}
         isSelfTemporaryGuest={isSelfTemporaryGuest}
         classifiedDomains={teamState.classifiedDomains()}
+        isCellsConversation={isCellsConversation}
       />
     );
   }

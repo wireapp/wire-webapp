@@ -17,13 +17,9 @@
  *
  */
 
-import React from 'react';
-
 import {t} from 'Util/LocalizerUtil';
 
-export interface MissedMessageProps {}
-
-const MissedMessage: React.FC<MissedMessageProps> = ({}) => {
+const MissedMessage = () => {
   return (
     <div className="message-header">
       <div className="message-header-icon">

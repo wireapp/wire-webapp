@@ -177,11 +177,10 @@ module.exports = {
           // Prevents content hashing
           info: {minimized: true},
         },
-        // Copy Core-Crypto worker for @wireapp/core-crypto package
+        // Copy and flatten everything from core-crypto src
         {
-          context: 'node_modules/@wireapp/core-crypto/src',
-          from: '*',
-          to: `${dist}/min/`,
+          from: 'node_modules/@wireapp/core-crypto/src/**/*',
+          to: `${dist}/min/[name][ext]`,
         },
       ],
     }),

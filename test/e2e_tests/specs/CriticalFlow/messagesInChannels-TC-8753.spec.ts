@@ -45,8 +45,6 @@ test(
   'Messages in Channels',
   {tag: ['@TC-8753', '@crit-flow-web']},
   async ({pageManager: userAPageManager, browser, api}) => {
-    test.slow(); // Increasing test timeout to 90 seconds to accommodate the full flow
-
     const {pages: userAPages, modals: userAModals, components: userAComponents} = userAPageManager.webapp;
 
     const userBContext = await browser.newContext();
@@ -65,6 +63,8 @@ test(
       await api.brig.enableMLSFeature(userA.teamId);
       await api.brig.unlockChannelFeature(userA.teamId);
       await api.brig.enableChannelsFeature(userA.teamId);
+      // timeout waiter
+
       await userAPageManager.waitForTimeout(3000);
     });
 
@@ -101,7 +101,7 @@ test(
       await userBPageManager.refreshPage({waitUntil: 'load'});
 
       await userBPages.conversationList().openConversation(channelName);
-      expect(await userBPages.conversation().isMessageVisible(`@${userB.fullName} ${messageText}`)).toBeTruthy();
+      await expect(userBPages.conversation().getMessage({content: `@${userB.fullName} ${messageText}`})).toBeVisible();
     });
 
     await test.step('User A sends image', async () => {
@@ -114,8 +114,8 @@ test(
     await test.step('User B can open the image preview and see the image', async () => {
       // Click on the image to open it in a preview
       await userBPages.conversation().clickImage(userA);
-
       // Verify that the detail view modal is visible
+      await userBModals.detailViewModal().waitForVisibility();
       expect(await userBModals.detailViewModal().isVisible()).toBeTruthy();
       expect(await userBModals.detailViewModal().isImageVisible()).toBeTruthy();
     });
@@ -135,9 +135,6 @@ test(
     });
 
     await test.step('User A can see the reaction', async () => {
-      // TODO: Bug [WPB-18226], remove this when fixed
-      await userAPageManager.refreshPage({waitUntil: 'load'});
-
       expect(await userAPages.conversation().isPlusOneReactionVisible()).toBeTruthy();
     });
 
@@ -161,18 +158,18 @@ test(
     await test.step('User B can play the audio file', async () => {
       await userBPages.conversation().playAudio();
       // Wait for 5 seconds to ensure audio starts playing
-      await userBPages.conversation().page.waitForTimeout(5000);
+      await userBPages.conversation().page.waitForTimeout(3000);
       expect(await userBPages.conversation().isAudioPlaying()).toBeTruthy();
     });
 
     await test.step('User A sends a quick (10 sec) self deleting message', async () => {
       await userAComponents.inputBarControls().setEphemeralTimerTo('10 seconds');
       await userAPages.conversation().sendMessage(selfDestructMessageText);
-      expect(await userAPages.conversation().isMessageVisible(selfDestructMessageText)).toBeTruthy();
+      await expect(userAPages.conversation().getMessage({content: selfDestructMessageText})).toBeVisible();
     });
 
     await test.step('User B sees the message', async () => {
-      expect(await userBPages.conversation().isMessageVisible(selfDestructMessageText)).toBeTruthy();
+      await expect(userBPages.conversation().getMessage({content: selfDestructMessageText})).toBeVisible();
     });
 
     await test.step('User B waits 10 seconds', async () => {
@@ -180,8 +177,8 @@ test(
     });
 
     await test.step('Both users see the message as removed', async () => {
-      expect(await userBPages.conversation().isMessageVisible(selfDestructMessageText, false)).toBeFalsy();
-      expect(await userAPages.conversation().isMessageVisible(selfDestructMessageText, false)).toBeFalsy();
+      await expect(userBPages.conversation().getMessage({content: selfDestructMessageText})).not.toBeVisible();
+      await expect(userAPages.conversation().getMessage({content: selfDestructMessageText})).not.toBeVisible();
 
       // Reset ephemeral timer to 'Off'
       await userAComponents.inputBarControls().setEphemeralTimerTo('Off');

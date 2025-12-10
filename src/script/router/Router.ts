@@ -19,7 +19,7 @@
 
 import {match} from 'path-to-regexp';
 
-export type Routes = Record<string, ((...args: any[]) => void) | null>;
+type Routes = Record<string, ((...args: any[]) => void | Promise<void>) | null>;
 
 const defaultRoute: Routes = {
   // do nothing if url was not matched
@@ -31,7 +31,7 @@ let routes: Routes = {};
 /**
  * Matches the current URL path against configured routes and triggers the appropriate handler.
  */
-export const parseRoute = () => {
+const parseRoute = () => {
   const currentPath = window.location.hash.replace('#', '') || '/';
 
   const exactMatch = routes[currentPath];

@@ -47,13 +47,6 @@ export const wrapperErrorStyles: CSSObject = {
   },
 };
 
-export const imageStyles: CSSObject = {
-  width: '100%',
-  height: '100%',
-  objectFit: 'cover',
-  borderRadius: '10px',
-};
-
 export const loadingWrapperStyles: CSSObject = {
   position: 'absolute',
   top: '50%',

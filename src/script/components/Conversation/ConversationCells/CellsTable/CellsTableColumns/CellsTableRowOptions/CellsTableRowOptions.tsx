@@ -24,13 +24,14 @@ import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {DropdownMenu, MoreIcon} from '@wireapp/react-ui-kit';
 
 import {useAppNotification} from 'Components/AppNotification/AppNotification';
-import {CellNode} from 'Components/Conversation/ConversationCells/common/cellNode/cellNode';
 import {openFolder} from 'Components/Conversation/ConversationCells/common/openFolder/openFolder';
 import {
   isInRecycleBin,
   isRootRecycleBinPath,
 } from 'Components/Conversation/ConversationCells/common/recycleBin/recycleBin';
 import {CellsRepository} from 'Repositories/cells/CellsRepository';
+import {CellNode, CellNodeType} from 'src/script/types/cellNode';
+import {isFileEditable} from 'Util/FileTypeUtil';
 import {t} from 'Util/LocalizerUtil';
 import {forcedDownloadFile} from 'Util/util';
 
@@ -96,7 +97,7 @@ const CellsTableRowOptionsContent = ({
   const [isRenameNodeModalOpen, setIsRenameNodeModalOpen] = useState(false);
 
   const url = node.url;
-  const name = node.type === 'folder' ? `${node.name}.zip` : node.name;
+  const name = node.type === CellNodeType.FOLDER ? `${node.name}.zip` : node.name;
 
   const restoreNodeFailedNotification = useAppNotification({
     message: t('cells.restore.error'),
@@ -123,6 +124,8 @@ const CellsTableRowOptionsContent = ({
 
   const isRootRecycleBin = isRootRecycleBinPath();
   const isNestedRecycleBin = isInRecycleBin();
+
+  const isEditable = node.type === CellNodeType.FILE && isFileEditable(node.extension);
 
   if (isRootRecycleBin || isNestedRecycleBin) {
     return (
@@ -162,7 +165,9 @@ const CellsTableRowOptionsContent = ({
       <DropdownMenu.Content>
         <DropdownMenu.Item
           onClick={() =>
-            node.type === 'folder' ? openFolder({conversationQualifiedId, name: node.name}) : handleOpenFile(node)
+            node.type === CellNodeType.FOLDER
+              ? openFolder({conversationQualifiedId, name: node.name})
+              : handleOpenFile(node)
           }
         >
           {t('cells.options.open')}
@@ -180,7 +185,7 @@ const CellsTableRowOptionsContent = ({
           {t('cells.options.share')}
         </DropdownMenu.Item>
 
-        {url && (
+        {!!url && (
           <DropdownMenu.Item onClick={() => forcedDownloadFile({url, name})}>
             {t('cells.options.download')}
           </DropdownMenu.Item>
@@ -190,6 +195,9 @@ const CellsTableRowOptionsContent = ({
         </DropdownMenu.Item>
         <DropdownMenu.Item onClick={() => setIsMoveNodeModalOpen(true)}>{t('cells.options.move')}</DropdownMenu.Item>
         <DropdownMenu.Item onClick={() => setIsTagsModalOpen(true)}>{t('cells.options.tags')}</DropdownMenu.Item>
+        {isEditable && (
+          <DropdownMenu.Item onClick={() => handleOpenFile(node, true)}>{t('cells.options.edit')}</DropdownMenu.Item>
+        )}
         <DropdownMenu.Item
           onClick={() =>
             showMoveToRecycleBinModal({

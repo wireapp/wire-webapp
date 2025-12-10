@@ -43,8 +43,6 @@ test(
   'Messages in Groups',
   {tag: ['@TC-8751', '@crit-flow-web']},
   async ({pageManager: userAPageManager, api, browser}) => {
-    test.slow(); // Increasing test timeout to 90 seconds to accommodate the full flow
-
     const {pages: userAPages, modals: userAModals, components: userAComponents} = userAPageManager.webapp;
 
     const userBContext = await browser.newContext();
@@ -58,7 +56,6 @@ test(
       addCreatedUser(userA);
       addCreatedUser(userB);
       await api.connectUsers(userA, userB);
-      await new Promise(resolve => setTimeout(resolve, 2000)); // Wait for connection to be updated
     });
 
     await test.step('Both users log in and open the group', async () => {
@@ -93,7 +90,7 @@ test(
       await userBPageManager.refreshPage({waitUntil: 'load'});
 
       await userBPages.conversationList().openConversation(conversationName);
-      expect(await userBPages.conversation().isMessageVisible(`@${userB.fullName} ${messageText}`)).toBeTruthy();
+      await expect(userBPages.conversation().getMessage({content: `@${userB.fullName} ${messageText}`})).toBeVisible();
     });
 
     await test.step('User A sends image', async () => {
@@ -108,6 +105,7 @@ test(
       await userBPages.conversation().clickImage(userA);
 
       // Verify that the detail view modal is visible
+      await userBPageManager.waitForTimeout(500);
       expect(await userBModals.detailViewModal().isVisible()).toBeTruthy();
       expect(await userBModals.detailViewModal().isImageVisible()).toBeTruthy();
     });
@@ -127,9 +125,6 @@ test(
     });
 
     await test.step('User A can see the reaction', async () => {
-      // TODO: Bug [WPB-18226], remove this when fixed
-      await userAPageManager.refreshPage({waitUntil: 'load'});
-
       expect(await userAPages.conversation().isPlusOneReactionVisible()).toBeTruthy();
     });
 
@@ -159,11 +154,11 @@ test(
     await test.step('User A sends a quick (10 sec) self deleting message', async () => {
       await userAComponents.inputBarControls().setEphemeralTimerTo('10 seconds');
       await userAPages.conversation().sendMessage(selfDestructMessageText);
-      expect(await userAPages.conversation().isMessageVisible(selfDestructMessageText)).toBeTruthy();
+      await expect(userAPages.conversation().getMessage({content: selfDestructMessageText})).toBeVisible();
     });
 
     await test.step('User B sees the message', async () => {
-      expect(await userBPages.conversation().isMessageVisible(selfDestructMessageText)).toBeTruthy();
+      await expect(userBPages.conversation().getMessage({content: selfDestructMessageText})).toBeVisible();
     });
 
     await test.step('User B waits 10 seconds', async () => {
@@ -171,8 +166,8 @@ test(
     });
 
     await test.step('Both users see the message as removed', async () => {
-      expect(await userBPages.conversation().isMessageVisible(selfDestructMessageText, false)).toBeFalsy();
-      expect(await userAPages.conversation().isMessageVisible(selfDestructMessageText, false)).toBeFalsy();
+      await expect(userBPages.conversation().getMessage({content: selfDestructMessageText})).not.toBeVisible();
+      await expect(userAPages.conversation().getMessage({content: selfDestructMessageText})).not.toBeVisible();
 
       // Reset ephemeral timer to 'Off'
       await userAComponents.inputBarControls().setEphemeralTimerTo('Off');

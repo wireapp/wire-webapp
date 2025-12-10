@@ -20,7 +20,7 @@
 import React, {useCallback, useContext, useEffect, useMemo, useState} from 'react';
 
 import {RECEIPT_MODE} from '@wireapp/api-client/lib/conversation/data/ConversationReceiptModeUpdateData';
-import {ConversationProtocol} from '@wireapp/api-client/lib/conversation/NewConversation';
+import {CONVERSATION_PROTOCOL, mapToConversationProtocol} from '@wireapp/api-client/lib/team';
 import {isNonFederatingBackendsError} from '@wireapp/core/lib/errors';
 import {amplify} from 'amplify';
 import cx from 'classnames';
@@ -69,10 +69,10 @@ enum GroupCreationModalState {
   PREFERENCES = 'GroupCreationModal.STATE.PREFERENCES',
 }
 
-const GroupCreationModal: React.FC<GroupCreationModalProps> = ({
+const GroupCreationModal = ({
   userState = container.resolve(UserState),
   teamState = container.resolve(TeamState),
-}) => {
+}: GroupCreationModalProps) => {
   const {
     isTeam,
     isMLSEnabled: isMLSEnabledForTeam,
@@ -90,10 +90,10 @@ const GroupCreationModal: React.FC<GroupCreationModalProps> = ({
 
   //if feature flag is set to false or mls is disabled for current team use proteus as default
   const defaultProtocol = isMLSEnabledForTeam
-    ? teamState.teamFeatures()?.mls?.config.defaultProtocol
-    : ConversationProtocol.PROTEUS;
+    ? mapToConversationProtocol(teamState.teamFeatures()?.mls?.config.defaultProtocol)
+    : CONVERSATION_PROTOCOL.PROTEUS;
 
-  const protocolOptions: ProtocolOption[] = ([ConversationProtocol.PROTEUS, ConversationProtocol.MLS] as const).map(
+  const protocolOptions: ProtocolOption[] = ([CONVERSATION_PROTOCOL.PROTEUS, CONVERSATION_PROTOCOL.MLS] as const).map(
     protocol => ({
       label: `${t(`modalCreateGroupProtocolSelect.${protocol}`)}${
         protocol === defaultProtocol ? t(`modalCreateGroupProtocolSelect.default`) : ''
@@ -104,10 +104,13 @@ const GroupCreationModal: React.FC<GroupCreationModalProps> = ({
 
   const initialProtocol = protocolOptions.find(protocol => protocol.value === defaultProtocol)!;
 
+  // Read receipts are temorarily disabled for MLS groups and channels until it is supported
+  const areReadReceiptsEnabled = defaultProtocol !== CONVERSATION_PROTOCOL.MLS;
+
   //both environment feature flag and team feature flag must be enabled to create conversations with cells
   const isCellsEnabledForEnvironment = Config.getConfig().FEATURE.ENABLE_CELLS;
   const enableCellsToggle = isCellsEnabledForEnvironment && isCellsEnabledForTeam;
-  const [isCellsOptionEnabled, setIsCellsOptionEnabled] = useState(enableCellsToggle);
+  const [isCellsOptionEnabled, setIsCellsOptionEnabled] = useState(false);
   const isCellsEnabledForGroup = isCellsEnabledForEnvironment && isCellsOptionEnabled;
 
   const [isShown, setIsShown] = useState<boolean>(false);
@@ -315,8 +318,8 @@ const GroupCreationModal: React.FC<GroupCreationModalProps> = ({
     setSelectedProtocol(option);
 
     if (
-      (option.value === ConversationProtocol.MLS && isServicesEnabled) ||
-      (option.value === ConversationProtocol.PROTEUS && !isServicesEnabled)
+      (option.value === CONVERSATION_PROTOCOL.MLS && isServicesEnabled) ||
+      (option.value === CONVERSATION_PROTOCOL.PROTEUS && !isServicesEnabled)
     ) {
       clickOnToggleServicesMode();
     }
@@ -502,7 +505,7 @@ const GroupCreationModal: React.FC<GroupCreationModalProps> = ({
                   name={t('guestOptionsTitle')}
                   info={t('guestRoomToggleInfo')}
                 />
-                {selectedProtocol.value !== ConversationProtocol.MLS && (
+                {selectedProtocol.value !== CONVERSATION_PROTOCOL.MLS && (
                   <InfoToggle
                     className="modal-style"
                     dataUieName="services"
@@ -513,15 +516,17 @@ const GroupCreationModal: React.FC<GroupCreationModalProps> = ({
                     info={t('servicesRoomToggleInfo')}
                   />
                 )}
-                <InfoToggle
-                  className="modal-style"
-                  dataUieName="read-receipts"
-                  info={t('readReceiptsToggleInfo')}
-                  isChecked={enableReadReceipts}
-                  setIsChecked={setEnableReadReceipts}
-                  isDisabled={false}
-                  name={t('readReceiptsToggleName')}
-                />
+                {areReadReceiptsEnabled && (
+                  <InfoToggle
+                    className="modal-style"
+                    dataUieName="read-receipts"
+                    info={t('readReceiptsToggleInfo')}
+                    isChecked={enableReadReceipts}
+                    setIsChecked={setEnableReadReceipts}
+                    isDisabled={false}
+                    name={t('readReceiptsToggleName')}
+                  />
+                )}
                 {enableCellsToggle && (
                   <InfoToggle
                     className="modal-style"

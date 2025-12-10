@@ -17,11 +17,15 @@
  *
  */
 
+import {useEffect, useState} from 'react';
+
 import {PDFViewer} from 'Components/FileFullscreenModal/PdfViewer/PdfViewer';
 import {FullscreenModal} from 'Components/FullscreenModal/FullscreenModal';
+import {isFileEditable} from 'Util/FileTypeUtil';
 import {getFileTypeFromExtension} from 'Util/getFileTypeFromExtension/getFileTypeFromExtension';
 import {getFileExtensionFromUrl} from 'Util/util';
 
+import {FileEditor} from './FileEditor/FileEditor';
 import {FileHeader} from './FileHeader/FileHeader';
 import {FileLoader} from './FileLoader/FileLoader';
 import {ImageFileView} from './ImageFileView/ImageFileView';
@@ -36,10 +40,12 @@ interface FileFullscreenModalProps {
   filePreviewUrl?: string;
   fileName: string;
   fileExtension: string;
+  fileUrl?: string;
   status?: Status;
   senderName: string;
   timestamp: number;
   badges?: string[];
+  isEditMode?: boolean;
 }
 
 export const FileFullscreenModal = ({
@@ -47,50 +53,84 @@ export const FileFullscreenModal = ({
   isOpen,
   onClose,
   filePreviewUrl,
+  fileUrl,
   status = 'success',
   fileName,
   fileExtension,
   senderName,
   timestamp,
   badges,
+  isEditMode,
 }: FileFullscreenModalProps) => {
+  const [isEditableState, setIsEditableState] = useState(isEditMode);
+  const isEditable = isFileEditable(fileExtension);
+
+  const onCloseModal = () => {
+    setIsEditableState(false);
+    onClose();
+  };
+
+  useEffect(() => {
+    setIsEditableState(!!isEditMode);
+  }, [isEditMode]);
+
   return (
-    <FullscreenModal id={id} isOpen={isOpen} onClose={onClose}>
+    <FullscreenModal id={id} isOpen={isOpen} onClose={onCloseModal}>
       <FileHeader
-        onClose={onClose}
+        onClose={onCloseModal}
         fileName={fileName}
-        filePreviewUrl={filePreviewUrl}
         fileExtension={fileExtension}
+        fileUrl={fileUrl}
         senderName={senderName}
         timestamp={timestamp}
         badges={badges}
+        isInEditMode={isEditableState}
+        onEditModeChange={setIsEditableState}
+        isEditable={isEditable}
+        id={id}
       />
-      <ModalContent
-        filePreviewUrl={filePreviewUrl}
-        fileName={fileName}
-        senderName={senderName}
-        timestamp={timestamp}
-        status={status}
-      />
+      {isEditableState && isEditable ? (
+        <FileEditor id={id} />
+      ) : (
+        <ModalContent
+          fileExtension={fileExtension}
+          filePreviewUrl={filePreviewUrl}
+          fileName={fileName}
+          fileUrl={fileUrl}
+          senderName={senderName}
+          timestamp={timestamp}
+          status={status}
+        />
+      )}
     </FullscreenModal>
   );
 };
 
 interface ModalContentProps {
-  filePreviewUrl?: string;
+  fileExtension: string;
   fileName: string;
   status: Status;
   senderName: string;
   timestamp: number;
+  filePreviewUrl?: string;
+  fileUrl?: string;
 }
 
-const ModalContent = ({filePreviewUrl, fileName, senderName, timestamp, status}: ModalContentProps) => {
+const ModalContent = ({
+  fileExtension,
+  filePreviewUrl,
+  fileName,
+  fileUrl,
+  senderName,
+  timestamp,
+  status,
+}: ModalContentProps) => {
   if (status === 'loading' && !filePreviewUrl) {
     return <FileLoader />;
   }
 
   if (status === 'unavailable' || !filePreviewUrl) {
-    return <NoPreviewAvailable fileUrl={filePreviewUrl} fileName={fileName} />;
+    return <NoPreviewAvailable fileUrl={fileUrl} fileName={fileName} fileExtension={fileExtension} />;
   }
 
   const extension = getFileExtensionFromUrl(filePreviewUrl);
@@ -104,5 +144,5 @@ const ModalContent = ({filePreviewUrl, fileName, senderName, timestamp, status}:
     return <ImageFileView src={filePreviewUrl} senderName={senderName} timestamp={timestamp} />;
   }
 
-  return <NoPreviewAvailable fileUrl={filePreviewUrl} fileName={fileName} />;
+  return <NoPreviewAvailable fileUrl={fileUrl} fileName={fileName} fileExtension={fileExtension} />;
 };

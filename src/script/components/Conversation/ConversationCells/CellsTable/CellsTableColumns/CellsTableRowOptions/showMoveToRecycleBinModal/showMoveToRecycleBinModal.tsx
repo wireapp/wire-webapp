@@ -17,8 +17,8 @@
  *
  */
 
-import {CellNode} from 'Components/Conversation/ConversationCells/common/cellNode/cellNode';
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
+import {CellNode, CellNodeType} from 'src/script/types/cellNode';
 import {t} from 'Util/LocalizerUtil';
 import {replaceReactComponents} from 'Util/LocalizerUtil/ReactLocalizerUtil';
 
@@ -34,7 +34,7 @@ export const showMoveToRecycleBinModal = ({
     text: {
       message: replaceReactComponents(
         t(
-          node.type === 'file'
+          node.type === CellNodeType.FILE
             ? 'cells.moveToRecycleBinModal.file.description'
             : 'cellsMoveToRecycleBinModal.folder.description',
           {
@@ -49,7 +49,7 @@ export const showMoveToRecycleBinModal = ({
         ],
       ),
       title:
-        node.type === 'file'
+        node.type === CellNodeType.FILE
           ? t('cellsMoveToRecycleBinModal.file.headline')
           : t('cellsMoveToRecycleBinModal.folder.headline'),
     },
