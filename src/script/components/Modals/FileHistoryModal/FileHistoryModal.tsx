@@ -64,7 +64,6 @@ export const FileHistoryModal = () => {
           ) : (
             <FileHistoryContent
               fileVersions={fileVersions}
-              isLoading={isLoading}
               handleDownload={handleDownload}
               handleRestore={setToBeRestoredVersionId}
             />

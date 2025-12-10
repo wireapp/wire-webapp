@@ -38,7 +38,6 @@ export const useFileVersions = (nodeUuid?: string, onClose?: () => void, onResto
   const [isDownloading, setIsDownloading] = useState(false);
   const [error, setError] = useState<string>();
   const [toBeRestoredVersionId, setToBeRestoredVersionId] = useState<string>();
-  const cellsRepository = container.resolve(CellsRepository);
 
   useEffect(() => {
     if (!nodeUuid) {
@@ -50,7 +49,7 @@ export const useFileVersions = (nodeUuid?: string, onClose?: () => void, onResto
     const loadFileVersions = async () => {
       setIsLoading(true);
       setError(undefined);
-
+      const cellsRepository = container.resolve(CellsRepository);
       try {
         // Fetch the node details and versions in parallel
         const [node, versions] = await Promise.all([
@@ -82,7 +81,7 @@ export const useFileVersions = (nodeUuid?: string, onClose?: () => void, onResto
     };
 
     void loadFileVersions();
-  }, [cellsRepository, nodeUuid]);
+  }, [nodeUuid]);
 
   const reset = useCallback(() => {
     setFileInfo(undefined);
@@ -116,6 +115,7 @@ export const useFileVersions = (nodeUuid?: string, onClose?: () => void, onResto
     }
     setIsLoading(true);
     try {
+      const cellsRepository = container.resolve(CellsRepository);
       await cellsRepository.promoteNodeDraft({
         uuid: nodeUuid,
         versionId: toBeRestoredVersionId,
@@ -126,7 +126,7 @@ export const useFileVersions = (nodeUuid?: string, onClose?: () => void, onResto
     } finally {
       reset();
     }
-  }, [toBeRestoredVersionId, nodeUuid, cellsRepository, reset]);
+  }, [toBeRestoredVersionId, nodeUuid, reset]);
 
   return {
     fileInfo,

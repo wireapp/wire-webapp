@@ -133,7 +133,7 @@ describe('useFileVersions', () => {
       });
 
       expect(result.current.fileInfo).toEqual({
-        name: 'document',
+        name: 'document.txt',
         extension: 'txt',
       });
       expect(result.current.fileVersions).toEqual({
@@ -338,7 +338,7 @@ describe('useFileVersions', () => {
 
       expect(mockForcedDownloadFile).toHaveBeenCalledWith({
         url: 'https://example.com/file.txt',
-        name: 'document',
+        name: 'document.txt',
       });
     });
 

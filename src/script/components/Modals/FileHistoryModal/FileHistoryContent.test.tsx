@@ -78,7 +78,6 @@ describe('FileHistoryContent', () => {
       withTheme(
         <FileHistoryContent
           fileVersions={mockFileVersions}
-          isLoading={false}
           handleDownload={mockHandleDownload}
           handleRestore={mockHandleRestore}
         />,
@@ -94,7 +93,6 @@ describe('FileHistoryContent', () => {
       withTheme(
         <FileHistoryContent
           fileVersions={mockFileVersions}
-          isLoading={false}
           handleDownload={mockHandleDownload}
           handleRestore={mockHandleRestore}
         />,
@@ -114,7 +112,6 @@ describe('FileHistoryContent', () => {
       withTheme(
         <FileHistoryContent
           fileVersions={mockFileVersions}
-          isLoading={false}
           handleDownload={mockHandleDownload}
           handleRestore={mockHandleRestore}
         />,
@@ -133,7 +130,6 @@ describe('FileHistoryContent', () => {
       withTheme(
         <FileHistoryContent
           fileVersions={mockFileVersions}
-          isLoading={false}
           handleDownload={mockHandleDownload}
           handleRestore={mockHandleRestore}
         />,
@@ -149,7 +145,6 @@ describe('FileHistoryContent', () => {
       withTheme(
         <FileHistoryContent
           fileVersions={mockFileVersions}
-          isLoading={false}
           handleDownload={mockHandleDownload}
           handleRestore={mockHandleRestore}
         />,
@@ -166,7 +161,6 @@ describe('FileHistoryContent', () => {
       withTheme(
         <FileHistoryContent
           fileVersions={mockFileVersions}
-          isLoading={false}
           handleDownload={mockHandleDownload}
           handleRestore={mockHandleRestore}
         />,
@@ -187,7 +181,6 @@ describe('FileHistoryContent', () => {
       withTheme(
         <FileHistoryContent
           fileVersions={mockFileVersions}
-          isLoading={false}
           handleDownload={mockHandleDownload}
           handleRestore={mockHandleRestore}
         />,
@@ -205,7 +198,6 @@ describe('FileHistoryContent', () => {
       withTheme(
         <FileHistoryContent
           fileVersions={mockFileVersions}
-          isLoading={false}
           handleDownload={mockHandleDownload}
           handleRestore={mockHandleRestore}
         />,
@@ -221,12 +213,7 @@ describe('FileHistoryContent', () => {
   it('should render empty state when no versions are provided', () => {
     const {container} = render(
       withTheme(
-        <FileHistoryContent
-          fileVersions={{}}
-          isLoading={false}
-          handleDownload={mockHandleDownload}
-          handleRestore={mockHandleRestore}
-        />,
+        <FileHistoryContent fileVersions={{}} handleDownload={mockHandleDownload} handleRestore={mockHandleRestore} />,
       ),
     );
 
@@ -239,7 +226,6 @@ describe('FileHistoryContent', () => {
       withTheme(
         <FileHistoryContent
           fileVersions={mockFileVersions}
-          isLoading={false}
           handleDownload={mockHandleDownload}
           handleRestore={mockHandleRestore}
         />,
@@ -263,7 +249,6 @@ describe('FileHistoryContent', () => {
       withTheme(
         <FileHistoryContent
           fileVersions={mockFileVersions}
-          isLoading={false}
           handleDownload={mockHandleDownload}
           handleRestore={mockHandleRestore}
         />,
