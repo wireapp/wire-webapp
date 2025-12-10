@@ -82,4 +82,24 @@ test.describe('Calling', () => {
     await userACall.sendReaction('👍');
     await reactionAssertion;
   });
+
+  test(
+    'I want to answer incoming call with Join button in conversation view',
+    {tag: ['@TC-2826', '@regression']},
+    async ({createPage}) => {
+      const [userAPages, userBPages] = await Promise.all([
+        PageManager.from(createPage(withLogin(userA), withConnectedUser(userB))).then(pm => pm.webapp.pages),
+        PageManager.from(createPage(withLogin(userB))).then(pm => pm.webapp.pages),
+      ]);
+
+      await userAPages.conversationList().openConversation(userB.fullName);
+      await userAPages.conversation().clickCallButton();
+
+      await expect(userBPages.conversationList().joinCallButton).toBeVisible();
+      await expect(userBPages.calling().acceptCallButton).toBeVisible();
+
+      await userBPages.conversationList().joinCallButton.click();
+      await expect(userBPages.calling().acceptCallButton).not.toBeVisible();
+    },
+  );
 });
