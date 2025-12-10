@@ -40,6 +40,7 @@ export class ConversationListPage {
   readonly moveConversationButton: Locator;
   readonly moveToMenu: Locator;
   readonly createNewFolderButton: Locator;
+  readonly conversationListHeaderTitle: Locator;
 
   constructor(page: Page) {
     this.page = page;
@@ -61,11 +62,10 @@ export class ConversationListPage {
     this.unblockConversationMenuButton = page.locator(
       `${selectById('btn-unblock')}${selectByDataAttribute('conversation-list-options-menu')}`,
     );
-    this.moveConversationButton = page.locator(selectById('btn-move-to'));
-    this.moveToMenu = page.locator('ul.ctx-menu', {
-      has: page.locator(selectById('btn-create-new-folder')),
-    });
-    this.createNewFolderButton = this.moveToMenu.locator(selectById('btn-create-new-folder'));
+    this.moveConversationButton = page.getByRole('menu').getByRole('button', {name: 'Move to'});
+    this.moveToMenu = page.getByRole('menu');
+    this.createNewFolderButton = this.moveToMenu.getByRole('button', {name: 'Create new folder'});
+    this.conversationListHeaderTitle = page.locator('[data-uie-name="conversation-list-header-title"]');
   }
 
   async isConversationItemVisible(conversationName: string) {
