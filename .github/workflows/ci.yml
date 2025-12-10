@@ -37,7 +37,7 @@ jobs:
         run: yarn test --coverage --coverage-reporters=lcov --detectOpenHandles=false
 
       - name: Monitor coverage
-        uses: codecov/codecov-action@v5.5.1
+        uses: codecov/codecov-action@v5.5.2
         with:
           fail_ci_if_error: false
           files: ./coverage/lcov.info
