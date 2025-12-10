@@ -221,3 +221,7 @@ export const RestNodeSchema = z.object({
 });
 
 export type Node = z.infer<typeof RestNodeSchema>;
+
+export const RestNodeVersionsSchema = z.array(RestVersionSchema);
+
+export type NodeVersions = z.infer<typeof RestNodeVersionsSchema>;

@@ -1073,7 +1073,7 @@ describe('CellsAPI', () => {
       expect(result).toEqual(mockVersions);
     });
 
-    it('returns undefined when file has no versions', async () => {
+    it('returns empty array when file has no versions', async () => {
       const fileUuid = 'file-uuid';
       const mockResponse = {
         Versions: undefined,
@@ -1084,7 +1084,7 @@ describe('CellsAPI', () => {
       const result = await cellsAPI.getNodeVersions({uuid: fileUuid});
 
       expect(mockNodeServiceApi.nodeVersions).toHaveBeenCalledWith(fileUuid, {FilterBy: 'VersionsAll'});
-      expect(result).toBeUndefined();
+      expect(result).toEqual([]);
     });
 
     it('propagates errors from the NodeServiceApi', async () => {
