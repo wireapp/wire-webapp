@@ -150,4 +150,38 @@ test.describe('Clear Conversation Content', () => {
       await expect(userAPages.conversation().messages).toHaveCount(0);
     },
   );
+
+  test(
+    'I want to cancel clearing content of 1on1 conversation via conversation list',
+    {tag: ['@TC-155', '@regression']},
+    async ({createPage}) => {
+      const [userAPageManager, userBPageManager] = await Promise.all([
+        PageManager.from(createPage(withLogin(userA), withConnectedUser(userB), withConnectedUser(userC))),
+        PageManager.from(createPage(withLogin(userB))),
+      ]);
+
+      const {pages: userAPages, modals: userAModals} = userAPageManager.webapp;
+      const userBPages = userBPageManager.webapp.pages;
+
+      // Step 1: Create a 1:1 conversation with User A and B
+      await userAPages.conversationList().openConversation(userB.fullName);
+
+      // Step 2: Write messages in the conversation
+      await userAPages.conversation().sendMessage('Message from User A');
+
+      await userBPages.conversationList().openConversation(userA.fullName);
+      await userBPages.conversation().sendMessage('Message from User B');
+
+      // Step 3: User A selects 'Clear Conversation' option from the Conversation List Context Menu
+      await userAPages.conversationList().openContextMenu(userB.fullName);
+      await userAPages.conversationList().clearContentButton.click();
+      // Step 4: Warning Popup should open
+      await expect(userAModals.confirm().modal).toBeVisible();
+      // Step 5: User A clicks 'Cancel'
+      await userAModals.confirm().clickCancel();
+      // Step 6: Verify that the conversation does not contain any past messages
+      await userAPages.conversationList().openConversation(userB.fullName);
+      await expect(userAPages.conversation().messages).toHaveCount(2);
+    },
+  );
 });
