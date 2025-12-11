@@ -37,6 +37,10 @@ export class ConversationListPage {
   readonly unarchiveConversationMenuButton: Locator;
   readonly blockedChip: Locator;
   readonly unblockConversationMenuButton: Locator;
+  readonly moveConversationButton: Locator;
+  readonly moveToMenu: Locator;
+  readonly createNewFolderButton: Locator;
+  readonly conversationListHeaderTitle: Locator;
 
   constructor(page: Page) {
     this.page = page;
@@ -58,6 +62,10 @@ export class ConversationListPage {
     this.unblockConversationMenuButton = page.locator(
       `${selectById('btn-unblock')}${selectByDataAttribute('conversation-list-options-menu')}`,
     );
+    this.moveConversationButton = page.getByRole('menu').getByRole('button', {name: 'Move to'});
+    this.moveToMenu = page.getByRole('menu');
+    this.createNewFolderButton = this.moveToMenu.getByRole('button', {name: 'Create new folder'});
+    this.conversationListHeaderTitle = page.locator('[data-uie-name="conversation-list-header-title"]');
   }
 
   async isConversationItemVisible(conversationName: string) {
@@ -138,5 +146,13 @@ export class ConversationListPage {
 
   async clickUnblockConversation() {
     await this.unblockConversationMenuButton.click();
+  }
+
+  getRemoveConversationFromFolderButton(folderName: string) {
+    return this.page.getByRole('button', {name: `Remove from "${folderName}"`});
+  }
+
+  getMoveToFolderButton(folderName: string) {
+    return this.moveToMenu.getByRole('button', {name: folderName, exact: true});
   }
 }
