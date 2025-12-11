@@ -17,34 +17,16 @@
  *
  */
 
-import {Locator, Page} from '@playwright/test';
+import {Page} from '@playwright/test';
 
-export class CallNotEstablishedModal {
-  readonly page: Page;
+import {AcknowledgeModal} from './acknowledge.modal';
 
-  readonly modal: Locator;
-  readonly modalTitle: Locator;
-  readonly modalText: Locator;
-  readonly okButton: Locator;
-
+export class CallNotEstablishedModal extends AcknowledgeModal {
   constructor(page: Page) {
-    this.page = page;
-
-    this.modal = page.locator("[data-uie-name='primary-modals-container'][aria-label='Call not established']");
-    this.modalTitle = this.modal.locator("[data-uie-name='status-modal-title']");
-    this.modalText = this.modal.locator("[data-uie-name='status-modal-text']");
-    this.okButton = this.modal.locator("[data-uie-name='do-action']");
-  }
-
-  async isModalPresent() {
-    return await this.modal.isVisible();
-  }
-
-  async getModalTitle() {
-    return (await this.modalTitle.textContent()) ?? '';
+    super(page);
   }
 
   async clickOk() {
-    await this.okButton.click();
+    await this.clickAction();
   }
 }

@@ -37,12 +37,12 @@ test('Setting up new device with a backup', {tag: ['@TC-8634', '@crit-flow-web']
 
   const createAndSaveBackup = async (password?: string, filenamePrefix?: string): Promise<string> => {
     await pages.account().clickBackUpButton();
-    expect(modals.exportBackup().isTitleVisible()).toBeTruthy();
+    expect(modals.passwordAdvancedSecurity().isTitleVisible()).toBeTruthy();
     if (password) {
-      await modals.exportBackup().enterPassword(password);
+      await modals.passwordAdvancedSecurity().enterPassword(password);
     }
-    await modals.exportBackup().clickBackUpNow();
-    expect(modals.exportBackup().isTitleHidden()).toBeTruthy();
+    await modals.passwordAdvancedSecurity().clickBackUpNow();
+    expect(modals.passwordAdvancedSecurity().isTitleHidden()).toBeTruthy();
     expect(pages.historyExport().isVisible()).toBeTruthy();
     const [download] = await Promise.all([
       pages.historyExport().page.waitForEvent('download'),
@@ -117,10 +117,10 @@ test('Setting up new device with a backup', {tag: ['@TC-8634', '@crit-flow-web']
   await test.step('User restores the previously created password protected backup', async () => {
     await components.conversationSidebar().clickPreferencesButton();
     await pages.account().backupFileInput.setInputFiles(passwordProtectedBackupName);
-    expect(modals.importBackup().isTitleVisible()).toBeTruthy();
-    await modals.importBackup().enterPassword(userA.password);
-    await modals.importBackup().clickContinue();
-    expect(modals.importBackup().isTitleHidden()).toBeTruthy();
+    await expect(modals.passwordAdvancedSecurity().modalTitle).toBeVisible();
+    await modals.passwordAdvancedSecurity().enterPassword(userA.password);
+    await modals.passwordAdvancedSecurity().clickAction();
+    await expect(modals.passwordAdvancedSecurity().modalTitle).not.toBeVisible();
     expect(pages.historyImport().importSuccessHeadline.isVisible()).toBeTruthy();
   });
 

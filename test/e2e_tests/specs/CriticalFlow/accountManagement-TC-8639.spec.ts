@@ -94,7 +94,7 @@ test('Account Management', {tag: ['@TC-8639', '@crit-flow-web']}, async ({pageMa
   await test.step('Member changes their email address to a new email address', async () => {
     await components.conversationSidebar().clickPreferencesButton();
     await pages.account().changeEmailAddress(newEmail);
-    await modals.verifyEmail().clickOkButton();
+    await modals.acknowledge().clickAction(); // Acknowledge verify email address modal
 
     const activationUrl = await api.inbucket.getAccountActivationURL(newEmail);
     await pageManager.openNewTab(activationUrl);
