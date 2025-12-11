@@ -59,8 +59,8 @@ test.describe('account settings', () => {
       await expect(pages.account().emailDisplay).toHaveText(memberA.email);
 
       await pages.account().changeEmailAddress(memberB.email);
-      await modals.errorModal().modalTitle.waitFor({state: 'visible'});
-      expect(await modals.errorModal().getModalTitle()).toContain('Error');
+      await expect(modals.acknowledge().modal).toBeVisible();
+      await expect(modals.acknowledge().modalTitle).toContainText('Error');
     },
   );
 
@@ -77,10 +77,10 @@ test.describe('account settings', () => {
       await expect(pages.account().emailDisplay).toHaveText(memberA.email);
 
       await pages.account().changeEmailAddress(incorrectEmail);
-      await modals.errorModal().modalTitle.waitFor({state: 'visible'});
 
-      expect(await modals.errorModal().getModalTitle()).toContain('Error');
-      expect(await modals.errorModal().getModalText()).toContain('Email address is invalid.');
+      await expect(modals.acknowledge().modal).toBeVisible();
+      await expect(modals.acknowledge().modalTitle).toContainText('Error');
+      await expect(modals.acknowledge().modalText).toContainText('Email address is invalid');
     },
   );
 

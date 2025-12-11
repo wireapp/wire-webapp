@@ -19,41 +19,36 @@
 
 import {Locator, Page} from '@playwright/test';
 
-import {selectByDataAttribute} from 'test/e2e_tests/utils/selector.util';
+import {PrimaryModalType} from 'Components/Modals/PrimaryModal/PrimaryModalTypes';
 
-export class ExportBackupModal {
+import {BaseModal} from './base.modal';
+
+export class PasswordAdvancedSecurityModal extends BaseModal {
   readonly page: Page;
 
-  readonly exportBackupModal: Locator;
-  readonly title: Locator;
   readonly passwordInput: Locator;
-  readonly primaryButton: Locator;
-  readonly secondaryButton: Locator;
 
   constructor(page: Page) {
+    super(page, PrimaryModalType.PASSWORD_ADVANCED_SECURITY);
     this.page = page;
 
-    this.exportBackupModal = page.locator(selectByDataAttribute('primary-modals-container'));
-    this.title = this.exportBackupModal.locator(selectByDataAttribute('status-modal-title'));
-    this.passwordInput = this.exportBackupModal.locator(selectByDataAttribute('backup-password'));
-    this.primaryButton = this.exportBackupModal.locator(selectByDataAttribute('do-action'));
-    this.secondaryButton = this.exportBackupModal.locator(selectByDataAttribute('do-secondary'));
+    this.passwordInput = this.modal.getByRole('textbox');
   }
 
   async isTitleVisible() {
-    await this.title.waitFor({state: 'visible'});
+    await this.modalTitle.waitFor({state: 'visible'});
   }
 
   async isTitleHidden() {
-    await this.title.waitFor({state: 'hidden'});
+    await this.modalTitle.waitFor({state: 'hidden'});
   }
 
   async clickBackUpNow() {
-    await this.primaryButton.click();
+    await this.actionButton.click();
   }
 
   async clickCancel() {
-    await this.secondaryButton.click();
+    await this.cancelButton.click();
   }
 
   async enterPassword(password: string) {

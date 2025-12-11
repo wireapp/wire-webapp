@@ -61,7 +61,7 @@ export const logOutUser = async (pageManager: PageManager, shouldDeleteClient = 
   const {pages, components, modals} = pageManager.webapp;
   await components.conversationSidebar().clickPreferencesButton();
   await pages.account().clickLogoutButton();
-  expect(modals.confirmLogout().isVisible()).toBeTruthy();
+  await expect(modals.confirmLogout().modal).toBeVisible();
   if (shouldDeleteClient) {
     await modals.confirmLogout().toggleModalCheck();
     expect(modals.confirmLogout().modalCheckbox.isChecked()).toBeTruthy();

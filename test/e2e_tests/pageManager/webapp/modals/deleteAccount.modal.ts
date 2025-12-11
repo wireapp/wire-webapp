@@ -31,7 +31,7 @@ export class DeleteAccountModal {
   constructor(page: Page) {
     this.page = page;
 
-    this.modal = page.locator("[data-uie-name='primary-modals-container'][aria-label='Delete account']");
+    this.modal = page.getByRole('dialog').filter({hasText: 'Delete account'});
     this.modalTitle = this.modal.locator("[data-uie-name='status-modal-title']");
     this.modalText = this.modal.locator("[data-uie-name='status-modal-text']");
     this.deleteButton = this.modal.locator("[data-uie-name='do-action']");
