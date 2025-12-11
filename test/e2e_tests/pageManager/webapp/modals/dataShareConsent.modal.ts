@@ -33,13 +33,11 @@ export class DataShareConsentModal {
   constructor(page: Page) {
     this.page = page;
 
-    this.modal = page.locator(
-      `${selectByDataAttribute('primary-modals-container')}[aria-label='Consent to share user data']`,
-    );
+    this.modal = page.getByRole('dialog').getByRole('button').nth(0);
     this.modalTitle = this.modal.locator(`${selectByDataAttribute('status-modal-title')}`);
     this.modalText = this.modal.locator(`${selectByDataAttribute('status-modal-text')}`);
     this.agreeButton = this.modal.locator(`${selectByDataAttribute('do-action')}`);
-    this.declineButton = this.modal.locator(`${selectByDataAttribute('do-secondary')}`);
+    this.declineButton = this.modal.getByRole('button', {name: 'Decline'});
   }
 
   async isModalPresent() {

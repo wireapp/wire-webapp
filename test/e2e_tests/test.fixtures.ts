@@ -46,11 +46,12 @@ type Fixtures = {
    * Creates a team and the associated owner, optionally adding members to it
    * Note: The team and owner are automatically deleted when the test completes.
    * @param options.withMembers Can either be the number of team members to create or an array of existing members to add to the team
+   * @param options.enablePaidFeatures If true, sets owner name to 'integrationtest' to enable paid features via backoffice workaround
    * @returns an object containing the teams owner and an array of members. The size of the members array matches the number or array length passed to `withMembers`
    */
   createTeam: (
     teamName: string,
-    options?: Parameters<typeof createUser>[1] & {withMembers?: number | User[]},
+    options?: Parameters<typeof createUser>[1] & {withMembers?: number | User[]; enablePaidFeatures?: boolean},
   ) => Promise<{owner: User; members: User[]}>;
 };
 
@@ -74,11 +75,11 @@ export const test = baseTest.extend<Fixtures>({
       let setupFns: PagePlugin[];
 
       // Check if firstParam is a browser context or PagePlugin
-      if (typeof firstParam === 'function') {
+      if (typeof firstParam === 'function' || firstParam === undefined) {
         // Create a new context, add it to the created contexts and treat firstParam as page plugin
         context = await browser.newContext();
         contexts.push(context);
-        setupFns = [firstParam, ...plugins];
+        setupFns = firstParam ? [firstParam, ...plugins] : plugins;
       } else {
         // Otherwise reuse existing context if provided
         context = firstParam;
@@ -110,11 +111,20 @@ export const test = baseTest.extend<Fixtures>({
   createTeam: async ({api}, use) => {
     const teamOwners: User[] = [];
 
-    await use(async (teamName, {withMembers, ...options} = {}) => {
-      const owner = await createUser(api, options);
-      const {teamId} = await api.auth.upgradeUserToTeamOwner(owner, teamName);
+    await use(async (teamName, {withMembers, enablePaidFeatures = false, ...options} = {}) => {
+      // Workaround for backoffice to enable paid features (opt-in)
+      const owner = await createUser(api, {
+        ...options,
+        ...(enablePaidFeatures && {
+          firstName: 'integrationtest',
+          lastName: 'integrationtest',
+          fullName: 'integrationtest',
+        }),
+      });
 
+      const {teamId} = await api.auth.upgradeUserToTeamOwner(owner, teamName);
       owner.teamId = teamId;
+
       teamOwners.push(owner);
 
       let members: User[] = [];
@@ -149,6 +159,8 @@ export const withLogin =
     const pageManager = PageManager.from(page);
     await pageManager.openLoginPage();
     await pageManager.webapp.pages.login().login(await user);
+    // Wait for the sidebar to be visible after login to ensure the app is fully loaded
+    await pageManager.webapp.components.conversationSidebar().sidebar.waitFor({state: 'visible', timeout: 80_000});
   };
 
 /**
@@ -173,10 +185,13 @@ export const withConnectionRequest =
     await sendConnectionRequest(pageManager, await user);
   };
 
-const createUser = async (api: ApiManagerE2E, options?: {disableTelemetry?: boolean}) => {
-  const {disableTelemetry = true} = options ?? {};
+const createUser = async (
+  api: ApiManagerE2E,
+  options?: {disableTelemetry?: boolean; firstName?: string; lastName?: string; fullName?: string},
+) => {
+  const {disableTelemetry = true, firstName, lastName, fullName} = options ?? {};
 
-  const user = getUser();
+  const user = getUser({firstName, lastName, fullName});
   await api.createPersonalUser(user);
 
   // Optionally decline to send telemetry via the api. This avoids the user being prompted for it in the UI upon first login
