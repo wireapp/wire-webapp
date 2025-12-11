@@ -69,6 +69,7 @@ import type {User} from 'Repositories/entity/User';
 import {CallingEvent} from 'Repositories/event/CallingEvent';
 import {EventRepository} from 'Repositories/event/EventRepository';
 import {EventSource} from 'Repositories/event/EventSource';
+import {NOTIFICATION_HANDLING_STATE} from 'Repositories/event/NotificationHandlingState';
 import type {MediaDevicesHandler} from 'Repositories/media/MediaDevicesHandler';
 import type {MediaStreamHandler} from 'Repositories/media/MediaStreamHandler';
 import {MediaType} from 'Repositories/media/MediaType';
@@ -426,6 +427,9 @@ export class CallingRepository {
     wCall.setReqClientsHandler(wUser, this.requestClients);
     wCall.setReqNewEpochHandler(wUser, this.requestNewEpoch);
     wCall.setActiveSpeakerHandler(wUser, this.updateActiveSpeakers);
+    // Set AVS to process notification mode on startup so that old calls will be ignored.
+    // This mode is terminated by the web app via the corresponding event NOTIFICATION_HANDLING_STATE.
+    wCall.processNotifications(wUser, 1);
 
     return wUser;
   }
@@ -630,6 +634,7 @@ export class CallingRepository {
     amplify.subscribe(WebAppEvents.PROPERTIES.UPDATED, ({settings}: WebappProperties) => {
       this.toggleCbrEncoding(settings.call.enable_vbr_encoding);
     });
+    amplify.subscribe(WebAppEvents.EVENT.NOTIFICATION_HANDLING_STATE, this.setNotificationHandlingState);
   }
 
   /**
@@ -2720,6 +2725,27 @@ export class CallingRepository {
     }
     return participant.doesMatchIds(this.selfUser.qualifiedId, this.selfClientId);
   }
+
+  /**
+   * Set the notification handling state in AVS.
+   *
+   * @note Inform AVS that now obsolete Call events may arrive. This prevents old calls from being displayed as missed.
+   * the events NOTIFICATION_HANDLING_STATE.RECOVERY and NOTIFICATION_HANDLING_STATE.STREAM switch AVS to standby mode.
+   * Both events will be ended again by NOTIFICATION_HANDLING_STATE.WEB_SOCKET.
+   *
+   * @param handlingState State of the notifications stream handling
+   */
+  private readonly setNotificationHandlingState = (handlingState: NOTIFICATION_HANDLING_STATE) => {
+    const isFetchingFromStream = handlingState !== NOTIFICATION_HANDLING_STATE.WEB_SOCKET;
+
+    if (isFetchingFromStream) {
+      this.wCall?.processNotifications(this.wUser, 1);
+      this.logger.debug(`Block avs call notification handling`);
+    } else {
+      this.wCall?.processNotifications(this.wUser, 0);
+      this.logger.debug(`Finish blocking avs call notification handling`);
+    }
+  };
 
   //##############################################################################
   // Logging
