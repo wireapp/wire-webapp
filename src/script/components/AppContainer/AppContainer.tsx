@@ -120,6 +120,9 @@ export const AppContainer = ({config, clientType}: AppProps) => {
           toggleScreenshare={mainView.calling.callActions.toggleScreenshare}
         />
       )}
+
+      {/* Wrapper which will hold the audio elements for playing e.g. the ringtone. The elements are created within AudioRepository.ts */}
+      <div id="audio-elements" />
     </>
   );
 };

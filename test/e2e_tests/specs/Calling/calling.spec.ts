@@ -17,9 +17,11 @@
  *
  */
 
+import {AudioType} from 'Repositories/audio/AudioType';
 import {User} from 'test/e2e_tests/data/user';
 import {PageManager} from 'test/e2e_tests/pageManager';
 import {test, withConnectedUser, withLogin, expect} from 'test/e2e_tests/test.fixtures';
+import {isPlayingAudio} from 'test/e2e_tests/utils/audio.util';
 
 test.describe('Calling', () => {
   let userA: User;
@@ -100,6 +102,40 @@ test.describe('Calling', () => {
 
       await userBPages.conversationList().joinCallButton.click();
       await expect(userBPages.calling().acceptCallButton).not.toBeVisible();
+    },
+  );
+
+  test(
+    'Verify 1on1 call ringing terminates on second client when accepting call',
+    {tag: ['@TC-2823', '@regression']},
+    async ({createPage}) => {
+      const [userAPage, userBPage1] = await Promise.all([
+        createPage(withLogin(userA), withConnectedUser(userB)),
+        createPage(withLogin(userB)),
+      ]);
+      const userAPages = PageManager.from(userAPage).webapp.pages;
+      const userBDevice1Pages = PageManager.from(userBPage1).webapp.pages;
+
+      // Log in second device of user B confirming new history
+      const userBPage2 = await createPage(withLogin(userB, {confirmNewHistory: true}));
+      const userBDevice2Pages = PageManager.from(userBPage2).webapp.pages;
+
+      // Ensure no audio is playing on both devices initially
+      await userAPages.conversationList().openConversation(userB.fullName);
+      await expect.poll(() => isPlayingAudio(userBPage1, AudioType.INCOMING_CALL)).toBe(false);
+      await expect.poll(() => isPlayingAudio(userBPage2, AudioType.INCOMING_CALL)).toBe(false);
+
+      // User A calls user B, confirming both devices are ringing
+      await userAPages.conversation().clickCallButton();
+      await expect.poll(() => isPlayingAudio(userBPage1, AudioType.INCOMING_CALL)).toBe(true);
+      await expect.poll(() => isPlayingAudio(userBPage2, AudioType.INCOMING_CALL)).toBe(true);
+
+      // User B accepts the call from the first device and both devices should stop ringing
+      await userBDevice1Pages.calling().clickAcceptCallButton();
+      await expect(userBDevice1Pages.calling().callCell).toBeVisible();
+      await expect.poll(() => isPlayingAudio(userBPage1, AudioType.INCOMING_CALL)).toBe(false);
+      await expect(userBDevice2Pages.calling().callCell).not.toBeVisible();
+      await expect.poll(() => isPlayingAudio(userBPage2, AudioType.INCOMING_CALL)).toBe(false);
     },
   );
 });
