@@ -28,7 +28,7 @@ export class VerifyEmailModal {
   constructor(page: Page) {
     this.page = page;
     this.modal = page.getByRole('dialog', {name: 'Verify email address'});
-    this.okButton = page.getByRole('dialog').getByRole('button').filter({hasText: 'ok'}).nth(1);
+    this.okButton = this.modal.getByRole('button', {name: 'ok'});
   }
 
   async isVisible() {
