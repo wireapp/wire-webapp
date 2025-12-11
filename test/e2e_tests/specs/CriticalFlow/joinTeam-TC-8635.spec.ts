@@ -40,12 +40,12 @@ test(
       const team = await createTeam('Test Team', {withMembers: 1});
       userA = team.owner;
       userB = team.members[0];
-      const [PmA, PmB] = await Promise.all([
+      const [pmA, pmB] = await Promise.all([
         PageManager.from(createPage(withLogin(userA))),
         PageManager.from(createPage(withLogin(userB))),
       ]);
-      userAPageManager = PmA;
-      userBPageManager = PmB;
+      userAPageManager = pmA;
+      userBPageManager = pmB;
     });
 
     await test.step('B searches for A', async () => {
