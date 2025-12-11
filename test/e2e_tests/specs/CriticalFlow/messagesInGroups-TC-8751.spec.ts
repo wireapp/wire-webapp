@@ -17,17 +17,13 @@
  *
  */
 
-import {getUser} from 'test/e2e_tests/data/user';
+import {User} from 'test/e2e_tests/data/user';
 import {PageManager} from 'test/e2e_tests/pageManager';
 import {getVideoFilePath, getAudioFilePath, getTextFilePath, isAssetDownloaded} from 'test/e2e_tests/utils/asset.util';
 import {getImageFilePath, getLocalQRCodeValue} from 'test/e2e_tests/utils/sendImage.util';
-import {addCreatedUser, removeCreatedUser} from 'test/e2e_tests/utils/tearDown.util';
-import {loginUser} from 'test/e2e_tests/utils/userActions';
 
-import {test, expect} from '../../test.fixtures';
+import {test, expect, withLogin} from '../../test.fixtures';
 
-const userA = getUser();
-const userB = getUser();
 const conversationName = 'Critical Group';
 const messageText = 'Hello, this is a test message!';
 
@@ -39,153 +35,150 @@ const videoFilePath = getVideoFilePath();
 const audioFilePath = getAudioFilePath();
 const textFilePath = getTextFilePath();
 
-test(
-  'Messages in Groups',
-  {tag: ['@TC-8751', '@crit-flow-web']},
-  async ({pageManager: userAPageManager, api, browser}) => {
-    const {pages: userAPages, modals: userAModals, components: userAComponents} = userAPageManager.webapp;
+test('Messages in Groups', {tag: ['@TC-8751', '@crit-flow-web']}, async ({createTeam, createPage}) => {
+  let userA: User;
+  let userB: User;
+  let userAPageManager: PageManager;
+  let userBPageManager: PageManager;
 
-    const userBContext = await browser.newContext();
-    const userBPage = await userBContext.newPage();
-    const userBPageManager = PageManager.from(userBPage);
-    const {pages: userBPages, modals: userBModals} = userBPageManager.webapp;
+  await test.step('Preconditions: Creating preconditions for the test via API', async () => {
+    const team = await createTeam('Critical Team', {withMembers: 1, enablePaidFeatures: true});
+    userA = team.owner;
+    userB = team.members[0];
 
-    await test.step('Preconditions: Creating preconditions for the test via API', async () => {
-      await api.createPersonalUser(userA);
-      await api.createPersonalUser(userB);
-      addCreatedUser(userA);
-      addCreatedUser(userB);
-      await api.connectUsers(userA, userB);
-    });
+    const [pmA, pmB] = await Promise.all([
+      PageManager.from(createPage(withLogin(userA))),
+      PageManager.from(createPage(withLogin(userB))),
+    ]);
+    userAPageManager = pmA;
+    userBPageManager = pmB;
+  });
 
-    await test.step('Both users log in and open the group', async () => {
-      const setupUserA = async () => {
-        await userAPageManager.openMainPage();
-        await loginUser(userA, userAPageManager);
-        await userAModals.dataShareConsent().clickDecline();
-        await userAPages.conversationList().clickCreateGroup();
-        await userAPages.groupCreation().setGroupName(conversationName);
-        await userAPages.startUI().selectUsers([userB.username]);
-        await userAPages.groupCreation().clickCreateGroupButton();
-      };
+  await test.step('User A creates a group with User B', async () => {
+    const {pages} = userAPageManager.webapp;
+    await pages.conversationList().clickCreateGroup();
+    await pages.groupCreation().setGroupName(conversationName);
+    await pages.startUI().selectUsers([userB.username]);
+    await pages.groupCreation().clickCreateGroupButton();
+  });
 
-      const setupUserB = async () => {
-        await userBPageManager.openMainPage();
-        await loginUser(userB, userBPageManager);
-        await userBModals.dataShareConsent().clickDecline();
-      };
+  await test.step('User A mentions User B in the group', async () => {
+    const {pages} = userAPageManager.webapp;
+    await pages.conversationList().openConversation(conversationName);
+    await pages.conversation().sendMessageWithUserMention(userB.fullName, messageText);
+  });
 
-      await Promise.all([setupUserA(), setupUserB()]);
-    });
+  await test.step('User B should receive mention', async () => {
+    const {pages} = userBPageManager.webapp;
+    expect(await pages.conversationList().doesConversationHasMentionIndicator(conversationName)).toBeTruthy();
 
-    await test.step('User A mentions User B in the group', async () => {
-      await userAPages.conversationList().openConversation(conversationName);
-      await userAPages.conversation().sendMessageWithUserMention(userB.fullName, messageText);
-    });
+    await pages.conversationList().openConversation(conversationName);
+    await expect(pages.conversation().getMessage({content: `@${userB.fullName} ${messageText}`})).toBeVisible();
+  });
 
-    await test.step('User B should receive mention', async () => {
-      expect(await userBPages.conversationList().doesConversationHasMentionIndicator(conversationName)).toBeTruthy();
+  await test.step('User A sends image', async () => {
+    const {pages, components} = userAPageManager.webapp;
+    await pages.conversationList().openConversation(conversationName);
+    await components.inputBarControls().clickShareImage(imageFilePath);
 
-      // TODO: Bug [WPB-18226], remove this when fixed
-      await userBPageManager.refreshPage({waitUntil: 'load'});
+    expect(await userBPageManager.webapp.pages.conversation().isImageFromUserVisible(userA)).toBeTruthy();
+  });
 
-      await userBPages.conversationList().openConversation(conversationName);
-      await expect(userBPages.conversation().getMessage({content: `@${userB.fullName} ${messageText}`})).toBeVisible();
-    });
+  await test.step('User B can open the image preview and see the image', async () => {
+    const {pages, modals} = userBPageManager.webapp;
+    // Click on the image to open it in a preview
+    await pages.conversation().clickImage(userA);
+    // Verify that the detail view modal is visible
+    await modals.detailViewModal().waitForVisibility();
+    expect(await modals.detailViewModal().isVisible()).toBeTruthy();
+    expect(await modals.detailViewModal().isImageVisible()).toBeTruthy();
+  });
 
-    await test.step('User A sends image', async () => {
-      await userAPages.conversationList().openConversation(conversationName);
-      await userAComponents.inputBarControls().clickShareImage(imageFilePath);
+  await test.step('User B can download the image', async () => {
+    const {modals} = userBPageManager.webapp;
+    // Click on the download button to download the image
+    const filePath = await modals.detailViewModal().downloadAsset();
+    const downloadQRCodeValue = await getLocalQRCodeValue(filePath);
+    const localQRCodeValue = await getLocalQRCodeValue(imageFilePath);
+    expect(downloadQRCodeValue).toBe(localQRCodeValue);
+  });
 
-      expect(userBPages.conversation().isImageFromUserVisible(userA)).toBeTruthy();
-    });
+  await test.step(`User B reacts to A's image`, async () => {
+    const {pages, modals} = userBPageManager.webapp;
+    await modals.detailViewModal().givePlusOneReaction();
+    await modals.detailViewModal().closeModal();
+    expect(await pages.conversation().isPlusOneReactionVisible()).toBeTruthy();
+  });
 
-    await test.step('User B can open the image preview and see the image', async () => {
-      // Click on the image to open it in a preview
-      await userBPages.conversation().clickImage(userA);
+  await test.step('User A can see the reaction', async () => {
+    const {pages} = userAPageManager.webapp;
+    expect(await pages.conversation().isPlusOneReactionVisible()).toBeTruthy();
+  });
 
-      // Verify that the detail view modal is visible
-      await userBPageManager.waitForTimeout(500);
-      expect(await userBModals.detailViewModal().isVisible()).toBeTruthy();
-      expect(await userBModals.detailViewModal().isImageVisible()).toBeTruthy();
-    });
+  await test.step('User A sends video message', async () => {
+    const {pages, components} = userAPageManager.webapp;
+    await components.inputBarControls().clickShareFile(videoFilePath);
+    expect(await pages.conversation().isVideoMessageVisible()).toBeTruthy();
+  });
 
-    await test.step('User B can download the image', async () => {
-      // Click on the download button to download the image
-      const filePath = await userBModals.detailViewModal().downloadAsset();
-      const downloadQRCodeValue = await getLocalQRCodeValue(filePath);
-      const localQRCodeValue = await getLocalQRCodeValue(imageFilePath);
-      expect(downloadQRCodeValue).toBe(localQRCodeValue);
-    });
+  await test.step('User B can play the received video', async () => {
+    const {pages} = userBPageManager.webapp;
+    await pages.conversation().playVideo();
+    // Wait for 5 seconds to ensure video starts playing
+    await pages.conversation().page.waitForTimeout(5000);
+    // ToDO: Bug -> Video is not loaded from the server, so we cannot check if it is playing
+  });
 
-    await test.step('User B reacts to A’s image', async () => {
-      await userBModals.detailViewModal().givePlusOneReaction();
-      await userBModals.detailViewModal().closeModal();
-      expect(await userBPages.conversation().isPlusOneReactionVisible()).toBeTruthy();
-    });
+  await test.step('User A sends audio file', async () => {
+    const {pages, components} = userAPageManager.webapp;
+    await components.inputBarControls().clickShareFile(audioFilePath);
+    expect(await pages.conversation().isAudioMessageVisible()).toBeTruthy();
+  });
 
-    await test.step('User A can see the reaction', async () => {
-      expect(await userAPages.conversation().isPlusOneReactionVisible()).toBeTruthy();
-    });
+  await test.step('User B can play the audio file', async () => {
+    const {pages} = userBPageManager.webapp;
+    await pages.conversation().playAudio();
+    // Wait for 5 seconds to ensure audio starts playing
+    await pages.conversation().page.waitForTimeout(3000);
+    expect(await pages.conversation().isAudioPlaying()).toBeTruthy();
+  });
+  await test.step('User A sends a quick (10 sec) self deleting message', async () => {
+    const {pages, components} = userAPageManager.webapp;
+    await components.inputBarControls().setEphemeralTimerTo('10 seconds');
+    await pages.conversation().sendMessage(selfDestructMessageText);
+    await expect(pages.conversation().getMessage({content: selfDestructMessageText})).toBeVisible();
+  });
 
-    await test.step('User A sends video message', async () => {
-      await userAComponents.inputBarControls().clickShareFile(videoFilePath);
-      expect(await userAPages.conversation().isVideoMessageVisible()).toBeTruthy();
-    });
+  await test.step('User B sees the message', async () => {
+    const {pages} = userBPageManager.webapp;
+    await expect(pages.conversation().getMessage({content: selfDestructMessageText})).toBeVisible();
+  });
 
-    await test.step('User B can play the message', async () => {
-      await userBPages.conversation().playVideo();
-      // Wait for 5 seconds to ensure video starts playing
-      await userBPages.conversation().page.waitForTimeout(5000);
-      // ToDO: Bug -> Video is not loaded from the server, so we cannot check if it is playing
-    });
+  await test.step('User B waits 10 seconds', async () => {
+    await userBPageManager.webapp.pages.conversation().page.waitForTimeout(11_000);
+  });
 
-    await test.step('User A sends audio file', async () => {
-      await userAComponents.inputBarControls().clickShareFile(audioFilePath);
-      expect(await userAPages.conversation().isAudioMessageVisible()).toBeTruthy();
-    });
+  await test.step('Both users see the message as removed', async () => {
+    await expect(
+      userBPageManager.webapp.pages.conversation().getMessage({content: selfDestructMessageText}),
+    ).not.toBeVisible();
+    await expect(
+      userAPageManager.webapp.pages.conversation().getMessage({content: selfDestructMessageText}),
+    ).not.toBeVisible();
 
-    await test.step('User B can play the file', async () => {
-      await userBPages.conversation().playAudio();
-      // Wait for 5 seconds to ensure audio starts playing
-      await userBPages.conversation().page.waitForTimeout(5000);
-      expect(await userBPages.conversation().isAudioPlaying()).toBeTruthy();
-    });
-    await test.step('User A sends a quick (10 sec) self deleting message', async () => {
-      await userAComponents.inputBarControls().setEphemeralTimerTo('10 seconds');
-      await userAPages.conversation().sendMessage(selfDestructMessageText);
-      await expect(userAPages.conversation().getMessage({content: selfDestructMessageText})).toBeVisible();
-    });
+    // Reset ephemeral timer to 'Off'
+    await userAPageManager.webapp.components.inputBarControls().setEphemeralTimerTo('Off');
+  });
 
-    await test.step('User B sees the message', async () => {
-      await expect(userBPages.conversation().getMessage({content: selfDestructMessageText})).toBeVisible();
-    });
+  await test.step('User A sends asset', async () => {
+    const {pages, components} = userAPageManager.webapp;
+    await components.inputBarControls().clickShareFile(textFilePath);
+    expect(await pages.conversation().isFileMessageVisible()).toBeTruthy();
+  });
 
-    await test.step('User B waits 10 seconds', async () => {
-      await userBPages.conversation().page.waitForTimeout(11_000);
-    });
-
-    await test.step('Both users see the message as removed', async () => {
-      await expect(userBPages.conversation().getMessage({content: selfDestructMessageText})).not.toBeVisible();
-      await expect(userAPages.conversation().getMessage({content: selfDestructMessageText})).not.toBeVisible();
-
-      // Reset ephemeral timer to 'Off'
-      await userAComponents.inputBarControls().setEphemeralTimerTo('Off');
-    });
-
-    await test.step('User A sends asset', async () => {
-      await userAComponents.inputBarControls().clickShareFile(textFilePath);
-      expect(await userAPages.conversation().isFileMessageVisible()).toBeTruthy();
-    });
-
-    await test.step('User B can download the file', async () => {
-      const filePath = await userBPages.conversation().downloadFile();
-      expect(await isAssetDownloaded(filePath)).toBeTruthy();
-    });
-  },
-);
-
-test.afterAll(async ({api}) => {
-  await removeCreatedUser(api, userA);
-  await removeCreatedUser(api, userB);
+  await test.step('User B can download the file', async () => {
+    const {pages} = userBPageManager.webapp;
+    const filePath = await pages.conversation().downloadFile();
+    expect(await isAssetDownloaded(filePath)).toBeTruthy();
+  });
 });

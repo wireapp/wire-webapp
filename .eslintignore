@@ -1,0 +1,36 @@
+# Dependencies
+node_modules/
+**/node_modules/
+
+# Build outputs
+dist/
+build/
+*.min.js
+server/dist/
+server/bin/
+
+# Cache
+.eslintcache
+.cache/
+
+# Docs and assets
+docs/
+assets/
+resource/
+
+# External
+src/ext/
+src/worker/
+
+# Generated files
+src/script/localization/**/webapp*.js
+src/types/i18n.d.ts
+src/script/components/Icon.tsx
+
+# Config files
+*.config.js
+webpack.*.js
+
+# Yarn
+.yarn/
+.pnp.*

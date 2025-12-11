@@ -19,8 +19,6 @@
 
 import {Page, Locator} from '@playwright/test';
 
-import {selectByDataAttribute} from 'test/e2e_tests/utils/selector.util';
-
 export class VerifyEmailModal {
   readonly page: Page;
 
@@ -29,8 +27,8 @@ export class VerifyEmailModal {
 
   constructor(page: Page) {
     this.page = page;
-    this.modal = page.locator('[data-uie-name="primary-modals-container"][aria-label="Verify email address"]');
-    this.okButton = this.modal.locator(selectByDataAttribute('do-action'));
+    this.modal = page.getByRole('dialog', {name: 'Verify email address'});
+    this.okButton = page.getByRole('dialog').getByRole('button').filter({hasText: 'ok'}).nth(1);
   }
 
   async isVisible() {

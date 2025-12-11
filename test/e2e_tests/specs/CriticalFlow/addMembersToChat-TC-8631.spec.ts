@@ -17,66 +17,44 @@
  *
  */
 
-import {BrowserContext} from '@playwright/test';
-
-import {addCreatedTeam, removeCreatedTeam} from 'test/e2e_tests/utils/tearDown.util';
+import {User} from 'test/e2e_tests/data/user';
 
 import {Services} from '../../data/serviceInfo';
-import {getUser} from '../../data/user';
 import {PageManager} from '../../pageManager';
-import {test, expect} from '../../test.fixtures';
-import {loginUser} from '../../utils/userActions';
+import {test, expect, withLogin} from '../../test.fixtures';
 
 // Generating test data
-let owner = getUser();
-const member1 = getUser();
-const member2 = getUser();
-const teamName = 'Critical';
 const conversationName = 'Crits';
-
-// Browser contexts for cleanup
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-let member1Context: BrowserContext | undefined;
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-let member2Context: BrowserContext | undefined;
 
 test(
   'Team owner adds whole team to an all team chat',
   {tag: ['@TC-8631', '@crit-flow-web']},
-  async ({page, pageManager, api, browser}) => {
-    const {pages, modals} = pageManager.webapp;
-
-    // Create page managers for members that will be reused across steps
+  async ({createTeam, createPage, api}) => {
+    let owner: User;
+    let member1: User;
+    let member2: User;
+    let ownerPageManager: PageManager;
     let member1PageManager: PageManager;
     let member2PageManager: PageManager;
 
     await test.step('Preconditions: Creating preconditions for the test via API', async () => {
-      const user = await api.createTeamOwner(owner, teamName);
-      owner = {...owner, ...user};
-      addCreatedTeam(owner, owner.teamId);
-      const invitationIdForMember1 = await api.team.inviteUserToTeam(member1.email, owner);
-      const invitationCodeForMember1 = await api.brig.getTeamInvitationCodeForEmail(
-        owner.teamId,
-        invitationIdForMember1,
-      );
+      const team = await createTeam('Critical', {withMembers: 2});
+      owner = team.owner;
+      member1 = team.members[0];
+      member2 = team.members[1];
 
-      const invitationIdForMember2 = await api.team.inviteUserToTeam(member2.email, owner);
-      const invitationCodeForMember2 = await api.brig.getTeamInvitationCodeForEmail(
-        owner.teamId,
-        invitationIdForMember2,
-      );
-
-      await api.createPersonalUser(member1, invitationCodeForMember1);
-      await api.createPersonalUser(member2, invitationCodeForMember2);
+      const [pmOwner, pm1, pm2] = await Promise.all([
+        PageManager.from(createPage(withLogin(owner))),
+        PageManager.from(createPage(withLogin(member1))),
+        PageManager.from(createPage(withLogin(member2))),
+      ]);
+      ownerPageManager = pmOwner;
+      member1PageManager = pm1;
+      member2PageManager = pm2;
     });
 
-    await test.step('Team owner logs in into a client and creates group conversation', async () => {
-      await pageManager.openMainPage();
-      await loginUser(owner, pageManager);
-      await modals.dataShareConsent().clickDecline();
-    });
-
-    await test.step('Team owner adds team members to a group', async () => {
+    await test.step('Team owner creates group conversation with team members', async () => {
+      const {pages} = ownerPageManager.webapp;
       await pages.conversationList().clickCreateGroup();
       await pages.groupCreation().setGroupName(conversationName);
       await pages.startUI().selectUsers([member1.username, member2.username]);
@@ -85,6 +63,7 @@ test(
     });
 
     await test.step('Team owner adds a service to newly created group', async () => {
+      const {pages} = ownerPageManager.webapp;
       await api.team.addServiceToTeamWhitelist(owner.teamId, Services.POLL_SERVICE, owner.token);
       // Add the Poll service to the conversation
       await pages.conversation().clickConversationTitle();
@@ -92,26 +71,13 @@ test(
       await pages.conversationDetails().clickAddPeopleButton();
       await pages.conversationDetails().addServiceToConversation('Poll');
       // Verify service was added by checking for system message
-      await expect(page.getByText('You added Poll Bot to the')).toBeVisible();
+      await expect(ownerPageManager.page.getByText('You added Poll Bot to the')).toBeVisible();
     });
 
     await test.step('All group participants send messages in a group', async () => {
-      // Member1 logs in and opens the conversation (establish encrypted session)
-      member1Context = await browser.newContext();
-      const member1Page = await member1Context.newPage();
-      member1PageManager = new PageManager(member1Page);
-      await member1PageManager.openMainPage();
-      await loginUser(member1, member1PageManager);
-      await member1PageManager.webapp.modals.dataShareConsent().clickDecline();
+      const {pages} = ownerPageManager.webapp;
+      // Member1 and Member2 open the conversation (establish encrypted session)
       await member1PageManager.webapp.pages.conversationList().openConversation(conversationName);
-
-      // Member2 logs in and opens the conversation (establish encrypted session)
-      member2Context = await browser.newContext();
-      const member2Page = await member2Context.newPage();
-      member2PageManager = new PageManager(member2Page);
-      await member2PageManager.openMainPage();
-      await loginUser(member2, member2PageManager);
-      await member2PageManager.webapp.modals.dataShareConsent().clickDecline();
       await member2PageManager.webapp.pages.conversationList().openConversation(conversationName);
 
       // Wait for encryption to be established by checking that conversation is fully loaded
@@ -142,6 +108,7 @@ test(
     });
 
     await test.step('Team owner and group members react on received messages with reactions', async () => {
+      const {pages} = ownerPageManager.webapp;
       // Owner reacts to member1's message with +1 (thumbs up)
       await pages.conversationList().openConversation(conversationName);
       const member1MessageForOwner = pages.conversation().getMessage({content: `Hello from ${member1.firstName}!`});
@@ -180,6 +147,7 @@ test(
     });
 
     await test.step('All group participants make sure they see reactions from other group participants', async () => {
+      const {pages} = ownerPageManager.webapp;
       // Owner verifies they can see heart (❤️) and joy (😂) reactions on their message from member1 and member2
       await pages.conversationList().openConversation(conversationName);
       const ownerMessage = pages.conversation().getMessage({content: `Hello from ${owner.firstName}!`});
@@ -212,8 +180,7 @@ test(
     });
 
     await test.step('Team owner removes one group member from a group', async () => {
-      // Conversation Sidebar should already be open from previous step
-
+      const {pages, modals} = ownerPageManager.webapp;
       // Get the member from the members list and remove them
       await pages.conversation().removeMemberFromGroup(member2.fullName);
       await modals.removeMember().clickConfirm();
@@ -223,8 +190,7 @@ test(
     });
 
     await test.step('Team owner removes a service from a group', async () => {
-      // Conversation Sidebar should already be open from previous step
-
+      const {pages} = ownerPageManager.webapp;
       // Remove the Poll service (services appear in the members list)
       await pages.conversationDetails().removeServiceFromConversation('Poll');
 
@@ -233,9 +199,3 @@ test(
     });
   },
 );
-
-test.afterAll(async ({api}) => {
-  await member1Context?.close();
-  await member2Context?.close();
-  await removeCreatedTeam(api, owner);
-});

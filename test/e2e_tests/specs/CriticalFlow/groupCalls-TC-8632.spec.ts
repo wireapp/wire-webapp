@@ -17,79 +17,67 @@
  *
  */
 
-import {BrowserContext} from '@playwright/test';
 import {FEATURE_KEY} from '@wireapp/api-client/lib/team/feature';
 
+import {User} from 'test/e2e_tests/data/user';
 import {PageManager} from 'test/e2e_tests/pageManager';
-import {completeLogin} from 'test/e2e_tests/utils/setup.util';
-import {addCreatedTeam, removeCreatedTeam} from 'test/e2e_tests/utils/tearDown.util';
 
-import {getUser} from '../../data/user';
-import {test, expect} from '../../test.fixtures';
+import {test, expect, withLogin} from '../../test.fixtures';
 
-let owner = getUser();
-owner.firstName = 'integrationtest';
-owner.lastName = 'integrationtest';
-owner.fullName = 'integrationtest';
-
-let memberContext: BrowserContext | undefined;
-
-test(
+// Fixme: Backoffice does not unlock calling feature for teams created during tests
+test.fixme(
   'Planning group call with sending various messages during call',
   {tag: ['@TC-8632', '@crit-flow-web']},
-  async ({browser, api, pageManager: ownerPageManager}) => {
+  async ({createTeam, createPage, api}) => {
     test.setTimeout(150_000);
 
-    const member = getUser();
-    const teamName = 'Calling';
+    let owner: User;
+    let member: User;
+    let ownerPageManager: PageManager;
+    let memberPageManager: PageManager;
+
     const conversationName = 'Calling';
 
-    memberContext = await browser.newContext();
-    const memberPage = await memberContext.newPage();
-    const memberPageManager = new PageManager(memberPage);
+    await test.step('Preconditions: Creating preconditions for the test via API', async () => {
+      const team = await createTeam('Calling', {withMembers: 1, enablePaidFeatures: true});
+      owner = team.owner;
+      member = team.members[0];
 
-    const ownerPages = ownerPageManager.webapp.pages;
-    const memberPages = memberPageManager.webapp.pages;
-
-    const ownerCalling = ownerPageManager.webapp.components.calling();
-    const memberCalling = memberPageManager.webapp.components.calling();
-
-    await test.step('Setup: Create users, invite member, enable calling', async () => {
-      const user = await api.createTeamOwner(owner, teamName);
-      owner = {...owner, ...user};
-      addCreatedTeam(owner, owner.teamId!);
-
-      const invitationId = await api.team.inviteUserToTeam(member.email, owner);
-      const invitationCode = await api.brig.getTeamInvitationCodeForEmail(owner.teamId!, invitationId);
-
-      await api.createPersonalUser(member, invitationCode);
       await api.enableConferenceCallingFeature(owner.teamId!);
       await api.waitForFeatureToBeEnabled(FEATURE_KEY.CONFERENCE_CALLING, owner.teamId!, owner.token);
-    });
 
-    await test.step('Owner and member login', async () => {
-      await Promise.all([completeLogin(ownerPageManager, owner), completeLogin(memberPageManager, member)]);
+      const [pmOwner, pmMember] = await Promise.all([
+        PageManager.from(createPage(withLogin(owner))),
+        PageManager.from(createPage(withLogin(member))),
+      ]);
+      ownerPageManager = pmOwner;
+      memberPageManager = pmMember;
     });
 
     await test.step('Owner creates group and adds the member', async () => {
-      await ownerPages.conversationList().clickCreateGroup();
-      await ownerPages.groupCreation().setGroupName(conversationName);
-      await ownerPages.startUI().selectUsers([member.username]);
-      await ownerPages.groupCreation().clickCreateGroupButton();
+      const {pages} = ownerPageManager.webapp;
+      await pages.conversationList().clickCreateGroup();
+      await pages.groupCreation().setGroupName(conversationName);
+      await pages.startUI().selectUsers([member.username]);
+      await pages.groupCreation().clickCreateGroupButton();
 
-      expect(await ownerPages.conversationList().isConversationItemVisible(conversationName)).toBeTruthy();
+      expect(await pages.conversationList().isConversationItemVisible(conversationName)).toBeTruthy();
     });
 
     await test.step('Owner starts call', async () => {
-      await ownerPages.conversationList().openConversation(conversationName);
-      await ownerPages.conversation().startCall();
+      const {pages, components} = ownerPageManager.webapp;
+      const ownerCalling = components.calling();
+      await pages.conversationList().openConversation(conversationName);
+      await pages.conversation().startCall();
       await ownerCalling.waitForCell();
 
       expect(await ownerCalling.isCellVisible()).toBeTruthy();
     });
 
     await test.step('Member joins call and goes full screen', async () => {
-      await memberPages.conversationList().openConversation(conversationName);
+      const {pages, components} = memberPageManager.webapp;
+      const memberCalling = components.calling();
+      await pages.conversationList().openConversation(conversationName);
       await memberCalling.waitForCell();
       expect(await memberCalling.isCellVisible()).toBeTruthy();
 
@@ -104,33 +92,35 @@ test(
     });
 
     await test.step('Owner goes full screen', async () => {
+      const {components} = ownerPageManager.webapp;
+      const ownerCalling = components.calling();
       await ownerCalling.maximizeCell();
       await ownerCalling.waitForGoFullScreen();
       expect(await ownerCalling.isFullScreenVisible()).toBeTruthy();
     });
 
     await test.step('Validation: Participants see each other', async () => {
+      const ownerCalling = ownerPageManager.webapp.components.calling();
+      const memberCalling = memberPageManager.webapp.components.calling();
       await ownerCalling.waitForParticipantNameToBeVisible(member.qualifiedId?.id);
       await memberCalling.waitForParticipantNameToBeVisible(owner.qualifiedId?.id);
     });
 
     await test.step('Validation: Owner sees member is muted', async () => {
+      const ownerCalling = ownerPageManager.webapp.components.calling();
       expect(await ownerCalling.isGridTileMuteIconVisibleForUser(member.username)).toBeFalsy();
     });
 
     await test.step('Member unmutes themselves', async () => {
+      const memberCalling = memberPageManager.webapp.components.calling();
       await memberCalling.unmuteSelfInFullScreen();
       await memberPageManager.waitForTimeout(250);
       expect(await memberCalling.isSelfUserMutedInFullScreen()).toBeFalsy();
     });
 
     await test.step('Validation: Owner sees member is unmuted', async () => {
+      const ownerCalling = ownerPageManager.webapp.components.calling();
       expect(await ownerCalling.isGridTileMuteIconVisibleForUser(member.username)).toBeFalsy();
     });
   },
 );
-
-test.afterAll(async ({api}) => {
-  await memberContext?.close();
-  await removeCreatedTeam(api, owner);
-});

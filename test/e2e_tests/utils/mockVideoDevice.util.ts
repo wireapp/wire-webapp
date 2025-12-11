@@ -19,21 +19,36 @@
 
 import {BrowserContext} from '@playwright/test';
 
-// Define a type for our fake video devices
-interface FakeVideoDevice {
+// Define a type for our fake devices
+interface FakeDevice {
   deviceId: string;
   label: string;
+  kind: MediaDeviceKind;
 }
 
-const fakeVideoDevices: FakeVideoDevice[] = [
-  {deviceId: 'fake-camera-1', label: 'Fake Camera 1'},
-  {deviceId: 'fake-camera-2', label: 'Fake Camera 2'},
-  {deviceId: 'fake-camera-3', label: 'Fake Camera 3'},
+const fakeVideoDevices: FakeDevice[] = [
+  {deviceId: 'fake-camera-1', label: 'Fake Camera 1', kind: 'videoinput'},
+  {deviceId: 'fake-camera-2', label: 'Fake Camera 2', kind: 'videoinput'},
+  {deviceId: 'fake-camera-3', label: 'Fake Camera 3', kind: 'videoinput'},
 ];
+
+const fakeAudioInputDevices: FakeDevice[] = [
+  {deviceId: 'fake-audio-input-1', label: 'Fake Audio Input 1', kind: 'audioinput'},
+  {deviceId: 'fake-audio-input-2', label: 'Fake Audio Input 2', kind: 'audioinput'},
+  {deviceId: 'fake-audio-input-3', label: 'Fake Audio Input 3', kind: 'audioinput'},
+];
+
+const fakeAudioOutputDevices: FakeDevice[] = [
+  {deviceId: 'fake-audio-output-1', label: 'Fake Audio Output 1', kind: 'audiooutput'},
+  {deviceId: 'fake-audio-output-2', label: 'Fake Audio Output 2', kind: 'audiooutput'},
+  {deviceId: 'fake-audio-output-3', label: 'Fake Audio Output 3', kind: 'audiooutput'},
+];
+
+const allFakeDevices = [...fakeVideoDevices, ...fakeAudioInputDevices, ...fakeAudioOutputDevices];
 
 export async function addMockCamerasToContext(context: BrowserContext): Promise<void> {
   // Add init script to existing context
-  await context.addInitScript((fakeDevices: FakeVideoDevice[]) => {
+  await context.addInitScript((fakeDevices: FakeDevice[]) => {
     // Cast to any to override read-only properties
     const mediaDevices = navigator.mediaDevices as any;
     const originalEnumerateDevices: () => Promise<MediaDeviceInfo[]> = mediaDevices.enumerateDevices.bind(mediaDevices);
@@ -41,15 +56,20 @@ export async function addMockCamerasToContext(context: BrowserContext): Promise<
       mediaDevices.getUserMedia.bind(mediaDevices);
 
     // Helper function to add fake devices to the device list
-    function addFakeVideoDevicesToList(devices: MediaDeviceInfo[]): MediaDeviceInfo[] {
+    function addFakeDevicesToList(devices: MediaDeviceInfo[]): MediaDeviceInfo[] {
+      // Filter out real devices of the same kinds we're mocking
+      const filteredDevices = devices.filter(
+        (d: MediaDeviceInfo) => d.kind !== 'videoinput' && d.kind !== 'audioinput' && d.kind !== 'audiooutput',
+      );
+
       return [
-        ...devices.filter((d: MediaDeviceInfo) => d.kind !== 'videoinput'),
+        ...filteredDevices,
         ...fakeDevices.map((fake, i) => ({
           deviceId: fake.deviceId,
           groupId: `fake-group-${i}`,
-          kind: 'videoinput' as MediaDeviceKind,
+          kind: fake.kind,
           label: fake.label,
-          toJSON: () => ({...fake, kind: 'videoinput'}),
+          toJSON: () => ({...fake}),
         })),
       ];
     }
@@ -89,7 +109,7 @@ export async function addMockCamerasToContext(context: BrowserContext): Promise<
     // Mock enumerateDevices
     mediaDevices.enumerateDevices = async (): Promise<MediaDeviceInfo[]> => {
       const devices: MediaDeviceInfo[] = await originalEnumerateDevices();
-      return addFakeVideoDevicesToList(devices);
+      return addFakeDevicesToList(devices);
     };
 
     // Mock getUserMedia
@@ -110,5 +130,5 @@ export async function addMockCamerasToContext(context: BrowserContext): Promise<
 
       return originalGetUserMedia(constraints);
     };
-  }, fakeVideoDevices);
+  }, allFakeDevices);
 }

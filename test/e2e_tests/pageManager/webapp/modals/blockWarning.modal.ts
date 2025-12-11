@@ -31,11 +31,11 @@ export class BlockWarningModal {
   constructor(page: Page) {
     this.page = page;
 
-    this.modal = page.locator("[data-uie-name='primary-modals-container'][aria-label*='Block']");
-    this.modalTitle = this.modal.locator("[data-uie-name='status-modal-title']");
-    this.modalText = this.modal.locator("[data-uie-name='status-modal-text']");
-    this.blockButton = this.modal.locator("[data-uie-name='do-action']");
-    this.cancelButton = this.modal.locator("[data-uie-name='do-secondary']");
+    this.modal = page.getByRole('dialog').getByRole('button').nth(0);
+    this.modalTitle = this.modal.getByRole('heading', {level: 2});
+    this.modalText = this.modal.getByRole('paragraph').nth(0);
+    this.blockButton = this.modal.getByRole('button', {name: 'Block'});
+    this.cancelButton = this.modal.getByRole('button', {name: 'Cancel'});
   }
 
   async isModalPresent() {

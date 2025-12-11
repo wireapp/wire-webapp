@@ -17,43 +17,41 @@
  *
  */
 
+import {getUser, User} from 'test/e2e_tests/data/user';
 import {PageManager} from 'test/e2e_tests/pageManager';
-import {addCreatedUser, removeCreatedUser} from 'test/e2e_tests/utils/tearDown.util';
-import {loginUser, sendTextMessageToUser} from 'test/e2e_tests/utils/userActions';
+import {sendTextMessageToUser} from 'test/e2e_tests/utils/userActions';
 
-import {getUser} from '../../data/user';
-import {test, expect} from '../../test.fixtures';
+import {test, expect, withLogin} from '../../test.fixtures';
 
-const userA = getUser();
-const otherUsers = Array.from({length: 2}, () => getUser());
-const [userB, userC] = otherUsers;
-
-test('Personal Account Lifecycle', {tag: ['@TC-8638', '@crit-flow-web']}, async ({pageManager, api, browser}) => {
-  const pageManagers = await Promise.all(
-    otherUsers.map(async () => {
-      const memberContext = await browser.newContext();
-      const memberPage = await memberContext.newPage();
-      return new PageManager(memberPage);
-    }),
-  );
-
-  const [pageManagerB, pageManagerC] = pageManagers;
-
-  const {pages, modals, components} = pageManager.webapp;
+test('Personal Account Lifecycle', {tag: ['@TC-8638', '@crit-flow-web']}, async ({createPage, createUser, api}) => {
+  let pageManager: PageManager;
+  let pageManagerB: PageManager;
+  let pageManagerC: PageManager;
+  let userA: User;
+  let userB: User;
+  let userC: User;
 
   await test.step('Preconditions: Creating preconditions for the test via API', async () => {
-    await Promise.all(
-      otherUsers.map(async (user, index) => {
-        await api.createPersonalUser(user);
-        addCreatedUser(user);
-        await pageManagers[index].openMainPage();
-        await loginUser(user, pageManagers[index]);
-        await pageManagers[index].webapp.modals.dataShareConsent().clickDecline();
-      }),
-    );
+    // Create user A as a personal user (who will register in the test)
+    userA = getUser();
+    // Create users B and C as personal users with login
+    userB = await createUser();
+    userC = await createUser();
+
+    const [pmB, pmC] = await Promise.all([
+      PageManager.from(createPage(withLogin(userB))),
+      PageManager.from(createPage(withLogin(userC))),
+    ]);
+
+    pageManagerB = pmB;
+    pageManagerC = pmC;
+
+    // Create page for User A (who will register in the test)
+    pageManager = PageManager.from(await createPage());
   });
 
   await test.step('User A opens the application and registers personal account', async () => {
+    const {pages, modals} = pageManager.webapp;
     await pageManager.openMainPage();
     await pages.singleSignOn().enterEmailOnSSOPage(userA.email);
     await pages.welcome().clickCreateAccountButton();
@@ -74,17 +72,20 @@ test('Personal Account Lifecycle', {tag: ['@TC-8638', '@crit-flow-web']}, async 
   });
 
   await test.step('Personal user A sets user name', async () => {
+    const {pages} = pageManager.webapp;
     await pages.setUsername().setUsername(userA.username);
     await pages.setUsername().clickNextButton();
     await pages.registerSuccess().clickOpenWireWebButton();
   });
 
   await test.step('Personal user A declines sending anonymous usage data', async () => {
+    const {modals} = pageManager.webapp;
     await modals.dataShareConsent().isModalPresent();
     await modals.dataShareConsent().clickDecline();
   });
 
   await test.step('Personal user A checks that username was set correctly', async () => {
+    const {pages, components} = pageManager.webapp;
     await expect(components.conversationSidebar().personalStatusName).toHaveText(
       `${userA.firstName} ${userA.lastName}`,
     );
@@ -93,12 +94,14 @@ test('Personal Account Lifecycle', {tag: ['@TC-8638', '@crit-flow-web']}, async 
   });
 
   await test.step('Personal user A searches for other personal user B', async () => {
+    const {pages, modals, components} = pageManager.webapp;
     await components.conversationSidebar().clickConnectButton();
     await pages.startUI().selectUser(userB.username);
     expect(await modals.userProfile().isVisible());
   });
 
   await test.step('Personal user A sends a connection request to personal user B', async () => {
+    const {pages, modals} = pageManager.webapp;
     await modals.userProfile().clickConnectButton();
     await pages.conversationList().openConversation(userB.fullName);
     expect(await pages.outgoingConnection().getOutgoingConnectionUsername()).toContain(userB.username);
@@ -124,6 +127,7 @@ test('Personal Account Lifecycle', {tag: ['@TC-8638', '@crit-flow-web']}, async 
   });
 
   await test.step('Personal user A blocks personal user B', async () => {
+    const {pages, modals} = pageManager.webapp;
     await pages.conversationList().clickConversationOptions(userB.fullName);
     await pages.conversationList().clickBlockConversation();
     expect(await modals.blockWarning().isModalPresent());
@@ -149,6 +153,7 @@ test('Personal Account Lifecycle', {tag: ['@TC-8638', '@crit-flow-web']}, async 
   });
 
   await test.step('Personal user A accepts request from C', async () => {
+    const {pages} = pageManager.webapp;
     await pages.conversationList().openPendingConnectionRequest();
     await pages.connectRequest().clickConnectButton();
   });
@@ -165,6 +170,7 @@ test('Personal Account Lifecycle', {tag: ['@TC-8638', '@crit-flow-web']}, async 
   });
 
   await test.step('Personal User A deletes their account', async () => {
+    const {pages, modals, components} = pageManager.webapp;
     await components.conversationSidebar().clickPreferencesButton();
     await pages.account().clickDeleteAccountButton();
     expect(await modals.deleteAccount().isModalPresent());
@@ -181,9 +187,4 @@ test('Personal Account Lifecycle', {tag: ['@TC-8638', '@crit-flow-web']}, async 
       expect(await tab.webapp.pages.deleteAccount().isAccountDeletedHeadlineVisible()).toBeTruthy();
     });
   });
-});
-
-test.afterAll(async ({api}) => {
-  await removeCreatedUser(api, userB);
-  await removeCreatedUser(api, userC);
 });
