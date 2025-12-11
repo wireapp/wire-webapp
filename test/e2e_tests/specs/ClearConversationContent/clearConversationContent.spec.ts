@@ -19,45 +19,54 @@
 
 import {User} from 'test/e2e_tests/data/user';
 import {PageManager} from 'test/e2e_tests/pageManager';
-import {test, expect, withLogin, withConnectionRequest} from 'test/e2e_tests/test.fixtures';
+import {test, withLogin, withConnectedUser} from 'test/e2e_tests/test.fixtures';
+
+import {createGroup} from '../../utils/userActions';
 
 test.describe('User Blocking', () => {
   test.describe('Block: User A and User B are NOT in the same team', () => {
     let userA: User;
     let userB: User;
-    //let userC: User;
+    let userC: User;
 
     test.beforeEach(async ({createTeam}) => {
-      const [teamA, teamB] = await Promise.all([createTeam('Team A', {withMembers: 1}), createTeam('Team B')]);
-      userA = teamA.owner;
-      userB = teamB.owner;
-      //userC = teamA.members[0];
+      const team = await createTeam('Test Team', {withMembers: 2});
+      userA = team.owner;
+      userB = team.members[0];
+      userC = team.members[1];
     });
 
     test(
-      'I want to cancel blocking a 1:1 conversation from conversation list',
-      {tag: ['@TC-137', '@regression']},
+      'I want to clear content of a group conversation via conversation list',
+      {tag: ['@TC-152', '@regression']},
       async ({createPage}) => {
-        const userAPageManager = (await PageManager.from(createPage(withLogin(userA), withConnectionRequest(userB))))
-          .webapp;
-        const {pages: userAPages, modals: userAModals} = userAPageManager;
-
-        // Preconditions: User B accepts the connection request
+        const userAPageManager = (
+          await PageManager.from(createPage(withLogin(userA), withConnectedUser(userB), withConnectedUser(userC)))
+        ).webapp;
+        const {pages: userAPages} = userAPageManager;
         const userBPages = (await PageManager.from(createPage(withLogin(userB)))).webapp.pages;
-        await userBPages.connectRequest().clickConnectButton();
+        const userCPages = (await PageManager.from(createPage(withLogin(userC)))).webapp.pages;
 
-        // Step 1: User A opens conversation with User B
-        await userAPages.conversationList().openConversation(userB.fullName);
-        // Step 2: User A opens the options menu for user B
-        await userAPages.conversationList().clickConversationOptions(userB.fullName);
-        // Step 3: User A opens modal and clicks 'Block' button
-        await userAPages.conversationList().clickBlockConversation();
-        // Step 4: User A clicks 'Cancel' button
-        await userAModals.blockWarning().clickCancel();
-        // Step 5: Conversation is still present, and User A can open it
-        await userAPages.conversationList().openConversation(userB.fullName);
-        // Step 6: User A still can send message to User B
-        await expect(userAPages.conversation().messageInput).toBeVisible();
+        // Step 1: Create a group conversation with User A, B and C
+        const conversationName = 'Group conversation';
+        await createGroup(userAPages, conversationName, [userB, userC]);
+
+        // Step 2: Write messages in the  group conversation
+        await userAPages.conversationList().openConversation(conversationName);
+        await userAPages.conversation().sendMessage('Message from User A');
+
+        await userBPages.conversationList().openConversation(conversationName);
+        await userBPages.conversation().sendMessage('Message from User B');
+
+        await userCPages.conversationList().openConversation(conversationName);
+        await userCPages.conversation().sendMessage('Message from User C');
+
+        // Step 3: User A selects 'Clear Conversation' option from the Conversation List Context Menu
+        await userAPages.conversationList().openContextMenu(conversationName);
+
+        // Step 4: Warning Popup should open
+        // Step 5: Confirm the Popup
+        // Step 6: Verify that the conversation does not contain any past messages
       },
     );
   });
