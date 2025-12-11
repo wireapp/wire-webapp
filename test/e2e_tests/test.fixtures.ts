@@ -21,7 +21,7 @@ import {test as baseTest, type BrowserContext, type Page} from '@playwright/test
 
 import {ApiManagerE2E} from './backend/apiManager.e2e';
 import {getUser, User} from './data/user';
-import {PageManager, webAppPath} from './pageManager';
+import {PageManager} from './pageManager';
 import {connectWithUser, sendConnectionRequest} from './utils/userActions';
 
 type PagePlugin = (page: Page) => void | Promise<void>;
@@ -159,16 +159,8 @@ export const withLogin =
     const pageManager = PageManager.from(page);
     await pageManager.openLoginPage();
     await pageManager.webapp.pages.login().login(await user);
-
-    if (options?.confirmNewHistory) {
-      await pageManager.webapp.pages.historyInfo().clickConfirmButton();
-    }
-
-    /**
-     * Since the login may take up to 40s we manually wait for it to finish here instead of increasing the timeout on all actions / assertions after this util
-     * This is an exception to the general best practice of using playwrights web assertions. (See: https://playwright.dev/docs/best-practices#use-web-first-assertions)
-     */
-    await page.waitForURL(new RegExp(`^${webAppPath}$`), {timeout: 40_000, waitUntil: 'networkidle'});
+    // Wait for the sidebar to be visible after login to ensure the app is fully loaded
+    await pageManager.webapp.components.conversationSidebar().sidebar.waitFor({state: 'visible', timeout: 80_000});
   };
 
 /**
