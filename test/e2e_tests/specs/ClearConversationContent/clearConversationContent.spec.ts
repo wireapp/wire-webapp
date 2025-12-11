@@ -68,11 +68,52 @@ test.describe('Clear Conversation Content', () => {
       await userAPages.conversationList().clearContentButton.click();
       // Step 4: Warning Popup should open
       await expect(userAModals.optionModal().modal).toBeVisible();
-      // Step 5: Confirm the Popup
+      // Step 5: User A clicks 'Clear'
       await userAModals.optionModal().clickAction();
       // Step 6: Verify that the conversation does not contain any past messages
       await userAPages.conversationList().openConversation(conversationName);
       await expect(userAPages.conversation().messages).toHaveCount(0);
+    },
+  );
+
+  test(
+    'I want to cancel clearing content of a group conversation via conversation list',
+    {tag: ['@TC-153', '@regression']},
+    async ({createPage}) => {
+      const [userAPageManager, userBPageManager, userCPageManager] = await Promise.all([
+        PageManager.from(createPage(withLogin(userA), withConnectedUser(userB), withConnectedUser(userC))),
+        PageManager.from(createPage(withLogin(userB))),
+        PageManager.from(createPage(withLogin(userC))),
+      ]);
+
+      const {pages: userAPages, modals: userAModals} = userAPageManager.webapp;
+      const userBPages = userBPageManager.webapp.pages;
+      const userCPages = userCPageManager.webapp.pages;
+
+      // Step 1: Create a group conversation with User A, B and C
+      const conversationName = 'Group conversation';
+      await createGroup(userAPages, conversationName, [userB, userC]);
+
+      // Step 2: Write messages in the  group conversation
+      await userAPages.conversationList().openConversation(conversationName);
+      await userAPages.conversation().sendMessage('Message from User A');
+
+      await userBPages.conversationList().openConversation(conversationName);
+      await userBPages.conversation().sendMessage('Message from User B');
+
+      await userCPages.conversationList().openConversation(conversationName);
+      await userCPages.conversation().sendMessage('Message from User C');
+
+      // Step 3: User A selects 'Clear Conversation' option from the Conversation List Context Menu
+      await userAPages.conversationList().openContextMenu(conversationName);
+      await userAPages.conversationList().clearContentButton.click();
+      // Step 4: Warning Popup should open
+      await expect(userAModals.optionModal().modal).toBeVisible();
+      // Step 5: User A clicks 'Cancel'
+      await userAModals.optionModal().clickCancel();
+      // Step 6: Verify that the conversation does not contain any past messages
+      await userAPages.conversationList().openConversation(conversationName);
+      await expect(userAPages.conversation().messages).toHaveCount(3);
     },
   );
 });
