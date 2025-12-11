@@ -31,6 +31,7 @@ import {amplify} from 'amplify';
 import axios from 'axios';
 import ko from 'knockout';
 import {container} from 'tsyringe';
+import {debounce} from 'underscore';
 import 'webrtc-adapter';
 
 import {
@@ -143,6 +144,8 @@ type SubconversationData = {
   secretKey: string;
   members: SubconversationEpochInfoMember[];
 };
+
+const DEBOUNCE_TIMEOUT = 100;
 
 export class CallingRepository {
   private readonly acceptVersionWarning: (conversationId: QualifiedId) => void;
@@ -347,7 +350,7 @@ export class CallingRepository {
     return {wCall: this.wCall, wUser: this.wUser};
   }
 
-  private onMediaDevicesRefresh = () => {
+  private onMediaDevicesRefresh = debounce(() => {
     const activeCall = this.callState.joinedCall();
 
     if (!activeCall) {
@@ -363,7 +366,7 @@ export class CallingRepository {
     if (selfParticipant.isSendingVideo()) {
       void this.refreshVideoInput();
     }
-  };
+  }, DEBOUNCE_TIMEOUT);
 
   setReady(): void {
     this.isReady = true;
