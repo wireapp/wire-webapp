@@ -382,7 +382,6 @@ export class CallingRepository {
     wCall.setVideoStreamHandler(this.updateParticipantVideoStream);
     this.isConferenceCallingSupported = wCall.isConferenceCallingSupported();
     let last = Date.now();
-
     setInterval(() => {
       // When the app enters sleep mode, no JavaScript is executed and the timer stops. We then determine this by
       // calculating the time difference.
@@ -391,7 +390,11 @@ export class CallingRepository {
 
       if (diff > AVS_BROWSER_SLEEP_MODE_DETECTION_TIME) {
         // Inform AVS that the app was in sleep mode. This recalibrates the timers within AVS
-        wCall.setBackground(this.wUser, 0);
+        try {
+          wCall.setBackground(this.wUser, 0);
+        } catch (e) {
+          this.logger.warn(`Informed AVS about background mode failed". ${e}`);
+        }
       }
 
       wCall.poll();
