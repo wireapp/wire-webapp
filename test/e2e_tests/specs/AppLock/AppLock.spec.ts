@@ -17,41 +17,41 @@
  *
  */
 
-import {getUser} from 'test/e2e_tests/data/user';
+import {User} from 'test/e2e_tests/data/user';
+import {PageManager} from 'test/e2e_tests/pageManager';
 import {checkAnyIndexedDBExists} from 'test/e2e_tests/utils/indexedDB.util';
-import {completeLogin, bootstrapTeamForTesting} from 'test/e2e_tests/utils/setup.util';
-import {tearDownAll} from 'test/e2e_tests/utils/tearDown.util';
 import {handleAppLockState} from 'test/e2e_tests/utils/userActions';
 
-import {test, expect} from '../../test.fixtures';
+import {test, expect, withLogin} from '../../test.fixtures';
 
 test.describe('AppLock', () => {
-  let owner = getUser();
-  const members = Array.from({length: 2}, () => getUser());
-  const [memberA] = members;
+  let owner: User;
+  let memberA: User;
   const teamName = 'AppLock';
   const appLockPassCode = '1a3!567N4';
 
-  test.beforeAll(async ({api}) => {
-    const user = await bootstrapTeamForTesting(api, members, owner, teamName);
-    owner = {...owner, ...user};
+  test.beforeEach(async ({api, createTeam}) => {
+    const team = await createTeam(teamName, {withMembers: 1});
+    owner = team.owner;
+    memberA = team.members[0];
+
     await api.brig.toggleAppLock(owner.teamId, 'enabled', true);
   });
 
   test(
     'I want to see app lock setup modal on login after app lock has been enforced for the team',
     {tag: ['@TC-2744', '@TC-2740', '@regression']},
-    async ({page, pageManager}) => {
-      const {modals} = pageManager.webapp;
+    async ({createPage}) => {
+      const page = await createPage(withLogin(memberA));
+      const {modals} = PageManager.from(page).webapp;
 
-      await completeLogin(pageManager, memberA);
-      await expect(modals.appLock().isVisible()).toBeTruthy();
+      await expect(modals.appLock().appLockModal).toBeVisible();
 
       await test.step('Web: I should not be able to close app lock setup modal if app lock is enforced', async () => {
         // click outside the modal
         await page.mouse.click(200, 350);
         // check if the modal still there
-        expect(await modals.appLock().isVisible()).toBeTruthy();
+        await expect(modals.appLock().appLockModal).toBeVisible();
       });
     },
   );
@@ -59,16 +59,17 @@ test.describe('AppLock', () => {
   test(
     'Web: App should not lock if I switch back to webapp tab in time (during inactivity timeout)',
     {tag: ['@TC-2752', '@TC-2753', '@regression']},
-    async ({page: webappPageA, pageManager, browser}) => {
+    async ({browser, createPage}) => {
+      const page = await createPage(withLogin(memberA));
+      const pageManager = PageManager.from(page);
       const {modals} = pageManager.webapp;
 
-      await completeLogin(pageManager, memberA);
       await handleAppLockState(pageManager, appLockPassCode);
       const unrelatedPage = await browser.newPage();
       await unrelatedPage.goto('about:blank');
       await unrelatedPage.bringToFront();
       await unrelatedPage.waitForTimeout(2_000); // open be only 2 sec in the other tab
-      await webappPageA.bringToFront();
+      await page.bringToFront();
 
       await expect(modals.appLock().appLockModalHeader).not.toBeVisible();
 
@@ -76,7 +77,7 @@ test.describe('AppLock', () => {
         await unrelatedPage.goto('about:blank');
         await unrelatedPage.bringToFront();
         await unrelatedPage.waitForTimeout(31_000);
-        await webappPageA.bringToFront();
+        await page.bringToFront();
         await expect(modals.appLock().appLockModalHeader).toBeVisible();
       });
     },
@@ -85,16 +86,16 @@ test.describe('AppLock', () => {
   test(
     'Web: I want to unlock the app with passphrase after login',
     {tag: ['@TC-2754', '@TC-2755', '@TC-2758', '@TC-2763', '@regression']},
-    async ({page, pageManager}) => {
+    async ({createPage}) => {
+      const page = await createPage(withLogin(memberA));
+      const pageManager = PageManager.from(page);
       const {modals, pages} = pageManager.webapp;
-
-      await completeLogin(pageManager, memberA);
 
       await test.step('Web: I want the app to automatically lock after refreshing the page', async () => {
         await handleAppLockState(pageManager, appLockPassCode);
         await pageManager.refreshPage();
 
-        expect(await modals.appLock().isVisible()).toBeTruthy();
+        await expect(modals.appLock().appLockModal).toBeVisible();
       });
 
       await test.step('Web: I should not be able to unlock the app with wrong passphrase', async () => {
@@ -123,9 +124,10 @@ test.describe('AppLock', () => {
   test(
     'I should not be able to switch off app lock if it is enforced for the team',
     {tag: ['@TC-2770', '@TC-2767', '@regression']},
-    async ({page, pageManager}) => {
+    async ({createPage}) => {
+      const page = await createPage(withLogin(memberA));
+      const pageManager = PageManager.from(page);
       const {components, pages} = pageManager.webapp;
-      await completeLogin(pageManager, memberA);
       await handleAppLockState(pageManager, appLockPassCode);
       await components.conversationSidebar().clickPreferencesButton();
 
@@ -138,12 +140,13 @@ test.describe('AppLock', () => {
     },
   );
 
-  test('I want to switch off app lock', {tag: ['@TC-2771', '@TC-2772', '@regression']}, async ({pageManager, api}) => {
+  test('I want to switch off app lock', {tag: ['@TC-2771', '@TC-2772', '@regression']}, async ({api, createPage}) => {
     await api.brig.toggleAppLock(owner.teamId, 'enabled', false);
 
+    const page = await createPage(withLogin(memberA));
+    const pageManager = PageManager.from(page);
     const {components, pages, modals} = pageManager.webapp;
 
-    await completeLogin(pageManager, memberA);
     await components.conversationSidebar().clickPreferencesButton();
     await pages.account().toggleAppLock();
     await handleAppLockState(pageManager, appLockPassCode);
@@ -157,13 +160,8 @@ test.describe('AppLock', () => {
   test.skip(
     'Web: Verify inactivity timeout can be set if app lock is not enforced on a team level',
     {tag: ['@TC-2772', '@regression']},
-    async ({pageManager, api}) => {
-      await completeLogin(pageManager, memberA);
+    async () => {
       // not implemented
     },
   );
-
-  test.afterAll(async ({api}) => {
-    await tearDownAll(api);
-  });
 });
