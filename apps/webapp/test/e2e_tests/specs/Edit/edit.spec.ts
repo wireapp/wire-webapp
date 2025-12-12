@@ -72,8 +72,7 @@ test.describe('Edit', () => {
       const deviceA = (await PageManager.from(createPage(withLogin(userA), withConnectedUser(userB)))).webapp.pages;
 
       // Device 2 is intentionally created after device 1 to ensure the history info warning is confirmed
-      const deviceB = (await PageManager.from(createPage(withLogin(userA)))).webapp.pages;
-      await deviceB.historyInfo().clickConfirmButton();
+      const deviceB = (await PageManager.from(createPage(withLogin(userA, {confirmNewHistory: true})))).webapp.pages;
       await deviceB.conversationList().openConversation(userB.fullName);
 
       await deviceA.conversation().sendMessage('Message from device 1');

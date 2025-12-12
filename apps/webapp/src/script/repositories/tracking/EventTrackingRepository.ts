@@ -223,7 +223,7 @@ export class EventTrackingRepository {
 
     this.isProductReportingActivated = true;
 
-    const {COUNTLY_ENABLE_LOGGING, VERSION, COUNTLY_API_KEY} = Config.getConfig();
+    const {COUNTLY_ENABLE_LOGGING, VERSION, COUNTLY_API_KEY, COUNTLY_SERVER_URL} = Config.getConfig();
 
     // Initialize telemetry if it is not initialized yet
     if (!this.telemetryInitialized) {
@@ -237,7 +237,7 @@ export class EventTrackingRepository {
         provider: {
           apiKey: COUNTLY_API_KEY,
           enableLogging: COUNTLY_ENABLE_LOGGING,
-          serverUrl: 'https://countly.wire.com/',
+          serverUrl: COUNTLY_SERVER_URL,
           autoErrorTracking: false,
         },
       });
@@ -255,6 +255,11 @@ export class EventTrackingRepository {
     }
 
     const device_id = Boolean(trackingId.length) ? trackingId : this.telemetryDeviceId;
+
+    if (!device_id) {
+      this.telemetryLogger.error('Telemetry device id is not defined');
+      return;
+    }
 
     telemetry.changeDeviceId(device_id);
     telemetry.disableOfflineMode(device_id);

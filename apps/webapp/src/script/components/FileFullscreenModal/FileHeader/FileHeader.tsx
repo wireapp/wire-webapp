@@ -19,10 +19,21 @@
 
 import {container} from 'tsyringe';
 
-import {BadgesWithTooltip, Button, ButtonVariant, CloseIcon, DownloadIcon, ShowIcon} from '@wireapp/react-ui-kit';
+import {
+  BadgesWithTooltip,
+  Button,
+  ButtonVariant,
+  CloseIcon,
+  DownloadIcon,
+  DropdownMenu,
+  MoreIcon,
+  ShowIcon,
+} from '@wireapp/react-ui-kit';
 
+import {useFileHistoryModal} from 'Components/components/Modals/FileHistoryModal/hooks/useFileHistoryModal';
 import {FileTypeIcon} from 'Components/Conversation/common/FileTypeIcon/FileTypeIcon';
 import {EditIcon} from 'Components/Icon';
+import {iconStyles} from 'Components/MessagesList/Message/ContentMessage/asset/MultipartAssets/FileAssetCard/common/FileAssetOptions/FileAssetOptions.styles';
 import {MessageTime} from 'Components/MessagesList/Message/MessageTime';
 import {useRelativeTimestamp} from 'Hooks/useRelativeTimestamp';
 import {CellsRepository} from 'Repositories/cells/CellsRepository';
@@ -53,6 +64,7 @@ interface FileHeaderProps {
   isEditable?: boolean;
   isInEditMode?: boolean;
   onEditModeChange: (isEditable: boolean) => void;
+  onFileContentRefresh: () => void;
 }
 
 export const FileHeader = ({
@@ -67,10 +79,12 @@ export const FileHeader = ({
   isEditable,
   isInEditMode,
   onEditModeChange,
+  onFileContentRefresh,
 }: FileHeaderProps) => {
   const timeAgo = useRelativeTimestamp(timestamp);
   const fileNameWithExtension = getFileNameWithExtension(fileName, fileExtension);
   const cellsRepository = container.resolve(CellsRepository);
+  const {showModal} = useFileHistoryModal();
 
   const handleFileDownload = async () => {
     if (fileUrl) {
@@ -132,6 +146,20 @@ export const FileHeader = ({
         >
           <DownloadIcon />
         </Button>
+        {isEditable && (
+          <DropdownMenu>
+            <DropdownMenu.Trigger asChild>
+              <Button variant={ButtonVariant.TERTIARY} css={downloadButtonStyles} aria-label={t('cells.options.label')}>
+                <MoreIcon css={iconStyles} />
+              </Button>
+            </DropdownMenu.Trigger>
+            <DropdownMenu.Content>
+              <DropdownMenu.Item onClick={() => showModal(id, () => onFileContentRefresh())}>
+                {t('cells.options.versionHistory')}
+              </DropdownMenu.Item>
+            </DropdownMenu.Content>
+          </DropdownMenu>
+        )}
       </div>
     </header>
   );

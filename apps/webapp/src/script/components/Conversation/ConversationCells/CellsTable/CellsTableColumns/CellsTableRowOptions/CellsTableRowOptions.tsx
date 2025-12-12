@@ -17,13 +17,14 @@
  *
  */
 
-import {useState} from 'react';
+import {useCallback, useState} from 'react';
 
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 
 import {DropdownMenu, MoreIcon} from '@wireapp/react-ui-kit';
 
 import {useAppNotification} from 'Components/AppNotification/AppNotification';
+import {useFileHistoryModal} from 'Components/components/Modals/FileHistoryModal/hooks/useFileHistoryModal';
 import {openFolder} from 'Components/Conversation/ConversationCells/common/openFolder/openFolder';
 import {
   isInRecycleBin,
@@ -95,6 +96,7 @@ const CellsTableRowOptionsContent = ({
   const [isMoveNodeModalOpen, setIsMoveNodeModalOpen] = useState(false);
   const [isTagsModalOpen, setIsTagsModalOpen] = useState(false);
   const [isRenameNodeModalOpen, setIsRenameNodeModalOpen] = useState(false);
+  const {showModal} = useFileHistoryModal();
 
   const url = node.url;
   const name = node.type === CellNodeType.FOLDER ? `${node.name}.zip` : node.name;
@@ -126,6 +128,11 @@ const CellsTableRowOptionsContent = ({
   const isNestedRecycleBin = isInRecycleBin();
 
   const isEditable = node.type === CellNodeType.FILE && isFileEditable(node.extension);
+
+  const onConfirmRestore = useCallback(() => {
+    onRefresh();
+    handleOpenFile(node, false);
+  }, [handleOpenFile, node, onRefresh]);
 
   if (isRootRecycleBin || isNestedRecycleBin) {
     return (
@@ -196,7 +203,12 @@ const CellsTableRowOptionsContent = ({
         <DropdownMenu.Item onClick={() => setIsMoveNodeModalOpen(true)}>{t('cells.options.move')}</DropdownMenu.Item>
         <DropdownMenu.Item onClick={() => setIsTagsModalOpen(true)}>{t('cells.options.tags')}</DropdownMenu.Item>
         {isEditable && (
-          <DropdownMenu.Item onClick={() => handleOpenFile(node, true)}>{t('cells.options.edit')}</DropdownMenu.Item>
+          <>
+            <DropdownMenu.Item onClick={() => handleOpenFile(node, true)}>{t('cells.options.edit')}</DropdownMenu.Item>
+            <DropdownMenu.Item onClick={() => showModal(node.id, onConfirmRestore)}>
+              {t('cells.options.versionHistory')}
+            </DropdownMenu.Item>
+          </>
         )}
         <DropdownMenu.Item
           onClick={() =>

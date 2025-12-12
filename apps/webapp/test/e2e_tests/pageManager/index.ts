@@ -47,6 +47,7 @@ import {ErrorModal} from './webapp/modals/error.modal';
 import {ExportBackupModal} from './webapp/modals/exportBackup.modal';
 import {importBackupModal} from './webapp/modals/importBackup.modal';
 import {LeaveConversationModal} from './webapp/modals/leaveConversation.modal';
+import {OptionModal} from './webapp/modals/option.modal';
 import {PasswordModal} from './webapp/modals/password.modal';
 import {RemoveMemberModal} from './webapp/modals/removeMember.modal';
 import {UnableToOpenConversationModal} from './webapp/modals/unableToOpenConversation.modal';
@@ -88,7 +89,7 @@ const teamManagementPath = process.env.TEAM_MANAGEMENT_URL ?? '';
 export class PageManager {
   private readonly cache = new Map<string, any>();
 
-  constructor(private readonly page: Page) {}
+  constructor(readonly page: Page) {}
 
   static from(page: Page): PageManager;
   static from(page: Promise<Page>): Promise<PageManager>;
@@ -135,10 +136,6 @@ export class PageManager {
 
   getContext = () => {
     return this.page.context();
-  };
-
-  getPage = async () => {
-    return await this.page;
   };
 
   waitForRequest = (url: string) => {
@@ -231,6 +228,7 @@ export class PageManager {
         this.getOrCreate('webapp.modals.cellsFileDetailView', () => new CellsFileDetailViewModal(this.page)),
       cancelRequest: () =>
         this.getOrCreate('webapp.modals.cancelRequestModal', () => new CancelRequestModal(this.page)),
+      optionModal: () => this.getOrCreate('webapp.modals.optionModal', () => new OptionModal(this.page)),
     },
     components: {
       contactList: () => this.getOrCreate('webapp.components.ContactList', () => new ContactList(this.page)),

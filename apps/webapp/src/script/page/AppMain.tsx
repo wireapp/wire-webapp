@@ -29,6 +29,7 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {CallingContainer} from 'Components/calling/CallingOverlayContainer';
 import {ChooseScreen} from 'Components/calling/ChooseScreen';
+import {FileHistoryModal} from 'Components/components/Modals/FileHistoryModal/FileHistoryModal';
 import {ConfigToolbar} from 'Components/ConfigToolbar/ConfigToolbar';
 import {ErrorFallback} from 'Components/ErrorFallback';
 import {CreateConversationModal} from 'Components/Modals/CreateConversation/CreateConversaionModal';
@@ -361,6 +362,7 @@ export const AppMain = ({
           <UserModal selfUser={selfUser} userRepository={repositories.user} />
           <GroupCreationModal userState={userState} teamState={teamState} />
           <CreateConversationModal />
+          <FileHistoryModal />
           <TeamCreationModalContainer
             selfUser={selfUser}
             teamRepository={repositories.team}

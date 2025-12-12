@@ -12,6 +12,7 @@ jobs:
     if: ${{github.actor == 'dependabot[bot]' || github.actor == 'otto-the-bot'}}
     steps:
       - name: Approve PR
+        if: ${{ github.actor == 'otto-the-bot' || (github.actor == 'dependabot[bot]' && (steps.dependabot-metadata.outputs.update-type != 'version-update:semver-major')) }}
         run: gh pr review --approve "$PR_URL"
         env:
           GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
