@@ -106,6 +106,7 @@ import type {ServerTimeHandler} from '../../time/serverTimeHandler';
 import {Warnings} from '../../view_model/WarningsContainer';
 
 const avsLogger = getLogger('avs');
+const AVS_BROWSER_SLEEP_MODE_DETECTION_TIME = 3000;
 
 interface MediaStreamQuery {
   audio?: boolean;
@@ -380,7 +381,23 @@ export class CallingRepository {
     wCall.setAudioStreamHandler(this.updateCallAudioStreams);
     wCall.setVideoStreamHandler(this.updateParticipantVideoStream);
     this.isConferenceCallingSupported = wCall.isConferenceCallingSupported();
-    setInterval(() => wCall.poll(), 500);
+    let last = Date.now();
+
+    setInterval(() => {
+      // When the app enters sleep mode, no JavaScript is executed and the timer stops. We then determine this by
+      // calculating the time difference.
+      const now = Date.now();
+      const diff = now - last;
+
+      if (diff > AVS_BROWSER_SLEEP_MODE_DETECTION_TIME) {
+        // Inform AVS that the app was in sleep mode. This recalibrates the timers within AVS
+        wCall.setBackground(this.wUser, 0);
+      }
+
+      wCall.poll();
+      last = now;
+    }, 500);
+
     return wCall;
   }
 
