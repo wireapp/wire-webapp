@@ -24,12 +24,12 @@ const archive = archiver('zip');
 
 const ROOT_PATH = path.resolve(__dirname, '..');
 const SERVER_PATH = path.resolve(ROOT_PATH, 'apps/server');
-const DIST_PATH = path.resolve(ROOT_PATH, 'apps/server/dist');
-const S3_PATH = path.resolve(ROOT_PATH, 'apps/server/dist/s3');
+const DIST_PATH = path.resolve(SERVER_PATH, 'dist');
+const S3_PATH = path.resolve(DIST_PATH, 's3');
 
 archive.file(path.join(SERVER_PATH, 'package.json'), {name: 'package.json'});
-archive.file(path.join(ROOT_PATH, '.env.defaults'), {name: '.env.defaults'});
-archive.file(path.join(ROOT_PATH, 'Procfile'), {name: 'Procfile'});
+archive.file(path.join(SERVER_PATH, '.env.defaults'), {name: '.env.defaults'});
+archive.file(path.join(SERVER_PATH, 'Procfile'), {name: 'Procfile'});
 archive.directory(DIST_PATH, false);
 
 if (!fs.existsSync(S3_PATH)) {
