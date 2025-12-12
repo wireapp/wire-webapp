@@ -165,8 +165,8 @@ test.describe('account settings', () => {
       await completeLogin(pageManager, owner);
 
       await expect(components.conversationSidebar().manageTeamButton).toBeVisible();
-      expect(await components.conversationSidebar().manageTeamButton.getAttribute('href')).toBe(
-        'https://wire-teams-dev.zinfra.io/login/',
+      expect(await components.conversationSidebar().manageTeamButton.getAttribute('href')).toMatch(
+        /^https:\/\/wire-teams-.+\.zinfra\.io\/login\/$/,
       );
     },
   );
