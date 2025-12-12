@@ -138,4 +138,29 @@ test.describe('Calling', () => {
       await expect.poll(() => isPlayingAudio(userBPage2, AudioType.INCOMING_CALL)).toBe(false);
     },
   );
+
+  test(
+    'Verify I can make another call while current one is ignored',
+    {tag: ['@TC-2803', '@regression']},
+    async ({createPage}) => {
+      const [userAPages, userBPages] = await Promise.all([
+        PageManager.from(createPage(withLogin(userA), withConnectedUser(userB))).then(pm => pm.webapp.pages),
+        PageManager.from(createPage(withLogin(userB), withConnectedUser(userC))).then(pm => pm.webapp.pages),
+      ]);
+
+      // User A calls user B
+      await userAPages.conversationList().openConversation(userB.fullName);
+      await userAPages.conversation().clickCallButton();
+
+      // User B declines the call
+      await userBPages.calling().clickLeaveCallButton();
+      await expect(userBPages.calling().callCell).not.toBeVisible();
+
+      // User B calls user C instead
+      await userBPages.conversationList().openConversation(userC.fullName);
+      await expect(userBPages.conversation().callButton).toBeEnabled();
+      await userBPages.conversation().startCall();
+      await expect(userBPages.calling().callCell).toBeVisible();
+    },
+  );
 });
