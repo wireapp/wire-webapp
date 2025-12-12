@@ -193,7 +193,7 @@ const SingleSignOnComponent = ({hasDefaultSSOCode}: Props & ConnectedProps & Dis
         <Overlay>
           <Container centerText style={{color: COLOR.WHITE, maxWidth: '330px'}}>
             <div style={{alignItems: 'center', display: 'flex', justifyContent: 'center', marginBottom: '30px'}}>
-              <Logo height={24} color={COLOR.WHITE} />
+              <Logo height={24} color={COLOR.WHITE} ariaLabel={t('accessibility.logo.wire')} />
             </div>
             <Text
               style={{fontSize: '0.875rem', fontWeight: 400, marginTop: '32px'}}
