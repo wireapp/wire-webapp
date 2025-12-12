@@ -1,0 +1,52 @@
+{
+  "name": "server",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "apps/server",
+  "projectType": "application",
+  "targets": {
+    "build": {
+      "executor": "nx:run-commands",
+      "outputs": ["{projectRoot}/dist"], // compiled server + assets
+      "options": {
+        "commands": [
+          "rimraf apps/server/dist",
+          "tsc -p apps/server/tsconfig.json",
+          "node apps/server/bin/generateVersionFile.js",
+          "node apps/server/bin/copy_server_assets.js"
+        ],
+        "parallel": false // run in order, artifacts depend on ts output
+      }
+    },
+    "serve": {
+      "executor": "@nx/js:node",
+      "options": {
+        "buildTarget": "server:build",
+        "buildTargetOptions": {
+          "outputPath": "apps/server/dist",
+          "outputFileName": "index.js"
+        },
+        "watch": true // rebuild & restart on change
+      },
+      "configurations": {
+        "production": {
+          "buildTarget": "server:build"
+        }
+      }
+    },
+    "test": {
+      "executor": "@nx/jest:jest",
+      "outputs": ["{workspaceRoot}/coverage/apps/server"],
+      "options": {
+        "jestConfig": "apps/server/jest.config.js",
+        "passWithNoTests": true
+      }
+    },
+    "type-check": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "tsc --project apps/server/tsconfig.json --noEmit"
+      }
+    }
+  },
+  "tags": ["type:app", "scope:backend"]
+}

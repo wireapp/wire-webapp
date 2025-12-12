@@ -9,6 +9,7 @@
 /package-lock.json
 /resource
 /temp
+/apps/webapp/resource
 CHANGELOG.md
 node_modules
 npm-debug.log
@@ -34,3 +35,7 @@ yalc.lock
 /blob-report/
 /playwright/.cache/
 /test/e2e_tests/.env
+
+# Nx
+.nx/
+apps/server/dist/

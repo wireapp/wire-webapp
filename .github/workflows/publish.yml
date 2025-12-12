@@ -28,7 +28,7 @@ jobs:
       build_artifact: ${{ env.BUILD_ARTIFACT }}
 
     env:
-      BUILD_DIR: server/dist/s3/
+      BUILD_DIR: apps/server/dist/s3/
       BUILD_ARTIFACT: ebs.zip
       COMMIT_URL: ${{github.event.head_commit.url}}
       COMMITTER: ${{github.event.head_commit.committer.name}}
@@ -63,12 +63,12 @@ jobs:
         run: yarn --immutable
 
       - name: Update configuration
-        run: yarn configure
+        run: yarn nx run webapp:configure
 
       - name: Test
         run: |
           set -o pipefail
-          yarn test --detectOpenHandles=false 2>&1 | tee ${{ env.UNIT_TEST_REPORT_FILE }}
+          yarn nx run-many -t test --all -- --detectOpenHandles=false 2>&1 | tee ${{ env.UNIT_TEST_REPORT_FILE }}
           echo -e "COMMIT SHA = ${{ github.sha }}" >> ${{env.UNIT_TEST_REPORT_FILE}}
           echo -e "TEST RUN DATE = $(date -u +'%Y-%m-%dT%H:%M:%SZ')" >> ${{env.UNIT_TEST_REPORT_FILE}}
 
@@ -87,7 +87,7 @@ jobs:
           aws s3 cp ${{env.UNIT_TEST_REPORT_FILE}} s3://wire-webapp/unit-tests-${TIMESTAMP}-${{ github.sha }}.log
 
       - name: Build
-        run: yarn build:prod
+        run: yarn nx run-many -t build --all
 
       - uses: actions/upload-artifact@v4
         with:
@@ -113,7 +113,7 @@ jobs:
         id: generate_changelog
         if: ${{ env.changelog_type }}
         run: |
-          yarn changelog:${{ env.changelog_type }} > ${{ env.CHANGELOG_FILE }}
+          yarn nx run workspace-tools:changelog-${{ env.changelog_type }} > ${{ env.CHANGELOG_FILE }}
           echo "changelog=${{ env.CHANGELOG_FILE }}" >> $GITHUB_OUTPUT
 
       - uses: actions/upload-artifact@v4

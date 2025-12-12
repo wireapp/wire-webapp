@@ -19,7 +19,7 @@ jobs:
       total_additions: ${{ steps.check_additions.outputs.total_additions }}
 
     env:
-      BUILD_DIR: server/dist/s3/
+      BUILD_DIR: apps/server/dist/s3/
       BUILD_ARTIFACT: ebs.zip
       COMMIT_URL: ${{github.event.head_commit.url}}
       COMMITTER: ${{github.event.head_commit.committer.name}}
@@ -43,10 +43,10 @@ jobs:
         run: yarn --immutable
 
       - name: Update configuration
-        run: yarn configure
+        run: yarn nx run webapp:configure
 
       - name: Build
-        run: yarn build:prod
+        run: yarn nx run-many -t build --all
 
       - uses: actions/upload-artifact@v4
         with:

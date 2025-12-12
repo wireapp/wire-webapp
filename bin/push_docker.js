@@ -20,7 +20,7 @@
  */
 
 const child = require('child_process');
-const appConfigPkg = require('../app-config/package.json');
+const appConfigPkg = require('../apps/webapp/app-config/package.json');
 
 require('dotenv').config();
 
@@ -64,7 +64,7 @@ tags.push(`${repository}:${uniqueTag}`);
 
 const dockerCommands = [
   `echo "$DOCKER_PASSWORD" | docker login --username "$DOCKER_USERNAME" --password-stdin ${dockerRegistryDomain}`,
-  `docker build . --tag ${commitShortSha}`,
+  `docker build . --file apps/server/Dockerfile --tag ${commitShortSha}`,
   `if [ "${uniqueTagOut}" != "" ]; then echo -n "${uniqueTag}" > "${uniqueTagOut}"; fi`,
 ];
 

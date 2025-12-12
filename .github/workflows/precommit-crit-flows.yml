@@ -24,7 +24,7 @@ jobs:
       committer: ${{ steps.meta.outputs.committer }}
 
     env:
-      BUILD_DIR: server/dist/s3/
+      BUILD_DIR: apps/server/dist/s3/
       BUILD_ARTIFACT: ebs.zip
       CHANGELOG_FILE: ./changelog.md
       UNIT_TEST_REPORT_FILE: ./unit-tests.log
@@ -41,8 +41,8 @@ jobs:
           cache: yarn
 
       - run: yarn --immutable
-      - run: yarn configure
-      - run: yarn build:prod
+      - run: yarn nx run webapp:configure
+      - run: yarn nx run-many -t build --all
 
       - name: Derive PR commit metadata
         id: meta

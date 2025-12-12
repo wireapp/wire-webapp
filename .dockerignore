@@ -1,2 +1,2 @@
 # ignore development certificates
-/server/certificate
+/apps/server/certificate

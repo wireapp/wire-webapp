@@ -16,6 +16,16 @@ For clarity, if you compile the open source software that we make available from
 
 No license is granted to the Wire trademark and its associated logos, all of which will continue to be owned exclusively by Wire Swiss GmbH. Any use of the Wire trademark and/or its associated logos is expressly prohibited without the express prior written consent of Wire Swiss GmbH.
 
+# Monorepo layout
+
+- `apps/webapp/`: the client (Webpack/React) plus E2E tests and i18n files.
+- `apps/server/`: the node/express wrapper that serves the built webapp and handles proxying.
+- `apps/webapp/app-config/`: configuration bundles fetched via `copy-config`.
+- `apps/webapp/.copyconfigrc.js`: copy-config setup (runs from the repo root, writes into `apps/webapp/resource`).
+- Root-level tooling (`package.json`, Nx, husky, bin scripts) orchestrates both apps.
+
+The root `yarn` and `nx` scripts are the entry points; package-level scripts delegate to them.
+
 # How to build the open source client
 
 Prerequisites:
@@ -23,27 +33,28 @@ Prerequisites:
 1. Install [Node.js](https://nodejs.org/)
 1. Install [Yarn](https://yarnpkg.com)
 
-## 1. Fetching dependencies and configurations
+## 1. Install deps & fetch configuration
 
-1. Run `yarn`
-   - This will install all dependencies and fetch a [configuration](https://github.com/wireapp/wire-web-config-wire/) for the application.
+1. Run `yarn` (uses Yarn 4 workspaces)
+2. Run `yarn nx run webapp:configure` to fetch the active config bundle into `apps/webapp/resource/`
 
 ## 2. Build & run
 
 ### Development
 
-1. Rename `.env.localhost` to `.env` in order to configure the application. This configuration can override/extend the configuration from the previous step.
+1. Copy `.env.localhost` to `.env` to override/extend defaults.
 1. Add the following entries to your hosts file (macOS / Linux: `/etc/hosts`, Windows 10: `%WINDIR%\system32\drivers\etc\hosts`):
    - `127.0.0.1 local.zinfra.io` (to connect with staging backend)
    - `127.0.0.1 local.imai.wire.link` (to connect with imai backend)
-1. Run `yarn start` and Wire's web app will be available at: https://local.zinfra.io:8081/auth/
+1. Run `yarn nx build webapp --configuration=development` to build static assets
+1. Run `yarn start` (runs `nx serve server`); the app will be available at https://local.zinfra.io:8081/auth/
 
 #### Install the self-signed certificate
 
 If you would like your browser to trust the certificate from "local.wire.com"/"local.zinfra.io"/"local.imai.wire.link":
 
 1. Download [mkcert](https://github.com/FiloSottile/mkcert/releases/latest) Installation on Mac `brew install mkcert` [refer to latest readme.md](https://github.com/FiloSottile/mkcert)
-2. Set the `CAROOT` environment variable to `<WebApp Dir>/server/certificate`
+2. Set the `CAROOT` environment variable to `<WebApp Dir>/apps/server/certificate`
 3. Run `mkcert -install`
 
 #### Environment Configuration
@@ -78,20 +89,22 @@ After updating the environment variables, the app will be available at the corre
 
 ### Production
 
-1. Run `yarn build:prod`
-1. Run `cd server && yarn start:prod`
+1. Build both apps: `yarn nx run-many -t build --all`
+1. Start the server output from `apps/server/dist` (or build a Docker image with `yarn docker <tag>`)
 
 ## Testing
 
 [![codecov](https://codecov.io/gh/wireapp/wire-webapp/branch/dev/graph/badge.svg?token=9ELBEPM793)](https://codecov.io/gh/wireapp/wire-webapp)
 
-To launch the full test suite (types check + linting + server tests + app tests), simply run:
+To launch the full suite:
 
-`yarn test`
+`yarn nx run-many -t test --all`
 
-Alternatively, you can test specific parts of the app:
+Other useful tasks:
 
-`yarn test:(server|types|app)`
+- Lint: `yarn nx run-many -t lint --all`
+- Type-check: `yarn nx run-many -t type-check --all`
+- E2E (Playwright): `yarn nx e2e webapp`
 
 ## CI Status
 
