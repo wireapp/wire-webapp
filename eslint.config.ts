@@ -22,19 +22,14 @@ const ignores = [
   'docs/',
   'bin/',
   '**/node_modules/',
-  'assets/',
   'apps/webapp/assets/',
   'resource/',
   'apps/webapp/resource/',
   'apps/webapp/test/',
-  'apps/webapp/test/e2e_tests/',
   '**/__mocks__/**',
   '**/setupTests.*',
   '**/*.config.*',
-  'apps/webapp/webpack.config.*',
-  'apps/webapp/babel.config.*',
-  'apps/webapp/jest.config.*',
-  'apps/webapp/playwright.config.*',
+  'apps/webapp/*.config.*',
   'apps/webapp/src/sw.js',
   'apps/server/bin/',
   'apps/server/dist/',
@@ -47,6 +42,7 @@ const ignores = [
   '**/*.spec.*',
   '*.js',
   'apps/webapp/src/types/i18n.d.ts',
+  'apps/webapp/playwright-report/',
 ];
 
 const base = compat.extends('@wireapp/eslint-config');

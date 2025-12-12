@@ -1,12 +1,12 @@
 {
   "name": "webapp",
-  "$schema": "../../node_modules/nx/schemas/project-schema.json",
-  "sourceRoot": "apps/webapp/src",
+  "$schema": "{projectRoot}/node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "{projectRoot}/src",
   "projectType": "application",
   "targets": {
     "build": {
       "executor": "nx:run-commands",
-      "outputs": ["{projectRoot}/../../apps/server/dist/static"], // web assets land in server dist/static
+      "outputs": ["{projectRoot}/apps/server/dist/static"], // web assets land in server dist/static
       "defaultConfiguration": "production",
       "dependsOn": ["server:build"], // ensure server build before bundling webapp
       "options": {
@@ -47,33 +47,33 @@
       "executor": "@nx/playwright:playwright",
       "outputs": ["{workspaceRoot}/dist/.playwright/apps/webapp"],
       "options": {
-        "config": "apps/webapp/playwright.config.ts"
+        "config": "{projectRoot}/playwright.config.ts"
       }
     },
     "lint": {
       "executor": "nx:run-commands",
       "dependsOn": ["webapp:stylelint", "webapp:type-check"],
       "options": {
-        "command": "eslint --ext .js,.ts,.tsx apps/webapp" // typed linting via root eslintrc
+        "command": "eslint --quiet --ext .js,.ts,.tsx {projectRoot}" // typed linting via root eslintrc
       }
     },
     "stylelint": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "prettier --ignore-path ../../.prettierignore --write \"**/*.less\" && stylelint --ignore-path ../../.gitignore \"**/*.less\"", // format+lint Less assets
+        "command": "prettier --ignore-path {projectRoot}/.prettierignore --write \"**/*.less\" && stylelint --ignore-path {projectRoot}/.gitignore \"**/*.less\"", // format+lint Less assets
         "cwd": "apps/webapp"
       }
     },
     "type-check": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "tsc --project apps/webapp/tsconfig.build.json --noEmit"
+        "command": "tsc --project {projectRoot}/tsconfig.build.json --noEmit"
       }
     },
     "check-circular": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "dpdm --no-warning --no-tree -T apps/webapp/src/script/auth/main.tsx apps/webapp/src/script/main/app.ts" // detect circular deps in entrypoints
+        "command": "dpdm --no-warning --no-tree -T {projectRoot}/src/script/auth/main.tsx {projectRoot}/src/script/main/app.ts" // detect circular deps in entrypoints
       }
     },
     "translate-extract": {
@@ -86,21 +86,21 @@
     "translate-merge": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "formatjs extract --format '../../bin/translations_extract_formatter.js' --out-file './src/i18n/en-US.json'",
+        "command": "formatjs extract --format './bin/translations_extract_formatter.js' --out-file './src/i18n/en-US.json'",
         "cwd": "apps/webapp"
       }
     },
     "translate-generate-types": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "node ../../bin/transalations_generate_types.js",
+        "command": "node ./bin/transalations_generate_types.js",
         "cwd": "apps/webapp"
       }
     },
     "configure": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "copy-config --config ./.copyconfigrc.js && ts-node ../../bin/generate_react_icons.ts", // fetch env config + generate icons
+        "command": "copy-config ./.copyconfigrc.js && ts-node ./bin/generate_react_icons.ts", // fetch env config + generate icons
         "cwd": "apps/webapp"
       }
     }
