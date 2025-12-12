@@ -24,13 +24,10 @@ import {PrimaryModalType} from 'Components/Modals/PrimaryModal/PrimaryModalTypes
 import {BaseModal} from './base.modal';
 
 export class PasswordAdvancedSecurityModal extends BaseModal {
-  readonly page: Page;
-
   readonly passwordInput: Locator;
 
   constructor(page: Page) {
     super(page, PrimaryModalType.PASSWORD_ADVANCED_SECURITY);
-    this.page = page;
 
     this.passwordInput = this.modal.getByRole('textbox');
   }
