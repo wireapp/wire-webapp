@@ -102,7 +102,7 @@ export class ConversationPage {
     this.messageItems = page.locator(selectByDataAttribute('item-message'));
     /** The attribute 'send-status' will be 1 while the message is being sent, since we only want to assert on sent messages these messages will be excluded. See: {@see StatusTypes} */
     this.messages = page.locator(
-      `${selectByDataAttribute('item-message')}:not(${selectByDataAttribute('1', 'send-status')})`,
+      `${selectByDataAttribute('item-message')}:not(${selectByDataAttribute('1', 'send-status')}):not(${selectByDataAttribute('-1', 'send-status')})`,
     );
     this.messageDetails = page.locator('#message-details');
     this.filesTab = page.locator('#conversation-tab-files');
@@ -465,5 +465,12 @@ export class ConversationPage {
   async getCurrentFocusedToolTip(message: Locator) {
     await message.getByTestId('emoji-pill').first().hover();
     return this.page.locator('[data-testid="tooltip-content"]');
+  }
+
+  /**
+   * Returns the locator for the ping element within the message list.
+   */
+  getPing(): Locator {
+    return this.messageItems.locator(selectByDataAttribute('element-message-ping'));
   }
 }
