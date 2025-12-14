@@ -27,15 +27,22 @@ const SERVER_PATH = path.resolve(ROOT_PATH, 'apps/server');
 const DIST_PATH = path.resolve(SERVER_PATH, 'dist');
 const S3_PATH = path.resolve(DIST_PATH, 's3');
 
-archive.file(path.join(SERVER_PATH, 'package.json'), {name: 'package.json'});
-archive.file(path.join(SERVER_PATH, '.env.defaults'), {name: '.env.defaults'});
-archive.file(path.join(SERVER_PATH, 'Procfile'), {name: 'Procfile'});
-archive.directory(DIST_PATH, false);
-
+// Create output directory first
 if (!fs.existsSync(S3_PATH)) {
-  fs.mkdirSync(S3_PATH);
+  fs.mkdirSync(S3_PATH, {recursive: true});
 }
 const output = fs.createWriteStream(path.join(S3_PATH, 'ebs.zip'));
+
+archive.file(path.join(SERVER_PATH, 'package.json'), {name: 'package.json'});
+archive.file(path.join(ROOT_PATH, '.env.defaults'), {name: '.env.defaults'});
+archive.file(path.join(SERVER_PATH, 'Procfile'), {name: 'Procfile'});
+// Archive dist directory but exclude s3 subdirectory
+archive.glob('**/*', {
+  cwd: DIST_PATH,
+  ignore: ['s3/**', '.ebextensions/**']
+});
+// Add .ebextensions directory from server root (not from dist)
+archive.directory(path.join(SERVER_PATH, '.ebextensions'), '.ebextensions');
 
 archive.pipe(output);
 
