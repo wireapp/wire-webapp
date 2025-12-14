@@ -50,8 +50,8 @@ jobs:
           echo -e "SHORT COMMIT SHA = ${{ steps.vars.outputs.sha_short }}" >> ${{ env.UNIT_TEST_REPORT_FILE }}
           echo -e "TEST RUN DATE = $(date -u +'%Y-%m-%dT%H:%M:%SZ')" >> ${{ env.UNIT_TEST_REPORT_FILE }}
 
-      - name: Build
-        run: yarn nx run-many -t build --all
+      - name: Build and package
+        run: yarn nx run server:package
 
       - name: Push Docker image
         env:

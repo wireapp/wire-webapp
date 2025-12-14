@@ -2,22 +2,10 @@
   "name": "workspace-tools",
   "$schema": "./node_modules/nx/schemas/project-schema.json",
   "targets": {
-    "deploy": {
-      "executor": "nx:run-commands",
-      "options": {
-        "command": "nx run-many -t build --all && eb deploy"
-      }
-    },
     "docker": {
       "executor": "nx:run-commands",
       "options": {
         "command": "node ./bin/push_docker.js"
-      }
-    },
-    "zip": {
-      "executor": "nx:run-commands",
-      "options": {
-        "command": "node ./bin/zip.js"
       }
     },
     "changelog-production": {

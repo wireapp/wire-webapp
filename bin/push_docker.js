@@ -30,7 +30,7 @@ require('dotenv').config();
  *
  * To run this script, you need to have Docker installed (i.e. "Docker Desktop for Mac"). The docker daemon (or Docker for Desktop app) has to be started before running this script. Make sure to set "DOCKER_USERNAME" and "DOCKER_PASSWORD" in your local ".env" file or system environment variables.
  *
- * Note: You must run "yarn build:prod" before creating the Docker image, otherwise the compiled JavaScript code (and other assets) won't be part of the bundle.
+ * Note: You must run "yarn nx run server:package" before creating the Docker image, otherwise the compiled JavaScript code (and other assets) won't be part of the bundle.
  *
  * Demo execution:
  * yarn docker staging '2021-08-25' '1240cfda9e609470cf1154e18f5bc582ca8907ff'
