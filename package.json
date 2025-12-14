@@ -172,7 +172,7 @@
     "tsc-watch": "6.2.1",
     "typescript": "5.5.2",
     "webpack": "5.103.0",
-    "webpack-bundle-analyzer": "^4.10.2",
+    "webpack-bundle-analyzer": "^5.1.0",
     "webpack-cli": "6.0.1",
     "webpack-dev-middleware": "7.4.5",
     "webpack-hot-middleware": "2.26.1",
