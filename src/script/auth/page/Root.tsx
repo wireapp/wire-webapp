@@ -210,7 +210,7 @@ const RootComponent: FC<RootProps & ConnectedProps & DispatchProps> = ({
                 <Route
                   path=""
                   element={
-                    <Title title={`${t('authSSOLoginTitle')} . ${brandName}`}>
+                    <Title title={`${t('authLoginTitle')} . ${brandName}`}>
                       <SingleSignOn />
                     </Title>
                   }
