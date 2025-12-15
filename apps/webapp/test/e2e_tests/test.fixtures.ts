@@ -29,6 +29,7 @@ type PagePlugin = (page: Page) => void | Promise<void>;
 
 // Define custom test type with axios fixture
 type Fixtures = {
+  _beforeEach: void;
   api: ApiManagerE2E;
   pageManager: PageManager;
   /**
@@ -63,6 +64,18 @@ type Fixtures = {
 export {expect} from '@playwright/test';
 
 export const test = baseTest.extend<Fixtures>({
+  // Temporary workaround to add the test id as annotation instead of tag so Testiny can pick it up
+  _beforeEach: [
+    async ({}, use, testInfo) => {
+      const testKey = testInfo.tags.find(tag => tag.startsWith('@TC'));
+      if (testKey && !testInfo.annotations.some(annotation => annotation.type === 'testKey')) {
+        testInfo.annotations.push({type: 'testKey', description: testKey.slice(1)});
+      }
+
+      await use();
+    },
+    {auto: true},
+  ],
   api: async ({}, use) => {
     // Create a new instance of ApiManager for each test
     await use(new ApiManagerE2E());
