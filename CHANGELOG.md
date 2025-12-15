@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [9.72.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/react-ui-kit@9.71.0...@wireapp/react-ui-kit@9.72.0) (2025-12-15)
+
+### Features
+
+* add aria-label for wire logo and role(WPB-22173) ([#7682](https://github.com/wireapp/wire-web-packages/issues/7682)) ([a942ed8](https://github.com/wireapp/wire-web-packages/commit/a942ed8175bfa07866b2028f018ac36ba24096f2))
+
 # [9.71.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/react-ui-kit@9.69.6...@wireapp/react-ui-kit@9.71.0) (2025-12-02)
 
 ### Features
