@@ -92,8 +92,10 @@ export class AudioRepository {
   }
 
   private initSounds(): void {
+    const audioElementsWrapper = document.getElementById('audio-elements');
     Object.values(AudioType).forEach(audioId => {
       this.audioElements[audioId] = this.createAudioElement(`./audio/${audioId}.mp3`);
+      audioElementsWrapper?.appendChild(this.audioElements[audioId]);
     });
   }
 
