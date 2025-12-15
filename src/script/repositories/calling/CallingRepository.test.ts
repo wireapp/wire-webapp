@@ -888,7 +888,7 @@ describe('NotificationHandlingState', () => {
   } as any;
 
   const mediaDevicesHandler = {
-    setOnMediaDevicesRefreshHandler: () => null,
+    setOnMediaDevicesRefreshHandler: () => {},
   } as any;
 
   const client = new CallingRepository(
