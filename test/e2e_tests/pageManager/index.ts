@@ -64,6 +64,7 @@ import {ConversationListPage} from './webapp/pages/conversationList.page';
 import {DeleteAccountPage} from './webapp/pages/deleteAccount.page';
 import {DevicesPage} from './webapp/pages/devices.page';
 import {EmailVerificationPage} from './webapp/pages/emailVerification.page';
+import {FullScreenCallPage} from './webapp/pages/fullScreenCall.page';
 import {GroupCreationPage} from './webapp/pages/groupCreation.page';
 import {GuestOptionsPage} from './webapp/pages/guestOptions.page';
 import {HistoryExportPage} from './webapp/pages/historyExport.page';
@@ -172,6 +173,7 @@ export class PageManager {
         this.getOrCreate('webapp.pages.cellsConversationFiles', () => new CellsConversationFilesPage(this.page)),
       connectRequest: () => this.getOrCreate('webapp.pages.connectRequest', () => new ConnectRequestPage(this.page)),
       calling: () => this.getOrCreate('webapp.pages.calling', () => new CallingPage(this.page)),
+      fullScreenCall: () => this.getOrCreate('webapp.pages.fullScreenCall', () => FullScreenCallPage(this.page)),
       settings: () => this.getOrCreate('webapp.pages.settings', () => new SettingsPage(this.page)),
       devices: () => this.getOrCreate('webapp.pages.devices', () => new DevicesPage(this.page)),
       options: () => this.getOrCreate('webapp.pages.options', () => new OptionsPage(this.page)),
