@@ -5858,15 +5858,15 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@tanstack/react-virtual@npm:3.13.4":
-  version: 3.13.4
-  resolution: "@tanstack/react-virtual@npm:3.13.4"
+"@tanstack/react-virtual@npm:3.13.13":
+  version: 3.13.13
+  resolution: "@tanstack/react-virtual@npm:3.13.13"
   dependencies:
-    "@tanstack/virtual-core": "npm:3.13.4"
+    "@tanstack/virtual-core": "npm:3.13.13"
   peerDependencies:
     react: ^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0
     react-dom: ^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0
-  checksum: 10/bc32f7c30436133f0eae7c8560a22ded071972fe5baa19adde5a43921631f82707b9f2dcbb2d79882d34e163e73151980547d33970a46b1e26a2c0a3cfa0d6fd
+  checksum: 10/956747d49af0f13b499f291d2c117ded6281d664b6881f354c9f7206f95b4b4185ffab8079053fb9d6945ff7ecd836a893af3ae01f4615e7080d1b8dbdb13381
   languageName: node
   linkType: hard
 
@@ -5877,10 +5877,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@tanstack/virtual-core@npm:3.13.4":
-  version: 3.13.4
-  resolution: "@tanstack/virtual-core@npm:3.13.4"
-  checksum: 10/c18618d1d737e7a82f826b7892ac4f5763bba991400601cd1fc8d7a56d5b473ea88418dfbf08d91bb15e354c19c0f8c79b078e606a3533972683d027353033e7
+"@tanstack/virtual-core@npm:3.13.13":
+  version: 3.13.13
+  resolution: "@tanstack/virtual-core@npm:3.13.13"
+  checksum: 10/e9b01a8af99584a428e24fcc18af38a67ab63970d731a12ac0487f18c9932f3314319123240c52e1e80443069e69b80bec1d37769ec1f02f99dfe2458f35fb21
   languageName: node
   linkType: hard
 
@@ -7163,9 +7163,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@wireapp/react-ui-kit@npm:9.71.0":
-  version: 9.71.0
-  resolution: "@wireapp/react-ui-kit@npm:9.71.0"
+"@wireapp/react-ui-kit@npm:9.72.0":
+  version: 9.72.0
+  resolution: "@wireapp/react-ui-kit@npm:9.72.0"
   dependencies:
     "@radix-ui/react-accordion": "npm:1.2.11"
     "@radix-ui/react-dropdown-menu": "npm:2.1.14"
@@ -7182,7 +7182,7 @@ __metadata:
   peerDependenciesMeta:
     "@types/react":
       optional: true
-  checksum: 10/51f74f35f02d1d197400c013b8d3671fa38e8ba40b0a3f15ed10932465b86bfe091f14f35ed237b2427f57ccf12bd4828f2e7502f03a89cbebb3779b06020f9a
+  checksum: 10/7af5a9a9149626d34f84e1ecdbec98057f9cfeca7daaef5cb4e6eb24df669695c84952811cbb411c58b287fc94ff4c86e81b70347a371dcbe4f915c47b7d8c8e
   languageName: node
   linkType: hard
 
@@ -20238,7 +20238,7 @@ __metadata:
     "@playwright/test": "npm:1.57.0"
     "@roamhq/wrtc": "npm:0.9.1"
     "@tanstack/react-table": "npm:8.21.3"
-    "@tanstack/react-virtual": "npm:3.13.4"
+    "@tanstack/react-virtual": "npm:3.13.13"
     "@testing-library/dom": "npm:^10.4.1"
     "@testing-library/jest-dom": "npm:^6.9.1"
     "@testing-library/react": "npm:16.3.0"
@@ -20278,7 +20278,7 @@ __metadata:
     "@wireapp/kalium-backup": "npm:0.0.4"
     "@wireapp/prettier-config": "npm:0.6.9"
     "@wireapp/promise-queue": "npm:2.4.10"
-    "@wireapp/react-ui-kit": "npm:9.71.0"
+    "@wireapp/react-ui-kit": "npm:9.72.0"
     "@wireapp/store-engine": "npm:5.1.17"
     "@wireapp/store-engine-dexie": "npm:2.1.16"
     "@wireapp/telemetry": "npm:0.3.1"

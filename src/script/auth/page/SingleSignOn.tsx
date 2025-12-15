@@ -58,6 +58,7 @@ import {AppAlreadyOpen} from '../component/AppAlreadyOpen';
 import {BackButton} from '../component/BackButton';
 import {RootState, bindActionCreators} from '../module/reducer';
 import * as AuthSelector from '../module/selector/AuthSelector';
+import {srOnlyStyle} from '../util/a11y';
 import {getEnterpriseLoginV2FF} from '../util/helpers';
 
 type Props = React.HTMLAttributes<HTMLDivElement>;
@@ -193,7 +194,7 @@ const SingleSignOnComponent = ({hasDefaultSSOCode}: Props & ConnectedProps & Dis
         <Overlay>
           <Container centerText style={{color: COLOR.WHITE, maxWidth: '330px'}}>
             <div style={{alignItems: 'center', display: 'flex', justifyContent: 'center', marginBottom: '30px'}}>
-              <Logo height={24} color={COLOR.WHITE} />
+              <Logo height={24} color={COLOR.WHITE} ariaLabel={t('accessibility.logo.wire')} />
             </div>
             <Text
               style={{fontSize: '0.875rem', fontWeight: 400, marginTop: '32px'}}
@@ -260,13 +261,19 @@ const SingleSignOnComponent = ({hasDefaultSSOCode}: Props & ConnectedProps & Dis
                 {isEnterpriseLoginV2Enabled ? (
                   <>
                     <div
+                      aria-labelledby="sso-login-heading-label sso-login-heading-text"
                       css={{fontWeight: '500', fontSize: '1.5rem'}}
                       role="heading"
                       aria-level={1}
                       data-page-title
                       tabIndex={-1}
                     >
-                      {t('index.welcome', {brandName: Config.getConfig().BACKEND_NAME})}
+                      <span id="sso-login-heading-label" style={srOnlyStyle}>
+                        {t('authLoginTitle')}
+                      </span>
+                      <span id="sso-login-heading-text">
+                        {t('index.welcome', {brandName: Config.getConfig().BACKEND_NAME})}
+                      </span>
                     </div>
 
                     <Text block center data-uie-name="status-email-or-sso-code">

@@ -163,6 +163,7 @@ declare module 'I18n/en-US.json' {
     'accessibility.rightPanel.close': `Close conversation info`;
     'accessibility.searchInput.cancel': `Delete entry`;
     'accessibility.userProfileDeleteEntry': `Delete entry`;
+    'accessibility.logo.wire': `Wire Logo`;
     'accountAlreadyExistsModal.changeEmailLink': `Change your email address`;
     'accountAlreadyExistsModal.content': `This email\'s domain belongs to an on-premises backend. Please change your email in the account settings or delete your account. If you are part of a team please contact your team admin.`;
     'accountAlreadyExistsModal.deletePersonalAccount': `Delete personal account`;
@@ -941,6 +942,7 @@ declare module 'I18n/en-US.json' {
     'dataSharingModalDecline': `Decline`;
     'dataSharingModalDescription': `Help to improve Wire by sharing your usage data via a pseudonymous ID. The data is neither linked to your personal information nor shared with third parties besides Wire Group. It includes, for example, when you use a feature, your app version, device type, or your operating system. This data will be deleted at the latest after 365 days. <br /> Find further details in our [link]Privacy Policy[/link]. You can revoke your consent at any time.`;
     'dataSharingModalTitle': `Consent to share user data`;
+    'dataSharingModalCloseBtnTitle': `Close window, Consent to share user data`;
     'deletedUser': `Deleted User`;
     'deletedUserBadge': `Deleted`;
     'downloadLatestMLS': `Download the latest MLS Wire version`;
