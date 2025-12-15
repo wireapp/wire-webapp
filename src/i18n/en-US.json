@@ -1048,6 +1048,7 @@
   "groupParticipantActionStartConversation": "Start conversation",
   "groupParticipantActionUnblock": "Unblock…",
   "groupSizeInfo": "Up to {count} people can join a group conversation.",
+  "channelSizeInfo": "Up to {count} people can join a channel.",
   "groupsPopoverLeave": "Leave group",
   "guestLinkDisabled": "Generating guest links is not allowed in your team.",
   "guestLinkDisabledByOtherTeam": "You can't generate a guest link in this conversation, as it has been created by someone from another team and this team is not allowed to use guest links.",

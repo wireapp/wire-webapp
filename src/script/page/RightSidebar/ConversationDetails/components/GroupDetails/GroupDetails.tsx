@@ -29,6 +29,7 @@ interface GroupDetailsProps {
   serviceParticipants: ServiceEntity[];
   allUsersCount: number;
   isTeam?: boolean;
+  isChannel?: boolean;
 }
 
 const GroupDetails: FC<GroupDetailsProps> = ({
@@ -36,6 +37,7 @@ const GroupDetails: FC<GroupDetailsProps> = ({
   serviceParticipants,
   allUsersCount,
   isTeam = false,
+  isChannel = false,
 }) => {
   const hasMultipleUserParticipants = userParticipants.length > 1;
   const participantsUserText = hasMultipleUserParticipants
@@ -76,7 +78,11 @@ const GroupDetails: FC<GroupDetailsProps> = ({
           className="panel__info-text conversation-details__group-size-info"
           data-uie-name="status-group-size-info-conversation-details"
         >
-          {t('groupSizeInfo', {count: ConversationRepository.CONFIG.GROUP.MAX_SIZE})}
+          {t(isChannel ? 'channelSizeInfo' : 'groupSizeInfo', {
+            count: isChannel
+              ? ConversationRepository.CONFIG.CHANNEL.MAX_SIZE
+              : ConversationRepository.CONFIG.GROUP.MAX_SIZE,
+          })}
         </p>
       )}
     </>
