@@ -159,6 +159,7 @@
   "accessibility.rightPanel.close": "Close conversation info",
   "accessibility.searchInput.cancel": "Delete entry",
   "accessibility.userProfileDeleteEntry": "Delete entry",
+  "accessibility.logo.wire": "Wire Logo",
   "accountAlreadyExistsModal.changeEmailLink": "Change your email address",
   "accountAlreadyExistsModal.content": "This email's domain belongs to an on-premises backend. Please change your email in the account settings or delete your account. If you are part of a team please contact your team admin.",
   "accountAlreadyExistsModal.deletePersonalAccount": "Delete personal account",
