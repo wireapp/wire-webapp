@@ -21,6 +21,8 @@ import {Page, Locator} from '@playwright/test';
 
 import {selectByDataAttribute} from 'test/e2e_tests/utils/selector.util';
 
+import {FullScreenCallPage} from './fullScreenCall.page';
+
 export class CallingPage {
   readonly page: Page;
 
@@ -48,8 +50,8 @@ export class CallingPage {
     this.callCell = page.locator('[data-uie-name="item-call"]');
     this.fullScreen = page.locator('.video-calling-wrapper');
     this.goFullScreen = page.locator('[data-uie-name="do-maximize-call"]');
-    this.acceptCallButton = this.callCell.locator('[data-uie-name="do-call-controls-call-accept"]');
-    this.leaveCallButton = this.callCell.locator('[data-uie-name="do-call-controls-call-leave"]');
+    this.acceptCallButton = this.callCell.getByRole('button', {name: 'Accept'});
+    this.leaveCallButton = this.callCell.getByRole('button', {name: 'Hang Up'});
 
     // Mute / Unmute control
     this.fullScreenMuteButton = page.locator('[data-uie-name="do-call-controls-video-call-mute"]');
@@ -110,6 +112,7 @@ export class CallingPage {
 
   async maximizeCell() {
     await this.goFullScreen.click();
+    return FullScreenCallPage(this.page);
   }
 
   // ─── Mute Controls ──────────────────────────────────────────────────────

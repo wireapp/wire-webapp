@@ -41,6 +41,7 @@ export class ConversationListPage {
   readonly moveToMenu: Locator;
   readonly createNewFolderButton: Locator;
   readonly conversationListHeaderTitle: Locator;
+  readonly joinCallButton: Locator;
 
   constructor(page: Page) {
     this.page = page;
@@ -66,6 +67,7 @@ export class ConversationListPage {
     this.moveToMenu = page.getByRole('menu');
     this.createNewFolderButton = this.moveToMenu.getByRole('button', {name: 'Create new folder'});
     this.conversationListHeaderTitle = page.locator('[data-uie-name="conversation-list-header-title"]');
+    this.joinCallButton = page.getByRole('button', {name: 'Join'});
   }
 
   async isConversationItemVisible(conversationName: string) {
