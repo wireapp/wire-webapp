@@ -54,7 +54,7 @@ export class CallingPage {
     this.leaveCallButton = this.callCell.getByRole('button', {name: 'Hang Up'});
 
     // Mute / Unmute control
-    this.fullScreenMuteButton = page.locator('[data-uie-name="do-call-controls-video-call-mute"]');
+    this.fullScreenMuteButton = page.getByRole('switch', {name: 'Microphone'});
     this.fullScreenGridTileMuteIcon = page.locator('[data-uie-name="mic-icon-off"]');
 
     this.toggleVideoButton = this.callCell.locator('[data-uie-name="do-toggle-video"]');
@@ -118,16 +118,15 @@ export class CallingPage {
   // ─── Mute Controls ──────────────────────────────────────────────────────
 
   async isSelfUserMutedInFullScreen(): Promise<boolean> {
-    const state = await this.fullScreenMuteButton.getAttribute('data-uie-value');
-    return state === 'active';
+    return this.fullScreenMuteButton.isChecked();
   }
 
   async muteSelfInFullScreen() {
-    return await this.fullScreenMuteButton.click();
+    return await this.fullScreenMuteButton.check();
   }
 
   async unmuteSelfInFullScreen() {
-    await this.fullScreenMuteButton.click();
+    await this.fullScreenMuteButton.check();
   }
 
   isFullScreenMuteButtonVisible(): Promise<boolean> {

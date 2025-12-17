@@ -17,7 +17,9 @@
  *
  */
 
+import {faker} from '@faker-js/faker';
 import {test as baseTest, type BrowserContext, type Page} from '@playwright/test';
+import {FEATURE_KEY} from '@wireapp/api-client/lib/team/feature';
 
 import {ApiManagerE2E} from './backend/apiManager.e2e';
 import {getUser, User} from './data/user';
@@ -50,7 +52,11 @@ type Fixtures = {
    */
   createTeam: (
     teamName: string,
-    options?: Parameters<typeof createUser>[1] & {withMembers?: number | User[]},
+    options?: {
+      disableTelemetry?: boolean;
+      withMembers?: number | User[];
+      features?: {enterpriseCalling?: boolean};
+    },
   ) => Promise<{owner: User; members: User[]}>;
 };
 
@@ -110,12 +116,27 @@ export const test = baseTest.extend<Fixtures>({
   createTeam: async ({api}, use) => {
     const teamOwners: User[] = [];
 
-    await use(async (teamName, {withMembers, ...options} = {}) => {
-      const owner = await createUser(api, options);
+    await use(async (teamName, {withMembers, features, ...options} = {}) => {
+      const owner = !!features
+        ? await createUser(api, {
+            ...options,
+            user: {
+              firstName: 'integrationtest',
+              lastName: 'integrationtest',
+              fullName: 'integrationtest',
+              username: faker.string.uuid(),
+            },
+          })
+        : await createUser(api, options);
       const {teamId} = await api.auth.upgradeUserToTeamOwner(owner, teamName);
 
       owner.teamId = teamId;
       teamOwners.push(owner);
+
+      if (features?.enterpriseCalling) {
+        await api.enableConferenceCallingFeature(owner.teamId);
+        await api.waitForFeatureToBeEnabled(FEATURE_KEY.CONFERENCE_CALLING, owner.teamId, owner.token);
+      }
 
       let members: User[] = [];
       if (withMembers !== undefined) {
@@ -183,10 +204,10 @@ export const withConnectionRequest =
     await sendConnectionRequest(pageManager, await user);
   };
 
-const createUser = async (api: ApiManagerE2E, options?: {disableTelemetry?: boolean}) => {
+const createUser = async (api: ApiManagerE2E, options?: {disableTelemetry?: boolean; user?: Partial<User>}) => {
   const {disableTelemetry = true} = options ?? {};
 
-  const user = getUser();
+  const user = getUser(options?.user);
   await api.createPersonalUser(user);
 
   // Optionally decline to send telemetry via the api. This avoids the user being prompted for it in the UI upon first login
