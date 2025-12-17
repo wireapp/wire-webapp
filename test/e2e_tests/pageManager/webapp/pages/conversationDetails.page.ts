@@ -21,8 +21,11 @@ import {Locator, Page} from '@playwright/test';
 
 import {selectByDataAttribute, selectById, selectByClass} from 'test/e2e_tests/utils/selector.util';
 
+import {AddParticipantsSidebar} from '../components/addParticipantsSidebar.component';
+
 export class ConversationDetailsPage {
   readonly page: Page;
+  readonly component: Locator;
 
   readonly addPeopleButton: Locator;
   readonly conversationDetails: Locator;
@@ -33,6 +36,7 @@ export class ConversationDetailsPage {
 
   constructor(page: Page) {
     this.page = page;
+    this.component = page.getByRole('complementary').last();
 
     this.addPeopleButton = page.locator(`${selectByDataAttribute('go-add-people')}`);
     this.conversationDetails = page.locator('#conversation-details');
@@ -58,6 +62,7 @@ export class ConversationDetailsPage {
 
   async clickAddPeopleButton() {
     await this.addPeopleButton.click();
+    return AddParticipantsSidebar(this.component);
   }
 
   async addUsersToConversation(fullNames: string[]) {

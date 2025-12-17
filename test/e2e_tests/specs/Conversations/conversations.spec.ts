@@ -68,4 +68,25 @@ test.describe('Conversations', () => {
       await expect(userCPages.conversation().systemMessages.filter({hasText: userB.fullName})).toBeVisible();
     },
   );
+
+  test(
+    'I want to see "No matching results. Try entering a different name." when I search for non existent users',
+    {tag: ['@TC-2987', '@regression']},
+    async ({createPage}) => {
+      const pages = PageManager.from(await createPage(withLogin(userA))).webapp.pages;
+
+      await pages.conversationList().clickCreateGroup();
+      await pages.groupCreation().setGroupName('Test Group');
+      await pages.groupCreation().searchUserInput.fill('Non-existent User');
+      await expect(pages.groupCreation().contactsList).toContainText('No matching results');
+
+      await pages.groupCreation().skipButton.click();
+      await pages.conversationList().openConversation('Test Group');
+      await pages.conversation().toggleGroupInformation();
+
+      const addPeopleSidebar = await pages.conversationDetails().clickAddPeopleButton();
+      await addPeopleSidebar.searchInput.fill('Non-existent User');
+      await expect(addPeopleSidebar).toContainText('No matching results');
+    },
+  );
 });

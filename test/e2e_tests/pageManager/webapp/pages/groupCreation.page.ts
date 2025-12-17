@@ -25,8 +25,13 @@ export class GroupCreationPage {
   readonly groupCreationModal: Locator;
   readonly groupNameInput: Locator;
   readonly nextButton: Locator;
+  readonly skipButton: Locator;
   readonly createGroupButton: Locator;
+
   readonly addMembersButton: Locator;
+  readonly searchUserInput: Locator;
+  readonly contactsList: Locator;
+
   readonly filesCheckbox: Locator;
 
   constructor(page: Page) {
@@ -35,8 +40,13 @@ export class GroupCreationPage {
     this.groupCreationModal = page.locator('#group-creation-modal');
     this.groupNameInput = page.locator('[data-uie-name="enter-group-name"]');
     this.nextButton = page.locator('[data-uie-name="go-next"]');
+    this.skipButton = this.groupCreationModal.getByRole('button', {name: 'Skip', exact: true});
     this.createGroupButton = page.locator('[data-uie-name="do-create-group"]');
+
     this.addMembersButton = page.locator('[data-uie-name="do-create"]');
+    this.searchUserInput = this.groupCreationModal.getByRole('textbox', {name: 'Search by name'});
+    this.contactsList = this.groupCreationModal.getByRole('list');
+
     this.filesCheckbox = page.locator('[data-uie-name="do-toggle-cells"]');
   }
 
