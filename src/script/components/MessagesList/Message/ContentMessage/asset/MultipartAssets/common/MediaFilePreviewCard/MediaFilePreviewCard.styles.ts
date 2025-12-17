@@ -34,6 +34,7 @@ export const wrapperStyles: CSSObject = {
 
 export const wrapperErrorStyles: CSSObject = {
   ...wrapperStyles,
+  width: 268,
   display: 'flex',
   alignItems: 'flex-start',
   justifyContent: 'space-between',

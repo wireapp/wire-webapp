@@ -36,7 +36,7 @@ interface MediaFilePreviewCardProps {
   label: string;
   isLoading: boolean;
   isError: boolean;
-  children: ReactNode;
+  children?: ReactNode;
 }
 
 export const MediaFilePreviewCard = ({label, isLoading, isError, children}: MediaFilePreviewCardProps) => {

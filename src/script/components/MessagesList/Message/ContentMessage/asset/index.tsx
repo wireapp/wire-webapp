@@ -104,7 +104,12 @@ const ContentAsset = ({
             />
           )}
 
-          <MultipartAssets senderName={senderName} timestamp={timestamp} assets={filesMultipart} />
+          <MultipartAssets
+            conversationId={message.conversation_id}
+            senderName={senderName}
+            timestamp={timestamp}
+            assets={filesMultipart}
+          />
 
           {shouldRenderTextMultipart && (
             <ReadIndicator message={message} is1to1Conversation={is1to1Conversation} onClick={onClickDetails} />

@@ -17,14 +17,18 @@
  *
  */
 
+import {useEffect} from 'react';
+
 import {container} from 'tsyringe';
 
 import {ICellAsset} from '@wireapp/protocol-messaging';
 
 import {useInView} from 'Hooks/useInView/useInView';
 import {CellsRepository} from 'Repositories/cells/CellsRepository';
+import {t} from 'Util/LocalizerUtil';
 import {formatBytes, getFileExtension, trimFileExtension} from 'Util/util';
 
+import {MediaFilePreviewCard} from './common/MediaFilePreviewCard/MediaFilePreviewCard';
 import {FileAssetCard} from './FileAssetCard/FileAssetCard';
 import {ImageAssetCard} from './ImageAssetCard/ImageAssetCard';
 import {
@@ -41,11 +45,13 @@ interface MultipartAssetsProps {
   assets: ICellAsset[];
   cellsRepository?: CellsRepository;
   senderName: string;
+  conversationId: string;
   timestamp: number;
 }
 
 export const MultipartAssets = ({
   assets,
+  conversationId,
   cellsRepository = container.resolve(CellsRepository),
   senderName,
   timestamp,
@@ -54,6 +60,7 @@ export const MultipartAssets = ({
     <ul css={assets.length === 1 ? listSingleItemStyles : listStyles}>
       {assets.map(asset => (
         <MultipartAsset
+          conversationId={conversationId}
           key={asset.uuid}
           cellsRepository={cellsRepository}
           assetsCount={assets.length}
@@ -70,6 +77,7 @@ interface MultipartAssetProps extends ICellAsset {
   cellsRepository: CellsRepository;
   assetsCount: number;
   senderName: string;
+  conversationId: string;
   timestamp: number;
 }
 
@@ -78,6 +86,7 @@ const MultipartAsset = ({
   initialName,
   initialSize,
   contentType,
+  conversationId,
   cellsRepository,
   assetsCount,
   image: imageMetadata,
@@ -95,7 +104,7 @@ const MultipartAsset = ({
   const isSingleAsset = assetsCount === 1;
   const variant = isSingleAsset ? 'large' : 'small';
 
-  const {src, isLoading, isError, imagePreviewUrl, pdfPreviewUrl, path} = useGetMultipartAsset({
+  const {src, isLoading, isError, imagePreviewUrl, pdfPreviewUrl, path, isRecycled, fetchData} = useGetMultipartAsset({
     uuid,
     cellsRepository,
     isEnabled: hasBeenInView,
@@ -103,6 +112,25 @@ const MultipartAsset = ({
   });
 
   const name = path ? getName(path) : getName(initialName!);
+
+  /**
+   * will listen to hash changes and fetch the data again
+   * in case changes were made to the file in the cell (file is moved to recycle bin, renamed, etc.)
+   */
+  useEffect(() => {
+    const handleHashChange = () => {
+      const currentPath = window.location.hash;
+      if (currentPath.includes(conversationId) && !currentPath.endsWith('/files')) {
+        void fetchData(true);
+      }
+    };
+    window.addEventListener('hashchange', handleHashChange);
+    return () => window.removeEventListener('hashchange', handleHashChange);
+  }, [fetchData, conversationId]);
+
+  if (isRecycled) {
+    return <MediaFilePreviewCard isLoading={false} isError label={t('cells.unavailableFile')} />;
+  }
 
   if (isImage) {
     return (
