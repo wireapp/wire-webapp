@@ -93,9 +93,7 @@ export class ConversationPage {
     this.makeAdminToggle = page.locator(selectByDataAttribute('do-allow-admin'));
     this.removeUserButton = page.locator(selectByDataAttribute('do-remove-item-text'));
     this.addMemberButton = page.locator(selectByDataAttribute('go-add-people'));
-    this.systemMessages = page.locator(
-      `${selectByDataAttribute('item-message')}${selectByClass('system-message')} ${selectByClass('message-header')}`,
-    );
+    this.systemMessages = page.locator(`${selectByDataAttribute('item-message')}${selectByClass('system-message')}`);
     this.callButton = page.locator(selectByDataAttribute('do-call'));
     this.conversationInfoButton = page.locator(selectByDataAttribute('do-open-info'));
     this.pingButton = page.locator(selectByDataAttribute('do-ping'));

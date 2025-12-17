@@ -47,4 +47,25 @@ test.describe('Conversations', () => {
       await expect(userAPages.conversation().systemMessages.filter({hasText: userC.fullName})).toBeVisible();
     },
   );
+
+  test(
+    'I want to see a system message with all group members mentioned when someone else created a group',
+    {tag: ['@TC-2966', '@regression']},
+    async ({createPage}) => {
+      const [userAPages, userBPages, userCPages] = await Promise.all([
+        PageManager.from(createPage(withLogin(userA))).then(pm => pm.webapp.pages),
+        PageManager.from(createPage(withLogin(userB))).then(pm => pm.webapp.pages),
+        PageManager.from(createPage(withLogin(userC))).then(pm => pm.webapp.pages),
+      ]);
+      await createGroup(userAPages, 'Test Group', [userB, userC]);
+
+      await userBPages.conversationList().openConversation('Test Group');
+      await expect(userBPages.conversation().systemMessages.filter({hasText: userA.fullName})).toBeVisible();
+      await expect(userBPages.conversation().systemMessages.filter({hasText: userC.fullName})).toBeVisible();
+
+      await userCPages.conversationList().openConversation('Test Group');
+      await expect(userCPages.conversation().systemMessages.filter({hasText: userA.fullName})).toBeVisible();
+      await expect(userCPages.conversation().systemMessages.filter({hasText: userB.fullName})).toBeVisible();
+    },
+  );
 });
