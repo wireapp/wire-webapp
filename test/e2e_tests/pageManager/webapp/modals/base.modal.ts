@@ -30,10 +30,10 @@ export abstract class BaseModal {
   constructor(page: Page, modalLocator: string) {
     this.page = page;
     this.modal = page.getByTestId(modalLocator);
-    this.modalTitle = this.modal.getByTestId('status-modal-title');
-    this.modalText = this.modal.getByTestId('status-modal-text');
-    this.actionButton = this.modal.getByTestId('do-action');
-    this.cancelButton = this.modal.getByTestId('do-secondary');
+    this.modalTitle = page.getByTestId('status-modal-title');
+    this.modalText = page.getByTestId('status-modal-text');
+    this.actionButton = page.getByTestId('do-action');
+    this.cancelButton = page.getByTestId('do-secondary');
   }
 
   async isModalPresent() {

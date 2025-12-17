@@ -35,11 +35,11 @@ export class ConfirmLogoutModal {
     this.page = page;
 
     this.modal = page.locator(`${selectByDataAttribute('modal-template-option')}`);
-    this.title = this.modal.locator(selectByDataAttribute('status-modal-title'));
-    this.modalCheckbox = this.modal.locator(`${selectByDataAttribute('modal-option-checkbox')}`);
-    this.modalCustomCheckbox = this.modal.locator(`${selectByLabel('clear-data-checkbox')}`);
-    this.cancelButton = this.modal.locator(`${selectByDataAttribute('do-secondary')}`);
-    this.confirmButton = this.modal.locator(`${selectByDataAttribute('do-action')}`);
+    this.title = page.locator(selectByDataAttribute('status-modal-title'));
+    this.modalCheckbox = page.locator(`${selectByDataAttribute('modal-option-checkbox')}`);
+    this.modalCustomCheckbox = page.locator(`${selectByLabel('clear-data-checkbox')}`);
+    this.cancelButton = page.locator(`${selectByDataAttribute('do-secondary')}`);
+    this.confirmButton = page.locator(`${selectByDataAttribute('do-action')}`);
   }
 
   async isVisible() {

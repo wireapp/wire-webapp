@@ -32,10 +32,10 @@ export class DeleteAccountModal {
     this.page = page;
 
     this.modal = page.locator("[data-uie-name='primary-modals-container'][aria-label='Delete account']");
-    this.modalTitle = this.modal.locator("[data-uie-name='status-modal-title']");
-    this.modalText = this.modal.locator("[data-uie-name='status-modal-text']");
-    this.deleteButton = this.modal.locator("[data-uie-name='do-action']");
-    this.cancelButton = this.modal.locator("[data-uie-name='do-secondary']");
+    this.modalTitle = page.locator("[data-uie-name='status-modal-title']");
+    this.modalText = page.locator("[data-uie-name='status-modal-text']");
+    this.deleteButton = page.locator("[data-uie-name='do-action']");
+    this.cancelButton = page.locator("[data-uie-name='do-secondary']");
   }
 
   async isModalPresent() {

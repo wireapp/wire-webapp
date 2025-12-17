@@ -24,7 +24,6 @@ import {selectByDataAttribute} from 'test/e2e_tests/utils/selector.util';
 export class DataShareConsentModal {
   readonly page: Page;
 
-  readonly modal: Locator;
   readonly modalTitle: Locator;
   readonly modalText: Locator;
   readonly agreeButton: Locator;
@@ -33,13 +32,10 @@ export class DataShareConsentModal {
   constructor(page: Page) {
     this.page = page;
 
-    this.modal = page.locator(
-      `${selectByDataAttribute('primary-modals-container')}[aria-label='Consent to share user data']`,
-    );
-    this.modalTitle = this.modal.locator(`${selectByDataAttribute('status-modal-title')}`);
-    this.modalText = this.modal.locator(`${selectByDataAttribute('status-modal-text')}`);
-    this.agreeButton = this.modal.locator(`${selectByDataAttribute('do-action')}`);
-    this.declineButton = this.modal.locator(`${selectByDataAttribute('do-secondary')}`);
+    this.modalTitle = page.locator(`${selectByDataAttribute('status-modal-title')}`);
+    this.modalText = page.locator(`${selectByDataAttribute('status-modal-text')}`);
+    this.agreeButton = page.locator(`${selectByDataAttribute('do-action')}`);
+    this.declineButton = page.locator(`${selectByDataAttribute('do-secondary')}`);
   }
 
   async isModalPresent() {

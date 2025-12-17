@@ -31,9 +31,9 @@ export class CallNotEstablishedModal {
     this.page = page;
 
     this.modal = page.locator("[data-uie-name='primary-modals-container'][aria-label='Call not established']");
-    this.modalTitle = this.modal.locator("[data-uie-name='status-modal-title']");
-    this.modalText = this.modal.locator("[data-uie-name='status-modal-text']");
-    this.okButton = this.modal.locator("[data-uie-name='do-action']");
+    this.modalTitle = page.locator("[data-uie-name='status-modal-title']");
+    this.modalText = page.locator("[data-uie-name='status-modal-text']");
+    this.okButton = page.locator("[data-uie-name='do-action']");
   }
 
   async isModalPresent() {

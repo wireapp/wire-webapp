@@ -31,10 +31,10 @@ export class CopyPasswordModal {
   constructor(page: Page) {
     this.page = page;
     this.modal = page.locator("[data-uie-name='primary-modals-container']");
-    this.modalTitle = this.modal.locator('#modal-title');
-    this.modalText = this.modal.locator('#modal-description-text');
-    this.cancelButton = this.modal.locator("[data-uie-name='do-secondary']");
-    this.copyButton = this.modal.locator("[data-uie-name='do-action']");
+    this.modalTitle = page.locator('#modal-title');
+    this.modalText = page.locator('#modal-description-text');
+    this.cancelButton = page.locator("[data-uie-name='do-secondary']");
+    this.copyButton = page.locator("[data-uie-name='do-action']");
   }
 
   async clickCancelButton() {

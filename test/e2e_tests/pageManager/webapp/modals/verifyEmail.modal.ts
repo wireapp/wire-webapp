@@ -30,7 +30,7 @@ export class VerifyEmailModal {
   constructor(page: Page) {
     this.page = page;
     this.modal = page.locator('[data-uie-name="primary-modals-container"][aria-label="Verify email address"]');
-    this.okButton = this.modal.locator(selectByDataAttribute('do-action'));
+    this.okButton = page.locator(selectByDataAttribute('do-action'));
   }
 
   async isVisible() {

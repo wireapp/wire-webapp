@@ -33,11 +33,11 @@ export class CreatGuestLinkModal {
     this.page = page;
 
     this.modal = page.locator("[data-uie-name='primary-modals-container']");
-    this.modalTitle = this.modal.locator('#modal-title');
-    this.modalText = this.modal.locator('#modal-description-text');
-    this.guestLinkPasswordInput = this.modal.locator("[data-uie-name='guest-link-password']");
-    this.guestLinkPasswordConfirmInput = this.modal.locator("[data-uie-name='guest-link-password-confirm']");
-    this.createLinkButton = this.modal.locator("[data-uie-name='do-action']");
+    this.modalTitle = page.locator('#modal-title');
+    this.modalText = page.locator('#modal-description-text');
+    this.guestLinkPasswordInput = page.locator("[data-uie-name='guest-link-password']");
+    this.guestLinkPasswordConfirmInput = page.locator("[data-uie-name='guest-link-password-confirm']");
+    this.createLinkButton = page.locator("[data-uie-name='do-action']");
   }
 
   async isModalPresent() {

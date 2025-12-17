@@ -24,7 +24,6 @@ import {selectByDataAttribute} from 'test/e2e_tests/utils/selector.util';
 export class importBackupModal {
   readonly page: Page;
 
-  readonly importBackupModal: Locator;
   readonly title: Locator;
   readonly passwordInput: Locator;
   readonly primaryButton: Locator;
@@ -33,11 +32,10 @@ export class importBackupModal {
   constructor(page: Page) {
     this.page = page;
 
-    this.importBackupModal = page.locator(selectByDataAttribute('primary-modals-container'));
-    this.title = this.importBackupModal.locator(selectByDataAttribute('status-modal-title'));
-    this.passwordInput = this.importBackupModal.locator(selectByDataAttribute('backup-password'));
-    this.primaryButton = this.importBackupModal.locator(selectByDataAttribute('do-action'));
-    this.secondaryButton = this.importBackupModal.locator(selectByDataAttribute('do-secondary'));
+    this.title = this.page.locator(selectByDataAttribute('status-modal-title'));
+    this.passwordInput = this.page.locator(selectByDataAttribute('backup-password'));
+    this.primaryButton = this.page.locator(selectByDataAttribute('do-action'));
+    this.secondaryButton = this.page.locator(selectByDataAttribute('do-secondary'));
   }
 
   async isTitleVisible() {

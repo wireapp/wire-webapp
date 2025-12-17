@@ -33,7 +33,7 @@ export class UnableToOpenConversationModal {
     this.modal = page.locator(
       `${selectByDataAttribute('primary-modals-container')}[aria-label='Wire can’t open this conversation.']`,
     );
-    this.acknowledgeButton = this.modal.locator(`${selectByDataAttribute('do-action')}`);
+    this.acknowledgeButton = page.locator(`${selectByDataAttribute('do-action')}`);
   }
 
   async isModalPresent() {
