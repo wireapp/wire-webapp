@@ -119,7 +119,6 @@ test('Personal Account Lifecycle', {tag: ['@TC-8638', '@crit-flow-web']}, async 
   });
 
   await test.step('Personal user B can see the message from user A', async () => {
-    await pageManagerB.refreshPage({waitUntil: 'domcontentloaded'});
     await pageManagerB.webapp.pages.conversationList().openConversation(userA.fullName);
     await expect(
       pageManagerB.webapp.pages.conversation().getMessage({content: `Hello! ${userA.firstName} here.`}),
@@ -143,13 +142,12 @@ test('Personal Account Lifecycle', {tag: ['@TC-8638', '@crit-flow-web']}, async 
   await test.step('Personal user C sends a connection request to personal user A', async () => {
     await pageManagerC.webapp.components.conversationSidebar().clickConnectButton();
     await pageManagerC.webapp.pages.startUI().selectUser(userA.username);
-    expect(await pageManagerC.webapp.modals.userProfile().isVisible());
     await pageManagerC.webapp.modals.userProfile().clickConnectButton();
     await pageManagerC.webapp.pages.conversationList().openConversation(userA.fullName);
     expect(await pageManagerC.webapp.pages.outgoingConnection().getOutgoingConnectionUsername()).toContain(
       userA.username,
     );
-    expect(await pageManagerC.webapp.pages.outgoingConnection().isPendingIconVisible(userA.fullName));
+    expect(await pageManagerC.webapp.pages.outgoingConnection().isPendingIconVisible(userA.fullName)).toBeTruthy();
   });
 
   await test.step('Personal user A accepts request from C', async () => {
@@ -173,7 +171,7 @@ test('Personal Account Lifecycle', {tag: ['@TC-8638', '@crit-flow-web']}, async 
     const {pages, modals, components} = pageManager.webapp;
     await components.conversationSidebar().clickPreferencesButton();
     await pages.account().clickDeleteAccountButton();
-    expect(await modals.deleteAccount().isModalPresent());
+    expect(await modals.deleteAccount().isModalPresent()).toBeTruthy();
     expect(await modals.deleteAccount().getModalTitle()).toContain('Delete account');
     expect(await modals.deleteAccount().getModalText()).toContain(
       'We will send you an email. Follow the link to delete your account permanently.',
