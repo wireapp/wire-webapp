@@ -21,9 +21,6 @@ import {useCallback, useEffect, useState} from 'react';
 
 import {MediaDevicesHandler} from 'Repositories/media/MediaDevicesHandler';
 import {MediaStreamHandler} from 'Repositories/media/MediaStreamHandler';
-import {BrowserPermissionStatus} from 'Repositories/permission/BrowserPermissionStatus';
-import {queryBrowserPermission} from 'Repositories/permission/permissionHandlers';
-import {PermissionType} from 'Repositories/permission/PermissionType';
 import {getLogger} from 'Util/Logger';
 
 const logger = getLogger('useInitializeMediaDevices');
@@ -33,16 +30,10 @@ export const useInitializeMediaDevices = (devicesHandler: MediaDevicesHandler, s
 
   const initializeMediaDevices = useCallback(async () => {
     try {
-      const permissionStatus = await queryBrowserPermission(PermissionType.MICROPHONE);
-      const hasPermission = permissionStatus === BrowserPermissionStatus.GRANTED;
+      const stream = await streamHandler.requestMediaStreamAccess(true);
 
-      if (!hasPermission) {
-        // Only request stream if we need to trigger the permission prompt
-        const stream = await streamHandler.requestMediaStreamAccess(true);
-
-        if (stream) {
-          stream.getTracks().forEach(track => track.stop());
-        }
+      if (stream) {
+        stream.getTracks().forEach(track => track.stop());
       }
       await devicesHandler?.initializeMediaDevices();
       setAreMediaDevicesInitialized(true);
