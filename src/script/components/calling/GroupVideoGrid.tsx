@@ -328,6 +328,7 @@ const GroupVideoGrid = ({
               avatarSize={minimized ? AVATAR_SIZE.SMALL : AVATAR_SIZE.MEDIUM}
               participant={selfParticipant.user}
               hideAvailabilityStatus
+              aria-hidden="true"
             />
           </div>
         </GroupVideoThumbnailWrapper>
