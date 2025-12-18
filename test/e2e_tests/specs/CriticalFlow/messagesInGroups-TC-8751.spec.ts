@@ -21,6 +21,7 @@ import {User} from 'test/e2e_tests/data/user';
 import {PageManager} from 'test/e2e_tests/pageManager';
 import {getVideoFilePath, getAudioFilePath, getTextFilePath, isAssetDownloaded} from 'test/e2e_tests/utils/asset.util';
 import {getImageFilePath, getLocalQRCodeValue} from 'test/e2e_tests/utils/sendImage.util';
+import {createGroup} from 'test/e2e_tests/utils/userActions';
 
 import {test, expect, withLogin} from '../../test.fixtures';
 
@@ -56,10 +57,7 @@ test('Messages in Groups', {tag: ['@TC-8751', '@crit-flow-web']}, async ({create
 
   await test.step('User A creates a group with User B', async () => {
     const {pages} = userAPageManager.webapp;
-    await pages.conversationList().clickCreateGroup();
-    await pages.groupCreation().setGroupName(conversationName);
-    await pages.startUI().selectUsers([userB.username]);
-    await pages.groupCreation().clickCreateGroupButton();
+    await createGroup(pages, conversationName, [userB]);
   });
 
   await test.step('User A mentions User B in the group', async () => {
@@ -90,8 +88,8 @@ test('Messages in Groups', {tag: ['@TC-8751', '@crit-flow-web']}, async ({create
     await pages.conversation().clickImage(userA);
     // Verify that the detail view modal is visible
     await modals.detailViewModal().waitForVisibility();
-    expect(await modals.detailViewModal().isVisible()).toBeTruthy();
-    expect(await modals.detailViewModal().isImageVisible()).toBeTruthy();
+    await expect(modals.detailViewModal().mainWindow).toBeVisible();
+    await expect(modals.detailViewModal().image).toBeVisible();
   });
 
   await test.step('User B can download the image', async () => {
@@ -138,13 +136,13 @@ test('Messages in Groups', {tag: ['@TC-8751', '@crit-flow-web']}, async ({create
   await test.step('User B can play the audio file', async () => {
     const {pages} = userBPageManager.webapp;
     await pages.conversation().playAudio();
-    // Wait for 5 seconds to ensure audio starts playing
+    // Wait for 3 seconds to ensure audio starts playing
     await pages.conversation().page.waitForTimeout(3000);
     expect(await pages.conversation().isAudioPlaying()).toBeTruthy();
   });
   await test.step('User A sends a quick (10 sec) self deleting message', async () => {
-    const {pages, components} = userAPageManager.webapp;
-    await components.inputBarControls().setEphemeralTimerTo('10 seconds');
+    const {pages} = userAPageManager.webapp;
+    await pages.conversation().enableSelfDeletingMessages();
     await pages.conversation().sendMessage(selfDestructMessageText);
     await expect(pages.conversation().getMessage({content: selfDestructMessageText})).toBeVisible();
   });
@@ -167,7 +165,7 @@ test('Messages in Groups', {tag: ['@TC-8751', '@crit-flow-web']}, async ({create
     ).not.toBeVisible();
 
     // Reset ephemeral timer to 'Off'
-    await userAPageManager.webapp.components.inputBarControls().setEphemeralTimerTo('Off');
+    await userAPageManager.webapp.pages.conversation().disableSelfDeletingMessages();
   });
 
   await test.step('User A sends asset', async () => {
