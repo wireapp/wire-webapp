@@ -17,7 +17,7 @@
  *
  */
 
-import React, {useState} from 'react';
+import React, {useCallback, useEffect, useMemo, useState} from 'react';
 
 import classNames from 'classnames';
 import {container} from 'tsyringe';
@@ -191,58 +191,73 @@ export const VideoControls = ({
   const selectedCallViewOption =
     callViewOptions[0].options.find(option => option.value === activeCallViewTab) ?? callViewOptions[0].options[0];
 
-  const audioOptions = [
-    {
-      label: t('videoCallaudioInputMicrophone'),
-      options: audioInputDevices.map((device: MediaDeviceInfo | ElectronDesktopCapturerSource) => {
-        return isMediaDevice(device)
-          ? {
-              label: device.label,
-              value: `${device.deviceId}-input`,
-              dataUieName: `${device.deviceId}-input`,
-              id: device.deviceId,
-            }
-          : {
-              label: device.name,
-              value: `${device.id}-input`,
-              dataUieName: `${device.id}-input`,
-              id: device.id,
-            };
-      }),
-    },
-    {
-      label: t('videoCallaudioOutputSpeaker'),
-      options: audioOutputDevices.map((device: MediaDeviceInfo | ElectronDesktopCapturerSource) => {
-        return isMediaDevice(device)
-          ? {
-              label: device.label,
-              value: `${device.deviceId}-output`,
-              dataUieName: `${device.deviceId}-output`,
-              id: device.deviceId,
-            }
-          : {
-              label: device.name,
-              value: `${device.id}-output`,
-              dataUieName: `${device.id}-output`,
-              id: device.id,
-            };
-      }),
-    },
-  ];
-
-  const [selectedAudioOptions, setSelectedAudioOptions] = useState(() =>
-    [currentMicrophoneDevice, currentSpeakerDevice].flatMap(
-      (device, index) => audioOptions[index].options.find(({id}) => id === device) ?? audioOptions[index].options[0],
-    ),
+  const audioOptions = useMemo(
+    () => [
+      {
+        label: t('videoCallaudioInputMicrophone'),
+        options: audioInputDevices.map((device: MediaDeviceInfo | ElectronDesktopCapturerSource) => {
+          return isMediaDevice(device)
+            ? {
+                label: device.label,
+                value: `${device.deviceId}-input`,
+                dataUieName: `${device.deviceId}-input`,
+                id: device.deviceId,
+              }
+            : {
+                label: device.name,
+                value: `${device.id}-input`,
+                dataUieName: `${device.id}-input`,
+                id: device.id,
+              };
+        }),
+      },
+      {
+        label: t('videoCallaudioOutputSpeaker'),
+        options: audioOutputDevices.map((device: MediaDeviceInfo | ElectronDesktopCapturerSource) => {
+          return isMediaDevice(device)
+            ? {
+                label: device.label,
+                value: `${device.deviceId}-output`,
+                dataUieName: `${device.deviceId}-output`,
+                id: device.deviceId,
+              }
+            : {
+                label: device.name,
+                value: `${device.id}-output`,
+                dataUieName: `${device.id}-output`,
+                id: device.id,
+              };
+        }),
+      },
+    ],
+    [audioInputDevices, audioOutputDevices],
   );
 
+  const [allMicrophones, allSpeaker] = audioOptions;
+
+  // Helper to get the selected audio options from current device IDs
+  const getSelectedAudioOptions = useCallback(() => {
+    const microphone =
+      allMicrophones.options.find(({id}) => id === currentMicrophoneDevice) ?? allMicrophones.options[0];
+    const speaker = allSpeaker.options.find(({id}) => id === currentSpeakerDevice) ?? allSpeaker.options[0];
+    return [microphone, speaker];
+  }, [allMicrophones, allSpeaker, currentMicrophoneDevice, currentSpeakerDevice]);
+
+  const [selectedAudioOptions, setSelectedAudioOptions] = useState(getSelectedAudioOptions);
+
+  // Sync selectedAudioOptions with store when devices change externally (e.g., device removal/fallback)
+  useEffect(() => {
+    setSelectedAudioOptions(getSelectedAudioOptions());
+  }, [getSelectedAudioOptions]);
+
   const updateAudioOptions = (selectedOption: string, input: boolean) => {
+    const [selectedMicrophone, selectedSpeaker] = selectedAudioOptions;
     const microphone = input
-      ? (audioOptions[0].options.find(({value}) => value === selectedOption) ?? selectedAudioOptions[0])
-      : selectedAudioOptions[0];
+      ? (allMicrophones.options.find(({value}) => value === selectedOption) ?? selectedMicrophone)
+      : selectedMicrophone;
     const speaker = !input
-      ? (audioOptions[1].options.find(({value}) => value === selectedOption) ?? selectedAudioOptions[1])
-      : selectedAudioOptions[1];
+      ? (allSpeaker.options.find(({value}) => value === selectedOption) ?? selectedSpeaker)
+      : selectedSpeaker;
 
     setSelectedAudioOptions([microphone, speaker]);
     switchMicrophoneInput(microphone.id);
