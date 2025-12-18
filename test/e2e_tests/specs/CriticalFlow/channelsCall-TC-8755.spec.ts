@@ -25,7 +25,8 @@ import {test, expect, withLogin} from '../../test.fixtures';
 
 const channelName = 'Test Channel';
 
-test(
+// ToDo(WPB-22442): Backoffice does not unlock calling feature for teams created during tests
+test.fixme(
   'Calls in channels with device switch and screenshare',
   {tag: ['@TC-8754', '@crit-flow-web']},
   async ({createTeam, createPage, api}) => {
@@ -37,7 +38,7 @@ test(
     let callingServiceInstanceId: string;
 
     await test.step('Preconditions: Team owner create a channels enabled team', async () => {
-      const team = await createTeam('Channels Call', {withMembers: 1, enablePaidFeatures: true});
+      const team = await createTeam('Channels Call', {withMembers: 1});
       owner = team.owner;
       member = team.members[0];
 

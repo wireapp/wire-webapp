@@ -25,7 +25,7 @@ import {test, expect, withLogin, withConnectionRequest} from '../../test.fixture
 
 const conversationName = 'CritiCall';
 
-// Fixme: Backoffice does not unlock calling feature for teams created during tests
+// ToDo(WPB-22442): Backoffice does not unlock calling feature for teams created during tests
 test.fixme(
   'Group Video call',
   {tag: ['@TC-8637', '@crit-flow-web']},
@@ -40,7 +40,7 @@ test.fixme(
     let callingServiceInstanceId: string;
 
     await test.step('Preconditions: Creating preconditions for the test via API', async () => {
-      const team = await createTeam('Critical', {withMembers: 1, enablePaidFeatures: true});
+      const team = await createTeam('Critical', {withMembers: 1});
       teamOwner = team.owner;
       teamMember = team.members[0];
 

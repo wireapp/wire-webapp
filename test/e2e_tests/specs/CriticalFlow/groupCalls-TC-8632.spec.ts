@@ -24,7 +24,7 @@ import {PageManager} from 'test/e2e_tests/pageManager';
 
 import {test, expect, withLogin} from '../../test.fixtures';
 
-// Fixme: Backoffice does not unlock calling feature for teams created during tests
+// ToDo(WPB-22442): Backoffice does not unlock calling feature for teams created during tests
 test.fixme(
   'Planning group call with sending various messages during call',
   {tag: ['@TC-8632', '@crit-flow-web']},
@@ -39,7 +39,7 @@ test.fixme(
     const conversationName = 'Calling';
 
     await test.step('Preconditions: Creating preconditions for the test via API', async () => {
-      const team = await createTeam('Calling', {withMembers: 1, enablePaidFeatures: true});
+      const team = await createTeam('Calling', {withMembers: 1});
       owner = team.owner;
       member = team.members[0];
 

@@ -36,17 +36,9 @@ test(
     let callingServiceInstanceId: string;
 
     await test.step('Preconditions: Creating two separate teams and users via API', async () => {
-      const [teamA, teamB] = await Promise.all([
-        createTeam('Team A', {enablePaidFeatures: true}),
-        createTeam('Team B', {enablePaidFeatures: true}),
-      ]);
+      const [teamA, teamB] = await Promise.all([createTeam('Team A'), createTeam('Team B')]);
       ownerA = teamA.owner;
       ownerB = teamB.owner;
-
-      await Promise.all([
-        api.enableConferenceCallingFeature(ownerA.teamId!),
-        api.enableConferenceCallingFeature(ownerB.teamId!),
-      ]);
 
       const [pmA, pmB] = await Promise.all([
         PageManager.from(createPage(withLogin(ownerA), withConnectionRequest(ownerB))).then(async pm => {

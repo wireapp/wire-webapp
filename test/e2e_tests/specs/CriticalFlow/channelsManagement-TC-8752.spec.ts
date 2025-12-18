@@ -27,14 +27,15 @@ import {test, expect, withLogin} from '../../test.fixtures';
 const conversation1 = 'Test Channel 1';
 const conversation2 = 'Test Channel 2';
 
-test('Channels Management', {tag: ['@TC-8752', '@crit-flow-web']}, async ({createTeam, createPage, api}) => {
+// ToDo(WPB-22442): Backoffice does not unlock calling feature for teams created during tests
+test.fixme('Channels Management', {tag: ['@TC-8752', '@crit-flow-web']}, async ({createTeam, createPage, api}) => {
   let owner: User;
   let member: User;
   let ownerPageManager: PageManager;
   let memberPageManager: PageManager;
 
   await test.step('Preconditions: Team owner create a channels enabled team', async () => {
-    const team = await createTeam('Channels Management', {withMembers: 1, enablePaidFeatures: true});
+    const team = await createTeam('Channels Management', {withMembers: 1});
     owner = team.owner;
     member = team.members[0];
 
