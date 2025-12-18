@@ -48,6 +48,7 @@ interface BaseImageProps extends React.HTMLProps<HTMLDivElement> {
 interface RemoteDataImageProps extends BaseImageProps {
   image: AssetRemoteData;
   imageSizes?: {width: string; height: string; ratio: number};
+  fileType?: string;
 }
 interface AssetImageProps extends BaseImageProps {
   image: MediumImage;
@@ -56,12 +57,13 @@ interface AssetImageProps extends BaseImageProps {
 export const AssetImage = ({image, alt, ...props}: AssetImageProps) => {
   const {resource} = useKoSubscribableChildren(image, ['resource']);
 
-  return <Image image={resource} imageSizes={image} alt={alt} {...props} />;
+  return <Image image={resource} imageSizes={image} fileType={image.file_type} alt={alt} {...props} />;
 };
 
 export const Image = ({
   image,
   imageSizes,
+  fileType,
   onClick,
   className,
   isQuote = false,
@@ -88,7 +90,7 @@ export const Image = ({
             'application/octet-stream', // Octet-stream is required to paste images from clipboard
             ...Config.getConfig().ALLOWED_IMAGE_TYPES,
           ];
-          const url = await getAssetUrl(image, allowedImageTypes);
+          const url = await getAssetUrl(image, allowedImageTypes, fileType);
           if (isUnmouted.current) {
             // Avoid re-rendering a component that is umounted
             return;
@@ -115,27 +117,40 @@ export const Image = ({
   const dummyImageUrl = `data:image/svg+xml;utf8,<svg aria-hidden="true" xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1 1' width='${imageSizes?.width}' height='${imageSizes?.height}'></svg>`;
   const assetUrl = imageUrl?.url || dummyImageUrl;
   const isLoading = !imageUrl;
+  const ImageElement = ({src}: {src: string}) => (
+    <img
+      css={{...getImageStyle(imageSizes), ...imageStyles}}
+      src={src}
+      role="presentation"
+      alt={alt}
+      data-uie-name={isLoading ? 'image-loader' : 'image-asset-img'}
+      onClick={event => {
+        if (!isLoading) {
+          onClick?.(event);
+        }
+      }}
+    />
+  );
 
   return (
     <InViewport
       onVisible={() => setIsInViewport(true)}
       css={getWrapperStyles(!!onClick)}
       className={cx(className, {'loading-dots image-asset--no-image': isLoading})}
-      onClick={event => {
-        if (!isLoading) {
-          onClick?.(event);
-        }
-      }}
       data-uie-status={isLoading ? 'loading' : 'loaded'}
       {...props}
     >
-      <img
-        css={{...getImageStyle(imageSizes), ...imageStyles}}
-        src={assetUrl}
-        role="presentation"
-        alt={alt}
-        data-uie-name={isLoading ? 'image-loader' : 'image-asset-img'}
-      />
+      {imageUrl?.pauseFrameUrl ? (
+        <div className="image-asset--animated-wrapper">
+          <ImageElement src={imageUrl?.pauseFrameUrl} />
+          <details open className="image-asset--animated">
+            <summary role="button" aria-label="Toggle animation playback"></summary>
+            <ImageElement src={assetUrl} />
+          </details>
+        </div>
+      ) : (
+        <ImageElement src={assetUrl} />
+      )}
     </InViewport>
   );
 };
