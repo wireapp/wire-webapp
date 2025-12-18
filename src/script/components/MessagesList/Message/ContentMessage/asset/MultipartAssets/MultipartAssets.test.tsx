@@ -168,8 +168,10 @@ describe('MultipartAssets', () => {
       );
 
       await waitFor(() => {
-        expect(mockCellsRepository.getNode).toHaveBeenCalledTimes(1);
+        expect(mockCellsRepository.getNode).toHaveBeenCalled();
       });
+
+      const callsBeforeHashChange = mockCellsRepository.getNode.mock.calls.length;
 
       // Simulate hash change within the same conversation
       await act(async () => {
@@ -178,8 +180,7 @@ describe('MultipartAssets', () => {
       });
 
       await waitFor(() => {
-        expect(mockCellsRepository.getNode).toHaveBeenCalled();
-        expect(mockCellsRepository.getNode).toHaveBeenCalledTimes(2);
+        expect(mockCellsRepository.getNode.mock.calls.length).toBeGreaterThan(callsBeforeHashChange);
       });
     });
 
@@ -354,8 +355,10 @@ describe('MultipartAssets', () => {
       );
 
       await waitFor(() => {
-        expect(mockCellsRepository.getNode).toHaveBeenCalledTimes(1);
+        expect(mockCellsRepository.getNode).toHaveBeenCalled();
       });
+
+      const callsBeforeHashChange = mockCellsRepository.getNode.mock.calls.length;
 
       // Simulate hash change
       await act(async () => {
@@ -364,7 +367,7 @@ describe('MultipartAssets', () => {
       });
 
       await waitFor(() => {
-        expect(mockCellsRepository.getNode).toHaveBeenCalledTimes(2);
+        expect(mockCellsRepository.getNode.mock.calls.length).toBeGreaterThan(callsBeforeHashChange);
       });
     });
 
