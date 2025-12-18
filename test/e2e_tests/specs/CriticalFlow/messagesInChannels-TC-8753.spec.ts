@@ -41,7 +41,7 @@ test('Messages in Channels', {tag: ['@TC-8753', '@crit-flow-web']}, async ({crea
   let userBPageManager: PageManager;
 
   await test.step('Preconditions: Creating preconditions for the test via API', async () => {
-    const team = await createTeam('Critical Team', {withMembers: 1, enablePaidFeatures: true});
+    const team = await createTeam('Critical Team', {withMembers: 1});
     userA = team.owner;
     userB = team.members[0];
 
