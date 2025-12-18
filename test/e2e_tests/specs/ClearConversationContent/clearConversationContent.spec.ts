@@ -21,6 +21,8 @@ import {User} from 'test/e2e_tests/data/user';
 import {PageManager} from 'test/e2e_tests/pageManager';
 import {test, withLogin, withConnectedUser, expect} from 'test/e2e_tests/test.fixtures';
 
+import {getTextFilePath, shareAssetHelper} from '../../utils/asset.util';
+import {getImageFilePath} from '../../utils/sendImage.util';
 import {createGroup} from '../../utils/userActions';
 
 test.describe('Clear Conversation Content', () => {
@@ -184,7 +186,8 @@ test.describe('Clear Conversation Content', () => {
     },
   );
 
-  test(
+  // TODO: Blocked [WPB-22442] - Group call feature requires Enterprise Account
+  test.skip(
     'I want to see incoming picture, ping and call after I clear content of a group conversation via conversation list',
     {tag: ['@TC-156', '@regression']},
     async ({createPage}) => {
@@ -233,15 +236,28 @@ test.describe('Clear Conversation Content', () => {
       await userAPages.conversationList().openConversation(conversationName);
       await expect(userAPages.conversation().getPing()).toBeVisible();
 
-      // Step 6.3: Verify you can receive incoming calls
+      // Step 6.3: Verify you can receive incoming pictures
+      const {page} = userAPages.conversation();
+      await shareAssetHelper(getImageFilePath(), page, page.getByRole('button', {name: 'Add picture'}));
+      await shareAssetHelper(
+        getImageFilePath(),
+        userBPageManager.page,
+        userBPageManager.page.getByRole('button', {name: 'Add picture'}),
+      );
+      const messageWithImage = userAPages.conversation().getMessage({sender: userB});
+      await expect(messageWithImage).toBeVisible();
+
+      // Step 6.4: Verify you can receive incoming files
+      await userAPages.conversationList().openConversation(conversationName);
+      await shareAssetHelper(getTextFilePath(), page, page.getByRole('button', {name: 'Add file'}));
+      const messageWithFile = userAPages.conversation().getMessage({sender: userA});
+      await expect(messageWithFile).toBeVisible();
+
+      // Step 6.5: Verify you can receive incoming calls
       await userAPages.conversationList().openConversation(conversationName);
       await userBPages.conversationList().openConversation(conversationName);
       await userBPages.conversation().startCall();
-
-      // Step 6.4: Verify you can receive incoming pictures
-      // Step 6.5: Verify you can receive incoming files
-      await userAPages.conversationList().openConversation(conversationName);
-      await expect(userAPages.conversation().messages).toHaveCount(0);
+      await expect(userAPages.calling().acceptCallButton).toBeVisible();
     },
   );
 
@@ -249,6 +265,7 @@ test.describe('Clear Conversation Content', () => {
     'I want to see incoming picture, ping and call after I clear content of a 1:1 conversation via conversation list',
     {tag: ['@TC-8779', '@regression']},
     async ({createPage}) => {
+      test.slow();
       const [userAPageManager, userBPageManager] = await Promise.all([
         PageManager.from(createPage(withLogin(userA), withConnectedUser(userB))),
         PageManager.from(createPage(withLogin(userB))),
@@ -276,9 +293,10 @@ test.describe('Clear Conversation Content', () => {
       // Step 6: Verify you can receive incoming new messages, pings, calls, pictures, and files
       // Step 6.1: Verify you can receive incoming new messages
       await userBPages.conversationList().openConversation(userA.fullName);
+      await expect(userAPages.conversation().messages).toHaveCount(0);
       await userBPages.conversation().sendMessage('Message from User B after Clear');
       await userAPages.conversationList().openConversation(userB.fullName);
-      await expect(userAPages.conversation().messages).toHaveCount(3);
+      await expect(userAPages.conversation().messages).toHaveCount(1);
 
       // Step 6.2: Verify you can receive incoming pings
       await userBPages.conversationList().openConversation(userA.fullName);
@@ -286,11 +304,97 @@ test.describe('Clear Conversation Content', () => {
       await userAPages.conversationList().openConversation(userB.fullName);
       await expect(userAPages.conversation().getPing()).toBeVisible();
 
-      // Step 6.3: Verify you can receive incoming calls
-      await userBPages.conversationList().openConversation(userA.fullName);
+      // Step 6.3: Verify you can receive incoming pictures
+      const {page} = userAPages.conversation();
+      await shareAssetHelper(getImageFilePath(), page, page.getByRole('button', {name: 'Add picture'}));
+      await shareAssetHelper(
+        getImageFilePath(),
+        userBPageManager.page,
+        userBPageManager.page.getByRole('button', {name: 'Add picture'}),
+      );
+      const messageWithImage = userAPages.conversation().getMessage({sender: userB}).last();
+      await expect(messageWithImage).toBeVisible();
 
-      // Step 6.4: Verify you can receive incoming pictures
-      // Step 6.5: Verify you can receive incoming files
+      // Step 6.4: Verify you can receive incoming files
+      await userAPages.conversationList().openConversation(userB.fullName);
+      await shareAssetHelper(getTextFilePath(), page, page.getByRole('button', {name: 'Add file'}));
+      const messageWithFile = userAPages.conversation().getMessage({sender: userB}).last();
+      await expect(messageWithFile).toBeVisible();
+
+      // Step 6.5: Verify you can receive incoming calls
+      await userAPages.conversationList().openConversation(userB.fullName);
+      await userBPages.conversationList().openConversation(userA.fullName);
+      await userBPages.conversation().startCall();
+      await expect(userAPages.calling().acceptCallButton).toBeVisible();
+    },
+  );
+
+  test(
+    'I want to clear the group conversation content from conversation details options',
+    {tag: ['@TC-424', '@regression']},
+    async ({createPage}) => {
+      const [userAPageManager, userBPageManager] = await Promise.all([
+        PageManager.from(createPage(withLogin(userA), withConnectedUser(userB))),
+        PageManager.from(createPage(withLogin(userB))),
+      ]);
+
+      const {pages: userAPages, modals: userAModals} = userAPageManager.webapp;
+      const userBPages = userBPageManager.webapp.pages;
+
+      const conversationName = 'Group conversation';
+      await createGroup(userAPages, conversationName, [userB]);
+
+      // Step 1: User A and B write in group conversation
+      await userAPages.conversationList().openConversation(conversationName);
+      await userAPages.conversation().sendMessage('Message from User A');
+
+      await userBPages.conversationList().openConversation(conversationName);
+      await userBPages.conversation().sendMessage('Message from User B');
+
+      // Step 2: User A opens Conversation Details
+      await userAPages.conversation().clickConversationInfoButton();
+      // Step 3: User A clicks Clear Conversation Button
+      await userAPages.conversationDetails().clickClearConversationContentButton();
+      // Step 4: Clear Conversation Content Modal appears
+      await expect(userAModals.optionModal().modal).toBeVisible();
+      // Step 5: User A clicks 'Clear'
+      await userAModals.optionModal().clickAction();
+      // Step 6: Verify that the conversation does not contain any past messages
+      await userAPages.conversationList().openConversation(userB.fullName);
+      await expect(userAPages.conversation().messages).toHaveCount(0);
+    },
+  );
+
+  test(
+    'I want to clear the 1:1 conversation content from conversation details options',
+    {tag: ['@TC-425', '@regression']},
+    async ({createPage}) => {
+      const [userAPageManager, userBPageManager] = await Promise.all([
+        PageManager.from(createPage(withLogin(userA), withConnectedUser(userB))),
+        PageManager.from(createPage(withLogin(userB))),
+      ]);
+
+      const {pages: userAPages, modals: userAModals} = userAPageManager.webapp;
+      const userBPages = userBPageManager.webapp.pages;
+
+      // Step 1: User A and B write in 1:1 conversation
+      await userAPages.conversationList().openConversation(userB.fullName);
+      await userAPages.conversation().sendMessage('Message from User A');
+
+      await userBPages.conversationList().openConversation(userA.fullName);
+      await userBPages.conversation().sendMessage('Message from User B');
+
+      // Step 2: User A opens Conversation Details
+      await userAPages.conversation().clickConversationInfoButton();
+      // Step 3: User A clicks Clear Conversation Button
+      await userAPages.conversationDetails().clickClearConversationContentButton();
+      // Step 4: Clear Conversation Content Modal appears
+      await expect(userAModals.confirm().modal).toBeVisible();
+      // Step 5: User A clicks 'Clear'
+      await userAModals.confirm().clickAction();
+      // Step 6: Verify that the conversation does not contain any past messages
+      await userAPages.conversationList().openConversation(userB.fullName);
+      await expect(userAPages.conversation().messages).toHaveCount(0);
     },
   );
 });
