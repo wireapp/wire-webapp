@@ -114,8 +114,10 @@ const MultipartAsset = ({
   const name = path ? getName(path) : getName(initialName!);
 
   /**
-   * will listen to hash changes and fetch the data again
-   * in case changes were made to the file in the cell (file is moved to recycle bin, renamed, etc.)
+   * Listen to hash changes within the current conversation (excluding the `/files` view)
+   * and refetch the asset data. This keeps the asset state in sync after navigation,
+   * for example when returning from views where the file might have been moved,
+   * renamed, or otherwise modified.
    */
   useEffect(() => {
     const handleHashChange = () => {
