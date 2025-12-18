@@ -27,6 +27,8 @@ export class ConversationDetailsPage {
   readonly page: Page;
   readonly component: Locator;
 
+  readonly changeConversationNameButton: Locator;
+  readonly conversationNameInput: Locator;
   readonly addPeopleButton: Locator;
   readonly conversationDetails: Locator;
   readonly guestOptionsButton: Locator;
@@ -38,6 +40,8 @@ export class ConversationDetailsPage {
     this.page = page;
     this.component = page.getByRole('complementary').last();
 
+    this.changeConversationNameButton = this.component.getByRole('button', {name: 'Change conversation name'});
+    this.conversationNameInput = this.component.getByRole('textbox');
     this.addPeopleButton = page.locator(`${selectByDataAttribute('go-add-people')}`);
     this.conversationDetails = page.locator('#conversation-details');
     this.guestOptionsButton = this.conversationDetails.locator('[data-uie-name="go-guest-options"]');
@@ -58,6 +62,12 @@ export class ConversationDetailsPage {
         )
         .textContent()) === conversationName
     );
+  }
+
+  async changeConversationName(newName: string) {
+    await this.changeConversationNameButton.click();
+    await this.conversationNameInput.fill('New Group Name');
+    await this.conversationNameInput.press('Enter');
   }
 
   async clickAddPeopleButton() {

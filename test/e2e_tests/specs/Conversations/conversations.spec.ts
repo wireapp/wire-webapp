@@ -89,4 +89,27 @@ test.describe('Conversations', () => {
       await expect(addPeopleSidebar).toContainText('No matching results');
     },
   );
+
+  test(
+    'Verify the name of the group conversation can be edited',
+    {tag: ['@TC-418', '@regression']},
+    async ({createPage}) => {
+      const [userAPages, userBPages] = await Promise.all([
+        createPage(withLogin(userA)).then(page => PageManager.from(page).webapp.pages),
+        createPage(withLogin(userB)).then(page => PageManager.from(page).webapp.pages),
+      ]);
+
+      await createGroup(userAPages, 'Test Group', [userB]);
+      await expect(userBPages.conversationList().getConversationLocator('Test Group')).toBeAttached();
+
+      await userAPages.conversationList().openConversation('Test Group');
+      await userAPages.conversation().toggleGroupInformation();
+      await userAPages.conversationDetails().changeConversationName('New Group Name');
+      await expect(userAPages.conversationList().getConversationLocator('Test Group')).not.toBeAttached();
+      await expect(userAPages.conversationList().getConversationLocator('New Group Name')).toBeAttached();
+
+      await expect(userBPages.conversationList().getConversationLocator('Test Group')).not.toBeAttached();
+      await expect(userBPages.conversationList().getConversationLocator('New Group Name')).toBeAttached();
+    },
+  );
 });
