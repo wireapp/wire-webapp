@@ -131,7 +131,11 @@ const MultipartAsset = ({
   }, [fetchData, conversationId]);
 
   if (isRecycled) {
-    return <MediaFilePreviewCard isLoading={false} isError label={t('cells.unavailableFile')} />;
+    return (
+      <li ref={elementRef} css={fileCardStyles}>
+        <MediaFilePreviewCard isLoading={false} isError label={t('cells.unavailableFile')} />
+      </li>
+    );
   }
 
   if (isImage) {
