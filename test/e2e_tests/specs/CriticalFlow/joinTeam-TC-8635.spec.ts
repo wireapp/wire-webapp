@@ -17,108 +17,60 @@
  *
  */
 
-import {User} from 'test/e2e_tests/data/user';
 import {PageManager} from 'test/e2e_tests/pageManager';
-import {sendTextMessageToUser} from 'test/e2e_tests/utils/userActions';
+import {createGroup} from 'test/e2e_tests/utils/userActions';
 
-import {test, expect, withLogin} from '../../test.fixtures';
-
-const conversationName = 'Crits';
-const textFromBToA = 'Hello Team Owner!';
-const textFromAToB = 'Keep up the good work!';
+import {test, expect, withLogin, withConnectedUser} from '../../test.fixtures';
 
 test(
   'New person joins team and setups up device',
   {tag: ['@TC-8635', '@crit-flow-web']},
-  async ({createTeam, createPage}) => {
-    let userA: User;
-    let userB: User;
-    let userAPageManager: PageManager;
-    let userBPageManager: PageManager;
+  async ({createTeam, createPage, createUser}) => {
+    const team = await createTeam('Test Team', {withMembers: 1});
+    const owner = team.owner;
+    const existingMember = team.members[0];
 
-    await test.step('Precondition', async () => {
-      const team = await createTeam('Test Team', {withMembers: 1});
-      userA = team.owner;
-      userB = team.members[0];
-      const [pmA, pmB] = await Promise.all([
-        PageManager.from(createPage(withLogin(userA))),
-        PageManager.from(createPage(withLogin(userB))),
-      ]);
-      userAPageManager = pmA;
-      userBPageManager = pmB;
+    const ownerPages = PageManager.from(await createPage(withLogin(owner))).webapp.pages;
+
+    await test.step('Precondition: Team has a group chat with existing members', async () => {
+      await createGroup(ownerPages, 'Test Group', [existingMember]);
     });
 
-    await test.step('B searches for A', async () => {
-      const {pages, components, modals} = userBPageManager.webapp;
-
-      await components.conversationSidebar().clickConnectButton();
-      await pages.startUI().selectUser(userA.username);
-      expect(await modals.userProfile().isVisible());
-      await modals.userProfile().clickStartConversation();
+    const userA = await createUser();
+    await test.step('Owner adds user A to team', async () => {
+      await team.addMember(userA);
     });
 
-    await test.step('B sends text to A', async () => {
-      await sendTextMessageToUser(userBPageManager, userA, textFromAToB);
+    const userAPages = PageManager.from(await createPage(withLogin(userA), withConnectedUser(owner))).webapp.pages;
+
+    await test.step('A sends text to owner', async () => {
+      await userAPages.conversationList().openConversation(owner.fullName);
+      await userAPages.conversation().sendMessage('Hello Team Owner!');
+
+      await ownerPages.conversationList().openConversation(userA.fullName);
+      await expect(ownerPages.conversation().getMessage({content: 'Hello Team Owner!'})).toBeVisible();
     });
 
-    await test.step('A receives text of B and sends a text to B', async () => {
-      const {pages} = userAPageManager.webapp;
-      await userAPageManager.waitForTimeout(200); // wait to get the message
-      await expect(pages.conversation().page.getByText(textFromAToB)).toBeVisible();
-      await sendTextMessageToUser(userAPageManager, userB, textFromBToA);
+    await test.step('Owner sends a text to A', async () => {
+      await ownerPages.conversation().sendMessage('Keep up the good work!');
+      await expect(userAPages.conversation().getMessage({content: 'Keep up the good work!'})).toBeVisible();
     });
 
-    await test.step('B receives Text of A', async () => {
-      const {pages} = userBPageManager.webapp;
-      await userAPageManager.waitForTimeout(200); // wait to get the message
-      await expect(pages.conversation().page.getByText(textFromBToA)).toBeVisible();
+    await test.step('Owner adds A to group chat and mentions him', async () => {
+      await ownerPages.conversationList().openConversation('Test Group');
+
+      // Add user A to group chat
+      await ownerPages.conversation().toggleGroupInformation();
+      await ownerPages.conversationDetails().clickAddPeopleButton();
+      await ownerPages.conversationDetails().addUsersToConversation([userA.fullName]);
+      await ownerPages.conversation().toggleGroupInformation();
+
+      await ownerPages.conversation().sendMessageWithUserMention(userA.fullName);
     });
 
-    await test.step('A creates a group chat', async () => {
-      const {pages} = userAPageManager.webapp;
-      await pages.conversationList().clickCreateGroup();
-      await pages.groupCreation().setGroupName(conversationName);
-      //await pages.groupCreation().clickAddMembers();
-      await pages.groupCreation().clickCreateGroupButton();
-    });
-
-    await test.step('A adds B to chat', async () => {
-      const {pages} = userAPageManager.webapp;
-
-      // Team owner opens the group chat
-      await pages.conversationList().openConversation(conversationName);
-      expect(await pages.conversation().isConversationOpen(conversationName));
-
-      // Team owner opens group information and adds A to the group
-      await pages.conversation().toggleGroupInformation();
-      expect(await pages.conversationDetails().isOpen(conversationName)).toBeTruthy();
-      await pages.conversationDetails().clickAddPeopleButton();
-      await pages.conversationDetails().addUsersToConversation([userB.fullName]);
-
-      // Team owner confirms the addition of A to the group
-      expect(await pages.conversationDetails().isUserPartOfConversationAsMember(userB.fullName));
-      await expect(
-        pages.conversation().page.getByText(`You added ${userB.fullName} to the conversation`),
-      ).toBeVisible();
-    });
-
-    await test.step('B sees the chat', async () => {
-      const {pages} = userBPageManager.webapp;
-      await pages.conversationList().openConversation(conversationName);
-      expect(await pages.conversation().isConversationOpen(conversationName));
-    });
-
-    await test.step('A mentions B', async () => {
-      const {pages} = userAPageManager.webapp;
-      await pages.conversation().sendMessageWithUserMention(userB.fullName);
-    });
-
-    await test.step('B sees the mention in the chat', async () => {
-      const {pages} = userBPageManager.webapp;
-      await userBPageManager.waitForTimeout(200); // wait to get the message
-
-      pages.conversation().sendMessageButton.filter({hasText: 'Send'});
-      await expect(pages.conversation().getMessage({content: `@${userB.fullName}`})).toBeVisible();
+    await test.step('User A receives mention in group chat', async () => {
+      await userAPages.conversationList().openConversation('Test Group');
+      await expect(userAPages.conversation().getMessage({content: `@${userA.fullName}`})).toBeVisible();
     });
   },
 );

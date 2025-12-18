@@ -52,7 +52,12 @@ type Fixtures = {
   createTeam: (
     teamName: string,
     options?: Parameters<typeof createUser>[1] & {withMembers?: number | User[]; enablePaidFeatures?: boolean},
-  ) => Promise<{owner: User; members: User[]}>;
+  ) => Promise<{
+    owner: User;
+    members: User[];
+    /** Add a new member to the team after its initial creation */
+    addMember: (member: User) => Promise<void>;
+  }>;
 };
 
 export {expect} from '@playwright/test';
@@ -128,6 +133,12 @@ export const test = baseTest.extend<Fixtures>({
 
       teamOwners.push(owner);
 
+      const addMember = async (member: User) => {
+        const invitationId = await api.team.inviteUserToTeam(member.email, owner);
+        const invitationCode = await api.brig.getTeamInvitationCodeForEmail(owner.teamId, invitationId);
+        await api.team.acceptTeamInvitation(invitationCode, member);
+      };
+
       let members: User[] = [];
       if (withMembers !== undefined) {
         // Depending on the type of withMembers, either create the number of users or use the given array of users
@@ -136,16 +147,10 @@ export const test = baseTest.extend<Fixtures>({
             ? await Promise.all(Array.from({length: withMembers}, () => createUser(api, options)))
             : withMembers;
 
-        await Promise.all(
-          members.map(async member => {
-            const invitationId = await api.team.inviteUserToTeam(member.email, owner);
-            const invitationCode = await api.brig.getTeamInvitationCodeForEmail(owner.teamId, invitationId);
-            await api.team.acceptTeamInvitation(invitationCode, member);
-          }),
-        );
+        await Promise.all(members.map(member => addMember(member)));
       }
 
-      return {owner, members};
+      return {owner, members, addMember};
     });
 
     // Deletes each created team and the owner / members associated with it
