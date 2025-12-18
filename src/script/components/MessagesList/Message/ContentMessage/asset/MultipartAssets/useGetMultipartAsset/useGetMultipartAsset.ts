@@ -114,6 +114,7 @@ export const useGetMultipartAsset = ({
         setImagePreviewUrl(imagePreview?.PreSignedGET?.Url);
         setPdfPreviewUrl(pdfPreview?.PreSignedGET?.Url);
         setPath(asset.Path);
+        setIsRecycled(asset.IsRecycled);
         setStatus('success');
       } catch (err) {
         if (!isMounted.current) {
