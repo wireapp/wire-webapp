@@ -42,7 +42,7 @@ test('Messages in Groups', {tag: ['@TC-8751', '@crit-flow-web']}, async ({create
   let userBPageManager: PageManager;
 
   await test.step('Preconditions: Creating preconditions for the test via API', async () => {
-    const team = await createTeam('Critical Team', {withMembers: 1, enablePaidFeatures: true});
+    const team = await createTeam('Critical Team', {withMembers: 1});
     userA = team.owner;
     userB = team.members[0];
 
