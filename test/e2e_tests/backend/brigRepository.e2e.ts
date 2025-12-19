@@ -190,7 +190,52 @@ export class BrigRepositoryE2E {
     await this.axiosInstance.put(
       `i/teams/${teamId}/features/cells`,
       {
+        config: {
+          channels: {
+            default: 'enabled',
+            enabled: true,
+          },
+          collabora: {
+            enabled: true,
+          },
+          groups: {
+            default: 'enabled',
+            enabled: true,
+          },
+          metadata: {
+            namespaces: {
+              usermetaTags: {
+                allowFreeValues: true,
+                defaultValues: [],
+              },
+            },
+          },
+          one2one: {
+            default: 'enabled',
+            enabled: true,
+          },
+          publicLinks: {
+            enableFiles: true,
+            enableFolders: true,
+            enforceExpirationDefault: 0,
+            enforceExpirationMax: 0,
+            enforcePassword: false,
+          },
+          storage: {
+            perFileQuotaBytes: '104857600',
+            recycle: {
+              allowSkip: false,
+              autoPurgeDays: 30,
+              disable: false,
+            },
+          },
+          users: {
+            externals: true,
+            guests: true,
+          },
+        },
         status: 'enabled',
+        ttl: 'unlimited',
       },
       {
         headers: {
