@@ -993,8 +993,8 @@ export class MLSService extends TypedEventEmitter<Events> {
    *
    * @param groupId groupId of the conversation
    */
-  public async commitPendingProposals(groupId: string, shouldRetry = true, params?: any): Promise<void> {
-    this.logger.info(`Committing pending proposals for groupId ${groupId}`, {shouldRetry, params});
+  public async commitPendingProposals(groupId: string, shouldRetry = true): Promise<void> {
+    this.logger.info(`Committing pending proposals for groupId ${groupId}`, {shouldRetry});
     const groupIdBytes = Decoder.fromBase64(groupId).asBytes;
 
     try {

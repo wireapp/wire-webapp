@@ -402,7 +402,7 @@ export class ConversationService extends TypedEventEmitter<Events> {
     const groupIdBytes = Decoder.fromBase64(groupId).asBytes;
 
     // immediately execute pending commits before sending the message
-    await this.mlsService.commitPendingProposals(groupId, true, params);
+    await this.mlsService.commitPendingProposals(groupId, true);
 
     const encrypted = await this.mlsService.encryptMessage(
       new ConversationId(groupIdBytes),
