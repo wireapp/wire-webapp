@@ -200,12 +200,6 @@ export class ConversationPage {
     }
 
     await this.messageInput.press('Enter');
-
-    // Handle "Send Anyways" dialog in case it appears
-    const sendAnywaysButton = this.page.locator("div[role='dialog'] button").filter({hasText: 'Send'});
-    if (await sendAnywaysButton.isVisible()) {
-      await sendAnywaysButton.click();
-    }
   }
 
   async isImageFromUserVisible(user: User) {
