@@ -30,6 +30,7 @@ export class ConversationDetailsPage {
   readonly selfDeletingMessageButton: Locator;
   readonly archiveButton: Locator;
   readonly blockConversationButton: Locator;
+  readonly clearConversationContentButton: Locator;
 
   constructor(page: Page) {
     this.page = page;
@@ -40,6 +41,7 @@ export class ConversationDetailsPage {
     this.selfDeletingMessageButton = this.conversationDetails.getByRole('button', {name: 'Self-deleting messages'});
     this.archiveButton = this.conversationDetails.locator(selectByDataAttribute('do-archive'));
     this.blockConversationButton = this.conversationDetails.locator(selectByDataAttribute('do-block'));
+    this.clearConversationContentButton = this.conversationDetails.getByRole('button', {name: 'Clear Content'});
   }
 
   async waitForSidebar() {
@@ -167,5 +169,9 @@ export class ConversationDetailsPage {
 
   async clickBlockConversationButton() {
     await this.blockConversationButton.click();
+  }
+
+  async clickClearConversationContentButton() {
+    await this.clearConversationContentButton.click();
   }
 }
