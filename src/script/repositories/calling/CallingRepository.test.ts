@@ -19,18 +19,21 @@
 
 import {CONVERSATION_TYPE, DefaultConversationRoleName} from '@wireapp/api-client/lib/conversation';
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
+import {amplify} from 'amplify';
 import 'jsdom-worker';
 import {Subscription} from 'knockout';
 import {container} from 'tsyringe';
 
 import {CALL_TYPE, CONV_TYPE, REASON, STATE as CALL_STATE, VIDEO_STATE, Wcall} from '@wireapp/avs';
 import {Runtime} from '@wireapp/commons';
+import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {Conversation} from 'Repositories/entity/Conversation';
 import {User} from 'Repositories/entity/User';
 import {CallingEvent} from 'Repositories/event/CallingEvent';
 import {CALL} from 'Repositories/event/Client';
 import {EventRepository} from 'Repositories/event/EventRepository';
+import {NOTIFICATION_HANDLING_STATE} from 'Repositories/event/NotificationHandlingState';
 import {MediaType} from 'Repositories/media/MediaType';
 import {UserRepository} from 'Repositories/user/UserRepository';
 import {serverTimeHandler} from 'src/script/time/serverTimeHandler';
@@ -873,6 +876,147 @@ describe.skip('E2E audio call', () => {
     };
     const NO_MEETING = 0;
     wCall.start(remoteWuser, conversationId.id, CALL_TYPE.NORMAL, CONV_TYPE.ONEONONE, 0, NO_MEETING);
+  });
+});
+
+describe('NotificationHandlingState', () => {
+  const messageRepository = {
+    grantMessage: () => Promise.resolve(true),
+  } as any;
+  const eventRepository = {
+    injectEvent: () => {},
+  } as any;
+
+  const mediaDevicesHandler = {
+    setOnMediaDevicesRefreshHandler: () => {},
+  } as any;
+
+  const client = new CallingRepository(
+    messageRepository,
+    eventRepository,
+    {} as UserRepository,
+    serverTimeHandler as any,
+    mediaDevicesHandler,
+    {} as any,
+  );
+  const user = new User('user-1');
+  let wCall: Wcall;
+  let wUserNumber: number;
+  //
+  beforeEach(() => {
+    return client.initAvs(user, 'device').then(({wCall: wCallInstance, wUser}) => {
+      createAutoAnsweringWuser(wCallInstance, client);
+      wCall = wCallInstance;
+      wUserNumber = wUser;
+    });
+  });
+
+  it('handle STREAM state notification', done => {
+    spyOn(wCall, 'processNotifications').and.callThrough();
+
+    amplify.publish(WebAppEvents.EVENT.NOTIFICATION_HANDLING_STATE, NOTIFICATION_HANDLING_STATE.STREAM);
+
+    expect(wCall.processNotifications).toHaveBeenCalledWith(wUserNumber, 1);
+    done();
+  });
+
+  it('handle RECOVERY state notification', done => {
+    spyOn(wCall, 'processNotifications').and.callThrough();
+
+    amplify.publish(WebAppEvents.EVENT.NOTIFICATION_HANDLING_STATE, NOTIFICATION_HANDLING_STATE.RECOVERY);
+
+    expect(wCall.processNotifications).toHaveBeenCalledWith(wUserNumber, 1);
+    done();
+  });
+
+  it('handle WEB_SOCKET state notification', done => {
+    spyOn(wCall, 'processNotifications').and.callThrough();
+
+    amplify.publish(WebAppEvents.EVENT.NOTIFICATION_HANDLING_STATE, NOTIFICATION_HANDLING_STATE.WEB_SOCKET);
+
+    expect(wCall.processNotifications).toHaveBeenCalledWith(wUserNumber, 0);
+    done();
+  });
+});
+
+describe('init AVS state', () => {
+  const messageRepository = {
+    grantMessage: () => Promise.resolve(true),
+  } as any;
+  const eventRepository = {
+    injectEvent: () => {},
+  } as any;
+
+  const mediaDevicesHandler = {
+    setOnMediaDevicesRefreshHandler: () => {},
+  } as any;
+
+  const client = new CallingRepository(
+    messageRepository,
+    eventRepository,
+    {} as UserRepository,
+    serverTimeHandler as any,
+    mediaDevicesHandler,
+    {} as any,
+  );
+  const user = new User('user-1');
+  beforeEach(() => {
+    jest.useFakeTimers();
+    jest.spyOn(Date, 'now');
+  });
+
+  afterEach(() => {
+    jest.useRealTimers();
+    jest.restoreAllMocks();
+  });
+
+  it('start polling', done => {
+    const nowMock = jest.spyOn(Date, 'now');
+    nowMock.mockReturnValue(0);
+    client.initAvs(user, 'device').then(({wCall: wCallInstance, wUser}) => {
+      createAutoAnsweringWuser(wCallInstance, client);
+      spyOn(wCallInstance, 'setBackground').and.callThrough();
+      spyOn(wCallInstance, 'poll').and.callThrough();
+      nowMock.mockReturnValue(500);
+      jest.advanceTimersByTime(500);
+
+      expect(wCallInstance.poll).toHaveBeenCalledTimes(1);
+      expect(wCallInstance.setBackground).not.toHaveBeenCalled();
+      done();
+    });
+  });
+
+  it('set info that app was in background to AVS', done => {
+    const nowMock = jest.spyOn(Date, 'now');
+    nowMock.mockReturnValue(0);
+    client.initAvs(user, 'device').then(({wCall: wCallInstance, wUser}) => {
+      createAutoAnsweringWuser(wCallInstance, client);
+      spyOn(wCallInstance, 'setBackground').and.callThrough();
+      spyOn(wCallInstance, 'poll').and.callThrough();
+      nowMock.mockReturnValue(3001);
+      jest.advanceTimersByTime(500);
+
+      expect(wCallInstance.poll).toHaveBeenCalledTimes(1);
+      expect(wCallInstance.setBackground).toHaveBeenCalledTimes(1);
+      done();
+    });
+  });
+
+  it('set info that app was in background to AVS fails', done => {
+    const nowMock = jest.spyOn(Date, 'now');
+    nowMock.mockReturnValue(0);
+    client.initAvs(user, 'device').then(({wCall: wCallInstance, wUser}) => {
+      createAutoAnsweringWuser(wCallInstance, client);
+      spyOn(wCallInstance, 'setBackground').and.throwError('AVS set background fails');
+      spyOn(wCallInstance, 'poll').and.callThrough();
+      nowMock.mockReturnValue(3001);
+      jest.advanceTimersByTime(500);
+
+      expect(wCallInstance.poll).toHaveBeenCalledTimes(1);
+      expect(wCallInstance.setBackground).toHaveBeenCalledTimes(1);
+      expect(wCallInstance.setBackground).toThrow('AVS set background fails');
+      done();
+    });
   });
 });
 
