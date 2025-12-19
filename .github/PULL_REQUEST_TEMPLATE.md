@@ -14,9 +14,13 @@
 - [ ] **No unsafe HTML is rendered**; if unavoidable, sanitization is applied **and** documented where it happens.
 - [ ] **Injection risks (XSS/SQL/command) are prevented** via safe APIs and/or escaping.
 
+## Accessibility (required)
+
+- [ ] I have read and this PR **upholds** our [Accessibility Best Practices](https://github.com/wireapp/wire-webapp/blob/dev/docs/accessibility-practices.md).
+
 ## Standards Acknowledgement (required)
 
-- [ ] I have read and this PR **upholds** our [Coding Standards](https://github.com/wireapp/wire-webapp/tree/docs/coding-standards.md) and [Tech Radar Choices](https://github.com/wireapp/wire-webapp/tree/docs/tech-radar.md).
+- [ ] I have read and this PR **upholds** our [Coding Standards](https://github.com/wireapp/wire-webapp/blob/dev/docs/coding-standards.md) and [Tech Radar Choices](https://github.com/wireapp/wire-webapp/blob/dev/docs/tech-radar.md).
 
 ---
 
