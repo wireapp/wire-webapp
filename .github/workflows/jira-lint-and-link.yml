@@ -5,7 +5,7 @@ on:
 jobs:
   add-jira-description:
     # avoid triggering this action on dependabot PRs
-    if: ${{ github.actor != 'dependabot[bot]' }}
+    if: ${{ github.actor != 'dependabot[bot]' && github.actor != 'otto-the-bot' }}
     runs-on: ubuntu-latest
     steps:
       - uses: cakeinpanic/jira-description-action@master
