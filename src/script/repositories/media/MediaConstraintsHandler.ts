@@ -34,7 +34,7 @@ interface Config {
       DISPLAY_MEDIA: MediaTrackConstraints;
       USER_MEDIA: MediaTrackConstraints & {mediaSource: string};
     };
-    VIDEO: Record<VIDEO_QUALITY_MODE, MediaTrackConstraints> & {PREFERRED_FACING_MODE: string};
+    VIDEO: Record<VIDEO_QUALITY_MODE, MediaTrackConstraints & {resizeMode: string}> & {PREFERRED_FACING_MODE: string};
   };
   DEFAULT_DEVICE_ID: string;
 }
@@ -69,24 +69,28 @@ export class MediaConstraintsHandler {
         },
         VIDEO: {
           [VIDEO_QUALITY_MODE.FULL_HD]: {
-            frameRate: 15,
-            height: 1080,
-            width: 1920,
+            frameRate: {ideal: 15},
+            height: {ideal: 1080},
+            width: {ideal: 1920},
+            resizeMode: 'none',
           },
           [VIDEO_QUALITY_MODE.GROUP]: {
-            frameRate: 15,
-            height: 720,
-            width: 1280,
+            frameRate: {ideal: 15},
+            height: {ideal: 720},
+            width: {ideal: 1280},
+            resizeMode: 'none',
           },
           [VIDEO_QUALITY_MODE.HD]: {
-            frameRate: 15,
-            height: 720,
-            width: 1280,
+            frameRate: {ideal: 15},
+            height: {ideal: 720},
+            width: {ideal: 1280},
+            resizeMode: 'none',
           },
           [VIDEO_QUALITY_MODE.MOBILE]: {
-            frameRate: 15,
-            height: 720,
-            width: 1280,
+            frameRate: {ideal: 15},
+            height: {ideal: 720},
+            width: {ideal: 1280},
+            resizeMode: 'none',
           },
           PREFERRED_FACING_MODE: 'user',
         },
