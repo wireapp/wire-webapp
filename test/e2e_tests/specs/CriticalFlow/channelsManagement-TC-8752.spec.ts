@@ -34,7 +34,7 @@ test.fixme('Channels Management', {tag: ['@TC-8752', '@crit-flow-web']}, async (
   let ownerPageManager: PageManager;
   let memberPageManager: PageManager;
 
-  await test.step('Preconditions: Team owner create a channels enabled team', async () => {
+  await test.step('Preconditions: Team owner creates a channels enabled team', async () => {
     const team = await createTeam('Channels Management', {withMembers: 1});
     owner = team.owner;
     member = team.members[0];

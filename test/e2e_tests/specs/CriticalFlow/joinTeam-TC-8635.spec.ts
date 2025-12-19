@@ -23,7 +23,7 @@ import {createGroup} from 'test/e2e_tests/utils/userActions';
 import {test, expect, withLogin, withConnectedUser} from '../../test.fixtures';
 
 test(
-  'New person joins team and setups up device',
+  'New person joins team and sets up device',
   {tag: ['@TC-8635', '@crit-flow-web']},
   async ({createTeam, createPage, createUser}) => {
     const team = await createTeam('Test Team', {withMembers: 1});

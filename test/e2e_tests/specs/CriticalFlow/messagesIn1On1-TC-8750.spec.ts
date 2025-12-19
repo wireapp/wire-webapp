@@ -70,7 +70,7 @@ test('Messages in 1:1', {tag: ['@TC-8750', '@crit-flow-web']}, async ({createTea
     await memberAPageManager.waitForTimeout(5_000);
     await pages.conversationList().openConversation(memberB.fullName);
     await components.inputBarControls().clickShareImage(imageFilePath);
-    expect(pages.conversation().isImageFromUserVisible(memberA)).toBeTruthy();
+    expect(await pages.conversation().isImageFromUserVisible(memberA)).toBeTruthy();
   });
   await test.step('User B can see the image in the conversation', async () => {
     await memberBPageManager.webapp.pages.conversationList().openConversation(memberA.fullName);
@@ -118,7 +118,7 @@ test('Messages in 1:1', {tag: ['@TC-8750', '@crit-flow-web']}, async ({createTea
     expect(await pages.conversation().isVideoMessageVisible()).toBeTruthy();
   });
   await test.step('User B can play the video', async () => {
-    const {pages} = memberAPageManager.webapp;
+    const {pages} = memberBPageManager.webapp;
     await pages.conversation().playVideo();
     // Wait for 5 seconds to ensure video starts playing
     await pages.conversation().page.waitForTimeout(5000);

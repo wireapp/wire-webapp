@@ -37,7 +37,7 @@ test.fixme(
     let ownerPageManager: PageManager;
     let callingServiceInstanceId: string;
 
-    await test.step('Preconditions: Team owner create a channels enabled team', async () => {
+    await test.step('Preconditions: Team owner creates a channels enabled team', async () => {
       const team = await createTeam('Channels Call', {withMembers: 1});
       owner = team.owner;
       member = team.members[0];
