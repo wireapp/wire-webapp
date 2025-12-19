@@ -139,146 +139,104 @@ test.describe('Clear Conversation Content', () => {
     );
   });
 
-  // TODO: Blocked [WPB-22442] - Group call feature requires Enterprise Account
-  test.skip(
-    'I want to see incoming picture, ping and call after I clear content of a group conversation via conversation list',
-    {tag: ['@TC-156', '@regression']},
-    async ({createPage}) => {
-      const [userAPageManager, userBPageManager, userCPageManager] = await Promise.all([
-        PageManager.from(createPage(withLogin(userA), withConnectedUser(userB), withConnectedUser(userC))),
-        PageManager.from(createPage(withLogin(userB))),
-        PageManager.from(createPage(withLogin(userC))),
-      ]);
+  [
+    {tag: '@TC-156', conversationType: 'group'},
+    {tag: '@TC-8779', conversationType: '1:1'},
+  ].forEach(({tag, conversationType}) => {
+    test(
+      `I want to see incoming picture, ping and call after I clear content of a ${conversationType} conversation via conversation list`,
+      {tag: [tag, '@regression']},
+      async ({createPage}) => {
+        test.skip(conversationType === 'group', 'Blocked [WPB-22442] - Group call feature requires Enterprise Account');
 
-      const {pages: userAPages, modals: userAModals} = userAPageManager.webapp;
-      const userBPages = userBPageManager.webapp.pages;
-      const userCPages = userCPageManager.webapp.pages;
+        // Step 1: Create a group conversation with User A, B and C
+        const [userAPageManager, userBPageManager, userCPageManager] = await Promise.all([
+          PageManager.from(createPage(withLogin(userA), withConnectedUser(userB), withConnectedUser(userC))),
+          PageManager.from(createPage(withLogin(userB))),
+          PageManager.from(createPage(withLogin(userC))),
+        ]);
 
-      // Step 1: Create a group conversation with User A, B and C
-      const conversationName = 'Group conversation';
-      await createGroup(userAPages, conversationName, [userB, userC]);
+        const {pages: userAPages, modals: userAModals} = userAPageManager.webapp;
+        const userBPages = userBPageManager.webapp.pages;
+        const userCPages = userCPageManager.webapp.pages;
 
-      // Step 2: Write messages in the group conversation
-      await userAPages.conversationList().openConversation(conversationName);
-      await userAPages.conversation().sendMessage('Message from User A');
+        const conversationName = conversationType === 'group' ? 'Group conversation' : userB.fullName;
 
-      await userBPages.conversationList().openConversation(conversationName);
-      await userBPages.conversation().sendMessage('Message from User B');
+        if (conversationType === 'group') {
+          await createGroup(userAPages, conversationName, [userB, userC]);
+        } else {
+          await userAPages.conversationList().openConversation(conversationName);
+        }
 
-      await userCPages.conversationList().openConversation(conversationName);
-      await userCPages.conversation().sendMessage('Message from User C');
+        // Step 2: Write messages in the conversation
+        await userAPages.conversationList().openConversation(conversationName);
+        await userAPages.conversation().sendMessage('Message from User A');
 
-      // Step 3: User A selects 'Clear Conversation' option from the Conversation List Context Menu
-      await userAPages.conversationList().openContextMenu(conversationName);
-      await userAPages.conversationList().clearContentButton.click();
-      // Step 4: Warning Popup should open
-      await expect(userAModals.optionModal().modal).toBeVisible();
-      // Step 5: User A clicks 'Clear'
-      await userAModals.optionModal().clickAction();
+        const conversationPartnerForUserB = conversationType === 'group' ? conversationName : userA.fullName;
 
-      // Step 6: Verify you can receive incoming new messages, pings, calls, pictures, and files
-      // Step 6.1: Verify you can receive incoming new messages
-      await userBPages.conversationList().openConversation(conversationName);
-      await userBPages.conversation().sendMessage('Message from User B after Clear');
-      await userAPages.conversationList().openConversation(conversationName);
-      await expect(userAPages.conversation().messages).toHaveCount(1);
+        await userBPages.conversationList().openConversation(conversationPartnerForUserB);
+        await userBPages.conversation().sendMessage('Message from User B');
 
-      // Step 6.2: Verify you can receive incoming pings
-      await userBPages.conversationList().openConversation(conversationName);
-      await userBPages.conversation().sendPing();
-      await userAPages.conversationList().openConversation(conversationName);
-      await expect(userAPages.conversation().getPing()).toBeVisible();
+        if (conversationType === 'group') {
+          await userCPages.conversationList().openConversation(conversationName);
+          await userCPages.conversation().sendMessage('Message from User C');
+        } else {
+          return;
+        }
 
-      // Step 6.3: Verify you can receive incoming pictures
-      const {page} = userBPages.conversation();
-      await shareAssetHelper(getImageFilePath(), page, page.getByRole('button', {name: 'Add picture'}));
-      const messageWithImage = userAPages.conversation().getMessage({sender: userB});
-      await expect(messageWithImage).toBeVisible();
+        // Step 3: User A selects 'Clear Conversation' option from the Conversation List Context Menu
+        await userAPages.conversationList().openContextMenu(conversationName);
+        await userAPages.conversationList().clearContentButton.click();
 
-      // Step 6.4: Verify you can receive incoming files
-      await userAPages.conversationList().openConversation(conversationName);
-      await shareAssetHelper(getTextFilePath(), page, page.getByRole('button', {name: 'Add file'}));
-      const messageWithFile = userAPages.conversation().getMessage({sender: userB});
-      await expect(messageWithFile).toBeVisible();
+        // Step 4: Warning Popup should open and User A clicks 'Clear'
+        if (conversationType === 'group') {
+          await expect(userAModals.optionModal().modal).toBeVisible();
+          await userAModals.optionModal().clickAction();
+        } else {
+          await expect(userAModals.confirm().modal).toBeVisible();
+          await userAModals.confirm().clickAction();
+        }
 
-      // Step 6.5: Verify you can receive incoming calls
-      await userAPages.conversationList().openConversation(conversationName);
-      await userBPages.conversationList().openConversation(conversationName);
-      await userBPages.conversation().startCall();
-      await expect(userAPages.calling().acceptCallButton).toBeVisible();
-    },
-  );
+        // Step 5: Verify you can receive incoming new messages, pings, calls, pictures, and files
+        // 5.1 Messages
+        await userBPages.conversationList().openConversation(conversationPartnerForUserB);
+        await userBPages.conversation().sendMessage('Message from User B after Clear');
+        await userAPages.conversationList().openConversation(conversationName);
+        await expect(userAPages.conversation().messages).toHaveCount(1);
 
-  test(
-    'I want to see incoming picture, ping and call after I clear content of a 1:1 conversation via conversation list',
-    {tag: ['@TC-8779', '@regression']},
-    async ({createPage}) => {
-      const [userAPageManager, userBPageManager] = await Promise.all([
-        PageManager.from(createPage(withLogin(userA), withConnectedUser(userB))),
-        PageManager.from(createPage(withLogin(userB))),
-      ]);
+        // 5.2 Pings
+        await userBPages.conversationList().openConversation(conversationPartnerForUserB);
+        await userBPages.conversation().sendPing();
+        await userAPages.conversationList().openConversation(conversationName);
+        await expect(userAPages.conversation().getPing()).toBeVisible();
 
-      const {pages: userAPages, modals: userAModals} = userAPageManager.webapp;
-      const userBPages = userBPageManager.webapp.pages;
+        // 5.3 Pictures
+        const {page} = userBPages.conversation();
+        await shareAssetHelper(getImageFilePath(), page, page.getByRole('button', {name: 'Add picture'}));
 
-      // Step 1: Create a 1:1 conversation with User A and B
-      await userAPages.conversationList().openConversation(userB.fullName);
+        const messageWithImage = userAPages
+          .conversation()
+          .getMessage({sender: userB})
+          .filter({has: userAPages.conversation().page.locator('img[data-uie-name="image-asset-img"]')});
+        await expect(messageWithImage).toBeVisible();
 
-      // Step 2: Write messages in the group conversation
-      await userAPages.conversation().sendMessage('Message from User A');
-      await userBPages.conversationList().openConversation(userA.fullName);
-      await userBPages.conversation().sendMessage('Message from User B');
-      await expect(userAPages.conversation().messages).toHaveCount(2);
+        // 5.4 Files
+        await userAPages.conversationList().openConversation(conversationName);
+        await shareAssetHelper(getTextFilePath(), page, page.getByRole('button', {name: 'Add file'}));
+        const messageWithFile = userAPages
+          .conversation()
+          .getMessage({sender: userB})
+          .filter({has: userAPages.conversation().page.locator('[data-uie-name="file-asset"]')});
+        await expect(messageWithFile).toBeVisible();
 
-      // Step 3: User A selects 'Clear Conversation' option from the Conversation List Context Menu
-      await userAPages.conversationList().openContextMenu(userB.fullName);
-      await userAPages.conversationList().clearContentButton.click();
-      // Step 4: Warning Popup should open
-      await expect(userAModals.confirm().modal).toBeVisible();
-      // Step 5: User A clicks 'Clear'
-      await userAModals.confirm().clickAction();
-
-      // Step 6: Verify you can receive incoming new messages, pings, calls, pictures, and files
-      // Step 6.1: Verify you can receive incoming new messages
-      await userBPages.conversationList().openConversation(userA.fullName);
-      await expect(userAPages.conversation().messages).toHaveCount(0);
-      await userBPages.conversation().sendMessage('Message from User B after Clear');
-      await userAPages.conversationList().openConversation(userB.fullName);
-      await expect(userAPages.conversation().messages).toHaveCount(1);
-
-      // Step 6.2: Verify you can receive incoming pings
-      await userBPages.conversationList().openConversation(userA.fullName);
-      await userBPages.conversation().sendPing();
-      await userAPages.conversationList().openConversation(userB.fullName);
-      await expect(userAPages.conversation().getPing()).toBeVisible();
-
-      // Step 6.3: Verify you can receive incoming pictures
-      const {page} = userBPages.conversation();
-      await shareAssetHelper(getImageFilePath(), page, page.getByRole('button', {name: 'Add picture'}));
-      const messageWithImage = userAPages
-        .conversation()
-        .getMessage({sender: userB})
-        .filter({has: userAPages.conversation().page.locator('img[data-uie-name="image-asset-img"]')});
-      await expect(messageWithImage).toBeVisible();
-
-      // Step 6.4: Verify you can receive incoming files
-      await userAPages.conversationList().openConversation(userB.fullName);
-      await shareAssetHelper(getTextFilePath(), page, page.getByRole('button', {name: 'Add file'}));
-      const messageWithFile = userAPages
-        .conversation()
-        .getMessage({sender: userB})
-        .filter({
-          has: userAPages.conversation().page.locator('[data-uie-name="file-asset"]'),
-        });
-      await expect(messageWithFile).toBeVisible();
-
-      // Step 6.5: Verify you can receive incoming calls
-      await userAPages.conversationList().openConversation(userB.fullName);
-      await userBPages.conversationList().openConversation(userA.fullName);
-      await userBPages.conversation().startCall();
-      await expect(userAPages.calling().acceptCallButton).toBeVisible();
-    },
-  );
+        // 5.5 Calls
+        await userAPages.conversationList().openConversation(conversationName);
+        await userBPages.conversationList().openConversation(conversationPartnerForUserB);
+        await userBPages.conversation().startCall();
+        await expect(userAPages.calling().acceptCallButton).toBeVisible();
+      },
+    );
+  });
 
   [
     {tag: '@TC-424', type: 'clear', conversationType: 'group'},
