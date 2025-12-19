@@ -939,6 +939,87 @@ describe('NotificationHandlingState', () => {
   });
 });
 
+describe('init AVS state', () => {
+  const messageRepository = {
+    grantMessage: () => Promise.resolve(true),
+  } as any;
+  const eventRepository = {
+    injectEvent: () => {},
+  } as any;
+
+  const mediaDevicesHandler = {
+    setOnMediaDevicesRefreshHandler: () => {},
+  } as any;
+
+  const client = new CallingRepository(
+    messageRepository,
+    eventRepository,
+    {} as UserRepository,
+    serverTimeHandler as any,
+    mediaDevicesHandler,
+    {} as any,
+  );
+  const user = new User('user-1');
+  beforeEach(() => {
+    jest.useFakeTimers();
+    jest.spyOn(Date, 'now');
+  });
+
+  afterEach(() => {
+    jest.useRealTimers();
+    jest.restoreAllMocks();
+  });
+
+  it('start polling', done => {
+    const nowMock = jest.spyOn(Date, 'now');
+    nowMock.mockReturnValue(0);
+    client.initAvs(user, 'device').then(({wCall: wCallInstance, wUser}) => {
+      createAutoAnsweringWuser(wCallInstance, client);
+      spyOn(wCallInstance, 'setBackground').and.callThrough();
+      spyOn(wCallInstance, 'poll').and.callThrough();
+      nowMock.mockReturnValue(500);
+      jest.advanceTimersByTime(500);
+
+      expect(wCallInstance.poll).toHaveBeenCalledTimes(1);
+      expect(wCallInstance.setBackground).not.toHaveBeenCalled();
+      done();
+    });
+  });
+
+  it('set info that app was in background to AVS', done => {
+    const nowMock = jest.spyOn(Date, 'now');
+    nowMock.mockReturnValue(0);
+    client.initAvs(user, 'device').then(({wCall: wCallInstance, wUser}) => {
+      createAutoAnsweringWuser(wCallInstance, client);
+      spyOn(wCallInstance, 'setBackground').and.callThrough();
+      spyOn(wCallInstance, 'poll').and.callThrough();
+      nowMock.mockReturnValue(3001);
+      jest.advanceTimersByTime(500);
+
+      expect(wCallInstance.poll).toHaveBeenCalledTimes(1);
+      expect(wCallInstance.setBackground).toHaveBeenCalledTimes(1);
+      done();
+    });
+  });
+
+  it('set info that app was in background to AVS fails', done => {
+    const nowMock = jest.spyOn(Date, 'now');
+    nowMock.mockReturnValue(0);
+    client.initAvs(user, 'device').then(({wCall: wCallInstance, wUser}) => {
+      createAutoAnsweringWuser(wCallInstance, client);
+      spyOn(wCallInstance, 'setBackground').and.throwError('AVS set background fails');
+      spyOn(wCallInstance, 'poll').and.callThrough();
+      nowMock.mockReturnValue(3001);
+      jest.advanceTimersByTime(500);
+
+      expect(wCallInstance.poll).toHaveBeenCalledTimes(1);
+      expect(wCallInstance.setBackground).toHaveBeenCalledTimes(1);
+      expect(wCallInstance.setBackground).toThrow('AVS set background fails');
+      done();
+    });
+  });
+});
+
 function extractAudioStats(stats: any) {
   const audioStats: any[] = [];
   stats.forEach((userStats: any) => {

@@ -388,12 +388,18 @@ export class CallingRepository {
       const now = Date.now();
       const diff = now - last;
 
+      // Inform AVS that the app was in sleep mode. This recalibrates the timers within AVS
       if (diff > AVS_BROWSER_SLEEP_MODE_DETECTION_TIME) {
-        // Inform AVS that the app was in sleep mode. This recalibrates the timers within AVS
-        try {
-          wCall.setBackground(this.wUser, 0);
-        } catch (e) {
-          this.logger.warn(`Informed AVS about background mode failed". ${e}`);
+        // Only notify AVS once a valid user identifier has been assigned.
+        const userId = this.wUser;
+        if (userId) {
+          try {
+            wCall.setBackground(this.wUser, 0);
+          } catch (e) {
+            this.logger.warn(`Informed AVS about background mode failed. ${e}`);
+          }
+        } else {
+          this.logger.warn('Skipping AVS background notification because AVS user ID is not initialized.');
         }
       }
 
@@ -447,8 +453,10 @@ export class CallingRepository {
     wCall.setReqClientsHandler(wUser, this.requestClients);
     wCall.setReqNewEpochHandler(wUser, this.requestNewEpoch);
     wCall.setActiveSpeakerHandler(wUser, this.updateActiveSpeakers);
-    // Set AVS to process notification mode on startup so that old calls will be ignored.
-    // This mode is terminated by the web app via the corresponding event NOTIFICATION_HANDLING_STATE.
+
+    // Set AVS to notification processing "blocking" mode on startup so that old calls will be ignored.
+    // Passing 1 enables this notification blocking mode (0 would disable it). This mode is terminated
+    // by the web app via the corresponding NOTIFICATION_HANDLING_STATE event.
     wCall.processNotifications(wUser, 1);
 
     return wUser;
