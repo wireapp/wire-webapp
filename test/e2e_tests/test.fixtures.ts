@@ -21,7 +21,7 @@ import {test as baseTest, type BrowserContext, type Page} from '@playwright/test
 
 import {ApiManagerE2E} from './backend/apiManager.e2e';
 import {getUser, User} from './data/user';
-import {PageManager, webAppPath} from './pageManager';
+import {PageManager} from './pageManager';
 import {connectWithUser, sendConnectionRequest} from './utils/userActions';
 
 type PagePlugin = (page: Page) => void | Promise<void>;
@@ -51,7 +51,12 @@ type Fixtures = {
   createTeam: (
     teamName: string,
     options?: Parameters<typeof createUser>[1] & {withMembers?: number | User[]},
-  ) => Promise<{owner: User; members: User[]}>;
+  ) => Promise<{
+    owner: User;
+    members: User[];
+    /** Add a new member to the team after its initial creation */
+    addMember: (member: User) => Promise<void>;
+  }>;
 };
 
 export {expect} from '@playwright/test';
@@ -74,11 +79,12 @@ export const test = baseTest.extend<Fixtures>({
       let setupFns: PagePlugin[];
 
       // Check if firstParam is a browser context or PagePlugin
-      if (typeof firstParam === 'function') {
+      if (typeof firstParam === 'function' || firstParam === undefined) {
         // Create a new context, add it to the created contexts and treat firstParam as page plugin
         context = await browser.newContext();
         contexts.push(context);
-        setupFns = [firstParam, ...plugins];
+        // The type assertion is necessary because the type check is done using `strict: false` which will not narrow the type correctly
+        setupFns = !!firstParam ? [firstParam as PagePlugin, ...plugins] : plugins;
       } else {
         // Otherwise reuse existing context if provided
         context = firstParam;
@@ -112,10 +118,17 @@ export const test = baseTest.extend<Fixtures>({
 
     await use(async (teamName, {withMembers, ...options} = {}) => {
       const owner = await createUser(api, options);
-      const {teamId} = await api.auth.upgradeUserToTeamOwner(owner, teamName);
 
+      const {teamId} = await api.auth.upgradeUserToTeamOwner(owner, teamName);
       owner.teamId = teamId;
+
       teamOwners.push(owner);
+
+      const addMember = async (member: User) => {
+        const invitationId = await api.team.inviteUserToTeam(member.email, owner);
+        const invitationCode = await api.brig.getTeamInvitationCodeForEmail(owner.teamId, invitationId);
+        await api.team.acceptTeamInvitation(invitationCode, member);
+      };
 
       let members: User[] = [];
       if (withMembers !== undefined) {
@@ -125,16 +138,10 @@ export const test = baseTest.extend<Fixtures>({
             ? await Promise.all(Array.from({length: withMembers}, () => createUser(api, options)))
             : withMembers;
 
-        await Promise.all(
-          members.map(async member => {
-            const invitationId = await api.team.inviteUserToTeam(member.email, owner);
-            const invitationCode = await api.brig.getTeamInvitationCodeForEmail(owner.teamId, invitationId);
-            await api.team.acceptTeamInvitation(invitationCode, member);
-          }),
-        );
+        await Promise.all(members.map(member => addMember(member)));
       }
 
-      return {owner, members};
+      return {owner, members, addMember};
     });
 
     // Deletes each created team and the owner / members associated with it
@@ -158,7 +165,7 @@ export const withLogin =
      * Since the login may take up to 40s we manually wait for it to finish here instead of increasing the timeout on all actions / assertions after this util
      * This is an exception to the general best practice of using playwrights web assertions. (See: https://playwright.dev/docs/best-practices#use-web-first-assertions)
      */
-    await page.waitForURL(new RegExp(`^${webAppPath}$`), {timeout: 40_000, waitUntil: 'networkidle'});
+    await pageManager.webapp.components.conversationSidebar().sidebar.waitFor({state: 'visible', timeout: 40_000});
   };
 
 /**
