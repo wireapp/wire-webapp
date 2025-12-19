@@ -19,7 +19,7 @@
 
 import {TabIndex, IconButton, IconButtonVariant} from '@wireapp/react-ui-kit';
 
-import {Avatar, AVATAR_SIZE, GroupAvatar} from 'Components/Avatar';
+import {Avatar, AVATAR_SIZE, ChannelAvatar, GroupAvatar} from 'Components/Avatar';
 import {Duration} from 'Components/calling/Duration';
 import * as Icon from 'Components/Icon';
 import {User} from 'Repositories/entity/User';
@@ -42,6 +42,7 @@ import {createNavigate, createNavigateKeyboard} from '../../../../router/routerB
 interface CallingHeaderProps {
   isOngoing: boolean;
   isGroup: boolean;
+  isChannel: boolean;
   showAlert: boolean;
   isVideoCall: boolean;
   clearShowAlert: () => void;
@@ -61,6 +62,7 @@ interface CallingHeaderProps {
 
 export const CallingHeader = ({
   isGroup,
+  isChannel,
   isOngoing,
   showAlert,
   isVideoCall,
@@ -104,9 +106,14 @@ export const CallingHeader = ({
       >
         {isDetachedWindow && !isTemporaryUser && (
           <div css={callAvatar}>
-            {isGroup && <GroupAvatar conversationID={conversationID} />}
-            {!isGroup && !!conversationParticipants.length && (
-              <Avatar participant={conversationParticipants[0]} avatarSize={AVATAR_SIZE.SMALL} />
+            {isChannel ? (
+              <ChannelAvatar conversationID={conversationID} />
+            ) : isGroup ? (
+              <GroupAvatar conversationID={conversationID} />
+            ) : (
+              conversationParticipants.length > 0 && (
+                <Avatar participant={conversationParticipants[0]} avatarSize={AVATAR_SIZE.SMALL} />
+              )
             )}
           </div>
         )}

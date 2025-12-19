@@ -103,11 +103,13 @@ export const CallingCell = ({
 
   const {
     isGroupOrChannel,
+    isChannel,
     participating_user_ets: userEts,
     selfUser,
     display_name: conversationName,
   } = useKoSubscribableChildren(conversation, [
     'isGroupOrChannel',
+    'isChannel',
     'participating_user_ets',
     'selfUser',
     'display_name',
@@ -350,6 +352,7 @@ export const CallingCell = ({
 
           <CallingHeader
             isGroup={isGroupOrChannel}
+            isChannel={isChannel}
             isOngoing={isOngoing}
             showAlert={showAlert}
             isVideoCall={isVideoCall}
