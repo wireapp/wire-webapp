@@ -37,7 +37,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           fetch-depth: 0
 
@@ -211,7 +211,7 @@ jobs:
 
     steps:
       - name: Check out wire-builds
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           repository: wireapp/wire-builds
           token: ${{secrets.WIRE_BUILDS_WRITE_ACCESS_GH_TOKEN}}
