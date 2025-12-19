@@ -37,87 +37,60 @@ test.describe('Clear Conversation Content', () => {
     userC = team.members[1];
   });
 
-  test(
-    'I want to clear content of a group conversation via conversation list',
-    {tag: ['@TC-152', '@regression']},
-    async ({createPage}) => {
-      const [userAPageManager, userBPageManager, userCPageManager] = await Promise.all([
-        PageManager.from(createPage(withLogin(userA), withConnectedUser(userB), withConnectedUser(userC))),
-        PageManager.from(createPage(withLogin(userB))),
-        PageManager.from(createPage(withLogin(userC))),
-      ]);
+  [
+    {tag: '@TC-152', type: 'clear'},
+    {tag: '@TC-153', type: 'cancel clearing'},
+  ].forEach(({type, tag}) => {
+    test(
+      `I want to ${type} content of a group conversation via conversation list`,
+      {tag: [tag, '@regression']},
+      async ({createPage}) => {
+        const [userAPageManager, userBPageManager, userCPageManager] = await Promise.all([
+          PageManager.from(createPage(withLogin(userA), withConnectedUser(userB), withConnectedUser(userC))),
+          PageManager.from(createPage(withLogin(userB))),
+          PageManager.from(createPage(withLogin(userC))),
+        ]);
 
-      const {pages: userAPages, modals: userAModals} = userAPageManager.webapp;
-      const userBPages = userBPageManager.webapp.pages;
-      const userCPages = userCPageManager.webapp.pages;
+        const {pages: userAPages, modals: userAModals} = userAPageManager.webapp;
+        const userBPages = userBPageManager.webapp.pages;
+        const userCPages = userCPageManager.webapp.pages;
 
-      // Step 1: Create a group conversation with User A, B and C
-      const conversationName = 'Group conversation';
-      await createGroup(userAPages, conversationName, [userB, userC]);
+        // Step 1: Create a group conversation with User A, B and C
+        const conversationName = 'Group conversation';
+        await createGroup(userAPages, conversationName, [userB, userC]);
 
-      // Step 2: Write messages in the group conversation
-      await userAPages.conversationList().openConversation(conversationName);
-      await userAPages.conversation().sendMessage('Message from User A');
+        // Step 2: Write messages in the group conversation
+        await userAPages.conversationList().openConversation(conversationName);
+        await userAPages.conversation().sendMessage('Message from User A');
 
-      await userBPages.conversationList().openConversation(conversationName);
-      await userBPages.conversation().sendMessage('Message from User B');
+        await userBPages.conversationList().openConversation(conversationName);
+        await userBPages.conversation().sendMessage('Message from User B');
 
-      await userCPages.conversationList().openConversation(conversationName);
-      await userCPages.conversation().sendMessage('Message from User C');
+        await userCPages.conversationList().openConversation(conversationName);
+        await userCPages.conversation().sendMessage('Message from User C');
 
-      // Step 3: User A selects 'Clear Conversation' option from the Conversation List Context Menu
-      await userAPages.conversationList().openContextMenu(conversationName);
-      await userAPages.conversationList().clearContentButton.click();
-      // Step 4: Warning Popup should open
-      await expect(userAModals.optionModal().modal).toBeVisible();
-      // Step 5: User A clicks 'Clear'
-      await userAModals.optionModal().clickAction();
-      // Step 6: Verify that the conversation does not contain any past messages
-      await userAPages.conversationList().openConversation(conversationName);
-      await expect(userAPages.conversation().messages).toHaveCount(0);
-    },
-  );
+        // Step 3: User A selects 'Clear Conversation' option from the Conversation List Context Menu
+        await userAPages.conversationList().openContextMenu(conversationName);
+        await userAPages.conversationList().clearContentButton.click();
+        // Step 4: Warning Popup should open
+        await expect(userAModals.optionModal().modal).toBeVisible();
 
-  test(
-    'I want to cancel clearing content of a group conversation via conversation list',
-    {tag: ['@TC-153', '@regression']},
-    async ({createPage}) => {
-      const [userAPageManager, userBPageManager, userCPageManager] = await Promise.all([
-        PageManager.from(createPage(withLogin(userA), withConnectedUser(userB), withConnectedUser(userC))),
-        PageManager.from(createPage(withLogin(userB))),
-        PageManager.from(createPage(withLogin(userC))),
-      ]);
-
-      const {pages: userAPages, modals: userAModals} = userAPageManager.webapp;
-      const userBPages = userBPageManager.webapp.pages;
-      const userCPages = userCPageManager.webapp.pages;
-
-      // Step 1: Create a group conversation with User A, B and C
-      const conversationName = 'Group conversation';
-      await createGroup(userAPages, conversationName, [userB, userC]);
-
-      // Step 2: Write messages in the group conversation
-      await userAPages.conversationList().openConversation(conversationName);
-      await userAPages.conversation().sendMessage('Message from User A');
-
-      await userBPages.conversationList().openConversation(conversationName);
-      await userBPages.conversation().sendMessage('Message from User B');
-
-      await userCPages.conversationList().openConversation(conversationName);
-      await userCPages.conversation().sendMessage('Message from User C');
-
-      // Step 3: User A selects 'Clear Conversation' option from the Conversation List Context Menu
-      await userAPages.conversationList().openContextMenu(conversationName);
-      await userAPages.conversationList().clearContentButton.click();
-      // Step 4: Warning Popup should open
-      await expect(userAModals.optionModal().modal).toBeVisible();
-      // Step 5: User A clicks 'Cancel'
-      await userAModals.optionModal().clickCancel();
-      // Step 6: Verify that the conversation does not contain any past messages
-      await userAPages.conversationList().openConversation(conversationName);
-      await expect(userAPages.conversation().messages).toHaveCount(3);
-    },
-  );
+        if (type === 'clear') {
+          // Step 5: User A clicks 'Clear'
+          await userAModals.optionModal().clickAction();
+          // Step 6: Verify that the conversation does not contain any past messages
+          await userAPages.conversationList().openConversation(conversationName);
+          await expect(userAPages.conversation().messages).toHaveCount(0);
+        } else {
+          // Step 5: User A clicks 'Cancel'
+          await userAModals.optionModal().clickCancel();
+          // Step 6: Verify that the conversation does not contain any past messages
+          await userAPages.conversationList().openConversation(conversationName);
+          await expect(userAPages.conversation().messages).toHaveCount(3);
+        }
+      },
+    );
+  });
 
   test(
     'I want to clear content of 1:1 conversation via conversation list',
@@ -237,20 +210,15 @@ test.describe('Clear Conversation Content', () => {
       await expect(userAPages.conversation().getPing()).toBeVisible();
 
       // Step 6.3: Verify you can receive incoming pictures
-      const {page} = userAPages.conversation();
+      const {page} = userBPages.conversation();
       await shareAssetHelper(getImageFilePath(), page, page.getByRole('button', {name: 'Add picture'}));
-      await shareAssetHelper(
-        getImageFilePath(),
-        userBPageManager.page,
-        userBPageManager.page.getByRole('button', {name: 'Add picture'}),
-      );
       const messageWithImage = userAPages.conversation().getMessage({sender: userB});
       await expect(messageWithImage).toBeVisible();
 
       // Step 6.4: Verify you can receive incoming files
       await userAPages.conversationList().openConversation(conversationName);
       await shareAssetHelper(getTextFilePath(), page, page.getByRole('button', {name: 'Add file'}));
-      const messageWithFile = userAPages.conversation().getMessage({sender: userA});
+      const messageWithFile = userAPages.conversation().getMessage({sender: userB});
       await expect(messageWithFile).toBeVisible();
 
       // Step 6.5: Verify you can receive incoming calls
@@ -265,7 +233,6 @@ test.describe('Clear Conversation Content', () => {
     'I want to see incoming picture, ping and call after I clear content of a 1:1 conversation via conversation list',
     {tag: ['@TC-8779', '@regression']},
     async ({createPage}) => {
-      test.slow();
       const [userAPageManager, userBPageManager] = await Promise.all([
         PageManager.from(createPage(withLogin(userA), withConnectedUser(userB))),
         PageManager.from(createPage(withLogin(userB))),
@@ -281,6 +248,7 @@ test.describe('Clear Conversation Content', () => {
       await userAPages.conversation().sendMessage('Message from User A');
       await userBPages.conversationList().openConversation(userA.fullName);
       await userBPages.conversation().sendMessage('Message from User B');
+      await expect(userAPages.conversation().messages).toHaveCount(2);
 
       // Step 3: User A selects 'Clear Conversation' option from the Conversation List Context Menu
       await userAPages.conversationList().openContextMenu(userB.fullName);
@@ -305,20 +273,23 @@ test.describe('Clear Conversation Content', () => {
       await expect(userAPages.conversation().getPing()).toBeVisible();
 
       // Step 6.3: Verify you can receive incoming pictures
-      const {page} = userAPages.conversation();
+      const {page} = userBPages.conversation();
       await shareAssetHelper(getImageFilePath(), page, page.getByRole('button', {name: 'Add picture'}));
-      await shareAssetHelper(
-        getImageFilePath(),
-        userBPageManager.page,
-        userBPageManager.page.getByRole('button', {name: 'Add picture'}),
-      );
-      const messageWithImage = userAPages.conversation().getMessage({sender: userB}).last();
+      const messageWithImage = userAPages
+        .conversation()
+        .getMessage({sender: userB})
+        .filter({has: userAPages.conversation().page.locator('img[data-uie-name="image-asset-img"]')});
       await expect(messageWithImage).toBeVisible();
 
       // Step 6.4: Verify you can receive incoming files
       await userAPages.conversationList().openConversation(userB.fullName);
       await shareAssetHelper(getTextFilePath(), page, page.getByRole('button', {name: 'Add file'}));
-      const messageWithFile = userAPages.conversation().getMessage({sender: userB}).last();
+      const messageWithFile = userAPages
+        .conversation()
+        .getMessage({sender: userB})
+        .filter({
+          has: userAPages.conversation().page.locator('[data-uie-name="file-asset"]'),
+        });
       await expect(messageWithFile).toBeVisible();
 
       // Step 6.5: Verify you can receive incoming calls
@@ -350,6 +321,8 @@ test.describe('Clear Conversation Content', () => {
 
       await userBPages.conversationList().openConversation(conversationName);
       await userBPages.conversation().sendMessage('Message from User B');
+
+      await expect(userAPages.conversation().messages).toHaveCount(2);
 
       // Step 2: User A opens Conversation Details
       await userAPages.conversation().clickConversationInfoButton();
@@ -383,6 +356,8 @@ test.describe('Clear Conversation Content', () => {
 
       await userBPages.conversationList().openConversation(userA.fullName);
       await userBPages.conversation().sendMessage('Message from User B');
+
+      await expect(userAPages.conversation().messages).toHaveCount(2);
 
       // Step 2: User A opens Conversation Details
       await userAPages.conversation().clickConversationInfoButton();
