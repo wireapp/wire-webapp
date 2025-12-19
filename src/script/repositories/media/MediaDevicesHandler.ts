@@ -276,16 +276,16 @@ export class MediaDevicesHandler {
     const defaults = MediaDevicesHandler.CONFIG.DEFAULT_DEVICE[type];
     const first = devices[0]?.deviceId;
 
-    // favorite first (must exist)
+    // prioritize current selection if still available
+    if (devices.some(({deviceId}) => deviceId === currentId)) {
+      return currentId;
+    }
+
+    // fallback to favorite if current is not available
     const favorites = loadValue<string[]>(this.favoriteKeyFor(type)) ?? [];
     const matchedFavorite = favorites.find(fav => devices.some(({deviceId}) => deviceId === fav));
     if (matchedFavorite) {
       return matchedFavorite;
-    }
-
-    // keep current if still available
-    if (devices.some(({deviceId}) => deviceId === currentId)) {
-      return currentId;
     }
 
     // else first available or default
