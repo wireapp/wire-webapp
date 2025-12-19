@@ -57,7 +57,7 @@ test.describe('Connections', () => {
 
       await test.step('I want to cancel a pending request from conversation list', async () => {
         await pages.conversation().clickCancelRequest();
-        await modals.cancelRequest().clickAction();
+        await modals.confirm().clickAction();
       });
 
       await test.step('I want to archive a pending request from conversation list', async () => {

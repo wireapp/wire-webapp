@@ -35,24 +35,17 @@ import {AcknowledgeModal} from './webapp/modals/acknowledge.modal';
 import {AppLockModal} from './webapp/modals/appLock.modal';
 import {BlockWarningModal} from './webapp/modals/blockWarning.modal';
 import {CallNotEstablishedModal} from './webapp/modals/callNotEstablished.modal';
-import {CancelRequestModal} from './webapp/modals/cancelRequest.modal';
 import {ConfirmModal} from './webapp/modals/confirm.modal';
 import {ConfirmLogoutModal} from './webapp/modals/confirmLogout.modal';
-import {CopyPasswordModal} from './webapp/modals/copyPassword.modal';
-import {CreatGuestLinkModal} from './webapp/modals/createGuestLink.modal';
 import {DataShareConsentModal} from './webapp/modals/dataShareConsent.modal';
 import {DeleteAccountModal} from './webapp/modals/deleteAccount.modal';
 import {DetailViewModal} from './webapp/modals/detailView.modal';
-import {ErrorModal} from './webapp/modals/error.modal';
-import {ExportBackupModal} from './webapp/modals/exportBackup.modal';
-import {importBackupModal} from './webapp/modals/importBackup.modal';
 import {LeaveConversationModal} from './webapp/modals/leaveConversation.modal';
 import {OptionModal} from './webapp/modals/option.modal';
 import {PasswordModal} from './webapp/modals/password.modal';
+import {PasswordAdvancedSecurityModal} from './webapp/modals/passwordAdvancedSecurity.modal';
 import {RemoveMemberModal} from './webapp/modals/removeMember.modal';
-import {UnableToOpenConversationModal} from './webapp/modals/unableToOpenConversation.modal';
 import {UserProfileModal} from './webapp/modals/userProfile.modal';
-import {VerifyEmailModal} from './webapp/modals/verifyEmail.modal';
 import {AccountPage} from './webapp/pages/account.page';
 import {AudioVideoSettingsPage} from './webapp/pages/audioVideoSettings.page';
 import {CallingPage} from './webapp/pages/calling.page';
@@ -199,7 +192,6 @@ export class PageManager {
       setUsername: () => this.getOrCreate('webapp.pages.setUsername', () => new SetUsernamePage(this.page)),
     },
     modals: {
-      errorModal: () => this.getOrCreate('webapp.modals.errorModal', () => new ErrorModal(this.page)),
       dataShareConsent: () =>
         this.getOrCreate('webapp.modals.dataShareConsent', () => new DataShareConsentModal(this.page)),
       appLock: () => this.getOrCreate('webapp.modals.appLock', () => new AppLockModal(this.page)),
@@ -211,16 +203,10 @@ export class PageManager {
       confirmLogout: () => this.getOrCreate('webapp.modals.confirmLogout', () => new ConfirmLogoutModal(this.page)),
       leaveConversation: () =>
         this.getOrCreate('webapp.modals.leaveConversation', () => new LeaveConversationModal(this.page)),
-      exportBackup: () => this.getOrCreate('webapp.modals.exportBackup', () => new ExportBackupModal(this.page)),
-      unableToOpenConversation: () =>
-        this.getOrCreate('webapp.modals.unableToOpenConversation', () => new UnableToOpenConversationModal(this.page)),
+      passwordAdvancedSecurity: () =>
+        this.getOrCreate('webapp.modals.passwordAdvancedSecurity', () => new PasswordAdvancedSecurityModal(this.page)),
       detailViewModal: () => this.getOrCreate('webapp.modals.detailView', () => new DetailViewModal(this.page)),
-      importBackup: () => this.getOrCreate('webapp.modals.importBackup', () => new importBackupModal(this.page)),
       removeMember: () => this.getOrCreate('webapp.modals.removeMember', () => new RemoveMemberModal(this.page)),
-      copyPassword: () => this.getOrCreate('webapp.modals.copyPassword', () => new CopyPasswordModal(this.page)),
-      createGuestLink: () =>
-        this.getOrCreate('webapp.modals.createGuestLink', () => new CreatGuestLinkModal(this.page)),
-      verifyEmail: () => this.getOrCreate('webapp.modals.verifyEmail', () => new VerifyEmailModal(this.page)),
       marketingConsent: () =>
         this.getOrCreate('webapp.modals.marketingConsent', () => new MarketingConsentModal(this.page)),
       acknowledge: () => this.getOrCreate('webapp.modals.marketingConsent', () => new AcknowledgeModal(this.page)),
@@ -228,8 +214,6 @@ export class PageManager {
       password: () => this.getOrCreate('webapp.modals.password', () => new PasswordModal(this.page)),
       cellsFileDetailView: () =>
         this.getOrCreate('webapp.modals.cellsFileDetailView', () => new CellsFileDetailViewModal(this.page)),
-      cancelRequest: () =>
-        this.getOrCreate('webapp.modals.cancelRequestModal', () => new CancelRequestModal(this.page)),
       optionModal: () => this.getOrCreate('webapp.modals.optionModal', () => new OptionModal(this.page)),
     },
     components: {

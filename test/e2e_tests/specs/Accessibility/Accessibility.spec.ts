@@ -133,9 +133,8 @@ test.describe('Accessibility', () => {
 
       await pageManager.openMainPage();
       await loginUser(memberA, pageManager);
-      const {components, pages} = pageManager.webapp;
+      const {components} = pageManager.webapp;
 
-      await pages.historyInfo().clickConfirmButton();
       await components.conversationSidebar().sidebar.waitFor({state: 'visible', timeout: loginTimeOut});
 
       await expect(components.conversationSidebar().sidebar).toHaveAttribute('data-is-collapsed', 'true');
@@ -151,8 +150,8 @@ test.describe('Accessibility', () => {
       await pageManager.openMainPage();
       await loginUser(memberA, pageManager);
 
-      await pages.historyInfo().clickConfirmButton();
       await components.conversationSidebar().sidebar.waitFor({state: 'visible', timeout: loginTimeOut});
+      await modals.dataShareConsent().clickDecline();
 
       await createGroup(pages, conversationName, [memberB]);
 
@@ -167,7 +166,7 @@ test.describe('Accessibility', () => {
       await pages.conversationList().openConversation(memberB.fullName);
 
       await pages.conversationList().openConversation(conversationName);
-      await expect(await pages.conversation().messageInput).toHaveText(message);
+      await expect(pages.conversation().messageInput).toHaveText(message);
     },
   );
 

@@ -98,7 +98,7 @@ test('Messages in 1:1', {tag: ['@TC-8750', '@crit-flow-web']}, async ({pageManag
     await memberBPM.webapp.modals.dataShareConsent().clickDecline();
 
     // ToDo: Workaround for the MLS Bug [WPB-18227]
-    await memberBPM.webapp.modals.unableToOpenConversation().clickAcknowledge();
+    await memberBPM.webapp.modals.acknowledge().clickAction();
   });
 
   // Step 2: Images
