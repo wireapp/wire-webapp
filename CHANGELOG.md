@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [46.46.11](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@46.46.10...@wireapp/core@46.46.11) (2025-12-19)
+
+### Bug Fixes
+
+* Remove extra logs [WPB-22504] ([#7722](https://github.com/wireapp/wire-web-packages/issues/7722)) ([0d0b67e](https://github.com/wireapp/wire-web-packages/commit/0d0b67e65f09bfbc392edaaf46bcedb0699fba66))
+
 ## [46.46.10](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@46.46.9...@wireapp/core@46.46.10) (2025-12-15)
 
 **Note:** Version bump only for package @wireapp/core
