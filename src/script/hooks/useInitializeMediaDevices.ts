@@ -31,10 +31,11 @@ export const useInitializeMediaDevices = (devicesHandler: MediaDevicesHandler, s
   const initializeMediaDevices = useCallback(async () => {
     try {
       const stream = await streamHandler.requestMediaStreamAccess(true);
-      await devicesHandler?.initializeMediaDevices();
+
       if (stream) {
         stream.getTracks().forEach(track => track.stop());
       }
+      await devicesHandler?.initializeMediaDevices();
       setAreMediaDevicesInitialized(true);
     } catch (error) {
       logger.warn(`Initialization of media devices failed:`, error);

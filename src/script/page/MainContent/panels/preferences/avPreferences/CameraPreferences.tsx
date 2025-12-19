@@ -19,6 +19,8 @@
 
 import {memo, useCallback, useEffect, useRef, useState} from 'react';
 
+import {useDebouncedCallback} from 'use-debounce';
+
 import * as Icon from 'Components/Icon';
 import {MediaStreamHandler} from 'Repositories/media/MediaStreamHandler';
 import {MediaType} from 'Repositories/media/MediaType';
@@ -38,6 +40,8 @@ interface CameraPreferencesProps {
   refreshStream: () => Promise<MediaStream | void>;
   streamHandler: MediaStreamHandler;
 }
+
+const DEBOUNCE_TIMEOUT = 100;
 
 const CameraPreferencesComponent = ({streamHandler, refreshStream, hasActiveCameraStream}: CameraPreferencesProps) => {
   const [isRequesting, setIsRequesting] = useState(false);
@@ -79,9 +83,12 @@ const CameraPreferencesComponent = ({streamHandler, refreshStream, hasActiveCame
     }
   }, [hasActiveCameraStream, refreshStream, streamHandler]);
 
+  // Debounce to handle rapid device changes (removeAllDevices + enumerateDevices)
+  const debouncedRequestStream = useDebouncedCallback(requestStream, DEBOUNCE_TIMEOUT);
+
   useEffect(() => {
-    requestStream();
-  }, [videoInputDeviceId, requestStream]);
+    debouncedRequestStream();
+  }, [videoInputDeviceId, videoInputDevices.length, debouncedRequestStream]);
 
   useEffect(() => {
     if (videoElement.current && stream) {

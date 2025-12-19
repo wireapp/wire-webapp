@@ -19,6 +19,8 @@
 
 import {useEffect, useState} from 'react';
 
+import {useDebouncedCallback} from 'use-debounce';
+
 import * as Icon from 'Components/Icon';
 import {MediaDevicesHandler} from 'Repositories/media/MediaDevicesHandler';
 import {MediaStreamHandler} from 'Repositories/media/MediaStreamHandler';
@@ -41,6 +43,8 @@ interface MicrophonePreferencesProps {
   streamHandler: MediaStreamHandler;
   hasActiveCall: boolean;
 }
+
+const DEBOUNCE_TIMEOUT = 100;
 
 const MicrophonePreferences = ({streamHandler, refreshStream, hasActiveCall}: MicrophonePreferencesProps) => {
   const [isRequesting, setIsRequesting] = useState(false);
@@ -68,10 +72,12 @@ const MicrophonePreferences = ({streamHandler, refreshStream, hasActiveCall}: Mi
     }
   };
 
+  // Debounce to handle rapid device changes (removeAllDevices + enumerateDevices)
+  const debouncedRequestStream = useDebouncedCallback(requestStream, DEBOUNCE_TIMEOUT);
+
   useEffect(() => {
-    requestStream();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [audioInputDeviceId]);
+    debouncedRequestStream();
+  }, [audioInputDeviceId, audioInputDevices.length, debouncedRequestStream]);
 
   useEffect(
     () => () => {
