@@ -40,7 +40,7 @@ test.describe('Clear Conversation Content', () => {
   [
     {tag: '@TC-152', type: 'clear'},
     {tag: '@TC-153', type: 'cancel clearing'},
-  ].forEach(({type, tag}) => {
+  ].forEach(({tag, type}) => {
     test(
       `I want to ${type} content of a group conversation via conversation list`,
       {tag: [tag, '@regression']},
@@ -92,72 +92,52 @@ test.describe('Clear Conversation Content', () => {
     );
   });
 
-  test(
-    'I want to clear content of 1:1 conversation via conversation list',
-    {tag: ['@TC-154', '@regression']},
-    async ({createPage}) => {
-      const [userAPageManager, userBPageManager] = await Promise.all([
-        PageManager.from(createPage(withLogin(userA), withConnectedUser(userB))),
-        PageManager.from(createPage(withLogin(userB))),
-      ]);
+  [
+    {tag: '@TC-154', type: 'clear'},
+    {tag: '@TC-155', type: 'cancel clearing'},
+  ].forEach(({tag, type}) => {
+    test(
+      `I want to ${type} content of 1:1 conversation via conversation list`,
+      {tag: [tag, '@regression']},
+      async ({createPage}) => {
+        const [userAPageManager, userBPageManager] = await Promise.all([
+          PageManager.from(createPage(withLogin(userA), withConnectedUser(userB))),
+          PageManager.from(createPage(withLogin(userB))),
+        ]);
 
-      const {pages: userAPages, modals: userAModals} = userAPageManager.webapp;
-      const userBPages = userBPageManager.webapp.pages;
+        const {pages: userAPages, modals: userAModals} = userAPageManager.webapp;
+        const userBPages = userBPageManager.webapp.pages;
 
-      // Step 1: Create a 1:1 conversation with User A and B
-      await userAPages.conversationList().openConversation(userB.fullName);
+        // Step 1: Create a 1:1 conversation with User A and B
+        await userAPages.conversationList().openConversation(userB.fullName);
 
-      // Step 2: Write messages in the conversation
-      await userAPages.conversation().sendMessage('Message from User A');
+        // Step 2: Write messages in the conversation
+        await userAPages.conversation().sendMessage('Message from User A');
 
-      await userBPages.conversationList().openConversation(userA.fullName);
-      await userBPages.conversation().sendMessage('Message from User B');
+        await userBPages.conversationList().openConversation(userA.fullName);
+        await userBPages.conversation().sendMessage('Message from User B');
 
-      // Step 3: User A selects 'Clear Conversation' option from the Conversation List Context Menu
-      await userAPages.conversationList().openContextMenu(userB.fullName);
-      await userAPages.conversationList().clearContentButton.click();
-      // Step 4: Warning Popup should open
-      await expect(userAModals.confirm().modal).toBeVisible();
-      // Step 5: User A clicks 'Clear'
-      await userAModals.confirm().clickAction();
-      // Step 6: Verify that the conversation does not contain any past messages
-      await userAPages.conversationList().openConversation(userB.fullName);
-      await expect(userAPages.conversation().messages).toHaveCount(0);
-    },
-  );
+        // Step 3: User A selects 'Clear Conversation' option from the Conversation List Context Menu
+        await userAPages.conversationList().openContextMenu(userB.fullName);
+        await userAPages.conversationList().clearContentButton.click();
+        // Step 4: Warning Popup should open
+        await expect(userAModals.confirm().modal).toBeVisible();
 
-  test(
-    'I want to cancel clearing content of 1:1 conversation via conversation list',
-    {tag: ['@TC-155', '@regression']},
-    async ({createPage}) => {
-      const [userAPageManager, userBPageManager] = await Promise.all([
-        PageManager.from(createPage(withLogin(userA), withConnectedUser(userB))),
-        PageManager.from(createPage(withLogin(userB))),
-      ]);
-
-      const {pages: userAPages, modals: userAModals} = userAPageManager.webapp;
-      const userBPages = userBPageManager.webapp.pages;
-
-      // Step 1: Create a 1:1 conversation with User A and B
-      await userAPages.conversationList().openConversation(userB.fullName);
-
-      // Step 2: Write messages in the conversation
-      await userAPages.conversation().sendMessage('Message from User A');
-
-      await userBPages.conversationList().openConversation(userA.fullName);
-      await userBPages.conversation().sendMessage('Message from User B');
-
-      // Step 3: User A selects 'Clear Conversation' option from the Conversation List Context Menu
-      await userAPages.conversationList().openContextMenu(userB.fullName);
-      await userAPages.conversationList().clearContentButton.click();
-      // Step 4: Warning Popup should open
-      await expect(userAModals.confirm().modal).toBeVisible();
-      // Step 5: User A clicks 'Cancel'
-      await userAModals.confirm().clickCancel();
-      // Step 6: Verify that the conversation does not contain any past messages
-      await expect(userAPages.conversation().messages).toHaveCount(2);
-    },
-  );
+        if (type === 'clear') {
+          // Step 5: User A clicks 'Clear'
+          await userAModals.confirm().clickAction();
+          // Step 6: Verify that the conversation does not contain any past messages
+          await userAPages.conversationList().openConversation(userB.fullName);
+          await expect(userAPages.conversation().messages).toHaveCount(0);
+        } else {
+          // Step 5: User A clicks 'Cancel'
+          await userAModals.confirm().clickCancel();
+          // Step 6: Verify that the conversation does not contain any past messages
+          await expect(userAPages.conversation().messages).toHaveCount(2);
+        }
+      },
+    );
+  });
 
   // TODO: Blocked [WPB-22442] - Group call feature requires Enterprise Account
   test.skip(
@@ -300,76 +280,63 @@ test.describe('Clear Conversation Content', () => {
     },
   );
 
-  test(
-    'I want to clear the group conversation content from conversation details options',
-    {tag: ['@TC-424', '@regression']},
-    async ({createPage}) => {
-      const [userAPageManager, userBPageManager] = await Promise.all([
-        PageManager.from(createPage(withLogin(userA), withConnectedUser(userB))),
-        PageManager.from(createPage(withLogin(userB))),
-      ]);
+  [
+    {tag: '@TC-424', type: 'clear', conversationType: 'group'},
+    {tag: '@TC-425', type: 'clear', conversationType: '1:1'},
+  ].forEach(({tag, type, conversationType}) => {
+    test(
+      `I want to ${type} the ${conversationType} conversation content from conversation details options`,
+      {tag: [tag, '@regression']},
+      async ({createPage}) => {
+        const [userAPageManager, userBPageManager] = await Promise.all([
+          PageManager.from(createPage(withLogin(userA), withConnectedUser(userB))),
+          PageManager.from(createPage(withLogin(userB))),
+        ]);
 
-      const {pages: userAPages, modals: userAModals} = userAPageManager.webapp;
-      const userBPages = userBPageManager.webapp.pages;
+        const {pages: userAPages, modals: userAModals} = userAPageManager.webapp;
+        const userBPages = userBPageManager.webapp.pages;
 
-      const conversationName = 'Group conversation';
-      await createGroup(userAPages, conversationName, [userB]);
+        const conversationName = 'Group conversation';
+        if (conversationType === 'group') {
+          await createGroup(userAPages, conversationName, [userB]);
+          // Step 1: User A and B write in group conversation
+          await userAPages.conversationList().openConversation(conversationName);
+          await userAPages.conversation().sendMessage('Message from User A');
 
-      // Step 1: User A and B write in group conversation
-      await userAPages.conversationList().openConversation(conversationName);
-      await userAPages.conversation().sendMessage('Message from User A');
+          await userBPages.conversationList().openConversation(conversationName);
+          await userBPages.conversation().sendMessage('Message from User B');
+        } else {
+          // Step 1: User A and B write in group conversation
+          await userAPages.conversationList().openConversation(userB.fullName);
+          await userAPages.conversation().sendMessage('Message from User A');
 
-      await userBPages.conversationList().openConversation(conversationName);
-      await userBPages.conversation().sendMessage('Message from User B');
+          await userBPages.conversationList().openConversation(userA.fullName);
+          await userBPages.conversation().sendMessage('Message from User B');
+        }
+        await expect(userAPages.conversation().messages).toHaveCount(2);
 
-      await expect(userAPages.conversation().messages).toHaveCount(2);
+        // Step 2: User A opens Conversation Details
+        await userAPages.conversation().clickConversationInfoButton();
+        // Step 3: User A clicks Clear Conversation Button
+        await userAPages.conversationDetails().clickClearConversationContentButton();
 
-      // Step 2: User A opens Conversation Details
-      await userAPages.conversation().clickConversationInfoButton();
-      // Step 3: User A clicks Clear Conversation Button
-      await userAPages.conversationDetails().clickClearConversationContentButton();
-      // Step 4: Clear Conversation Content Modal appears
-      await expect(userAModals.optionModal().modal).toBeVisible();
-      // Step 5: User A clicks 'Clear'
-      await userAModals.optionModal().clickAction();
-      // Step 6: Verify that the conversation does not contain any past messages
-      await userAPages.conversationList().openConversation(userB.fullName);
-      await expect(userAPages.conversation().messages).toHaveCount(0);
-    },
-  );
-
-  test(
-    'I want to clear the 1:1 conversation content from conversation details options',
-    {tag: ['@TC-425', '@regression']},
-    async ({createPage}) => {
-      const [userAPageManager, userBPageManager] = await Promise.all([
-        PageManager.from(createPage(withLogin(userA), withConnectedUser(userB))),
-        PageManager.from(createPage(withLogin(userB))),
-      ]);
-
-      const {pages: userAPages, modals: userAModals} = userAPageManager.webapp;
-      const userBPages = userBPageManager.webapp.pages;
-
-      // Step 1: User A and B write in 1:1 conversation
-      await userAPages.conversationList().openConversation(userB.fullName);
-      await userAPages.conversation().sendMessage('Message from User A');
-
-      await userBPages.conversationList().openConversation(userA.fullName);
-      await userBPages.conversation().sendMessage('Message from User B');
-
-      await expect(userAPages.conversation().messages).toHaveCount(2);
-
-      // Step 2: User A opens Conversation Details
-      await userAPages.conversation().clickConversationInfoButton();
-      // Step 3: User A clicks Clear Conversation Button
-      await userAPages.conversationDetails().clickClearConversationContentButton();
-      // Step 4: Clear Conversation Content Modal appears
-      await expect(userAModals.confirm().modal).toBeVisible();
-      // Step 5: User A clicks 'Clear'
-      await userAModals.confirm().clickAction();
-      // Step 6: Verify that the conversation does not contain any past messages
-      await userAPages.conversationList().openConversation(userB.fullName);
-      await expect(userAPages.conversation().messages).toHaveCount(0);
-    },
-  );
+        if (conversationType === 'group') {
+          // Step 4: Clear Conversation Content Modal appears
+          await expect(userAModals.optionModal().modal).toBeVisible();
+          // Step 5: User A clicks 'Clear'
+          await userAModals.optionModal().clickAction();
+          // Step 6: Verify that the conversation does not contain any past messages
+          await userAPages.conversationList().openConversation(conversationName);
+        } else {
+          // Step 4: Clear Conversation Content Modal appears
+          await expect(userAModals.confirm().modal).toBeVisible();
+          // Step 5: User A clicks 'Clear'
+          await userAModals.confirm().clickAction();
+          // Step 6: Verify that the conversation does not contain any past messages
+          await userAPages.conversationList().openConversation(userB.fullName);
+        }
+        await expect(userAPages.conversation().messages).toHaveCount(0);
+      },
+    );
+  });
 });
