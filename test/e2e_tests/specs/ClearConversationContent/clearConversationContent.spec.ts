@@ -86,7 +86,7 @@ test.describe('Clear Conversation Content', () => {
         } else {
           // Step 5: User A clicks 'Cancel'
           await userAModals.optionModal().clickCancel();
-          // Step 6: Verify that the conversation does not contain any past messages
+          // Step 6: Verify that the conversation still contains any past messages
           await userAPages.conversationList().openConversation(conversationName);
           await expect(userAPages.conversation().messages).toHaveCount(3);
         }
@@ -136,7 +136,7 @@ test.describe('Clear Conversation Content', () => {
         } else {
           // Step 5: User A clicks 'Cancel'
           await userAModals.confirm().clickCancel();
-          // Step 6: Verify that the conversation does not contain any past messages
+          // Step 6: Verify that the conversation still contains any past messages
           await expect(userAPages.conversation().messages).toHaveCount(2);
         }
       },
@@ -271,7 +271,7 @@ test.describe('Clear Conversation Content', () => {
           await userBPages.conversationList().openConversation(conversationName);
           await userBPages.conversation().sendMessage('Message from User B');
         } else {
-          // Step 1: User A and B write in group conversation
+          // Step 1: User A and B write in conversation
           await userAPages.conversationList().openConversation(userB.fullName);
           await userAPages.conversation().sendMessage('Message from User A');
 
