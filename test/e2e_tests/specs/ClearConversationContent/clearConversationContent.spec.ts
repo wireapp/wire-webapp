@@ -46,7 +46,7 @@ test.describe('Clear Conversation Content', () => {
       {tag: [tag, '@regression']},
       async ({createPage}) => {
         const [userAPageManager, userBPageManager, userCPageManager] = await Promise.all([
-          PageManager.from(createPage(withLogin(userA), withConnectedUser(userB), withConnectedUser(userC))),
+          PageManager.from(createPage(withLogin(userA))),
           PageManager.from(createPage(withLogin(userB))),
           PageManager.from(createPage(withLogin(userC))),
         ]);
@@ -68,6 +68,8 @@ test.describe('Clear Conversation Content', () => {
 
         await userCPages.conversationList().openConversation(conversationName);
         await userCPages.conversation().sendMessage('Message from User C');
+
+        await expect(userAPages.conversation().messages).toHaveCount(3);
 
         // Step 3: User A selects 'Clear Conversation' option from the Conversation List Context Menu
         await userAPages.conversationList().openContextMenu(conversationName);
@@ -116,6 +118,8 @@ test.describe('Clear Conversation Content', () => {
 
         await userBPages.conversationList().openConversation(userA.fullName);
         await userBPages.conversation().sendMessage('Message from User B');
+
+        await expect(userAPages.conversation().messages).toHaveCount(2);
 
         // Step 3: User A selects 'Clear Conversation' option from the Conversation List Context Menu
         await userAPages.conversationList().openContextMenu(userB.fullName);
@@ -180,8 +184,9 @@ test.describe('Clear Conversation Content', () => {
         if (conversationType === 'group') {
           await userCPages.conversationList().openConversation(conversationName);
           await userCPages.conversation().sendMessage('Message from User C');
+          await expect(userAPages.conversation().messages).toHaveCount(3);
         } else {
-          return;
+          await expect(userAPages.conversation().messages).toHaveCount(2);
         }
 
         // Step 3: User A selects 'Clear Conversation' option from the Conversation List Context Menu
@@ -196,6 +201,8 @@ test.describe('Clear Conversation Content', () => {
           await expect(userAModals.confirm().modal).toBeVisible();
           await userAModals.confirm().clickAction();
         }
+
+        await expect(userAPages.conversation().messages).toHaveCount(0);
 
         // Step 5: Verify you can receive incoming new messages, pings, calls, pictures, and files
         // 5.1 Messages
@@ -217,7 +224,7 @@ test.describe('Clear Conversation Content', () => {
         const messageWithImage = userAPages
           .conversation()
           .getMessage({sender: userB})
-          .filter({has: userAPages.conversation().page.locator('img[data-uie-name="image-asset-img"]')});
+          .filter({has: userAPages.conversation().page.getByRole('img')});
         await expect(messageWithImage).toBeVisible();
 
         // 5.4 Files
@@ -239,11 +246,11 @@ test.describe('Clear Conversation Content', () => {
   });
 
   [
-    {tag: '@TC-424', type: 'clear', conversationType: 'group'},
-    {tag: '@TC-425', type: 'clear', conversationType: '1:1'},
-  ].forEach(({tag, type, conversationType}) => {
+    {tag: '@TC-424', conversationType: 'group'},
+    {tag: '@TC-425', conversationType: '1:1'},
+  ].forEach(({tag, conversationType}) => {
     test(
-      `I want to ${type} the ${conversationType} conversation content from conversation details options`,
+      `I want to clear the ${conversationType} conversation content from conversation details options`,
       {tag: [tag, '@regression']},
       async ({createPage}) => {
         const [userAPageManager, userBPageManager] = await Promise.all([
