@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.29.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/webapp-events@0.28.6...@wireapp/webapp-events@0.29.0) (2025-12-20)
+
+### Features
+
+* **webapp-events:** add event for remote muted state ([#7724](https://github.com/wireapp/wire-web-packages/issues/7724)) ([7f7148e](https://github.com/wireapp/wire-web-packages/commit/7f7148ee6008ce90d9309c4553153c4dc22224e8))
+
 ## [0.28.6](https://github.com/wireapp/wire-web-packages/compare/@wireapp/webapp-events@0.28.5...@wireapp/webapp-events@0.28.6) (2025-12-02)
 
 **Note:** Version bump only for package @wireapp/webapp-events
