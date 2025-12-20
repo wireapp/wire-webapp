@@ -66,6 +66,7 @@ export const WebAppEvents = {
       TOGGLE: 'wire.webapp.call.state.toggle',
     },
     HAND_RAISED: 'wire.webapp.call.hand_raised',
+    REMOTE_MUTED: 'wire.webapp.call.remote-muted',
     SCREEN_SHARING_ENDED: 'wire.webapp.call.screen_sharing_ended',
   },
   CLIENT: {
