@@ -64,8 +64,11 @@ const config: Linter.Config[] = [
       parser: tsParser,
       parserOptions: {
         // Enable type-aware linting for TypeScript sources
-        project: ['./tsconfig.eslint.json'],
+        project: './apps/webapp/tsconfig.eslint.json',
         tsconfigRootDir: __dirname,
+        EXPERIMENTAL_useProjectService: {
+          allowDefaultProjectForFiles: ['*.ts', '*.tsx'],
+        },
       },
       globals: {
         ...globals.browser,
@@ -109,11 +112,7 @@ const config: Linter.Config[] = [
       'import/resolver': {
         typescript: {
           alwaysTryTypes: true,
-          project: [
-            path.join(__dirname, 'tsconfig.eslint.json'),
-            path.join(__dirname, 'apps/webapp/tsconfig.json'),
-            path.join(__dirname, 'apps/server/tsconfig.json'),
-          ],
+          project: path.join(__dirname, 'apps/webapp/tsconfig.eslint.json'),
         },
         node: {
           extensions: ['.js', '.jsx', '.ts', '.tsx'],

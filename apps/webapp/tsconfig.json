@@ -1,5 +1,6 @@
 {
   "extends": "../../tsconfig.base.json",
+  "references": [{"path": "../server"}],
   "ts-node": {
     "compilerOptions": {
       "module": "commonjs"
@@ -8,7 +9,6 @@
   "compilerOptions": {
     "allowJs": true,
     "baseUrl": ".",
-    "declaration": false,
     "jsx": "react-jsx",
     "jsxImportSource": "@emotion/react",
     "module": "esnext",
@@ -28,5 +28,6 @@
     "strict": true
   },
   "types": ["@types/wicg-file-system-access", "jest", "@testing-library/jest-dom"],
+  "include": ["src/**/*", "test/**/*"],
   "exclude": ["node_modules", "../server/", "src/sw.js", "src/worker/"]
 }
