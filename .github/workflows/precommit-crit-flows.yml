@@ -182,7 +182,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: blob-report-${{ matrix.shard }}
-          path: apps/webapp/blob-report
+          path: ./apps/webapp/blob-report
           retention-days: 1
 
   e2e-report:

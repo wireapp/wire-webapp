@@ -2,16 +2,17 @@ codecov:
   require_ci_to_pass: yes
   status:
     project:
-      target: 40%
-      threshold: 5%
-    app_webapp:
-      target: auto
-      flags:
-        - app_webapp
-    app_server:
-      target: auto
-      flags:
-        - app_server
+      default:
+        target: 50%
+        threshold: 5%
+      app_webapp:
+        target: auto
+        flags:
+          - app_webapp
+      app_server:
+        target: auto
+        flags:
+          - app_server
 
 coverage:
   precision: 2
@@ -42,9 +43,11 @@ flags:
   app_webapp:
     paths:
       - 'apps/webapp/**'
+    carryforward: false
   app_server:
     paths:
       - 'apps/server/**'
+    carryforward: true
 
 github_checks:
   annotations: false
