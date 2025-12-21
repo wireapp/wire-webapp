@@ -42,6 +42,12 @@
       "options": {
         "jestConfig": "{projectRoot}/jest.config.js",
         "passWithNoTests": true
+      },
+      "configurations": {
+        "ci": {
+          "ci": true,
+          "coverage": true
+        }
       }
     },
     "type-check": {

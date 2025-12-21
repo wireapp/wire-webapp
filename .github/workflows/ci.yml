@@ -34,20 +34,12 @@ jobs:
         run: yarn nx run-many -t lint --all
 
       - name: Test
-        run: yarn nx run-many -t test --all -- --coverage --coverage-reporters=lcov --detectOpenHandles=false
+        run: yarn nx run-many -t test --all -- --coverage --coverageReporters=lcov --detectOpenHandles=false
 
-      - name: Monitor coverage
+      - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v5.5.2
         with:
           fail_ci_if_error: false
-          files: ./apps/webapp/coverage/lcov.info
-          flags: app_webapp
-          token: ${{ secrets.CODECOV_TOKEN }}
-
-      - name: Upload server coverage to Codecov
-        uses: codecov/codecov-action@v5.5.2
-        with:
-          fail_ci_if_error: false
-          files: ./apps/server/coverage/lcov.info
-          flags: app_server
+          directory: ./coverage
+          flags: unittests
           token: ${{ secrets.CODECOV_TOKEN }}
