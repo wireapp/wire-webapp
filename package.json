@@ -17,7 +17,7 @@
     "@aws-sdk/lib-storage": "3.940.0",
     "@wireapp/commons": "workspace:^",
     "@wireapp/priority-queue": "workspace:^",
-    "@wireapp/protocol-messaging": "1.53.0",
+    "@wireapp/protocol-messaging": "1.56.0",
     "axios": "1.13.2",
     "axios-retry": "4.5.0",
     "cells-sdk-ts": "0.1.1-alpha18",
