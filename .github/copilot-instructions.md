@@ -1,84 +1,153 @@
-# Copilot — Repository Instructions (Security-first)
+# GitHub Copilot Repository Instructions
 
-## Goals & tone
+## REPOSITORY STRUCTURE
 
-- Apply our **Web Coding Standards** during **PR description drafting** and **code review**.
-- Prefer **specific, actionable** comments with short code examples.
-- Use severities: **[Blocker]**, **[Important]**, **[Suggestion]**.
-- Do **not** nitpick items handled by automation (formatting, lint rules).
+You are reviewing code in an Nx monorepo with these key directories:
 
-Related docs (important):
+```
+apps/
+├── webapp/           # React frontend application
+│   ├── src/          # Source code (components, pages, etc.)
+│   └── app-config/   # Webapp configuration
+└── server/           # Node.js/Express backend API
+    └── src/          # Server source code
+docs/                 # Project documentation
+package.json          # Root dependencies (use yarn commands)
+```
 
-- **Coding Standards:** docs/coding-standards.md
-- **Tech Radar:** docs/tech-radar.md
+## ESSENTIAL COMMANDS
 
-**Additional rules (open when relevant)**
+```bash
+yarn nx run webapp:serve    # Start frontend development
+yarn nx run webapp:build    # Build frontend for production
+yarn nx run server:package  # Package server for deployment
+```
 
-- Security: `.github/instructions/security.instructions.md`
-- Accessibility: `.github/instructions/accessibility.instructions.md`
-- React/UX: `.github/instructions/react.instructions.md`
-- TypeScript: `.github/instructions/typescript.instructions.md`
+## CODE REVIEW PRIORITIES
 
----
+REVIEW IN THIS ORDER:
 
-## PR description — Auto-checks Copilot should perform
+1. SECURITY ISSUES (CRITICAL - Must fix)
+2. ACCESSIBILITY VIOLATIONS (CRITICAL - Must fix)
+3. TYPESRIPT/REACT BEST PRACTICES (Important)
+4. CODE STYLE (Minor - Only if not handled by linters)
 
----
+## COMMENT SEVERITY LEVELS
 
-## Security Checklist (required)
+Use these exact formats:
 
-- [ ] **External inputs validated & sanitised** (client/server as applicable). _Tick if_ validation/sanitisation is visible before use.
-- [ ] **API responses validated**; unexpected shapes handled (fallbacks/errors). _Tick if_ guards/schemas are present at boundaries.
-- [ ] **No unsafe HTML is rendered**; if unavoidable, sanitisation is applied **and** noted where it happens. _Fail signal:_ `dangerouslySetInnerHTML` without sanitiser (e.g., `DOMPurify.sanitize`).
-- [ ] **Injection risks (XSS/SQL/command) mitigated** via safe APIs/escaping. _Tick if_ sinks are avoided or safely wrapped.
+- **[Blocker]** - Security vulnerabilities, accessibility failures, critical functionality issues
+- **[Important]** - TypeScript errors, React anti-patterns, performance problems
+- **[Suggestion]** - Code organization, naming conventions, minor improvements
 
----
+## SECURITY CHECKLIST
 
-## When reviewing pull requests (Copilot)
+ALWAYS verify these items in EVERY PR:
 
-**Scope & approach**
+✓ Input validation and sanitization
+✓ API response validation and error handling
+✓ No dangerouslySetInnerHTML without sanitization
+✓ No hardcoded secrets, tokens, or API keys
+✓ Safe URL handling and redirect validation
+✓ Proper authentication and authorization
 
-- Review **from the code diff only**; do not assume runtime behavior.
-- Use severities: **[Blocker]**, **[Important]**, **[Suggestion]**.
-- Provide concise, actionable comments; include a minimal before/after snippet where useful.
+## ACCESSIBILITY CHECKLIST
 
-### Security (focus of inline review)
+For UI changes in apps/webapp/src/:
 
-- Avoid/flag `dangerouslySetInnerHTML`; if present, require sanitisation and name the sanitizer.
-- No raw DOM insertion into trusted contexts; validate URLs/redirect targets.
-- Validate untrusted inputs and API responses **before** use; prefer schemas/guards.
-- Check for secrets/tokens in code, configs, and tests.
-- Call out missing error/fallback paths on boundary failures.
+✓ Keyboard navigation (Tab, Enter, Space, Escape, Arrow keys)
+✓ Focus management (visible focus, proper trapping in modals)
+✓ ARIA labels and roles (icon buttons need action-focused labels)
+✓ Form accessibility (labels tied to inputs, error descriptions)
+✓ Screen reader support (aria-live for dynamic content)
 
-### Accessibility (minimum check)
+## REVIEW SCOPE
 
-- Keyboard access (Esc closes dialogs), visible focus, correct roles/labels.
-- Use of `aria-live` for async status where appropriate.
+REVIEW these files:
+- Security: All code changes (especially APIs and user input)
+- Accessibility: apps/webapp/src/**/*
+- TypeScript: apps/**/*.{ts,tsx}
+- React: apps/webapp/src/**/*.{tsx,jsx}
 
-### Everything else
+DO NOT REVIEW:
+- Code formatting (handled by prettier/eslint)
+- Import ordering (automated)
+- Trivial naming preferences
 
-- For imports/TS/React/testing/naming/readability: **refer to** the [Coding Standards](docs/coding-standards.md).
-  - If a standard is violated, link the relevant section and suggest a minimal change.
+## REFERENCE DOCUMENTS
 
-### Technology choices
+- Web Coding Standards: docs/coding-standards.md
+- Technology Radar: docs/tech-radar.md
 
-- Compare any new dependencies in `package.json`/lockfiles to the [Tech Radar](docs/tech-radar.md).
-  - If not **Adopt**/**Trial**, mark **[Blocker]** and request an RFC/approval link.
-  - For **Trial**, ensure usage is narrowly scoped and success criteria exist.
+## SPECIALIZED INSTRUCTION FILES
 
----
+- Security: .github/instructions/security.instructions.md (apps/**/*)
+- Accessibility: .github/instructions/accessibility.instructions.md (apps/webapp/src/**/*)
+- React: .github/instructions/react.instructions.md (apps/webapp/src/**/*.{tsx,jsx})
+- TypeScript: .github/instructions/typescript.instructions.md (apps/**/*.{ts,tsx})
 
-## Comment format Copilot should use
+## Pull Request Review Process
 
-**Top-level summary**
+### When Reviewing PRs
+**Your Approach:**
+1. Review only the code changes shown in the diff
+2. Focus on security, accessibility, and critical functionality
+3. Use clear severity levels in comments
+4. Provide specific, actionable feedback with code examples when helpful
 
-- Verdict: **Ready** / **Changes requested**, with counts of Blockers/Important/Suggestions.
-- Mini checklist (only items evidenced by diff): Security, Accessibility, Tech choices, (then link to Coding Standards for any non-security notes).
+### Comment Guidelines
+**Format each comment with:**
+- Severity level: **[Blocker]**, **[Important]**, or **[Suggestion]**
+- File location and line numbers
+- Clear explanation of the issue
+- Specific fix suggestion when appropriate
 
-**Inline comments**
+**Example:**
+```
+**[Blocker]** - Security vulnerability in authentication.ts:45
 
-- One issue per comment with severity, file:line, brief reason, and (when helpful) a minimal suggested patch.
+The password validation logic allows empty strings. This could allow unauthorized access.
 
-**Approval**
+**Suggested fix:**
+```typescript
+if (!password || password.trim().length === 0) {
+  throw new Error('Password cannot be empty');
+}
+```
+```
 
-- Approve only if there are **no Blockers** and Important items are fixed or explicitly deferred with rationale.
+### Security Review Checklist
+For every PR, check these security items:
+
+- **Input Validation**: All user inputs are validated before use
+- **API Response Handling**: Responses are validated and have error handling
+- **XSS Prevention**: No unsafe HTML rendering without sanitization
+- **Secret Management**: No hardcoded secrets, tokens, or API keys
+- **URL Safety**: All redirects and external URLs are validated
+
+### Accessibility Review Checklist
+For UI changes in `apps/webapp/src/`:
+
+- **Keyboard Navigation**: All interactive elements are keyboard accessible
+- **Focus Management**: Proper focus handling in modals and dynamic content
+- **ARIA Labels**: Icon buttons have meaningful labels
+- **Form Accessibility**: Inputs have proper labels and error descriptions
+
+### Technology Review
+When new dependencies are added:
+
+1. Check if the dependency is in the [Tech Radar](docs/tech-radar.md)
+2. If **Adopt** or **Trial**: Verify it follows project standards
+3. If **Hold** or **Assess**: Flag as **[Blocker]** and require team approval
+4. Check for security vulnerabilities and licensing issues
+
+### Approval Criteria
+**Approve the PR when:**
+- No **[Blocker]** issues remain
+- All **[Important]** issues are either fixed or properly justified
+- Security and accessibility requirements are met
+
+**Request changes when:**
+- Any **[Blocker]** issues exist
+- Critical security vulnerabilities are found
+- Essential accessibility features are missing
