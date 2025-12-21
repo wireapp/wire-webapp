@@ -159,7 +159,7 @@ jobs:
       - uses: 1password/install-cli-action@143a85f84a90555d121cde2ff5872e393a47ab9f
 
       - name: Generate env file
-        run: op inject -i test/e2e_tests/.env.staging.tpl -o test/e2e_tests/.env
+        run: op inject -i apps/webapp/test/e2e_tests/.env.staging.tpl -o apps/webapp/test/e2e_tests/.env
         env:
           OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
 
@@ -175,7 +175,7 @@ jobs:
           # Overrides URL from .env file
           WEBAPP_URL: https://wire-webapp-precommit.zinfra.io/
           TEST_SERVICE_URL: http://localhost:8080 # Run tests against locally running test service
-        run: yarn e2e-test --shard=${{ matrix.shard }}/${{ strategy.job-total }} --grep "@crit-flow-web|@regression"
+        run: yarn nx run webapp:e2e --shard=${{ matrix.shard }}/${{ strategy.job-total }} --grep "@crit-flow-web|@regression"
 
       - name: Upload blob report
         if: ${{ !cancelled() }}
@@ -208,7 +208,7 @@ jobs:
           merge-multiple: true
 
       - name: Merge playwright reports
-        run: yarn playwright merge-reports --config ./playwright.config.ts ./all-blob-reports
+        run: yarn playwright merge-reports --config ./apps/webapp/playwright.config.ts ./all-blob-reports
 
       - name: Upload test report
         id: upload_playwright_report
@@ -222,7 +222,7 @@ jobs:
         if: always()
         id: generate_comment
         run: |
-          node --experimental-strip-types test/e2e_tests/scripts/create-playwright-report-summary.ts
+          node --experimental-strip-types apps/webapp/test/e2e_tests/scripts/create-playwright-report-summary.ts
           COMMENT=$(cat playwright-report-summary.txt)
           echo "comment<<EOF" >> $GITHUB_OUTPUT
           echo "$COMMENT" >> $GITHUB_OUTPUT

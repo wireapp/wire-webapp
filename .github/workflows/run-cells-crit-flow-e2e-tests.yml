@@ -41,12 +41,12 @@ jobs:
         uses: 1password/install-cli-action@143a85f84a90555d121cde2ff5872e393a47ab9f
 
       - name: Generate env file
-        run: op inject -i test/e2e_tests/.env.$ENV.tpl -o test/e2e_tests/.env
+        run: op inject -i apps/webapp/test/e2e_tests/.env.$ENV.tpl -o apps/webapp/test/e2e_tests/.env
         env:
           ENV: ${{ inputs.environment }}
           OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
       - name: Run critical flow tests
-        run: yarn e2e-test --grep "@crit-flow-cells"
+        run: yarn nx run webapp:e2e --grep "@crit-flow-cells"
 
       - name: Upload test report
         if: always()
