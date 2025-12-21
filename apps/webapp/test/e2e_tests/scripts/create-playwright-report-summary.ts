@@ -22,7 +22,8 @@ import type {JSONReport, JSONReportSuite, JSONReportTest} from '@playwright/test
 import {readFileSync, writeFileSync} from 'fs';
 import {resolve} from 'path';
 
-const jsonPath = resolve('playwright-report', 'report.json');
+const reportDir = process.argv[2] || 'playwright-report';
+const jsonPath = resolve(reportDir, 'report.json');
 let report: JSONReport;
 
 try {

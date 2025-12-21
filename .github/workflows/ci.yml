@@ -41,7 +41,7 @@ jobs:
         with:
           fail_ci_if_error: false
           files: ./apps/webapp/coverage/lcov.info
-          flags: app_webapp
+          flags: app_webapp,unittests
           token: ${{ secrets.CODECOV_TOKEN }}
 
       - name: Upload server coverage to Codecov
@@ -49,5 +49,5 @@ jobs:
         with:
           fail_ci_if_error: false
           files: ./apps/server/coverage/lcov.info
-          flags: app_server
+          flags: app_server,unittests
           token: ${{ secrets.CODECOV_TOKEN }}

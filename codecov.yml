@@ -8,8 +8,7 @@ coverage:
   status:
     project:
       default:
-        target: 50%
-        threshold: 5%
+        target: auto
       app_webapp:
         target: auto
         flags:
