@@ -25,3 +25,6 @@ test/e2e_tests/.env
 !.yarn/sdks
 yalc.lock
 .yalc
+
+# Generated files
+src/script/components/Icon.tsx
