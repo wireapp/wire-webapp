@@ -17,7 +17,7 @@
     "@wireapp/cryptobox": "12.8.0",
     "@wireapp/priority-queue": "workspace:^",
     "@wireapp/promise-queue": "workspace:^",
-    "@wireapp/protocol-messaging": "1.53.0",
+    "@wireapp/protocol-messaging": "1.56.0",
     "@wireapp/store-engine": "workspace:^",
     "axios": "1.13.2",
     "bazinga64": "workspace:^",
