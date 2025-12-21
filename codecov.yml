@@ -18,13 +18,10 @@ coverage:
   precision: 2
   round: down
   range: '45...80'
-  status:
-    project:
-      app_webapp:
-        informational: true
-        only_pulls: true
-      app_server:
-        informational: true
+
+ignore:
+  - '**/*.test.*'
+  - '**/*.spec.*'
 
 parsers:
   gcov:
