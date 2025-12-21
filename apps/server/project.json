@@ -46,7 +46,8 @@
       "configurations": {
         "ci": {
           "ci": true,
-          "coverage": true
+          "coverage": true,
+          "coverageReporters": ["lcov", "text"]
         }
       }
     },

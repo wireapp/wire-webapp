@@ -42,7 +42,7 @@ const config: Config = {
     '^react(.*)$': '<rootDir>/../../node_modules/react$1',
     '.*\\.glsl': 'jest-transform-stub',
   },
-  reporters: ['default', 'github-actions'],
+  reporters: ['default'],
   setupFilesAfterEnv: ['<rootDir>/setupTests.js'],
   testEnvironment: 'jsdom',
   testEnvironmentOptions: {
