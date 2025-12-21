@@ -1,5 +1,8 @@
 {
   "extends": "./tsconfig.json",
-  "include": ["src/**/*", "test/**/*"],
-  "exclude": ["node_modules", "dist"]
+  "compilerOptions": {
+    "composite": false
+  },
+  "include": ["src/**/*", "test/**/*", "../server/**/*.ts"],
+  "exclude": ["node_modules", "dist", "../server/node_modules", "../server/dist"]
 }
