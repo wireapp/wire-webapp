@@ -47,7 +47,7 @@ export const AccountRegistrationLayout = ({children}: {children: ReactNode}) => 
   return (
     <FlexBox css={bodyCss}>
       <div css={leftSectionCss}>
-        <Logo color={COLOR_V2.WHITE} scale={1.9} />
+        <Logo color={COLOR_V2.WHITE} scale={1.9} ariaLabel={t('accessibility.logo.wire')} />
         <div css={registrationLayoutContainerCss}>
           <Text bold css={whiteFontCss} fontSize="1.5rem">
             {t('registrationLayout.header')}

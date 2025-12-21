@@ -39,11 +39,6 @@ export const sendTextMessageToUser = async (pageManager: PageManager, recipient:
 
   await pages.conversation().sendMessage(text);
 
-  // TODO: Bug [WPB-18226] Message is not visible in the conversation after sending it
-  await pages.conversation().page.waitForTimeout(3000); // Wait for the message to be sent
-  await pageManager.refreshPage({waitUntil: 'domcontentloaded'});
-  // End of TODO: Bug [WPB-18226]
-
   await expect(pages.conversation().page.getByText(text)).toBeVisible();
 };
 
@@ -61,7 +56,7 @@ export const logOutUser = async (pageManager: PageManager, shouldDeleteClient = 
   const {pages, components, modals} = pageManager.webapp;
   await components.conversationSidebar().clickPreferencesButton();
   await pages.account().clickLogoutButton();
-  expect(modals.confirmLogout().isVisible()).toBeTruthy();
+  await expect(modals.confirmLogout().modal).toBeVisible();
   if (shouldDeleteClient) {
     await modals.confirmLogout().toggleModalCheck();
     expect(modals.confirmLogout().modalCheckbox.isChecked()).toBeTruthy();

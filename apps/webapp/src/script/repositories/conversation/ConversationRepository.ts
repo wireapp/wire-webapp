@@ -214,6 +214,9 @@ export class ConversationRepository {
         MAX_NAME_LENGTH: 64,
         MAX_SIZE: Config.getConfig().MAX_GROUP_PARTICIPANTS,
       },
+      CHANNEL: {
+        MAX_SIZE: Config.getConfig().MAX_CHANNEL_PARTICIPANTS,
+      },
     };
   }
 

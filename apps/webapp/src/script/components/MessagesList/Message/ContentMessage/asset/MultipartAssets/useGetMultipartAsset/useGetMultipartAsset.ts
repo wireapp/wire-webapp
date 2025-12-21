@@ -61,6 +61,7 @@ export const useGetMultipartAsset = ({
   const [imagePreviewUrl, setImagePreviewUrl] = useState<string | undefined>(undefined);
   const [pdfPreviewUrl, setPdfPreviewUrl] = useState<string | undefined>(undefined);
   const [status, setStatus] = useState<Status>('idle');
+  const [isRecycled, setIsRecycled] = useState<boolean | undefined>(undefined);
 
   const timeoutRef = useRef<number>();
   const isMounted = useRef(true);
@@ -71,55 +72,59 @@ export const useGetMultipartAsset = ({
     uuidRef.current = uuid;
   }
 
-  const fetchData = useCallback(async () => {
-    if (!isMounted.current || status === 'success') {
-      return;
-    }
-
-    try {
-      setStatus('loading');
-      const asset = await cellsRepository.getNode({uuid});
-
-      if (!isMounted.current) {
+  const fetchData = useCallback(
+    async (forceRefetch = false) => {
+      if (!forceRefetch && (!isMounted.current || status === 'success')) {
         return;
       }
 
-      const imagePreview = asset.Previews?.find(preview => preview?.ContentType?.startsWith('image/'));
-      const pdfPreview = asset.Previews?.find(preview => preview?.ContentType?.startsWith('application/pdf'));
+      try {
+        setStatus('loading');
+        const asset = await cellsRepository.getNode({uuid});
+        if (!isMounted.current) {
+          return;
+        }
 
-      const shouldReturnImmediately =
-        !retryPreviewUntilSuccess || (!imagePreview && !pdfPreview) || (imagePreview?.Error && pdfPreview?.Error);
+        const imagePreview = asset.Previews?.find(preview => preview?.ContentType?.startsWith('image/'));
+        const pdfPreview = asset.Previews?.find(preview => preview?.ContentType?.startsWith('application/pdf'));
 
-      if (shouldReturnImmediately) {
+        const shouldReturnImmediately =
+          !retryPreviewUntilSuccess || (!imagePreview && !pdfPreview) || (imagePreview?.Error && pdfPreview?.Error);
+
+        if (shouldReturnImmediately) {
+          setSrc(asset.PreSignedGET?.Url);
+          setImagePreviewUrl(imagePreview?.PreSignedGET?.Url);
+          setPdfPreviewUrl(pdfPreview?.PreSignedGET?.Url);
+          setPath(asset.Path);
+          setIsRecycled(asset.IsRecycled);
+          setStatus('success');
+
+          return;
+        }
+
+        const shouldRetry = (imagePreview?.Processing || pdfPreview?.Processing) && attemptRef.current < maxRetries;
+
+        if (shouldRetry) {
+          attemptRef.current += 1;
+          setStatus('retrying');
+          return;
+        }
+
         setSrc(asset.PreSignedGET?.Url);
         setImagePreviewUrl(imagePreview?.PreSignedGET?.Url);
         setPdfPreviewUrl(pdfPreview?.PreSignedGET?.Url);
         setPath(asset.Path);
+        setIsRecycled(asset.IsRecycled);
         setStatus('success');
-
-        return;
+      } catch (err) {
+        if (!isMounted.current) {
+          return;
+        }
+        setStatus('error');
       }
-
-      const shouldRetry = (imagePreview?.Processing || pdfPreview?.Processing) && attemptRef.current < maxRetries;
-
-      if (shouldRetry) {
-        attemptRef.current += 1;
-        setStatus('retrying');
-        return;
-      }
-
-      setSrc(asset.PreSignedGET?.Url);
-      setImagePreviewUrl(imagePreview?.PreSignedGET?.Url);
-      setPdfPreviewUrl(pdfPreview?.PreSignedGET?.Url);
-      setPath(asset.Path);
-      setStatus('success');
-    } catch (err) {
-      if (!isMounted.current) {
-        return;
-      }
-      setStatus('error');
-    }
-  }, [status, retryPreviewUntilSuccess, maxRetries, cellsRepository, uuid]);
+    },
+    [status, retryPreviewUntilSuccess, maxRetries, cellsRepository, uuid],
+  );
 
   useEffect(() => {
     isMounted.current = true;
@@ -160,6 +165,8 @@ export const useGetMultipartAsset = ({
   }, [status, fetchData, retryDelay]);
 
   return {
+    fetchData,
+    isRecycled,
     src,
     imagePreviewUrl,
     pdfPreviewUrl,

@@ -19,6 +19,7 @@
     "eslint-import-resolver-typescript": "^4.4.4",
     "eslint-plugin-header": "^3.1.1",
     "eslint-plugin-import": "^2.32.0",
+    "eslint-plugin-jest": "^29.5.0",
     "eslint-plugin-jsdoc": "^61.5.0",
     "eslint-plugin-prettier": "5.5.4",
     "eslint-plugin-react-hooks": "^7.0.1",
@@ -87,7 +88,8 @@
     "xml2js": "0.5.0",
     "@stablelib/utf8": "1.0.2",
     "dexie-encrypted@2.0.0": "patch:dexie-encrypted@npm%3A2.0.0#./.yarn/patches/dexie-encrypted-npm-2.0.0-eb61eb5975.patch",
-    "axios": "^1.9.0"
+    "axios": "^1.9.0",
+    "dexie": "4.0.7"
   },
   "version": "0.27.0",
   "packageManager": "yarn@4.1.1"

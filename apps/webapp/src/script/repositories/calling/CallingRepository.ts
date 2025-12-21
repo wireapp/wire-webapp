@@ -69,6 +69,7 @@ import type {User} from 'Repositories/entity/User';
 import {CallingEvent} from 'Repositories/event/CallingEvent';
 import {EventRepository} from 'Repositories/event/EventRepository';
 import {EventSource} from 'Repositories/event/EventSource';
+import {NOTIFICATION_HANDLING_STATE} from 'Repositories/event/NotificationHandlingState';
 import type {MediaDevicesHandler} from 'Repositories/media/MediaDevicesHandler';
 import type {MediaStreamHandler} from 'Repositories/media/MediaStreamHandler';
 import {MediaType} from 'Repositories/media/MediaType';
@@ -105,6 +106,7 @@ import type {ServerTimeHandler} from '../../time/serverTimeHandler';
 import {Warnings} from '../../view_model/WarningsContainer';
 
 const avsLogger = getLogger('avs');
+const AVS_BROWSER_SLEEP_MODE_DETECTION_TIME = 3000;
 
 interface MediaStreamQuery {
   audio?: boolean;
@@ -379,7 +381,32 @@ export class CallingRepository {
     wCall.setAudioStreamHandler(this.updateCallAudioStreams);
     wCall.setVideoStreamHandler(this.updateParticipantVideoStream);
     this.isConferenceCallingSupported = wCall.isConferenceCallingSupported();
-    setInterval(() => wCall.poll(), 500);
+    let last = Date.now();
+    setInterval(() => {
+      // When the app enters sleep mode, no JavaScript is executed and the timer stops. We then determine this by
+      // calculating the time difference.
+      const now = Date.now();
+      const diff = now - last;
+
+      // Inform AVS that the app was in sleep mode. This recalibrates the timers within AVS
+      if (diff > AVS_BROWSER_SLEEP_MODE_DETECTION_TIME) {
+        // Only notify AVS once a valid user identifier has been assigned.
+        const userId = this.wUser;
+        if (userId) {
+          try {
+            wCall.setBackground(this.wUser, 0);
+          } catch (e) {
+            this.logger.warn(`Informed AVS about background mode failed. ${e}`);
+          }
+        } else {
+          this.logger.warn('Skipping AVS background notification because AVS user ID is not initialized.');
+        }
+      }
+
+      wCall.poll();
+      last = now;
+    }, 500);
+
     return wCall;
   }
 
@@ -426,6 +453,11 @@ export class CallingRepository {
     wCall.setReqClientsHandler(wUser, this.requestClients);
     wCall.setReqNewEpochHandler(wUser, this.requestNewEpoch);
     wCall.setActiveSpeakerHandler(wUser, this.updateActiveSpeakers);
+
+    // Set AVS to notification processing "blocking" mode on startup so that old calls will be ignored.
+    // Passing 1 enables this notification blocking mode (0 would disable it). This mode is terminated
+    // by the web app via the corresponding NOTIFICATION_HANDLING_STATE event.
+    wCall.processNotifications(wUser, 1);
 
     return wUser;
   }
@@ -630,6 +662,7 @@ export class CallingRepository {
     amplify.subscribe(WebAppEvents.PROPERTIES.UPDATED, ({settings}: WebappProperties) => {
       this.toggleCbrEncoding(settings.call.enable_vbr_encoding);
     });
+    amplify.subscribe(WebAppEvents.EVENT.NOTIFICATION_HANDLING_STATE, this.setNotificationHandlingState);
   }
 
   /**
@@ -2720,6 +2753,27 @@ export class CallingRepository {
     }
     return participant.doesMatchIds(this.selfUser.qualifiedId, this.selfClientId);
   }
+
+  /**
+   * Set the notification handling state in AVS.
+   *
+   * @note Inform AVS that now obsolete Call events may arrive. This prevents old calls from being displayed as missed.
+   * the events NOTIFICATION_HANDLING_STATE.RECOVERY and NOTIFICATION_HANDLING_STATE.STREAM switch AVS to standby mode.
+   * Both events will be ended again by NOTIFICATION_HANDLING_STATE.WEB_SOCKET.
+   *
+   * @param handlingState State of the notifications stream handling
+   */
+  private readonly setNotificationHandlingState = (handlingState: NOTIFICATION_HANDLING_STATE) => {
+    const isFetchingFromStream = handlingState !== NOTIFICATION_HANDLING_STATE.WEB_SOCKET;
+
+    if (isFetchingFromStream) {
+      this.wCall?.processNotifications(this.wUser, 1);
+      this.logger.debug(`Block avs call notification handling`);
+    } else {
+      this.wCall?.processNotifications(this.wUser, 0);
+      this.logger.debug(`Finish blocking avs call notification handling`);
+    }
+  };
 
   //##############################################################################
   // Logging

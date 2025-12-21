@@ -222,6 +222,9 @@ export type Env = {
   /** Limits the number of participants in a group conversation */
   MAX_GROUP_PARTICIPANTS: string;
 
+  /** Limits the number of participants in a channel conversation */
+  MAX_CHANNEL_PARTICIPANTS: string;
+
   /** Limits the number of participants in a legacy video call */
   MAX_VIDEO_PARTICIPANTS: string;
 

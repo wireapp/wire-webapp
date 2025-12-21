@@ -24,12 +24,12 @@ import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {DropdownMenu, MoreIcon} from '@wireapp/react-ui-kit';
 
 import {useAppNotification} from 'Components/AppNotification/AppNotification';
-import {useFileHistoryModal} from 'Components/components/Modals/FileHistoryModal/hooks/useFileHistoryModal';
 import {openFolder} from 'Components/Conversation/ConversationCells/common/openFolder/openFolder';
 import {
   isInRecycleBin,
   isRootRecycleBinPath,
 } from 'Components/Conversation/ConversationCells/common/recycleBin/recycleBin';
+import {useFileHistoryModal} from 'Components/Modals/FileHistoryModal/hooks/useFileHistoryModal';
 import {CellsRepository} from 'Repositories/cells/CellsRepository';
 import {CellNode, CellNodeType} from 'src/script/types/cellNode';
 import {isFileEditable} from 'Util/FileTypeUtil';

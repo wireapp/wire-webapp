@@ -36,7 +36,7 @@ Prerequisites:
 ## 1. Install deps & fetch configuration
 
 1. Run `yarn` (uses Yarn 4 workspaces)
-2. Run `yarn nx run webapp:configure` to fetch the active config bundle into `apps/webapp/resource/`
+   - This will install all dependencies and fetch a [configuration](https://github.com/wireapp/wire-web-config-wire/) for the application into `apps/webapp/resource/`
 
 ## 2. Build & run
 

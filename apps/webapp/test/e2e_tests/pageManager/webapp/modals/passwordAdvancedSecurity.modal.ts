@@ -17,12 +17,38 @@
  *
  */
 
-import {Page} from '@playwright/test';
+import {Locator, Page} from '@playwright/test';
+
+import {PrimaryModalType} from 'Components/Modals/PrimaryModal/PrimaryModalTypes';
 
 import {BaseModal} from './base.modal';
 
-export class CancelRequestModal extends BaseModal {
+export class PasswordAdvancedSecurityModal extends BaseModal {
+  readonly passwordInput: Locator;
+
   constructor(page: Page) {
-    super(page, "[data-uie-name='primary-modals-container']");
+    super(page, PrimaryModalType.PASSWORD_ADVANCED_SECURITY);
+
+    this.passwordInput = this.modal.getByRole('textbox');
+  }
+
+  async isTitleVisible() {
+    await this.modalTitle.waitFor({state: 'visible'});
+  }
+
+  async isTitleHidden() {
+    await this.modalTitle.waitFor({state: 'hidden'});
+  }
+
+  async clickBackUpNow() {
+    await this.actionButton.click();
+  }
+
+  async clickCancel() {
+    await this.cancelButton.click();
+  }
+
+  async enterPassword(password: string) {
+    await this.passwordInput.fill(password);
   }
 }

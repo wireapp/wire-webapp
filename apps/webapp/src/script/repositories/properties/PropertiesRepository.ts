@@ -158,6 +158,7 @@ export class PropertiesRepository {
       text: {
         title: t('dataSharingModalTitle'),
         htmlMessage: t('dataSharingModalDescription', undefined, replaceLink(Config.getConfig().URL.PRIVACY_POLICY)),
+        closeBtnLabel: t('dataSharingModalCloseBtnTitle'),
       },
       primaryAction: {
         text: t('dataSharingModalAgree'),

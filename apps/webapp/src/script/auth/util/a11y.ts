@@ -17,12 +17,12 @@
  *
  */
 
-import {Page} from '@playwright/test';
+import React from 'react';
 
-import {BaseModal} from './base.modal';
-
-export class ErrorModal extends BaseModal {
-  constructor(page: Page) {
-    super(page, 'primary-modals-container');
-  }
-}
+export const srOnlyStyle: React.CSSProperties = {
+  position: 'absolute',
+  left: -10000,
+  overflow: 'hidden',
+  width: 1,
+  height: 1,
+};

@@ -148,6 +148,7 @@ declare module 'I18n/en-US.json' {
     'accessibility.headings.preferencesOptions': `Preferences - options`;
     'accessibility.headings.sidebar': `Navigation`;
     'accessibility.headings.sidebar.footer': `Navigation Footer`;
+    'accessibility.logo.wire': `Wire Logo`;
     'accessibility.messageActionsMenuEmoji': `Select emoji`;
     'accessibility.messageActionsMenuLabel': `Message actions`;
     'accessibility.messageActionsMenuLike': `React with heart`;
@@ -537,6 +538,7 @@ declare module 'I18n/en-US.json' {
     'channelDetailsActionDelete': `Delete channel`;
     'channelDetailsActionLeave': `Leave channel`;
     'channelParticipantActionLeave': `Leave channel…`;
+    'channelSizeInfo': `Up to {count} people can join a channel.`;
     'channelsPopoverLeave': `Leave channel`;
     'chooseHandle.handlePlaceholder': `Username`;
     'chooseHandle.headline': `Set your username`;
@@ -938,6 +940,7 @@ declare module 'I18n/en-US.json' {
     'customEnvRedirect.redirectHeadline': `Redirecting...`;
     'customEnvRedirect.redirectTo': `You are being redirected to your dedicated enterprise service.`;
     'dataSharingModalAgree': `Agree`;
+    'dataSharingModalCloseBtnTitle': `Close window, Consent to share user data`;
     'dataSharingModalDecline': `Decline`;
     'dataSharingModalDescription': `Help to improve Wire by sharing your usage data via a pseudonymous ID. The data is neither linked to your personal information nor shared with third parties besides Wire Group. It includes, for example, when you use a feature, your app version, device type, or your operating system. This data will be deleted at the latest after 365 days. <br /> Find further details in our [link]Privacy Policy[/link]. You can revoke your consent at any time.`;
     'dataSharingModalTitle': `Consent to share user data`;

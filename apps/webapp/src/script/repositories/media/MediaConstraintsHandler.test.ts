@@ -85,9 +85,10 @@ describe('MediaConstraintsHandler', () => {
       expect(constraints.video.deviceId).toBeUndefined();
       expect(constraints.video).toEqual(
         expect.objectContaining({
-          frameRate: expect.any(Number),
-          height: expect.any(Number),
-          width: expect.any(Number),
+          frameRate: {ideal: expect.any(Number)},
+          height: {ideal: expect.any(Number)},
+          width: {ideal: expect.any(Number)},
+          resizeMode: 'none',
         }),
       );
     });

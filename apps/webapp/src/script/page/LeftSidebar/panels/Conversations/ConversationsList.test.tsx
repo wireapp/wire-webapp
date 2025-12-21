@@ -17,6 +17,15 @@
  *
  */
 
+jest.mock('@tanstack/react-virtual', () => ({
+  useVirtualizer: ({count}: {count: number}) => ({
+    getVirtualItems: () =>
+      Array.from({length: count}, (_, index) => ({index, key: index, size: 56, start: index * 56})),
+    getTotalSize: () => count * 56, // default estimated row size
+    scrollToIndex: jest.fn(),
+  }),
+}));
+
 import {createRef} from 'react';
 
 import {render} from '@testing-library/react';
@@ -89,16 +98,14 @@ describe('ConversationsList', () => {
       />,
     );
 
-  it("should render all 1:1 conversations if there's no search filter", () => {
+  it("should render all 1:1 conversations if there's no search filter", async () => {
     const userNames = ['Alice', 'Bob', 'Charlie'];
     const conversations = userNames.map(create1to1Conversation);
 
     window.Element.prototype.getBoundingClientRect = jest.fn().mockReturnValue({height: 1000, width: 1000});
 
-    const {getByText} = renderComponent(conversations);
+    const {findByText} = renderComponent(conversations);
 
-    userNames.forEach(userName => {
-      expect(getByText(userName)).toBeDefined();
-    });
+    await Promise.all(userNames.map(async userName => expect(await findByText(userName)).toBeDefined()));
   });
 });

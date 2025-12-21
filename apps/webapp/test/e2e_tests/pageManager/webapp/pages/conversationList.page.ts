@@ -18,6 +18,7 @@
  */
 
 import {Locator, Page} from '@playwright/test';
+
 import {selectById, selectByDataAttribute} from 'test/e2e_tests/utils/selector.util';
 import {escapeHtml} from 'test/e2e_tests/utils/userDataProcessor';
 
@@ -40,6 +41,8 @@ export class ConversationListPage {
   readonly moveToMenu: Locator;
   readonly createNewFolderButton: Locator;
   readonly conversationListHeaderTitle: Locator;
+  readonly joinCallButton: Locator;
+  readonly clearContentButton: Locator;
 
   constructor(page: Page) {
     this.page = page;
@@ -65,6 +68,8 @@ export class ConversationListPage {
     this.moveToMenu = page.getByRole('menu');
     this.createNewFolderButton = this.moveToMenu.getByRole('button', {name: 'Create new folder'});
     this.conversationListHeaderTitle = page.locator('[data-uie-name="conversation-list-header-title"]');
+    this.joinCallButton = page.getByRole('button', {name: 'Join'});
+    this.clearContentButton = page.getByRole('button', {name: 'Clear content'});
   }
 
   async isConversationItemVisible(conversationName: string) {

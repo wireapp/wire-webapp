@@ -17,26 +17,16 @@
  *
  */
 
-import {Page, Locator} from '@playwright/test';
-import {selectByDataAttribute} from 'test/e2e_tests/utils/selector.util';
+import {Page} from '@playwright/test';
 
-export class VerifyEmailModal {
-  readonly page: Page;
+import {AudioType} from 'Repositories/audio/AudioType';
 
-  readonly modal: Locator;
-  readonly okButton: Locator;
-
-  constructor(page: Page) {
-    this.page = page;
-    this.modal = page.locator('[data-uie-name="primary-modals-container"][aria-label="Verify email address"]');
-    this.okButton = this.modal.locator(selectByDataAttribute('do-action'));
-  }
-
-  async isVisible() {
-    await this.modal.isVisible();
-  }
-
-  async clickOkButton() {
-    await this.okButton.click();
-  }
-}
+/**
+ * Detect if the given sound is currently being played. The sounds played are managed by `AudioRepository.ts`
+ * @param page the page to check if audio is playing on
+ * @param type the sound which is currently playing
+ */
+export const isPlayingAudio = async (page: Page, type: AudioType) => {
+  const audioTag = page.locator(`#audio-elements>audio[src*="${type}"]`);
+  return await audioTag.evaluate((el: HTMLAudioElement) => !el.paused);
+};

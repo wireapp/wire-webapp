@@ -29,6 +29,9 @@ export class ConversationDetailsPage {
   readonly selfDeletingMessageButton: Locator;
   readonly archiveButton: Locator;
   readonly blockConversationButton: Locator;
+  readonly clearConversationContentButton: Locator;
+  readonly selectedSearchList: Locator;
+  readonly searchList: Locator;
 
   constructor(page: Page) {
     this.page = page;
@@ -39,6 +42,9 @@ export class ConversationDetailsPage {
     this.selfDeletingMessageButton = this.conversationDetails.getByRole('button', {name: 'Self-deleting messages'});
     this.archiveButton = this.conversationDetails.locator(selectByDataAttribute('do-archive'));
     this.blockConversationButton = this.conversationDetails.locator(selectByDataAttribute('do-block'));
+    this.clearConversationContentButton = this.conversationDetails.getByRole('button', {name: 'Clear Content'});
+    this.selectedSearchList = this.page.locator(selectByDataAttribute('selected-search-list'));
+    this.searchList = this.page.locator(selectByDataAttribute('search-list'));
   }
 
   async waitForSidebar() {
@@ -59,14 +65,18 @@ export class ConversationDetailsPage {
     await this.addPeopleButton.click();
   }
 
+  async clickSelectedUsersButton() {
+    await this.page
+      .locator(`${selectById('add-participants')} ${selectByDataAttribute('do-toggle-selected-search-list')}`)
+      .click();
+  }
+
   async addUsersToConversation(fullNames: string[]) {
     for (const fullName of fullNames) {
-      const userLocator = this.page.locator(
-        `${selectById('add-participants')} ${selectByDataAttribute('search-list')} [aria-label="Open profile of ${fullName}"]`,
-      );
-      await userLocator.click();
+      await this.searchList.locator(`li div[aria-label*="${fullName}"]`).click();
       // Wait for the user to be selected (checkbox should be checked)
-      await userLocator.locator('input[type="checkbox"]').waitFor({state: 'attached'});
+      await this.clickSelectedUsersButton();
+      await this.selectedSearchList.locator(`li div[aria-label*="${fullName}"]`).waitFor({state: 'attached'});
     }
 
     await this.page.locator(`${selectById('add-participants')} ${selectByDataAttribute('do-create')}`).click();
@@ -166,5 +176,9 @@ export class ConversationDetailsPage {
 
   async clickBlockConversationButton() {
     await this.blockConversationButton.click();
+  }
+
+  async clickClearConversationContentButton() {
+    await this.clearConversationContentButton.click();
   }
 }
