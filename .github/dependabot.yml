@@ -2,7 +2,7 @@ version: 2
 updates:
   # Webapp configs
   - package-ecosystem: npm
-    directory: '/app-config'
+    directory: '/apps/webapp/app-config'
     schedule:
       interval: daily
       time: '16:00'
@@ -13,7 +13,7 @@ updates:
 
   # Webapp frontend dependencies
   - package-ecosystem: npm
-    directory: '/'
+    directory: '/apps/webapp'
     schedule:
       interval: weekly
       day: sunday
@@ -47,7 +47,7 @@ updates:
 
   # Server dependencies
   - package-ecosystem: npm
-    directory: '/server'
+    directory: '/apps/server'
     schedule:
       interval: weekly
       day: sunday

@@ -30,13 +30,23 @@
 '👕 size: XXL':
   size-above: 999
 
+# Apps
+'app: webapp':
+  files:
+    - 'apps/webapp/.*'
+'app: server':
+  files:
+    - 'apps/server/.*'
+
+# Libraries
+
 # Components
 'comp: calling':
   files:
-    - 'src/script/repositories/calling/.*'
+    - 'apps/webapp/src/script/repositories/calling/.*'
 'comp: preferences':
   files:
-    - 'src/script/repositories/properties/.*'
+    - 'apps/webapp/src/script/repositories/properties/.*'
 'comp: infrastructure':
   files:
     - '.elasticbeanstalk'
