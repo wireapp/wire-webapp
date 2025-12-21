@@ -208,7 +208,7 @@ jobs:
           merge-multiple: true
 
       - name: Merge playwright reports
-        run: yarn playwright merge-reports --config ./apps/webapp/playwright.config.ts ./all-blob-reports
+        run: yarn playwright merge-reports --config ./apps/webapp/playwright.config.ts --reporter=json --reporter=html ./all-blob-reports
 
       - name: Upload test report
         id: upload_playwright_report
@@ -222,8 +222,14 @@ jobs:
         if: always()
         id: generate_comment
         run: |
-          node --experimental-strip-types apps/webapp/test/e2e_tests/scripts/create-playwright-report-summary.ts
-          COMMENT=$(cat playwright-report-summary.txt)
+          ls -la playwright-report/ || echo "No playwright-report directory found"
+          ls -la playwright-report/report.json || echo "No report.json found"
+          node --experimental-strip-types apps/webapp/test/e2e_tests/scripts/create-playwright-report-summary.ts || echo "Script failed, creating fallback message"
+          if [ -f playwright-report-summary.txt ]; then
+            COMMENT=$(cat playwright-report-summary.txt)
+          else
+            COMMENT="❌ Playwright report summary could not be generated"
+          fi
           echo "comment<<EOF" >> $GITHUB_OUTPUT
           echo "$COMMENT" >> $GITHUB_OUTPUT
           echo "EOF" >> $GITHUB_OUTPUT
