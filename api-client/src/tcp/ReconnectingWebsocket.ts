@@ -73,6 +73,7 @@ export class ReconnectingWebsocket {
 
   private isPingingEnabled = true;
   private readonly pendingHealthChecks = new Set<(isHealthy: boolean) => void>();
+  private lastMessageTimestamp = 0;
 
   constructor(
     private readonly onReconnect: () => Promise<string>,
@@ -129,6 +130,7 @@ export class ReconnectingWebsocket {
       return;
     }
 
+    this.lastMessageTimestamp = Date.now();
     this.onMessage?.(data);
   };
 
@@ -208,17 +210,39 @@ export class ReconnectingWebsocket {
   }
 
   /**
-   * Lightweight health probe that sends a single ping and resolves with whether a pong was received in time.
+   * Lightweight health probe that intelligently determines connection health.
+   *
+   * If the WebSocket is actively processing messages (i.e., received a message within the last 5 seconds),
+   * it considers the connection healthy without sending a ping, as message processing
+   * indicates the connection is working properly.
+   *
+   * If the WebSocket is idle, it sends a ping and expects a pong within the timeout.
+   * This approach prevents false failures during high-load scenarios where pong responses
+   * get queued behind many other messages.
+   *
    * Does not close or reconnect the socket; callers can decide how to react to failures.
    */
-  public checkHealth(timeoutMs = TimeUtil.TimeInMillis.SECOND * 5): Promise<boolean> {
+  public checkHealth(timeoutMs = TimeUtil.TimeInMillis.SECOND * 10): Promise<boolean> {
     if (!this.socket || this.getState() !== WEBSOCKET_STATE.OPEN) {
       return Promise.resolve(false);
     }
 
+    const now = Date.now();
+    const timeSinceLastMessage = now - this.lastMessageTimestamp;
+
+    // If we're actively processing messages during the last 5 seconds, consider the connection healthy
+    if (timeSinceLastMessage < TimeUtil.TimeInMillis.SECOND * 5) {
+      this.logger.debug(
+        `WebSocket is actively processing messages (last: ${timeSinceLastMessage}ms ago), considering healthy`,
+      );
+      return Promise.resolve(true);
+    }
+
+    // If idle, use ping/pong to verify connection
     return new Promise<boolean>(resolve => {
       const timeoutId = setTimeout(() => {
         this.pendingHealthChecks.delete(resolveHealthCheck);
+        this.logger.debug('Health check timeout - no pong received within timeout');
         resolve(false);
       }, timeoutMs);
 
@@ -228,6 +252,7 @@ export class ReconnectingWebsocket {
       };
 
       this.pendingHealthChecks.add(resolveHealthCheck);
+      this.logger.debug('WebSocket is idle, sending ping for health check');
       this.send(PingMessage.PING);
     });
   }
