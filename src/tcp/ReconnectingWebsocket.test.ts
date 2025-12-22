@@ -228,7 +228,7 @@ describe('ReconnectingWebsocket', () => {
       RWS.connect();
     }, 5000);
 
-    it('uses default timeout of 5 seconds when not specified', done => {
+    it('uses default timeout of 10 seconds when not specified', done => {
       const onReconnect = jest.fn().mockReturnValue(getServerAddress());
       const RWS = createRWS(onReconnect);
 
@@ -240,16 +240,16 @@ describe('ReconnectingWebsocket', () => {
         const duration = Date.now() - startTime;
 
         expect(result).toBe(false);
-        // Should be approximately 5000ms (with some tolerance)
-        expect(duration).toBeGreaterThanOrEqual(4900);
-        expect(duration).toBeLessThan(5500);
+        // Should be approximately 10000ms (with some tolerance)
+        expect(duration).toBeGreaterThanOrEqual(9900);
+        expect(duration).toBeLessThan(10500);
 
         RWS.disconnect();
         done();
       });
 
       RWS.connect();
-    }, 10000);
+    }, 15000);
 
     it('handles multiple concurrent health checks', done => {
       const onReconnect = jest.fn().mockReturnValue(getServerAddress());
@@ -361,6 +361,193 @@ describe('ReconnectingWebsocket', () => {
 
       RWS.connect();
     }, 5000);
+
+    it('considers connection healthy when messages are actively being processed', done => {
+      const onReconnect = jest.fn().mockReturnValue(getServerAddress());
+      const RWS = createRWS(onReconnect);
+
+      RWS.setOnOpen(async () => {
+        const sendSpy = jest.spyOn(RWS, 'send');
+
+        // Simulate recent message activity (within 5 seconds)
+        RWS['lastMessageTimestamp'] = Date.now() - 1000; // 1 second ago
+
+        const result = await RWS.checkHealth(1000);
+
+        expect(result).toBe(true);
+        // Should NOT send a ping when messages are actively being processed
+        expect(sendSpy).not.toHaveBeenCalled();
+
+        sendSpy.mockRestore();
+        RWS.disconnect();
+        done();
+      });
+
+      RWS.connect();
+    });
+
+    it('sends ping when connection is idle (no messages for 5+ seconds)', done => {
+      const onReconnect = jest.fn().mockReturnValue(getServerAddress());
+      const RWS = createRWS(onReconnect);
+
+      RWS.setOnOpen(async () => {
+        const sendSpy = jest.spyOn(RWS, 'send');
+
+        // Simulate idle connection (no messages for 6 seconds)
+        RWS['lastMessageTimestamp'] = Date.now() - 6000; // 6 seconds ago
+
+        const checkPromise = RWS.checkHealth(1000);
+
+        // Should send a ping when idle
+        expect(sendSpy).toHaveBeenCalledWith(PingMessage.PING);
+
+        // Simulate pong response
+        setTimeout(() => {
+          RWS['internalOnMessage']({data: Buffer.from(PingMessage.PONG)} as MessageEvent);
+        }, 100);
+
+        const result = await checkPromise;
+        expect(result).toBe(true);
+
+        sendSpy.mockRestore();
+        RWS.disconnect();
+        done();
+      });
+
+      RWS.connect();
+    });
+
+    it('updates lastMessageTimestamp when non-PONG messages are received', done => {
+      const onReconnect = jest.fn().mockReturnValue(getServerAddress());
+      const RWS = createRWS(onReconnect);
+      const testMessage = JSON.stringify({test: 'data'});
+
+      RWS.setOnOpen(() => {
+        const initialTimestamp = RWS['lastMessageTimestamp'];
+        expect(initialTimestamp).toBe(0);
+
+        // Simulate receiving a message
+        RWS['internalOnMessage']({data: Buffer.from(testMessage)} as MessageEvent);
+
+        const updatedTimestamp = RWS['lastMessageTimestamp'];
+        expect(updatedTimestamp).toBeGreaterThan(initialTimestamp);
+        expect(updatedTimestamp).toBeGreaterThan(Date.now() - 1000);
+
+        RWS.disconnect();
+        done();
+      });
+
+      RWS.connect();
+    });
+
+    it('does not update lastMessageTimestamp for PONG messages', done => {
+      const onReconnect = jest.fn().mockReturnValue(getServerAddress());
+      const RWS = createRWS(onReconnect);
+
+      RWS.setOnOpen(() => {
+        RWS['lastMessageTimestamp'] = 12345; // Set a specific timestamp
+
+        // Receive a PONG message
+        RWS['internalOnMessage']({data: Buffer.from(PingMessage.PONG)} as MessageEvent);
+
+        // Timestamp should not be updated for PONG
+        expect(RWS['lastMessageTimestamp']).toBe(12345);
+
+        RWS.disconnect();
+        done();
+      });
+
+      RWS.connect();
+    });
+
+    it('prevents false negatives during high message volume', done => {
+      const onReconnect = jest.fn().mockReturnValue(getServerAddress());
+      const RWS = createRWS(onReconnect);
+
+      RWS.setOnOpen(async () => {
+        const sendSpy = jest.spyOn(RWS, 'send');
+
+        // Simulate high message activity - messages received very recently
+        RWS['lastMessageTimestamp'] = Date.now() - 500; // 500ms ago
+
+        // Even with a very short timeout, should still return true due to recent activity
+        const result = await RWS.checkHealth(100); // Very short timeout
+
+        expect(result).toBe(true);
+        expect(sendSpy).not.toHaveBeenCalled(); // No ping sent
+
+        sendSpy.mockRestore();
+        RWS.disconnect();
+        done();
+      });
+
+      RWS.connect();
+    });
+
+    it('returns false for idle connection when pong not received', done => {
+      const onReconnect = jest.fn().mockReturnValue(getServerAddress());
+      const RWS = createRWS(onReconnect);
+
+      RWS.setOnOpen(async () => {
+        const sendSpy = jest.spyOn(RWS, 'send');
+
+        // Simulate idle connection
+        RWS['lastMessageTimestamp'] = Date.now() - 10000; // 10 seconds ago
+
+        // Don't mock pong response - should timeout
+        const result = await RWS.checkHealth(200);
+
+        expect(result).toBe(false);
+        expect(sendSpy).toHaveBeenCalledWith(PingMessage.PING);
+
+        sendSpy.mockRestore();
+        RWS.disconnect();
+        done();
+      });
+
+      RWS.connect();
+    });
+
+    it('handles mixed scenarios - recent activity then idle', async () => {
+      const onReconnect = jest.fn().mockReturnValue(getServerAddress());
+      const RWS = createRWS(onReconnect);
+
+      RWS.connect();
+
+      return new Promise<void>((resolve, reject) => {
+        RWS.setOnOpen(async () => {
+          try {
+            const sendSpy = jest.spyOn(RWS, 'send');
+
+            // Test 1: Recent activity - should be healthy without ping
+            RWS['lastMessageTimestamp'] = Date.now() - 1000; // 1 second ago
+            let result = await RWS.checkHealth(1000);
+            expect(result).toBe(true);
+            expect(sendSpy).not.toHaveBeenCalled();
+            sendSpy.mockClear();
+
+            // Test 2: Idle - should send ping
+            RWS['lastMessageTimestamp'] = Date.now() - 6000; // 6 seconds ago
+            const checkPromise = RWS.checkHealth(1000);
+            expect(sendSpy).toHaveBeenCalledWith(PingMessage.PING);
+
+            // Simulate pong
+            setTimeout(() => {
+              RWS['internalOnMessage']({data: Buffer.from(PingMessage.PONG)} as MessageEvent);
+            }, 100);
+
+            result = await checkPromise;
+            expect(result).toBe(true);
+
+            sendSpy.mockRestore();
+            RWS.disconnect();
+            resolve();
+          } catch (error) {
+            reject(error);
+          }
+        });
+      });
+    });
   });
 
   describe('constructor', () => {
