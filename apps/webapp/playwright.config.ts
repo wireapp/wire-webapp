@@ -19,8 +19,9 @@
 
 import {defineConfig, devices, ReporterDescription} from '@playwright/test';
 import {config} from 'dotenv';
+import {resolve} from 'node:path';
 
-config({path: './test/e2e_tests/.env'});
+config({path: resolve(__dirname, './test/e2e_tests/.env')});
 
 const numberOfRetriesOnCI = 1;
 const numberOfParallelWorkersOnCI = 1;
