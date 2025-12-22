@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [27.94.5](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@27.94.4...@wireapp/api-client@27.94.5) (2025-12-22)
+
+### Bug Fixes
+
+* consider active websocket for health check ([#7745](https://github.com/wireapp/wire-web-packages/issues/7745)) ([3d74f8c](https://github.com/wireapp/wire-web-packages/commit/3d74f8c3e88e1181b6a758c8ea0d5aba3ae0c86d))
+
 ## [27.94.4](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@27.94.3...@wireapp/api-client@27.94.4) (2025-12-21)
 
 **Note:** Version bump only for package @wireapp/api-client
