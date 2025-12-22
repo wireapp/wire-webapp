@@ -188,23 +188,31 @@ const FullscreenVideoCall = ({
 
   const [isParticipantsListOpen, toggleParticipantsList] = useToggleState(false);
 
-  const handRaisedNotification = useAppNotification({
+  const callNotification = useAppNotification({
     activeWindow: viewMode === CallingViewMode.DETACHED_WINDOW ? detachedWindow! : window,
   });
 
   useEffect(() => {
     const handRaisedHandler = (event: Event) => {
-      handRaisedNotification.show({
+      callNotification.show({
+        message: (event as CustomEvent<{notificationMessage: string}>).detail.notificationMessage,
+      });
+    };
+
+    const remoteMutedHandler = (event: Event) => {
+      callNotification.show({
         message: (event as CustomEvent<{notificationMessage: string}>).detail.notificationMessage,
       });
     };
 
     window.addEventListener(WebAppEvents.CALL.HAND_RAISED, handRaisedHandler);
+    window.addEventListener(WebAppEvents.CALL.REMOTE_MUTED, remoteMutedHandler);
 
     return () => {
       window.removeEventListener(WebAppEvents.CALL.HAND_RAISED, handRaisedHandler);
+      window.removeEventListener(WebAppEvents.CALL.REMOTE_MUTED, remoteMutedHandler);
     };
-  }, [handRaisedNotification]);
+  }, [callNotification]);
 
   function toggleIsHandRaised(currentIsHandRaised: boolean) {
     selfParticipant.handRaisedAt(new Date().getTime());
@@ -283,18 +291,6 @@ const FullscreenVideoCall = ({
                 <Duration startedAt={startedAt} />
               </div>
             </div>
-
-            {muteState === MuteState.REMOTE_MUTED && (
-              <div
-                className="video-title__info-bar"
-                style={{
-                  position: 'absolute',
-                  right: '12px',
-                }}
-              >
-                {t('muteStateRemoteMute')}
-              </div>
-            )}
           </div>
           <div css={headerActionsWrapperStyles}>
             {!isMobile && isPaginationVisible && (

@@ -22,7 +22,7 @@
     "@wireapp/react-ui-kit": "9.72.0",
     "@wireapp/store-engine-dexie": "2.1.16",
     "@wireapp/telemetry": "0.3.1",
-    "@wireapp/webapp-events": "0.28.1",
+    "@wireapp/webapp-events": "0.29.0",
     "amplify": "https://github.com/wireapp/amplify#head=master",
     "beautiful-react-hooks": "5.0.3",
     "classnames": "2.5.1",

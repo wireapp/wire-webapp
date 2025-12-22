@@ -813,6 +813,15 @@ export class CallingRepository {
         }
 
         this.muteCall(currentCall, true, MuteState.REMOTE_MUTED);
+
+        window.dispatchEvent(
+          new CustomEvent(WebAppEvents.CALL.REMOTE_MUTED, {
+            detail: {
+              notificationMessage: t('muteStateRemoteMute'),
+            },
+          }),
+        );
+
         return this.processCallingMessage(conversation, event);
       }
 
