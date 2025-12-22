@@ -182,7 +182,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: blob-report-${{ matrix.shard }}
-          path: ./apps/webapp/blob-report
+          path: apps/webapp/blob-report
           retention-days: 1
 
   e2e-report:
@@ -211,7 +211,7 @@ jobs:
         run: |
           ls -la all-blob-reports/ || echo "No blob reports found"
           cd apps/webapp
-          yarn playwright merge-reports --config ./playwright.config.ts --reporter=json,html ../../all-blob-reports
+          yarn playwright merge-reports --config ./playwright.config.ts ../../all-blob-reports
           cd ../..
 
       - name: Upload test report
@@ -226,14 +226,22 @@ jobs:
         if: always()
         id: generate_comment
         run: |
+          echo "Checking for Playwright report..."
           ls -la apps/webapp/playwright-report/ || echo "No playwright-report directory found"
           ls -la apps/webapp/playwright-report/report.json || echo "No report.json found"
-          cd apps/webapp && node --experimental-strip-types test/e2e_tests/scripts/create-playwright-report-summary.ts playwright-report && cd ../.. || echo "Script failed, creating fallback message"
-          if [ -f playwright-report-summary.txt ]; then
-            COMMENT=$(cat playwright-report-summary.txt)
+
+          # Check if report.json exists before running the script
+          if [ -f "apps/webapp/playwright-report/report.json" ]; then
+            cd apps/webapp && node --experimental-strip-types test/e2e_tests/scripts/create-playwright-report-summary.ts playwright-report && cd ../..
+            if [ -f apps/webapp/playwright-report-summary.txt ]; then
+              COMMENT=$(cat apps/webapp/playwright-report-summary.txt)
+            else
+              COMMENT="❌ Playwright report summary could not be generated from the report data"
+            fi
           else
-            COMMENT="❌ Playwright report summary could not be generated"
+            COMMENT="❌ No Playwright report.json found - test execution may have failed or no tests were run"
           fi
+
           echo "comment<<EOF" >> $GITHUB_OUTPUT
           echo "$COMMENT" >> $GITHUB_OUTPUT
           echo "EOF" >> $GITHUB_OUTPUT
