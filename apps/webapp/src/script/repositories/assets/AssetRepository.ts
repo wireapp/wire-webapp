@@ -200,7 +200,7 @@ export class AssetRepository {
     const buffer = await loadFileBuffer(image);
     let compressedBytes: ArrayBuffer;
     if (skipCompression === true) {
-      compressedBytes = new Uint8Array(buffer);
+      compressedBytes = buffer;
     } else {
       const worker = new WebWorker(() => new Worker(new URL('./imageWorker', import.meta.url)));
       compressedBytes = await worker.post({buffer, useProfileImageSize});

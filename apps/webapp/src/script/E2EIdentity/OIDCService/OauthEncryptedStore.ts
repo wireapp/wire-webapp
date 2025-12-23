@@ -24,17 +24,21 @@ export class EncryptedStorage {
   length = Promise.resolve(0);
 
   constructor(secretKey: Uint8Array) {
-    this.encryptionKey = crypto.subtle.importKey('raw', secretKey, 'AES-GCM', false, ['encrypt', 'decrypt']);
+    this.encryptionKey = crypto.subtle.importKey('raw', Uint8Array.from(secretKey), 'AES-GCM', false, [
+      'encrypt',
+      'decrypt',
+    ]);
   }
 
   async setItem(key: string, value: string) {
     try {
       const encryptionKey = await this.encryptionKey;
       const iv = window.crypto.getRandomValues(new Uint8Array(12));
+      const encodedBytes = Encoder.toBase64(value).asBytes;
       const encryptedValue = await window.crypto.subtle.encrypt(
         {name: 'AES-GCM', iv},
         encryptionKey,
-        Encoder.toBase64(value).asBytes,
+        Uint8Array.from(encodedBytes),
       );
       const base64Value = Encoder.toBase64(encryptedValue).asString;
       window.localStorage.setItem(key, JSON.stringify({value: base64Value, iv: Array.from(iv)}));
@@ -49,10 +53,11 @@ export class EncryptedStorage {
     if (entry) {
       const encryptionKey = await this.encryptionKey;
       const {value, iv} = JSON.parse(entry);
+      const decodedBytes = Decoder.fromBase64(value).asBytes;
       const decrypted = await crypto.subtle.decrypt(
         {name: 'AES-GCM', iv: new Uint8Array(iv)},
         encryptionKey,
-        Decoder.fromBase64(value).asBytes,
+        Uint8Array.from(decodedBytes),
       );
       return Decoder.fromBase64(Array.from(new Uint8Array(decrypted))).asString;
     }

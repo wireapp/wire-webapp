@@ -105,7 +105,7 @@ export class BackupRepository {
           checkCancelStatus,
         });
         // Compression and encryption are handled by the kalium-backup library
-        return new Blob([exportedData], {type: 'application/zip'});
+        return new Blob([Uint8Array.from(exportedData)], {type: 'application/zip'});
       }
 
       // If the feature flag is disabled, export the history as a legacy backup
@@ -155,7 +155,7 @@ export class BackupRepository {
 
     // If no password, return the regular ZIP archive
     const array = await this.worker.post<Uint8Array>({type: 'zip', files});
-    return new Blob([array], {type: 'application/zip'});
+    return new Blob([Uint8Array.from(array)], {type: 'application/zip'});
   }
 
   private async createEncryptedBackup(files: Record<string, Uint8Array>, user: User, password: string): Promise<Blob> {
@@ -172,7 +172,7 @@ export class BackupRepository {
 
     // Prepend the combinedBytes to the ZIP archive data
     const combinedArray = this.concatenateByteArrays([backupHeader, array]);
-    return new Blob([combinedArray], {type: 'application/zip'});
+    return new Blob([Uint8Array.from(combinedArray)], {type: 'application/zip'});
   }
 
   private async generateBackupHeader(user: User, password: string, backupCoder: BackUpHeader) {

@@ -204,7 +204,7 @@ export const arrayToBase64 = (array: ArrayBuffer | Uint8Array): string => {
 export const base64ToBlob = (base64: string): Blob => {
   const mimeType = getContentTypeFromDataUrl(base64);
   const bytes = base64ToArray(base64);
-  return new Blob([bytes], {type: mimeType});
+  return new Blob([Uint8Array.from(bytes)], {type: mimeType});
 };
 
 /**

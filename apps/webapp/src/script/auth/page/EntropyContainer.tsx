@@ -46,7 +46,7 @@ const EntropyContainer = ({onSetEntropy, containerSize = 400}: Props) => {
 
   const forwardEntropy = async (entropy: Uint8Array) => {
     // we want to hash the entire entropy array to get a 256 bit (32 bytes) array
-    const hashedValue = await window.crypto.subtle.digest('SHA-256', entropy);
+    const hashedValue = await window.crypto.subtle.digest('SHA-256', Uint8Array.from(entropy));
     onSetEntropy(new Uint8Array(hashedValue));
   };
 

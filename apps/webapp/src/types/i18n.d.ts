@@ -2048,6 +2048,7 @@ declare module 'I18n/en-US.json' {
     'videoCallbackgroundBlurHeadline': `Background`;
     'videoCallbackgroundNotBlurred': `Don\'t blur my background`;
     'videoCallvideoInputCamera': `Camera`;
+    'videoCallNoCameraAvailable': `No options`;
     'videoSpeakersTabAll': `All ({count})`;
     'videoSpeakersTabSpeakers': `Speakers`;
     'viewingInAnotherWindow': `Viewing in another window`;
