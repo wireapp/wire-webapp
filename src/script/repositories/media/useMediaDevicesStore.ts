@@ -107,17 +107,18 @@ export const mediaDevicesStore = createStore<MediaDevicesState>()(
     // devices setters
     setAudioInputDevices: devices =>
       set(state => {
-        state.audio.input.devices = devices;
+        // Filter out invalid devices empty deviceId or label
+        state.audio.input.devices = devices.filter(device => device.deviceId && device.label);
       }),
 
     setAudioOutputDevices: devices =>
       set(state => {
-        state.audio.output.devices = devices;
+        state.audio.output.devices = devices.filter(device => device.deviceId && device.label);
       }),
 
     setVideoInputDevices: devices =>
       set(state => {
-        state.video.input.devices = devices;
+        state.video.input.devices = devices.filter(device => device.deviceId && device.label);
       }),
 
     setScreenInputSources: sources =>
@@ -173,7 +174,7 @@ export const mediaDevicesStore = createStore<MediaDevicesState>()(
       set(state => {
         // audio.input
         if (payload.audio?.input?.devices !== undefined) {
-          state.audio.input.devices = payload.audio.input.devices;
+          state.audio.input.devices = payload.audio.input.devices.filter(device => device.deviceId && device.label);
         }
         if (payload.audio?.input?.selectedId !== undefined) {
           state.audio.input.selectedId = payload.audio.input.selectedId!;
@@ -184,7 +185,7 @@ export const mediaDevicesStore = createStore<MediaDevicesState>()(
 
         // audio.output
         if (payload.audio?.output?.devices !== undefined) {
-          state.audio.output.devices = payload.audio.output.devices;
+          state.audio.output.devices = payload.audio.output.devices.filter(device => device.deviceId && device.label);
         }
         if (payload.audio?.output?.selectedId !== undefined) {
           state.audio.output.selectedId = payload.audio.output.selectedId!;
@@ -195,7 +196,7 @@ export const mediaDevicesStore = createStore<MediaDevicesState>()(
 
         // video.input
         if (payload.video?.input?.devices !== undefined) {
-          state.video.input.devices = payload.video.input.devices;
+          state.video.input.devices = payload.video.input.devices.filter(device => device.deviceId && device.label);
         }
         if (payload.video?.input?.selectedId !== undefined) {
           state.video.input.selectedId = payload.video.input.selectedId!;
