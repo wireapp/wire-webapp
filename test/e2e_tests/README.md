@@ -34,7 +34,7 @@ If you're not in the Wire VPN you can run it locally as a docker container:
 
 ## Tests
 
-E2E tests can be found inside [test folder](/test/e2e_tests/). The folder contains [page objects](/test/e2e_tests/pageManager), [backend clients (used only for e2e tests)](/test/e2e_tests/backend), [spec files](/test//e2e_tests/specs), [various utils](/test/e2e_tests/utils), and env. template files.
+E2E tests can be found inside [test folder](/test/e2e_tests/). The folder contains [page objects](/test/e2e_tests/pageManager), [backend clients (used only for e2e tests)](/test/e2e_tests/backend), [spec files](/test/e2e_tests/specs), [various utils](/test/e2e_tests/utils), and env. template files.
 
 Other important items: [test fixtures](/test/e2e_tests/test.fixtures.ts), [script to create test summary PRs](/test/e2e_tests/scripts/create-playwright-report-summary.ts), and [assets folder (for file exchange tests)](/test/e2e_tests/assets)
 
