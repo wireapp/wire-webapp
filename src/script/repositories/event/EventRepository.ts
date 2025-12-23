@@ -49,11 +49,19 @@ import {validateEvent} from './EventValidator';
 import {NOTIFICATION_HANDLING_STATE} from './NotificationHandlingState';
 import type {NotificationService} from './NotificationService';
 import {EventValidationError} from './preprocessor/EventStorageMiddleware/eventHandlers/EventValidationError';
+import {WebSocketConnectionManager} from './WebSocketConnectionManager';
 
 import {CryptographyError} from '../../error/CryptographyError';
 import {EventError} from '../../error/EventError';
 import type {ServerTimeHandler} from '../../time/serverTimeHandler';
 import {Warnings} from '../../view_model/WarningsContainer';
+
+/**
+ * Type guard for errors that may contain a response object with time information.
+ */
+function isErrorResponse(error: unknown): error is {response: {time?: string}} {
+  return typeof error === 'object' && error !== null && 'response' in error;
+}
 
 export class EventRepository {
   logger: Logger;
@@ -80,6 +88,11 @@ export class EventRepository {
         INITIAL: 500,
         MAX: 10000,
         SUBSEQUENT: 5000,
+      },
+      WEBSOCKET_CONNECTION: {
+        retryDelayMs: TIME_IN_MILLIS.SECOND * 5,
+        heartbeatIntervalMs: TIME_IN_MILLIS.MINUTE,
+        connectionTimeoutMs: TIME_IN_MILLIS.SECOND * 30,
       },
     };
   }
@@ -130,7 +143,6 @@ export class EventRepository {
   //##############################################################################
 
   private readonly updateConnectivityStatus = (state: ConnectionState) => {
-    this.latestConnectionState = state;
     this.logger.log('Websocket connection state changed to', state);
     switch (state) {
       case ConnectionState.CONNECTING: {
@@ -169,7 +181,10 @@ export class EventRepository {
         await this.handleEvent(payload, source);
       } catch (error) {
         if (source === EventSource.NOTIFICATION_STREAM) {
-          this.logger.warn(`Failed to handle event of type "${event.type}": ${error.message}`, error);
+          this.logger.warn(
+            `Failed to handle event of type "${payload.event.type}": ${(error as Error).message}`,
+            error,
+          );
         } else {
           throw error;
         }
@@ -189,11 +204,12 @@ export class EventRepository {
   }
 
   /**
-   * connects to the websocket with the given account
+   * Connects to the WebSocket with the given account.
    *
-   * @param account the account to connect to
-   * @param onNotificationStreamProgress callback when a notification for the notification stream has been processed
-   * @param dryRun when set will not decrypt and not store the last notification ID. This is useful if you only want to subscribe to unencrypted backend events
+   * @param account The account to connect to
+   * @param useLegacy Whether to use the legacy WebSocket protocol
+   * @param onNotificationStreamProgress Callback when a notification for the notification stream has been processed
+   * @param dryRun When set will not decrypt and not store the last notification ID. This is useful if you only want to subscribe to unencrypted backend events
    * @returns Resolves when the notification stream has fully been processed
    */
   async connectWebSocket(
@@ -202,209 +218,34 @@ export class EventRepository {
     onNotificationStreamProgress: (currentProcessingNotificationTimestamp: string) => void,
     dryRun = false,
   ): Promise<void> {
-    // Clean up any existing connectivity listeners from previous connection attempts
-    this.removeConnectivityListeners?.();
+    // Clean up any existing connection manager from previous connection attempts
+    this.connectionManager?.disconnect();
     await this.handleTimeDrift();
 
-    // Track the current connection attempt to prevent concurrent connections
-    let activeConnectionAttempt: Promise<void> | undefined;
+    // Create a new connection manager with the provided configuration
+    this.connectionManager = new WebSocketConnectionManager(
+      account,
+      EventRepository.CONFIG.WEBSOCKET_CONNECTION,
+      dryRun,
+      useLegacy,
+      this.updateConnectivityStatus,
+      this.handleIncomingEvent,
+      this.triggerMissedSystemEventMessageRendering,
+      onNotificationStreamProgress,
+    );
 
-    const RETRY_DELAY_MS = TIME_IN_MILLIS.SECOND * 5;
-    const HEARTBEAT_CHECK_INTERVAL_MS = TIME_IN_MILLIS.MINUTE;
-    const CONNECTION_TIMEOUT_MS = TIME_IN_MILLIS.SECOND * 30;
+    // Store the disconnect function for external access
+    this.disconnectWebSocket = () => this.connectionManager?.disconnect();
 
-    /**
-     * Schedules a reconnection attempt after a delay.
-     * Ensures only one retry is scheduled at a time.
-     */
-    const scheduleReconnectionRetry = () => {
-      // Don't schedule if a retry is already pending
-      if (this.reconnectRetryTimeout) {
-        return;
-      }
-
-      this.reconnectRetryTimeout = window.setTimeout(() => {
-        this.reconnectRetryTimeout = undefined;
-        attemptWebSocketConnection().catch(error => {
-          this.logger.error('Scheduled reconnection failed', error);
-        });
-      }, RETRY_DELAY_MS);
-    };
-
-    /**
-     * Attempts a single WebSocket connection.
-     * Returns the existing attempt if one is already in progress.
-     */
-    const attemptWebSocketConnection = () => {
-      // Return existing connection attempt to prevent concurrent connections
-      if (activeConnectionAttempt) {
-        return activeConnectionAttempt;
-      }
-      // We make sure there is only one active connection to the WebSocket.
-      if (
-        this.latestConnectionState !== ConnectionState.LIVE &&
-        this.latestConnectionState !== ConnectionState.CONNECTING
-      ) {
-        this.disconnectWebSocket?.();
-      }
-
-      activeConnectionAttempt = new Promise<void>((resolve, reject) => {
-        let connectionTimeoutHandle: number | undefined;
-        let hasConnectionSettled = false;
-
-        const clearConnectionTimeout = () => {
-          if (connectionTimeoutHandle) {
-            window.clearTimeout(connectionTimeoutHandle);
-            connectionTimeoutHandle = undefined;
-          }
-        };
-
-        /**
-         * Settles the connection promise (resolve or reject).
-         * On failure, schedules a retry attempt.
-         * Ensures the promise is only settled once.
-         */
-        const settleConnectionAttempt = (isSuccessful: boolean, error?: Error) => {
-          if (hasConnectionSettled) {
-            return;
-          }
-          hasConnectionSettled = true;
-          clearConnectionTimeout();
-
-          if (!isSuccessful) {
-            scheduleReconnectionRetry();
-            reject(error as Error);
-            return;
-          }
-          resolve();
-        };
-
-        // Start timeout timer - connection must reach LIVE state within this time
-        connectionTimeoutHandle = window.setTimeout(() => {
-          settleConnectionAttempt(false, new Error('WebSocket connection timeout'));
-        }, CONNECTION_TIMEOUT_MS);
-
-        account
-          .listen({
-            useLegacy,
-            onConnectionStateChanged: connectionState => {
-              this.updateConnectivityStatus(connectionState);
-
-              // Connection successfully reached LIVE state
-              if (connectionState === ConnectionState.LIVE) {
-                settleConnectionAttempt(true);
-              }
-
-              // Connection closed before reaching LIVE state
-              if (connectionState === ConnectionState.CLOSED) {
-                settleConnectionAttempt(false, new Error('WebSocket connection closed'));
-              }
-            },
-            onEvent: this.handleIncomingEvent,
-            onMissedNotifications: this.triggerMissedSystemEventMessageRendering,
-            onNotificationStreamProgress: onNotificationStreamProgress,
-            dryRun,
-          })
-          .then(disconnect => {
-            this.disconnectWebSocket = disconnect;
-          })
-          .catch(error => {
-            this.logger.error('Failed to establish WebSocket connection', error);
-            settleConnectionAttempt(false, error);
-          });
-      }).finally(() => {
-        // Clean up the reference once the connection attempt settles
-        activeConnectionAttempt = undefined;
-      });
-
-      return activeConnectionAttempt;
-    };
-
-    /**
-     * Handles browser 'online' event by attempting to reconnect.
-     * This fires when the browser detects internet connectivity is restored.
-     */
-    const handleOnline = () => {
-      this.logger.info('Internet connection regained. Re-establishing WebSocket connection...');
-      attemptWebSocketConnection().catch(error => {
-        this.logger.error('Failed to reconnect on online event', error);
-      });
-    };
-
-    /**
-     * Handles browser 'offline' event by disconnecting and showing warning.
-     * Cancels any pending retry attempts.
-     */
-    const handleOffline = () => {
-      this.logger.warn('Internet connection lost');
-      this.disconnectWebSocket();
-      Warnings.showWarning(Warnings.TYPE.NO_INTERNET);
-
-      // Cancel any pending retry since we're explicitly offline
-      if (this.reconnectRetryTimeout) {
-        window.clearTimeout(this.reconnectRetryTimeout);
-        this.reconnectRetryTimeout = undefined;
-      }
-    };
-
-    // Listen for browser connectivity events
-    window.addEventListener('online', handleOnline);
-    window.addEventListener('offline', handleOffline);
-
-    /**
-     * Fallback heartbeat check to detect stale connections.
-     * This handles cases where the 'online' event never fires (e.g., after system sleep).
-     * Periodically verifies the WebSocket is healthy and reconnects if needed.
-     */
-    this.fallbackReconnectIntervalId = window.setInterval(async () => {
-      try {
-        // Use heartbeat to check connection health without disconnecting
-        const isWebsocketHealthy = await account.isWebsocketHealthy();
-        if (isWebsocketHealthy) {
-          this.logger.debug('Periodic WebSocket health check: heartbeat succeeded, skipping reconnect');
-          return;
-        }
-
-        this.logger.info('Periodic WebSocket health check: attempting reconnect (heartbeat failed)');
-        attemptWebSocketConnection().catch(error => {
-          this.logger.error('Periodic health check reconnection failed', error);
-        });
-      } catch (error) {
-        this.logger.error('Error during periodic WebSocket health check', error);
-      }
-    }, HEARTBEAT_CHECK_INTERVAL_MS);
-
-    /**
-     * Cleanup function to remove all connectivity-related event listeners and timers.
-     * Should be called when disconnecting or before setting up new listeners.
-     */
-    this.removeConnectivityListeners = () => {
-      window.removeEventListener('online', handleOnline);
-      window.removeEventListener('offline', handleOffline);
-
-      if (this.reconnectRetryTimeout) {
-        window.clearTimeout(this.reconnectRetryTimeout);
-        this.reconnectRetryTimeout = undefined;
-      }
-
-      if (this.fallbackReconnectIntervalId) {
-        window.clearInterval(this.fallbackReconnectIntervalId);
-        this.fallbackReconnectIntervalId = undefined;
-      }
-    };
-
-    // Initiate the first connection attempt
-    return attemptWebSocketConnection();
+    // Initiate the connection
+    return this.connectionManager.connect();
   }
 
   /**
    * Close the WebSocket connection. (will be set only once the connectWebSocket is called)
    */
   public disconnectWebSocket: () => void = () => {};
-  private removeConnectivityListeners: () => void = () => {};
-  private reconnectRetryTimeout?: number;
-  private fallbackReconnectIntervalId?: number;
-  private latestConnectionState: ConnectionState = ConnectionState.CLOSED;
+  private connectionManager: WebSocketConnectionManager | undefined;
 
   //##############################################################################
   // Notification Stream handling
@@ -414,8 +255,8 @@ export class EventRepository {
       const time = await this.notificationService.getServerTime();
       this.serverTimeHandler.computeTimeOffset(time);
     } catch (errorResponse) {
-      if (errorResponse.response?.time) {
-        this.serverTimeHandler.computeTimeOffset(errorResponse.response?.time);
+      if (isErrorResponse(errorResponse) && errorResponse.response?.time) {
+        this.serverTimeHandler.computeTimeOffset(errorResponse.response.time);
       }
     }
   }
@@ -454,7 +295,8 @@ export class EventRepository {
    * @returns Resolves when the last event date was stored
    */
   private updateLastEventDate(eventDate: string): Promise<string> | void {
-    const didDateIncrease = eventDate > this.lastEventDate();
+    const lastDate = this.lastEventDate();
+    const didDateIncrease = !lastDate || eventDate > lastDate;
     if (didDateIncrease) {
       this.lastEventDate(eventDate);
       return this.notificationService.saveLastEventDateToDb(eventDate);

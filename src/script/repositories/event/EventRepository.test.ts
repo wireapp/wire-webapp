@@ -436,10 +436,6 @@ describe('EventRepository', () => {
   });
 
   describe('updateConnectivityStatus', () => {
-    beforeEach(() => {
-      testFactory.event_repository!['latestConnectionState'] = ConnectionState.CLOSED;
-    });
-
     describe('notification handling state changes', () => {
       it('should update notification handling state to STREAM when PROCESSING_NOTIFICATIONS', () => {
         testFactory.event_repository!['updateConnectivityStatus'](ConnectionState.PROCESSING_NOTIFICATIONS);
@@ -451,16 +447,6 @@ describe('EventRepository', () => {
         testFactory.event_repository!['updateConnectivityStatus'](ConnectionState.LIVE);
 
         expect(testFactory.event_repository!.notificationHandlingState()).toBe(NOTIFICATION_HANDLING_STATE.WEB_SOCKET);
-      });
-    });
-
-    describe('connection state tracking', () => {
-      it('should track latest connection state', () => {
-        testFactory.event_repository!['updateConnectivityStatus'](ConnectionState.CONNECTING);
-        expect(testFactory.event_repository!['latestConnectionState']).toBe(ConnectionState.CONNECTING);
-
-        testFactory.event_repository!['updateConnectivityStatus'](ConnectionState.LIVE);
-        expect(testFactory.event_repository!['latestConnectionState']).toBe(ConnectionState.LIVE);
       });
     });
   });
@@ -750,7 +736,7 @@ describe('EventRepository', () => {
     });
 
     describe('cleanup', () => {
-      it('should clean up event listeners when removeConnectivityListeners is called', async () => {
+      it('should not clean up event listeners when disconnect is called', async () => {
         const mockNotificationService = {getServerTime: jest.fn().mockResolvedValue('2023-01-01T00:00:00.000Z')};
         const eventRepo = new EventRepository(
           {} as any,
@@ -768,11 +754,13 @@ describe('EventRepository', () => {
 
         await eventRepo.connectWebSocket(mockAccount, false, jest.fn());
 
-        eventRepo['removeConnectivityListeners']();
+        eventRepo.disconnectWebSocket();
 
-        expect(removeEventListenerSpy).toHaveBeenCalledWith('online', expect.any(Function));
-        expect(removeEventListenerSpy).toHaveBeenCalledWith('offline', expect.any(Function));
-        expect(clearIntervalSpy).toHaveBeenCalled();
+        // Event listeners should remain active to detect when connectivity returns
+        expect(removeEventListenerSpy).not.toHaveBeenCalledWith('online', expect.any(Function));
+        expect(removeEventListenerSpy).not.toHaveBeenCalledWith('offline', expect.any(Function));
+        // Heartbeat should continue running
+        expect(clearIntervalSpy).not.toHaveBeenCalled();
       });
     });
   });
