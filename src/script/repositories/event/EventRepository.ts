@@ -38,6 +38,7 @@ import {EventName} from 'Repositories/tracking/EventName';
 import {UserState} from 'Repositories/user/UserState';
 import {getLogger, Logger} from 'Util/Logger';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
+import {isAxiosError, isBackendError} from 'Util/TypePredicateUtil';
 
 import {ClientEvent} from './Client';
 import {EventMiddleware, EventProcessor, IncomingEvent} from './EventProcessor';
@@ -55,13 +56,6 @@ import {CryptographyError} from '../../error/CryptographyError';
 import {EventError} from '../../error/EventError';
 import type {ServerTimeHandler} from '../../time/serverTimeHandler';
 import {Warnings} from '../../view_model/WarningsContainer';
-
-/**
- * Type guard for errors that may contain a response object with time information.
- */
-function isErrorResponse(error: unknown): error is {response: {time?: string}} {
-  return typeof error === 'object' && error !== null && 'response' in error;
-}
 
 export class EventRepository {
   logger: Logger;
@@ -254,10 +248,24 @@ export class EventRepository {
     try {
       const time = await this.notificationService.getServerTime();
       this.serverTimeHandler.computeTimeOffset(time);
-    } catch (errorResponse) {
-      if (isErrorResponse(errorResponse) && errorResponse.response?.time) {
-        this.serverTimeHandler.computeTimeOffset(errorResponse.response.time);
+    } catch (error) {
+      // Handle Axios errors with notification list format
+      // The backend returns a NotificationList in the error response with time field
+      if (isAxiosError<{time?: string}>(error) && error.response?.data?.time) {
+        this.logger.info('Computed time offset from error response time');
+        this.serverTimeHandler.computeTimeOffset(error.response.data.time);
+        return;
       }
+
+      // Handle BackendError instances
+      if (isBackendError(error)) {
+        this.logger.warn(`Could not compute time offset due to backend error: "${error.message}"`, error);
+        return;
+      }
+
+      // Log all other errors without failing the connection
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      this.logger.warn(`Could not compute time offset: "${errorMessage}"`, error);
     }
   }
 

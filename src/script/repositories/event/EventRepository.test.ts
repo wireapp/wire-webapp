@@ -22,6 +22,7 @@ import {BackendEvent, CONVERSATION_EVENT, USER_EVENT} from '@wireapp/api-client/
 import {ConnectionState} from '@wireapp/core';
 
 import {ClientConversationEvent} from 'Repositories/conversation/EventBuilder';
+import {getLogger} from 'Util/Logger';
 
 import {ClientEvent} from './Client';
 import {EventRepository} from './EventRepository';
@@ -537,6 +538,308 @@ describe('EventRepository', () => {
       expect(EventRepository.CONFIG.NOTIFICATION_BATCHES.SUBSEQUENT).toBe(5000);
       expect(EventRepository.CONFIG.NOTIFICATION_BATCHES.MAX).toBe(10000);
       expect(EventRepository.CONFIG.IGNORED_ERRORS).toContain('VALIDATION_FAILED');
+    });
+  });
+
+  describe('handleTimeDrift', () => {
+    it('should compute time offset on successful server time fetch', async () => {
+      const mockServerTime = '2023-01-01T12:00:00.000Z';
+      const mockNotificationService = {
+        getServerTime: jest.fn().mockResolvedValue(mockServerTime),
+      };
+      const mockServerTimeHandler = {
+        computeTimeOffset: jest.fn(),
+      };
+
+      const eventRepo = new EventRepository(
+        {} as any,
+        mockNotificationService as any,
+        mockServerTimeHandler as any,
+        {} as any,
+      );
+
+      await eventRepo['handleTimeDrift']();
+
+      expect(mockNotificationService.getServerTime).toHaveBeenCalled();
+      expect(mockServerTimeHandler.computeTimeOffset).toHaveBeenCalledWith(mockServerTime);
+    });
+
+    it('should compute time offset from axios error response data when server time fetch fails', async () => {
+      const mockErrorTime = '2023-01-01T12:00:00.000Z';
+      const mockNotificationService = {
+        getServerTime: jest.fn().mockRejectedValue({
+          isAxiosError: true,
+          response: {
+            data: {
+              time: mockErrorTime,
+            },
+          },
+        }),
+      };
+      const mockServerTimeHandler = {
+        computeTimeOffset: jest.fn(),
+      };
+
+      const eventRepo = new EventRepository(
+        {} as any,
+        mockNotificationService as any,
+        mockServerTimeHandler as any,
+        {} as any,
+      );
+
+      await eventRepo['handleTimeDrift']();
+
+      expect(mockServerTimeHandler.computeTimeOffset).toHaveBeenCalledWith(mockErrorTime);
+    });
+
+    it('should log warning if axios error response has no time data', async () => {
+      const mockNotificationService = {
+        getServerTime: jest.fn().mockRejectedValue({
+          isAxiosError: true,
+          response: {
+            data: {},
+          },
+        }),
+      };
+      const mockServerTimeHandler = {
+        computeTimeOffset: jest.fn(),
+      };
+      const logger = getLogger('EventRepository');
+      const warnSpy = jest.spyOn(logger, 'warn');
+
+      const eventRepo = new EventRepository(
+        {} as any,
+        mockNotificationService as any,
+        mockServerTimeHandler as any,
+        {} as any,
+      );
+
+      await eventRepo['handleTimeDrift']();
+
+      expect(mockServerTimeHandler.computeTimeOffset).not.toHaveBeenCalled();
+      expect(warnSpy).toHaveBeenCalled();
+      warnSpy.mockRestore();
+    });
+
+    it('should log warning if error is not an axios error', async () => {
+      const mockNotificationService = {
+        getServerTime: jest.fn().mockRejectedValue(new Error('Network error')),
+      };
+      const mockServerTimeHandler = {
+        computeTimeOffset: jest.fn(),
+      };
+      const logger = getLogger('EventRepository');
+      const warnSpy = jest.spyOn(logger, 'warn');
+
+      const eventRepo = new EventRepository(
+        {} as any,
+        mockNotificationService as any,
+        mockServerTimeHandler as any,
+        {} as any,
+      );
+
+      await eventRepo['handleTimeDrift']();
+
+      expect(mockServerTimeHandler.computeTimeOffset).not.toHaveBeenCalled();
+      expect(warnSpy).toHaveBeenCalledWith(expect.stringContaining('Could not compute time offset'), expect.any(Error));
+      warnSpy.mockRestore();
+    });
+
+    it('should log warning if error is a BackendError', async () => {
+      const mockNotificationService = {
+        getServerTime: jest.fn().mockRejectedValue({
+          label: 'backend-error',
+          message: 'Backend operation failed',
+        }),
+      };
+      const mockServerTimeHandler = {
+        computeTimeOffset: jest.fn(),
+      };
+      const logger = getLogger('EventRepository');
+      const warnSpy = jest.spyOn(logger, 'warn');
+
+      const eventRepo = new EventRepository(
+        {} as any,
+        mockNotificationService as any,
+        mockServerTimeHandler as any,
+        {} as any,
+      );
+
+      await eventRepo['handleTimeDrift']();
+
+      expect(mockServerTimeHandler.computeTimeOffset).not.toHaveBeenCalled();
+      expect(warnSpy).toHaveBeenCalledWith(
+        expect.stringContaining('Could not compute time offset due to backend error'),
+        expect.objectContaining({
+          label: 'backend-error',
+          message: 'Backend operation failed',
+        }),
+      );
+      warnSpy.mockRestore();
+    });
+
+    it('should log info message when computing time offset from error response', async () => {
+      const mockErrorTime = '2023-01-01T12:00:00.000Z';
+      const mockNotificationService = {
+        getServerTime: jest.fn().mockRejectedValue({
+          isAxiosError: true,
+          response: {
+            data: {
+              time: mockErrorTime,
+            },
+          },
+        }),
+      };
+      const mockServerTimeHandler = {
+        computeTimeOffset: jest.fn(),
+      };
+      const logger = getLogger('EventRepository');
+      const infoSpy = jest.spyOn(logger, 'info');
+
+      const eventRepo = new EventRepository(
+        {} as any,
+        mockNotificationService as any,
+        mockServerTimeHandler as any,
+        {} as any,
+      );
+
+      await eventRepo['handleTimeDrift']();
+
+      expect(infoSpy).toHaveBeenCalledWith('Computed time offset from error response time');
+      expect(mockServerTimeHandler.computeTimeOffset).toHaveBeenCalledWith(mockErrorTime);
+      infoSpy.mockRestore();
+    });
+
+    it('should handle axios error with notification list format (has_more and notifications)', async () => {
+      const mockErrorTime = '2023-01-01T12:00:00.000Z';
+      const mockNotificationService = {
+        getServerTime: jest.fn().mockRejectedValue({
+          isAxiosError: true,
+          response: {
+            data: {
+              time: mockErrorTime,
+              has_more: false,
+              notifications: [],
+            },
+          },
+        }),
+      };
+      const mockServerTimeHandler = {
+        computeTimeOffset: jest.fn(),
+      };
+
+      const eventRepo = new EventRepository(
+        {} as any,
+        mockNotificationService as any,
+        mockServerTimeHandler as any,
+        {} as any,
+      );
+
+      await eventRepo['handleTimeDrift']();
+
+      expect(mockServerTimeHandler.computeTimeOffset).toHaveBeenCalledWith(mockErrorTime);
+    });
+
+    it('should log warning for non-Error objects', async () => {
+      const mockNotificationService = {
+        getServerTime: jest.fn().mockRejectedValue('string error'),
+      };
+      const mockServerTimeHandler = {
+        computeTimeOffset: jest.fn(),
+      };
+      const logger = getLogger('EventRepository');
+      const warnSpy = jest.spyOn(logger, 'warn');
+
+      const eventRepo = new EventRepository(
+        {} as any,
+        mockNotificationService as any,
+        mockServerTimeHandler as any,
+        {} as any,
+      );
+
+      await eventRepo['handleTimeDrift']();
+
+      expect(mockServerTimeHandler.computeTimeOffset).not.toHaveBeenCalled();
+      expect(warnSpy).toHaveBeenCalledWith(expect.stringContaining('Could not compute time offset'), 'string error');
+      warnSpy.mockRestore();
+    });
+
+    it('should log warning for null error value', async () => {
+      const mockNotificationService = {
+        getServerTime: jest.fn().mockRejectedValue(null),
+      };
+      const mockServerTimeHandler = {
+        computeTimeOffset: jest.fn(),
+      };
+      const logger = getLogger('EventRepository');
+      const warnSpy = jest.spyOn(logger, 'warn');
+
+      const eventRepo = new EventRepository(
+        {} as any,
+        mockNotificationService as any,
+        mockServerTimeHandler as any,
+        {} as any,
+      );
+
+      await eventRepo['handleTimeDrift']();
+
+      expect(mockServerTimeHandler.computeTimeOffset).not.toHaveBeenCalled();
+      expect(warnSpy).toHaveBeenCalledWith(expect.stringContaining('Could not compute time offset'), null);
+      warnSpy.mockRestore();
+    });
+
+    it('should handle axios error without response object', async () => {
+      const mockNotificationService = {
+        getServerTime: jest.fn().mockRejectedValue({
+          isAxiosError: true,
+          message: 'Network timeout',
+        }),
+      };
+      const mockServerTimeHandler = {
+        computeTimeOffset: jest.fn(),
+      };
+      const logger = getLogger('EventRepository');
+      const warnSpy = jest.spyOn(logger, 'warn');
+
+      const eventRepo = new EventRepository(
+        {} as any,
+        mockNotificationService as any,
+        mockServerTimeHandler as any,
+        {} as any,
+      );
+
+      await eventRepo['handleTimeDrift']();
+
+      expect(mockServerTimeHandler.computeTimeOffset).not.toHaveBeenCalled();
+      expect(warnSpy).toHaveBeenCalled();
+      warnSpy.mockRestore();
+    });
+
+    it('should handle axios error with response but no data', async () => {
+      const mockNotificationService = {
+        getServerTime: jest.fn().mockRejectedValue({
+          isAxiosError: true,
+          response: {},
+        }),
+      };
+      const mockServerTimeHandler = {
+        computeTimeOffset: jest.fn(),
+      };
+      const logger = getLogger('EventRepository');
+      const warnSpy = jest.spyOn(logger, 'warn');
+
+      const eventRepo = new EventRepository(
+        {} as any,
+        mockNotificationService as any,
+        mockServerTimeHandler as any,
+        {} as any,
+      );
+
+      await eventRepo['handleTimeDrift']();
+
+      expect(mockServerTimeHandler.computeTimeOffset).not.toHaveBeenCalled();
+      expect(warnSpy).toHaveBeenCalled();
+      warnSpy.mockRestore();
     });
   });
 
