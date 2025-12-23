@@ -287,21 +287,31 @@ export const VideoControls = ({
   const videoOptions = [
     {
       label: t('videoCallvideoInputCamera'),
-      options: videoInputDevices.map((device: MediaDeviceInfo | ElectronDesktopCapturerSource) => {
-        return isMediaDevice(device)
-          ? {
-              label: device.label,
-              value: device.deviceId,
-              dataUieName: device.deviceId,
-              id: device.deviceId,
-            }
-          : {
-              label: device.name,
-              value: device.id,
-              dataUieName: device.id,
-              id: device.id,
-            };
-      }),
+      options: videoInputDevices.length
+        ? videoInputDevices.map((device: MediaDeviceInfo | ElectronDesktopCapturerSource) => {
+            return isMediaDevice(device)
+              ? {
+                  label: device.label,
+                  value: device.deviceId,
+                  dataUieName: device.deviceId,
+                  id: device.deviceId,
+                }
+              : {
+                  label: device.name,
+                  value: device.id,
+                  dataUieName: device.id,
+                  id: device.id,
+                };
+          })
+        : [
+            {
+              label: t('videoCallNoCameraAvailable'),
+              value: 'no-camera',
+              dataUieName: 'no-camera',
+              id: 'no-camera',
+              isDisabled: true,
+            },
+          ],
     },
     ...(isBlurredBackgroundEnabled ? [blurredBackgroundOptions] : []),
   ];

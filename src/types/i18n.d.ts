@@ -148,6 +148,7 @@ declare module 'I18n/en-US.json' {
     'accessibility.headings.preferencesOptions': `Preferences - options`;
     'accessibility.headings.sidebar': `Navigation`;
     'accessibility.headings.sidebar.footer': `Navigation Footer`;
+    'accessibility.logo.wire': `Wire Logo`;
     'accessibility.messageActionsMenuEmoji': `Select emoji`;
     'accessibility.messageActionsMenuLabel': `Message actions`;
     'accessibility.messageActionsMenuLike': `React with heart`;
@@ -163,7 +164,6 @@ declare module 'I18n/en-US.json' {
     'accessibility.rightPanel.close': `Close conversation info`;
     'accessibility.searchInput.cancel': `Delete entry`;
     'accessibility.userProfileDeleteEntry': `Delete entry`;
-    'accessibility.logo.wire': `Wire Logo`;
     'accountAlreadyExistsModal.changeEmailLink': `Change your email address`;
     'accountAlreadyExistsModal.content': `This email\'s domain belongs to an on-premises backend. Please change your email in the account settings or delete your account. If you are part of a team please contact your team admin.`;
     'accountAlreadyExistsModal.deletePersonalAccount': `Delete personal account`;
@@ -533,6 +533,7 @@ declare module 'I18n/en-US.json' {
     'channelDetailsActionDelete': `Delete channel`;
     'channelDetailsActionLeave': `Leave channel`;
     'channelParticipantActionLeave': `Leave channel…`;
+    'channelSizeInfo': `Up to {count} people can join a channel.`;
     'channelsPopoverLeave': `Leave channel`;
     'chooseHandle.handlePlaceholder': `Username`;
     'chooseHandle.headline': `Set your username`;
@@ -934,10 +935,10 @@ declare module 'I18n/en-US.json' {
     'customEnvRedirect.redirectHeadline': `Redirecting...`;
     'customEnvRedirect.redirectTo': `You are being redirected to your dedicated enterprise service.`;
     'dataSharingModalAgree': `Agree`;
+    'dataSharingModalCloseBtnTitle': `Close window, Consent to share user data`;
     'dataSharingModalDecline': `Decline`;
     'dataSharingModalDescription': `Help to improve Wire by sharing your usage data via a pseudonymous ID. The data is neither linked to your personal information nor shared with third parties besides Wire Group. It includes, for example, when you use a feature, your app version, device type, or your operating system. This data will be deleted at the latest after 365 days. <br /> Find further details in our [link]Privacy Policy[/link]. You can revoke your consent at any time.`;
     'dataSharingModalTitle': `Consent to share user data`;
-    'dataSharingModalCloseBtnTitle': `Close window, Consent to share user data`;
     'deletedUser': `Deleted User`;
     'deletedUserBadge': `Deleted`;
     'downloadLatestMLS': `Download the latest MLS Wire version`;
@@ -1054,7 +1055,6 @@ declare module 'I18n/en-US.json' {
     'groupParticipantActionStartConversation': `Start conversation`;
     'groupParticipantActionUnblock': `Unblock…`;
     'groupSizeInfo': `Up to {count} people can join a group conversation.`;
-    'channelSizeInfo': `Up to {count} people can join a channel.`;
     'groupsPopoverLeave': `Leave group`;
     'guestLinkDisabled': `Generating guest links is not allowed in your team.`;
     'guestLinkDisabledByOtherTeam': `You can\'t generate a guest link in this conversation, as it has been created by someone from another team and this team is not allowed to use guest links.`;
@@ -2048,6 +2048,7 @@ declare module 'I18n/en-US.json' {
     'videoCallbackgroundBlurHeadline': `Background`;
     'videoCallbackgroundNotBlurred': `Don\'t blur my background`;
     'videoCallvideoInputCamera': `Camera`;
+    'videoCallNoCameraAvailable': `No options`;
     'videoSpeakersTabAll': `All ({count})`;
     'videoSpeakersTabSpeakers': `Speakers`;
     'viewingInAnotherWindow': `Viewing in another window`;
