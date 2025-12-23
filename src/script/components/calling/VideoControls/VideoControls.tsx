@@ -63,6 +63,41 @@ enum BlurredBackgroundStatus {
   ON = 'bluron',
 }
 
+/**
+ * Maps video input devices to select options.
+ */
+const mapVideoInputDevices = (devices: (MediaDeviceInfo | ElectronDesktopCapturerSource)[]) => {
+  if (!devices.length) {
+    return [
+      {
+        label: t('videoCallNoCameraAvailable'),
+        value: 'no-camera',
+        dataUieName: 'no-camera',
+        id: 'no-camera',
+        isDisabled: true,
+      },
+    ];
+  }
+
+  return devices.map(device => {
+    if (isMediaDevice(device)) {
+      return {
+        label: device.label,
+        value: device.deviceId,
+        dataUieName: device.deviceId,
+        id: device.deviceId,
+      };
+    }
+
+    return {
+      label: device.name,
+      value: device.id,
+      dataUieName: device.id,
+      id: device.id,
+    };
+  });
+};
+
 interface VideoControlsProps {
   activeCallViewTab: string;
   call: Call;
@@ -287,21 +322,7 @@ export const VideoControls = ({
   const videoOptions = [
     {
       label: t('videoCallvideoInputCamera'),
-      options: videoInputDevices.map((device: MediaDeviceInfo | ElectronDesktopCapturerSource) => {
-        return isMediaDevice(device)
-          ? {
-              label: device.label,
-              value: device.deviceId,
-              dataUieName: device.deviceId,
-              id: device.deviceId,
-            }
-          : {
-              label: device.name,
-              value: device.id,
-              dataUieName: device.id,
-              id: device.id,
-            };
-      }),
+      options: mapVideoInputDevices(videoInputDevices),
     },
     ...(isBlurredBackgroundEnabled ? [blurredBackgroundOptions] : []),
   ];
