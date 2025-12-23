@@ -24,6 +24,7 @@ module.exports = {
     'src/script/components/Icon.tsx',
     '*.js',
     'src/types/i18n.d.ts',
+    'test/',
   ],
   parserOptions: {
     project: ['./tsconfig.build.json', './server/tsconfig.json'],
