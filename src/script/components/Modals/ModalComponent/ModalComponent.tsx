@@ -44,6 +44,7 @@ interface ModalComponentProps extends HTMLProps<HTMLDivElement> {
   onClosed?: () => void;
   showLoading?: boolean;
   wrapperCSS?: CSSObject;
+  container?: Element | DocumentFragment;
 }
 
 const CLOSE_DELAY = 350;
@@ -56,6 +57,7 @@ const ModalComponent = ({
   onClosed = noop,
   showLoading = false,
   wrapperCSS,
+  container,
   children,
   onKeyDown,
   ...rest
@@ -134,7 +136,7 @@ const ModalComponent = ({
             </div>
           )}
         </div>,
-        document.body,
+        container || document.body,
       )}
     </>
   );
