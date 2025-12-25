@@ -48,9 +48,15 @@ jobs:
           cache: 'yarn'
 
       - name: Set environment variables
+        shell: bash
         run: |
-          echo "BRANCH_NAME=$(git branch --show-current)" >> $GITHUB_ENV
-          echo "TAG=$(git tag --points-at ${{github.sha}})" >> $GITHUB_ENV
+          echo "BRANCH_NAME=${GITHUB_REF_NAME}" >> "$GITHUB_ENV"
+
+          if [[ "${GITHUB_REF_TYPE}" == "tag" ]]; then
+            echo "TAG=${GITHUB_REF_NAME}" >> "$GITHUB_ENV"
+          else
+            echo "TAG=" >> "$GITHUB_ENV"
+          fi
 
       - name: Print environment variables
         run: |

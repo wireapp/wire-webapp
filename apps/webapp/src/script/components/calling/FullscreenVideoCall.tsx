@@ -177,7 +177,9 @@ const FullscreenVideoCall = ({
 
     const hasAlreadyConfirmed = localStorage.getItem(LOCAL_STORAGE_KEY_FOR_SCREEN_SHARING_CONFIRM_MODAL) === 'true';
 
-    if (isSharingScreen && isScreenSharingSourceFromDetachedWindow && !hasAlreadyConfirmed) {
+    const isDetachedWindow = viewMode === CallingViewMode.DETACHED_WINDOW;
+
+    if (isSharingScreen && isScreenSharingSourceFromDetachedWindow && isDetachedWindow && !hasAlreadyConfirmed) {
       setIsConfirmCloseModalOpen(true);
       return;
     }
@@ -457,6 +459,9 @@ const FullscreenVideoCall = ({
         onBgClick={() => setIsConfirmCloseModalOpen(false)}
         data-uie-name="confirm-close-with-active-screen-share-modal"
         wrapperCSS={{borderRadius: 10, width: 328}}
+        container={
+          viewMode === CallingViewMode.DETACHED_WINDOW && detachedWindow ? detachedWindow.document.body : undefined
+        }
       >
         {isConfirmCloseModalOpen && (
           <>
