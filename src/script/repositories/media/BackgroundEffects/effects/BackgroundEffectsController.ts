@@ -45,6 +45,7 @@ import type {
   BackgroundSourceVideoFrame,
   DebugMode,
   EffectMode,
+  Metrics,
   Mode,
   PipelineType,
   QualityMode,
@@ -130,6 +131,12 @@ export class BackgroundEffectsController {
   private lastMainTier: 'A' | 'B' | 'C' | 'D' | null = null;
   /** Last quality tier for worker pipeline (for logging tier changes). */
   private lastWorkerTier: 'A' | 'B' | 'C' | 'D' | null = null;
+  /** Optional metrics callback for demo/telemetry use. */
+  private onMetrics: ((metrics: Metrics) => void) | null = null;
+  /** Recent samples for main-thread metrics averaging. */
+  private readonly metricsSamples: {totalMs: number; segmentationMs: number; gpuMs: number}[] = [];
+  /** Max samples to keep for rolling averages. */
+  private readonly metricsMaxSamples = 30;
 
   /**
    * Creates a new background effects controller.
@@ -171,6 +178,7 @@ export class BackgroundEffectsController {
     this.quality = opts.quality ?? this.quality;
     this.targetFps = opts.targetFps ?? this.targetFps;
     this.segmentationModelPath = opts.segmentationModelPath ?? this.segmentationModelPath;
+    this.onMetrics = opts.onMetrics ?? null;
 
     // Detect capabilities and select optimal pipeline
     const cap = detectCapabilities();
@@ -429,6 +437,8 @@ export class BackgroundEffectsController {
     this.canvasCtx = null;
     this.foregroundCanvas = null;
     this.foregroundCtx = null;
+    this.onMetrics = null;
+    this.metricsSamples.length = 0;
   }
 
   /**
@@ -463,6 +473,7 @@ export class BackgroundEffectsController {
     this.worker.onmessage = (event: MessageEvent<WorkerResponse>) => {
       if (event.data.type === 'metrics') {
         this.maybeLogWorkerTierChange(event.data.metrics.tier);
+        this.onMetrics?.(event.data.metrics);
       }
       if (event.data.type === 'segmenterError' && this.isDev) {
         this.logger.warn('Worker segmenter init failed', event.data.error);
@@ -686,6 +697,35 @@ export class BackgroundEffectsController {
       );
       this.maybeLogMainTierChange(updatedTier.tier);
     }
+    this.updateMainMetrics(segmentationMs + gpuMs, segmentationMs, gpuMs, qualityTier.tier);
+  }
+
+  private updateMainMetrics(totalMs: number, segmentationMs: number, gpuMs: number, tier: 'A' | 'B' | 'C' | 'D') {
+    if (!this.onMetrics) {
+      return;
+    }
+    this.metricsSamples.push({totalMs, segmentationMs, gpuMs});
+    if (this.metricsSamples.length > this.metricsMaxSamples) {
+      this.metricsSamples.shift();
+    }
+    const totals = this.metricsSamples.reduce(
+      (acc, sample) => {
+        acc.totalMs += sample.totalMs;
+        acc.segmentationMs += sample.segmentationMs;
+        acc.gpuMs += sample.gpuMs;
+        return acc;
+      },
+      {totalMs: 0, segmentationMs: 0, gpuMs: 0},
+    );
+    const count = this.metricsSamples.length || 1;
+    const metrics: Metrics = {
+      avgTotalMs: totals.totalMs / count,
+      avgSegmentationMs: totals.segmentationMs / count,
+      avgGpuMs: totals.gpuMs / count,
+      droppedFrames: this.droppedFrames,
+      tier,
+    };
+    this.onMetrics(metrics);
   }
 
   /**

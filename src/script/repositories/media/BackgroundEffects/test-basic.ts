@@ -356,8 +356,10 @@ async function runBrowserDemo() {
 
   const rawPanel = createPanel('Raw input');
   const processedPanel = createPanel('Processed output');
+  const metricsPanel = createPanel('Performance');
   root.appendChild(rawPanel);
   root.appendChild(processedPanel);
+  root.appendChild(metricsPanel);
 
   const rawVideo = document.createElement('video');
   rawVideo.id = 'bgfx-raw-video';
@@ -384,6 +386,11 @@ async function runBrowserDemo() {
     `fps=${targetFps} bg=${backgroundKind} pipeline=${activePipeline}`;
   status.style.gridColumn = '1 / -1';
   root.appendChild(status);
+
+  const metricsLine = document.createElement('div');
+  metricsLine.id = 'bgfx-metrics';
+  metricsLine.textContent = 'metrics: waiting for frames...';
+  metricsPanel.appendChild(metricsLine);
 
   const logGetUserMediaError = (error: unknown, label: string) => {
     const err = error as DOMException & {constraint?: string};
@@ -447,6 +454,22 @@ async function runBrowserDemo() {
     targetFps,
     backgroundImage: backgroundImage ?? undefined,
     pipelineOverride,
+    onMetrics: metrics => {
+      const budgetMs = 1000 / targetFps;
+      const totalMs = metrics.avgTotalMs || 0;
+      const utilization = budgetMs > 0 ? Math.min(999, (totalMs / budgetMs) * 100) : 0;
+      const cpuShare = totalMs > 0 ? (metrics.avgSegmentationMs / totalMs) * 100 : 0;
+      const gpuShare = totalMs > 0 ? (metrics.avgGpuMs / totalMs) * 100 : 0;
+      metricsLine.textContent =
+        `total=${totalMs.toFixed(1)}ms ` +
+        `seg=${metrics.avgSegmentationMs.toFixed(1)}ms ` +
+        `gpu=${metrics.avgGpuMs.toFixed(1)}ms ` +
+        `budget=${budgetMs.toFixed(1)}ms ` +
+        `util=${utilization.toFixed(0)}% ` +
+        `cpu=${cpuShare.toFixed(0)}% ` +
+        `gpu=${gpuShare.toFixed(0)}% ` +
+        `tier=${metrics.tier} dropped=${metrics.droppedFrames}`;
+    },
   });
 
   processedVideo.srcObject = new MediaStream([outputTrack]);

@@ -83,6 +83,8 @@ interface State {
   backgroundSize: {width: number; height: number} | null;
   /** Last processed timestamp in milliseconds, used for monotonic timestamp generation. */
   lastTimestampMs: number;
+  /** Rolling samples for metrics averaging. */
+  metricsSamples: {totalMs: number; segmentationMs: number; gpuMs: number}[];
 }
 
 const state: State = {
@@ -103,12 +105,15 @@ const state: State = {
     droppedFrames: 0,
     tier: 'A',
   },
+  metricsSamples: [],
   frameCount: 0,
   lastMask: null,
   background: null,
   backgroundSize: null,
   lastTimestampMs: 0,
 };
+
+const METRICS_MAX_SAMPLES = 30;
 
 /**
  * Main message handler for worker communication.
@@ -391,8 +396,26 @@ function updateMetrics(totalMs: number, segmentationMs: number, gpuMs: number, t
     state.quality === 'auto'
       ? state.qualityController.update({totalMs, segmentationMs, gpuMs}, getQualityMode())
       : state.qualityController.getTier(getQualityMode());
-  // Get averaged metrics from quality controller
-  const averages = state.qualityController.getAverages();
+
+  state.metricsSamples.push({totalMs, segmentationMs, gpuMs});
+  if (state.metricsSamples.length > METRICS_MAX_SAMPLES) {
+    state.metricsSamples.shift();
+  }
+  const totals = state.metricsSamples.reduce(
+    (acc, sample) => {
+      acc.totalMs += sample.totalMs;
+      acc.segmentationMs += sample.segmentationMs;
+      acc.gpuMs += sample.gpuMs;
+      return acc;
+    },
+    {totalMs: 0, segmentationMs: 0, gpuMs: 0},
+  );
+  const count = state.metricsSamples.length || 1;
+  const averages = {
+    totalMs: totals.totalMs / count,
+    segmentationMs: totals.segmentationMs / count,
+    gpuMs: totals.gpuMs / count,
+  };
   // Update state metrics
   state.metrics = {
     avgTotalMs: averages.totalMs,

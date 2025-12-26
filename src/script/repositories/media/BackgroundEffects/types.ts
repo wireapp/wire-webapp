@@ -189,6 +189,8 @@ export interface StartOptions {
   useWorker?: boolean;
   /** Override pipeline selection (primarily for testing). */
   pipelineOverride?: PipelineType;
+  /** Optional callback to receive performance metrics updates. */
+  onMetrics?: (metrics: Metrics) => void;
 }
 
 /**
