@@ -44,7 +44,7 @@ stop();
 
 ## Capability detection
 
-`effects/capability.ts` detects OffscreenCanvas, Worker, WebGL2, `requestVideoFrameCallback`, and WebCodecs.
+`effects/capability.ts` detects OffscreenCanvas, Worker, WebGL2, and `requestVideoFrameCallback`.
 
 Pipeline selection order:
 
@@ -74,4 +74,5 @@ Use `setQuality('A' | 'B' | 'C' | 'D')` to force a tier, or `setQuality('auto')`
 
 - The worker pipeline uses `createImageBitmap(video)` to transfer frames. Only one frame is kept in flight; new frames overwrite the pending one.
 - Background images are transferred once; background video frames are sampled at ~15fps.
-- The module uses MediaPipe assets from `/assets/mediapipe-models/selfie_segmenter.tflite` and `/min/mediapipe/wasm`.
+- The Canvas2D fallback honors `mode`, `debugMode`, `backgroundSource`, and `blurStrength`, but visual quality is lower than WebGL2.
+- The module uses MediaPipe assets from `/assets/mediapipe-models/selfie_segmenter_landscape.tflite` and `/min/mediapipe/wasm`.

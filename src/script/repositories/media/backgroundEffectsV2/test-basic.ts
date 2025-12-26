@@ -144,7 +144,6 @@ if (!isBrowser && isNode) {
     console.log('    - Worker:', caps.worker);
     console.log('    - WebGL2:', caps.webgl2);
     console.log('    - requestVideoFrameCallback:', caps.requestVideoFrameCallback);
-    console.log('    - WebCodecs:', caps.webcodecs);
 
     const pipeline = choosePipeline(caps, true);
     console.log('  ✓ Pipeline chosen:', pipeline);
@@ -222,7 +221,6 @@ if (isBrowser) {
       logExpectation('Worker', caps.worker);
       logExpectation('WebGL2', caps.webgl2);
       logExpectation('requestVideoFrameCallback', caps.requestVideoFrameCallback);
-      logExpectation('WebCodecs', caps.webcodecs);
       const webgl = getWebglDiagnostics();
       logExpectation('WebGL1', webgl.webgl1);
       logExpectation('WebGL2 (context check)', webgl.webgl2);

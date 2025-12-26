@@ -19,8 +19,26 @@
 
 import type {DebugMode} from '../types';
 
+/**
+ * Array of all valid debug mode values.
+ *
+ * Debug modes provide visualization tools for inspecting the segmentation mask:
+ * - 'off': Normal rendering with background effects applied
+ * - 'maskOverlay': Overlays a semi-transparent green tint on mask areas (foreground)
+ * - 'maskOnly': Displays only the segmentation mask as a grayscale image
+ * - 'edgeOnly': Highlights the edges of the mask using smoothstep edge detection
+ */
 export const DebugModeValues: DebugMode[] = ['off', 'maskOverlay', 'maskOnly', 'edgeOnly'];
 
+/**
+ * Type guard function that checks if a string value is a valid DebugMode.
+ *
+ * This function provides runtime type safety when parsing debug mode values
+ * from external sources (e.g., URL parameters, user input, configuration files).
+ *
+ * @param value - The string value to check.
+ * @returns True if the value is a valid DebugMode, false otherwise.
+ */
 export function isDebugMode(value: string): value is DebugMode {
   return (DebugModeValues as string[]).includes(value);
 }
