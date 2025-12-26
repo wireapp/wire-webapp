@@ -18,6 +18,7 @@
  */
 
 const webpack = require('webpack');
+const HtmlWebpackPlugin = require('html-webpack-plugin');
 
 const path = require('path');
 
@@ -59,9 +60,24 @@ module.exports = {
     ...commonConfig.entry,
     app: ['webpack-hot-middleware/client?reload=true', path.resolve(__dirname, srcScript, 'main/index.tsx')],
     auth: ['webpack-hot-middleware/client', path.resolve(__dirname, srcScript, 'auth/main.tsx')],
+    'test-background-effects': path.resolve(
+      __dirname,
+      srcScript,
+      'repositories/media/backgroundEffectsV2/test-basic.ts',
+    ),
   },
   mode: 'development',
-  plugins: [...commonConfig.plugins, new webpack.HotModuleReplacementPlugin(), updateTranslationTypesPlugin],
+  plugins: [
+    ...commonConfig.plugins,
+    new webpack.HotModuleReplacementPlugin(),
+    updateTranslationTypesPlugin,
+    new HtmlWebpackPlugin({
+      inject: false,
+      filename: 'test-background-effects.html',
+      template: path.resolve(__dirname, 'src/page/test-background-effects.html'),
+      templateParameters: {},
+    }),
+  ],
   snapshot: {
     // This will make sure that changes in the node_modules will be detected and recompiled automatically (when using yalc for example)
     managedPaths: [],

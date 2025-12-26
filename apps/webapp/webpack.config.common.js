@@ -88,7 +88,7 @@ module.exports = {
       },
       {
         loader: 'raw-loader',
-        test: /\.glsl$/,
+        test: /\.(glsl|vert|frag)$/,
       },
       {
         test: /\.less$/i,

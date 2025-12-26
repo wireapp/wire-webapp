@@ -1,0 +1,74 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Background Effects V2 Test</title>
+    <style>
+      body {
+        margin: 0;
+        padding: 20px;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+        background: #111;
+        color: #fff;
+      }
+      #console-output {
+        background: #1e1e1e;
+        border: 1px solid #333;
+        border-radius: 4px;
+        padding: 16px;
+        font-family: 'Courier New', monospace;
+        font-size: 14px;
+        line-height: 1.6;
+        white-space: pre-wrap;
+        max-height: 400px;
+        overflow-y: auto;
+        margin-bottom: 20px;
+      }
+      .info {
+        color: #4a9eff;
+      }
+      .success {
+        color: #4caf50;
+      }
+      .warning {
+        color: #ff9800;
+      }
+      .error {
+        color: #f44336;
+      }
+      h1 {
+        margin-top: 0;
+      }
+      .note {
+        background: #2a2a2a;
+        border-left: 4px solid #4a9eff;
+        padding: 12px;
+        margin: 20px 0;
+        border-radius: 4px;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Background Effects V2 Browser Test</h1>
+    <div class="note">
+      <strong>Note:</strong> This test requires camera access. When prompted, allow camera access to test the full
+      functionality. <br /><br />
+      <strong>Query Parameters:</strong>
+      <ul>
+        <li><code>?mode=blur</code> - Effect mode: blur, virtual, or passthrough</li>
+        <li><code>?debug=maskOverlay</code> - Debug mode: off, maskOverlay, maskOnly, or edgeOnly</li>
+        <li><code>?quality=A</code> - Quality: auto, A, B, C, or D</li>
+        <li><code>?blur=0.7</code> - Blur strength (0-1)</li>
+        <li><code>?fps=30</code> - Target FPS</li>
+        <li><code>?bg=gradient</code> - Virtual background: gradient, grid, or none</li>
+      </ul>
+      Example: <code>?mode=blur&debug=maskOverlay&quality=A&blur=0.7&fps=30</code>
+    </div>
+    <div id="console-output"></div>
+    <div id="app-root"></div>
+
+    <script src="./min/runtime.js"></script>
+    <script src="./min/test-background-effects.js"></script>
+  </body>
+</html>
