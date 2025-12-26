@@ -149,8 +149,12 @@ export class WebGLRenderer {
    * @throws Error if WebGL2 is not supported.
    */
   constructor(canvas: HTMLCanvasElement | OffscreenCanvas, width: number, height: number) {
+    const isOffscreen = typeof OffscreenCanvas !== 'undefined' && canvas instanceof OffscreenCanvas;
     // Create WebGL2 context with performance optimizations
-    const gl = canvas.getContext('webgl2', {premultipliedAlpha: false, desynchronized: true});
+    const gl = canvas.getContext('webgl2', {
+      premultipliedAlpha: false,
+      desynchronized: isOffscreen,
+    });
     if (!gl) {
       throw new Error('WebGL2 not supported');
     }

@@ -203,7 +203,6 @@ export class BackgroundEffectsController {
     } else if (this.pipeline === 'canvas2d') {
       await this.initCanvasPipeline();
     }
-
     // Start frame processing loop
     await this.videoSource.start(async (timestamp, width, height) => {
       if (!this.outputCanvas) {

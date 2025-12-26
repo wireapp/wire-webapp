@@ -395,7 +395,15 @@ async function runBrowserDemo() {
 
   window.__bgfxDemo = {
     status: 'starting',
-    options: {mode, debugMode, quality, blurStrength, targetFps, backgroundKind, pipeline: activePipeline},
+    options: {
+      mode,
+      debugMode,
+      quality,
+      blurStrength,
+      targetFps,
+      backgroundKind,
+      pipeline: activePipeline,
+    },
     requestedPipeline: pipelineOverride ?? 'auto',
     pipeline: activePipeline,
   };
