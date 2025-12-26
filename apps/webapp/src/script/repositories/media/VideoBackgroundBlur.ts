@@ -17,11 +17,11 @@
  *
  */
 
-import {BackgroundEffectsController} from './backgroundEffectsV2/effects/BackgroundEffectsController';
+import {BackgroundEffectsController} from './BackgroundEffects/effects/BackgroundEffectsController';
 
 /**
  * Will create a new MediaStream that will both segment each frame and apply a blur effect to the background.
- * This is an adapter function that uses the new backgroundEffectsV2 module while maintaining the old API.
+ * This is an adapter function that uses the new BackgroundEffects module while maintaining the old API.
  * @param originalStream the stream that contains the video that needs background blur
  * @returns a promise that resolves to an object containing the new MediaStream and a release function to stop the blur process
  */

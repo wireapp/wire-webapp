@@ -41,7 +41,7 @@
  *
  * @example
  * ```typescript
- * import {BackgroundEffectsController} from 'Repositories/media/backgroundEffectsV2';
+ * import {BackgroundEffectsController} from 'Repositories/media/BackgroundEffects';
  *
  * const controller = new BackgroundEffectsController();
  * const {outputTrack, stop} = await controller.start(inputTrack, {

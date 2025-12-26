@@ -60,11 +60,7 @@ module.exports = {
     ...commonConfig.entry,
     app: ['webpack-hot-middleware/client?reload=true', path.resolve(__dirname, srcScript, 'main/index.tsx')],
     auth: ['webpack-hot-middleware/client', path.resolve(__dirname, srcScript, 'auth/main.tsx')],
-    'test-background-effects': path.resolve(
-      __dirname,
-      srcScript,
-      'repositories/media/backgroundEffectsV2/test-basic.ts',
-    ),
+    'test-background-effects': path.resolve(__dirname, srcScript, 'repositories/media/BackgroundEffects/test-basic.ts'),
   },
   mode: 'development',
   plugins: [

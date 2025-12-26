@@ -15,7 +15,7 @@ Production-grade background blur and virtual background pipeline that avoids Web
 ## Example usage
 
 ```ts
-import {BackgroundEffectsController} from 'Repositories/media/backgroundEffectsV2/effects/BackgroundEffectsController';
+import {BackgroundEffectsController} from 'Repositories/media/BackgroundEffects/effects/BackgroundEffectsController';
 
 const controller = new BackgroundEffectsController();
 const stream = await navigator.mediaDevices.getUserMedia({video: {width: 1280, height: 720}});
