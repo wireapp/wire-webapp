@@ -323,13 +323,11 @@ export class BackgroundEffectsController {
               },
               [bitmap],
             );
-          } else if (this.renderer) {
-            this.backgroundSource?.bitmap?.close();
-            this.backgroundSource = {type: 'image', bitmap, width: source.naturalWidth, height: source.naturalHeight};
-            this.renderer.setBackground(bitmap, source.naturalWidth, source.naturalHeight);
-          } else {
-            bitmap.close();
+            return;
           }
+          this.backgroundSource?.bitmap?.close();
+          this.backgroundSource = {type: 'image', bitmap, width: source.naturalWidth, height: source.naturalHeight};
+          this.renderer?.setBackground(bitmap, source.naturalWidth, source.naturalHeight);
         })
         .catch(error => this.logger.warn('Failed to set background image', error));
       return;
@@ -350,13 +348,11 @@ export class BackgroundEffectsController {
         },
         [source],
       );
-    } else if (this.renderer) {
-      this.backgroundSource?.bitmap?.close();
-      this.backgroundSource = {type: 'image', bitmap: source, width: source.width, height: source.height};
-      this.renderer.setBackground(source, source.width, source.height);
-    } else {
-      source.close();
+      return;
     }
+    this.backgroundSource?.bitmap?.close();
+    this.backgroundSource = {type: 'image', bitmap: source, width: source.width, height: source.height};
+    this.renderer?.setBackground(source, source.width, source.height);
   }
 
   /**
@@ -784,6 +780,7 @@ export class BackgroundEffectsController {
         return;
       }
       const mask = result.mask;
+      const renderStart = performance.now();
 
       if (this.debugMode !== 'off' && mask) {
         ctx.clearRect(0, 0, width, height);
@@ -802,6 +799,8 @@ export class BackgroundEffectsController {
         }
         mask.close();
         frame.close();
+        const renderMs = performance.now() - renderStart;
+        this.updateMainMetrics(result.durationMs + renderMs, result.durationMs, renderMs, qualityTier.tier);
         return;
       }
 
@@ -838,6 +837,8 @@ export class BackgroundEffectsController {
       }
 
       frame.close();
+      const renderMs = performance.now() - renderStart;
+      this.updateMainMetrics(result.durationMs + renderMs, result.durationMs, renderMs, qualityTier.tier);
     });
   }
 
@@ -988,13 +989,11 @@ export class BackgroundEffectsController {
             },
             [bitmap],
           );
-        } else if (this.renderer) {
-          this.backgroundSource?.bitmap?.close();
-          this.backgroundSource = {type: 'video', bitmap, width: video.videoWidth, height: video.videoHeight};
-          this.renderer.setBackground(bitmap, video.videoWidth, video.videoHeight);
-        } else {
-          bitmap.close();
+          return;
         }
+        this.backgroundSource?.bitmap?.close();
+        this.backgroundSource = {type: 'video', bitmap, width: video.videoWidth, height: video.videoHeight};
+        this.renderer?.setBackground(bitmap, video.videoWidth, video.videoHeight);
       } catch (error) {
         this.logger.warn('Failed to capture background video frame', error);
       }

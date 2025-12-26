@@ -260,7 +260,7 @@ export class Segmenter {
     }
     // Direct ImageData format (preferred, no conversion needed)
     if (typeof mask.getAsImageData === 'function') {
-      return mask.getAsImageData();
+      return this.normalizeMaskImageData(mask.getAsImageData());
     }
     // Float32Array format (0-1 range, needs normalization)
     if (typeof mask.getAsFloat32Array === 'function') {
@@ -307,9 +307,23 @@ export class Segmenter {
       out[idx] = value; // R
       out[idx + 1] = value; // G
       out[idx + 2] = value; // B
-      out[idx + 3] = 255; // A (fully opaque)
+      out[idx + 3] = value; // A (mask alpha)
     }
     return imageData;
+  }
+
+  private normalizeMaskImageData(imageData: ImageData): ImageData {
+    const out = new ImageData(imageData.width, imageData.height);
+    const src = imageData.data;
+    const dest = out.data;
+    for (let i = 0; i < src.length; i += 4) {
+      const value = src[i];
+      dest[i] = value;
+      dest[i + 1] = value;
+      dest[i + 2] = value;
+      dest[i + 3] = value;
+    }
+    return out;
   }
 
   /**

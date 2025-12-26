@@ -173,7 +173,7 @@ export class WebGLRenderer {
         segmentationHeight: 144,
         segmentationCadence: 1,
         maskRefineScale: 0.5,
-        blurDownsampleScale: 0.5,
+        blurDownsampleScale: 0.25,
         blurRadius: 4,
         bilateralRadius: 5,
         bilateralSpatialSigma: 3.5,
