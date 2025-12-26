@@ -28,7 +28,28 @@
  */
 
 import {detectCapabilities, choosePipeline} from './effects/capability';
-import type {EffectMode, DebugMode, QualityMode, StartOptions} from './types';
+import type {EffectMode, DebugMode, QualityMode, StartOptions, PipelineType} from './types';
+
+declare global {
+  interface Window {
+    __bgfxDemo?: {
+      status: 'starting' | 'running' | 'failed';
+      error?: string;
+      options?: {
+        mode: EffectMode;
+        debugMode: DebugMode;
+        quality: QualityMode;
+        blurStrength: number;
+        targetFps: number;
+        backgroundKind: string;
+        pipeline: string;
+      };
+      pipeline?: string;
+      requestedPipeline?: string;
+      stop?: () => void;
+    };
+  }
+}
 
 const isBrowser = typeof window !== 'undefined' && typeof document !== 'undefined';
 const isNode = typeof process !== 'undefined' && process.exit;
@@ -41,7 +62,7 @@ const getWebglDiagnostics = () => {
   const canvas2 = document.createElement('canvas');
   const gl1 = canvas1.getContext('webgl') || canvas1.getContext('experimental-webgl');
   const gl2 = canvas2.getContext('webgl2');
-  const gl = gl2 || gl1;
+  const gl = (gl2 || gl1) as WebGLRenderingContext | WebGL2RenderingContext | null;
   let renderer: string | null = null;
   if (gl) {
     const debugExt = gl.getExtension('WEBGL_debug_renderer_info');
@@ -74,29 +95,59 @@ if (isBrowser) {
         outputDiv.scrollTop = outputDiv.scrollHeight;
       };
 
+      const formatConsoleArgs = (args: any[]): string => {
+        if (args.length === 0) {
+          return '';
+        }
+        const [first, ...rest] = args;
+        if (typeof first === 'string' && first.includes('%c')) {
+          const cleaned = first.replace(/%c/g, '').trim();
+          const nonStyleArgs = rest.filter(arg => typeof arg !== 'string' || !arg.includes(':'));
+          return [cleaned, ...nonStyleArgs.map(formatConsoleValue)].filter(Boolean).join(' ');
+        }
+        return args.map(formatConsoleValue).join(' ');
+      };
+
+      const formatConsoleValue = (value: any): string => {
+        if (value === null || value === undefined) {
+          return String(value);
+        }
+        if (typeof value === 'string') {
+          return value;
+        }
+        if (value instanceof Error) {
+          return value.stack ?? `${value.name}: ${value.message}`;
+        }
+        try {
+          return JSON.stringify(value);
+        } catch {
+          return String(value);
+        }
+      };
+
       console.log = function (...args: any[]) {
         originalLog.apply(console, args);
-        addOutput(args.join(' '), 'log');
+        addOutput(formatConsoleArgs(args), 'log');
       };
 
       console.error = function (...args: any[]) {
         originalError.apply(console, args);
-        addOutput(args.join(' '), 'error');
+        addOutput(formatConsoleArgs(args), 'error');
       };
 
       console.warn = function (...args: any[]) {
         originalWarn.apply(console, args);
-        addOutput(args.join(' '), 'warning');
+        addOutput(formatConsoleArgs(args), 'warning');
       };
 
       console.info = function (...args: any[]) {
         originalInfo.apply(console, args);
-        addOutput(args.join(' '), 'info');
+        addOutput(formatConsoleArgs(args), 'info');
       };
 
       (console as any).status = function (ok: boolean, ...args: any[]) {
         originalLog.apply(console, args);
-        addOutput(args.join(' '), ok ? 'success' : 'error');
+        addOutput(formatConsoleArgs(args), ok ? 'success' : 'error');
       };
     } else {
       const warnMsg = 'console-output div not found, console output will only appear in browser console';
@@ -262,8 +313,18 @@ async function runBrowserDemo() {
   const blurStrength = Number(params.get('blur') ?? '0.7');
   const targetFps = Number(params.get('fps') ?? '30');
   const backgroundKind = params.get('bg') || (mode === 'virtual' ? 'gradient' : 'none');
+  const pipelineParam = params.get('pipeline');
+  const pipelineOverride = (
+    pipelineParam && ['worker-webgl2', 'main-webgl2', 'canvas2d', 'passthrough'].includes(pipelineParam)
+      ? pipelineParam
+      : undefined
+  ) as PipelineType | undefined;
 
   const {BackgroundEffectsController} = await import('./effects/BackgroundEffectsController');
+
+  const caps = detectCapabilities();
+  const chosenPipeline = choosePipeline(caps, true);
+  const activePipeline = pipelineOverride ?? chosenPipeline;
 
   const root = document.getElementById('app-root') || document.createElement('div');
   if (!root.id) {
@@ -299,6 +360,7 @@ async function runBrowserDemo() {
   root.appendChild(processedPanel);
 
   const rawVideo = document.createElement('video');
+  rawVideo.id = 'bgfx-raw-video';
   rawVideo.autoplay = true;
   rawVideo.muted = true;
   rawVideo.playsInline = true;
@@ -307,6 +369,7 @@ async function runBrowserDemo() {
   rawPanel.appendChild(rawVideo);
 
   const processedVideo = document.createElement('video');
+  processedVideo.id = 'bgfx-processed-video';
   processedVideo.autoplay = true;
   processedVideo.muted = true;
   processedVideo.playsInline = true;
@@ -315,7 +378,10 @@ async function runBrowserDemo() {
   processedPanel.appendChild(processedVideo);
 
   const status = document.createElement('div');
-  status.textContent = `mode=${mode} debug=${debugMode} quality=${quality} blur=${blurStrength} fps=${targetFps} bg=${backgroundKind}`;
+  status.id = 'bgfx-status';
+  status.textContent =
+    `mode=${mode} debug=${debugMode} quality=${quality} blur=${blurStrength} ` +
+    `fps=${targetFps} bg=${backgroundKind} pipeline=${activePipeline}`;
   status.style.gridColumn = '1 / -1';
   root.appendChild(status);
 
@@ -325,6 +391,13 @@ async function runBrowserDemo() {
     if (err?.constraint) {
       console.error(`${label} constraint:`, err.constraint);
     }
+  };
+
+  window.__bgfxDemo = {
+    status: 'starting',
+    options: {mode, debugMode, quality, blurStrength, targetFps, backgroundKind, pipeline: activePipeline},
+    requestedPipeline: pipelineOverride ?? 'auto',
+    pipeline: activePipeline,
   };
 
   let stream: MediaStream;
@@ -358,19 +431,20 @@ async function runBrowserDemo() {
 
   const backgroundImage = await createBackgroundImage(backgroundKind, settings);
   const controller = new BackgroundEffectsController();
-  const {outputTrack} = await controller.start(inputTrack, {
+  const {outputTrack, stop} = await controller.start(inputTrack, {
     mode,
     debugMode,
     quality,
     blurStrength,
     targetFps,
     backgroundImage: backgroundImage ?? undefined,
+    pipelineOverride,
   });
 
   processedVideo.srcObject = new MediaStream([outputTrack]);
+  window.__bgfxDemo = {...window.__bgfxDemo, status: 'running', stop};
 
   console.log('Browser demo running.');
-  console.log('Use query params: ?mode=blur&debug=maskOnly&quality=A&blur=0.7&fps=30');
 }
 
 async function createBackgroundImage(kind: string, settings: MediaTrackSettings): Promise<ImageBitmap | null> {
@@ -433,6 +507,7 @@ async function createBackgroundImage(kind: string, settings: MediaTrackSettings)
 if (isBrowser) {
   const startDemo = () => {
     runBrowserDemo().catch(error => {
+      window.__bgfxDemo = {status: 'failed', error: (error as Error)?.message ?? String(error)};
       console.error('Browser demo failed:', error);
     });
   };

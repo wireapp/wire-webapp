@@ -105,6 +105,11 @@ export type {DebugMode} from './types';
 export type {QualityMode} from './types';
 
 /**
+ * Pipeline selection type.
+ */
+export type {PipelineType} from './types';
+
+/**
  * Configuration options for starting the background effects pipeline.
  */
 export type {StartOptions} from './types';

@@ -46,6 +46,7 @@ import type {
   DebugMode,
   EffectMode,
   Mode,
+  PipelineType,
   QualityMode,
   StartOptions,
   WorkerOptions,
@@ -104,7 +105,7 @@ export class BackgroundEffectsController {
   /** Background image/video source for virtual background mode. */
   private backgroundSource: BackgroundSourceImage | BackgroundSourceVideoFrame | null = null;
   /** Selected rendering pipeline. */
-  private pipeline: 'worker-webgl2' | 'main-webgl2' | 'canvas2d' | 'passthrough' = 'passthrough';
+  private pipeline: PipelineType = 'passthrough';
   /** Flag indicating if a frame is currently being processed by worker. */
   private inFlight = false;
   /** Pending frame waiting to be sent to worker (backpressure control). */
@@ -173,10 +174,15 @@ export class BackgroundEffectsController {
 
     // Detect capabilities and select optimal pipeline
     const cap = detectCapabilities();
-    this.pipeline = choosePipeline(cap, opts.useWorker !== false);
+    const chosenPipeline = choosePipeline(cap, opts.useWorker !== false);
+    this.pipeline = opts.pipelineOverride ?? chosenPipeline;
     if (this.isDev) {
       this.logger.info('Background effects capabilities', cap);
-      this.logger.info('Background effects pipeline', this.pipeline);
+      this.logger.info('Background effects pipeline', {
+        chosen: chosenPipeline,
+        override: opts.pipelineOverride ?? null,
+        active: this.pipeline,
+      });
     }
 
     // Initialize video source for frame extraction
