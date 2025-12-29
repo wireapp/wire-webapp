@@ -75,6 +75,15 @@ export interface MappedText {
   type: CONVERSATION;
 }
 
+export interface MappedMultipart {
+  data: {
+    text: {content: string; mentions: string[]; previews: string[]; quote?: string};
+    attachments: MultiPartContent['attachments'];
+    replacing_message_id?: string;
+  };
+  type: CONVERSATION;
+}
+
 export interface MappedAssetMetaData {
   duration: number;
   loudness: Uint8Array;
@@ -488,6 +497,12 @@ export class CryptographyMapper {
   }
 
   private _mapEdited(edited: MessageEdit) {
+    if (edited.multipart) {
+      const mappedMultipart = this._mapMultipart(edited.multipart.text as Text, edited.multipart.attachments);
+      mappedMultipart.data.replacing_message_id = edited.replacingMessageId;
+      return mappedMultipart;
+    }
+
     const mappedMessage = this._mapText(edited.text as Text);
     mappedMessage.data.replacing_message_id = edited.replacingMessageId;
     return mappedMessage;
@@ -613,7 +628,7 @@ export class CryptographyMapper {
     };
   }
 
-  private _mapMultipart(text: Text, attachments: MultiPartContent['attachments']) {
+  private _mapMultipart(text: Text, attachments: MultiPartContent['attachments']): MappedMultipart {
     const mappedText = this._mapText(text);
     return {
       data: {

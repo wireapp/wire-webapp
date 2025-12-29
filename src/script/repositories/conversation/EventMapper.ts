@@ -160,12 +160,27 @@ export class EventMapper {
   updateMessageEvent(originalEntity: ContentMessage, event: LegacyEventRecord): ContentMessage {
     const {id, data: eventData, edited_time: editedTime, qualified_conversation} = event;
 
-    if (eventData.quote) {
-      const {hash, message_id: messageId, user_id: userId, error} = eventData.quote;
+    // Handle quote for both regular text messages and multipart messages
+    const quoteData = eventData.quote || eventData.text?.quote;
+    if (quoteData) {
+      const {hash, message_id: messageId, user_id: userId, error} = quoteData;
       originalEntity.quote(new QuoteEntity({error, hash, messageId, userId}));
     }
 
-    if (id !== originalEntity.id && originalEntity.hasAssetText()) {
+    // Check if this is multipart data (has text and attachments structure)
+    const isMultipartData =
+      eventData && typeof eventData === 'object' && 'text' in eventData && 'attachments' in eventData;
+
+    // Handle multipart messages first (check isMultipartData OR originalEntity has multipart asset)
+    if ((id !== originalEntity.id || isMultipartData) && originalEntity.hasMultipartAsset()) {
+      // Update multipart asset if ID changed OR if we have multipart data structure
+      originalEntity.assets.removeAll();
+      const multipartAsset = this._mapAssetMultipart(eventData as MultipartMessageAddEvent['data']);
+      if (multipartAsset) {
+        originalEntity.assets.push(multipartAsset);
+      }
+    } else if (id !== originalEntity.id && originalEntity.hasAssetText()) {
+      // Handle regular text messages (only if not multipart)
       originalEntity.assets.removeAll();
       const textAsset = this._mapAssetText(eventData);
       originalEntity.assets.push(textAsset);
@@ -664,11 +679,15 @@ export class EventMapper {
    * @returns Content message entity
    */
   private _mapEventMultipartAdd(event: MultipartMessageAddEvent) {
-    const {data: eventData} = event;
+    const {data: eventData, edited_time: editedTime} = event;
     const messageEntity = new ContentMessage();
 
     const assets = this._mapAssetMultipart(eventData);
     messageEntity.assets.push(assets);
+    messageEntity.replacing_message_id = eventData.replacing_message_id;
+    if (editedTime) {
+      messageEntity.edited_timestamp(new Date(editedTime).getTime());
+    }
 
     if (eventData.text?.quote) {
       const {message_id: messageId, user_id: userId, error} = eventData.text.quote as any;

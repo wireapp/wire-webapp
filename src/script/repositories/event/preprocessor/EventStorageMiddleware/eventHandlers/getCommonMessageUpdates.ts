@@ -17,16 +17,46 @@
  *
  */
 
-import {MessageAddEvent} from 'Repositories/conversation/EventBuilder';
+import {MessageAddEvent, MultipartMessageAddEvent} from 'Repositories/conversation/EventBuilder';
 import {StoredEvent} from 'Repositories/storage';
 
-export function getCommonMessageUpdates(originalEvent: StoredEvent<MessageAddEvent>, newEvent: MessageAddEvent) {
-  return {
-    ...newEvent,
-    data: {...newEvent.data, expects_read_confirmation: originalEvent.data.expects_read_confirmation},
+import {EditableEvent} from './editedEventHandler';
+
+function isMultipartEvent(event: EditableEvent): event is MultipartMessageAddEvent {
+  return 'attachments' in event.data;
+}
+
+export function getCommonMessageUpdates(
+  originalEvent: StoredEvent<EditableEvent>,
+  newEvent: EditableEvent,
+): EditableEvent {
+  const commonProps = {
     edited_time: originalEvent.edited_time,
     read_receipts: !newEvent.read_receipts ? originalEvent.read_receipts : newEvent.read_receipts,
     status: !newEvent.status || newEvent.status < originalEvent.status ? originalEvent.status : newEvent.status,
     time: originalEvent.time,
   };
+
+  // Handle multipart messages
+  if (isMultipartEvent(newEvent) && isMultipartEvent(originalEvent)) {
+    return {
+      ...newEvent,
+      ...commonProps,
+      data: {
+        ...newEvent.data,
+        attachments: newEvent.data.attachments ?? originalEvent.data.attachments,
+        expects_read_confirmation: originalEvent.data.expects_read_confirmation,
+      },
+    } as MultipartMessageAddEvent;
+  }
+
+  // Handle regular text messages
+  return {
+    ...newEvent,
+    ...commonProps,
+    data: {
+      ...newEvent.data,
+      expects_read_confirmation: originalEvent.data.expects_read_confirmation,
+    },
+  } as MessageAddEvent;
 }

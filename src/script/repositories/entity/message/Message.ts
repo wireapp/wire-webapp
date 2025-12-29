@@ -192,11 +192,22 @@ export class Message {
    * @returns Message contains text
    */
   hasAssetText(): boolean {
-    return this.isContent() ? this.assets().some(assetEntity => assetEntity.isText()) : false;
+    return this.isContent()
+      ? this.assets().some(assetEntity => assetEntity.isText() || assetEntity.isMultipart())
+      : false;
   }
 
   hasMultipartAsset(): boolean {
     return this.isContent() ? this.assets().some(assetEntity => assetEntity.type === AssetType.MULTIPART) : false;
+  }
+
+  getMultipartAssets() {
+    const hasMultipartAsset = this.hasMultipartAsset();
+    if (!hasMultipartAsset || !this.isContent()) {
+      return [];
+    }
+
+    return this.assets().filter(assetEntity => assetEntity.isMultipart());
   }
 
   /**

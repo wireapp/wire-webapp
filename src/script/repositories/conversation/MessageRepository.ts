@@ -154,6 +154,8 @@ type MultipartMessagePayload = TextMessagePayload & {
   attachments: MultiPartContent['attachments'];
 };
 
+type EditMultiPartMessagePayload = MultipartMessagePayload & {originalMessageId: string};
+
 const enum SendAndInjectSendingState {
   FAILED = 'FAILED',
 }
@@ -326,6 +328,31 @@ export class MessageRepository {
     return this.sendAndInjectMessage(editMessage, conversation, {syncTimestamp: false});
   }
 
+  private async sendEditMultiPart({
+    attachments,
+    conversation,
+    message,
+    messageId,
+    originalMessageId,
+    mentions = [],
+    quote,
+  }: EditMultiPartMessagePayload) {
+    const editedMessage = MessageBuilder.buildEditedMultipartMessage(
+      attachments,
+      this.decorateTextMessage(
+        {
+          originalMessageId: originalMessageId,
+          text: message,
+        },
+        conversation,
+        {mentions, quote},
+      ),
+      originalMessageId,
+      messageId,
+    );
+    return this.sendAndInjectMessage(editedMessage, conversation, {syncTimestamp: false});
+  }
+
   private decorateTextMessage<T extends TextContent | EditedTextContent>(
     baseMessage: T,
     conversation: Conversation,
@@ -433,6 +460,10 @@ export class MessageRepository {
 
     const originalMessageId = originalMessage.id;
     const messagePayload = {
+      attachments: originalMessage
+        .getMultipartAssets()
+        .map(multipart => multipart.attachments?.() || [])
+        .flat(),
       conversation,
       mentions,
       message: textMessage,
@@ -444,7 +475,9 @@ export class MessageRepository {
     // It prevents from sending a link preview for a message that has been replaced by another one
     cancelSendingLinkPreview(originalMessageId);
     try {
-      const {state} = await this.sendEdit(messagePayload);
+      const {state} = originalMessage.hasMultipartAsset()
+        ? await this.sendEditMultiPart(messagePayload)
+        : await this.sendEdit(messagePayload);
       if (state !== MessageSendingState.CANCELED) {
         await this.handleLinkPreview(messagePayload);
       }

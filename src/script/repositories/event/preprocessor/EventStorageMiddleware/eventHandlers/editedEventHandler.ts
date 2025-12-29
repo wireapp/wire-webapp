@@ -17,7 +17,7 @@
  *
  */
 
-import {MessageAddEvent} from 'Repositories/conversation/EventBuilder';
+import {MessageAddEvent, MultipartMessageAddEvent} from 'Repositories/conversation/EventBuilder';
 import {StoredEvent} from 'Repositories/storage';
 import {EventError} from 'src/script/error/EventError';
 
@@ -30,15 +30,20 @@ function throwValidationError(message: string): never {
   throw new EventError(EventError.TYPE.VALIDATION_FAILED, `Event validation failed: ${message}`);
 }
 
+export type EditableEvent = MessageAddEvent | MultipartMessageAddEvent;
+
 function validateEditEvent(
   originalEvent: HandledEvents | undefined,
-  editEvent: MessageAddEvent,
-): originalEvent is StoredEvent<MessageAddEvent> {
+  editEvent: EditableEvent,
+): originalEvent is StoredEvent<EditableEvent> {
   if (!originalEvent) {
     throwValidationError('Edit event without original event');
   }
 
-  if (originalEvent.type !== ClientEvent.CONVERSATION.MESSAGE_ADD) {
+  if (
+    originalEvent.type !== ClientEvent.CONVERSATION.MESSAGE_ADD &&
+    originalEvent.type !== ClientEvent.CONVERSATION.MULTIPART_MESSAGE_ADD
+  ) {
     throwValidationError('Edit event for non-text message');
   }
 
@@ -49,17 +54,14 @@ function validateEditEvent(
   return true;
 }
 
-function getUpdatesForEditMessage(
-  originalEvent: StoredEvent<MessageAddEvent>,
-  newEvent: MessageAddEvent,
-): MessageAddEvent {
+function getUpdatesForEditMessage(originalEvent: StoredEvent<EditableEvent>, newEvent: EditableEvent): EditableEvent {
   // Remove reactions, so that likes (hearts) don't stay when a message's text gets edited
   const commonUpdates = getCommonMessageUpdates(originalEvent, newEvent);
 
   return {...newEvent, ...commonUpdates, edited_time: newEvent.time, reactions: {}};
 }
 
-function computeEventUpdates(originalEvent: StoredEvent<MessageAddEvent>, newEvent: MessageAddEvent) {
+function computeEventUpdates(originalEvent: StoredEvent<EditableEvent>, newEvent: EditableEvent) {
   const primaryKeyUpdate = {primary_key: originalEvent.primary_key};
   const updates = getUpdatesForEditMessage(originalEvent, newEvent);
 
@@ -67,7 +69,7 @@ function computeEventUpdates(originalEvent: StoredEvent<MessageAddEvent>, newEve
 }
 
 export const handleEditEvent: EventHandler = async (event, {findEvent}) => {
-  if (event.type !== CONVERSATION.MESSAGE_ADD) {
+  if (event.type !== CONVERSATION.MESSAGE_ADD && event.type !== CONVERSATION.MULTIPART_MESSAGE_ADD) {
     return undefined;
   }
   const editedEventId = event.data.replacing_message_id;
