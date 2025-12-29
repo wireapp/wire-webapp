@@ -171,7 +171,7 @@ export class EventMapper {
     const isMultipartData =
       eventData && typeof eventData === 'object' && 'text' in eventData && 'attachments' in eventData;
 
-    // Handle multipart messages first (check isMultipartData OR originalEntity has multipart asset)
+    // Handle multipart messages first (check isMultipartData or originalEntity has multipart asset)
     if ((id !== originalEntity.id || isMultipartData) && originalEntity.hasMultipartAsset()) {
       // Update multipart asset if ID changed OR if we have multipart data structure
       originalEntity.assets.removeAll();

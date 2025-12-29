@@ -26,6 +26,10 @@ function isMultipartEvent(event: EditableEvent): event is MultipartMessageAddEve
   return 'attachments' in event.data;
 }
 
+function isMessageAddEvent(event: EditableEvent): event is MessageAddEvent {
+  return !isMultipartEvent(event);
+}
+
 export function getCommonMessageUpdates(
   originalEvent: StoredEvent<EditableEvent>,
   newEvent: EditableEvent,
@@ -47,16 +51,20 @@ export function getCommonMessageUpdates(
         attachments: newEvent.data.attachments ?? originalEvent.data.attachments,
         expects_read_confirmation: originalEvent.data.expects_read_confirmation,
       },
-    } as MultipartMessageAddEvent;
+    };
   }
 
   // Handle regular text messages
-  return {
-    ...newEvent,
-    ...commonProps,
-    data: {
-      ...newEvent.data,
-      expects_read_confirmation: originalEvent.data.expects_read_confirmation,
-    },
-  } as MessageAddEvent;
+  if (isMessageAddEvent(newEvent) && isMessageAddEvent(originalEvent)) {
+    return {
+      ...newEvent,
+      ...commonProps,
+      data: {
+        ...newEvent.data,
+        expects_read_confirmation: originalEvent.data.expects_read_confirmation,
+      },
+    };
+  }
+
+  throw new Error('Incompatible event types for computing common message updates');
 }
