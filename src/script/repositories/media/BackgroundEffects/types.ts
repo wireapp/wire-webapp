@@ -183,6 +183,8 @@ export interface StartOptions {
   backgroundImage?: HTMLImageElement | ImageBitmap;
   /** Background video element for virtual background mode. */
   backgroundVideo?: HTMLVideoElement;
+  /** Solid background color for virtual background mode (CSS color string). */
+  backgroundColor?: string;
   /** Path to MediaPipe segmentation model file. */
   segmentationModelPath?: string;
   /** Whether to prefer worker-based pipeline when available. Default: true. */

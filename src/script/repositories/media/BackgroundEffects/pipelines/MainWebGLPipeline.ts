@@ -1,0 +1,227 @@
+/*
+ * Wire
+ * Copyright (C) 2025 Wire Swiss GmbH
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ *
+ */
+
+import {getLogger, Logger} from 'Util/Logger';
+
+import type {Pipeline, PipelineConfig, PipelineInit} from './Pipeline';
+
+import {QualityController} from '../quality/QualityController';
+import {WebGLRenderer} from '../renderer/WebGLRenderer';
+import {NoopMaskPostProcessor} from '../segmentation/maskPostProcessor';
+import type {MaskPostProcessor} from '../segmentation/maskPostProcessor';
+import {MediaPipeSegmenterFactory} from '../segmentation/mediaPipeSegmenter';
+import type {SegmenterLike} from '../segmentation/segmenterTypes';
+import {buildMaskInput, MaskInput} from '../shared/mask';
+import {buildMetrics, MetricsSample, pushMetricsSample} from '../shared/metrics';
+import {getQualityMode, resolveQualityTier} from '../shared/quality';
+import type {QualityTierParams} from '../types';
+
+export class MainWebGLPipeline implements Pipeline {
+  public readonly type = 'main-webgl2' as const;
+  private readonly logger: Logger;
+  private renderer: WebGLRenderer | null = null;
+  private segmenter: SegmenterLike | null = null;
+  private maskPostProcessor: MaskPostProcessor = new NoopMaskPostProcessor();
+  private qualityController: QualityController | null = null;
+  private outputCanvas: HTMLCanvasElement | null = null;
+  private background: {bitmap: ImageBitmap; width: number; height: number} | null = null;
+  private config: PipelineConfig | null = null;
+  private onMetrics: PipelineInit['onMetrics'] = null;
+  private onTierChange: PipelineInit['onTierChange'] | null = null;
+  private getDroppedFrames: PipelineInit['getDroppedFrames'] | null = null;
+  private readonly metricsSamples: MetricsSample[] = [];
+  private readonly metricsMaxSamples = 30;
+  private mainFrameCount = 0;
+
+  constructor() {
+    this.logger = getLogger('MainWebGLPipeline');
+  }
+
+  public async init(init: PipelineInit): Promise<void> {
+    this.outputCanvas = init.outputCanvas;
+    this.config = init.config;
+    this.onMetrics = init.onMetrics;
+    this.onTierChange = init.onTierChange;
+    this.getDroppedFrames = init.getDroppedFrames;
+    this.mainFrameCount = 0;
+
+    this.renderer = new WebGLRenderer(this.outputCanvas, this.outputCanvas.width, this.outputCanvas.height);
+    const segmenterFactory = init.createSegmenter ?? MediaPipeSegmenterFactory;
+    this.segmenter = segmenterFactory.create({
+      modelPath: init.segmentationModelPath,
+      delegate: 'GPU',
+      canvas: this.outputCanvas,
+    });
+    const postProcessorFactory = init.createMaskPostProcessor ?? {
+      create: () => new NoopMaskPostProcessor(),
+    };
+    this.maskPostProcessor = postProcessorFactory.create();
+    this.qualityController = new QualityController(init.targetFps);
+    try {
+      await this.segmenter.init();
+    } catch (error) {
+      this.logger.warn('Segmentation init failed, falling back to passthrough', error);
+      this.segmenter?.close();
+      this.segmenter = null;
+      this.renderer?.destroy();
+      this.renderer = null;
+      throw error;
+    }
+  }
+
+  public updateConfig(config: PipelineConfig): void {
+    this.config = config;
+    if (this.qualityController && config.quality !== 'auto') {
+      this.qualityController.setTier(config.quality);
+    }
+  }
+
+  public async processFrame(frame: ImageBitmap, timestamp: number, width: number, height: number): Promise<void> {
+    if (!this.renderer || !this.outputCanvas || !this.config) {
+      frame.close();
+      return;
+    }
+
+    const qualityTier = this.resolveQuality();
+
+    let maskInput: MaskInput | null = null;
+    let maskBitmap: ImageBitmap | null = null;
+    let releaseMaskResources: (() => void) | null = null;
+    let segmentationMs = 0;
+    if (!qualityTier.bypass && qualityTier.segmentationCadence > 0 && this.segmenter && this.qualityController) {
+      this.mainFrameCount += 1;
+      if (this.mainFrameCount % qualityTier.segmentationCadence === 0) {
+        this.segmenter.configure(qualityTier.segmentationWidth, qualityTier.segmentationHeight);
+        const segStart = performance.now();
+        const timestampMs = timestamp * 1000;
+        const result = await this.segmenter.segment(frame, timestampMs);
+        segmentationMs = performance.now() - segStart;
+        const processed = await this.maskPostProcessor.process(result, {
+          qualityTier,
+          mode: this.config.mode,
+          timestampMs,
+          frameSize: {width, height},
+        });
+        if (processed !== result) {
+          result.mask?.close();
+          result.release();
+        }
+        const maskResult = buildMaskInput(processed);
+        maskInput = maskResult.maskInput;
+        maskBitmap = maskResult.maskBitmap;
+        releaseMaskResources = maskResult.release;
+      }
+    }
+
+    if (this.outputCanvas.width !== width || this.outputCanvas.height !== height) {
+      this.outputCanvas.width = width;
+      this.outputCanvas.height = height;
+    }
+
+    this.renderer.configure(
+      width,
+      height,
+      qualityTier,
+      this.config.mode,
+      this.config.debugMode,
+      this.config.blurStrength,
+    );
+
+    if (this.background) {
+      this.renderer.setBackground(this.background.bitmap, this.background.width, this.background.height);
+    }
+
+    const gpuStart = performance.now();
+    let gpuMs = 0;
+    try {
+      this.renderer.render(frame, maskInput);
+    } finally {
+      gpuMs = performance.now() - gpuStart;
+      maskBitmap?.close();
+      releaseMaskResources?.();
+      frame.close();
+    }
+
+    if (this.config.quality === 'auto' && this.qualityController) {
+      const updatedTier = this.qualityController.update(
+        {totalMs: segmentationMs + gpuMs, segmentationMs, gpuMs},
+        getQualityMode(this.config.mode),
+      );
+      this.onTierChange?.(updatedTier.tier);
+    }
+
+    this.updateMetrics(segmentationMs + gpuMs, segmentationMs, gpuMs, qualityTier.tier);
+  }
+
+  public setBackgroundImage(bitmap: ImageBitmap, width: number, height: number): void {
+    this.background?.bitmap?.close();
+    this.background = {bitmap, width, height};
+    this.renderer?.setBackground(bitmap, width, height);
+  }
+
+  public setBackgroundVideoFrame(bitmap: ImageBitmap, width: number, height: number): void {
+    this.setBackgroundImage(bitmap, width, height);
+  }
+
+  public clearBackground(): void {
+    this.background?.bitmap?.close();
+    this.background = null;
+    this.renderer?.setBackground(null, 0, 0);
+  }
+
+  public notifyDroppedFrames(_count: number): void {
+    // No-op for main pipeline.
+  }
+
+  public isOutputCanvasTransferred(): boolean {
+    return false;
+  }
+
+  public stop(): void {
+    this.background?.bitmap?.close();
+    this.background = null;
+    this.maskPostProcessor.reset();
+    this.segmenter?.close();
+    this.segmenter = null;
+    this.renderer?.destroy();
+    this.renderer = null;
+    this.qualityController = null;
+    this.outputCanvas = null;
+    this.config = null;
+    this.onMetrics = null;
+    this.onTierChange = null;
+    this.getDroppedFrames = null;
+    this.metricsSamples.length = 0;
+  }
+
+  private resolveQuality(): QualityTierParams {
+    if (!this.config) {
+      return resolveQualityTier(null, 'auto', 'blur');
+    }
+    return resolveQualityTier(this.qualityController, this.config.quality, getQualityMode(this.config.mode));
+  }
+
+  private updateMetrics(totalMs: number, segmentationMs: number, gpuMs: number, tier: 'A' | 'B' | 'C' | 'D'): void {
+    if (!this.onMetrics || !this.getDroppedFrames) {
+      return;
+    }
+    pushMetricsSample(this.metricsSamples, this.metricsMaxSamples, {totalMs, segmentationMs, gpuMs});
+    this.onMetrics(buildMetrics(this.metricsSamples, this.getDroppedFrames(), tier));
+  }
+}

@@ -35,24 +35,14 @@
 import {getLogger, Logger} from 'Util/Logger';
 
 import {detectCapabilities, choosePipeline} from './capability';
-import {VideoSource} from './VideoSource';
+import {FrameSource} from './FrameSource';
 
-import {QualityController} from '../quality/QualityController';
-import {WebGLRenderer} from '../renderer/WebGLRenderer';
-import {Segmenter} from '../segmentation/segmenter';
-import type {
-  BackgroundSourceImage,
-  BackgroundSourceVideoFrame,
-  DebugMode,
-  EffectMode,
-  Metrics,
-  Mode,
-  PipelineType,
-  QualityMode,
-  StartOptions,
-  WorkerOptions,
-  WorkerResponse,
-} from '../types';
+import {Canvas2DPipeline} from '../pipelines/Canvas2DPipeline';
+import {MainWebGLPipeline} from '../pipelines/MainWebGLPipeline';
+import {PassthroughPipeline} from '../pipelines/PassthroughPipeline';
+import type {Pipeline, PipelineConfig} from '../pipelines/Pipeline';
+import {WorkerWebGLPipeline} from '../pipelines/WorkerWebGLPipeline';
+import type {DebugMode, EffectMode, Metrics, PipelineType, QualityMode, StartOptions} from '../types';
 
 /**
  * Main controller for background effects processing.
@@ -77,20 +67,14 @@ export class BackgroundEffectsController {
   private readonly logger: Logger;
   /** Whether running in development mode (enables additional logging). */
   private readonly isDev = process.env.NODE_ENV !== 'production';
-  /** Web Worker instance for worker-webgl2 pipeline. */
-  private worker: Worker | null = null;
-  /** WebGL renderer instance for main-webgl2 pipeline. */
-  private renderer: WebGLRenderer | null = null;
-  /** ML segmenter instance for person/background separation. */
-  private segmenter: Segmenter | null = null;
-  /** Quality controller for adaptive performance tuning. */
-  private qualityController: QualityController | null = null;
-  /** Video source wrapper for frame extraction from input track. */
-  private videoSource: VideoSource | null = null;
+  /** Frame source adapter for extracting frames from input track. */
+  private frameSource: FrameSource | null = null;
   /** Output canvas for rendering processed frames. */
   private outputCanvas: HTMLCanvasElement | null = null;
   /** Output MediaStreamTrack from canvas.captureStream(). */
   private outputTrack: MediaStreamTrack | null = null;
+  /** Active pipeline implementation. */
+  private pipelineImpl: Pipeline | null = null;
   /** Current effect mode ('blur', 'virtual', or 'passthrough'). */
   private mode: EffectMode = 'blur';
   /** Current debug visualization mode. */
@@ -103,40 +87,26 @@ export class BackgroundEffectsController {
   private targetFps = 30;
   /** Path to MediaPipe segmentation model file. */
   private segmentationModelPath = '/assets/mediapipe-models/selfie_segmenter_landscape.tflite';
-  /** Background image/video source for virtual background mode. */
-  private backgroundSource: BackgroundSourceImage | BackgroundSourceVideoFrame | null = null;
   /** Selected rendering pipeline. */
   private pipeline: PipelineType = 'passthrough';
-  /** Flag indicating if a frame is currently being processed by worker. */
-  private inFlight = false;
-  /** Pending frame waiting to be sent to worker (backpressure control). */
-  private pendingFrame: ImageBitmap | null = null;
   /** Cancel function for background video pump (stops video frame extraction). */
   private backgroundPumpCancel: (() => void) | null = null;
-  /** Counter for dropped frames (worker pipeline backpressure). */
+  /** Counter for dropped frames (backpressure and frame skips). */
   private droppedFrames = 0;
-  /** Frame counter for segmentation cadence (main and canvas2d pipelines). */
-  private mainFrameCount = 0;
-  /** Monotonic token to prevent out-of-order Canvas2D renders. */
-  private canvasFrameToken = 0;
-  /** Canvas2D rendering context for canvas2d pipeline. */
-  private canvasCtx: CanvasRenderingContext2D | null = null;
-  /** Foreground canvas for Canvas2D compositing. */
-  private foregroundCanvas: HTMLCanvasElement | null = null;
-  /** Foreground canvas 2D context. */
-  private foregroundCtx: CanvasRenderingContext2D | null = null;
-  /** Flag to prevent duplicate passthrough warnings in canvas2d pipeline. */
-  private canvasPassthroughLogged = false;
+  /** WebGL context loss handler (main-webgl2 pipeline). */
+  private webglContextLossHandler: ((event: Event) => void) | null = null;
+  /** WebGL context restoration handler (main-webgl2 pipeline). */
+  private webglContextRestoreHandler: (() => void) | null = null;
+  /** Tracks whether the main WebGL context is currently lost. */
+  private webglContextLost = false;
+  /** Pipeline to attempt to restore after context loss. */
+  private webglRestorePipeline: PipelineType | null = null;
   /** Last quality tier for main pipeline (for logging tier changes). */
   private lastMainTier: 'A' | 'B' | 'C' | 'D' | null = null;
   /** Last quality tier for worker pipeline (for logging tier changes). */
   private lastWorkerTier: 'A' | 'B' | 'C' | 'D' | null = null;
   /** Optional metrics callback for demo/telemetry use. */
   private onMetrics: ((metrics: Metrics) => void) | null = null;
-  /** Recent samples for main-thread metrics averaging. */
-  private readonly metricsSamples: {totalMs: number; segmentationMs: number; gpuMs: number}[] = [];
-  /** Max samples to keep for rolling averages. */
-  private readonly metricsMaxSamples = 30;
 
   /**
    * Creates a new background effects controller.
@@ -179,6 +149,8 @@ export class BackgroundEffectsController {
     this.targetFps = opts.targetFps ?? this.targetFps;
     this.segmentationModelPath = opts.segmentationModelPath ?? this.segmentationModelPath;
     this.onMetrics = opts.onMetrics ?? null;
+    this.droppedFrames = 0;
+    this.pipelineImpl = null;
 
     // Detect capabilities and select optimal pipeline
     const cap = detectCapabilities();
@@ -193,8 +165,8 @@ export class BackgroundEffectsController {
       });
     }
 
-    // Initialize video source for frame extraction
-    this.videoSource = new VideoSource(inputTrack);
+    // Initialize frame source for frame extraction
+    this.frameSource = new FrameSource(inputTrack);
     // Create output canvas for rendering
     this.outputCanvas = document.createElement('canvas');
 
@@ -204,41 +176,56 @@ export class BackgroundEffectsController {
     this.outputCanvas.height = settings.height ?? 480;
 
     // Initialize selected pipeline
-    if (this.pipeline === 'worker-webgl2') {
-      await this.initWorkerPipeline();
-    } else if (this.pipeline === 'main-webgl2') {
-      await this.initMainPipeline();
-    } else if (this.pipeline === 'canvas2d') {
-      await this.initCanvasPipeline();
-    }
+    await this.initPipeline(this.pipeline);
     // Start frame processing loop
-    await this.videoSource.start(async (timestamp, width, height) => {
-      if (!this.outputCanvas) {
-        return;
-      }
-      // Skip frames with invalid dimensions
-      if (width === 0 || height === 0) {
-        return;
-      }
-      // Resize canvas if dimensions changed
-      if (this.outputCanvas.width !== width || this.outputCanvas.height !== height) {
-        try {
-          this.outputCanvas.width = width;
-          this.outputCanvas.height = height;
-        } catch (error) {
-          this.logger.warn('Failed to resize output canvas', error);
+    await this.frameSource.start(
+      async (frame, timestamp, width, height) => {
+        if (!this.outputCanvas) {
+          try {
+            frame.close();
+          } catch {
+            // Ignore close errors.
+          }
+          return;
         }
-      }
+        // Skip frames with invalid dimensions
+        if (width === 0 || height === 0) {
+          try {
+            frame.close();
+          } catch {
+            // Ignore close errors.
+          }
+          return;
+        }
+        // Resize canvas if dimensions changed (skip if transferred to worker)
+        if (
+          !this.pipelineImpl?.isOutputCanvasTransferred() &&
+          (this.outputCanvas.width !== width || this.outputCanvas.height !== height)
+        ) {
+          try {
+            this.outputCanvas.width = width;
+            this.outputCanvas.height = height;
+          } catch (error) {
+            this.logger.warn('Failed to resize output canvas', error);
+          }
+        }
 
-      // Worker pipeline backpressure: skip if frame already in flight and pending frame exists
-      if (this.pipeline === 'worker-webgl2' && this.inFlight && this.pendingFrame) {
-        return;
-      }
-
-      // Extract frame from video element and process
-      const bitmap = await createImageBitmap(this.videoSource!.element);
-      this.handleFrame(bitmap, timestamp, width, height);
-    });
+        try {
+          await this.handleFrame(frame, timestamp, width, height);
+        } catch (error) {
+          try {
+            frame.close();
+          } catch {
+            // Ignore close errors.
+          }
+          this.logger.warn('Frame handling failed', error);
+        }
+      },
+      () => {
+        const count = this.handleFrameDrop();
+        this.pipelineImpl?.notifyDroppedFrames(count);
+      },
+    );
 
     // Create output MediaStreamTrack from canvas
     const captureStream = this.outputCanvas.captureStream(this.targetFps);
@@ -253,6 +240,9 @@ export class BackgroundEffectsController {
     }
     if (opts.backgroundVideo) {
       this.setBackgroundSource(opts.backgroundVideo);
+    }
+    if (opts.backgroundColor) {
+      this.setBackgroundColor(opts.backgroundColor);
     }
 
     return {
@@ -273,9 +263,7 @@ export class BackgroundEffectsController {
     if (this.isDev) {
       this.logger.info('Background effects mode', mode);
     }
-    if (this.worker) {
-      this.worker.postMessage({type: 'setMode', mode});
-    }
+    this.updatePipelineConfig();
   }
 
   /**
@@ -287,9 +275,7 @@ export class BackgroundEffectsController {
    */
   public setBlurStrength(value: number): void {
     this.blurStrength = Math.max(0, Math.min(1, value));
-    if (this.worker) {
-      this.worker.postMessage({type: 'setBlurStrength', blurStrength: this.blurStrength});
-    }
+    this.updatePipelineConfig();
   }
 
   /**
@@ -313,21 +299,11 @@ export class BackgroundEffectsController {
     if (source instanceof HTMLImageElement) {
       createImageBitmap(source)
         .then(bitmap => {
-          if (this.worker) {
-            this.worker.postMessage(
-              {
-                type: 'setBackgroundImage',
-                image: bitmap,
-                width: source.naturalWidth,
-                height: source.naturalHeight,
-              },
-              [bitmap],
-            );
+          if (!this.pipelineImpl) {
+            bitmap.close();
             return;
           }
-          this.backgroundSource?.bitmap?.close();
-          this.backgroundSource = {type: 'image', bitmap, width: source.naturalWidth, height: source.naturalHeight};
-          this.renderer?.setBackground(bitmap, source.naturalWidth, source.naturalHeight);
+          this.pipelineImpl.setBackgroundImage(bitmap, source.naturalWidth, source.naturalHeight);
         })
         .catch(error => this.logger.warn('Failed to set background image', error));
       return;
@@ -338,21 +314,33 @@ export class BackgroundEffectsController {
       return;
     }
 
-    if (this.worker) {
-      this.worker.postMessage(
-        {
-          type: 'setBackgroundImage',
-          image: source,
-          width: source.width,
-          height: source.height,
-        },
-        [source],
-      );
+    if (!this.pipelineImpl) {
+      source.close();
       return;
     }
-    this.backgroundSource?.bitmap?.close();
-    this.backgroundSource = {type: 'image', bitmap: source, width: source.width, height: source.height};
-    this.renderer?.setBackground(source, source.width, source.height);
+    this.pipelineImpl.setBackgroundImage(source, source.width, source.height);
+  }
+
+  /**
+   * Sets a solid-color background for virtual background mode.
+   *
+   * Creates a 1x1 ImageBitmap filled with the requested color and reuses the
+   * existing background source pipeline.
+   *
+   * @param color - CSS color string (e.g., '#112233' or 'rgb(0, 0, 0)').
+   */
+  public setBackgroundColor(color: string): void {
+    this.backgroundPumpCancel?.();
+    this.backgroundPumpCancel = null;
+    this.createSolidColorBitmap(color)
+      .then(bitmap => {
+        if (!this.pipelineImpl) {
+          bitmap.close();
+          return;
+        }
+        this.pipelineImpl.setBackgroundImage(bitmap, 1, 1);
+      })
+      .catch(error => this.logger.warn('Failed to set solid background color', error));
   }
 
   /**
@@ -365,9 +353,7 @@ export class BackgroundEffectsController {
    */
   public setDebugMode(mode: DebugMode): void {
     this.debugMode = mode;
-    if (this.worker) {
-      this.worker.postMessage({type: 'setDebugMode', debugMode: mode});
-    }
+    this.updatePipelineConfig();
   }
 
   /**
@@ -384,9 +370,7 @@ export class BackgroundEffectsController {
     if (this.isDev) {
       this.logger.info('Background effects quality mode', mode);
     }
-    if (this.worker) {
-      this.worker.postMessage({type: 'setQuality', quality: mode});
-    }
+    this.updatePipelineConfig();
   }
 
   /**
@@ -406,150 +390,154 @@ export class BackgroundEffectsController {
   public stop(): void {
     this.backgroundPumpCancel?.();
     this.backgroundPumpCancel = null;
-    this.pendingFrame?.close();
-    this.pendingFrame = null;
-    this.backgroundSource?.bitmap?.close();
-    this.backgroundSource = null;
+    this.pipelineImpl?.stop();
+    this.pipelineImpl = null;
 
-    if (this.worker) {
-      this.worker.postMessage({type: 'stop'});
-      this.worker.terminate();
-      this.worker = null;
-    }
-
-    this.renderer?.destroy();
-    this.renderer = null;
-
-    this.segmenter?.close();
-    this.segmenter = null;
-
-    this.videoSource?.stop();
-    this.videoSource = null;
+    this.frameSource?.stop();
+    this.frameSource = null;
 
     this.outputTrack?.stop();
     this.outputTrack = null;
 
+    this.detachWebGLContextHandlers();
+    this.webglContextLost = false;
+    this.webglRestorePipeline = null;
     this.outputCanvas = null;
-    this.canvasCtx = null;
-    this.foregroundCanvas = null;
-    this.foregroundCtx = null;
     this.onMetrics = null;
-    this.metricsSamples.length = 0;
+    this.pipeline = 'passthrough';
   }
 
-  /**
-   * Initializes the worker-based WebGL2 pipeline.
-   *
-   * Transfers OffscreenCanvas control to a Web Worker and initializes the worker
-   * with renderer, segmenter, and quality controller. The worker processes frames
-   * in a background thread to avoid blocking the main thread.
-   *
-   * Sets up message handlers for:
-   * - Metrics: Performance metrics from worker
-   * - Segmenter errors: Non-fatal errors (worker continues in bypass mode)
-   * - Frame processed: Backpressure control (allows next frame to be sent)
-   */
-  private async initWorkerPipeline(): Promise<void> {
+  private async initPipeline(type: PipelineType): Promise<void> {
     if (!this.outputCanvas) {
       return;
     }
+    this.detachWebGLContextHandlers();
+    this.pipelineImpl?.stop();
+    this.pipelineImpl = this.createPipeline(type);
+    this.pipeline = type;
 
-    const offscreen = this.outputCanvas.transferControlToOffscreen();
-    this.worker = new Worker(new URL('../worker/bgfx.worker.ts', import.meta.url), {type: 'module'});
-
-    const workerOptions: WorkerOptions = {
+    const config: PipelineConfig = {
       mode: this.mode,
       debugMode: this.debugMode,
-      quality: this.quality,
       blurStrength: this.blurStrength,
-      segmentationModelPath: this.segmentationModelPath,
-      targetFps: this.targetFps,
+      quality: this.quality,
     };
 
-    this.worker.onmessage = (event: MessageEvent<WorkerResponse>) => {
-      if (event.data.type === 'metrics') {
-        this.maybeLogWorkerTierChange(event.data.metrics.tier);
-        this.onMetrics?.(event.data.metrics);
-      }
-      if (event.data.type === 'segmenterError' && this.isDev) {
-        this.logger.warn('Worker segmenter init failed', event.data.error);
-      }
-      if (event.data.type === 'frameProcessed') {
-        this.inFlight = false;
-        if (this.pendingFrame) {
-          const next = this.pendingFrame;
-          this.pendingFrame = null;
-          this.sendFrameToWorker(next);
-        }
-      }
-    };
-
-    this.worker.postMessage(
-      {
-        type: 'init',
-        canvas: offscreen,
-        width: this.outputCanvas.width,
-        height: this.outputCanvas.height,
-        devicePixelRatio: window.devicePixelRatio,
-        options: workerOptions,
-      },
-      [offscreen],
-    );
-  }
-
-  /**
-   * Initializes the main-thread WebGL2 pipeline.
-   *
-   * Creates WebGL renderer, segmenter (GPU-accelerated), and quality controller
-   * on the main thread. Falls back to passthrough if segmenter initialization fails.
-   */
-  private async initMainPipeline(): Promise<void> {
-    if (!this.outputCanvas) {
-      return;
+    try {
+      await this.pipelineImpl.init({
+        outputCanvas: this.outputCanvas,
+        targetFps: this.targetFps,
+        segmentationModelPath: this.segmentationModelPath,
+        config,
+        onMetrics: this.onMetrics,
+        onTierChange: tier => this.handleTierChange(tier),
+        onDroppedFrame: () => this.handleFrameDrop(),
+        getDroppedFrames: () => this.droppedFrames,
+        onWorkerSegmenterError: error => {
+          if (this.isDev) {
+            this.logger.warn('Worker segmenter init failed', error);
+          }
+        },
+      });
+    } catch (error) {
+      this.logger.warn('Pipeline init failed, falling back to passthrough', error);
+      this.pipelineImpl?.stop();
+      this.pipelineImpl = new PassthroughPipeline();
+      this.pipeline = 'passthrough';
+      await this.pipelineImpl.init({
+        outputCanvas: this.outputCanvas,
+        targetFps: this.targetFps,
+        segmentationModelPath: this.segmentationModelPath,
+        config,
+        onMetrics: this.onMetrics,
+        onTierChange: tier => this.handleTierChange(tier),
+        onDroppedFrame: () => this.handleFrameDrop(),
+        getDroppedFrames: () => this.droppedFrames,
+      });
     }
 
-    this.renderer = new WebGLRenderer(this.outputCanvas, this.outputCanvas.width, this.outputCanvas.height);
-    this.segmenter = new Segmenter(this.segmentationModelPath, 'GPU');
-    this.qualityController = new QualityController(this.targetFps);
-    try {
-      await this.segmenter.init();
-    } catch (error) {
-      this.logger.warn('Segmentation init failed, falling back to passthrough', error);
-      this.segmenter = null;
-      this.pipeline = 'passthrough';
+    if (this.pipeline === 'main-webgl2') {
+      this.bindWebGLContextHandlers();
     }
   }
 
-  /**
-   * Initializes the Canvas2D fallback pipeline.
-   *
-   * Creates Canvas2D rendering contexts and segmenter (CPU-accelerated, since
-   * Canvas2D pipeline doesn't have WebGL2). Uses basic blur/filtering and compositing
-   * to honor effect mode, debug modes, and blur strength with lower visual quality.
-   * Falls back to passthrough if segmenter initialization fails.
-   */
-  private async initCanvasPipeline(): Promise<void> {
+  private createPipeline(type: PipelineType): Pipeline {
+    switch (type) {
+      case 'worker-webgl2':
+        return new WorkerWebGLPipeline();
+      case 'main-webgl2':
+        return new MainWebGLPipeline();
+      case 'canvas2d':
+        return new Canvas2DPipeline();
+      default:
+        return new PassthroughPipeline();
+    }
+  }
+
+  private updatePipelineConfig(): void {
+    if (!this.pipelineImpl) {
+      return;
+    }
+    this.pipelineImpl.updateConfig({
+      mode: this.mode,
+      debugMode: this.debugMode,
+      blurStrength: this.blurStrength,
+      quality: this.quality,
+    });
+  }
+
+  private bindWebGLContextHandlers(): void {
+    if (!this.outputCanvas || this.webglContextLossHandler || this.pipeline !== 'main-webgl2') {
+      return;
+    }
+    this.webglContextLossHandler = event => {
+      event.preventDefault();
+      this.handleWebGLContextLost();
+    };
+    this.webglContextRestoreHandler = () => {
+      void this.handleWebGLContextRestored();
+    };
+    this.outputCanvas.addEventListener('webglcontextlost', this.webglContextLossHandler as EventListener, {
+      passive: false,
+    });
+    this.outputCanvas.addEventListener('webglcontextrestored', this.webglContextRestoreHandler as EventListener);
+  }
+
+  private detachWebGLContextHandlers(): void {
+    if (!this.outputCanvas || !this.webglContextLossHandler || !this.webglContextRestoreHandler) {
+      return;
+    }
+    this.outputCanvas.removeEventListener('webglcontextlost', this.webglContextLossHandler as EventListener);
+    this.outputCanvas.removeEventListener('webglcontextrestored', this.webglContextRestoreHandler as EventListener);
+    this.webglContextLossHandler = null;
+    this.webglContextRestoreHandler = null;
+  }
+
+  private handleWebGLContextLost(): void {
+    if (this.webglContextLost || this.pipeline !== 'main-webgl2') {
+      return;
+    }
+    this.webglContextLost = true;
+    this.webglRestorePipeline = this.pipeline;
+    this.logger.warn('WebGL context lost; falling back to passthrough');
+    void this.initPipeline('passthrough');
+  }
+
+  private async handleWebGLContextRestored(): Promise<void> {
+    if (!this.webglContextLost || this.webglRestorePipeline !== 'main-webgl2') {
+      return;
+    }
     if (!this.outputCanvas) {
       return;
     }
-    const ctx = this.outputCanvas.getContext('2d');
-    if (!ctx) {
-      this.pipeline = 'passthrough';
-      return;
-    }
-    this.canvasCtx = ctx;
-    this.foregroundCanvas = document.createElement('canvas');
-    this.foregroundCanvas.width = this.outputCanvas.width;
-    this.foregroundCanvas.height = this.outputCanvas.height;
-    this.foregroundCtx = this.foregroundCanvas.getContext('2d');
-    // Canvas2D pipeline doesn't have WebGL2, so use CPU delegate
-    this.segmenter = new Segmenter(this.segmentationModelPath, 'CPU');
-    this.qualityController = new QualityController(this.targetFps);
+    this.logger.info('WebGL context restored; restarting main pipeline');
     try {
-      await this.segmenter.init();
+      await this.initPipeline('main-webgl2');
     } catch (error) {
-      this.logger.warn('Segmentation init failed, canvas2d will pass through', error);
-      this.segmenter = null;
+      this.logger.warn('Failed to restore WebGL pipeline; staying in passthrough', error);
+    } finally {
+      this.webglContextLost = false;
+      this.webglRestorePipeline = null;
     }
   }
 
@@ -567,354 +555,25 @@ export class BackgroundEffectsController {
    * @param width - Frame width in pixels.
    * @param height - Frame height in pixels.
    */
-  private handleFrame(frame: ImageBitmap, timestamp: number, width: number, height: number): void {
+  private async handleFrame(frame: ImageBitmap, timestamp: number, width: number, height: number): Promise<void> {
+    if (!this.pipelineImpl) {
+      frame.close();
+      return;
+    }
+    await this.pipelineImpl.processFrame(frame, timestamp, width, height);
+  }
+
+  private handleFrameDrop(): number {
+    this.droppedFrames += 1;
+    return this.droppedFrames;
+  }
+
+  private handleTierChange(tier: 'A' | 'B' | 'C' | 'D'): void {
     if (this.pipeline === 'worker-webgl2') {
-      this.sendFrameToWorker(frame, timestamp, width, height);
+      this.maybeLogWorkerTierChange(tier);
       return;
     }
-
-    if (this.pipeline === 'main-webgl2') {
-      this.renderOnMain(frame, timestamp, width, height).catch(error => this.logger.warn('Main render failed', error));
-      return;
-    }
-
-    if (this.pipeline === 'canvas2d') {
-      this.renderOnCanvas2D(frame, width, height);
-      return;
-    }
-
-    this.renderPassthrough(frame, width, height);
-  }
-
-  /**
-   * Sends a frame to the worker for processing.
-   *
-   * Implements backpressure control: if a frame is already in flight, stores
-   * the new frame as pending and increments dropped frame counter. The pending
-   * frame is sent when the worker signals frameProcessed.
-   *
-   * The frame is transferred (not cloned) for performance.
-   *
-   * @param frame - Video frame as ImageBitmap (will be transferred).
-   * @param timestamp - Optional frame timestamp (defaults to current time).
-   * @param width - Optional frame width (defaults to frame.width).
-   * @param height - Optional frame height (defaults to frame.height).
-   */
-  private sendFrameToWorker(frame: ImageBitmap, timestamp?: number, width?: number, height?: number): void {
-    if (!this.worker) {
-      frame.close();
-      return;
-    }
-
-    if (this.inFlight) {
-      this.droppedFrames += 1;
-      this.pendingFrame?.close();
-      this.pendingFrame = frame;
-      this.worker.postMessage({type: 'setDroppedFrames', droppedFrames: this.droppedFrames});
-      return;
-    }
-
-    this.inFlight = true;
-    this.worker.postMessage(
-      {
-        type: 'frame',
-        frame,
-        timestamp: timestamp ?? performance.now() / 1000,
-        width: width ?? frame.width,
-        height: height ?? frame.height,
-      },
-      [frame],
-    );
-  }
-
-  /**
-   * Renders a frame on the main thread using WebGL2.
-   *
-   * Processing steps:
-   * 1. Resolves quality tier (adaptive or fixed)
-   * 2. Runs segmentation if cadence allows
-   * 3. Sets background source if available
-   * 4. Renders frame with effects
-   * 5. Updates quality controller metrics (adaptive mode)
-   *
-   * @param frame - Video frame as ImageBitmap.
-   * @param timestamp - Frame timestamp in seconds.
-   * @param width - Frame width in pixels.
-   * @param height - Frame height in pixels.
-   */
-  private async renderOnMain(frame: ImageBitmap, timestamp: number, width: number, height: number): Promise<void> {
-    if (!this.renderer) {
-      frame.close();
-      return;
-    }
-
-    if (!this.segmenter || !this.qualityController) {
-      this.renderer.configure(width, height, this.resolveMainQuality(), this.mode, this.debugMode, this.blurStrength);
-      this.renderer.render(frame, null);
-      frame.close();
-      return;
-    }
-
-    const qualityTier = this.resolveMainQuality();
-    this.renderer.configure(width, height, qualityTier, this.mode, this.debugMode, this.blurStrength);
-
-    let mask: ImageBitmap | null = null;
-    let segmentationMs = 0;
-    if (!qualityTier.bypass && qualityTier.segmentationCadence > 0) {
-      this.mainFrameCount += 1;
-      if (this.mainFrameCount % qualityTier.segmentationCadence === 0) {
-        this.segmenter.configure(qualityTier.segmentationWidth, qualityTier.segmentationHeight);
-        const segStart = performance.now();
-        const result = await this.segmenter.segment(frame, timestamp * 1000);
-        segmentationMs = performance.now() - segStart;
-        mask = result.mask;
-      }
-    }
-
-    if (this.backgroundSource) {
-      this.renderer.setBackground(
-        this.backgroundSource.bitmap,
-        this.backgroundSource.width,
-        this.backgroundSource.height,
-      );
-    }
-
-    const gpuStart = performance.now();
-    this.renderer.render(frame, mask);
-    const gpuMs = performance.now() - gpuStart;
-
-    frame.close();
-    mask?.close();
-
-    if (this.quality === 'auto' && this.qualityController) {
-      const updatedTier = this.qualityController.update(
-        {totalMs: segmentationMs + gpuMs, segmentationMs, gpuMs},
-        this.getQualityMode(),
-      );
-      this.maybeLogMainTierChange(updatedTier.tier);
-    }
-    this.updateMainMetrics(segmentationMs + gpuMs, segmentationMs, gpuMs, qualityTier.tier);
-  }
-
-  private updateMainMetrics(totalMs: number, segmentationMs: number, gpuMs: number, tier: 'A' | 'B' | 'C' | 'D') {
-    if (!this.onMetrics) {
-      return;
-    }
-    this.metricsSamples.push({totalMs, segmentationMs, gpuMs});
-    if (this.metricsSamples.length > this.metricsMaxSamples) {
-      this.metricsSamples.shift();
-    }
-    const totals = this.metricsSamples.reduce(
-      (acc, sample) => {
-        acc.totalMs += sample.totalMs;
-        acc.segmentationMs += sample.segmentationMs;
-        acc.gpuMs += sample.gpuMs;
-        return acc;
-      },
-      {totalMs: 0, segmentationMs: 0, gpuMs: 0},
-    );
-    const count = this.metricsSamples.length || 1;
-    const metrics: Metrics = {
-      avgTotalMs: totals.totalMs / count,
-      avgSegmentationMs: totals.segmentationMs / count,
-      avgGpuMs: totals.gpuMs / count,
-      droppedFrames: this.droppedFrames,
-      tier,
-    };
-    this.onMetrics(metrics);
-  }
-
-  /**
-   * Renders a frame using Canvas2D API (fallback pipeline).
-   *
-   * Uses basic Canvas2D operations:
-   * - Blur filter for background blur (honors blurStrength)
-   * - Background image compositing for virtual mode
-   * - Debug mode visualization using the mask
-   * - Global composite operations for mask compositing
-   * - Async segmentation (doesn't block rendering)
-   *
-   * This pipeline has lower quality than WebGL2 but is widely supported
-   * and doesn't require WebGL2.
-   *
-   * @param frame - Video frame as ImageBitmap.
-   * @param width - Frame width in pixels.
-   * @param height - Frame height in pixels.
-   */
-  private renderOnCanvas2D(frame: ImageBitmap, width: number, height: number): void {
-    if (!this.outputCanvas || !this.canvasCtx) {
-      frame.close();
-      return;
-    }
-    const ctx = this.canvasCtx;
-    this.foregroundCanvas!.width = width;
-    this.foregroundCanvas!.height = height;
-    ctx.clearRect(0, 0, width, height);
-
-    if (this.mode === 'passthrough' || !this.segmenter || !this.qualityController) {
-      if (!this.segmenter && !this.canvasPassthroughLogged) {
-        this.logger.warn('Canvas2D pipeline running without segmenter; output will be passthrough');
-        this.canvasPassthroughLogged = true;
-      }
-      ctx.drawImage(frame, 0, 0, width, height);
-      frame.close();
-      return;
-    }
-
-    const qualityTier = this.resolveMainQuality();
-    this.mainFrameCount += 1;
-    const token = ++this.canvasFrameToken;
-
-    const renderMask = async () => {
-      if (qualityTier.segmentationCadence > 0 && this.mainFrameCount % qualityTier.segmentationCadence === 0) {
-        this.segmenter!.configure(qualityTier.segmentationWidth, qualityTier.segmentationHeight);
-        return this.segmenter!.segment(frame, performance.now());
-      }
-      return {mask: null, width: 0, height: 0, durationMs: 0};
-    };
-
-    renderMask().then(result => {
-      if (token !== this.canvasFrameToken) {
-        result.mask?.close();
-        frame.close();
-        return;
-      }
-      const mask = result.mask;
-      const renderStart = performance.now();
-
-      if (this.debugMode !== 'off' && mask) {
-        ctx.clearRect(0, 0, width, height);
-        if (this.debugMode === 'maskOnly') {
-          ctx.drawImage(mask, 0, 0, width, height);
-        } else if (this.debugMode === 'maskOverlay') {
-          ctx.drawImage(frame, 0, 0, width, height);
-          ctx.globalAlpha = 0.5;
-          ctx.fillStyle = '#00ff00';
-          ctx.globalCompositeOperation = 'source-atop';
-          ctx.drawImage(mask, 0, 0, width, height);
-          ctx.globalCompositeOperation = 'source-over';
-          ctx.globalAlpha = 1;
-        } else if (this.debugMode === 'edgeOnly') {
-          ctx.drawImage(mask, 0, 0, width, height);
-        }
-        mask.close();
-        frame.close();
-        const renderMs = performance.now() - renderStart;
-        this.updateMainMetrics(result.durationMs + renderMs, result.durationMs, renderMs, qualityTier.tier);
-        return;
-      }
-
-      ctx.clearRect(0, 0, width, height);
-      const blurPx = Math.round(2 + this.blurStrength * 10);
-      if (this.mode === 'virtual' && this.backgroundSource) {
-        ctx.drawImage(
-          this.backgroundSource.bitmap,
-          0,
-          0,
-          this.backgroundSource.width,
-          this.backgroundSource.height,
-          0,
-          0,
-          width,
-          height,
-        );
-      } else {
-        ctx.filter = `blur(${blurPx}px)`;
-        ctx.drawImage(frame, 0, 0, width, height);
-        ctx.filter = 'none';
-      }
-
-      if (mask && this.foregroundCtx) {
-        this.foregroundCtx.clearRect(0, 0, width, height);
-        this.foregroundCtx.drawImage(frame, 0, 0, width, height);
-        this.foregroundCtx.globalCompositeOperation = 'destination-in';
-        this.foregroundCtx.drawImage(mask, 0, 0, width, height);
-        this.foregroundCtx.globalCompositeOperation = 'source-over';
-        ctx.drawImage(this.foregroundCanvas!, 0, 0, width, height);
-        mask.close();
-      } else {
-        ctx.drawImage(frame, 0, 0, width, height);
-      }
-
-      frame.close();
-      const renderMs = performance.now() - renderStart;
-      this.updateMainMetrics(result.durationMs + renderMs, result.durationMs, renderMs, qualityTier.tier);
-    });
-  }
-
-  /**
-   * Renders frame without processing (passthrough mode).
-   *
-   * Simply draws the input frame to the output canvas without any effects.
-   * Used when no processing pipeline is available or when explicitly set to passthrough.
-   *
-   * @param frame - Video frame as ImageBitmap.
-   * @param width - Frame width in pixels.
-   * @param height - Frame height in pixels.
-   */
-  private renderPassthrough(frame: ImageBitmap, width: number, height: number): void {
-    if (!this.outputCanvas) {
-      frame.close();
-      return;
-    }
-    const ctx = this.outputCanvas.getContext('2d');
-    if (!ctx) {
-      frame.close();
-      return;
-    }
-    ctx.drawImage(frame, 0, 0, width, height);
-    frame.close();
-  }
-
-  /**
-   * Resolves quality tier parameters for main-thread pipelines.
-   *
-   * Returns quality tier based on:
-   * - Fixed quality mode: Uses the specified tier
-   * - Auto quality mode: Gets current adaptive tier from quality controller
-   * - Fallback: Returns bypass tier (D) if quality controller unavailable
-   *
-   * @returns Quality tier parameters for rendering configuration.
-   */
-  private resolveMainQuality(): ReturnType<QualityController['getTier']> {
-    if (!this.qualityController) {
-      return {
-        tier: 'D',
-        segmentationWidth: 0,
-        segmentationHeight: 0,
-        segmentationCadence: 0,
-        maskRefineScale: 1,
-        blurDownsampleScale: 1,
-        blurRadius: 0,
-        bilateralRadius: 0,
-        bilateralSpatialSigma: 0,
-        bilateralRangeSigma: 0,
-        softLow: 0.3,
-        softHigh: 0.65,
-        matteLow: 0.45,
-        matteHigh: 0.6,
-        matteHysteresis: 0.04,
-        temporalAlpha: 0,
-        bypass: true,
-      };
-    }
-
-    if (this.quality !== 'auto') {
-      this.qualityController.setTier(this.quality);
-    }
-    return this.qualityController.getTier(this.getQualityMode());
-  }
-
-  /**
-   * Converts effect mode to quality mode.
-   *
-   * Quality controller uses 'blur' or 'virtual' modes, while effect mode
-   * can also be 'passthrough' (which maps to 'blur' for quality purposes).
-   *
-   * @returns Quality mode ('blur' or 'virtual').
-   */
-  private getQualityMode(): Mode {
-    return this.mode === 'virtual' ? 'virtual' : 'blur';
+    this.maybeLogMainTierChange(tier);
   }
 
   /**
@@ -945,6 +604,23 @@ export class BackgroundEffectsController {
       this.logger.info('Worker pipeline quality tier change', {from: this.lastWorkerTier, to: tier});
       this.lastWorkerTier = tier;
     }
+  }
+
+  private async createSolidColorBitmap(color: string): Promise<ImageBitmap> {
+    const canvas =
+      typeof OffscreenCanvas !== 'undefined' ? new OffscreenCanvas(1, 1) : document.createElement('canvas');
+    const isOffscreen = typeof OffscreenCanvas !== 'undefined' && canvas instanceof OffscreenCanvas;
+    if (!isOffscreen) {
+      (canvas as HTMLCanvasElement).width = 1;
+      (canvas as HTMLCanvasElement).height = 1;
+    }
+    const ctx = canvas.getContext('2d');
+    if (!ctx) {
+      throw new Error('Failed to create 2D context for solid background.');
+    }
+    ctx.fillStyle = color;
+    ctx.fillRect(0, 0, 1, 1);
+    return createImageBitmap(canvas as OffscreenCanvas | HTMLCanvasElement);
   }
 
   /**
@@ -979,21 +655,11 @@ export class BackgroundEffectsController {
 
       try {
         const bitmap = await createImageBitmap(video);
-        if (this.worker) {
-          this.worker.postMessage(
-            {
-              type: 'setBackgroundVideo',
-              video: bitmap,
-              width: video.videoWidth,
-              height: video.videoHeight,
-            },
-            [bitmap],
-          );
-          return;
+        if (!this.pipelineImpl) {
+          bitmap.close();
+        } else {
+          this.pipelineImpl.setBackgroundVideoFrame(bitmap, video.videoWidth, video.videoHeight);
         }
-        this.backgroundSource?.bitmap?.close();
-        this.backgroundSource = {type: 'video', bitmap, width: video.videoWidth, height: video.videoHeight};
-        this.renderer?.setBackground(bitmap, video.videoWidth, video.videoHeight);
       } catch (error) {
         this.logger.warn('Failed to capture background video frame', error);
       }
@@ -1018,8 +684,7 @@ export class BackgroundEffectsController {
       if (rafHandle !== null) {
         window.cancelAnimationFrame(rafHandle);
       }
-      this.backgroundSource?.bitmap?.close();
-      this.backgroundSource = null;
+      this.pipelineImpl?.clearBackground();
     };
   }
 }

@@ -559,9 +559,9 @@ describe('Segmenter', () => {
 
       const result = await segmenter.segment(mockFrame, 1000);
 
-      expect(mockMaskCtx.clearRect).toHaveBeenCalled();
+      expect(mockMaskCtx.clearRect).not.toHaveBeenCalled();
       expect(mockMaskCtx.putImageData).not.toHaveBeenCalled();
-      expect(result.mask).toBeDefined(); // createImageBitmap still called
+      expect(result.mask).toBeNull();
 
       restoreOffscreenCanvas(segmenter);
     });
@@ -575,8 +575,8 @@ describe('Segmenter', () => {
 
       const result = await segmenter.segment(mockFrame, 1000);
 
-      expect(mockMaskCtx.clearRect).toHaveBeenCalled();
-      expect(result.mask).toBeDefined();
+      expect(mockMaskCtx.clearRect).not.toHaveBeenCalled();
+      expect(result.mask).toBeNull();
 
       restoreOffscreenCanvas(segmenter);
     });

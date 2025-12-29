@@ -35,12 +35,16 @@ import {FilesetResolver, ImageSegmenter} from '@mediapipe/tasks-vision';
 export interface SegmentationResult {
   /** Segmentation mask as ImageBitmap, or null if segmentation failed. */
   mask: ImageBitmap | null;
+  /** Segmentation mask as WebGLTexture (zero-copy GPU path), or null if unavailable. */
+  maskTexture: WebGLTexture | null;
   /** Width of the mask in pixels. */
   width: number;
   /** Height of the mask in pixels. */
   height: number;
   /** Time taken for segmentation in milliseconds. */
   durationMs: number;
+  /** Releases MediaPipe mask resources after rendering. */
+  release: () => void;
 }
 
 /**
@@ -78,10 +82,12 @@ export class Segmenter {
    * @param modelPath - Path to the MediaPipe segmentation model file.
    * @param delegate - Inference delegate ('CPU' or 'GPU'). GPU is faster but requires
    *                  WebGL support. Defaults to 'CPU' for broader compatibility.
+   * @param gpuCanvas - Canvas bound to the WebGL context used by the GPU delegate.
    */
   constructor(
     private readonly modelPath: string,
     private readonly delegate: 'CPU' | 'GPU' = 'CPU',
+    private readonly gpuCanvas?: HTMLCanvasElement | OffscreenCanvas,
   ) {}
 
   /**
@@ -98,10 +104,9 @@ export class Segmenter {
    * @throws May throw if model files are missing or initialization fails.
    */
   public async init(): Promise<void> {
-    console.info(`[Segmenter] init delegate=${this.delegate} model=${this.modelPath}`);
-    // Probe for required assets (non-blocking, logs warnings if missing)
-    await this.probeAsset(`${this.wasmBasePath}/vision_wasm_internal.wasm`, 'MediaPipe wasm');
-    await this.probeAsset(this.modelPath, 'segmentation model');
+    // Probe for required assets (non-blocking)
+    await this.probeAsset(`${this.wasmBasePath}/vision_wasm_internal.wasm`);
+    await this.probeAsset(this.modelPath);
     // Resolve MediaPipe fileset
     const fileset = await FilesetResolver.forVisionTasks(this.wasmBasePath);
     // Create segmenter with video mode and confidence masks
@@ -110,6 +115,7 @@ export class Segmenter {
         modelAssetPath: this.modelPath,
         delegate: this.delegate,
       },
+      ...(this.gpuCanvas ? {canvas: this.gpuCanvas} : {}),
       runningMode: 'VIDEO', // Video mode for temporal consistency
       outputCategoryMask: false, // We only need confidence masks
       outputConfidenceMasks: true, // Confidence values (0-1) for smooth edges
@@ -183,7 +189,7 @@ export class Segmenter {
   public async segment(frame: ImageBitmap, timestampMs: number): Promise<SegmentationResult> {
     // Validate segmenter and canvases are initialized
     if (!this.segmenter || !this.resizeCtx || !this.maskCtx || !this.resizeCanvas || !this.maskCanvas) {
-      return {mask: null, width: 0, height: 0, durationMs: 0};
+      return {mask: null, maskTexture: null, width: 0, height: 0, durationMs: 0, release: () => {}};
     }
 
     const start = performance.now();
@@ -196,35 +202,81 @@ export class Segmenter {
       const result = this.segmenter.segmentForVideo(this.resizeCanvas, timestampMs);
       masks = result.confidenceMasks ?? [];
       // Step 3: Convert MediaPipe mask format to ImageData
-      const maskImage = this.maskToImageData(masks[0] ?? null);
+      const primaryMask = masks[0] ?? null;
+      const release = () => {
+        masks.forEach(mask => {
+          try {
+            mask?.close();
+          } catch {
+            // Ignore errors when closing (mask may already be closed)
+          }
+        });
+      };
+
+      if (!primaryMask) {
+        const durationMs = performance.now() - start;
+        return {mask: null, maskTexture: null, width: 0, height: 0, durationMs, release};
+      }
+
+      if (
+        primaryMask &&
+        this.gpuCanvas &&
+        typeof primaryMask.hasWebGLTexture === 'function' &&
+        primaryMask.hasWebGLTexture() &&
+        primaryMask.canvas === this.gpuCanvas &&
+        typeof primaryMask.getAsWebGLTexture === 'function'
+      ) {
+        const maskTexture = primaryMask.getAsWebGLTexture();
+        const durationMs = performance.now() - start;
+        return {
+          mask: null,
+          maskTexture,
+          width: primaryMask.width ?? this.width,
+          height: primaryMask.height ?? this.height,
+          durationMs,
+          release,
+        };
+      }
+
+      const maskImage = this.maskToImageData(primaryMask);
+      if (!maskImage) {
+        const durationMs = performance.now() - start;
+        return {mask: null, maskTexture: null, width: 0, height: 0, durationMs, release};
+      }
 
       // Step 4: Render mask to canvas
       this.maskCtx.clearRect(0, 0, this.width, this.height);
-      if (maskImage) {
-        this.maskCtx.putImageData(maskImage, 0, 0);
-      }
+      this.maskCtx.putImageData(maskImage, 0, 0);
 
       // Step 5: Create ImageBitmap from mask canvas
       const mask = await createImageBitmap(this.maskCanvas);
       const durationMs = performance.now() - start;
       return {
         mask,
+        maskTexture: null,
         width: this.width,
         height: this.height,
         durationMs,
+        release,
       };
     } catch (error) {
       console.warn('[Segmenter] segment failed', error);
-      return {mask: null, width: 0, height: 0, durationMs: performance.now() - start};
-    } finally {
-      // Step 6: Clean up MediaPipe mask resources to prevent memory leaks
-      masks.forEach(mask => {
-        try {
-          mask?.close();
-        } catch {
-          // Ignore errors when closing (mask may already be closed)
-        }
-      });
+      return {
+        mask: null,
+        maskTexture: null,
+        width: 0,
+        height: 0,
+        durationMs: performance.now() - start,
+        release: () => {
+          masks.forEach(mask => {
+            try {
+              mask?.close();
+            } catch {
+              // Ignore errors when closing (mask may already be closed)
+            }
+          });
+        },
+      };
     }
   }
 
@@ -336,9 +388,8 @@ export class Segmenter {
    * Useful for debugging missing files in development environments.
    *
    * @param url - URL of the asset to check.
-   * @param label - Human-readable label for logging (e.g., 'MediaPipe wasm').
    */
-  private async probeAsset(url: string, label: string): Promise<void> {
+  private async probeAsset(url: string): Promise<void> {
     // Skip probe if fetch is unavailable (e.g., Node.js environment)
     if (typeof fetch !== 'function') {
       return;
@@ -347,12 +398,7 @@ export class Segmenter {
       // Use HEAD request to check availability without downloading
       const response = await fetch(url, {method: 'HEAD'});
       if (!response.ok) {
-        console.warn(`[Segmenter] ${label} check failed (${response.status}): ${url}`);
-      } else {
-        console.info(`[Segmenter] ${label} available: ${url}`);
       }
-    } catch (error) {
-      console.warn(`[Segmenter] ${label} check error: ${url}`, error);
-    }
+    } catch (error) {}
   }
 }

@@ -31,47 +31,12 @@
  * (Web Worker), enabling background thread processing for better performance.
  */
 
-// @ts-ignore
-import compositeBlurFrag from '../shaders/compositeBlur.frag';
-// @ts-ignore
-import compositeVirtualFrag from '../shaders/compositeVirtual.frag';
-// @ts-ignore
-import debugOverlayFrag from '../shaders/debugOverlay.frag';
-// @ts-ignore
-import downsampleFrag from '../shaders/downsample.frag';
-// @ts-ignore
-import fullscreenVert from '../shaders/fullscreen.vert';
-// @ts-ignore
-import gaussianBlurHFrag from '../shaders/gaussianBlurH.frag';
-// @ts-ignore
-import gaussianBlurVFrag from '../shaders/gaussianBlurV.frag';
-// @ts-ignore
-import jointBilateralFrag from '../shaders/jointBilateralMask.frag';
-// @ts-ignore
-import maskUpsampleFrag from '../shaders/maskUpsample.frag';
-// @ts-ignore
-import temporalMaskFrag from '../shaders/temporalMask.frag';
+import {BackgroundRenderer} from './BackgroundRenderer';
+import {RenderPasses} from './RenderPasses';
+import {ShaderPrograms} from './ShaderPrograms';
+import {WebGLResources, type Size} from './WebGLResources';
+
 import type {DebugMode, EffectMode, QualityTierParams} from '../types';
-
-/**
- * WebGL program information including program handle and uniform locations.
- */
-interface ProgramInfo {
-  /** Compiled and linked WebGL program. */
-  program: WebGLProgram;
-  /** Map of uniform names to their locations (null if uniform not found). */
-  uniforms: Record<string, WebGLUniformLocation | null>;
-}
-
-/**
- * Texture or canvas dimensions.
- */
-interface Size {
-  /** Width in pixels. */
-  width: number;
-  /** Height in pixels. */
-  height: number;
-}
 
 /**
  * Renderer configuration state.
@@ -91,15 +56,21 @@ interface RendererConfig {
   blurStrength: number;
 }
 
-/**
- * Background texture information for virtual background mode.
- */
-interface BackgroundInfo {
-  /** WebGL texture containing background image/video. */
-  texture: WebGLTexture | null;
-  /** Background dimensions. */
-  size: Size | null;
+interface MaskInputBitmap {
+  type: 'bitmap';
+  bitmap: ImageBitmap;
+  width: number;
+  height: number;
 }
+
+interface MaskInputTexture {
+  type: 'texture';
+  texture: WebGLTexture;
+  width: number;
+  height: number;
+}
+
+type MaskInput = MaskInputBitmap | MaskInputTexture;
 
 /**
  * WebGL2 renderer for background effects processing.
@@ -121,18 +92,16 @@ export class WebGLRenderer {
   private readonly gl: WebGL2RenderingContext;
   /** Vertex array object for fullscreen quad rendering. */
   private readonly vao: WebGLVertexArrayObject;
-  /** Map of shader program names to compiled program info. */
-  private readonly programs: Record<string, ProgramInfo>;
-  /** Map of texture names to WebGL texture objects. */
-  private readonly textures: Map<string, WebGLTexture> = new Map();
-  /** Map of framebuffer names to WebGL framebuffer objects. */
-  private readonly framebuffers: Map<string, WebGLFramebuffer> = new Map();
-  /** Map of texture names to their dimensions. */
-  private sizes: Record<string, Size> = {};
+  /** Shader program manager. */
+  private readonly programs: ShaderPrograms;
+  /** WebGL resource manager for textures/framebuffers. */
+  private readonly resources: WebGLResources;
+  /** Render pass helpers. */
+  private readonly passes: RenderPasses;
   /** Current renderer configuration. */
   private config: RendererConfig;
-  /** Background texture for virtual background mode. */
-  private background: BackgroundInfo = {texture: null, size: null};
+  /** Background renderer for virtual background mode. */
+  private readonly background: BackgroundRenderer;
   /** Flag indicating if maskPrev has been initialized (for temporal stabilization). */
   private maskPrevInitialized = false;
 
@@ -162,7 +131,11 @@ export class WebGLRenderer {
     // Create fullscreen quad for rendering
     this.vao = this.createQuad();
     // Compile all shader programs
-    this.programs = this.createPrograms();
+    this.programs = new ShaderPrograms(this.gl);
+    // Initialize resources and passes
+    this.resources = new WebGLResources(this.gl);
+    this.passes = new RenderPasses(this.gl, this.programs, this.resources);
+    this.background = new BackgroundRenderer(this.gl);
     // Initialize default configuration
     this.config = {
       width,
@@ -225,7 +198,10 @@ export class WebGLRenderer {
   ): void {
     this.config = {width, height, quality, mode, debugMode, blurStrength};
     // Ensure all textures and framebuffers exist with correct sizes
-    this.ensureResources();
+    const maskPrevWasNew = this.resources.ensureResources({width, height, quality});
+    if (maskPrevWasNew) {
+      this.maskPrevInitialized = false;
+    }
   }
 
   /**
@@ -240,32 +216,7 @@ export class WebGLRenderer {
    * @param height - Image height in pixels.
    */
   public setBackground(image: ImageBitmap | null, width: number, height: number): void {
-    const gl = this.gl;
-    if (!image) {
-      if (this.background.texture) {
-        gl.deleteTexture(this.background.texture);
-      }
-      this.background = {texture: null, size: null};
-      return;
-    }
-
-    const texture = this.background.texture ?? gl.createTexture();
-    if (!texture) {
-      return;
-    }
-
-    gl.bindTexture(gl.TEXTURE_2D, texture);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-    gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, 0);
-    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image);
-
-    this.background = {
-      texture,
-      size: {width, height},
-    };
+    this.background.setBackground(image, width, height);
   }
 
   /**
@@ -293,34 +244,47 @@ export class WebGLRenderer {
    * - Blur mode: Composite with blurred background
    *
    * @param frame - Input video frame as ImageBitmap.
-   * @param maskLow - Low-resolution segmentation mask, or null if not available
-   *                  (will use previous frame's mask for temporal consistency).
+   * @param maskLow - Low-resolution segmentation mask (bitmap or GPU texture),
+   *                  or null if not available (will use previous frame's mask).
    */
-  public render(frame: ImageBitmap, maskLow: ImageBitmap | null): void {
+  public render(frame: ImageBitmap, maskLow: MaskInput | null): void {
     const gl = this.gl;
     const {quality, width, height, mode, debugMode, blurStrength} = this.config;
 
     // Ensure all textures and framebuffers are ready
-    this.ensureResources();
+    const maskPrevWasNew = this.resources.ensureResources({width, height, quality});
+    if (maskPrevWasNew) {
+      this.maskPrevInitialized = false;
+    }
 
     gl.bindVertexArray(this.vao);
     // Upload input frame to video texture
-    this.uploadTexture('videoTex', frame, width, height, undefined, undefined, true);
+    this.resources.uploadTexture('videoTex', frame, width, height, undefined, undefined, true);
     // Upload low-res mask if available
+    let maskTexture: WebGLTexture | null = null;
+    let maskSize: Size | null = null;
     if (maskLow) {
-      this.uploadTexture(
-        'maskLowTex',
-        maskLow,
-        quality.segmentationWidth,
-        quality.segmentationHeight,
-        gl.RGBA8,
-        gl.RGBA,
-        true,
-      );
-    } else if (!this.textures.get('maskPrev')) {
+      if (maskLow.type === 'bitmap') {
+        this.resources.uploadTexture(
+          'maskLowTex',
+          maskLow.bitmap,
+          maskLow.width,
+          maskLow.height,
+          gl.RGBA8,
+          gl.RGBA,
+          true,
+        );
+        maskTexture = this.resources.getTexture('maskLowTex') ?? null;
+        maskSize = {width: maskLow.width, height: maskLow.height};
+      } else {
+        this.resources.ensureExternalMaskTexture(maskLow.texture);
+        maskTexture = maskLow.texture;
+        maskSize = {width: maskLow.width, height: maskLow.height};
+      }
+    } else if (!this.resources.getTexture('maskPrev')) {
       // No mask and no previous mask: passthrough
-      this.drawSimple('compositePassthrough', null, width, height, {
-        uSrc: this.textures.get('videoTex'),
+      this.passes.drawSimple('compositePassthrough', null, width, height, {
+        uSrc: this.resources.getTexture('videoTex'),
         uTexelSize: [1 / width, 1 / height],
       });
       return;
@@ -328,39 +292,41 @@ export class WebGLRenderer {
 
     // Bypass mode: passthrough without processing
     if (quality.bypass || mode === 'passthrough') {
-      this.drawSimple('compositePassthrough', null, width, height, {
-        uSrc: this.textures.get('videoTex'),
+      this.passes.drawSimple('compositePassthrough', null, width, height, {
+        uSrc: this.resources.getTexture('videoTex'),
         uTexelSize: [1 / width, 1 / height],
       });
       return;
     }
 
     // Pass 1: Downsample video for blur (reduces blur processing cost)
-    this.drawToTexture('downsample', 'videoSmallTex', this.sizes.videoSmallTex, {
-      uSrc: this.textures.get('videoTex'),
+    this.passes.drawToTexture('downsample', 'videoSmallTex', this.resources.getSize('videoSmallTex')!, {
+      uSrc: this.resources.getTexture('videoTex'),
       uTexelSize: [1 / width, 1 / height],
     });
 
     // Pass 2: Upsample mask to refine resolution
-    if (maskLow) {
+    if (maskTexture && maskSize) {
       // Use new low-res mask from segmentation
-      this.drawToTexture('maskUpsample', 'maskRefineA', this.sizes.maskRefineA, {
-        uSrc: this.textures.get('maskLowTex'),
-        uTexelSize: [1 / quality.segmentationWidth, 1 / quality.segmentationHeight],
+      this.passes.drawToTexture('maskUpsample', 'maskRefineA', this.resources.getSize('maskRefineA')!, {
+        uSrc: maskTexture,
+        uTexelSize: [1 / maskSize.width, 1 / maskSize.height],
       });
     } else {
       // Reuse previous frame's mask (cadence > 1)
-      this.drawToTexture('maskUpsample', 'maskRefineA', this.sizes.maskRefineA, {
-        uSrc: this.textures.get('maskPrev'),
-        uTexelSize: [1 / this.sizes.maskPrev.width, 1 / this.sizes.maskPrev.height],
+      const maskPrevSize = this.resources.getSize('maskPrev')!;
+      this.passes.drawToTexture('maskUpsample', 'maskRefineA', this.resources.getSize('maskRefineA')!, {
+        uSrc: this.resources.getTexture('maskPrev'),
+        uTexelSize: [1 / maskPrevSize.width, 1 / maskPrevSize.height],
       });
     }
 
     // Pass 3: Joint bilateral filter (edge-preserving smoothing using video as guide)
-    this.drawToTexture('jointBilateral', 'maskRefineB', this.sizes.maskRefineB, {
-      uMask: this.textures.get('maskRefineA'),
-      uVideo: this.textures.get('videoTex'),
-      uTexelSize: [1 / this.sizes.maskRefineA.width, 1 / this.sizes.maskRefineA.height],
+    const maskRefineASize = this.resources.getSize('maskRefineA')!;
+    this.passes.drawToTexture('jointBilateral', 'maskRefineB', this.resources.getSize('maskRefineB')!, {
+      uMask: this.resources.getTexture('maskRefineA'),
+      uVideo: this.resources.getTexture('videoTex'),
+      uTexelSize: [1 / maskRefineASize.width, 1 / maskRefineASize.height],
       uSpatialSigma: quality.bilateralSpatialSigma,
       uRangeSigma: quality.bilateralRangeSigma,
       uRadius: quality.bilateralRadius,
@@ -369,39 +335,42 @@ export class WebGLRenderer {
     // Pass 4: Temporal stabilization (exponential moving average with previous frame)
     if (this.maskPrevInitialized) {
       // Blend current mask with previous frame's mask for temporal consistency
-      this.drawToTexture('temporalMask', 'maskStable', this.sizes.maskStable, {
-        uMask: this.textures.get('maskRefineB'),
-        uPrevMask: this.textures.get('maskPrev'),
-        uTexelSize: [1 / this.sizes.maskStable.width, 1 / this.sizes.maskStable.height],
+      const maskStableSize = this.resources.getSize('maskStable')!;
+      this.passes.drawToTexture('temporalMask', 'maskStable', maskStableSize, {
+        uMask: this.resources.getTexture('maskRefineB'),
+        uPrevMask: this.resources.getTexture('maskPrev'),
+        uTexelSize: [1 / maskStableSize.width, 1 / maskStableSize.height],
         uAlpha: quality.temporalAlpha,
       });
       // Swap stable mask to maskPrev for next frame
-      this.swapTextures('maskStable', 'maskPrev');
+      this.resources.swapTextures('maskStable', 'maskPrev');
     } else {
       // First frame: copy refined mask directly to maskPrev (no previous frame to blend)
-      this.swapTextures('maskRefineB', 'maskPrev');
+      this.resources.swapTextures('maskRefineB', 'maskPrev');
       this.maskPrevInitialized = true;
     }
 
     // Pass 5: Horizontal Gaussian blur (separable blur for efficiency)
-    this.drawToTexture('blurH', 'blurHTex', this.sizes.blurHTex, {
-      uSrc: this.textures.get('videoSmallTex'),
-      uTexelSize: [1 / this.sizes.videoSmallTex.width, 1 / this.sizes.videoSmallTex.height],
+    const videoSmallSize = this.resources.getSize('videoSmallTex')!;
+    this.passes.drawToTexture('blurH', 'blurHTex', this.resources.getSize('blurHTex')!, {
+      uSrc: this.resources.getTexture('videoSmallTex'),
+      uTexelSize: [1 / videoSmallSize.width, 1 / videoSmallSize.height],
       uRadius: quality.blurRadius,
     });
 
     // Pass 6: Vertical Gaussian blur (completes separable blur)
-    this.drawToTexture('blurV', 'blurVTex', this.sizes.blurVTex, {
-      uSrc: this.textures.get('blurHTex'),
-      uTexelSize: [1 / this.sizes.blurHTex.width, 1 / this.sizes.blurHTex.height],
+    const blurHSize = this.resources.getSize('blurHTex')!;
+    this.passes.drawToTexture('blurV', 'blurVTex', this.resources.getSize('blurVTex')!, {
+      uSrc: this.resources.getTexture('blurHTex'),
+      uTexelSize: [1 / blurHSize.width, 1 / blurHSize.height],
       uRadius: quality.blurRadius,
     });
 
     // Debug mode: Overlay mask visualization
     if (debugMode !== 'off') {
-      this.drawSimple('debugOverlay', null, width, height, {
-        uVideo: this.textures.get('videoTex'),
-        uMask: this.textures.get('maskPrev'),
+      this.passes.drawSimple('debugOverlay', null, width, height, {
+        uVideo: this.resources.getTexture('videoTex'),
+        uMask: this.resources.getTexture('maskPrev'),
         uMode: debugMode,
       });
       return;
@@ -409,23 +378,23 @@ export class WebGLRenderer {
 
     // Virtual background mode: Composite with background image/video
     if (mode === 'virtual') {
-      this.drawSimple('compositeVirtual', null, width, height, {
-        uVideo: this.textures.get('videoTex'),
-        uMask: this.textures.get('maskPrev'),
-        uBg: this.background.texture ?? this.textures.get('videoTex'),
+      this.passes.drawSimple('compositeVirtual', null, width, height, {
+        uVideo: this.resources.getTexture('videoTex'),
+        uMask: this.resources.getTexture('maskPrev'),
+        uBg: this.background.getTexture() ?? this.resources.getTexture('videoTex'),
         uTexelSize: [1 / width, 1 / height],
         uMatteLow: quality.matteLow,
         uMatteHigh: quality.matteHigh,
-        uBgScale: this.getCoverScale(this.background.size, {width, height}),
+        uBgScale: this.background.getCoverScale({width, height}),
       });
       return;
     }
 
     // Blur mode: Composite with blurred background
-    this.drawSimple('compositeBlur', null, width, height, {
-      uVideo: this.textures.get('videoTex'),
-      uBlur: this.textures.get('blurVTex'),
-      uMask: this.textures.get('maskPrev'),
+    this.passes.drawSimple('compositeBlur', null, width, height, {
+      uVideo: this.resources.getTexture('videoTex'),
+      uBlur: this.resources.getTexture('blurVTex'),
+      uMask: this.resources.getTexture('maskPrev'),
       uTexelSize: [1 / width, 1 / height],
       uSoftLow: quality.softLow,
       uSoftHigh: quality.softHigh,
@@ -441,12 +410,9 @@ export class WebGLRenderer {
    */
   public destroy(): void {
     const gl = this.gl;
-    this.textures.forEach(texture => gl.deleteTexture(texture));
-    if (this.background.texture) {
-      gl.deleteTexture(this.background.texture);
-    }
-    this.framebuffers.forEach(fbo => gl.deleteFramebuffer(fbo));
-    Object.values(this.programs).forEach(({program}) => gl.deleteProgram(program));
+    this.resources.destroy();
+    this.background.destroy();
+    this.programs.destroy();
     gl.deleteVertexArray(this.vao);
   }
 
@@ -494,440 +460,5 @@ export class WebGLRenderer {
     return vao;
   }
 
-  /**
-   * Creates all shader programs used by the renderer.
-   *
-   * Compiles and links all shader programs, storing uniform locations for
-   * efficient uniform updates during rendering. All programs use the same
-   * fullscreen vertex shader with different fragment shaders.
-   *
-   * @returns Map of program names to program info (program handle and uniform locations).
-   */
-  private createPrograms(): Record<string, ProgramInfo> {
-    return {
-      downsample: this.createProgram(fullscreenVert, downsampleFrag, ['uSrc', 'uTexelSize', 'uFlipY']),
-      maskUpsample: this.createProgram(fullscreenVert, maskUpsampleFrag, ['uSrc', 'uTexelSize', 'uFlipY']),
-      jointBilateral: this.createProgram(fullscreenVert, jointBilateralFrag, [
-        'uMask',
-        'uVideo',
-        'uTexelSize',
-        'uSpatialSigma',
-        'uRangeSigma',
-        'uRadius',
-        'uFlipY',
-      ]),
-      temporalMask: this.createProgram(fullscreenVert, temporalMaskFrag, [
-        'uMask',
-        'uPrevMask',
-        'uTexelSize',
-        'uAlpha',
-        'uFlipY',
-      ]),
-      blurH: this.createProgram(fullscreenVert, gaussianBlurHFrag, ['uSrc', 'uTexelSize', 'uRadius', 'uFlipY']),
-      blurV: this.createProgram(fullscreenVert, gaussianBlurVFrag, ['uSrc', 'uTexelSize', 'uRadius', 'uFlipY']),
-      compositeBlur: this.createProgram(fullscreenVert, compositeBlurFrag, [
-        'uVideo',
-        'uBlur',
-        'uMask',
-        'uTexelSize',
-        'uSoftLow',
-        'uSoftHigh',
-        'uBlurStrength',
-        'uFlipY',
-      ]),
-      compositeVirtual: this.createProgram(fullscreenVert, compositeVirtualFrag, [
-        'uVideo',
-        'uMask',
-        'uBg',
-        'uTexelSize',
-        'uMatteLow',
-        'uMatteHigh',
-        'uBgScale',
-        'uFlipY',
-      ]),
-      debugOverlay: this.createProgram(fullscreenVert, debugOverlayFrag, ['uVideo', 'uMask', 'uMode', 'uFlipY']),
-      compositePassthrough: this.createProgram(fullscreenVert, downsampleFrag, ['uSrc', 'uTexelSize', 'uFlipY']),
-    };
-  }
-
-  /**
-   * Ensures all textures and framebuffers exist with correct dimensions.
-   *
-   * Creates or resizes textures and framebuffers based on current configuration.
-   * Textures are reused if dimensions match, otherwise recreated. This method
-   * is called whenever configuration changes to maintain resource consistency.
-   */
-  private ensureResources(): void {
-    const {width, height, quality} = this.config;
-    this.ensureTexture('videoTex', width, height, this.gl.RGBA8, this.gl.RGBA);
-
-    const maskLow = {
-      width: Math.max(1, quality.segmentationWidth),
-      height: Math.max(1, quality.segmentationHeight),
-    };
-    this.ensureTexture('maskLowTex', maskLow.width, maskLow.height, this.gl.RGBA8, this.gl.RGBA);
-
-    const refineSize = {
-      width: Math.max(1, Math.floor(width * quality.maskRefineScale)),
-      height: Math.max(1, Math.floor(height * quality.maskRefineScale)),
-    };
-    this.ensureTexture('maskRefineA', refineSize.width, refineSize.height, this.gl.RGBA8, this.gl.RGBA);
-    this.ensureTexture('maskRefineB', refineSize.width, refineSize.height, this.gl.RGBA8, this.gl.RGBA);
-    this.ensureTexture('maskStable', refineSize.width, refineSize.height, this.gl.RGBA8, this.gl.RGBA);
-    const maskPrevWasNew = this.ensureTexture(
-      'maskPrev',
-      refineSize.width,
-      refineSize.height,
-      this.gl.RGBA8,
-      this.gl.RGBA,
-    );
-    if (maskPrevWasNew) {
-      this.initializeMaskPrevWithWhite(refineSize.width, refineSize.height);
-      this.maskPrevInitialized = false; // Reset flag when texture is recreated
-    }
-
-    const blurSize = {
-      width: Math.max(1, Math.floor(width * quality.blurDownsampleScale)),
-      height: Math.max(1, Math.floor(height * quality.blurDownsampleScale)),
-    };
-    this.ensureTexture('videoSmallTex', blurSize.width, blurSize.height, this.gl.RGBA8, this.gl.RGBA);
-    this.ensureTexture('blurHTex', blurSize.width, blurSize.height, this.gl.RGBA8, this.gl.RGBA);
-    this.ensureTexture('blurVTex', blurSize.width, blurSize.height, this.gl.RGBA8, this.gl.RGBA);
-  }
-
-  /**
-   * Ensures a texture exists with the specified dimensions.
-   *
-   * Creates a new texture if it doesn't exist or if dimensions changed.
-   * Reuses existing texture if dimensions match. Also creates/updates the
-   * associated framebuffer for rendering to this texture.
-   *
-   * @param key - Texture name identifier.
-   * @param width - Texture width in pixels.
-   * @param height - Texture height in pixels.
-   * @param internalFormat - Internal texture format (e.g., RGBA8).
-   * @param format - Pixel format (e.g., RGBA).
-   * @returns True if a new texture was created, false if existing texture was reused.
-   * @throws Error if texture creation fails.
-   */
-  private ensureTexture(key: string, width: number, height: number, internalFormat: number, format: number): boolean {
-    const gl = this.gl;
-    const existing = this.textures.get(key);
-    const size = this.sizes[key];
-
-    if (existing && size && size.width === width && size.height === height) {
-      return false; // Texture already exists with correct size
-    }
-
-    if (existing) {
-      gl.deleteTexture(existing);
-    }
-
-    const texture = gl.createTexture();
-    if (!texture) {
-      throw new Error('Failed to create texture');
-    }
-    gl.bindTexture(gl.TEXTURE_2D, texture);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-    gl.texImage2D(gl.TEXTURE_2D, 0, internalFormat, width, height, 0, format, gl.UNSIGNED_BYTE, null);
-
-    this.textures.set(key, texture);
-    this.sizes[key] = {width, height};
-
-    const fbo = this.framebuffers.get(key) ?? gl.createFramebuffer();
-    if (fbo) {
-      gl.bindFramebuffer(gl.FRAMEBUFFER, fbo);
-      gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, texture, 0);
-      this.framebuffers.set(key, fbo);
-    }
-
-    return true; // New texture was created
-  }
-
-  /**
-   * Initializes maskPrev texture with white (fully opaque).
-   *
-   * Used when maskPrev texture is first created to avoid black mask on first frame.
-   * White mask means "all foreground" which prevents artifacts during initialization.
-   *
-   * @param width - Texture width in pixels.
-   * @param height - Texture height in pixels.
-   */
-  private initializeMaskPrevWithWhite(width: number, height: number): void {
-    const gl = this.gl;
-    const fbo = this.framebuffers.get('maskPrev');
-    if (!fbo) {
-      return;
-    }
-
-    // Fill texture with white using framebuffer clear
-    gl.bindFramebuffer(gl.FRAMEBUFFER, fbo);
-    gl.viewport(0, 0, width, height);
-    gl.clearColor(1.0, 1.0, 1.0, 1.0); // White (1.0 = 255/255)
-    gl.clear(gl.COLOR_BUFFER_BIT);
-  }
-
-  /**
-   * Uploads an ImageBitmap to a WebGL texture.
-   *
-   * Updates the texture with new image data. Supports optional Y-flip for
-   * correcting coordinate system differences between ImageBitmap and WebGL.
-   *
-   * @param key - Texture name identifier.
-   * @param source - ImageBitmap to upload.
-   * @param width - Image width in pixels.
-   * @param height - Image height in pixels.
-   * @param internalFormat - Optional internal texture format (defaults to RGBA).
-   * @param format - Optional pixel format (defaults to RGBA).
-   * @param flipY - If true, flips the image vertically during upload.
-   */
-  private uploadTexture(
-    key: string,
-    source: ImageBitmap,
-    width: number,
-    height: number,
-    internalFormat?: number,
-    format?: number,
-    flipY = false,
-  ): void {
-    const gl = this.gl;
-    const texture = this.textures.get(key);
-    if (!texture) {
-      return;
-    }
-    gl.bindTexture(gl.TEXTURE_2D, texture);
-    gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, flipY ? 1 : 0);
-    if (internalFormat && format) {
-      gl.texImage2D(gl.TEXTURE_2D, 0, internalFormat, width, height, 0, format, gl.UNSIGNED_BYTE, source);
-    } else {
-      gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, source);
-    }
-    gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, 0);
-  }
-
-  /**
-   * Renders to a texture using a shader program.
-   *
-   * Binds the target texture's framebuffer and renders a fullscreen quad
-   * using the specified shader program. Used for all intermediate rendering passes.
-   *
-   * @param programKey - Shader program name to use.
-   * @param targetKey - Target texture name to render to.
-   * @param size - Target texture dimensions.
-   * @param uniforms - Uniform values to set (textures, scalars, vectors).
-   */
-  private drawToTexture(programKey: string, targetKey: string, size: Size, uniforms: Record<string, any>): void {
-    const gl = this.gl;
-    const programInfo = this.programs[programKey];
-    const fbo = this.framebuffers.get(targetKey);
-    if (!programInfo || !fbo) {
-      return;
-    }
-
-    gl.bindFramebuffer(gl.FRAMEBUFFER, fbo);
-    gl.viewport(0, 0, size.width, size.height);
-    this.useProgram(programInfo, {...uniforms, uFlipY: 0.0});
-    gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
-  }
-
-  /**
-   * Renders to canvas or framebuffer using a shader program.
-   *
-   * Renders a fullscreen quad using the specified shader program. If fbo is null,
-   * renders to the canvas (final output). Otherwise renders to the specified framebuffer.
-   * Automatically handles Y-flip for canvas rendering (WebGL coordinate system correction).
-   *
-   * @param programKey - Shader program name to use.
-   * @param fbo - Target framebuffer, or null to render to canvas.
-   * @param width - Viewport width in pixels.
-   * @param height - Viewport height in pixels.
-   * @param uniforms - Uniform values to set (textures, scalars, vectors).
-   */
-  private drawSimple(
-    programKey: string,
-    fbo: WebGLFramebuffer | null,
-    width: number,
-    height: number,
-    uniforms: Record<string, any>,
-  ): void {
-    const gl = this.gl;
-    const programInfo = this.programs[programKey];
-    if (!programInfo) {
-      return;
-    }
-    gl.bindFramebuffer(gl.FRAMEBUFFER, fbo);
-    gl.viewport(0, 0, width, height);
-    // Flip Y texture coordinates when rendering to canvas (fbo === null), not when rendering to framebuffers
-    const flipY = fbo === null ? 1.0 : 0.0;
-    this.useProgram(programInfo, {...uniforms, uFlipY: flipY});
-    gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
-  }
-
-  /**
-   * Activates a shader program and sets all uniforms.
-   *
-   * Binds the program and sets all uniform values. Handles different uniform types:
-   * - WebGLTexture: Binds to texture units sequentially
-   * - Arrays: Sets as vec2 uniforms
-   * - Numbers: Sets as float/int uniforms
-   * - Strings: Maps debug mode strings to integers
-   *
-   * @param programInfo - Program info containing program handle and uniform locations.
-   * @param uniforms - Map of uniform names to values.
-   */
-  private useProgram(programInfo: ProgramInfo, uniforms: Record<string, any>): void {
-    const gl = this.gl;
-    gl.useProgram(programInfo.program);
-
-    let textureUnit = 0;
-    Object.entries(uniforms).forEach(([name, value]) => {
-      const location = programInfo.uniforms[name];
-      if (!location) {
-        return;
-      }
-      if (value instanceof WebGLTexture) {
-        gl.activeTexture(gl.TEXTURE0 + textureUnit);
-        gl.bindTexture(gl.TEXTURE_2D, value);
-        gl.uniform1i(location, textureUnit);
-        textureUnit += 1;
-        return;
-      }
-      if (Array.isArray(value)) {
-        gl.uniform2f(location, value[0], value[1]);
-        return;
-      }
-      if (typeof value === 'number') {
-        gl.uniform1f(location, value);
-        return;
-      }
-      if (typeof value === 'string') {
-        const modeMap: Record<string, number> = {
-          off: 0,
-          maskOverlay: 1,
-          maskOnly: 2,
-          edgeOnly: 3,
-        };
-        gl.uniform1i(location, modeMap[value] ?? 0);
-      }
-    });
-  }
-
-  /**
-   * Creates a WebGL shader program from vertex and fragment shader sources.
-   *
-   * Compiles both shaders, links them into a program, and retrieves uniform locations.
-   * Vertex attributes are bound to locations 0 (position) and 1 (texture coordinates).
-   *
-   * @param vertexSource - Vertex shader source code.
-   * @param fragmentSource - Fragment shader source code.
-   * @param uniforms - Array of uniform names to retrieve locations for.
-   * @returns Program info with program handle and uniform locations.
-   * @throws Error if shader compilation or program linking fails.
-   */
-  private createProgram(vertexSource: string, fragmentSource: string, uniforms: string[]): ProgramInfo {
-    const gl = this.gl;
-    const vertexShader = this.compileShader(gl.VERTEX_SHADER, vertexSource);
-    const fragmentShader = this.compileShader(gl.FRAGMENT_SHADER, fragmentSource);
-
-    const program = gl.createProgram();
-    if (!program) {
-      throw new Error('Failed to create WebGL program');
-    }
-
-    gl.attachShader(program, vertexShader);
-    gl.attachShader(program, fragmentShader);
-    gl.bindAttribLocation(program, 0, 'aPosition');
-    gl.bindAttribLocation(program, 1, 'aTexCoord');
-    gl.linkProgram(program);
-
-    if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
-      throw new Error(gl.getProgramInfoLog(program) || 'Failed to link program');
-    }
-
-    const uniformLocations: Record<string, WebGLUniformLocation | null> = {};
-    uniforms.forEach(name => {
-      uniformLocations[name] = gl.getUniformLocation(program, name);
-    });
-
-    return {program, uniforms: uniformLocations};
-  }
-
-  /**
-   * Compiles a WebGL shader from source code.
-   *
-   * @param type - Shader type (VERTEX_SHADER or FRAGMENT_SHADER).
-   * @param source - Shader source code.
-   * @returns Compiled shader object.
-   * @throws Error if shader compilation fails.
-   */
-  private compileShader(type: number, source: string): WebGLShader {
-    const gl = this.gl;
-    const shader = gl.createShader(type);
-    if (!shader) {
-      throw new Error('Failed to create shader');
-    }
-    gl.shaderSource(shader, source);
-    gl.compileShader(shader);
-
-    if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
-      const info = gl.getShaderInfoLog(shader);
-      gl.deleteShader(shader);
-      throw new Error(info || 'Failed to compile shader');
-    }
-
-    return shader;
-  }
-
-  /**
-   * Swaps two textures and their associated framebuffers and sizes.
-   *
-   * Used for ping-pong rendering (e.g., temporal stabilization) where textures
-   * are swapped between frames to avoid copying data.
-   *
-   * @param a - First texture name.
-   * @param b - Second texture name.
-   */
-  private swapTextures(a: string, b: string): void {
-    const texA = this.textures.get(a);
-    const texB = this.textures.get(b);
-    if (!texA || !texB) {
-      return;
-    }
-    this.textures.set(a, texB);
-    this.textures.set(b, texA);
-
-    const sizeA = this.sizes[a];
-    const sizeB = this.sizes[b];
-    this.sizes[a] = sizeB;
-    this.sizes[b] = sizeA;
-
-    const fboA = this.framebuffers.get(a);
-    const fboB = this.framebuffers.get(b);
-    if (fboA && fboB) {
-      this.framebuffers.set(a, fboB);
-      this.framebuffers.set(b, fboA);
-    }
-  }
-
-  /**
-   * Calculates scale factors for background image to cover target size.
-   *
-   * Computes scale factors for "cover" sizing (background fills entire area,
-   * may be cropped). Used for virtual background to ensure background covers
-   * the entire frame while maintaining aspect ratio.
-   *
-   * @param bgSize - Background image dimensions, or null.
-   * @param target - Target dimensions to cover.
-   * @returns Scale factors [x, y] for background texture coordinates.
-   */
-  private getCoverScale(bgSize: Size | null, target: Size): [number, number] {
-    if (!bgSize || bgSize.width === 0 || bgSize.height === 0) {
-      return [1, 1];
-    }
-    const scale = Math.max(target.width / bgSize.width, target.height / bgSize.height);
-    return [(bgSize.width * scale) / target.width, (bgSize.height * scale) / target.height];
-  }
+  // Resource and program management moved to helper classes.
 }
