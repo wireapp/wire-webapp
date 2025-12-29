@@ -340,8 +340,6 @@ export class MessageRepository {
     },
   ): T {
     const quoteData = quote && {quotedMessageId: quote.messageId, quotedMessageSha256: new Uint8Array(quote.hash)};
-    if (quote) {
-    }
 
     return new TextContentBuilder(baseMessage)
       .withMentions(
