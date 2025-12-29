@@ -17,6 +17,10 @@
  *
  */
 
+import {getLogger} from './Logger';
+
+const logger = getLogger('focusUtil');
+
 /**
  * Returns back a NodeList of focusable elements
  * that exist within the passed parent HTMLElement, or
@@ -31,7 +35,7 @@ export const getAllFocusableElements = (
   customSelector: string[] = [],
 ): NodeListOf<HTMLElement> | [] => {
   if (!parent) {
-    console.warn('You need to pass a parent HTMLElement');
+    logger.development.warn('You need to pass a parent HTMLElement');
     return []; // Return array so length queries will work
   }
 

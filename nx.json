@@ -12,7 +12,7 @@
     },
     "lint": {
       "cache": true,
-      "inputs": ["default", "{workspaceRoot}/eslint.config.ts"] // workspace lint config in hash
+      "inputs": ["default", "{workspaceRoot}/eslint.config.ts", "{workspaceRoot}/eslint.config.base.ts", "{projectRoot}/eslint.config.ts"] // workspace and project lint configs in hash
     }
   },
   "namedInputs": {
@@ -28,5 +28,29 @@
     ],
     "sharedGlobals": [] // hook for root-level shared files if needed
   },
-  "defaultProject": "webapp"
+  "defaultProject": "webapp",
+  "release": {
+    "projects": ["libraries/*"],
+    "projectsRelationship": "independent",
+    "releaseTag": {
+      "pattern": "{projectName}@{version}"
+    },
+    "git": {
+      "commitMessage": "chore(release): publish {projectName}@{version} [skip ci]"
+    },
+    "changelog": {
+      "workspaceChangelog": false,
+      "projectChangelogs": {
+        "createRelease": "github",
+        "file": "{projectRoot}/CHANGELOG.md"
+      }
+    },
+    "version": {
+      "conventionalCommits": true,
+      "generatorOptions": {
+        "packageRoot": "{projectRoot}",
+        "currentVersionResolver": "git-tag"
+      }
+    }
+  }
 }

@@ -29,6 +29,9 @@ import {GifImage} from 'Components/Giphy/GifImage';
 import * as Icon from 'Components/Icon';
 import {Gif, GiphyRepository} from 'Repositories/extension/GiphyRepository';
 import {t} from 'Util/LocalizerUtil';
+import {getLogger} from 'Util/Logger';
+
+const logger = getLogger('Giphy');
 
 const GIPHY_CLOSE_TIMEOUT = 350;
 
@@ -101,7 +104,7 @@ const Giphy: FC<GiphyProps> = ({giphyRepository, defaultGiphyState = GiphyState.
         setGiphyState(GiphyState.RESULTS);
       }
     } catch (error) {
-      console.warn(error);
+      logger.development.warn('Failed to get gifs', error);
       setGiphyState(GiphyState.ERROR);
     }
   };

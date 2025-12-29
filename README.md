@@ -153,6 +153,38 @@ Once translations are uploaded on Crowdin, our (and external) translators can tr
 1. Approve translation on Crowdin
 1. Run `yarn translate:download`
 
+## Documentation
+
+- [Adding New Projects](./docs/adding-new-projects.md) - Guide for adding libraries or applications to the monorepo
+- [Architecture Decision Records (ADRs)](./docs/ADRs/intro.md) - Historical context for architectural decisions
+  - [Nx Monorepo Migration](./docs/ADRs/2025-12-29-nx-monorepo-migration.md)
+  - [Unified Logging Library](./docs/ADRs/2025-12-29-unified-logging-library.md)
+- [Coding Standards](./docs/coding-standards.md)
+- [Accessibility Practices](./docs/accessibility-practices.md)
+- [Tech Radar](./docs/tech-radar.md)
+
+## Releases
+
+### Library Releases (Automated via GitHub Actions)
+
+Libraries are published automatically when merged to `main` via the [Release Libraries workflow](./.github/workflows/release-libraries.yml):
+
+```bash
+# Manual release commands (for local testing)
+yarn release:libs              # Interactive release
+yarn release:libs:version      # Version only
+yarn release:libs:publish      # Publish only
+yarn release:libs:dry-run      # Preview changes
+```
+
+### Application Releases
+
+```bash
+yarn release:staging           # Release to staging
+yarn release:production        # Release to production
+yarn release:custom            # Custom release
+```
+
 ## Contributing
 
 Contributions are welcome! Feel free to check our [issues page](https://github.com/wireapp/wire-webapp/issues).

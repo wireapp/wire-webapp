@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2019 Wire Swiss GmbH
+ * Copyright (C) 2025 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,20 +17,17 @@
  *
  */
 
-import {getStorage} from './localStorage';
-
-import {Configuration} from '../Config';
-
-export function enableLogging(config: Configuration, search = window.location.search) {
-  const storage = getStorage();
-  const namespace = new URLSearchParams(search).get('enableLogging');
-  const force = config.FEATURE.ENABLE_DEBUG;
-
-  if (namespace) {
-    storage?.setItem('debug', namespace);
-  } else if (force) {
-    storage?.setItem('debug', '*');
-  } else {
-    storage?.removeItem('debug');
-  }
+/**
+ * Check if AVS log message is allowed
+ * AVS logs are very verbose, so we only allow specific ones
+ */
+export function isAllowedAVSLog(message: string): boolean {
+  return (
+    message.includes('ccall_hash_user') ||
+    message.includes('c3_message_recv') ||
+    message.includes('c3_message_send') ||
+    message.includes('dce_message_recv') ||
+    message.includes('dce_message_send') ||
+    message.includes('WAPI wcall: create userid')
+  );
 }

@@ -17,6 +17,10 @@ coverage:
         target: auto
         flags:
           - app_server
+      lib_logger:
+        target: auto
+        flags:
+          - lib_logger
     patch:
       default:
         informational: true
@@ -30,7 +34,7 @@ parsers:
       macro: no
 
 comment:
-  layout:  "diff, flags, files"
+  layout: 'diff, flags, files'
   behavior: default
   require_changes: no
 
@@ -43,6 +47,10 @@ flags:
     paths:
       - 'apps/server/**'
     carryforward: true
+  lib_logger:
+    paths:
+      - 'libraries/Logger/**'
+    carryforward: false
 
 github_checks:
   annotations: false

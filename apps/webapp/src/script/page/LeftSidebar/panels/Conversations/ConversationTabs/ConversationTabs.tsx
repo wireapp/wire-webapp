@@ -42,9 +42,9 @@ import {ConversationFolderTab} from 'src/script/page/LeftSidebar/panels/Conversa
 import {SidebarTabs} from 'src/script/page/LeftSidebar/panels/Conversations/useSidebarStore';
 import {Core} from 'src/script/service/CoreSingleton';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
-import {isDataDogEnabled} from 'Util/DataDog';
 import {getWebEnvironment} from 'Util/Environment';
 import {replaceLink, t} from 'Util/LocalizerUtil';
+import {isDataDogEnabled} from 'Util/Logger';
 import {useChannelsFeatureFlag} from 'Util/useChannelsFeatureFlag';
 
 import {

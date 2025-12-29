@@ -19,6 +19,10 @@
 
 import {match} from 'path-to-regexp';
 
+import {getLogger} from 'Util/Logger';
+
+const logger = getLogger('Router');
+
 type Routes = Record<string, ((...args: any[]) => void | Promise<void>) | null>;
 
 const defaultRoute: Routes = {
@@ -72,7 +76,9 @@ const parseRoute = () => {
       const paramValues = paramNames.map(name => params[name]);
       return handler(...paramValues);
     } catch (error) {
-      console.error('Error matching pattern:', pattern, error);
+      logger.development.error('Error matching pattern', error instanceof Error ? error : new Error(String(error)), {
+        pattern,
+      });
       continue;
     }
   }

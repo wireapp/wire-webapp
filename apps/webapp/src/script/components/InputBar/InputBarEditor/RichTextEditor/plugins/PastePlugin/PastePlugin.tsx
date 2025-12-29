@@ -32,8 +32,11 @@ import {
 } from 'lexical';
 
 import {User} from 'Repositories/entity/User';
+import {getLogger} from 'Util/Logger';
 
 import {$createMentionNode} from '../../nodes/MentionNode';
+
+const logger = getLogger('PastePlugin');
 
 interface PastePluginProps {
   /** Function that returns list of users that can be mentioned in the current context */
@@ -277,7 +280,7 @@ export const PastePlugin = ({getMentionCandidates, isPreviewMode}: PastePluginPr
 
           return true;
         } catch (error) {
-          console.error('Error handling paste:', error);
+          logger.development.error('Error handling paste', error);
           $getSelection()?.insertText(plainText);
           return false;
         }

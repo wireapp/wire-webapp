@@ -33,8 +33,11 @@ import type {FileAsset as FileAssetType} from 'Repositories/entity/message/FileA
 import {TeamState} from 'Repositories/team/TeamState';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
+import {getLogger} from 'Util/Logger';
 import {formatSeconds} from 'Util/TimeUtil';
 import {useEffectRef} from 'Util/useEffectRef';
+
+const logger = getLogger('VideoAsset');
 
 import {MediaButton} from '../common/MediaButton/MediaButton';
 import {SeekBar} from '../common/SeekBar/SeekBar';
@@ -153,7 +156,10 @@ const VideoAsset = ({
           }
           // ToDo: This needs to be revisited
           //amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.MESSAGES.VIDEO.PLAY_FAILED);
-          console.error('Failed to load video asset ', error);
+          logger.development.error(
+            'Failed to load video asset',
+            error instanceof Error ? error : new Error(String(error)),
+          );
         }
 
         asset.status(AssetTransferState.UPLOADED);
@@ -177,7 +183,7 @@ const VideoAsset = ({
       const playPromise = videoElement.play();
 
       playPromise?.catch(error => {
-        console.error('Failed to load video asset ', error);
+        logger.development.error('Failed to load video asset', error);
       });
     }
   }, [videoElement, videoSrc]);
@@ -219,7 +225,9 @@ const VideoAsset = ({
                 setVideoPlaybackError(true);
                 // ToDo: This needs to be revisited
                 //amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.MESSAGES.VIDEO.PLAY_FAILED);
-                console.error('Video cannot be played', event);
+                logger.development.error('Video cannot be played', new Error('Video playback error'), {
+                  event: event.type,
+                });
               }}
               onPlaying={onVideoPlaying}
               onTimeUpdate={syncVideoTimeRest}

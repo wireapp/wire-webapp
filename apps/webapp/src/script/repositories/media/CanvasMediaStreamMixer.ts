@@ -17,6 +17,10 @@
  *
  */
 
+import {getLogger} from 'Util/Logger';
+
+const logger = getLogger('CanvasMediaStreamMixer');
+
 // Canvas configuration
 const DEFAULT_CANVAS_WIDTH = 1920;
 const DEFAULT_CANVAS_HEIGHT = 1080;
@@ -182,7 +186,7 @@ export class CanvasMediaStreamMixer {
             this.context.restore();
           }
         } catch (error) {
-          console.error('Error in mixFrames:', error);
+          logger.development.error('Error in mixFrames', error);
         }
       }
 
@@ -194,7 +198,7 @@ export class CanvasMediaStreamMixer {
 
   async togglePictureInPicture(): Promise<void> {
     if (!document.pictureInPictureEnabled || !window.documentPictureInPicture) {
-      console.warn('Picture-in-Picture not supported');
+      logger.development.warn('Picture-in-Picture not supported');
       return;
     }
 
@@ -212,7 +216,7 @@ export class CanvasMediaStreamMixer {
 
       this.setupPipWindow(pipWindow);
     } catch (error) {
-      console.error('Failed to enter Picture-in-Picture mode:', error);
+      logger.development.error('Failed to enter Picture-in-Picture mode', error);
       this.resetPipState();
     }
   }

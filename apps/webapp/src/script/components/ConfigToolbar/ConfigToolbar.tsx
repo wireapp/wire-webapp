@@ -28,6 +28,9 @@ import {ConversationState} from 'Repositories/conversation/ConversationState';
 import {Config, Configuration} from 'src/script/Config';
 import {useClickOutside} from 'src/script/hooks/useClickOutside';
 import {CoreCryptoLogLevel} from 'Util/DebugUtil';
+import {getLogger} from 'Util/Logger';
+
+const logger = getLogger('ConfigToolbar');
 
 import {wrapperStyles} from './ConfigToolbar.styles';
 
@@ -91,7 +94,7 @@ export function ConfigToolbar() {
         });
         messageCountRef.current++;
       } catch (error) {
-        console.error('Error sending message:', error);
+        logger.development.error('Error sending message', error);
       }
 
       if (isActive) {
@@ -279,7 +282,7 @@ export function ConfigToolbar() {
     try {
       await window.wire?.app?.debug?.resetMLSConversation();
     } catch (error) {
-      console.error('Error resetting MLS conversation:', error);
+      logger.development.error('Error resetting MLS conversation', error);
     } finally {
       setIsResettingMLSConversation(false);
     }

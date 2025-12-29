@@ -84,11 +84,11 @@ import {TeamService} from 'Repositories/team/TeamService';
 import {EventTrackingRepository} from 'Repositories/tracking/EventTrackingRepository';
 import {UserRepository} from 'Repositories/user/UserRepository';
 import {UserService} from 'Repositories/user/UserService';
-import {initializeDataDog} from 'Util/DataDog';
 import {DebugUtil} from 'Util/DebugUtil';
 import {Environment} from 'Util/Environment';
 import {t} from 'Util/LocalizerUtil';
 import {getLogger, Logger} from 'Util/Logger';
+import {initializeWireLogger} from 'Util/Logger';
 import {durationFrom, formatCoarseDuration, TIME_IN_MILLIS} from 'Util/TimeUtil';
 import {AppInitializationStep, checkIndexedDb, InitializationEventLogger} from 'Util/util';
 
@@ -416,7 +416,17 @@ export class App {
 
       this.initializeCells({cellsRepository, selfUser});
 
-      await initializeDataDog(this.config, selfUser.qualifiedId);
+      // Initialize new Wire Logger library (includes DataDog)
+      await initializeWireLogger(this.config, selfUser.qualifiedId);
+
+      // Verify new logger is working
+      const {getLogger: getWireLogger} = await import('@wireapp/logger');
+      const wireLogger = getWireLogger('@wireapp/App.ts');
+      wireLogger.production.info('Wire Logger initialized successfully', {
+        userId: selfUser.id,
+        environment: this.config.ENVIRONMENT,
+      });
+
       const eventLogger = new InitializationEventLogger(selfUser.id);
       eventLogger.log(AppInitializationStep.AppInitialize);
 
@@ -461,7 +471,7 @@ export class App {
       try {
         await this.core.initClient(localClient, getClientMLSConfig(teamFeatures));
       } catch (error) {
-        console.warn('Failed to initialize client', {error});
+        this.logger.development.warn('Failed to initialize client', {error});
         this.showForceLogoutModal(SIGN_OUT_REASON.CLIENT_REMOVED);
       }
 

@@ -24,7 +24,8 @@
     "skipDefaultLibCheck": true,
     "baseUrl": ".",
     "paths": {
-      "apps/*": ["apps/*"]
+      "apps/*": ["apps/*"],
+      "@wireapp/logger": ["libraries/Logger/src/index.ts"]
     }
   },
   "exclude": ["node_modules", "tmp"]

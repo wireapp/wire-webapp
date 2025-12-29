@@ -1,5 +1,6 @@
 apps/webapp/src/i18n/
 .vscode/
+/charts
 /config
 /docs/auth-coverage
 /docs/coverage

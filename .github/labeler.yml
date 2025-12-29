@@ -39,6 +39,9 @@
     - 'apps/server/.*'
 
 # Libraries
+'lib: logger':
+  files:
+    - 'libraries/Logger/.*'
 
 # Components
 'comp: calling':
