@@ -163,9 +163,29 @@ export type MultipartMessageAddEvent = ConversationEvent<
   CONVERSATION.MULTIPART_MESSAGE_ADD,
   {
     attachments: MultiPartContent['attachments'];
-    text: MultiPartContent['text'] & {mentions?: string[]; previews?: string[]};
+    text: MultiPartContent['text'] & {
+      mentions?: string[];
+      previews?: string[];
+      quote?:
+        | string
+        | {
+            message_id: string;
+            user_id: string;
+            hash: Uint8Array;
+          }
+        | {error: {type: string}};
+    };
+    replacing_message_id?: string;
   }
->;
+> & {
+  /** who have received/read the event */
+  read_receipts?: ReadReceipt[];
+  /** who reacted to the event */
+  reactions?: UserReactionMap | ReactionMap;
+  edited_time?: string;
+  status: StatusType;
+  version?: number;
+};
 export type MissedEvent = BaseEvent & {id: string; type: CONVERSATION.MISSED_MESSAGES};
 export type JoinedAfterMLSMigrationFinalisationEvent = BaseEvent & {
   type: CONVERSATION.JOINED_AFTER_MLS_MIGRATION;

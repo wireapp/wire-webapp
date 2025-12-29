@@ -61,6 +61,8 @@ const getTimestampBytes = (event: any): number[] => {
 
 const getTextBytes = (event: any): number[] => utf8ToUtf16BE(event.data.content);
 
+const getMultipartTextBytes = (event: any): number[] => utf8ToUtf16BE(event.data.text.content);
+
 /**
  * Creates a hash of the given event.
  *
@@ -72,6 +74,10 @@ const hashEvent = (event: any): Promise<ArrayBuffer> => {
   switch (event.type) {
     case ClientEvent.CONVERSATION.MESSAGE_ADD: {
       specificBytes = getTextBytes(event);
+      break;
+    }
+    case ClientEvent.CONVERSATION.MULTIPART_MESSAGE_ADD: {
+      specificBytes = getMultipartTextBytes(event);
       break;
     }
     case ClientEvent.CONVERSATION.LOCATION: {
