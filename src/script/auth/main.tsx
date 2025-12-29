@@ -55,7 +55,9 @@ const core = container.resolve(Core);
 let localStorage;
 try {
   localStorage = window.localStorage;
-} catch (error) {}
+} catch {
+  // ignore error
+}
 
 const store = configureStore({
   actions: actionRoot,
