@@ -384,6 +384,26 @@ export function buildMultipartMessage(
   });
 }
 
+export function buildEditedMultipartMessage(
+  attachments: MultiPartContent['attachments'],
+  textContent: TextContent,
+  originalMessageId: string,
+  messageId: string = createId(),
+): GenericMessage {
+  const editedMessage = MessageEdit.create({
+    replacingMessageId: originalMessageId,
+    multipart: {
+      attachments,
+      text: MessageToProtoMapper.mapText(textContent),
+    },
+  });
+
+  return GenericMessage.create({
+    [GenericMessageType.EDITED]: editedMessage,
+    messageId: messageId,
+  });
+}
+
 export function buildTextMessage(
   payloadBundle: TextMessage['content'],
   messageId: string = createId(),

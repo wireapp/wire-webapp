@@ -49,6 +49,11 @@ export interface MultiPartMessage extends BasePayloadBundle {
   type: PayloadBundleType.MULTIPART;
 }
 
+export interface EditedMultiPartMessage extends BasePayloadBundle {
+  content: MultiPartContent;
+  type: PayloadBundleType.MESSAGE_EDIT;
+}
+
 export interface TextMessage extends BasePayloadBundle {
   content: TextContent;
   type: PayloadBundleType.TEXT;
