@@ -7,16 +7,15 @@ export default defineConfig({
     target: 'esnext',
     lib: {
       entry: resolve(__dirname, 'src/index.ts'),
-      formats: ['es', 'cjs'],
-      fileName: format => {
-        if (format === 'cjs') {
-          return 'index.cjs';
-        }
-        return 'index.js';
-      },
+      // Only build ESM format to avoid Datadog being loaded twice
+      // Webpack can consume ESM modules natively
+      formats: ['es'],
+      fileName: () => 'index.js',
     },
     rollupOptions: {
-      external: ['logdown', '@datadog/browser-logs', '@datadog/browser-rum', 'fs', 'path', 'fs/promises'],
+      // Bundle all dependencies to avoid require() issues in webpack
+      // Only keep Node.js built-ins as external
+      external: ['fs', 'path', 'fs/promises'],
     },
     outDir: 'lib',
   },

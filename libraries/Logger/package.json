@@ -4,14 +4,15 @@
   "description": "Security-critical unified logging library with automatic PII sanitization, multi-transport support, and global singleton for Electron + Browser contexts",
   "license": "GPL-3.0",
   "author": "Wire Swiss GmbH",
-  "main": "./lib/index.cjs",
+  "type": "module",
+  "main": "./lib/index.js",
   "module": "./lib/index.js",
   "types": "./lib/index.d.ts",
   "exports": {
     ".": {
       "types": "./lib/index.d.ts",
       "import": "./lib/index.js",
-      "require": "./lib/index.cjs"
+      "default": "./lib/index.js"
     },
     "./package.json": "./package.json"
   },

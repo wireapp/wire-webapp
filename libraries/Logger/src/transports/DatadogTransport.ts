@@ -22,18 +22,9 @@ import logdown from 'logdown';
 import {Transport, LogEntry, LogLevel, DatadogTransportConfig} from '../types';
 import {isAllowedAVSLog} from '../utils/avsFilter';
 
-// Datadog SDK imports
-let datadogLogs: any;
-let datadogRum: any;
-
-try {
-  // Dynamic imports for browser environment
-  datadogLogs = require('@datadog/browser-logs');
-  datadogRum = require('@datadog/browser-rum');
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-} catch (error) {
-  // Datadog SDKs not available - transport will remain uninitialized
-}
+// Datadog SDK imports - these will be bundled with the library
+import {datadogLogs} from '@datadog/browser-logs';
+import {datadogRum} from '@datadog/browser-rum';
 
 /**
  * Datadog transport implementation - Sends production logs to DataDog
@@ -131,7 +122,7 @@ export class DatadogTransport implements Transport {
         env: this.config.env,
         version: this.config.version,
         forwardErrorsToLogs: true,
-        forwardConsoleLogs: this.config.forwardConsoleLogs, // Should always be false in config
+        forwardConsoleLogs: this.config.forwardConsoleLogs ? 'all' : undefined, // Should always be false in config
         sessionSampleRate: 100,
         beforeSend: (log: any) => {
           // Filter AVS logs (they are very verbose)
@@ -235,7 +226,20 @@ export class DatadogTransport implements Transport {
       }
 
       // Log to Datadog with structured context
-      datadogLogs.logger[datadogLevel](entry.message, logContext, entry.error);
+      switch (datadogLevel) {
+        case 'debug':
+          datadogLogs.logger.debug(entry.message, logContext, entry.error);
+          break;
+        case 'info':
+          datadogLogs.logger.info(entry.message, logContext, entry.error);
+          break;
+        case 'warn':
+          datadogLogs.logger.warn(entry.message, logContext, entry.error);
+          break;
+        case 'error':
+          datadogLogs.logger.error(entry.message, logContext, entry.error);
+          break;
+      }
 
       // Debug log for successful Datadog call
       this.debugLogger.debug('Successfully logged to Datadog', {

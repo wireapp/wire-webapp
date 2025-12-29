@@ -33,11 +33,7 @@
 
 import Cookies from 'js-cookie';
 
-import {getLogger} from 'Util/Logger';
-
 import {QUERY_KEY} from '../auth/route';
-
-const logger = getLogger('CheckBrowser');
 
 const isOauth = (): boolean => location?.hash?.includes(QUERY_KEY.SCOPE) ?? false;
 
@@ -71,7 +67,7 @@ const supportsCookies = (): boolean => {
 
 const redirectUnsupportedBrowser = (error: string): void => {
   location.href = '/unsupported/';
-  logger.development.error(error);
+  console.error('[CheckBrowser]', error);
 };
 
 const supportsIndexDB = (): Promise<boolean> =>
