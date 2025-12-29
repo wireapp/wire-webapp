@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [46.47.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@46.46.17...@wireapp/core@46.47.0) (2025-12-29)
+
+### Features
+
+* Add support for multipart message editing [WPB-22309] ([#7746](https://github.com/wireapp/wire-web-packages/issues/7746)) ([ab90548](https://github.com/wireapp/wire-web-packages/commit/ab90548ae0e6a177aa7b809d597667dbc838cf6a))
+
 ## [46.46.17](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@46.46.16...@wireapp/core@46.46.17) (2025-12-28)
 
 **Note:** Version bump only for package @wireapp/core
