@@ -8708,7 +8708,7 @@ __metadata:
     "@types/hbs": "npm:4.0.5"
     "@types/jest": "npm:29.5.14"
     "@wireapp/commons": "npm:5.4.11"
-    dotenv: "npm:16.6.1"
+    dotenv: "npm:16.5.0"
     dotenv-extended: "npm:2.9.0"
     express: "npm:4.22.1"
     express-sitemap-xml: "npm:3.1.0"
@@ -12297,6 +12297,13 @@ __metadata:
   bin:
     dotenv-extended: lib/bin/index.js
   checksum: 10/b0418eb0fef371a3af59866d9cfcde199a2ce453b1e83a039ed3abd1879c1f59df43b235a67d72ebcf31ffc6d11be7c0437af192e442dd4bd7886a74d025fcb3
+  languageName: node
+  linkType: hard
+
+"dotenv@npm:16.5.0":
+  version: 16.5.0
+  resolution: "dotenv@npm:16.5.0"
+  checksum: 10/e68a16834f1a41cc2dfb01563bc150668ad675e6cd09191211467b5c0806b6ecd6ec438e021aa8e01cd0e72d2b70ef4302bec7cc0fe15b6955f85230b62dc8a9
   languageName: node
   linkType: hard
 
