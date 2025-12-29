@@ -2010,6 +2010,7 @@ declare module 'I18n/en-US.json' {
     'videoCallMenuMoreRaiseHand': `Raise hand`;
     'videoCallMenuMoreSeeParticipants': `See participants`;
     'videoCallMenuMoreVideoSettings': `Video Settings`;
+    'videoCallMenuMoreCameraSettings': `Camera Settings`;
     'videoCallNoCameraAvailable': `No options`;
     'videoCallOverlayCamera': `Camera`;
     'videoCallOverlayChangeViewMode': `Change view mode`;
@@ -2051,6 +2052,19 @@ declare module 'I18n/en-US.json' {
     'videoCallbackgroundBlur': `Blur my background`;
     'videoCallbackgroundBlurHeadline': `Background`;
     'videoCallbackgroundNotBlurred': `Don\'t blur my background`;
+    'videoCallBackgroundEffectsLabel': `Background effects`;
+    'videoCallBackgroundNone': `None`;
+    'videoCallBackgroundBlurLow': `Blur (Low)`;
+    'videoCallBackgroundBlurHigh': `Blur (High)`;
+    'videoCallBackgroundsLabel': `Backgrounds`;
+    'videoCallBackgroundAdd': `Add background...`;
+    'videoCallBackgroundAddToast': `Custom backgrounds are coming soon.`;
+    'videoCallBackgroundSunset': `Sunset`;
+    'videoCallBackgroundOcean': `Ocean`;
+    'videoCallBackgroundForest': `Forest`;
+    'videoCallBackgroundSand': `Sand`;
+    'videoCallBackgroundEmber': `Ember`;
+    'videoCallBackgroundSlate': `Slate`;
     'videoCallvideoInputCamera': `Camera`;
     'videoSpeakersTabAll': `All ({count})`;
     'videoSpeakersTabSpeakers': `Speakers`;

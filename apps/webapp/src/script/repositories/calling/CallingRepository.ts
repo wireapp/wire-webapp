@@ -73,6 +73,8 @@ import {NOTIFICATION_HANDLING_STATE} from 'Repositories/event/NotificationHandli
 import type {MediaDevicesHandler} from 'Repositories/media/MediaDevicesHandler';
 import type {MediaStreamHandler} from 'Repositories/media/MediaStreamHandler';
 import {MediaType} from 'Repositories/media/MediaType';
+import {loadBackgroundSource} from 'Repositories/media/VideoBackgroundEffects';
+import type {BackgroundEffectSelection, BackgroundSource} from 'Repositories/media/VideoBackgroundEffects';
 import {TeamState} from 'Repositories/team/TeamState';
 import {EventName} from 'Repositories/tracking/EventName';
 import * as trackingHelpers from 'Repositories/tracking/Helpers';
@@ -151,7 +153,6 @@ export class CallingRepository {
   private readonly acceptVersionWarning: (conversationId: QualifiedId) => void;
   private readonly callLog: string[];
   private readonly logger: Logger;
-  private enableBackgroundBlur = false;
   private avsVersion: number = 0;
   private incomingCallCallback: (call: Call) => void;
   private isReady: boolean = false;
@@ -317,20 +318,59 @@ export class CallingRepository {
     }
   };
 
-  public async switchVideoBackgroundBlur(enable: boolean): Promise<void> {
+  public async switchVideoBackgroundEffect(
+    effect: BackgroundEffectSelection,
+    customBackground?: BackgroundSource,
+  ): Promise<void> {
     const activeCall = this.callState.joinedCall();
     if (!activeCall) {
       return;
     }
     const selfParticipant = activeCall.getSelfParticipant();
-    selfParticipant.releaseBlurredVideoStream();
     const videoFeed = selfParticipant.videoStream();
     if (!videoFeed) {
+      selfParticipant.backgroundEffect(effect);
       return;
     }
-    this.enableBackgroundBlur = enable;
-    const newVideoFeed = enable ? ((await selfParticipant.setBlurredBackground(true)) as MediaStream) : videoFeed;
-    this.changeMediaSource(newVideoFeed, MediaType.VIDEO, false);
+
+    if (effect.type === 'none') {
+      selfParticipant.releaseBlurredVideoStream();
+      selfParticipant.backgroundEffect(effect);
+      this.changeMediaSource(videoFeed, MediaType.VIDEO, false);
+      return;
+    }
+
+    const previousEffect = selfParticipant.backgroundEffect();
+    let backgroundSource: BackgroundSource | undefined;
+    try {
+      if (effect.type === 'virtual') {
+        backgroundSource = await loadBackgroundSource(effect.backgroundId);
+      } else if (effect.type === 'custom') {
+        if (!customBackground) {
+          return;
+        }
+        backgroundSource = customBackground;
+      }
+    } catch (error) {
+      this.logger.warn('Failed to load background source', error);
+      return;
+    }
+
+    let processedStream: MediaStream | undefined;
+    try {
+      processedStream = await selfParticipant.applyBackgroundEffect(effect, backgroundSource);
+    } catch (error) {
+      this.logger.warn('Failed to apply background effect', error);
+      return;
+    }
+    if (!processedStream) {
+      return;
+    }
+    selfParticipant.backgroundEffect(effect);
+
+    if (previousEffect.type === 'none' || !selfParticipant.blurredVideoStream()) {
+      this.changeMediaSource(processedStream, MediaType.VIDEO, false);
+    }
   }
 
   getStats(conversationId: QualifiedId) {
@@ -619,7 +659,16 @@ export class CallingRepository {
       const mediaStream = await this.getMediaStream({audio, camera}, call.isGroupOrConference);
       if (call.state() !== CALL_STATE.NONE) {
         selfParticipant.updateMediaStream(mediaStream, true);
-        await selfParticipant.setBlurredBackground(this.enableBackgroundBlur);
+        const effect = selfParticipant.backgroundEffect();
+        let backgroundSource: BackgroundSource | undefined;
+        if (effect.type === 'virtual') {
+          try {
+            backgroundSource = await loadBackgroundSource(effect.backgroundId);
+          } catch (error) {
+            this.logger.warn('Failed to load background source', error);
+          }
+        }
+        await selfParticipant.applyBackgroundEffect(effect, backgroundSource);
         if (camera) {
           call.getSelfParticipant().videoState(VIDEO_STATE.STARTED);
         }
@@ -1855,6 +1904,14 @@ export class CallingRepository {
     const stream = await this.mediaStreamHandler.requestMediaStream(false, true, false, false);
     this.stopMediaSource(MediaType.VIDEO);
     const clonedMediaStream = this.changeMediaSource(stream, MediaType.VIDEO);
+    const activeCall = this.callState.joinedCall();
+    if (activeCall) {
+      const selfParticipant = activeCall.getSelfParticipant();
+      const effect = selfParticipant.backgroundEffect();
+      if (effect.type !== 'none') {
+        await this.switchVideoBackgroundEffect(effect);
+      }
+    }
     return clonedMediaStream;
   }
 
@@ -2529,7 +2586,16 @@ export class CallingRepository {
         const mediaStream = await this.getMediaStream(missingStreams, call.isGroupOrConference);
         this.mediaStreamQuery = undefined;
         selfParticipant.updateMediaStream(mediaStream, true);
-        await selfParticipant.setBlurredBackground(this.enableBackgroundBlur);
+        const effect = selfParticipant.backgroundEffect();
+        let backgroundSource: BackgroundSource | undefined;
+        if (effect.type === 'virtual') {
+          try {
+            backgroundSource = await loadBackgroundSource(effect.backgroundId);
+          } catch (error) {
+            this.logger.warn('Failed to load background source', error);
+          }
+        }
+        await selfParticipant.applyBackgroundEffect(effect, backgroundSource);
         return selfParticipant.getMediaStream();
       } catch (error) {
         this.mediaStreamQuery = undefined;

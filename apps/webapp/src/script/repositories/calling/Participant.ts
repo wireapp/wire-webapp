@@ -24,7 +24,13 @@ import {VIDEO_STATE} from '@wireapp/avs';
 import {AvsDebugger} from '@wireapp/avs-debugger';
 
 import {User} from 'Repositories/entity/User';
-import {applyBlur} from 'Repositories/media/VideoBackgroundBlur';
+import {BackgroundEffectsController} from 'Repositories/media/BackgroundEffects/effects/BackgroundEffectsController';
+import {
+  BLUR_STRENGTHS,
+  DEFAULT_BACKGROUND_EFFECT,
+  type BackgroundEffectSelection,
+  type BackgroundSource,
+} from 'Repositories/media/VideoBackgroundEffects';
 import {matchQualifiedIds} from 'Util/QualifiedId';
 
 export type UserId = string;
@@ -35,6 +41,7 @@ export class Participant {
   public readonly videoState = observable(VIDEO_STATE.STOPPED);
   public readonly videoStream = observable<MediaStream | undefined>();
   public readonly blurredVideoStream = observable<{stream: MediaStream; release: () => void} | undefined>();
+  public readonly backgroundEffect = observable<BackgroundEffectSelection>(DEFAULT_BACKGROUND_EFFECT);
   public readonly hasActiveVideo: ko.PureComputed<boolean>;
   public readonly hasPausedVideo: ko.PureComputed<boolean>;
   public readonly sharesScreen: ko.PureComputed<boolean>;
@@ -44,6 +51,7 @@ export class Participant {
   public readonly isActivelySpeaking = observable(false);
   public readonly isSendingVideo: ko.PureComputed<boolean>;
   public readonly isAudioEstablished = observable(false);
+  private backgroundEffectsController: BackgroundEffectsController | null = null;
 
   // Audio
   public readonly audioStream = observable<MediaStream | undefined>();
@@ -85,15 +93,65 @@ export class Participant {
   public releaseBlurredVideoStream(): void {
     this.blurredVideoStream()?.release();
     this.blurredVideoStream(undefined);
+    this.backgroundEffectsController = null;
   }
 
-  public async setBlurredBackground(isBlurred: boolean) {
+  public async applyBackgroundEffect(
+    effect: BackgroundEffectSelection,
+    backgroundSource?: BackgroundSource,
+  ): Promise<MediaStream | undefined> {
     const originalVideoStream = this.videoStream();
-    if (isBlurred && originalVideoStream) {
-      this.blurredVideoStream(await applyBlur(originalVideoStream));
-    } else {
-      this.releaseBlurredVideoStream();
+    if (!originalVideoStream) {
+      return undefined;
     }
+    if (effect.type === 'none') {
+      this.releaseBlurredVideoStream();
+      return originalVideoStream;
+    }
+    const videoTrack = originalVideoStream.getVideoTracks()[0];
+    if (!videoTrack) {
+      return undefined;
+    }
+
+    const isVirtual = effect.type === 'virtual' || effect.type === 'custom';
+    const blurStrength = effect.type === 'blur' ? BLUR_STRENGTHS[effect.level] : BLUR_STRENGTHS.high;
+
+    if (!this.backgroundEffectsController || !this.blurredVideoStream()) {
+      const controller = new BackgroundEffectsController();
+      const {outputTrack, stop} = await controller.start(videoTrack, {
+        mode: isVirtual ? 'virtual' : 'blur',
+        blurStrength,
+        quality: 'auto',
+        targetFps: 30,
+        debugMode: 'off',
+        ...(isVirtual && backgroundSource ? {backgroundImage: backgroundSource} : {}),
+      });
+      const processedStream = new MediaStream([outputTrack]);
+      this.backgroundEffectsController = controller;
+      this.blurredVideoStream({
+        stream: processedStream,
+        release: () => {
+          stop();
+          outputTrack.stop();
+          this.backgroundEffectsController = null;
+        },
+      });
+    }
+
+    if (!this.backgroundEffectsController) {
+      return this.blurredVideoStream()?.stream;
+    }
+
+    if (isVirtual) {
+      this.backgroundEffectsController.setMode('virtual');
+      if (backgroundSource) {
+        this.backgroundEffectsController.setBackgroundSource(backgroundSource);
+      }
+    } else {
+      this.backgroundEffectsController.setMode('blur');
+      this.backgroundEffectsController.setBlurStrength(blurStrength);
+    }
+
     return this.blurredVideoStream()?.stream;
   }
 

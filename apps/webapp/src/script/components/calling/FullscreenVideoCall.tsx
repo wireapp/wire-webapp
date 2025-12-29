@@ -47,6 +47,7 @@ import {Participant} from 'Repositories/calling/Participant';
 import type {Grid} from 'Repositories/calling/videoGridHandler';
 import type {Conversation} from 'Repositories/entity/Conversation';
 import {MediaDevicesHandler} from 'Repositories/media/MediaDevicesHandler';
+import type {BackgroundEffectSelection} from 'Repositories/media/VideoBackgroundEffects';
 import {PropertiesRepository} from 'Repositories/properties/PropertiesRepository';
 import {TeamState} from 'Repositories/team/TeamState';
 import {useActiveWindowMatchMedia} from 'src/script/hooks/useActiveWindowMatchMedia';
@@ -95,7 +96,7 @@ export interface FullscreenVideoCallProps {
   switchCameraInput: (deviceId: string) => void;
   switchMicrophoneInput: (deviceId: string) => void;
   switchSpeakerOutput: (deviceId: string) => void;
-  switchBlurredBackground: (status: boolean) => void;
+  switchVideoBackgroundEffect: (effect: BackgroundEffectSelection) => void;
   teamState?: TeamState;
   callState?: CallState;
   toggleCamera: (call: Call) => void;
@@ -125,7 +126,7 @@ const FullscreenVideoCall = ({
   switchCameraInput,
   switchMicrophoneInput,
   switchSpeakerOutput,
-  switchBlurredBackground,
+  switchVideoBackgroundEffect,
   setMaximizedParticipant,
   setActiveCallViewTab,
   toggleMute,
@@ -439,7 +440,7 @@ const FullscreenVideoCall = ({
               toggleIsHandRaised={toggleIsHandRaised}
               switchMicrophoneInput={switchMicrophoneInput}
               switchSpeakerOutput={switchSpeakerOutput}
-              switchBlurredBackground={switchBlurredBackground}
+              switchVideoBackgroundEffect={switchVideoBackgroundEffect}
               switchCameraInput={switchCameraInput}
               setActiveCallViewTab={setActiveCallViewTab}
               setMaximizedParticipant={setMaximizedParticipant}

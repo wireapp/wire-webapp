@@ -17,7 +17,7 @@
  *
  */
 
-import React, {useCallback, useEffect, useMemo, useState} from 'react';
+import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react';
 
 import classNames from 'classnames';
 import {container} from 'tsyringe';
@@ -26,6 +26,7 @@ import {CALL_TYPE} from '@wireapp/avs';
 import {EmojiIcon, GridIcon, MoreIcon, QUERY, RaiseHandIcon, TabIndex} from '@wireapp/react-ui-kit';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
+import {useAppNotification} from 'Components/AppNotification';
 import * as Icon from 'Components/Icon';
 import {useActiveWindowMatchMedia} from 'Hooks/useActiveWindowMatchMedia';
 import {useUserPropertyValue} from 'Hooks/useUserProperty';
@@ -35,6 +36,8 @@ import {Participant} from 'Repositories/calling/Participant';
 import {Conversation} from 'Repositories/entity/Conversation';
 import {ElectronDesktopCapturerSource, MediaDevicesHandler} from 'Repositories/media/MediaDevicesHandler';
 import {useMediaDevicesStore} from 'Repositories/media/useMediaDevicesStore';
+import type {BackgroundEffectSelection} from 'Repositories/media/VideoBackgroundEffects';
+import {BUILTIN_BACKGROUNDS, DEFAULT_BACKGROUND_EFFECT} from 'Repositories/media/VideoBackgroundEffects';
 import {PropertiesRepository} from 'Repositories/properties/PropertiesRepository';
 import {PROPERTIES_TYPE} from 'Repositories/properties/PropertiesType';
 import {TeamState} from 'Repositories/team/TeamState';
@@ -47,6 +50,7 @@ import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {handleKeyDown, isEscapeKey, KEY} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
 
+import {BackgroundEffectsMenu} from './BackgroundEffects/BackgroundEffectsMenu';
 import {EmojisBar} from './EmojisBar/EmojisBar';
 import {VideoCallCancelButton} from './VideoCallCancelButton/VideoCallCancelButton';
 import {
@@ -54,14 +58,12 @@ import {
   videoControlActiveStyles,
   videoControlDisabledStyles,
   videoControlInActiveStyles,
+  videoOptionsBackdropStyles,
+  videoOptionsMenuStyles,
+  videoOptionsSheetStyles,
   videoControlsWrapperStyles,
 } from './VideoControls.styles';
 import {VideoControlsSelect} from './VideoControlsSelect/VideoControlsSelect';
-
-enum BlurredBackgroundStatus {
-  OFF = 'bluroff',
-  ON = 'bluron',
-}
 
 /**
  * Maps video input devices to select options.
@@ -118,7 +120,7 @@ interface VideoControlsProps {
   toggleIsHandRaised: (isHandRaised: boolean) => void;
   switchMicrophoneInput: (deviceId: string) => void;
   switchSpeakerOutput: (deviceId: string) => void;
-  switchBlurredBackground: (status: boolean) => void;
+  switchVideoBackgroundEffect: (effect: BackgroundEffectSelection) => void;
   switchCameraInput: (deviceId: string) => void;
   setActiveCallViewTab: (tab: CallViewTab) => void;
   setMaximizedParticipant: (call: Call, participant: Participant | null) => void;
@@ -142,7 +144,7 @@ export const VideoControls = ({
   toggleIsHandRaised,
   switchMicrophoneInput,
   switchSpeakerOutput,
-  switchBlurredBackground,
+  switchVideoBackgroundEffect,
   switchCameraInput,
   setActiveCallViewTab,
   setMaximizedParticipant,
@@ -157,7 +159,7 @@ export const VideoControls = ({
     handRaisedAt: selfHandRaisedAt,
   } = useKoSubscribableChildren(selfParticipant, ['sharesScreen', 'sharesCamera', 'handRaisedAt']);
   const {
-    ENABLE_BLUR_BACKGROUND: isBlurredBackgroundEnabled,
+    ENABLE_BACKGROUND_EFFECTS: isBackgroundEffectsEnabled,
     ENABLE_PRESS_SPACE_TO_UNMUTE: isPressSpaceToUnmuteEnable,
     ENABLE_IN_CALL_REACTIONS: isInCallReactionsEnable,
     ENABLE_IN_CALL_HAND_RAISE: isInCallHandRaiseEnable,
@@ -167,14 +169,19 @@ export const VideoControls = ({
 
   const {is1to1: is1to1Conversation} = useKoSubscribableChildren(conversation, ['is1to1']);
 
-  const {blurredVideoStream} = useKoSubscribableChildren(selfParticipant, ['blurredVideoStream']);
-  const hasBlurredBackground = !!blurredVideoStream;
+  const {backgroundEffect} = useKoSubscribableChildren(selfParticipant, ['backgroundEffect']);
+  const selectedBackgroundEffect = backgroundEffect ?? DEFAULT_BACKGROUND_EFFECT;
 
   const {participants} = useKoSubscribableChildren(call, ['participants']);
 
   const [showEmojisBar, setShowEmojisBar] = useState(false);
 
   const {viewMode, detachedWindow} = useKoSubscribableChildren(callState, ['viewMode', 'detachedWindow']);
+  const activeWindow = viewMode === CallingViewMode.DETACHED_WINDOW && detachedWindow ? detachedWindow : window;
+  const addBackgroundNotification = useAppNotification({
+    message: t('videoCallBackgroundAddToast'),
+    activeWindow,
+  });
 
   const {isVideoCallingEnabled} = useKoSubscribableChildren(teamState, ['isVideoCallingEnabled']);
 
@@ -200,6 +207,8 @@ export const VideoControls = ({
   const [audioOptionsOpen, setAudioOptionsOpen] = useState(false);
   const [videoOptionsOpen, setVideoOptionsOpen] = useState(false);
   const [isCallViewOpen, setIsCallViewOpen] = useState(false);
+  const videoOptionsMenuRef = useRef<HTMLDivElement | null>(null);
+  const videoOptionsSheetRef = useRef<HTMLDivElement | null>(null);
 
   const showToggleVideo =
     isVideoCallingEnabled &&
@@ -299,48 +308,73 @@ export const VideoControls = ({
     switchSpeakerOutput(speaker.id);
   };
 
-  const blurredBackgroundOptions = {
-    label: t('videoCallbackgroundBlurHeadline'),
-    options: [
+  const cameraOptions = useMemo(
+    () => [
       {
-        // Blurring is not possible if webgl context is not available
-        isDisabled: !document.createElement('canvas').getContext('webgl2'),
-        label: t('videoCallbackgroundBlur'),
-        value: BlurredBackgroundStatus.ON,
-        dataUieName: 'blur',
-        id: BlurredBackgroundStatus.ON,
-      },
-      {
-        label: t('videoCallbackgroundNotBlurred'),
-        value: BlurredBackgroundStatus.OFF,
-        dataUieName: 'no-blur',
-        id: BlurredBackgroundStatus.OFF,
+        label: t('videoCallvideoInputCamera'),
+        options: mapVideoInputDevices(videoInputDevices),
       },
     ],
+    [videoInputDevices],
+  );
+
+  const selectedCameraOption =
+    cameraOptions[0].options.find(({id}) => id === currentCameraDevice) ?? cameraOptions[0].options[0];
+  const selectedCameraOptions = [selectedCameraOption];
+
+  const updateCameraOptions = (selectedOption: string) => {
+    const camera = cameraOptions[0].options.find(({value}) => value === selectedOption) ?? selectedCameraOption;
+    switchCameraInput(camera.id);
   };
 
-  const videoOptions = [
-    {
-      label: t('videoCallvideoInputCamera'),
-      options: mapVideoInputDevices(videoInputDevices),
+  const handleBackgroundSelect = useCallback(
+    (effect: BackgroundEffectSelection) => {
+      if (effect.type === 'custom') {
+        addBackgroundNotification.show();
+        if (isMobile) {
+          setVideoOptionsOpen(false);
+        }
+        return;
+      }
+      void switchVideoBackgroundEffect(effect);
+      if (isMobile) {
+        setVideoOptionsOpen(false);
+      }
     },
-    ...(isBlurredBackgroundEnabled ? [blurredBackgroundOptions] : []),
-  ];
+    [addBackgroundNotification, isMobile, switchVideoBackgroundEffect],
+  );
 
-  const selectedVideoOptions = [currentCameraDevice, hasBlurredBackground]
-    .flatMap(device => videoOptions.flatMap(options => options.options.filter(item => item.id === device)) ?? [])
-    .concat(hasBlurredBackground ? blurredBackgroundOptions.options[0] : blurredBackgroundOptions.options[1]);
-
-  const updateVideoOptions = (selectedOption: string | BlurredBackgroundStatus) => {
-    const camera = videoOptions[0].options.find(({value}) => value === selectedOption) ?? selectedVideoOptions[0];
-    if (selectedOption === BlurredBackgroundStatus.ON) {
-      switchBlurredBackground(true);
-    } else if (selectedOption === BlurredBackgroundStatus.OFF) {
-      switchBlurredBackground(false);
-    } else {
-      switchCameraInput(camera.id);
+  const handleAddBackground = useCallback(() => {
+    addBackgroundNotification.show();
+    if (isMobile) {
+      setVideoOptionsOpen(false);
     }
-  };
+  }, [addBackgroundNotification, isMobile]);
+
+  useEffect(() => {
+    if (!videoOptionsOpen) {
+      return;
+    }
+    const handlePointerDown = (event: MouseEvent) => {
+      const target = event.target as Node;
+      if (videoOptionsMenuRef.current?.contains(target) || videoOptionsSheetRef.current?.contains(target)) {
+        return;
+      }
+      setVideoOptionsOpen(false);
+    };
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (isEscapeKey(event)) {
+        setVideoOptionsOpen(false);
+      }
+    };
+
+    activeWindow.document.addEventListener('pointerdown', handlePointerDown);
+    activeWindow.document.addEventListener('keydown', handleKeyDown);
+    return () => {
+      activeWindow.document.removeEventListener('pointerdown', handlePointerDown);
+      activeWindow.document.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [activeWindow, videoOptionsOpen]);
 
   const handleEmojiClick = (selectedEmoji: string) => sendEmoji(selectedEmoji, call);
 
@@ -411,7 +445,7 @@ export const VideoControls = ({
 
   const isInCallHandRaiseControlVisible = isInCallHandRaiseEnable && !is1to1Conversation;
 
-  const emojisBarTargetWindow = viewMode === CallingViewMode.DETACHED_WINDOW ? detachedWindow! : window;
+  const emojisBarTargetWindow = activeWindow;
 
   return (
     <ul id="video-controls" className="video-controls" css={videoControlsWrapperStyles}>
@@ -439,26 +473,37 @@ export const VideoControls = ({
           />
         )}
         {isMobile && videoOptionsOpen && (
-          <VideoControlsSelect
-            value={selectedVideoOptions}
-            onChange={selectedOption => {
-              updateVideoOptions(String(selectedOption?.value));
-              setVideoOptionsOpen(false);
-            }}
-            onKeyDown={event =>
-              handleKeyDown({
-                event,
-                callback: () => toggleCamera(call),
-                keys: [KEY.ENTER, KEY.SPACE],
-              })
-            }
-            id="select-camera"
-            dataUieName="select-camera"
-            options={videoOptions}
-            onMenuClose={() => setVideoOptionsOpen(false)}
-            menuIsOpen={videoOptionsOpen}
-            menuCSS={{width: '100vw', minWidth: 'initial'}}
-          />
+          <>
+            <div
+              css={videoOptionsBackdropStyles}
+              onClick={() => setVideoOptionsOpen(false)}
+              onKeyDown={event => isEscapeKey(event) && setVideoOptionsOpen(false)}
+              role="button"
+              tabIndex={0}
+            />
+            <div css={videoOptionsSheetStyles} ref={videoOptionsSheetRef}>
+              <BackgroundEffectsMenu
+                isOpen={videoOptionsOpen}
+                showHeader
+                onClose={() => setVideoOptionsOpen(false)}
+                cameraOptions={cameraOptions}
+                selectedCameraOptions={selectedCameraOptions}
+                onCameraChange={selectedOption => updateCameraOptions(String(selectedOption?.value))}
+                onCameraKeyDown={event =>
+                  handleKeyDown({
+                    event,
+                    callback: () => toggleCamera(call),
+                    keys: [KEY.ENTER, KEY.SPACE],
+                  })
+                }
+                isBackgroundEffectsEnabled={isBackgroundEffectsEnabled}
+                selectedEffect={selectedBackgroundEffect}
+                backgrounds={BUILTIN_BACKGROUNDS}
+                onSelectEffect={handleBackgroundSelect}
+                onAddBackground={handleAddBackground}
+              />
+            </div>
+          </>
         )}
         {!isDesktop && isCallViewOpen && (
           <VideoControlsSelect
@@ -602,44 +647,40 @@ export const VideoControls = ({
               )}
             </button>
             {!isMobile && (
-              <button
-                className="device-toggle-button"
-                css={videoOptionsOpen ? videoControlActiveStyles : videoControlInActiveStyles}
-                onClick={() => setVideoOptionsOpen(prev => !prev)}
-                onKeyDown={event =>
-                  handleKeyDown({
-                    event,
-                    callback: () => setVideoOptionsOpen(prev => !prev),
-                    keys: [KEY.ENTER, KEY.SPACE],
-                  })
-                }
-                onBlur={event => {
-                  if (!event.currentTarget.contains(event.relatedTarget)) {
-                    setVideoOptionsOpen(false);
+              <div ref={videoOptionsMenuRef}>
+                <button
+                  className="device-toggle-button"
+                  css={videoOptionsOpen ? videoControlActiveStyles : videoControlInActiveStyles}
+                  onClick={() => setVideoOptionsOpen(prev => !prev)}
+                  onKeyDown={event =>
+                    handleKeyDown({
+                      event,
+                      callback: () => setVideoOptionsOpen(prev => !prev),
+                      keys: [KEY.ENTER, KEY.SPACE],
+                    })
                   }
-                }}
-                aria-label={
-                  videoOptionsOpen ? t('videoCallOverlayCloseOptions') : t('videoCallOverlayOpenCameraOptions')
-                }
-              >
-                {videoOptionsOpen ? (
-                  <>
-                    <VideoControlsSelect
-                      value={selectedVideoOptions}
-                      onChange={selectedOption => updateVideoOptions(String(selectedOption?.value))}
-                      onKeyDown={event => isEscapeKey(event) && setVideoOptionsOpen(false)}
-                      id="select-camera"
-                      dataUieName="select-camera"
-                      options={videoOptions}
-                      menuIsOpen
-                      wrapperCSS={{marginBottom: 0}}
+                  type="button"
+                  aria-expanded={videoOptionsOpen}
+                >
+                  <Icon.ChevronIcon css={{rotate: videoOptionsOpen ? '0deg' : '180deg', height: '16px'}} />
+                </button>
+                {videoOptionsOpen && (
+                  <div css={videoOptionsMenuStyles}>
+                    <BackgroundEffectsMenu
+                      isOpen={videoOptionsOpen}
+                      cameraOptions={cameraOptions}
+                      selectedCameraOptions={selectedCameraOptions}
+                      onCameraChange={selectedOption => updateCameraOptions(String(selectedOption?.value))}
+                      onCameraKeyDown={event => isEscapeKey(event) && setVideoOptionsOpen(false)}
+                      isBackgroundEffectsEnabled={isBackgroundEffectsEnabled}
+                      selectedEffect={selectedBackgroundEffect}
+                      backgrounds={BUILTIN_BACKGROUNDS}
+                      onSelectEffect={handleBackgroundSelect}
+                      onAddBackground={handleAddBackground}
                     />
-                    <Icon.ChevronIcon css={{height: '16px'}} />
-                  </>
-                ) : (
-                  <Icon.ChevronIcon css={{rotate: '180deg', height: '16px'}} />
+                  </div>
                 )}
-              </button>
+              </div>
             )}
           </li>
         )}

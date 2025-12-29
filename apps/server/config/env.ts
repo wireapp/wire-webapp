@@ -118,8 +118,8 @@ export type Env = {
   /** Feature toggle for advanced filters */
   FEATURE_ENABLE_ADVANCED_FILTERS: string;
 
-  /** Feature toggle to blur the background during video call */
-  FEATURE_ENABLE_BLUR_BACKGROUND: string;
+  /** Feature toggle to enable background effects during video call */
+  FEATURE_ENABLE_BACKGROUND_EFFECTS: string;
 
   /** Feature toggle for debug utils. Can be set to true or false */
   FEATURE_ENABLE_DEBUG: string;

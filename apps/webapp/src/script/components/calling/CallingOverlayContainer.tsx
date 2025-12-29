@@ -169,7 +169,7 @@ const CallingContainer = ({
           switchCameraInput={switchCameraInput}
           switchMicrophoneInput={switchMicrophoneInput}
           switchSpeakerOutput={switchSpeakerOutput}
-          switchBlurredBackground={status => callingRepository.switchVideoBackgroundBlur(status)}
+          switchVideoBackgroundEffect={effect => callingRepository.switchVideoBackgroundEffect(effect)}
           setMaximizedParticipant={setMaximizedParticipant}
           setActiveCallViewTab={setActiveCallViewTab}
           toggleMute={toggleMute}

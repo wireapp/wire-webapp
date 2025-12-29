@@ -249,7 +249,7 @@ export class DebugUtil {
   }
 
   enableCameraBlur(flag: boolean) {
-    return this.callingRepository.switchVideoBackgroundBlur(flag);
+    return this.callingRepository.switchVideoBackgroundEffect(flag ? {type: 'blur', level: 'high'} : {type: 'none'});
   }
 
   reconnectWebSocket({dryRun} = {dryRun: false}) {
