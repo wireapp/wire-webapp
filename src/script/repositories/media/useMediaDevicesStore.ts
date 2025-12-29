@@ -28,6 +28,13 @@ export const defaultAudioOutputId = 'default';
 export const defaultVideoInputId = 'default';
 export const defaultScreenInputId = 'screen';
 
+/**
+ * Filter out invalid devices empty deviceId or label
+ * return MediaDeviceInfo[]
+ */
+const filterInvalidDevices = (devices: MediaDeviceInfo[]): MediaDeviceInfo[] =>
+  devices.filter(device => device.deviceId && device.label);
+
 type MediaChannelPatch<T> = Partial<Pick<MediaChannel<T>, 'devices' | 'selectedId' | 'supported'>>;
 // omit thumbnail (which is a native image) to avoid serialization issues in Zustand immer
 type ScreenDevice = Omit<ElectronDesktopCapturerSource, 'thumbnail'> & {thumbnail: unknown};
@@ -107,17 +114,17 @@ export const mediaDevicesStore = createStore<MediaDevicesState>()(
     // devices setters
     setAudioInputDevices: devices =>
       set(state => {
-        state.audio.input.devices = devices;
+        state.audio.input.devices = filterInvalidDevices(devices);
       }),
 
     setAudioOutputDevices: devices =>
       set(state => {
-        state.audio.output.devices = devices;
+        state.audio.output.devices = filterInvalidDevices(devices);
       }),
 
     setVideoInputDevices: devices =>
       set(state => {
-        state.video.input.devices = devices;
+        state.video.input.devices = filterInvalidDevices(devices);
       }),
 
     setScreenInputSources: sources =>
@@ -173,7 +180,7 @@ export const mediaDevicesStore = createStore<MediaDevicesState>()(
       set(state => {
         // audio.input
         if (payload.audio?.input?.devices !== undefined) {
-          state.audio.input.devices = payload.audio.input.devices;
+          state.audio.input.devices = filterInvalidDevices(payload.audio.input.devices);
         }
         if (payload.audio?.input?.selectedId !== undefined) {
           state.audio.input.selectedId = payload.audio.input.selectedId!;
@@ -184,7 +191,7 @@ export const mediaDevicesStore = createStore<MediaDevicesState>()(
 
         // audio.output
         if (payload.audio?.output?.devices !== undefined) {
-          state.audio.output.devices = payload.audio.output.devices;
+          state.audio.output.devices = filterInvalidDevices(payload.audio.output.devices);
         }
         if (payload.audio?.output?.selectedId !== undefined) {
           state.audio.output.selectedId = payload.audio.output.selectedId!;
@@ -195,7 +202,7 @@ export const mediaDevicesStore = createStore<MediaDevicesState>()(
 
         // video.input
         if (payload.video?.input?.devices !== undefined) {
-          state.video.input.devices = payload.video.input.devices;
+          state.video.input.devices = filterInvalidDevices(payload.video.input.devices);
         }
         if (payload.video?.input?.selectedId !== undefined) {
           state.video.input.selectedId = payload.video.input.selectedId!;

@@ -177,7 +177,9 @@ const FullscreenVideoCall = ({
 
     const hasAlreadyConfirmed = localStorage.getItem(LOCAL_STORAGE_KEY_FOR_SCREEN_SHARING_CONFIRM_MODAL) === 'true';
 
-    if (isSharingScreen && isScreenSharingSourceFromDetachedWindow && !hasAlreadyConfirmed) {
+    const isDetachedWindow = viewMode === CallingViewMode.DETACHED_WINDOW;
+
+    if (isSharingScreen && isScreenSharingSourceFromDetachedWindow && isDetachedWindow && !hasAlreadyConfirmed) {
       setIsConfirmCloseModalOpen(true);
       return;
     }
@@ -188,23 +190,31 @@ const FullscreenVideoCall = ({
 
   const [isParticipantsListOpen, toggleParticipantsList] = useToggleState(false);
 
-  const handRaisedNotification = useAppNotification({
+  const callNotification = useAppNotification({
     activeWindow: viewMode === CallingViewMode.DETACHED_WINDOW ? detachedWindow! : window,
   });
 
   useEffect(() => {
     const handRaisedHandler = (event: Event) => {
-      handRaisedNotification.show({
+      callNotification.show({
+        message: (event as CustomEvent<{notificationMessage: string}>).detail.notificationMessage,
+      });
+    };
+
+    const remoteMutedHandler = (event: Event) => {
+      callNotification.show({
         message: (event as CustomEvent<{notificationMessage: string}>).detail.notificationMessage,
       });
     };
 
     window.addEventListener(WebAppEvents.CALL.HAND_RAISED, handRaisedHandler);
+    window.addEventListener(WebAppEvents.CALL.REMOTE_MUTED, remoteMutedHandler);
 
     return () => {
       window.removeEventListener(WebAppEvents.CALL.HAND_RAISED, handRaisedHandler);
+      window.removeEventListener(WebAppEvents.CALL.REMOTE_MUTED, remoteMutedHandler);
     };
-  }, [handRaisedNotification]);
+  }, [callNotification]);
 
   function toggleIsHandRaised(currentIsHandRaised: boolean) {
     selfParticipant.handRaisedAt(new Date().getTime());
@@ -283,18 +293,6 @@ const FullscreenVideoCall = ({
                 <Duration startedAt={startedAt} />
               </div>
             </div>
-
-            {muteState === MuteState.REMOTE_MUTED && (
-              <div
-                className="video-title__info-bar"
-                style={{
-                  position: 'absolute',
-                  right: '12px',
-                }}
-              >
-                {t('muteStateRemoteMute')}
-              </div>
-            )}
           </div>
           <div css={headerActionsWrapperStyles}>
             {!isMobile && isPaginationVisible && (
@@ -461,6 +459,9 @@ const FullscreenVideoCall = ({
         onBgClick={() => setIsConfirmCloseModalOpen(false)}
         data-uie-name="confirm-close-with-active-screen-share-modal"
         wrapperCSS={{borderRadius: 10, width: 328}}
+        container={
+          viewMode === CallingViewMode.DETACHED_WINDOW && detachedWindow ? detachedWindow.document.body : undefined
+        }
       >
         {isConfirmCloseModalOpen && (
           <>
