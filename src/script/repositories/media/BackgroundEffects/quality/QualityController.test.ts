@@ -23,7 +23,8 @@ const MODE_BLUR = 'blur' as const;
 const MODE_VIRTUAL = 'virtual' as const;
 
 const TARGET_FPS = 30;
-const HYSTERESIS_FRAMES = 30;
+const HYSTERESIS_FRAMES = 60;
+const DOWNGRADE_CONFIRM_FRAMES = 10;
 
 const cpuBoundSample = {totalMs: 40, segmentationMs: 30, gpuMs: 5};
 const gpuBoundSample = {totalMs: 40, segmentationMs: 5, gpuMs: 30};
@@ -36,7 +37,7 @@ describe('QualityController', () => {
   it('downgrades CPU/ML-bound workloads to the next tier', () => {
     const controller = new QualityController(TARGET_FPS);
     let params;
-    for (let i = 0; i < HYSTERESIS_FRAMES + 1; i += 1) {
+    for (let i = 0; i < HYSTERESIS_FRAMES + DOWNGRADE_CONFIRM_FRAMES + 1; i += 1) {
       params = controller.update(cpuBoundSample, MODE_BLUR);
     }
     expect(params?.tier).toBe('B');
@@ -45,7 +46,7 @@ describe('QualityController', () => {
   it('downgrades GPU-bound workloads more aggressively', () => {
     const controller = new QualityController(TARGET_FPS);
     let params;
-    for (let i = 0; i < HYSTERESIS_FRAMES + 1; i += 1) {
+    for (let i = 0; i < HYSTERESIS_FRAMES + DOWNGRADE_CONFIRM_FRAMES + 1; i += 1) {
       params = controller.update(gpuBoundSample, MODE_BLUR);
     }
     expect(params?.tier).toBe('C');
@@ -113,14 +114,14 @@ describe('QualityController', () => {
 
     // Trigger downgrade with CPU-bound samples (A -> B)
     let params;
-    for (let i = 0; i < HYSTERESIS_FRAMES + 1; i += 1) {
+    for (let i = 0; i < HYSTERESIS_FRAMES + DOWNGRADE_CONFIRM_FRAMES + 1; i += 1) {
       params = controller.update(cpuBoundSample, MODE_BLUR);
     }
-    // Should downgrade to B, and cooldown is set to 30 frames
+    // Should downgrade to B, and cooldown is set to 60 frames
     expect(params?.tier).toBe('B');
 
     // Provide fast samples immediately after downgrade
-    // Cooldown decrements each frame, so after 30 frames it will be 0
+    // Cooldown decrements each frame, so after 60 frames it will be 0
     // But we need to check before it expires - check after just a few frames
     for (let i = 0; i < 5; i += 1) {
       params = controller.update(veryFastSample, MODE_BLUR);
@@ -129,8 +130,8 @@ describe('QualityController', () => {
     expect(params?.tier).toBe('B');
 
     // Continue providing fast samples - cooldown decrements each frame
-    // After 30 total frames from downgrade, cooldown expires
-    for (let i = 0; i < 25; i += 1) {
+    // After 60 total frames from downgrade, cooldown expires
+    for (let i = 0; i < 55; i += 1) {
       params = controller.update(veryFastSample, MODE_BLUR);
     }
     // Cooldown should now be 0, but we need another hysteresis period to upgrade
@@ -138,8 +139,8 @@ describe('QualityController', () => {
     for (let i = 0; i < HYSTERESIS_FRAMES + 1; i += 1) {
       params = controller.update(veryFastSample, MODE_BLUR);
     }
-    // Should have upgraded from B to A after cooldown expired
-    expect(params?.tier).toBe('A');
+    // Should remain at B due to performance cap after downgrade from A
+    expect(params?.tier).toBe('B');
   });
 
   it('applies bypass mode and zero temporal alpha for tier D', () => {
@@ -181,7 +182,7 @@ describe('QualityController', () => {
     const controller = new QualityController(TARGET_FPS);
     // Balanced sample: neither CPU nor GPU dominates (>55%)
     let params;
-    for (let i = 0; i < HYSTERESIS_FRAMES + 1; i += 1) {
+    for (let i = 0; i < HYSTERESIS_FRAMES + DOWNGRADE_CONFIRM_FRAMES + 1; i += 1) {
       params = controller.update(balancedSample, MODE_BLUR);
     }
     // Should step down normally (A -> B) for balanced workloads
@@ -204,19 +205,19 @@ describe('QualityController', () => {
     let params;
 
     // A -> B (CPU-bound downgrade)
-    for (let i = 0; i < HYSTERESIS_FRAMES + 1; i += 1) {
+    for (let i = 0; i < HYSTERESIS_FRAMES + DOWNGRADE_CONFIRM_FRAMES + 1; i += 1) {
       params = controller.update(cpuBoundSample, MODE_BLUR);
     }
     expect(params?.tier).toBe('B');
 
     // B -> C (further downgrade)
-    for (let i = 0; i < HYSTERESIS_FRAMES + 1; i += 1) {
+    for (let i = 0; i < HYSTERESIS_FRAMES + DOWNGRADE_CONFIRM_FRAMES + 1; i += 1) {
       params = controller.update(slowSample, MODE_BLUR);
     }
     expect(params?.tier).toBe('C');
 
     // C -> D (final downgrade)
-    for (let i = 0; i < HYSTERESIS_FRAMES + 1; i += 1) {
+    for (let i = 0; i < HYSTERESIS_FRAMES + DOWNGRADE_CONFIRM_FRAMES + 1; i += 1) {
       params = controller.update(slowSample, MODE_BLUR);
     }
     expect(params?.tier).toBe('D');
@@ -249,7 +250,7 @@ describe('QualityController', () => {
   it('handles boundary conditions at thresholds', () => {
     const controller = new QualityController(TARGET_FPS);
     const budget = 1000 / TARGET_FPS;
-    const upgradeThreshold = budget * 0.6;
+    const upgradeThreshold = budget * 0.5;
     const justAboveUpgrade = upgradeThreshold + 0.5;
     const clearlyBelowUpgrade = upgradeThreshold - 5;
 

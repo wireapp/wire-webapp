@@ -33,15 +33,28 @@ interface Sample {
   gpuMs: number;
 }
 
+const DEFAULT_TUNING = {
+  // Upgrade when we are comfortably under budget (ratio of frame budget).
+  upgradeThresholdRatio: 0.5,
+  // Downgrade when we approach budget (ratio of frame budget).
+  downgradeThresholdRatio: 1.0,
+  // Frames required before considering any tier change.
+  hysteresisFrames: 60,
+  // Consecutive over-budget averages required to downgrade.
+  downgradeConfirmFrames: 10,
+  // Require N full sample windows before allowing downgrade.
+  downgradeWarmupWindows: 3,
+} as const;
+
 /**
  * Adaptive quality controller that dynamically adjusts rendering quality tiers
  * based on real-time performance measurements.
  *
  * The controller uses a hysteresis-based system to prevent tier oscillation:
  * - Monitors frame processing time (segmentation + GPU rendering)
- * - Downgrades when performance exceeds 85% of frame budget
- * - Upgrades when performance is below 60% of frame budget
- * - Requires 30 stable frames before tier changes to prevent thrashing
+ * - Downgrades when performance exceeds 90% of frame budget for several frames
+ * - Upgrades when performance is below 50% of frame budget
+ * - Requires 60 stable frames before tier changes to prevent thrashing
  * - Implements cooldown periods after downgrades to ensure stability
  *
  * Tier selection considers dominant cost (CPU/ML vs GPU) to optimize
@@ -50,18 +63,28 @@ interface Sample {
 export class QualityController {
   /** Rolling window of performance samples for averaging. */
   private readonly samples: Sample[] = [];
+  /** Total number of samples observed since controller initialization. */
+  private totalSamplesSeen = 0;
   /** Maximum number of samples to retain in the rolling window. */
   private readonly maxSamples = 30;
   /** Current quality tier. Starts at 'A' (highest quality). */
   private tier: TierKey = 'A';
+  /** Maximum tier allowed for upgrades once performance caps are applied. */
+  private maxTier: TierKey | null = null;
   /** Threshold in milliseconds below which we can upgrade tier (60% of frame budget). */
   private readonly upgradeThresholdMs: number;
   /** Threshold in milliseconds above which we must downgrade tier (85% of frame budget). */
   private readonly downgradeThresholdMs: number;
   /** Number of frames required for stability before allowing tier changes. */
-  private readonly hysteresisFrames = 30;
+  private readonly hysteresisFrames: number;
+  /** Number of consecutive over-budget averages required to downgrade. */
+  private readonly downgradeConfirmFrames: number;
+  /** Minimum total sample count before allowing downgrades (warm-up period). */
+  private readonly downgradeMinSamples: number;
   /** Counter tracking consecutive stable frames at current tier. */
   private stableFrames = 0;
+  /** Counter tracking consecutive over-budget frames for downgrade confirmation. */
+  private overBudgetFrames = 0;
   /** Cooldown counter preventing immediate upgrades after downgrades. */
   private cooldownFrames = 0;
   /** Current effect mode to apply mode-specific overlays. */
@@ -74,12 +97,19 @@ export class QualityController {
    *                    and performance thresholds (budget = 1000ms / targetFps).
    */
   constructor(targetFps: number) {
+    if (process.env.NODE_ENV !== 'production') {
+      console.info('[QualityController] init', {targetFps});
+    }
     // Calculate frame budget: time available per frame to maintain target FPS
     const budget = 1000 / targetFps;
-    // Upgrade threshold: 60% of budget - we have headroom to increase quality
-    this.upgradeThresholdMs = budget * 0.6;
-    // Downgrade threshold: 85% of budget - approaching frame budget limit
-    this.downgradeThresholdMs = budget * 0.85;
+    // Upgrade threshold: 50% of budget - require more headroom to increase quality
+    this.upgradeThresholdMs = budget * DEFAULT_TUNING.upgradeThresholdRatio;
+    // Downgrade threshold: 90% of budget - approaching frame budget limit
+    this.downgradeThresholdMs = budget * DEFAULT_TUNING.downgradeThresholdRatio;
+    this.hysteresisFrames = DEFAULT_TUNING.hysteresisFrames;
+    this.downgradeConfirmFrames = DEFAULT_TUNING.downgradeConfirmFrames;
+    // Require at least two full windows before downgrading to avoid cold-start spikes.
+    this.downgradeMinSamples = this.maxSamples * DEFAULT_TUNING.downgradeWarmupWindows;
   }
 
   /**
@@ -104,6 +134,7 @@ export class QualityController {
     this.tier = tier;
     this.stableFrames = 0;
     this.cooldownFrames = 0;
+    this.overBudgetFrames = 0;
   }
 
   /**
@@ -125,6 +156,7 @@ export class QualityController {
 
     // Maintain rolling window of samples for averaging
     this.samples.push(sample);
+    this.totalSamplesSeen += 1;
     if (this.samples.length > this.maxSamples) {
       this.samples.shift();
     }
@@ -150,17 +182,41 @@ export class QualityController {
     if (this.cooldownFrames > 0) {
       this.cooldownFrames -= 1;
     }
+    if (avgTotalMs > this.downgradeThresholdMs) {
+      this.overBudgetFrames += 1;
+    } else {
+      this.overBudgetFrames = 0;
+    }
 
     // Evaluate tier changes only after sufficient stability period
     if (this.stableFrames >= this.hysteresisFrames) {
       // Downgrade if performance exceeds threshold
-      if (avgTotalMs > this.downgradeThresholdMs) {
+      if (this.overBudgetFrames >= this.downgradeConfirmFrames && this.totalSamplesSeen >= this.downgradeMinSamples) {
         // Determine dominant cost to optimize downgrade strategy
         const dominant = this.getDominantCost(avgTotalMs, avgSegmentationMs, avgGpuMs);
         const nextTier = this.downgradeTier(dominant);
         if (nextTier !== this.tier) {
+          if (this.tier === 'A') {
+            this.maxTier = 'B';
+            if (process.env.NODE_ENV !== 'production') {
+              console.info('[QualityController] maxTier cap set', {maxTier: this.maxTier});
+            }
+          }
+          if (process.env.NODE_ENV !== 'production') {
+            console.info('[QualityController] downgrade', {
+              from: this.tier,
+              to: nextTier,
+              avgTotalMs,
+              avgSegmentationMs,
+              avgGpuMs,
+              overBudgetFrames: this.overBudgetFrames,
+              sampleCount: this.samples.length,
+              maxTier: this.maxTier,
+            });
+          }
           this.tier = nextTier;
           this.stableFrames = 0;
+          this.overBudgetFrames = 0;
           // Apply cooldown to prevent immediate re-upgrade
           this.cooldownFrames = this.hysteresisFrames;
         }
@@ -169,6 +225,17 @@ export class QualityController {
       else if (avgTotalMs < this.upgradeThresholdMs && this.cooldownFrames === 0) {
         const nextTier = this.upgradeTier();
         if (nextTier !== this.tier) {
+          if (process.env.NODE_ENV !== 'production') {
+            console.info('[QualityController] upgrade', {
+              from: this.tier,
+              to: nextTier,
+              avgTotalMs,
+              avgSegmentationMs,
+              avgGpuMs,
+              sampleCount: this.samples.length,
+              maxTier: this.maxTier,
+            });
+          }
           this.tier = nextTier;
           this.stableFrames = 0;
         }
@@ -215,6 +282,7 @@ export class QualityController {
       this.currentMode = mode;
       this.stableFrames = 0;
       this.cooldownFrames = 0;
+      this.overBudgetFrames = 0;
     }
   }
 
@@ -275,13 +343,24 @@ export class QualityController {
    * @returns The next higher quality tier, or current tier if already at maximum.
    */
   private upgradeTier(): TierKey {
+    if (this.tier === 'A') {
+      return 'A';
+    }
     if (this.tier === 'D') {
-      return 'C';
+      return this.canUpgradeTo('C') ? 'C' : 'D';
     }
     if (this.tier === 'C') {
-      return 'B';
+      return this.canUpgradeTo('B') ? 'B' : 'C';
     }
     // Tier B or A: can only go to A (maximum quality)
-    return this.tier === 'B' ? 'A' : 'A';
+    return this.tier === 'B' && this.canUpgradeTo('A') ? 'A' : 'B';
+  }
+
+  private canUpgradeTo(tier: TierKey): boolean {
+    if (!this.maxTier) {
+      return true;
+    }
+    const rank: Record<TierKey, number> = {D: 0, C: 1, B: 2, A: 3};
+    return rank[tier] <= rank[this.maxTier];
   }
 }

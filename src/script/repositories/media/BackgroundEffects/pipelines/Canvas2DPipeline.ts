@@ -23,6 +23,7 @@ import type {Pipeline, PipelineConfig, PipelineInit} from './Pipeline';
 
 import {
   buildMetrics,
+  computeBlurRadius,
   getQualityMode,
   MetricsSample,
   pushMetricsSample,
@@ -218,7 +219,7 @@ export class Canvas2DPipeline implements Pipeline {
       }
 
       ctx.clearRect(0, 0, width, height);
-      const blurPx = Math.round(2 + this.config.blurStrength * 10);
+      const blurPx = computeBlurRadius(qualityTier, this.config.blurStrength, false);
       if (this.config.mode === 'virtual' && this.background) {
         ctx.drawImage(this.background.bitmap, 0, 0, this.background.width, this.background.height, 0, 0, width, height);
       } else {

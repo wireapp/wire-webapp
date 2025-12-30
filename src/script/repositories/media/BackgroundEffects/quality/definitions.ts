@@ -84,10 +84,10 @@ export const TIER_DEFINITIONS: Record<TierKey, TierDefinition> = {
   A: {
     tier: 'A',
     segmentationWidth: 256,
-    segmentationHeight: 144,
+    segmentationHeight: 256,
     segmentationCadence: 1,
     maskRefineScale: 0.5,
-    blurDownsampleScale: 0.25,
+    blurDownsampleScale: 0.5,
     blurRadius: 4,
     bilateralRadius: 5,
     bilateralSpatialSigma: 3.5,

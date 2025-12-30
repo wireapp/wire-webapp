@@ -31,3 +31,4 @@ export {
 } from './definitions';
 export {getQualityMode, getBypassTier, resolveQualityTier} from './resolve';
 export {buildMetrics, pushMetricsSample, type MetricsSample} from './metrics';
+export {computeBlurRadius} from './blur';

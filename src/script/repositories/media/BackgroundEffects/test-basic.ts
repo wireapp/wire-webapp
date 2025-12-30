@@ -307,9 +307,9 @@ async function runBrowserDemo() {
   }
 
   const params = new URLSearchParams(window.location.search);
-  const mode = (params.get('mode') as EffectMode) || 'blur';
-  const debugMode = (params.get('debug') as DebugMode) || 'maskOverlay';
-  const quality = (params.get('quality') as QualityMode) || 'A';
+  const mode = (params.get('mode') as EffectMode) || 'virtual';
+  const debugMode = (params.get('debug') as DebugMode) || 'off';
+  const quality = (params.get('quality') as QualityMode) || 'auto';
   const blurStrength = Number(params.get('blur') ?? '0.7');
   const targetFps = Number(params.get('fps') ?? '30');
   const backgroundKind = params.get('bg') || (mode === 'virtual' ? 'gradient' : 'none');

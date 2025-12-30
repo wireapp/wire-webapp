@@ -17,7 +17,7 @@
  * Uniforms:
  *   uSrc: Source texture to blur
  *   uTexelSize: Texture texel size (1/width, 1/height) for pixel offsets
- *   uRadius: Blur radius in pixels (clamped to MAX_RADIUS = 8)
+ *   uRadius: Blur radius in pixels (clamped to MAX_RADIUS = 16)
  */
 
 
@@ -42,7 +42,7 @@ float gaussian(float x, float sigma) {
 }
 
 void main() {
-  const int MAX_RADIUS = 8; // Maximum blur radius (performance limit)
+  const int MAX_RADIUS = 16; // Maximum blur radius (performance limit)
   float sigma = max(1.0, uRadius); // Sigma derived from radius
   vec4 sum = vec4(0.0);
   float weightSum = 0.0;

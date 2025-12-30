@@ -52,7 +52,7 @@ export async function handleFrame(frame: ImageBitmap, timestamp: number, width: 
     }
 
     let qualityTier = resolveQualityTierParams();
-    await ensureSegmenterForTier(qualityTier.tier);
+    ensureSegmenterForTier(qualityTier.tier);
     if (!state.segmenter) {
       qualityTier = {...qualityTier, bypass: true};
     }
@@ -120,8 +120,11 @@ function resolveQualityTierParams(): QualityTierParams {
   return resolveQualityTier(state.qualityController, state.quality, getQualityMode(state.mode));
 }
 
-async function ensureSegmenterForTier(tier: 'A' | 'B' | 'C' | 'D'): Promise<void> {
+function ensureSegmenterForTier(tier: 'A' | 'B' | 'C' | 'D'): void {
   if (!state.options || !state.canvas) {
+    return;
+  }
+  if (state.segmenterInitPromise) {
     return;
   }
   const desiredPath = resolveSegmentationModelPath(
@@ -132,17 +135,22 @@ async function ensureSegmenterForTier(tier: 'A' | 'B' | 'C' | 'D'): Promise<void
   if (state.currentModelPath === desiredPath && state.segmenter) {
     return;
   }
-  const nextSegmenter = new Segmenter(desiredPath, 'GPU', state.canvas);
-  try {
-    await nextSegmenter.init();
-  } catch (error) {
-    console.warn('[bgfx.worker] Segmentation model swap failed, keeping previous model', error);
-    nextSegmenter.close();
-    return;
-  }
-  state.segmenter?.close();
-  state.segmenter = nextSegmenter;
-  state.currentModelPath = desiredPath;
+  state.segmenterInitPromise = (async () => {
+    const nextSegmenter = new Segmenter(desiredPath, 'GPU', state.canvas as OffscreenCanvas);
+    try {
+      await nextSegmenter.init();
+    } catch (error) {
+      console.warn('[bgfx.worker] Segmentation model swap failed, keeping previous model', error);
+      nextSegmenter.close();
+      return;
+    }
+    state.segmenter?.close();
+    state.segmenter = nextSegmenter;
+    state.currentModelPath = desiredPath;
+  })();
+  void state.segmenterInitPromise.finally(() => {
+    state.segmenterInitPromise = null;
+  });
 }
 
 function updateMetrics(totalMs: number, segmentationMs: number, gpuMs: number, tier: 'A' | 'B' | 'C' | 'D'): void {

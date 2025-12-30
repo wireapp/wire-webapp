@@ -56,16 +56,23 @@ export async function handleInit(
     options.segmentationModelByTier,
     options.segmentationModelPath,
   );
-  state.segmenter = new Segmenter(modelPath, 'GPU', canvas);
-  try {
-    await state.segmenter.init();
-    state.currentModelPath = modelPath;
-  } catch (error) {
-    console.warn('[bgfx.worker] Segmenter init failed, running in bypass mode.', error);
-    postMessage({type: 'segmenterError', error: String(error)} as WorkerResponse);
-    state.segmenter = null;
-    state.currentModelPath = null;
-  }
+  state.segmenterInitPromise = (async () => {
+    const segmenter = new Segmenter(modelPath, 'GPU', canvas);
+    try {
+      await segmenter.init();
+      state.segmenter?.close();
+      state.segmenter = segmenter;
+      state.currentModelPath = modelPath;
+    } catch (error) {
+      console.warn('[bgfx.worker] Segmenter init failed, running in bypass mode.', error);
+      postMessage({type: 'segmenterError', error: String(error)} as WorkerResponse);
+      segmenter.close();
+      state.segmenter = null;
+      state.currentModelPath = null;
+    } finally {
+      state.segmenterInitPromise = null;
+    }
+  })();
 
   bindContextLossHandlers(canvas);
 }

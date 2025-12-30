@@ -36,6 +36,7 @@ import {RenderPasses} from './RenderPasses';
 import {ShaderPrograms} from './ShaderPrograms';
 import {WebGLResources, type Size} from './WebGLResources';
 
+import {computeBlurRadius} from '../quality';
 import type {DebugMode, EffectMode, QualityTierParams} from '../types';
 
 /**
@@ -368,11 +369,13 @@ export class WebGLRenderer {
     }
 
     // Pass 5: Horizontal Gaussian blur (separable blur for efficiency)
+    const dynamicBlurRadius = computeBlurRadius(quality, blurStrength, true);
+
     const videoSmallSize = this.resources.getSize('videoSmallTex')!;
     this.passes.drawToTexture('blurH', 'blurHTex', this.resources.getSize('blurHTex')!, {
       uSrc: this.resources.getTexture('videoSmallTex'),
       uTexelSize: [1 / videoSmallSize.width, 1 / videoSmallSize.height],
-      uRadius: quality.blurRadius,
+      uRadius: dynamicBlurRadius,
     });
 
     // Pass 6: Vertical Gaussian blur (completes separable blur)
@@ -380,7 +383,7 @@ export class WebGLRenderer {
     this.passes.drawToTexture('blurV', 'blurVTex', this.resources.getSize('blurVTex')!, {
       uSrc: this.resources.getTexture('blurHTex'),
       uTexelSize: [1 / blurHSize.width, 1 / blurHSize.height],
-      uRadius: quality.blurRadius,
+      uRadius: dynamicBlurRadius,
     });
 
     // Debug mode: Overlay mask visualization
