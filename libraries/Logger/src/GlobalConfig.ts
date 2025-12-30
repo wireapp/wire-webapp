@@ -144,13 +144,29 @@ class GlobalLoggerConfig {
 
   /**
    * Update configuration after initialization
+   *
+   * IMPORTANT: Transports are merged, not replaced. This allows:
+   * - Browser to update console/datadog without affecting file transport (set by Electron)
+   * - Electron to set file transport without affecting browser-configured transports
    */
   updateConfig(updates: Partial<LoggerConfig>): void {
     if (!this.initialized) {
       throw new Error('[GlobalLoggerConfig] Must call initialize() before updateConfig()');
     }
 
-    this.config = {...this.config!, ...updates};
+    // Deep merge transports instead of replacing them
+    const mergedTransports = updates.transports
+      ? {
+          ...this.config!.transports,
+          ...updates.transports,
+        }
+      : this.config!.transports;
+
+    this.config = {
+      ...this.config!,
+      ...updates,
+      transports: mergedTransports,
+    };
 
     // Recreate transport manager and sanitizer if needed
     if (updates.transports) {

@@ -122,6 +122,103 @@ describe('GlobalConfig', () => {
       expect(newTransportManager).toBeDefined();
     });
 
+    it('should merge transports instead of replacing them', () => {
+      // Initialize with console and file transports
+      initializeLogger(
+        {platform: 'electron', deployment: 'development'},
+        {
+          transports: {
+            console: {enabled: true, level: LogLevel.INFO},
+            file: {
+              enabled: true,
+              level: LogLevel.DEBUG,
+              path: './test.log',
+              maxSize: 1024,
+              maxFiles: 5,
+              format: 'json',
+              runtimeEnvironment: {platform: 'electron', deployment: 'development'},
+            },
+          },
+        },
+      );
+
+      // Update only the datadog transport (simulating browser updating config)
+      updateLoggerConfig({
+        transports: {
+          datadog: {
+            enabled: true,
+            level: LogLevel.INFO,
+            clientToken: 'test-token',
+            applicationId: 'test-app-id',
+            site: 'datadoghq.eu',
+            service: 'test-service',
+            forwardConsoleLogs: false,
+          },
+        },
+      });
+
+      const config = getLoggerConfig();
+
+      // Console and file transports should still be present
+      expect(config.transports.console).toBeDefined();
+      expect(config.transports.console?.enabled).toBe(true);
+      expect(config.transports.file).toBeDefined();
+      expect(config.transports.file?.enabled).toBe(true);
+      expect(config.transports.file?.path).toBe('./test.log');
+
+      // Datadog transport should be added
+      expect(config.transports.datadog).toBeDefined();
+      expect(config.transports.datadog?.enabled).toBe(true);
+    });
+
+    it('should allow updating individual transports without affecting others', () => {
+      // Initialize with all three transports
+      initializeLogger(
+        {platform: 'electron', deployment: 'development'},
+        {
+          transports: {
+            console: {enabled: true, level: LogLevel.INFO},
+            file: {
+              enabled: true,
+              level: LogLevel.DEBUG,
+              path: './test.log',
+              maxSize: 1024,
+              maxFiles: 5,
+              format: 'json',
+              runtimeEnvironment: {platform: 'electron', deployment: 'development'},
+            },
+            datadog: {
+              enabled: false,
+              level: LogLevel.INFO,
+              clientToken: 'test-token',
+              applicationId: 'test-app-id',
+              site: 'datadoghq.eu',
+              service: 'test-service',
+              forwardConsoleLogs: false,
+            },
+          },
+        },
+      );
+
+      // Update only console transport
+      updateLoggerConfig({
+        transports: {
+          console: {enabled: false, level: LogLevel.ERROR},
+        },
+      });
+
+      const config = getLoggerConfig();
+
+      // Console should be updated
+      expect(config.transports.console?.enabled).toBe(false);
+      expect(config.transports.console?.level).toBe(LogLevel.ERROR);
+
+      // File and datadog should remain unchanged
+      expect(config.transports.file?.enabled).toBe(true);
+      expect(config.transports.file?.path).toBe('./test.log');
+      expect(config.transports.datadog?.enabled).toBe(false);
+    });
+
     it('should recreate sanitizer when sanitization rules updated', () => {
       initializeLogger({platform: 'browser', deployment: 'development'});
       const originalSanitizer = globalConfig.getSanitizer();
@@ -288,33 +385,39 @@ describe('GlobalConfig', () => {
       });
 
       it('should return null when DataDog transport is not configured', () => {
-        initializeLogger({platform: 'browser', deployment: 'development'}, {
-          transports: {
-            console: {
-              enabled: true,
-              level: LogLevel.INFO,
+        initializeLogger(
+          {platform: 'browser', deployment: 'development'},
+          {
+            transports: {
+              console: {
+                enabled: true,
+                level: LogLevel.INFO,
+              },
             },
           },
-        });
+        );
 
         const transport = getDatadogTransport();
         expect(transport).toBeNull();
       });
 
       it('should return DataDog transport when configured', () => {
-        initializeLogger({platform: 'browser', deployment: 'production'}, {
-          transports: {
-            datadog: {
-              enabled: true,
-              level: LogLevel.INFO,
-              clientToken: 'test-token',
-              applicationId: 'test-app-id',
-              site: 'datadoghq.eu',
-              service: 'test-service',
-              forwardConsoleLogs: false,
+        initializeLogger(
+          {platform: 'browser', deployment: 'production'},
+          {
+            transports: {
+              datadog: {
+                enabled: true,
+                level: LogLevel.INFO,
+                clientToken: 'test-token',
+                applicationId: 'test-app-id',
+                site: 'datadoghq.eu',
+                service: 'test-service',
+                forwardConsoleLogs: false,
+              },
             },
           },
-        });
+        );
 
         const transport = getDatadogTransport();
         expect(transport).toBeDefined();
@@ -322,19 +425,22 @@ describe('GlobalConfig', () => {
       });
 
       it('should return same transport instance on multiple calls', () => {
-        initializeLogger({platform: 'browser', deployment: 'production'}, {
-          transports: {
-            datadog: {
-              enabled: true,
-              level: LogLevel.INFO,
-              clientToken: 'test-token',
-              applicationId: 'test-app-id',
-              site: 'datadoghq.eu',
-              service: 'test-service',
-              forwardConsoleLogs: false,
+        initializeLogger(
+          {platform: 'browser', deployment: 'production'},
+          {
+            transports: {
+              datadog: {
+                enabled: true,
+                level: LogLevel.INFO,
+                clientToken: 'test-token',
+                applicationId: 'test-app-id',
+                site: 'datadoghq.eu',
+                service: 'test-service',
+                forwardConsoleLogs: false,
+              },
             },
           },
-        });
+        );
 
         const transport1 = getDatadogTransport();
         const transport2 = getDatadogTransport();
@@ -348,54 +454,63 @@ describe('GlobalConfig', () => {
       });
 
       it('should return false when DataDog transport is not configured', () => {
-        initializeLogger({platform: 'browser', deployment: 'development'}, {
-          transports: {
-            console: {
-              enabled: true,
-              level: LogLevel.INFO,
+        initializeLogger(
+          {platform: 'browser', deployment: 'development'},
+          {
+            transports: {
+              console: {
+                enabled: true,
+                level: LogLevel.INFO,
+              },
             },
           },
-        });
+        );
 
         expect(isDatadogEnabled()).toBe(false);
       });
 
       it('should return false when DataDog transport is disabled', () => {
-        initializeLogger({platform: 'browser', deployment: 'production'}, {
-          transports: {
-            datadog: {
-              enabled: false,
-              level: LogLevel.INFO,
-              clientToken: 'test-token',
-              applicationId: 'test-app-id',
-              site: 'datadoghq.eu',
-              service: 'test-service',
-              forwardConsoleLogs: false,
+        initializeLogger(
+          {platform: 'browser', deployment: 'production'},
+          {
+            transports: {
+              datadog: {
+                enabled: false,
+                level: LogLevel.INFO,
+                clientToken: 'test-token',
+                applicationId: 'test-app-id',
+                site: 'datadoghq.eu',
+                service: 'test-service',
+                forwardConsoleLogs: false,
+              },
             },
           },
-        });
+        );
 
         expect(isDatadogEnabled()).toBe(false);
       });
 
-      it('should return false when DataDog SDKs are not available (initialization fails)', () => {
-        // DataDog transport will fail to initialize in test environment
-        initializeLogger({platform: 'browser', deployment: 'production'}, {
-          transports: {
-            datadog: {
-              enabled: true,
-              level: LogLevel.INFO,
-              clientToken: 'test-token',
-              applicationId: 'test-app-id',
-              site: 'datadoghq.eu',
-              service: 'test-service',
-              forwardConsoleLogs: false,
+      it('should return true when DataDog SDKs are mocked and available', () => {
+        // In test environment, DataDog SDKs are mocked
+        initializeLogger(
+          {platform: 'browser', deployment: 'production'},
+          {
+            transports: {
+              datadog: {
+                enabled: true,
+                level: LogLevel.INFO,
+                clientToken: 'test-token',
+                applicationId: 'test-app-id',
+                site: 'datadoghq.eu',
+                service: 'test-service',
+                forwardConsoleLogs: false,
+              },
             },
           },
-        });
+        );
 
-        // In test environment, DataDog SDKs are not available
-        expect(isDatadogEnabled()).toBe(false);
+        // With mocked DataDog SDKs, initialization succeeds
+        expect(isDatadogEnabled()).toBe(true);
       });
     });
 
@@ -407,14 +522,17 @@ describe('GlobalConfig', () => {
       });
 
       it('should not throw when DataDog transport is not configured', () => {
-        initializeLogger({platform: 'browser', deployment: 'development'}, {
-          transports: {
-            console: {
-              enabled: true,
-              level: LogLevel.INFO,
+        initializeLogger(
+          {platform: 'browser', deployment: 'development'},
+          {
+            transports: {
+              console: {
+                enabled: true,
+                level: LogLevel.INFO,
+              },
             },
           },
-        });
+        );
 
         expect(() => {
           setDatadogUser('test-user-123');
@@ -422,19 +540,22 @@ describe('GlobalConfig', () => {
       });
 
       it('should call setUser on DataDog transport when available', () => {
-        initializeLogger({platform: 'browser', deployment: 'production'}, {
-          transports: {
-            datadog: {
-              enabled: true,
-              level: LogLevel.INFO,
-              clientToken: 'test-token',
-              applicationId: 'test-app-id',
-              site: 'datadoghq.eu',
-              service: 'test-service',
-              forwardConsoleLogs: false,
+        initializeLogger(
+          {platform: 'browser', deployment: 'production'},
+          {
+            transports: {
+              datadog: {
+                enabled: true,
+                level: LogLevel.INFO,
+                clientToken: 'test-token',
+                applicationId: 'test-app-id',
+                site: 'datadoghq.eu',
+                service: 'test-service',
+                forwardConsoleLogs: false,
+              },
             },
           },
-        });
+        );
 
         const transport = getDatadogTransport();
         if (transport) {
@@ -445,19 +566,22 @@ describe('GlobalConfig', () => {
       });
 
       it('should handle multiple setUser calls', () => {
-        initializeLogger({platform: 'browser', deployment: 'production'}, {
-          transports: {
-            datadog: {
-              enabled: true,
-              level: LogLevel.INFO,
-              clientToken: 'test-token',
-              applicationId: 'test-app-id',
-              site: 'datadoghq.eu',
-              service: 'test-service',
-              forwardConsoleLogs: false,
+        initializeLogger(
+          {platform: 'browser', deployment: 'production'},
+          {
+            transports: {
+              datadog: {
+                enabled: true,
+                level: LogLevel.INFO,
+                clientToken: 'test-token',
+                applicationId: 'test-app-id',
+                site: 'datadoghq.eu',
+                service: 'test-service',
+                forwardConsoleLogs: false,
+              },
             },
           },
-        });
+        );
 
         expect(() => {
           setDatadogUser('user-1');

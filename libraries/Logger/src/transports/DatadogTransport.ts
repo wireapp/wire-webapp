@@ -17,14 +17,14 @@
  *
  */
 
+import {datadogLogs} from '@datadog/browser-logs';
+import {datadogRum} from '@datadog/browser-rum';
 import logdown from 'logdown';
 
 import {Transport, LogEntry, LogLevel, DatadogTransportConfig} from '../types';
 import {isAllowedAVSLog} from '../utils/avsFilter';
 
 // Datadog SDK imports - these will be bundled with the library
-import {datadogLogs} from '@datadog/browser-logs';
-import {datadogRum} from '@datadog/browser-rum';
 
 /**
  * Datadog transport implementation - Sends production logs to DataDog
@@ -101,9 +101,14 @@ export class DatadogTransport implements Transport {
     this.debugLogger = logdown('@wireapp/logger/DatadogTransport');
     this.debugLogger.state.isEnabled = true;
 
-    // Only initialize if Datadog SDKs are available
-    if (datadogLogs && datadogRum && config.enabled) {
+    // Only initialize if Datadog SDKs are available AND credentials are provided
+    const hasCredentials = !!(config.clientToken && config.applicationId);
+    if (datadogLogs && datadogRum && config.enabled && hasCredentials) {
       this.initializeDatadog();
+    } else if (!hasCredentials && config.enabled) {
+      this.debugLogger.warn(
+        'Datadog enabled but missing credentials (clientToken or applicationId); skipping initialization.',
+      );
     } else {
       this.debugLogger.warn('Datadog SDKs not available or transport disabled; skipping initialization.');
     }

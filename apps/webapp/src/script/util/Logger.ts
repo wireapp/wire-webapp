@@ -27,7 +27,7 @@ import {
   Logger,
 } from '@wireapp/logger';
 
-import {Config, Configuration} from '../Config';
+import {Configuration} from '../Config';
 
 const LOGGER_NAMESPACE = '@wireapp/webapp';
 
@@ -76,17 +76,6 @@ let isAppLoggerInitialized = false;
  * ```
  */
 export function getLogger(name: string) {
-  // Warn if logger hasn't been initialized in production
-  if (!isLoggerInitialized() && typeof window !== 'undefined') {
-    const config = Config.getConfig();
-    if (config.ENVIRONMENT === 'production') {
-      console.warn(
-        '[Logger] Logger not initialized! Call initializeWireLogger() at app startup. ' +
-          'Auto-initializing with development defaults.',
-      );
-    }
-  }
-
   return getWireLogger(`${LOGGER_NAMESPACE}/${name}`);
 }
 
@@ -107,52 +96,43 @@ export async function initializeWireLogger(config: Configuration, user?: {id?: s
   const isDevelopment = config.ENVIRONMENT !== 'production';
   const hasDataDog = !!(config.dataDog?.applicationId && config.dataDog?.clientToken);
 
-  // Check if logger was already initialized (e.g., from Electron main process)
+  // Build the configuration - only specify transports we want to control
+  // IMPORTANT: Don't include file transport here, as Electron may have configured it
+  const loggerConfig = {
+    transports: {
+      console: {
+        enabled: true,
+        level: isDevelopment ? LogLevel.DEBUG : LogLevel.INFO,
+      },
+      datadog: hasDataDog
+        ? {
+            enabled: true,
+            level: LogLevel.INFO,
+            clientToken: config.dataDog!.clientToken!,
+            applicationId: config.dataDog!.applicationId!,
+            site: 'datadoghq.eu',
+            service: 'web-internal',
+            forwardConsoleLogs: false,
+            env: config.FEATURE?.DATADOG_ENVIRONMENT || config.ENVIRONMENT,
+            version: config.VERSION,
+          }
+        : undefined,
+    },
+  };
+
+  // Check if logger was already initialized (e.g., auto-initialized by getLogger() or from Electron)
   if (!isLoggerInitialized()) {
+    // First time initialization
     initializeLogger(
       {
         platform: 'browser',
         deployment: isDevelopment ? 'development' : 'production',
       },
-      {
-        transports: {
-          console: {
-            enabled: true,
-            level: isDevelopment ? LogLevel.DEBUG : LogLevel.INFO,
-          },
-          datadog: hasDataDog
-            ? {
-                enabled: true,
-                level: LogLevel.INFO,
-                clientToken: config.dataDog!.clientToken!,
-                applicationId: config.dataDog!.applicationId!,
-                site: 'datadoghq.eu',
-                service: 'web-internal',
-                forwardConsoleLogs: false,
-                env: config.FEATURE?.DATADOG_ENVIRONMENT || config.ENVIRONMENT,
-                version: config.VERSION,
-              }
-            : undefined,
-        },
-      },
+      loggerConfig,
     );
-  } else if (hasDataDog) {
-    // If already initialized (from Electron), just add DataDog transport
-    updateLoggerConfig({
-      transports: {
-        datadog: {
-          enabled: true,
-          level: LogLevel.INFO,
-          clientToken: config.dataDog!.clientToken!,
-          applicationId: config.dataDog!.applicationId!,
-          site: 'datadoghq.eu',
-          service: 'web-internal',
-          forwardConsoleLogs: false,
-          env: config.FEATURE?.DATADOG_ENVIRONMENT || config.ENVIRONMENT,
-          version: config.VERSION,
-        },
-      },
-    });
+  } else {
+    // Logger was already initialized (auto-init or Electron), update the configuration
+    updateLoggerConfig(loggerConfig);
   }
 
   // Set user if provided (DataDog is initialized by the transport)

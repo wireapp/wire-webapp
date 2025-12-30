@@ -17,6 +17,10 @@
  *
  */
 
+// Mock DataDog packages
+jest.mock('@datadog/browser-logs');
+jest.mock('@datadog/browser-rum');
+
 // Mock console methods for testing
 global.console = {
   ...console,
@@ -29,18 +33,3 @@ global.console = {
 
 // Mock window for browser-specific tests
 global.window = global.window || {};
-
-// Mock Datadog SDK
-(global as any).datadogLogs = {
-  init: jest.fn(() => ({
-    logger: {
-      log: jest.fn(),
-      addContext: jest.fn(),
-    },
-  })),
-};
-
-(global as any).datadogRum = {
-  init: jest.fn(() => ({})),
-  getInternalContext: jest.fn(() => ({session_id: 'test-session-id'})),
-};

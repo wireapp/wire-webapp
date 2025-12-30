@@ -16,7 +16,7 @@
       "executor": "@nx/jest:jest",
       "outputs": ["{workspaceRoot}/coverage/libraries/Logger"],
       "options": {
-        "jestConfig": "{projectRoot}/jest.config.js",
+        "jestConfig": "{projectRoot}/jest.config.cjs",
         "passWithNoTests": false
       },
       "configurations": {
