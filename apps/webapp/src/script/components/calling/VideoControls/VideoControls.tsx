@@ -661,6 +661,8 @@ export const VideoControls = ({
                   }
                   type="button"
                   aria-expanded={videoOptionsOpen}
+                  aria-label={t('videoCallMenuMoreCameraSettings')}
+                  title={t('videoCallMenuMoreCameraSettings')}
                 >
                   <Icon.ChevronIcon css={{rotate: videoOptionsOpen ? '0deg' : '180deg', height: '16px'}} />
                 </button>

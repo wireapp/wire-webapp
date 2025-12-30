@@ -118,24 +118,30 @@ export class Participant {
 
     if (!this.backgroundEffectsController || !this.blurredVideoStream()) {
       const controller = new BackgroundEffectsController();
-      const {outputTrack, stop} = await controller.start(videoTrack, {
-        mode: isVirtual ? 'virtual' : 'blur',
-        blurStrength,
-        quality: 'auto',
-        targetFps: 30,
-        debugMode: 'off',
-        ...(isVirtual && backgroundSource ? {backgroundImage: backgroundSource} : {}),
-      });
-      const processedStream = new MediaStream([outputTrack]);
-      this.backgroundEffectsController = controller;
-      this.blurredVideoStream({
-        stream: processedStream,
-        release: () => {
-          stop();
-          outputTrack.stop();
-          this.backgroundEffectsController = null;
-        },
-      });
+      try {
+        const {outputTrack, stop} = await controller.start(videoTrack, {
+          mode: isVirtual ? 'virtual' : 'blur',
+          blurStrength,
+          quality: 'auto',
+          targetFps: 30,
+          debugMode: 'off',
+          ...(isVirtual && backgroundSource ? {backgroundImage: backgroundSource} : {}),
+        });
+        const processedStream = new MediaStream([outputTrack]);
+        this.backgroundEffectsController = controller;
+        this.blurredVideoStream({
+          stream: processedStream,
+          release: () => {
+            stop();
+            outputTrack.stop();
+            this.backgroundEffectsController = null;
+          },
+        });
+      } catch (_error) {
+        controller.stop();
+        this.releaseBlurredVideoStream();
+        return undefined;
+      }
     }
 
     if (!this.backgroundEffectsController) {

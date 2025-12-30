@@ -73,7 +73,7 @@ import {NOTIFICATION_HANDLING_STATE} from 'Repositories/event/NotificationHandli
 import type {MediaDevicesHandler} from 'Repositories/media/MediaDevicesHandler';
 import type {MediaStreamHandler} from 'Repositories/media/MediaStreamHandler';
 import {MediaType} from 'Repositories/media/MediaType';
-import {loadBackgroundSource} from 'Repositories/media/VideoBackgroundEffects';
+import {DEFAULT_BACKGROUND_EFFECT, loadBackgroundSource} from 'Repositories/media/VideoBackgroundEffects';
 import type {BackgroundEffectSelection, BackgroundSource} from 'Repositories/media/VideoBackgroundEffects';
 import {TeamState} from 'Repositories/team/TeamState';
 import {EventName} from 'Repositories/tracking/EventName';
@@ -153,6 +153,7 @@ export class CallingRepository {
   private readonly acceptVersionWarning: (conversationId: QualifiedId) => void;
   private readonly callLog: string[];
   private readonly logger: Logger;
+  private preferredBackgroundEffect: BackgroundEffectSelection = DEFAULT_BACKGROUND_EFFECT;
   private avsVersion: number = 0;
   private incomingCallCallback: (call: Call) => void;
   private isReady: boolean = false;
@@ -322,6 +323,7 @@ export class CallingRepository {
     effect: BackgroundEffectSelection,
     customBackground?: BackgroundSource,
   ): Promise<void> {
+    this.preferredBackgroundEffect = effect;
     const activeCall = this.callState.joinedCall();
     if (!activeCall) {
       return;
@@ -333,27 +335,55 @@ export class CallingRepository {
       return;
     }
 
+    const previousEffect = selfParticipant.backgroundEffect();
+    const {applied, processedStream} = await this.applyBackgroundEffectToParticipant(
+      selfParticipant,
+      effect,
+      customBackground,
+    );
+    if (!applied) {
+      return;
+    }
+    selfParticipant.backgroundEffect(effect);
+
     if (effect.type === 'none') {
-      selfParticipant.releaseBlurredVideoStream();
-      selfParticipant.backgroundEffect(effect);
       this.changeMediaSource(videoFeed, MediaType.VIDEO, false);
       return;
     }
 
-    const previousEffect = selfParticipant.backgroundEffect();
+    if (processedStream && (previousEffect.type === 'none' || !selfParticipant.blurredVideoStream())) {
+      this.changeMediaSource(processedStream, MediaType.VIDEO, false);
+    }
+  }
+
+  private async applyBackgroundEffectToParticipant(
+    selfParticipant: Participant,
+    effect: BackgroundEffectSelection,
+    customBackground?: BackgroundSource,
+  ): Promise<{applied: boolean; processedStream?: MediaStream}> {
+    const videoFeed = selfParticipant.videoStream();
+    if (!videoFeed) {
+      return {applied: false};
+    }
+
+    if (effect.type === 'none') {
+      selfParticipant.releaseBlurredVideoStream();
+      return {applied: true, processedStream: videoFeed};
+    }
+
     let backgroundSource: BackgroundSource | undefined;
     try {
       if (effect.type === 'virtual') {
         backgroundSource = await loadBackgroundSource(effect.backgroundId);
       } else if (effect.type === 'custom') {
         if (!customBackground) {
-          return;
+          return {applied: false};
         }
         backgroundSource = customBackground;
       }
     } catch (error) {
       this.logger.warn('Failed to load background source', error);
-      return;
+      return {applied: false};
     }
 
     let processedStream: MediaStream | undefined;
@@ -361,16 +391,14 @@ export class CallingRepository {
       processedStream = await selfParticipant.applyBackgroundEffect(effect, backgroundSource);
     } catch (error) {
       this.logger.warn('Failed to apply background effect', error);
-      return;
+      return {applied: false};
     }
-    if (!processedStream) {
-      return;
-    }
-    selfParticipant.backgroundEffect(effect);
 
-    if (previousEffect.type === 'none' || !selfParticipant.blurredVideoStream()) {
-      this.changeMediaSource(processedStream, MediaType.VIDEO, false);
+    if (!processedStream) {
+      return {applied: false};
     }
+
+    return {applied: true, processedStream};
   }
 
   getStats(conversationId: QualifiedId) {
@@ -659,16 +687,11 @@ export class CallingRepository {
       const mediaStream = await this.getMediaStream({audio, camera}, call.isGroupOrConference);
       if (call.state() !== CALL_STATE.NONE) {
         selfParticipant.updateMediaStream(mediaStream, true);
-        const effect = selfParticipant.backgroundEffect();
-        let backgroundSource: BackgroundSource | undefined;
-        if (effect.type === 'virtual') {
-          try {
-            backgroundSource = await loadBackgroundSource(effect.backgroundId);
-          } catch (error) {
-            this.logger.warn('Failed to load background source', error);
-          }
+        const effect = this.preferredBackgroundEffect;
+        const {applied} = await this.applyBackgroundEffectToParticipant(selfParticipant, effect);
+        if (applied) {
+          selfParticipant.backgroundEffect(effect);
         }
-        await selfParticipant.applyBackgroundEffect(effect, backgroundSource);
         if (camera) {
           call.getSelfParticipant().videoState(VIDEO_STATE.STARTED);
         }
@@ -1906,11 +1929,7 @@ export class CallingRepository {
     const clonedMediaStream = this.changeMediaSource(stream, MediaType.VIDEO);
     const activeCall = this.callState.joinedCall();
     if (activeCall) {
-      const selfParticipant = activeCall.getSelfParticipant();
-      const effect = selfParticipant.backgroundEffect();
-      if (effect.type !== 'none') {
-        await this.switchVideoBackgroundEffect(effect);
-      }
+      await this.switchVideoBackgroundEffect(this.preferredBackgroundEffect);
     }
     return clonedMediaStream;
   }
@@ -2586,16 +2605,11 @@ export class CallingRepository {
         const mediaStream = await this.getMediaStream(missingStreams, call.isGroupOrConference);
         this.mediaStreamQuery = undefined;
         selfParticipant.updateMediaStream(mediaStream, true);
-        const effect = selfParticipant.backgroundEffect();
-        let backgroundSource: BackgroundSource | undefined;
-        if (effect.type === 'virtual') {
-          try {
-            backgroundSource = await loadBackgroundSource(effect.backgroundId);
-          } catch (error) {
-            this.logger.warn('Failed to load background source', error);
-          }
+        const effect = this.preferredBackgroundEffect;
+        const {applied} = await this.applyBackgroundEffectToParticipant(selfParticipant, effect);
+        if (applied) {
+          selfParticipant.backgroundEffect(effect);
         }
-        await selfParticipant.applyBackgroundEffect(effect, backgroundSource);
         return selfParticipant.getMediaStream();
       } catch (error) {
         this.mediaStreamQuery = undefined;

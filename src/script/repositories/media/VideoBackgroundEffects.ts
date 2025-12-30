@@ -93,7 +93,31 @@ export const BUILTIN_BACKGROUNDS: BuiltinBackground[] = BUILTIN_BACKGROUND_DEFIN
   previewGradient: buildGradient(definition.previewColors),
 }));
 
+const MAX_BACKGROUND_CACHE_ENTRIES = 8;
 const backgroundImageCache = new Map<string, HTMLImageElement>();
+
+const getCachedImage = (backgroundId: string): HTMLImageElement | undefined => {
+  const cached = backgroundImageCache.get(backgroundId);
+  if (!cached) {
+    return undefined;
+  }
+  backgroundImageCache.delete(backgroundId);
+  backgroundImageCache.set(backgroundId, cached);
+  return cached;
+};
+
+const setCachedImage = (backgroundId: string, image: HTMLImageElement): void => {
+  if (backgroundImageCache.has(backgroundId)) {
+    backgroundImageCache.delete(backgroundId);
+  }
+  backgroundImageCache.set(backgroundId, image);
+  if (backgroundImageCache.size > MAX_BACKGROUND_CACHE_ENTRIES) {
+    const oldestKey = backgroundImageCache.keys().next().value;
+    if (oldestKey) {
+      backgroundImageCache.delete(oldestKey);
+    }
+  }
+};
 
 const loadImage = (src: string): Promise<HTMLImageElement> =>
   new Promise((resolve, reject) => {
@@ -136,13 +160,13 @@ export const loadBackgroundSource = async (backgroundId: string): Promise<Backgr
   if (!background) {
     throw new Error(`Unknown background id: ${backgroundId}`);
   }
-  const cachedImage = backgroundImageCache.get(backgroundId);
+  const cachedImage = getCachedImage(backgroundId);
   if (cachedImage) {
     return cachedImage;
   }
   try {
     const image = await loadImage(background.imageUrl);
-    backgroundImageCache.set(backgroundId, image);
+    setCachedImage(backgroundId, image);
     return image;
   } catch (_error) {
     return createGradientBitmap(background.previewColors);
