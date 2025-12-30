@@ -498,6 +498,10 @@ export class CryptographyMapper {
 
   private _mapEdited(edited: MessageEdit) {
     if (edited.multipart) {
+      if (!edited.multipart.text) {
+        const message = 'Edited multipart message is missing required text content.';
+        throw new CryptographyError(CryptographyError.TYPE.UNHANDLED_TYPE, message);
+      }
       const mappedMultipart = this._mapMultipart(edited.multipart.text as Text, edited.multipart.attachments);
       mappedMultipart.data.replacing_message_id = edited.replacingMessageId;
       return mappedMultipart;
