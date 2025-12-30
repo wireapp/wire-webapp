@@ -171,9 +171,7 @@ export class EventMapper {
     if (id !== originalEntity.id && originalEntity.hasMultipartAsset()) {
       originalEntity.assets.removeAll();
       const multipartAsset = this._mapAssetMultipart(eventData as MultipartMessageAddEvent['data']);
-      if (multipartAsset) {
-        originalEntity.assets.push(multipartAsset);
-      }
+      originalEntity.assets.push(multipartAsset);
     } else if (id !== originalEntity.id && originalEntity.hasAssetText()) {
       // Handle regular text messages when ID changes (edit case)
       originalEntity.assets.removeAll();
