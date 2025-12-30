@@ -24,12 +24,12 @@ import type {Pipeline, PipelineConfig, PipelineInit} from './Pipeline';
 import {
   buildMetrics,
   computeBlurRadius,
-  getQualityMode,
-  MetricsSample,
+  createMetricsWindow,
   pushMetricsSample,
   QualityController,
-  resolveQualityTier,
+  resolveQualityTierForEffectMode,
   resolveSegmentationModelPath,
+  resetMetricsWindow,
 } from '../quality';
 import {NoopMaskPostProcessor} from '../segmentation/maskPostProcessor';
 import type {MaskPostProcessor} from '../segmentation/maskPostProcessor';
@@ -56,8 +56,8 @@ export class Canvas2DPipeline implements Pipeline {
   private onMetrics: PipelineInit['onMetrics'] = null;
   private onTierChange: PipelineInit['onTierChange'] | null = null;
   private getDroppedFrames: PipelineInit['getDroppedFrames'] | null = null;
-  private readonly metricsSamples: MetricsSample[] = [];
   private readonly metricsMaxSamples = 30;
+  private readonly metricsWindow = createMetricsWindow(this.metricsMaxSamples);
   private mainFrameCount = 0;
   private canvasFrameToken = 0;
   private canvasPassthroughLogged = false;
@@ -93,11 +93,6 @@ export class Canvas2DPipeline implements Pipeline {
 
     this.segmenterFactory = init.createSegmenter ?? MediaPipeSegmenterFactory;
     this.segmentationModelByTier = init.segmentationModelByTier;
-    this.segmenter = this.segmenterFactory.create({
-      modelPath: init.segmentationModelPath,
-      delegate: 'CPU',
-    });
-    this.currentModelPath = init.segmentationModelPath;
     const postProcessorFactory = init.createMaskPostProcessor ?? {
       create: () => new NoopMaskPostProcessor(),
     };
@@ -108,11 +103,23 @@ export class Canvas2DPipeline implements Pipeline {
     } else if (this.qualityController && this.config?.quality !== 'auto') {
       this.qualityController.setTier(this.config.quality);
     }
-    try {
-      await this.segmenter.init();
-    } catch (error) {
-      this.logger.warn('Segmentation init failed, canvas2d will pass through', error);
+    const startingTier = init.config.quality === 'auto' ? init.initialTier : init.config.quality;
+    const shouldInitSegmenter = startingTier !== 'D' && init.config.mode !== 'passthrough';
+    if (shouldInitSegmenter) {
+      this.segmenter = this.segmenterFactory.create({
+        modelPath: init.segmentationModelPath,
+        delegate: 'CPU',
+      });
+      this.currentModelPath = init.segmentationModelPath;
+      try {
+        await this.segmenter.init();
+      } catch (error) {
+        this.logger.warn('Segmentation init failed, canvas2d will pass through', error);
+        this.segmenter = null;
+      }
+    } else {
       this.segmenter = null;
+      this.currentModelPath = null;
     }
   }
 
@@ -148,7 +155,9 @@ export class Canvas2DPipeline implements Pipeline {
     }
 
     const qualityTier = this.resolveQuality();
-    await this.ensureSegmenterForTier(qualityTier.tier);
+    if (!qualityTier.bypass) {
+      await this.ensureSegmenterForTier(qualityTier.tier);
+    }
     this.mainFrameCount += 1;
     const token = ++this.canvasFrameToken;
 
@@ -365,17 +374,20 @@ export class Canvas2DPipeline implements Pipeline {
     this.onMetrics = null;
     this.onTierChange = null;
     this.getDroppedFrames = null;
-    this.metricsSamples.length = 0;
+    resetMetricsWindow(this.metricsWindow);
   }
 
   private resolveQuality(): QualityTierParams {
     if (!this.config) {
-      return resolveQualityTier(null, 'auto', 'blur');
+      return resolveQualityTierForEffectMode(null, 'auto', 'blur');
     }
-    return resolveQualityTier(this.qualityController, this.config.quality, getQualityMode(this.config.mode));
+    return resolveQualityTierForEffectMode(this.qualityController, this.config.quality, this.config.mode);
   }
 
   private async ensureSegmenterForTier(tier: 'A' | 'B' | 'C' | 'D'): Promise<void> {
+    if (tier === 'D') {
+      return;
+    }
     const desiredPath = resolveSegmentationModelPath(
       tier,
       this.segmentationModelByTier,
@@ -404,12 +416,12 @@ export class Canvas2DPipeline implements Pipeline {
     if (!this.onMetrics || !this.getDroppedFrames) {
       return;
     }
-    pushMetricsSample(this.metricsSamples, this.metricsMaxSamples, {totalMs, segmentationMs, gpuMs});
+    pushMetricsSample(this.metricsWindow, {totalMs, segmentationMs, gpuMs});
     if (this.config?.quality === 'auto') {
       this.onTierChange?.(tier);
     }
     // Canvas2DPipeline uses CPU delegate
     const segmentationDelegate = this.segmenter?.getDelegate?.() ?? 'CPU';
-    this.onMetrics(buildMetrics(this.metricsSamples, this.getDroppedFrames(), tier, segmentationDelegate));
+    this.onMetrics(buildMetrics(this.metricsWindow, this.getDroppedFrames(), tier, segmentationDelegate));
   }
 }

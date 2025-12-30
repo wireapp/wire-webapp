@@ -17,13 +17,13 @@
  *
  */
 
-import {METRICS_MAX_SAMPLES, state} from './state';
+import {state} from './state';
 
 import {
   buildMetrics,
-  getQualityMode,
+  isProcessingMode,
   pushMetricsSample,
-  resolveQualityTier,
+  resolveQualityTierForEffectMode,
   resolveSegmentationModelPath,
 } from '../quality';
 import {Segmenter} from '../segmentation/segmenter';
@@ -52,9 +52,11 @@ export async function handleFrame(frame: ImageBitmap, timestamp: number, width: 
     }
 
     let qualityTier = resolveQualityTierParams();
-    ensureSegmenterForTier(qualityTier.tier);
-    if (!state.segmenter) {
-      qualityTier = {...qualityTier, bypass: true};
+    if (!qualityTier.bypass) {
+      ensureSegmenterForTier(qualityTier.tier);
+      if (!state.segmenter) {
+        qualityTier = {...qualityTier, bypass: true};
+      }
     }
     let segmentationMs = 0;
 
@@ -117,11 +119,14 @@ export async function handleFrame(frame: ImageBitmap, timestamp: number, width: 
 }
 
 function resolveQualityTierParams(): QualityTierParams {
-  return resolveQualityTier(state.qualityController, state.quality, getQualityMode(state.mode));
+  return resolveQualityTierForEffectMode(state.qualityController, state.quality, state.mode);
 }
 
 function ensureSegmenterForTier(tier: 'A' | 'B' | 'C' | 'D'): void {
   if (!state.options || !state.canvas) {
+    return;
+  }
+  if (tier === 'D') {
     return;
   }
   if (state.segmenterInitPromise) {
@@ -158,18 +163,20 @@ function updateMetrics(totalMs: number, segmentationMs: number, gpuMs: number, t
     return;
   }
 
-  const params =
-    state.quality === 'auto'
-      ? state.qualityController.update({totalMs, segmentationMs, gpuMs}, getQualityMode(state.mode))
-      : state.qualityController.getTier(getQualityMode(state.mode));
+  const processingMode = isProcessingMode(state.mode);
+  const params = processingMode
+    ? state.quality === 'auto'
+      ? state.qualityController.update({totalMs, segmentationMs, gpuMs}, state.mode)
+      : state.qualityController.getTier(state.mode)
+    : null;
 
-  pushMetricsSample(state.metricsSamples, METRICS_MAX_SAMPLES, {totalMs, segmentationMs, gpuMs});
+  pushMetricsSample(state.metricsWindow, {totalMs, segmentationMs, gpuMs});
   // Get segmentation delegate type (null if no segmenter)
   const segmentationDelegate = state.segmenter?.getDelegate() ?? null;
   state.metrics = buildMetrics(
-    state.metricsSamples,
+    state.metricsWindow,
     state.metrics.droppedFrames,
-    state.quality === 'auto' ? params.tier : tier,
+    state.quality === 'auto' && params ? params.tier : tier,
     segmentationDelegate,
   );
 

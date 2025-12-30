@@ -17,8 +17,21 @@
  *
  */
 
+/**
+ * Public API exports for the quality control module.
+ *
+ * This module provides:
+ * - QualityController: Adaptive quality tier management
+ * - Tier definitions and resolution utilities
+ * - Quality policy resolution based on browser capabilities
+ * - Performance metrics collection and aggregation
+ * - Blur radius computation utilities
+ */
+
 export {QualityController} from './QualityController';
 export {resolveQualityPolicy, baselineTierForCapabilities, applyPolicyMode} from './capabilityPolicy';
+export {DEFAULT_TUNING, type QualityTuning} from './tuning';
+export type {PerformanceSample} from './samples';
 export {
   TIER_DEFINITIONS,
   resolveSegmentationModelPath,
@@ -29,6 +42,19 @@ export {
   type PerfTierParams,
   type ModeOverlay,
 } from './definitions';
-export {getQualityMode, getBypassTier, resolveQualityTier} from './resolve';
-export {buildMetrics, pushMetricsSample, type MetricsSample} from './metrics';
+export {
+  effectModeToProcessingMode,
+  getBypassTier,
+  resolveQualityTier,
+  resolveQualityTierForEffectMode,
+  isProcessingMode,
+} from './resolve';
+export {
+  buildMetrics,
+  createMetricsWindow,
+  pushMetricsSample,
+  resetMetricsWindow,
+  type MetricsSample,
+  type MetricsWindow,
+} from './metrics';
 export {computeBlurRadius} from './blur';

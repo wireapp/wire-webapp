@@ -66,6 +66,12 @@ async function handleContextRestored(): Promise<void> {
 
   state.contextLost = false;
   const tier = state.metrics?.tier ?? (state.quality === 'auto' ? state.options.initialTier : state.quality);
+  if (tier === 'D' || state.mode === 'passthrough') {
+    state.segmenter?.close();
+    state.segmenter = null;
+    state.currentModelPath = null;
+    return;
+  }
   const modelPath = resolveSegmentationModelPath(
     tier,
     state.options.segmentationModelByTier,

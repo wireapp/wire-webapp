@@ -21,6 +21,12 @@ import {TIER_DEFINITIONS, type TierKey} from './definitions';
 
 import type {CapabilityInfo, QualityPolicyMode, QualityPolicyResult, QualityPolicyResolver} from '../types';
 
+/**
+ * Downgrades a tier by one level (A→B→C→D).
+ *
+ * @param tier - Current tier to downgrade.
+ * @returns Next lower tier, or 'D' if already at minimum.
+ */
 const downgradeTier = (tier: TierKey): TierKey => {
   if (tier === 'A') {
     return 'B';
@@ -31,6 +37,12 @@ const downgradeTier = (tier: TierKey): TierKey => {
   return 'D';
 };
 
+/**
+ * Upgrades a tier by one level (D→C→B→A).
+ *
+ * @param tier - Current tier to upgrade.
+ * @returns Next higher tier, or 'A' if already at maximum.
+ */
 const upgradeTier = (tier: TierKey): TierKey => {
   if (tier === 'D') {
     return 'C';
@@ -41,6 +53,18 @@ const upgradeTier = (tier: TierKey): TierKey => {
   return 'A';
 };
 
+/**
+ * Determines the baseline quality tier based on browser capabilities.
+ *
+ * Tier selection priority:
+ * - Tier A: WebGL2 + Worker + OffscreenCanvas (full GPU acceleration in worker)
+ * - Tier B: WebGL2 only (GPU acceleration on main thread)
+ * - Tier C: Canvas2D available (CPU-based rendering fallback)
+ * - Tier D: No rendering capabilities (bypass mode)
+ *
+ * @param capabilities - Browser capability information.
+ * @returns Baseline quality tier appropriate for the available capabilities.
+ */
 export const baselineTierForCapabilities = (capabilities: CapabilityInfo): TierKey => {
   if (capabilities.webgl2 && capabilities.worker && capabilities.offscreenCanvas) {
     return 'A';
@@ -54,6 +78,18 @@ export const baselineTierForCapabilities = (capabilities: CapabilityInfo): TierK
   return 'D';
 };
 
+/**
+ * Applies a quality policy mode to adjust the tier.
+ *
+ * Policy modes:
+ * - 'conservative': Downgrades tier by one level (more stable, lower quality)
+ * - 'aggressive': Upgrades tier by one level (higher quality, may be less stable)
+ * - 'balanced': No adjustment (uses baseline tier)
+ *
+ * @param tier - Baseline tier to adjust.
+ * @param policy - Quality policy mode to apply.
+ * @returns Adjusted tier based on the policy mode.
+ */
 export const applyPolicyMode = (tier: TierKey, policy: QualityPolicyMode): TierKey => {
   if (policy === 'conservative') {
     return downgradeTier(tier);
@@ -64,6 +100,24 @@ export const applyPolicyMode = (tier: TierKey, policy: QualityPolicyMode): TierK
   return tier;
 };
 
+/**
+ * Resolves the initial quality tier and model configuration based on capabilities and policy.
+ *
+ * Resolution process:
+ * 1. If policy is a function: Calls it with capabilities and returns the result
+ * 2. If policy is a mode string:
+ *    a. Determines baseline tier from capabilities
+ *    b. Applies policy mode adjustment (conservative/aggressive/balanced)
+ *    c. Configures model path overrides (non-WebGL2 browsers use tier B model for tier A)
+ *
+ * Model path override: When WebGL2 is not available, tier A uses tier B's model path
+ * because the tier A model (multiclass) requires WebGL2 for GPU inference.
+ *
+ * @param capabilities - Browser capability information.
+ * @param policy - Quality policy mode ('conservative', 'aggressive', 'balanced') or
+ *                 a custom resolver function that returns QualityPolicyResult.
+ * @returns Quality policy result containing initial tier and optional model path overrides.
+ */
 export function resolveQualityPolicy(
   capabilities: CapabilityInfo,
   policy: QualityPolicyMode | QualityPolicyResolver,

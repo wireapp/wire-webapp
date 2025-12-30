@@ -17,7 +17,7 @@
  *
  */
 
-import {QualityController} from '../quality';
+import {createMetricsWindow, type MetricsWindow, QualityController} from '../quality';
 import {WebGLRenderer} from '../renderer/WebGLRenderer';
 import {Segmenter} from '../segmentation/segmenter';
 import type {DebugMode, EffectMode, Metrics, QualityMode, WorkerOptions} from '../types';
@@ -40,10 +40,12 @@ export interface State {
   background: ImageBitmap | null;
   backgroundSize: {width: number; height: number} | null;
   lastTimestampMs: number;
-  metricsSamples: {totalMs: number; segmentationMs: number; gpuMs: number}[];
+  metricsWindow: MetricsWindow;
   canvas: OffscreenCanvas | null;
   contextLost: boolean;
 }
+
+export const METRICS_MAX_SAMPLES = 30;
 
 export const state: State = {
   renderer: null,
@@ -66,7 +68,7 @@ export const state: State = {
     droppedFrames: 0,
     tier: 'A',
   },
-  metricsSamples: [],
+  metricsWindow: createMetricsWindow(METRICS_MAX_SAMPLES),
   frameCount: 0,
   background: null,
   backgroundSize: null,
@@ -74,5 +76,3 @@ export const state: State = {
   canvas: null,
   contextLost: false,
 };
-
-export const METRICS_MAX_SAMPLES = 30;

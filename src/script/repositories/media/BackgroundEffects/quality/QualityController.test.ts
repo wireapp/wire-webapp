@@ -18,13 +18,18 @@
  */
 
 import {QualityController} from './QualityController';
+import {DEFAULT_TUNING} from './tuning';
 
 const MODE_BLUR = 'blur' as const;
 const MODE_VIRTUAL = 'virtual' as const;
 
 const TARGET_FPS = 30;
-const HYSTERESIS_FRAMES = 60;
-const DOWNGRADE_CONFIRM_FRAMES = 10;
+const BUDGET_MS = 1000 / TARGET_FPS;
+const DOWNGRADE_THRESHOLD_MS = BUDGET_MS * DEFAULT_TUNING.downgradeThresholdRatio;
+const HYSTERESIS_FRAMES = DEFAULT_TUNING.hysteresisFrames;
+const DOWNGRADE_MIN_SAMPLES = DEFAULT_TUNING.maxSamples * DEFAULT_TUNING.downgradeWarmupWindows;
+const OVER_BUDGET_DEBT_FRAMES = DEFAULT_TUNING.overBudgetDebtFrames;
+const COOLDOWN_FRAMES = DEFAULT_TUNING.cooldownFramesAfterDowngrade;
 
 const cpuBoundSample = {totalMs: 40, segmentationMs: 30, gpuMs: 5};
 const gpuBoundSample = {totalMs: 40, segmentationMs: 5, gpuMs: 30};
@@ -33,11 +38,16 @@ const slowSample = {totalMs: 40, segmentationMs: 10, gpuMs: 10};
 const balancedSample = {totalMs: 40, segmentationMs: 20, gpuMs: 18};
 const veryFastSample = {totalMs: 5, segmentationMs: 1, gpuMs: 1};
 
+const OVER_BUDGET_DEBT_THRESHOLD_MS = BUDGET_MS * OVER_BUDGET_DEBT_FRAMES;
+const OVER_BUDGET_DELTA_MS = Math.max(1, cpuBoundSample.totalMs - DOWNGRADE_THRESHOLD_MS);
+const OVER_BUDGET_TRIGGER_FRAMES = Math.ceil(OVER_BUDGET_DEBT_THRESHOLD_MS / OVER_BUDGET_DELTA_MS);
+const DOWNGRADE_TRIGGER_SAMPLES = Math.max(HYSTERESIS_FRAMES, DOWNGRADE_MIN_SAMPLES, OVER_BUDGET_TRIGGER_FRAMES) + 1;
+
 describe('QualityController', () => {
   it('downgrades CPU/ML-bound workloads to the next tier', () => {
     const controller = new QualityController(TARGET_FPS);
     let params;
-    for (let i = 0; i < HYSTERESIS_FRAMES + DOWNGRADE_CONFIRM_FRAMES + 1; i += 1) {
+    for (let i = 0; i < DOWNGRADE_TRIGGER_SAMPLES; i += 1) {
       params = controller.update(cpuBoundSample, MODE_BLUR);
     }
     expect(params?.tier).toBe('B');
@@ -46,7 +56,7 @@ describe('QualityController', () => {
   it('downgrades GPU-bound workloads more aggressively', () => {
     const controller = new QualityController(TARGET_FPS);
     let params;
-    for (let i = 0; i < HYSTERESIS_FRAMES + DOWNGRADE_CONFIRM_FRAMES + 1; i += 1) {
+    for (let i = 0; i < DOWNGRADE_TRIGGER_SAMPLES; i += 1) {
       params = controller.update(gpuBoundSample, MODE_BLUR);
     }
     expect(params?.tier).toBe('C');
@@ -114,10 +124,10 @@ describe('QualityController', () => {
 
     // Trigger downgrade with CPU-bound samples (A -> B)
     let params;
-    for (let i = 0; i < HYSTERESIS_FRAMES + DOWNGRADE_CONFIRM_FRAMES + 1; i += 1) {
+    for (let i = 0; i < DOWNGRADE_TRIGGER_SAMPLES; i += 1) {
       params = controller.update(cpuBoundSample, MODE_BLUR);
     }
-    // Should downgrade to B, and cooldown is set to 60 frames
+    // Should downgrade to B, and cooldown is set to configured frames
     expect(params?.tier).toBe('B');
 
     // Provide fast samples immediately after downgrade
@@ -130,8 +140,8 @@ describe('QualityController', () => {
     expect(params?.tier).toBe('B');
 
     // Continue providing fast samples - cooldown decrements each frame
-    // After 60 total frames from downgrade, cooldown expires
-    for (let i = 0; i < 55; i += 1) {
+    // After configured frames from downgrade, cooldown expires
+    for (let i = 0; i < COOLDOWN_FRAMES - 5; i += 1) {
       params = controller.update(veryFastSample, MODE_BLUR);
     }
     // Cooldown should now be 0, but we need another hysteresis period to upgrade
@@ -182,7 +192,7 @@ describe('QualityController', () => {
     const controller = new QualityController(TARGET_FPS);
     // Balanced sample: neither CPU nor GPU dominates (>55%)
     let params;
-    for (let i = 0; i < HYSTERESIS_FRAMES + DOWNGRADE_CONFIRM_FRAMES + 1; i += 1) {
+    for (let i = 0; i < DOWNGRADE_TRIGGER_SAMPLES; i += 1) {
       params = controller.update(balancedSample, MODE_BLUR);
     }
     // Should step down normally (A -> B) for balanced workloads
@@ -205,19 +215,19 @@ describe('QualityController', () => {
     let params;
 
     // A -> B (CPU-bound downgrade)
-    for (let i = 0; i < HYSTERESIS_FRAMES + DOWNGRADE_CONFIRM_FRAMES + 1; i += 1) {
+    for (let i = 0; i < DOWNGRADE_TRIGGER_SAMPLES; i += 1) {
       params = controller.update(cpuBoundSample, MODE_BLUR);
     }
     expect(params?.tier).toBe('B');
 
     // B -> C (further downgrade)
-    for (let i = 0; i < HYSTERESIS_FRAMES + DOWNGRADE_CONFIRM_FRAMES + 1; i += 1) {
+    for (let i = 0; i < DOWNGRADE_TRIGGER_SAMPLES; i += 1) {
       params = controller.update(slowSample, MODE_BLUR);
     }
     expect(params?.tier).toBe('C');
 
     // C -> D (final downgrade)
-    for (let i = 0; i < HYSTERESIS_FRAMES + DOWNGRADE_CONFIRM_FRAMES + 1; i += 1) {
+    for (let i = 0; i < DOWNGRADE_TRIGGER_SAMPLES; i += 1) {
       params = controller.update(slowSample, MODE_BLUR);
     }
     expect(params?.tier).toBe('D');
@@ -231,26 +241,24 @@ describe('QualityController', () => {
 
   it('maintains sample window size limit', () => {
     const controller = new QualityController(TARGET_FPS);
+    const sampleCount = DEFAULT_TUNING.maxSamples + 20;
 
-    // Add more samples than maxSamples (30)
-    for (let i = 0; i < 50; i += 1) {
+    // Add more samples than maxSamples
+    for (let i = 0; i < sampleCount; i += 1) {
       controller.update({totalMs: 10 + i, segmentationMs: 5, gpuMs: 3}, MODE_BLUR);
     }
 
     const averages = controller.getAverages();
-    // Should only average the last 30 samples, not all 50
-    // Last 30 samples: values 30-59 (indices 20-49 in the loop, but values are 10+i)
-    // Average = (30+31+...+59)/30 = (30+59)*30/2/30 = 44.5
-    expect(averages.totalMs).toBeGreaterThan(40);
-    expect(averages.totalMs).toBeLessThan(50);
-    // Verify it's close to the expected average of last 30 samples
-    expect(averages.totalMs).toBeCloseTo(44.5, 0);
+    const first = 10 + (sampleCount - DEFAULT_TUNING.maxSamples);
+    const last = 10 + (sampleCount - 1);
+    const expectedAverage = (first + last) / 2;
+    expect(averages.totalMs).toBeCloseTo(expectedAverage, 1);
   });
 
   it('handles boundary conditions at thresholds', () => {
     const controller = new QualityController(TARGET_FPS);
     const budget = 1000 / TARGET_FPS;
-    const upgradeThreshold = budget * 0.5;
+    const upgradeThreshold = budget * DEFAULT_TUNING.upgradeThresholdRatio;
     const justAboveUpgrade = upgradeThreshold + 0.5;
     const clearlyBelowUpgrade = upgradeThreshold - 5;
 

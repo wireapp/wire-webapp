@@ -23,12 +23,13 @@ import type {Pipeline, PipelineConfig, PipelineInit} from './Pipeline';
 
 import {
   buildMetrics,
-  getQualityMode,
-  MetricsSample,
+  createMetricsWindow,
+  isProcessingMode,
   pushMetricsSample,
   QualityController,
-  resolveQualityTier,
+  resolveQualityTierForEffectMode,
   resolveSegmentationModelPath,
+  resetMetricsWindow,
 } from '../quality';
 import {WebGLRenderer} from '../renderer/WebGLRenderer';
 import {NoopMaskPostProcessor} from '../segmentation/maskPostProcessor';
@@ -54,8 +55,8 @@ export class MainWebGLPipeline implements Pipeline {
   private onMetrics: PipelineInit['onMetrics'] = null;
   private onTierChange: PipelineInit['onTierChange'] | null = null;
   private getDroppedFrames: PipelineInit['getDroppedFrames'] | null = null;
-  private readonly metricsSamples: MetricsSample[] = [];
   private readonly metricsMaxSamples = 30;
+  private readonly metricsWindow = createMetricsWindow(this.metricsMaxSamples);
   private mainFrameCount = 0;
 
   constructor() {
@@ -73,12 +74,6 @@ export class MainWebGLPipeline implements Pipeline {
     this.renderer = new WebGLRenderer(this.outputCanvas, this.outputCanvas.width, this.outputCanvas.height);
     this.segmenterFactory = init.createSegmenter ?? MediaPipeSegmenterFactory;
     this.segmentationModelByTier = init.segmentationModelByTier;
-    this.segmenter = this.segmenterFactory.create({
-      modelPath: init.segmentationModelPath,
-      delegate: 'GPU',
-      canvas: this.outputCanvas,
-    });
-    this.currentModelPath = init.segmentationModelPath;
     const postProcessorFactory = init.createMaskPostProcessor ?? {
       create: () => new NoopMaskPostProcessor(),
     };
@@ -89,15 +84,28 @@ export class MainWebGLPipeline implements Pipeline {
     } else if (this.qualityController && this.config?.quality !== 'auto') {
       this.qualityController.setTier(this.config.quality);
     }
-    try {
-      await this.segmenter.init();
-    } catch (error) {
-      this.logger.warn('Segmentation init failed, falling back to passthrough', error);
-      this.segmenter?.close();
+    const startingTier = init.config.quality === 'auto' ? init.initialTier : init.config.quality;
+    const shouldInitSegmenter = startingTier !== 'D' && init.config.mode !== 'passthrough';
+    if (shouldInitSegmenter) {
+      this.segmenter = this.segmenterFactory.create({
+        modelPath: init.segmentationModelPath,
+        delegate: 'GPU',
+        canvas: this.outputCanvas,
+      });
+      this.currentModelPath = init.segmentationModelPath;
+      try {
+        await this.segmenter.init();
+      } catch (error) {
+        this.logger.warn('Segmentation init failed, falling back to passthrough', error);
+        this.segmenter?.close();
+        this.segmenter = null;
+        this.renderer?.destroy();
+        this.renderer = null;
+        throw error;
+      }
+    } else {
       this.segmenter = null;
-      this.renderer?.destroy();
-      this.renderer = null;
-      throw error;
+      this.currentModelPath = null;
     }
   }
 
@@ -115,7 +123,9 @@ export class MainWebGLPipeline implements Pipeline {
     }
 
     const qualityTier = this.resolveQuality();
-    await this.ensureSegmenterForTier(qualityTier.tier);
+    if (!qualityTier.bypass) {
+      await this.ensureSegmenterForTier(qualityTier.tier);
+    }
 
     let maskInput: MaskInput | null = null;
     let maskBitmap: ImageBitmap | null = null;
@@ -192,10 +202,10 @@ export class MainWebGLPipeline implements Pipeline {
       frame.close();
     }
 
-    if (this.config.quality === 'auto' && this.qualityController) {
+    if (this.config.quality === 'auto' && this.qualityController && isProcessingMode(this.config.mode)) {
       const updatedTier = this.qualityController.update(
         {totalMs: segmentationMs + gpuMs, segmentationMs, gpuMs},
-        getQualityMode(this.config.mode),
+        this.config.mode,
       );
       this.onTierChange?.(updatedTier.tier);
     }
@@ -242,18 +252,21 @@ export class MainWebGLPipeline implements Pipeline {
     this.onMetrics = null;
     this.onTierChange = null;
     this.getDroppedFrames = null;
-    this.metricsSamples.length = 0;
+    resetMetricsWindow(this.metricsWindow);
   }
 
   private resolveQuality(): QualityTierParams {
     if (!this.config) {
-      return resolveQualityTier(null, 'auto', 'blur');
+      return resolveQualityTierForEffectMode(null, 'auto', 'blur');
     }
-    return resolveQualityTier(this.qualityController, this.config.quality, getQualityMode(this.config.mode));
+    return resolveQualityTierForEffectMode(this.qualityController, this.config.quality, this.config.mode);
   }
 
   private async ensureSegmenterForTier(tier: 'A' | 'B' | 'C' | 'D'): Promise<void> {
     if (!this.outputCanvas) {
+      return;
+    }
+    if (tier === 'D') {
       return;
     }
     const desiredPath = resolveSegmentationModelPath(
@@ -285,9 +298,9 @@ export class MainWebGLPipeline implements Pipeline {
     if (!this.onMetrics || !this.getDroppedFrames) {
       return;
     }
-    pushMetricsSample(this.metricsSamples, this.metricsMaxSamples, {totalMs, segmentationMs, gpuMs});
+    pushMetricsSample(this.metricsWindow, {totalMs, segmentationMs, gpuMs});
     // MainWebGLPipeline uses GPU delegate
     const segmentationDelegate = this.segmenter?.getDelegate?.() ?? 'GPU';
-    this.onMetrics(buildMetrics(this.metricsSamples, this.getDroppedFrames(), tier, segmentationDelegate));
+    this.onMetrics(buildMetrics(this.metricsWindow, this.getDroppedFrames(), tier, segmentationDelegate));
   }
 }

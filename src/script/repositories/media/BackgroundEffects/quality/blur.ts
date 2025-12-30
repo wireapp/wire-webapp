@@ -19,12 +19,33 @@
 
 import type {QualityTierParams} from '../types';
 
+/** Minimum blur radius in pixels (at blurStrength = 0). */
 const BASE_MIN_RADIUS = 2;
+/** Maximum blur radius in pixels (at blurStrength = 1). */
 const BASE_MAX_RADIUS = 12;
+/** Reference tier radius used for scaling calculations (tier A default). */
 const BASE_TIER_RADIUS = 4;
+/** Reference downsampling scale used for scaling calculations (tier A default). */
 const BASE_DOWNSAMPLE_SCALE = 0.5;
+/** Maximum blur radius supported by the shader (hardware/implementation limit). */
 const MAX_SHADER_RADIUS = 16;
 
+/**
+ * Computes the effective blur radius based on quality tier, blur strength, and downsampling.
+ *
+ * The blur radius is calculated as:
+ * 1. Base radius: Interpolated between BASE_MIN_RADIUS and BASE_MAX_RADIUS based on blurStrength (0-1)
+ * 2. Tier scale: Multiplied by (quality.blurRadius / BASE_TIER_RADIUS) to adjust for quality tier
+ * 3. Downsample scale: Optionally multiplied by (quality.blurDownsampleScale / BASE_DOWNSAMPLE_SCALE)
+ *    to account for downsampled rendering (blur appears stronger at lower resolution)
+ * 4. Final radius: Clamped to [0, MAX_SHADER_RADIUS]
+ *
+ * @param quality - Quality tier parameters containing blurRadius and blurDownsampleScale.
+ * @param blurStrength - User-controlled blur strength (0-1), clamped internally.
+ * @param includeDownsampleScale - If true, applies downsampling scale factor to account for
+ *                                 lower-resolution blur rendering making blur appear stronger.
+ * @returns Computed blur radius in pixels, clamped to valid shader range.
+ */
 export const computeBlurRadius = (
   quality: QualityTierParams,
   blurStrength: number,

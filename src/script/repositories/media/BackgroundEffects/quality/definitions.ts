@@ -161,6 +161,17 @@ export const MODE_DEFAULTS: Record<Mode, ModeOverlay> = {
   },
 };
 
+/**
+ * Gets mode-specific overlay parameters for a given mode and tier.
+ *
+ * Applies tier-specific adjustments to the base mode defaults:
+ * - Tier D: Disables temporal smoothing (temporalAlpha = 0) since bypass mode doesn't need it
+ * - Virtual mode at Tier C: Expands matte thresholds slightly to improve edge quality at lower resolution
+ *
+ * @param mode - The effect mode ('blur' or 'virtual').
+ * @param tier - The quality tier ('A', 'B', 'C', or 'D').
+ * @returns Mode overlay parameters with tier-specific adjustments applied.
+ */
 export function getModeOverlay(mode: Mode, tier: TierKey): ModeOverlay {
   const base = MODE_DEFAULTS[mode];
   if (tier === 'D') {
@@ -172,6 +183,17 @@ export function getModeOverlay(mode: Mode, tier: TierKey): ModeOverlay {
   return base;
 }
 
+/**
+ * Applies mode-specific overlay parameters to tier parameters.
+ *
+ * Merges the base tier performance parameters with mode-specific overlay values
+ * to produce the final quality tier parameters. The overlay values override
+ * the tier defaults to optimize rendering for each effect mode.
+ *
+ * @param tier - Base performance tier parameters.
+ * @param mode - The effect mode ('blur' or 'virtual').
+ * @returns Complete quality tier parameters with mode-specific adjustments.
+ */
 export function applyModeOverlay(tier: PerfTierParams, mode: Mode): QualityTierParams {
   const overlay = getModeOverlay(mode, tier.tier);
   return {
@@ -185,10 +207,34 @@ export function applyModeOverlay(tier: PerfTierParams, mode: Mode): QualityTierP
   };
 }
 
+/**
+ * Resolves quality tier parameters for a given tier and mode.
+ *
+ * Looks up the tier definition and applies mode-specific overlays to produce
+ * the final quality parameters. This is a convenience function that combines
+ * tier lookup and mode overlay application.
+ *
+ * @param tier - The quality tier ('A', 'B', 'C', or 'D').
+ * @param mode - The effect mode ('blur' or 'virtual').
+ * @returns Complete quality tier parameters for the specified tier and mode.
+ */
 export function resolveTierParams(tier: TierKey, mode: Mode): QualityTierParams {
   return applyModeOverlay(TIER_DEFINITIONS[tier], mode);
 }
 
+/**
+ * Resolves the segmentation model path for a given tier.
+ *
+ * Resolution priority:
+ * 1. Tier-specific override from `overrides` map
+ * 2. Global `fallback` path
+ * 3. Default model path from tier definition
+ *
+ * @param tier - The quality tier ('A', 'B', 'C', or 'D').
+ * @param overrides - Optional map of tier-specific model path overrides.
+ * @param fallback - Optional fallback model path if no tier override exists.
+ * @returns The resolved segmentation model path for the tier.
+ */
 export function resolveSegmentationModelPath(
   tier: TierKey,
   overrides: SegmentationModelByTier | undefined,
