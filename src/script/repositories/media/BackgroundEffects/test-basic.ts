@@ -458,16 +458,18 @@ async function runBrowserDemo() {
       const budgetMs = 1000 / targetFps;
       const totalMs = metrics.avgTotalMs || 0;
       const utilization = budgetMs > 0 ? Math.min(999, (totalMs / budgetMs) * 100) : 0;
-      const cpuShare = totalMs > 0 ? (metrics.avgSegmentationMs / totalMs) * 100 : 0;
-      const gpuShare = totalMs > 0 ? (metrics.avgGpuMs / totalMs) * 100 : 0;
+      const mlShare = totalMs > 0 ? (metrics.avgSegmentationMs / totalMs) * 100 : 0;
+      const webglShare = totalMs > 0 ? (metrics.avgGpuMs / totalMs) * 100 : 0;
+      // Label ML phase based on actual delegate type
+      const mlLabel = metrics.segmentationDelegate ? `ML(${metrics.segmentationDelegate})` : 'ML';
       metricsLine.textContent =
         `total=${totalMs.toFixed(1)}ms ` +
         `seg=${metrics.avgSegmentationMs.toFixed(1)}ms ` +
-        `gpu=${metrics.avgGpuMs.toFixed(1)}ms ` +
+        `webgl=${metrics.avgGpuMs.toFixed(1)}ms ` +
         `budget=${budgetMs.toFixed(1)}ms ` +
         `util=${utilization.toFixed(0)}% ` +
-        `cpu=${cpuShare.toFixed(0)}% ` +
-        `gpu=${gpuShare.toFixed(0)}% ` +
+        `${mlLabel}=${mlShare.toFixed(0)}% ` +
+        `webgl=${webglShare.toFixed(0)}% ` +
         `tier=${metrics.tier} dropped=${metrics.droppedFrames}`;
     },
   });

@@ -29,12 +29,16 @@
 
 import {FilesetResolver, ImageSegmenter} from '@mediapipe/tasks-vision';
 
+import type {SegmenterOptions} from './segmenterTypes';
+
 /**
  * Result of a segmentation operation.
  */
 export interface SegmentationResult {
   /** Segmentation mask as ImageBitmap, or null if segmentation failed. */
   mask: ImageBitmap | null;
+  /** Multiclass mask with class indices encoded in RGB, or null if unavailable. */
+  classMask: ImageBitmap | null;
   /** Segmentation mask as WebGLTexture (zero-copy GPU path), or null if unavailable. */
   maskTexture: WebGLTexture | null;
   /** Width of the mask in pixels. */
@@ -55,8 +59,8 @@ export interface SegmentationResult {
  * It supports both CPU and GPU inference delegates, and works in both main thread
  * and Web Worker environments (using OffscreenCanvas when available).
  *
- * The segmenter uses MediaPipe's Selfie Segmentation model to generate confidence
- * masks that separate foreground (person) from background.
+ * The segmenter uses MediaPipe segmentation models to generate confidence masks
+ * that separate foreground (person) from background, with optional multiclass output.
  */
 export class Segmenter {
   /** MediaPipe ImageSegmenter instance. */
@@ -91,6 +95,13 @@ export class Segmenter {
   ) {}
 
   /**
+   * Returns the delegate type used for segmentation ('CPU' or 'GPU').
+   */
+  public getDelegate(): 'CPU' | 'GPU' {
+    return this.delegate;
+  }
+
+  /**
    * Initializes the MediaPipe segmenter with the specified model.
    *
    * This method:
@@ -117,7 +128,7 @@ export class Segmenter {
       },
       ...(this.gpuCanvas ? {canvas: this.gpuCanvas} : {}),
       runningMode: 'VIDEO', // Video mode for temporal consistency
-      outputCategoryMask: false, // We only need confidence masks
+      outputCategoryMask: true, // Needed for multiclass debug visualization
       outputConfidenceMasks: true, // Confidence values (0-1) for smooth edges
     });
   }
@@ -186,14 +197,19 @@ export class Segmenter {
    * @param timestampMs - Frame timestamp in milliseconds (monotonic, for temporal consistency).
    * @returns Segmentation result with mask, dimensions, and processing time.
    */
-  public async segment(frame: ImageBitmap, timestampMs: number): Promise<SegmentationResult> {
+  public async segment(
+    frame: ImageBitmap,
+    timestampMs: number,
+    options: SegmenterOptions = {},
+  ): Promise<SegmentationResult> {
     // Validate segmenter and canvases are initialized
     if (!this.segmenter || !this.resizeCtx || !this.maskCtx || !this.resizeCanvas || !this.maskCanvas) {
-      return {mask: null, maskTexture: null, width: 0, height: 0, durationMs: 0, release: () => {}};
+      return {mask: null, classMask: null, maskTexture: null, width: 0, height: 0, durationMs: 0, release: () => {}};
     }
 
     const start = performance.now();
     let masks: any[] = [];
+    let categoryMask: any | null = null;
     try {
       // Step 1: Resize input frame to segmentation resolution
       this.resizeCtx.drawImage(frame, 0, 0, this.width, this.height);
@@ -201,6 +217,7 @@ export class Segmenter {
       // Step 2: Run MediaPipe segmentation (video mode uses timestamp for temporal smoothing)
       const result = this.segmenter.segmentForVideo(this.resizeCanvas, timestampMs);
       masks = result.confidenceMasks ?? [];
+      categoryMask = result.categoryMask ?? null;
       // Step 3: Convert MediaPipe mask format to ImageData
       const primaryMask = masks[0] ?? null;
       const release = () => {
@@ -211,14 +228,22 @@ export class Segmenter {
             // Ignore errors when closing (mask may already be closed)
           }
         });
+        try {
+          categoryMask?.close?.();
+        } catch {
+          // Ignore errors when closing (mask may already be closed)
+        }
       };
 
       if (!primaryMask) {
         const durationMs = performance.now() - start;
-        return {mask: null, maskTexture: null, width: 0, height: 0, durationMs, release};
+        return {mask: null, classMask: null, maskTexture: null, width: 0, height: 0, durationMs, release};
       }
 
+      const classMask = options.includeClassMask ? await this.buildClassMask(categoryMask) : null;
+
       if (
+        masks.length === 1 &&
         primaryMask &&
         this.gpuCanvas &&
         typeof primaryMask.hasWebGLTexture === 'function' &&
@@ -230,6 +255,7 @@ export class Segmenter {
         const durationMs = performance.now() - start;
         return {
           mask: null,
+          classMask,
           maskTexture,
           width: primaryMask.width ?? this.width,
           height: primaryMask.height ?? this.height,
@@ -238,10 +264,10 @@ export class Segmenter {
         };
       }
 
-      const maskImage = this.maskToImageData(primaryMask);
+      const maskImage = this.combineConfidenceMasks(masks);
       if (!maskImage) {
         const durationMs = performance.now() - start;
-        return {mask: null, maskTexture: null, width: 0, height: 0, durationMs, release};
+        return {mask: null, classMask, maskTexture: null, width: 0, height: 0, durationMs, release};
       }
 
       // Step 4: Render mask to canvas
@@ -253,6 +279,7 @@ export class Segmenter {
       const durationMs = performance.now() - start;
       return {
         mask,
+        classMask,
         maskTexture: null,
         width: this.width,
         height: this.height,
@@ -263,6 +290,7 @@ export class Segmenter {
       console.warn('[Segmenter] segment failed', error);
       return {
         mask: null,
+        classMask: null,
         maskTexture: null,
         width: 0,
         height: 0,
@@ -275,6 +303,11 @@ export class Segmenter {
               // Ignore errors when closing (mask may already be closed)
             }
           });
+          try {
+            categoryMask?.close?.();
+          } catch {
+            // Ignore errors when closing (mask may already be closed)
+          }
         },
       };
     }
@@ -323,6 +356,125 @@ export class Segmenter {
     if (typeof mask.getAsUint8Array === 'function') {
       const data = mask.getAsUint8Array() as Uint8Array;
       return this.buildMaskImageData(data, 255);
+    }
+    return null;
+  }
+
+  private combineConfidenceMasks(masks: any[]): ImageData | null {
+    if (!masks.length) {
+      return null;
+    }
+    if (masks.length === 1) {
+      return this.maskToImageData(masks[0]);
+    }
+    const arrays = masks.map(mask => this.maskToFloatArray(mask));
+    if (arrays.some(array => !array)) {
+      return this.maskToImageData(masks[0]);
+    }
+    const width = masks[0]?.width ?? this.width;
+    const height = masks[0]?.height ?? this.height;
+    const imageData = new ImageData(width, height);
+    const out = imageData.data;
+    const count = Math.min(arrays[0]!.length, width * height);
+    for (let i = 0; i < count; i += 1) {
+      let maxValue = 0;
+      for (let maskIndex = 1; maskIndex < arrays.length; maskIndex += 1) {
+        const value = arrays[maskIndex]![i];
+        if (value > maxValue) {
+          maxValue = value;
+        }
+      }
+      const clamped = Math.max(0, Math.min(1, maxValue));
+      const value = Math.round(clamped * 255);
+      const idx = i * 4;
+      out[idx] = value;
+      out[idx + 1] = value;
+      out[idx + 2] = value;
+      out[idx + 3] = 255;
+    }
+    return imageData;
+  }
+
+  private maskToFloatArray(mask: any): Float32Array | null {
+    if (!mask) {
+      return null;
+    }
+    if (typeof mask.getAsFloat32Array === 'function') {
+      return mask.getAsFloat32Array() as Float32Array;
+    }
+    if (typeof mask.getAsUint8Array === 'function') {
+      const data = mask.getAsUint8Array() as Uint8Array;
+      const out = new Float32Array(data.length);
+      for (let i = 0; i < data.length; i += 1) {
+        out[i] = data[i] / 255;
+      }
+      return out;
+    }
+    if (typeof mask.getAsImageData === 'function') {
+      const imageData = mask.getAsImageData() as ImageData;
+      const src = imageData.data;
+      const out = new Float32Array(imageData.width * imageData.height);
+      for (let i = 0, j = 0; i < src.length; i += 4, j += 1) {
+        out[j] = src[i] / 255;
+      }
+      return out;
+    }
+    return null;
+  }
+
+  private async buildClassMask(categoryMask: any | null): Promise<ImageBitmap | null> {
+    if (!categoryMask) {
+      return null;
+    }
+    const imageData = this.categoryMaskToImageData(categoryMask);
+    if (!imageData) {
+      return null;
+    }
+    try {
+      return await createImageBitmap(imageData);
+    } catch {
+      return null;
+    }
+  }
+
+  private categoryMaskToImageData(mask: any): ImageData | null {
+    if (!mask) {
+      return null;
+    }
+    const width = mask.width ?? this.width;
+    const height = mask.height ?? this.height;
+    const imageData = new ImageData(width, height);
+    const out = imageData.data;
+    const write = (value: number, idx: number) => {
+      out[idx] = value;
+      out[idx + 1] = value;
+      out[idx + 2] = value;
+      out[idx + 3] = 255;
+    };
+    if (typeof mask.getAsUint8Array === 'function') {
+      const data = mask.getAsUint8Array() as Uint8Array;
+      const count = Math.min(data.length, width * height);
+      for (let i = 0; i < count; i += 1) {
+        write(data[i], i * 4);
+      }
+      return imageData;
+    }
+    if (typeof mask.getAsFloat32Array === 'function') {
+      const data = mask.getAsFloat32Array() as Float32Array;
+      const count = Math.min(data.length, width * height);
+      for (let i = 0; i < count; i += 1) {
+        const value = Math.round(Math.max(0, Math.min(255, data[i])));
+        write(value, i * 4);
+      }
+      return imageData;
+    }
+    if (typeof mask.getAsImageData === 'function') {
+      const data = mask.getAsImageData() as ImageData;
+      const src = data.data;
+      for (let i = 0; i < src.length; i += 4) {
+        write(src[i], i);
+      }
+      return imageData;
     }
     return null;
   }

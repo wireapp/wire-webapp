@@ -33,6 +33,7 @@ export interface State {
   debugMode: DebugMode;
   blurStrength: number;
   quality: QualityMode;
+  currentModelPath: string | null;
   metrics: Metrics;
   frameCount: number;
   background: ImageBitmap | null;
@@ -54,10 +55,12 @@ export const state: State = {
   debugMode: 'off',
   blurStrength: 0.5,
   quality: 'auto',
+  currentModelPath: null,
   metrics: {
     avgTotalMs: 0,
     avgSegmentationMs: 0,
     avgGpuMs: 0,
+    segmentationDelegate: null,
     droppedFrames: 0,
     tier: 'A',
   },

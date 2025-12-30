@@ -44,8 +44,10 @@ export type Mode = Exclude<EffectMode, 'passthrough'>;
  * - 'maskOverlay': Overlays green tint on mask areas
  * - 'maskOnly': Displays only the segmentation mask as grayscale
  * - 'edgeOnly': Highlights mask edges using edge detection
+ * - 'classOverlay': Overlays class colors from multiclass segmentation
+ * - 'classOnly': Shows class colors only (no video)
  */
-export type DebugMode = 'off' | 'maskOverlay' | 'maskOnly' | 'edgeOnly';
+export type DebugMode = 'off' | 'maskOverlay' | 'maskOnly' | 'edgeOnly' | 'classOverlay' | 'classOnly';
 
 /**
  * Quality mode for rendering performance.
@@ -53,6 +55,11 @@ export type DebugMode = 'off' | 'maskOverlay' | 'maskOnly' | 'edgeOnly';
  * - 'A' | 'B' | 'C' | 'D': Fixed quality tier (A = highest, D = bypass)
  */
 export type QualityMode = 'auto' | 'A' | 'B' | 'C' | 'D';
+
+/**
+ * Optional mapping of quality tiers to segmentation model paths.
+ */
+export type SegmentationModelByTier = Partial<Record<'A' | 'B' | 'C' | 'D', string>>;
 
 /**
  * Rendering pipeline selection.
@@ -148,14 +155,24 @@ export interface BackgroundSourceVideoFrame {
  * These metrics are collected by the worker/main thread and sent to the
  * main thread for monitoring and adaptive quality control. Averages are
  * computed over a rolling window of recent frames.
+ *
+ * **Important**: These metrics measure **time allocation** (wall-clock time
+ * spent in each phase), not actual hardware CPU/GPU utilization. The percentages
+ * indicate what portion of total processing time was spent in each phase.
+ *
+ * - `avgSegmentationMs`: Time spent in ML segmentation (may run on CPU or GPU
+ *   depending on delegate type, see `segmentationDelegate`)
+ * - `avgGpuMs`: Time spent in WebGL rendering operations (runs on GPU)
  */
 export interface Metrics {
-  /** Average total frame processing time in milliseconds (segmentation + GPU). */
+  /** Average total frame processing time in milliseconds (segmentation + WebGL rendering). */
   avgTotalMs: number;
   /** Average ML segmentation time in milliseconds. */
   avgSegmentationMs: number;
-  /** Average GPU rendering time in milliseconds. */
+  /** Average WebGL rendering time in milliseconds. */
   avgGpuMs: number;
+  /** Segmentation delegate type ('CPU' or 'GPU') indicating where segmentation runs. */
+  segmentationDelegate: 'CPU' | 'GPU' | null;
   /** Number of frames dropped due to processing errors or timeouts. */
   droppedFrames: number;
   /** Current quality tier ('A' = highest, 'D' = bypass). */
@@ -187,6 +204,8 @@ export interface StartOptions {
   backgroundColor?: string;
   /** Path to MediaPipe segmentation model file. */
   segmentationModelPath?: string;
+  /** Per-tier segmentation model overrides (e.g., Tier A uses multiclass). */
+  segmentationModelByTier?: SegmentationModelByTier;
   /** Whether to prefer worker-based pipeline when available. Default: true. */
   useWorker?: boolean;
   /** Override pipeline selection (primarily for testing). */
@@ -356,6 +375,8 @@ export interface WorkerOptions {
   blurStrength: number;
   /** Path to MediaPipe segmentation model file. */
   segmentationModelPath: string;
+  /** Per-tier segmentation model overrides (resolved in worker). */
+  segmentationModelByTier: SegmentationModelByTier;
   /** Target frames per second for adaptive quality control. */
   targetFps: number;
 }

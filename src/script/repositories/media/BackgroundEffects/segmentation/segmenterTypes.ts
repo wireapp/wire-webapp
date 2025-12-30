@@ -27,11 +27,16 @@ export interface SegmenterInit {
   canvas?: HTMLCanvasElement | OffscreenCanvas;
 }
 
+export interface SegmenterOptions {
+  includeClassMask?: boolean;
+}
+
 export interface SegmenterLike {
   init(): Promise<void>;
   configure(width: number, height: number): void;
-  segment(frame: ImageBitmap, timestampMs: number): Promise<SegmentationResult>;
+  segment(frame: ImageBitmap, timestampMs: number, options?: SegmenterOptions): Promise<SegmentationResult>;
   close(): void;
+  getDelegate?(): SegmenterDelegate;
 }
 
 export interface SegmenterFactory {

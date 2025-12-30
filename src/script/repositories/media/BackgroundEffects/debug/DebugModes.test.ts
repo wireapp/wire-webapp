@@ -22,11 +22,13 @@ import {isDebugMode, DebugModeValues} from './DebugModes';
 describe('DebugModes', () => {
   describe('DebugModeValues', () => {
     it('contains all valid debug mode values', () => {
-      expect(DebugModeValues).toEqual(expect.arrayContaining(['off', 'maskOverlay', 'maskOnly', 'edgeOnly']));
+      expect(DebugModeValues).toEqual(
+        expect.arrayContaining(['off', 'maskOverlay', 'maskOnly', 'edgeOnly', 'classOverlay', 'classOnly']),
+      );
     });
 
-    it('has exactly 4 debug mode values', () => {
-      expect(DebugModeValues.length).toBe(4);
+    it('has exactly 6 debug mode values', () => {
+      expect(DebugModeValues.length).toBe(6);
     });
   });
 

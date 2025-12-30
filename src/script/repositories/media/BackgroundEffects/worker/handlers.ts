@@ -20,6 +20,7 @@
 import {bindContextLossHandlers, resetContextLossHandlers} from './contextLoss';
 import {state} from './state';
 
+import {resolveSegmentationModelPath} from '../quality/definitions';
 import {QualityController} from '../quality/QualityController';
 import {WebGLRenderer} from '../renderer/WebGLRenderer';
 import {Segmenter} from '../segmentation/segmenter';
@@ -48,13 +49,21 @@ export async function handleInit(
     state.qualityController.setTier(state.quality);
   }
 
-  state.segmenter = new Segmenter(options.segmentationModelPath, 'GPU', canvas);
+  const initialTier = options.quality === 'auto' ? 'A' : options.quality;
+  const modelPath = resolveSegmentationModelPath(
+    initialTier,
+    options.segmentationModelByTier,
+    options.segmentationModelPath,
+  );
+  state.segmenter = new Segmenter(modelPath, 'GPU', canvas);
   try {
     await state.segmenter.init();
+    state.currentModelPath = modelPath;
   } catch (error) {
     console.warn('[bgfx.worker] Segmenter init failed, running in bypass mode.', error);
     postMessage({type: 'segmenterError', error: String(error)} as WorkerResponse);
     state.segmenter = null;
+    state.currentModelPath = null;
   }
 
   bindContextLossHandlers(canvas);

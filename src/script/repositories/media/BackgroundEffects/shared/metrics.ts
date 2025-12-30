@@ -32,7 +32,12 @@ export const pushMetricsSample = (samples: MetricsSample[], maxSamples: number, 
   }
 };
 
-export const buildMetrics = (samples: MetricsSample[], droppedFrames: number, tier: Metrics['tier']): Metrics => {
+export const buildMetrics = (
+  samples: MetricsSample[],
+  droppedFrames: number,
+  tier: Metrics['tier'],
+  segmentationDelegate: 'CPU' | 'GPU' | null = null,
+): Metrics => {
   const totals = samples.reduce(
     (acc, sample) => {
       acc.totalMs += sample.totalMs;
@@ -47,6 +52,7 @@ export const buildMetrics = (samples: MetricsSample[], droppedFrames: number, ti
     avgTotalMs: totals.totalMs / count,
     avgSegmentationMs: totals.segmentationMs / count,
     avgGpuMs: totals.gpuMs / count,
+    segmentationDelegate,
     droppedFrames,
     tier,
   };

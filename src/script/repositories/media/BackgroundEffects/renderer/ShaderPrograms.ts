@@ -86,6 +86,8 @@ export class ShaderPrograms {
           maskOverlay: 1,
           maskOnly: 2,
           edgeOnly: 3,
+          classOverlay: 4,
+          classOnly: 5,
         };
         gl.uniform1i(location, modeMap[value] ?? 0);
       }

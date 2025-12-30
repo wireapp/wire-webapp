@@ -27,8 +27,10 @@ import type {DebugMode} from '../types';
  * - 'maskOverlay': Overlays a semi-transparent green tint on mask areas (foreground)
  * - 'maskOnly': Displays only the segmentation mask as a grayscale image
  * - 'edgeOnly': Highlights the edges of the mask using smoothstep edge detection
+ * - 'classOverlay': Overlays class colors from multiclass segmentation
+ * - 'classOnly': Shows class colors only (no video)
  */
-export const DebugModeValues: DebugMode[] = ['off', 'maskOverlay', 'maskOnly', 'edgeOnly'];
+export const DebugModeValues: DebugMode[] = ['off', 'maskOverlay', 'maskOnly', 'edgeOnly', 'classOverlay', 'classOnly'];
 
 /**
  * Type guard function that checks if a string value is a valid DebugMode.

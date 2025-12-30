@@ -19,13 +19,21 @@
 
 import {Segmenter} from './segmenter';
 import type {SegmentationResult} from './segmenter';
-import type {SegmenterFactory, SegmenterInit, SegmenterLike} from './segmenterTypes';
+import type {
+  SegmenterDelegate,
+  SegmenterFactory,
+  SegmenterInit,
+  SegmenterLike,
+  SegmenterOptions,
+} from './segmenterTypes';
 
 class MediaPipeSegmenterAdapter implements SegmenterLike {
   private readonly segmenter: Segmenter;
+  private readonly delegate: SegmenterDelegate;
 
   constructor(init: SegmenterInit) {
     this.segmenter = new Segmenter(init.modelPath, init.delegate, init.canvas);
+    this.delegate = init.delegate;
   }
 
   public init(): Promise<void> {
@@ -36,12 +44,16 @@ class MediaPipeSegmenterAdapter implements SegmenterLike {
     this.segmenter.configure(width, height);
   }
 
-  public segment(frame: ImageBitmap, timestampMs: number): Promise<SegmentationResult> {
-    return this.segmenter.segment(frame, timestampMs);
+  public segment(frame: ImageBitmap, timestampMs: number, options?: SegmenterOptions): Promise<SegmentationResult> {
+    return this.segmenter.segment(frame, timestampMs, options);
   }
 
   public close(): void {
     this.segmenter.close();
+  }
+
+  public getDelegate(): SegmenterDelegate {
+    return this.delegate;
   }
 }
 

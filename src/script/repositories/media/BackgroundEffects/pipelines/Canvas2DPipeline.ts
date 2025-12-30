@@ -21,14 +21,15 @@ import {getLogger, Logger} from 'Util/Logger';
 
 import type {Pipeline, PipelineConfig, PipelineInit} from './Pipeline';
 
+import {resolveSegmentationModelPath} from '../quality/definitions';
 import {QualityController} from '../quality/QualityController';
+import {getQualityMode, resolveQualityTier} from '../quality/resolve';
 import {NoopMaskPostProcessor} from '../segmentation/maskPostProcessor';
 import type {MaskPostProcessor} from '../segmentation/maskPostProcessor';
 import {MediaPipeSegmenterFactory} from '../segmentation/mediaPipeSegmenter';
-import type {SegmenterLike} from '../segmentation/segmenterTypes';
+import type {SegmenterFactory, SegmenterLike} from '../segmentation/segmenterTypes';
 import {buildMetrics, MetricsSample, pushMetricsSample} from '../shared/metrics';
-import {getQualityMode, resolveQualityTier} from '../shared/quality';
-import type {QualityTierParams} from '../types';
+import type {QualityTierParams, SegmentationModelByTier} from '../types';
 
 export class Canvas2DPipeline implements Pipeline {
   public readonly type = 'canvas2d' as const;
@@ -37,7 +38,12 @@ export class Canvas2DPipeline implements Pipeline {
   private canvasCtx: CanvasRenderingContext2D | null = null;
   private foregroundCanvas: HTMLCanvasElement | null = null;
   private foregroundCtx: CanvasRenderingContext2D | null = null;
+  private debugCanvas: HTMLCanvasElement | null = null;
+  private debugCtx: CanvasRenderingContext2D | null = null;
   private segmenter: SegmenterLike | null = null;
+  private segmenterFactory: SegmenterFactory = MediaPipeSegmenterFactory;
+  private segmentationModelByTier: SegmentationModelByTier = {};
+  private currentModelPath: string | null = null;
   private maskPostProcessor: MaskPostProcessor = new NoopMaskPostProcessor();
   private qualityController: QualityController | null = null;
   private config: PipelineConfig | null = null;
@@ -74,12 +80,18 @@ export class Canvas2DPipeline implements Pipeline {
     this.foregroundCanvas.width = this.outputCanvas.width;
     this.foregroundCanvas.height = this.outputCanvas.height;
     this.foregroundCtx = this.foregroundCanvas.getContext('2d');
+    this.debugCanvas = document.createElement('canvas');
+    this.debugCanvas.width = this.outputCanvas.width;
+    this.debugCanvas.height = this.outputCanvas.height;
+    this.debugCtx = this.debugCanvas.getContext('2d');
 
-    const segmenterFactory = init.createSegmenter ?? MediaPipeSegmenterFactory;
-    this.segmenter = segmenterFactory.create({
+    this.segmenterFactory = init.createSegmenter ?? MediaPipeSegmenterFactory;
+    this.segmentationModelByTier = init.segmentationModelByTier;
+    this.segmenter = this.segmenterFactory.create({
       modelPath: init.segmentationModelPath,
       delegate: 'CPU',
     });
+    this.currentModelPath = init.segmentationModelPath;
     const postProcessorFactory = init.createMaskPostProcessor ?? {
       create: () => new NoopMaskPostProcessor(),
     };
@@ -108,6 +120,10 @@ export class Canvas2DPipeline implements Pipeline {
     const ctx = this.canvasCtx;
     this.foregroundCanvas!.width = width;
     this.foregroundCanvas!.height = height;
+    if (this.debugCanvas) {
+      this.debugCanvas.width = width;
+      this.debugCanvas.height = height;
+    }
     ctx.clearRect(0, 0, width, height);
 
     if (this.config.mode === 'passthrough' || !this.segmenter || !this.qualityController) {
@@ -121,16 +137,18 @@ export class Canvas2DPipeline implements Pipeline {
     }
 
     const qualityTier = this.resolveQuality();
+    await this.ensureSegmenterForTier(qualityTier.tier);
     this.mainFrameCount += 1;
     const token = ++this.canvasFrameToken;
 
     let result:
-      | {mask: ImageBitmap | null; durationMs: number; release: () => void}
-      | {mask: null; durationMs: number; release: () => void};
+      | {mask: ImageBitmap | null; classMask: ImageBitmap | null; durationMs: number; release: () => void}
+      | {mask: null; classMask: ImageBitmap | null; durationMs: number; release: () => void};
     if (qualityTier.segmentationCadence > 0 && this.mainFrameCount % qualityTier.segmentationCadence === 0) {
       this.segmenter.configure(qualityTier.segmentationWidth, qualityTier.segmentationHeight);
       const timestampMs = performance.now();
-      const segmentation = await this.segmenter.segment(frame, timestampMs);
+      const includeClassMask = this.config.debugMode === 'classOverlay' || this.config.debugMode === 'classOnly';
+      const segmentation = await this.segmenter.segment(frame, timestampMs, {includeClassMask});
       const processed = await this.maskPostProcessor.process(segmentation, {
         qualityTier,
         mode: this.config.mode,
@@ -139,11 +157,17 @@ export class Canvas2DPipeline implements Pipeline {
       });
       if (processed !== segmentation) {
         segmentation.mask?.close();
+        segmentation.classMask?.close();
         segmentation.release();
       }
-      result = {mask: processed.mask, durationMs: processed.durationMs, release: processed.release};
+      result = {
+        mask: processed.mask,
+        classMask: processed.classMask,
+        durationMs: processed.durationMs,
+        release: processed.release,
+      };
     } else {
-      result = {mask: null, durationMs: 0, release: () => {}};
+      result = {mask: null, classMask: null, durationMs: 0, release: () => {}};
     }
 
     if (token !== this.canvasFrameToken) {
@@ -154,22 +178,29 @@ export class Canvas2DPipeline implements Pipeline {
     }
 
     const mask = result.mask;
+    const classMask = result.classMask;
     const renderStart = performance.now();
     try {
-      if (this.config.debugMode !== 'off' && mask) {
+      const isClassDebug = this.config.debugMode === 'classOverlay' || this.config.debugMode === 'classOnly';
+      const activeMask = isClassDebug ? classMask : mask;
+      if (this.config.debugMode !== 'off' && activeMask) {
         ctx.clearRect(0, 0, width, height);
         if (this.config.debugMode === 'maskOnly') {
-          ctx.drawImage(mask, 0, 0, width, height);
+          ctx.drawImage(activeMask, 0, 0, width, height);
         } else if (this.config.debugMode === 'maskOverlay') {
           ctx.drawImage(frame, 0, 0, width, height);
           ctx.globalAlpha = 0.5;
           ctx.fillStyle = '#00ff00';
           ctx.globalCompositeOperation = 'source-atop';
-          ctx.drawImage(mask, 0, 0, width, height);
+          ctx.drawImage(activeMask, 0, 0, width, height);
           ctx.globalCompositeOperation = 'source-over';
           ctx.globalAlpha = 1;
         } else if (this.config.debugMode === 'edgeOnly') {
-          ctx.drawImage(mask, 0, 0, width, height);
+          ctx.drawImage(activeMask, 0, 0, width, height);
+        } else if (this.config.debugMode === 'classOnly') {
+          this.renderClassMask(ctx, activeMask, width, height, false, frame);
+        } else if (this.config.debugMode === 'classOverlay') {
+          this.renderClassMask(ctx, activeMask, width, height, true, frame);
         }
         const renderMs = performance.now() - renderStart;
         this.updateMetrics(result.durationMs + renderMs, result.durationMs, renderMs, qualityTier.tier);
@@ -201,6 +232,7 @@ export class Canvas2DPipeline implements Pipeline {
       this.updateMetrics(result.durationMs + renderMs, result.durationMs, renderMs, qualityTier.tier);
     } finally {
       mask?.close();
+      classMask?.close();
       result.release();
       frame.close();
     }
@@ -228,17 +260,96 @@ export class Canvas2DPipeline implements Pipeline {
     return false;
   }
 
+  private renderClassMask(
+    ctx: CanvasRenderingContext2D,
+    mask: ImageBitmap,
+    width: number,
+    height: number,
+    overlay: boolean,
+    frame: ImageBitmap,
+  ): void {
+    if (!this.debugCanvas || !this.debugCtx) {
+      if (overlay) {
+        ctx.drawImage(frame, 0, 0, width, height);
+      }
+      ctx.drawImage(mask, 0, 0, width, height);
+      return;
+    }
+    this.debugCtx.clearRect(0, 0, width, height);
+    this.debugCtx.drawImage(mask, 0, 0, width, height);
+    const imageData = this.debugCtx.getImageData(0, 0, width, height);
+    const data = imageData.data;
+    for (let i = 0; i < data.length; i += 4) {
+      const classId = data[i];
+      if (classId === 0) {
+        data[i] = 0;
+        data[i + 1] = 0;
+        data[i + 2] = 0;
+        data[i + 3] = overlay ? 0 : 255;
+        continue;
+      }
+      const [r, g, b] = this.classColor(classId);
+      data[i] = r;
+      data[i + 1] = g;
+      data[i + 2] = b;
+      data[i + 3] = 255;
+    }
+    this.debugCtx.putImageData(imageData, 0, 0);
+    if (overlay) {
+      ctx.drawImage(frame, 0, 0, width, height);
+      ctx.globalAlpha = 0.6;
+      ctx.drawImage(this.debugCanvas, 0, 0, width, height);
+      ctx.globalAlpha = 1;
+    } else {
+      ctx.drawImage(this.debugCanvas, 0, 0, width, height);
+    }
+  }
+
+  private classColor(classId: number): [number, number, number] {
+    const hue = (classId * 0.13) % 1;
+    const [r, g, b] = this.hsvToRgb(hue, 0.75, 0.95);
+    return [Math.round(r * 255), Math.round(g * 255), Math.round(b * 255)];
+  }
+
+  private hsvToRgb(h: number, s: number, v: number): [number, number, number] {
+    const i = Math.floor(h * 6);
+    const f = h * 6 - i;
+    const p = v * (1 - s);
+    const q = v * (1 - f * s);
+    const t = v * (1 - (1 - f) * s);
+    const mod = i % 6;
+    if (mod === 0) {
+      return [v, t, p];
+    }
+    if (mod === 1) {
+      return [q, v, p];
+    }
+    if (mod === 2) {
+      return [p, v, t];
+    }
+    if (mod === 3) {
+      return [p, q, v];
+    }
+    if (mod === 4) {
+      return [t, p, v];
+    }
+    return [v, p, q];
+  }
+
   public stop(): void {
     this.background?.bitmap?.close();
     this.background = null;
     this.maskPostProcessor.reset();
     this.segmenter?.close();
     this.segmenter = null;
+    this.currentModelPath = null;
     this.qualityController = null;
     this.outputCanvas = null;
     this.canvasCtx = null;
     this.foregroundCanvas = null;
     this.foregroundCtx = null;
+    this.debugCanvas = null;
+    this.debugCtx = null;
     this.config = null;
     this.onMetrics = null;
     this.onTierChange = null;
@@ -253,6 +364,31 @@ export class Canvas2DPipeline implements Pipeline {
     return resolveQualityTier(this.qualityController, this.config.quality, getQualityMode(this.config.mode));
   }
 
+  private async ensureSegmenterForTier(tier: 'A' | 'B' | 'C' | 'D'): Promise<void> {
+    const desiredPath = resolveSegmentationModelPath(
+      tier,
+      this.segmentationModelByTier,
+      this.currentModelPath ?? undefined,
+    );
+    if (this.currentModelPath === desiredPath && this.segmenter) {
+      return;
+    }
+    const nextSegmenter = this.segmenterFactory.create({
+      modelPath: desiredPath,
+      delegate: 'CPU',
+    });
+    try {
+      await nextSegmenter.init();
+    } catch (error) {
+      this.logger.warn('Segmentation model swap failed, keeping previous model', error);
+      nextSegmenter.close();
+      return;
+    }
+    this.segmenter?.close();
+    this.segmenter = nextSegmenter;
+    this.currentModelPath = desiredPath;
+  }
+
   private updateMetrics(totalMs: number, segmentationMs: number, gpuMs: number, tier: 'A' | 'B' | 'C' | 'D'): void {
     if (!this.onMetrics || !this.getDroppedFrames) {
       return;
@@ -261,6 +397,8 @@ export class Canvas2DPipeline implements Pipeline {
     if (this.config?.quality === 'auto') {
       this.onTierChange?.(tier);
     }
-    this.onMetrics(buildMetrics(this.metricsSamples, this.getDroppedFrames(), tier));
+    // Canvas2DPipeline uses CPU delegate
+    const segmentationDelegate = this.segmenter?.getDelegate?.() ?? 'CPU';
+    this.onMetrics(buildMetrics(this.metricsSamples, this.getDroppedFrames(), tier, segmentationDelegate));
   }
 }

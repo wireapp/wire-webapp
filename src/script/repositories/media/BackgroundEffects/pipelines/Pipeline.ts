@@ -19,7 +19,7 @@
 
 import type {MaskPostProcessorFactory} from '../segmentation/maskPostProcessor';
 import type {SegmenterFactory} from '../segmentation/segmenterTypes';
-import type {DebugMode, EffectMode, Metrics, PipelineType, QualityMode} from '../types';
+import type {DebugMode, EffectMode, Metrics, PipelineType, QualityMode, SegmentationModelByTier} from '../types';
 
 export interface PipelineConfig {
   mode: EffectMode;
@@ -32,6 +32,7 @@ export interface PipelineInit {
   outputCanvas: HTMLCanvasElement;
   targetFps: number;
   segmentationModelPath: string;
+  segmentationModelByTier: SegmentationModelByTier;
   config: PipelineConfig;
   createSegmenter?: SegmenterFactory;
   createMaskPostProcessor?: MaskPostProcessorFactory;

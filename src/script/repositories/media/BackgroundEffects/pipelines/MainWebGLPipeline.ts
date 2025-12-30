@@ -21,22 +21,26 @@ import {getLogger, Logger} from 'Util/Logger';
 
 import type {Pipeline, PipelineConfig, PipelineInit} from './Pipeline';
 
+import {resolveSegmentationModelPath} from '../quality/definitions';
 import {QualityController} from '../quality/QualityController';
+import {getQualityMode, resolveQualityTier} from '../quality/resolve';
 import {WebGLRenderer} from '../renderer/WebGLRenderer';
 import {NoopMaskPostProcessor} from '../segmentation/maskPostProcessor';
 import type {MaskPostProcessor} from '../segmentation/maskPostProcessor';
 import {MediaPipeSegmenterFactory} from '../segmentation/mediaPipeSegmenter';
-import type {SegmenterLike} from '../segmentation/segmenterTypes';
+import type {SegmenterFactory, SegmenterLike} from '../segmentation/segmenterTypes';
 import {buildMaskInput, MaskInput} from '../shared/mask';
 import {buildMetrics, MetricsSample, pushMetricsSample} from '../shared/metrics';
-import {getQualityMode, resolveQualityTier} from '../shared/quality';
-import type {QualityTierParams} from '../types';
+import type {QualityTierParams, SegmentationModelByTier} from '../types';
 
 export class MainWebGLPipeline implements Pipeline {
   public readonly type = 'main-webgl2' as const;
   private readonly logger: Logger;
   private renderer: WebGLRenderer | null = null;
   private segmenter: SegmenterLike | null = null;
+  private segmenterFactory: SegmenterFactory = MediaPipeSegmenterFactory;
+  private segmentationModelByTier: SegmentationModelByTier = {};
+  private currentModelPath: string | null = null;
   private maskPostProcessor: MaskPostProcessor = new NoopMaskPostProcessor();
   private qualityController: QualityController | null = null;
   private outputCanvas: HTMLCanvasElement | null = null;
@@ -62,12 +66,14 @@ export class MainWebGLPipeline implements Pipeline {
     this.mainFrameCount = 0;
 
     this.renderer = new WebGLRenderer(this.outputCanvas, this.outputCanvas.width, this.outputCanvas.height);
-    const segmenterFactory = init.createSegmenter ?? MediaPipeSegmenterFactory;
-    this.segmenter = segmenterFactory.create({
+    this.segmenterFactory = init.createSegmenter ?? MediaPipeSegmenterFactory;
+    this.segmentationModelByTier = init.segmentationModelByTier;
+    this.segmenter = this.segmenterFactory.create({
       modelPath: init.segmentationModelPath,
       delegate: 'GPU',
       canvas: this.outputCanvas,
     });
+    this.currentModelPath = init.segmentationModelPath;
     const postProcessorFactory = init.createMaskPostProcessor ?? {
       create: () => new NoopMaskPostProcessor(),
     };
@@ -99,6 +105,7 @@ export class MainWebGLPipeline implements Pipeline {
     }
 
     const qualityTier = this.resolveQuality();
+    await this.ensureSegmenterForTier(qualityTier.tier);
 
     let maskInput: MaskInput | null = null;
     let maskBitmap: ImageBitmap | null = null;
@@ -110,7 +117,8 @@ export class MainWebGLPipeline implements Pipeline {
         this.segmenter.configure(qualityTier.segmentationWidth, qualityTier.segmentationHeight);
         const segStart = performance.now();
         const timestampMs = timestamp * 1000;
-        const result = await this.segmenter.segment(frame, timestampMs);
+        const includeClassMask = this.config.debugMode === 'classOverlay' || this.config.debugMode === 'classOnly';
+        const result = await this.segmenter.segment(frame, timestampMs, {includeClassMask});
         segmentationMs = performance.now() - segStart;
         const processed = await this.maskPostProcessor.process(result, {
           qualityTier,
@@ -120,9 +128,25 @@ export class MainWebGLPipeline implements Pipeline {
         });
         if (processed !== result) {
           result.mask?.close();
+          result.classMask?.close();
           result.release();
         }
-        const maskResult = buildMaskInput(processed);
+        const useClassMask = includeClassMask && processed.classMask;
+        const maskSource = useClassMask
+          ? {
+              mask: processed.classMask,
+              maskTexture: null,
+              width: processed.width,
+              height: processed.height,
+              release: processed.release,
+            }
+          : processed;
+        if (useClassMask) {
+          processed.mask?.close();
+        } else {
+          processed.classMask?.close();
+        }
+        const maskResult = buildMaskInput(maskSource);
         maskInput = maskResult.maskInput;
         maskBitmap = maskResult.maskBitmap;
         releaseMaskResources = maskResult.release;
@@ -199,6 +223,7 @@ export class MainWebGLPipeline implements Pipeline {
     this.maskPostProcessor.reset();
     this.segmenter?.close();
     this.segmenter = null;
+    this.currentModelPath = null;
     this.renderer?.destroy();
     this.renderer = null;
     this.qualityController = null;
@@ -217,11 +242,42 @@ export class MainWebGLPipeline implements Pipeline {
     return resolveQualityTier(this.qualityController, this.config.quality, getQualityMode(this.config.mode));
   }
 
+  private async ensureSegmenterForTier(tier: 'A' | 'B' | 'C' | 'D'): Promise<void> {
+    if (!this.outputCanvas) {
+      return;
+    }
+    const desiredPath = resolveSegmentationModelPath(
+      tier,
+      this.segmentationModelByTier,
+      this.currentModelPath ?? undefined,
+    );
+    if (this.currentModelPath === desiredPath && this.segmenter) {
+      return;
+    }
+    const nextSegmenter = this.segmenterFactory.create({
+      modelPath: desiredPath,
+      delegate: 'GPU',
+      canvas: this.outputCanvas,
+    });
+    try {
+      await nextSegmenter.init();
+    } catch (error) {
+      this.logger.warn('Segmentation model swap failed, keeping previous model', error);
+      nextSegmenter.close();
+      return;
+    }
+    this.segmenter?.close();
+    this.segmenter = nextSegmenter;
+    this.currentModelPath = desiredPath;
+  }
+
   private updateMetrics(totalMs: number, segmentationMs: number, gpuMs: number, tier: 'A' | 'B' | 'C' | 'D'): void {
     if (!this.onMetrics || !this.getDroppedFrames) {
       return;
     }
     pushMetricsSample(this.metricsSamples, this.metricsMaxSamples, {totalMs, segmentationMs, gpuMs});
-    this.onMetrics(buildMetrics(this.metricsSamples, this.getDroppedFrames(), tier));
+    // MainWebGLPipeline uses GPU delegate
+    const segmentationDelegate = this.segmenter?.getDelegate?.() ?? 'GPU';
+    this.onMetrics(buildMetrics(this.metricsSamples, this.getDroppedFrames(), tier, segmentationDelegate));
   }
 }

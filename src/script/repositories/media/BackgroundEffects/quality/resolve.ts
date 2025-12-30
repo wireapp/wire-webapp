@@ -17,6 +17,7 @@
  *
  */
 
+import {resolveTierParams} from '../quality/definitions';
 import type {EffectMode, Mode, QualityMode, QualityTierParams} from '../types';
 
 export interface QualityControllerLike {
@@ -26,25 +27,7 @@ export interface QualityControllerLike {
 
 export const getQualityMode = (mode: EffectMode): Mode => (mode === 'virtual' ? 'virtual' : 'blur');
 
-export const getBypassTier = (): QualityTierParams => ({
-  tier: 'D',
-  segmentationWidth: 0,
-  segmentationHeight: 0,
-  segmentationCadence: 0,
-  maskRefineScale: 1,
-  blurDownsampleScale: 1,
-  blurRadius: 0,
-  bilateralRadius: 0,
-  bilateralSpatialSigma: 0,
-  bilateralRangeSigma: 0,
-  softLow: 0.3,
-  softHigh: 0.65,
-  matteLow: 0.45,
-  matteHigh: 0.6,
-  matteHysteresis: 0.04,
-  temporalAlpha: 0,
-  bypass: true,
-});
+export const getBypassTier = (mode: Mode): QualityTierParams => resolveTierParams('D', mode);
 
 export const resolveQualityTier = (
   qualityController: QualityControllerLike | null,
@@ -52,7 +35,7 @@ export const resolveQualityTier = (
   mode: Mode,
 ): QualityTierParams => {
   if (!qualityController) {
-    return getBypassTier();
+    return getBypassTier(mode);
   }
 
   if (quality !== 'auto') {

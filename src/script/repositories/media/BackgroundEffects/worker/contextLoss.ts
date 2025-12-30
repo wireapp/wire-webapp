@@ -19,6 +19,7 @@
 
 import {state} from './state';
 
+import {resolveSegmentationModelPath} from '../quality/definitions';
 import {WebGLRenderer} from '../renderer/WebGLRenderer';
 import {Segmenter} from '../segmentation/segmenter';
 
@@ -64,12 +65,20 @@ async function handleContextRestored(): Promise<void> {
   }
 
   state.contextLost = false;
+  const tier = state.metrics?.tier ?? (state.quality === 'auto' ? 'A' : state.quality);
+  const modelPath = resolveSegmentationModelPath(
+    tier,
+    state.options.segmentationModelByTier,
+    state.options.segmentationModelPath,
+  );
   state.segmenter?.close();
-  state.segmenter = new Segmenter(state.options.segmentationModelPath, 'GPU', state.canvas ?? undefined);
+  state.segmenter = new Segmenter(modelPath, 'GPU', state.canvas ?? undefined);
   try {
     await state.segmenter.init();
+    state.currentModelPath = modelPath;
   } catch (error) {
     console.warn('[bgfx.worker] Segmenter restore failed', error);
     state.segmenter = null;
+    state.currentModelPath = null;
   }
 }

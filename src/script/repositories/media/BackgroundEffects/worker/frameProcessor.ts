@@ -19,9 +19,11 @@
 
 import {METRICS_MAX_SAMPLES, state} from './state';
 
+import {resolveSegmentationModelPath} from '../quality/definitions';
+import {getQualityMode, resolveQualityTier} from '../quality/resolve';
+import {Segmenter} from '../segmentation/segmenter';
 import {buildMaskInput, MaskInput} from '../shared/mask';
 import {buildMetrics, pushMetricsSample} from '../shared/metrics';
-import {getQualityMode, resolveQualityTier} from '../shared/quality';
 import {toMonotonicTimestampMs} from '../shared/timestamps';
 import type {QualityTierParams} from '../types';
 
@@ -46,6 +48,7 @@ export async function handleFrame(frame: ImageBitmap, timestamp: number, width: 
     }
 
     let qualityTier = resolveQualityTierParams();
+    await ensureSegmenterForTier(qualityTier.tier);
     if (!state.segmenter) {
       qualityTier = {...qualityTier, bypass: true};
     }
@@ -55,8 +58,24 @@ export async function handleFrame(frame: ImageBitmap, timestamp: number, width: 
       if (state.frameCount % qualityTier.segmentationCadence === 0) {
         state.segmenter.configure(qualityTier.segmentationWidth, qualityTier.segmentationHeight);
         const timestampMs = nextTimestampMs(timestamp);
-        const result = await state.segmenter.segment(frame, timestampMs);
-        const maskResult = buildMaskInput(result);
+        const includeClassMask = state.debugMode === 'classOverlay' || state.debugMode === 'classOnly';
+        const result = await state.segmenter.segment(frame, timestampMs, {includeClassMask});
+        const useClassMask = includeClassMask && result.classMask;
+        const maskSource = useClassMask
+          ? {
+              mask: result.classMask,
+              maskTexture: null,
+              width: result.width,
+              height: result.height,
+              release: result.release,
+            }
+          : result;
+        if (useClassMask) {
+          result.mask?.close();
+        } else {
+          result.classMask?.close();
+        }
+        const maskResult = buildMaskInput(maskSource);
         releaseMaskResources = maskResult.release;
         maskInput = maskResult.maskInput;
         maskBitmap = maskResult.maskBitmap;
@@ -97,6 +116,31 @@ function resolveQualityTierParams(): QualityTierParams {
   return resolveQualityTier(state.qualityController, state.quality, getQualityMode(state.mode));
 }
 
+async function ensureSegmenterForTier(tier: 'A' | 'B' | 'C' | 'D'): Promise<void> {
+  if (!state.options || !state.canvas) {
+    return;
+  }
+  const desiredPath = resolveSegmentationModelPath(
+    tier,
+    state.options.segmentationModelByTier,
+    state.options.segmentationModelPath,
+  );
+  if (state.currentModelPath === desiredPath && state.segmenter) {
+    return;
+  }
+  const nextSegmenter = new Segmenter(desiredPath, 'GPU', state.canvas);
+  try {
+    await nextSegmenter.init();
+  } catch (error) {
+    console.warn('[bgfx.worker] Segmentation model swap failed, keeping previous model', error);
+    nextSegmenter.close();
+    return;
+  }
+  state.segmenter?.close();
+  state.segmenter = nextSegmenter;
+  state.currentModelPath = desiredPath;
+}
+
 function updateMetrics(totalMs: number, segmentationMs: number, gpuMs: number, tier: 'A' | 'B' | 'C' | 'D'): void {
   if (!state.qualityController) {
     return;
@@ -108,10 +152,13 @@ function updateMetrics(totalMs: number, segmentationMs: number, gpuMs: number, t
       : state.qualityController.getTier(getQualityMode(state.mode));
 
   pushMetricsSample(state.metricsSamples, METRICS_MAX_SAMPLES, {totalMs, segmentationMs, gpuMs});
+  // Get segmentation delegate type (null if no segmenter)
+  const segmentationDelegate = state.segmenter?.getDelegate() ?? null;
   state.metrics = buildMetrics(
     state.metricsSamples,
     state.metrics.droppedFrames,
     state.quality === 'auto' ? params.tier : tier,
+    segmentationDelegate,
   );
 
   postMessage({type: 'metrics', metrics: state.metrics});

@@ -17,6 +17,8 @@
  *
  */
 
+import {applyModeOverlay, type TierKey, TIER_DEFINITIONS} from './definitions';
+
 import type {Mode, QualityTierParams} from '../types';
 
 /**
@@ -30,149 +32,6 @@ interface Sample {
   /** Time spent on GPU rendering operations in milliseconds. */
   gpuMs: number;
 }
-
-/**
- * Quality tier identifier. Tiers are ordered from highest quality (A) to lowest (D).
- * - A: Highest quality, full processing
- * - B: Medium-high quality, reduced cadence
- * - C: Medium quality, lower resolution and reduced effects
- * - D: Bypass mode, no processing
- */
-type TierKey = 'A' | 'B' | 'C' | 'D';
-
-/**
- * Performance tier parameters that control rendering quality and resource usage.
- * These parameters are applied before mode-specific overlays.
- */
-interface PerfTierParams {
-  /** Quality tier identifier. */
-  tier: TierKey;
-  /** Width of the segmentation mask in pixels. Lower values reduce CPU/ML cost. */
-  segmentationWidth: number;
-  /** Height of the segmentation mask in pixels. Lower values reduce CPU/ML cost. */
-  segmentationHeight: number;
-  /** Segmentation cadence (process every Nth frame). Higher values reduce CPU/ML cost. */
-  segmentationCadence: number;
-  /** Scale factor for mask refinement pass (0-1). Lower values reduce GPU cost. */
-  maskRefineScale: number;
-  /** Scale factor for blur downsampling (0-1). Lower values reduce GPU cost. */
-  blurDownsampleScale: number;
-  /** Blur radius in pixels. Lower values reduce GPU cost. */
-  blurRadius: number;
-  /** Joint bilateral filter radius in pixels. Lower values reduce GPU cost. */
-  bilateralRadius: number;
-  /** Spatial sigma for joint bilateral filter. Controls spatial smoothing. */
-  bilateralSpatialSigma: number;
-  /** Range sigma for joint bilateral filter. Controls edge preservation. */
-  bilateralRangeSigma: number;
-  /** If true, bypass all processing and pass through original frames. */
-  bypass: boolean;
-}
-
-/**
- * Mode-specific overlay parameters that adjust matte processing and temporal smoothing.
- * These values are applied on top of tier parameters to optimize for each effect mode.
- */
-interface ModeOverlay {
-  /** Temporal smoothing alpha (0-1). Higher values increase temporal stability. */
-  temporalAlpha: number;
-  /** Lower threshold for soft matte edge (0-1). Controls where soft edges begin. */
-  softLow: number;
-  /** Upper threshold for soft matte edge (0-1). Controls where soft edges end. */
-  softHigh: number;
-  /** Lower threshold for matte cutoff (0-1). Pixels below this are considered background. */
-  matteLow: number;
-  /** Upper threshold for matte cutoff (0-1). Pixels above this are considered foreground. */
-  matteHigh: number;
-  /** Hysteresis value for matte thresholds to prevent flickering (0-1). */
-  matteHysteresis: number;
-}
-
-/**
- * Quality tier definitions ordered from highest (A) to lowest (D) quality.
- * Each tier balances visual quality against performance by adjusting:
- * - Segmentation resolution and cadence (CPU/ML cost)
- * - Blur and bilateral filter parameters (GPU cost)
- * - Mask refinement and downsampling scales (GPU cost)
- */
-const TIERS: Record<TierKey, PerfTierParams> = {
-  A: {
-    tier: 'A',
-    segmentationWidth: 256,
-    segmentationHeight: 144,
-    segmentationCadence: 1,
-    maskRefineScale: 0.5,
-    blurDownsampleScale: 0.25,
-    blurRadius: 4,
-    bilateralRadius: 5,
-    bilateralSpatialSigma: 3.5,
-    bilateralRangeSigma: 0.1,
-    bypass: false,
-  },
-  B: {
-    tier: 'B',
-    segmentationWidth: 256,
-    segmentationHeight: 144,
-    segmentationCadence: 2,
-    maskRefineScale: 0.5,
-    blurDownsampleScale: 0.25,
-    blurRadius: 3,
-    bilateralRadius: 4,
-    bilateralSpatialSigma: 3.0,
-    bilateralRangeSigma: 0.1,
-    bypass: false,
-  },
-  C: {
-    tier: 'C',
-    segmentationWidth: 160,
-    segmentationHeight: 96,
-    segmentationCadence: 2,
-    maskRefineScale: 0.5,
-    blurDownsampleScale: 0.25,
-    blurRadius: 2,
-    bilateralRadius: 3,
-    bilateralSpatialSigma: 2.5,
-    bilateralRangeSigma: 0.12,
-    bypass: false,
-  },
-  D: {
-    tier: 'D',
-    segmentationWidth: 0,
-    segmentationHeight: 0,
-    segmentationCadence: 0,
-    maskRefineScale: 1,
-    blurDownsampleScale: 1,
-    blurRadius: 0,
-    bilateralRadius: 0,
-    bilateralSpatialSigma: 0,
-    bilateralRangeSigma: 0,
-    bypass: true,
-  },
-};
-
-/**
- * Default overlay parameters for each effect mode.
- * These values are tuned for optimal visual quality and can be adjusted
- * per-tier based on performance characteristics.
- */
-const MODE_DEFAULTS: Record<Mode, ModeOverlay> = {
-  blur: {
-    temporalAlpha: 0.78,
-    softLow: 0.3,
-    softHigh: 0.65,
-    matteLow: 0.45,
-    matteHigh: 0.6,
-    matteHysteresis: 0.04,
-  },
-  virtual: {
-    temporalAlpha: 0.62,
-    softLow: 0.3,
-    softHigh: 0.65,
-    matteLow: 0.45,
-    matteHigh: 0.6,
-    matteHysteresis: 0.04,
-  },
-};
 
 /**
  * Adaptive quality controller that dynamically adjusts rendering quality tiers
@@ -232,7 +91,7 @@ export class QualityController {
    */
   public getTier(mode: Mode): QualityTierParams {
     this.handleModeChange(mode);
-    return this.applyModeOverlay(TIERS[this.tier], mode);
+    return applyModeOverlay(TIER_DEFINITIONS[this.tier], mode);
   }
 
   /**
@@ -316,7 +175,7 @@ export class QualityController {
       }
     }
 
-    return this.applyModeOverlay(TIERS[this.tier], mode);
+    return applyModeOverlay(TIER_DEFINITIONS[this.tier], mode);
   }
 
   /**
@@ -357,47 +216,6 @@ export class QualityController {
       this.stableFrames = 0;
       this.cooldownFrames = 0;
     }
-  }
-
-  /**
-   * Applies mode-specific overlay parameters to base tier parameters.
-   * Combines performance tier settings with mode-optimized matte processing values.
-   *
-   * @param tier - Base tier parameters.
-   * @param mode - Effect mode to get overlay for.
-   * @returns Combined quality tier parameters with mode-specific adjustments.
-   */
-  private applyModeOverlay(tier: PerfTierParams, mode: Mode): QualityTierParams {
-    const overlay = this.getModeOverlay(mode, tier.tier);
-    return {
-      ...tier,
-      softLow: overlay.softLow,
-      softHigh: overlay.softHigh,
-      matteLow: overlay.matteLow,
-      matteHigh: overlay.matteHigh,
-      matteHysteresis: overlay.matteHysteresis,
-      temporalAlpha: overlay.temporalAlpha,
-    };
-  }
-
-  /**
-   * Gets mode-specific overlay parameters, with tier-specific adjustments.
-   *
-   * @param mode - Effect mode ('blur' or 'virtual').
-   * @param tier - Current quality tier.
-   * @returns Mode overlay parameters, adjusted for the tier if needed.
-   */
-  private getModeOverlay(mode: Mode, tier: TierKey): ModeOverlay {
-    const base = MODE_DEFAULTS[mode];
-    // Tier D (bypass) disables temporal smoothing
-    if (tier === 'D') {
-      return {...base, temporalAlpha: 0};
-    }
-    // Virtual background at tier C uses slightly wider matte range for better edge handling
-    if (mode === 'virtual' && tier === 'C') {
-      return {...base, matteLow: base.matteLow - 0.02, matteHigh: base.matteHigh + 0.02};
-    }
-    return base;
   }
 
   /**

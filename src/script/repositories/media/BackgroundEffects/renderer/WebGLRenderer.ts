@@ -250,6 +250,7 @@ export class WebGLRenderer {
   public render(frame: ImageBitmap, maskLow: MaskInput | null): void {
     const gl = this.gl;
     const {quality, width, height, mode, debugMode, blurStrength} = this.config;
+    const isClassDebug = debugMode === 'classOverlay' || debugMode === 'classOnly';
 
     // Ensure all textures and framebuffers are ready
     const maskPrevWasNew = this.resources.ensureResources({width, height, quality});
@@ -286,6 +287,22 @@ export class WebGLRenderer {
       this.passes.drawSimple('compositePassthrough', null, width, height, {
         uSrc: this.resources.getTexture('videoTex'),
         uTexelSize: [1 / width, 1 / height],
+      });
+      return;
+    }
+
+    if (isClassDebug) {
+      if (!maskTexture) {
+        this.passes.drawSimple('compositePassthrough', null, width, height, {
+          uSrc: this.resources.getTexture('videoTex'),
+          uTexelSize: [1 / width, 1 / height],
+        });
+        return;
+      }
+      this.passes.drawSimple('debugOverlay', null, width, height, {
+        uVideo: this.resources.getTexture('videoTex'),
+        uMask: maskTexture,
+        uMode: debugMode,
       });
       return;
     }

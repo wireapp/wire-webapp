@@ -42,7 +42,16 @@ import {MainWebGLPipeline} from '../pipelines/MainWebGLPipeline';
 import {PassthroughPipeline} from '../pipelines/PassthroughPipeline';
 import type {Pipeline, PipelineConfig} from '../pipelines/Pipeline';
 import {WorkerWebGLPipeline} from '../pipelines/WorkerWebGLPipeline';
-import type {DebugMode, EffectMode, Metrics, PipelineType, QualityMode, StartOptions} from '../types';
+import {resolveSegmentationModelPath, TIER_DEFINITIONS} from '../quality/definitions';
+import type {
+  DebugMode,
+  EffectMode,
+  Metrics,
+  PipelineType,
+  QualityMode,
+  SegmentationModelByTier,
+  StartOptions,
+} from '../types';
 
 /**
  * Main controller for background effects processing.
@@ -85,8 +94,13 @@ export class BackgroundEffectsController {
   private quality: QualityMode = 'auto';
   /** Target frames per second for adaptive quality control. */
   private targetFps = 30;
-  /** Path to MediaPipe segmentation model file. */
-  private segmentationModelPath = '/assets/mediapipe-models/selfie_segmenter_landscape.tflite';
+  /** Per-tier segmentation model overrides. */
+  private segmentationModelByTier: SegmentationModelByTier = {
+    A: TIER_DEFINITIONS.A.modelPath,
+    B: TIER_DEFINITIONS.B.modelPath,
+    C: TIER_DEFINITIONS.C.modelPath,
+    D: TIER_DEFINITIONS.D.modelPath,
+  };
   /** Selected rendering pipeline. */
   private pipeline: PipelineType = 'passthrough';
   /** Cancel function for background video pump (stops video frame extraction). */
@@ -147,7 +161,29 @@ export class BackgroundEffectsController {
     this.blurStrength = opts.blurStrength ?? this.blurStrength;
     this.quality = opts.quality ?? this.quality;
     this.targetFps = opts.targetFps ?? this.targetFps;
-    this.segmentationModelPath = opts.segmentationModelPath ?? this.segmentationModelPath;
+    if (opts.segmentationModelPath) {
+      this.segmentationModelByTier = {
+        A: opts.segmentationModelPath,
+        B: opts.segmentationModelPath,
+        C: opts.segmentationModelPath,
+        D: opts.segmentationModelPath,
+      };
+    } else if (opts.segmentationModelByTier) {
+      this.segmentationModelByTier = {
+        A: TIER_DEFINITIONS.A.modelPath,
+        B: TIER_DEFINITIONS.B.modelPath,
+        C: TIER_DEFINITIONS.C.modelPath,
+        D: TIER_DEFINITIONS.D.modelPath,
+        ...opts.segmentationModelByTier,
+      };
+    } else {
+      this.segmentationModelByTier = {
+        A: TIER_DEFINITIONS.A.modelPath,
+        B: TIER_DEFINITIONS.B.modelPath,
+        C: TIER_DEFINITIONS.C.modelPath,
+        D: TIER_DEFINITIONS.D.modelPath,
+      };
+    }
     this.onMetrics = opts.onMetrics ?? null;
     this.droppedFrames = 0;
     this.pipelineImpl = null;
@@ -423,11 +459,15 @@ export class BackgroundEffectsController {
       quality: this.quality,
     };
 
+    const initialTier = this.quality === 'auto' ? 'A' : this.quality;
+    const segmentationModelPath = resolveSegmentationModelPath(initialTier, this.segmentationModelByTier, undefined);
+
     try {
       await this.pipelineImpl.init({
         outputCanvas: this.outputCanvas,
         targetFps: this.targetFps,
-        segmentationModelPath: this.segmentationModelPath,
+        segmentationModelPath,
+        segmentationModelByTier: this.segmentationModelByTier,
         config,
         onMetrics: this.onMetrics,
         onTierChange: tier => this.handleTierChange(tier),
@@ -447,7 +487,8 @@ export class BackgroundEffectsController {
       await this.pipelineImpl.init({
         outputCanvas: this.outputCanvas,
         targetFps: this.targetFps,
-        segmentationModelPath: this.segmentationModelPath,
+        segmentationModelPath,
+        segmentationModelByTier: this.segmentationModelByTier,
         config,
         onMetrics: this.onMetrics,
         onTierChange: tier => this.handleTierChange(tier),
