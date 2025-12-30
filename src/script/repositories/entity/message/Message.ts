@@ -197,13 +197,13 @@ export class Message {
       : false;
   }
 
-  hasMultipartAsset(): boolean {
+  hasMultipartAsset(): this is ContentMessage {
     return this.isContent() ? this.assets().some(assetEntity => assetEntity.type === AssetType.MULTIPART) : false;
   }
 
   getMultipartAssets() {
     const hasMultipartAsset = this.hasMultipartAsset();
-    if (!hasMultipartAsset || !this.isContent()) {
+    if (!hasMultipartAsset) {
       return [];
     }
 
