@@ -336,6 +336,7 @@ export class CallingRepository {
     }
 
     const previousEffect = selfParticipant.backgroundEffect();
+    selfParticipant.backgroundEffect(effect);
     const {applied, processedStream} = await this.applyBackgroundEffectToParticipant(
       selfParticipant,
       effect,
@@ -344,7 +345,6 @@ export class CallingRepository {
     if (!applied) {
       return;
     }
-    selfParticipant.backgroundEffect(effect);
 
     if (effect.type === 'none') {
       this.changeMediaSource(videoFeed, MediaType.VIDEO, false);
@@ -666,6 +666,7 @@ export class CallingRepository {
   }
 
   private storeCall(call: Call): void {
+    call.getSelfParticipant().backgroundEffect(this.preferredBackgroundEffect);
     this.callState.calls.push(call);
   }
 

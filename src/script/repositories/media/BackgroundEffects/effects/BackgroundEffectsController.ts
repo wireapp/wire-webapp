@@ -121,6 +121,8 @@ export class BackgroundEffectsController {
   private lastWorkerTier: 'A' | 'B' | 'C' | 'D' | null = null;
   /** Optional metrics callback for demo/telemetry use. */
   private onMetrics: ((metrics: Metrics) => void) | null = null;
+  /** Tracks shutdown to avoid logging expected stop errors. */
+  private isStopping = false;
 
   /**
    * Creates a new background effects controller.
@@ -155,6 +157,7 @@ export class BackgroundEffectsController {
     inputTrack: MediaStreamTrack,
     opts: StartOptions = {},
   ): Promise<{outputTrack: MediaStreamTrack; stop: () => void}> {
+    this.isStopping = false;
     // Apply configuration options (use defaults if not provided)
     this.mode = opts.mode ?? this.mode;
     this.debugMode = opts.debugMode ?? this.debugMode;
@@ -256,6 +259,9 @@ export class BackgroundEffectsController {
             frame.close();
           } catch {
             // Ignore close errors.
+          }
+          if (this.isStopping) {
+            return;
           }
           this.logger.warn('Frame handling failed', error);
         }
@@ -427,6 +433,7 @@ export class BackgroundEffectsController {
    * and prevent memory leaks.
    */
   public stop(): void {
+    this.isStopping = true;
     this.backgroundPumpCancel?.();
     this.backgroundPumpCancel = null;
     this.pipelineImpl?.stop();

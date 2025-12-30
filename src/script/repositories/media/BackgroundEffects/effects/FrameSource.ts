@@ -41,6 +41,7 @@ export class FrameSource {
   private readonly logger: Logger;
   private processor: any | null = null;
   private processorAbort: AbortController | null = null;
+  private processorReader: ReadableStreamDefaultReader<any> | null = null;
   private processorPipe: Promise<void> | null = null;
   private videoSource: VideoSource | null = null;
   private processing = false;
@@ -71,12 +72,13 @@ export class FrameSource {
       this.processorAbort.abort();
       this.processorAbort = null;
     }
-    if (this.processor?.readable?.cancel) {
+    if (this.processorReader) {
       try {
-        this.processor.readable.cancel();
+        this.processorReader.cancel();
       } catch (error) {
         this.logger.warn('FrameSource cancel failed', error);
       }
+      this.processorReader = null;
     }
     this.processor = null;
     this.processorPipe = null;
@@ -100,15 +102,22 @@ export class FrameSource {
     const readable = this.processor.readable;
     const abortController = new AbortController();
     this.processorAbort = abortController;
+    const reader = readable.getReader();
+    this.processorReader = reader;
 
-    const writable = new WritableStream<any>(
-      {
-        write: async frame => {
+    this.processorPipe = (async () => {
+      try {
+        while (this.running && !abortController.signal.aborted) {
+          const result = await reader.read();
+          if (result.done) {
+            break;
+          }
+          const frame = result.value;
           let bitmap: ImageBitmap | null = null;
           try {
             if (!this.running) {
               frame.close();
-              return;
+              continue;
             }
             bitmap = await createImageBitmap(frame);
             const timestampSeconds = Number.isFinite(frame.timestamp)
@@ -129,18 +138,23 @@ export class FrameSource {
           } finally {
             frame.close();
           }
-        },
-      },
-      new CountQueuingStrategy({highWaterMark: 1}),
-    );
-
-    this.processorPipe = readable.pipeTo(writable, {signal: abortController.signal});
-    this.processorPipe.catch(error => {
-      if (error?.name === 'AbortError') {
-        return;
+        }
+      } catch (error) {
+        if (abortController.signal.aborted || error?.name === 'AbortError') {
+          return;
+        }
+        this.logger.warn('FrameSource processor pipe failed', error);
+      } finally {
+        try {
+          reader.releaseLock();
+        } catch {
+          // Ignore release errors.
+        }
+        if (this.processorReader === reader) {
+          this.processorReader = null;
+        }
       }
-      this.logger.warn('FrameSource processor pipe failed', error);
-    });
+    })();
   }
 
   private async startWithVideoElement(onFrame: FrameCallback, onDrop?: () => void): Promise<void> {

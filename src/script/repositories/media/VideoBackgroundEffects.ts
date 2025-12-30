@@ -32,8 +32,8 @@ export type BackgroundSource = HTMLImageElement | ImageBitmap;
 export const DEFAULT_BACKGROUND_EFFECT: BackgroundEffectSelection = {type: 'none'};
 
 export const BLUR_STRENGTHS: Record<BlurLevel, number> = {
-  low: 0.35,
-  high: 0.7,
+  low: 0.7,
+  high: 1.0,
 };
 
 type BuiltinBackgroundDefinition = {
