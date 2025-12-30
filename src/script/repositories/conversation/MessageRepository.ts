@@ -463,7 +463,8 @@ export class MessageRepository {
       attachments: originalMessage
         .getMultipartAssets()
         .map(multipart => multipart.attachments?.() || [])
-        .flat(),
+        .flat()
+        .filter(Boolean),
       conversation,
       mentions,
       message: textMessage,
