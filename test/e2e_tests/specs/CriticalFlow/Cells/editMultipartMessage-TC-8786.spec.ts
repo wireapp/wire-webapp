@@ -19,7 +19,7 @@
 
 import {getUser} from 'test/e2e_tests/data/user';
 import {PageManager} from 'test/e2e_tests/pageManager';
-import {getImageFilePath, getLocalQRCodeValue, ImageQRCodeFileName} from 'test/e2e_tests/utils/sendImage.util';
+import {getImageFilePath} from 'test/e2e_tests/utils/sendImage.util';
 import {addCreatedTeam, removeCreatedTeam} from 'test/e2e_tests/utils/tearDown.util';
 import {inviteMembers, loginUser} from 'test/e2e_tests/utils/userActions';
 
