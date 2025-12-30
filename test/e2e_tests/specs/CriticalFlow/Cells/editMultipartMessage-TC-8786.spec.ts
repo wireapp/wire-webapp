@@ -50,7 +50,7 @@ test(
     const userBPage = await userBContext.newPage();
     const userBPageManager = new PageManager(userBPage);
 
-    const {pages: userBPages, modals: userBModals, components: userBComponents} = userBPageManager.webapp;
+    const {pages: userBPages, modals: userBModals} = userBPageManager.webapp;
 
     await test.step('Preconditions: Creating preconditions for the test via API', async () => {
       await api.createTeamOwner(userA, teamName).then(user => {
