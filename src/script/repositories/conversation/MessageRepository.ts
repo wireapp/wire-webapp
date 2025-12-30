@@ -367,8 +367,6 @@ export class MessageRepository {
     },
   ): T {
     const quoteData = quote && {quotedMessageId: quote.messageId, quotedMessageSha256: new Uint8Array(quote.hash)};
-    if (quote) {
-    }
 
     return new TextContentBuilder(baseMessage)
       .withMentions(
@@ -463,7 +461,8 @@ export class MessageRepository {
       attachments: originalMessage
         .getMultipartAssets()
         .map(multipart => multipart.attachments?.() || [])
-        .flat(),
+        .flat()
+        .filter(Boolean),
       conversation,
       mentions,
       message: textMessage,

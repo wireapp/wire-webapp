@@ -63,6 +63,7 @@ export const useEnrichedFields = (
         const richProfile = await richProfileRepository.getUserRichProfile(user.id);
         returnFields.push(...(richProfile?.fields ?? []));
       } catch {
+        // ignore errors
       } finally {
         if (!cancel) {
           onFieldsLoaded?.(returnFields);
