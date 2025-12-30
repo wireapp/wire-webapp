@@ -47,6 +47,11 @@ function validateEditEvent(
     throwValidationError('Edit event for non-text message');
   }
 
+  // do not allow allow invalid cross-type edits
+  if (originalEvent.type !== editEvent.type) {
+    throwValidationError('Edit event type does not match original event type');
+  }
+
   if (originalEvent.from !== editEvent.from) {
     throwValidationError('ID reused by other user');
   }
