@@ -23,7 +23,7 @@ import {StoredEvent} from 'Repositories/storage';
 import {EditableEvent} from './editedEventHandler';
 
 function isMultipartEvent(event: EditableEvent): event is MultipartMessageAddEvent {
-  return 'attachments' in event.data;
+  return 'attachments' in event.data && Array.isArray(event.data.attachments);
 }
 
 function isMessageAddEvent(event: EditableEvent): event is MessageAddEvent {
