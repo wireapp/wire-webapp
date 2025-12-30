@@ -54,6 +54,7 @@ export class WorkerWebGLPipeline implements Pipeline {
       blurStrength: init.config.blurStrength,
       segmentationModelPath: init.segmentationModelPath,
       segmentationModelByTier: init.segmentationModelByTier,
+      initialTier: init.initialTier,
       targetFps: init.targetFps,
     };
 

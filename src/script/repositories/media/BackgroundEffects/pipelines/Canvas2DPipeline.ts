@@ -21,14 +21,19 @@ import {getLogger, Logger} from 'Util/Logger';
 
 import type {Pipeline, PipelineConfig, PipelineInit} from './Pipeline';
 
-import {resolveSegmentationModelPath} from '../quality/definitions';
-import {QualityController} from '../quality/QualityController';
-import {getQualityMode, resolveQualityTier} from '../quality/resolve';
+import {
+  buildMetrics,
+  getQualityMode,
+  MetricsSample,
+  pushMetricsSample,
+  QualityController,
+  resolveQualityTier,
+  resolveSegmentationModelPath,
+} from '../quality';
 import {NoopMaskPostProcessor} from '../segmentation/maskPostProcessor';
 import type {MaskPostProcessor} from '../segmentation/maskPostProcessor';
 import {MediaPipeSegmenterFactory} from '../segmentation/mediaPipeSegmenter';
 import type {SegmenterFactory, SegmenterLike} from '../segmentation/segmenterTypes';
-import {buildMetrics, MetricsSample, pushMetricsSample} from '../shared/metrics';
 import type {QualityTierParams, SegmentationModelByTier} from '../types';
 
 export class Canvas2DPipeline implements Pipeline {
@@ -97,6 +102,11 @@ export class Canvas2DPipeline implements Pipeline {
     };
     this.maskPostProcessor = postProcessorFactory.create();
     this.qualityController = new QualityController(init.targetFps);
+    if (this.qualityController && this.config?.quality === 'auto') {
+      this.qualityController.setTier(init.initialTier);
+    } else if (this.qualityController && this.config?.quality !== 'auto') {
+      this.qualityController.setTier(this.config.quality);
+    }
     try {
       await this.segmenter.init();
     } catch (error) {

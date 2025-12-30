@@ -62,6 +62,25 @@ export type QualityMode = 'auto' | 'A' | 'B' | 'C' | 'D';
 export type SegmentationModelByTier = Partial<Record<'A' | 'B' | 'C' | 'D', string>>;
 
 /**
+ * Browser capability information detected at runtime.
+ */
+export interface CapabilityInfo {
+  offscreenCanvas: boolean;
+  worker: boolean;
+  webgl2: boolean;
+  requestVideoFrameCallback: boolean;
+}
+
+export type QualityPolicyMode = 'auto' | 'conservative' | 'aggressive';
+
+export interface QualityPolicyResult {
+  initialTier: 'A' | 'B' | 'C' | 'D';
+  segmentationModelByTier?: SegmentationModelByTier;
+}
+
+export type QualityPolicyResolver = (capabilities: CapabilityInfo) => QualityPolicyResult;
+
+/**
  * Rendering pipeline selection.
  * - 'worker-webgl2': OffscreenCanvas + WebGL2 in a Worker
  * - 'main-webgl2': WebGL2 on the main thread
@@ -206,6 +225,8 @@ export interface StartOptions {
   segmentationModelPath?: string;
   /** Per-tier segmentation model overrides (e.g., Tier A uses multiclass). */
   segmentationModelByTier?: SegmentationModelByTier;
+  /** Optional device capability policy for tier/model selection. */
+  qualityPolicy?: QualityPolicyMode | QualityPolicyResolver;
   /** Whether to prefer worker-based pipeline when available. Default: true. */
   useWorker?: boolean;
   /** Override pipeline selection (primarily for testing). */
@@ -377,6 +398,8 @@ export interface WorkerOptions {
   segmentationModelPath: string;
   /** Per-tier segmentation model overrides (resolved in worker). */
   segmentationModelByTier: SegmentationModelByTier;
+  /** Initial tier used when quality is set to auto. */
+  initialTier: 'A' | 'B' | 'C' | 'D';
   /** Target frames per second for adaptive quality control. */
   targetFps: number;
 }

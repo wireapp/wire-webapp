@@ -17,7 +17,7 @@
  *
  */
 
-import {QualityController} from '../quality/QualityController';
+import {QualityController} from '../quality';
 import {WebGLRenderer} from '../renderer/WebGLRenderer';
 import {Segmenter} from '../segmentation/segmenter';
 import type {DebugMode, EffectMode, Metrics, QualityMode, WorkerOptions} from '../types';

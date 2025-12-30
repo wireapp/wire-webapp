@@ -89,7 +89,7 @@ Sets the background source for virtual background mode.
 
 Sets debug visualization mode for inspecting segmentation masks.
 
-- `mode`: `'off'` | `'maskOverlay'` | `'maskOnly'` | `'edgeOnly'`
+- `mode`: `'off'` | `'maskOverlay'` | `'maskOnly'` | `'edgeOnly'` | `'classOverlay'` | `'classOnly'`
 
 **`setQuality(mode: QualityMode): void`**
 
@@ -109,12 +109,21 @@ Configuration options for `start()` method:
 interface StartOptions {
   targetFps?: number; // Default: 30
   quality?: QualityMode; // Default: 'auto'
+  qualityPolicy?:
+    | 'auto'
+    | 'conservative'
+    | 'aggressive'
+    | ((capabilities) => {
+        initialTier: 'A' | 'B' | 'C' | 'D';
+        segmentationModelByTier?: Partial<Record<'A' | 'B' | 'C' | 'D', string>>;
+      });
   debugMode?: DebugMode; // Default: 'off'
   mode?: EffectMode; // Default: 'blur'
   blurStrength?: number; // Default: 0.5 (0-1)
   backgroundImage?: HTMLImageElement | ImageBitmap;
   backgroundVideo?: HTMLVideoElement;
-  segmentationModelPath?: string; // Default: '/assets/mediapipe-models/selfie_segmenter_landscape.tflite'
+  segmentationModelPath?: string; // Optional override for all tiers
+  segmentationModelByTier?: Partial<Record<'A' | 'B' | 'C' | 'D', string>>;
   useWorker?: boolean; // Default: true
 }
 ```
@@ -235,12 +244,13 @@ BackgroundEffects/
 
 ## Dependencies
 
-- MediaPipe Selfie Segmentation model: `/assets/mediapipe-models/selfie_segmenter_landscape.tflite`
+- Tier A uses MediaPipe multiclass segmentation: `/assets/mediapipe-models/selfie_multiclass_256x256.tflite`
+- Tier B/C/D use MediaPipe selfie segmentation: `/assets/mediapipe-models/selfie_segmenter_landscape.tflite`
 - MediaPipe WASM: `/min/mediapipe/wasm`
 
 ## Notes
 
 - The Canvas2D fallback honors `mode`, `debugMode`, `backgroundSource`, and `blurStrength`, but visual quality is lower than WebGL2.
 - Passthrough mode is used when no other pipeline is available or when explicitly selected.
-- The module uses MediaPipe assets from `/assets/mediapipe-models/selfie_segmenter_landscape.tflite` and `/min/mediapipe/wasm`.
+- The module uses MediaPipe assets from `/assets/mediapipe-models/selfie_multiclass_256x256.tflite`, `/assets/mediapipe-models/selfie_segmenter_landscape.tflite`, and `/min/mediapipe/wasm`.
 - All runtime controls (`setMode`, `setBlurStrength`, etc.) work with both worker and main pipelines.

@@ -17,37 +17,7 @@
  *
  */
 
-/**
- * Browser capability information detected at runtime.
- *
- * This interface represents the availability of web APIs required for
- * different rendering pipelines. Each capability is detected independently
- * to allow graceful fallback to less capable pipelines when needed.
- */
-export interface CapabilityInfo {
-  /**
-   * Whether OffscreenCanvas is supported.
-   * Required for worker-based rendering pipelines to avoid main thread blocking.
-   */
-  offscreenCanvas: boolean;
-  /**
-   * Whether Web Workers are supported.
-   * Required for offloading rendering work to background threads.
-   */
-  worker: boolean;
-  /**
-   * Whether WebGL2 is supported.
-   * Required for GPU-accelerated rendering and advanced image processing.
-   * Falls back to Canvas2D if unavailable.
-   */
-  webgl2: boolean;
-  /**
-   * Whether requestVideoFrameCallback is supported.
-   * Provides efficient frame timing for video processing (better than requestAnimationFrame).
-   * Falls back to requestAnimationFrame if unavailable.
-   */
-  requestVideoFrameCallback: boolean;
-}
+import type {CapabilityInfo} from '../types';
 
 /**
  * Detects browser capabilities required for background effects rendering.

@@ -19,11 +19,15 @@
 
 import {METRICS_MAX_SAMPLES, state} from './state';
 
-import {resolveSegmentationModelPath} from '../quality/definitions';
-import {getQualityMode, resolveQualityTier} from '../quality/resolve';
+import {
+  buildMetrics,
+  getQualityMode,
+  pushMetricsSample,
+  resolveQualityTier,
+  resolveSegmentationModelPath,
+} from '../quality';
 import {Segmenter} from '../segmentation/segmenter';
 import {buildMaskInput, MaskInput} from '../shared/mask';
-import {buildMetrics, pushMetricsSample} from '../shared/metrics';
 import {toMonotonicTimestampMs} from '../shared/timestamps';
 import type {QualityTierParams} from '../types';
 

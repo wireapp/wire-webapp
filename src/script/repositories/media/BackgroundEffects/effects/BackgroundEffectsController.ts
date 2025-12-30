@@ -42,7 +42,7 @@ import {MainWebGLPipeline} from '../pipelines/MainWebGLPipeline';
 import {PassthroughPipeline} from '../pipelines/PassthroughPipeline';
 import type {Pipeline, PipelineConfig} from '../pipelines/Pipeline';
 import {WorkerWebGLPipeline} from '../pipelines/WorkerWebGLPipeline';
-import {resolveSegmentationModelPath, TIER_DEFINITIONS} from '../quality/definitions';
+import {resolveQualityPolicy, resolveSegmentationModelPath, TIER_DEFINITIONS} from '../quality';
 import type {
   DebugMode,
   EffectMode,
@@ -161,6 +161,10 @@ export class BackgroundEffectsController {
     this.blurStrength = opts.blurStrength ?? this.blurStrength;
     this.quality = opts.quality ?? this.quality;
     this.targetFps = opts.targetFps ?? this.targetFps;
+    // Detect capabilities and select optimal pipeline
+    const cap = detectCapabilities();
+    const policy = resolveQualityPolicy(cap, opts.qualityPolicy ?? 'auto');
+
     if (opts.segmentationModelPath) {
       this.segmentationModelByTier = {
         A: opts.segmentationModelPath,
@@ -168,12 +172,13 @@ export class BackgroundEffectsController {
         C: opts.segmentationModelPath,
         D: opts.segmentationModelPath,
       };
-    } else if (opts.segmentationModelByTier) {
+    } else if (opts.segmentationModelByTier || policy.segmentationModelByTier) {
       this.segmentationModelByTier = {
         A: TIER_DEFINITIONS.A.modelPath,
         B: TIER_DEFINITIONS.B.modelPath,
         C: TIER_DEFINITIONS.C.modelPath,
         D: TIER_DEFINITIONS.D.modelPath,
+        ...policy.segmentationModelByTier,
         ...opts.segmentationModelByTier,
       };
     } else {
@@ -188,8 +193,6 @@ export class BackgroundEffectsController {
     this.droppedFrames = 0;
     this.pipelineImpl = null;
 
-    // Detect capabilities and select optimal pipeline
-    const cap = detectCapabilities();
     const chosenPipeline = choosePipeline(cap, opts.useWorker !== false);
     this.pipeline = opts.pipelineOverride ?? chosenPipeline;
     if (this.isDev) {
@@ -459,7 +462,9 @@ export class BackgroundEffectsController {
       quality: this.quality,
     };
 
-    const initialTier = this.quality === 'auto' ? 'A' : this.quality;
+    const cap = detectCapabilities();
+    const policy = resolveQualityPolicy(cap, 'auto');
+    const initialTier = this.quality === 'auto' ? policy.initialTier : this.quality;
     const segmentationModelPath = resolveSegmentationModelPath(initialTier, this.segmentationModelByTier, undefined);
 
     try {
@@ -468,6 +473,7 @@ export class BackgroundEffectsController {
         targetFps: this.targetFps,
         segmentationModelPath,
         segmentationModelByTier: this.segmentationModelByTier,
+        initialTier,
         config,
         onMetrics: this.onMetrics,
         onTierChange: tier => this.handleTierChange(tier),
@@ -489,6 +495,7 @@ export class BackgroundEffectsController {
         targetFps: this.targetFps,
         segmentationModelPath,
         segmentationModelByTier: this.segmentationModelByTier,
+        initialTier,
         config,
         onMetrics: this.onMetrics,
         onTierChange: tier => this.handleTierChange(tier),

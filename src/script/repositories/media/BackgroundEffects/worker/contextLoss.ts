@@ -19,7 +19,7 @@
 
 import {state} from './state';
 
-import {resolveSegmentationModelPath} from '../quality/definitions';
+import {resolveSegmentationModelPath} from '../quality';
 import {WebGLRenderer} from '../renderer/WebGLRenderer';
 import {Segmenter} from '../segmentation/segmenter';
 
@@ -65,7 +65,7 @@ async function handleContextRestored(): Promise<void> {
   }
 
   state.contextLost = false;
-  const tier = state.metrics?.tier ?? (state.quality === 'auto' ? 'A' : state.quality);
+  const tier = state.metrics?.tier ?? (state.quality === 'auto' ? state.options.initialTier : state.quality);
   const modelPath = resolveSegmentationModelPath(
     tier,
     state.options.segmentationModelByTier,

@@ -20,8 +20,7 @@
 import {bindContextLossHandlers, resetContextLossHandlers} from './contextLoss';
 import {state} from './state';
 
-import {resolveSegmentationModelPath} from '../quality/definitions';
-import {QualityController} from '../quality/QualityController';
+import {resolveSegmentationModelPath, QualityController} from '../quality';
 import {WebGLRenderer} from '../renderer/WebGLRenderer';
 import {Segmenter} from '../segmentation/segmenter';
 import type {WorkerOptions, WorkerResponse} from '../types';
@@ -45,11 +44,13 @@ export async function handleInit(
   state.renderer = renderer;
 
   state.qualityController = new QualityController(options.targetFps ?? 30);
-  if (state.quality !== 'auto') {
+  if (state.quality === 'auto') {
+    state.qualityController.setTier(options.initialTier);
+  } else {
     state.qualityController.setTier(state.quality);
   }
 
-  const initialTier = options.quality === 'auto' ? 'A' : options.quality;
+  const initialTier = options.quality === 'auto' ? options.initialTier : options.quality;
   const modelPath = resolveSegmentationModelPath(
     initialTier,
     options.segmentationModelByTier,

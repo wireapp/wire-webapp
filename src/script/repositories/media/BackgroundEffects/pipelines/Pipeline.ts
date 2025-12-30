@@ -33,6 +33,7 @@ export interface PipelineInit {
   targetFps: number;
   segmentationModelPath: string;
   segmentationModelByTier: SegmentationModelByTier;
+  initialTier: 'A' | 'B' | 'C' | 'D';
   config: PipelineConfig;
   createSegmenter?: SegmenterFactory;
   createMaskPostProcessor?: MaskPostProcessorFactory;
