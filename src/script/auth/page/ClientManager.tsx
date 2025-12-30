@@ -68,7 +68,9 @@ const ClientManagerComponent = ({doGetAllClients, doLogout}: Props & ConnectedPr
   const logout = async () => {
     try {
       await doLogout();
-    } catch (error) {}
+    } catch (error) {
+      // ignore errors on logout
+    }
   };
 
   return (

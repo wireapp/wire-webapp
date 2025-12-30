@@ -44,6 +44,7 @@ module.exports = {
     '@typescript-eslint/no-floating-promises': 'warn',
     '@typescript-eslint/typedef': 'off',
     'no-dupe-class-members': 'off',
+    'no-empty': 'error',
     'no-unsanitized/property': 'off',
     'prefer-promise-reject-errors': 'off',
     'valid-jsdoc': 'off',

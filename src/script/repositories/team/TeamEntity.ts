@@ -44,7 +44,9 @@ export class TeamEntity {
 
     try {
       hasIcon = !!this.icon && isValidAsset(this.icon);
-    } catch (error) {}
+    } catch (error) {
+      // ignore error
+    }
 
     if (hasIcon && teamDomain) {
       return new AssetRemoteData({assetKey: this.icon, assetDomain: teamDomain});

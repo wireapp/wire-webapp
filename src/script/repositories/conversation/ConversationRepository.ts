@@ -2078,7 +2078,9 @@ export class ConversationRepository {
 
     try {
       return await this.resolve1To1Conversation(otherUserId, {shouldRefreshUser}, conversation.qualifiedId);
-    } catch {}
+    } catch {
+      // ignore errors
+    }
 
     return conversation;
   };
