@@ -167,20 +167,15 @@ export class EventMapper {
       originalEntity.quote(new QuoteEntity({error, hash, messageId, userId}));
     }
 
-    // Check if this is multipart data (has text and attachments structure)
-    const isMultipartData =
-      eventData && typeof eventData === 'object' && 'text' in eventData && 'attachments' in eventData;
-
-    // Handle multipart messages first (check isMultipartData or originalEntity has multipart asset)
-    if ((id !== originalEntity.id || isMultipartData) && originalEntity.hasMultipartAsset()) {
-      // Update multipart asset if ID changed OR if we have multipart data structure
+    // Handle multipart messages when ID changes (edit case)
+    if (id !== originalEntity.id && originalEntity.hasMultipartAsset()) {
       originalEntity.assets.removeAll();
       const multipartAsset = this._mapAssetMultipart(eventData as MultipartMessageAddEvent['data']);
       if (multipartAsset) {
         originalEntity.assets.push(multipartAsset);
       }
     } else if (id !== originalEntity.id && originalEntity.hasAssetText()) {
-      // Handle regular text messages (only if not multipart)
+      // Handle regular text messages when ID changes (edit case)
       originalEntity.assets.removeAll();
       const textAsset = this._mapAssetText(eventData);
       originalEntity.assets.push(textAsset);
