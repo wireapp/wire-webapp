@@ -385,6 +385,20 @@ export class ConversationPage {
     return await fileMessageLocator.isVisible();
   }
 
+  async isReplyMessageVisible(replyText: string) {
+    const replyMessageLocator = this.page.locator(
+      `${selectByDataAttribute('item-message')} ${selectByClass('message-body')}${selectByClass('message-quoted')} ${selectByClass(
+        'text',
+      )}`,
+      {hasText: replyText},
+    );
+
+    // Wait for at least one matching element to appear (optional timeout can be set)
+    await replyMessageLocator.first().waitFor({state: 'visible'});
+
+    return await replyMessageLocator.isVisible();
+  }
+
   async downloadFile() {
     const downloadButton = this.page.locator(
       `${selectByDataAttribute('item-message')} ${selectByDataAttribute('file-asset')}`,

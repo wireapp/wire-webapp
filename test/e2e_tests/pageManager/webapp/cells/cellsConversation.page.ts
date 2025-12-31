@@ -29,6 +29,16 @@ export class CellsConversationPage extends ConversationPage {
     super(page);
   }
 
+  async isMultipartMessageVisible(user: User, messageText: string): Promise<boolean> {
+    const messageLocator = this.getMessage({sender: user});
+    const textLocator = messageLocator.locator(`p`, {hasText: messageText});
+    const imageLocator = messageLocator.locator(`[aria-label^="Image from ${user.fullName}"]`);
+    await textLocator.waitFor({state: 'visible', timeout: 5000});
+    await imageLocator.waitFor({state: 'visible', timeout: 5000});
+
+    return (await textLocator.isVisible()) && (await imageLocator.isVisible());
+  }
+
   override getImageLocator(user: User): Locator {
     return this.page.locator(`${selectByDataAttribute('item-message')} [aria-label^="Image from ${user.fullName}"]`);
   }
