@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [27.95.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@27.94.7...@wireapp/api-client@27.95.0) (2025-12-31)
+
+### Features
+
+* **api-client:** Add support to search cells files within a conversation [WPB-21646] ([#7758](https://github.com/wireapp/wire-web-packages/issues/7758)) ([28c9e4f](https://github.com/wireapp/wire-web-packages/commit/28c9e4fbb07a460b68d4c9c4ce11d2d7256182a3))
+
 ## [27.94.7](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@27.94.6...@wireapp/api-client@27.94.7) (2025-12-28)
 
 **Note:** Version bump only for package @wireapp/api-client
