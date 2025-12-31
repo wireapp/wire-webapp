@@ -76,29 +76,41 @@ export class RepliesUpdaterMiddleware implements EventMiddleware {
   }
 
   /**
+   * Updates replies to point to the new message ID after an edit
+   */
+  private async updateRepliesToEditedMessage(
+    replies: StoredEvent<MessageAddEvent | MultipartMessageAddEvent>[],
+    newMessageId: string,
+  ): Promise<void> {
+    await Promise.all(
+      replies.map(async reply => {
+        if (reply.type === ClientEvent.CONVERSATION.MESSAGE_ADD) {
+          const quote = reply.data.quote;
+          if (quote && typeof quote !== 'string' && 'message_id' in quote) {
+            quote.message_id = newMessageId;
+          }
+        } else if (reply.type === ClientEvent.CONVERSATION.MULTIPART_MESSAGE_ADD && reply.data.text?.quote) {
+          const quote = reply.data.text.quote;
+          if (quote && typeof quote !== 'string' && 'message_id' in quote) {
+            quote.message_id = newMessageId;
+          }
+        }
+        await this.eventService.replaceEvent(reply);
+      }),
+    );
+  }
+
+  /**
    * will update the message ID of all the replies to an edited message
    */
   private async handleEditEvent(event: MessageAddEvent, originalMessageId: string) {
     const {originalEvent, replies} = await this.findRepliesToMessage(event.conversation, originalMessageId, event.id);
-    if (!originalEvent) {
+    if (!originalEvent || !event.id) {
       return event;
     }
 
     this.logger.info(`Updating '${replies.length}' replies to updated message '${originalMessageId}'`);
-    replies.forEach(async reply => {
-      if (reply.type === ClientEvent.CONVERSATION.MESSAGE_ADD) {
-        const quote = reply.data.quote;
-        if (quote && typeof quote !== 'string' && 'message_id' in quote && 'id' in event) {
-          quote.message_id = event.id as string;
-        }
-      } else if (reply.type === ClientEvent.CONVERSATION.MULTIPART_MESSAGE_ADD && reply.data.text?.quote) {
-        const quote = reply.data.text.quote;
-        if (quote && typeof quote !== 'string' && 'message_id' in quote && 'id' in event) {
-          quote.message_id = event.id as string;
-        }
-      }
-      await this.eventService.replaceEvent(reply);
-    });
+    await this.updateRepliesToEditedMessage(replies, event.id);
     return event;
   }
 
@@ -107,25 +119,12 @@ export class RepliesUpdaterMiddleware implements EventMiddleware {
    */
   private async handleMultipartEditEvent(event: MultipartMessageAddEvent, originalMessageId: string) {
     const {originalEvent, replies} = await this.findRepliesToMessage(event.conversation, originalMessageId, event.id);
-    if (!originalEvent) {
+    if (!originalEvent || !event.id) {
       return event;
     }
 
     this.logger.info(`Updating '${replies.length}' replies to updated multipart message '${originalMessageId}'`);
-    replies.forEach(async reply => {
-      if (reply.type === ClientEvent.CONVERSATION.MESSAGE_ADD) {
-        const quote = reply.data.quote;
-        if (quote && typeof quote !== 'string' && 'message_id' in quote && 'id' in event) {
-          quote.message_id = event.id as string;
-        }
-      } else if (reply.type === ClientEvent.CONVERSATION.MULTIPART_MESSAGE_ADD && reply.data.text?.quote) {
-        const quote = reply.data.text.quote;
-        if (quote && typeof quote !== 'string' && 'message_id' in quote && 'id' in event) {
-          quote.message_id = event.id as string;
-        }
-      }
-      await this.eventService.replaceEvent(reply);
-    });
+    await this.updateRepliesToEditedMessage(replies, event.id);
     return event;
   }
 
