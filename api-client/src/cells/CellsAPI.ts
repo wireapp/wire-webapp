@@ -389,6 +389,7 @@ export class CellsAPI {
 
   async searchNodes({
     phrase,
+    path = '/',
     limit = DEFAULT_LIMIT,
     offset = DEFAULT_OFFSET,
     sortBy,
@@ -398,6 +399,7 @@ export class CellsAPI {
     deleted = false,
   }: {
     phrase: string;
+    path?: string;
     limit?: number;
     offset?: number;
     sortBy?: string;
@@ -411,7 +413,7 @@ export class CellsAPI {
     }
 
     const request: RestLookupRequest = {
-      Scope: {Root: {Path: '/'}, Recursive: true},
+      Scope: {Root: {Path: path}, Recursive: true},
       Filters: {
         Text: {SearchIn: 'BaseName', Term: phrase},
         Type: type || 'UNKNOWN',

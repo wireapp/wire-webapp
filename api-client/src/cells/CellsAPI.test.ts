@@ -1596,6 +1596,71 @@ describe('CellsAPI', () => {
       });
       expect(result).toEqual(mockResponse);
     });
+
+    it('searches for files within a specific path when provided', async () => {
+      const searchPhrase = 'test';
+      const specificPath = '/conversations/abc123';
+      const mockResponse: RestNodeCollection = {
+        Nodes: [
+          {
+            Path: '/conversations/abc123/test.txt',
+            Uuid: 'file-uuid-1',
+          },
+        ],
+      } as RestNodeCollection;
+
+      mockNodeServiceApi.lookup.mockResolvedValueOnce(createMockResponse(mockResponse));
+
+      const result = await cellsAPI.searchNodes({phrase: searchPhrase, path: specificPath});
+
+      expect(mockNodeServiceApi.lookup).toHaveBeenCalledWith({
+        Scope: {Root: {Path: specificPath}, Recursive: true},
+        Filters: {
+          Text: {SearchIn: 'BaseName', Term: searchPhrase},
+          Type: 'UNKNOWN',
+          Status: {
+            Deleted: 'Not',
+          },
+          Metadata: [],
+        },
+        Flags: ['WithPreSignedURLs'],
+        Limit: '10',
+        Offset: '0',
+      });
+      expect(result).toEqual(mockResponse);
+    });
+
+    it('uses default root path when path is not provided', async () => {
+      const searchPhrase = 'test';
+      const mockResponse: RestNodeCollection = {
+        Nodes: [
+          {
+            Path: '/test.txt',
+            Uuid: 'file-uuid-1',
+          },
+        ],
+      } as RestNodeCollection;
+
+      mockNodeServiceApi.lookup.mockResolvedValueOnce(createMockResponse(mockResponse));
+
+      const result = await cellsAPI.searchNodes({phrase: searchPhrase});
+
+      expect(mockNodeServiceApi.lookup).toHaveBeenCalledWith({
+        Scope: {Root: {Path: '/'}, Recursive: true},
+        Filters: {
+          Text: {SearchIn: 'BaseName', Term: searchPhrase},
+          Type: 'UNKNOWN',
+          Status: {
+            Deleted: 'Not',
+          },
+          Metadata: [],
+        },
+        Flags: ['WithPreSignedURLs'],
+        Limit: '10',
+        Offset: '0',
+      });
+      expect(result).toEqual(mockResponse);
+    });
   });
 
   describe('createFile', () => {
