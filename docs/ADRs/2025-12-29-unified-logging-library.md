@@ -2,119 +2,82 @@
 
 ## Context
 
-The Wire webapp had a fragmented logging implementation with several critical security and operational gaps:
+The Wire webapp's logging implementation had critical security and operational problems that needed immediate attention.
 
-### 1. **Security Vulnerabilities**
+### Security Vulnerabilities
 
-- **Direct console.log forwarding to Datadog**: The existing implementation had `forwardConsoleLogs: ['info', 'warn', 'error']` in [DataDog.ts](../../apps/webapp/src/script/util/DataDog.ts), which automatically sent ALL console logs to Datadog with NO sanitization
-- **58+ direct console.log statements**: Found throughout the codebase ([logging-analysis.md](../logging-analysis.md)), bypassing any sanitization
-- **Inconsistent sanitization**: Datadog had UUID/domain/token filters, but they could be easily bypassed via `console.log`
-- **No PII protection framework**: Manual sanitization required, error-prone, and incomplete
-- **Third-party library logs**: Any `console.log` from dependencies would be forwarded to Datadog unsanitized
+The existing system automatically forwarded all console logs to Datadog without proper sanitization. This meant that any `console.log` statement—whether from our code or third-party libraries—would send data to external servers without any PII protection. The existing Datadog integration had some UUID and token filters, but these were easily bypassed by using console.log directly.
 
-### 2. **Architectural Problems**
+### Architectural Problems
 
-- **No centralized strategy**: Multiple logging approaches coexisted without coordination
-  - Direct `console.log` statements (58+)
-  - `@wireapp/commons` Logger utility (99+ instances)
-  - Datadog integration (with limited sanitization)
-  - Manual call log export only
-- **No production file logging**: Call logs were in-memory only, lost on crashes
-- **Desktop wrapper lacked logging**: No separate log files or infrastructure
-- **Development vs production inconsistency**: No clear distinction between safe and sensitive logging
-- **No log level configuration**: Cannot control verbosity per component
+Multiple logging approaches existed without coordination: direct console statements scattered throughout the code, an older Logger utility from `@wireapp/commons`, and a Datadog integration with limited sanitization. There was no clear distinction between development logging (which can contain sensitive data for debugging) and production logging (which should never contain PII). The system also lacked file logging for the desktop app, meaning logs were lost on crashes.
 
-### 3. **Data at Risk**
+### Data at Risk
 
-Based on analysis of existing `console.error/warn/log` statements, the following sensitive data could be leaked:
-
-- Error objects with stack traces containing user data
-- Message content in error handlers
-- User IDs and email addresses
-- Decryption failures exposing plaintext
-- Media errors with asset URLs
-- Network errors with request/response bodies
-- OAuth tokens in SSO flows
-- File paths with user data
-- Window titles from PiP errors
+Analysis of existing logging revealed that sensitive data was being logged including error objects with stack traces containing user data, message content, user IDs, email addresses, decryption failures, OAuth tokens, and file paths with personal information.
 
 ## Decision
 
-Create a unified, security-critical logging library (`@wireapp/logger`) with:
+We built a unified, security-first logging library (`@wireapp/logger`) that makes it impossible to accidentally leak sensitive data.
 
-### 1. **Explicit Production/Development API**
+### Explicit Production/Development API
+
+Developers must explicitly choose between production and development logging:
 
 ```typescript
-// Production logs - ONLY these go to Datadog
+// Production logs - can go to Datadog
 logger.production.info('API call', {endpoint: '/v3/users'});
 logger.production.warn('API slow', {duration: 5000});
 logger.production.error('API failed', error, {statusCode: 500});
 
-// Development logs - NEVER go to Datadog
+// Development logs - only for local development and development environments
 logger.development.info('Full state dump', {fullState});
 logger.development.debug('Processing step', {step: 1});
 logger.development.trace('Detailed flow', {details});
 ```
 
-**Key principle**: Developers must explicitly choose `.production.*` or `.development.*`, making it impossible to accidentally log sensitive data to Datadog.
+This explicit choice prevents accidentally logging sensitive debugging data to external services.
 
-### 2. **Automatic Multi-Layer Sanitization**
+### Automatic Multi-Layer Sanitization
 
-**No manual sanitization required** - all data is automatically protected:
+All production logs are automatically sanitized through multiple defensive layers—no manual sanitization required.
 
-#### Layer 1: Context Key Whitelist (TypeScript + Runtime)
+**Layer 1: Context Key Whitelist**
 
-Only whitelisted keys allowed in production logs:
+Only approved keys are allowed in production logs. Identifiers like `conversationId`, `clientId`, and `userId` are automatically truncated. Metadata like `timestamp`, `duration`, `errorCode`, and `status` are allowed. Unknown keys are silently dropped.
 
-- Identifiers: `conversationId`, `clientId`, `userId` (auto-truncated)
-- Metadata: `timestamp`, `duration`, `errorCode`, `status`, `protocol`
-- Counters: `count`, `size`, `length`
-- Datadog: `correlationId`, `sessionId`
+**Layer 2: Microsoft Presidio Patterns**
 
-Unknown keys are silently dropped at runtime.
+Expert-maintained PII detection patterns from Microsoft's Presidio project detect and mask:
+- Global patterns: credit cards, emails, phone numbers, IP addresses, IBANs, URLs, cryptocurrency addresses
+- DACH region: German, Austrian, and Swiss tax IDs, VAT IDs, AHV numbers, license plates
+- USA: Social Security Numbers, passport numbers
+- UK: NHS numbers
+- Spain/Italy: NIF and fiscal codes
 
-#### Layer 2: Microsoft Presidio Patterns (19 recognizers)
+**Layer 3: Wire-Specific Patterns**
 
-Expert-maintained PII detection patterns:
+Custom patterns for Wire-specific data:
+- UUID masking (partial replacement: `123e4567***`)
+- Bearer tokens → `Bearer [TOKEN]`
+- JWT tokens → `[JWT_TOKEN]`
+- API keys → `[API_KEY]` (Stripe, AWS, generic)
+- Message content → `[MESSAGE_CONTENT]`
+- Encryption keys → `[ENCRYPTED]`
+- URL whitelisting (Wire domains preserved, others masked)
+- Stack traces → `[STACK_FRAME]`
+- MAC addresses, BIC/SWIFT codes, and context-specific patterns
 
-- **Global** (9): Credit cards, emails, phone numbers, IPs, IBANs, URLs, crypto addresses
-- **DACH** (6): German/Austrian/Swiss tax IDs, VAT IDs, AHV numbers, license plates
-- **USA** (2): SSN, passports
-- **UK** (1): NHS numbers
-- **Spain/Italy** (2): NIF, fiscal codes
+**Layer 4: Runtime Console Override**
 
-#### Layer 3: Wire-Specific Patterns (26 patterns)
+In production, the console override prevents accidental leaks. Direct console.log calls are silenced, console.warn remains visible but isn't forwarded, and console.error goes only to RUM error tracking.
 
-- UUID masking: `123e4567***` (partial replacement, not full)
-- Bearer tokens: `Bearer [TOKEN]`
-- JWT tokens: `[JWT_TOKEN]`
-- API keys: `[API_KEY]` (Stripe, AWS, generic)
-- Message content: `[MESSAGE_CONTENT]` (context-aware)
-- Encryption keys: `[ENCRYPTED]` (context-aware)
-- URL whitelisting: Wire domains preserved, others masked
-- Stack traces: `[STACK_FRAME]`
-- MAC addresses: `[MAC_ADDRESS]`
-- BIC/SWIFT codes: `[BIC]`
-- Context-specific: names, DOB, addresses, passports
+### Global Singleton Architecture
 
-#### Layer 4: Runtime Console Override (Production Only)
+The library uses a global singleton pattern to ensure a single shared configuration across all contexts—Electron main process, Electron renderer, and browser. This means you initialize once and all logger instances share that configuration:
 
 ```typescript
-// Prevents accidental leaks via console.log
-if (process.env.NODE_ENV === 'production') {
-  installConsoleOverride();
-  // console.log/info/debug → silent no-op
-  // console.warn → visible but not forwarded
-  // console.error → RUM error tracking only
-}
-```
-
-### 3. **Global Singleton Architecture**
-
-Uses `globalThis` symbol to ensure single shared instance across Electron main process, Electron renderer, and browser contexts:
-
-```typescript
-// Electron main process - initialize once
+// Initialize once (usually at app startup)
 initializeLogger({
   environment: 'production',
   transports: {
@@ -122,252 +85,116 @@ initializeLogger({
   },
 });
 
-// Browser context - reuses existing config
-if (!isLoggerInitialized()) {
-  initializeLogger({
-    /* config */
-  });
-} else {
-  updateLoggerConfig({
-    /* updates */
-  });
-}
-
-// Any file - lightweight, no config overhead
+// Use anywhere without additional configuration
 const logger = getLogger('MyComponent');
 logger.production.info('Hello!');
 ```
 
-### 4. **Multi-Transport Support**
+### Multi-Transport Support
 
-- **Console Transport**: All logging (development + production, colored, formatted via logdown)
-- **File Transport**: Electron only, **production logs ONLY**, with rotation (max 10MB × 5 files)
-- **Datadog Transport**: Production only, with sampling and correlation IDs
-- **In-Memory Buffer**: Browser ring buffer (5000 logs) for support export
+The library supports multiple output destinations:
 
-**Security Principle**: File transport and Datadog transport ONLY accept logs marked with `isProductionSafe: true`. Development logs (from `logger.development.*` methods) are never persisted to files or sent to external services.
+- **Console Transport**: All logs (development and production) appear in the console with color formatting (based on `logdown`)
+- **File Transport**: Electron only, production logs only, with automatic rotation to prevent unbounded growth (electron needs to be initalized with file transport enabled, first in line)
+- **Datadog Transport**: Production logs only, with correlation IDs for request tracing
+- **In-Memory Buffer**: Browser ring buffer for support export via developer tools
 
-### 5. **Support Export Helpers**
+Development logs are never persisted to files or sent to external services.
+
+### Support Export Helpers
+
+Browser console commands make it easy to export logs for debugging:
 
 ```javascript
-// Browser console commands
-window.wireDebug.exportLogs(); // Export as JSON
+window.wireDebug.exportLogs();           // Export as JSON
 window.wireDebug.copyLogsToClipboard(); // One-click copy
-window.wireDebug.getDatadogInfo(); // Session ID for correlation
-window.wireDebug.clearLogs(); // Clear buffer
+window.wireDebug.getDatadogInfo();      // Session ID for correlation
+window.wireDebug.clearLogs();           // Clear buffer
 ```
 
-### 6. **Implementation Location**
+### Implementation Location
 
-- **Monorepo package**: Developed in `libraries/Logger/`
-- **npm distribution**: Published as `@wireapp/logger` for external use
-- **Standalone**: Usable outside wire-webapp monorepo
-- **Zero dependencies**: Only `logdown` for colored output, optional Datadog peer deps
+The library lives in `libraries/Logger/` within the monorepo but is also published as `@wireapp/logger` for use outside the Wire webapp. It has minimal dependencies—just `logdown` for colored console output, with optional Datadog peer dependencies.
 
 ## Alternatives Considered
 
-### Alternative 1: Sanitization Helper Functions (Rejected)
+### Manual Sanitization Helpers (Rejected)
 
-**Approach**: Provide manual sanitization helpers developers must call:
+We considered providing sanitization functions that developers would call manually. This approach was rejected because it's error-prone—developers must remember to sanitize every field, which is easy to forget during urgent bug fixes. There's no compile-time enforcement, and it adds cognitive load.
 
-```typescript
-// ❌ Manual sanitization required
-logger.info('User logged in', {
-  userId: sanitizer.truncate(user.id, 8),
-  email: sanitizer.mask(user.email),
-});
-```
+### Zod Schema Validation (Rejected)
 
-**Why rejected**:
+We considered using Zod schemas to validate and transform log context at runtime. This was rejected due to runtime overhead on every log call, complex schema maintenance, and the fact that it doesn't prevent console.log bypasses.
 
-- Error-prone - developers must remember to sanitize
-- Easy to forget or skip in urgent fixes
-- No compile-time enforcement
-- High cognitive load
+### Single Log Level API (Rejected)
 
-### Alternative 2: Zod Schema Validation (Rejected)
-
-**Approach**: Use Zod schemas to validate log context at runtime:
-
-```typescript
-const LogContextSchema = z.object({
-  userId: z.string().transform(truncate),
-  email: z.string().transform(mask),
-});
-
-logger.info('User logged in', LogContextSchema.parse(context));
-```
-
-**Why rejected**:
-
-- Runtime overhead (Zod parsing on every log)
-- Complex schema maintenance
-- Doesn't prevent raw console.log bypasses
-- Over-engineering for the problem
-
-### Alternative 3: Single Log Level API (Rejected)
-
-**Approach**: Standard log levels (INFO, DEBUG, etc.) with environment-based filtering:
-
-```typescript
-logger.info('API call', {endpoint: '/v3/users'});
-// Goes to Datadog in production, console in dev
-```
-
-**Why rejected**:
-
-- Not obvious where logs go (Datadog? Console? Both?)
-- Easy to accidentally log sensitive data thinking it's dev-only
-- No compile-time distinction between safe/unsafe logs
-- Harder to audit what goes to Datadog
+We considered a traditional approach with standard log levels (INFO, DEBUG, etc.) and environment-based filtering. This was rejected because it's not obvious where logs end up—developers might think they're logging locally when data is actually being sent to Datadog. The explicit production/development split makes the destination clear.
 
 ## Consequences
 
-### Positive
+### Benefits
 
-1. **Eliminates Security Vulnerabilities**
-   - ✅ No console.log forwarding to Datadog
-   - ✅ All data automatically sanitized (45+ PII patterns)
-   - ✅ Context key whitelist prevents unknown data leaks
-   - ✅ Explicit production/development API prevents accidents
-   - ✅ Runtime console override catches bypasses
+**Security**: The library eliminates console.log forwarding to Datadog, automatically sanitizes all data through multiple layers, prevents unknown data leaks via context key whitelist, and catches accidental bypasses through runtime console override.
 
-2. **Comprehensive PII Protection**
-   - ✅ Microsoft Presidio patterns (19 recognizers, expert-maintained)
-   - ✅ DACH region support (German/Austrian/Swiss patterns)
-   - ✅ GDPR/PCI-DSS compliant detection
-   - ✅ Multi-language support (20+ languages)
-   - ✅ Context-aware masking (message content, encryption keys)
+**PII Protection**: Expert-maintained patterns from Microsoft Presidio provide GDPR and PCI-DSS compliant detection across multiple languages, with special support for DACH region requirements and context-aware masking.
 
-3. **Better Developer Experience**
-   - ✅ No manual sanitization needed
-   - ✅ Self-documenting API (`.production.*` vs `.development.*`)
-   - ✅ TypeScript compile-time safety
-   - ✅ Backward-compatible simple methods (`logger.info()`)
-   - ✅ Support export via `wireDebug.*`
+**Developer Experience**: No manual sanitization is needed. The API is self-documenting—`.production.*` versus `.development.*` makes intent clear. TypeScript provides compile-time safety, and support export is available through simple browser commands.
 
-4. **Improved Operations**
-   - ✅ File logging in Electron (with rotation)
-   - ✅ Correlation IDs for request tracing
-   - ✅ Datadog session correlation
-   - ✅ In-memory buffer for support
-   - ✅ Sampling for cost control
+**Operations**: File logging in Electron includes automatic rotation. Correlation IDs enable request tracing across systems. The in-memory buffer facilitates support debugging.
 
-5. **Scalability & Maintenance**
-   - ✅ Standalone npm package (usable outside monorepo)
-   - ✅ Global singleton (works across Electron + Browser)
-   - ✅ Presidio patterns auto-update via script
-   - ✅ Extensible (custom rules, transports, patterns)
-   - ✅ Zero runtime overhead (TypeScript checks at compile time)
+**Maintenance**: The library is published as a standalone npm package. Presidio patterns update automatically via a simple script. The architecture supports custom rules, transports, and patterns.
 
-### Negative
+### Trade-offs
 
-1. **Migration Effort**
-   - ⚠️ 99+ existing logger instances need migration
-   - ⚠️ 58+ direct console.log statements to replace
-   - ⚠️ Team must learn `.production.*` vs `.development.*` API
-   - ⚠️ Documentation updates required
+**Adoption**: The team needs to learn the explicit production/development API pattern. The codebase required migration from the old logger (now complete) and from direct console statements (nearly complete).
 
-2. **Complexity**
-   - ⚠️ More complex than simple console.log
-   - ⚠️ Global singleton pattern requires understanding
-   - ⚠️ Multiple sanitization layers to maintain
-   - ⚠️ Presidio pattern updates need monitoring
+**Complexity**: The library is more complex than simple console.log. The global singleton pattern requires understanding, though it simplifies usage. Multiple sanitization layers need maintenance, though Presidio patterns auto-update.
 
-3. **Performance**
-   - ⚠️ Regex sanitization overhead (mitigated by sampling)
-   - ⚠️ In-memory buffer uses ~1-2MB RAM
-   - ⚠️ Context key filtering on every log
+**Performance**: Regex sanitization adds some overhead, mitigated by careful pattern design. The in-memory buffer uses minimal memory. Context key filtering happens on every production log.
 
-4. **Dependencies**
-   - ⚠️ Adds `logdown` dependency
-   - ⚠️ Peer dependencies on Datadog SDK (optional)
-   - ⚠️ Requires Node.js >= 18.0.0
+**Dependencies**: The library adds `logdown` as a dependency and has optional peer dependencies on the Datadog SDK. It requires Node.js 18 or higher.
 
 ## References
 
 - **Library README**: [libraries/Logger/README.md](../../libraries/Logger/README.md)
-- **Package**: [libraries/Logger/package.json](../../libraries/Logger/package.json)
+- **Presidio Integration Guide**: [libraries/Logger/docs/presidio-integration.md](../../libraries/Logger/docs/presidio-integration.md)
 - **Microsoft Presidio**: https://github.com/microsoft/presidio
 - **Datadog Browser SDK**: https://docs.datadoghq.com/logs/log_collection/javascript/
 
 ## Security Guarantees
 
-1. **No data leaks via console.log** - Console override silences in production
-2. **No console forwarding to Datadog** - `forwardConsoleLogs: false` enforced
-3. **Explicit production marking** - Only `.production.*` methods send to Datadog
-4. **Development logs never persisted** - File transport and Datadog only accept `isProductionSafe: true`
-5. **Automatic sanitization** - All data processed through 3 layers
-6. **Context key whitelist** - Unknown keys silently dropped
-7. **Defense in depth** - Multiple layers prevent single point of failure
-8. **AVS log filtering** - Verbose audio/video logs filtered to reduce costs
-9. **Initialization warnings** - Production environments warned if logger not initialized
+The library provides multiple layers of defense:
+
+1. Console override silences accidental console.log in production
+2. Console forwarding to Datadog is explicitly disabled
+3. Only explicit production methods send data to Datadog
+4. Development logs never persist to files or external services
+5. All data passes through multiple sanitization layers
+6. Unknown context keys are silently dropped
+7. Multiple layers prevent single points of failure
+8. Verbose audio/video logs are filtered to reduce noise
+9. Production environments warn if logger isn't initialized
 
 ## Implementation Status
 
-### ✅ Completed (December 2025)
+### Completed (December 2025 - January 2026)
 
-**Core Library**:
+The core library is complete with production/development API separation, automatic PII sanitization through Microsoft Presidio integration, multi-transport support, global singleton architecture, in-memory buffer, and console override implementation.
 
-- ✅ `@wireapp/logger` library implemented (49.39 kB gzipped: 13.59 kB)
-- ✅ Production/Development API separation
-- ✅ Automatic PII sanitization (45+ patterns)
-- ✅ Microsoft Presidio integration (19+ recognizers)
-- ✅ Multi-transport support (Console, File, DataDog)
-- ✅ Global singleton architecture
-- ✅ In-memory log buffer (5000 logs)
+Wire webapp integration is complete with a unified Logger module, Datadog and RUM initialization, debug logging control, and widespread adoption across the codebase.
 
-**Wire Webapp Integration**:
+All security features are in place: console log forwarding is disabled, AVS log filtering reduces noise, context key whitelist enforcement protects against unknown data leaks, and defense-in-depth sanitization provides multiple protection layers.
 
-- ✅ Unified `Logger.ts` module (merged WireLogger.ts + Logger.ts)
-- ✅ DataDog + RUM initialization
-- ✅ Debug logging control (`enableLogging`)
-- ✅ Initialization check with production warnings
-- ✅ Import cleanup (removed old files: DataDog.ts, LoggerUtil.ts)
+Migration from the old `@wireapp/commons` Logger is complete. Migration from direct console statements is nearly complete—only one console.log remains.
 
-**Security Features**:
+Tooling includes automated Presidio pattern updates via `yarn presidio:update`, which fetches the latest patterns from Microsoft's repository.
 
-- ✅ `forwardConsoleLogs: false` enforced in all configs
-- ✅ AVS log filtering (shared utility)
-- ✅ Context key whitelist enforcement
-- ✅ Defense-in-depth sanitization
+Comprehensive documentation covers the library, Presidio integration, and this architectural decision record. Full test coverage validates the implementation.
 
-**Documentation**:
+### Remaining Work
 
-- ✅ 214 lines of JSDoc documentation
-- ✅ Comprehensive README (755 lines)
-- ✅ Architecture Decision Record (this document)
-- ✅ Code examples and security warnings
+The console override code exists but needs activation in production builds. The last remaining console.log statement should be migrated to the new logger.
 
-**Testing**:
+### Future Enhancements
 
-- ✅ 392 total tests passing
-- ✅ 13 test suites (including new: enableDebugLogging, avsFilter)
-- ✅ 100% build success rate
-
-**Files Changed**:
-
-- Created: 4 new files (avsFilter, enableDebugLogging, + tests)
-- Modified: 8 files (Logger.ts, transports, imports, exports)
-- Deleted: 3 files (WireLogger.ts, LoggerUtil.ts, DataDog.ts)
-
-### 📋 Future Enhancements (Optional)
-
-**Migration**:
-
-- ⏳ Replace remaining direct `console.log` statements (58+ found)
-- ⏳ Migrate old logger instances (99+ found)
-- ⏳ Team training on `.production.*` vs `.development.*` API
-
-**Features**:
-
-- 💡 Console override for production (prevent accidental console.log)
-- 💡 Log sampling for high-volume scenarios
-- 💡 Custom transport plugins
-- 💡 Performance monitoring integration
-
-**Tooling**:
-
-- 💡 ESLint rules to enforce `.production.*` usage
-- 💡 Build-time analysis of log statements
-- 💡 Automated Presidio pattern updates
+Optional improvements include log sampling for high-volume scenarios, ESLint rules to enforce logger usage patterns, custom transport plugins, and build-time log statement analysis.

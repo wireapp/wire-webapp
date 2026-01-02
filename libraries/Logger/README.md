@@ -1,107 +1,30 @@
 # @wireapp/logger
 
-A security-critical unified logging library for the Wire ecosystem with automatic sanitization and multi-transport support.
+A security-first logging library for the Wire ecosystem with automatic PII sanitization and multi-transport support.
 
-## Features
+## Why This Library Exists
 
-- **Explicit Production/Development API** - Clear separation between production-safe and development-only logs
-- **Automatic Sanitization** - No manual sanitization calls needed - happens automatically
-- **Microsoft Presidio Integration** - Expert-maintained PII patterns for 20+ languages
-- **Multi-Transport Support** - Console, File (Electron), and Datadog transports
-- **In-Memory Buffer** - Browser-based ring buffer for support export
-- **Context Key Whitelist** - Only whitelisted keys allowed in production logs
-- **45+ PII Patterns** - Presidio (19 recognizers) + Wire-specific (26 patterns) for comprehensive coverage
-- **DACH Region Focus** - German, Austrian, Swiss patterns (Tax IDs, VAT, AHV, license plates)
-- **GDPR/PCI-DSS Compliant** - Battle-tested patterns from Microsoft Presidio
-- **Global Singleton** - Shared instance across Electron and Browser contexts via `globalThis`
-- **Debug Logging Control** - URL parameter and feature flag support for enabling specific loggers
-- **AVS Log Filtering** - Automatic filtering of verbose Audio Video Signaling logs
-- **Comprehensive JSDoc** - 200+ lines of inline documentation for IDE IntelliSense
+The Wire webapp previously forwarded all console logs to Datadog without sanitization, creating a serious security risk. Any `console.log` statement—from our code or third-party libraries—could leak sensitive user data to external servers. This library solves that problem by requiring explicit intent and automatically sanitizing all production logs.
+
+## Key Features
+
+**Security First**: Automatic PII sanitization with no manual calls required. Multiple defensive layers prevent data leaks.
+
+**Explicit Intent**: Developers must choose `.production.*` (goes to Datadog) or `.development.*` (stays local), making it impossible to accidentally log sensitive data.
+
+**Microsoft Presidio Integration**: Expert-maintained PII patterns for credit cards, emails, phone numbers, tax IDs, and more across multiple languages and regions.
+
+**Multi-Transport**: Console (with color formatting), File (Electron only, with rotation), Datadog (with correlation IDs), and in-memory buffer (for support export).
+
+**Global Singleton**: Shared configuration across Electron main process, Electron renderer, and browser contexts.
+
+**Debug Control**: URL parameters and feature flags enable/disable specific loggers without code changes.
 
 ## Installation
 
 ```bash
 yarn add @wireapp/logger
 ```
-
-## Building and Publishing
-
-### Build Configuration
-
-The library is built using **Vite** with TypeScript support:
-
-- **Build tool**: Vite 6.x with `vite-plugin-dts` for TypeScript declarations
-- **Formats**: Dual ESM/CJS output (`lib/index.js` and `lib/index.cjs`)
-- **Type definitions**: Generated automatically via `vite-plugin-dts` (`lib/index.d.ts`)
-- **Target**: ESNext (compatible with Node 18+)
-- **External dependencies**: `logdown`, `@datadog/browser-logs`, `@datadog/browser-rum` (peer dependencies)
-
-### Build Commands
-
-```bash
-# Clean build output
-yarn clean
-
-# Build library (ESM + CJS + type declarations)
-yarn build
-
-# Type check without emitting
-yarn type-check
-
-# Run tests
-yarn test
-yarn test:watch
-yarn test:coverage
-
-# Lint code
-yarn lint
-yarn lint:fix
-```
-
-### Nx Integration
-
-This library is part of an Nx monorepo. Build via Nx:
-
-```bash
-# Build via Nx (from workspace root)
-nx build logging
-
-# Run tests via Nx
-nx test logging
-
-# Type check via Nx
-nx run logging:type-check
-
-# Lint via Nx
-nx lint logging
-```
-
-### Publishing to NPM
-
-The library is published to NPM as `@wireapp/logger`:
-
-```bash
-# Prepare for publishing (automatically runs clean + build)
-yarn prepublishOnly
-
-# Publish to NPM
-npm publish --access public
-
-# Or using yarn
-yarn publish --access public
-```
-
-**Package exports**:
-
-- ESM: `import {getLogger} from '@wireapp/logger'`
-- CJS: `const {getLogger} = require('@wireapp/logger')`
-- Types: Automatic via `exports` field in package.json
-
-**Published files**:
-
-- `lib/` - Compiled JavaScript and TypeScript declarations
-- `README.md` - Documentation
-- `LICENSE` - GPL-3.0 license
 
 ## Quick Start
 
@@ -110,37 +33,26 @@ import {getLogger} from '@wireapp/logger';
 
 const logger = getLogger('MyComponent');
 
-// Production logs - go to Datadog (if configured)
+// Production logs - go to Datadog if configured
 logger.production.info('API call successful', {endpoint: '/v3/users'});
 logger.production.warn('API slow', {duration: 5000});
 logger.production.error('API request failed', error, {statusCode: 500});
 
-// Development logs - never go to Datadog
+// Development logs
 logger.development.info('Full state dump', {fullState});
 logger.development.debug('Processing step', {step: 1});
-logger.development.trace('Detailed flow', {step1: 'a', step2: 'b'});
+logger.development.trace('Detailed flow', {details});
 ```
 
-## Initialization and Configuration Order
+## Initialization
 
-### Critical Initialization Rules
+### Browser Application
 
-**⚠️ IMPORTANT**: The logger uses a global singleton pattern to ensure configuration is shared across all contexts. Follow these rules:
-
-1. **Initialize ONCE** - Call `initializeLogger()` only once at app startup
-2. **Check before re-initializing** - Use `isLoggerInitialized()` to check if already initialized
-3. **Update don't overwrite** - Use `updateLoggerConfig()` to add transports after initialization
-4. **Electron first, Browser second** - In Electron apps, initialize in main process first
-
-### Initialization Order
-
-#### 1. Standalone Browser Application
+Initialize once at app startup:
 
 ```typescript
-// In your app entry point (e.g., main.tsx or app.ts)
 import {initializeLogger, LogLevel} from '@wireapp/logger';
 
-// Initialize ONCE at app startup
 initializeLogger(
   {platform: 'browser', deployment: 'production'},
   {
@@ -161,19 +73,24 @@ initializeLogger(
     },
   },
 );
+```
 
-// Later, anywhere in your app
+Then use the logger anywhere:
+
+```typescript
 import {getLogger} from '@wireapp/logger';
+
 const logger = getLogger('MyComponent');
 logger.production.info('App started');
 ```
 
-#### 2. Electron Application (Recommended Pattern)
+### Electron Application
 
-**Step 1: Initialize in Electron Main Process (FIRST)**
+Initialize in the main process first, then update configuration in the renderer:
+
+**Electron Main Process:**
 
 ```typescript
-// In Electron main process (main.js / main.ts)
 import {initializeLogger, LogLevel} from '@wireapp/logger';
 
 initializeLogger(
@@ -190,172 +107,162 @@ initializeLogger(
         path: './logs/electron.log',
         maxSize: 10 * 1024 * 1024, // 10MB
         maxFiles: 5,
-        format: 'json',
       },
     },
   },
 );
-
-// Config is now stored in globalThis - shared with renderer process
 ```
 
-**Step 2: Update Config in Renderer Process (SECOND)**
+**Renderer Process:**
 
 ```typescript
-// In webapp renderer (e.g., main.tsx or app.ts)
-import {initializeLogger, updateLoggerConfig, isLoggerInitialized, LogLevel} from '@wireapp/logger';
+import {updateLoggerConfig, isLoggerInitialized, LogLevel} from '@wireapp/logger';
 
-// Check if already initialized (from Electron main process)
+// Check if already initialized from Electron
 if (!isLoggerInitialized()) {
-  // Fallback: Initialize if running standalone (not in Electron)
-  initializeLogger(
-    {platform: 'browser', deployment: 'production'},
-    {
-      transports: {
-        console: {enabled: true, level: LogLevel.WARN},
-      },
-    },
-  );
+  // Fallback for standalone mode
+  initializeLogger({platform: 'browser', deployment: 'production'}, {});
 }
 
-// Add Datadog transport to existing config (preserves FileTransport from Electron)
-if (config.dataDog?.applicationId && config.dataDog?.clientToken) {
-  updateLoggerConfig({
-    transports: {
-      datadog: {
-        enabled: true,
-        level: LogLevel.INFO,
-        clientToken: config.dataDog.clientToken,
-        applicationId: config.dataDog.applicationId,
-        site: 'datadoghq.eu',
-        service: 'webapp',
-        forwardConsoleLogs: false,
-      },
+// Add Datadog transport without removing file transport
+updateLoggerConfig({
+  transports: {
+    datadog: {
+      enabled: true,
+      level: LogLevel.INFO,
+      clientToken: config.dataDog.clientToken,
+      applicationId: config.dataDog.applicationId,
+      site: 'datadoghq.eu',
+      service: 'webapp',
+      forwardConsoleLogs: false,
     },
-  });
-}
+  },
+});
 ```
 
-**Step 3: Use Logger Anywhere**
+## How It Works
 
-```typescript
-// In any file (Electron main, renderer, or standalone)
-import {getLogger} from '@wireapp/logger';
+### Global Singleton Pattern
 
-const logger = getLogger('MyComponent');
-logger.production.info('This works everywhere!');
-```
+The library uses `globalThis` with a symbol to ensure a single shared instance across all JavaScript contexts. When you initialize in the Electron main process, that configuration is available in the renderer process. When you call `updateLoggerConfig()`, it merges transports instead of replacing them.
 
-### Why This Order Matters
+Benefits:
+- Single source of truth for configuration
+- No duplicate logger instances
+- File transport remains active when webapp adds Datadog
+- Full TypeScript support across all contexts
 
-1. **Electron main process** initializes with FileTransport for persistent logging
-2. Config stored in `globalThis[Symbol.for('@wireapp/logger:globalConfig')]` (shared across contexts)
-3. **Renderer process** checks `isLoggerInitialized()` → returns `true` (config exists)
-4. Renderer calls `updateLoggerConfig()` to **ADD** Datadog (doesn't overwrite)
-5. **Result**: Both FileTransport (Electron) and DatadogTransport (webapp) are active ✅
+### Automatic Sanitization Layers
 
-### Global Singleton Pattern (Electron + Browser)
+**Layer 1: Context Key Whitelist**
 
-The logger uses `globalThis` with `Symbol.for()` to ensure a **single shared instance** across all contexts:
+Only approved keys are allowed in production logs. Identifiers like `conversationId`, `clientId`, and `userId` are automatically truncated. Metadata like `timestamp`, `duration`, `errorCode`, and `status` are allowed. Everything else is silently dropped.
 
-- **Symbol key**: `Symbol.for('@wireapp/logger:globalConfig')` - Same symbol across all realms
-- **Shared registry**: Logger instances, configuration, and buffer are all shared
-- **Initialize-once guard**: `initialize()` refuses to re-initialize if already called
-- **Safe updates**: `updateLoggerConfig()` merges transports instead of replacing them
+**Layer 2: Microsoft Presidio Patterns**
 
-**Key Benefits**:
+Expert-maintained PII detection from Microsoft's Presidio project masks:
+- Credit cards, emails, phone numbers, IP addresses, IBANs, URLs, cryptocurrency addresses
+- Regional patterns for DACH (German, Austrian, Swiss tax IDs, VAT, AHV, license plates)
+- US patterns (Social Security Numbers, passport numbers)
+- UK, Spain, and Italy patterns
 
-- **Single Source of Truth**: Configuration set in Electron is available in Browser context
-- **No Duplicate Instances**: Logger registry, config, and buffer are shared via `globalThis`
-- **FileTransport Preserved**: Electron's FileLogger remains active when webapp adds Datadog
-- **Type Safety**: Full TypeScript support across all contexts
+**Layer 3: Wire-Specific Patterns**
 
-## API
+Custom patterns for Wire data:
+- UUIDs (partial masking: `123e4567***`)
+- Tokens (Bearer, JWT, API keys)
+- Message content
+- Encryption keys
+- Stack traces
+- MAC addresses
+
+**Layer 4: Console Override (Production)**
+
+In production environments, direct console.log calls are silenced to prevent accidental leaks. Console.warn remains visible but isn't forwarded. Console.error goes only to RUM error tracking.
+
+## API Reference
 
 ### Production Logging
 
-Production logs are explicitly marked as safe and can be sent to Datadog:
+Only these methods send logs to external services:
 
 ```typescript
-logger.production.info(message: string, context?: LogContext): void;
-logger.production.warn(message: string, context?: LogContext): void;
-logger.production.error(message: string, error?: Error, context?: LogContext): void;
+logger.production.info(message, context?);
+logger.production.warn(message, context?);
+logger.production.error(message, error?, context?);
 ```
-
-**Only these methods send logs to Datadog.**
 
 ### Development Logging
 
-Development logs are never sent to Datadog:
+These methods never leave the dev environment:
 
 ```typescript
-logger.development.info(message: string, context?: LogContext): void;
-logger.development.warn(message: string, context?: LogContext): void;
-logger.development.error(message: string, error?: Error, context?: LogContext): void;
-logger.development.debug(message: string, context?: LogContext): void;
-logger.development.trace(message: string, context?: LogContext): void;
+logger.development.info(message, context?);
+logger.development.warn(message, context?);
+logger.development.error(message, error?, context?);
+logger.development.debug(message, context?);
+logger.development.trace(message, context?);
 ```
 
 ### Debug Logging Control
 
-Control which loggers output to the console via localStorage `debug` key (used by `logdown`):
+Enable specific loggers via URL parameters or feature flags:
 
 ```typescript
-import {enableDebugLogging, disableDebugLogging, getDebugLogging} from '@wireapp/logger';
+import {enableDebugLogging, disableDebugLogging} from '@wireapp/logger';
 
-// Enable all logs via URL parameter: ?enableLogging=*
+// Enable via URL parameter: ?enableLogging=*
 enableDebugLogging({urlParams: window.location.search});
 
 // Enable specific namespace
 enableDebugLogging({namespace: '@wireapp/webapp/calling'});
 
-// Enable all logs (useful for feature flags)
+// Enable all (useful for feature flags)
 enableDebugLogging({force: true});
 
-// Disable debug logging
+// Disable
 disableDebugLogging();
-
-// Get current debug configuration
-const currentDebug = getDebugLogging(); // Returns namespace or null
 ```
 
-**Common patterns**:
+Common patterns:
+- `*` - All loggers
+- `@wireapp/webapp/*` - All webapp loggers
+- `@wireapp/webapp/calling` - Only calling logs
 
-- `*` - Enable all loggers
-- `@wireapp/webapp/*` - Enable all webapp loggers
-- `@wireapp/webapp/calling` - Enable only calling logs
-- `@wireapp/webapp/avs` - Enable only AVS logs
+### Support Export
 
-**Integration with Wire webapp**:
+Browser console commands for debugging:
 
-```typescript
-import {enableLogging} from 'Util/Logger';
+```javascript
+// Export logs as JSON
+window.wireDebug.exportLogs();
 
-// Reads ?enableLogging parameter and feature flags
-enableLogging(config);
+// Copy to clipboard
+window.wireDebug.copyLogsToClipboard();
+
+// Get Datadog session ID for correlation
+window.wireDebug.getDatadogInfo();
+
+// Clear log buffer
+window.wireDebug.clearLogs();
+
+// Get buffer statistics
+window.wireDebug.getLogStats();
 ```
 
-### AVS Log Filtering
+### Console Override
 
-AVS (Audio Video Signaling) logs are very verbose and filtered by default in production transports (DataDog, File).
-
-**Allowed AVS messages** (all others filtered):
-
-- `ccall_hash_user`
-- `c3_message_recv` / `c3_message_send`
-- `dce_message_recv` / `dce_message_send`
-- `WAPI wcall: create userid`
+Prevent accidental console.log leaks in production:
 
 ```typescript
-import {isAllowedAVSLog} from '@wireapp/logger';
+import {installConsoleOverride} from '@wireapp/logger';
 
-// Check if an AVS log should be allowed
-if (isAllowedAVSLog(message)) {
-  // This message will be sent to production transports
+if (process.env.NODE_ENV === 'production') {
+  installConsoleOverride();
 }
 ```
 
-**Usage**: Automatically applied in DataDog and File transports. No manual filtering needed.
+This silences console.log/info/debug/trace while preserving console.warn and sending console.error to RUM tracking.
 
 ### Configuration Management
 
@@ -365,7 +272,6 @@ import {
   updateLoggerConfig,
   getLoggerConfig,
   isLoggerInitialized,
-  resetLoggerConfig, // For testing only
 } from '@wireapp/logger';
 
 // Initialize once at startup
@@ -379,402 +285,87 @@ if (isLoggerInitialized()) {
 // Update configuration (merges with existing)
 updateLoggerConfig({
   transports: {
-    datadog: {enabled: true /* ... */},
+    datadog: {enabled: true},
   },
 });
 
 // Get current configuration
 const currentConfig = getLoggerConfig();
-
-// Reset (testing only)
-resetLoggerConfig();
 ```
 
-### Configuration Options
+### AVS Log Filtering
 
-All configuration is externally customizable:
+Audio Video Signaling logs are very verbose and automatically filtered in production. Only specific messages are allowed through:
+- `ccall_hash_user`
+- `c3_message_recv` / `c3_message_send`
+- `dce_message_recv` / `dce_message_send`
+- `WAPI wcall: create userid`
+
+No manual filtering needed—this happens automatically in Datadog and File transports.
+
+### Datadog User Tracking
+
+Set user ID for Datadog correlation:
 
 ```typescript
-import {LoggerConfig, LogLevel, SafetyLevel, PRODUCTION_CONTEXT_WHITELIST} from '@wireapp/logger';
+import {setDatadogUser, getDatadogSessionId} from '@wireapp/logger';
 
-const config: Partial<LoggerConfig> = {
-  environment: 'production',
-  safetyLevel: SafetyLevel.SAFE,
-  logLevel: LogLevel.INFO,
-  transports: {
-    console: {
-      enabled: true,
-      level: LogLevel.WARN,
-    },
-    file: {
-      enabled: false,
-      level: LogLevel.DEBUG,
-      path: './logs/app.log',
-      maxSize: 10 * 1024 * 1024, // 10MB
-      maxFiles: 5,
-      format: 'json',
-      runtimeEnvironment: {
-        platform: 'electron',
-        deployment: 'production',
-      },
-    },
-    datadog: {
-      enabled: true,
-      level: LogLevel.INFO,
-      clientToken: 'your-datadog-client-token',
-      applicationId: 'your-datadog-application-id',
-      site: 'datadoghq.eu',
-      service: 'wire-webapp',
-      forwardConsoleLogs: false, // CRITICAL: Never forward console logs
-    },
-  },
-  contextWhitelist: PRODUCTION_CONTEXT_WHITELIST,
-};
+// Set user (ID automatically truncated to 8 characters)
+setDatadogUser(userId);
 
-initializeLogger({platform: 'browser', deployment: 'production'}, config);
+// Get session ID for correlation with Datadog logs
+const sessionId = getDatadogSessionId();
 ```
 
-#### Customizing Context Whitelist
+## Security Best Practices
 
-Extend the default whitelist with custom keys:
+### Safe Logging ✅
 
 ```typescript
-import {PRODUCTION_CONTEXT_WHITELIST, updateLoggerConfig} from '@wireapp/logger';
-
-// Extend the whitelist
-const customWhitelist = new Set([...PRODUCTION_CONTEXT_WHITELIST, 'requestId', 'conversationDomain', 'teamId']);
-
-updateLoggerConfig({
-  contextWhitelist: customWhitelist,
-});
-```
-
-#### Customizing Sanitization Rules
-
-Add custom sanitization rules or replace the defaults:
-
-```typescript
-import {
-  DEFAULT_SANITIZATION_RULES,
-  WIRE_SPECIFIC_SANITIZATION_RULES,
-  SafetyLevel,
-  SanitizationRule,
-} from '@wireapp/logger';
-
-// Add a custom rule
-const customRules: SanitizationRule[] = [
-  ...DEFAULT_SANITIZATION_RULES,
-  {
-    pattern: /custom-secret-[a-z0-9]+/gi,
-    replacement: '[CUSTOM_SECRET]',
-    appliesTo: [SafetyLevel.SAFE, SafetyLevel.SANITIZED],
-  },
-];
-
-initializeLogger({platform: 'browser', deployment: 'production'}, {sanitizationRules: customRules});
-```
-
-#### Using Presidio Patterns (Recommended)
-
-Use Microsoft Presidio's battle-tested PII patterns instead of maintaining custom regex:
-
-```typescript
-import {PresidioLoader, DEFAULT_SANITIZATION_RULES} from '@wireapp/logger';
-
-// Option 1: Load bundled Presidio patterns (19 recognizers for global + DACH)
-const presidioJson = require('@wireapp/logger/lib/presidio/presidio-recognizers.json');
-const loader = new PresidioLoader();
-loader.loadFromJSON(presidioJson);
-
-// Convert to sanitization rules
-const presidioRules = loader.toSanitizationRules({
-  language: 'en', // Filter by language (optional)
-  entityTypes: ['CREDIT_CARD', 'EMAIL_ADDRESS', 'US_SSN'], // Filter by types (optional)
-});
-
-// Option 2: Load from remote URL
-import {loadPresidioRulesFromURL} from '@wireapp/logger';
-
-const presidioRules = await loadPresidioRulesFromURL(
-  'https://your-cdn.com/presidio-patterns.json',
-  {language: 'de'}, // German patterns
-);
-
-// Merge with default rules
-const customRules = [...DEFAULT_SANITIZATION_RULES, ...presidioRules];
-
-initializeLogger({platform: 'browser', deployment: 'production'}, {sanitizationRules: customRules});
-```
-
-**Why use Presidio patterns?**
-
-- Expert-maintained patterns from Microsoft
-- Multi-language support (20+ languages)
-- Regular updates with new PII patterns
-- Lower false positives than custom regex
-- GDPR/PCI-DSS compliant detection
-
-## Production Context Whitelist
-
-Only these context keys are allowed in production logs:
-
-- `conversationId` - Conversation identifier (auto-truncated)
-- `clientId` - Client identifier (auto-truncated)
-- `userId` - User identifier (auto-truncated)
-- `timestamp` - Event timestamp
-- `duration` - Duration in milliseconds
-- `errorCode` - Error code
-- `status` - HTTP status code
-- `protocol` - Protocol name
-- `count` - Counter
-- `size` - Size in bytes
-- `length` - Array or string length
-- `correlationId` - Correlation ID
-- `sessionId` - Session ID
-
-## Automatic Sanitization
-
-The library automatically sanitizes sensitive data using **Microsoft Presidio** (19 recognizers) + **Wire-specific patterns** (26 patterns) for comprehensive PII protection.
-
-### Pattern Sources
-
-1. **Microsoft Presidio** - Expert-maintained patterns from [github.com/microsoft/presidio](https://github.com/microsoft/presidio)
-   - Global patterns: Credit cards, emails, phone numbers, IPs, IBANs, URLs, crypto
-   - USA: SSN, passports
-   - UK: NHS numbers
-   - DACH: German/Austrian/Swiss Tax IDs, VAT IDs, AHV numbers, license plates
-   - Spain, Italy: NIF, fiscal codes
-
-2. **Wire-Specific** - Custom patterns for Wire ecosystem
-   - UUID masking (partial replacement)
-   - Bearer tokens, JWT tokens, API keys (Stripe, AWS)
-   - Message content & encryption key masking (context-aware)
-   - URL whitelisting (Wire domains)
-   - Stack traces, MAC addresses
-   - BIC/SWIFT codes, German Commercial Register
-   - Context-specific patterns (names, DOB, addresses)
-
-### Global Patterns (Messages & Context)
-
-| Data Type                  | Masked As          | Example                                        |
-| -------------------------- | ------------------ | ---------------------------------------------- |
-| **Credit Card**            | `[CREDIT_CARD]`    | Visa, Mastercard, Amex, Discover, etc.         |
-| **SSN**                    | `[SSN]`            | US Social Security: `123-45-6789`              |
-| **UUID**                   | `123e4567***`      | `123e4567-e89b-12d3-a456-426614174000`         |
-| **Email**                  | `[EMAIL]`          | `alice@example.com`                            |
-| **Phone**                  | `[PHONE]`          | `+1 (555) 123-4567`, `+49 30 12345678`         |
-| **IPv4 Address**           | `[IP_ADDRESS]`     | `192.168.1.1`                                  |
-| **IPv6 Address**           | `[IP_ADDRESS]`     | `2001:0db8:85a3::8a2e:0370:7334`               |
-| **IBAN**                   | `[IBAN]`           | `DE89370400440532013000`                       |
-| **BIC/SWIFT**              | `[BIC]`            | `DEUTDEFF500`                                  |
-| **MAC Address**            | `[MAC_ADDRESS]`    | `00:1B:44:11:3A:B7`                            |
-| **Bitcoin Address**        | `[CRYPTO_ADDRESS]` | `bc1qxy2kgdygjrsqtzq2n0yrf...`                 |
-| **Bearer Token**           | `Bearer [TOKEN]`   | `Bearer eyJhbGciOiJIUzI1NiIs...`               |
-| **JWT Token**              | `[JWT_TOKEN]`      | `eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...`      |
-| **API Keys**               | `[API_KEY]`        | Stripe: `sk_live_...`, Generic: `api_key: ...` |
-| **AWS Keys**               | `[AWS_KEY]`        | `AKIAIOSFODNN7EXAMPLE`                         |
-| **URLs** (non-whitelisted) | `[URL]`            | `https://example.com/api`                      |
-| **Stack Traces**           | `[STACK_FRAME]`    | `at Object.<anonymous> (/app/...)`             |
-
-### DACH-Specific Patterns (Germany, Austria, Switzerland)
-
-| Data Type                | Masked As           | Example                                |
-| ------------------------ | ------------------- | -------------------------------------- |
-| **German Tax ID**        | `[TAX_ID]`          | Steueridentifikationsnummer: 11 digits |
-| **German VAT ID**        | `[VAT_ID]`          | `DE123456789`                          |
-| **Austrian VAT ID**      | `[VAT_ID]`          | `ATU12345678`                          |
-| **Swiss VAT ID**         | `[VAT_ID]`          | `CHE-123.456.789`                      |
-| **Swiss AHV Number**     | `[AHV_NUMBER]`      | `756.1234.5678.97`                     |
-| **German License Plate** | `[LICENSE_PLATE]`   | `B-AB 1234`                            |
-| **German ID Card**       | `[ID_CARD]`         | Personalausweisnummer                  |
-| **Commercial Register**  | `[REGISTER_NUMBER]` | `HRB 12345`                            |
-
-### Context-Specific Patterns (Keys Only)
-
-These patterns only apply when specific keys are used in log context:
-
-| Context Key         | Masked As            | Keys Matched                                                    |
-| ------------------- | -------------------- | --------------------------------------------------------------- |
-| **Names**           | `[NAME]`             | `name`, `firstName`, `lastName`, `displayName`, `username`      |
-| **Dates of Birth**  | `[DATE_OF_BIRTH]`    | `dob`, `dateOfBirth`, `birthDate`, `birthday`                   |
-| **Addresses**       | `[ADDRESS]`          | `address`, `street`, `city`, `zipCode`, `postalCode`, `country` |
-| **Passports**       | `[PASSPORT]`         | `passport`, `passportNumber`                                    |
-| **Insurance**       | `[INSURANCE_NUMBER]` | `insuranceNumber`, `versicherungsnummer`, `krankenversicherung` |
-| **Message Content** | `[MESSAGE_CONTENT]`  | `content`, `text`, `message`, `plaintext`                       |
-| **Encryption Keys** | `[ENCRYPTED]`        | `key`, `secret`, `private`, `privateKey`                        |
-
-**Whitelisted URLs** (not masked):
-
-- `*.wire.com`
-- `*.zinfra.io`
-- `*.datadoghq.com`
-
-### Updating Presidio Patterns
-
-Keep your PII detection patterns up-to-date:
-
-```bash
-# Update bundled Presidio patterns
-yarn presidio:update
-
-# Or manually run the script
-node scripts/updatePresidio.js
-```
-
-The script includes curated recognizers for:
-
-- **Global entities** (9 recognizers): Credit cards, emails, phone numbers, IPs, IBANs, URLs, crypto addresses
-- **DACH region** (6 recognizers): German/Austrian/Swiss tax IDs, VAT IDs, AHV numbers, license plates
-- **USA** (2 recognizers): SSN, passports
-- **UK** (1 recognizer): NHS numbers
-- **Spain, Italy** (2 recognizers): NIF, fiscal codes
-
-**Total: 19 Presidio recognizers + 26 Wire-specific patterns = 45+ PII patterns**
-
-### Presidio Pattern Metadata
-
-Each Presidio-sourced rule includes tracking metadata:
-
-```typescript
-{
-  pattern: /regex/,
-  replacement: '[CREDIT_CARD]',
-  appliesTo: [SafetyLevel.SAFE, SafetyLevel.SANITIZED],
-  metadata: {
-    source: 'presidio',
-    recognizerName: 'Credit Card Recognizer',
-    entityType: 'CREDIT_CARD',
-    confidence: 0.8,
-  }
-}
-```
-
-This allows filtering, debugging, and auditing of patterns.
-
-## Support Export
-
-In browser environments, logs are stored in an in-memory ring buffer (5000 log limit).
-
-### Installing wireDebug Helpers
-
-```typescript
-import {installWireLoggingHelper} from '@wireapp/logger';
-
-// Install in browser (typically in your app initialization)
-if (typeof window !== 'undefined') {
-  installWireLoggingHelper();
-}
-```
-
-### Using wireDebug in Browser Console
-
-```javascript
-// Export all logs as JSON
-window.wireDebug.exportLogs();
-
-// Copy logs to clipboard
-window.wireDebug.copyLogsToClipboard();
-
-// Get Datadog session info for correlation
-window.wireDebug.getDatadogInfo();
-// Returns: {sessionId: 'xxx', rumEnabled: true, logCount: 1234}
-
-// Get log statistics
-window.wireDebug.getLogStats();
-// Returns: {totalLogs: 1234, bufferSize: 5000, oldestLog: '...', newestLog: '...'}
-
-// Clear log buffer
-window.wireDebug.clearLogs();
-```
-
-## Production Console Override
-
-Prevent accidental data leaks via `console.log` in production:
-
-```typescript
-import {installConsoleOverride} from '@wireapp/logger';
-
-// Install console override (only active in production)
-if (process.env.NODE_ENV === 'production') {
-  installConsoleOverride();
-}
-```
-
-**What it does:**
-
-- Silences `console.log`, `console.info`, `console.debug`, `console.trace`
-- Preserves `console.warn` and `console.error`
-- Sends `console.error` to Datadog RUM for tracking
-- Only activates in `NODE_ENV=production`
-
-```typescript
-// Check if override is active
-import {isConsoleOverrideActive, getConsoleOverrideInfo} from '@wireapp/logger';
-
-console.log(isConsoleOverrideActive()); // true in production
-
-console.log(getConsoleOverrideInfo());
-// {
-//   active: true,
-//   environment: 'production',
-//   silencedMethods: ['log', 'info', 'debug', 'trace'],
-//   preservedMethods: ['warn', 'error']
-// }
-```
-
-## Security Guarantees
-
-1. **No Data Leaks** - All sensitive data is automatically sanitized
-2. **Explicit Production Marking** - Only `logger.production.*` methods send to Datadog
-3. **No Console Forwarding** - `forwardConsoleLogs` is always `false` (CRITICAL)
-4. **Console Override** - `console.log` silenced in production to prevent leaks
-5. **Context Whitelist** - Unknown keys are silently dropped from production logs
-6. **Defense in Depth** - Sanitization happens at multiple layers
-7. **Global Singleton Protection** - Config cannot be overwritten, only updated via `updateLoggerConfig()`
-
-## Best Practices
-
-### DO - Safe Logging
-
-```typescript
-// ✅ SAFE: Production logs with whitelisted context
+// Production logs with whitelisted context
 logger.production.info('API call', {endpoint: '/v3/users'});
 logger.production.warn('API slow', {duration: 5000});
 logger.production.error('API failed', {errorCode: 'NETWORK_ERROR'});
 
-// ✅ SAFE: Development logs for debugging
+// Development logs for debugging
 logger.development.debug('Processing message', {messageId: '123***'});
 logger.development.trace('Flow step', {step: 1});
 ```
 
-### DON'T - Unsafe Logging
+### Unsafe Logging ❌
 
 ```typescript
-// ❌ NOT SAFE: Direct console.log (bypasses sanitization)
-console.log('User logged in', user); // Goes to Datadog with NO sanitization!
+// Direct console.log bypasses all sanitization
+console.log('User logged in', user);
 
-// ❌ NOT SAFE: Message content in production logs
-logger.production.info('Message sent', {content: 'Hello world'}); // Leaks message content!
+// Message content in production logs
+logger.production.info('Message sent', {content: 'Hello world'});
 
-// ❌ NOT SAFE: User PII in production logs
-logger.production.info('User logged in', {email: 'alice@example.com'}); // Leaks email!
+// User PII in production logs
+logger.production.info('User logged in', {email: 'alice@example.com'});
 
-// ❌ NOT SAFE: Decrypted content
-logger.production.error('Decryption failed', {plaintext: 'Secret message...'}); // Leaks decrypted content!
+// Decrypted content
+logger.production.error('Decryption failed', {plaintext: 'Secret message'});
 
-// ❌ NOT SAFE: Encryption keys
-logger.production.debug('Key generated', {privateKey: '0x123...'}); // Leaks key material!
+// Encryption keys
+logger.production.debug('Key generated', {privateKey: '0x123...'});
 
-// ❌ NOT SAFE: Access tokens
-logger.production.info('API call', {authorization: 'Bearer eyJhb...'}); // Leaks token!
+// Access tokens
+logger.production.info('API call', {authorization: 'Bearer eyJhb...'});
 ```
 
+## Security Guarantees
+
+1. All sensitive data is automatically sanitized
+2. Only `.production.*` methods send to Datadog
+3. Console forwarding is always disabled
+4. Console override silences accidental console.log in production
+5. Unknown context keys are silently dropped
+6. Multiple sanitization layers provide defense in depth
+7. Configuration cannot be overwritten, only updated
+8. Development logs never persist to files or external services
+
 ## Configuration Options
-
-### Environment
-
-- `development` - Full logging, no Datadog
-- `production` - Filtered logging, Datadog enabled
 
 ### Log Levels
 
@@ -789,6 +380,102 @@ enum LogLevel {
 }
 ```
 
+### Transport Configuration
+
+**Console Transport**: All logs with color formatting
+
+```typescript
+{
+  console: {
+    enabled: true,
+    level: LogLevel.DEBUG,
+  }
+}
+```
+
+**File Transport**: Electron only, production logs only, with rotation
+
+```typescript
+{
+  file: {
+    enabled: true,
+    level: LogLevel.DEBUG,
+    path: './logs/app.log',
+    maxSize: 10 * 1024 * 1024, // 10MB
+    maxFiles: 5, // Keep 5 rotated files
+  }
+}
+```
+
+**Datadog Transport**: Production logs only, with correlation
+
+```typescript
+{
+  datadog: {
+    enabled: true,
+    level: LogLevel.INFO,
+    clientToken: 'YOUR_CLIENT_TOKEN',
+    applicationId: 'YOUR_APP_ID',
+    site: 'datadoghq.eu',
+    service: 'webapp',
+    env: 'production',
+    version: '1.0.0',
+    forwardConsoleLogs: false, // Always false for security
+  }
+}
+```
+
+## Building and Publishing
+
+### Build Commands
+
+```bash
+# Clean build output
+yarn clean
+
+# Build library (ESM + CJS + TypeScript declarations)
+yarn build
+
+# Type check
+yarn type-check
+
+# Run tests
+yarn test
+yarn test:watch
+yarn test:coverage
+
+# Lint
+yarn lint
+yarn lint:fix
+```
+
+### Nx Integration
+
+```bash
+# From workspace root
+nx build logging
+nx test logging
+nx lint logging
+```
+
+### Publishing to NPM
+
+```bash
+# Prepare and publish
+yarn prepublishOnly
+npm publish --access public
+```
+
+### Presidio Pattern Updates
+
+Update PII patterns from Microsoft Presidio:
+
+```bash
+yarn presidio:update
+```
+
+This fetches the latest recognizers from Microsoft's Presidio GitHub repository and updates the bundled patterns.
+
 ## Testing
 
 ```bash
@@ -801,11 +488,10 @@ yarn test:coverage
 # Run in watch mode
 yarn test:watch
 
-# Run via Nx (from workspace root)
-nx test logging
+# Run via Nx
 nx test logging --coverage
 ```
 
 ## License
 
-GPL-3.0
+GPL-3.0 - Wire Swiss GmbH

@@ -2,128 +2,88 @@
 
 ## Overview
 
-The `@wireapp/logging` library now supports Microsoft Presidio's battle-tested PII detection patterns as an alternative to maintaining custom regex patterns. This integration provides:
+The logging library integrates Microsoft Presidio's battle-tested PII detection patterns, providing expert-maintained regex patterns that are more accurate than hand-written alternatives. Presidio patterns support multiple languages, receive regular updates, and provide GDPR and PCI-DSS compliant detection out of the box.
 
-- **Expert-maintained patterns** from Microsoft's Presidio project
-- **Multi-language support** (20+ languages including English, German, Spanish, Italian, etc.)
-- **Regular updates** with new PII patterns as Presidio evolves
-- **Lower false positives** compared to hand-written regex
-- **GDPR/PCI-DSS compliant** detection out of the box
+## Why Presidio
 
-## Architecture
+**Expert Maintenance**: Microsoft's security experts maintain these patterns, continuously updating them as new PII threats emerge.
 
-```
-┌─────────────────────────────────────────────────────────────┐
-│  Microsoft Presidio (Python)                                 │
-│  https://github.com/microsoft/presidio                       │
-└────────────────────┬────────────────────────────────────────┘
-                     │
-                     │ Curated recognizers in JSON format
-                     ▼
-┌─────────────────────────────────────────────────────────────┐
-│  fetch-presidio-patterns.ts                                  │
-│  - Extracts recognizer definitions                           │
-│  - Converts to Presidio JSON format                          │
-│  - Generates presidio-recognizers.json                       │
-└────────────────────┬────────────────────────────────────────┘
-                     │
-                     │ presidio-recognizers.json
-                     ▼
-┌─────────────────────────────────────────────────────────────┐
-│  PresidioLoader                                              │
-│  - Loads recognizers from JSON                               │
-│  - Filters by language/entity type                           │
-│  - Converts to SanitizationRule[]                            │
-└────────────────────┬────────────────────────────────────────┘
-                     │
-                     │ SanitizationRule[]
-                     ▼
-┌─────────────────────────────────────────────────────────────┐
-│  Sanitizer                                                   │
-│  - Applies regex patterns                                    │
-│  - Masks PII in log messages                                 │
-│  - Uses metadata for tracking                                │
-└─────────────────────────────────────────────────────────────┘
-```
+**Multi-Language Support**: Patterns work across many languages including English, German, Spanish, Italian, and others, with special attention to regional requirements.
 
-## Key Components
+**Lower False Positives**: Battle-tested in production systems, Presidio patterns have been refined to minimize false detections.
 
-### 1. PresidioTypes.ts
+**Compliance Ready**: Patterns are designed to meet GDPR and PCI-DSS requirements for PII detection.
 
-Defines the TypeScript types for Presidio's JSON format:
+## How It Works
 
-- `PresidioRegexRecognizer` - Pattern-based recognizers
-- `PresidioDenyListRecognizer` - Deny-list based recognizers
-- `PresidioRecognizerCollection` - Collection of recognizers with versioning
+Microsoft Presidio provides recognizers in JSON format. We fetch these recognizers, convert them to our sanitization rule format, and bundle them with the library. The Presidio Loader reads these patterns and applies them during log sanitization.
 
-### 2. PresidioConverter.ts
+Flow:
+1. Microsoft Presidio (GitHub) → Recognizers JSON
+2. Update script fetches latest patterns
+3. Presidio Loader converts to sanitization rules
+4. Sanitizer applies patterns to mask PII
 
-Converts Presidio recognizers to our `SanitizationRule` format:
+## Components
 
-- Maps entity types to replacement placeholders (e.g., `CREDIT_CARD` → `[CREDIT_CARD]`)
-- Determines safety levels based on sensitivity (high-sensitivity → SAFE + SANITIZED)
-- Converts Python regex to JavaScript regex
-- Handles both regex and deny-list recognizers
+**PresidioTypes**: TypeScript type definitions for Presidio's JSON format (regex recognizers, deny-list recognizers, recognizer collections).
 
-### 3. PresidioLoader.ts
+**PresidioConverter**: Converts Presidio recognizers to our sanitization rule format. Maps entity types to placeholders (e.g., `CREDIT_CARD` → `[CREDIT_CARD]`), determines safety levels, and handles Python to JavaScript regex conversion.
 
-Loads and manages Presidio recognizers:
+**PresidioLoader**: Manages recognizer loading and filtering. Can load from JSON objects, strings, or URLs. Supports filtering by language or entity type.
 
-- Load from JSON object, string, or URL
-- Filter by language (e.g., only German patterns)
-- Filter by entity types (e.g., only high-sensitivity patterns)
-- Convert to sanitization rules
-- Provides metadata about loaded patterns
+**Update Script**: `scripts/updatePresidio.js` fetches the latest recognizers from Microsoft's GitHub repository and updates the bundled pattern file.
 
-### 4. fetch-presidio-patterns.ts
+## Usage
 
-Script to generate/update the bundled pattern file:
+### Using Bundled Patterns (Default)
 
-- Curates recognizers for Wire's use cases
-- Focuses on global + DACH region patterns
-- Generates versioned JSON with timestamp
-- Can be run periodically to update patterns
-
-## Usage Examples
-
-### Basic: Load Bundled Patterns
+The library automatically includes bundled Presidio patterns. No additional setup required:
 
 ```typescript
-import {getLogger, PresidioLoader, SafetyLevel} from '@wireapp/logging';
+import {getLogger} from '@wireapp/logger';
 
-// Load bundled Presidio patterns
-const presidioJson = require('@wireapp/logging/dist/presidio/presidio-recognizers.json');
+const logger = getLogger('MyComponent');
+// Presidio patterns are already active
+logger.production.info('User data', {email: 'test@example.com'});
+// Email is automatically masked
+```
+
+### Loading Patterns Manually
+
+If you need custom pattern loading:
+
+```typescript
+import {PresidioLoader} from '@wireapp/logger';
+
 const loader = new PresidioLoader();
+
+// Load from bundled JSON
+const presidioJson = require('@wireapp/logger/dist/presidio/presidio-recognizers.json');
 loader.loadFromJSON(presidioJson);
 
-// Convert to rules and use with logger
+// Convert to sanitization rules
 const rules = loader.toSanitizationRules();
-const logger = getLogger('MyComponent', {
-  environment: 'production',
-  safetyLevel: SafetyLevel.SAFE,
-  sanitizationRules: rules,
-});
 ```
 
-### Filter by Language (DACH Focus)
+### Filtering by Language
+
+Load patterns for specific languages:
 
 ```typescript
-import {PresidioLoader} from '@wireapp/logging';
-
-const loader = new PresidioLoader();
-loader.loadFromJSON(presidioJson);
-
-// Load only German patterns + global patterns
+// Load German patterns plus global patterns
 const germanRules = loader.toSanitizationRules({
   language: 'de',
 });
 
-// This will include:
+// This includes:
 // - All 'de' language recognizers (German Tax ID, VAT ID, etc.)
 // - All 'all' language recognizers (Email, Credit Card, etc.)
 ```
 
-### Filter by Entity Types
+### Filtering by Entity Type
+
+Load only specific PII types:
 
 ```typescript
 // Load only high-sensitivity patterns
@@ -132,18 +92,19 @@ const highSensitivityRules = loader.toSanitizationRules({
 });
 ```
 
-### Merge with Custom Rules
+### Merging with Custom Rules
+
+Combine Presidio patterns with your own:
 
 ```typescript
-import {DEFAULT_SANITIZATION_RULES} from '@wireapp/logging';
+import {DEFAULT_SANITIZATION_RULES} from '@wireapp/logger';
 
-const presidioRules = loader.toSanitizationRules();
+const presidioRules = loader.toSanitizationRules({language: 'de'});
 
 const allRules = [
-  ...presidioRules, // Presidio patterns
-  ...DEFAULT_SANITIZATION_RULES, // Our custom patterns
+  ...presidioRules,                    // Presidio patterns
+  ...DEFAULT_SANITIZATION_RULES,       // Wire-specific patterns
   {
-    // Additional custom rule
     pattern: /wire-secret-[a-z0-9]+/gi,
     replacement: '[WIRE_SECRET]',
     appliesTo: [SafetyLevel.SAFE, SafetyLevel.SANITIZED],
@@ -151,74 +112,56 @@ const allRules = [
 ];
 ```
 
-### Load from Remote URL
-
-```typescript
-import {loadPresidioRulesFromURL} from '@wireapp/logging';
-
-// Load from CDN (async)
-const rules = await loadPresidioRulesFromURL('https://cdn.yourcompany.com/presidio-patterns.json', {language: 'de'});
-```
-
 ## Updating Patterns
 
-### Regenerate Bundled Patterns
+Update to the latest Presidio patterns:
 
 ```bash
-cd libraries/logging
-yarn ts-node scripts/fetch-presidio-patterns.ts
+yarn presidio:update
 ```
 
-This will update `src/presidio/presidio-recognizers.json` with the latest curated patterns.
+This script:
+1. Fetches the latest recognizers from Microsoft's Presidio GitHub
+2. Updates `src/presidio/presidio-recognizers.json`
+3. Displays summary of changes
 
-### Add More Recognizers
+Run this periodically to keep PII patterns up to date.
 
-Edit `scripts/fetch-presidio-patterns.ts` and add to the `CURATED_RECOGNIZERS` array:
+## Supported Patterns
 
-```typescript
-const CURATED_RECOGNIZERS: PresidioRecognizer[] = [
-  // ... existing recognizers
+The bundled patterns include recognizers for:
 
-  // Add new recognizer
-  {
-    name: 'French IBAN Recognizer',
-    supported_language: 'fr',
-    supported_entity: 'FR_IBAN',
-    patterns: [
-      {
-        name: 'French IBAN',
-        regex: '\\bFR\\d{2}[ ]?\\d{5}[ ]?\\d{5}[ ]?\\d{11}[ ]?\\d{2}\\b',
-        score: 0.8,
-      },
-    ],
-  },
-];
-```
+**Global**: Credit cards, emails, phone numbers, IP addresses, IBANs, URLs, cryptocurrency addresses
 
-Then regenerate:
+**DACH Region**: German, Austrian, and Swiss tax IDs, VAT IDs, AHV numbers, license plates
 
-```bash
-yarn ts-node scripts/fetch-presidio-patterns.ts
-```
+**United States**: Social Security Numbers, passport numbers
+
+**United Kingdom**: NHS numbers
+
+**Spain**: NIF (tax identification numbers)
+
+**Italy**: Fiscal codes
 
 ## Entity Type Mapping
 
-The converter automatically maps Presidio entity types to our placeholders:
+Presidio entity types are automatically mapped to replacement placeholders:
 
-| Presidio Entity | Replacement     | Sensitivity             |
-| --------------- | --------------- | ----------------------- |
-| `CREDIT_CARD`   | `[CREDIT_CARD]` | High (SAFE + SANITIZED) |
-| `US_SSN`        | `[SSN]`         | High (SAFE + SANITIZED) |
-| `EMAIL_ADDRESS` | `[EMAIL]`       | Medium (SANITIZED)      |
-| `PHONE_NUMBER`  | `[PHONE]`       | Medium (SANITIZED)      |
-| `IBAN_CODE`     | `[IBAN]`        | High (SAFE + SANITIZED) |
-| `DE_VAT_ID`     | `[VAT_ID]`      | High (SAFE + SANITIZED) |
-| `CH_AHV`        | `[AHV_NUMBER]`  | High (SAFE + SANITIZED) |
-| ...             | ...             | ...                     |
+| Presidio Entity | Replacement     | Sensitivity Level |
+|-----------------|-----------------|-------------------|
+| CREDIT_CARD     | [CREDIT_CARD]   | High              |
+| US_SSN          | [SSN]           | High              |
+| EMAIL_ADDRESS   | [EMAIL]         | Medium            |
+| PHONE_NUMBER    | [PHONE]         | Medium            |
+| IBAN_CODE       | [IBAN]          | High              |
+| DE_VAT_ID       | [VAT_ID]        | High              |
+| CH_AHV          | [AHV_NUMBER]    | High              |
+
+High-sensitivity patterns apply to both SAFE and SANITIZED safety levels. Medium-sensitivity patterns apply only to SANITIZED level.
 
 ## Pattern Metadata
 
-Each converted rule includes metadata for tracking and debugging:
+Each converted rule includes metadata for tracking:
 
 ```typescript
 {
@@ -234,104 +177,50 @@ Each converted rule includes metadata for tracking and debugging:
 }
 ```
 
-This allows you to:
+This metadata helps with:
+- Tracking which patterns come from Presidio versus custom sources
+- Debugging pattern matches by entity type
+- Filtering rules by confidence level
+- Auditing pattern coverage
 
-- Track which patterns are from Presidio vs custom
-- Debug pattern matches by entity type
-- Filter rules by confidence level
-- Audit pattern coverage
+## Benefits Over Custom Patterns
+
+| Custom Patterns         | Presidio Integration    |
+|-------------------------|-------------------------|
+| Manual maintenance      | Expert-maintained       |
+| Single language         | Multi-language support  |
+| Static patterns         | Regular updates         |
+| Higher false positives  | Battle-tested accuracy  |
+| Custom compliance       | GDPR/PCI-DSS built-in   |
+| No versioning           | Versioned with metadata |
 
 ## Testing
 
-Run Presidio loader tests:
+Presidio integration is fully tested:
 
 ```bash
 yarn test PresidioLoader.test.ts
 ```
 
-All tests (13/13) pass:
+Tests cover:
+- Loading recognizers from JSON
+- Converting to sanitization rules
+- Filtering by language and entity types
+- Metadata extraction
+- Integration with bundled patterns
 
-- ✅ Loading recognizers from JSON
-- ✅ Converting to sanitization rules
-- ✅ Filtering by language
-- ✅ Filtering by entity types
-- ✅ Metadata extraction
-- ✅ Integration with bundled patterns
+## Related Files
 
-## Benefits Over Custom Regex
-
-| Custom Regex              | Presidio Integration               |
-| ------------------------- | ---------------------------------- |
-| Manual maintenance        | Expert-maintained by Microsoft     |
-| Single language focus     | 20+ languages supported            |
-| Static patterns           | Regular updates available          |
-| Higher false positives    | Battle-tested accuracy             |
-| Custom compliance mapping | GDPR/PCI-DSS built-in              |
-| No versioning             | Versioned patterns with timestamps |
-
-## Migration Path
-
-### Current: Custom Patterns Only
-
-```typescript
-const logger = getLogger('MyComponent', {
-  sanitizationRules: DEFAULT_SANITIZATION_RULES,
-});
-```
-
-### Future: Presidio + Custom (Recommended)
-
-```typescript
-const presidioRules = loader.toSanitizationRules({language: 'de'});
-const allRules = [...presidioRules, ...DEFAULT_SANITIZATION_RULES];
-
-const logger = getLogger('MyComponent', {
-  sanitizationRules: allRules,
-});
-```
-
-### Long-term: Presidio Only
-
-```typescript
-// Once Presidio patterns are proven stable
-const logger = getLogger('MyComponent', {
-  sanitizationRules: loader.toSanitizationRules(),
-});
-```
-
-## Bundled Patterns
-
-Current bundled patterns (v1.0.0) include:
-
-- **Global** (9 recognizers): Credit cards, emails, phone numbers, IPs (IPv4/IPv6), IBANs, URLs, crypto addresses
-- **DACH** (6 recognizers): German/Austrian/Swiss tax IDs, VAT IDs, AHV numbers, license plates
-- **USA** (2 recognizers): SSN, passports
-- **UK** (1 recognizer): NHS numbers
-- **Spain** (1 recognizer): NIF
-- **Italy** (1 recognizer): Fiscal codes
-
-**Total: 19 recognizers, 19 patterns**
-
-## Future Enhancements
-
-1. **Automatic Updates**: Script to fetch latest Presidio patterns from GitHub
-2. **Context-aware Recognition**: Use Presidio's context words for better accuracy
-3. **Checksum Validation**: Enable Presidio's checksum validators (e.g., Luhn for credit cards)
-4. **ML-based Detection**: Integrate Presidio's NER models for name detection
-5. **Custom Recognizers**: UI to add custom Presidio recognizers without editing code
+- `src/presidio/PresidioTypes.ts` - TypeScript type definitions
+- `src/presidio/PresidioConverter.ts` - Pattern converter
+- `src/presidio/PresidioLoader.ts` - Main loader class
+- `scripts/updatePresidio.js` - Pattern update script
+- `src/presidio/presidio-recognizers.json` - Bundled patterns
+- `src/__tests__/PresidioLoader.test.ts` - Tests
 
 ## References
 
 - [Microsoft Presidio Documentation](https://microsoft.github.io/presidio/)
 - [Presidio GitHub Repository](https://github.com/microsoft/presidio)
-- [Presidio Supported Entities](https://microsoft.github.io/presidio/supported_entities/)
-- [Adding Recognizers Tutorial](https://microsoft.github.io/presidio/analyzer/adding_recognizers/)
-
-## Related Files
-
-- [src/presidio/PresidioTypes.ts](../src/presidio/PresidioTypes.ts) - TypeScript types
-- [src/presidio/PresidioConverter.ts](../src/presidio/PresidioConverter.ts) - Pattern converter
-- [src/presidio/PresidioLoader.ts](../src/presidio/PresidioLoader.ts) - Main loader class
-- [scripts/fetch-presidio-patterns.ts](../scripts/fetch-presidio-patterns.ts) - Pattern generator
-- [examples/presidio-integration.ts](../examples/presidio-integration.ts) - Usage examples
-- [src/**tests**/PresidioLoader.test.ts](../src/__tests__/PresidioLoader.test.ts) - Tests
+- [Supported Entities](https://microsoft.github.io/presidio/supported_entities/)
+- [Adding Recognizers](https://microsoft.github.io/presidio/analyzer/adding_recognizers/)
