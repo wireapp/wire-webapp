@@ -659,6 +659,8 @@ export const VideoControls = ({
             data-uie-value={selfSharesScreen ? 'active' : 'inactive'}
             data-uie-enabled={canShareScreen ? 'true' : 'false'}
             data-uie-name="do-toggle-screen"
+            role="switch"
+            aria-checked={selfSharesScreen}
             title={t('videoCallOverlayShareScreen')}
           >
             {selfSharesScreen ? (
