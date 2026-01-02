@@ -543,6 +543,11 @@ export const VideoControls = ({
                   setAudioOptionsOpen(false);
                 }
               }}
+              aria-label={
+                audioOptionsOpen
+                  ? t('videoCallOverlayCloseOptions')
+                  : t('videoCallOverlayOpenMicrophoneAndSpeakerOptions')
+              }
             >
               {audioOptionsOpen ? (
                 <>
@@ -613,6 +618,9 @@ export const VideoControls = ({
                     setVideoOptionsOpen(false);
                   }
                 }}
+                aria-label={
+                  videoOptionsOpen ? t('videoCallOverlayCloseOptions') : t('videoCallOverlayOpenCameraOptions')
+                }
               >
                 {videoOptionsOpen ? (
                   <>
