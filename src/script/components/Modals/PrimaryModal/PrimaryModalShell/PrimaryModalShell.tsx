@@ -56,9 +56,14 @@ export const PrimaryModalShell = ({
       return undefined;
     }
 
-    const detachedWindowRoot = (container as HTMLElement).querySelector?.('#detached-window') as HTMLElement;
+    // Safety check
+    const element = container instanceof HTMLElement ? container : null;
+    if (!element?.querySelector) {
+      return undefined;
+    }
 
-    if (!detachedWindowRoot) {
+    const detachedWindowRoot = element.querySelector('#detached-window');
+    if (!detachedWindowRoot || !(detachedWindowRoot instanceof HTMLElement)) {
       return undefined;
     }
 
