@@ -19,6 +19,8 @@
 
 import {ReactNode, useEffect, useRef} from 'react';
 
+import {Runtime} from '@wireapp/commons';
+
 import {ModalComponent} from 'Components/Modals/ModalComponent';
 
 import {largeModalStyles} from './PrimaryModalShell.styles';
@@ -33,6 +35,7 @@ interface PrimaryModalShellProps {
   onClose: () => void;
   onBgClick: () => void;
   size?: ModalSize;
+  container?: Element | DocumentFragment;
 }
 
 export const PrimaryModalShell = ({
@@ -43,14 +46,48 @@ export const PrimaryModalShell = ({
   onClose,
   onBgClick,
   size,
+  container,
 }: PrimaryModalShellProps) => {
   const modalsRef = useRef<HTMLDivElement | null>(null);
 
+  // Make detached window background inert when modal is shown
   useEffect(() => {
-    if (isShown) {
-      modalsRef.current?.focus();
+    if (!container) {
+      return undefined;
     }
-  }, [isShown]);
+
+    const detachedWindowRoot = (container as HTMLElement).querySelector?.('#detached-window') as HTMLElement;
+
+    if (!detachedWindowRoot) {
+      return undefined;
+    }
+
+    const applyInertAttributes = (element: HTMLElement) => {
+      element.setAttribute('aria-hidden', 'true');
+      (element as any).inert = '';
+      if (Runtime.isDesktopApp()) {
+        element.setAttribute('tabIndex', '-1');
+        element.style.pointerEvents = 'none';
+      }
+    };
+
+    const removeInertAttributes = (element: HTMLElement) => {
+      element.removeAttribute('aria-hidden');
+      delete (element as any).inert;
+      if (Runtime.isDesktopApp()) {
+        element.removeAttribute('tabIndex');
+        element.style.pointerEvents = '';
+      }
+    };
+
+    if (isShown) {
+      applyInertAttributes(detachedWindowRoot);
+    }
+
+    return () => {
+      removeInertAttributes(detachedWindowRoot);
+    };
+  }, [isShown, container]);
 
   return (
     <div
@@ -68,6 +105,7 @@ export const PrimaryModalShell = ({
         onBgClick={onBgClick}
         data-uie-name={dataUieName}
         wrapperCSS={size === 'large' ? largeModalStyles : undefined}
+        container={container}
       >
         {isShown && children}
       </ModalComponent>

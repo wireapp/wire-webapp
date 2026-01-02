@@ -58,6 +58,7 @@ export const PrimaryModalComponent: FC = () => {
   const updateCurrentModalContent = usePrimaryModalState(state => state.updateCurrentModalContent);
   const currentId = usePrimaryModalState(state => state.currentModalId);
   const primaryActionButtonRef = useRef<HTMLButtonElement>(null);
+  const closeButtonRef = useRef<HTMLButtonElement>(null);
   const isModalVisible = currentId !== null;
   const passwordValueRef = useRef<HTMLInputElement>(null);
   const [isFormSubmitted, setIsFormSubmitted] = useState(false);
@@ -83,6 +84,7 @@ export const PrimaryModalComponent: FC = () => {
     allButtonsFullWidth = false,
     primaryBtnFirst = false,
     size = 'small',
+    container,
   } = content;
 
   const isPassword = currentType === PrimaryModalType.PASSWORD;
@@ -207,21 +209,38 @@ export const PrimaryModalComponent: FC = () => {
 
   const secondaryActions = Array.isArray(secondaryAction) ? secondaryAction : [secondaryAction];
 
+  // Auto-focus close button when modal opens
   useEffect(() => {
-    const onKeyPress = (event: KeyboardEvent) => {
+    if (!isModalVisible) {
+      return undefined;
+    }
+
+    // Use setTimeout to ensure the modal is fully rendered before focusing
+    const timeoutId = setTimeout(() => {
+      if (closeButtonRef.current) {
+        closeButtonRef.current.focus();
+      }
+    }, 0);
+
+    return () => clearTimeout(timeoutId);
+  }, [isModalVisible]);
+
+  useEffect(() => {
+    const onKeyDown = (event: KeyboardEvent) => {
       if (isEscapeKey(event) && isModalVisible) {
         removeCurrentModal();
         closeAction();
       }
 
       if (isEnterKey(event) && primaryAction?.runActionOnEnterClick) {
+        event.preventDefault();
         primaryAction?.action?.();
         removeCurrentModal();
       }
     };
 
-    document.addEventListener('keypress', onKeyPress);
-    return () => document.removeEventListener('keypress', onKeyPress);
+    document.addEventListener('keydown', onKeyDown);
+    return () => document.removeEventListener('keydown', onKeyDown);
   }, [primaryAction, isModalVisible]);
 
   const closeAction = () => {
@@ -272,8 +291,10 @@ export const PrimaryModalComponent: FC = () => {
       onBgClick={onBgClick}
       dataUieName={modalUie}
       size={size}
+      container={container}
     >
       <PrimaryModalHeader
+        ref={closeButtonRef}
         titleText={titleText}
         closeBtnTitle={closeBtnTitle}
         hideCloseBtn={hideCloseBtn}

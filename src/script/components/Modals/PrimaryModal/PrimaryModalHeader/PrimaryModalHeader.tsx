@@ -17,6 +17,8 @@
  *
  */
 
+import {forwardRef} from 'react';
+
 import * as Icon from 'Components/Icon';
 
 import {removeCurrentModal} from '../PrimaryModalState';
@@ -28,26 +30,31 @@ interface ModalHeaderProps {
   closeAction: () => void;
 }
 
-export const PrimaryModalHeader = ({titleText, closeAction, closeBtnTitle, hideCloseBtn}: ModalHeaderProps) => {
-  return (
-    <div className="modal__header" data-uie-name="status-modal-title">
-      <h2 className="modal__header__title" id="modal-title">
-        {titleText}
-      </h2>
-      {!hideCloseBtn && (
-        <button
-          type="button"
-          className="modal__header__button"
-          onClick={() => {
-            removeCurrentModal();
-            closeAction();
-          }}
-          aria-label={closeBtnTitle}
-          data-uie-name="do-close"
-        >
-          <Icon.CloseIcon className="modal__header__icon" aria-hidden="true" />
-        </button>
-      )}
-    </div>
-  );
-};
+export const PrimaryModalHeader = forwardRef<HTMLButtonElement, ModalHeaderProps>(
+  ({titleText, closeAction, closeBtnTitle, hideCloseBtn}, ref) => {
+    return (
+      <div className="modal__header" data-uie-name="status-modal-title">
+        <h2 className="modal__header__title" id="modal-title">
+          {titleText}
+        </h2>
+        {!hideCloseBtn && (
+          <button
+            ref={ref}
+            type="button"
+            className="modal__header__button"
+            onClick={() => {
+              removeCurrentModal();
+              closeAction();
+            }}
+            aria-label={closeBtnTitle}
+            data-uie-name="do-close"
+          >
+            <Icon.CloseIcon className="modal__header__icon" aria-hidden="true" />
+          </button>
+        )}
+      </div>
+    );
+  },
+);
+
+PrimaryModalHeader.displayName = 'PrimaryModalHeader';
