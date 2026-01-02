@@ -177,7 +177,7 @@ The library provides multiple layers of defense:
 
 ## Implementation Status
 
-### Completed (December 2025 - January 2026)
+### Phase 1: Core Library & Initial Integration (Completed)
 
 The core library is complete with production/development API separation, automatic PII sanitization through Microsoft Presidio integration, multi-transport support, global singleton architecture, in-memory buffer, and console override implementation.
 
@@ -191,10 +191,228 @@ Tooling includes automated Presidio pattern updates via `yarn presidio:update`, 
 
 Comprehensive documentation covers the library, Presidio integration, and this architectural decision record. Full test coverage validates the implementation.
 
-### Remaining Work
+### Phase 2: Production Validation & Distribution (In Progress)
 
-The console override code exists but needs activation in production builds. The last remaining console.log statement should be migrated to the new logger.
+**Testing & Validation**:
+- Test Datadog integration in production environment to verify log delivery, correlation IDs, and RUM integration work correctly
+- Test Electron file logging to ensure logs are written to disk with proper rotation and the global singleton pattern works across main and renderer processes
+- Verify console override behavior in production builds
 
-### Future Enhancements
+**Distribution**:
+- Publish library to NPM registry as `@wireapp/logger` for external use and version management
+- Establish versioning strategy and release process
 
-Optional improvements include log sampling for high-volume scenarios, ESLint rules to enforce logger usage patterns, custom transport plugins, and build-time log statement analysis.
+**Electron Migration**:
+- Remove old file logging implementation from Electron wrapper
+- Ensure file transport is initialized first in the Electron main process
+- Verify log file location, rotation, and accessibility for support
+)
+
+### Phase 3: Development Logging Migration (Not Started)
+
+**Codebase-Wide Migration**:
+- Replace all existing logger calls throughout web-packages with `.development.*` methods
+- This ensures all current logging is explicitly marked as development-only and will not be sent to Datadog
+- Review each logger instance to understand its purpose and appropriate log level
+
+**Rationale**: Start by making all logs development-only to establish a secure baseline. This prevents accidentally sending sensitive data to Datadog while we review what should be production logging.
+
+### Phase 4: Production Logging Strategy (Not Started)
+
+**Define Production Logging Standards**:
+- Identify what events and metrics are valuable for production monitoring
+- Define which errors require production tracking versus development-only debugging
+- Establish guidelines for production log context (what data is safe to include)
+- Document production logging patterns and anti-patterns
+
+**Add Production Logging**:
+- Systematically add `.production.*` logs for critical events, errors, and metrics
+- Focus on operational visibility: API failures, authentication issues, feature usage, performance metrics
+- Ensure all production logs contain only whitelisted context keys
+- Review each production log for PII safety
+
+**Examples of Production-Worthy Logs**:
+- Authentication failures with error codes
+- API request failures with status codes and endpoints
+- Feature flag activations
+- Critical user flows (login, message send, call start)
+- Performance metrics (API latency, render times)
+- Client configuration issues
+
+### Phase 5: Final Hardening (Not Started)
+
+**Console Override Activation**:
+- Activate `installConsoleOverride()` in production builds to silence accidental console.log
+- Test in staging environment first
+
+**Remaining Cleanup**:
+- Migrate the last console.log statement in MLSConversations
+- Final audit of all logging to ensure production/development separation is correct
+
+### Improvements & Enhancements
+
+The following improvements would enhance the library's usability and functionality:
+
+#### Timer API for Performance Measurement
+
+**What**: Console.time/console.timeEnd equivalent that integrates with the logger.
+
+**Why**: Performance measurements often need to correlate with other logs. A timer API that uses the same logger infrastructure would provide better context and ensure timing data is properly sanitized when logged.
+
+**How**:
+```typescript
+// Start a timer
+logger.development.timer.start('apiCall');
+
+// Log intermediate time
+logger.development.log('apiCall', 'Request sent'); // Logs elapsed time
+
+// End timer and log final duration
+logger.development.timer.end('apiCall'); // Logs total duration
+```
+
+**Benefits**:
+- Automatic duration calculation
+- Consistent formatting across the codebase
+- Integration with production/development logging (timing data can be production-safe)
+- Correlation IDs can link timers to other log events
+
+#### Log Sampling for High-Volume Scenarios
+
+**What**: Configurable sampling rate to reduce log volume and costs for high-frequency events.
+
+**Why**: Some events (like network requests or render loops) can generate thousands of logs per second. Sending all of these to Datadog is expensive and creates noise. Sampling allows us to capture representative data without overwhelming the system.
+
+**How**:
+```typescript
+// Sample 10% of logs for this logger
+const logger = getLogger('HighVolumeComponent', {sampleRate: 0.1});
+
+// Or configure per-transport
+{
+  datadog: {
+    enabled: true,
+    sampleRate: 0.1, // Only send 10% of production logs to Datadog
+  }
+}
+```
+
+**Use Cases**:
+- Audio/video signaling logs (already have AVS filtering, sampling would be additional)
+- Mouse move or scroll events
+- Network request logging in high-traffic scenarios
+- Render performance logging
+- Websocket message logging
+
+**Benefits**:
+- Reduces Datadog costs significantly for high-volume loggers
+- Still provides representative data for understanding system behavior
+- Can sample differently per environment (100% in staging, 1% in production)
+- Sampling decisions made before sanitization, saving processing time
+
+**Implementation Considerations**:
+- Sampling happens deterministically (same session always samples or doesn't)
+- Or random sampling per log call (different logs from same session)
+- Sample rate configurable per logger, per transport, or globally
+- Important errors should bypass sampling (ERROR/FATAL always sent)
+
+#### ESLint Rules for Logger Enforcement
+
+**What**: Custom ESLint rules that enforce proper logger usage patterns.
+
+**Why**: Prevent common mistakes before code reaches production. Automated enforcement is more reliable than code review alone.
+
+**Rules**:
+- `no-console`: Disallow console.log/info/debug/warn (except in tests)
+- `require-production-method`: Prevent accidentally using generic `logger.info()` instead of `logger.production.info()` or `logger.development.info()`
+- `no-sensitive-context-keys`: Warn when using non-whitelisted context keys in production logs
+- `production-log-review`: Require special comment or annotation for new `.production.*` logs
+
+**Benefits**:
+- Catch issues during development, not in production
+- Enforce team standards automatically
+- Reduce cognitive load in code review
+- Build institutional knowledge into tooling
+
+#### Build-Time Log Analysis
+
+**What**: Script that analyzes all log statements during build and generates a report.
+
+**Why**: Understanding what gets logged where helps with security auditing and cost management.
+
+**Output**:
+- Count of production vs development logs
+- List of all production log context keys used
+- Loggers with highest call count (candidates for sampling)
+- Production logs that might need review
+- Unused loggers
+
+**Benefits**:
+- Security audit trail
+- Cost estimation for Datadog
+- Identify high-volume loggers before they become problems
+- Documentation of logging surface area
+
+#### Custom Transport Plugins
+
+**What**: Public API for adding custom transport implementations.
+
+**Why**: Organizations might want to send logs to other destinations beyond Datadog and file (e.g., Sentry, Elasticsearch, custom internal systems).
+
+**How**:
+```typescript
+class CustomTransport implements Transport {
+  log(entry: LogEntry): void {
+    // Custom logic
+  }
+}
+
+updateLoggerConfig({
+  transports: {
+    custom: new CustomTransport(),
+  },
+});
+```
+
+**Benefits**:
+- Flexibility for different deployment scenarios
+- Easier testing (mock transport)
+- Community contributions
+- Gradual migration between monitoring services
+
+#### Structured Error Context
+
+**What**: Helper for extracting safe error context from Error objects.
+
+**Why**: Error objects contain useful debugging information, but they can also contain sensitive data in messages or stack traces. A helper that extracts only safe fields would be useful.
+
+**How**:
+```typescript
+try {
+  await riskyOperation();
+} catch (error) {
+  logger.production.error('Operation failed', error, {
+    operation: 'riskyOperation',
+    // Error name, code, and sanitized message automatically extracted
+  });
+}
+```
+
+**Benefits**:
+- Consistent error logging
+- Automatic stack trace sanitization
+- Extract error codes and types safely
+- Integration with error tracking services
+
+#### Performance Monitoring Integration
+
+**What**: Hooks for integrating with performance monitoring tools beyond Datadog RUM.
+
+**Why**: Some teams use specialized performance monitoring tools (e.g., Sentry, New Relic) and want to correlate logs with performance data.
+
+**How**: Callbacks or events when certain log types occur, allowing integration code to forward data to other systems without coupling the logger to specific services.
+
+**Benefits**:
+- Flexible performance monitoring strategy
+- Correlate logs with performance traces
+- Use best-of-breed tools for different purposes
