@@ -2010,16 +2010,20 @@ declare module 'I18n/en-US.json' {
     'videoCallMenuMoreRaiseHand': `Raise hand`;
     'videoCallMenuMoreSeeParticipants': `See participants`;
     'videoCallMenuMoreVideoSettings': `Video Settings`;
+    'videoCallNoCameraAvailable': `No options`;
     'videoCallOverlayCamera': `Camera`;
     'videoCallOverlayChangeViewMode': `Change view mode`;
     'videoCallOverlayCloseFullScreen': `Go back to minimized view`;
+    'videoCallOverlayCloseOptions': `Close options`;
     'videoCallOverlayConversations': `Conversations`;
     'videoCallOverlayFitVideoLabel': `Double-click to view full screen`;
     'videoCallOverlayFitVideoLabelGoBack': `Double-click to show all participants`;
     'videoCallOverlayHangUp': `Hang Up`;
     'videoCallOverlayHideParticipantsList': `Hide participants list`;
     'videoCallOverlayMicrophone': `Microphone`;
+    'videoCallOverlayOpenCameraOptions': `Open camera options`;
     'videoCallOverlayOpenFullScreen': `Open the call in full screen`;
+    'videoCallOverlayOpenMicrophoneAndSpeakerOptions': `Open microphone and speaker options`;
     'videoCallOverlayOpenPopupWindow': `Open in a new window`;
     'videoCallOverlayParticipantsListCloseButton': `Hide participants`;
     'videoCallOverlayParticipantsListLabel': `Participants ({count})`;
@@ -2048,7 +2052,6 @@ declare module 'I18n/en-US.json' {
     'videoCallbackgroundBlurHeadline': `Background`;
     'videoCallbackgroundNotBlurred': `Don\'t blur my background`;
     'videoCallvideoInputCamera': `Camera`;
-    'videoCallNoCameraAvailable': `No options`;
     'videoSpeakersTabAll': `All ({count})`;
     'videoSpeakersTabSpeakers': `Speakers`;
     'viewingInAnotherWindow': `Viewing in another window`;
