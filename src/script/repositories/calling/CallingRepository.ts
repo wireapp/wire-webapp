@@ -84,6 +84,7 @@ import {calculateChildWindowPosition} from 'Util/DOM/caculateChildWindowPosition
 import {isDetachedCallingFeatureEnabled} from 'Util/isDetachedCallingFeatureEnabled';
 import {t} from 'Util/LocalizerUtil';
 import {getLogger, Logger} from 'Util/Logger';
+import {captureModalFocusContext} from 'Util/ModalFocusUtil';
 import {roundLogarithmic} from 'Util/NumberUtil';
 import {matchQualifiedIds} from 'Util/QualifiedId';
 import {copyStyles} from 'Util/renderElement';
@@ -2782,31 +2783,21 @@ export class CallingRepository {
 
   /**
    * Helper method to get modal container and restore focus callback
-   * @returns Object containing container, targetDocument, and a focus restoration callback
+   * Call this method immediately before showing a modal to ensure the correct active element is captured.
+   * @returns Object containing container and focus restoration callback
    */
-  private getModalContainerAndRestoreFocusCallback(): {
-    container?: HTMLElement;
-    targetDocument: Document;
-    restoreFocusCallback: (additionalCallback?: () => void) => () => void;
-  } {
+  private getModalContainerAndRestoreFocusCallback() {
     const detachedWindow = this.callState.detachedWindow();
     const isDetachedWindow = this.callState.viewMode() === CallingViewMode.DETACHED_WINDOW;
-    const targetDocument = isDetachedWindow && detachedWindow ? detachedWindow.document : document;
-    const previouslyFocusedElement = targetDocument.activeElement as HTMLElement;
+
+    const context = captureModalFocusContext({
+      targetDocument: isDetachedWindow && detachedWindow ? detachedWindow.document : undefined,
+      container: isDetachedWindow && detachedWindow ? detachedWindow.document.body : undefined,
+    });
 
     return {
-      container: isDetachedWindow && detachedWindow ? detachedWindow.document.body : undefined,
-      targetDocument,
-      restoreFocusCallback: (additionalCallback?: () => void) => () => {
-        // Execute additional callback if provided
-        if (additionalCallback) {
-          additionalCallback();
-        }
-        // Restore focus to the button that triggered the modal
-        if (previouslyFocusedElement && typeof previouslyFocusedElement.focus === 'function') {
-          previouslyFocusedElement.focus();
-        }
-      },
+      container: context.container,
+      restoreFocusCallback: context.createFocusRestorationCallback,
     };
   }
 

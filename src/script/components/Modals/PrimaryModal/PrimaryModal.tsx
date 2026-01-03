@@ -17,7 +17,7 @@
  *
  */
 
-import {FC, FormEvent, MouseEvent, useState, useRef, ChangeEvent, useEffect, useMemo} from 'react';
+import {FC, FormEvent, MouseEvent, useState, useRef, ChangeEvent, useEffect, useMemo, useCallback} from 'react';
 
 import {ValidationUtil} from '@wireapp/commons';
 import {ErrorMessage} from '@wireapp/react-ui-kit';
@@ -209,6 +209,13 @@ export const PrimaryModalComponent: FC = () => {
 
   const secondaryActions = Array.isArray(secondaryAction) ? secondaryAction : [secondaryAction];
 
+  const closeAction = useCallback(() => {
+    if (hasPasswordWithRules) {
+      const [closeActionItem] = secondaryActions;
+      closeActionItem?.action?.();
+    }
+  }, [hasPasswordWithRules, secondaryActions]);
+
   // Auto-focus close button when modal opens
   useEffect(() => {
     if (!isModalVisible) {
@@ -217,17 +224,23 @@ export const PrimaryModalComponent: FC = () => {
 
     // Use setTimeout to ensure the modal is fully rendered before focusing
     const timeoutId = setTimeout(() => {
-      if (closeButtonRef.current) {
-        closeButtonRef.current.focus();
+      // Focus primary button if it should come first, otherwise focus close button
+      const targetElement = primaryBtnFirst ? primaryActionButtonRef.current : closeButtonRef.current;
+      const fallbackElement = primaryBtnFirst ? closeButtonRef.current : primaryActionButtonRef.current;
+
+      if (targetElement) {
+        targetElement.focus();
+      } else if (fallbackElement) {
+        fallbackElement.focus();
       }
     }, 0);
 
     return () => clearTimeout(timeoutId);
-  }, [isModalVisible]);
+  }, [isModalVisible, primaryBtnFirst]);
 
-  useEffect(() => {
-    const onKeyDown = (event: KeyboardEvent) => {
-      if (isEscapeKey(event) && isModalVisible) {
+  const onKeyDown = useCallback(
+    (event: KeyboardEvent) => {
+      if (isEscapeKey(event)) {
         removeCurrentModal();
         closeAction();
       }
@@ -237,18 +250,18 @@ export const PrimaryModalComponent: FC = () => {
         primaryAction?.action?.();
         removeCurrentModal();
       }
-    };
+    },
+    [closeAction, primaryAction],
+  );
+
+  useEffect(() => {
+    if (!isModalVisible) {
+      return undefined;
+    }
 
     document.addEventListener('keydown', onKeyDown);
     return () => document.removeEventListener('keydown', onKeyDown);
-  }, [primaryAction, isModalVisible]);
-
-  const closeAction = () => {
-    if (hasPasswordWithRules) {
-      const [closeAction] = secondaryActions;
-      closeAction?.action?.();
-    }
-  };
+  }, [isModalVisible, primaryAction, closeAction, onKeyDown]);
 
   const secondaryButtons = secondaryActions
     .filter((action): action is ButtonAction => action !== null && !!action.text)
