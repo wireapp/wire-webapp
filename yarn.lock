@@ -3084,13 +3084,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@formatjs/cli@npm:6.8.6":
-  version: 6.8.6
-  resolution: "@formatjs/cli@npm:6.8.6"
+"@formatjs/cli@npm:6.9.0":
+  version: 6.9.0
+  resolution: "@formatjs/cli@npm:6.9.0"
   peerDependencies:
     "@glimmer/syntax": ^0.95.0
     "@vue/compiler-core": ^3.5.12
-    content-tag: ^3.0.0
+    content-tag: 4
     ember-template-recast: ^6.1.5
     vue: ^3.5.12
   peerDependenciesMeta:
@@ -3112,7 +3112,7 @@ __metadata:
       optional: true
   bin:
     formatjs: bin/formatjs
-  checksum: 10/93559b7aa9c1d00e9dae648de170083d5682a006df37f2da8bc1fb202a43424aea45bc6701dff775a4ea328fbd18b18dc2b8dd3a6d3588e0b8a90fa69fcce137
+  checksum: 10/5fa0b4502825a67d99d4d0a01d86d801c80045258689bacfd12816d27fd52d0ced598cce07188d17f53e8bb902b0b24dac8c0410038e9d3e335ca72065fc6ee6
   languageName: node
   linkType: hard
 
@@ -20622,7 +20622,7 @@ __metadata:
     "@emotion/eslint-plugin": "npm:11.11.0"
     "@emotion/react": "npm:11.11.4"
     "@faker-js/faker": "npm:9.9.0"
-    "@formatjs/cli": "npm:6.8.6"
+    "@formatjs/cli": "npm:6.9.0"
     "@formkit/auto-animate": "npm:0.9.0"
     "@lexical/code": "npm:0.27.2"
     "@lexical/history": "npm:0.27.2"
