@@ -14,7 +14,7 @@
   },
   "dependencies": {
     "@aws-sdk/client-s3": "3.958.0",
-    "@aws-sdk/lib-storage": "3.958.0",
+    "@aws-sdk/lib-storage": "3.962.0",
     "@wireapp/commons": "workspace:^",
     "@wireapp/priority-queue": "workspace:^",
     "@wireapp/protocol-messaging": "1.56.0",
