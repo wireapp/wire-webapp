@@ -55,7 +55,7 @@
     "emoji-picker-react": "4.16.1",
     "http-status-codes": "2.3.0",
     "immer": "10.2.0",
-    "jimp": "0.22.12",
+    "jimp": "1.6.0",
     "js-cookie": "3.0.5",
     "jszip": "3.10.1",
     "keyboardjs": "2.7.0",
