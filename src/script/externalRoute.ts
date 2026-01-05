@@ -24,15 +24,6 @@ const URL = Config.getConfig().URL;
 
 const isProductionWebsite = URL.WEBSITE_BASE && URL.WEBSITE_BASE === 'https://wire.com';
 
-/**
- * Check if audit logging is enabled for the current backend.
- * Audit logging is explicitly disabled for the production cloud backend.
- */
-export const isAuditLogEnabledForBackend = (): boolean => {
-  const {BACKEND_REST} = Config.getConfig();
-  return BACKEND_REST !== 'https://prod-nginz-https.wire.com';
-};
-
 const getTeamSettingsUrl = (path: string = '', utmSource?: string): string | undefined => {
   const query = utmSource ? `?utm_source=${utmSource}&utm_term=desktop` : '';
   const teamSettingsUrl = `${URL.TEAMS_BASE}${path}${query}`;
