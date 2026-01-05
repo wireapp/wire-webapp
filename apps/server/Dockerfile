@@ -11,7 +11,7 @@ COPY .yarn ./.yarn
 COPY apps/server/package.json ./apps/server/package.json
 
 # Install only server production deps
-RUN yarn workspaces focus @wireapp/server --production --immutable
+RUN yarn workspaces focus @wireapp/server --production
 
 # Copy built server artifacts and runtime files
 COPY apps/server/dist /dist
