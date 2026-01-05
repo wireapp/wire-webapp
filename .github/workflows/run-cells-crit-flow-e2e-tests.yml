@@ -50,7 +50,7 @@ jobs:
 
       - name: Upload test report
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: playwright-report-${{ env.ENV }}
           path: playwright-report/

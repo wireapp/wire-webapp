@@ -55,7 +55,7 @@ jobs:
           echo "commit_url=$COMMIT_URL" >> "$GITHUB_OUTPUT"
           echo "committer=$AUTHOR" >> "$GITHUB_OUTPUT"
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v6
         with:
           name: build-artifact
           path: ${{ env.BUILD_DIR }}${{ env.BUILD_ARTIFACT }}
@@ -179,7 +179,7 @@ jobs:
 
       - name: Upload blob report
         if: ${{ !cancelled() }}
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: blob-report-${{ matrix.shard }}
           path: apps/webapp/blob-report
@@ -217,7 +217,7 @@ jobs:
       - name: Upload test report
         id: upload_playwright_report
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: playwright-report
           path: apps/webapp/playwright-report/
