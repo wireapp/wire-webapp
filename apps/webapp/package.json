@@ -144,7 +144,7 @@
     "baseline-browser-mapping": "^2.9.11",
     "browserslist": "^4.28.1",
     "copy-webpack-plugin": "13.0.1",
-    "cross-env": "7.0.3",
+    "cross-env": "10.1.0",
     "css-loader": "7.1.2",
     "cssnano": "7.1.2",
     "dexie": "4.0.7",
