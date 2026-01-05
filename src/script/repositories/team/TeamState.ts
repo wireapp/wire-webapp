@@ -26,6 +26,7 @@ import {Conversation} from 'Repositories/entity/Conversation';
 import {User} from 'Repositories/entity/User';
 import {ROLE, roleMap} from 'Repositories/user/UserPermission';
 import {UserState} from 'Repositories/user/UserState';
+import {Config} from 'src/script/Config';
 import {sortUsersByPriority} from 'Util/StringUtil';
 
 import {TeamEntity} from './TeamEntity';
@@ -144,6 +145,15 @@ export class TeamState {
     this.isAuditLogEnabled = ko.pureComputed(() => {
       return this.teamFeatures()?.assetAuditLog?.status === FEATURE_STATUS.ENABLED;
     });
+  }
+
+  /**
+   * Check if audit logging is enabled for the current backend.
+   * Audit logging is explicitly disabled for the production cloud backend.
+   */
+  static isAuditLogEnabledForBackend(): boolean {
+    const {BACKEND_REST} = Config.getConfig();
+    return BACKEND_REST !== 'https://prod-nginz-https.wire.com';
   }
 
   isInTeam(entity: User | Conversation): boolean {
