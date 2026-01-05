@@ -83,7 +83,7 @@ jobs:
       precommit_url: ${{ steps.fetch_url.outputs.url }}
 
     steps:
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v7
         with:
           name: build-artifact
 
@@ -201,7 +201,7 @@ jobs:
       - run: yarn --immutable
 
       - name: Download blob reports
-        uses: actions/download-artifact@v5
+        uses: actions/download-artifact@v7
         with:
           path: all-blob-reports
           pattern: blob-report-*
