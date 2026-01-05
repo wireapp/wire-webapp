@@ -114,15 +114,15 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@aws-sdk/client-s3@npm:3.958.0":
-  version: 3.958.0
-  resolution: "@aws-sdk/client-s3@npm:3.958.0"
+"@aws-sdk/client-s3@npm:3.962.0":
+  version: 3.962.0
+  resolution: "@aws-sdk/client-s3@npm:3.962.0"
   dependencies:
     "@aws-crypto/sha1-browser": "npm:5.2.0"
     "@aws-crypto/sha256-browser": "npm:5.2.0"
     "@aws-crypto/sha256-js": "npm:5.2.0"
     "@aws-sdk/core": "npm:3.957.0"
-    "@aws-sdk/credential-provider-node": "npm:3.958.0"
+    "@aws-sdk/credential-provider-node": "npm:3.962.0"
     "@aws-sdk/middleware-bucket-endpoint": "npm:3.957.0"
     "@aws-sdk/middleware-expect-continue": "npm:3.957.0"
     "@aws-sdk/middleware-flexible-checksums": "npm:3.957.0"
@@ -173,7 +173,7 @@ __metadata:
     "@smithy/util-utf8": "npm:^4.2.0"
     "@smithy/util-waiter": "npm:^4.2.7"
     tslib: "npm:^2.6.2"
-  checksum: 10/a6be498c0dbf273405327c47b295d0bfbc606f0b66f878f735b8129f519776d1f8cd4ddfc69e7ef2d415ea6af5713bfd4c3a99d1d51f5f4878628714fb605189
+  checksum: 10/88b529c3c7994a845eb83ef656689abe8345b8b9231797ab07d3ef01baa373bb81bc767abd9625d84ffd3fdcfdf59fb8bc0df0868ed4510bc685877fbb4d7bf9
   languageName: node
   linkType: hard
 
@@ -285,14 +285,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@aws-sdk/credential-provider-ini@npm:3.958.0":
-  version: 3.958.0
-  resolution: "@aws-sdk/credential-provider-ini@npm:3.958.0"
+"@aws-sdk/credential-provider-ini@npm:3.962.0":
+  version: 3.962.0
+  resolution: "@aws-sdk/credential-provider-ini@npm:3.962.0"
   dependencies:
     "@aws-sdk/core": "npm:3.957.0"
     "@aws-sdk/credential-provider-env": "npm:3.957.0"
     "@aws-sdk/credential-provider-http": "npm:3.957.0"
-    "@aws-sdk/credential-provider-login": "npm:3.958.0"
+    "@aws-sdk/credential-provider-login": "npm:3.962.0"
     "@aws-sdk/credential-provider-process": "npm:3.957.0"
     "@aws-sdk/credential-provider-sso": "npm:3.958.0"
     "@aws-sdk/credential-provider-web-identity": "npm:3.958.0"
@@ -303,13 +303,13 @@ __metadata:
     "@smithy/shared-ini-file-loader": "npm:^4.4.2"
     "@smithy/types": "npm:^4.11.0"
     tslib: "npm:^2.6.2"
-  checksum: 10/531a6fef016c5dd82f20e61bf05f2ef4b813c4f93fd33e53ac11ed42e0453946f8cca0d76940016e4a8e1199f272cd5b7ee8dbc0b3e99633660729d2a580c37c
+  checksum: 10/d04c7edafe3d7638909832c4ff82a8d998d5a41759ec78f1c7f32830a592fb140f5882b3973680bf76f41879b6722eea26f6cad01045ed339eb6f386056749e7
   languageName: node
   linkType: hard
 
-"@aws-sdk/credential-provider-login@npm:3.958.0":
-  version: 3.958.0
-  resolution: "@aws-sdk/credential-provider-login@npm:3.958.0"
+"@aws-sdk/credential-provider-login@npm:3.962.0":
+  version: 3.962.0
+  resolution: "@aws-sdk/credential-provider-login@npm:3.962.0"
   dependencies:
     "@aws-sdk/core": "npm:3.957.0"
     "@aws-sdk/nested-clients": "npm:3.958.0"
@@ -319,17 +319,17 @@ __metadata:
     "@smithy/shared-ini-file-loader": "npm:^4.4.2"
     "@smithy/types": "npm:^4.11.0"
     tslib: "npm:^2.6.2"
-  checksum: 10/421fe85db17f01c6796bde874e1d86e8b686911a0f65fd529bb82a5b41f9845c404917d6c8afdd0cb7ffc5900876dd2aa6d02e03176636710fa4bab8b1949144
+  checksum: 10/c2e0404cc3d9ef572521be78655df22297a7bd7bbf0933db201ab83cd5de205dc3f61ce7b6fbe8079b3a522b48348704923edae3cc80e5edf0a8dc48e654e376
   languageName: node
   linkType: hard
 
-"@aws-sdk/credential-provider-node@npm:3.958.0":
-  version: 3.958.0
-  resolution: "@aws-sdk/credential-provider-node@npm:3.958.0"
+"@aws-sdk/credential-provider-node@npm:3.962.0":
+  version: 3.962.0
+  resolution: "@aws-sdk/credential-provider-node@npm:3.962.0"
   dependencies:
     "@aws-sdk/credential-provider-env": "npm:3.957.0"
     "@aws-sdk/credential-provider-http": "npm:3.957.0"
-    "@aws-sdk/credential-provider-ini": "npm:3.958.0"
+    "@aws-sdk/credential-provider-ini": "npm:3.962.0"
     "@aws-sdk/credential-provider-process": "npm:3.957.0"
     "@aws-sdk/credential-provider-sso": "npm:3.958.0"
     "@aws-sdk/credential-provider-web-identity": "npm:3.958.0"
@@ -339,7 +339,7 @@ __metadata:
     "@smithy/shared-ini-file-loader": "npm:^4.4.2"
     "@smithy/types": "npm:^4.11.0"
     tslib: "npm:^2.6.2"
-  checksum: 10/5797068f0716a7d29995356cedf59a1e76de062c0f650e4aa4eb45e909bcdd14a684eed45b31801faef44a66c8cd4b6d762cdedec84d993ee275f34efaf1aa48
+  checksum: 10/0356b3ef2842e37a869a32b349d205eeada6074bf36391991886e7ceee35a6b83724990ae20b53e031b528f005acbf9dccbdf887be2e020b7743093df4465b55
   languageName: node
   linkType: hard
 
@@ -388,9 +388,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@aws-sdk/lib-storage@npm:3.958.0":
-  version: 3.958.0
-  resolution: "@aws-sdk/lib-storage@npm:3.958.0"
+"@aws-sdk/lib-storage@npm:3.962.0":
+  version: 3.962.0
+  resolution: "@aws-sdk/lib-storage@npm:3.962.0"
   dependencies:
     "@smithy/abort-controller": "npm:^4.2.7"
     "@smithy/middleware-endpoint": "npm:^4.4.1"
@@ -400,8 +400,8 @@ __metadata:
     stream-browserify: "npm:3.0.0"
     tslib: "npm:^2.6.2"
   peerDependencies:
-    "@aws-sdk/client-s3": ^3.958.0
-  checksum: 10/b262081a41aaef2e2d60bf29645f8f142c5222fdbd3a93ef1689ae637b9e5897225b2c8f9bcc8a47b957adeaddcbf84a076cec09b1c98049adf8747c7b38aba9
+    "@aws-sdk/client-s3": ^3.962.0
+  checksum: 10/a56832ac34c45c6c2c817eef05b1547567fb0a8eb95e3c001bf3c2c06be157db40f96d4dc46304daee12d2505810c8ca17b301ae400961a0ba8b77fad7076a29
   languageName: node
   linkType: hard
 
@@ -7164,12 +7164,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@wireapp/api-client@npm:^27.95.0":
-  version: 27.95.0
-  resolution: "@wireapp/api-client@npm:27.95.0"
+"@wireapp/api-client@npm:^27.95.2":
+  version: 27.95.2
+  resolution: "@wireapp/api-client@npm:27.95.2"
   dependencies:
-    "@aws-sdk/client-s3": "npm:3.958.0"
-    "@aws-sdk/lib-storage": "npm:3.958.0"
+    "@aws-sdk/client-s3": "npm:3.962.0"
+    "@aws-sdk/lib-storage": "npm:3.962.0"
     "@wireapp/commons": "npm:^5.4.11"
     "@wireapp/priority-queue": "npm:^2.1.17"
     "@wireapp/protocol-messaging": "npm:1.56.0"
@@ -7185,7 +7185,7 @@ __metadata:
     uuid: "npm:11.1.0"
     ws: "npm:8.18.1"
     zod: "npm:3.24.2"
-  checksum: 10/ea3cb2fe839305e35ce3b4e00781609e6156f744a56094c5120d036e52651fb032c1884047565e7d9198e79fed49018b656aaa3b47af0062f7302dd08343c413
+  checksum: 10/bcdc64f7247bd4c06bd92d510e08077d8e0cb2b2a37ba061e7e242cd1116080c2905432baba9c8771dae89b489d9effd1617388df4a3e8fa154e44a0446ce78d
   languageName: node
   linkType: hard
 
@@ -7250,11 +7250,11 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@wireapp/core@npm:46.47.1":
-  version: 46.47.1
-  resolution: "@wireapp/core@npm:46.47.1"
+"@wireapp/core@npm:46.47.3":
+  version: 46.47.3
+  resolution: "@wireapp/core@npm:46.47.3"
   dependencies:
-    "@wireapp/api-client": "npm:^27.95.0"
+    "@wireapp/api-client": "npm:^27.95.2"
     "@wireapp/commons": "npm:^5.4.11"
     "@wireapp/core-crypto": "npm:9.1.2"
     "@wireapp/cryptobox": "npm:12.8.0"
@@ -7263,7 +7263,7 @@ __metadata:
     "@wireapp/protocol-messaging": "npm:1.56.0"
     "@wireapp/store-engine": "npm:^5.1.17"
     axios: "npm:1.13.2"
-    bazinga64: "npm:^6.5.8"
+    bazinga64: "npm:^6.5.9"
     deepmerge-ts: "npm:6.0.0"
     hash.js: "npm:1.1.7"
     http-status-codes: "npm:2.3.0"
@@ -7272,7 +7272,7 @@ __metadata:
     long: "npm:^5.2.0"
     uuid: "npm:9.0.1"
     zod: "npm:3.24.2"
-  checksum: 10/2411390b091e99316862a252ebaff06b59a965e298fc8205ea5fff640ebf95976edc7da6c1cfc2c722ba24576d6e4c95c5290ec5449dad6cb5c48a1baa347f20
+  checksum: 10/65309c7d1a81b6272c140aa420774d07bcd16b692cf4abb070483ba8eba09efaaef8c9c7beeafcac55feb07ff7b633dbff9159600b86387e3a56113d2a2d840d
   languageName: node
   linkType: hard
 
@@ -8342,10 +8342,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"bazinga64@npm:^6.5.8":
-  version: 6.5.8
-  resolution: "bazinga64@npm:6.5.8"
-  checksum: 10/5d16b6c7359942690098e2d08b27449448aec5597e5e2a95c20cc6d6b041985bbce545f1ec2d1b382436af455ced56dde8dedb78fbf4855a43cad677a66fec49
+"bazinga64@npm:^6.5.9":
+  version: 6.5.9
+  resolution: "bazinga64@npm:6.5.9"
+  checksum: 10/245b2a528eb4107475ed61804d6888425bb3a7f501e13e1a664665f5297fd94dab2ad24798a0ab683a76b2a54a7b844cbbbaaa06a421af2748d4b605c1cd654b
   languageName: node
   linkType: hard
 
@@ -14247,12 +14247,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"libsodium-wrappers@npm:0.7.16":
-  version: 0.7.16
-  resolution: "libsodium-wrappers@npm:0.7.16"
+"libsodium-wrappers@npm:0.7.15":
+  version: 0.7.15
+  resolution: "libsodium-wrappers@npm:0.7.15"
   dependencies:
-    libsodium: "npm:^0.7.16"
-  checksum: 10/4f6fdec0ee3ee960bb13bbbafde6f119ed16534c9afb8a2e96b0e9d3ca44937ca6e3ac24ea1822fc9c938031c8b2d42a26c797b0b7673de01b3ff29d73df4218
+    libsodium: "npm:^0.7.15"
+  checksum: 10/a97e72da2de9b9294df35aaa053c7943b7eab0e805e5c4cbdc37bd7190221875b57d485f41595b217e80cbe44f96033a756ea12bc6214d3710b2be3d16ac1f9b
   languageName: node
   linkType: hard
 
@@ -20669,7 +20669,7 @@ __metadata:
     "@wireapp/avs-debugger": "npm:0.0.7"
     "@wireapp/commons": "npm:5.4.11"
     "@wireapp/copy-config": "npm:2.3.10"
-    "@wireapp/core": "npm:46.47.1"
+    "@wireapp/core": "npm:46.47.3"
     "@wireapp/eslint-config": "npm:3.1.7"
     "@wireapp/kalium-backup": "npm:0.0.4"
     "@wireapp/prettier-config": "npm:0.6.9"
@@ -20724,7 +20724,7 @@ __metadata:
     less: "npm:4.5.1"
     less-loader: "npm:12.3.0"
     lexical: "npm:0.27.2"
-    libsodium-wrappers: "npm:0.7.16"
+    libsodium-wrappers: "npm:0.7.15"
     linkify-it: "npm:5.0.0"
     lint-staged: "npm:15.5.0"
     long: "npm:5.3.2"
