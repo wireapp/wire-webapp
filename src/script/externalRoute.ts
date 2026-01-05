@@ -22,7 +22,16 @@ import {Config} from './Config';
 
 const URL = Config.getConfig().URL;
 
-export const isProductionWebsite = URL.WEBSITE_BASE && URL.WEBSITE_BASE === 'https://wire.com';
+const isProductionWebsite = URL.WEBSITE_BASE && URL.WEBSITE_BASE === 'https://wire.com';
+
+/**
+ * Check if audit logging is allowed for the current backend.
+ * Audit logging must be disabled for the production backend.
+ */
+export const isAuditLogAllowedForBackend = (): boolean => {
+  const {BACKEND_REST} = Config.getConfig();
+  return BACKEND_REST !== 'https://prod-nginz-https.wire.com';
+};
 
 const getTeamSettingsUrl = (path: string = '', utmSource?: string): string | undefined => {
   const query = utmSource ? `?utm_source=${utmSource}&utm_term=desktop` : '';
