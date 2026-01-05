@@ -79,7 +79,7 @@
     "react-pdf": "9.2.1",
     "react-redux": "9.2.0",
     "react-router": "6.30.2",
-    "react-router-dom": "6.30.2",
+    "react-router-dom": "7.11.0",
     "react-transition-group": "4.4.5",
     "redux": "5.0.1",
     "redux-logdown": "1.0.4",
