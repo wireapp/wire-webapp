@@ -113,7 +113,7 @@
     "@types/dexie-batch": "0.4.7",
     "@types/jest": "29.5.14",
     "@types/js-cookie": "3.0.6",
-    "@types/jsdom": "21.1.7",
+    "@types/jsdom": "27.0.0",
     "@types/keyboardjs": "2.5.3",
     "@types/libsodium-wrappers": "0.7.14",
     "@types/linkify-it": "5.0.0",
