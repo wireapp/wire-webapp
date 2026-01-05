@@ -20,9 +20,9 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
-          node-version: 18.16.x
+          node-version-file: '.nvmrc'
           cache: 'yarn'
 
       - name: Authenticate git clone
@@ -34,7 +34,7 @@ jobs:
         run: yarn --immutable
 
       - name: Merge translations
-        run: yarn translate:merge
+        run: yarn nx run webapp:translate-merge
 
       - name: Download translations
         uses: crowdin/github-action@v2.13.0
@@ -54,6 +54,6 @@ jobs:
           pull_request_title: 'chore: Update translations'
           commit_message: 'chore: Update translations'
           token: ${{secrets.WEBTEAM_CROWDIN_TOKEN}}
-          source: '/src/i18n/en-US.json'
-          translation: '/src/i18n/%locale%.json'
+          source: '/apps/webapp/src/i18n/en-US.json'
+          translation: '/apps/webapp/src/i18n/%locale%.json'
           base_path: '.'

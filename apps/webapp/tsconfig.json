@@ -1,0 +1,33 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "references": [{"path": "../server"}],
+  "ts-node": {
+    "compilerOptions": {
+      "module": "commonjs"
+    }
+  },
+  "compilerOptions": {
+    "allowJs": true,
+    "baseUrl": ".",
+    "jsx": "react-jsx",
+    "jsxImportSource": "@emotion/react",
+    "module": "esnext",
+    "lib": ["esnext", "dom", "dom.iterable"],
+    "noEmitOnError": true,
+    "outDir": "../../dist/apps/webapp",
+    "paths": {
+      "Components/*": ["./src/script/components/*"],
+      "Hooks/*": ["./src/script/hooks/*"],
+      "I18n/*": ["./src/i18n/*"],
+      "Repositories/*": ["./src/script/repositories/*"],
+      "Resource/*": ["./resource/*"],
+      "Util/*": ["./src/script/util/*"]
+    },
+    "rootDirs": ["src"],
+    "target": "ESNext",
+    "strict": true
+  },
+  "types": ["@types/wicg-file-system-access", "jest", "@testing-library/jest-dom"],
+  "include": ["src/**/*", "test/**/*"],
+  "exclude": ["node_modules", "../server/", "src/sw.js", "src/worker/"]
+}

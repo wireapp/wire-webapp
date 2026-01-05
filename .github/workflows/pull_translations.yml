@@ -44,6 +44,6 @@ jobs:
           pull_request_title: 'chore: Pull translations'
           commit_message: 'chore: Pull translations'
           token: ${{secrets.WEBTEAM_CROWDIN_TOKEN}}
-          source: '/src/i18n/en-US.json'
-          translation: '/src/i18n/%locale%.json'
+          source: '/apps/webapp/src/i18n/en-US.json'
+          translation: '/apps/webapp/src/i18n/%locale%.json'
           base_path: '.'

@@ -1,7 +1,6 @@
 ---
-appliesTo:
-  paths:
-    - 'src/**/*'
+applyTo: 'apps/webapp/src/**/*'
+description: Accessibility rules for frontend UI components
 ---
 
 # Copilot — Accessibility

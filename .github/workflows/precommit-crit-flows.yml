@@ -24,7 +24,7 @@ jobs:
       committer: ${{ steps.meta.outputs.committer }}
 
     env:
-      BUILD_DIR: server/dist/s3/
+      BUILD_DIR: apps/server/dist/s3/
       BUILD_ARTIFACT: ebs.zip
       CHANGELOG_FILE: ./changelog.md
       UNIT_TEST_REPORT_FILE: ./unit-tests.log
@@ -41,8 +41,8 @@ jobs:
           cache: yarn
 
       - run: yarn --immutable
-      - run: yarn configure
-      - run: yarn build:prod
+      - run: yarn nx run webapp:configure
+      - run: yarn nx run server:package
 
       - name: Derive PR commit metadata
         id: meta
@@ -159,7 +159,7 @@ jobs:
       - uses: 1password/install-cli-action@143a85f84a90555d121cde2ff5872e393a47ab9f
 
       - name: Generate env file
-        run: op inject -i test/e2e_tests/.env.staging.tpl -o test/e2e_tests/.env
+        run: op inject -i apps/webapp/test/e2e_tests/.env.staging.tpl -o apps/webapp/test/e2e_tests/.env
         env:
           OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
 
@@ -175,14 +175,14 @@ jobs:
           # Overrides URL from .env file
           WEBAPP_URL: https://wire-webapp-precommit.zinfra.io/
           TEST_SERVICE_URL: http://localhost:8080 # Run tests against locally running test service
-        run: yarn e2e-test --shard=${{ matrix.shard }}/${{ strategy.job-total }} --grep "@crit-flow-web|@regression"
+        run: yarn nx run webapp:e2e --shard=${{ matrix.shard }}/${{ strategy.job-total }} --grep "@crit-flow-web|@regression"
 
       - name: Upload blob report
         if: ${{ !cancelled() }}
         uses: actions/upload-artifact@v4
         with:
           name: blob-report-${{ matrix.shard }}
-          path: blob-report
+          path: apps/webapp/blob-report
           retention-days: 1
 
   e2e-report:
@@ -208,7 +208,11 @@ jobs:
           merge-multiple: true
 
       - name: Merge playwright reports
-        run: yarn playwright merge-reports --config ./playwright.config.ts ./all-blob-reports
+        run: |
+          ls -la all-blob-reports/ || echo "No blob reports found"
+          cd apps/webapp
+          yarn playwright merge-reports --config ./playwright.config.ts ../../all-blob-reports
+          cd ../..
 
       - name: Upload test report
         id: upload_playwright_report
@@ -216,14 +220,28 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: playwright-report
-          path: playwright-report/
+          path: apps/webapp/playwright-report/
 
       - name: Generate PR comment
         if: always()
         id: generate_comment
         run: |
-          node --experimental-strip-types test/e2e_tests/scripts/create-playwright-report-summary.ts
-          COMMENT=$(cat playwright-report-summary.txt)
+          echo "Checking for Playwright report..."
+          ls -la apps/webapp/playwright-report/ || echo "No playwright-report directory found"
+          ls -la apps/webapp/playwright-report/report.json || echo "No report.json found"
+
+          # Check if report.json exists before running the script
+          if [ -f "apps/webapp/playwright-report/report.json" ]; then
+            cd apps/webapp && node --experimental-strip-types test/e2e_tests/scripts/create-playwright-report-summary.ts playwright-report && cd ../..
+            if [ -f apps/webapp/playwright-report-summary.txt ]; then
+              COMMENT=$(cat apps/webapp/playwright-report-summary.txt)
+            else
+              COMMENT="❌ Playwright report summary could not be generated from the report data"
+            fi
+          else
+            COMMENT="❌ No Playwright report.json found - test execution may have failed or no tests were run"
+          fi
+
           echo "comment<<EOF" >> $GITHUB_OUTPUT
           echo "$COMMENT" >> $GITHUB_OUTPUT
           echo "EOF" >> $GITHUB_OUTPUT

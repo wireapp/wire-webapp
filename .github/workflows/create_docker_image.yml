@@ -30,9 +30,9 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
-          node-version: 18.16.x
+          node-version-file: '.nvmrc'
           cache: 'yarn'
 
       - name: Install JS dependencies
@@ -45,19 +45,19 @@ jobs:
       - name: Test
         run: |
           set -o pipefail
-          yarn test --coverage --coverage-reporters=lcov --detectOpenHandles=false 2>&1 | tee ${{ env.UNIT_TEST_REPORT_FILE }}
+          yarn nx run-many -t test --all -- --coverage --coverage-reporters=lcov --detectOpenHandles=false 2>&1 | tee ${{ env.UNIT_TEST_REPORT_FILE }}
           echo -e "RELEASE TAG = ${{ inputs.tag }}" >> ${{ env.UNIT_TEST_REPORT_FILE }}
           echo -e "SHORT COMMIT SHA = ${{ steps.vars.outputs.sha_short }}" >> ${{ env.UNIT_TEST_REPORT_FILE }}
           echo -e "TEST RUN DATE = $(date -u +'%Y-%m-%dT%H:%M:%SZ')" >> ${{ env.UNIT_TEST_REPORT_FILE }}
 
-      - name: Build
-        run: yarn build:prod
+      - name: Build and package
+        run: yarn nx run server:package
 
       - name: Push Docker image
         env:
           DOCKER_PASSWORD: ${{secrets.WEBTEAM_QUAY_PASSWORD}}
           DOCKER_USERNAME: ${{secrets.WEBTEAM_QUAY_USERNAME}}
-        run: yarn docker "${{inputs.tag}}-${{ steps.vars.outputs.sha_short }}"
+        run: yarn nx run workspace-tools:docker -- "${{inputs.tag}}-${{ steps.vars.outputs.sha_short }}"
 
       - name: Upload unit-tests.log to S3
         env:

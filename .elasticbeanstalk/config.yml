@@ -4,7 +4,7 @@ branch-defaults:
   master:
     environment: wire-webapp-master-al2
 deploy:
-  artifact: server/dist/s3/ebs.zip
+  artifact: apps/server/dist/s3/ebs.zip
 global:
   application_name: Webapp
   default_platform: Node.js

@@ -1,0 +1,15 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "module": "commonjs",
+    "outDir": "dist",
+    "removeComments": true,
+    "lib": ["esnext"],
+    "noEmitOnError": true,
+    "rootDir": ".",
+    "target": "es2017",
+    "types": ["node", "jest"]
+  },
+  "include": ["./**/*.ts"],
+  "exclude": ["node_modules", "dist"]
+}

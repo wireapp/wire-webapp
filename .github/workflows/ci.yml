@@ -22,24 +22,32 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
-          node-version: 18.16.x
+          node-version-file: '.nvmrc'
           cache: 'yarn'
 
       - name: Install JS dependencies
         run: yarn --immutable
 
       - name: Lint
-        run: yarn lint
+        run: yarn nx run-many -t lint --all
 
       - name: Test
-        run: yarn test --coverage --coverage-reporters=lcov --detectOpenHandles=false
+        run: yarn nx run-many -t test --all --configuration=ci --detectOpenHandles=false
 
-      - name: Monitor coverage
+      - name: Upload webapp coverage to Codecov
         uses: codecov/codecov-action@v5.5.2
         with:
           fail_ci_if_error: false
-          files: ./coverage/lcov.info
-          flags: unittests
+          files: ./apps/webapp/coverage/lcov.info
+          flags: app_webapp
+          token: ${{ secrets.CODECOV_TOKEN }}
+
+      - name: Upload server coverage to Codecov
+        uses: codecov/codecov-action@v5.5.2
+        with:
+          fail_ci_if_error: false
+          files: ./apps/server/coverage/lcov.info
+          flags: app_server
           token: ${{ secrets.CODECOV_TOKEN }}

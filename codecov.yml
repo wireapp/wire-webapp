@@ -6,11 +6,20 @@ coverage:
   round: down
   range: '45...80'
   status:
-    patch: off
     project:
       default:
+        target: auto
+      app_webapp:
+        target: auto
+        flags:
+          - app_webapp
+      app_server:
+        target: auto
+        flags:
+          - app_server
+    patch:
+      default:
         informational: true
-        only_pulls: true
 
 parsers:
   gcov:
@@ -21,9 +30,19 @@ parsers:
       macro: no
 
 comment:
-  layout: 'diff'
+  layout:  "diff, flags, files"
   behavior: default
   require_changes: no
+
+flags:
+  app_webapp:
+    paths:
+      - 'apps/webapp/**'
+    carryforward: false
+  app_server:
+    paths:
+      - 'apps/server/**'
+    carryforward: true
 
 github_checks:
   annotations: false

@@ -14,9 +14,9 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
-          node-version: 18.16.x
+          node-version-file: '.nvmrc'
           cache: 'yarn'
 
       - name: Install JS dependencies
@@ -29,12 +29,12 @@ jobs:
         uses: 1password/install-cli-action@v1
 
       - name: Generate env file
-        run: op inject -i test/e2e_tests/.env.staging.tpl -o test/e2e_tests/.env
+        run: op inject -i apps/webapp/test/e2e_tests/.env.staging.tpl -o apps/webapp/test/e2e_tests/.env
         env:
           OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
 
       - name: Run smoke tests
-        run: yarn e2e-test --grep "@smoke"
+        run: yarn nx run webapp:e2e --grep "@smoke"
 
       - name: Upload test report
         if: always()

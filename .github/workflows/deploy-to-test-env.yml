@@ -22,7 +22,7 @@ jobs:
     env:
       DEPLOYMENT_RECOVERY_TIMEOUT_SECONDS: 150
       AWS_APPLICATION_NAME: Webapp
-      AWS_BUILD_ZIP_PATH: server/dist/s3/ebs.zip
+      AWS_BUILD_ZIP_PATH: apps/server/dist/s3/ebs.zip
 
     steps:
       - name: Print environment variables
@@ -36,16 +36,16 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
-          node-version: 20.14.x
+          node-version-file: '.nvmrc'
           cache: 'yarn'
 
       - name: Install JS dependencies
         run: yarn --immutable
 
-      - name: Build
-        run: yarn build:prod
+      - name: Build and package
+        run: yarn nx run server:package
 
       - name: Deploy to Elastic Beanstalk
         uses: einaregilsson/beanstalk-deploy@v22
