@@ -133,8 +133,9 @@ test.describe('Accessibility', () => {
 
       await pageManager.openMainPage();
       await loginUser(memberA, pageManager);
-      const {components} = pageManager.webapp;
+      const {components, pages} = pageManager.webapp;
 
+      await pages.historyInfo().clickConfirmButton();
       await components.conversationSidebar().sidebar.waitFor({state: 'visible', timeout: loginTimeOut});
 
       await expect(components.conversationSidebar().sidebar).toHaveAttribute('data-is-collapsed', 'true');

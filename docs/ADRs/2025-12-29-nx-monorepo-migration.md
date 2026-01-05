@@ -17,6 +17,7 @@ Additionally, the team had plans to migrate packages from the separate `wire-web
 Migrate the repository to **Nx monorepo** (v22.3.3) with the following changes:
 
 ### Directory Structure
+
 ```
 Before:                    After:
 ├── server/               ├── apps/
@@ -115,11 +116,14 @@ Before:                    After:
 ## Alternatives Considered
 
 ### 1. Keep Existing Yarn Workspace
+
 **Pros:**
+
 - No migration effort
 - Familiar structure for team
 
 **Cons:**
+
 - No build caching
 - Poor scalability for libraries
 - Manual project organization
@@ -127,11 +131,14 @@ Before:                    After:
 **Rejected:** Long-term benefits of Nx outweigh migration effort.
 
 ### 2. Use Lerna (like wire-web-packages)
+
 **Pros:**
+
 - Familiar to team (already used in wire-web-packages)
 - Independent versioning
 
 **Cons:**
+
 - No built-in caching
 - Less active development than Nx
 - Would still need structural changes
@@ -139,11 +146,14 @@ Before:                    After:
 **Rejected:** Nx provides better caching and modern tooling support.
 
 ### 3. Use Turborepo
+
 **Pros:**
+
 - Lightweight
 - Good caching
 
 **Cons:**
+
 - Less mature than Nx
 - Fewer built-in features
 - Would still need significant config

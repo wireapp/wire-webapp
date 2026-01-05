@@ -32,6 +32,7 @@ const dist = path.resolve(DIST_PATH, 'static');
 const auth = path.resolve(SRC_PATH, 'script/auth');
 const checkBrowser = path.resolve(SRC_PATH, 'script/browser');
 const srcScript = path.resolve(SRC_PATH, 'script');
+const librariesSrc = path.resolve(ROOT_PATH, 'libraries');
 
 const HOME_TEMPLATE_PATH = path.resolve(SRC_PATH, 'page/index.ejs');
 const AUTH_TEMPLATE_PATH = path.resolve(SRC_PATH, 'page/auth.ejs');
@@ -71,7 +72,7 @@ module.exports = {
     rules: [
       {
         exclude: /node_modules/,
-        include: srcScript,
+        include: [srcScript, librariesSrc],
         loader: 'babel-loader',
         options: {
           // Ensure we use the app-specific babel config for TS/JSX support

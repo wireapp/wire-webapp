@@ -17,13 +17,41 @@
  *
  */
 
-import {Page} from '@playwright/test';
+import {Locator, Page} from '@playwright/test';
 
-import {ConfirmModal} from './confirm.modal';
+export class BlockWarningModal {
+  readonly page: Page;
 
-export class BlockWarningModal extends ConfirmModal {
+  readonly modal: Locator;
+  readonly modalTitle: Locator;
+  readonly modalText: Locator;
+  readonly blockButton: Locator;
+  readonly cancelButton: Locator;
+
   constructor(page: Page) {
-    super(page);
+    this.page = page;
+
+    this.modal = page.locator("[data-uie-name='primary-modals-container'][aria-label*='Block']");
+    this.modalTitle = this.modal.locator("[data-uie-name='status-modal-title']");
+    this.modalText = this.modal.locator("[data-uie-name='status-modal-text']");
+    this.blockButton = this.modal.locator("[data-uie-name='do-action']");
+    this.cancelButton = this.modal.locator("[data-uie-name='do-secondary']");
+  }
+
+  async isModalPresent() {
+    return await this.modal.isVisible();
+  }
+
+  async getModalTitle() {
+    return (await this.modalTitle.textContent()) ?? '';
+  }
+
+  async getModalText() {
+    return (await this.modalText.textContent()) ?? '';
+  }
+
+  async isBlockButtonVisible() {
+    return await this.blockButton.isVisible();
   }
 
   async clickCancel() {
@@ -31,6 +59,6 @@ export class BlockWarningModal extends ConfirmModal {
   }
 
   async clickBlock() {
-    await this.clickAction();
+    await this.blockButton.click();
   }
 }

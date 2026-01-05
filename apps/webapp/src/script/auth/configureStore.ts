@@ -17,14 +17,14 @@
  *
  */
 
-import {applyMiddleware, combineReducers, legacy_createStore as createStore} from 'redux';
+import {applyMiddleware, combineReducers, legacy_createStore as createStore, Middleware} from 'redux';
 import {withExtraArgument} from 'redux-thunk';
 
-import {LOGGER_NAMESPACE} from 'Util/Logger';
+import {getLogger} from 'Util/Logger';
 
 import {reducers} from './module/reducer';
 
-const reduxLogdown = require('redux-logdown');
+const logger = getLogger('redux');
 
 const configureStore = (thunkArguments: object = {}) => {
   const store = createStore(combineReducers(reducers), undefined, createMiddleware(thunkArguments));
@@ -40,7 +40,15 @@ const configureStore = (thunkArguments: object = {}) => {
   return store;
 };
 
-const createLoggerMiddleware = () => reduxLogdown(LOGGER_NAMESPACE, {diff: true});
+const createLoggerMiddleware = (): Middleware => _store => next => (action: any) => {
+  if (process.env.NODE_ENV !== 'production') {
+    logger.development.debug('Action dispatched', {
+      action: action?.type ?? 'unknown',
+      payload: action,
+    });
+  }
+  return next(action);
+};
 
 const createMiddleware = (thunkArguments: object) => {
   const middlewares = [withExtraArgument(thunkArguments), createLoggerMiddleware()];

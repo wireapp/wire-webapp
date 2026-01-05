@@ -36,7 +36,7 @@ Prerequisites:
 ## 1. Install deps & fetch configuration
 
 1. Run `yarn` (uses Yarn 4 workspaces)
-   - This will install all dependencies and fetch a [configuration](https://github.com/wireapp/wire-web-config-wire/) for the application into `apps/webapp/resource/`
+2. Run `yarn nx run webapp:configure` to fetch the active config bundle into `apps/webapp/resource/`
 
 ## 2. Build & run
 
@@ -152,6 +152,38 @@ Once translations are uploaded on Crowdin, our (and external) translators can tr
 1. Add translation on Crowdin
 1. Approve translation on Crowdin
 1. Run `yarn translate:download`
+
+## Documentation
+
+- [Adding New Projects](./docs/adding-new-projects.md) - Guide for adding libraries or applications to the monorepo
+- [Architecture Decision Records (ADRs)](./docs/ADRs/intro.md) - Historical context for architectural decisions
+  - [Nx Monorepo Migration](./docs/ADRs/2025-12-29-nx-monorepo-migration.md)
+  - [Unified Logging Library](./docs/ADRs/2025-12-29-unified-logging-library.md)
+- [Coding Standards](./docs/coding-standards.md)
+- [Accessibility Practices](./docs/accessibility-practices.md)
+- [Tech Radar](./docs/tech-radar.md)
+
+## Releases
+
+### Library Releases (Automated via GitHub Actions)
+
+Libraries are published automatically when merged to `main` via the [Release Libraries workflow](./.github/workflows/release-libraries.yml):
+
+```bash
+# Manual release commands (for local testing)
+yarn release:libs              # Interactive release
+yarn release:libs:version      # Version only
+yarn release:libs:publish      # Publish only
+yarn release:libs:dry-run      # Preview changes
+```
+
+### Application Releases
+
+```bash
+yarn release:staging           # Release to staging
+yarn release:production        # Release to production
+yarn release:custom            # Custom release
+```
 
 ## Contributing
 

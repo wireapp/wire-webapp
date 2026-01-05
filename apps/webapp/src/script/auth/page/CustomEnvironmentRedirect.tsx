@@ -26,7 +26,10 @@ import {COLOR, ContainerXS, FlexBox, Text} from '@wireapp/react-ui-kit';
 
 import {LogoIcon} from 'Components/Icon';
 import {t} from 'Util/LocalizerUtil';
+import {getLogger} from 'Util/Logger';
 import {afterRender} from 'Util/util';
+
+const logger = getLogger('CustomEnvironmentRedirect');
 
 import {Page} from './Page';
 
@@ -51,7 +54,9 @@ const CustomEnvironmentRedirectComponent = ({doNavigate, doSendNavigationEvent}:
     if (destinationUrl) {
       redirectTimeoutId = window.setTimeout(() => {
         if (Runtime.isDesktopApp()) {
-          doSendNavigationEvent(destinationUrl).catch(console.error);
+          doSendNavigationEvent(destinationUrl).catch(error =>
+            logger.development.error('Failed to send navigation event', error),
+          );
         } else {
           doNavigate(destinationUrl);
         }

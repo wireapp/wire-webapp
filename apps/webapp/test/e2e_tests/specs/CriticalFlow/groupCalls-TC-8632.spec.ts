@@ -18,8 +18,6 @@
  */
 
 import {FEATURE_KEY} from '@wireapp/api-client/lib/team/feature';
-
-import {User} from 'test/e2e_tests/data/user';
 import {PageManager} from 'test/e2e_tests/pageManager';
 
 import {test, expect, withLogin} from '../../test.fixtures';

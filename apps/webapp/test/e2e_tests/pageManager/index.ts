@@ -214,6 +214,8 @@ export class PageManager {
       password: () => this.getOrCreate('webapp.modals.password', () => new PasswordModal(this.page)),
       cellsFileDetailView: () =>
         this.getOrCreate('webapp.modals.cellsFileDetailView', () => new CellsFileDetailViewModal(this.page)),
+      cancelRequest: () =>
+        this.getOrCreate('webapp.modals.cancelRequestModal', () => new CancelRequestModal(this.page)),
       optionModal: () => this.getOrCreate('webapp.modals.optionModal', () => new OptionModal(this.page)),
     },
     components: {

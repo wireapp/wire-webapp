@@ -44,7 +44,10 @@ import {AssetRemoteData} from 'Repositories/assets/AssetRemoteData';
 import {AssetRepository} from 'Repositories/assets/AssetRepository';
 import {handleEscDown, handleKeyDown, KEY} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
+import {getLogger} from 'Util/Logger';
 import {loadDataUrl} from 'Util/util';
+
+const logger = getLogger('OAuthPermissions');
 
 import {
   boxCSS,
@@ -108,7 +111,7 @@ const OAuthPermissionsComponent = ({
       const url = await postOauthCode({...oauthParams, scope: cleanedScopes});
       window.location.replace(url);
     } catch (error) {
-      console.error(error);
+      logger.development.error('Failed to post OAuth code', error);
     }
   };
 
@@ -136,12 +139,12 @@ const OAuthPermissionsComponent = ({
       }
     };
     getUserData().catch(error => {
-      console.error(error);
+      logger.development.error('Failed to get user data', error);
       if (error.message === 'OAuth client not found') {
         window.location.replace('/');
       } else {
         doLogout().catch(error => {
-          console.error(error);
+          logger.development.error('Failed to logout', error);
         });
       }
     });

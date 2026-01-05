@@ -28,6 +28,9 @@ import {
 import {useCellsStore} from 'Components/Conversation/ConversationCells/common/useCellsStore/useCellsStore';
 import {CellsRepository} from 'Repositories/cells/CellsRepository';
 import {CellNode} from 'src/script/types/cellNode';
+import {getLogger} from 'Util/Logger';
+
+const logger = getLogger('useRestoreParentNode');
 
 interface UseRestoreParentNodeProps {
   childNode: CellNode;
@@ -69,7 +72,7 @@ export const useRestoreParentNode = ({
           });
         });
       } catch (error) {
-        console.error(error);
+        logger.development.error('Failed to restore parent node', error);
         onError();
       }
     },

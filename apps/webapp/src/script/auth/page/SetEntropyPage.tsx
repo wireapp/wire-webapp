@@ -23,6 +23,8 @@ import {connect} from 'react-redux';
 import {useNavigate} from 'react-router-dom';
 import {AnyAction, Dispatch} from 'redux';
 
+import {getLogger} from 'Util/Logger';
+
 import {EntropyContainer} from './EntropyContainer';
 import {Page} from './Page';
 
@@ -30,6 +32,8 @@ import {AccountRegistrationLayout} from '../component/AccountRegistrationLayout'
 import {actionRoot as ROOT_ACTIONS} from '../module/action';
 import {RootState, bindActionCreators} from '../module/reducer';
 import {ROUTE} from '../route';
+
+const logger = getLogger('SetEntropyPage');
 
 type Props = React.HTMLProps<HTMLDivElement>;
 
@@ -41,7 +45,7 @@ const SetEntropyPageComponent = ({pushEntropyData}: Props & ConnectedProps & Dis
       await pushEntropyData(entropyData);
       navigate(ROUTE.VERIFY_EMAIL_CODE);
     } catch (error) {
-      console.warn(error);
+      logger.development.warn('Failed to set entropy', error);
     }
   };
 

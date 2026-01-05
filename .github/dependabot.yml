@@ -67,6 +67,21 @@ updates:
       - dependency-name: 'typescript'
       - dependency-name: '@types/node'
 
+  # Logger library dependencies
+  - package-ecosystem: npm
+    directory: '/libraries/Logger'
+    schedule:
+      interval: weekly
+      day: sunday
+      time: '16:00'
+      timezone: 'Europe/Berlin'
+    open-pull-requests-limit: 99
+    labels:
+      - 'type: chore 🧹'
+    ignore:
+      - dependency-name: 'typescript'
+      - dependency-name: '@types/node'
+
   # Github actions
   - package-ecosystem: 'github-actions'
     directory: '/'

@@ -22,7 +22,10 @@ import {useState, useEffect} from 'react';
 import {PrimaryModal, removeCurrentModal} from 'Components/Modals/PrimaryModal';
 import {ModalOptions} from 'Components/Modals/PrimaryModal/PrimaryModalTypes';
 import {t} from 'Util/LocalizerUtil';
+import {getLogger} from 'Util/Logger';
 import {downloadFile} from 'Util/util';
+
+const logger = getLogger('useCertificateDetailsModal');
 
 const COPY_MESSAGE_TIMEOUT = 3000;
 const DOWNLOAD_CERTIFICATE_TIMEOUT = 500;
@@ -81,7 +84,7 @@ export const useCertificateDetailsModal = (certificate: string) => {
         }, COPY_MESSAGE_TIMEOUT);
       });
     } catch (err) {
-      console.error('Failed to copy: ', err);
+      logger.development.error('Failed to copy: ', err);
     }
   };
 

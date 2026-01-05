@@ -19,6 +19,10 @@
 
 import {Encoder, Decoder} from 'bazinga64';
 
+import {getLogger} from 'Util/Logger';
+
+const logger = getLogger('OauthEncryptedStore');
+
 export class EncryptedStorage {
   private encryptionKey: Promise<CryptoKey>;
   length = Promise.resolve(0);
@@ -43,7 +47,7 @@ export class EncryptedStorage {
       const base64Value = Encoder.toBase64(encryptedValue).asString;
       window.localStorage.setItem(key, JSON.stringify({value: base64Value, iv: Array.from(iv)}));
     } catch (error) {
-      console.error(error);
+      logger.development.error('Failed to set item', error);
       throw error;
     }
   }

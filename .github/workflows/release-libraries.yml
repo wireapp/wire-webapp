@@ -1,0 +1,121 @@
+name: Release Libraries
+
+on:
+  push:
+    branches: [main, dev]
+    paths:
+      - 'libraries/**'
+  workflow_dispatch:
+    inputs:
+      force_publish:
+        description: 'Force publish?'
+        required: true
+        default: false
+        type: boolean
+
+permissions:
+  id-token: write # Required for NPM Trusted Publishing
+  contents: write # Required for creating tags and releases
+
+jobs:
+  release_libraries:
+    runs-on: ubuntu-latest
+    env:
+      COMMITTER: ${{ github.triggering_actor || github.actor }}
+      COMMIT_URL: ${{ github.event.head_commit.url || format('{0}/{1}', github.server_url, github.repository) }}
+      FORCE_PUBLISH: ${{ github.event.inputs.force_publish || false }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set environment variables
+        run: |
+          echo "BRANCH_NAME=$(git branch --show-current)" >> $GITHUB_ENV
+          echo "TAG=$(git tag --points-at ${{github.sha}})" >> $GITHUB_ENV
+          echo "COMMIT_MESSAGE=$(git log --format=%B -n 1 ${{github.sha}} | head -n 1)" >> $GITHUB_ENV
+
+      - name: Set TITLE
+        env:
+          PR_TITLE: ${{github.event.pull_request.title || env.COMMIT_MESSAGE}}
+        run: echo "TITLE=$PR_TITLE" >> $GITHUB_ENV
+
+      - name: Print environment variables
+        run: |
+          echo -e "BRANCH_NAME = ${BRANCH_NAME}"
+          echo -e "TAG = ${TAG}"
+          echo -e "TITLE = ${TITLE}"
+          echo -e "COMMIT_MESSAGE = ${COMMIT_MESSAGE}"
+          echo -e "COMMIT_URL = ${COMMIT_URL}"
+          echo -e "COMMITTER = ${COMMITTER}"
+          echo -e "FORCE_PUBLISH = ${FORCE_PUBLISH}"
+
+      - name: Validate branch
+        if: github.event_name == 'workflow_dispatch' && env.FORCE_PUBLISH == 'true'
+        run: |
+          echo "Validating branch (${BRANCH_NAME})..."
+
+          # Only allow manual publish from main
+          if [[ "${BRANCH_NAME}" != "main" ]]; then
+            echo "Error: Manual publish is only allowed from 'main' branch (got '${BRANCH_NAME}')."
+            exit 1
+          fi
+
+          echo "Branch validation passed ✅"
+
+      - name: Skip CI
+        if: |
+          contains(env.TITLE || env.COMMIT_MESSAGE, '[skip ci]') ||
+          contains(env.TITLE || env.COMMIT_MESSAGE, '[ci skip]')
+        uses: andymckay/cancel-action@0.4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version-file: '.nvmrc'
+          cache: 'yarn'
+          registry-url: 'https://registry.npmjs.org'
+
+      - name: Install JS dependencies
+        run: yarn --immutable
+
+      - name: Build libraries
+        run: yarn nx run-many -t build --projects=libraries/*
+
+      - name: Test libraries
+        run: yarn nx run-many -t test --projects=libraries/*
+
+      - name: Configure git user
+        run: |
+          git config --global user.name "${GITHUB_ACTOR}"
+          git config --global user.email "${GITHUB_ACTOR_ID}+${GITHUB_ACTOR}@users.noreply.github.com"
+
+      # Automatic release on main (push / merge)
+      - name: Release libraries (Trusted Publishing)
+        if: |
+          env.BRANCH_NAME == 'main' &&
+          github.event_name != 'workflow_dispatch'
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: yarn release:libs
+
+      # Manual force publish on main via "Run workflow" button
+      - name: Manual force publish libraries (Trusted Publishing)
+        if: |
+          env.BRANCH_NAME == 'main' &&
+          github.event_name == 'workflow_dispatch' &&
+          env.FORCE_PUBLISH == 'true'
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: yarn release:libs
+
+      - name: Notify CI error
+        if: failure() && github.event_name != 'pull_request'
+        uses: wireapp/github-action-wire-messenger@v2.0.0
+        with:
+          email: ${{secrets.WIRE_EMAIL}}
+          password: ${{secrets.WIRE_PASSWORD}}
+          conversation: 'b2cc7120-4154-4be4-b0c0-45a8c361c4d1'
+          text: '🔴 Library release failed! ${{env.COMMITTER}} on "${{env.BRANCH_NAME}}" branch with [${{env.TITLE}}](${{env.COMMIT_URL}})'

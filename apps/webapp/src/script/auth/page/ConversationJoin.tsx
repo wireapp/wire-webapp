@@ -28,7 +28,10 @@ import {UrlUtil} from '@wireapp/commons';
 import {Column, Columns, H1, Muted} from '@wireapp/react-ui-kit';
 
 import {t} from 'Util/LocalizerUtil';
+import {getLogger} from 'Util/Logger';
 import {noop} from 'Util/util';
+
+const logger = getLogger('ConversationJoin');
 
 import {GuestLoginColumn, IsLoggedInColumn, Separator} from './ConversationJoinComponents';
 import {ConversationJoinFull} from './ConversationJoinInvalid';
@@ -149,7 +152,7 @@ const ConversationJoinComponent = ({
         setIsJoinGuestLinkPasswordModalOpen(true);
         return;
       }
-      console.warn('Unable to join conversation', error);
+      logger.development.warn('Unable to join conversation', error);
       setShowEntropyForm(false);
     }
   };
@@ -188,14 +191,14 @@ const ConversationJoinComponent = ({
             );
             if (!isValidationError) {
               void doLogout();
-              console.warn('Unable to create wireless account', error);
+              logger.development.warn('Unable to create wireless account', error);
               setShowEntropyForm(false);
             }
           }
         }
       } else {
         await doLogout();
-        console.warn('Unable to create wireless account', error);
+        logger.development.warn('Unable to create wireless account', error);
         setShowEntropyForm(false);
       }
     }

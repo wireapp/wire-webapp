@@ -27,6 +27,9 @@ import {InViewport} from 'Components/InViewport';
 import {AssetRemoteData} from 'Repositories/assets/AssetRemoteData';
 import {AssetRepository} from 'Repositories/assets/AssetRepository';
 import {CSS_FILL_PARENT} from 'Util/CSSMixin';
+import {getLogger} from 'Util/Logger';
+
+const logger = getLogger('AvatarImage');
 
 import {AVATAR_SIZE} from '.';
 
@@ -77,7 +80,7 @@ const AvatarImage: React.FunctionComponent<AvatarImageProps> = ({
             }
             setAvatarLoadingBlocked(false);
           } catch (error) {
-            console.warn('Failed to load avatar picture.', error);
+            logger.development.warn('Failed to load avatar picture', error);
           }
         } else {
           setAvatarLoadingBlocked(false);

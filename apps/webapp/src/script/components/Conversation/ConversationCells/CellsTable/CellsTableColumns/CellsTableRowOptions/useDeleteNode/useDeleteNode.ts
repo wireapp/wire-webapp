@@ -23,6 +23,9 @@ import {useAppNotification} from 'Components/AppNotification';
 import {useCellsStore} from 'Components/Conversation/ConversationCells/common/useCellsStore/useCellsStore';
 import {CellsRepository} from 'Repositories/cells/CellsRepository';
 import {t} from 'Util/LocalizerUtil';
+import {getLogger} from 'Util/Logger';
+
+const logger = getLogger('useDeleteNode');
 
 interface UseDeleteNodeProps {
   conversationQualifiedId: QualifiedId;
@@ -43,7 +46,7 @@ export const useDeleteNode = ({conversationQualifiedId, cellsRepository}: UseDel
         await cellsRepository.deleteNode({uuid, permanently});
       } catch (error) {
         deleteFileFailedNotification.show();
-        console.error(error);
+        logger.development.error('Failed to delete node', error);
       }
     },
   };

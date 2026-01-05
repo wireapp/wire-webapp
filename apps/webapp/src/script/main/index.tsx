@@ -30,7 +30,7 @@ import {Runtime} from '@wireapp/commons';
 import {AppContainer} from 'Components/AppContainer/AppContainer';
 import {doSimpleRedirect} from 'Repositories/LifeCycleRepository/LifeCycleRepository';
 import {StorageKey} from 'Repositories/storage';
-import {enableLogging} from 'Util/LoggerUtil';
+import {enableLogging} from 'Util/Logger';
 import {loadValue} from 'Util/StorageUtil';
 import {exposeWrapperGlobals} from 'Util/wrapper';
 

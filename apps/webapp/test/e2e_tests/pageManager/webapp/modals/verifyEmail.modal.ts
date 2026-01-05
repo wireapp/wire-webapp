@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2019 Wire Swiss GmbH
+ * Copyright (C) 2025 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,20 +17,25 @@
  *
  */
 
-import {getStorage} from './localStorage';
+import {Page, Locator} from '@playwright/test';
+import {selectByDataAttribute} from 'test/e2e_tests/utils/selector.util';
 
-import {Configuration} from '../Config';
+export class VerifyEmailModal {
+  readonly page: Page;
 
-export function enableLogging(config: Configuration, search = window.location.search) {
-  const storage = getStorage();
-  const namespace = new URLSearchParams(search).get('enableLogging');
-  const force = config.FEATURE.ENABLE_DEBUG;
+  readonly modal: Locator;
+  readonly okButton: Locator;
 
-  if (namespace) {
-    storage?.setItem('debug', namespace);
-  } else if (force) {
-    storage?.setItem('debug', '*');
-  } else {
-    storage?.removeItem('debug');
+export class BlockWarningModal extends ConfirmModal {
+  constructor(page: Page) {
+    super(page);
+  }
+
+  async clickCancel() {
+    await this.cancelButton.click();
+  }
+
+  async clickBlock() {
+    await this.clickAction();
   }
 }
