@@ -80,7 +80,7 @@ import {Segmentation} from 'Repositories/tracking/Segmentation';
 import {protoFromType} from 'Repositories/user/AvailabilityMapper';
 import {UserRepository} from 'Repositories/user/UserRepository';
 import {UserState} from 'Repositories/user/UserState';
-import {isAuditLogAllowedForBackend} from 'src/script/externalRoute';
+import {isAuditLogEnabledForBackend} from 'src/script/externalRoute';
 import {
   cancelSendingLinkPreview,
   clearLinkPreviewSendingState,
@@ -728,7 +728,7 @@ export class MessageRepository {
     asImage: boolean,
     meta: FileMetaDataContent,
   ) {
-    const isAuditLogEnabled = this.teamState.isAuditLogEnabled() && isAuditLogAllowedForBackend();
+    const isAuditLogEnabled = this.teamState.isAuditLogEnabled() && isAuditLogEnabledForBackend();
 
     const auditData: AssetAuditData | undefined = isAuditLogEnabled
       ? {
