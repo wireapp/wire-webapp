@@ -44,6 +44,10 @@ updates:
       - dependency-name: '@lexical/markdown'
       - dependency-name: '@lexical/react'
       - dependency-name: '@lexical/rich-text'
+      # Wait until libsodium-wrappers:0.7.17 because: https://github.com/jedisct1/libsodium.js/issues/357
+      - dependency-name: 'libsodium-wrappers'
+        versions:
+          - '0.7.16'
 
   # Server dependencies
   - package-ecosystem: npm

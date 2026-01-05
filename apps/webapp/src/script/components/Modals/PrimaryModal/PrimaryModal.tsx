@@ -17,7 +17,7 @@
  *
  */
 
-import {FC, FormEvent, MouseEvent, useState, useRef, ChangeEvent, useEffect, useMemo} from 'react';
+import {FC, FormEvent, MouseEvent, useState, useRef, ChangeEvent, useEffect, useMemo, useCallback} from 'react';
 
 import {ValidationUtil} from '@wireapp/commons';
 import {ErrorMessage} from '@wireapp/react-ui-kit';
@@ -58,6 +58,7 @@ export const PrimaryModalComponent: FC = () => {
   const updateCurrentModalContent = usePrimaryModalState(state => state.updateCurrentModalContent);
   const currentId = usePrimaryModalState(state => state.currentModalId);
   const primaryActionButtonRef = useRef<HTMLButtonElement>(null);
+  const closeButtonRef = useRef<HTMLButtonElement>(null);
   const isModalVisible = currentId !== null;
   const passwordValueRef = useRef<HTMLInputElement>(null);
   const [isFormSubmitted, setIsFormSubmitted] = useState(false);
@@ -83,6 +84,7 @@ export const PrimaryModalComponent: FC = () => {
     allButtonsFullWidth = false,
     primaryBtnFirst = false,
     size = 'small',
+    container,
   } = content;
 
   const isPassword = currentType === PrimaryModalType.PASSWORD;
@@ -207,29 +209,59 @@ export const PrimaryModalComponent: FC = () => {
 
   const secondaryActions = Array.isArray(secondaryAction) ? secondaryAction : [secondaryAction];
 
+  const closeAction = useCallback(() => {
+    if (hasPasswordWithRules) {
+      const [closeActionItem] = secondaryActions;
+      closeActionItem?.action?.();
+    }
+  }, [hasPasswordWithRules, secondaryActions]);
+
+  // Auto-focus close button when modal opens
   useEffect(() => {
-    const onKeyPress = (event: KeyboardEvent) => {
-      if (isEscapeKey(event) && isModalVisible) {
+    if (!isModalVisible) {
+      return undefined;
+    }
+
+    // Use setTimeout to ensure the modal is fully rendered before focusing
+    const timeoutId = setTimeout(() => {
+      // Focus primary button if it should come first, otherwise focus close button
+      const targetElement = primaryBtnFirst ? primaryActionButtonRef.current : closeButtonRef.current;
+      const fallbackElement = primaryBtnFirst ? closeButtonRef.current : primaryActionButtonRef.current;
+
+      if (targetElement) {
+        targetElement.focus();
+      } else if (fallbackElement) {
+        fallbackElement.focus();
+      }
+    }, 0);
+
+    return () => clearTimeout(timeoutId);
+  }, [isModalVisible, primaryBtnFirst]);
+
+  const onKeyDown = useCallback(
+    (event: KeyboardEvent) => {
+      if (isEscapeKey(event)) {
         removeCurrentModal();
         closeAction();
       }
 
       if (isEnterKey(event) && primaryAction?.runActionOnEnterClick) {
+        event.preventDefault();
         primaryAction?.action?.();
         removeCurrentModal();
       }
-    };
+    },
+    [closeAction, primaryAction],
+  );
 
-    document.addEventListener('keypress', onKeyPress);
-    return () => document.removeEventListener('keypress', onKeyPress);
-  }, [primaryAction, isModalVisible]);
-
-  const closeAction = () => {
-    if (hasPasswordWithRules) {
-      const [closeAction] = secondaryActions;
-      closeAction?.action?.();
+  useEffect(() => {
+    if (!isModalVisible) {
+      return undefined;
     }
-  };
+
+    document.addEventListener('keydown', onKeyDown);
+    return () => document.removeEventListener('keydown', onKeyDown);
+  }, [isModalVisible, primaryAction, closeAction, onKeyDown]);
 
   const secondaryButtons = secondaryActions
     .filter((action): action is ButtonAction => action !== null && !!action.text)
@@ -272,8 +304,10 @@ export const PrimaryModalComponent: FC = () => {
       onBgClick={onBgClick}
       dataUieName={modalUie}
       size={size}
+      container={container}
     >
       <PrimaryModalHeader
+        ref={closeButtonRef}
         titleText={titleText}
         closeBtnTitle={closeBtnTitle}
         hideCloseBtn={hideCloseBtn}

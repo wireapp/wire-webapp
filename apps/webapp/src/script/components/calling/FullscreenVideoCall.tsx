@@ -222,28 +222,35 @@ const FullscreenVideoCall = ({
   }
 
   useEffect(() => {
+    const isFullScreen = viewMode === CallingViewMode.FULL_SCREEN || viewMode === CallingViewMode.DETACHED_WINDOW;
+
+    if (!isFullScreen) {
+      return undefined;
+    }
+
+    const targetDocument =
+      viewMode === CallingViewMode.DETACHED_WINDOW && detachedWindow ? detachedWindow.document : document;
+
     const onKeyDown = (event: KeyboardEvent): void => {
       const target = event.target as HTMLElement;
 
-      if (
-        viewMode !== CallingViewMode.FULL_SCREEN ||
-        target?.getAttribute('aria-controls') === 'epr-search-id' // Exclude emoji search input
-      ) {
+      if (target?.getAttribute('aria-controls') === 'epr-search-id') {
+        // Exclude emoji search input
         return;
       }
 
       event.preventDefault();
       event.stopPropagation();
 
-      preventFocusOutside(event, 'video-calling');
+      preventFocusOutside(event, 'video-calling', targetDocument);
     };
 
-    document.addEventListener('keydown', onKeyDown);
+    targetDocument.addEventListener('keydown', onKeyDown);
 
     return () => {
-      document.removeEventListener('keydown', onKeyDown);
+      targetDocument.removeEventListener('keydown', onKeyDown);
     };
-  }, [viewMode]);
+  }, [viewMode, detachedWindow]);
 
   const {showAlert, isGroupCall, clearShowAlert} = useCallAlertState();
 
