@@ -148,6 +148,8 @@ export const CallingControls = ({
                   data-uie-value={selfSharesScreen ? 'active' : 'inactive'}
                   data-uie-enabled={disableScreenButton ? 'false' : 'true'}
                   title={t('videoCallOverlayShareScreen')}
+                  role="switch"
+                  aria-checked={selfSharesScreen}
                   disabled={disableScreenButton}
                 >
                   {selfSharesScreen ? (

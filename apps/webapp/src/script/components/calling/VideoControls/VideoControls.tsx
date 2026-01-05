@@ -543,6 +543,11 @@ export const VideoControls = ({
                   setAudioOptionsOpen(false);
                 }
               }}
+              aria-label={
+                audioOptionsOpen
+                  ? t('videoCallOverlayCloseOptions')
+                  : t('videoCallOverlayOpenMicrophoneAndSpeakerOptions')
+              }
             >
               {audioOptionsOpen ? (
                 <>
@@ -613,6 +618,9 @@ export const VideoControls = ({
                     setVideoOptionsOpen(false);
                   }
                 }}
+                aria-label={
+                  videoOptionsOpen ? t('videoCallOverlayCloseOptions') : t('videoCallOverlayOpenCameraOptions')
+                }
               >
                 {videoOptionsOpen ? (
                   <>
@@ -659,6 +667,8 @@ export const VideoControls = ({
             data-uie-value={selfSharesScreen ? 'active' : 'inactive'}
             data-uie-enabled={canShareScreen ? 'true' : 'false'}
             data-uie-name="do-toggle-screen"
+            role="switch"
+            aria-checked={selfSharesScreen}
             title={t('videoCallOverlayShareScreen')}
           >
             {selfSharesScreen ? (

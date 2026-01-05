@@ -142,6 +142,7 @@ const config: Linter.Config[] = [
       'prefer-promise-reject-errors': 'off',
       'jest/no-jasmine-globals': 'off',
       'jsx-a11y/media-has-caption': 'off',
+      'no-empty': 'error',
     },
     settings: {
       'import/resolver': {
