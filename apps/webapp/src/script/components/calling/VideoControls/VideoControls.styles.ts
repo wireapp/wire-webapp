@@ -51,12 +51,14 @@ export const videoControlActiveStyles = css`
   svg > path {
     fill: var(--app-bg-secondary);
   }
-  &:hover {
+  &:hover:not(:disabled) {
     background-color: var(--background);
   }
-  &:active {
+  &:focus-visible {
+    outline: 2px solid var(--accent-color-focus);
+  }
+  &:active:not(:disabled) {
     background-color: var(--accent-color-highlight-inversed);
-    border: 1px solid var(--accent-color-focus);
   }
 `;
 
@@ -67,6 +69,9 @@ export const videoControlDisabledStyles = css`
   svg {
     fill: var(--disabled-call-button-svg);
   }
+  &:hover {
+    background-color: var(--disabled-call-button-bg);
+  }
 `;
 
 export const videoControlInActiveStyles = css`
@@ -76,12 +81,13 @@ export const videoControlInActiveStyles = css`
   svg > g > path {
     fill: var(--main-color);
   }
-  &:hover {
+  &:hover:not(:disabled) {
     background-color: var(--inactive-call-button-hover-bg);
-    border: 1px solid var(--inactive-call-button-hover-border);
   }
-  &:active {
+  &:focus-visible {
+    outline: 2px solid var(--accent-color-focus);
+  }
+  &:active:not(:disabled) {
     background-color: var(--accent-color-highlight);
-    border: 1px solid var(--accent-color-focus);
   }
 `;
