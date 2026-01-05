@@ -43,3 +43,58 @@
     line-height: 1.3em;
   }
 }
+
+.image-asset--animated-wrapper {
+  position: relative;
+  display: inline-block;
+
+  summary {
+    position: absolute;
+    z-index: 2;
+    top: 0.5rem;
+    right: 0.5rem;
+    width: 0;
+    height: 2em;
+    border-width: 1em 0 1em 2em;
+    border-style: solid;
+
+    border-color: transparent transparent transparent #202020;
+    background: transparent;
+    cursor: pointer;
+    opacity: 0.1;
+    transition: 100ms all ease;
+
+    &:focus,
+    &:focus-visible {
+      opacity: 1;
+      outline: 2px solid var(--accent-color, #ffffff);
+      outline-offset: 2px;
+    }
+  }
+
+  &:hover summary {
+    opacity: 1;
+  }
+
+  [open] summary {
+    border-width: 0 0 0 2em;
+    border-style: double;
+  }
+
+  /* for blink/webkit */
+  details summary::-webkit-details-marker {
+    display: none;
+  }
+  /* for firefox */
+  details > summary:first-of-type {
+    list-style: none;
+  }
+
+  .image-asset--animated img {
+    position: absolute;
+    top: 0;
+    left: 0;
+    display: inline-block;
+    overflow: visible;
+  }
+}

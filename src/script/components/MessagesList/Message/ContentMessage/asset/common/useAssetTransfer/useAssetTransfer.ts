@@ -19,6 +19,7 @@
 
 import {useEffect, useState} from 'react';
 
+import {GifUtil} from 'gifwrap';
 import {container} from 'tsyringe';
 
 import {AssetRemoteData} from 'Repositories/assets/AssetRemoteData';
@@ -30,6 +31,7 @@ import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 
 export type AssetUrl = {
   url: string;
+  pauseFrameUrl?: string;
   dispose: () => void;
 };
 
@@ -59,7 +61,11 @@ export const useAssetTransfer = (message?: ContentMessage, assetRepository = con
     isPendingUpload: transferState === AssetTransferState.UPLOAD_PENDING,
     isUploaded: transferState === AssetTransferState.UPLOADED,
     isUploading: transferState === AssetTransferState.UPLOADING,
-    getAssetUrl: async (resource: AssetRemoteData, acceptedMimeTypes?: string[]): Promise<AssetUrl> => {
+    getAssetUrl: async (
+      resource: AssetRemoteData,
+      acceptedMimeTypes?: string[],
+      fileType?: string,
+    ): Promise<AssetUrl> => {
       const blob = await assetRepository.load(resource);
       if (!blob) {
         throw new Error(`Asset could not be loaded`);
@@ -68,9 +74,55 @@ export const useAssetTransfer = (message?: ContentMessage, assetRepository = con
         throw new Error(`Mime type not accepted "${blob.type}"`);
       }
       const url = URL.createObjectURL(blob);
+
+      const pauseFrameUrl = await (async () => {
+        if (blob.type === 'image/gif' || fileType === 'image/gif') {
+          try {
+            const gifArrayBuffer = await blob.arrayBuffer();
+            const gifBuffer = Buffer.from(gifArrayBuffer);
+            const frame0 = await GifUtil.read(gifBuffer).then(gifFile => gifFile.frames[0]);
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            if (!ctx) {
+              return undefined;
+            }
+            canvas.width = frame0.bitmap.width;
+            canvas.height = frame0.bitmap.height;
+
+            const imageData = ctx.createImageData(frame0.bitmap.width, frame0.bitmap.height);
+            imageData.data.set(frame0.bitmap.data);
+            ctx.putImageData(imageData, 0, 0);
+
+            const pauseImageBlob: Blob | null = await new Promise(resolve => {
+              canvas.toBlob(
+                blob => {
+                  resolve(blob);
+                },
+                'image/jpeg',
+                0.9,
+              );
+            });
+
+            if (pauseImageBlob) {
+              return URL.createObjectURL(pauseImageBlob);
+            }
+            return undefined;
+          } catch (_error) {
+            return undefined;
+          }
+        }
+        return undefined;
+      })();
+
       return {
-        dispose: () => URL.revokeObjectURL(url),
+        dispose: () => {
+          URL.revokeObjectURL(url);
+          if (pauseFrameUrl) {
+            URL.revokeObjectURL(pauseFrameUrl);
+          }
+        },
         url,
+        pauseFrameUrl,
       };
     },
     transferState,

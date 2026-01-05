@@ -40,6 +40,7 @@ export class FileAsset extends Asset {
   public readonly downloadProgress: ko.PureComputed<number | undefined>;
   public readonly cancelDownload: () => void;
   public file_size: number;
+  public readonly file_type: string;
   public meta: Partial<AssetMetaData>;
   public readonly status: ko.Observable<AssetTransferState>;
   public readonly upload_failed_reason: ko.Observable<ProtobufAsset.NotUploaded>;
