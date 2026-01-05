@@ -11,7 +11,7 @@
     "@types/generate-changelog": "1.8.3",
     "@types/js-yaml": "4.0.9",
     "@types/node": "24.10.4",
-    "@typescript-eslint/eslint-plugin": "8.50.1",
+    "@typescript-eslint/eslint-plugin": "8.51.0",
     "@typescript-eslint/parser": "8.50.1",
     "@wireapp/copy-config": "2.3.10",
     "@wireapp/eslint-config": "3.1.7",
