@@ -1,6 +1,24 @@
 version: 2
 updates:
-  # Webapp configs
+  # Root workspace dependencies (monorepo root)
+  - package-ecosystem: npm
+    directory: '/'
+    schedule:
+      interval: weekly
+      day: sunday
+      time: '16:00'
+      timezone: 'Europe/Berlin'
+    open-pull-requests-limit: 99
+    labels:
+      - 'type: chore 🧹'
+    ignore:
+      # Prevent major version updates
+      - dependency-name: '*'
+        update-types: ['version-update:semver-major']
+      - dependency-name: '@types/node'
+      - dependency-name: 'typescript'
+
+  # Webapp config dependencies
   - package-ecosystem: npm
     directory: '/apps/webapp/app-config'
     schedule:
@@ -10,6 +28,10 @@ updates:
     open-pull-requests-limit: 99
     labels:
       - 'type: chore 🧹'
+    ignore:
+      # Prevent major version updates
+      - dependency-name: '*'
+        update-types: ['version-update:semver-major']
 
   # Webapp frontend dependencies
   - package-ecosystem: npm
@@ -31,6 +53,9 @@ updates:
           - '*@datadog*'
 
     ignore:
+      # Prevent major version updates
+      - dependency-name: '*'
+        update-types: ['version-update:semver-major']
       - dependency-name: '@wireapp/avs'
       # Wait until we have next release with wasm folder
       - dependency-name: '@mediapipe/tasks-vision'
@@ -61,6 +86,9 @@ updates:
     labels:
       - 'type: chore 🧹'
     ignore:
+      # Prevent major version updates
+      - dependency-name: '*'
+        update-types: ['version-update:semver-major']
       - dependency-name: geolite2
         versions:
           - '>= 2.a'
