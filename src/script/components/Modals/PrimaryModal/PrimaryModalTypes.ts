@@ -62,6 +62,8 @@ export interface ModalOptions {
   allButtonsFullWidth?: boolean;
   primaryBtnFirst?: boolean;
   size?: ModalSize;
+  /** DOM element where modal should be rendered for detached windows */
+  container?: Element | DocumentFragment;
 }
 
 export enum PrimaryModalType {
@@ -103,6 +105,7 @@ export interface ModalContent {
   allButtonsFullWidth?: boolean;
   primaryBtnFirst?: boolean;
   size?: ModalSize;
+  container?: Element | DocumentFragment;
 }
 
 export type ModalItem = {id: string; options: ModalOptions; type: PrimaryModalType};

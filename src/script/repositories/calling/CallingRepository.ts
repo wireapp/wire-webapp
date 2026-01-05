@@ -84,6 +84,7 @@ import {calculateChildWindowPosition} from 'Util/DOM/caculateChildWindowPosition
 import {isDetachedCallingFeatureEnabled} from 'Util/isDetachedCallingFeatureEnabled';
 import {t} from 'Util/LocalizerUtil';
 import {getLogger, Logger} from 'Util/Logger';
+import {captureModalFocusContext} from 'Util/ModalFocusUtil';
 import {roundLogarithmic} from 'Util/NumberUtil';
 import {matchQualifiedIds} from 'Util/QualifiedId';
 import {copyStyles} from 'Util/renderElement';
@@ -236,6 +237,8 @@ export class CallingRepository {
       if (isDegraded) {
         this.abortCall(activeConversation.qualifiedId, LEAVE_CALL_REASON.CONVERSATION_DEGRADED);
 
+        const {container, restoreFocusCallback} = this.getModalContainerAndRestoreFocusCallback();
+
         const modalOptions = {
           primaryAction: {
             text: t('conversation.E2EIOk'),
@@ -244,6 +247,8 @@ export class CallingRepository {
             message: t('conversation.E2EIGroupCallDisconnected'),
             title: t('conversation.E2EIConversationNoLongerVerified'),
           },
+          close: restoreFocusCallback(),
+          container,
         };
 
         PrimaryModal.show(PrimaryModal.type.ACKNOWLEDGE, modalOptions, `degraded-${activeConversation.id}`);
@@ -684,6 +689,9 @@ export class CallingRepository {
 
       if (participant) {
         this.leaveCall(conversation.qualifiedId, LEAVE_CALL_REASON.USER_TURNED_UNVERIFIED);
+
+        const {container, restoreFocusCallback} = this.getModalContainerAndRestoreFocusCallback();
+
         PrimaryModal.show(
           PrimaryModal.type.ACKNOWLEDGE,
           {
@@ -694,6 +702,8 @@ export class CallingRepository {
               message: t('callDegradationDescription', {username: participant.user.name()}),
               title: t('callDegradationTitle'),
             },
+            close: restoreFocusCallback(),
+            container,
           },
           `degraded-${conversation.qualifiedId}`,
         );
@@ -716,14 +726,17 @@ export class CallingRepository {
 
   private warnOutdatedClient(conversationId: QualifiedId) {
     const brandName = Config.getConfig().BRAND_NAME;
+    const {container, restoreFocusCallback} = this.getModalContainerAndRestoreFocusCallback();
+
     PrimaryModal.show(
       PrimaryModal.type.ACKNOWLEDGE,
       {
-        close: () => this.acceptVersionWarning(conversationId),
+        close: restoreFocusCallback(() => this.acceptVersionWarning(conversationId)),
         text: {
           message: t('modalCallUpdateClientMessage', {brandName}),
           title: t('modalCallUpdateClientHeadline', {brandName}),
         },
+        container,
       },
       'update-client-warning',
     );
@@ -1391,6 +1404,8 @@ export class CallingRepository {
       const isE2EIDegradedConversation = conversation.mlsVerificationState() === ConversationVerificationState.DEGRADED;
       let userConsentWithDegradation = true;
       if (isE2EIDegradedConversation) {
+        const {container, restoreFocusCallback} = this.getModalContainerAndRestoreFocusCallback();
+
         userConsentWithDegradation = await new Promise(resolve =>
           PrimaryModal.show(PrimaryModal.type.CONFIRM, {
             primaryAction: {
@@ -1408,6 +1423,8 @@ export class CallingRepository {
               message: t('conversation.E2EIDegradedJoinCall'),
               title: t('conversation.E2EIConversationNoLongerVerified'),
             },
+            close: restoreFocusCallback(),
+            container,
           }),
         );
       }
@@ -2718,6 +2735,8 @@ export class CallingRepository {
   }
 
   private showNoAudioInputModal(): void {
+    const {container, restoreFocusCallback} = this.getModalContainerAndRestoreFocusCallback();
+
     const modalOptions = {
       primaryAction: {
         text: t('modalAcknowledgeAction'),
@@ -2731,11 +2750,15 @@ export class CallingRepository {
         message: t('modalNoAudioInputMessage'),
         title: t('modalNoAudioInputTitle'),
       },
+      close: restoreFocusCallback(),
+      container,
     };
     PrimaryModal.show(PrimaryModal.type.CONFIRM, modalOptions);
   }
 
   private showNoCameraModal(): void {
+    const {container, restoreFocusCallback} = this.getModalContainerAndRestoreFocusCallback();
+
     const modalOptions = {
       text: {
         closeBtnLabel: t('modalNoCameraCloseBtn'),
@@ -2752,8 +2775,30 @@ export class CallingRepository {
         ),
         title: t('modalNoCameraTitle'),
       },
+      close: restoreFocusCallback(),
+      container,
     };
     PrimaryModal.show(PrimaryModal.type.ACKNOWLEDGE, modalOptions);
+  }
+
+  /**
+   * Helper method to get modal container and restore focus callback
+   * Call this method immediately before showing a modal to ensure the correct active element is captured.
+   * @returns Object containing container and focus restoration callback
+   */
+  private getModalContainerAndRestoreFocusCallback() {
+    const detachedWindow = this.callState.detachedWindow();
+    const isDetachedWindow = this.callState.viewMode() === CallingViewMode.DETACHED_WINDOW;
+
+    const context = captureModalFocusContext({
+      targetDocument: isDetachedWindow && detachedWindow ? detachedWindow.document : undefined,
+      container: isDetachedWindow && detachedWindow ? detachedWindow.document.body : undefined,
+    });
+
+    return {
+      container: context.container,
+      restoreFocusCallback: context.createFocusRestorationCallback,
+    };
   }
 
   private isSelfUser(participant: Participant): boolean {

@@ -305,14 +305,18 @@ export const noop = (): void => {};
 const focusableElementsSelector =
   'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
 
-export const preventFocusOutside = (event: KeyboardEvent, parentId: string): void => {
+export const preventFocusOutside = (
+  event: KeyboardEvent,
+  parentId: string,
+  targetDocument: Document = document,
+): void => {
   if (!isTabKey(event)) {
     return;
   }
   event.preventDefault();
-  const parent = document.getElementById(parentId);
+  const parent = targetDocument.getElementById(parentId);
   const focusableContent = parent ? [...parent.querySelectorAll(focusableElementsSelector)] : [];
-  const focusedItemIndex = focusableContent.indexOf(document.activeElement);
+  const focusedItemIndex = focusableContent.indexOf(targetDocument.activeElement);
   if (event.shiftKey && focusedItemIndex != 0) {
     (focusableContent[focusedItemIndex - 1] as HTMLElement)?.focus();
     return;

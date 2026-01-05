@@ -17,7 +17,7 @@
  *
  */
 
-import React, {useEffect, useId, useRef, useState, useCallback, HTMLProps} from 'react';
+import React, {useEffect, useId, useRef, useState, HTMLProps} from 'react';
 
 import {CSSObject} from '@emotion/react';
 import {createPortal} from 'react-dom';
@@ -67,18 +67,21 @@ const ModalComponent = ({
   const isMounting = useRef<boolean>(true);
   const trapId = useId();
 
-  const trapFocus = useCallback((event: KeyboardEvent) => preventFocusOutside(event, trapId), [trapId]);
-
   useEffect(() => {
+    // Get the correct document based on the container
+    const targetDocument = container ? (container as HTMLElement).ownerDocument || document : document;
+
+    const trapFocus = (event: KeyboardEvent) => preventFocusOutside(event, trapId, targetDocument);
+
     if (isShown) {
-      document.addEventListener('keydown', trapFocus);
+      targetDocument.addEventListener('keydown', trapFocus);
     } else {
-      document.removeEventListener('keydown', trapFocus);
+      targetDocument.removeEventListener('keydown', trapFocus);
     }
     return () => {
-      document.removeEventListener('keydown', trapFocus);
+      targetDocument.removeEventListener('keydown', trapFocus);
     };
-  }, [isShown, onkeydown]);
+  }, [isShown, onkeydown, trapId, container]);
 
   useEffect(() => {
     let timeoutId = 0;
