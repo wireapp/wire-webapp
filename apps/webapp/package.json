@@ -148,7 +148,7 @@
     "css-loader": "7.1.2",
     "cssnano": "7.1.2",
     "dexie": "4.0.7",
-    "dotenv": "16.6.1",
+    "dotenv": "17.2.3",
     "fake-indexeddb": "6.2.5",
     "html-webpack-plugin": "5.6.5",
     "i18next-scanner": "4.6.0",
