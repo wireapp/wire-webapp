@@ -728,7 +728,7 @@ export class MessageRepository {
     asImage: boolean,
     meta: FileMetaDataContent,
   ) {
-    const isAuditLogEnabled = this.teamState.isAuditLogEnabled() && !getWebEnvironment().isProduction;
+    const isAuditLogEnabled = this.teamState.isAuditLogEnabled() && this.teamState.isAuditLogEnabledForBackend();
 
     const auditData: AssetAuditData | undefined = isAuditLogEnabled
       ? {
