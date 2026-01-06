@@ -40,6 +40,9 @@ jobs:
           node-version-file: .nvmrc
           cache: yarn
 
+      - name: Enable Corepack
+        run: corepack enable
+
       - run: yarn --immutable
       - run: yarn nx run webapp:configure
       - run: yarn nx run server:package
@@ -154,6 +157,9 @@ jobs:
           node-version-file: .nvmrc
           cache: yarn
 
+      - name: Enable Corepack
+        run: corepack enable
+
       - run: yarn --immutable
       - run: yarn playwright install --with-deps chrome
       - uses: 1password/install-cli-action@143a85f84a90555d121cde2ff5872e393a47ab9f
@@ -198,6 +204,10 @@ jobs:
         with:
           node-version-file: .nvmrc
           cache: yarn
+
+      - name: Enable Corepack
+        run: corepack enable
+
       - run: yarn --immutable
 
       - name: Download blob reports

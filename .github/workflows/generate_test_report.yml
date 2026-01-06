@@ -37,6 +37,9 @@ jobs:
           node-version-file: '.nvmrc'
           cache: 'yarn'
 
+      - name: Enable Corepack
+        run: corepack enable
+
       - name: Authenticate git clone
         env:
           GH_TOKEN: ${{secrets.OTTO_THE_BOT_GH_TOKEN}}
