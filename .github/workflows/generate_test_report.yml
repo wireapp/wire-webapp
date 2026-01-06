@@ -31,14 +31,14 @@ jobs:
         with:
           access_token: ${{github.token}}
 
+      - name: Enable Corepack
+        run: corepack enable
+
       - name: Setup Node.js
         uses: actions/setup-node@v6
         with:
           node-version-file: '.nvmrc'
           cache: 'yarn'
-
-      - name: Enable Corepack
-        run: corepack enable
 
       - name: Authenticate git clone
         env:
