@@ -29,6 +29,16 @@
       }
     }
 
+    &:focus-visible {
+      outline: 1px solid var(--accent-color-focus);
+      outline-offset: 1px;
+    }
+
+    &:disabled {
+      cursor: not-allowed;
+      opacity: 0.5;
+    }
+
     &--active {
       background-color: var(--main-color) !important;
       color: var(--white) !important;
@@ -90,7 +100,12 @@
       border-color: var(--green-500) !important;
       background-color: var(--green-500) !important;
 
-      &:hover {
+      &:focus-visible {
+        outline: 1px solid var(--accent-color-focus) !important;
+        outline-offset: 1px;
+      }
+
+      &:hover:not(:disabled) {
         border-color: @green-600 !important;
         background-color: @green-600 !important;
 
@@ -99,13 +114,37 @@
           background-color: @green-dark-400 !important;
         }
       }
+
+      &:active:not(:disabled) {
+        border-color: @green-700 !important;
+        background-color: @green-700 !important;
+
+        body.theme-dark & {
+          border-color: @green-dark-500 !important;
+          background-color: @green-dark-500 !important;
+        }
+      }
+
+      &:disabled {
+        cursor: not-allowed;
+        opacity: 0.5;
+      }
     }
 
     &--red {
       border-color: var(--red-500) !important;
       background-color: var(--red-500) !important;
 
-      &:hover {
+      &:focus-visible {
+        outline: 1px solid @red-300 !important;
+        outline-offset: 1px;
+
+        body.theme-dark & {
+          outline: 1px solid @red-dark-300 !important;
+        }
+      }
+
+      &:hover:not(:disabled) {
         border-color: @red-600 !important;
         background-color: @red-600 !important;
 
@@ -113,6 +152,21 @@
           border-color: @red-dark-400 !important;
           background-color: @red-dark-400 !important;
         }
+      }
+
+      &:active:not(:disabled) {
+        border-color: @red-700 !important;
+        background-color: @red-700 !important;
+
+        body.theme-dark & {
+          border-color: @red-dark-500 !important;
+          background-color: @red-dark-500 !important;
+        }
+      }
+
+      &:disabled {
+        cursor: not-allowed;
+        opacity: 0.5;
       }
     }
 

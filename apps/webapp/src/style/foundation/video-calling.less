@@ -211,6 +211,17 @@
 
     &:focus-visible {
       outline: 2px solid var(--accent-color-focus);
+      outline-offset: 1px;
+    }
+
+    &:disabled {
+      cursor: not-allowed;
+      opacity: 0.5;
+
+      &:hover {
+        border-color: var(--disabled-call-button-border);
+        background-color: var(--disabled-call-button-bg);
+      }
     }
 
     &--red {
@@ -219,19 +230,33 @@
       svg > path {
         fill: var(--app-bg-secondary);
       }
-      &:hover {
-        background-color: #9b000f;
+      &:focus-visible {
+        outline: 2px solid @red-300;
+        outline-offset: 1px;
+
         body.theme-dark & {
-          background-color: #ff928d;
+          outline: 2px solid @red-dark-300;
         }
-        &:active {
-          border: 1px solid #74000b;
+      }
+      &:hover:not(:disabled) {
+        border-color: @red-600;
+        background-color: @red-600;
+        body.theme-dark & {
+          border-color: @red-dark-400;
+          background-color: @red-dark-400;
+        }
+      }
+      &:active:not(:disabled) {
+        border-color: @red-700;
+        background-color: @red-700;
+        body.theme-dark & {
+          border-color: @red-dark-500;
           background-color: var(--red-500);
-          body.theme-dark & {
-            border: 1px solid #ffc9c6;
-            background-color: var(--red-500);
-          }
         }
+      }
+      &:disabled {
+        cursor: not-allowed;
+        opacity: 0.5;
       }
     }
   }
