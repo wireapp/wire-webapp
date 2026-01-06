@@ -39,7 +39,7 @@ archive.file(path.join(SERVER_PATH, 'Procfile'), {name: 'Procfile'});
 // Archive dist directory but exclude s3 subdirectory
 archive.glob('**/*', {
   cwd: DIST_PATH,
-  ignore: ['s3/**', '.ebextensions/**']
+  ignore: ['s3/**', '.ebextensions/**'],
 });
 // Add .ebextensions directory from server root (not from dist)
 archive.directory(path.join(SERVER_PATH, '.ebextensions'), '.ebextensions');

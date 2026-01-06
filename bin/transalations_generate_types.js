@@ -36,7 +36,4 @@ ${body}
 const ROOT_PATH = path.resolve(__dirname, '..');
 const PROJECT_PATH = path.join(ROOT_PATH, 'apps/webapp');
 
-generateTypeDefinitions(
-  path.join(PROJECT_PATH, 'src/i18n/en-US.json'),
-  path.join(PROJECT_PATH, 'src/types/i18n.d.ts'),
-);
+generateTypeDefinitions(path.join(PROJECT_PATH, 'src/i18n/en-US.json'), path.join(PROJECT_PATH, 'src/types/i18n.d.ts'));
