@@ -44,32 +44,25 @@ Use these exact formats:
 
 ALWAYS verify these items in EVERY PR:
 
-✓ Input validation and sanitization
-✓ API response validation and error handling
-✓ No dangerouslySetInnerHTML without sanitization
-✓ No hardcoded secrets, tokens, or API keys
-✓ Safe URL handling and redirect validation
-✓ Proper authentication and authorization
+✓ Input validation and sanitization ✓ API response validation and error handling ✓ No dangerouslySetInnerHTML without sanitization ✓ No hardcoded secrets, tokens, or API keys ✓ Safe URL handling and redirect validation ✓ Proper authentication and authorization
 
 ## ACCESSIBILITY CHECKLIST
 
 For UI changes in apps/webapp/src/:
 
-✓ Keyboard navigation (Tab, Enter, Space, Escape, Arrow keys)
-✓ Focus management (visible focus, proper trapping in modals)
-✓ ARIA labels and roles (icon buttons need action-focused labels)
-✓ Form accessibility (labels tied to inputs, error descriptions)
-✓ Screen reader support (aria-live for dynamic content)
+✓ Keyboard navigation (Tab, Enter, Space, Escape, Arrow keys) ✓ Focus management (visible focus, proper trapping in modals) ✓ ARIA labels and roles (icon buttons need action-focused labels) ✓ Form accessibility (labels tied to inputs, error descriptions) ✓ Screen reader support (aria-live for dynamic content)
 
 ## REVIEW SCOPE
 
 REVIEW these files:
+
 - Security: All code changes (especially APIs and user input)
-- Accessibility: apps/webapp/src/**/*
-- TypeScript: apps/**/*.{ts,tsx}
-- React: apps/webapp/src/**/*.{tsx,jsx}
+- Accessibility: apps/webapp/src/\*_/_
+- TypeScript: apps/\*_/_.{ts,tsx}
+- React: apps/webapp/src/\*_/_.{tsx,jsx}
 
 DO NOT REVIEW:
+
 - Code formatting (handled by prettier/eslint)
 - Import ordering (automated)
 - Trivial naming preferences
@@ -81,29 +74,34 @@ DO NOT REVIEW:
 
 ## SPECIALIZED INSTRUCTION FILES
 
-- Security: .github/instructions/security.instructions.md (apps/**/*)
-- Accessibility: .github/instructions/accessibility.instructions.md (apps/webapp/src/**/*)
-- React: .github/instructions/react.instructions.md (apps/webapp/src/**/*.{tsx,jsx})
-- TypeScript: .github/instructions/typescript.instructions.md (apps/**/*.{ts,tsx})
+- Security: .github/instructions/security.instructions.md (apps/\*_/_)
+- Accessibility: .github/instructions/accessibility.instructions.md (apps/webapp/src/\*_/_)
+- React: .github/instructions/react.instructions.md (apps/webapp/src/\*_/_.{tsx,jsx})
+- TypeScript: .github/instructions/typescript.instructions.md (apps/\*_/_.{ts,tsx})
 
 ## Pull Request Review Process
 
 ### When Reviewing PRs
+
 **Your Approach:**
+
 1. Review only the code changes shown in the diff
 2. Focus on security, accessibility, and critical functionality
 3. Use clear severity levels in comments
 4. Provide specific, actionable feedback with code examples when helpful
 
 ### Comment Guidelines
+
 **Format each comment with:**
+
 - Severity level: **[Blocker]**, **[Important]**, or **[Suggestion]**
 - File location and line numbers
 - Clear explanation of the issue
 - Specific fix suggestion when appropriate
 
 **Example:**
-```
+
+````
 **[Blocker]** - Security vulnerability in authentication.ts:45
 
 The password validation logic allows empty strings. This could allow unauthorized access.
@@ -113,7 +111,8 @@ The password validation logic allows empty strings. This could allow unauthorize
 if (!password || password.trim().length === 0) {
   throw new Error('Password cannot be empty');
 }
-```
+````
+
 ```
 
 ### Security Review Checklist
@@ -151,3 +150,4 @@ When new dependencies are added:
 - Any **[Blocker]** issues exist
 - Critical security vulnerabilities are found
 - Essential accessibility features are missing
+```
