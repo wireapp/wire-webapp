@@ -18633,10 +18633,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"libsodium@npm:0.7.10":
-  version: 0.7.10
-  resolution: "libsodium@npm:0.7.10"
-  checksum: 10/43cf2832fcf9c997d8390679fb60357046e3fc161f686ee942c12e361e58a7d18b9dd18d1452b6d4335c99f6eea4c55c4c72922ddf0fc43d826d9cd5bddf883d
+"libsodium@npm:^0.7.16":
+  version: 0.7.16
+  resolution: "libsodium@npm:0.7.16"
+  checksum: 10/58a0c5f94147aeade1fccd7e772b9bb5aa347689bd91737254ab4da52221d0966698dbd1d60da59e0419042ae64341c76f9d81ad5ed448596a8c1f7387ec3a79
   languageName: node
   linkType: hard
 

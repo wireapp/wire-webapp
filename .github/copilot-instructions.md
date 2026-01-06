@@ -1,5 +1,15 @@
 # GitHub Copilot Repository Instructions
 
+## ⚠️ CRITICAL RULES - READ FIRST
+
+**YOU MUST FOLLOW THESE RULES IN EVERY RESPONSE:**
+
+1. ✅ **Always use Nx commands** (`nx run`, `nx run-many`, `nx affected`) - never call tools directly
+2. 🔒 **Security is mandatory** - check all input validation, XSS, secrets, and API handling
+3. ♿ **Accessibility is mandatory** - verify keyboard nav, ARIA, focus management for all UI changes
+4. 📋 **Use severity levels** - tag all comments with [Blocker], [Important], or [Suggestion]
+5. 📁 **Check specialized instructions** - load context from `.github/instructions/*.md` for specific file types
+
 ## REPOSITORY STRUCTURE
 
 You are reviewing code in an Nx monorepo with these key directories:
@@ -37,12 +47,12 @@ yarn nx run server:package  # Package server for deployment
 
 ## CODE REVIEW PRIORITIES
 
-REVIEW IN THIS ORDER:
+**ALWAYS REVIEW IN THIS ORDER:**
 
-1. SECURITY ISSUES (CRITICAL - Must fix)
-2. ACCESSIBILITY VIOLATIONS (CRITICAL - Must fix)
-3. TYPESRIPT/REACT BEST PRACTICES (Important)
-4. CODE STYLE (Minor - Only if not handled by linters)
+1. **SECURITY ISSUES** (CRITICAL - Must fix immediately)
+2. **ACCESSIBILITY VIOLATIONS** (CRITICAL - Must fix immediately)
+3. **TYPESCRIPT/REACT BEST PRACTICES** (Important - Should fix)
+4. **CODE STYLE** (Minor - Only if not handled by linters)
 
 ## COMMENT SEVERITY LEVELS
 
