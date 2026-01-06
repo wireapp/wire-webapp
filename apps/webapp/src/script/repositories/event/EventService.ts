@@ -203,7 +203,20 @@ export class EventService {
         .table(StorageSchemata.OBJECT_STORE.EVENTS)
         .where(['conversation', 'time'])
         .between([conversationId, quotedMessageTime], [conversationId, new Date().toISOString()], true, true)
-        .filter(event => event.data && event.data.quote && event.data.quote.message_id === quotedMessageId)
+        .filter(event => {
+          if (!event.data) {
+            return false;
+          }
+          // Check normal message quote
+          if (event.data.quote && event.data.quote.message_id === quotedMessageId) {
+            return true;
+          }
+          // Check multipart message quote
+          if (event.data.text?.quote && event.data.text.quote.message_id === quotedMessageId) {
+            return true;
+          }
+          return false;
+        })
         .toArray();
       return events;
     }
@@ -217,7 +230,20 @@ export class EventService {
           record.time <= new Date().toISOString()
         );
       })
-      .filter(event => !!event.data && !!event.data.quote && event.data.quote.message_id === quotedMessageId)
+      .filter(event => {
+        if (!event.data) {
+          return false;
+        }
+        // Check normal message quote
+        if (event.data.quote && event.data.quote.message_id === quotedMessageId) {
+          return true;
+        }
+        // Check multipart message quote
+        if (event.data.text?.quote && event.data.text.quote.message_id === quotedMessageId) {
+          return true;
+        }
+        return false;
+      })
       .sort(compareEventsByConversation);
   }
 
