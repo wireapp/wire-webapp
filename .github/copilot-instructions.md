@@ -23,6 +23,18 @@ yarn nx run webapp:build    # Build frontend for production
 yarn nx run server:package  # Package server for deployment
 ```
 
+## NX WORKFLOW GUIDELINES
+
+**Important:** This is an Nx monorepo. Follow these guidelines:
+
+- **Always use Nx commands**: Run tasks through `nx` (e.g., `nx run`, `nx run-many`, `nx affected`) instead of calling underlying tools directly
+- **Use Nx MCP tools**: You have access to Nx MCP server tools:
+  - `nx_workspace` - Understand workspace architecture and check for errors
+  - `nx_project_details` - Analyze specific project structure and dependencies
+  - `nx_docs` - Get up-to-date Nx configuration guidance (never assume Nx configuration)
+- **Check workspace first**: When answering repository questions, use `nx_workspace` tool first to understand the architecture
+- **Get help for errors**: Use `nx_workspace` tool to diagnose Nx configuration or project graph errors
+
 ## CODE REVIEW PRIORITIES
 
 REVIEW IN THIS ORDER:
@@ -44,22 +56,31 @@ Use these exact formats:
 
 ALWAYS verify these items in EVERY PR:
 
-✓ Input validation and sanitization ✓ API response validation and error handling ✓ No dangerouslySetInnerHTML without sanitization ✓ No hardcoded secrets, tokens, or API keys ✓ Safe URL handling and redirect validation ✓ Proper authentication and authorization
+- ✓ Input validation and sanitization
+- ✓ API response validation and error handling
+- ✓ No dangerouslySetInnerHTML without sanitization
+- ✓ No hardcoded secrets, tokens, or API keys
+- ✓ Safe URL handling and redirect validation
+- ✓ Proper authentication and authorization
 
 ## ACCESSIBILITY CHECKLIST
 
 For UI changes in apps/webapp/src/:
 
-✓ Keyboard navigation (Tab, Enter, Space, Escape, Arrow keys) ✓ Focus management (visible focus, proper trapping in modals) ✓ ARIA labels and roles (icon buttons need action-focused labels) ✓ Form accessibility (labels tied to inputs, error descriptions) ✓ Screen reader support (aria-live for dynamic content)
+- ✓ Keyboard navigation (Tab, Enter, Space, Escape, Arrow keys)
+- ✓ Focus management (visible focus, proper trapping in modals)
+- ✓ ARIA labels and roles (icon buttons need action-focused labels)
+- ✓ Form accessibility (labels tied to inputs, error descriptions)
+- ✓ Screen reader support (aria-live for dynamic content)
 
 ## REVIEW SCOPE
 
 REVIEW these files:
 
 - Security: All code changes (especially APIs and user input)
-- Accessibility: apps/webapp/src/\*_/_
-- TypeScript: apps/\*_/_.{ts,tsx}
-- React: apps/webapp/src/\*_/_.{tsx,jsx}
+- Accessibility: apps/webapp/src/**/*
+- TypeScript: apps/**/*.{ts,tsx}
+- React: apps/webapp/src/**/*.{tsx,jsx}
 
 DO NOT REVIEW:
 
@@ -74,10 +95,10 @@ DO NOT REVIEW:
 
 ## SPECIALIZED INSTRUCTION FILES
 
-- Security: .github/instructions/security.instructions.md (apps/\*_/_)
-- Accessibility: .github/instructions/accessibility.instructions.md (apps/webapp/src/\*_/_)
-- React: .github/instructions/react.instructions.md (apps/webapp/src/\*_/_.{tsx,jsx})
-- TypeScript: .github/instructions/typescript.instructions.md (apps/\*_/_.{ts,tsx})
+- Security: .github/instructions/security.instructions.md (apps/**/*)
+- Accessibility: .github/instructions/accessibility.instructions.md (apps/webapp/src/**/*)
+- React: .github/instructions/react.instructions.md (apps/webapp/src/**/*.{tsx,jsx})
+- TypeScript: .github/instructions/typescript.instructions.md (apps/**/*.{ts,tsx})
 
 ## Pull Request Review Process
 
@@ -150,4 +171,3 @@ When new dependencies are added:
 - Any **[Blocker]** issues exist
 - Critical security vulnerabilities are found
 - Essential accessibility features are missing
-```
