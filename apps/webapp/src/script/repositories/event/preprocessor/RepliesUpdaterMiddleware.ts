@@ -69,7 +69,7 @@ export class RepliesUpdaterMiddleware implements EventMiddleware {
         if (reply.type === ClientEvent.CONVERSATION.MESSAGE_ADD) {
           reply.data.quote = {error: {type: QuoteEntity.ERROR.MESSAGE_NOT_FOUND}};
         } else if (reply.type === ClientEvent.CONVERSATION.MULTIPART_MESSAGE_ADD && reply.data.text) {
-          reply.data.text.quote = {error: {type: QuoteEntity.ERROR.MESSAGE_NOT_FOUND}} as any;
+          reply.data.text.quote = {error: {type: QuoteEntity.ERROR.MESSAGE_NOT_FOUND}};
         }
         await this.eventService.replaceEvent(reply);
       }),

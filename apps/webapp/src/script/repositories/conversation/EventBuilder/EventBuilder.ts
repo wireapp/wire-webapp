@@ -163,7 +163,7 @@ export type MultipartMessageAddEvent = ConversationEvent<
   CONVERSATION.MULTIPART_MESSAGE_ADD,
   {
     attachments: MultiPartContent['attachments'];
-    text: MultiPartContent['text'] & {
+    text: Omit<MultiPartContent['text'], 'quote'> & {
       mentions?: string[];
       previews?: string[];
       quote?:
