@@ -1,5 +1,28 @@
 # Background Effects
 
+## 🚧 Limited Release - Real-World Testing Phase
+
+**Status:** Production-ready code, limited to **Edge and Internal releases only** for real-world validation.
+
+### Why Limited Release?
+
+Several components need real-world testing across diverse hardware before general availability:
+
+- **Capability Detection & Pipeline Selection** - Validate automatic pipeline selection (worker-webgl2, main-webgl2, canvas2d) across different device configurations
+- **Quality Controller** - Test adaptive quality tier system (A/B/C/D) under varying CPU/GPU load scenarios on different hardware types
+- **Performance Characteristics** - Gather data on CPU/GPU utilization patterns across device ranges
+
+### Known Areas for Future Improvement
+
+- **Segmentation Quality** - Edge detection, matte refinement, and temporal stability can be enhanced
+- **Overlay Quality** - Blending, color matching, and edge handling improvements
+
+### Next Steps
+
+Collect performance metrics and user feedback from limited release to validate behavior before expanding to broader rollout.
+
+---
+
 Production-grade background blur and virtual background pipeline that avoids WebRTC Insertable Streams. It processes the original camera track, renders to a canvas (via WebGL2 or Canvas2D), and exposes a processed track using `canvas.captureStream()`.
 
 ## Features
