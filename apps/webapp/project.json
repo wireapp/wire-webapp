@@ -8,7 +8,7 @@
       "executor": "nx:run-commands",
       "outputs": ["{workspaceRoot}/apps/server/dist/static"], // web assets land in server dist/static
       "defaultConfiguration": "production",
-      "dependsOn": ["server:build"], // ensure server build before bundling webapp
+      "dependsOn": ["core-lib:build", "server:build"], // ensure core-lib and server build before bundling webapp
       "options": {
         "command": "yarn build:prod",
         "cwd": "{projectRoot}"
