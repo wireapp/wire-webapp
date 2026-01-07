@@ -64,14 +64,16 @@ export class RepliesUpdaterMiddleware implements EventMiddleware {
     const originalMessageId = event.data.message_id;
     const {replies} = await this.findRepliesToMessage(event.conversation, originalMessageId);
     this.logger.info(`Invalidating '${replies.length}' replies to deleted message '${originalMessageId}'`);
-    replies.forEach(async reply => {
-      if (reply.type === ClientEvent.CONVERSATION.MESSAGE_ADD) {
-        reply.data.quote = {error: {type: QuoteEntity.ERROR.MESSAGE_NOT_FOUND}};
-      } else if (reply.type === ClientEvent.CONVERSATION.MULTIPART_MESSAGE_ADD && reply.data.text) {
-        reply.data.text.quote = {error: {type: QuoteEntity.ERROR.MESSAGE_NOT_FOUND}} as any;
-      }
-      await this.eventService.replaceEvent(reply);
-    });
+    await Promise.all(
+      replies.map(async reply => {
+        if (reply.type === ClientEvent.CONVERSATION.MESSAGE_ADD) {
+          reply.data.quote = {error: {type: QuoteEntity.ERROR.MESSAGE_NOT_FOUND}};
+        } else if (reply.type === ClientEvent.CONVERSATION.MULTIPART_MESSAGE_ADD && reply.data.text) {
+          reply.data.text.quote = {error: {type: QuoteEntity.ERROR.MESSAGE_NOT_FOUND}} as any;
+        }
+        await this.eventService.replaceEvent(reply);
+      }),
+    );
     return event;
   }
 
