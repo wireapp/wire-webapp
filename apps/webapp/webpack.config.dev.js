@@ -63,7 +63,9 @@ module.exports = {
   mode: 'development',
   plugins: [...commonConfig.plugins, new webpack.HotModuleReplacementPlugin(), updateTranslationTypesPlugin],
   snapshot: {
-    // This will make sure that changes in the node_modules will be detected and recompiled automatically (when using yalc for example)
-    managedPaths: [],
+    // Only watch @wireapp packages in node_modules for changes (useful when using yalc for local development)
+    // Also watch workspace libraries and the webapp app itself
+    managedPaths: [/^(.+?[\\/]node_modules[\\/](?!@wireapp[\\/]))/],
+    immutablePaths: [],
   },
 };
