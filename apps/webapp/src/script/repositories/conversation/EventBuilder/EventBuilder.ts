@@ -176,6 +176,7 @@ export type MultipartMessageAddEvent = ConversationEvent<
         | {error: {type: string}};
     };
     replacing_message_id?: string;
+    expects_read_confirmation?: boolean;
   }
 > & {
   /** who have received/read the event */
