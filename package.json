@@ -80,7 +80,7 @@
     "lint": "nx run-many -t lint --all",
     "lint:fix": "nx run-many -t lint --all --fix",
     "lint:other": "nx format:check --base=dev --head=HEAD && nx run webapp:stylelint",
-    "postinstall": "node bin/fix-libsodium-wrappers.js && nx run webapp:configure && husky install",
+    "postinstall": "nx run webapp:configure && husky install",
     "prettier": "nx format:check --base=dev --head=HEAD",
     "release:staging": "nx run workspace-tools:release-staging",
     "release:production": "nx run workspace-tools:release-production",
@@ -103,7 +103,9 @@
     "@types/react": "18.2.37",
     "@types/react-dom": "18.2.11",
     "react": "18.2.0",
-    "react-dom": "18.2.0"
+    "react-dom": "18.2.0",
+    "libsodium-wrappers-sumo": "0.8.0",
+    "libsodium-sumo": "0.8.0"
   },
   "version": "0.27.0",
   "packageManager": "yarn@4.12.0"
