@@ -51,3 +51,11 @@ jobs:
           files: ./apps/server/coverage/lcov.info
           flags: app_server
           token: ${{ secrets.CODECOV_TOKEN }}
+
+      - name: Upload core library coverage to Codecov
+        uses: codecov/codecov-action@v5.5.2
+        with:
+          fail_ci_if_error: false
+          files: ./coverage/libraries/core/lcov.info
+          flags: lib_core
+          token: ${{ secrets.CODECOV_TOKEN }}

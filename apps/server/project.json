@@ -22,6 +22,12 @@
     },
     "serve": {
       "executor": "@nx/js:node",
+      "dependsOn": [
+        {
+          "projects": "dependencies",
+          "target": "build"
+        }
+      ],
       "options": {
         "buildTarget": "server:build",
         "buildTargetOptions": {

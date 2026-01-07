@@ -164,18 +164,8 @@ export type MultipartMessageAddEvent = ConversationEvent<
   {
     attachments: MultiPartContent['attachments'];
     text: MultiPartContent['text'] & {mentions?: string[]; previews?: string[]};
-    replacing_message_id?: string;
-    expects_read_confirmation?: boolean;
   }
-> & {
-  /** who have received/read the event */
-  read_receipts?: ReadReceipt[];
-  /** who reacted to the event */
-  reactions?: UserReactionMap | ReactionMap;
-  edited_time?: string;
-  status: StatusType;
-  version?: number;
-};
+>;
 export type MissedEvent = BaseEvent & {id: string; type: CONVERSATION.MISSED_MESSAGES};
 export type JoinedAfterMLSMigrationFinalisationEvent = BaseEvent & {
   type: CONVERSATION.JOINED_AFTER_MLS_MIGRATION;

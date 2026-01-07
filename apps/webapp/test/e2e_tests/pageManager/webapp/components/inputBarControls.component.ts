@@ -18,7 +18,6 @@
  */
 
 import {Page, Locator} from '@playwright/test';
-
 import {shareAssetHelper} from 'test/e2e_tests/utils/asset.util';
 import {selectByDataAttribute} from 'test/e2e_tests/utils/selector.util';
 
@@ -32,7 +31,6 @@ export class InputBarControls {
   readonly ping: Locator;
   readonly setEphemeralTimer: Locator;
   readonly sendMessage: Locator;
-  readonly messageInput: Locator;
 
   constructor(page: Page) {
     this.page = page;
@@ -42,7 +40,6 @@ export class InputBarControls {
     this.ping = page.locator(`${selectByDataAttribute('do-ping')}`);
     this.setEphemeralTimer = page.locator(`${selectByDataAttribute('do-set-ephemeral-timer')}`);
     this.sendMessage = page.locator(`${selectByDataAttribute('do-send-message')}`);
-    this.messageInput = page.locator(`${selectByDataAttribute('input-message')}`);
   }
 
   async clickShareImage(imageFilePath: string) {
@@ -74,10 +71,6 @@ export class InputBarControls {
         return;
       }
     }
-  }
-
-  async setMessageInput(message: string) {
-    await this.messageInput.fill(message);
   }
 
   async clickSendMessage() {
