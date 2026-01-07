@@ -22,6 +22,13 @@ import {QualifiedId, User} from '@wireapp/api-client/lib/user/';
 
 import {APIClient} from '@wireapp/api-client';
 
+// Type definition for the UsersResponse from the API (not exported by api-client)
+type UsersResponse = {
+  found: User[];
+  failed?: QualifiedId[];
+  not_found?: QualifiedId[];
+};
+
 export class UserService {
   private readonly apiClient: APIClient;
 
@@ -33,7 +40,7 @@ export class UserService {
     return this.apiClient.api.user.getUser(userId as QualifiedId);
   }
 
-  public async getUsers(userIds: QualifiedId[]) {
+  public async getUsers(userIds: QualifiedId[]): Promise<User[] | UsersResponse> {
     if (!userIds.length) {
       return [];
     }

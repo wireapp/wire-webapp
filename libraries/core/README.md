@@ -38,6 +38,62 @@ console.info(`User ID "${userId}", Client ID "${clientId}"`);
 await account.listen();
 ```
 
+### Development
+
+This library is part of the Wire monorepo and uses Nx for task orchestration. All commands should be run using Nx:
+
+#### Building
+
+```bash
+# Build the library
+nx run core-lib:build
+
+# Clean build artifacts
+nx run core-lib:clean
+
+# Watch mode for development
+nx run core-lib:watch
+```
+
+#### Testing
+
+```bash
+# Run tests
+nx run core-lib:test
+
+# Run tests with coverage
+nx run core-lib:test:coverage
+
+# Run tests in CI mode
+nx run core-lib:test --configuration=ci
+```
+
+#### Linting & Type Checking
+
+```bash
+# Run linter
+nx run core-lib:lint
+
+# Run type checking
+nx run core-lib:type-check
+```
+
+#### Demo Scripts
+
+```bash
+# Run composite demo
+nx run core-lib:demo:composite
+
+# Run send counter demo
+nx run core-lib:demo:sendCounter
+
+# Start echo server
+nx run core-lib:start:echo
+
+# Start sender
+nx run core-lib:start:sender
+```
+
 ### Contributing
 
 The following commits will help you getting started quickly with the code base:

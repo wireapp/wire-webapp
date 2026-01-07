@@ -245,9 +245,9 @@ describe('E2EIServiceExternal', () => {
     });
 
     it('registers the server certificates and shedules a timer to refresh intermediate certs every', async () => {
-      jest.useFakeTimers();
-
+      jest.useFakeTimers({doNotFake: ['nextTick', 'setImmediate']});
       const [service, {transactionContext}] = await buildE2EIService('mockedDB1');
+
       jest.spyOn(transactionContext, 'e2eiIsPKIEnvSetup').mockResolvedValueOnce(false);
       await service.initialize('https://some.crl.discovery.url');
 
@@ -263,8 +263,6 @@ describe('E2EIServiceExternal', () => {
     });
 
     it('does not register the root cert if it was already registered', async () => {
-      jest.useFakeTimers();
-
       const [service, {transactionContext}] = await buildE2EIService('mockedDB2');
 
       jest.spyOn(transactionContext, 'e2eiIsPKIEnvSetup').mockResolvedValueOnce(true);

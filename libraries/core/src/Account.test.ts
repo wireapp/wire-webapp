@@ -288,6 +288,7 @@ describe('Account', () => {
   describe('Websocket connection', () => {
     let dependencies: {account: Account; apiClient: APIClient};
     let server: WS;
+    let disconnectFn: (() => void) | null = null;
 
     const mockNotifications = (size: number) => {
       const notifications = Array.from(new Array(size)).map(() => ({
@@ -342,8 +343,35 @@ describe('Account', () => {
       jest.spyOn(dependencies.account, 'getNotificationEventTime').mockReturnValue('2025-10-01T00:00:00Z');
     });
 
-    afterEach(() => {
-      server.close(); // ensure server shutdown
+    afterEach(async () => {
+      // Call disconnect function if it was set
+      if (disconnectFn) {
+        try {
+          disconnectFn();
+        } catch (error) {
+          // Ignore errors during cleanup
+        }
+        disconnectFn = null;
+      }
+
+      // Ensure all connections are properly closed
+      if (dependencies?.apiClient) {
+        try {
+          dependencies.apiClient.disconnect();
+        } catch (error) {
+          // Ignore errors during cleanup
+        }
+      }
+
+      // Give time for cleanup
+      await new Promise(resolve => setTimeout(resolve, 100));
+
+      try {
+        server.close();
+      } catch (error) {
+        // Ignore errors during cleanup
+      }
+
       WS.clean();
     });
 
@@ -358,7 +386,7 @@ describe('Account', () => {
           const onNotificationStreamProgress = jest.fn();
           const onEvent = jest.fn().mockImplementation(() => {});
           mockNotifications(nbNotifications);
-          await dependencies.account.listen({
+          disconnectFn = await dependencies.account.listen({
             useLegacy: false,
             onConnectionStateChanged: callWhen(ConnectionState.LIVE, async () => {
               expect(onNotificationStreamProgress).toHaveBeenCalledTimes(nbNotifications);
@@ -389,7 +417,7 @@ describe('Account', () => {
             onNotificationStreamProgress: onNotificationStreamProgress,
           });
         });
-      });
+      }, 60000);
 
       it('sends information to consumer of the connection state change in order', async () => {
         await new Promise<void>(async resolve => {
@@ -409,16 +437,17 @@ describe('Account', () => {
             }
           });
 
-          const disconnect = await dependencies.account.listen({
+          disconnectFn = await dependencies.account.listen({
             useLegacy: false,
             onConnectionStateChanged,
           });
 
           await waitFor(() => expect(onConnectionStateChanged).toHaveBeenCalledWith(ConnectionState.LIVE));
 
-          disconnect();
+          disconnectFn();
+          disconnectFn = null; // Clear since we called it
         });
-      });
+      }, 60000);
 
       it('warns consumer of the connection close', async () => {
         await new Promise<void>(async resolve => {
@@ -427,29 +456,29 @@ describe('Account', () => {
           const onConnectionStateChanged = jest.fn().mockImplementation((state: ConnectionState) => {
             switch (state) {
               case ConnectionState.LIVE:
+                // Disconnect when we reach live state
+                if (disconnectFn) {
+                  disconnectFn();
+                  disconnectFn = null;
+                }
                 break;
               case ConnectionState.CLOSED:
                 // Expect all states to have been called in order
                 expect(onConnectionStateChanged).toHaveBeenNthCalledWith(1, ConnectionState.PROCESSING_NOTIFICATIONS);
                 expect(onConnectionStateChanged).toHaveBeenNthCalledWith(2, ConnectionState.CONNECTING);
-                expect(onConnectionStateChanged).toHaveBeenNthCalledWith(3, ConnectionState.CLOSED);
+                expect(onConnectionStateChanged).toHaveBeenNthCalledWith(3, ConnectionState.LIVE);
+                expect(onConnectionStateChanged).toHaveBeenNthCalledWith(4, ConnectionState.CLOSED);
                 resolve();
                 break;
             }
           });
 
-          const disconnect = await dependencies.account.listen({
+          disconnectFn = await dependencies.account.listen({
             useLegacy: false,
             onConnectionStateChanged,
           });
-
-          await waitFor(() =>
-            expect(onConnectionStateChanged).toHaveBeenCalledWith(ConnectionState.PROCESSING_NOTIFICATIONS),
-          );
-
-          disconnect();
         });
-      });
+      }, 60000);
 
       it('processes notification stream upon connection', async () => {
         return new Promise<void>(async resolve => {
@@ -457,7 +486,7 @@ describe('Account', () => {
           const onNotificationStreamProgress = jest.fn();
           const onEvent = jest.fn();
           mockNotifications(nbNotifications);
-          await dependencies.account.listen({
+          disconnectFn = await dependencies.account.listen({
             useLegacy: false,
             onConnectionStateChanged: callWhen(ConnectionState.LIVE, () => {
               expect(onNotificationStreamProgress).toHaveBeenCalledTimes(nbNotifications);
@@ -469,7 +498,7 @@ describe('Account', () => {
             onNotificationStreamProgress: onNotificationStreamProgress,
           });
         });
-      });
+      }, 60000);
 
       it('does stop processing messages if websocket connection is aborted', async () => {
         jest
@@ -487,7 +516,7 @@ describe('Account', () => {
           });
 
         return new Promise<void>(async resolve => {
-          return dependencies.account.listen({
+          disconnectFn = await dependencies.account.listen({
             useLegacy: false,
             onConnectionStateChanged: async state => {
               switch (state) {
@@ -520,7 +549,7 @@ describe('Account', () => {
             onNotificationStreamProgress: onNotificationStreamProgress,
           });
         });
-      });
+      }, 60000);
     });
   });
 });

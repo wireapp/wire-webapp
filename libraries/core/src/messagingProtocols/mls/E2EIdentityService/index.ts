@@ -19,3 +19,4 @@
 
 export * from './E2EIService.types';
 export * from './E2EIServiceExternal';
+export * from './Helper';

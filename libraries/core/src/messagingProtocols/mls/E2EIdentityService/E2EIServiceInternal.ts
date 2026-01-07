@@ -34,6 +34,7 @@ import {createE2EIEnrollmentStorage} from './Storage/E2EIStorage';
 import {EnrollmentFlowData, InitialData, UnidentifiedEnrollmentFlowData} from './Storage/E2EIStorage.schema';
 
 import {CoreDatabase} from '../../../storage/CoreDB';
+import {toBufferSource} from '../../../util/bufferUtils';
 
 export type getTokenCallback = (challengesData?: {challenge: any; keyAuth: string}) => Promise<string | undefined>;
 
@@ -93,7 +94,7 @@ export class E2EIServiceInternal {
     const handle = await this.coreCryptoClient.transaction(cx => cx.e2eiEnrollmentStash(identity));
 
     const enrollmentData = {
-      handle,
+      handle: toBufferSource(handle),
       ...enrollmentChallenges,
     };
     await this.enrollmentStorage.savePendingEnrollmentData(enrollmentData);

@@ -25,6 +25,8 @@ import {CRUDEngine} from '@wireapp/store-engine';
 
 import {CryptoClient} from './CryptoClient.types';
 
+import {toArrayBuffer} from '../../../../util/bufferUtils';
+
 type Config = {
   onNewPrekeys: (prekeys: PreKey[]) => void;
 };
@@ -60,7 +62,7 @@ export class CryptoboxWrapper implements CryptoClient {
   }
 
   decrypt(sessionId: string, message: Uint8Array) {
-    return this.cryptobox.decrypt(sessionId, message.buffer);
+    return this.cryptobox.decrypt(sessionId, toArrayBuffer(message.buffer));
   }
 
   async init() {
@@ -102,8 +104,8 @@ export class CryptoboxWrapper implements CryptoClient {
     // Cryptobox is keeping track of consumed prekeys internally
   }
 
-  async sessionFromPrekey(sessionId: string, prekey: Uint8Array) {
-    return void (await this.cryptobox.session_from_prekey(sessionId, prekey.buffer));
+  async sessionFromPrekey(sessionId: string, prekey: Uint8Array): Promise<void> {
+    return void (await this.cryptobox.session_from_prekey(sessionId, toArrayBuffer(prekey.buffer)));
   }
 
   async sessionExists(sessionId: string) {
