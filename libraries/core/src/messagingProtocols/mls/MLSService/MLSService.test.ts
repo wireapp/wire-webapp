@@ -548,6 +548,10 @@ describe('MLSService', () => {
   });
 
   describe('handleMLSMessageAddEvent', () => {
+    afterEach(() => {
+      jest.useRealTimers();
+    });
+
     it('decrypts a message', async () => {
       const [mlsService, {transactionContext, coreCrypto}] = await createMLSService();
 
@@ -640,6 +644,10 @@ describe('MLSService', () => {
   });
 
   describe('handleMLSWelcomeMessageEvent', () => {
+    afterEach(() => {
+      jest.useRealTimers();
+    });
+
     it("before processing welcome it verifies that there's enough key packages locally", async () => {
       const [mlsService, {apiClient, transactionContext}] = await createMLSService();
 
@@ -755,6 +763,10 @@ describe('MLSService', () => {
   });
 
   describe('tryEstablishingMLSGroup', () => {
+    afterEach(() => {
+      jest.useRealTimers();
+    });
+
     it('returns false if group did already exist locally', async () => {
       const [mlsService, {coreCrypto}] = await createMLSService();
 

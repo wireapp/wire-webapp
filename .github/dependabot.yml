@@ -95,6 +95,24 @@ updates:
       - dependency-name: 'typescript'
       - dependency-name: '@types/node'
 
+  # Core library dependencies
+  - package-ecosystem: npm
+    directory: '/libraries/core'
+    schedule:
+      interval: weekly
+      day: sunday
+      time: '16:00'
+      timezone: 'Europe/Berlin'
+    open-pull-requests-limit: 99
+    labels:
+      - 'type: chore 🧹'
+    ignore:
+      # Prevent major version updates
+      - dependency-name: '*'
+        update-types: ['version-update:semver-major']
+      - dependency-name: '@types/node'
+      - dependency-name: 'typescript'
+
   # Github actions
   - package-ecosystem: 'github-actions'
     directory: '/'

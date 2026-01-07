@@ -17,6 +17,7 @@
  *
  */
 
+import {toBufferSource} from '../../../../util/bufferUtils';
 import {AcmeService} from '../Connection';
 import {E2eiEnrollment, NewAcmeAuthz, Nonce} from '../E2EIService.types';
 import {jsonToByteArray} from '../Helper';
@@ -57,12 +58,12 @@ export const getAuthorizationChallenges = async ({
   const authorization = {
     keyauth: oidcChallenge.keyauth!,
     dpopChallenge: {
-      delegate: dpopChallenge.challenge.delegate,
+      delegate: toBufferSource(dpopChallenge.challenge.delegate),
       target: dpopChallenge.challenge.target,
       url: dpopChallenge.challenge.url,
     },
     oidcChallenge: {
-      delegate: oidcChallenge.challenge.delegate,
+      delegate: toBufferSource(oidcChallenge.challenge.delegate),
       target: oidcChallenge.challenge.target,
       url: oidcChallenge.challenge.url,
     },

@@ -216,7 +216,9 @@ export class NotificationService extends TypedEventEmitter<Events> {
       let lastEventDate: Date | undefined = undefined;
       try {
         lastEventDate = await this.database.getLastEventDate();
-      } catch {}
+      } catch {
+        // Ignore database errors when fetching last event date
+      }
       if ('time' in event && this.isOutdatedEvent(event, source, lastEventDate)) {
         this.logger.info(`Ignored outdated event type: '${event.type}'`);
         continue;
