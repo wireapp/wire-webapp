@@ -26,12 +26,12 @@ import {ChooseScreen} from './ChooseScreen';
 
 describe('ChooseScreen', () => {
   const screens = [
-    {id: 'screen:first', thumbnail: {toDataURL: () => 'first screen'} as HTMLCanvasElement},
-    {id: 'screen:second', thumbnail: {toDataURL: () => 'second screen'} as HTMLCanvasElement},
+    {id: 'screen:first', name: 'Screen 1', thumbnail: {toDataURL: () => 'first screen'} as HTMLCanvasElement},
+    {id: 'screen:second', name: 'Screen 2', thumbnail: {toDataURL: () => 'second screen'} as HTMLCanvasElement},
   ];
   const windows = [
-    {id: 'window:first', thumbnail: {toDataURL: () => 'first window'} as HTMLCanvasElement},
-    {id: 'window:second', thumbnail: {toDataURL: () => 'second window'} as HTMLCanvasElement},
+    {id: 'window:first', name: 'Window 1', thumbnail: {toDataURL: () => 'first window'} as HTMLCanvasElement},
+    {id: 'window:second', name: 'Window 2', thumbnail: {toDataURL: () => 'second window'} as HTMLCanvasElement},
   ];
 
   const props = {
