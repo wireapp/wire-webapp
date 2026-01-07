@@ -21,6 +21,9 @@ apps/
 │   └── app-config/   # Webapp configuration
 └── server/           # Node.js/Express backend API
     └── src/          # Server source code
+libraries/
+└── core/             # Core library (@wireapp/core) with messaging protocols
+    └── src/          # Library source code
 docs/                 # Project documentation
 package.json          # Root dependencies (use yarn commands)
 ```
@@ -28,9 +31,10 @@ package.json          # Root dependencies (use yarn commands)
 ## ESSENTIAL COMMANDS
 
 ```bash
-yarn nx run webapp:serve    # Start frontend development
-yarn nx run webapp:build    # Build frontend for production
-yarn nx run server:package  # Package server for deployment
+yarn nx run webapp:serve     # Start frontend development
+yarn nx run webapp:build     # Build frontend for production
+yarn nx run core-lib:build   # Build core library
+yarn nx run server:package   # Package server for deployment
 ```
 
 ## NX WORKFLOW GUIDELINES
@@ -89,7 +93,7 @@ REVIEW these files:
 
 - Security: All code changes (especially APIs and user input)
 - Accessibility: apps/webapp/src/**/*
-- TypeScript: apps/**/*.{ts,tsx}
+- TypeScript: apps/**/*.{ts,tsx}, libraries/**/*.{ts,tsx}
 - React: apps/webapp/src/**/*.{tsx,jsx}
 
 DO NOT REVIEW:
