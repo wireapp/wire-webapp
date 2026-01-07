@@ -18,6 +18,7 @@
  */
 
 import {Locator, Page} from '@playwright/test';
+
 import {User} from 'test/e2e_tests/data/user';
 import {selectByDataAttribute} from 'test/e2e_tests/utils/selector.util';
 
@@ -26,6 +27,16 @@ import {ConversationPage} from '../pages/conversation.page';
 export class CellsConversationPage extends ConversationPage {
   constructor(page: Page) {
     super(page);
+  }
+
+  async isMultipartMessageVisible(user: User, messageText: string): Promise<boolean> {
+    const messageLocator = this.getMessage({sender: user});
+    const textLocator = messageLocator.locator(`p`, {hasText: messageText});
+    const imageLocator = messageLocator.locator(`[aria-label^="Image from ${user.fullName}"]`);
+    await textLocator.waitFor({state: 'visible', timeout: 5000});
+    await imageLocator.waitFor({state: 'visible', timeout: 5000});
+
+    return (await textLocator.isVisible()) && (await imageLocator.isVisible());
   }
 
   override getImageLocator(user: User): Locator {
