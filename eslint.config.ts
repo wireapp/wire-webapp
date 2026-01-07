@@ -48,6 +48,9 @@ const ignores = [
   '*.js',
   'apps/webapp/src/types/i18n.d.ts',
   'apps/webapp/playwright-report/',
+  'libraries/core/lib/',
+  'libraries/core/.tmp/',
+  'libraries/core/src/demo/',
 ];
 
 const base = compat.extends('@wireapp/eslint-config');
@@ -69,7 +72,7 @@ const config: Linter.Config[] = [
       parser: tsParser,
       parserOptions: {
         // Enable type-aware linting for TypeScript sources
-        project: './apps/webapp/tsconfig.eslint.json',
+        project: ['./apps/webapp/tsconfig.eslint.json', './libraries/core/tsconfig.eslint.json'],
         tsconfigRootDir: __dirname,
         EXPERIMENTAL_useProjectService: {
           allowDefaultProjectForFiles: ['*.ts', '*.tsx'],
@@ -81,6 +84,7 @@ const config: Linter.Config[] = [
         React: 'readonly',
         JSX: 'readonly',
         amplify: 'readonly',
+        NodeJS: 'readonly',
       },
     },
     // @ts-ignore - Plugin type compatibility issues with ESLint 9 flat config

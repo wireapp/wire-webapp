@@ -57,13 +57,15 @@
   "prettier": "@wireapp/prettier-config",
   "private": true,
   "workspaces": [
-    "apps/*"
+    "apps/*",
+    "libraries/*"
   ],
   "repository": {
     "type": "git",
     "url": "https://github.com/wireapp/wire-webapp.git"
   },
   "scripts": {
+    "build": "nx run-many -t build --projects=tag:type:lib",
     "bundle:dev": "nx build webapp --configuration=development",
     "bundle:prod": "nx build webapp --configuration=production",
     "clean:jest": "nx reset && nx run workspace-tools:clean-jest",
@@ -83,7 +85,7 @@
     "release:staging": "nx run workspace-tools:release-staging",
     "release:production": "nx run workspace-tools:release-production",
     "release:custom": "nx run workspace-tools:release-custom",
-    "start": "nx serve server",
+    "start": "nx watch --projects=tag:type:lib -- nx run \\$NX_PROJECT_NAME:watch & nx serve server",
     "stylelint": "nx run webapp:stylelint",
     "e2e-test": "nx e2e webapp",
     "e2e-ui": "nx e2e webapp --ui",
