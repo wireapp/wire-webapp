@@ -130,7 +130,12 @@ export class QuotedMessageMiddleware implements EventMiddleware {
       quote = Quote.decode(encodedQuote);
     } catch (error) {
       this.logger.warn('Failed to decode quoted message.', error);
-      return event;
+      const quoteData: ProcessedQuoteData = {
+        error: {
+          type: QuoteEntity.ERROR.MESSAGE_NOT_FOUND,
+        },
+      };
+      return accessor.set(event, quoteData);
     }
     this.logger.info(`Found quoted message: ${quote.quotedMessageId}`);
 
