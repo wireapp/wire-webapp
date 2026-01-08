@@ -108,7 +108,7 @@ describe('ChooseScreen', () => {
   it('calls cancel on escape', () => {
     setup();
 
-    fireEvent.keyDown(document, {code: 'Enter', key: 'Escape'});
+    fireEvent.keyDown(document, {code: 'Escape', key: 'Escape'});
     expect(callState.selectableScreens()).toEqual([]);
     expect(callState.selectableWindows()).toEqual([]);
   });
