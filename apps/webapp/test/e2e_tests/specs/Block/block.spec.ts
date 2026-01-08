@@ -43,9 +43,8 @@ export async function blockUserFromConversationList(pageManager: PageManager, us
  * @param pageManager PageManager of the blocking user
  * @param userToBlock User object of the user to be blocked
  */
-export async function blockUserFromProfileView(pageManager: PageManager, userToBlock: User) {
+export async function blockUserFromProfileView(pageManager: PageManager) {
   const {pages, modals} = pageManager.webapp;
-  await pages.conversationList().openConversation(userToBlock.fullName);
   await pages.conversation().clickConversationInfoButton();
   await pages.participantDetails().blockUser();
   await modals.blockWarning().clickBlock();
@@ -158,6 +157,7 @@ test.describe('User Blocking', () => {
         // Preconditions: User B accepts the connection request
         const userBPages = (await PageManager.from(createPage(withLogin(userB)))).webapp.pages;
         await userBPages.connectRequest().clickConnectButton();
+        await userBPages.conversationList().openConversation(userA.fullName, {protocol: 'mls'});
         await createGroup(userAPages, conversationName, [userB]);
 
         await test.step('Step 1: User B sends message to group chat with User A', async () => {
@@ -201,7 +201,7 @@ test.describe('User Blocking', () => {
         // Step 1: User A and B have a 1:1 conversation
         await userAPages.conversationList().openConversation(userB.fullName, {protocol: 'mls'});
         // Step 2: User A blocks User B
-        await blockUserFromProfileView(userAPageManagerInstance, userB);
+        await blockUserFromProfileView(userAPageManagerInstance);
         await expect(userAPages.conversation().messageInput).toBeHidden();
         // Step 3: User A unblocks User B from Conversation Details Options
         await userAPages.conversationList().clickConversationOptions(userB.fullName);
