@@ -29,7 +29,6 @@ export class ConversationListPage {
 
   readonly blockConversationMenuButton: Locator;
   readonly createGroupButton: Locator;
-  readonly connectWithPeopleButton: Locator;
   readonly pendingConnectionRequest: Locator;
   readonly leaveConversationButton: Locator;
   readonly searchConversationsInput: Locator;
@@ -51,7 +50,6 @@ export class ConversationListPage {
       `${selectById('btn-block')}${selectByDataAttribute('conversation-list-options-menu')}`,
     );
 
-    this.connectWithPeopleButton = page.locator('[data-uie-name="connect-with-new-users"]');
     this.pendingConnectionRequest = page.locator('[data-uie-name="connection-request"]');
     this.createGroupButton = page.locator(
       `${selectByDataAttribute('conversation-list-header')} ${selectByDataAttribute('go-create-group')}`,
@@ -102,10 +100,6 @@ export class ConversationListPage {
 
   async clickConversationOptions(conversationName: string) {
     await this.getConversationLocator(conversationName).locator(selectByDataAttribute('go-options')).first().click();
-  }
-
-  async clickConnectWithPeople() {
-    await this.connectWithPeopleButton.click();
   }
 
   async clickBlockConversation() {
