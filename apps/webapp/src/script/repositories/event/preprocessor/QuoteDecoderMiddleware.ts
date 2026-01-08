@@ -19,7 +19,7 @@
 
 import {Quote} from '@wireapp/protocol-messaging';
 
-import {MessageAddEvent, MultipartMessageAddEvent} from 'Repositories/conversation/EventBuilder';
+import {MessageAddEvent, MultipartMessageAddEvent, QuoteData} from 'Repositories/conversation/EventBuilder';
 import {StoredEvent} from 'Repositories/storage/record/EventRecord';
 import {getLogger, Logger} from 'Util/Logger';
 import {base64ToArray} from 'Util/util';
@@ -28,6 +28,32 @@ import {QuoteEntity} from '../../../message/QuoteEntity';
 import {ClientEvent} from '../Client';
 import {EventMiddleware, IncomingEvent} from '../EventProcessor';
 import type {EventService} from '../EventService';
+
+type ProcessedQuoteData = Exclude<QuoteData, string>;
+
+type QuoteAccessor<T> = {
+  get: (event: T) => QuoteData | undefined;
+  set: (event: T, quote: ProcessedQuoteData | undefined) => T;
+};
+
+const messageAddQuoteAccessor: QuoteAccessor<MessageAddEvent> = {
+  get: event => event.data.quote,
+  set: (event, quote) => ({
+    ...event,
+    data: {...event.data, quote},
+  }),
+};
+
+const multipartMessageAddQuoteAccessor: QuoteAccessor<MultipartMessageAddEvent> = {
+  get: event => event.data.text.quote,
+  set: (event, quote) => ({
+    ...event,
+    data: {
+      ...event.data,
+      text: {...event.data.text, quote},
+    },
+  }),
+};
 
 export class QuotedMessageMiddleware implements EventMiddleware {
   private readonly logger: Logger;
@@ -47,32 +73,52 @@ export class QuotedMessageMiddleware implements EventMiddleware {
     switch (event.type) {
       case ClientEvent.CONVERSATION.MESSAGE_ADD: {
         const originalMessageId = event.data.replacing_message_id;
-        return originalMessageId ? this.handleEditEvent(event, originalMessageId) : this.handleAddEvent(event);
+        return originalMessageId
+          ? this.handleEditEvent(event, originalMessageId, messageAddQuoteAccessor)
+          : this.handleAddEvent(event, messageAddQuoteAccessor);
       }
       case ClientEvent.CONVERSATION.MULTIPART_MESSAGE_ADD: {
         const originalMessageId = event.data.replacing_message_id;
         return originalMessageId
-          ? this.handleMultipartEditEvent(event, originalMessageId)
-          : this.handleMultipartAddEvent(event);
+          ? this.handleEditEvent(event, originalMessageId, multipartMessageAddQuoteAccessor)
+          : this.handleAddEvent(event, multipartMessageAddQuoteAccessor);
       }
     }
     return event;
   }
 
-  private async handleEditEvent(event: MessageAddEvent, originalMessageId: string): Promise<MessageAddEvent> {
+  private async handleEditEvent<T extends MessageAddEvent | MultipartMessageAddEvent>(
+    event: T,
+    originalMessageId: string,
+    accessor: QuoteAccessor<T>,
+  ): Promise<T> {
     const originalEvent = (await this.eventService.loadEvent(event.conversation, originalMessageId)) as StoredEvent<
-      MessageAddEvent | undefined
+      MessageAddEvent | MultipartMessageAddEvent | undefined
     >;
     if (!originalEvent) {
       return event;
     }
 
-    const decoratedData = {...event.data, quote: originalEvent.data.quote};
-    return {...event, data: decoratedData};
+    const originalQuote = this.extractQuoteFromOriginalEvent(originalEvent);
+    return accessor.set(event, originalQuote);
   }
 
-  private async handleAddEvent(event: MessageAddEvent): Promise<MessageAddEvent> {
-    const rawQuote = event.data.quote;
+  private extractQuoteFromOriginalEvent(
+    event: MessageAddEvent | MultipartMessageAddEvent,
+  ): ProcessedQuoteData | undefined {
+    if (event.type === ClientEvent.CONVERSATION.MULTIPART_MESSAGE_ADD) {
+      const quote = event.data.text.quote;
+      return typeof quote === 'string' ? undefined : quote;
+    }
+    const quote = event.data.quote;
+    return typeof quote === 'string' ? undefined : quote;
+  }
+
+  private async handleAddEvent<T extends MessageAddEvent | MultipartMessageAddEvent>(
+    event: T,
+    accessor: QuoteAccessor<T>,
+  ): Promise<T> {
+    const rawQuote = accessor.get(event);
 
     if (!rawQuote || typeof rawQuote !== 'string') {
       return event;
@@ -87,88 +133,21 @@ export class QuotedMessageMiddleware implements EventMiddleware {
     const quotedMessage = await this.eventService.loadEvent(event.conversation, messageId);
     if (!quotedMessage) {
       this.logger.warn(`Quoted message with ID "${messageId}" not found.`);
-      const quoteData = {
+      const quoteData: ProcessedQuoteData = {
         error: {
           type: QuoteEntity.ERROR.MESSAGE_NOT_FOUND,
         },
       };
 
-      const decoratedData = {...event.data, quote: quoteData};
-      return {...event, data: decoratedData};
+      return accessor.set(event, quoteData);
     }
 
-    const quoteData = {
+    const quoteData: ProcessedQuoteData = {
       message_id: messageId,
       user_id: quotedMessage.from,
       hash: quote.quotedMessageSha256,
     };
 
-    const decoratedData = {...event.data, quote: quoteData};
-    return {...event, data: decoratedData};
-  }
-
-  private async handleMultipartEditEvent(
-    event: MultipartMessageAddEvent,
-    originalMessageId: string,
-  ): Promise<MultipartMessageAddEvent> {
-    const originalEvent = (await this.eventService.loadEvent(event.conversation, originalMessageId)) as StoredEvent<
-      MessageAddEvent | MultipartMessageAddEvent | undefined
-    >;
-    if (!originalEvent) {
-      return event;
-    }
-
-    const originalQuote =
-      originalEvent.type === ClientEvent.CONVERSATION.MULTIPART_MESSAGE_ADD
-        ? originalEvent.data.text.quote
-        : originalEvent.data.quote;
-
-    const decoratedData: MultipartMessageAddEvent['data'] = {
-      ...event.data,
-      text: {...event.data.text, quote: originalQuote},
-    };
-    return {...event, data: decoratedData};
-  }
-
-  private async handleMultipartAddEvent(event: MultipartMessageAddEvent): Promise<MultipartMessageAddEvent> {
-    const rawQuote = event.data.text.quote;
-
-    if (!rawQuote || typeof rawQuote !== 'string') {
-      return event;
-    }
-
-    const encodedQuote = base64ToArray(rawQuote);
-    const quote = Quote.decode(encodedQuote);
-    this.logger.info(`Found quoted message in multipart: ${quote.quotedMessageId}`);
-
-    const messageId = quote.quotedMessageId;
-
-    const quotedMessage = await this.eventService.loadEvent(event.conversation, messageId);
-    if (!quotedMessage) {
-      this.logger.warn(`Quoted message with ID "${messageId}" not found.`);
-      const quoteData: {error: {type: string}} = {
-        error: {
-          type: QuoteEntity.ERROR.MESSAGE_NOT_FOUND,
-        },
-      };
-
-      const decoratedData: MultipartMessageAddEvent['data'] = {
-        ...event.data,
-        text: {...event.data.text, quote: quoteData},
-      };
-      return {...event, data: decoratedData};
-    }
-
-    const quoteData: {message_id: string; user_id: string; hash: Uint8Array} = {
-      message_id: messageId,
-      user_id: quotedMessage.from,
-      hash: quote.quotedMessageSha256,
-    };
-
-    const decoratedData: MultipartMessageAddEvent['data'] = {
-      ...event.data,
-      text: {...event.data.text, quote: quoteData},
-    };
-    return {...event, data: decoratedData};
+    return accessor.set(event, quoteData);
   }
 }
