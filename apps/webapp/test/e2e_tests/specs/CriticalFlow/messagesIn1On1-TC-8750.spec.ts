@@ -66,14 +66,14 @@ test('Messages in 1:1', {tag: ['@TC-8750', '@crit-flow-web']}, async ({createTea
   await test.step('User A sends image', async () => {
     const {pages, components} = memberAPageManager.webapp;
 
-    // Wait for connection to be fully established, MLS migration is still ongoing
-    await memberAPageManager.waitForTimeout(5_000);
-    await pages.conversationList().openConversation(memberB.fullName);
+    // When a conversation between two non team members is created proteus will be used by default and later upgrade to mls.
+    // To avoid loosing messages during the fast execution with playwright we wait for the upgrade is finished to open the MLS conversation.
+    await pages.conversationList().openConversation(memberB.fullName, {protocol: 'mls'});
     await components.inputBarControls().clickShareImage(imageFilePath);
     expect(await pages.conversation().isImageFromUserVisible(memberA)).toBeTruthy();
   });
   await test.step('User B can see the image in the conversation', async () => {
-    await memberBPageManager.webapp.pages.conversationList().openConversation(memberA.fullName);
+    await memberBPageManager.webapp.pages.conversationList().openConversation(memberA.fullName, {protocol: 'mls'});
 
     // Verify that the image is visible in the conversation
     expect(await memberBPageManager.webapp.pages.conversation().isImageFromUserVisible(memberA)).toBeTruthy();
