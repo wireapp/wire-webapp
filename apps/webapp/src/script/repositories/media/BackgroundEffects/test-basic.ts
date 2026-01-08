@@ -54,7 +54,9 @@ declare global {
 const isBrowser = typeof window !== 'undefined' && typeof document !== 'undefined';
 const isNode = typeof process !== 'undefined' && process.exit;
 
-const getWebglDiagnostics = () => {
+type WebglDiagnostics = {webgl1: boolean; webgl2: boolean; renderer: string | null};
+
+const getWebglDiagnostics = (): WebglDiagnostics => {
   if (!isBrowser) {
     return {webgl1: false, webgl2: false, renderer: null as string | null};
   }
@@ -184,8 +186,8 @@ if (!isBrowser && isNode) {
     // Mock browser globals for Node.js environment
     (global as any).window = {};
     (global as any).document = {
-      createElement: () => ({
-        getContext: () => null,
+      createElement: (_tag?: string): {getContext: (contextId?: string) => WebGLRenderingContext | null} => ({
+        getContext: (): WebGLRenderingContext | null => null,
       }),
     };
 
@@ -428,7 +430,12 @@ async function runBrowserDemo() {
     });
   }
   const inputTrack = stream.getVideoTracks()[0];
-  const settings = inputTrack.getSettings();
+  const settings = inputTrack.getSettings() as MediaTrackSettings & {
+    exposureMode?: string;
+    focusMode?: string;
+    resizeMode?: string;
+    whiteBalanceMode?: string;
+  };
   const fmt = (value: unknown) => (value === undefined ? 'n/a' : String(value));
   console.log(
     'Video track settings:',

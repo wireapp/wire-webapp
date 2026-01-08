@@ -36,7 +36,7 @@ import {NoopMaskPostProcessor} from '../segmentation/maskPostProcessor';
 import type {MaskPostProcessor} from '../segmentation/maskPostProcessor';
 import {MediaPipeSegmenterFactory} from '../segmentation/mediaPipeSegmenter';
 import type {SegmenterFactory, SegmenterLike} from '../segmentation/segmenterTypes';
-import {buildMaskInput, MaskInput} from '../shared/mask';
+import {buildMaskInput, type MaskInput, type MaskSource} from '../shared/mask';
 import type {QualityTierParams, SegmentationModelByTier} from '../types';
 
 export class MainWebGLPipeline implements Pipeline {
@@ -152,7 +152,7 @@ export class MainWebGLPipeline implements Pipeline {
           result.release();
         }
         const useClassMask = includeClassMask && processed.classMask;
-        const maskSource = useClassMask
+        const maskSource: MaskSource = useClassMask
           ? {
               mask: processed.classMask,
               maskTexture: null,

@@ -26,6 +26,7 @@ import type {BackgroundEffectSelection, BuiltinBackground} from 'Repositories/me
 import {t} from 'Util/LocalizerUtil';
 
 import {BackgroundEffectsPicker} from './BackgroundEffectsPicker';
+
 import {
   videoOptionsBackButtonStyles,
   videoOptionsRowButtonStyles,
@@ -34,26 +35,54 @@ import {
   videoOptionsSelectMenuStyles,
   videoOptionsSheetHeaderStyles,
   videoOptionsSheetTitleStyles,
-} from './VideoControls.styles';
-import {selectGroupStyles} from './VideoControlsSelect/VideoControlsSelect.styles';
+} from '../VideoControls.styles';
+import {selectGroupStyles} from '../VideoControlsSelect/VideoControlsSelect.styles';
 
 type SelectProps = React.ComponentProps<typeof Select<false>>;
 
+/**
+ * Props for the BackgroundEffectsMenu component.
+ */
 interface BackgroundEffectsMenuProps {
+  /** Whether the menu is currently open. */
   isOpen: boolean;
+  /** Whether to display the header with title and close button. */
   showHeader?: boolean;
+  /** Callback invoked when the menu should be closed. */
   onClose?: () => void;
+  /** Options for the camera selection dropdown. */
   cameraOptions: SelectProps['options'];
+  /** Currently selected camera option value. */
   selectedCameraOptions: SelectProps['value'];
+  /** Callback invoked when camera selection changes. */
   onCameraChange: SelectProps['onChange'];
+  /** Optional keyboard event handler for camera selection. */
   onCameraKeyDown?: SelectProps['onKeyDown'];
+  /** Whether background effects feature is enabled. */
   isBackgroundEffectsEnabled: boolean;
+  /** Currently selected background effect. */
   selectedEffect: BackgroundEffectSelection;
+  /** Array of builtin background options available for selection. */
   backgrounds: BuiltinBackground[];
+  /** Callback invoked when a background effect is selected. */
   onSelectEffect: (effect: BackgroundEffectSelection) => void;
+  /** Callback invoked when the user wants to add a custom background. */
   onAddBackground: () => void;
 }
 
+/**
+ * Menu component for selecting camera and background effects in video calls.
+ *
+ * This component provides a two-view interface:
+ * - Root view: Camera selection dropdown and navigation to background effects
+ * - Backgrounds view: Background effects picker with blur and virtual background options
+ *
+ * The component manages view state internally and resets to root view when closed.
+ * It conditionally renders a header with back/close buttons based on props.
+ *
+ * @param props - Component props.
+ * @returns React component tree.
+ */
 export const BackgroundEffectsMenu = ({
   isOpen,
   showHeader = false,

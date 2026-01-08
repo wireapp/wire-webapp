@@ -21,12 +21,22 @@ import {css, CSSObject} from '@emotion/react';
 
 import {media} from '@wireapp/react-ui-kit';
 
+/**
+ * Container styles for the background effects picker.
+ *
+ * Flexbox layout with vertical stacking and gap spacing between sections.
+ */
 export const backgroundPickerStyles: CSSObject = {
   display: 'flex',
   flexDirection: 'column',
   gap: 12,
 };
 
+/**
+ * Styles for section title headings (e.g., "Background Effects", "Backgrounds").
+ *
+ * Small uppercase text with letter spacing for visual hierarchy.
+ */
 export const backgroundSectionTitleStyles: CSSObject = {
   fontSize: 11,
   fontWeight: 600,
@@ -35,6 +45,12 @@ export const backgroundSectionTitleStyles: CSSObject = {
   color: 'var(--gray-70)',
 };
 
+/**
+ * Grid layout styles for background effect tiles.
+ *
+ * Responsive grid: 3 columns on desktop, 2 columns on mobile.
+ * Uses minmax(0, 1fr) to ensure equal column widths.
+ */
 export const backgroundTileGridStyles: CSSObject = {
   display: 'grid',
   gridTemplateColumns: 'repeat(3, minmax(0, 1fr))',
@@ -45,6 +61,13 @@ export const backgroundTileGridStyles: CSSObject = {
   },
 };
 
+/**
+ * Button styles for background effect tiles.
+ *
+ * Removes default button styling and provides hover/focus/active states.
+ * Selected state is indicated via data-selected attribute styling.
+ * Includes focus-visible outline for keyboard navigation accessibility.
+ */
 export const backgroundTileButtonStyles = css`
   background: none;
   border: none;
@@ -80,6 +103,13 @@ export const backgroundTileButtonStyles = css`
   }
 `;
 
+/**
+ * Preview area styles for background effect tiles.
+ *
+ * 16:9 aspect ratio container with rounded corners and border.
+ * Supports background images and custom content. Includes transition
+ * animations for hover/selection state changes.
+ */
 export const backgroundTilePreviewStyles: CSSObject = {
   position: 'relative',
   width: '100%',
@@ -96,6 +126,11 @@ export const backgroundTilePreviewStyles: CSSObject = {
   justifyContent: 'center',
 };
 
+/**
+ * Label text styles for background effect tiles.
+ *
+ * Small, medium-weight text centered below the preview area.
+ */
 export const backgroundTileLabelStyles: CSSObject = {
   fontSize: 11,
   fontWeight: 500,
@@ -103,6 +138,12 @@ export const backgroundTileLabelStyles: CSSObject = {
   color: 'var(--main-color)',
 };
 
+/**
+ * Checkmark indicator styles for selected background effect tiles.
+ *
+ * Circular badge positioned in the top-right corner of the preview area.
+ * Uses accent color background with shadow for visibility.
+ */
 export const backgroundTileCheckStyles: CSSObject = {
   position: 'absolute',
   top: 6,
@@ -117,18 +158,35 @@ export const backgroundTileCheckStyles: CSSObject = {
   boxShadow: '0 1px 4px rgba(0, 0, 0, 0.2)',
 };
 
+/**
+ * Icon styles for the checkmark indicator.
+ *
+ * Small checkmark icon centered within the check badge.
+ */
 export const backgroundTileCheckIconStyles: CSSObject = {
   width: 12,
   height: 12,
   fill: 'var(--app-bg-secondary)',
 };
 
+/**
+ * Backdrop styles for blur effect tile previews.
+ *
+ * Gradient background used behind the human outline icon in blur tiles.
+ * Positioned absolutely to cover the entire preview area.
+ */
 export const backgroundTileBlurBackdropStyles: CSSObject = {
   position: 'absolute',
   inset: 0,
   backgroundImage: 'linear-gradient(135deg, #f4f6f8 0%, #dfe5ec 100%)',
 };
 
+/**
+ * SVG container styles for the human outline icon.
+ *
+ * Sizes the icon to 78% of the preview area and positions it relatively
+ * for proper centering. Uses currentColor for stroke color inheritance.
+ */
 export const backgroundTileHumanOutlineStyles: CSSObject = {
   position: 'relative',
   width: '78%',
@@ -137,6 +195,12 @@ export const backgroundTileHumanOutlineStyles: CSSObject = {
   zIndex: 1,
 };
 
+/**
+ * Stroke styles for the human outline SVG paths.
+ *
+ * Defines stroke appearance (no fill, rounded line caps/joins) for
+ * the silhouette icon used in effect previews.
+ */
 export const backgroundTileHumanStrokeStyles: CSSObject = {
   fill: 'none',
   stroke: 'currentColor',
@@ -145,17 +209,34 @@ export const backgroundTileHumanStrokeStyles: CSSObject = {
   strokeLinejoin: 'round',
 };
 
+/**
+ * Pattern overlay styles for blur effect tile previews.
+ *
+ * Diagonal repeating gradient pattern positioned absolutely over the
+ * preview area. Used to visually represent blur effect in preview tiles.
+ */
 export const backgroundTileBlurPatternStyles: CSSObject = {
   position: 'absolute',
   inset: 0,
   backgroundImage: 'repeating-linear-gradient(135deg, rgba(0, 0, 0, 0.14) 0 6px, rgba(255, 255, 255, 0.8) 6px 12px)',
 };
 
+/**
+ * Preview styles for the "Add Background" tile.
+ *
+ * Dashed border and lighter background to distinguish it from
+ * selectable background options.
+ */
 export const backgroundTileAddStyles: CSSObject = {
   borderStyle: 'dashed',
   backgroundColor: 'var(--gray-10)',
 };
 
+/**
+ * Icon styles for the plus icon in the "Add Background" tile.
+ *
+ * Medium-sized plus icon with gray fill color.
+ */
 export const backgroundTileAddIconStyles: CSSObject = {
   width: 16,
   height: 16,

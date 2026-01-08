@@ -353,7 +353,7 @@ export const VideoControls = ({
 
   useEffect(() => {
     if (!videoOptionsOpen) {
-      return;
+      return undefined;
     }
     const handlePointerDown = (event: MouseEvent) => {
       const target = event.target as Node;

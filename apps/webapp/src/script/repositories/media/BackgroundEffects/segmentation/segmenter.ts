@@ -550,7 +550,10 @@ export class Segmenter {
       // Use HEAD request to check availability without downloading
       const response = await fetch(url, {method: 'HEAD'});
       if (!response.ok) {
+        // Intentionally ignore missing assets; init will surface issues if needed.
       }
-    } catch (error) {}
+    } catch (error) {
+      // Swallow probe errors to avoid blocking initialization.
+    }
   }
 }

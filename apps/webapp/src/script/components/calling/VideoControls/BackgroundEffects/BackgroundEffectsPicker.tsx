@@ -41,14 +41,33 @@ import {
   backgroundTilePreviewStyles,
 } from './BackgroundEffectsPicker.styles';
 
+/**
+ * Props for the BackgroundEffectsPicker component.
+ */
 interface BackgroundEffectsPickerProps {
+  /** Currently selected background effect. */
   selectedEffect: BackgroundEffectSelection;
+  /** Array of builtin background options available for selection. */
   backgrounds: BuiltinBackground[];
+  /** Callback invoked when a background effect is selected. */
   onSelectEffect: (effect: BackgroundEffectSelection) => void;
+  /** Callback invoked when the user wants to add a custom background. */
   onAddBackground: () => void;
+  /** Whether the picker is disabled (prevents selection). */
   isDisabled?: boolean;
 }
 
+/**
+ * Checks if two background effect selections are equivalent.
+ *
+ * Compares effect types and, for blur effects, compares blur levels.
+ * For virtual backgrounds, compares background IDs. 'none' and 'custom'
+ * effects match if their types match.
+ *
+ * @param selected - The currently selected effect.
+ * @param candidate - The effect to compare against.
+ * @returns True if the effects are equivalent, false otherwise.
+ */
 const isEffectSelected = (selected: BackgroundEffectSelection, candidate: BackgroundEffectSelection) => {
   if (selected.type !== candidate.type) {
     return false;
@@ -62,6 +81,20 @@ const isEffectSelected = (selected: BackgroundEffectSelection, candidate: Backgr
   return true;
 };
 
+/**
+ * Picker component for selecting background effects in video calls.
+ *
+ * Displays a grid of selectable background effect tiles organized into two sections:
+ * 1. Background effects: None, low blur, high blur
+ * 2. Virtual backgrounds: Builtin background images and custom background option
+ *
+ * Each tile shows a preview of the effect and indicates selection state with
+ * a checkmark overlay. The component handles effect selection and custom
+ * background addition through callbacks.
+ *
+ * @param props - Component props.
+ * @returns React component tree.
+ */
 export const BackgroundEffectsPicker = ({
   selectedEffect,
   backgrounds,
@@ -117,7 +150,7 @@ export const BackgroundEffectsPicker = ({
           {backgrounds.map(background => (
             <BackgroundTile
               key={background.id}
-              label={t(background.labelKey)}
+              label={t(background.labelKey as BuiltinBackground['labelKey'])}
               effect={{type: 'virtual', backgroundId: background.id}}
               selectedEffect={selectedEffect}
               onSelectEffect={onSelectEffect}
@@ -142,6 +175,15 @@ export const BackgroundEffectsPicker = ({
   );
 };
 
+/**
+ * SVG icon component rendering a human silhouette outline.
+ *
+ * Used as a preview indicator in background effect tiles to show how
+ * the effect will appear with a person in the foreground. The icon
+ * is hidden from screen readers and not keyboard focusable.
+ *
+ * @returns SVG element with human outline path.
+ */
 const HumanOutline = () => (
   <svg viewBox="0 0 64 64" css={backgroundTileHumanOutlineStyles} aria-hidden="true" focusable="false">
     <circle cx="32" cy="20" r="10" css={backgroundTileHumanStrokeStyles} />
@@ -151,16 +193,37 @@ const HumanOutline = () => (
   </svg>
 );
 
+/**
+ * Props for the BackgroundTile component.
+ */
 interface BackgroundTileProps {
+  /** Display label for the tile. */
   label: string;
+  /** Background effect represented by this tile. */
   effect: BackgroundEffectSelection;
+  /** Currently selected background effect (for comparison). */
   selectedEffect: BackgroundEffectSelection;
+  /** Callback invoked when the tile is clicked. */
   onSelectEffect: (effect: BackgroundEffectSelection) => void;
+  /** Whether the tile is disabled (prevents selection). */
   isDisabled?: boolean;
+  /** Optional CSS styles for the preview area. */
   previewStyle?: CSSObject;
+  /** Optional React node to render inside the preview area. */
   previewContent?: React.ReactNode;
 }
 
+/**
+ * Individual selectable tile for a background effect option.
+ *
+ * Renders a button with a preview area and label. Shows a checkmark
+ * overlay when selected. Supports custom preview content (e.g., blur
+ * pattern, background image) and styling. Handles click events to
+ * select the effect.
+ *
+ * @param props - Component props.
+ * @returns Button element with preview and label.
+ */
 const BackgroundTile = ({
   label,
   effect,

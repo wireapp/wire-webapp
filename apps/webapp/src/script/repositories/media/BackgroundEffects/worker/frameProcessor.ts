@@ -27,7 +27,7 @@ import {
   resolveSegmentationModelPath,
 } from '../quality';
 import {Segmenter} from '../segmentation/segmenter';
-import {buildMaskInput, MaskInput} from '../shared/mask';
+import {buildMaskInput, type MaskInput, type MaskSource} from '../shared/mask';
 import {toMonotonicTimestampMs} from '../shared/timestamps';
 import type {QualityTierParams} from '../types';
 
@@ -67,7 +67,7 @@ export async function handleFrame(frame: ImageBitmap, timestamp: number, width: 
         const includeClassMask = state.debugMode === 'classOverlay' || state.debugMode === 'classOnly';
         const result = await state.segmenter.segment(frame, timestampMs, {includeClassMask});
         const useClassMask = includeClassMask && result.classMask;
-        const maskSource = useClassMask
+        const maskSource: MaskSource = useClassMask
           ? {
               mask: result.classMask,
               maskTexture: null,
@@ -163,11 +163,11 @@ function updateMetrics(totalMs: number, segmentationMs: number, gpuMs: number, t
     return;
   }
 
-  const processingMode = isProcessingMode(state.mode);
+  const processingMode = isProcessingMode(state.mode) ? state.mode : null;
   const params = processingMode
     ? state.quality === 'auto'
-      ? state.qualityController.update({totalMs, segmentationMs, gpuMs}, state.mode)
-      : state.qualityController.getTier(state.mode)
+      ? state.qualityController.update({totalMs, segmentationMs, gpuMs}, processingMode)
+      : state.qualityController.getTier(processingMode)
     : null;
 
   pushMetricsSample(state.metricsWindow, {totalMs, segmentationMs, gpuMs});

@@ -42,7 +42,6 @@ export class FrameSource {
   private processor: any | null = null;
   private processorAbort: AbortController | null = null;
   private processorReader: ReadableStreamDefaultReader<any> | null = null;
-  private processorPipe: Promise<void> | null = null;
   private videoSource: VideoSource | null = null;
   private processing = false;
   private running = false;
@@ -81,7 +80,6 @@ export class FrameSource {
       this.processorReader = null;
     }
     this.processor = null;
-    this.processorPipe = null;
     this.videoSource?.stop();
     this.videoSource = null;
     this.processing = false;
@@ -105,7 +103,7 @@ export class FrameSource {
     const reader = readable.getReader();
     this.processorReader = reader;
 
-    this.processorPipe = (async () => {
+    void (async () => {
       try {
         while (this.running && !abortController.signal.aborted) {
           const result = await reader.read();

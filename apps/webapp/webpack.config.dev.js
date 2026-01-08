@@ -69,8 +69,8 @@ module.exports = {
     updateTranslationTypesPlugin,
     new HtmlWebpackPlugin({
       inject: false,
-      filename: 'test-background-effects.html',
-      template: path.resolve(__dirname, 'src/page/test-background-effects.html'),
+      filename: 'testBackgroundEffects.html',
+      template: path.resolve(__dirname, 'src/page/testBackgroundEffects.html'),
       templateParameters: {},
     }),
   ],
