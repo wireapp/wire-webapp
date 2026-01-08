@@ -23,14 +23,14 @@ import {MessageAddEvent, MultipartMessageAddEvent} from '../../conversation/Even
 import {ClientEvent} from '../../event/Client';
 
 /**
- * Type guard to check if an event is a MessageAddEvent (has quote field).
+ * Type guard to check if an event is a MessageAddEvent (type MESSAGE_ADD).
  */
 export const isMessageAddEvent = (event: EventRecord): event is EventRecord & MessageAddEvent => {
   return event.type === ClientEvent.CONVERSATION.MESSAGE_ADD;
 };
 
 /**
- * Type guard to check if an event is a MultipartMessageAddEvent (has text.quote field).
+ * Type guard to check if an event is a MultipartMessageAddEvent (type MULTIPART_MESSAGE_ADD).
  */
 export const isMultipartMessageAddEvent = (event: EventRecord): event is EventRecord & MultipartMessageAddEvent => {
   return event.type === ClientEvent.CONVERSATION.MULTIPART_MESSAGE_ADD;
