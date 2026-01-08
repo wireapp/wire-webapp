@@ -21,6 +21,25 @@ import type {Pipeline, PipelineConfig, PipelineInit} from './Pipeline';
 
 import type {WorkerOptions, WorkerResponse} from '../types';
 
+/**
+ * Worker-thread WebGL2 rendering pipeline for background effects.
+ *
+ * This pipeline transfers the output canvas to a Web Worker and performs
+ * all processing (segmentation and rendering) in a background thread. This
+ * provides the best performance by avoiding main thread blocking.
+ *
+ * Performance characteristics:
+ * - Highest quality and performance
+ * - Offloads processing to background thread (no UI blocking)
+ * - Requires WebGL2, Worker, and OffscreenCanvas support
+ * - Uses backpressure (single frame in flight) to prevent queue buildup
+ *
+ * Communication:
+ * - Main thread sends frames via postMessage (ImageBitmap transferred, not cloned)
+ * - Worker processes frames and renders to OffscreenCanvas
+ * - Worker sends metrics and completion notifications back to main thread
+ * - All configuration updates are sent via postMessage
+ */
 export class WorkerWebGLPipeline implements Pipeline {
   public readonly type = 'worker-webgl2' as const;
   private worker: Worker | null = null;
@@ -32,13 +51,28 @@ export class WorkerWebGLPipeline implements Pipeline {
   private onTierChange: PipelineInit['onTierChange'] | null = null;
   private onDroppedFrame: PipelineInit['onDroppedFrame'] | null = null;
   private onWorkerSegmenterError: PipelineInit['onWorkerSegmenterError'] | null = null;
+  private onWorkerContextLoss: PipelineInit['onWorkerContextLoss'] | null = null;
   private lastTier: 'A' | 'B' | 'C' | 'D' | null = null;
 
+  /**
+   * Initializes the worker WebGL2 pipeline.
+   *
+   * Transfers the output canvas to an OffscreenCanvas, creates a Web Worker,
+   * and sends initialization message with configuration. Sets up message handlers
+   * for metrics, tier changes, segmenter errors, and frame completion.
+   *
+   * The canvas is transferred (not cloned) to the worker, so the main thread
+   * can no longer access it directly after this call.
+   *
+   * @param init - Pipeline initialization parameters.
+   * @returns Promise that resolves when worker initialization is complete.
+   */
   public async init(init: PipelineInit): Promise<void> {
     this.onMetrics = init.onMetrics;
     this.onTierChange = init.onTierChange;
     this.onDroppedFrame = init.onDroppedFrame;
     this.onWorkerSegmenterError = init.onWorkerSegmenterError ?? null;
+    this.onWorkerContextLoss = init.onWorkerContextLoss ?? null;
     this.workerFrameInFlight = false;
     this.workerFrameResolve = null;
     this.workerFrameReject = null;
@@ -70,6 +104,9 @@ export class WorkerWebGLPipeline implements Pipeline {
       if (event.data.type === 'segmenterError') {
         this.onWorkerSegmenterError?.(event.data.error);
       }
+      if (event.data.type === 'contextLost') {
+        this.onWorkerContextLoss?.();
+      }
       if (event.data.type === 'frameProcessed') {
         this.workerFrameInFlight = false;
         this.workerFrameResolve?.();
@@ -91,6 +128,15 @@ export class WorkerWebGLPipeline implements Pipeline {
     );
   }
 
+  /**
+   * Updates pipeline configuration at runtime.
+   *
+   * Sends configuration updates to the worker via postMessage. The worker
+   * applies these changes without reinitializing. If the worker is not
+   * initialized, this method does nothing.
+   *
+   * @param config - New pipeline configuration.
+   */
   public updateConfig(config: PipelineConfig): void {
     if (!this.worker) {
       return;
@@ -101,6 +147,22 @@ export class WorkerWebGLPipeline implements Pipeline {
     this.worker.postMessage({type: 'setQuality', quality: config.quality});
   }
 
+  /**
+   * Processes a video frame by sending it to the worker.
+   *
+   * Implements backpressure: if a frame is already in flight, drops the
+   * new frame and increments dropped frame counter. Otherwise, transfers
+   * the frame to the worker and waits for completion notification.
+   *
+   * The frame is transferred (not cloned) to the worker for performance.
+   * The promise resolves when the worker sends 'frameProcessed' message.
+   *
+   * @param frame - Input video frame as ImageBitmap (transferred to worker).
+   * @param timestamp - Frame timestamp in seconds.
+   * @param width - Frame width in pixels.
+   * @param height - Frame height in pixels.
+   * @returns Promise that resolves when worker finishes processing the frame.
+   */
   public async processFrame(frame: ImageBitmap, timestamp: number, width: number, height: number): Promise<void> {
     if (!this.worker) {
       frame.close();
@@ -134,6 +196,17 @@ export class WorkerWebGLPipeline implements Pipeline {
     await done;
   }
 
+  /**
+   * Sets a static background image for virtual background mode.
+   *
+   * Transfers the bitmap to the worker via postMessage. The bitmap is
+   * transferred (not cloned) for performance. If the worker is not
+   * initialized, closes the bitmap immediately.
+   *
+   * @param bitmap - Background image as ImageBitmap (transferred to worker).
+   * @param width - Image width in pixels.
+   * @param height - Image height in pixels.
+   */
   public setBackgroundImage(bitmap: ImageBitmap, width: number, height: number): void {
     if (!this.worker) {
       bitmap.close();
@@ -150,6 +223,17 @@ export class WorkerWebGLPipeline implements Pipeline {
     );
   }
 
+  /**
+   * Sets a video frame as background for virtual background mode.
+   *
+   * Transfers the bitmap to the worker via postMessage with 'setBackgroundVideo'
+   * message type. The bitmap is transferred (not cloned) for performance.
+   * If the worker is not initialized, closes the bitmap immediately.
+   *
+   * @param bitmap - Background video frame as ImageBitmap (transferred to worker).
+   * @param width - Frame width in pixels.
+   * @param height - Frame height in pixels.
+   */
   public setBackgroundVideoFrame(bitmap: ImageBitmap, width: number, height: number): void {
     if (!this.worker) {
       bitmap.close();
@@ -166,6 +250,12 @@ export class WorkerWebGLPipeline implements Pipeline {
     );
   }
 
+  /**
+   * Clears the background source.
+   *
+   * Sends a message to the worker to clear the background. If the worker
+   * is not initialized, does nothing.
+   */
   public clearBackground(): void {
     if (!this.worker) {
       return;
@@ -173,6 +263,14 @@ export class WorkerWebGLPipeline implements Pipeline {
     this.worker.postMessage({type: 'setBackgroundImage', image: null, width: 0, height: 0});
   }
 
+  /**
+   * Notifies the worker of dropped frame count.
+   *
+   * Sends the dropped frame count to the worker for metrics tracking.
+   * The worker uses this to include dropped frames in performance metrics.
+   *
+   * @param count - Number of dropped frames.
+   */
   public notifyDroppedFrames(count: number): void {
     if (!this.worker) {
       return;
@@ -180,10 +278,25 @@ export class WorkerWebGLPipeline implements Pipeline {
     this.worker.postMessage({type: 'setDroppedFrames', droppedFrames: count});
   }
 
+  /**
+   * Returns whether output canvas is transferred (always true after init).
+   *
+   * The canvas is transferred to the worker during init(), so it's always
+   * transferred after initialization completes.
+   *
+   * @returns True if canvas is transferred to worker, false if not yet initialized.
+   */
   public isOutputCanvasTransferred(): boolean {
     return this.outputCanvasTransferred;
   }
 
+  /**
+   * Stops the pipeline and releases all resources.
+   *
+   * Rejects any pending frame promise, sends stop message to worker,
+   * terminates the worker thread, and clears all references. Should be
+   * called when the pipeline is no longer needed.
+   */
   public stop(): void {
     if (this.workerFrameReject) {
       this.workerFrameReject(new Error('Worker stopped'));
@@ -201,6 +314,7 @@ export class WorkerWebGLPipeline implements Pipeline {
     this.onTierChange = null;
     this.onDroppedFrame = null;
     this.onWorkerSegmenterError = null;
+    this.onWorkerContextLoss = null;
     this.lastTier = null;
   }
 }

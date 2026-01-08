@@ -2059,12 +2059,11 @@ declare module 'I18n/en-US.json' {
     'videoCallBackgroundsLabel': `Backgrounds`;
     'videoCallBackgroundAdd': `Add background...`;
     'videoCallBackgroundAddToast': `Custom backgrounds are coming soon.`;
-    'videoCallBackgroundSunset': `Sunset`;
-    'videoCallBackgroundOcean': `Ocean`;
-    'videoCallBackgroundForest': `Forest`;
-    'videoCallBackgroundSand': `Sand`;
-    'videoCallBackgroundEmber': `Ember`;
-    'videoCallBackgroundSlate': `Slate`;
+    'videoCallBackgroundOffice1': `Office 1`;
+    'videoCallBackgroundOffice2': `Office 2`;
+    'videoCallBackgroundOffice3': `Office 3`;
+    'videoCallBackgroundOffice4': `Office 4`;
+    'videoCallBackgroundOffice5': `Office 5`;
     'videoCallvideoInputCamera': `Camera`;
     'videoSpeakersTabAll': `All ({count})`;
     'videoSpeakersTabSpeakers': `Speakers`;

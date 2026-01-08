@@ -369,6 +369,17 @@ export interface WorkerErrorMessage {
 }
 
 /**
+ * Worker context lost message sent from worker to main thread.
+ *
+ * Sent when the worker's WebGL context is lost so the main thread can
+ * decide how to recover (e.g., fallback to passthrough).
+ */
+export interface WorkerContextLostMessage {
+  /** Message type discriminator. */
+  type: 'contextLost';
+}
+
+/**
  * Union type of all messages sent from worker to main thread.
  *
  * Used for type-safe message handling in the main thread's worker.onmessage handler.
@@ -377,7 +388,8 @@ export type WorkerResponse =
   | WorkerMetricsMessage
   | WorkerReadyMessage
   | WorkerFrameProcessedMessage
-  | WorkerErrorMessage;
+  | WorkerErrorMessage
+  | WorkerContextLostMessage;
 
 /**
  * Required worker options for initialization.

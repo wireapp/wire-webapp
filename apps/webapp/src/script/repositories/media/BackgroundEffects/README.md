@@ -206,6 +206,22 @@ The module automatically selects the best available pipeline based on browser ca
 4. **Compositing**: GPU-accelerated blur or virtual background replacement
 5. **Output**: Rendered to canvas, exposed via `canvas.captureStream()`
 
+### Post-Processing Today
+
+**WebGL pipelines (worker-webgl2 / main-webgl2)**
+
+- Mask upsample (linear sampling) from low-res segmentation to refined resolution
+- Joint bilateral filtering using the video frame as guidance (edge-preserving smoothing)
+- Temporal smoothing (EMA) using the previous refined mask
+- Separable Gaussian blur (downsample + horizontal + vertical passes)
+- Matte thresholds + soft edges for blur/virtual compositing
+
+**Canvas2D pipeline**
+
+- CPU compositing with blur filter and mask-based alpha
+- Temporal smoothing for masks (EMA) and mask reuse between segmentation frames
+- No bilateral refinement (kept lightweight for low-end devices)
+
 ### Quality Tiers
 
 Quality tiers balance visual quality against performance:
@@ -278,3 +294,11 @@ BackgroundEffects/
 - Passthrough mode is used when no other pipeline is available or when explicitly selected.
 - The module uses MediaPipe assets from `/assets/mediapipe-models/selfie_segmenter_landscape.tflite` and `/min/mediapipe/wasm`. Optional multiclass assets are not bundled by default.
 - All runtime controls (`setMode`, `setBlurStrength`, etc.) work with both worker and main pipelines.
+
+## Future Exploration
+
+- Higher quality mask refinement (guided filter, morphological ops, or ML post-processing)
+- Improved edge handling (halo suppression, adaptive matte thresholds, temporal stability)
+- Color matching/relighting for virtual backgrounds
+- Class-aware compositing (multi-class segmentation use cases)
+- Dynamic post-processing knobs per quality tier and device class

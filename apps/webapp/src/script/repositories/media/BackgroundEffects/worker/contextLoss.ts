@@ -22,6 +22,7 @@ import {state} from './state';
 import {resolveSegmentationModelPath} from '../quality';
 import {WebGLRenderer} from '../renderer/WebGLRenderer';
 import {Segmenter} from '../segmentation/segmenter';
+import type {WorkerResponse} from '../types';
 
 let contextHandlersBound = false;
 
@@ -41,6 +42,7 @@ export function resetContextLossHandlers(): void {
 function handleContextLost(event: Event): void {
   event.preventDefault();
   state.contextLost = true;
+  postMessage({type: 'contextLost'} as WorkerResponse);
   try {
     state.renderer?.destroy();
   } catch (error) {

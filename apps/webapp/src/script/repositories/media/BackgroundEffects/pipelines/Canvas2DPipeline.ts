@@ -25,6 +25,7 @@ import {
   buildMetrics,
   computeBlurRadius,
   createMetricsWindow,
+  isProcessingMode,
   pushMetricsSample,
   QualityController,
   resolveQualityTierForEffectMode,
@@ -37,6 +38,25 @@ import {MediaPipeSegmenterFactory} from '../segmentation/mediaPipeSegmenter';
 import type {SegmenterFactory, SegmenterLike} from '../segmentation/segmenterTypes';
 import type {QualityTierParams, SegmentationModelByTier} from '../types';
 
+/**
+ * Canvas2D-based rendering pipeline for background effects.
+ *
+ * This pipeline uses CPU-based Canvas2D API for rendering, making it a
+ * fallback option when WebGL2 is unavailable. It performs segmentation
+ * using CPU delegate and renders effects using Canvas2D compositing operations.
+ *
+ * Performance characteristics:
+ * - Lower quality than WebGL pipelines (no GPU acceleration)
+ * - Runs on main thread (may impact UI responsiveness)
+ * - Widely supported across browsers
+ * - Uses CPU-based blur filter (less efficient than GPU blur)
+ *
+ * Rendering approach:
+ * - Segmentation: CPU-based ML inference
+ * - Background blur: Canvas2D filter API
+ * - Virtual background: Canvas2D drawImage with compositing
+ * - Mask compositing: destination-in blend mode
+ */
 export class Canvas2DPipeline implements Pipeline {
   public readonly type = 'canvas2d' as const;
   private readonly logger: Logger;
@@ -46,6 +66,11 @@ export class Canvas2DPipeline implements Pipeline {
   private foregroundCtx: CanvasRenderingContext2D | null = null;
   private debugCanvas: HTMLCanvasElement | null = null;
   private debugCtx: CanvasRenderingContext2D | null = null;
+  private maskCanvas: HTMLCanvasElement | null = null;
+  private maskCtx: CanvasRenderingContext2D | null = null;
+  private maskScratchCanvas: HTMLCanvasElement | null = null;
+  private maskScratchCtx: CanvasRenderingContext2D | null = null;
+  private hasMask = false;
   private segmenter: SegmenterLike | null = null;
   private segmenterFactory: SegmenterFactory = MediaPipeSegmenterFactory;
   private segmentationModelByTier: SegmentationModelByTier = {};
@@ -67,6 +92,19 @@ export class Canvas2DPipeline implements Pipeline {
     this.logger = getLogger('Canvas2DPipeline');
   }
 
+  /**
+   * Initializes the Canvas2D pipeline.
+   *
+   * Sets up Canvas2D contexts (output, foreground, debug), initializes
+   * segmenter with CPU delegate, quality controller, and mask post-processor.
+   * Creates foreground and debug canvases for compositing operations.
+   *
+   * If segmentation initialization fails, the pipeline will run in passthrough
+   * mode (no effects applied).
+   *
+   * @param init - Pipeline initialization parameters.
+   * @throws Error if Canvas2D context is unavailable.
+   */
   public async init(init: PipelineInit): Promise<void> {
     this.outputCanvas = init.outputCanvas;
     this.config = init.config;
@@ -76,6 +114,11 @@ export class Canvas2DPipeline implements Pipeline {
     this.mainFrameCount = 0;
     this.canvasFrameToken = 0;
     this.canvasPassthroughLogged = false;
+    this.maskCanvas = null;
+    this.maskCtx = null;
+    this.maskScratchCanvas = null;
+    this.maskScratchCtx = null;
+    this.hasMask = false;
 
     const ctx = this.outputCanvas.getContext('2d');
     if (!ctx) {
@@ -123,6 +166,15 @@ export class Canvas2DPipeline implements Pipeline {
     }
   }
 
+  /**
+   * Updates pipeline configuration at runtime.
+   *
+   * Updates internal config and quality controller tier if quality
+   * mode is fixed (not 'auto'). Adaptive quality updates happen
+   * automatically during frame processing.
+   *
+   * @param config - New pipeline configuration.
+   */
   public updateConfig(config: PipelineConfig): void {
     this.config = config;
     if (this.qualityController && config.quality !== 'auto') {
@@ -130,6 +182,28 @@ export class Canvas2DPipeline implements Pipeline {
     }
   }
 
+  /**
+   * Processes a video frame through the Canvas2D pipeline.
+   *
+   * Processing steps:
+   * 1. Resolves quality tier parameters (adaptive or fixed)
+   * 2. Ensures segmenter is initialized for current tier
+   * 3. Performs segmentation (if cadence allows, respecting frame token)
+   * 4. Applies mask post-processing
+   * 5. Renders background (blur using Canvas2D filter or virtual background)
+   * 6. Composites foreground using mask with destination-in blend mode
+   * 7. Updates performance metrics
+   *
+   * Supports debug visualization modes (maskOverlay, maskOnly, edgeOnly,
+   * classOverlay, classOnly). Handles frame token validation to prevent
+   * race conditions when frames arrive faster than processing.
+   *
+   * @param frame - Input video frame as ImageBitmap (will be closed after processing).
+   * @param _timestamp - Frame timestamp (unused, uses performance.now() for segmentation).
+   * @param width - Frame width in pixels.
+   * @param height - Frame height in pixels.
+   * @returns Promise that resolves when frame processing is complete.
+   */
   public async processFrame(frame: ImageBitmap, _timestamp: number, width: number, height: number): Promise<void> {
     if (!this.outputCanvas || !this.canvasCtx || !this.config) {
       frame.close();
@@ -155,16 +229,22 @@ export class Canvas2DPipeline implements Pipeline {
     }
 
     const qualityTier = this.resolveQuality();
+    if (qualityTier.bypass) {
+      ctx.drawImage(frame, 0, 0, width, height);
+      frame.close();
+      return;
+    }
     if (!qualityTier.bypass) {
       await this.ensureSegmenterForTier(qualityTier.tier);
     }
+    const frameIndex = this.mainFrameCount;
     this.mainFrameCount += 1;
     const token = ++this.canvasFrameToken;
 
     let result:
       | {mask: ImageBitmap | null; classMask: ImageBitmap | null; durationMs: number; release: () => void}
       | {mask: null; classMask: ImageBitmap | null; durationMs: number; release: () => void};
-    if (qualityTier.segmentationCadence > 0 && this.mainFrameCount % qualityTier.segmentationCadence === 0) {
+    if (qualityTier.segmentationCadence > 0 && frameIndex % qualityTier.segmentationCadence === 0) {
       this.segmenter.configure(qualityTier.segmentationWidth, qualityTier.segmentationHeight);
       const timestampMs = performance.now();
       const includeClassMask = this.config.debugMode === 'classOverlay' || this.config.debugMode === 'classOnly';
@@ -199,13 +279,19 @@ export class Canvas2DPipeline implements Pipeline {
 
     const mask = result.mask;
     const classMask = result.classMask;
+    if (mask) {
+      this.updateMaskCanvas(mask, width, height, qualityTier.temporalAlpha);
+    }
+    const maskForEffect = this.hasMask ? this.maskCanvas : null;
     const renderStart = performance.now();
     try {
       const isClassDebug = this.config.debugMode === 'classOverlay' || this.config.debugMode === 'classOnly';
-      const activeMask = isClassDebug ? classMask : mask;
-      if (this.config.debugMode !== 'off' && activeMask) {
+      const activeMask = isClassDebug ? classMask : maskForEffect;
+      if (this.config.debugMode !== 'off') {
         ctx.clearRect(0, 0, width, height);
-        if (this.config.debugMode === 'maskOnly') {
+        if (!activeMask) {
+          ctx.drawImage(frame, 0, 0, width, height);
+        } else if (this.config.debugMode === 'maskOnly') {
           ctx.drawImage(activeMask, 0, 0, width, height);
         } else if (this.config.debugMode === 'maskOverlay') {
           ctx.drawImage(frame, 0, 0, width, height);
@@ -216,14 +302,24 @@ export class Canvas2DPipeline implements Pipeline {
           ctx.globalCompositeOperation = 'source-over';
           ctx.globalAlpha = 1;
         } else if (this.config.debugMode === 'edgeOnly') {
-          ctx.drawImage(activeMask, 0, 0, width, height);
-        } else if (this.config.debugMode === 'classOnly') {
-          this.renderClassMask(ctx, activeMask, width, height, false, frame);
-        } else if (this.config.debugMode === 'classOverlay') {
-          this.renderClassMask(ctx, activeMask, width, height, true, frame);
+          this.renderEdgeMask(ctx, activeMask, width, height);
+        } else if (this.config.debugMode === 'classOnly' && classMask) {
+          this.renderClassMask(ctx, classMask, width, height, false, frame);
+        } else if (this.config.debugMode === 'classOverlay' && classMask) {
+          this.renderClassMask(ctx, classMask, width, height, true, frame);
         }
         const renderMs = performance.now() - renderStart;
-        this.updateMetrics(result.durationMs + renderMs, result.durationMs, renderMs, qualityTier.tier);
+        const totalMs = result.durationMs + renderMs;
+        let metricsTier = qualityTier.tier;
+        if (this.config.quality === 'auto' && this.qualityController && isProcessingMode(this.config.mode)) {
+          const updatedTier = this.qualityController.update(
+            {totalMs, segmentationMs: result.durationMs, gpuMs: renderMs},
+            this.config.mode,
+          );
+          metricsTier = updatedTier.tier;
+          this.onTierChange?.(updatedTier.tier);
+        }
+        this.updateMetrics(totalMs, result.durationMs, renderMs, metricsTier);
         return;
       }
 
@@ -237,11 +333,11 @@ export class Canvas2DPipeline implements Pipeline {
         ctx.filter = 'none';
       }
 
-      if (mask && this.foregroundCtx) {
+      if (maskForEffect && this.foregroundCtx) {
         this.foregroundCtx.clearRect(0, 0, width, height);
         this.foregroundCtx.drawImage(frame, 0, 0, width, height);
         this.foregroundCtx.globalCompositeOperation = 'destination-in';
-        this.foregroundCtx.drawImage(mask, 0, 0, width, height);
+        this.foregroundCtx.drawImage(maskForEffect, 0, 0, width, height);
         this.foregroundCtx.globalCompositeOperation = 'source-over';
         ctx.drawImage(this.foregroundCanvas!, 0, 0, width, height);
       } else {
@@ -249,7 +345,17 @@ export class Canvas2DPipeline implements Pipeline {
       }
 
       const renderMs = performance.now() - renderStart;
-      this.updateMetrics(result.durationMs + renderMs, result.durationMs, renderMs, qualityTier.tier);
+      const totalMs = result.durationMs + renderMs;
+      let metricsTier = qualityTier.tier;
+      if (this.config.quality === 'auto' && this.qualityController && isProcessingMode(this.config.mode)) {
+        const updatedTier = this.qualityController.update(
+          {totalMs, segmentationMs: result.durationMs, gpuMs: renderMs},
+          this.config.mode,
+        );
+        metricsTier = updatedTier.tier;
+        this.onTierChange?.(updatedTier.tier);
+      }
+      this.updateMetrics(totalMs, result.durationMs, renderMs, metricsTier);
     } finally {
       mask?.close();
       classMask?.close();
@@ -258,28 +364,82 @@ export class Canvas2DPipeline implements Pipeline {
     }
   }
 
+  /**
+   * Sets a static background image for virtual background mode.
+   *
+   * Stores the bitmap and uses it for all subsequent frames until cleared
+   * or replaced. The previous background bitmap is closed to prevent leaks.
+   *
+   * @param bitmap - Background image as ImageBitmap.
+   * @param width - Image width in pixels.
+   * @param height - Image height in pixels.
+   */
   public setBackgroundImage(bitmap: ImageBitmap, width: number, height: number): void {
     this.background?.bitmap?.close();
     this.background = {bitmap, width, height};
   }
 
+  /**
+   * Sets a video frame as background for virtual background mode.
+   *
+   * Delegates to setBackgroundImage since Canvas2D pipeline treats
+   * video frames the same as static images.
+   *
+   * @param bitmap - Background video frame as ImageBitmap.
+   * @param width - Frame width in pixels.
+   * @param height - Frame height in pixels.
+   */
   public setBackgroundVideoFrame(bitmap: ImageBitmap, width: number, height: number): void {
     this.setBackgroundImage(bitmap, width, height);
   }
 
+  /**
+   * Clears the background source.
+   *
+   * Closes the stored background bitmap and resets background state.
+   */
   public clearBackground(): void {
     this.background?.bitmap?.close();
     this.background = null;
   }
 
+  /**
+   * Notifies of dropped frames (no-op for Canvas2D).
+   *
+   * Canvas2D pipeline doesn't need dropped frame notifications since it
+   * processes frames synchronously on the main thread.
+   *
+   * @param _count - Dropped frame count (ignored).
+   */
   public notifyDroppedFrames(_count: number): void {
     // No-op for canvas2d.
   }
 
+  /**
+   * Returns whether output canvas is transferred (always false).
+   *
+   * Canvas2D pipeline always runs on the main thread.
+   *
+   * @returns Always false.
+   */
   public isOutputCanvasTransferred(): boolean {
     return false;
   }
 
+  /**
+   * Renders class mask visualization for debug modes.
+   *
+   * Converts class mask ImageBitmap to colored visualization by mapping
+   * class IDs to HSV-based colors. Supports overlay and standalone modes.
+   * Uses a debug canvas for pixel manipulation before rendering.
+   *
+   * @param ctx - Canvas2D rendering context for output.
+   * @param mask - Class mask ImageBitmap with class IDs encoded in RGB channels.
+   * @param width - Mask width in pixels.
+   * @param height - Mask height in pixels.
+   * @param overlay - If true, overlays colored mask on video frame; if false, shows only mask.
+   * @param frame - Original video frame (used for overlay mode).
+   */
   private renderClassMask(
     ctx: CanvasRenderingContext2D,
     mask: ImageBitmap,
@@ -325,12 +485,33 @@ export class Canvas2DPipeline implements Pipeline {
     }
   }
 
+  /**
+   * Generates a color for a class ID using HSV color space.
+   *
+   * Uses a fixed saturation and value with hue derived from class ID
+   * to ensure distinct colors for different classes. The hue is multiplied
+   * by 0.13 and wrapped to ensure good color distribution.
+   *
+   * @param classId - Class identifier (0-255).
+   * @returns RGB color tuple [r, g, b] with values 0-255.
+   */
   private classColor(classId: number): [number, number, number] {
     const hue = (classId * 0.13) % 1;
     const [r, g, b] = this.hsvToRgb(hue, 0.75, 0.95);
     return [Math.round(r * 255), Math.round(g * 255), Math.round(b * 255)];
   }
 
+  /**
+   * Converts HSV color to RGB color space.
+   *
+   * Implements standard HSV to RGB conversion algorithm using the
+   * hexagonal color model.
+   *
+   * @param h - Hue (0-1).
+   * @param s - Saturation (0-1).
+   * @param v - Value/brightness (0-1).
+   * @returns RGB color tuple [r, g, b] with values 0-1.
+   */
   private hsvToRgb(h: number, s: number, v: number): [number, number, number] {
     const i = Math.floor(h * 6);
     const f = h * 6 - i;
@@ -356,6 +537,113 @@ export class Canvas2DPipeline implements Pipeline {
     return [v, p, q];
   }
 
+  private updateMaskCanvas(mask: ImageBitmap, width: number, height: number, alpha: number): void {
+    const resolvedWidth = width || mask.width;
+    const resolvedHeight = height || mask.height;
+    this.ensureMaskCanvas(resolvedWidth, resolvedHeight);
+    if (!this.maskCanvas || !this.maskCtx) {
+      return;
+    }
+    const clampedAlpha = Math.max(0, Math.min(1, alpha));
+    if (!this.hasMask || clampedAlpha >= 1) {
+      this.maskCtx.globalAlpha = 1;
+      this.maskCtx.clearRect(0, 0, resolvedWidth, resolvedHeight);
+      this.maskCtx.drawImage(mask, 0, 0, resolvedWidth, resolvedHeight);
+      this.hasMask = true;
+      return;
+    }
+    if (clampedAlpha <= 0) {
+      this.hasMask = true;
+      return;
+    }
+    if (!this.maskScratchCanvas || !this.maskScratchCtx) {
+      this.maskCtx.globalAlpha = 1;
+      this.maskCtx.clearRect(0, 0, resolvedWidth, resolvedHeight);
+      this.maskCtx.drawImage(mask, 0, 0, resolvedWidth, resolvedHeight);
+      this.hasMask = true;
+      return;
+    }
+    this.maskScratchCtx.globalAlpha = 1 - clampedAlpha;
+    this.maskScratchCtx.clearRect(0, 0, resolvedWidth, resolvedHeight);
+    this.maskScratchCtx.drawImage(this.maskCanvas, 0, 0, resolvedWidth, resolvedHeight);
+    this.maskScratchCtx.globalAlpha = clampedAlpha;
+    this.maskScratchCtx.drawImage(mask, 0, 0, resolvedWidth, resolvedHeight);
+    this.maskScratchCtx.globalAlpha = 1;
+    this.swapMaskBuffers();
+    this.hasMask = true;
+  }
+
+  private renderEdgeMask(ctx: CanvasRenderingContext2D, mask: CanvasImageSource, width: number, height: number): void {
+    if (!this.maskScratchCanvas || !this.maskScratchCtx || !this.maskCanvas) {
+      ctx.drawImage(mask, 0, 0, width, height);
+      return;
+    }
+    const maskWidth = this.maskCanvas.width || width;
+    const maskHeight = this.maskCanvas.height || height;
+    if (this.maskScratchCanvas.width !== maskWidth || this.maskScratchCanvas.height !== maskHeight) {
+      this.maskScratchCanvas.width = maskWidth;
+      this.maskScratchCanvas.height = maskHeight;
+    }
+    this.maskScratchCtx.clearRect(0, 0, maskWidth, maskHeight);
+    this.maskScratchCtx.drawImage(mask, 0, 0, maskWidth, maskHeight);
+    const imageData = this.maskScratchCtx.getImageData(0, 0, maskWidth, maskHeight);
+    const data = imageData.data;
+    for (let i = 0; i < data.length; i += 4) {
+      const value = data[i] / 255;
+      const edge = this.smoothstep(0.4, 0.6, value) - this.smoothstep(0.6, 0.8, value);
+      const gray = Math.round(edge * 255);
+      data[i] = gray;
+      data[i + 1] = gray;
+      data[i + 2] = gray;
+      data[i + 3] = 255;
+    }
+    this.maskScratchCtx.putImageData(imageData, 0, 0);
+    ctx.drawImage(this.maskScratchCanvas, 0, 0, width, height);
+  }
+
+  private smoothstep(edge0: number, edge1: number, x: number): number {
+    const t = Math.max(0, Math.min(1, (x - edge0) / (edge1 - edge0)));
+    return t * t * (3 - 2 * t);
+  }
+
+  private ensureMaskCanvas(width: number, height: number): void {
+    if (!this.maskCanvas) {
+      this.maskCanvas = document.createElement('canvas');
+      this.maskCtx = this.maskCanvas.getContext('2d');
+    }
+    if (!this.maskScratchCanvas) {
+      this.maskScratchCanvas = document.createElement('canvas');
+      this.maskScratchCtx = this.maskScratchCanvas.getContext('2d');
+    }
+    if (this.maskCanvas && (this.maskCanvas.width !== width || this.maskCanvas.height !== height)) {
+      this.maskCanvas.width = width;
+      this.maskCanvas.height = height;
+    }
+    if (
+      this.maskScratchCanvas &&
+      (this.maskScratchCanvas.width !== width || this.maskScratchCanvas.height !== height)
+    ) {
+      this.maskScratchCanvas.width = width;
+      this.maskScratchCanvas.height = height;
+    }
+  }
+
+  private swapMaskBuffers(): void {
+    const canvas = this.maskCanvas;
+    this.maskCanvas = this.maskScratchCanvas;
+    this.maskScratchCanvas = canvas;
+    const ctx = this.maskCtx;
+    this.maskCtx = this.maskScratchCtx;
+    this.maskScratchCtx = ctx;
+  }
+
+  /**
+   * Stops the pipeline and releases all resources.
+   *
+   * Closes segmenter, releases background bitmaps, destroys canvases,
+   * resets quality controller, and clears all references. Should be called
+   * when the pipeline is no longer needed to prevent memory leaks.
+   */
   public stop(): void {
     this.background?.bitmap?.close();
     this.background = null;
@@ -370,6 +658,11 @@ export class Canvas2DPipeline implements Pipeline {
     this.foregroundCtx = null;
     this.debugCanvas = null;
     this.debugCtx = null;
+    this.maskCanvas = null;
+    this.maskCtx = null;
+    this.maskScratchCanvas = null;
+    this.maskScratchCtx = null;
+    this.hasMask = false;
     this.config = null;
     this.onMetrics = null;
     this.onTierChange = null;
@@ -377,6 +670,15 @@ export class Canvas2DPipeline implements Pipeline {
     resetMetricsWindow(this.metricsWindow);
   }
 
+  /**
+   * Resolves quality tier parameters for the current configuration.
+   *
+   * Delegates to resolveQualityTierForEffectMode with the current quality
+   * controller, quality mode, and effect mode. Returns bypass tier if
+   * config is unavailable.
+   *
+   * @returns Quality tier parameters for current configuration.
+   */
   private resolveQuality(): QualityTierParams {
     if (!this.config) {
       return resolveQualityTierForEffectMode(null, 'auto', 'blur');
@@ -384,6 +686,15 @@ export class Canvas2DPipeline implements Pipeline {
     return resolveQualityTierForEffectMode(this.qualityController, this.config.quality, this.config.mode);
   }
 
+  /**
+   * Ensures the segmenter is initialized for the specified quality tier.
+   *
+   * If the tier requires a different model than currently loaded, swaps
+   * the segmenter instance. Skips swap if tier is 'D' (bypass) or if the
+   * desired model is already loaded. Uses CPU delegate for Canvas2D pipeline.
+   *
+   * @param tier - Quality tier ('A', 'B', 'C', or 'D').
+   */
   private async ensureSegmenterForTier(tier: 'A' | 'B' | 'C' | 'D'): Promise<void> {
     if (tier === 'D') {
       return;
@@ -412,14 +723,23 @@ export class Canvas2DPipeline implements Pipeline {
     this.currentModelPath = desiredPath;
   }
 
+  /**
+   * Updates performance metrics and invokes metrics callback.
+   *
+   * Adds a new sample to the metrics window, updates quality tier if in
+   * adaptive mode, and invokes the onMetrics callback with aggregated metrics.
+   * Uses 'CPU' as the segmentation delegate since Canvas2D uses CPU inference.
+   *
+   * @param totalMs - Total frame processing time in milliseconds.
+   * @param segmentationMs - Segmentation processing time in milliseconds.
+   * @param gpuMs - Rendering time in milliseconds (Canvas2D operations).
+   * @param tier - Current quality tier.
+   */
   private updateMetrics(totalMs: number, segmentationMs: number, gpuMs: number, tier: 'A' | 'B' | 'C' | 'D'): void {
     if (!this.onMetrics || !this.getDroppedFrames) {
       return;
     }
     pushMetricsSample(this.metricsWindow, {totalMs, segmentationMs, gpuMs});
-    if (this.config?.quality === 'auto') {
-      this.onTierChange?.(tier);
-    }
     // Canvas2DPipeline uses CPU delegate
     const segmentationDelegate = this.segmenter?.getDelegate?.() ?? 'CPU';
     this.onMetrics(buildMetrics(this.metricsWindow, this.getDroppedFrames(), tier, segmentationDelegate));

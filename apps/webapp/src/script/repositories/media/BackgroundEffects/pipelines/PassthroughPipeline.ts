@@ -19,18 +19,59 @@
 
 import type {Pipeline, PipelineConfig, PipelineInit} from './Pipeline';
 
+/**
+ * Passthrough pipeline that renders frames without any processing.
+ *
+ * This pipeline serves as a fallback when other pipelines are unavailable
+ * or when passthrough mode is explicitly requested. It simply copies input
+ * frames to the output canvas without applying any background effects.
+ *
+ * Use cases:
+ * - Fallback when WebGL2/Canvas2D unavailable
+ * - Explicit passthrough mode (no effects)
+ * - Error recovery after pipeline failures
+ */
 export class PassthroughPipeline implements Pipeline {
   public readonly type = 'passthrough' as const;
   private outputCanvas: HTMLCanvasElement | null = null;
 
+  /**
+   * Initializes the passthrough pipeline.
+   *
+   * Stores a reference to the output canvas. No other initialization is needed
+   * since no processing resources are required.
+   *
+   * @param init - Pipeline initialization parameters.
+   * @returns Promise that resolves immediately.
+   */
   public async init(init: PipelineInit): Promise<void> {
     this.outputCanvas = init.outputCanvas;
   }
 
+  /**
+   * Updates pipeline configuration (no-op for passthrough).
+   *
+   * Passthrough pipeline ignores all configuration changes since it doesn't
+   * apply any effects or processing.
+   *
+   * @param _config - New configuration (ignored).
+   */
   public updateConfig(_config: PipelineConfig): void {
     // No-op.
   }
 
+  /**
+   * Processes a frame by copying it directly to the output canvas.
+   *
+   * Draws the input frame to the output canvas using Canvas2D without
+   * any processing or effects applied. The frame is closed after drawing.
+   *
+   * @param frame - Input video frame as ImageBitmap.
+   * @param _timestamp - Frame timestamp (unused).
+   * @param width - Frame width in pixels.
+   * @param height - Frame height in pixels.
+   * @returns Promise that resolves immediately after drawing.
+   */
   public async processFrame(frame: ImageBitmap, _timestamp: number, width: number, height: number): Promise<void> {
     if (!this.outputCanvas) {
       frame.close();
@@ -45,26 +86,72 @@ export class PassthroughPipeline implements Pipeline {
     frame.close();
   }
 
+  /**
+   * Sets background image (no-op, closes bitmap immediately).
+   *
+   * Passthrough pipeline doesn't use backgrounds, so the bitmap is
+   * immediately closed to prevent memory leaks.
+   *
+   * @param bitmap - Background image bitmap (closed immediately).
+   * @param _width - Image width (unused).
+   * @param _height - Image height (unused).
+   */
   public setBackgroundImage(bitmap: ImageBitmap, _width: number, _height: number): void {
     bitmap.close();
   }
 
+  /**
+   * Sets background video frame (no-op, closes bitmap immediately).
+   *
+   * Passthrough pipeline doesn't use backgrounds, so the bitmap is
+   * immediately closed to prevent memory leaks.
+   *
+   * @param bitmap - Background video frame bitmap (closed immediately).
+   * @param _width - Frame width (unused).
+   * @param _height - Frame height (unused).
+   */
   public setBackgroundVideoFrame(bitmap: ImageBitmap, _width: number, _height: number): void {
     bitmap.close();
   }
 
+  /**
+   * Clears background (no-op for passthrough).
+   *
+   * Passthrough pipeline doesn't maintain background state.
+   */
   public clearBackground(): void {
     // No-op.
   }
 
+  /**
+   * Notifies of dropped frames (no-op for passthrough).
+   *
+   * Passthrough pipeline doesn't track dropped frames since it has
+   * minimal processing overhead.
+   *
+   * @param _count - Dropped frame count (ignored).
+   */
   public notifyDroppedFrames(_count: number): void {
     // No-op.
   }
 
+  /**
+   * Returns whether output canvas is transferred (always false).
+   *
+   * Passthrough pipeline always runs on the main thread.
+   *
+   * @returns Always false.
+   */
   public isOutputCanvasTransferred(): boolean {
     return false;
   }
 
+  /**
+   * Stops the pipeline and releases resources.
+   *
+   * Clears the output canvas reference. No other cleanup is needed
+   * since passthrough doesn't allocate processing resources.
+   */
   public stop(): void {
     this.outputCanvas = null;
   }

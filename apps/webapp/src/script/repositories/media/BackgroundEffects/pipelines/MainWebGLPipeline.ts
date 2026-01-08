@@ -39,6 +39,25 @@ import type {SegmenterFactory, SegmenterLike} from '../segmentation/segmenterTyp
 import {buildMaskInput, type MaskInput, type MaskSource} from '../shared/mask';
 import type {QualityTierParams, SegmentationModelByTier} from '../types';
 
+/**
+ * Main-thread WebGL2 rendering pipeline for background effects.
+ *
+ * This pipeline uses GPU-accelerated WebGL2 rendering on the main thread.
+ * It performs segmentation using GPU delegate and renders effects using
+ * a multi-pass WebGL rendering pipeline with shader programs.
+ *
+ * Performance characteristics:
+ * - High quality rendering with GPU acceleration
+ * - Runs on main thread (may impact UI responsiveness)
+ * - Requires WebGL2 support
+ * - Uses GPU-accelerated segmentation (faster than CPU)
+ *
+ * Rendering approach:
+ * - Segmentation: GPU-based ML inference (MediaPipe GPU delegate)
+ * - Background blur: Multi-pass Gaussian blur with downsampling
+ * - Virtual background: WebGL texture compositing
+ * - Mask refinement: Joint bilateral filtering, temporal smoothing
+ */
 export class MainWebGLPipeline implements Pipeline {
   public readonly type = 'main-webgl2' as const;
   private readonly logger: Logger;
@@ -63,6 +82,19 @@ export class MainWebGLPipeline implements Pipeline {
     this.logger = getLogger('MainWebGLPipeline');
   }
 
+  /**
+   * Initializes the main WebGL2 pipeline.
+   *
+   * Sets up WebGL renderer, initializes segmenter with GPU delegate,
+   * quality controller, and mask post-processor. Creates WebGL context
+   * on the output canvas and compiles all shader programs.
+   *
+   * If segmentation initialization fails, the pipeline throws an error
+   * (caller should fall back to another pipeline).
+   *
+   * @param init - Pipeline initialization parameters.
+   * @throws Error if segmentation initialization fails.
+   */
   public async init(init: PipelineInit): Promise<void> {
     this.outputCanvas = init.outputCanvas;
     this.config = init.config;
@@ -109,6 +141,15 @@ export class MainWebGLPipeline implements Pipeline {
     }
   }
 
+  /**
+   * Updates pipeline configuration at runtime.
+   *
+   * Updates internal config and quality controller tier if quality
+   * mode is fixed (not 'auto'). Adaptive quality updates happen
+   * automatically during frame processing.
+   *
+   * @param config - New pipeline configuration.
+   */
   public updateConfig(config: PipelineConfig): void {
     this.config = config;
     if (this.qualityController && config.quality !== 'auto') {
@@ -116,6 +157,27 @@ export class MainWebGLPipeline implements Pipeline {
     }
   }
 
+  /**
+   * Processes a video frame through the main WebGL2 pipeline.
+   *
+   * Processing steps:
+   * 1. Resolves quality tier parameters (adaptive or fixed)
+   * 2. Ensures segmenter is initialized for current tier
+   * 3. Performs segmentation (if cadence allows, GPU-accelerated)
+   * 4. Applies mask post-processing
+   * 5. Configures WebGL renderer with current settings
+   * 6. Renders frame through multi-pass WebGL pipeline
+   * 7. Updates quality controller and performance metrics
+   *
+   * The renderer performs mask refinement, temporal smoothing, blur passes,
+   * and final compositing using GPU shaders for optimal performance.
+   *
+   * @param frame - Input video frame as ImageBitmap (will be closed after processing).
+   * @param timestamp - Frame timestamp in seconds (used for temporal smoothing).
+   * @param width - Frame width in pixels.
+   * @param height - Frame height in pixels.
+   * @returns Promise that resolves when frame processing is complete.
+   */
   public async processFrame(frame: ImageBitmap, timestamp: number, width: number, height: number): Promise<void> {
     if (!this.renderer || !this.outputCanvas || !this.config) {
       frame.close();
@@ -126,14 +188,15 @@ export class MainWebGLPipeline implements Pipeline {
     if (!qualityTier.bypass) {
       await this.ensureSegmenterForTier(qualityTier.tier);
     }
+    const frameIndex = this.mainFrameCount;
+    this.mainFrameCount += 1;
 
     let maskInput: MaskInput | null = null;
     let maskBitmap: ImageBitmap | null = null;
     let releaseMaskResources: (() => void) | null = null;
     let segmentationMs = 0;
     if (!qualityTier.bypass && qualityTier.segmentationCadence > 0 && this.segmenter && this.qualityController) {
-      this.mainFrameCount += 1;
-      if (this.mainFrameCount % qualityTier.segmentationCadence === 0) {
+      if (frameIndex % qualityTier.segmentationCadence === 0) {
         this.segmenter.configure(qualityTier.segmentationWidth, qualityTier.segmentationHeight);
         const segStart = performance.now();
         const timestampMs = timestamp * 1000;
@@ -213,30 +276,78 @@ export class MainWebGLPipeline implements Pipeline {
     this.updateMetrics(segmentationMs + gpuMs, segmentationMs, gpuMs, qualityTier.tier);
   }
 
+  /**
+   * Sets a static background image for virtual background mode.
+   *
+   * Stores the bitmap and uploads it to the WebGL renderer as a texture.
+   * The previous background bitmap is closed to prevent leaks.
+   *
+   * @param bitmap - Background image as ImageBitmap.
+   * @param width - Image width in pixels.
+   * @param height - Image height in pixels.
+   */
   public setBackgroundImage(bitmap: ImageBitmap, width: number, height: number): void {
     this.background?.bitmap?.close();
     this.background = {bitmap, width, height};
     this.renderer?.setBackground(bitmap, width, height);
   }
 
+  /**
+   * Sets a video frame as background for virtual background mode.
+   *
+   * Delegates to setBackgroundImage since the renderer treats video
+   * frames the same as static images (updates texture each frame).
+   *
+   * @param bitmap - Background video frame as ImageBitmap.
+   * @param width - Frame width in pixels.
+   * @param height - Frame height in pixels.
+   */
   public setBackgroundVideoFrame(bitmap: ImageBitmap, width: number, height: number): void {
     this.setBackgroundImage(bitmap, width, height);
   }
 
+  /**
+   * Clears the background source.
+   *
+   * Closes the stored background bitmap, resets background state, and
+   * clears the renderer's background texture.
+   */
   public clearBackground(): void {
     this.background?.bitmap?.close();
     this.background = null;
     this.renderer?.setBackground(null, 0, 0);
   }
 
+  /**
+   * Notifies of dropped frames (no-op for main pipeline).
+   *
+   * Main WebGL pipeline doesn't need dropped frame notifications since it
+   * processes frames synchronously on the main thread.
+   *
+   * @param _count - Dropped frame count (ignored).
+   */
   public notifyDroppedFrames(_count: number): void {
     // No-op for main pipeline.
   }
 
+  /**
+   * Returns whether output canvas is transferred (always false).
+   *
+   * Main WebGL pipeline always runs on the main thread.
+   *
+   * @returns Always false.
+   */
   public isOutputCanvasTransferred(): boolean {
     return false;
   }
 
+  /**
+   * Stops the pipeline and releases all resources.
+   *
+   * Closes segmenter, destroys WebGL renderer (releases all GPU resources),
+   * releases background bitmaps, resets quality controller, and clears all
+   * references. Should be called when the pipeline is no longer needed.
+   */
   public stop(): void {
     this.background?.bitmap?.close();
     this.background = null;
@@ -255,6 +366,15 @@ export class MainWebGLPipeline implements Pipeline {
     resetMetricsWindow(this.metricsWindow);
   }
 
+  /**
+   * Resolves quality tier parameters for the current configuration.
+   *
+   * Delegates to resolveQualityTierForEffectMode with the current quality
+   * controller, quality mode, and effect mode. Returns bypass tier if
+   * config is unavailable.
+   *
+   * @returns Quality tier parameters for current configuration.
+   */
   private resolveQuality(): QualityTierParams {
     if (!this.config) {
       return resolveQualityTierForEffectMode(null, 'auto', 'blur');
@@ -262,6 +382,16 @@ export class MainWebGLPipeline implements Pipeline {
     return resolveQualityTierForEffectMode(this.qualityController, this.config.quality, this.config.mode);
   }
 
+  /**
+   * Ensures the segmenter is initialized for the specified quality tier.
+   *
+   * If the tier requires a different model than currently loaded, swaps
+   * the segmenter instance. Skips swap if tier is 'D' (bypass), output canvas
+   * is unavailable, or if the desired model is already loaded. Uses GPU delegate
+   * for main WebGL pipeline.
+   *
+   * @param tier - Quality tier ('A', 'B', 'C', or 'D').
+   */
   private async ensureSegmenterForTier(tier: 'A' | 'B' | 'C' | 'D'): Promise<void> {
     if (!this.outputCanvas) {
       return;
@@ -294,6 +424,18 @@ export class MainWebGLPipeline implements Pipeline {
     this.currentModelPath = desiredPath;
   }
 
+  /**
+   * Updates performance metrics and invokes metrics callback.
+   *
+   * Adds a new sample to the metrics window, updates quality tier if in
+   * adaptive mode, and invokes the onMetrics callback with aggregated metrics.
+   * Uses 'GPU' as the segmentation delegate since MainWebGLPipeline uses GPU inference.
+   *
+   * @param totalMs - Total frame processing time in milliseconds.
+   * @param segmentationMs - Segmentation processing time in milliseconds.
+   * @param gpuMs - WebGL rendering time in milliseconds.
+   * @param tier - Current quality tier.
+   */
   private updateMetrics(totalMs: number, segmentationMs: number, gpuMs: number, tier: 'A' | 'B' | 'C' | 'D'): void {
     if (!this.onMetrics || !this.getDroppedFrames) {
       return;

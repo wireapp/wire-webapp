@@ -491,6 +491,7 @@ export class BackgroundEffectsController {
             this.logger.warn('Worker segmenter init failed', error);
           }
         },
+        onWorkerContextLoss: () => this.handleWorkerContextLoss(),
       });
     } catch (error) {
       this.logger.warn('Pipeline init failed, falling back to passthrough', error);
@@ -508,6 +509,7 @@ export class BackgroundEffectsController {
         onTierChange: tier => this.handleTierChange(tier),
         onDroppedFrame: () => this.handleFrameDrop(),
         getDroppedFrames: () => this.droppedFrames,
+        onWorkerContextLoss: () => this.handleWorkerContextLoss(),
       });
     }
 
@@ -594,6 +596,14 @@ export class BackgroundEffectsController {
       this.webglContextLost = false;
       this.webglRestorePipeline = null;
     }
+  }
+
+  private handleWorkerContextLoss(): void {
+    if (this.isStopping || this.pipeline !== 'worker-webgl2') {
+      return;
+    }
+    this.logger.warn('Worker WebGL context lost; falling back to passthrough');
+    void this.initPipeline('passthrough');
   }
 
   /**

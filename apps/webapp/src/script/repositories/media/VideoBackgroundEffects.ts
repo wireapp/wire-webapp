@@ -61,12 +61,11 @@ export const BLUR_STRENGTHS: Record<BlurLevel, number> = {
 };
 
 type BuiltinBackgroundLabelKey =
-  | 'videoCallBackgroundSunset'
-  | 'videoCallBackgroundOcean'
-  | 'videoCallBackgroundForest'
-  | 'videoCallBackgroundSand'
-  | 'videoCallBackgroundEmber'
-  | 'videoCallBackgroundSlate';
+  | 'videoCallBackgroundOffice1'
+  | 'videoCallBackgroundOffice2'
+  | 'videoCallBackgroundOffice3'
+  | 'videoCallBackgroundOffice4'
+  | 'videoCallBackgroundOffice5';
 
 /**
  * Base definition for builtin background images.
@@ -107,40 +106,34 @@ const buildGradient = (colors: string[]) => `linear-gradient(135deg, ${colors.jo
 
 const BUILTIN_BACKGROUND_DEFINITIONS: BuiltinBackgroundDefinition[] = [
   {
-    id: 'sunset',
-    labelKey: 'videoCallBackgroundSunset',
-    imageUrl: '/image/backgrounds/sunset.jpg',
-    previewColors: ['#ff7a59', '#ffb27a', '#ffd37e'],
+    id: 'office-1',
+    labelKey: 'videoCallBackgroundOffice1',
+    imageUrl: '/image/backgrounds/office-1.jpg',
+    previewColors: ['#4a5568', '#718096', '#cbd5e0'],
   },
   {
-    id: 'ocean',
-    labelKey: 'videoCallBackgroundOcean',
-    imageUrl: '/image/backgrounds/ocean.jpg',
-    previewColors: ['#1b4965', '#5fa8d3', '#cae9ff'],
+    id: 'office-2',
+    labelKey: 'videoCallBackgroundOffice2',
+    imageUrl: '/image/backgrounds/office-2.jpg',
+    previewColors: ['#2d3748', '#4a5568', '#718096'],
   },
   {
-    id: 'forest',
-    labelKey: 'videoCallBackgroundForest',
-    imageUrl: '/image/backgrounds/forest.jpg',
-    previewColors: ['#2d6a4f', '#52b788', '#b7e4c7'],
+    id: 'office-3',
+    labelKey: 'videoCallBackgroundOffice3',
+    imageUrl: '/image/backgrounds/office-3.jpg',
+    previewColors: ['#1a202c', '#2d3748', '#4a5568'],
   },
   {
-    id: 'sand',
-    labelKey: 'videoCallBackgroundSand',
-    imageUrl: '/image/backgrounds/sand.jpg',
-    previewColors: ['#f1dca7', '#e6b980', '#cfa670'],
+    id: 'office-4',
+    labelKey: 'videoCallBackgroundOffice4',
+    imageUrl: '/image/backgrounds/office-4.jpg',
+    previewColors: ['#2c3e50', '#34495e', '#7f8c8d'],
   },
   {
-    id: 'ember',
-    labelKey: 'videoCallBackgroundEmber',
-    imageUrl: '/image/backgrounds/ember.jpg',
-    previewColors: ['#b23a48', '#fcbf49', '#f77f00'],
-  },
-  {
-    id: 'slate',
-    labelKey: 'videoCallBackgroundSlate',
-    imageUrl: '/image/backgrounds/slate.jpg',
-    previewColors: ['#30343f', '#536878', '#9aa5b1'],
+    id: 'office-5',
+    labelKey: 'videoCallBackgroundOffice5',
+    imageUrl: '/image/backgrounds/office-5.jpg',
+    previewColors: ['#34495e', '#5d6d7e', '#aab7b8'],
   },
 ];
 
