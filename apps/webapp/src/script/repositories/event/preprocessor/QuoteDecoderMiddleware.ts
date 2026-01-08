@@ -107,7 +107,7 @@ export class QuotedMessageMiddleware implements EventMiddleware {
     event: MessageAddEvent | MultipartMessageAddEvent,
   ): ProcessedQuoteData | undefined {
     if (event.type === ClientEvent.CONVERSATION.MULTIPART_MESSAGE_ADD) {
-      const quote = event.data.text.quote;
+      const quote = event.data.text?.quote;
       return typeof quote === 'string' ? undefined : quote;
     }
     const quote = event.data.quote;
