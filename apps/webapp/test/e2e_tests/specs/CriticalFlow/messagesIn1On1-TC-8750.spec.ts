@@ -89,8 +89,8 @@ test('Messages in 1:1', {tag: ['@TC-8750', '@crit-flow-web']}, async ({createTea
     await memberBPageManager.webapp.pages.conversation().clickImage(memberA);
 
     // Verify that the detail view modal is visible
-    expect(await memberBPageManager.webapp.modals.detailViewModal().isVisible()).toBeTruthy();
-    expect(await memberBPageManager.webapp.modals.detailViewModal().isImageVisible()).toBeTruthy();
+    await expect(memberBPageManager.webapp.modals.detailViewModal().mainWindow).toBeVisible();
+    await expect(memberBPageManager.webapp.modals.detailViewModal().image).toBeVisible();
   });
   await test.step('User B can download the image', async () => {
     // Click on the download button to download the image
