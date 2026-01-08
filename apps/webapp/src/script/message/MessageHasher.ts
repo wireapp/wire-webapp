@@ -69,9 +69,10 @@ const getTextBytes = (event: any): number[] => utf8ToUtf16BE(event.data.content)
  * @returns Array of bytes containing text and attachment UUIDs
  */
 const getMultipartTextBytes = (event: any): number[] => {
-  const textBytes = utf8ToUtf16BE(event.data.text.content);
+  const textContent = event.data?.text?.content ?? '';
+  const textBytes = utf8ToUtf16BE(textContent);
 
-  const attachments = event.data.attachments || [];
+  const attachments = event.data?.attachments ?? [];
   const uuidString = attachments
     .map((attachment: any) => attachment?.cellAsset?.uuid)
     .filter(Boolean)
