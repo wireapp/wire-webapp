@@ -20,12 +20,10 @@
 import {Quote} from '@wireapp/protocol-messaging';
 
 import {Conversation} from 'Repositories/entity/Conversation';
-import {MultipartMessageAddEvent} from 'Repositories/conversation/EventBuilder';
 import {User} from 'Repositories/entity/User';
-import {CONVERSATION} from 'Repositories/event/Client';
 import {MessageHasher} from 'src/script/message/MessageHasher';
 import {QuoteEntity} from 'src/script/message/QuoteEntity';
-import {createMessageAddEvent, toSavedEvent} from 'test/helper/EventGenerator';
+import {createMessageAddEvent, createMultipartMessageAddEvent, toSavedEvent} from 'test/helper/EventGenerator';
 import {arrayToBase64} from 'Util/util';
 import {createUuid} from 'Util/uuid';
 
@@ -42,41 +40,6 @@ function buildQuotedMessageMiddleware() {
   } as unknown as jest.Mocked<EventService>;
 
   return [new QuotedMessageMiddleware(eventService), {eventService}] as const;
-}
-
-function createMultipartMessageAddEvent({
-  overrides = {},
-  dataOverrides = {},
-}: {
-  overrides?: Partial<MultipartMessageAddEvent>;
-  dataOverrides?: Partial<MultipartMessageAddEvent['data']>;
-} = {}): MultipartMessageAddEvent {
-  const from = createUuid();
-  const conversationId = createUuid();
-  return {
-    conversation: conversationId,
-    from,
-    id: createUuid(),
-    time: new Date().toISOString(),
-    type: CONVERSATION.MULTIPART_MESSAGE_ADD,
-    data: {
-      text: {},
-      attachments: null,
-      ...dataOverrides,
-    },
-    status: 1,
-    ...overrides,
-  };
-}
-
-function toSavedMultipartEvent<T extends MultipartMessageAddEvent>(
-  event: T,
-): T & {primary_key: string; category: number} {
-  return {
-    primary_key: createUuid(),
-    category: 1,
-    ...event,
-  };
 }
 
 describe('QuotedMessageMiddleware', () => {
@@ -233,7 +196,7 @@ describe('QuotedMessageMiddleware', () => {
         const originalMessage = createMultipartMessageAddEvent();
         originalMessage.data.text.quote = originalQuoteData;
 
-        eventService.loadEvent.mockResolvedValue(toSavedMultipartEvent(originalMessage));
+        eventService.loadEvent.mockResolvedValue(toSavedEvent(originalMessage));
 
         const editEvent = createMultipartMessageAddEvent({
           dataOverrides: {
@@ -299,7 +262,7 @@ describe('QuotedMessageMiddleware', () => {
         const originalMessage = createMultipartMessageAddEvent();
         originalMessage.data.text.quote = originalQuoteData;
 
-        eventService.loadEvent.mockResolvedValue(toSavedMultipartEvent(originalMessage));
+        eventService.loadEvent.mockResolvedValue(toSavedEvent(originalMessage));
 
         const editEvent = createMultipartMessageAddEvent({
           dataOverrides: {
