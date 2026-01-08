@@ -53,6 +53,7 @@ export const hasQuoteForMessage = (event: EventRecord, quotedMessageId: string):
   // Check multipart message quote (MultipartMessageAddEvent)
   if (
     isMultipartMessageAddEvent(event) &&
+    event.data.text &&
     event.data.text.quote &&
     typeof event.data.text.quote === 'object' &&
     'message_id' in event.data.text.quote
