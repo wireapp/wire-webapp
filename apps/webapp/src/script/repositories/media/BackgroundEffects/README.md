@@ -201,7 +201,7 @@ The module automatically selects the best available pipeline based on browser ca
 ### Processing Pipeline
 
 1. **Frame extraction**: `VideoSource` extracts frames using `requestVideoFrameCallback` (preferred) or `requestAnimationFrame` (fallback)
-2. **Segmentation**: MediaPipe Selfie Segmentation generates low-res mask (256x144 or 160x96)
+2. **Segmentation**: MediaPipe Selfie Segmentation generates low-res mask (256x256, 256x144, or 160x96)
 3. **Mask refinement**: Joint bilateral filter + temporal smoothing + upsampling
 4. **Compositing**: GPU-accelerated blur or virtual background replacement
 5. **Output**: Rendered to canvas, exposed via `canvas.captureStream()`
@@ -226,9 +226,9 @@ The module automatically selects the best available pipeline based on browser ca
 
 Quality tiers balance visual quality against performance:
 
-- **Tier A**: 256x144 segmentation, cadence 1, blur 1/2 res with radius 4
+- **Tier A**: 256x256 segmentation, cadence 1, blur 1/2 res with radius 4
 - **Tier B**: 256x144 segmentation, cadence 2, blur 1/2 res with radius 3
-- **Tier C**: 160x96 segmentation, cadence 2, blur 1/4 res with radius 2
+- **Tier C**: 160x96 segmentation, cadence 3, blur 1/4 res with radius 2
 - **Tier D**: Bypass (no processing)
 
 Use `setQuality('A' | 'B' | 'C' | 'D')` to force a tier, or `setQuality('auto')` to let the controller adapt based on performance metrics.
