@@ -181,6 +181,7 @@ export const ConversationListCell = ({
       data-uie-uid={conversation.id}
       data-uie-value={displayName}
       data-uie-status={isActive ? 'active' : 'inactive'}
+      data-protocol={conversation.protocol}
       className={cx('conversation-list-cell', {'conversation-list-cell--active': isActive})}
     >
       <div
