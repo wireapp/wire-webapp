@@ -128,7 +128,7 @@ function ChooseScreen({choose, callState = container.resolve(CallState)}: Choose
       focusContext.targetDocument.removeEventListener('keydown', handleKeyDown);
       dialog.removeEventListener('focusout', handleFocusOut);
     };
-  }, [selectableScreens, selectableWindows, cancel, callState]);
+  }, [selectableScreens, selectableWindows, cancel, callState, restoreFocusRef]);
 
   const renderPreviews = (list: ElectronDesktopCapturerSource[], uieName: string) =>
     list.map(({id, name, thumbnail}) => (
