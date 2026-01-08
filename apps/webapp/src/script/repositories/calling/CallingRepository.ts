@@ -319,6 +319,23 @@ export class CallingRepository {
     }
   };
 
+  /**
+   * Switches the video background effect for the self participant in the active call.
+   *
+   * This method:
+   * 1. Stores the effect as the preferred background effect
+   * 2. Updates the participant's background effect observable
+   * 3. Applies the effect to the participant's video stream
+   * 4. Replaces the media source with the processed stream if successfully applied
+   *
+   * If no active call exists or no video feed is available, only updates the
+   * participant's effect observable without applying processing. For 'none' effect,
+   * switches back to the original video feed.
+   *
+   * @param effect - Background effect to apply ('none', 'blur', 'virtual', or 'custom').
+   * @param customBackground - Optional custom background source for 'custom' effect type.
+   * @returns Promise that resolves when the effect switch is complete.
+   */
   public async switchVideoBackgroundEffect(
     effect: BackgroundEffectSelection,
     customBackground?: BackgroundSource,
@@ -335,7 +352,6 @@ export class CallingRepository {
       return;
     }
 
-    const previousEffect = selfParticipant.backgroundEffect();
     selfParticipant.backgroundEffect(effect);
     const {applied, processedStream} = await this.applyBackgroundEffectToParticipant(
       selfParticipant,
@@ -351,11 +367,30 @@ export class CallingRepository {
       return;
     }
 
-    if (processedStream && (previousEffect.type === 'none' || !selfParticipant.blurredVideoStream())) {
+    if (processedStream) {
       this.changeMediaSource(processedStream, MediaType.VIDEO, false);
     }
   }
 
+  /**
+   * Applies a background effect to a participant's video stream.
+   *
+   * Handles effect application logic:
+   * - 'none': Releases processed stream and returns original stream
+   * - 'virtual': Loads builtin background image and applies virtual background
+   * - 'custom': Uses provided custom background source (requires customBackground parameter)
+   * - 'blur': Applies blur effect with appropriate strength
+   *
+   * Returns an object indicating success and the processed MediaStream if applicable.
+   * If background loading fails or effect application fails, returns {applied: false}.
+   *
+   * @param selfParticipant - Participant to apply the effect to.
+   * @param effect - Background effect selection.
+   * @param customBackground - Optional custom background source for 'custom' effect type.
+   *                          Required for 'custom' effect type.
+   * @returns Promise resolving to an object indicating if the effect was applied
+   *          and the processed MediaStream if successful.
+   */
   private async applyBackgroundEffectToParticipant(
     selfParticipant: Participant,
     effect: BackgroundEffectSelection,
@@ -367,7 +402,7 @@ export class CallingRepository {
     }
 
     if (effect.type === 'none') {
-      selfParticipant.releaseBlurredVideoStream();
+      selfParticipant.releaseProcessedVideoStream();
       return {applied: true, processedStream: videoFeed};
     }
 

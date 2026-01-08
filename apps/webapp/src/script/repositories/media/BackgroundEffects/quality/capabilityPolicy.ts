@@ -110,8 +110,7 @@ export const applyPolicyMode = (tier: TierKey, policy: QualityPolicyMode): TierK
  *    b. Applies policy mode adjustment (conservative/aggressive/balanced)
  *    c. Configures model path overrides (non-WebGL2 browsers use tier B model for tier A)
  *
- * Model path override: When WebGL2 is not available, tier A uses tier B's model path
- * because the tier A model (multiclass) requires WebGL2 for GPU inference.
+ * Model path override: When WebGL2 is not available, tier A uses tier B's model path.
  *
  * @param capabilities - Browser capability information.
  * @param policy - Quality policy mode ('conservative', 'aggressive', 'balanced') or

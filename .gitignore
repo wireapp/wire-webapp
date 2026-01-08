@@ -10,6 +10,7 @@
 /resource
 /temp
 /apps/webapp/resource
+/apps/webapp/assets/mediapipe-models/selfie_multiclass_256x256.tflite
 CHANGELOG.md
 node_modules
 npm-debug.log

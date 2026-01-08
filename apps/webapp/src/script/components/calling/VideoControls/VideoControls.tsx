@@ -308,6 +308,14 @@ export const VideoControls = ({
     switchSpeakerOutput(speaker.id);
   };
 
+  /**
+   * Camera selection options memoized from available video input devices.
+   *
+   * Formats video input devices into select options grouped under a camera label.
+   * Recomputes when videoInputDevices change.
+   *
+   * @returns Array containing a single group with camera device options.
+   */
   const cameraOptions = useMemo(
     () => [
       {
@@ -322,11 +330,27 @@ export const VideoControls = ({
     cameraOptions[0].options.find(({id}) => id === currentCameraDevice) ?? cameraOptions[0].options[0];
   const selectedCameraOptions = [selectedCameraOption];
 
+  /**
+   * Handles camera device selection from the dropdown.
+   *
+   * Finds the selected camera device by value and switches the active camera input.
+   *
+   * @param selectedOption - Selected option value (device ID).
+   */
   const updateCameraOptions = (selectedOption: string) => {
     const camera = cameraOptions[0].options.find(({value}) => value === selectedOption) ?? selectedCameraOption;
     switchCameraInput(camera.id);
   };
 
+  /**
+   * Handles background effect selection from the picker.
+   *
+   * For 'custom' effects, shows a notification that custom backgrounds are not yet
+   * implemented and closes the menu on mobile. For other effects, applies the
+   * effect via switchVideoBackgroundEffect and closes the menu on mobile.
+   *
+   * @param effect - Selected background effect to apply.
+   */
   const handleBackgroundSelect = useCallback(
     (effect: BackgroundEffectSelection) => {
       if (effect.type === 'custom') {
@@ -344,6 +368,12 @@ export const VideoControls = ({
     [addBackgroundNotification, isMobile, switchVideoBackgroundEffect],
   );
 
+  /**
+   * Handles the "Add Background" action from the picker.
+   *
+   * Shows a notification that custom backgrounds are not yet implemented
+   * and closes the video options menu on mobile devices.
+   */
   const handleAddBackground = useCallback(() => {
     addBackgroundNotification.show();
     if (isMobile) {

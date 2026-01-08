@@ -33,6 +33,8 @@ import {
 } from 'Repositories/media/VideoBackgroundEffects';
 import {matchQualifiedIds} from 'Util/QualifiedId';
 
+import {Config} from '../../Config';
+
 export type UserId = string;
 export type ClientId = string;
 
@@ -40,7 +42,7 @@ export class Participant {
   // Video
   public readonly videoState = observable(VIDEO_STATE.STOPPED);
   public readonly videoStream = observable<MediaStream | undefined>();
-  public readonly blurredVideoStream = observable<{stream: MediaStream; release: () => void} | undefined>();
+  public readonly processedVideoStream = observable<{stream: MediaStream; release: () => void} | undefined>();
   public readonly backgroundEffect = observable<BackgroundEffectSelection>(DEFAULT_BACKGROUND_EFFECT);
   public readonly hasActiveVideo: ko.PureComputed<boolean>;
   public readonly hasPausedVideo: ko.PureComputed<boolean>;
@@ -90,12 +92,33 @@ export class Participant {
     });
   }
 
-  public releaseBlurredVideoStream(): void {
-    this.blurredVideoStream()?.release();
-    this.blurredVideoStream(undefined);
+  public releaseProcessedVideoStream(): void {
+    this.processedVideoStream()?.release();
+    this.processedVideoStream(undefined);
     this.backgroundEffectsController = null;
   }
 
+  /**
+   * Applies a background effect to this participant's video stream.
+   *
+   * This method:
+   * 1. Initializes the background effects controller if needed (first call or after release)
+   * 2. Starts processing the video track with the selected effect
+   * 3. Updates the controller's mode and background source for virtual effects
+   * 4. Returns the processed MediaStream with effects applied
+   *
+   * For 'none' effect, releases any existing processed stream and returns
+   * the original video stream. The controller is reused if already initialized
+   * to avoid reinitialization overhead. Background sources are only updated
+   * when switching effects on an existing controller (not during initial creation).
+   *
+   * @param effect - Background effect to apply ('none', 'blur', 'virtual', or 'custom').
+   * @param backgroundSource - Optional background source for virtual/custom effects.
+   *                          Required for 'custom' effect type. Only used when
+   *                          updating an existing controller, not during initialization.
+   * @returns Promise resolving to the processed MediaStream with effects applied,
+   *          or undefined if application fails or no video stream is available.
+   */
   public async applyBackgroundEffect(
     effect: BackgroundEffectSelection,
     backgroundSource?: BackgroundSource,
@@ -105,7 +128,7 @@ export class Participant {
       return undefined;
     }
     if (effect.type === 'none') {
-      this.releaseBlurredVideoStream();
+      this.releaseProcessedVideoStream();
       return originalVideoStream;
     }
     const videoTrack = originalVideoStream.getVideoTracks()[0];
@@ -116,8 +139,11 @@ export class Participant {
     const isVirtual = effect.type === 'virtual' || effect.type === 'custom';
     const blurStrength = effect.type === 'blur' ? BLUR_STRENGTHS[effect.level] : BLUR_STRENGTHS.high;
 
-    if (!this.backgroundEffectsController || !this.blurredVideoStream()) {
+    const shouldCreateController = !this.backgroundEffectsController || !this.processedVideoStream();
+    if (shouldCreateController) {
       const controller = new BackgroundEffectsController();
+      const multiclassModelPath = Config.getConfig().FEATURE.MULTICLASS_MODEL_PATH;
+      const segmentationModelByTier = multiclassModelPath ? {A: multiclassModelPath} : undefined;
       try {
         const {outputTrack, stop} = await controller.start(videoTrack, {
           mode: isVirtual ? 'virtual' : 'blur',
@@ -125,11 +151,12 @@ export class Participant {
           quality: 'auto',
           targetFps: 30,
           debugMode: 'off',
+          segmentationModelByTier,
           ...(isVirtual && backgroundSource ? {backgroundImage: backgroundSource} : {}),
         });
         const processedStream = new MediaStream([outputTrack]);
         this.backgroundEffectsController = controller;
-        this.blurredVideoStream({
+        this.processedVideoStream({
           stream: processedStream,
           release: () => {
             stop();
@@ -139,18 +166,18 @@ export class Participant {
         });
       } catch (_error) {
         controller.stop();
-        this.releaseBlurredVideoStream();
+        this.releaseProcessedVideoStream();
         return undefined;
       }
     }
 
     if (!this.backgroundEffectsController) {
-      return this.blurredVideoStream()?.stream;
+      return this.processedVideoStream()?.stream;
     }
 
     if (isVirtual) {
       this.backgroundEffectsController.setMode('virtual');
-      if (backgroundSource) {
+      if (backgroundSource && !shouldCreateController) {
         this.backgroundEffectsController.setBackgroundSource(backgroundSource);
       }
     } else {
@@ -158,7 +185,7 @@ export class Participant {
       this.backgroundEffectsController.setBlurStrength(blurStrength);
     }
 
-    return this.blurredVideoStream()?.stream;
+    return this.processedVideoStream()?.stream;
   }
 
   readonly doesMatchIds = (userId: QualifiedId, clientId: ClientId): boolean =>
@@ -170,7 +197,7 @@ export class Participant {
   }
 
   setVideoStream(videoStream: MediaStream, stopTracks: boolean): void {
-    this.releaseBlurredVideoStream();
+    this.releaseProcessedVideoStream();
     this.releaseStream(this.videoStream(), stopTracks);
     this.videoStream(videoStream);
   }
@@ -188,13 +215,13 @@ export class Participant {
   getMediaStream(): MediaStream {
     const audioTracks: MediaStreamTrack[] = this.audioStream()?.getTracks() ?? [];
     const videoTracks: MediaStreamTrack[] =
-      this.blurredVideoStream()?.stream.getTracks() ?? this.videoStream()?.getTracks() ?? [];
+      this.processedVideoStream()?.stream.getTracks() ?? this.videoStream()?.getTracks() ?? [];
     return new MediaStream(audioTracks.concat(videoTracks));
   }
 
   releaseVideoStream(stopTracks: boolean): void {
     this.releaseStream(this.videoStream(), stopTracks);
-    this.releaseBlurredVideoStream();
+    this.releaseProcessedVideoStream();
     this.videoStream(undefined);
   }
 

@@ -267,13 +267,14 @@ BackgroundEffects/
 
 ## Dependencies
 
-- Tier A uses MediaPipe multiclass segmentation: `/assets/mediapipe-models/selfie_multiclass_256x256.tflite`
+- Tier A defaults to the selfie segmentation model: `/assets/mediapipe-models/selfie_segmenter_landscape.tflite`
 - Tier B/C/D use MediaPipe selfie segmentation: `/assets/mediapipe-models/selfie_segmenter_landscape.tflite`
+- Multiclass segmentation is optional and can be provided via `segmentationModelByTier` or config override.
 - MediaPipe WASM: `/min/mediapipe/wasm`
 
 ## Notes
 
 - The Canvas2D fallback honors `mode`, `debugMode`, `backgroundSource`, and `blurStrength`, but visual quality is lower than WebGL2.
 - Passthrough mode is used when no other pipeline is available or when explicitly selected.
-- The module uses MediaPipe assets from `/assets/mediapipe-models/selfie_multiclass_256x256.tflite`, `/assets/mediapipe-models/selfie_segmenter_landscape.tflite`, and `/min/mediapipe/wasm`.
+- The module uses MediaPipe assets from `/assets/mediapipe-models/selfie_segmenter_landscape.tflite` and `/min/mediapipe/wasm`. Optional multiclass assets are not bundled by default.
 - All runtime controls (`setMode`, `setBlurStrength`, etc.) work with both worker and main pipelines.
