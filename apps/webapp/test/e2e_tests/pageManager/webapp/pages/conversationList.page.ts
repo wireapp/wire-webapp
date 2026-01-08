@@ -20,7 +20,6 @@
 import {Locator, Page} from '@playwright/test';
 
 import {selectById, selectByDataAttribute} from 'test/e2e_tests/utils/selector.util';
-import {escapeHtml} from 'test/e2e_tests/utils/userDataProcessor';
 
 import {User} from '../../../data/user';
 
@@ -90,8 +89,8 @@ export class ConversationListPage {
     return await mentionIndicator.isVisible();
   }
 
-  async openConversation(conversationName: string) {
-    await this.getConversationLocator(conversationName).first().click();
+  async openConversation(conversationName: string, options?: Parameters<typeof this.getConversationLocator>[1]) {
+    await this.getConversationLocator(conversationName, options).click();
   }
 
   async openPendingConnectionRequest() {
@@ -118,10 +117,19 @@ export class ConversationListPage {
     await this.createGroupButton.click();
   }
 
-  getConversationLocator(conversationName: string) {
-    return this.page.locator(
-      `${selectByDataAttribute('item-conversation')}${selectByDataAttribute(escapeHtml(conversationName), 'value')}`,
-    );
+  /**
+   * Get a locator for a specific conversation in the list
+   * @param conversationName Name of the conversation to search for
+   * @param options.protocol Only locate conversations matching this protocol (mls only works for 1on1 conversations as groups still use proteus) - Default: "mls"
+   */
+  getConversationLocator(conversationName: string, options?: {protocol?: 'mls' | 'proteus'}) {
+    const conversation = this.page.getByTestId('item-conversation').filter({hasText: conversationName});
+
+    if (options?.protocol) {
+      return conversation.and(this.page.locator(`[data-protocol="${options.protocol}"]`));
+    }
+
+    return conversation;
   }
 
   async openContextMenu(conversationName: string) {
