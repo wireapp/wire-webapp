@@ -45,7 +45,7 @@ const messageAddQuoteAccessor: QuoteAccessor<MessageAddEvent> = {
 };
 
 const multipartMessageAddQuoteAccessor: QuoteAccessor<MultipartMessageAddEvent> = {
-  get: event => event.data.text.quote,
+  get: event => event.data.text?.quote,
   set: (event, quote) => ({
     ...event,
     data: {
@@ -107,7 +107,7 @@ export class QuotedMessageMiddleware implements EventMiddleware {
     event: MessageAddEvent | MultipartMessageAddEvent,
   ): ProcessedQuoteData | undefined {
     if (event.type === ClientEvent.CONVERSATION.MULTIPART_MESSAGE_ADD) {
-      const quote = event.data.text.quote;
+      const quote = event.data.text?.quote;
       return typeof quote === 'string' ? undefined : quote;
     }
     const quote = event.data.quote;
@@ -129,7 +129,7 @@ export class QuotedMessageMiddleware implements EventMiddleware {
       const encodedQuote = base64ToArray(rawQuote);
       quote = Quote.decode(encodedQuote);
     } catch (error) {
-      this.logger.warn('Failed to decode quoted message in multipart event.', error);
+      this.logger.warn('Failed to decode quoted message.', error);
       return event;
     }
     this.logger.info(`Found quoted message: ${quote.quotedMessageId}`);
