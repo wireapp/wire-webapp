@@ -93,7 +93,7 @@ test.describe('User Blocking', () => {
         await userBPages.connectRequest().clickConnectButton();
 
         // Step 1: User A opens conversation with User B
-        await userAPages.conversationList().openConversation(userB.fullName);
+        await userAPages.conversationList().openConversation(userB.fullName, {protocol: 'mls'});
         // Step 2: User A opens the options menu for user B
         await userAPages.conversationList().clickConversationOptions(userB.fullName);
         // Step 3: User A opens modal and clicks 'Block' button
@@ -101,7 +101,7 @@ test.describe('User Blocking', () => {
         // Step 4: User A clicks 'Cancel' button
         await userAModals.blockWarning().clickCancel();
         // Step 5: Conversation is still present, and User A can open it
-        await userAPages.conversationList().openConversation(userB.fullName);
+        await userAPages.conversationList().openConversation(userB.fullName, {protocol: 'mls'});
         // Step 6: User A still can send message to User B
         await expect(userAPages.conversation().messageInput).toBeVisible();
       },
@@ -120,7 +120,7 @@ test.describe('User Blocking', () => {
         await userBPages.connectRequest().clickConnectButton();
 
         // Step 1: User A and B have a 1:1 conversation
-        await userAPages.conversationList().openConversation(userB.fullName);
+        await userAPages.conversationList().openConversation(userB.fullName, {protocol: 'mls'});
         // Step 2: User A opens conversation info
         await userAPages.conversation().clickConversationInfoButton();
         // Step 3: User A clicks 'Block conversation' button
@@ -128,10 +128,10 @@ test.describe('User Blocking', () => {
         // Step 4: User A clicks 'Confirm' button
         await userAModals.blockWarning().clickBlock();
         // Step 5: User A cannot send message to User B
-        await userAPages.conversationList().openConversation(userB.fullName);
+        await userAPages.conversationList().openConversation(userB.fullName, {protocol: 'mls'});
         await expect(userAPages.conversation().messageInput).not.toBeVisible();
         // Step 6: User B cannot send message to User A
-        await userBPages.conversationList().openConversation(userA.fullName);
+        await userBPages.conversationList().openConversation(userA.fullName, {protocol: 'mls'});
         await userBPages.conversation().sendMessage('Message after block');
         const message = userAPages.conversation().getMessage({sender: userB});
         await expect(message).not.toBeVisible();
@@ -199,7 +199,7 @@ test.describe('User Blocking', () => {
         await userBPages.connectRequest().clickConnectButton();
 
         // Step 1: User A and B have a 1:1 conversation
-        await userAPages.conversationList().openConversation(userB.fullName);
+        await userAPages.conversationList().openConversation(userB.fullName, {protocol: 'mls'});
         // Step 2: User A blocks User B
         await blockUserFromProfileView(userAPageManagerInstance, userB);
         await expect(userAPages.conversation().messageInput).toBeHidden();
@@ -208,15 +208,15 @@ test.describe('User Blocking', () => {
         await userAPages.conversationList().clickUnblockConversation();
         await userAModals.confirm().clickAction();
         // Step 4: User A send message to User B
-        await userAPages.conversationList().openConversation(userB.fullName);
+        await userAPages.conversationList().openConversation(userB.fullName, {protocol: 'mls'});
         await userAPages.conversation().sendMessage('Message after unblock');
         // Step 5: User B receives message from User A
-        await userBPages.conversationList().openConversation(userA.fullName);
+        await userBPages.conversationList().openConversation(userA.fullName, {protocol: 'mls'});
         await expect(userBPages.conversation().messages).toHaveCount(1);
         // Step 6: User B writes message to User A
         await userBPages.conversation().sendMessage('Message after being unblocked');
         // Step 7: User A receives message from User B
-        await userAPages.conversationList().openConversation(userB.fullName);
+        await userAPages.conversationList().openConversation(userB.fullName, {protocol: 'mls'});
         const message = userAPages.conversation().getMessage({sender: userB});
         await expect(message).toContainText('Message after being unblocked');
       },
@@ -308,16 +308,16 @@ test.describe('User Blocking', () => {
         });
 
         await test.step('User B receives message sent by User A', async () => {
-          await userAPages.conversationList().openConversation(userB.fullName);
+          await userAPages.conversationList().openConversation(userB.fullName, {protocol: 'mls'});
           await userAPages.conversation().sendMessage('Message after unblocking');
-          await userBPages.conversationList().openConversation(userA.fullName);
+          await userBPages.conversationList().openConversation(userA.fullName, {protocol: 'mls'});
           await expect(userBPages.conversation().messages).toHaveCount(1);
         });
 
         await test.step('User A receives message sent by User B', async () => {
-          await userBPages.conversationList().openConversation(userA.fullName);
+          await userBPages.conversationList().openConversation(userA.fullName, {protocol: 'mls'});
           await userBPages.conversation().sendMessage('Message after being unblocked');
-          await userAPages.conversationList().openConversation(userB.fullName);
+          await userAPages.conversationList().openConversation(userB.fullName, {protocol: 'mls'});
           const message = userAPages.conversation().getMessage({sender: userB});
           await expect(message).toContainText('Message after being unblocked');
         });
