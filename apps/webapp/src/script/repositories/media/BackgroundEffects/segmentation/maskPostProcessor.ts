@@ -21,26 +21,62 @@ import type {SegmentationResult} from './segmenter';
 
 import type {EffectMode, QualityTierParams} from '../types';
 
+/**
+ * Context information for mask post-processing operations.
+ */
 export interface MaskPostProcessContext {
   qualityTier: QualityTierParams;
   mode: EffectMode;
   timestampMs: number;
+  /** Frame dimensions in pixels. */
   frameSize: {width: number; height: number};
 }
 
+/**
+ * Interface for mask post-processing operations.
+ *
+ * Post-processors can modify segmentation results before rendering,
+ * such as applying temporal smoothing, edge refinement, or other
+ * enhancements to improve mask quality.
+ */
 export interface MaskPostProcessor {
   process(
     result: SegmentationResult,
     context: MaskPostProcessContext,
   ): Promise<SegmentationResult> | SegmentationResult;
+  /**
+   * Resets post-processor state (e.g., clears temporal buffers).
+   *
+   * @returns Nothing.
+   */
   reset(): void;
 }
 
+/**
+ * Factory interface for creating mask post-processor instances.
+ */
 export interface MaskPostProcessorFactory {
+  /**
+   * Creates a new mask post-processor instance.
+   *
+   * @returns A new MaskPostProcessor instance.
+   */
   create(): MaskPostProcessor;
 }
 
+/**
+ * No-op mask post-processor that returns results unchanged.
+ *
+ * Used as a default when no post-processing is needed. Simply passes
+ * through segmentation results without modification.
+ */
 export class NoopMaskPostProcessor implements MaskPostProcessor {
+  /**
+   * Returns the segmentation result unchanged.
+   *
+   * @param result - Segmentation result to process.
+   * @returns The same result, unmodified.
+   */
   public process(result: SegmentationResult): SegmentationResult {
     return result;
   }

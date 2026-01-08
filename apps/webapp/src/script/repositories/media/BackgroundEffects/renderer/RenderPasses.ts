@@ -20,6 +20,13 @@
 import type {ShaderPrograms} from './ShaderPrograms';
 import type {Size, WebGLResources} from './WebGLResources';
 
+/**
+ * Helper class for executing WebGL render passes.
+ *
+ * Provides utilities for drawing to framebuffers and the default framebuffer
+ * using shader programs. Handles viewport setup, program binding, and uniform
+ * configuration.
+ */
 export class RenderPasses {
   constructor(
     private readonly gl: WebGL2RenderingContext,
@@ -27,6 +34,18 @@ export class RenderPasses {
     private readonly resources: WebGLResources,
   ) {}
 
+  /**
+   * Draws to a texture using a framebuffer.
+   *
+   * Binds the specified framebuffer, sets viewport, and draws a fullscreen
+   * quad using the specified shader program. Sets uFlipY to 0 for texture rendering.
+   *
+   * @param programKey - Key identifying the shader program to use.
+   * @param targetKey - Key identifying the target framebuffer/texture.
+   * @param size - Viewport size (width and height).
+   * @param uniforms - Uniform values to pass to the shader program.
+   * @returns Nothing.
+   */
   public drawToTexture(programKey: string, targetKey: string, size: Size, uniforms: Record<string, any>): void {
     const fbo = this.resources.getFramebuffer(targetKey);
     if (!fbo) {
@@ -38,6 +57,20 @@ export class RenderPasses {
     this.gl.drawArrays(this.gl.TRIANGLE_STRIP, 0, 4);
   }
 
+  /**
+   * Draws to a framebuffer or the default framebuffer (screen).
+   *
+   * Binds the specified framebuffer (or null for default), sets viewport,
+   * and draws a fullscreen quad. Automatically sets uFlipY based on whether
+   * rendering to texture (0) or screen (1).
+   *
+   * @param programKey - Key identifying the shader program to use.
+   * @param fbo - Framebuffer to render to, or null for default framebuffer.
+   * @param width - Viewport width in pixels.
+   * @param height - Viewport height in pixels.
+   * @param uniforms - Uniform values to pass to the shader program.
+   * @returns Nothing.
+   */
   public drawSimple(
     programKey: string,
     fbo: WebGLFramebuffer | null,

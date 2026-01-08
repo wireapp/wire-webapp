@@ -26,6 +26,16 @@ import type {WorkerResponse} from '../types';
 
 let contextHandlersBound = false;
 
+/**
+ * Binds WebGL context loss and restoration event handlers to the canvas.
+ *
+ * Registers event listeners for 'webglcontextlost' and 'webglcontextrestored'
+ * events. Only binds handlers once per canvas to avoid duplicate listeners.
+ * Prevents default context loss behavior to allow graceful recovery.
+ *
+ * @param canvas - OffscreenCanvas to bind handlers to.
+ * @returns Nothing.
+ */
 export function bindContextLossHandlers(canvas: OffscreenCanvas): void {
   if (contextHandlersBound || typeof canvas.addEventListener !== 'function') {
     return;
@@ -35,10 +45,28 @@ export function bindContextLossHandlers(canvas: OffscreenCanvas): void {
   contextHandlersBound = true;
 }
 
+/**
+ * Resets the context loss handlers binding state.
+ *
+ * Allows handlers to be rebound after cleanup. Called when the worker
+ * is stopped to prepare for potential reinitialization.
+ *
+ * @returns Nothing.
+ */
 export function resetContextLossHandlers(): void {
   contextHandlersBound = false;
 }
 
+/**
+ * Handles WebGL context loss event.
+ *
+ * Prevents default context loss behavior, marks context as lost in state,
+ * notifies the main thread via postMessage, and cleans up renderer and
+ * segmenter resources. The main thread should handle fallback to another pipeline.
+ *
+ * @param event - WebGL context lost event.
+ * @returns Nothing.
+ */
 function handleContextLost(event: Event): void {
   event.preventDefault();
   state.contextLost = true;
@@ -53,6 +81,15 @@ function handleContextLost(event: Event): void {
   state.segmenter = null;
 }
 
+/**
+ * Handles WebGL context restoration event.
+ *
+ * Recreates the WebGL renderer and reinitializes the segmenter if needed.
+ * Restores the previous quality tier and mode. If restoration fails, marks
+ * context as lost and notifies the main thread.
+ *
+ * @returns Promise that resolves when context restoration is complete.
+ */
 async function handleContextRestored(): Promise<void> {
   if (!state.canvas || !state.options) {
     return;

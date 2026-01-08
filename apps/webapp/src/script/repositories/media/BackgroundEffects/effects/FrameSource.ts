@@ -30,6 +30,19 @@ import {getLogger, Logger} from 'Util/Logger';
 
 import {VideoSource} from './VideoSource';
 
+/**
+ * Callback function for processing extracted video frames.
+ *
+ * Invoked for each frame extracted from the MediaStreamTrack. The frame
+ * is provided as an ImageBitmap along with its timestamp and dimensions.
+ * The callback can be async to allow for frame processing.
+ *
+ * @param frame - Video frame as ImageBitmap (caller will close after callback).
+ * @param timestampSeconds - Frame timestamp in seconds.
+ * @param width - Frame width in pixels.
+ * @param height - Frame height in pixels.
+ * @returns Promise or void (async processing is supported).
+ */
 export type FrameCallback = (
   frame: ImageBitmap,
   timestampSeconds: number,
@@ -50,6 +63,17 @@ export class FrameSource {
     this.logger = getLogger('FrameSource');
   }
 
+  /**
+   * Starts frame extraction from the MediaStreamTrack.
+   *
+   * Prefers WebCodecs MediaStreamTrackProcessor if available (better performance
+   * and backpressure handling), otherwise falls back to HTMLVideoElement-based
+   * extraction. Only one extraction can be active at a time.
+   *
+   * @param onFrame - Callback invoked for each extracted frame.
+   * @param onDrop - Optional callback invoked when frames are dropped (video element fallback only).
+   * @returns Promise that resolves when extraction starts.
+   */
   public async start(onFrame: FrameCallback, onDrop?: () => void): Promise<void> {
     if (this.running) {
       return;
@@ -65,6 +89,14 @@ export class FrameSource {
     await this.startWithVideoElement(onFrame, onDrop);
   }
 
+  /**
+   * Stops frame extraction and releases resources.
+   *
+   * Cancels any active processor readers, stops video element extraction,
+   * and clears all references. Safe to call multiple times.
+   *
+   * @returns Nothing.
+   */
   public stop(): void {
     this.running = false;
     if (this.processorAbort) {
@@ -85,6 +117,18 @@ export class FrameSource {
     this.processing = false;
   }
 
+  /**
+   * Starts frame extraction using WebCodecs MediaStreamTrackProcessor.
+   *
+   * Creates a processor and reads frames from its readable stream. Converts
+   * VideoFrames to ImageBitmaps and invokes the callback. Handles backpressure
+   * naturally through the stream API. Falls back to video element if processor
+   * creation fails.
+   *
+   * @param Processor - MediaStreamTrackProcessor constructor.
+   * @param onFrame - Callback invoked for each extracted frame.
+   * @returns Promise that resolves when extraction starts.
+   */
   private async startWithProcessor(
     Processor: new (opts: {track: MediaStreamTrack}) => {readable: ReadableStream<any>},
     onFrame: FrameCallback,
@@ -155,6 +199,18 @@ export class FrameSource {
     })();
   }
 
+  /**
+   * Starts frame extraction using HTMLVideoElement fallback.
+   *
+   * Creates a hidden video element, attaches the track, and uses
+   * requestVideoFrameCallback (preferred) or requestAnimationFrame (fallback)
+   * to extract frames. Uses a processing flag to prevent concurrent frame
+   * processing and calls onDrop when frames are dropped.
+   *
+   * @param onFrame - Callback invoked for each extracted frame.
+   * @param onDrop - Optional callback invoked when frames are dropped.
+   * @returns Promise that resolves when extraction starts.
+   */
   private async startWithVideoElement(onFrame: FrameCallback, onDrop?: () => void): Promise<void> {
     this.videoSource = new VideoSource(this.track);
     await this.videoSource.start(async (timestamp, width, height) => {

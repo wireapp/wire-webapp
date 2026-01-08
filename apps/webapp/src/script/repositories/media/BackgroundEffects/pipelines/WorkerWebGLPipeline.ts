@@ -59,10 +59,15 @@ export class WorkerWebGLPipeline implements Pipeline {
    *
    * Transfers the output canvas to an OffscreenCanvas, creates a Web Worker,
    * and sends initialization message with configuration. Sets up message handlers
-   * for metrics, tier changes, segmenter errors, and frame completion.
+   * for metrics, tier changes, segmenter errors, context loss, and frame completion.
    *
    * The canvas is transferred (not cloned) to the worker, so the main thread
    * can no longer access it directly after this call.
+   *
+   * Context loss handling:
+   * - Listens for 'contextLost' messages from the worker
+   * - Invokes onWorkerContextLoss callback when WebGL context is lost
+   * - The callback should handle fallback to another pipeline
    *
    * @param init - Pipeline initialization parameters.
    * @returns Promise that resolves when worker initialization is complete.

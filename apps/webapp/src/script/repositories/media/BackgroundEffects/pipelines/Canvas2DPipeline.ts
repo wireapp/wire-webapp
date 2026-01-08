@@ -186,17 +186,22 @@ export class Canvas2DPipeline implements Pipeline {
    * Processes a video frame through the Canvas2D pipeline.
    *
    * Processing steps:
-   * 1. Resolves quality tier parameters (adaptive or fixed)
-   * 2. Ensures segmenter is initialized for current tier
-   * 3. Performs segmentation (if cadence allows, respecting frame token)
-   * 4. Applies mask post-processing
-   * 5. Renders background (blur using Canvas2D filter or virtual background)
-   * 6. Composites foreground using mask with destination-in blend mode
-   * 7. Updates performance metrics
+   * 1. Checks for bypass mode (passthrough or no segmenter) and returns early if needed
+   * 2. Resolves quality tier parameters (adaptive or fixed)
+   * 3. Checks quality tier bypass and returns early if needed
+   * 4. Ensures segmenter is initialized for current tier
+   * 5. Captures frame index before incrementing for cadence calculation
+   * 6. Performs segmentation (if cadence allows, respecting frame token)
+   * 7. Applies mask post-processing
+   * 8. Applies temporal mask smoothing via updateMaskCanvas() (if mask available)
+   * 9. Renders background (blur using Canvas2D filter or virtual background)
+   * 10. Composites foreground using temporally-smoothed mask with destination-in blend mode
+   * 11. Updates quality controller inline (if in 'auto' mode) and performance metrics
    *
    * Supports debug visualization modes (maskOverlay, maskOnly, edgeOnly,
    * classOverlay, classOnly). Handles frame token validation to prevent
-   * race conditions when frames arrive faster than processing.
+   * race conditions when frames arrive faster than processing. Uses temporally-smoothed
+   * masks (maskForEffect) instead of raw masks for better visual stability.
    *
    * @param frame - Input video frame as ImageBitmap (will be closed after processing).
    * @param _timestamp - Frame timestamp (unused, uses performance.now() for segmentation).
@@ -537,6 +542,24 @@ export class Canvas2DPipeline implements Pipeline {
     return [v, p, q];
   }
 
+  /**
+   * Updates the mask canvas with temporal smoothing using exponential moving average.
+   *
+   * Implements temporal mask smoothing by blending the new mask with the previous
+   * mask using an alpha value. Uses ping-pong buffering (maskCanvas and maskScratchCanvas)
+   * to avoid reading and writing to the same buffer.
+   *
+   * Behavior:
+   * - If no previous mask exists or alpha >= 1: replaces mask completely
+   * - If alpha <= 0: keeps previous mask unchanged
+   * - Otherwise: blends previous mask (1-alpha) with new mask (alpha)
+   *
+   * @param mask - New mask ImageBitmap to blend in.
+   * @param width - Mask width in pixels (uses mask.width if not provided).
+   * @param height - Mask height in pixels (uses mask.height if not provided).
+   * @param alpha - Blending factor (0-1) for temporal smoothing. Higher values
+   *                make the mask more responsive to changes.
+   */
   private updateMaskCanvas(mask: ImageBitmap, width: number, height: number, alpha: number): void {
     const resolvedWidth = width || mask.width;
     const resolvedHeight = height || mask.height;
@@ -573,6 +596,23 @@ export class Canvas2DPipeline implements Pipeline {
     this.hasMask = true;
   }
 
+  /**
+   * Renders edge visualization of a mask for debug mode.
+   *
+   * Extracts edges from the mask using smoothstep functions to create a band-pass
+   * filter that highlights mask boundaries. The result is a grayscale image where
+   * edges appear as bright regions.
+   *
+   * Edge detection algorithm:
+   * - Uses smoothstep(0.4, 0.6, value) to detect rising edges
+   * - Subtracts smoothstep(0.6, 0.8, value) to detect falling edges
+   * - Result highlights the transition region (edges) of the mask
+   *
+   * @param ctx - Canvas2D rendering context for output.
+   * @param mask - Mask image source to extract edges from.
+   * @param width - Output width in pixels.
+   * @param height - Output height in pixels.
+   */
   private renderEdgeMask(ctx: CanvasRenderingContext2D, mask: CanvasImageSource, width: number, height: number): void {
     if (!this.maskScratchCanvas || !this.maskScratchCtx || !this.maskCanvas) {
       ctx.drawImage(mask, 0, 0, width, height);
@@ -601,11 +641,36 @@ export class Canvas2DPipeline implements Pipeline {
     ctx.drawImage(this.maskScratchCanvas, 0, 0, width, height);
   }
 
+  /**
+   * Smooth interpolation function (smoothstep) for edge detection.
+   *
+   * Implements the standard smoothstep function that provides smooth interpolation
+   * between 0 and 1 using a cubic Hermite polynomial. Returns 0 for x <= edge0,
+   * 1 for x >= edge1, and smoothly interpolates between them.
+   *
+   * Used for edge detection in renderEdgeMask to create smooth transitions
+   * rather than hard thresholds.
+   *
+   * @param edge0 - Lower edge threshold.
+   * @param edge1 - Upper edge threshold.
+   * @param x - Input value to interpolate.
+   * @returns Interpolated value between 0 and 1.
+   */
   private smoothstep(edge0: number, edge1: number, x: number): number {
     const t = Math.max(0, Math.min(1, (x - edge0) / (edge1 - edge0)));
     return t * t * (3 - 2 * t);
   }
 
+  /**
+   * Ensures mask canvas buffers are created and properly sized.
+   *
+   * Creates maskCanvas and maskScratchCanvas if they don't exist, and resizes
+   * them to match the specified dimensions. These canvases are used for temporal
+   * mask smoothing with ping-pong buffering.
+   *
+   * @param width - Required canvas width in pixels.
+   * @param height - Required canvas height in pixels.
+   */
   private ensureMaskCanvas(width: number, height: number): void {
     if (!this.maskCanvas) {
       this.maskCanvas = document.createElement('canvas');
@@ -628,6 +693,13 @@ export class Canvas2DPipeline implements Pipeline {
     }
   }
 
+  /**
+   * Swaps mask canvas buffers for ping-pong rendering.
+   *
+   * Exchanges maskCanvas with maskScratchCanvas and their associated contexts.
+   * Used after blending operations to prepare for the next frame, allowing
+   * reading from one buffer while writing to the other.
+   */
   private swapMaskBuffers(): void {
     const canvas = this.maskCanvas;
     this.maskCanvas = this.maskScratchCanvas;
@@ -726,8 +798,10 @@ export class Canvas2DPipeline implements Pipeline {
   /**
    * Updates performance metrics and invokes metrics callback.
    *
-   * Adds a new sample to the metrics window, updates quality tier if in
-   * adaptive mode, and invokes the onMetrics callback with aggregated metrics.
+   * Adds a new sample to the metrics window and invokes the onMetrics callback
+   * with aggregated metrics. Note that quality controller updates now happen
+   * inline in processFrame() when in 'auto' mode, not in this method.
+   *
    * Uses 'CPU' as the segmentation delegate since Canvas2D uses CPU inference.
    *
    * @param totalMs - Total frame processing time in milliseconds.

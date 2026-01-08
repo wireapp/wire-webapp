@@ -22,6 +22,12 @@ import {WebGLRenderer} from '../renderer/WebGLRenderer';
 import {Segmenter} from '../segmentation/segmenter';
 import type {DebugMode, EffectMode, Metrics, QualityMode, WorkerOptions} from '../types';
 
+/**
+ * Global state for the background effects worker.
+ *
+ * Maintains all state needed for frame processing, including renderer,
+ * segmenter, quality controller, configuration, and metrics.
+ */
 export interface State {
   renderer: WebGLRenderer | null;
   segmenter: Segmenter | null;
@@ -42,11 +48,23 @@ export interface State {
   lastTimestampMs: number;
   metricsWindow: MetricsWindow;
   canvas: OffscreenCanvas | null;
+  /** Whether the WebGL context has been lost. */
   contextLost: boolean;
 }
 
+/**
+ * Maximum number of metrics samples to keep in the metrics window.
+ *
+ * Used for calculating rolling averages of performance metrics.
+ */
 export const METRICS_MAX_SAMPLES = 30;
 
+/**
+ * Global worker state instance.
+ *
+ * Shared state object used throughout the worker for frame processing,
+ * configuration, and resource management.
+ */
 export const state: State = {
   renderer: null,
   segmenter: null,

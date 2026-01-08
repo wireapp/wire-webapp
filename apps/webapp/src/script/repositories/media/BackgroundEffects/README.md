@@ -32,7 +32,7 @@ Production-grade background blur and virtual background pipeline that avoids Web
 - **Advanced post-processing**: Joint bilateral smoothing, temporal stabilization, and GPU compositing
 - **Adaptive quality control**: Automatic quality tier adjustment (A-D) based on performance metrics
 - **Backpressure management**: Prevents unbounded frame queues with single-frame-in-flight design
-- **Debug visualization**: Mask overlay, mask-only, and edge-only modes for inspection
+- **Debug visualization**: Mask overlay, mask-only, edge-only, and class modes for inspection
 - **Runtime controls**: Change mode, quality, blur strength, and background sources without restarting
 
 ## Quick Start
@@ -145,9 +145,12 @@ interface StartOptions {
   blurStrength?: number; // Default: 0.5 (0-1)
   backgroundImage?: HTMLImageElement | ImageBitmap;
   backgroundVideo?: HTMLVideoElement;
+  backgroundColor?: string;
   segmentationModelPath?: string; // Optional override for all tiers
   segmentationModelByTier?: Partial<Record<'A' | 'B' | 'C' | 'D', string>>;
   useWorker?: boolean; // Default: true
+  pipelineOverride?: PipelineType;
+  onMetrics?: (metrics: Metrics) => void;
 }
 ```
 
@@ -173,7 +176,7 @@ Selects the optimal rendering pipeline based on browser capabilities.
 ### Types
 
 - `EffectMode`: `'blur'` | `'virtual'` | `'passthrough'`
-- `DebugMode`: `'off'` | `'maskOverlay'` | `'maskOnly'` | `'edgeOnly'`
+- `DebugMode`: `'off'` | `'maskOverlay'` | `'maskOnly'` | `'edgeOnly'` | `'classOverlay'` | `'classOnly'`
 - `QualityMode`: `'auto'` | `'A'` | `'B'` | `'C'` | `'D'`
 - `Metrics`: Performance metrics tracked during frame processing
 
@@ -202,8 +205,8 @@ The module automatically selects the best available pipeline based on browser ca
 
 1. **Frame extraction**: `VideoSource` extracts frames using `requestVideoFrameCallback` (preferred) or `requestAnimationFrame` (fallback)
 2. **Segmentation**: MediaPipe Selfie Segmentation generates low-res mask (256x256, 256x144, or 160x96)
-3. **Mask refinement**: Joint bilateral filter + temporal smoothing + upsampling
-4. **Compositing**: GPU-accelerated blur or virtual background replacement
+3. **Mask refinement**: WebGL pipelines apply joint bilateral filter + temporal smoothing + upsampling
+4. **Compositing**: GPU-accelerated blur or virtual background replacement (WebGL) or CPU compositing (Canvas2D)
 5. **Output**: Rendered to canvas, exposed via `canvas.captureStream()`
 
 ### Post-Processing Today
@@ -238,6 +241,8 @@ Use `setQuality('A' | 'B' | 'C' | 'D')` to force a tier, or `setQuality('auto')`
 - `maskOverlay`: Overlays green tint on mask areas
 - `maskOnly`: Displays only the segmentation mask as grayscale
 - `edgeOnly`: Highlights mask edges using edge detection
+- `classOverlay`: Overlays class colors from multiclass segmentation
+- `classOnly`: Shows class colors only (no video)
 
 ## Module Structure
 
@@ -245,8 +250,10 @@ Use `setQuality('A' | 'B' | 'C' | 'D')` to force a tier, or `setQuality('auto')`
 BackgroundEffects/
 ├── effects/
 │   ├── BackgroundEffectsController.ts  # Main controller
+│   ├── FrameSource.ts                  # Frame extraction adapter
 │   ├── VideoSource.ts                  # Frame extraction
 │   └── capability.ts                   # Capability detection
+├── pipelines/                          # Pipeline implementations
 ├── renderer/
 │   └── WebGLRenderer.ts                # WebGL2 rendering pipeline
 ├── segmentation/
@@ -258,6 +265,8 @@ BackgroundEffects/
 ├── shaders/                           # GLSL shaders
 ├── debug/
 │   └── DebugModes.ts                  # Debug mode utilities
+├── shared/                             # Shared helpers (mask, timestamps)
+├── test-basic.ts                       # Basic pipeline test harness
 ├── types.ts                           # Type definitions
 └── index.ts                           # Public API exports
 ```
@@ -266,7 +275,8 @@ BackgroundEffects/
 
 ### Frame Transfer
 
-- **Worker pipeline**: Uses `createImageBitmap(video)` to transfer frames. Only one frame is kept in flight; new frames overwrite the pending one.
+- **Frame source**: `FrameSource` produces `ImageBitmap` frames using `MediaStreamTrackProcessor` or a `VideoSource` fallback.
+- **Worker pipeline**: Transfers `ImageBitmap` frames to the worker; if a frame is in flight, the next frame is dropped.
 - **Main pipeline**: Frames are processed directly on the main thread.
 
 ### Background Sources

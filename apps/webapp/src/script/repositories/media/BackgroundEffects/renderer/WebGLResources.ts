@@ -19,17 +19,36 @@
 
 import type {QualityTierParams} from '../types';
 
+/**
+ * Size dimensions for textures and framebuffers.
+ */
 export interface Size {
+  /** Width in pixels. */
   width: number;
+  /** Height in pixels. */
   height: number;
 }
 
+/**
+ * Configuration for WebGL resource allocation.
+ */
 export interface RendererConfig {
+  /** Output canvas width in pixels. */
   width: number;
+  /** Output canvas height in pixels. */
   height: number;
+  /** Quality tier parameters controlling resource sizes. */
   quality: QualityTierParams;
 }
 
+/**
+ * Manages WebGL resources (textures, framebuffers) for the rendering pipeline.
+ *
+ * Handles creation, sizing, and lifecycle of all WebGL resources needed for
+ * background effects rendering. Automatically creates textures and framebuffers
+ * based on quality tier parameters, and manages resource swapping for ping-pong
+ * operations.
+ */
 export class WebGLResources {
   private readonly textures: Map<string, WebGLTexture> = new Map();
   private readonly framebuffers: Map<string, WebGLFramebuffer> = new Map();
@@ -39,6 +58,20 @@ export class WebGLResources {
 
   constructor(private readonly gl: WebGL2RenderingContext) {}
 
+  /**
+   * Ensures all required WebGL resources are created and properly sized.
+   *
+   * Creates or resizes textures and framebuffers based on the renderer configuration
+   * and quality tier. Allocates resources for:
+   * - Video input texture
+   * - Mask textures (low-res, refined, stable, previous)
+   * - Blur intermediate textures (downsampled, horizontal, vertical)
+   *
+   * Returns true if maskPrev texture was newly created (needs initialization).
+   *
+   * @param config - Renderer configuration with dimensions and quality parameters.
+   * @returns True if maskPrev texture was newly created, false otherwise.
+   */
   public ensureResources(config: RendererConfig): boolean {
     const {width, height, quality} = config;
     this.ensureTexture('videoTex', width, height, this.gl.RGBA8, this.gl.RGBA);
@@ -78,18 +111,51 @@ export class WebGLResources {
     return maskPrevWasNew;
   }
 
+  /**
+   * Retrieves a texture by key.
+   *
+   * @param key - Texture key identifier.
+   * @returns WebGL texture, or undefined if not found.
+   */
   public getTexture(key: string): WebGLTexture | undefined {
     return this.textures.get(key);
   }
 
+  /**
+   * Retrieves the size of a texture by key.
+   *
+   * @param key - Texture key identifier.
+   * @returns Size object, or undefined if not found.
+   */
   public getSize(key: string): Size | undefined {
     return this.sizes[key];
   }
 
+  /**
+   * Retrieves a framebuffer by key.
+   *
+   * @param key - Framebuffer key identifier.
+   * @returns WebGL framebuffer, or undefined if not found.
+   */
   public getFramebuffer(key: string): WebGLFramebuffer | undefined {
     return this.framebuffers.get(key);
   }
 
+  /**
+   * Uploads image data to a texture.
+   *
+   * Binds the texture and uploads ImageBitmap data. Supports custom internal
+   * format and format parameters, and optional Y-flip for coordinate system conversion.
+   *
+   * @param key - Texture key identifier.
+   * @param source - ImageBitmap to upload.
+   * @param width - Image width in pixels.
+   * @param height - Image height in pixels.
+   * @param internalFormat - Optional internal texture format (defaults to RGBA).
+   * @param format - Optional texture format (defaults to RGBA).
+   * @param flipY - Whether to flip the image vertically (defaults to false).
+   * @returns Nothing.
+   */
   public uploadTexture(
     key: string,
     source: ImageBitmap,
@@ -114,6 +180,17 @@ export class WebGLResources {
     gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, 0);
   }
 
+  /**
+   * Configures an external mask texture for use in the rendering pipeline.
+   *
+   * Sets texture parameters (filtering, wrapping) for a mask texture that
+   * was created outside this resource manager. Uses linear filtering if
+   * float linear extension is available, otherwise uses nearest filtering.
+   * Only configures once per texture (uses WeakSet to track).
+   *
+   * @param texture - External WebGL texture to configure.
+   * @returns Nothing.
+   */
   public ensureExternalMaskTexture(texture: WebGLTexture): void {
     if (this.maskTextureConfigured.has(texture)) {
       return;
@@ -132,6 +209,17 @@ export class WebGLResources {
     this.maskTextureConfigured.add(texture);
   }
 
+  /**
+   * Swaps two textures and their associated framebuffers and sizes.
+   *
+   * Exchanges the textures, framebuffers, and size records for two keys.
+   * Used for ping-pong rendering operations where buffers are alternated
+   * between read and write.
+   *
+   * @param a - First texture key.
+   * @param b - Second texture key.
+   * @returns Nothing.
+   */
   public swapTextures(a: string, b: string): void {
     const texA = this.textures.get(a);
     const texB = this.textures.get(b);
@@ -154,6 +242,15 @@ export class WebGLResources {
     }
   }
 
+  /**
+   * Destroys all WebGL resources and clears all references.
+   *
+   * Deletes all textures and framebuffers, and resets internal state.
+   * Should be called when the renderer is no longer needed to prevent
+   * memory leaks.
+   *
+   * @returns Nothing.
+   */
   public destroy(): void {
     this.textures.forEach(texture => this.gl.deleteTexture(texture));
     this.framebuffers.forEach(fbo => this.gl.deleteFramebuffer(fbo));
@@ -164,6 +261,20 @@ export class WebGLResources {
     this.floatLinearSupported = null;
   }
 
+  /**
+   * Ensures a texture exists and is properly sized.
+   *
+   * Creates a new texture if it doesn't exist, or resizes it if dimensions
+   * have changed. Creates an associated framebuffer for render-to-texture.
+   * Returns true if the texture was newly created.
+   *
+   * @param key - Texture key identifier.
+   * @param width - Required texture width in pixels.
+   * @param height - Required texture height in pixels.
+   * @param internalFormat - Internal texture format.
+   * @param format - Texture format.
+   * @returns True if texture was newly created, false if it already existed with correct size.
+   */
   private ensureTexture(key: string, width: number, height: number, internalFormat: number, format: number): boolean {
     const gl = this.gl;
     const existing = this.textures.get(key);
@@ -201,6 +312,16 @@ export class WebGLResources {
     return true;
   }
 
+  /**
+   * Initializes the maskPrev texture with white (fully opaque).
+   *
+   * Clears the maskPrev framebuffer to white, providing a safe initial
+   * state for temporal mask smoothing. Called when maskPrev is first created.
+   *
+   * @param width - Texture width in pixels.
+   * @param height - Texture height in pixels.
+   * @returns Nothing.
+   */
   private initializeMaskPrevWithWhite(width: number, height: number): void {
     const fbo = this.framebuffers.get('maskPrev');
     if (!fbo) {

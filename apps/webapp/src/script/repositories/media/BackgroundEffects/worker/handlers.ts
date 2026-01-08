@@ -25,6 +25,22 @@ import {WebGLRenderer} from '../renderer/WebGLRenderer';
 import {Segmenter} from '../segmentation/segmenter';
 import type {WorkerOptions, WorkerResponse} from '../types';
 
+/**
+ * Handles worker initialization message.
+ *
+ * Sets up the WebGL renderer, quality controller, and segmenter based on
+ * the provided options. Binds context loss handlers to the canvas.
+ * Initializes segmenter asynchronously if needed (non-bypass tier).
+ *
+ * If segmenter initialization fails, sends 'segmenterError' message to
+ * main thread and continues in bypass mode.
+ *
+ * @param canvas - OffscreenCanvas for WebGL rendering.
+ * @param width - Initial canvas width in pixels.
+ * @param height - Initial canvas height in pixels.
+ * @param options - Worker initialization options.
+ * @returns Promise that resolves when initialization is complete.
+ */
 export async function handleInit(
   canvas: OffscreenCanvas,
   width: number,
@@ -84,6 +100,18 @@ export async function handleInit(
   bindContextLossHandlers(canvas);
 }
 
+/**
+ * Handles background image update message.
+ *
+ * Stores the background image bitmap and dimensions for virtual background
+ * mode. Closes any existing background bitmap before storing the new one.
+ * If null is provided, clears the background.
+ *
+ * @param bitmap - Background image as ImageBitmap, or null to clear.
+ * @param width - Image width in pixels.
+ * @param height - Image height in pixels.
+ * @returns Promise that resolves immediately.
+ */
 export async function handleBackgroundImage(bitmap: ImageBitmap | null, width: number, height: number): Promise<void> {
   if (!bitmap) {
     state.background?.close();
@@ -96,6 +124,15 @@ export async function handleBackgroundImage(bitmap: ImageBitmap | null, width: n
   state.backgroundSize = {width, height};
 }
 
+/**
+ * Cleans up all worker resources.
+ *
+ * Closes segmenter, destroys renderer, releases background bitmap, clears
+ * canvas reference, resets context loss state, and unbinds context loss handlers.
+ * Should be called when the worker is being stopped.
+ *
+ * @returns Nothing.
+ */
 export function cleanup(): void {
   state.segmenter?.close();
   state.segmenter = null;

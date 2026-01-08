@@ -38,11 +38,23 @@ import maskUpsampleFrag from '../shaders/maskUpsample.frag';
 // @ts-ignore
 import temporalMaskFrag from '../shaders/temporalMask.frag';
 
+/**
+ * Information about a compiled WebGL shader program.
+ */
 export interface ProgramInfo {
+  /** Compiled and linked WebGL program. */
   program: WebGLProgram;
+  /** Map of uniform names to their locations in the program. */
   uniforms: Record<string, WebGLUniformLocation | null>;
 }
 
+/**
+ * Manages WebGL shader programs for background effects rendering.
+ *
+ * Compiles and links vertex/fragment shader pairs, manages uniform locations,
+ * and provides a unified interface for setting uniforms and binding programs.
+ * Supports various uniform types: textures, 2D vectors, floats, and debug mode strings.
+ */
 export class ShaderPrograms {
   private readonly programs: Record<string, ProgramInfo>;
 
@@ -50,6 +62,20 @@ export class ShaderPrograms {
     this.programs = this.createPrograms();
   }
 
+  /**
+   * Activates a shader program and sets its uniforms.
+   *
+   * Binds the specified program and configures all provided uniforms.
+   * Automatically handles different uniform types:
+   * - WebGLTexture: Binds to texture units sequentially
+   * - Arrays: Sets as vec2 uniforms
+   * - Numbers: Sets as float uniforms
+   * - Strings: Maps debug mode strings to integers
+   *
+   * @param programKey - Key identifying the shader program to use.
+   * @param uniforms - Map of uniform names to values.
+   * @returns Nothing.
+   */
   public use(programKey: string, uniforms: Record<string, any>): void {
     const programInfo = this.programs[programKey];
     if (!programInfo) {
@@ -94,10 +120,27 @@ export class ShaderPrograms {
     });
   }
 
+  /**
+   * Destroys all shader programs and releases WebGL resources.
+   *
+   * Deletes all compiled programs. Should be called when the renderer is
+   * no longer needed to prevent memory leaks.
+   *
+   * @returns Nothing.
+   */
   public destroy(): void {
     Object.values(this.programs).forEach(({program}) => this.gl.deleteProgram(program));
   }
 
+  /**
+   * Creates all shader programs used by the renderer.
+   *
+   * Compiles and links all vertex/fragment shader pairs for the rendering
+   * pipeline: downsample, mask upsampling, joint bilateral filtering, temporal
+   * smoothing, blur passes, compositing, and debug overlay.
+   *
+   * @returns Map of program keys to ProgramInfo objects.
+   */
   private createPrograms(): Record<string, ProgramInfo> {
     return {
       downsample: this.createProgram(fullscreenVert, downsampleFrag, ['uSrc', 'uTexelSize', 'uFlipY']),
@@ -145,6 +188,18 @@ export class ShaderPrograms {
     };
   }
 
+  /**
+   * Creates a single shader program from vertex and fragment shader sources.
+   *
+   * Compiles both shaders, links them into a program, and extracts uniform
+   * locations. Throws an error if compilation or linking fails.
+   *
+   * @param vertexSource - Vertex shader source code.
+   * @param fragmentSource - Fragment shader source code.
+   * @param uniforms - Array of uniform names to extract locations for.
+   * @returns ProgramInfo containing the program and uniform locations.
+   * @throws Error if shader compilation or program linking fails.
+   */
   private createProgram(vertexSource: string, fragmentSource: string, uniforms: string[]): ProgramInfo {
     const gl = this.gl;
     const vertexShader = this.compileShader(gl.VERTEX_SHADER, vertexSource);
@@ -173,6 +228,17 @@ export class ShaderPrograms {
     return {program, uniforms: uniformLocations};
   }
 
+  /**
+   * Compiles a shader from source code.
+   *
+   * Creates a shader of the specified type, compiles it, and returns the
+   * compiled shader. Throws an error if compilation fails.
+   *
+   * @param type - Shader type (gl.VERTEX_SHADER or gl.FRAGMENT_SHADER).
+   * @param source - Shader source code.
+   * @returns Compiled WebGL shader.
+   * @throws Error if shader compilation fails.
+   */
   private compileShader(type: number, source: string): WebGLShader {
     const gl = this.gl;
     const shader = gl.createShader(type);

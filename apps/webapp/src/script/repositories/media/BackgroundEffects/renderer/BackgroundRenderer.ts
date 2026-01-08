@@ -19,12 +19,31 @@
 
 import type {Size} from './WebGLResources';
 
+/**
+ * Manages background image texture for virtual background rendering.
+ *
+ * Handles WebGL texture creation, upload, and lifecycle for background images
+ * used in virtual background mode. Provides utilities for calculating cover
+ * scale to ensure background images fill the output canvas appropriately.
+ */
 export class BackgroundRenderer {
   private texture: WebGLTexture | null = null;
   private size: Size | null = null;
 
   constructor(private readonly gl: WebGL2RenderingContext) {}
 
+  /**
+   * Sets or clears the background image for virtual background mode.
+   *
+   * Uploads the image to a WebGL texture and stores its dimensions. If null
+   * is provided, releases the existing texture. Reuses existing texture if
+   * available to avoid unnecessary allocations.
+   *
+   * @param image - Background image as ImageBitmap, or null to clear.
+   * @param width - Image width in pixels.
+   * @param height - Image height in pixels.
+   * @returns Nothing.
+   */
   public setBackground(image: ImageBitmap | null, width: number, height: number): void {
     if (!image) {
       if (this.texture) {
@@ -52,14 +71,34 @@ export class BackgroundRenderer {
     this.size = {width, height};
   }
 
+  /**
+   * Returns the WebGL texture containing the background image.
+   *
+   * @returns WebGL texture, or null if no background is set.
+   */
   public getTexture(): WebGLTexture | null {
     return this.texture;
   }
 
+  /**
+   * Returns the dimensions of the background image.
+   *
+   * @returns Size object with width and height, or null if no background is set.
+   */
   public getSize(): Size | null {
     return this.size;
   }
 
+  /**
+   * Calculates scale factors for covering target size with background image.
+   *
+   * Computes scale factors that ensure the background image covers the entire
+   * target area while maintaining aspect ratio. Uses the larger of width/height
+   * ratios to ensure complete coverage.
+   *
+   * @param target - Target size to cover.
+   * @returns Tuple [scaleX, scaleY] for scaling the background texture coordinates.
+   */
   public getCoverScale(target: Size): [number, number] {
     if (!this.size || this.size.width === 0 || this.size.height === 0) {
       return [1, 1];
@@ -68,6 +107,14 @@ export class BackgroundRenderer {
     return [(this.size.width * scale) / target.width, (this.size.height * scale) / target.height];
   }
 
+  /**
+   * Destroys the background renderer and releases WebGL resources.
+   *
+   * Deletes the WebGL texture and clears all references. Should be called
+   * when the renderer is no longer needed to prevent memory leaks.
+   *
+   * @returns Nothing.
+   */
   public destroy(): void {
     if (this.texture) {
       this.gl.deleteTexture(this.texture);

@@ -31,6 +31,26 @@ import {buildMaskInput, type MaskInput, type MaskSource} from '../shared/mask';
 import {toMonotonicTimestampMs} from '../shared/timestamps';
 import type {QualityTierParams} from '../types';
 
+/**
+ * Processes a single video frame in the worker thread.
+ *
+ * Performs the complete frame processing pipeline:
+ * 1. Updates canvas dimensions if frame size changed
+ * 2. Resolves quality tier and ensures segmenter is configured
+ * 3. Performs segmentation (if cadence allows)
+ * 4. Configures renderer with current settings
+ * 5. Renders frame with effects applied
+ * 6. Updates performance metrics
+ *
+ * Handles context loss by checking state.contextLost and skipping processing.
+ * Always closes the input frame to prevent memory leaks.
+ *
+ * @param frame - Input video frame as ImageBitmap (will be closed).
+ * @param timestamp - Frame timestamp in seconds.
+ * @param width - Frame width in pixels.
+ * @param height - Frame height in pixels.
+ * @returns Promise that resolves when frame processing is complete.
+ */
 export async function handleFrame(frame: ImageBitmap, timestamp: number, width: number, height: number): Promise<void> {
   const renderer = state.renderer;
   if (!renderer || state.contextLost) {
@@ -118,10 +138,31 @@ export async function handleFrame(frame: ImageBitmap, timestamp: number, width: 
   }
 }
 
+/**
+ * Resolves quality tier parameters for the current configuration.
+ *
+ * Delegates to resolveQualityTierForEffectMode with the current quality
+ * controller, quality mode, and effect mode from worker state.
+ *
+ * @returns Quality tier parameters for current configuration.
+ */
 function resolveQualityTierParams(): QualityTierParams {
   return resolveQualityTierForEffectMode(state.qualityController, state.quality, state.mode);
 }
 
+/**
+ * Ensures the segmenter is initialized for the specified quality tier.
+ *
+ * If the tier requires a different model than currently loaded, initiates
+ * an asynchronous segmenter swap. Skips if tier is 'D' (bypass), if a swap
+ * is already in progress, or if the desired model is already loaded.
+ *
+ * Uses GPU delegate for worker pipeline. The swap happens asynchronously
+ * to avoid blocking frame processing.
+ *
+ * @param tier - Quality tier ('A', 'B', 'C', or 'D').
+ * @returns Nothing.
+ */
 function ensureSegmenterForTier(tier: 'A' | 'B' | 'C' | 'D'): void {
   if (!state.options || !state.canvas) {
     return;
@@ -158,6 +199,19 @@ function ensureSegmenterForTier(tier: 'A' | 'B' | 'C' | 'D'): void {
   });
 }
 
+/**
+ * Updates performance metrics and sends them to the main thread.
+ *
+ * Updates the quality controller if in 'auto' mode, pushes metrics sample
+ * to the metrics window, builds aggregated metrics, and posts them to
+ * the main thread via postMessage.
+ *
+ * @param totalMs - Total frame processing time in milliseconds.
+ * @param segmentationMs - Segmentation processing time in milliseconds.
+ * @param gpuMs - GPU rendering time in milliseconds.
+ * @param tier - Current quality tier.
+ * @returns Nothing.
+ */
 function updateMetrics(totalMs: number, segmentationMs: number, gpuMs: number, tier: 'A' | 'B' | 'C' | 'D'): void {
   if (!state.qualityController) {
     return;
@@ -183,6 +237,16 @@ function updateMetrics(totalMs: number, segmentationMs: number, gpuMs: number, t
   postMessage({type: 'metrics', metrics: state.metrics});
 }
 
+/**
+ * Converts frame timestamp to monotonic milliseconds.
+ *
+ * Ensures timestamps are strictly increasing and never in the past by
+ * using toMonotonicTimestampMs. Updates state.lastTimestampMs with the
+ * result for the next frame.
+ *
+ * @param sourceTimestampSeconds - Frame timestamp in seconds.
+ * @returns Monotonic timestamp in milliseconds.
+ */
 function nextTimestampMs(sourceTimestampSeconds: number): number {
   const monotonic = toMonotonicTimestampMs(sourceTimestampSeconds, state.lastTimestampMs);
   state.lastTimestampMs = monotonic;

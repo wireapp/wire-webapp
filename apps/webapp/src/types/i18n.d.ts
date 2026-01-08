@@ -2064,6 +2064,7 @@ declare module 'I18n/en-US.json' {
     'videoCallBackgroundOffice3': `Office 3`;
     'videoCallBackgroundOffice4': `Office 4`;
     'videoCallBackgroundOffice5': `Office 5`;
+    'videoCallBackgroundWire1': `Wire 1`;
     'videoCallvideoInputCamera': `Camera`;
     'videoSpeakersTabAll': `All ({count})`;
     'videoSpeakersTabSpeakers': `Speakers`;

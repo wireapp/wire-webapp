@@ -65,7 +65,8 @@ type BuiltinBackgroundLabelKey =
   | 'videoCallBackgroundOffice2'
   | 'videoCallBackgroundOffice3'
   | 'videoCallBackgroundOffice4'
-  | 'videoCallBackgroundOffice5';
+  | 'videoCallBackgroundOffice5'
+  | 'videoCallBackgroundWire1';
 
 /**
  * Base definition for builtin background images.
@@ -105,6 +106,12 @@ export type BuiltinBackground = BuiltinBackgroundDefinition & {
 const buildGradient = (colors: string[]) => `linear-gradient(135deg, ${colors.join(', ')})`;
 
 const BUILTIN_BACKGROUND_DEFINITIONS: BuiltinBackgroundDefinition[] = [
+  {
+    id: 'wire-1',
+    labelKey: 'videoCallBackgroundWire1',
+    imageUrl: '/image/backgrounds/wire-1.jpg',
+    previewColors: ['#1a1a1a', '#2d2d2d', '#4a4a4a'],
+  },
   {
     id: 'office-1',
     labelKey: 'videoCallBackgroundOffice1',

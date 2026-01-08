@@ -598,6 +598,18 @@ export class BackgroundEffectsController {
     }
   }
 
+  /**
+   * Handles WebGL context loss in the worker pipeline.
+   *
+   * When the worker's WebGL context is lost (e.g., due to GPU driver issues,
+   * system sleep, or resource constraints), this method falls back to passthrough
+   * mode to ensure video continues to work, albeit without effects.
+   *
+   * Only handles context loss for worker-webgl2 pipeline. Main-thread WebGL
+   * context loss is handled separately via bindWebGLContextHandlers().
+   *
+   * @returns Nothing.
+   */
   private handleWorkerContextLoss(): void {
     if (this.isStopping || this.pipeline !== 'worker-webgl2') {
       return;
