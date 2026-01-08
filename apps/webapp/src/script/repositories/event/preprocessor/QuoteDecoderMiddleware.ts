@@ -124,8 +124,14 @@ export class QuotedMessageMiddleware implements EventMiddleware {
       return event;
     }
 
-    const encodedQuote = base64ToArray(rawQuote);
-    const quote = Quote.decode(encodedQuote);
+    let quote;
+    try {
+      const encodedQuote = base64ToArray(rawQuote);
+      quote = Quote.decode(encodedQuote);
+    } catch (error) {
+      this.logger.warn('Failed to decode quoted message in multipart event.', error);
+      return event;
+    }
     this.logger.info(`Found quoted message: ${quote.quotedMessageId}`);
 
     const messageId = quote.quotedMessageId;
