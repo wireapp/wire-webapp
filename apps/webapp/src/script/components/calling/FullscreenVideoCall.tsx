@@ -239,6 +239,12 @@ const FullscreenVideoCall = ({
         return;
       }
 
+      // Allow focus to move into the ChooseScreen dialog if it's open
+      const chooseScreenDialog = targetDocument.querySelector('.choose-screen[role="dialog"]');
+      if (chooseScreenDialog) {
+        return;
+      }
+
       event.preventDefault();
       event.stopPropagation();
 
