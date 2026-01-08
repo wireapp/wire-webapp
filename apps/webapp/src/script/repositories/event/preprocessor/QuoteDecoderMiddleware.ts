@@ -123,7 +123,10 @@ export class QuotedMessageMiddleware implements EventMiddleware {
         ? originalEvent.data.text.quote
         : originalEvent.data.quote;
 
-    const decoratedData = {...event.data, text: {...event.data.text, quote: originalQuote} as any};
+    const decoratedData: MultipartMessageAddEvent['data'] = {
+      ...event.data,
+      text: {...event.data.text, quote: originalQuote},
+    };
     return {...event, data: decoratedData};
   }
 
@@ -143,23 +146,29 @@ export class QuotedMessageMiddleware implements EventMiddleware {
     const quotedMessage = await this.eventService.loadEvent(event.conversation, messageId);
     if (!quotedMessage) {
       this.logger.warn(`Quoted message with ID "${messageId}" not found.`);
-      const quoteData = {
+      const quoteData: {error: {type: string}} = {
         error: {
           type: QuoteEntity.ERROR.MESSAGE_NOT_FOUND,
         },
       };
 
-      const decoratedData = {...event.data, text: {...event.data.text, quote: quoteData} as any};
+      const decoratedData: MultipartMessageAddEvent['data'] = {
+        ...event.data,
+        text: {...event.data.text, quote: quoteData},
+      };
       return {...event, data: decoratedData};
     }
 
-    const quoteData = {
+    const quoteData: {message_id: string; user_id: string; hash: Uint8Array} = {
       message_id: messageId,
       user_id: quotedMessage.from,
       hash: quote.quotedMessageSha256,
     };
 
-    const decoratedData = {...event.data, text: {...event.data.text, quote: quoteData} as any};
+    const decoratedData: MultipartMessageAddEvent['data'] = {
+      ...event.data,
+      text: {...event.data.text, quote: quoteData},
+    };
     return {...event, data: decoratedData};
   }
 }
