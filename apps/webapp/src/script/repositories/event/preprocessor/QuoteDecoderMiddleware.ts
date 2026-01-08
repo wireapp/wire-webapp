@@ -45,7 +45,7 @@ const messageAddQuoteAccessor: QuoteAccessor<MessageAddEvent> = {
 };
 
 const multipartMessageAddQuoteAccessor: QuoteAccessor<MultipartMessageAddEvent> = {
-  get: event => event.data.text.quote,
+  get: event => event.data.text?.quote,
   set: (event, quote) => ({
     ...event,
     data: {
