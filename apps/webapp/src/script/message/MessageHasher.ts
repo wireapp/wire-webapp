@@ -63,7 +63,7 @@ const getTextBytes = (event: any): number[] => utf8ToUtf16BE(event.data.content)
 
 /**
  * Gets bytes for multipart message including text content and attachment UUIDs.
- * Format: BOM + text_content + "uuid1, uuid2, uuid3" (comma and space separated)
+ * Format: BOM + text_content + attachment_uuids (comma and space separated, no BOM for UUIDs)
  *
  * @param event The multipart message event
  * @returns Array of bytes containing text and attachment UUIDs
