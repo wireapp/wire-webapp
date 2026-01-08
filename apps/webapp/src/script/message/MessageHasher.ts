@@ -63,15 +63,16 @@ const getTextBytes = (event: any): number[] => utf8ToUtf16BE(event.data.content)
 
 /**
  * Gets bytes for multipart message including text content and attachment UUIDs.
- * Format: BOM + text_content + "uuid1, uuid2, uuid3" (comma and space separated)
+ * Format: BOM + text_content + attachment_uuids (comma and space separated, no BOM for UUIDs)
  *
  * @param event The multipart message event
  * @returns Array of bytes containing text and attachment UUIDs
  */
 const getMultipartTextBytes = (event: any): number[] => {
-  const textBytes = utf8ToUtf16BE(event.data.text.content);
+  const textContent = event.data?.text?.content ?? '';
+  const textBytes = utf8ToUtf16BE(textContent);
 
-  const attachments = event.data.attachments || [];
+  const attachments = event.data?.attachments ?? [];
   const uuidString = attachments
     .map((attachment: any) => attachment?.cellAsset?.uuid)
     .filter(Boolean)
