@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [9.73.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/react-ui-kit@9.72.1...@wireapp/react-ui-kit@9.73.0) (2026-01-09)
+
+### Features
+
+* **react-ui-kit:** Introduce dark/light theme for switch component [WPB-20913] ([#7776](https://github.com/wireapp/wire-web-packages/issues/7776)) ([091f1ae](https://github.com/wireapp/wire-web-packages/commit/091f1ae165305ea6b40d40a92eeddbea328dc4e7))
+
 ## [9.72.1](https://github.com/wireapp/wire-web-packages/compare/@wireapp/react-ui-kit@9.72.0...@wireapp/react-ui-kit@9.72.1) (2025-12-21)
 
 **Note:** Version bump only for package @wireapp/react-ui-kit
