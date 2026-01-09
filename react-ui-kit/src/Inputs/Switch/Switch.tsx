@@ -19,18 +19,23 @@
 
 import {forwardRef} from 'react';
 
+import {useTheme} from '@emotion/react';
+
 import {inputStyles, labelStyles, loadingStyles, switchDotStyles, switchStyles, wrapperStyles} from './Switch.styles';
 
 import {Loading} from '../../DataDisplay';
-import {COLOR} from '../../Identity';
+import {COLOR, THEME_ID, Theme} from '../../Identity';
 import {InputProps} from '../Input';
 
 export interface SwitchProps<T = HTMLInputElement> extends InputProps<T> {
   activatedColor?: string;
+  activatedColorDark?: string;
   checked: boolean;
   deactivatedColor?: string;
+  deactivatedColorDark?: string;
   disabled?: boolean;
   disabledColor?: string;
+  disabledColorDark?: string;
   id?: string;
   loadingColor?: string;
   name?: string;
@@ -48,48 +53,70 @@ export const Switch = forwardRef<HTMLInputElement, SwitchProps>(
       showLoading,
       disabled,
       loadingColor = COLOR.BLUE,
-      activatedColor = COLOR.BLUE,
-      deactivatedColor = '#d2d2d2',
+      activatedColor,
+      activatedColorDark,
+      deactivatedColor,
+      deactivatedColorDark,
+      disabledColor,
+      disabledColorDark,
       name,
       dataUieName,
     },
     ref,
-  ) => (
-    <div css={wrapperStyles}>
-      <input
-        ref={ref}
-        id={id}
-        checked={checked}
-        disabled={disabled}
-        name={name}
-        onChange={event => onToggle(event.target.checked)}
-        onKeyDown={event => {
-          if (event.key == 'Enter') {
-            onToggle(!(event.target as HTMLInputElement).checked);
-          }
-        }}
-        type="checkbox"
-        css={inputStyles}
-        data-uie-name={dataUieName}
-      />
-      <label htmlFor={id} css={labelStyles(disabled, showLoading)}>
-        <span
-          css={switchStyles({
-            disabled,
-            showLoading,
-            checked,
-            activatedColor,
-            deactivatedColor,
-          })}
+  ) => {
+    const theme = useTheme() as Theme;
+    const isDarkTheme = theme?.themeId === THEME_ID.DARK;
+    const switchTheme = theme?.Switch;
+
+    const resolvedActivatedColor =
+      (isDarkTheme ? activatedColorDark ?? activatedColor : activatedColor) ??
+      switchTheme?.activatedColor ??
+      COLOR.BLUE;
+    const resolvedDeactivatedColor =
+      (isDarkTheme ? deactivatedColorDark ?? deactivatedColor : deactivatedColor) ??
+      switchTheme?.deactivatedColor ??
+      '#d2d2d2';
+    const resolvedDisabledColor =
+      (isDarkTheme ? disabledColorDark ?? disabledColor : disabledColor) ?? switchTheme?.disabledColor;
+
+    return (
+      <div css={wrapperStyles}>
+        <input
+          ref={ref}
+          id={id}
+          checked={checked}
+          disabled={disabled}
+          name={name}
+          onChange={event => onToggle(event.target.checked)}
+          onKeyDown={event => {
+            if (event.key === 'Enter') {
+              onToggle(!(event.target as HTMLInputElement).checked);
+            }
+          }}
+          type="checkbox"
+          css={inputStyles}
+          data-uie-name={dataUieName}
         />
-        {showLoading ? (
-          <Loading size={21} color={loadingColor} css={loadingStyles} />
-        ) : (
-          <span css={switchDotStyles(disabled, checked)} />
-        )}
-      </label>
-    </div>
-  ),
+        <label htmlFor={id} css={labelStyles(disabled, showLoading)}>
+          <span
+            css={switchStyles({
+              disabled,
+              showLoading,
+              checked,
+              activatedColor: resolvedActivatedColor,
+              deactivatedColor: resolvedDeactivatedColor,
+              disabledColor: resolvedDisabledColor,
+            })}
+          />
+          {showLoading ? (
+            <Loading size={21} color={loadingColor} css={loadingStyles} />
+          ) : (
+            <span css={switchDotStyles(disabled, checked)} />
+          )}
+        </label>
+      </div>
+    );
+  },
 );
 
 Switch.displayName = 'Switch';

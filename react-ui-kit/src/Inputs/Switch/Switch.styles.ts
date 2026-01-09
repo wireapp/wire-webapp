@@ -53,6 +53,7 @@ type SwitchStylesProps = {
   checked: boolean;
   activatedColor: string;
   deactivatedColor: string;
+  disabledColor?: string;
 };
 
 export const switchStyles = ({
@@ -61,6 +62,7 @@ export const switchStyles = ({
   checked,
   activatedColor,
   deactivatedColor,
+  disabledColor,
 }: SwitchStylesProps): CSSObject => ({
   '&:after': {
     content: '" "',
@@ -74,7 +76,7 @@ export const switchStyles = ({
   '&:before, &:after': {
     backgroundColor:
       disabled || showLoading
-        ? COLOR.tint(checked ? activatedColor : deactivatedColor, 0.4)
+        ? disabledColor ?? COLOR.tint(checked ? activatedColor : deactivatedColor, 0.4)
         : checked
           ? activatedColor
           : deactivatedColor,
