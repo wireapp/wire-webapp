@@ -30,7 +30,7 @@ parsers:
       macro: no
 
 comment:
-  layout:  "diff, flags, files"
+  layout: 'diff, flags, files'
   behavior: default
   require_changes: no
 

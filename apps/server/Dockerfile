@@ -1,4 +1,4 @@
-FROM node:23-alpine
+FROM node:24-alpine
 
 # For some extra dependencies...
 RUN apk add --no-cache dumb-init git bash && corepack enable
@@ -11,7 +11,7 @@ COPY .yarn ./.yarn
 COPY apps/server/package.json ./apps/server/package.json
 
 # Install only server production deps
-RUN yarn workspaces focus @wireapp/server --production --immutable
+RUN yarn workspaces focus @wireapp/server --production
 
 # Copy built server artifacts and runtime files
 COPY apps/server/dist /dist
@@ -22,4 +22,4 @@ ENV PATH=/app/node_modules/.bin:$PATH
 
 EXPOSE 8080
 
-ENTRYPOINT ["dumb-init", "--", "/bin/bash", "/run.sh"]
+ENTRYPOINT ["dumb-init", "--", "/bin/bash", "/app/run.sh"]

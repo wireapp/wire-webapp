@@ -37,8 +37,8 @@ jobs:
 
       - uses: actions/setup-node@v6
         with:
-          node-version-file: .nvmrc
-          cache: yarn
+          node-version-file: '.nvmrc'
+          cache: 'yarn'
 
       - run: yarn --immutable
       - run: yarn nx run webapp:configure
@@ -151,8 +151,8 @@ jobs:
 
       - uses: actions/setup-node@v6
         with:
-          node-version-file: .nvmrc
-          cache: yarn
+          node-version-file: '.nvmrc'
+          cache: 'yarn'
 
       - run: yarn --immutable
       - run: yarn playwright install --with-deps chrome
@@ -196,8 +196,9 @@ jobs:
 
       - uses: actions/setup-node@v6
         with:
-          node-version-file: .nvmrc
-          cache: yarn
+          node-version-file: '.nvmrc'
+          cache: 'yarn'
+
       - run: yarn --immutable
 
       - name: Download blob reports
