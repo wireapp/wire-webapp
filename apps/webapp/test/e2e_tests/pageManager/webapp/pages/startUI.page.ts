@@ -66,4 +66,8 @@ export class StartUIPage {
     }
     throw new Error(`User ${username} not found in search results`);
   }
+
+  getSearchResultForSpecificUser(username: String) {
+    return this.page.getByRole('button', {name: `Open profile of ${username}`});
+  }
 }
