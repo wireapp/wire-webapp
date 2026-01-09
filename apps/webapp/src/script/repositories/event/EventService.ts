@@ -25,7 +25,13 @@ import {container} from 'tsyringe';
 import {Asset as ProtobufAsset} from '@wireapp/protocol-messaging';
 
 import {AssetTransferState} from 'Repositories/assets/AssetTransferState';
-import {StorageService, DatabaseListenerCallback, LegacyEventRecord, EventRecord} from 'Repositories/storage';
+import {
+  StorageService,
+  DatabaseListenerCallback,
+  LegacyEventRecord,
+  EventRecord,
+  hasQuoteForMessage,
+} from 'Repositories/storage';
 import {StorageSchemata} from 'Repositories/storage/StorageSchemata';
 import {getLogger, Logger} from 'Util/Logger';
 
@@ -203,12 +209,12 @@ export class EventService {
         .table(StorageSchemata.OBJECT_STORE.EVENTS)
         .where(['conversation', 'time'])
         .between([conversationId, quotedMessageTime], [conversationId, new Date().toISOString()], true, true)
-        .filter(event => event.data && event.data.quote && event.data.quote.message_id === quotedMessageId)
+        .filter(event => hasQuoteForMessage(event, quotedMessageId))
         .toArray();
       return events;
     }
 
-    const records = await this.storageService.getAll<any>(StorageSchemata.OBJECT_STORE.EVENTS);
+    const records = await this.storageService.getAll<EventRecord>(StorageSchemata.OBJECT_STORE.EVENTS);
     return records
       .filter(record => {
         return (
@@ -217,7 +223,7 @@ export class EventService {
           record.time <= new Date().toISOString()
         );
       })
-      .filter(event => !!event.data && !!event.data.quote && event.data.quote.message_id === quotedMessageId)
+      .filter(event => hasQuoteForMessage(event, quotedMessageId))
       .sort(compareEventsByConversation);
   }
 

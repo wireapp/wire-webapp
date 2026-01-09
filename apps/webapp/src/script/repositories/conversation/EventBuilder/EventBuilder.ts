@@ -128,6 +128,16 @@ export type MemberLeaveEvent = BackendEventMessage<
     user_ids: string[];
   }
 >;
+
+export type QuoteData =
+  | string
+  | {
+      message_id: string;
+      user_id: string;
+      hash: Uint8Array;
+    }
+  | {error: {type: string}};
+
 export type MessageAddEvent = ConversationEvent<
   CONVERSATION.MESSAGE_ADD,
   {
@@ -137,14 +147,7 @@ export type MessageAddEvent = ConversationEvent<
     previews?: string[];
     expects_read_confirmation?: boolean;
     mentions?: string[];
-    quote?:
-      | string
-      | {
-          message_id: string;
-          user_id: string;
-          hash: Uint8Array;
-        }
-      | {error: {type: string}};
+    quote?: QuoteData;
     /** @deprecated this was legacy field for the text content */
     message?: string;
     /** @deprecated this was legacy field for the conversationId */
@@ -163,7 +166,12 @@ export type MultipartMessageAddEvent = ConversationEvent<
   CONVERSATION.MULTIPART_MESSAGE_ADD,
   {
     attachments: MultiPartContent['attachments'];
-    text: MultiPartContent['text'] & {mentions?: string[]; previews?: string[]};
+    text: {
+      content: string;
+      mentions?: string[];
+      previews?: string[];
+      quote?: QuoteData;
+    };
     replacing_message_id?: string;
     expects_read_confirmation?: boolean;
   }
