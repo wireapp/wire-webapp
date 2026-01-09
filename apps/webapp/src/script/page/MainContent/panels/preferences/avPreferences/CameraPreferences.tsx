@@ -41,7 +41,7 @@ interface CameraPreferencesProps {
   streamHandler: MediaStreamHandler;
 }
 
-const DEBOUNCE_TIMEOUT = 100;
+const DEBOUNCE_TIMEOUT = 1;
 
 const CameraPreferencesComponent = ({streamHandler, refreshStream, hasActiveCameraStream}: CameraPreferencesProps) => {
   const [isRequesting, setIsRequesting] = useState(false);
@@ -93,6 +93,20 @@ const CameraPreferencesComponent = ({streamHandler, refreshStream, hasActiveCame
   useEffect(() => {
     if (videoElement.current && stream) {
       videoElement.current.srcObject = stream;
+
+      // @TODO: Fix me, compare with ticket WPB-11337
+      // We have a race condition between removing a stream and re-adding it.
+      // Firefox is very sensitive when a stream is ended while it is still attached to the video element and then a new
+      // stream is added. Depending on the time interval, the new stream will not start.
+      // This is just a workaround to fix the problem. The actual cause lies in the timing of the useEfects and that
+      // should be cleaned up.
+      const currentStream = stream;
+      videoElement.current.load(); // Firefox only fix
+      videoElement.current.play().catch(() => {
+        if (videoElement.current && stream && videoElement.current.srcObject === currentStream) {
+          videoElement.current.srcObject = stream;
+        }
+      });
     }
   }, [stream]);
 
