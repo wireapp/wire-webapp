@@ -41,7 +41,7 @@ interface CameraPreferencesProps {
   streamHandler: MediaStreamHandler;
 }
 
-const DEBOUNCE_TIMEOUT = 1;
+const DEBOUNCE_TIMEOUT = 100;
 
 const CameraPreferencesComponent = ({streamHandler, refreshStream, hasActiveCameraStream}: CameraPreferencesProps) => {
   const [isRequesting, setIsRequesting] = useState(false);
