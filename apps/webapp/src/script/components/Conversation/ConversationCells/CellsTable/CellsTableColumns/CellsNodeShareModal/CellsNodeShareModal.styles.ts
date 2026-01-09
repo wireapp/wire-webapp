@@ -26,7 +26,7 @@ export const wrapperStyles: CSSObject = {
 
 export const labelStyles: CSSObject = {
   fontSize: 'var(--font-size-base)',
-  fontWeight: 'var(--font-weight-regular)',
+  fontWeight: 'var(--font-weight-semibold)',
   marginBottom: '8px',
 };
 
