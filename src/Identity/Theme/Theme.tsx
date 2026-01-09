@@ -113,10 +113,17 @@ export interface Theme extends ETheme {
     optionHoverBg: string;
     selectedActiveBg: string;
   };
+  Switch: {
+    activatedColor: string;
+    deactivatedColor: string;
+    disabledColor?: string;
+  };
+  themeId: THEME_ID;
 }
 
 export const themes: {[themeId in THEME_ID]: Theme} = {
   [THEME_ID.DEFAULT]: {
+    themeId: THEME_ID.DEFAULT,
     fontSizes,
     Button: {
       primaryBg: 'var(--accent-color)',
@@ -191,8 +198,14 @@ export const themes: {[themeId in THEME_ID]: Theme} = {
       contrastColor: 'var(--text-input-background)',
       focusColor: 'var(--accent-color-focus)',
     },
+    Switch: {
+      activatedColor: COLOR.BLUE,
+      deactivatedColor: '#d2d2d2',
+      disabledColor: COLOR.GRAY_LIGHTEN_88,
+    },
   },
   [THEME_ID.LIGHT]: {
+    themeId: THEME_ID.LIGHT,
     fontSizes,
     Button: {
       primaryBg: 'var(--accent-color)',
@@ -267,8 +280,14 @@ export const themes: {[themeId in THEME_ID]: Theme} = {
       contrastColor: 'var(--text-input-background)',
       focusColor: 'var(--accent-color-focus)',
     },
+    Switch: {
+      activatedColor: BASE_LIGHT_COLOR.BLUE,
+      deactivatedColor: COLOR_V2.GRAY_70,
+      disabledColor: COLOR_V2.GRAY_70,
+    },
   },
   [THEME_ID.DARK]: {
+    themeId: THEME_ID.DARK,
     fontSizes,
     Button: {
       primaryBg: 'var(--accent-color)',
@@ -342,6 +361,11 @@ export const themes: {[themeId in THEME_ID]: Theme} = {
       successColor: COLOR_V2.GREEN_DARK_500,
       contrastColor: 'var(--text-input-background)',
       focusColor: 'var(--accent-color-focus)',
+    },
+    Switch: {
+      activatedColor: BASE_DARK_COLOR.BLUE,
+      deactivatedColor: COLOR_V2.GRAY_60,
+      disabledColor: COLOR_V2.GRAY_60,
     },
   },
 };
