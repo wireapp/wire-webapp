@@ -21,9 +21,23 @@ apps/
 │   └── app-config/   # Webapp configuration
 └── server/           # Node.js/Express backend API
     └── src/          # Server source code
+libraries/
+└── core/             # @wireapp/core - Wire's communication core library
+    ├── src/          # Core library source code
+    └── README.md     # Core library documentation
 docs/                 # Project documentation
 package.json          # Root dependencies (use yarn commands)
 ```
+
+### Core Library (`@wireapp/core`)
+
+The `libraries/core` directory contains Wire's communication core library, which handles:
+- Account authentication and management
+- WebSocket connections for real-time communication
+- Protocol message handling (send/receive Protobuf messages)
+- Cryptographic operations for secure messaging
+
+This is a critical dependency for the webapp. Changes to core functionality should be carefully reviewed for security and backwards compatibility.
 
 ## ESSENTIAL COMMANDS
 
