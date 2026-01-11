@@ -17,16 +17,23 @@
  *
  */
 
-const baseConfig = require('../../jest.config.base');
-
-const { TextDecoder, TextEncoder } = require('util');
+const {TextDecoder, TextEncoder} = require('util');
 
 module.exports = {
-  ...baseConfig,
+  displayName: 'core-lib',
   testEnvironment: 'node',
-  setupFilesAfterEnv: ['./jest.setup.ts'],
+  clearMocks: true,
+  setupFilesAfterEnv: ['<rootDir>/jest.setup.ts'],
   globals: {
     TextDecoder,
     TextEncoder,
   },
+  transform: {
+    '^.+\\.(ts|tsx)$': '@swc/jest',
+    '^.+\\.(js|jsx)$': '@swc/jest',
+  },
+  transformIgnorePatterns: ['node_modules/'],
+  coverageDirectory: '../../coverage/libraries/core',
+  testMatch: ['<rootDir>/src/**/__tests__/**/*.[jt]s?(x)', '<rootDir>/src/**/?(*.)+(spec|test).[jt]s?(x)'],
+  moduleFileExtensions: ['js', 'json', 'ts', 'tsx'],
 };

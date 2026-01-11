@@ -19,3 +19,8 @@
 
 export * from './TypePredicateUtil';
 export * from './TaskScheduler';
+export * from './LowPrecisionTaskScheduler';
+export * from './RecurringTaskScheduler';
+export * from './qualifiedIdUtil';
+export * from './fullyQualifiedClientIdUtils';
+export * from './numberToHex';

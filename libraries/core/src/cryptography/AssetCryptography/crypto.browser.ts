@@ -19,20 +19,26 @@
 
 import {Crypto} from './interfaces';
 
+import {toBufferSource} from '../../util/bufferUtils';
+
 const cryptoLib = window.crypto;
 
 export const crypto: Crypto = {
   async digest(cipherText: Uint8Array): Promise<Uint8Array> {
-    const checksum = await cryptoLib.subtle.digest('SHA-256', cipherText);
+    const checksum = await cryptoLib.subtle.digest('SHA-256', toBufferSource(cipherText));
     return new Uint8Array(checksum);
   },
 
   async decrypt(cipherText: Uint8Array, keyBytes: Uint8Array): Promise<Uint8Array> {
-    const key = await cryptoLib.subtle.importKey('raw', keyBytes, 'AES-CBC', false, ['decrypt']);
+    const key = await cryptoLib.subtle.importKey('raw', toBufferSource(keyBytes), 'AES-CBC', false, ['decrypt']);
 
     const initializationVector = cipherText.slice(0, 16);
     const assetCipherText = cipherText.slice(16);
-    const decipher = await cryptoLib.subtle.decrypt({iv: initializationVector, name: 'AES-CBC'}, key, assetCipherText);
+    const decipher = await cryptoLib.subtle.decrypt(
+      {iv: toBufferSource(initializationVector), name: 'AES-CBC'},
+      key,
+      toBufferSource(assetCipherText),
+    );
 
     return new Uint8Array(decipher);
   },
@@ -46,10 +52,14 @@ export const crypto: Crypto = {
     keyBytes: Uint8Array,
     initializationVector: Uint8Array,
   ): Promise<{key: Uint8Array; cipher: Uint8Array | ArrayBuffer}> {
-    const key = await cryptoLib.subtle.importKey('raw', keyBytes, 'AES-CBC', true, ['encrypt']);
+    const key = await cryptoLib.subtle.importKey('raw', toBufferSource(keyBytes), 'AES-CBC', true, ['encrypt']);
     return {
       key: new Uint8Array(await cryptoLib.subtle.exportKey('raw', key)),
-      cipher: await cryptoLib.subtle.encrypt({iv: initializationVector, name: 'AES-CBC'}, key, plainText),
+      cipher: await cryptoLib.subtle.encrypt(
+        {iv: toBufferSource(initializationVector), name: 'AES-CBC'},
+        key,
+        toBufferSource(plainText),
+      ),
     };
   },
 };

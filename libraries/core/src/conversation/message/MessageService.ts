@@ -22,9 +22,10 @@ import {QualifiedId, QualifiedUserPreKeyBundleMap} from '@wireapp/api-client/lib
 import {uuidToBytes} from '@wireapp/commons/lib/util/StringUtil';
 import {proteus as ProtobufOTR} from '@wireapp/protocol-messaging/web/otr';
 import {AxiosError} from 'axios';
-import {deepmerge} from 'deepmerge-ts';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
-import Long from 'long';
+import {merge} from 'lodash';
+// @ts-expect-error - long module has compatibility issues between versions
+import * as Long from 'long';
 
 import {APIClient} from '@wireapp/api-client';
 
@@ -70,7 +71,7 @@ export class MessageService {
     const send = async ({payloads, unknowns, failed}: EncryptionResult): Promise<MessageSendingStatus> => {
       const result = await this.sendOtrMessage(sendingClientId, payloads, options);
       const extras = {failed, deleted: unknowns ?? {}};
-      return deepmerge(result, extras) as MessageSendingStatus & {failed?: QualifiedId[]};
+      return merge({}, result, extras) as MessageSendingStatus & {failed?: QualifiedId[]};
     };
 
     try {
@@ -181,6 +182,6 @@ export class MessageService {
       return initialPayloads;
     }
     const reencryptedResults = await this.proteusService.encrypt(plainText, mismatch.missing);
-    return deepmerge(initialPayloads, reencryptedResults);
+    return merge({}, initialPayloads, reencryptedResults);
   }
 }

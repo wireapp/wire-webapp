@@ -48,6 +48,6 @@ export type User = {
   teamId: string;
   handle: string;
 };
-export type Account = Uint8Array;
+export type AcmeAccount = Uint8Array;
 export type Nonce = string;
 export type KeyAuth = NewAcmeAuthzOriginal['keyauth'];

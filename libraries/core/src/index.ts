@@ -19,11 +19,12 @@
 
 export {Account, ConnectionState, ProcessedEventPayload} from './Account';
 export * as auth from './auth/';
-export * as conversation from './conversation/';
+export * from './conversation/';
 export {CoreError} from './CoreError';
-export * as cryptography from './cryptography/';
-export * as util from './util';
+export * from './cryptography/';
+export * from './util';
 export * as MessageBuilder from './conversation/message/MessageBuilder';
-export * as errors from './errors';
-
-export {Ciphersuite} from '@wireapp/core-crypto';
+export * from './errors';
+export * from './client/';
+export * from './messagingProtocols/mls/';
+export * from './messagingProtocols/proteus/';

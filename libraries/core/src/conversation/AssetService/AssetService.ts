@@ -24,6 +24,7 @@ import {APIClient} from '@wireapp/api-client';
 
 import {EncryptedAsset, EncryptedAssetUploaded} from '../../cryptography';
 import {decryptAsset, encryptAsset} from '../../cryptography/AssetCryptography/AssetCryptography';
+import {toBufferSource} from '../../util/bufferUtils';
 
 export {ProgressCallback};
 
@@ -127,14 +128,17 @@ export class AssetService {
     const {response} = request;
 
     return {
-      response: response.then(async response => ({
-        ...response,
-        buffer: await decryptAsset({
+      response: response.then(async response => {
+        const decrypted = await decryptAsset({
           cipherText: new Uint8Array(response.buffer),
           keyBytes: otrKey,
           sha256: sha256,
-        }),
-      })),
+        });
+        return {
+          ...response,
+          buffer: toBufferSource(decrypted).buffer,
+        };
+      }),
       cancel: request.cancel,
     };
   }

@@ -57,7 +57,8 @@
   "prettier": "@wireapp/prettier-config",
   "private": true,
   "workspaces": [
-    "apps/*"
+    "apps/*",
+    "libraries/*"
   ],
   "repository": {
     "type": "git",
