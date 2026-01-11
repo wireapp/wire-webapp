@@ -1,197 +1,269 @@
-# GitHub Copilot Repository Instructions
+# 🚨 STOP - READ THIS FIRST 🚨
 
-## ⚠️ CRITICAL RULES - READ FIRST
+## MANDATORY REQUIREMENTS FOR EVERY RESPONSE
 
-**YOU MUST FOLLOW THESE RULES IN EVERY RESPONSE:**
+You MUST do ALL of these things in EVERY response:
 
-1. ✅ **Always use Nx commands** (`nx run`, `nx run-many`, `nx affected`) - never call tools directly
-2. 🔒 **Security is mandatory** - check all input validation, XSS, secrets, and API handling
-3. ♿ **Accessibility is mandatory** - verify keyboard nav, ARIA, focus management for all UI changes
-4. 📋 **Use severity levels** - tag all comments with [Blocker], [Important], or [Suggestion]
-5. 📁 **Check specialized instructions** - load context from `.github/instructions/*.md` for specific file types
+### 1. 🔒 SECURITY CHECKS (BLOCKER - NEVER SKIP)
+- ✓ Validate ALL user inputs before use
+- ✓ Check API responses are validated with error handling
+- ✓ NO `dangerouslySetInnerHTML` without sanitization
+- ✓ NO hardcoded secrets, tokens, or API keys
+- ✓ Validate all URL redirects and external links
+- ✓ Verify authentication and authorization
+
+### 2. ♿ ACCESSIBILITY CHECKS (BLOCKER - NEVER SKIP)
+For ANY UI change in `apps/webapp/src/`:
+- ✓ Keyboard navigation works (Tab, Enter, Space, Escape, Arrows)
+- ✓ Focus management (visible focus, trapped in modals)
+- ✓ ARIA labels on icon buttons (action-focused, not icon name)
+- ✓ Form labels tied to inputs with error descriptions
+- ✓ Screen reader support (aria-live for dynamic content)
+
+### 3. ✅ USE NX COMMANDS (NEVER USE DIRECT TOOL CALLS)
+```bash
+nx run webapp:build      # ✅ CORRECT
+npm run build           # ❌ WRONG
+
+nx run-many -t test     # ✅ CORRECT
+jest                    # ❌ WRONG
+```
+
+### 4. 📋 TAG ALL COMMENTS WITH SEVERITY
+- `[Blocker]` - Security/accessibility/critical bugs (MUST FIX)
+- `[Important]` - TypeScript errors, React anti-patterns, performance
+- `[Suggestion]` - Code organization, naming, minor improvements
+
+---
 
 ## REPOSITORY STRUCTURE
 
-You are reviewing code in an Nx monorepo with these key directories:
+**Nx Monorepo:**
 
 ```
 apps/
-├── webapp/           # React frontend application
-│   ├── src/          # Source code (components, pages, etc.)
-│   └── app-config/   # Webapp configuration
-└── server/           # Node.js/Express backend API
-    └── src/          # Server source code
+├── webapp/           # React frontend (security + accessibility focus)
+└── server/           # Node.js/Express API (security focus)
 libraries/
-└── core/             # @wireapp/core - Wire's communication core library
-    ├── src/          # Core library source code
-    └── README.md     # Core library documentation
-docs/                 # Project documentation
-package.json          # Root dependencies (use yarn commands)
+└── core/             # @wireapp/core - Communication library
+                      # ⚠️ CRITICAL: Changes affect authentication, encryption, messaging
 ```
 
 ### Core Library (`@wireapp/core`)
+**Location:** `libraries/core/`
+**Critical Functions:**
+- Authentication and session management
+- WebSocket connections
+- Protocol message handling (Protobuf)
+- Cryptographic operations
 
-The `libraries/core` directory contains Wire's communication core library, which handles:
-- Account authentication and management
-- WebSocket connections for real-time communication
-- Protocol message handling (send/receive Protobuf messages)
-- Cryptographic operations for secure messaging
+⚠️ **Changes to core MUST be reviewed for security and backwards compatibility**
 
-This is a critical dependency for the webapp. Changes to core functionality should be carefully reviewed for security and backwards compatibility.
+---
 
-## ESSENTIAL COMMANDS
+## COMMENT FORMAT
 
-```bash
-yarn nx run webapp:serve    # Start frontend development
-yarn nx run webapp:build    # Build frontend for production
-yarn nx run server:package  # Package server for deployment
+**ALWAYS use this exact format:**
+
+```
+**[Blocker]** - Security vulnerability in auth.ts:45
+
+The password validation accepts empty strings, allowing unauthorized access.
+
+Suggested fix:
+\`\`\`typescript
+if (!password?.trim()) {
+  throw new Error('Password required');
+}
+\`\`\`
 ```
 
-## NX WORKFLOW GUIDELINES
+---
 
-**Important:** This is an Nx monorepo. Follow these guidelines:
+## REVIEW PRIORITY ORDER
 
-- **Always use Nx commands**: Run tasks through `nx` (e.g., `nx run`, `nx run-many`, `nx affected`) instead of calling underlying tools directly
-- **Use Nx MCP tools**: You have access to Nx MCP server tools:
-  - `nx_workspace` - Understand workspace architecture and check for errors
-  - `nx_project_details` - Analyze specific project structure and dependencies
-  - `nx_docs` - Get up-to-date Nx configuration guidance (never assume Nx configuration)
-- **Check workspace first**: When answering repository questions, use `nx_workspace` tool first to understand the architecture
-- **Get help for errors**: Use `nx_workspace` tool to diagnose Nx configuration or project graph errors
+Review in this exact order:
 
-## CODE REVIEW PRIORITIES
+1. **🔒 SECURITY** (Blocker - stop everything else if found)
+2. **♿ ACCESSIBILITY** (Blocker - stop everything else if found)
+3. **⚙️ TYPESCRIPT/REACT** (Important)
+4. **🎨 CODE STYLE** (Only if linters don't catch it)
 
-**ALWAYS REVIEW IN THIS ORDER:**
+---
 
-1. **SECURITY ISSUES** (CRITICAL - Must fix immediately)
-2. **ACCESSIBILITY VIOLATIONS** (CRITICAL - Must fix immediately)
-3. **TYPESCRIPT/REACT BEST PRACTICES** (Important - Should fix)
-4. **CODE STYLE** (Minor - Only if not handled by linters)
+## NX WORKFLOW (MANDATORY)
 
-## COMMENT SEVERITY LEVELS
+**ALWAYS use Nx commands:**
+```bash
+# Development
+nx run webapp:serve
 
-Use these exact formats:
+# Building
+nx run webapp:build --configuration=production
+nx run server:package
 
-- **[Blocker]** - Security vulnerabilities, accessibility failures, critical functionality issues
-- **[Important]** - TypeScript errors, React anti-patterns, performance problems
-- **[Suggestion]** - Code organization, naming conventions, minor improvements
+# Testing
+nx run-many -t test --all
+nx affected -t test
 
-## SECURITY CHECKLIST
+# Linting
+nx run-many -t lint --all
+```
 
-ALWAYS verify these items in EVERY PR:
+**MCP Tools Available:**
+- `nx_workspace` - Get architecture overview, check for errors
+- `nx_project_details` - Analyze project structure
+- `nx_docs` - Get current Nx configuration docs (NEVER assume)
 
-- ✓ Input validation and sanitization
-- ✓ API response validation and error handling
-- ✓ No dangerouslySetInnerHTML without sanitization
-- ✓ No hardcoded secrets, tokens, or API keys
-- ✓ Safe URL handling and redirect validation
-- ✓ Proper authentication and authorization
+---
 
-## ACCESSIBILITY CHECKLIST
+## SECURITY REVIEW CHECKLIST
 
-For UI changes in apps/webapp/src/:
+Check EVERY PR for these (failure = [Blocker]):
 
-- ✓ Keyboard navigation (Tab, Enter, Space, Escape, Arrow keys)
-- ✓ Focus management (visible focus, proper trapping in modals)
-- ✓ ARIA labels and roles (icon buttons need action-focused labels)
-- ✓ Form accessibility (labels tied to inputs, error descriptions)
-- ✓ Screen reader support (aria-live for dynamic content)
+| Check | What to Look For |
+|-------|------------------|
+| **Input Validation** | All `req.body`, `req.query`, `req.params` validated |
+| **API Response** | Try-catch blocks, response validation, error handling |
+| **XSS Prevention** | No `dangerouslySetInnerHTML`, sanitize HTML, escape output |
+| **Secrets** | No API keys, tokens, passwords in code |
+| **URL Safety** | Validate redirects, check for open redirects |
+| **Auth/Authz** | Verify permission checks, session validation |
 
-## REVIEW SCOPE
+**Common Vulnerabilities:**
+```typescript
+// ❌ BLOCKER - No validation
+app.post('/api/user', (req, res) => {
+  const user = req.body;
+  db.save(user);
+});
 
-REVIEW these files:
+// ✅ CORRECT - Validated
+app.post('/api/user', (req, res) => {
+  const schema = z.object({
+    email: z.string().email(),
+    name: z.string().min(1).max(100)
+  });
+  const user = schema.parse(req.body);
+  db.save(user);
+});
+```
 
-- Security: All code changes (especially APIs and user input)
-- Accessibility: apps/webapp/src/**/*
-- TypeScript: apps/**/*.{ts,tsx}
-- React: apps/webapp/src/**/*.{tsx,jsx}
+---
 
-DO NOT REVIEW:
+## ACCESSIBILITY REVIEW CHECKLIST
 
-- Code formatting (handled by prettier/eslint)
+For ANY file in `apps/webapp/src/` (failure = [Blocker]):
+
+| Check | Requirements |
+|-------|--------------|
+| **Keyboard Nav** | All interactive elements reachable/operable via keyboard |
+| **Focus** | Visible focus indicator, logical order, trapped in modals |
+| **ARIA** | Icon buttons have action labels ("Delete message", not "Trash icon") |
+| **Forms** | Labels for inputs, error messages with `aria-describedby` |
+| **Dynamic Content** | Use `aria-live` for status updates, `role="alert"` for errors |
+
+**Common Violations:**
+```tsx
+// ❌ BLOCKER - No keyboard access, no ARIA
+<div onClick={handleDelete}>🗑️</div>
+
+// ✅ CORRECT - Accessible
+<button
+  onClick={handleDelete}
+  aria-label="Delete message"
+>
+  🗑️
+</button>
+```
+
+---
+
+## WHAT NOT TO REVIEW
+
+DO NOT comment on:
+- Code formatting (prettier handles it)
 - Import ordering (automated)
 - Trivial naming preferences
+- Style that matches existing patterns
 
-## REFERENCE DOCUMENTS
+---
 
-- Web Coding Standards: docs/coding-standards.md
-- Technology Radar: docs/tech-radar.md
+## APPROVAL CRITERIA
 
-## SPECIALIZED INSTRUCTION FILES
+**✅ APPROVE when:**
+- Zero [Blocker] issues
+- All [Important] issues fixed or justified
+- Security + accessibility requirements met
 
-- Security: .github/instructions/security.instructions.md (apps/**/*)
-- Accessibility: .github/instructions/accessibility.instructions.md (apps/webapp/src/**/*)
-- React: .github/instructions/react.instructions.md (apps/webapp/src/**/*.{tsx,jsx})
-- TypeScript: .github/instructions/typescript.instructions.md (apps/**/*.{ts,tsx})
+**❌ REQUEST CHANGES when:**
+- Any [Blocker] issues exist
+- Security vulnerabilities present
+- Accessibility requirements not met
 
-## Pull Request Review Process
+---
 
-### When Reviewing PRs
+## SPECIALIZED INSTRUCTIONS
 
-**Your Approach:**
+For detailed rules by file type:
+- **Security:** `.github/instructions/security.instructions.md`
+- **Accessibility:** `.github/instructions/accessibility.instructions.md`
+- **React:** `.github/instructions/react.instructions.md`
+- **TypeScript:** `.github/instructions/typescript.instructions.md`
 
-1. Review only the code changes shown in the diff
-2. Focus on security, accessibility, and critical functionality
-3. Use clear severity levels in comments
-4. Provide specific, actionable feedback with code examples when helpful
+**Reference Docs:**
+- Coding Standards: `docs/coding-standards.md`
+- Tech Radar: `docs/tech-radar.md`
 
-### Comment Guidelines
+---
 
-**Format each comment with:**
+## DEPENDENCY MANAGEMENT
 
-- Severity level: **[Blocker]**, **[Important]**, or **[Suggestion]**
-- File location and line numbers
-- Clear explanation of the issue
-- Specific fix suggestion when appropriate
-
-**Example:**
-
-````
-**[Blocker]** - Security vulnerability in authentication.ts:45
-
-The password validation logic allows empty strings. This could allow unauthorized access.
-
-**Suggested fix:**
-```typescript
-if (!password || password.trim().length === 0) {
-  throw new Error('Password cannot be empty');
-}
-````
-
-```
-
-### Security Review Checklist
-For every PR, check these security items:
-
-- **Input Validation**: All user inputs are validated before use
-- **API Response Handling**: Responses are validated and have error handling
-- **XSS Prevention**: No unsafe HTML rendering without sanitization
-- **Secret Management**: No hardcoded secrets, tokens, or API keys
-- **URL Safety**: All redirects and external URLs are validated
-
-### Accessibility Review Checklist
-For UI changes in `apps/webapp/src/`:
-
-- **Keyboard Navigation**: All interactive elements are keyboard accessible
-- **Focus Management**: Proper focus handling in modals and dynamic content
-- **ARIA Labels**: Icon buttons have meaningful labels
-- **Form Accessibility**: Inputs have proper labels and error descriptions
-
-### Technology Review
 When new dependencies are added:
+1. Check `docs/tech-radar.md` for approval status
+2. **Adopt/Trial** ✅ - Verify follows standards
+3. **Hold/Assess** 🚫 - Flag as [Blocker], require team approval
+4. Check for security vulnerabilities (npm audit, Snyk)
+5. Verify license compatibility
 
-1. Check if the dependency is in the [Tech Radar](docs/tech-radar.md)
-2. If **Adopt** or **Trial**: Verify it follows project standards
-3. If **Hold** or **Assess**: Flag as **[Blocker]** and require team approval
-4. Check for security vulnerabilities and licensing issues
+---
 
-### Approval Criteria
-**Approve the PR when:**
-- No **[Blocker]** issues remain
-- All **[Important]** issues are either fixed or properly justified
-- Security and accessibility requirements are met
+## EXAMPLE REVIEW
 
-**Request changes when:**
-- Any **[Blocker]** issues exist
-- Critical security vulnerabilities are found
-- Essential accessibility features are missing
+```markdown
+**[Blocker]** - XSS vulnerability in MessageComponent.tsx:67
+
+Using `dangerouslySetInnerHTML` without sanitization allows script injection.
+
+Suggested fix:
+\`\`\`typescript
+import DOMPurify from 'dompurify';
+
+<div dangerouslySetInnerHTML={{
+  __html: DOMPurify.sanitize(message.content)
+}} />
+\`\`\`
+
+**[Blocker]** - Keyboard inaccessible in MessageActions.tsx:45
+
+Delete button is a `<div>` with `onClick`, not keyboard accessible.
+
+Suggested fix:
+\`\`\`typescript
+<button
+  onClick={handleDelete}
+  aria-label="Delete message"
+  className="delete-btn"
+>
+  <TrashIcon />
+</button>
+\`\`\`
+
+**[Important]** - Missing error handling in api.ts:123
+
+API call has no try-catch or error handling, will crash on network errors.
+
+**[Suggestion]** - Consider extracting validation logic
+
+The validation code could be a reusable schema to reduce duplication.
+```
