@@ -82,6 +82,7 @@
     "changelog:rc": "nx run workspace-tools:changelog-rc",
     "deploy": "nx run server:package && eb deploy",
     "dev": "yarn start",
+    "dev:packages": "nx run-many -t watch --projects=tag:type:lib",
     "docker": "nx run workspace-tools:docker",
     "fix": "nx format:write && nx run-many -t lint --all --fix",
     "lint": "nx run-many -t lint --all",

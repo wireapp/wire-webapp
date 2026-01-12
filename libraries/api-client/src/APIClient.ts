@@ -470,5 +470,3 @@ export class APIClient extends EventEmitter {
     return false;
   }
 }
-
-console.log(`BARDIA 2 @wireapp/api-client version: ${APIClient.VERSION}`);
