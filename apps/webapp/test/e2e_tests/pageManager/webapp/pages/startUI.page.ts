@@ -20,16 +20,16 @@
 import {Page, Locator} from '@playwright/test';
 
 export class StartUIPage {
-  readonly page: Page;
+  readonly component: Locator;
 
   readonly searchInput: Locator;
   readonly searchResults: Locator;
 
   constructor(page: Page) {
-    this.page = page;
+    this.component = page.locator('#start-ui');
 
-    this.searchInput = page.locator('[data-uie-name="enter-users"]');
-    this.searchResults = page.locator('[data-uie-name="item-user"] [data-uie-name="status-username"]');
+    this.searchInput = this.component.getByLabel('Search people');
+    this.searchResults = this.component.getByRole('list', {name: 'Conversation List'}).getByRole('listitem');
   }
 
   async selectUsers(usernames: string[]) {

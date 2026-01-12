@@ -34,7 +34,7 @@ test.describe('Search', () => {
       await userAComponents.conversationSidebar().clickConnectButton();
       await userAPages.startUI().searchInput.fill(partialUsername);
 
-      await expect(userAPages.startUI().searchResults).toContainText(userB.username);
+      await expect(userAPages.startUI().searchResults).toContainText(userB.fullName);
     },
   );
 
@@ -68,7 +68,7 @@ test.describe('Search', () => {
 
       await userAComponents.conversationSidebar().clickConnectButton();
       await userAPages.startUI().searchInput.fill('@' + userB.username);
-      await expect(userAPages.startUI().searchResults).toContainText(userB.username);
+      await expect(userAPages.startUI().searchResults).toContainText(userB.fullName);
       await expect(userAPages.startUI().searchResults).toHaveCount(1);
     },
   );
@@ -83,7 +83,7 @@ test.describe('Search', () => {
 
       await userAComponents.conversationSidebar().clickConnectButton();
       await userAPages.startUI().searchInput.fill(userB.username);
-      await expect(userAPages.startUI().searchResults).toContainText(userB.username);
+      await expect(userAPages.startUI().searchResults).toContainText(userB.fullName);
     },
   );
 });
