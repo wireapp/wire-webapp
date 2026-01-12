@@ -38,17 +38,34 @@ const isMonorepo =
   !require('fs').existsSync(path.join(deploymentRootPath, '.env.defaults'));
 const rootPath = isMonorepo ? monorepoRootPath : deploymentRootPath;
 
-const env = dotenv.load({
+console.log('[Config] Loading environment from:', rootPath);
+console.log('[Config] __dirname:', __dirname);
+console.log('[Config] Is monorepo:', isMonorepo);
+
+const dotenvConfig = {
   path: path.join(rootPath, '.env'),
   defaults: path.join(rootPath, '.env.defaults'),
   includeProcessEnv: true,
-}) as Env;
+  silent: false, // Don't fail silently
+};
+
+console.log('[Config] dotenv config:', JSON.stringify(dotenvConfig, null, 2));
+
+const env = dotenv.load(dotenvConfig) as Env;
+
+console.log('[Config] Environment loaded. APP_BASE:', env.APP_BASE ? 'SET' : 'NOT SET');
 
 function generateUrls() {
   const federation = env.FEDERATION;
 
   if (!federation) {
     if (!env.APP_BASE || !env.BACKEND_REST || !env.BACKEND_WS) {
+      console.error('[Config] Missing required environment variables!');
+      console.error('[Config] APP_BASE:', env.APP_BASE);
+      console.error('[Config] BACKEND_REST:', env.BACKEND_REST);
+      console.error('[Config] BACKEND_WS:', env.BACKEND_WS);
+      console.error('[Config] Root path used:', rootPath);
+      console.error('[Config] .env.defaults exists:', require('fs').existsSync(path.join(rootPath, '.env.defaults')));
       throw new Error('missing environment variables');
     }
     return {
