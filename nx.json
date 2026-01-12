@@ -2,6 +2,7 @@
   "$schema": "./node_modules/nx/schemas/nx-schema.json",
   "targetDefaults": {
     "build": {
+      "dependsOn": ["^build"], // build all upstream dependencies first
       "cache": true,
       "inputs": ["production"], // skip test-only files when hashing builds
       "outputs": ["{projectRoot}/dist"]
