@@ -4,11 +4,11 @@
   "private": true,
   "license": "GPL-3.0",
   "main": "lib/index.js",
-  "types": "src/index.ts",
+  "types": "lib/index.d.ts",
   "typesVersions": {
     "*": {
       "lib/*": [
-        "src/*"
+        "lib/*"
       ]
     }
   },

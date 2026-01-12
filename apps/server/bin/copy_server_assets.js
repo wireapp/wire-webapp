@@ -43,6 +43,9 @@ const configLibDest = path.resolve(__dirname, distFolder, 'node_modules/@wireapp
 const configPkgSrc = path.resolve(__dirname, '../../../libraries/config/package.json');
 const configPkgDest = path.resolve(__dirname, distFolder, 'node_modules/@wireapp/config/package.json');
 
-fs.ensureDirSync(path.dirname(configLibDest));
+// Ensure the node_modules/@wireapp/config directory exists
+fs.ensureDirSync(path.resolve(__dirname, distFolder, 'node_modules/@wireapp/config'));
+// Copy the compiled lib directory
 fs.copySync(configLibSrc, configLibDest);
+// Copy the package.json
 fs.copySync(configPkgSrc, configPkgDest);
