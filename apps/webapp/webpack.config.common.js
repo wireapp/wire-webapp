@@ -37,7 +37,7 @@ const HOME_TEMPLATE_PATH = path.resolve(SRC_PATH, 'page/index.ejs');
 const AUTH_TEMPLATE_PATH = path.resolve(SRC_PATH, 'page/auth.ejs');
 const UNSUPPORTED_TEMPLATE_PATH = path.resolve(SRC_PATH, 'page/unsupported.ejs');
 
-const {clientConfig, serverConfig} = require(path.resolve(DIST_PATH, 'config/index.js'));
+const {clientConfig, serverConfig} = require(path.resolve(DIST_PATH, 'config.js'));
 
 const templateParameters = {
   VERSION: clientConfig.VERSION,
