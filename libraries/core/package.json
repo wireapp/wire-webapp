@@ -32,30 +32,23 @@
     "hash.js": "1.1.7",
     "http-status-codes": "2.3.0",
     "idb": "8.0.3",
-    "lodash": "^4.17.21",
+    "lodash": "4.17.21",
     "logdown": "3.3.1",
     "long": "5.2.0",
     "uuid": "11.1.0",
     "zod": "3.25.76"
   },
   "devDependencies": {
-    "@faker-js/faker": "^9.9.0",
     "@swc/core": "1.15.8",
     "@swc/jest": "0.2.39",
-    "@types/jest": "29.5.14",
-    "@types/lodash": "^4.17.21",
+    "@types/lodash": "4.17.21",
     "@types/long": "5.0.0",
     "@types/tough-cookie": "4.0.5",
-    "@types/uuid": "10.0.0",
     "commander": "14.0.2",
-    "cross-env": "10.1.0",
     "dotenv-defaults": "5.0.2",
     "fake-indexeddb": "5.0.2",
-    "jest": "29.7.0",
     "jest-websocket-mock": "2.5.0",
-    "nock": "14.0.10",
-    "rimraf": "6.1.2",
-    "typescript": "5.9.3"
+    "nock": "14.0.10"
   },
   "scripts": {
     "build": "nx run core-lib:build",
