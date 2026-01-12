@@ -4,13 +4,21 @@
   "sourceRoot": "{projectRoot}/src",
   "projectType": "library",
   "targets": {
+    "clean": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "rimraf lib",
+        "cwd": "{projectRoot}"
+      }
+    },
     "build": {
       "executor": "nx:run-commands",
       "outputs": ["{projectRoot}/lib"],
       "options": {
         "command": "tsc",
         "cwd": "{projectRoot}"
-      }
+      },
+      "dependsOn": ["clean"]
     },
     "test": {
       "executor": "@nx/jest:jest",
