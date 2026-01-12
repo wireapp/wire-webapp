@@ -7,6 +7,12 @@
       "inputs": ["production"], // skip test-only files when hashing builds
       "outputs": ["{projectRoot}/dist"]
     },
+    "serve": {
+      "dependsOn": ["^build"] // ensure dependencies are built before serving
+    },
+    "watch": {
+      "dependsOn": ["build"] // ensure initial build before watching
+    },
     "test": {
       "cache": true,
       "inputs": ["default", "^production", "{workspaceRoot}/jest.preset.js"] // include shared preset in cache key

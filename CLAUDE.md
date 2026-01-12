@@ -24,8 +24,11 @@ libraries/
 └── core/             # @wireapp/core - Wire's communication core library
 ```
 
-## Core Library (`@wireapp/core`)
+## Libraries
 
+All libraries are located in `libraries/` directory. Current libraries:
+
+### Core Library (`@wireapp/core`)
 Located in `libraries/core/`, this is Wire's communication core library that provides:
 - Account authentication and management
 - WebSocket connections for real-time communication
@@ -36,3 +39,30 @@ The webapp depends on this library for all backend communication. When making ch
 - Run tests: `nx run core-lib:test`
 - Build the library: `nx run core-lib:build`
 - Check for circular dependencies: `nx run core-lib:check:circular-dependencies`
+
+## Development Workflow
+
+### Starting the Dev Server
+Run `yarn start` from the root to start the development environment. This automatically:
+1. Builds all library projects (tagged with `type:lib`)
+2. Starts watch mode for all libraries (auto-rebuilds on file changes)
+3. Starts the server with webpack-dev-middleware
+4. Enables hot module reloading for the webapp
+
+**All local workspace libraries are automatically watched**, so changes to any library will trigger rebuilds and refresh the webapp.
+
+### Adding New Libraries
+When creating a new library in `libraries/`:
+1. **Required**: Add `"type:lib"` tag to `project.json` tags array
+2. **Required**: Add a `watch` target in `project.json`:
+   ```json
+   "watch": {
+     "executor": "nx:run-commands",
+     "dependsOn": ["build"],
+     "options": {
+       "command": "tsc --watch",
+       "cwd": "{projectRoot}"
+     }
+   }
+   ```
+3. The library will automatically be included in watch mode when running `yarn start`

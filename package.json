@@ -92,7 +92,7 @@
     "release:staging": "nx run workspace-tools:release-staging",
     "release:production": "nx run workspace-tools:release-production",
     "release:custom": "nx run workspace-tools:release-custom",
-    "start": "nx serve server",
+    "start": "nx run-many --targets=watch,serve --projects=tag:type:lib,server",
     "stylelint": "nx run webapp:stylelint",
     "e2e-test": "nx e2e webapp",
     "e2e-ui": "nx e2e webapp --ui",
