@@ -50,6 +50,10 @@ const config: Config = {
   },
   testPathIgnorePatterns: ['<rootDir>/server', '<rootDir>/.yalc', '<rootDir>/test/e2e_tests'],
   testRunner: 'jest-jasmine2',
+  // Override transform to use babel-jest for webapp (uses React automatic runtime with Emotion)
+  transform: {
+    '^.+\\.[tj]sx?$': 'babel-jest',
+  },
 };
 
 // eslint-disable-next-line import/no-default-export
