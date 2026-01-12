@@ -36,14 +36,25 @@ const output = fs.createWriteStream(path.join(S3_PATH, 'ebs.zip'));
 // Read and modify package.json to remove all workspace dependencies
 const packageJson = JSON.parse(fs.readFileSync(path.join(SERVER_PATH, 'package.json'), 'utf8'));
 
-// Remove all workspace:* dependencies since they're bundled in node_modules
+// Collect and remove all workspace:* dependencies, mark them as bundled
+const workspaceDeps = [];
 if (packageJson.dependencies) {
   Object.keys(packageJson.dependencies).forEach(dep => {
     if (packageJson.dependencies[dep].startsWith('workspace:')) {
       console.log(`Removing workspace dependency: ${dep}`);
+      workspaceDeps.push(dep);
       delete packageJson.dependencies[dep];
     }
   });
+}
+
+// Mark workspace packages as bundledDependencies so npm doesn't remove them
+if (workspaceDeps.length > 0) {
+  if (!packageJson.bundledDependencies) {
+    packageJson.bundledDependencies = [];
+  }
+  packageJson.bundledDependencies.push(...workspaceDeps);
+  console.log(`Marked as bundled:`, workspaceDeps.join(', '));
 }
 
 // Write modified package.json to a temp file
