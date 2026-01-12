@@ -43,6 +43,8 @@ archive.glob('**/*', {
 });
 // Add .ebextensions directory from server root (not from dist)
 archive.directory(path.join(SERVER_PATH, '.ebextensions'), '.ebextensions');
+// Add .platform directory for deployment hooks
+archive.directory(path.join(SERVER_PATH, '.platform'), '.platform');
 
 archive.pipe(output);
 

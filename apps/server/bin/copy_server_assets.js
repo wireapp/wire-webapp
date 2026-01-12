@@ -36,3 +36,13 @@ fs.copySync(
   path.resolve(__dirname, npmModulesFolder, '@wireapp/telemetry/lib/embed.js'),
   path.resolve(__dirname, distFolder, 'libs/wire/telemetry/embed.js'),
 );
+
+// Bundle @wireapp/config library for deployment (since it's a workspace dependency)
+const configLibSrc = path.resolve(__dirname, '../../../libraries/config/lib');
+const configLibDest = path.resolve(__dirname, distFolder, 'node_modules/@wireapp/config/lib');
+const configPkgSrc = path.resolve(__dirname, '../../../libraries/config/package.json');
+const configPkgDest = path.resolve(__dirname, distFolder, 'node_modules/@wireapp/config/package.json');
+
+fs.ensureDirSync(path.dirname(configLibDest));
+fs.copySync(configLibSrc, configLibDest);
+fs.copySync(configPkgSrc, configPkgDest);

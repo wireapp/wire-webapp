@@ -53,6 +53,7 @@
     "date-fns": "4.1.0",
     "dexie-batch": "0.4.3",
     "dexie-encrypted": "2.0.0",
+    "dotenv-extended": "2.9.0",
     "emoji-picker-react": "4.16.1",
     "http-status-codes": "2.3.0",
     "immer": "10.2.0",

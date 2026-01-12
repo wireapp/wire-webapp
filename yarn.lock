@@ -9367,6 +9367,7 @@ __metadata:
     dexie: "npm:4.0.7"
     dexie-batch: "npm:0.4.3"
     dexie-encrypted: "npm:2.0.0"
+    dotenv-extended: "npm:2.9.0"
     emoji-picker-react: "npm:4.16.1"
     fake-indexeddb: "npm:6.2.5"
     html-webpack-plugin: "npm:5.6.5"

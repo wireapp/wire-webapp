@@ -122,8 +122,15 @@ export function generateConfig(params: ConfigGeneratorParams, env: Env) {
       DISALLOW: readFile(ROBOTS_DISALLOW_FILE, 'User-agent: *\r\nDisallow: /'),
     },
     SSL_CERTIFICATE_KEY_PATH:
-      env.SSL_CERTIFICATE_KEY_PATH || path.join(__dirname, '../certificate/development-key.pem'),
-    SSL_CERTIFICATE_PATH: env.SSL_CERTIFICATE_PATH || path.join(__dirname, '../certificate/development-cert.pem'),
+      env.SSL_CERTIFICATE_KEY_PATH ||
+      (fs.existsSync(path.resolve(process.cwd(), 'certificate/development-key.pem'))
+        ? path.resolve(process.cwd(), 'certificate/development-key.pem')
+        : path.resolve(process.cwd(), 'apps/server/dist/certificate/development-key.pem')),
+    SSL_CERTIFICATE_PATH:
+      env.SSL_CERTIFICATE_PATH ||
+      (fs.existsSync(path.resolve(process.cwd(), 'certificate/development-cert.pem'))
+        ? path.resolve(process.cwd(), 'certificate/development-cert.pem')
+        : path.resolve(process.cwd(), 'apps/server/dist/certificate/development-cert.pem')),
   } as const;
 }
 
