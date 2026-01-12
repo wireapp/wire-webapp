@@ -1,0 +1,99 @@
+name: Publish Libraries to NPM
+
+on:
+  push:
+    branches:
+      - main
+      - dev
+    paths:
+      - 'libraries/**'
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: 'Dry run (skip actual publish)'
+        required: false
+        default: 'false'
+        type: choice
+        options:
+          - 'true'
+          - 'false'
+
+permissions:
+  contents: write # needed for pushing tags and commits
+  id-token: write # needed for npm provenance (trusted publishing)
+  pull-requests: write # needed for creating release PRs
+
+concurrency:
+  group: publish-libraries-${{ github.ref }}
+  cancel-in-progress: false # don't cancel ongoing releases
+
+jobs:
+  publish:
+    name: Version and Publish Libraries
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # needed for nx release to determine version bumps
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: '.nvmrc'
+          cache: 'yarn'
+          registry-url: 'https://registry.npmjs.org'
+
+      - name: Configure git
+        run: |
+          git config user.name "${GITHUB_ACTOR}"
+          git config user.email "${GITHUB_ACTOR_ID}+${GITHUB_ACTOR}@users.noreply.github.com"
+
+      - name: Install dependencies
+        run: yarn --immutable
+
+      - name: Build libraries
+        run: yarn nx run-many -t build --projects=tag:npm:public
+
+      - name: Test libraries
+        run: yarn nx run-many -t test --projects=tag:npm:public
+
+      - name: Lint libraries
+        run: yarn nx run-many -t lint --projects=tag:npm:public
+
+      - name: Check for changes to publish (dry-run)
+        if: github.event.inputs.dry_run == 'true' || github.event_name == 'pull_request'
+        run: |
+          echo "🔍 Checking what would be published..."
+          yarn nx release --dry-run --verbose
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Version and Publish (main branch - stable release)
+        if: |
+          github.ref == 'refs/heads/main' && 
+          github.event.inputs.dry_run != 'true' &&
+          github.event_name != 'pull_request'
+        run: |
+          echo "📦 Publishing stable release to npm..."
+          yarn nx release --verbose
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          NPM_CONFIG_PROVENANCE: true
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Version and Publish Beta (dev branch)
+        if: |
+          github.ref == 'refs/heads/dev' && 
+          github.event.inputs.dry_run != 'true' &&
+          github.event_name != 'pull_request'
+        run: |
+          echo "🧪 Publishing beta release to npm with beta tag..."
+          yarn nx release --preid=beta --verbose
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          NPM_CONFIG_PROVENANCE: true
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NPM_CONFIG_TAG: beta

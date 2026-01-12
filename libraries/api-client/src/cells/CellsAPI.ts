@@ -44,6 +44,7 @@ import {S3Service} from './CellsStorage/S3Service';
 
 import {AccessTokenStore} from '../auth';
 import {HttpClient} from '../http';
+import {AxiosRequestHeaders} from 'axios';
 
 export type SortDirection = 'asc' | 'desc';
 
@@ -133,7 +134,7 @@ export class CellsAPI {
     http.client.interceptors.request.use(config => {
       const accessToken = this.accessTokenStore.getAccessToken();
       if (accessToken) {
-        config.headers = config.headers || {};
+        config.headers = config.headers || ({} as AxiosRequestHeaders);
         config.headers.Authorization = `Bearer ${accessToken}`;
       }
       return config;

@@ -20,7 +20,7 @@
     "./lib/cryptography/AssetCryptography/crypto.node": "./lib/cryptography/AssetCryptography/crypto.browser.js"
   },
   "dependencies": {
-    "@wireapp/api-client": "27.95.2",
+    "@wireapp/api-client": "workspace:^",
     "@wireapp/commons": "5.4.11",
     "@wireapp/core-crypto": "9.1.2",
     "@wireapp/cryptobox": "12.8.0",

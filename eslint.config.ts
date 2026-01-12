@@ -49,6 +49,8 @@ const ignores = [
   'apps/webapp/src/types/i18n.d.ts',
   'apps/webapp/playwright-report/',
   'libraries/core/lib/',
+  'libraries/api-client/lib/',
+  'libraries/api-client/demo.ts',
   'libraries/core/.tmp/',
   'libraries/core/src/demo/',
 ];

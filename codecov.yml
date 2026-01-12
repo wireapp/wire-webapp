@@ -21,6 +21,10 @@ coverage:
         target: auto
         flags:
           - lib_core
+      lib_api_client:
+        target: auto
+        flags:
+          - lib_api_client
     patch:
       default:
         informational: true
@@ -50,6 +54,10 @@ flags:
   lib_core:
     paths:
       - 'libraries/core/**'
+    carryforward: true
+  lib_api_client:
+    paths:
+      - 'libraries/api-client/**'
     carryforward: true
 
 github_checks:

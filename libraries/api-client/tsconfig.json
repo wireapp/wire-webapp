@@ -1,8 +1,17 @@
 {
-  "extends": "../../tsconfig.json",
+  "extends": "../../tsconfig.base.json",
   "compilerOptions": {
     "esModuleInterop": true,
-    "outDir": "lib"
+    "allowSyntheticDefaultImports": true,
+    "outDir": "lib",
+    "skipLibCheck": true,
+    "rootDir": "src",
+    "types": ["node"],
+    "lib": ["dom", "es2022"],
+    "target": "es2020",
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "resolveJsonModule": true
   },
   "exclude": ["node_modules", "./demo.ts", "**/*.test.ts"],
   "include": ["src/**/*.ts"]

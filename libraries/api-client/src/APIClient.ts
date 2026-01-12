@@ -463,8 +463,12 @@ export class APIClient extends EventEmitter {
     try {
       const backendRemovalKey = (await this.api.client.getPublicKeys()).removal;
       return !!backendRemovalKey;
-    } catch {}
+    } catch {
+      // Ignore errors, backend might not support removal keys
+    }
 
     return false;
   }
 }
+
+console.log(`BARDIA 2 @wireapp/api-client version: ${APIClient.VERSION}`);

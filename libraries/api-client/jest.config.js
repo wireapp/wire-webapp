@@ -17,9 +17,22 @@
  *
  */
 
-const baseConfig = require('../../jest.config.base');
+const {TextDecoder, TextEncoder} = require('util');
 
 module.exports = {
-  ...baseConfig,
+  displayName: 'api-client-lib',
   testEnvironment: 'node',
+  clearMocks: true,
+  globals: {
+    TextDecoder,
+    TextEncoder,
+  },
+  transform: {
+    '^.+\\.(ts|tsx)$': '@swc/jest',
+    '^.+\\.(js|jsx)$': '@swc/jest',
+  },
+  transformIgnorePatterns: ['node_modules/'],
+  coverageDirectory: '../../coverage/libraries/api-client',
+  testMatch: ['<rootDir>/src/**/__tests__/**/*.[jt]s?(x)', '<rootDir>/src/**/?(*.)+(spec|test).[jt]s?(x)'],
+  moduleFileExtensions: ['js', 'json', 'ts', 'tsx'],
 };

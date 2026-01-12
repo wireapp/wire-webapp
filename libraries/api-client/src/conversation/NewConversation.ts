@@ -24,13 +24,12 @@ import {RECEIPT_MODE} from './data/ConversationReceiptModeUpdateData';
 import {CONVERSATION_PROTOCOL, TeamInfo} from '../team/';
 import {QualifiedId} from '../user/';
 
-export interface NewConversation
-  extends Partial<
-    Pick<
-      Conversation,
-      'access' | 'access_role' | 'access_role_v2' | 'message_timer' | 'name' | 'group_conv_type' | 'add_permission'
-    >
-  > {
+export interface NewConversation extends Partial<
+  Pick<
+    Conversation,
+    'access' | 'access_role' | 'access_role_v2' | 'message_timer' | 'name' | 'group_conv_type' | 'add_permission'
+  >
+> {
   conversation_role?: DefaultConversationRoleName;
   qualified_users?: QualifiedId[];
   receipt_mode: RECEIPT_MODE | null;

@@ -159,7 +159,7 @@ export class AssetAPI {
       `--${BOUNDARY}\r\n` +
       'Content-Type: application/octet-stream\r\n' +
       `Content-length: ${asset.length}\r\n` +
-      `Content-MD5: ${base64MD5FromBuffer(asset.buffer)}\r\n` +
+      `Content-MD5: ${base64MD5FromBuffer(asset.buffer as ArrayBuffer)}\r\n` +
       '\r\n';
 
     const footer = `\r\n--${BOUNDARY}--\r\n`;
