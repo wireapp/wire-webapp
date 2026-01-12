@@ -51,8 +51,8 @@ test.describe('Search', () => {
       const conversationName = 'Group conversation';
       await createGroup(userAPages, conversationName, [userB]);
       await userAPages.conversationList().openConversation(conversationName);
-      await userAPages.conversation().sendMessage('@' + userB.username + 'Group message with mention of User B');
-      await userAPages.conversationList().searchConversation('@' + userB.username);
+      await userAPages.conversation().sendMessage(`@${userB.username} Group message with mention of User B`);
+      await userAPages.conversationList().searchConversation(`@${userB.username}`);
 
       await expect(userAPages.conversationList().getConversationLocator(conversationName)).toBeVisible();
       await expect(userAPages.conversationList().getConversationLocator(userB.fullName)).toBeVisible();
