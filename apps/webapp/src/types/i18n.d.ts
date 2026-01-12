@@ -504,6 +504,10 @@ declare module 'I18n/en-US.json' {
     'cells.shareModal.heading': `Share via link`;
     'cells.shareModal.linkCopied': `Link copied`;
     'cells.shareModal.primaryAction': `Done`;
+    'cells.shareModal.password': `Password`;
+    'cells.shareModal.password.description': `Set a password to restrict access.`;
+    'cells.shareModal.expiration': `Expiration`;
+    'cells.shareModal.expiration.description': `Link expires on a selected day.`;
     'cells.sidebar.heading': `Files`;
     'cells.sidebar.title': `All`;
     'cells.tableRow.actions': `More options`;

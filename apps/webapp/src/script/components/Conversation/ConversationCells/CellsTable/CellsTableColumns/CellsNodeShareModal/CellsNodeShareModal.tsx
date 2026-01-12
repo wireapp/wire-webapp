@@ -17,9 +17,9 @@
  *
  */
 
-import {Input, Label, Switch} from '@wireapp/react-ui-kit';
-
-import {CopyToClipboardButton} from 'Components/CopyToClipboardButton/CopyToClipboardButton';
+import {CellsShareModalContent} from 'Components/Cells/ShareModal/CellsShareModalContent';
+import {useCellExpirationToggle} from 'Components/Cells/ShareModal/useCellExpirationToggle';
+import {useCellPasswordToggle} from 'Components/Cells/ShareModal/useCellPasswordToggle';
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {CellsRepository} from 'Repositories/cells/CellsRepository';
 import {t} from 'Util/LocalizerUtil';
@@ -29,14 +29,17 @@ import {
   inputWrapperStyles,
   labelStyles,
   loaderWrapperStyles,
+  dividerStyles,
   publicLinkDescriptionStyles,
+  passwordDescriptionStyles,
+  expirationDescriptionStyles,
+  switchContentStyles,
   switchContainerStyles,
   switchWrapperStyles,
+  toggleContentStyles,
   wrapperStyles,
 } from './CellsNodeShareModal.styles';
 import {useCellPublicLink} from './useCellPublicLink';
-
-import {CellsTableLoader} from '../../../common/CellsTableLoader/CellsTableLoader';
 
 interface ShareModalParams {
   type: 'file' | 'folder';
@@ -65,53 +68,60 @@ export const showShareModal = ({type, uuid, conversationId, cellsRepository}: Sh
 
 const CellShareModalContent = ({type, uuid, conversationId, cellsRepository}: ShareModalParams) => {
   const {status, link, isEnabled, togglePublicLink} = useCellPublicLink({uuid, conversationId, cellsRepository});
+  const {isEnabled: isPasswordEnabled, toggle: togglePassword} = useCellPasswordToggle();
+  const {isEnabled: isExpirationEnabled, toggle: toggleExpiration} = useCellExpirationToggle();
 
   const isInputDisabled = ['loading', 'error'].includes(status);
 
   return (
-    <div css={wrapperStyles}>
-      <div css={switchContainerStyles}>
-        <div>
-          <Label htmlFor="switch-public-link" css={labelStyles}>
-            {t('cells.shareModal.enablePublicLink')}
-          </Label>
-          <p id="switch-public-link-description" css={publicLinkDescriptionStyles}>
-            {t(
-              type === 'file'
-                ? 'cells.shareModal.enablePublicLink.file.description'
-                : 'cells.shareModal.enablePublicLink.folder.description',
-            )}
-          </p>
-        </div>
-        <div css={switchWrapperStyles}>
-          <Switch
-            id="switch-public-link"
-            aria-describedby="switch-public-link-description"
-            checked={isEnabled}
-            onToggle={togglePublicLink}
-            disabled={status === 'loading'}
-          />
-        </div>
-      </div>
-      {isEnabled && status === 'success' && link && (
-        <div css={inputWrapperStyles}>
-          <label htmlFor="generated-public-link" className="visually-hidden">
-            {t('cells.shareModal.generatedPublicLink')}
-          </label>
-          <Input id="generated-public-link" value={link} wrapperCSS={inputStyles} disabled={isInputDisabled} readOnly />
-          <CopyToClipboardButton
-            textToCopy={link}
-            displayText={t('cells.shareModal.copyLink')}
-            copySuccessText={t('cells.shareModal.linkCopied')}
-          />
-        </div>
+    <CellsShareModalContent
+      publicLinkDescription={t(
+        type === 'file'
+          ? 'cells.shareModal.enablePublicLink.file.description'
+          : 'cells.shareModal.enablePublicLink.folder.description',
       )}
-      {status === 'loading' && (
-        <div css={loaderWrapperStyles}>
-          <CellsTableLoader />
-        </div>
-      )}
-      {status === 'error' && <div>{t('cells.shareModal.error.loadingLink')}</div>}
-    </div>
+      labels={{
+        enablePublicLink: t('cells.shareModal.enablePublicLink'),
+        password: t('cells.shareModal.password'),
+        passwordDescription: t('cells.shareModal.password.description'),
+        expiration: t('cells.shareModal.expiration'),
+        expirationDescription: t('cells.shareModal.expiration.description'),
+        generatedPublicLink: t('cells.shareModal.generatedPublicLink'),
+        copyLink: t('cells.shareModal.copyLink'),
+        linkCopied: t('cells.shareModal.linkCopied'),
+        errorLoadingLink: t('cells.shareModal.error.loadingLink'),
+      }}
+      publicLink={{
+        status,
+        link,
+        isEnabled,
+        onToggle: togglePublicLink,
+        disabled: status === 'loading',
+      }}
+      password={{
+        isEnabled: isPasswordEnabled,
+        onToggle: togglePassword,
+      }}
+      expiration={{
+        isEnabled: isExpirationEnabled,
+        onToggle: toggleExpiration,
+      }}
+      isInputDisabled={isInputDisabled}
+      styles={{
+        wrapperStyles,
+        labelStyles,
+        publicLinkDescriptionStyles,
+        passwordDescriptionStyles,
+        expirationDescriptionStyles,
+        dividerStyles,
+        switchContentStyles,
+        toggleContentStyles,
+        switchContainerStyles,
+        switchWrapperStyles,
+        inputStyles,
+        inputWrapperStyles,
+        loaderWrapperStyles,
+      }}
+    />
   );
 };
