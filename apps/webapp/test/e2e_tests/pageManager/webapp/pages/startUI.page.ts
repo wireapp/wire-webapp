@@ -32,15 +32,12 @@ export class StartUIPage {
     this.searchResults = this.component.getByRole('list', {name: 'Conversation List'}).getByRole('listitem');
   }
 
-  async selectUsers(usernames: string[]) {
+  /** Search and select each of the provided usernames */
+  async selectUsers(...usernames: string[]) {
     for (const username of usernames) {
-      await this.selectUser(username);
+      await this.searchForUser(username);
+      await this.searchResults.filter({hasText: username}).click();
     }
-  }
-
-  async selectUser(username: string) {
-    await this.searchForUser(username);
-    await this.searchResults.filter({hasText: username}).click();
   }
 
   private async searchForUser(username: string) {

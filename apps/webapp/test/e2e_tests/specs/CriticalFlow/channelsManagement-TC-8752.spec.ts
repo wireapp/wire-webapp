@@ -57,7 +57,7 @@ test.fixme('Channels Management', {tag: ['@TC-8752', '@crit-flow-web']}, async (
     await pages.conversationList().clickCreateGroup();
     await pages.groupCreation().setGroupName(conversation1);
     await pages.groupCreation().clickNextButton();
-    await pages.startUI().selectUsers([member.username]);
+    await pages.startUI().selectUsers(member.username);
     await pages.groupCreation().clickCreateGroupButton();
     await pages.groupCreation().waitForModalClose();
     expect(await pages.conversationList().isConversationItemVisible(conversation1)).toBeTruthy();
@@ -87,7 +87,7 @@ test.fixme('Channels Management', {tag: ['@TC-8752', '@crit-flow-web']}, async (
     await pages.conversationList().clickCreateGroup();
     await pages.groupCreation().setGroupName(conversation2);
     await pages.groupCreation().clickNextButton();
-    await pages.startUI().selectUsers([member.username]);
+    await pages.startUI().selectUsers(member.username);
     await pages.groupCreation().clickCreateGroupButton();
     await pages.groupCreation().waitForModalClose();
     expect(await pages.conversationList().isConversationItemVisible(conversation2)).toBeTruthy();
@@ -124,7 +124,7 @@ test.fixme('Channels Management', {tag: ['@TC-8752', '@crit-flow-web']}, async (
     await pages.conversation().toggleGroupInformation();
     await pages.conversationDetails().waitForSidebar();
     await pages.conversationDetails().clickAddPeopleButton();
-    await pages.startUI().selectUsers([member.username]);
+    await pages.startUI().selectUsers(member.username);
     await pages.groupCreation().clickAddMembers();
   });
 

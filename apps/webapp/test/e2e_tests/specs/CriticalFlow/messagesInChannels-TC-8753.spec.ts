@@ -63,7 +63,7 @@ test('Messages in Channels', {tag: ['@TC-8753', '@crit-flow-web']}, async ({crea
     await pages.conversationList().clickCreateGroup();
     await pages.groupCreation().setGroupName(channelName);
     await pages.groupCreation().clickNextButton();
-    await pages.startUI().selectUsers([userB.username]);
+    await pages.startUI().selectUsers(userB.username);
     await pages.groupCreation().clickCreateGroupButton();
   });
 

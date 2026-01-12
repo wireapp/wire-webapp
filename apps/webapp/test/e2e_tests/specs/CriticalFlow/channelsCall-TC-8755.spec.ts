@@ -64,7 +64,7 @@ test.fixme(
       await pages.conversationList().clickCreateGroup();
       await pages.groupCreation().setGroupName(channelName);
       await pages.groupCreation().clickNextButton();
-      await pages.startUI().selectUsers([member.username]);
+      await pages.startUI().selectUsers(member.username);
       await pages.groupCreation().clickCreateGroupButton();
       await pages.groupCreation().waitForModalClose();
       expect(await pages.conversationList().isConversationItemVisible(channelName)).toBeTruthy();

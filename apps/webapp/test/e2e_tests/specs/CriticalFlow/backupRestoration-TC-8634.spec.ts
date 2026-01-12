@@ -74,7 +74,7 @@ test('Setting up new device with a backup', {tag: ['@TC-8634', '@crit-flow-web']
 
     await pages.conversationList().clickCreateGroup();
     await pages.groupCreation().setGroupName(groupName);
-    await pages.startUI().selectUsers([userB.username]);
+    await pages.startUI().selectUsers(userB.username);
     await pages.groupCreation().clickCreateGroupButton();
     await pages.conversationList().openConversation(groupName);
     await pages.conversation().sendMessage(groupMessage);

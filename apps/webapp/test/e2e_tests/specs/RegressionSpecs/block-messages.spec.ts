@@ -70,7 +70,7 @@ test('Block specs', {tag: ['@TC-141', '@regression']}, async ({pageManager: user
     await userAComponents.conversationSidebar().isPageLoaded();
     await userAPages.conversationList().clickCreateGroup();
     await userAPages.groupCreation().setGroupName(conversationName);
-    await userAPages.startUI().selectUsers([userB.username]);
+    await userAPages.startUI().selectUsers(userB.username);
     await userAPages.groupCreation().clickCreateGroupButton();
   });
 

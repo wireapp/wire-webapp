@@ -69,7 +69,7 @@ test.fixme(
       const {pages} = ownerPageManager.webapp;
       await pages.conversationList().clickCreateGroup();
       await pages.groupCreation().setGroupName(conversationName);
-      await pages.startUI().selectUser(teamMember.username);
+      await pages.startUI().selectUsers(teamMember.username);
       await pages.groupCreation().clickCreateGroupButton();
       expect(await pages.conversationList().isConversationItemVisible(conversationName)).toBeTruthy();
     });

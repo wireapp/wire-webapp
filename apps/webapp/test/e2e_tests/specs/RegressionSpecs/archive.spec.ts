@@ -66,7 +66,7 @@ test(
 
     await test.step('Preconditions: Users have a 1:1', async () => {
       await userBComponents.conversationSidebar().clickConnectButton();
-      await userBPages.startUI().selectUser(ownerA.username);
+      await userBPages.startUI().selectUsers(ownerA.username);
       expect(await userBModals.userProfile().isVisible());
       await userBModals.userProfile().clickStartConversation();
     });
@@ -74,7 +74,7 @@ test(
     await test.step('Preconditions: Users have a group conversation', async () => {
       await userBPages.conversationList().clickCreateGroup();
       await userBPages.groupCreation().setGroupName(conversationName);
-      await userBPages.startUI().selectUsers([ownerA.username]);
+      await userBPages.startUI().selectUsers(ownerA.username);
       await userBPages.groupCreation().clickCreateGroupButton();
     });
 

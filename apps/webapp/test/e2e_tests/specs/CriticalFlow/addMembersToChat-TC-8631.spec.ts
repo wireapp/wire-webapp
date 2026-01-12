@@ -57,7 +57,7 @@ test(
       const {pages} = ownerPageManager.webapp;
       await pages.conversationList().clickCreateGroup();
       await pages.groupCreation().setGroupName(conversationName);
-      await pages.startUI().selectUsers([member1.username, member2.username]);
+      await pages.startUI().selectUsers(member1.username, member2.username);
       await pages.groupCreation().clickCreateGroupButton();
       expect(await pages.conversationList().isConversationItemVisible(conversationName)).toBeTruthy();
     });

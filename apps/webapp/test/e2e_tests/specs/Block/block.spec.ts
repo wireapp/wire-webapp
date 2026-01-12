@@ -250,7 +250,7 @@ test.describe('User Blocking', () => {
         await test.step('Users A tries to add B to a group', async () => {
           await userAPages.conversationList().clickCreateGroup();
           await userAPages.groupCreation().setGroupName(conversationName);
-          await userAPages.startUI().selectUsers([userB.username]);
+          await userAPages.startUI().selectUsers(userB.username);
           await userAPages.groupCreation().clickCreateGroupButton();
 
           // Modal 'modalConversationNotConnectedMessageOne' is visible
@@ -302,7 +302,7 @@ test.describe('User Blocking', () => {
         await test.step('User A unblocks User B from Search List', async () => {
           await userAComponents.conversationSidebar().clickConnectButton();
           await userAPages.startUI().searchInput.fill(userB.username);
-          await userAPages.startUI().selectUser(userB.username);
+          await userAPages.startUI().selectUsers(userB.username);
           await userAModals.userProfile().unblockButton.click();
           await userAModals.confirm().clickAction();
         });

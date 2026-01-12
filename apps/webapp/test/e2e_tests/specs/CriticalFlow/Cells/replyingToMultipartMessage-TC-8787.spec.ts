@@ -76,7 +76,7 @@ test(
 
         await userAPages.groupCreation().enableFilesCheckbox();
         await userAPages.groupCreation().setGroupName(conversationName);
-        await userAPages.startUI().selectUsers([userB.username]);
+        await userAPages.startUI().selectUsers(userB.username);
         await userAPages.groupCreation().clickCreateGroupButton();
       };
 

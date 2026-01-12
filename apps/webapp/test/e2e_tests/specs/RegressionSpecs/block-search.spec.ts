@@ -57,7 +57,7 @@ test('Block from search specs', {tag: ['@TC-144', '@regression']}, async ({api, 
   // Test steps
   await test.step('User B sends User A a connection request', async () => {
     await userBComponents.conversationSidebar().clickConnectButton();
-    await userBPages.startUI().selectUser(userA.username);
+    await userBPages.startUI().selectUsers(userA.username);
     expect(await userBModals.userProfile().isVisible());
     await userBModals.userProfile().clickConnectButton();
   });
