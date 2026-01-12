@@ -33,7 +33,23 @@ if (!fs.existsSync(S3_PATH)) {
 }
 const output = fs.createWriteStream(path.join(S3_PATH, 'ebs.zip'));
 
-archive.file(path.join(SERVER_PATH, 'package.json'), {name: 'package.json'});
+// Read and modify package.json to remove all workspace dependencies
+const packageJson = JSON.parse(fs.readFileSync(path.join(SERVER_PATH, 'package.json'), 'utf8'));
+
+// Remove all workspace:* dependencies since they're bundled in node_modules
+if (packageJson.dependencies) {
+  Object.keys(packageJson.dependencies).forEach(dep => {
+    if (packageJson.dependencies[dep].startsWith('workspace:')) {
+      console.log(`Removing workspace dependency: ${dep}`);
+      delete packageJson.dependencies[dep];
+    }
+  });
+}
+
+// Write modified package.json to a temp file
+const tempPackageJsonPath = path.join(DIST_PATH, 'package.json.tmp');
+fs.writeFileSync(tempPackageJsonPath, JSON.stringify(packageJson, null, 2));
+archive.file(tempPackageJsonPath, {name: 'package.json'});
 archive.file(path.join(ROOT_PATH, '.env.defaults'), {name: '.env.defaults'});
 archive.file(path.join(SERVER_PATH, 'Procfile'), {name: 'Procfile'});
 // Archive dist directory but exclude s3 subdirectory

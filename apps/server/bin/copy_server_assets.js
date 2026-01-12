@@ -37,15 +37,42 @@ fs.copySync(
   path.resolve(__dirname, distFolder, 'libs/wire/telemetry/embed.js'),
 );
 
-// Bundle @wireapp/config library for deployment (since it's a workspace dependency)
-const configLibSrc = path.resolve(__dirname, '../../../libraries/config/lib');
-const configLibDest = path.resolve(__dirname, distFolder, 'node_modules/@wireapp/config/lib');
-const configPkgSrc = path.resolve(__dirname, '../../../libraries/config/package.json');
-const configPkgDest = path.resolve(__dirname, distFolder, 'node_modules/@wireapp/config/package.json');
+// Bundle all workspace dependencies for deployment
+// Read server's package.json to find workspace dependencies
+const serverPackageJson = require('../package.json');
+const workspaceDeps = Object.entries(serverPackageJson.dependencies || {})
+  .filter(([, version]) => version.startsWith('workspace:'))
+  .map(([name]) => name);
 
-// Ensure the node_modules/@wireapp/config directory exists
-fs.ensureDirSync(path.resolve(__dirname, distFolder, 'node_modules/@wireapp/config'));
-// Copy the compiled lib directory
-fs.copySync(configLibSrc, configLibDest);
-// Copy the package.json
-fs.copySync(configPkgSrc, configPkgDest);
+console.log('Bundling workspace dependencies:', workspaceDeps.join(', '));
+
+workspaceDeps.forEach(depName => {
+  // Map package name to library folder (e.g., @wireapp/config -> config)
+  const libName = depName.split('/').pop(); // Extract last part after /
+
+  // Find the library in the monorepo
+  const libraryPath = path.resolve(__dirname, '../../../libraries', libName);
+
+  if (!fs.existsSync(libraryPath)) {
+    throw new Error(`Workspace dependency ${depName} not found at ${libraryPath}`);
+  }
+
+  // Copy the compiled lib directory
+  const libSrc = path.join(libraryPath, 'lib');
+  const libDest = path.resolve(__dirname, distFolder, 'node_modules', depName, 'lib');
+
+  // Copy the package.json
+  const pkgSrc = path.join(libraryPath, 'package.json');
+  const pkgDest = path.resolve(__dirname, distFolder, 'node_modules', depName, 'package.json');
+
+  console.log(`  - Bundling ${depName} from ${libraryPath}`);
+
+  // Ensure the directory exists
+  fs.ensureDirSync(path.resolve(__dirname, distFolder, 'node_modules', depName));
+
+  // Copy files
+  if (fs.existsSync(libSrc)) {
+    fs.copySync(libSrc, libDest);
+  }
+  fs.copySync(pkgSrc, pkgDest);
+});
