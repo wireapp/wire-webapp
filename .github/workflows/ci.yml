@@ -30,6 +30,9 @@ jobs:
       - name: Install JS dependencies
         run: yarn --immutable
 
+      - name: Build libraries
+        run: yarn nx run-many -t build --projects=tag:type:lib
+
       - name: Lint
         run: yarn nx run-many -t lint --all
 
