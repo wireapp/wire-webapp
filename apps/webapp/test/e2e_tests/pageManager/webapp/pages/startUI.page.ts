@@ -40,34 +40,10 @@ export class StartUIPage {
 
   async selectUser(username: string) {
     await this.searchForUser(username);
-    await this.clickUserFromSearchResults(username);
+    await this.searchResults.filter({hasText: username}).click();
   }
 
   private async searchForUser(username: string) {
     await this.searchInput.fill(username);
-  }
-
-  private async clickUserFromSearchResults(username: string) {
-    await this.searchResults.first().waitFor({state: 'visible'});
-
-    const timeout = 30000;
-    const delayBetweenAttempts = 500;
-    const maxAttempts = timeout / delayBetweenAttempts;
-
-    for (let attempt = 0; attempt < maxAttempts; attempt++) {
-      for (const result of await this.searchResults.all()) {
-        const text = await result.textContent();
-        if (text?.includes(username)) {
-          await result.click();
-          return;
-        }
-      }
-      await new Promise(resolve => setTimeout(resolve, delayBetweenAttempts));
-    }
-    throw new Error(`User ${username} not found in search results`);
-  }
-
-  getSearchResultForSpecificUser(username: string) {
-    return this.page.getByRole('button', {name: `Open profile of ${username}`});
   }
 }

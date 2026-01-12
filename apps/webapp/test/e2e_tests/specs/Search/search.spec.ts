@@ -33,9 +33,8 @@ test.describe('Search', () => {
 
       await userAComponents.conversationSidebar().clickConnectButton();
       await userAPages.startUI().searchInput.fill(partialUsername);
-      const searchResult = userAPages.startUI().getSearchResultForSpecificUser(userB.fullName);
-      await expect(searchResult).toBeVisible();
-      await expect(searchResult).toContainText(userB.fullName);
+
+      await expect(userAPages.startUI().searchResults).toContainText(userB.username);
     },
   );
 
@@ -69,8 +68,7 @@ test.describe('Search', () => {
 
       await userAComponents.conversationSidebar().clickConnectButton();
       await userAPages.startUI().searchInput.fill('@' + userB.username);
-      const searchResult = userAPages.startUI().getSearchResultForSpecificUser(userB.fullName);
-      await expect(searchResult).toBeVisible();
+      await expect(userAPages.startUI().searchResults).toContainText(userB.username);
       await expect(userAPages.startUI().searchResults).toHaveCount(1);
     },
   );
@@ -85,9 +83,7 @@ test.describe('Search', () => {
 
       await userAComponents.conversationSidebar().clickConnectButton();
       await userAPages.startUI().searchInput.fill(userB.username);
-      const searchResult = userAPages.startUI().getSearchResultForSpecificUser(userB.fullName);
-      await expect(searchResult).toBeVisible();
-      await expect(searchResult).toContainText(userB.fullName);
+      await expect(userAPages.startUI().searchResults).toContainText(userB.username);
     },
   );
 });
