@@ -33,7 +33,7 @@ if (!fs.existsSync(S3_PATH)) {
 }
 const output = fs.createWriteStream(path.join(S3_PATH, 'ebs.zip'));
 
-// Read and modify package.json to remove all workspace dependencies
+// Read and modify package.json to handle workspace dependencies
 const packageJson = JSON.parse(fs.readFileSync(path.join(SERVER_PATH, 'package.json'), 'utf8'));
 
 // Collect and remove all workspace:* dependencies, mark them as bundled
