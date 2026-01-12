@@ -28,12 +28,14 @@ const versionData = readFileSync(path.resolve(__dirname, './version.json'), 'utf
 const version = versionData ? JSON.parse(versionData) : {version: 'unknown', commit: 'unknown'};
 
 // Determine the correct root path based on the directory structure
-// In monorepo (dev/CI): go up from apps/server/dist to workspace root
-// In AWS EB deployment: go up from dist to deployment root
-// Check if we're in a monorepo structure by testing if .env.defaults exists at workspace root
+// In monorepo (dev/CI): __dirname is apps/server/dist, so go up to workspace root (3 levels)
+// In AWS EB deployment: __dirname is /var/app/current (files are at root level)
+// Check if .env.defaults exists in current directory (deployment) or 3 levels up (monorepo)
+const deploymentRootPath = __dirname;
 const monorepoRootPath = path.resolve(__dirname, '../../..');
-const deploymentRootPath = path.resolve(__dirname, '..');
-const isMonorepo = require('fs').existsSync(path.join(monorepoRootPath, '.env.defaults'));
+const isMonorepo =
+  require('fs').existsSync(path.join(monorepoRootPath, '.env.defaults')) &&
+  !require('fs').existsSync(path.join(deploymentRootPath, '.env.defaults'));
 const rootPath = isMonorepo ? monorepoRootPath : deploymentRootPath;
 
 const env = dotenv.load({
