@@ -152,7 +152,10 @@ const config: Linter.Config[] = [
       'import/resolver': {
         typescript: {
           alwaysTryTypes: true,
-          project: path.join(__dirname, 'apps/webapp/tsconfig.eslint.json'),
+          project: [
+            path.join(__dirname, 'apps/webapp/tsconfig.eslint.json'),
+            path.join(__dirname, 'libraries/core/tsconfig.eslint.json'),
+          ],
         },
         node: {
           extensions: ['.js', '.jsx', '.ts', '.tsx'],
