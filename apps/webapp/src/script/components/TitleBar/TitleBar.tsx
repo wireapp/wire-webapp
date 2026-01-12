@@ -263,6 +263,7 @@ export const TitleBar = ({
             className="conversation-title-bar-icon icon-back"
             css={{marginBottom: 0}}
             onClick={setLeftSidebar}
+            aria-label={t('index.goBack')}
           />
         )}
 
