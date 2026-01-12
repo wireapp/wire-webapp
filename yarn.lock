@@ -9000,6 +9000,18 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@wireapp/config@workspace:^, @wireapp/config@workspace:libraries/config":
+  version: 0.0.0-use.local
+  resolution: "@wireapp/config@workspace:libraries/config"
+  dependencies:
+    "@types/fs-extra": "npm:11.0.4"
+    dotenv: "npm:16.6.1"
+    dotenv-extended: "npm:2.9.0"
+    fs-extra: "npm:11.3.3"
+    logdown: "npm:3.3.1"
+  languageName: unknown
+  linkType: soft
+
 "@wireapp/copy-config@npm:2.3.10":
   version: 2.3.10
   resolution: "@wireapp/copy-config@npm:2.3.10"
@@ -9214,6 +9226,7 @@ __metadata:
     "@types/geolite2": "npm:2.0.2"
     "@types/hbs": "npm:4.0.5"
     "@wireapp/commons": "npm:5.4.11"
+    "@wireapp/config": "workspace:^"
     dotenv: "npm:16.6.1"
     dotenv-extended: "npm:2.9.0"
     express: "npm:4.22.1"
@@ -9329,6 +9342,7 @@ __metadata:
     "@wireapp/avs": "npm:10.2.21"
     "@wireapp/avs-debugger": "npm:0.0.7"
     "@wireapp/commons": "npm:5.4.11"
+    "@wireapp/config": "workspace:^"
     "@wireapp/core": "workspace:^"
     "@wireapp/kalium-backup": "npm:0.0.4"
     "@wireapp/promise-queue": "npm:2.4.11"

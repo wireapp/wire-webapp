@@ -19,7 +19,6 @@
 
 import fs from 'fs-extra';
 import logdown from 'logdown';
-
 import path from 'path';
 
 import {ConfigGeneratorParams} from './config.types';
@@ -51,11 +50,11 @@ const logger = logdown('config', {
   markdown: false,
 });
 
-function readFile(path: string, fallback?: string): string {
+function readFile(filePath: string, fallback?: string): string {
   try {
-    return fs.readFileSync(path, {encoding: 'utf8', flag: 'r'});
+    return fs.readFileSync(filePath, {encoding: 'utf8', flag: 'r'});
   } catch (error) {
-    logger.warn(`Cannot access "${path}": ${error.message}`);
+    logger.warn(`Cannot access "${filePath}": ${(error as Error).message}`);
     return fallback;
   }
 }
@@ -127,3 +126,5 @@ export function generateConfig(params: ConfigGeneratorParams, env: Env) {
     SSL_CERTIFICATE_PATH: env.SSL_CERTIFICATE_PATH || path.join(__dirname, '../certificate/development-cert.pem'),
   } as const;
 }
+
+export type ServerConfig = ReturnType<typeof generateConfig>;

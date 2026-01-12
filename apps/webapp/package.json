@@ -37,6 +37,7 @@
     "@wireapp/avs": "10.2.21",
     "@wireapp/avs-debugger": "0.0.7",
     "@wireapp/commons": "5.4.11",
+    "@wireapp/config": "workspace:^",
     "@wireapp/core": "workspace:^",
     "@wireapp/kalium-backup": "0.0.4",
     "@wireapp/promise-queue": "2.4.11",

@@ -159,3 +159,5 @@ export function generateConfig(params: ConfigGeneratorParams, env: Env) {
     WEBSITE_LABEL: env.WEBSITE_LABEL,
   } as const;
 }
+
+export type ClientConfig = ReturnType<typeof generateConfig>;

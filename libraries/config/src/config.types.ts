@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2024 Wire Swiss GmbH
+ * Copyright (C) 2023 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,22 +17,13 @@
  *
  */
 
-import type {ClientConfig} from '@wireapp/config';
-
-import {WireModule} from 'src/types/Wire.types';
-
-const wire: WireModule = {
-  app: {} as any,
-  env: {
-    APP_BASE: 'https://app.wire.com',
-    BACKEND_REST: 'https://test.wire.link',
-    FEATURE: {},
-    URL: {SUPPORT: {}},
-    NEW_PASSWORD_MINIMUM_LENGTH: 8,
-  } as ClientConfig,
+export type ConfigGeneratorParams = {
+  commit: string;
+  version: string;
+  env: string;
+  urls: {
+    base?: string;
+    api?: string;
+    ws?: string;
+  };
 };
-
-Object.defineProperty(window, 'wire', {
-  value: wire,
-  writable: true,
-});
