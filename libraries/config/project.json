@@ -14,11 +14,11 @@
     "build": {
       "executor": "nx:run-commands",
       "outputs": ["{projectRoot}/lib"],
+      "dependsOn": ["clean"],
       "options": {
         "command": "tsc",
         "cwd": "{projectRoot}"
-      },
-      "dependsOn": ["clean"]
+      }
     },
     "test": {
       "executor": "@nx/jest:jest",
