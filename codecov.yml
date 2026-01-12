@@ -17,6 +17,10 @@ coverage:
         target: auto
         flags:
           - app_server
+      lib_core:
+        target: auto
+        flags:
+          - lib_core
     patch:
       default:
         informational: true
@@ -30,7 +34,7 @@ parsers:
       macro: no
 
 comment:
-  layout:  "diff, flags, files"
+  layout: 'diff, flags, files'
   behavior: default
   require_changes: no
 
@@ -42,6 +46,10 @@ flags:
   app_server:
     paths:
       - 'apps/server/**'
+    carryforward: true
+  lib_core:
+    paths:
+      - 'libraries/core/**'
     carryforward: true
 
 github_checks:

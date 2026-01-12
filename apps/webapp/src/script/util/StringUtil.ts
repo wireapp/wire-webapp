@@ -134,14 +134,11 @@ export const sortByPriority = (stringA: string = '', stringB: string = '', query
 export const sortUsersByPriority = (userA: User, userB: User): number => sortByPriority(userA.name(), userB.name());
 
 /**
+ * Converts a string to UTF-16 Big Endian byte array without BOM
  * @param str The string to convert
  * @returns Converted string as byte array
  */
-export const utf8ToUtf16BE = (str = ''): number[] => {
-  const BOMChar = '\uFEFF';
-
-  str = `${BOMChar}${str}`;
-
+export const stringToUtf16BE = (str = ''): number[] => {
   const bytes: number[] = [];
   str
     .split('')
@@ -152,6 +149,25 @@ export const utf8ToUtf16BE = (str = ''): number[] => {
     });
 
   return bytes;
+};
+
+/**
+ * Adds UTF-16 BOM (Byte Order Mark) to the beginning of a byte array
+ * @param bytes The byte array to prepend BOM to
+ * @returns Byte array with BOM prepended
+ */
+export const addBOM = (bytes: number[]): number[] => {
+  const BOMChar = '\uFEFF';
+  const bomBytes = stringToUtf16BE(BOMChar);
+  return bomBytes.concat(bytes);
+};
+
+/**
+ * @param str The string to convert
+ * @returns Converted string as byte array with BOM
+ */
+export const utf8ToUtf16BE = (str = ''): number[] => {
+  return addBOM(stringToUtf16BE(str));
 };
 
 export const splitFingerprint = (fingerprint: string): string[] => fingerprint?.padStart(16, '0').match(/(..?)/g) ?? [];
