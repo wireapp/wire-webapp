@@ -54,7 +54,6 @@ const ignores = [
 ];
 
 const base = compat.extends('@wireapp/eslint-config');
-
 const config: Linter.Config[] = [
   {ignores},
   ...base,
@@ -72,7 +71,7 @@ const config: Linter.Config[] = [
       parser: tsParser,
       parserOptions: {
         // Enable type-aware linting for TypeScript sources
-        project: ['./apps/webapp/tsconfig.eslint.json', './libraries/core/tsconfig.eslint.json'],
+        project: './tsconfig.eslint.json',
         tsconfigRootDir: __dirname,
         EXPERIMENTAL_useProjectService: {
           allowDefaultProjectForFiles: ['*.ts', '*.tsx'],
@@ -152,10 +151,7 @@ const config: Linter.Config[] = [
       'import/resolver': {
         typescript: {
           alwaysTryTypes: true,
-          project: [
-            path.join(__dirname, 'apps/webapp/tsconfig.eslint.json'),
-            path.join(__dirname, 'libraries/core/tsconfig.eslint.json'),
-          ],
+          project: path.join(__dirname, 'tsconfig.eslint.json'),
         },
         node: {
           extensions: ['.js', '.jsx', '.ts', '.tsx'],
