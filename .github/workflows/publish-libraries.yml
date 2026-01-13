@@ -55,13 +55,13 @@ jobs:
         run: yarn --immutable
 
       - name: Build libraries
-        run: yarn nx run-many -t build --projects=tag:npm:public
+        run: yarn nx run-many -t build --projects=tag:type:lib
 
       - name: Test libraries
-        run: yarn nx run-many -t test --projects=tag:npm:public
+        run: yarn nx run-many -t test --projects=tag:type:lib
 
       - name: Lint libraries
-        run: yarn nx run-many -t lint --projects=tag:npm:public
+        run: yarn nx run-many -t lint --projects=tag:type:lib
 
       - name: Check for changes to publish (dry-run)
         if: github.event.inputs.dry_run == 'true' || github.event_name == 'pull_request'
