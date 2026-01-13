@@ -19,10 +19,14 @@
 
 import {ComponentProps} from 'react';
 import {CSSObject} from '@emotion/react';
+import {ValidationUtil} from '@wireapp/commons';
 import {BASE_DARK_COLOR, BASE_LIGHT_COLOR, COLOR_V2, Input, Label, Switch} from '@wireapp/react-ui-kit';
 
 import {CellsTableLoader} from 'Components/Conversation/ConversationCells/common/CellsTableLoader/CellsTableLoader';
 import {CopyToClipboardButton} from 'Components/CopyToClipboardButton/CopyToClipboardButton';
+import {PasswordGeneratorButton} from 'Components/PasswordGeneratorButton';
+import {Config} from 'src/script/Config';
+import {t} from 'Util/LocalizerUtil';
 
 type PublicLinkStatus = 'idle' | 'loading' | 'error' | 'success';
 
@@ -49,22 +53,36 @@ interface CellsShareModalContentStyles {
   switchWrapperStyles: CSSObject;
   inputStyles: CSSObject;
   inputWrapperStyles: CSSObject;
+  passwordContentStyles: CSSObject;
+  passwordInputRowStyles: CSSObject;
+  passwordInputLabelStyles: CSSObject;
+  passwordInputStyles: CSSObject;
+  passwordActionButtonStyles: CSSObject;
+  passwordCopyButtonStyles: CSSObject;
   loaderWrapperStyles: CSSObject;
+}
+
+interface CellsShareModalContentLabels {
+  enablePublicLink: string;
+  password: string;
+  passwordDescription: string;
+  expiration: string;
+  expirationDescription: string;
+  generatedPublicLink: string;
+  copyLink: string;
+  linkCopied: string;
+  errorLoadingLink: string;
+  passwordInputLabel: string;
+  passwordInputPlaceholder: string;
+  passwordCopy: string;
+  passwordCopied: string;
+  showTogglePasswordLabel: string;
+  hideTogglePasswordLabel: string;
 }
 
 interface CellsShareModalContentProps {
   publicLinkDescription: string;
-  labels: {
-    enablePublicLink: string;
-    password: string;
-    passwordDescription: string;
-    expiration: string;
-    expirationDescription: string;
-    generatedPublicLink: string;
-    copyLink: string;
-    linkCopied: string;
-    errorLoadingLink: string;
-  };
+  labels?: Partial<CellsShareModalContentLabels>;
   publicLink: {
     status: PublicLinkStatus;
     link?: string;
@@ -75,6 +93,9 @@ interface CellsShareModalContentProps {
   password: {
     isEnabled: boolean;
     onToggle: () => void;
+    value: string;
+    onChange: (value: string) => void;
+    onGeneratePassword: (password: string) => void;
   };
   expiration: {
     isEnabled: boolean;
@@ -98,6 +119,24 @@ const DEFAULT_SWITCH_COLORS: SwitchColorProps = {
   disabledColorDark: COLOR_V2.GRAY_60,
 };
 
+const DEFAULT_LABELS: CellsShareModalContentLabels = {
+  enablePublicLink: t('cells.shareModal.enablePublicLink'),
+  password: t('cells.shareModal.password'),
+  passwordDescription: t('cells.shareModal.password.description'),
+  expiration: t('cells.shareModal.expiration'),
+  expirationDescription: t('cells.shareModal.expiration.description'),
+  generatedPublicLink: t('cells.shareModal.generatedPublicLink'),
+  copyLink: t('cells.shareModal.copyLink'),
+  linkCopied: t('cells.shareModal.linkCopied'),
+  errorLoadingLink: t('cells.shareModal.error.loadingLink'),
+  passwordInputLabel: t('modalGuestLinkJoinLabel'),
+  passwordInputPlaceholder: t('modalGuestLinkJoinPlaceholder'),
+  passwordCopy: t('conversationContextMenuCopy'),
+  passwordCopied: t('guestOptionsPasswordCopyToClipboardSuccess'),
+  showTogglePasswordLabel: t('showTogglePasswordLabel'),
+  hideTogglePasswordLabel: t('hideTogglePasswordLabel'),
+};
+
 export const CellsShareModalContent = ({
   publicLinkDescription,
   labels,
@@ -108,6 +147,7 @@ export const CellsShareModalContent = ({
   styles,
   switchColors,
 }: CellsShareModalContentProps) => {
+  const resolvedLabels = {...DEFAULT_LABELS, ...labels};
   const shouldShowLink = publicLink.isEnabled && publicLink.status === 'success' && publicLink.link;
   const publicLinkColors = switchColors?.publicLink ?? DEFAULT_SWITCH_COLORS;
   const passwordColors = switchColors?.password ?? DEFAULT_SWITCH_COLORS;
@@ -118,7 +158,7 @@ export const CellsShareModalContent = ({
       <div css={styles.switchContainerStyles}>
         <div css={styles.switchContentStyles}>
           <Label htmlFor="switch-public-link" css={styles.labelStyles}>
-            {labels.enablePublicLink}
+            {resolvedLabels.enablePublicLink}
           </Label>
           <p id="switch-public-link-description" css={styles.publicLinkDescriptionStyles}>
             {publicLinkDescription}
@@ -139,10 +179,10 @@ export const CellsShareModalContent = ({
       <div css={styles.switchContainerStyles}>
         <div css={styles.switchContentStyles}>
           <Label htmlFor="switch-password" css={styles.labelStyles}>
-            {labels.password}
+            {resolvedLabels.password}
           </Label>
           <p id="switch-password-description" css={styles.passwordDescriptionStyles}>
-            {labels.passwordDescription}
+            {resolvedLabels.passwordDescription}
           </p>
         </div>
         <div css={styles.switchWrapperStyles}>
@@ -155,14 +195,52 @@ export const CellsShareModalContent = ({
           />
         </div>
       </div>
-      {password.isEnabled && <div css={styles.toggleContentStyles} data-uie-name="cells-share-password-content" />}
+      {password.isEnabled && (
+        <div css={styles.toggleContentStyles} data-uie-name="cells-share-password-content">
+          <div css={styles.passwordContentStyles}>
+            <div css={styles.passwordActionButtonStyles}>
+              <PasswordGeneratorButton
+                passwordLength={Config.getConfig().MINIMUM_PASSWORD_LENGTH}
+                onGeneratePassword={password.onGeneratePassword}
+              />
+            </div>
+            <div css={styles.passwordInputRowStyles}>
+              <Label htmlFor="cells_share_pswd" css={styles.passwordInputLabelStyles}>
+                {resolvedLabels.passwordInputLabel}
+              </Label>
+              <Input
+                name="cells-share-password"
+                data-uie-name="cells-share-password"
+                placeholder={resolvedLabels.passwordInputPlaceholder}
+                id="cells_share_pswd"
+                type="password"
+                showTogglePasswordLabel={resolvedLabels.showTogglePasswordLabel}
+                hideTogglePasswordLabel={resolvedLabels.hideTogglePasswordLabel}
+                autoComplete="off"
+                value={password.value}
+                onChange={event => password.onChange(event.currentTarget.value)}
+                pattern={ValidationUtil.getNewPasswordPattern(Config.getConfig().NEW_PASSWORD_MINIMUM_LENGTH)}
+                wrapperCSS={styles.passwordInputStyles}
+              />
+              <div css={styles.passwordCopyButtonStyles}>
+                <CopyToClipboardButton
+                  textToCopy={password.value}
+                  displayText={resolvedLabels.passwordCopy}
+                  copySuccessText={resolvedLabels.passwordCopied}
+                  disabled={!password.value}
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
       <div css={styles.switchContainerStyles}>
         <div css={styles.switchContentStyles}>
           <Label htmlFor="switch-expiration" css={styles.labelStyles}>
-            {labels.expiration}
+            {resolvedLabels.expiration}
           </Label>
           <p id="switch-expiration-description" css={styles.expirationDescriptionStyles}>
-            {labels.expirationDescription}
+            {resolvedLabels.expirationDescription}
           </p>
         </div>
         <div css={styles.switchWrapperStyles}>
@@ -179,7 +257,7 @@ export const CellsShareModalContent = ({
       {shouldShowLink && (
         <div css={styles.inputWrapperStyles}>
           <label htmlFor="generated-public-link" className="visually-hidden">
-            {labels.generatedPublicLink}
+            {resolvedLabels.generatedPublicLink}
           </label>
           <Input
             id="generated-public-link"
@@ -190,8 +268,8 @@ export const CellsShareModalContent = ({
           />
           <CopyToClipboardButton
             textToCopy={publicLink.link || ''}
-            displayText={labels.copyLink}
-            copySuccessText={labels.linkCopied}
+            displayText={resolvedLabels.copyLink}
+            copySuccessText={resolvedLabels.linkCopied}
           />
         </div>
       )}
@@ -200,7 +278,7 @@ export const CellsShareModalContent = ({
           <CellsTableLoader />
         </div>
       )}
-      {publicLink.status === 'error' && <div>{labels.errorLoadingLink}</div>}
+      {publicLink.status === 'error' && <div>{resolvedLabels.errorLoadingLink}</div>}
     </div>
   );
 };

@@ -17,6 +17,8 @@
  *
  */
 
+import {useState} from 'react';
+
 import {CellsShareModalContent} from 'Components/Cells/ShareModal/CellsShareModalContent';
 import {useCellExpirationToggle} from 'Components/Cells/ShareModal/useCellExpirationToggle';
 import {useCellPasswordToggle} from 'Components/Cells/ShareModal/useCellPasswordToggle';
@@ -27,6 +29,12 @@ import {t} from 'Util/LocalizerUtil';
 import {
   inputStyles,
   inputWrapperStyles,
+  passwordActionButtonStyles,
+  passwordContentStyles,
+  passwordCopyButtonStyles,
+  passwordInputLabelStyles,
+  passwordInputRowStyles,
+  passwordInputStyles,
   labelStyles,
   loaderWrapperStyles,
   dividerStyles,
@@ -62,6 +70,7 @@ const CellsShareModal = ({type, uuid, cellsRepository}: ShareModalParams) => {
   const {status, link, isEnabled, togglePublicLink} = useCellPublicLink({uuid, cellsRepository});
   const {isEnabled: isPasswordEnabled, toggle: togglePassword} = useCellPasswordToggle();
   const {isEnabled: isExpirationEnabled, toggle: toggleExpiration} = useCellExpirationToggle();
+  const [passwordValue, setPasswordValue] = useState('');
 
   const isInputDisabled = ['loading', 'error'].includes(status);
 
@@ -72,17 +81,6 @@ const CellsShareModal = ({type, uuid, cellsRepository}: ShareModalParams) => {
           ? 'cells.shareModal.enablePublicLink.file.description'
           : 'cells.shareModal.enablePublicLink.folder.description',
       )}
-      labels={{
-        enablePublicLink: t('cells.shareModal.enablePublicLink'),
-        password: t('cells.shareModal.password'),
-        passwordDescription: t('cells.shareModal.password.description'),
-        expiration: t('cells.shareModal.expiration'),
-        expirationDescription: t('cells.shareModal.expiration.description'),
-        generatedPublicLink: t('cells.shareModal.generatedPublicLink'),
-        copyLink: t('cells.shareModal.copyLink'),
-        linkCopied: t('cells.shareModal.linkCopied'),
-        errorLoadingLink: t('cells.shareModal.error.loadingLink'),
-      }}
       publicLink={{
         status,
         link,
@@ -93,6 +91,9 @@ const CellsShareModal = ({type, uuid, cellsRepository}: ShareModalParams) => {
       password={{
         isEnabled: isPasswordEnabled,
         onToggle: togglePassword,
+        value: passwordValue,
+        onChange: setPasswordValue,
+        onGeneratePassword: setPasswordValue,
       }}
       expiration={{
         isEnabled: isExpirationEnabled,
@@ -112,6 +113,12 @@ const CellsShareModal = ({type, uuid, cellsRepository}: ShareModalParams) => {
         switchWrapperStyles,
         inputStyles,
         inputWrapperStyles,
+        passwordContentStyles,
+        passwordInputRowStyles,
+        passwordInputLabelStyles,
+        passwordInputStyles,
+        passwordActionButtonStyles,
+        passwordCopyButtonStyles,
         loaderWrapperStyles,
       }}
     />

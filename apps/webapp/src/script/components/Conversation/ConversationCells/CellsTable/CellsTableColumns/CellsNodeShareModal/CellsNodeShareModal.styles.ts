@@ -86,6 +86,15 @@ export const inputWrapperStyles: CSSObject = {
   gap: '8px',
 };
 
+export {
+  passwordActionButtonStyles,
+  passwordContentStyles,
+  passwordCopyButtonStyles,
+  passwordInputLabelStyles,
+  passwordInputRowStyles,
+  passwordInputStyles,
+} from 'Components/Cells/ShareModal/CellsSharePasswordStyles';
+
 export const loaderWrapperStyles: CSSObject = {
   display: 'flex',
   justifyContent: 'center',
