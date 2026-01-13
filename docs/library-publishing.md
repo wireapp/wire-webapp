@@ -10,17 +10,12 @@ The monorepo uses **Nx Release** to automate versioning and publishing of librar
 
 ### Automatic Publishing
 
-When you push changes to libraries on specific branches:
+When you push changes to libraries on main/dev branches:
 
-1. **`main` branch**: 
-   - Automatically versions, creates tags, and publishes to npm
-   - Uses conventional commits to determine version bump (major/minor/patch)
-   - Creates GitHub releases
-   - Publishes with npm provenance for security
-
-2. **`dev` branch**:
-   - Creates versions and changelogs but does NOT publish
-   - Useful for testing the release process
+- Automatically versions, creates tags, and publishes to npm (uses `beta` tag on merge to `dev`)
+- Uses conventional commits to determine version bump (major/minor/patch)
+- Creates GitHub releases
+- Publishes with npm provenance for security
 
 ### Workflow Trigger
 
