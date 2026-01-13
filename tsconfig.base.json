@@ -24,7 +24,8 @@
     "skipDefaultLibCheck": true,
     "baseUrl": ".",
     "paths": {
-      "apps/*": ["apps/*"]
+      "apps/*": ["apps/*"],
+      "@wireapp/core/lib/*": ["libraries/core/src/*"]
     }
   },
   "exclude": ["node_modules", "tmp"]
