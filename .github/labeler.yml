@@ -42,7 +42,7 @@
 'lib: config':
   files:
     - 'libraries/config/.*'
-"lib: core":
+'lib: core':
   files:
     - 'libraries/core/.*'
 
