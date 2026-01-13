@@ -42,3 +42,5 @@ apps/server/dist/
 dist/
 *.tsbuildinfo
 lib/
+
+plans/

@@ -73,6 +73,7 @@
     "url": "https://github.com/wireapp/wire-webapp.git"
   },
   "scripts": {
+    "build:libs": "nx run-many -t build --projects=tag:type:lib",
     "bundle:dev": "nx build webapp --configuration=development",
     "bundle:prod": "nx build webapp --configuration=production",
     "clean:jest": "nx reset && nx run workspace-tools:clean-jest",
