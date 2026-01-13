@@ -1,8 +1,6 @@
-#!/usr/bin/env node
-
 /*
  * Wire
- * Copyright (C) 2023 Wire Swiss GmbH
+ * Copyright (C) 2026 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,26 +17,16 @@
  *
  */
 
-const path = require('path');
-const {writeFileSync} = require('fs');
-const {execSync} = require('child_process');
-
-function generateVersion() {
-  return new Date()
-    .toISOString()
-    .replace(/[T\-:]/g, '.')
-    .replace(/\.\d+Z/, '');
-}
-
-function generateCommmitHash() {
-  try {
-    return execSync('git rev-parse HEAD').toString().trim();
-  } catch (error) {
-    return 'unknown';
-  }
-}
-
-writeFileSync(
-  path.resolve(__dirname, '../dist/version.json'),
-  JSON.stringify({version: generateVersion(), commit: generateCommmitHash()}),
-);
+module.exports = {
+  displayName: 'config-lib',
+  testEnvironment: 'node',
+  clearMocks: true,
+  transform: {
+    '^.+\\.(ts|tsx)$': '@swc/jest',
+    '^.+\\.(js|jsx)$': '@swc/jest',
+  },
+  transformIgnorePatterns: ['node_modules/'],
+  coverageDirectory: '../../coverage/libraries/config',
+  testMatch: ['<rootDir>/src/**/__tests__/**/*.[jt]s?(x)', '<rootDir>/src/**/?(*.)+(spec|test).[jt]s?(x)'],
+  moduleFileExtensions: ['js', 'json', 'ts', 'tsx'],
+};

@@ -45,6 +45,9 @@
 'lib: api-client':
   files:
     - 'libraries/api-client/.*'
+'lib: config':
+  files:
+    - 'libraries/config/.*'
 
 # Components
 'comp: calling':

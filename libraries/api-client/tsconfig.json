@@ -4,6 +4,7 @@
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
     "outDir": "lib",
+    "declaration": true,
     "skipLibCheck": true,
     "rootDir": "src",
     "types": ["node"],
@@ -11,8 +12,10 @@
     "target": "es2020",
     "module": "commonjs",
     "moduleResolution": "node",
-    "resolveJsonModule": true
+    "resolveJsonModule": true,
+    "declarationMap": true,
+    "strict": true
   },
   "exclude": ["node_modules", "./demo.ts", "**/*.test.ts"],
-  "include": ["src/**/*.ts"]
+  "include": ["src/**/*.ts", "src/**/*.d.ts"]
 }

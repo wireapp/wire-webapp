@@ -6,9 +6,9 @@
   "targets": {
     "build": {
       "executor": "nx:run-commands",
-      "outputs": ["{workspaceRoot}/apps/server/dist/static"], // web assets land in server dist/static
+      "outputs": ["{workspaceRoot}/apps/server/dist/static"],
       "defaultConfiguration": "production",
-      "dependsOn": ["^build", "server:build"], // build all dependencies first, then server
+      "dependsOn": ["^build"],
       "options": {
         "command": "yarn build:prod",
         "cwd": "{projectRoot}"
@@ -26,7 +26,7 @@
       "executor": "nx:run-commands",
       "defaultConfiguration": "development",
       "options": {
-        "command": "echo 'Use yarn start from the root to run the dev server with webpack-dev-middleware'" // served via root start
+        "command": "echo 'Use yarn start from the root to run the dev server with webpack-dev-middleware'"
       }
     },
     "test": {
@@ -55,13 +55,13 @@
       "executor": "nx:run-commands",
       "dependsOn": ["webapp:stylelint", "webapp:type-check"],
       "options": {
-        "command": "eslint --quiet --ext .js,.ts,.tsx {projectRoot}" // typed linting via root eslintrc
+        "command": "eslint --quiet --ext .js,.ts,.tsx {projectRoot}"
       }
     },
     "stylelint": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "prettier --ignore-path {projectRoot}/.prettierignore --write \"**/*.less\" && stylelint --ignore-path {projectRoot}/.gitignore \"**/*.less\"", // format+lint Less assets
+        "command": "prettier --ignore-path {projectRoot}/.prettierignore --write \"**/*.less\" && stylelint --ignore-path {projectRoot}/.gitignore \"**/*.less\"",
         "cwd": "{projectRoot}"
       }
     },
@@ -74,7 +74,7 @@
     "check-circular": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "dpdm --no-warning --no-tree -T {projectRoot}/src/script/auth/main.tsx {projectRoot}/src/script/main/app.ts" // detect circular deps in entrypoints
+        "command": "dpdm --no-warning --no-tree -T {projectRoot}/src/script/auth/main.tsx {projectRoot}/src/script/main/app.ts"
       }
     },
     "translate-extract": {
@@ -101,7 +101,7 @@
     "configure": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "copy-config ./.copyconfigrc.js && ts-node ./bin/generate_react_icons.ts", // fetch env config + generate icons
+        "command": "copy-config ./.copyconfigrc.js && ts-node ./bin/generate_react_icons.ts",
         "cwd": "{projectRoot}"
       }
     }

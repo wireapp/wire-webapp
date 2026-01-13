@@ -9043,7 +9043,6 @@ __metadata:
     spark-md5: "npm:3.0.2"
     tough-cookie: "npm:4.1.4"
     ts-node: "npm:^10.9.1"
-    typescript: "npm:^5.0.4"
     uuid: "npm:11.1.0"
     webpack: "npm:^5.74.0"
     ws: "npm:8.18.1"
@@ -9087,6 +9086,19 @@ __metadata:
   checksum: 10/73de44eb2c1c18f0a8d561e52b7dee35479a592a2bf8760833c1e5727c638928d50cdf00e6cf88a12db17d531ae3fd045e41a45a3738181bdaeaa39e755d0524
   languageName: node
   linkType: hard
+
+"@wireapp/config@workspace:^, @wireapp/config@workspace:libraries/config":
+  version: 0.0.0-use.local
+  resolution: "@wireapp/config@workspace:libraries/config"
+  dependencies:
+    "@types/fs-extra": "npm:11.0.4"
+    dotenv: "npm:16.6.1"
+    dotenv-extended: "npm:2.9.0"
+    fs-extra: "npm:11.3.3"
+    logdown: "npm:3.3.1"
+    tslib: "npm:2.8.1"
+  languageName: unknown
+  linkType: soft
 
 "@wireapp/copy-config@npm:2.3.10":
   version: 2.3.10
@@ -9269,9 +9281,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@wireapp/react-ui-kit@npm:9.72.1":
-  version: 9.72.1
-  resolution: "@wireapp/react-ui-kit@npm:9.72.1"
+"@wireapp/react-ui-kit@npm:9.73.0":
+  version: 9.73.0
+  resolution: "@wireapp/react-ui-kit@npm:9.73.0"
   dependencies:
     "@radix-ui/react-accordion": "npm:1.2.11"
     "@radix-ui/react-dropdown-menu": "npm:2.1.14"
@@ -9288,7 +9300,7 @@ __metadata:
   peerDependenciesMeta:
     "@types/react":
       optional: true
-  checksum: 10/8e920149618d3fd497e76de5521e52fd1abc894e4990253f0d3c1014f8f63ae019f27a7d4325ea8d9d8a8f0c6fcb62bc74cd384741e52177664b6844fb7206c7
+  checksum: 10/f297e5ba5eeae5b30875b09abdc066c58b7fd73bac7e5805f8b33cea8c57a82a38f7c73683c381b06dd826fbf11b5256d9fa394cfe0391e146c8011b4a6d9223
   languageName: node
   linkType: hard
 
@@ -9302,6 +9314,7 @@ __metadata:
     "@types/geolite2": "npm:2.0.2"
     "@types/hbs": "npm:4.0.5"
     "@wireapp/commons": "npm:5.4.11"
+    "@wireapp/config": "workspace:^"
     dotenv: "npm:16.6.1"
     dotenv-extended: "npm:2.9.0"
     express: "npm:4.22.1"
@@ -9318,6 +9331,7 @@ __metadata:
     nocache: "npm:4.0.0"
     opn: "npm:6.0.0"
     pm2: "npm:6.0.14"
+    tslib: "npm:2.8.1"
   languageName: unknown
   linkType: soft
 
@@ -9428,10 +9442,11 @@ __metadata:
     "@wireapp/avs": "npm:10.2.21"
     "@wireapp/avs-debugger": "npm:0.0.7"
     "@wireapp/commons": "npm:5.4.11"
+    "@wireapp/config": "workspace:^"
     "@wireapp/core": "workspace:^"
     "@wireapp/kalium-backup": "npm:0.0.4"
     "@wireapp/promise-queue": "npm:2.4.11"
-    "@wireapp/react-ui-kit": "npm:9.72.1"
+    "@wireapp/react-ui-kit": "npm:9.73.0"
     "@wireapp/store-engine": "npm:5.1.17"
     "@wireapp/store-engine-dexie": "npm:2.1.22"
     "@wireapp/telemetry": "npm:0.3.7"
@@ -9452,6 +9467,7 @@ __metadata:
     dexie: "npm:4.0.7"
     dexie-batch: "npm:0.4.3"
     dexie-encrypted: "npm:2.0.0"
+    dotenv-extended: "npm:2.9.0"
     emoji-picker-react: "npm:4.16.1"
     fake-indexeddb: "npm:6.2.5"
     html-webpack-plugin: "npm:5.6.5"
@@ -26837,17 +26853,17 @@ __metadata:
   languageName: node
   linkType: hard
 
+"tslib@npm:2.8.1, tslib@npm:^2.0.0, tslib@npm:^2.0.1, tslib@npm:^2.0.3, tslib@npm:^2.1.0, tslib@npm:^2.3.0, tslib@npm:^2.4.0, tslib@npm:^2.6.2, tslib@npm:^2.7.0, tslib@npm:^2.8.0, tslib@npm:^2.8.1":
+  version: 2.8.1
+  resolution: "tslib@npm:2.8.1"
+  checksum: 10/3e2e043d5c2316461cb54e5c7fe02c30ef6dccb3384717ca22ae5c6b5bc95232a6241df19c622d9c73b809bea33b187f6dbc73030963e29950c2141bc32a79f7
+  languageName: node
+  linkType: hard
+
 "tslib@npm:^1.8.1, tslib@npm:^1.9.3":
   version: 1.14.1
   resolution: "tslib@npm:1.14.1"
   checksum: 10/7dbf34e6f55c6492637adb81b555af5e3b4f9cc6b998fb440dac82d3b42bdc91560a35a5fb75e20e24a076c651438234da6743d139e4feabf0783f3cdfe1dddb
-  languageName: node
-  linkType: hard
-
-"tslib@npm:^2.0.0, tslib@npm:^2.0.1, tslib@npm:^2.0.3, tslib@npm:^2.1.0, tslib@npm:^2.3.0, tslib@npm:^2.4.0, tslib@npm:^2.6.2, tslib@npm:^2.7.0, tslib@npm:^2.8.0, tslib@npm:^2.8.1":
-  version: 2.8.1
-  resolution: "tslib@npm:2.8.1"
-  checksum: 10/3e2e043d5c2316461cb54e5c7fe02c30ef6dccb3384717ca22ae5c6b5bc95232a6241df19c622d9c73b809bea33b187f6dbc73030963e29950c2141bc32a79f7
   languageName: node
   linkType: hard
 

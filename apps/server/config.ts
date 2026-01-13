@@ -22,33 +22,50 @@ import dotenv from 'dotenv-extended';
 import {readFileSync} from 'fs';
 import path from 'path';
 
-import {generateConfig as generateClientConfig} from './client.config';
-import {Env} from './env';
-import {generateConfig as generateServerConfig} from './server.config';
+import {generateClientConfig, generateServerConfig, Env} from '@wireapp/config';
 
 const versionData = readFileSync(path.resolve(__dirname, './version.json'), 'utf8');
 const version = versionData ? JSON.parse(versionData) : {version: 'unknown', commit: 'unknown'};
 
 // Determine the correct root path based on the directory structure
-// In monorepo (dev/CI): go up from apps/server/dist/config to workspace root
-// In AWS EB deployment: go up from dist/config to deployment root
-// Check if we're in a monorepo structure by testing if .env.defaults exists at workspace root
-const monorepoRootPath = path.resolve(__dirname, '../../../..');
-const deploymentRootPath = path.resolve(__dirname, '..');
-const isMonorepo = require('fs').existsSync(path.join(monorepoRootPath, '.env.defaults'));
+// In monorepo (dev/CI): __dirname is apps/server/dist, so go up to workspace root (3 levels)
+// In AWS EB deployment: __dirname is /var/app/current (files are at root level)
+// Check if .env.defaults exists in current directory (deployment) or 3 levels up (monorepo)
+const deploymentRootPath = __dirname;
+const monorepoRootPath = path.resolve(__dirname, '../../..');
+const isMonorepo =
+  require('fs').existsSync(path.join(monorepoRootPath, '.env.defaults')) &&
+  !require('fs').existsSync(path.join(deploymentRootPath, '.env.defaults'));
 const rootPath = isMonorepo ? monorepoRootPath : deploymentRootPath;
 
-const env = dotenv.load({
+console.log('[Config] Loading environment from:', rootPath);
+console.log('[Config] __dirname:', __dirname);
+console.log('[Config] Is monorepo:', isMonorepo);
+
+const dotenvConfig = {
   path: path.join(rootPath, '.env'),
   defaults: path.join(rootPath, '.env.defaults'),
   includeProcessEnv: true,
-}) as Env;
+  silent: false, // Don't fail silently
+};
+
+console.log('[Config] dotenv config:', JSON.stringify(dotenvConfig, null, 2));
+
+const env = dotenv.load(dotenvConfig) as Env;
+
+console.log('[Config] Environment loaded. APP_BASE:', env.APP_BASE ? 'SET' : 'NOT SET');
 
 function generateUrls() {
   const federation = env.FEDERATION;
 
   if (!federation) {
     if (!env.APP_BASE || !env.BACKEND_REST || !env.BACKEND_WS) {
+      console.error('[Config] Missing required environment variables!');
+      console.error('[Config] APP_BASE:', env.APP_BASE);
+      console.error('[Config] BACKEND_REST:', env.BACKEND_REST);
+      console.error('[Config] BACKEND_WS:', env.BACKEND_WS);
+      console.error('[Config] Root path used:', rootPath);
+      console.error('[Config] .env.defaults exists:', require('fs').existsSync(path.join(rootPath, '.env.defaults')));
       throw new Error('missing environment variables');
     }
     return {
@@ -73,7 +90,4 @@ const commonConfig = {
 };
 
 export const clientConfig = generateClientConfig(commonConfig, env);
-export type ClientConfig = ReturnType<typeof generateClientConfig>;
-
 export const serverConfig = generateServerConfig(commonConfig, env);
-export type ServerConfig = ReturnType<typeof generateServerConfig>;

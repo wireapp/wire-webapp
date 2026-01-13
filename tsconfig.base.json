@@ -23,13 +23,6 @@
     "skipLibCheck": true,
     "skipDefaultLibCheck": true,
     "baseUrl": ".",
-    "paths": {
-      "@wireapp/api-client": ["libraries/api-client/lib"],
-      "@wireapp/api-client/*": ["libraries/api-client/lib/*"],
-      "@wireapp/core": ["libraries/core/lib"],
-      "@wireapp/core/*": ["libraries/core/lib/*"],
-      "apps/*": ["apps/*"]
-    }
   },
   "exclude": ["node_modules", "tmp"]
 }

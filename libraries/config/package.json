@@ -1,0 +1,29 @@
+{
+  "name": "@wireapp/config",
+  "version": "1.0.0",
+  "private": true,
+  "license": "GPL-3.0",
+  "main": "lib/index.js",
+  "types": "lib/index.d.ts",
+  "typesVersions": {
+    "*": {
+      "lib/*": [
+        "lib/*"
+      ]
+    }
+  },
+  "files": [
+    "lib",
+    "src"
+  ],
+  "dependencies": {
+    "dotenv": "16.6.1",
+    "dotenv-extended": "2.9.0",
+    "fs-extra": "11.3.3",
+    "logdown": "3.3.1",
+    "tslib": "2.8.1"
+  },
+  "devDependencies": {
+    "@types/fs-extra": "11.0.4"
+  }
+}

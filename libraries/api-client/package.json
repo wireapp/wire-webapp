@@ -7,6 +7,7 @@
     "lib"
   ],
   "main": "lib/APIClient",
+  "types": "lib/APIClient.d.ts",
   "browser": {
     "./lib/shims/node/buffer": "./lib/shims/browser/buffer.js",
     "./lib/shims/node/cookie": "./lib/shims/browser/cookie.js",
@@ -53,7 +54,6 @@
     "react-dom": "18.3.1",
     "rimraf": "6.1.2",
     "ts-node": "^10.9.1",
-    "typescript": "^5.0.4",
     "webpack": "^5.74.0",
     "ws": "8.18.1"
   },
