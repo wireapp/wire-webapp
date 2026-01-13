@@ -33,7 +33,7 @@ describe('Client Config', () => {
     },
   };
 
-  const mockEnv: Partial<Env> = {
+  const mockEnv = {
     NODE_ENV: 'production',
     PORT: '8081',
     NODE_DEBUG: '@wireapp/*',
@@ -99,7 +99,7 @@ describe('Client Config', () => {
     });
 
     it('should parse boolean feature flags correctly', () => {
-      const envWithFeatures: Partial<Env> = {
+      const envWithFeatures = {
         ...mockEnv,
         FEATURE_ENABLE_DEBUG: 'true',
         FEATURE_ENABLE_SSO: 'false',
@@ -122,7 +122,7 @@ describe('Client Config', () => {
     });
 
     it('should parse numeric values correctly', () => {
-      const envWithNumbers: Partial<Env> = {
+      const envWithNumbers = {
         ...mockEnv,
         MAX_GROUP_PARTICIPANTS: '1000',
         MAX_VIDEO_PARTICIPANTS: '8',
@@ -139,7 +139,7 @@ describe('Client Config', () => {
     });
 
     it('should use default values for missing numeric values', () => {
-      const envWithoutNumbers: Partial<Env> = {
+      const envWithoutNumbers = {
         ...mockEnv,
         MAX_GROUP_PARTICIPANTS: '',
         MAX_VIDEO_PARTICIPANTS: '',
@@ -155,7 +155,7 @@ describe('Client Config', () => {
     });
 
     it('should parse file upload extensions correctly', () => {
-      const envWithExtensions: Partial<Env> = {
+      const envWithExtensions = {
         ...mockEnv,
         FEATURE_ALLOWED_FILE_UPLOAD_EXTENSIONS: '.jpg, .png, .pdf',
       } as Env;
@@ -166,7 +166,7 @@ describe('Client Config', () => {
     });
 
     it('should default to all extensions when not specified', () => {
-      const envWithAllExtensions: Partial<Env> = {
+      const envWithAllExtensions = {
         ...mockEnv,
         FEATURE_ALLOWED_FILE_UPLOAD_EXTENSIONS: '*',
       } as Env;
@@ -185,7 +185,7 @@ describe('Client Config', () => {
     });
 
     it('should handle COUNTLY configuration', () => {
-      const envWithCountly: Partial<Env> = {
+      const envWithCountly = {
         ...mockEnv,
         COUNTLY_API_KEY: 'test-key',
         COUNTLY_ENABLE_LOGGING: 'true',
@@ -202,7 +202,7 @@ describe('Client Config', () => {
     });
 
     it('should handle optional APPLOCK timeout configuration', () => {
-      const envWithAppLock: Partial<Env> = {
+      const envWithAppLock = {
         ...mockEnv,
         FEATURE_APPLOCK_SCHEDULED_TIMEOUT: '300',
       } as Env;
@@ -219,7 +219,7 @@ describe('Client Config', () => {
     });
 
     it('should handle DataDog configuration', () => {
-      const envWithDataDog: Partial<Env> = {
+      const envWithDataDog = {
         ...mockEnv,
         DATADOG_APPLICATION_ID: 'app-id',
         DATADOG_CLIENT_TOKEN: 'client-token',
@@ -245,7 +245,7 @@ describe('Client Config', () => {
     });
 
     it('should handle ENABLE_DEV_BACKEND_API flag', () => {
-      const envWithDevApi: Partial<Env> = {
+      const envWithDevApi = {
         ...mockEnv,
         ENABLE_DEV_BACKEND_API: 'true',
       } as Env;
