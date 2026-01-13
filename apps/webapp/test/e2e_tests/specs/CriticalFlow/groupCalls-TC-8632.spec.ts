@@ -23,6 +23,7 @@ import {User} from 'test/e2e_tests/data/user';
 import {PageManager} from 'test/e2e_tests/pageManager';
 
 import {test, expect, withLogin} from '../../test.fixtures';
+import {createGroup} from 'test/e2e_tests/utils/userActions';
 
 // ToDo(WPB-22442): Backoffice does not unlock calling feature for teams created during tests
 test.fixme(
@@ -56,11 +57,7 @@ test.fixme(
 
     await test.step('Owner creates group and adds the member', async () => {
       const {pages} = ownerPageManager.webapp;
-      await pages.conversationList().clickCreateGroup();
-      await pages.groupCreation().setGroupName(conversationName);
-      await pages.startUI().selectUsers(member.username);
-      await pages.groupCreation().clickCreateGroupButton();
-
+      await createGroup(pages, conversationName, [member]);
       expect(await pages.conversationList().isConversationItemVisible(conversationName)).toBeTruthy();
     });
 

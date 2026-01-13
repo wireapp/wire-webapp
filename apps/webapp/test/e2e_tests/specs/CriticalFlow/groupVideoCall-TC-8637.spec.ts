@@ -22,6 +22,7 @@ import {PageManager} from 'test/e2e_tests/pageManager';
 import {addMockCamerasToContext} from 'test/e2e_tests/utils/mockVideoDevice.util';
 
 import {test, expect, withLogin, withConnectionRequest} from '../../test.fixtures';
+import {createGroup} from 'test/e2e_tests/utils/userActions';
 
 const conversationName = 'CritiCall';
 
@@ -67,10 +68,7 @@ test.fixme(
 
     await test.step('Owner and team member are in a group conversation together', async () => {
       const {pages} = ownerPageManager.webapp;
-      await pages.conversationList().clickCreateGroup();
-      await pages.groupCreation().setGroupName(conversationName);
-      await pages.startUI().selectUsers(teamMember.username);
-      await pages.groupCreation().clickCreateGroupButton();
+      await createGroup(pages, conversationName, [teamMember]);
       expect(await pages.conversationList().isConversationItemVisible(conversationName)).toBeTruthy();
     });
 

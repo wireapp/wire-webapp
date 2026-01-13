@@ -250,7 +250,7 @@ test.describe('User Blocking', () => {
         await test.step('Users A tries to add B to a group', async () => {
           await userAPages.conversationList().clickCreateGroup();
           await userAPages.groupCreation().setGroupName(conversationName);
-          await userAPages.startUI().selectUsers(userB.username);
+          await userAPages.groupCreation().selectGroupMembers(userB.username);
           await userAPages.groupCreation().clickCreateGroupButton();
 
           // Modal 'modalConversationNotConnectedMessageOne' is visible

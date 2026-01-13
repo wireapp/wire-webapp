@@ -19,7 +19,7 @@
 
 import {User} from 'test/e2e_tests/data/user';
 import {PageManager} from 'test/e2e_tests/pageManager';
-import {sendTextMessageToConversation} from 'test/e2e_tests/utils/userActions';
+import {createGroup, sendTextMessageToConversation} from 'test/e2e_tests/utils/userActions';
 
 import {test, expect, withLogin} from '../../test.fixtures';
 
@@ -49,10 +49,7 @@ test('Conversation Management', {tag: ['@TC-8636', '@crit-flow-web']}, async ({c
 
   await test.step('Team owner creates a group with all the five members', async () => {
     const {pages} = ownerPageManager.webapp;
-    await pages.conversationList().clickCreateGroup();
-    await pages.groupCreation().setGroupName(conversationName);
-    await pages.startUI().selectUsers(members.map(member => member.username));
-    await pages.groupCreation().clickCreateGroupButton();
+    await createGroup(pages, conversationName, members);
     expect(await pages.conversationList().isConversationItemVisible(conversationName)).toBeTruthy();
   });
 

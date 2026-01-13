@@ -19,7 +19,7 @@
 
 import {PageManager} from 'test/e2e_tests/pageManager';
 import {addCreatedUser, removeCreatedUser} from 'test/e2e_tests/utils/tearDown.util';
-import {loginUser} from 'test/e2e_tests/utils/userActions';
+import {createGroup, loginUser} from 'test/e2e_tests/utils/userActions';
 
 import {getUser} from '../../data/user';
 import {test, expect} from '../../test.fixtures';
@@ -68,10 +68,7 @@ test('Block specs', {tag: ['@TC-141', '@regression']}, async ({pageManager: user
 
   await test.step('Preconditions: Users A and B are in a group', async () => {
     await userAComponents.conversationSidebar().isPageLoaded();
-    await userAPages.conversationList().clickCreateGroup();
-    await userAPages.groupCreation().setGroupName(conversationName);
-    await userAPages.startUI().selectUsers(userB.username);
-    await userAPages.groupCreation().clickCreateGroupButton();
+    await createGroup(userAPages, conversationName, [userB]);
   });
 
   // Test steps

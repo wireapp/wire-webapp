@@ -78,7 +78,7 @@ type UserPages = PageManager['webapp']['pages'];
 export const createGroup = async (pages: UserPages, conversationName: string, user: User[]) => {
   await pages.conversationList().clickCreateGroup();
   await pages.groupCreation().setGroupName(conversationName);
-  await pages.startUI().selectUsers(...user.map(user => user.username));
+  await pages.groupCreation().selectGroupMembers(...user.map(user => user.username));
   await pages.groupCreation().clickCreateGroupButton();
 };
 
@@ -87,7 +87,7 @@ export const createChannel = async (pages: UserPages, conversationName: string, 
   await pages.groupCreation().setGroupName(conversationName);
   await pages.groupCreation().clickNextButton();
   // task: set params for testing
-  await pages.startUI().selectUsers(...user.flatMap(user => user.username));
+  await pages.groupCreation().selectGroupMembers(...user.flatMap(user => user.username));
   await pages.groupCreation().clickCreateGroupButton();
 };
 
