@@ -36,25 +36,23 @@ const output = fs.createWriteStream(path.join(S3_PATH, 'ebs.zip'));
 // Read and modify package.json to handle workspace dependencies
 const packageJson = JSON.parse(fs.readFileSync(path.join(SERVER_PATH, 'package.json'), 'utf8'));
 
-// Collect and remove all workspace:* dependencies, mark them as bundled
+// Convert workspace:* dependencies to "*" version - they're pre-bundled in node_modules
 const workspaceDeps = [];
 if (packageJson.dependencies) {
   Object.keys(packageJson.dependencies).forEach(dep => {
     if (packageJson.dependencies[dep].startsWith('workspace:')) {
-      console.log(`Removing workspace dependency: ${dep}`);
+      console.log(`Marking workspace dependency as pre-bundled: ${dep}`);
       workspaceDeps.push(dep);
-      delete packageJson.dependencies[dep];
+      // Read version from the library's package.json
+      const libPkgPath = path.join(ROOT_PATH, 'libraries', dep.replace('@wireapp/', ''), 'package.json');
+      if (fs.existsSync(libPkgPath)) {
+        const libPkg = JSON.parse(fs.readFileSync(libPkgPath, 'utf8'));
+        packageJson.dependencies[dep] = libPkg.version;
+      } else {
+        packageJson.dependencies[dep] = '*';
+      }
     }
   });
-}
-
-// Mark workspace packages as bundledDependencies so npm doesn't remove them
-if (workspaceDeps.length > 0) {
-  if (!packageJson.bundledDependencies) {
-    packageJson.bundledDependencies = [];
-  }
-  packageJson.bundledDependencies.push(...workspaceDeps);
-  console.log(`Marked as bundled:`, workspaceDeps.join(', '));
 }
 
 // Write modified package.json to a temp file
