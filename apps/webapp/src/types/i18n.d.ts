@@ -441,7 +441,7 @@ declare module 'I18n/en-US.json' {
     'cells.options.versionHistory': `Version History`;
     'cells.options.rename': `Rename`;
     'cells.options.restore': `Restore`;
-    'cells.options.share': `Share`;
+    'cells.options.share': `Share via link`;
     'cells.options.tags': `Add or Remove Tags`;
     'cells.pagination.loadMoreResults': `Load More Items`;
     'cells.pagination.nextPage': `Next Page`;
