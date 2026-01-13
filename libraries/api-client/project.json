@@ -70,20 +70,6 @@
         "command": "tsc --project {projectRoot}/tsconfig.json --noEmit"
       }
     },
-    "demo:http401": {
-      "executor": "nx:run-commands",
-      "options": {
-        "command": "cross-env NODE_DEBUG='@wireapp/api-client*' ts-node src/demo/http401.ts",
-        "cwd": "{projectRoot}"
-      }
-    },
-    "demo:self": {
-      "executor": "nx:run-commands",
-      "options": {
-        "command": "cross-env NODE_DEBUG='@wireapp/api-client*' ts-node src/demo/self.ts",
-        "cwd": "{projectRoot}"
-      }
-    },
     "nx-release-publish": {
       "executor": "@nx/js:release-publish",
       "dependsOn": ["^nx-release-publish"],
