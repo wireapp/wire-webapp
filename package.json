@@ -15,7 +15,7 @@
     "@types/jsdom": "21.1.7",
     "@types/node": "24.10.4",
     "@types/uuid": "10.0.0",
-    "@typescript-eslint/eslint-plugin": "8.52.0",
+    "@typescript-eslint/eslint-plugin": "8.53.0",
     "@typescript-eslint/parser": "8.52.0",
     "@wireapp/copy-config": "2.3.10",
     "@wireapp/eslint-config": "3.1.7",
