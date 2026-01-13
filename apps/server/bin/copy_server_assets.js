@@ -57,22 +57,23 @@ workspaceDeps.forEach(depName => {
     throw new Error(`Workspace dependency ${depName} not found at ${libraryPath}`);
   }
 
-  // Copy the compiled lib directory
-  const libSrc = path.join(libraryPath, 'lib');
-  const libDest = path.resolve(__dirname, distFolder, 'node_modules', depName, 'lib');
-
-  // Copy the package.json
-  const pkgSrc = path.join(libraryPath, 'package.json');
-  const pkgDest = path.resolve(__dirname, distFolder, 'node_modules', depName, 'package.json');
+  // Copy the package to node_modules preserving structure
+  const packageDest = path.resolve(__dirname, distFolder, 'node_modules', depName);
 
   console.log(`  - Bundling ${depName} from ${libraryPath}`);
 
   // Ensure the directory exists
-  fs.ensureDirSync(path.resolve(__dirname, distFolder, 'node_modules', depName));
+  fs.ensureDirSync(packageDest);
 
-  // Copy files
+  // Copy package.json
+  const pkgSrc = path.join(libraryPath, 'package.json');
+  fs.copySync(pkgSrc, path.join(packageDest, 'package.json'));
+
+  // Copy the compiled lib directory (preserving the lib folder structure)
+  const libSrc = path.join(libraryPath, 'lib');
   if (fs.existsSync(libSrc)) {
-    fs.copySync(libSrc, libDest);
+    fs.copySync(libSrc, path.join(packageDest, 'lib'));
+  } else {
+    throw new Error(`Compiled lib directory not found for ${depName} at ${libSrc}. Did you run the build?`);
   }
-  fs.copySync(pkgSrc, pkgDest);
 });
