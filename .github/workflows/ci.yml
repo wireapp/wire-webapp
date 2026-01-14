@@ -95,11 +95,3 @@ jobs:
           files: ./coverage/libraries/core/lcov.info
           flags: lib_core
           token: ${{ secrets.CODECOV_TOKEN }}
-
-      - name: Upload api-client library coverage to Codecov
-        uses: codecov/codecov-action@v5.5.2
-        with:
-          fail_ci_if_error: false
-          files: ./coverage/libraries/api-client/lcov.info
-          flags: lib_api_client
-          token: ${{ secrets.CODECOV_TOKEN }}
