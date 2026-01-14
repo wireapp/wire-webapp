@@ -20,7 +20,7 @@
     "./lib/cryptography/AssetCryptography/crypto.node": "./lib/cryptography/AssetCryptography/crypto.browser.js"
   },
   "dependencies": {
-    "@wireapp/api-client": "27.95.2",
+    "@wireapp/api-client": "27.95.4",
     "@wireapp/commons": "5.4.11",
     "@wireapp/core-crypto": "9.1.2",
     "@wireapp/cryptobox": "12.8.0",
@@ -41,7 +41,7 @@
   "devDependencies": {
     "@swc/core": "1.15.8",
     "@swc/jest": "0.2.39",
-    "@types/lodash": "4.17.21",
+    "@types/lodash": "4.17.23",
     "@types/long": "5.0.0",
     "@types/tough-cookie": "4.0.5",
     "commander": "14.0.2",

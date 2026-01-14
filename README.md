@@ -22,6 +22,7 @@ No license is granted to the Wire trademark and its associated logos, all of whi
 - `apps/server/`: the node/express wrapper that serves the built webapp and handles proxying.
 - `apps/webapp/app-config/`: configuration bundles fetched via `copy-config`.
 - `apps/webapp/.copyconfigrc.js`: copy-config setup (runs from the repo root, writes into `apps/webapp/resource`).
+- `libraries/config/`: the `@wireapp/config` package - centralized environment configuration management with type-safe configuration loading and validation.
 - `libraries/core/`: the `@wireapp/core` package - Wire's communication core library handling authentication, WebSocket connections, and protocol messaging.
 - Root-level tooling (`package.json`, Nx, husky, bin scripts) orchestrates both apps and libraries.
 
