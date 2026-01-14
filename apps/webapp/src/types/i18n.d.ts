@@ -515,7 +515,6 @@ declare module 'I18n/en-US.json' {
     'cells.shareModal.expiration.previousMonthLabel': `Previous month`;
     'cells.shareModal.expiration.nextMonthLabel': `Next month`;
     'cells.shareModal.expiration.error.pastDate': `Date in the past`;
-    'cells.shareModal.expiration.error.pastDate': `Date in the past`;
     'cells.sidebar.heading': `Files`;
     'cells.sidebar.title': `All`;
     'cells.tableRow.actions': `More options`;

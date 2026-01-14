@@ -72,6 +72,7 @@
     "prism-themes": "1.9.0",
     "prismjs": "1.30.0",
     "react": "18.3.1",
+    "react-aria-components": "^1.14.0",
     "react-dom": "18.3.1",
     "react-dropzone": "14.3.8",
     "react-error-boundary": "5.0.0",
