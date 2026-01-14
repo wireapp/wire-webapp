@@ -14,7 +14,7 @@
     "build": {
       "executor": "nx:run-commands",
       "outputs": ["{projectRoot}/lib"],
-      "dependsOn": ["^build", "clean"],
+      "dependsOn": ["clean"],
       "options": {
         "command": "tsc",
         "cwd": "{projectRoot}"
