@@ -22,6 +22,7 @@ import {PageManager} from 'test/e2e_tests/pageManager';
 import {addMockCamerasToContext} from 'test/e2e_tests/utils/mockVideoDevice.util';
 
 import {test, expect, withLogin} from '../../test.fixtures';
+import {createGroup} from 'test/e2e_tests/utils/userActions';
 
 const channelName = 'Test Channel';
 
@@ -61,12 +62,7 @@ test.fixme(
 
     await test.step('Team owner creates a channel with available member', async () => {
       const {pages} = ownerPageManager.webapp;
-      await pages.conversationList().clickCreateGroup();
-      await pages.groupCreation().setGroupName(channelName);
-      await pages.groupCreation().clickNextButton();
-      await pages.startUI().selectUsers([member.username]);
-      await pages.groupCreation().clickCreateGroupButton();
-      await pages.groupCreation().waitForModalClose();
+      await createGroup(pages, channelName, [member]);
       expect(await pages.conversationList().isConversationItemVisible(channelName)).toBeTruthy();
     });
 

@@ -19,7 +19,7 @@
 
 import {PageManager} from 'test/e2e_tests/pageManager';
 import {addCreatedUser, removeCreatedUser} from 'test/e2e_tests/utils/tearDown.util';
-import {loginUser} from 'test/e2e_tests/utils/userActions';
+import {createGroup, loginUser} from 'test/e2e_tests/utils/userActions';
 
 import {getUser} from '../../data/user';
 import {test, expect} from '../../test.fixtures';
@@ -63,15 +63,12 @@ test('Block specs', {tag: ['@TC-141', '@regression']}, async ({pageManager: user
       })(),
     ]);
 
-    api.connectUsers(userA, userB);
+    await api.connectUsers(userA, userB);
   });
 
   await test.step('Preconditions: Users A and B are in a group', async () => {
     await userAComponents.conversationSidebar().isPageLoaded();
-    await userAPages.conversationList().clickCreateGroup();
-    await userAPages.groupCreation().setGroupName(conversationName);
-    await userAPages.startUI().selectUsers([userB.username]);
-    await userAPages.groupCreation().clickCreateGroupButton();
+    await createGroup(userAPages, conversationName, [userB]);
   });
 
   // Test steps
@@ -83,7 +80,7 @@ test('Block specs', {tag: ['@TC-141', '@regression']}, async ({pageManager: user
   });
 
   await test.step('User B sends messages to 1:1', async () => {
-    await userBPages.conversationList().openConversation(userA.fullName);
+    await userBPages.conversationList().openConversation(userA.fullName, {protocol: 'mls'});
     await userBPages.conversation().sendMessage(messageText);
   });
 
@@ -93,7 +90,7 @@ test('Block specs', {tag: ['@TC-141', '@regression']}, async ({pageManager: user
   });
 
   await test.step('User A does not see the 1:1 message', async () => {
-    await userAPages.conversationList().openConversation(userB.fullName);
+    await userAPages.conversationList().openConversation(userB.fullName, {protocol: 'mls'});
     await expect(userAPages.conversation().conversationTitle).toHaveText(userB.fullName, {timeout: 10_000});
     expect(await userAPages.conversation().messageCount()).toBe(0);
   });
