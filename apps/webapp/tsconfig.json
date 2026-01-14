@@ -21,10 +21,7 @@
       "I18n/*": ["./src/i18n/*"],
       "Repositories/*": ["./src/script/repositories/*"],
       "Resource/*": ["./resource/*"],
-      "Util/*": ["./src/script/util/*"],
-      "apps/*": ["apps/*"],
-      "@wireapp/core/lib/*": ["libraries/core/src/*"],
-      "@wireapp/api-client/lib/*": ["libraries/api-client/src/*"]
+      "Util/*": ["./src/script/util/*"]
     },
     "rootDirs": ["src"],
     "target": "ESNext",
