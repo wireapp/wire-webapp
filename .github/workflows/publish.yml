@@ -37,7 +37,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           fetch-depth: 0
 
@@ -78,7 +78,7 @@ jobs:
           echo -e "COMMIT SHA = ${{ github.sha }}" >> ${{env.UNIT_TEST_REPORT_FILE}}
           echo -e "TEST RUN DATE = $(date -u +'%Y-%m-%dT%H:%M:%SZ')" >> ${{env.UNIT_TEST_REPORT_FILE}}
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v5
         with:
           name: 'unit-tests-report'
           path: ${{env.UNIT_TEST_REPORT_FILE}}
@@ -95,7 +95,7 @@ jobs:
       - name: Build and package
         run: yarn nx run server:package
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v5
         with:
           name: 'build-artifact'
           path: '${{env.BUILD_DIR}}${{env.BUILD_ARTIFACT}}'
@@ -122,7 +122,7 @@ jobs:
           yarn nx run workspace-tools:changelog-${{ env.changelog_type }} > ${{ env.CHANGELOG_FILE }}
           echo "changelog=${{ env.CHANGELOG_FILE }}" >> $GITHUB_OUTPUT
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v5
         if: ${{ env.changelog_type }}
         with:
           name: 'changelog'
@@ -145,7 +145,7 @@ jobs:
           release_name="${TAG:-v${packageVersion}}"
           echo "release_name=$release_name" >> $GITHUB_OUTPUT
 
-      - uses: azure/setup-helm@v4
+      - uses: azure/setup-helm@v4.2.0
         with:
           version: '3.12.2'
 
@@ -217,7 +217,7 @@ jobs:
 
     steps:
       - name: Check out wire-builds
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           repository: wireapp/wire-builds
           token: ${{secrets.WIRE_BUILDS_WRITE_ACCESS_GH_TOKEN}}
@@ -318,7 +318,7 @@ jobs:
         target: ${{fromJson(needs.set_deployment_targets.outputs.deployment_targets)}}
 
     steps:
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v5
         with:
           name: 'build-artifact'
 
@@ -347,11 +347,11 @@ jobs:
       release_url: ${{ steps.release.outputs.url }}
 
     steps:
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v5
         with:
           name: 'changelog'
 
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v5
         with:
           name: 'unit-tests-report'
 
