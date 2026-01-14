@@ -40,8 +40,14 @@ require('dotenv').config();
 const versionTag = process.argv[2].replace('/', '-');
 const uniqueTagOut = process.argv[3] || '';
 /** Commit ID of https://github.com/wireapp/wire-webapp (i.e. "1240cfda9e609470cf1154e18f5bc582ca8907ff") */
-const commitSha = process.env.GITHUB_SHA || process.argv[4];
-const commitShortSha = commitSha.substring(0, 7);
+let commitSha = process.env.GITHUB_SHA || process.argv[4];
+let commitShortSha = commitSha.substring(0, 7);
+
+const prTagPattern = /^pr-\d+$/;
+if (prTagPattern.test(versionTag)) {
+  /** on PRs, use the 9-digit SHA from the head commit (not the merge commit) for tagging purposes */
+  commitShortSha = child.execSync('git rev-parse --short HEAD').toString().trim();
+}
 const dockerRegistryDomain = 'quay.io';
 const repository = `${dockerRegistryDomain}/wire/webapp`;
 
@@ -60,7 +66,6 @@ if (versionTag.includes('production')) {
 }
 const configVersion = appConfigPkg.dependencies[configurationEntry].split('#')[1];
 const uniqueTag = `${versionTag}-${configVersion}-${commitShortSha}`;
-const prTagPattern = /^pr-\d+$/;
 if (!prTagPattern.test(versionTag)) {
   tags.push(`${repository}:${uniqueTag}`);
 }
