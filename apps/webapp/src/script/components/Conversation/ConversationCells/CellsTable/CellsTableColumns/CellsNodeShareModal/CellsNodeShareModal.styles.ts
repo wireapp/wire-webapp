@@ -19,8 +19,6 @@
 
 import {CSSObject} from '@emotion/react';
 
-import {COLOR_V2} from '@wireapp/react-ui-kit';
-
 export const wrapperStyles: CSSObject = {
   paddingTop: '8px',
   width: '100%',
