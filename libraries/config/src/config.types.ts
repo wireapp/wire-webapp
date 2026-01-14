@@ -1,5 +1,3 @@
-#!/usr/bin/env node
-
 /*
  * Wire
  * Copyright (C) 2023 Wire Swiss GmbH
@@ -19,26 +17,13 @@
  *
  */
 
-const path = require('path');
-const {writeFileSync} = require('fs');
-const {execSync} = require('child_process');
-
-function generateVersion() {
-  return new Date()
-    .toISOString()
-    .replace(/[T\-:]/g, '.')
-    .replace(/\.\d+Z/, '');
-}
-
-function generateCommmitHash() {
-  try {
-    return execSync('git rev-parse HEAD').toString().trim();
-  } catch (error) {
-    return 'unknown';
-  }
-}
-
-writeFileSync(
-  path.resolve(__dirname, '../dist/version.json'),
-  JSON.stringify({version: generateVersion(), commit: generateCommmitHash()}),
-);
+export type ConfigGeneratorParams = {
+  commit: string;
+  version: string;
+  env: string;
+  urls: {
+    base?: string;
+    api?: string;
+    ws?: string;
+  };
+};

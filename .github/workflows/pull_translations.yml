@@ -9,15 +9,18 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Cancel Previous Runs
-        uses: styfle/cancel-workflow-action@0.12.1
+        uses: styfle/cancel-workflow-action@0.12.0
         with:
           access_token: ${{github.token}}
 
-      - name: Yarn cache
-        uses: c-hive/gha-yarn-cache@v2
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version-file: '.nvmrc'
+          cache: 'yarn'
 
       - name: Authenticate git clone
         env:
@@ -28,7 +31,7 @@ jobs:
         run: yarn --immutable
 
       - name: Sync translations
-        uses: crowdin/github-action@v2.13.0
+        uses: crowdin/github-action@v2
         env:
           GITHUB_TOKEN: ${{secrets.OTTO_THE_BOT_GH_TOKEN}}
           GITHUB_ACTOR: otto-the-bot

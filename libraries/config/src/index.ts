@@ -17,13 +17,9 @@
  *
  */
 
-export type ConfigGeneratorParams = {
-  env: string;
-  urls: {
-    base: string;
-    api: string;
-    ws: string;
-  };
-  commit: string;
-  version: string;
-};
+export type {Env} from './env';
+export type {ClientConfig} from './client.config';
+export type {ServerConfig} from './server.config';
+export type {ConfigGeneratorParams} from './config.types';
+export {generateConfig as generateClientConfig} from './client.config';
+export {generateConfig as generateServerConfig} from './server.config';

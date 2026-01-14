@@ -39,6 +39,12 @@
     - 'apps/server/.*'
 
 # Libraries
+'lib: config':
+  files:
+    - 'libraries/config/.*'
+'lib: core':
+  files:
+    - 'libraries/core/.*'
 
 # Components
 'comp: calling':

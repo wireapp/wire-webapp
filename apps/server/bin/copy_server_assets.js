@@ -36,3 +36,44 @@ fs.copySync(
   path.resolve(__dirname, npmModulesFolder, '@wireapp/telemetry/lib/embed.js'),
   path.resolve(__dirname, distFolder, 'libs/wire/telemetry/embed.js'),
 );
+
+// Bundle all workspace dependencies for deployment
+// Read server's package.json to find workspace dependencies
+const serverPackageJson = require('../package.json');
+const workspaceDeps = Object.entries(serverPackageJson.dependencies || {})
+  .filter(([, version]) => version.startsWith('workspace:'))
+  .map(([name]) => name);
+
+console.log('Bundling workspace dependencies:', workspaceDeps.join(', '));
+
+workspaceDeps.forEach(depName => {
+  // Map package name to library folder (e.g., @wireapp/config -> config)
+  const libName = depName.split('/').pop(); // Extract last part after /
+
+  // Find the library in the monorepo
+  const libraryPath = path.resolve(__dirname, '../../../libraries', libName);
+
+  if (!fs.existsSync(libraryPath)) {
+    throw new Error(`Workspace dependency ${depName} not found at ${libraryPath}`);
+  }
+
+  // Copy the package to node_modules preserving structure
+  const packageDest = path.resolve(__dirname, distFolder, 'node_modules', depName);
+
+  console.log(`  - Bundling ${depName} from ${libraryPath}`);
+
+  // Ensure the directory exists
+  fs.ensureDirSync(packageDest);
+
+  // Copy package.json
+  const pkgSrc = path.join(libraryPath, 'package.json');
+  fs.copySync(pkgSrc, path.join(packageDest, 'package.json'));
+
+  // Copy the compiled lib directory (preserving the lib folder structure)
+  const libSrc = path.join(libraryPath, 'lib');
+  if (fs.existsSync(libSrc)) {
+    fs.copySync(libSrc, path.join(packageDest, 'lib'));
+  } else {
+    throw new Error(`Compiled lib directory not found for ${depName} at ${libSrc}. Did you run the build?`);
+  }
+});

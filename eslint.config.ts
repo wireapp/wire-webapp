@@ -52,6 +52,7 @@ const ignores = [
   'libraries/core/.tmp/',
   'libraries/core/src/demo/',
   'libraries/core/src/test/',
+  'libraries/config/lib/',
   '**/jest.setup.ts',
 ];
 
