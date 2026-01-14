@@ -41,13 +41,13 @@ const versionTag = process.argv[2].replace('/', '-');
 const uniqueTagOut = process.argv[3] || '';
 /** Commit ID of https://github.com/wireapp/wire-webapp (i.e. "1240cfda9e609470cf1154e18f5bc582ca8907ff") */
 let commitSha = process.env.GITHUB_SHA || process.argv[4];
-let commitShortSha = commitSha.substring(0, 7);
 
 const prTagPattern = /^pr-\d+$/;
 if (prTagPattern.test(versionTag)) {
-  /** on PRs, use the 9-digit SHA from the head commit (not the merge commit) for tagging purposes */
-  commitShortSha = child.execSync('git rev-parse --short HEAD').toString().trim();
+  /** on PRs, use the SHA from the head commit (not the merge commit) for tagging purposes */
+  commitSha = child.execSync('git rev-parse HEAD').toString().trim();
 }
+const commitShortSha = commitSha.substring(0, 7);
 const dockerRegistryDomain = 'quay.io';
 const repository = `${dockerRegistryDomain}/wire/webapp`;
 
