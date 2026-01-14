@@ -60,9 +60,11 @@ if (versionTag.includes('production')) {
 }
 const configVersion = appConfigPkg.dependencies[configurationEntry].split('#')[1];
 const uniqueTag = `${versionTag}-${configVersion}-${commitShortSha}`;
-tags.push(`${repository}:${uniqueTag}`);
-
 const prTagPattern = /^pr-\d+$/;
+if (!prTagPattern.test(versionTag)) {
+  tags.push(`${repository}:${uniqueTag}`);
+}
+
 if (prTagPattern.test(versionTag)) {
   tags.push(`${repository}:${versionTag}-${commitShortSha}`);
 }
