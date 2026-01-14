@@ -55,9 +55,9 @@ test('Account Management', {tag: ['@TC-8639', '@crit-flow-web']}, async ({contex
     await modals.appLock().unlockAppWithPasscode(appLockPassphrase);
   });
 
-  await test.step.skip('Member changes their email address to a new email address', async () => {
-    await components.conversationSidebar().clickPreferencesButton();
+  await components.conversationSidebar().clickPreferencesButton();
 
+  await test.step('Member changes their email address to a new email address', async () => {
     const newEmail = generateWireEmail(user.lastName);
     await pages.account().changeEmailAddress(newEmail);
     await modals.acknowledge().clickAction(); // Acknowledge verify email address modal
@@ -69,7 +69,6 @@ test('Account Management', {tag: ['@TC-8639', '@crit-flow-web']}, async ({contex
   });
 
   await test.step('Member changes audio device settings', async () => {
-    await components.conversationSidebar().clickPreferencesButton();
     const fakeAudioInput = 'Fake Audio Input 1';
     const fakeAudioOutput = 'Fake Audio Output 1';
     const fakeCamera = 'Fake Camera 1';
