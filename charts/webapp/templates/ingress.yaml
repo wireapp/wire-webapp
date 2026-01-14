@@ -1,0 +1,86 @@
+{{- if .Values.ingress.enabled }}
+{{- include "webapp.validateDomainConfig" . }}
+{{- $apiIsStable := eq (include "ingress.isStable" .) "true" -}}
+{{- $ingressFieldNotAnnotation := eq (include "ingress.FieldNotAnnotation" .) "true" -}}
+{{- $ingressSupportsPathType := eq (include "ingress.supportsPathType" .) "true" -}}
+{{- $ingressClass := default "nginx" .Values.ingress.className -}}
+{{- $backendDomain := "" -}}
+{{- $backendRest := "" -}}
+{{- if .Values.ingress.renderCSPInIngress }}
+  {{- $backendDomain = required "Need a 'config.externalUrls.backendDomain' for CSP headers." .Values.config.externalUrls.backendDomain -}}
+  {{- $backendRest = required "Need a 'config.externalUrls.backendRest' for CSP headers." .Values.config.externalUrls.backendRest -}}
+{{- end }}
+apiVersion: {{ include "ingress.apiVersion" . }}
+kind: Ingress
+metadata:
+  name: webapp
+  labels:
+    app: webapp
+    chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+  annotations:
+    {{- if not $ingressFieldNotAnnotation }}
+    kubernetes.io/ingress.class: {{ $ingressClass | quote }}
+    {{- end }}
+    {{- range $key, $val := .Values.ingress.annotations }}
+    {{ $key }}: {{ $val | quote }}
+    {{- end }}
+    {{- if .Values.ingress.renderCSPInIngress }}
+    {{- if not (contains $ingressClass "nginx") }}
+        {{- fail "In ingress CSP header setting only works with a 'nginx' controller. (Rename it to 'nginx-*' if it is one.)" }}
+    {{- end }}
+    nginx.ingress.kubernetes.io/configuration-snippet: |
+      if ($uri !~ "(^/sso/finalize-login(/[a-zA-Z0-9-]*)?$)|(^/sso/initiate-login(/[a-zA-Z0-9-]*)?$)|(^/favicon.ico$)") {
+        set $CSP "connect-src 'self' blob: data: https://*.giphy.com https://{{ $backendRest }}";
+        {{- if .Values.config.externalUrls.backendWebsocket }}
+        set $CSP "${CSP} wss://{{ .Values.config.externalUrls.backendWebsocket }}";
+        {{- end }}
+        set $CSP "${CSP} https://*.{{ $backendDomain }};";
+        set $CSP "${CSP} default-src 'self';";
+        set $CSP "${CSP} font-src 'self' data:;";
+        set $CSP "${CSP} frame-src https://*.soundcloud.com https://*.spotify.com https://*.vimeo.com https://*.youtube-nocookie.com;";
+        set $CSP "${CSP} img-src 'self' blob: data: https://*.giphy.com https://*.{{ $backendDomain }};";
+        set $CSP "${CSP} manifest-src 'self';";
+        set $CSP "${CSP} media-src 'self' blob: data:;";
+        set $CSP "${CSP} object-src 'none';";
+        set $CSP "${CSP} script-src 'self' 'unsafe-eval' https://*.{{ $backendDomain }}; ";
+        set $CSP "${CSP} style-src 'self' 'unsafe-inline';";
+        set $CSP "${CSP} worker-src 'self' blob:;";
+        set $CSP "${CSP} base-uri 'self';";
+        set $CSP "${CSP} form-action 'self';";
+        set $CSP "${CSP} frame-ancestors 'self';";
+        set $CSP "${CSP} script-src-attr 'none';";
+        set $CSP "${CSP} upgrade-insecure-requests";
+        more_set_headers "content-security-policy: $CSP";
+      }
+    {{- end }}
+spec:
+  {{- if $ingressFieldNotAnnotation }}
+  ingressClassName: {{ $ingressClass | quote }}
+  {{- end }}
+  {{- if .Values.tls.enabled }}
+  tls:
+    - hosts:
+        - {{ .Values.webappDomain }}
+      secretName: {{ include "webapp.certificateSecretName" . | quote }}
+  {{- end }}
+  rules:
+    - host: {{ .Values.webappDomain }}
+      http:
+        paths:
+          - path: /
+            {{- if $ingressSupportsPathType }}
+            pathType: Prefix
+            {{- end }}
+            backend:
+              {{- if $apiIsStable }}
+              service:
+                name: webapp-http
+                port:
+                  number: {{ .Values.service.http.port | default .Values.service.http.internalPort }}
+              {{- else }}
+              serviceName: webapp-http
+              servicePort: {{ .Values.service.http.port | default .Values.service.http.internalPort }}
+              {{- end }}
+{{- end }}

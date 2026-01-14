@@ -10,6 +10,28 @@ resources:
 image:
   repository: quay.io/wire/webapp
   # tag: override version defined in Chart.appVersion
+
+# webappDomain: webapp.example.com
+
+ingress:
+  enabled: false
+  className: nginx
+  annotations: {}
+  renderCSPInIngress: false
+
+tls:
+  enabled: false
+  useCertManager: true
+  createIssuer: true
+  issuer:
+    name: letsencrypt-http01
+    kind: Issuer
+
+certManager:
+  inTestMode: false
+  certmasterEmail:
+  customSolvers:
+
 service:
   https:
     externalPort: 443

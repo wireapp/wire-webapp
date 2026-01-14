@@ -1,0 +1,35 @@
+{{- if and .Values.tls.enabled .Values.tls.useCertManager .Values.ingress.enabled }}
+{{- include "webapp.validateDomainConfig" . }}
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: "{{ include "webapp.fullname" . }}-csr"
+  namespace: {{ .Release.Namespace }}
+  labels:
+    chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+    release: "{{ .Release.Name }}"
+    heritage: "{{ .Release.Service }}"
+spec:
+  issuerRef:
+    name: {{ include "webapp.issuerName" . | quote }}
+    {{- if or (eq .Values.tls.issuer.kind "Issuer") (eq .Values.tls.issuer.kind "ClusterIssuer") }}
+    kind: {{ .Values.tls.issuer.kind }}
+    {{- else }}
+    {{- fail (cat ".tls.issuer.kind can only be one of Issuer or ClusterIssuer, got: " .Values.tls.issuer.kind )}}
+    {{- end }}
+  usages:
+    - server auth
+  duration: 2160h
+  renewBefore: 360h
+  isCA: false
+  secretName: {{ include "webapp.certificateSecretName" . | quote }}
+
+  privateKey:
+    algorithm: ECDSA
+    size: 384
+    encoding: PKCS1
+    rotationPolicy: Always
+
+  dnsNames:
+    - {{ .Values.webappDomain }}
+{{- end -}}
