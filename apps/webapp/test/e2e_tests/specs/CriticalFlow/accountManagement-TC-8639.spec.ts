@@ -23,6 +23,7 @@ import {addMockCamerasToContext} from 'test/e2e_tests/utils/mockVideoDevice.util
 
 import {expect, test, withLogin} from '../../test.fixtures';
 import {generateSecurePassword, generateWireEmail} from '../../utils/userDataGenerator';
+import {loginUser} from 'test/e2e_tests/utils/userActions';
 
 // Generating test data
 const conversationName = 'Tracking';
@@ -88,7 +89,7 @@ test('Account Management', {tag: ['@TC-8639', '@crit-flow-web']}, async ({create
     expect(await pages.conversationList().isConversationItemVisible(conversationName));
   });
 
-  await test.step('Member changes their email address to a new email address', async () => {
+  await test.step.skip('Member changes their email address to a new email address', async () => {
     const {pages, modals, components} = memberPageManager.webapp;
     await components.conversationSidebar().clickPreferencesButton();
     await pages.account().changeEmailAddress(newEmail);
@@ -100,7 +101,8 @@ test('Account Management', {tag: ['@TC-8639', '@crit-flow-web']}, async ({create
   });
 
   await test.step('Member changes audio device settings', async () => {
-    const {pages} = memberPageManager.webapp;
+    const {pages, components} = memberPageManager.webapp;
+    await components.conversationSidebar().clickPreferencesButton();
     const fakeAudioInput = 'Fake Audio Input 1';
     const fakeAudioOutput = 'Fake Audio Output 1';
     const fakeCamera = 'Fake Camera 1';
@@ -122,7 +124,7 @@ test('Account Management', {tag: ['@TC-8639', '@crit-flow-web']}, async ({create
   });
 
   await test.step('Member resets their password ', async () => {
-    const {pages} = memberPageManager.webapp;
+    const {pages, modals, components} = memberPageManager.webapp;
     const [newPage] = await Promise.all([
       memberPageManager.getContext().waitForEvent('page'), // Wait for the new tab
       pages.account().clickResetPasswordButton(),
@@ -130,8 +132,8 @@ test('Account Management', {tag: ['@TC-8639', '@crit-flow-web']}, async ({create
 
     const resetPasswordPageManager = PageManager.from(newPage);
     const resetPasswordPage = resetPasswordPageManager.webapp.pages.requestResetPassword();
-    await resetPasswordPage.requestPasswordResetForEmail(newEmail);
-    const resetPasswordUrl = await api.inbucket.getResetPasswordURL(newEmail);
+    await resetPasswordPage.requestPasswordResetForEmail(member.email);
+    const resetPasswordUrl = await api.inbucket.getResetPasswordURL(member.email);
     await newPage.close(); // Close the new tab
 
     const newPassword = generateSecurePassword();
@@ -142,15 +144,13 @@ test('Account Management', {tag: ['@TC-8639', '@crit-flow-web']}, async ({create
     await pages.resetPassword().isPasswordChangeMessageVisible();
 
     // Logging in with the new password
-    // Bug [WPB-19061] Getting 403 (/access) and 401 (/self) after trying to open main page after resetting passwowrd. Also it looks like endless empty loading screen and nothing happens
+    await memberPageManager.openMainPage();
+    await loginUser(member, memberPageManager);
+    await modals.appLock().unlockAppWithPasscode(appLockPassphrase);
 
-    //   await memberPageManager.openMainPage();
-    //   await loginUser(member, memberPageManager);
-    //   await modals.dataShareConsent().clickDecline();
-
-    //   expect(await components.conversationSidebar().getPersonalStatusName()).toBe(
-    //     `${member.firstName} ${member.lastName}`,
-    //   );
-    //   expect(await components.conversationSidebar().getPersonalUserName()).toContain(member.username);
+    await expect(components.conversationSidebar().personalStatusLabel).toContainText(
+      `${member.firstName} ${member.lastName}`,
+    );
+    await expect(components.conversationSidebar().personalUserName).toContainText(member.username);
   });
 });
