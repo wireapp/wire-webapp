@@ -62,6 +62,11 @@ const configVersion = appConfigPkg.dependencies[configurationEntry].split('#')[1
 const uniqueTag = `${versionTag}-${configVersion}-${commitShortSha}`;
 tags.push(`${repository}:${uniqueTag}`);
 
+const prTagPattern = /^pr-\d+$/;
+if (prTagPattern.test(versionTag)) {
+  tags.push(`${repository}:${versionTag}-${commitShortSha}`);
+}
+
 const dockerCommands = [
   `echo "$DOCKER_PASSWORD" | docker login --username "$DOCKER_USERNAME" --password-stdin ${dockerRegistryDomain}`,
   `docker build . --file apps/server/Dockerfile --tag ${commitShortSha}`,
