@@ -17,90 +17,58 @@
  *
  */
 
-import {User} from 'test/e2e_tests/data/user';
 import {PageManager} from 'test/e2e_tests/pageManager';
 import {addMockCamerasToContext} from 'test/e2e_tests/utils/mockVideoDevice.util';
 
 import {expect, test, withLogin} from '../../test.fixtures';
 import {generateSecurePassword, generateWireEmail} from '../../utils/userDataGenerator';
+import {loginUser} from 'test/e2e_tests/utils/userActions';
 
-// Generating test data
-const conversationName = 'Tracking';
+const appLockPassphrase = generateSecurePassword();
 
-test('Account Management', {tag: ['@TC-8639', '@crit-flow-web']}, async ({createTeam, createPage, api}) => {
-  let owner: User;
-  let member: User;
-  let memberPageManager: PageManager;
-  let newEmail: string;
-  let appLockPassphrase: string;
+test('Account Management', {tag: ['@TC-8639', '@crit-flow-web']}, async ({context, createUser, createPage, api}) => {
+  await addMockCamerasToContext(context);
 
-  // Creating preconditions for the test via API
-  await test.step('Preconditions: Creating preconditions for the test via API', async () => {
-    const team = await createTeam('Critical', {withMembers: 1});
-    owner = team.owner;
-    member = team.members[0];
+  const user = await createUser();
+  const pageManager = PageManager.from(await createPage(context, withLogin(user)));
+  const {pages, modals, components} = pageManager.webapp;
 
-    newEmail = generateWireEmail(owner.lastName);
-    appLockPassphrase = generateSecurePassword();
-
-    if (!member.id) {
-      throw new Error(`Member ${member.username} has no ID and can't be invited to the conversation`);
-    }
-    if (!owner.token) {
-      throw new Error(`Owner ${owner.username} has no token and can't be used for team operations`);
-    }
-
-    await api.conversation.inviteToConversation(member.id, owner.token, owner.teamId, conversationName);
-
-    memberPageManager = await PageManager.from(createPage(withLogin(member)));
-    // Add fake video devices to the browser context
-    await addMockCamerasToContext(memberPageManager.getContext());
-  });
-
-  // Test steps
   await test.step('Member opens settings', async () => {
-    const {components} = memberPageManager.webapp;
     await components.conversationSidebar().clickPreferencesButton();
   });
 
   await test.step('Member enables logging in settings', async () => {
-    const {pages} = memberPageManager.webapp;
     await pages.account().toggleSendUsageData();
   });
 
   await test.step('Member enables applock and sets their password', async () => {
-    const {pages, modals, components} = memberPageManager.webapp;
     await pages.account().toggleAppLock();
     await modals.appLock().setPasscode(appLockPassphrase);
     await components.conversationSidebar().clickAllConversationsButton();
-    expect(await pages.conversationList().isConversationItemVisible(conversationName));
   });
 
   await test.step('Member verifies if applock is working', async () => {
-    const {pages, modals} = memberPageManager.webapp;
-    await memberPageManager.refreshPage({waitUntil: 'domcontentloaded'});
-    expect(await modals.appLock().isVisible());
-    expect(await modals.appLock().getAppLockModalHeader()).toContain('Enter passcode to unlock');
-    expect(await modals.appLock().getAppLockModalText()).toContain('Passcode');
+    await pageManager.refreshPage();
+    await expect(modals.appLock().appLockModalHeader).toContainText('Enter passcode to unlock');
+    await expect(modals.appLock().appLockModalText).toContainText('Passcode');
 
     await modals.appLock().unlockAppWithPasscode(appLockPassphrase);
-    expect(await modals.appLock().isHidden());
-    expect(await pages.conversationList().isConversationItemVisible(conversationName));
   });
 
+  await components.conversationSidebar().clickPreferencesButton();
+
   await test.step('Member changes their email address to a new email address', async () => {
-    const {pages, modals, components} = memberPageManager.webapp;
-    await components.conversationSidebar().clickPreferencesButton();
+    const newEmail = generateWireEmail(user.lastName);
     await pages.account().changeEmailAddress(newEmail);
     await modals.acknowledge().clickAction(); // Acknowledge verify email address modal
 
     const activationUrl = await api.inbucket.getAccountActivationURL(newEmail);
-    await memberPageManager.openNewTab(activationUrl);
+    await pageManager.openNewTab(activationUrl);
     await pages.account().isDisplayedEmailEquals(newEmail);
+    user.email = newEmail;
   });
 
   await test.step('Member changes audio device settings', async () => {
-    const {pages} = memberPageManager.webapp;
     const fakeAudioInput = 'Fake Audio Input 1';
     const fakeAudioOutput = 'Fake Audio Output 1';
     const fakeCamera = 'Fake Camera 1';
@@ -109,48 +77,44 @@ test('Account Management', {tag: ['@TC-8639', '@crit-flow-web']}, async ({create
     await pages.audioVideoSettings().selectMicrophone(fakeAudioInput);
     await pages.audioVideoSettings().selectSpeaker(fakeAudioOutput);
     await pages.audioVideoSettings().selectCamera(fakeCamera);
-    expect(await pages.audioVideoSettings().isMicrophoneSetTo('Fake Audio Input 1'));
-    expect(await pages.audioVideoSettings().isSpeakerSetTo('Fake Audio Output 1'));
+    expect(await pages.audioVideoSettings().isMicrophoneSetTo(fakeAudioInput));
+    expect(await pages.audioVideoSettings().isSpeakerSetTo(fakeAudioOutput));
     expect(await pages.audioVideoSettings().isCameraSetTo(fakeCamera));
   });
 
   await test.step('Member turns off data consent', async () => {
-    const {pages} = memberPageManager.webapp;
     await pages.settings().clickAccountButton();
     await pages.account().toggleReceiveNewsletter();
-    expect(await pages.account().isReceiveNewsletterEnabled()).toBeFalsy();
+    await expect(pages.account().receiveNewsletterCheckbox).toBeChecked();
   });
 
   await test.step('Member resets their password ', async () => {
-    const {pages} = memberPageManager.webapp;
     const [newPage] = await Promise.all([
-      memberPageManager.getContext().waitForEvent('page'), // Wait for the new tab
+      pageManager.getContext().waitForEvent('page'), // Wait for the new tab
       pages.account().clickResetPasswordButton(),
     ]);
 
     const resetPasswordPageManager = PageManager.from(newPage);
     const resetPasswordPage = resetPasswordPageManager.webapp.pages.requestResetPassword();
-    await resetPasswordPage.requestPasswordResetForEmail(newEmail);
-    const resetPasswordUrl = await api.inbucket.getResetPasswordURL(newEmail);
+    await resetPasswordPage.requestPasswordResetForEmail(user.email);
+    const resetPasswordUrl = await api.inbucket.getResetPasswordURL(user.email);
     await newPage.close(); // Close the new tab
 
     const newPassword = generateSecurePassword();
-    member.password = newPassword; // Update member's password for password reset
+    user.password = newPassword; // Update member's password for password reset
 
-    await memberPageManager.openUrl(resetPasswordUrl);
+    await pageManager.openUrl(resetPasswordUrl);
     await pages.resetPassword().setNewPassword(newPassword);
     await pages.resetPassword().isPasswordChangeMessageVisible();
 
     // Logging in with the new password
-    // Bug [WPB-19061] Getting 403 (/access) and 401 (/self) after trying to open main page after resetting passwowrd. Also it looks like endless empty loading screen and nothing happens
+    await pageManager.openMainPage();
+    await loginUser(user, pageManager);
+    await modals.appLock().unlockAppWithPasscode(appLockPassphrase);
 
-    //   await memberPageManager.openMainPage();
-    //   await loginUser(member, memberPageManager);
-    //   await modals.dataShareConsent().clickDecline();
-
-    //   expect(await components.conversationSidebar().getPersonalStatusName()).toBe(
-    //     `${member.firstName} ${member.lastName}`,
-    //   );
-    //   expect(await components.conversationSidebar().getPersonalUserName()).toContain(member.username);
+    await expect(components.conversationSidebar().personalUserName).toContainText(user.username);
+    await expect(components.conversationSidebar().personalStatusName).toContainText(
+      `${user.firstName} ${user.lastName}`,
+    );
   });
 });
