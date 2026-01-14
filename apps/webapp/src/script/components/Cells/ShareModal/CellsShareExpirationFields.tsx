@@ -18,6 +18,8 @@
  */
 
 import {useMemo, useState} from 'react';
+
+import {DateValue, getLocalTimeZone, today} from '@internationalized/date';
 import {I18nProvider} from '@react-aria/i18n';
 import {
   Button,
@@ -35,7 +37,7 @@ import {
   Heading,
   Popover,
 } from 'react-aria-components';
-import {DateValue, getLocalTimeZone, today} from '@internationalized/date';
+
 import {Label, Select, type Option} from '@wireapp/react-ui-kit';
 
 import {
@@ -154,8 +156,20 @@ export const CellsShareExpirationFields = ({labels, errorText}: CellsShareExpira
               <Button css={calendarButtonStyles} aria-label={labels.openCalendarLabel}>
                 <svg viewBox="0 0 16 16" fill="none" aria-hidden="true" focusable="false" css={calendarIconStyles}>
                   <g clipPath="url(#cells-share-calendar-clip)">
-                    <path d="M5.2 1V3.8" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                    <path d="M10.8 1V3.8" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                    <path
+                      d="M5.2 1V3.8"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                    <path
+                      d="M10.8 1V3.8"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
                     <path
                       d="M12.9 2.4004H3.1C2.3268 2.4004 1.7 3.0272 1.7 3.8004V13.6005C1.7 14.3737 2.3268 15.0005 3.1 15.0005H12.9C13.6733 15.0005 14.3001 14.3737 14.3001 13.6005V3.8004C14.3001 3.0272 13.6733 2.4004 12.9 2.4004Z"
                       stroke="currentColor"
@@ -163,7 +177,13 @@ export const CellsShareExpirationFields = ({labels, errorText}: CellsShareExpira
                       strokeLinecap="round"
                       strokeLinejoin="round"
                     />
-                    <path d="M1.7 6.5996H14.3" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                    <path
+                      d="M1.7 6.5996H14.3"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
                   </g>
                   <defs>
                     <clipPath id="cells-share-calendar-clip">

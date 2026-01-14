@@ -18,6 +18,7 @@
  */
 
 import {CSSObject} from '@emotion/react';
+
 import {BASE_DARK_COLOR, BASE_LIGHT_COLOR} from '@wireapp/react-ui-kit';
 
 export const expirationContentStyles: CSSObject = {
