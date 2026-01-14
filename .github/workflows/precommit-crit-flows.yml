@@ -30,7 +30,7 @@ jobs:
       UNIT_TEST_REPORT_FILE: ./unit-tests.log
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           fetch-depth: 0
           ref: ${{ github.event.pull_request.head.sha }}
@@ -55,7 +55,7 @@ jobs:
           echo "commit_url=$COMMIT_URL" >> "$GITHUB_OUTPUT"
           echo "committer=$AUTHOR" >> "$GITHUB_OUTPUT"
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v5
         with:
           name: build-artifact
           path: ${{ env.BUILD_DIR }}${{ env.BUILD_ARTIFACT }}
@@ -83,7 +83,7 @@ jobs:
       precommit_url: ${{ steps.fetch_url.outputs.url }}
 
     steps:
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v5
         with:
           name: build-artifact
 
@@ -179,7 +179,7 @@ jobs:
 
       - name: Upload blob report
         if: ${{ !cancelled() }}
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: blob-report-${{ matrix.shard }}
           path: apps/webapp/blob-report
@@ -218,7 +218,7 @@ jobs:
       - name: Upload test report
         id: upload_playwright_report
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: playwright-report
           path: apps/webapp/playwright-report/
