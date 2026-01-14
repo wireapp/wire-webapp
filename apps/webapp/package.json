@@ -17,8 +17,8 @@
     "lint:fix": "nx lint webapp --fix",
     "check:circular-dependencies": "dpdm --no-warning --no-tree -T ./src/script/auth/main.tsx ./src/script/main/app.ts",
     "translate:extract": "i18next-scanner 'src/{page,script}/**/*.{js,html,htm}'",
-    "translate:merge": "formatjs extract --format '../../bin/translations_extract_formatter.js' --out-file './src/i18n/en-US.json'",
-    "translate:generate-types": "node ../../bin/transalations_generate_types.js"
+    "translate:merge": "formatjs extract --format './bin/translations_extract_formatter.js' --out-file './src/i18n/en-US.json' 'src/**/*.{ts,tsx,js,jsx}' --ignore 'src/**/*.d.ts'",
+    "translate:generate-types": "node ./bin/transalations_generate_types.js"
   },
   "dependencies": {
     "@datadog/browser-logs": "5.35.1",
