@@ -508,6 +508,14 @@ declare module 'I18n/en-US.json' {
     'cells.shareModal.password.description': `Set a password to restrict access.`;
     'cells.shareModal.expiration': `Expiration`;
     'cells.shareModal.expiration.description': `Link expires on a selected day.`;
+    'cells.shareModal.expiration.expiresLabel': `Expires`;
+    'cells.shareModal.expiration.dateAriaLabel': `Select expiration date`;
+    'cells.shareModal.expiration.timeAriaLabel': `Select expiration time`;
+    'cells.shareModal.expiration.openCalendarLabel': `Open calendar`;
+    'cells.shareModal.expiration.previousMonthLabel': `Previous month`;
+    'cells.shareModal.expiration.nextMonthLabel': `Next month`;
+    'cells.shareModal.expiration.error.pastDate': `Date in the past`;
+    'cells.shareModal.expiration.error.pastDate': `Date in the past`;
     'cells.sidebar.heading': `Files`;
     'cells.sidebar.title': `All`;
     'cells.tableRow.actions': `More options`;

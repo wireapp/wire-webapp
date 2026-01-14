@@ -24,6 +24,7 @@ import {BASE_DARK_COLOR, BASE_LIGHT_COLOR, COLOR_V2, Input, Label, Switch} from 
 
 import {CellsTableLoader} from 'Components/Conversation/ConversationCells/common/CellsTableLoader/CellsTableLoader';
 import {CopyToClipboardButton} from 'Components/CopyToClipboardButton/CopyToClipboardButton';
+import {CellsShareExpirationFields} from 'Components/Cells/ShareModal/CellsShareExpirationFields';
 import {PasswordGeneratorButton} from 'Components/PasswordGeneratorButton';
 import {Config} from 'src/script/Config';
 import {t} from 'Util/LocalizerUtil';
@@ -68,6 +69,13 @@ interface CellsShareModalContentLabels {
   passwordDescription: string;
   expiration: string;
   expirationDescription: string;
+  expirationExpiresLabel: string;
+  expirationDateAriaLabel: string;
+  expirationTimeAriaLabel: string;
+  expirationOpenCalendarLabel: string;
+  expirationPreviousMonthLabel: string;
+  expirationNextMonthLabel: string;
+  expirationPastDateError: string;
   generatedPublicLink: string;
   copyLink: string;
   linkCopied: string;
@@ -125,6 +133,13 @@ const DEFAULT_LABELS: CellsShareModalContentLabels = {
   passwordDescription: t('cells.shareModal.password.description'),
   expiration: t('cells.shareModal.expiration'),
   expirationDescription: t('cells.shareModal.expiration.description'),
+  expirationExpiresLabel: t('cells.shareModal.expiration.expiresLabel'),
+  expirationDateAriaLabel: t('cells.shareModal.expiration.dateAriaLabel'),
+  expirationTimeAriaLabel: t('cells.shareModal.expiration.timeAriaLabel'),
+  expirationOpenCalendarLabel: t('cells.shareModal.expiration.openCalendarLabel'),
+  expirationPreviousMonthLabel: t('cells.shareModal.expiration.previousMonthLabel'),
+  expirationNextMonthLabel: t('cells.shareModal.expiration.nextMonthLabel'),
+  expirationPastDateError: t('cells.shareModal.expiration.error.pastDate'),
   generatedPublicLink: t('cells.shareModal.generatedPublicLink'),
   copyLink: t('cells.shareModal.copyLink'),
   linkCopied: t('cells.shareModal.linkCopied'),
@@ -253,7 +268,21 @@ export const CellsShareModalContent = ({
           />
         </div>
       </div>
-      {expiration.isEnabled && <div css={styles.toggleContentStyles} data-uie-name="cells-share-expiration-content" />}
+      {expiration.isEnabled && (
+        <div css={styles.toggleContentStyles} data-uie-name="cells-share-expiration-content">
+          <CellsShareExpirationFields
+            labels={{
+              expiresLabel: resolvedLabels.expirationExpiresLabel,
+              dateAriaLabel: resolvedLabels.expirationDateAriaLabel,
+              timeAriaLabel: resolvedLabels.expirationTimeAriaLabel,
+              openCalendarLabel: resolvedLabels.expirationOpenCalendarLabel,
+              previousMonthLabel: resolvedLabels.expirationPreviousMonthLabel,
+              nextMonthLabel: resolvedLabels.expirationNextMonthLabel,
+            }}
+            errorText={resolvedLabels.expirationPastDateError}
+          />
+        </div>
+      )}
       {shouldShowLink && (
         <div css={styles.inputWrapperStyles}>
           <label htmlFor="generated-public-link" className="visually-hidden">

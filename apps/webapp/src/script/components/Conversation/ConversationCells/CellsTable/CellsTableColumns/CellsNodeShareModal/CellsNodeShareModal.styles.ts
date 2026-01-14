@@ -40,12 +40,12 @@ export const publicLinkDescriptionStyles: CSSObject = {
 
 export const passwordDescriptionStyles: CSSObject = {
   fontSize: 'var(--font-size-small)',
-  color: COLOR_V2.GRAY_90,
+  color: 'var(--base-secondary-text)',
 };
 
 export const expirationDescriptionStyles: CSSObject = {
   fontSize: 'var(--font-size-small)',
-  color: COLOR_V2.GRAY_90,
+  color: 'var(--base-secondary-text)',
 };
 
 export const dividerStyles: CSSObject = {

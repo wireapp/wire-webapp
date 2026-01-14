@@ -36,6 +36,7 @@ export const useCellPublicLink = ({uuid, cellsRepository}: UseCellPublicLinkPara
   const node = nodes.find(n => n.id === uuid);
   const [isEnabled, setIsEnabled] = useState(!!node?.publicLink?.alreadyShared || false);
   const [status, setStatus] = useState<PublicLinkStatus>(node?.publicLink ? 'success' : 'idle');
+  const publicLinkUrl = node?.publicLink?.url;
 
   const createPublicLink = useCallback(async () => {
     try {
@@ -124,6 +125,12 @@ export const useCellPublicLink = ({uuid, cellsRepository}: UseCellPublicLinkPara
       void createPublicLink();
     }
   }, [isEnabled, node?.publicLink, createPublicLink, deletePublicLink, getPublicLink]);
+
+  useEffect(() => {
+    if (publicLinkUrl) {
+      setStatus('success');
+    }
+  }, [publicLinkUrl]);
 
   return {
     status,
