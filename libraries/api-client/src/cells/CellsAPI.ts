@@ -17,6 +17,7 @@
  *
  */
 
+import {AxiosRequestHeaders} from 'axios';
 import {
   NodeServiceApi,
   RestLookupRequest,
@@ -44,7 +45,6 @@ import {S3Service} from './CellsStorage/S3Service';
 
 import {AccessTokenStore} from '../auth';
 import {HttpClient} from '../http';
-import {AxiosRequestHeaders} from 'axios';
 
 export type SortDirection = 'asc' | 'desc';
 
