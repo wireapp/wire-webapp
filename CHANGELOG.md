@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [9.73.1](https://github.com/wireapp/wire-web-packages/compare/@wireapp/react-ui-kit@9.73.0...@wireapp/react-ui-kit@9.73.1) (2026-01-15)
+
+### Bug Fixes
+
+* **react-ui-kit:** use id to link label to input [WPB-22420] ([#7793](https://github.com/wireapp/wire-web-packages/issues/7793)) ([05affa7](https://github.com/wireapp/wire-web-packages/commit/05affa7a81eaee889cca2bee96dfcdbf30a2dbcd))
+
 # [9.73.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/react-ui-kit@9.72.1...@wireapp/react-ui-kit@9.73.0) (2026-01-09)
 
 ### Features
