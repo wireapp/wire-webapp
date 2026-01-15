@@ -94,7 +94,7 @@ export class PageManager {
   openNewTab = async <T>(url?: string, handler?: (tab: PageManager) => Promise<T>): Promise<T> => {
     const newPage = await this.page.context().newPage();
     if (url) {
-      await newPage.goto(url);
+      await newPage.goto(url, {waitUntil: 'networkidle'});
     }
     const tabManager = new PageManager(newPage);
     try {
