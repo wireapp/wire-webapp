@@ -63,11 +63,11 @@ jest.mock('axios');
 jest.mock('@formkit/auto-animate/react');
 jest.mock('react-pdf');
 jest.mock('@wireapp/react-ui-kit');
-jest.mock('@wireapp/api-client/src/team/feature/FeatureAPI');
+jest.mock('@wireapp/api-client/lib/team/feature/FeatureAPI');
 jest.mock('@wireapp/core');
 jest.mock('@wireapp/core-crypto');
 
 // Important: the team module re-exports FeatureAPI. Requiring both modules here
 // ensures Node's module cache captures the mocked constructors instead of the real ones.
-require('@wireapp/api-client/src/team/feature/FeatureAPI');
-require('@wireapp/api-client/src/team');
+require('@wireapp/api-client/lib/team/feature/FeatureAPI');
+require('@wireapp/api-client/lib/team');
