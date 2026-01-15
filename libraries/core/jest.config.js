@@ -36,7 +36,4 @@ module.exports = {
   coverageDirectory: '../../coverage/libraries/core',
   testMatch: ['<rootDir>/src/**/__tests__/**/*.[jt]s?(x)', '<rootDir>/src/**/?(*.)+(spec|test).[jt]s?(x)'],
   moduleFileExtensions: ['js', 'json', 'ts', 'tsx'],
-  moduleNameMapper: {
-    '^@wireapp/api-client/lib/(.*)$': '<rootDir>/../api-client/src/$1',
-  },
 };
