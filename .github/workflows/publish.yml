@@ -2,7 +2,7 @@ name: Publish
 
 on:
   push:
-    branches: [master, dev, release/*, new-navigation]
+    branches: [master, dev, release/*]
     tags:
       - '*q1-2024*'
       - '*q2-2025*'
