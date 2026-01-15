@@ -68,6 +68,7 @@
     },
     "type-check": {
       "executor": "nx:run-commands",
+      "dependsOn": ["^build"],
       "options": {
         "command": "tsc --project {projectRoot}/tsconfig.build.json --noEmit"
       }
