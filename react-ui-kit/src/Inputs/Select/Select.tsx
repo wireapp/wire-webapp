@@ -118,7 +118,6 @@ export const Select = <IsMulti extends boolean = false, Group extends GroupBase<
       )}
 
       <ReactSelect
-        id={id}
         styles={
           customStyles({
             theme: theme as Theme,
@@ -142,6 +141,7 @@ export const Select = <IsMulti extends boolean = false, Group extends GroupBase<
           ...(hideControl && {Control: () => null}),
           ...(menuListHeading && {MenuList: SelectMenuList(menuListHeading, dataUieName)}),
         }}
+        inputId={id}
         tabIndex={TabIndex.UNFOCUSABLE}
         isDisabled={disabled}
         hideSelectedOptions={false}
