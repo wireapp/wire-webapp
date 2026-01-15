@@ -22,6 +22,7 @@ import {User} from 'test/e2e_tests/data/user';
 import {Services} from '../../data/serviceInfo';
 import {PageManager} from '../../pageManager';
 import {test, expect, withLogin} from '../../test.fixtures';
+import {createGroup} from 'test/e2e_tests/utils/userActions';
 
 // Generating test data
 const conversationName = 'Crits';
@@ -55,10 +56,7 @@ test(
 
     await test.step('Team owner creates group conversation with team members', async () => {
       const {pages} = ownerPageManager.webapp;
-      await pages.conversationList().clickCreateGroup();
-      await pages.groupCreation().setGroupName(conversationName);
-      await pages.startUI().selectUsers([member1.username, member2.username]);
-      await pages.groupCreation().clickCreateGroupButton();
+      await createGroup(pages, conversationName, [member1, member2]);
       expect(await pages.conversationList().isConversationItemVisible(conversationName)).toBeTruthy();
     });
 

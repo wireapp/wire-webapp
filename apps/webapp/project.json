@@ -88,7 +88,7 @@
     "translate-merge": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "formatjs extract --format './bin/translations_extract_formatter.js' --out-file './src/i18n/en-US.json'",
+        "command": "formatjs extract --format './bin/translations_extract_formatter.js' --out-file './src/i18n/en-US.json' 'src/**/*.{ts,tsx,js,jsx}' --ignore 'src/**/*.d.ts' --additional-function-names t",
         "cwd": "{projectRoot}"
       }
     },

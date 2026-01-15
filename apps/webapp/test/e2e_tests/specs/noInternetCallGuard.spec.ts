@@ -77,7 +77,7 @@ test('Starting call 1:1 call without internet', async ({browser, pageManager: ow
   await test.step('User A connects with User B', async () => {
     await ownerAComponents.conversationSidebar().clickConnectButton();
     await ownerAPages.startUI().searchInput.fill(ownerB.username);
-    await ownerAPages.startUI().selectUser(ownerB.username);
+    await ownerAPages.startUI().selectUsers(ownerB.username);
     await ownerAModals.userProfile().clickConnectButton();
 
     expect(await ownerAPages.conversationList().isConversationItemVisible(ownerB.fullName));
