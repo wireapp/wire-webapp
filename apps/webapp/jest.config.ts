@@ -41,6 +41,7 @@ const config: Config = {
     'Util/(.*)': '<rootDir>/src/script/util/$1',
     '^react(.*)$': '<rootDir>/../../node_modules/react$1',
     '.*\\.glsl': 'jest-transform-stub',
+    '^@wireapp/api-client/lib/(.*)$': '<rootDir>/../../libraries/api-client/src/$1',
   },
   reporters: ['default'],
   setupFilesAfterEnv: ['<rootDir>/setupTests.js'],
