@@ -68,9 +68,6 @@ jobs:
       - name: Install JS dependencies
         run: yarn --immutable
 
-      - name: Build libraries
-        run: yarn nx run-many -t build --projects=tag:type:lib
-
       - name: Update configuration
         run: yarn nx run webapp:configure
 
