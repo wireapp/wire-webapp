@@ -14,45 +14,14 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  pr_docker_image:
-    name: Build and push PR Docker image
-    needs: test
+  test_and_build:
     runs-on: buildjet-8vcpu-ubuntu-2204
-    if: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository }}
 
     steps:
       - name: Checkout
         uses: actions/checkout@v6
         with:
           fetch-depth: 0
-          ref: ${{ github.event.pull_request.head.sha }}
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v6
-        with:
-          node-version-file: '.nvmrc'
-          cache: 'yarn'
-
-      - name: Install JS dependencies
-        run: yarn --immutable
-
-      - name: Build and package
-        run: yarn nx run server:package
-
-      - name: Push PR Docker image
-        env:
-          DOCKER_PASSWORD: ${{ secrets.WEBTEAM_QUAY_PASSWORD }}
-          DOCKER_USERNAME: ${{ secrets.WEBTEAM_QUAY_USERNAME }}
-          PR_TAG: pr-${{ github.event.pull_request.number }}
-          GITHUB_SHA: ${{ github.event.pull_request.head.sha }}
-        run: yarn docker "$PR_TAG"
-
-  test:
-    runs-on: buildjet-8vcpu-ubuntu-2204
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v6
 
       - name: Setup Node.js
         uses: actions/setup-node@v6
@@ -95,3 +64,24 @@ jobs:
           files: ./coverage/libraries/core/lcov.info
           flags: lib_core
           token: ${{ secrets.CODECOV_TOKEN }}
+
+      - name: Upload api-client library coverage to Codecov
+        uses: codecov/codecov-action@v5.5.2
+        with:
+          fail_ci_if_error: false
+          files: ./coverage/libraries/api-client/lcov.info
+          flags: lib_api_client
+          token: ${{ secrets.CODECOV_TOKEN }}
+
+      - name: Build and package
+        if: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository }}
+        run: yarn nx run server:package
+
+      - name: Push PR Docker image
+        if: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository }}
+        env:
+          DOCKER_PASSWORD: ${{ secrets.WEBTEAM_QUAY_PASSWORD }}
+          DOCKER_USERNAME: ${{ secrets.WEBTEAM_QUAY_USERNAME }}
+          PR_TAG: pr-${{ github.event.pull_request.number }}
+          GITHUB_SHA: ${{ github.event.pull_request.head.sha }}
+        run: yarn docker "$PR_TAG" "" "" --pr
