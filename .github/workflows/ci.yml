@@ -82,4 +82,5 @@ jobs:
           DOCKER_USERNAME: ${{ secrets.WEBTEAM_QUAY_USERNAME }}
           PR_TAG: pr-${{ github.event.pull_request.number }}
           GITHUB_SHA: ${{ github.event.pull_request.head.sha }}
+        # The second and third positional parameters are uniqueTagOut and commitSha; they are intentionally left empty here.
         run: yarn docker "$PR_TAG" "" "" --pr
