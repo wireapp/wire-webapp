@@ -17,7 +17,6 @@
  *
  */
 
-import {AxiosRequestHeaders} from 'axios';
 import {
   NodeServiceApi,
   RestLookupRequest,
@@ -29,6 +28,7 @@ import {
   RestPromoteVersionResponse,
   RestPublicLinkDeleteSuccess,
   RestShareLink,
+  RestShareLinkAccessType,
   RestIncomingNode,
   RestNodeLocator,
   RestActionOptionsCopyMove,
@@ -134,7 +134,7 @@ export class CellsAPI {
     http.client.interceptors.request.use(config => {
       const accessToken = this.accessTokenStore.getAccessToken();
       if (accessToken) {
-        config.headers = config.headers || ({} as AxiosRequestHeaders);
+        config.headers = config.headers || {};
         config.headers.Authorization = `Bearer ${accessToken}`;
       }
       return config;
@@ -505,17 +505,60 @@ export class CellsAPI {
     return result.data;
   }
 
-  async createNodePublicLink({uuid, label}: {uuid: string; label?: string}): Promise<RestShareLink> {
+  /**
+   * Creates a public link for sharing a node (file or folder).
+   *
+   * @param uuid - The UUID of the node to share
+   * @param label - Optional label for the link
+   * @param createPassword - Initial password to protect the link
+   * @param passwordEnabled - Whether password protection is enabled (required if createPassword is provided)
+   * @param accessEnd - Unix timestamp as string (e.g., '1765839600') for link expiration
+   * @returns The created share link with its URL and metadata
+   */
+  async createNodePublicLink({
+    uuid,
+    label,
+    createPassword,
+    passwordEnabled,
+    accessEnd,
+  }: {
+    uuid: string;
+    label?: string;
+    createPassword?: string;
+    passwordEnabled?: boolean;
+    accessEnd?: string;
+  }): Promise<RestShareLink> {
     if (!this.client || !this.storageService) {
       throw new Error(CONFIGURATION_ERROR);
     }
 
-    const result = await this.client.createPublicLink(uuid, {
+    const requestBody: {
+      Link: {
+        Label?: string;
+        Permissions: RestShareLinkAccessType[];
+        PasswordRequired?: boolean;
+        AccessEnd?: string;
+      };
+      CreatePassword?: string;
+      PasswordEnabled?: boolean;
+    } = {
       Link: {
         Label: label,
         Permissions: ['Preview', 'Download'],
       },
-    });
+    };
+
+    if (createPassword && passwordEnabled) {
+      requestBody.Link.PasswordRequired = true;
+      requestBody.CreatePassword = createPassword;
+      requestBody.PasswordEnabled = passwordEnabled;
+    }
+
+    if (accessEnd) {
+      requestBody.Link.AccessEnd = accessEnd;
+    }
+
+    const result = await this.client.createPublicLink(uuid, requestBody);
 
     return result.data;
   }
@@ -526,6 +569,75 @@ export class CellsAPI {
     }
 
     const result = await this.client.getPublicLink(uuid);
+
+    return result.data;
+  }
+
+  /**
+   * Updates an existing public link's settings.
+   *
+   * @param linkUuid - The UUID of the link to update
+   * @param label - New label for the link
+   * @param createPassword - Set initial password (use when setting password for first time)
+   * @param updatePassword - Update existing password (use when changing an existing password)
+   * @param passwordEnabled - Enable or disable password protection
+   * @param accessEnd - Unix timestamp as string (e.g., '1765839600') for expiration, or null to remove expiration
+   * @returns The updated share link with new settings
+   */
+  async updateNodePublicLink({
+    linkUuid,
+    label,
+    createPassword,
+    updatePassword,
+    passwordEnabled,
+    accessEnd,
+  }: {
+    linkUuid: string;
+    label?: string;
+    createPassword?: string;
+    updatePassword?: string;
+    passwordEnabled?: boolean;
+    accessEnd?: string | null;
+  }): Promise<RestShareLink> {
+    if (!this.client || !this.storageService) {
+      throw new Error(CONFIGURATION_ERROR);
+    }
+
+    const requestBody: {
+      Link: {
+        Label?: string;
+        PasswordRequired?: boolean;
+        AccessEnd?: string;
+      };
+      CreatePassword?: string;
+      UpdatePassword?: string;
+      PasswordEnabled?: boolean;
+    } = {
+      Link: {},
+    };
+
+    if (label !== undefined) {
+      requestBody.Link.Label = label;
+    }
+
+    if (passwordEnabled !== undefined) {
+      requestBody.PasswordEnabled = passwordEnabled;
+      requestBody.Link.PasswordRequired = passwordEnabled;
+    }
+
+    if (createPassword) {
+      requestBody.CreatePassword = createPassword;
+    }
+
+    if (updatePassword) {
+      requestBody.UpdatePassword = updatePassword;
+    }
+
+    if (accessEnd !== undefined && accessEnd !== null) {
+      requestBody.Link.AccessEnd = accessEnd;
+    }
+
+    const result = await this.client.updatePublicLink(linkUuid, requestBody);
 
     return result.data;
   }

@@ -76,6 +76,7 @@ describe('CellsAPI', () => {
       createPublicLink: jest.fn(),
       nodeVersions: jest.fn(),
       getPublicLink: jest.fn(),
+      updatePublicLink: jest.fn(),
       listNamespaceValues: jest.fn(),
       patchNode: jest.fn(),
     } as unknown as jest.Mocked<NodeServiceApi>;
@@ -1205,6 +1206,322 @@ describe('CellsAPI', () => {
       mockNodeServiceApi.createPublicLink.mockRejectedValueOnce(new Error(errorMessage));
 
       await expect(cellsAPI.createNodePublicLink({uuid: emptyUuid, label})).rejects.toThrow(errorMessage);
+    });
+
+    it('creates a password-protected public link', async () => {
+      const uuid = 'file-uuid';
+      const label = 'Protected File';
+      const password = 'secret123';
+      const mockResponse = {
+        Link: {
+          Uuid: uuid,
+          Label: label,
+          LinkHash: 'hash123',
+          LinkUrl: 'https://example.com/link',
+          Permissions: ['Preview', 'Download'],
+          PasswordRequired: true,
+        },
+      } as RestShareLink;
+
+      mockNodeServiceApi.createPublicLink.mockResolvedValueOnce(createMockResponse(mockResponse));
+
+      const result = await cellsAPI.createNodePublicLink({
+        uuid,
+        label,
+        createPassword: password,
+        passwordEnabled: true,
+      });
+
+      expect(mockNodeServiceApi.createPublicLink).toHaveBeenCalledWith(uuid, {
+        Link: {
+          Label: label,
+          Permissions: ['Preview', 'Download'],
+          PasswordRequired: true,
+        },
+        CreatePassword: password,
+        PasswordEnabled: true,
+      });
+      expect(result).toEqual(mockResponse);
+    });
+
+    it('creates a public link with expiration time', async () => {
+      const uuid = 'file-uuid';
+      const label = 'Temporary File';
+      const accessEnd = '1765839600';
+      const mockResponse = {
+        Link: {
+          Uuid: uuid,
+          Label: label,
+          LinkHash: 'hash123',
+          LinkUrl: 'https://example.com/link',
+          Permissions: ['Preview', 'Download'],
+          AccessEnd: accessEnd,
+        },
+      } as RestShareLink;
+
+      mockNodeServiceApi.createPublicLink.mockResolvedValueOnce(createMockResponse(mockResponse));
+
+      const result = await cellsAPI.createNodePublicLink({uuid, label, accessEnd});
+
+      expect(mockNodeServiceApi.createPublicLink).toHaveBeenCalledWith(uuid, {
+        Link: {
+          Label: label,
+          Permissions: ['Preview', 'Download'],
+          AccessEnd: accessEnd,
+        },
+      });
+      expect(result).toEqual(mockResponse);
+    });
+
+    it('creates a password-protected link with expiration', async () => {
+      const uuid = 'file-uuid';
+      const label = 'Secure Temporary File';
+      const password = 'secret123';
+      const accessEnd = '1765839600';
+      const mockResponse = {
+        Link: {
+          Uuid: uuid,
+          Label: label,
+          LinkHash: 'hash123',
+          LinkUrl: 'https://example.com/link',
+          Permissions: ['Preview', 'Download'],
+          PasswordRequired: true,
+          AccessEnd: accessEnd,
+        },
+      } as RestShareLink;
+
+      mockNodeServiceApi.createPublicLink.mockResolvedValueOnce(createMockResponse(mockResponse));
+
+      const result = await cellsAPI.createNodePublicLink({
+        uuid,
+        label,
+        createPassword: password,
+        passwordEnabled: true,
+        accessEnd,
+      });
+
+      expect(mockNodeServiceApi.createPublicLink).toHaveBeenCalledWith(uuid, {
+        Link: {
+          Label: label,
+          Permissions: ['Preview', 'Download'],
+          PasswordRequired: true,
+          AccessEnd: accessEnd,
+        },
+        CreatePassword: password,
+        PasswordEnabled: true,
+      });
+      expect(result).toEqual(mockResponse);
+    });
+  });
+
+  describe('updateNodePublicLink', () => {
+    it('updates a public link label', async () => {
+      const linkUuid = 'link-uuid';
+      const newLabel = 'Updated Label';
+      const mockResponse = {
+        Link: {
+          Uuid: linkUuid,
+          Label: newLabel,
+          LinkHash: 'hash123',
+          LinkUrl: 'https://example.com/link',
+          Permissions: ['Preview', 'Download'],
+        },
+      } as RestShareLink;
+
+      mockNodeServiceApi.updatePublicLink.mockResolvedValueOnce(createMockResponse(mockResponse));
+
+      const result = await cellsAPI.updateNodePublicLink({linkUuid, label: newLabel});
+
+      expect(mockNodeServiceApi.updatePublicLink).toHaveBeenCalledWith(linkUuid, {
+        Link: {
+          Label: newLabel,
+        },
+      });
+      expect(result).toEqual(mockResponse);
+    });
+
+    it('sets initial password on existing link', async () => {
+      const linkUuid = 'link-uuid';
+      const password = 'newPassword123';
+      const mockResponse = {
+        Link: {
+          Uuid: linkUuid,
+          LinkHash: 'hash123',
+          LinkUrl: 'https://example.com/link',
+          Permissions: ['Preview', 'Download'],
+          PasswordRequired: true,
+        },
+      } as RestShareLink;
+
+      mockNodeServiceApi.updatePublicLink.mockResolvedValueOnce(createMockResponse(mockResponse));
+
+      const result = await cellsAPI.updateNodePublicLink({
+        linkUuid,
+        createPassword: password,
+        passwordEnabled: true,
+      });
+
+      expect(mockNodeServiceApi.updatePublicLink).toHaveBeenCalledWith(linkUuid, {
+        Link: {
+          PasswordRequired: true,
+        },
+        CreatePassword: password,
+        PasswordEnabled: true,
+      });
+      expect(result).toEqual(mockResponse);
+    });
+
+    it('updates existing password', async () => {
+      const linkUuid = 'link-uuid';
+      const newPassword = 'updatedPassword456';
+      const mockResponse = {
+        Link: {
+          Uuid: linkUuid,
+          LinkHash: 'hash123',
+          LinkUrl: 'https://example.com/link',
+          Permissions: ['Preview', 'Download'],
+          PasswordRequired: true,
+        },
+      } as RestShareLink;
+
+      mockNodeServiceApi.updatePublicLink.mockResolvedValueOnce(createMockResponse(mockResponse));
+
+      const result = await cellsAPI.updateNodePublicLink({
+        linkUuid,
+        updatePassword: newPassword,
+        passwordEnabled: true,
+      });
+
+      expect(mockNodeServiceApi.updatePublicLink).toHaveBeenCalledWith(linkUuid, {
+        Link: {
+          PasswordRequired: true,
+        },
+        UpdatePassword: newPassword,
+        PasswordEnabled: true,
+      });
+      expect(result).toEqual(mockResponse);
+    });
+
+    it('removes password protection from link', async () => {
+      const linkUuid = 'link-uuid';
+      const mockResponse = {
+        Link: {
+          Uuid: linkUuid,
+          LinkHash: 'hash123',
+          LinkUrl: 'https://example.com/link',
+          Permissions: ['Preview', 'Download'],
+          PasswordRequired: false,
+        },
+      } as RestShareLink;
+
+      mockNodeServiceApi.updatePublicLink.mockResolvedValueOnce(createMockResponse(mockResponse));
+
+      const result = await cellsAPI.updateNodePublicLink({
+        linkUuid,
+        passwordEnabled: false,
+      });
+
+      expect(mockNodeServiceApi.updatePublicLink).toHaveBeenCalledWith(linkUuid, {
+        Link: {
+          PasswordRequired: false,
+        },
+        PasswordEnabled: false,
+      });
+      expect(result).toEqual(mockResponse);
+    });
+
+    it('sets expiration time on link', async () => {
+      const linkUuid = 'link-uuid';
+      const accessEnd = '1765839600';
+      const mockResponse = {
+        Link: {
+          Uuid: linkUuid,
+          LinkHash: 'hash123',
+          LinkUrl: 'https://example.com/link',
+          Permissions: ['Preview', 'Download'],
+          AccessEnd: accessEnd,
+        },
+      } as RestShareLink;
+
+      mockNodeServiceApi.updatePublicLink.mockResolvedValueOnce(createMockResponse(mockResponse));
+
+      const result = await cellsAPI.updateNodePublicLink({linkUuid, accessEnd});
+
+      expect(mockNodeServiceApi.updatePublicLink).toHaveBeenCalledWith(linkUuid, {
+        Link: {
+          AccessEnd: accessEnd,
+        },
+      });
+      expect(result).toEqual(mockResponse);
+    });
+
+    it('removes expiration time from link', async () => {
+      const linkUuid = 'link-uuid';
+      const mockResponse = {
+        Link: {
+          Uuid: linkUuid,
+          LinkHash: 'hash123',
+          LinkUrl: 'https://example.com/link',
+          Permissions: ['Preview', 'Download'],
+        },
+      } as RestShareLink;
+
+      mockNodeServiceApi.updatePublicLink.mockResolvedValueOnce(createMockResponse(mockResponse));
+
+      const result = await cellsAPI.updateNodePublicLink({linkUuid, accessEnd: null});
+
+      expect(mockNodeServiceApi.updatePublicLink).toHaveBeenCalledWith(linkUuid, {
+        Link: {},
+      });
+      expect(result).toEqual(mockResponse);
+    });
+
+    it('updates multiple properties at once', async () => {
+      const linkUuid = 'link-uuid';
+      const newLabel = 'Updated Secure File';
+      const newPassword = 'newPassword789';
+      const accessEnd = '1765839600';
+      const mockResponse = {
+        Link: {
+          Uuid: linkUuid,
+          Label: newLabel,
+          LinkHash: 'hash123',
+          LinkUrl: 'https://example.com/link',
+          Permissions: ['Preview', 'Download'],
+          PasswordRequired: true,
+          AccessEnd: accessEnd,
+        },
+      } as RestShareLink;
+
+      mockNodeServiceApi.updatePublicLink.mockResolvedValueOnce(createMockResponse(mockResponse));
+
+      const result = await cellsAPI.updateNodePublicLink({
+        linkUuid,
+        label: newLabel,
+        updatePassword: newPassword,
+        passwordEnabled: true,
+        accessEnd,
+      });
+
+      expect(mockNodeServiceApi.updatePublicLink).toHaveBeenCalledWith(linkUuid, {
+        Link: {
+          Label: newLabel,
+          PasswordRequired: true,
+          AccessEnd: accessEnd,
+        },
+        UpdatePassword: newPassword,
+        PasswordEnabled: true,
+      });
+      expect(result).toEqual(mockResponse);
+    });
+
+    it('propagates errors when update fails', async () => {
+      const linkUuid = 'link-uuid';
+      const errorMessage = 'Update failed';
+
+      mockNodeServiceApi.updatePublicLink.mockRejectedValueOnce(new Error(errorMessage));
+
+      await expect(cellsAPI.updateNodePublicLink({linkUuid, label: 'New Label'})).rejects.toThrow(errorMessage);
     });
   });
 
