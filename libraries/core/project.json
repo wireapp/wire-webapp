@@ -107,5 +107,5 @@
       }
     }
   },
-  "tags": ["type:lib", "scope:core", "npm:public"]
+  "tags": ["type:lib", "scope:core"]
 }
