@@ -227,7 +227,6 @@ exports[`"Select" renders 1`] = `
   >
     <div
       className="emotion-2"
-      id="test"
       onKeyDown={[Function]}
     >
       <div
@@ -268,7 +267,7 @@ exports[`"Select" renders 1`] = `
               aria-readonly={true}
               className="emotion-8"
               disabled={false}
-              id="react-select-2-input"
+              id="test"
               inputMode="none"
               onBlur={[Function]}
               onChange={[Function]}
@@ -529,7 +528,6 @@ exports[`"Select" renders as disabled 1`] = `
   >
     <div
       className="emotion-2"
-      id="test"
       onKeyDown={[Function]}
     >
       <div
@@ -571,7 +569,7 @@ exports[`"Select" renders as disabled 1`] = `
               aria-readonly={true}
               className="emotion-8"
               disabled={true}
-              id="react-select-3-input"
+              id="test"
               inputMode="none"
               onBlur={[Function]}
               onChange={[Function]}
@@ -833,7 +831,6 @@ exports[`"Select" renders as invalid 1`] = `
   >
     <div
       className="emotion-2"
-      id="test"
       onKeyDown={[Function]}
     >
       <div
@@ -874,7 +871,7 @@ exports[`"Select" renders as invalid 1`] = `
               aria-readonly={true}
               className="emotion-8"
               disabled={false}
-              id="react-select-4-input"
+              id="test"
               inputMode="none"
               onBlur={[Function]}
               onChange={[Function]}
