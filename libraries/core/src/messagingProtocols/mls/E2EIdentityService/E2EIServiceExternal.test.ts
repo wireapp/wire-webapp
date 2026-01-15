@@ -17,7 +17,6 @@
  *
  */
 
-import {TimeInMillis} from '@wireapp/commons/lib/util/TimeUtil';
 import axios from 'axios';
 
 import {ClientId, CoreCrypto, CoreCryptoContext, CredentialType, WireIdentity} from '@wireapp/core-crypto';
@@ -244,9 +243,7 @@ describe('E2EIServiceExternal', () => {
       jest.useRealTimers();
     });
 
-    it('registers the server certificates and shedules a timer to refresh intermediate certs every', async () => {
-      jest.useFakeTimers();
-
+    it('registers the server certificates on initialization', async () => {
       const [service, {transactionContext}] = await buildE2EIService('mockedDB1');
       jest.spyOn(transactionContext, 'e2eiIsPKIEnvSetup').mockResolvedValueOnce(false);
       await service.initialize('https://some.crl.discovery.url');
@@ -255,21 +252,16 @@ describe('E2EIServiceExternal', () => {
       expect(transactionContext.e2eiRegisterIntermediateCA).toHaveBeenCalledWith(federatedCerts[0]);
       expect(transactionContext.e2eiRegisterIntermediateCA).toHaveBeenCalledWith(federatedCerts[1]);
       expect(transactionContext.e2eiRegisterIntermediateCA).toHaveBeenCalledTimes(2);
-
-      await jest.advanceTimersByTimeAsync(TimeInMillis.DAY);
-      await jest.runAllTimersAsync();
-
-      expect(transactionContext.e2eiRegisterIntermediateCA).toHaveBeenCalledTimes(4);
     });
 
     it('does not register the root cert if it was already registered', async () => {
-      jest.useFakeTimers();
-
       const [service, {transactionContext}] = await buildE2EIService('mockedDB2');
 
       jest.spyOn(transactionContext, 'e2eiIsPKIEnvSetup').mockResolvedValueOnce(true);
 
       await service.initialize('https://some.crl.discovery.url');
+
+      jest.useFakeTimers();
 
       expect(transactionContext.e2eiRegisterAcmeCA).not.toHaveBeenCalled();
       expect(transactionContext.e2eiRegisterIntermediateCA).toHaveBeenCalledTimes(2);

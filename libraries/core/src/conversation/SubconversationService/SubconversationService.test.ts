@@ -150,7 +150,6 @@ describe('SubconversationService', () => {
     });
 
     it('deletes conference subconversation from backend if group is already established and epoch is older than one day, then rejoins', async () => {
-      jest.useFakeTimers();
       const [subconversationService, {apiClient, mlsService}] = await buildSubconversationService();
 
       const parentConversationId = {id: 'parentConversationId', domain: 'domain'};
@@ -158,6 +157,7 @@ describe('SubconversationService', () => {
       const subconversationGroupId = 'subconversationGroupId';
       const initialSubconversationEpoch = 1;
 
+      jest.useFakeTimers();
       const currentTimeISO = '2023-10-24T12:00:00.000Z';
       jest.setSystemTime(new Date(currentTimeISO));
 
@@ -188,7 +188,10 @@ describe('SubconversationService', () => {
 
       jest.spyOn(apiClient.api.conversation, 'getSubconversation').mockResolvedValueOnce(subconversationResponse2);
 
-      await subconversationService.joinConferenceSubconversation(parentConversationId, parentGroupId);
+      await Promise.all([
+        subconversationService.joinConferenceSubconversation(parentConversationId, parentGroupId),
+        jest.runAllTimersAsync(),
+      ]);
 
       expect(apiClient.api.conversation.deleteSubconversation).toHaveBeenCalledWith(
         parentConversationId,
@@ -204,7 +207,6 @@ describe('SubconversationService', () => {
     });
 
     it('joins conference subconversation with external commit if group is already established and epoch is younger than one day', async () => {
-      jest.useFakeTimers();
       const [subconversationService, {apiClient, mlsService}] = await buildSubconversationService();
 
       const parentConversationId = {id: 'parentConversationId', domain: 'domain'};
@@ -212,6 +214,7 @@ describe('SubconversationService', () => {
       const parentGroupId = 'parentGroupId';
       const subconversationEpoch = 1;
 
+      jest.useFakeTimers();
       const currentTimeISO = '2023-10-24T12:00:00.000Z';
       jest.setSystemTime(new Date(currentTimeISO));
 
@@ -230,7 +233,10 @@ describe('SubconversationService', () => {
 
       jest.spyOn(apiClient.api.conversation, 'getSubconversation').mockResolvedValueOnce(subconversationResponse);
 
-      await subconversationService.joinConferenceSubconversation(parentConversationId, parentGroupId);
+      await Promise.all([
+        subconversationService.joinConferenceSubconversation(parentConversationId, parentGroupId),
+        jest.runAllTimersAsync(),
+      ]);
 
       expect(apiClient.api.conversation.deleteSubconversation).not.toHaveBeenCalled();
       expect(mlsService.registerConversation).not.toHaveBeenCalled();
