@@ -1,0 +1,71 @@
+{
+  "name": "@wireapp/api-client",
+  "license": "GPL-3.0",
+  "description": "Wire API Client to send and receive data.",
+  "repository": "https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client",
+  "files": [
+    "lib"
+  ],
+  "main": "lib/APIClient",
+  "types": "lib/APIClient.d.ts",
+  "browser": {
+    "./lib/shims/node/buffer": "./lib/shims/browser/buffer.js",
+    "./lib/shims/node/cookie": "./lib/shims/browser/cookie.js",
+    "./lib/shims/node/websocket": "./lib/shims/browser/websocket.js"
+  },
+  "dependencies": {
+    "@aws-sdk/client-s3": "3.966.0",
+    "@aws-sdk/lib-storage": "3.966.0",
+    "@wireapp/commons": "5.4.11",
+    "@wireapp/priority-queue": "2.1.17",
+    "@wireapp/protocol-messaging": "1.56.0",
+    "axios": "1.13.2",
+    "axios-retry": "4.5.0",
+    "cells-sdk-ts": "0.1.1-alpha18",
+    "http-status-codes": "2.3.0",
+    "logdown": "3.3.1",
+    "pako": "2.1.0",
+    "reconnecting-websocket": "4.4.0",
+    "spark-md5": "3.0.2",
+    "tough-cookie": "4.1.4",
+    "uuid": "11.1.0",
+    "ws": "8.18.1",
+    "zod": "3.24.2"
+  },
+  "devDependencies": {
+    "@swc/core": "^1.3.10",
+    "@swc/jest": "^0.2.23",
+    "@types/axios": "^0.14.0",
+    "@types/jest": "^29.2.0",
+    "@types/node": "^22.0.0",
+    "@types/pako": "2",
+    "@types/spark-md5": "3.0.5",
+    "@types/tough-cookie": "4.0.5",
+    "@types/ws": "8.5.14",
+    "@wireapp/store-engine": "5.1.17",
+    "@wireapp/store-engine-fs": "3.1.20",
+    "browser-sync": "3.0.4",
+    "concurrently": "9.2.1",
+    "cross-env": "10.1.0",
+    "dotenv": "17.2.3",
+    "jest": "^29.2.1",
+    "nock": "14.0.10",
+    "react": "18.3.1",
+    "react-dom": "18.3.1",
+    "rimraf": "6.1.2",
+    "ts-node": "^10.9.1",
+    "webpack": "^5.74.0",
+    "ws": "8.18.1"
+  },
+  "scripts": {
+    "build": "nx run api-client-lib:build",
+    "clean": "nx run api-client-lib:clean",
+    "dist": "nx run api-client-lib:dist",
+    "test": "nx run api-client-lib:test",
+    "test:coverage": "nx run api-client-lib:test:coverage",
+    "watch": "nx run api-client-lib:watch",
+    "prepare": "yarn dist"
+  },
+  "version": "27.95.4",
+  "gitHead": "5339f01fe01ef0871da8c8bc8662fbe9e604754a"
+}
