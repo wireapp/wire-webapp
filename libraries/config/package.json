@@ -15,5 +15,9 @@
   "files": [
     "lib",
     "src"
-  ]
+  ],
+  "dependencies": {
+    "fs-extra": "11.2.0",
+    "logdown": "3.3.1"
+  }
 }
