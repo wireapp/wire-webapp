@@ -32,23 +32,7 @@ export class OutgoingConnectionPage {
     this.uniqueUsernameOutgoing = this.page.locator('.message-connected-username.label-username');
   }
 
-  async getOutgoingConnectionUsername() {
-    return this.uniqueUsernameOutgoing.textContent();
-  }
-
-  async isPendingIconVisible(fullName: string) {
-    const pendingIcon = this.getPendingConnectionIconLocator(fullName);
-    await pendingIcon.waitFor({state: 'visible'});
-    return pendingIcon.isVisible();
-  }
-
-  async isPendingIconHidden(fullName: string) {
-    const pendingIcon = this.getPendingConnectionIconLocator(fullName);
-    await pendingIcon.waitFor({state: 'hidden'});
-    return pendingIcon.isVisible();
-  }
-
-  private getPendingConnectionIconLocator(fullName: string) {
+  getPendingConnectionIconLocator(fullName: string) {
     return this.page.locator(
       `${selectByDataAttribute('item-conversation')}${selectByDataAttribute(escapeHtml(fullName), 'value')} ${selectByDataAttribute('status-pending')}`,
     );
