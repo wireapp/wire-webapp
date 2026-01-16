@@ -48,10 +48,6 @@ export const MultipartAssetPreview: FC<MultipartAssetPreviewProps> = ({
   timestamp,
 }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
-
-  if (!cellAssets || cellAssets.length === 0) {
-    return null;
-  }
   const firstAsset = cellAssets[0];
   const modalId = `multipart-preview-${firstAsset?.uuid || 'unknown'}`;
 
@@ -65,6 +61,10 @@ export const MultipartAssetPreview: FC<MultipartAssetPreviewProps> = ({
     isEnabled: hasPreview,
     retryPreviewUntilSuccess: false,
   });
+
+  if (!cellAssets || cellAssets.length === 0) {
+    return null;
+  }
 
   const previewUrl = isVideo ? imagePreviewUrl : src;
 
@@ -117,12 +117,7 @@ export const MultipartAssetPreview: FC<MultipartAssetPreviewProps> = ({
             )}
           </div>
         ) : hasMultipleFiles ? (
-          <MultipleFilesIcon
-            className="message-quote__files-icon"
-            width={16}
-            height={16}
-            aria-hidden="true"
-          />
+          <MultipleFilesIcon className="message-quote__files-icon" width={16} height={16} aria-hidden="true" />
         ) : (
           <span
             className="message-quote__filetype-icon"
