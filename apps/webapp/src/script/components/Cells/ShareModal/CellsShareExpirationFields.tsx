@@ -17,7 +17,7 @@
  *
  */
 
-import {useMemo, useState} from 'react';
+import {useEffect, useMemo, useState} from 'react';
 
 import {DateValue, getLocalTimeZone, today} from '@internationalized/date';
 import {I18nProvider} from '@react-aria/i18n';
@@ -79,6 +79,14 @@ interface CellsShareExpirationFieldsLabels {
 interface CellsShareExpirationFieldsProps {
   labels: CellsShareExpirationFieldsLabels;
   errorText: string;
+  onChange?: (nextValue: CellsShareExpirationSelection) => void;
+}
+
+export interface CellsShareExpirationSelection {
+  date: DateValue | null;
+  dateTime: Date | null;
+  isInvalid: boolean;
+  time: Option | null;
 }
 
 const parseTimeLabel = (value: string | number) => {
@@ -108,7 +116,7 @@ const buildTimeOptions = (): Option[] =>
     return {value: label, label};
   });
 
-export const CellsShareExpirationFields = ({labels, errorText}: CellsShareExpirationFieldsProps) => {
+export const CellsShareExpirationFields = ({labels, errorText, onChange}: CellsShareExpirationFieldsProps) => {
   const timeOptions = useMemo(() => buildTimeOptions(), []);
   const [selectedTime, setSelectedTime] = useState<Option>(timeOptions[0]);
   const [selectedDate, setSelectedDate] = useState<DateValue | null>(() => today(getLocalTimeZone()));
@@ -116,17 +124,19 @@ export const CellsShareExpirationFields = ({labels, errorText}: CellsShareExpira
   const portalContainer = typeof document === 'undefined' ? undefined : document.body;
   const popoverStyle = {zIndex: 10000020};
   const labelId = 'cells-share-expiration-label';
-  const isExpirationInvalid = useMemo(() => {
+  const selectedDateTime = useMemo(() => {
     if (!selectedDate || !selectedTime?.value) {
-      return false;
+      return null;
     }
 
     const {hour24, minutes} = parseTimeLabel(selectedTime.value);
     const date = selectedDate.toDate(getLocalTimeZone());
-    const selectedDateTime = new Date(date.getFullYear(), date.getMonth(), date.getDate(), hour24, minutes, 0, 0);
-
-    return selectedDateTime.getTime() < Date.now();
+    return new Date(date.getFullYear(), date.getMonth(), date.getDate(), hour24, minutes, 0, 0);
   }, [selectedDate, selectedTime]);
+  const isExpirationInvalid = useMemo(
+    () => Boolean(selectedDateTime && selectedDateTime.getTime() < Date.now()),
+    [selectedDateTime],
+  );
   const dateGroupStyles = isExpirationInvalid
     ? {...datePickerGroupStyles, ...expirationErrorBorderStyles}
     : datePickerGroupStyles;
@@ -134,6 +144,15 @@ export const CellsShareExpirationFields = ({labels, errorText}: CellsShareExpira
   const labelStyles = isExpirationInvalid
     ? {...expirationLabelStyles, ...expirationErrorLabelStyles}
     : expirationLabelStyles;
+
+  useEffect(() => {
+    onChange?.({
+      date: selectedDate,
+      dateTime: selectedDateTime,
+      isInvalid: isExpirationInvalid,
+      time: selectedTime ?? null,
+    });
+  }, [onChange, selectedDate, selectedDateTime, isExpirationInvalid, selectedTime]);
 
   return (
     <div css={expirationContentStyles}>

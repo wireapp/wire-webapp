@@ -194,6 +194,28 @@ export class CellsRepository {
     return this.apiClient.api.cells.deleteNodePublicLink({uuid});
   }
 
+  async updatePublicLink({
+    linkUuid,
+    label,
+    updatePassword,
+    passwordEnabled,
+    accessEnd,
+  }: {
+    linkUuid: string;
+    label?: string;
+    updatePassword?: string;
+    passwordEnabled?: boolean;
+    accessEnd?: string | null;
+  }) {
+    return this.apiClient.api.cells.updateNodePublicLink({
+      linkUuid,
+      label,
+      updatePassword,
+      passwordEnabled,
+      accessEnd,
+    });
+  }
+
   async searchNodes({
     query,
     limit = DEFAULT_MAX_FILES_LIMIT,
