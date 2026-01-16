@@ -41,3 +41,6 @@ yalc.lock
 apps/server/dist/
 dist/
 *.tsbuildinfo
+lib/
+
+plans/

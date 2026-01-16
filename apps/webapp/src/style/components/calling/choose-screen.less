@@ -84,6 +84,18 @@
       left: 32px;
     }
   }
+
+  &:focus,
+  &:focus-visible {
+    outline: none;
+  }
+
+  &:focus img,
+  &:focus-within img,
+  &:hover img {
+    border: 1px solid var(--accent-color);
+    box-shadow: 0 0 0 2px var(--accent-color-100);
+  }
 }
 
 .choose-screen-list-image {

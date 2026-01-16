@@ -18,7 +18,7 @@
  */
 
 import {removeCreatedUser} from 'test/e2e_tests/utils/tearDown.util';
-import {loginUser, logOutUser} from 'test/e2e_tests/utils/userActions';
+import {createGroup, loginUser, logOutUser} from 'test/e2e_tests/utils/userActions';
 
 import {getUser} from '../../data/user';
 import {test, expect} from '../../test.fixtures';
@@ -72,10 +72,7 @@ test('Setting up new device with a backup', {tag: ['@TC-8634', '@crit-flow-web']
     await pages.conversation().sendMessage(personalMessage);
     await expect(pages.conversation().getMessage({content: personalMessage})).toBeVisible();
 
-    await pages.conversationList().clickCreateGroup();
-    await pages.groupCreation().setGroupName(groupName);
-    await pages.startUI().selectUsers([userB.username]);
-    await pages.groupCreation().clickCreateGroupButton();
+    await createGroup(pages, groupName, [userB]);
     await pages.conversationList().openConversation(groupName);
     await pages.conversation().sendMessage(groupMessage);
 

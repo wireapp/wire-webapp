@@ -94,7 +94,7 @@ export class PageManager {
   openNewTab = async <T>(url?: string, handler?: (tab: PageManager) => Promise<T>): Promise<T> => {
     const newPage = await this.page.context().newPage();
     if (url) {
-      await newPage.goto(url);
+      await newPage.goto(url, {waitUntil: 'networkidle'});
     }
     const tabManager = new PageManager(newPage);
     try {
@@ -152,6 +152,7 @@ export class PageManager {
       singleSignOn: () => this.getOrCreate('webapp.pages.singleSignOn', () => new SingleSignOnPage(this.page)),
       welcome: () => this.getOrCreate('webapp.pages.welcome', () => new WelcomePage(this.page)),
       registration: () => this.getOrCreate('webapp.pages.registration', () => new RegistrationPage(this.page)),
+      sidebar: () => this.getOrCreate('webapp.pages.sidebar', () => new ConversationSidebar(this.page)),
       startUI: () => this.getOrCreate('webapp.pages.startUI', () => new StartUIPage(this.page)),
       account: () => this.getOrCreate('webapp.pages.account', () => new AccountPage(this.page)),
       conversationList: () =>

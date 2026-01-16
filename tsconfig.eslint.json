@@ -1,12 +1,20 @@
 {
   "extends": "./tsconfig.base.json",
   "compilerOptions": {
-    "noEmit": true
+    "noEmit": true,
+    "paths": {
+      "@wireapp/core/lib/*": ["libraries/core/src/*"],
+      "@wireapp/core": ["libraries/core/src/index.ts"],
+      "@wireapp/api-client": ["libraries/api-client/src/APIClient.ts"]
+    }
   },
   "include": [
     "apps/webapp/src/**/*",
     "apps/webapp/test/**/*",
-    "apps/server/**/*.ts"
+    "apps/server/**/*.ts",
+    "libraries/core/src/**/*",
+    "libraries/core/jest.setup.ts",
+    "libraries/api-client/src/**/*"
   ],
   "exclude": [
     "node_modules",
@@ -14,6 +22,16 @@
     "coverage",
     "tmp",
     "apps/server/dist",
-    "apps/webapp/dist"
+    "apps/webapp/dist",
+    "libraries/core/lib",
+    "libraries/core/.tmp",
+    "libraries/api-client/lib",
+    "libraries/api-client/.tmp"
+  ],
+  "references": [
+    { "path": "./apps/webapp" },
+    { "path": "./apps/server" },
+    { "path": "./libraries/core" },
+    { "path": "./libraries/api-client" }
   ]
 }

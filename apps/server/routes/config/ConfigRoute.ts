@@ -19,7 +19,7 @@
 
 import {Router} from 'express';
 
-import {ClientConfig, ServerConfig} from '../../config';
+import type {ClientConfig, ServerConfig} from '@wireapp/config';
 import {replaceHostname} from '../../util/hostnameReplacer';
 
 export const ConfigRoute = (serverConfig: ServerConfig, clientConfig: ClientConfig) =>

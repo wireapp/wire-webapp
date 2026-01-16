@@ -33,16 +33,43 @@ if (!fs.existsSync(S3_PATH)) {
 }
 const output = fs.createWriteStream(path.join(S3_PATH, 'ebs.zip'));
 
-archive.file(path.join(SERVER_PATH, 'package.json'), {name: 'package.json'});
+// Read and modify package.json to handle workspace dependencies
+const packageJson = JSON.parse(fs.readFileSync(path.join(SERVER_PATH, 'package.json'), 'utf8'));
+
+// Convert workspace:* dependencies to "*" version - they're pre-bundled in node_modules
+const workspaceDeps = [];
+if (packageJson.dependencies) {
+  Object.keys(packageJson.dependencies).forEach(dep => {
+    if (packageJson.dependencies[dep].startsWith('workspace:')) {
+      console.log(`Marking workspace dependency as pre-bundled: ${dep}`);
+      workspaceDeps.push(dep);
+      // Read version from the library's package.json
+      const libPkgPath = path.join(ROOT_PATH, 'libraries', dep.replace('@wireapp/', ''), 'package.json');
+      if (fs.existsSync(libPkgPath)) {
+        const libPkg = JSON.parse(fs.readFileSync(libPkgPath, 'utf8'));
+        packageJson.dependencies[dep] = libPkg.version;
+      } else {
+        packageJson.dependencies[dep] = '*';
+      }
+    }
+  });
+}
+
+// Write modified package.json to a temp file
+const tempPackageJsonPath = path.join(DIST_PATH, 'package.json.tmp');
+fs.writeFileSync(tempPackageJsonPath, JSON.stringify(packageJson, null, 2));
+archive.file(tempPackageJsonPath, {name: 'package.json'});
 archive.file(path.join(ROOT_PATH, '.env.defaults'), {name: '.env.defaults'});
 archive.file(path.join(SERVER_PATH, 'Procfile'), {name: 'Procfile'});
 // Archive dist directory but exclude s3 subdirectory
 archive.glob('**/*', {
   cwd: DIST_PATH,
-  ignore: ['s3/**', '.ebextensions/**']
+  ignore: ['s3/**', '.ebextensions/**'],
 });
 // Add .ebextensions directory from server root (not from dist)
 archive.directory(path.join(SERVER_PATH, '.ebextensions'), '.ebextensions');
+// Add .platform directory for deployment hooks
+archive.directory(path.join(SERVER_PATH, '.platform'), '.platform');
 
 archive.pipe(output);
 

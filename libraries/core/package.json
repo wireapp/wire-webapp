@@ -1,0 +1,58 @@
+{
+  "name": "@wireapp/core",
+  "license": "GPL-3.0",
+  "description": "Wire for Web's communication core.",
+  "repository": "https://github.com/wireapp/wire-webapp/tree/main/libraries/core",
+  "files": [
+    "lib",
+    "src"
+  ],
+  "main": "lib/index",
+  "types": "src/index.ts",
+  "typesVersions": {
+    "*": {
+      "lib/*": [
+        "src/*"
+      ]
+    }
+  },
+  "browser": {
+    "./lib/cryptography/AssetCryptography/crypto.node": "./lib/cryptography/AssetCryptography/crypto.browser.js"
+  },
+  "dependencies": {
+    "@wireapp/api-client": "workspace:^",
+    "@wireapp/core-crypto": "9.1.2",
+    "@wireapp/cryptobox": "12.8.0",
+    "@wireapp/priority-queue": "2.1.17",
+    "@wireapp/promise-queue": "2.4.11",
+    "@wireapp/protocol-messaging": "1.56.0",
+    "@wireapp/store-engine": "5.1.17",
+    "hash.js": "1.1.7",
+    "idb": "8.0.3",
+    "lodash": "4.17.21"
+  },
+  "devDependencies": {
+    "@swc/core": "1.15.8",
+    "@swc/jest": "0.2.39",
+    "@types/lodash": "4.17.23",
+    "@types/long": "5.0.0",
+    "commander": "14.0.2",
+    "dotenv-defaults": "5.0.2",
+    "jest-websocket-mock": "2.5.0"
+  },
+  "scripts": {
+    "build": "nx run core-lib:build",
+    "clean": "nx run core-lib:clean",
+    "dist": "nx run core-lib:dist",
+    "demo:composite": "nx run core-lib:demo:composite",
+    "demo:sendCounter": "nx run core-lib:demo:sendCounter",
+    "start": "nx run core-lib:start",
+    "start:echo": "nx run core-lib:start:echo",
+    "start:sender": "nx run core-lib:start:sender",
+    "test": "nx run core-lib:test",
+    "test:coverage": "nx run core-lib:test:coverage",
+    "watch": "nx run core-lib:watch"
+  },
+  "version": "46.47.3",
+  "gitHead": "5339f01fe01ef0871da8c8bc8662fbe9e604754a"
+}

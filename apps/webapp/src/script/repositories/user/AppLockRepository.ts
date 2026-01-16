@@ -17,7 +17,7 @@
  *
  */
 
-import sodium from 'libsodium-wrappers';
+import sodium from 'libsodium-wrappers-sumo';
 import {container, singleton} from 'tsyringe';
 
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';

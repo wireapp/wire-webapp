@@ -17,7 +17,7 @@
  *
  */
 
-import {Input, Label, Switch} from '@wireapp/react-ui-kit';
+import {BASE_DARK_COLOR, BASE_LIGHT_COLOR, COLOR_V2, Input, Label, Switch} from '@wireapp/react-ui-kit';
 
 import {CopyToClipboardButton} from 'Components/CopyToClipboardButton/CopyToClipboardButton';
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
@@ -90,6 +90,12 @@ const CellShareModalContent = ({type, uuid, conversationId, cellsRepository}: Sh
             checked={isEnabled}
             onToggle={togglePublicLink}
             disabled={status === 'loading'}
+            activatedColor={BASE_LIGHT_COLOR.GREEN}
+            activatedColorDark={BASE_DARK_COLOR.GREEN}
+            deactivatedColor={COLOR_V2.GRAY_70}
+            deactivatedColorDark={COLOR_V2.GRAY_60}
+            disabledColor={COLOR_V2.GRAY_70}
+            disabledColorDark={COLOR_V2.GRAY_60}
           />
         </div>
       </div>

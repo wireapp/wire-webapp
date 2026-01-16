@@ -21,19 +21,24 @@ Each ADR should follow this structure:
 # YYYY-MM-DD - [Short Title]
 
 ## Context
+
 What is the issue that we're seeing that is motivating this decision or change?
 
 ## Decision
+
 What is the change that we're proposing and/or doing?
 
 ## Consequences
+
 - **Positive**: What becomes easier or more difficult to do because of this change?
 - **Negative**: What becomes easier or more difficult to do because of this change?
 
 ## Alternatives Considered
+
 What other approaches did we consider, and why did we reject them?
 
 ## Related ADRs
+
 Links to related decisions
 ```
 
