@@ -104,7 +104,7 @@ export const MultipartAssetPreview: FC<MultipartAssetPreviewProps> = ({
               <>
                 <img src={previewUrl} alt="" />
                 {isVideo && (
-                  <div className="message-quote__preview-overlay">
+                  <div className="message-quote__preview-overlay" aria-hidden="true">
                     <PlayIcon width={16} height={16} />
                   </div>
                 )}
