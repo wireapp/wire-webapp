@@ -130,9 +130,7 @@ export const CellsShareExpirationFields = ({labels, errorText}: CellsShareExpira
   const dateGroupStyles = isExpirationInvalid
     ? {...datePickerGroupStyles, ...expirationErrorBorderStyles}
     : datePickerGroupStyles;
-  const timeControlStyles = isExpirationInvalid
-    ? {...timeSelectStyles, ...expirationErrorBorderStyles}
-    : timeSelectStyles;
+  const timeControlStyles = timeSelectStyles;
   const labelStyles = isExpirationInvalid
     ? {...expirationLabelStyles, ...expirationErrorLabelStyles}
     : expirationLabelStyles;
@@ -244,6 +242,7 @@ export const CellsShareExpirationFields = ({labels, errorText}: CellsShareExpira
                 setSelectedTime(option as Option);
               }
             }}
+            markInvalid={isExpirationInvalid}
           />
         </div>
       </div>

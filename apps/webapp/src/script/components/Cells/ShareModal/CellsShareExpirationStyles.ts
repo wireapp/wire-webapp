@@ -56,10 +56,6 @@ export const datePickerGroupStyles: CSSObject = {
   border: '1px solid var(--accent-color)',
   backgroundColor: 'var(--text-input-background)',
 
-  '&:focus-within': {
-    borderColor: 'var(--accent-color)',
-    boxShadow: '0 0 0 2px rgba(0, 122, 255, 0.2)',
-  },
   'body.theme-dark &': {
     backgroundColor: 'var(--text-input-background)',
     borderColor: 'var(--gray-100)',
@@ -230,8 +226,6 @@ export const timeSelectStyles: CSSObject = {
   height: '48px',
   minHeight: '48px',
   borderRadius: '14px',
-  borderColor: 'var(--accent-color)',
-  boxShadow: '0 0 0 1px var(--accent-color)',
   '& .css-1dimb5e-singleValue': {
     color: 'var(--main-color)',
   },
