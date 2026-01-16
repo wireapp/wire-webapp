@@ -49,6 +49,9 @@ export const MultipartAssetPreview: FC<MultipartAssetPreviewProps> = ({
 }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
+  if (!cellAssets || cellAssets.length === 0) {
+    return null;
+  }
   const firstAsset = cellAssets[0];
   const modalId = `multipart-preview-${firstAsset?.uuid || 'unknown'}`;
 
