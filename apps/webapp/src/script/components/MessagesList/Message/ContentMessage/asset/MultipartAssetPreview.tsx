@@ -121,7 +121,13 @@ export const MultipartAssetPreview: FC<MultipartAssetPreviewProps> = ({
             aria-hidden="true"
           />
         ) : (
-          <FileTypeIcon extension={fileExtension} size={16} />
+          <span
+            className="message-quote__filetype-icon"
+            role="img"
+            aria-label={fileExtension ? `${fileExtension.toUpperCase()} file` : 'File attachment'}
+          >
+            <FileTypeIcon extension={fileExtension} size={16} />
+          </span>
         )}
         {showText && <span>{displayText}</span>}
       </div>
