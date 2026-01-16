@@ -9,10 +9,12 @@
       "outputs": ["{projectRoot}/dist"]
     },
     "test": {
+      "dependsOn": ["^build"], // build all upstream dependencies first
       "cache": true,
       "inputs": ["default", "^production", "{workspaceRoot}/jest.preset.js"] // include shared preset in cache key
     },
     "lint": {
+      "dependsOn": ["^build"], // build all upstream dependencies first
       "cache": true,
       "inputs": ["default", "{workspaceRoot}/eslint.config.ts"] // workspace lint config in hash
     }
@@ -30,5 +32,23 @@
     ],
     "sharedGlobals": [] // hook for root-level shared files if needed
   },
-  "defaultProject": "webapp"
+  "defaultProject": "webapp",
+  "release": {
+    "projects": ["tag:npm:public"],
+    "projectsRelationship": "independent",
+    "version": {
+      "conventionalCommits": true,
+      "fallbackCurrentVersionResolver": "disk"
+    },
+    "changelog": {
+      "projectChangelogs": {
+        "createRelease": "github"
+      }
+    },
+    "git": {
+      "commit": true,
+      "tag": true,
+      "commitMessage": "chore(release): publish {projectName} {version} [skip ci]"
+    }
+  }
 }

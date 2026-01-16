@@ -21,7 +21,8 @@
       "I18n/*": ["./src/i18n/*"],
       "Repositories/*": ["./src/script/repositories/*"],
       "Resource/*": ["./resource/*"],
-      "Util/*": ["./src/script/util/*"]
+      "Util/*": ["./src/script/util/*"],
+      "apps/*": ["apps/*"]
     },
     "rootDirs": ["src"],
     "target": "ESNext",
