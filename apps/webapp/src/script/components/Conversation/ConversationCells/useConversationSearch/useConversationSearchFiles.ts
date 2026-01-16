@@ -119,17 +119,19 @@ export const useConversationSearchFiles = ({
   }, DEBOUNCE_TIME);
 
   const handleSearch = (value: string) => {
+    setSearchValue(value);
     if (!value) {
+      searchNodesDebounced.cancel();
       handleClearSearch();
       onClear?.();
       return;
     }
     shouldPerformSearch.current = true;
-    setSearchValue(value);
     void searchNodesDebounced(value);
   };
 
   const handleClearSearch = () => {
+    searchNodesDebounced.cancel();
     setSearchValue('');
     setSearchQuery('');
     shouldPerformSearch.current = false;
