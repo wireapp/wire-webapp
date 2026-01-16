@@ -114,7 +114,12 @@ export const MultipartAssetPreview: FC<MultipartAssetPreviewProps> = ({
             )}
           </div>
         ) : hasMultipleFiles ? (
-          <MultipleFilesIcon className="message-quote__files-icon" width={16} height={16} />
+          <MultipleFilesIcon
+            className="message-quote__files-icon"
+            width={16}
+            height={16}
+            aria-hidden="true"
+          />
         ) : (
           <FileTypeIcon extension={fileExtension} size={16} />
         )}
