@@ -263,7 +263,6 @@ export const expirationErrorLabelStyles: CSSObject = {
 };
 
 export const expirationErrorTextStyles: CSSObject = {
-  marginTop: '-1rem',
   fontSize: 'var(--font-size-small)',
   color: BASE_LIGHT_COLOR.RED,
   'body.theme-dark &': {
