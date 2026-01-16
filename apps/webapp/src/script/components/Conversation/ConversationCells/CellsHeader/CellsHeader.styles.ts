@@ -42,3 +42,10 @@ export const actionsStyles: CSSObject = {
   alignItems: 'center',
   gap: '8px',
 };
+
+export const searchInputStyles: CSSObject = {
+  '.wireinput': {
+    padding: 0,
+    paddingLeft: '8px',
+  },
+};
