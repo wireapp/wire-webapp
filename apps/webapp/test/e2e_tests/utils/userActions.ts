@@ -31,17 +31,6 @@ export const loginUser = async (user: User, pageManager: PageManager) => {
   await pages.login().signInButton.click();
 };
 
-export const sendTextMessageToUser = async (pageManager: PageManager, recipient: User, text: string) => {
-  const {pages} = pageManager.webapp;
-
-  await pages.conversationList().openConversation(recipient.fullName);
-  expect(await pages.conversation().isConversationOpen(recipient.fullName));
-
-  await pages.conversation().sendMessage(text);
-
-  await expect(pages.conversation().page.getByText(text)).toBeVisible();
-};
-
 export const inviteMembers = async (members: User[], owner: User, api: ApiManagerE2E) => {
   await Promise.all(
     members.map(async member => {
