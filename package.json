@@ -17,7 +17,7 @@
     "react-transition-group": "4.4.5"
   },
   "devDependencies": {
-    "@babel/cli": "7.26.4",
+    "@babel/cli": "7.28.6",
     "@babel/core": "7.28.0",
     "@babel/preset-env": "7.28.6",
     "@babel/preset-react": "7.26.3",
