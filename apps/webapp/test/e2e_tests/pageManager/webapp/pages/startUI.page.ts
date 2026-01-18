@@ -20,54 +20,27 @@
 import {Page, Locator} from '@playwright/test';
 
 export class StartUIPage {
-  readonly page: Page;
+  readonly component: Locator;
 
   readonly searchInput: Locator;
   readonly searchResults: Locator;
 
   constructor(page: Page) {
-    this.page = page;
+    this.component = page.locator('#start-ui');
 
-    this.searchInput = page.locator('[data-uie-name="enter-users"]');
-    this.searchResults = page.locator('[data-uie-name="item-user"] [data-uie-name="status-username"]');
+    this.searchInput = this.component.getByLabel('Search people');
+    this.searchResults = this.component.getByRole('list', {name: 'Conversation List'}).getByRole('listitem');
   }
 
-  async selectUsers(usernames: string[]) {
+  /** Search and select each of the provided usernames */
+  async selectUsers(...usernames: string[]) {
     for (const username of usernames) {
-      await this.selectUser(username);
+      await this.searchForUser(username);
+      await this.searchResults.filter({hasText: username}).click();
     }
-  }
-
-  async selectUser(username: string) {
-    await this.searchForUser(username);
-    await this.clickUserFromSearchResults(username);
   }
 
   private async searchForUser(username: string) {
     await this.searchInput.fill(username);
-  }
-
-  private async clickUserFromSearchResults(username: string) {
-    await this.searchResults.first().waitFor({state: 'visible'});
-
-    const timeout = 30000;
-    const delayBetweenAttempts = 500;
-    const maxAttempts = timeout / delayBetweenAttempts;
-
-    for (let attempt = 0; attempt < maxAttempts; attempt++) {
-      for (const result of await this.searchResults.all()) {
-        const text = await result.textContent();
-        if (text?.includes(username)) {
-          await result.click();
-          return;
-        }
-      }
-      await new Promise(resolve => setTimeout(resolve, delayBetweenAttempts));
-    }
-    throw new Error(`User ${username} not found in search results`);
-  }
-
-  getSearchResultForSpecificUser(username: string) {
-    return this.page.getByRole('button', {name: `Open profile of ${username}`});
   }
 }

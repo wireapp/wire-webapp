@@ -95,10 +95,6 @@ export class AccountPage {
     return this.sendUsageDataCheckbox.isChecked();
   }
 
-  async isReceiveNewsletterEnabled() {
-    return this.receiveNewsletterCheckbox.isChecked();
-  }
-
   async toggleAppLock() {
     await this.appLockCheckboxLabel.click();
   }

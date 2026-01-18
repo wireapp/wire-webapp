@@ -19,7 +19,7 @@
 
 import {PageManager} from 'test/e2e_tests/pageManager';
 import {addCreatedTeam, removeCreatedTeam} from 'test/e2e_tests/utils/tearDown.util';
-import {inviteMembers, loginUser} from 'test/e2e_tests/utils/userActions';
+import {createGroup, inviteMembers, loginUser} from 'test/e2e_tests/utils/userActions';
 
 import {getUser} from '../../data/user';
 import {test, expect} from '../../test.fixtures';
@@ -66,16 +66,13 @@ test(
 
     await test.step('Preconditions: Users have a 1:1', async () => {
       await userBComponents.conversationSidebar().clickConnectButton();
-      await userBPages.startUI().selectUser(ownerA.username);
+      await userBPages.startUI().selectUsers(ownerA.username);
       expect(await userBModals.userProfile().isVisible());
       await userBModals.userProfile().clickStartConversation();
     });
 
     await test.step('Preconditions: Users have a group conversation', async () => {
-      await userBPages.conversationList().clickCreateGroup();
-      await userBPages.groupCreation().setGroupName(conversationName);
-      await userBPages.startUI().selectUsers([ownerA.username]);
-      await userBPages.groupCreation().clickCreateGroupButton();
+      await createGroup(userBPages, conversationName, [ownerA]);
     });
 
     await test.step('Users A has archives conversations with User B', async () => {
