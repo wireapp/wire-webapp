@@ -127,7 +127,7 @@
     "xml2js": "0.5.0",
     "@stablelib/utf8": "1.0.2",
     "dexie-encrypted@2.0.0": "patch:dexie-encrypted@npm%3A2.0.0#./.yarn/patches/dexie-encrypted-npm-2.0.0-eb61eb5975.patch",
-    "axios": "1.9.0",
+    "axios": "1.13.2",
     "dexie": "4.0.7",
     "dotenv": "17.2.3",
     "@types/react": "18.3.27",
