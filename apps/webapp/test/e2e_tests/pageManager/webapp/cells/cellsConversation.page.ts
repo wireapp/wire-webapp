@@ -29,6 +29,24 @@ export class CellsConversationPage extends ConversationPage {
   }
 
   override getImageLocator(user: User): Locator {
-    return this.page.locator(`${selectByDataAttribute('item-message')} [aria-label^="Image from ${user.fullName}"]`);
+    return this.page.locator(
+      `${selectByDataAttribute('item-message')} [aria-label^="Image from ${user.fullName}"] img`,
+    );
+  }
+
+  protected getVideoLocator(user: User): Locator {
+    return this.page.locator(
+      `${selectByDataAttribute('item-message')} [aria-label^="Video file preview"] [aria-label^="Image from ${user.fullName}"] video`,
+    );
+  }
+
+  async isVideoFromUserVisible(user: User) {
+    // Trying multiple times for the image to appear
+    const locator = this.getVideoLocator(user);
+
+    // Wait for at least one matching element to appear (optional timeout can be set)
+    await locator.first().waitFor({state: 'visible'});
+
+    return await locator.isVisible();
   }
 }
