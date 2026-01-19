@@ -24,7 +24,10 @@ import {CSSObject} from '@emotion/react';
 import {ValidationUtil} from '@wireapp/commons';
 import {BASE_DARK_COLOR, BASE_LIGHT_COLOR, COLOR_V2, Input, Label, Switch} from '@wireapp/react-ui-kit';
 
-import {CellsShareExpirationFields, type CellsShareExpirationSelection} from 'Components/Cells/ShareModal/CellsShareExpirationFields';
+import {
+  CellsShareExpirationFields,
+  type CellsShareExpirationSelection,
+} from 'Components/Cells/ShareModal/CellsShareExpirationFields';
 import {CellsTableLoader} from 'Components/Conversation/ConversationCells/common/CellsTableLoader/CellsTableLoader';
 import {CopyToClipboardButton} from 'Components/CopyToClipboardButton/CopyToClipboardButton';
 import {PasswordGeneratorButton} from 'Components/PasswordGeneratorButton';

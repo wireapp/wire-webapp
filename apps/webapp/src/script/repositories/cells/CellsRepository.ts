@@ -209,17 +209,20 @@ export class CellsRepository {
   async updatePublicLink({
     linkUuid,
     link,
+    createPassword,
     updatePassword,
     passwordEnabled,
   }: {
     linkUuid: string;
     link: RestShareLink;
+    createPassword?: string;
     updatePassword?: string;
     passwordEnabled?: boolean;
   }) {
     return this.apiClient.api.cells.updateNodePublicLink({
       linkUuid,
       link,
+      createPassword,
       updatePassword,
       passwordEnabled,
     });

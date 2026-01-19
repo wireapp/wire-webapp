@@ -1573,9 +1573,7 @@ describe('CellsAPI', () => {
 
       mockNodeServiceApi.updatePublicLink.mockRejectedValueOnce(new Error(errorMessage));
 
-      await expect(
-        cellsAPI.updateNodePublicLink({linkUuid, link: {Label: 'New Label'}}),
-      ).rejects.toThrow(errorMessage);
+      await expect(cellsAPI.updateNodePublicLink({linkUuid, link: {Label: 'New Label'}})).rejects.toThrow(errorMessage);
     });
   });
 

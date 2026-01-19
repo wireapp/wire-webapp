@@ -139,7 +139,7 @@ const CellShareModalContent = ({
 
       try {
         await updatePublicLink({
-          updatePassword: serialized.updatePassword,
+          password: serialized.updatePassword,
           passwordEnabled: serialized.passwordEnabled,
           ...(serialized.accessEnd ? {accessEnd: serialized.accessEnd} : {}),
         });

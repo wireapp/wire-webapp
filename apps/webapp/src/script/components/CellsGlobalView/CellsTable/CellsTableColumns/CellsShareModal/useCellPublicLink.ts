@@ -110,11 +110,11 @@ export const useCellPublicLink = ({uuid, cellsRepository}: UseCellPublicLinkPara
 
   const updatePublicLink = useCallback(
     async ({
-      updatePassword,
+      password,
       passwordEnabled,
       accessEnd,
     }: {
-      updatePassword?: string;
+      password?: string;
       passwordEnabled?: boolean;
       accessEnd?: string;
     }) => {
@@ -128,6 +128,10 @@ export const useCellPublicLink = ({uuid, cellsRepository}: UseCellPublicLinkPara
         // Fetch the complete link object first
         const currentLink = await cellsRepository.getPublicLink({uuid: node.publicLink.uuid});
 
+        // Determine if we're creating a new password or updating an existing one
+        const hasExistingPassword = currentLink.PasswordRequired === true;
+        const isSettingPassword = passwordEnabled && password;
+
         // Update only the properties we need to change
         const updatedLink = {
           ...currentLink,
@@ -138,7 +142,8 @@ export const useCellPublicLink = ({uuid, cellsRepository}: UseCellPublicLinkPara
         await cellsRepository.updatePublicLink({
           linkUuid: node.publicLink.uuid,
           link: updatedLink,
-          updatePassword,
+          // Use createPassword if no password exists, updatePassword if it does
+          ...(isSettingPassword ? (hasExistingPassword ? {updatePassword: password} : {createPassword: password}) : {}),
           passwordEnabled,
         });
 
