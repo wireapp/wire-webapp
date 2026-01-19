@@ -46,7 +46,6 @@ export class CellsConversationFilesPage {
   }
 
   async numberOfFilesInTheList() {
-    // await this.filesList.first().waitFor({state: 'visible'});
     return await this.filesList.count();
   }
 }
