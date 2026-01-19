@@ -17,7 +17,9 @@
  *
  */
 
-import {useCallback, useEffect, useState} from 'react';
+import {useCallback, useEffect, useRef, useState} from 'react';
+
+import type {RestShareLink} from '@wireapp/api-client/lib/cells';
 
 import {CellsRepository} from 'Repositories/cells/CellsRepository';
 import {Config} from 'src/script/Config';
@@ -38,6 +40,8 @@ export const useCellPublicLink = ({uuid, conversationId, cellsRepository}: UseCe
   const node = nodes.find(n => n.id === uuid);
   const [isEnabled, setIsEnabled] = useState(!!node?.publicLink?.alreadyShared || false);
   const [status, setStatus] = useState<PublicLinkStatus>(node?.publicLink ? 'success' : 'idle');
+  const [linkData, setLinkData] = useState<RestShareLink | null>(null);
+  const fetchedLinkId = useRef<string | null>(null);
 
   const createPublicLink = useCallback(async () => {
     try {
@@ -56,6 +60,7 @@ export const useCellPublicLink = ({uuid, conversationId, cellsRepository}: UseCe
 
       const newLink = {uuid: link.Uuid, url: Config.getConfig().CELLS_PYDIO_URL + link.LinkUrl, alreadyShared: true};
       setPublicLink({conversationId, nodeId: uuid, data: newLink});
+      setLinkData(link);
       setStatus('success');
     } catch (err) {
       setStatus('error');
@@ -67,9 +72,8 @@ export const useCellPublicLink = ({uuid, conversationId, cellsRepository}: UseCe
 
   const getPublicLink = useCallback(async () => {
     const linkId = node?.publicLink?.uuid;
-    const linkUrl = node?.publicLink?.url;
 
-    if (!linkId || linkUrl) {
+    if (!linkId || fetchedLinkId.current === linkId) {
       return;
     }
 
@@ -85,14 +89,17 @@ export const useCellPublicLink = ({uuid, conversationId, cellsRepository}: UseCe
       const newLink = {uuid: link.Uuid, url: Config.getConfig().CELLS_PYDIO_URL + link.LinkUrl, alreadyShared: true};
 
       setPublicLink({conversationId, nodeId: uuid, data: newLink});
+      setLinkData(link);
+      fetchedLinkId.current = linkId;
       setStatus('success');
     } catch (err) {
       setStatus('error');
       setPublicLink({conversationId, nodeId: uuid, data: undefined});
     }
     // cellsRepository is not a dependency because it's a singleton
+    // node?.publicLink is intentionally not a dependency to avoid infinite loop
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [uuid, conversationId, setPublicLink, node?.publicLink]);
+  }, [uuid, conversationId, setPublicLink]);
 
   const deletePublicLink = useCallback(async () => {
     if (!node?.publicLink || !node.publicLink.uuid) {
@@ -106,8 +113,9 @@ export const useCellPublicLink = ({uuid, conversationId, cellsRepository}: UseCe
       setStatus('error');
     }
     // cellsRepository is not a dependency because it's a singleton
+    // node?.publicLink is intentionally not a dependency to avoid infinite loop
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [uuid, conversationId, node?.publicLink, setPublicLink]);
+  }, [uuid, conversationId, setPublicLink]);
 
   const updatePublicLink = useCallback(
     async ({
@@ -186,6 +194,7 @@ export const useCellPublicLink = ({uuid, conversationId, cellsRepository}: UseCe
   return {
     status,
     link: node?.publicLink?.url,
+    linkData,
     isEnabled,
     togglePublicLink,
     updatePublicLink,

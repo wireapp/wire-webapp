@@ -102,7 +102,7 @@ const CellShareModalContent = ({
   cellsRepository,
   modalId,
 }: ShareModalParams & {modalId: string}) => {
-  const {status, link, isEnabled, togglePublicLink, updatePublicLink} = useCellPublicLink({
+  const {status, link, linkData, isEnabled, togglePublicLink, updatePublicLink} = useCellPublicLink({
     uuid,
     conversationId,
     cellsRepository,
@@ -110,11 +110,38 @@ const CellShareModalContent = ({
   const node = useCellsStore(state =>
     state.nodesByConversation[conversationId]?.find(cellNode => cellNode.id === uuid),
   );
-  const {isEnabled: isPasswordEnabled, toggle: togglePassword} = useCellPasswordToggle();
-  const {isEnabled: isExpirationEnabled, toggle: toggleExpiration} = useCellExpirationToggle();
+  const {
+    isEnabled: isPasswordEnabled,
+    toggle: togglePassword,
+    setIsEnabled: setIsPasswordEnabled,
+  } = useCellPasswordToggle();
+  const {
+    isEnabled: isExpirationEnabled,
+    toggle: toggleExpiration,
+    setIsEnabled: setIsExpirationEnabled,
+  } = useCellExpirationToggle();
   const [passwordValue, setPasswordValue] = useState('');
   const [expirationDateTime, setExpirationDateTime] = useState<Date | null>(null);
   const [isExpirationInvalid, setIsExpirationInvalid] = useState(false);
+
+  // Initialize toggles and values based on existing link data
+  useEffect(() => {
+    if (linkData && status === 'success') {
+      // Always sync password toggle with linkData state
+      setIsPasswordEnabled(!!linkData.PasswordRequired);
+
+      // Always sync expiration toggle and date with linkData state
+      if (linkData.AccessEnd) {
+        setIsExpirationEnabled(true);
+        // Convert Unix timestamp (in seconds) to Date
+        const expirationDate = new Date(parseInt(linkData.AccessEnd) * 1000);
+        setExpirationDateTime(expirationDate);
+      } else {
+        setIsExpirationEnabled(false);
+        setExpirationDateTime(null);
+      }
+    }
+  }, [linkData, status, setIsPasswordEnabled, setIsExpirationEnabled]);
 
   const isInputDisabled = ['loading', 'error'].includes(status);
 
@@ -190,6 +217,7 @@ const CellShareModalContent = ({
       expiration={{
         isEnabled: isExpirationEnabled,
         onToggle: toggleExpiration,
+        dateTime: expirationDateTime,
         onChange: selection => {
           setExpirationDateTime(selection.dateTime);
           setIsExpirationInvalid(selection.isInvalid);

@@ -17,7 +17,9 @@
  *
  */
 
-import {useCallback, useEffect, useState} from 'react';
+import {useCallback, useEffect, useRef, useState} from 'react';
+
+import type {RestShareLink} from '@wireapp/api-client/lib/cells';
 
 import {CellsRepository} from 'Repositories/cells/CellsRepository';
 import {Config} from 'src/script/Config';
@@ -36,6 +38,8 @@ export const useCellPublicLink = ({uuid, cellsRepository}: UseCellPublicLinkPara
   const node = nodes.find(n => n.id === uuid);
   const [isEnabled, setIsEnabled] = useState(!!node?.publicLink?.alreadyShared || false);
   const [status, setStatus] = useState<PublicLinkStatus>(node?.publicLink ? 'success' : 'idle');
+  const [linkData, setLinkData] = useState<RestShareLink | null>(null);
+  const fetchedLinkId = useRef<string | null>(null);
   const publicLinkUrl = node?.publicLink?.url;
 
   const createPublicLink = useCallback(async () => {
@@ -55,6 +59,7 @@ export const useCellPublicLink = ({uuid, cellsRepository}: UseCellPublicLinkPara
 
       const newLink = {uuid: link.Uuid, url: Config.getConfig().CELLS_PYDIO_URL + link.LinkUrl, alreadyShared: true};
       setPublicLink(uuid, newLink);
+      setLinkData(link);
       setStatus('success');
     } catch (err) {
       setStatus('error');
@@ -66,9 +71,8 @@ export const useCellPublicLink = ({uuid, cellsRepository}: UseCellPublicLinkPara
 
   const getPublicLink = useCallback(async () => {
     const linkId = node?.publicLink?.uuid;
-    const linkUrl = node?.publicLink?.url;
 
-    if (!linkId || linkUrl) {
+    if (!linkId || fetchedLinkId.current === linkId) {
       return;
     }
 
@@ -84,6 +88,8 @@ export const useCellPublicLink = ({uuid, cellsRepository}: UseCellPublicLinkPara
       const newLink = {uuid: link.Uuid, url: Config.getConfig().CELLS_PYDIO_URL + link.LinkUrl, alreadyShared: true};
 
       setPublicLink(uuid, newLink);
+      setLinkData(link);
+      fetchedLinkId.current = linkId;
       setStatus('success');
     } catch (err) {
       setStatus('error');
@@ -191,6 +197,7 @@ export const useCellPublicLink = ({uuid, cellsRepository}: UseCellPublicLinkPara
   return {
     status,
     link: node?.publicLink?.url,
+    linkData,
     isEnabled,
     togglePublicLink,
     updatePublicLink,

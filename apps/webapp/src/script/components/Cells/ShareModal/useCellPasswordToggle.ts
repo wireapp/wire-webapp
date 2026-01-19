@@ -26,5 +26,5 @@ export const useCellPasswordToggle = () => {
     setIsEnabled(prev => !prev);
   }, []);
 
-  return {isEnabled, toggle};
+  return {isEnabled, toggle, setIsEnabled};
 };

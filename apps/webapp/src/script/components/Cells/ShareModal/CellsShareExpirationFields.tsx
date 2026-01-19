@@ -79,6 +79,7 @@ interface CellsShareExpirationFieldsLabels {
 interface CellsShareExpirationFieldsProps {
   labels: CellsShareExpirationFieldsLabels;
   errorText: string;
+  dateTime?: Date | null;
   onChange?: (nextValue: CellsShareExpirationSelection) => void;
 }
 
@@ -116,10 +117,33 @@ const buildTimeOptions = (): Option[] =>
     return {value: label, label};
   });
 
-export const CellsShareExpirationFields = ({labels, errorText, onChange}: CellsShareExpirationFieldsProps) => {
+export const CellsShareExpirationFields = ({
+  labels,
+  errorText,
+  dateTime,
+  onChange,
+}: CellsShareExpirationFieldsProps) => {
   const timeOptions = useMemo(() => buildTimeOptions(), []);
-  const [selectedTime, setSelectedTime] = useState<Option>(timeOptions[0]);
-  const [selectedDate, setSelectedDate] = useState<DateValue | null>(() => today(getLocalTimeZone()));
+  const [selectedTime, setSelectedTime] = useState<Option>(() => {
+    if (dateTime) {
+      const hour24 = dateTime.getHours();
+      const minutes = dateTime.getMinutes();
+      const label = formatTimeLabel(hour24, minutes);
+      return {value: label, label};
+    }
+    return timeOptions[0];
+  });
+  const [selectedDate, setSelectedDate] = useState<DateValue | null>(() => {
+    if (dateTime) {
+      const tz = getLocalTimeZone();
+      return today(tz).set({
+        year: dateTime.getFullYear(),
+        month: dateTime.getMonth() + 1,
+        day: dateTime.getDate(),
+      });
+    }
+    return today(getLocalTimeZone());
+  });
   const menuMaxHeight = 200;
   const portalContainer = typeof document === 'undefined' ? undefined : document.body;
   const popoverStyle = {zIndex: 10000020};

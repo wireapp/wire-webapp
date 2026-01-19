@@ -113,6 +113,7 @@ interface CellsShareModalContentProps {
   expiration: {
     isEnabled: boolean;
     onToggle: () => void;
+    dateTime?: Date | null;
     onChange?: (nextValue: CellsShareExpirationSelection) => void;
   };
   isInputDisabled: boolean;
@@ -286,6 +287,7 @@ export const CellsShareModalContent = ({
               nextMonthLabel: resolvedLabels.expirationNextMonthLabel,
             }}
             errorText={resolvedLabels.expirationPastDateError}
+            dateTime={expiration.dateTime}
             onChange={expiration.onChange}
           />
         </div>
