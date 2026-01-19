@@ -1,6 +1,8 @@
-import Changelog from 'generate-changelog';
-import simpleGit from 'simple-git';
-import * as pkg from '../package.json';
+import {generate} from 'generate-changelog';
+import {simpleGit} from 'simple-git';
+
+// Use require for JSON to avoid ts-node config issues
+const pkg = require('../package.json');
 
 const args = process.argv.slice(2);
 const releaseType = args[0];
@@ -29,7 +31,7 @@ void (async () => {
   const to = until ? until : newProductionTag;
 
   try {
-    const changelog = await Changelog.generate({
+    const changelog = await generate({
       exclude: ['chore', 'docs', 'refactor', 'style', 'test', 'runfix'],
       repoUrl: pkg.repository.url.replace('.git', ''),
       tag: `${from}...${to}`,
