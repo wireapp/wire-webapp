@@ -18,6 +18,7 @@
  */
 
 import {Locator, Page} from '@playwright/test';
+
 import {User} from 'test/e2e_tests/data/user';
 import {downloadAssetAndGetFilePath} from 'test/e2e_tests/utils/asset.util';
 import {selectByClass, selectByDataAttribute} from 'test/e2e_tests/utils/selector.util';
@@ -29,10 +30,8 @@ type EmojiReaction = 'plus-one' | 'heart' | 'joy';
 export class ConversationPage {
   readonly page: Page;
 
-  readonly createGroupModal: Locator;
-  readonly createGroupButton: Locator;
-  readonly createGroupNameInput: Locator;
-  readonly createGroupSubmitButton: Locator;
+  /** The back button is shown on narrow screens e.g. phones to navigate back to the conversation list */
+  readonly backButton: Locator;
   readonly messageInput: Locator;
   readonly sendMessageButton: Locator;
   readonly searchButton: Locator;
@@ -57,7 +56,7 @@ export class ConversationPage {
   readonly messageDetails: Locator;
   readonly messageItems: Locator;
   readonly filesTab: Locator;
-  readonly isTypingIndicator: Locator;
+  readonly typingIndicator: Locator;
   readonly itemPendingRequest: Locator;
   readonly ignoreButton: Locator;
   readonly cancelRequest: Locator;
@@ -73,10 +72,7 @@ export class ConversationPage {
   constructor(page: Page) {
     this.page = page;
 
-    this.createGroupButton = page.locator(selectByDataAttribute('go-create-group'));
-    this.createGroupModal = page.locator(selectByDataAttribute('group-creation-label'));
-    this.createGroupNameInput = this.createGroupModal.locator(selectByDataAttribute('enter-group-name'));
-    this.createGroupSubmitButton = this.createGroupModal.locator(selectByDataAttribute('submit'));
+    this.backButton = page.getByRole('button', {name: 'Go Back'});
     this.messageInput = page.locator(selectByDataAttribute('input-message'));
     this.watermark = page.locator(`${selectByDataAttribute('no-conversation')} svg`);
     this.sendMessageButton = page.locator(selectByDataAttribute('do-send-message'));
@@ -107,7 +103,7 @@ export class ConversationPage {
     );
     this.messageDetails = page.locator('#message-details');
     this.filesTab = page.locator('#conversation-tab-files');
-    this.isTypingIndicator = page.locator(selectByDataAttribute('typing-indicator-title'));
+    this.typingIndicator = page.locator(selectByDataAttribute('typing-indicator-title'));
     this.itemPendingRequest = page.locator(selectByDataAttribute('item-pending-requests'));
     this.ignoreButton = page.getByTestId('do-ignore');
     this.cancelRequest = page.getByTestId('do-cancel-request');
@@ -163,12 +159,6 @@ export class ConversationPage {
     await this.messageInput.click();
     // Use pressSequentially which simulates realistic typing with built-in delays
     await this.messageInput.pressSequentially(message, {delay: 100});
-  }
-
-  async createGroup(groupName: string) {
-    await this.createGroupButton.click();
-    await this.createGroupNameInput.fill(groupName);
-    await this.createGroupSubmitButton.click();
   }
 
   async replyToMessage(message: Locator) {
@@ -382,6 +372,20 @@ export class ConversationPage {
     await fileMessageLocator.first().waitFor({state: 'visible'});
 
     return await fileMessageLocator.isVisible();
+  }
+
+  async isReplyMessageVisible(replyText: string) {
+    const replyMessageLocator = this.page.locator(
+      `${selectByDataAttribute('item-message')} ${selectByClass('message-body')}${selectByClass('message-quoted')} ${selectByClass(
+        'text',
+      )}`,
+      {hasText: replyText},
+    );
+
+    // Wait for at least one matching element to appear (optional timeout can be set)
+    await replyMessageLocator.first().waitFor({state: 'visible'});
+
+    return await replyMessageLocator.isVisible();
   }
 
   async downloadFile() {

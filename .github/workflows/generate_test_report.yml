@@ -17,7 +17,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4.1.6
+        uses: actions/checkout@v6
         with:
           ref: ${{ inputs.commit }}
 
@@ -27,7 +27,7 @@ jobs:
         run: echo "TITLE=$PR_TITLE" >> $GITHUB_ENV
 
       - name: Cancel Previous Runs
-        uses: styfle/cancel-workflow-action@0.12.1
+        uses: styfle/cancel-workflow-action@0.13.0
         with:
           access_token: ${{github.token}}
 

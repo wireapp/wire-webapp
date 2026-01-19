@@ -19,7 +19,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Setup Node.js
         uses: actions/setup-node@v6
@@ -30,6 +30,9 @@ jobs:
       - name: Install JS dependencies
         run: yarn --immutable
 
+      - name: Build libraries
+        run: yarn nx run-many -t build --projects=tag:type:lib
+
       - name: Lint
         run: yarn nx run-many -t lint --all
 
@@ -37,7 +40,7 @@ jobs:
         run: yarn nx run-many -t test --all --configuration=ci --detectOpenHandles=false
 
       - name: Upload webapp coverage to Codecov
-        uses: codecov/codecov-action@v5.5.2
+        uses: codecov/codecov-action@v5
         with:
           fail_ci_if_error: false
           files: ./apps/webapp/coverage/lcov.info
@@ -45,9 +48,25 @@ jobs:
           token: ${{ secrets.CODECOV_TOKEN }}
 
       - name: Upload server coverage to Codecov
-        uses: codecov/codecov-action@v5.5.2
+        uses: codecov/codecov-action@v5
         with:
           fail_ci_if_error: false
           files: ./apps/server/coverage/lcov.info
           flags: app_server
+          token: ${{ secrets.CODECOV_TOKEN }}
+
+      - name: Upload core library coverage to Codecov
+        uses: codecov/codecov-action@v5
+        with:
+          fail_ci_if_error: false
+          files: ./coverage/libraries/core/lcov.info
+          flags: lib_core
+          token: ${{ secrets.CODECOV_TOKEN }}
+
+      - name: Upload api-client library coverage to Codecov
+        uses: codecov/codecov-action@v5.5.2
+        with:
+          fail_ci_if_error: false
+          files: ./coverage/libraries/api-client/lcov.info
+          flags: lib_api_client
           token: ${{ secrets.CODECOV_TOKEN }}

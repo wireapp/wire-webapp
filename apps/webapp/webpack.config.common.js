@@ -21,14 +21,17 @@ const CopyPlugin = require('copy-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const webpack = require('webpack');
 const WorkboxPlugin = require('workbox-webpack-plugin');
+const dotenv = require('dotenv-extended');
+const {execSync} = require('child_process');
 
 const path = require('path');
 
-const DIST_PATH = path.resolve(__dirname, '../../apps/server/dist');
+const {generateClientConfig, generateServerConfig} = require('@wireapp/config');
+
 const ROOT_PATH = path.resolve(__dirname, '../..');
 const SRC_PATH = path.resolve(__dirname, 'src');
 
-const dist = path.resolve(DIST_PATH, 'static');
+const dist = path.resolve(ROOT_PATH, 'apps/server/dist/static');
 const auth = path.resolve(SRC_PATH, 'script/auth');
 const checkBrowser = path.resolve(SRC_PATH, 'script/browser');
 const srcScript = path.resolve(SRC_PATH, 'script');
@@ -37,7 +40,65 @@ const HOME_TEMPLATE_PATH = path.resolve(SRC_PATH, 'page/index.ejs');
 const AUTH_TEMPLATE_PATH = path.resolve(SRC_PATH, 'page/auth.ejs');
 const UNSUPPORTED_TEMPLATE_PATH = path.resolve(SRC_PATH, 'page/unsupported.ejs');
 
-const {clientConfig, serverConfig} = require(path.resolve(DIST_PATH, 'config/index.js'));
+// Generate version information
+function generateVersion() {
+  return new Date()
+    .toISOString()
+    .replace(/[T\-:]/g, '.')
+    .replace(/\.\d+Z/, '');
+}
+
+function generateCommitHash() {
+  try {
+    return execSync('git rev-parse HEAD').toString().trim();
+  } catch (error) {
+    return 'unknown';
+  }
+}
+
+const version = {
+  version: generateVersion(),
+  commit: generateCommitHash(),
+};
+
+// Load environment variables
+const env = dotenv.load({
+  path: path.join(ROOT_PATH, '.env'),
+  defaults: path.join(ROOT_PATH, '.env.defaults'),
+  includeProcessEnv: true,
+});
+
+// Generate URLs
+function generateUrls() {
+  const federation = env.FEDERATION;
+
+  if (!federation) {
+    if (!env.APP_BASE || !env.BACKEND_REST || !env.BACKEND_WS) {
+      throw new Error('missing environment variables');
+    }
+    return {
+      base: env.APP_BASE,
+      api: env.BACKEND_REST,
+      ws: env.BACKEND_WS,
+    };
+  }
+
+  return {
+    base: `https://local.${federation}.wire.link:8081`,
+    api: `https://nginz-https.${federation}.wire.link`,
+    ws: `wss://nginz-ssl.${federation}.wire.link`,
+  };
+}
+
+const commonConfig = {
+  commit: version.commit,
+  version: version.version,
+  env: env.NODE_ENV || 'production',
+  urls: generateUrls(),
+};
+
+const clientConfig = generateClientConfig(commonConfig, env);
+const serverConfig = generateServerConfig(commonConfig, env);
 
 const templateParameters = {
   VERSION: clientConfig.VERSION,

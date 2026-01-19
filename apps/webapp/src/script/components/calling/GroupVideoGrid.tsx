@@ -113,6 +113,7 @@ const GroupVideoThumbnailWrapper = ({children, minimized}: {children?: ReactNode
         : undefined
     }
     data-uie-name="self-video-thumbnail-wrapper"
+    aria-hidden="true"
   >
     {children}
   </div>

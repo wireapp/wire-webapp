@@ -157,7 +157,7 @@ const GroupVideoGridTile = ({
         </div>
       )}
 
-      <div css={groupVideoActiveSpeakerTile(isActivelySpeaking, participantCount)} />
+      <div css={groupVideoActiveSpeakerTile(isActivelySpeaking)} />
 
       {!minimized && isMuted && (
         <span className="group-video-grid__element__label__icon">

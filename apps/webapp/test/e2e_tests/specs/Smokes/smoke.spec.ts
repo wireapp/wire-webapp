@@ -46,7 +46,7 @@ test('Login and search smoke', {tag: ['@smoke']}, async ({pageManager, api, brow
 
   await test.step('User can search', async () => {
     await components.conversationSidebar().clickConnectButton();
-    await pages.startUI().selectUser(userB.username);
+    await pages.startUI().selectUsers(userB.username);
     expect(await modals.userProfile().isVisible());
   });
 });

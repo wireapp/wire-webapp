@@ -18,7 +18,7 @@
  */
 
 import JSZip from 'jszip';
-import sodium from 'libsodium-wrappers';
+import sodium from 'libsodium-wrappers-sumo';
 
 import {ImportError} from './Error';
 
