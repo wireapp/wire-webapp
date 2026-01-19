@@ -29,6 +29,7 @@ import * as Icon from 'Components/Icon';
 import {AssetImage} from 'Components/Image';
 import type {Conversation} from 'Repositories/entity/Conversation';
 import {ContentMessage} from 'Repositories/entity/message/ContentMessage';
+import {Multipart} from 'Repositories/entity/message/Multipart';
 import {Text} from 'Repositories/entity/message/Text';
 import {User} from 'Repositories/entity/User';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
@@ -39,6 +40,7 @@ import {formatDateNumeral, formatTimeShort, isBeforeToday} from 'Util/TimeUtil';
 import {AudioAsset} from './asset/AudioAsset/AudioAsset';
 import {FileAsset} from './asset/FileAsset/FileAsset';
 import {LocationAsset} from './asset/LocationAsset';
+import {MultipartAssetPreview} from './asset/MultipartAssetPreview';
 import {TextMessageRenderer} from './asset/TextMessageRenderer';
 import {VideoAsset} from './asset/VideoAsset/VideoAsset';
 
@@ -190,6 +192,44 @@ const QuotedMessage: FC<QuotedMessageProps> = ({
       </div>
       {assets.map((asset, index) => (
         <Fragment key={index}>
+          {asset.isMultipart() &&
+            (() => {
+              const multipartAsset = asset as Multipart;
+              const shouldRenderText = multipartAsset.should_render_text();
+              const cellAssets = multipartAsset.getCellAssets();
+              const attachmentsCount = cellAssets.length;
+              const attachmentsCountCopy =
+                attachmentsCount === 1
+                  ? t('replyBarSingleAttachment')
+                  : t('replyBarMultipleAttachments', {count: attachmentsCount});
+
+              return (
+                <>
+                  {shouldRenderText && (
+                    <TextMessageRenderer
+                      onMessageClick={handleClickOnMessage}
+                      text={multipartAsset.render(selfId)}
+                      className={cx('message-quote__text', {
+                        'message-quote__text--large': includesOnlyEmojis(multipartAsset.text),
+                      })}
+                      isFocusable={isMessageFocused}
+                      data-uie-name="media-text-quote"
+                      collapse
+                    />
+                  )}
+                  {attachmentsCount > 0 && (
+                    <MultipartAssetPreview
+                      cellAssets={cellAssets}
+                      conversationId={quotedMessage.conversation_id}
+                      attachmentsCountCopy={attachmentsCountCopy}
+                      senderName={senderName}
+                      timestamp={timestamp}
+                    />
+                  )}
+                </>
+              );
+            })()}
+
           {asset.isImage() && (
             <div data-uie-name="media-picture-quote">
               <AssetImage
