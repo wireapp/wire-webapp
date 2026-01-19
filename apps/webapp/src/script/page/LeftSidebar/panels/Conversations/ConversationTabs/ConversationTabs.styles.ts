@@ -57,5 +57,4 @@ export const conversationsTitleWrapper: CSSObject = {
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'space-between',
-  paddingRight: '6px',
 };
