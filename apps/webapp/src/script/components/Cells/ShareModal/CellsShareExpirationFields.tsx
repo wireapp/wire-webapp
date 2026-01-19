@@ -53,6 +53,7 @@ import {
   calendarPopoverStyles,
   dateInputStyles,
   datePickerGroupStyles,
+  datePickerGroupFocusStyles,
   dateSegmentStyles,
   expirationContentStyles,
   expirationFieldsRowStyles,
@@ -163,7 +164,7 @@ export const CellsShareExpirationFields = ({
   );
   const dateGroupStyles = isExpirationInvalid
     ? {...datePickerGroupStyles, ...expirationErrorBorderStyles}
-    : datePickerGroupStyles;
+    : {...datePickerGroupStyles, ...datePickerGroupFocusStyles};
   const timeControlStyles = timeSelectStyles;
   const labelStyles = isExpirationInvalid
     ? {...expirationLabelStyles, ...expirationErrorLabelStyles}

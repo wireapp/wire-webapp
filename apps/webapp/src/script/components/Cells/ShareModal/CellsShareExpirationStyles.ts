@@ -19,7 +19,7 @@
 
 import {CSSObject} from '@emotion/react';
 
-import {BASE_DARK_COLOR, BASE_LIGHT_COLOR} from '@wireapp/react-ui-kit';
+import {BASE_DARK_COLOR, BASE_LIGHT_COLOR, COLOR} from '@wireapp/react-ui-kit';
 
 export const expirationContentStyles: CSSObject = {
   display: 'flex',
@@ -53,12 +53,28 @@ export const datePickerGroupStyles: CSSObject = {
   minHeight: '48px',
   padding: '10px 14px',
   borderRadius: '14px',
-  border: '1px solid var(--accent-color)',
+  border: '1px solid var(--text-input-border)',
   backgroundColor: 'var(--text-input-background)',
-
   'body.theme-dark &': {
-    backgroundColor: 'var(--text-input-background)',
-    borderColor: 'var(--gray-100)',
+    backgroundColor: COLOR.BLACK_LIGHTEN_24,
+    borderColor: 'var(--text-input-border)',
+  },
+};
+
+export const datePickerGroupFocusStyles: CSSObject = {
+  '&[data-focus-visible]': {
+    borderColor: 'var(--accent-color)',
+  },
+  '.react-aria-DatePicker[data-open] &': {
+    borderColor: 'var(--accent-color)',
+  },
+  'body.theme-dark &': {
+    '&&[data-focus-visible]': {
+      borderColor: 'var(--accent-color)',
+    },
+    '.react-aria-DatePicker[data-open] &': {
+      borderColor: 'var(--accent-color)',
+    },
   },
 };
 
@@ -235,8 +251,6 @@ export const timeSelectStyles: CSSObject = {
 };
 
 export const timeSelectMenuStyles: CSSObject = {
-  paddingBottom: '4px',
-  paddingTop: '4px',
   '& [role="option"]': {
     color: 'var(--main-color)',
   },
