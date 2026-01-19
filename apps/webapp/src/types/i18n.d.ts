@@ -476,7 +476,7 @@ declare module 'I18n/en-US.json' {
     'cells.search.closeButton': `Close`;
     'cells.search.failed': `Something went wrong, please try again later.`;
     'cells.search.placeholder': `Search files and folders`;
-    'cells.selfDeletingMessage.info': `The feature is not available for conversations with Cells.`;
+    'cells.selfDeletingMessage.info': `The feature is not available for conversations with a shared Drive.`;
     'cells.shareModal.copyLink': `Copy Link`;
     'cells.shareModal.disablePublicLink': `Disable public link`;
     'cells.shareModal.disablePublicLink.description': `Disable public link`;
@@ -488,8 +488,8 @@ declare module 'I18n/en-US.json' {
     'cells.shareModal.heading': `Share via link`;
     'cells.shareModal.linkCopied': `Link copied`;
     'cells.shareModal.primaryAction': `Done`;
-    'cells.sidebar.heading': `Files`;
-    'cells.sidebar.title': `All`;
+    'cells.sidebar.heading': `Drive`;
+    'cells.sidebar.title': `Files`;
     'cells.tableRow.actions': `More options`;
     'cells.tableRow.conversationName': `Conversation`;
     'cells.tableRow.created': `Created`;
@@ -642,7 +642,7 @@ declare module 'I18n/en-US.json' {
     'conversationDetailsActionBlock': `Block`;
     'conversationDetailsActionCancelRequest': `Cancel request`;
     'conversationDetailsActionCellsOption': `Permanently on for this conversation.`;
-    'conversationDetailsActionCellsTitle': `File collaboration (Cells beta version) is on`;
+    'conversationDetailsActionCellsTitle': `Shared Drive`;
     'conversationDetailsActionClear': `Clear content`;
     'conversationDetailsActionConversationParticipants': `Show all ({number})`;
     'conversationDetailsActionCreateGroup': `Create group`;
