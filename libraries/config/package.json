@@ -17,7 +17,7 @@
     "src"
   ],
   "dependencies": {
-    "fs-extra": "11.2.0",
+    "fs-extra": "11.3.3",
     "logdown": "3.3.1"
   }
 }
