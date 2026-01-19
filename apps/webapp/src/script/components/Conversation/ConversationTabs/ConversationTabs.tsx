@@ -93,7 +93,7 @@ export const ConversationTabs = ({activeTabIndex, onIndexChange, conversationQua
         />
         <ConversationTab
           id="files"
-          label="Files"
+          label="Shared Drive"
           isActive={activeTabIndex === 1}
           onClick={event => {
             createNavigate(filesUrl)(event);
