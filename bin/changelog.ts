@@ -1,6 +1,9 @@
 import {generate} from 'generate-changelog';
 import {simpleGit} from 'simple-git';
 
+// Suppress dotenv logging
+require('dotenv').config({quiet: true});
+
 // Use require for JSON to avoid ts-node config issues
 const pkg = require('../package.json');
 
@@ -24,8 +27,10 @@ void (async () => {
   const tags = await simpleGit().tags({'--list': null});
   const productionTags = tags.all.filter(tag => tag.includes(`-${releaseType}.`));
 
-  const newProductionTag = productionTags.sort().reverse()[0];
-  const lastProductionTag = productionTags.sort().reverse()[1];
+  // Sort tags in descending order (newest first)
+  const sortedTags = productionTags.sort().reverse();
+  const newProductionTag = sortedTags[0];
+  const lastProductionTag = sortedTags[1];
 
   const from = until ? newProductionTag : lastProductionTag;
   const to = until ? until : newProductionTag;
