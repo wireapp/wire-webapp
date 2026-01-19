@@ -1405,8 +1405,8 @@ declare module 'I18n/en-US.json' {
     'modalCreateFolderHeadline': `Create new folder`;
     'modalCreateFolderMessage': `Move your conversation to a new folder.`;
     'modalCreateFolderPlaceholder': `Folder name`;
-    'modalCreateGroupCellsToggleHeading': `File collaboration (Cells beta version)`;
-    'modalCreateGroupCellsToggleInfo': `Enable participants to manage their documents and media files. Use folders, tags, and filters to work more efficiently. This can’t be undone.`;
+    'modalCreateGroupCellsToggleHeading': `Shared Drive`;
+    'modalCreateGroupCellsToggleInfo': `Enable participants to manage their documents and media files in a shared Drive. This can’t be undone.`;
     'modalCreateGroupProtocolHeading': `Protocol`;
     'modalCreateGroupProtocolInfo': `Select MLS to create a group conversation using the Messaging Layer Security protocol.`;
     'modalCreateGroupProtocolSelect.default': ` (default)`;
