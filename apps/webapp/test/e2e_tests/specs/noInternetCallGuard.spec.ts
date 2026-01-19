@@ -19,12 +19,12 @@
 
 import {getUser} from 'test/e2e_tests/data/user';
 import {PageManager} from 'test/e2e_tests/pageManager';
-import {addMockCamerasToContext} from 'test/e2e_tests/utils/mockVideoDevice.util';
 import {addCreatedTeam, removeCreatedTeam} from 'test/e2e_tests/utils/tearDown.util';
 import {loginUser} from 'test/e2e_tests/utils/userActions';
 
 import {expect, test} from '../test.fixtures';
 import {makeNetworkOffline, makeNetworkOnline} from '../utils/network.util';
+import {mockAudioAndVideoDevices} from '../utils/mockVideoDevice.util';
 
 let ownerA = getUser();
 let ownerB = getUser();
@@ -37,7 +37,7 @@ test('Starting call 1:1 call without internet', async ({browser, pageManager: ow
 
   const {pages: ownerAPages, modals: ownerAModals, components: ownerAComponents} = ownerAPageManager.webapp;
 
-  await addMockCamerasToContext(ownerAPageManager.getContext());
+  await ownerAPageManager.getContext().addInitScript(mockAudioAndVideoDevices);
 
   const ownerBContext = await browser.newContext();
   const ownerBPage = await ownerBContext.newPage();

@@ -19,14 +19,13 @@
 
 import {User} from 'test/e2e_tests/data/user';
 import {PageManager} from 'test/e2e_tests/pageManager';
-import {addMockCamerasToContext} from 'test/e2e_tests/utils/mockVideoDevice.util';
 
 import {test, expect, withLogin, withConnectionRequest} from '../../test.fixtures';
 
 test(
   '1:1 Video call with device switch and screenshare',
   {tag: ['@TC-8754', '@crit-flow-web']},
-  async ({createTeam, createPage, browser, api}) => {
+  async ({createTeam, createPage, api}) => {
     test.setTimeout(150_000);
 
     let ownerA: User;
@@ -40,10 +39,8 @@ test(
       ownerA = teamA.owner;
       ownerB = teamB.owner;
 
-      const userAContext = await browser.newContext();
-      await addMockCamerasToContext(userAContext);
       const [pmA, pmB] = await Promise.all([
-        PageManager.from(createPage(userAContext, withLogin(ownerA), withConnectionRequest(ownerB))),
+        PageManager.from(createPage(withLogin(ownerA), withConnectionRequest(ownerB))),
         PageManager.from(createPage(withLogin(ownerB))),
       ]);
       ownerAPageManager = pmA;
