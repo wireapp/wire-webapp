@@ -38,15 +38,6 @@ export enum SidebarTabs {
   CELLS,
 }
 
-export enum ConversationFilter {
-  NONE = 'NONE',
-  UNREAD = 'UNREAD',
-  MENTIONS = 'MENTIONS',
-  REPLIES = 'REPLIES',
-  DRAFTS = 'DRAFTS',
-  PINGS = 'PINGS',
-}
-
 export const SidebarStatus = {
   OPEN: 'OPEN',
   CLOSED: 'CLOSED',
@@ -59,8 +50,9 @@ export interface SidebarStore {
   setStatus: (status: SidebarStatus) => void;
   currentTab: SidebarTabs;
   setCurrentTab: (tab: SidebarTabs) => void;
-  conversationFilter: ConversationFilter;
-  setConversationFilter: (filter: ConversationFilter) => void;
+  visibleTabs: SidebarTabs[];
+  setVisibleTabs: (tabs: SidebarTabs[]) => void;
+  toggleTabVisibility: (tab: SidebarTabs) => void;
 }
 
 const useSidebarStore = create<SidebarStore>()(
@@ -72,8 +64,40 @@ const useSidebarStore = create<SidebarStore>()(
       },
       status: SidebarStatus.OPEN,
       setStatus: status => set({status: status}),
-      conversationFilter: ConversationFilter.NONE,
-      setConversationFilter: (filter: ConversationFilter) => set({conversationFilter: filter}),
+      visibleTabs: [
+        SidebarTabs.RECENT,
+        SidebarTabs.FOLDER,
+        SidebarTabs.FAVORITES,
+        SidebarTabs.GROUPS,
+        SidebarTabs.CHANNELS,
+        SidebarTabs.DIRECTS,
+        SidebarTabs.UNREAD,
+        SidebarTabs.MENTIONS,
+        SidebarTabs.REPLIES,
+        SidebarTabs.DRAFTS,
+        SidebarTabs.PINGS,
+        SidebarTabs.ARCHIVES,
+      ],
+      setVisibleTabs: (tabs: SidebarTabs[]) => set({visibleTabs: tabs}),
+      toggleTabVisibility: (tab: SidebarTabs) => {
+        set(state => {
+          const isCurrentlyVisible = state.visibleTabs.includes(tab);
+          const isActiveTab = state.currentTab === tab;
+
+          if (isCurrentlyVisible && isActiveTab) {
+            return {
+              currentTab: SidebarTabs.RECENT,
+              visibleTabs: state.visibleTabs.filter(visibleTab => visibleTab !== tab),
+            };
+          }
+
+          const newVisibleTabs = isCurrentlyVisible
+            ? state.visibleTabs.filter(visibleTab => visibleTab !== tab)
+            : [...state.visibleTabs, tab];
+
+          return {visibleTabs: newVisibleTabs};
+        });
+      },
     }),
     {
       name: 'sidebar-store',
@@ -83,7 +107,7 @@ const useSidebarStore = create<SidebarStore>()(
         currentTab: [SidebarTabs.PREFERENCES, SidebarTabs.CONNECT, SidebarTabs.CELLS].includes(state.currentTab)
           ? SidebarTabs.RECENT
           : state.currentTab,
-        conversationFilter: state.conversationFilter,
+        visibleTabs: state.visibleTabs,
       }),
     },
   ),
