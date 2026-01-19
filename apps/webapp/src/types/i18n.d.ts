@@ -600,7 +600,7 @@ declare module 'I18n/en-US.json' {
     'conversationAudioAssetUploadFailed': `Upload failed: {name}`;
     'conversationAudioAssetUploading': `Uploading: {name}`;
     'conversationButtonSeparator': `or`;
-    'conversationCellsConversationEnabled': `File collaboration (Cells beta) is on`;
+    'conversationCellsConversationEnabled': `Shared Drive is on`;
     'conversationClassified': `Security level: VS-NfD`;
     'conversationCommonFeature1': `Up to [bold]{capacity}[/bold] people`;
     'conversationCommonFeature2': `Video conferencing`;
