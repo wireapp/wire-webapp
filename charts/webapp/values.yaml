@@ -22,10 +22,10 @@ ingress:
 tls:
   enabled: false
   useCertManager: true
-  createIssuer: true
+  createIssuer: false
   issuer:
-    name: letsencrypt-http01
-    kind: Issuer
+    name: letsencrypt
+    kind: ClusterIssuer
 
 certManager:
   inTestMode: false
