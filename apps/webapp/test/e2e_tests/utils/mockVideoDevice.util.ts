@@ -17,9 +17,19 @@
  *
  */
 
+/**
+ * Init script to mock the available audio and video devices the browser sees.
+ *
+ * Usage: `context.addInitScript(mockAudioAndVideoDevices);`
+ *
+ * This will add 3 devices for audio in- and output as well as 3 cameras.
+ * No matter which of the devices is selected the default input is returned. (The default input is mocked via launchArgs in the playwright config)
+ */
 export const mockAudioAndVideoDevices = () => {
+  // Keep a copy of the original function so it can be used within its own stub
   const originalGetUserMedia = navigator.mediaDevices?.getUserMedia.bind(navigator.mediaDevices);
 
+  // Mock the devices the browser sees, 3 for each device type
   navigator.mediaDevices.enumerateDevices = async () => [
     // Create 3 fake cameras
     ...Array.from<unknown, MediaDeviceInfo>({length: 3}, (_, i) => ({
@@ -49,6 +59,11 @@ export const mockAudioAndVideoDevices = () => {
     })),
   ];
 
+  /**
+   * Stub the function to always return the default audio / video stream no matter which device was requested.
+   * This is necessary as only the default device gets mocked by the chrome launch args,
+   * otherwise the dummy devices defined above would show up as inputs but wouldn't work once selected.
+   */
   navigator.mediaDevices.getUserMedia = async () => {
     return await originalGetUserMedia({audio: {deviceId: 'default'}, video: {deviceId: 'default'}});
   };
