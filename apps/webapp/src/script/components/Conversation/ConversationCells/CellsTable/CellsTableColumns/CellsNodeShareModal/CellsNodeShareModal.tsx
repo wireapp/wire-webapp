@@ -50,6 +50,7 @@ import {
   wrapperStyles,
 } from './CellsNodeShareModal.styles';
 import {useCellPublicLink} from './useCellPublicLink';
+
 import {useCellsStore} from '../../../common/useCellsStore/useCellsStore';
 
 interface ShareModalParams {
@@ -101,7 +102,11 @@ const CellShareModalContent = ({
   cellsRepository,
   modalId,
 }: ShareModalParams & {modalId: string}) => {
-  const {status, link, isEnabled, togglePublicLink} = useCellPublicLink({uuid, conversationId, cellsRepository});
+  const {status, link, isEnabled, togglePublicLink, updatePublicLink} = useCellPublicLink({
+    uuid,
+    conversationId,
+    cellsRepository,
+  });
   const node = useCellsStore(state =>
     state.nodesByConversation[conversationId]?.find(cellNode => cellNode.id === uuid),
   );
@@ -128,17 +133,15 @@ const CellShareModalContent = ({
         expirationInvalid: isExpirationInvalid,
       });
 
-      console.log('Serialized Input:', serialized);
       if (!serialized.isValid) {
         return;
       }
 
       try {
-        await cellsRepository.updatePublicLink({
-          linkUuid: node.publicLink.uuid,
+        await updatePublicLink({
           updatePassword: serialized.updatePassword,
           passwordEnabled: serialized.passwordEnabled,
-          accessEnd: serialized.accessEnd,
+          ...(serialized.accessEnd ? {accessEnd: serialized.accessEnd} : {}),
         });
         removeCurrentModal();
       } catch {
@@ -160,6 +163,7 @@ const CellShareModalContent = ({
     isExpirationEnabled,
     expirationDateTime,
     isExpirationInvalid,
+    updatePublicLink,
   ]);
 
   return (

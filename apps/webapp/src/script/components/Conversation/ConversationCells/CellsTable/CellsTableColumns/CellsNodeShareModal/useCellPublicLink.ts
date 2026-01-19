@@ -42,7 +42,13 @@ export const useCellPublicLink = ({uuid, conversationId, cellsRepository}: UseCe
   const createPublicLink = useCallback(async () => {
     try {
       setStatus('loading');
-      const link = await cellsRepository.createPublicLink({uuid, label: node?.name || ''});
+      const link = await cellsRepository.createPublicLink({
+        uuid,
+        link: {
+          Label: node?.name || '',
+          Permissions: ['Preview', 'Download'],
+        },
+      });
 
       if (!link.LinkUrl || !link.Uuid) {
         throw new Error('Link not found');
@@ -103,6 +109,51 @@ export const useCellPublicLink = ({uuid, conversationId, cellsRepository}: UseCe
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [uuid, conversationId, node?.publicLink, setPublicLink]);
 
+  const updatePublicLink = useCallback(
+    async ({
+      updatePassword,
+      passwordEnabled,
+      accessEnd,
+    }: {
+      updatePassword?: string;
+      passwordEnabled?: boolean;
+      accessEnd?: string;
+    }) => {
+      if (!node?.publicLink?.uuid) {
+        throw new Error('No public link to update');
+      }
+
+      try {
+        setStatus('loading');
+
+        // Fetch the complete link object first
+        const currentLink = await cellsRepository.getPublicLink({uuid: node.publicLink.uuid});
+
+        // Update only the properties we need to change
+        const updatedLink = {
+          ...currentLink,
+          PasswordRequired: passwordEnabled,
+          ...(accessEnd ? {AccessEnd: accessEnd} : {}),
+        };
+
+        await cellsRepository.updatePublicLink({
+          linkUuid: node.publicLink.uuid,
+          link: updatedLink,
+          updatePassword,
+          passwordEnabled,
+        });
+
+        setStatus('success');
+      } catch (err) {
+        setStatus('error');
+        throw err;
+      }
+    },
+    // cellsRepository is not a dependency because it's a singleton
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [node?.publicLink?.uuid],
+  );
+
   const togglePublicLink = useCallback(() => {
     setIsEnabled(prev => !prev);
   }, []);
@@ -132,5 +183,6 @@ export const useCellPublicLink = ({uuid, conversationId, cellsRepository}: UseCe
     link: node?.publicLink?.url,
     isEnabled,
     togglePublicLink,
+    updatePublicLink,
   };
 };

@@ -17,7 +17,7 @@
  *
  */
 
-import {NodeFlags} from '@wireapp/api-client/lib/cells';
+import {NodeFlags, RestShareLink} from '@wireapp/api-client/lib/cells';
 import {container, singleton} from 'tsyringe';
 
 import {createUuid} from 'Util/uuid';
@@ -179,10 +179,22 @@ export class CellsRepository {
     return this.apiClient.api.cells.createFile({path: filePath, uuid, versionId});
   }
 
-  async createPublicLink({uuid, label}: {uuid: string; label?: string}) {
+  async createPublicLink({
+    uuid,
+    link,
+    createPassword,
+    passwordEnabled,
+  }: {
+    uuid: string;
+    link: RestShareLink;
+    createPassword?: string;
+    passwordEnabled?: boolean;
+  }) {
     return this.apiClient.api.cells.createNodePublicLink({
       uuid,
-      label,
+      link,
+      createPassword,
+      passwordEnabled,
     });
   }
 
@@ -196,23 +208,20 @@ export class CellsRepository {
 
   async updatePublicLink({
     linkUuid,
-    label,
+    link,
     updatePassword,
     passwordEnabled,
-    accessEnd,
   }: {
     linkUuid: string;
-    label?: string;
+    link: RestShareLink;
     updatePassword?: string;
     passwordEnabled?: boolean;
-    accessEnd?: string | null;
   }) {
     return this.apiClient.api.cells.updateNodePublicLink({
       linkUuid,
-      label,
+      link,
       updatePassword,
       passwordEnabled,
-      accessEnd,
     });
   }
 

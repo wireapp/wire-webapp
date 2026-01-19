@@ -50,6 +50,7 @@ import {
   wrapperStyles,
 } from './CellsShareModal.styles';
 import {useCellPublicLink} from './useCellPublicLink';
+
 import {useCellsStore} from '../../../common/useCellsStore/useCellsStore';
 
 interface ShareModalParams {
@@ -62,27 +63,31 @@ const submitHandlers = new Map<string, () => Promise<void> | void>();
 
 export const showShareModal = ({type, uuid, cellsRepository}: ShareModalParams) => {
   const modalId = createUuid();
-  PrimaryModal.show(PrimaryModal.type.CONFIRM, {
-    closeOnConfirm: false,
-    size: 'large',
-    primaryAction: {
-      action: () => {
-        const submitHandler = submitHandlers.get(modalId);
-        if (submitHandler) {
-          void submitHandler();
-        }
+  PrimaryModal.show(
+    PrimaryModal.type.CONFIRM,
+    {
+      closeOnConfirm: false,
+      size: 'large',
+      primaryAction: {
+        action: () => {
+          const submitHandler = submitHandlers.get(modalId);
+          if (submitHandler) {
+            void submitHandler();
+          }
+        },
+        text: t('cells.shareModal.primaryAction'),
       },
-      text: t('cells.shareModal.primaryAction'),
+      text: {
+        message: <CellsShareModal type={type} uuid={uuid} cellsRepository={cellsRepository} modalId={modalId} />,
+        title: t('cells.shareModal.heading'),
+      },
     },
-    text: {
-      message: <CellsShareModal type={type} uuid={uuid} cellsRepository={cellsRepository} modalId={modalId} />,
-      title: t('cells.shareModal.heading'),
-    },
-  }, modalId);
+    modalId,
+  );
 };
 
 const CellsShareModal = ({type, uuid, cellsRepository, modalId}: ShareModalParams & {modalId: string}) => {
-  const {status, link, isEnabled, togglePublicLink} = useCellPublicLink({uuid, cellsRepository});
+  const {status, link, isEnabled, togglePublicLink, updatePublicLink} = useCellPublicLink({uuid, cellsRepository});
   const node = useCellsStore(state => state.nodes.find(cellNode => cellNode.id === uuid));
   const {isEnabled: isPasswordEnabled, toggle: togglePassword} = useCellPasswordToggle();
   const {isEnabled: isExpirationEnabled, toggle: toggleExpiration} = useCellExpirationToggle();
@@ -112,11 +117,10 @@ const CellsShareModal = ({type, uuid, cellsRepository, modalId}: ShareModalParam
       }
 
       try {
-        await cellsRepository.updatePublicLink({
-          linkUuid: node.publicLink.uuid,
+        await updatePublicLink({
           updatePassword: serialized.updatePassword,
           passwordEnabled: serialized.passwordEnabled,
-          accessEnd: serialized.accessEnd,
+          ...(serialized.accessEnd ? {accessEnd: serialized.accessEnd} : {}),
         });
         removeCurrentModal();
       } catch {
@@ -138,6 +142,7 @@ const CellsShareModal = ({type, uuid, cellsRepository, modalId}: ShareModalParam
     isExpirationEnabled,
     expirationDateTime,
     isExpirationInvalid,
+    updatePublicLink,
   ]);
 
   return (
