@@ -18,12 +18,16 @@ jobs:
     runs-on: buildjet-8vcpu-ubuntu-2204
 
     steps:
-      - name: Checkout
+      - name: Checkout (pull_request)
+        if: ${{ github.event_name == 'pull_request' }}
         uses: actions/checkout@v6
         with:
-          # Uses the head commit (not merge commit)
+          # Uses the head commit (not merge commit) for PRs
           ref: ${{ github.event.pull_request.head.sha }}
 
+      - name: Checkout (non-PR)
+        if: ${{ github.event_name != 'pull_request' }}
+        uses: actions/checkout@v6
       - name: Setup Node.js
         uses: actions/setup-node@v6
         with:
@@ -85,5 +89,5 @@ jobs:
           DOCKER_USERNAME: ${{ secrets.WEBTEAM_QUAY_USERNAME }}
           PR_TAG: pr-${{ github.event.pull_request.number }}
           GITHUB_SHA: ${{ github.event.pull_request.head.sha }}
-        # The second and third positional parameters are uniqueTagOut and commitSha; they are intentionally left empty here.
+        # The third and fourth positional parameters are uniqueTagOut and commitSha; they are intentionally left empty here.
         run: yarn docker "$PR_TAG" "" "" --pr
