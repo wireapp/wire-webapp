@@ -232,6 +232,7 @@ export class CellsRepository {
     query,
     limit = DEFAULT_MAX_FILES_LIMIT,
     tags,
+    path,
     type,
     sortBy,
     sortDirection,
@@ -239,6 +240,7 @@ export class CellsRepository {
     query: string;
     limit?: number;
     tags?: string[];
+    path?: string;
     type?: 'file' | 'folder';
     sortBy?: SortBy;
     sortDirection?: SortDirection;
@@ -249,6 +251,7 @@ export class CellsRepository {
       sortBy,
       sortDirection,
       tags,
+      path,
       ...(type ? {type: type === 'file' ? 'LEAF' : 'COLLECTION'} : {}),
     });
   }
