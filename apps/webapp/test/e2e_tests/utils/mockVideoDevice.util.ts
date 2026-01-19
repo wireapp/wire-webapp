@@ -24,88 +24,37 @@ export async function addMockCamerasToContext(context: BrowserContext): Promise<
   await context.addInitScript(() => {
     const originalGetUserMedia = navigator.mediaDevices?.getUserMedia.bind(navigator.mediaDevices);
 
-    navigator.mediaDevices.enumerateDevices = async () => {
-      return [
-        {
-          deviceId: 'default',
-          kind: 'videoinput',
-          label: 'Fake Camera 1',
-          groupId: 'video-group-1',
-          toJSON: () => '{}',
-          __proto__: MediaDeviceInfo.prototype,
-        },
-        {
-          deviceId: 'video-2',
-          kind: 'videoinput',
-          label: 'Fake Camera 2',
-          groupId: 'video-group-2',
-          toJSON: () => '{}',
-          __proto__: MediaDeviceInfo.prototype,
-        },
-        {
-          deviceId: 'video-3',
-          kind: 'videoinput',
-          label: 'Fake Camera 3',
-          groupId: 'video-group-3',
-          toJSON: () => '{}',
-          __proto__: MediaDeviceInfo.prototype,
-        },
+    navigator.mediaDevices.enumerateDevices = async () => [
+      // Create 3 fake cameras
+      ...Array.from<unknown, MediaDeviceInfo>({length: 3}, (_, i) => ({
+        deviceId: `video-camera-${i + 1}`,
+        kind: 'videoinput',
+        label: `Fake Camera ${i + 1}`,
+        groupId: `video-group-${i + 1}`,
+        toJSON: () => `{ "deviceId": "video-camera-${i + 1}" }`,
+      })),
 
-        {
-          deviceId: 'default',
-          kind: 'audioinput',
-          label: 'Fake Audio Input 1',
-          groupId: 'audio-input-group-1',
-          toJSON: () => '{}',
-          __proto__: MediaDeviceInfo.prototype,
-        },
-        {
-          deviceId: 'audio-input-2',
-          kind: 'audioinput',
-          label: 'Fake Audio Input 2',
-          groupId: 'audio-input-group-2',
-          toJSON: () => '{}',
-          __proto__: MediaDeviceInfo.prototype,
-        },
-        {
-          deviceId: 'audio-input-3',
-          kind: 'audioinput',
-          label: 'Fake Audio Input 3',
-          groupId: 'audio-input-group-3',
-          toJSON: () => '{}',
-          __proto__: MediaDeviceInfo.prototype,
-        },
+      // Create 3 fake audio inputs
+      ...Array.from<unknown, MediaDeviceInfo>({length: 3}, (_, i) => ({
+        deviceId: `audio-input-${i + 1}`,
+        kind: 'audioinput',
+        label: `Fake Audio Input ${i + 1}`,
+        groupId: `audio-input-group-${i + 1}`,
+        toJSON: () => `{ "deviceId": "audio-input-${i + 1}" }`,
+      })),
 
-        {
-          deviceId: 'default',
-          kind: 'audiooutput',
-          label: 'Fake Audio Output 1',
-          groupId: 'audio-output-group-1',
-          toJSON: () => '{}',
-          __proto__: MediaDeviceInfo.prototype,
-        },
-        {
-          deviceId: 'audio-output-2',
-          kind: 'audiooutput',
-          label: 'Fake Audio Output 2',
-          groupId: 'audio-output-group-2',
-          toJSON: () => '{}',
-          __proto__: MediaDeviceInfo.prototype,
-        },
-        {
-          deviceId: 'audio-output-3',
-          kind: 'audiooutput',
-          label: 'Fake Audio Output 3',
-          groupId: 'audio-output-group-3',
-          toJSON: () => '{}',
-          __proto__: MediaDeviceInfo.prototype,
-        },
-      ];
-    };
+      // Create 3 fake audio outputs
+      ...Array.from<unknown, MediaDeviceInfo>({length: 3}, (_, i) => ({
+        deviceId: `audio-output-${i + 1}`,
+        kind: 'audiooutput',
+        label: `Fake Audio Output ${i + 1}`,
+        groupId: `audio-output-group-${i + 1}`,
+        toJSON: () => `{ "deviceId": "audio-output-${i + 1}" }`,
+      })),
+    ];
 
     navigator.mediaDevices.getUserMedia = async () => {
-      const stream = await originalGetUserMedia({audio: {deviceId: 'default'}, video: {deviceId: 'default'}});
-      return stream;
+      return await originalGetUserMedia({audio: {deviceId: 'default'}, video: {deviceId: 'default'}});
     };
   });
 }
