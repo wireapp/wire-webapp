@@ -36,8 +36,10 @@ export class AudioVideoSettingsPage {
   }
 
   async selectMicrophone(microphoneName: string) {
+    // The Select component doesn't implement the disabled state correctly so we need to use this workaround
+    await this.microphoneDrowdown.getByRole('combobox', {name: 'Microphone'}).isEditable();
     await this.microphoneDrowdown.click();
-    await this.page.locator(`[data-uie-name="option-enter-microphone"]`).filter({hasText: microphoneName}).click();
+    await this.page.getByRole('listbox').getByRole('option', {name: microphoneName}).click();
   }
 
   async isMicrophoneSetTo(expectedMicrophoneName: string) {
@@ -46,8 +48,10 @@ export class AudioVideoSettingsPage {
   }
 
   async selectSpeaker(speakerName: string) {
+    // The Select component doesn't implement the disabled state correctly so we need to use this workaround
+    await this.speakerDrowdown.getByRole('combobox', {name: 'Speakers'}).isEditable();
     await this.speakerDrowdown.click();
-    await this.page.locator(`[data-uie-name="option-enter-speaker"]`).filter({hasText: speakerName}).click();
+    await this.page.getByRole('listbox').getByRole('option', {name: speakerName}).click();
   }
 
   async isSpeakerSetTo(expectedSpeakerName: string) {
@@ -56,8 +60,10 @@ export class AudioVideoSettingsPage {
   }
 
   async selectCamera(cameraName: string) {
+    // The Select component doesn't implement the disabled state correctly so we need to use this workaround
+    await this.cameraDrowdown.getByRole('combobox', {name: 'Camera'}).isEditable();
     await this.cameraDrowdown.click();
-    await this.page.locator(`[data-uie-name="option-enter-camera"]`).filter({hasText: cameraName}).click();
+    await this.page.getByRole('listbox').getByRole('option', {name: cameraName}).click();
   }
 
   async isCameraSetTo(expectedCameraName: string) {
