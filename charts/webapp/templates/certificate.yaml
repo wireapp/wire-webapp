@@ -1,4 +1,4 @@
-{{- if and .Values.tls.enabled .Values.tls.useCertManager .Values.ingress.enabled }}
+{{- if and .Values.tls.enabled .Values.tls.useCertManager .Values.ingress.enabled (empty .Values.tls.existingSecretName) }}
 {{- include "webapp.validateDomainConfig" . }}
 apiVersion: cert-manager.io/v1
 kind: Certificate

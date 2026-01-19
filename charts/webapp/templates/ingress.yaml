@@ -63,7 +63,7 @@ spec:
   tls:
     - hosts:
         - {{ .Values.webappDomain }}
-      secretName: {{ include "webapp.certificateSecretName" . | quote }}
+      secretName: {{ include "webapp.tlsSecretName" . | quote }}
   {{- end }}
   rules:
     - host: {{ .Values.webappDomain }}

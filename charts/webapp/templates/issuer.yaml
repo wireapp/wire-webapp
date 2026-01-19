@@ -1,4 +1,4 @@
-{{- if and .Values.tls.enabled .Values.tls.useCertManager .Values.tls.createIssuer .Values.ingress.enabled }}
+{{- if and .Values.tls.enabled .Values.tls.useCertManager .Values.tls.createIssuer .Values.ingress.enabled (empty .Values.tls.existingSecretName) }}
 {{- include "webapp.validateDomainConfig" . }}
 apiVersion: cert-manager.io/v1
 {{- if or (eq .Values.tls.issuer.kind "Issuer") (eq .Values.tls.issuer.kind "ClusterIssuer") }}

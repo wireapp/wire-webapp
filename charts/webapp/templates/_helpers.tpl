@@ -33,6 +33,9 @@ We truncate at 63 chars because some Kubernetes name fields are limited to this 
   {{- if and .Values.tls.enabled (not .Values.ingress.enabled) }}
     {{- fail "ingress.enabled must be true when tls.enabled is true" }}
   {{- end }}
+  {{- if and .Values.tls.enabled (not .Values.tls.useCertManager) (empty .Values.tls.existingSecretName) }}
+    {{- fail "When tls.enabled is true, either tls.useCertManager must be true or tls.existingSecretName must be set" }}
+  {{- end }}
 {{- end -}}
 
 {{/* Get Ingress API Version */}}
@@ -63,6 +66,14 @@ We truncate at 63 chars because some Kubernetes name fields are limited to this 
 
 {{- define "webapp.certificateSecretName" -}}
 {{- printf "%s-managed-tls-certificate" (include "webapp.fullname" .) -}}
+{{- end -}}
+
+{{- define "webapp.tlsSecretName" -}}
+{{- if .Values.tls.existingSecretName -}}
+{{- .Values.tls.existingSecretName -}}
+{{- else -}}
+{{- include "webapp.certificateSecretName" . -}}
+{{- end -}}
 {{- end -}}
 
 {{- define "webapp.issuerName" -}}
