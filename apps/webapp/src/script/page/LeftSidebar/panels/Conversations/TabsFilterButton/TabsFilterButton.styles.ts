@@ -67,6 +67,50 @@ export const dropdownCheckboxItem: CSSObject = {
   },
 };
 
+export const dropdownHeader: CSSObject = {
+  padding: '4px 16px 2px',
+  fontSize: '11px',
+  fontWeight: 400,
+  color: 'var(--foreground-fade-56)',
+};
+
+export const checkboxLabel: CSSObject = {
+  fontSize: 'var(--font-size-small)',
+};
+
+export const dropdownDivider: CSSObject = {
+  width: '100%',
+  height: '1px',
+  borderTop: '1px solid var(--border-color)',
+  margin: '4px 0',
+};
+
+export const roundCheckbox: CSSObject = {
+  [`input[type="checkbox"] + label::before`]: {
+    borderRadius: '50% !important',
+    minWidth: '18px !important',
+    width: '18px !important',
+    height: '18px !important',
+    margin: '0 8px 0 0 !important',
+  },
+  [`input[type="checkbox"]:checked + label::before`]: {
+    borderWidth: '5px',
+    borderColor: 'var(--accent-color-500)',
+    background: 'var(--accent-color-500) !important',
+  },
+  [`input[type="checkbox"]:checked + label::after`]: {
+    display: 'none',
+  },
+  [`input[type="checkbox"] + label svg`]: {
+    width: '12px !important',
+    height: '12px !important',
+    position: 'absolute',
+    left: '3px',
+    top: '50%',
+    transform: 'translateY(-50%)',
+  },
+};
+
 export const filterButtonWrapper: CSSObject = {
   position: 'relative',
 };
