@@ -23,7 +23,7 @@ const rootDir = path.join(__dirname, '..', '..');
 const pkg = require(path.join(rootDir, 'package.json'));
 const appConfigPkg = require('./app-config/package.json');
 const {execSync} = require('child_process');
-require('dotenv').config();
+require('dotenv').config({quiet: true});
 
 /**
  * Selects configuration based on current branch and tagged commits

@@ -31,7 +31,7 @@ const logger = logdown('@wireapp/core/demo/StatusBot', {
   markdown: false,
 });
 
-require('dotenv').config();
+require('dotenv').config({quiet: true});
 
 const CONVERSATION_ARGUMENT_INDEX = 2;
 const conversations = process.argv[CONVERSATION_ARGUMENT_INDEX];

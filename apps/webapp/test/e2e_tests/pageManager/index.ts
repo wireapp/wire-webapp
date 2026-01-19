@@ -19,12 +19,8 @@
 
 import {Page} from '@playwright/test';
 
-import {MarketingConsentModal} from './team_management/modals/marketingConsent.modal';
-import {TeamDataShareConsentModal} from './team_management/modals/teamsDataShareConsent.modal';
-import {SetUsernamePage} from './team_management/pages/setUsername.page';
-import {TeamLoginPage} from './team_management/pages/teamLogin.page';
-import {TeamsPage} from './team_management/pages/teams.page';
-import {TeamSignUpPage} from './team_management/pages/teamSignUp.page';
+import {MarketingConsentModal} from './webapp/modals/marketingConsent.modal';
+import {SetUsernamePage} from './webapp/pages/setUsername.page';
 import {CellsConversationPage} from './webapp/cells/cellsConversation.page';
 import {CellsConversationFilesPage} from './webapp/cells/cellsConversationFiles.page';
 import {CellsFileDetailViewModal} from './webapp/cells/cellsFileDetailView.modal';
@@ -224,19 +220,6 @@ export class PageManager {
       inputBarControls: () =>
         this.getOrCreate('webapp.components.inputBarControls', () => new InputBarControls(this.page)),
       calling: () => this.getOrCreate('webapp.components.calling', () => new CallingPage(this.page)),
-    },
-  } as const;
-
-  // ───────────── TEAM MANAGEMENT ─────────────
-  public tm = {
-    pages: {
-      teamLogin: () => this.getOrCreate('tm.pages.teamLogin', () => new TeamLoginPage(this.page)),
-      teamSignUp: () => this.getOrCreate('tm.pages.teamSignUp', () => new TeamSignUpPage(this.page)),
-      teams: () => this.getOrCreate('tm.pages.teams', () => new TeamsPage(this.page)),
-    },
-    modals: {
-      dataShareConsent: () =>
-        this.getOrCreate('tm.modals.dataShareConsent', () => new TeamDataShareConsentModal(this.page)),
     },
   } as const;
 }
