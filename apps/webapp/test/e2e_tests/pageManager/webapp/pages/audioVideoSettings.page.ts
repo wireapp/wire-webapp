@@ -37,7 +37,7 @@ export class AudioVideoSettingsPage {
 
   async selectMicrophone(microphoneName: string) {
     await this.microphoneDrowdown.click();
-    await this.getMicrophoneOptions().locator(`text=${microphoneName}`).click();
+    await this.page.locator(`[data-uie-name="option-enter-microphone"]`).filter({hasText: microphoneName}).click();
   }
 
   async isMicrophoneSetTo(expectedMicrophoneName: string) {
@@ -47,7 +47,7 @@ export class AudioVideoSettingsPage {
 
   async selectSpeaker(speakerName: string) {
     await this.speakerDrowdown.click();
-    await this.getSpeakerOptions().locator(`text=${speakerName}`).click();
+    await this.page.locator(`[data-uie-name="option-enter-speaker"]`).filter({hasText: speakerName}).click();
   }
 
   async isSpeakerSetTo(expectedSpeakerName: string) {
@@ -57,23 +57,11 @@ export class AudioVideoSettingsPage {
 
   async selectCamera(cameraName: string) {
     await this.cameraDrowdown.click();
-    await this.getCameraOptions().locator(`text=${cameraName}`).click();
+    await this.page.locator(`[data-uie-name="option-enter-camera"]`).filter({hasText: cameraName}).click();
   }
 
   async isCameraSetTo(expectedCameraName: string) {
     const selectedCamera = await this.cameraDrowdown.getByText(expectedCameraName, {exact: true});
     return selectedCamera.isVisible();
-  }
-
-  private getMicrophoneOptions(): Locator {
-    return this.page.locator(`[data-uie-name="option-enter-microphone"]`);
-  }
-
-  private getSpeakerOptions(): Locator {
-    return this.page.locator(`[data-uie-name="option-enter-speaker"]`);
-  }
-
-  private getCameraOptions(): Locator {
-    return this.page.locator(`[data-uie-name="option-enter-camera"]`);
   }
 }
