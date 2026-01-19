@@ -22,7 +22,7 @@ import {LoginData} from '../auth';
 import {ClientType} from '../client';
 import {Config} from '../Config';
 
-require('dotenv').config();
+require('dotenv').config({quiet: true});
 
 export async function initClient(): Promise<APIClient> {
   const credentials: LoginData = {

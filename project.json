@@ -11,19 +11,19 @@
     "changelog-production": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "ts-node ./bin/changelog.ts production"
+        "command": "ts-node ./bin/changelog.ts production 2>&1 | grep -v '\\[dotenv@'"
       }
     },
     "changelog-staging": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "ts-node ./bin/changelog.ts staging"
+        "command": "ts-node ./bin/changelog.ts staging 2>&1 | grep -v '\\[dotenv@'"
       }
     },
     "changelog-rc": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "ts-node ./bin/changelog.ts production master"
+        "command": "ts-node ./bin/changelog.ts production master 2>&1 | grep -v '\\[dotenv@'"
       }
     },
     "release-staging": {
