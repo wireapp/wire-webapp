@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [9.73.5](https://github.com/wireapp/wire-web-packages/compare/@wireapp/react-ui-kit@9.73.4...@wireapp/react-ui-kit@9.73.5) (2026-01-20)
+
+### Bug Fixes
+
+* danger theme color selectbox(WPB-20913) ([#7796](https://github.com/wireapp/wire-web-packages/issues/7796)) ([7bfc619](https://github.com/wireapp/wire-web-packages/commit/7bfc6190a9ec1667482122be00d4b2c632966293))
+
 ## [9.73.4](https://github.com/wireapp/wire-web-packages/compare/@wireapp/react-ui-kit@9.73.3...@wireapp/react-ui-kit@9.73.4) (2026-01-18)
 
 **Note:** Version bump only for package @wireapp/react-ui-kit
