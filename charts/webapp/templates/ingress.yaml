@@ -1,8 +1,5 @@
 {{- if .Values.ingress.enabled }}
 {{- include "webapp.validateDomainConfig" . }}
-{{- $apiIsStable := eq (include "ingress.isStable" .) "true" -}}
-{{- $ingressFieldNotAnnotation := eq (include "ingress.FieldNotAnnotation" .) "true" -}}
-{{- $ingressSupportsPathType := eq (include "ingress.supportsPathType" .) "true" -}}
 {{- $ingressClass := default "nginx" .Values.ingress.className -}}
 {{- $backendDomain := "" -}}
 {{- $backendRest := "" -}}
@@ -10,7 +7,7 @@
   {{- $backendDomain = required "Need a 'config.externalUrls.backendDomain' for CSP headers." .Values.config.externalUrls.backendDomain -}}
   {{- $backendRest = required "Need a 'config.externalUrls.backendRest' for CSP headers." .Values.config.externalUrls.backendRest -}}
 {{- end }}
-apiVersion: {{ include "ingress.apiVersion" . }}
+apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: webapp
@@ -20,9 +17,6 @@ metadata:
     release: {{ .Release.Name }}
     heritage: {{ .Release.Service }}
   annotations:
-    {{- if not $ingressFieldNotAnnotation }}
-    kubernetes.io/ingress.class: {{ $ingressClass | quote }}
-    {{- end }}
     {{- range $key, $val := .Values.ingress.annotations }}
     {{ $key }}: {{ $val | quote }}
     {{- end }}
@@ -56,9 +50,7 @@ metadata:
       }
     {{- end }}
 spec:
-  {{- if $ingressFieldNotAnnotation }}
   ingressClassName: {{ $ingressClass | quote }}
-  {{- end }}
   {{- if .Values.tls.enabled }}
   tls:
     - hosts:
@@ -70,17 +62,10 @@ spec:
       http:
         paths:
           - path: /
-            {{- if $ingressSupportsPathType }}
             pathType: Prefix
-            {{- end }}
             backend:
-              {{- if $apiIsStable }}
               service:
                 name: webapp-http
                 port:
                   number: {{ .Values.service.http.port | default .Values.service.http.internalPort }}
-              {{- else }}
-              serviceName: webapp-http
-              servicePort: {{ .Values.service.http.port | default .Values.service.http.internalPort }}
-              {{- end }}
 {{- end }}
