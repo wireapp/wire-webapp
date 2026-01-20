@@ -1154,7 +1154,13 @@ describe('CellsAPI', () => {
 
       mockNodeServiceApi.createPublicLink.mockResolvedValueOnce(createMockResponse(mockResponse));
 
-      const result = await cellsAPI.createNodePublicLink({uuid, label});
+      const result = await cellsAPI.createNodePublicLink({
+        uuid,
+        link: {
+          Label: label,
+          Permissions: ['Preview', 'Download'],
+        },
+      });
 
       expect(mockNodeServiceApi.createPublicLink).toHaveBeenCalledWith(uuid, {
         Link: {
@@ -1178,7 +1184,12 @@ describe('CellsAPI', () => {
 
       mockNodeServiceApi.createPublicLink.mockResolvedValueOnce(createMockResponse(mockResponse));
 
-      const result = await cellsAPI.createNodePublicLink({uuid});
+      const result = await cellsAPI.createNodePublicLink({
+        uuid,
+        link: {
+          Permissions: ['Preview', 'Download'],
+        },
+      });
 
       expect(mockNodeServiceApi.createPublicLink).toHaveBeenCalledWith(uuid, {
         Link: {
@@ -1195,7 +1206,12 @@ describe('CellsAPI', () => {
 
       mockNodeServiceApi.createPublicLink.mockRejectedValueOnce(new Error(errorMessage));
 
-      await expect(cellsAPI.createNodePublicLink({uuid, label})).rejects.toThrow(errorMessage);
+      await expect(
+        cellsAPI.createNodePublicLink({
+          uuid,
+          link: {Label: label, Permissions: ['Preview', 'Download']},
+        }),
+      ).rejects.toThrow(errorMessage);
     });
 
     it('handles empty UUID', async () => {
@@ -1205,7 +1221,12 @@ describe('CellsAPI', () => {
 
       mockNodeServiceApi.createPublicLink.mockRejectedValueOnce(new Error(errorMessage));
 
-      await expect(cellsAPI.createNodePublicLink({uuid: emptyUuid, label})).rejects.toThrow(errorMessage);
+      await expect(
+        cellsAPI.createNodePublicLink({
+          uuid: emptyUuid,
+          link: {Label: label, Permissions: ['Preview', 'Download']},
+        }),
+      ).rejects.toThrow(errorMessage);
     });
 
     it('creates a password-protected public link', async () => {
@@ -1227,7 +1248,10 @@ describe('CellsAPI', () => {
 
       const result = await cellsAPI.createNodePublicLink({
         uuid,
-        label,
+        link: {
+          Label: label,
+          Permissions: ['Preview', 'Download'],
+        },
         createPassword: password,
         passwordEnabled: true,
       });
@@ -1261,7 +1285,14 @@ describe('CellsAPI', () => {
 
       mockNodeServiceApi.createPublicLink.mockResolvedValueOnce(createMockResponse(mockResponse));
 
-      const result = await cellsAPI.createNodePublicLink({uuid, label, accessEnd});
+      const result = await cellsAPI.createNodePublicLink({
+        uuid,
+        link: {
+          Label: label,
+          Permissions: ['Preview', 'Download'],
+          AccessEnd: accessEnd,
+        },
+      });
 
       expect(mockNodeServiceApi.createPublicLink).toHaveBeenCalledWith(uuid, {
         Link: {
@@ -1294,10 +1325,13 @@ describe('CellsAPI', () => {
 
       const result = await cellsAPI.createNodePublicLink({
         uuid,
-        label,
+        link: {
+          Label: label,
+          Permissions: ['Preview', 'Download'],
+          AccessEnd: accessEnd,
+        },
         createPassword: password,
         passwordEnabled: true,
-        accessEnd,
       });
 
       expect(mockNodeServiceApi.createPublicLink).toHaveBeenCalledWith(uuid, {
@@ -1330,7 +1364,12 @@ describe('CellsAPI', () => {
 
       mockNodeServiceApi.updatePublicLink.mockResolvedValueOnce(createMockResponse(mockResponse));
 
-      const result = await cellsAPI.updateNodePublicLink({linkUuid, label: newLabel});
+      const result = await cellsAPI.updateNodePublicLink({
+        linkUuid,
+        link: {
+          Label: newLabel,
+        },
+      });
 
       expect(mockNodeServiceApi.updatePublicLink).toHaveBeenCalledWith(linkUuid, {
         Link: {
@@ -1357,6 +1396,7 @@ describe('CellsAPI', () => {
 
       const result = await cellsAPI.updateNodePublicLink({
         linkUuid,
+        link: {},
         createPassword: password,
         passwordEnabled: true,
       });
@@ -1388,6 +1428,7 @@ describe('CellsAPI', () => {
 
       const result = await cellsAPI.updateNodePublicLink({
         linkUuid,
+        link: {},
         updatePassword: newPassword,
         passwordEnabled: true,
       });
@@ -1418,6 +1459,7 @@ describe('CellsAPI', () => {
 
       const result = await cellsAPI.updateNodePublicLink({
         linkUuid,
+        link: {},
         passwordEnabled: false,
       });
 
@@ -1445,7 +1487,12 @@ describe('CellsAPI', () => {
 
       mockNodeServiceApi.updatePublicLink.mockResolvedValueOnce(createMockResponse(mockResponse));
 
-      const result = await cellsAPI.updateNodePublicLink({linkUuid, accessEnd});
+      const result = await cellsAPI.updateNodePublicLink({
+        linkUuid,
+        link: {
+          AccessEnd: accessEnd,
+        },
+      });
 
       expect(mockNodeServiceApi.updatePublicLink).toHaveBeenCalledWith(linkUuid, {
         Link: {
@@ -1468,7 +1515,10 @@ describe('CellsAPI', () => {
 
       mockNodeServiceApi.updatePublicLink.mockResolvedValueOnce(createMockResponse(mockResponse));
 
-      const result = await cellsAPI.updateNodePublicLink({linkUuid, accessEnd: null});
+      const result = await cellsAPI.updateNodePublicLink({
+        linkUuid,
+        link: {},
+      });
 
       expect(mockNodeServiceApi.updatePublicLink).toHaveBeenCalledWith(linkUuid, {
         Link: {},
@@ -1497,10 +1547,12 @@ describe('CellsAPI', () => {
 
       const result = await cellsAPI.updateNodePublicLink({
         linkUuid,
-        label: newLabel,
+        link: {
+          Label: newLabel,
+          AccessEnd: accessEnd,
+        },
         updatePassword: newPassword,
         passwordEnabled: true,
-        accessEnd,
       });
 
       expect(mockNodeServiceApi.updatePublicLink).toHaveBeenCalledWith(linkUuid, {
@@ -1521,7 +1573,7 @@ describe('CellsAPI', () => {
 
       mockNodeServiceApi.updatePublicLink.mockRejectedValueOnce(new Error(errorMessage));
 
-      await expect(cellsAPI.updateNodePublicLink({linkUuid, label: 'New Label'})).rejects.toThrow(errorMessage);
+      await expect(cellsAPI.updateNodePublicLink({linkUuid, link: {Label: 'New Label'}})).rejects.toThrow(errorMessage);
     });
   });
 

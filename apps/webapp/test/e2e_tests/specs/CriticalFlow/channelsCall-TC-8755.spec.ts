@@ -19,7 +19,6 @@
 
 import {User} from 'test/e2e_tests/data/user';
 import {PageManager} from 'test/e2e_tests/pageManager';
-import {addMockCamerasToContext} from 'test/e2e_tests/utils/mockVideoDevice.util';
 
 import {test, expect, withLogin} from '../../test.fixtures';
 import {createGroup} from 'test/e2e_tests/utils/userActions';
@@ -50,11 +49,8 @@ test.fixme(
 
       // Create page managers for both owner and member
       // Member page manager is needed for the channel/calling service to work properly
-      await Promise.all([
-        PageManager.from(createPage(withLogin(owner))).then(async pm => {
-          ownerPageManager = pm;
-          await addMockCamerasToContext(ownerPageManager.getContext());
-        }),
+      [ownerPageManager] = await Promise.all([
+        PageManager.from(createPage(withLogin(owner))),
         // Member logs in but calling service handles call participation
         createPage(withLogin(member)),
       ]);

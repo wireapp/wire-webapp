@@ -18,7 +18,6 @@
  */
 
 import {PageManager} from 'test/e2e_tests/pageManager';
-import {addMockCamerasToContext} from 'test/e2e_tests/utils/mockVideoDevice.util';
 
 import {expect, test, withLogin} from '../../test.fixtures';
 import {generateSecurePassword, generateWireEmail} from '../../utils/userDataGenerator';
@@ -26,11 +25,9 @@ import {loginUser} from 'test/e2e_tests/utils/userActions';
 
 const appLockPassphrase = generateSecurePassword();
 
-test('Account Management', {tag: ['@TC-8639', '@crit-flow-web']}, async ({context, createUser, createPage, api}) => {
-  await addMockCamerasToContext(context);
-
+test('Account Management', {tag: ['@TC-8639', '@crit-flow-web']}, async ({createUser, createPage, api}) => {
   const user = await createUser();
-  const pageManager = PageManager.from(await createPage(context, withLogin(user)));
+  const pageManager = PageManager.from(await createPage(withLogin(user)));
   const {pages, modals, components} = pageManager.webapp;
 
   await test.step('Member opens settings', async () => {

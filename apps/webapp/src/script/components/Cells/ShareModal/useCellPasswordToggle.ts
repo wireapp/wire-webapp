@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2018 Wire Swiss GmbH
+ * Copyright (C) 2025 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,6 +17,14 @@
  *
  */
 
-export * from './CellsAPI';
-export type {GetByUuidFlagsEnum as NodeFlags, RestShareLink} from 'cells-sdk-ts';
-export type {Node} from './CellsAPI.schema';
+import {useCallback, useState} from 'react';
+
+export const useCellPasswordToggle = () => {
+  const [isEnabled, setIsEnabled] = useState(false);
+
+  const toggle = useCallback(() => {
+    setIsEnabled(prev => !prev);
+  }, []);
+
+  return {isEnabled, toggle, setIsEnabled};
+};

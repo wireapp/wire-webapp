@@ -28,7 +28,6 @@ import {
   RestPromoteVersionResponse,
   RestPublicLinkDeleteSuccess,
   RestShareLink,
-  RestShareLinkAccessType,
   RestIncomingNode,
   RestNodeLocator,
   RestActionOptionsCopyMove,
@@ -517,34 +516,27 @@ export class CellsAPI {
    */
   async createNodePublicLink({
     uuid,
-    label,
+    link,
     createPassword,
     passwordEnabled,
-    accessEnd,
   }: {
     uuid: string;
-    label?: string;
+    link: RestShareLink;
     createPassword?: string;
     passwordEnabled?: boolean;
-    accessEnd?: string;
   }): Promise<RestShareLink> {
     if (!this.client || !this.storageService) {
       throw new Error(CONFIGURATION_ERROR);
     }
 
     const requestBody: {
-      Link: {
-        Label?: string;
-        Permissions: RestShareLinkAccessType[];
-        PasswordRequired?: boolean;
-        AccessEnd?: string;
-      };
+      Link: RestShareLink;
       CreatePassword?: string;
       PasswordEnabled?: boolean;
     } = {
       Link: {
-        Label: label,
-        Permissions: ['Preview', 'Download'],
+        ...link,
+        Permissions: link.Permissions ?? ['Preview', 'Download'],
       },
     };
 
@@ -552,10 +544,6 @@ export class CellsAPI {
       requestBody.Link.PasswordRequired = true;
       requestBody.CreatePassword = createPassword;
       requestBody.PasswordEnabled = passwordEnabled;
-    }
-
-    if (accessEnd) {
-      requestBody.Link.AccessEnd = accessEnd;
     }
 
     const result = await this.client.createPublicLink(uuid, requestBody);
@@ -577,48 +565,37 @@ export class CellsAPI {
    * Updates an existing public link's settings.
    *
    * @param linkUuid - The UUID of the link to update
-   * @param label - New label for the link
+   * @param link - The RestShareLink object with updated properties
    * @param createPassword - Set initial password (use when setting password for first time)
    * @param updatePassword - Update existing password (use when changing an existing password)
    * @param passwordEnabled - Enable or disable password protection
-   * @param accessEnd - Unix timestamp as string (e.g., '1765839600') for expiration, or null to remove expiration
    * @returns The updated share link with new settings
    */
   async updateNodePublicLink({
     linkUuid,
-    label,
+    link,
     createPassword,
     updatePassword,
     passwordEnabled,
-    accessEnd,
   }: {
     linkUuid: string;
-    label?: string;
+    link: RestShareLink;
     createPassword?: string;
     updatePassword?: string;
     passwordEnabled?: boolean;
-    accessEnd?: string | null;
   }): Promise<RestShareLink> {
     if (!this.client || !this.storageService) {
       throw new Error(CONFIGURATION_ERROR);
     }
 
     const requestBody: {
-      Link: {
-        Label?: string;
-        PasswordRequired?: boolean;
-        AccessEnd?: string;
-      };
+      Link: RestShareLink;
       CreatePassword?: string;
       UpdatePassword?: string;
       PasswordEnabled?: boolean;
     } = {
-      Link: {},
+      Link: link,
     };
-
-    if (label !== undefined) {
-      requestBody.Link.Label = label;
-    }
 
     if (passwordEnabled !== undefined) {
       requestBody.PasswordEnabled = passwordEnabled;
@@ -631,10 +608,6 @@ export class CellsAPI {
 
     if (updatePassword) {
       requestBody.UpdatePassword = updatePassword;
-    }
-
-    if (accessEnd !== undefined && accessEnd !== null) {
-      requestBody.Link.AccessEnd = accessEnd;
     }
 
     const result = await this.client.updatePublicLink(linkUuid, requestBody);
