@@ -42,7 +42,7 @@ export class AudioVideoSettingsPage {
   }
 
   async isMicrophoneSetTo(expectedMicrophoneName: string) {
-    const selectedMicrophone = await this.microphoneDropdown.getByText(expectedMicrophoneName, {exact: true});
+    const selectedMicrophone = this.microphoneDropdown.getByText(expectedMicrophoneName, {exact: true});
     return selectedMicrophone.isVisible();
   }
 
@@ -54,7 +54,7 @@ export class AudioVideoSettingsPage {
   }
 
   async isSpeakerSetTo(expectedSpeakerName: string) {
-    const selectedSpeaker = await this.speakerDropdown.getByText(expectedSpeakerName, {exact: true});
+    const selectedSpeaker = this.speakerDropdown.getByText(expectedSpeakerName, {exact: true});
     return selectedSpeaker.isVisible();
   }
 
@@ -66,7 +66,7 @@ export class AudioVideoSettingsPage {
   }
 
   async isCameraSetTo(expectedCameraName: string) {
-    const selectedCamera = await this.cameraDropdown.getByText(expectedCameraName, {exact: true});
+    const selectedCamera = this.cameraDropdown.getByText(expectedCameraName, {exact: true});
     return selectedCamera.isVisible();
   }
 }
