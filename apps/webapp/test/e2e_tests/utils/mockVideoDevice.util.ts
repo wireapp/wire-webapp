@@ -40,7 +40,7 @@ export const mockAudioAndVideoDevices = () => {
       kind: 'videoinput',
       label: `Fake Camera ${i + 1}`,
       groupId: `video-group-${i + 1}`,
-      toJSON: () => `{ "deviceId": "video-camera-${i + 1}" }`,
+      toJSON: () => ({deviceId: `video-camera-${i + 1}`}),
     })),
 
     // Create 3 fake audio inputs
@@ -49,7 +49,7 @@ export const mockAudioAndVideoDevices = () => {
       kind: 'audioinput',
       label: `Fake Audio Input ${i + 1}`,
       groupId: `audio-input-group-${i + 1}`,
-      toJSON: () => `{ "deviceId": "audio-input-${i + 1}" }`,
+      toJSON: () => ({deviceId: `audio-input-${i + 1}`}),
     })),
 
     // Create 3 fake audio outputs
@@ -58,7 +58,7 @@ export const mockAudioAndVideoDevices = () => {
       kind: 'audiooutput',
       label: `Fake Audio Output ${i + 1}`,
       groupId: `audio-output-group-${i + 1}`,
-      toJSON: () => `{ "deviceId": "audio-output-${i + 1}" }`,
+      toJSON: () => ({deviceId: `audio-output-${i + 1}`}),
     })),
   ];
 
