@@ -47,6 +47,7 @@ process.on('unhandledRejection', (reason, promise) =>
 
 require(`dotenv-defaults`).config({
   path: path.join(__dirname, 'echo.env'),
+  quiet: true,
 });
 
 const assetOriginalCache = {};

@@ -22,7 +22,7 @@
 const child = require('child_process');
 const appConfigPkg = require('../apps/webapp/app-config/package.json');
 
-require('dotenv').config();
+require('dotenv').config({quiet: true});
 
 /**
  * This script creates a Docker image of "wire-webapp" and uploads it to:

@@ -125,6 +125,75 @@
     cursor: pointer;
   }
 
+  &__attachments {
+    display: flex;
+    align-items: center;
+    margin-top: 4px;
+    font-size: var(--font-size-small);
+    font-weight: var(--font-weight-regular);
+    gap: 6px;
+
+    span {
+      color: var(--main-color);
+    }
+  }
+
+  &__files-icon {
+    flex-shrink: 0;
+    --multiple-file-icon-bg: var(--app-bg-secondary);
+    --multiple-file-icon-stroke: var(--main-color);
+  }
+
+  &__preview-thumbnail {
+    position: relative;
+    overflow: hidden;
+    width: 40px;
+    height: 40px;
+    flex-shrink: 0;
+    border-radius: 4px;
+
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+  }
+
+  &__preview-loading {
+    width: 100%;
+    height: 100%;
+    animation: pulse 1.5s ease-in-out infinite;
+    background-color: var(--foreground-fade-8);
+  }
+
+  @keyframes pulse {
+    0%,
+    100% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0.5;
+    }
+  }
+
+  &__preview-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    display: flex;
+    width: 100%;
+    height: 100%;
+    align-items: center;
+    justify-content: center;
+    background-color: rgba(0, 0, 0, 0.3);
+
+    svg {
+      width: 16px;
+      height: 16px;
+      fill: white;
+    }
+  }
+
   &__timestamp {
     display: block;
     margin-top: 4px;

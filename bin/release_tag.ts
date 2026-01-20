@@ -22,7 +22,7 @@ import * as logdown from 'logdown';
 import * as path from 'path';
 import * as readline from 'readline';
 
-require('dotenv').config();
+require('dotenv').config({quiet: true});
 
 enum DeploymentStage {
   PRODUCTION = 'production',
