@@ -92,9 +92,8 @@ describe('MemberMessage', () => {
       isSelfDeletingMessagesOff: true,
     };
 
-    const {getByTestId, getByText} = render(withTheme(<MemberMessage {...props} />));
-    expect(getByTestId('label-self-deleting-messages-off')).not.toBeNull();
-    expect(getByText('Self-deleting messages are off')).not.toBeNull();
+    const {getByText} = render(withTheme(<MemberMessage {...props} />));
+    expect(getByText('Self-deleting messages are off')).toBeInTheDocument();
   });
 
   it('does not show self-deleting messages off banner when self-deleting messages are enabled', () => {
@@ -105,8 +104,8 @@ describe('MemberMessage', () => {
       isSelfDeletingMessagesOff: false,
     };
 
-    const {queryByTestId} = render(withTheme(<MemberMessage {...props} />));
-    expect(queryByTestId('label-self-deleting-messages-off')).toBeNull();
+    const {queryByText} = render(withTheme(<MemberMessage {...props} />));
+    expect(queryByText('Self-deleting messages are off')).not.toBeInTheDocument();
   });
 
   it('shows self-deleting messages off banner when Cells is enabled (even with global timer)', () => {
@@ -118,9 +117,8 @@ describe('MemberMessage', () => {
       isCellsConversation: true,
     };
 
-    const {getByTestId, getByText} = render(withTheme(<MemberMessage {...props} />));
-    expect(getByTestId('label-self-deleting-messages-off')).not.toBeNull();
-    expect(getByText('Self-deleting messages are off')).not.toBeNull();
+    const {getByText} = render(withTheme(<MemberMessage {...props} />));
+    expect(getByText('Self-deleting messages are off')).toBeInTheDocument();
   });
 
   it('shows self-deleting messages off banner when Cells is enabled because Cells disables ephemeral messages', () => {
@@ -132,10 +130,10 @@ describe('MemberMessage', () => {
       isCellsConversation: true,
     };
 
-    const {getByTestId} = render(withTheme(<MemberMessage {...props} />));
+    const {getByText} = render(withTheme(<MemberMessage {...props} />));
     // Both banners should be visible
-    expect(getByTestId('label-cells-conversation')).not.toBeNull();
-    expect(getByTestId('label-self-deleting-messages-off')).not.toBeNull();
+    expect(getByText('Shared Drive is on')).toBeInTheDocument();
+    expect(getByText('Self-deleting messages are off')).toBeInTheDocument();
   });
 
   describe('CONVERSATION_CREATE', () => {
