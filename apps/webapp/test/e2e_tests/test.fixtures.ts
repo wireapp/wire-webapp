@@ -23,6 +23,7 @@ import {ApiManagerE2E} from './backend/apiManager.e2e';
 import {getUser, User} from './data/user';
 import {PageManager} from './pageManager';
 import {connectWithUser, sendConnectionRequest} from './utils/userActions';
+import {mockAudioAndVideoDevices} from './utils/mockVideoDevice.util';
 
 type PagePlugin = (page: Page) => void | Promise<void>;
 
@@ -90,6 +91,9 @@ export const test = baseTest.extend<Fixtures>({
         context = firstParam;
         setupFns = plugins;
       }
+
+      // Add mocked Audio and Video devices (Hardware is treated as part of the test setup)
+      await context.addInitScript(mockAudioAndVideoDevices);
 
       const page = await context.newPage();
       for (const setupFn of setupFns) {
