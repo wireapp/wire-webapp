@@ -123,6 +123,21 @@ describe('MemberMessage', () => {
     expect(getByText('Self-deleting messages are off')).not.toBeNull();
   });
 
+  it('shows self-deleting messages off banner when Cells is enabled because Cells disables ephemeral messages', () => {
+    const message = createMemberMessage({systemType: SystemMessageType.CONVERSATION_CREATE}, [generateUser()]);
+    const props = {
+      ...baseProps,
+      message,
+      isSelfDeletingMessagesOff: true, // Always true when isCellsConversation is true (computed in MessageWrapper)
+      isCellsConversation: true,
+    };
+
+    const {getByTestId} = render(withTheme(<MemberMessage {...props} />));
+    // Both banners should be visible
+    expect(getByTestId('label-cells-conversation')).not.toBeNull();
+    expect(getByTestId('label-self-deleting-messages-off')).not.toBeNull();
+  });
+
   describe('CONVERSATION_CREATE', () => {
     it('displays participants of a newly created conversation', () => {
       const nbUsers = randomInt(1, 10);
