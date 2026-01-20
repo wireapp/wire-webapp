@@ -19,7 +19,7 @@
 
 import {generateRandomPassword} from 'Util/StringUtil';
 
-import {test, expect} from '../../test.fixtures';
+import {test, expect, LOGIN_TIMEOUT} from '../../test.fixtures';
 
 test(
   'Verify sign in error appearance in case of wrong credentials',
@@ -46,6 +46,7 @@ test('Verify you can sign in by email', {tag: ['@TC-3461', '@regression']}, asyn
   await pages.login().passwordInput.fill(user.password);
   await pages.login().signInButton.click();
 
-  await expect(components.conversationSidebar().personalStatusName).toHaveText(`${user.firstName} ${user.lastName}`);
-  await expect(components.conversationSidebar().personalUserName).toContainText(user.username);
+  const {personalStatusName, personalUserName} = components.conversationSidebar();
+  await expect(personalStatusName).toHaveText(`${user.firstName} ${user.lastName}`, {timeout: LOGIN_TIMEOUT});
+  await expect(personalUserName).toContainText(user.username);
 });
