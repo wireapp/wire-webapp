@@ -28,11 +28,11 @@ test(
     test.setTimeout(150_000);
 
     const [{owner: userA}, {owner: userB}] = await Promise.all([createTeam('User A Team'), createTeam('User B Team')]);
-    const [userAPageManager, userBPageManager, callingServiceInstanceId] = await Promise.all([
+    const [userAPageManager, userBPageManager] = await Promise.all([
       PageManager.from(createPage(withLogin(userA), withConnectionRequest(userB))),
       PageManager.from(createPage(withLogin(userB))),
-      api.callingService.createInstance(userB.password, userB.email).then(res => res.id),
     ]);
+    const {id: callingServiceInstanceId} = await api.callingService.createInstance(userB.password, userB.email);
 
     await test.step('User B accepts connection request from User A', async () => {
       const {pages} = userBPageManager.webapp;
