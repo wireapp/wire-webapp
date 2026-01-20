@@ -30,6 +30,8 @@ export interface BaseSelectStylesParams {
   containerCSS?: CSSObject;
 }
 
+const getSelectAccentColor = (theme: Theme): string => theme.general.primaryColor;
+
 export const baseIndicatorSeparatorStyles = (): CSSObject => ({
   display: 'none',
 });
@@ -80,14 +82,14 @@ export const baseControlStyles = ({
     boxShadow: `0 0 0 1px ${theme.general.dangerColor}`,
   }),
   ...(selectProps.menuIsOpen && {
-    boxShadow: `0 0 0 1px ${theme.general.primaryColor}`,
+    boxShadow: `0 0 0 1px ${getSelectAccentColor(theme)}`,
     '&:hover': {
-      boxShadow: `0 0 0 1px ${theme.general.primaryColor}`,
+      boxShadow: `0 0 0 1px ${getSelectAccentColor(theme)}`,
     },
   }),
   cursor: !selectProps.isDisabled && 'pointer',
   '&:focus:visible, active': {
-    boxShadow: !selectProps.isDisabled && `0 0 0 1px ${theme.general.primaryColor}`,
+    boxShadow: !selectProps.isDisabled && `0 0 0 1px ${getSelectAccentColor(theme)}`,
   },
   ...controlCSS,
 });
@@ -116,7 +118,8 @@ export const baseMenuStyles = ({
   theme: Theme;
   menuPosition: 'absolute' | 'relative';
 }): CSSObject => ({
-  boxShadow: `0 0 0 1px ${theme.general.primaryColor}, 0 4px 11px hsl(0deg 0% 0% / 10%)`,
+  boxShadow: `0 0 0 1px ${getSelectAccentColor(theme)}, 0 4px 11px hsl(0deg 0% 0% / 10%)`,
+  backgroundColor: theme.Input.backgroundColor,
   borderRadius: 12,
   marginBottom: 0,
   marginTop: 4,
@@ -152,8 +155,8 @@ export const baseOptionStyles = ({
   ...(isSelected &&
     !isDisabled &&
     !isMulti && {
-      background: theme.general.primaryColor,
-      borderColor: theme.general.primaryColor,
+      background: getSelectAccentColor(theme),
+      borderColor: getSelectAccentColor(theme),
       color: theme.Select.contrastTextColor,
       '&:hover': {
         backgroundColor: theme.Select.selectedActiveBg,

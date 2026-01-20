@@ -670,7 +670,7 @@ exports[`"Select" renders as invalid 1`] = `
   background: #fff;
   border: none;
   border-radius: 12px;
-  box-shadow: 0 0 0 1px #c20013;
+  box-shadow: 0 0 0 1px var(--danger-color);
   caret-color: #0667c8;
   color: rgb(29, 30, 31);
   font-weight: 400;
