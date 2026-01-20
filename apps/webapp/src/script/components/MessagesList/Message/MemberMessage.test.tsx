@@ -59,6 +59,7 @@ function createMemberMessage({systemType, type}: {systemType?: SystemMessageType
 
 const baseProps = {
   hasReadReceiptsTurnedOn: false,
+  isSelfDeletingMessagesOff: false,
   isSelfTemporaryGuest: false,
   onClickCancelRequest: jest.fn(),
   onClickInvitePeople: jest.fn(),
@@ -81,6 +82,45 @@ describe('MemberMessage', () => {
 
     const {getByTestId} = render(withTheme(<MemberMessage {...props} />));
     expect(getByTestId('element-connected-message')).not.toBeNull();
+  });
+
+  it('shows self-deleting messages off banner when group is created and self-deleting messages are disabled', () => {
+    const message = createMemberMessage({systemType: SystemMessageType.CONVERSATION_CREATE}, [generateUser()]);
+    const props = {
+      ...baseProps,
+      message,
+      isSelfDeletingMessagesOff: true,
+    };
+
+    const {getByTestId, getByText} = render(withTheme(<MemberMessage {...props} />));
+    expect(getByTestId('label-self-deleting-messages-off')).not.toBeNull();
+    expect(getByText('Self-deleting messages are off')).not.toBeNull();
+  });
+
+  it('does not show self-deleting messages off banner when self-deleting messages are enabled', () => {
+    const message = createMemberMessage({systemType: SystemMessageType.CONVERSATION_CREATE}, [generateUser()]);
+    const props = {
+      ...baseProps,
+      message,
+      isSelfDeletingMessagesOff: false,
+    };
+
+    const {queryByTestId} = render(withTheme(<MemberMessage {...props} />));
+    expect(queryByTestId('label-self-deleting-messages-off')).toBeNull();
+  });
+
+  it('shows self-deleting messages off banner when Cells is enabled (even with global timer)', () => {
+    const message = createMemberMessage({systemType: SystemMessageType.CONVERSATION_CREATE}, [generateUser()]);
+    const props = {
+      ...baseProps,
+      message,
+      isSelfDeletingMessagesOff: true, // This would be true when isCellsConversation is true (per MessageWrapper logic)
+      isCellsConversation: true,
+    };
+
+    const {getByTestId, getByText} = render(withTheme(<MemberMessage {...props} />));
+    expect(getByTestId('label-self-deleting-messages-off')).not.toBeNull();
+    expect(getByText('Self-deleting messages are off')).not.toBeNull();
   });
 
   describe('CONVERSATION_CREATE', () => {

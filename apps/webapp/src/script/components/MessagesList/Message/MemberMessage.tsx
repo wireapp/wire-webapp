@@ -34,6 +34,7 @@ import {MessageTime} from './MessageTime';
 interface MemberMessageProps {
   classifiedDomains?: string[];
   hasReadReceiptsTurnedOn: boolean;
+  isSelfDeletingMessagesOff: boolean;
   isSelfTemporaryGuest: boolean;
   message: MemberMessageEntity;
   onClickCancelRequest: (message: MemberMessageEntity) => void;
@@ -49,6 +50,7 @@ export const MemberMessage = ({
   shouldShowInvitePeople,
   isSelfTemporaryGuest,
   hasReadReceiptsTurnedOn,
+  isSelfDeletingMessagesOff,
   onClickInvitePeople,
   onClickParticipants,
   onClickCancelRequest,
@@ -165,6 +167,17 @@ export const MemberMessage = ({
           </div>
           <p className="message-header-label">
             <span className="ellipsis">{t('conversationCreateReceiptsEnabled')}</span>
+          </p>
+        </div>
+      )}
+
+      {isGroupCreation && isSelfDeletingMessagesOff && (
+        <div className="message-header" data-uie-name="label-self-deleting-messages-off">
+          <div className="message-header-icon message-header-icon--svg text-foreground">
+            <Icon.TimerIcon />
+          </div>
+          <p className="message-header-label">
+            <span className="ellipsis">{t('conversationDetailsActionTimedMessagesDisabled')}</span>
           </p>
         </div>
       )}
