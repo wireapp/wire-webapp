@@ -26,8 +26,11 @@
  * No matter which of the devices is selected the default input is returned. (The default input is mocked via launchArgs in the playwright config)
  */
 export const mockAudioAndVideoDevices = () => {
+  // If media devices aren't defined on the current device there's nothing to mock
+  if (!navigator.mediaDevices) return;
+
   // Keep a copy of the original function so it can be used within its own stub
-  const originalGetUserMedia = navigator.mediaDevices?.getUserMedia.bind(navigator.mediaDevices);
+  const originalGetUserMedia = navigator.mediaDevices.getUserMedia.bind(navigator.mediaDevices);
 
   // Mock the devices the browser sees, 3 for each device type
   navigator.mediaDevices.enumerateDevices = async () => [
