@@ -33,34 +33,30 @@ export const mockAudioAndVideoDevices = () => {
   const originalGetUserMedia = navigator.mediaDevices.getUserMedia.bind(navigator.mediaDevices);
 
   // Mock the devices the browser sees, 3 for each device type
-  navigator.mediaDevices.enumerateDevices = async () => [
-    // Create 3 fake cameras
-    ...Array.from<unknown, MediaDeviceInfo>({length: 3}, (_, i) => ({
-      deviceId: `video-camera-${i + 1}`,
-      kind: 'videoinput',
-      label: `Fake Camera ${i + 1}`,
-      groupId: `video-group-${i + 1}`,
-      toJSON: () => ({deviceId: `video-camera-${i + 1}`}),
-    })),
-
-    // Create 3 fake audio inputs
-    ...Array.from<unknown, MediaDeviceInfo>({length: 3}, (_, i) => ({
-      deviceId: `audio-input-${i + 1}`,
-      kind: 'audioinput',
-      label: `Fake Audio Input ${i + 1}`,
-      groupId: `audio-input-group-${i + 1}`,
-      toJSON: () => ({deviceId: `audio-input-${i + 1}`}),
-    })),
-
-    // Create 3 fake audio outputs
-    ...Array.from<unknown, MediaDeviceInfo>({length: 3}, (_, i) => ({
-      deviceId: `audio-output-${i + 1}`,
-      kind: 'audiooutput',
-      label: `Fake Audio Output ${i + 1}`,
-      groupId: `audio-output-group-${i + 1}`,
-      toJSON: () => ({deviceId: `audio-output-${i + 1}`}),
-    })),
-  ];
+  navigator.mediaDevices.enumerateDevices = async () =>
+    Array.from<never, MediaDeviceInfo[]>({length: 3}, (_, i) => [
+      {
+        deviceId: `video-camera-${i + 1}`,
+        kind: 'videoinput',
+        label: `Fake Camera ${i + 1}`,
+        groupId: `video-group-${i + 1}`,
+        toJSON: () => ({deviceId: `video-camera-${i + 1}`}),
+      },
+      {
+        deviceId: `audio-input-${i + 1}`,
+        kind: 'audioinput',
+        label: `Fake Audio Input ${i + 1}`,
+        groupId: `audio-input-group-${i + 1}`,
+        toJSON: () => ({deviceId: `audio-input-${i + 1}`}),
+      },
+      {
+        deviceId: `audio-output-${i + 1}`,
+        kind: 'audiooutput',
+        label: `Fake Audio Output ${i + 1}`,
+        groupId: `audio-output-group-${i + 1}`,
+        toJSON: () => ({deviceId: `audio-output-${i + 1}`}),
+      },
+    ]).flat();
 
   /**
    * Stub the function to always return the default audio / video stream no matter which device was requested.
