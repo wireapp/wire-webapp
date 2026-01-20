@@ -69,6 +69,10 @@ export const MemberMessage = ({
   const isMemberLeave = message.isMemberLeave();
   const isMemberChange = message.isMemberChange();
 
+  const cellsConversationLabel = t('conversationCellsConversationEnabled');
+  const receiptsEnabledLabel = t('conversationCreateReceiptsEnabled');
+  const timedMessagesDisabledLabel = t('conversationDetailsActionTimedMessagesDisabled');
+
   const isConnectedMessage = [SystemMessageType.CONNECTION_ACCEPTED, SystemMessageType.CONNECTION_REQUEST].includes(
     message.memberMessageType,
   );
@@ -99,8 +103,8 @@ export const MemberMessage = ({
       )}
 
       {hasUsers && (
-        <div className="message-header">
-          <div className="message-header-icon message-header-icon--svg text-foreground">
+        <div className="message-header" role="status" aria-live="polite">
+          <div className="message-header-icon message-header-icon--svg text-foreground" aria-hidden="true">
             {isGroupCreation && <Icon.MessageIcon />}
             {isMemberRemoval && <span className="icon-minus" />}
             {isMemberJoin && <span className="icon-plus" />}
@@ -150,34 +154,45 @@ export const MemberMessage = ({
       )}
 
       {isGroupCreation && isCellsConversation && (
-        <div className="message-header" data-uie-name="label-cells-conversation">
-          <div className="message-header-icon message-header-icon--svg text-foreground">
+        <div className="message-header" data-uie-name="label-cells-conversation" role="status" aria-live="polite">
+          <div className="message-header-icon message-header-icon--svg text-foreground" aria-hidden="true">
             <CollectionIcon />
           </div>
           <p className="message-header-label">
-            <span className="ellipsis">{t('conversationCellsConversationEnabled')}</span>
+            <span className="ellipsis" title={cellsConversationLabel}>
+              {cellsConversationLabel}
+            </span>
           </p>
         </div>
       )}
 
       {isGroupCreation && hasReadReceiptsTurnedOn && (
-        <div className="message-header" data-uie-name="label-group-creation-receipts">
-          <div className="message-header-icon message-header-icon--svg text-foreground">
+        <div className="message-header" data-uie-name="label-group-creation-receipts" role="status" aria-live="polite">
+          <div className="message-header-icon message-header-icon--svg text-foreground" aria-hidden="true">
             <Icon.ReadIcon />
           </div>
           <p className="message-header-label">
-            <span className="ellipsis">{t('conversationCreateReceiptsEnabled')}</span>
+            <span className="ellipsis" title={receiptsEnabledLabel}>
+              {receiptsEnabledLabel}
+            </span>
           </p>
         </div>
       )}
 
       {isGroupCreation && isSelfDeletingMessagesOff && (
-        <div className="message-header" data-uie-name="label-self-deleting-messages-off">
-          <div className="message-header-icon message-header-icon--svg text-foreground">
+        <div
+          className="message-header"
+          data-uie-name="label-self-deleting-messages-off"
+          role="status"
+          aria-live="polite"
+        >
+          <div className="message-header-icon message-header-icon--svg text-foreground" aria-hidden="true">
             <Icon.TimerIcon />
           </div>
           <p className="message-header-label">
-            <span className="ellipsis">{t('conversationDetailsActionTimedMessagesDisabled')}</span>
+            <span className="ellipsis" title={timedMessagesDisabledLabel}>
+              {timedMessagesDisabledLabel}
+            </span>
           </p>
         </div>
       )}
