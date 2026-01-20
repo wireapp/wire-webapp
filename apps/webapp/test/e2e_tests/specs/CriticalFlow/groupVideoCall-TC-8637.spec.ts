@@ -19,7 +19,6 @@
 
 import {User} from 'test/e2e_tests/data/user';
 import {PageManager} from 'test/e2e_tests/pageManager';
-import {addMockCamerasToContext} from 'test/e2e_tests/utils/mockVideoDevice.util';
 
 import {test, expect, withLogin, withConnectionRequest} from '../../test.fixtures';
 import {createGroup} from 'test/e2e_tests/utils/userActions';
@@ -50,10 +49,7 @@ test.fixme(
       guestUser = await createUser();
 
       const [pmOwner, pmGuest] = await Promise.all([
-        PageManager.from(createPage(withLogin(teamOwner), withConnectionRequest(guestUser))).then(async pm => {
-          await addMockCamerasToContext(pm.getContext());
-          return pm;
-        }),
+        PageManager.from(createPage(withLogin(teamOwner), withConnectionRequest(guestUser))),
         PageManager.from(createPage(withLogin(guestUser))),
       ]);
       ownerPageManager = pmOwner;
