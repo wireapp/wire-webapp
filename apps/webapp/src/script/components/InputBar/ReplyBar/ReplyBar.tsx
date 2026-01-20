@@ -23,6 +23,7 @@ import {RestrictedVideo} from 'Components/asset/RestrictedVideo';
 import {ParticipantMicOnIcon} from 'Components/calling/ParticipantMicOnIcon';
 import * as Icon from 'Components/Icon';
 import {AssetImage} from 'Components/Image';
+import {MultipartAssetPreview} from 'Components/MessagesList/Message/ContentMessage/asset/MultipartAssetPreview';
 import {ContentMessage} from 'Repositories/entity/message/ContentMessage';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
@@ -38,17 +39,21 @@ export const ReplyBar = ({replyMessageEntity, onCancel}: ReplyBarProps) => {
     assets,
     senderName,
     was_edited: wasEdited,
-  } = useKoSubscribableChildren(replyMessageEntity, ['assets', 'senderName', 'was_edited']);
+    timestamp,
+  } = useKoSubscribableChildren(replyMessageEntity, ['assets', 'senderName', 'was_edited', 'timestamp']);
   const replyAsset = assets?.[0];
 
   const isMultipart = replyAsset?.isMultipart();
 
-  const attachmentsCount = isMultipart ? (replyAsset.attachments?.()?.length ?? 0) : 0;
+  const cellAssets = isMultipart ? replyAsset.getCellAssets() : [];
+  const attachmentsCount = cellAssets.length;
 
   const attachmentsCountCopy =
     attachmentsCount === 1
       ? t('replyBarSingleAttachment')
       : t('replyBarMultipleAttachments', {count: attachmentsCount});
+
+  const shouldRenderText = isMultipart ? replyAsset.should_render_text?.() : false;
 
   return (
     <div className="input-bar__reply" data-uie-name="input-bar-reply-box">
@@ -83,14 +88,24 @@ export const ReplyBar = ({replyMessageEntity, onCancel}: ReplyBarProps) => {
 
           {isMultipart && (
             <>
-              <div
-                className="input-bar__reply__message input-bar__reply__message__text"
-                data-uie-name="media-text-reply-box"
-                dangerouslySetInnerHTML={{__html: renderMessage(replyAsset.text, undefined, replyAsset.mentions())}}
-                aria-label={replyAsset.text}
-                tabIndex={TabIndex.FOCUSABLE}
-              />
-              {attachmentsCount > 0 && <p className="input-bar__reply__attachments-count">{attachmentsCountCopy}</p>}
+              {shouldRenderText && (
+                <div
+                  className="input-bar__reply__message input-bar__reply__message__text"
+                  data-uie-name="media-text-reply-box"
+                  dangerouslySetInnerHTML={{__html: renderMessage(replyAsset.text, undefined, replyAsset.mentions())}}
+                  aria-label={replyAsset.text}
+                  tabIndex={TabIndex.FOCUSABLE}
+                />
+              )}
+              {attachmentsCount > 0 && (
+                <MultipartAssetPreview
+                  cellAssets={cellAssets}
+                  conversationId={replyMessageEntity.conversation_id}
+                  attachmentsCountCopy={attachmentsCountCopy}
+                  senderName={senderName}
+                  timestamp={timestamp}
+                />
+              )}
             </>
           )}
 
