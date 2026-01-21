@@ -24,7 +24,6 @@ import {CellNode, CellNodeType} from 'src/script/types/cellNode';
 
 import {useCellPublicLink} from './useCellPublicLink';
 
-// Mock the Config module
 jest.mock('src/script/Config', () => ({
   Config: {
     getConfig: () => ({
@@ -33,7 +32,6 @@ jest.mock('src/script/Config', () => ({
   },
 }));
 
-// Mock the useCellsStore
 const mockSetPublicLink = jest.fn();
 let mockNodes: CellNode[] = [];
 
@@ -74,7 +72,6 @@ describe('useCellPublicLink', () => {
       updatePublicLink: jest.fn(),
     } as unknown as jest.Mocked<CellsRepository>;
 
-    // Reset mock nodes to default state
     mockNodes = [createMockNode()];
   });
 
@@ -92,11 +89,9 @@ describe('useCellPublicLink', () => {
         }),
       );
 
-      // Initially not enabled
       expect(result.current.isEnabled).toBe(false);
       expect(result.current.status).toBe('idle');
 
-      // Toggle on
       act(() => {
         result.current.togglePublicLink();
       });
@@ -125,7 +120,6 @@ describe('useCellPublicLink', () => {
 
   describe('should delete a public link when toggle is disabled', () => {
     it('deletes an existing public link when toggled off', async () => {
-      // Set up a node that already has a public link
       mockNodes = [
         createMockNode({
           publicLink: {
@@ -145,10 +139,8 @@ describe('useCellPublicLink', () => {
         }),
       );
 
-      // Should start enabled because alreadyShared is true
       expect(result.current.isEnabled).toBe(true);
 
-      // Toggle off
       act(() => {
         result.current.togglePublicLink();
       });
@@ -167,10 +159,8 @@ describe('useCellPublicLink', () => {
 
   describe('should delete a newly created link when toggle is immediately disabled', () => {
     it('uses createdLinkUuid ref to delete link when state has not propagated yet', async () => {
-      // Start with a node that has NO public link
       mockNodes = [createMockNode()];
 
-      // Make createPublicLink return a new link UUID
       mockCellsRepository.createPublicLink.mockResolvedValue({
         Uuid: 'newly-created-uuid',
         LinkUrl: '/public/new-link',
@@ -185,17 +175,14 @@ describe('useCellPublicLink', () => {
         }),
       );
 
-      // Initially not enabled
       expect(result.current.isEnabled).toBe(false);
 
-      // Toggle ON - this triggers createPublicLink
       act(() => {
         result.current.togglePublicLink();
       });
 
       expect(result.current.isEnabled).toBe(true);
 
-      // Wait for the link to be created
       await waitFor(() => {
         expect(mockCellsRepository.createPublicLink).toHaveBeenCalled();
       });
@@ -204,11 +191,6 @@ describe('useCellPublicLink', () => {
         expect(result.current.status).toBe('success');
       });
 
-      // Now we need to simulate the scenario where the user toggles OFF
-      // BEFORE the node's publicLink state has been updated in the store
-      // The hook should use createdLinkUuid.current to delete the link
-
-      // Update mockNodes to reflect the created link (simulating store update)
       mockNodes = [
         createMockNode({
           publicLink: {
@@ -219,7 +201,6 @@ describe('useCellPublicLink', () => {
         }),
       ];
 
-      // Toggle OFF immediately
       act(() => {
         result.current.togglePublicLink();
       });
@@ -234,10 +215,6 @@ describe('useCellPublicLink', () => {
     });
 
     it('handles rapid toggle on/off using createdLinkUuid ref when node state is stale', async () => {
-      // This test verifies the bug fix for stale closure issue
-      // The createdLinkUuid ref ensures we can delete a just-created link
-      // even if node.publicLink hasn't been updated yet
-
       mockNodes = [createMockNode()];
 
       let createResolve: (value: {Uuid: string; LinkUrl: string}) => void;
@@ -255,15 +232,12 @@ describe('useCellPublicLink', () => {
         }),
       );
 
-      // Toggle ON
       act(() => {
         result.current.togglePublicLink();
       });
 
-      // createPublicLink is called but hasn't resolved yet
       expect(mockCellsRepository.createPublicLink).toHaveBeenCalled();
 
-      // Now resolve the create promise
       await act(async () => {
         createResolve!({Uuid: 'rapid-toggle-uuid', LinkUrl: '/public/rapid-link'});
       });
@@ -272,9 +246,6 @@ describe('useCellPublicLink', () => {
         expect(result.current.status).toBe('success');
       });
 
-      // At this point, setPublicLink was called but mockNodes might not be updated
-      // (simulating real-world async state propagation delay)
-      // Update mockNodes to have the link
       mockNodes = [
         createMockNode({
           publicLink: {
@@ -285,7 +256,6 @@ describe('useCellPublicLink', () => {
         }),
       ];
 
-      // Toggle OFF
       act(() => {
         result.current.togglePublicLink();
       });
@@ -324,7 +294,6 @@ describe('useCellPublicLink', () => {
         }),
       );
 
-      // Should start enabled because alreadyShared is true
       expect(result.current.isEnabled).toBe(true);
 
       await waitFor(() => {
@@ -343,7 +312,6 @@ describe('useCellPublicLink', () => {
         Label: 'test-file.pdf',
       });
 
-      // Should not have called createPublicLink
       expect(mockCellsRepository.createPublicLink).not.toHaveBeenCalled();
     });
 
@@ -376,10 +344,8 @@ describe('useCellPublicLink', () => {
 
       expect(mockCellsRepository.getPublicLink).toHaveBeenCalledTimes(1);
 
-      // Rerender the hook
       rerender();
 
-      // Should not fetch again because fetchedLinkId.current matches
       expect(mockCellsRepository.getPublicLink).toHaveBeenCalledTimes(1);
     });
   });
@@ -397,7 +363,6 @@ describe('useCellPublicLink', () => {
         }),
       );
 
-      // Toggle on
       act(() => {
         result.current.togglePublicLink();
       });
@@ -406,14 +371,12 @@ describe('useCellPublicLink', () => {
         expect(result.current.status).toBe('error');
       });
 
-      // Should clear the public link on error
       expect(mockSetPublicLink).toHaveBeenCalledWith('test-uuid', undefined);
     });
 
     it('sets error status when link response is missing required fields', async () => {
       mockNodes = [createMockNode()];
 
-      // Return incomplete link data
       mockCellsRepository.createPublicLink.mockResolvedValue({
         Uuid: undefined,
         LinkUrl: undefined,
@@ -426,7 +389,6 @@ describe('useCellPublicLink', () => {
         }),
       );
 
-      // Toggle on
       act(() => {
         result.current.togglePublicLink();
       });
@@ -460,10 +422,8 @@ describe('useCellPublicLink', () => {
         }),
       );
 
-      // Should start enabled
       expect(result.current.isEnabled).toBe(true);
 
-      // Toggle off
       act(() => {
         result.current.togglePublicLink();
       });
