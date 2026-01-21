@@ -127,23 +127,17 @@ const CellShareModalContent = ({
   const [wasPasswordDisabled, setWasPasswordDisabled] = useState(false);
   const initializedLinkIdRef = useRef<string | null>(null);
 
-  // Derive hasExistingPassword from linkData
   const hasExistingPassword = Boolean(linkData?.PasswordRequired);
 
-  // Handle password toggle with tracking for OFF then ON behavior
   const handlePasswordToggle = () => {
     if (isPasswordEnabled) {
-      // Password is being turned OFF - track this
       setWasPasswordDisabled(true);
       setIsEditingPassword(false);
     } else {
-      // Password is being turned ON
       if (wasPasswordDisabled || !hasExistingPassword) {
-        // If it was disabled and now re-enabled, or no existing password, show input fields
         setIsEditingPassword(true);
         setPasswordValue('');
       } else {
-        // Opening fresh with existing password - show "Change Password" button
         setIsEditingPassword(false);
       }
       setWasPasswordDisabled(false);
@@ -151,13 +145,11 @@ const CellShareModalContent = ({
     togglePassword();
   };
 
-  // Handle "Change Password" button click
   const handleChangePasswordClick = () => {
     setIsEditingPassword(true);
     setPasswordValue('');
   };
 
-  // Initialize toggles and values based on existing link data
   useEffect(() => {
     if (!isEnabled) {
       initializedLinkIdRef.current = null;
@@ -165,13 +157,10 @@ const CellShareModalContent = ({
     }
 
     if (linkData && status === 'success' && initializedLinkIdRef.current !== linkData.Uuid) {
-      // Always sync password toggle with linkData state
       setIsPasswordEnabled(!!linkData.PasswordRequired);
 
-      // Always sync expiration toggle and date with linkData state
       if (linkData.AccessEnd) {
         setIsExpirationEnabled(true);
-        // Convert Unix timestamp (in seconds) to Date
         const expirationDate = new Date(parseInt(linkData.AccessEnd) * 1000);
         setExpirationDateTime(expirationDate);
       } else {
