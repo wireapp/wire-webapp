@@ -29,7 +29,7 @@
     "@wireapp/store-engine": "5.1.17",
     "hash.js": "1.1.7",
     "idb": "8.0.3",
-    "lodash": "4.17.21"
+    "lodash": "4.17.23"
   },
   "devDependencies": {
     "@swc/core": "1.15.8",
