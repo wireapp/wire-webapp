@@ -32,6 +32,5 @@ INBUCKET_PASSWORD="{{ op://Test Automation/BackendConnection imai/inbucketPasswo
 INBUCKET_URL=op://Test Automation/BackendConnection imai/inbucketUrl
 BACKEND_URL=op://Test Automation/BackendConnection imai/backendUrl
 WEBAPP_URL=op://Test Automation/BackendConnection imai/webappUrl
-TEAM_MANAGEMENT_URL=op://Test Automation/BackendConnection imai/teamManagementUrl
 DOMAIN=op://Test Automation/BackendConnection imai/domain
 BASIC_AUTH=op://Test Automation/BackendConnection imai/basicAuth
