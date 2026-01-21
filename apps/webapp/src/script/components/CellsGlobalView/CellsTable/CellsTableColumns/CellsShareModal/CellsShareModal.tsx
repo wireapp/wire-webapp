@@ -120,7 +120,6 @@ const CellsShareModal = ({type, uuid, cellsRepository, modalId}: ShareModalParam
     }
 
     if (linkData && status === 'success' && initializedLinkIdRef.current !== linkData.Uuid) {
-      // Always sync password toggle with linkData state
       setIsPasswordEnabled(!!linkData.PasswordRequired);
 
       // Always sync expiration toggle and date with linkData state
@@ -139,20 +138,15 @@ const CellsShareModal = ({type, uuid, cellsRepository, modalId}: ShareModalParam
     }
   }, [isEnabled, linkData, status, setIsPasswordEnabled, setIsExpirationEnabled]);
 
-  // Handle password toggle with tracking for OFF then ON behavior
   const handlePasswordToggle = () => {
     if (isPasswordEnabled) {
-      // Password is being turned OFF - track this
       setWasPasswordDisabled(true);
       setIsEditingPassword(false);
     } else {
-      // Password is being turned ON
       if (wasPasswordDisabled || !hasExistingPassword) {
-        // If it was disabled and now re-enabled, or no existing password, show input fields
         setIsEditingPassword(true);
         setPasswordValue('');
       } else {
-        // Opening fresh with existing password - show "Change Password" button
         setIsEditingPassword(false);
       }
       setWasPasswordDisabled(false);
