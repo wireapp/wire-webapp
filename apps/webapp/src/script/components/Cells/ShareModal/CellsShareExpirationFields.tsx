@@ -65,6 +65,7 @@ import {
   expirationErrorBorderStyles,
   expirationErrorLabelStyles,
   expirationErrorTextStyles,
+  timeSelectMenuPortalStyles,
 } from './CellsShareExpirationStyles';
 
 interface CellsShareExpirationFieldsLabels {
@@ -285,6 +286,7 @@ export const CellsShareExpirationFields = ({
               }
             }}
             markInvalid={isExpirationInvalid}
+            selectMenuPortalCSS={timeSelectMenuPortalStyles}
           />
         </div>
       </div>
