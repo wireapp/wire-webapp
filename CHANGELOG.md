@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [9.73.7](https://github.com/wireapp/wire-web-packages/compare/@wireapp/react-ui-kit@9.73.5...@wireapp/react-ui-kit@9.73.7) (2026-01-21)
+
+### Bug Fixes
+
+* switch disable styles ([#7822](https://github.com/wireapp/wire-web-packages/issues/7822)) ([0bdc960](https://github.com/wireapp/wire-web-packages/commit/0bdc960f76ddf2bd89e06f0797fb46842b9b3afb))
+
 ## [9.73.5](https://github.com/wireapp/wire-web-packages/compare/@wireapp/react-ui-kit@9.73.4...@wireapp/react-ui-kit@9.73.5) (2026-01-20)
 
 ### Bug Fixes
