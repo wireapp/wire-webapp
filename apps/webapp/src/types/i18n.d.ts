@@ -499,6 +499,8 @@ declare module 'I18n/en-US.json' {
     'cells.shareModal.linkCopied': `Link copied`;
     'cells.shareModal.password': `Password`;
     'cells.shareModal.password.description': `Set a password to restrict access.`;
+    'cells.shareModal.password.error.required': `Enter a password`;
+    'cells.shareModal.password.label': `Set password`;
     'cells.shareModal.primaryAction': `Save`;
     'cells.sidebar.heading': `Drive`;
     'cells.sidebar.title': `Files`;
