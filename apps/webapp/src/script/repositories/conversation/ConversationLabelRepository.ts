@@ -132,7 +132,17 @@ export class ConversationLabelRepository extends TypedEventTarget<{type: 'conver
   readonly saveLabels = () => {
     const currentData = this.marshal();
     const storedData = localStorage.getItem(ConversationLabelRepository.LocalStorageKey);
-    const parsedStoredData = storedData ? JSON.parse(storedData) : null;
+    let parsedStoredData: LabelProperty | null = null;
+
+    if (storedData) {
+      try {
+        parsedStoredData = JSON.parse(storedData);
+      } catch (error) {
+        this.logger.warn(`Failed to parse stored labels: ${error instanceof Error ? error.message : String(error)}`);
+        // Clear corrupted data
+        localStorage.removeItem(ConversationLabelRepository.LocalStorageKey);
+      }
+    }
 
     // Only save if data has actually changed
     if (!parsedStoredData || JSON.stringify(currentData.labels) !== JSON.stringify(parsedStoredData.labels)) {
@@ -149,7 +159,18 @@ export class ConversationLabelRepository extends TypedEventTarget<{type: 'conver
   loadLabels = async () => {
     try {
       const conversationLabelJson = localStorage.getItem(ConversationLabelRepository.LocalStorageKey);
-      const localData = conversationLabelJson ? JSON.parse(conversationLabelJson) : null;
+      let localData: LabelProperty | null = null;
+
+      if (conversationLabelJson) {
+        try {
+          localData = JSON.parse(conversationLabelJson);
+        } catch (error) {
+          this.logger.warn(
+            `Failed to parse stored labels, clearing corrupted data: ${error instanceof Error ? error.message : String(error)}`,
+          );
+          localStorage.removeItem(ConversationLabelRepository.LocalStorageKey);
+        }
+      }
 
       // Always fetch from backend first
       const labelProperties = await this.propertiesService.getPropertiesByKey(propertiesKey);
@@ -158,19 +179,43 @@ export class ConversationLabelRepository extends TypedEventTarget<{type: 'conver
         // Compare timestamps to determine which is newer
         const localTimestamp = localData.lastSyncTimestamp || 0;
         const remoteTimestamp = labelProperties.lastSyncTimestamp || 0;
+        const localVersion = localData.version || 0;
+        const remoteVersion = labelProperties.version || 0;
 
-        if (localTimestamp > remoteTimestamp) {
+        // Use local data if it has a newer timestamp, or same timestamp but higher version
+        const isLocalNewer =
+          localTimestamp > remoteTimestamp || (localTimestamp === remoteTimestamp && localVersion > remoteVersion);
+
+        if (isLocalNewer) {
           // Local data is newer, use it and update backend
           this.unmarshal(localData);
-          this.persistValues(localData);
-          await this.saveLabels();
+          const updatedData = {
+            ...localData,
+            lastSyncTimestamp: Date.now(),
+            version: (localData.version || 0) + 1,
+          };
+          void this.propertiesService.putPropertiesByKey(propertiesKey, updatedData);
+          this.persistValues(updatedData);
           return;
         }
       }
 
-      // Use backend data (either because local is empty or older)
-      this.unmarshal(labelProperties);
-      this.persistValues(labelProperties);
+      // Use backend data if available (either because local is empty or older)
+      if (labelProperties) {
+        this.unmarshal(labelProperties);
+        this.persistValues(labelProperties);
+      } else if (localData) {
+        // Backend has no data but local does, use local and sync to backend
+        this.unmarshal(localData);
+        const updatedData = {
+          ...localData,
+          lastSyncTimestamp: Date.now(),
+          version: (localData.version || 0) + 1,
+        };
+        void this.propertiesService.putPropertiesByKey(propertiesKey, updatedData);
+        this.persistValues(updatedData);
+      }
+      // If both are null, labels remain empty (default state)
     } catch (error) {
       this.logger.warn(`No labels were loaded: ${error instanceof Error ? error.message : String(error)}`);
       // Don't save empty state on error
@@ -179,12 +224,7 @@ export class ConversationLabelRepository extends TypedEventTarget<{type: 'conver
 
   private persistValues = (data?: LabelProperty) => {
     const values = data || this.marshal();
-    const valuesWithTimestamp = {
-      ...values,
-      lastSyncTimestamp: Date.now(),
-      version: (values.version || 0) + 1,
-    };
-    localStorage.setItem(ConversationLabelRepository.LocalStorageKey, JSON.stringify(valuesWithTimestamp));
+    localStorage.setItem(ConversationLabelRepository.LocalStorageKey, JSON.stringify(values));
   };
 
   readonly onUserEvent = (event: any) => {

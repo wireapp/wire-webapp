@@ -42,16 +42,26 @@ describe('ConversationLabelRepository Integration - Synchronization Fix', () => 
     allConversations = ko.observableArray<Conversation>([]);
     conversations = ko.observableArray<Conversation>([]);
 
-    // Create a simple properties service that uses localStorage for simulation
+    // Create a properly typed mock properties service that uses localStorage for simulation
     propertiesService = {
-      getPropertiesByKey: async (key: string) => {
+      getPropertiesByKey: jest.fn(async <T = any>(key: string): Promise<T> => {
         const data = localStorage.getItem(`test_${key}`);
-        return data ? JSON.parse(data) : null;
-      },
-      putPropertiesByKey: async (key: string, value: any) => {
+        return (data ? JSON.parse(data) : null) as T;
+      }),
+      putPropertiesByKey: jest.fn(async <T extends Record<string, any>>(key: string, value: T): Promise<void> => {
         localStorage.setItem(`test_${key}`, JSON.stringify(value));
-      },
-    } as PropertiesService;
+      }),
+      deleteProperties: jest.fn(async (): Promise<void> => {
+        // Not used in these tests
+      }),
+      deletePropertiesByKey: jest.fn(async (key: string): Promise<void> => {
+        localStorage.removeItem(`test_${key}`);
+      }),
+      getProperties: jest.fn(async (): Promise<string[]> => {
+        // Not used in these tests
+        return [];
+      }),
+    } as unknown as PropertiesService;
 
     // Create repository instance
     conversationLabelRepository = new ConversationLabelRepository(
