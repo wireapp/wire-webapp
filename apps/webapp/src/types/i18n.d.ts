@@ -477,6 +477,7 @@ declare module 'I18n/en-US.json' {
     'cells.search.failed': `Something went wrong, please try again later.`;
     'cells.search.placeholder': `Search files and folders`;
     'cells.selfDeletingMessage.info': `The feature is not available for conversations with a shared Drive.`;
+    'cells.shareModal.changePassword': `Change Password`;
     'cells.shareModal.copyLink': `Copy Link`;
     'cells.shareModal.disablePublicLink': `Disable public link`;
     'cells.shareModal.disablePublicLink.description': `Disable public link`;
@@ -498,6 +499,8 @@ declare module 'I18n/en-US.json' {
     'cells.shareModal.linkCopied': `Link copied`;
     'cells.shareModal.password': `Password`;
     'cells.shareModal.password.description': `Set a password to restrict access.`;
+    'cells.shareModal.password.error.required': `Enter a password`;
+    'cells.shareModal.password.label': `Set password`;
     'cells.shareModal.primaryAction': `Save`;
     'cells.sidebar.heading': `Drive`;
     'cells.sidebar.title': `Files`;

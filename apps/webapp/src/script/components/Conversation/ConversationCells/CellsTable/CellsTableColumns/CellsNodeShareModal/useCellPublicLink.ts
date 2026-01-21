@@ -133,7 +133,7 @@ export const useCellPublicLink = ({uuid, conversationId, cellsRepository}: UseCe
     }: {
       password?: string;
       passwordEnabled?: boolean;
-      accessEnd?: string;
+      accessEnd?: string | null;
     }) => {
       if (!node?.publicLink?.uuid) {
         throw new Error('No public link to update');
@@ -142,26 +142,40 @@ export const useCellPublicLink = ({uuid, conversationId, cellsRepository}: UseCe
       try {
         setStatus('loading');
 
-        // Fetch the complete link object first
         const currentLink = await cellsRepository.getPublicLink({uuid: node.publicLink.uuid});
 
-        // Determine if we're creating a new password or updating an existing one
         const hasExistingPassword = currentLink.PasswordRequired === true;
         const isSettingPassword = passwordEnabled && password;
 
-        // Update only the properties we need to change
-        const updatedLink = {
+        const updatedLink: typeof currentLink = {
           ...currentLink,
           PasswordRequired: passwordEnabled,
-          ...(accessEnd ? {AccessEnd: accessEnd} : {}),
         };
+
+        if (accessEnd === null) {
+          // Ensure that accessEnd is not present in JSON
+          delete updatedLink.AccessEnd;
+        } else if (accessEnd !== undefined) {
+          updatedLink.AccessEnd = accessEnd;
+        }
 
         await cellsRepository.updatePublicLink({
           linkUuid: node.publicLink.uuid,
           link: updatedLink,
-          // Use createPassword if no password exists, updatePassword if it does
           ...(isSettingPassword ? (hasExistingPassword ? {updatePassword: password} : {createPassword: password}) : {}),
           passwordEnabled,
+        });
+
+        // Update linkData with the new values so the UI doesn't reset
+        setLinkData(prevData => {
+          if (!prevData) {
+            return prevData;
+          }
+          return {
+            ...prevData,
+            PasswordRequired: passwordEnabled,
+            AccessEnd: accessEnd === null ? undefined : accessEnd !== undefined ? accessEnd : prevData.AccessEnd,
+          };
         });
 
         const newLink = await cellsRepository.getPublicLink({uuid: node.publicLink.uuid});
