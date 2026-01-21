@@ -165,6 +165,36 @@ export const trimFileExtension = (filename?: string): string => {
   return '';
 };
 
+/**
+ * Sanitizes a filename by converting it to ASCII-safe characters.
+ * This is important for filenames that may contain locale-specific characters
+ * (like German umlauts) which can cause encoding issues when sent to the server.
+ *
+ * @param filename - The filename to sanitize
+ * @returns A sanitized filename with ASCII-safe characters
+ *
+ * @example
+ * sanitizeFilename("Bild eingefügt am 12. Jan. 2026, 14:30:57.png")
+ * // Returns: "Bild eingefuegt am 12. Jan. 2026- 14-30-57.png"
+ */
+export const sanitizeFilename = (filename: string): string => {
+  // Replace German umlauts and special characters first
+  let sanitized = filename
+    .replace(/ä/g, 'ae')
+    .replace(/ö/g, 'oe')
+    .replace(/ü/g, 'ue')
+    .replace(/Ä/g, 'Ae')
+    .replace(/Ö/g, 'Oe')
+    .replace(/Ü/g, 'Ue')
+    .replace(/ß/g, 'ss');
+
+  // Then normalize to decomposed form and remove combining marks for other accents
+  sanitized = sanitized.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+
+  // Replace problematic special characters with safe alternatives
+  return sanitized.replace(/[,;]/g, '-').replace(/[:]/g, '-').replace(/\s+/g, ' ').trim();
+};
+
 export const formatBytes = (bytes: number, decimals: number = 1): string => {
   if (bytes === 0) {
     return '0 B';
