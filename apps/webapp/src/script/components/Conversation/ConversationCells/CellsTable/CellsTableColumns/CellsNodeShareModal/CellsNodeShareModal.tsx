@@ -123,9 +123,33 @@ const CellShareModalContent = ({
   const [passwordValue, setPasswordValue] = useState('');
   const [expirationDateTime, setExpirationDateTime] = useState<Date | null>(null);
   const [isExpirationInvalid, setIsExpirationInvalid] = useState(false);
+  const [isEditingPassword, setIsEditingPassword] = useState(false);
+  const [wasPasswordDisabled, setWasPasswordDisabled] = useState(false);
   const initializedLinkIdRef = useRef<string | null>(null);
 
-  // Initialize toggles and values based on existing link data
+  const hasExistingPassword = Boolean(linkData?.PasswordRequired);
+
+  const handlePasswordToggle = () => {
+    if (isPasswordEnabled) {
+      setWasPasswordDisabled(true);
+      setIsEditingPassword(false);
+    } else {
+      if (wasPasswordDisabled || !hasExistingPassword) {
+        setIsEditingPassword(true);
+        setPasswordValue('');
+      } else {
+        setIsEditingPassword(false);
+      }
+      setWasPasswordDisabled(false);
+    }
+    togglePassword();
+  };
+
+  const handleChangePasswordClick = () => {
+    setIsEditingPassword(true);
+    setPasswordValue('');
+  };
+
   useEffect(() => {
     if (!isEnabled) {
       initializedLinkIdRef.current = null;
@@ -133,13 +157,10 @@ const CellShareModalContent = ({
     }
 
     if (linkData && status === 'success' && initializedLinkIdRef.current !== linkData.Uuid) {
-      // Always sync password toggle with linkData state
       setIsPasswordEnabled(!!linkData.PasswordRequired);
 
-      // Always sync expiration toggle and date with linkData state
       if (linkData.AccessEnd) {
         setIsExpirationEnabled(true);
-        // Convert Unix timestamp (in seconds) to Date
         const expirationDate = new Date(parseInt(linkData.AccessEnd) * 1000);
         setExpirationDateTime(expirationDate);
       } else {
@@ -190,6 +211,8 @@ const CellShareModalContent = ({
         expirationEnabled: isExpirationEnabled,
         expirationDateTime,
         expirationInvalid: isExpirationInvalid,
+        hasExistingPassword,
+        isEditingPassword,
       });
 
       if (!serialized.isValid) {
@@ -222,6 +245,8 @@ const CellShareModalContent = ({
     expirationDateTime,
     isExpirationInvalid,
     updatePublicLink,
+    hasExistingPassword,
+    isEditingPassword,
   ]);
 
   return (
@@ -240,10 +265,13 @@ const CellShareModalContent = ({
       }}
       password={{
         isEnabled: isPasswordEnabled,
-        onToggle: togglePassword,
+        onToggle: handlePasswordToggle,
         value: passwordValue,
         onChange: setPasswordValue,
         onGeneratePassword: setPasswordValue,
+        hasExistingPassword,
+        isEditingPassword,
+        onChangePasswordClick: handleChangePasswordClick,
       }}
       expiration={{
         isEnabled: isExpirationEnabled,
