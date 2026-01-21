@@ -105,6 +105,11 @@ const CellsShareModal = ({type, uuid, cellsRepository, modalId}: ShareModalParam
   const [passwordValue, setPasswordValue] = useState('');
   const [expirationDateTime, setExpirationDateTime] = useState<Date | null>(null);
   const [isExpirationInvalid, setIsExpirationInvalid] = useState(false);
+  const [isEditingPassword, setIsEditingPassword] = useState(false);
+  const [wasPasswordDisabled, setWasPasswordDisabled] = useState(false);
+
+  // Derive hasExistingPassword from linkData
+  const hasExistingPassword = Boolean(linkData?.PasswordRequired);
 
   // Initialize toggles and values based on existing link data
   useEffect(() => {
@@ -125,6 +130,33 @@ const CellsShareModal = ({type, uuid, cellsRepository, modalId}: ShareModalParam
     }
   }, [linkData, status, setIsPasswordEnabled, setIsExpirationEnabled]);
 
+  // Handle password toggle with tracking for OFF then ON behavior
+  const handlePasswordToggle = () => {
+    if (isPasswordEnabled) {
+      // Password is being turned OFF - track this
+      setWasPasswordDisabled(true);
+      setIsEditingPassword(false);
+    } else {
+      // Password is being turned ON
+      if (wasPasswordDisabled || !hasExistingPassword) {
+        // If it was disabled and now re-enabled, or no existing password, show input fields
+        setIsEditingPassword(true);
+        setPasswordValue('');
+      } else {
+        // Opening fresh with existing password - show "Change Password" button
+        setIsEditingPassword(false);
+      }
+      setWasPasswordDisabled(false);
+    }
+    togglePassword();
+  };
+
+  // Handle "Change Password" button click
+  const handleChangePasswordClick = () => {
+    setIsEditingPassword(true);
+    setPasswordValue('');
+  };
+
   const isInputDisabled = ['loading', 'error'].includes(status);
 
   useEffect(() => {
@@ -139,6 +171,8 @@ const CellsShareModal = ({type, uuid, cellsRepository, modalId}: ShareModalParam
         expirationEnabled: isExpirationEnabled,
         expirationDateTime,
         expirationInvalid: isExpirationInvalid,
+        hasExistingPassword,
+        isEditingPassword,
       });
 
       if (!serialized.isValid) {
@@ -171,6 +205,8 @@ const CellsShareModal = ({type, uuid, cellsRepository, modalId}: ShareModalParam
     expirationDateTime,
     isExpirationInvalid,
     updatePublicLink,
+    hasExistingPassword,
+    isEditingPassword,
   ]);
 
   return (
@@ -189,10 +225,13 @@ const CellsShareModal = ({type, uuid, cellsRepository, modalId}: ShareModalParam
       }}
       password={{
         isEnabled: isPasswordEnabled,
-        onToggle: togglePassword,
+        onToggle: handlePasswordToggle,
         value: passwordValue,
         onChange: setPasswordValue,
         onGeneratePassword: setPasswordValue,
+        hasExistingPassword,
+        isEditingPassword,
+        onChangePasswordClick: handleChangePasswordClick,
       }}
       expiration={{
         isEnabled: isExpirationEnabled,
