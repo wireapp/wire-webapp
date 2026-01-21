@@ -60,7 +60,6 @@ import {
   expirationLabelStyles,
   timeSelectLabelVisuallyHiddenStyles,
   timeSelectMenuStyles,
-  timeSelectMenuPortalStyles,
   timeSelectStyles,
   timeSelectWrapperStyles,
   expirationErrorBorderStyles,
@@ -276,7 +275,6 @@ export const CellsShareExpirationFields = ({
             value={selectedTime}
             selectContainerCSS={timeControlStyles}
             selectControlCSS={timeControlStyles}
-            selectMenuPortalCSS={timeSelectMenuPortalStyles}
             menuCSS={timeSelectMenuStyles}
             menuPlacement="top"
             maxMenuHeight={menuMaxHeight}
