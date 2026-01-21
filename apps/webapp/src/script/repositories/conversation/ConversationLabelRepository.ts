@@ -56,6 +56,8 @@ interface ConversationLabelJson extends Omit<ConversationLabel, 'conversations'>
 
 interface LabelProperty {
   labels: ConversationLabelJson[];
+  lastSyncTimestamp?: number;
+  version?: number;
 }
 
 const propertiesKey = 'labels';
@@ -128,32 +130,61 @@ export class ConversationLabelRepository extends TypedEventTarget<{type: 'conver
   };
 
   readonly saveLabels = () => {
-    const conversationLabelJson = this.marshal();
-    void this.propertiesService.putPropertiesByKey(propertiesKey, conversationLabelJson);
-    this.persistValues();
+    const currentData = this.marshal();
+    const storedData = localStorage.getItem(ConversationLabelRepository.LocalStorageKey);
+    const parsedStoredData = storedData ? JSON.parse(storedData) : null;
+
+    // Only save if data has actually changed
+    if (!parsedStoredData || JSON.stringify(currentData.labels) !== JSON.stringify(parsedStoredData.labels)) {
+      const conversationLabelJson = {
+        ...currentData,
+        lastSyncTimestamp: Date.now(),
+        version: (parsedStoredData?.version || 0) + 1,
+      };
+      void this.propertiesService.putPropertiesByKey(propertiesKey, conversationLabelJson);
+      this.persistValues(conversationLabelJson);
+    }
   };
 
   loadLabels = async () => {
     try {
       const conversationLabelJson = localStorage.getItem(ConversationLabelRepository.LocalStorageKey);
+      const localData = conversationLabelJson ? JSON.parse(conversationLabelJson) : null;
 
-      if (conversationLabelJson) {
-        this.unmarshal(JSON.parse(conversationLabelJson));
-        this.saveLabels();
-        return;
+      // Always fetch from backend first
+      const labelProperties = await this.propertiesService.getPropertiesByKey(propertiesKey);
+
+      if (localData && labelProperties) {
+        // Compare timestamps to determine which is newer
+        const localTimestamp = localData.lastSyncTimestamp || 0;
+        const remoteTimestamp = labelProperties.lastSyncTimestamp || 0;
+
+        if (localTimestamp > remoteTimestamp) {
+          // Local data is newer, use it and update backend
+          this.unmarshal(localData);
+          this.persistValues(localData);
+          await this.saveLabels();
+          return;
+        }
       }
 
-      const labelProperties = await this.propertiesService.getPropertiesByKey(propertiesKey);
+      // Use backend data (either because local is empty or older)
       this.unmarshal(labelProperties);
-      this.persistValues();
+      this.persistValues(labelProperties);
     } catch (error) {
-      this.logger.warn(`No labels were loaded: ${error.message}`);
+      this.logger.warn(`No labels were loaded: ${error instanceof Error ? error.message : String(error)}`);
+      // Don't save empty state on error
     }
   };
 
-  private persistValues = () => {
-    const values = this.marshal();
-    localStorage.setItem(ConversationLabelRepository.LocalStorageKey, JSON.stringify(values));
+  private persistValues = (data?: LabelProperty) => {
+    const values = data || this.marshal();
+    const valuesWithTimestamp = {
+      ...values,
+      lastSyncTimestamp: Date.now(),
+      version: (values.version || 0) + 1,
+    };
+    localStorage.setItem(ConversationLabelRepository.LocalStorageKey, JSON.stringify(valuesWithTimestamp));
   };
 
   readonly onUserEvent = (event: any) => {
@@ -174,10 +205,13 @@ export class ConversationLabelRepository extends TypedEventTarget<{type: 'conver
     );
   };
 
-  readonly getFavoriteLabel = (): ConversationLabel => this.labels().find(({type}) => type === LabelType.Favorite);
+  readonly getFavoriteLabel = (): ConversationLabel | undefined =>
+    this.labels().find(({type}) => type === LabelType.Favorite);
 
-  readonly getFavorites = (conversations = this.conversations()): Conversation[] =>
-    this.getLabelConversations(this.getFavoriteLabel(), conversations);
+  readonly getFavorites = (conversations = this.conversations()): Conversation[] => {
+    const favoriteLabel = this.getFavoriteLabel();
+    return favoriteLabel ? this.getLabelConversations(favoriteLabel, conversations) : [];
+  };
 
   readonly getLabelConversations = (label: ConversationLabel, conversations = this.conversations()): Conversation[] =>
     label ? conversations.filter(conversation => label.conversations().includes(conversation)) : [];
@@ -237,7 +271,10 @@ export class ConversationLabelRepository extends TypedEventTarget<{type: 'conver
     const isInCustomFolder = this.allLabeledConversations().includes(conversation);
 
     if (isInCustomFolder) {
-      ids.push(this.getConversationCustomLabel(conversation).id);
+      const customLabel = this.getConversationCustomLabel(conversation);
+      if (customLabel) {
+        ids.push(customLabel.id);
+      }
     } else if (conversation.isGroupOrChannel()) {
       ids.push(DefaultLabelIds.Groups);
     } else {
