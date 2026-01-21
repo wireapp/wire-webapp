@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.1.19](https://github.com/wireapp/wire-web-packages/compare/@wireapp/priority-queue@2.1.17...@wireapp/priority-queue@2.1.19) (2026-01-21)
+
+**Note:** Version bump only for package @wireapp/priority-queue
+
 ## [2.1.17](https://github.com/wireapp/wire-web-packages/compare/@wireapp/priority-queue@2.1.16...@wireapp/priority-queue@2.1.17) (2025-12-02)
 
 **Note:** Version bump only for package @wireapp/priority-queue

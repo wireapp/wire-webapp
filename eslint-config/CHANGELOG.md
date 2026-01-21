@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [3.1.9](https://github.com/wireapp/wire-web-packages/compare/@wireapp/eslint-config@3.1.7...@wireapp/eslint-config@3.1.9) (2026-01-21)
+
+**Note:** Version bump only for package @wireapp/eslint-config
+
 ## [3.1.7](https://github.com/wireapp/wire-web-packages/compare/@wireapp/eslint-config@3.1.6...@wireapp/eslint-config@3.1.7) (2025-10-23)
 
 **Note:** Version bump only for package @wireapp/eslint-config
