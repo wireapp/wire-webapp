@@ -42,6 +42,8 @@ export const useCellPublicLink = ({uuid, conversationId, cellsRepository}: UseCe
   const [status, setStatus] = useState<PublicLinkStatus>(node?.publicLink ? 'success' : 'idle');
   const [linkData, setLinkData] = useState<RestShareLink | null>(null);
   const fetchedLinkId = useRef<string | null>(null);
+  // Track created link UUID to handle immediate disable scenario
+  const createdLinkUuid = useRef<string | null>(null);
 
   const createPublicLink = useCallback(async () => {
     try {
@@ -59,10 +61,13 @@ export const useCellPublicLink = ({uuid, conversationId, cellsRepository}: UseCe
       }
 
       const newLink = {uuid: link.Uuid, url: Config.getConfig().CELLS_PYDIO_URL + link.LinkUrl, alreadyShared: true};
+      // Store the created link UUID for immediate deletion scenario
+      createdLinkUuid.current = link.Uuid;
       setPublicLink({conversationId, nodeId: uuid, data: newLink});
       setLinkData(link);
       setStatus('success');
     } catch (err) {
+      createdLinkUuid.current = null;
       setStatus('error');
       setPublicLink({conversationId, nodeId: uuid, data: undefined});
     }
@@ -102,18 +107,21 @@ export const useCellPublicLink = ({uuid, conversationId, cellsRepository}: UseCe
   }, [uuid, conversationId, setPublicLink]);
 
   const deletePublicLink = useCallback(async () => {
-    if (!node?.publicLink || !node.publicLink.uuid) {
+    // Use createdLinkUuid as fallback for immediate disable scenario
+    const linkUuid = node?.publicLink?.uuid || createdLinkUuid.current;
+
+    if (!linkUuid) {
       return;
     }
 
     try {
-      await cellsRepository.deletePublicLink({uuid: node.publicLink.uuid});
+      await cellsRepository.deletePublicLink({uuid: linkUuid});
       setPublicLink({conversationId, nodeId: uuid, data: undefined});
+      createdLinkUuid.current = null; // Clear after successful deletion
     } catch (err) {
       setStatus('error');
     }
     // cellsRepository is not a dependency because it's a singleton
-    // node?.publicLink is intentionally not a dependency to avoid infinite loop
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [uuid, conversationId, setPublicLink]);
 
@@ -125,7 +133,7 @@ export const useCellPublicLink = ({uuid, conversationId, cellsRepository}: UseCe
     }: {
       password?: string;
       passwordEnabled?: boolean;
-      accessEnd?: string;
+      accessEnd?: string | null;
     }) => {
       if (!node?.publicLink?.uuid) {
         throw new Error('No public link to update');
@@ -134,27 +142,44 @@ export const useCellPublicLink = ({uuid, conversationId, cellsRepository}: UseCe
       try {
         setStatus('loading');
 
-        // Fetch the complete link object first
         const currentLink = await cellsRepository.getPublicLink({uuid: node.publicLink.uuid});
 
-        // Determine if we're creating a new password or updating an existing one
         const hasExistingPassword = currentLink.PasswordRequired === true;
         const isSettingPassword = passwordEnabled && password;
 
-        // Update only the properties we need to change
-        const updatedLink = {
+        const updatedLink: typeof currentLink = {
           ...currentLink,
           PasswordRequired: passwordEnabled,
-          ...(accessEnd ? {AccessEnd: accessEnd} : {}),
         };
+
+        if (accessEnd === null) {
+          // Ensure that accessEnd is not present in JSON
+          delete updatedLink.AccessEnd;
+        } else if (accessEnd !== undefined) {
+          updatedLink.AccessEnd = accessEnd;
+        }
 
         await cellsRepository.updatePublicLink({
           linkUuid: node.publicLink.uuid,
           link: updatedLink,
-          // Use createPassword if no password exists, updatePassword if it does
           ...(isSettingPassword ? (hasExistingPassword ? {updatePassword: password} : {createPassword: password}) : {}),
           passwordEnabled,
         });
+
+        // Update linkData with the new values so the UI doesn't reset
+        setLinkData(prevData => {
+          if (!prevData) {
+            return prevData;
+          }
+          return {
+            ...prevData,
+            PasswordRequired: passwordEnabled,
+            AccessEnd: accessEnd === null ? undefined : accessEnd !== undefined ? accessEnd : prevData.AccessEnd,
+          };
+        });
+
+        const newLink = await cellsRepository.getPublicLink({uuid: node.publicLink.uuid});
+        setLinkData(newLink);
 
         setStatus('success');
       } catch (err) {

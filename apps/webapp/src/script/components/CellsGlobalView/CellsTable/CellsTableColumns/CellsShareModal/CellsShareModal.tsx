@@ -17,7 +17,7 @@
  *
  */
 
-import {useEffect, useState} from 'react';
+import {useEffect, useRef, useState} from 'react';
 
 import {CellsShareModalContent} from 'Components/Cells/ShareModal/CellsShareModalContent';
 import {serializeShareModalInput} from 'Components/Cells/ShareModal/shareModalSerializer';
@@ -107,13 +107,19 @@ const CellsShareModal = ({type, uuid, cellsRepository, modalId}: ShareModalParam
   const [isExpirationInvalid, setIsExpirationInvalid] = useState(false);
   const [isEditingPassword, setIsEditingPassword] = useState(false);
   const [wasPasswordDisabled, setWasPasswordDisabled] = useState(false);
+  const initializedLinkIdRef = useRef<string | null>(null);
 
   // Derive hasExistingPassword from linkData
   const hasExistingPassword = Boolean(linkData?.PasswordRequired);
 
   // Initialize toggles and values based on existing link data
   useEffect(() => {
-    if (linkData && status === 'success') {
+    if (!isEnabled) {
+      initializedLinkIdRef.current = null;
+      return;
+    }
+
+    if (linkData && status === 'success' && initializedLinkIdRef.current !== linkData.Uuid) {
       // Always sync password toggle with linkData state
       setIsPasswordEnabled(!!linkData.PasswordRequired);
 
@@ -127,8 +133,11 @@ const CellsShareModal = ({type, uuid, cellsRepository, modalId}: ShareModalParam
         setIsExpirationEnabled(false);
         setExpirationDateTime(null);
       }
+      if (linkData?.Uuid) {
+        initializedLinkIdRef.current = linkData.Uuid;
+      }
     }
-  }, [linkData, status, setIsPasswordEnabled, setIsExpirationEnabled]);
+  }, [isEnabled, linkData, status, setIsPasswordEnabled, setIsExpirationEnabled]);
 
   // Handle password toggle with tracking for OFF then ON behavior
   const handlePasswordToggle = () => {
@@ -160,6 +169,29 @@ const CellsShareModal = ({type, uuid, cellsRepository, modalId}: ShareModalParam
   const isInputDisabled = ['loading', 'error'].includes(status);
 
   useEffect(() => {
+    if (!isEnabled) {
+      setIsPasswordEnabled(false);
+      setIsExpirationEnabled(false);
+      setPasswordValue('');
+      setExpirationDateTime(null);
+      setIsExpirationInvalid(false);
+    }
+  }, [isEnabled, setIsPasswordEnabled, setIsExpirationEnabled]);
+
+  useEffect(() => {
+    if (!isExpirationEnabled) {
+      setExpirationDateTime(null);
+      setIsExpirationInvalid(false);
+    }
+  }, [isExpirationEnabled]);
+
+  useEffect(() => {
+    if (!isPasswordEnabled) {
+      setPasswordValue('');
+    }
+  }, [isPasswordEnabled]);
+
+  useEffect(() => {
     submitHandlers.set(modalId, async () => {
       if (!isEnabled || status !== 'success' || !node?.publicLink?.uuid) {
         return;
@@ -183,7 +215,7 @@ const CellsShareModal = ({type, uuid, cellsRepository, modalId}: ShareModalParam
         await updatePublicLink({
           password: serialized.updatePassword,
           passwordEnabled: serialized.passwordEnabled,
-          ...(serialized.accessEnd ? {accessEnd: serialized.accessEnd} : {}),
+          accessEnd: serialized.accessEnd,
         });
       } catch {
         // Keep the modal open if the update fails.

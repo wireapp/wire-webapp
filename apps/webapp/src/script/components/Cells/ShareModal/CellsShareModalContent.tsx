@@ -186,6 +186,7 @@ export const CellsShareModalContent = ({
 }: CellsShareModalContentProps) => {
   const resolvedLabels = {...DEFAULT_LABELS, ...labels};
   const shouldShowLink = publicLink.isEnabled && publicLink.status === 'success' && publicLink.link;
+  const areDependentTogglesDisabled = !publicLink.isEnabled;
   const publicLinkColors = switchColors?.publicLink ?? DEFAULT_SWITCH_COLORS;
   const passwordColors = switchColors?.password ?? DEFAULT_SWITCH_COLORS;
   const expirationColors = switchColors?.expiration ?? DEFAULT_SWITCH_COLORS;
@@ -226,8 +227,9 @@ export const CellsShareModalContent = ({
           <Switch
             id="switch-password"
             aria-describedby="switch-password-description"
-            checked={password.isEnabled}
+            checked={publicLink.isEnabled && password.isEnabled}
             onToggle={password.onToggle}
+            disabled={areDependentTogglesDisabled}
             {...passwordColors}
           />
         </div>
@@ -298,8 +300,9 @@ export const CellsShareModalContent = ({
           <Switch
             id="switch-expiration"
             aria-describedby="switch-expiration-description"
-            checked={expiration.isEnabled}
+            checked={publicLink.isEnabled && expiration.isEnabled}
             onToggle={expiration.onToggle}
+            disabled={areDependentTogglesDisabled}
             {...expirationColors}
           />
         </div>

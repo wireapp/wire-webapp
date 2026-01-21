@@ -17,7 +17,7 @@
  *
  */
 
-import {useEffect, useState} from 'react';
+import {useEffect, useRef, useState} from 'react';
 
 import {CellsShareModalContent} from 'Components/Cells/ShareModal/CellsShareModalContent';
 import {serializeShareModalInput} from 'Components/Cells/ShareModal/shareModalSerializer';
@@ -125,6 +125,7 @@ const CellShareModalContent = ({
   const [isExpirationInvalid, setIsExpirationInvalid] = useState(false);
   const [isEditingPassword, setIsEditingPassword] = useState(false);
   const [wasPasswordDisabled, setWasPasswordDisabled] = useState(false);
+  const initializedLinkIdRef = useRef<string | null>(null);
 
   // Derive hasExistingPassword from linkData
   const hasExistingPassword = Boolean(linkData?.PasswordRequired);
@@ -158,7 +159,12 @@ const CellShareModalContent = ({
 
   // Initialize toggles and values based on existing link data
   useEffect(() => {
-    if (linkData && status === 'success') {
+    if (!isEnabled) {
+      initializedLinkIdRef.current = null;
+      return;
+    }
+
+    if (linkData && status === 'success' && initializedLinkIdRef.current !== linkData.Uuid) {
       // Always sync password toggle with linkData state
       setIsPasswordEnabled(!!linkData.PasswordRequired);
 
@@ -172,10 +178,37 @@ const CellShareModalContent = ({
         setIsExpirationEnabled(false);
         setExpirationDateTime(null);
       }
+
+      if (linkData?.Uuid) {
+        initializedLinkIdRef.current = linkData.Uuid;
+      }
     }
-  }, [linkData, status, setIsPasswordEnabled, setIsExpirationEnabled]);
+  }, [isEnabled, linkData, status, setIsPasswordEnabled, setIsExpirationEnabled]);
 
   const isInputDisabled = ['loading', 'error'].includes(status);
+
+  useEffect(() => {
+    if (!isEnabled) {
+      setIsPasswordEnabled(false);
+      setIsExpirationEnabled(false);
+      setPasswordValue('');
+      setExpirationDateTime(null);
+      setIsExpirationInvalid(false);
+    }
+  }, [isEnabled, setIsPasswordEnabled, setIsExpirationEnabled]);
+
+  useEffect(() => {
+    if (!isExpirationEnabled) {
+      setExpirationDateTime(null);
+      setIsExpirationInvalid(false);
+    }
+  }, [isExpirationEnabled]);
+
+  useEffect(() => {
+    if (!isPasswordEnabled) {
+      setPasswordValue('');
+    }
+  }, [isPasswordEnabled]);
 
   useEffect(() => {
     submitHandlers.set(modalId, async () => {
@@ -201,7 +234,7 @@ const CellShareModalContent = ({
         await updatePublicLink({
           password: serialized.updatePassword,
           passwordEnabled: serialized.passwordEnabled,
-          ...(serialized.accessEnd ? {accessEnd: serialized.accessEnd} : {}),
+          accessEnd: serialized.accessEnd,
         });
       } catch {
         // Keep the modal open if the update fails.
