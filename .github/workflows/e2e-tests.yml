@@ -85,7 +85,8 @@ jobs:
           WEBAPP_URL: ${{ inputs.webappUrl }}
           BACKEND_URL: ${{ inputs.backendUrl }}
           TEST_SERVICE_URL: http://localhost:8080 # Run tests against locally running test service
-        run: yarn nx run webapp:e2e --shard=${{ matrix.shard }}/${{ strategy.job-total }} ${{ inputs.grep && format('--grep "{0}"', inputs.grep) }}
+          GREP: ${{ inputs.grep }}
+        run: yarn nx run webapp:e2e --shard=${{ matrix.shard }}/${{ strategy.job-total }} --grep="${GREP}"
 
       - name: Upload blob report
         if: ${{ !cancelled() }}
