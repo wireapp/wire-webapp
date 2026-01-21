@@ -132,7 +132,7 @@ export const CellsShareExpirationFields = ({
       const label = formatTimeLabel(hour24, minutes);
       return {value: label, label};
     }
-    return timeOptions[timeOptions.length - 1];
+    return timeOptions[0];
   });
   const [selectedDate, setSelectedDate] = useState<DateValue | null>(() => {
     if (dateTime) {
