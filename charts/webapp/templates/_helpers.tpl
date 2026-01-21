@@ -7,6 +7,22 @@ Expand the name of the chart.
 {{- end -}}
 
 {{/*
+Base resource name. Keep legacy "webapp" naming by default, optionally append
+the release name to allow multiple installations in the same namespace.
+*/}}
+{{- define "webapp.baseName" -}}
+{{- if .Values.appendReleaseNameToResources }}
+{{- printf "webapp-%s" .Release.Name | trunc 63 | trimSuffix "-" -}}
+{{- else }}
+webapp
+{{- end -}}
+{{- end -}}
+
+{{- define "webapp.httpServiceName" -}}
+{{- printf "%s-http" (include "webapp.baseName" .) | trunc 63 | trimSuffix "-" -}}
+{{- end -}}
+
+{{/*
 Create a default fully qualified app name.
 We truncate at 63 chars because some Kubernetes name fields are limited to this (by the DNS naming spec).
 */}}
