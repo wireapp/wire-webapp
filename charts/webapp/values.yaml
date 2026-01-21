@@ -10,6 +10,29 @@ resources:
 image:
   repository: quay.io/wire/webapp
   # tag: override version defined in Chart.appVersion
+
+# webappDomain: webapp.example.com
+
+ingress:
+  enabled: false
+  className: nginx
+  annotations: {}
+  renderCSPInIngress: false
+
+tls:
+  enabled: false
+  useCertManager: false
+  createIssuer: false
+  # existingSecretName: "" # set this if you created e.g. a wildcard cert outside this chart
+  issuer:
+    name: letsencrypt
+    kind: ClusterIssuer
+
+certManager:
+  inTestMode: false
+  certmasterEmail:
+  customSolvers:
+
 service:
   https:
     externalPort: 443

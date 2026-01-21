@@ -17,7 +17,9 @@
  *
  */
 
-import {useCallback, useEffect, useState} from 'react';
+import {useCallback, useEffect, useRef, useState} from 'react';
+
+import type {RestShareLink} from '@wireapp/api-client/lib/cells';
 
 import {CellsRepository} from 'Repositories/cells/CellsRepository';
 import {Config} from 'src/script/Config';
@@ -36,22 +38,37 @@ export const useCellPublicLink = ({uuid, cellsRepository}: UseCellPublicLinkPara
   const node = nodes.find(n => n.id === uuid);
   const [isEnabled, setIsEnabled] = useState(!!node?.publicLink?.alreadyShared || false);
   const [status, setStatus] = useState<PublicLinkStatus>(node?.publicLink ? 'success' : 'idle');
+  const [linkData, setLinkData] = useState<RestShareLink | null>(null);
+  const fetchedLinkId = useRef<string | null>(null);
+  const publicLinkUrl = node?.publicLink?.url;
+  // Track created link UUID to handle immediate disable scenario
+  const createdLinkUuid = useRef<string | null>(null);
 
   const createPublicLink = useCallback(async () => {
     try {
       setStatus('loading');
-      const link = await cellsRepository.createPublicLink({uuid, label: node?.name || ''});
+      const link = await cellsRepository.createPublicLink({
+        uuid,
+        link: {
+          Label: node?.name || '',
+          Permissions: ['Preview', 'Download'],
+        },
+      });
 
       if (!link.LinkUrl || !link.Uuid) {
         throw new Error('Link not found');
       }
 
       const newLink = {uuid: link.Uuid, url: Config.getConfig().CELLS_PYDIO_URL + link.LinkUrl, alreadyShared: true};
+      // Store the created link UUID for immediate deletion scenario
+      createdLinkUuid.current = link.Uuid;
       setPublicLink(uuid, newLink);
+      setLinkData(link);
       setStatus('success');
     } catch (err) {
       setStatus('error');
       setPublicLink(uuid, undefined);
+      createdLinkUuid.current = null;
     }
     // cellsRepository is not a dependency because it's a singleton
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -59,9 +76,8 @@ export const useCellPublicLink = ({uuid, cellsRepository}: UseCellPublicLinkPara
 
   const getPublicLink = useCallback(async () => {
     const linkId = node?.publicLink?.uuid;
-    const linkUrl = node?.publicLink?.url;
 
-    if (!linkId || linkUrl) {
+    if (!linkId || fetchedLinkId.current === linkId) {
       return;
     }
 
@@ -77,6 +93,8 @@ export const useCellPublicLink = ({uuid, cellsRepository}: UseCellPublicLinkPara
       const newLink = {uuid: link.Uuid, url: Config.getConfig().CELLS_PYDIO_URL + link.LinkUrl, alreadyShared: true};
 
       setPublicLink(uuid, newLink);
+      setLinkData(link);
+      fetchedLinkId.current = linkId;
       setStatus('success');
     } catch (err) {
       setStatus('error');
@@ -87,19 +105,88 @@ export const useCellPublicLink = ({uuid, cellsRepository}: UseCellPublicLinkPara
   }, [uuid, setPublicLink, node?.publicLink]);
 
   const deletePublicLink = useCallback(async () => {
-    if (!node?.publicLink || !node.publicLink.uuid) {
+    // Use createdLinkUuid as fallback for immediate disable scenario
+    const linkUuid = node?.publicLink?.uuid || createdLinkUuid.current;
+
+    if (!linkUuid) {
       return;
     }
 
     try {
-      await cellsRepository.deletePublicLink({uuid: node.publicLink.uuid});
+      await cellsRepository.deletePublicLink({uuid: linkUuid});
       setPublicLink(uuid, undefined);
+      createdLinkUuid.current = null; // Clear after successful deletion
     } catch (err) {
       setStatus('error');
     }
     // cellsRepository is not a dependency because it's a singleton
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [uuid, node?.publicLink, setPublicLink]);
+
+  const updatePublicLink = useCallback(
+    async ({
+      password,
+      passwordEnabled,
+      accessEnd,
+    }: {
+      password?: string;
+      passwordEnabled?: boolean;
+      accessEnd?: string | null;
+    }) => {
+      if (!node?.publicLink?.uuid) {
+        throw new Error('No public link to update');
+      }
+
+      try {
+        setStatus('loading');
+
+        const currentLink = await cellsRepository.getPublicLink({uuid: node.publicLink.uuid});
+
+        const hasExistingPassword = currentLink.PasswordRequired === true;
+        const isSettingPassword = passwordEnabled && password;
+
+        const updatedLink: typeof currentLink = {
+          ...currentLink,
+          PasswordRequired: passwordEnabled,
+        };
+
+        if (accessEnd === null) {
+          // Ensure that accessEnd is not present in JSON
+          delete updatedLink.AccessEnd;
+        } else if (accessEnd !== undefined) {
+          updatedLink.AccessEnd = accessEnd;
+        }
+
+        await cellsRepository.updatePublicLink({
+          linkUuid: node.publicLink.uuid,
+          link: updatedLink,
+          // Use createPassword if no password exists, updatePassword if it does
+          ...(isSettingPassword ? (hasExistingPassword ? {updatePassword: password} : {createPassword: password}) : {}),
+          passwordEnabled,
+        });
+
+        // Update linkData with the new values so the UI doesn't reset
+        setLinkData(prevData => {
+          if (!prevData) {
+            return prevData;
+          }
+          return {
+            ...prevData,
+            PasswordRequired: passwordEnabled,
+            AccessEnd: accessEnd === null ? undefined : accessEnd !== undefined ? accessEnd : prevData.AccessEnd,
+          };
+        });
+
+        setStatus('success');
+      } catch (err) {
+        setStatus('error');
+        throw err;
+      }
+    },
+    // cellsRepository is not a dependency because it's a singleton
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [node?.publicLink?.uuid],
+  );
 
   const togglePublicLink = useCallback(() => {
     setIsEnabled(prev => !prev);
@@ -125,10 +212,18 @@ export const useCellPublicLink = ({uuid, cellsRepository}: UseCellPublicLinkPara
     }
   }, [isEnabled, node?.publicLink, createPublicLink, deletePublicLink, getPublicLink]);
 
+  useEffect(() => {
+    if (publicLinkUrl) {
+      setStatus('success');
+    }
+  }, [publicLinkUrl]);
+
   return {
     status,
     link: node?.publicLink?.url,
+    linkData,
     isEnabled,
     togglePublicLink,
+    updatePublicLink,
   };
 };

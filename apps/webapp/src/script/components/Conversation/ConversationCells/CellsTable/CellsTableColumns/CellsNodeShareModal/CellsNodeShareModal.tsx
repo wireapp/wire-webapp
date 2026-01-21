@@ -17,26 +17,41 @@
  *
  */
 
-import {BASE_DARK_COLOR, BASE_LIGHT_COLOR, COLOR_V2, Input, Label, Switch} from '@wireapp/react-ui-kit';
+import {useEffect, useRef, useState} from 'react';
 
-import {CopyToClipboardButton} from 'Components/CopyToClipboardButton/CopyToClipboardButton';
+import {CellsShareModalContent} from 'Components/Cells/ShareModal/CellsShareModalContent';
+import {serializeShareModalInput} from 'Components/Cells/ShareModal/shareModalSerializer';
+import {useCellExpirationToggle} from 'Components/Cells/ShareModal/useCellExpirationToggle';
+import {useCellPasswordToggle} from 'Components/Cells/ShareModal/useCellPasswordToggle';
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {CellsRepository} from 'Repositories/cells/CellsRepository';
 import {t} from 'Util/LocalizerUtil';
+import {createUuid} from 'Util/uuid';
 
 import {
   inputStyles,
   inputWrapperStyles,
+  passwordContentStyles,
+  passwordInputRowStyles,
+  passwordInputLabelStyles,
+  passwordInputStyles,
+  passwordActionButtonStyles,
+  passwordCopyButtonStyles,
   labelStyles,
   loaderWrapperStyles,
+  dividerStyles,
   publicLinkDescriptionStyles,
+  passwordDescriptionStyles,
+  expirationDescriptionStyles,
+  switchContentStyles,
   switchContainerStyles,
   switchWrapperStyles,
+  toggleContentStyles,
   wrapperStyles,
 } from './CellsNodeShareModal.styles';
 import {useCellPublicLink} from './useCellPublicLink';
 
-import {CellsTableLoader} from '../../../common/CellsTableLoader/CellsTableLoader';
+import {useCellsStore} from '../../../common/useCellsStore/useCellsStore';
 
 interface ShareModalParams {
   type: 'file' | 'folder';
@@ -45,79 +60,222 @@ interface ShareModalParams {
   cellsRepository: CellsRepository;
 }
 
+const submitHandlers = new Map<string, () => Promise<void> | void>();
+
 export const showShareModal = ({type, uuid, conversationId, cellsRepository}: ShareModalParams) => {
-  PrimaryModal.show(PrimaryModal.type.CONFIRM, {
-    size: 'large',
-    primaryAction: {action: () => {}, text: t('cells.shareModal.primaryAction')},
-    text: {
-      message: (
-        <CellShareModalContent
-          type={type}
-          uuid={uuid}
-          conversationId={conversationId}
-          cellsRepository={cellsRepository}
-        />
-      ),
-      title: t('cells.shareModal.heading'),
+  const modalId = createUuid();
+  PrimaryModal.show(
+    PrimaryModal.type.CONFIRM,
+    {
+      closeOnConfirm: false,
+      size: 'large',
+      primaryAction: {
+        action: () => {
+          const submitHandler = submitHandlers.get(modalId);
+          if (submitHandler) {
+            void submitHandler();
+          }
+        },
+        text: t('cells.shareModal.primaryAction'),
+      },
+      text: {
+        message: (
+          <CellShareModalContent
+            type={type}
+            uuid={uuid}
+            conversationId={conversationId}
+            cellsRepository={cellsRepository}
+            modalId={modalId}
+          />
+        ),
+        title: t('cells.shareModal.heading'),
+      },
     },
-  });
+    modalId,
+  );
 };
 
-const CellShareModalContent = ({type, uuid, conversationId, cellsRepository}: ShareModalParams) => {
-  const {status, link, isEnabled, togglePublicLink} = useCellPublicLink({uuid, conversationId, cellsRepository});
+const CellShareModalContent = ({
+  type,
+  uuid,
+  conversationId,
+  cellsRepository,
+  modalId,
+}: ShareModalParams & {modalId: string}) => {
+  const {status, link, linkData, isEnabled, togglePublicLink, updatePublicLink} = useCellPublicLink({
+    uuid,
+    conversationId,
+    cellsRepository,
+  });
+  const node = useCellsStore(state =>
+    state.nodesByConversation[conversationId]?.find(cellNode => cellNode.id === uuid),
+  );
+  const {
+    isEnabled: isPasswordEnabled,
+    toggle: togglePassword,
+    setIsEnabled: setIsPasswordEnabled,
+  } = useCellPasswordToggle();
+  const {
+    isEnabled: isExpirationEnabled,
+    toggle: toggleExpiration,
+    setIsEnabled: setIsExpirationEnabled,
+  } = useCellExpirationToggle();
+  const [passwordValue, setPasswordValue] = useState('');
+  const [expirationDateTime, setExpirationDateTime] = useState<Date | null>(null);
+  const [isExpirationInvalid, setIsExpirationInvalid] = useState(false);
+  const initializedLinkIdRef = useRef<string | null>(null);
+
+  // Initialize toggles and values based on existing link data
+  useEffect(() => {
+    if (!isEnabled) {
+      initializedLinkIdRef.current = null;
+      return;
+    }
+
+    if (linkData && status === 'success' && initializedLinkIdRef.current !== linkData.Uuid) {
+      // Always sync password toggle with linkData state
+      setIsPasswordEnabled(!!linkData.PasswordRequired);
+
+      // Always sync expiration toggle and date with linkData state
+      if (linkData.AccessEnd) {
+        setIsExpirationEnabled(true);
+        // Convert Unix timestamp (in seconds) to Date
+        const expirationDate = new Date(parseInt(linkData.AccessEnd) * 1000);
+        setExpirationDateTime(expirationDate);
+      } else {
+        setIsExpirationEnabled(false);
+        setExpirationDateTime(null);
+      }
+
+      if (linkData?.Uuid) {
+        initializedLinkIdRef.current = linkData.Uuid;
+      }
+    }
+  }, [isEnabled, linkData, status, setIsPasswordEnabled, setIsExpirationEnabled]);
 
   const isInputDisabled = ['loading', 'error'].includes(status);
 
+  useEffect(() => {
+    if (!isEnabled) {
+      setIsPasswordEnabled(false);
+      setIsExpirationEnabled(false);
+      setPasswordValue('');
+      setExpirationDateTime(null);
+      setIsExpirationInvalid(false);
+    }
+  }, [isEnabled, setIsPasswordEnabled, setIsExpirationEnabled]);
+
+  useEffect(() => {
+    if (!isExpirationEnabled) {
+      setExpirationDateTime(null);
+      setIsExpirationInvalid(false);
+    }
+  }, [isExpirationEnabled]);
+
+  useEffect(() => {
+    if (!isPasswordEnabled) {
+      setPasswordValue('');
+    }
+  }, [isPasswordEnabled]);
+
+  useEffect(() => {
+    submitHandlers.set(modalId, async () => {
+      if (!isEnabled || status !== 'success' || !node?.publicLink?.uuid) {
+        return;
+      }
+
+      const serialized = serializeShareModalInput({
+        passwordEnabled: isPasswordEnabled,
+        passwordValue,
+        expirationEnabled: isExpirationEnabled,
+        expirationDateTime,
+        expirationInvalid: isExpirationInvalid,
+      });
+
+      if (!serialized.isValid) {
+        return;
+      }
+
+      try {
+        await updatePublicLink({
+          password: serialized.updatePassword,
+          passwordEnabled: serialized.passwordEnabled,
+          accessEnd: serialized.accessEnd,
+        });
+      } catch {
+        // Keep the modal open if the update fails.
+      }
+    });
+
+    return () => {
+      submitHandlers.delete(modalId);
+    };
+  }, [
+    modalId,
+    cellsRepository,
+    isEnabled,
+    status,
+    node?.publicLink?.uuid,
+    isPasswordEnabled,
+    passwordValue,
+    isExpirationEnabled,
+    expirationDateTime,
+    isExpirationInvalid,
+    updatePublicLink,
+  ]);
+
   return (
-    <div css={wrapperStyles}>
-      <div css={switchContainerStyles}>
-        <div>
-          <Label htmlFor="switch-public-link" css={labelStyles}>
-            {t('cells.shareModal.enablePublicLink')}
-          </Label>
-          <p id="switch-public-link-description" css={publicLinkDescriptionStyles}>
-            {t(
-              type === 'file'
-                ? 'cells.shareModal.enablePublicLink.file.description'
-                : 'cells.shareModal.enablePublicLink.folder.description',
-            )}
-          </p>
-        </div>
-        <div css={switchWrapperStyles}>
-          <Switch
-            id="switch-public-link"
-            aria-describedby="switch-public-link-description"
-            checked={isEnabled}
-            onToggle={togglePublicLink}
-            disabled={status === 'loading'}
-            activatedColor={BASE_LIGHT_COLOR.GREEN}
-            activatedColorDark={BASE_DARK_COLOR.GREEN}
-            deactivatedColor={COLOR_V2.GRAY_70}
-            deactivatedColorDark={COLOR_V2.GRAY_60}
-            disabledColor={COLOR_V2.GRAY_70}
-            disabledColorDark={COLOR_V2.GRAY_60}
-          />
-        </div>
-      </div>
-      {isEnabled && status === 'success' && link && (
-        <div css={inputWrapperStyles}>
-          <label htmlFor="generated-public-link" className="visually-hidden">
-            {t('cells.shareModal.generatedPublicLink')}
-          </label>
-          <Input id="generated-public-link" value={link} wrapperCSS={inputStyles} disabled={isInputDisabled} readOnly />
-          <CopyToClipboardButton
-            textToCopy={link}
-            displayText={t('cells.shareModal.copyLink')}
-            copySuccessText={t('cells.shareModal.linkCopied')}
-          />
-        </div>
+    <CellsShareModalContent
+      publicLinkDescription={t(
+        type === 'file'
+          ? 'cells.shareModal.enablePublicLink.file.description'
+          : 'cells.shareModal.enablePublicLink.folder.description',
       )}
-      {status === 'loading' && (
-        <div css={loaderWrapperStyles}>
-          <CellsTableLoader />
-        </div>
-      )}
-      {status === 'error' && <div>{t('cells.shareModal.error.loadingLink')}</div>}
-    </div>
+      publicLink={{
+        status,
+        link,
+        isEnabled,
+        onToggle: togglePublicLink,
+        disabled: status === 'loading',
+      }}
+      password={{
+        isEnabled: isPasswordEnabled,
+        onToggle: togglePassword,
+        value: passwordValue,
+        onChange: setPasswordValue,
+        onGeneratePassword: setPasswordValue,
+      }}
+      expiration={{
+        isEnabled: isExpirationEnabled,
+        onToggle: toggleExpiration,
+        dateTime: expirationDateTime,
+        onChange: selection => {
+          setExpirationDateTime(selection.dateTime);
+          setIsExpirationInvalid(selection.isInvalid);
+        },
+      }}
+      isInputDisabled={isInputDisabled}
+      styles={{
+        wrapperStyles,
+        labelStyles,
+        publicLinkDescriptionStyles,
+        passwordDescriptionStyles,
+        expirationDescriptionStyles,
+        dividerStyles,
+        switchContentStyles,
+        toggleContentStyles,
+        switchContainerStyles,
+        switchWrapperStyles,
+        inputStyles,
+        inputWrapperStyles,
+        passwordContentStyles,
+        passwordInputRowStyles,
+        passwordInputLabelStyles,
+        passwordInputStyles,
+        passwordActionButtonStyles,
+        passwordCopyButtonStyles,
+        loaderWrapperStyles,
+      }}
+    />
   );
 };

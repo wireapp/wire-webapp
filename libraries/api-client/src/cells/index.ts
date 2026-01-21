@@ -18,5 +18,5 @@
  */
 
 export * from './CellsAPI';
-export type {GetByUuidFlagsEnum as NodeFlags} from 'cells-sdk-ts';
+export type {GetByUuidFlagsEnum as NodeFlags, RestShareLink} from 'cells-sdk-ts';
 export type {Node} from './CellsAPI.schema';
