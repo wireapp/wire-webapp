@@ -42,6 +42,8 @@ export const useCellPublicLink = ({uuid, conversationId, cellsRepository}: UseCe
   const [status, setStatus] = useState<PublicLinkStatus>(node?.publicLink ? 'success' : 'idle');
   const [linkData, setLinkData] = useState<RestShareLink | null>(null);
   const fetchedLinkId = useRef<string | null>(null);
+  // Track created link UUID to handle immediate disable scenario
+  const createdLinkUuid = useRef<string | null>(null);
 
   const createPublicLink = useCallback(async () => {
     try {
@@ -59,10 +61,13 @@ export const useCellPublicLink = ({uuid, conversationId, cellsRepository}: UseCe
       }
 
       const newLink = {uuid: link.Uuid, url: Config.getConfig().CELLS_PYDIO_URL + link.LinkUrl, alreadyShared: true};
+      // Store the created link UUID for immediate deletion scenario
+      createdLinkUuid.current = link.Uuid;
       setPublicLink({conversationId, nodeId: uuid, data: newLink});
       setLinkData(link);
       setStatus('success');
     } catch (err) {
+      createdLinkUuid.current = null;
       setStatus('error');
       setPublicLink({conversationId, nodeId: uuid, data: undefined});
     }
@@ -102,18 +107,21 @@ export const useCellPublicLink = ({uuid, conversationId, cellsRepository}: UseCe
   }, [uuid, conversationId, setPublicLink]);
 
   const deletePublicLink = useCallback(async () => {
-    if (!node?.publicLink || !node.publicLink.uuid) {
+    // Use createdLinkUuid as fallback for immediate disable scenario
+    const linkUuid = node?.publicLink?.uuid || createdLinkUuid.current;
+
+    if (!linkUuid) {
       return;
     }
 
     try {
-      await cellsRepository.deletePublicLink({uuid: node.publicLink.uuid});
+      await cellsRepository.deletePublicLink({uuid: linkUuid});
       setPublicLink({conversationId, nodeId: uuid, data: undefined});
+      createdLinkUuid.current = null; // Clear after successful deletion
     } catch (err) {
       setStatus('error');
     }
     // cellsRepository is not a dependency because it's a singleton
-    // node?.publicLink is intentionally not a dependency to avoid infinite loop
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [uuid, conversationId, setPublicLink]);
 
@@ -169,6 +177,9 @@ export const useCellPublicLink = ({uuid, conversationId, cellsRepository}: UseCe
             AccessEnd: accessEnd === null ? undefined : accessEnd !== undefined ? accessEnd : prevData.AccessEnd,
           };
         });
+
+        const newLink = await cellsRepository.getPublicLink({uuid: node.publicLink.uuid});
+        setLinkData(newLink);
 
         setStatus('success');
       } catch (err) {
