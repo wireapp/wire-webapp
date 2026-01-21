@@ -267,6 +267,98 @@ describe('useCellPublicLink', () => {
     });
   });
 
+  describe('should delete the newly created link UUID when disabling after re-enabling an already shared file', () => {
+    it('uses the new link UUID from re-enable when deleting, not the original stale UUID', async () => {
+      mockGetNodes.mockReturnValue([
+        {
+          id: testUuid,
+          name: 'test-file.txt',
+          publicLink: {
+            uuid: 'old-link-uuid',
+            url: 'https://cells.example.com/public/share/old-link',
+            alreadyShared: true,
+          },
+        },
+      ]);
+
+      mockDeletePublicLink.mockResolvedValue(undefined);
+      mockCreatePublicLink.mockResolvedValue({
+        Uuid: 'new-link-uuid',
+        LinkUrl: '/public/share/new-link',
+      });
+      mockGetPublicLink.mockResolvedValue({
+        Uuid: 'old-link-uuid',
+        LinkUrl: '/public/share/old-link',
+      });
+
+      const {result} = renderHook(() => useCellPublicLink(defaultProps));
+
+      expect(result.current.isEnabled).toBe(true);
+
+      await waitFor(() => {
+        expect(result.current.status).toBe('success');
+      });
+
+      act(() => {
+        result.current.togglePublicLink();
+      });
+
+      expect(result.current.isEnabled).toBe(false);
+
+      await waitFor(() => {
+        expect(mockDeletePublicLink).toHaveBeenCalledWith({uuid: 'old-link-uuid'});
+      });
+
+      mockGetNodes.mockReturnValue([
+        {
+          id: testUuid,
+          name: 'test-file.txt',
+          publicLink: undefined,
+        },
+      ]);
+
+      mockDeletePublicLink.mockClear();
+
+      act(() => {
+        result.current.togglePublicLink();
+      });
+
+      expect(result.current.isEnabled).toBe(true);
+
+      await waitFor(() => {
+        expect(mockCreatePublicLink).toHaveBeenCalled();
+      });
+
+      await waitFor(() => {
+        expect(result.current.status).toBe('success');
+      });
+
+      mockGetNodes.mockReturnValue([
+        {
+          id: testUuid,
+          name: 'test-file.txt',
+          publicLink: {
+            uuid: 'new-link-uuid',
+            url: 'https://cells.example.com/public/share/new-link',
+            alreadyShared: true,
+          },
+        },
+      ]);
+
+      act(() => {
+        result.current.togglePublicLink();
+      });
+
+      expect(result.current.isEnabled).toBe(false);
+
+      await waitFor(() => {
+        expect(mockDeletePublicLink).toHaveBeenCalledWith({uuid: 'new-link-uuid'});
+      });
+
+      expect(mockDeletePublicLink).not.toHaveBeenCalledWith({uuid: 'old-link-uuid'});
+    });
+  });
+
   describe('should fetch existing link data when toggle is enabled on already shared node', () => {
     it('fetches link details for already shared node', async () => {
       mockGetNodes.mockReturnValue([
