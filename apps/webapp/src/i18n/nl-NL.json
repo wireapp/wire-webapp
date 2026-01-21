@@ -494,7 +494,7 @@
   "cells.shareModal.linkCopied": "Link copied",
   "cells.shareModal.password": "Password",
   "cells.shareModal.password.description": "Set a password to restrict access.",
-  "cells.shareModal.primaryAction": "Done",
+  "cells.shareModal.primaryAction": "Save",
   "cells.sidebar.heading": "Drive",
   "cells.sidebar.title": "Files",
   "cells.tableRow.actions": "More options",
