@@ -1,6 +1,28 @@
 name: E2E Tests
 
 on:
+  # Options for the workflow when it's manually triggered
+  workflow_dispatch:
+    inputs:
+      webappUrl:
+        type: choice
+        description: Define which stage to run the tests against
+        required: true
+        options:
+          - https://wire-webapp-dev.zinfra.io/
+          - https://wire-webapp-master.zinfra.io/
+          - https://wire-webapp-edge.wire.com/
+          - https://wire-webapp-staging.wire.com/
+      backendUrl:
+        type: string
+        description: Define which backend should be used (make sure this matches the one used by the stage set for webappUrl)
+        options:
+          - https://staging-nginz-https.zinfra.io/
+          - https://prod-nginz-https.wire.com/
+      grep:
+        type: string
+        description: Define which tests to run, the given value will be passed to the `--grep` flag of playwright
+  # Options for calling the workflow within an other workflow
   workflow_call:
     inputs:
       webappUrl:
