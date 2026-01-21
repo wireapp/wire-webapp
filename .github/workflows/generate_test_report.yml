@@ -17,7 +17,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4.1.6
+        uses: actions/checkout@v6
         with:
           ref: ${{ inputs.commit }}
 
@@ -27,14 +27,14 @@ jobs:
         run: echo "TITLE=$PR_TITLE" >> $GITHUB_ENV
 
       - name: Cancel Previous Runs
-        uses: styfle/cancel-workflow-action@0.12.1
+        uses: styfle/cancel-workflow-action@0.13.0
         with:
           access_token: ${{github.token}}
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
-          node-version: 18.16.x
+          node-version-file: '.nvmrc'
           cache: 'yarn'
 
       - name: Authenticate git clone
@@ -48,7 +48,7 @@ jobs:
       - name: Test
         run: |
           set -o pipefail
-          yarn test --coverage --coverage_reporters=lcov 2>&1 | tee ${{ env.UNIT_TEST_REPORT_FILE }}
+          yarn nx run-many -t test --all -- --coverage --coverage_reporters=lcov 2>&1 | tee ${{ env.UNIT_TEST_REPORT_FILE }}
           echo -e "COMMIT SHA = ${{ inputs.commit }}" >> ${{ env.UNIT_TEST_REPORT_FILE }}
           echo -e "TEST RUN DATE = $(date -u +'%Y-%m-%dT%H:%M:%SZ')" >> ${{ env.UNIT_TEST_REPORT_FILE }}
 

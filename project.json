@@ -1,0 +1,85 @@
+{
+  "name": "workspace-tools",
+  "$schema": "./node_modules/nx/schemas/project-schema.json",
+  "targets": {
+    "docker": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "node ./bin/push_docker.js"
+      }
+    },
+    "changelog-production": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "ts-node ./bin/changelog.ts production 2>&1 | grep -v '\\[dotenv@'"
+      }
+    },
+    "changelog-staging": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "ts-node ./bin/changelog.ts staging 2>&1 | grep -v '\\[dotenv@'"
+      }
+    },
+    "changelog-rc": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "ts-node ./bin/changelog.ts production master 2>&1 | grep -v '\\[dotenv@'"
+      }
+    },
+    "release-staging": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "git checkout dev && git pull && ts-node ./bin/release_tag.ts staging"
+      }
+    },
+    "release-production": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "git checkout master && git pull && ts-node ./bin/release_tag.ts production"
+      }
+    },
+    "release-custom": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "npx ts-node ./bin/release_tag.ts"
+      }
+    },
+    "clean-jest": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "jest --clearCache"
+      }
+    },
+    "test": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "echo \"workspace-tools has no tests\""
+      }
+    },
+    "build": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "echo \"workspace-tools has no build\""
+      }
+    },
+    "lint": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "echo \"workspace-tools has no lint\""
+      }
+    },
+    "e2e": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "echo \"workspace-tools has no e2e\""
+      }
+    },
+    "type-check": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "echo \"workspace-tools has no type-check\""
+      }
+    }
+  },
+  "tags": ["scope:tooling"]
+}

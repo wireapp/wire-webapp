@@ -13,13 +13,15 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Setup Node.js
         uses: actions/setup-node@v6
         with:
-          node-version-file: .nvmrc
-          cache: yarn
+          node-version-file: '.nvmrc'
+
+      - name: Enable Corepack
+        run: corepack enable
 
       - name: Install JS dependencies
         run: yarn --immutable
@@ -31,16 +33,16 @@ jobs:
         uses: 1password/install-cli-action@v1
 
       - name: Generate env file
-        run: op inject -i test/e2e_tests/.env.staging.tpl -o test/e2e_tests/.env
+        run: op inject -i apps/webapp/test/e2e_tests/.env.staging.tpl -o apps/webapp/test/e2e_tests/.env
         env:
           OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
 
       - name: Run critical flow tests
-        run: yarn e2e-test --grep "@crit-flow-web"
+        run: yarn nx run webapp:e2e --grep "@crit-flow-web"
 
       - name: Upload test report
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: playwright-report
           path: playwright-report/
@@ -49,7 +51,7 @@ jobs:
         if: always()
         id: generate_comment
         run: |
-          node --experimental-strip-types test/e2e_tests/scripts/create-playwright-report-summary.ts
+          node --experimental-strip-types apps/webapp/test/e2e_tests/scripts/create-playwright-report-summary.ts
           COMMENT=$(cat playwright-report-summary.txt)
           echo "comment<<EOF" >> $GITHUB_OUTPUT
           echo "$COMMENT" >> $GITHUB_OUTPUT

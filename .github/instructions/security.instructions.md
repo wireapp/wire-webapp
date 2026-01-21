@@ -1,7 +1,6 @@
 ---
-appliesTo:
-  paths:
-    - 'src/**/*'
+applyTo: 'apps/**/*'
+description: Security hygiene for all application code
 ---
 
 # Copilot — Security hygiene

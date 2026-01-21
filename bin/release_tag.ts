@@ -18,11 +18,11 @@
  */
 
 import {execSync} from 'child_process';
-import logdown from 'logdown';
-import path from 'path';
-import readline from 'readline';
+import * as logdown from 'logdown';
+import * as path from 'path';
+import * as readline from 'readline';
 
-require('dotenv').config();
+require('dotenv').config({quiet: true});
 
 enum DeploymentStage {
   PRODUCTION = 'production',
@@ -38,11 +38,13 @@ const usageText = `Usage: ${filename} [-h|--help] <staging|production> <commitId
 
 const exec = (command: string): string => execSync(command, {stdio: 'pipe'}).toString().trim();
 
-let commitId = process.argv[3];
+const isDryRun = process.argv.includes('--dry-run');
+// Filter out flags from arguments to get the actual commitId
+const args = process.argv.slice(2).filter(arg => !arg.startsWith('--'));
+let commitId = args[1]; // args[0] is stage, args[1] is commitId if provided
 let target = '';
 let commitMessage = '';
 let branch = exec('git rev-parse --abbrev-ref HEAD');
-const isDryRun = process.argv.includes('--dry-run');
 
 const logger = logdown(filename, {
   logger: console,
@@ -102,7 +104,7 @@ try {
   process.exit(1);
 }
 
-const origin = exec('git remote');
+const origin = exec('git remote').split('\n')[0];
 
 logger.info(`Fetching base "${origin}" ...`);
 exec(`git fetch ${origin}`);
@@ -143,7 +145,8 @@ const ask = (questionToAsk: string): Promise<string> => {
   if (answer === 'yes') {
     logger.info(`Creating tag "${tagName}" ...`);
     if (!isDryRun) {
-      exec(`git tag ${tagName} ${commitId}`);
+      // Add -m flag to provide tag message inline (avoids opening editor, required for GPG-signed tags)
+      exec(`git tag -m "Release ${tagName}" ${tagName} ${commitId}`);
       logger.info(`Pushing "${tagName}" to "${origin}" ...`);
       exec(`git push origin && git push ${origin} ${tagName}`);
     }
