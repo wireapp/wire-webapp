@@ -260,11 +260,103 @@ describe('useCellPublicLink', () => {
         result.current.togglePublicLink();
       });
 
-      // The hook should use createdLinkUuid.current (or node.publicLink.uuid) to delete
       await waitFor(() => {
         expect(mockCellsRepository.deletePublicLink).toHaveBeenCalledWith({
           uuid: 'rapid-toggle-uuid',
         });
+      });
+    });
+  });
+
+  describe('should delete the newly created link UUID when disabling after re-enabling an already shared file', () => {
+    it('uses the new link UUID from re-enable when deleting, not the original stale UUID', async () => {
+      mockNodes = [
+        createMockNode({
+          publicLink: {
+            alreadyShared: true,
+            uuid: 'old-link-uuid',
+            url: 'https://cells.example.com/public/old-link',
+          },
+        }),
+      ];
+
+      mockCellsRepository.deletePublicLink.mockResolvedValue({});
+      mockCellsRepository.createPublicLink.mockResolvedValue({
+        Uuid: 'new-link-uuid',
+        LinkUrl: '/public/new-link',
+      });
+      mockCellsRepository.getPublicLink.mockResolvedValue({
+        Uuid: 'old-link-uuid',
+        LinkUrl: '/public/old-link',
+      });
+
+      const {result} = renderHook(() =>
+        useCellPublicLink({
+          uuid: 'test-uuid',
+          cellsRepository: mockCellsRepository,
+        }),
+      );
+
+      expect(result.current.isEnabled).toBe(true);
+
+      await waitFor(() => {
+        expect(result.current.status).toBe('success');
+      });
+
+      act(() => {
+        result.current.togglePublicLink();
+      });
+
+      expect(result.current.isEnabled).toBe(false);
+
+      await waitFor(() => {
+        expect(mockCellsRepository.deletePublicLink).toHaveBeenCalledWith({
+          uuid: 'old-link-uuid',
+        });
+      });
+
+      mockNodes = [createMockNode()];
+
+      mockCellsRepository.deletePublicLink.mockClear();
+
+      act(() => {
+        result.current.togglePublicLink();
+      });
+
+      expect(result.current.isEnabled).toBe(true);
+
+      await waitFor(() => {
+        expect(mockCellsRepository.createPublicLink).toHaveBeenCalled();
+      });
+
+      await waitFor(() => {
+        expect(result.current.status).toBe('success');
+      });
+
+      mockNodes = [
+        createMockNode({
+          publicLink: {
+            alreadyShared: true,
+            uuid: 'new-link-uuid',
+            url: 'https://cells.example.com/public/new-link',
+          },
+        }),
+      ];
+
+      act(() => {
+        result.current.togglePublicLink();
+      });
+
+      expect(result.current.isEnabled).toBe(false);
+
+      await waitFor(() => {
+        expect(mockCellsRepository.deletePublicLink).toHaveBeenCalledWith({
+          uuid: 'new-link-uuid',
+        });
+      });
+
+      expect(mockCellsRepository.deletePublicLink).not.toHaveBeenCalledWith({
+        uuid: 'old-link-uuid',
       });
     });
   });
