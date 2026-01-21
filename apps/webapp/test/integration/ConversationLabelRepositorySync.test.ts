@@ -93,6 +93,9 @@ describe('ConversationLabelRepository Integration - Synchronization Fix', () => 
     // Simulate existing localStorage data
     localStorage.setItem(ConversationLabelRepository.LocalStorageKey, JSON.stringify(localLabels));
 
+    // Simulate backend data (mock propertiesService uses 'test_labels' key)
+    localStorage.setItem('test_labels', JSON.stringify(backendLabels));
+
     // Act
     await conversationLabelRepository.loadLabels();
 
@@ -139,6 +142,9 @@ describe('ConversationLabelRepository Integration - Synchronization Fix', () => 
     // Simulate existing localStorage data
     localStorage.setItem(ConversationLabelRepository.LocalStorageKey, JSON.stringify(localLabels));
 
+    // Simulate backend data (mock propertiesService uses 'test_labels' key)
+    localStorage.setItem('test_labels', JSON.stringify(backendLabels));
+
     // Act
     await conversationLabelRepository.loadLabels();
 
@@ -170,6 +176,9 @@ describe('ConversationLabelRepository Integration - Synchronization Fix', () => 
 
     // Ensure localStorage is empty
     localStorage.removeItem(ConversationLabelRepository.LocalStorageKey);
+
+    // Simulate backend data (mock propertiesService uses 'test_labels' key)
+    localStorage.setItem('test_labels', JSON.stringify(backendLabels));
 
     // Act
     await conversationLabelRepository.loadLabels();
