@@ -282,7 +282,7 @@ describe('getFileNameWithExtension', () => {
 describe('sanitizeFilename', () => {
   it('converts German umlauts to ASCII equivalents', () => {
     expect(sanitizeFilename('Bild eingefügt am 12. Jan. 2026, 14:30:57.png')).toBe(
-      'Bild eingefuegt am 12. Jan. 2026- 14-30-57.png',
+      'Bild eingefuegt am 12. Jan. 2026-14-30-57.png',
     );
   });
 
@@ -328,6 +328,26 @@ describe('sanitizeFilename', () => {
   });
 
   it('handles mixed special characters', () => {
-    expect(sanitizeFilename('Müller: Café, 2:30 PM.pdf')).toBe('Mueller- Cafe- 2-30 PM.pdf');
+    expect(sanitizeFilename('Müller: Café, 2:30 PM.pdf')).toBe('Mueller-Cafe-2-30 PM.pdf');
+  });
+
+  it('removes null bytes', () => {
+    expect(sanitizeFilename('file\x00name.txt')).toBe('filename.txt');
+  });
+
+  it('removes control characters', () => {
+    // Test various control characters (ASCII 0-31)
+    expect(sanitizeFilename('file\x01\x02\x03name.txt')).toBe('filename.txt');
+    expect(sanitizeFilename('file\tname.txt')).toBe('filename.txt'); // tab
+    expect(sanitizeFilename('file\nname.txt')).toBe('filename.txt'); // newline
+    expect(sanitizeFilename('file\rname.txt')).toBe('filename.txt'); // carriage return
+  });
+
+  it('removes DEL character (ASCII 127)', () => {
+    expect(sanitizeFilename('file\x7Fname.txt')).toBe('filename.txt');
+  });
+
+  it('handles filenames with both control characters and special characters', () => {
+    expect(sanitizeFilename('file\x00: name\x01, test\x7F.txt')).toBe('file-name-test.txt');
   });
 });
