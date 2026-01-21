@@ -105,7 +105,6 @@ export const useCellPublicLink = ({uuid, cellsRepository}: UseCellPublicLinkPara
   }, [uuid, setPublicLink, node?.publicLink]);
 
   const deletePublicLink = useCallback(async () => {
-    // Prefer createdLinkUuid (most recent) over node?.publicLink?.uuid (may be stale)
     const linkUuid = createdLinkUuid.current || node?.publicLink?.uuid;
 
     if (!linkUuid) {
