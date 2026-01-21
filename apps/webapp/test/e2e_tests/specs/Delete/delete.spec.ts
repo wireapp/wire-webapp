@@ -17,10 +17,12 @@
  *
  */
 
-import {Locator, Page} from 'playwright/test';
+import {Locator} from 'playwright/test';
 import {User} from 'test/e2e_tests/data/user';
 import {PageManager} from 'test/e2e_tests/pageManager';
 import {test, expect, withConnectedUser, withLogin} from 'test/e2e_tests/test.fixtures';
+import {getAudioFilePath, getTextFilePath, getVideoFilePath, shareAssetHelper} from 'test/e2e_tests/utils/asset.util';
+import {getImageFilePath} from 'test/e2e_tests/utils/sendImage.util';
 import {createGroup} from 'test/e2e_tests/utils/userActions';
 
 test.describe('Delete', () => {
@@ -151,19 +153,20 @@ test.describe('Delete', () => {
     'Message gets deleted even when I was offline on time of deletion',
     {tag: ['@TC-573', '@regression']},
     async ({context, createPage}) => {
-      let userBPage!: Page;
-      let [userAPages, userBPages] = await Promise.all([
-        PageManager.from(createPage(withLogin(userA), withConnectedUser(userB))).then(pm => pm.webapp.pages),
-        PageManager.from(createPage(context, withLogin(userB), withConnectedUser(userA))).then(pm => {userBPage = pm.page; return pm.webapp.pages}),
-      ]);
+      const userAPages = (await PageManager.from(createPage(withLogin(userA)))).webapp.pages;
+      let userBPage = await createPage(context, withLogin(userB));
+      let userBPages = PageManager.from(userBPage).webapp.pages;
 
-      await userBPages.conversationList().openConversation(userA.fullName, {protocol: 'mls'});
+      await withConnectedUser(userA)(userBPage);
+
+      await userAPages.conversationList().openConversation(userB.fullName);
       await userAPages.conversation().sendMessage('Test Message');
 
       const messageA = userAPages.conversation().getMessage({sender: userA});
       await expect(messageA).toContainText('Test Message');
 
-      const messageB = userBPages.conversation().getMessage({sender: userA});
+      await userBPages.conversationList().openConversation(userA.fullName, {protocol: 'mls'});
+      let messageB = userBPages.conversation().getMessage({sender: userA});
       await expect(messageB).toContainText('Test Message');
 
       await userBPage.close();
@@ -171,6 +174,8 @@ test.describe('Delete', () => {
 
       userBPages = (await PageManager.from(createPage(context, withLogin(userB)))).webapp.pages;
       await userBPages.conversationList().openConversation(userA.fullName);
+
+      messageB = userBPages.conversation().getMessage({sender: userA});
 
       await expect(messageA).not.toBeAttached();
       await expect(messageB).not.toBeAttached();
@@ -189,15 +194,19 @@ test.describe('Delete', () => {
       await createGroup(userAPages, 'Test Group', [userB]);
       await userBPages.conversationList().openConversation('Test Group');
 
-      await userAPages.conversation();
+      await userAPages.conversation().sendMessage('Test Message');
 
       const messageA = userAPages.conversation().getMessage({sender: userA});
       const messageB = userBPages.conversation().getMessage({sender: userA});
+      await expect(messageA).toContainText('Test Message');
       await expect(messageB).toContainText('Test Message');
 
       await userAPages.conversation().deleteMessage(messageA, 'Everyone');
 
-      const text = await messageB.textContent();
+      // Deletion of a message converts it to a system message with a trash can symbol
+      await expect(userBPages.conversation().systemMessages.getByTitle('Deleted')).toBeAttached();
+
+      await expect(messageB).not.toBeAttached();
       await expect(messageB).not.toBeAttached();
     },
   );
@@ -211,38 +220,237 @@ test.describe('Delete', () => {
         PageManager.from(createPage(withLogin(userB), withConnectedUser(userA))).then(pm => pm.webapp.pages),
       ]);
 
-      await userAPages.conversation().sendMessage('Test Message');
+      await test.step('Create test group', async () => {
+        await createGroup(userAPages, 'Test Group', [userB]);
+        await userBPages.conversationList().openConversation('Test Group');
+      });
+
+      let messageA: Locator;
+      let messageB: Locator;
+
+      await test.step('Send and delete message from user A to B', async () => {
+        await userAPages.conversationList().openConversation('Test Group');
+        await userAPages.conversation().sendMessage('Test Message');
+
+        messageA = userAPages.conversation().getMessage({sender: userA});
+        await expect(messageA).toContainText('Test Message');
+
+        messageB = userAPages.conversation().getMessage({sender: userA});
+        await expect(messageB).toContainText('Test Message');
+      });
+
+      await test.step('Delete message and verify deletion', async () => {
+        await userAPages.conversation().deleteMessage(messageA, 'Everyone');
+
+        // Deletion of a message converts it to a system message with a trash can symbol
+        await expect(userBPages.conversation().systemMessages.getByTitle('Deleted')).toBeAttached();
+
+        await expect(messageA).not.toBeAttached();
+        await expect(messageB).not.toBeAttached();
+      });
+    },
+  );
+
+  test('Delete "For Everyone" works for images', {tag: ['@TC-580', '@regression']}, async ({createPage}) => {
+    const [userAPages, userBPages] = await Promise.all([
+      PageManager.from(createPage(withLogin(userA), withConnectedUser(userB))).then(pm => pm.webapp.pages),
+      PageManager.from(createPage(withLogin(userB), withConnectedUser(userA))).then(pm => pm.webapp.pages),
+    ]);
+
+    await userBPages.conversationList().openConversation(userA.fullName);
+
+    const {page} = userAPages.conversation();
+    await shareAssetHelper(getImageFilePath(), page, page.getByRole('button', {name: 'Add picture'}));
+
+    const messageA = userAPages.conversation().getMessage({sender: userA});
+    const messageB = userBPages.conversation().getMessage({sender: userA});
+    await expect(messageA).toBeAttached();
+    await expect(messageB).toBeAttached();
+
+    await userAPages.conversation().deleteMessage(messageA, 'Everyone');
+
+    await expect(messageB).not.toBeAttached();
+    await expect(messageB).not.toBeAttached();
+  });
+
+  test('Delete "For Everyone" works for link preview', {tag: ['@TC-581', '@regression']}, async ({createPage}) => {
+    const [userAPages, userBPages] = await Promise.all([
+      PageManager.from(createPage(withLogin(userA), withConnectedUser(userB))).then(pm => pm.webapp.pages),
+      PageManager.from(createPage(withLogin(userB), withConnectedUser(userA))).then(pm => pm.webapp.pages),
+    ]);
+
+    await userBPages.conversationList().openConversation(userA.fullName);
+
+    await userAPages.conversation().sendMessage('https://www.lidl.de/');
+
+    const messageA = userAPages.conversation().getMessage({sender: userA});
+    const messageB = userBPages.conversation().getMessage({sender: userA});
+    await expect(messageA).toBeAttached();
+    await expect(messageB).toBeAttached();
+
+    await userAPages.conversation().deleteMessage(messageA, 'Everyone');
+
+    await expect(messageB).not.toBeAttached();
+    await expect(messageB).not.toBeAttached();
+  });
+
+  test(
+    'Delete "For Everyone" works for location sharing',
+    {tag: ['@TC-582', '@regression']},
+    async ({createPage, api}) => {
+      const [userAPages, userBPages] = await Promise.all([
+        PageManager.from(createPage(withLogin(userA), withConnectedUser(userB))).then(pm => pm.webapp.pages),
+        PageManager.from(createPage(withLogin(userB), withConnectedUser(userA))).then(pm => pm.webapp.pages),
+      ]);
+
       await userBPages.conversationList().openConversation(userA.fullName);
+
+      await test.step('Prerequisite: Send location via TestService', async () => {
+        const {instanceId} = await api.testService.createInstance(
+          userA.password,
+          userA.email,
+          'Test Service Device',
+          false,
+        );
+        const conversationId = await api.conversation.getConversationWithUser(userA.token, userB.id!);
+        await api.testService.sendLocation(instanceId, conversationId, {
+          locationName: 'Test Location',
+          latitude: 52.5170365,
+          longitude: 13.404954,
+          zoom: 42,
+        });
+      });
 
       const messageA = userAPages.conversation().getMessage({sender: userA});
       const messageB = userBPages.conversation().getMessage({sender: userA});
-      await expect(messageB).toContainText('Test Message');
+      await expect(messageA).toBeAttached();
+      await expect(messageB).toBeAttached();
 
       await userAPages.conversation().deleteMessage(messageA, 'Everyone');
 
-      const text = await messageB.textContent();
+      await expect(messageB).not.toBeAttached();
       await expect(messageB).not.toBeAttached();
     },
   );
 
-  test('Delete "For Everyone" works for images', {tag: ['@TC-580', '@regression']}, async ({createPage}) => {});
+  test('Delete "For Everyone" works for file sharing', {tag: ['@TC-583', '@regression']}, async ({createPage}) => {
+    const [userAPages, userBPages] = await Promise.all([
+      PageManager.from(createPage(withLogin(userA), withConnectedUser(userB))).then(pm => pm.webapp.pages),
+      PageManager.from(createPage(withLogin(userB), withConnectedUser(userA))).then(pm => pm.webapp.pages),
+    ]);
 
-  test('Delete "For Everyone" works for link preview', {tag: ['@TC-581', '@regression']}, async ({createPage}) => {});
-  test(
-    'Delete "For Everyone" works for location sharing',
-    {tag: ['@TC-582', '@regression']},
-    async ({createPage}) => {},
-  );
-  test('Delete "For Everyone" works for file sharing', {tag: ['@TC-583', '@regression']}, async ({createPage}) => {});
+    await userBPages.conversationList().openConversation(userA.fullName);
+
+    const {page} = userAPages.conversation();
+    await shareAssetHelper(getTextFilePath(), page, page.getByRole('button', {name: 'Add file'}));
+
+    const messageA = userAPages.conversation().getMessage({sender: userA});
+    const messageB = userBPages.conversation().getMessage({sender: userA});
+    await expect(messageA).toBeAttached();
+    await expect(messageB).toBeAttached();
+
+    await userAPages.conversation().deleteMessage(messageA, 'Everyone');
+
+    await expect(messageB).not.toBeAttached();
+    await expect(messageB).not.toBeAttached();
+  });
+
   test(
     'Dy delete "For Everyone" works for audio messages',
     {tag: ['@TC-584', '@regression']},
-    async ({createPage}) => {},
+    async ({createPage}) => {
+      const [userAPages, userBPages] = await Promise.all([
+      PageManager.from(createPage(withLogin(userA), withConnectedUser(userB))).then(pm => pm.webapp.pages),
+      PageManager.from(createPage(withLogin(userB), withConnectedUser(userA))).then(pm => pm.webapp.pages),
+    ]);
+
+    await userBPages.conversationList().openConversation(userA.fullName);
+
+    const {page} = userAPages.conversation();
+    await shareAssetHelper(getAudioFilePath(), page, page.getByRole('button', {name: 'Add file'}));
+
+    const messageA = userAPages.conversation().getMessage({sender: userA});
+    const messageB = userBPages.conversation().getMessage({sender: userA});
+    await expect(messageA).toBeAttached();
+    await expect(messageB).toBeAttached();
+
+    await userAPages.conversation().deleteMessage(messageA, 'Everyone');
+
+    await expect(messageB).not.toBeAttached();
+    await expect(messageB).not.toBeAttached();
+    },
   );
-  test('Delete "For Everyone" works for video messages', {tag: ['@TC-585', '@regression']}, async ({createPage}) => {});
+
+  test('Delete "For Everyone" works for video messages', {tag: ['@TC-585', '@regression']}, async ({createPage}) => {
+    const [userAPages, userBPages] = await Promise.all([
+      PageManager.from(createPage(withLogin(userA), withConnectedUser(userB))).then(pm => pm.webapp.pages),
+      PageManager.from(createPage(withLogin(userB), withConnectedUser(userA))).then(pm => pm.webapp.pages),
+    ]);
+
+    await userBPages.conversationList().openConversation(userA.fullName);
+
+    const {page} = userAPages.conversation();
+    await shareAssetHelper(getVideoFilePath(), page, page.getByRole('button', {name: 'Add file'}));
+
+    const messageA = userAPages.conversation().getMessage({sender: userA});
+    const messageB = userBPages.conversation().getMessage({sender: userA});
+    await expect(messageA).toBeAttached();
+    await expect(messageB).toBeAttached();
+
+    await userAPages.conversation().deleteMessage(messageA, 'Everyone');
+
+    await expect(messageB).not.toBeAttached();
+    await expect(messageB).not.toBeAttached();
+  });
+
   test(
     'I see no unread count if a message was deleted from someone in a conversation',
     {tag: ['@TC-587', '@regression']},
-    async ({createPage}) => {},
+    async ({createPage}) => {
+      const [userAPages, userBPages] = await Promise.all([
+        PageManager.from(createPage(withLogin(userA), withConnectedUser(userB))).then(pm => pm.webapp.pages),
+        PageManager.from(createPage(withLogin(userB), withConnectedUser(userA))).then(pm => pm.webapp.pages),
+      ]);
+
+      await test.step('Create group as second conversation', async () => {
+        // We need to create a second conversation in order to switch to it to ensure the unread marker can be shown on the not open conversation
+        await createGroup(userAPages, 'Test Group', [userB]);
+        await userBPages.conversationList().openConversation('Test Group');
+      });
+
+      await test.step('Send message from user A to B', async () => {
+        await userAPages.conversationList().openConversation(userB.fullName);
+        await userAPages.conversation().sendMessage('Test Message');
+      });
+
+      await test.step('Check user B has a unread conversation with A containing the sent message', async () => {
+        const conversation = userBPages.conversationList().getConversationLocator(userA.fullName);
+        await expect(conversation.getByTestId('status-unread')).toBeVisible();
+
+        await userBPages.conversationList().openConversation(userA.fullName);
+        await expect(conversation).toContainText('Test Message');
+        await expect(conversation.getByTestId('status-unread')).not.toBeVisible();
+      });
+
+      await test.step("Open group conversation to ensure new messages won't be read immediately", async () => {
+        await userBPages.conversationList().openConversation('Test Group');
+        await expect(userBPages.conversation().conversationTitle).toHaveText('Test Group');
+      });
+
+      await test.step('Delete message sent by A', async () => {
+        const message = userAPages.conversation().getMessage({sender: userA});
+        await userAPages.conversation().deleteMessage(message, 'Everyone');
+        await expect(message).not.toBeAttached();
+      });
+
+      await test.step('Check B received the updated message without marking the conversation as unread', async () => {
+        const conversation = userBPages.conversationList().getConversationLocator(userA.fullName);
+        await expect(conversation.getByTestId('status-unread')).not.toBeVisible();
+
+        await userBPages.conversationList().openConversation(userA.fullName);
+        const message = userBPages.conversation().getMessage({sender: userA});
+        await expect(message).not.toBeAttached();
+      });
+    },
   );
 });
