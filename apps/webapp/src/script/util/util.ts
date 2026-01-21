@@ -180,13 +180,13 @@ export const trimFileExtension = (filename?: string): string => {
 export const sanitizeFilename = (filename: string): string => {
   // Replace German umlauts and special characters first
   let sanitized = filename
-    .replace(/ä/g, 'ae')
-    .replace(/ö/g, 'oe')
-    .replace(/ü/g, 'ue')
-    .replace(/Ä/g, 'Ae')
-    .replace(/Ö/g, 'Oe')
-    .replace(/Ü/g, 'Ue')
-    .replace(/ß/g, 'ss');
+    .replaceAll('ä', 'ae')
+    .replaceAll('ö', 'oe')
+    .replaceAll('ü', 'ue')
+    .replaceAll('Ä', 'Ae')
+    .replaceAll('Ö', 'Oe')
+    .replaceAll('Ü', 'Ue')
+    .replaceAll('ß', 'ss');
 
   // Then normalize to decomposed form and remove combining marks for other accents
   sanitized = sanitized.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
@@ -199,7 +199,7 @@ export const sanitizeFilename = (filename: string): string => {
   // First replace punctuation followed by space to avoid inconsistent spacing
   sanitized = sanitized.replace(/[,;:]\s+/g, '-');
   // Then replace any remaining punctuation
-  sanitized = sanitized.replace(/[,;:]/g, '-');
+  sanitized = sanitized.replaceAll(/[,;:]/g, '-');
   // Normalize multiple spaces and trim
   return sanitized.replace(/\s+/g, ' ').trim();
 };
