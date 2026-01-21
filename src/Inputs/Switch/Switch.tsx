@@ -78,6 +78,13 @@ export const Switch = forwardRef<HTMLInputElement, SwitchProps>(
       '#d2d2d2';
     const resolvedDisabledColor =
       (isDarkTheme ? disabledColorDark ?? disabledColor : disabledColor) ?? switchTheme?.disabledColor;
+    const isInteractionDisabled = Boolean(disabled || showLoading);
+    const handleToggle = (nextChecked: boolean) => {
+      if (isInteractionDisabled) {
+        return;
+      }
+      onToggle(nextChecked);
+    };
 
     return (
       <div css={wrapperStyles}>
@@ -85,12 +92,13 @@ export const Switch = forwardRef<HTMLInputElement, SwitchProps>(
           ref={ref}
           id={id}
           checked={checked}
-          disabled={disabled}
+          disabled={isInteractionDisabled}
           name={name}
-          onChange={event => onToggle(event.target.checked)}
+          onChange={event => handleToggle(event.target.checked)}
           onKeyDown={event => {
             if (event.key === 'Enter') {
-              onToggle(!(event.target as HTMLInputElement).checked);
+              event.preventDefault();
+              handleToggle(!(event.target as HTMLInputElement).checked);
             }
           }}
           type="checkbox"

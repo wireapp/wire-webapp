@@ -41,10 +41,11 @@ export const inputStyles: CSSObject = {
 
 export const labelStyles = (disabled: boolean, showLoading: boolean): CSSObject => ({
   borderRadius: '20px',
-  cursor: disabled || showLoading ? '' : 'pointer',
+  cursor: disabled || showLoading ? 'not-allowed' : 'pointer',
   display: 'block',
   margin: 0,
   overflow: 'hidden',
+  opacity: disabled ? 0.5 : 1,
 });
 
 type SwitchStylesProps = {
