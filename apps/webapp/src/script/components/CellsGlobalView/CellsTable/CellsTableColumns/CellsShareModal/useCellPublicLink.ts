@@ -131,25 +131,20 @@ export const useCellPublicLink = ({uuid, cellsRepository}: UseCellPublicLinkPara
       try {
         setStatus('loading');
 
-        // Fetch the complete link object first
         const currentLink = await cellsRepository.getPublicLink({uuid: node.publicLink.uuid});
 
-        // Determine if we're creating a new password or updating an existing one
         const hasExistingPassword = currentLink.PasswordRequired === true;
         const isSettingPassword = passwordEnabled && password;
 
-        // Build the updated link, handling accessEnd removal
         const updatedLink: typeof currentLink = {
           ...currentLink,
           PasswordRequired: passwordEnabled,
         };
 
-        // Handle accessEnd: null means remove, string means set, undefined means don't change
         if (accessEnd === null) {
-          // User wants to clear expiration - delete the property
+          // Ensure that accessEnd is not present in JSON
           delete updatedLink.AccessEnd;
         } else if (accessEnd !== undefined) {
-          // User is setting a new expiration
           updatedLink.AccessEnd = accessEnd;
         }
 
