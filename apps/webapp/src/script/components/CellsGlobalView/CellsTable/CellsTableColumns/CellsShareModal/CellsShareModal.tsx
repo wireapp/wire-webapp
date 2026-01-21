@@ -23,7 +23,7 @@ import {CellsShareModalContent} from 'Components/Cells/ShareModal/CellsShareModa
 import {serializeShareModalInput} from 'Components/Cells/ShareModal/shareModalSerializer';
 import {useCellExpirationToggle} from 'Components/Cells/ShareModal/useCellExpirationToggle';
 import {useCellPasswordToggle} from 'Components/Cells/ShareModal/useCellPasswordToggle';
-import {PrimaryModal, removeCurrentModal} from 'Components/Modals/PrimaryModal';
+import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {CellsRepository} from 'Repositories/cells/CellsRepository';
 import {t} from 'Util/LocalizerUtil';
 import {createUuid} from 'Util/uuid';
@@ -130,7 +130,6 @@ const CellsShareModal = ({type, uuid, cellsRepository, modalId}: ShareModalParam
   useEffect(() => {
     submitHandlers.set(modalId, async () => {
       if (!isEnabled || status !== 'success' || !node?.publicLink?.uuid) {
-        removeCurrentModal();
         return;
       }
 
@@ -152,7 +151,6 @@ const CellsShareModal = ({type, uuid, cellsRepository, modalId}: ShareModalParam
           passwordEnabled: serialized.passwordEnabled,
           ...(serialized.accessEnd ? {accessEnd: serialized.accessEnd} : {}),
         });
-        removeCurrentModal();
       } catch {
         // Keep the modal open if the update fails.
       }
