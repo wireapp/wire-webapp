@@ -167,7 +167,7 @@ const CellShareModalContent = ({
         await updatePublicLink({
           password: serialized.updatePassword,
           passwordEnabled: serialized.passwordEnabled,
-          ...(serialized.accessEnd ? {accessEnd: serialized.accessEnd} : {}),
+          accessEnd: serialized.accessEnd,
         });
       } catch {
         // Keep the modal open if the update fails.

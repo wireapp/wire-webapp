@@ -125,7 +125,7 @@ export const useCellPublicLink = ({uuid, conversationId, cellsRepository}: UseCe
     }: {
       password?: string;
       passwordEnabled?: boolean;
-      accessEnd?: string;
+      accessEnd?: string | null;
     }) => {
       if (!node?.publicLink?.uuid) {
         throw new Error('No public link to update');
@@ -141,12 +141,20 @@ export const useCellPublicLink = ({uuid, conversationId, cellsRepository}: UseCe
         const hasExistingPassword = currentLink.PasswordRequired === true;
         const isSettingPassword = passwordEnabled && password;
 
-        // Update only the properties we need to change
-        const updatedLink = {
+        // Build the updated link, handling accessEnd removal
+        const updatedLink: typeof currentLink = {
           ...currentLink,
           PasswordRequired: passwordEnabled,
-          ...(accessEnd ? {AccessEnd: accessEnd} : {}),
         };
+
+        // Handle accessEnd: null means remove, string means set, undefined means don't change
+        if (accessEnd === null) {
+          // User wants to clear expiration - delete the property
+          delete updatedLink.AccessEnd;
+        } else if (accessEnd !== undefined) {
+          // User is setting a new expiration
+          updatedLink.AccessEnd = accessEnd;
+        }
 
         await cellsRepository.updatePublicLink({
           linkUuid: node.publicLink.uuid,
