@@ -158,6 +158,18 @@ export const useCellPublicLink = ({uuid, conversationId, cellsRepository}: UseCe
           passwordEnabled,
         });
 
+        // Update linkData with the new values so the UI doesn't reset
+        setLinkData(prevData => {
+          if (!prevData) {
+            return prevData;
+          }
+          return {
+            ...prevData,
+            PasswordRequired: passwordEnabled,
+            AccessEnd: accessEnd === null ? undefined : accessEnd !== undefined ? accessEnd : prevData.AccessEnd,
+          };
+        });
+
         setStatus('success');
       } catch (err) {
         setStatus('error');
