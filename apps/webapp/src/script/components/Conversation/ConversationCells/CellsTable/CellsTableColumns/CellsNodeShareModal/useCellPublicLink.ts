@@ -107,8 +107,7 @@ export const useCellPublicLink = ({uuid, conversationId, cellsRepository}: UseCe
   }, [uuid, conversationId, setPublicLink]);
 
   const deletePublicLink = useCallback(async () => {
-    // Use createdLinkUuid as fallback for immediate disable scenario
-    const linkUuid = node?.publicLink?.uuid || createdLinkUuid.current;
+    const linkUuid = createdLinkUuid.current || node?.publicLink?.uuid;
 
     if (!linkUuid) {
       return;
