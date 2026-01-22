@@ -1,0 +1,218 @@
+/*
+ * Wire
+ * Copyright (C) 2018 Wire Swiss GmbH
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ *
+ */
+
+@font-face {
+  font-family: 'Wire';
+  src: url('/font/Wire.ttf?call') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+[class^='icon-'],
+[class*=' icon-'] {
+  /* use !important to prevent issues with browser extensions that change fonts */
+  font-family: 'Wire' !important;
+  font-style: normal;
+  font-weight: normal;
+  font-variant: normal;
+  text-transform: none;
+  line-height: 1;
+
+  /* Better Font Rendering =========== */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.icon-options:before {
+  content: '\e135';
+}
+.icon-wire:before {
+  content: '\e202';
+}
+.icon-plus:before {
+  content: '\e100';
+}
+.icon-minus:before {
+  content: '\e101';
+}
+.icon-check:before {
+  content: '\e102';
+}
+.icon-close:before {
+  content: '\e603';
+}
+.icon-block:before {
+  content: '\e104';
+}
+.icon-back:before {
+  content: '\e110';
+}
+.icon-forward:before {
+  content: '\e111';
+}
+.icon-down:before {
+  content: '\e113';
+}
+.icon-reload:before {
+  content: '\e117';
+}
+.icon-grid:before {
+  content: '\e123';
+}
+.icon-more:before {
+  content: '\e125';
+}
+.icon-spinner:before {
+  content: '\e126';
+}
+.icon-play:before {
+  content: '\e131';
+}
+.icon-pause:before {
+  content: '\e132';
+}
+.icon-ping:before {
+  content: '\e137';
+}
+.icon-ping-timed:before {
+  content: '\e637';
+}
+.icon-people:before {
+  content: '\e142';
+}
+.icon-camera:before {
+  content: '\e143';
+}
+.icon-library:before {
+  content: '\e145';
+}
+.icon-library-timed:before {
+  content: '\e645';
+}
+.icon-movie:before {
+  content: '\e146';
+}
+.icon-location:before {
+  content: '\e148';
+}
+.icon-file:before {
+  content: '\e152';
+}
+.icon-attachment:before {
+  content: '\e154';
+}
+.icon-attachment-timed:before {
+  content: '\e654';
+}
+.icon-speaker:before {
+  content: '\e158';
+}
+.icon-silence:before {
+  content: '\e162';
+}
+.icon-search:before {
+  content: '\e163';
+}
+.icon-settings:before {
+  content: '\e164';
+}
+.icon-pending:before {
+  content: '\e165';
+}
+.icon-link:before {
+  content: '\e167';
+}
+.icon-envelope:before {
+  content: '\e172';
+}
+.icon-edit:before {
+  content: '\e177';
+}
+.icon-like:before {
+  content: '\e183';
+}
+.icon-like-small:before {
+  content: '\e1830';
+}
+.icon-liked:before {
+  content: '\e184';
+}
+.icon-liked-small:before {
+  content: '\e1840';
+}
+.icon-view:before {
+  content: '\e185';
+}
+.icon-trash:before {
+  content: '\e186';
+}
+.icon-delete-for-me:before {
+  content: '\e1861';
+}
+.icon-delete-for-everyone:before {
+  content: '\e1862';
+}
+.icon-download:before {
+  content: '\e197';
+}
+.icon-error:before {
+  content: '\e208';
+}
+.icon-call:before {
+  content: '\e211';
+}
+.icon-gif:before {
+  content: '\e219';
+}
+.icon-gif-timed:before {
+  content: '\e719';
+}
+.icon-end-call:before {
+  content: '\e222';
+}
+.icon-invite:before {
+  content: '\e223';
+}
+.icon-sysmsg-error:before {
+  content: '\e225';
+}
+.icon-video:before {
+  content: '\e226';
+}
+.icon-screensharing:before {
+  content: '\e227';
+}
+.icon-send:before {
+  content: '\e235';
+}
+.icon-emoji:before {
+  content: '\e237';
+}
+.icon-hourglass:before {
+  content: '\e239';
+}
+.icon-av:before {
+  content: '\e261';
+}
+.icon-dismiss:before {
+  content: '\e262';
+}
+.icon-contacts:before {
+  content: '\e602';
+}

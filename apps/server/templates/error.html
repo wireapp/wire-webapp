@@ -1,0 +1,358 @@
+<!doctype html>
+<!-- Wire, Copyright (C) 2018 Wire Swiss GmbH -->
+<!-- {{@config.VERSION}} -->
+<html class="support theme-gray bg-theme">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <link rel="shortcut icon" href="/image/favicon.ico" sizes="48x48" />
+    <link rel="icon" href="/image/meta/wire-icon-256.png" sizes="256x256" type="image/png" />
+    <link rel="icon" href="/image/meta/wire-icon-128.png" sizes="128x128" type="image/png" />
+    <link rel="icon" href="/image/meta/wire-icon-64.png" sizes="64x64" type="image/png" />
+    <title>Wire Error</title>
+    <meta property="og:title" content="{{@config.OPEN_GRAPH.TITLE}}" />
+    <meta property="og:description" name="description" content="{{@config.OPEN_GRAPH.DESCRIPTION}}" />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="{{@config.APP_BASE}}" />
+    <meta property="og:image" content="{{@config.OPEN_GRAPH.IMAGE_URL}}" />
+    <style>
+      @font-face {
+        font-family: Wire;
+        src: url(/font/Wire.ttf?call) format('truetype');
+        font-weight: 400;
+        font-style: normal;
+      }
+      [class*=' icon-'],
+      [class^='icon-'] {
+        font-family: Wire !important;
+        font-style: normal;
+        font-weight: 400;
+        font-variant: normal;
+        text-transform: none;
+        line-height: 1;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+      }
+      .icon-options:before {
+        content: '\e135';
+      }
+      .icon-wire:before {
+        content: '\e202';
+      }
+      .icon-plus:before {
+        content: '\e100';
+      }
+      .icon-minus:before {
+        content: '\e101';
+      }
+      .icon-check:before {
+        content: '\e102';
+      }
+      .icon-close:before {
+        content: '\e603';
+      }
+      .icon-block:before {
+        content: '\e104';
+      }
+      .icon-back:before {
+        content: '\e110';
+      }
+      .icon-forward:before {
+        content: '\e111';
+      }
+      .icon-down:before {
+        content: '\e113';
+      }
+      .icon-reload:before {
+        content: '\e117';
+      }
+      .icon-grid:before {
+        content: '\e123';
+      }
+      .icon-more:before {
+        content: '\e125';
+      }
+      .icon-spinner:before {
+        content: '\e126';
+      }
+      .icon-play:before {
+        content: '\e131';
+      }
+      .icon-pause:before {
+        content: '\e132';
+      }
+      .icon-ping:before {
+        content: '\e137';
+      }
+      .icon-ping-timed:before {
+        content: '\e637';
+      }
+      .icon-people:before {
+        content: '\e142';
+      }
+      .icon-camera:before {
+        content: '\e143';
+      }
+      .icon-library:before {
+        content: '\e145';
+      }
+      .icon-library-timed:before {
+        content: '\e645';
+      }
+      .icon-movie:before {
+        content: '\e146';
+      }
+      .icon-location:before {
+        content: '\e148';
+      }
+      .icon-file:before {
+        content: '\e152';
+      }
+      .icon-attachment:before {
+        content: '\e154';
+      }
+      .icon-attachment-timed:before {
+        content: '\e654';
+      }
+      .icon-speaker:before {
+        content: '\e158';
+      }
+      .icon-silence:before {
+        content: '\e162';
+      }
+      .icon-search:before {
+        content: '\e163';
+      }
+      .icon-settings:before {
+        content: '\e164';
+      }
+      .icon-pending:before {
+        content: '\e165';
+      }
+      .icon-link:before {
+        content: '\e167';
+      }
+      .icon-envelope:before {
+        content: '\e172';
+      }
+      .icon-edit:before {
+        content: '\e177';
+      }
+      .icon-like:before {
+        content: '\e183';
+      }
+      .icon-like-small:before {
+        content: '\e1830';
+      }
+      .icon-liked:before {
+        content: '\e184';
+      }
+      .icon-liked-small:before {
+        content: '\e1840';
+      }
+      .icon-view:before {
+        content: '\e185';
+      }
+      .icon-trash:before {
+        content: '\e186';
+      }
+      .icon-delete-for-me:before {
+        content: '\e1861';
+      }
+      .icon-delete-for-everyone:before {
+        content: '\e1862';
+      }
+      .icon-download:before {
+        content: '\e197';
+      }
+      .icon-error:before {
+        content: '\e208';
+      }
+      .icon-call:before {
+        content: '\e211';
+      }
+      .icon-gif:before {
+        content: '\e219';
+      }
+      .icon-gif-timed:before {
+        content: '\e719';
+      }
+      .icon-end-call:before {
+        content: '\e222';
+      }
+      .icon-invite:before {
+        content: '\e223';
+      }
+      .icon-sysmsg-error:before {
+        content: '\e225';
+      }
+      .icon-video:before {
+        content: '\e226';
+      }
+      .icon-screensharing:before {
+        content: '\e227';
+      }
+      .icon-send:before {
+        content: '\e235';
+      }
+      .icon-emoji:before {
+        content: '\e237';
+      }
+      .icon-hourglass:before {
+        content: '\e239';
+      }
+      .icon-av:before {
+        content: '\e261';
+      }
+      .icon-dismiss:before {
+        content: '\e262';
+      }
+      .icon-contacts:before {
+        content: '\e602';
+      }
+      @font-face {
+        font-family: emoji;
+        src:
+          local('Apple Color Emoji'), local('Segoe UI Emoji'), local('Android Emoji'), local('Noto Color Emoji'),
+          local('JoyPixels'), local('Twemoji');
+        unicode-range:
+          u+1f000-1f003, u+1f004, u+1f005-1f0ce, u+1f0cf, u+1f0d0-1f0ff, u+1f10d-1f10f, u+1f12f, u+1f16c-1f16f,
+          u+1f170-1f171, u+1f17e-1f17f, u+1f18e, u+1f191-1f19a, u+1f1ad-1f1e5, u+1f1e6-1f1ff, u+1f201, u+1f201-1f202,
+          u+1f203-1f20f, u+1f21a, u+1f22f, u+1f232-1f236, u+1f232-1f23a, u+1f238-1f23a, u+1f23c-1f23f, u+1f249-1f24f,
+          u+1f250-1f251, u+1f252-1f2ff, u+1f300-1f320, u+1f300-1f321, u+1f322-1f323, u+1f324-1f393, u+1f32d-1f335,
+          u+1f337-1f37c, u+1f37e-1f393, u+1f385, u+1f394-1f395, u+1f396-1f397, u+1f398, u+1f399-1f39b, u+1f39c-1f39d,
+          u+1f39e-1f3f0, u+1f3a0-1f3ca, u+1f3c2-1f3c4, u+1f3c7, u+1f3ca-1f3cc, u+1f3cf-1f3d3, u+1f3e0-1f3f0,
+          u+1f3f1-1f3f2, u+1f3f3-1f3f5, u+1f3f4, u+1f3f6, u+1f3f7-1f3fa, u+1f3f7-1f4fd, u+1f3f8-1f43e, u+1f3fb-1f3ff,
+          u+1f400-1f4fd, u+1f440, u+1f442-1f443, u+1f442-1f4fc, u+1f446-1f450, u+1f466-1f478, u+1f47c, u+1f481-1f483,
+          u+1f485-1f487, u+1f48f, u+1f491, u+1f4aa, u+1f4fe, u+1f4ff-1f53d, u+1f546-1f548, u+1f549-1f54e, u+1f54b-1f54e,
+          u+1f54f, u+1f550-1f567, u+1f568-1f56e, u+1f56f-1f570, u+1f571-1f572, u+1f573-1f579, u+1f574-1f575, u+1f57a,
+          u+1f57b-1f586, u+1f587, u+1f588-1f589, u+1f58a-1f58d, u+1f58e-1f58f, u+1f590, u+1f591-1f594, u+1f595-1f596,
+          u+1f597-1f5a3, u+1f5a4, u+1f5a5, u+1f5a6-1f5a7, u+1f5a8, u+1f5a9-1f5b0, u+1f5b1-1f5b2, u+1f5b3-1f5bb, u+1f5bc,
+          u+1f5bd-1f5c1, u+1f5c2-1f5c4, u+1f5c5-1f5d0, u+1f5d1-1f5d3, u+1f5d4-1f5db, u+1f5dc-1f5de, u+1f5df-1f5e0,
+          u+1f5e1, u+1f5e2, u+1f5e3, u+1f5e4-1f5e7, u+1f5e8, u+1f5e9-1f5ee, u+1f5ef, u+1f5f0-1f5f2, u+1f5f3,
+          u+1f5f4-1f5f9, u+1f5fa-1f64f, u+1f5fb-1f64f, u+1f645-1f647, u+1f64b-1f64f, u+1f680-1f6c5, u+1f6a3,
+          u+1f6b4-1f6b6, u+1f6c0, u+1f6c6-1f6ca, u+1f6cb-1f6d0, u+1f6cc, u+1f6d0, u+1f6d1-1f6d2, u+1f6d3-1f6d4, u+1f6d5,
+          u+1f6d6-1f6df, u+1f6e0-1f6e5, u+1f6e6-1f6e8, u+1f6e9, u+1f6ea, u+1f6eb-1f6ec, u+1f6ed-1f6ef, u+1f6f0,
+          u+1f6f1-1f6f2, u+1f6f3, u+1f6f4-1f6f6, u+1f6f7-1f6f8, u+1f6f9, u+1f6fa, u+1f6fb-1f6ff, u+1f774-1f77f,
+          u+1f7d5-1f7df, u+1f7e0-1f7eb, u+1f7ec-1f7ff, u+1f80c-1f80f, u+1f848-1f84f, u+1f85a-1f85f, u+1f888-1f88f,
+          u+1f8ae-1f8ff, u+1f90c, u+1f90d-1f90f, u+1f90f, u+1f910-1f918, u+1f918, u+1f919-1f91e, u+1f91f, u+1f920-1f927,
+          u+1f926, u+1f928-1f92f, u+1f930, u+1f931-1f932, u+1f933-1f939, u+1f933-1f93a, u+1f93c-1f93e, u+1f93f,
+          u+1f940-1f945, u+1f947-1f94b, u+1f94c, u+1f94d-1f94f, u+1f950-1f95e, u+1f95f-1f96b, u+1f96c-1f970, u+1f971,
+          u+1f972, u+1f973-1f976, u+1f977-1f979, u+1f97a, u+1f97b, u+1f97c-1f97f, u+1f980-1f984, u+1f985-1f991,
+          u+1f992-1f997, u+1f998-1f9a2, u+1f9a3-1f9a4, u+1f9a5-1f9aa, u+1f9ab-1f9ad, u+1f9ae-1f9af, u+1f9b0-1f9b3,
+          u+1f9b0-1f9b9, u+1f9b5-1f9b6, u+1f9b8-1f9b9, u+1f9ba-1f9bf, u+1f9bb, u+1f9c0, u+1f9c1-1f9c2, u+1f9c3-1f9ca,
+          u+1f9cb-1f9cc, u+1f9cd-1f9cf, u+1f9d0-1f9e6, u+1f9d1-1f9dd, u+1f9e7-1f9ff, u+1fa00-1fa6f, u+1fa70-1fa73,
+          u+1fa74-1fa77, u+1fa78-1fa7a, u+1fa7b-1fa7f, u+1fa80-1fa82, u+1fa83-1fa8f, u+1fa90-1fa95, u+1fa96-1fffd,
+          u+200d, u+203c, u+2049, u+20e3, u+2139, u+2194-2199, u+21a9-21aa, u+231a-231b, u+2328, u+2388, u+23cf,
+          u+23e9-23ec, u+23e9-23f3, u+23f0, u+23f3, u+23f8-23fa, u+24c2, u+25aa-25ab, u+25b6, u+25c0, u+25fb-25fe,
+          u+25fd-25fe, u+2600-2604, u+2605, u+2607-260d, u+260e, u+260f-2610, u+2611, u+2612, u+2614-2615, u+2616-2617,
+          u+2618, u+2619-261c, u+261d, u+261e-261f, u+2620, u+2621, u+2622-2623, u+2624-2625, u+2626, u+2627-2629,
+          u+262a, u+262b-262d, u+262e-262f, u+2630-2637, u+2638-263a, u+263b-263f, u+2640, u+2641, u+2642, u+2643-2647,
+          u+2648-2653, u+2654-265e, u+265f, u+2660, u+2661-2662, u+2663, u+2664, u+2665-2666, u+2667, u+2668,
+          u+2669-267a, u+267b, u+267c-267d, u+267e, u+267f, u+2680-2685, u+2690-2691, u+2692-2694, u+2693, u+2695,
+          u+2696-2697, u+2698, u+2699, u+269a, u+269b-269c, u+269d-269f, u+26a0-26a1, u+26a1, u+26a2-26a9, u+26aa-26ab,
+          u+26ac-26af, u+26b0-26b1, u+26b2-26bc, u+26bd-26be, u+26bf-26c3, u+26c4-26c5, u+26c6-26c7, u+26c8,
+          u+26c9-26cd, u+26ce, u+26ce-26cf, u+26d0, u+26d1, u+26d2, u+26d3-26d4, u+26d4, u+26d5-26e8, u+26e9-26ea,
+          u+26ea, u+26eb-26ef, u+26f0-26f5, u+26f2-26f3, u+26f5, u+26f6, u+26f7-26fa, u+26f9, u+26fa, u+26fb-26fc,
+          u+26fd, u+26fe-2701, u+2702, u+2703-2704, u+2705, u+2708-270d, u+270a-270b, u+270a-270d, u+270e, u+270f,
+          u+2710-2711, u+2712, u+2714, u+2716, u+271d, u+2721, u+2728, u+2733-2734, u+2744, u+2747, u+274c, u+274e,
+          u+2753-2755, u+2757, u+2763-2764, u+2765-2767, u+2795-2797, u+27a1, u+27b0, u+27bf, u+2934-2935, u+2b05-2b07,
+          u+2b1b-2b1c, u+2b50, u+2b55, u+3030, u+303d, u+3297, u+3299, u+e0020-e007f, u+fe0f;
+      }
+      html {
+        box-sizing: border-box;
+      }
+      *,
+      :after,
+      :before {
+        box-sizing: inherit;
+      }
+      body,
+      html {
+        display: table;
+        overflow: hidden;
+        width: 100%;
+        height: 100%;
+        padding: 0;
+        margin: 0;
+        font-family:
+          emoji,
+          BlinkMacSystemFont,
+          -apple-system,
+          Helvetica Neue,
+          Arial,
+          sans-serif;
+        font-size: 16px;
+        font-weight: 300;
+      }
+      svg {
+        width: 32px;
+        height: 26.5px;
+        fill: #000;
+      }
+      a {
+        color: #000;
+        text-decoration: none;
+      }
+      p {
+        margin-top: 0;
+        margin-bottom: 12px;
+      }
+      .container {
+        display: table-cell;
+        width: 100%;
+        height: 100%;
+        vertical-align: middle;
+      }
+      .container .content {
+        width: 100%;
+        max-width: 400px;
+        padding: 16px;
+        margin: 0 auto;
+      }
+      .header {
+        margin-bottom: 96px;
+      }
+      .footer {
+        margin-top: 96px;
+        font-size: 14px;
+      }
+      .footer p {
+        margin-bottom: 4px;
+      }
+      .support .btn {
+        text-transform: none;
+      }
+      .support .btn.hover,
+      .support .btn:hover {
+        color: #fff !important;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="container">
+      <div class="content">
+        <div class="header">
+          <a href="https://wire.com">
+            <svg class="wi wi-logo" width="140" height="116" viewBox="0 0 140 116" xmlns="http://www.w3.org/2000/svg">
+              <path
+                class="fill-theme"
+                d="M140 71.875C140 95.653 120.735 115 96.895 115c-10.108 0-19.264-3.503-26.635-9.322-7.37 5.82-16.744 9.322-26.85 9.322C19.57 115 0 95.653 0 71.875V4.107h8.235v67.768c0 19.25 15.787 34.91 35.087 34.91 7.774 0 15.026-2.57 20.84-6.864C57.66 92.373 53.53 82.585 53.53 71.876V16.43C53.53 7.37 60.92 0 70 0c9.08 0 16.47 7.37 16.47 16.43v55.445c0 10.71-3.87 20.497-10.373 28.046 5.815 4.294 13.068 6.866 20.84 6.866 19.3 0 34.828-15.66 34.828-34.91V4.105H140v67.77zM78.235 16.43c0-4.532-3.694-8.216-8.235-8.216-4.54 0-8.235 3.684-8.235 8.215v55.445c0 8.546 3.105 16.375 8.235 22.45 5.13-6.075 8.235-13.904 8.235-22.45V16.43z"
+              ></path>
+            </svg>
+          </a>
+        </div>
+        <p>{{@error.code}} — {{@error.message}}</p>
+        <div class="footer">
+          <p>
+            <a href="https://wire.com/legal/terms/">Terms of Use</a> ·
+            <a href="https://wire.com/legal/privacy/">Privacy Policy</a> ·
+            <a href="https://support.wire.com">Support</a>
+          </p>
+          <p class="copyright">&copy; Wire Swiss GmbH. All rights reserved.</p>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

@@ -1,6 +1,11 @@
-import Changelog from 'generate-changelog';
-import simpleGit from 'simple-git';
-import * as pkg from '../package.json';
+import {generate} from 'generate-changelog';
+import {simpleGit} from 'simple-git';
+
+// Suppress dotenv logging
+require('dotenv').config({quiet: true});
+
+// Use require for JSON to avoid ts-node config issues
+const pkg = require('../package.json');
 
 const args = process.argv.slice(2);
 const releaseType = args[0];
@@ -22,14 +27,16 @@ void (async () => {
   const tags = await simpleGit().tags({'--list': null});
   const productionTags = tags.all.filter(tag => tag.includes(`-${releaseType}.`));
 
-  const newProductionTag = productionTags.sort().reverse()[0];
-  const lastProductionTag = productionTags.sort().reverse()[1];
+  // Sort tags in descending order (newest first)
+  const sortedTags = productionTags.sort().reverse();
+  const newProductionTag = sortedTags[0];
+  const lastProductionTag = sortedTags[1];
 
   const from = until ? newProductionTag : lastProductionTag;
   const to = until ? until : newProductionTag;
 
   try {
-    const changelog = await Changelog.generate({
+    const changelog = await generate({
       exclude: ['chore', 'docs', 'refactor', 'style', 'test', 'runfix'],
       repoUrl: pkg.repository.url.replace('.git', ''),
       tag: `${from}...${to}`,

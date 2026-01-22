@@ -1,0 +1,112 @@
+{
+  "name": "webapp",
+  "$schema": "{projectRoot}/node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "{projectRoot}/src",
+  "projectType": "application",
+  "targets": {
+    "build": {
+      "executor": "nx:run-commands",
+      "outputs": ["{workspaceRoot}/apps/server/dist/static"],
+      "defaultConfiguration": "production",
+      "dependsOn": ["^build"],
+      "options": {
+        "command": "yarn build:prod",
+        "cwd": "{projectRoot}"
+      },
+      "configurations": {
+        "development": {
+          "command": "yarn build:dev"
+        },
+        "production": {
+          "command": "yarn build:prod"
+        }
+      }
+    },
+    "serve": {
+      "executor": "nx:run-commands",
+      "defaultConfiguration": "development",
+      "options": {
+        "command": "echo 'Use yarn start from the root to run the dev server with webpack-dev-middleware'"
+      }
+    },
+    "test": {
+      "executor": "@nx/jest:jest",
+      "outputs": ["{workspaceRoot}/coverage/apps/webapp"],
+      "options": {
+        "jestConfig": "{projectRoot}/jest.config.ts",
+        "passWithNoTests": false
+      },
+      "configurations": {
+        "ci": {
+          "ci": true,
+          "coverage": true,
+          "coverageReporters": ["lcov", "text"]
+        }
+      }
+    },
+    "e2e": {
+      "executor": "@nx/playwright:playwright",
+      "outputs": ["{workspaceRoot}/dist/.playwright/apps/webapp"],
+      "dependsOn": ["^build"],
+      "options": {
+        "config": "{projectRoot}/playwright.config.ts"
+      }
+    },
+    "lint": {
+      "executor": "nx:run-commands",
+      "dependsOn": ["webapp:stylelint", "webapp:type-check"],
+      "options": {
+        "command": "eslint --quiet --ext .js,.ts,.tsx {projectRoot}"
+      }
+    },
+    "stylelint": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "prettier --ignore-path {projectRoot}/.prettierignore --write \"**/*.less\" && stylelint --ignore-path {projectRoot}/.gitignore \"**/*.less\"",
+        "cwd": "{projectRoot}"
+      }
+    },
+    "type-check": {
+      "executor": "nx:run-commands",
+      "dependsOn": ["^build"],
+      "options": {
+        "command": "tsc --project {projectRoot}/tsconfig.build.json --noEmit"
+      }
+    },
+    "check-circular": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "dpdm --no-warning --no-tree -T {projectRoot}/src/script/auth/main.tsx {projectRoot}/src/script/main/app.ts"
+      }
+    },
+    "translate-extract": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "i18next-scanner 'src/{page,script}/**/*.{js,html,htm}'",
+        "cwd": "{projectRoot}"
+      }
+    },
+    "translate-merge": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "formatjs extract --format './bin/translations_extract_formatter.js' --out-file './src/i18n/en-US.json' 'src/**/*.{ts,tsx,js,jsx}' --ignore 'src/**/*.d.ts' --additional-function-names t",
+        "cwd": "{projectRoot}"
+      }
+    },
+    "translate-generate-types": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "node ./bin/transalations_generate_types.js",
+        "cwd": "{projectRoot}"
+      }
+    },
+    "configure": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "copy-config ./.copyconfigrc.js && ts-node ./bin/generate_react_icons.ts",
+        "cwd": "{projectRoot}"
+      }
+    }
+  },
+  "tags": ["type:app", "scope:frontend"]
+}

@@ -1,8 +1,26 @@
 version: 2
 updates:
-  # Webapp configs
+  # Root workspace dependencies (monorepo root)
   - package-ecosystem: npm
-    directory: '/app-config'
+    directory: '/'
+    schedule:
+      interval: weekly
+      day: sunday
+      time: '16:00'
+      timezone: 'Europe/Berlin'
+    open-pull-requests-limit: 99
+    labels:
+      - 'type: chore 🧹'
+    ignore:
+      # Prevent major version updates
+      - dependency-name: '*'
+        update-types: ['version-update:semver-major']
+      - dependency-name: '@types/node'
+      - dependency-name: 'typescript'
+
+  # Webapp config dependencies
+  - package-ecosystem: npm
+    directory: '/apps/webapp/app-config'
     schedule:
       interval: daily
       time: '16:00'
@@ -10,10 +28,14 @@ updates:
     open-pull-requests-limit: 99
     labels:
       - 'type: chore 🧹'
+    ignore:
+      # Prevent major version updates
+      - dependency-name: '*'
+        update-types: ['version-update:semver-major']
 
   # Webapp frontend dependencies
   - package-ecosystem: npm
-    directory: '/'
+    directory: '/apps/webapp'
     schedule:
       interval: weekly
       day: sunday
@@ -31,6 +53,9 @@ updates:
           - '*@datadog*'
 
     ignore:
+      # Prevent major version updates
+      - dependency-name: '*'
+        update-types: ['version-update:semver-major']
       - dependency-name: '@wireapp/avs'
       # Wait until we have next release with wasm folder
       - dependency-name: '@mediapipe/tasks-vision'
@@ -44,10 +69,14 @@ updates:
       - dependency-name: '@lexical/markdown'
       - dependency-name: '@lexical/react'
       - dependency-name: '@lexical/rich-text'
+      # Wait until libsodium-wrappers:0.7.17 because: https://github.com/jedisct1/libsodium.js/issues/357
+      - dependency-name: 'libsodium-wrappers'
+        versions:
+          - '0.7.16'
 
   # Server dependencies
   - package-ecosystem: npm
-    directory: '/server'
+    directory: '/apps/server'
     schedule:
       interval: weekly
       day: sunday
@@ -57,11 +86,50 @@ updates:
     labels:
       - 'type: chore 🧹'
     ignore:
+      # Prevent major version updates
+      - dependency-name: '*'
+        update-types: ['version-update:semver-major']
       - dependency-name: geolite2
         versions:
           - '>= 2.a'
       - dependency-name: 'typescript'
       - dependency-name: '@types/node'
+
+  # Core library dependencies
+  - package-ecosystem: npm
+    directory: '/libraries/core'
+    schedule:
+      interval: weekly
+      day: sunday
+      time: '16:00'
+      timezone: 'Europe/Berlin'
+    open-pull-requests-limit: 99
+    labels:
+      - 'type: chore 🧹'
+    ignore:
+      # Prevent major version updates
+      - dependency-name: '*'
+        update-types: ['version-update:semver-major']
+      - dependency-name: '@types/node'
+      - dependency-name: 'typescript'
+
+  # Config library dependencies
+  - package-ecosystem: npm
+    directory: '/libraries/config'
+    schedule:
+      interval: weekly
+      day: sunday
+      time: '16:00'
+      timezone: 'Europe/Berlin'
+    open-pull-requests-limit: 99
+    labels:
+      - 'type: chore 🧹'
+    ignore:
+      # Prevent major version updates
+      - dependency-name: '*'
+        update-types: ['version-update:semver-major']
+      - dependency-name: '@types/node'
+      - dependency-name: 'typescript'
 
   # Github actions
   - package-ecosystem: 'github-actions'

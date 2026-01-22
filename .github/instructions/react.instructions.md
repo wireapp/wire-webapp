@@ -1,7 +1,6 @@
 ---
-appliesTo:
-  paths:
-    - 'src/**/*.tsx'
+applyTo: 'apps/webapp/src/**/*.{tsx,jsx}'
+description: React code review rules for all React components in the webapp
 ---
 
 # Copilot — React code review rules

@@ -1,0 +1,217 @@
+.message-quote {
+  position: relative;
+  max-width: calc(var(--conversation-max-width) - var(--conversation-message-sender-width) - 16px);
+  padding-left: 16px;
+  margin-bottom: 10px;
+  font-size: var(--font-size-medium);
+  line-height: 1.5em;
+
+  button {
+    &:focus-visible {
+      .focus-outline;
+      .focus-border-radius;
+      .focus-offset;
+      margin: 0.75rem 0;
+    }
+  }
+
+  &::before {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    display: block;
+    width: 4px;
+    height: 100%;
+    border-radius: 2px;
+    background-color: var(--message-quote-bg);
+    content: '';
+  }
+
+  &__error {
+    font-style: italic;
+    opacity: 0.4;
+  }
+
+  &__sender {
+    margin-bottom: 4px;
+    cursor: pointer;
+    font-size: var(--font-size-small);
+    font-weight: var(--font-weight-bold);
+
+    svg {
+      width: 8px;
+      height: 8px;
+      margin-left: 4px;
+      fill: var(--background-fade-40);
+    }
+  }
+
+  &__text {
+    overflow: hidden;
+    height: 1.5em;
+    max-height: 1.5em;
+    line-height: 1.5em;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+
+    pre {
+      overflow: hidden;
+      margin: 0;
+      text-overflow: ellipsis;
+    }
+
+    ol,
+    ul {
+      padding: 0 16px;
+      margin: 0;
+    }
+
+    &--large {
+      font-size: var(--font-size-xxl);
+    }
+
+    &--full {
+      height: unset;
+      max-height: unset;
+      white-space: normal;
+
+      &:not(pre) > code {
+        padding: 2px 4px;
+        border-radius: 4px;
+        background: var(--foreground-fade-8);
+      }
+
+      pre {
+        overflow: auto;
+        max-width: var(--conversation-message-asset-width);
+        padding: 8px 12px;
+        border-radius: 8px;
+        background: var(--foreground-fade-8);
+        font-size: var(--font-size-small);
+        margin-block: 4px;
+        text-overflow: unset;
+      }
+    }
+
+    &__show-more {
+      display: block;
+      color: var(--accent-color-500);
+      cursor: pointer;
+      font-size: var(--font-size-small);
+      font-weight: var(--font-weight-regular);
+      user-select: none;
+
+      .disclose-icon {
+        margin-left: 4px;
+        color: var(--foreground);
+        fill: currentColor;
+        transform: rotate(90deg);
+
+        &.upside-down {
+          transform: rotate(-90deg);
+        }
+      }
+    }
+  }
+
+  &__image,
+  &__image img {
+    max-width: 200px;
+    max-height: 113px;
+  }
+
+  &__image img {
+    cursor: pointer;
+  }
+
+  &__attachments {
+    display: flex;
+    align-items: center;
+    margin-top: 4px;
+    font-size: var(--font-size-small);
+    font-weight: var(--font-weight-regular);
+    gap: 6px;
+
+    span {
+      color: var(--main-color);
+    }
+  }
+
+  &__files-icon {
+    flex-shrink: 0;
+    --multiple-file-icon-bg: var(--app-bg-secondary);
+    --multiple-file-icon-stroke: var(--main-color);
+  }
+
+  &__preview-thumbnail {
+    position: relative;
+    overflow: hidden;
+    width: 40px;
+    height: 40px;
+    flex-shrink: 0;
+    border-radius: 4px;
+
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+  }
+
+  &__preview-loading {
+    width: 100%;
+    height: 100%;
+    animation: pulse 1.5s ease-in-out infinite;
+    background-color: var(--foreground-fade-8);
+  }
+
+  @keyframes pulse {
+    0%,
+    100% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0.5;
+    }
+  }
+
+  &__preview-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    display: flex;
+    width: 100%;
+    height: 100%;
+    align-items: center;
+    justify-content: center;
+    background-color: rgba(0, 0, 0, 0.3);
+
+    svg {
+      width: 16px;
+      height: 16px;
+      fill: white;
+    }
+  }
+
+  &__timestamp {
+    display: block;
+    margin-top: 4px;
+    cursor: pointer;
+    font-size: var(--font-size-small);
+    font-weight: var(--font-weight-regular);
+    opacity: 0.4;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+
+  .video-asset {
+    background-color: transparent;
+  }
+
+  .message-mention {
+    font-size: var(--font-size-medium);
+  }
+}

@@ -19,7 +19,7 @@ jobs:
       total_additions: ${{ steps.check_additions.outputs.total_additions }}
 
     env:
-      BUILD_DIR: server/dist/s3/
+      BUILD_DIR: apps/server/dist/s3/
       BUILD_ARTIFACT: ebs.zip
       COMMIT_URL: ${{github.event.head_commit.url}}
       COMMITTER: ${{github.event.head_commit.committer.name}}
@@ -28,27 +28,27 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           fetch-depth: 0
           ref: ${{ github.event.pull_request.head.sha }}
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
-          node-version: 18.16.x
+          node-version-file: '.nvmrc'
           cache: 'yarn'
 
       - name: Install JS dependencies
         run: yarn --immutable
 
       - name: Update configuration
-        run: yarn configure
+        run: yarn nx run webapp:configure
 
-      - name: Build
-        run: yarn build:prod
+      - name: Build and package
+        run: yarn nx run server:package
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v5
         with:
           name: 'build-artifact'
           path: '${{env.BUILD_DIR}}${{env.BUILD_ARTIFACT}}'
@@ -74,7 +74,7 @@ jobs:
     needs: [build]
 
     steps:
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v5
         with:
           name: 'build-artifact'
 
