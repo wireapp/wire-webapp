@@ -100,6 +100,12 @@ jobs:
     runs-on: ubuntu-latest
     if: ${{ !cancelled() }}
     needs: [test]
+
+    # It's necessary to define the outputs of the job so the calling workflow can access them
+    outputs:
+      reportArtifactId: ${{ steps.generate-outputs.outputs.reportArtifactId }}
+      reportUrl: ${{ steps.generate-outputs.outputs.reportUrl }}
+
     steps:
       - uses: actions/checkout@v6
 
@@ -132,6 +138,7 @@ jobs:
           path: apps/webapp/playwright-report/
 
       - name: Generate outputs
+        id: generate-outputs
         run: |
           echo "reportUrl=${{ steps.upload_playwright_report.outputs.artifact-url }}" >> $GITHUB_OUTPUT
           echo "reportArtifactId=${{ steps.upload_playwright_report.outputs.artifact-id }}" >> $GITHUB_OUTPUT
