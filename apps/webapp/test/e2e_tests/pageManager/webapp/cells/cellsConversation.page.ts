@@ -55,7 +55,7 @@ export class CellsConversationPage extends ConversationPage {
     // Trying multiple times for the video element to appear
     const locator = this.getVideoLocator(user);
 
-    // Wait for at least one matching element to appear (optional timeout can be set)
+    // Wait for at least one matching element to appear
     await locator.first().waitFor({state: 'visible'});
 
     return await locator.isVisible();
