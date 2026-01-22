@@ -56,6 +56,8 @@ interface ConversationLabelJson extends Omit<ConversationLabel, 'conversations'>
 
 interface LabelProperty {
   labels: ConversationLabelJson[];
+  lastSyncTimestamp?: number;
+  version?: number;
 }
 
 const propertiesKey = 'labels';
@@ -128,31 +130,100 @@ export class ConversationLabelRepository extends TypedEventTarget<{type: 'conver
   };
 
   readonly saveLabels = () => {
-    const conversationLabelJson = this.marshal();
-    void this.propertiesService.putPropertiesByKey(propertiesKey, conversationLabelJson);
-    this.persistValues();
+    const currentData = this.marshal();
+    const storedData = localStorage.getItem(ConversationLabelRepository.LocalStorageKey);
+    let parsedStoredData: LabelProperty | null = null;
+
+    if (storedData) {
+      try {
+        parsedStoredData = JSON.parse(storedData);
+      } catch (error) {
+        this.logger.warn(`Failed to parse stored labels: ${error instanceof Error ? error.message : String(error)}`);
+        // Clear corrupted data
+        localStorage.removeItem(ConversationLabelRepository.LocalStorageKey);
+      }
+    }
+
+    // Only save if data has actually changed
+    if (!parsedStoredData || JSON.stringify(currentData.labels) !== JSON.stringify(parsedStoredData.labels)) {
+      const conversationLabelJson = {
+        ...currentData,
+        lastSyncTimestamp: Date.now(),
+        version: (parsedStoredData?.version || 0) + 1,
+      };
+      void this.propertiesService.putPropertiesByKey(propertiesKey, conversationLabelJson);
+      this.persistValues(conversationLabelJson);
+    }
   };
 
   loadLabels = async () => {
     try {
       const conversationLabelJson = localStorage.getItem(ConversationLabelRepository.LocalStorageKey);
+      let localData: LabelProperty | null = null;
 
       if (conversationLabelJson) {
-        this.unmarshal(JSON.parse(conversationLabelJson));
-        this.saveLabels();
-        return;
+        try {
+          localData = JSON.parse(conversationLabelJson);
+        } catch (error) {
+          this.logger.warn(
+            `Failed to parse stored labels, clearing corrupted data: ${error instanceof Error ? error.message : String(error)}`,
+          );
+          localStorage.removeItem(ConversationLabelRepository.LocalStorageKey);
+        }
       }
 
+      // Always fetch from backend first
       const labelProperties = await this.propertiesService.getPropertiesByKey(propertiesKey);
-      this.unmarshal(labelProperties);
-      this.persistValues();
+
+      if (localData && labelProperties) {
+        // Compare timestamps to determine which is newer
+        const localTimestamp = localData.lastSyncTimestamp || 0;
+        const remoteTimestamp = labelProperties.lastSyncTimestamp || 0;
+        const localVersion = localData.version || 0;
+        const remoteVersion = labelProperties.version || 0;
+
+        // Use local data if it has a newer timestamp, or same timestamp but higher version
+        const isLocalNewer =
+          localTimestamp > remoteTimestamp || (localTimestamp === remoteTimestamp && localVersion > remoteVersion);
+
+        if (isLocalNewer) {
+          // Local data is newer, use it and update backend
+          this.unmarshal(localData);
+          const updatedData = {
+            ...localData,
+            lastSyncTimestamp: Date.now(),
+            version: (localData.version || 0) + 1,
+          };
+          void this.propertiesService.putPropertiesByKey(propertiesKey, updatedData);
+          this.persistValues(updatedData);
+          return;
+        }
+      }
+
+      // Use backend data if available (either because local is empty or older)
+      if (labelProperties) {
+        this.unmarshal(labelProperties);
+        this.persistValues(labelProperties);
+      } else if (localData) {
+        // Backend has no data but local does, use local and sync to backend
+        this.unmarshal(localData);
+        const updatedData = {
+          ...localData,
+          lastSyncTimestamp: Date.now(),
+          version: (localData.version || 0) + 1,
+        };
+        void this.propertiesService.putPropertiesByKey(propertiesKey, updatedData);
+        this.persistValues(updatedData);
+      }
+      // If both are null, labels remain empty (default state)
     } catch (error) {
-      this.logger.warn(`No labels were loaded: ${error.message}`);
+      this.logger.warn(`No labels were loaded: ${error instanceof Error ? error.message : String(error)}`);
+      // Don't save empty state on error
     }
   };
 
-  private persistValues = () => {
-    const values = this.marshal();
+  private persistValues = (data?: LabelProperty) => {
+    const values = data || this.marshal();
     localStorage.setItem(ConversationLabelRepository.LocalStorageKey, JSON.stringify(values));
   };
 
@@ -174,10 +245,13 @@ export class ConversationLabelRepository extends TypedEventTarget<{type: 'conver
     );
   };
 
-  readonly getFavoriteLabel = (): ConversationLabel => this.labels().find(({type}) => type === LabelType.Favorite);
+  readonly getFavoriteLabel = (): ConversationLabel | undefined =>
+    this.labels().find(({type}) => type === LabelType.Favorite);
 
-  readonly getFavorites = (conversations = this.conversations()): Conversation[] =>
-    this.getLabelConversations(this.getFavoriteLabel(), conversations);
+  readonly getFavorites = (conversations = this.conversations()): Conversation[] => {
+    const favoriteLabel = this.getFavoriteLabel();
+    return favoriteLabel ? this.getLabelConversations(favoriteLabel, conversations) : [];
+  };
 
   readonly getLabelConversations = (label: ConversationLabel, conversations = this.conversations()): Conversation[] =>
     label ? conversations.filter(conversation => label.conversations().includes(conversation)) : [];
@@ -237,7 +311,10 @@ export class ConversationLabelRepository extends TypedEventTarget<{type: 'conver
     const isInCustomFolder = this.allLabeledConversations().includes(conversation);
 
     if (isInCustomFolder) {
-      ids.push(this.getConversationCustomLabel(conversation).id);
+      const customLabel = this.getConversationCustomLabel(conversation);
+      if (customLabel) {
+        ids.push(customLabel.id);
+      }
     } else if (conversation.isGroupOrChannel()) {
       ids.push(DefaultLabelIds.Groups);
     } else {
