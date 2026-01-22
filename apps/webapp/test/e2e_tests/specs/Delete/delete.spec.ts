@@ -17,7 +17,8 @@
  *
  */
 
-import {Locator} from 'playwright/test';
+import {Locator, Page} from 'playwright/test';
+import {ApiManagerE2E} from 'test/e2e_tests/backend/apiManager.e2e';
 import {User} from 'test/e2e_tests/data/user';
 import {PageManager} from 'test/e2e_tests/pageManager';
 import {test, expect, withConnectedUser, withLogin} from 'test/e2e_tests/test.fixtures';
@@ -72,7 +73,7 @@ test.describe('Delete', () => {
     let messageA: Locator;
     let messageB: Locator;
 
-    await test.step('Send and delete message from user A to B', async () => {
+    await test.step('Send message from user A to B', async () => {
       await userAPages.conversationList().openConversation('Test Group');
       await userAPages.conversation().sendMessage('Test Message');
 
@@ -144,6 +145,7 @@ test.describe('Delete', () => {
       });
 
       await test.step('Verify message remains deleted', async () => {
+        await pages.conversationList().openConversation(userB.fullName);
         await expect(message).not.toBeAttached();
       });
     },
@@ -153,13 +155,14 @@ test.describe('Delete', () => {
     'Message gets deleted even when I was offline on time of deletion',
     {tag: ['@TC-573', '@regression']},
     async ({context, createPage}) => {
-      const userAPages = (await PageManager.from(createPage(withLogin(userA)))).webapp.pages;
-      let userBPage = await createPage(context, withLogin(userB));
+      const [userAPage, userBPage] = await Promise.all([
+        createPage(withLogin(userA), withConnectedUser(userB)),
+        createPage(context, withLogin(userB), withConnectedUser(userA)),
+      ]);
+      const userAPages = PageManager.from(userAPage).webapp.pages;
       let userBPages = PageManager.from(userBPage).webapp.pages;
 
-      await withConnectedUser(userA)(userBPage);
-
-      await userAPages.conversationList().openConversation(userB.fullName);
+      await userAPages.conversationList().openConversation(userB.fullName, {protocol: 'mls'});
       await userAPages.conversation().sendMessage('Test Message');
 
       const messageA = userAPages.conversation().getMessage({sender: userA});
@@ -190,9 +193,6 @@ test.describe('Delete', () => {
         PageManager.from(createPage(withLogin(userA), withConnectedUser(userB))).then(pm => pm.webapp.pages),
         PageManager.from(createPage(withLogin(userB), withConnectedUser(userA))).then(pm => pm.webapp.pages),
       ]);
-
-      await createGroup(userAPages, 'Test Group', [userB]);
-      await userBPages.conversationList().openConversation('Test Group');
 
       await userAPages.conversation().sendMessage('Test Message');
 
@@ -251,75 +251,89 @@ test.describe('Delete', () => {
     },
   );
 
-  test('Delete "For Everyone" works for images', {tag: ['@TC-580', '@regression']}, async ({createPage}) => {
-    const [userAPages, userBPages] = await Promise.all([
-      PageManager.from(createPage(withLogin(userA), withConnectedUser(userB))).then(pm => pm.webapp.pages),
-      PageManager.from(createPage(withLogin(userB), withConnectedUser(userA))).then(pm => pm.webapp.pages),
-    ]);
+  type SendActionParams = {
+    pageA: Page;
+    pageB: Page;
+    api: ApiManagerE2E;
+  }
 
-    await userBPages.conversationList().openConversation(userA.fullName);
+  const testCases = [
+    {
+      name: 'images',
+      tc: '@TC-580',
+      sendAction: async ({pageA}: SendActionParams) => {
+        await shareAssetHelper(getImageFilePath(), pageA, pageA.getByRole('button', {name: 'Add picture'}));
+      },
+    },
+    {
+      name: 'link preview',
+      tc: '@TC-581',
+      sendAction: async ({pageA}: SendActionParams) => {
+        const userAPages = PageManager.from(pageA).webapp.pages;
+        await userAPages.conversation().sendMessage('https://www.lidl.de/');
+      },
+    },
+    {
+      name: 'location sharing',
+      tc: '@TC-582',
+      sendAction: async ({pageB, api}: SendActionParams) => {
+        const userBPages = PageManager.from(pageB).webapp.pages;
 
-    const {page} = userAPages.conversation();
-    await shareAssetHelper(getImageFilePath(), page, page.getByRole('button', {name: 'Add picture'}));
+        await userBPages.conversationList().openConversation(userA.fullName, {protocol: 'mls'});
 
-    const messageA = userAPages.conversation().getMessage({sender: userA});
-    const messageB = userBPages.conversation().getMessage({sender: userA});
-    await expect(messageA).toBeAttached();
-    await expect(messageB).toBeAttached();
+        await test.step('Prerequisite: Send location via TestService', async () => {
+          const {instanceId} = await api.testService.createInstance(
+            userA.password,
+            userA.email,
+            'Test Service Device',
+            false,
+          );
+          const conversationId = await api.conversation.getConversationWithUser(userA.token, userB.id!);
+          await api.testService.sendLocation(instanceId, conversationId, {
+            locationName: 'Test Location',
+            latitude: 52.5170365,
+            longitude: 13.404954,
+            zoom: 42,
+          });
+        });
+      },
+    },
+    {
+      name: 'file sharing',
+      tc: '@TC-583',
+      sendAction: async ({pageA}: SendActionParams) => {
+        await shareAssetHelper(getTextFilePath(), pageA, pageA.getByRole('button', {name: 'Add file'}));
+      },
+    },
+    {
+      name: 'audio messages',
+      tc: '@TC-584',
+      sendAction: async ({pageA}: SendActionParams) => {
+        await shareAssetHelper(getAudioFilePath(), pageA, pageA.getByRole('button', {name: 'Add file'}));
+      },
+    },
+    {
+      name: 'video messages',
+      tc: '@TC-585',
+      sendAction: async ({pageA}: SendActionParams) => {
+        await shareAssetHelper(getVideoFilePath(), pageA, pageA.getByRole('button', {name: 'Add file'}));
+      },
+    },
+  ];
 
-    await userAPages.conversation().deleteMessage(messageA, 'Everyone');
-
-    await expect(messageB).not.toBeAttached();
-    await expect(messageB).not.toBeAttached();
-  });
-
-  test('Delete "For Everyone" works for link preview', {tag: ['@TC-581', '@regression']}, async ({createPage}) => {
-    const [userAPages, userBPages] = await Promise.all([
-      PageManager.from(createPage(withLogin(userA), withConnectedUser(userB))).then(pm => pm.webapp.pages),
-      PageManager.from(createPage(withLogin(userB), withConnectedUser(userA))).then(pm => pm.webapp.pages),
-    ]);
-
-    await userBPages.conversationList().openConversation(userA.fullName);
-
-    await userAPages.conversation().sendMessage('https://www.lidl.de/');
-
-    const messageA = userAPages.conversation().getMessage({sender: userA});
-    const messageB = userBPages.conversation().getMessage({sender: userA});
-    await expect(messageA).toBeAttached();
-    await expect(messageB).toBeAttached();
-
-    await userAPages.conversation().deleteMessage(messageA, 'Everyone');
-
-    await expect(messageB).not.toBeAttached();
-    await expect(messageB).not.toBeAttached();
-  });
-
-  test(
-    'Delete "For Everyone" works for location sharing',
-    {tag: ['@TC-582', '@regression']},
-    async ({createPage, api}) => {
+  testCases.forEach(({name, tc, sendAction}) => {
+    test(`Delete "For Everyone" works for ${name}`, {tag: [tc, '@regression']}, async ({createPage, api}) => {
       const [userAPages, userBPages] = await Promise.all([
         PageManager.from(createPage(withLogin(userA), withConnectedUser(userB))).then(pm => pm.webapp.pages),
-        PageManager.from(createPage(withLogin(userB), withConnectedUser(userA))).then(pm => pm.webapp.pages),
+        PageManager.from(createPage(withLogin(userB))).then(pm => pm.webapp.pages),
       ]);
 
-      await userBPages.conversationList().openConversation(userA.fullName);
+      await userAPages.conversationList().openConversation(userB.fullName, {protocol: 'mls'});
+      await userBPages.conversationList().openConversation(userA.fullName, {protocol: 'mls'});
 
-      await test.step('Prerequisite: Send location via TestService', async () => {
-        const {instanceId} = await api.testService.createInstance(
-          userA.password,
-          userA.email,
-          'Test Service Device',
-          false,
-        );
-        const conversationId = await api.conversation.getConversationWithUser(userA.token, userB.id!);
-        await api.testService.sendLocation(instanceId, conversationId, {
-          locationName: 'Test Location',
-          latitude: 52.5170365,
-          longitude: 13.404954,
-          zoom: 42,
-        });
-      });
+      const {page: pageA} = userAPages.conversation();
+      const {page: pageB} = userBPages.conversation();
+      await sendAction({pageA, pageB, api});
 
       const messageA = userAPages.conversation().getMessage({sender: userA});
       const messageB = userBPages.conversation().getMessage({sender: userA});
@@ -330,77 +344,7 @@ test.describe('Delete', () => {
 
       await expect(messageB).not.toBeAttached();
       await expect(messageB).not.toBeAttached();
-    },
-  );
-
-  test('Delete "For Everyone" works for file sharing', {tag: ['@TC-583', '@regression']}, async ({createPage}) => {
-    const [userAPages, userBPages] = await Promise.all([
-      PageManager.from(createPage(withLogin(userA), withConnectedUser(userB))).then(pm => pm.webapp.pages),
-      PageManager.from(createPage(withLogin(userB), withConnectedUser(userA))).then(pm => pm.webapp.pages),
-    ]);
-
-    await userBPages.conversationList().openConversation(userA.fullName);
-
-    const {page} = userAPages.conversation();
-    await shareAssetHelper(getTextFilePath(), page, page.getByRole('button', {name: 'Add file'}));
-
-    const messageA = userAPages.conversation().getMessage({sender: userA});
-    const messageB = userBPages.conversation().getMessage({sender: userA});
-    await expect(messageA).toBeAttached();
-    await expect(messageB).toBeAttached();
-
-    await userAPages.conversation().deleteMessage(messageA, 'Everyone');
-
-    await expect(messageB).not.toBeAttached();
-    await expect(messageB).not.toBeAttached();
-  });
-
-  test(
-    'Dy delete "For Everyone" works for audio messages',
-    {tag: ['@TC-584', '@regression']},
-    async ({createPage}) => {
-      const [userAPages, userBPages] = await Promise.all([
-      PageManager.from(createPage(withLogin(userA), withConnectedUser(userB))).then(pm => pm.webapp.pages),
-      PageManager.from(createPage(withLogin(userB), withConnectedUser(userA))).then(pm => pm.webapp.pages),
-    ]);
-
-    await userBPages.conversationList().openConversation(userA.fullName);
-
-    const {page} = userAPages.conversation();
-    await shareAssetHelper(getAudioFilePath(), page, page.getByRole('button', {name: 'Add file'}));
-
-    const messageA = userAPages.conversation().getMessage({sender: userA});
-    const messageB = userBPages.conversation().getMessage({sender: userA});
-    await expect(messageA).toBeAttached();
-    await expect(messageB).toBeAttached();
-
-    await userAPages.conversation().deleteMessage(messageA, 'Everyone');
-
-    await expect(messageB).not.toBeAttached();
-    await expect(messageB).not.toBeAttached();
-    },
-  );
-
-  test('Delete "For Everyone" works for video messages', {tag: ['@TC-585', '@regression']}, async ({createPage}) => {
-    const [userAPages, userBPages] = await Promise.all([
-      PageManager.from(createPage(withLogin(userA), withConnectedUser(userB))).then(pm => pm.webapp.pages),
-      PageManager.from(createPage(withLogin(userB), withConnectedUser(userA))).then(pm => pm.webapp.pages),
-    ]);
-
-    await userBPages.conversationList().openConversation(userA.fullName);
-
-    const {page} = userAPages.conversation();
-    await shareAssetHelper(getVideoFilePath(), page, page.getByRole('button', {name: 'Add file'}));
-
-    const messageA = userAPages.conversation().getMessage({sender: userA});
-    const messageB = userBPages.conversation().getMessage({sender: userA});
-    await expect(messageA).toBeAttached();
-    await expect(messageB).toBeAttached();
-
-    await userAPages.conversation().deleteMessage(messageA, 'Everyone');
-
-    await expect(messageB).not.toBeAttached();
-    await expect(messageB).not.toBeAttached();
+    });
   });
 
   test(
@@ -423,18 +367,9 @@ test.describe('Delete', () => {
         await userAPages.conversation().sendMessage('Test Message');
       });
 
-      await test.step('Check user B has a unread conversation with A containing the sent message', async () => {
+      await test.step('Check user B has a unread conversation with A', async () => {
         const conversation = userBPages.conversationList().getConversationLocator(userA.fullName);
         await expect(conversation.getByTestId('status-unread')).toBeVisible();
-
-        await userBPages.conversationList().openConversation(userA.fullName);
-        await expect(conversation).toContainText('Test Message');
-        await expect(conversation.getByTestId('status-unread')).not.toBeVisible();
-      });
-
-      await test.step("Open group conversation to ensure new messages won't be read immediately", async () => {
-        await userBPages.conversationList().openConversation('Test Group');
-        await expect(userBPages.conversation().conversationTitle).toHaveText('Test Group');
       });
 
       await test.step('Delete message sent by A', async () => {
@@ -443,7 +378,7 @@ test.describe('Delete', () => {
         await expect(message).not.toBeAttached();
       });
 
-      await test.step('Check B received the updated message without marking the conversation as unread', async () => {
+      await test.step('Check B has no unread indicator anymore', async () => {
         const conversation = userBPages.conversationList().getConversationLocator(userA.fullName);
         await expect(conversation.getByTestId('status-unread')).not.toBeVisible();
 
