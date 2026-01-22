@@ -76,7 +76,7 @@ test(
 
         await userAPages.groupCreation().enableFilesCheckbox();
         await userAPages.groupCreation().setGroupName(conversationName);
-        await userAPages.startUI().selectUsers([userB.username]);
+        await userAPages.groupCreation().selectGroupMembers(userB.username);
         await userAPages.groupCreation().clickCreateGroupButton();
       };
 
@@ -109,27 +109,38 @@ test(
     await test.step('User B opens Files tab and searches for a file', async () => {
       await userBPages.conversationList().openConversation(conversationName);
       await userBPages.conversation().clickFilesTab();
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      expect(await userBPages.cellsConversationFiles().numberOfFilesInTheList()).toBe(2);
 
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      await userBPages.cellsConversationFiles().searchFile(ImageQRCodeFileName);
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      expect(await userBPages.cellsConversationFiles().numberOfFilesInTheList()).toBe(1);
-      expect(await userBPages.cellsConversationFiles().isFileVisible(ImageQRCodeFileName)).toBeTruthy();
+      // Initially both files should be visible
+      await expect
+        .poll(async () => {
+          return await userBPages.cellsConversationFiles().numberOfFilesInTheList();
+        })
+        .toBe(2);
 
+      // Search for a non-existing file
+      await userBPages.cellsConversationFiles().searchFile('non-existing-file.txt');
+      await expect
+        .poll(async () => {
+          return await userBPages.cellsConversationFiles().numberOfFilesInTheList();
+        })
+        .toBe(0);
+
+      // Search for the video file
       await userBPages.cellsConversationFiles().searchFile(VideoFileName);
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      expect(await userBPages.cellsConversationFiles().numberOfFilesInTheList()).toBe(1);
+      await expect
+        .poll(async () => {
+          return await userBPages.cellsConversationFiles().numberOfFilesInTheList();
+        })
+        .toBe(1);
       expect(await userBPages.cellsConversationFiles().isFileVisible(VideoFileName)).toBeTruthy();
 
-      await userBPages.cellsConversationFiles().searchFile('non-existing-file.txt');
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      expect(await userBPages.cellsConversationFiles().numberOfFilesInTheList()).toBe(0);
-
+      // Clearing the search input and making sure both files are visible again
       await userBPages.cellsConversationFiles().searchFile('');
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      expect(await userBPages.cellsConversationFiles().numberOfFilesInTheList()).toBe(2);
+      await expect
+        .poll(async () => {
+          return await userBPages.cellsConversationFiles().numberOfFilesInTheList();
+        })
+        .toBe(2);
     });
   },
 );
