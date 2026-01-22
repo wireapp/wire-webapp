@@ -17,22 +17,16 @@
  *
  */
 
-import {getUser} from 'test/e2e_tests/data/user';
+import {User} from 'test/e2e_tests/data/user';
 import {PageManager} from 'test/e2e_tests/pageManager';
-import {getImageFilePath, ImageQRCodeFileName} from 'test/e2e_tests/utils/sendImage.util';
-import {addCreatedTeam, removeCreatedTeam} from 'test/e2e_tests/utils/tearDown.util';
-import {inviteMembers, loginUser} from 'test/e2e_tests/utils/userActions';
+import {getImageFilePath} from 'test/e2e_tests/utils/sendImage.util';
 
-import {test, expect} from '../../../test.fixtures';
+import {test, expect, withLogin} from '../../../test.fixtures';
 import {getVideoFilePath, VideoFileName} from 'test/e2e_tests/utils/asset.util';
 
 // User A is a team owner, User B is a team member
-let userA = getUser();
-userA.firstName = 'integrationtest';
-userA.lastName = 'integrationtest';
-userA.fullName = 'integrationtest';
-
-const userB = getUser();
+let userA: User;
+let userB: User;
 
 const teamName = 'Cells Critical Team';
 const conversationName = 'Cells Critical Conversation';
@@ -40,65 +34,41 @@ const conversationName = 'Cells Critical Conversation';
 const imageFilePath = getImageFilePath();
 const videoFilePath = getVideoFilePath();
 
+test.beforeEach(async ({createTeam}) => {
+  const team = await createTeam(teamName, {withMembers: 1, disableTelemetry: true});
+  userA = team.owner;
+  userB = team.members[0];
+});
+
 test(
   'Searching files in a group conversation',
   {tag: ['@crit-flow-cells', '@regression', '@TC-8788']},
-  async ({pageManager: userAPageManager, browser, api}) => {
-    const {pages: userAPages, modals: userAModals, components: userAComponents} = userAPageManager.webapp;
+  async ({createPage, api}) => {
+    const [userAPage, userBPage] = await Promise.all([createPage(withLogin(userA)), createPage(withLogin(userB))]);
 
-    const userBContext = await browser.newContext();
-    const userBPage = await userBContext.newPage();
-    const userBPageManager = new PageManager(userBPage);
-
-    const {pages: userBPages, modals: userBModals} = userBPageManager.webapp;
+    const {pages: userAPages, components: userAComponents} = PageManager.from(userAPage).webapp;
+    const userBPages = PageManager.from(userBPage).webapp.pages;
 
     await test.step('Preconditions: Creating preconditions for the test via API', async () => {
-      await api.createTeamOwner(userA, teamName).then(user => {
-        userA = {...userA, ...user};
-      });
-      addCreatedTeam(userA, userA.teamId);
-      await inviteMembers([userB], userA, api);
-
       await api.brig.unlockCellsFeature(userA.teamId);
       await api.brig.enableCells(userA.teamId);
     });
 
     await test.step('Preconditions: Both users log in and open the group', async () => {
-      const loginOwner = async () => {
-        await userAPageManager.openMainPage();
-        await loginUser(userA, userAPageManager);
-        if (process.env.ENV_NAME === 'staging') {
-          await userAModals.dataShareConsent().clickDecline();
-        }
-        await userAPages.conversationList().clickCreateGroup();
-        // Files should be disabled by default
-        expect(await userAPages.groupCreation().isFilesCheckboxChecked()).toBeFalsy();
+      await userAPages.conversationList().clickCreateGroup();
+      // Files should be disabled by default
+      expect(await userAPages.groupCreation().isFilesCheckboxChecked()).toBeFalsy();
 
-        await userAPages.groupCreation().enableFilesCheckbox();
-        await userAPages.groupCreation().setGroupName(conversationName);
-        await userAPages.groupCreation().selectGroupMembers(userB.username);
-        await userAPages.groupCreation().clickCreateGroupButton();
-      };
-
-      const loginMember = async () => {
-        await userBPageManager.openMainPage();
-        await loginUser(userB, userBPageManager);
-        if (process.env.ENV_NAME === 'staging') {
-          await userBModals.dataShareConsent().clickDecline();
-        }
-      };
-
-      await Promise.all([loginOwner(), loginMember()]);
-
-      // Wait for some time before uploading the file to make sure the cell is ready
-      await new Promise(resolve => setTimeout(resolve, 5000));
+      await userAPages.groupCreation().enableFilesCheckbox();
+      await userAPages.groupCreation().setGroupName(conversationName);
+      await userAPages.groupCreation().selectGroupMembers(userB.username);
+      await userAPages.groupCreation().clickCreateGroupButton();
     });
 
     await test.step('User A sends a message with assets in a group conversation', async () => {
       await userAPages.conversationList().openConversation(conversationName);
       await userAComponents.inputBarControls().clickShareFile(imageFilePath);
       await userAComponents.inputBarControls().clickShareFile(videoFilePath);
-      await userAPageManager.page.waitForLoadState('networkidle');
       await userAComponents.inputBarControls().clickSendMessage();
       await userBPages.conversationList().openConversation(conversationName);
 
@@ -111,40 +81,20 @@ test(
       await userBPages.conversation().clickFilesTab();
 
       // Initially both files should be visible
-      await expect
-        .poll(async () => {
-          return await userBPages.cellsConversationFiles().numberOfFilesInTheList();
-        })
-        .toBe(2);
+      await expect(userBPages.cellsConversationFiles().filesList).toHaveCount(2);
 
       // Search for a non-existing file
       await userBPages.cellsConversationFiles().searchFile('non-existing-file.txt');
-      await expect
-        .poll(async () => {
-          return await userBPages.cellsConversationFiles().numberOfFilesInTheList();
-        })
-        .toBe(0);
+      await expect(userBPages.cellsConversationFiles().filesList).toHaveCount(0);
 
       // Search for the video file
       await userBPages.cellsConversationFiles().searchFile(VideoFileName);
-      await expect
-        .poll(async () => {
-          return await userBPages.cellsConversationFiles().numberOfFilesInTheList();
-        })
-        .toBe(1);
-      expect(await userBPages.cellsConversationFiles().isFileVisible(VideoFileName)).toBeTruthy();
+      await expect(userBPages.cellsConversationFiles().filesList).toHaveCount(1);
+      expect(await userBPages.cellsConversationFiles().getFile(VideoFileName)).toBeVisible();
 
       // Clearing the search input and making sure both files are visible again
       await userBPages.cellsConversationFiles().searchFile('');
-      await expect
-        .poll(async () => {
-          return await userBPages.cellsConversationFiles().numberOfFilesInTheList();
-        })
-        .toBe(2);
+      await expect(userBPages.cellsConversationFiles().filesList).toHaveCount(2);
     });
   },
 );
-
-test.afterAll(async ({api}) => {
-  await removeCreatedTeam(api, userA);
-});

@@ -22,7 +22,7 @@ import {selectByDataAttribute} from 'test/e2e_tests/utils/selector.util';
 
 export class CellsConversationFilesPage {
   readonly page: Page;
-  readonly filesList: Locator;
+  filesList: Locator;
   readonly searchInput: Locator;
 
   constructor(page: Page) {
@@ -31,21 +31,11 @@ export class CellsConversationFilesPage {
     this.searchInput = page.locator(selectByDataAttribute('full-search-header-input'));
   }
 
-  async clickFile(fileName: string) {
-    const file = this.filesList.getByRole('button', {name: fileName});
-    await file.click();
-  }
-
   async searchFile(fileName: string) {
     await this.searchInput.fill(fileName);
   }
 
-  async isFileVisible(fileName: string) {
-    const file = this.filesList.getByRole('button', {name: fileName});
-    return await file.isVisible();
-  }
-
-  async numberOfFilesInTheList() {
-    return await this.filesList.count();
+  async getFile(fileName: string) {
+    return this.filesList.getByRole('button', {name: fileName});
   }
 }
