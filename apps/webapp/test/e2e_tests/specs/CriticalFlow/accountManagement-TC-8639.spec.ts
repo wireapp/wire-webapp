@@ -55,7 +55,7 @@ test('Account Management', {tag: ['@TC-8639', '@crit-flow-web']}, async ({create
   await components.conversationSidebar().clickPreferencesButton();
 
   await test.step('Member changes their email address to a new email address', async () => {
-    const newEmail = generateWireEmail(user.lastName);
+    const newEmail = generateWireEmail(user.firstName, user.lastName);
     await pages.account().changeEmailAddress(newEmail);
     await modals.acknowledge().clickAction(); // Acknowledge verify email address modal
 
