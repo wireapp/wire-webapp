@@ -77,7 +77,6 @@ test(
     });
 
     await test.step('User B opens Files tab and searches for a file', async () => {
-      await userBPages.conversationList().openConversation(conversationName);
       await userBPages.conversation().clickFilesTab();
 
       // Initially both files should be visible
