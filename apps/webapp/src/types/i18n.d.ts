@@ -399,7 +399,7 @@ declare module 'I18n/en-US.json' {
     'cells.filtersModal.tags.placeholder': `Select a tag`;
     'cells.filtersModal.title': `Filters`;
     'cells.folderBreadcrumbCombained': `Show more`;
-    'cells.heading': `All files`;
+    'cells.heading': `Files`;
     'cells.imageFullScreenModal.closeButton': `Close`;
     'cells.imageFullScreenModal.downloadButton': `Download`;
     'cells.modal.closeButton': `Close`;
