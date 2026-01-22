@@ -58,6 +58,6 @@ export class CellsConversationPage extends ConversationPage {
     // Wait for at least one matching element to appear
     await locator.first().waitFor({state: 'visible'});
 
-    return await locator.isVisible();
+    return await locator.first().isVisible();
   }
 }
