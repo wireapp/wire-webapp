@@ -52,7 +52,7 @@ export class CellsConversationPage extends ConversationPage {
   }
 
   async isVideoFromUserVisible(user: User) {
-    // Trying multiple times for the image to appear
+    // Trying multiple times for the video element to appear
     const locator = this.getVideoLocator(user);
 
     // Wait for at least one matching element to appear (optional timeout can be set)
