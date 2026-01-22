@@ -32,18 +32,10 @@ jest.mock('src/script/Config', () => ({
   },
 }));
 
-const mockSetPublicLink = jest.fn();
-let mockNodes: CellNode[] = [];
-
-jest.mock('../../../common/useCellsStore/useCellsStore', () => ({
-  useCellsStore: () => ({
-    nodes: mockNodes,
-    setPublicLink: mockSetPublicLink,
-  }),
-}));
-
 describe('useCellPublicLink', () => {
   let mockCellsRepository: jest.Mocked<CellsRepository>;
+  let mockNode: CellNode | undefined;
+  const mockSetPublicLink = jest.fn();
 
   const createMockNode = (overrides: Partial<CellNode> = {}): CellNode => ({
     id: 'test-uuid',
@@ -62,6 +54,40 @@ describe('useCellPublicLink', () => {
     ...overrides,
   });
 
+  const renderPublicLinkHook = (options?: {
+    node?: CellNode;
+    refreshLinkDataAfterUpdate?: boolean;
+    setStatusOnPublicLinkUrl?: boolean;
+  }) => {
+    const initialProps = {
+      node: options?.node ?? mockNode,
+      refreshLinkDataAfterUpdate: options?.refreshLinkDataAfterUpdate ?? false,
+      setStatusOnPublicLinkUrl: options?.setStatusOnPublicLinkUrl ?? false,
+    };
+
+    const hook = renderHook(
+      ({node, refreshLinkDataAfterUpdate, setStatusOnPublicLinkUrl}) =>
+        useCellPublicLink({
+          uuid: 'test-uuid',
+          node,
+          cellsRepository: mockCellsRepository,
+          setPublicLink: mockSetPublicLink,
+          refreshLinkDataAfterUpdate,
+          setStatusOnPublicLinkUrl,
+        }),
+      {initialProps},
+    );
+
+    const rerenderWith = (props: Partial<typeof initialProps>) =>
+      hook.rerender({
+        node: props.node ?? initialProps.node,
+        refreshLinkDataAfterUpdate: props.refreshLinkDataAfterUpdate ?? initialProps.refreshLinkDataAfterUpdate,
+        setStatusOnPublicLinkUrl: props.setStatusOnPublicLinkUrl ?? initialProps.setStatusOnPublicLinkUrl,
+      });
+
+    return {...hook, rerenderWith};
+  };
+
   beforeEach(() => {
     jest.clearAllMocks();
 
@@ -72,7 +98,7 @@ describe('useCellPublicLink', () => {
       updatePublicLink: jest.fn(),
     } as unknown as jest.Mocked<CellsRepository>;
 
-    mockNodes = [createMockNode()];
+    mockNode = createMockNode();
   });
 
   describe('should create a public link when toggle is enabled', () => {
@@ -82,12 +108,7 @@ describe('useCellPublicLink', () => {
         LinkUrl: '/public/test-link',
       });
 
-      const {result} = renderHook(() =>
-        useCellPublicLink({
-          uuid: 'test-uuid',
-          cellsRepository: mockCellsRepository,
-        }),
-      );
+      const {result} = renderPublicLinkHook();
 
       expect(result.current.isEnabled).toBe(false);
       expect(result.current.status).toBe('idle');
@@ -110,7 +131,7 @@ describe('useCellPublicLink', () => {
         },
       });
 
-      expect(mockSetPublicLink).toHaveBeenCalledWith('test-uuid', {
+      expect(mockSetPublicLink).toHaveBeenCalledWith({
         uuid: 'new-link-uuid',
         url: 'https://cells.example.com/public/test-link',
         alreadyShared: true,
@@ -120,24 +141,17 @@ describe('useCellPublicLink', () => {
 
   describe('should delete a public link when toggle is disabled', () => {
     it('deletes an existing public link when toggled off', async () => {
-      mockNodes = [
-        createMockNode({
-          publicLink: {
-            alreadyShared: true,
-            uuid: 'existing-link-uuid',
-            url: 'https://cells.example.com/public/existing-link',
-          },
-        }),
-      ];
+      mockNode = createMockNode({
+        publicLink: {
+          alreadyShared: true,
+          uuid: 'existing-link-uuid',
+          url: 'https://cells.example.com/public/existing-link',
+        },
+      });
 
       mockCellsRepository.deletePublicLink.mockResolvedValue({});
 
-      const {result} = renderHook(() =>
-        useCellPublicLink({
-          uuid: 'test-uuid',
-          cellsRepository: mockCellsRepository,
-        }),
-      );
+      const {result} = renderPublicLinkHook({node: mockNode});
 
       expect(result.current.isEnabled).toBe(true);
 
@@ -153,14 +167,12 @@ describe('useCellPublicLink', () => {
         });
       });
 
-      expect(mockSetPublicLink).toHaveBeenCalledWith('test-uuid', undefined);
+      expect(mockSetPublicLink).toHaveBeenCalledWith(undefined);
     });
   });
 
   describe('should delete a newly created link when toggle is immediately disabled', () => {
     it('uses createdLinkUuid ref to delete link when state has not propagated yet', async () => {
-      mockNodes = [createMockNode()];
-
       mockCellsRepository.createPublicLink.mockResolvedValue({
         Uuid: 'newly-created-uuid',
         LinkUrl: '/public/new-link',
@@ -168,12 +180,7 @@ describe('useCellPublicLink', () => {
 
       mockCellsRepository.deletePublicLink.mockResolvedValue({});
 
-      const {result} = renderHook(() =>
-        useCellPublicLink({
-          uuid: 'test-uuid',
-          cellsRepository: mockCellsRepository,
-        }),
-      );
+      const {result, rerenderWith} = renderPublicLinkHook();
 
       expect(result.current.isEnabled).toBe(false);
 
@@ -191,15 +198,15 @@ describe('useCellPublicLink', () => {
         expect(result.current.status).toBe('success');
       });
 
-      mockNodes = [
-        createMockNode({
-          publicLink: {
-            alreadyShared: true,
-            uuid: 'newly-created-uuid',
-            url: 'https://cells.example.com/public/new-link',
-          },
-        }),
-      ];
+      mockNode = createMockNode({
+        publicLink: {
+          alreadyShared: true,
+          uuid: 'newly-created-uuid',
+          url: 'https://cells.example.com/public/new-link',
+        },
+      });
+
+      rerenderWith({node: mockNode});
 
       act(() => {
         result.current.togglePublicLink();
@@ -213,72 +220,17 @@ describe('useCellPublicLink', () => {
         });
       });
     });
-
-    it('handles rapid toggle on/off using createdLinkUuid ref when node state is stale', async () => {
-      mockNodes = [createMockNode()];
-
-      let createResolve: (value: {Uuid: string; LinkUrl: string}) => void;
-      const createPromise = new Promise<{Uuid: string; LinkUrl: string}>(resolve => {
-        createResolve = resolve;
-      });
-
-      mockCellsRepository.createPublicLink.mockReturnValue(createPromise);
-      mockCellsRepository.deletePublicLink.mockResolvedValue({});
-
-      const {result} = renderHook(() =>
-        useCellPublicLink({
-          uuid: 'test-uuid',
-          cellsRepository: mockCellsRepository,
-        }),
-      );
-
-      act(() => {
-        result.current.togglePublicLink();
-      });
-
-      expect(mockCellsRepository.createPublicLink).toHaveBeenCalled();
-
-      await act(async () => {
-        createResolve!({Uuid: 'rapid-toggle-uuid', LinkUrl: '/public/rapid-link'});
-      });
-
-      await waitFor(() => {
-        expect(result.current.status).toBe('success');
-      });
-
-      mockNodes = [
-        createMockNode({
-          publicLink: {
-            alreadyShared: true,
-            uuid: 'rapid-toggle-uuid',
-            url: 'https://cells.example.com/public/rapid-link',
-          },
-        }),
-      ];
-
-      act(() => {
-        result.current.togglePublicLink();
-      });
-
-      await waitFor(() => {
-        expect(mockCellsRepository.deletePublicLink).toHaveBeenCalledWith({
-          uuid: 'rapid-toggle-uuid',
-        });
-      });
-    });
   });
 
   describe('should delete the newly created link UUID when disabling after re-enabling an already shared file', () => {
     it('uses the new link UUID from re-enable when deleting, not the original stale UUID', async () => {
-      mockNodes = [
-        createMockNode({
-          publicLink: {
-            alreadyShared: true,
-            uuid: 'old-link-uuid',
-            url: 'https://cells.example.com/public/old-link',
-          },
-        }),
-      ];
+      mockNode = createMockNode({
+        publicLink: {
+          alreadyShared: true,
+          uuid: 'old-link-uuid',
+          url: 'https://cells.example.com/public/old-link',
+        },
+      });
 
       mockCellsRepository.deletePublicLink.mockResolvedValue({});
       mockCellsRepository.createPublicLink.mockResolvedValue({
@@ -290,12 +242,7 @@ describe('useCellPublicLink', () => {
         LinkUrl: '/public/old-link',
       });
 
-      const {result} = renderHook(() =>
-        useCellPublicLink({
-          uuid: 'test-uuid',
-          cellsRepository: mockCellsRepository,
-        }),
-      );
+      const {result, rerenderWith} = renderPublicLinkHook({node: mockNode});
 
       expect(result.current.isEnabled).toBe(true);
 
@@ -315,8 +262,9 @@ describe('useCellPublicLink', () => {
         });
       });
 
-      mockNodes = [createMockNode()];
+      mockNode = createMockNode();
 
+      rerenderWith({node: mockNode});
       mockCellsRepository.deletePublicLink.mockClear();
 
       act(() => {
@@ -333,15 +281,15 @@ describe('useCellPublicLink', () => {
         expect(result.current.status).toBe('success');
       });
 
-      mockNodes = [
-        createMockNode({
-          publicLink: {
-            alreadyShared: true,
-            uuid: 'new-link-uuid',
-            url: 'https://cells.example.com/public/new-link',
-          },
-        }),
-      ];
+      mockNode = createMockNode({
+        publicLink: {
+          alreadyShared: true,
+          uuid: 'new-link-uuid',
+          url: 'https://cells.example.com/public/new-link',
+        },
+      });
+
+      rerenderWith({node: mockNode});
 
       act(() => {
         result.current.togglePublicLink();
@@ -363,15 +311,13 @@ describe('useCellPublicLink', () => {
 
   describe('should fetch existing link data when toggle is enabled on already shared node', () => {
     it('fetches existing link data instead of creating a new one', async () => {
-      mockNodes = [
-        createMockNode({
-          publicLink: {
-            alreadyShared: true,
-            uuid: 'existing-link-uuid',
-            url: 'https://cells.example.com/public/existing-link',
-          },
-        }),
-      ];
+      mockNode = createMockNode({
+        publicLink: {
+          alreadyShared: true,
+          uuid: 'existing-link-uuid',
+          url: 'https://cells.example.com/public/existing-link',
+        },
+      });
 
       mockCellsRepository.getPublicLink.mockResolvedValue({
         Uuid: 'existing-link-uuid',
@@ -379,12 +325,7 @@ describe('useCellPublicLink', () => {
         Label: 'test-file.pdf',
       });
 
-      const {result} = renderHook(() =>
-        useCellPublicLink({
-          uuid: 'test-uuid',
-          cellsRepository: mockCellsRepository,
-        }),
-      );
+      const {result} = renderPublicLinkHook({node: mockNode});
 
       expect(result.current.isEnabled).toBe(true);
 
@@ -408,27 +349,20 @@ describe('useCellPublicLink', () => {
     });
 
     it('does not re-fetch if link was already fetched', async () => {
-      mockNodes = [
-        createMockNode({
-          publicLink: {
-            alreadyShared: true,
-            uuid: 'existing-link-uuid',
-            url: 'https://cells.example.com/public/existing-link',
-          },
-        }),
-      ];
+      mockNode = createMockNode({
+        publicLink: {
+          alreadyShared: true,
+          uuid: 'existing-link-uuid',
+          url: 'https://cells.example.com/public/existing-link',
+        },
+      });
 
       mockCellsRepository.getPublicLink.mockResolvedValue({
         Uuid: 'existing-link-uuid',
         LinkUrl: '/public/existing-link',
       });
 
-      const {result, rerender} = renderHook(() =>
-        useCellPublicLink({
-          uuid: 'test-uuid',
-          cellsRepository: mockCellsRepository,
-        }),
-      );
+      const {result, rerenderWith} = renderPublicLinkHook({node: mockNode});
 
       await waitFor(() => {
         expect(result.current.status).toBe('success');
@@ -436,7 +370,7 @@ describe('useCellPublicLink', () => {
 
       expect(mockCellsRepository.getPublicLink).toHaveBeenCalledTimes(1);
 
-      rerender();
+      rerenderWith({node: mockNode});
 
       expect(mockCellsRepository.getPublicLink).toHaveBeenCalledTimes(1);
     });
@@ -444,16 +378,9 @@ describe('useCellPublicLink', () => {
 
   describe('should handle errors during link creation', () => {
     it('sets error status when createPublicLink fails', async () => {
-      mockNodes = [createMockNode()];
-
       mockCellsRepository.createPublicLink.mockRejectedValue(new Error('Network error'));
 
-      const {result} = renderHook(() =>
-        useCellPublicLink({
-          uuid: 'test-uuid',
-          cellsRepository: mockCellsRepository,
-        }),
-      );
+      const {result} = renderPublicLinkHook();
 
       act(() => {
         result.current.togglePublicLink();
@@ -463,23 +390,16 @@ describe('useCellPublicLink', () => {
         expect(result.current.status).toBe('error');
       });
 
-      expect(mockSetPublicLink).toHaveBeenCalledWith('test-uuid', undefined);
+      expect(mockSetPublicLink).toHaveBeenCalledWith(undefined);
     });
 
     it('sets error status when link response is missing required fields', async () => {
-      mockNodes = [createMockNode()];
-
       mockCellsRepository.createPublicLink.mockResolvedValue({
         Uuid: undefined,
         LinkUrl: undefined,
       } as any);
 
-      const {result} = renderHook(() =>
-        useCellPublicLink({
-          uuid: 'test-uuid',
-          cellsRepository: mockCellsRepository,
-        }),
-      );
+      const {result} = renderPublicLinkHook();
 
       act(() => {
         result.current.togglePublicLink();
@@ -489,30 +409,23 @@ describe('useCellPublicLink', () => {
         expect(result.current.status).toBe('error');
       });
 
-      expect(mockSetPublicLink).toHaveBeenCalledWith('test-uuid', undefined);
+      expect(mockSetPublicLink).toHaveBeenCalledWith(undefined);
     });
   });
 
   describe('should handle errors during link deletion', () => {
     it('sets error status when deletePublicLink fails', async () => {
-      mockNodes = [
-        createMockNode({
-          publicLink: {
-            alreadyShared: true,
-            uuid: 'existing-link-uuid',
-            url: 'https://cells.example.com/public/existing-link',
-          },
-        }),
-      ];
+      mockNode = createMockNode({
+        publicLink: {
+          alreadyShared: true,
+          uuid: 'existing-link-uuid',
+          url: 'https://cells.example.com/public/existing-link',
+        },
+      });
 
       mockCellsRepository.deletePublicLink.mockRejectedValue(new Error('Delete failed'));
 
-      const {result} = renderHook(() =>
-        useCellPublicLink({
-          uuid: 'test-uuid',
-          cellsRepository: mockCellsRepository,
-        }),
-      );
+      const {result} = renderPublicLinkHook({node: mockNode});
 
       expect(result.current.isEnabled).toBe(true);
 
@@ -528,15 +441,13 @@ describe('useCellPublicLink', () => {
 
   describe('updatePublicLink', () => {
     it('updates public link with password and access end', async () => {
-      mockNodes = [
-        createMockNode({
-          publicLink: {
-            alreadyShared: true,
-            uuid: 'existing-link-uuid',
-            url: 'https://cells.example.com/public/existing-link',
-          },
-        }),
-      ];
+      mockNode = createMockNode({
+        publicLink: {
+          alreadyShared: true,
+          uuid: 'existing-link-uuid',
+          url: 'https://cells.example.com/public/existing-link',
+        },
+      });
 
       const existingLink = {
         Uuid: 'existing-link-uuid',
@@ -547,12 +458,7 @@ describe('useCellPublicLink', () => {
       mockCellsRepository.getPublicLink.mockResolvedValue(existingLink);
       mockCellsRepository.updatePublicLink.mockResolvedValue({} as any);
 
-      const {result} = renderHook(() =>
-        useCellPublicLink({
-          uuid: 'test-uuid',
-          cellsRepository: mockCellsRepository,
-        }),
-      );
+      const {result} = renderPublicLinkHook({node: mockNode, refreshLinkDataAfterUpdate: true});
 
       await waitFor(() => {
         expect(result.current.status).toBe('success');
@@ -576,17 +482,14 @@ describe('useCellPublicLink', () => {
         createPassword: 'secret123',
         passwordEnabled: true,
       });
+
+      expect(mockCellsRepository.getPublicLink).toHaveBeenCalledWith({
+        uuid: 'existing-link-uuid',
+      });
     });
 
     it('throws error when updating without existing public link', async () => {
-      mockNodes = [createMockNode()];
-
-      const {result} = renderHook(() =>
-        useCellPublicLink({
-          uuid: 'test-uuid',
-          cellsRepository: mockCellsRepository,
-        }),
-      );
+      const {result} = renderPublicLinkHook();
 
       await expect(
         result.current.updatePublicLink({
@@ -594,6 +497,28 @@ describe('useCellPublicLink', () => {
           passwordEnabled: true,
         }),
       ).rejects.toThrow('No public link to update');
+    });
+  });
+
+  describe('setStatusOnPublicLinkUrl', () => {
+    it('sets success when public link url appears and flag is enabled', async () => {
+      const {result, rerenderWith} = renderPublicLinkHook({setStatusOnPublicLinkUrl: true});
+
+      expect(result.current.status).toBe('idle');
+
+      mockNode = createMockNode({
+        publicLink: {
+          alreadyShared: true,
+          uuid: 'existing-link-uuid',
+          url: 'https://cells.example.com/public/existing-link',
+        },
+      });
+
+      rerenderWith({node: mockNode, setStatusOnPublicLinkUrl: true});
+
+      await waitFor(() => {
+        expect(result.current.status).toBe('success');
+      });
     });
   });
 });
