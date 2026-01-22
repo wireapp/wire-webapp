@@ -165,6 +165,45 @@ export const trimFileExtension = (filename?: string): string => {
   return '';
 };
 
+/**
+ * Sanitizes a filename by converting it to ASCII-safe characters.
+ * This is important for filenames that may contain locale-specific characters
+ * (like German umlauts) which can cause encoding issues when sent to the server.
+ *
+ * @param filename - The filename to sanitize
+ * @returns A sanitized filename with ASCII-safe characters
+ *
+ * @example
+ * sanitizeFilename("Bild eingefügt am 12. Jan. 2026, 14:30:57.png")
+ * // Returns: "Bild eingefuegt am 12. Jan. 2026-14-30-57.png"
+ */
+export const sanitizeFilename = (filename: string): string => {
+  // Replace German umlauts and special characters first
+  let sanitized = filename
+    .replaceAll('ä', 'ae')
+    .replaceAll('ö', 'oe')
+    .replaceAll('ü', 'ue')
+    .replaceAll('Ä', 'Ae')
+    .replaceAll('Ö', 'Oe')
+    .replaceAll('Ü', 'Ue')
+    .replaceAll('ß', 'ss');
+
+  // Then normalize to decomposed form and remove combining marks for other accents
+  sanitized = sanitized.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+
+  // Remove control characters (ASCII 0-31 and 127) including null bytes
+  // These characters can cause issues with file systems and backend processing
+  sanitized = sanitized.replace(/[\x00-\x1F\x7F]/g, '');
+
+  // Replace problematic special characters with safe alternatives
+  // First replace punctuation followed by space to avoid inconsistent spacing
+  sanitized = sanitized.replace(/[,;:]\s+/g, '-');
+  // Then replace any remaining punctuation
+  sanitized = sanitized.replaceAll(/[,;:]/g, '-');
+  // Normalize multiple spaces and trim
+  return sanitized.replace(/\s+/g, ' ').trim();
+};
+
 export const formatBytes = (bytes: number, decimals: number = 1): string => {
   if (bytes === 0) {
     return '0 B';
