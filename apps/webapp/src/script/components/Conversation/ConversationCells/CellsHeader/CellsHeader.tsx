@@ -117,8 +117,8 @@ export const CellsHeader = ({
           type="text"
           value={searchValue}
           ref={inputRef}
-          aria-label={t('fullsearchPlaceholder')}
-          placeholder={t('fullsearchPlaceholder')}
+          aria-label={t('cells.search.placeholder')}
+          placeholder={t('cells.search.placeholder')}
           onChange={event => onSearchChange(event.currentTarget.value)}
           data-uie-name="full-search-header-input"
         />
