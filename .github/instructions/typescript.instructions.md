@@ -1,8 +1,6 @@
 ---
-appliesTo:
-  paths:
-    - 'src/**/*.ts'
-    - 'src/**/*.tsx'
+applyTo: 'apps/**/*.{ts,tsx}'
+description: TypeScript safety rules for all TypeScript files in the monorepo
 ---
 
 # Copilot — TypeScript safety

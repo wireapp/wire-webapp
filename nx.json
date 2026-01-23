@@ -1,0 +1,54 @@
+{
+  "$schema": "./node_modules/nx/schemas/nx-schema.json",
+  "defaultBase": "dev",
+  "targetDefaults": {
+    "build": {
+      "dependsOn": ["^build"], // build all upstream dependencies first
+      "cache": true,
+      "inputs": ["production"], // skip test-only files when hashing builds
+      "outputs": ["{projectRoot}/dist"]
+    },
+    "test": {
+      "dependsOn": ["^build"], // build all upstream dependencies first
+      "cache": true,
+      "inputs": ["default", "^production", "{workspaceRoot}/jest.preset.js"] // include shared preset in cache key
+    },
+    "lint": {
+      "dependsOn": ["^build"], // build all upstream dependencies first
+      "cache": true,
+      "inputs": ["default", "{workspaceRoot}/eslint.config.ts"] // workspace lint config in hash
+    }
+  },
+  "namedInputs": {
+    "default": ["{projectRoot}/**/*", "sharedGlobals"], // everything under the project by default
+    "production": [
+      "default",
+      "!{projectRoot}/**/?(*.)+(spec|test).[jt]s?(x)?(.snap)",
+      "!{projectRoot}/tsconfig.spec.json",
+      "!{projectRoot}/jest.config.[jt]s",
+      "!{projectRoot}/.eslintrc.json",
+      "!{projectRoot}/src/test-setup.[jt]s",
+      "!{projectRoot}/test-setup.[jt]s"
+    ],
+    "sharedGlobals": [] // hook for root-level shared files if needed
+  },
+  "defaultProject": "webapp",
+  "release": {
+    "projects": ["tag:npm:public"],
+    "projectsRelationship": "independent",
+    "version": {
+      "conventionalCommits": true,
+      "fallbackCurrentVersionResolver": "disk"
+    },
+    "changelog": {
+      "projectChangelogs": {
+        "createRelease": "github"
+      }
+    },
+    "git": {
+      "commit": true,
+      "tag": true,
+      "commitMessage": "chore(release): publish {projectName} {version} [skip ci]"
+    }
+  }
+}

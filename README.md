@@ -8,43 +8,56 @@ You can find the published source code at [github.com/wireapp/wire](https://gith
 
 For licensing information, see the attached LICENSE file and the list of third-party licenses at [wire.com/legal/licenses/](https://wire.com/legal/licenses/).
 
-If you compile the open source software that we make available from time to time to develop your own mobile, desktop or web application, and cause that application to connect to our servers for any purposes, we refer to that resulting application as an “Open Source App”. All Open Source Apps are subject to, and may only be used and/or commercialized in accordance with, the Terms of Use applicable to the Wire Application, which can be found at https://wire.com/legal/#terms. Additionally, if you choose to build an Open Source App, certain restrictions apply, as follows:
+If you compile the open source software that we make available from time to time to develop your own mobile, desktop, or web application, and cause that application to connect to our servers for any purposes, we refer to that resulting application as an "Open Source App". All Open Source Apps are subject to, and may only be used and/or commercialized in accordance with, the Terms of Use applicable to Wire Application, which can be found at https://wire.com/legal/#terms. Additionally, if you choose to build an Open Source App, certain restrictions apply, as follows:
 
-a. You agree not to change the way the Open Source App connects and interacts with our servers; b. You agree not to weaken any of the security features of the Open Source App; c. You agree not to use our servers to store data for purposes other than the intended and original functionality of the Open Source App; d. You acknowledge that you are solely responsible for any and all updates to your Open Source App.
+a. You agree not to change the way the Open Source App connects and interacts with our servers;
+b. You agree not to weaken any of the security features of the Open Source App;
+c. You agree not to use our servers to store data for purposes other than the intended and original functionality of the Open Source App;
+d. You acknowledge that you are solely responsible for any and all updates to your Open Source App.
 
-For clarity, if you compile the open source software that we make available from time to time to develop your own mobile, desktop or web application, and do not cause that application to connect to our servers for any purposes, then that application will not be deemed an Open Source App and the foregoing will not apply to that application.
+For clarity, if you compile the open source software that we make available from time to time to develop your own mobile, desktop, or web application, and do not cause that application to connect to our servers for any purposes, then that application will not be deemed an Open Source App and the foregoing will not apply to that application.
 
 No license is granted to the Wire trademark and its associated logos, all of which will continue to be owned exclusively by Wire Swiss GmbH. Any use of the Wire trademark and/or its associated logos is expressly prohibited without the express prior written consent of Wire Swiss GmbH.
 
-# How to build the open source client
+# Monorepo Layout
+
+- `apps/webapp/`: client (Webpack/React) plus E2E tests and i18n files
+- `apps/server/`: node/express wrapper that serves the built webapp and handles proxying
+- `libraries/config/`: `@wireapp/config` package - centralized environment configuration management with type-safe configuration loading and validation
+- `libraries/core/`: `@wireapp/core` package - Wire's communication core library handling authentication, WebSocket connections, and protocol messaging
+- Root-level tooling (`package.json`, Nx, husky, bin scripts) orchestrates both apps and libraries
+
+The root `yarn` and `nx` scripts are the entry points; package-level scripts delegate to them.
+
+# How to Build the Open Source Client
 
 Prerequisites:
 
 1. Install [Node.js](https://nodejs.org/)
 1. Install [Yarn](https://yarnpkg.com)
 
-## 1. Fetching dependencies and configurations
+## 1. Install Dependencies & Fetch Configuration
 
-1. Run `yarn`
+1. Run `yarn` (uses Yarn 4 workspaces)
+   - This will install all dependencies and fetch a [configuration](https://github.com/wireapp/wire-web-config-wire/) for the application into `apps/webapp/resource/`
 
-   - This will install all dependencies and fetch a [configuration](https://github.com/wireapp/wire-web-config-wire/) for the application.
-
-## 2. Build & run
+## 2. Build & Run
 
 ### Development
 
-1. Rename `.env.localhost` to `.env` in order to configure the application. This configuration can override/extend the configuration from the previous step.
+1. Copy `.env.localhost` to `.env` to override/extend defaults
 1. Add the following entries to your hosts file (macOS / Linux: `/etc/hosts`, Windows 10: `%WINDIR%\system32\drivers\etc\hosts`):
-   - `127.0.0.1 local.zinfra.io` (to connect with staging backend)
-   - `127.0.0.1 local.imai.wire.link` (to connect with imai backend)
-1. Run `yarn start` and Wire's web app will be available at: https://local.zinfra.io:8081/auth/
+   - `127.0.0.1 local.zinfra.io` (to connect with the staging backend)
+   - `127.0.0.1 local.imai.wire.link` (to connect with the imai backend)
+1. Run `yarn nx build webapp --configuration=development` to build static assets
+1. Run `yarn start` (runs `nx serve server`); the app will be available at https://local.zinfra.io:8081/auth/
 
-#### Install the self-signed certificate
+#### Install Self-Signed Certificate
 
 If you would like your browser to trust the certificate from "local.wire.com"/"local.zinfra.io"/"local.imai.wire.link":
 
-1. Download [mkcert](https://github.com/FiloSottile/mkcert/releases/latest) Installation on Mac `brew install mkcert` [refer to latest readme.md](https://github.com/FiloSottile/mkcert)
-2. Set the `CAROOT` environment variable to `<WebApp Dir>/server/certificate`
+1. Download [mkcert](https://github.com/FiloSottile/mkcert/releases/latest) - Installation on Mac: `brew install mkcert` (refer to the latest [README.md](https://github.com/FiloSottile/mkcert))
+2. Set the `CAROOT` environment variable to `<WebApp Dir>/apps/server/certificate`
 3. Run `mkcert -install`
 
 #### Environment Configuration
@@ -79,20 +92,27 @@ After updating the environment variables, the app will be available at the corre
 
 ### Production
 
-1. Run `yarn build:prod`
-1. Run `cd server && yarn start:prod`
+1. Build and package for production: `yarn nx run server:package` (or `yarn build:prod`)
+   - This builds both the server and webapp (in production mode) and creates the deployment package at `apps/server/dist/s3/ebs.zip`
+1. Start the server output from `apps/server/dist` (or build a Docker image with `yarn docker <tag>`)
+
+**Note:** The `yarn zip` command has been deprecated. Packaging is now integrated into the build process via `yarn build:prod` or `yarn nx run server:package`.
 
 ## Testing
 
 [![codecov](https://codecov.io/gh/wireapp/wire-webapp/branch/dev/graph/badge.svg?token=9ELBEPM793)](https://codecov.io/gh/wireapp/wire-webapp)
 
-To launch the full test suite (types check + linting + server tests + app tests), simply run:
+To launch the full test suite:
 
-`yarn test`
+```bash
+yarn nx run-many -t test --all
+```
 
-Alternatively, you can test specific parts of the app:
+Other useful tasks:
 
-`yarn test:(server|types|app)`
+- Lint: `yarn nx run-many -t lint --all`
+- Type-check: `yarn nx run-many -t type-check --all`
+- E2E (Playwright): `yarn nx e2e webapp`
 
 ## CI Status
 
@@ -102,12 +122,12 @@ Alternatively, you can test specific parts of the app:
 
 All Wire translations are crowdsourced via [Crowdin](https://crowdin.com/projects/wire).
 
-### Add new strings
+### Add New Strings
 
 **Info:**
 
-- To download translations we use Crowdin API v1, and you need to setup your [username](https://crowdin.com/settings#account) and [api_key](https://crowdin.com/settings#api-key) (Account API key).
-- To upload translations we use Crowdin CLI v3, and you will need to setup [project_identifier](https://crowdin.com/project/wire-webapp/settings#api) and [api_token](https://crowdin.com/settings#api-key) (Personal Access Token).
+- To download translations we use Crowdin API v1, and you need to set up your [username](https://crowdin.com/settings#account) and [api_key](https://crowdin.com/settings#api-key) (Account API key)
+- To upload translations we use Crowdin CLI v3, and you will need to set up [project_identifier](https://crowdin.com/project/wire-webapp/settings#api) and [api_token](https://crowdin.com/settings#api-key) (Personal Access Token)
 
 **Setup:**
 
@@ -122,27 +142,27 @@ username: your-username
 
 **Usage:**
 
-1. Add string variable to "i18n/en-US.json"
-2. Create a PR and merge it after approval. When the PR gets merged, our CI will take care of uploading the english texts to Crowdin.
+1. Add a string variable to "i18n/en-US.json"
+2. Create a PR and merge it after approval. When the PR gets merged, our CI will take care of uploading the English texts to Crowdin
 
-If our CI pipeline is broken, you still have the option to upload new strings manually. For this case do the following:
+If our CI pipeline is broken, you still have the option to upload new strings manually. For this case, do the following:
 
 1. Install [Crowdin CLI v3](https://support.crowdin.com/cli-tool/)
 1. Verify you have a `keys/crowdin.yaml` in place
 1. Run `yarn translate:upload`
 
-Once translations are uploaded on Crowdin, our (and external) translators can translate the new strings on Crowdin. There is a script that will run to create PRs with translation updates. As an alternative, translations can be downloaded the following way:
+Once translations are uploaded on Crowdin, our (and external) translators can translate the new strings on Crowdin. There is a script that will run to create PRs with translation updates. As an alternative, translations can be downloaded in the following way:
 
-1. Verify your string shows up on [Crowdin project: wire-webapp](https://crowdin.com/translate/wire-webapp/1224/en-en)
-1. Add translation on Crowdin
-1. Approve translation on Crowdin
+1. Verify your string shows up on the [Crowdin project: wire-webapp](https://crowdin.com/translate/wire-webapp/1224/en-en)
+1. Add a translation on Crowdin
+1. Approve the translation on Crowdin
 1. Run `yarn translate:download`
 
 ## Contributing
 
 Contributions are welcome! Feel free to check our [issues page](https://github.com/wireapp/wire-webapp/issues).
 
-The following commits will help you getting started quickly with our code base:
+The following commits will help you get started quickly with our code base:
 
 - [Show a modal / pop-up](https://github.com/wireapp/wire-webapp/commit/00d3d120aacb3f36da80edd1ca829afc045331e9)
 - [Sync setting between via backend](https://github.com/wireapp/wire-webapp/commit/3e4595a208189b7b6b51935fd2c41a74bbd16994)
