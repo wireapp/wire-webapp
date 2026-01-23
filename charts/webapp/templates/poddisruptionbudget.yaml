@@ -1,10 +1,11 @@
 {{- if gt (int .Values.replicaCount) 1 }}
+{{- $appName := include "webapp.baseName" . -}}
 apiVersion: policy/v1
 kind: PodDisruptionBudget
 metadata:
-  name: webapp
+  name: {{ $appName }}
   labels:
-    app: webapp
+    app: {{ $appName }}
     chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
     release: {{ .Release.Name }}
     heritage: {{ .Release.Service }}
@@ -12,5 +13,5 @@ spec:
   maxUnavailable: {{ sub (int .Values.replicaCount) 1 }}
   selector:
     matchLabels:
-      app: webapp
+      app: {{ $appName }}
 {{- end }}

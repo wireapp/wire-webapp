@@ -108,18 +108,26 @@ export const editModeButtonStyles: CSSObject = {
   padding: '4px',
   borderRadius: '12px',
 
+  'body.theme-dark &': {
+    backgroundColor: 'var(--gray-90)',
+  },
+
   button: {
     padding: '4px 18px',
     borderRadius: '8px',
     backgroundColor: 'transparent',
     border: 'none',
+    color: 'var(--base-secondary-text)',
     transition: 'background-color 0.3s ease-in-out, color 0.3s ease-in-out',
 
     '&.active': {
-      backgroundColor: COLOR_V2.WHITE,
+      backgroundColor: 'var(--app-bg-secondary)',
+      color: 'var(--main-color)',
     },
     svg: {
       marginRight: '8px',
+      color: 'currentColor',
+      fill: 'currentColor',
       transition: 'color 0.3s ease-in-out',
     },
   },

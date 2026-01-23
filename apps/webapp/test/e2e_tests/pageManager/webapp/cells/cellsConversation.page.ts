@@ -20,7 +20,6 @@
 import {Locator, Page} from '@playwright/test';
 
 import {User} from 'test/e2e_tests/data/user';
-import {selectByDataAttribute} from 'test/e2e_tests/utils/selector.util';
 
 import {ConversationPage} from '../pages/conversation.page';
 
@@ -40,6 +39,6 @@ export class CellsConversationPage extends ConversationPage {
   }
 
   override getImageLocator(user: User): Locator {
-    return this.page.locator(`${selectByDataAttribute('item-message')} [aria-label^="Image from ${user.fullName}"]`);
+    return this.page.getByTestId('item-message').locator(`[aria-label^="Image from ${user.fullName}"]`);
   }
 }

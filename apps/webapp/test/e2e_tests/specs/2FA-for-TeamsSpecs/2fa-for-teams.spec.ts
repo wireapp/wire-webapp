@@ -104,7 +104,7 @@ test.describe('f2a for teams', () => {
 
   test(
     'I want to verify that verification code is not required after login if 2FA has been disabled',
-    {tag: ['@TC-8749', '@regression']},
+    {tag: ['@TC-44', '@regression']},
     async ({pageManager, api}) => {
       await api.featureConfig.changeStateSndFactorPasswordChallenge(owner, owner.teamId, 'disabled');
 

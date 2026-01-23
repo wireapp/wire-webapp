@@ -38,7 +38,6 @@ import {EventName} from 'Repositories/tracking/EventName';
 import {UserState} from 'Repositories/user/UserState';
 import {getLogger, Logger} from 'Util/Logger';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
-import {isAxiosError, isBackendError} from 'Util/TypePredicateUtil';
 
 import {ClientEvent} from './Client';
 import {EventMiddleware, EventProcessor, IncomingEvent} from './EventProcessor';
@@ -50,7 +49,6 @@ import {validateEvent} from './EventValidator';
 import {NOTIFICATION_HANDLING_STATE} from './NotificationHandlingState';
 import type {NotificationService} from './NotificationService';
 import {EventValidationError} from './preprocessor/EventStorageMiddleware/eventHandlers/EventValidationError';
-import {WebSocketConnectionManager} from './WebSocketConnectionManager';
 
 import {CryptographyError} from '../../error/CryptographyError';
 import {EventError} from '../../error/EventError';
@@ -82,11 +80,6 @@ export class EventRepository {
         INITIAL: 500,
         MAX: 10000,
         SUBSEQUENT: 5000,
-      },
-      WEBSOCKET_CONNECTION: {
-        retryDelayMs: TIME_IN_MILLIS.SECOND * 5,
-        heartbeatIntervalMs: TIME_IN_MILLIS.MINUTE,
-        connectionTimeoutMs: TIME_IN_MILLIS.SECOND * 30,
       },
     };
   }
@@ -136,7 +129,7 @@ export class EventRepository {
   // WebSocket handling
   //##############################################################################
 
-  private readonly updateConnectivityStatus = (state: ConnectionState) => {
+  private readonly updateConnectivitityStatus = (state: ConnectionState) => {
     this.logger.log('Websocket connection state changed to', state);
     switch (state) {
       case ConnectionState.CONNECTING: {
@@ -175,10 +168,7 @@ export class EventRepository {
         await this.handleEvent(payload, source);
       } catch (error) {
         if (source === EventSource.NOTIFICATION_STREAM) {
-          this.logger.warn(
-            `Failed to handle event of type "${payload.event.type}": ${(error as Error).message}`,
-            error,
-          );
+          this.logger.warn(`Failed to handle event of type "${event.type}": ${error.message}`, error);
         } else {
           throw error;
         }
@@ -198,12 +188,11 @@ export class EventRepository {
   }
 
   /**
-   * Connects to the WebSocket with the given account.
+   * connects to the websocket with the given account
    *
-   * @param account The account to connect to
-   * @param useLegacy Whether to use the legacy WebSocket protocol
-   * @param onNotificationStreamProgress Callback when a notification for the notification stream has been processed
-   * @param dryRun When set will not decrypt and not store the last notification ID. This is useful if you only want to subscribe to unencrypted backend events
+   * @param account the account to connect to
+   * @param onNotificationStreamProgress callback when a notification for the notification stream has been processed
+   * @param dryRun when set will not decrypt and not store the last notification ID. This is useful if you only want to subscribe to unencrypted backend events
    * @returns Resolves when the notification stream has fully been processed
    */
   async connectWebSocket(
@@ -212,34 +201,45 @@ export class EventRepository {
     onNotificationStreamProgress: (currentProcessingNotificationTimestamp: string) => void,
     dryRun = false,
   ): Promise<void> {
-    // Clean up any existing connection manager from previous connection attempts
-    this.connectionManager?.disconnect();
     await this.handleTimeDrift();
+    const connect = () => {
+      // We make sure there is only be a single active connection to the WebSocket.
+      this.disconnectWebSocket?.();
+      return new Promise<void>(async resolve => {
+        this.disconnectWebSocket = await account.listen({
+          useLegacy,
+          onConnectionStateChanged: connectionState => {
+            this.updateConnectivitityStatus(connectionState);
+            if (connectionState === ConnectionState.LIVE) {
+              resolve();
+            }
+          },
+          onEvent: this.handleIncomingEvent,
+          onMissedNotifications: this.triggerMissedSystemEventMessageRendering,
+          onNotificationStreamProgress: onNotificationStreamProgress,
+          dryRun,
+        });
+      });
+    };
 
-    // Create a new connection manager with the provided configuration
-    this.connectionManager = new WebSocketConnectionManager(
-      account,
-      EventRepository.CONFIG.WEBSOCKET_CONNECTION,
-      dryRun,
-      useLegacy,
-      this.updateConnectivityStatus,
-      this.handleIncomingEvent,
-      this.triggerMissedSystemEventMessageRendering,
-      onNotificationStreamProgress,
-    );
+    window.addEventListener('online', () => {
+      this.logger.info('Internet connection regained. Re-establishing WebSocket connection...');
+      connect();
+    });
 
-    // Store the disconnect function for external access
-    this.disconnectWebSocket = () => this.connectionManager?.disconnect();
+    window.addEventListener('offline', () => {
+      this.logger.warn('Internet connection lost');
+      this.disconnectWebSocket();
+      Warnings.showWarning(Warnings.TYPE.NO_INTERNET);
+    });
 
-    // Initiate the connection
-    return this.connectionManager.connect();
+    return connect();
   }
 
   /**
    * Close the WebSocket connection. (will be set only once the connectWebSocket is called)
    */
-  public disconnectWebSocket: () => void = () => {};
-  private connectionManager: WebSocketConnectionManager | undefined;
+  disconnectWebSocket: () => void = () => {};
 
   //##############################################################################
   // Notification Stream handling
@@ -248,24 +248,10 @@ export class EventRepository {
     try {
       const time = await this.notificationService.getServerTime();
       this.serverTimeHandler.computeTimeOffset(time);
-    } catch (error) {
-      // Handle Axios errors with notification list format
-      // The backend returns a NotificationList in the error response with time field
-      if (isAxiosError<{time?: string}>(error) && error.response?.data?.time) {
-        this.logger.info('Computed time offset from error response time');
-        this.serverTimeHandler.computeTimeOffset(error.response.data.time);
-        return;
+    } catch (errorResponse) {
+      if (errorResponse.response?.time) {
+        this.serverTimeHandler.computeTimeOffset(errorResponse.response?.time);
       }
-
-      // Handle BackendError instances
-      if (isBackendError(error)) {
-        this.logger.warn(`Could not compute time offset due to backend error: "${error.message}"`, error);
-        return;
-      }
-
-      // Log all other errors without failing the connection
-      const errorMessage = error instanceof Error ? error.message : String(error);
-      this.logger.warn(`Could not compute time offset: "${errorMessage}"`, error);
     }
   }
 
@@ -303,8 +289,7 @@ export class EventRepository {
    * @returns Resolves when the last event date was stored
    */
   private updateLastEventDate(eventDate: string): Promise<string> | void {
-    const lastDate = this.lastEventDate();
-    const didDateIncrease = !lastDate || eventDate > lastDate;
+    const didDateIncrease = eventDate > this.lastEventDate();
     if (didDateIncrease) {
       this.lastEventDate(eventDate);
       return this.notificationService.saveLastEventDateToDb(eventDate);
