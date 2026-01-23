@@ -10,6 +10,11 @@ on:
       - dev
   workflow_dispatch:
 
+# Only allow one instance of this workflow to run per branch at a time
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
+
 jobs:
   e2e_tests:
     name: Run e2e tests
