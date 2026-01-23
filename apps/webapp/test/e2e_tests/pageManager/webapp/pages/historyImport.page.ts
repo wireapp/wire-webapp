@@ -18,7 +18,6 @@
  */
 
 import {Locator, Page} from '@playwright/test';
-import {selectByDataAttribute} from 'test/e2e_tests/utils/selector.util';
 
 export class HistoryImportPage {
   readonly page: Page;
@@ -28,7 +27,7 @@ export class HistoryImportPage {
   constructor(page: Page) {
     this.page = page;
 
-    this.importSuccessHeadline = page.locator(selectByDataAttribute('status-history-import-success'));
+    this.importSuccessHeadline = page.getByTestId('status-history-import-success');
   }
 
   async isVisible() {

@@ -38,13 +38,7 @@ export class CallingServiceClientE2E {
       email,
       password,
       verificationCode: '',
-      backend: 'MASTER',
-      customBackend: {
-        name: 'staging',
-        webappUrl: 'https://wire-webapp-dev.zinfra.io/',
-        backendUrl: 'https://staging-nginz-https.zinfra.io/',
-        websocketUrl: 'wss://staging-nginz-ssl.zinfra.io',
-      },
+      backend: 'DEV',
       instanceType: {
         name: 'chrome',
         version: '103.0.5060.53',

@@ -36,7 +36,12 @@ describe('EphemeralTimer', () => {
 
     const circle = getByTestId('ephemeral-timer-circle');
 
-    expect(window.getComputedStyle(circle).getPropertyValue('--offset')).toBe('1');
+    const offset = 1;
+    const strokewidth = 4;
+    const strokelength = strokewidth * Math.PI;
+    const expected = strokelength * (1 + offset); // offset === 1 => (1 + offset)
+
+    expect(parseFloat(window.getComputedStyle(circle).getPropertyValue('stroke-dashoffset'))).toBeCloseTo(expected, 5);
   });
 
   it('hides the icon when no ephemeral timer was started', () => {
@@ -46,6 +51,11 @@ describe('EphemeralTimer', () => {
 
     const circle = getByTestId('ephemeral-timer-circle');
 
-    expect(window.getComputedStyle(circle).getPropertyValue('--offset')).toBe('0');
+    const offset = 0;
+    const strokewidth = 4;
+    const strokelength = strokewidth * Math.PI;
+    const expected = strokelength * (1 + offset);
+
+    expect(parseFloat(window.getComputedStyle(circle).getPropertyValue('stroke-dashoffset'))).toBeCloseTo(expected, 5);
   });
 });
