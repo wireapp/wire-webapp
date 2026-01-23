@@ -74,7 +74,6 @@ import {StartUIPage} from './webapp/pages/startUI.page';
 import {WelcomePage} from './webapp/pages/welcome.page';
 
 export const webAppPath = process.env.WEBAPP_URL ?? '';
-const teamManagementPath = process.env.TEAM_MANAGEMENT_URL ?? '';
 
 export class PageManager {
   private readonly cache = new Map<string, any>();
@@ -110,10 +109,6 @@ export class PageManager {
 
   openUrl = (url: string) => {
     return this.page.goto(url, {waitUntil: 'networkidle'});
-  };
-
-  openTeamManagementPage = () => {
-    return this.page.goto(teamManagementPath, {waitUntil: 'networkidle'});
   };
 
   refreshPage = (options: {waitUntil?: 'load' | 'domcontentloaded' | 'networkidle'} = {waitUntil: 'networkidle'}) => {
