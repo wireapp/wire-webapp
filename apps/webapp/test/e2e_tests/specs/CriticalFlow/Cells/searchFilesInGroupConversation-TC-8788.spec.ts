@@ -89,7 +89,7 @@ test(
       // Search for the video file
       await userBPages.cellsConversationFiles().searchFile(VideoFileName);
       await expect(userBPages.cellsConversationFiles().filesList).toHaveCount(1);
-      expect(await userBPages.cellsConversationFiles().getFile(VideoFileName)).toBeVisible();
+      await expect(userBPages.cellsConversationFiles().getFile(VideoFileName)).toBeVisible();
 
       // Clearing the search input and making sure both files are visible again
       await userBPages.cellsConversationFiles().searchFile('');
