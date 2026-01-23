@@ -1,0 +1,49 @@
+name: E2E Tests Nightly
+
+on:
+  schedule:
+    # we want to run this nightly on dev
+    - cron: '0 02 * * 1-5'
+  # ToDo: This trigger is only for testing, remove before merging
+  pull_request:
+    branches:
+      - dev
+  workflow_dispatch:
+
+jobs:
+  e2e_tests:
+    name: Run e2e tests
+    uses: ./.github/workflows/e2e-tests.yml
+    with:
+      webappUrl: https://wire-webapp-dev.zinfra.io/
+      backendUrl: https://staging-nginz-https.zinfra.io/
+    secrets:
+      OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
+
+  report-to-testiny:
+    name: Upload test report to Testiny
+    if: ${{ !cancelled() }}
+    runs-on: ubuntu-latest
+    needs: e2e_tests
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version-file: '.nvmrc'
+          cache: 'yarn'
+
+      - name: Download report
+        uses: actions/download-artifact@v5
+        with:
+          artifact-ids: ${{ needs.e2e_tests.outputs.reportArtifactId }}
+          path: apps/webapp/playwright-report
+
+      - name: Run Testiny CLI
+        env:
+          TESTINY_API_KEY: ${{ secrets.TESTINY_API_KEY }}
+        run: |
+          yarn dlx @testiny/cli automation --project WEB --source "github" --playwright ./apps/webapp/playwright-report/report.json
