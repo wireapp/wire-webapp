@@ -281,6 +281,7 @@ test.describe('Delete', () => {
           'Test Service Device',
           false,
         );
+
         const conversationId = await api.conversation.getConversationWithUser(userA.token, userB.id!);
         await api.testService.sendLocation(instanceId, conversationId, {
           locationName: 'Test Location',
