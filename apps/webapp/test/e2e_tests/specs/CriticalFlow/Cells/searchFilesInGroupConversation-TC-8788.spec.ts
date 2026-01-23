@@ -35,7 +35,7 @@ const imageFilePath = getImageFilePath();
 const videoFilePath = getVideoFilePath();
 
 test.beforeEach(async ({createTeam}) => {
-  const team = await createTeam(teamName, {withMembers: 1, disableTelemetry: true});
+  const team = await createTeam(teamName, {withMembers: 1});
   userA = team.owner;
   userB = team.members[0];
 });
