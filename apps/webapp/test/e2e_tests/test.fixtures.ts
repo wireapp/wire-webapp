@@ -67,9 +67,9 @@ export const test = baseTest.extend<Fixtures>({
   // Temporary workaround to add the test id as annotation instead of tag so Testiny can pick it up
   _beforeEach: [
     async ({}, use, testInfo) => {
-      const testKey = testInfo.tags.find(tag => tag.startsWith('@TC'));
-      if (testKey && !testInfo.annotations.some(annotation => annotation.type === 'testKey')) {
-        testInfo.annotations.push({type: 'testKey', description: testKey.slice(1)});
+      const testid = testInfo.tags.find(tag => tag.startsWith('@TC'));
+      if (testid && !testInfo.annotations.some(annotation => annotation.type === 'testid')) {
+        testInfo.annotations.push({type: 'testid', description: testid.slice(1)});
       }
 
       await use();
