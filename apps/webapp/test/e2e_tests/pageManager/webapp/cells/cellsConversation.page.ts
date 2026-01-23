@@ -20,8 +20,6 @@
 import {Locator, Page} from '@playwright/test';
 
 import {User} from 'test/e2e_tests/data/user';
-import {selectByDataAttribute} from 'test/e2e_tests/utils/selector.util';
-
 import {ConversationPage} from '../pages/conversation.page';
 
 export class CellsConversationPage extends ConversationPage {
@@ -40,15 +38,11 @@ export class CellsConversationPage extends ConversationPage {
   }
 
   override getImageLocator(user: User): Locator {
-    return this.page.locator(
-      `${selectByDataAttribute('item-message')} [aria-label^="Image from ${user.fullName}"] img`,
-    );
+    return this.page.getByLabel(new RegExp(`^Image from ${user.fullName}`)).getByRole('img');
   }
 
   protected getVideoLocator(user: User): Locator {
-    return this.page.locator(
-      `${selectByDataAttribute('item-message')} [aria-label^="Video file preview"] [aria-label^="Image from ${user.fullName}"] video`,
-    );
+    return this.page.getByLabel(new RegExp(`^Image from ${user.fullName}`)).locator('video');
   }
 
   async isVideoFromUserVisible(user: User) {

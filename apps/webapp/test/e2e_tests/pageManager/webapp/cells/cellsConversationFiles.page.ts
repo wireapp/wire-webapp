@@ -28,7 +28,7 @@ export class CellsConversationFilesPage {
   constructor(page: Page) {
     this.page = page;
     this.filesList = page.locator('table td[data-cell="Name"]');
-    this.searchInput = page.getByRole('textbox', {name: 'Search text messages'});
+    this.searchInput = page.getByRole('textbox', {name: 'Search files and folders'});
   }
 
   async searchFile(fileName: string) {
