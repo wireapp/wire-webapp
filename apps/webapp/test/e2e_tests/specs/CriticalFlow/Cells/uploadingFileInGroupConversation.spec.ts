@@ -116,7 +116,7 @@ test(
 
     await test.step('User A opens group conversation files and sees the image file there', async () => {
       await userAPages.conversation().clickFilesTab();
-      await userAPages.cellsConversationFiles().clickFile(ImageQRCodeFileName);
+      await userAPages.cellsConversationFiles().getFile(ImageQRCodeFileName).click();
 
       expect(await userAModals.cellsFileDetailView().isImageVisible()).toBeTruthy();
     });

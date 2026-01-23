@@ -28,14 +28,14 @@ export class CellsConversationFilesPage {
   constructor(page: Page) {
     this.page = page;
     this.filesList = page.locator('table td[data-cell="Name"]');
-    this.searchInput = page.locator(selectByDataAttribute('full-search-header-input'));
+    this.searchInput = page.getByRole('textbox', {name: 'Search text messages'});
   }
 
   async searchFile(fileName: string) {
     await this.searchInput.fill(fileName);
   }
 
-  async getFile(fileName: string) {
+  getFile(fileName: string) {
     return this.filesList.getByRole('button', {name: fileName});
   }
 }
