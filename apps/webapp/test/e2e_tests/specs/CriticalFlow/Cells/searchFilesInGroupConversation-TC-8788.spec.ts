@@ -20,9 +20,9 @@
 import {User} from 'test/e2e_tests/data/user';
 import {PageManager} from 'test/e2e_tests/pageManager';
 import {getImageFilePath} from 'test/e2e_tests/utils/sendImage.util';
+import {getVideoFilePath, VideoFileName} from 'test/e2e_tests/utils/asset.util';
 
 import {test, expect, withLogin} from '../../../test.fixtures';
-import {getVideoFilePath, VideoFileName} from 'test/e2e_tests/utils/asset.util';
 
 // User A is a team owner, User B is a team member
 let userA: User;
@@ -35,7 +35,7 @@ const imageFilePath = getImageFilePath();
 const videoFilePath = getVideoFilePath();
 
 test.beforeEach(async ({createTeam}) => {
-  const team = await createTeam(teamName, {withMembers: 1, disableTelemetry: true});
+  const team = await createTeam(teamName, {withMembers: 1});
   userA = team.owner;
   userB = team.members[0];
 });
@@ -77,7 +77,6 @@ test(
     });
 
     await test.step('User B opens Files tab and searches for a file', async () => {
-      await userBPages.conversationList().openConversation(conversationName);
       await userBPages.conversation().clickFilesTab();
 
       // Initially both files should be visible
@@ -90,7 +89,7 @@ test(
       // Search for the video file
       await userBPages.cellsConversationFiles().searchFile(VideoFileName);
       await expect(userBPages.cellsConversationFiles().filesList).toHaveCount(1);
-      expect(await userBPages.cellsConversationFiles().getFile(VideoFileName)).toBeVisible();
+      await expect(userBPages.cellsConversationFiles().getFile(VideoFileName)).toBeVisible();
 
       // Clearing the search input and making sure both files are visible again
       await userBPages.cellsConversationFiles().searchFile('');

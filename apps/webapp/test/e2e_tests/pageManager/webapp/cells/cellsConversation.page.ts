@@ -52,7 +52,7 @@ export class CellsConversationPage extends ConversationPage {
   }
 
   async isVideoFromUserVisible(user: User) {
-    // Trying multiple times for the video element to appear
+    // Wait for the video element to become visible
     const locator = this.getVideoLocator(user);
 
     return await locator.isVisible();
