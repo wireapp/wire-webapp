@@ -251,24 +251,22 @@ test.describe('Delete', () => {
     },
   );
 
-  type SendActionParams = {
-    pageA: Page;
-    pageB: Page;
-    api: ApiManagerE2E;
-  }
-
-  const testCases = [
+  const testCases: {
+    name: string;
+    tc: string;
+    sendAction: (params: {pageA: Page; pageB: Page; api: ApiManagerE2E}) => Promise<void>;
+  }[] = [
     {
       name: 'images',
       tc: '@TC-580',
-      sendAction: async ({pageA}: SendActionParams) => {
+      sendAction: async ({pageA}) => {
         await shareAssetHelper(getImageFilePath(), pageA, pageA.getByRole('button', {name: 'Add picture'}));
       },
     },
     {
       name: 'link preview',
       tc: '@TC-581',
-      sendAction: async ({pageA}: SendActionParams) => {
+      sendAction: async ({pageA}) => {
         const userAPages = PageManager.from(pageA).webapp.pages;
         await userAPages.conversation().sendMessage('https://www.lidl.de/');
       },
@@ -276,46 +274,40 @@ test.describe('Delete', () => {
     {
       name: 'location sharing',
       tc: '@TC-582',
-      sendAction: async ({pageB, api}: SendActionParams) => {
-        const userBPages = PageManager.from(pageB).webapp.pages;
-
-        await userBPages.conversationList().openConversation(userA.fullName, {protocol: 'mls'});
-
-        await test.step('Prerequisite: Send location via TestService', async () => {
-          const {instanceId} = await api.testService.createInstance(
-            userA.password,
-            userA.email,
-            'Test Service Device',
-            false,
-          );
-          const conversationId = await api.conversation.getConversationWithUser(userA.token, userB.id!);
-          await api.testService.sendLocation(instanceId, conversationId, {
-            locationName: 'Test Location',
-            latitude: 52.5170365,
-            longitude: 13.404954,
-            zoom: 42,
-          });
+      sendAction: async ({pageB, api}) => {
+        const {instanceId} = await api.testService.createInstance(
+          userA.password,
+          userA.email,
+          'Test Service Device',
+          false,
+        );
+        const conversationId = await api.conversation.getConversationWithUser(userA.token, userB.id!);
+        await api.testService.sendLocation(instanceId, conversationId, {
+          locationName: 'Test Location',
+          latitude: 52.5170365,
+          longitude: 13.404954,
+          zoom: 42,
         });
       },
     },
     {
       name: 'file sharing',
       tc: '@TC-583',
-      sendAction: async ({pageA}: SendActionParams) => {
+      sendAction: async ({pageA}) => {
         await shareAssetHelper(getTextFilePath(), pageA, pageA.getByRole('button', {name: 'Add file'}));
       },
     },
     {
       name: 'audio messages',
       tc: '@TC-584',
-      sendAction: async ({pageA}: SendActionParams) => {
+      sendAction: async ({pageA}) => {
         await shareAssetHelper(getAudioFilePath(), pageA, pageA.getByRole('button', {name: 'Add file'}));
       },
     },
     {
       name: 'video messages',
       tc: '@TC-585',
-      sendAction: async ({pageA}: SendActionParams) => {
+      sendAction: async ({pageA}) => {
         await shareAssetHelper(getVideoFilePath(), pageA, pageA.getByRole('button', {name: 'Add file'}));
       },
     },
@@ -328,22 +320,33 @@ test.describe('Delete', () => {
         PageManager.from(createPage(withLogin(userB))).then(pm => pm.webapp.pages),
       ]);
 
-      await userAPages.conversationList().openConversation(userB.fullName, {protocol: 'mls'});
-      await userBPages.conversationList().openConversation(userA.fullName, {protocol: 'mls'});
+      await test.step('Await mls conversation creation', async () => {
+        await userAPages.conversationList().openConversation(userB.fullName, {protocol: 'mls'});
+        await userBPages.conversationList().openConversation(userA.fullName, {protocol: 'mls'});
+      });
 
-      const {page: pageA} = userAPages.conversation();
-      const {page: pageB} = userBPages.conversation();
-      await sendAction({pageA, pageB, api});
+      await test.step('Execute send action', async () => {
+        const {page: pageA} = userAPages.conversation();
+        const {page: pageB} = userBPages.conversation();
+        await sendAction({pageA, pageB, api});
+      });
 
-      const messageA = userAPages.conversation().getMessage({sender: userA});
-      const messageB = userBPages.conversation().getMessage({sender: userA});
-      await expect(messageA).toBeAttached();
-      await expect(messageB).toBeAttached();
+      let messageA: Locator;
+      let messageB: Locator;
 
-      await userAPages.conversation().deleteMessage(messageA, 'Everyone');
+      await test.step('Veryify send action', async () => {
+        messageA = userAPages.conversation().getMessage({sender: userA});
+        messageB = userBPages.conversation().getMessage({sender: userA});
+        await expect(messageA).toBeAttached();
+        await expect(messageB).toBeAttached();
+      });
 
-      await expect(messageB).not.toBeAttached();
-      await expect(messageB).not.toBeAttached();
+      await test.step('Do and assert deletion of message', async () => {
+        await userAPages.conversation().deleteMessage(messageA, 'Everyone');
+
+        await expect(messageB).not.toBeAttached();
+        await expect(messageB).not.toBeAttached();
+      });
     });
   });
 
