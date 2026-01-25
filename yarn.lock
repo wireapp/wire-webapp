@@ -10814,7 +10814,7 @@ __metadata:
     "@wireapp/priority-queue": "npm:2.1.17"
     "@wireapp/protocol-messaging": "npm:1.56.0"
     "@wireapp/store-engine": "npm:5.1.17"
-    "@wireapp/store-engine-fs": "npm:3.1.20"
+    "@wireapp/store-engine-fs": "npm:3.1.22"
     axios-retry: "npm:4.5.0"
     browser-sync: "npm:3.0.4"
     cells-sdk-ts: "npm:0.1.1-alpha18"
@@ -11111,14 +11111,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@wireapp/store-engine-fs@npm:3.1.20":
-  version: 3.1.20
-  resolution: "@wireapp/store-engine-fs@npm:3.1.20"
+"@wireapp/store-engine-fs@npm:3.1.22":
+  version: 3.1.22
+  resolution: "@wireapp/store-engine-fs@npm:3.1.22"
   dependencies:
     fs-extra: "npm:11.3.3"
   peerDependencies:
     "@wireapp/store-engine": 5.x.x
-  checksum: 10/aa1da9a9c7ea4cd67bf7af9cc2252876e9358619c186335ae4de5c6454bedb0d8313502fa9f8c0d8273c873831b3529ec4370a02ce8929278bd7cf7fedffc65a
+  checksum: 10/5e1d68c55d50d56cf6a98990b8b4c2bdded726cd0702d8d3a24cb7dc32247fd31fb86f1a9402e28d347b4c2fb0cd2910d6c32955beb89c5f46da31cf88b5a5ac
   languageName: node
   linkType: hard
 
