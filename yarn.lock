@@ -4980,6 +4980,23 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@nx/devkit@npm:22.4.1":
+  version: 22.4.1
+  resolution: "@nx/devkit@npm:22.4.1"
+  dependencies:
+    "@zkochan/js-yaml": "npm:0.0.7"
+    ejs: "npm:^3.1.7"
+    enquirer: "npm:~2.3.6"
+    minimatch: "npm:10.1.1"
+    semver: "npm:^7.6.3"
+    tslib: "npm:^2.3.0"
+    yargs-parser: "npm:21.1.1"
+  peerDependencies:
+    nx: ">= 21 <= 23 || ^22.0.0-0"
+  checksum: 10/fc3096e314965a30cc038f8f5eb6a61eaf71290d45c313cc033d3e0979c8cbb7bd1db7105d65bcbc09255fd9bbfb2ce2c4e533706cbdb82a30e285c1dd874de4
+  languageName: node
+  linkType: hard
+
 "@nx/docker@npm:22.3.3":
   version: 22.3.3
   resolution: "@nx/docker@npm:22.3.3"
@@ -5007,6 +5024,25 @@ __metadata:
     "@zkochan/js-yaml":
       optional: true
   checksum: 10/ccda8b7a44853760ca5b01d45f8f4760ac0f32a50b32498332d6df35c7e0d5c1b559b625ab0a4572a35e74e255bb42a999d74c71a7b29bbe7b48099a1aeffd6c
+  languageName: node
+  linkType: hard
+
+"@nx/eslint@npm:22.4.1":
+  version: 22.4.1
+  resolution: "@nx/eslint@npm:22.4.1"
+  dependencies:
+    "@nx/devkit": "npm:22.4.1"
+    "@nx/js": "npm:22.4.1"
+    semver: "npm:^7.6.3"
+    tslib: "npm:^2.3.0"
+    typescript: "npm:~5.9.2"
+  peerDependencies:
+    "@zkochan/js-yaml": 0.0.7
+    eslint: ^8.0.0 || ^9.0.0
+  peerDependenciesMeta:
+    "@zkochan/js-yaml":
+      optional: true
+  checksum: 10/d4cd5773ead09ef17ff5b0f5cb71d2f7ca8a04bb3cb854e87a9fe73c3a0aa45a17a2915e1dfbede894f3a2e527027bc9bb8abd6ecb63354f25b729570f702020
   languageName: node
   linkType: hard
 
@@ -5069,6 +5105,45 @@ __metadata:
     verdaccio:
       optional: true
   checksum: 10/54e3e99ec31fc3d7fca1ffc85769ac73e07a58da93fc6324151dbe45b49c4b8298669ca08fd5af63d3f0e371ce027a36f7267e8023250b9df6e31a42d9e3b22f
+  languageName: node
+  linkType: hard
+
+"@nx/js@npm:22.4.1":
+  version: 22.4.1
+  resolution: "@nx/js@npm:22.4.1"
+  dependencies:
+    "@babel/core": "npm:^7.23.2"
+    "@babel/plugin-proposal-decorators": "npm:^7.22.7"
+    "@babel/plugin-transform-class-properties": "npm:^7.22.5"
+    "@babel/plugin-transform-runtime": "npm:^7.23.2"
+    "@babel/preset-env": "npm:^7.23.2"
+    "@babel/preset-typescript": "npm:^7.22.5"
+    "@babel/runtime": "npm:^7.22.6"
+    "@nx/devkit": "npm:22.4.1"
+    "@nx/workspace": "npm:22.4.1"
+    "@zkochan/js-yaml": "npm:0.0.7"
+    babel-plugin-const-enum: "npm:^1.0.1"
+    babel-plugin-macros: "npm:^3.1.0"
+    babel-plugin-transform-typescript-metadata: "npm:^0.3.1"
+    chalk: "npm:^4.1.0"
+    columnify: "npm:^1.6.0"
+    detect-port: "npm:^1.5.1"
+    ignore: "npm:^5.0.4"
+    js-tokens: "npm:^4.0.0"
+    jsonc-parser: "npm:3.2.0"
+    npm-run-path: "npm:^4.0.1"
+    picocolors: "npm:^1.1.0"
+    picomatch: "npm:4.0.2"
+    semver: "npm:^7.6.3"
+    source-map-support: "npm:0.5.19"
+    tinyglobby: "npm:^0.2.12"
+    tslib: "npm:^2.3.0"
+  peerDependencies:
+    verdaccio: ^6.0.5
+  peerDependenciesMeta:
+    verdaccio:
+      optional: true
+  checksum: 10/61e8d3462d3611522550a3c5e58c9899200daf0a58287790b2af5f7254a15dd0d4077d662ee9455ef13d7146f5561cd26a145027b08f47750920620d5f142935
   languageName: node
   linkType: hard
 
@@ -5228,21 +5303,21 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@nx/playwright@npm:22.3.3":
-  version: 22.3.3
-  resolution: "@nx/playwright@npm:22.3.3"
+"@nx/playwright@npm:22.4.1":
+  version: 22.4.1
+  resolution: "@nx/playwright@npm:22.4.1"
   dependencies:
-    "@nx/devkit": "npm:22.3.3"
-    "@nx/eslint": "npm:22.3.3"
-    "@nx/js": "npm:22.3.3"
-    minimatch: "npm:9.0.3"
+    "@nx/devkit": "npm:22.4.1"
+    "@nx/eslint": "npm:22.4.1"
+    "@nx/js": "npm:22.4.1"
+    minimatch: "npm:10.1.1"
     tslib: "npm:^2.3.0"
   peerDependencies:
     "@playwright/test": ^1.36.0
   peerDependenciesMeta:
     "@playwright/test":
       optional: true
-  checksum: 10/77126ab4a143882af63265667e0559763700cda522ba9c7a4eff7db40c3788587dbca4c85ac01a07fd98a7052b45086aa917b3702cb0165754cb72e0b4ea9a9a
+  checksum: 10/4274aea1717953b26c0a16239fe7254421bcabf376ff105ae222904b62303457f5176dac8c7e33d55913d8a62f79a04d01ee232edece3d792bc227ad4098c7c3
   languageName: node
   linkType: hard
 
@@ -5304,6 +5379,23 @@ __metadata:
     tslib: "npm:^2.3.0"
     yargs-parser: "npm:21.1.1"
   checksum: 10/190815a8623b8cc17045e4e1d2e158cea842b3c4e87de41b91abe047cc7ab92cfbfd6b70961fb2b95e4aca21ee2d29d2c52e04af32472d8a462a61617c446ec2
+  languageName: node
+  linkType: hard
+
+"@nx/workspace@npm:22.4.1":
+  version: 22.4.1
+  resolution: "@nx/workspace@npm:22.4.1"
+  dependencies:
+    "@nx/devkit": "npm:22.4.1"
+    "@zkochan/js-yaml": "npm:0.0.7"
+    chalk: "npm:^4.1.0"
+    enquirer: "npm:~2.3.6"
+    nx: "npm:22.4.1"
+    picomatch: "npm:4.0.2"
+    semver: "npm:^7.6.3"
+    tslib: "npm:^2.3.0"
+    yargs-parser: "npm:21.1.1"
+  checksum: 10/4f6576206ead6b76e282cda7ed642c7e3f12fe89e3fe895f8087599db782e77035988c472a68c3eb9440d514b56433f87ab1b58ffe86e5168d57f9f8a7a71746
   languageName: node
   linkType: hard
 
@@ -29106,7 +29198,7 @@ __metadata:
     "@faker-js/faker": "npm:9.9.0"
     "@nx/jest": "npm:22.3.3"
     "@nx/node": "npm:22.3.3"
-    "@nx/playwright": "npm:22.3.3"
+    "@nx/playwright": "npm:22.4.1"
     "@nx/workspace": "npm:22.3.3"
     "@tony.ganchev/eslint-plugin-header": "npm:3.1.11"
     "@types/eslint": "npm:9.6.1"
