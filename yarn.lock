@@ -10727,7 +10727,7 @@ __metadata:
     "@types/pako": "npm:2.0.4"
     "@types/spark-md5": "npm:3.0.5"
     "@types/ws": "npm:8.18.1"
-    "@wireapp/priority-queue": "npm:2.1.17"
+    "@wireapp/priority-queue": "npm:2.1.19"
     "@wireapp/protocol-messaging": "npm:1.56.0"
     "@wireapp/store-engine": "npm:5.1.17"
     "@wireapp/store-engine-fs": "npm:3.1.22"
@@ -10829,7 +10829,7 @@ __metadata:
     "@wireapp/api-client": "workspace:^"
     "@wireapp/core-crypto": "npm:9.1.2"
     "@wireapp/cryptobox": "npm:12.8.0"
-    "@wireapp/priority-queue": "npm:2.1.17"
+    "@wireapp/priority-queue": "npm:2.1.19"
     "@wireapp/promise-queue": "npm:2.4.11"
     "@wireapp/protocol-messaging": "npm:1.56.0"
     "@wireapp/store-engine": "npm:5.1.17"
@@ -10927,10 +10927,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@wireapp/priority-queue@npm:2.1.17":
-  version: 2.1.17
-  resolution: "@wireapp/priority-queue@npm:2.1.17"
-  checksum: 10/69910b86c1a55d9b209a4265d7b3b1b6598960905fef0fdaf4874d358957a5c3945f78359c8a248f24a61927d8f4400a2d34c3c2684774f6403f60dbb7a196cf
+"@wireapp/priority-queue@npm:2.1.19":
+  version: 2.1.19
+  resolution: "@wireapp/priority-queue@npm:2.1.19"
+  checksum: 10/b99d1042bcd15a00e0990eb9af5c435b4a046bb148f6f1ca3d41bfffe87f1fa8137001402c3c39a8e19a3c5712b2c9b3bfc1981c132775f258a7799ea98d152e
   languageName: node
   linkType: hard
 
