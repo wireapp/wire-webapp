@@ -12178,14 +12178,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"axios@npm:1.13.2":
-  version: 1.13.2
-  resolution: "axios@npm:1.13.2"
+"axios@npm:1.13.3":
+  version: 1.13.3
+  resolution: "axios@npm:1.13.3"
   dependencies:
     follow-redirects: "npm:^1.15.6"
     form-data: "npm:^4.0.4"
     proxy-from-env: "npm:^1.1.0"
-  checksum: 10/ae4e06dcd18289f2fd18179256d550d27f9a53ecb2f9c59f2ccc4efd1d7151839ba8c3e0fb533dac793e4a59a576ca8689a19244dce5c396680837674a47a867
+  checksum: 10/2ceca9215671f9c2bcd5d8a0a1a667e9a35f9f7cfae88f25bba773ed9612de6cac50b2bf8be5e6918cbd2db601b4431ca87a00bffd9682939a8b85da9c89345a
   languageName: node
   linkType: hard
 
@@ -29262,7 +29262,7 @@ __metadata:
     "@wireapp/eslint-config": "npm:3.1.7"
     "@wireapp/prettier-config": "npm:0.6.11"
     archiver: "npm:7.0.1"
-    axios: "npm:1.13.2"
+    axios: "npm:1.13.3"
     babel-jest: "npm:29.7.0"
     cross-env: "npm:10.1.0"
     dotenv: "npm:17.2.3"
