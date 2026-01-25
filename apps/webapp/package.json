@@ -39,7 +39,7 @@
     "@wireapp/config": "workspace:^",
     "@wireapp/core": "workspace:^",
     "@wireapp/kalium-backup": "0.0.4",
-    "@wireapp/promise-queue": "2.4.11",
+    "@wireapp/promise-queue": "2.4.13",
     "@wireapp/react-ui-kit": "9.73.7",
     "@wireapp/store-engine-dexie": "2.1.24",
     "@wireapp/telemetry": "0.3.7",
