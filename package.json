@@ -16,7 +16,7 @@
     "@faker-js/faker": "9.9.0",
     "@nx/jest": "22.3.3",
     "@nx/node": "22.3.3",
-    "@nx/playwright": "22.3.3",
+    "@nx/playwright": "22.4.1",
     "@nx/workspace": "22.3.3",
     "@tony.ganchev/eslint-plugin-header": "3.1.11",
     "@types/eslint": "9.6.1",
