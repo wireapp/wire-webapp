@@ -11168,14 +11168,14 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@wireapp/store-engine-dexie@npm:2.1.22":
-  version: 2.1.22
-  resolution: "@wireapp/store-engine-dexie@npm:2.1.22"
+"@wireapp/store-engine-dexie@npm:2.1.24":
+  version: 2.1.24
+  resolution: "@wireapp/store-engine-dexie@npm:2.1.24"
   dependencies:
     dexie: "npm:>3.2.0"
   peerDependencies:
     "@wireapp/store-engine": 5.x.x
-  checksum: 10/2b7d2b2646baf090b19ef9d84399895468e4e09329f8251c1fc38f64bdb503cade7458d8c8eba16f44b5239cb133807a9af241451bc8cde805891ebf88ef234b
+  checksum: 10/6069ca46015ad69cb74293f051ab0dbe6f14190536e38bfa30331ad4abfdc3e5079751b9b6f225a3e88ac5bcc6ac45631e059f814e5855016f21cc2fbb1d92f1
   languageName: node
   linkType: hard
 
@@ -11280,7 +11280,7 @@ __metadata:
     "@wireapp/promise-queue": "npm:2.4.11"
     "@wireapp/react-ui-kit": "npm:9.73.7"
     "@wireapp/store-engine": "npm:5.1.17"
-    "@wireapp/store-engine-dexie": "npm:2.1.22"
+    "@wireapp/store-engine-dexie": "npm:2.1.24"
     "@wireapp/telemetry": "npm:0.3.7"
     "@wireapp/webapp-events": "npm:0.29.0"
     amplify: "https://github.com/wireapp/amplify#head=master"
