@@ -4997,33 +4997,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@nx/docker@npm:22.3.3":
-  version: 22.3.3
-  resolution: "@nx/docker@npm:22.3.3"
+"@nx/docker@npm:22.4.1":
+  version: 22.4.1
+  resolution: "@nx/docker@npm:22.4.1"
   dependencies:
-    "@nx/devkit": "npm:22.3.3"
+    "@nx/devkit": "npm:22.4.1"
     enquirer: "npm:~2.3.6"
     tslib: "npm:^2.3.0"
-  checksum: 10/4583afaa98671c127414655417057c59df2c12c19046362975f6d318aec1006e2d4d5fd30c378baedf0d8f16f16a5e5715dfcfb31d33fad1bff9218f853971de
-  languageName: node
-  linkType: hard
-
-"@nx/eslint@npm:22.3.3":
-  version: 22.3.3
-  resolution: "@nx/eslint@npm:22.3.3"
-  dependencies:
-    "@nx/devkit": "npm:22.3.3"
-    "@nx/js": "npm:22.3.3"
-    semver: "npm:^7.6.3"
-    tslib: "npm:^2.3.0"
-    typescript: "npm:~5.9.2"
-  peerDependencies:
-    "@zkochan/js-yaml": 0.0.7
-    eslint: ^8.0.0 || ^9.0.0
-  peerDependenciesMeta:
-    "@zkochan/js-yaml":
-      optional: true
-  checksum: 10/ccda8b7a44853760ca5b01d45f8f4760ac0f32a50b32498332d6df35c7e0d5c1b559b625ab0a4572a35e74e255bb42a999d74c71a7b29bbe7b48099a1aeffd6c
+  checksum: 10/c5c2b623431180895d6d4b08e0cc1e85e6faabcca4348b31ac72ed900262f9e49556109ca75b1922db05df0b3cbdf28e46f066842b96ee40362e76ea2560ac48
   languageName: node
   linkType: hard
 
@@ -5066,6 +5047,29 @@ __metadata:
     tslib: "npm:^2.3.0"
     yargs-parser: "npm:21.1.1"
   checksum: 10/584015d0852f046d5cfc3af348ae3862c4d4f8f69724495c190b36037eaabf8f6e4b1a54dc17a5e5d09c21e8c250fd01cb54141b12d15bcd3301924e7562d6d6
+  languageName: node
+  linkType: hard
+
+"@nx/jest@npm:22.4.1":
+  version: 22.4.1
+  resolution: "@nx/jest@npm:22.4.1"
+  dependencies:
+    "@jest/reporters": "npm:^30.0.2"
+    "@jest/test-result": "npm:^30.0.2"
+    "@nx/devkit": "npm:22.4.1"
+    "@nx/js": "npm:22.4.1"
+    "@phenomnomnominal/tsquery": "npm:~6.1.4"
+    identity-obj-proxy: "npm:3.0.0"
+    jest-config: "npm:^30.0.2"
+    jest-resolve: "npm:^30.0.2"
+    jest-util: "npm:^30.0.2"
+    minimatch: "npm:10.1.1"
+    picocolors: "npm:^1.1.0"
+    resolve.exports: "npm:2.0.3"
+    semver: "npm:^7.6.3"
+    tslib: "npm:^2.3.0"
+    yargs-parser: "npm:21.1.1"
+  checksum: 10/d04881e1b4668ceb96761014b5b17d2c88da6bb1ed60a4e6f359e91a62e02138f543040ff250b36f998fa9560b83d4cf3369d1273f1cc9e602f40e0de990fd2c
   languageName: node
   linkType: hard
 
@@ -5147,19 +5151,19 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@nx/node@npm:22.3.3":
-  version: 22.3.3
-  resolution: "@nx/node@npm:22.3.3"
+"@nx/node@npm:22.4.1":
+  version: 22.4.1
+  resolution: "@nx/node@npm:22.4.1"
   dependencies:
-    "@nx/devkit": "npm:22.3.3"
-    "@nx/docker": "npm:22.3.3"
-    "@nx/eslint": "npm:22.3.3"
-    "@nx/jest": "npm:22.3.3"
-    "@nx/js": "npm:22.3.3"
+    "@nx/devkit": "npm:22.4.1"
+    "@nx/docker": "npm:22.4.1"
+    "@nx/eslint": "npm:22.4.1"
+    "@nx/jest": "npm:22.4.1"
+    "@nx/js": "npm:22.4.1"
     kill-port: "npm:^1.6.1"
     tcp-port-used: "npm:^1.0.2"
     tslib: "npm:^2.3.0"
-  checksum: 10/5d919d7b5b2922e1593a2c5e8693b3b429f1d15cf2b04e0036fd4252999264d6c8be46f3b845b62bc250919f6471891f78cf59dbc9e2fe86d56478cec7ef91da
+  checksum: 10/4682ef2e47b78c965776eadf9443c6af5c385ce5acd79f00fb3cc97438c70edc7e33762897ba9f0e10dc82b01738b4f9a322e518c7d0a3c52d48ec743b1d11a9
   languageName: node
   linkType: hard
 
@@ -29262,7 +29266,7 @@ __metadata:
   dependencies:
     "@faker-js/faker": "npm:9.9.0"
     "@nx/jest": "npm:22.3.3"
-    "@nx/node": "npm:22.3.3"
+    "@nx/node": "npm:22.4.1"
     "@nx/playwright": "npm:22.4.1"
     "@nx/workspace": "npm:22.4.1"
     "@tony.ganchev/eslint-plugin-header": "npm:3.2.0"
