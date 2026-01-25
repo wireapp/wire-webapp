@@ -17,7 +17,7 @@
     "@nx/jest": "22.3.3",
     "@nx/node": "22.3.3",
     "@nx/playwright": "22.4.1",
-    "@nx/workspace": "22.3.3",
+    "@nx/workspace": "22.4.1",
     "@tony.ganchev/eslint-plugin-header": "3.1.11",
     "@types/eslint": "9.6.1",
     "@types/eslint-plugin-jsx-a11y": "6.10.1",

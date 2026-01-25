@@ -29175,7 +29175,7 @@ __metadata:
     "@nx/jest": "npm:22.3.3"
     "@nx/node": "npm:22.3.3"
     "@nx/playwright": "npm:22.4.1"
-    "@nx/workspace": "npm:22.3.3"
+    "@nx/workspace": "npm:22.4.1"
     "@tony.ganchev/eslint-plugin-header": "npm:3.1.11"
     "@types/eslint": "npm:9.6.1"
     "@types/eslint-plugin-jsx-a11y": "npm:6.10.1"
