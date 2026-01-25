@@ -63,7 +63,7 @@
     "nock": "14.0.10",
     "nx": "22.4.1",
     "playwright": "1.58.0",
-    "prettier": "3.8.0",
+    "prettier": "3.8.1",
     "rimraf": "6.1.2",
     "simple-git": "3.30.0",
     "stylelint": "16.26.1",
