@@ -1,6 +1,6 @@
 {
   "dependencies": {
-    "@wireapp/commons": "5.4.11",
+    "@wireapp/commons": "5.4.13",
     "axios": "1.13.2",
     "dotenv": "17.2.3",
     "dotenv-extended": "2.9.0",
