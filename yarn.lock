@@ -10971,11 +10971,11 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@wireapp/copy-config@npm:2.3.10":
-  version: 2.3.10
-  resolution: "@wireapp/copy-config@npm:2.3.10"
+"@wireapp/copy-config@npm:2.3.13":
+  version: 2.3.13
+  resolution: "@wireapp/copy-config@npm:2.3.13"
   dependencies:
-    axios: "npm:1.13.2"
+    axios: "npm:1.13.3"
     copy: "npm:0.3.2"
     cosmiconfig: "npm:9.0.0"
     fs-extra: "npm:11.3.3"
@@ -10984,7 +10984,7 @@ __metadata:
     rimraf: "npm:6.1.2"
   bin:
     copy-config: lib/cli.js
-  checksum: 10/774c91cefc581381079a1114923bc194ab99a94dfc1b25fbc8e9a09478bafd67a2a74b54e513ab2ad22722b90e2cc6addf85d17a2a5deea7f6de566e4ff6aa64
+  checksum: 10/033215710959844b3d7deb6fb061b42b2fc28e78d0352d61f5349d775204b9fb7eee08d0d4b9aa79e66eb6454a1aa641963a3afafe3ef7f204d33081a548a30b
   languageName: node
   linkType: hard
 
@@ -29283,7 +29283,7 @@ __metadata:
     "@typescript-eslint/eslint-plugin": "npm:8.53.0"
     "@typescript-eslint/parser": "npm:8.53.1"
     "@wireapp/commons": "npm:5.4.13"
-    "@wireapp/copy-config": "npm:2.3.10"
+    "@wireapp/copy-config": "npm:2.3.13"
     "@wireapp/eslint-config": "npm:3.1.7"
     "@wireapp/prettier-config": "npm:0.6.11"
     archiver: "npm:7.0.1"
