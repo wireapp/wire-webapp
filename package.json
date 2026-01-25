@@ -31,7 +31,7 @@
     "@types/uuid": "10.0.0",
     "@typescript-eslint/eslint-plugin": "8.53.0",
     "@typescript-eslint/parser": "8.53.1",
-    "@wireapp/copy-config": "2.3.10",
+    "@wireapp/copy-config": "2.3.13",
     "@wireapp/eslint-config": "3.1.7",
     "@wireapp/prettier-config": "0.6.11",
     "archiver": "7.0.1",
