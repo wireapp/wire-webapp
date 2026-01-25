@@ -10830,7 +10830,7 @@ __metadata:
     "@wireapp/core-crypto": "npm:9.1.2"
     "@wireapp/cryptobox": "npm:12.8.0"
     "@wireapp/priority-queue": "npm:2.1.19"
-    "@wireapp/promise-queue": "npm:2.4.11"
+    "@wireapp/promise-queue": "npm:2.4.13"
     "@wireapp/protocol-messaging": "npm:1.56.0"
     "@wireapp/store-engine": "npm:5.1.17"
     commander: "npm:14.0.2"
@@ -10934,10 +10934,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@wireapp/promise-queue@npm:2.4.11":
-  version: 2.4.11
-  resolution: "@wireapp/promise-queue@npm:2.4.11"
-  checksum: 10/d4006fdfe948183d86a725292fd86129466b074bf67c76c1391806ec7ccc6e3d8ff5739340de890aa443bd7538c5d4faee1840c44d8461d907adb8bdd0d4ebcb
+"@wireapp/promise-queue@npm:2.4.13":
+  version: 2.4.13
+  resolution: "@wireapp/promise-queue@npm:2.4.13"
+  checksum: 10/1cadf6761136e1ee6802d6ac3be5ec2e52c272872cd48aef5e23695959bcc6e0fcdc023d3a26adc4c7d3d8d947bb1efc25cf8000ba6ec8b3720aa83a43de9643
   languageName: node
   linkType: hard
 
@@ -11125,7 +11125,7 @@ __metadata:
     "@wireapp/config": "workspace:^"
     "@wireapp/core": "workspace:^"
     "@wireapp/kalium-backup": "npm:0.0.4"
-    "@wireapp/promise-queue": "npm:2.4.11"
+    "@wireapp/promise-queue": "npm:2.4.13"
     "@wireapp/react-ui-kit": "npm:9.73.7"
     "@wireapp/store-engine": "npm:5.1.17"
     "@wireapp/store-engine-dexie": "npm:2.1.24"
