@@ -23,7 +23,7 @@
     "@wireapp/api-client": "workspace:^",
     "@wireapp/core-crypto": "9.1.2",
     "@wireapp/cryptobox": "12.8.0",
-    "@wireapp/priority-queue": "2.1.17",
+    "@wireapp/priority-queue": "2.1.19",
     "@wireapp/promise-queue": "2.4.11",
     "@wireapp/protocol-messaging": "1.56.0",
     "@wireapp/store-engine": "5.1.17",
