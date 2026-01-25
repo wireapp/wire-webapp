@@ -5321,14 +5321,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@nx/webpack@npm:22.3.3":
-  version: 22.3.3
-  resolution: "@nx/webpack@npm:22.3.3"
+"@nx/webpack@npm:22.4.1":
+  version: 22.4.1
+  resolution: "@nx/webpack@npm:22.4.1"
   dependencies:
     "@babel/core": "npm:^7.23.2"
-    "@nx/devkit": "npm:22.3.3"
-    "@nx/js": "npm:22.3.3"
-    "@phenomnomnominal/tsquery": "npm:~5.0.1"
+    "@nx/devkit": "npm:22.4.1"
+    "@nx/js": "npm:22.4.1"
+    "@phenomnomnominal/tsquery": "npm:~6.1.4"
     ajv: "npm:^8.12.0"
     autoprefixer: "npm:^10.4.9"
     babel-loader: "npm:^9.1.2"
@@ -5361,7 +5361,7 @@ __metadata:
     webpack-dev-server: "npm:^5.2.1"
     webpack-node-externals: "npm:^3.0.0"
     webpack-subresource-integrity: "npm:^5.1.0"
-  checksum: 10/8d3e0fb4cd3da3c314998b7705ede5aabe758469eba9b931ee5d6ddc17bf7d671bef9a47305731e99f9d56eb39c312a7507e14d30bd17b935c8ed28741729ae0
+  checksum: 10/c6cf2970511b3b7dc4082e6e0a198186c714a92ebdd94e29faa9e1c5c9ed94ed7c54de418c704aba80a61abccd8ce3aa39e3c7650cad4b207524d4b19be0bcd8
   languageName: node
   linkType: hard
 
@@ -5575,6 +5575,18 @@ __metadata:
   peerDependencies:
     typescript: ^3 || ^4 || ^5
   checksum: 10/46ad2081b4c95c9cddf77ba89263b68e3bb0a21c68d1e08220cef9deb0fe1944d19c930d32565e699bb4fd561242c61939d5e4365222f15a9be206e04284d252
+  languageName: node
+  linkType: hard
+
+"@phenomnomnominal/tsquery@npm:~6.1.4":
+  version: 6.1.4
+  resolution: "@phenomnomnominal/tsquery@npm:6.1.4"
+  dependencies:
+    "@types/esquery": "npm:^1.5.0"
+    esquery: "npm:^1.5.0"
+  peerDependencies:
+    typescript: ^3 || ^4 || ^5
+  checksum: 10/682096c51cb9b97e3e8415dc6554bf1d8c52b9f143e5507be884e68ac3b23bd71b85d795e11bfd77bbafcc1f5c5bb02f7354eaadb553887705cbff7899cf04cc
   languageName: node
   linkType: hard
 
@@ -9459,6 +9471,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/esquery@npm:^1.5.0":
+  version: 1.5.4
+  resolution: "@types/esquery@npm:1.5.4"
+  dependencies:
+    "@types/estree": "npm:*"
+  checksum: 10/5fc78cbaf48e66b05d051013a634aa270311b02a4c38b9b02510e4224ebd29974c0f8b9bff647d258c08ac35dc3e3266425b39c4b7e24b055097eec502a12d71
+  languageName: node
+  linkType: hard
+
 "@types/estree@npm:*, @types/estree@npm:^1.0.0, @types/estree@npm:^1.0.6, @types/estree@npm:^1.0.8":
   version: 1.0.8
   resolution: "@types/estree@npm:1.0.8"
@@ -11244,7 +11265,7 @@ __metadata:
     "@lexical/react": "npm:0.27.2"
     "@lexical/rich-text": "npm:0.27.2"
     "@mediapipe/tasks-vision": "npm:0.10.22-rc.20250304"
-    "@nx/webpack": "npm:22.3.3"
+    "@nx/webpack": "npm:22.4.1"
     "@playwright/test": "npm:1.58.0"
     "@roamhq/wrtc": "npm:0.9.1"
     "@tanstack/react-table": "npm:8.21.3"
