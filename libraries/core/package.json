@@ -26,7 +26,7 @@
     "@wireapp/priority-queue": "2.1.19",
     "@wireapp/promise-queue": "2.4.13",
     "@wireapp/protocol-messaging": "1.56.0",
-    "@wireapp/store-engine": "5.1.17",
+    "@wireapp/store-engine": "5.1.19",
     "hash.js": "1.1.7",
     "idb": "8.0.3",
     "lodash": "4.17.23"
