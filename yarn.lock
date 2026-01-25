@@ -22719,6 +22719,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"playwright-core@npm:1.58.0":
+  version: 1.58.0
+  resolution: "playwright-core@npm:1.58.0"
+  bin:
+    playwright-core: cli.js
+  checksum: 10/718549cdcd22e55f42887e7b832276c9a50e112b278d22a2242bb00c401021623fedf9554c7090f132e389b5bbe11a987ce71e3c877e767eed4dd9bfe573019c
+  languageName: node
+  linkType: hard
+
 "playwright@npm:1.57.0":
   version: 1.57.0
   resolution: "playwright@npm:1.57.0"
@@ -22731,6 +22740,21 @@ __metadata:
   bin:
     playwright: cli.js
   checksum: 10/241559210f98ef11b6bd6413f2d29da7ef67c7865b72053192f0d164fab9e0d3bd47913b3351d5de6433a8aff2d8424d4b8bd668df420bf4dda7ae9fcd37b942
+  languageName: node
+  linkType: hard
+
+"playwright@npm:1.58.0":
+  version: 1.58.0
+  resolution: "playwright@npm:1.58.0"
+  dependencies:
+    fsevents: "npm:2.3.2"
+    playwright-core: "npm:1.58.0"
+  dependenciesMeta:
+    fsevents:
+      optional: true
+  bin:
+    playwright: cli.js
+  checksum: 10/5ef5d0977906046400cee9a359f18c87eafb3e3193a33a22351cc84740c0dffb3cff7b9f2320d1e200817dbf24e63b747a0546b6c671a9fd95937e2402682ad9
   languageName: node
   linkType: hard
 
@@ -29136,7 +29160,7 @@ __metadata:
     long: "npm:5.3.2"
     nock: "npm:14.0.10"
     nx: "npm:22.4.1"
-    playwright: "npm:1.57.0"
+    playwright: "npm:1.58.0"
     prettier: "npm:3.8.0"
     rimraf: "npm:6.1.2"
     simple-git: "npm:3.30.0"
