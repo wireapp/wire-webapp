@@ -10856,9 +10856,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@wireapp/eslint-config@npm:3.1.7":
-  version: 3.1.7
-  resolution: "@wireapp/eslint-config@npm:3.1.7"
+"@wireapp/eslint-config@npm:3.1.9":
+  version: 3.1.9
+  resolution: "@wireapp/eslint-config@npm:3.1.9"
   dependencies:
     "@types/eslint": "npm:^8"
     "@types/prettier": "npm:^3"
@@ -10887,7 +10887,7 @@ __metadata:
   peerDependencies:
     eslint: ^8
     prettier: ^3
-  checksum: 10/0630b18cc24bd3caa887dfc6e6d161bda65f42b650d253252db65d2871f31e6ce2cfe124048b319a9ecb4c916d2b8e763889eeab1bbd70c8e0c380a19b0eaab0
+  checksum: 10/757fcfdd1ce094a11385ea79be53581cd841dee28ed3b0cb3e0cba57b2fb1cb6731105078f0406a4e520fbf2af3bdc160d91620d33b81457c44575e29771f9ae
   languageName: node
   linkType: hard
 
@@ -29013,7 +29013,7 @@ __metadata:
     "@typescript-eslint/parser": "npm:8.53.1"
     "@wireapp/commons": "npm:5.4.13"
     "@wireapp/copy-config": "npm:2.3.13"
-    "@wireapp/eslint-config": "npm:3.1.7"
+    "@wireapp/eslint-config": "npm:3.1.9"
     "@wireapp/prettier-config": "npm:0.6.11"
     archiver: "npm:7.0.1"
     axios: "npm:1.13.3"
