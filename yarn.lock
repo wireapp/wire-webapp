@@ -11063,10 +11063,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@wireapp/prettier-config@npm:0.6.9":
-  version: 0.6.9
-  resolution: "@wireapp/prettier-config@npm:0.6.9"
-  checksum: 10/9e7f25d543ac71ee1c1f889d17ca562920c843970e30aa4bb01207cd997d4baf7f3c749e2782d29c83aed8bd13cc7ea840e3e64746a69aa075630040b5618cd8
+"@wireapp/prettier-config@npm:0.6.11":
+  version: 0.6.11
+  resolution: "@wireapp/prettier-config@npm:0.6.11"
+  checksum: 10/b3f17c5eed8fa9c7552fa96d8c6fc16e01bee637c27e3e4a60d3d88931aab12a36c8bcdb3c0713374bc3aca205a8f9b6b259851df2579363194c574d156339ce
   languageName: node
   linkType: hard
 
@@ -29260,7 +29260,7 @@ __metadata:
     "@wireapp/commons": "npm:5.4.13"
     "@wireapp/copy-config": "npm:2.3.10"
     "@wireapp/eslint-config": "npm:3.1.7"
-    "@wireapp/prettier-config": "npm:0.6.9"
+    "@wireapp/prettier-config": "npm:0.6.11"
     archiver: "npm:7.0.1"
     axios: "npm:1.13.2"
     babel-jest: "npm:29.7.0"
