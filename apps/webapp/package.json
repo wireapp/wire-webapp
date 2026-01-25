@@ -41,7 +41,7 @@
     "@wireapp/kalium-backup": "0.0.4",
     "@wireapp/promise-queue": "2.4.11",
     "@wireapp/react-ui-kit": "9.73.7",
-    "@wireapp/store-engine-dexie": "2.1.22",
+    "@wireapp/store-engine-dexie": "2.1.24",
     "@wireapp/telemetry": "0.3.7",
     "@wireapp/webapp-events": "0.29.0",
     "amplify": "https://github.com/wireapp/amplify#head=master",
