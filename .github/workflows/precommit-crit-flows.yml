@@ -124,71 +124,23 @@ jobs:
             echo "❌ Deployment failed"; exit 1
           fi
 
-  e2e_crit_flow:
+  run_e2e_tests:
     name: Playwright Critical Flow (precommit)
     if: ${{ !cancelled() && github.repository == 'wireapp/wire-webapp' && github.actor != 'dependabot[bot]' && github.actor != 'dependabot' }}
-    runs-on: ubuntu-latest
-    needs: [deploy_to_aws]
-    timeout-minutes: 35
-
-    strategy:
-      fail-fast: false
-      matrix:
-        # prettier-ignore
-        shard: [ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32]
-
-    services:
-      # Run the kalium testservice as service container of the current job
-      testservice:
-        image: quay.io/wire/testservice:latest
-        ports:
-          - 8080:8080
-
-    steps:
-      - uses: actions/checkout@v6
-        with:
-          ref: ${{ github.event.pull_request.head.sha }}
-
-      - uses: actions/setup-node@v6
-        with:
-          node-version-file: '.nvmrc'
-          cache: 'yarn'
-
-      - run: yarn --immutable
-      - run: yarn playwright install --with-deps chrome
-      - uses: 1password/install-cli-action@143a85f84a90555d121cde2ff5872e393a47ab9f
-
-      - name: Generate env file
-        run: op inject -i apps/webapp/test/e2e_tests/.env.staging.tpl -o apps/webapp/test/e2e_tests/.env
-        env:
-          OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
-
-      # Log which URL will be used for tests (deploy output vs fallback) and probe if env responds
-      - name: Show target URL + quick probe
-        run: |
-          echo "Using precommit URL: https://wire-webapp-precommit.zinfra.io/"
-          curl -s -o /dev/null -w "HTTP %{http_code}\n" https://wire-webapp-precommit.zinfra.io/
-
-      - name: Run critical flow tests
-        env:
-          # TODO: remove hardcoded precommit env in the future when ephemeral PR envs will exist
-          # Overrides URL from .env file
-          WEBAPP_URL: https://wire-webapp-precommit.zinfra.io/
-          TEST_SERVICE_URL: http://localhost:8080 # Run tests against locally running test service
-        run: yarn nx run webapp:e2e --shard=${{ matrix.shard }}/${{ strategy.job-total }} --grep "@crit-flow-web|@regression"
-
-      - name: Upload blob report
-        if: ${{ !cancelled() }}
-        uses: actions/upload-artifact@v5
-        with:
-          name: blob-report-${{ matrix.shard }}
-          path: apps/webapp/blob-report
-          retention-days: 1
+    needs: deploy_to_aws
+    uses: ./.github/workflows/e2e-tests.yml
+    with:
+      webappUrl: https://wire-webapp-precommit.zinfra.io/
+      backendUrl: https://staging-nginz-https.zinfra.io/
+      grep: '@crit-flow-web|@regression'
+    secrets:
+      OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
 
   e2e-report:
-    runs-on: ubuntu-latest
+    name: Generate test report
+    needs: run_e2e_tests
     if: ${{ !cancelled() }}
-    needs: [e2e_crit_flow]
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
         with:
@@ -199,29 +151,11 @@ jobs:
           node-version-file: '.nvmrc'
           cache: 'yarn'
 
-      - run: yarn --immutable
-
-      - name: Download blob reports
+      - name: Download report
         uses: actions/download-artifact@v5
         with:
-          path: all-blob-reports
-          pattern: blob-report-*
-          merge-multiple: true
-
-      - name: Merge playwright reports
-        run: |
-          ls -la all-blob-reports/ || echo "No blob reports found"
-          cd apps/webapp
-          yarn playwright merge-reports --config ./playwright.config.ts ../../all-blob-reports
-          cd ../..
-
-      - name: Upload test report
-        id: upload_playwright_report
-        if: always()
-        uses: actions/upload-artifact@v5
-        with:
-          name: playwright-report
-          path: apps/webapp/playwright-report/
+          artifact-ids: ${{ needs.run_e2e_tests.outputs.reportArtifactId }}
+          path: apps/webapp/playwright-report
 
       - name: Generate PR comment
         if: always()
@@ -253,7 +187,7 @@ jobs:
         with:
           header: playwright-summary
           message: |
-            🔗 [Download Full Report Artifact](${{ steps.upload_playwright_report.outputs.artifact-url }})
+            🔗 [Download Full Report Artifact](${{ needs.run_e2e_tests.outputs.reportUrl }})
 
             ${{ steps.generate_comment.outputs.comment }}
         env:
