@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [9.73.9](https://github.com/wireapp/wire-web-packages/compare/@wireapp/react-ui-kit@9.73.8...@wireapp/react-ui-kit@9.73.9) (2026-01-26)
+
+### Bug Fixes
+
+* add aria role to tooltip ([#7843](https://github.com/wireapp/wire-web-packages/issues/7843)) ([338bad8](https://github.com/wireapp/wire-web-packages/commit/338bad86d5ce3434b198ae2e5dd4552f68e3a23a))
+
 ## [9.73.8](https://github.com/wireapp/wire-web-packages/compare/@wireapp/react-ui-kit@9.73.7...@wireapp/react-ui-kit@9.73.8) (2026-01-25)
 
 **Note:** Version bump only for package @wireapp/react-ui-kit
