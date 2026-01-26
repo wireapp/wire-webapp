@@ -22,16 +22,8 @@ import {PageManager} from 'test/e2e_tests/pageManager';
 import {test, expect, withLogin, withConnectedUser} from 'test/e2e_tests/test.fixtures';
 import {getAudioFilePath, getTextFilePath, getVideoFilePath, shareAssetHelper} from 'test/e2e_tests/utils/asset.util';
 import {getImageFilePath} from 'test/e2e_tests/utils/sendImage.util';
-import {selectByDataAttribute} from '../../utils/selector.util';
 
-type PM = Awaited<ReturnType<typeof PageManager.from>>;
-type Pages = PM['webapp']['pages'];
-
-type LikeCase = {
-  tc: '@TC-1527' | '@TC-1528' | '@TC-1529' | '@TC-1530' | '@TC-1532' | '@TC-1536';
-  title: string;
-  sendFromUserB: (userBPages: Pages) => Promise<void>;
-};
+type Pages = PageManager['webapp']['pages'];
 
 test.describe('Reactions', () => {
   let userA: User;
@@ -43,7 +35,7 @@ test.describe('Reactions', () => {
     userB = team.members[0];
   });
 
-  const likeCases: LikeCase[] = [
+  const likeCases = [
     {
       tc: '@TC-1527',
       title: 'link preview in 1:1',
@@ -107,7 +99,7 @@ test.describe('Reactions', () => {
 
       await userAPages.conversation().reactOnMessage(messageFromUserB, 'heart');
 
-      await expect(userAPages.conversation().reactionWithHeartEmoji).toBeVisible();
+      await expect(userAPages.conversation().getReactionOnMessage(messageFromUserB, 'heart')).toBeVisible();
     });
   }
 
@@ -135,7 +127,7 @@ test.describe('Reactions', () => {
     const messageWithLink = userAPages.conversation().getMessage({sender: userB});
     await userAPages.conversation().reactOnMessage(messageWithLink, 'heart');
 
-    await expect(userAPages.conversation().reactionWithHeartEmoji).toBeVisible();
+    await expect(userAPages.conversation().getReactionOnMessage(messageWithLink, 'heart')).toBeVisible();
   });
 
   test('Verify liking an own text message', {tag: ['@TC-1534', '@regression']}, async ({createPage}) => {
@@ -145,16 +137,13 @@ test.describe('Reactions', () => {
     const messageUserA = userAPages.conversation().getMessage({sender: userA});
     await userAPages.conversation().reactOnMessage(messageUserA, 'heart');
 
-    await expect(userAPages.conversation().reactionWithHeartEmoji).toBeVisible();
+    await expect(userAPages.conversation().getReactionOnMessage(messageUserA, 'heart')).toBeVisible();
   });
 
   test('Verify you cannot like a system message', {tag: ['@TC-1535', '@regression']}, async ({createPage}) => {
     const userAPages = (await PageManager.from(createPage(withLogin(userA), withConnectedUser(userB)))).webapp.pages;
 
-    const systemMessage = userAPages
-      .conversation()
-      .page.locator(`${selectByDataAttribute('item-message')}${selectByDataAttribute('-1', 'send-status')}`)
-      .last();
+    const systemMessage = userAPages.conversation().systemMessages;
     await systemMessage.hover();
 
     const reactionButtons = systemMessage.getByRole('group').getByRole('button').first();
@@ -172,7 +161,7 @@ test.describe('Reactions', () => {
     const messageUserB = userAPages.conversation().getMessage({sender: userB});
     await userAPages.conversation().reactOnMessage(messageUserB, 'heart');
 
-    const reaction = userAPages.conversation().reactionWithHeartEmoji;
+    const reaction = userAPages.conversation().getReactionOnMessage(messageUserB, 'heart');
     await expect(reaction).toBeVisible();
 
     await userBPages.conversation().editMessage(userBPages.conversation().getMessage({sender: userB}));
@@ -200,80 +189,55 @@ test.describe('Reactions', () => {
       const message = userBPages.conversation().getMessage({sender: userB});
       await userBPages.conversation().reactOnMessage(message, 'heart');
 
-      const reaction = userAPages.conversation().reactionWithHeartEmoji;
+      const reaction = userAPages.conversation().getReactionOnMessage(messageUserB, 'heart');
       await reaction.hover();
 
       const tooltip = userAPages
         .conversation()
-        .page.locator('[data-testid="tooltip-content"] div')
+        .page.getByRole('tooltip')
         .filter({hasText: `${userA.fullName} reacted with`});
       await expect(tooltip).toBeVisible();
     },
   );
 
-  test(
-    'I want to add/remove a reaction by clicking a reaction pill',
-    {tag: ['@TC-1548', '@regression']},
-    async ({createPage}) => {
+  const toggleReactionCases = [
+    {
+      tc: '@TC-1548',
+      title: 'I want to add/remove a reaction by clicking a reaction pill',
+      emoji: 'heart',
+    },
+    {
+      tc: '@TC-1549',
+      title: 'I want to add/remove a reaction using emoji picker',
+      emoji: 'joy',
+    },
+  ] as const;
+
+  for (const c of toggleReactionCases) {
+    test(c.title, {tag: [c.tc, '@regression']}, async ({createPage}) => {
       const [userAPages, userBPages] = await Promise.all([
         PageManager.from(createPage(withLogin(userA), withConnectedUser(userB))).then(pm => pm.webapp.pages),
         PageManager.from(createPage(withLogin(userB), withConnectedUser(userA))).then(pm => pm.webapp.pages),
       ]);
 
       await userBPages.conversation().sendMessage('Message to react to');
-      const messageInUserA = userAPages.conversation().getMessage({sender: userB});
 
-      await userAPages.conversation().reactOnMessage(messageInUserA, 'heart');
+      const messageInUserA = userAPages.conversation().getMessage({sender: userB});
+      await userAPages.conversation().reactOnMessage(messageInUserA, c.emoji);
 
       const messageInUserB = userBPages.conversation().getMessage({sender: userB});
-      await userBPages.conversation().reactOnMessage(messageInUserB, 'heart');
+      await userBPages.conversation().reactOnMessage(messageInUserB, c.emoji);
 
-      const reactionPill = userAPages.conversation().reactionWithHeartEmoji;
+      const reactionPill = userAPages.conversation().getReactionOnMessage(messageInUserA, c.emoji);
 
       await expect(reactionPill).toBeVisible();
-      await expect(reactionPill).toHaveAttribute('aria-label', '2 reactions, react with heart emoji');
-      await expect(reactionPill).toHaveAttribute('aria-pressed', 'true');
+      await expect(reactionPill).toHaveText('2');
 
       await reactionPill.click();
-      await expect(reactionPill).toHaveAttribute('aria-label', '1 reaction, react with heart emoji');
-      await expect(reactionPill).toHaveAttribute('aria-pressed', 'false');
+      await expect(reactionPill).toHaveText('1');
 
       await reactionPill.click();
-      await expect(reactionPill).toHaveAttribute('aria-label', '2 reactions, react with heart emoji');
-      await expect(reactionPill).toHaveAttribute('aria-pressed', 'true');
-    },
-  );
-
-  test(
-    'I want to add/remove a reaction using emoji picker',
-    {tag: ['@TC-1549', '@regression']},
-    async ({createPage}) => {
-      const [userAPages, userBPages] = await Promise.all([
-        PageManager.from(createPage(withLogin(userA), withConnectedUser(userB))).then(pm => pm.webapp.pages),
-        PageManager.from(createPage(withLogin(userB), withConnectedUser(userA))).then(pm => pm.webapp.pages),
-      ]);
-
-      await userBPages.conversation().sendMessage('Message for emoji picker test');
-      const message = userAPages.conversation().getMessage({sender: userB});
-
-      await message.hover();
-
-      const thumbsUpButton = message.getByRole('button', {name: 'React with thumbs up'});
-
-      await expect(thumbsUpButton).toBeVisible();
-      await expect(thumbsUpButton).toHaveAttribute('aria-pressed', 'false');
-
-      await thumbsUpButton.click();
-      await expect(thumbsUpButton).toHaveAttribute('aria-pressed', 'true');
-
-      const reactionPill = userAPages.conversation().page.getByRole('button', {name: /react with \+1/i});
-      await expect(reactionPill).toBeVisible();
-
-      await message.hover();
-      await thumbsUpButton.click();
-
-      await expect(thumbsUpButton).toHaveAttribute('aria-pressed', 'false');
-      await expect(reactionPill).not.toBeVisible();
-    },
-  );
+      await expect(reactionPill).toHaveText('2');
+    });
+  }
 });

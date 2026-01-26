@@ -60,7 +60,6 @@ export class ConversationPage {
   readonly itemPendingRequest: Locator;
   readonly ignoreButton: Locator;
   readonly cancelRequest: Locator;
-  readonly reactionWithHeartEmoji: Locator;
 
   readonly getImageAltText = (user: User) => `Image from ${user.fullName}`;
 
@@ -89,9 +88,7 @@ export class ConversationPage {
     this.makeAdminToggle = page.locator(selectByDataAttribute('do-allow-admin'));
     this.removeUserButton = page.locator(selectByDataAttribute('do-remove-item-text'));
     this.addMemberButton = page.locator(selectByDataAttribute('go-add-people'));
-    this.systemMessages = page.locator(
-      `${selectByDataAttribute('item-message')}${selectByClass('system-message')} ${selectByClass('message-header')}`,
-    );
+    this.systemMessages = page.locator(`${selectByDataAttribute('item-message')}${selectByClass('system-message')}`);
     this.callButton = page.locator(selectByDataAttribute('do-call'));
     this.conversationInfoButton = page.locator(selectByDataAttribute('do-open-info'));
     this.pingButton = page.locator(selectByDataAttribute('do-ping'));
@@ -108,7 +105,6 @@ export class ConversationPage {
     this.itemPendingRequest = page.locator(selectByDataAttribute('item-pending-requests'));
     this.ignoreButton = page.getByTestId('do-ignore');
     this.cancelRequest = page.getByTestId('do-cancel-request');
-    this.reactionWithHeartEmoji = page.getByRole('button', {name: /react with heart emoji/i});
   }
 
   protected getImageLocator(user: User): Locator {
