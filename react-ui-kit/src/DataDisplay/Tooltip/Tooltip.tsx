@@ -155,6 +155,7 @@ const PortalComponent = ({children, wrapperRect, selector = '#wire-app'}: Portal
       className="tooltip"
       css={(theme: Theme) => tooltipStyle(theme)}
       data-position={isTouchingTop ? 'bottom' : 'top'}
+      role="tooltip"
     >
       <TooltipArrow wrapperRect={wrapperRect} />
 
