@@ -4,11 +4,6 @@ on:
   schedule:
     # we want to run this nightly on dev
     - cron: '0 02 * * 1-5'
-  # ToDo: This trigger is only for testing, remove before merging
-  pull_request:
-    branches:
-      - dev
-  workflow_dispatch:
 
 # Only allow one instance of this workflow to run per branch at a time
 concurrency:
