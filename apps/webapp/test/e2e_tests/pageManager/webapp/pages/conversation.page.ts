@@ -60,6 +60,7 @@ export class ConversationPage {
   readonly itemPendingRequest: Locator;
   readonly ignoreButton: Locator;
   readonly cancelRequest: Locator;
+  readonly reactionWithHeartEmoji: Locator;
 
   readonly getImageAltText = (user: User) => `Image from ${user.fullName}`;
 
@@ -107,6 +108,7 @@ export class ConversationPage {
     this.itemPendingRequest = page.locator(selectByDataAttribute('item-pending-requests'));
     this.ignoreButton = page.getByTestId('do-ignore');
     this.cancelRequest = page.getByTestId('do-cancel-request');
+    this.reactionWithHeartEmoji = page.getByRole('button', {name: /react with heart emoji/i});
   }
 
   protected getImageLocator(user: User): Locator {
@@ -264,12 +266,10 @@ export class ConversationPage {
 
   async reactOnMessage(message: Locator, emojiType: EmojiReaction) {
     await message.hover();
-    const reactionButton = message.getByRole('group').getByRole('button').first();
-    await reactionButton.click();
 
     switch (emojiType) {
       case 'plus-one':
-        // The first quick reaction button is +1 (thumbs up), so we just clicked it
+        await message.getByRole('group').getByRole('button').first().click();
         break;
       case 'heart':
         await this.page.getByTestId('reactwith-love-message').click();
