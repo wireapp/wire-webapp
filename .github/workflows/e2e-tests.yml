@@ -14,7 +14,7 @@ on:
           - https://wire-webapp-edge.wire.com/
           - https://wire-webapp-staging.wire.com/
       backendUrl:
-        type: string
+        type: choice
         description: Define which backend should be used (make sure this matches the one used by the stage set for webappUrl)
         options:
           - https://staging-nginz-https.zinfra.io/
