@@ -32,6 +32,5 @@ INBUCKET_PASSWORD="{{ op://Test Automation/BackendConnection fulu/inbucketPasswo
 INBUCKET_URL=op://Test Automation/BackendConnection fulu/inbucketUrl
 BACKEND_URL=op://Test Automation/BackendConnection fulu/backendUrl
 WEBAPP_URL=op://Test Automation/BackendConnection fulu/webappUrl
-TEAM_MANAGEMENT_URL=op://Test Automation/BackendConnection fulu/teamManagementUrl
 DOMAIN=op://Test Automation/BackendConnection fulu/domain
 BASIC_AUTH=op://Test Automation/BackendConnection fulu/basicAuth

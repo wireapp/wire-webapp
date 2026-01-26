@@ -32,7 +32,7 @@ const numberOfParallelWorkersOnCI = 1;
 module.exports = defineConfig({
   testDir: './test/e2e_tests',
   /* Run tests in files in parallel */
-  fullyParallel: false,
+  fullyParallel: true,
   /* Fail the build on CI if you accidentally left test.only in the source code. */
   forbidOnly: !!process.env.CI,
   /* Due to the tests usually requiring registration and login of a new user the default 30s timeout isn't sufficient */
@@ -43,10 +43,9 @@ module.exports = defineConfig({
   workers: process.env.CI ? numberOfParallelWorkersOnCI : undefined,
   /* Reporter to use. See https://playwright.dev/docs/test-reporters */
   reporter: [
-    ['html', {outputFolder: 'playwright-report', open: 'never'}],
+    ['html', {outputFolder: 'playwright-report/html', open: 'never'}],
     ['json', {outputFile: 'playwright-report/report.json'}],
-    // Add github and blob reporters in CI otherwise html and json are enough
-    ...(process.env.CI ? ([['line'], ['blob']] satisfies ReporterDescription[]) : []),
+    ['line'],
   ],
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
   use: {

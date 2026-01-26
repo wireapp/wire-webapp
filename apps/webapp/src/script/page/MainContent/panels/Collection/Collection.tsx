@@ -19,8 +19,10 @@
 
 import {useEffect, useState} from 'react';
 
+import {CONVERSATION_CELLS_STATE} from '@wireapp/api-client/lib/conversation';
 import {amplify} from 'amplify';
 
+import {ChevronIcon, SecondaryButton} from '@wireapp/react-ui-kit';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import * as Icon from 'Components/Icon';
@@ -31,6 +33,7 @@ import {MessageRepository} from 'Repositories/conversation/MessageRepository';
 import {Conversation} from 'Repositories/entity/Conversation';
 import {ContentMessage} from 'Repositories/entity/message/ContentMessage';
 import {User} from 'Repositories/entity/User';
+import {Config} from 'src/script/Config';
 import {generateConversationUrl} from 'src/script/router/routeGenerator';
 import {createNavigate} from 'src/script/router/routerBindings';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
@@ -88,7 +91,7 @@ const Collection = ({
   selfUser,
 }: CollectionDetailsProps) => {
   const [searchTerm, setSearchTerm] = useState('');
-  const {display_name} = useKoSubscribableChildren(conversation, ['display_name']);
+  const {display_name, cellsState} = useKoSubscribableChildren(conversation, ['display_name', 'cellsState']);
   const [messages, setMessages] = useState<ContentMessage[]>([]);
   const [detailCategory, setDetailCategory] = useState<Category | undefined>(undefined);
 
@@ -191,6 +194,12 @@ const Collection = ({
     </>
   );
 
+  const filesUrl = generateConversationUrl({...conversation.qualifiedId, filePath: 'files'});
+  const isCellsEnabled =
+    Config.getConfig().FEATURE.ENABLE_CELLS &&
+    cellsState !== undefined &&
+    cellsState !== CONVERSATION_CELLS_STATE.DISABLED;
+
   return (
     <div id="collection" className="collection content">
       <div className="content-titlebar">
@@ -214,6 +223,17 @@ const Collection = ({
             change={setSearchTerm}
             click={message => amplify.publish(WebAppEvents.CONVERSATION.SHOW, conversation, {exposeMessage: message})}
           />
+          {isCellsEnabled && (
+            <SecondaryButton onClick={createNavigate(filesUrl)} fullWidth={true} uieName="shared-drive-id">
+              <span data-secondary-button-content="true">
+                <span data-secondary-button-title="true">{t('cells.sharedDrive.title')}</span>
+                <span data-secondary-text="true">{t('cells.sharedDrive.description')}</span>
+              </span>
+              <span data-secondary-button-chevron="true" aria-hidden="true">
+                <ChevronIcon width={16} height={16} color="currentColor" />
+              </span>
+            </SecondaryButton>
+          )}
           {content}
         </div>
       </div>
