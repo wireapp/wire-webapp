@@ -58,7 +58,7 @@ export const CellsHeader = ({
   const inputRef = useRef<HTMLInputElement>(null);
 
   const breadcrumbs = getBreadcrumbsFromPath({
-    baseCrumb: `${conversationName} files`,
+    baseCrumb: t('cells.breadcrumb.files', {conversationName}),
     currentPath: getCellsFilesPath(),
   });
 
