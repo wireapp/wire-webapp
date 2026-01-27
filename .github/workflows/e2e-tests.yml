@@ -14,7 +14,7 @@ on:
           - https://wire-webapp-edge.wire.com/
           - https://wire-webapp-staging.wire.com/
       backendUrl:
-        type: string
+        type: choice
         description: Define which backend should be used (make sure this matches the one used by the stage set for webappUrl)
         options:
           - https://staging-nginz-https.zinfra.io/
@@ -85,15 +85,16 @@ jobs:
           WEBAPP_URL: ${{ inputs.webappUrl }}
           BACKEND_URL: ${{ inputs.backendUrl }}
           TEST_SERVICE_URL: http://localhost:8080 # Run tests against locally running test service
+          PLAYWRIGHT_BLOB_OUTPUT_DIR: apps/webapp/playwright-report/blob-reports
           GREP: ${{ inputs.grep }}
-        run: yarn nx run webapp:e2e --shard=${{ matrix.shard }}/${{ strategy.job-total }} --grep="${GREP}"
+        run: yarn nx run webapp:e2e --shard=${{ matrix.shard }}/${{ strategy.job-total }} --reporter=blob --grep="${GREP}"
 
       - name: Upload blob report
         if: ${{ !cancelled() }}
         uses: actions/upload-artifact@v5
         with:
           name: blob-report-${{ matrix.shard }}
-          path: apps/webapp/blob-report
+          path: apps/webapp/playwright-report/blob-reports
           retention-days: 1
 
   e2e-report:
@@ -119,16 +120,16 @@ jobs:
       - name: Download blob reports
         uses: actions/download-artifact@v5
         with:
-          path: all-blob-reports
+          path: ./apps/webapp/playwright-report/blob-reports
           pattern: blob-report-*
           merge-multiple: true
 
+      # Merge reports and delete blob reports, only keep resources to include within the artifact
       - name: Merge playwright reports
+        working-directory: apps/webapp
         run: |
-          ls -la all-blob-reports/ || echo "No blob reports found"
-          cd apps/webapp
-          yarn playwright merge-reports --config ./playwright.config.ts ../../all-blob-reports
-          cd ../..
+          yarn playwright merge-reports --config ./playwright.config.ts playwright-report/blob-reports
+          rm -rf playwright-report/blob-reports/report*
 
       - name: Upload test report
         id: upload_playwright_report

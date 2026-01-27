@@ -49,7 +49,7 @@ import {
   toggleContentStyles,
   wrapperStyles,
 } from './CellsNodeShareModal.styles';
-import {useCellPublicLink} from './useCellPublicLink';
+import {useCellConversationPublicLink} from './useCellConversationPublicLink';
 
 import {useCellsStore} from '../../../common/useCellsStore/useCellsStore';
 
@@ -102,7 +102,7 @@ const CellShareModalContent = ({
   cellsRepository,
   modalId,
 }: ShareModalParams & {modalId: string}) => {
-  const {status, link, linkData, isEnabled, togglePublicLink, updatePublicLink} = useCellPublicLink({
+  const {status, link, linkData, isEnabled, togglePublicLink, updatePublicLink} = useCellConversationPublicLink({
     uuid,
     conversationId,
     cellsRepository,
