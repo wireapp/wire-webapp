@@ -56,7 +56,7 @@
       "executor": "nx:run-commands",
       "dependsOn": ["webapp:stylelint", "webapp:type-check"],
       "options": {
-        "command": "eslint --quiet --ext .js,.ts,.tsx {projectRoot}"
+        "command": "eslint --config eslint.config.ts --quiet --ext .js,.ts,.tsx {projectRoot}"
       }
     },
     "stylelint": {
