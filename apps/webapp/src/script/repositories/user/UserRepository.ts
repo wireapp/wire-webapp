@@ -1004,7 +1004,7 @@ export class UserRepository extends TypedEventEmitter<Events> {
   /**
    * Change the profile image.
    */
-  async changePicture(picture: Blob): Promise<User> {
+  async changePicture(picture: File): Promise<User> {
     try {
       const selfUser = this.userState.self();
       const {previewImageKey, mediumImageKey} = await this.assetRepository.uploadProfileImage(picture);
