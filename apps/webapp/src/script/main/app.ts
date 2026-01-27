@@ -609,7 +609,14 @@ export class App {
 
       this._handleUrlParams();
       await conversationRepository.updateConversationsOnAppInit();
-      await conversationRepository.conversationLabelRepository.loadLabels();
+
+      // Load conversation labels with proper error handling
+      try {
+        await conversationRepository.conversationLabelRepository.loadLabels();
+      } catch (error) {
+        this.logger.error('Failed to load conversation labels', error);
+        // Continue with empty labels rather than breaking the app
+      }
 
       await selfRepository.initialisePeriodicSelfSupportedProtocolsCheck();
 

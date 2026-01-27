@@ -22,7 +22,16 @@ import {ComponentProps} from 'react';
 import {CSSObject} from '@emotion/react';
 
 import {ValidationUtil} from '@wireapp/commons';
-import {BASE_DARK_COLOR, BASE_LIGHT_COLOR, COLOR_V2, Input, Label, Switch} from '@wireapp/react-ui-kit';
+import {
+  BASE_DARK_COLOR,
+  BASE_LIGHT_COLOR,
+  Button,
+  ButtonVariant,
+  COLOR_V2,
+  Input,
+  Label,
+  Switch,
+} from '@wireapp/react-ui-kit';
 
 import {
   CellsShareExpirationFields,
@@ -30,6 +39,7 @@ import {
 } from 'Components/Cells/ShareModal/CellsShareExpirationFields';
 import {CellsTableLoader} from 'Components/Conversation/ConversationCells/common/CellsTableLoader/CellsTableLoader';
 import {CopyToClipboardButton} from 'Components/CopyToClipboardButton/CopyToClipboardButton';
+import * as Icon from 'Components/Icon';
 import {PasswordGeneratorButton} from 'Components/PasswordGeneratorButton';
 import {Config} from 'src/script/Config';
 import {t} from 'Util/LocalizerUtil';
@@ -72,6 +82,7 @@ interface CellsShareModalContentLabels {
   enablePublicLink: string;
   password: string;
   passwordDescription: string;
+  changePassword: string;
   expiration: string;
   expirationDescription: string;
   expirationExpiresLabel: string;
@@ -109,6 +120,9 @@ interface CellsShareModalContentProps {
     value: string;
     onChange: (value: string) => void;
     onGeneratePassword: (password: string) => void;
+    hasExistingPassword?: boolean;
+    isEditingPassword?: boolean;
+    onChangePasswordClick?: () => void;
   };
   expiration: {
     isEnabled: boolean;
@@ -138,6 +152,7 @@ const DEFAULT_LABELS: CellsShareModalContentLabels = {
   enablePublicLink: t('cells.shareModal.enablePublicLink'),
   password: t('cells.shareModal.password'),
   passwordDescription: t('cells.shareModal.password.description'),
+  changePassword: t('cells.shareModal.changePassword'),
   expiration: t('cells.shareModal.expiration'),
   expirationDescription: t('cells.shareModal.expiration.description'),
   expirationExpiresLabel: t('cells.shareModal.expiration.expiresLabel'),
@@ -171,6 +186,7 @@ export const CellsShareModalContent = ({
 }: CellsShareModalContentProps) => {
   const resolvedLabels = {...DEFAULT_LABELS, ...labels};
   const shouldShowLink = publicLink.isEnabled && publicLink.status === 'success' && publicLink.link;
+  const areDependentTogglesDisabled = !publicLink.isEnabled;
   const publicLinkColors = switchColors?.publicLink ?? DEFAULT_SWITCH_COLORS;
   const passwordColors = switchColors?.password ?? DEFAULT_SWITCH_COLORS;
   const expirationColors = switchColors?.expiration ?? DEFAULT_SWITCH_COLORS;
@@ -211,13 +227,28 @@ export const CellsShareModalContent = ({
           <Switch
             id="switch-password"
             aria-describedby="switch-password-description"
-            checked={password.isEnabled}
+            checked={publicLink.isEnabled && password.isEnabled}
             onToggle={password.onToggle}
+            disabled={areDependentTogglesDisabled}
             {...passwordColors}
           />
         </div>
       </div>
-      {password.isEnabled && (
+      {password.isEnabled && password.hasExistingPassword && !password.isEditingPassword && (
+        <div css={styles.toggleContentStyles} data-uie-name="cells-share-password-view-mode">
+          <div css={styles.passwordActionButtonStyles}>
+            <Button
+              variant={ButtonVariant.TERTIARY}
+              onClick={password.onChangePasswordClick}
+              data-uie-name="do-change-password"
+            >
+              <Icon.EditIcon data-uie-name="change-password-icon" width="16" height="16" css={{marginRight: '10px'}} />
+              {resolvedLabels.changePassword}
+            </Button>
+          </div>
+        </div>
+      )}
+      {password.isEnabled && (password.isEditingPassword || !password.hasExistingPassword) && (
         <div css={styles.toggleContentStyles} data-uie-name="cells-share-password-content">
           <div css={styles.passwordContentStyles}>
             <div css={styles.passwordActionButtonStyles}>
@@ -269,8 +300,9 @@ export const CellsShareModalContent = ({
           <Switch
             id="switch-expiration"
             aria-describedby="switch-expiration-description"
-            checked={expiration.isEnabled}
+            checked={publicLink.isEnabled && expiration.isEnabled}
             onToggle={expiration.onToggle}
+            disabled={areDependentTogglesDisabled}
             {...expirationColors}
           />
         </div>

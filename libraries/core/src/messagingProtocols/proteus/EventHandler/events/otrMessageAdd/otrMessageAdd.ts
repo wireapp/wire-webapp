@@ -48,9 +48,9 @@ export const handleOtrMessageAdd = async ({
     const userId = qualified_from || {id: from, domain: ''};
     const messageBytes = Decoder.fromBase64(encodedCiphertext).asBytes;
     const now = Date.now();
-    logger.info('Decrypting OTR message', {userId, clientId, event});
+    logger.info('Decrypting OTR message', {userId, clientId});
     const decryptedData = await proteusService.decrypt(messageBytes, userId, clientId);
-    logger.info('OTR message decrypted successfully', {userId, clientId, event, duration: Date.now() - now});
+    logger.info('OTR message decrypted successfully', {userId, clientId, duration: Date.now() - now});
     const decodedData = GenericMessage.decode(decryptedData);
 
     const isSessionReset = decodedData[GenericMessageType.CLIENT_ACTION] === ClientAction.RESET_SESSION;
@@ -64,7 +64,7 @@ export const handleOtrMessageAdd = async ({
       decryptedData: decodedData,
     };
   } catch (error) {
-    logger.warn('Failed to decrypt OTR message', {event, error});
+    logger.warn('Failed to decrypt OTR message', {error});
     if (error instanceof DecryptionError) {
       return {event, decryptionError: error};
     }

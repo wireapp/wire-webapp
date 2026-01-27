@@ -23,24 +23,35 @@ import type {RestShareLink} from '@wireapp/api-client/lib/cells';
 
 import {CellsRepository} from 'Repositories/cells/CellsRepository';
 import {Config} from 'src/script/Config';
-
-import {useCellsStore} from '../../../common/useCellsStore/useCellsStore';
-
-interface UseCellPublicLinkParams {
-  uuid: string;
-  cellsRepository: CellsRepository;
-}
+import type {CellNode} from 'src/script/types/cellNode';
 
 type PublicLinkStatus = 'idle' | 'loading' | 'error' | 'success';
 
-export const useCellPublicLink = ({uuid, cellsRepository}: UseCellPublicLinkParams) => {
-  const {nodes, setPublicLink} = useCellsStore();
-  const node = nodes.find(n => n.id === uuid);
+interface UseCellPublicLinkParams {
+  uuid: string;
+  node?: CellNode;
+  cellsRepository: CellsRepository;
+  setPublicLink: (data: CellNode['publicLink'] | undefined) => void;
+  refreshLinkDataAfterUpdate?: boolean;
+  setStatusOnPublicLinkUrl?: boolean;
+  includeNodePublicLinkInCallbacks?: boolean;
+}
+
+export const useCellPublicLink = ({
+  uuid,
+  node,
+  cellsRepository,
+  setPublicLink,
+  refreshLinkDataAfterUpdate = false,
+  setStatusOnPublicLinkUrl = false,
+  includeNodePublicLinkInCallbacks = false,
+}: UseCellPublicLinkParams) => {
   const [isEnabled, setIsEnabled] = useState(!!node?.publicLink?.alreadyShared || false);
   const [status, setStatus] = useState<PublicLinkStatus>(node?.publicLink ? 'success' : 'idle');
   const [linkData, setLinkData] = useState<RestShareLink | null>(null);
   const fetchedLinkId = useRef<string | null>(null);
-  const publicLinkUrl = node?.publicLink?.url;
+  // Track created link UUID to handle immediate disable scenario
+  const createdLinkUuid = useRef<string | null>(null);
 
   const createPublicLink = useCallback(async () => {
     try {
@@ -58,12 +69,15 @@ export const useCellPublicLink = ({uuid, cellsRepository}: UseCellPublicLinkPara
       }
 
       const newLink = {uuid: link.Uuid, url: Config.getConfig().CELLS_PYDIO_URL + link.LinkUrl, alreadyShared: true};
-      setPublicLink(uuid, newLink);
+      // Store the created link UUID for immediate deletion scenario
+      createdLinkUuid.current = link.Uuid;
+      setPublicLink(newLink);
       setLinkData(link);
       setStatus('success');
     } catch (err) {
       setStatus('error');
-      setPublicLink(uuid, undefined);
+      setPublicLink(undefined);
+      createdLinkUuid.current = null;
     }
     // cellsRepository is not a dependency because it's a singleton
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -87,32 +101,45 @@ export const useCellPublicLink = ({uuid, cellsRepository}: UseCellPublicLinkPara
 
       const newLink = {uuid: link.Uuid, url: Config.getConfig().CELLS_PYDIO_URL + link.LinkUrl, alreadyShared: true};
 
-      setPublicLink(uuid, newLink);
+      setPublicLink(newLink);
       setLinkData(link);
       fetchedLinkId.current = linkId;
       setStatus('success');
     } catch (err) {
       setStatus('error');
-      setPublicLink(uuid, undefined);
+      setPublicLink(undefined);
     }
     // cellsRepository is not a dependency because it's a singleton
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [uuid, setPublicLink, node?.publicLink]);
+  }, [
+    uuid,
+    setPublicLink,
+    includeNodePublicLinkInCallbacks ? node?.publicLink : undefined,
+    includeNodePublicLinkInCallbacks,
+  ]);
 
   const deletePublicLink = useCallback(async () => {
-    if (!node?.publicLink || !node.publicLink.uuid) {
+    const linkUuid = createdLinkUuid.current || node?.publicLink?.uuid;
+
+    if (!linkUuid) {
       return;
     }
 
     try {
-      await cellsRepository.deletePublicLink({uuid: node.publicLink.uuid});
-      setPublicLink(uuid, undefined);
+      await cellsRepository.deletePublicLink({uuid: linkUuid});
+      setPublicLink(undefined);
+      createdLinkUuid.current = null; // Clear after successful deletion
     } catch (err) {
       setStatus('error');
     }
     // cellsRepository is not a dependency because it's a singleton
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [uuid, node?.publicLink, setPublicLink]);
+  }, [
+    uuid,
+    setPublicLink,
+    includeNodePublicLinkInCallbacks ? node?.publicLink : undefined,
+    includeNodePublicLinkInCallbacks,
+  ]);
 
   const updatePublicLink = useCallback(
     async ({
@@ -122,7 +149,7 @@ export const useCellPublicLink = ({uuid, cellsRepository}: UseCellPublicLinkPara
     }: {
       password?: string;
       passwordEnabled?: boolean;
-      accessEnd?: string;
+      accessEnd?: string | null;
     }) => {
       if (!node?.publicLink?.uuid) {
         throw new Error('No public link to update');
@@ -131,19 +158,22 @@ export const useCellPublicLink = ({uuid, cellsRepository}: UseCellPublicLinkPara
       try {
         setStatus('loading');
 
-        // Fetch the complete link object first
         const currentLink = await cellsRepository.getPublicLink({uuid: node.publicLink.uuid});
 
-        // Determine if we're creating a new password or updating an existing one
         const hasExistingPassword = currentLink.PasswordRequired === true;
         const isSettingPassword = passwordEnabled && password;
 
-        // Update only the properties we need to change
-        const updatedLink = {
+        const updatedLink: typeof currentLink = {
           ...currentLink,
           PasswordRequired: passwordEnabled,
-          ...(accessEnd ? {AccessEnd: accessEnd} : {}),
         };
+
+        if (accessEnd === null) {
+          // Ensure that accessEnd is not present in JSON
+          delete updatedLink.AccessEnd;
+        } else if (accessEnd !== undefined) {
+          updatedLink.AccessEnd = accessEnd;
+        }
 
         await cellsRepository.updatePublicLink({
           linkUuid: node.publicLink.uuid,
@@ -153,6 +183,23 @@ export const useCellPublicLink = ({uuid, cellsRepository}: UseCellPublicLinkPara
           passwordEnabled,
         });
 
+        // Update linkData with the new values so the UI doesn't reset
+        setLinkData(prevData => {
+          if (!prevData) {
+            return prevData;
+          }
+          return {
+            ...prevData,
+            PasswordRequired: passwordEnabled,
+            AccessEnd: accessEnd === null ? undefined : accessEnd !== undefined ? accessEnd : prevData.AccessEnd,
+          };
+        });
+
+        if (refreshLinkDataAfterUpdate) {
+          const refreshedLink = await cellsRepository.getPublicLink({uuid: node.publicLink.uuid});
+          setLinkData(refreshedLink);
+        }
+
         setStatus('success');
       } catch (err) {
         setStatus('error');
@@ -161,7 +208,7 @@ export const useCellPublicLink = ({uuid, cellsRepository}: UseCellPublicLinkPara
     },
     // cellsRepository is not a dependency because it's a singleton
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [node?.publicLink?.uuid],
+    [node?.publicLink?.uuid, refreshLinkDataAfterUpdate],
   );
 
   const togglePublicLink = useCallback(() => {
@@ -189,10 +236,14 @@ export const useCellPublicLink = ({uuid, cellsRepository}: UseCellPublicLinkPara
   }, [isEnabled, node?.publicLink, createPublicLink, deletePublicLink, getPublicLink]);
 
   useEffect(() => {
-    if (publicLinkUrl) {
+    if (!setStatusOnPublicLinkUrl) {
+      return;
+    }
+
+    if (node?.publicLink?.url) {
       setStatus('success');
     }
-  }, [publicLinkUrl]);
+  }, [node?.publicLink?.url, setStatusOnPublicLinkUrl]);
 
   return {
     status,
