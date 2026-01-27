@@ -22,7 +22,7 @@ import {useCallback, useEffect} from 'react';
 import {checkFileSharingPermission} from 'Components/Conversation/utils/checkFileSharingPermission';
 import {t} from 'Util/LocalizerUtil';
 import {formatLocale} from 'Util/TimeUtil';
-import {getFileExtension} from 'Util/util';
+import {getFileExtension, sanitizeFilename} from 'Util/util';
 
 interface UseFilePasteParams {
   onFilePasted: (file: File) => void;
@@ -40,9 +40,12 @@ export const useFilePaste = ({onFilePasted, isFileNameKept}: UseFilePasteParams)
       const {lastModified} = pastedFile;
 
       const date = formatLocale(lastModified || new Date(), 'PP, pp');
-      const fileName = isFileNameKept
+      const rawFileName = isFileNameKept
         ? pastedFile.name
         : `${t('conversationSendPastedFile', {date})}.${getFileExtension(pastedFile.name)}`;
+
+      // Sanitize the filename to avoid encoding issues with locale-specific characters
+      const fileName = sanitizeFilename(rawFileName);
 
       const newFile = new File([pastedFile], fileName, {
         type: pastedFile.type,
