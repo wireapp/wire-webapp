@@ -84,42 +84,55 @@ test.describe('account settings', () => {
     },
   );
 
-  test(
-    'I should not be able to change email of user managed by SCIM',
-    {tag: ['@TC-60', '@regression']},
-    async ({context, createPage}) => {
-      const ssoUser = getUser({
-        email: process.env.SCIM_USER_SSO_CODE,
-        username: process.env.SCIM_USER_EMAIL,
-        password: process.env.SCIM_USER_PASSWORD,
-      });
+  test.describe('SCIM', () => {
+    let pageManager: PageManager;
+    const ssoUser = getUser({
+      email: process.env.SCIM_USER_SSO_CODE,
+      username: process.env.SCIM_USER_EMAIL,
+      password: process.env.SCIM_USER_PASSWORD,
+    });
 
-      const pageManager = PageManager.from(await createPage(context));
-      await pageManager.openMainPage();
+    test.beforeEach(async ({context, createPage}) => {
+      pageManager = PageManager.from(await createPage(context));
+    });
 
-      const {pages, modals, components} = pageManager.webapp;
-      const [newPage] = await Promise.all([
-        context.waitForEvent('page'),
-        pages.singleSignOn().enterEmailOnSSOPage(ssoUser.email),
-      ]);
-
-      await newPage.getByRole('textbox', {name: 'Username'}).fill(ssoUser.username, {timeout: 20_000});
-      await newPage.getByRole('textbox', {name: 'Password'}).fill(ssoUser.password);
-      await newPage.getByRole('button', {name: 'Sign In'}).click();
-      await expect(components.conversationSidebar().sidebar, `Login took more than ${LOGIN_TIMEOUT}s`).toBeVisible({
-        timeout: LOGIN_TIMEOUT,
-      });
-
-      await pages.sidebar().clickPreferencesButton();
-      await pages.settings().accountButton.click();
-      await expect(pages.account().emailDisplay).toHaveCount(0);
+    test.afterEach(async () => {
+      const {pages, modals} = pageManager.webapp;
 
       // Log out the user to ensure the previous login won't affect future runs
+      // If this isn't done the test will start to fail due to too many clients being registered for this one user
+      await pages.sidebar().clickPreferencesButton();
+      await pages.settings().accountButton.click();
       await pages.account().logoutButton.click();
       await modals.confirmLogout().deleteDeviceCheckbox.click();
       await modals.confirmLogout().clickAction();
-    },
-  );
+    });
+
+    test(
+      'I should not be able to change email of user managed by SCIM',
+      {tag: ['@TC-60', '@regression']},
+      async ({context}) => {
+        await pageManager.openMainPage();
+
+        const {pages, components} = pageManager.webapp;
+        const [newPage] = await Promise.all([
+          context.waitForEvent('page'),
+          pages.singleSignOn().enterEmailOnSSOPage(ssoUser.email),
+        ]);
+
+        await newPage.getByRole('textbox', {name: 'Username'}).fill(ssoUser.username, {timeout: 20_000});
+        await newPage.getByRole('textbox', {name: 'Password'}).fill(ssoUser.password);
+        await newPage.getByRole('button', {name: 'Sign In'}).click();
+        await expect(components.conversationSidebar().sidebar, `Login took more than ${LOGIN_TIMEOUT}s`).toBeVisible({
+          timeout: LOGIN_TIMEOUT,
+        });
+
+        await pages.sidebar().clickPreferencesButton();
+        await pages.settings().accountButton.click();
+        await expect(pages.account().emailDisplay).toHaveCount(0);
+      },
+    );
+  });
 
   // see https://wearezeta.atlassian.net/browse/WPB-20548
   test.skip(
