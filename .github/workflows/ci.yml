@@ -14,7 +14,7 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  test_and_build:
+  test:
     runs-on: buildjet-8vcpu-ubuntu-2204
 
     steps:
