@@ -1,9 +1,10 @@
+{{- $appName := include "webapp.baseName" . -}}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: webapp
+  name: {{ $appName }}
   labels:
-    app: webapp
+    app: {{ $appName }}
     chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
     release: {{ .Release.Name }}
     heritage: {{ .Release.Service }}
@@ -16,15 +17,15 @@ spec:
       maxSurge: {{ .Values.replicaCount | mul 2 }}
   selector:
     matchLabels:
-      app: webapp
+      app: {{ $appName }}
   template:
     metadata:
       labels:
-        app: webapp
+        app: {{ $appName }}
         release: {{ .Release.Name }}
     spec:
       containers:
-      - name: webapp
+      - name: {{ $appName }}
         image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
         {{- if eq (include "includeSecurityContext" .) "true" }}
         securityContext:
