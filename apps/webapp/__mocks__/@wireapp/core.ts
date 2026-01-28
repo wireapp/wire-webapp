@@ -113,11 +113,4 @@ export const util = {
   TaskScheduler,
 };
 
-export enum ConnectionState {
-  CLOSED = 'closed',
-  CONNECTING = 'connecting',
-  PROCESSING_NOTIFICATIONS = 'processing_notifications',
-  LIVE = 'live',
-}
-
 export {Ciphersuite} from '@wireapp/core-crypto';
