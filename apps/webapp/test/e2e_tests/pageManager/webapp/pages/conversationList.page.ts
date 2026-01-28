@@ -19,7 +19,7 @@
 
 import {Locator, Page} from '@playwright/test';
 
-import {selectById, selectByDataAttribute} from 'test/e2e_tests/utils/selector.util';
+import {selectByDataAttribute} from 'test/e2e_tests/utils/selector.util';
 
 import {User} from '../../../data/user';
 
@@ -46,7 +46,7 @@ export class ConversationListPage {
     this.page = page;
 
     this.blockConversationMenuButton = page.locator(
-      `${selectById('btn-block')}${selectByDataAttribute('conversation-list-options-menu')}`,
+      `#btn-block${selectByDataAttribute('conversation-list-options-menu')}`,
     );
 
     this.pendingConnectionRequest = page.locator('[data-uie-name="connection-request"]');
@@ -55,11 +55,11 @@ export class ConversationListPage {
     );
     this.leaveConversationButton = page.locator(selectByDataAttribute('conversation-leave'));
     this.searchConversationsInput = page.locator(selectByDataAttribute('search-conversations'));
-    this.archiveConversationMenuButton = page.locator(selectById('btn-archive'));
-    this.unarchiveConversationMenuButton = page.locator(selectById('btn-unarchive'));
+    this.archiveConversationMenuButton = page.locator('#btn-archive');
+    this.unarchiveConversationMenuButton = page.locator('#btn-unarchive');
     this.blockedChip = page.locator(`span[data-uie-name="status-label"] + span`);
     this.unblockConversationMenuButton = page.locator(
-      `${selectById('btn-unblock')}${selectByDataAttribute('conversation-list-options-menu')}`,
+      `#btn-unblock${selectByDataAttribute('conversation-list-options-menu')}`,
     );
     this.moveConversationButton = page.getByRole('menu').getByRole('button', {name: 'Move to'});
     this.moveToMenu = page.getByRole('menu');

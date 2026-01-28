@@ -19,7 +19,7 @@
 
 import {Locator, Page} from '@playwright/test';
 import {downloadAssetAndGetFilePath} from 'test/e2e_tests/utils/asset.util';
-import {selectById, selectByDataAttribute} from 'test/e2e_tests/utils/selector.util';
+import {selectByDataAttribute} from 'test/e2e_tests/utils/selector.util';
 
 export class DetailViewModal {
   readonly page: Page;
@@ -33,7 +33,7 @@ export class DetailViewModal {
   constructor(page: Page) {
     this.page = page;
 
-    this.mainWindow = page.locator(selectById('detail-view'));
+    this.mainWindow = page.locator('#detail-view');
     this.image = this.mainWindow.locator(`img`);
     this.plusOneButton = this.mainWindow.locator(`footer button${selectByDataAttribute('reactwith-thumbsup-messag')}`);
     this.downloadButton = this.mainWindow.locator(
