@@ -3,6 +3,7 @@
 {{- $ingressClass := default "nginx" .Values.ingress.className -}}
 {{- $backendDomain := "" -}}
 {{- $backendRest := "" -}}
+{{- $appName := include "webapp.baseName" . -}}
 {{- if .Values.ingress.renderCSPInIngress }}
   {{- $backendDomain = required "Need a 'config.externalUrls.backendDomain' for CSP headers." .Values.config.externalUrls.backendDomain -}}
   {{- $backendRest = required "Need a 'config.externalUrls.backendRest' for CSP headers." .Values.config.externalUrls.backendRest -}}
@@ -10,9 +11,9 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: webapp
+  name: {{ $appName }}
   labels:
-    app: webapp
+    app: {{ $appName }}
     chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
     release: {{ .Release.Name }}
     heritage: {{ .Release.Service }}
@@ -65,7 +66,7 @@ spec:
             pathType: Prefix
             backend:
               service:
-                name: webapp-http
+                name: {{ include "webapp.httpServiceName" . }}
                 port:
                   number: {{ .Values.service.http.port | default .Values.service.http.internalPort }}
 {{- end }}
