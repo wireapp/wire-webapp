@@ -472,6 +472,7 @@
   "cells.search.closeButton": "Schließen",
   "cells.search.failed": "Es ist ein Fehler aufgetreten. Bitte versuchen Sie es später erneut.",
   "cells.search.placeholder": "Dateien und Ordner suchen",
+  "cells.breadcrumb.files": "{conversationName} Dateien",
   "cells.selfDeletingMessage.info": "Die Funktion ist für Unterhaltungen mit Geteiltes Drive nicht verfügbar.",
   "cells.shareModal.changePassword": "Passwort ändern",
   "cells.shareModal.copyLink": "Link kopieren",
