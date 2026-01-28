@@ -23,18 +23,18 @@ import {selectByDataAttribute, selectByLabel} from 'test/e2e_tests/utils/selecto
 import {OptionModal} from './option.modal';
 
 export class ConfirmLogoutModal extends OptionModal {
-  readonly modalCustomCheckbox: Locator;
+  readonly deleteDeviceCheckbox: Locator;
   readonly modalCheckbox: Locator;
 
   constructor(page: Page) {
     super(page);
 
     this.modalCheckbox = this.modal.locator(`${selectByDataAttribute('modal-option-checkbox')}`);
-    this.modalCustomCheckbox = this.modal.locator(`${selectByLabel('clear-data-checkbox')}`);
+    this.deleteDeviceCheckbox = this.modal.locator(`${selectByLabel('clear-data-checkbox')}`);
   }
 
   async toggleModalCheck() {
-    await this.modalCustomCheckbox.click();
+    await this.deleteDeviceCheckbox.click();
   }
 
   async clickCancel() {
