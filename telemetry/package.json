@@ -23,7 +23,8 @@
   },
   "scripts": {
     "build": "yarn clean && vite build",
-    "clean": "rimraf lib"
+    "clean": "rimraf lib",
+    "dist": "yarn build"
   },
   "dependencies": {
     "countly-sdk-web": "24.11.4"
