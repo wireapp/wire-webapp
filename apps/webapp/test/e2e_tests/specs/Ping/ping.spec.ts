@@ -25,56 +25,99 @@ import {createGroup} from '../../utils/userActions';
 test.describe('Ping', () => {
   let userA: User;
   let userB: User;
+  let userC: User;
+  let userD: User;
+  let userE: User;
+  let userF: User;
 
   test.beforeEach(async ({createTeam}) => {
-    const team = await createTeam('Test Team', {withMembers: 1});
+    const team = await createTeam('Test Team', {withMembers: 5});
     userA = team.owner;
     userB = team.members[0];
+    userC = team.members[1];
+    userD = team.members[2];
+    userE = team.members[3];
+    userF = team.members[4];
   });
 
-  test('Verify I can receive ping in 1:1', {tag: ['@TC-1490', '@regression']}, async ({createPage}) => {
-    const [userAPages, userBPages] = await Promise.all([
-      PageManager.from(createPage(withLogin(userA), withConnectedUser(userB))).then(pm => pm.webapp.pages),
-      PageManager.from(createPage(withLogin(userB))).then(pm => pm.webapp.pages),
-    ]);
+  const pingScenarios = [
+    {
+      id: '@TC-1490',
+      title: 'Verify I can receive ping in 1:1',
+      isGroup: false,
+      pingCount: 1,
+    },
+    {
+      id: '@TC-1491',
+      title: 'Verify I can receive ping several times in a row',
+      isGroup: false,
+      pingCount: 5,
+    },
+    {
+      id: '@TC-1492',
+      title: 'Verify I can receive ping in group conversation',
+      isGroup: true,
+      pingCount: 1,
+    },
+  ];
 
-    await userBPages.conversationList().openConversation(userA.fullName);
-    await userBPages.conversation().sendPing();
+  for (const scenario of pingScenarios) {
+    test(scenario.title, {tag: [scenario.id, '@regression']}, async ({createPage}) => {
+      const [userAPages, userBPages] = await Promise.all([
+        PageManager.from(createPage(withLogin(userA), withConnectedUser(userB))).then(pm => pm.webapp.pages),
+        PageManager.from(createPage(withLogin(userB))).then(pm => pm.webapp.pages),
+      ]);
 
-    await userAPages.conversationList().openConversation(userB.fullName);
-    await expect(userAPages.conversation().getPing()).toBeVisible();
-  });
+      let conversationNameForB = userA.fullName;
+      let conversationNameForA = userB.fullName;
 
-  test('Verify I can receive ping several times in a row', {tag: ['@TC-1491', '@regression']}, async ({createPage}) => {
-    const [userAPages, userBPages] = await Promise.all([
-      PageManager.from(createPage(withLogin(userA), withConnectedUser(userB))).then(pm => pm.webapp.pages),
-      PageManager.from(createPage(withLogin(userB))).then(pm => pm.webapp.pages),
-    ]);
+      if (scenario.isGroup) {
+        const conversationName = 'Test Group';
+        await createGroup(userAPages, conversationName, [userB]);
+        conversationNameForB = conversationName;
+        conversationNameForA = conversationName;
+      }
 
-    await userBPages.conversationList().openConversation(userA.fullName);
-    await userBPages.conversation().sendPing();
-    await userBPages.conversation().sendPing();
-    await userBPages.conversation().sendPing();
-    await userBPages.conversation().sendPing();
-    await userBPages.conversation().sendPing();
+      await userBPages.conversationList().openConversation(conversationNameForB);
 
-    await userAPages.conversationList().openConversation(userB.fullName);
-    await expect(userAPages.conversation().getPing()).toHaveCount(5);
-  });
+      for (let i = 0; i < scenario.pingCount; i++) {
+        await userBPages.conversation().sendPing();
+      }
 
-  test('Verify I can receive ping in group conversation', {tag: ['@TC-1492', '@regression']}, async ({createPage}) => {
-    const [userAPages, userBPages] = await Promise.all([
-      PageManager.from(createPage(withLogin(userA), withConnectedUser(userB))).then(pm => pm.webapp.pages),
-      PageManager.from(createPage(withLogin(userB))).then(pm => pm.webapp.pages),
-    ]);
+      await userAPages.conversationList().openConversation(conversationNameForA);
 
-    const conversationName = 'Test Group';
-    await createGroup(userAPages, conversationName, [userB]);
+      const pingMessage = userAPages.conversation().getPing();
 
-    await userBPages.conversationList().openConversation(conversationName);
-    await userBPages.conversation().sendPing();
+      if (scenario.pingCount === 1) {
+        await expect(pingMessage).toBeVisible();
+      } else {
+        await expect(pingMessage).toHaveCount(scenario.pingCount);
+      }
+    });
+  }
 
-    await userAPages.conversationList().openConversation(conversationName);
-    await expect(userAPages.conversation().getPing()).toBeVisible();
-  });
+  test(
+    'Verify I see a warning when I ping in a big group',
+    {tag: ['@TC-1496', '@regression']},
+    async ({createPage}) => {
+      const userAPage = await createPage(
+        withLogin(userA),
+        withConnectedUser(userB),
+        withConnectedUser(userC),
+        withConnectedUser(userD),
+        withConnectedUser(userE),
+        withConnectedUser(userF),
+      );
+      const userAPages = PageManager.from(userAPage).webapp.pages;
+      const userAModals = PageManager.from(userAPage).webapp.modals;
+
+      const conversationName = 'Test Group';
+      await createGroup(userAPages, conversationName, [userB, userC, userD, userE, userF]);
+
+      await userAPages.conversationList().openConversation(conversationName);
+      await userAPages.conversation().sendPing();
+
+      await expect(userAModals.confirm().modal).toBeVisible();
+    },
+  );
 });
