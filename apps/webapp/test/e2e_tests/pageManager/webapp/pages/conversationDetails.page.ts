@@ -18,7 +18,7 @@
  */
 
 import {Locator, Page} from '@playwright/test';
-import {selectByDataAttribute, selectByClass} from 'test/e2e_tests/utils/selector.util';
+import {selectByDataAttribute} from 'test/e2e_tests/utils/selector.util';
 
 export class ConversationDetailsPage {
   readonly page: Page;
@@ -54,9 +54,7 @@ export class ConversationDetailsPage {
   async isOpen(conversationName: string) {
     return (
       (await this.page
-        .locator(
-          `#right-column ${selectByClass('conversation-details__header')} ${selectByDataAttribute('status-name')}`,
-        )
+        .locator(`#right-column .conversation-details__header ${selectByDataAttribute('status-name')}`)
         .textContent()) === conversationName
     );
   }

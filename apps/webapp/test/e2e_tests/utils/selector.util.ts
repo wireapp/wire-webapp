@@ -19,5 +19,4 @@
 
 export const selectByDataAttribute = (selector: string, attribute: string = 'name') =>
   `[data-uie-${attribute}="${selector}"]`;
-export const selectByClass = (selector: string) => `.${selector}`;
 export const selectByLabel = (selector: string) => `label[for="${selector}"]`;

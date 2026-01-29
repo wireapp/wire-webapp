@@ -21,7 +21,7 @@ import {Locator, Page} from '@playwright/test';
 
 import {User} from 'test/e2e_tests/data/user';
 import {downloadAssetAndGetFilePath} from 'test/e2e_tests/utils/asset.util';
-import {selectByClass, selectByDataAttribute} from 'test/e2e_tests/utils/selector.util';
+import {selectByDataAttribute} from 'test/e2e_tests/utils/selector.util';
 
 import {ConfirmModal} from '../modals/confirm.modal';
 
@@ -89,7 +89,7 @@ export class ConversationPage {
     this.removeUserButton = page.locator(selectByDataAttribute('do-remove-item-text'));
     this.addMemberButton = page.locator(selectByDataAttribute('go-add-people'));
     this.systemMessages = page.locator(
-      `${selectByDataAttribute('item-message')}${selectByClass('system-message')}:not(${selectByDataAttribute('1', 'send-status')})`,
+      `${selectByDataAttribute('item-message')}.system-message:not(${selectByDataAttribute('1', 'send-status')})`,
     );
     this.callButton = page.locator(selectByDataAttribute('do-call'));
     this.conversationInfoButton = page.locator(selectByDataAttribute('do-open-info'));
@@ -111,7 +111,7 @@ export class ConversationPage {
 
   protected getImageLocator(user: User): Locator {
     return this.page.locator(
-      `${selectByDataAttribute('item-message')} ${selectByClass('message-body')} ${selectByDataAttribute('image-asset')} ${selectByDataAttribute('image-asset-img')}[alt^="${this.getImageAltText(user)}"]`,
+      `${selectByDataAttribute('item-message')} .message-body ${selectByDataAttribute('image-asset')} ${selectByDataAttribute('image-asset-img')}[alt^="${this.getImageAltText(user)}"]`,
     );
   }
 
@@ -374,9 +374,7 @@ export class ConversationPage {
 
   async isReplyMessageVisible(replyText: string) {
     const replyMessageLocator = this.page.locator(
-      `${selectByDataAttribute('item-message')} ${selectByClass('message-body')}${selectByClass('message-quoted')} ${selectByClass(
-        'text',
-      )}`,
+      `${selectByDataAttribute('item-message')} .message-body.message-quoted .text`,
       {hasText: replyText},
     );
 
