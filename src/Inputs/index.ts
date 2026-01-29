@@ -39,3 +39,4 @@ export * from './Select';
 export * from './ShakeBox';
 export * from './Switch';
 export * from './TextArea';
+export * from './SecondaryButton';
