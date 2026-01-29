@@ -11164,7 +11164,7 @@ __metadata:
     dexie-batch: "npm:0.4.3"
     dexie-encrypted: "npm:2.0.0"
     dotenv-extended: "npm:2.9.0"
-    emoji-picker-react: "npm:4.16.1"
+    emoji-picker-react: "npm:4.17.2"
     html-webpack-plugin: "npm:5.6.6"
     i18next-scanner: "npm:4.6.0"
     immer: "npm:10.2.0"
@@ -14787,14 +14787,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"emoji-picker-react@npm:4.16.1":
-  version: 4.16.1
-  resolution: "emoji-picker-react@npm:4.16.1"
+"emoji-picker-react@npm:4.17.2":
+  version: 4.17.2
+  resolution: "emoji-picker-react@npm:4.17.2"
   dependencies:
     flairup: "npm:1.0.0"
   peerDependencies:
     react: ">=16"
-  checksum: 10/04c932b0890b89c62e982780288bcd71abc547c2d781c370b19948dfab4081ddaefcf8e4efbd38f8bb1ba8f29169bff4cebd62aea7e17adf30989e44104bdb64
+  checksum: 10/8c990d19088b7c7337229029b0b43ecbdc1e0009d9b90339c7f14316fac177fd92f2df6230bd6aea983ecd22eb99cb509e63e0586067dcf311f198cfe28bb1c9
   languageName: node
   linkType: hard
 
