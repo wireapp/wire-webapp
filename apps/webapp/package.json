@@ -61,7 +61,7 @@
     "keyboardjs": "2.7.0",
     "knockout": "3.5.1",
     "lexical": "0.27.2",
-    "libsodium-wrappers-sumo": "0.8.0",
+    "libsodium-wrappers-sumo": "0.8.1",
     "linkify-it": "5.0.0",
     "markdown-it": "14.1.0",
     "murmurhash": "2.0.1",
