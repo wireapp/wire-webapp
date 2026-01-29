@@ -11180,7 +11180,7 @@ __metadata:
     knockout: "npm:3.5.1"
     less: "npm:4.5.1"
     less-loader: "npm:12.3.0"
-    lexical: "npm:0.27.2"
+    lexical: "npm:0.39.0"
     libsodium-wrappers-sumo: "npm:0.8.0"
     linkify-it: "npm:5.0.0"
     markdown-it: "npm:14.1.0"
@@ -20326,6 +20326,13 @@ __metadata:
   version: 0.27.2
   resolution: "lexical@npm:0.27.2"
   checksum: 10/d476d71756fae6139374b967afbddf0309d356f19c4bca62997ee4b63624ef0072c61107617bb0b6d917dd1366440ddc46982e0d61b9e3e9cfd2501faf6d70f0
+  languageName: node
+  linkType: hard
+
+"lexical@npm:0.39.0":
+  version: 0.39.0
+  resolution: "lexical@npm:0.39.0"
+  checksum: 10/a6b1cb754bffa8ff62e56a16fce38477388c53734a7127f7a56075fb6fde37e36283221c3d297dc034e4ed6cc15951ef7bf8e2a0adfcec196fcf10153103dd47
   languageName: node
   linkType: hard
 
