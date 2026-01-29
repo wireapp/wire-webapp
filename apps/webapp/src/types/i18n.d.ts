@@ -163,6 +163,7 @@ declare module 'I18n/en-US.json' {
     'accessibility.rightPanel.GoBack': `Go back`;
     'accessibility.rightPanel.close': `Close conversation info`;
     'accessibility.searchInput.cancel': `Delete entry`;
+    'accessibility.selfDeletingMessage.timer': `Self-deleting message, timer is counting down.`;
     'accessibility.userProfileDeleteEntry': `Delete entry`;
     'accountAlreadyExistsModal.changeEmailLink': `Change your email address`;
     'accountAlreadyExistsModal.content': `This email\'s domain belongs to an on-premises backend. Please change your email in the account settings or delete your account. If you are part of a team please contact your team admin.`;
@@ -478,7 +479,7 @@ declare module 'I18n/en-US.json' {
     'cells.search.closeButton': `Close`;
     'cells.search.failed': `Something went wrong, please try again later.`;
     'cells.search.placeholder': `Search files and folders`;
-    "cells.breadcrumb.files": "{conversationName} files",
+    'cells.breadcrumb.files': `{conversationName} files`;
     'cells.selfDeletingMessage.info': `The feature is not available for conversations with a shared Drive.`;
     'cells.shareModal.changePassword': `Change Password`;
     'cells.shareModal.copyLink': `Copy Link`;
