@@ -89,7 +89,7 @@ export class ConversationPage {
     this.removeUserButton = page.locator(selectByDataAttribute('do-remove-item-text'));
     this.addMemberButton = page.locator(selectByDataAttribute('go-add-people'));
     this.systemMessages = page.locator(
-      `${selectByDataAttribute('item-message')}${selectByClass('system-message')} ${selectByClass('message-header')}`,
+      `${selectByDataAttribute('item-message')}${selectByClass('system-message')}:not(${selectByDataAttribute('1', 'send-status')})`,
     );
     this.callButton = page.locator(selectByDataAttribute('do-call'));
     this.conversationInfoButton = page.locator(selectByDataAttribute('do-open-info'));
@@ -99,7 +99,7 @@ export class ConversationPage {
      * Status type -1 ensures that system messages do NOT count as sent messages
      */
     this.messages = page.locator(
-      `${selectByDataAttribute('item-message')}:not(${selectByDataAttribute('1', 'send-status')}):not(${selectByDataAttribute('-1', 'send-status')})`,
+      `${selectByDataAttribute('item-message')}:not(${selectByDataAttribute('1', 'send-status')}):not(${selectByDataAttribute('-1', 'send-status')}):not(${selectByClass('system-message')})`,
     );
     this.messageDetails = page.locator('#message-details');
     this.filesTab = page.locator('#conversation-tab-files');
@@ -264,12 +264,10 @@ export class ConversationPage {
 
   async reactOnMessage(message: Locator, emojiType: EmojiReaction) {
     await message.hover();
-    const reactionButton = message.getByRole('group').getByRole('button').first();
-    await reactionButton.click();
 
     switch (emojiType) {
       case 'plus-one':
-        // The first quick reaction button is +1 (thumbs up), so we just clicked it
+        await message.getByRole('group').getByRole('button').first().click();
         break;
       case 'heart':
         await this.page.getByTestId('reactwith-love-message').click();

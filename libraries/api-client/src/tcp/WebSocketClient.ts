@@ -269,7 +269,7 @@ export class WebSocketClient extends EventEmitter {
     const queryString = queryParams.toString();
 
     const websocketAddress = this.useLegacySocket
-      ? `${this.baseUrl}/await?${queryString}`
+      ? `${this.baseUrl}/websocket?${queryString}`
       : `${this.baseUrl}${this.versionPrefix}/events?${queryString}`;
 
     this.logger.info(`WebSocket URL: ${websocketAddress}`);

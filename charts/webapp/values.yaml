@@ -11,6 +11,11 @@ image:
   repository: quay.io/wire/webapp
   # tag: override version defined in Chart.appVersion
 
+# Keep resource names backwards compatible by default. Set to true to append
+# the Helm release name to resource names so multiple installations can
+# coexist in the same namespace.
+appendReleaseNameToResources: false
+
 # webappDomain: webapp.example.com
 
 ingress:
@@ -81,5 +86,6 @@ podSecurityContext:
       - ALL
   runAsUser: 1000
   runAsGroup: 1000
+  runAsNonRoot: true
   seccompProfile:
     type: RuntimeDefault
