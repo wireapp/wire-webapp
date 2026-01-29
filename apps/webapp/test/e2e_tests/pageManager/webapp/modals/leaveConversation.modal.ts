@@ -18,7 +18,6 @@
  */
 
 import {Page, Locator} from '@playwright/test';
-import {selectByLabel} from 'test/e2e_tests/utils/selector.util';
 
 export class LeaveConversationModal {
   readonly page: Page;
@@ -32,7 +31,7 @@ export class LeaveConversationModal {
     this.page = page;
 
     this.modal = page.getByTestId('modal-template-option');
-    this.modalCheckbox = this.modal.locator(selectByLabel('clear-data-checkbox'));
+    this.modalCheckbox = this.modal.getByText('clear the content');
     this.cancelButton = this.modal.getByTestId('do-secondary');
     this.confirmButton = this.modal.getByTestId('do-action');
   }

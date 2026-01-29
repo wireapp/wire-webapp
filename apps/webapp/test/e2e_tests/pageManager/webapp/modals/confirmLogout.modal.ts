@@ -18,7 +18,6 @@
  */
 
 import {Page, Locator} from '@playwright/test';
-import {selectByLabel} from 'test/e2e_tests/utils/selector.util';
 
 import {OptionModal} from './option.modal';
 
@@ -30,7 +29,7 @@ export class ConfirmLogoutModal extends OptionModal {
     super(page);
 
     this.modalCheckbox = this.modal.getByTestId('modal-option-checkbox');
-    this.deleteDeviceCheckbox = this.modal.locator(`${selectByLabel('clear-data-checkbox')}`);
+    this.deleteDeviceCheckbox = this.modal.getByText('Delete all your personal information');
   }
 
   async toggleModalCheck() {
