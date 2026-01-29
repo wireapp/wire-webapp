@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [9.74.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/react-ui-kit@9.73.9...@wireapp/react-ui-kit@9.74.0) (2026-01-29)
+
+### Features
+
+* introduce secondary button(WPB-23027) ([#7844](https://github.com/wireapp/wire-web-packages/issues/7844)) ([b858a87](https://github.com/wireapp/wire-web-packages/commit/b858a8706be7d8ce4dfaebdf49a73f237508a1c1))
+
 ## [9.73.9](https://github.com/wireapp/wire-web-packages/compare/@wireapp/react-ui-kit@9.73.8...@wireapp/react-ui-kit@9.73.9) (2026-01-26)
 
 ### Bug Fixes
