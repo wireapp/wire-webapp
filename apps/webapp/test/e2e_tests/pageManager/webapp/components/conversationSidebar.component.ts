@@ -18,7 +18,6 @@
  */
 
 import {Page, Locator} from '@playwright/test';
-import {selectByDataAttribute} from 'test/e2e_tests/utils/selector.util';
 
 export class ConversationSidebar {
   readonly pageLoadingTimeout = 60_000;
@@ -37,13 +36,13 @@ export class ConversationSidebar {
     this.page = page;
 
     this.personalStatusLabel = page.getByTestId('status-availability');
-    this.personalStatusName = page.locator(`${selectByDataAttribute('status-name')}`);
-    this.personalUserName = page.locator(`${selectByDataAttribute('user-handle')}`);
-    this.preferencesButton = page.locator(`${selectByDataAttribute('go-preferences')}`);
-    this.allConverationsButton = page.locator(`${selectByDataAttribute('go-recent-view')}`);
-    this.connectButton = page.locator(`button${selectByDataAttribute('go-people')}`);
-    this.archiveButton = page.locator(selectByDataAttribute('go-archive'));
-    this.manageTeamButton = page.locator(selectByDataAttribute('go-team-management'));
+    this.personalStatusName = page.getByTestId('status-name');
+    this.personalUserName = page.getByTestId('user-handle');
+    this.preferencesButton = page.getByTestId('go-preferences');
+    this.allConverationsButton = page.getByTestId('go-recent-view');
+    this.connectButton = page.getByTestId('go-people');
+    this.archiveButton = page.getByTestId('go-archive');
+    this.manageTeamButton = page.getByTestId('go-team-management');
     this.sidebar = page.locator(`.conversations-sidebar-items`);
   }
 

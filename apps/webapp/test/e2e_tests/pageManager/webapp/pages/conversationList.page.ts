@@ -19,9 +19,7 @@
 
 import {Locator, Page} from '@playwright/test';
 
-import {selectByDataAttribute} from 'test/e2e_tests/utils/selector.util';
-
-import {User} from '../../../data/user';
+import {User} from 'test/e2e_tests/data/user';
 
 export class ConversationListPage {
   readonly page: Page;
@@ -45,22 +43,17 @@ export class ConversationListPage {
   constructor(page: Page) {
     this.page = page;
 
-    this.blockConversationMenuButton = page.locator(
-      `#btn-block${selectByDataAttribute('conversation-list-options-menu')}`,
-    );
-
+    this.blockConversationMenuButton = page.getByRole('menu').getByRole('button', {name: 'Block'});
     this.pendingConnectionRequest = page.locator('[data-uie-name="connection-request"]');
-    this.createGroupButton = page.locator(
-      `${selectByDataAttribute('conversation-list-header')} ${selectByDataAttribute('go-create-group')}`,
-    );
-    this.leaveConversationButton = page.locator(selectByDataAttribute('conversation-leave'));
-    this.searchConversationsInput = page.locator(selectByDataAttribute('search-conversations'));
+    this.createGroupButton = page.getByTestId('conversation-list-header').getByTestId('go-create-group');
+    this.leaveConversationButton = page.getByTestId('conversation-leave');
+    this.searchConversationsInput = page.getByTestId('search-conversations');
     this.archiveConversationMenuButton = page.locator('#btn-archive');
     this.unarchiveConversationMenuButton = page.locator('#btn-unarchive');
     this.blockedChip = page.locator(`span[data-uie-name="status-label"] + span`);
-    this.unblockConversationMenuButton = page.locator(
-      `#btn-unblock${selectByDataAttribute('conversation-list-options-menu')}`,
-    );
+    this.unblockConversationMenuButton = page
+      .getByTestId('conversation-list-options-menu')
+      .and(page.locator('#btn-unblock'));
     this.moveConversationButton = page.getByRole('menu').getByRole('button', {name: 'Move to'});
     this.moveToMenu = page.getByRole('menu');
     this.createNewFolderButton = this.moveToMenu.getByRole('button', {name: 'Create new folder'});
@@ -76,15 +69,11 @@ export class ConversationListPage {
   }
 
   async isConversationBlocked(conversationName: string) {
-    return await this.getConversationLocator(conversationName)
-      .locator(selectByDataAttribute('status-blocked'))
-      .isVisible();
+    return await this.getConversationLocator(conversationName).getByTestId('status-blocked').isVisible();
   }
 
   async doesConversationHasMentionIndicator(conversationName: string) {
-    const mentionIndicator = this.getConversationLocator(conversationName).locator(
-      selectByDataAttribute('status-mention'),
-    );
+    const mentionIndicator = this.getConversationLocator(conversationName).getByTestId('status-mention');
     await mentionIndicator.waitFor({state: 'visible'});
     return await mentionIndicator.isVisible();
   }
@@ -98,7 +87,7 @@ export class ConversationListPage {
   }
 
   async clickConversationOptions(conversationName: string) {
-    await this.getConversationLocator(conversationName).locator(selectByDataAttribute('go-options')).first().click();
+    await this.getConversationLocator(conversationName).getByTestId('go-options').first().click();
   }
 
   async clickBlockConversation() {
@@ -147,7 +136,7 @@ export class ConversationListPage {
   }
 
   async getUserAvatarWrapper(user: User): Promise<Locator> {
-    return this.getConversationLocator(user.fullName).locator(selectByDataAttribute('element-avatar-user'));
+    return this.getConversationLocator(user.fullName).getByTestId('element-avatar-user');
   }
 
   async clickUnblockConversation() {

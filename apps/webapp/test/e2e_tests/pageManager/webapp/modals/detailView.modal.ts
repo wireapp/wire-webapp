@@ -19,7 +19,6 @@
 
 import {Locator, Page} from '@playwright/test';
 import {downloadAssetAndGetFilePath} from 'test/e2e_tests/utils/asset.util';
-import {selectByDataAttribute} from 'test/e2e_tests/utils/selector.util';
 
 export class DetailViewModal {
   readonly page: Page;
@@ -35,11 +34,9 @@ export class DetailViewModal {
 
     this.mainWindow = page.locator('#detail-view');
     this.image = this.mainWindow.locator(`img`);
-    this.plusOneButton = this.mainWindow.locator(`footer button${selectByDataAttribute('reactwith-thumbsup-messag')}`);
-    this.downloadButton = this.mainWindow.locator(
-      `footer button${selectByDataAttribute('do-download-fullscreen-picture')}`,
-    );
-    this.closeButton = this.mainWindow.locator(`header button${selectByDataAttribute('do-close-detail-view')}`);
+    this.plusOneButton = this.mainWindow.locator('footer').getByTestId('reactwith-thumbsup-messag');
+    this.downloadButton = this.mainWindow.locator('footer').getByTestId('do-download-fullscreen-picture');
+    this.closeButton = this.mainWindow.locator('header').getByTestId('do-close-detail-view');
   }
 
   async waitForVisibility() {

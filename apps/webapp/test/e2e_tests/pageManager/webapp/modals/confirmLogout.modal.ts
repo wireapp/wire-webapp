@@ -18,7 +18,7 @@
  */
 
 import {Page, Locator} from '@playwright/test';
-import {selectByDataAttribute, selectByLabel} from 'test/e2e_tests/utils/selector.util';
+import {selectByLabel} from 'test/e2e_tests/utils/selector.util';
 
 import {OptionModal} from './option.modal';
 
@@ -29,7 +29,7 @@ export class ConfirmLogoutModal extends OptionModal {
   constructor(page: Page) {
     super(page);
 
-    this.modalCheckbox = this.modal.locator(`${selectByDataAttribute('modal-option-checkbox')}`);
+    this.modalCheckbox = this.modal.getByTestId('modal-option-checkbox');
     this.deleteDeviceCheckbox = this.modal.locator(`${selectByLabel('clear-data-checkbox')}`);
   }
 

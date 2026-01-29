@@ -21,7 +21,6 @@ import {Locator, Page} from '@playwright/test';
 
 import {User} from 'test/e2e_tests/data/user';
 import {downloadAssetAndGetFilePath} from 'test/e2e_tests/utils/asset.util';
-import {selectByDataAttribute} from 'test/e2e_tests/utils/selector.util';
 
 import {ConfirmModal} from '../modals/confirm.modal';
 
@@ -73,53 +72,51 @@ export class ConversationPage {
     this.page = page;
 
     this.backButton = page.getByRole('button', {name: 'Go Back'});
-    this.messageInput = page.locator(selectByDataAttribute('input-message'));
-    this.watermark = page.locator(`${selectByDataAttribute('no-conversation')} svg`);
-    this.sendMessageButton = page.locator(selectByDataAttribute('do-send-message'));
+    this.messageInput = page.getByTestId('input-message');
+    this.watermark = page.getByTestId('no-conversation').locator('svg');
+    this.sendMessageButton = page.getByTestId('do-send-message');
     this.searchButton = page.getByRole('button', {name: 'Search'});
     this.conversationTitle = page.locator('[data-uie-name="status-conversation-title-bar-label"]');
-    this.openGroupInformationViaName = page.locator(selectByDataAttribute('status-conversation-title-bar-label'));
-    this.timerMessageButton = page.locator(selectByDataAttribute('do-set-ephemeral-timer'));
+    this.openGroupInformationViaName = page.getByTestId('status-conversation-title-bar-label');
+    this.timerMessageButton = page.getByTestId('do-set-ephemeral-timer');
     this.timerOffButton = page.getByRole('button', {name: 'Off'});
     this.timerTenSecondsButton = page.getByRole('button', {name: '10 seconds'});
-    this.membersList = page.locator(selectByDataAttribute('list-members'));
-    this.adminsList = page.locator(selectByDataAttribute('list-admins'));
-    this.leaveConversationButton = page.locator(selectByDataAttribute('do-leave-item-text'));
-    this.makeAdminToggle = page.locator(selectByDataAttribute('do-allow-admin'));
-    this.removeUserButton = page.locator(selectByDataAttribute('do-remove-item-text'));
-    this.addMemberButton = page.locator(selectByDataAttribute('go-add-people'));
-    this.systemMessages = page.locator(
-      `${selectByDataAttribute('item-message')}.system-message:not(${selectByDataAttribute('1', 'send-status')})`,
-    );
-    this.callButton = page.locator(selectByDataAttribute('do-call'));
-    this.conversationInfoButton = page.locator(selectByDataAttribute('do-open-info'));
-    this.pingButton = page.locator(selectByDataAttribute('do-ping'));
-    this.messageItems = page.locator(selectByDataAttribute('item-message'));
+    this.membersList = page.getByTestId('list-members');
+    this.adminsList = page.getByTestId('list-admins');
+    this.leaveConversationButton = page.getByTestId('do-leave-item-text');
+    this.makeAdminToggle = page.getByTestId('do-allow-admin');
+    this.removeUserButton = page.getByTestId('do-remove-item-text');
+    this.addMemberButton = page.getByTestId('go-add-people');
+    this.systemMessages = page.locator('[data-uie-name="item-message"].system-message:not([data-uie-send-status="1"])');
+    this.callButton = page.getByTestId('do-call');
+    this.conversationInfoButton = page.getByTestId('do-open-info');
+    this.pingButton = page.getByTestId('do-ping');
+    this.messageItems = page.getByTestId('item-message');
     /** The attribute 'send-status' will be 1 while the message is being sent, since we only want to assert on sent messages these messages will be excluded. See: {@see StatusTypes}
      * Status type -1 ensures that system messages do NOT count as sent messages
      */
     this.messages = page.locator(
-      `${selectByDataAttribute('item-message')}:not(${selectByDataAttribute('1', 'send-status')}):not(${selectByDataAttribute('-1', 'send-status')}):not(${selectByClass('system-message')})`,
+      `[data-uie-name="item-message"]:not([data-uie-send-status="1"]):not([data-uie-send-status="-1"]):not(.system-message)`,
     );
     this.messageDetails = page.locator('#message-details');
     this.filesTab = page.locator('#conversation-tab-files');
-    this.typingIndicator = page.locator(selectByDataAttribute('typing-indicator-title'));
-    this.itemPendingRequest = page.locator(selectByDataAttribute('item-pending-requests'));
+    this.typingIndicator = page.getByTestId('typing-indicator-title');
+    this.itemPendingRequest = page.getByTestId('item-pending-requests');
     this.ignoreButton = page.getByTestId('do-ignore');
     this.cancelRequest = page.getByTestId('do-cancel-request');
   }
 
   protected getImageLocator(user: User): Locator {
-    return this.page.locator(
-      `${selectByDataAttribute('item-message')} .message-body ${selectByDataAttribute('image-asset')} ${selectByDataAttribute('image-asset-img')}[alt^="${this.getImageAltText(user)}"]`,
-    );
+    return this.page
+      .getByTestId('item-message')
+      .locator('.message-body')
+      .getByTestId('image-asset')
+      .getByTestId('image-asset-img')
+      .and(this.page.locator(`[alt^="${this.getImageAltText(user)}"]`));
   }
 
   async isConversationOpen(conversationName: string) {
-    return (
-      (await this.page.locator(selectByDataAttribute('status-conversation-title-bar-label')).textContent()) ===
-      conversationName
-    );
+    return (await this.page.getByTestId('status-conversation-title-bar-label').textContent()) === conversationName;
   }
 
   async clickItemPendingRequest() {
@@ -179,9 +176,9 @@ export class ConversationPage {
   async sendMessageWithUserMention(userFullName: string, messageText?: string) {
     await this.messageInput.fill(`@`);
     await this.page
-      .locator(`${selectByDataAttribute('item-mention-suggestion')} ${selectByDataAttribute('status-name')}`, {
-        hasText: userFullName,
-      })
+      .getByTestId('item-mention-suggestion')
+      .getByTestId('status-name')
+      .filter({hasText: userFullName})
       .click({timeout: 1000});
 
     if (messageText) {
@@ -280,15 +277,16 @@ export class ConversationPage {
 
     // Wait for the reaction to appear on the message
     const reactionPill = message
-      .locator(selectByDataAttribute('message-reactions'))
-      .locator(`${selectByDataAttribute('emoji-pill')}[title="${this.emojiTitleMap[emojiType]}"]`);
+      .getByTestId('message-reactions')
+      .getByTestId('emoji-pill')
+      .and(this.page.locator(`[title="${this.emojiTitleMap[emojiType]}"]`));
     await reactionPill.waitFor({state: 'visible', timeout: 5000});
   }
 
   getReactionOnMessage(message: Locator, emojiType: EmojiReaction): Locator {
     const emojiTitle = this.emojiTitleMap[emojiType];
-    const messageReactions = message.locator(selectByDataAttribute('message-reactions'));
-    return messageReactions.locator(`${selectByDataAttribute('emoji-pill')}[title="${emojiTitle}"]`);
+    const messageReactions = message.getByTestId('message-reactions');
+    return messageReactions.getByTestId('emoji-pill').and(this.page.locator(`[title="${emojiTitle}"]`));
   }
 
   async clickImage(user: User) {
@@ -301,9 +299,11 @@ export class ConversationPage {
   }
 
   async isPlusOneReactionVisible() {
-    const plusOneReactionIcon = this.page.locator(
-      `${selectByDataAttribute('item-message')} ${selectByDataAttribute('message-reactions')} button${selectByDataAttribute('emoji-pill')}[aria-label="1 reaction, react with +1 emoji"]`,
-    );
+    const plusOneReactionIcon = this.page
+      .getByTestId('item-message')
+      .getByTestId('message-reactions')
+      .getByTestId('emoji-pill')
+      .and(this.page.locator('button[aria-label="1 reaction, react with +1 emoji"]'));
 
     // Wait for at least one matching element to appear (optional timeout can be set)
     await plusOneReactionIcon.first().waitFor({state: 'visible'});
@@ -312,9 +312,7 @@ export class ConversationPage {
   }
 
   async isVideoMessageVisible() {
-    const videoMessageLocator = this.page.locator(
-      `${selectByDataAttribute('item-message')} ${selectByDataAttribute('video-asset')}`,
-    );
+    const videoMessageLocator = this.page.getByTestId('item-message').getByTestId('video-asset');
 
     // Wait for at least one matching element to appear (optional timeout can be set)
     await videoMessageLocator.first().waitFor({state: 'visible'});
@@ -323,24 +321,27 @@ export class ConversationPage {
   }
 
   async playVideo() {
-    const videoPlayButton = this.page.locator(
-      `${selectByDataAttribute('item-message')} ${selectByDataAttribute('video-asset')} ${selectByDataAttribute('do-play-media')}`,
-    );
+    const videoPlayButton = this.page
+      .getByTestId('item-message')
+      .getByTestId('video-asset')
+      .getByTestId('do-play-media');
 
     await videoPlayButton.click();
   }
 
   async playAudio() {
-    const audioPlayButton = this.page.locator(
-      `${selectByDataAttribute('item-message')} ${selectByDataAttribute('audio-asset')} ${selectByDataAttribute('do-play-media')}`,
-    );
+    const audioPlayButton = this.page
+      .getByTestId('item-message')
+      .getByTestId('audio-asset')
+      .getByTestId('do-play-media');
     await audioPlayButton.click();
   }
 
   async isAudioPlaying() {
-    const audioTimeLocator = this.page.locator(
-      `${selectByDataAttribute('item-message')} ${selectByDataAttribute('audio-asset')} ${selectByDataAttribute('status-audio-time')}`,
-    );
+    const audioTimeLocator = this.page
+      .getByTestId('item-message')
+      .getByTestId('audio-asset')
+      .getByTestId('status-audio-time');
 
     const audioTimeText = (await audioTimeLocator.textContent())?.trim();
     if (!audioTimeText) {
@@ -351,9 +352,7 @@ export class ConversationPage {
   }
 
   async isAudioMessageVisible() {
-    const audioMessageLocator = this.page.locator(
-      `${selectByDataAttribute('item-message')} ${selectByDataAttribute('audio-asset')}`,
-    );
+    const audioMessageLocator = this.page.getByTestId('item-message').getByTestId('audio-asset');
 
     // Wait for at least one matching element to appear (optional timeout can be set)
     await audioMessageLocator.first().waitFor({state: 'visible'});
@@ -362,9 +361,7 @@ export class ConversationPage {
   }
 
   async isFileMessageVisible() {
-    const fileMessageLocator = this.page.locator(
-      `${selectByDataAttribute('item-message')} ${selectByDataAttribute('file-asset')}`,
-    );
+    const fileMessageLocator = this.page.getByTestId('item-message').getByTestId('file-asset');
 
     // Wait for at least one matching element to appear (optional timeout can be set)
     await fileMessageLocator.first().waitFor({state: 'visible'});
@@ -373,10 +370,9 @@ export class ConversationPage {
   }
 
   async isReplyMessageVisible(replyText: string) {
-    const replyMessageLocator = this.page.locator(
-      `${selectByDataAttribute('item-message')} .message-body.message-quoted .text`,
-      {hasText: replyText},
-    );
+    const replyMessageLocator = this.page
+      .getByTestId('item-message')
+      .locator('.message-body.message-quoted .text', {hasText: replyText});
 
     // Wait for at least one matching element to appear (optional timeout can be set)
     await replyMessageLocator.first().waitFor({state: 'visible'});
@@ -385,9 +381,7 @@ export class ConversationPage {
   }
 
   async downloadFile() {
-    const downloadButton = this.page.locator(
-      `${selectByDataAttribute('item-message')} ${selectByDataAttribute('file-asset')}`,
-    );
+    const downloadButton = this.page.getByTestId('item-message').getByTestId('file-asset');
 
     const filePath = await downloadAssetAndGetFilePath(this.page, downloadButton);
     return filePath;
@@ -417,29 +411,40 @@ export class ConversationPage {
 
   async isUserGroupMember(name: string) {
     return this.membersList
-      .locator(`${selectByDataAttribute('item-user')}${selectByDataAttribute(name, 'value')}`)
+      .getByTestId('item-user')
+      .and(this.page.locator(`[data-uie-value="${name}"]`))
       .isVisible();
   }
 
   async isUserGroupAdmin(name: string) {
     await this.adminsList
-      .locator(`${selectByDataAttribute('item-user')}${selectByDataAttribute(name, 'value')}`)
+      .getByTestId('item-user')
+      .and(this.page.locator(`[data-uie-value="${name}"]`))
       .waitFor({state: 'visible'});
     return true;
   }
 
   async makeUserAdmin(name: string) {
-    await this.membersList.locator(selectByDataAttribute(name, 'value')).click();
+    await this.membersList
+      .getByTestId('item-user')
+      .and(this.page.locator(`[data-uie-value="${name}"]`))
+      .click();
     return this.makeAdminToggle.click();
   }
 
   async removeMemberFromGroup(name: string) {
-    await this.membersList.locator(selectByDataAttribute(name, 'value')).click();
+    await this.membersList
+      .getByTestId('item-user')
+      .and(this.page.locator(`[data-uie-value="${name}"]`))
+      .click();
     return this.removeUserButton.click();
   }
 
   async removeAdminFromGroup(name: string) {
-    await this.adminsList.locator(selectByDataAttribute(name, 'value')).click();
+    await this.adminsList
+      .getByTestId('item-user')
+      .and(this.page.locator(`[data-uie-value="${name}"]`))
+      .click();
     return this.removeUserButton.click();
   }
 
@@ -472,6 +477,6 @@ export class ConversationPage {
    * Returns the locator for the ping element within the message list.
    */
   getPing(): Locator {
-    return this.messageItems.locator(selectByDataAttribute('element-message-ping'));
+    return this.messageItems.getByTestId('element-message-ping');
   }
 }

@@ -18,7 +18,6 @@
  */
 
 import {Page, Locator} from '@playwright/test';
-import {selectByDataAttribute} from 'test/e2e_tests/utils/selector.util';
 
 export class OptionsPage {
   readonly checkboxSoundAlertsAll: Locator;
@@ -26,9 +25,9 @@ export class OptionsPage {
   readonly checkboxSoundAlertsNone: Locator;
 
   constructor(page: Page) {
-    this.checkboxSoundAlertsAll = page.locator(selectByDataAttribute('preferences-options-audio-all'));
-    this.checkboxSoundAlertsSome = page.locator(selectByDataAttribute('preferences-options-audio-some'));
-    this.checkboxSoundAlertsNone = page.locator(selectByDataAttribute('preferences-options-audio-none'));
+    this.checkboxSoundAlertsAll = page.getByTestId('preferences-options-audio-all');
+    this.checkboxSoundAlertsSome = page.getByTestId('preferences-options-audio-some');
+    this.checkboxSoundAlertsNone = page.getByTestId('preferences-options-audio-none');
   }
 
   async checkSoundAll() {
