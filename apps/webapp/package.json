@@ -53,7 +53,7 @@
     "dexie-batch": "0.4.3",
     "dexie-encrypted": "2.0.0",
     "dotenv-extended": "2.9.0",
-    "emoji-picker-react": "4.16.1",
+    "emoji-picker-react": "4.17.2",
     "immer": "10.2.0",
     "jimp": "0.22.12",
     "js-cookie": "3.0.5",
