@@ -1018,6 +1018,8 @@ declare module 'I18n/en-US.json' {
     'federationDelete': `[bold]Your backend[/bold] stopped federating with [bold]{backendUrl}.[/bold]`;
     'fileCardDefaultCloseButtonLabel': `Close`;
     'fileFullscreenModal.editor.error': `Failed to load edit preview`;
+    'fileFullscreenModal.editor.errorTitle': `Unable to open file edit mode`;
+    'fileFullscreenModal.editor.errorDescription': `There was a problem connecting to the server. Please try again.`;
     'fileFullscreenModal.editor.iframeTitle': `Document editor`;
     'fileFullscreenModal.noPreviewAvailable.callToAction': `Download File`;
     'fileFullscreenModal.noPreviewAvailable.description': `There is no preview available for this file. Download the file instead.`;
