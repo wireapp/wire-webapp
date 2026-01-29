@@ -400,6 +400,8 @@ declare module 'I18n/en-US.json' {
     'cells.filtersModal.title': `Filters`;
     'cells.folderBreadcrumbCombained': `Show more`;
     'cells.heading': `Files`;
+    'cells.sharedDrive.title': `Shared Drive`;
+    'cells.sharedDrive.description': `Find any file or folder in this conversation`;
     'cells.imageFullScreenModal.closeButton': `Close`;
     'cells.imageFullScreenModal.downloadButton': `Download`;
     'cells.modal.closeButton': `Close`;
