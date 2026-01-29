@@ -73,12 +73,12 @@ test.describe('Ping', () => {
     ]);
 
     await userBPages.conversationList().openConversation(userA.fullName);
-    for (let i = 0; i < 5; i++) {
-      await userBPages.conversation().sendPing();
-    }
+    await userBPages.conversation().sendPing();
+    await expect(userBPages.conversation().pingButton).toBeDisabled();
+    await userBPages.conversation().sendPing();
 
     await userAPages.conversationList().openConversation(userB.fullName);
-    await expect(userAPages.conversation().getPing()).toHaveCount(5);
+    await expect(userAPages.conversation().getPing()).toHaveCount(2);
   });
 
   test(
@@ -101,7 +101,7 @@ test.describe('Ping', () => {
       await userAPages.conversation().sendPing();
 
       await expect(userAModals.confirm().modal).toBeVisible();
-      // await expect(await userAModals.confirm().getModalTitle()).toContain('');
+      await expect(await userAModals.confirm().getModalTitle()).toContain('Are you sure you want to ping 5 people?');
     },
   );
 });
