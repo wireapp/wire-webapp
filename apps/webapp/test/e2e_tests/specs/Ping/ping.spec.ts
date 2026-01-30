@@ -19,11 +19,11 @@
 
 import {User} from 'test/e2e_tests/data/user';
 import {PageManager} from 'test/e2e_tests/pageManager';
-import {test, expect, withLogin, withConnectedUser} from 'test/e2e_tests/test.fixtures';
+import {test, expect, withLogin, withConnectedUser, Team} from 'test/e2e_tests/test.fixtures';
 import {createGroup} from '../../utils/userActions';
 
 test.describe('Ping', () => {
-  let team: any;
+  let team: Team;
   let userA: User;
   let userB: User;
 
@@ -85,8 +85,8 @@ test.describe('Ping', () => {
     'Verify I see a warning when I ping in a big group',
     {tag: ['@TC-1496', '@regression']},
     async ({createPage, createUser}) => {
-      const usersForBigGroup = [];
-      for (let i = 0; i<4; i++) {
+      const usersForBigGroup: User[] = [];
+      for (let i = 0; i < 4; i++) {
         const newMember = await createUser();
         await team.addMember(newMember);
         usersForBigGroup.push(newMember);
