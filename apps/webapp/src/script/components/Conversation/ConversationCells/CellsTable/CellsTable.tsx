@@ -23,7 +23,6 @@ import {QualifiedId} from '@wireapp/api-client/lib/user/';
 import {CellsRepository} from 'Repositories/cells/CellsRepository';
 import {CellNode} from 'src/script/types/cellNode';
 
-import {CellsFilePreviewModal} from './CellsFilePreviewModal/CellsFilePreviewModal';
 import {
   headerCellStyles,
   tableActionsCellStyles,
@@ -33,7 +32,6 @@ import {
   wrapperStyles,
 } from './CellsTable.styles';
 import {getCellsTableColumns} from './CellsTableColumns/CellsTableColumns';
-import {CellsFilePreviewModalProvider} from './common/CellsFilePreviewModalContext/CellsFilePreviewModalContext';
 
 interface CellsTableProps {
   nodes: Array<CellNode>;
@@ -64,51 +62,48 @@ export const CellsTable = ({
   const rows = table.getRowModel().rows;
 
   return (
-    <CellsFilePreviewModalProvider>
-      <div css={wrapperStyles}>
-        <table css={tableStyles}>
-          <thead>
-            {table.getHeaderGroups().map(headerGroup => (
-              <tr key={headerGroup.id}>
-                {headerGroup.headers.map(header => {
-                  return (
-                    <th
-                      key={header.id}
-                      css={headerCellStyles}
-                      style={{
-                        width: header.id == 'name' ? undefined : header.getSize(),
-                      }}
-                    >
-                      {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
-                    </th>
-                  );
-                })}
+    <div css={wrapperStyles}>
+      <table css={tableStyles}>
+        <thead>
+          {table.getHeaderGroups().map(headerGroup => (
+            <tr key={headerGroup.id}>
+              {headerGroup.headers.map(header => {
+                return (
+                  <th
+                    key={header.id}
+                    css={headerCellStyles}
+                    style={{
+                      width: header.id == 'name' ? undefined : header.getSize(),
+                    }}
+                  >
+                    {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
+                  </th>
+                );
+              })}
+            </tr>
+          ))}
+        </thead>
+        {rows.length > 0 && (
+          <tbody>
+            {rows.map(row => (
+              <tr key={row.id} css={tableCellRow}>
+                {row.getVisibleCells().map(cell => (
+                  <td
+                    key={cell.id}
+                    css={cell.column.id === 'id' ? tableActionsCellStyles : tableCellStyles}
+                    data-cell={cell.column.id === 'id' ? undefined : cell.column.columnDef.header}
+                    style={{
+                      width: cell.column.id == 'name' ? undefined : cell.column.getSize(),
+                    }}
+                  >
+                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                  </td>
+                ))}
               </tr>
             ))}
-          </thead>
-          {rows.length > 0 && (
-            <tbody>
-              {rows.map(row => (
-                <tr key={row.id} css={tableCellRow}>
-                  {row.getVisibleCells().map(cell => (
-                    <td
-                      key={cell.id}
-                      css={cell.column.id === 'id' ? tableActionsCellStyles : tableCellStyles}
-                      data-cell={cell.column.id === 'id' ? undefined : cell.column.columnDef.header}
-                      style={{
-                        width: cell.column.id == 'name' ? undefined : cell.column.getSize(),
-                      }}
-                    >
-                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                    </td>
-                  ))}
-                </tr>
-              ))}
-            </tbody>
-          )}
-        </table>
-        <CellsFilePreviewModal />
-      </div>
-    </CellsFilePreviewModalProvider>
+          </tbody>
+        )}
+      </table>
+    </div>
   );
 };

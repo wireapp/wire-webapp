@@ -17,6 +17,8 @@
  *
  */
 
+import {useState} from 'react';
+
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 
 import {CellsNewNodeForm} from 'Components/Conversation/ConversationCells/common/CellsNewNodeForm/CellsNewNodeForm';
@@ -27,6 +29,7 @@ import {t} from 'Util/LocalizerUtil';
 
 import {descriptionStyles} from './CellsNewItemModal.styles';
 
+import {useCellsFilePreviewModal} from '../../../CellsTable/common/CellsFilePreviewModalContext/CellsFilePreviewModalContext';
 import {CellsModal} from '../../../common/CellsModal/CellsModal';
 
 interface CellsNewItemModalProps {
@@ -49,6 +52,14 @@ export const CellsNewItemModal = ({
   currentPath,
 }: CellsNewItemModalProps) => {
   const isFolder = type === 'folder';
+  const {handleOpenFile} = useCellsFilePreviewModal();
+
+  const fileTypeOptions = [
+    {value: 'docx', label: t('cells.newItemMenuModal.typeDocument')},
+    {value: 'xlsx', label: t('cells.newItemMenuModal.typeSpreadsheet')},
+    {value: 'pptx', label: t('cells.newItemMenuModal.typePresentation')},
+  ];
+  const [selectedFileType, setSelectedFileType] = useState(fileTypeOptions[0]);
 
   const {name, error, isSubmitting, handleSubmit, handleChange} = useCellsNewItemForm({
     type,
@@ -56,15 +67,17 @@ export const CellsNewItemModal = ({
     conversationQualifiedId,
     onSuccess,
     currentPath,
+    fileExtension: type === 'file' ? selectedFileType.value : undefined,
+    onCreatedFile: type === 'file' ? file => handleOpenFile(file, true) : undefined,
   });
 
   return (
     <CellsModal isOpen={isOpen} onClose={onClose} size="large">
       <CellsModal.Header>
-        {t(isFolder ? 'cells.newItemMenuModal.headlineFolder' : 'cells.newItemMenuModal.headlineFile')}
+        {t(!isFolder ? 'cells.newItemMenuModal.headlineFolder' : 'cells.newItemMenuModal.headlineFile')}
       </CellsModal.Header>
       <p css={descriptionStyles}>
-        {t(isFolder ? 'cells.newItemMenuModal.descriptionFolder' : 'cells.newItemMenuModal.descriptionFile')}
+        {t(!isFolder ? 'cells.newItemMenuModal.descriptionFolder' : 'cells.newItemMenuModal.descriptionFile')}
       </p>
       <CellsNewNodeForm
         type={type}
@@ -73,6 +86,9 @@ export const CellsNewItemModal = ({
         onChange={handleChange}
         error={error}
         isOpen={isOpen}
+        fileTypeOptions={type === 'file' ? fileTypeOptions : undefined}
+        selectedFileType={type === 'file' ? selectedFileType : undefined}
+        onFileTypeChange={type === 'file' ? setSelectedFileType : undefined}
       />
       <CellsModal.Actions>
         <CellsModal.SecondaryButton onClick={onClose}>
