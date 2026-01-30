@@ -85,10 +85,11 @@ test.describe('Ping', () => {
     'Verify I see a warning when I ping in a big group',
     {tag: ['@TC-1496', '@regression']},
     async ({createPage, createUser}) => {
-      const usersForBigGroup = await Promise.all([createUser(), createUser(), createUser(), createUser()]);
-
-      for (const member of usersForBigGroup) {
-        await team.addMember(member);
+      const usersForBigGroup = [];
+      for (let i = 0; i<4; i++) {
+        const newMember = await createUser();
+        await team.addMember(newMember);
+        usersForBigGroup.push(newMember);
       }
 
       const userAPage = await createPage(withLogin(userA), withConnectedUser(userB));
