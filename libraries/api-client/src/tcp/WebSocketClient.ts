@@ -244,6 +244,9 @@ export class WebSocketClient extends EventEmitter {
    * @returns true if app is connected to wire.com backend
    */
   private _temporaryIsProdBackend() {
+    if (typeof window === 'undefined') {
+      return false;
+    }
     return window.location.hostname.includes('wire.com');
   }
 
