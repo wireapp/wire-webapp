@@ -163,6 +163,7 @@ declare module 'I18n/en-US.json' {
     'accessibility.rightPanel.GoBack': `Go back`;
     'accessibility.rightPanel.close': `Close conversation info`;
     'accessibility.searchInput.cancel': `Delete entry`;
+    'accessibility.selfDeletingMessage.timer': `Self-deleting message, timer is counting down.`;
     'accessibility.userProfileDeleteEntry': `Delete entry`;
     'accountAlreadyExistsModal.changeEmailLink': `Change your email address`;
     'accountAlreadyExistsModal.content': `This email\'s domain belongs to an on-premises backend. Please change your email in the account settings or delete your account. If you are part of a team please contact your team admin.`;
@@ -400,6 +401,8 @@ declare module 'I18n/en-US.json' {
     'cells.filtersModal.title': `Filters`;
     'cells.folderBreadcrumbCombained': `Show more`;
     'cells.heading': `Files`;
+    'cells.sharedDrive.title': `Shared Drive`;
+    'cells.sharedDrive.description': `Find any file or folder in this conversation`;
     'cells.imageFullScreenModal.closeButton': `Close`;
     'cells.imageFullScreenModal.downloadButton': `Download`;
     'cells.modal.closeButton': `Close`;
@@ -476,7 +479,7 @@ declare module 'I18n/en-US.json' {
     'cells.search.closeButton': `Close`;
     'cells.search.failed': `Something went wrong, please try again later.`;
     'cells.search.placeholder': `Search files and folders`;
-    "cells.breadcrumb.files": "{conversationName} files",
+    'cells.breadcrumb.files': `{conversationName} files`;
     'cells.selfDeletingMessage.info': `The feature is not available for conversations with a shared Drive.`;
     'cells.shareModal.changePassword': `Change Password`;
     'cells.shareModal.copyLink': `Copy Link`;
@@ -1016,6 +1019,8 @@ declare module 'I18n/en-US.json' {
     'federationDelete': `[bold]Your backend[/bold] stopped federating with [bold]{backendUrl}.[/bold]`;
     'fileCardDefaultCloseButtonLabel': `Close`;
     'fileFullscreenModal.editor.error': `Failed to load edit preview`;
+    'fileFullscreenModal.editor.errorTitle': `Unable to open file edit mode`;
+    'fileFullscreenModal.editor.errorDescription': `There was a problem connecting to the server. Please try again.`;
     'fileFullscreenModal.editor.iframeTitle': `Document editor`;
     'fileFullscreenModal.noPreviewAvailable.callToAction': `Download File`;
     'fileFullscreenModal.noPreviewAvailable.description': `There is no preview available for this file. Download the file instead.`;
