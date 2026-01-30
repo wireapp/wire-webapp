@@ -32,7 +32,9 @@ import {CellsHeader} from './CellsHeader/CellsHeader';
 import {CellsLoader} from './CellsLoader/CellsLoader';
 import {CellsPagination} from './CellsPagination/CellsPagination';
 import {CellsStateInfo} from './CellsStateInfo/CellsStateInfo';
+import {CellsFilePreviewModal} from './CellsTable/CellsFilePreviewModal/CellsFilePreviewModal';
 import {CellsTable} from './CellsTable/CellsTable';
+import {CellsFilePreviewModalProvider} from './CellsTable/common/CellsFilePreviewModalContext/CellsFilePreviewModalContext';
 import {isInRecycleBin} from './common/recycleBin/recycleBin';
 import {useCellsStore} from './common/useCellsStore/useCellsStore';
 import {wrapperStyles} from './ConversationCells.styles';
@@ -122,36 +124,39 @@ export const ConversationCells = memo(
     const isEmptyRecycleBin = isInRecycleBin() && emptyView && !isLoading;
 
     return (
-      <div css={wrapperStyles}>
-        <CellsHeader
-          onRefresh={handleRefresh}
-          conversationQualifiedId={conversationQualifiedId}
-          conversationName={name}
-          cellsRepository={cellsRepository}
-          searchValue={searchValue}
-          onSearchChange={handleSearch}
-          onSearchClear={handleClearSearch}
-        />
-        {isTableVisible && (
-          <CellsTable
-            nodes={isLoading ? [] : nodes}
-            cellsRepository={cellsRepository}
+      <CellsFilePreviewModalProvider>
+        <div css={wrapperStyles}>
+          <CellsHeader
+            onRefresh={handleRefresh}
             conversationQualifiedId={conversationQualifiedId}
             conversationName={name}
-            onRefresh={handleRefresh}
+            cellsRepository={cellsRepository}
+            searchValue={searchValue}
+            onSearchChange={handleSearch}
+            onSearchClear={handleClearSearch}
           />
-        )}
-        {isCellsStatePending && !isRefreshing && (
-          <CellsStateInfo heading={t('cells.pending.heading')} description={t('cells.pending.description')} />
-        )}
-        {isNoNodesVisible && (
-          <CellsStateInfo heading={t('cells.noNodes.heading')} description={t('cells.noNodes.description')} />
-        )}
-        {isEmptyRecycleBin && <CellsStateInfo description={t('cells.emptyRecycleBin.description')} />}
-        {(isLoadingVisible || isRefreshing) && <CellsLoader />}
-        {isError && <CellsStateInfo heading={t('cells.error.heading')} description={t('cells.error.description')} />}
-        {isPaginationVisible && <CellsPagination {...getPaginationProps()} goToPage={goToPage} />}
-      </div>
+          {isTableVisible && (
+            <CellsTable
+              nodes={isLoading ? [] : nodes}
+              cellsRepository={cellsRepository}
+              conversationQualifiedId={conversationQualifiedId}
+              conversationName={name}
+              onRefresh={handleRefresh}
+            />
+          )}
+          {isCellsStatePending && !isRefreshing && (
+            <CellsStateInfo heading={t('cells.pending.heading')} description={t('cells.pending.description')} />
+          )}
+          {isNoNodesVisible && (
+            <CellsStateInfo heading={t('cells.noNodes.heading')} description={t('cells.noNodes.description')} />
+          )}
+          {isEmptyRecycleBin && <CellsStateInfo description={t('cells.emptyRecycleBin.description')} />}
+          {(isLoadingVisible || isRefreshing) && <CellsLoader />}
+          {isError && <CellsStateInfo heading={t('cells.error.heading')} description={t('cells.error.description')} />}
+          {isPaginationVisible && <CellsPagination {...getPaginationProps()} goToPage={goToPage} />}
+          <CellsFilePreviewModal />
+        </div>
+      </CellsFilePreviewModalProvider>
     );
   },
 );

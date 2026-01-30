@@ -26,3 +26,11 @@ export const inputWrapperStyles: CSSObject = {
   padding: '16px',
   gap: '8px',
 };
+
+export const selectWrapperStyles: CSSObject = {
+  width: '100%',
+};
+
+export const selectStyles: CSSObject = {
+  width: '100%',
+};
