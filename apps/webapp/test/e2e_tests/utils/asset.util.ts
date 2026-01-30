@@ -26,7 +26,7 @@ export const DownloadFilePath = './test-results/downloads/';
 
 const e2eRootDir = path.join(__dirname, '../');
 const fileTransferAssetsDir = path.join(e2eRootDir, 'assets/filetransfer');
-const VideoFileName = 'example.mp4';
+export const VideoFileName = 'example.mp4';
 const AudioFileName = 'example.mp3';
 const TextFileName = 'example.txt';
 

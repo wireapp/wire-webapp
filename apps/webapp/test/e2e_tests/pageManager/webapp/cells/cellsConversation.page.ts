@@ -39,6 +39,17 @@ export class CellsConversationPage extends ConversationPage {
   }
 
   override getImageLocator(user: User): Locator {
-    return this.page.getByTestId('item-message').locator(`[aria-label^="Image from ${user.fullName}"]`);
+    return this.page.getByLabel(new RegExp(`^Image from ${user.fullName}`)).getByRole('img');
+  }
+
+  protected getVideoLocator(user: User): Locator {
+    return this.page.getByLabel(new RegExp(`^Image from ${user.fullName}`)).locator('video');
+  }
+
+  async isVideoFromUserVisible(user: User) {
+    // Wait for the video element to become visible
+    const locator = this.getVideoLocator(user);
+
+    return await locator.isVisible();
   }
 }
