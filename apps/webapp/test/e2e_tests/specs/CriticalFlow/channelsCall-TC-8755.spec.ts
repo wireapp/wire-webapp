@@ -28,7 +28,7 @@ const channelName = 'Test Channel';
 // ToDo(WPB-22442): Backoffice does not unlock calling feature for teams created during tests
 test.fixme(
   'Calls in channels with device switch and screenshare',
-  {tag: ['@TC-8754', '@crit-flow-web']},
+  {tag: ['@TC-8755', '@crit-flow-web']},
   async ({createTeam, createPage, api}) => {
     test.setTimeout(150_000);
 
