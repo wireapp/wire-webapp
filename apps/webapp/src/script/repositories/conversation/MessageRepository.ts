@@ -425,7 +425,7 @@ export class MessageRepository {
     }
 
     if (state !== MessageSendingState.CANCELED) {
-      await this.handleLinkPreview(textPayload);
+      await this.handleLinkPreview(textPayload, conversation.qualifiedId);
     }
   }
 
@@ -477,14 +477,14 @@ export class MessageRepository {
         ? await this.sendEditMultiPart(messagePayload)
         : await this.sendEdit(messagePayload);
       if (state !== MessageSendingState.CANCELED) {
-        await this.handleLinkPreview(messagePayload);
+        await this.handleLinkPreview(messagePayload, conversation.qualifiedId);
       }
     } finally {
       clearLinkPreviewSendingState(originalMessageId);
     }
   }
 
-  private async handleLinkPreview(textPayload: TextMessagePayload & {messageId: string}) {
+  private async handleLinkPreview(textPayload: TextMessagePayload & {messageId: string}, conversationId: QualifiedId) {
     // check if the user actually wants to send link previews
     if (
       !this.propertyRepository.getPreference(PROPERTIES_TYPE.PREVIEWS.SEND) ||
@@ -501,12 +501,18 @@ export class MessageRepository {
 
     const linkPreview = await getLinkPreviewFromString(textPayload.message);
     if (linkPreview) {
+      const isAuditLogEnabled = this.teamState.isAuditLogEnabled();
+
       // If we detect a link preview, then we go on and send a new message (that will override the initial message) containing the link preview
       await this.sendText(
         {
           ...textPayload,
           linkPreview: linkPreview.image
-            ? await this.core.service!.linkPreview.uploadLinkPreviewImage(linkPreview as LinkPreviewContent)
+            ? await this.core.service!.linkPreview.uploadLinkPreviewImage(
+                linkPreview as LinkPreviewContent,
+                conversationId,
+                isAuditLogEnabled,
+              )
             : linkPreview,
         },
         {syncTimestamp: false},
@@ -761,7 +767,7 @@ export class MessageRepository {
     asImage: boolean,
     meta: FileMetaDataContent,
   ) {
-    const isAuditLogEnabled = this.teamState.isAuditLogEnabled() && TeamState.isAuditLogEnabledForBackend();
+    const isAuditLogEnabled = this.teamState.isAuditLogEnabled();
 
     const auditData: AssetAuditData | undefined = isAuditLogEnabled
       ? {

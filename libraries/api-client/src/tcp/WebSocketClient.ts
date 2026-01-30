@@ -235,6 +235,21 @@ export class WebSocketClient extends EventEmitter {
     return this.isSocketLocked;
   }
 
+  /**
+   * this is a temporary hack method to check if app is running on
+   * wire.com domain in order to use a different temporary websocket
+   * endpoint on wire production server
+   * delete this method as soon as /websocket no longer exists on prod backend
+   * (possibly with next release of web), and change line 284 to use /await only
+   * @returns true if app is connected to wire.com backend
+   */
+  private _temporaryIsProdBackend() {
+    if (typeof window === 'undefined') {
+      return false;
+    }
+    return window.location.hostname.includes('wire.com');
+  }
+
   public buildWebSocketUrl(): string {
     const {
       accessTokenStore: {getAccessToken, getNextMarkerToken},
@@ -269,7 +284,7 @@ export class WebSocketClient extends EventEmitter {
     const queryString = queryParams.toString();
 
     const websocketAddress = this.useLegacySocket
-      ? `${this.baseUrl}/websocket?${queryString}`
+      ? `${this.baseUrl}/${this._temporaryIsProdBackend() ? 'websocket' : 'await'}?${queryString}`
       : `${this.baseUrl}${this.versionPrefix}/events?${queryString}`;
 
     this.logger.info(`WebSocket URL: ${websocketAddress}`);
