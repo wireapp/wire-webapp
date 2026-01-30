@@ -124,6 +124,7 @@ test.describe('Reactions', () => {
       });
     });
 
+    await userAPages.conversationList().openConversation(userB.fullName, {protocol: 'mls'});
     const messageWithLink = userAPages.conversation().getMessage({sender: userB});
     await userAPages.conversation().reactOnMessage(messageWithLink, 'heart');
 

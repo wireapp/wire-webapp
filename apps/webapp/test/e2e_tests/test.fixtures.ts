@@ -53,12 +53,14 @@ type Fixtures = {
   createTeam: (
     teamName: string,
     options?: Parameters<typeof createUser>[1] & {withMembers?: number | User[]},
-  ) => Promise<{
-    owner: User;
-    members: User[];
-    /** Add a new member to the team after its initial creation */
-    addMember: (member: User) => Promise<void>;
-  }>;
+  ) => Promise<Team>;
+};
+
+export type Team = {
+  owner: User;
+  members: User[];
+  /** Add a new member to the team after its initial creation */
+  addMember: (member: User) => Promise<void>;
 };
 
 export {expect} from '@playwright/test';
