@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2018 Wire Swiss GmbH
+ * Copyright (C) 2026 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,22 +17,21 @@
  *
  */
 
-@strokewidth: 4px;
-@strokelength: @strokewidth * pi();
+import {CSSObject} from '@emotion/react';
 
-.ephemeral-timer {
-  &__background {
-    fill: var(--foreground-fade-16);
-    stroke: var(--foreground);
-    stroke-width: 1px;
-  }
+const strokewidth = 4;
+const strokelength = strokewidth * Math.PI;
 
-  &__dial {
-    --offset: 1;
-    fill: none;
-    stroke: var(--foreground);
-    stroke-dasharray: @strokelength;
-    stroke-dashoffset: calc(@strokelength * (1 + var(--offset)));
-    stroke-width: @strokewidth;
-  }
-}
+export const ephemeralTimerBackgroundStyle: CSSObject = {
+  fill: 'var(--app-bg-secondary)',
+  stroke: 'var(--foreground)',
+  strokeWidth: '1px',
+};
+
+export const ephemeralTimerDialStyle: (offset: number) => CSSObject = (offset = 1) => ({
+  fill: 'none',
+  stroke: 'var(--foreground)',
+  strokeDasharray: strokelength,
+  strokeDashoffset: `${strokelength * (1 + offset)}`,
+  strokeWidth: strokewidth,
+});

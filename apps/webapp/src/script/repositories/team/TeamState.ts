@@ -17,6 +17,7 @@
  *
  */
 
+import {Backend} from '@wireapp/api-client/lib/env';
 import {Role} from '@wireapp/api-client/lib/team';
 import {FeatureList, FEATURE_STATUS, SELF_DELETING_TIMEOUT} from '@wireapp/api-client/lib/team/feature/';
 import ko from 'knockout';
@@ -143,17 +144,15 @@ export class TeamState {
     });
 
     this.isAuditLogEnabled = ko.pureComputed(() => {
-      return this.teamFeatures()?.assetAuditLog?.status === FEATURE_STATUS.ENABLED;
-    });
-  }
+      const {BACKEND_REST} = Config.getConfig();
 
-  /**
-   * Check if audit logging is enabled for the current backend.
-   * Audit logging is explicitly disabled for the production cloud backend.
-   */
-  static isAuditLogEnabledForBackend(): boolean {
-    const {BACKEND_REST} = Config.getConfig();
-    return BACKEND_REST !== 'https://prod-nginz-https.wire.com';
+      return (
+        this.teamFeatures()?.assetAuditLog?.status === FEATURE_STATUS.ENABLED &&
+        // Check if audit logging is enabled for the current backend.
+        // Audit logging is explicitly disabled for the production cloud backend.
+        BACKEND_REST !== Backend.PRODUCTION.rest
+      );
+    });
   }
 
   isInTeam(entity: User | Conversation): boolean {

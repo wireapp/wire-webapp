@@ -17,10 +17,13 @@
  *
  */
 
-import {CSSProperties} from 'react';
+import {TabIndex} from '@wireapp/react-ui-kit';
 
 import type {Message} from 'Repositories/entity/message/Message';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
+import {t} from 'Util/LocalizerUtil';
+
+import {ephemeralTimerBackgroundStyle, ephemeralTimerDialStyle} from './EphemeralTimer.styles';
 
 interface EphemeralTimerProps {
   message: Message;
@@ -36,15 +39,21 @@ const EphemeralTimer = ({message}: EphemeralTimerProps) => {
   const duration = Number(expires) - started;
 
   return (
-    <svg aria-hidden="true" className="ephemeral-timer" viewBox="0 0 8 8" width={8} height={8}>
-      <circle className="ephemeral-timer__background" cx={4} cy={4} r={3.5} />
+    <svg
+      aria-label={t('accessibility.selfDeletingMessage.timer')}
+      className="ephemeral-timer"
+      tabIndex={TabIndex.FOCUSABLE}
+      viewBox="0 0 8 8"
+      width={8}
+      height={8}
+    >
+      <circle css={ephemeralTimerBackgroundStyle} cx={4} cy={4} r={3.5} />
       <circle
+        css={ephemeralTimerDialStyle(remaining / duration || 0)}
         data-uie-name="ephemeral-timer-circle"
-        className="ephemeral-timer__dial"
         cx={4}
         cy={4}
         r={2}
-        style={{'--offset': remaining / duration || 0} as CSSProperties}
         transform="rotate(-90 4 4)"
       />
     </svg>
