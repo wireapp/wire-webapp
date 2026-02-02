@@ -23,7 +23,7 @@ import {getImageFilePath, getLocalQRCodeValue, ImageQRCodeFileName} from 'test/e
 import {addCreatedTeam, removeCreatedTeam} from 'test/e2e_tests/utils/tearDown.util';
 import {inviteMembers, loginUser} from 'test/e2e_tests/utils/userActions';
 
-import {test, expect} from '../../../test.fixtures';
+import {test, expect} from '../../test.fixtures';
 
 // User A is a team owner, User B is a team member
 let userA = getUser();
@@ -40,7 +40,7 @@ const imageFilePath = getImageFilePath();
 
 test(
   'Uploading an file in a group conversation',
-  {tag: ['@crit-flow-cells', '@regression']},
+  {tag: ['@crit-flow-cells', '@regression', '@TC-8785']},
   async ({pageManager: userAPageManager, browser, api}) => {
     const {pages: userAPages, modals: userAModals, components: userAComponents} = userAPageManager.webapp;
 

@@ -22,7 +22,7 @@ import {PageManager} from 'test/e2e_tests/pageManager';
 import {getImageFilePath} from 'test/e2e_tests/utils/sendImage.util';
 import {getVideoFilePath, VideoFileName} from 'test/e2e_tests/utils/asset.util';
 
-import {test, expect, withLogin} from '../../../test.fixtures';
+import {test, expect, withLogin} from '../../test.fixtures';
 
 // User A is a team owner, User B is a team member
 let userA: User;
