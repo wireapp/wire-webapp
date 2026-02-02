@@ -148,7 +148,7 @@ export const TitleBar = ({
 
   const conversationSubtitle = is1to1 && firstUserEntity?.isFederated ? (firstUserEntity?.handle ?? '') : '';
 
-  const peopleTooltip = t('tooltipConversationPeople', {displayName});
+  const conversationDetailsTooltip = t('tooltipConversationPeople', {displayName});
 
   // To be changed when design chooses a breakpoint, the conditional can be integrated to the ui-kit directly
   const mdBreakpoint = useMatchMedia('max-width: 1000px');
@@ -282,8 +282,8 @@ export const TitleBar = ({
         <div
           id="show-participants"
           onClick={onClickDetails}
-          title={peopleTooltip}
-          aria-label={peopleTooltip}
+          title={conversationDetailsTooltip}
+          aria-label={conversationDetailsTooltip}
           onKeyDown={event =>
             handleKeyDown({
               event,
