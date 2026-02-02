@@ -82,14 +82,17 @@ test(
       // Initially both files should be visible
       await expect(userBPages.cellsConversationFiles().filesList).toHaveCount(2);
 
-      // Search for a non-existing file
-      await userBPages.cellsConversationFiles().searchFile('non-existing-file.txt');
-      await expect(userBPages.cellsConversationFiles().filesList).toHaveCount(0);
+      // Files might take some time to get indexed by the search engine
+      await new Promise(resolve => setTimeout(resolve, 1000));
 
       // Search for the video file
       await userBPages.cellsConversationFiles().searchFile(VideoFileName);
       await expect(userBPages.cellsConversationFiles().filesList).toHaveCount(1);
       await expect(userBPages.cellsConversationFiles().getFile(VideoFileName)).toBeVisible();
+
+      // Search for a non-existing file
+      await userBPages.cellsConversationFiles().searchFile('non-existing-file.txt');
+      await expect(userBPages.cellsConversationFiles().filesList).toHaveCount(0);
 
       // Clearing the search input and making sure both files are visible again
       await userBPages.cellsConversationFiles().searchFile('');
