@@ -47,8 +47,6 @@ import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 
 import {RightSidebarParams} from '../../page/AppMain';
 import {PanelState} from '../../page/RightSidebar';
-import {Shortcut} from '../../ui/Shortcut';
-import {ShortcutType} from '../../ui/ShortcutType';
 import {CallActions} from '../../view_model/CallingViewModel';
 import {ViewModelRepositories} from '../../view_model/MainViewModel';
 
@@ -150,8 +148,7 @@ export const TitleBar = ({
 
   const conversationSubtitle = is1to1 && firstUserEntity?.isFederated ? (firstUserEntity?.handle ?? '') : '';
 
-  const shortcut = Shortcut.getShortcutTooltip(ShortcutType.PEOPLE);
-  const peopleTooltip = t('tooltipConversationPeople', {shortcut});
+  const peopleTooltip = t('tooltipConversationPeople', {displayName});
 
   // To be changed when design chooses a breakpoint, the conditional can be integrated to the ui-kit directly
   const mdBreakpoint = useMatchMedia('max-width: 1000px');
