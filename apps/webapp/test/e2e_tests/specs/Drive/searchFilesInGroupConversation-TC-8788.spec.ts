@@ -54,7 +54,7 @@ test(
       await api.brig.enableCells(userA.teamId);
     });
 
-    await test.step('Preconditions: Both users log in and open the group', async () => {
+    await test.step('Preconditions: Create group with drive enabled', async () => {
       await userAPages.conversationList().clickCreateGroup();
       // Files should be disabled by default
       expect(await userAPages.groupCreation().isFilesCheckboxChecked()).toBeFalsy();
