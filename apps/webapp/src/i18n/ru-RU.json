@@ -1962,7 +1962,7 @@
   "tooltipConversationInputOneUserTyping": "{user1} пишет",
   "tooltipConversationInputPlaceholder": "Введите сообщение",
   "tooltipConversationInputTwoUserTyping": "{user1} и {user2} пишут",
-  "tooltipConversationPeople": "{displayName}, conversation details",
+  "tooltipConversationPeople": "{displayName}, детали беседы",
   "tooltipConversationPicture": "Добавить изображение",
   "tooltipConversationPing": "Пинг",
   "tooltipConversationSearch": "Поиск",
