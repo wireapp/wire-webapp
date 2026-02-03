@@ -1962,7 +1962,7 @@
   "tooltipConversationInputOneUserTyping": "{user1} is typing",
   "tooltipConversationInputPlaceholder": "Napsat zprávu",
   "tooltipConversationInputTwoUserTyping": "{user1} and {user2} are typing",
-  "tooltipConversationPeople": "Kontakty ({shortcut})",
+  "tooltipConversationPeople": "{displayName}, conversation details",
   "tooltipConversationPicture": "Přidat obrázek",
   "tooltipConversationPing": "Ping",
   "tooltipConversationSearch": "Hledat",

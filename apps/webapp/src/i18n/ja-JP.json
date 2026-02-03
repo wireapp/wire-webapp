@@ -1962,7 +1962,7 @@
   "tooltipConversationInputOneUserTyping": "{user1} is typing",
   "tooltipConversationInputPlaceholder": "メッセージを入力",
   "tooltipConversationInputTwoUserTyping": "{user1} and {user2} are typing",
-  "tooltipConversationPeople": "友人 ({shortcut})",
+  "tooltipConversationPeople": "{displayName}, conversation details",
   "tooltipConversationPicture": "写真を追加",
   "tooltipConversationPing": "Ping",
   "tooltipConversationSearch": "検索",

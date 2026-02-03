@@ -1962,7 +1962,7 @@
   "tooltipConversationInputOneUserTyping": "{user1} is typing",
   "tooltipConversationInputPlaceholder": "Scrie un mesaj",
   "tooltipConversationInputTwoUserTyping": "{user1} and {user2} are typing",
-  "tooltipConversationPeople": "Persoane ({shortcut})",
+  "tooltipConversationPeople": "{displayName}, conversation details",
   "tooltipConversationPicture": "Adaugă poză",
   "tooltipConversationPing": "Ping",
   "tooltipConversationSearch": "Caută",

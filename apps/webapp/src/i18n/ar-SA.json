@@ -1962,7 +1962,7 @@
   "tooltipConversationInputOneUserTyping": "{user1} is typing",
   "tooltipConversationInputPlaceholder": "اكتب الرسالة",
   "tooltipConversationInputTwoUserTyping": "{user1} and {user2} are typing",
-  "tooltipConversationPeople": "الأشخاص ({shortcut})",
+  "tooltipConversationPeople": "{displayName}, conversation details",
   "tooltipConversationPicture": "إضافة صورة",
   "tooltipConversationPing": "Ping",
   "tooltipConversationSearch": "ابحث",

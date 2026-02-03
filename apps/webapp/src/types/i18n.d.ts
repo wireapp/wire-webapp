@@ -376,6 +376,7 @@ declare module 'I18n/en-US.json' {
     'callingRestrictedConferenceCallTeamMemberModalTitle': `Feature unavailable`;
     'cameraStatusOff': `off`;
     'cameraStatusOn': `on`;
+    'cells.breadcrumb.files': `{conversationName} files`;
     'cells.clearFilters.button': `Clear all`;
     'cells.deleteModal.description': `This will permanently delete the file {name} for all participants.`;
     'cells.deleteModal.error': `Something went wrong, please try again later and refresh the list.`;
@@ -401,8 +402,6 @@ declare module 'I18n/en-US.json' {
     'cells.filtersModal.title': `Filters`;
     'cells.folderBreadcrumbCombained': `Show more`;
     'cells.heading': `Files`;
-    'cells.sharedDrive.title': `Shared Drive`;
-    'cells.sharedDrive.description': `Find any file or folder in this conversation`;
     'cells.imageFullScreenModal.closeButton': `Close`;
     'cells.imageFullScreenModal.downloadButton': `Download`;
     'cells.modal.closeButton': `Close`;
@@ -479,7 +478,6 @@ declare module 'I18n/en-US.json' {
     'cells.search.closeButton': `Close`;
     'cells.search.failed': `Something went wrong, please try again later.`;
     'cells.search.placeholder': `Search files and folders`;
-    'cells.breadcrumb.files': `{conversationName} files`;
     'cells.selfDeletingMessage.info': `The feature is not available for conversations with a shared Drive.`;
     'cells.shareModal.changePassword': `Change Password`;
     'cells.shareModal.copyLink': `Copy Link`;
@@ -506,6 +504,8 @@ declare module 'I18n/en-US.json' {
     'cells.shareModal.password.error.required': `Enter a password`;
     'cells.shareModal.password.label': `Set password`;
     'cells.shareModal.primaryAction': `Save`;
+    'cells.sharedDrive.description': `Find any file or folder in this conversation`;
+    'cells.sharedDrive.title': `Shared Drive`;
     'cells.sidebar.heading': `Drive`;
     'cells.sidebar.title': `Files`;
     'cells.tableRow.actions': `More options`;
@@ -1019,8 +1019,8 @@ declare module 'I18n/en-US.json' {
     'federationDelete': `[bold]Your backend[/bold] stopped federating with [bold]{backendUrl}.[/bold]`;
     'fileCardDefaultCloseButtonLabel': `Close`;
     'fileFullscreenModal.editor.error': `Failed to load edit preview`;
-    'fileFullscreenModal.editor.errorTitle': `Unable to open file edit mode`;
     'fileFullscreenModal.editor.errorDescription': `There was a problem connecting to the server. Please try again.`;
+    'fileFullscreenModal.editor.errorTitle': `Unable to open file edit mode`;
     'fileFullscreenModal.editor.iframeTitle': `Document editor`;
     'fileFullscreenModal.noPreviewAvailable.callToAction': `Download File`;
     'fileFullscreenModal.noPreviewAvailable.description': `There is no preview available for this file. Download the file instead.`;
@@ -1966,7 +1966,7 @@ declare module 'I18n/en-US.json' {
     'tooltipConversationInputOneUserTyping': `{user1} is typing`;
     'tooltipConversationInputPlaceholder': `Type a message`;
     'tooltipConversationInputTwoUserTyping': `{user1} and {user2} are typing`;
-    'tooltipConversationPeople': `People ({shortcut})`;
+    'tooltipConversationPeople': `{displayName}, conversation details`;
     'tooltipConversationPicture': `Add picture`;
     'tooltipConversationPing': `Ping`;
     'tooltipConversationSearch': `Search`;
