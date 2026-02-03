@@ -148,9 +148,6 @@ export type BackendVersionResponse = {
   supported: number[];
   federation?: boolean;
   development?: number[];
-  /**
-   * The domain of the backend server
-   */
   domain: string;
 };
 
