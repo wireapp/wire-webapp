@@ -72,10 +72,10 @@ describe('isFileEditable', () => {
     expect(isFileEditable('')).toBe(false);
   });
 
-  it('returns false for older Microsoft Office extensions', () => {
-    expect(isFileEditable('doc')).toBe(false);
-    expect(isFileEditable('xls')).toBe(false);
-    expect(isFileEditable('ppt')).toBe(false);
+  it('returns true for older Microsoft Office extensions', () => {
+    expect(isFileEditable('doc')).toBe(true);
+    expect(isFileEditable('xls')).toBe(true);
+    expect(isFileEditable('ppt')).toBe(true);
   });
 
   it('returns false for extensions with leading dot', () => {
@@ -92,13 +92,13 @@ describe('isFileEditable', () => {
   it('returns false for partial matches', () => {
     expect(isFileEditable('docxs')).toBe(false);
     expect(isFileEditable('xdocx')).toBe(false);
-    expect(isFileEditable('doc')).toBe(false);
+    expect(isFileEditable('xdoc')).toBe(false);
   });
 
-  it('returns false for similar but unsupported extensions', () => {
-    expect(isFileEditable('odt')).toBe(false);
-    expect(isFileEditable('ods')).toBe(false);
-    expect(isFileEditable('odp')).toBe(false);
+  it('returns true for similar supported extensions', () => {
+    expect(isFileEditable('odt')).toBe(true);
+    expect(isFileEditable('ods')).toBe(true);
+    expect(isFileEditable('odp')).toBe(true);
   });
 
   it('returns false for undefined or null-like values converted to strings', () => {

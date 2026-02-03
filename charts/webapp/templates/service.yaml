@@ -1,0 +1,20 @@
+{{- if .Values.ingress.enabled }}
+{{- $appName := include "webapp.baseName" . -}}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "webapp.httpServiceName" . }}
+  labels:
+    app: {{ $appName }}
+    chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+spec:
+  type: ClusterIP
+  ports:
+    - name: http
+      port: {{ .Values.service.http.port | default .Values.service.http.internalPort }}
+      targetPort: {{ .Values.service.http.internalPort }}
+  selector:
+    app: {{ $appName }}
+{{- end }}

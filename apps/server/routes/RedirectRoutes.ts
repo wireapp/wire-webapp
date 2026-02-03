@@ -20,7 +20,8 @@
 import express from 'express';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 
-import type {ClientConfig, ServerConfig} from '../config';
+import type {ClientConfig, ServerConfig} from '@wireapp/config';
+
 import * as BrowserUtil from '../util/BrowserUtil';
 
 const router = express.Router();

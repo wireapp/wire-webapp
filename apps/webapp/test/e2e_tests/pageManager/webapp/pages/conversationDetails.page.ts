@@ -18,7 +18,6 @@
  */
 
 import {Locator, Page} from '@playwright/test';
-import {selectByDataAttribute, selectById, selectByClass} from 'test/e2e_tests/utils/selector.util';
 
 export class ConversationDetailsPage {
   readonly page: Page;
@@ -36,15 +35,15 @@ export class ConversationDetailsPage {
   constructor(page: Page) {
     this.page = page;
 
-    this.addPeopleButton = page.locator(`${selectByDataAttribute('go-add-people')}`);
+    this.addPeopleButton = page.getByTestId('go-add-people');
     this.conversationDetails = page.locator('#conversation-details');
     this.guestOptionsButton = this.conversationDetails.locator('[data-uie-name="go-guest-options"]');
     this.selfDeletingMessageButton = this.conversationDetails.getByRole('button', {name: 'Self-deleting messages'});
-    this.archiveButton = this.conversationDetails.locator(selectByDataAttribute('do-archive'));
-    this.blockConversationButton = this.conversationDetails.locator(selectByDataAttribute('do-block'));
+    this.archiveButton = this.conversationDetails.getByTestId('do-archive');
+    this.blockConversationButton = this.conversationDetails.getByTestId('do-block');
     this.clearConversationContentButton = this.conversationDetails.getByRole('button', {name: 'Clear Content'});
-    this.selectedSearchList = this.page.locator(selectByDataAttribute('selected-search-list'));
-    this.searchList = this.page.locator(selectByDataAttribute('search-list'));
+    this.selectedSearchList = this.page.getByTestId('selected-search-list');
+    this.searchList = this.page.getByTestId('search-list');
   }
 
   async waitForSidebar() {
@@ -54,9 +53,8 @@ export class ConversationDetailsPage {
   async isOpen(conversationName: string) {
     return (
       (await this.page
-        .locator(
-          `${selectById('right-column')} ${selectByClass('conversation-details__header')} ${selectByDataAttribute('status-name')}`,
-        )
+        .locator('#right-column .conversation-details__header')
+        .getByTestId('status-name')
         .textContent()) === conversationName
     );
   }
@@ -66,9 +64,7 @@ export class ConversationDetailsPage {
   }
 
   async clickSelectedUsersButton() {
-    await this.page
-      .locator(`${selectById('add-participants')} ${selectByDataAttribute('do-toggle-selected-search-list')}`)
-      .click();
+    await this.page.locator('#add-participants').getByTestId('do-toggle-selected-search-list').click();
   }
 
   async addUsersToConversation(fullNames: string[]) {
@@ -79,21 +75,25 @@ export class ConversationDetailsPage {
       await this.selectedSearchList.locator(`li div[aria-label*="${fullName}"]`).waitFor({state: 'attached'});
     }
 
-    await this.page.locator(`${selectById('add-participants')} ${selectByDataAttribute('do-create')}`).click();
+    await this.page.locator('#add-participants').getByTestId('do-create').click();
   }
 
   async isUserPartOfConversationAsAdmin(fullName: string) {
-    const userLocator = this.page.locator(
-      `${selectById('conversation-details')} ${selectByDataAttribute('list-admins')} ${selectByDataAttribute('item-user')}${selectByDataAttribute(fullName, 'value')}`,
-    );
+    const userLocator = this.page
+      .locator('#conversation-details')
+      .getByTestId('list-admins')
+      .getByTestId('item-user')
+      .and(this.page.locator(`[data-uie-value="${fullName}"]`));
     await userLocator.waitFor({state: 'visible'});
     return userLocator.isVisible();
   }
 
   async isUserPartOfConversationAsMember(fullName: string) {
-    const userLocator = this.page.locator(
-      `${selectById('conversation-details')} ${selectByDataAttribute('list-members')} ${selectByDataAttribute('item-user')}${selectByDataAttribute(fullName, 'value')}`,
-    );
+    const userLocator = this.page
+      .locator('#conversation-details')
+      .getByTestId('list-members')
+      .getByTestId('item-user')
+      .and(this.page.locator(`[data-uie-value="${fullName}"]`));
     await userLocator.waitFor({state: 'visible'});
     return userLocator.isVisible();
   }
@@ -104,9 +104,11 @@ export class ConversationDetailsPage {
   }
 
   async getLocatorByUser(fullName: string) {
-    const userLocator = this.page.locator(
-      `${selectById('conversation-details')} ${selectByDataAttribute('list-members')} ${selectByDataAttribute('item-user')}${selectByDataAttribute(fullName, 'value')}`,
-    );
+    const userLocator = this.page
+      .locator('#conversation-details')
+      .getByTestId('list-members')
+      .getByTestId('item-user')
+      .and(this.page.locator(`[data-uie-value="${fullName}"]`));
     await userLocator.waitFor({state: 'visible'});
     return userLocator;
   }
@@ -126,13 +128,11 @@ export class ConversationDetailsPage {
 
   async addServiceToConversation(serviceName: string) {
     // Click on the Services/Apps tab
-    const servicesTab = this.page.locator(
-      `${selectById('add-participants')} ${selectByDataAttribute('do-add-services')}`,
-    );
+    const servicesTab = this.page.locator('#add-participants').getByTestId('do-add-services');
     await servicesTab.click();
 
     // Wait for search input to be ready
-    const searchInput = this.page.locator(`${selectById('add-participants')} input[type="text"]`);
+    const searchInput = this.page.locator('#add-participants input[type="text"]');
     await searchInput.waitFor({state: 'visible'});
 
     // Search for the service
@@ -154,7 +154,7 @@ export class ConversationDetailsPage {
   async removeServiceFromConversation(serviceName: string) {
     // Services appear in the members list with item-service test id
     const serviceLocator = this.page
-      .locator(`${selectById('conversation-details')}`)
+      .locator('#conversation-details')
       .getByTestId('item-service')
       .filter({hasText: serviceName});
     await serviceLocator.click();
@@ -167,7 +167,7 @@ export class ConversationDetailsPage {
 
   async isServicePartOfConversation(serviceName: string) {
     const serviceLocator = this.page
-      .locator(`${selectById('conversation-details')}`)
+      .locator('#conversation-details')
       .getByTestId('item-service')
       .filter({hasText: serviceName});
     await serviceLocator.waitFor({state: 'visible'});

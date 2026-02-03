@@ -18,17 +18,14 @@
  */
 
 import {Locator, Page} from '@playwright/test';
-import {selectById, selectByDataAttribute} from 'test/e2e_tests/utils/selector.util';
-import {escapeHtml} from 'test/e2e_tests/utils/userDataProcessor';
 
-import {User} from '../../../data/user';
+import {User} from 'test/e2e_tests/data/user';
 
 export class ConversationListPage {
   readonly page: Page;
 
   readonly blockConversationMenuButton: Locator;
   readonly createGroupButton: Locator;
-  readonly connectWithPeopleButton: Locator;
   readonly pendingConnectionRequest: Locator;
   readonly leaveConversationButton: Locator;
   readonly searchConversationsInput: Locator;
@@ -40,31 +37,33 @@ export class ConversationListPage {
   readonly moveToMenu: Locator;
   readonly createNewFolderButton: Locator;
   readonly conversationListHeaderTitle: Locator;
+  readonly joinCallButton: Locator;
+  readonly clearContentButton: Locator;
 
   constructor(page: Page) {
     this.page = page;
 
-    this.blockConversationMenuButton = page.locator(
-      `${selectById('btn-block')}${selectByDataAttribute('conversation-list-options-menu')}`,
-    );
-
-    this.connectWithPeopleButton = page.locator('[data-uie-name="connect-with-new-users"]');
+    this.blockConversationMenuButton = page.getByRole('menu').getByRole('button', {name: 'Block'});
     this.pendingConnectionRequest = page.locator('[data-uie-name="connection-request"]');
-    this.createGroupButton = page.locator(
-      `${selectByDataAttribute('conversation-list-header')} ${selectByDataAttribute('go-create-group')}`,
-    );
-    this.leaveConversationButton = page.locator(selectByDataAttribute('conversation-leave'));
-    this.searchConversationsInput = page.locator(selectByDataAttribute('search-conversations'));
-    this.archiveConversationMenuButton = page.locator(selectById('btn-archive'));
-    this.unarchiveConversationMenuButton = page.locator(selectById('btn-unarchive'));
+    this.createGroupButton = page.getByTestId('conversation-list-header').getByTestId('go-create-group');
+    this.leaveConversationButton = page.getByTestId('conversation-leave');
+    this.searchConversationsInput = page.getByTestId('search-conversations');
+    this.archiveConversationMenuButton = page.locator('#btn-archive');
+    this.unarchiveConversationMenuButton = page.locator('#btn-unarchive');
     this.blockedChip = page.locator(`span[data-uie-name="status-label"] + span`);
-    this.unblockConversationMenuButton = page.locator(
-      `${selectById('btn-unblock')}${selectByDataAttribute('conversation-list-options-menu')}`,
-    );
+    this.unblockConversationMenuButton = page
+      .getByTestId('conversation-list-options-menu')
+      .and(page.locator('#btn-unblock'));
     this.moveConversationButton = page.getByRole('menu').getByRole('button', {name: 'Move to'});
     this.moveToMenu = page.getByRole('menu');
-    this.createNewFolderButton = this.moveToMenu.getByRole('button', {name: 'Create new folder'});
+    this.createNewFolderButton = this.moveToMenu.getByRole('button', {
+      name: 'Create new folder',
+    });
     this.conversationListHeaderTitle = page.locator('[data-uie-name="conversation-list-header-title"]');
+    this.joinCallButton = page.getByRole('button', {name: 'Join'});
+    this.clearContentButton = page.getByRole('button', {
+      name: 'Clear content',
+    });
   }
 
   async isConversationItemVisible(conversationName: string) {
@@ -74,21 +73,17 @@ export class ConversationListPage {
   }
 
   async isConversationBlocked(conversationName: string) {
-    return await this.getConversationLocator(conversationName)
-      .locator(selectByDataAttribute('status-blocked'))
-      .isVisible();
+    return await this.getConversationLocator(conversationName).getByTestId('status-blocked').isVisible();
   }
 
   async doesConversationHasMentionIndicator(conversationName: string) {
-    const mentionIndicator = this.getConversationLocator(conversationName).locator(
-      selectByDataAttribute('status-mention'),
-    );
+    const mentionIndicator = this.getConversationLocator(conversationName).getByTestId('status-mention');
     await mentionIndicator.waitFor({state: 'visible'});
     return await mentionIndicator.isVisible();
   }
 
-  async openConversation(conversationName: string) {
-    await this.getConversationLocator(conversationName).first().click();
+  async openConversation(conversationName: string, options?: Parameters<typeof this.getConversationLocator>[1]) {
+    await this.getConversationLocator(conversationName, options).click();
   }
 
   async openPendingConnectionRequest() {
@@ -96,11 +91,7 @@ export class ConversationListPage {
   }
 
   async clickConversationOptions(conversationName: string) {
-    await this.getConversationLocator(conversationName).locator(selectByDataAttribute('go-options')).first().click();
-  }
-
-  async clickConnectWithPeople() {
-    await this.connectWithPeopleButton.click();
+    await this.getConversationLocator(conversationName).getByTestId('go-options').first().click();
   }
 
   async clickBlockConversation() {
@@ -119,15 +110,26 @@ export class ConversationListPage {
     await this.createGroupButton.click();
   }
 
-  getConversationLocator(conversationName: string) {
-    return this.page.locator(
-      `${selectByDataAttribute('item-conversation')}${selectByDataAttribute(escapeHtml(conversationName), 'value')}`,
-    );
+  /**
+   * Get a locator for a specific conversation in the list
+   * @param conversationName Name of the conversation to search for
+   * @param options.protocol Only locate conversations matching this protocol (mls only works for 1on1 conversations as groups still use proteus) - Default: "mls"
+   */
+  getConversationLocator(conversationName: string, options?: {protocol?: 'mls' | 'proteus'}) {
+    const conversation = this.page.getByTestId('item-conversation').filter({hasText: conversationName});
+
+    if (options?.protocol) {
+      return conversation.and(this.page.locator(`[data-protocol="${options.protocol}"]`));
+    }
+
+    return conversation;
   }
 
   async openContextMenu(conversationName: string) {
     await this.getConversationLocator(conversationName).click();
-    await this.getConversationLocator(conversationName).click({button: 'right'});
+    await this.getConversationLocator(conversationName).click({
+      button: 'right',
+    });
   }
 
   async leaveConversation() {
@@ -140,7 +142,7 @@ export class ConversationListPage {
   }
 
   async getUserAvatarWrapper(user: User): Promise<Locator> {
-    return this.getConversationLocator(user.fullName).locator(selectByDataAttribute('element-avatar-user'));
+    return this.getConversationLocator(user.fullName).getByTestId('element-avatar-user');
   }
 
   async clickUnblockConversation() {
@@ -148,10 +150,15 @@ export class ConversationListPage {
   }
 
   getRemoveConversationFromFolderButton(folderName: string) {
-    return this.page.getByRole('button', {name: `Remove from "${folderName}"`});
+    return this.page.getByRole('button', {
+      name: `Remove from "${folderName}"`,
+    });
   }
 
   getMoveToFolderButton(folderName: string) {
-    return this.moveToMenu.getByRole('button', {name: folderName, exact: true});
+    return this.moveToMenu.getByRole('button', {
+      name: folderName,
+      exact: true,
+    });
   }
 }

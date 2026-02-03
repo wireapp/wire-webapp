@@ -21,13 +21,15 @@ import {test as baseTest, type BrowserContext, type Page} from '@playwright/test
 
 import {ApiManagerE2E} from './backend/apiManager.e2e';
 import {getUser, User} from './data/user';
-import {PageManager, webAppPath} from './pageManager';
+import {PageManager} from './pageManager';
 import {connectWithUser, sendConnectionRequest} from './utils/userActions';
+import {mockAudioAndVideoDevices} from './utils/mockVideoDevice.util';
 
 type PagePlugin = (page: Page) => void | Promise<void>;
 
 // Define custom test type with axios fixture
 type Fixtures = {
+  _beforeEach: void;
   api: ApiManagerE2E;
   pageManager: PageManager;
   /**
@@ -35,7 +37,10 @@ type Fixtures = {
    * @param ctx BrowserContext - optional browser context to reuse, if not provided, a new one will be created
    * @param setup Array of PagePlugins, effectively functions which will be applied to the page in the given order
    */
-  createPage: {(...setup: PagePlugin[]): Promise<Page>; (ctx: BrowserContext, ...setup: PagePlugin[]): Promise<Page>};
+  createPage: {
+    (...setup: PagePlugin[]): Promise<Page>;
+    (ctx: BrowserContext, ...setup: PagePlugin[]): Promise<Page>;
+  };
   /**
    * Create a new user
    * Note: The created user will be deleted automatically once the test is finished
@@ -50,18 +55,38 @@ type Fixtures = {
    */
   createTeam: (
     teamName: string,
-    options?: Parameters<typeof createUser>[1] & {withMembers?: number | User[]},
-  ) => Promise<{
-    owner: User;
-    members: User[];
-    /** Add a new member to the team after its initial creation */
-    addMember: (member: User) => Promise<void>;
-  }>;
+    options?: Parameters<typeof createUser>[1] & {
+      withMembers?: number | User[];
+    },
+  ) => Promise<Team>;
+};
+
+export type Team = {
+  owner: User;
+  members: User[];
+  /** Add a new member to the team after its initial creation */
+  addMember: (member: User) => Promise<void>;
 };
 
 export {expect} from '@playwright/test';
 
 export const test = baseTest.extend<Fixtures>({
+  // Temporary workaround to add the test id as annotation instead of tag so Testiny can pick it up
+  // The following test suites need to be updated to be individual tests: AppLock, Connections, RegisterSpecs
+  _beforeEach: [
+    async ({}, use, testInfo) => {
+      const testid = testInfo.tags.find(tag => tag.startsWith('@TC'));
+      if (testid && !testInfo.annotations.some(annotation => annotation.type === 'testid')) {
+        testInfo.annotations.push({
+          type: 'testid',
+          description: testid.slice(1),
+        });
+      }
+
+      await use();
+    },
+    {auto: true},
+  ],
   api: async ({}, use) => {
     // Create a new instance of ApiManager for each test
     await use(new ApiManagerE2E());
@@ -90,6 +115,9 @@ export const test = baseTest.extend<Fixtures>({
         context = firstParam;
         setupFns = plugins;
       }
+
+      // Add mocked Audio and Video devices (Hardware is treated as part of the test setup)
+      await context.addInitScript(mockAudioAndVideoDevices);
 
       const page = await context.newPage();
       for (const setupFn of setupFns) {
@@ -149,6 +177,9 @@ export const test = baseTest.extend<Fixtures>({
   },
 });
 
+/** Max time the login is allowed to take before the application needs to be useable */
+export const LOGIN_TIMEOUT = 40_000;
+
 /** PagePlugin to log in as the given user */
 export const withLogin =
   (user: User | Promise<User>, options?: {confirmNewHistory?: boolean}): PagePlugin =>
@@ -165,7 +196,9 @@ export const withLogin =
      * Since the login may take up to 40s we manually wait for it to finish here instead of increasing the timeout on all actions / assertions after this util
      * This is an exception to the general best practice of using playwrights web assertions. (See: https://playwright.dev/docs/best-practices#use-web-first-assertions)
      */
-    await page.waitForURL(new RegExp(`^${webAppPath}$`), {timeout: 40_000, waitUntil: 'networkidle'});
+    await pageManager.webapp.components
+      .conversationSidebar()
+      .sidebar.waitFor({state: 'visible', timeout: LOGIN_TIMEOUT});
   };
 
 /**

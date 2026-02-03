@@ -26,13 +26,40 @@ export const wrapperStyles: CSSObject = {
 
 export const labelStyles: CSSObject = {
   fontSize: 'var(--font-size-base)',
-  fontWeight: 'var(--font-weight-regular)',
+  fontWeight: 'var(--font-weight-semibold)',
   marginBottom: '8px',
+  color: 'var(--main-color)',
 };
 
 export const publicLinkDescriptionStyles: CSSObject = {
   fontSize: 'var(--font-size-small)',
-  color: 'var(--gray-70)',
+  color: 'var(--base-secondary-text)',
+};
+
+export const passwordDescriptionStyles: CSSObject = {
+  fontSize: 'var(--font-size-small)',
+  color: 'var(--base-secondary-text)',
+};
+
+export const expirationDescriptionStyles: CSSObject = {
+  fontSize: 'var(--font-size-small)',
+  color: 'var(--base-secondary-text)',
+};
+
+export const dividerStyles: CSSObject = {
+  border: 0,
+  height: '1px',
+  backgroundColor: '#DCE0E3',
+  margin: '16px 0',
+};
+
+export const switchContentStyles: CSSObject = {
+  flex: 1,
+};
+
+export const toggleContentStyles: CSSObject = {
+  minHeight: '32px',
+  marginBottom: '16px',
 };
 
 export const switchContainerStyles: CSSObject = {
@@ -56,6 +83,15 @@ export const inputWrapperStyles: CSSObject = {
   alignItems: 'flex-start',
   gap: '8px',
 };
+
+export {
+  passwordActionButtonStyles,
+  passwordContentStyles,
+  passwordCopyButtonStyles,
+  passwordInputLabelStyles,
+  passwordInputRowStyles,
+  passwordInputStyles,
+} from 'Components/Cells/ShareModal/CellsSharePasswordStyles';
 
 export const loaderWrapperStyles: CSSObject = {
   display: 'flex',

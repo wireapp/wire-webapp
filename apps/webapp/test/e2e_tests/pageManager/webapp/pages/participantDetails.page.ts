@@ -18,7 +18,6 @@
  */
 
 import {Locator, Page} from '@playwright/test';
-import {selectByDataAttribute} from 'test/e2e_tests/utils/selector.util';
 
 export class ParticipantDetails {
   readonly page: Page;
@@ -28,7 +27,7 @@ export class ParticipantDetails {
   constructor(page: Page) {
     this.page = page;
 
-    this.block = this.page.locator(selectByDataAttribute('do-block-item-text'));
+    this.block = this.page.getByTestId('do-block-item-text');
   }
 
   async blockUser() {

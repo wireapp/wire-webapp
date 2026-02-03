@@ -1,16 +1,20 @@
 {
   "$schema": "./node_modules/nx/schemas/nx-schema.json",
+  "defaultBase": "dev",
   "targetDefaults": {
     "build": {
+      "dependsOn": ["^build"], // build all upstream dependencies first
       "cache": true,
       "inputs": ["production"], // skip test-only files when hashing builds
       "outputs": ["{projectRoot}/dist"]
     },
     "test": {
+      "dependsOn": ["^build"], // build all upstream dependencies first
       "cache": true,
       "inputs": ["default", "^production", "{workspaceRoot}/jest.preset.js"] // include shared preset in cache key
     },
     "lint": {
+      "dependsOn": ["^build"], // build all upstream dependencies first
       "cache": true,
       "inputs": ["default", "{workspaceRoot}/eslint.config.ts", "{workspaceRoot}/eslint.config.base.ts", "{projectRoot}/eslint.config.ts"] // workspace and project lint configs in hash
     }
@@ -30,27 +34,21 @@
   },
   "defaultProject": "webapp",
   "release": {
-    "projects": ["libraries/*"],
+    "projects": ["tag:npm:public"],
     "projectsRelationship": "independent",
-    "releaseTag": {
-      "pattern": "{projectName}@{version}"
-    },
-    "git": {
-      "commitMessage": "chore(release): publish {projectName}@{version} [skip ci]"
-    },
-    "changelog": {
-      "workspaceChangelog": false,
-      "projectChangelogs": {
-        "createRelease": "github",
-        "file": "{projectRoot}/CHANGELOG.md"
-      }
-    },
     "version": {
       "conventionalCommits": true,
-      "generatorOptions": {
-        "packageRoot": "{projectRoot}",
-        "currentVersionResolver": "git-tag"
+      "fallbackCurrentVersionResolver": "disk"
+    },
+    "changelog": {
+      "projectChangelogs": {
+        "createRelease": "github"
       }
+    },
+    "git": {
+      "commit": true,
+      "tag": true,
+      "commitMessage": "chore(release): publish {projectName} {version} [skip ci]"
     }
   }
 }

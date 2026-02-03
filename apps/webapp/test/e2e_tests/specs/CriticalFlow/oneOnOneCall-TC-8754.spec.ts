@@ -17,85 +17,42 @@
  *
  */
 
-import {getUser} from 'test/e2e_tests/data/user';
 import {PageManager} from 'test/e2e_tests/pageManager';
-import {addMockCamerasToContext} from 'test/e2e_tests/utils/mockVideoDevice.util';
-import {completeLogin} from 'test/e2e_tests/utils/setup.util';
-import {addCreatedTeam, removeCreatedTeam} from 'test/e2e_tests/utils/tearDown.util';
 
-import {test, expect} from '../../test.fixtures';
-
-let ownerA = getUser();
-let ownerB = getUser();
-
-const teamAName = 'Direct Call A';
-const teamBName = 'Direct Call B';
+import {test, expect, withLogin, withConnectionRequest} from '../../test.fixtures';
 
 test(
   '1:1 Video call with device switch and screenshare',
   {tag: ['@TC-8754', '@crit-flow-web']},
-  async ({browser, pageManager: ownerAPageManager, api}) => {
+  async ({createTeam, createPage, api}) => {
     test.setTimeout(150_000);
 
-    const {pages: ownerAPages, modals: ownerAModals, components: ownerAComponents} = ownerAPageManager.webapp;
+    const [{owner: userA}, {owner: userB}] = await Promise.all([createTeam('User A Team'), createTeam('User B Team')]);
+    const [userAPageManager, userBPageManager] = await Promise.all([
+      PageManager.from(createPage(withLogin(userA), withConnectionRequest(userB))),
+      PageManager.from(createPage(withLogin(userB))),
+    ]);
+    const {id: callingServiceInstanceId} = await api.callingService.createInstance(userB.password, userB.email);
 
-    await addMockCamerasToContext(ownerAPageManager.getContext());
-
-    const ownerBContext = await browser.newContext();
-    const ownerBPage = await ownerBContext.newPage();
-    const ownerBPageManager = PageManager.from(ownerBPage);
-    const {pages: ownerBPages} = ownerBPageManager.webapp;
-
-    let callingServiceInstanceId: string;
-
-    await test.step('Preconditions: Creating two separate teams and users via API', async () => {
-      const user = await api.createTeamOwner(ownerA, teamAName);
-      ownerA = {...ownerA, ...user};
-      addCreatedTeam(ownerA, ownerA.teamId!);
-      await api.enableConferenceCallingFeature(ownerA.teamId!);
-
-      const userB = await api.createTeamOwner(ownerB, teamBName);
-      ownerB = {...ownerB, ...userB};
-      addCreatedTeam(ownerB, ownerB.teamId!);
-      await api.enableConferenceCallingFeature(ownerB.teamId!);
-    });
-
-    await test.step('Users A and B are logged in', async () => {
-      await Promise.all([completeLogin(ownerAPageManager, ownerA), completeLogin(ownerBPageManager, ownerB)]);
-    });
-
-    // user A finds user B and sends a connection request
-    await test.step('User A connects with User B', async () => {
-      await ownerAComponents.conversationSidebar().clickConnectButton();
-      await ownerAPages.startUI().searchInput.fill(ownerB.username);
-      await ownerAPages.startUI().selectUser(ownerB.username);
-      await ownerAModals.userProfile().clickConnectButton();
-
-      expect(await ownerAPages.conversationList().isConversationItemVisible(ownerB.fullName));
-      await expect(ownerBPage).toHaveTitle('(1) Wire');
-
-      await ownerBPages.conversationList().openPendingConnectionRequest();
-      await ownerBPages.connectRequest().clickConnectButton();
+    await test.step('User B accepts connection request from User A', async () => {
+      const {pages} = userBPageManager.webapp;
+      await pages.conversationList().openPendingConnectionRequest();
+      await pages.connectRequest().clickConnectButton();
     });
 
     await test.step('User A calls User B', async () => {
-      try {
-        const response = await api.callingService.createInstance(ownerB.password, ownerB.email);
-        callingServiceInstanceId = response.id;
-        await api.callingService.setAcceptNextCall(callingServiceInstanceId);
-        await ownerAPages.conversationList().openConversation(ownerB.fullName);
-        await ownerAPages.conversation().clickConversationInfoButton();
-        await ownerAPages.conversation().clickCallButton();
-      } catch (error) {
-        console.error('Error during call initiation:', error);
-        throw error;
-      }
+      const {pages} = userAPageManager.webapp;
+      await api.callingService.setAcceptNextCall(callingServiceInstanceId);
+
+      await pages.conversationList().openConversation(userB.fullName);
+      await pages.conversation().clickConversationInfoButton();
+      await pages.conversation().clickCallButton();
     });
 
     await test.step('User B answers call from calling notification', async () => {
+      const {pages} = userAPageManager.webapp;
       // answering happens automatically calling service
-      await ownerAPages.calling().waitForCell();
-      expect(await ownerAPages.calling().isCellVisible()).toBeTruthy();
+      await expect(pages.calling().callCell).toBeVisible();
     });
 
     await test.step('User A switches audio on and sends audio', async () => {
@@ -107,7 +64,8 @@ test(
     });
 
     await test.step('User A turns on camera', async () => {
-      await ownerAPages.calling().clickToggleVideoButton();
+      const {pages} = userAPageManager.webapp;
+      await pages.calling().clickToggleVideoButton();
     });
 
     await test.step('User B is able to see User A', async () => {
@@ -115,11 +73,12 @@ test(
     });
 
     await test.step('User A swaps audio and video devices', async () => {
-      await ownerAComponents.conversationSidebar().clickPreferencesButton();
-      await ownerAPages.settings().clickAudioVideoSettingsButton();
-      await ownerAPages.audioVideoSettings().selectMicrophone('Fake Audio Input 2');
-      await ownerAPages.audioVideoSettings().selectSpeaker('Fake Audio Output 2');
-      await ownerAPages.audioVideoSettings().selectCamera('Fake Camera 2');
+      const {pages, components} = userAPageManager.webapp;
+      await components.conversationSidebar().clickPreferencesButton();
+      await pages.settings().clickAudioVideoSettingsButton();
+      await pages.audioVideoSettings().selectMicrophone('Fake Audio Input 2');
+      await pages.audioVideoSettings().selectSpeaker('Fake Audio Output 2');
+      await pages.audioVideoSettings().selectCamera('Fake Camera 2');
     });
 
     await test.step('User B is able to hear and see User A with new devices', async () => {
@@ -128,7 +87,8 @@ test(
     });
 
     await test.step('User A turns on screenshare', async () => {
-      await ownerAPages.calling().clickToggleScreenShareButton();
+      const {pages} = userAPageManager.webapp;
+      await pages.calling().clickToggleScreenShareButton();
     });
 
     await test.step("User B is able to see User A's screen", async () => {
@@ -136,12 +96,8 @@ test(
     });
 
     await test.step('User A ends call', async () => {
-      await ownerAPages.calling().clickLeaveCallButton();
+      const {pages} = userAPageManager.webapp;
+      await pages.calling().clickLeaveCallButton();
     });
   },
 );
-
-test.afterAll(async ({api}) => {
-  await removeCreatedTeam(api, ownerA);
-  await removeCreatedTeam(api, ownerB);
-});

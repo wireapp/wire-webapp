@@ -19,16 +19,16 @@
 
 import {User} from 'test/e2e_tests/data/user';
 import {PageManager} from 'test/e2e_tests/pageManager';
-import {addMockCamerasToContext} from 'test/e2e_tests/utils/mockVideoDevice.util';
 
 import {test, expect, withLogin} from '../../test.fixtures';
+import {createGroup} from 'test/e2e_tests/utils/userActions';
 
 const channelName = 'Test Channel';
 
 // ToDo(WPB-22442): Backoffice does not unlock calling feature for teams created during tests
 test.fixme(
   'Calls in channels with device switch and screenshare',
-  {tag: ['@TC-8754', '@crit-flow-web']},
+  {tag: ['@TC-8755', '@crit-flow-web']},
   async ({createTeam, createPage, api}) => {
     test.setTimeout(150_000);
 
@@ -49,11 +49,8 @@ test.fixme(
 
       // Create page managers for both owner and member
       // Member page manager is needed for the channel/calling service to work properly
-      await Promise.all([
-        PageManager.from(createPage(withLogin(owner))).then(async pm => {
-          ownerPageManager = pm;
-          await addMockCamerasToContext(ownerPageManager.getContext());
-        }),
+      [ownerPageManager] = await Promise.all([
+        PageManager.from(createPage(withLogin(owner))),
         // Member logs in but calling service handles call participation
         createPage(withLogin(member)),
       ]);
@@ -61,12 +58,7 @@ test.fixme(
 
     await test.step('Team owner creates a channel with available member', async () => {
       const {pages} = ownerPageManager.webapp;
-      await pages.conversationList().clickCreateGroup();
-      await pages.groupCreation().setGroupName(channelName);
-      await pages.groupCreation().clickNextButton();
-      await pages.startUI().selectUsers([member.username]);
-      await pages.groupCreation().clickCreateGroupButton();
-      await pages.groupCreation().waitForModalClose();
+      await createGroup(pages, channelName, [member]);
       expect(await pages.conversationList().isConversationItemVisible(channelName)).toBeTruthy();
     });
 

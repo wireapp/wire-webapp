@@ -29,7 +29,8 @@ import http from 'http';
 import https from 'https';
 import path from 'path';
 
-import type {ClientConfig, ServerConfig} from './config';
+import type {ClientConfig, ServerConfig} from '@wireapp/config';
+
 import {HealthCheckRoute} from './routes/_health/HealthRoute';
 import {AppleAssociationRoute} from './routes/appleassociation/AppleAssociationRoute';
 import {ConfigRoute} from './routes/config/ConfigRoute';

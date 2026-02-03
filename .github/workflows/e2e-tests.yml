@@ -1,0 +1,145 @@
+name: E2E Tests
+
+on:
+  # Options for the workflow when it's manually triggered
+  workflow_dispatch:
+    inputs:
+      webappUrl:
+        type: choice
+        description: Define which stage to run the tests against
+        required: true
+        options:
+          - https://wire-webapp-dev.zinfra.io/
+          - https://wire-webapp-master.zinfra.io/
+          - https://wire-webapp-edge.wire.com/
+          - https://wire-webapp-staging.wire.com/
+      backendUrl:
+        type: choice
+        description: Define which backend should be used (make sure this matches the one used by the stage set for webappUrl)
+        options:
+          - https://staging-nginz-https.zinfra.io/
+          - https://prod-nginz-https.wire.com/
+      grep:
+        type: string
+        description: Define which tests to run, the given value will be passed to the `--grep` flag of playwright
+  # Options for calling the workflow within an other workflow
+  workflow_call:
+    inputs:
+      webappUrl:
+        type: string
+        required: true
+      backendUrl:
+        type: string
+        required: true
+      grep:
+        type: string
+        description: Define which tests to run, the given value will be passed to the `--grep` flag of playwright
+    secrets:
+      OP_SERVICE_ACCOUNT_TOKEN:
+        required: true
+    outputs:
+      reportArtifactId:
+        description: ID of the playwright report artifact
+        value: ${{ jobs.e2e-report.outputs.reportArtifactId }}
+      reportUrl:
+        description: URL to the playwright report artifact
+        value: ${{ jobs.e2e-report.outputs.reportUrl }}
+
+jobs:
+  test:
+    name: Run E2E Tests
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        # prettier-ignore
+        shard: [ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32]
+
+    services:
+      # Run the kalium testservice as service container of the current job
+      testservice:
+        image: quay.io/wire/testservice:latest
+        ports:
+          - 8080:8080
+
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version-file: '.nvmrc'
+          cache: 'yarn'
+
+      - run: yarn --immutable
+      - run: yarn playwright install --with-deps chrome
+      - uses: 1password/install-cli-action@143a85f84a90555d121cde2ff5872e393a47ab9f
+
+      - name: Generate env file
+        run: op inject -i apps/webapp/test/e2e_tests/.env.staging.tpl -o apps/webapp/test/e2e_tests/.env
+        env:
+          OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
+
+      - name: Run tests
+        env:
+          WEBAPP_URL: ${{ inputs.webappUrl }}
+          BACKEND_URL: ${{ inputs.backendUrl }}
+          TEST_SERVICE_URL: http://localhost:8080 # Run tests against locally running test service
+          PLAYWRIGHT_BLOB_OUTPUT_DIR: apps/webapp/playwright-report/blob-reports
+          GREP: ${{ inputs.grep }}
+        run: yarn nx run webapp:e2e --shard=${{ matrix.shard }}/${{ strategy.job-total }} --reporter=blob --grep="${GREP}"
+
+      - name: Upload blob report
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v5
+        with:
+          name: blob-report-${{ matrix.shard }}
+          path: apps/webapp/playwright-report/blob-reports
+          retention-days: 1
+
+  e2e-report:
+    runs-on: ubuntu-latest
+    if: ${{ !cancelled() }}
+    needs: [test]
+
+    # It's necessary to define the outputs of the job so the calling workflow can access them
+    outputs:
+      reportArtifactId: ${{ steps.generate-outputs.outputs.reportArtifactId }}
+      reportUrl: ${{ steps.generate-outputs.outputs.reportUrl }}
+
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version-file: '.nvmrc'
+          cache: 'yarn'
+
+      - run: yarn --immutable
+
+      - name: Download blob reports
+        uses: actions/download-artifact@v5
+        with:
+          path: ./apps/webapp/playwright-report/blob-reports
+          pattern: blob-report-*
+          merge-multiple: true
+
+      # Merge reports and delete blob reports, only keep resources to include within the artifact
+      - name: Merge playwright reports
+        working-directory: apps/webapp
+        run: |
+          yarn playwright merge-reports --config ./playwright.config.ts playwright-report/blob-reports
+          rm -rf playwright-report/blob-reports/report*
+
+      - name: Upload test report
+        id: upload_playwright_report
+        uses: actions/upload-artifact@v5
+        with:
+          name: playwright-report
+          path: apps/webapp/playwright-report/
+
+      - name: Generate outputs
+        id: generate-outputs
+        run: |
+          echo "reportUrl=${{ steps.upload_playwright_report.outputs.artifact-url }}" >> $GITHUB_OUTPUT
+          echo "reportArtifactId=${{ steps.upload_playwright_report.outputs.artifact-id }}" >> $GITHUB_OUTPUT

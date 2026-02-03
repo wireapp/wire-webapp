@@ -1,6 +1,28 @@
 version: 2
 updates:
-  # Webapp configs
+  ################ MONOREPO ROOT ################
+
+  # Root workspace dependencies (monorepo root)
+  - package-ecosystem: npm
+    directory: '/'
+    schedule:
+      interval: weekly
+      day: sunday
+      time: '16:00'
+      timezone: 'Europe/Berlin'
+    open-pull-requests-limit: 99
+    labels:
+      - 'type: chore 🧹'
+    ignore:
+      # Prevent major version updates
+      - dependency-name: '*'
+        update-types: ['version-update:semver-major']
+      - dependency-name: '@types/node'
+      - dependency-name: 'typescript'
+
+  ################ APPS ################
+
+  # Webapp config dependencies
   - package-ecosystem: npm
     directory: '/apps/webapp/app-config'
     schedule:
@@ -10,6 +32,10 @@ updates:
     open-pull-requests-limit: 99
     labels:
       - 'type: chore 🧹'
+    ignore:
+      # Prevent major version updates
+      - dependency-name: '*'
+        update-types: ['version-update:semver-major']
 
   # Webapp frontend dependencies
   - package-ecosystem: npm
@@ -31,6 +57,9 @@ updates:
           - '*@datadog*'
 
     ignore:
+      # Prevent major version updates
+      - dependency-name: '*'
+        update-types: ['version-update:semver-major']
       - dependency-name: '@wireapp/avs'
       # Wait until we have next release with wasm folder
       - dependency-name: '@mediapipe/tasks-vision'
@@ -61,13 +90,71 @@ updates:
     labels:
       - 'type: chore 🧹'
     ignore:
+      # Prevent major version updates
+      - dependency-name: '*'
+        update-types: ['version-update:semver-major']
       - dependency-name: geolite2
         versions:
           - '>= 2.a'
       - dependency-name: 'typescript'
       - dependency-name: '@types/node'
 
-  # Logger library dependencies
+  ################ LIBRRIES ################
+
+  # Core library dependencies
+  - package-ecosystem: npm
+    directory: '/libraries/core'
+    schedule:
+      interval: weekly
+      day: sunday
+      time: '16:00'
+      timezone: 'Europe/Berlin'
+    open-pull-requests-limit: 99
+    labels:
+      - 'type: chore 🧹'
+    ignore:
+      # Prevent major version updates
+      - dependency-name: '*'
+        update-types: ['version-update:semver-major']
+      - dependency-name: '@types/node'
+      - dependency-name: 'typescript'
+
+  # ApiClient library dependencies
+  - package-ecosystem: npm
+    directory: '/libraries/api-client'
+    schedule:
+      interval: weekly
+      day: sunday
+      time: '16:00'
+      timezone: 'Europe/Berlin'
+    open-pull-requests-limit: 99
+    labels:
+      - 'type: chore 🧹'
+    ignore:
+      # Prevent major version updates
+      - dependency-name: '*'
+        update-types: ['version-update:semver-major']
+      - dependency-name: '@types/node'
+      - dependency-name: 'typescript'
+
+  # Config library dependencies
+  - package-ecosystem: npm
+    directory: '/libraries/config'
+    schedule:
+      interval: weekly
+      day: sunday
+      time: '16:00'
+      timezone: 'Europe/Berlin'
+    open-pull-requests-limit: 99
+    labels:
+      - 'type: chore 🧹'
+    ignore:
+      # Prevent major version updates
+      - dependency-name: '*'
+        update-types: ['version-update:semver-major']
+      - dependency-name: '@types/node'
+      - dependency-name: 'typescript'
+
   - package-ecosystem: npm
     directory: '/libraries/Logger'
     schedule:
@@ -79,8 +166,11 @@ updates:
     labels:
       - 'type: chore 🧹'
     ignore:
-      - dependency-name: 'typescript'
+      # Prevent major version updates
+      - dependency-name: '*'
+        update-types: ['version-update:semver-major']
       - dependency-name: '@types/node'
+      - dependency-name: 'typescript'
 
   # Github actions
   - package-ecosystem: 'github-actions'

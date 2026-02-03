@@ -19,12 +19,8 @@
 
 import {Page} from '@playwright/test';
 
-import {MarketingConsentModal} from './team_management/modals/marketingConsent.modal';
-import {TeamDataShareConsentModal} from './team_management/modals/teamsDataShareConsent.modal';
-import {SetUsernamePage} from './team_management/pages/setUsername.page';
-import {TeamLoginPage} from './team_management/pages/teamLogin.page';
-import {TeamsPage} from './team_management/pages/teams.page';
-import {TeamSignUpPage} from './team_management/pages/teamSignUp.page';
+import {MarketingConsentModal} from './webapp/modals/marketingConsent.modal';
+import {SetUsernamePage} from './webapp/pages/setUsername.page';
 import {CellsConversationPage} from './webapp/cells/cellsConversation.page';
 import {CellsConversationFilesPage} from './webapp/cells/cellsConversationFiles.page';
 import {CellsFileDetailViewModal} from './webapp/cells/cellsFileDetailView.modal';
@@ -78,7 +74,6 @@ import {StartUIPage} from './webapp/pages/startUI.page';
 import {WelcomePage} from './webapp/pages/welcome.page';
 
 export const webAppPath = process.env.WEBAPP_URL ?? '';
-const teamManagementPath = process.env.TEAM_MANAGEMENT_URL ?? '';
 
 export class PageManager {
   private readonly cache = new Map<string, any>();
@@ -94,7 +89,7 @@ export class PageManager {
   openNewTab = async <T>(url?: string, handler?: (tab: PageManager) => Promise<T>): Promise<T> => {
     const newPage = await this.page.context().newPage();
     if (url) {
-      await newPage.goto(url);
+      await newPage.goto(url, {waitUntil: 'networkidle'});
     }
     const tabManager = new PageManager(newPage);
     try {
@@ -114,10 +109,6 @@ export class PageManager {
 
   openUrl = (url: string) => {
     return this.page.goto(url, {waitUntil: 'networkidle'});
-  };
-
-  openTeamManagementPage = () => {
-    return this.page.goto(teamManagementPath, {waitUntil: 'networkidle'});
   };
 
   refreshPage = (options: {waitUntil?: 'load' | 'domcontentloaded' | 'networkidle'} = {waitUntil: 'networkidle'}) => {
@@ -152,6 +143,7 @@ export class PageManager {
       singleSignOn: () => this.getOrCreate('webapp.pages.singleSignOn', () => new SingleSignOnPage(this.page)),
       welcome: () => this.getOrCreate('webapp.pages.welcome', () => new WelcomePage(this.page)),
       registration: () => this.getOrCreate('webapp.pages.registration', () => new RegistrationPage(this.page)),
+      sidebar: () => this.getOrCreate('webapp.pages.sidebar', () => new ConversationSidebar(this.page)),
       startUI: () => this.getOrCreate('webapp.pages.startUI', () => new StartUIPage(this.page)),
       account: () => this.getOrCreate('webapp.pages.account', () => new AccountPage(this.page)),
       conversationList: () =>
@@ -225,19 +217,6 @@ export class PageManager {
       inputBarControls: () =>
         this.getOrCreate('webapp.components.inputBarControls', () => new InputBarControls(this.page)),
       calling: () => this.getOrCreate('webapp.components.calling', () => new CallingPage(this.page)),
-    },
-  } as const;
-
-  // ───────────── TEAM MANAGEMENT ─────────────
-  public tm = {
-    pages: {
-      teamLogin: () => this.getOrCreate('tm.pages.teamLogin', () => new TeamLoginPage(this.page)),
-      teamSignUp: () => this.getOrCreate('tm.pages.teamSignUp', () => new TeamSignUpPage(this.page)),
-      teams: () => this.getOrCreate('tm.pages.teams', () => new TeamsPage(this.page)),
-    },
-    modals: {
-      dataShareConsent: () =>
-        this.getOrCreate('tm.modals.dataShareConsent', () => new TeamDataShareConsentModal(this.page)),
     },
   } as const;
 }

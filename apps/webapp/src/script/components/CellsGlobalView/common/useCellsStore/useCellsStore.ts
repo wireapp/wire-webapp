@@ -27,7 +27,9 @@ export type Status = 'idle' | 'loading' | 'fetchingMore' | 'success' | 'error';
 
 interface FiltersState {
   tags: string[];
+  path?: string;
   setTags: (tags: string[]) => void;
+  setPath: (path?: string) => void;
   clearAll: () => void;
   getActiveCount: () => number;
 }
@@ -54,6 +56,7 @@ export const useCellsStore = create<CellsState>((set, get) => ({
   pagination: null,
   filters: {
     tags: [],
+    path: undefined,
     setTags: tags =>
       set(state => ({
         filters: {
@@ -61,11 +64,19 @@ export const useCellsStore = create<CellsState>((set, get) => ({
           tags,
         },
       })),
+    setPath: path =>
+      set(state => ({
+        filters: {
+          ...state.filters,
+          path,
+        },
+      })),
     clearAll: () =>
       set(state => ({
         filters: {
           ...state.filters,
           tags: [],
+          path: undefined,
         },
       })),
     getActiveCount: () => {
@@ -73,6 +84,10 @@ export const useCellsStore = create<CellsState>((set, get) => ({
       let count = 0;
 
       if (filters.tags.length > 0) {
+        count += 1;
+      }
+
+      if (filters.path) {
         count += 1;
       }
 

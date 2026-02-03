@@ -83,7 +83,7 @@ export const ConversationTabs = ({activeTabIndex, onIndexChange, conversationQua
       <div className="conversation-tabs__list" role="tablist" aria-label={t('conversationTabs')}>
         <ConversationTab
           id="conversation"
-          label="Conversation"
+          label={t('cells.tableRow.conversationName')}
           isActive={activeTabIndex === 0}
           onClick={event => {
             createNavigate(messagesUrl)(event);
@@ -93,7 +93,7 @@ export const ConversationTabs = ({activeTabIndex, onIndexChange, conversationQua
         />
         <ConversationTab
           id="files"
-          label="Files"
+          label={t('conversationDetailsActionCellsTitle')}
           isActive={activeTabIndex === 1}
           onClick={event => {
             createNavigate(filesUrl)(event);

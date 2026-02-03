@@ -21,7 +21,7 @@ import {defineConfig, devices, ReporterDescription} from '@playwright/test';
 import {config} from 'dotenv';
 import {resolve} from 'node:path';
 
-config({path: resolve(__dirname, './test/e2e_tests/.env')});
+config({path: resolve(__dirname, './test/e2e_tests/.env'), quiet: true});
 
 const numberOfRetriesOnCI = 1;
 const numberOfParallelWorkersOnCI = 1;
@@ -32,7 +32,7 @@ const numberOfParallelWorkersOnCI = 1;
 module.exports = defineConfig({
   testDir: './test/e2e_tests',
   /* Run tests in files in parallel */
-  fullyParallel: false,
+  fullyParallel: true,
   /* Fail the build on CI if you accidentally left test.only in the source code. */
   forbidOnly: !!process.env.CI,
   /* Due to the tests usually requiring registration and login of a new user the default 30s timeout isn't sufficient */
@@ -43,10 +43,9 @@ module.exports = defineConfig({
   workers: process.env.CI ? numberOfParallelWorkersOnCI : undefined,
   /* Reporter to use. See https://playwright.dev/docs/test-reporters */
   reporter: [
-    ['html', {outputFolder: 'playwright-report', open: 'never'}],
+    ['html', {outputFolder: 'playwright-report/html', open: 'never'}],
     ['json', {outputFile: 'playwright-report/report.json'}],
-    // Add github and blob reporters in CI otherwise html and json are enough
-    ...(process.env.CI ? ([['line'], ['blob']] satisfies ReporterDescription[]) : []),
+    ['line'],
   ],
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
   use: {
@@ -69,7 +68,11 @@ module.exports = defineConfig({
         channel: 'chrome',
         headless: process.env.HEADLESS !== 'false',
         launchOptions: {
-          args: ['--use-fake-device-for-media-stream', '--use-fake-ui-for-media-stream'],
+          args: [
+            '--use-fake-device-for-media-stream', // Provide fake devices for audio & video device input
+            '--use-fake-ui-for-media-stream', // Bypasses the popup to grant permission and select video / audio input device by automatically selecting the default one
+            '--mute-audio', // Mute all audio output from the test browser because e.g. the ringtone of a call can be annoying during testing
+          ],
         },
       }, // or 'chrome-beta'
     },

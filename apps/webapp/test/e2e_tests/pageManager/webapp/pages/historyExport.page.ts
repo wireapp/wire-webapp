@@ -19,7 +19,6 @@
 
 import {Locator, Page} from '@playwright/test';
 import {downloadAssetAndGetFilePath} from 'test/e2e_tests/utils/asset.util';
-import {selectByDataAttribute} from 'test/e2e_tests/utils/selector.util';
 
 export class HistoryExportPage {
   readonly page: Page;
@@ -31,9 +30,9 @@ export class HistoryExportPage {
   constructor(page: Page) {
     this.page = page;
 
-    this.exportSuccessHeadline = page.locator(selectByDataAttribute('status-history-export-success-headline'));
-    this.saveFileButton = page.locator(selectByDataAttribute('do-save-history-export'));
-    this.cancelButton = page.locator(selectByDataAttribute('do-cancel-history-export'));
+    this.exportSuccessHeadline = page.getByTestId('status-history-export-success-headline');
+    this.saveFileButton = page.getByTestId('do-save-history-export');
+    this.cancelButton = page.getByTestId('do-cancel-history-export');
   }
 
   async isVisible() {

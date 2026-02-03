@@ -6,14 +6,16 @@
   "targets": {
     "build": {
       "executor": "nx:run-commands",
-      "outputs": ["{projectRoot}/dist"], // compiled server + assets
+      "dependsOn": ["^build", "webapp:build"],
+      "outputs": ["{projectRoot}/dist"],
       "options": {
         "commands": ["rimraf {projectRoot}/dist", "tsc -p {projectRoot}/tsconfig.json", "node {projectRoot}/bin/generateVersionFile.js", "node {projectRoot}/bin/copy_server_assets.js"],
-        "parallel": false // run in order, artifacts depend on ts output
+        "parallel": false
       }
     },
     "package": {
       "executor": "nx:run-commands",
+      "dependsOn": ["^build"],
       "outputs": ["{projectRoot}/dist/s3"],
       "options": {
         "commands": ["rimraf {projectRoot}/dist", "nx run server:build", "nx run webapp:build:production", "node bin/zip.js"],
@@ -28,7 +30,7 @@
           "outputPath": "{projectRoot}/dist",
           "outputFileName": "index.js"
         },
-        "watch": true // rebuild & restart on change
+        "watch": true
       },
       "configurations": {
         "production": {

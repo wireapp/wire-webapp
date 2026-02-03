@@ -80,7 +80,6 @@ import {Segmentation} from 'Repositories/tracking/Segmentation';
 import {protoFromType} from 'Repositories/user/AvailabilityMapper';
 import {UserRepository} from 'Repositories/user/UserRepository';
 import {UserState} from 'Repositories/user/UserState';
-import {getWebEnvironment} from 'Util/Environment';
 import {
   cancelSendingLinkPreview,
   clearLinkPreviewSendingState,
@@ -153,6 +152,8 @@ type EditMessagePayload = TextMessagePayload & {originalMessageId: string};
 type MultipartMessagePayload = TextMessagePayload & {
   attachments: MultiPartContent['attachments'];
 };
+
+type EditMultiPartMessagePayload = MultipartMessagePayload & {originalMessageId: string};
 
 const enum SendAndInjectSendingState {
   FAILED = 'FAILED',
@@ -326,6 +327,31 @@ export class MessageRepository {
     return this.sendAndInjectMessage(editMessage, conversation, {syncTimestamp: false});
   }
 
+  private async sendEditMultiPart({
+    attachments,
+    conversation,
+    message,
+    messageId,
+    originalMessageId,
+    mentions = [],
+    quote,
+  }: EditMultiPartMessagePayload) {
+    const editedMessage = MessageBuilder.buildEditedMultipartMessage(
+      attachments,
+      this.decorateTextMessage(
+        {
+          originalMessageId: originalMessageId,
+          text: message,
+        },
+        conversation,
+        {mentions, quote},
+      ),
+      originalMessageId,
+      messageId,
+    );
+    return this.sendAndInjectMessage(editedMessage, conversation, {syncTimestamp: false});
+  }
+
   private decorateTextMessage<T extends TextContent | EditedTextContent>(
     baseMessage: T,
     conversation: Conversation,
@@ -399,7 +425,7 @@ export class MessageRepository {
     }
 
     if (state !== MessageSendingState.CANCELED) {
-      await this.handleLinkPreview(textPayload);
+      await this.handleLinkPreview(textPayload, conversation.qualifiedId);
     }
   }
 
@@ -431,6 +457,11 @@ export class MessageRepository {
 
     const originalMessageId = originalMessage.id;
     const messagePayload = {
+      attachments: originalMessage
+        .getMultipartAssets()
+        .map(multipart => multipart.attachments?.() || [])
+        .flat()
+        .filter(Boolean),
       conversation,
       mentions,
       message: textMessage,
@@ -442,16 +473,18 @@ export class MessageRepository {
     // It prevents from sending a link preview for a message that has been replaced by another one
     cancelSendingLinkPreview(originalMessageId);
     try {
-      const {state} = await this.sendEdit(messagePayload);
+      const {state} = originalMessage.hasMultipartAsset()
+        ? await this.sendEditMultiPart(messagePayload)
+        : await this.sendEdit(messagePayload);
       if (state !== MessageSendingState.CANCELED) {
-        await this.handleLinkPreview(messagePayload);
+        await this.handleLinkPreview(messagePayload, conversation.qualifiedId);
       }
     } finally {
       clearLinkPreviewSendingState(originalMessageId);
     }
   }
 
-  private async handleLinkPreview(textPayload: TextMessagePayload & {messageId: string}) {
+  private async handleLinkPreview(textPayload: TextMessagePayload & {messageId: string}, conversationId: QualifiedId) {
     // check if the user actually wants to send link previews
     if (
       !this.propertyRepository.getPreference(PROPERTIES_TYPE.PREVIEWS.SEND) ||
@@ -468,12 +501,18 @@ export class MessageRepository {
 
     const linkPreview = await getLinkPreviewFromString(textPayload.message);
     if (linkPreview) {
+      const isAuditLogEnabled = this.teamState.isAuditLogEnabled();
+
       // If we detect a link preview, then we go on and send a new message (that will override the initial message) containing the link preview
       await this.sendText(
         {
           ...textPayload,
           linkPreview: linkPreview.image
-            ? await this.core.service!.linkPreview.uploadLinkPreviewImage(linkPreview as LinkPreviewContent)
+            ? await this.core.service!.linkPreview.uploadLinkPreviewImage(
+                linkPreview as LinkPreviewContent,
+                conversationId,
+                isAuditLogEnabled,
+              )
             : linkPreview,
         },
         {syncTimestamp: false},
@@ -728,7 +767,7 @@ export class MessageRepository {
     asImage: boolean,
     meta: FileMetaDataContent,
   ) {
-    const isAuditLogEnabled = this.teamState.isAuditLogEnabled() && TeamState.isAuditLogEnabledForBackend();
+    const isAuditLogEnabled = this.teamState.isAuditLogEnabled();
 
     const auditData: AssetAuditData | undefined = isAuditLogEnabled
       ? {
