@@ -1962,7 +1962,7 @@
   "tooltipConversationInputOneUserTyping": "{user1} ලියමින්",
   "tooltipConversationInputPlaceholder": "පණිවිඩයක් ලියන්න",
   "tooltipConversationInputTwoUserTyping": "{user1} හා {user2} ලියමින්",
-  "tooltipConversationPeople": "පුද්ගලයින් ({shortcut})",
+  "tooltipConversationPeople": "{displayName}, conversation details",
   "tooltipConversationPicture": "සේයාරුවක් එකතු කරන්න",
   "tooltipConversationPing": "හඬවන්න",
   "tooltipConversationSearch": "සොයන්න",
