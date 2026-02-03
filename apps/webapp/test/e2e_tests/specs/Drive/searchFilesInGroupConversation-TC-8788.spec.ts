@@ -82,14 +82,13 @@ test(
       // Initially both files should be visible
       await expect(userBPages.cellsConversationFiles().filesList).toHaveCount(2);
 
-      // Files might take some time to get indexed by the search engine
-      await new Promise(resolve => setTimeout(resolve, 1000));
-
-      // Search for the video file
-      await userBPages.cellsConversationFiles().searchFile(VideoFileName);
-      await expect(userBPages.cellsConversationFiles().filesList).toHaveCount(1);
-      await expect(userBPages.cellsConversationFiles().getFile(VideoFileName)).toBeVisible();
-
+      // Files might take some time to get indexed by the search engine, that's why this block might be retried
+      await expect(async () => {
+        // Search for the video file
+        await userBPages.cellsConversationFiles().searchFile(VideoFileName);
+        await expect(userBPages.cellsConversationFiles().filesList).toHaveCount(1, {timeout: 500});
+        await expect(userBPages.cellsConversationFiles().getFile(VideoFileName)).toBeVisible({timeout: 500});
+      }).toPass({intervals: [1_000, 2_000, 5_000], timeout: 10_000});
       // Search for a non-existing file
       await userBPages.cellsConversationFiles().searchFile('non-existing-file.txt');
       await expect(userBPages.cellsConversationFiles().filesList).toHaveCount(0);
