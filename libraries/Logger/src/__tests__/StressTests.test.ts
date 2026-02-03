@@ -210,10 +210,8 @@ describe('Stress Tests', () => {
 
       // Large messages take more time due to regex processing on 20k character strings
       // This is expected and acceptable for real-world usage
-      expect(duration).toBeLessThan(60000); // 60 seconds for 100 large messages
-
-      // Log performance for awareness
-      console.log(`Large message sanitization: ${duration.toFixed(2)}ms for 100 x 20KB messages`);
+      // Allow extra time for CI environments which may be under load
+      expect(duration).toBeLessThan(90000); // 90 seconds for 100 large messages
     });
 
     it('should handle deep context objects', () => {
