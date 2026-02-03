@@ -72,8 +72,8 @@ test(
       await userAComponents.inputBarControls().clickSendMessage();
       await userBPages.conversationList().openConversation(conversationName);
 
-      expect(await userBPages.cellsConversation().isImageFromUserVisible(userA)).toBeTruthy();
-      expect(await userBPages.cellsConversation().isVideoFromUserVisible(userA)).toBeTruthy();
+      await expect(userBPages.cellsConversation().getImageLocator(userA)).toBeVisible();
+      await expect(userBPages.cellsConversation().getVideoLocator(userA)).toBeVisible();
     });
 
     await test.step('User B opens Files tab and searches for a file', async () => {
