@@ -1957,7 +1957,7 @@
   "tooltipConversationInputOneUserTyping": "{user1} schreibt",
   "tooltipConversationInputPlaceholder": "Eine Nachricht schreiben",
   "tooltipConversationInputTwoUserTyping": "{user1} und {user2} schreiben",
-  "tooltipConversationPeople": "Unterhaltungsübersicht ({shortcut})",
+  "tooltipConversationPeople": "{displayName}, conversation details",
   "tooltipConversationPicture": "Bild senden",
   "tooltipConversationPing": "Ping",
   "tooltipConversationSearch": "Suche",
