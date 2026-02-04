@@ -5089,6 +5089,45 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@nx/js@npm:22.4.5":
+  version: 22.4.5
+  resolution: "@nx/js@npm:22.4.5"
+  dependencies:
+    "@babel/core": "npm:^7.23.2"
+    "@babel/plugin-proposal-decorators": "npm:^7.22.7"
+    "@babel/plugin-transform-class-properties": "npm:^7.22.5"
+    "@babel/plugin-transform-runtime": "npm:^7.23.2"
+    "@babel/preset-env": "npm:^7.23.2"
+    "@babel/preset-typescript": "npm:^7.22.5"
+    "@babel/runtime": "npm:^7.22.6"
+    "@nx/devkit": "npm:22.4.5"
+    "@nx/workspace": "npm:22.4.5"
+    "@zkochan/js-yaml": "npm:0.0.7"
+    babel-plugin-const-enum: "npm:^1.0.1"
+    babel-plugin-macros: "npm:^3.1.0"
+    babel-plugin-transform-typescript-metadata: "npm:^0.3.1"
+    chalk: "npm:^4.1.0"
+    columnify: "npm:^1.6.0"
+    detect-port: "npm:^1.5.1"
+    ignore: "npm:^5.0.4"
+    js-tokens: "npm:^4.0.0"
+    jsonc-parser: "npm:3.2.0"
+    npm-run-path: "npm:^4.0.1"
+    picocolors: "npm:^1.1.0"
+    picomatch: "npm:4.0.2"
+    semver: "npm:^7.6.3"
+    source-map-support: "npm:0.5.19"
+    tinyglobby: "npm:^0.2.12"
+    tslib: "npm:^2.3.0"
+  peerDependencies:
+    verdaccio: ^6.0.5
+  peerDependenciesMeta:
+    verdaccio:
+      optional: true
+  checksum: 10/fb838233ae53974680a441cc418de9e6e787c85294393cca8b63644f30d53989908ef20da10f3b3d00cb9ec61a684891a8247bdaa86e276d93d0195f8cc45ecc
+  languageName: node
+  linkType: hard
+
 "@nx/node@npm:22.4.1":
   version: 22.4.1
   resolution: "@nx/node@npm:22.4.1"
@@ -5263,13 +5302,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@nx/webpack@npm:22.4.1":
-  version: 22.4.1
-  resolution: "@nx/webpack@npm:22.4.1"
+"@nx/webpack@npm:22.4.5":
+  version: 22.4.5
+  resolution: "@nx/webpack@npm:22.4.5"
   dependencies:
     "@babel/core": "npm:^7.23.2"
-    "@nx/devkit": "npm:22.4.1"
-    "@nx/js": "npm:22.4.1"
+    "@nx/devkit": "npm:22.4.5"
+    "@nx/js": "npm:22.4.5"
     "@phenomnomnominal/tsquery": "npm:~6.1.4"
     ajv: "npm:^8.12.0"
     autoprefixer: "npm:^10.4.9"
@@ -5303,7 +5342,7 @@ __metadata:
     webpack-dev-server: "npm:^5.2.1"
     webpack-node-externals: "npm:^3.0.0"
     webpack-subresource-integrity: "npm:^5.1.0"
-  checksum: 10/c6cf2970511b3b7dc4082e6e0a198186c714a92ebdd94e29faa9e1c5c9ed94ed7c54de418c704aba80a61abccd8ce3aa39e3c7650cad4b207524d4b19be0bcd8
+  checksum: 10/db27d1123dca03f429d6f25341fae6a4b8fff38f84e66bc5df4fec7b56bb34e5f132c660d68130c5bbf23b7eedebdaabfd0a63632812ce1a74916f8eb2f1b9c8
   languageName: node
   linkType: hard
 
@@ -11211,7 +11250,7 @@ __metadata:
     "@lexical/react": "npm:0.27.2"
     "@lexical/rich-text": "npm:0.27.2"
     "@mediapipe/tasks-vision": "npm:0.10.32"
-    "@nx/webpack": "npm:22.4.1"
+    "@nx/webpack": "npm:22.4.5"
     "@playwright/test": "npm:1.58.0"
     "@roamhq/wrtc": "npm:0.9.1"
     "@tanstack/react-table": "npm:8.21.3"
