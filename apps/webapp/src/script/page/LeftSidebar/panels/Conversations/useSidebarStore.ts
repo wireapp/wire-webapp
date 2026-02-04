@@ -38,17 +38,6 @@ export enum SidebarTabs {
   CELLS,
 }
 
-/**
- * Tabs that are always visible and cannot be hidden by the user.
- * RECENT tab serves as the default view and fallback when users (accidentally)
- * hide their currently active tab.
- */
-export const ALWAYS_VISIBLE_TABS: readonly SidebarTabs[] = [SidebarTabs.RECENT];
-
-export const isTabVisible = (tab: SidebarTabs, visibleTabs: SidebarTabs[]): boolean => {
-  return ALWAYS_VISIBLE_TABS.includes(tab) || visibleTabs.includes(tab);
-};
-
 export const SidebarStatus = {
   OPEN: 'OPEN',
   CLOSED: 'CLOSED',
