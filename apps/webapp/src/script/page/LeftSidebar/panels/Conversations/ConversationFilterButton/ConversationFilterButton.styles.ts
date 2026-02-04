@@ -35,10 +35,6 @@ export const filterButton = (isActive: boolean): CSSObject => ({
   '&:focus': {
     outline: 'none',
   },
-  '&:focus-visible': {
-    outline: '2px solid var(--accent-color-focus)',
-    outlineOffset: '2px',
-  },
   '& svg': {
     fill: 'currentColor',
   },
