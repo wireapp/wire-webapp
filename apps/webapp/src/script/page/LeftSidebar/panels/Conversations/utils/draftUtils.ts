@@ -51,16 +51,8 @@ export const conversationHasDraft = (conversation: Conversation): boolean => {
     const amplifyData: AmplifyWrapper | DraftData = JSON.parse(draftData);
     // Amplify wraps the data in an object with 'data' and 'expires' properties
     const draft = (amplifyData as AmplifyWrapper).data || (amplifyData as DraftData);
-
-    if (!draft) {
-      return false;
-    }
-
-    // Check if plainMessage has actual content (not just whitespace)
-    const plainMessage = draft.plainMessage || '';
-    const hasTextContent = plainMessage.trim().length > 0;
-
-    return hasTextContent;
+    // Check if draft has content (editorState or plainMessage)
+    return Boolean(draft && (draft.editorState || draft.plainMessage));
   } catch (error) {
     // Only log error type, not the actual error to avoid exposing draft content
     logger.warn(

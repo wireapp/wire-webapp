@@ -159,11 +159,6 @@ export const Conversations = ({
     SidebarTabs.GROUPS,
     SidebarTabs.CHANNELS,
     SidebarTabs.DIRECTS,
-    SidebarTabs.UNREAD,
-    SidebarTabs.MENTIONS,
-    SidebarTabs.REPLIES,
-    SidebarTabs.DRAFTS,
-    SidebarTabs.PINGS,
     SidebarTabs.ARCHIVES,
   ].includes(currentTab);
 
@@ -395,13 +390,11 @@ export const Conversations = ({
               isTeam={isTeam}
               changeTab={changeTab}
               currentTab={currentTab}
-              conversations={conversations}
               groupConversations={groupConversations}
               directConversations={directConversations}
               unreadConversations={unreadConversations}
               favoriteConversations={favoriteConversations}
               archivedConversations={archivedConversations}
-              draftConversations={draftConversations}
               conversationRepository={conversationRepository}
               onClickPreferences={onClickPreferences}
               showNotificationsBadge={notifications.length > 0}

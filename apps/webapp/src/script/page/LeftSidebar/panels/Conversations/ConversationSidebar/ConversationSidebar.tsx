@@ -45,14 +45,12 @@ type ConversationSidebarProps = {
   isTeam: boolean;
   changeTab: (nextTab: SidebarTabs, folderId?: string) => void;
   currentTab: SidebarTabs;
-  conversations: Conversation[];
   groupConversations: Conversation[];
   channelConversations: Conversation[];
   directConversations: Conversation[];
   unreadConversations: Conversation[];
   favoriteConversations: Conversation[];
   archivedConversations: Conversation[];
-  draftConversations: Conversation[];
   conversationRepository: ConversationRepository;
   onClickPreferences: (contentState: ContentState) => void;
   showNotificationsBadge: boolean;
@@ -67,13 +65,11 @@ export const ConversationSidebar = ({
   isTeam,
   changeTab,
   currentTab,
-  conversations,
   groupConversations,
   directConversations,
   unreadConversations,
   favoriteConversations,
   archivedConversations,
-  draftConversations,
   conversationRepository,
   onClickPreferences,
   showNotificationsBadge,
@@ -92,13 +88,11 @@ export const ConversationSidebar = ({
         <ConversationTabs
           onChangeTab={changeTab}
           currentTab={currentTab}
-          conversations={conversations}
           groupConversations={groupConversations}
           directConversations={directConversations}
           unreadConversations={unreadConversations}
           favoriteConversations={favoriteConversations}
           archivedConversations={archivedConversations}
-          draftConversations={draftConversations}
           conversationRepository={conversationRepository}
           onClickPreferences={onClickPreferences}
           showNotificationsBadge={showNotificationsBadge}
