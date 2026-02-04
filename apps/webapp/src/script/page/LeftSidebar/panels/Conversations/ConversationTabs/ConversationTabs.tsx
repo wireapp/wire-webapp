@@ -39,7 +39,7 @@ import {TeamState} from 'Repositories/team/TeamState';
 import {FEATURES, hasAccessToFeature} from 'Repositories/user/UserPermission';
 import {getManageTeamUrl} from 'src/script/externalRoute';
 import {ConversationFolderTab} from 'src/script/page/LeftSidebar/panels/Conversations/ConversationTab/ConversationFolderTab';
-import {SidebarTabs, useSidebarStore} from 'src/script/page/LeftSidebar/panels/Conversations/useSidebarStore';
+import {SidebarTabs} from 'src/script/page/LeftSidebar/panels/Conversations/useSidebarStore';
 import {Core} from 'src/script/service/CoreSingleton';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {isDataDogEnabled} from 'Util/DataDog';
@@ -59,8 +59,8 @@ import {TeamCreationBanner} from './TeamCreation/TeamCreationBanner';
 
 import {Config} from '../../../../../Config';
 import {ContentState} from '../../../../useAppState';
+import {ConversationFilterButton} from '../ConversationFilterButton';
 import {ConversationTab} from '../ConversationTab';
-import {TabsFilterButton} from '../TabsFilterButton';
 
 interface ConversationTabsProps {
   conversations: Conversation[];
@@ -95,7 +95,6 @@ export const ConversationTabs = ({
   selfUser,
   channelConversations,
 }: ConversationTabsProps) => {
-  const {visibleTabs} = useSidebarStore();
   const {isChannelsEnabled, isChannelsFeatureEnabled} = useChannelsFeatureFlag();
   const core = container.resolve(Core);
   const teamState = container.resolve(TeamState);
@@ -225,12 +224,6 @@ export const ConversationTabs = ({
       unreadConversations: channelConversationsLength,
     });
   }
-
-  // filter tabs based on visibility prefs (RECENT should always bevisible)
-  const visibleConversationTabs = conversationTabs.filter(
-    tab => tab.type === SidebarTabs.RECENT || visibleTabs.includes(tab.type),
-  );
-
   const manageTeamUrl = getManageTeamUrl();
   const replaceWireLink = replaceLink('https://app.wire.com', '', '');
 
@@ -246,10 +239,10 @@ export const ConversationTabs = ({
       >
         <div className="conversations-sidebar-title" css={conversationsTitleWrapper}>
           <span>{t('videoCallOverlayConversations')}</span>
-          <TabsFilterButton />
+          <ConversationFilterButton />
         </div>
 
-        {visibleConversationTabs.map((conversationTab, index) => {
+        {conversationTabs.map((conversationTab, index) => {
           if (conversationTab.type === SidebarTabs.FOLDER) {
             return (
               <ConversationFolderTab

@@ -21,7 +21,7 @@ import {Conversation} from 'Repositories/entity/Conversation';
 import {t} from 'Util/LocalizerUtil';
 import {replaceAccents} from 'Util/StringUtil';
 
-import {SidebarTabs} from './useSidebarStore';
+import {ConversationFilter, SidebarTabs} from './useSidebarStore';
 
 interface GetTabConversationsProps {
   currentTab: SidebarTabs;
@@ -35,12 +35,40 @@ interface GetTabConversationsProps {
   channelAndGroupConversations: Conversation[];
   conversationsFilter: string;
   isChannelsEnabled: boolean;
+  conversationFilter: ConversationFilter;
   draftConversations: Conversation[];
 }
 
 type GetTabConversations = {
   conversations: Conversation[];
   searchInputPlaceholder: string;
+};
+
+const applyAdvancedFilter = (
+  conversations: Conversation[],
+  filter: ConversationFilter,
+  draftConversations: Conversation[],
+): Conversation[] => {
+  if (filter === ConversationFilter.NONE) {
+    return conversations;
+  }
+
+  return conversations.filter(conversation => {
+    switch (filter) {
+      case ConversationFilter.UNREAD:
+        return conversation.hasUnread();
+      case ConversationFilter.MENTIONS:
+        return conversation.unreadState().selfMentions.length > 0;
+      case ConversationFilter.REPLIES:
+        return conversation.unreadState().selfReplies.length > 0;
+      case ConversationFilter.DRAFTS:
+        return draftConversations.some(draftConv => draftConv.id === conversation.id);
+      case ConversationFilter.PINGS:
+        return conversation.unreadState().pings.length > 0;
+      default:
+        return true;
+    }
+  });
 };
 
 export function getTabConversations({
@@ -54,6 +82,7 @@ export function getTabConversations({
   channelConversations,
   isChannelsEnabled,
   channelAndGroupConversations,
+  conversationFilter,
   draftConversations,
 }: GetTabConversationsProps): GetTabConversations {
   const conversationSearchFilter = (conversation: Conversation) => {
@@ -68,7 +97,7 @@ export function getTabConversations({
   if ([SidebarTabs.FOLDER, SidebarTabs.RECENT].includes(currentTab)) {
     if (!conversationsFilter) {
       return {
-        conversations: conversations,
+        conversations: applyAdvancedFilter(conversations, conversationFilter, draftConversations),
         searchInputPlaceholder: t('searchConversations'),
       };
     }
@@ -85,7 +114,7 @@ export function getTabConversations({
     const combinedConversations = [...filteredConversations, ...filteredGroupConversations];
 
     return {
-      conversations: combinedConversations,
+      conversations: applyAdvancedFilter(combinedConversations, conversationFilter, draftConversations),
       searchInputPlaceholder: t('searchConversations'),
     };
   }
@@ -95,7 +124,7 @@ export function getTabConversations({
     const filteredConversations = conversations.filter(conversationArchivedFilter).filter(conversationSearchFilter);
 
     return {
-      conversations: filteredConversations,
+      conversations: applyAdvancedFilter(filteredConversations, conversationFilter, draftConversations),
       searchInputPlaceholder: t('searchGroupConversations'),
     };
   }
@@ -106,7 +135,7 @@ export function getTabConversations({
       .filter(conversationSearchFilter);
 
     return {
-      conversations: filteredConversations,
+      conversations: applyAdvancedFilter(filteredConversations, conversationFilter, draftConversations),
       searchInputPlaceholder: t('searchChannelConversations'),
     };
   }
@@ -117,7 +146,7 @@ export function getTabConversations({
       .filter(conversationSearchFilter);
 
     return {
-      conversations: filteredConversations,
+      conversations: applyAdvancedFilter(filteredConversations, conversationFilter, draftConversations),
       searchInputPlaceholder: t('searchDirectConversations'),
     };
   }
@@ -126,7 +155,7 @@ export function getTabConversations({
     const filteredConversations = favoriteConversations.filter(conversationSearchFilter);
 
     return {
-      conversations: filteredConversations,
+      conversations: applyAdvancedFilter(filteredConversations, conversationFilter, draftConversations),
       searchInputPlaceholder: t('searchFavoriteConversations'),
     };
   }
@@ -135,7 +164,7 @@ export function getTabConversations({
     const filteredConversations = archivedConversations.filter(conversationSearchFilter);
 
     return {
-      conversations: filteredConversations,
+      conversations: applyAdvancedFilter(filteredConversations, conversationFilter, draftConversations),
       searchInputPlaceholder: t('searchArchivedConversations'),
     };
   }

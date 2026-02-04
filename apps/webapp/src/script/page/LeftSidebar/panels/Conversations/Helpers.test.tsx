@@ -21,7 +21,7 @@ import {Conversation} from 'Repositories/entity/Conversation';
 import {getTabConversations} from 'src/script/page/LeftSidebar/panels/Conversations/helpers';
 import {generateConversation} from 'test/helper/ConversationGenerator';
 
-import {SidebarTabs} from './useSidebarStore';
+import {SidebarTabs, ConversationFilter} from './useSidebarStore';
 
 describe('getTabConversations', () => {
   let conversations: Conversation[];
@@ -56,6 +56,7 @@ describe('getTabConversations', () => {
       channelAndGroupConversations: groupConversations,
       channelConversations: [],
       isChannelsEnabled: false,
+      conversationFilter: ConversationFilter.NONE,
       draftConversations: [],
     });
   };
@@ -122,6 +123,7 @@ describe('getTabConversations', () => {
       channelAndGroupConversations: newGroupConversations,
       channelConversations: [],
       isChannelsEnabled: false,
+      conversationFilter: ConversationFilter.NONE,
       draftConversations: [],
     });
 
@@ -136,6 +138,7 @@ describe('getTabConversations', () => {
       channelAndGroupConversations: groupConversations,
       channelConversations: [],
       isChannelsEnabled: false,
+      conversationFilter: ConversationFilter.NONE,
       draftConversations: [],
     });
 

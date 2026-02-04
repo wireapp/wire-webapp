@@ -717,7 +717,13 @@ declare module 'I18n/en-US.json' {
     'conversationFileUploadOverlayDescription': `Drag & drop to add files`;
     'conversationFileUploadOverlayTitle': `Upload files`;
     'conversationFileVideoPreviewLabel': `Video file preview for: {src}`;
-    'tabsFilterTooltip': `Customize visible tabs`;
+    'conversationFilterDrafts': `Drafts`;
+    'conversationFilterMentions': `Mentions`;
+    'conversationFilterNone': `No filter`;
+    'conversationFilterPings': `Pings`;
+    'conversationFilterReplies': `Replies`;
+    'conversationFilterTooltip': `Filter conversations`;
+    'conversationFilterUnread': `Unread`;
     'conversationFoldersEmptyText': `Add your conversations to folders to stay organized.`;
     'conversationFoldersEmptyTextLearnMore': `Learn more`;
     'conversationFooterArchive': `Archive`;

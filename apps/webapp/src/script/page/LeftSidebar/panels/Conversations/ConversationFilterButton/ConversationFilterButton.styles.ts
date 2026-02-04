@@ -45,26 +45,36 @@ export const dropdown: CSSObject = {
   top: '100%',
   right: 0,
   marginTop: '4px',
-  width: 'max-content',
-  padding: '8px 0',
-  backgroundColor: 'var(--dropdown-menu-bg)',
-  borderRadius: '12px',
-  boxShadow: '0 0 1px 0 rgba(0, 0, 0, 0.08), 0 8px 24px 0 rgba(0, 0, 0, 0.16)',
+  minWidth: '200px',
+  backgroundColor: 'var(--app-bg)',
+  border: '1px solid var(--border-color)',
+  borderRadius: '8px',
+  boxShadow: '0 4px 16px rgba(0, 0, 0, 0.1)',
   zIndex: 10,
   overflow: 'hidden',
 };
 
-export const dropdownCheckboxItem: CSSObject = {
-  display: 'flex',
-  alignItems: 'center',
-  height: '30px',
-  padding: '0 24px',
+export const dropdownItem: CSSObject = {
+  display: 'block',
+  width: '100%',
+  padding: '12px 16px',
+  textAlign: 'left',
+  border: 'none',
+  backgroundColor: 'transparent',
+  color: 'var(--foreground)',
+  fontSize: '14px',
   cursor: 'pointer',
   transition: 'background-color 0.15s ease',
-  whiteSpace: 'nowrap',
   '&:hover': {
-    backgroundColor: 'var(--foreground-fade-16)',
+    backgroundColor: 'var(--background-fade-8)',
   },
+};
+
+export const activeDropdownItem: CSSObject = {
+  ...dropdownItem,
+  backgroundColor: 'var(--background-fade-16)',
+  color: 'var(--accent-color)',
+  fontWeight: 600,
 };
 
 export const filterButtonWrapper: CSSObject = {
