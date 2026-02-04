@@ -42,7 +42,7 @@ export class CellsConversationPage extends ConversationPage {
     return this.page.getByLabel(new RegExp(`^Image from ${user.fullName}`)).getByRole('img');
   }
 
-  protected getVideoLocator(user: User): Locator {
+  public getVideoLocator(user: User): Locator {
     return this.page.getByLabel(new RegExp(`^Image from ${user.fullName}`)).locator('video');
   }
 
