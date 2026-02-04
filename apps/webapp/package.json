@@ -30,7 +30,7 @@
     "@lexical/list": "0.27.2",
     "@lexical/markdown": "0.27.2",
     "@lexical/react": "0.27.2",
-    "@lexical/rich-text": "0.27.2",
+    "@lexical/rich-text": "0.40.0",
     "@mediapipe/tasks-vision": "0.10.32",
     "@tanstack/react-table": "8.21.3",
     "@tanstack/react-virtual": "3.13.18",
