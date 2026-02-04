@@ -69,13 +69,13 @@ export const dropdownCheckboxItem: CSSObject = {
 
 export const dropdownHeader: CSSObject = {
   padding: '4px 16px 2px',
-  fontSize: '11px',
+  fontSize: 'var(--font-size-small)',
   fontWeight: 400,
   color: 'var(--foreground-fade-56)',
 };
 
 export const checkboxLabel: CSSObject = {
-  fontSize: 'var(--font-size-small)',
+  fontSize: 'var(--font-size-base)',
 };
 
 export const dropdownDivider: CSSObject = {
