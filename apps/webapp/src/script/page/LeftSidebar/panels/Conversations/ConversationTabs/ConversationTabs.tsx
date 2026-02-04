@@ -167,7 +167,7 @@ export const ConversationTabs = ({
       type: SidebarTabs.UNREAD,
       title: t('conversationLabelUnread'),
       dataUieName: 'go-unread-view',
-      Icon: <Icon.MessageUnreadIcon />,
+      Icon: <Icon.NotificationIcon />,
       unreadConversations: unreadCount,
     },
     {
