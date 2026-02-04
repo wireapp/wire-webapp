@@ -1962,7 +1962,7 @@
   "tooltipConversationInputOneUserTyping": "{user1} is typing",
   "tooltipConversationInputPlaceholder": "Mengetik pesan",
   "tooltipConversationInputTwoUserTyping": "{user1} and {user2} are typing",
-  "tooltipConversationPeople": "Orang ( {shortcut} )",
+  "tooltipConversationPeople": "{displayName}, conversation details",
   "tooltipConversationPicture": "Tambah gambar",
   "tooltipConversationPing": "Ping",
   "tooltipConversationSearch": "Pencarian",

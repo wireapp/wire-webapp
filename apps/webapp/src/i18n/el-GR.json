@@ -1962,7 +1962,7 @@
   "tooltipConversationInputOneUserTyping": "{user1} is typing",
   "tooltipConversationInputPlaceholder": "Πληκτρολογηση μηνυματος",
   "tooltipConversationInputTwoUserTyping": "{user1} and {user2} are typing",
-  "tooltipConversationPeople": "Άτομα ({shortcut})",
+  "tooltipConversationPeople": "{displayName}, conversation details",
   "tooltipConversationPicture": "Προσθήκη εικόνας",
   "tooltipConversationPing": "Ping",
   "tooltipConversationSearch": "Αναζήτηση",

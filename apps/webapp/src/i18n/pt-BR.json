@@ -1962,7 +1962,7 @@
   "tooltipConversationInputOneUserTyping": "{user1} está digitando",
   "tooltipConversationInputPlaceholder": "Digite uma mensagem",
   "tooltipConversationInputTwoUserTyping": "{user1} e {user2} estão digitando",
-  "tooltipConversationPeople": "Pessoas ({shortcut})",
+  "tooltipConversationPeople": "{displayName}, conversation details",
   "tooltipConversationPicture": "Adicionar foto",
   "tooltipConversationPing": "Ping",
   "tooltipConversationSearch": "Pesquisar",

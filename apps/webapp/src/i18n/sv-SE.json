@@ -1962,7 +1962,7 @@
   "tooltipConversationInputOneUserTyping": "{user1} skriver",
   "tooltipConversationInputPlaceholder": "Skriv ett meddelande",
   "tooltipConversationInputTwoUserTyping": "{user1} och {user2} skriver",
-  "tooltipConversationPeople": "Personer ({shortcut})",
+  "tooltipConversationPeople": "{displayName}, conversation details",
   "tooltipConversationPicture": "Lägg till bild",
   "tooltipConversationPing": "Ping",
   "tooltipConversationSearch": "Sök",
