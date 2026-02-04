@@ -5027,6 +5027,25 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@nx/eslint@npm:22.4.5":
+  version: 22.4.5
+  resolution: "@nx/eslint@npm:22.4.5"
+  dependencies:
+    "@nx/devkit": "npm:22.4.5"
+    "@nx/js": "npm:22.4.5"
+    semver: "npm:^7.6.3"
+    tslib: "npm:^2.3.0"
+    typescript: "npm:~5.9.2"
+  peerDependencies:
+    "@zkochan/js-yaml": 0.0.7
+    eslint: ^8.0.0 || ^9.0.0
+  peerDependenciesMeta:
+    "@zkochan/js-yaml":
+      optional: true
+  checksum: 10/e8f4fb221a89ea2c477d3d418f08c4d14ae97bcb413f49328e710876e5eb308d3f4d895fc75fb34823f7dc8067945e5e9128ee3910eadcfc4282732468756bd5
+  languageName: node
+  linkType: hard
+
 "@nx/jest@npm:22.4.1":
   version: 22.4.1
   resolution: "@nx/jest@npm:22.4.1"
@@ -5086,6 +5105,45 @@ __metadata:
     verdaccio:
       optional: true
   checksum: 10/61e8d3462d3611522550a3c5e58c9899200daf0a58287790b2af5f7254a15dd0d4077d662ee9455ef13d7146f5561cd26a145027b08f47750920620d5f142935
+  languageName: node
+  linkType: hard
+
+"@nx/js@npm:22.4.5":
+  version: 22.4.5
+  resolution: "@nx/js@npm:22.4.5"
+  dependencies:
+    "@babel/core": "npm:^7.23.2"
+    "@babel/plugin-proposal-decorators": "npm:^7.22.7"
+    "@babel/plugin-transform-class-properties": "npm:^7.22.5"
+    "@babel/plugin-transform-runtime": "npm:^7.23.2"
+    "@babel/preset-env": "npm:^7.23.2"
+    "@babel/preset-typescript": "npm:^7.22.5"
+    "@babel/runtime": "npm:^7.22.6"
+    "@nx/devkit": "npm:22.4.5"
+    "@nx/workspace": "npm:22.4.5"
+    "@zkochan/js-yaml": "npm:0.0.7"
+    babel-plugin-const-enum: "npm:^1.0.1"
+    babel-plugin-macros: "npm:^3.1.0"
+    babel-plugin-transform-typescript-metadata: "npm:^0.3.1"
+    chalk: "npm:^4.1.0"
+    columnify: "npm:^1.6.0"
+    detect-port: "npm:^1.5.1"
+    ignore: "npm:^5.0.4"
+    js-tokens: "npm:^4.0.0"
+    jsonc-parser: "npm:3.2.0"
+    npm-run-path: "npm:^4.0.1"
+    picocolors: "npm:^1.1.0"
+    picomatch: "npm:4.0.2"
+    semver: "npm:^7.6.3"
+    source-map-support: "npm:0.5.19"
+    tinyglobby: "npm:^0.2.12"
+    tslib: "npm:^2.3.0"
+  peerDependencies:
+    verdaccio: ^6.0.5
+  peerDependenciesMeta:
+    verdaccio:
+      optional: true
+  checksum: 10/fb838233ae53974680a441cc418de9e6e787c85294393cca8b63644f30d53989908ef20da10f3b3d00cb9ec61a684891a8247bdaa86e276d93d0195f8cc45ecc
   languageName: node
   linkType: hard
 
@@ -5245,13 +5303,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@nx/playwright@npm:22.4.1":
-  version: 22.4.1
-  resolution: "@nx/playwright@npm:22.4.1"
+"@nx/playwright@npm:22.4.5":
+  version: 22.4.5
+  resolution: "@nx/playwright@npm:22.4.5"
   dependencies:
-    "@nx/devkit": "npm:22.4.1"
-    "@nx/eslint": "npm:22.4.1"
-    "@nx/js": "npm:22.4.1"
+    "@nx/devkit": "npm:22.4.5"
+    "@nx/eslint": "npm:22.4.5"
+    "@nx/js": "npm:22.4.5"
     minimatch: "npm:10.1.1"
     tslib: "npm:^2.3.0"
   peerDependencies:
@@ -5259,7 +5317,7 @@ __metadata:
   peerDependenciesMeta:
     "@playwright/test":
       optional: true
-  checksum: 10/4274aea1717953b26c0a16239fe7254421bcabf376ff105ae222904b62303457f5176dac8c7e33d55913d8a62f79a04d01ee232edece3d792bc227ad4098c7c3
+  checksum: 10/0924ca0a1361f07ed32aafd8232e23d079aa0e463739d417495122f2129c60d58edaac15d46853c4f3da1a41fe7079a314c0db7978e6734e6deab84fbd19046d
   languageName: node
   linkType: hard
 
@@ -29200,7 +29258,7 @@ __metadata:
     "@faker-js/faker": "npm:9.9.0"
     "@nx/jest": "npm:22.4.1"
     "@nx/node": "npm:22.4.1"
-    "@nx/playwright": "npm:22.4.1"
+    "@nx/playwright": "npm:22.4.5"
     "@nx/workspace": "npm:22.4.5"
     "@tony.ganchev/eslint-plugin-header": "npm:3.2.0"
     "@types/eslint": "npm:9.6.1"
