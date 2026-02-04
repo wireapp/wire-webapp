@@ -72,8 +72,12 @@ export const useFilesUploadDropzone = ({
     noKeyboard: true,
     disabled: isDisabled,
     accept,
-    onDrop: checkFileSharingPermission(async (acceptedFiles: File[], rejectedFiles: FileRejection[]) => {
-      await processIncomingFiles(acceptedFiles, rejectedFiles, files, MAX_SIZE, MAX_FILES, conversation.id);
+    onDrop: checkFileSharingPermission((acceptedFiles: File[], rejectedFiles: FileRejection[]) => {
+      void processIncomingFiles(acceptedFiles, rejectedFiles, files, MAX_SIZE, MAX_FILES, conversation.id).catch(
+        error => {
+          logger.error('Processing incoming files failed', error);
+        },
+      );
     }),
     onError: (error: Error) => {
       logger.error('Dropping files failed', error);
@@ -122,7 +126,11 @@ export const useFilesUploadDropzone = ({
 
     addFiles({conversationId, files: transformedAcceptedFiles});
 
-    await attatchMetadataToFiles(transformedAcceptedFiles);
+    try {
+      await attatchMetadataToFiles(transformedAcceptedFiles);
+    } catch (error) {
+      logger.warn('Attaching file metadata failed', error);
+    }
 
     await uploadFiles(transformedAcceptedFiles);
   };
@@ -182,17 +190,21 @@ export const useFilesUploadDropzone = ({
   const attatchMetadataToFiles = async (files: FileWithPreview[]) => {
     await Promise.all(
       files.map(async file => {
-        const metadata = await buildCellFileMetadata(file);
+        try {
+          const metadata = await buildCellFileMetadata(file);
 
-        if (!metadata) {
-          return;
+          if (!metadata) {
+            return;
+          }
+
+          updateFile({
+            conversationId: conversation.id,
+            fileId: file.id,
+            data: {...metadata},
+          });
+        } catch (error) {
+          logger.warn('Building file metadata failed', error);
         }
-
-        updateFile({
-          conversationId: conversation.id,
-          fileId: file.id,
-          data: {...metadata},
-        });
       }),
     );
   };
