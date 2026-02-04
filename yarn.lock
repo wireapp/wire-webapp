@@ -5050,6 +5050,29 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@nx/jest@npm:22.4.5":
+  version: 22.4.5
+  resolution: "@nx/jest@npm:22.4.5"
+  dependencies:
+    "@jest/reporters": "npm:^30.0.2"
+    "@jest/test-result": "npm:^30.0.2"
+    "@nx/devkit": "npm:22.4.5"
+    "@nx/js": "npm:22.4.5"
+    "@phenomnomnominal/tsquery": "npm:~6.1.4"
+    identity-obj-proxy: "npm:3.0.0"
+    jest-config: "npm:^30.0.2"
+    jest-resolve: "npm:^30.0.2"
+    jest-util: "npm:^30.0.2"
+    minimatch: "npm:10.1.1"
+    picocolors: "npm:^1.1.0"
+    resolve.exports: "npm:2.0.3"
+    semver: "npm:^7.6.3"
+    tslib: "npm:^2.3.0"
+    yargs-parser: "npm:21.1.1"
+  checksum: 10/14fbd679ba5490a5475a73457aa96d5300d17bf06df7283982da9542408777118640ecd84e811ab63733cd52100fef21240a47e7936182ca39d6dbaf18a9409e
+  languageName: node
+  linkType: hard
+
 "@nx/js@npm:22.4.1":
   version: 22.4.1
   resolution: "@nx/js@npm:22.4.1"
@@ -5086,6 +5109,45 @@ __metadata:
     verdaccio:
       optional: true
   checksum: 10/61e8d3462d3611522550a3c5e58c9899200daf0a58287790b2af5f7254a15dd0d4077d662ee9455ef13d7146f5561cd26a145027b08f47750920620d5f142935
+  languageName: node
+  linkType: hard
+
+"@nx/js@npm:22.4.5":
+  version: 22.4.5
+  resolution: "@nx/js@npm:22.4.5"
+  dependencies:
+    "@babel/core": "npm:^7.23.2"
+    "@babel/plugin-proposal-decorators": "npm:^7.22.7"
+    "@babel/plugin-transform-class-properties": "npm:^7.22.5"
+    "@babel/plugin-transform-runtime": "npm:^7.23.2"
+    "@babel/preset-env": "npm:^7.23.2"
+    "@babel/preset-typescript": "npm:^7.22.5"
+    "@babel/runtime": "npm:^7.22.6"
+    "@nx/devkit": "npm:22.4.5"
+    "@nx/workspace": "npm:22.4.5"
+    "@zkochan/js-yaml": "npm:0.0.7"
+    babel-plugin-const-enum: "npm:^1.0.1"
+    babel-plugin-macros: "npm:^3.1.0"
+    babel-plugin-transform-typescript-metadata: "npm:^0.3.1"
+    chalk: "npm:^4.1.0"
+    columnify: "npm:^1.6.0"
+    detect-port: "npm:^1.5.1"
+    ignore: "npm:^5.0.4"
+    js-tokens: "npm:^4.0.0"
+    jsonc-parser: "npm:3.2.0"
+    npm-run-path: "npm:^4.0.1"
+    picocolors: "npm:^1.1.0"
+    picomatch: "npm:4.0.2"
+    semver: "npm:^7.6.3"
+    source-map-support: "npm:0.5.19"
+    tinyglobby: "npm:^0.2.12"
+    tslib: "npm:^2.3.0"
+  peerDependencies:
+    verdaccio: ^6.0.5
+  peerDependenciesMeta:
+    verdaccio:
+      optional: true
+  checksum: 10/fb838233ae53974680a441cc418de9e6e787c85294393cca8b63644f30d53989908ef20da10f3b3d00cb9ec61a684891a8247bdaa86e276d93d0195f8cc45ecc
   languageName: node
   linkType: hard
 
@@ -29198,7 +29260,7 @@ __metadata:
   resolution: "wire-webapp@workspace:."
   dependencies:
     "@faker-js/faker": "npm:9.9.0"
-    "@nx/jest": "npm:22.4.1"
+    "@nx/jest": "npm:22.4.5"
     "@nx/node": "npm:22.4.1"
     "@nx/playwright": "npm:22.4.1"
     "@nx/workspace": "npm:22.4.5"
