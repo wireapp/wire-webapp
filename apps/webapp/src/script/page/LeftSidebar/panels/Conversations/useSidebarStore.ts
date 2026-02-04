@@ -91,10 +91,6 @@ const useSidebarStore = create<SidebarStore>()(
       ],
       setVisibleTabs: (tabs: SidebarTabs[]) => set({visibleTabs: tabs}),
       toggleTabVisibility: (tab: SidebarTabs) => {
-        if (ALWAYS_VISIBLE_TABS.includes(tab)) {
-          return;
-        }
-
         set(state => {
           const isCurrentlyVisible = state.visibleTabs.includes(tab);
           const isActiveTab = state.currentTab === tab;

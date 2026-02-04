@@ -17,6 +17,8 @@
  *
  */
 
+import {useMemo} from 'react';
+
 import {container} from 'tsyringe';
 
 import {
@@ -108,13 +110,15 @@ export const ConversationTabs = ({
   const {teamRole} = useKoSubscribableChildren(selfUser, ['teamRole']);
   const {isCellsEnabled: isCellsEnabledForTeam} = useKoSubscribableChildren(teamState, ['isCellsEnabled']);
 
-  const totalUnreadFavoriteConversations = favoriteConversations.filter(favoriteConversation =>
-    favoriteConversation.hasUnread(),
-  ).length;
+  const totalUnreadFavoriteConversations = useMemo(
+    () => favoriteConversations.filter(favoriteConversation => favoriteConversation.hasUnread()).length,
+    [favoriteConversations],
+  );
 
-  const totalUnreadArchivedConversations = archivedConversations.filter(conversation =>
-    conversation.hasUnread(),
-  ).length;
+  const totalUnreadArchivedConversations = useMemo(
+    () => archivedConversations.filter(conversation => conversation.hasUnread()).length,
+    [archivedConversations],
+  );
 
   const filterUnreadAndArchivedConversations = (conversation: Conversation) =>
     conversationFilters.notArchived(conversation) && conversationFilters.hasUnread(conversation);
@@ -123,20 +127,51 @@ export const ConversationTabs = ({
     Config.getConfig().FEATURE.ENABLE_TEAM_CREATION &&
     core.backendFeatures.version >= Config.getConfig().MIN_TEAM_CREATION_SUPPORTED_API_VERSION;
 
-  const channelConversationsLength = channelConversations.filter(filterUnreadAndArchivedConversations).length;
-  const groupConversationsLength = groupConversations.filter(filterUnreadAndArchivedConversations).length;
-  const unreadCount = unreadConversations.filter(conversationFilters.notArchived).length;
-  const mentionsCount = unreadConversations.filter(
-    conv => conversationFilters.notArchived(conv) && conversationFilters.hasMentions(conv),
-  ).length;
-  const repliesCount = unreadConversations.filter(
-    conv => conversationFilters.notArchived(conv) && conversationFilters.hasReplies(conv),
-  ).length;
-  const draftsCount = draftConversations.filter(conversationFilters.notArchived).length;
-  const pingsCount = unreadConversations.filter(
-    conv => conversationFilters.notArchived(conv) && conversationFilters.hasPings(conv),
-  ).length;
-  const directConversationsLength = directConversations.filter(filterUnreadAndArchivedConversations).length;
+  const channelConversationsLength = useMemo(
+    () => channelConversations.filter(filterUnreadAndArchivedConversations).length,
+    [channelConversations],
+  );
+
+  const groupConversationsLength = useMemo(
+    () => groupConversations.filter(filterUnreadAndArchivedConversations).length,
+    [groupConversations],
+  );
+
+  const unreadCount = useMemo(
+    () => unreadConversations.filter(conversationFilters.notArchived).length,
+    [unreadConversations],
+  );
+
+  const mentionsCount = useMemo(
+    () =>
+      unreadConversations.filter(conv => conversationFilters.notArchived(conv) && conversationFilters.hasMentions(conv))
+        .length,
+    [unreadConversations],
+  );
+
+  const repliesCount = useMemo(
+    () =>
+      unreadConversations.filter(conv => conversationFilters.notArchived(conv) && conversationFilters.hasReplies(conv))
+        .length,
+    [unreadConversations],
+  );
+
+  const draftsCount = useMemo(
+    () => draftConversations.filter(conversationFilters.notArchived).length,
+    [draftConversations],
+  );
+
+  const pingsCount = useMemo(
+    () =>
+      unreadConversations.filter(conv => conversationFilters.notArchived(conv) && conversationFilters.hasPings(conv))
+        .length,
+    [unreadConversations],
+  );
+
+  const directConversationsLength = useMemo(
+    () => directConversations.filter(filterUnreadAndArchivedConversations).length,
+    [directConversations],
+  );
 
   const conversationTabs = [
     {

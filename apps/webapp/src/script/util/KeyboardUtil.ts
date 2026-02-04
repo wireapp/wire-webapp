@@ -63,8 +63,7 @@ export const isTabKey = (keyboardEvent: KeyboardEvent | ReactKeyboardEvent): boo
 export const isEnterKey = (keyboardEvent: KeyboardEvent | ReactKeyboardEvent): boolean =>
   isKey(keyboardEvent, KEY.ENTER);
 
-export const isSpaceKey = (keyboardEvent: KeyboardEvent | ReactKeyboardEvent): boolean =>
-  isKey(keyboardEvent, KEY.SPACE);
+export const isSpaceKey = (keyboardEvent: KeyboardEvent): boolean => isKey(keyboardEvent, KEY.SPACE);
 
 export const isEscapeKey = (keyboardEvent: KeyboardEvent | ReactKeyboardEvent): boolean =>
   isKey(keyboardEvent, KEY.ESC);

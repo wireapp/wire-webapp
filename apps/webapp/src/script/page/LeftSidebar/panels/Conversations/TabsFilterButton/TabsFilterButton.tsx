@@ -17,18 +17,18 @@
  *
  */
 
-import {useState, useRef, useEffect, useId, useCallback} from 'react';
+import {useState, useRef, useEffect, useId} from 'react';
 
 import {container} from 'tsyringe';
 
-import {Checkbox, CheckboxLabel, TabIndex} from '@wireapp/react-ui-kit';
+import {Checkbox, CheckboxLabel} from '@wireapp/react-ui-kit';
 
 import * as Icon from 'Components/Icon';
 import {TeamState} from 'Repositories/team/TeamState';
 import {Config} from 'src/script/Config';
 import {SidebarTabs, useSidebarStore} from 'src/script/page/LeftSidebar/panels/Conversations/useSidebarStore';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
-import {handleEscDown, isKey, KEY, isEnterKey, isSpaceKey} from 'Util/KeyboardUtil';
+import {handleEscDown} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
 import {useChannelsFeatureFlag} from 'Util/useChannelsFeatureFlag';
 
@@ -46,58 +46,13 @@ import {
 export const TabsFilterButton = () => {
   const {visibleTabs, toggleTabVisibility} = useSidebarStore();
   const [isOpen, setIsOpen] = useState(false);
-  const [focusedIndex, setFocusedIndex] = useState(0);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const buttonRef = useRef<HTMLButtonElement>(null);
-  const itemRefs = useRef<(HTMLDivElement | null)[]>([]);
   const menuId = useId();
 
   const {shouldShowChannelTab} = useChannelsFeatureFlag();
   const teamState = container.resolve(TeamState);
   const {isCellsEnabled: isCellsEnabledForTeam} = useKoSubscribableChildren(teamState, ['isCellsEnabled']);
-
-  const showCells = Config.getConfig().FEATURE.ENABLE_CELLS && isCellsEnabledForTeam;
-
-  const availableTabs = [
-    {type: SidebarTabs.FAVORITES, label: t('conversationLabelFavorites')},
-    {type: SidebarTabs.GROUPS, label: t('conversationLabelGroups')},
-    {type: SidebarTabs.DIRECTS, label: t('conversationLabelDirects')},
-    {type: SidebarTabs.FOLDER, label: t('folderViewTooltip')},
-    {type: SidebarTabs.ARCHIVES, label: t('conversationFooterArchive')},
-    {type: SidebarTabs.UNREAD, label: t('conversationLabelUnread')},
-    {type: SidebarTabs.MENTIONS, label: t('conversationLabelMentions')},
-    {type: SidebarTabs.REPLIES, label: t('conversationLabelReplies')},
-    {type: SidebarTabs.DRAFTS, label: t('conversationLabelDrafts')},
-    {type: SidebarTabs.PINGS, label: t('conversationLabelPings')},
-  ];
-
-  if (shouldShowChannelTab) {
-    availableTabs.splice(2, 0, {type: SidebarTabs.CHANNELS, label: t('conversationLabelChannels')});
-  }
-
-  if (showCells) {
-    availableTabs.push({type: SidebarTabs.CELLS, label: t('cells.sidebar.title')});
-  }
-
-  const handleMenuKeyDown = useCallback(
-    (event: KeyboardEvent) => {
-      // Handle Escape
-      handleEscDown(event, () => {
-        setIsOpen(false);
-        buttonRef.current?.focus();
-      });
-
-      // Handle arrow navigation
-      if (isKey(event, KEY.ARROW_DOWN)) {
-        event.preventDefault();
-        setFocusedIndex(prev => (prev + 1) % availableTabs.length);
-      } else if (isKey(event, KEY.ARROW_UP)) {
-        event.preventDefault();
-        setFocusedIndex(prev => (prev - 1 + availableTabs.length) % availableTabs.length);
-      }
-    },
-    [availableTabs],
-  );
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -125,31 +80,47 @@ export const TabsFilterButton = () => {
   }, [isOpen]);
 
   useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      handleEscDown(event, () => {
+        setIsOpen(false);
+        buttonRef.current?.focus();
+      });
+    };
+
     if (isOpen) {
-      document.addEventListener('keydown', handleMenuKeyDown);
+      document.addEventListener('keydown', handleKeyDown);
     }
 
     return () => {
-      document.removeEventListener('keydown', handleMenuKeyDown);
+      document.removeEventListener('keydown', handleKeyDown);
     };
-  }, [isOpen, handleMenuKeyDown]);
-
-  // Focus the item when focusedIndex changes
-  useEffect(() => {
-    if (isOpen && itemRefs.current[focusedIndex]) {
-      itemRefs.current[focusedIndex]?.focus();
-    }
-  }, [isOpen, focusedIndex]);
-
-  // Reset focused index when dropdown opens
-  useEffect(() => {
-    if (isOpen) {
-      setFocusedIndex(0);
-    }
   }, [isOpen]);
 
   if (!Config.getConfig().FEATURE.ENABLE_ADVANCED_FILTERS) {
     return null;
+  }
+
+  const showCells = Config.getConfig().FEATURE.ENABLE_CELLS && isCellsEnabledForTeam;
+
+  const availableTabs = [
+    {type: SidebarTabs.FAVORITES, label: t('conversationLabelFavorites')},
+    {type: SidebarTabs.GROUPS, label: t('conversationLabelGroups')},
+    {type: SidebarTabs.DIRECTS, label: t('conversationLabelDirects')},
+    {type: SidebarTabs.FOLDER, label: t('folderViewTooltip')},
+    {type: SidebarTabs.ARCHIVES, label: t('conversationFooterArchive')},
+    {type: SidebarTabs.UNREAD, label: t('conversationLabelUnread')},
+    {type: SidebarTabs.MENTIONS, label: t('conversationLabelMentions')},
+    {type: SidebarTabs.REPLIES, label: t('conversationLabelReplies')},
+    {type: SidebarTabs.DRAFTS, label: t('conversationLabelDrafts')},
+    {type: SidebarTabs.PINGS, label: t('conversationLabelPings')},
+  ];
+
+  if (shouldShowChannelTab) {
+    availableTabs.splice(2, 0, {type: SidebarTabs.CHANNELS, label: t('conversationLabelChannels')});
+  }
+
+  if (showCells) {
+    availableTabs.push({type: SidebarTabs.CELLS, label: t('cells.sidebar.title')});
   }
 
   return (
@@ -182,19 +153,7 @@ export const TabsFilterButton = () => {
           <div css={dropdownDivider} />
           {availableTabs.map((tab, index) => (
             <div key={tab.type}>
-              <div
-                ref={el => (itemRefs.current[index] = el)}
-                css={dropdownCheckboxItem}
-                role="menuitemcheckbox"
-                aria-checked={visibleTabs.includes(tab.type)}
-                tabIndex={index === focusedIndex ? TabIndex.FOCUSABLE : TabIndex.UNFOCUSABLE}
-                onKeyDown={event => {
-                  if (isEnterKey(event) || isSpaceKey(event)) {
-                    event.preventDefault();
-                    toggleTabVisibility(tab.type);
-                  }
-                }}
-              >
+              <div css={dropdownCheckboxItem} role="menuitemcheckbox" aria-checked={visibleTabs.includes(tab.type)}>
                 <Checkbox
                   wrapperCSS={roundCheckbox}
                   checked={visibleTabs.includes(tab.type)}
