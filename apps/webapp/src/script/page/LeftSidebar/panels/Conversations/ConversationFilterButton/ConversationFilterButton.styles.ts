@@ -49,11 +49,9 @@ export const dropdown: CSSObject = {
   top: '100%',
   right: 0,
   marginTop: '4px',
-  minWidth: '200px',
-  maxWidth: '240px',
+  width: 'max-content',
   padding: '8px 0',
   backgroundColor: 'var(--dropdown-menu-bg)',
-  border: '1px solid var(--border-color)',
   borderRadius: '12px',
   boxShadow: '0 0 1px 0 rgba(0, 0, 0, 0.08), 0 8px 24px 0 rgba(0, 0, 0, 0.16)',
   zIndex: 10,
@@ -64,9 +62,8 @@ export const dropdownCheckboxItem: CSSObject = {
   display: 'flex',
   alignItems: 'center',
   height: '30px',
-  padding: '0 16px',
+  padding: '0 24px',
   cursor: 'pointer',
-  fontSize: 'var(--font-size-small)',
   transition: 'background-color 0.15s ease',
   whiteSpace: 'nowrap',
   '&:hover': {
@@ -76,48 +73,4 @@ export const dropdownCheckboxItem: CSSObject = {
 
 export const filterButtonWrapper: CSSObject = {
   position: 'relative',
-};
-
-export const dropdownHeader: CSSObject = {
-  padding: '4px 16px 2px',
-  fontSize: '11px',
-  fontWeight: 400,
-  color: 'var(--foreground-fade-56)',
-};
-
-export const checkboxLabel: CSSObject = {
-  fontSize: 'var(--font-size-small)',
-};
-
-export const dropdownDivider: CSSObject = {
-  width: '100%',
-  height: '1px',
-  borderTop: '1px solid var(--border-color)',
-  margin: '4px 0',
-};
-
-export const roundCheckbox: CSSObject = {
-  [`input[type="checkbox"] + label::before`]: {
-    borderRadius: '50% !important',
-    minWidth: '16px !important',
-    width: '16px !important',
-    height: '16px !important',
-    margin: '0 8px 0 0 !important',
-  },
-  [`input[type="checkbox"]:checked + label::before`]: {
-    borderWidth: '5px',
-    borderColor: 'var(--accent-color-500)',
-    background: 'var(--accent-color-500) !important',
-  },
-  [`input[type="checkbox"]:checked + label::after`]: {
-    display: 'none',
-  },
-  [`input[type="checkbox"] + label svg`]: {
-    width: '10px !important',
-    height: '10px !important',
-    position: 'absolute',
-    left: '3px',
-    top: '50%',
-    transform: 'translateY(-50%)',
-  },
 };
