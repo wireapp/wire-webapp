@@ -60,7 +60,6 @@ import {TeamCreationBanner} from './TeamCreation/TeamCreationBanner';
 import {Config} from '../../../../../Config';
 import {ContentState} from '../../../../useAppState';
 import {ConversationTab} from '../ConversationTab';
-import {conversationFilters} from '../helpers';
 import {TabsFilterButton} from '../TabsFilterButton';
 
 interface ConversationTabsProps {
@@ -113,7 +112,7 @@ export const ConversationTabs = ({
   ).length;
 
   const filterUnreadAndArchivedConversations = (conversation: Conversation) =>
-    conversationFilters.notArchived(conversation) && conversationFilters.hasUnread(conversation);
+    !conversation.is_archived() && conversation.hasUnread();
 
   const isTeamCreationEnabled =
     Config.getConfig().FEATURE.ENABLE_TEAM_CREATION &&
@@ -122,16 +121,16 @@ export const ConversationTabs = ({
   const channelConversationsLength = channelConversations.filter(filterUnreadAndArchivedConversations).length;
   const groupConversationsLength = groupConversations.filter(filterUnreadAndArchivedConversations).length;
 
-  const unreadCount = unreadConversations.filter(conversationFilters.notArchived).length;
+  const unreadCount = unreadConversations.filter(conv => !conv.is_archived()).length;
   const mentionsCount = unreadConversations.filter(
-    conv => conversationFilters.notArchived(conv) && conversationFilters.hasMentions(conv),
+    conv => !conv.is_archived() && conv.unreadState().selfMentions.length > 0,
   ).length;
   const repliesCount = unreadConversations.filter(
-    conv => conversationFilters.notArchived(conv) && conversationFilters.hasReplies(conv),
+    conv => !conv.is_archived() && conv.unreadState().selfReplies.length > 0,
   ).length;
-  const draftsCount = draftConversations.filter(conversationFilters.notArchived).length;
+  const draftsCount = draftConversations.filter(conv => !conv.is_archived()).length;
   const pingsCount = unreadConversations.filter(
-    conv => conversationFilters.notArchived(conv) && conversationFilters.hasPings(conv),
+    conv => !conv.is_archived() && conv.unreadState().pings.length > 0,
   ).length;
 
   const conversationTabs = [
