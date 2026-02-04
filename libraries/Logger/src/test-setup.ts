@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2019 Wire Swiss GmbH
+ * Copyright (C) 2025 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,20 +17,19 @@
  *
  */
 
-import {getStorage} from './localStorage';
+// Mock DataDog packages
+jest.mock('@datadog/browser-logs');
+jest.mock('@datadog/browser-rum');
 
-import {Configuration} from '../Config';
+// Mock console methods for testing
+global.console = {
+  ...console,
+  log: jest.fn(),
+  info: jest.fn(),
+  warn: jest.fn(),
+  error: jest.fn(),
+  debug: jest.fn(),
+};
 
-export function enableLogging(config: Configuration, search = window.location.search) {
-  const storage = getStorage();
-  const namespace = new URLSearchParams(search).get('enableLogging');
-  const force = config.FEATURE.ENABLE_DEBUG;
-
-  if (namespace) {
-    storage?.setItem('debug', namespace);
-  } else if (force) {
-    storage?.setItem('debug', '*');
-  } else {
-    storage?.removeItem('debug');
-  }
-}
+// Mock window for browser-specific tests
+global.window = global.window || {};

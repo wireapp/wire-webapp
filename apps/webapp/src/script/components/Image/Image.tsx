@@ -28,6 +28,9 @@ import {AssetRemoteData} from 'Repositories/assets/AssetRemoteData';
 import {MediumImage} from 'Repositories/entity/message/MediumImage';
 import {TeamState} from 'Repositories/team/TeamState';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
+import {getLogger} from 'Util/Logger';
+
+const logger = getLogger('Image');
 
 import {getImageStyle, getWrapperStyles} from './Image.styles';
 import {RestrictedImage} from './RestrictedImage';
@@ -95,7 +98,7 @@ export const Image = ({
           }
           setImageUrl(url);
         } catch (error) {
-          console.error(error);
+          logger.development.error('Failed to load image', error);
         }
       })();
     }

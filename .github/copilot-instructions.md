@@ -43,12 +43,34 @@ jest                    # ❌ WRONG
 ```
 apps/
 ├── webapp/           # React frontend (security + accessibility focus)
+│   ├── src/          # Source code (components, pages, etc.)
+│   └── app-config/   # Webapp configuration
 └── server/           # Node.js/Express API (security focus)
-libraries/
+    └── src/          # Server source code
+libraries/            # Shared libraries
+├── api-client/       # @wireapp/api-client - Wire API Client library
+│                     # HTTP/REST API communication, WebSocket management
 ├── config/           # @wireapp/config - Environment configuration library
-├── core/             # @wireapp/core - Communication library
-                      # ⚠️ CRITICAL: Changes affect authentication, encryption, messaging
+├── core/             # @wireapp/core - Communication core library
+│                     # ⚠️ CRITICAL: Changes affect authentication, encryption, messaging
+└── logger/           # @wireapp/logger - Unified logging library
+                      # Security-critical: PII sanitization, multi-transport logging
+docs/                 # Project documentation
+package.json          # Root dependencies (use yarn commands)
 ```
+
+### API Client Library (`@wireapp/api-client`)
+**Location:** `libraries/api-client/`
+**Purpose:**
+- Wire API Client to send and receive data
+- HTTP/REST API communication with Wire backend
+- WebSocket connection management
+- S3 storage integration for Cells
+- Request/response handling and retries
+
+**Common tasks:**
+- Run tests: `nx run api-client-lib:test`
+- Build the library: `nx run api-client-lib:build`
 
 ### Config Library (`@wireapp/config`)
 **Location:** `libraries/config/`
@@ -61,12 +83,30 @@ libraries/
 ### Core Library (`@wireapp/core`)
 **Location:** `libraries/core/`
 **Critical Functions:**
+- Wire's communication core
 - Authentication and session management
-- WebSocket connections
 - Protocol message handling (Protobuf)
-- Cryptographic operations
+- Cryptographic operations for secure messaging
 
 ⚠️ **Changes to core MUST be reviewed for security and backwards compatibility**
+
+**Common tasks:**
+- Run tests: `nx run core-lib:test`
+- Build the library: `nx run core-lib:build`
+
+### Logger Library (`@wireapp/logger`)
+**Location:** `libraries/logger/`
+**Purpose:**
+- Security-critical unified logging with automatic PII sanitization
+- Multi-transport support (Console, Datadog, File)
+- Global singleton for Electron + Browser contexts
+- GDPR-compliant logging with Presidio integration
+
+⚠️ **Security-critical: Changes affect PII handling and compliance**
+
+**Common tasks:**
+- Run tests: `nx run logging:test`
+- Build the library: `nx run logging:build`
 
 ---
 

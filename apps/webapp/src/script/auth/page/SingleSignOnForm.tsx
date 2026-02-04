@@ -31,7 +31,10 @@ import {Runtime, UrlUtil} from '@wireapp/commons';
 import {Button, Checkbox, CheckboxLabel, ErrorMessage, Form, Input, InputBlock, Loading} from '@wireapp/react-ui-kit';
 
 import {t} from 'Util/LocalizerUtil';
+import {getLogger} from 'Util/Logger';
 import {isBackendError} from 'Util/TypePredicateUtil';
+
+const logger = getLogger('SingleSignOnForm');
 
 import {Config} from '../../Config';
 import {JoinGuestLinkPasswordModal} from '../component/JoinGuestLinkPasswordModal';
@@ -153,11 +156,11 @@ const SingleSignOnFormComponent = ({
       setConversationKey(queryConversationKey);
       setIsValidLink(true);
       doCheckConversationCode(queryConversationKey, queryConversationCode).catch(error => {
-        console.warn('Invalid conversation code', error);
+        logger.development.warn('Invalid conversation code', error);
         setIsValidLink(false);
       });
       doGetConversationInfoByCode(queryConversationKey, queryConversationCode).catch(error => {
-        console.warn('Failed to fetch conversation info', error);
+        logger.development.warn('Failed to fetch conversation info', error);
         setIsValidLink(false);
       });
     }
@@ -275,7 +278,7 @@ const SingleSignOnFormComponent = ({
               errorType => error.label && error.label.endsWith(errorType),
             );
             if (!isValidationError) {
-              console.warn('SSO authentication error', JSON.stringify(Object.entries(error)), error);
+              logger.development.warn('SSO authentication error', {error: JSON.stringify(Object.entries(error))});
             }
             break;
           }

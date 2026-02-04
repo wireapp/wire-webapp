@@ -30,8 +30,7 @@ import {container} from 'tsyringe';
 
 import {Runtime} from '@wireapp/commons';
 
-import {initializeDataDog} from 'Util/DataDog';
-import {enableLogging} from 'Util/LoggerUtil';
+import {initializeWireLogger, enableLogging} from 'Util/Logger';
 import {exposeWrapperGlobals} from 'Util/wrapper';
 
 import './configureEnvironment';
@@ -83,7 +82,17 @@ const config = Config.getConfig();
 
 async function runApp() {
   const {domain} = await updateApiVersion();
-  await initializeDataDog(config, {domain: domain});
+
+  // Initialize new Wire Logger library (includes DataDog)
+  await initializeWireLogger(config, {domain});
+
+  // Verify new logger is working
+  const {getLogger: getWireLogger} = await import('@wireapp/logger');
+  const wireLogger = getWireLogger('Auth');
+  wireLogger.production.info('Wire Logger initialized in auth flow', {
+    domain,
+    environment: config.ENVIRONMENT,
+  });
 
   render(Root);
   setAppLocale();

@@ -11,28 +11,3 @@
 - If the user needs help with an Nx configuration or project graph error, use the `nx_workspace` tool to get any errors
 
 <!-- nx configuration end-->
-
-# Repository Structure
-
-This is an Nx monorepo with the following structure:
-
-```
-apps/
-├── webapp/           # React frontend application
-└── server/           # Node.js/Express backend API
-libraries/
-└── core/             # @wireapp/core - Wire's communication core library
-```
-
-## Core Library (`@wireapp/core`)
-
-Located in `libraries/core/`, this is Wire's communication core library that provides:
-- Account authentication and management
-- WebSocket connections for real-time communication
-- Protocol message handling (send/receive Protobuf messages)
-- Cryptographic operations for secure messaging
-
-The webapp depends on this library for all backend communication. When making changes to core functionality:
-- Run tests: `nx run core-lib:test`
-- Build the library: `nx run core-lib:build`
-- Check for circular dependencies: `nx run core-lib:check:circular-dependencies`

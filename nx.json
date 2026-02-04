@@ -16,7 +16,7 @@
     "lint": {
       "dependsOn": ["^build"], // build all upstream dependencies first
       "cache": true,
-      "inputs": ["default", "{workspaceRoot}/eslint.config.ts"] // workspace lint config in hash
+      "inputs": ["default", "{workspaceRoot}/eslint.config.ts", "{workspaceRoot}/eslint.config.base.ts", "{projectRoot}/eslint.config.ts"] // workspace and project lint configs in hash
     }
   },
   "namedInputs": {

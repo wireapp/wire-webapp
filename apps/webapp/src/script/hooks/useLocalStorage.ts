@@ -19,11 +19,15 @@
 
 import {useSyncExternalStore} from 'react';
 
+import {getLogger} from 'Util/Logger';
+
+const logger = getLogger('useLocalStorage');
+
 const parseJSON = <Value>(key: string, value: string | null): Value | null => {
   try {
     return value === null ? null : JSON.parse(value);
   } catch {
-    console.error(`Error parsing JSON for key "${key}"`);
+    logger.development.error(`Error parsing JSON for key "${key}"`);
     return null;
   }
 };

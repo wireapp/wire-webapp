@@ -56,10 +56,14 @@ export class ConversationListPage {
       .and(page.locator('#btn-unblock'));
     this.moveConversationButton = page.getByRole('menu').getByRole('button', {name: 'Move to'});
     this.moveToMenu = page.getByRole('menu');
-    this.createNewFolderButton = this.moveToMenu.getByRole('button', {name: 'Create new folder'});
+    this.createNewFolderButton = this.moveToMenu.getByRole('button', {
+      name: 'Create new folder',
+    });
     this.conversationListHeaderTitle = page.locator('[data-uie-name="conversation-list-header-title"]');
     this.joinCallButton = page.getByRole('button', {name: 'Join'});
-    this.clearContentButton = page.getByRole('button', {name: 'Clear content'});
+    this.clearContentButton = page.getByRole('button', {
+      name: 'Clear content',
+    });
   }
 
   async isConversationItemVisible(conversationName: string) {
@@ -123,7 +127,9 @@ export class ConversationListPage {
 
   async openContextMenu(conversationName: string) {
     await this.getConversationLocator(conversationName).click();
-    await this.getConversationLocator(conversationName).click({button: 'right'});
+    await this.getConversationLocator(conversationName).click({
+      button: 'right',
+    });
   }
 
   async leaveConversation() {
@@ -144,10 +150,15 @@ export class ConversationListPage {
   }
 
   getRemoveConversationFromFolderButton(folderName: string) {
-    return this.page.getByRole('button', {name: `Remove from "${folderName}"`});
+    return this.page.getByRole('button', {
+      name: `Remove from "${folderName}"`,
+    });
   }
 
   getMoveToFolderButton(folderName: string) {
-    return this.moveToMenu.getByRole('button', {name: folderName, exact: true});
+    return this.moveToMenu.getByRole('button', {
+      name: folderName,
+      exact: true,
+    });
   }
 }

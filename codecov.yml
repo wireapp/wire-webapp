@@ -17,6 +17,10 @@ coverage:
         target: auto
         flags:
           - app_server
+      lib_logger:
+        target: auto
+        flags:
+          - lib_logger
       lib_core:
         target: auto
         flags:
@@ -51,6 +55,10 @@ flags:
     paths:
       - 'apps/server/**'
     carryforward: true
+  lib_logger:
+    paths:
+      - 'libraries/Logger/**'
+    carryforward: false
   lib_core:
     paths:
       - 'libraries/core/**'

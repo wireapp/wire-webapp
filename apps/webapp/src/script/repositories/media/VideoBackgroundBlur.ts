@@ -19,7 +19,11 @@
 
 import {ImageSegmenter, FilesetResolver} from '@mediapipe/tasks-vision';
 
+import {getLogger} from 'Util/Logger';
+
 import {VideoDimensions, blurBackground, initShaderProgram} from './BackgroundBlurrer';
+
+const logger = getLogger('VideoBackgroundBlur');
 
 enum SEGMENTATION_MODEL {
   // Other models are available and could be tested later on (https://github.com/google-ai-edge/mediapipe/blob/master/docs/solutions/models.md#selfie-segmentation), this one is optimized for performance and yeild rather good results for our MVP
@@ -64,7 +68,7 @@ function startBlurProcess(
         blurBackground(result, videoEl, webGlContext, videoDimensions),
       );
     } catch (error) {
-      console.error('Failed to segment video', error);
+      logger.development.error('Failed to segment video', error);
     }
   }
   rafId = window.requestAnimationFrame(() => startBlurProcess(segmenter, webGlContext, videoEl, videoDimensions));
@@ -104,7 +108,7 @@ export async function applyBlur(stream: MediaStream): Promise<{stream: MediaStre
     // Ensure metadata is loaded to get video dimensions
     videoDimensions.width = videoEl.videoWidth || 1240;
     videoDimensions.height = videoEl.videoHeight || 720;
-    videoEl.play().catch(error => console.error('Error playing the video: ', error));
+    videoEl.play().catch(error => logger.development.error('Error playing the video', error));
   };
 
   return new Promise(resolve => {

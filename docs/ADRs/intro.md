@@ -65,6 +65,11 @@ Don't create an ADR for:
 3. **Implementation Details** - Low-level coding decisions
 4. **Temporary Workarounds** - Unless they become permanent
 
+## Active ADRs
+
+- [2025-12-29 - Nx Monorepo Migration](2025-12-29-nx-monorepo-migration.md)
+- [2025-12-29 - Unified Logging Library](2025-12-29-unified-logging-library.md)
+
 ## References
 
 - [Michael Nygard's ADR Format](https://cognitect.com/blog/2011/11/15/documenting-architecture-decisions)

@@ -286,13 +286,12 @@ export const VideoControls = ({
   }, [getSelectedAudioOptions]);
 
   const updateAudioOptions = (selectedOption: string, input: boolean) => {
-    const [selectedMicrophone, selectedSpeaker] = selectedAudioOptions;
     const microphone = input
-      ? (allMicrophones.options.find(({value}) => value === selectedOption) ?? selectedMicrophone)
-      : selectedMicrophone;
+      ? (audioOptions[0].options.find(({value}) => value === selectedOption) ?? selectedAudioOptions[0])
+      : selectedAudioOptions[0];
     const speaker = !input
-      ? (allSpeaker.options.find(({value}) => value === selectedOption) ?? selectedSpeaker)
-      : selectedSpeaker;
+      ? (audioOptions[1].options.find(({value}) => value === selectedOption) ?? selectedAudioOptions[1])
+      : selectedAudioOptions[1];
 
     setSelectedAudioOptions([microphone, speaker]);
     switchMicrophoneInput(microphone.id);

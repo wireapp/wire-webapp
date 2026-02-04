@@ -37,7 +37,10 @@ type Fixtures = {
    * @param ctx BrowserContext - optional browser context to reuse, if not provided, a new one will be created
    * @param setup Array of PagePlugins, effectively functions which will be applied to the page in the given order
    */
-  createPage: {(...setup: PagePlugin[]): Promise<Page>; (ctx: BrowserContext, ...setup: PagePlugin[]): Promise<Page>};
+  createPage: {
+    (...setup: PagePlugin[]): Promise<Page>;
+    (ctx: BrowserContext, ...setup: PagePlugin[]): Promise<Page>;
+  };
   /**
    * Create a new user
    * Note: The created user will be deleted automatically once the test is finished
@@ -52,7 +55,9 @@ type Fixtures = {
    */
   createTeam: (
     teamName: string,
-    options?: Parameters<typeof createUser>[1] & {withMembers?: number | User[]},
+    options?: Parameters<typeof createUser>[1] & {
+      withMembers?: number | User[];
+    },
   ) => Promise<Team>;
 };
 
@@ -72,7 +77,10 @@ export const test = baseTest.extend<Fixtures>({
     async ({}, use, testInfo) => {
       const testid = testInfo.tags.find(tag => tag.startsWith('@TC'));
       if (testid && !testInfo.annotations.some(annotation => annotation.type === 'testid')) {
-        testInfo.annotations.push({type: 'testid', description: testid.slice(1)});
+        testInfo.annotations.push({
+          type: 'testid',
+          description: testid.slice(1),
+        });
       }
 
       await use();

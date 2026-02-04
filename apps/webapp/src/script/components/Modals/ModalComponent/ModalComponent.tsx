@@ -139,7 +139,7 @@ const ModalComponent = ({
             </div>
           )}
         </div>,
-        container || document.body,
+        document.body,
       )}
     </>
   );

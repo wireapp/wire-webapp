@@ -19,7 +19,11 @@
 
 import {useState, useCallback, useRef, SyntheticEvent} from 'react';
 
+import {getLogger} from 'Util/Logger';
+
 import {isVideoPlayable} from './isVideoPlayable/isVideoPlayable';
+
+const logger = getLogger('useVideoPlayback');
 
 interface UseVideoPlaybackProps {
   url?: string;
@@ -105,7 +109,7 @@ export const useVideoPlayback = ({url, videoElement, isEnabled}: UseVideoPlaybac
     setIsError(true);
     // Todo: This needs to be revisited
     //amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.MESSAGES.VIDEO.PLAY_FAILED);
-    console.error('Video cannot be played', event);
+    logger.development.error('Video cannot be played', new Error('Video playback error'), {event: event.type});
   }, []);
 
   return {

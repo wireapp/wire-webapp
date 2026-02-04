@@ -1,5 +1,7 @@
 version: 2
 updates:
+  ################ MONOREPO ROOT ################
+
   # Root workspace dependencies (monorepo root)
   - package-ecosystem: npm
     directory: '/'
@@ -17,6 +19,8 @@ updates:
         update-types: ['version-update:semver-major']
       - dependency-name: '@types/node'
       - dependency-name: 'typescript'
+
+  ################ APPS ################
 
   # Webapp config dependencies
   - package-ecosystem: npm
@@ -95,6 +99,8 @@ updates:
       - dependency-name: 'typescript'
       - dependency-name: '@types/node'
 
+  ################ LIBRRIES ################
+
   # Core library dependencies
   - package-ecosystem: npm
     directory: '/libraries/core'
@@ -113,9 +119,44 @@ updates:
       - dependency-name: '@types/node'
       - dependency-name: 'typescript'
 
+  # ApiClient library dependencies
+  - package-ecosystem: npm
+    directory: '/libraries/api-client'
+    schedule:
+      interval: weekly
+      day: sunday
+      time: '16:00'
+      timezone: 'Europe/Berlin'
+    open-pull-requests-limit: 99
+    labels:
+      - 'type: chore 🧹'
+    ignore:
+      # Prevent major version updates
+      - dependency-name: '*'
+        update-types: ['version-update:semver-major']
+      - dependency-name: '@types/node'
+      - dependency-name: 'typescript'
+
   # Config library dependencies
   - package-ecosystem: npm
     directory: '/libraries/config'
+    schedule:
+      interval: weekly
+      day: sunday
+      time: '16:00'
+      timezone: 'Europe/Berlin'
+    open-pull-requests-limit: 99
+    labels:
+      - 'type: chore 🧹'
+    ignore:
+      # Prevent major version updates
+      - dependency-name: '*'
+        update-types: ['version-update:semver-major']
+      - dependency-name: '@types/node'
+      - dependency-name: 'typescript'
+
+  - package-ecosystem: npm
+    directory: '/libraries/Logger'
     schedule:
       interval: weekly
       day: sunday

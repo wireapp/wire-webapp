@@ -5,7 +5,8 @@
     "paths": {
       "@wireapp/core/lib/*": ["libraries/core/src/*"],
       "@wireapp/core": ["libraries/core/src/index.ts"],
-      "@wireapp/api-client": ["libraries/api-client/src/APIClient.ts"]
+      "@wireapp/api-client": ["libraries/api-client/src/APIClient.ts"],
+      "@wireapp/logger": ["libraries/Logger/src/index.ts"]
     }
   },
   "include": [
@@ -14,7 +15,8 @@
     "apps/server/**/*.ts",
     "libraries/core/src/**/*",
     "libraries/core/jest.setup.ts",
-    "libraries/api-client/src/**/*"
+    "libraries/api-client/src/**/*",
+    "libraries/Logger/src/**/*"
   ],
   "exclude": [
     "node_modules",
@@ -26,12 +28,14 @@
     "libraries/core/lib",
     "libraries/core/.tmp",
     "libraries/api-client/lib",
-    "libraries/api-client/.tmp"
+    "libraries/api-client/.tmp",
+    "libraries/Logger/lib"
   ],
   "references": [
     { "path": "./apps/webapp" },
     { "path": "./apps/server" },
     { "path": "./libraries/core" },
-    { "path": "./libraries/api-client" }
+    { "path": "./libraries/api-client" },
+    { "path": "./libraries/Logger" }
   ]
 }

@@ -173,7 +173,9 @@ export class Call {
     }
 
     Object.values(this.audios).forEach(audio => {
-      audio.audioElement?.setSinkId?.(outputDeviceId).catch(console.warn);
+      audio.audioElement?.setSinkId?.(outputDeviceId).catch(error => {
+        // Silently fail if setSinkId is not supported
+      });
     });
   }
 

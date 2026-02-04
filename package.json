@@ -92,6 +92,7 @@
     "build:libs": "nx run-many -t build --projects=tag:type:lib",
     "bundle:dev": "nx build webapp --configuration=development",
     "bundle:prod": "nx build webapp --configuration=production",
+    "build": "nx run-many -t build --projects=tag:type:lib",
     "clean:jest": "nx reset && nx run workspace-tools:clean-jest",
     "clean:yarn": "find . -name node_modules -type d -prune -exec rm -rf '{}' + && yarn cache clean",
     "changelog:production": "nx run workspace-tools:changelog-production 2>&1 | grep -v '\\[dotenv@'",
