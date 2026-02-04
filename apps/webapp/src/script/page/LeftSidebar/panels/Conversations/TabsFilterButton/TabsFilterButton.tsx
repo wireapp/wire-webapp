@@ -47,10 +47,6 @@ export const TabsFilterButton = () => {
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (!event.target) {
-        return;
-      }
-
       if (
         dropdownRef.current &&
         !dropdownRef.current.contains(event.target as Node) &&
