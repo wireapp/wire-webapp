@@ -1865,6 +1865,14 @@ export class CallingRepository {
     return stream;
   }
 
+  public refreshAudioOutput() {
+    const activeCall = this.callState.joinedCall();
+    if (!activeCall) {
+      return;
+    }
+    activeCall.updateAudioStreamsSink();
+  }
+
   /**
    * @returns `true` if a media stream has been stopped.
    */

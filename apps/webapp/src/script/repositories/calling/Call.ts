@@ -162,6 +162,7 @@ export class Call {
       audioElement.srcObject = audio.stream;
       audioElement.play();
       audio.audioElement = audioElement;
+      document.body.appendChild(audioElement);
     });
     this.updateAudioStreamsSink();
   }
