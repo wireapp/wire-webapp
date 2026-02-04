@@ -36,7 +36,7 @@
     "@swc/jest": "0.2.39",
     "@types/lodash": "4.17.23",
     "@types/long": "5.0.0",
-    "commander": "14.0.2",
+    "commander": "14.0.3",
     "dotenv-defaults": "5.0.2",
     "jest-websocket-mock": "2.5.0"
   },
