@@ -14799,20 +14799,20 @@ __metadata:
   languageName: node
   linkType: hard
 
-"dpdm@npm:3.14.0":
-  version: 3.14.0
-  resolution: "dpdm@npm:3.14.0"
+"dpdm@npm:3.15.1":
+  version: 3.15.1
+  resolution: "dpdm@npm:3.15.1"
   dependencies:
     chalk: "npm:^4.1.2"
-    fs-extra: "npm:^11.1.1"
-    glob: "npm:^10.3.4"
+    fs-extra: "npm:^11.2.0"
+    glob: "npm:^10.3.10"
     ora: "npm:^5.4.1"
-    tslib: "npm:^2.6.2"
-    typescript: "npm:^5.2.2"
+    tslib: "npm:^2.7.0"
+    typescript: "npm:^5.6.3"
     yargs: "npm:^17.7.2"
   bin:
     dpdm: lib/bin/dpdm.js
-  checksum: 10/bfbc4c1f862cffcf5379971a7c2ed7a4a12c1057950ac8a58600287fbb56222f64fbc148c10587c67b32f9d10a74811c640f2af6d855760bb568ec7eabf23765
+  checksum: 10/289152e6f6101ebc88b18117f14cb241f7cc32cc46c8b3b933298fc2cd028d24b987f61c5b08e4c8a7fd803449c64d20266eeacfdd605f82c08d68eec4ce22a2
   languageName: node
   linkType: hard
 
@@ -16725,7 +16725,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"fs-extra@npm:11.3.3, fs-extra@npm:^11.1.1":
+"fs-extra@npm:11.3.3, fs-extra@npm:^11.2.0":
   version: 11.3.3
   resolution: "fs-extra@npm:11.3.3"
   dependencies:
@@ -17146,7 +17146,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"glob@npm:^10.0.0, glob@npm:^10.2.2, glob@npm:^10.3.10, glob@npm:^10.3.4":
+"glob@npm:^10.0.0, glob@npm:^10.2.2, glob@npm:^10.3.10":
   version: 10.5.0
   resolution: "glob@npm:10.5.0"
   dependencies:
@@ -29225,7 +29225,7 @@ __metadata:
     cross-env: "npm:10.1.0"
     dotenv: "npm:17.2.3"
     dotenv-extended: "npm:2.9.0"
-    dpdm: "npm:3.14.0"
+    dpdm: "npm:3.15.1"
     eslint: "npm:9.39.2"
     eslint-import-resolver-typescript: "npm:4.4.4"
     eslint-plugin-header: "npm:3.1.1"
