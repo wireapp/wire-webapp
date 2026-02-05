@@ -17,6 +17,16 @@ on:
         options:
           - 'true'
           - 'false'
+      force_version:
+        description: 'Force version bump type (even without changes)'
+        required: false
+        default: 'none'
+        type: choice
+        options:
+          - 'none'
+          - 'patch'
+          - 'minor'
+          - 'major'
 
 permissions:
   contents: write # needed for pushing tags and commits
@@ -68,8 +78,6 @@ jobs:
         run: |
           echo "🔍 Checking what would be published..."
           yarn nx release --dry-run --verbose
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
       - name: Version and Publish (main branch - stable release)
         if: |
@@ -78,10 +86,13 @@ jobs:
           github.event_name != 'pull_request'
         run: |
           echo "📦 Publishing stable release to npm..."
-          yarn nx release --verbose
+          if [ "${{ github.event.inputs.force_version }}" != "none" ] && [ -n "${{ github.event.inputs.force_version }}" ]; then
+            echo "⚡ Force bumping version: ${{ github.event.inputs.force_version }}"
+            yarn nx release --specifier=${{ github.event.inputs.force_version }} --verbose
+          else
+            yarn nx release --verbose
+          fi
         env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-          NPM_CONFIG_PROVENANCE: true
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Version and Publish Beta (dev branch)
@@ -91,9 +102,12 @@ jobs:
           github.event_name != 'pull_request'
         run: |
           echo "🧪 Publishing beta release to npm with beta tag..."
-          yarn nx release --preid=beta --verbose
+          if [ "${{ github.event.inputs.force_version }}" != "none" ] && [ -n "${{ github.event.inputs.force_version }}" ]; then
+            echo "⚡ Force bumping version: ${{ github.event.inputs.force_version }}"
+            yarn nx release --preid=beta --specifier=${{ github.event.inputs.force_version }} --verbose
+          else
+            yarn nx release --preid=beta --verbose
+          fi
         env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-          NPM_CONFIG_PROVENANCE: true
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NPM_CONFIG_TAG: beta
