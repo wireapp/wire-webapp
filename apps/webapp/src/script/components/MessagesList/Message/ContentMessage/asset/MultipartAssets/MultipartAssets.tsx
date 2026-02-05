@@ -25,6 +25,7 @@ import {ICellAsset} from '@wireapp/protocol-messaging';
 
 import {useInView} from 'Hooks/useInView/useInView';
 import {CellsRepository} from 'Repositories/cells/CellsRepository';
+import {isPreviewableImage} from 'Util/ImageUtil';
 import {t} from 'Util/LocalizerUtil';
 import {formatBytes, getFileExtension, trimFileExtension} from 'Util/util';
 
@@ -100,6 +101,7 @@ const MultipartAsset = ({
 
   const isImage = contentType.startsWith('image');
   const isVideo = contentType.startsWith('video');
+  const canPreviewImage = isPreviewableImage({mimeType: contentType, extension});
 
   const isSingleAsset = assetsCount === 1;
   const variant = isSingleAsset ? 'large' : 'small';
@@ -138,7 +140,7 @@ const MultipartAsset = ({
     );
   }
 
-  if (isImage) {
+  if (isImage && canPreviewImage) {
     return (
       <li ref={elementRef} css={imageCardStyles}>
         <ImageAssetCard

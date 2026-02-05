@@ -59,10 +59,12 @@ export const ImageAssetLarge = ({
   timestamp,
 }: ImageAssetLargeProps) => {
   const [isLoaded, setIsLoaded] = useState(false);
+  const [hasLoadError, setHasLoadError] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
 
   const aspectRatio = metadata?.width && metadata?.height ? metadata?.width / metadata?.height : undefined;
   const opacity = isLoaded ? 1 : 0;
+  const isUnavailable = isError || hasLoadError;
 
   return (
     <>
@@ -76,7 +78,7 @@ export const ImageAssetLarge = ({
         aria-haspopup="dialog"
         aria-expanded={isOpen}
         aria-controls={id}
-        disabled={isError}
+        disabled={isUnavailable}
         style={
           {
             '--aspect-ratio': aspectRatio,
@@ -85,8 +87,8 @@ export const ImageAssetLarge = ({
       >
         <div css={infoOverlayStyles}>
           <div css={infoWrapperStyles}>
-            {!isLoaded && !isError && <div className="icon-spinner spin" css={loaderIconStyles} />}
-            {isError && (
+            {!isLoaded && !isUnavailable && <div className="icon-spinner spin" css={loaderIconStyles} />}
+            {isUnavailable && (
               <>
                 <UnavailableFileIcon css={errorIconStyles} width={14} height={14} />
                 <p css={errorTextStyles}>{t('cells.unavailableFile')}</p>
@@ -106,6 +108,10 @@ export const ImageAssetLarge = ({
             }
             width={metadata?.width}
             onLoad={() => setIsLoaded(true)}
+            onError={() => {
+              setHasLoadError(true);
+              setIsLoaded(true);
+            }}
           />
         </div>
       </button>
