@@ -17,7 +17,7 @@
  *
  */
 
-import {imageHasExifData, stripImageExifData} from './ImageUtil';
+import {imageHasExifData, isPreviewableImage, stripImageExifData} from './ImageUtil';
 
 const jpegWithExif = new Blob([new Uint8Array([0xff, 0xd8, 0xff, 0xe1, 0x00, 0x10, 0x45, 0x78, 0x69, 0x66])], {
   type: 'image/jpeg',
@@ -114,6 +114,30 @@ describe('ImageUtil', () => {
       const inputBlob = new Blob(['dummy-image'], {type: 'image/png'});
 
       await expect(stripImageExifData(inputBlob)).rejects.toThrow('Failed to load image');
+    });
+  });
+
+  describe('isPreviewableImage', () => {
+    it('returns true for supported image mime types', () => {
+      expect(isPreviewableImage({mimeType: 'image/jpeg'})).toBe(true);
+      expect(isPreviewableImage({mimeType: 'image/png'})).toBe(true);
+      expect(isPreviewableImage({mimeType: 'image/webp'})).toBe(true);
+    });
+
+    it('returns true for supported file extensions', () => {
+      expect(isPreviewableImage({extension: 'jpg'})).toBe(true);
+      expect(isPreviewableImage({extension: 'PNG'})).toBe(true);
+      expect(isPreviewableImage({fileName: 'photo.gif'})).toBe(true);
+    });
+
+    it('returns false for unsupported image formats', () => {
+      expect(isPreviewableImage({mimeType: 'image/heic'})).toBe(false);
+      expect(isPreviewableImage({extension: 'heic'})).toBe(false);
+      expect(isPreviewableImage({fileName: 'photo.heic'})).toBe(false);
+    });
+
+    it('returns false when no mime type or extension is provided', () => {
+      expect(isPreviewableImage({})).toBe(false);
     });
   });
 });
