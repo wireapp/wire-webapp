@@ -11251,7 +11251,7 @@ __metadata:
     "@wireapp/telemetry": "npm:0.3.7"
     "@wireapp/webapp-events": "npm:0.29.2"
     amplify: "https://github.com/wireapp/amplify#head=master"
-    autoprefixer: "npm:10.4.23"
+    autoprefixer: "npm:10.4.24"
     babel-jest: "npm:29.7.0"
     babel-loader: "npm:10.0.0"
     babel-plugin-transform-import-meta: "npm:2.3.3"
@@ -12101,7 +12101,24 @@ __metadata:
   languageName: node
   linkType: hard
 
-"autoprefixer@npm:10.4.23, autoprefixer@npm:^10.4.23, autoprefixer@npm:^10.4.9":
+"autoprefixer@npm:10.4.24":
+  version: 10.4.24
+  resolution: "autoprefixer@npm:10.4.24"
+  dependencies:
+    browserslist: "npm:^4.28.1"
+    caniuse-lite: "npm:^1.0.30001766"
+    fraction.js: "npm:^5.3.4"
+    picocolors: "npm:^1.1.1"
+    postcss-value-parser: "npm:^4.2.0"
+  peerDependencies:
+    postcss: ^8.1.0
+  bin:
+    autoprefixer: bin/autoprefixer
+  checksum: 10/d09c4259a96001256e3150c2734aa0c5f7a53d98cc69ec42ef5fa167aadd804e857040dc3c732f62d80602212ebfd7d8783c9d27f1766a413f637eeac4fefa53
+  languageName: node
+  linkType: hard
+
+"autoprefixer@npm:^10.4.23, autoprefixer@npm:^10.4.9":
   version: 10.4.23
   resolution: "autoprefixer@npm:10.4.23"
   dependencies:
@@ -12914,6 +12931,13 @@ __metadata:
   version: 1.0.30001761
   resolution: "caniuse-lite@npm:1.0.30001761"
   checksum: 10/9ebcef209a08d7c2f3d55b5105fafe48f657b3259a8cdd5842c5445aca9dcb0b6778cae524bde0cd73de508c680222edea594e64954503cbffd992407dbceda2
+  languageName: node
+  linkType: hard
+
+"caniuse-lite@npm:^1.0.30001766":
+  version: 1.0.30001767
+  resolution: "caniuse-lite@npm:1.0.30001767"
+  checksum: 10/786028f1b4036b0fddef29eaa7cee40549136662ed803fda3ca77b05889159ab4469a6e4469f7bb01923336db415b73a845a5522be2d7383af6e9a4784a491fc
   languageName: node
   linkType: hard
 
