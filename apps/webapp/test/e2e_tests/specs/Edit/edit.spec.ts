@@ -37,7 +37,7 @@ test.describe('Edit', () => {
     await pages.conversation().sendMessage('Test Message');
 
     const message = pages.conversation().getMessage({sender: userA});
-    await expect(message).toContainText('Test Message!!!');
+    await expect(message).toContainText('Test Message');
 
     await pages.conversation().editMessage(message);
     await expect(pages.conversation().messageInput).toContainText('Test Message');
