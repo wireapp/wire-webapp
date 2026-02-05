@@ -24,7 +24,6 @@ import {getUser, User} from './data/user';
 import {PageManager} from './pageManager';
 import {connectWithUser, sendConnectionRequest} from './utils/userActions';
 import {mockAudioAndVideoDevices} from './utils/mockVideoDevice.util';
-import {mockNotifications} from './scripts/mock-notifications';
 
 type PagePlugin = (page: Page) => void | Promise<void>;
 
@@ -111,7 +110,6 @@ export const test = baseTest.extend<Fixtures>({
 
       // Add mocked Audio and Video devices (Hardware is treated as part of the test setup)
       await context.addInitScript(mockAudioAndVideoDevices);
-      await context.addInitScript(mockNotifications); // Adding this as an init script might be to early
 
       const page = await context.newPage();
       for (const setupFn of setupFns) {
