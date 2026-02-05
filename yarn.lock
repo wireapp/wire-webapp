@@ -1180,7 +1180,20 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@babel/plugin-proposal-decorators@npm:7.28.6, @babel/plugin-proposal-decorators@npm:^7.22.7":
+"@babel/plugin-proposal-decorators@npm:7.29.0":
+  version: 7.29.0
+  resolution: "@babel/plugin-proposal-decorators@npm:7.29.0"
+  dependencies:
+    "@babel/helper-create-class-features-plugin": "npm:^7.28.6"
+    "@babel/helper-plugin-utils": "npm:^7.28.6"
+    "@babel/plugin-syntax-decorators": "npm:^7.28.6"
+  peerDependencies:
+    "@babel/core": ^7.0.0-0
+  checksum: 10/fa7b9aa1a48993ad60b9e118619ed364aa67da4c634b8a755a6f0529a9f61719723fccfdaf3bf0c6ff693eeee0992a67fb311e0cbe8fed7d48de43cdc8ebff2c
+  languageName: node
+  linkType: hard
+
+"@babel/plugin-proposal-decorators@npm:^7.22.7":
   version: 7.28.6
   resolution: "@babel/plugin-proposal-decorators@npm:7.28.6"
   dependencies:
@@ -11194,7 +11207,7 @@ __metadata:
   resolution: "@wireapp/webapp@workspace:apps/webapp"
   dependencies:
     "@babel/core": "npm:7.28.6"
-    "@babel/plugin-proposal-decorators": "npm:7.28.6"
+    "@babel/plugin-proposal-decorators": "npm:7.29.0"
     "@babel/preset-env": "npm:7.28.6"
     "@babel/preset-react": "npm:7.28.5"
     "@babel/preset-typescript": "npm:7.28.5"
