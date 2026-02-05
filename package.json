@@ -29,7 +29,7 @@
     "@types/node": "24.10.8",
     "@types/tough-cookie": "4.0.5",
     "@types/uuid": "10.0.0",
-    "@typescript-eslint/eslint-plugin": "8.53.1",
+    "@typescript-eslint/eslint-plugin": "8.54.0",
     "@typescript-eslint/parser": "8.53.1",
     "@wireapp/copy-config": "2.3.13",
     "@wireapp/eslint-config": "3.1.9",
