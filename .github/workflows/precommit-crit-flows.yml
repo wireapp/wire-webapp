@@ -129,7 +129,7 @@ jobs:
     name: Check if the PR touches e2e tests
     runs-on: ubuntu-latest
     outputs:
-      edits_e2e_tests: ${{ steps.check_e2e_tests.outputs.edits_e2e_tests}}
+      tests_to_run: ${{ steps.check_e2e_tests.outputs.tests_to_run}}
     steps:
       - uses: actions/checkout@v6
         with:
@@ -140,22 +140,24 @@ jobs:
         run: |
           git diff --exit-code origin/${{ github.base_ref }}...HEAD -- apps/webapp/test/e2e_tests/ || RESULT=$?
 
+          # If the e2e_tests folder was touched within the PR run all tests, otherwise just the critical flow ones
           if [ $RESULT -eq 1 ]; then
+            echo "tests_to_run=" >> $GITHUB_OUTPUT
             echo "E2E Tests have been modified, executing all tests"
           else
+            echo "tests_to_run=@crit-flow-web" >> $GITHUB_OUTPUT
             echo "E2E Tests have not been modified, executing critical flow tests only"
           fi
 
   run_e2e_tests:
     name: Playwright Critical Flow (precommit)
     if: ${{ !cancelled() && github.repository == 'wireapp/wire-webapp' && github.actor != 'dependabot[bot]' && github.actor != 'dependabot' }}
-    needs: [deploy_to_aws, check_edits_to_e2e_tests]
+    needs: [check_edits_to_e2e_tests, deploy_to_aws]
     uses: ./.github/workflows/e2e-tests.yml
     with:
       webappUrl: https://wire-webapp-precommit.zinfra.io/
       backendUrl: https://staging-nginz-https.zinfra.io/
-      # If the e2e_tests folder was touched within the PR run all tests, otherwise just the critical flow ones
-      grep: ${{ needs.check_edits_to_e2e_tests.outputs.edits_e2e_tests && '' || '@crit-flow-web' }}
+      grep: ${{ needs.check_edits_to_e2e_tests.outputs.tests_to_run }}
     secrets:
       OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
 
