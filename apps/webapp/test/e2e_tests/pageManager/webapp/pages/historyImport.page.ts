@@ -23,11 +23,15 @@ export class HistoryImportPage {
   readonly page: Page;
 
   readonly importSuccessHeadline: Locator;
+  readonly wrongBackupHeadline: Locator;
+  readonly wrongBackupInfo: Locator;
 
   constructor(page: Page) {
     this.page = page;
 
     this.importSuccessHeadline = page.getByTestId('status-history-import-success');
+    this.wrongBackupHeadline = page.locator('[data-uie-name="status-history-import-error-headline"]');
+    this.wrongBackupInfo = page.locator('[data-uie-name="status-history-import-error-info"]');
   }
 
   async isVisible() {
