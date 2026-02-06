@@ -94,14 +94,14 @@ test(
 
     await test.step('User A sends an image to User B in a group conversation', async () => {
       await userAPages.conversationList().openConversation(conversationName);
+      await userBPages.conversationList().openConversation(conversationName);
       await userAComponents.inputBarControls().clickShareFile(imageFilePath);
       await userAComponents.inputBarControls().clickSendMessage();
 
-      expect(userBPages.cellsConversation().isImageFromUserVisible(userA)).toBeTruthy();
+      await expect(userBPages.cellsConversation().getImageLocator(userA)).toBeVisible();
     });
 
     await test.step('User B opens the image in the conversation', async () => {
-      await userBPages.conversationList().openConversation(conversationName);
       await userBPages.cellsConversation().clickImage(userA);
 
       expect(await userBModals.cellsFileDetailView().isImageVisible()).toBeTruthy();
