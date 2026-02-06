@@ -22,14 +22,12 @@ test.describe('Notifications', () => {
     const userAPages = PageManager.from(userAPage).webapp.pages;
     const userBPages = PageManager.from(userBPage).webapp.pages;
 
-    // Create group so B can open it while A sends the message
+    // Create group so B can open it while A sends the message so a notification will be sent for it
     await createGroup(userAPages, 'Test Group', [userB]);
+    await userBPages.conversationList().openConversation('Test Group');
 
     // Start intercepting notifications
     const {getNotifications: getUserBNotifications} = await interceptNotifications(userBPage);
-
-    // Open group for user B to the message won't be read immediately
-    await userBPages.conversationList().openConversation('Test Group');
 
     // Send message from A to B in 1on1 conversation
     await userAPages.conversationList().openConversation(userB.fullName, {protocol: 'mls'});
