@@ -10,8 +10,7 @@ import emotionPlugin from '@emotion/eslint-plugin';
 import importPlugin from 'eslint-plugin-import';
 import tsParser from '@typescript-eslint/parser';
 import reactHooksPlugin from 'eslint-plugin-react-hooks';
-// @ts-ignore - No types available for @tony.ganchev/eslint-plugin-header
-import headerPlugin from '@tony.ganchev/eslint-plugin-header';
+import headerPlugin, { HeaderOptions, HeaderRuleConfig } from '@tony.ganchev/eslint-plugin-header';
 import globals from 'globals';
 import type {Linter} from 'eslint';
 
@@ -117,32 +116,38 @@ const config: Linter.Config[] = [
       '@emotion/styled-import': 'error',
       'header-tony/header': [
         'error',
-        'block',
-        [
-          '',
-          ' * Wire',
-          {
-            pattern: ' \\* Copyright \\(C\\) \\d{4} Wire Swiss GmbH',
-            template: ` * Copyright (C) ${year} Wire Swiss GmbH`,
+        {
+          header: {
+            commentType: 'block',
+            lines: [
+              '',
+              ' * Wire',
+              {
+                pattern: ' \\* Copyright \\(C\\) \\d{4} Wire Swiss GmbH',
+                template: ` * Copyright (C) ${year} Wire Swiss GmbH`,
+              },
+              ' *',
+              ' * This program is free software: you can redistribute it and/or modify',
+              ' * it under the terms of the GNU General Public License as published by',
+              ' * the Free Software Foundation, either version 3 of the License, or',
+              ' * (at your option) any later version.',
+              ' *',
+              ' * This program is distributed in the hope that it will be useful,',
+              ' * but WITHOUT ANY WARRANTY; without even the implied warranty of',
+              ' * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the',
+              ' * GNU General Public License for more details.',
+              ' *',
+              ' * You should have received a copy of the GNU General Public License',
+              ' * along with this program. If not, see http://www.gnu.org/licenses/.',
+              ' *',
+              ' ',
+            ],
           },
-          ' *',
-          ' * This program is free software: you can redistribute it and/or modify',
-          ' * it under the terms of the GNU General Public License as published by',
-          ' * the Free Software Foundation, either version 3 of the License, or',
-          ' * (at your option) any later version.',
-          ' *',
-          ' * This program is distributed in the hope that it will be useful,',
-          ' * but WITHOUT ANY WARRANTY; without even the implied warranty of',
-          ' * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the',
-          ' * GNU General Public License for more details.',
-          ' *',
-          ' * You should have received a copy of the GNU General Public License',
-          ' * along with this program. If not, see http://www.gnu.org/licenses/.',
-          ' *',
-          ' ',
-        ],
-        2,
-      ],
+          trailingEmptyLines: {
+            minimum: 2,
+          },
+        } as HeaderOptions,
+      ] as HeaderRuleConfig,
       'id-length': 'warn',
       '@typescript-eslint/explicit-module-boundary-types': 'off',
       '@typescript-eslint/ban-ts-comment': 'off',
