@@ -106,7 +106,7 @@ export class ConversationPage {
     this.cancelRequest = page.getByTestId('do-cancel-request');
   }
 
-  protected getImageLocator(user: User): Locator {
+  getImageLocator(user: User): Locator {
     return this.page
       .getByTestId('item-message')
       .locator('.message-body')

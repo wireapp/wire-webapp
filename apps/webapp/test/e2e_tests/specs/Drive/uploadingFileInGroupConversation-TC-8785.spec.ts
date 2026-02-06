@@ -23,7 +23,7 @@ import {getImageFilePath, getLocalQRCodeValue, ImageQRCodeFileName} from 'test/e
 import {addCreatedTeam, removeCreatedTeam} from 'test/e2e_tests/utils/tearDown.util';
 import {inviteMembers, loginUser} from 'test/e2e_tests/utils/userActions';
 
-import {test, expect} from '../../../test.fixtures';
+import {test, expect} from '../../test.fixtures';
 
 // User A is a team owner, User B is a team member
 let userA = getUser();
@@ -40,7 +40,7 @@ const imageFilePath = getImageFilePath();
 
 test(
   'Uploading an file in a group conversation',
-  {tag: ['@crit-flow-cells', '@regression']},
+  {tag: ['@crit-flow-cells', '@regression', '@TC-8785']},
   async ({pageManager: userAPageManager, browser, api}) => {
     const {pages: userAPages, modals: userAModals, components: userAComponents} = userAPageManager.webapp;
 
@@ -94,14 +94,14 @@ test(
 
     await test.step('User A sends an image to User B in a group conversation', async () => {
       await userAPages.conversationList().openConversation(conversationName);
+      await userBPages.conversationList().openConversation(conversationName);
       await userAComponents.inputBarControls().clickShareFile(imageFilePath);
       await userAComponents.inputBarControls().clickSendMessage();
 
-      expect(userBPages.cellsConversation().isImageFromUserVisible(userA)).toBeTruthy();
+      await expect(userBPages.cellsConversation().getImageLocator(userA)).toBeVisible();
     });
 
     await test.step('User B opens the image in the conversation', async () => {
-      await userBPages.conversationList().openConversation(conversationName);
       await userBPages.cellsConversation().clickImage(userA);
 
       expect(await userBModals.cellsFileDetailView().isImageVisible()).toBeTruthy();
@@ -116,7 +116,7 @@ test(
 
     await test.step('User A opens group conversation files and sees the image file there', async () => {
       await userAPages.conversation().clickFilesTab();
-      await userAPages.cellsConversationFiles().clickFile(ImageQRCodeFileName);
+      await userAPages.cellsConversationFiles().getFile(ImageQRCodeFileName).click();
 
       expect(await userAModals.cellsFileDetailView().isImageVisible()).toBeTruthy();
     });
