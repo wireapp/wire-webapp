@@ -6,7 +6,6 @@ declare global {
 
 export const mockNotifications = () => {
   if (!window.wire?.app?.repository?.notification?.notifications) return;
-  console.log('MARK: Mocking notifications');
 
   window.__wireNotifications ||= [];
 
@@ -14,7 +13,6 @@ export const mockNotifications = () => {
   window.wire.app.repository.notification.notifications.push = (...notifications) => {
     // Every time one or more notifications are pushed to the array also keep a reference to them in the global variable
     window.__wireNotifications.push(...notifications);
-    console.log('MARK: Mocked push notifications:', notifications);
 
     // Use the native push function of the prototype to not modify the behavior
     return Array.prototype.push.apply(window.wire.app.repository.notification.notifications, notifications);
