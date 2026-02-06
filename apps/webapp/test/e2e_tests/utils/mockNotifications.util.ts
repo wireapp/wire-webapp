@@ -38,10 +38,10 @@ const getNotifications = async (page: Page) => {
      * It's necessary to construct a new object containing the important properties of the notification
      * since the class would otherwise be serialized as empty object.
      */
-    window.__wireNotifications.map(n => ({
-      title: n.title,
-      body: n.body,
-      data: n.data,
+    window.__wireNotifications.map(notification => ({
+      title: notification.title,
+      body: notification.body,
+      data: notification.data,
     })),
   );
 };
