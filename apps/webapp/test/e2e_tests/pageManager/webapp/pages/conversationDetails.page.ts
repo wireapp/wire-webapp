@@ -31,6 +31,9 @@ export class ConversationDetailsPage {
   readonly clearConversationContentButton: Locator;
   readonly selectedSearchList: Locator;
   readonly searchList: Locator;
+  readonly deleteGroupButton: Locator;
+  readonly notificationsButton: Locator;
+  readonly editConversationNameButton: Locator;
 
   constructor(page: Page) {
     this.page = page;
@@ -44,6 +47,9 @@ export class ConversationDetailsPage {
     this.clearConversationContentButton = this.conversationDetails.getByRole('button', {name: 'Clear Content'});
     this.selectedSearchList = this.page.getByTestId('selected-search-list');
     this.searchList = this.page.getByTestId('search-list');
+    this.deleteGroupButton = this.page.getByRole('button', {name: 'Delete group'});
+    this.notificationsButton = this.page.getByRole('button', {name: 'Notifications'});
+    this.editConversationNameButton = this.page.getByRole('button', {name: 'Change conversation name'});
   }
 
   async waitForSidebar() {

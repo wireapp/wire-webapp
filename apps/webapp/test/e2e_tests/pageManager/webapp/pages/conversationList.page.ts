@@ -39,6 +39,7 @@ export class ConversationListPage {
   readonly conversationListHeaderTitle: Locator;
   readonly joinCallButton: Locator;
   readonly clearContentButton: Locator;
+  readonly mutedConversationBadge: Locator;
 
   constructor(page: Page) {
     this.page = page;
@@ -60,6 +61,7 @@ export class ConversationListPage {
     this.conversationListHeaderTitle = page.locator('[data-uie-name="conversation-list-header-title"]');
     this.joinCallButton = page.getByRole('button', {name: 'Join'});
     this.clearContentButton = page.getByRole('button', {name: 'Clear content'});
+    this.mutedConversationBadge = page.locator('[data-uie-name="status-silence"]');
   }
 
   async isConversationItemVisible(conversationName: string) {
