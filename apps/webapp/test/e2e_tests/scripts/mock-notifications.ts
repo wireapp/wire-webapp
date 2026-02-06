@@ -1,13 +1,17 @@
+import {type Page} from 'playwright/test';
+
 declare global {
   interface Window {
+    // Declare the custom variable used to store the intercepted notifications on the window object
     __wireNotifications: (typeof window)['wire']['app']['repository']['notification']['notifications'];
   }
 }
 
-export const mockNotifications = () => {
-  if (!window.wire?.app?.repository?.notification?.notifications) return;
+const stubNotifications = () => {
+  if (!window.wire?.app?.repository?.notification?.notifications)
+    throw new Error("Can't stub notifications - Notifications array wasn't initialized yet");
 
-  window.__wireNotifications ||= [];
+  window.__wireNotifications ??= [];
 
   // Mock the push function of the notifications array
   window.wire.app.repository.notification.notifications.push = (...notifications) => {
@@ -19,4 +23,39 @@ export const mockNotifications = () => {
   };
 };
 
-// Maybe try to just re-use the current notifications array and just search it from playwright? <- Issue would be that notifications could disappear from it...
+const getNotifications = async (page: Page) => {
+  return await page.evaluate(() =>
+    /**
+     * It's necessary to construct a new object containing the important properties of the notification
+     * since the class would otherwise be serialized as empty object.
+     */
+    window.__wireNotifications.map(n => ({
+      title: n.title,
+      body: n.body,
+      data: n.data,
+    })),
+  );
+};
+
+/**
+ * Start intercepting the notifications pushed for the given page
+ * @example
+ * ```ts
+ * const { getNotifications } = await interceptNotifications(userBPage);
+ *
+ * // Send a notification to userB
+ *
+ * await expect.poll(() => getNotifications()).toHaveLength(1):
+ * ```
+ */
+export const interceptNotifications = async (page: Page) => {
+  await page.evaluate(stubNotifications);
+
+  return {
+    /**
+     * Async function to get the notifications the intercepted page received so far
+     * Pass this to `expect.poll()` to avoid flake due to timing issues.
+     */
+    getNotifications: () => getNotifications(page),
+  };
+};

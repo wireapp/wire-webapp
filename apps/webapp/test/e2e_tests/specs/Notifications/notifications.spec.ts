@@ -1,7 +1,6 @@
-import {Page} from 'playwright/test';
 import {User} from 'test/e2e_tests/data/user';
 import {PageManager} from 'test/e2e_tests/pageManager';
-import {mockNotifications} from 'test/e2e_tests/scripts/mock-notifications';
+import {interceptNotifications} from 'test/e2e_tests/scripts/mock-notifications';
 import {test, withLogin, withConnectedUser, expect} from 'test/e2e_tests/test.fixtures';
 import {createGroup} from 'test/e2e_tests/utils/userActions';
 
@@ -27,7 +26,7 @@ test.describe('Notifications', () => {
     await createGroup(userAPages, 'Test Group', [userB]);
 
     // Start intercepting notifications
-    await userBPage.evaluate(mockNotifications);
+    const {getNotifications: getUserBNotifications} = await interceptNotifications(userBPage);
 
     // Open group for user B to the message won't be read immediately
     await userBPages.conversationList().openConversation('Test Group');
@@ -38,7 +37,7 @@ test.describe('Notifications', () => {
 
     // Check the notifications B received to contain the message from A
     await expect
-      .poll(() => getNotifications(userBPage))
+      .poll(() => getUserBNotifications())
       .toEqual(
         expect.arrayContaining([
           expect.objectContaining({
@@ -49,13 +48,3 @@ test.describe('Notifications', () => {
       );
   });
 });
-
-const getNotifications = async (page: Page) => {
-  return await page.evaluate(() =>
-    window.__wireNotifications.map(n => ({
-      title: n.title,
-      body: n.body,
-      data: n.data,
-    })),
-  );
-};
