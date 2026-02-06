@@ -20,6 +20,7 @@
 import {NodeFlags, RestShareLink} from '@wireapp/api-client/lib/cells';
 import {container, singleton} from 'tsyringe';
 
+import {getFileExtension} from 'Util/util';
 import {createUuid} from 'Util/uuid';
 
 import {APIClient} from '../../service/APIClientSingleton';
@@ -46,11 +47,18 @@ type SortDirection = 'asc' | 'desc';
 
 const DEFAULT_MAX_FILES_LIMIT = 100;
 
+type TemplateMap = {
+  docx?: string;
+  xlsx?: string;
+  pptx?: string;
+};
+
 @singleton()
 export class CellsRepository {
   private readonly basePath = 'wire-cells-web';
   private isInitialized = false;
   private uploadControllers: Map<string, AbortController> = new Map();
+  private templatesPromise?: Promise<TemplateMap>;
 
   constructor(private readonly apiClient = container.resolve(APIClient)) {}
 
@@ -176,7 +184,62 @@ export class CellsRepository {
     const uuid = createUuid();
     const versionId = createUuid();
 
-    return this.apiClient.api.cells.createFile({path: filePath, uuid, versionId});
+    const fileExtension = getFileExtension(name).toLowerCase();
+    const templateUuid = await this.getTemplateUuidForExtension(fileExtension);
+    const contentType = this.getContentTypeForExtension(fileExtension);
+
+    return this.apiClient.api.cells.createFile({path: filePath, uuid, versionId, templateUuid, contentType});
+  }
+
+  private async getTemplateUuidForExtension(extension: string): Promise<string | undefined> {
+    if (!extension) {
+      return undefined;
+    }
+
+    if (!this.templatesPromise) {
+      this.templatesPromise = this.fetchTemplateMap();
+    }
+
+    const templates = await this.templatesPromise;
+    return templates[extension as keyof TemplateMap];
+  }
+
+  private async fetchTemplateMap(): Promise<TemplateMap> {
+    try {
+      const response = await this.apiClient.api.cells.listTemplates();
+      const templates = response?.Templates || [];
+
+      return templates.reduce<TemplateMap>((acc, template) => {
+        const label = (template.Label || '').toLowerCase();
+        const path = (template.Node as {Node?: {Path?: string}} | undefined)?.Node?.Path || '';
+        const extension = getFileExtension(path).toLowerCase();
+
+        if (extension === 'docx' || label.includes('document')) {
+          acc.docx = acc.docx || template.UUID;
+        } else if (extension === 'xlsx' || label.includes('spreadsheet')) {
+          acc.xlsx = acc.xlsx || template.UUID;
+        } else if (extension === 'pptx' || label.includes('presentation')) {
+          acc.pptx = acc.pptx || template.UUID;
+        }
+
+        return acc;
+      }, {});
+    } catch (error) {
+      return {};
+    }
+  }
+
+  private getContentTypeForExtension(extension: string): string | undefined {
+    switch (extension) {
+      case 'docx':
+        return 'application/vnd.openxmlformats-officedocument.wordprocessingml.document';
+      case 'xlsx':
+        return 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
+      case 'pptx':
+        return 'application/vnd.openxmlformats-officedocument.presentationml.presentation';
+      default:
+        return undefined;
+    }
   }
 
   async createPublicLink({

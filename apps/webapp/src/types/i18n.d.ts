@@ -422,6 +422,10 @@ declare module 'I18n/en-US.json' {
     'cells.newItemMenuModal.headlineFile': `Create file`;
     'cells.newItemMenuModal.headlineFolder': `Create folder`;
     'cells.newItemMenuModal.label': `Name`;
+    'cells.newItemMenuModal.typeLabel': `File type`;
+    'cells.newItemMenuModal.typeDocument': `Document (.docx)`;
+    'cells.newItemMenuModal.typeSpreadsheet': `Spreadsheet (.xlsx)`;
+    'cells.newItemMenuModal.typePresentation': `Presentation (.pptx)`;
     'cells.newItemMenuModal.placeholderFile': `Enter file name`;
     'cells.newItemMenuModal.placeholderFolder': `Enter folder name`;
     'cells.newItemMenuModal.primaryAction': `Create`;

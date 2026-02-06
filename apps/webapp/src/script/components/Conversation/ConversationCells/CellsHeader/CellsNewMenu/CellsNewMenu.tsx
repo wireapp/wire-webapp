@@ -57,6 +57,9 @@ export const CellsNewMenu = ({cellsRepository, conversationQualifiedId, onRefres
           </Button>
         </DropdownMenu.Trigger>
         <DropdownMenu.Content>
+          <DropdownMenu.Item onClick={() => openModal(CellNodeType.FILE)}>
+            {t('cells.newItemMenu.file')}
+          </DropdownMenu.Item>
           <DropdownMenu.Item onClick={() => openModal(CellNodeType.FOLDER)}>
             {t('cells.newItemMenu.folder')}
           </DropdownMenu.Item>
