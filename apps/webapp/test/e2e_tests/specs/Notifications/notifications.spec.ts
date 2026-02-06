@@ -21,12 +21,6 @@ test.describe('Notifications', () => {
     const userAPages = PageManager.from(userAPage).webapp.pages;
     const userBPages = PageManager.from(userBPage).webapp.pages;
 
-    await userBPage.evaluate(() => {
-      // @ts-expect-error --- This function is private within the class
-      window.wire.app.repository.notification.shouldShowNotification = () => true;
-      window.wire.app.repository.notification.checkPermission = () => Promise.resolve(true);
-    });
-
     await createGroup(userAPages, 'Test Group', [userB]);
 
     await userAPages.conversationList().openConversation(userB.fullName, {protocol: 'mls'});
