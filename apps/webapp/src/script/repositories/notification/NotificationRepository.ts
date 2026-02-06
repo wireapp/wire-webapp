@@ -90,7 +90,7 @@ interface WebappNotifications extends Notification {
 export class NotificationRepository {
   private readonly conversationRepository: ConversationRepository;
   private readonly logger: Logger;
-  private readonly notifications: WebappNotifications[];
+  readonly notifications: WebappNotifications[];
   private readonly notificationsPreference: ko.Observable<NotificationPreference>;
   private readonly assetRepository: AssetRepository;
   private isSoftLock = false;
