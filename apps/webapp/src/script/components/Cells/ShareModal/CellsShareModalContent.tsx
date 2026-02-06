@@ -148,7 +148,7 @@ const DEFAULT_SWITCH_COLORS: SwitchColorProps = {
   disabledColorDark: COLOR_V2.GRAY_60,
 };
 
-const DEFAULT_LABELS: CellsShareModalContentLabels = {
+const getDefaultLabels = (): CellsShareModalContentLabels => ({
   enablePublicLink: t('cells.shareModal.enablePublicLink'),
   password: t('cells.shareModal.password'),
   passwordDescription: t('cells.shareModal.password.description'),
@@ -172,7 +172,7 @@ const DEFAULT_LABELS: CellsShareModalContentLabels = {
   passwordCopied: t('guestOptionsPasswordCopyToClipboardSuccess'),
   showTogglePasswordLabel: t('showTogglePasswordLabel'),
   hideTogglePasswordLabel: t('hideTogglePasswordLabel'),
-};
+});
 
 export const CellsShareModalContent = ({
   publicLinkDescription,
@@ -184,7 +184,7 @@ export const CellsShareModalContent = ({
   styles,
   switchColors,
 }: CellsShareModalContentProps) => {
-  const resolvedLabels = {...DEFAULT_LABELS, ...labels};
+  const resolvedLabels = {...getDefaultLabels(), ...labels};
   const shouldShowLink = publicLink.isEnabled && publicLink.status === 'success' && publicLink.link;
   const areDependentTogglesDisabled = !publicLink.isEnabled;
   const publicLinkColors = switchColors?.publicLink ?? DEFAULT_SWITCH_COLORS;
