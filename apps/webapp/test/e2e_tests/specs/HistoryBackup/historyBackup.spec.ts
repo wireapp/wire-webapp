@@ -74,16 +74,18 @@ test.describe('History Backup', () => {
       const messageUserA = 'Message from User A';
       const messageUserB = 'Message from User B';
 
-      await userAPages.conversationList().openConversation(conversationName);
-      await userAPages.conversation().sendMessage(messageUserA);
-      await userBPages.conversationList().openConversation(conversationName);
-      await userBPages.conversation().sendMessage(messageUserB);
+      await test.step('User A are writing messages to each other', async () => {
+        await userAPages.conversationList().openConversation(conversationName);
+        await userAPages.conversation().sendMessage(messageUserA);
+        await userBPages.conversationList().openConversation(conversationName);
+        await userBPages.conversation().sendMessage(messageUserB);
+      });
 
       // User A creates Backup
       await userAComponents.conversationSidebar().clickPreferencesButton();
       const backupName = await createAndSaveBackup(userAPageManager);
 
-      await test.step('Member changes their email address to a new email address', async () => {
+      await test.step('User A changes their Email address', async () => {
         const newEmail = generateWireEmail(userA.lastName);
         await userAPages.account().changeEmailAddress(newEmail);
         await userAModals.acknowledge().clickAction(); // Acknowledge verify email address modal
@@ -94,9 +96,9 @@ test.describe('History Backup', () => {
         userA.email = newEmail;
       });
 
-      await test.step('Member resets their password ', async () => {
+      await test.step('User A changes their Password', async () => {
         const [newPage] = await Promise.all([
-          userAPageManager.getContext().waitForEvent('page'), // Wait for the new tab
+          userAPageManager.getContext().waitForEvent('page'),
           userAPages.account().clickResetPasswordButton(),
         ]);
 
@@ -104,16 +106,15 @@ test.describe('History Backup', () => {
         const resetPasswordPage = resetPasswordPageManager.webapp.pages.requestResetPassword();
         await resetPasswordPage.requestPasswordResetForEmail(userA.email);
         const resetPasswordUrl = await api.inbucket.getResetPasswordURL(userA.email);
-        await newPage.close(); // Close the new tab
+        await newPage.close();
 
         const newPassword = generateSecurePassword();
-        userA.password = newPassword; // Update member's password for password reset
+        userA.password = newPassword;
 
         await userAPageManager.openUrl(resetPasswordUrl);
         await userAPages.resetPassword().setNewPassword(newPassword);
         await userAPages.resetPassword().isPasswordChangeMessageVisible();
 
-        // Logging in with the new password
         await userAPageManager.openMainPage();
         await loginUser(userA, userAPageManager);
       });
@@ -121,10 +122,12 @@ test.describe('History Backup', () => {
       await userAComponents.conversationSidebar().clickPreferencesButton();
       await userAPages.account().backupFileInput.setInputFiles(backupName);
 
-      await userAComponents.conversationSidebar().allConverationsButton.click();
-      await userAPages.conversationList().openConversation(conversationName);
-      await expect(userAPages.conversation().getMessage({sender: userB})).toContainText(messageUserB);
-      await expect(userAPages.conversation().getMessage({sender: userA})).toContainText(messageUserA);
+      await test.step('Validate conversation is still visible with all messages after restoring backup', async () => {
+        await userAComponents.conversationSidebar().allConverationsButton.click();
+        await userAPages.conversationList().openConversation(conversationName);
+        await expect(userAPages.conversation().getMessage({sender: userB})).toContainText(messageUserB);
+        await expect(userAPages.conversation().getMessage({sender: userA})).toContainText(messageUserA);
+      });
     },
   );
 
@@ -143,27 +146,30 @@ test.describe('History Backup', () => {
       const messageUserA = 'Message from User A';
       const messageUserB = 'Message from User B';
 
-      await userAPages.conversationList().openConversation(userB.fullName, {protocol: 'mls'});
-      await userAPages.conversation().sendMessage(messageUserA);
-      await userBPages.conversationList().openConversation(userA.fullName, {protocol: 'mls'});
-      await userBPages.conversation().sendMessage(messageUserB);
+      await test.step('User A and B are writing messages to each other', async () => {
+        await userAPages.conversationList().openConversation(userB.fullName, {protocol: 'mls'});
+        await userAPages.conversation().sendMessage(messageUserA);
+        await userBPages.conversationList().openConversation(userA.fullName, {protocol: 'mls'});
+        await userBPages.conversation().sendMessage(messageUserB);
+      });
 
-      // User A creates History Backup
-      await userAComponents.conversationSidebar().clickPreferencesButton();
-      const backupName = await createAndSaveBackup(userAPageManager);
+      await test.step('User A creates History Backup and User B tries to restore it', async () => {
+        await userAComponents.conversationSidebar().clickPreferencesButton();
+        const backupName = await createAndSaveBackup(userAPageManager);
+        await logOutUser(userBPageManager, true);
+        await loginUser(userB, userBPageManager);
+        await userBPages.historyInfo().clickConfirmButton();
+        await userBComponents.conversationSidebar().clickPreferencesButton();
+        await userBPages.account().backupFileInput.setInputFiles(backupName);
+      });
 
-      // User B tries to import History Backup from User A
-      await logOutUser(userBPageManager, true);
-      await loginUser(userB, userBPageManager);
-      await userBPages.historyInfo().clickConfirmButton();
-      await userBComponents.conversationSidebar().clickPreferencesButton();
-      await userBPages.account().backupFileInput.setInputFiles(backupName);
-
-      const errorHeadline = userBPages.historyImport().wrongBackupHeadline;
-      const errorInfo = userBPages.historyImport().wrongBackupInfo;
-      await expect(errorHeadline).toBeVisible();
-      await expect(errorHeadline).toHaveText('Wrong backup');
-      await expect(errorInfo).toHaveText('You cannot restore history from a different account.');
+      await test.step('Validate User B cannot import History Backup from User A', async () => {
+        const errorHeadline = userBPages.historyImport().wrongBackupHeadline;
+        const errorInfo = userBPages.historyImport().wrongBackupInfo;
+        await expect(errorHeadline).toBeVisible();
+        await expect(errorHeadline).toHaveText('Wrong backup');
+        await expect(errorInfo).toHaveText('You cannot restore history from a different account.');
+      });
     },
   );
 
@@ -184,39 +190,44 @@ test.describe('History Backup', () => {
       const messageUserA = 'Message from User A';
       const messageUserB = 'Message from User B';
 
-      await userAPages.conversationList().openConversation(conversationName);
-      await userAPages.conversation().sendMessage(messageUserA);
-      await userBPages.conversationList().openConversation(conversationName);
-      await userBPages.conversation().sendMessage(messageUserB);
-
-      // User A creates Backup
-      await userAComponents.conversationSidebar().clickPreferencesButton();
-      const backupName = await createAndSaveBackup(userAPageManager);
-      await userAComponents.conversationSidebar().allConverationsButton.click();
-      await userAPages.conversationList().openConversation(userB.fullName, {protocol: 'mls'});
-
-      // User B renames group conversation
-      await userBPages.conversation().conversationInfoButton.click();
-      await userBPages.conversationDetails().editConversationNameButton.click();
-      const textFieldConversationName = userBPages
-        .conversationDetails()
-        .page.locator('textarea[data-uie-name="enter-name"]');
-      await textFieldConversationName.fill('');
       const renamedConversationName = 'renamedConversationName';
-      await textFieldConversationName.fill(renamedConversationName);
-      await textFieldConversationName.press('Enter');
 
-      await userAComponents.conversationSidebar().clickPreferencesButton();
-      await userAPages.account().backupFileInput.setInputFiles(backupName);
+      await test.step('User A and B writing in their group conversation', async () => {
+        await userAPages.conversationList().openConversation(conversationName);
+        await userAPages.conversation().sendMessage(messageUserA);
+        await userBPages.conversationList().openConversation(conversationName);
+        await userBPages.conversation().sendMessage(messageUserB);
+      });
 
-      // User A sees renamed conversation
-      await userAComponents.conversationSidebar().allConverationsButton.click();
-      await expect(userAPages.conversationList().getConversationLocator(renamedConversationName)).toBeVisible();
+      await test.step('User A creates History Backup, User B renames group conversation and User A restores the Backup', async () => {
+        await userAComponents.conversationSidebar().clickPreferencesButton();
+        const backupName = await createAndSaveBackup(userAPageManager);
+        await userAComponents.conversationSidebar().allConverationsButton.click();
+        await userAPages.conversationList().openConversation(userB.fullName, {protocol: 'mls'});
+        // User B renames group conversation
+        await userBPages.conversation().conversationInfoButton.click();
+        await userBPages.conversationDetails().editConversationNameButton.click();
+        const textFieldConversationName = userBPages
+          .conversationDetails()
+          .page.locator('textarea[data-uie-name="enter-name"]');
+        await textFieldConversationName.fill('');
+        await textFieldConversationName.fill(renamedConversationName);
+        await textFieldConversationName.press('Enter');
 
-      // User A sees system message that User B had renamed the conversation
-      await userAPages.conversationList().openConversation(renamedConversationName);
-      const renamedSystemMessage = userAPages.conversation().systemMessages.last();
-      await expect(renamedSystemMessage).toContainText(`${userB.fullName} renamed the conversation`);
+        await userAComponents.conversationSidebar().clickPreferencesButton();
+        await userAPages.account().backupFileInput.setInputFiles(backupName);
+      });
+
+      await test.step('Validate User A sees renamed conversation and system message', async () => {
+        // User A sees renamed conversation
+        await userAComponents.conversationSidebar().allConverationsButton.click();
+        await expect(userAPages.conversationList().getConversationLocator(renamedConversationName)).toBeVisible();
+
+        // User A sees system message that User B had renamed the conversation
+        await userAPages.conversationList().openConversation(renamedConversationName);
+        const renamedSystemMessage = userAPages.conversation().systemMessages.last();
+        await expect(renamedSystemMessage).toContainText(`${userB.fullName} renamed the conversation`);
+      });
     },
   );
 
@@ -237,42 +248,49 @@ test.describe('History Backup', () => {
       const messageUserA = 'Message from User A';
       const messageUserB = 'Message from User B';
 
-      await userAPages.conversationList().openConversation(conversationName);
-      await userAPages.conversation().sendMessage(messageUserA);
-      await userBPages.conversationList().openConversation(conversationName);
-      await userBPages.conversation().sendMessage(messageUserB);
+      await test.step('User A and B writing messages to each other', async () => {
+        await userAPages.conversationList().openConversation(conversationName);
+        await userAPages.conversation().sendMessage(messageUserA);
+        await userBPages.conversationList().openConversation(conversationName);
+        await userBPages.conversation().sendMessage(messageUserB);
+      });
 
-      // User A mutes group conversation with User B
-      await userAPages.conversation().conversationInfoButton.click();
-      await userAPages.conversationDetails().notificationsButton.click();
-      await userAPages
-        .conversationDetails()
-        .page.getByRole('radiogroup')
-        .locator('label', {hasText: 'Nothing'})
-        .click();
+      await test.step('User A mutes group conversation with User B', async () => {
+        await userAPages.conversation().conversationInfoButton.click();
+        await userAPages.conversationDetails().notificationsButton.click();
+        await userAPages
+          .conversationDetails()
+          .page.getByRole('radiogroup')
+          .locator('label', {hasText: 'Nothing'})
+          .click();
+      });
 
-      // User A archives 1:1 conversation with User B
-      await userAPages.conversationList().openConversation(userB.fullName);
-      await userAPages.conversation().conversationInfoButton.click();
-      await userAPages.conversationDetails().archiveButton.click();
+      await test.step('User A archives 1:1 conversation with User B', async () => {
+        await userAPages.conversationList().openConversation(userB.fullName);
+        await userAPages.conversation().conversationInfoButton.click();
+        await userAPages.conversationDetails().archiveButton.click();
+      });
 
-      // User A creates Backup
-      await userAComponents.conversationSidebar().clickPreferencesButton();
-      const backupName = await createAndSaveBackup(userAPageManager);
+      await test.step('User A creates History Backup and restores it', async () => {
+        await userAComponents.conversationSidebar().clickPreferencesButton();
+        const backupName = await createAndSaveBackup(userAPageManager);
 
-      await logOutUser(userAPageManager, true);
-      await loginUser(userA, userAPageManager);
-      await userAPages.historyInfo().clickConfirmButton();
-      await userAComponents.conversationSidebar().clickPreferencesButton();
-      await userAPages.account().backupFileInput.setInputFiles(backupName);
+        await logOutUser(userAPageManager, true);
+        await loginUser(userA, userAPageManager);
+        await userAPages.historyInfo().clickConfirmButton();
+        await userAComponents.conversationSidebar().clickPreferencesButton();
+        await userAPages.account().backupFileInput.setInputFiles(backupName);
+      });
 
-      await userAComponents.conversationSidebar().allConverationsButton.click();
-      await userAPages.conversationList().openConversation(conversationName);
-      await expect(userAPages.conversationList().mutedConversationBadge).toBeVisible();
+      await test.step('Validate muted and archived state are the same', async () => {
+        await userAComponents.conversationSidebar().allConverationsButton.click();
+        await userAPages.conversationList().openConversation(conversationName);
+        await expect(userAPages.conversationList().mutedConversationBadge).toBeVisible();
 
-      await userAComponents.conversationSidebar().archiveButton.click();
-      const archivedConversation = userAPages.conversationList().getConversationLocator(userB.fullName);
-      await expect(archivedConversation).toBeVisible();
+        await userAComponents.conversationSidebar().archiveButton.click();
+        const archivedConversation = userAPages.conversationList().getConversationLocator(userB.fullName);
+        await expect(archivedConversation).toBeVisible();
+      });
     },
   );
 
@@ -291,30 +309,34 @@ test.describe('History Backup', () => {
       const messageUserA = 'Message from User A';
       const messageUserB = 'Message from User B';
 
-      await userAPages.conversationList().openConversation(userB.fullName, {protocol: 'mls'});
-      await userAPages.conversation().sendMessage(messageUserA);
-      await userBPages.conversationList().openConversation(userA.fullName, {protocol: 'mls'});
-      await userBPages.conversation().sendMessage(messageUserB);
+      await test.step('User A and B writing messages to each other', async () => {
+        await userAPages.conversationList().openConversation(userB.fullName, {protocol: 'mls'});
+        await userAPages.conversation().sendMessage(messageUserA);
+        await userBPages.conversationList().openConversation(userA.fullName, {protocol: 'mls'});
+        await userBPages.conversation().sendMessage(messageUserB);
+      });
 
-      // User A creates History Backup
-      await userAComponents.conversationSidebar().clickPreferencesButton();
-      const backupName = await createAndSaveBackup(userAPageManager, userA.password);
+      await test.step('User A creates History Backup and tries to restore it with wrong password', async () => {
+        // User A creates History Backup
+        await userAComponents.conversationSidebar().clickPreferencesButton();
+        const backupName = await createAndSaveBackup(userAPageManager, userA.password);
 
-      await logOutUser(userAPageManager, true);
-      await loginUser(userA, userAPageManager);
+        await logOutUser(userAPageManager, true);
+        await loginUser(userA, userAPageManager);
 
-      // User A tries to restore backup with wrong password
-      await userAPages.historyInfo().clickConfirmButton();
-      await userAComponents.conversationSidebar().clickPreferencesButton();
-      await userAPages.account().backupFileInput.setInputFiles(backupName);
-      await userAModals.passwordAdvancedSecurity().enterPassword('wrongPassword1.');
-      await userAModals.passwordAdvancedSecurity().clickAction();
+        // User A tries to restore backup with wrong password
+        await userAPages.historyInfo().clickConfirmButton();
+        await userAComponents.conversationSidebar().clickPreferencesButton();
+        await userAPages.account().backupFileInput.setInputFiles(backupName);
+        await userAModals.passwordAdvancedSecurity().enterPassword('wrongPassword1.');
+        await userAModals.passwordAdvancedSecurity().clickAction();
 
-      const errorHeadline = userAPages.historyImport().wrongBackupHeadline;
-      const errorInfo = userAPages.historyImport().wrongBackupInfo;
-      await expect(errorHeadline).toBeVisible();
-      await expect(errorHeadline).toHaveText('Wrong Password');
-      await expect(errorInfo).toHaveText('Please verify your input and try again');
+        const errorHeadline = userAPages.historyImport().wrongBackupHeadline;
+        const errorInfo = userAPages.historyImport().wrongBackupInfo;
+        await expect(errorHeadline).toBeVisible();
+        await expect(errorHeadline).toHaveText('Wrong Password');
+        await expect(errorInfo).toHaveText('Please verify your input and try again');
+      });
     },
   );
 
@@ -335,26 +357,35 @@ test.describe('History Backup', () => {
       const messageUserA = 'Message from User A';
       const messageUserB = 'Message from User B';
 
-      await userAPages.conversationList().openConversation(conversationName);
-      await userAPages.conversation().sendMessage(messageUserA);
-      await userBPages.conversationList().openConversation(conversationName);
-      await userBPages.conversation().sendMessage(messageUserB);
+      await test.step('User A and User B are writing messages to each other', async () => {
+        await userAPages.conversationList().openConversation(conversationName);
+        await userAPages.conversation().sendMessage(messageUserA);
+        await userBPages.conversationList().openConversation(conversationName);
+        await userBPages.conversation().sendMessage(messageUserB);
+      });
 
-      await userAPages.conversation().conversationInfoButton.click();
-      await userAPages.conversationDetails().deleteGroupButton.click();
-      const deleteGroupModal = userAModals.confirm();
-      expect(await deleteGroupModal.getModalTitle()).toContain('Delete group conversation?');
-      await deleteGroupModal.clickAction();
+      await test.step('User A deletes group conversation with User B', async () => {
+        await userAPages.conversation().conversationInfoButton.click();
+        await userAPages.conversationDetails().deleteGroupButton.click();
+        const deleteGroupModal = userAModals.confirm();
+        expect(await deleteGroupModal.getModalTitle()).toContain('Delete group conversation?');
+        await deleteGroupModal.clickAction();
+      });
 
-      await userAComponents.conversationSidebar().clickPreferencesButton();
-      const backupName = await createAndSaveBackup(userAPageManager);
+      await test.step('User A creates History Backup', async () => {
+        await userAComponents.conversationSidebar().clickPreferencesButton();
+        const backupName = await createAndSaveBackup(userAPageManager);
 
-      await logOutUser(userAPageManager, true);
-      await loginUser(userA, userAPageManager);
-      await userAPages.historyInfo().clickConfirmButton();
-      await userAComponents.conversationSidebar().clickPreferencesButton();
-      await userAPages.account().backupFileInput.setInputFiles(backupName);
-      await expect(userAPages.conversationList().getConversationLocator(conversationName)).not.toBeVisible();
+        await logOutUser(userAPageManager, true);
+        await loginUser(userA, userAPageManager);
+        await userAPages.historyInfo().clickConfirmButton();
+        await userAComponents.conversationSidebar().clickPreferencesButton();
+        await userAPages.account().backupFileInput.setInputFiles(backupName);
+      });
+
+      await test.step('Validate deleted group conversation is no longer visible', async () => {
+        await expect(userAPages.conversationList().getConversationLocator(conversationName)).not.toBeVisible();
+      });
     },
   );
 });
