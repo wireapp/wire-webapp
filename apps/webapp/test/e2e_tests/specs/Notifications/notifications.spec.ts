@@ -1,6 +1,6 @@
 import {User} from 'test/e2e_tests/data/user';
 import {PageManager} from 'test/e2e_tests/pageManager';
-import {interceptNotifications} from 'test/e2e_tests/scripts/mock-notifications';
+import {interceptNotifications} from 'test/e2e_tests/utils/mockNotifications.util';
 import {test, withLogin, withConnectedUser, expect} from 'test/e2e_tests/test.fixtures';
 import {createGroup} from 'test/e2e_tests/utils/userActions';
 
