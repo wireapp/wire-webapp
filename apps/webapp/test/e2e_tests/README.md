@@ -9,7 +9,7 @@ Have 1Password's cli installed (op)
 Before running tests create the env file by
 
 ```
-op inject -i test/e2e_tests/.env.staging.tpl -o test/e2e_tests/.env
+op inject -i apps/webapp/test/e2e_tests/.env.staging.tpl -o apps/webapp/test/e2e_tests/.env
 ```
 
 It will generate .env file with variables from 1Password

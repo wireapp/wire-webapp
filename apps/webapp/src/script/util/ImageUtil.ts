@@ -157,3 +157,25 @@ const isInvalidSegmentLength = (view: DataView, offset: number): boolean => {
 const getNextOffset = (view: DataView, offset: number): number => {
   return INITIAL_OFFSET + view.getUint16(offset, false);
 };
+
+const PREVIEWABLE_IMAGE_MIME_TYPES = new Set(['image/png', 'image/jpeg', 'image/gif', 'image/webp']);
+const PREVIEWABLE_IMAGE_EXTENSIONS = new Set(['png', 'jpg', 'jpeg', 'gif', 'webp']);
+
+export const isPreviewableImage = ({
+  mimeType,
+  fileName,
+  extension,
+}: {
+  mimeType?: string;
+  fileName?: string;
+  extension?: string;
+}): boolean => {
+  const normalizedMimeType = mimeType?.toLowerCase();
+  if (normalizedMimeType && PREVIEWABLE_IMAGE_MIME_TYPES.has(normalizedMimeType)) {
+    return true;
+  }
+
+  const normalizedExtension = extension?.toLowerCase() ?? fileName?.split('.').pop()?.toLowerCase();
+
+  return !!normalizedExtension && PREVIEWABLE_IMAGE_EXTENSIONS.has(normalizedExtension);
+};
