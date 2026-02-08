@@ -67,6 +67,7 @@ module.exports = defineConfig({
         ...devices['Desktop Chrome'],
         channel: 'chrome',
         headless: process.env.HEADLESS !== 'false',
+        permissions: ['notifications'],
         launchOptions: {
           args: [
             '--use-fake-device-for-media-stream', // Provide fake devices for audio & video device input

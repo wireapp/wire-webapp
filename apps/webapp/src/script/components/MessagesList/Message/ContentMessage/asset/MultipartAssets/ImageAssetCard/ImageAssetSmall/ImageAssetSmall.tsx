@@ -48,7 +48,9 @@ export const ImageAssetSmall = ({
   timestamp,
 }: ImageAssetSmallProps) => {
   const [isLoaded, setIsLoaded] = useState(false);
+  const [hasLoadError, setHasLoadError] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
+  const isUnavailable = isError || hasLoadError;
 
   return (
     <>
@@ -62,14 +64,25 @@ export const ImageAssetSmall = ({
         aria-haspopup="dialog"
         aria-expanded={isOpen}
         aria-controls={id}
-        disabled={isError}
+        disabled={isUnavailable}
       >
         <MediaFilePreviewCard
           label={src ? t('conversationFileImagePreviewLabel', {src}) : ''}
           isLoading={!isLoaded}
-          isError={isError}
+          isError={isUnavailable}
         >
-          {!isLoading && !isError && src && <img src={src} alt="" css={imageStyles} onLoad={() => setIsLoaded(true)} />}
+          {!isLoading && !isUnavailable && src && (
+            <img
+              src={src}
+              alt=""
+              css={imageStyles}
+              onLoad={() => setIsLoaded(true)}
+              onError={() => {
+                setHasLoadError(true);
+                setIsLoaded(true);
+              }}
+            />
+          )}
         </MediaFilePreviewCard>
       </button>
       <FileFullscreenModal
