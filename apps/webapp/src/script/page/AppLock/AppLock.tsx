@@ -467,7 +467,6 @@ const AppLock = ({
               aria-label={t('modalAppLockLockedTitle', {brandName: Config.getConfig().BRAND_NAME})}
               label={t('modalAppLockPasscode')}
               autoFocus
-              className="modal__input"
               type="password"
               id={Math.random().toString()}
               name="password"
