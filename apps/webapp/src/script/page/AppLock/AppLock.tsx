@@ -481,24 +481,15 @@ const AppLock = ({
               {t('modalAppLockLockedUnlockButton')}
             </Button>
 
-            <button
+            <Link
+              variant={LinkVariant.PRIMARY}
               type="button"
               className="button-reset-default block modal__cta"
               data-uie-name="go-forgot-passphrase"
               onClick={onClickForgot}
             >
               {t('modalAppLockLockedForgotCTA')}
-            </button>
-
-            <div className="modal__buttons">
-              <button
-                type="submit"
-                className="modal__button modal__button--primary modal__button--full"
-                data-uie-name="do-action"
-              >
-                {t('modalAppLockLockedUnlockButton')}
-              </button>
-            </div>
+            </Link>
           </form>
         )}
 
