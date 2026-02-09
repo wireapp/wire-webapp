@@ -22,58 +22,51 @@ import {Locator, Page} from '@playwright/test';
 export class AudioVideoSettingsPage {
   readonly page: Page;
 
-  readonly microphoneDrowdown: Locator;
-  readonly speakerDrowdown: Locator;
-
-  readonly cameraDrowdown: Locator;
+  readonly microphoneDropdown: Locator;
+  readonly speakerDropdown: Locator;
+  readonly cameraDropdown: Locator;
 
   constructor(page: Page) {
     this.page = page;
 
-    this.microphoneDrowdown = page.locator('[data-uie-name="enter-microphone"]');
-    this.speakerDrowdown = page.locator('[data-uie-name="enter-speaker"]');
-    this.cameraDrowdown = page.locator('[data-uie-name="enter-camera"]');
+    this.microphoneDropdown = page.locator('[data-uie-name="enter-microphone"]');
+    this.speakerDropdown = page.locator('[data-uie-name="enter-speaker"]');
+    this.cameraDropdown = page.locator('[data-uie-name="enter-camera"]');
   }
 
   async selectMicrophone(microphoneName: string) {
-    await this.microphoneDrowdown.click();
-    await this.getMicrophoneOptions().locator(`text=${microphoneName}`).click();
+    // The Select component doesn't implement the disabled state correctly so we need to use this workaround
+    await this.microphoneDropdown.getByRole('combobox', {name: 'Microphone'}).isEditable();
+    await this.microphoneDropdown.click();
+    await this.page.getByRole('listbox').getByRole('option', {name: microphoneName}).click();
   }
 
   async isMicrophoneSetTo(expectedMicrophoneName: string) {
-    const selectedMicrophone = await this.microphoneDrowdown.getByText(expectedMicrophoneName, {exact: true});
+    const selectedMicrophone = this.microphoneDropdown.getByText(expectedMicrophoneName, {exact: true});
     return selectedMicrophone.isVisible();
   }
 
   async selectSpeaker(speakerName: string) {
-    await this.speakerDrowdown.click();
-    await this.getSpeakerOptions().locator(`text=${speakerName}`).click();
+    // The Select component doesn't implement the disabled state correctly so we need to use this workaround
+    await this.speakerDropdown.getByRole('combobox', {name: 'Speakers'}).isEditable();
+    await this.speakerDropdown.click();
+    await this.page.getByRole('listbox').getByRole('option', {name: speakerName}).click();
   }
 
   async isSpeakerSetTo(expectedSpeakerName: string) {
-    const selectedSpeaker = await this.speakerDrowdown.getByText(expectedSpeakerName, {exact: true});
+    const selectedSpeaker = this.speakerDropdown.getByText(expectedSpeakerName, {exact: true});
     return selectedSpeaker.isVisible();
   }
 
   async selectCamera(cameraName: string) {
-    await this.cameraDrowdown.click();
-    await this.getCameraOptions().locator(`text=${cameraName}`).click();
+    // The Select component doesn't implement the disabled state correctly so we need to use this workaround
+    await this.cameraDropdown.getByRole('combobox', {name: 'Camera'}).isEditable();
+    await this.cameraDropdown.click();
+    await this.page.getByRole('listbox').getByRole('option', {name: cameraName}).click();
   }
 
   async isCameraSetTo(expectedCameraName: string) {
-    const selectedCamera = await this.cameraDrowdown.getByText(expectedCameraName, {exact: true});
+    const selectedCamera = this.cameraDropdown.getByText(expectedCameraName, {exact: true});
     return selectedCamera.isVisible();
-  }
-
-  private getMicrophoneOptions(): Locator {
-    return this.page.locator(`[data-uie-name="option-enter-microphone"]`);
-  }
-
-  private getSpeakerOptions(): Locator {
-    return this.page.locator(`[data-uie-name="option-enter-speaker"]`);
-  }
-
-  private getCameraOptions(): Locator {
-    return this.page.locator(`[data-uie-name="option-enter-camera"]`);
   }
 }

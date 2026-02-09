@@ -122,12 +122,18 @@ export const MessageWrapper = ({
       await messageRepository.retryUploadFile(conversation, file, firstAsset.isImage(), message.id);
     }
   };
-  const {display_name: displayName} = useKoSubscribableChildren(conversation, ['display_name']);
+  const {display_name: displayName, hasGlobalMessageTimer} = useKoSubscribableChildren(conversation, [
+    'display_name',
+    'hasGlobalMessageTimer',
+  ]);
   const isFileShareRestricted = !teamState.isFileSharingReceivingEnabled();
 
   const isCellsConversation =
     conversation.cellsState() === CONVERSATION_CELLS_STATE.READY ||
     conversation.cellsState() === CONVERSATION_CELLS_STATE.PENDING;
+
+  // When Cells is enabled, self-deleting messages are always off
+  const isSelfDeletingMessagesOff = !hasGlobalMessageTimer || isCellsConversation;
 
   const contextMenuEntries = ko.pureComputed(() => {
     const entries: ContextMenuEntry[] = [];
@@ -257,6 +263,7 @@ export const MessageWrapper = ({
         onClickParticipants={onClickParticipants}
         onClickCancelRequest={onClickCancelRequest}
         hasReadReceiptsTurnedOn={hasReadReceiptsTurnedOn}
+        isSelfDeletingMessagesOff={isSelfDeletingMessagesOff}
         shouldShowInvitePeople={shouldShowInvitePeople}
         isSelfTemporaryGuest={isSelfTemporaryGuest}
         classifiedDomains={teamState.classifiedDomains()}

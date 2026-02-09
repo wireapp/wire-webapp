@@ -548,6 +548,10 @@ describe('MLSService', () => {
   });
 
   describe('handleMLSMessageAddEvent', () => {
+    afterEach(() => {
+      jest.useRealTimers();
+    });
+
     it('decrypts a message', async () => {
       const [mlsService, {transactionContext, coreCrypto}] = await createMLSService();
 

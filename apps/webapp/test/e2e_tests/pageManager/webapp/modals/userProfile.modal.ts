@@ -18,7 +18,6 @@
  */
 
 import {Page, Locator} from '@playwright/test';
-import {selectByDataAttribute} from 'test/e2e_tests/utils/selector.util';
 
 export class UserProfileModal {
   readonly page: Page;
@@ -30,16 +29,10 @@ export class UserProfileModal {
 
   constructor(page: Page) {
     this.page = page;
-    this.modal = page.locator(`${selectByDataAttribute('modal-user-profile')}`);
-    this.connectButton = page.locator(
-      `${selectByDataAttribute('modal-user-profile')} ${selectByDataAttribute('do-send-request')}`,
-    );
-    this.startConversationButton = page.locator(
-      `${selectByDataAttribute('modal-user-profile')} ${selectByDataAttribute('start-conversation')}`,
-    );
-    this.unblockButton = page.locator(
-      `${selectByDataAttribute('modal-user-profile')} ${selectByDataAttribute('do-unblock')}`,
-    );
+    this.modal = page.getByTestId('modal-user-profile');
+    this.connectButton = page.getByTestId('modal-user-profile').getByTestId('do-send-request');
+    this.startConversationButton = page.getByTestId('modal-user-profile').getByTestId('start-conversation');
+    this.unblockButton = page.getByTestId('modal-user-profile').getByTestId('do-unblock');
   }
 
   async isVisible() {

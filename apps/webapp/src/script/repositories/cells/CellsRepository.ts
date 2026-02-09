@@ -17,7 +17,7 @@
  *
  */
 
-import {NodeFlags} from '@wireapp/api-client/lib/cells';
+import {NodeFlags, RestShareLink} from '@wireapp/api-client/lib/cells';
 import {container, singleton} from 'tsyringe';
 
 import {createUuid} from 'Util/uuid';
@@ -179,10 +179,22 @@ export class CellsRepository {
     return this.apiClient.api.cells.createFile({path: filePath, uuid, versionId});
   }
 
-  async createPublicLink({uuid, label}: {uuid: string; label?: string}) {
+  async createPublicLink({
+    uuid,
+    link,
+    createPassword,
+    passwordEnabled,
+  }: {
+    uuid: string;
+    link: RestShareLink;
+    createPassword?: string;
+    passwordEnabled?: boolean;
+  }) {
     return this.apiClient.api.cells.createNodePublicLink({
       uuid,
-      label,
+      link,
+      createPassword,
+      passwordEnabled,
     });
   }
 
@@ -194,10 +206,33 @@ export class CellsRepository {
     return this.apiClient.api.cells.deleteNodePublicLink({uuid});
   }
 
+  async updatePublicLink({
+    linkUuid,
+    link,
+    createPassword,
+    updatePassword,
+    passwordEnabled,
+  }: {
+    linkUuid: string;
+    link: RestShareLink;
+    createPassword?: string;
+    updatePassword?: string;
+    passwordEnabled?: boolean;
+  }) {
+    return this.apiClient.api.cells.updateNodePublicLink({
+      linkUuid,
+      link,
+      createPassword,
+      updatePassword,
+      passwordEnabled,
+    });
+  }
+
   async searchNodes({
     query,
     limit = DEFAULT_MAX_FILES_LIMIT,
     tags,
+    path,
     type,
     sortBy,
     sortDirection,
@@ -205,6 +240,7 @@ export class CellsRepository {
     query: string;
     limit?: number;
     tags?: string[];
+    path?: string;
     type?: 'file' | 'folder';
     sortBy?: SortBy;
     sortDirection?: SortDirection;
@@ -215,6 +251,7 @@ export class CellsRepository {
       sortBy,
       sortDirection,
       tags,
+      path,
       ...(type ? {type: type === 'file' ? 'LEAF' : 'COLLECTION'} : {}),
     });
   }

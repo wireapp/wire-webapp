@@ -17,13 +17,13 @@
  *
  */
 
-import {getUser, User} from 'test/e2e_tests/data/user';
+import {getUser} from 'test/e2e_tests/data/user';
 import {PageManager} from 'test/e2e_tests/pageManager';
 import {bootstrapTeamForTesting, completeLogin} from 'test/e2e_tests/utils/setup.util';
 import {tearDownAll} from 'test/e2e_tests/utils/tearDown.util';
 import {createChannel, createGroup, loginUser} from 'test/e2e_tests/utils/userActions';
 
-import {test, expect} from '../../test.fixtures';
+import {test, expect, LOGIN_TIMEOUT} from '../../test.fixtures';
 
 test.describe('account settings', () => {
   let owner = getUser();
@@ -84,42 +84,55 @@ test.describe('account settings', () => {
     },
   );
 
-  test(
-    'I should not be able to change email of user managed by SCIM',
-    {tag: ['@TC-60', '@regression']},
-    async ({pageManager, context}) => {
-      const {components, pages, modals} = pageManager.webapp;
-      // use an extra account
-      const ssoUser: User = getUser({
-        email: process.env.SCIM_USER_SSO_CODE,
-        username: process.env.SCIM_USER_EMAIL,
-        password: process.env.SCIM_USER_PASSWORD,
-      });
-      await pageManager.openMainPage();
+  test.describe('SCIM', () => {
+    let pageManager: PageManager;
+    const ssoUser = getUser({
+      email: process.env.SCIM_USER_SSO_CODE,
+      username: process.env.SCIM_USER_EMAIL,
+      password: process.env.SCIM_USER_PASSWORD,
+    });
 
-      await pages.singleSignOn().isSSOPageVisible();
+    test.beforeEach(async ({context, createPage}) => {
+      pageManager = PageManager.from(await createPage(context));
+    });
 
-      const [newPage] = await Promise.all([
-        context.waitForEvent('page'),
-        pages.singleSignOn().enterEmailOnSSOPage(ssoUser.email),
-      ]);
+    test.afterEach(async () => {
+      const {pages, modals} = pageManager.webapp;
 
-      await newPage.waitForLoadState();
-      await newPage.getByRole('textbox', {name: 'Username'}).fill(ssoUser.username);
-      await newPage.getByRole('textbox', {name: 'Password'}).fill(ssoUser.password);
-      await newPage.getByRole('button', {name: 'Sign In'}).click();
+      // Log out the user to ensure the previous login won't affect future runs
+      // If this isn't done the test will start to fail due to too many clients being registered for this one user
+      await pages.sidebar().clickPreferencesButton();
+      await pages.settings().accountButton.click();
+      await pages.account().logoutButton.click();
+      await modals.confirmLogout().deleteDeviceCheckbox.click();
+      await modals.confirmLogout().clickAction();
+    });
 
-      if (await pages.historyInfo().isButtonVisible()) {
-        await pages.historyInfo().clickConfirmButton();
-      }
-      await components.conversationSidebar().isPageLoaded();
+    test(
+      'I should not be able to change email of user managed by SCIM',
+      {tag: ['@TC-60', '@regression']},
+      async ({context}) => {
+        await pageManager.openMainPage();
 
-      if (await modals.dataShareConsent().isModalPresent()) {
-        await modals.dataShareConsent().clickDecline();
-      }
-      await expect(pages.account().emailDisplay).toHaveCount(0);
-    },
-  );
+        const {pages, components} = pageManager.webapp;
+        const [newPage] = await Promise.all([
+          context.waitForEvent('page'),
+          pages.singleSignOn().enterEmailOnSSOPage(ssoUser.email),
+        ]);
+
+        await newPage.getByRole('textbox', {name: 'Username'}).fill(ssoUser.username, {timeout: 20_000});
+        await newPage.getByRole('textbox', {name: 'Password'}).fill(ssoUser.password);
+        await newPage.getByRole('button', {name: 'Sign In'}).click();
+        await expect(components.conversationSidebar().sidebar, `Login took more than ${LOGIN_TIMEOUT}s`).toBeVisible({
+          timeout: LOGIN_TIMEOUT,
+        });
+
+        await pages.sidebar().clickPreferencesButton();
+        await pages.settings().accountButton.click();
+        await expect(pages.account().emailDisplay).toHaveCount(0);
+      },
+    );
+  });
 
   // see https://wearezeta.atlassian.net/browse/WPB-20548
   test.skip(

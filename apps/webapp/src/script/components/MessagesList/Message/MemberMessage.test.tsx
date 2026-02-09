@@ -59,6 +59,7 @@ function createMemberMessage({systemType, type}: {systemType?: SystemMessageType
 
 const baseProps = {
   hasReadReceiptsTurnedOn: false,
+  isSelfDeletingMessagesOff: false,
   isSelfTemporaryGuest: false,
   onClickCancelRequest: jest.fn(),
   onClickInvitePeople: jest.fn(),
@@ -81,6 +82,58 @@ describe('MemberMessage', () => {
 
     const {getByTestId} = render(withTheme(<MemberMessage {...props} />));
     expect(getByTestId('element-connected-message')).not.toBeNull();
+  });
+
+  it('shows self-deleting messages off banner when group is created and self-deleting messages are disabled', () => {
+    const message = createMemberMessage({systemType: SystemMessageType.CONVERSATION_CREATE}, [generateUser()]);
+    const props = {
+      ...baseProps,
+      message,
+      isSelfDeletingMessagesOff: true,
+    };
+
+    const {getByText} = render(withTheme(<MemberMessage {...props} />));
+    expect(getByText('Self-deleting messages are off')).toBeInTheDocument();
+  });
+
+  it('does not show self-deleting messages off banner when self-deleting messages are enabled', () => {
+    const message = createMemberMessage({systemType: SystemMessageType.CONVERSATION_CREATE}, [generateUser()]);
+    const props = {
+      ...baseProps,
+      message,
+      isSelfDeletingMessagesOff: false,
+    };
+
+    const {queryByText} = render(withTheme(<MemberMessage {...props} />));
+    expect(queryByText('Self-deleting messages are off')).not.toBeInTheDocument();
+  });
+
+  it('shows self-deleting messages off banner when Cells is enabled (even with global timer)', () => {
+    const message = createMemberMessage({systemType: SystemMessageType.CONVERSATION_CREATE}, [generateUser()]);
+    const props = {
+      ...baseProps,
+      message,
+      isSelfDeletingMessagesOff: true, // This would be true when isCellsConversation is true (per MessageWrapper logic)
+      isCellsConversation: true,
+    };
+
+    const {getByText} = render(withTheme(<MemberMessage {...props} />));
+    expect(getByText('Self-deleting messages are off')).toBeInTheDocument();
+  });
+
+  it('shows self-deleting messages off banner when Cells is enabled because Cells disables ephemeral messages', () => {
+    const message = createMemberMessage({systemType: SystemMessageType.CONVERSATION_CREATE}, [generateUser()]);
+    const props = {
+      ...baseProps,
+      message,
+      isSelfDeletingMessagesOff: true, // Always true when isCellsConversation is true (computed in MessageWrapper)
+      isCellsConversation: true,
+    };
+
+    const {getByText} = render(withTheme(<MemberMessage {...props} />));
+    // Both banners should be visible
+    expect(getByText('Shared Drive is on')).toBeInTheDocument();
+    expect(getByText('Self-deleting messages are off')).toBeInTheDocument();
   });
 
   describe('CONVERSATION_CREATE', () => {

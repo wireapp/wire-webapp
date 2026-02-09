@@ -29,25 +29,22 @@ const participantNameColor = (isActivelySpeaking: boolean, isAudioEstablished: b
   return 'var(--white)';
 };
 
-export const activelySpeakingBoxShadow = `inset 0px 0px 0px 1px var(--group-video-bg), inset 0px 0px 0px 4px var(--accent-color), inset 0px 0px 0px 7px var(--app-bg-secondary)`;
-
-export const groupVideoBoxShadow = (participantCount: number): string =>
-  participantCount > 1 ? 'inset 0px 0px 0px 2px var(--group-video-bg)' : 'initial';
-
 export const groupVideoTileWrapper: CSSObject = {
   alignItems: 'center',
   backgroundColor: 'var(--group-video-tile-bg)',
-  borderRadius: '10px',
+  borderRadius: '8px',
   display: 'flex',
   height: '100%',
   justifyContent: 'center',
   width: '100%',
 };
 
-export const groupVideoActiveSpeakerTile = (isActivelySpeaking: boolean, participantCount: number): CSSObject => ({
+export const groupVideoActiveSpeakerTile = (isActivelySpeaking: boolean): CSSObject => ({
   borderRadius: '8px',
   bottom: 0,
-  boxShadow: isActivelySpeaking ? activelySpeakingBoxShadow : groupVideoBoxShadow(participantCount),
+  boxShadow: isActivelySpeaking
+    ? 'inset 0 0 0 3px var(--accent-color), inset 0 0 0 6px var(--app-bg-secondary)'
+    : 'none',
   left: 0,
   position: 'absolute',
   right: 0,

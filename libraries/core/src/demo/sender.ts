@@ -44,6 +44,7 @@ commander.option('-c, --conversationId <conversationId>').parse(process.argv);
 
 require(`dotenv-defaults`).config({
   path: path.join(__dirname, 'sender.env'),
+  quiet: true,
 });
 
 const logger = logdown('@wireapp/core/src/demo/sender.ts', {

@@ -45,9 +45,18 @@ apps/
 ├── webapp/           # React frontend (security + accessibility focus)
 └── server/           # Node.js/Express API (security focus)
 libraries/
-└── core/             # @wireapp/core - Communication library
+├── config/           # @wireapp/config - Environment configuration library
+├── core/             # @wireapp/core - Communication library
                       # ⚠️ CRITICAL: Changes affect authentication, encryption, messaging
 ```
+
+### Config Library (`@wireapp/config`)
+**Location:** `libraries/config/`
+**Purpose:**
+- Centralized environment configuration management
+- Type-safe configuration loading
+- Environment variable validation
+- Shared configuration utilities across apps
 
 ### Core Library (`@wireapp/core`)
 **Location:** `libraries/core/`

@@ -19,9 +19,9 @@
 
 import {User} from 'test/e2e_tests/data/user';
 import {PageManager} from 'test/e2e_tests/pageManager';
-import {addMockCamerasToContext} from 'test/e2e_tests/utils/mockVideoDevice.util';
 
 import {test, expect, withLogin, withConnectionRequest} from '../../test.fixtures';
+import {createGroup} from 'test/e2e_tests/utils/userActions';
 
 const conversationName = 'CritiCall';
 
@@ -49,10 +49,7 @@ test.fixme(
       guestUser = await createUser();
 
       const [pmOwner, pmGuest] = await Promise.all([
-        PageManager.from(createPage(withLogin(teamOwner), withConnectionRequest(guestUser))).then(async pm => {
-          await addMockCamerasToContext(pm.getContext());
-          return pm;
-        }),
+        PageManager.from(createPage(withLogin(teamOwner), withConnectionRequest(guestUser))),
         PageManager.from(createPage(withLogin(guestUser))),
       ]);
       ownerPageManager = pmOwner;
@@ -67,10 +64,7 @@ test.fixme(
 
     await test.step('Owner and team member are in a group conversation together', async () => {
       const {pages} = ownerPageManager.webapp;
-      await pages.conversationList().clickCreateGroup();
-      await pages.groupCreation().setGroupName(conversationName);
-      await pages.startUI().selectUser(teamMember.username);
-      await pages.groupCreation().clickCreateGroupButton();
+      await createGroup(pages, conversationName, [teamMember]);
       expect(await pages.conversationList().isConversationItemVisible(conversationName)).toBeTruthy();
     });
 

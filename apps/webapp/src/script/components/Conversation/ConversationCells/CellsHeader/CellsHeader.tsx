@@ -17,11 +17,16 @@
  *
  */
 
+import {useEffect, useRef} from 'react';
+
 import {QualifiedId} from '@wireapp/api-client/lib/user/';
 
-import {CellsRepository} from 'Repositories/cells/CellsRepository';
+import {CloseIcon, Input, InputSubmitCombo, SearchIcon} from '@wireapp/react-ui-kit';
 
-import {actionsStyles, contentStyles, wrapperStyles} from './CellsHeader.styles';
+import {CellsRepository} from 'Repositories/cells/CellsRepository';
+import {t} from 'Util/LocalizerUtil';
+
+import {actionsStyles, contentStyles, searchInputStyles, wrapperStyles} from './CellsHeader.styles';
 import {CellsMoreMenu} from './CellsMoreMenu/CellsMoreMenu';
 import {CellsNewMenu} from './CellsNewMenu/CellsNewMenu';
 import {CellsRefresh} from './CellsRefresh/CellsRefresh';
@@ -35,8 +40,10 @@ interface CellsHeaderProps {
   onRefresh: () => void;
   conversationName: string;
   conversationQualifiedId: QualifiedId;
-
   cellsRepository: CellsRepository;
+  searchValue: string;
+  onSearchChange: (value: string) => void;
+  onSearchClear: () => void;
 }
 
 export const CellsHeader = ({
@@ -44,11 +51,20 @@ export const CellsHeader = ({
   conversationQualifiedId,
   conversationName,
   cellsRepository,
+  searchValue,
+  onSearchChange,
+  onSearchClear,
 }: CellsHeaderProps) => {
+  const inputRef = useRef<HTMLInputElement>(null);
+
   const breadcrumbs = getBreadcrumbsFromPath({
-    baseCrumb: `${conversationName} files`,
+    baseCrumb: t('cells.breadcrumb.files', {conversationName}),
     currentPath: getCellsFilesPath(),
   });
+
+  useEffect(() => {
+    inputRef.current?.focus();
+  }, []);
 
   return (
     <div css={wrapperStyles}>
@@ -72,6 +88,54 @@ export const CellsHeader = ({
           <CellsMoreMenu conversationQualifiedId={conversationQualifiedId} />
         </div>
       </div>
+      <InputSubmitCombo
+        css={{
+          ...searchInputStyles,
+          marginLeft: '8px',
+          marginTop: '24px',
+          width: '288px',
+          height: '32px',
+          borderRadius: '8px',
+          paddingLeft: '10px',
+        }}
+      >
+        <SearchIcon />
+
+        <Input
+          wrapperCSS={{
+            marginBottom: 0,
+            width: '100%',
+            '> div': {width: '100%'},
+            input: {
+              fontSize: '14px',
+              height: '32px',
+              '&:hover': {
+                boxShadow: 'none',
+              },
+              '&:focus': {
+                outline: 'none',
+                boxShadow: 'none',
+              },
+            },
+          }}
+          type="text"
+          value={searchValue}
+          ref={inputRef}
+          aria-label={t('cells.search.placeholder')}
+          placeholder={t('cells.search.placeholder')}
+          onChange={event => onSearchChange(event.currentTarget.value)}
+          data-uie-name="full-search-header-input"
+        />
+
+        {searchValue && (
+          <CloseIcon
+            css={{cursor: 'pointer'}}
+            data-uie-name="full-search-dismiss"
+            aria-label={t('fullsearchCancelCloseBtn')}
+            onClick={onSearchClear}
+          />
+        )}
+      </InputSubmitCombo>
     </div>
   );
 };

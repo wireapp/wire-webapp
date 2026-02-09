@@ -39,6 +39,6 @@ function generateCommmitHash() {
 }
 
 writeFileSync(
-  path.resolve(__dirname, '../dist/config/version.json'),
+  path.resolve(__dirname, '../dist/version.json'),
   JSON.stringify({version: generateVersion(), commit: generateCommmitHash()}),
 );

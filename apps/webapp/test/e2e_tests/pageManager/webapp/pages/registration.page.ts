@@ -46,13 +46,6 @@ export class RegistrationPage {
     this.passwordPolicy = page.locator('[data-uie-name="element-password-help"]');
   }
 
-  async isPasswordPolicyInfoVisible() {
-    return (
-      (await this.passwordPolicyInfo.textContent()) ==
-      'Use at least 8 characters, with one lowercase letter, one capital letter, a number, and a special character.'
-    );
-  }
-
   async fillInUserInfo(user: User) {
     await this.nameInput.fill(`${user.firstName} ${user.lastName}`);
     await this.emailInput.fill(user.email);
@@ -62,10 +55,6 @@ export class RegistrationPage {
 
   async toggleTermsCheckbox() {
     await this.termsCheckbox.dispatchEvent('click');
-  }
-
-  async isSubmitButtonEnabled() {
-    return await this.submitButton.isEnabled();
   }
 
   async clickSubmitButton() {

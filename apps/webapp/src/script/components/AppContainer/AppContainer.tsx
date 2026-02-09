@@ -33,6 +33,7 @@ import {PROPERTIES_TYPE} from 'Repositories/properties/PropertiesType';
 import {SIGN_OUT_REASON} from 'src/script/auth/SignOutReason';
 import {useAppSoftLock} from 'src/script/hooks/useAppSoftLock';
 import {useSingleInstance} from 'src/script/hooks/useSingleInstance';
+import {useUserPropertyValue} from 'src/script/hooks/useUserProperty';
 import {isDetachedCallingFeatureEnabled} from 'Util/isDetachedCallingFeatureEnabled';
 
 import {useAccentColor} from './hooks/useAccentColor';
@@ -62,6 +63,11 @@ export const AppContainer = ({config, clientType}: AppProps) => {
   const mainView = new MainViewModel(app.repository);
   useTheme(() => app.repository.properties.getPreference(PROPERTIES_TYPE.INTERFACE.THEME));
   useAccentColor();
+  const themePreference = useUserPropertyValue(
+    () => app.repository.properties.getPreference(PROPERTIES_TYPE.INTERFACE.THEME),
+    WebAppEvents.PROPERTIES.UPDATE.INTERFACE.THEME,
+  );
+  const themeId = themePreference === 'dark' ? THEME_ID.DARK : THEME_ID.DEFAULT;
 
   const {hasOtherInstance, registerInstance} = useSingleInstance();
 
@@ -108,7 +114,7 @@ export const AppContainer = ({config, clientType}: AppProps) => {
         }}
       </AppLoader>
 
-      <StyledApp themeId={THEME_ID.DEFAULT} css={{backgroundColor: 'unset', height: '100%'}}>
+      <StyledApp themeId={themeId} css={{backgroundColor: 'unset', height: '100%'}}>
         <PrimaryModalComponent />
         <QualityFeedbackModal callingRepository={app.repository.calling} />
       </StyledApp>

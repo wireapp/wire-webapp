@@ -93,17 +93,19 @@
     height: 100%;
     flex-wrap: wrap;
     justify-content: center;
+    gap: 4px;
     --rows: 1;
     --columns: 1;
 
     &__element {
       position: relative;
       overflow: hidden;
-      width: calc(100% / var(--columns));
-      height: calc(100% / var(--rows));
+      width: calc((100% - (var(--columns) - 1) * 6px) / var(--columns));
+      height: calc((100% - (var(--rows) - 1) * 6px) / var(--rows));
       box-sizing: border-box;
       padding: 0;
       border: none;
+      border-radius: 8px;
       background-color: inherit;
 
       &:focus {
@@ -119,6 +121,7 @@
         border-radius: 8px;
         opacity: 0;
         transition: opacity 0.35s ease-in-out;
+
         &:hover {
           opacity: 1;
         }
@@ -188,8 +191,10 @@
           border-radius: 4px;
           margin: 8px;
           background-color: var(--app-bg-secondary);
+
           svg {
             width: 16px;
+
             & path {
               fill: var(--red-500);
             }

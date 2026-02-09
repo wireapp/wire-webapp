@@ -17,75 +17,62 @@
  *
  */
 
-import {getUser, User} from 'test/e2e_tests/data/user';
+import {getUser} from 'test/e2e_tests/data/user';
 import {PageManager} from 'test/e2e_tests/pageManager';
-import {sendTextMessageToUser} from 'test/e2e_tests/utils/userActions';
 
 import {test, expect, withLogin} from '../../test.fixtures';
 
 test('Personal Account Lifecycle', {tag: ['@TC-8638', '@crit-flow-web']}, async ({createPage, createUser, api}) => {
-  let pageManager: PageManager;
-  let pageManagerB: PageManager;
-  let pageManagerC: PageManager;
-  let userA: User;
-  let userB: User;
-  let userC: User;
+  // Create user A as a personal user (who will register in the test)
+  const userA = getUser();
+  // Create users B and C as personal users with login
+  const userB = await createUser();
+  const userC = await createUser();
 
-  await test.step('Preconditions: Creating preconditions for the test via API', async () => {
-    // Create user A as a personal user (who will register in the test)
-    userA = getUser();
-    // Create users B and C as personal users with login
-    userB = await createUser();
-    userC = await createUser();
-
-    const [pmB, pmC] = await Promise.all([
-      PageManager.from(createPage(withLogin(userB))),
-      PageManager.from(createPage(withLogin(userC))),
-    ]);
-
-    pageManagerB = pmB;
-    pageManagerC = pmC;
-
-    // Create page for User A (who will register in the test)
-    pageManager = PageManager.from(await createPage());
-  });
+  const [pageManagerA, pageManagerB, pageManagerC] = await Promise.all([
+    PageManager.from(createPage()), // Create page for User A (who will register in the test)
+    PageManager.from(createPage(withLogin(userB))),
+    PageManager.from(createPage(withLogin(userC))),
+  ]);
 
   await test.step('User A opens the application and registers personal account', async () => {
-    const {pages, modals} = pageManager.webapp;
-    await pageManager.openMainPage();
+    const {pages, modals} = pageManagerA.webapp;
+    await pageManagerA.openMainPage();
     await pages.singleSignOn().enterEmailOnSSOPage(userA.email);
     await pages.welcome().clickCreateAccountButton();
     await pages.welcome().clickCreatePersonalAccountButton();
-    expect(await pages.registration().isPasswordPolicyInfoVisible());
+    await expect(pages.registration().passwordPolicyInfo).toContainText(
+      'Use at least 8 characters, with one lowercase letter, one capital letter, a number, and a special character.',
+    );
 
     await pages.registration().fillInUserInfo(userA);
-    expect(await pages.registration().isSubmitButtonEnabled()).toBeFalsy();
+    await expect(pages.registration().submitButton).toBeDisabled();
 
     await pages.registration().toggleTermsCheckbox();
-    expect(await pages.registration().isSubmitButtonEnabled()).toBeTruthy();
+    await expect(pages.registration().submitButton).toBeEnabled();
 
     await pages.registration().clickSubmitButton();
     const verificationCode = await api.brig.getActivationCodeForEmail(userA.email);
-    expect(await pages.emailVerification().isEmailVerificationPageVisible()).toBeTruthy();
+
+    await expect(pages.emailVerification().verificationCodeInputLabel).toBeVisible();
     await pages.emailVerification().enterVerificationCode(verificationCode);
     await modals.marketingConsent().clickConfirmButton();
   });
 
   await test.step('Personal user A sets user name', async () => {
-    const {pages} = pageManager.webapp;
+    const {pages} = pageManagerA.webapp;
     await pages.setUsername().setUsername(userA.username);
     await pages.setUsername().clickNextButton();
     await pages.registerSuccess().clickOpenWireWebButton();
   });
 
   await test.step('Personal user A declines sending anonymous usage data', async () => {
-    const {modals} = pageManager.webapp;
-    await modals.dataShareConsent().isModalPresent();
+    const {modals} = pageManagerA.webapp;
     await modals.dataShareConsent().clickDecline();
   });
 
   await test.step('Personal user A checks that username was set correctly', async () => {
-    const {pages, components} = pageManager.webapp;
+    const {pages, components} = pageManagerA.webapp;
     await expect(components.conversationSidebar().personalStatusName).toHaveText(
       `${userA.firstName} ${userA.lastName}`,
     );
@@ -94,28 +81,30 @@ test('Personal Account Lifecycle', {tag: ['@TC-8638', '@crit-flow-web']}, async 
   });
 
   await test.step('Personal user A searches for other personal user B', async () => {
-    const {pages, modals, components} = pageManager.webapp;
+    const {pages, modals, components} = pageManagerA.webapp;
     await components.conversationSidebar().clickConnectButton();
-    await pages.startUI().selectUser(userB.username);
-    expect(await modals.userProfile().isVisible());
+    await pages.startUI().selectUsers(userB.username);
+    await expect(modals.userProfile().modal).toBeVisible();
   });
 
   await test.step('Personal user A sends a connection request to personal user B', async () => {
-    const {pages, modals} = pageManager.webapp;
+    const {pages, modals} = pageManagerA.webapp;
     await modals.userProfile().clickConnectButton();
     await pages.conversationList().openConversation(userB.fullName);
-    expect(await pages.outgoingConnection().getOutgoingConnectionUsername()).toContain(userB.username);
-    expect(await pages.outgoingConnection().isPendingIconVisible(userB.fullName));
+    await expect(pages.outgoingConnection().uniqueUsernameOutgoing).toContainText(userB.username);
+    await expect(pages.outgoingConnection().getPendingConnectionIconLocator(userB.fullName)).toBeVisible();
   });
 
   await test.step('Personal user B accepts request from A', async () => {
     await pageManagerB.webapp.pages.conversationList().openPendingConnectionRequest();
     await pageManagerB.webapp.pages.connectRequest().clickConnectButton();
-    await pageManagerB.webapp.pages.conversationList().isConversationItemVisible(userA.fullName);
+    await expect(pageManagerB.webapp.pages.conversationList().getConversationLocator(userA.fullName)).toBeVisible();
   });
 
   await test.step('Personal user A send message to personal user B', async () => {
-    await sendTextMessageToUser(pageManager, userB, `Hello! ${userA.firstName} here.`);
+    const {pages} = pageManagerA.webapp;
+    await pages.conversationList().openConversation(userB.fullName, {protocol: 'mls'});
+    await pages.conversation().sendMessage(`Hello! ${userA.firstName} here.`);
   });
 
   await test.step('Personal user B can see the message from user A', async () => {
@@ -126,63 +115,68 @@ test('Personal Account Lifecycle', {tag: ['@TC-8638', '@crit-flow-web']}, async 
   });
 
   await test.step('Personal user A blocks personal user B', async () => {
-    const {pages, modals} = pageManager.webapp;
+    const {pages, modals} = pageManagerA.webapp;
+    const conversation = pages.conversationList().getConversationLocator(userB.fullName);
+
+    await expect(conversation).not.toContainText('Blocked');
     await pages.conversationList().clickConversationOptions(userB.fullName);
     await pages.conversationList().clickBlockConversation();
-    expect(await modals.blockWarning().isModalPresent());
-    expect(await modals.blockWarning().getModalTitle()).toContain(`Block ${userB.fullName}`);
-    expect(await modals.blockWarning().getModalText()).toContain(
+    await expect(modals.blockWarning().modal).toBeVisible();
+    await expect(modals.blockWarning().modalTitle).toContainText(`Block ${userB.fullName}`);
+    await expect(modals.blockWarning().modalText).toContainText(
       `${userB.fullName} won’t be able to contact you or add you to group conversations.`,
     );
 
     await modals.blockWarning().clickBlock();
-    expect(await pages.conversationList().isConversationBlocked(userB.fullName));
+    await expect(conversation).toContainText('Blocked');
   });
 
   await test.step('Personal user C sends a connection request to personal user A', async () => {
     await pageManagerC.webapp.components.conversationSidebar().clickConnectButton();
-    await pageManagerC.webapp.pages.startUI().selectUser(userA.username);
+    await pageManagerC.webapp.pages.startUI().selectUsers(userA.username);
     await pageManagerC.webapp.modals.userProfile().clickConnectButton();
     await pageManagerC.webapp.pages.conversationList().openConversation(userA.fullName);
-    expect(await pageManagerC.webapp.pages.outgoingConnection().getOutgoingConnectionUsername()).toContain(
-      userA.username,
-    );
-    expect(await pageManagerC.webapp.pages.outgoingConnection().isPendingIconVisible(userA.fullName)).toBeTruthy();
+    await expect(pageManagerC.webapp.pages.outgoingConnection().uniqueUsernameOutgoing).toContainText(userA.username);
+    await expect(
+      pageManagerC.webapp.pages.outgoingConnection().getPendingConnectionIconLocator(userA.fullName),
+    ).toBeVisible();
   });
 
   await test.step('Personal user A accepts request from C', async () => {
-    const {pages} = pageManager.webapp;
+    const {pages} = pageManagerA.webapp;
     await pages.conversationList().openPendingConnectionRequest();
     await pages.connectRequest().clickConnectButton();
   });
 
   await test.step('Personal user A send message to personal user C', async () => {
-    await sendTextMessageToUser(pageManager, userC, `Hello! ${userA.firstName} here.`);
+    const {pages} = pageManagerA.webapp;
+    await pages.conversationList().openConversation(userC.fullName, {protocol: 'mls'});
+    await pages.conversation().sendMessage(`Hello! ${userA.firstName} here.`);
   });
 
   await test.step('Personal user C can see the message from user A', async () => {
-    await pageManagerC.webapp.pages.conversationList().openConversation(userA.fullName);
+    await pageManagerC.webapp.pages.conversationList().openConversation(userA.fullName, {protocol: 'mls'});
     await expect(
       pageManagerC.webapp.pages.conversation().getMessage({content: `Hello! ${userA.firstName} here.`}),
     ).toBeVisible();
   });
 
   await test.step('Personal User A deletes their account', async () => {
-    const {pages, modals, components} = pageManager.webapp;
+    const {pages, modals, components} = pageManagerA.webapp;
     await components.conversationSidebar().clickPreferencesButton();
     await pages.account().clickDeleteAccountButton();
-    expect(await modals.deleteAccount().isModalPresent()).toBeTruthy();
-    expect(await modals.deleteAccount().getModalTitle()).toContain('Delete account');
-    expect(await modals.deleteAccount().getModalText()).toContain(
+    await expect(modals.deleteAccount().modal).toBeVisible();
+    await expect(modals.deleteAccount().modalTitle).toContainText('Delete account');
+    await expect(modals.deleteAccount().modalText).toContainText(
       'We will send you an email. Follow the link to delete your account permanently.',
     );
 
     await modals.deleteAccount().clickDelete();
     const url = await api.inbucket.getAccountDeletionURL(userA.email);
 
-    await pageManager.openNewTab(url, async tab => {
-      await tab.webapp.pages.deleteAccount().clickDeleteAccountButton();
-      expect(await tab.webapp.pages.deleteAccount().isAccountDeletedHeadlineVisible()).toBeTruthy();
+    await pageManagerA.openNewTab(url, async tab => {
+      await tab.webapp.pages.deleteAccount().deleteAccountButton.click();
+      await expect(tab.webapp.pages.deleteAccount().accountDeletedHeadline).toContainText('Account deleted');
     });
   });
 });

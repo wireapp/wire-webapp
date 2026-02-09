@@ -31,17 +31,6 @@ export const loginUser = async (user: User, pageManager: PageManager) => {
   await pages.login().signInButton.click();
 };
 
-export const sendTextMessageToUser = async (pageManager: PageManager, recipient: User, text: string) => {
-  const {pages} = pageManager.webapp;
-
-  await pages.conversationList().openConversation(recipient.fullName);
-  expect(await pages.conversation().isConversationOpen(recipient.fullName));
-
-  await pages.conversation().sendMessage(text);
-
-  await expect(pages.conversation().page.getByText(text)).toBeVisible();
-};
-
 export const inviteMembers = async (members: User[], owner: User, api: ApiManagerE2E) => {
   await Promise.all(
     members.map(async member => {
@@ -78,7 +67,7 @@ type UserPages = PageManager['webapp']['pages'];
 export const createGroup = async (pages: UserPages, conversationName: string, user: User[]) => {
   await pages.conversationList().clickCreateGroup();
   await pages.groupCreation().setGroupName(conversationName);
-  await pages.startUI().selectUsers(user.map(user => user.username));
+  await pages.groupCreation().selectGroupMembers(...user.map(user => user.username));
   await pages.groupCreation().clickCreateGroupButton();
 };
 
@@ -87,7 +76,7 @@ export const createChannel = async (pages: UserPages, conversationName: string, 
   await pages.groupCreation().setGroupName(conversationName);
   await pages.groupCreation().clickNextButton();
   // task: set params for testing
-  await pages.startUI().selectUsers(user.flatMap(user => user.username));
+  await pages.groupCreation().selectGroupMembers(...user.flatMap(user => user.username));
   await pages.groupCreation().clickCreateGroupButton();
 };
 
@@ -111,7 +100,7 @@ export async function connectWithUser(senderPageManager: PageManager, receiver: 
   const {pages, modals, components} = senderPageManager.webapp;
   await components.conversationSidebar().clickConnectButton();
   await pages.startUI().searchInput.fill(receiver.username);
-  await pages.startUI().selectUser(receiver.username);
+  await pages.startUI().selectUsers(receiver.username);
   await modals.userProfile().clickStartConversation();
 }
 
@@ -123,6 +112,6 @@ export async function sendConnectionRequest(senderPageManager: PageManager, rece
   const {pages, modals, components} = senderPageManager.webapp;
   await components.conversationSidebar().clickConnectButton();
   await pages.startUI().searchInput.fill(receiver.username);
-  await pages.startUI().selectUser(receiver.username);
+  await pages.startUI().selectUsers(receiver.username);
   await modals.userProfile().clickConnectButton();
 }

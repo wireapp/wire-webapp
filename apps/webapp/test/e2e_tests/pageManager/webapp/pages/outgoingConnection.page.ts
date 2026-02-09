@@ -18,7 +18,6 @@
  */
 
 import {Locator, Page} from '@playwright/test';
-import {selectByDataAttribute} from 'test/e2e_tests/utils/selector.util';
 import {escapeHtml} from 'test/e2e_tests/utils/userDataProcessor';
 
 export class OutgoingConnectionPage {
@@ -32,25 +31,10 @@ export class OutgoingConnectionPage {
     this.uniqueUsernameOutgoing = this.page.locator('.message-connected-username.label-username');
   }
 
-  async getOutgoingConnectionUsername() {
-    return this.uniqueUsernameOutgoing.textContent();
-  }
-
-  async isPendingIconVisible(fullName: string) {
-    const pendingIcon = this.getPendingConnectionIconLocator(fullName);
-    await pendingIcon.waitFor({state: 'visible'});
-    return pendingIcon.isVisible();
-  }
-
-  async isPendingIconHidden(fullName: string) {
-    const pendingIcon = this.getPendingConnectionIconLocator(fullName);
-    await pendingIcon.waitFor({state: 'hidden'});
-    return pendingIcon.isVisible();
-  }
-
-  private getPendingConnectionIconLocator(fullName: string) {
-    return this.page.locator(
-      `${selectByDataAttribute('item-conversation')}${selectByDataAttribute(escapeHtml(fullName), 'value')} ${selectByDataAttribute('status-pending')}`,
-    );
+  getPendingConnectionIconLocator(fullName: string) {
+    return this.page
+      .getByTestId('item-conversation')
+      .and(this.page.locator(`[data-uie-value="${escapeHtml(fullName)}"]`))
+      .getByTestId('status-pending');
   }
 }

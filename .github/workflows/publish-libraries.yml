@@ -1,0 +1,81 @@
+name: Create Library Release PR
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: library-release
+  cancel-in-progress: false
+
+jobs:
+  create-release-pr:
+    name: Create Release PR
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+          ref: dev
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version-file: '.nvmrc'
+          cache: 'yarn'
+
+      - name: Configure git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Create release branch
+        run: |
+          BRANCH_NAME="chore/library-release-${{ github.run_id }}"
+          git checkout -b "$BRANCH_NAME"
+          echo "RELEASE_BRANCH=$BRANCH_NAME" >> $GITHUB_ENV
+
+      - name: Install dependencies
+        run: yarn --immutable
+
+      - name: Lint libraries
+        run: yarn nx run-many -t lint --projects=tag:type:lib
+
+      - name: Test libraries
+        run: yarn nx run-many -t test --projects=tag:type:lib
+
+      - name: Build libraries
+        run: yarn nx run-many -t build --projects=tag:type:lib
+
+      - name: Create version PR
+        run: |
+          echo "📦 Creating release PR for dev..."
+          echo "🔍 Auto-detecting version bump from conventional commits..."
+
+          # Run nx release to update versions, commit, and tag
+          yarn nx release version --skip-publish
+
+          # Check if any commits were created
+          COMMITS_AHEAD="$(git rev-list --count "origin/dev..HEAD")"
+          if [ "$COMMITS_AHEAD" -eq 0 ]; then
+            echo "ℹ️ No new version changes detected. Skipping push and PR creation."
+            exit 0
+          fi
+
+          # Push the branch with tags
+          git push origin "$RELEASE_BRANCH" --follow-tags
+
+          # Create PR using GitHub CLI
+          gh pr create \
+            --base dev \
+            --head "$RELEASE_BRANCH" \
+            --title "chore(release): publish libraries" \
+            --body "Automated release PR created by nx release. ⚠️ **Important:** Do NOT squash merge this PR. Use 'Merge commit' to preserve git tags."
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

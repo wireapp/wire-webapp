@@ -21,6 +21,7 @@ import {AssetAuditData, AssetOptions, AssetRetentionPolicy} from '@wireapp/api-c
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 import ko from 'knockout';
 import {container, singleton} from 'tsyringe';
+import {NIL as NilUuid} from 'uuid';
 
 import {GenericMessage, LegalHoldStatus} from '@wireapp/protocol-messaging';
 
@@ -171,7 +172,7 @@ export class AssetRepository {
     }
   }
 
-  async uploadProfileImage(image: Blob): Promise<{
+  async uploadProfileImage(image: File): Promise<{
     mediumImageKey: {domain?: string; key: string};
     previewImageKey: {domain?: string; key: string};
   }> {
@@ -182,9 +183,18 @@ export class AssetRepository {
       this.compressImage(strippedImage, true),
     ]);
 
+    const isAuditLogEnabled = this.teamState.isAuditLogEnabled();
+
     const options: AssetUploadOptions = {
       public: true,
       retention: AssetRetentionPolicy.ETERNAL,
+      ...(isAuditLogEnabled && {
+        auditData: {
+          filename: image.name,
+          filetype: image.type,
+          conversationId: {domain: this.teamState.teamDomain(), id: NilUuid},
+        },
+      }),
     };
 
     const [previewImageKey, mediumImageKey] = await Promise.all([

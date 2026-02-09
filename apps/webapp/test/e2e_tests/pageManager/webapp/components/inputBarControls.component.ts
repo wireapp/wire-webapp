@@ -20,7 +20,6 @@
 import {Page, Locator} from '@playwright/test';
 
 import {shareAssetHelper} from 'test/e2e_tests/utils/asset.util';
-import {selectByDataAttribute} from 'test/e2e_tests/utils/selector.util';
 
 export const EPHEMERAL_TIMER_CHOICES = ['10 seconds', '5 minutes', '1 hour', 'Off'] as const;
 
@@ -37,12 +36,12 @@ export class InputBarControls {
   constructor(page: Page) {
     this.page = page;
 
-    this.shareImage = page.locator(`${selectByDataAttribute('do-share-image')}`);
-    this.shareFile = page.locator(`${selectByDataAttribute('do-share-file')}`);
-    this.ping = page.locator(`${selectByDataAttribute('do-ping')}`);
-    this.setEphemeralTimer = page.locator(`${selectByDataAttribute('do-set-ephemeral-timer')}`);
-    this.sendMessage = page.locator(`${selectByDataAttribute('do-send-message')}`);
-    this.messageInput = page.locator(`${selectByDataAttribute('input-message')}`);
+    this.shareImage = page.getByTestId('do-share-image');
+    this.shareFile = page.getByTestId('do-share-file');
+    this.ping = page.getByTestId('do-ping');
+    this.setEphemeralTimer = page.getByTestId('do-set-ephemeral-timer');
+    this.sendMessage = page.getByTestId('do-send-message');
+    this.messageInput = page.getByTestId('input-message');
   }
 
   async clickShareImage(imageFilePath: string) {
@@ -61,7 +60,7 @@ export class InputBarControls {
 
   async setEphemeralTimerTo(choice: (typeof EPHEMERAL_TIMER_CHOICES)[number]) {
     await this.setEphemeralTimer.click();
-    const buttons = this.page.locator(selectByDataAttribute('message-timer-menu'));
+    const buttons = this.page.getByTestId('message-timer-menu');
     await buttons.last().waitFor({state: 'visible'});
 
     // Get all buttons and find the one with the matching title

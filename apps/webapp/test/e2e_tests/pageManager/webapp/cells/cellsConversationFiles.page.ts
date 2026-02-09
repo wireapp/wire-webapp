@@ -21,15 +21,20 @@ import {Locator, Page} from '@playwright/test';
 
 export class CellsConversationFilesPage {
   readonly page: Page;
-  readonly filesList: Locator;
+  filesList: Locator;
+  readonly searchInput: Locator;
 
   constructor(page: Page) {
     this.page = page;
     this.filesList = page.locator('table td[data-cell="Name"]');
+    this.searchInput = page.getByRole('textbox', {name: 'Search files and folders'});
   }
 
-  async clickFile(fileName: string) {
-    const file = this.filesList.getByRole('button', {name: fileName});
-    await file.click();
+  async searchFile(fileName: string) {
+    await this.searchInput.fill(fileName);
+  }
+
+  getFile(fileName: string) {
+    return this.filesList.getByRole('button', {name: fileName});
   }
 }

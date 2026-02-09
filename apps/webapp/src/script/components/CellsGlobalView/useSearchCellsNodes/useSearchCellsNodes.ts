@@ -67,6 +67,7 @@ export const useSearchCellsNodes = ({
           query,
           limit,
           tags: filters.tags,
+          path: filters.path,
           sortBy: shouldSort ? 'mtime' : undefined,
           sortDirection: shouldSort ? 'desc' : undefined,
           type: 'file',

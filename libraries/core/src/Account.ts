@@ -861,9 +861,7 @@ export class Account extends TypedEventEmitter<Events> {
           try {
             const start = Date.now();
             const notificationTime = this.getNotificationEventTime(notification.payload[0]);
-            this.logger.info(`Processing legacy notification "${notification.id}" at ${notificationTime}`, {
-              notification,
-            });
+            this.logger.info(`Processing legacy notification "${notification.id}" at ${notificationTime}`);
             this.logger.info(`Total notifications queue length: ${this.notificationProcessingQueue.getLength()}`);
             this.logger.info(`Total pending proposals queue length: ${getProposalQueueLength()}`);
             if (notificationTime) {
@@ -894,7 +892,7 @@ export class Account extends TypedEventEmitter<Events> {
     onConnectionStateChanged: (state: ConnectionState) => void,
   ) => {
     return async (notification: ConsumableNotification, source: NotificationSource): Promise<void> => {
-      this.logger.info(`Received consumable notification of type "${notification.type}"`, {notification});
+      this.logger.info(`Received consumable notification of type "${notification.type}"`);
       try {
         if (notification.type === ConsumableEvent.MISSED) {
           this.reactToMissedNotification();
@@ -940,7 +938,7 @@ export class Account extends TypedEventEmitter<Events> {
     notification: ConsumableNotificationSynchronization,
     onConnectionStateChanged: (state: ConnectionState) => void,
   ) => {
-    this.logger.info('acknowledging synchronization notification', {notification});
+    this.logger.info('acknowledging synchronization notification');
     this.acknowledgeSynchronizationNotification(notification);
 
     const markerId = notification.data.marker_id;
@@ -1114,7 +1112,7 @@ export class Account extends TypedEventEmitter<Events> {
     this.apiClient.transport.ws.removeAllListeners(WebSocketClient.TOPIC.ON_MESSAGE);
 
     this.apiClient.transport.ws.on(WebSocketClient.TOPIC.ON_MESSAGE, notification => {
-      this.logger.info('Received new notification from backend', {notification});
+      this.logger.info('Received new notification from backend');
       if (Account.checkIsConsumable(notification)) {
         void handleNotification(notification, NotificationSource.WEBSOCKET);
         return;

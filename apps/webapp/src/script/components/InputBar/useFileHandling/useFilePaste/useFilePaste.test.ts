@@ -41,6 +41,8 @@ describe('useFilePaste', () => {
   const mockOnFilePasted = jest.fn();
   const mockDate = new Date('2024-01-01');
   const mockFormattedDate = '1 Jan 2024, 12:00';
+  // After sanitization, commas and colons are replaced with hyphens
+  const sanitizedFormattedDate = '1 Jan 2024-12-00';
 
   beforeEach(() => {
     jest.clearAllMocks();
@@ -66,7 +68,7 @@ describe('useFilePaste', () => {
     expect(mockOnFilePasted).toHaveBeenCalled();
     const calledWithFile = mockOnFilePasted.mock.calls[0][0];
     expect(calledWithFile instanceof File).toBe(true);
-    expect(calledWithFile.name).toBe(`Pasted file from ${mockFormattedDate}.txt`);
+    expect(calledWithFile.name).toBe(`Pasted file from ${sanitizedFormattedDate}.txt`);
     expect(checkFileSharingPermissionModule.checkFileSharingPermission).toHaveBeenCalled();
   });
 

@@ -37,6 +37,7 @@ import {isInRecycleBin} from './common/recycleBin/recycleBin';
 import {useCellsStore} from './common/useCellsStore/useCellsStore';
 import {wrapperStyles} from './ConversationCells.styles';
 import {useCellsPagination} from './useCellsPagination/useCellsPagination';
+import {useConversationSearchFiles} from './useConversationSearch/useConversationSearchFiles';
 import {useGetAllCellsNodes} from './useGetAllCellsNodes/useGetAllCellsNodes';
 import {useOnPresignedUrlExpired} from './useOnPresignedUrlExpired/useOnPresignedUrlExpired';
 import {useRefreshCellsState} from './useRefreshCellsState/useRefreshCellsState';
@@ -73,6 +74,28 @@ export const ConversationCells = memo(
       userRepository,
     });
 
+    const {
+      searchValue,
+      handleSearch,
+      handleClearSearch: clearSearch,
+    } = useConversationSearchFiles({
+      cellsRepository,
+      conversationQualifiedId,
+      enabled: isCellsStateReady,
+      userRepository,
+      onClear: refresh,
+    });
+
+    const isSearchActive = !!searchValue;
+
+    const handleClearSearch = () => {
+      clearSearch();
+      void refresh();
+    };
+
+    // When search is active, refresh should trigger search reload
+    const handleRefresh = isSearchActive ? () => handleSearch(searchValue) : refresh;
+
     const nodes = getNodes({conversationId});
     const pagination = getPagination({conversationId});
 
@@ -101,10 +124,13 @@ export const ConversationCells = memo(
     return (
       <div css={wrapperStyles}>
         <CellsHeader
-          onRefresh={refresh}
+          onRefresh={handleRefresh}
           conversationQualifiedId={conversationQualifiedId}
           conversationName={name}
           cellsRepository={cellsRepository}
+          searchValue={searchValue}
+          onSearchChange={handleSearch}
+          onSearchClear={handleClearSearch}
         />
         {isTableVisible && (
           <CellsTable
@@ -112,7 +138,7 @@ export const ConversationCells = memo(
             cellsRepository={cellsRepository}
             conversationQualifiedId={conversationQualifiedId}
             conversationName={name}
-            onRefresh={refresh}
+            onRefresh={handleRefresh}
           />
         )}
         {isCellsStatePending && !isRefreshing && (

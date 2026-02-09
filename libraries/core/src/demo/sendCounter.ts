@@ -37,7 +37,7 @@ import {FileEngine} from '@wireapp/store-engine-fs';
 
 commander.option('-c, --conversationId <conversationId>').parse(process.argv);
 
-require('dotenv').config({path: path.join(__dirname, 'sender.env')});
+require('dotenv').config({path: path.join(__dirname, 'sender.env'), quiet: true});
 
 const logger = logdown('@wireapp/core/src/demo/send-counter.ts', {
   logger: console,
