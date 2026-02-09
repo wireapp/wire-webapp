@@ -10,7 +10,7 @@
     "types": ["node"],
     "lib": ["dom", "es2022"],
     "target": "es2020",
-    "module": "commonjs",
+    "module": "esnext",
     "moduleResolution": "node",
     "resolveJsonModule": true,
     "declarationMap": true,
