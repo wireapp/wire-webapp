@@ -20,14 +20,12 @@
 import {Locator, Page} from '@playwright/test';
 
 export class HistoryImportPage {
-  readonly page: Page;
-  readonly component: Locator;
+  private component: Locator;
 
   readonly title: Locator;
   readonly description: Locator;
 
   constructor(page: Page) {
-    this.page = page;
     this.component = page.locator('#history-import');
 
     this.title = this.component.getByRole('heading');
