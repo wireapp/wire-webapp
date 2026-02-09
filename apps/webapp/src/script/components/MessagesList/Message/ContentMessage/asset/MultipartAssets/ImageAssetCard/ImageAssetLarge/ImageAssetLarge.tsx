@@ -123,7 +123,7 @@ export const ImageAssetLarge = ({
         onClose={() => setIsOpen(false)}
         filePreviewUrl={filePreviewUrl}
         fileExtension={extension}
-        fileUrl={fileUrl || filePreviewUrl}
+        fileUrl={fileUrl}
         fileName={name}
         senderName={senderName}
         timestamp={timestamp}
