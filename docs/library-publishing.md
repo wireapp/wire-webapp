@@ -8,34 +8,28 @@ The monorepo uses **Nx Release** to automate versioning and publishing of librar
 
 ## How It Works
 
-### Automatic Publishing
+The release process is a **two-step workflow** triggered manually and gated by a PR review:
 
-When you push changes to libraries on main/dev branches:
+1. **Create a release PR** — Run the `Create Library Release PR` workflow from the GitHub Actions UI. It lints, tests, and builds the libraries, bumps versions using conventional commits, and opens a PR to `dev` with the `publish-to-npm` label.
+2. **Publish on merge** — When the release PR is merged to `dev`, a second workflow detects the `publish-to-npm` label and publishes the built libraries to npm with provenance.
 
-- Automatically versions, creates tags, and publishes to npm (uses `beta` tag on merge to `dev`)
-- Uses conventional commits to determine version bump (major/minor/patch)
-- Creates GitHub releases
-- Publishes with npm provenance for security
+### Key Details
 
-### Workflow Trigger
+- Uses **conventional commits** to determine version bumps (major/minor/patch)
+- Creates GitHub releases and git tags
+- Publishes with **npm provenance** for supply-chain security
+- The release PR must be **merge-committed** (not squash-merged) to preserve git tags
 
-The release process uses two workflows:
+### Workflow Files
 
-1. **`.github/workflows/publish-libraries.yml`** — Creates a release PR with version bumps. Triggered manually via GitHub Actions UI.
-2. **`.github/workflows/publish-libraries-on-merge.yml`** — Publishes to npm when the release PR is merged to `dev`.
+1. **`.github/workflows/publish-libraries.yml`** — Creates the release PR. Triggered manually via `workflow_dispatch`.
+2. **`.github/workflows/publish-libraries-on-merge.yml`** — Publishes to npm when a PR with the `publish-to-npm` label is merged to `dev`.
 
-### Publishing Behavior
+### Tagged Projects
 
-**Main Branch (Stable Releases)**
-- Publishes to npm with the `latest` tag
-- Version format: `1.0.0`, `1.1.0`, `2.0.0`
-- Users install with: `npm install @wireapp/api-client`
-
-**Dev Branch (Beta Releases)**  
-- Publishes to npm with the `beta` tag
-- Version format: `1.0.0-beta.0`, `1.0.0-beta.1`, `1.1.0-beta.0`
-- Users install with: `npm install @wireapp/api-client@beta`
-- Does not affect the `latest` tag
+Only libraries with the `npm:public` tag in their `project.json` are published:
+- `libraries/core` → `@wireapp/core`
+- `libraries/api-client` → `@wireapp/api-client`
 
 ### Tagged Projects
 
@@ -71,47 +65,29 @@ Only libraries with the `npm:public` tag in their `project.json` are published:
 
 ## Publishing Workflow
 
-### Option 1: Automatic - Main Branch (Stable Release)
+### Creating a Release
 
-1. Make changes to a library (e.g., `libraries/api-client/`)
-2. Commit with conventional commit messages:
+1. Merge your library changes to `dev` using conventional commit messages:
    ```bash
    git commit -m "feat: add new API method"      # → minor bump
    git commit -m "fix: resolve auth issue"       # → patch bump
    git commit -m "feat!: breaking API change"    # → major bump
    ```
-3. Push to `main`:
-   ```bash
-   git push origin main
-   ```
-4. GitHub Actions will automatically:
-   - Build and test the library
-   - Determine version bump from commits
-   - Update `package.json` version (e.g., `1.0.0` → `1.1.0`)
-   - Create CHANGELOG
-   - Create git tag
-   - Publish to npm with `latest` tag
-   - Create GitHub release
+2. Go to **GitHub Actions → Create Library Release PR → Run workflow**.
+3. The workflow will:
+   - Lint, test, and build all libraries
+   - Run `nx release version` to bump versions based on conventional commits
+   - Push a release branch and open a PR to `dev` with the `publish-to-npm` label
+4. Review the PR — verify version bumps and changelog entries look correct.
+5. **Merge the PR using a merge commit** (do NOT squash — this preserves git tags).
+6. On merge, the publish workflow automatically:
+   - Builds the libraries
+   - Publishes to npm with provenance
+   - Creates GitHub releases
 
-### Option 2: Automatic - Dev Branch (Beta Release)
+### Local Testing (Dry Run)
 
-1. Make changes to a library and merge to `dev`
-2. Push to `dev`:
-   ```bash
-   git push origin dev
-   ```
-3. GitHub Actions will automatically:
-   - Build and test the library
-   - Determine version bump from commits
-   - Update `package.json` version with beta prerelease (e.g., `1.0.0` → `1.1.0-beta.0`)
-   - Create CHANGELOG
-   - Create git tag
-   - Publish to npm with `beta` tag
-   - Users can test with: `npm install @wireapp/api-client@beta`
-
-### Option 3: Manual Testing
-
-Test the release locally before pushing:
+Preview what a release would do without publishing:
 
 ```bash
 # Dry run to see what would happen
@@ -173,16 +149,21 @@ This generates cryptographic proof that the package was built in GitHub Actions 
 ### Version not incrementing
 - Check commit messages use conventional commit format
 - Run `yarn release:dry-run` to preview changes
-- Ensure commits are on `main` branch
+- Ensure commits are on the `dev` branch before triggering the workflow
+
+### Release PR not created
+- The workflow skips PR creation if no version changes are detected
+- Verify new conventional commits exist since the last release tag
 
 ### Publish fails
+- Verify the merged PR has the `publish-to-npm` label
 - Verify `NPM_TOKEN` secret is set in GitHub
 - Check npm package permissions
 - Review workflow logs in GitHub Actions
 
 ### Want to skip a release
-- Add `[skip ci]` to commit message
-- Or manually increment version in affected `package.json` files
+- Simply don't trigger the release workflow
+- Or close the release PR without merging
 
 ## Manual Release (Emergency)
 
