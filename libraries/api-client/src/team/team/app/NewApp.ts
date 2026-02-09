@@ -20,7 +20,8 @@
 import {UserAsset} from '../../../user';
 
 export interface NewApp {
-  assets: UserAsset[];
+  accent_id?: number;
+  assets?: UserAsset[];
   category: string;
   description: string;
   name: string;
