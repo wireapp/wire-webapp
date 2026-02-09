@@ -271,6 +271,12 @@ const AppLock = ({
     }
   };
 
+  const ErrorMessage = () => (
+    <p className="modal__input__error" data-uie-name="label-applock-unlock-error">
+      {unlockError}
+    </p>
+  );
+
   return (
     <ModalComponent isShown={isVisible} showLoading={isLoading} onClosed={onClosed} data-uie-name="applock-modal">
       <div className="modal__header">
@@ -457,12 +463,9 @@ const AppLock = ({
 
         {state === APPLOCK_STATE.LOCKED && (
           <form onSubmit={onUnlock}>
-            <div className="modal__text modal__label" data-uie-name="label-applock-unlock-text">
-              {t('modalAppLockPasscode')}
-            </div>
-
-            <input
+            <Input
               aria-label={t('modalAppLockLockedTitle', {brandName: Config.getConfig().BRAND_NAME})}
+              label={t('modalAppLockPasscode')}
               autoFocus
               className="modal__input"
               type="password"
@@ -471,6 +474,7 @@ const AppLock = ({
               onKeyDown={clearUnlockError}
               data-uie-name="input-applock-unlock"
               autoComplete="new-password"
+              error={ErrorMessage()}
             />
 
             <p className="modal__input__error" data-uie-name="label-applock-unlock-error">
