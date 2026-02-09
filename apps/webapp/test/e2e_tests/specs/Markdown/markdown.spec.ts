@@ -31,7 +31,7 @@ test.describe('Markdown', () => {
     userB = team.members[0];
   });
 
-  test('I want to write a bold message', {tag: ['@TC-1314', '@regression']}, async ({createPage}) => {
+  test('I want to write a bold message', {tag: ['@TC-1313', '@regression']}, async ({createPage}) => {
     const [userAPages, userBPages] = await Promise.all([
       PageManager.from(createPage(withLogin(userA), withConnectedUser(userB))).then(pm => pm.webapp.pages),
       PageManager.from(createPage(withLogin(userB), withConnectedUser(userA))).then(pm => pm.webapp.pages),
@@ -42,7 +42,7 @@ test.describe('Markdown', () => {
     for (const pages of [userAPages, userBPages]) {
       const message = pages.conversation().getMessage({sender: userA});
       await expect(message).toBeVisible();
-      await expect(message.locator('strong, b')).toHaveText('Bold Message from User A');
+      await expect(message.getByRole('strong')).toHaveText('Bold Message from User A');
     }
   });
 
@@ -57,7 +57,7 @@ test.describe('Markdown', () => {
     for (const pages of [userAPages, userBPages]) {
       const message = pages.conversation().getMessage({sender: userA});
       await expect(message).toBeVisible();
-      await expect(message.locator('em, i')).toHaveText('Emphasized message from User A');
+      await expect(message.getByRole('emphasis')).toHaveText('Emphasized message from User A');
     }
   });
 
@@ -72,7 +72,7 @@ test.describe('Markdown', () => {
     for (const pages of [userAPages, userBPages]) {
       const message = pages.conversation().getMessage({sender: userA});
       await expect(message).toBeVisible();
-      await expect(message.locator('code')).toContainText('Code message from User A');
+      await expect(message.getByRole('code')).toContainText('Code message from User A');
     }
   });
 
@@ -87,8 +87,7 @@ test.describe('Markdown', () => {
     for (const pages of [userAPages, userBPages]) {
       const message = pages.conversation().getMessage({sender: userA});
       await expect(message).toBeVisible();
-      await expect(message.locator('pre')).toBeVisible();
-      await expect(message.locator('pre code')).toContainText('const a = 5; const b = 10;');
+      await expect(message.getByRole('code')).toContainText('const a = 5; const b = 10;');
     }
   });
 
@@ -103,9 +102,9 @@ test.describe('Markdown', () => {
     for (const pages of [userAPages, userBPages]) {
       const message = pages.conversation().getMessage({sender: userA});
       await expect(message).toBeVisible();
-      await expect(message.locator('strong, b')).toContainText('Bold');
-      await expect(message.locator('em, i')).toContainText('Italic');
-      await expect(message.locator('code')).toContainText('Code');
+      await expect(message.getByRole('strong')).toContainText('Bold');
+      await expect(message.getByRole('emphasis')).toContainText('Italic');
+      await expect(message.getByRole('code')).toContainText('Code');
     }
   });
 
@@ -120,8 +119,8 @@ test.describe('Markdown', () => {
     const sentMessageA = userAPages.conversation().getMessage({sender: userA});
     const sentMessageB = userBPages.conversation().getMessage({sender: userA});
 
-    await expect(sentMessageA.locator('strong, b')).toHaveText('Bold');
-    await expect(sentMessageB.locator('strong, b')).toHaveText('Bold');
+    await expect(sentMessageA.getByRole('strong')).toHaveText('Bold');
+    await expect(sentMessageB.getByRole('strong')).toHaveText('Bold');
 
     await userAPages.conversation().editMessage(sentMessageA);
     await expect(userAPages.conversation().messageInput).toContainText('Start Bold Message');
@@ -130,8 +129,8 @@ test.describe('Markdown', () => {
 
     for (const message of [sentMessageA, sentMessageB]) {
       await expect(message).toContainText('Edited to Italic Message');
-      await expect(message.locator('em, i')).toHaveText('Italic');
-      await expect(message.locator('strong, b')).not.toBeVisible();
+      await expect(message.getByRole('emphasis')).toHaveText('Italic');
+      await expect(message.getByRole('strong')).not.toBeVisible();
     }
   });
 
@@ -153,8 +152,7 @@ test.describe('Markdown', () => {
         await expect(message).toBeVisible();
         await expect(message).toContainText(`Visit ${linkText} for book a demo`);
 
-        const linkLocator = message.locator('a');
-        await expect(linkLocator).toHaveText(linkText);
+        const linkLocator = message.getByRole('link', {name: linkText});
         await expect(linkLocator).toHaveAttribute('href', url);
       }
     },
