@@ -58,8 +58,8 @@ jobs:
           echo "📦 Creating release PR for dev..."
           echo "🔍 Auto-detecting version bump from conventional commits..."
 
-          # Run nx release to update versions, commit, and tag
-          yarn nx release version --skip-publish
+          # Run nx release version to update versions, commit, and tag
+          yarn nx release version
 
           # Check if any commits were created
           COMMITS_AHEAD="$(git rev-list --count "origin/dev..HEAD")"
