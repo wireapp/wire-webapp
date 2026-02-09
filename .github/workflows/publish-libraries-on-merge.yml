@@ -1,4 +1,4 @@
-name: Publish Libraries on Release PR Merge
+name: Publish packages to npm
 
 on:
   pull_request:
