@@ -19,9 +19,10 @@ When you push changes to libraries on main/dev branches:
 
 ### Workflow Trigger
 
-The workflow (`.github/workflows/publish-libraries.yml`) runs when:
-- Changes are pushed to `libraries/**` on `main` or `dev` branches
-- Manually triggered via GitHub Actions UI
+The release process uses two workflows:
+
+1. **`.github/workflows/publish-libraries.yml`** — Creates a release PR with version bumps. Triggered manually via GitHub Actions UI.
+2. **`.github/workflows/publish-libraries-on-merge.yml`** — Publishes to npm when the release PR is merged to `dev`.
 
 ### Publishing Behavior
 
@@ -144,7 +145,7 @@ git commit -m "feat(api-client)!: remove deprecated auth methods"
 The workflow uses **npm provenance** for secure, keyless publishing:
 
 ### Requirements:
-1. **GitHub Actions workflow** named `publish-libraries.yml` 
+1. **GitHub Actions workflow** named `publish-libraries-on-merge.yml` (the workflow that runs `nx release publish`)
 2. **Permissions** in workflow:
    ```yaml
    permissions:
@@ -154,7 +155,7 @@ The workflow uses **npm provenance** for secure, keyless publishing:
 3. **NPM package settings**:
    - Enable "Require 2FA or Automation tokens" 
    - Configure trusted publisher:
-     - **Workflow**: `publish-libraries.yml`
+     - **Workflow**: `publish-libraries-on-merge.yml`
      - **Repository**: `wireapp/wire-webapp`
 
 4. **NPM_TOKEN secret** in GitHub repository settings
