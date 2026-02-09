@@ -17,29 +17,13 @@
  *
  */
 
-import {AxiosRequestConfig} from 'axios';
+import {UserAsset} from '../../../user';
 
-import {NewAppRequest} from './NewAppRequest';
-import {NewAppResponse} from './NewAppResponse';
-
-import {HttpClient} from '../../http';
-import {TeamAPI} from '../team';
-
-export class AppAPI {
-  constructor(private readonly client: HttpClient) {}
-
-  public static readonly URL = {
-    APPS: 'apps',
-  };
-
-  public async postApp(teamId: string, app: NewAppRequest): Promise<NewAppResponse> {
-    const config: AxiosRequestConfig = {
-      data: app,
-      method: 'POST',
-      url: `${TeamAPI.URL.TEAMS}/${teamId}/${AppAPI.URL.APPS}`,
-    };
-
-    const response = await this.client.sendJSON<NewAppResponse>(config);
-    return response.data;
-  }
+export interface NewApp {
+  assets: UserAsset[];
+  category: string;
+  description: string;
+  name: string;
+  // We don't send any metadata but the backend requires the metadata field to be present
+  metadata: {};
 }

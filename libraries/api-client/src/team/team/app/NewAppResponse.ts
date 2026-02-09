@@ -17,7 +17,7 @@
  *
  */
 
-import {User} from '../../user';
+import {User} from '../../../user';
 
 export interface NewAppResponse {
   cookie: string;
