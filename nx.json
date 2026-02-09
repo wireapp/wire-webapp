@@ -39,6 +39,7 @@
     "version": {
       "conventionalCommits": true,
       "fallbackCurrentVersionResolver": "disk",
+      "preserveLocalDependencyProtocols": false,
       "git": {
         "commit": true,
         "tag": true,
