@@ -75,7 +75,7 @@ jobs:
           gh pr create \
             --base dev \
             --head "$RELEASE_BRANCH" \
-            --title "chore(release): publish libraries" \
+            --title "chore(release): publish libraries [WPB-22420]" \
             --label "publish-to-npm" \
             --body "Automated release PR created by nx release. ⚠️ **Important:** Do NOT squash merge this PR. Use 'Merge commit' to preserve git tags."
         env:
