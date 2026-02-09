@@ -86,14 +86,28 @@ const CameraPreferencesComponent = ({streamHandler, refreshStream, hasActiveCame
   // Debounce to handle rapid device changes (removeAllDevices + enumerateDevices)
   const debouncedRequestStream = useDebouncedCallback(requestStream, DEBOUNCE_TIMEOUT);
 
+  const cleanUpVideoSrc = () => {
+    if (videoElement.current) {
+      videoElement.current.srcObject = null;
+    }
+  };
+
   useEffect(() => {
     debouncedRequestStream();
   }, [videoInputDeviceId, videoInputDevices.length, debouncedRequestStream]);
 
   useEffect(() => {
     if (videoElement.current && stream) {
+      cleanUpVideoSrc();
+
+      // Attach the new stream (autoPlay attribute handles playback)
       videoElement.current.srcObject = stream;
     }
+
+    // Cleanup function to properly detach stream when component unmounts or stream changes
+    return () => {
+      cleanUpVideoSrc();
+    };
   }, [stream]);
 
   useEffect(
