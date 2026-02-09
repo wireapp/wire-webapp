@@ -38,7 +38,8 @@ import {
 import {FileFullscreenModal} from '../../../../../../../FileFullscreenModal/FileFullscreenModal';
 
 interface ImageAssetLargeProps {
-  src?: string;
+  filePreviewUrl?: string;
+  fileUrl?: string;
   name: string;
   extension: string;
   metadata: ICellAsset['image'];
@@ -50,7 +51,8 @@ interface ImageAssetLargeProps {
 
 export const ImageAssetLarge = ({
   id,
-  src,
+  filePreviewUrl,
+  fileUrl,
   name,
   extension,
   metadata,
@@ -98,7 +100,7 @@ export const ImageAssetLarge = ({
         </div>
         <div css={imageWrapperStyles}>
           <img
-            src={src}
+            src={filePreviewUrl}
             alt=""
             css={imageStyle}
             style={
@@ -119,9 +121,9 @@ export const ImageAssetLarge = ({
         id={id}
         isOpen={isOpen}
         onClose={() => setIsOpen(false)}
-        filePreviewUrl={src}
+        filePreviewUrl={filePreviewUrl}
         fileExtension={extension}
-        fileUrl={src}
+        fileUrl={fileUrl || filePreviewUrl}
         fileName={name}
         senderName={senderName}
         timestamp={timestamp}

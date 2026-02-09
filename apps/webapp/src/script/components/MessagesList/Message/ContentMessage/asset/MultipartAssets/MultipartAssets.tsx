@@ -146,7 +146,8 @@ const MultipartAsset = ({
       <li ref={elementRef} css={imageCardStyles}>
         <ImageAssetCard
           id={uuid}
-          src={imageSrc}
+          filePreviewUrl={imageSrc}
+          fileUrl={src}
           name={name}
           extension={extension}
           variant={variant}
