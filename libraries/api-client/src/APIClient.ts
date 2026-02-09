@@ -67,6 +67,7 @@ import {
   TeamConversationAPI,
   TeamInvitationAPI,
 } from './team/';
+import {AppAPI} from './team/app/AppAPI';
 import {ScimAPI} from './team/scim/ScimAPI';
 import {TeamSearchAPI} from './team/search';
 import {SSOAPI} from './team/sso';
@@ -110,6 +111,7 @@ type Apis = {
   services: ServicesAPI;
   serviceProvider: ServiceProviderAPI;
   teams: {
+    app: AppAPI;
     conversation: TeamConversationAPI;
     feature: FeatureAPI;
     identityProvider: IdentityProviderAPI;
@@ -238,6 +240,7 @@ export class APIClient extends EventEmitter {
       self: new SelfAPI(this.transport.http),
       serviceProvider: new ServiceProviderAPI(this.transport.http),
       teams: {
+        app: new AppAPI(this.transport.http),
         conversation: new TeamConversationAPI(this.transport.http),
         feature: new FeatureAPI(this.transport.http),
         identityProvider: new IdentityProviderAPI(this.transport.http),
