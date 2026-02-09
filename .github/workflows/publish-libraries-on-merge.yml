@@ -16,7 +16,6 @@ concurrency:
 
 jobs:
   publish:
-    name: Publish Libraries to NPM
     if: |
       github.event.pull_request.merged == true &&
       contains(github.event.pull_request.labels.*.name, 'publish-to-npm')
