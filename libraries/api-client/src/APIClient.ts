@@ -405,7 +405,7 @@ export class APIClient extends EventEmitter {
       const self = await this.api.self.getSelf();
       selfDomain = self.qualified_id?.domain;
     } catch (error) {
-      this.logger.warn('Could not get self user', (error as BackendError).message);
+      this.logger.warn('Could not get self user:', (error as BackendError).message);
     }
 
     this.context = this.context
