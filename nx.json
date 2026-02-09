@@ -38,17 +38,17 @@
     "projectsRelationship": "independent",
     "version": {
       "conventionalCommits": true,
-      "fallbackCurrentVersionResolver": "disk"
+      "fallbackCurrentVersionResolver": "disk",
+      "git": {
+        "commit": true,
+        "tag": true,
+        "commitMessage": "chore(release): publish {projectName} {version} [skip ci]"
+      }
     },
     "changelog": {
       "projectChangelogs": {
         "createRelease": "github"
       }
-    },
-    "git": {
-      "commit": true,
-      "tag": true,
-      "commitMessage": "chore(release): publish {projectName} {version} [skip ci]"
     }
   }
 }
