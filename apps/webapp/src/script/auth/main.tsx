@@ -87,12 +87,13 @@ async function runApp() {
   await initializeWireLogger(config, {domain});
 
   // Verify new logger is working
-  const {getLogger: getWireLogger} = await import('@wireapp/logger');
-  const wireLogger = getWireLogger('Auth');
-  wireLogger.production.info('Wire Logger initialized in auth flow', {
+  const {getLogger} = await import('@wireapp/logger');
+  const wireLogger = getLogger('Auth');
+  wireLogger.development.info('@wireapp/logger library initialized successfully for', {
     domain,
     environment: config.ENVIRONMENT,
   });
+  wireLogger.production.info('@wireapp/logger library initialized');
 
   render(Root);
   setAppLocale();

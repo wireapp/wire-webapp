@@ -420,12 +420,14 @@ export class App {
       await initializeWireLogger(this.config, selfUser.qualifiedId);
 
       // Verify new logger is working
-      const {getLogger: getWireLogger} = await import('@wireapp/logger');
-      const wireLogger = getWireLogger('@wireapp/App.ts');
-      wireLogger.production.info('Wire Logger initialized successfully', {
-        userId: selfUser.id,
+      const {getLogger} = await import('@wireapp/logger');
+      const wireLogger = getLogger('@wireapp/App.ts');
+      wireLogger.development.info('@wireapp/logger library initialized successfully for', {
+        userId: selfUser.qualifiedId.id,
+        domain: selfUser.qualifiedId.domain,
         environment: this.config.ENVIRONMENT,
       });
+      wireLogger.production.info('@wireapp/logger library initialized');
 
       const eventLogger = new InitializationEventLogger(selfUser.id);
       eventLogger.log(AppInitializationStep.AppInitialize);
