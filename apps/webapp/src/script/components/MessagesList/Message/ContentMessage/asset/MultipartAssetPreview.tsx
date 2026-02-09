@@ -55,13 +55,11 @@ export const MultipartAssetPreview: FC<MultipartAssetPreviewProps> = ({
   const extension = firstAsset?.initialName ? getFileExtension(firstAsset.initialName) : '';
   const isImage = firstAsset?.contentType?.startsWith('image');
   const isVideo = firstAsset?.contentType?.startsWith('video');
-  const canPreviewImage = isPreviewableImage({mimeType: firstAsset?.contentType, extension});
-  const hasPreview = ((isImage && canPreviewImage) || isVideo) && !!firstAsset?.uuid;
 
   const {src, imagePreviewUrl, isLoading} = useGetMultipartAsset({
     uuid: firstAsset?.uuid || '',
     cellsRepository,
-    isEnabled: hasPreview,
+    isEnabled: !!firstAsset?.uuid,
     retryPreviewUntilSuccess: false,
   });
 
@@ -69,7 +67,9 @@ export const MultipartAssetPreview: FC<MultipartAssetPreviewProps> = ({
     return null;
   }
 
-  const previewUrl = isVideo ? imagePreviewUrl : src;
+  const canPreviewImage = isPreviewableImage({mimeType: firstAsset?.contentType, extension}) || !!imagePreviewUrl;
+  const hasPreview = ((isImage && canPreviewImage) || isVideo) && !!firstAsset?.uuid;
+  const previewUrl = isVideo ? imagePreviewUrl : imagePreviewUrl || src;
 
   // Show loading state or preview for images/videos
   const shouldDisplayImagePreview = hasPreview && (previewUrl || isLoading);
@@ -136,7 +136,7 @@ export const MultipartAssetPreview: FC<MultipartAssetPreviewProps> = ({
           id={modalId}
           isOpen={isModalOpen}
           onClose={() => setIsModalOpen(false)}
-          filePreviewUrl={isVideo ? imagePreviewUrl : src}
+          filePreviewUrl={previewUrl}
           fileExtension={fileExtension}
           fileName={fileName}
           fileUrl={src}
