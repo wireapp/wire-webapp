@@ -482,5 +482,44 @@ describe('MultipartAssets', () => {
 
       expect(screen.queryByLabelText('accessibility.conversationAssetImageAlt')).not.toBeInTheDocument();
     });
+
+    it('should render an image card when a server preview is available for HEIC', async () => {
+      const heicPreviewNode: RestNode = {
+        ...mockNode,
+        Previews: [
+          {
+            ContentType: 'image/jpeg',
+            PreSignedGET: {
+              Url: 'https://example.com/preview.jpg',
+            },
+          },
+        ],
+      } as RestNode;
+
+      mockCellsRepository.getNode.mockResolvedValue(heicPreviewNode);
+
+      const assets: ICellAsset[] = [
+        {
+          ...createMockAsset('test-uuid', 'image/heic', 'sample.heic'),
+          image: {width: 100, height: 100},
+        },
+      ];
+
+      render(
+        withTheme(
+          <MultipartAssets
+            assets={assets}
+            conversationId="conv-123"
+            cellsRepository={mockCellsRepository}
+            senderName="John Doe"
+            timestamp={Date.now()}
+          />,
+        ),
+      );
+
+      await waitFor(() => {
+        expect(screen.getByLabelText('accessibility.conversationAssetImageAlt')).toBeInTheDocument();
+      });
+    });
   });
 });
