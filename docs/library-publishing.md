@@ -118,23 +118,24 @@ git commit -m "feat(api-client)!: remove deprecated auth methods"
 
 ## NPM Trusted Publishing Setup
 
-The workflow uses **npm provenance** for secure, keyless publishing:
+The workflow uses **OIDC-based trusted publishing** for secure, keyless npm authentication — no npm tokens are stored as secrets.
+
+### How It Works
+
+GitHub Actions mints a short-lived OIDC token during the workflow run. npm verifies the token against the trusted publisher configuration on the package, confirming the publish originated from the expected repository and workflow. The `NPM_CONFIG_PROVENANCE` flag attaches a cryptographic provenance attestation to the published package.
 
 ### Requirements:
-1. **GitHub Actions workflow** named `publish-libraries-on-merge.yml` (the workflow that runs `nx release publish`)
-2. **Permissions** in workflow:
+1. **GitHub Actions workflow** must have:
    ```yaml
    permissions:
-     id-token: write  # for provenance
+     id-token: write  # for OIDC token / provenance
      contents: write  # for tags/commits
    ```
-3. **NPM package settings**:
-   - Enable "Require 2FA or Automation tokens" 
-   - Configure trusted publisher:
-     - **Workflow**: `publish-libraries-on-merge.yml`
+2. **NPM package settings** (configured per-package on npmjs.com):
+   - Go to **Settings → Publishing access → Configure trusted publishers**
+   - Add a trusted publisher:
      - **Repository**: `wireapp/wire-webapp`
-
-4. **NPM_TOKEN secret** in GitHub repository settings
+     - **Workflow**: `publish-libraries-on-merge.yml`
 
 ### Environment Variable:
 ```yaml
@@ -157,7 +158,8 @@ This generates cryptographic proof that the package was built in GitHub Actions 
 
 ### Publish fails
 - Verify the merged PR has the `publish-to-npm` label
-- Verify `NPM_TOKEN` secret is set in GitHub
+- Ensure the npm package has a trusted publisher configured for `wireapp/wire-webapp` and the `publish-libraries-on-merge.yml` workflow
+- Check that the workflow has `id-token: write` permission
 - Check npm package permissions
 - Review workflow logs in GitHub Actions
 
