@@ -477,9 +477,9 @@ const AppLock = ({
               error={ErrorMessage()}
             />
 
-            <p className="modal__input__error" data-uie-name="label-applock-unlock-error">
-              {unlockError}
-            </p>
+            <Button block type="submit" data-uie-name="do-action">
+              {t('modalAppLockLockedUnlockButton')}
+            </Button>
 
             <button
               type="button"
