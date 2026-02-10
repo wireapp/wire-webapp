@@ -1,5 +1,6 @@
 {
   "name": "@wireapp/core",
+  "private": true,
   "license": "GPL-3.0",
   "description": "Wire for Web's communication core.",
   "repository": {
