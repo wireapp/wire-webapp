@@ -42,7 +42,9 @@ test.describe('History Backup', () => {
         PageManager.from(createPage(withLogin(userA), withConnectedUser(userB))),
         PageManager.from(createPage(withLogin(userB), withConnectedUser(userA))),
       ]);
-      const {pages: userAPages, modals: userAModals, components: userAComponents} = userAPageManager.webapp;
+
+      // Use 'let' here so we can re-assign these later to the new browser context
+      let {pages: userAPages, modals: userAModals, components: userAComponents} = userAPageManager.webapp;
       const {pages: userBPages} = userBPageManager.webapp;
 
       const conversationName = 'Test group';
@@ -89,10 +91,24 @@ test.describe('History Backup', () => {
 
         await userAPageManager.openUrl(resetPasswordUrl);
         await userAPages.resetPassword().setNewPassword(newPassword);
-        await userAPages.resetPassword().isPasswordChangeMessageVisible();
+        await expect(userAPages.resetPassword().passwordChangeMessage).toBeVisible();
 
-        await userAPageManager.openMainPage();
-        await loginUser(userA, userAPageManager);
+        await userAPageManager.page.context().close();
+
+        // Initialize a new context and page
+        const newBrowserContext = await userAPageManager.page.context().browser()!.newContext();
+        const newPageUserA = await newBrowserContext.newPage();
+        const newUserAPageManager = PageManager.from(newPageUserA);
+
+        await newUserAPageManager.openMainPage();
+        await loginUser(userA, newUserAPageManager);
+
+        // Reassign pages, modals and components for new context
+        userAPages = newUserAPageManager.webapp.pages;
+        userAModals = newUserAPageManager.webapp.modals;
+        userAComponents = newUserAPageManager.webapp.components;
+
+        await userAPages.historyInfo().continueButton.click();
       });
 
       await userAComponents.conversationSidebar().clickPreferencesButton();
@@ -183,10 +199,7 @@ test.describe('History Backup', () => {
         // User B renames group conversation
         await userBPages.conversation().conversationInfoButton.click();
         await userBPages.conversationDetails().editConversationNameButton.click();
-        const textFieldConversationName = userBPages
-          .conversationDetails()
-          .page.locator('textarea[data-uie-name="enter-name"]');
-        await textFieldConversationName.fill('');
+        const textFieldConversationName = userBPages.conversationDetails().textFieldForConversationName;
         await textFieldConversationName.fill(renamedConversationName);
         await textFieldConversationName.press('Enter');
 
@@ -233,12 +246,7 @@ test.describe('History Backup', () => {
 
       await test.step('User A mutes group conversation with User B', async () => {
         await userAPages.conversation().conversationInfoButton.click();
-        await userAPages.conversationDetails().notificationsButton.click();
-        await userAPages
-          .conversationDetails()
-          .page.getByRole('radiogroup')
-          .locator('label', {hasText: 'Nothing'})
-          .click();
+        await userAPages.conversationDetails().setNotificationsForConversation('Nothing');
       });
 
       await test.step('User A archives 1:1 conversation with User B', async () => {
@@ -343,9 +351,8 @@ test.describe('History Backup', () => {
       await test.step('User A deletes group conversation with User B', async () => {
         await userAPages.conversation().conversationInfoButton.click();
         await userAPages.conversationDetails().deleteGroupButton.click();
-        const deleteGroupModal = userAModals.confirm();
-        expect(await deleteGroupModal.getModalTitle()).toContain('Delete group conversation?');
-        await deleteGroupModal.clickAction();
+        expect(await userAModals.confirm().modalTitle).toContainText('Delete group conversation?');
+        await userAModals.confirm().clickAction();
       });
 
       await test.step('User A creates History Backup', async () => {

@@ -34,6 +34,7 @@ export class ConversationDetailsPage {
   readonly deleteGroupButton: Locator;
   readonly notificationsButton: Locator;
   readonly editConversationNameButton: Locator;
+  readonly textFieldForConversationName: Locator;
 
   constructor(page: Page) {
     this.page = page;
@@ -50,6 +51,7 @@ export class ConversationDetailsPage {
     this.deleteGroupButton = this.page.getByRole('button', {name: 'Delete group'});
     this.notificationsButton = this.page.getByRole('button', {name: 'Notifications'});
     this.editConversationNameButton = this.page.getByRole('button', {name: 'Change conversation name'});
+    this.textFieldForConversationName = this.page.locator('textarea[data-uie-name="enter-name"]');
   }
 
   async waitForSidebar() {
@@ -186,5 +188,10 @@ export class ConversationDetailsPage {
 
   async clickClearConversationContentButton() {
     await this.clearConversationContentButton.click();
+  }
+
+  async setNotificationsForConversation(value: 'Everything' | 'Mentions and replies' | 'Nothing') {
+    await this.notificationsButton.click();
+    await this.page.getByRole('radiogroup').locator('label', {hasText: value}).click();
   }
 }
