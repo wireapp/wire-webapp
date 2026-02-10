@@ -26,6 +26,7 @@ import {InvalidAppLockTimeoutError} from './FeatureError';
 import {
   allFeaturesResponseSchema,
   FeatureAllowedGlobalOperations,
+  FeatureApps,
   FeatureAppLock,
   FeatureCells,
   FeatureChannels,
@@ -462,6 +463,16 @@ export class FeatureAPI {
     };
 
     const response = await this.client.sendJSON<FeatureAssetAuditLog>(config);
+    return response.data;
+  }
+
+  public async getAppsFeature(teamId: string): Promise<FeatureCells> {
+    const config: AxiosRequestConfig = {
+      method: 'get',
+      url: `/teams/${teamId}/features/apps`,
+    };
+
+    const response = await this.client.sendJSON<FeatureApps>(config);
     return response.data;
   }
 }
