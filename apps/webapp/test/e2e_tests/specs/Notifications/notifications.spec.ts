@@ -45,4 +45,38 @@ test.describe('Notifications', () => {
         ]),
       );
   });
+
+  // TODO: This test is currently failing if it's a bug disable it and link bug ticket
+  test(
+    'I should not receive notifications for archived conversations',
+    {tag: ['@TC-8760', '@regression']},
+    async ({createPage}) => {
+      const [userAPage, userBPage] = await Promise.all([
+        createPage(withLogin(userA), withConnectedUser(userB)),
+        createPage(withLogin(userB)),
+      ]);
+      const userAPages = PageManager.from(userAPage).webapp.pages;
+      const {pages: userBPages, components: userBComponents} = PageManager.from(userBPage).webapp;
+
+      // Start intercepting notifications
+      const {getNotifications: getUserBNotifications} = await interceptNotifications(userBPage);
+
+      // Archive conversation for user B
+      await userBPages.conversationList().openConversation(userA.fullName, {protocol: 'mls'});
+      await userBPages.conversationList().clickConversationOptions(userA.fullName);
+      await userBPages.conversationList().archiveConversation();
+
+      // Send message from A to B in 1on1 conversation
+      await userAPages.conversationList().openConversation(userB.fullName, {protocol: 'mls'});
+      await userAPages.conversation().sendMessage('Hello');
+
+      // Open the archived conversation and ensure the message was received
+      await userBComponents.conversationSidebar().clickArchive();
+      await userBPages.conversationList().openConversation(userA.fullName);
+      await expect(userBPages.conversation().getMessage({sender: userA})).toBeVisible();
+
+      // Check that B did not receive any more notifications
+      await expect.poll(() => getUserBNotifications()).toHaveLength(0);
+    },
+  );
 });
