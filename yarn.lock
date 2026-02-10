@@ -10864,6 +10864,7 @@ __metadata:
     ts-node: "npm:^10.9.2"
     webpack: "npm:^5.104.1"
     ws: "npm:8.19.0"
+    zod: "npm:3.25.76"
   languageName: unknown
   linkType: soft
 
