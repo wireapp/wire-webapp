@@ -22,7 +22,7 @@ jobs:
         with:
           fetch-depth: 0
           ref: dev
-          token: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.OTTO_THE_BOT_GH_TOKEN }}
 
       - name: Setup Node.js
         uses: actions/setup-node@v6
@@ -32,8 +32,8 @@ jobs:
 
       - name: Configure git
         run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git config user.name "otto-the-bot"
+          git config user.email "8736538+otto-the-bot@users.noreply.github.com"
 
       - name: Create release branch
         run: |
@@ -79,4 +79,4 @@ jobs:
             --label "publish-to-npm" \
             --body "Automated release PR created by nx release. ⚠️ **Important:** Do NOT squash merge this PR. Use 'Merge commit' to preserve git tags."
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.OTTO_THE_BOT_GH_TOKEN }}
