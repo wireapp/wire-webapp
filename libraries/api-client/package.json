@@ -51,8 +51,7 @@
     "dist": "nx run api-client-lib:dist",
     "test": "nx run api-client-lib:test",
     "test:coverage": "nx run api-client-lib:test:coverage",
-    "watch": "nx run api-client-lib:watch",
-    "prepare": "yarn dist"
+    "watch": "nx run api-client-lib:watch"
   },
   "version": "27.95.5",
   "gitHead": "5339f01fe01ef0871da8c8bc8662fbe9e604754a"
