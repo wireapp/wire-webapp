@@ -2,7 +2,11 @@
   "name": "@wireapp/core",
   "license": "GPL-3.0",
   "description": "Wire for Web's communication core.",
-  "repository": "https://github.com/wireapp/wire-webapp/tree/main/libraries/core",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/wireapp/wire-webapp",
+    "directory": "libraries/core"
+  },
   "files": [
     "lib",
     "src"
