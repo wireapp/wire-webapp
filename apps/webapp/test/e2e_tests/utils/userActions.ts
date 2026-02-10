@@ -115,3 +115,23 @@ export async function sendConnectionRequest(senderPageManager: PageManager, rece
   await pages.startUI().selectUsers(receiver.username);
   await modals.userProfile().clickConnectButton();
 }
+
+export async function createAndSaveBackup(pageManager: PageManager, password?: string, filenamePrefix?: string) {
+  const {pages, modals} = pageManager.webapp;
+
+  await pages.account().clickBackUpButton();
+  await expect(modals.passwordAdvancedSecurity().modal).toBeVisible();
+  if (password) {
+    await modals.passwordAdvancedSecurity().enterPassword(password);
+  }
+  await modals.passwordAdvancedSecurity().clickBackUpNow();
+  await expect(modals.passwordAdvancedSecurity().modal).toBeHidden();
+  expect(pages.historyExport().isVisible()).toBeTruthy();
+  const [download] = await Promise.all([
+    pages.historyExport().page.waitForEvent('download'),
+    pages.historyExport().clickSaveFileButton(),
+  ]);
+  const backupName = `./test-results/downloads/${filenamePrefix}${download.suggestedFilename()}`;
+  await download.saveAs(backupName);
+  return backupName;
+}

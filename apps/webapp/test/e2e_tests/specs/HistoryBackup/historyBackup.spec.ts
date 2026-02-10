@@ -20,8 +20,9 @@
 import {User} from 'test/e2e_tests/data/user';
 import {PageManager} from 'test/e2e_tests/pageManager';
 import {test, expect, withLogin, withConnectedUser} from 'test/e2e_tests/test.fixtures';
-import {createGroup, loginUser, logOutUser} from 'test/e2e_tests/utils/userActions';
+import {createAndSaveBackup, createGroup, loginUser, logOutUser} from 'test/e2e_tests/utils/userActions';
 import {generateSecurePassword, generateWireEmail} from '../../utils/userDataGenerator';
+import {RequestResetPasswordPage} from '../../pageManager/webapp/pages/requestResetPassword.page';
 
 test.describe('History Backup', () => {
   let userA: User;
@@ -32,30 +33,6 @@ test.describe('History Backup', () => {
     userA = team.owner;
     userB = team.members[0];
   });
-
-  const createAndSaveBackup = async (
-    pageManager: PageManager,
-    password?: string,
-    filenamePrefix?: string,
-  ): Promise<string> => {
-    const {pages, modals} = pageManager.webapp;
-
-    await pages.account().clickBackUpButton();
-    await expect(modals.passwordAdvancedSecurity().modal).toBeVisible();
-    if (password) {
-      await modals.passwordAdvancedSecurity().enterPassword(password);
-    }
-    await modals.passwordAdvancedSecurity().clickBackUpNow();
-    await expect(modals.passwordAdvancedSecurity().modal).toBeHidden();
-    expect(pages.historyExport().isVisible()).toBeTruthy();
-    const [download] = await Promise.all([
-      pages.historyExport().page.waitForEvent('download'),
-      pages.historyExport().clickSaveFileButton(),
-    ]);
-    const backupName = `./test-results/downloads/${filenamePrefix}${download.suggestedFilename()}`;
-    await download.saveAs(backupName);
-    return backupName;
-  };
 
   test(
     'I want to import a backup that I exported when I was using a different email/password',
@@ -102,8 +79,7 @@ test.describe('History Backup', () => {
           userAPages.account().clickResetPasswordButton(),
         ]);
 
-        const resetPasswordPageManager = PageManager.from(newPage);
-        const resetPasswordPage = resetPasswordPageManager.webapp.pages.requestResetPassword();
+        const resetPasswordPage = new RequestResetPasswordPage(newPage);
         await resetPasswordPage.requestPasswordResetForEmail(userA.email);
         const resetPasswordUrl = await api.inbucket.getResetPasswordURL(userA.email);
         await newPage.close();
