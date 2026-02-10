@@ -108,7 +108,7 @@ test('Setting up new device with a backup', {tag: ['@TC-8634', '@crit-flow-web']
   await test.step('User restores the previously created backup', async () => {
     await components.conversationSidebar().clickPreferencesButton();
     await pages.account().backupFileInput.setInputFiles(backupName);
-    expect(pages.historyImport().importSuccessHeadline.isVisible()).toBeTruthy();
+    await expect(pages.historyImport().title).toContainText('History restored');
   });
 
   await test.step('User restores the previously created password protected backup', async () => {
@@ -118,7 +118,7 @@ test('Setting up new device with a backup', {tag: ['@TC-8634', '@crit-flow-web']
     await modals.passwordAdvancedSecurity().enterPassword(userA.password);
     await modals.passwordAdvancedSecurity().clickAction();
     await expect(modals.passwordAdvancedSecurity().modalTitle).not.toBeVisible();
-    expect(pages.historyImport().importSuccessHeadline.isVisible()).toBeTruthy();
+    await expect(pages.historyImport().title).toContainText('History restored');
   });
 
   await test.step('All data (chat history, contacts) are restored', async () => {

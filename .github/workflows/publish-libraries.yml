@@ -58,8 +58,8 @@ jobs:
           echo "📦 Creating release PR for dev..."
           echo "🔍 Auto-detecting version bump from conventional commits..."
 
-          # Run nx release to update versions, commit, and tag
-          yarn nx release version --skip-publish
+          # Run nx release version to update versions, commit, and tag
+          yarn nx release version
 
           # Check if any commits were created
           COMMITS_AHEAD="$(git rev-list --count "origin/dev..HEAD")"
@@ -75,7 +75,8 @@ jobs:
           gh pr create \
             --base dev \
             --head "$RELEASE_BRANCH" \
-            --title "chore(release): publish libraries" \
+            --title "chore(release): publish libraries [WPB-22420]" \
+            --label "publish-to-npm" \
             --body "Automated release PR created by nx release. ⚠️ **Important:** Do NOT squash merge this PR. Use 'Merge commit' to preserve git tags."
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

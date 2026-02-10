@@ -84,55 +84,47 @@ test.describe('account settings', () => {
     },
   );
 
-  test.describe('SCIM', () => {
-    let pageManager: PageManager;
-    const ssoUser = getUser({
-      email: process.env.SCIM_USER_SSO_CODE,
-      username: process.env.SCIM_USER_EMAIL,
-      password: process.env.SCIM_USER_PASSWORD,
-    });
+  const ssoUser = getUser({
+    email: process.env.SCIM_USER_SSO_CODE,
+    username: process.env.SCIM_USER_EMAIL,
+    password: process.env.SCIM_USER_PASSWORD,
+  });
 
-    test.beforeEach(async ({context, createPage}) => {
-      pageManager = PageManager.from(await createPage(context));
-    });
+  test(
+    'I should not be able to change email of user managed by SCIM',
+    {tag: ['@TC-60', '@regression']},
+    async ({context, createPage}) => {
+      const page = await createPage(context);
+      const pageManager = PageManager.from(page);
+      await pageManager.openMainPage();
 
-    test.afterEach(async () => {
-      const {pages, modals} = pageManager.webapp;
+      const {pages, components} = pageManager.webapp;
+      const [idpPage] = await Promise.all([
+        context.waitForEvent('page'),
+        pages.singleSignOn().enterEmailOnSSOPage(ssoUser.email),
+      ]);
 
-      // Log out the user to ensure the previous login won't affect future runs
-      // If this isn't done the test will start to fail due to too many clients being registered for this one user
-      await pages.sidebar().clickPreferencesButton();
-      await pages.settings().accountButton.click();
-      await pages.account().logoutButton.click();
-      await modals.confirmLogout().deleteDeviceCheckbox.click();
-      await modals.confirmLogout().clickAction();
-    });
+      await test.step('Log in on IDP page', async () => {
+        await idpPage.getByRole('textbox', {name: 'Username'}).fill(ssoUser.username, {timeout: 20_000});
+        await idpPage.getByRole('textbox', {name: 'Password'}).fill(ssoUser.password);
+        await idpPage.getByRole('button', {name: 'Sign In'}).click();
+      });
 
-    test(
-      'I should not be able to change email of user managed by SCIM',
-      {tag: ['@TC-60', '@regression']},
-      async ({context}) => {
-        await pageManager.openMainPage();
-
-        const {pages, components} = pageManager.webapp;
-        const [newPage] = await Promise.all([
-          context.waitForEvent('page'),
-          pages.singleSignOn().enterEmailOnSSOPage(ssoUser.email),
-        ]);
-
-        await newPage.getByRole('textbox', {name: 'Username'}).fill(ssoUser.username, {timeout: 20_000});
-        await newPage.getByRole('textbox', {name: 'Password'}).fill(ssoUser.password);
-        await newPage.getByRole('button', {name: 'Sign In'}).click();
+      await test.step('Remove an existing device and confirm new history', async () => {
+        // Since this test re-uses the same user over and over again we need to always remove one of the previously registered devices
+        await page.getByRole('button', {name: 'Remove device'}).first().click({timeout: LOGIN_TIMEOUT});
+        // We will also always be prompted to confirm the new history on this device
+        await pages.historyInfo().clickConfirmButton();
         await expect(components.conversationSidebar().sidebar, `Login took more than ${LOGIN_TIMEOUT}s`).toBeVisible({
           timeout: LOGIN_TIMEOUT,
         });
+      });
 
-        await pages.sidebar().clickPreferencesButton();
-        await pages.settings().accountButton.click();
-        await expect(pages.account().emailDisplay).toHaveCount(0);
-      },
-    );
-  });
+      await pages.sidebar().clickPreferencesButton();
+      await pages.settings().accountButton.click();
+      await expect(pages.account().emailDisplay).not.toBeVisible();
+    },
+  );
 
   // see https://wearezeta.atlassian.net/browse/WPB-20548
   test.skip(
