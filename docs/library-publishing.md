@@ -1,187 +1,209 @@
 # Library Publishing Guide
 
-This document explains how automated publishing works for the Wire monorepo libraries.
+This guide explains how to publish Wire monorepo libraries to npm using the two-step GitHub Actions workflow.
 
-## Overview
+## Quick Links
 
-The monorepo uses **Nx Release** to automate versioning and publishing of libraries (like `@wireapp/api-client` and `@wireapp/core`) to npm with **Trusted Publishing** (provenance).
+| Workflow | Purpose | Link |
+|----------|---------|------|
+| **Create Library Release PR** | Bumps versions and opens a release PR | [Run workflow](https://github.com/wireapp/wire-webapp/actions/workflows/publish-libraries.yml) |
+| **Publish packages to npm** | Publishes to npm when the release PR is merged | [View runs](https://github.com/wireapp/wire-webapp/actions/workflows/publish-libraries-on-merge.yml) |
+
+---
+
+## Which Libraries Get Published?
+
+Only libraries tagged `npm:public` in their `project.json` are versioned and published by `nx release`. Currently that is:
+
+| Library | npm Package | Tag |
+|---------|-------------|-----|
+| `libraries/api-client` | `@wireapp/api-client` | `npm:public` |
+
+Other libraries (`core`, `config`) have `type:lib` but **not** `npm:public`, so they are linted, tested, and built by the release workflow but are **not** versioned or published.
+
+> **To add a new library to the publish set**, add the `npm:public` tag to its `project.json` tags array and configure a trusted publisher on npmjs.com (see [NPM Trusted Publishing](#npm-trusted-publishing-setup) below).
+
+---
 
 ## How It Works
 
-The release process is a **two-step workflow** triggered manually and gated by a PR review:
+The release process is a **two-step workflow** triggered manually and gated by a PR review.
 
-1. **Create a release PR** — Run the `Create Library Release PR` workflow from the GitHub Actions UI. It lints, tests, and builds the libraries, bumps versions using conventional commits, and opens a PR to `dev` with the `publish-to-npm` label.
-2. **Publish on merge** — When the release PR is merged to `dev`, a second workflow detects the `publish-to-npm` label and publishes the built libraries to npm with provenance.
+### Step 1 — Create the Release PR
 
-### Key Details
+Trigger: **Manual** (`workflow_dispatch`) from the [Create Library Release PR](https://github.com/wireapp/wire-webapp/actions/workflows/publish-libraries.yml) action page.
 
-- Uses **conventional commits** to determine version bumps (major/minor/patch)
-- Creates GitHub releases and git tags
-- Publishes with **npm provenance** for supply-chain security
-- The release PR must be **merge-committed** (not squash-merged) to preserve git tags
+What it does:
 
-### Workflow Files
+1. Checks out `dev` and creates a release branch (`chore/library-release-<run_id>`).
+2. Installs dependencies (`yarn --immutable`).
+3. Lints, tests, and builds **all** libraries (`tag:type:lib`).
+4. Runs `nx release version` which:
+   - Reads conventional commits since the last release tag.
+   - Bumps versions in `package.json` for each `npm:public` library.
+   - Creates a git commit and tag per version bump.
+5. Pushes the branch with tags and opens a PR to `dev` with the **`publish-to-npm`** label.
 
-1. **`.github/workflows/publish-libraries.yml`** — Creates the release PR. Triggered manually via `workflow_dispatch`.
-2. **`.github/workflows/publish-libraries-on-merge.yml`** — Publishes to npm when a PR with the `publish-to-npm` label is merged to `dev`.
+If no version changes are detected the workflow exits without creating a PR.
 
-### Tagged Projects
+### Step 2 — Publish on Merge
 
-Only libraries with the `npm:public` tag in their `project.json` are published:
-- `libraries/core` → `@wireapp/core`
-- `libraries/api-client` → `@wireapp/api-client`
+Trigger: **Automatic** when a PR with the `publish-to-npm` label is merged to `dev` (or via `workflow_dispatch` from the [Publish packages to npm](https://github.com/wireapp/wire-webapp/actions/workflows/publish-libraries-on-merge.yml) action page).
 
-### Tagged Projects
+What it does:
 
-Only libraries with the `npm:public` tag in their `project.json` are published:
-- `libraries/core` → `@wireapp/core`
-- `libraries/api-client` → `@wireapp/api-client`
+1. Checks out the **exact merge commit** (to avoid publishing unrelated changes).
+2. Installs dependencies and builds all libraries (`tag:type:lib`).
+3. Runs `nx release publish` which publishes every `npm:public` library to npm with provenance.
+
+---
+
+## Step-by-Step Guide
+
+### 1. Write Your Changes with Conventional Commits
+
+Merge your library changes to `dev` using conventional commit messages so that `nx release` can determine the correct version bump:
+
+```bash
+git commit -m "feat(api-client): add new endpoint"   # → minor bump
+git commit -m "fix(api-client): handle timeout"       # → patch bump
+git commit -m "feat(api-client)!: drop legacy auth"   # → major bump
+```
+
+### 2. Trigger the Release PR
+
+1. Open the [**Create Library Release PR**](https://github.com/wireapp/wire-webapp/actions/workflows/publish-libraries.yml) workflow page.
+2. Click **Run workflow** (branch: `dev`).
+3. Wait for the workflow to complete — it will open a PR automatically.
+
+### 3. Review the PR
+
+- Verify the version bumps match what you expect.
+- Check the generated changelog entries.
+
+### 4. Merge the PR
+
+> **⚠️ Important:** Use **"Merge commit"** — do **NOT** squash merge. Squash merging destroys the git tags that `nx release` created, and the publish step will fail.
+
+### 5. Confirm the Publish
+
+After merging, the [publish workflow](https://github.com/wireapp/wire-webapp/actions/workflows/publish-libraries-on-merge.yml) runs automatically. Check its output to confirm the packages were published successfully.
+
+---
+
+## Conventional Commit Reference
+
+| Prefix | Version Bump | Example |
+|--------|-------------|---------|
+| `feat:` | Minor (0.**X**.0) | `feat(api-client): add cells support` |
+| `fix:` | Patch (0.0.**X**) | `fix(api-client): resolve retry logic` |
+| `feat!:` / `BREAKING CHANGE:` | Major (**X**.0.0) | `feat(api-client)!: remove deprecated methods` |
+| `chore:`, `docs:`, `refactor:` | None | `chore: update dev dependencies` |
+
+Only commits scoped to a published library (or unscoped commits touching its files) trigger a version bump for that library.
+
+---
+
+## Local Testing (Dry Run)
+
+Preview what a release would do without publishing:
+
+```bash
+# Full dry run (version + publish simulation)
+yarn release:dry-run
+
+# Version only (no publish)
+yarn release:version
+
+# Publish already-versioned packages
+yarn release:publish
+```
+
+---
 
 ## Configuration
 
 ### Nx Release Config (`nx.json`)
 
-```json
+```jsonc
 {
   "release": {
-    "projects": ["tag:npm:public"],
-    "projectsRelationship": "independent",
+    "projects": ["tag:npm:public"],          // only npm:public libraries
+    "projectsRelationship": "independent",   // each library versioned separately
     "version": {
-      "conventionalCommits": true
+      "conventionalCommits": true,
+      "fallbackCurrentVersionResolver": "disk",
+      "git": {
+        "commit": true,
+        "tag": true,
+        "commitMessage": "chore(release): publish {projectName} {version} [WPB-22420]"
+      }
     },
     "changelog": {
       "projectChangelogs": {
-        "createRelease": "github"
+        "createRelease": "github"            // creates a GitHub release per version
       }
     }
   }
 }
 ```
 
-### Key Settings:
-- **Independent versioning**: Each library has its own version
-- **Conventional commits**: Automatically determines version bump from commit messages
-- **GitHub releases**: Creates releases for each version
-
-## Publishing Workflow
-
-### Creating a Release
-
-1. Merge your library changes to `dev` using conventional commit messages:
-   ```bash
-   git commit -m "feat: add new API method"      # → minor bump
-   git commit -m "fix: resolve auth issue"       # → patch bump
-   git commit -m "feat!: breaking API change"    # → major bump
-   ```
-2. Go to **GitHub Actions → Create Library Release PR → Run workflow**.
-3. The workflow will:
-   - Lint, test, and build all libraries
-   - Run `nx release version` to bump versions based on conventional commits
-   - Push a release branch and open a PR to `dev` with the `publish-to-npm` label
-4. Review the PR — verify version bumps and changelog entries look correct.
-5. **Merge the PR using a merge commit** (do NOT squash — this preserves git tags).
-6. On merge, the publish workflow automatically:
-   - Builds the libraries
-   - Publishes to npm with provenance
-   - Creates GitHub releases
-
-### Local Testing (Dry Run)
-
-Preview what a release would do without publishing:
-
-```bash
-# Dry run to see what would happen
-yarn release:dry-run
-
-# Create version and changelog only (no publish)
-yarn release:version
-
-# Publish already versioned packages
-yarn release:publish
-```
-
-## Conventional Commit Format
-
-Use these prefixes to control version bumps:
-
-- `feat:` → **Minor** version bump (0.X.0)
-- `fix:` → **Patch** version bump (0.0.X)
-- `feat!:` or `BREAKING CHANGE:` → **Major** version bump (X.0.0)
-- `chore:`, `docs:`, `refactor:` → No version bump
-
-Examples:
-```bash
-git commit -m "feat(api-client): add cells support"
-git commit -m "fix(core): resolve memory leak in message handling"
-git commit -m "feat(api-client)!: remove deprecated auth methods"
-```
+---
 
 ## NPM Trusted Publishing Setup
 
-The workflow uses **OIDC-based trusted publishing** for secure, keyless npm authentication — no npm tokens are stored as secrets.
+The publish workflow uses **OIDC-based trusted publishing** — no long-lived npm tokens are stored as secrets.
 
 ### How It Works
 
 GitHub Actions mints a short-lived OIDC token during the workflow run. npm verifies the token against the trusted publisher configuration on the package, confirming the publish originated from the expected repository and workflow. The `NPM_CONFIG_PROVENANCE` flag attaches a cryptographic provenance attestation to the published package.
 
-### Requirements:
-1. **GitHub Actions workflow** must have:
-   ```yaml
-   permissions:
-     id-token: write  # for OIDC token / provenance
-     contents: write  # for tags/commits
-   ```
-2. **NPM package settings** (configured per-package on npmjs.com):
-   - Go to **Settings → Publishing access → Configure trusted publishers**
-   - Add a trusted publisher:
-     - **Repository**: `wireapp/wire-webapp`
-     - **Workflow**: `publish-libraries-on-merge.yml`
+### Required Workflow Permissions
 
-### Environment Variable:
 ```yaml
-env:
-  NPM_CONFIG_PROVENANCE: true
+permissions:
+  id-token: write   # OIDC token for npm provenance
+  contents: write   # push tags and commits
 ```
 
-This generates cryptographic proof that the package was built in GitHub Actions from your repository.
+### NPM Package Configuration
+
+For each `npm:public` package on [npmjs.com](https://www.npmjs.com/):
+
+1. Go to **Settings → Publishing access → Configure trusted publishers**.
+2. Add a trusted publisher:
+   - **Repository**: `wireapp/wire-webapp`
+   - **Workflow**: `publish-libraries-on-merge.yml`
+
+---
 
 ## Troubleshooting
 
-### Version not incrementing
-- Check commit messages use conventional commit format
-- Run `yarn release:dry-run` to preview changes
-- Ensure commits are on the `dev` branch before triggering the workflow
+| Problem | What to Check |
+|---------|---------------|
+| **Version not incrementing** | Verify commits use conventional commit format. Run `yarn release:dry-run` locally. |
+| **Release PR not created** | No new conventional commits since the last release tag — nothing to bump. |
+| **Publish fails with 403** | The npm package may not have a trusted publisher configured for `wireapp/wire-webapp` + `publish-libraries-on-merge.yml`. |
+| **Publish fails with missing tags** | The PR was squash-merged instead of merge-committed. Re-tag manually or re-run the release PR workflow. |
+| **Want to skip a release** | Don't trigger the workflow, or close the release PR without merging. |
 
-### Release PR not created
-- The workflow skips PR creation if no version changes are detected
-- Verify new conventional commits exist since the last release tag
+### Manual Release (Emergency)
 
-### Publish fails
-- Verify the merged PR has the `publish-to-npm` label
-- Ensure the npm package has a trusted publisher configured for `wireapp/wire-webapp` and the `publish-libraries-on-merge.yml` workflow
-- Check that the workflow has `id-token: write` permission
-- Check npm package permissions
-- Review workflow logs in GitHub Actions
-
-### Want to skip a release
-- Simply don't trigger the release workflow
-- Or close the release PR without merging
-
-## Manual Release (Emergency)
-
-If automation fails, you can manually release:
+If automation fails and you need to publish immediately:
 
 ```bash
-# 1. Update version
+# 1. Bump the version
 cd libraries/api-client
-npm version patch  # or minor/major
+npm version patch  # or minor / major
 
 # 2. Build
 yarn nx build api-client-lib
 
-# 3. Publish (from library directory)
+# 3. Publish with provenance
 npm publish --provenance --access public
 ```
+
+---
 
 ## References
 
