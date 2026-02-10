@@ -113,6 +113,30 @@ describe('MultipartAssets', () => {
       expect(screen.queryByText('cells.unavailableFile')).not.toBeInTheDocument();
     });
 
+    it('should render a small file card when no preview is available', async () => {
+      mockCellsRepository.getNode.mockResolvedValue(mockNode);
+
+      const assets: ICellAsset[] = [createMockAsset('test-uuid', 'application/zip', 'archive.zip')];
+
+      render(
+        withTheme(
+          <MultipartAssets
+            assets={assets}
+            conversationId="conv-123"
+            cellsRepository={mockCellsRepository}
+            senderName="John Doe"
+            timestamp={Date.now()}
+          />,
+        ),
+      );
+
+      await waitFor(() => {
+        expect(mockCellsRepository.getNode).toHaveBeenCalledWith({uuid: 'test-uuid'});
+      });
+
+      expect(screen.queryByText('cells.unavailableFilePreview')).not.toBeInTheDocument();
+    });
+
     it('should render multiple assets with mixed recycled state', async () => {
       mockCellsRepository.getNode
         .mockResolvedValueOnce(mockNode)
