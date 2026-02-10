@@ -43,7 +43,7 @@
       "git": {
         "commit": true,
         "tag": true,
-        "commitMessage": "chore(release): publish {projectName} {version} [skip ci]"
+        "commitMessage": "chore(release): publish {projectName} {version} [WPB-22420]"
       }
     },
     "changelog": {
