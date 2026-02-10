@@ -23,7 +23,8 @@ import {ImageAssetLarge} from './ImageAssetLarge/ImageAssetLarge';
 import {ImageAssetSmall} from './ImageAssetSmall/ImageAssetSmall';
 
 interface ImageAssetCardProps {
-  src?: string;
+  filePreviewUrl?: string;
+  fileUrl?: string;
   name: string;
   extension: string;
   senderName: string;
@@ -37,7 +38,8 @@ interface ImageAssetCardProps {
 
 export const ImageAssetCard = ({
   id,
-  src,
+  filePreviewUrl,
+  fileUrl,
   name,
   extension,
   senderName,
@@ -51,7 +53,8 @@ export const ImageAssetCard = ({
     return (
       <ImageAssetLarge
         id={id}
-        src={src}
+        filePreviewUrl={filePreviewUrl}
+        fileUrl={fileUrl}
         name={name}
         extension={extension}
         metadata={metadata}
@@ -65,7 +68,8 @@ export const ImageAssetCard = ({
   return (
     <ImageAssetSmall
       id={id}
-      src={src}
+      filePreviewUrl={filePreviewUrl}
+      fileUrl={fileUrl}
       name={name}
       extension={extension}
       isLoading={isLoading}
