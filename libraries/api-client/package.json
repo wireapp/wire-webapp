@@ -2,7 +2,11 @@
   "name": "@wireapp/api-client",
   "license": "GPL-3.0",
   "description": "Wire API Client to send and receive data.",
-  "repository": "https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/wireapp/wire-webapp",
+    "directory": "libraries/api-client"
+  },
   "files": [
     "lib"
   ],
