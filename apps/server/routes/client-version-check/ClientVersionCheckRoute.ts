@@ -20,8 +20,14 @@
 import {Router} from 'express';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 
-export const ClientVersionCheck = () => {
-  return Router().get('/client-version-check', (request, response) => {
+type ClientVersionCheckRouteDependencies = {
+  readonly router: ReturnType<typeof Router>;
+};
+
+export function createClientVersionCheckRoute(dependencies: ClientVersionCheckRouteDependencies) {
+  const {router} = dependencies;
+
+  return router.get('/client-version-check', (request, response) => {
     return response.sendStatus(HTTP_STATUS.OK);
   });
-};
+}

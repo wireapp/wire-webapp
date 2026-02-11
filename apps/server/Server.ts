@@ -17,7 +17,7 @@
  *
  */
 
-import express from 'express';
+import express, {Router} from 'express';
 import expressSitemapXml from 'express-sitemap-xml';
 import hbs from 'hbs';
 import helmet from 'helmet';
@@ -30,8 +30,10 @@ import https from 'https';
 import path from 'path';
 
 import type {ClientConfig, ServerConfig} from '@wireapp/config';
+
 import {HealthCheckRoute} from './routes/_health/HealthRoute';
 import {AppleAssociationRoute} from './routes/appleassociation/AppleAssociationRoute';
+import {createClientVersionCheckRoute} from './routes/client-version-check/ClientVersionCheckRoute';
 import {ConfigRoute} from './routes/config/ConfigRoute';
 import {InternalErrorRoute, NotFoundRoute} from './routes/error/ErrorRoutes';
 import {GoogleWebmasterRoute} from './routes/googlewebmaster/GoogleWebmasterRoute';
@@ -67,7 +69,7 @@ class Server {
     this.initStaticRoutes();
     this.initWebpack();
     this.initSiteMap(this.config);
-    // eslint-disable-next-line import/no-named-as-default-member
+
     this.app.use('/libs', express.static(path.join(__dirname, 'libs')));
     this.app.use(Root());
     this.app.use(HealthCheckRoute());
@@ -76,6 +78,7 @@ class Server {
     this.app.use(AppleAssociationRoute());
     this.app.use(NotFoundRoute());
     this.app.use(InternalErrorRoute());
+    this.app.use(createClientVersionCheckRoute({router: Router()}));
   }
 
   private initWebpack() {
@@ -170,7 +173,6 @@ class Server {
     const staticRoutes = ['audio', 'ext', 'font', 'image', 'min', 'proto', 'style', 'worker', 'assets'];
 
     staticRoutes.forEach(route => {
-      // eslint-disable-next-line import/no-named-as-default-member
       this.app.use(`/${route}`, express.static(path.join(__dirname, `static/${route}`)));
     });
 
