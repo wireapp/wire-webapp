@@ -1,8 +1,13 @@
 {
   "name": "@wireapp/core",
+  "private": true,
   "license": "GPL-3.0",
   "description": "Wire for Web's communication core.",
-  "repository": "https://github.com/wireapp/wire-webapp/tree/main/libraries/core",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/wireapp/wire-webapp",
+    "directory": "libraries/core"
+  },
   "files": [
     "lib",
     "src"
@@ -20,7 +25,7 @@
     "./lib/cryptography/AssetCryptography/crypto.node": "./lib/cryptography/AssetCryptography/crypto.browser.js"
   },
   "dependencies": {
-    "@wireapp/api-client": "workspace:^",
+    "@wireapp/api-client": "27.95.5",
     "@wireapp/core-crypto": "9.1.2",
     "@wireapp/cryptobox": "12.8.0",
     "@wireapp/priority-queue": "2.1.19",
@@ -53,6 +58,6 @@
     "test:coverage": "nx run core-lib:test:coverage",
     "watch": "nx run core-lib:watch"
   },
-  "version": "46.47.3",
+  "version": "46.47.4",
   "gitHead": "5339f01fe01ef0871da8c8bc8662fbe9e604754a"
 }

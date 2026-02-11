@@ -2,7 +2,11 @@
   "name": "@wireapp/api-client",
   "license": "GPL-3.0",
   "description": "Wire API Client to send and receive data.",
-  "repository": "https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/wireapp/wire-webapp",
+    "directory": "libraries/api-client"
+  },
   "files": [
     "lib"
   ],
@@ -24,7 +28,8 @@
     "reconnecting-websocket": "4.4.0",
     "spark-md5": "3.0.2",
     "tough-cookie": "4.1.4",
-    "ws": "8.19.0"
+    "ws": "8.19.0",
+    "zod": "3.25.76"
   },
   "devDependencies": {
     "@swc/core": "^1.15.11",
@@ -51,9 +56,8 @@
     "dist": "nx run api-client-lib:dist",
     "test": "nx run api-client-lib:test",
     "test:coverage": "nx run api-client-lib:test:coverage",
-    "watch": "nx run api-client-lib:watch",
-    "prepare": "yarn dist"
+    "watch": "nx run api-client-lib:watch"
   },
-  "version": "27.95.4",
+  "version": "27.95.5",
   "gitHead": "5339f01fe01ef0871da8c8bc8662fbe9e604754a"
 }
