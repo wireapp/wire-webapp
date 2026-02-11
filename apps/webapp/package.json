@@ -28,7 +28,7 @@
     "@lexical/code": "0.27.2",
     "@lexical/history": "0.27.2",
     "@lexical/list": "0.27.2",
-    "@lexical/markdown": "0.27.2",
+    "@lexical/markdown": "0.40.0",
     "@lexical/react": "0.27.2",
     "@lexical/rich-text": "0.27.2",
     "@mediapipe/tasks-vision": "0.10.32",
