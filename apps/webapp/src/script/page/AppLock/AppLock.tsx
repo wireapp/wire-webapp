@@ -205,22 +205,13 @@ const AppLock = ({
     startScheduledTimeout();
   };
 
-  // const onWipeDatabase = async (event: FormEvent) => {
-  //   const target = event.target as HTMLFormElement & {password: HTMLInputElement};
-  //   try {
-  //     setIsLoading(true);
-  //     const currentClientId = clientState.currentClient.id;
-  //     await clientRepository.clientService.deleteClient(currentClientId, target.password.value);
-  //     appLockRepository.removeCode();
-  //     amplify.publish(WebAppEvents.LIFECYCLE.SIGN_OUT, SIGN_OUT_REASON.USER_REQUESTED, true);
-  //   } catch ({code, message}) {
-  //     setIsLoading(false);
-  //     if ([HTTP_STATUS.BAD_REQUEST, HTTP_STATUS.UNAUTHORIZED, HTTP_STATUS.FORBIDDEN].includes(code)) {
-  //       return setWipeError(t('modalAppLockWipePasswordError'));
-  //     }
-  //     setWipeError(message);
-  //   }
-  // };
+  const onLogout = async () => {
+    if (!isAppLockEnforced) {
+      appLockRepository.disableFeature();
+    }
+    appLockRepository.removeCode();
+    amplify.publish(WebAppEvents.LIFECYCLE.SIGN_OUT, SIGN_OUT_REASON.USER_REQUESTED, true);
+  };
 
   const changePassphrase = () => {
     setState(APPLOCK_STATE.SETUP);
@@ -495,7 +486,7 @@ const AppLock = ({
               {t('modalAppLockWipeConfirmGoBackButton')}
             </Button>
 
-            <Button onClick={onClickLogout} data-uie-name="do-action">
+            <Button onClick={onLogout} data-uie-name="do-action">
               {t('modalAccountLogoutAction')}
             </Button>
           </Fragment>
