@@ -126,7 +126,7 @@ export async function createAndSaveBackup(pageManager: PageManager, password?: s
   }
   await modals.passwordAdvancedSecurity().clickBackUpNow();
   await expect(modals.passwordAdvancedSecurity().modal).toBeHidden();
-  expect(await pages.historyExport().isVisible()).toBeTruthy();
+  await expect(pages.historyExport().exportSuccessHeadline).toBeVisible();
   const [download] = await Promise.all([
     pages.historyExport().page.waitForEvent('download'),
     pages.historyExport().clickSaveFileButton(),

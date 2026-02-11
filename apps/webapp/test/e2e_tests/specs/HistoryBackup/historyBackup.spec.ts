@@ -43,7 +43,7 @@ test.describe('History Backup', () => {
         PageManager.from(createPage(withLogin(userB), withConnectedUser(userA))),
       ]);
 
-      let {pages: userAPages, modals: userAModals, components: userAComponents} = userAPageManager.webapp;
+      const {pages: userAPages, modals: userAModals, components: userAComponents} = userAPageManager.webapp;
       const {pages: userBPages} = userBPageManager.webapp;
 
       const conversationName = 'Test group';
@@ -93,31 +93,20 @@ test.describe('History Backup', () => {
         await expect(userAPages.resetPassword().passwordChangeMessage).toBeVisible();
 
         await userAPageManager.page.context().close();
-
-        // Initialize a new context and page
-        const newBrowserContext = await userAPageManager.page.context().browser()!.newContext();
-        const newPageUserA = await newBrowserContext.newPage();
-        const newUserAPageManager = PageManager.from(newPageUserA);
-
-        await newUserAPageManager.openMainPage();
-        await loginUser(userA, newUserAPageManager);
-
-        // Reassign pages, modals and components for new context
-        userAPages = newUserAPageManager.webapp.pages;
-        userAModals = newUserAPageManager.webapp.modals;
-        userAComponents = newUserAPageManager.webapp.components;
-
-        await userAPages.historyInfo().continueButton.click();
       });
 
-      await userAComponents.conversationSidebar().clickPreferencesButton();
-      await userAPages.account().backupFileInput.setInputFiles(backupName);
+      const newUserAPageManager = PageManager.from(await createPage(withLogin(userA, {confirmNewHistory: true})));
+
+      const {pages: userAPages2, components: userAComponents2} = newUserAPageManager.webapp;
+
+      await userAComponents2.conversationSidebar().clickPreferencesButton();
+      await userAPages2.account().backupFileInput.setInputFiles(backupName);
 
       await test.step('Validate conversation is still visible with all messages after restoring backup', async () => {
-        await userAComponents.conversationSidebar().allConverationsButton.click();
-        await userAPages.conversationList().openConversation(conversationName);
-        await expect(userAPages.conversation().getMessage({sender: userB})).toContainText(messageUserB);
-        await expect(userAPages.conversation().getMessage({sender: userA})).toContainText(messageUserA);
+        await userAComponents2.conversationSidebar().allConverationsButton.click();
+        await userAPages2.conversationList().openConversation(conversationName);
+        await expect(userAPages2.conversation().getMessage({sender: userB})).toContainText(messageUserB);
+        await expect(userAPages2.conversation().getMessage({sender: userA})).toContainText(messageUserA);
       });
     },
   );
