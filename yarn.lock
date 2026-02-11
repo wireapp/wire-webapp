@@ -10873,6 +10873,7 @@ __metadata:
     browser-sync: "npm:3.0.4"
     cells-sdk-ts: "npm:0.1.1-alpha18"
     concurrently: "npm:9.2.1"
+    http-status-codes: "npm:2.3.0"
     jest: "npm:^29.7.0"
     pako: "npm:2.1.0"
     react: "npm:18.3.1"
