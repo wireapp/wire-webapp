@@ -52,7 +52,7 @@ test.describe('History Backup', () => {
       const messageUserA = 'Message from User A';
       const messageUserB = 'Message from User B';
 
-      await test.step('User A are writing messages to each other', async () => {
+      await test.step('User A and B write messages to each other', async () => {
         await userAPages.conversationList().openConversation(conversationName);
         await userAPages.conversation().sendMessage(messageUserA);
         await userBPages.conversationList().openConversation(conversationName);
@@ -126,7 +126,7 @@ test.describe('History Backup', () => {
       const messageUserA = 'Message from User A';
       const messageUserB = 'Message from User B';
 
-      await test.step('User A and B are writing messages to each other', async () => {
+      await test.step('User A and B write messages to each other', async () => {
         await userAPages.conversationList().openConversation(userB.fullName, {protocol: 'mls'});
         await userAPages.conversation().sendMessage(messageUserA);
         await userBPages.conversationList().openConversation(userA.fullName, {protocol: 'mls'});
@@ -172,7 +172,7 @@ test.describe('History Backup', () => {
 
       const renamedConversationName = 'renamedConversationName';
 
-      await test.step('User A and B writing in their group conversation', async () => {
+      await test.step('User A and B write in their group conversation', async () => {
         await userAPages.conversationList().openConversation(conversationName);
         await userAPages.conversation().sendMessage(messageUserA);
         await userBPages.conversationList().openConversation(conversationName);
@@ -225,7 +225,7 @@ test.describe('History Backup', () => {
       const messageUserA = 'Message from User A';
       const messageUserB = 'Message from User B';
 
-      await test.step('User A and B writing messages to each other', async () => {
+      await test.step('User A and B write messages to each other', async () => {
         await userAPages.conversationList().openConversation(conversationName);
         await userAPages.conversation().sendMessage(messageUserA);
         await userBPages.conversationList().openConversation(conversationName);
@@ -281,7 +281,7 @@ test.describe('History Backup', () => {
       const messageUserA = 'Message from User A';
       const messageUserB = 'Message from User B';
 
-      await test.step('User A and B writing messages to each other', async () => {
+      await test.step('User A and B write messages to each other', async () => {
         await userAPages.conversationList().openConversation(userB.fullName, {protocol: 'mls'});
         await userAPages.conversation().sendMessage(messageUserA);
         await userBPages.conversationList().openConversation(userA.fullName, {protocol: 'mls'});
@@ -329,7 +329,7 @@ test.describe('History Backup', () => {
       const messageUserA = 'Message from User A';
       const messageUserB = 'Message from User B';
 
-      await test.step('User A and User B are writing messages to each other', async () => {
+      await test.step('User A and User B write messages to each other', async () => {
         await userAPages.conversationList().openConversation(conversationName);
         await userAPages.conversation().sendMessage(messageUserA);
         await userBPages.conversationList().openConversation(conversationName);
