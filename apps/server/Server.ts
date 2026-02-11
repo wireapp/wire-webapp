@@ -76,9 +76,9 @@ class Server {
     this.app.use(ConfigRoute(this.config, this.clientConfig));
     this.app.use(GoogleWebmasterRoute(this.config));
     this.app.use(AppleAssociationRoute());
+    this.app.use(createClientVersionCheckRoute({router: Router()}));
     this.app.use(NotFoundRoute());
     this.app.use(InternalErrorRoute());
-    this.app.use(createClientVersionCheckRoute({router: Router()}));
   }
 
   private initWebpack() {

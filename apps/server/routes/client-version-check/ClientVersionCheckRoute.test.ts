@@ -16,11 +16,12 @@ describe('/client-version-check', () => {
 
   it('returns HTTP 200', async () => {
     const sendStatus = jest.fn();
+    const fakeRequest = {header: jest.fn().mockReturnValue('1.0.0')} as unknown as Request;
     const fakeResponse = {sendStatus} as unknown as Response;
 
     const fakeRouter = {
       get: jest.fn((_routePath, routeHandler) => {
-        routeHandler(undefined, fakeResponse);
+        routeHandler(fakeRequest, fakeResponse);
       }),
     } as unknown as Router;
 
@@ -28,4 +29,26 @@ describe('/client-version-check', () => {
 
     expect(sendStatus).toHaveBeenNthCalledWith(1, 200);
   });
+
+  it.each<{headerValue: string | undefined; expectedHttpStatusCode: number}>([
+    {headerValue: '', expectedHttpStatusCode: 400},
+    {headerValue: undefined, expectedHttpStatusCode: 400},
+  ])(
+    'returns HTTP status code $expectedHttpStatusCode if header value is "$headerValue"',
+    async ({headerValue, expectedHttpStatusCode}) => {
+      const sendStatus = jest.fn();
+      const fakeRequest = {header: jest.fn().mockReturnValue(headerValue)} as unknown as Request;
+      const fakeResponse = {sendStatus} as unknown as Response;
+
+      const fakeRouter = {
+        get: jest.fn((_routePath, routeHandler) => {
+          routeHandler(fakeRequest, fakeResponse);
+        }),
+      } as unknown as Router;
+
+      createClientVersionCheckRoute({router: fakeRouter});
+
+      expect(sendStatus).toHaveBeenNthCalledWith(1, expectedHttpStatusCode);
+    },
+  );
 });
