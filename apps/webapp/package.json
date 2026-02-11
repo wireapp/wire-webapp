@@ -34,7 +34,7 @@
     "@mediapipe/tasks-vision": "0.10.32",
     "@tanstack/react-table": "8.21.3",
     "@tanstack/react-virtual": "3.13.18",
-    "@wireapp/avs": "10.2.21",
+    "@wireapp/avs": "10.2.22",
     "@wireapp/avs-debugger": "0.0.7",
     "@wireapp/config": "workspace:^",
     "@wireapp/core": "workspace:^",
