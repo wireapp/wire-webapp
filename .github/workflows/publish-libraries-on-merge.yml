@@ -5,6 +5,7 @@ on:
     types: [closed]
     branches:
       - dev
+  workflow_dispatch:
 
 permissions:
   contents: write
@@ -16,9 +17,7 @@ concurrency:
 
 jobs:
   publish:
-    if: |
-      github.event.pull_request.merged == true &&
-      contains(github.event.pull_request.labels.*.name, 'publish-to-npm')
+    if: github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.merged == true && contains(github.event.pull_request.labels.*.name, 'publish-to-npm'))
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -38,8 +37,8 @@ jobs:
 
       - name: Configure git
         run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git config user.name "otto-the-bot"
+          git config user.email "8736538+otto-the-bot@users.noreply.github.com"
 
       - name: Install dependencies
         run: yarn --immutable
@@ -52,5 +51,6 @@ jobs:
           echo "📦 Publishing release to npm..."
           yarn nx release publish --verbose
         env:
+          DOTENV_CONFIG_QUIET: 'true'
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NPM_CONFIG_PROVENANCE: true

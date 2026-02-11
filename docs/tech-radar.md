@@ -55,7 +55,6 @@ A living map of our technology choices, organized by areas and levels of adoptio
 | webpack    |  ✅   |       |        |      |
 | prettier   |  ✅   |       |        |      |
 | eslint     |  ✅   |       |        |      |
-| husky      |  ✅   |       |        |      |
 | swc        |  ✅   |       |        |      |
 | lerna-lite |       |       |        |  ✅  |
 | storybook  |  ✅   |       |        |      |
@@ -92,7 +91,7 @@ A living map of our technology choices, organized by areas and levels of adoptio
 
 > Quick scan of choices across all quadrants.
 
-- **Adopt**: React; zod; lexical; typescript; electron; tanstack/react-table; axios; tanstack-query _(team-management only)_; react-router; Emotion; react-select; react-transition-group; webpack; prettier; eslint; husky; swc; storybook; zustand _(Factories)_; dexie.js; tsyringe _(Singleton Classes)_; Jest; Playwright; testing-library
+- **Adopt**: React; zod; lexical; typescript; electron; tanstack/react-table; axios; tanstack-query _(team-management only)_; react-router; Emotion; react-select; react-transition-group; webpack; prettier; eslint; swc; storybook; zustand _(Factories)_; dexie.js; tsyringe _(Singleton Classes)_; Jest; Playwright; testing-library
 
 - **Trial**: tanstack/react-virtual; Axios Cache Interceptor
 

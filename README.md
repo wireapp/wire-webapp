@@ -25,7 +25,7 @@ No license is granted to the Wire trademark and its associated logos, all of whi
 - `apps/server/`: node/express wrapper that serves the built webapp and handles proxying
 - `libraries/config/`: `@wireapp/config` package - centralized environment configuration management with type-safe configuration loading and validation
 - `libraries/core/`: `@wireapp/core` package - Wire's communication core library handling authentication, WebSocket connections, and protocol messaging
-- Root-level tooling (`package.json`, Nx, husky, bin scripts) orchestrates both apps and libraries
+- Root-level tooling (`package.json`, Nx, bin scripts) orchestrates both apps and libraries
 
 The root `yarn` and `nx` scripts are the entry points; package-level scripts delegate to them.
 
