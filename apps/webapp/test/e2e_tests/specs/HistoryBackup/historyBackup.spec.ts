@@ -37,7 +37,7 @@ test.describe('History Backup', () => {
   test(
     'I want to import a backup that I exported when I was using a different email/password',
     {tag: ['@TC-118', '@regression']},
-    async ({createPage, api}) => {
+    async ({createPage, api}, testInfo) => {
       const [userAPageManager, userBPageManager] = await Promise.all([
         PageManager.from(createPage(withLogin(userA), withConnectedUser(userB))),
         PageManager.from(createPage(withLogin(userB), withConnectedUser(userA))),
@@ -61,7 +61,7 @@ test.describe('History Backup', () => {
 
       // User A creates Backup
       await userAComponents.conversationSidebar().clickPreferencesButton();
-      const backupName = await createAndSaveBackup(userAPageManager);
+      const backupName = await createAndSaveBackup(testInfo, userAPageManager);
 
       await test.step('User A changes their Email address', async () => {
         const newEmail = generateWireEmail(userA.lastName);
@@ -114,7 +114,7 @@ test.describe('History Backup', () => {
   test(
     "I should not be able to restore from the history of another person's account",
     {tag: ['@TC-125', '@regression']},
-    async ({createPage}) => {
+    async ({createPage}, testInfo) => {
       const [userAPageManager, userBPageManager] = await Promise.all([
         PageManager.from(createPage(withLogin(userA), withConnectedUser(userB))),
         PageManager.from(createPage(withLogin(userB), withConnectedUser(userA))),
@@ -135,7 +135,7 @@ test.describe('History Backup', () => {
 
       await test.step('User A creates History Backup and User B tries to restore it', async () => {
         await userAComponents.conversationSidebar().clickPreferencesButton();
-        const backupName = await createAndSaveBackup(userAPageManager);
+        const backupName = await createAndSaveBackup(testInfo, userAPageManager);
         await logOutUser(userBPageManager, true);
         await loginUser(userB, userBPageManager);
         await userBPages.historyInfo().clickConfirmButton();
@@ -156,7 +156,7 @@ test.describe('History Backup', () => {
   test(
     'I want to see new name and system message of the renamed conversation when it was renamed after export',
     {tag: ['@TC-131', '@regression']},
-    async ({createPage}) => {
+    async ({createPage}, testInfo) => {
       const [userAPageManager, userBPageManager] = await Promise.all([
         PageManager.from(createPage(withLogin(userA), withConnectedUser(userB))),
         PageManager.from(createPage(withLogin(userB), withConnectedUser(userA))),
@@ -181,7 +181,7 @@ test.describe('History Backup', () => {
 
       await test.step('User A creates History Backup, User B renames group conversation and User A restores the Backup', async () => {
         await userAComponents.conversationSidebar().clickPreferencesButton();
-        const backupName = await createAndSaveBackup(userAPageManager);
+        const backupName = await createAndSaveBackup(testInfo, userAPageManager);
         await userAComponents.conversationSidebar().allConverationsButton.click();
         await userAPages.conversationList().openConversation(userB.fullName, {protocol: 'mls'});
         // User B renames group conversation
@@ -211,7 +211,7 @@ test.describe('History Backup', () => {
   test(
     'I want to have the same mute or archive state of a conversation after import',
     {tag: ['@TC-133', '@regression']},
-    async ({createPage}) => {
+    async ({createPage}, testInfo) => {
       const [userAPageManager, userBPageManager] = await Promise.all([
         PageManager.from(createPage(withLogin(userA), withConnectedUser(userB))),
         PageManager.from(createPage(withLogin(userB), withConnectedUser(userA))),
@@ -245,7 +245,7 @@ test.describe('History Backup', () => {
 
       await test.step('User A creates History Backup and restores it', async () => {
         await userAComponents.conversationSidebar().clickPreferencesButton();
-        const backupName = await createAndSaveBackup(userAPageManager);
+        const backupName = await createAndSaveBackup(testInfo, userAPageManager);
 
         await logOutUser(userAPageManager, true);
         await loginUser(userA, userAPageManager);
@@ -269,7 +269,7 @@ test.describe('History Backup', () => {
   test(
     'I should not be able to import a backup with wrong password',
     {tag: ['@TC-135', '@regression']},
-    async ({createPage}) => {
+    async ({createPage}, testInfo) => {
       const [userAPageManager, userBPageManager] = await Promise.all([
         PageManager.from(createPage(withLogin(userA), withConnectedUser(userB))),
         PageManager.from(createPage(withLogin(userB), withConnectedUser(userA))),
@@ -291,7 +291,7 @@ test.describe('History Backup', () => {
       await test.step('User A creates History Backup and tries to restore it with wrong password', async () => {
         // User A creates History Backup
         await userAComponents.conversationSidebar().clickPreferencesButton();
-        const backupName = await createAndSaveBackup(userAPageManager, userA.password);
+        const backupName = await createAndSaveBackup(testInfo, userAPageManager, userA.password);
 
         await logOutUser(userAPageManager, true);
         await loginUser(userA, userAPageManager);
@@ -315,7 +315,7 @@ test.describe('History Backup', () => {
   test(
     'I should not see the deleted group after restore from the backup',
     {tag: ['@TC-1097', '@regression']},
-    async ({createPage}) => {
+    async ({createPage}, testInfo) => {
       const [userAPageManager, userBPageManager] = await Promise.all([
         PageManager.from(createPage(withLogin(userA), withConnectedUser(userB))),
         PageManager.from(createPage(withLogin(userB), withConnectedUser(userA))),
@@ -345,7 +345,7 @@ test.describe('History Backup', () => {
 
       await test.step('User A creates History Backup', async () => {
         await userAComponents.conversationSidebar().clickPreferencesButton();
-        const backupName = await createAndSaveBackup(userAPageManager);
+        const backupName = await createAndSaveBackup(testInfo, userAPageManager);
 
         await logOutUser(userAPageManager, true);
         await loginUser(userA, userAPageManager);

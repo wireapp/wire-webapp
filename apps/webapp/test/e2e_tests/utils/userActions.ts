@@ -17,7 +17,7 @@
  *
  */
 
-import {expect} from 'playwright/test';
+import {expect, TestInfo} from 'playwright/test';
 
 import {ApiManagerE2E} from '../backend/apiManager.e2e';
 import {User} from '../data/user';
@@ -116,7 +116,15 @@ export async function sendConnectionRequest(senderPageManager: PageManager, rece
   await modals.userProfile().clickConnectButton();
 }
 
-export async function createAndSaveBackup(pageManager: PageManager, password?: string, filenamePrefix?: string) {
+/**
+ * @param testInfo is needed to make backup filename unique
+ */
+export async function createAndSaveBackup(
+  testInfo: TestInfo,
+  pageManager: PageManager,
+  password?: string,
+  filenamePrefix?: string,
+) {
   const {pages, modals} = pageManager.webapp;
 
   await pages.account().clickBackUpButton();
@@ -132,7 +140,7 @@ export async function createAndSaveBackup(pageManager: PageManager, password?: s
     pages.historyExport().clickSaveFileButton(),
   ]);
   const safePrefix = filenamePrefix ?? '';
-  const backupName = `./test-results/downloads/${safePrefix}${download.suggestedFilename()}`;
+  const backupName = testInfo.outputPath(`${safePrefix}${download.suggestedFilename()}`);
   await download.saveAs(backupName);
   return backupName;
 }

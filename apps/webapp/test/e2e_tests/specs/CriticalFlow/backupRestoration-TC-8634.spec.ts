@@ -32,7 +32,7 @@ const groupMessage = 'This is a group message!';
 let backupName: string;
 let passwordProtectedBackupName: string;
 
-test('Setting up new device with a backup', {tag: ['@TC-8634', '@crit-flow-web']}, async ({pageManager, api}) => {
+test('Setting up new device with a backup', {tag: ['@TC-8634', '@crit-flow-web']}, async ({pageManager, api}, testInfo) => {
   const {pages, modals, components} = pageManager.webapp;
 
   // Creating preconditions for the test via API
@@ -63,11 +63,11 @@ test('Setting up new device with a backup', {tag: ['@TC-8634', '@crit-flow-web']
 
   await test.step('User creates and saves a backup', async () => {
     await components.conversationSidebar().clickPreferencesButton();
-    backupName = await createAndSaveBackup(pageManager);
+    backupName = await createAndSaveBackup(testInfo, pageManager);
   });
 
   await test.step('User creates and saves a password backup', async () => {
-    passwordProtectedBackupName = await createAndSaveBackup(pageManager, userA.password, 'password-');
+    passwordProtectedBackupName = await createAndSaveBackup(testInfo, pageManager, userA.password, 'password-');
   });
 
   await test.step('User logs out and clears all data', async () => {
