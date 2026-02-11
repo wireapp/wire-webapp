@@ -101,19 +101,23 @@ const MultipartAsset = ({
 
   const isImage = contentType.startsWith('image');
   const isVideo = contentType.startsWith('video');
-  const canPreviewImage = isPreviewableImage({mimeType: contentType, extension});
 
   const isSingleAsset = assetsCount === 1;
   const variant = isSingleAsset ? 'large' : 'small';
 
-  const {src, isLoading, isError, imagePreviewUrl, pdfPreviewUrl, path, isRecycled, fetchData} = useGetMultipartAsset({
-    uuid,
-    cellsRepository,
-    isEnabled: hasBeenInView,
-    retryPreviewUntilSuccess: isSingleAsset && !isImage && !isVideo,
-  });
+  const {src, isLoading, isError, imagePreviewUrl, pdfPreviewUrl, hasPreview, path, isRecycled, fetchData} =
+    useGetMultipartAsset({
+      uuid,
+      cellsRepository,
+      isEnabled: hasBeenInView,
+      retryPreviewUntilSuccess: isSingleAsset && !isImage && !isVideo,
+    });
 
   const name = path ? getName(path) : getName(initialName!);
+  const canPreviewImage = isPreviewableImage({mimeType: contentType, extension}) || !!imagePreviewUrl;
+  const imageSrc = imagePreviewUrl || src;
+  const hasFilePreview = hasPreview ?? false;
+  const fileVariant = isSingleAsset && hasFilePreview ? 'large' : 'small';
 
   /**
    * Listen to hash changes within the current conversation (excluding the `/files` view)
@@ -145,7 +149,8 @@ const MultipartAsset = ({
       <li ref={elementRef} css={imageCardStyles}>
         <ImageAssetCard
           id={uuid}
-          src={src}
+          filePreviewUrl={imageSrc}
+          fileUrl={src}
           name={name}
           extension={extension}
           variant={variant}
@@ -183,7 +188,7 @@ const MultipartAsset = ({
       <FileAssetCard
         id={uuid}
         src={src}
-        variant={variant}
+        variant={fileVariant}
         extension={extension}
         name={name}
         size={size}

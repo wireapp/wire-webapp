@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2025 Wire Swiss GmbH
+ * Copyright (C) 2026 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,18 +17,14 @@
  *
  */
 
-import {Locator, Page} from '@playwright/test';
+import {UserAsset} from '../../../user';
 
-export class HistoryImportPage {
-  private component: Locator;
-
-  readonly title: Locator;
-  readonly description: Locator;
-
-  constructor(page: Page) {
-    this.component = page.locator('#history-import');
-
-    this.title = this.component.getByRole('heading');
-    this.description = this.component.getByRole('paragraph');
-  }
+export interface NewApp {
+  accent_id?: number;
+  assets?: UserAsset[];
+  category: string;
+  description: string;
+  name: string;
+  // We don't send any metadata but the backend requires the metadata field to be present
+  metadata: {};
 }

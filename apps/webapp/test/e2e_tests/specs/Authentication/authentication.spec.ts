@@ -238,7 +238,7 @@ test.describe('Authentication', () => {
 
   test(
     'Verify session expired info is visible on login page',
-    {tag: ['@TC-1311', '@regression']},
+    {tag: ['@TC-1312', '@regression']},
     async ({createPage, createUser}) => {
       const user = await createUser();
       const device1Pages = PageManager.from(await createPage(withLogin(user))).webapp.pages;

@@ -37,8 +37,9 @@ export const useCellsRenameForm = ({node, cellsRepository, onSuccess}: UseCellsR
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  const originalBaseName = trimFileExtension(node.name);
   const hasInvalidCharacters = INVALID_CHARACTERS.some(char => name.includes(char));
-  const isDisabled = isSubmitting || name === node.name || !name.trim();
+  const isDisabled = isSubmitting || name === originalBaseName || !name.trim();
 
   const renameNode = async (name: string) => {
     try {
