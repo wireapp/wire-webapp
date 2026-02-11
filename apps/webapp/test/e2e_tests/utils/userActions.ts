@@ -126,12 +126,13 @@ export async function createAndSaveBackup(pageManager: PageManager, password?: s
   }
   await modals.passwordAdvancedSecurity().clickBackUpNow();
   await expect(modals.passwordAdvancedSecurity().modal).toBeHidden();
-  expect(pages.historyExport().isVisible()).toBeTruthy();
+  expect(await pages.historyExport().isVisible()).toBeTruthy();
   const [download] = await Promise.all([
     pages.historyExport().page.waitForEvent('download'),
     pages.historyExport().clickSaveFileButton(),
   ]);
-  const backupName = `./test-results/downloads/${filenamePrefix}${download.suggestedFilename()}`;
+  const safePrefix = filenamePrefix ?? '';
+  const backupName = `./test-results/downloads/${safePrefix}${download.suggestedFilename()}`;
   await download.saveAs(backupName);
   return backupName;
 }

@@ -43,7 +43,6 @@ test.describe('History Backup', () => {
         PageManager.from(createPage(withLogin(userB), withConnectedUser(userA))),
       ]);
 
-      // Use 'let' here so we can re-assign these later to the new browser context
       let {pages: userAPages, modals: userAModals, components: userAComponents} = userAPageManager.webapp;
       const {pages: userBPages} = userBPageManager.webapp;
 
@@ -351,7 +350,7 @@ test.describe('History Backup', () => {
       await test.step('User A deletes group conversation with User B', async () => {
         await userAPages.conversation().conversationInfoButton.click();
         await userAPages.conversationDetails().deleteGroupButton.click();
-        expect(await userAModals.confirm().modalTitle).toContainText('Delete group conversation?');
+        await expect(userAModals.confirm().modalTitle).toContainText('Delete group conversation?');
         await userAModals.confirm().clickAction();
       });
 
