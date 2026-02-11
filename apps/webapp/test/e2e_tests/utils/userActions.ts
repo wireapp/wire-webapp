@@ -117,7 +117,7 @@ export async function sendConnectionRequest(senderPageManager: PageManager, rece
 }
 
 /**
- * @param testInfo is needed to make backup filename unique
+ * @param testInfo is needed to create unique backup filename
  */
 export async function createAndSaveBackup(
   testInfo: TestInfo,
