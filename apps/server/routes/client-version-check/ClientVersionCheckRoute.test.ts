@@ -30,35 +30,25 @@ describe('/client-version-check', () => {
     expect(sendStatus).toHaveBeenNthCalledWith(1, 200);
   });
 
-  it("returns HTTP 400 if 'X-Webapp-Client-Version' header is missing", async () => {
-    const sendStatus = jest.fn();
-    const fakeRequest = {header: jest.fn().mockReturnValue(undefined)} as unknown as Request;
-    const fakeResponse = {sendStatus} as unknown as Response;
+  it.each<{headerValue: string | undefined; expectedHttpStatusCode: number}>([
+    {headerValue: '', expectedHttpStatusCode: 400},
+    {headerValue: undefined, expectedHttpStatusCode: 400},
+  ])(
+    'returns HTTP status code $expectedHttpStatusCode if header value is "$headerValue"',
+    async ({headerValue, expectedHttpStatusCode}) => {
+      const sendStatus = jest.fn();
+      const fakeRequest = {header: jest.fn().mockReturnValue(headerValue)} as unknown as Request;
+      const fakeResponse = {sendStatus} as unknown as Response;
 
-    const fakeRouter = {
-      get: jest.fn((_routePath, routeHandler) => {
-        routeHandler(fakeRequest, fakeResponse);
-      }),
-    } as unknown as Router;
+      const fakeRouter = {
+        get: jest.fn((_routePath, routeHandler) => {
+          routeHandler(fakeRequest, fakeResponse);
+        }),
+      } as unknown as Router;
 
-    createClientVersionCheckRoute({router: fakeRouter});
+      createClientVersionCheckRoute({router: fakeRouter});
 
-    expect(sendStatus).toHaveBeenNthCalledWith(1, 400);
-  });
-
-  it("returns HTTP 400 if 'X-Webapp-Client-Version' header is empty", async () => {
-    const sendStatus = jest.fn();
-    const fakeRequest = {header: jest.fn().mockReturnValue('')} as unknown as Request;
-    const fakeResponse = {sendStatus} as unknown as Response;
-
-    const fakeRouter = {
-      get: jest.fn((_routePath, routeHandler) => {
-        routeHandler(fakeRequest, fakeResponse);
-      }),
-    } as unknown as Router;
-
-    createClientVersionCheckRoute({router: fakeRouter});
-
-    expect(sendStatus).toHaveBeenNthCalledWith(1, 400);
-  });
+      expect(sendStatus).toHaveBeenNthCalledWith(1, expectedHttpStatusCode);
+    },
+  );
 });
