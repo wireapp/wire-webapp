@@ -257,7 +257,7 @@ test.describe('History Backup', () => {
       await test.step('Validate muted and archived state are the same', async () => {
         await userAComponents.conversationSidebar().allConverationsButton.click();
         await userAPages.conversationList().openConversation(conversationName);
-        await expect(userAPages.conversationList().mutedConversationBadge).toBeVisible();
+        await expect(await userAPages.conversationList().getMutedConversationBadge(conversationName)).toBeVisible();
 
         await userAComponents.conversationSidebar().archiveButton.click();
         const archivedConversation = userAPages.conversationList().getConversationLocator(userB.fullName);
