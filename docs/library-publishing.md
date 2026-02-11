@@ -133,6 +133,7 @@ yarn release:publish
     "version": {
       "conventionalCommits": true,
       "fallbackCurrentVersionResolver": "disk",
+      "preserveLocalDependencyProtocols": false, // rewrite workspace: protocols to real versions on release
       "git": {
         "commit": true,
         "tag": true,
