@@ -31,6 +31,7 @@ export class CellsConversationFilesPage {
   }
 
   async searchFile(fileName: string) {
+    await this.searchInput.clear();
     await this.searchInput.fill(fileName);
   }
 

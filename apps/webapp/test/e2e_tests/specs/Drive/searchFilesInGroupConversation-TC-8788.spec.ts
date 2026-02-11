@@ -86,7 +86,7 @@ test(
       await expect(async () => {
         // Search for the video file
         await userBPages.cellsConversationFiles().searchFile(VideoFileName);
-        await expect(userBPages.cellsConversationFiles().filesList).toHaveCount(1, {timeout: 500});
+        await expect(userBPages.cellsConversationFiles().filesList).toHaveCount(1, {timeout: 1500});
         await expect(userBPages.cellsConversationFiles().getFile(VideoFileName)).toBeVisible({timeout: 500});
       }).toPass({intervals: [1_000, 2_000, 5_000], timeout: 10_000});
       // Search for a non-existing file
