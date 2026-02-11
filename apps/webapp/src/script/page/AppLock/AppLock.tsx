@@ -21,11 +21,10 @@ import {useCallback, useEffect, useRef, useState, Fragment, FormEvent} from 'rea
 
 import {amplify} from 'amplify';
 import cx from 'classnames';
-import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 import {container} from 'tsyringe';
 
 import {ValidationUtil} from '@wireapp/commons';
-import {Button, Input, Link, LinkVariant} from '@wireapp/react-ui-kit';
+import {Button, ButtonVariant, Input, Link, LinkVariant} from '@wireapp/react-ui-kit';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import * as Icon from 'Components/Icon';
@@ -42,11 +41,10 @@ import {t} from 'Util/LocalizerUtil';
 export enum APPLOCK_STATE {
   FORGOT = 'applock.forgot',
   LOCKED = 'applock.locked',
+  LOGOUT = 'applock.logout',
   NONE = 'applock.none',
   SETUP = 'applock.setup',
   SETUP_CHANGE = 'applock.setup_change',
-  WIPE_CONFIRM = 'applock.wipe-confirm',
-  WIPE_PASSWORD = 'applock.wipe-password',
 }
 
 const DEFAULT_INACTIVITY_APP_LOCK_TIMEOUT_IN_SEC = 60;
@@ -72,7 +70,6 @@ const AppLock = ({
   appLockRepository = container.resolve(AppLockRepository),
 }: AppLockProps) => {
   const [state, setState] = useState<APPLOCK_STATE>(APPLOCK_STATE.NONE);
-  const [wipeError, setWipeError] = useState('');
   const [unlockError, setUnlockError] = useState('');
   const [isVisible, setIsVisible] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -208,22 +205,22 @@ const AppLock = ({
     startScheduledTimeout();
   };
 
-  const onWipeDatabase = async (event: FormEvent) => {
-    const target = event.target as HTMLFormElement & {password: HTMLInputElement};
-    try {
-      setIsLoading(true);
-      const currentClientId = clientState.currentClient.id;
-      await clientRepository.clientService.deleteClient(currentClientId, target.password.value);
-      appLockRepository.removeCode();
-      amplify.publish(WebAppEvents.LIFECYCLE.SIGN_OUT, SIGN_OUT_REASON.USER_REQUESTED, true);
-    } catch ({code, message}) {
-      setIsLoading(false);
-      if ([HTTP_STATUS.BAD_REQUEST, HTTP_STATUS.UNAUTHORIZED, HTTP_STATUS.FORBIDDEN].includes(code)) {
-        return setWipeError(t('modalAppLockWipePasswordError'));
-      }
-      setWipeError(message);
-    }
-  };
+  // const onWipeDatabase = async (event: FormEvent) => {
+  //   const target = event.target as HTMLFormElement & {password: HTMLInputElement};
+  //   try {
+  //     setIsLoading(true);
+  //     const currentClientId = clientState.currentClient.id;
+  //     await clientRepository.clientService.deleteClient(currentClientId, target.password.value);
+  //     appLockRepository.removeCode();
+  //     amplify.publish(WebAppEvents.LIFECYCLE.SIGN_OUT, SIGN_OUT_REASON.USER_REQUESTED, true);
+  //   } catch ({code, message}) {
+  //     setIsLoading(false);
+  //     if ([HTTP_STATUS.BAD_REQUEST, HTTP_STATUS.UNAUTHORIZED, HTTP_STATUS.FORBIDDEN].includes(code)) {
+  //       return setWipeError(t('modalAppLockWipePasswordError'));
+  //     }
+  //     setWipeError(message);
+  //   }
+  // };
 
   const changePassphrase = () => {
     setState(APPLOCK_STATE.SETUP);
@@ -237,12 +234,10 @@ const AppLock = ({
   const isSetupPassphraseLength = passwordRegexLength.test(setupPassphrase);
   const isSetupPassphraseSpecial = passwordRegexSpecial.test(setupPassphrase);
 
-  const clearWipeError = () => setWipeError('');
   const clearUnlockError = () => setUnlockError('');
   const onGoBack = () => setState(APPLOCK_STATE.LOCKED);
   const onClickForgot = () => setState(APPLOCK_STATE.FORGOT);
-  const onClickWipe = () => setState(APPLOCK_STATE.WIPE_CONFIRM);
-  const onClickWipeConfirm = () => setState(APPLOCK_STATE.WIPE_PASSWORD);
+  const onClickLogout = () => setState(APPLOCK_STATE.LOGOUT);
   const onClosed = () => {
     setState(APPLOCK_STATE.NONE);
     setSetupPassphrase('');
@@ -260,12 +255,10 @@ const AppLock = ({
         return t('modalAppLockSetupTitle');
       case APPLOCK_STATE.LOCKED:
         return t('modalAppLockLockedTitle', {brandName: Config.getConfig().BRAND_NAME});
+      case APPLOCK_STATE.LOGOUT:
+        return t('modalAccountLogoutHeadline');
       case APPLOCK_STATE.FORGOT:
         return t('modalAppLockForgotTitle');
-      case APPLOCK_STATE.WIPE_CONFIRM:
-        return t('modalAppLockWipeConfirmTitle');
-      case APPLOCK_STATE.WIPE_PASSWORD:
-        return t('modalAppLockWipePasswordTitle', {brandName: Config.getConfig().BRAND_NAME});
       default:
         return '';
     }
@@ -308,22 +301,15 @@ const AppLock = ({
               data-uie-name="label-applock-set-text"
             />
 
-            <label
-              className="modal__text modal__label"
-              data-uie-name="label-applock-unlock-text"
-              htmlFor="input-applock-set-a"
-            >
-              {t('modalAppLockPasscode')}
-            </label>
-
             {/* eslint jsx-a11y/no-autofocus : "off" */}
-            <input
+            <Input
               aria-label={t('modalAppLockSetupTitle')}
               autoFocus
               className="modal__input"
+              label={t('modalAppLockPasscode')}
               type="password"
               value={setupPassphrase}
-              onChange={event => setSetupPassphrase(event.target.value)}
+              onChange={(event: React.ChangeEvent<HTMLInputElement>) => setSetupPassphrase(event.target.value)}
               data-uie-status={isSetupPassphraseValid ? 'valid' : 'invalid'}
               data-uie-name="input-applock-set-a"
               autoComplete="new-password"
@@ -374,24 +360,24 @@ const AppLock = ({
 
             <div className="modal__buttons">
               {!isAppLockEnforced && (
-                <button
+                <Button
+                  variant={ButtonVariant.SECONDARY}
                   type="button"
-                  className="modal__button modal__button--secondary"
                   data-uie-name="do-cancel-applock"
                   onClick={onCancelAppLock}
                 >
                   {t('modalConfirmSecondary')}
-                </button>
+                </Button>
               )}
 
-              <button
+              <Button
+                block={isAppLockEnforced}
                 type="submit"
-                className="modal__button modal__button--primary modal__button--full"
                 data-uie-name="do-action"
                 disabled={!isSetupPassphraseValid}
               >
                 {t('modalAppLockSetupAcceptButton')}
-              </button>
+              </Button>
             </div>
           </form>
         )}
@@ -410,17 +396,14 @@ const AppLock = ({
               data-uie-name="label-applock-set-text"
             />
 
-            <div className="modal__text modal__label" data-uie-name="label-applock-unlock-text">
-              {t('modalAppLockPasscode')}
-            </div>
-
-            <input
+            <Input
               aria-label={t('modalAppLockSetupChangeTitle', {brandName: Config.getConfig().BRAND_NAME})}
               autoFocus
               className="modal__input"
+              label={t('modalAppLockPasscode')}
               type="password"
               value={setupPassphrase}
-              onChange={event => setSetupPassphrase(event.target.value)}
+              onChange={(event: React.ChangeEvent<HTMLInputElement>) => setSetupPassphrase(event.target.value)}
               data-uie-status={isSetupPassphraseValid ? 'valid' : 'invalid'}
               data-uie-name="input-applock-set-a"
               autoComplete="new-password"
@@ -449,14 +432,9 @@ const AppLock = ({
             </p>
 
             <div className="modal__buttons">
-              <button
-                type="submit"
-                className="modal__button modal__button--primary modal__button--full"
-                data-uie-name="do-action"
-                disabled={!isSetupPassphraseValid}
-              >
+              <Button block type="submit" data-uie-name="do-action" disabled={!isSetupPassphraseValid}>
                 {t('modalAppLockSetupAcceptButton')}
-              </button>
+              </Button>
             </div>
           </form>
         )}
@@ -498,86 +476,29 @@ const AppLock = ({
               {t('modalAppLockForgotMessage')}
             </div>
 
-            <button
-              type="button"
-              className="button-reset-default block modal__cta"
-              onClick={onClickWipe}
-              data-uie-name="go-wipe-database"
-            >
-              {t('modalAppLockForgotWipeCTA')}
-            </button>
-
-            <div className="modal__buttons">
-              <button
-                onClick={onGoBack}
-                className="modal__button modal__button--secondary modal__button--full"
-                data-uie-name="do-go-back"
-              >
-                {t('modalAppLockForgotGoBackButton')}
-              </button>
-            </div>
+            <Button variant={ButtonVariant.SECONDARY} onClick={onGoBack} data-uie-name="do-go-back">
+              {t('modalAppLockForgotGoBackButton')}
+            </Button>
+            <Button onClick={onClickLogout} data-uie-name="go-wipe-database">
+              {t('modalAccountLogoutAction')}
+            </Button>
           </Fragment>
         )}
 
-        {state === APPLOCK_STATE.WIPE_CONFIRM && (
+        {state === APPLOCK_STATE.LOGOUT && (
           <Fragment>
             <div className="modal__text" data-uie-name="label-applock-wipe-confirm-text">
               {t('modalAppLockWipeConfirmMessage')}
             </div>
 
-            <div className="modal__buttons">
-              <button onClick={onGoBack} className="modal__button modal__button--secondary" data-uie-name="do-go-back">
-                {t('modalAppLockWipeConfirmGoBackButton')}
-              </button>
+            <Button variant={ButtonVariant.SECONDARY} onClick={onGoBack} data-uie-name="do-go-back">
+              {t('modalAppLockWipeConfirmGoBackButton')}
+            </Button>
 
-              <button
-                onClick={onClickWipeConfirm}
-                className="modal__button modal__button--primary modal__button--alert"
-                data-uie-name="do-action"
-              >
-                {t('modalAppLockWipeConfirmConfirmButton')}
-              </button>
-            </div>
+            <Button onClick={onClickLogout} data-uie-name="do-action">
+              {t('modalAccountLogoutAction')}
+            </Button>
           </Fragment>
-        )}
-
-        {state === APPLOCK_STATE.WIPE_PASSWORD && (
-          <form onSubmit={onWipeDatabase}>
-            <input
-              aria-label={t('modalAppLockWipePasswordTitle', {brandName: Config.getConfig().BRAND_NAME})}
-              autoFocus
-              className="modal__input"
-              type="password"
-              name="password"
-              autoComplete="new-password"
-              placeholder={t('modalAppLockWipePasswordPlaceholder')}
-              onKeyDown={clearWipeError}
-              data-uie-name="input-applock-wipe"
-            />
-
-            <p className="modal__input__error" style={{height: 20}} data-uie-name="label-applock-wipe-error">
-              {wipeError}
-            </p>
-
-            <div className="modal__buttons">
-              <button
-                type="button"
-                onClick={onGoBack}
-                className="modal__button modal__button--secondary"
-                data-uie-name="do-go-back"
-              >
-                {t('modalAppLockWipePasswordGoBackButton')}
-              </button>
-
-              <button
-                type="submit"
-                className="modal__button modal__button--primary modal__button--alert"
-                data-uie-name="do-action"
-              >
-                {t('modalAppLockWipePasswordConfirmButton')}
-              </button>
-            </div>
-          </form>
         )}
       </div>
     </ModalComponent>
