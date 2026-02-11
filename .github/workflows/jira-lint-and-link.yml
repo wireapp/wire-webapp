@@ -2,13 +2,20 @@ name: Link and Lint PR with Jira Ticket Number
 on:
   pull_request:
     types: [opened, edited, synchronize]
+  merge_group:
+    branches: [dev]
 jobs:
   add-jira-description:
-    # avoid triggering this action on dependabot PRs
-    if: ${{ github.actor != 'dependabot[bot]' && github.actor != 'otto-the-bot' }}
+    # On merge_group there is no pull request payload; keep the required check green there.
+    if: ${{ github.event_name == 'merge_group' || (github.actor != 'dependabot[bot]' && github.actor != 'otto-the-bot') }}
     runs-on: ubuntu-latest
     steps:
+      - name: Skip on merge queue
+        if: ${{ github.event_name == 'merge_group' }}
+        run: echo "Skipping Jira pull request description validation on merge queue."
+
       - uses: cakeinpanic/jira-description-action@master
+        if: ${{ github.event_name == 'pull_request' }}
         name: jira-description-action
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
