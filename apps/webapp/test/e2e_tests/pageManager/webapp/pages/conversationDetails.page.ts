@@ -190,10 +190,12 @@ export class ConversationDetailsPage {
     await this.clearConversationContentButton.click();
   }
 
-  async setNotificationsForConversation(value: 'Everything' | 'Mentions and replies' | 'Nothing') {
+  async setNotifications(value: 'Everything' | 'Mentions and replies' | 'Nothing') {
     await this.notificationsButton.click();
-    const notificationsPanel = this.page.locator('aside#right-column');
-    await notificationsPanel.getByRole('radiogroup').getByText(value).click();
+    await this.page.getByRole('radiogroup').locator('label', {hasText: value}).click();
+
+    // Close the settings by clicking "Go back" button.
+    await this.page.getByRole('button', {name: 'Go back'}).click();
   }
 
   async changeConversationName(newConversationName: string) {

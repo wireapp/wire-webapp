@@ -23,14 +23,21 @@ export class OptionsPage {
   readonly page: Page;
 
   readonly soundAlertsRadioGroup: Locator;
+  readonly notificationsRadioGroup: Locator;
 
   constructor(page: Page) {
     this.page = page;
 
     this.soundAlertsRadioGroup = page.getByRole('group', {name: 'Sound alerts'}).getByRole('radiogroup');
+    this.notificationsRadioGroup = page.getByRole('group', {name: 'Notifications'}).getByRole('radiogroup');
   }
 
   async setSoundAlerts(option: 'All' | 'Some' | 'None') {
     await this.soundAlertsRadioGroup.locator('label', {hasText: option}).click();
+  }
+
+  async setNotifications(option: 'Show sender and message' | 'Show sender' | 'Hide details' | 'Off') {
+    // Radio groups in Wire are not a11y compliant so we need to click them since checking doesn't work
+    await this.notificationsRadioGroup.locator('label', {hasText: new RegExp(`^${option}$`)}).click();
   }
 }
