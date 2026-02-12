@@ -211,30 +211,29 @@ export class EventRepository {
 
     const connect = async () => {
       actualDisconnect();
-      return new Promise<void>(async resolve => {
+      try {
         actualDisconnect = await account.listen({
           useLegacy,
           onConnectionStateChanged: connectionState => {
             this.updateConnectivitityStatus(connectionState);
-            if (connectionState === ConnectionState.LIVE) {
-              resolve();
-            }
           },
           onEvent: this.handleIncomingEvent,
           onMissedNotifications: this.triggerMissedSystemEventMessageRendering,
           onNotificationStreamProgress: onNotificationStreamProgress,
           dryRun,
         });
-      });
+      } catch {
+        actualDisconnect = () => {};
+      }
     };
 
-    const handleOnline = async () => {
+    const handleOnline = () => {
       if (!navigator.onLine) {
         return;
       }
 
       this.logger.info('Internet connection regained. Re-establishing WebSocket connection...');
-      await connect();
+      void connect();
     };
 
     const handleOffline = () => {
@@ -250,7 +249,7 @@ export class EventRepository {
           this.logger.info('Window focused, verifying connection...');
           const currentState = this.notificationHandlingState();
           if (currentState === NOTIFICATION_HANDLING_STATE.CLOSED && navigator.onLine) {
-            void handleOnline();
+            handleOnline();
           }
         }
       };
@@ -264,7 +263,7 @@ export class EventRepository {
           this.logger.info('Tab became visible, verifying connection...');
           const currentState = this.notificationHandlingState();
           if (currentState === NOTIFICATION_HANDLING_STATE.CLOSED) {
-            void handleOnline();
+            handleOnline();
           }
         }
       };
@@ -289,7 +288,7 @@ export class EventRepository {
       const currentState = this.notificationHandlingState();
       if (currentState === NOTIFICATION_HANDLING_STATE.CLOSED && navigator.onLine) {
         this.logger.info('Heartbeat: Connection is closed and app is online, attempting reconnection...');
-        void handleOnline();
+        handleOnline();
       }
     }, EventRepository.CONFIG.HEART_BEAT_INTERVAL);
 
