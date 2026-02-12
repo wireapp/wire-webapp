@@ -554,42 +554,6 @@ test.describe('Notifications', () => {
     },
   );
 
-  // ToDo: Check if a notification should be received when removed from group
-  test.fixme(
-    'Verify I see notification when I am removed from group conversation',
-    {tag: ['@TC-1463', '@regression']},
-    async ({createPage}) => {
-      const [userAPage, userBPage] = await Promise.all([
-        createPage(withLogin(userA), withConnectedUser(userB)),
-        createPage(withLogin(userB)),
-      ]);
-      const userAPages = PageManager.from(userAPage).webapp.pages;
-      const userBPages = PageManager.from(userBPage).webapp.pages;
-
-      await createGroup(userAPages, 'Test Group', [userB]);
-      await userBPages.conversationList().openConversation(userA.fullName, {protocol: 'mls'});
-
-      const {getNotifications} = await interceptNotifications(userBPage);
-
-      // User A removes User B from the group
-      await userAPages.conversationList().openConversation('Test Group');
-      await userAPages.conversation().toggleGroupInformation(); // Open conversation details
-      await userAPages.conversation().removeMemberFromGroup(userB.fullName);
-
-      // Verify User B receives a notification about being removed from the group
-      await expect
-        .poll(() => getNotifications())
-        .toEqual(
-          expect.arrayContaining([
-            expect.objectContaining({
-              title: 'Test Group',
-              body: 'You were removed',
-            }),
-          ]),
-        );
-    },
-  );
-
   test(
     'Verify I see notification when image is sent to group conversation',
     {tag: ['@TC-1464', '@regression']},
