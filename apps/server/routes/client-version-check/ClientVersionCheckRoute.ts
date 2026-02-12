@@ -28,7 +28,7 @@ export function createClientVersionCheckRoute(dependencies: ClientVersionCheckRo
   const {router} = dependencies;
 
   return router.get('/client-version-check', (request, response) => {
-    const clientVersion = request.header('X-Webapp-Client-Version');
+    const clientVersion = request.header('Wire-Client-Version');
 
     if (clientVersion === undefined || clientVersion.trim() === '') {
       return response.sendStatus(HTTP_STATUS.BAD_REQUEST);
