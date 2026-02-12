@@ -445,11 +445,12 @@ const AppLock = ({
               label={t('modalAppLockPasscode')}
               autoFocus
               type="password"
+              placeholder={t('modalAppLockLockedInputPlaceholder')}
               id={Math.random().toString()}
               name="password"
               onKeyDown={clearUnlockError}
               data-uie-name="input-applock-unlock"
-              autoComplete="new-password"
+              autoComplete="current-password"
               error={ErrorMessage()}
             />
 
@@ -471,9 +472,8 @@ const AppLock = ({
 
         {state === APPLOCK_STATE.FORGOT && (
           <Fragment>
-            <div className="modal__text" data-uie-name="label-applock-forgot-text">
-              {t('modalAppLockForgotMessage')}
-            </div>
+            <p>{t('modalAppLockForgotMessage')}</p>
+            <p>{t('modalAppLockForgotSecondMessage')}</p>
 
             <Button variant={ButtonVariant.SECONDARY} onClick={onGoBack} data-uie-name="do-go-back">
               {t('modalAppLockForgotGoBackButton')}
@@ -501,7 +501,7 @@ const AppLock = ({
             </Checkbox>
 
             <Button variant={ButtonVariant.SECONDARY} onClick={onGoBack} data-uie-name="do-go-back">
-              {t('modalAppLockWipeConfirmGoBackButton')}
+              {t('modalAppLockForgotGoBackButton')}
             </Button>
 
             <Button onClick={() => onLogout(clearData)} data-uie-name="do-action">

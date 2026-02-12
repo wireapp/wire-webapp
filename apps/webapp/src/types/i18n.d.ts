@@ -717,13 +717,6 @@ declare module 'I18n/en-US.json' {
     'conversationFileUploadOverlayDescription': `Drag & drop to add files`;
     'conversationFileUploadOverlayTitle': `Upload files`;
     'conversationFileVideoPreviewLabel': `Video file preview for: {src}`;
-    'conversationFilterDrafts': `Drafts`;
-    'conversationFilterMentions': `Mentions`;
-    'conversationFilterNone': `No filter`;
-    'conversationFilterPings': `Pings`;
-    'conversationFilterReplies': `Replies`;
-    'conversationFilterTooltip': `Filter conversations`;
-    'conversationFilterUnread': `Unread`;
     'conversationFoldersEmptyText': `Add your conversations to folders to stay organized.`;
     'conversationFoldersEmptyTextLearnMore': `Learn more`;
     'conversationFooterArchive': `Archive`;
@@ -1253,7 +1246,7 @@ declare module 'I18n/en-US.json' {
     'modalAccountLeaveGuestRoomAction': `Leave`;
     'modalAccountLeaveGuestRoomHeadline': `Leave the guest room?`;
     'modalAccountLeaveGuestRoomMessage': `Conversation history will be deleted. To keep it, create an account next time.`;
-    'modalAccountLogoutAction': `Log out`;
+    'modalAccountLogoutAction': `Log Out`;
     'modalAccountLogoutHeadline': `Clear Data?`;
     'modalAccountLogoutOption': `Delete all your personal information and conversations on this device.`;
     'modalAccountNewDevicesFrom': `From:`;
@@ -1270,12 +1263,14 @@ declare module 'I18n/en-US.json' {
     'modalAccountRemoveDevicePlaceholder': `Password`;
     'modalAcknowledgeAction': `Ok`;
     'modalAcknowledgeHeadline': `Something went wrong`;
-    'modalAppLockForgotGoBackButton': `Go back`;
-    'modalAppLockForgotMessage': `The data stored on this device can only be accessed with your app lock passcode. If you have forgotten your passcode, you can reset this client.`;
-    'modalAppLockForgotTitle': `Forgot your app lock passcode?`;
+    'modalAppLockForgotGoBackButton': `Back`;
+    'modalAppLockForgotMessage': `The data stored on this device can only be accessed with your app lock passcode.`;
+    'modalAppLockForgotSecondMessage': `If you have forgotten your passcode, you can log out of this account and set a new passcode the next time you log in.`;
+    'modalAppLockForgotTitle': `Forgot passcode?`;
     'modalAppLockForgotWipeCTA': `Reset this client`;
     'modalAppLockLockedError': `Wrong passcode`;
-    'modalAppLockLockedForgotCTA': `Access as new device`;
+    'modalAppLockLockedForgotCTA': `Forgot passcode?`;
+    'modalAppLockLockedInputPlaceholder': `Enter passcode`;
     'modalAppLockLockedTitle': `Enter passcode to unlock {brandName}`;
     'modalAppLockLockedUnlockButton': `Unlock`;
     'modalAppLockPasscode': `Passcode`;
@@ -1798,6 +1793,7 @@ declare module 'I18n/en-US.json' {
     'searchCreateGroup': `Create group`;
     'searchCreateGuestRoom': `Create guest room`;
     'searchDirectConversations': `Search 1:1 conversations`;
+    'searchDraftsConversations': `Search in drafts`;
     'searchFavoriteConversations': `Search favorites`;
     'searchFederatedDomainNotAvailable': `The federated domain is currently not available.`;
     'searchFederatedDomainNotAvailableLearnMore': `Learn more`;
@@ -1816,6 +1812,7 @@ declare module 'I18n/en-US.json' {
     'searchManageServices': `Manage Apps`;
     'searchManageServicesNoResults': `Manage apps`;
     'searchMemberInvite': `Invite people to join the team`;
+    'searchMentionsConversations': `Search in mentions`;
     'searchNoContactsOnWire': `You have no contacts on {brandName}.\nTry finding people by\nname or username.`;
     'searchNoMatchesPartner': `No results`;
     'searchNoServicesManager': `Apps are helpers that can improve your workflow.`;
@@ -1826,6 +1823,8 @@ declare module 'I18n/en-US.json' {
     'searchPeople': `People`;
     'searchPeopleOnlyPlaceholder': `Search people`;
     'searchPeoplePlaceholder': `Search for people and conversations`;
+    'searchPingsConversations': `Search in pings`;
+    'searchRepliesConversations': `Search in replies`;
     'searchServiceConfirmButton': `Open Conversation`;
     'searchServicePlaceholder': `Search by name`;
     'searchServices': `Apps`;
@@ -1835,6 +1834,7 @@ declare module 'I18n/en-US.json' {
     'searchTrySearch': `Find people by\nname or username`;
     'searchTrySearchFederation': `Find people in Wire by name or\n@username\n\nFind people from another domain\nby @username@domainname`;
     'searchTrySearchLearnMore': `Learn more`;
+    'searchUnreadConversations': `Search in unread`;
     'selectAccountTypeHeading': `How will you use Wire?`;
     'selectPersonalAccountTypeOptionButtonText': `Create Personal Account`;
     'selectPersonalAccountTypeOptionDescription': `Chat with friends and family.`;
@@ -1885,6 +1885,8 @@ declare module 'I18n/en-US.json' {
     'success.openWebAppText': `Open Wire for web`;
     'success.subheader': `What do you want to do next?`;
     'systemMessageLearnMore': `Learn more`;
+    'tabsFilterHeader': `Show filters`;
+    'tabsFilterTooltip': `Customize visible tabs`;
     'takeoverButtonChoose': `Choose your own`;
     'takeoverButtonKeep': `Keep this one`;
     'takeoverLink': `Learn more`;
