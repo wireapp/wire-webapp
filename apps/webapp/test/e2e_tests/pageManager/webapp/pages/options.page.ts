@@ -20,23 +20,17 @@
 import {Page, Locator} from '@playwright/test';
 
 export class OptionsPage {
-  readonly checkboxSoundAlertsAll: Locator;
-  readonly checkboxSoundAlertsSome: Locator;
-  readonly checkboxSoundAlertsNone: Locator;
+  readonly page: Page;
+
+  readonly soundAlertsRadioGroup: Locator;
 
   constructor(page: Page) {
-    this.checkboxSoundAlertsAll = page.getByTestId('preferences-options-audio-all');
-    this.checkboxSoundAlertsSome = page.getByTestId('preferences-options-audio-some');
-    this.checkboxSoundAlertsNone = page.getByTestId('preferences-options-audio-none');
+    this.page = page;
+
+    this.soundAlertsRadioGroup = page.getByRole('group', {name: 'Sound alerts'}).getByRole('radiogroup');
   }
 
-  async checkSoundAll() {
-    await this.checkboxSoundAlertsAll.check();
-  }
-  async checkSoundSome() {
-    await this.checkboxSoundAlertsSome.check();
-  }
-  async checkSoundNone() {
-    await this.checkboxSoundAlertsNone.check();
+  async setSoundAlerts(option: 'All' | 'Some' | 'None') {
+    await this.soundAlertsRadioGroup.locator('label', {hasText: option}).click();
   }
 }
