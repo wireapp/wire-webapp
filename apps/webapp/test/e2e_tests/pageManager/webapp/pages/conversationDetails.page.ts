@@ -193,8 +193,12 @@ export class ConversationDetailsPage {
   async setNotificationsForConversation(value: 'Everything' | 'Mentions and replies' | 'Nothing') {
     await this.notificationsButton.click();
     const notificationsPanel = this.page.locator('aside#right-column');
-    const radioGroup = notificationsPanel.getByRole('radiogroup');
-    await radioGroup.waitFor({state: 'visible'});
-    await radioGroup.getByText(value).click();
+    await notificationsPanel.getByRole('radiogroup').getByText(value).click();
+  }
+
+  async changeConversationName(newConversationName: string) {
+    await this.editConversationNameButton.click();
+    await this.textFieldForConversationName.fill(newConversationName);
+    await this.textFieldForConversationName.press('Enter');
   }
 }

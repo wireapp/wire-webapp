@@ -133,9 +133,14 @@ test.describe('History Backup', () => {
         await userBPages.conversation().sendMessage(messageUserB);
       });
 
-      await test.step('User A creates History Backup and User B tries to restore it', async () => {
+      let backupName: string;
+
+      await test.step('User A creates History Backup', async () => {
         await userAComponents.conversationSidebar().clickPreferencesButton();
-        const backupName = await createAndSaveBackup(testInfo, userAPageManager);
+        backupName = await createAndSaveBackup(testInfo, userAPageManager);
+      });
+
+      await test.step('User B tries to restore User A\'s backup', async () => {
         await logOutUser(userBPageManager, true);
         await loginUser(userB, userBPageManager);
         await userBPages.historyInfo().clickConfirmButton();
@@ -179,18 +184,21 @@ test.describe('History Backup', () => {
         await userBPages.conversation().sendMessage(messageUserB);
       });
 
-      await test.step('User A creates History Backup, User B renames group conversation and User A restores the Backup', async () => {
-        await userAComponents.conversationSidebar().clickPreferencesButton();
-        const backupName = await createAndSaveBackup(testInfo, userAPageManager);
-        await userAComponents.conversationSidebar().allConverationsButton.click();
-        await userAPages.conversationList().openConversation(userB.fullName, {protocol: 'mls'});
-        // User B renames group conversation
-        await userBPages.conversation().conversationInfoButton.click();
-        await userBPages.conversationDetails().editConversationNameButton.click();
-        const textFieldConversationName = userBPages.conversationDetails().textFieldForConversationName;
-        await textFieldConversationName.fill(renamedConversationName);
-        await textFieldConversationName.press('Enter');
+      let backupName: string;
 
+      await test.step('User A creates History Backup', async () => {
+        await userAComponents.conversationSidebar().clickPreferencesButton();
+        backupName = await createAndSaveBackup(testInfo, userAPageManager);
+        await userAComponents.conversationSidebar().allConverationsButton.click();
+        await userAPages.conversationList().openConversation(userB.fullName, { protocol: 'mls' });
+      });
+
+      await test.step('User B renames group conversation', async () => {
+        await userBPages.conversation().conversationInfoButton.click();
+        await userBPages.conversationDetails().changeConversationName(renamedConversationName);
+      });
+
+      await test.step('User A restores the Backup', async () => {
         await userAComponents.conversationSidebar().clickPreferencesButton();
         await userAPages.account().backupFileInput.setInputFiles(backupName);
       });
@@ -202,7 +210,7 @@ test.describe('History Backup', () => {
 
         // User A sees system message that User B had renamed the conversation
         await userAPages.conversationList().openConversation(renamedConversationName);
-        const renamedSystemMessage = userAPages.conversation().systemMessages.last();
+        const renamedSystemMessage = userAPages.conversation().systemMessages.filter({hasText: `${userB.fullName} renamed the conversation`});
         await expect(renamedSystemMessage).toContainText(`${userB.fullName} renamed the conversation`);
       });
     },
@@ -243,13 +251,20 @@ test.describe('History Backup', () => {
         await userAPages.conversationDetails().archiveButton.click();
       });
 
-      await test.step('User A creates History Backup and restores it', async () => {
-        await userAComponents.conversationSidebar().clickPreferencesButton();
-        const backupName = await createAndSaveBackup(testInfo, userAPageManager);
+      let backupName: string;
 
+      await test.step('User A creates History Backup', async () => {
+        await userAComponents.conversationSidebar().clickPreferencesButton();
+        backupName = await createAndSaveBackup(testInfo, userAPageManager);
+      });
+
+      await test.step('User A logs out and logs back in', async () => {
         await logOutUser(userAPageManager, true);
         await loginUser(userA, userAPageManager);
         await userAPages.historyInfo().clickConfirmButton();
+      });
+
+      await test.step('User A restores the backup', async () => {
         await userAComponents.conversationSidebar().clickPreferencesButton();
         await userAPages.account().backupFileInput.setInputFiles(backupName);
       });
@@ -355,6 +370,7 @@ test.describe('History Backup', () => {
       });
 
       await test.step('Validate deleted group conversation is no longer visible', async () => {
+        await userAComponents.conversationSidebar().allConverationsButton.click();
         await expect(userAPages.conversationList().getConversationLocator(conversationName)).not.toBeVisible();
       });
     },

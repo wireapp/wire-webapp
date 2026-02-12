@@ -152,6 +152,6 @@ export class ConversationListPage {
   }
 
   async getMutedConversationBadge(conversationName: string) {
-    return this.getConversationLocator(conversationName).locator('[data-uie-name="status-silence"]');
+    return this.getConversationLocator(conversationName).getByTitle('Muted conversation');
   }
 }
