@@ -447,7 +447,7 @@ const AppLock = ({
               label={t('modalAppLockPasscode')}
               autoFocus
               type="password"
-              placeholder={t('modalAppLockLockedInputPlaceholder')}
+              placeholder={t('modalAppLockInputPlaceholder')}
               id={Math.random().toString()}
               name="password"
               onKeyDown={clearUnlockError}
