@@ -1267,10 +1267,9 @@ declare module 'I18n/en-US.json' {
     'modalAppLockForgotMessage': `The data stored on this device can only be accessed with your app lock passcode.`;
     'modalAppLockForgotSecondMessage': `If you have forgotten your passcode, you can log out of this account and set a new passcode the next time you log in.`;
     'modalAppLockForgotTitle': `Forgot passcode?`;
-    'modalAppLockForgotWipeCTA': `Reset this client`;
     'modalAppLockLockedError': `Wrong passcode`;
     'modalAppLockLockedForgotCTA': `Forgot passcode?`;
-    'modalAppLockLockedInputPlaceholder': `Enter passcode`;
+    'modalAppLockInputPlaceholder': `Enter passcode`;
     'modalAppLockLockedTitle': `Enter passcode to unlock {brandName}`;
     'modalAppLockLockedUnlockButton': `Unlock`;
     'modalAppLockPasscode': `Passcode`;
@@ -1286,15 +1285,6 @@ declare module 'I18n/en-US.json' {
     'modalAppLockSetupSpecial': `A special character`;
     'modalAppLockSetupTitle': `Set app lock passcode`;
     'modalAppLockSetupUppercase': `An uppercase letter`;
-    'modalAppLockWipeConfirmConfirmButton': `Reset this client`;
-    'modalAppLockWipeConfirmGoBackButton': `Go back`;
-    'modalAppLockWipeConfirmMessage': `All your conversation history will be permanently deleted from this client. You may then log in again.`;
-    'modalAppLockWipeConfirmTitle': `Do you really want to reset this client?`;
-    'modalAppLockWipePasswordConfirmButton': `Reset this client`;
-    'modalAppLockWipePasswordError': `Wrong password`;
-    'modalAppLockWipePasswordGoBackButton': `Go back`;
-    'modalAppLockWipePasswordPlaceholder': `Password`;
-    'modalAppLockWipePasswordTitle': `Enter your {brandName} account password to reset this client`;
     'modalAssetFileTypeRestrictionHeadline': `Restricted filetype`;
     'modalAssetFileTypeRestrictionMessage': `The filetype of "{fileName}" is not allowed.`;
     'modalAssetParallelUploadsHeadline': `Too many files at once`;

@@ -307,6 +307,7 @@ const AppLock = ({
               className="modal__input"
               label={t('modalAppLockPasscode')}
               type="password"
+              placeholder={t('modalAppLockInputPlaceholder')}
               value={setupPassphrase}
               onChange={(event: React.ChangeEvent<HTMLInputElement>) => setSetupPassphrase(event.target.value)}
               data-uie-status={isSetupPassphraseValid ? 'valid' : 'invalid'}
@@ -401,6 +402,7 @@ const AppLock = ({
               className="modal__input"
               label={t('modalAppLockPasscode')}
               type="password"
+              placeholder={t('modalAppLockInputPlaceholder')}
               value={setupPassphrase}
               onChange={(event: React.ChangeEvent<HTMLInputElement>) => setSetupPassphrase(event.target.value)}
               data-uie-status={isSetupPassphraseValid ? 'valid' : 'invalid'}
