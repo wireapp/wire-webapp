@@ -72,7 +72,6 @@ const AppLock = ({
   const [state, setState] = useState<APPLOCK_STATE>(APPLOCK_STATE.NONE);
   const [unlockError, setUnlockError] = useState('');
   const [isVisible, setIsVisible] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
   const [setupPassphrase, setSetupPassphrase] = useState('');
   const [clearData, setClearData] = useState(false);
   const [inactivityTimeoutId, setInactivityTimeoutId] = useState<number>();
@@ -271,7 +270,7 @@ const AppLock = ({
   );
 
   return (
-    <ModalComponent isShown={isVisible} showLoading={isLoading} onClosed={onClosed} data-uie-name="applock-modal">
+    <ModalComponent isShown={isVisible} onClosed={onClosed} data-uie-name="applock-modal">
       <div className="modal__header">
         {!isAppLockEnforced && !isAppLockActivated && (
           <button
