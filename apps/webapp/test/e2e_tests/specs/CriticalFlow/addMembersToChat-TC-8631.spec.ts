@@ -178,10 +178,9 @@ test(
     });
 
     await test.step('Team owner removes one group member from a group', async () => {
-      const {pages, modals} = ownerPageManager.webapp;
+      const {pages} = ownerPageManager.webapp;
       // Get the member from the members list and remove them
       await pages.conversation().removeMemberFromGroup(member2.fullName);
-      await modals.removeMember().clickConfirm();
 
       // Verify member is no longer in the conversation by checking system message
       expect(await pages.conversation().isSystemMessageVisible(`You removed ${member2.fullName}`)).toBeTruthy();

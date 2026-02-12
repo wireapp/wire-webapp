@@ -19,7 +19,6 @@
 
 import {User} from 'test/e2e_tests/data/user';
 import {PageManager} from 'test/e2e_tests/pageManager';
-import {ConfirmModal} from 'test/e2e_tests/pageManager/webapp/modals/confirm.modal';
 import {test, expect, withLogin, withConnectedUser} from 'test/e2e_tests/test.fixtures';
 import {getAudioFilePath, getTextFilePath, getVideoFilePath, shareAssetHelper} from 'test/e2e_tests/utils/asset.util';
 import {getImageFilePath} from 'test/e2e_tests/utils/sendImage.util';
@@ -306,7 +305,6 @@ test.describe('Reply', () => {
 
       await userAPages.conversation().clickConversationInfoButton();
       await userAPages.conversation().removeMemberFromGroup(userB.fullName);
-      await new ConfirmModal(userAPages.conversation().page).clickAction();
       await expect(
         userBPages.conversation().systemMessages.filter({hasText: `${userA.fullName} removed you`}),
       ).toBeVisible();
