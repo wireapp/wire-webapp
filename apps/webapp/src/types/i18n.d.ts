@@ -1283,7 +1283,7 @@ declare module 'I18n/en-US.json' {
     'modalAppLockSetupMessage': `The app will lock itself after a certain time of inactivity.[br]To unlock the app you need to enter this passcode.[br]Make sure to remember this passcode as there is no way to recover it.`;
     'modalAppLockSetupSecondPlaceholder': `Repeat passcode`;
     'modalAppLockSetupSpecial': `A special character`;
-    'modalAppLockSetupTitle': `Set app lock passcode`;
+    'modalAppLockSetupTitle': `Create passcode`;
     'modalAppLockSetupUppercase': `An uppercase letter`;
     'modalAssetFileTypeRestrictionHeadline': `Restricted filetype`;
     'modalAssetFileTypeRestrictionMessage': `The filetype of "{fileName}" is not allowed.`;
