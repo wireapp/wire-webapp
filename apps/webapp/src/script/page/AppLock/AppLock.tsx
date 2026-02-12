@@ -24,7 +24,7 @@ import cx from 'classnames';
 import {container} from 'tsyringe';
 
 import {ValidationUtil} from '@wireapp/commons';
-import {Button, ButtonVariant, Input, Link, LinkVariant} from '@wireapp/react-ui-kit';
+import {Button, ButtonVariant, Checkbox, CheckboxLabel, Input, Link, LinkVariant} from '@wireapp/react-ui-kit';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import * as Icon from 'Components/Icon';
@@ -74,6 +74,7 @@ const AppLock = ({
   const [isVisible, setIsVisible] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [setupPassphrase, setSetupPassphrase] = useState('');
+  const [clearData, setClearData] = useState(false);
   const [inactivityTimeoutId, setInactivityTimeoutId] = useState<number>();
   const [scheduledTimeoutId, setScheduledTimeoutId] = useState<number>();
   const {isAppLockActivated, isAppLockEnabled, isAppLockEnforced} = useKoSubscribableChildren(appLockState, [
@@ -81,6 +82,8 @@ const AppLock = ({
     'isAppLockEnabled',
     'isAppLockEnforced',
   ]);
+
+  const isTemporaryClient = clientState.currentClient?.isTemporary();
 
   // We log the user out if there is a style change on the app element
   // i.e. if there is an attempt to remove the blur effect
@@ -205,12 +208,12 @@ const AppLock = ({
     startScheduledTimeout();
   };
 
-  const onLogout = async () => {
+  const onLogout = (clearData: boolean) => {
     if (!isAppLockEnforced) {
       appLockRepository.disableFeature();
     }
     appLockRepository.removeCode();
-    amplify.publish(WebAppEvents.LIFECYCLE.SIGN_OUT, SIGN_OUT_REASON.USER_REQUESTED, true);
+    amplify.publish(WebAppEvents.LIFECYCLE.SIGN_OUT, SIGN_OUT_REASON.USER_REQUESTED, clearData);
   };
 
   const changePassphrase = () => {
@@ -228,7 +231,13 @@ const AppLock = ({
   const clearUnlockError = () => setUnlockError('');
   const onGoBack = () => setState(APPLOCK_STATE.LOCKED);
   const onClickForgot = () => setState(APPLOCK_STATE.FORGOT);
-  const onClickLogout = () => setState(APPLOCK_STATE.LOGOUT);
+  const onClickLogout = async () => {
+    if (isTemporaryClient) {
+      await clientRepository.logoutClient();
+    } else {
+      setState(APPLOCK_STATE.LOGOUT);
+    }
+  };
   const onClosed = () => {
     setState(APPLOCK_STATE.NONE);
     setSetupPassphrase('');
@@ -478,15 +487,25 @@ const AppLock = ({
 
         {state === APPLOCK_STATE.LOGOUT && (
           <Fragment>
-            <div className="modal__text" data-uie-name="label-applock-wipe-confirm-text">
-              {t('modalAppLockWipeConfirmMessage')}
-            </div>
+            <Checkbox
+              checked={clearData}
+              data-uie-name="modal-option-checkbox"
+              id="clear-data-checkbox"
+              onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                const value = event.target.checked;
+                setClearData(value);
+              }}
+            >
+              <CheckboxLabel className="label-xs" htmlFor="clear-data-checkbox">
+                {t('modalAccountLogoutOption')}
+              </CheckboxLabel>
+            </Checkbox>
 
             <Button variant={ButtonVariant.SECONDARY} onClick={onGoBack} data-uie-name="do-go-back">
               {t('modalAppLockWipeConfirmGoBackButton')}
             </Button>
 
-            <Button onClick={onLogout} data-uie-name="do-action">
+            <Button onClick={() => onLogout(clearData)} data-uie-name="do-action">
               {t('modalAccountLogoutAction')}
             </Button>
           </Fragment>
