@@ -8136,10 +8136,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@sindresorhus/is@npm:^7.2.0":
-  version: 7.2.0
-  resolution: "@sindresorhus/is@npm:7.2.0"
-  checksum: 10/d4f93d0fae3a799e1cb1cf31cdcc77f087f4203e2659e25afd7296493d9b4d430f37c4193404f56658d220a7467928fd2b29946dc141218bf42a2d2ebf8597fb
+"@sindresorhus/is@npm:4.6.0":
+  version: 4.6.0
+  resolution: "@sindresorhus/is@npm:4.6.0"
+  checksum: 10/e7f36ed72abfcd5e0355f7423a72918b9748bb1ef370a59f3e5ad8d40b728b85d63b272f65f63eec1faf417cda89dcb0aeebe94015647b6054659c1442fe5ce0
   languageName: node
   linkType: hard
 
@@ -11139,7 +11139,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@wireapp/server@workspace:apps/server"
   dependencies:
-    "@sindresorhus/is": "npm:^7.2.0"
+    "@sindresorhus/is": "npm:4.6.0"
     "@types/express": "npm:4.17.25"
     "@types/express-sitemap-xml": "npm:3.0.4"
     "@types/express-useragent": "npm:1.0.5"
