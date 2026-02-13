@@ -1269,11 +1269,12 @@ declare module 'I18n/en-US.json' {
     'modalAppLockForgotTitle': `Forgot passcode?`;
     'modalAppLockLockedError': `Wrong passcode`;
     'modalAppLockLockedForgotCTA': `Forgot passcode?`;
+    'modalAppLockLogoutCancelButton': `Cancel`;
     'modalAppLockInputPlaceholder': `Enter passcode`;
     'modalAppLockLockedTitle': `Enter passcode to unlock {brandName}`;
     'modalAppLockLockedUnlockButton': `Unlock`;
     'modalAppLockPasscode': `Passcode`;
-    'modalAppLockSetupAcceptButton': `Set passcode`;
+    'modalAppLockSetupAcceptButton': `Create Passcode`;
     'modalAppLockSetupChangeMessage': `Your organization needs to lock your app when {brandName} is not in use to keep the team safe.[br]Create a passlock to unlock {brandName}. Please, remember it, as it can not be recovered.`;
     'modalAppLockSetupChangeTitle': `There was a change at {brandName}`;
     'modalAppLockSetupCloseBtn': `Close window, Set app lock passcode?`;

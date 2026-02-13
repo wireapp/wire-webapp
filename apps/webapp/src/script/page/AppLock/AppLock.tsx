@@ -521,7 +521,7 @@ const AppLock = ({
                 onClick={onGoBack}
                 data-uie-name="do-go-back"
               >
-                {t('modalAppLockForgotGoBackButton')}
+                {t('modalAppLockLogoutCancelButton')}
               </Button>
 
               <Button css={applockStyles.buttonStyle} onClick={() => onLogout(clearData)} data-uie-name="do-action">
