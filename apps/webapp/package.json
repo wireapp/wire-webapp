@@ -63,7 +63,7 @@
     "lexical": "0.27.2",
     "libsodium-wrappers-sumo": "0.8.0",
     "linkify-it": "5.0.0",
-    "markdown-it": "14.1.0",
+    "markdown-it": "14.1.1",
     "murmurhash": "2.0.1",
     "oidc-client-ts": "3.4.1",
     "path-to-regexp": "8.3.0",
