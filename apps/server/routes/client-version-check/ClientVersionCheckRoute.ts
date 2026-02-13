@@ -20,15 +20,16 @@
 import is from '@sindresorhus/is';
 import {Router} from 'express';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
-import type {Result} from 'true-myth';
+import {Maybe, result, type Result} from 'true-myth';
 
 type ClientVersionCheckRouteDependencies = {
   readonly router: ReturnType<typeof Router>;
   readonly parseClientVersion: (clientVersionHeaderValue: string) => Result<Date, Error>;
+  readonly disallowedClientVersion: Maybe<Date>;
 };
 
 export function createClientVersionCheckRoute(dependencies: ClientVersionCheckRouteDependencies) {
-  const {router, parseClientVersion} = dependencies;
+  const {router, parseClientVersion, disallowedClientVersion} = dependencies;
 
   return router.get('/client-version-check', (request, response) => {
     const clientVersionHeaderValue = request.header('Wire-Client-Version');
@@ -39,10 +40,24 @@ export function createClientVersionCheckRoute(dependencies: ClientVersionCheckRo
 
     const parsedClientVersion = parseClientVersion(clientVersionHeaderValue);
 
-    if (parsedClientVersion.isErr) {
+    if (result.isErr(parsedClientVersion)) {
       return response.sendStatus(HTTP_STATUS.BAD_REQUEST);
     }
 
-    return response.sendStatus(HTTP_STATUS.OK);
+    return disallowedClientVersion.match({
+      Just: blockedClientVersionDate => {
+        const isClientVersionBlocked = parsedClientVersion.value.getTime() <= blockedClientVersionDate.getTime();
+
+        if (isClientVersionBlocked) {
+          return response.status(HTTP_STATUS.UPGRADE_REQUIRED).json({action: 'reload'});
+        }
+
+        return response.sendStatus(HTTP_STATUS.OK);
+      },
+
+      Nothing: () => {
+        return response.sendStatus(HTTP_STATUS.OK);
+      },
+    });
   });
 }
