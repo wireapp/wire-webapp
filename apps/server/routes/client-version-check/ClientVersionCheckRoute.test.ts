@@ -5,16 +5,16 @@ import {createClientVersionCheckRoute} from './ClientVersionCheckRoute';
 type ClientVersionCheckRouteDependencyFunctionOverrides = {
   readonly get?: jest.Mock;
   readonly parseClientVersion?: jest.Mock;
-  readonly disallowedClientVersion?: Maybe<Date>;
+  readonly minimumRequiredClientBuildDate?: Maybe<Date>;
 };
 
 function createClientVersionCheckRouteDependencies(overrides: ClientVersionCheckRouteDependencyFunctionOverrides = {}) {
   const get = overrides.get ?? jest.fn();
   const parseClientVersion = overrides.parseClientVersion ?? jest.fn().mockReturnValue(Result.ok(new Date()));
-  const disallowedClientVersion = overrides.disallowedClientVersion ?? Maybe.nothing<Date>();
+  const minimumRequiredClientBuildDate = overrides.minimumRequiredClientBuildDate ?? Maybe.nothing<Date>();
   const router = {get} as unknown as Router;
 
-  return {router, parseClientVersion, disallowedClientVersion, get};
+  return {router, parseClientVersion, minimumRequiredClientBuildDate, get};
 }
 
 describe('/client-version-check', () => {
@@ -92,7 +92,7 @@ describe('/client-version-check', () => {
     const fakeResponse = {sendStatus, status} as unknown as Response;
     const dependencies = createClientVersionCheckRouteDependencies({
       parseClientVersion: jest.fn().mockReturnValue(Result.ok(blockedVersionDate)),
-      disallowedClientVersion: Maybe.just(blockedVersionDate),
+      minimumRequiredClientBuildDate: Maybe.just(blockedVersionDate),
       get: jest.fn((_routePath, routeHandler) => {
         routeHandler(fakeRequest, fakeResponse);
       }),
@@ -115,7 +115,7 @@ describe('/client-version-check', () => {
     const fakeResponse = {sendStatus, status} as unknown as Response;
     const dependencies = createClientVersionCheckRouteDependencies({
       parseClientVersion: jest.fn().mockReturnValue(Result.ok(clientVersionDate)),
-      disallowedClientVersion: Maybe.just(blockedVersionDate),
+      minimumRequiredClientBuildDate: Maybe.just(blockedVersionDate),
       get: jest.fn((_routePath, routeHandler) => {
         routeHandler(fakeRequest, fakeResponse);
       }),
@@ -136,7 +136,7 @@ describe('/client-version-check', () => {
     const fakeResponse = {sendStatus} as unknown as Response;
     const dependencies = createClientVersionCheckRouteDependencies({
       parseClientVersion: jest.fn().mockReturnValue(Result.ok(clientVersionDate)),
-      disallowedClientVersion: Maybe.just(blockedVersionDate),
+      minimumRequiredClientBuildDate: Maybe.just(blockedVersionDate),
       get: jest.fn((_routePath, routeHandler) => {
         routeHandler(fakeRequest, fakeResponse);
       }),

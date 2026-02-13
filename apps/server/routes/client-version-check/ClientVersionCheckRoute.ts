@@ -25,11 +25,11 @@ import {Maybe, result, type Result} from 'true-myth';
 type ClientVersionCheckRouteDependencies = {
   readonly router: ReturnType<typeof Router>;
   readonly parseClientVersion: (clientVersionHeaderValue: string) => Result<Date, Error>;
-  readonly disallowedClientVersion: Maybe<Date>;
+  readonly minimumRequiredClientBuildDate: Maybe<Date>;
 };
 
 export function createClientVersionCheckRoute(dependencies: ClientVersionCheckRouteDependencies) {
-  const {router, parseClientVersion, disallowedClientVersion} = dependencies;
+  const {router, parseClientVersion, minimumRequiredClientBuildDate} = dependencies;
 
   return router.get('/client-version-check', (request, response) => {
     const clientVersionHeaderValue = request.header('Wire-Client-Version');
@@ -44,15 +44,16 @@ export function createClientVersionCheckRoute(dependencies: ClientVersionCheckRo
       return response.sendStatus(HTTP_STATUS.BAD_REQUEST);
     }
 
-    return disallowedClientVersion.match({
-      Just: blockedClientVersionDate => {
-        const isClientVersionBlocked = parsedClientVersion.value.getTime() <= blockedClientVersionDate.getTime();
+    return minimumRequiredClientBuildDate.match({
+      Just: minimumRequiredClientBuildDateValue => {
+        const isClientVersionAllowed =
+          parsedClientVersion.value.getTime() > minimumRequiredClientBuildDateValue.getTime();
 
-        if (isClientVersionBlocked) {
-          return response.status(HTTP_STATUS.UPGRADE_REQUIRED).json({action: 'reload'});
+        if (isClientVersionAllowed) {
+          return response.sendStatus(HTTP_STATUS.OK);
         }
 
-        return response.sendStatus(HTTP_STATUS.OK);
+        return response.status(HTTP_STATUS.UPGRADE_REQUIRED).json({action: 'reload'});
       },
 
       Nothing: () => {
