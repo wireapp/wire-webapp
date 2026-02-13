@@ -12,6 +12,6 @@ module.exports = {
     '^.+\\.(ts|tsx)$': '@swc/jest',
     '^.+\\.(js|jsx)$': 'babel-jest',
   },
-  transformIgnorePatterns: ['/node_modules/(?!(true-myth)/)'],
+  transformIgnorePatterns: ['/node_modules/(?!(true-myth|@sindresorhus/is)/)'],
   moduleFileExtensions: ['js', 'json', 'ts', 'tsx'],
 };
