@@ -20,7 +20,7 @@
 import {CSSObject} from '@emotion/react';
 
 const buttonGroupStyle: CSSObject = {
-  margin: '32px 0',
+  margin: '16px 0',
   display: 'flex',
   justifyContent: 'space-around',
 };

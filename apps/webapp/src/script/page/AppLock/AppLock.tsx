@@ -38,6 +38,8 @@ import {Config} from 'src/script/Config';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 
+import {applockStyles} from './Applock.styles';
+
 export enum APPLOCK_STATE {
   FORGOT = 'applock.forgot',
   LOCKED = 'applock.locked',
