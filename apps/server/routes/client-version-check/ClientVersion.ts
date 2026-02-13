@@ -35,5 +35,9 @@ export function parseClientVersion(clientVersionHeaderValue: string): Result<Dat
     return Result.ok(parseResult.data);
   }
 
-  return Result.err(new Error('foobar', {cause: parseResult.error}));
+  return Result.err(
+    new Error(`Invalid client version format: "${clientVersionHeaderValue}". Expected format: yyyy.MM.dd.HH.mm.ss`, {
+      cause: parseResult.error,
+    }),
+  );
 }

@@ -38,11 +38,14 @@ describe('client version', () => {
     '2026.02.12.24.00.00',
     '2026.02.12.17.60.00',
     '2026.02.12.17.51.60',
-  ])('returns an Result Err when the version number has out-of-range date or time values (%s)', invalidClientVersion => {
-    const actual = parseClientVersion(invalidClientVersion);
+  ])(
+    'returns an Result Err when the version number has out-of-range date or time values (%s)',
+    invalidClientVersion => {
+      const actual = parseClientVersion(invalidClientVersion);
 
-    expect(actual.isErr).toBe(true);
-  });
+      expect(actual.isErr).toBe(true);
+    },
+  );
 
   it('returns an Error with zod validation cause when parsing fails', () => {
     const actual = parseClientVersion('not-a-date');
@@ -50,6 +53,9 @@ describe('client version', () => {
     assert(actual.isErr === true);
 
     expect(actual.error).toBeInstanceOf(Error);
+    expect(actual.error.message).toBe(
+      'Invalid client version format: "not-a-date". Expected format: yyyy.MM.dd.HH.mm.ss',
+    );
     expect(actual.error.cause).toBeDefined();
   });
 
