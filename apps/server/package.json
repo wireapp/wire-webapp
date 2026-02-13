@@ -13,6 +13,7 @@
     "test": "jest"
   },
   "dependencies": {
+    "@sindresorhus/is": "^7.2.0",
     "@wireapp/config": "workspace:^",
     "date-fns": "4.1.0",
     "dotenv-extended": "2.9.0",
