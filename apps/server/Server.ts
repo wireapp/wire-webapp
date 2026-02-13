@@ -23,7 +23,6 @@ import hbs from 'hbs';
 import helmet from 'helmet';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 import nocache from 'nocache';
-import {toolbelt} from 'true-myth';
 
 import fs from 'fs';
 import http from 'http';
@@ -34,6 +33,7 @@ import type {ClientConfig, ServerConfig} from '@wireapp/config';
 
 import {HealthCheckRoute} from './routes/_health/HealthRoute';
 import {AppleAssociationRoute} from './routes/appleassociation/AppleAssociationRoute';
+import {parseMinimumRequiredClientBuildDate} from './routes/client-version-check/ClientBuildDate';
 import {parseClientVersion} from './routes/client-version-check/ClientVersion';
 import {createClientVersionCheckRoute} from './routes/client-version-check/ClientVersionCheckRoute';
 import {ConfigRoute} from './routes/config/ConfigRoute';
@@ -82,9 +82,10 @@ class Server {
       createClientVersionCheckRoute({
         router: Router(),
         parseClientVersion,
-        minimumRequiredClientBuildDate: toolbelt.fromResult(
-          parseClientVersion(this.config.MINIMUM_REQUIRED_CLIENT_BUILD_DATE),
-        ),
+        minimumRequiredClientBuildDate: parseMinimumRequiredClientBuildDate({
+          parseClientVersion,
+          clientVersion: this.config.MINIMUM_REQUIRED_CLIENT_BUILD_DATE,
+        }),
       }),
     );
     this.app.use(NotFoundRoute());
