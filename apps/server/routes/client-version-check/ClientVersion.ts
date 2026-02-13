@@ -28,8 +28,8 @@ const clientVersionSchema = z
   })
   .pipe(z.date());
 
-export function parseClientVersion(clientVersionDate: string): Result<Date, Error> {
-  const parseResult = clientVersionSchema.safeParse(clientVersionDate);
+export function parseClientVersion(clientVersionHeaderValue: string): Result<Date, Error> {
+  const parseResult = clientVersionSchema.safeParse(clientVersionHeaderValue);
 
   if (parseResult.success) {
     return Result.ok(parseResult.data);
