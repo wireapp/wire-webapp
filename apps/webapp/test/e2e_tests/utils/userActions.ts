@@ -17,7 +17,7 @@
  *
  */
 
-import {expect} from 'playwright/test';
+import {expect, TestInfo} from 'playwright/test';
 
 import {ApiManagerE2E} from '../backend/apiManager.e2e';
 import {User} from '../data/user';
@@ -114,4 +114,33 @@ export async function sendConnectionRequest(senderPageManager: PageManager, rece
   await pages.startUI().searchInput.fill(receiver.username);
   await pages.startUI().selectUsers(receiver.username);
   await modals.userProfile().clickConnectButton();
+}
+
+/**
+ * @param testInfo is needed to create unique backup filename
+ */
+export async function createAndSaveBackup(
+  testInfo: TestInfo,
+  pageManager: PageManager,
+  password?: string,
+  filenamePrefix?: string,
+) {
+  const {pages, modals} = pageManager.webapp;
+
+  await pages.account().clickBackUpButton();
+  await expect(modals.passwordAdvancedSecurity().modal).toBeVisible();
+  if (password) {
+    await modals.passwordAdvancedSecurity().enterPassword(password);
+  }
+  await modals.passwordAdvancedSecurity().clickBackUpNow();
+  await expect(modals.passwordAdvancedSecurity().modal).toBeHidden();
+  await expect(pages.historyExport().exportSuccessHeadline).toBeVisible();
+  const [download] = await Promise.all([
+    pages.historyExport().page.waitForEvent('download'),
+    pages.historyExport().clickSaveFileButton(),
+  ]);
+  const safePrefix = filenamePrefix ?? '';
+  const backupName = testInfo.outputPath(`${safePrefix}${download.suggestedFilename()}`);
+  await download.saveAs(backupName);
+  return backupName;
 }

@@ -1,10 +1,11 @@
 {{- if .Values.ingress.enabled }}
+{{- $appName := include "webapp.baseName" . -}}
 apiVersion: v1
 kind: Service
 metadata:
-  name: webapp-http
+  name: {{ include "webapp.httpServiceName" . }}
   labels:
-    app: webapp
+    app: {{ $appName }}
     chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
     release: {{ .Release.Name }}
     heritage: {{ .Release.Service }}
@@ -15,5 +16,5 @@ spec:
       port: {{ .Values.service.http.port | default .Values.service.http.internalPort }}
       targetPort: {{ .Values.service.http.internalPort }}
   selector:
-    app: webapp
+    app: {{ $appName }}
 {{- end }}

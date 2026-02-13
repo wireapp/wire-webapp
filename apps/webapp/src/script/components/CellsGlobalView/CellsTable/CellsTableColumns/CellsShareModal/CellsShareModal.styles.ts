@@ -19,8 +19,6 @@
 
 import {CSSObject} from '@emotion/react';
 
-import {COLOR_V2} from '@wireapp/react-ui-kit';
-
 export const wrapperStyles: CSSObject = {
   paddingTop: '8px',
   width: '100%',
@@ -40,12 +38,12 @@ export const publicLinkDescriptionStyles: CSSObject = {
 
 export const passwordDescriptionStyles: CSSObject = {
   fontSize: 'var(--font-size-small)',
-  color: COLOR_V2.GRAY_90,
+  color: 'var(--base-secondary-text)',
 };
 
 export const expirationDescriptionStyles: CSSObject = {
   fontSize: 'var(--font-size-small)',
-  color: COLOR_V2.GRAY_90,
+  color: 'var(--base-secondary-text)',
 };
 
 export const dividerStyles: CSSObject = {

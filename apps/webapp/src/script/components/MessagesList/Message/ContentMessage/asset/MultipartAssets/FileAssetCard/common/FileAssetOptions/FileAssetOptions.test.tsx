@@ -87,9 +87,9 @@ describe('FileAssetOptions', () => {
       expect(isFileEditable('jpg')).toBe(false);
     });
 
-    it('correctly identifies older Office formats as non-editable', () => {
+    it('correctly identifies older Office formats as editable', () => {
       render(withTheme(<FileAssetOptions {...defaultProps} extension="doc" />));
-      expect(isFileEditable('doc')).toBe(false);
+      expect(isFileEditable('doc')).toBe(true);
     });
   });
 

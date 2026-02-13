@@ -44,8 +44,21 @@ export const actionsStyles: CSSObject = {
 };
 
 export const searchInputStyles: CSSObject = {
+  boxShadow: '0 0 0 0.667px transparent',
   '.wireinput': {
     padding: 0,
     paddingLeft: '8px',
+    boxShadow: 'none',
+    '&:focus, &:hover, &:active': {
+      boxShadow: 'none',
+    },
+  },
+  '&:focus-within': {
+    boxShadow: '0 0 0 0.667px var(--Light-UI-Blue, #0667C8)',
+  },
+  'body.theme-dark &': {
+    '&:focus-within': {
+      boxShadow: '0 0 0 0.667px var(--Dark-UI-Blue, #54a6ff)',
+    },
   },
 };

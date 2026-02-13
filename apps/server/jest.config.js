@@ -23,4 +23,9 @@ module.exports = {
   moduleDirectories: ['node_modules', __dirname],
   testEnvironment: 'node',
   testPathIgnorePatterns: ['<rootDir>/dist'],
+  transformIgnorePatterns: ['/node_modules/(?!(true-myth)/)'],
+  transform: {
+    '^.+\\.(ts|tsx)$': 'babel-jest',
+    '^.+\\.(js|jsx)$': 'babel-jest',
+  },
 };

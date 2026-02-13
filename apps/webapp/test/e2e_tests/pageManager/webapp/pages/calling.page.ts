@@ -18,7 +18,6 @@
  */
 
 import {Page, Locator} from '@playwright/test';
-import {selectByDataAttribute} from 'test/e2e_tests/utils/selector.util';
 
 import {FullScreenCallPage} from './fullScreenCall.page';
 
@@ -141,27 +140,24 @@ export class CallingPage {
     }
 
     await this.page
-      .locator(CallingPage.selectorForParticipantName(userId))
+      .getByTestId('call-participant-name')
+      .and(this.page.locator(`[data-uie-value="${userId}"]`))
       .waitFor({state: 'visible', timeout: 20_000});
   }
 
   // ─── Mute State for Other Users ─────────────────────────────────────────
 
   waitForGridTileMuteIconToBeVisibleForUser(userId: string): Promise<void> {
-    return this.page.locator(CallingPage.selectorForMuteIcon(userId)).waitFor({state: 'visible'});
+    return this.page
+      .getByTestId('mic-icon-off')
+      .and(this.page.locator(`[data-uie-value="${userId}"]`))
+      .waitFor({state: 'visible'});
   }
 
   isGridTileMuteIconVisibleForUser(userId: string): Promise<boolean> {
-    return this.page.locator(CallingPage.selectorForMuteIcon(userId)).isVisible();
-  }
-
-  // ─── Dynamic Selector Generators ─────────────────────────────────────────
-
-  static selectorForParticipantName(userId: string): string {
-    return `${selectByDataAttribute('call-participant-name')}${selectByDataAttribute(userId, 'value')}`;
-  }
-
-  static selectorForMuteIcon(userId: string): string {
-    return `${selectByDataAttribute('mic-icon-off')}${selectByDataAttribute(userId, 'value')}`;
+    return this.page
+      .getByTestId('mic-icon-off')
+      .and(this.page.locator(`[data-uie-value="${userId}"]`))
+      .isVisible();
   }
 }

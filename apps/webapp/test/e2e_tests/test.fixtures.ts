@@ -29,6 +29,7 @@ type PagePlugin = (page: Page) => void | Promise<void>;
 
 // Define custom test type with axios fixture
 type Fixtures = {
+  _beforeEach: void;
   api: ApiManagerE2E;
   pageManager: PageManager;
   /**
@@ -52,17 +53,32 @@ type Fixtures = {
   createTeam: (
     teamName: string,
     options?: Parameters<typeof createUser>[1] & {withMembers?: number | User[]},
-  ) => Promise<{
-    owner: User;
-    members: User[];
-    /** Add a new member to the team after its initial creation */
-    addMember: (member: User) => Promise<void>;
-  }>;
+  ) => Promise<Team>;
+};
+
+export type Team = {
+  owner: User;
+  members: User[];
+  /** Add a new member to the team after its initial creation */
+  addMember: (member: User) => Promise<void>;
 };
 
 export {expect} from '@playwright/test';
 
 export const test = baseTest.extend<Fixtures>({
+  // Temporary workaround to add the test id as annotation instead of tag so Testiny can pick it up
+  // The following test suites need to be updated to be individual tests: AppLock, Connections, RegisterSpecs
+  _beforeEach: [
+    async ({}, use, testInfo) => {
+      const testid = testInfo.tags.find(tag => tag.startsWith('@TC'));
+      if (testid && !testInfo.annotations.some(annotation => annotation.type === 'testid')) {
+        testInfo.annotations.push({type: 'testid', description: testid.slice(1)});
+      }
+
+      await use();
+    },
+    {auto: true},
+  ],
   api: async ({}, use) => {
     // Create a new instance of ApiManager for each test
     await use(new ApiManagerE2E());

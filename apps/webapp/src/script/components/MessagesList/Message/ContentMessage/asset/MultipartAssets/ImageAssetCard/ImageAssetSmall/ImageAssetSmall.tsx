@@ -27,7 +27,8 @@ import {FileFullscreenModal} from '../../../../../../../FileFullscreenModal/File
 import {MediaFilePreviewCard} from '../../common/MediaFilePreviewCard/MediaFilePreviewCard';
 
 interface ImageAssetSmallProps {
-  src?: string;
+  filePreviewUrl?: string;
+  fileUrl?: string;
   name: string;
   extension: string;
   isLoading: boolean;
@@ -39,7 +40,8 @@ interface ImageAssetSmallProps {
 
 export const ImageAssetSmall = ({
   id,
-  src,
+  filePreviewUrl,
+  fileUrl,
   name,
   extension,
   isLoading,
@@ -48,7 +50,9 @@ export const ImageAssetSmall = ({
   timestamp,
 }: ImageAssetSmallProps) => {
   const [isLoaded, setIsLoaded] = useState(false);
+  const [hasLoadError, setHasLoadError] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
+  const isUnavailable = isError || hasLoadError;
 
   return (
     <>
@@ -62,24 +66,35 @@ export const ImageAssetSmall = ({
         aria-haspopup="dialog"
         aria-expanded={isOpen}
         aria-controls={id}
-        disabled={isError}
+        disabled={isUnavailable}
       >
         <MediaFilePreviewCard
-          label={src ? t('conversationFileImagePreviewLabel', {src}) : ''}
+          label={filePreviewUrl ? t('conversationFileImagePreviewLabel', {src: filePreviewUrl}) : ''}
           isLoading={!isLoaded}
-          isError={isError}
+          isError={isUnavailable}
         >
-          {!isLoading && !isError && src && <img src={src} alt="" css={imageStyles} onLoad={() => setIsLoaded(true)} />}
+          {!isLoading && !isUnavailable && filePreviewUrl && (
+            <img
+              src={filePreviewUrl}
+              alt=""
+              css={imageStyles}
+              onLoad={() => setIsLoaded(true)}
+              onError={() => {
+                setHasLoadError(true);
+                setIsLoaded(true);
+              }}
+            />
+          )}
         </MediaFilePreviewCard>
       </button>
       <FileFullscreenModal
         id={id}
         isOpen={isOpen}
         onClose={() => setIsOpen(false)}
-        filePreviewUrl={src}
+        filePreviewUrl={filePreviewUrl}
         fileExtension={extension}
         fileName={name}
-        fileUrl={src}
+        fileUrl={fileUrl}
         senderName={senderName}
         timestamp={timestamp}
       />

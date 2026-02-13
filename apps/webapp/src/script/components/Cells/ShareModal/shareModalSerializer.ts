@@ -23,6 +23,10 @@ interface ShareModalInput {
   expirationEnabled: boolean;
   expirationDateTime: Date | null;
   expirationInvalid: boolean;
+  /** Whether the share link already has a password set */
+  hasExistingPassword?: boolean;
+  /** Whether the user has clicked to edit/change the password */
+  isEditingPassword?: boolean;
 }
 
 export interface ShareModalSerializedInput {
@@ -38,10 +42,10 @@ export const serializeShareModalInput = ({
   expirationEnabled,
   expirationDateTime,
   expirationInvalid,
+  hasExistingPassword,
+  isEditingPassword,
 }: ShareModalInput): ShareModalSerializedInput => {
   const trimmedPassword = passwordValue.trim();
-  const hasPassword = passwordEnabled && trimmedPassword.length > 0;
-  const isPasswordValid = !passwordEnabled || hasPassword;
   const hasValidExpiration = !expirationEnabled || (expirationDateTime && !expirationInvalid);
 
   const accessEnd = expirationEnabled
@@ -50,10 +54,68 @@ export const serializeShareModalInput = ({
       : undefined
     : null;
 
+  const {isPasswordValid, updatePassword} = getPasswordValidationResult({
+    passwordEnabled,
+    trimmedPassword,
+    hasExistingPassword,
+    isEditingPassword,
+  });
+
   return {
     accessEnd,
     isValid: Boolean(isPasswordValid && hasValidExpiration),
     passwordEnabled,
-    updatePassword: hasPassword ? trimmedPassword : undefined,
+    updatePassword,
   };
+};
+
+interface PasswordValidationInput {
+  passwordEnabled: boolean;
+  trimmedPassword: string;
+  hasExistingPassword?: boolean;
+  isEditingPassword?: boolean;
+}
+
+interface PasswordValidationResult {
+  isPasswordValid: boolean;
+  updatePassword?: string;
+}
+
+const getPasswordValidationResult = ({
+  passwordEnabled,
+  trimmedPassword,
+  hasExistingPassword,
+  isEditingPassword,
+}: PasswordValidationInput): PasswordValidationResult => {
+  if (!passwordEnabled) {
+    return {isPasswordValid: true, updatePassword: undefined};
+  }
+
+  const hasPasswordInput = trimmedPassword.length > 0;
+
+  if (hasExistingPassword === undefined && isEditingPassword === undefined) {
+    const isValid = hasPasswordInput;
+    return {
+      isPasswordValid: isValid,
+      updatePassword: hasPasswordInput ? trimmedPassword : undefined,
+    };
+  }
+
+  if (hasExistingPassword && !isEditingPassword) {
+    return {isPasswordValid: true, updatePassword: undefined};
+  }
+
+  if (hasExistingPassword && isEditingPassword && !hasPasswordInput) {
+    return {isPasswordValid: true, updatePassword: undefined};
+  }
+
+  if (hasExistingPassword && isEditingPassword && hasPasswordInput) {
+    return {isPasswordValid: true, updatePassword: trimmedPassword};
+  }
+
+  if (!hasExistingPassword && hasPasswordInput) {
+    return {isPasswordValid: true, updatePassword: trimmedPassword};
+  }
+
+  return {isPasswordValid: false, updatePassword: undefined};
 };

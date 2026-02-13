@@ -23,7 +23,7 @@ import {getImageFilePath} from 'test/e2e_tests/utils/sendImage.util';
 import {addCreatedTeam, removeCreatedTeam} from 'test/e2e_tests/utils/tearDown.util';
 import {inviteMembers, loginUser} from 'test/e2e_tests/utils/userActions';
 
-import {test, expect} from '../../../test.fixtures';
+import {test, expect} from '../../test.fixtures';
 
 // User A is a team owner, User B is a team member
 let userA = getUser();
@@ -36,13 +36,13 @@ const userB = getUser();
 const teamName = 'Cells Critical Team';
 const conversationName = 'Cells Critical Conversation';
 const initialMessageText = 'Here is an image for you';
-const replyMessageText = 'Nice image, thanks!';
+const editedMessageText = 'Here is an image for you, friend';
 
 const imageFilePath = getImageFilePath();
 
 test(
-  'Replying to multipart message in a group conversation',
-  {tag: ['@crit-flow-cells', '@regression', '@TC-8787']},
+  'Edit multipart message in a group conversation',
+  {tag: ['@crit-flow-cells', '@regression', '@TC-8786']},
   async ({pageManager: userAPageManager, browser, api}) => {
     const {pages: userAPages, modals: userAModals, components: userAComponents} = userAPageManager.webapp;
 
@@ -50,7 +50,7 @@ test(
     const userBPage = await userBContext.newPage();
     const userBPageManager = new PageManager(userBPage);
 
-    const {pages: userBPages, modals: userBModals, components: userBComponents} = userBPageManager.webapp;
+    const {pages: userBPages, modals: userBModals} = userBPageManager.webapp;
 
     await test.step('Preconditions: Creating preconditions for the test via API', async () => {
       await api.createTeamOwner(userA, teamName).then(user => {
@@ -95,7 +95,7 @@ test(
       await new Promise(resolve => setTimeout(resolve, 5000));
     });
 
-    await test.step('User A sends a multipart message to User B in a group conversation', async () => {
+    await test.step('User A sends a multipart message in a group conversation', async () => {
       await userAPages.conversationList().openConversation(conversationName);
       await userAComponents.inputBarControls().clickShareFile(imageFilePath);
       await userAComponents.inputBarControls().setMessageInput(initialMessageText);
@@ -104,13 +104,13 @@ test(
       expect(await userBPages.cellsConversation().isMultipartMessageVisible(userA, initialMessageText)).toBeTruthy();
     });
 
-    await test.step('User B replies to a multipart message', async () => {
-      const message = userBPages.cellsConversation().getMessage({sender: userA});
-      await userBPages.cellsConversation().replyToMessage(message);
-      await userBComponents.inputBarControls().setMessageInput(replyMessageText);
-      await userBComponents.inputBarControls().clickSendMessage();
+    await test.step('User A edits text part of the multipart message', async () => {
+      const message = userAPages.cellsConversation().getMessage({sender: userA});
+      await userAPages.cellsConversation().editMessage(message);
+      await userAComponents.inputBarControls().setMessageInput(editedMessageText);
+      await userAComponents.inputBarControls().clickSendMessage();
 
-      expect(await userAPages.cellsConversation().isReplyMessageVisible(replyMessageText)).toBeTruthy();
+      expect(await userBPages.cellsConversation().isMultipartMessageVisible(userA, editedMessageText)).toBeTruthy();
     });
   },
 );

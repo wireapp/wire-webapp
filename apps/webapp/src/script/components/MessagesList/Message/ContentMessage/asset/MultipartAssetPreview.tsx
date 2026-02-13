@@ -27,6 +27,7 @@ import {MultipleFilesIcon, PlayIcon} from '@wireapp/react-ui-kit';
 import {FileTypeIcon} from 'Components/Conversation/common/FileTypeIcon/FileTypeIcon';
 import {FileFullscreenModal} from 'Components/FileFullscreenModal/FileFullscreenModal';
 import {CellsRepository} from 'Repositories/cells/CellsRepository';
+import {isPreviewableImage} from 'Util/ImageUtil';
 import {getFileExtension, getName} from 'Util/util';
 
 import {useGetMultipartAsset} from './MultipartAssets/useGetMultipartAsset/useGetMultipartAsset';
@@ -51,14 +52,14 @@ export const MultipartAssetPreview: FC<MultipartAssetPreviewProps> = ({
   const firstAsset = cellAssets[0];
   const modalId = `multipart-preview-${firstAsset?.uuid || 'unknown'}`;
 
+  const extension = firstAsset?.initialName ? getFileExtension(firstAsset.initialName) : '';
   const isImage = firstAsset?.contentType?.startsWith('image');
   const isVideo = firstAsset?.contentType?.startsWith('video');
-  const hasPreview = (isImage || isVideo) && !!firstAsset?.uuid;
 
   const {src, imagePreviewUrl, isLoading} = useGetMultipartAsset({
     uuid: firstAsset?.uuid || '',
     cellsRepository,
-    isEnabled: hasPreview,
+    isEnabled: !!firstAsset?.uuid,
     retryPreviewUntilSuccess: false,
   });
 
@@ -66,7 +67,9 @@ export const MultipartAssetPreview: FC<MultipartAssetPreviewProps> = ({
     return null;
   }
 
-  const previewUrl = isVideo ? imagePreviewUrl : src;
+  const canPreviewImage = isPreviewableImage({mimeType: firstAsset?.contentType, extension}) || !!imagePreviewUrl;
+  const hasPreview = ((isImage && canPreviewImage) || isVideo) && !!firstAsset?.uuid;
+  const previewUrl = isVideo ? imagePreviewUrl : imagePreviewUrl || src;
 
   // Show loading state or preview for images/videos
   const shouldDisplayImagePreview = hasPreview && (previewUrl || isLoading);
@@ -76,9 +79,7 @@ export const MultipartAssetPreview: FC<MultipartAssetPreviewProps> = ({
   const showText = !shouldDisplayImagePreview || hasMultipleFiles;
 
   // Get file extension for FileTypeIcon - use initialName if available, fallback to contentType
-  const fileExtension = firstAsset?.initialName
-    ? getFileExtension(firstAsset.initialName)
-    : firstAsset?.contentType?.split('/').pop() || '';
+  const fileExtension = extension || firstAsset?.contentType?.split('/').pop() || '';
 
   // Get the file name to display for single files
   const fileName = firstAsset?.initialName ? getName(firstAsset.initialName) : '';
@@ -135,7 +136,7 @@ export const MultipartAssetPreview: FC<MultipartAssetPreviewProps> = ({
           id={modalId}
           isOpen={isModalOpen}
           onClose={() => setIsModalOpen(false)}
-          filePreviewUrl={isVideo ? imagePreviewUrl : src}
+          filePreviewUrl={previewUrl}
           fileExtension={fileExtension}
           fileName={fileName}
           fileUrl={src}

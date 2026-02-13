@@ -18,7 +18,6 @@
  */
 
 import {Page, Locator} from '@playwright/test';
-import {selectByDataAttribute} from 'test/e2e_tests/utils/selector.util';
 
 export class RequestResetPasswordPage {
   readonly page: Page;
@@ -29,9 +28,9 @@ export class RequestResetPasswordPage {
 
   constructor(page: Page) {
     this.page = page;
-    this.emailInput = page.locator(selectByDataAttribute('enter-email'));
-    this.resetPasswordButton = page.locator(selectByDataAttribute('do-send-password-reset-email'));
-    this.goBackToLoginButton = page.locator(selectByDataAttribute('do-go-back-to-login'));
+    this.emailInput = page.getByTestId('enter-email');
+    this.resetPasswordButton = page.getByTestId('do-send-password-reset-email');
+    this.goBackToLoginButton = page.getByTestId('do-go-back-to-login');
   }
 
   async requestPasswordResetForEmail(email: string) {

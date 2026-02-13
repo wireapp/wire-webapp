@@ -11,13 +11,6 @@ jobs:
     runs-on: ubuntu-latest
     if: ${{github.actor == 'dependabot[bot]' || github.actor == 'otto-the-bot'}}
     steps:
-      - name: Approve PR
-        if: ${{ github.actor == 'otto-the-bot' || (github.actor == 'dependabot[bot]' && (steps.dependabot-metadata.outputs.update-type != 'version-update:semver-major')) }}
-        run: gh pr review --approve "$PR_URL"
-        env:
-          GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
-          PR_URL: ${{github.event.pull_request.html_url}}
-
       - name: Fetch Dependabot metadata
         if: ${{github.actor == 'dependabot[bot]'}}
         id: dependabot-metadata
@@ -25,9 +18,21 @@ jobs:
         with:
           github-token: ${{secrets.GITHUB_TOKEN}}
 
+      - name: Approve PR
+        if: ${{ github.actor == 'otto-the-bot' || (github.actor == 'dependabot[bot]' && (steps.dependabot-metadata.outputs.update-type != 'version-update:semver-major')) }}
+        run: gh pr review --approve "$PR_URL"
+        env:
+          GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
+          PR_URL: ${{github.event.pull_request.html_url}}
+
       - name: Enable auto-merge
-        if: ${{github.actor == 'otto-the-bot' || (github.actor == 'dependabot[bot]' && steps.dependabot-metadata.outputs.update-type != 'version-update:semver-major')}}
-        run: gh pr merge --auto --squash "$PR_URL"
+        if: ${{github.actor == 'otto-the-bot' || (github.actor == 'dependabot[bot]' && steps.dependabot-metadata.outputs.update-type != 'version-update:semver-major') || (github.event.pull_request.labels && contains(github.event.pull_request.labels.*.name, 'publish-to-npm')) }}
+        run: |
+          if [[ "${{ github.event.pull_request.labels }}" == *publish-to-npm* ]]; then
+            gh pr merge --auto --merge "$PR_URL"
+          else
+            gh pr merge --auto --squash "$PR_URL"
+          fi
         env:
           GITHUB_TOKEN: ${{secrets.OTTO_THE_BOT_GH_TOKEN}}
           PR_URL: ${{github.event.pull_request.html_url}}

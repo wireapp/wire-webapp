@@ -34,13 +34,21 @@ require('dotenv').config({quiet: true});
  *
  * Demo execution:
  * yarn docker staging '2021-08-25' '1240cfda9e609470cf1154e18f5bc582ca8907ff'
+ * yarn docker staging '2021-08-25' '1240cfda9e609470cf1154e18f5bc582ca8907ff' --pr
  */
 
-/** Version tag of webapp (e.g. "2023-11-09-staging.0", "dev") */
+/** Version tag of webapp (e.g. "2023-11-09-staging.0", "dev", "pr-123") */
 const versionTag = process.argv[2].replace('/', '-');
 const uniqueTagOut = process.argv[3] || '';
 /** Commit ID of https://github.com/wireapp/wire-webapp (i.e. "1240cfda9e609470cf1154e18f5bc582ca8907ff") */
-const commitSha = process.env.GITHUB_SHA || process.argv[4];
+let commitSha = process.env.GITHUB_SHA || process.argv[4];
+/** Flag to indicate if this is a PR build */
+const isPR = process.argv.includes('--pr');
+
+if (isPR) {
+  /** on PRs, use the SHA from the head commit (not the merge commit) for tagging purposes */
+  commitSha = child.execSync('git rev-parse HEAD').toString().trim();
+}
 const commitShortSha = commitSha.substring(0, 7);
 const dockerRegistryDomain = 'quay.io';
 const repository = `${dockerRegistryDomain}/wire/webapp`;
@@ -60,7 +68,13 @@ if (versionTag.includes('production')) {
 }
 const configVersion = appConfigPkg.dependencies[configurationEntry].split('#')[1];
 const uniqueTag = `${versionTag}-${configVersion}-${commitShortSha}`;
-tags.push(`${repository}:${uniqueTag}`);
+if (!isPR) {
+  tags.push(`${repository}:${uniqueTag}`);
+}
+
+if (isPR) {
+  tags.push(`${repository}:${versionTag}-${commitShortSha}`);
+}
 
 const dockerCommands = [
   `echo "$DOCKER_PASSWORD" | docker login --username "$DOCKER_USERNAME" --password-stdin ${dockerRegistryDomain}`,

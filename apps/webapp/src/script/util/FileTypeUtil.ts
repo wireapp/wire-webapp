@@ -47,9 +47,34 @@ export const isAllowedFile = (name: string, type: string): boolean => {
   return fileExtRegex.test(name.toLowerCase());
 };
 
-export const getFileExtensionOrName = (fileName: string): string => fileName.match(/(\.?[^.]*)$/)[0];
+export const getFileExtensionOrName = (fileName: string): string => {
+  const match = fileName.match(/(\.?[^.]*)$/)?.[0];
+  return match ?? '';
+};
 
-const EDITABLE_FILE_EXTENSIONS = ['odf', 'docx', 'xlsx', 'pptx'];
+const EDITABLE_FILE_EXTENSIONS = [
+  'odf',
+  'docx',
+  'pptx',
+  'xlsx',
+  'dotx',
+  'xltx',
+  'ppsx',
+  'doc',
+  'ppt',
+  'xls',
+  'dot',
+  'xlt',
+  'pps',
+  'odt',
+  'odp',
+  'ods',
+  'ots',
+  'ott',
+  'otp',
+  'rtf',
+  'csv',
+];
 
 export const isFileEditable = (fileExtension: string): boolean => {
   return EDITABLE_FILE_EXTENSIONS.includes(fileExtension.toLowerCase());

@@ -17,6 +17,8 @@
  *
  */
 
+import {QualifiedId} from '@wireapp/api-client/lib/user';
+
 import {AssetService} from '../conversation';
 import {LinkPreviewContent, LinkPreviewUploadedContent} from '../conversation/content';
 
@@ -25,7 +27,8 @@ export class LinkPreviewService {
 
   public async uploadLinkPreviewImage(
     linkPreview: LinkPreviewContent,
-    domain?: string,
+    conversationId: QualifiedId,
+    isAuditLogEnabled: boolean = false,
   ): Promise<LinkPreviewUploadedContent> {
     const {image, ...preview} = linkPreview;
     if (!image) {
@@ -33,7 +36,14 @@ export class LinkPreviewService {
     }
 
     const uploadedLinkPreview: LinkPreviewUploadedContent = preview;
-    const asset = await (await this.assetService.uploadAsset(linkPreview.image.data, {domain})).response;
+    const asset = await (
+      await this.assetService.uploadAsset(linkPreview.image.data, {
+        domain: conversationId.domain,
+        ...(isAuditLogEnabled && {
+          auditData: {conversationId, filename: linkPreview.title, filetype: linkPreview.image.type},
+        }),
+      })
+    ).response;
     uploadedLinkPreview.imageUploaded = {
       asset,
       image,

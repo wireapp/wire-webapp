@@ -18,7 +18,6 @@
  */
 
 import {Locator, Page} from '@playwright/test';
-import {selectByDataAttribute} from 'test/e2e_tests/utils/selector.util';
 
 export class AppLockModal {
   readonly page: Page;
@@ -41,14 +40,14 @@ export class AppLockModal {
     this.appLockModal = page.locator("[data-uie-name='applock-modal']");
     this.lockPasscodeInput = page.locator("[data-uie-name='applock-modal'] [data-uie-name='input-applock-set-a']");
     this.unlockPasscodeInput = page.locator("[data-uie-name='applock-modal'] [data-uie-name='input-applock-unlock']");
-    this.appLockWipeInput = this.appLockModal.locator(selectByDataAttribute('input-applock-wipe'));
+    this.appLockWipeInput = this.appLockModal.getByTestId('input-applock-wipe');
     this.appLockActionButton = this.appLockModal.locator("[data-uie-name='do-action']");
     this.appLockModalHeader = page.locator("[data-uie-name='applock-modal'] [data-uie-name='applock-modal-header']");
     this.appLockModalText = page.locator("[data-uie-name='applock-modal'] [data-uie-name='label-applock-unlock-text']");
     this.loadingBar = page.locator('.progress-bar');
-    this.errorMessage = this.appLockModal.locator(selectByDataAttribute('label-applock-unlock-error'));
-    this.forgotPassphraseButton = this.appLockModal.locator(selectByDataAttribute('go-forgot-passphrase'));
-    this.wipeDatabaseButton = this.appLockModal.locator(selectByDataAttribute('go-wipe-database'));
+    this.errorMessage = this.appLockModal.getByTestId('label-applock-unlock-error');
+    this.forgotPassphraseButton = this.appLockModal.getByTestId('go-forgot-passphrase');
+    this.wipeDatabaseButton = this.appLockModal.getByTestId('go-wipe-database');
   }
 
   async setPasscode(passcode: string) {

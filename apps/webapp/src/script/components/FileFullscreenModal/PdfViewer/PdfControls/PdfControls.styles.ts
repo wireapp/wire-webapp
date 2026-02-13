@@ -25,6 +25,7 @@ export const wrapperStyles: CSSObject = {
   left: '50%',
   transform: 'translateX(-50%)',
   backgroundColor: 'var(--gray-20)',
+  color: 'var(--main-color)',
   zIndex: 1000,
   display: 'flex',
   alignItems: 'center',
@@ -32,10 +33,16 @@ export const wrapperStyles: CSSObject = {
   gap: '16px',
   padding: '4px',
   borderRadius: '12px',
+
+  'body.theme-dark &': {
+    backgroundColor: 'var(--gray-90)',
+    color: 'var(--main-color)',
+  },
 };
 
 export const buttonStyles: CSSObject = {
   marginBottom: '0px',
+  color: 'inherit',
 };
 
 export const pageNumberStyles: CSSObject = {

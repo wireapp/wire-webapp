@@ -60,12 +60,12 @@ import {
   expirationLabelStyles,
   timeSelectLabelVisuallyHiddenStyles,
   timeSelectMenuStyles,
-  timeSelectMenuPortalStyles,
   timeSelectStyles,
   timeSelectWrapperStyles,
   expirationErrorBorderStyles,
   expirationErrorLabelStyles,
   expirationErrorTextStyles,
+  timeSelectMenuPortalStyles,
 } from './CellsShareExpirationStyles';
 
 interface CellsShareExpirationFieldsLabels {
@@ -109,6 +109,13 @@ const formatTimeLabel = (hour24: number, minutes: number): string => {
   return `${hour12}:${String(minutes).padStart(2, '0')} ${period}`;
 };
 
+export const getNextHourDateTime = (): Date => {
+  const now = new Date();
+  const plusOneHour = new Date(now);
+  plusOneHour.setHours(plusOneHour.getHours() + 1);
+  return plusOneHour;
+};
+
 const buildTimeOptions = (): Option[] =>
   Array.from({length: 96}, (_, index) => {
     const totalMinutes = index * 15;
@@ -118,6 +125,23 @@ const buildTimeOptions = (): Option[] =>
     return {value: label, label};
   });
 
+const getInitialState = (dateTime: Date | null | undefined): {time: Option; date: DateValue} => {
+  const effectiveDateTime = dateTime ?? getNextHourDateTime();
+  const hour24 = effectiveDateTime.getHours();
+  const minutes = effectiveDateTime.getMinutes();
+  const timeLabel = formatTimeLabel(hour24, minutes);
+  const tz = getLocalTimeZone();
+
+  return {
+    time: {value: timeLabel, label: timeLabel},
+    date: today(tz).set({
+      year: effectiveDateTime.getFullYear(),
+      month: effectiveDateTime.getMonth() + 1,
+      day: effectiveDateTime.getDate(),
+    }),
+  };
+};
+
 export const CellsShareExpirationFields = ({
   labels,
   errorText,
@@ -125,26 +149,9 @@ export const CellsShareExpirationFields = ({
   onChange,
 }: CellsShareExpirationFieldsProps) => {
   const timeOptions = useMemo(() => buildTimeOptions(), []);
-  const [selectedTime, setSelectedTime] = useState<Option>(() => {
-    if (dateTime) {
-      const hour24 = dateTime.getHours();
-      const minutes = dateTime.getMinutes();
-      const label = formatTimeLabel(hour24, minutes);
-      return {value: label, label};
-    }
-    return timeOptions[0];
-  });
-  const [selectedDate, setSelectedDate] = useState<DateValue | null>(() => {
-    if (dateTime) {
-      const tz = getLocalTimeZone();
-      return today(tz).set({
-        year: dateTime.getFullYear(),
-        month: dateTime.getMonth() + 1,
-        day: dateTime.getDate(),
-      });
-    }
-    return today(getLocalTimeZone());
-  });
+  const [initialState] = useState(() => getInitialState(dateTime));
+  const [selectedTime, setSelectedTime] = useState<Option>(initialState.time);
+  const [selectedDate, setSelectedDate] = useState<DateValue | null>(initialState.date);
   const menuMaxHeight = 200;
   const portalContainer = typeof document === 'undefined' ? undefined : document.body;
   const popoverStyle = {zIndex: 10000020};
@@ -276,7 +283,6 @@ export const CellsShareExpirationFields = ({
             value={selectedTime}
             selectContainerCSS={timeControlStyles}
             selectControlCSS={timeControlStyles}
-            selectMenuPortalCSS={timeSelectMenuPortalStyles}
             menuCSS={timeSelectMenuStyles}
             menuPlacement="top"
             maxMenuHeight={menuMaxHeight}
@@ -287,6 +293,7 @@ export const CellsShareExpirationFields = ({
               }
             }}
             markInvalid={isExpirationInvalid}
+            selectMenuPortalCSS={timeSelectMenuPortalStyles}
           />
         </div>
       </div>

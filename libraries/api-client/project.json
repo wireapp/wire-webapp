@@ -7,7 +7,7 @@
     "clean": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "rimraf lib",
+        "command": "npx rimraf lib",
         "cwd": "{projectRoot}"
       }
     },

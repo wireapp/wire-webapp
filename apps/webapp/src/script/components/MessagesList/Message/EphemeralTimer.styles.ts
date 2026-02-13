@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2025 Wire Swiss GmbH
+ * Copyright (C) 2026 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,8 +17,21 @@
  *
  */
 
-export const selectByDataAttribute = (selector: string, attribute: string = 'name') =>
-  `[data-uie-${attribute}="${selector}"]`;
-export const selectById = (selector: string) => `#${selector}`;
-export const selectByClass = (selector: string) => `.${selector}`;
-export const selectByLabel = (selector: string) => `label[for="${selector}"]`;
+import {CSSObject} from '@emotion/react';
+
+const strokewidth = 4;
+const strokelength = strokewidth * Math.PI;
+
+export const ephemeralTimerBackgroundStyle: CSSObject = {
+  fill: 'var(--app-bg-secondary)',
+  stroke: 'var(--foreground)',
+  strokeWidth: '1px',
+};
+
+export const ephemeralTimerDialStyle: (offset: number) => CSSObject = (offset = 1) => ({
+  fill: 'none',
+  stroke: 'var(--foreground)',
+  strokeDasharray: strokelength,
+  strokeDashoffset: `${strokelength * (1 + offset)}`,
+  strokeWidth: strokewidth,
+});

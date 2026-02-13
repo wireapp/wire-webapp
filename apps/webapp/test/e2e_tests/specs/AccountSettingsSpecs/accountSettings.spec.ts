@@ -17,13 +17,13 @@
  *
  */
 
-import {getUser, User} from 'test/e2e_tests/data/user';
+import {getUser} from 'test/e2e_tests/data/user';
 import {PageManager} from 'test/e2e_tests/pageManager';
 import {bootstrapTeamForTesting, completeLogin} from 'test/e2e_tests/utils/setup.util';
 import {tearDownAll} from 'test/e2e_tests/utils/tearDown.util';
 import {createChannel, createGroup, loginUser} from 'test/e2e_tests/utils/userActions';
 
-import {test, expect} from '../../test.fixtures';
+import {test, expect, LOGIN_TIMEOUT} from '../../test.fixtures';
 
 test.describe('account settings', () => {
   let owner = getUser();
@@ -84,40 +84,45 @@ test.describe('account settings', () => {
     },
   );
 
+  const ssoUser = getUser({
+    email: process.env.SCIM_USER_SSO_CODE,
+    username: process.env.SCIM_USER_EMAIL,
+    password: process.env.SCIM_USER_PASSWORD,
+  });
+
   test(
     'I should not be able to change email of user managed by SCIM',
     {tag: ['@TC-60', '@regression']},
-    async ({pageManager, context}) => {
-      const {components, pages, modals} = pageManager.webapp;
-      // use an extra account
-      const ssoUser: User = getUser({
-        email: process.env.SCIM_USER_SSO_CODE,
-        username: process.env.SCIM_USER_EMAIL,
-        password: process.env.SCIM_USER_PASSWORD,
-      });
+    async ({context, createPage}) => {
+      const page = await createPage(context);
+      const pageManager = PageManager.from(page);
       await pageManager.openMainPage();
 
-      await pages.singleSignOn().isSSOPageVisible();
-
-      const [newPage] = await Promise.all([
+      const {pages, components} = pageManager.webapp;
+      const [idpPage] = await Promise.all([
         context.waitForEvent('page'),
         pages.singleSignOn().enterEmailOnSSOPage(ssoUser.email),
       ]);
 
-      await newPage.waitForLoadState();
-      await newPage.getByRole('textbox', {name: 'Username'}).fill(ssoUser.username);
-      await newPage.getByRole('textbox', {name: 'Password'}).fill(ssoUser.password);
-      await newPage.getByRole('button', {name: 'Sign In'}).click();
+      await test.step('Log in on IDP page', async () => {
+        await idpPage.getByRole('textbox', {name: 'Username'}).fill(ssoUser.username, {timeout: 20_000});
+        await idpPage.getByRole('textbox', {name: 'Password'}).fill(ssoUser.password);
+        await idpPage.getByRole('button', {name: 'Sign In'}).click();
+      });
 
-      if (await pages.historyInfo().isButtonVisible()) {
+      await test.step('Remove an existing device and confirm new history', async () => {
+        // Since this test re-uses the same user over and over again we need to always remove one of the previously registered devices
+        await page.getByRole('button', {name: 'Remove device'}).first().click({timeout: LOGIN_TIMEOUT});
+        // We will also always be prompted to confirm the new history on this device
         await pages.historyInfo().clickConfirmButton();
-      }
-      await components.conversationSidebar().isPageLoaded();
+        await expect(components.conversationSidebar().sidebar, `Login took more than ${LOGIN_TIMEOUT}s`).toBeVisible({
+          timeout: LOGIN_TIMEOUT,
+        });
+      });
 
-      if (await modals.dataShareConsent().isModalPresent()) {
-        await modals.dataShareConsent().clickDecline();
-      }
-      await expect(pages.account().emailDisplay).toHaveCount(0);
+      await pages.sidebar().clickPreferencesButton();
+      await pages.settings().accountButton.click();
+      await expect(pages.account().emailDisplay).not.toBeVisible();
     },
   );
 

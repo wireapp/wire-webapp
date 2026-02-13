@@ -18,7 +18,6 @@
  */
 
 import {Locator, Page} from '@playwright/test';
-import {selectByDataAttribute} from 'test/e2e_tests/utils/selector.util';
 import {escapeHtml} from 'test/e2e_tests/utils/userDataProcessor';
 
 export class OutgoingConnectionPage {
@@ -33,8 +32,9 @@ export class OutgoingConnectionPage {
   }
 
   getPendingConnectionIconLocator(fullName: string) {
-    return this.page.locator(
-      `${selectByDataAttribute('item-conversation')}${selectByDataAttribute(escapeHtml(fullName), 'value')} ${selectByDataAttribute('status-pending')}`,
-    );
+    return this.page
+      .getByTestId('item-conversation')
+      .and(this.page.locator(`[data-uie-value="${escapeHtml(fullName)}"]`))
+      .getByTestId('status-pending');
   }
 }

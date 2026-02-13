@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2018 Wire Swiss GmbH
+ * Copyright (C) 2026 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,22 +17,9 @@
  *
  */
 
-@strokewidth: 4px;
-@strokelength: @strokewidth * pi();
+import {NewApp} from './NewApp';
 
-.ephemeral-timer {
-  &__background {
-    fill: var(--foreground-fade-16);
-    stroke: var(--foreground);
-    stroke-width: 1px;
-  }
-
-  &__dial {
-    --offset: 1;
-    fill: none;
-    stroke: var(--foreground);
-    stroke-dasharray: @strokelength;
-    stroke-dashoffset: calc(@strokelength * (1 + var(--offset)));
-    stroke-width: @strokewidth;
-  }
+export interface NewAppRequest {
+  app: NewApp;
+  password: string;
 }
