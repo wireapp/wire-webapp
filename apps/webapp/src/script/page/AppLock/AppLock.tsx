@@ -271,7 +271,7 @@ const AppLock = ({
 
   return (
     <ModalComponent isShown={isVisible} onClosed={onClosed} data-uie-name="applock-modal">
-      <div className="modal__header">
+      <div className="modal__header" css={applockStyles.headerStyle}>
         {!isAppLockEnforced && !isAppLockActivated && (
           <button
             type="button"
@@ -358,9 +358,10 @@ const AppLock = ({
               {t('modalAppLockSetupSpecial')}
             </p>
 
-            <div className="modal__buttons">
+            <div css={applockStyles.buttonGroupStyle}>
               {!isAppLockEnforced && (
                 <Button
+                  css={applockStyles.buttonStyle}
                   variant={ButtonVariant.SECONDARY}
                   type="button"
                   data-uie-name="do-cancel-applock"
@@ -371,6 +372,7 @@ const AppLock = ({
               )}
 
               <Button
+                css={!isAppLockEnforced ? applockStyles.buttonStyle : undefined}
                 block={isAppLockEnforced}
                 type="submit"
                 data-uie-name="do-action"
@@ -456,13 +458,14 @@ const AppLock = ({
               error={ErrorMessage()}
             />
 
-            <Button block type="submit" data-uie-name="do-action">
+            <Button block type="submit" data-uie-name="do-action" css={applockStyles.unlockButtonStyle}>
               {t('modalAppLockLockedUnlockButton')}
             </Button>
 
             <Link
               variant={LinkVariant.PRIMARY}
               type="button"
+              css={applockStyles.linkStyle}
               className="button-reset-default block modal__cta"
               data-uie-name="go-forgot-passphrase"
               onClick={onClickForgot}
@@ -475,14 +478,21 @@ const AppLock = ({
         {state === APPLOCK_STATE.FORGOT && (
           <Fragment>
             <p>{t('modalAppLockForgotMessage')}</p>
+            <br />
             <p>{t('modalAppLockForgotSecondMessage')}</p>
-
-            <Button variant={ButtonVariant.SECONDARY} onClick={onGoBack} data-uie-name="do-go-back">
-              {t('modalAppLockForgotGoBackButton')}
-            </Button>
-            <Button onClick={onClickLogout} data-uie-name="go-wipe-database">
-              {t('modalAccountLogoutAction')}
-            </Button>
+            <div css={applockStyles.buttonGroupStyle}>
+              <Button
+                css={applockStyles.buttonStyle}
+                variant={ButtonVariant.SECONDARY}
+                onClick={onGoBack}
+                data-uie-name="do-go-back"
+              >
+                {t('modalAppLockForgotGoBackButton')}
+              </Button>
+              <Button css={applockStyles.buttonStyle} onClick={onClickLogout} data-uie-name="go-wipe-database">
+                {t('modalAccountLogoutAction')}
+              </Button>
+            </div>
           </Fragment>
         )}
 
@@ -502,13 +512,20 @@ const AppLock = ({
               </CheckboxLabel>
             </Checkbox>
 
-            <Button variant={ButtonVariant.SECONDARY} onClick={onGoBack} data-uie-name="do-go-back">
-              {t('modalAppLockForgotGoBackButton')}
-            </Button>
+            <div css={applockStyles.buttonGroupStyle}>
+              <Button
+                css={applockStyles.buttonStyle}
+                variant={ButtonVariant.SECONDARY}
+                onClick={onGoBack}
+                data-uie-name="do-go-back"
+              >
+                {t('modalAppLockForgotGoBackButton')}
+              </Button>
 
-            <Button onClick={() => onLogout(clearData)} data-uie-name="do-action">
-              {t('modalAccountLogoutAction')}
-            </Button>
+              <Button css={applockStyles.buttonStyle} onClick={() => onLogout(clearData)} data-uie-name="do-action">
+                {t('modalAccountLogoutAction')}
+              </Button>
+            </div>
           </Fragment>
         )}
       </div>
