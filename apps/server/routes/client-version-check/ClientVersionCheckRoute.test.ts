@@ -37,7 +37,8 @@ describe('/client-version-check', () => {
     'returns HTTP status code $expectedHttpStatusCode if header value is "$headerValue"',
     async ({headerValue, expectedHttpStatusCode}) => {
       const sendStatus = jest.fn();
-      const fakeRequest = {header: jest.fn().mockReturnValue(headerValue)} as unknown as Request;
+      const fakeHeader = jest.fn().mockReturnValue(headerValue);
+      const fakeRequest = {header: fakeHeader} as unknown as Request;
       const fakeResponse = {sendStatus} as unknown as Response;
 
       const fakeRouter = {
@@ -48,6 +49,7 @@ describe('/client-version-check', () => {
 
       createClientVersionCheckRoute({router: fakeRouter});
 
+      expect(fakeHeader).toHaveBeenNthCalledWith(1, 'Wire-Client-Version');
       expect(sendStatus).toHaveBeenNthCalledWith(1, expectedHttpStatusCode);
     },
   );

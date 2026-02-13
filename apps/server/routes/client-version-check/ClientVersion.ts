@@ -17,23 +17,27 @@
  *
  */
 
-import {Router} from 'express';
-import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
+import {parse} from 'date-fns';
+import {Result} from 'true-myth';
+import {z} from 'zod';
 
-type ClientVersionCheckRouteDependencies = {
-  readonly router: ReturnType<typeof Router>;
-};
+const clientVersionSchema = z
+  .string()
+  .transform(clientVersionString => {
+    return parse(clientVersionString, 'yyyy.MM.dd.HH.mm.ss', new Date());
+  })
+  .pipe(z.date());
 
-export function createClientVersionCheckRoute(dependencies: ClientVersionCheckRouteDependencies) {
-  const {router} = dependencies;
+export function parseClientVersion(clientVersionHeaderValue: string): Result<Date, Error> {
+  const parseResult = clientVersionSchema.safeParse(clientVersionHeaderValue);
 
-  return router.get('/client-version-check', (request, response) => {
-    const clientVersion = request.header('Wire-Client-Version');
+  if (parseResult.success) {
+    return Result.ok(parseResult.data);
+  }
 
-    if (clientVersion === undefined || clientVersion.trim() === '') {
-      return response.sendStatus(HTTP_STATUS.BAD_REQUEST);
-    }
-
-    return response.sendStatus(HTTP_STATUS.OK);
-  });
+  return Result.err(
+    new Error(`Invalid client version format: "${clientVersionHeaderValue}". Expected format: yyyy.MM.dd.HH.mm.ss`, {
+      cause: parseResult.error,
+    }),
+  );
 }
