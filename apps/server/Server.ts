@@ -23,6 +23,7 @@ import hbs from 'hbs';
 import helmet from 'helmet';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 import nocache from 'nocache';
+import {Maybe} from 'true-myth';
 
 import fs from 'fs';
 import http from 'http';
@@ -30,7 +31,6 @@ import https from 'https';
 import path from 'path';
 
 import type {ClientConfig, ServerConfig} from '@wireapp/config';
-import {Maybe} from 'true-myth';
 
 import {HealthCheckRoute} from './routes/_health/HealthRoute';
 import {AppleAssociationRoute} from './routes/appleassociation/AppleAssociationRoute';
@@ -82,7 +82,7 @@ class Server {
       createClientVersionCheckRoute({
         router: Router(),
         parseClientVersion,
-        disallowedClientVersion: Maybe.nothing<Date>(),
+        minimumRequiredClientBuildDate: Maybe.nothing(),
       }),
     );
     this.app.use(NotFoundRoute());
