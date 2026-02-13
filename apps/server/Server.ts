@@ -30,6 +30,7 @@ import https from 'https';
 import path from 'path';
 
 import type {ClientConfig, ServerConfig} from '@wireapp/config';
+import {Maybe} from 'true-myth';
 
 import {HealthCheckRoute} from './routes/_health/HealthRoute';
 import {AppleAssociationRoute} from './routes/appleassociation/AppleAssociationRoute';
@@ -77,7 +78,13 @@ class Server {
     this.app.use(ConfigRoute(this.config, this.clientConfig));
     this.app.use(GoogleWebmasterRoute(this.config));
     this.app.use(AppleAssociationRoute());
-    this.app.use(createClientVersionCheckRoute({router: Router(), parseClientVersion}));
+    this.app.use(
+      createClientVersionCheckRoute({
+        router: Router(),
+        parseClientVersion,
+        disallowedClientVersion: Maybe.nothing<Date>(),
+      }),
+    );
     this.app.use(NotFoundRoute());
     this.app.use(InternalErrorRoute());
   }
