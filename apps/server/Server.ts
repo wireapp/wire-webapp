@@ -33,6 +33,7 @@ import type {ClientConfig, ServerConfig} from '@wireapp/config';
 
 import {HealthCheckRoute} from './routes/_health/HealthRoute';
 import {AppleAssociationRoute} from './routes/appleassociation/AppleAssociationRoute';
+import {parseClientVersion} from './routes/client-version-check/ClientVersion';
 import {createClientVersionCheckRoute} from './routes/client-version-check/ClientVersionCheckRoute';
 import {ConfigRoute} from './routes/config/ConfigRoute';
 import {InternalErrorRoute, NotFoundRoute} from './routes/error/ErrorRoutes';
@@ -76,7 +77,7 @@ class Server {
     this.app.use(ConfigRoute(this.config, this.clientConfig));
     this.app.use(GoogleWebmasterRoute(this.config));
     this.app.use(AppleAssociationRoute());
-    this.app.use(createClientVersionCheckRoute({router: Router()}));
+    this.app.use(createClientVersionCheckRoute({router: Router(), parseClientVersion}));
     this.app.use(NotFoundRoute());
     this.app.use(InternalErrorRoute());
   }

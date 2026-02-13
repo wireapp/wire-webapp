@@ -17,20 +17,29 @@
  *
  */
 
+import is from '@sindresorhus/is';
 import {Router} from 'express';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
+import type {Result} from 'true-myth';
 
 type ClientVersionCheckRouteDependencies = {
   readonly router: ReturnType<typeof Router>;
+  readonly parseClientVersion: (clientVersionHeaderValue: string) => Result<Date, Error>;
 };
 
 export function createClientVersionCheckRoute(dependencies: ClientVersionCheckRouteDependencies) {
-  const {router} = dependencies;
+  const {router, parseClientVersion} = dependencies;
 
   return router.get('/client-version-check', (request, response) => {
-    const clientVersion = request.header('Wire-Client-Version');
+    const clientVersionHeaderValue = request.header('Wire-Client-Version');
 
-    if (clientVersion === undefined || clientVersion.trim() === '') {
+    if (is.undefined(clientVersionHeaderValue) || is.emptyStringOrWhitespace(clientVersionHeaderValue)) {
+      return response.sendStatus(HTTP_STATUS.BAD_REQUEST);
+    }
+
+    const parsedClientVersion = parseClientVersion(clientVersionHeaderValue);
+
+    if (parsedClientVersion.isErr) {
       return response.sendStatus(HTTP_STATUS.BAD_REQUEST);
     }
 
