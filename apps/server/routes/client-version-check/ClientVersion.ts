@@ -17,29 +17,23 @@
  *
  */
 
-import {parse, isValid} from 'date-fns';
+import {parse} from 'date-fns';
 import {Result} from 'true-myth';
 import {z} from 'zod';
 
 const clientVersionSchema = z
   .string()
-  .refine(clientVersionString => {
-    const parseResult = parse(clientVersionString, 'yyyy.MM.dd.HH.mm.ss', new Date());
-
-    return isValid(parseResult);
-  })
   .transform(clientVersionString => {
-    const parseResult = parse(clientVersionString, 'yyyy.MM.dd.HH.mm.ss', new Date());
+    return parse(clientVersionString, 'yyyy.MM.dd.HH.mm.ss', new Date());
+  })
+  .pipe(z.date());
 
-    return parseResult;
-  });
-
-export function parseClientVersion(clientVersionDate: string): Result<Error, Date> {
+export function parseClientVersion(clientVersionDate: string): Result<Date, Error> {
   const parseResult = clientVersionSchema.safeParse(clientVersionDate);
 
   if (parseResult.success) {
-    return Result.ok<Error, Date>(parseResult.data);
+    return Result.ok(parseResult.data);
   }
 
-  return Result.err<Error, Date>(new Error('foobar', {cause: parseResult.error}));
+  return Result.err(new Error('foobar', {cause: parseResult.error}));
 }
