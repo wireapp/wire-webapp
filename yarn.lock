@@ -11163,6 +11163,7 @@ __metadata:
     opn: "npm:6.0.0"
     pm2: "npm:6.0.14"
     true-myth: "npm:9.3.1"
+    zod: "npm:3.25.76"
   languageName: unknown
   linkType: soft
 
