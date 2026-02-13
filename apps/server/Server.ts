@@ -23,7 +23,7 @@ import hbs from 'hbs';
 import helmet from 'helmet';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 import nocache from 'nocache';
-import {Maybe} from 'true-myth';
+import {toolbelt} from 'true-myth';
 
 import fs from 'fs';
 import http from 'http';
@@ -82,7 +82,9 @@ class Server {
       createClientVersionCheckRoute({
         router: Router(),
         parseClientVersion,
-        minimumRequiredClientBuildDate: Maybe.nothing(),
+        minimumRequiredClientBuildDate: toolbelt.fromResult(
+          parseClientVersion(this.config.MINIMUM_REQUIRED_CLIENT_BUILD_DATE),
+        ),
       }),
     );
     this.app.use(NotFoundRoute());
