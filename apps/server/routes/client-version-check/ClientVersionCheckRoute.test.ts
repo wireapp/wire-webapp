@@ -7,9 +7,7 @@ type ClientVersionCheckRouteDependencyFunctionOverrides = {
   readonly parseClientVersion?: jest.Mock;
 };
 
-function createClientVersionCheckRouteDependencies(
-  overrides: ClientVersionCheckRouteDependencyFunctionOverrides = {},
-) {
+function createClientVersionCheckRouteDependencies(overrides: ClientVersionCheckRouteDependencyFunctionOverrides = {}) {
   const get = overrides.get ?? jest.fn();
   const parseClientVersion = overrides.parseClientVersion ?? jest.fn().mockReturnValue(Result.ok(new Date()));
   const router = {get} as unknown as Router;
@@ -66,7 +64,7 @@ describe('/client-version-check', () => {
     },
   );
 
-  it('returns HTTP 400 if parseClientVersion() returns an Result Err', async () => {
+  it('returns HTTP 400 if parseClientVersion() returns a Result Err', async () => {
     const sendStatus = jest.fn();
     const fakeRequest = {header: jest.fn().mockReturnValue('1.0.0')} as unknown as Request;
     const fakeResponse = {sendStatus} as unknown as Response;
