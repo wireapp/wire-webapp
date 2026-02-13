@@ -22,15 +22,51 @@ import {Locator, Page} from '@playwright/test';
 export class ParticipantDetails {
   readonly page: Page;
 
+  readonly userPicture: Locator;
+  readonly adminStatus: Locator;
+  readonly guestStatus: Locator;
+  readonly createGroup: Locator;
   readonly block: Locator;
+  readonly closeButton: Locator;
+  readonly cancelRequest: Locator;
+  readonly unblockButton: Locator;
+  readonly removeFromGroup: Locator;
 
   constructor(page: Page) {
     this.page = page;
 
-    this.block = this.page.getByTestId('do-block-item-text');
+    this.userPicture = this.page.getByTestId('status-profile-picture');
+    this.adminStatus = this.page.locator('.panel-participant').getByTestId('status-admin');
+    this.guestStatus = this.page.locator('#group-participant-user').getByTestId('status-guest');
+    this.createGroup = this.page.locator('#conversation-details').getByRole('button', {name: 'Create group'});
+    this.block = this.page.getByRole('button', {name: 'Block'});
+    this.closeButton = this.page.getByRole('button', {name: 'Close conversation info'});
+    this.cancelRequest = this.page.getByRole('button', {name: 'Cancel request'});
+    this.unblockButton = this.page.getByRole('button', {name: 'Unblock…'});
+    this.removeFromGroup = this.page.getByRole('button', {name: 'Remove from group…'});
   }
 
   async blockUser() {
     this.block.click();
+  }
+
+  async getUserEmailLocator(email: string) {
+    return this.page.getByTestId('item-enriched-value').and(this.page.locator(`[data-uie-value="${email}"]`));
+  }
+
+  async getUserNameLocator(userName: string) {
+    return this.page.getByTitle(userName);
+  }
+
+  async getUserPictureLocator(userName: string) {
+    return this.page.getByRole('button', {name: userName});
+  }
+
+  async closeParticipantDetails() {
+    this.closeButton.click();
+  }
+
+  async sendConnectRequest() {
+    this.page.getByRole('button', {name: 'Connect'}).click();
   }
 }
