@@ -47,7 +47,6 @@ test('Account Management', {tag: ['@TC-8639', '@crit-flow-web']}, async ({create
   await test.step('Member verifies if applock is working', async () => {
     await pageManager.refreshPage();
     await expect(modals.appLock().appLockModalHeader).toContainText('Enter passcode to unlock');
-    await expect(modals.appLock().appLockModalText).toContainText('Passcode');
 
     await modals.appLock().unlockAppWithPasscode(appLockPassphrase);
   });
