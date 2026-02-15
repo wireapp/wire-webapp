@@ -26157,14 +26157,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"simple-git@npm:3.30.0":
-  version: 3.30.0
-  resolution: "simple-git@npm:3.30.0"
+"simple-git@npm:3.31.1":
+  version: 3.31.1
+  resolution: "simple-git@npm:3.31.1"
   dependencies:
     "@kwsites/file-exists": "npm:^1.1.1"
     "@kwsites/promise-deferred": "npm:^1.1.1"
     debug: "npm:^4.4.0"
-  checksum: 10/65f78b2598950d4f7ce163ad736e7ad358199e13dd84096524b9f10b093f92278d6d40c7390330e7603f1a048db7d7ee1f5ea3a157eb382e691b5c85de549a6b
+  checksum: 10/8e646331eafa0397537f5b8a338405d69a38c8cf8d0cf60f5377d487d6387371c02841156f009926d5df1558c9c020fbf70a722713a60153c743e57831a7e89d
   languageName: node
   linkType: hard
 
@@ -29096,7 +29096,7 @@ __metadata:
     playwright: "npm:1.58.0"
     prettier: "npm:3.8.1"
     rimraf: "npm:6.1.2"
-    simple-git: "npm:3.30.0"
+    simple-git: "npm:3.31.1"
     stylelint: "npm:16.26.1"
     stylelint-config-idiomatic-order: "npm:10.0.0"
     ts-node: "npm:10.9.2"
