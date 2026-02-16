@@ -257,7 +257,7 @@ export class EventRepository {
         if (navigator.onLine) {
           this.logger.info('Window focused, verifying connection...');
           const currentState = this.notificationHandlingState();
-          if (currentState === NOTIFICATION_HANDLING_STATE.CLOSED && navigator.onLine) {
+          if (currentState === NOTIFICATION_HANDLING_STATE.CLOSED) {
             handleOnline();
           }
         }
