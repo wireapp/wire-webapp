@@ -135,8 +135,10 @@ test.describe('Notifications', () => {
 
         await pages.conversationList().openConversation(conversationName);
         await pages.conversation().clickConversationInfoButton();
+        await expect(pages.conversationDetails().notificationsButton).toContainText('Everything');
+
         await pages.conversationDetails().setNotifications('Nothing');
-        // ToDo: Ensure change is reflected in conversation details
+        await expect(pages.conversationDetails().notificationsButton).toContainText('Nothing');
 
         const conversation = pages.conversationList().getConversationLocator(conversationName);
         await expect(conversation.getByTitle('Muted conversation')).toBeVisible();
