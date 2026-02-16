@@ -90,9 +90,10 @@ const StartUI = ({
 
   const actions = mainViewModel.actions;
   const isTeam = teamState.isTeam();
+  const appsEnabled = teamState?.isAppsEnabled();
   const defaultProtocol = teamState.teamFeatures()?.mls?.config.defaultProtocol;
   const areServicesSupportedByProtocol = defaultProtocol !== CONVERSATION_PROTOCOL.MLS;
-  const showServiceTab = isTeam && canChatWithServices() && areServicesSupportedByProtocol;
+  const showServiceTab = isTeam && canChatWithServices() && areServicesSupportedByProtocol && appsEnabled;
 
   const [searchQuery, setSearchQuery] = useState('');
   const [activeTab, setActiveTab] = useState(Tabs.PEOPLE);
