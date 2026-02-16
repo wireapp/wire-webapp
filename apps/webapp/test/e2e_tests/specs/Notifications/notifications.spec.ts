@@ -305,11 +305,17 @@ test.describe('Notifications', () => {
         createPage(withLogin(userA), withConnectedUser(userB)),
         createPage(withLogin(userB)),
       ]);
-      const {pages: userAPages} = PageManager.from(userAPage).webapp;
+      const {pages: userAPages, components: userAComponents} = PageManager.from(userAPage).webapp;
       const {pages: userBPages, components: userBComponents} = PageManager.from(userBPage).webapp;
 
+      // User A uploads a profile picture which should not be shown in the notification
+      await userAComponents.conversationSidebar().preferencesButton.click();
+      await userAPages.settings().accountButton.click();
+      await userAPages.account().uploadProfilePicture(getImageFilePath());
+      await userAComponents.conversationSidebar().allConverationsButton.click();
+
       // User B navigates to preferences and sets "Show sender"
-      await userBComponents.conversationSidebar().clickPreferencesButton();
+      await userBComponents.conversationSidebar().preferencesButton.click();
       await userBPages.settings().optionsButton.click();
       await userBPages.options().setNotifications('Hide details');
 
@@ -327,7 +333,7 @@ test.describe('Notifications', () => {
           expect.objectContaining({
             title: 'Someone',
             body: 'Sent a message',
-            // ToDo: Give user A a profile picture to ensure this test could fail
+            // Verify the icon of the notification is the default one and not the users profile picture
             icon: expect.stringMatching(/notification\.png$/),
           }),
         ]);
