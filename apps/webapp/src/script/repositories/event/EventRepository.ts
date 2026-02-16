@@ -131,7 +131,7 @@ export class EventRepository {
   // WebSocket handling
   //##############################################################################
 
-  private readonly updateConnectivitityStatus = (state: ConnectionState) => {
+  private readonly updateConnectivityStatus = (state: ConnectionState) => {
     this.logger.log('Websocket connection state changed to', state);
     switch (state) {
       case ConnectionState.CONNECTING: {
@@ -208,14 +208,21 @@ export class EventRepository {
 
     const cleanupHandlers: Array<() => void> = [];
     let actualDisconnect: () => void = () => {};
+    let connectionInProgress = false;
 
     const connect = async () => {
+      if (connectionInProgress) {
+        this.logger.info('Connection attempt already in progress, skipping...');
+        return;
+      }
+
+      connectionInProgress = true;
       actualDisconnect();
       try {
         actualDisconnect = await account.listen({
           useLegacy,
           onConnectionStateChanged: connectionState => {
-            this.updateConnectivitityStatus(connectionState);
+            this.updateConnectivityStatus(connectionState);
           },
           onEvent: this.handleIncomingEvent,
           onMissedNotifications: this.triggerMissedSystemEventMessageRendering,
@@ -224,6 +231,8 @@ export class EventRepository {
         });
       } catch {
         actualDisconnect = () => {};
+      } finally {
+        connectionInProgress = false;
       }
     };
 
