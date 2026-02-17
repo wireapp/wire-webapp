@@ -69,7 +69,7 @@ export class EventRepository {
   static get CONFIG() {
     return {
       E_CALL_EVENT_LIFETIME: TIME_IN_MILLIS.SECOND * 30,
-      HEART_BEAT_INTERVAL: TIME_IN_MILLIS.SECOND * 30,
+      HEARTBEAT_INTERVAL: TIME_IN_MILLIS.SECOND * 30,
       IGNORED_ERRORS: [
         CryptographyError.TYPE.IGNORED_ASSET,
         CryptographyError.TYPE.IGNORED_PREVIEW,
@@ -299,7 +299,7 @@ export class EventRepository {
         this.logger.info('Heartbeat: Connection is closed and app is online, attempting reconnection...');
         handleOnline();
       }
-    }, EventRepository.CONFIG.HEART_BEAT_INTERVAL);
+    }, EventRepository.CONFIG.HEARTBEAT_INTERVAL);
 
     cleanupHandlers.push(() => {
       window.clearInterval(heartbeatInterval);
