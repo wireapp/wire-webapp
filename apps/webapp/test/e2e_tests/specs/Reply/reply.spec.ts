@@ -307,7 +307,9 @@ test.describe('Reply', () => {
       await userAPages.conversation().clickConversationInfoButton();
       await userAPages.conversation().removeMemberFromGroup(userB.fullName);
       await new ConfirmModal(userAPages.conversation().page).clickAction();
-      await expect(userBPages.conversation().getMessage({content: `${userA.fullName} removed you`})).toBeVisible();
+      await expect(
+        userBPages.conversation().systemMessages.filter({hasText: `${userA.fullName} removed you`}),
+      ).toBeVisible();
 
       await message.hover();
       await expect(message.getByTestId('do-reply-message')).not.toBeAttached();

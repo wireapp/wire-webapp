@@ -113,6 +113,30 @@ describe('MultipartAssets', () => {
       expect(screen.queryByText('cells.unavailableFile')).not.toBeInTheDocument();
     });
 
+    it('should render a small file card when no preview is available', async () => {
+      mockCellsRepository.getNode.mockResolvedValue(mockNode);
+
+      const assets: ICellAsset[] = [createMockAsset('test-uuid', 'application/zip', 'archive.zip')];
+
+      render(
+        withTheme(
+          <MultipartAssets
+            assets={assets}
+            conversationId="conv-123"
+            cellsRepository={mockCellsRepository}
+            senderName="John Doe"
+            timestamp={Date.now()}
+          />,
+        ),
+      );
+
+      await waitFor(() => {
+        expect(mockCellsRepository.getNode).toHaveBeenCalledWith({uuid: 'test-uuid'});
+      });
+
+      expect(screen.queryByText('cells.unavailableFilePreview')).not.toBeInTheDocument();
+    });
+
     it('should render multiple assets with mixed recycled state', async () => {
       mockCellsRepository.getNode
         .mockResolvedValueOnce(mockNode)
@@ -451,6 +475,74 @@ describe('MultipartAssets', () => {
 
       await waitFor(() => {
         expect(screen.getByText('cells.unavailableFile')).toBeInTheDocument();
+      });
+    });
+
+    it('should render a file card for non-previewable image formats', async () => {
+      mockCellsRepository.getNode.mockResolvedValue(mockNode);
+
+      const assets: ICellAsset[] = [
+        {
+          ...createMockAsset('test-uuid', 'image/heic', 'sample.heic'),
+          image: {width: 100, height: 100},
+        },
+      ];
+
+      render(
+        withTheme(
+          <MultipartAssets
+            assets={assets}
+            conversationId="conv-123"
+            cellsRepository={mockCellsRepository}
+            senderName="John Doe"
+            timestamp={Date.now()}
+          />,
+        ),
+      );
+
+      await waitFor(() => {
+        expect(screen.getByText('sample')).toBeInTheDocument();
+      });
+
+      expect(screen.queryByLabelText('accessibility.conversationAssetImageAlt')).not.toBeInTheDocument();
+    });
+
+    it('should render an image card when a server preview is available for HEIC', async () => {
+      const heicPreviewNode: RestNode = {
+        ...mockNode,
+        Previews: [
+          {
+            ContentType: 'image/jpeg',
+            PreSignedGET: {
+              Url: 'https://example.com/preview.jpg',
+            },
+          },
+        ],
+      } as RestNode;
+
+      mockCellsRepository.getNode.mockResolvedValue(heicPreviewNode);
+
+      const assets: ICellAsset[] = [
+        {
+          ...createMockAsset('test-uuid', 'image/heic', 'sample.heic'),
+          image: {width: 100, height: 100},
+        },
+      ];
+
+      render(
+        withTheme(
+          <MultipartAssets
+            assets={assets}
+            conversationId="conv-123"
+            cellsRepository={mockCellsRepository}
+            senderName="John Doe"
+            timestamp={Date.now()}
+          />,
+        ),
+      );
+
+      await waitFor(() => {
+        expect(screen.getByLabelText('accessibility.conversationAssetImageAlt')).toBeInTheDocument();
       });
     });
   });

@@ -18,7 +18,6 @@
  */
 
 import {Page, Locator} from '@playwright/test';
-import {selectByDataAttribute} from 'test/e2e_tests/utils/selector.util';
 
 export class RemoveMemberModal {
   readonly page: Page;
@@ -29,8 +28,8 @@ export class RemoveMemberModal {
   constructor(page: Page) {
     this.page = page;
 
-    this.modal = page.locator(`${selectByDataAttribute('modal-template-confirm')}`);
-    this.confirmButton = this.modal.locator(`${selectByDataAttribute('do-action')}`);
+    this.modal = page.getByTestId('modal-template-confirm');
+    this.confirmButton = this.modal.getByTestId('do-action');
   }
 
   async clickConfirm() {

@@ -310,6 +310,49 @@ describe('useGetMultipartAsset', () => {
   });
 
   describe('preview retry logic', () => {
+    it('should set hasPreview to true when previews are available', async () => {
+      mockCellsRepository.getNode.mockResolvedValue(mockNode);
+
+      const {result} = renderHook(() =>
+        useGetMultipartAsset({
+          uuid: 'test-uuid',
+          cellsRepository: mockCellsRepository,
+          isEnabled: true,
+          retryPreviewUntilSuccess: false,
+        }),
+      );
+
+      await waitFor(() => {
+        expect(result.current.isLoading).toBe(false);
+      });
+
+      expect(result.current.hasPreview).toBe(true);
+    });
+
+    it('should set hasPreview to false when no previews are available', async () => {
+      const noPreviewNode: RestNode = {
+        ...mockNode,
+        Previews: [],
+      };
+
+      mockCellsRepository.getNode.mockResolvedValue(noPreviewNode);
+
+      const {result} = renderHook(() =>
+        useGetMultipartAsset({
+          uuid: 'test-uuid',
+          cellsRepository: mockCellsRepository,
+          isEnabled: true,
+          retryPreviewUntilSuccess: false,
+        }),
+      );
+
+      await waitFor(() => {
+        expect(result.current.isLoading).toBe(false);
+      });
+
+      expect(result.current.hasPreview).toBe(false);
+    });
+
     it('should return immediately when retryPreviewUntilSuccess is false', async () => {
       const processingNode: RestNode = {
         ...mockNode,

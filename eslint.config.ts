@@ -48,13 +48,35 @@ const ignores = [
   '*.js',
   'apps/webapp/src/types/i18n.d.ts',
   'apps/webapp/playwright-report/',
+  'libraries/core/lib/',
+  'libraries/api-client/lib/',
+  'libraries/api-client/demo.ts',
+  'libraries/core/.tmp/',
+  'libraries/core/src/demo/',
+  'libraries/core/src/test/',
+  'libraries/config/lib/',
+  '**/jest.setup.ts',
 ];
 
 const base = compat.extends('@wireapp/eslint-config');
-
+// Remove 'project' from parserOptions in all base configs to avoid conflict with projectService
+const cleanedBase = base.map(cfg => {
+  if (cfg.languageOptions?.parserOptions) {
+    const parserOptions = cfg.languageOptions.parserOptions as Record<string, unknown>;
+    const {project, ...rest} = parserOptions;
+    return {
+      ...cfg,
+      languageOptions: {
+        ...cfg.languageOptions,
+        parserOptions: rest,
+      },
+    };
+  }
+  return cfg;
+});
 const config: Linter.Config[] = [
   {ignores},
-  ...base,
+  ...cleanedBase,
   {
     // Adjust legacy bits from extended config
     rules: {
@@ -68,12 +90,9 @@ const config: Linter.Config[] = [
     languageOptions: {
       parser: tsParser,
       parserOptions: {
-        // Enable type-aware linting for TypeScript sources
-        project: './apps/webapp/tsconfig.eslint.json',
+        // Enable type-aware linting for TypeScript sources with project references support
+        projectService: true,
         tsconfigRootDir: __dirname,
-        EXPERIMENTAL_useProjectService: {
-          allowDefaultProjectForFiles: ['*.ts', '*.tsx'],
-        },
       },
       globals: {
         ...globals.browser,
@@ -81,6 +100,7 @@ const config: Linter.Config[] = [
         React: 'readonly',
         JSX: 'readonly',
         amplify: 'readonly',
+        NodeJS: 'readonly',
       },
     },
     // @ts-ignore - Plugin type compatibility issues with ESLint 9 flat config
@@ -148,7 +168,6 @@ const config: Linter.Config[] = [
       'import/resolver': {
         typescript: {
           alwaysTryTypes: true,
-          project: path.join(__dirname, 'apps/webapp/tsconfig.eslint.json'),
         },
         node: {
           extensions: ['.js', '.jsx', '.ts', '.tsx'],

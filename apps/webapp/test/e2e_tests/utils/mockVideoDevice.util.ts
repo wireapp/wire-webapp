@@ -17,118 +17,53 @@
  *
  */
 
-import {BrowserContext} from '@playwright/test';
+/**
+ * Init script to mock the available audio and video devices the browser sees.
+ *
+ * Usage: `context.addInitScript(mockAudioAndVideoDevices);`
+ *
+ * This will add 3 devices for audio in- and output as well as 3 cameras.
+ * No matter which of the devices is selected the default input is returned. (The default input is mocked via launchArgs in the playwright config)
+ */
+export const mockAudioAndVideoDevices = () => {
+  // If media devices aren't defined on the current device there's nothing to mock
+  if (!navigator.mediaDevices) return;
 
-// Define a type for our fake devices
-interface FakeDevice {
-  deviceId: string;
-  label: string;
-  kind: MediaDeviceKind;
-}
+  // Keep a copy of the original function so it can be used within its own stub
+  const originalGetUserMedia = navigator.mediaDevices.getUserMedia.bind(navigator.mediaDevices);
 
-const fakeVideoDevices: FakeDevice[] = [
-  {deviceId: 'fake-camera-1', label: 'Fake Camera 1', kind: 'videoinput'},
-  {deviceId: 'fake-camera-2', label: 'Fake Camera 2', kind: 'videoinput'},
-  {deviceId: 'fake-camera-3', label: 'Fake Camera 3', kind: 'videoinput'},
-];
+  // Mock the devices the browser sees, 3 for each device type
+  navigator.mediaDevices.enumerateDevices = async () =>
+    Array.from<never, MediaDeviceInfo[]>({length: 3}, (_, i) => [
+      {
+        deviceId: `video-camera-${i + 1}`,
+        kind: 'videoinput',
+        label: `Fake Camera ${i + 1}`,
+        groupId: `video-group-${i + 1}`,
+        toJSON: () => ({deviceId: `video-camera-${i + 1}`}),
+      },
+      {
+        deviceId: `audio-input-${i + 1}`,
+        kind: 'audioinput',
+        label: `Fake Audio Input ${i + 1}`,
+        groupId: `audio-input-group-${i + 1}`,
+        toJSON: () => ({deviceId: `audio-input-${i + 1}`}),
+      },
+      {
+        deviceId: `audio-output-${i + 1}`,
+        kind: 'audiooutput',
+        label: `Fake Audio Output ${i + 1}`,
+        groupId: `audio-output-group-${i + 1}`,
+        toJSON: () => ({deviceId: `audio-output-${i + 1}`}),
+      },
+    ]).flat();
 
-const fakeAudioInputDevices: FakeDevice[] = [
-  {deviceId: 'fake-audio-input-1', label: 'Fake Audio Input 1', kind: 'audioinput'},
-  {deviceId: 'fake-audio-input-2', label: 'Fake Audio Input 2', kind: 'audioinput'},
-  {deviceId: 'fake-audio-input-3', label: 'Fake Audio Input 3', kind: 'audioinput'},
-];
-
-const fakeAudioOutputDevices: FakeDevice[] = [
-  {deviceId: 'fake-audio-output-1', label: 'Fake Audio Output 1', kind: 'audiooutput'},
-  {deviceId: 'fake-audio-output-2', label: 'Fake Audio Output 2', kind: 'audiooutput'},
-  {deviceId: 'fake-audio-output-3', label: 'Fake Audio Output 3', kind: 'audiooutput'},
-];
-
-const allFakeDevices = [...fakeVideoDevices, ...fakeAudioInputDevices, ...fakeAudioOutputDevices];
-
-export async function addMockCamerasToContext(context: BrowserContext): Promise<void> {
-  // Add init script to existing context
-  await context.addInitScript((fakeDevices: FakeDevice[]) => {
-    // Cast to any to override read-only properties
-    const mediaDevices = navigator.mediaDevices as any;
-    const originalEnumerateDevices: () => Promise<MediaDeviceInfo[]> = mediaDevices.enumerateDevices.bind(mediaDevices);
-    const originalGetUserMedia: (constraints: MediaStreamConstraints) => Promise<MediaStream> =
-      mediaDevices.getUserMedia.bind(mediaDevices);
-
-    // Helper function to add fake devices to the device list
-    function addFakeDevicesToList(devices: MediaDeviceInfo[]): MediaDeviceInfo[] {
-      // Filter out real devices of the same kinds we're mocking
-      const filteredDevices = devices.filter(
-        (d: MediaDeviceInfo) => d.kind !== 'videoinput' && d.kind !== 'audioinput' && d.kind !== 'audiooutput',
-      );
-
-      return [
-        ...filteredDevices,
-        ...fakeDevices.map((fake, i) => ({
-          deviceId: fake.deviceId,
-          groupId: `fake-group-${i}`,
-          kind: fake.kind,
-          label: fake.label,
-          toJSON: () => ({...fake}),
-        })),
-      ];
-    }
-
-    // Helper function to extract the requested device ID from constraints
-    function extractRequestedDeviceId(videoConstraints: MediaTrackConstraints): string | undefined {
-      const deviceId = videoConstraints.deviceId;
-
-      if (!deviceId) {
-        return undefined;
-      }
-
-      if (typeof deviceId === 'object' && 'exact' in deviceId) {
-        return deviceId.exact as string;
-      }
-
-      if (typeof deviceId === 'object' && 'ideal' in deviceId) {
-        return deviceId.ideal as string;
-      }
-
-      return typeof deviceId === 'string' ? deviceId : undefined;
-    }
-
-    // Helper function to create constraints without deviceId
-    function createConstraintsWithoutDeviceId(
-      constraints: MediaStreamConstraints,
-      videoConstraints: MediaTrackConstraints,
-    ): MediaStreamConstraints {
-      const newConstraints: MediaStreamConstraints = {
-        ...constraints,
-        video: {...videoConstraints},
-      };
-      delete (newConstraints.video as MediaTrackConstraints).deviceId;
-      return newConstraints;
-    }
-
-    // Mock enumerateDevices
-    mediaDevices.enumerateDevices = async (): Promise<MediaDeviceInfo[]> => {
-      const devices: MediaDeviceInfo[] = await originalEnumerateDevices();
-      return addFakeDevicesToList(devices);
-    };
-
-    // Mock getUserMedia
-    mediaDevices.getUserMedia = async (constraints: MediaStreamConstraints): Promise<MediaStream> => {
-      const videoConstraints = constraints.video;
-
-      if (!videoConstraints || typeof videoConstraints !== 'object') {
-        return originalGetUserMedia(constraints);
-      }
-
-      const deviceId = extractRequestedDeviceId(videoConstraints);
-      const isFakeDevice = deviceId && fakeDevices.some(fake => fake.deviceId === deviceId);
-
-      if (isFakeDevice) {
-        const newConstraints = createConstraintsWithoutDeviceId(constraints, videoConstraints);
-        return originalGetUserMedia(newConstraints);
-      }
-
-      return originalGetUserMedia(constraints);
-    };
-  }, allFakeDevices);
-}
+  /**
+   * Stub the function to always return the default audio / video stream no matter which device was requested.
+   * This is necessary as only the default device gets mocked by the chrome launch args,
+   * otherwise the dummy devices defined above would show up as inputs but wouldn't work once selected.
+   */
+  navigator.mediaDevices.getUserMedia = async () => {
+    return await originalGetUserMedia({audio: {deviceId: 'default'}, video: {deviceId: 'default'}});
+  };
+};

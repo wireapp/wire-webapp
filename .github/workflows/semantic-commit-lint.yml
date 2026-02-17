@@ -3,6 +3,8 @@ name: 'Semantic Commit Linting of PR titles'
 on:
   pull_request_target:
     types: [opened, edited, synchronize]
+  merge_group:
+    branches: [master, dev, release/*]
 
 permissions:
   statuses: write
@@ -11,10 +13,15 @@ jobs:
   semantic-commit-pr-title-lint:
     runs-on: ubuntu-latest
     steps:
+      - name: Skip on merge queue
+        if: ${{ github.event_name == 'merge_group' }}
+        run: echo "Skipping semantic PR title lint on merge queue."
+
       # Please look up the latest version from
       # https://github.com/amannn/action-semantic-pull-request/releases
       - name: Run Semantic Commint Linter
-        uses: amannn/action-semantic-pull-request@v5.5.3
+        if: ${{ github.event_name == 'pull_request_target' }}
+        uses: amannn/action-semantic-pull-request@v5
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:

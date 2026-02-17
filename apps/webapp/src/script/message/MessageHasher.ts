@@ -21,7 +21,7 @@ import Long from 'long';
 
 import {ClientEvent} from 'Repositories/event/Client';
 import {LegacyEventRecord} from 'Repositories/storage/record/EventRecord';
-import {utf8ToUtf16BE} from 'Util/StringUtil';
+import {stringToUtf16BE, utf8ToUtf16BE} from 'Util/StringUtil';
 
 /**
  * @returns Promise with hashed string bytes
@@ -62,6 +62,28 @@ const getTimestampBytes = (event: any): number[] => {
 const getTextBytes = (event: any): number[] => utf8ToUtf16BE(event.data.content);
 
 /**
+ * Gets bytes for multipart message including text content and attachment UUIDs.
+ * Format: BOM + text_content + attachment_uuids (comma and space separated, no BOM for UUIDs)
+ *
+ * @param event The multipart message event
+ * @returns Array of bytes containing text and attachment UUIDs
+ */
+const getMultipartTextBytes = (event: any): number[] => {
+  const textContent = event.data?.text?.content ?? '';
+  const textBytes = utf8ToUtf16BE(textContent);
+
+  const attachments = event.data?.attachments ?? [];
+  const uuidString = attachments
+    .map((attachment: any) => attachment?.cellAsset?.uuid)
+    .filter(Boolean)
+    .join(', ');
+
+  const attachmentBytes = uuidString ? stringToUtf16BE(uuidString) : [];
+
+  return textBytes.concat(attachmentBytes);
+};
+
+/**
  * Creates a hash of the given event.
  *
  * @returns buffer containing the bytes of the hash
@@ -72,6 +94,10 @@ const hashEvent = (event: any): Promise<ArrayBuffer> => {
   switch (event.type) {
     case ClientEvent.CONVERSATION.MESSAGE_ADD: {
       specificBytes = getTextBytes(event);
+      break;
+    }
+    case ClientEvent.CONVERSATION.MULTIPART_MESSAGE_ADD: {
+      specificBytes = getMultipartTextBytes(event);
       break;
     }
     case ClientEvent.CONVERSATION.LOCATION: {

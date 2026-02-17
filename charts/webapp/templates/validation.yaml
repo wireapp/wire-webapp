@@ -1,0 +1,4 @@
+{{- /*
+This template triggers validation logic without rendering a Kubernetes resource.
+*/ -}}
+{{- include "webapp.validateDomainConfig" . -}}

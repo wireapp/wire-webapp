@@ -31,12 +31,4 @@ export class DeleteAccountPage {
     this.deleteAccountButton = page.locator("[data-uie-name='do-delete-account']");
     this.accountDeletedHeadline = page.locator("[data-uie-name='successful-delete-account-headline']");
   }
-
-  async clickDeleteAccountButton() {
-    await this.deleteAccountButton.click();
-  }
-
-  async isAccountDeletedHeadlineVisible() {
-    return (await this.accountDeletedHeadline.textContent()) === 'Account deleted';
-  }
 }

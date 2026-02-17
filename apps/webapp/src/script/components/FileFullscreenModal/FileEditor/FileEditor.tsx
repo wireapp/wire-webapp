@@ -17,11 +17,12 @@
  *
  */
 
-import {useCallback, useEffect, useState} from 'react';
+import {useCallback, useEffect, useRef, useState} from 'react';
 
 import {Node} from '@wireapp/api-client/lib/cells';
 import {container} from 'tsyringe';
 
+import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {CellsRepository} from 'Repositories/cells/CellsRepository';
 import {t} from 'Util/LocalizerUtil';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
@@ -41,6 +42,7 @@ export const FileEditor = ({id}: FileEditorProps) => {
   const [node, setNode] = useState<Node | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isError, setIsError] = useState(false);
+  const hasShownErrorModal = useRef(false);
 
   const fetchNode = useCallback(async () => {
     try {
@@ -54,6 +56,11 @@ export const FileEditor = ({id}: FileEditorProps) => {
       setIsLoading(false);
     }
   }, [id, cellsRepository]);
+
+  const handleRetry = useCallback(() => {
+    hasShownErrorModal.current = false;
+    void fetchNode();
+  }, [fetchNode]);
 
   // Initial fetch
   useEffect(() => {
@@ -79,19 +86,46 @@ export const FileEditor = ({id}: FileEditorProps) => {
     };
   }, [node, fetchNode]);
 
+  useEffect(() => {
+    if (isLoading || (!isError && node)) {
+      return;
+    }
+
+    if (hasShownErrorModal.current) {
+      return;
+    }
+
+    hasShownErrorModal.current = true;
+
+    PrimaryModal.show(PrimaryModal.type.CONFIRM, {
+      secondaryAction: {
+        text: t('modalConfirmSecondary'),
+      },
+      primaryAction: {
+        action: handleRetry,
+        text: t('unknownApplicationErrorTryAgain'),
+      },
+      text: {
+        message: t('fileFullscreenModal.editor.errorDescription'),
+        title: t('fileFullscreenModal.editor.errorTitle'),
+      },
+    });
+  }, [handleRetry, isError, isLoading, node]);
+
+  useEffect(() => {
+    if (!isLoading && !isError && node) {
+      hasShownErrorModal.current = false;
+    }
+  }, [isError, isLoading, node]);
+
   if (isLoading) {
     return <FileLoader />;
   }
 
-  if (isError || !node) {
-    return <div>{t('fileFullscreenModal.editor.error')}</div>;
+  const editorUrl = node?.EditorURLs?.collabora?.Url;
+  if (!editorUrl) {
+    return null;
   }
 
-  return (
-    <iframe
-      css={styles.editorIframe}
-      src={node.EditorURLs?.collabora.Url}
-      title={t('fileFullscreenModal.editor.iframeTitle')}
-    />
-  );
+  return <iframe css={styles.editorIframe} src={editorUrl} title={t('fileFullscreenModal.editor.iframeTitle')} />;
 };

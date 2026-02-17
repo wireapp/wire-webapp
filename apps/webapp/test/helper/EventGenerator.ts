@@ -27,10 +27,12 @@ import {
   GroupCreationEvent,
   MemberLeaveEvent,
   MessageAddEvent,
+  MultipartMessageAddEvent,
   ReactionEvent,
 } from 'Repositories/conversation/EventBuilder';
 import {Conversation} from 'Repositories/entity/Conversation';
 import {CONVERSATION} from 'Repositories/event/Client';
+import {StatusType} from 'src/script/message/StatusType';
 import {createUuid} from 'Util/uuid';
 
 export function createMessageAddEvent({
@@ -59,6 +61,35 @@ export function createMessageAddEvent({
       ...dataOverrides,
     },
     from,
+    ...overrides,
+  };
+}
+
+export function createMultipartMessageAddEvent({
+  text = '',
+  overrides = {},
+  dataOverrides = {},
+}: {
+  text?: string;
+  overrides?: Partial<MultipartMessageAddEvent>;
+  dataOverrides?: Partial<MultipartMessageAddEvent['data']>;
+} = {}): MultipartMessageAddEvent {
+  const from = createUuid();
+  const conversation = new Conversation(createUuid(), 'domain');
+  return {
+    conversation: conversation.id,
+    data: {
+      attachments: [],
+      text: {
+        content: text,
+      },
+      ...dataOverrides,
+    },
+    from,
+    status: StatusType.SENDING,
+    id: createUuid(),
+    time: new Date().toISOString(),
+    type: CONVERSATION.MULTIPART_MESSAGE_ADD,
     ...overrides,
   };
 }
@@ -150,7 +181,7 @@ export function createGroupCreationEvent(overrides: Partial<GroupCreationEvent>)
  * @param event
  * @returns
  */
-export function toSavedEvent<T extends MessageAddEvent | AssetAddEvent>(
+export function toSavedEvent<T extends MessageAddEvent | MultipartMessageAddEvent | AssetAddEvent>(
   event: T,
 ): T & {primary_key: string; category: number} {
   return {

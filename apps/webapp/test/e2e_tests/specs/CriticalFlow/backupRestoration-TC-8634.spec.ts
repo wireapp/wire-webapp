@@ -18,7 +18,7 @@
  */
 
 import {removeCreatedUser} from 'test/e2e_tests/utils/tearDown.util';
-import {loginUser, logOutUser} from 'test/e2e_tests/utils/userActions';
+import {createAndSaveBackup, createGroup, loginUser, logOutUser} from 'test/e2e_tests/utils/userActions';
 
 import {getUser} from '../../data/user';
 import {test, expect} from '../../test.fixtures';
@@ -32,26 +32,8 @@ const groupMessage = 'This is a group message!';
 let backupName: string;
 let passwordProtectedBackupName: string;
 
-test('Setting up new device with a backup', {tag: ['@TC-8634', '@crit-flow-web']}, async ({pageManager, api}) => {
+test('Setting up new device with a backup', {tag: ['@TC-8634', '@crit-flow-web']}, async ({pageManager, api}, testInfo) => {
   const {pages, modals, components} = pageManager.webapp;
-
-  const createAndSaveBackup = async (password?: string, filenamePrefix?: string): Promise<string> => {
-    await pages.account().clickBackUpButton();
-    expect(modals.passwordAdvancedSecurity().isTitleVisible()).toBeTruthy();
-    if (password) {
-      await modals.passwordAdvancedSecurity().enterPassword(password);
-    }
-    await modals.passwordAdvancedSecurity().clickBackUpNow();
-    expect(modals.passwordAdvancedSecurity().isTitleHidden()).toBeTruthy();
-    expect(pages.historyExport().isVisible()).toBeTruthy();
-    const [download] = await Promise.all([
-      pages.historyExport().page.waitForEvent('download'),
-      pages.historyExport().clickSaveFileButton(),
-    ]);
-    const backupName = `./test-results/downloads/${filenamePrefix}${download.suggestedFilename()}`;
-    await download.saveAs(backupName);
-    return backupName;
-  };
 
   // Creating preconditions for the test via API
   await test.step('Preconditions: Creating preconditions for the test via API', async () => {
@@ -72,10 +54,7 @@ test('Setting up new device with a backup', {tag: ['@TC-8634', '@crit-flow-web']
     await pages.conversation().sendMessage(personalMessage);
     await expect(pages.conversation().getMessage({content: personalMessage})).toBeVisible();
 
-    await pages.conversationList().clickCreateGroup();
-    await pages.groupCreation().setGroupName(groupName);
-    await pages.startUI().selectUsers([userB.username]);
-    await pages.groupCreation().clickCreateGroupButton();
+    await createGroup(pages, groupName, [userB]);
     await pages.conversationList().openConversation(groupName);
     await pages.conversation().sendMessage(groupMessage);
 
@@ -84,11 +63,11 @@ test('Setting up new device with a backup', {tag: ['@TC-8634', '@crit-flow-web']
 
   await test.step('User creates and saves a backup', async () => {
     await components.conversationSidebar().clickPreferencesButton();
-    backupName = await createAndSaveBackup();
+    backupName = await createAndSaveBackup(testInfo, pageManager);
   });
 
   await test.step('User creates and saves a password backup', async () => {
-    passwordProtectedBackupName = await createAndSaveBackup(userA.password, 'password-');
+    passwordProtectedBackupName = await createAndSaveBackup(testInfo, pageManager, userA.password, 'password-');
   });
 
   await test.step('User logs out and clears all data', async () => {
@@ -111,7 +90,7 @@ test('Setting up new device with a backup', {tag: ['@TC-8634', '@crit-flow-web']
   await test.step('User restores the previously created backup', async () => {
     await components.conversationSidebar().clickPreferencesButton();
     await pages.account().backupFileInput.setInputFiles(backupName);
-    expect(pages.historyImport().importSuccessHeadline.isVisible()).toBeTruthy();
+    await expect(pages.historyImport().title).toContainText('History restored');
   });
 
   await test.step('User restores the previously created password protected backup', async () => {
@@ -121,7 +100,7 @@ test('Setting up new device with a backup', {tag: ['@TC-8634', '@crit-flow-web']
     await modals.passwordAdvancedSecurity().enterPassword(userA.password);
     await modals.passwordAdvancedSecurity().clickAction();
     await expect(modals.passwordAdvancedSecurity().modalTitle).not.toBeVisible();
-    expect(pages.historyImport().importSuccessHeadline.isVisible()).toBeTruthy();
+    await expect(pages.historyImport().title).toContainText('History restored');
   });
 
   await test.step('All data (chat history, contacts) are restored', async () => {

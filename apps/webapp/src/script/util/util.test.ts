@@ -31,6 +31,7 @@ import {
   trimFileExtension,
   zeroPadding,
   getFileNameWithExtension,
+  sanitizeFilename,
 } from 'Util/util';
 
 import {createUuid} from './uuid';
@@ -275,5 +276,78 @@ describe('getFileNameWithExtension', () => {
 
   it('does not add the extension if already present', () => {
     expect(getFileNameWithExtension('file.jpg', 'jpg')).toBe('file.jpg');
+  });
+});
+
+describe('sanitizeFilename', () => {
+  it('converts German umlauts to ASCII equivalents', () => {
+    expect(sanitizeFilename('Bild eingefügt am 12. Jan. 2026, 14:30:57.png')).toBe(
+      'Bild eingefuegt am 12. Jan. 2026-14-30-57.png',
+    );
+  });
+
+  it('converts uppercase German umlauts', () => {
+    expect(sanitizeFilename('ÄÖÜ.txt')).toBe('AeOeUe.txt');
+  });
+
+  it('converts lowercase German umlauts', () => {
+    expect(sanitizeFilename('äöü.txt')).toBe('aeoeue.txt');
+  });
+
+  it('converts ß to ss', () => {
+    expect(sanitizeFilename('Straße.pdf')).toBe('Strasse.pdf');
+  });
+
+  it('replaces colons with dashes', () => {
+    expect(sanitizeFilename('file:name.txt')).toBe('file-name.txt');
+  });
+
+  it('replaces commas and semicolons with dashes', () => {
+    expect(sanitizeFilename('file,name;test.txt')).toBe('file-name-test.txt');
+  });
+
+  it('preserves spaces but normalizes multiple spaces', () => {
+    expect(sanitizeFilename('file   with   spaces.txt')).toBe('file with spaces.txt');
+  });
+
+  it('handles French accents by removing diacritics', () => {
+    expect(sanitizeFilename('café.txt')).toBe('cafe.txt');
+    expect(sanitizeFilename('résumé.pdf')).toBe('resume.pdf');
+  });
+
+  it('handles Spanish characters', () => {
+    expect(sanitizeFilename('año.txt')).toBe('ano.txt');
+  });
+
+  it('leaves ASCII filenames unchanged', () => {
+    expect(sanitizeFilename('simple-file.txt')).toBe('simple-file.txt');
+  });
+
+  it('trims whitespace from start and end', () => {
+    expect(sanitizeFilename('  file.txt  ')).toBe('file.txt');
+  });
+
+  it('handles mixed special characters', () => {
+    expect(sanitizeFilename('Müller: Café, 2:30 PM.pdf')).toBe('Mueller-Cafe-2-30 PM.pdf');
+  });
+
+  it('removes null bytes', () => {
+    expect(sanitizeFilename('file\x00name.txt')).toBe('filename.txt');
+  });
+
+  it('removes control characters', () => {
+    // Test various control characters (ASCII 0-31)
+    expect(sanitizeFilename('file\x01\x02\x03name.txt')).toBe('filename.txt');
+    expect(sanitizeFilename('file\tname.txt')).toBe('filename.txt'); // tab
+    expect(sanitizeFilename('file\nname.txt')).toBe('filename.txt'); // newline
+    expect(sanitizeFilename('file\rname.txt')).toBe('filename.txt'); // carriage return
+  });
+
+  it('removes DEL character (ASCII 127)', () => {
+    expect(sanitizeFilename('file\x7Fname.txt')).toBe('filename.txt');
+  });
+
+  it('handles filenames with both control characters and special characters', () => {
+    expect(sanitizeFilename('file\x00: name\x01, test\x7F.txt')).toBe('file-name-test.txt');
   });
 });

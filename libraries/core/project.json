@@ -1,0 +1,111 @@
+{
+  "name": "core-lib",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "{projectRoot}/src",
+  "projectType": "library",
+  "targets": {
+    "clean": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "rimraf .tmp lib",
+        "cwd": "{projectRoot}"
+      }
+    },
+    "build": {
+      "executor": "nx:run-commands",
+      "outputs": ["{projectRoot}/lib"],
+      "dependsOn": ["^build", "clean"],
+      "options": {
+        "command": "tsc",
+        "cwd": "{projectRoot}"
+      }
+    },
+    "dist": {
+      "executor": "nx:run-commands",
+      "dependsOn": ["build"],
+      "options": {
+        "command": "echo 'Build complete'"
+      }
+    },
+    "test": {
+      "executor": "@nx/jest:jest",
+      "outputs": ["{workspaceRoot}/coverage/libraries/core"],
+      "options": {
+        "jestConfig": "{projectRoot}/jest.config.js",
+        "passWithNoTests": false
+      },
+      "configurations": {
+        "ci": {
+          "ci": true,
+          "coverage": true,
+          "coverageReporters": ["lcov", "text"]
+        }
+      }
+    },
+    "test:coverage": {
+      "executor": "@nx/jest:jest",
+      "outputs": ["{workspaceRoot}/coverage/libraries/core"],
+      "options": {
+        "jestConfig": "{projectRoot}/jest.config.js",
+        "passWithNoTests": false,
+        "coverage": true
+      }
+    },
+    "watch": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "tsc --watch",
+        "cwd": "{projectRoot}"
+      }
+    },
+    "lint": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "eslint --config eslint.config.ts --quiet --ext .js,.ts {projectRoot}"
+      }
+    },
+    "type-check": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "tsc --project {projectRoot}/tsconfig.json --noEmit"
+      }
+    },
+    "demo:composite": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "cross-env NODE_DEBUG='@wireapp*' ts-node src/demo/composite.ts",
+        "cwd": "{projectRoot}"
+      }
+    },
+    "demo:sendCounter": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "cross-env NODE_DEBUG='@wireapp*' ts-node src/demo/sendCounter.ts",
+        "cwd": "{projectRoot}"
+      }
+    },
+    "start": {
+      "executor": "nx:run-commands",
+      "dependsOn": ["dist"],
+      "options": {
+        "command": "node index.js",
+        "cwd": "{projectRoot}"
+      }
+    },
+    "start:echo": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "cross-env NODE_DEBUG='@wireapp/core*' node src/demo/echo.js",
+        "cwd": "{projectRoot}"
+      }
+    },
+    "start:sender": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "cross-env NODE_DEBUG='@wireapp/core*' node src/demo/sender.js",
+        "cwd": "{projectRoot}"
+      }
+    }
+  },
+  "tags": ["type:lib", "scope:core"]
+}

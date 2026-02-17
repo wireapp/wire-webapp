@@ -17,10 +17,17 @@
  *
  */
 
+import sodium from 'libsodium-wrappers-sumo';
+
 import {BackUpHeader, ENCRYPTED_BACKUP_FORMAT, ENCRYPTED_BACKUP_VERSION} from './BackUpHeader';
 
 describe('BackUpHeader', () => {
   let backUpHeader: BackUpHeader;
+
+  beforeAll(async () => {
+    // Ensure sodium is initialized before any tests run
+    await sodium.ready;
+  });
 
   beforeEach(() => {
     // Initialize the BackUpHeader instance before each test

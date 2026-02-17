@@ -9,6 +9,9 @@ module.exports = {
     '!**/.{idea,git,cache,output,temp}/**',
   ],
   transform: {
-    '^.+\\.[tj]sx?$': 'babel-jest',
+    '^.+\\.(ts|tsx)$': '@swc/jest',
+    '^.+\\.(js|jsx)$': 'babel-jest',
   },
+  transformIgnorePatterns: ['/node_modules/(?!(true-myth)/)'],
+  moduleFileExtensions: ['js', 'json', 'ts', 'tsx'],
 };

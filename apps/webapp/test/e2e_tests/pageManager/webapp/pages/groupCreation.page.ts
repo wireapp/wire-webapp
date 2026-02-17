@@ -29,6 +29,9 @@ export class GroupCreationPage {
   readonly addMembersButton: Locator;
   readonly filesCheckbox: Locator;
 
+  readonly searchPeopleInput: Locator;
+  readonly searchPeopleResults: Locator;
+
   constructor(page: Page) {
     this.page = page;
 
@@ -38,6 +41,9 @@ export class GroupCreationPage {
     this.createGroupButton = page.locator('[data-uie-name="do-create-group"]');
     this.addMembersButton = page.locator('[data-uie-name="do-create"]');
     this.filesCheckbox = page.locator('[data-uie-name="do-toggle-cells"]');
+
+    this.searchPeopleInput = page.getByRole('dialog').getByLabel('Search by name');
+    this.searchPeopleResults = page.getByRole('dialog').getByRole('list').getByRole('listitem');
   }
 
   async setGroupName(name: string) {
@@ -68,5 +74,12 @@ export class GroupCreationPage {
 
   async waitForModalClose() {
     await this.groupCreationModal.waitFor({state: 'detached'});
+  }
+
+  async selectGroupMembers(...usernames: string[]) {
+    for (const username of usernames) {
+      await this.searchPeopleInput.fill(username);
+      await this.searchPeopleResults.filter({hasText: username}).click();
+    }
   }
 }

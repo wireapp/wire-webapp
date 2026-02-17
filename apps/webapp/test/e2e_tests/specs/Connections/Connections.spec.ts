@@ -47,7 +47,7 @@ test.describe('Connections', () => {
       await Promise.all([completeLogin(memberPageManagerA, memberA), completeLogin(memberPageManagerB, memberB)]);
 
       await components.conversationSidebar().clickConnectButton();
-      await pages.startUI().selectUser(memberB.username);
+      await pages.startUI().selectUsers(memberB.username);
       await modals.userProfile().clickConnectButton();
       await pagesB.conversationList().openPendingConnectionRequest();
       await pagesB.conversation().clickItemPendingRequest();
@@ -62,7 +62,7 @@ test.describe('Connections', () => {
 
       await test.step('I want to archive a pending request from conversation list', async () => {
         await components.conversationSidebar().clickConnectButton();
-        await pages.startUI().selectUser(memberB.username);
+        await pages.startUI().selectUsers(memberB.username);
         await modals.userProfile().clickConnectButton();
         await pagesB.conversationList().openPendingConnectionRequest();
         await pagesB.conversation().clickItemPendingRequest();

@@ -1,0 +1,32 @@
+{{- if and .Values.tls.enabled .Values.tls.useCertManager .Values.tls.createIssuer .Values.ingress.enabled (empty .Values.tls.existingSecretName) }}
+{{- include "webapp.validateDomainConfig" . }}
+apiVersion: cert-manager.io/v1
+{{- if or (eq .Values.tls.issuer.kind "Issuer") (eq .Values.tls.issuer.kind "ClusterIssuer") }}
+kind: "{{ .Values.tls.issuer.kind }}"
+{{- else }}
+{{- fail (cat ".tls.issuer.kind can only be one of Issuer or ClusterIssuer, got: " .Values.tls.issuer.kind )}}
+{{- end }}
+metadata:
+  name: {{ include "webapp.issuerName" . | quote }}
+  {{- if eq .Values.tls.issuer.kind "Issuer" }}
+  namespace: {{ .Release.Namespace }}
+  {{- end }}
+  labels:
+    chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+    release: "{{ .Release.Name }}"
+    heritage: "{{ .Release.Service }}"
+spec:
+  acme:
+    server: {{ include "webapp.certManager.apiServerURL" . | quote }}
+    email: {{ required "Missing value: certManager.certmasterEmail" .Values.certManager.certmasterEmail | quote }}
+    privateKeySecretRef:
+      name: {{ include "webapp.issuerName" . -}}-account-key
+    solvers:
+{{- if .Values.certManager.customSolvers }}
+{{ toYaml .Values.certManager.customSolvers | indent 6 }}
+{{- else }}
+      - http01:
+          ingress:
+            class: {{ default "nginx" .Values.ingress.className }}
+{{- end }}
+{{- end -}}

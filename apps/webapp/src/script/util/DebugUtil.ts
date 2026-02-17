@@ -349,11 +349,6 @@ export class DebugUtil {
     return Promise.all(blockUsers);
   }
 
-  async resetIdentity(): Promise<void> {
-    const proteusService = this.core.service!.proteus;
-    await proteusService['cryptoClient'].debugResetIdentity();
-  }
-
   /** Used by QA test automation. */
   async breakSession(userId: QualifiedId, clientId: string): Promise<void> {
     const proteusService = this.core.service!.proteus;

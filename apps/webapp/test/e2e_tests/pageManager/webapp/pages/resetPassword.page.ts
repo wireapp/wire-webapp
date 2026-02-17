@@ -18,7 +18,6 @@
  */
 
 import {Locator, Page} from '@playwright/test';
-import {selectByDataAttribute} from 'test/e2e_tests/utils/selector.util';
 
 export class ResetPasswordPage {
   readonly page: Page;
@@ -30,9 +29,9 @@ export class ResetPasswordPage {
   constructor(page: Page) {
     this.page = page;
 
-    this.newPasswordInput = page.locator(selectByDataAttribute('enter-new-password'));
+    this.newPasswordInput = page.getByTestId('enter-new-password');
     this.passwordChangeMessage = page.getByText('You can now log in with your new password.');
-    this.setNewPasswordButton = page.locator(selectByDataAttribute('do-set-new-password'));
+    this.setNewPasswordButton = page.getByTestId('do-set-new-password');
   }
 
   async setNewPassword(password: string) {

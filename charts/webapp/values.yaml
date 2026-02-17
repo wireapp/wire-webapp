@@ -10,6 +10,34 @@ resources:
 image:
   repository: quay.io/wire/webapp
   # tag: override version defined in Chart.appVersion
+
+# Keep resource names backwards compatible by default. Set to true to append
+# the Helm release name to resource names so multiple installations can
+# coexist in the same namespace.
+appendReleaseNameToResources: false
+
+# webappDomain: webapp.example.com
+
+ingress:
+  enabled: false
+  className: nginx
+  annotations: {}
+  renderCSPInIngress: false
+
+tls:
+  enabled: false
+  useCertManager: false
+  createIssuer: false
+  # existingSecretName: "" # set this if you created e.g. a wildcard cert outside this chart
+  issuer:
+    name: letsencrypt
+    kind: ClusterIssuer
+
+certManager:
+  inTestMode: false
+  certmasterEmail:
+  customSolvers:
+
 service:
   https:
     externalPort: 443
@@ -58,5 +86,6 @@ podSecurityContext:
       - ALL
   runAsUser: 1000
   runAsGroup: 1000
+  runAsNonRoot: true
   seccompProfile:
     type: RuntimeDefault
