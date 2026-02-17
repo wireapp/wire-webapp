@@ -123,27 +123,41 @@ test.describe('Notifications', () => {
       `I want to mute the ${conversationType} conversation via conversation details`,
       {tag: [testId, '@regression']},
       async ({createPage}) => {
-        const pages = PageManager.from(await createPage(withLogin(userA), withConnectedUser(userB))).webapp.pages;
+        const [userAPage, userBPage] = await Promise.all([
+          createPage(withLogin(userA), withConnectedUser(userB)),
+          createPage(withLogin(userB)),
+        ]);
+        const userAPages = PageManager.from(userAPage).webapp.pages;
+        const userBPages = PageManager.from(userBPage).webapp.pages;
+        await createGroup(userAPages, 'Test Group', [userB]);
 
-        let conversationName: string;
-        if (conversationType === 'group') {
-          await createGroup(pages, 'Test Group', [userB]);
-          conversationName = 'Test Group';
+        // Depending on the current test case mute either the group or the 1on1
+        await userBPages
+          .conversationList()
+          .openConversation(conversationType === 'group' ? 'Test Group' : userA.fullName);
+        await userBPages.conversation().clickConversationInfoButton();
+        await expect(userBPages.conversationDetails().notificationsButton).toContainText('Everything');
+
+        // Verify the changed setting is reflected
+        await userBPages.conversationDetails().setNotifications('Nothing');
+        await expect(userBPages.conversationDetails().notificationsButton).toContainText('Nothing');
+
+        // Open the not muted conversation for for userB so a notification could be received
+        if (conversationType == 'group') {
+          await userBPages.conversationList().openConversation(userA.fullName);
         } else {
-          conversationName = userB.fullName;
+          await userBPages.conversationList().openConversation('Test Group');
         }
 
-        await pages.conversationList().openConversation(conversationName);
-        await pages.conversation().clickConversationInfoButton();
-        await expect(pages.conversationDetails().notificationsButton).toContainText('Everything');
+        // Start intercepting notifications for User B
+        const {getNotifications: getUserBNotifications} = await interceptNotifications(userBPage);
 
-        await pages.conversationDetails().setNotifications('Nothing');
-        await expect(pages.conversationDetails().notificationsButton).toContainText('Nothing');
-
-        const conversation = pages.conversationList().getConversationLocator(conversationName);
-        await expect(conversation.getByTitle('Muted conversation')).toBeVisible();
-
-        // ToDo: Ensure you don't receive notifications
+        // User A sends a message to the muted conversation
+        await userAPages
+          .conversationList()
+          .openConversation(conversationType === 'group' ? 'Test Group' : userB.fullName);
+        await userAPages.conversation().sendMessage('Test Message');
+        await expect.poll(() => getUserBNotifications()).toHaveLength(0);
       },
     );
   });
