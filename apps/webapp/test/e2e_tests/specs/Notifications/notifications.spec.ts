@@ -22,11 +22,6 @@ test.describe('Notifications', () => {
       createPage(withLogin(userB)),
     ]);
     const userAPages = PageManager.from(userAPage).webapp.pages;
-    const userBPages = PageManager.from(userBPage).webapp.pages;
-
-    // Create group so B can open it while A sends the message so a notification will be sent for it
-    await createGroup(userAPages, 'Test Group', [userB]);
-    await userBPages.conversationList().openConversation('Test Group');
 
     // Start intercepting notifications
     const {getNotifications: getUserBNotifications} = await interceptNotifications(userBPage);
@@ -142,13 +137,6 @@ test.describe('Notifications', () => {
         await userBPages.conversationDetails().setNotifications('Nothing');
         await expect(userBPages.conversationDetails().notificationsButton).toContainText('Nothing');
 
-        // Open the not muted conversation for for userB so a notification could be received
-        if (conversationType == 'group') {
-          await userBPages.conversationList().openConversation(userA.fullName);
-        } else {
-          await userBPages.conversationList().openConversation('Test Group');
-        }
-
         // Start intercepting notifications for User B
         const {getNotifications: getUserBNotifications} = await interceptNotifications(userBPage);
 
@@ -230,11 +218,6 @@ test.describe('Notifications', () => {
         createPage(withLogin(userB)),
       ]);
       const userAPages = PageManager.from(userAPage).webapp.pages;
-      const userBPages = PageManager.from(userBPage).webapp.pages;
-
-      // Create group and open it for user B so the message won't be read immediately
-      await createGroup(userBPages, 'Test Group', [userA]);
-      await userBPages.conversationList().openConversation('Test Group');
 
       // Start intercepting notifications for User B
       const {getNotifications: getUserBNotifications} = await interceptNotifications(userBPage);
@@ -554,12 +537,13 @@ test.describe('Notifications', () => {
 
       // Users A and B are created, but not connected for this test
       const [userAPage, userCPage] = await Promise.all([createPage(withLogin(userA)), createPage(withLogin(userC))]);
+      const userAPageManager = PageManager.from(userAPage);
 
       // Start intercepting notifications for User B
       const {getNotifications} = await interceptNotifications(userCPage);
 
       // User A sends a connection request to User B
-      await sendConnectionRequest(PageManager.from(userAPage), userC);
+      await sendConnectionRequest(userAPageManager, userC);
 
       // Verify User B receives a notification about the connection request
       await expect
