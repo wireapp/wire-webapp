@@ -192,7 +192,7 @@ export class ConversationDetailsPage {
 
   async setNotifications(value: 'Everything' | 'Mentions and replies' | 'Nothing') {
     await this.notificationsButton.click();
-    await this.page.getByRole('radiogroup').locator('label', {hasText: value}).click();
+    await this.page.getByRole('radiogroup').getByText(value).click();
 
     // Close the settings by clicking "Go back" button.
     await this.page.getByRole('button', {name: 'Go back'}).click();
