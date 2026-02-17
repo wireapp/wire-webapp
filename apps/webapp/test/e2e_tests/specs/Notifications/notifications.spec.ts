@@ -234,22 +234,87 @@ test.describe('Notifications', () => {
     },
   );
 
-  // ToDo: Create parameterized test out of the following 4
-  test(
-    "Sender name and a message are shown in notification when 'Show sender and message' item is selected in preferences",
-    {tag: ['@TC-1450', '@regression']},
-    async ({createPage}) => {
+  (
+    [
+      {
+        testId: '@TC-1450',
+        title:
+          "Sender name and a message are shown in notification when 'Show sender and message' item is selected in preferences",
+        notificationPreference: 'Show sender and message',
+        getExpectedNotifications: (conversationType: '1on1' | 'group') => {
+          const expectedTitle = conversationType === '1on1' ? userA.fullName : `${userA.fullName} in Test Group`;
+          return [
+            {title: expectedTitle, body: 'Test Message'},
+            {title: expectedTitle, body: 'Pinged'},
+            {title: expectedTitle, body: 'https://lidl.de'},
+            {title: expectedTitle, body: 'Shared a picture'},
+            {title: expectedTitle, body: 'Shared an audio message'},
+            {title: expectedTitle, body: 'Shared a video'},
+            {title: expectedTitle, body: 'Shared a file'},
+          ];
+        },
+      },
+      {
+        testId: '@TC-1451',
+        title: "No message content is written on notification when 'Show sender' item is selected in preferences",
+        notificationPreference: 'Show sender',
+        getExpectedNotifications: (conversationType: '1on1' | 'group') => {
+          const expectedTitle = conversationType === '1on1' ? userA.fullName : `${userA.fullName} in Test Group`;
+          return [
+            {title: expectedTitle, body: 'Sent a message'},
+            {title: expectedTitle, body: 'Sent a message'},
+            {title: expectedTitle, body: 'Sent a message'},
+            {title: expectedTitle, body: 'Sent a message'},
+            {title: expectedTitle, body: 'Sent a message'},
+            {title: expectedTitle, body: 'Sent a message'},
+            {title: expectedTitle, body: 'Sent a message'},
+          ];
+        },
+      },
+      {
+        testId: '@TC-1452',
+        title:
+          "No sender name, profile image or message content is written on notification when choose 'Hide details' in preferences",
+        notificationPreference: 'Hide details',
+        getExpectedNotifications: () => [
+          // The default wire icon is called "notification.png", if it is set the users profile picture isn't shown
+          {title: 'Someone', body: 'Sent a message', icon: expect.stringMatching(/notification\.png$/)},
+          {title: 'Someone', body: 'Sent a message', icon: expect.stringMatching(/notification\.png$/)},
+          {title: 'Someone', body: 'Sent a message', icon: expect.stringMatching(/notification\.png$/)},
+          {title: 'Someone', body: 'Sent a message', icon: expect.stringMatching(/notification\.png$/)},
+          {title: 'Someone', body: 'Sent a message', icon: expect.stringMatching(/notification\.png$/)},
+          {title: 'Someone', body: 'Sent a message', icon: expect.stringMatching(/notification\.png$/)},
+          {title: 'Someone', body: 'Sent a message', icon: expect.stringMatching(/notification\.png$/)},
+        ],
+      },
+      {
+        testId: '@TC-1453',
+        title: "No notification shown when selecting 'Off' in preferences",
+        notificationPreference: 'Off',
+        getExpectedNotifications: () => [],
+      },
+    ] as const
+  ).forEach(({testId, title, notificationPreference, getExpectedNotifications}) => {
+    test(title, {tag: [testId, '@regression']}, async ({createPage}) => {
       const [userAPage, userBPage] = await Promise.all([
         createPage(withLogin(userA), withConnectedUser(userB)),
         createPage(withLogin(userB)),
       ]);
-      const {pages: userAPages} = PageManager.from(userAPage).webapp;
+      const {pages: userAPages, components: userAComponents} = PageManager.from(userAPage).webapp;
       const {pages: userBPages, components: userBComponents} = PageManager.from(userBPage).webapp;
 
-      // User B navigates to preferences and sets "Show sender and message"
-      await userBComponents.conversationSidebar().clickPreferencesButton();
-      await userBPages.settings().optionsButton.click();
-      await userBPages.options().setNotifications('Show sender and message');
+      await test.step('User A uploads a profile picture which should not be shown in the notification', async () => {
+        await userAComponents.conversationSidebar().preferencesButton.click();
+        await userAPages.settings().accountButton.click();
+        await userAPages.account().uploadProfilePicture(getImageFilePath());
+        await userAComponents.conversationSidebar().allConverationsButton.click();
+      });
+
+      await test.step(`User B navigates to preferences and sets "${notificationPreference}"`, async () => {
+        await userBComponents.conversationSidebar().clickPreferencesButton();
+        await userBPages.settings().optionsButton.click();
+        await userBPages.options().setNotifications(notificationPreference);
+      });
 
       // Start intercepting notifications for User B
       const {getNotifications: getUserBNotifications} = await interceptNotifications(userBPage);
@@ -275,129 +340,16 @@ test.describe('Notifications', () => {
         });
 
         await test.step('UserB should have received a notification for each message', async () => {
-          const expectedTitle = conversation === '1on1' ? userA.fullName : `${userA.fullName} in Test Group`;
+          const expectedNotifications = getExpectedNotifications(conversation).map(notification =>
+            expect.objectContaining(notification),
+          );
           await expect
             .poll(() => getUserBNotifications())
-            .toEqual(
-              expect.arrayContaining([
-                expect.objectContaining({title: expectedTitle, body: 'Test Message'}),
-                expect.objectContaining({title: expectedTitle, body: 'Pinged'}),
-                expect.objectContaining({title: expectedTitle, body: 'https://lidl.de'}),
-                expect.objectContaining({title: expectedTitle, body: 'Shared a picture'}),
-                expect.objectContaining({title: expectedTitle, body: 'Shared an audio message'}),
-                expect.objectContaining({title: expectedTitle, body: 'Shared a video'}),
-                expect.objectContaining({title: expectedTitle, body: 'Shared a file'}),
-              ]),
-            );
+            .toEqual(expectedNotifications.length ? expect.arrayContaining(expectedNotifications) : []);
         });
       }
-    },
-  );
-
-  test(
-    "No message content is written on notification when 'Show sender' item is selected in preferences",
-    {tag: ['@TC-1451', '@regression']},
-    async ({createPage}) => {
-      const [userAPage, userBPage] = await Promise.all([
-        createPage(withLogin(userA), withConnectedUser(userB)),
-        createPage(withLogin(userB)),
-      ]);
-      const {pages: userAPages} = PageManager.from(userAPage).webapp;
-      const {pages: userBPages, components: userBComponents} = PageManager.from(userBPage).webapp;
-
-      // User B navigates to preferences and sets "Show sender"
-      await userBComponents.conversationSidebar().clickPreferencesButton();
-      await userBPages.settings().optionsButton.click();
-      await userBPages.options().setNotifications('Show sender');
-
-      // Start intercepting notifications for User B
-      const {getNotifications: getUserBNotifications} = await interceptNotifications(userBPage);
-
-      // User A sends a message to User B
-      await userAPages.conversationList().openConversation(userB.fullName, {protocol: 'mls'});
-      await userAPages.conversation().sendMessage('Test Message');
-
-      // Verify User B receives a notification containing sender's name and message content
-      await expect
-        .poll(() => getUserBNotifications())
-        .toEqual([expect.objectContaining({title: userA.fullName, body: 'Sent a message'})]);
-    },
-  );
-
-  test(
-    "No sender name, profile image or message content is written on notification when choose 'Hide details' in preferences",
-    {tag: ['@TC-1452', '@regression']},
-    async ({createPage}) => {
-      const [userAPage, userBPage] = await Promise.all([
-        createPage(withLogin(userA), withConnectedUser(userB)),
-        createPage(withLogin(userB)),
-      ]);
-      const {pages: userAPages, components: userAComponents} = PageManager.from(userAPage).webapp;
-      const {pages: userBPages, components: userBComponents} = PageManager.from(userBPage).webapp;
-
-      // User A uploads a profile picture which should not be shown in the notification
-      await userAComponents.conversationSidebar().preferencesButton.click();
-      await userAPages.settings().accountButton.click();
-      await userAPages.account().uploadProfilePicture(getImageFilePath());
-      await userAComponents.conversationSidebar().allConverationsButton.click();
-
-      // User B navigates to preferences and sets "Show sender"
-      await userBComponents.conversationSidebar().preferencesButton.click();
-      await userBPages.settings().optionsButton.click();
-      await userBPages.options().setNotifications('Hide details');
-
-      // Start intercepting notifications for User B
-      const {getNotifications: getUserBNotifications} = await interceptNotifications(userBPage);
-
-      // User A sends a message to User B
-      await userAPages.conversationList().openConversation(userB.fullName, {protocol: 'mls'});
-      await userAPages.conversation().sendMessage('Test Message');
-
-      // Verify User B receives a notification containing sender's name and message content
-      await expect
-        .poll(() => getUserBNotifications())
-        .toEqual([
-          expect.objectContaining({
-            title: 'Someone',
-            body: 'Sent a message',
-            // Verify the icon of the notification is the default one and not the users profile picture
-            icon: expect.stringMatching(/notification\.png$/),
-          }),
-        ]);
-    },
-  );
-
-  test(
-    "No notification shown when selecting 'Off' in preferences",
-    {tag: ['@TC-1453', '@regression']},
-    async ({createPage}) => {
-      const [userAPage, userBPage] = await Promise.all([
-        createPage(withLogin(userA), withConnectedUser(userB)),
-        createPage(withLogin(userB)),
-      ]);
-      const {pages: userAPages} = PageManager.from(userAPage).webapp;
-      const {pages: userBPages, components: userBComponents} = PageManager.from(userBPage).webapp;
-
-      // User B navigates to preferences and sets "Off"
-      await userBComponents.conversationSidebar().clickPreferencesButton();
-      await userBPages.settings().optionsButton.click();
-      await userBPages.options().setNotifications('Off');
-
-      // Start intercepting notifications for User B
-      const {getNotifications: getUserBNotifications} = await interceptNotifications(userBPage);
-
-      // User A sends a message to User B
-      await userAPages.conversationList().openConversation(userB.fullName, {protocol: 'mls'});
-      await userAPages.conversation().sendMessage('Test Message');
-
-      await userBComponents.conversationSidebar().allConverationsButton.click();
-      await userBPages.conversationList().openConversation(userA.fullName, {protocol: 'mls'});
-      await expect(userBPages.conversation().getMessage({sender: userA})).toBeVisible();
-
-      // Verify User B receives a notification containing sender's name and message content
-      await expect.poll(() => getUserBNotifications()).toHaveLength(0);
-    },
-  );
+    });
+  });
 
   test(
     'Verify I can click ping notification while other conversation is opened',
