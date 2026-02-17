@@ -232,9 +232,9 @@ describe('EventRepository', () => {
   });
 
   describe('CONFIG', () => {
-    it('should have HEART_BEAT_INTERVAL configured', () => {
-      expect(EventRepository.CONFIG.HEART_BEAT_INTERVAL).toBeDefined();
-      expect(EventRepository.CONFIG.HEART_BEAT_INTERVAL).toBe(30000); // 30 seconds in milliseconds
+    it('should have HEARTBEAT_INTERVAL configured', () => {
+      expect(EventRepository.CONFIG.HEARTBEAT_INTERVAL).toBeDefined();
+      expect(EventRepository.CONFIG.HEARTBEAT_INTERVAL).toBe(30000); // 30 seconds in milliseconds
     });
 
     it('should have existing configurations', () => {
