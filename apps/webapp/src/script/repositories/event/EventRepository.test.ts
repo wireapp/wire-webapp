@@ -18,8 +18,12 @@
  */
 
 import {BackendEvent, CONVERSATION_EVENT, USER_EVENT} from '@wireapp/api-client/lib/event/';
+import {ConnectionState} from '@wireapp/core';
+import {WebAppEvents} from '@wireapp/webapp-events';
+import {amplify} from 'amplify';
 
 import {ClientConversationEvent} from 'Repositories/conversation/EventBuilder';
+import {Warnings} from '../../view_model/WarningsContainer';
 
 import {ClientEvent} from './Client';
 import {EventRepository} from './EventRepository';
@@ -149,9 +153,94 @@ describe('EventRepository', () => {
         type: 'conversation.unable-to-decrypt',
       } as ClientConversationEvent;
 
-      return testFactory.event_repository.injectEvent(event).then(() => {
+      return testFactory.event_repository!.injectEvent(event).then(() => {
         expect(testFactory.event_repository!['distributeEvent']).toHaveBeenCalled();
       });
+    });
+  });
+
+  describe('updateConnectivityStatus', () => {
+    let eventRepository: EventRepository;
+
+    beforeEach(() => {
+      // Create a minimal EventRepository instance for testing
+      const mockEventService: any = {};
+      const mockNotificationService: any = {};
+      const mockServerTimeHandler: any = {};
+      const mockUserState: any = {};
+
+      eventRepository = new EventRepository(
+        mockEventService,
+        mockNotificationService,
+        mockServerTimeHandler,
+        mockUserState,
+      );
+
+      // Spy on Warnings methods
+      jest.spyOn(Warnings, 'showWarning').mockImplementation(() => {});
+      jest.spyOn(Warnings, 'hideWarning').mockImplementation(() => {});
+
+      // Spy on amplify publish
+      jest.spyOn(amplify, 'publish').mockReturnValue(true);
+    });
+
+    afterEach(() => {
+      jest.restoreAllMocks();
+    });
+
+    it('should handle ConnectionState.CONNECTING', () => {
+      eventRepository['updateConnectivityStatus'](ConnectionState.CONNECTING);
+
+      expect(Warnings.hideWarning).toHaveBeenCalledWith(Warnings.TYPE.NO_INTERNET);
+      expect(Warnings.showWarning).toHaveBeenCalledWith(Warnings.TYPE.CONNECTIVITY_RECONNECT);
+      // Note: CONNECTING does not change notificationHandlingState
+    });
+
+    it('should handle ConnectionState.PROCESSING_NOTIFICATIONS', () => {
+      eventRepository['updateConnectivityStatus'](ConnectionState.PROCESSING_NOTIFICATIONS);
+
+      expect(eventRepository.notificationHandlingState()).toBe(NOTIFICATION_HANDLING_STATE.STREAM);
+      expect(Warnings.hideWarning).toHaveBeenCalledWith(Warnings.TYPE.NO_INTERNET);
+      expect(Warnings.hideWarning).toHaveBeenCalledWith(Warnings.TYPE.CONNECTIVITY_RECONNECT);
+      expect(Warnings.showWarning).toHaveBeenCalledWith(Warnings.TYPE.CONNECTIVITY_RECOVERY);
+    });
+
+    it('should handle ConnectionState.CLOSED', () => {
+      eventRepository['updateConnectivityStatus'](ConnectionState.CLOSED);
+
+      expect(eventRepository.notificationHandlingState()).toBe(NOTIFICATION_HANDLING_STATE.CLOSED);
+      expect(Warnings.showWarning).toHaveBeenCalledWith(Warnings.TYPE.NO_INTERNET);
+    });
+
+    it('should handle ConnectionState.LIVE', () => {
+      eventRepository['updateConnectivityStatus'](ConnectionState.LIVE);
+
+      expect(eventRepository.notificationHandlingState()).toBe(NOTIFICATION_HANDLING_STATE.WEB_SOCKET);
+      expect(amplify.publish).toHaveBeenCalledWith(WebAppEvents.CONNECTION.ONLINE);
+      expect(Warnings.hideWarning).toHaveBeenCalledWith(Warnings.TYPE.NO_INTERNET);
+      expect(Warnings.hideWarning).toHaveBeenCalledWith(Warnings.TYPE.CONNECTIVITY_RECONNECT);
+      expect(Warnings.hideWarning).toHaveBeenCalledWith(Warnings.TYPE.CONNECTIVITY_RECOVERY);
+    });
+
+    it('should log the connection state change', () => {
+      const logSpy = jest.spyOn(eventRepository.logger, 'log').mockImplementation(() => {});
+
+      eventRepository['updateConnectivityStatus'](ConnectionState.LIVE);
+
+      expect(logSpy).toHaveBeenCalledWith('Websocket connection state changed to', ConnectionState.LIVE);
+    });
+  });
+
+  describe('CONFIG', () => {
+    it('should have HEART_BEAT_INTERVAL configured', () => {
+      expect(EventRepository.CONFIG.HEART_BEAT_INTERVAL).toBeDefined();
+      expect(EventRepository.CONFIG.HEART_BEAT_INTERVAL).toBe(30000); // 30 seconds in milliseconds
+    });
+
+    it('should have existing configurations', () => {
+      expect(EventRepository.CONFIG.E_CALL_EVENT_LIFETIME).toBeDefined();
+      expect(EventRepository.CONFIG.IGNORED_ERRORS).toBeDefined();
+      expect(EventRepository.CONFIG.NOTIFICATION_BATCHES).toBeDefined();
     });
   });
 });
