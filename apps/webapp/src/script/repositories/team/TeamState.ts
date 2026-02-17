@@ -38,6 +38,7 @@ export class TeamState {
   public readonly memberInviters: ko.Observable<Record<string, string>>;
   public readonly memberRoles: ko.Observable<Record<string, ROLE>>;
   public readonly supportsLegalHold: ko.Observable<boolean>;
+  public readonly hasWhitelistedServices: ko.Observable<boolean>;
   public readonly teamName: ko.PureComputed<string>;
   public readonly teamFeatures: ko.Observable<FeatureList | undefined>;
   public readonly classifiedDomains: ko.PureComputed<string[] | undefined>;
@@ -85,6 +86,7 @@ export class TeamState {
     });
 
     this.supportsLegalHold = ko.observable(false);
+    this.hasWhitelistedServices = ko.observable(false);
 
     this.isFileSharingSendingEnabled = ko.pureComputed(() => {
       const status = this.teamFeatures()?.fileSharing?.status;
