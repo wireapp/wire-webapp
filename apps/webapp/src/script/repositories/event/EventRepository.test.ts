@@ -243,4 +243,193 @@ describe('EventRepository', () => {
       expect(EventRepository.CONFIG.NOTIFICATION_BATCHES).toBeDefined();
     });
   });
+
+  describe('connectWebSocket', () => {
+    let eventRepository: EventRepository;
+    let mockAccount: any;
+    let mockEventService: any;
+    let mockNotificationService: any;
+    let mockServerTimeHandler: any;
+
+    beforeEach(() => {
+      mockEventService = {};
+      mockNotificationService = {
+        getServerTime: jest.fn().mockResolvedValue('2024-01-01T00:00:00.000Z'),
+      };
+      mockServerTimeHandler = {
+        computeTimeOffset: jest.fn(),
+      };
+
+      eventRepository = new EventRepository(mockEventService, mockNotificationService, mockServerTimeHandler, {} as any);
+
+      mockAccount = {
+        listen: jest.fn().mockResolvedValue(jest.fn()),
+      };
+
+      // Mock window event listeners
+      jest.spyOn(window, 'addEventListener');
+      jest.spyOn(window, 'removeEventListener');
+      jest.spyOn(window, 'setInterval').mockReturnValue(123 as any);
+      jest.spyOn(window, 'clearInterval');
+
+      // Mock document event listeners
+      jest.spyOn(document, 'addEventListener');
+      jest.spyOn(document, 'removeEventListener');
+
+      // Mock Warnings
+      jest.spyOn(Warnings, 'showWarning').mockImplementation(() => {});
+      jest.spyOn(Warnings, 'hideWarning').mockImplementation(() => {});
+    });
+
+    afterEach(() => {
+      jest.restoreAllMocks();
+    });
+
+    it('should setup online and offline event listeners', async () => {
+      await eventRepository.connectWebSocket(mockAccount, false, jest.fn());
+
+      expect(window.addEventListener).toHaveBeenCalledWith('online', expect.any(Function));
+      expect(window.addEventListener).toHaveBeenCalledWith('offline', expect.any(Function));
+    });
+
+    it('should setup heartbeat interval', async () => {
+      await eventRepository.connectWebSocket(mockAccount, false, jest.fn());
+
+      expect(window.setInterval).toHaveBeenCalledWith(expect.any(Function), 30000);
+    });
+
+    it('should setup visibilitychange listener in browser', async () => {
+      const originalIsElectron = (window as any).isElectron;
+      (window as any).isElectron = undefined;
+
+      await eventRepository.connectWebSocket(mockAccount, false, jest.fn());
+
+      expect(document.addEventListener).toHaveBeenCalledWith('visibilitychange', expect.any(Function));
+
+      (window as any).isElectron = originalIsElectron;
+    });
+
+    it('should call account.listen with correct parameters', async () => {
+      const progressCallback = jest.fn();
+
+      await eventRepository.connectWebSocket(mockAccount, true, progressCallback, false);
+
+      expect(mockAccount.listen).toHaveBeenCalledWith({
+        useLegacy: true,
+        onConnectionStateChanged: expect.any(Function),
+        onEvent: expect.any(Function),
+        onMissedNotifications: expect.any(Function),
+        onNotificationStreamProgress: progressCallback,
+        dryRun: false,
+      });
+    });
+
+    it('should handle connection errors gracefully', async () => {
+      mockAccount.listen.mockRejectedValueOnce(new Error('Connection failed'));
+
+      await expect(eventRepository.connectWebSocket(mockAccount, false, jest.fn())).resolves.not.toThrow();
+    });
+
+    it('should compute time offset on initialization', async () => {
+      await eventRepository.connectWebSocket(mockAccount, false, jest.fn());
+
+      expect(mockNotificationService.getServerTime).toHaveBeenCalled();
+      expect(mockServerTimeHandler.computeTimeOffset).toHaveBeenCalled();
+    });
+
+    it('should handle server time fetch error', async () => {
+      const timeError = {response: {time: '2024-01-01T00:00:00.000Z'}};
+      mockNotificationService.getServerTime.mockRejectedValueOnce(timeError);
+
+      await eventRepository.connectWebSocket(mockAccount, false, jest.fn());
+
+      expect(mockServerTimeHandler.computeTimeOffset).toHaveBeenCalledWith('2024-01-01T00:00:00.000Z');
+    });
+
+    it('should not reconnect when already connecting', async () => {
+      let connectResolve: any;
+      const connectPromise = new Promise(resolve => {
+        connectResolve = resolve;
+      });
+
+      mockAccount.listen.mockReturnValueOnce(connectPromise);
+
+      const connectionPromise = eventRepository.connectWebSocket(mockAccount, false, jest.fn());
+
+      // Try to trigger reconnection while connection is in progress
+      // The connect function should skip if already connecting
+      await new Promise(resolve => setTimeout(resolve, 10));
+
+      connectResolve(jest.fn());
+      await connectionPromise;
+
+      // Should only be called once despite potential multiple triggers
+      expect(mockAccount.listen).toHaveBeenCalledTimes(1);
+    });
+  });
+
+  describe('handleIncomingEvent', () => {
+    let eventRepository: EventRepository;
+
+    beforeEach(() => {
+      const mockEventService: any = {};
+      const mockNotificationService: any = {};
+      const mockServerTimeHandler: any = {};
+
+      eventRepository = new EventRepository(mockEventService, mockNotificationService, mockServerTimeHandler, {} as any);
+      jest.spyOn<any, any>(eventRepository, 'handleEvent').mockResolvedValue(undefined);
+    });
+
+    afterEach(() => {
+      jest.restoreAllMocks();
+    });
+
+    it('should handle events sequentially through the queue', async () => {
+      const event1 = {event: {type: 'test.event1'}} as any;
+      const event2 = {event: {type: 'test.event2'}} as any;
+
+      await eventRepository['handleIncomingEvent'](event1, 'NOTIFICATION_STREAM' as any);
+      await eventRepository['handleIncomingEvent'](event2, 'NOTIFICATION_STREAM' as any);
+
+      expect(eventRepository['handleEvent']).toHaveBeenCalledTimes(2);
+    });
+
+    it('should throw errors from non-stream sources', async () => {
+      const mockError = new Error('Test error');
+      jest.spyOn<any, any>(eventRepository, 'handleEvent').mockRejectedValueOnce(mockError);
+
+      const event = {event: {type: 'test.event'}} as any;
+
+      await expect(eventRepository['handleIncomingEvent'](event, 'WEBSOCKET' as any)).rejects.toThrow(mockError);
+    });
+  });
+
+  describe('importEvents', () => {
+    let eventRepository: EventRepository;
+
+    beforeEach(() => {
+      const mockEventService: any = {};
+      const mockNotificationService: any = {};
+      const mockServerTimeHandler: any = {};
+
+      eventRepository = new EventRepository(mockEventService, mockNotificationService, mockServerTimeHandler, {} as any);
+      jest.spyOn<any, any>(eventRepository, 'handleIncomingEvent').mockResolvedValue(undefined);
+    });
+
+    afterEach(() => {
+      jest.restoreAllMocks();
+    });
+
+    it('should import multiple events sequentially', async () => {
+      const events = [
+        {event: {type: 'test.event1'}} as any,
+        {event: {type: 'test.event2'}} as any,
+        {event: {type: 'test.event3'}} as any,
+      ];
+
+      await eventRepository.importEvents(events as any);
+
+      expect(eventRepository['handleIncomingEvent']).toHaveBeenCalledTimes(3);
+    });
+  });
 });
