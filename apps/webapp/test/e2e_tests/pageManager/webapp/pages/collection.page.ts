@@ -21,21 +21,69 @@ import {Locator, Page} from '@playwright/test';
 
 /** POM for the "collection". This page is accessible by searching for a message within a conversation. */
 export class CollectionPage {
-  readonly page: Locator;
+  readonly page: Page;
+  readonly component: Locator;
 
   constructor(page: Page) {
-    this.page = page.locator('#collection');
+    this.page = page;
+    this.component = page.locator('#collection');
   }
 
   get searchInput() {
-    return this.page.getByRole('textbox', {name: 'Search text messages'});
+    return this.component.getByRole('textbox', {name: 'Search text messages'});
   }
 
   get searchItems() {
-    return this.page.getByTestId('full-search-item');
+    return this.component.getByTestId('full-search-item');
   }
 
   async searchForMessages(search: string) {
     await this.searchInput.fill(search);
+  }
+
+  get imagesSection() {
+    return this.component.locator('section').filter({has: this.page.locator('header', {hasText: 'Images'})});
+  }
+
+  get audioSection() {
+    return this.component.locator('section').filter({has: this.page.locator('header', {hasText: 'Audio'})});
+  }
+
+  get filesSection() {
+    return this.component.locator('section').filter({has: this.page.locator('header', {hasText: 'Files'})});
+  }
+
+  get overviewImagesButton() {
+    return this.imagesSection.getByRole('button', {name: /Show all/i});
+  }
+
+  get overviewFilesButton() {
+    return this.filesSection.getByRole('button', {name: /Show all/i});
+  }
+
+  get fullSearchBar() {
+    return this.component.getByRole('textbox', {name: 'Search text messages'});
+  }
+
+  get noResultsMessage() {
+    return this.component.getByText('No results.', {exact: true});
+  }
+
+  /**
+   * Returns a locator for the highlighted (marked) text within the search results.
+   * @param searchTerm The text you expect to be highlighted.
+   */
+  getMarkedSearchResult(searchTerm: string): Locator {
+    return this.component.locator('mark').filter({hasText: searchTerm});
+  }
+
+  /** Locates the text content of every search result item */
+  get resultTexts() {
+    return this.component.locator('[data-uie-name="full-search-item-text"]');
+  }
+
+  /** Gets all result texts as an array of strings */
+  async getAllResultTexts(): Promise<string[]> {
+    return await this.resultTexts.allInnerTexts();
   }
 }
