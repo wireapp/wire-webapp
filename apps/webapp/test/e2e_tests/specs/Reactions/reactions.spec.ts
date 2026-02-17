@@ -92,8 +92,10 @@ test.describe('Reactions', () => {
         PageManager.from(createPage(withLogin(userB), withConnectedUser(userA))).then(pm => pm.webapp.pages),
       ]);
 
+      await userBPages.conversationList().openConversation(userA.fullName, {protocol: 'mls'});
       await c.sendFromUserB(userBPages);
 
+      await userAPages.conversationList().openConversation(userB.fullName, {protocol: 'mls'});
       const messageFromUserB = userAPages.conversation().getMessage({sender: userB});
       await expect(messageFromUserB).toBeVisible();
 
