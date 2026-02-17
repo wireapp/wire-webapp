@@ -433,9 +433,8 @@ test.describe('Notifications', () => {
     },
   );
 
-  // ToDo: Wait for confirmation if this test is implemented correctly (title might change)
   test(
-    'Verify clicking a notification of a team opens team conversation',
+    'Verify clicking a notification of a group conversation opens this conversation',
     {tag: ['@TC-1458', '@regression']},
     async ({createPage}) => {
       const [userAPage, userBPage] = await Promise.all([
@@ -445,20 +444,20 @@ test.describe('Notifications', () => {
       const userAPages = PageManager.from(userAPage).webapp.pages;
       const userBPages = PageManager.from(userBPage).webapp.pages;
 
-      await createGroup(userBPages, 'Test Group', [userA]);
-      await userBPages.conversationList().openConversation('Test Group');
+      await createGroup(userAPages, 'Test Group', [userB]);
+      await userBPages.conversationList().openConversation(userA.fullName, {protocol: 'mls'});
 
       // Start intercepting notifications
       const {clickNotification} = await interceptNotifications(userBPage);
 
-      // User A pings User B
-      await userAPages.conversationList().openConversation(userB.fullName, {protocol: 'mls'});
+      // User A sends message in group
+      await userAPages.conversationList().openConversation('Test Group');
       await userAPages.conversation().sendMessage('Test Message');
 
-      await clickNotification({title: userA.fullName, body: 'Test Message'});
+      await clickNotification({title: `${userA.fullName} in Test Group`, body: 'Test Message'});
 
       // After clicking the notification B should show the 1on1 conversation instead of the group
-      await expect(userBPages.conversation().conversationTitle).toContainText(userA.fullName);
+      await expect(userBPages.conversation().conversationTitle).toContainText('Test Group');
     },
   );
 
