@@ -52,6 +52,10 @@ declare global {
   interface Window {
     openGraphAsync?: (url: string) => Promise<OpenGraphResult>;
     desktopAppConfig?: {version: string; supportsCallingPopoutWindow?: boolean};
+    desktopAppSettings?: {
+      setHardwareAccelerationEnabled: (enabled: boolean) => void;
+      isHardwareAccelerationEnabled: () => boolean;
+    };
   }
 }
 const logger = getLogger('LinkPreviewRepository');

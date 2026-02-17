@@ -22,6 +22,7 @@ import {ChangeEvent, useCallback, useEffect, useRef, useState} from 'react';
 import type {WebappProperties} from '@wireapp/api-client/lib/user/data/';
 import {amplify} from 'amplify';
 
+import {Runtime} from '@wireapp/commons';
 import {Checkbox, CheckboxLabel} from '@wireapp/react-ui-kit';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
@@ -53,6 +54,10 @@ const CallOptions = ({constraintsHandler, propertiesRepository}: CallOptionsProp
   const [pressSpaceToUnmuteEnabled, setPressSpaceToUnmuteEnabled] = useState(
     !!propertiesRepository.properties.settings.call.enable_press_space_to_unmute,
   );
+
+  const isHardwareAccelerationOption = Runtime.isElectron();
+
+  const [handleHardwareAccelerationEnabled, setHardwareAccelerationEnabled] = useState(true);
 
   useEffect(() => {
     const updateProperties = ({settings}: WebappProperties) => {
@@ -98,6 +103,15 @@ const CallOptions = ({constraintsHandler, propertiesRepository}: CallOptionsProp
       const isChecked = event.target.checked;
       propertiesRepository.savePreference(PROPERTIES_TYPE.CALL.ENABLE_PRESS_SPACE_TO_UNMUTE, isChecked);
       setPressSpaceToUnmuteEnabled(isChecked);
+    },
+    [propertiesRepository],
+  );
+
+  const handleHardwareAccelerationOption = useCallback(
+    (event: ChangeEvent<HTMLInputElement>) => {
+      const isChecked = event.target.checked;
+      //propertiesRepository.savePreference(PROPERTIES_TYPE.CALL.ENABLE_PRESS_SPACE_TO_UNMUTE, isChecked);
+      setHardwareAccelerationEnabled(isChecked);
     },
     [propertiesRepository],
   );
@@ -150,6 +164,23 @@ const CallOptions = ({constraintsHandler, propertiesRepository}: CallOptionsProp
           </Checkbox>
           <p className="preferences-detail preferences-detail-intended">
             {t('preferencesOptionsEnablePressSpaceToUnmuteDetails')}
+          </p>
+        </div>
+      )}
+
+      {isHardwareAccelerationOption && (
+        <div className="checkbox-margin">
+          <Checkbox
+            onChange={handleHardwareAccelerationOption}
+            checked={handleHardwareAccelerationEnabled}
+            data-uie-name="status-preference-hardware-acceleration"
+          >
+            <CheckboxLabel htmlFor="status-preference-hardware-acceleration">
+              {t('preferencesOptionsEnableHardwareAcceleration')}
+            </CheckboxLabel>
+          </Checkbox>
+          <p className="preferences-detail preferences-detail-intended">
+            {t('preferencesOptionsEnableHardwareAccelerationDetails')}
           </p>
         </div>
       )}
