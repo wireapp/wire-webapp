@@ -3,7 +3,7 @@ import {PageManager} from 'test/e2e_tests/pageManager';
 import {interceptNotifications} from 'test/e2e_tests/utils/mockNotifications.util';
 import {test, withLogin, withConnectedUser, expect} from 'test/e2e_tests/test.fixtures';
 import {createGroup, sendConnectionRequest} from 'test/e2e_tests/utils/userActions';
-import {shareAssetHelper} from 'test/e2e_tests/utils/asset.util';
+import {getAudioFilePath, getTextFilePath, getVideoFilePath, shareAssetHelper} from 'test/e2e_tests/utils/asset.util';
 import {getImageFilePath} from 'test/e2e_tests/utils/sendImage.util';
 
 test.describe('Notifications', () => {
@@ -254,15 +254,43 @@ test.describe('Notifications', () => {
       // Start intercepting notifications for User B
       const {getNotifications: getUserBNotifications} = await interceptNotifications(userBPage);
 
-      // ToDo: Also send types ping, link, audio, video and file transfer to 1on1 and group -> Same for 3 following tests
-      // User A sends a message to User B
-      await userAPages.conversationList().openConversation(userB.fullName, {protocol: 'mls'});
-      await userAPages.conversation().sendMessage('Test Message');
+      for (const conversation of ['1on1', 'group'] as const) {
+        await test.step(`User A opens the ${conversation} conversation`, async () => {
+          if (conversation === '1on1') {
+            await userAPages.conversationList().openConversation(userB.fullName, {protocol: 'mls'});
+          } else {
+            await createGroup(userAPages, 'Test Group', [userB]);
+            await userAPages.conversationList().openConversation('Test Group');
+          }
+        });
 
-      // Verify User B receives a notification containing sender's name and message content
-      await expect
-        .poll(() => getUserBNotifications())
-        .toEqual([expect.objectContaining({title: userA.fullName, body: 'Test Message'})]);
+        await test.step('User A sends a text message, ping, link, picture, audio, video and file to User B', async () => {
+          await userAPages.conversation().sendMessage('Test Message');
+          await userAPages.conversation().sendPing();
+          await userAPages.conversation().sendMessage('https://lidl.de');
+          await shareAssetHelper(getImageFilePath(), userAPage, userAPage.getByRole('button', {name: 'Add picture'}));
+          await shareAssetHelper(getAudioFilePath(), userAPage, userAPage.getByRole('button', {name: 'Add file'}));
+          await shareAssetHelper(getVideoFilePath(), userAPage, userAPage.getByRole('button', {name: 'Add file'}));
+          await shareAssetHelper(getTextFilePath(), userAPage, userAPage.getByRole('button', {name: 'Add file'}));
+        });
+
+        await test.step('UserB should have received a notification for each message', async () => {
+          const expectedTitle = conversation === '1on1' ? userA.fullName : `${userA.fullName} in Test Group`;
+          await expect
+            .poll(() => getUserBNotifications())
+            .toEqual(
+              expect.arrayContaining([
+                expect.objectContaining({title: expectedTitle, body: 'Test Message'}),
+                expect.objectContaining({title: expectedTitle, body: 'Pinged'}),
+                expect.objectContaining({title: expectedTitle, body: 'https://lidl.de'}),
+                expect.objectContaining({title: expectedTitle, body: 'Shared a picture'}),
+                expect.objectContaining({title: expectedTitle, body: 'Shared an audio message'}),
+                expect.objectContaining({title: expectedTitle, body: 'Shared a video'}),
+                expect.objectContaining({title: expectedTitle, body: 'Shared a file'}),
+              ]),
+            );
+        });
+      }
     },
   );
 
