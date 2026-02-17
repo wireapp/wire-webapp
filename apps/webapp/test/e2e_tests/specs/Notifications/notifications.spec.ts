@@ -515,17 +515,17 @@ test.describe('Notifications', () => {
       // Create User C as member outside the team
       const userC = await createUser();
 
-      // Users A and B are created, but not connected for this test
+      // Users A and C are created, but not connected for this test
       const [userAPage, userCPage] = await Promise.all([createPage(withLogin(userA)), createPage(withLogin(userC))]);
       const userAPageManager = PageManager.from(userAPage);
 
-      // Start intercepting notifications for User B
+      // Start intercepting notifications for User C
       const {getNotifications} = await interceptNotifications(userCPage);
 
-      // User A sends a connection request to User B
+      // User A sends a connection request to User C
       await sendConnectionRequest(userAPageManager, userC);
 
-      // Verify User B receives a notification about the connection request
+      // Verify User C receives a notification about the connection request
       await expect
         .poll(() => getNotifications())
         .toEqual(
