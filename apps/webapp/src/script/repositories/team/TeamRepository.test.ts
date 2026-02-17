@@ -70,11 +70,13 @@ describe('TeamRepository', () => {
   };
   const team_metadata = teams_data.teams[0];
 
+  const services_data = {has_more: false, services: []};
+
   describe('getTeam()', () => {
     it('returns the team entity', async () => {
       const [teamRepo, {teamService}] = buildConnectionRepository();
       jest.spyOn(teamService, 'getTeamById').mockResolvedValue(team_metadata);
-
+      jest.spyOn(teamService, 'getWhitelistedServices').mockResolvedValue(services_data);
       jest.spyOn(teamRepo, 'getSelfMember').mockResolvedValue(new TeamMemberEntity(randomUUID()));
 
       const team_et = await teamRepo.getTeam();
@@ -89,6 +91,7 @@ describe('TeamRepository', () => {
     it('updates team feature config from backend', async () => {
       const [teamRepo, {teamService, teamState}] = buildConnectionRepository();
       jest.spyOn(teamService, 'getTeamById').mockResolvedValue(team_metadata);
+      jest.spyOn(teamService, 'getWhitelistedServices').mockResolvedValue(services_data);
       jest.spyOn(teamRepo, 'getSelfMember').mockResolvedValue(new TeamMemberEntity(randomUUID()));
 
       const localFeatures = {
