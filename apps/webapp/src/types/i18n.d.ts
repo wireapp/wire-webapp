@@ -1692,6 +1692,8 @@ declare module 'I18n/en-US.json' {
     'preferencesOptionsEmojiReplaceDetail': `:-) → [icon]`;
     'preferencesOptionsEnableAgcCheckbox': `Automatic gain control (AGC)`;
     'preferencesOptionsEnableAgcDetails': `Enable to allow your microphone volume to be adjusted automatically to ensure all participants in a call are heard with similar and comfortable loudness.`;
+    'preferencesOptionsEnableHardwareAcceleration': `Enable Hardware Acceleration (Recommended)`,
+    'preferencesOptionsEnableHardwareAccelerationDetails': `When enabled, hardware acceleration allows the webcam to use your device’s GPU to improve video performance and reduce CPU usage. This can result in smoother video playback, better responsiveness, and improved overall stability.\nThis option is enabled by default and is recommended for most systems. Disable it only if you experience compatibility or display issues.\nA restart of the application is required for changes to take effect.`,
     'preferencesOptionsEnablePressSpaceToUnmute': `Unmute with space bar`;
     'preferencesOptionsEnablePressSpaceToUnmuteDetails': `Enable to unmute your microphone by pressing and holding the space bar as long as you want to speak. You can use this option in full view.`;
     'preferencesOptionsEnableSoundlessIncomingCalls': `Silence other calls`;
