@@ -19,13 +19,14 @@
 
 import logdown from 'logdown';
 import {ErrorEvent} from 'reconnecting-websocket';
-import {Maybe} from 'true-myth';
+import {Maybe, toolbelt} from 'true-myth';
 
 import {EventEmitter} from 'events';
 
 import {LogFactory} from '@wireapp/commons';
 
 import {AcknowledgeType} from './AcknowledgeEvent.types';
+import {findWebSocketAddressPrefix} from './FindWebSocketAddressPrefix';
 import {ReconnectingWebsocket, WEBSOCKET_STATE} from './ReconnectingWebsocket';
 
 import {InvalidTokenError, MissingCookieAndTokenError, MissingCookieError} from '../auth/';
@@ -271,7 +272,14 @@ export class WebSocketClient extends EventEmitter {
     const queryString = queryParams.toString();
 
     if (this.cachedSocketAddress.isNothing) {
-      this.cachedSocketAddress = Maybe.just(await this.findSocketAddressToUse(this.baseUrl, queryString));
+      const webSocketAddressPrefix = await findWebSocketAddressPrefix({
+        baseUrl: this.baseUrl,
+        queryString,
+        webSocket: WebSocket,
+        connectionTimeoutInMilliseconds: 5000,
+      });
+
+      this.cachedSocketAddress = toolbelt.fromResult(webSocketAddressPrefix);
     }
 
     const webSocketAddress = this.cachedSocketAddress.match({
@@ -288,37 +296,6 @@ export class WebSocketClient extends EventEmitter {
     this.logger.info(`WebSocket URL: ${webSocketAddress}`);
 
     return webSocketAddress;
-  }
-
-  private findSocketAddressToUse(baseUrl: string, queryString: string): Promise<'websocket' | 'await'> {
-    const websocketUrl = `${baseUrl}/websocket?${queryString}`;
-
-    // We try to connect to the websocket endpoint first, if it fails we fallback to the await endpoint
-    return new Promise<'websocket' | 'await'>(resolve => {
-      const testSocket = new WebSocket(websocketUrl);
-
-      // In case the connection hangs, we fallback to the await endpoint after 5 seconds
-      const timeoutId = setTimeout(() => {
-        if (testSocket.readyState !== WebSocket.OPEN) {
-          handleFailure();
-        }
-      }, 5000);
-
-      const handleSuccess = () => {
-        clearTimeout(timeoutId);
-        testSocket.close();
-        resolve('websocket');
-      };
-
-      const handleFailure = () => {
-        clearTimeout(timeoutId);
-        testSocket.close();
-        resolve('await');
-      };
-
-      testSocket.onopen = handleSuccess;
-      testSocket.onerror = handleFailure;
-    });
   }
 
   public useAsyncNotificationsSocket() {
