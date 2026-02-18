@@ -19,6 +19,7 @@
 
 import logdown from 'logdown';
 import {ErrorEvent} from 'reconnecting-websocket';
+import {Maybe} from 'true-myth';
 
 import {EventEmitter} from 'events';
 
@@ -66,7 +67,7 @@ export class WebSocketClient extends EventEmitter {
   private bufferedMessages: string[];
   private abortHandler?: AbortController;
   private versionPrefix = '';
-  private cachedSocketAddress?: 'websocket' | 'await';
+  private cachedSocketAddress: Maybe<'websocket' | 'await'> = Maybe.nothing();
 
   public static readonly TOPIC = TOPIC;
 
@@ -269,18 +270,24 @@ export class WebSocketClient extends EventEmitter {
 
     const queryString = queryParams.toString();
 
-    if (!this.cachedSocketAddress) {
-      this.cachedSocketAddress = await this.findSocketAddressToUse(this.baseUrl, queryString);
+    if (this.cachedSocketAddress.isNothing) {
+      this.cachedSocketAddress = Maybe.just(await this.findSocketAddressToUse(this.baseUrl, queryString));
     }
-    const socketAddressToUse = this.cachedSocketAddress;
 
-    const websocketAddress = this.useLegacySocket
-      ? `${this.baseUrl}/${socketAddressToUse}?${queryString}`
-      : `${this.baseUrl}${this.versionPrefix}/events?${queryString}`;
+    const webSocketAddress = this.cachedSocketAddress.match({
+      Just: cachedSocketPrefixValue => {
+        return this.useLegacySocket
+          ? `${this.baseUrl}/${cachedSocketPrefixValue}?${queryString}`
+          : `${this.baseUrl}${this.versionPrefix}/events?${queryString}`;
+      },
+      Nothing: () => {
+        return `${this.baseUrl}/await?${queryString}`;
+      },
+    });
 
-    this.logger.info(`WebSocket URL: ${websocketAddress}`);
+    this.logger.info(`WebSocket URL: ${webSocketAddress}`);
 
-    return websocketAddress;
+    return webSocketAddress;
   }
 
   private findSocketAddressToUse(baseUrl: string, queryString: string): Promise<'websocket' | 'await'> {
