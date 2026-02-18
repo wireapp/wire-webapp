@@ -362,5 +362,3 @@ export class WebSocketClient extends EventEmitter {
     return this.socket.checkHealth();
   }
 }
-
-console.info('running new code 3');
