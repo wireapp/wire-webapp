@@ -66,6 +66,7 @@ export class WebSocketClient extends EventEmitter {
   private bufferedMessages: string[];
   private abortHandler?: AbortController;
   private versionPrefix = '';
+  private cachedSocketAddress?: 'websocket' | 'await';
 
   public static readonly TOPIC = TOPIC;
 
@@ -268,7 +269,10 @@ export class WebSocketClient extends EventEmitter {
 
     const queryString = queryParams.toString();
 
-    const socketAddressToUse = await this.findSocketAddressToUse(this.baseUrl, queryString);
+    if (!this.cachedSocketAddress) {
+      this.cachedSocketAddress = await this.findSocketAddressToUse(this.baseUrl, queryString);
+    }
+    const socketAddressToUse = this.cachedSocketAddress;
 
     const websocketAddress = this.useLegacySocket
       ? `${this.baseUrl}/${socketAddressToUse}?${queryString}`
@@ -286,25 +290,27 @@ export class WebSocketClient extends EventEmitter {
     return new Promise<'websocket' | 'await'>(resolve => {
       const testSocket = new WebSocket(websocketUrl);
 
+      // In case the connection hangs, we fallback to the await endpoint after 5 seconds
+      const timeoutId = setTimeout(() => {
+        if (testSocket.readyState !== WebSocket.OPEN) {
+          handleFailure();
+        }
+      }, 5000);
+
       const handleSuccess = () => {
+        clearTimeout(timeoutId);
         testSocket.close();
         resolve('websocket');
       };
 
       const handleFailure = () => {
+        clearTimeout(timeoutId);
         testSocket.close();
         resolve('await');
       };
 
       testSocket.onopen = handleSuccess;
       testSocket.onerror = handleFailure;
-
-      // In case the connection hangs, we fallback to the await endpoint after 5 seconds
-      setTimeout(() => {
-        if (testSocket.readyState !== WebSocket.OPEN) {
-          handleFailure();
-        }
-      }, 5000);
     });
   }
 
