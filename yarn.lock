@@ -10863,6 +10863,7 @@ __metadata:
     concurrently: "npm:9.2.1"
     http-status-codes: "npm:2.3.0"
     jest: "npm:^29.7.0"
+    p-cancelable: "npm:4.0.1"
     p-timeout: "npm:7.0.1"
     pako: "npm:2.1.0"
     react: "npm:18.3.1"
@@ -22143,6 +22144,13 @@ __metadata:
     object-keys: "npm:^1.1.1"
     safe-push-apply: "npm:^1.0.0"
   checksum: 10/ab4bb3b8636908554fc19bf899e225444195092864cb61503a0d048fdaf662b04be2605b636a4ffeaf6e8811f6fcfa8cbb210ec964c0eb1a41eb853e1d5d2f41
+  languageName: node
+  linkType: hard
+
+"p-cancelable@npm:4.0.1":
+  version: 4.0.1
+  resolution: "p-cancelable@npm:4.0.1"
+  checksum: 10/64de7b0be4c8bacc006488e0e90aa66fbcceb4da4f6fb84584573145f015f9650fe6ac26470897b3e82a3b528f6c60ea276b84cc315e35c45e9f12dec062a295
   languageName: node
   linkType: hard
 
