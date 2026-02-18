@@ -131,4 +131,16 @@ export class AccountPage {
     await this.displayNameInput.fill(newName);
     await this.displayNameInput.press('Enter');
   }
+
+  statusOption(status: 'Away' | 'Busy' | 'Available' | 'None') {
+    return this.page.getByRole('button', {name: `Change your status to ${status}`});
+  }
+
+  selectedStatus(status: 'Away' | 'Busy' | 'Available' | 'None') {
+    return this.page.getByRole('button', {name: `Selected, ${status}`});
+  }
+
+  async selectStatus(status: 'Away' | 'Busy' | 'Available' | 'None') {
+    await this.statusOption(status).click();
+  }
 }
