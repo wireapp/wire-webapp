@@ -373,7 +373,7 @@
   "cameraStatusOff": "aus",
   "cameraStatusOn": "an",
   "cells.breadcrumb.files": "{conversationName} Dateien",
-  "cells.clearFilters.button": "Alle löschen",
+  "cells.clearFilters.button": "Entfernen",
   "cells.deleteModal.description": "Dies wird die Datei {name} für alle Teilnehmer endgültig löschen.",
   "cells.deleteModal.error": "Etwas ist schief gelaufen. Bitte versuchen Sie es später noch einmal und aktualisieren Sie die Liste.",
   "cells.deleteModal.heading": "Datei löschen",
