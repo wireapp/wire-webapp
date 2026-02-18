@@ -55,9 +55,17 @@ const CallOptions = ({constraintsHandler, propertiesRepository}: CallOptionsProp
     !!propertiesRepository.properties.settings.call.enable_press_space_to_unmute,
   );
 
-  const isHardwareAccelerationOption = Runtime.isElectron();
+  const desktopSettings = Config.getDesktopSettings();
 
-  const [handleHardwareAccelerationEnabled, setHardwareAccelerationEnabled] = useState(true);
+  const isHardwareAccelerationChangeable = Runtime.isDesktopApp() && !!desktopSettings;
+
+  const [hardwareAccelerationEnabled, setHardwareAccelerationEnabled] = useState<boolean>(() => {
+    if (!isHardwareAccelerationChangeable) {
+      return true; // default in browser (but not changeable)
+    }
+
+    return desktopSettings.isHardwareAccelerationEnabled();
+  });
 
   useEffect(() => {
     const updateProperties = ({settings}: WebappProperties) => {
@@ -107,13 +115,20 @@ const CallOptions = ({constraintsHandler, propertiesRepository}: CallOptionsProp
     [propertiesRepository],
   );
 
-  const handleHardwareAccelerationOption = useCallback(
+  const handleHardwareAccelerationChange = useCallback(
     (event: ChangeEvent<HTMLInputElement>) => {
       const isChecked = event.target.checked;
-      //propertiesRepository.savePreference(PROPERTIES_TYPE.CALL.ENABLE_PRESS_SPACE_TO_UNMUTE, isChecked);
+
       setHardwareAccelerationEnabled(isChecked);
+
+      if (desktopSettings) {
+        desktopSettings.setHardwareAccelerationEnabled(isChecked);
+
+        // Hardware acceleration requires restart
+        amplify.publish(WebAppEvents.LIFECYCLE.RESTART);
+      }
     },
-    [propertiesRepository],
+    [desktopSettings],
   );
 
   return (
@@ -168,11 +183,11 @@ const CallOptions = ({constraintsHandler, propertiesRepository}: CallOptionsProp
         </div>
       )}
 
-      {isHardwareAccelerationOption && (
+      {isHardwareAccelerationChangeable && (
         <div className="checkbox-margin">
           <Checkbox
-            onChange={handleHardwareAccelerationOption}
-            checked={handleHardwareAccelerationEnabled}
+            onChange={handleHardwareAccelerationChange}
+            checked={hardwareAccelerationEnabled}
             data-uie-name="status-preference-hardware-acceleration"
           >
             <CheckboxLabel htmlFor="status-preference-hardware-acceleration">
