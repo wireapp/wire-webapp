@@ -5,6 +5,9 @@ on:
     # we want to run the CI on every PR targetting those branches
     branches: [master, dev, release/*]
 
+  merge_group:
+    branches: [master, dev, release/*]
+
   push:
     # We also run CI on dev in order to update the coverage monitoring
     branches: [dev]

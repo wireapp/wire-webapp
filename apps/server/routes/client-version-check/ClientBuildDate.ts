@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2020 Wire Swiss GmbH
+ * Copyright (C) 2026 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,15 +17,17 @@
  *
  */
 
-module.exports = {
-  preset: '../../jest.preset.js',
-  collectCoverageFrom: ['src/**/*.{js,ts}', '!src/**/*.d.ts', '!src/**/*.test.{js,ts}'],
-  moduleDirectories: ['node_modules', __dirname],
-  testEnvironment: 'node',
-  testPathIgnorePatterns: ['<rootDir>/dist'],
-  transformIgnorePatterns: ['/node_modules/(?!(true-myth|@sindresorhus/is)/)'],
-  transform: {
-    '^.+\\.(ts|tsx)$': 'babel-jest',
-    '^.+\\.(js|jsx)$': 'babel-jest',
-  },
+import {Maybe, Result, toolbelt} from 'true-myth';
+
+export type ParseMinimumRequiredClientBuildDateDependencies = {
+  readonly parseClientVersion: (clientVersionHeaderValue: string) => Result<Date, Error>;
+  readonly clientVersion?: string | undefined;
 };
+
+export function parseMinimumRequiredClientBuildDate(
+  dependencies: ParseMinimumRequiredClientBuildDateDependencies,
+): Maybe<Date> {
+  const {parseClientVersion, clientVersion} = dependencies;
+
+  return toolbelt.fromResult(parseClientVersion(clientVersion));
+}
