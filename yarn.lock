@@ -10840,26 +10840,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@wireapp/api-client@npm:27.95.5":
-  version: 27.95.5
-  resolution: "@wireapp/api-client@npm:27.95.5"
-  dependencies:
-    "@aws-sdk/client-s3": "npm:3.975.0"
-    "@aws-sdk/lib-storage": "npm:3.975.0"
-    "@wireapp/priority-queue": "npm:2.1.19"
-    "@wireapp/protocol-messaging": "npm:1.56.0"
-    axios-retry: "npm:4.5.0"
-    cells-sdk-ts: "npm:0.1.1-alpha18"
-    pako: "npm:2.1.0"
-    reconnecting-websocket: "npm:4.4.0"
-    spark-md5: "npm:3.0.2"
-    tough-cookie: "npm:4.1.4"
-    ws: "npm:8.19.0"
-  checksum: 10/f8f1889dcba896144274a016ce80b64562a45eac4f22374d2bab5877ad301b0288d533acc4e4ec730960dbdbf38dbcf6a6b1c067a5619f142b9e31134449be6a
-  languageName: node
-  linkType: hard
-
-"@wireapp/api-client@workspace:libraries/api-client":
+"@wireapp/api-client@npm:27.95.6, @wireapp/api-client@workspace:libraries/api-client":
   version: 0.0.0-use.local
   resolution: "@wireapp/api-client@workspace:libraries/api-client"
   dependencies:
@@ -10973,7 +10954,7 @@ __metadata:
     "@swc/jest": "npm:0.2.39"
     "@types/lodash": "npm:4.17.23"
     "@types/long": "npm:5.0.0"
-    "@wireapp/api-client": "npm:27.95.5"
+    "@wireapp/api-client": "npm:27.95.6"
     "@wireapp/core-crypto": "npm:9.1.2"
     "@wireapp/cryptobox": "npm:12.8.0"
     "@wireapp/priority-queue": "npm:2.1.19"

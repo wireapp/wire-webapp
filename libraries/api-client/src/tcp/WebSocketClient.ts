@@ -126,7 +126,7 @@ export class WebSocketClient extends EventEmitter {
       // before we try any connection, we first refresh the access token to make sure we will avoid concurrent accessToken refreshes
       await this.refreshAccessToken();
     }
-    return this.buildWebSocketUrl();
+    return await this.buildWebSocketUrl();
   };
 
   private readonly onOpen = () => {
@@ -235,22 +235,7 @@ export class WebSocketClient extends EventEmitter {
     return this.isSocketLocked;
   }
 
-  /**
-   * this is a temporary hack method to check if app is running on
-   * wire.com domain in order to use a different temporary websocket
-   * endpoint on wire production server
-   * delete this method as soon as /websocket no longer exists on prod backend
-   * (possibly with next release of web), and change line 284 to use /await only
-   * @returns true if app is connected to wire.com backend
-   */
-  private _temporaryIsProdBackend() {
-    if (typeof window === 'undefined') {
-      return false;
-    }
-    return window.location.hostname.includes('wire.com');
-  }
-
-  public buildWebSocketUrl(): string {
+  public async buildWebSocketUrl(): Promise<string> {
     const {
       accessTokenStore: {getAccessToken, getNextMarkerToken},
     } = this.client;
@@ -283,13 +268,44 @@ export class WebSocketClient extends EventEmitter {
 
     const queryString = queryParams.toString();
 
+    const socketAddressToUse = await this.findSocketAddressToUse(this.baseUrl, queryString);
+
     const websocketAddress = this.useLegacySocket
-      ? `${this.baseUrl}/${this._temporaryIsProdBackend() ? 'websocket' : 'await'}?${queryString}`
+      ? `${this.baseUrl}/${socketAddressToUse}?${queryString}`
       : `${this.baseUrl}${this.versionPrefix}/events?${queryString}`;
 
     this.logger.info(`WebSocket URL: ${websocketAddress}`);
 
     return websocketAddress;
+  }
+
+  private findSocketAddressToUse(baseUrl: string, queryString: string): Promise<'websocket' | 'await'> {
+    const websocketUrl = `${baseUrl}/websocket?${queryString}`;
+
+    // We try to connect to the websocket endpoint first, if it fails we fallback to the await endpoint
+    return new Promise<'websocket' | 'await'>(resolve => {
+      const testSocket = new WebSocket(websocketUrl);
+
+      const handleSuccess = () => {
+        testSocket.close();
+        resolve('websocket');
+      };
+
+      const handleFailure = () => {
+        testSocket.close();
+        resolve('await');
+      };
+
+      testSocket.onopen = handleSuccess;
+      testSocket.onerror = handleFailure;
+
+      // In case the connection hangs, we fallback to the await endpoint after 5 seconds
+      setTimeout(() => {
+        if (testSocket.readyState !== WebSocket.OPEN) {
+          handleFailure();
+        }
+      }, 5000);
+    });
   }
 
   public useAsyncNotificationsSocket() {
@@ -346,3 +362,5 @@ export class WebSocketClient extends EventEmitter {
     return this.socket.checkHealth();
   }
 }
+
+console.info('running new code 3');
