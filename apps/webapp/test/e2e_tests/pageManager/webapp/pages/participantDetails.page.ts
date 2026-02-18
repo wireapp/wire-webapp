@@ -23,9 +23,8 @@ export class ParticipantDetails {
   readonly page: Page;
 
   readonly userPicture: Locator;
-  readonly adminStatus: Locator;
-  readonly guestStatus: Locator;
-  readonly externalStatus: Locator;
+  readonly userName: Locator;
+  readonly userStatus: Locator;
   readonly createGroup: Locator;
   readonly block: Locator;
   readonly closeButton: Locator;
@@ -36,12 +35,11 @@ export class ParticipantDetails {
   constructor(page: Page) {
     this.page = page;
     this.userPicture = this.page.getByTestId('status-profile-picture');
-    this.adminStatus = this.page
+    this.userName = this.page.locator('.panel-participant').getByTestId('status-name');
+    this.userStatus = this.page
       .locator('#group-participant-user')
-      .getByTestId('status-admin')
-      .filter({hasText: 'Group Admin'});
-    this.guestStatus = this.page.locator('#group-participant-user').getByTestId('status-guest');
-    this.externalStatus = this.page.locator('#group-participant-user').getByTestId('status-external');
+      .getByTestId(/^status-(external|guest|admin)$/)
+      .and(this.page.locator('.panel-participant__label'));
     this.createGroup = this.page.locator('#conversation-details').getByRole('button', {name: 'Create group'});
     this.block = this.page.getByRole('button', {name: 'Block'});
     this.closeButton = this.page.getByRole('button', {name: 'Close conversation info'});
@@ -56,10 +54,6 @@ export class ParticipantDetails {
 
   getUserEmailLocator(email: string) {
     return this.page.getByTestId('item-enriched-value').and(this.page.locator(`[data-uie-value="${email}"]`));
-  }
-
-  getUserNameLocator(userName: string) {
-    return this.page.getByTitle(userName).and(this.page.getByTestId('status-username'));
   }
 
   async closeParticipantDetails() {

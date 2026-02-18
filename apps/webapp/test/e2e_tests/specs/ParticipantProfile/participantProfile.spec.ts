@@ -71,8 +71,8 @@ test.describe('Participant Profile', () => {
       await test.step('Open People popover', async () => {
         await userAPages.conversation().clickConversationTitle();
 
-        await expect(userAPages.participantDetails().getUserNameLocator(userC.username)).toBeVisible();
-        await expect(userAPages.participantDetails().getUserNameLocator(userC.username)).toContainText(userC.username);
+        await expect(userAPages.participantDetails().userName).toBeVisible();
+        await expect(userAPages.participantDetails().userName).toContainText(userC.fullName);
         await expect(userAPages.participantDetails().getUserEmailLocator(userC.username)).not.toBeVisible();
 
         await expect(userAPages.participantDetails().userPicture).toBeVisible();
@@ -82,7 +82,7 @@ test.describe('Participant Profile', () => {
 
       await test.step('Click on the X button to close the popover', async () => {
         await userAPages.participantDetails().closeParticipantDetails();
-        await expect(userAPages.participantDetails().getUserNameLocator(userB.username)).not.toBeVisible();
+        await expect(userAPages.participantDetails().userName).not.toBeVisible();
         await expect(userAPages.participantDetails().userPicture).not.toBeVisible();
       });
     },
@@ -93,7 +93,7 @@ test.describe('Participant Profile', () => {
     {tag: ['@TC-1477', '@regression']},
     async ({createPage, createUser}) => {
       const userC = await createUser();
-      const [userAPage, userBPages, userCPages] = await Promise.all([
+      const [userAPages, userBPages, userCPages] = await Promise.all([
         PageManager.from(createPage(withLogin(userA), withConnectionRequest(userC))).then(pm => pm.webapp.pages),
         PageManager.from(createPage(withLogin(userB), withConnectedUser(userA))).then(pm => pm.webapp.pages),
         PageManager.from(createPage(withLogin(userC))).then(pm => pm.webapp.pages),
@@ -102,7 +102,7 @@ test.describe('Participant Profile', () => {
       await acceptConnectionRequest(userCPages);
 
       await test.step('User C is in group with User A and B. User C is not connected to user B', async () => {
-        await createGroup(userAPage, groupName, [userB, userC]);
+        await createGroup(userAPages, groupName, [userB, userC]);
       });
 
       await test.step('User B asks to connect with user C', async () => {
@@ -114,13 +114,17 @@ test.describe('Participant Profile', () => {
         await expect(userBPages.participantDetails().userPicture).toBeVisible();
         await expect(userBPages.participantDetails().userPicture).toHaveAttribute('data-uie-status', 'pending');
 
-        await expect(userBPages.participantDetails().getUserNameLocator(userC.username)).toBeVisible();
-        await expect(userBPages.participantDetails().getUserNameLocator(userC.username)).toContainText(userC.username);
+        await expect(userBPages.participantDetails().userName).toBeVisible();
+        await expect(userBPages.participantDetails().userName).toContainText(userC.fullName);
 
         await expect(userBPages.participantDetails().getUserEmailLocator(userC.email)).not.toBeVisible();
         await expect(userBPages.participantDetails().cancelRequest).toBeVisible();
         await expect(userBPages.participantDetails().block).toBeVisible();
       });
+
+      // Validate email visibility for team member in participant details
+      await openParticipantDetailsFromGroup(userAPages, groupName, userB.fullName);
+      await expect(userAPages.participantDetails().getUserEmailLocator(userB.email)).toBeVisible();
     },
   );
 
@@ -156,8 +160,8 @@ test.describe('Participant Profile', () => {
         await expect(pages.participantDetails().userPicture).toBeVisible();
         await expect(pages.participantDetails().userPicture).toHaveAttribute('data-uie-status', 'blocked');
 
-        await expect(pages.participantDetails().getUserNameLocator(userC.username)).toBeVisible();
-        await expect(pages.participantDetails().getUserNameLocator(userC.username)).toContainText(userC.username);
+        await expect(pages.participantDetails().userName).toBeVisible();
+        await expect(pages.participantDetails().userName).toContainText(userC.fullName);
 
         await expect(pages.participantDetails().getUserEmailLocator(userC.email)).not.toBeVisible();
         await expect(pages.participantDetails().unblockButton).toBeVisible();
@@ -179,8 +183,8 @@ test.describe('Participant Profile', () => {
       await openParticipantDetailsFromGroup(userBPages, groupName, userA.fullName);
 
       await expect(userBPages.participantDetails().userPicture).toBeVisible();
-      await expect(userBPages.participantDetails().getUserNameLocator(userA.username)).toContainText(userA.username);
-      await expect(userBPages.participantDetails().getUserNameLocator(userA.username)).toBeVisible;
+      await expect(userBPages.participantDetails().userName).toBeVisible;
+      await expect(userBPages.participantDetails().userName).toContainText(userA.fullName);
     },
   );
 
@@ -189,7 +193,7 @@ test.describe('Participant Profile', () => {
     {tag: ['@TC-1484', '@regression']},
     async ({createPage, createUser}) => {
       const externalUser = await createUser();
-      team.addMember(externalUser, {role: Role.EXTERNAL});
+      await team.addMember(externalUser, {role: Role.EXTERNAL});
 
       const [adminPage, userBPages] = await Promise.all([
         PageManager.from(createPage(withLogin(userA), withConnectedUser(externalUser))).then(pm => pm.webapp.pages),
@@ -199,8 +203,7 @@ test.describe('Participant Profile', () => {
       await createGroup(adminPage, groupName, [userB, externalUser]);
       await openParticipantDetailsFromGroup(userBPages, groupName, externalUser.fullName);
 
-      await expect(userBPages.participantDetails().externalStatus).toBeVisible();
-      await expect(userBPages.participantDetails().externalStatus).toContainText('External');
+      await expect(userBPages.participantDetails().userStatus).toContainText('External');
     },
   );
 
@@ -216,8 +219,7 @@ test.describe('Participant Profile', () => {
       await createGroup(adminPage, groupName, [userB]);
       await openParticipantDetailsFromGroup(userBPages, groupName, userA.fullName);
 
-      await expect(userBPages.participantDetails().adminStatus).toBeVisible();
-      await expect(userBPages.participantDetails().adminStatus).toContainText('Group Admin');
+      await expect(userBPages.participantDetails().userStatus).toContainText('Group Admin');
     },
   );
 
@@ -235,9 +237,7 @@ test.describe('Participant Profile', () => {
       await adminPage.conversation().clickConversationInfoButton();
 
       await adminPage.conversation().makeUserAdmin(userB.fullName);
-
-      await expect(adminPage.participantDetails().adminStatus).toBeVisible();
-      await expect(adminPage.participantDetails().adminStatus).toContainText('Group Admin');
+      await expect(adminPage.participantDetails().userStatus).toContainText('Group Admin');
     },
   );
 
