@@ -717,13 +717,6 @@ declare module 'I18n/en-US.json' {
     'conversationFileUploadOverlayDescription': `Drag & drop to add files`;
     'conversationFileUploadOverlayTitle': `Upload files`;
     'conversationFileVideoPreviewLabel': `Video file preview for: {src}`;
-    'conversationFilterDrafts': `Drafts`;
-    'conversationFilterMentions': `Mentions`;
-    'conversationFilterNone': `No filter`;
-    'conversationFilterPings': `Pings`;
-    'conversationFilterReplies': `Replies`;
-    'conversationFilterTooltip': `Filter conversations`;
-    'conversationFilterUnread': `Unread`;
     'conversationFoldersEmptyText': `Add your conversations to folders to stay organized.`;
     'conversationFoldersEmptyTextLearnMore': `Learn more`;
     'conversationFooterArchive': `Archive`;
@@ -1692,8 +1685,12 @@ declare module 'I18n/en-US.json' {
     'preferencesOptionsEmojiReplaceDetail': `:-) → [icon]`;
     'preferencesOptionsEnableAgcCheckbox': `Automatic gain control (AGC)`;
     'preferencesOptionsEnableAgcDetails': `Enable to allow your microphone volume to be adjusted automatically to ensure all participants in a call are heard with similar and comfortable loudness.`;
-    'preferencesOptionsEnableHardwareAcceleration': `Enable Hardware Acceleration (Recommended)`,
-    'preferencesOptionsEnableHardwareAccelerationDetails': `When enabled, hardware acceleration allows the webcam to use your device’s GPU to improve video performance and reduce CPU usage. This can result in smoother video playback, better responsiveness, and improved overall stability.\nThis option is enabled by default and is recommended for most systems. Disable it only if you experience compatibility or display issues.\nA restart of the application is required for changes to take effect.`,
+    'preferencesOptionsEnableHardwareAcceleration': `Enable Hardware Acceleration (Recommended)`;
+    'preferencesOptionsEnableHardwareAccelerationDetails': `When enabled, hardware acceleration allows the webcam to use your device’s GPU to improve video performance and reduce CPU usage. This can result in smoother video playback, better responsiveness, and improved overall stability.\nThis option is enabled by default and is recommended for most systems. Disable it only if you experience compatibility or display issues.\nA restart of the application is required for changes to take effect.`;
+    'preferencesOptionsEnableHardwareAccelerationModalTitle': `Restart required`;
+    'preferencesOptionsEnableHardwareAccelerationModalMessage': `Changing the hardware acceleration setting requires a restart of the application. The app will close and reopen automatically. Do you want to restart now?`;
+    'preferencesOptionsEnableHardwareAccelerationModalCancel': `Cancel`;
+    'preferencesOptionsEnableHardwareAccelerationModalOk': `Restart now`;
     'preferencesOptionsEnablePressSpaceToUnmute': `Unmute with space bar`;
     'preferencesOptionsEnablePressSpaceToUnmuteDetails': `Enable to unmute your microphone by pressing and holding the space bar as long as you want to speak. You can use this option in full view.`;
     'preferencesOptionsEnableSoundlessIncomingCalls': `Silence other calls`;
@@ -1800,6 +1797,7 @@ declare module 'I18n/en-US.json' {
     'searchCreateGroup': `Create group`;
     'searchCreateGuestRoom': `Create guest room`;
     'searchDirectConversations': `Search 1:1 conversations`;
+    'searchDraftsConversations': `Search in drafts`;
     'searchFavoriteConversations': `Search favorites`;
     'searchFederatedDomainNotAvailable': `The federated domain is currently not available.`;
     'searchFederatedDomainNotAvailableLearnMore': `Learn more`;
@@ -1818,6 +1816,7 @@ declare module 'I18n/en-US.json' {
     'searchManageServices': `Manage Apps`;
     'searchManageServicesNoResults': `Manage apps`;
     'searchMemberInvite': `Invite people to join the team`;
+    'searchMentionsConversations': `Search in mentions`;
     'searchNoContactsOnWire': `You have no contacts on {brandName}.\nTry finding people by\nname or username.`;
     'searchNoMatchesPartner': `No results`;
     'searchNoServicesManager': `Apps are helpers that can improve your workflow.`;
@@ -1828,6 +1827,8 @@ declare module 'I18n/en-US.json' {
     'searchPeople': `People`;
     'searchPeopleOnlyPlaceholder': `Search people`;
     'searchPeoplePlaceholder': `Search for people and conversations`;
+    'searchPingsConversations': `Search in pings`;
+    'searchRepliesConversations': `Search in replies`;
     'searchServiceConfirmButton': `Open Conversation`;
     'searchServicePlaceholder': `Search by name`;
     'searchServices': `Apps`;
@@ -1837,6 +1838,7 @@ declare module 'I18n/en-US.json' {
     'searchTrySearch': `Find people by\nname or username`;
     'searchTrySearchFederation': `Find people in Wire by name or\n@username\n\nFind people from another domain\nby @username@domainname`;
     'searchTrySearchLearnMore': `Learn more`;
+    'searchUnreadConversations': `Search in unread`;
     'selectAccountTypeHeading': `How will you use Wire?`;
     'selectPersonalAccountTypeOptionButtonText': `Create Personal Account`;
     'selectPersonalAccountTypeOptionDescription': `Chat with friends and family.`;
@@ -1887,6 +1889,8 @@ declare module 'I18n/en-US.json' {
     'success.openWebAppText': `Open Wire for web`;
     'success.subheader': `What do you want to do next?`;
     'systemMessageLearnMore': `Learn more`;
+    'tabsFilterHeader': `Show filters`;
+    'tabsFilterTooltip': `Customize visible tabs`;
     'takeoverButtonChoose': `Choose your own`;
     'takeoverButtonKeep': `Keep this one`;
     'takeoverLink': `Learn more`;

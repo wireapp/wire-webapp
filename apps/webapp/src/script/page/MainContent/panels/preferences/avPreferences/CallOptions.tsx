@@ -31,6 +31,8 @@ import type {PropertiesRepository} from 'Repositories/properties/PropertiesRepos
 import {PROPERTIES_TYPE} from 'Repositories/properties/PropertiesType';
 import {t} from 'Util/LocalizerUtil';
 
+import {HardwareAccelerationRestartModal} from './HardwareAccelerationRestartModal';
+
 import {Config} from '../../../../../Config';
 import {PreferencesSection} from '../components/PreferencesSection';
 
@@ -58,6 +60,9 @@ const CallOptions = ({constraintsHandler, propertiesRepository}: CallOptionsProp
   const desktopSettings = Config.getDesktopSettings();
 
   const isHardwareAccelerationChangeable = Runtime.isDesktopApp() && !!desktopSettings;
+
+  const [showHwRestartModal, setShowHwRestartModal] = useState(false);
+  const [pendingHwValue, setPendingHwValue] = useState<boolean | null>(null);
 
   const [hardwareAccelerationEnabled, setHardwareAccelerationEnabled] = useState<boolean>(() => {
     if (!isHardwareAccelerationChangeable) {
@@ -115,21 +120,31 @@ const CallOptions = ({constraintsHandler, propertiesRepository}: CallOptionsProp
     [propertiesRepository],
   );
 
-  const handleHardwareAccelerationChange = useCallback(
-    (event: ChangeEvent<HTMLInputElement>) => {
-      const isChecked = event.target.checked;
+  const handleHardwareAccelerationChange = useCallback((event: ChangeEvent<HTMLInputElement>) => {
+    const isChecked = event.target.checked;
 
-      setHardwareAccelerationEnabled(isChecked);
+    setPendingHwValue(isChecked);
+    setShowHwRestartModal(true);
+  }, []);
 
-      if (desktopSettings) {
-        desktopSettings.setHardwareAccelerationEnabled(isChecked);
+  const confirmHardwareAccelerationChange = () => {
+    if (!desktopSettings || pendingHwValue === null) {
+      setShowHwRestartModal(false);
+      return;
+    }
 
-        // Hardware acceleration requires restart
-        amplify.publish(WebAppEvents.LIFECYCLE.RESTART);
-      }
-    },
-    [desktopSettings],
-  );
+    desktopSettings.setHardwareAccelerationEnabled(pendingHwValue);
+    setHardwareAccelerationEnabled(pendingHwValue);
+
+    setShowHwRestartModal(false);
+
+    amplify.publish(WebAppEvents.LIFECYCLE.RESTART);
+  };
+
+  const cancelHardwareAccelerationChange = () => {
+    setShowHwRestartModal(false);
+    setPendingHwValue(null);
+  };
 
   return (
     <PreferencesSection title={t('preferencesOptionsCall')}>
@@ -199,6 +214,12 @@ const CallOptions = ({constraintsHandler, propertiesRepository}: CallOptionsProp
           </p>
         </div>
       )}
+
+      <HardwareAccelerationRestartModal
+        isShown={showHwRestartModal}
+        onCancel={cancelHardwareAccelerationChange}
+        onConfirm={confirmHardwareAccelerationChange}
+      />
     </PreferencesSection>
   );
 };
