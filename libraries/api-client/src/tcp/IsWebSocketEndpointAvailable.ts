@@ -21,7 +21,7 @@ import PCancelable from 'p-cancelable';
 import pTimeout from 'p-timeout';
 import {Task, task} from 'true-myth';
 
-export type FindWebSocketAddressPrefixOptions = {
+export type IsWebSocketEndpointAvailableOptions = {
   baseUrl: string;
   queryString: string;
   webSocket: typeof WebSocket;
@@ -44,7 +44,7 @@ function tryToEstablishWebSocketConnection(webSocket: typeof WebSocket, websocke
   });
 }
 
-export function findWebSocketAddressPrefix(dependencies: FindWebSocketAddressPrefixOptions): Task<void, unknown> {
+export function isWebSocketEndpointAvailable(dependencies: IsWebSocketEndpointAvailableOptions): Task<void, unknown> {
   const {baseUrl, queryString, webSocket, connectionTimeoutInMilliseconds} = dependencies;
 
   const websocketUrl = `${baseUrl}/websocket?${queryString}`;

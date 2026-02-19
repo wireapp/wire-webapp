@@ -26,7 +26,7 @@ import {EventEmitter} from 'events';
 import {LogFactory} from '@wireapp/commons';
 
 import {AcknowledgeType} from './AcknowledgeEvent.types';
-import {findWebSocketAddressPrefix} from './FindWebSocketAddressPrefix';
+import {isWebSocketEndpointAvailable} from './IsWebSocketEndpointAvailable';
 import {ReconnectingWebsocket, WEBSOCKET_STATE} from './ReconnectingWebsocket';
 
 import {InvalidTokenError, MissingCookieAndTokenError, MissingCookieError} from '../auth/';
@@ -272,14 +272,14 @@ export class WebSocketClient extends EventEmitter {
     const queryString = queryParams.toString();
 
     if (this.useWebSocketAsAddressPrefix.isNothing) {
-      const webSocketAddressPrefix = await findWebSocketAddressPrefix({
+      const canUseWebSocketAsAddressPrefix = await isWebSocketEndpointAvailable({
         baseUrl: this.baseUrl,
         queryString,
         webSocket: WebSocket,
         connectionTimeoutInMilliseconds: 5000,
       });
 
-      this.useWebSocketAsAddressPrefix = webSocketAddressPrefix.isOk ? Maybe.just(true) : Maybe.nothing();
+      this.useWebSocketAsAddressPrefix = canUseWebSocketAsAddressPrefix.isOk ? Maybe.just(true) : Maybe.nothing();
     }
 
     const webSocketAddress = this.useWebSocketAsAddressPrefix.match({
