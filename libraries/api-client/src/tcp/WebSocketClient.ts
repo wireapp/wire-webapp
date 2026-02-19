@@ -68,7 +68,7 @@ export class WebSocketClient extends EventEmitter {
   private bufferedMessages: string[];
   private abortHandler?: AbortController;
   private versionPrefix = '';
-  private useWebSocketAsAddressPrefix: Maybe<boolean> = Maybe.nothing();
+  private isWebSocketEndpointAvailable: Maybe<boolean> = Maybe.nothing();
 
   public static readonly TOPIC = TOPIC;
 
@@ -271,7 +271,7 @@ export class WebSocketClient extends EventEmitter {
 
     const queryString = queryParams.toString();
 
-    if (this.useWebSocketAsAddressPrefix.isNothing) {
+    if (this.isWebSocketEndpointAvailable.isNothing) {
       const canUseWebSocketAsAddressPrefix = await isWebSocketEndpointAvailable({
         baseUrl: this.baseUrl,
         queryString,
@@ -279,10 +279,10 @@ export class WebSocketClient extends EventEmitter {
         connectionTimeoutInMilliseconds: 5000,
       });
 
-      this.useWebSocketAsAddressPrefix = canUseWebSocketAsAddressPrefix.isOk ? Maybe.just(true) : Maybe.nothing();
+      this.isWebSocketEndpointAvailable = canUseWebSocketAsAddressPrefix.isOk ? Maybe.just(true) : Maybe.nothing();
     }
 
-    const webSocketAddress = this.useWebSocketAsAddressPrefix.match({
+    const webSocketAddress = this.isWebSocketEndpointAvailable.match({
       Just: () => {
         return this.useLegacySocket
           ? `${this.baseUrl}/websocket?${queryString}`
