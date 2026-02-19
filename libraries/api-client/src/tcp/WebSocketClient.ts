@@ -279,13 +279,13 @@ export class WebSocketClient extends EventEmitter {
         connectionTimeoutInMilliseconds: 5000,
       });
 
-      this.isWebSocketEndpointAvailable = webSocketAvailabilityResult.isOk ? Maybe.just(true) : Maybe.nothing();
+      this.isWebSocketEndpointAvailable = webSocketAvailabilityResult.isOk ? Maybe.just(true) : Maybe.just(false);
     }
 
     const webSocketAddress = this.isWebSocketEndpointAvailable.match({
-      Just: () => {
+      Just: canUseWebSocketPrefix => {
         return this.useLegacySocket
-          ? `${this.baseUrl}/websocket?${queryString}`
+          ? `${this.baseUrl}/${canUseWebSocketPrefix ? 'websocket' : 'await'}?${queryString}`
           : `${this.baseUrl}${this.versionPrefix}/events?${queryString}`;
       },
       Nothing: () => {
