@@ -31,6 +31,10 @@ export class ConversationDetailsPage {
   readonly clearConversationContentButton: Locator;
   readonly selectedSearchList: Locator;
   readonly searchList: Locator;
+  readonly deleteGroupButton: Locator;
+  readonly notificationsButton: Locator;
+  readonly editConversationNameButton: Locator;
+  readonly textFieldForConversationName: Locator;
 
   constructor(page: Page) {
     this.page = page;
@@ -44,6 +48,10 @@ export class ConversationDetailsPage {
     this.clearConversationContentButton = this.conversationDetails.getByRole('button', {name: 'Clear Content'});
     this.selectedSearchList = this.page.getByTestId('selected-search-list');
     this.searchList = this.page.getByTestId('search-list');
+    this.deleteGroupButton = this.page.getByRole('button', {name: 'Delete group'});
+    this.notificationsButton = this.page.getByRole('button', {name: 'Notifications'});
+    this.editConversationNameButton = this.page.getByRole('button', {name: 'Change conversation name'});
+    this.textFieldForConversationName = this.page.locator('textarea[data-uie-name="enter-name"]');
   }
 
   async waitForSidebar() {
@@ -180,5 +188,17 @@ export class ConversationDetailsPage {
 
   async clickClearConversationContentButton() {
     await this.clearConversationContentButton.click();
+  }
+
+  async setNotificationsForConversation(value: 'Everything' | 'Mentions and replies' | 'Nothing') {
+    await this.notificationsButton.click();
+    const notificationsPanel = this.page.locator('aside#right-column');
+    await notificationsPanel.getByRole('radiogroup').getByText(value).click();
+  }
+
+  async changeConversationName(newConversationName: string) {
+    await this.editConversationNameButton.click();
+    await this.textFieldForConversationName.fill(newConversationName);
+    await this.textFieldForConversationName.press('Enter');
   }
 }

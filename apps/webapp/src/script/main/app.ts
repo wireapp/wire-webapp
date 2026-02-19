@@ -539,6 +539,7 @@ export class App {
         teamFeatures[FEATURE_KEY.CONSUMABLE_NOTIFICATIONS]?.status === FEATURE_STATUS.ENABLED;
       const useLegacyNotificationStream = !useAsyncNotificationStream;
 
+      let previousMessage = '';
       await eventRepository.connectWebSocket(
         this.core,
         useLegacyNotificationStream,
@@ -553,9 +554,14 @@ export class App {
             : '';
 
           totalNotifications++;
-          onProgress(message);
+          if (message !== previousMessage) {
+            onProgress(message);
+            previousMessage = message;
+          }
         },
       );
+
+      this.logger.info(`Finished loading notifications, total: ${totalNotifications}`);
 
       // Pause the notification queue until we've fully initialized
       this.core.pauseNotificationQueue();
@@ -573,6 +579,8 @@ export class App {
           this.core,
         );
 
+        this.logger.info('Finished initializing self and team conversations after migration finalization');
+
         // join all the mls groups that are known by the user but were migrated to mls
         await joinConversationsAfterMigrationFinalisation({
           conversations,
@@ -583,12 +591,16 @@ export class App {
             this.logger.error(`Failed when joining a migrated mls conversation with id ${id}, error: `, error),
         });
 
+        this.logger.info('Finished joining conversations after migration finalization');
+
         // join all the mls groups we're member of and have not yet joined (eg. we were not send welcome message)
         await initMLSGroupConversations(conversations, conversationRepository, {
           core: this.core,
           onError: ({id}, error) =>
             this.logger.error(`Failed when initialising mls conversation with id ${id}, error: `, error),
         });
+
+        this.logger.info('Finished initializing MLS group conversations');
       }
 
       eventLogger.log(AppInitializationStep.SetupMLS);

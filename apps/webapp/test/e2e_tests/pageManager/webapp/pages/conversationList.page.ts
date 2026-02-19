@@ -150,4 +150,8 @@ export class ConversationListPage {
   getMoveToFolderButton(folderName: string) {
     return this.moveToMenu.getByRole('button', {name: folderName, exact: true});
   }
+
+  async getMutedConversationBadge(conversationName: string) {
+    return this.getConversationLocator(conversationName).getByTitle('Muted conversation');
+  }
 }

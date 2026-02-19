@@ -20,18 +20,15 @@
 import {Locator, Page} from '@playwright/test';
 
 export class HistoryImportPage {
-  readonly page: Page;
+  private component: Locator;
 
-  readonly importSuccessHeadline: Locator;
+  readonly title: Locator;
+  readonly description: Locator;
 
   constructor(page: Page) {
-    this.page = page;
+    this.component = page.locator('#history-import');
 
-    this.importSuccessHeadline = page.getByTestId('status-history-import-success');
-  }
-
-  async isVisible() {
-    await this.importSuccessHeadline.waitFor({state: 'visible'});
-    return await this.importSuccessHeadline.isVisible();
+    this.title = this.component.getByRole('heading');
+    this.description = this.component.getByRole('paragraph');
   }
 }

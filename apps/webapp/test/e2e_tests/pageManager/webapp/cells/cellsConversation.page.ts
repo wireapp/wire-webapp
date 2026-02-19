@@ -39,6 +39,16 @@ export class CellsConversationPage extends ConversationPage {
   }
 
   override getImageLocator(user: User): Locator {
-    return this.page.getByTestId('item-message').locator(`[aria-label^="Image from ${user.fullName}"]`);
+    return this.page
+      .getByTestId('item-message')
+      .getByRole('button', {name: new RegExp(`^Image from ${user.fullName}`)});
+  }
+
+  public getImageInMultipartMessageLocator(user: User): Locator {
+    return this.page.getByLabel(new RegExp(`^Image from ${user.fullName}`)).getByRole('img');
+  }
+
+  public getVideoInMultipartMessageLocator(user: User): Locator {
+    return this.page.getByLabel(new RegExp(`^Image from ${user.fullName}`)).locator('video');
   }
 }

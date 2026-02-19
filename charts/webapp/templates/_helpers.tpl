@@ -11,9 +11,9 @@ Base resource name. Keep legacy "webapp" naming by default, optionally append
 the release name to allow multiple installations in the same namespace.
 */}}
 {{- define "webapp.baseName" -}}
-{{- if .Values.appendReleaseNameToResources }}
+{{- if .Values.appendReleaseNameToResources -}}
 {{- printf "webapp-%s" .Release.Name | trunc 63 | trimSuffix "-" -}}
-{{- else }}
+{{- else -}}
 webapp
 {{- end -}}
 {{- end -}}

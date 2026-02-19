@@ -25,6 +25,7 @@ import {ICellAsset} from '@wireapp/protocol-messaging';
 
 import {useInView} from 'Hooks/useInView/useInView';
 import {CellsRepository} from 'Repositories/cells/CellsRepository';
+import {isPreviewableImage} from 'Util/ImageUtil';
 import {t} from 'Util/LocalizerUtil';
 import {formatBytes, getFileExtension, trimFileExtension} from 'Util/util';
 
@@ -104,14 +105,19 @@ const MultipartAsset = ({
   const isSingleAsset = assetsCount === 1;
   const variant = isSingleAsset ? 'large' : 'small';
 
-  const {src, isLoading, isError, imagePreviewUrl, pdfPreviewUrl, path, isRecycled, fetchData} = useGetMultipartAsset({
-    uuid,
-    cellsRepository,
-    isEnabled: hasBeenInView,
-    retryPreviewUntilSuccess: isSingleAsset && !isImage && !isVideo,
-  });
+  const {src, isLoading, isError, imagePreviewUrl, pdfPreviewUrl, hasPreview, path, isRecycled, fetchData} =
+    useGetMultipartAsset({
+      uuid,
+      cellsRepository,
+      isEnabled: hasBeenInView,
+      retryPreviewUntilSuccess: isSingleAsset && !isImage && !isVideo,
+    });
 
   const name = path ? getName(path) : getName(initialName!);
+  const canPreviewImage = isPreviewableImage({mimeType: contentType, extension}) || !!imagePreviewUrl;
+  const imageSrc = imagePreviewUrl || src;
+  const hasFilePreview = hasPreview ?? false;
+  const fileVariant = isSingleAsset && hasFilePreview ? 'large' : 'small';
 
   /**
    * Listen to hash changes within the current conversation (excluding the `/files` view)
@@ -138,12 +144,13 @@ const MultipartAsset = ({
     );
   }
 
-  if (isImage) {
+  if (isImage && canPreviewImage) {
     return (
       <li ref={elementRef} css={imageCardStyles}>
         <ImageAssetCard
           id={uuid}
-          src={src}
+          filePreviewUrl={imageSrc}
+          fileUrl={src}
           name={name}
           extension={extension}
           variant={variant}
@@ -181,7 +188,7 @@ const MultipartAsset = ({
       <FileAssetCard
         id={uuid}
         src={src}
-        variant={variant}
+        variant={fileVariant}
         extension={extension}
         name={name}
         size={size}
