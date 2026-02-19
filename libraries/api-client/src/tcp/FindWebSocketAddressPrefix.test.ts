@@ -84,24 +84,22 @@ function createDependencies(overrides: DependencyOverrides = {}): FindWebSocketA
 }
 
 describe('findWebSocketAddressPrefix', () => {
-  it("returns Ok('websocket') when the connection opens successfully", async () => {
+  it('returns Ok when the connection opens successfully', async () => {
     const {fakeWebSocket} = createFakeWebSocketThatOpens();
     const dependencies = createDependencies({webSocket: fakeWebSocket});
 
     const result = await findWebSocketAddressPrefix(dependencies);
 
     assert(result.isOk);
-    expect(result.value).toBe('websocket');
   });
 
-  it("returns Err('await') when the websocket fires onerror", async () => {
+  it('returns Err when the websocket fires onerror', async () => {
     const {fakeWebSocket} = createFakeWebSocketThatErrors();
     const dependencies = createDependencies({webSocket: fakeWebSocket});
 
     const result = await findWebSocketAddressPrefix(dependencies);
 
     assert(result.isErr);
-    expect(result.error).toBe('await');
   });
 
   it('returns Err when the WebSocket constructor throws', async () => {
@@ -190,24 +188,14 @@ describe('findWebSocketAddressPrefix', () => {
     expect(fakeWebSocket).toHaveBeenCalledTimes(1);
   });
 
-  it("Ok result value is exactly 'websocket', not just a string", async () => {
+  it('Ok result value is void on success', async () => {
     const {fakeWebSocket} = createFakeWebSocketThatOpens();
     const dependencies = createDependencies({webSocket: fakeWebSocket});
 
     const result = await findWebSocketAddressPrefix(dependencies);
 
     assert(result.isOk);
-    expect(result.value).toStrictEqual('websocket');
-  });
-
-  it("Err result from onerror carries 'await' as the error payload", async () => {
-    const {fakeWebSocket} = createFakeWebSocketThatErrors();
-    const dependencies = createDependencies({webSocket: fakeWebSocket});
-
-    const result = await findWebSocketAddressPrefix(dependencies);
-
-    assert(result.isErr);
-    expect(result.error).toStrictEqual('await');
+    expect(result.value).toBeUndefined();
   });
 
   it('succeeds if the connection opens before the timeout', async () => {

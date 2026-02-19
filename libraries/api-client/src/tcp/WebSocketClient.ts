@@ -19,7 +19,7 @@
 
 import logdown from 'logdown';
 import {ErrorEvent} from 'reconnecting-websocket';
-import {Maybe, toolbelt} from 'true-myth';
+import {Maybe} from 'true-myth';
 
 import {EventEmitter} from 'events';
 
@@ -68,7 +68,7 @@ export class WebSocketClient extends EventEmitter {
   private bufferedMessages: string[];
   private abortHandler?: AbortController;
   private versionPrefix = '';
-  private cachedSocketAddress: Maybe<'websocket' | 'await'> = Maybe.nothing();
+  private useWebSocketAsAddressPrefix: Maybe<boolean> = Maybe.nothing();
 
   public static readonly TOPIC = TOPIC;
 
@@ -271,7 +271,7 @@ export class WebSocketClient extends EventEmitter {
 
     const queryString = queryParams.toString();
 
-    if (this.cachedSocketAddress.isNothing) {
+    if (this.useWebSocketAsAddressPrefix.isNothing) {
       const webSocketAddressPrefix = await findWebSocketAddressPrefix({
         baseUrl: this.baseUrl,
         queryString,
@@ -279,13 +279,13 @@ export class WebSocketClient extends EventEmitter {
         connectionTimeoutInMilliseconds: 5000,
       });
 
-      this.cachedSocketAddress = toolbelt.fromResult(webSocketAddressPrefix);
+      this.useWebSocketAsAddressPrefix = webSocketAddressPrefix.isOk ? Maybe.just(true) : Maybe.nothing();
     }
 
-    const webSocketAddress = this.cachedSocketAddress.match({
-      Just: cachedSocketPrefixValue => {
+    const webSocketAddress = this.useWebSocketAsAddressPrefix.match({
+      Just: () => {
         return this.useLegacySocket
-          ? `${this.baseUrl}/${cachedSocketPrefixValue}?${queryString}`
+          ? `${this.baseUrl}/websocket?${queryString}`
           : `${this.baseUrl}${this.versionPrefix}/events?${queryString}`;
       },
       Nothing: () => {
