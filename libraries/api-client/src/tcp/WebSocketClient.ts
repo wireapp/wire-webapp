@@ -272,14 +272,14 @@ export class WebSocketClient extends EventEmitter {
     const queryString = queryParams.toString();
 
     if (this.isWebSocketEndpointAvailable.isNothing) {
-      const canUseWebSocketAsAddressPrefix = await isWebSocketEndpointAvailable({
+      const webSocketAvailabilityResult = await isWebSocketEndpointAvailable({
         baseUrl: this.baseUrl,
         queryString,
         webSocket: WebSocket,
         connectionTimeoutInMilliseconds: 5000,
       });
 
-      this.isWebSocketEndpointAvailable = canUseWebSocketAsAddressPrefix.isOk ? Maybe.just(true) : Maybe.nothing();
+      this.isWebSocketEndpointAvailable = webSocketAvailabilityResult.isOk ? Maybe.just(true) : Maybe.nothing();
     }
 
     const webSocketAddress = this.isWebSocketEndpointAvailable.match({
