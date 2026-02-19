@@ -18,6 +18,7 @@
  */
 
 import {BackendEvent, CONVERSATION_EVENT, USER_EVENT} from '@wireapp/api-client/lib/event/';
+import {Runtime} from '@wireapp/commons';
 import {ConnectionState} from '@wireapp/core';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import {amplify} from 'amplify';
@@ -31,11 +32,23 @@ import {EventSource} from './EventSource';
 import {NOTIFICATION_HANDLING_STATE} from './NotificationHandlingState';
 
 import {TestFactory} from '../../../../test/helper/TestFactory';
+import {WindowService} from 'src/script/window/windowService';
+import {container} from 'tsyringe';
 
 const testFactory = new TestFactory();
 
+const mockService = {
+  onOnline: jest.fn().mockReturnValue(() => {}),
+  onOffline: jest.fn().mockReturnValue(() => {}),
+  onVisibilityChange: jest.fn().mockReturnValue(() => {}),
+  onFocus: jest.fn().mockReturnValue(() => {}),
+} as unknown as WindowService;
+
 describe('EventRepository', () => {
-  beforeAll(() => testFactory.exposeClientActors());
+  beforeAll(() => {
+    testFactory.exposeClientActors();
+    container.registerInstance(WindowService, mockService);
+  });
 
   beforeEach(() => {
     return testFactory.exposeEventActors();
@@ -260,21 +273,20 @@ describe('EventRepository', () => {
         computeTimeOffset: jest.fn(),
       };
 
-      eventRepository = new EventRepository(mockEventService, mockNotificationService, mockServerTimeHandler, {} as any);
+      eventRepository = new EventRepository(
+        mockEventService,
+        mockNotificationService,
+        mockServerTimeHandler,
+        {} as any,
+      );
 
       mockAccount = {
         listen: jest.fn().mockResolvedValue(jest.fn()),
       };
 
-      // Mock window event listeners
-      jest.spyOn(window, 'addEventListener');
-      jest.spyOn(window, 'removeEventListener');
+      // Mock window timer methods (WindowService doesn't manage timers)
       jest.spyOn(window, 'setInterval').mockReturnValue(123 as any);
       jest.spyOn(window, 'clearInterval');
-
-      // Mock document event listeners
-      jest.spyOn(document, 'addEventListener');
-      jest.spyOn(document, 'removeEventListener');
 
       // Mock Warnings
       jest.spyOn(Warnings, 'showWarning').mockImplementation(() => {});
@@ -288,8 +300,8 @@ describe('EventRepository', () => {
     it('should setup online and offline event listeners', async () => {
       await eventRepository.connectWebSocket(mockAccount, false, jest.fn());
 
-      expect(window.addEventListener).toHaveBeenCalledWith('online', expect.any(Function));
-      expect(window.addEventListener).toHaveBeenCalledWith('offline', expect.any(Function));
+      expect(mockService.onOnline).toHaveBeenCalledWith(expect.any(Function));
+      expect(mockService.onOffline).toHaveBeenCalledWith(expect.any(Function));
     });
 
     it('should setup heartbeat interval', async () => {
@@ -299,14 +311,14 @@ describe('EventRepository', () => {
     });
 
     it('should setup visibilitychange listener in browser', async () => {
-      const originalIsElectron = (window as any).isElectron;
-      (window as any).isElectron = undefined;
+      const originalIsElectron = Runtime.isElectron;
+      jest.spyOn(Runtime, 'isElectron').mockReturnValue(false);
 
       await eventRepository.connectWebSocket(mockAccount, false, jest.fn());
 
-      expect(document.addEventListener).toHaveBeenCalledWith('visibilitychange', expect.any(Function));
+      expect(mockService.onVisibilityChange).toHaveBeenCalledWith(expect.any(Function));
 
-      (window as any).isElectron = originalIsElectron;
+      jest.spyOn(Runtime, 'isElectron').mockReturnValue(originalIsElectron());
     });
 
     it('should call account.listen with correct parameters', async () => {
@@ -376,7 +388,12 @@ describe('EventRepository', () => {
       const mockNotificationService: any = {};
       const mockServerTimeHandler: any = {};
 
-      eventRepository = new EventRepository(mockEventService, mockNotificationService, mockServerTimeHandler, {} as any);
+      eventRepository = new EventRepository(
+        mockEventService,
+        mockNotificationService,
+        mockServerTimeHandler,
+        {} as any,
+      );
       jest.spyOn<any, any>(eventRepository, 'handleEvent').mockResolvedValue(undefined);
     });
 
@@ -412,7 +429,12 @@ describe('EventRepository', () => {
       const mockNotificationService: any = {};
       const mockServerTimeHandler: any = {};
 
-      eventRepository = new EventRepository(mockEventService, mockNotificationService, mockServerTimeHandler, {} as any);
+      eventRepository = new EventRepository(
+        mockEventService,
+        mockNotificationService,
+        mockServerTimeHandler,
+        {} as any,
+      );
       jest.spyOn<any, any>(eventRepository, 'handleIncomingEvent').mockResolvedValue(undefined);
     });
 

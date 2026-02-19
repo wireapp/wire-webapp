@@ -55,6 +55,7 @@ import {CryptographyError} from '../../error/CryptographyError';
 import {EventError} from '../../error/EventError';
 import type {ServerTimeHandler} from '../../time/serverTimeHandler';
 import {Warnings} from '../../view_model/WarningsContainer';
+import {WindowService} from '../../window/windowService';
 
 export class EventRepository {
   logger: Logger;
@@ -101,6 +102,7 @@ export class EventRepository {
     readonly notificationService: NotificationService,
     private readonly serverTimeHandler: ServerTimeHandler,
     private readonly userState = container.resolve(UserState),
+    private readonly windowService = container.resolve(WindowService),
   ) {
     this.logger = getLogger('EventRepository');
 
@@ -263,8 +265,7 @@ export class EventRepository {
         }
       };
 
-      window.addEventListener('focus', handleFocus);
-      cleanupHandlers.push(() => window.removeEventListener('focus', handleFocus));
+      cleanupHandlers.push(this.windowService.onFocus(handleFocus));
     } else {
       // In browser, use visibilitychange
       const handleVisibilityChange = () => {
@@ -277,20 +278,12 @@ export class EventRepository {
         }
       };
 
-      document.addEventListener('visibilitychange', handleVisibilityChange);
-      cleanupHandlers.push(() => {
-        document.removeEventListener('visibilitychange', handleVisibilityChange);
-      });
+      cleanupHandlers.push(this.windowService.onVisibilityChange(handleVisibilityChange));
     }
 
     // Online/Offline handlers work for both environments
-    window.addEventListener('online', handleOnline);
-    window.addEventListener('offline', handleOffline);
-
-    cleanupHandlers.push(() => {
-      window.removeEventListener('online', handleOnline);
-      window.removeEventListener('offline', handleOffline);
-    });
+    cleanupHandlers.push(this.windowService.onOnline(handleOnline));
+    cleanupHandlers.push(this.windowService.onOffline(handleOffline));
 
     // Heartbeat to check connection state every 30 seconds
     const heartbeatInterval = window.setInterval(() => {
