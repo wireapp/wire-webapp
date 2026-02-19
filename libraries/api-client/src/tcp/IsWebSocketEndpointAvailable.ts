@@ -21,37 +21,30 @@ import PCancelable from 'p-cancelable';
 import pTimeout from 'p-timeout';
 import {Task, task} from 'true-myth';
 
-type WebSocketAddressPrefix = 'websocket' | 'await';
-
-export type FindWebSocketAddressPrefixOptions = {
+export type IsWebSocketEndpointAvailableOptions = {
   baseUrl: string;
   queryString: string;
   webSocket: typeof WebSocket;
   connectionTimeoutInMilliseconds: number;
 };
 
-function tryToEstablishWebSocketConnection(
-  webSocket: typeof WebSocket,
-  websocketUrl: string,
-): PCancelable<WebSocketAddressPrefix> {
-  return new PCancelable<WebSocketAddressPrefix>((resolve, reject, onCancel) => {
+function tryToEstablishWebSocketConnection(webSocket: typeof WebSocket, websocketUrl: string): PCancelable<void> {
+  return new PCancelable<void>((resolve, reject, onCancel) => {
     const testSocket = new webSocket(websocketUrl);
     onCancel(() => {
       testSocket.close();
     });
     testSocket.onopen = () => {
       testSocket.close();
-      resolve('websocket');
+      resolve();
     };
     testSocket.onerror = () => {
-      reject('await');
+      reject();
     };
   });
 }
 
-export function findWebSocketAddressPrefix(
-  dependencies: FindWebSocketAddressPrefixOptions,
-): Task<WebSocketAddressPrefix, unknown> {
+export function isWebSocketEndpointAvailable(dependencies: IsWebSocketEndpointAvailableOptions): Task<void, unknown> {
   const {baseUrl, queryString, webSocket, connectionTimeoutInMilliseconds} = dependencies;
 
   const websocketUrl = `${baseUrl}/websocket?${queryString}`;
@@ -60,5 +53,5 @@ export function findWebSocketAddressPrefix(
     milliseconds: connectionTimeoutInMilliseconds,
   });
 
-  return task.fromPromise<WebSocketAddressPrefix>(timeoutPromise);
+  return task.fromPromise(timeoutPromise);
 }
