@@ -70,4 +70,81 @@ describe('createFakeWallClock', () => {
     expect(secondCurrentDate.getTime()).toBe(100);
   });
 
+  it('does not execute interval callback before enough time elapsed', () => {
+    const fakeWallClock = createFakeWallClock();
+    const intervalCallback = jest.fn();
+
+    fakeWallClock.setInterval(intervalCallback, 1_000);
+    fakeWallClock.advanceByMilliseconds(999);
+
+    expect(intervalCallback).not.toHaveBeenCalled();
+  });
+
+  it('executes interval callback repeatedly when enough time elapsed', () => {
+    const fakeWallClock = createFakeWallClock();
+    const intervalCallback = jest.fn();
+
+    fakeWallClock.setInterval(intervalCallback, 1_000);
+    fakeWallClock.advanceByMilliseconds(3_500);
+
+    expect(intervalCallback).toHaveBeenCalledTimes(3);
+  });
+
+  it('stops executing interval callback after clearInterval', () => {
+    const fakeWallClock = createFakeWallClock();
+    const intervalCallback = jest.fn();
+    const intervalIdentifier = fakeWallClock.setInterval(intervalCallback, 1_000);
+
+    fakeWallClock.advanceByMilliseconds(1_000);
+    fakeWallClock.clearInterval(intervalIdentifier);
+    fakeWallClock.advanceByMilliseconds(5_000);
+
+    expect(intervalCallback).toHaveBeenCalledTimes(1);
+  });
+
+  it('does not execute an interval that was cleared by another interval callback', () => {
+    const fakeWallClock = createFakeWallClock();
+    const clearedIntervalCallback = jest.fn();
+    let clearedIntervalIdentifier: ReturnType<typeof globalThis.setInterval> | undefined;
+
+    fakeWallClock.setInterval(() => {
+      if (clearedIntervalIdentifier !== undefined) {
+        fakeWallClock.clearInterval(clearedIntervalIdentifier);
+      }
+    }, 1_000);
+    clearedIntervalIdentifier = fakeWallClock.setInterval(clearedIntervalCallback, 1_000);
+    fakeWallClock.advanceByMilliseconds(1_000);
+
+    expect(clearedIntervalCallback).not.toHaveBeenCalled();
+  });
+
+  it('executes interval callback with arguments', () => {
+    const fakeWallClock = createFakeWallClock();
+    const intervalCallback = jest.fn();
+
+    fakeWallClock.setInterval(intervalCallback, 1_000, 'first', 42);
+    fakeWallClock.advanceByMilliseconds(1_000);
+
+    expect(intervalCallback).toHaveBeenCalledWith('first', 42);
+  });
+
+  it('throws for non-positive interval delay', () => {
+    const fakeWallClock = createFakeWallClock();
+
+    expect(() => {
+      fakeWallClock.setInterval(jest.fn(), 0);
+    }).toThrow('Invalid delay 0, must be greater than 0');
+    expect(() => {
+      fakeWallClock.setInterval(jest.fn(), -1);
+    }).toThrow('Invalid delay -1, must be greater than 0');
+  });
+
+  it('throws for non-finite interval delay', () => {
+    const fakeWallClock = createFakeWallClock();
+
+    expect(() => fakeWallClock.setInterval(jest.fn(), Number.NaN)).toThrow('Invalid delay, must be a finite number');
+    expect(() => fakeWallClock.setInterval(jest.fn(), Number.POSITIVE_INFINITY)).toThrow(
+      'Invalid delay, must be a finite number',
+    );
+  });
 });

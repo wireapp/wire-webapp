@@ -97,6 +97,7 @@ const config: Linter.Config[] = [
       globals: {
         ...globals.browser,
         ...globals.node,
+        globalThis: 'readonly',
         React: 'readonly',
         JSX: 'readonly',
         amplify: 'readonly',

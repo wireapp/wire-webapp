@@ -11246,6 +11246,7 @@ __metadata:
     "@nx/webpack": "npm:22.4.1"
     "@playwright/test": "npm:1.58.0"
     "@roamhq/wrtc": "npm:0.9.1"
+    "@sindresorhus/is": "npm:4.6.0"
     "@tanstack/react-table": "npm:8.21.3"
     "@tanstack/react-virtual": "npm:3.13.18"
     "@testing-library/dom": "npm:10.4.1"

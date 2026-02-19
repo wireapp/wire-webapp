@@ -22,6 +22,10 @@ import timers from 'node:timers/promises';
 import {createWallClock} from './wallClock';
 
 describe('wall clock', () => {
+  afterEach(() => {
+    jest.restoreAllMocks();
+  });
+
   it('returns the current timestamp in milliseconds', () => {
     const lowerTimestampBound = Date.now();
     const wallClock = createWallClock();
@@ -53,5 +57,27 @@ describe('wall clock', () => {
 
     expect(firstCurrentDate).not.toBe(secondCurrentDate);
     expect(secondCurrentDate.getTime()).toBeGreaterThanOrEqual(firstCurrentDate.getTime());
+  });
+
+  it('delegates setInterval to setInterval', () => {
+    const expectedIdentifier = 123 as unknown as ReturnType<typeof globalThis.setInterval>;
+    const setIntervalSpy = jest.spyOn(globalThis, 'setInterval').mockReturnValue(expectedIdentifier);
+    const wallClock = createWallClock();
+    const callback = jest.fn();
+
+    const intervalIdentifier = wallClock.setInterval(callback, 1_000, 'first', 42);
+
+    expect(intervalIdentifier).toBe(expectedIdentifier);
+    expect(setIntervalSpy).toHaveBeenCalledWith(callback, 1_000, 'first', 42);
+  });
+
+  it('delegates clearInterval to clearInterval', () => {
+    const clearIntervalSpy = jest.spyOn(globalThis, 'clearInterval').mockImplementation(() => undefined);
+    const wallClock = createWallClock();
+    const intervalIdentifier = 456 as unknown as ReturnType<typeof globalThis.setInterval>;
+
+    wallClock.clearInterval(intervalIdentifier);
+
+    expect(clearIntervalSpy).toHaveBeenCalledWith(intervalIdentifier);
   });
 });
