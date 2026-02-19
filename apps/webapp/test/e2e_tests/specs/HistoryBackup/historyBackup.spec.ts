@@ -40,7 +40,7 @@ test.describe('History Backup', () => {
     async ({createPage, api}, testInfo) => {
       const [userAPageManager, userBPageManager] = await Promise.all([
         PageManager.from(createPage(withLogin(userA), withConnectedUser(userB))),
-        PageManager.from(createPage(withLogin(userB), withConnectedUser(userA))),
+        PageManager.from(createPage(withLogin(userB))),
       ]);
 
       const {pages: userAPages, modals: userAModals, components: userAComponents} = userAPageManager.webapp;
@@ -117,7 +117,7 @@ test.describe('History Backup', () => {
     async ({createPage}, testInfo) => {
       const [userAPageManager, userBPageManager] = await Promise.all([
         PageManager.from(createPage(withLogin(userA), withConnectedUser(userB))),
-        PageManager.from(createPage(withLogin(userB), withConnectedUser(userA))),
+        PageManager.from(createPage(withLogin(userB))),
       ]);
 
       const {pages: userAPages, components: userAComponents} = userAPageManager.webapp;
@@ -164,7 +164,7 @@ test.describe('History Backup', () => {
     async ({createPage}, testInfo) => {
       const [userAPageManager, userBPageManager] = await Promise.all([
         PageManager.from(createPage(withLogin(userA), withConnectedUser(userB))),
-        PageManager.from(createPage(withLogin(userB), withConnectedUser(userA))),
+        PageManager.from(createPage(withLogin(userB))),
       ]);
       const {pages: userAPages, components: userAComponents} = userAPageManager.webapp;
       const {pages: userBPages} = userBPageManager.webapp;
@@ -222,7 +222,7 @@ test.describe('History Backup', () => {
     async ({createPage}, testInfo) => {
       const [userAPageManager, userBPageManager] = await Promise.all([
         PageManager.from(createPage(withLogin(userA), withConnectedUser(userB))),
-        PageManager.from(createPage(withLogin(userB), withConnectedUser(userA))),
+        PageManager.from(createPage(withLogin(userB))),
       ]);
       const {pages: userAPages, components: userAComponents} = userAPageManager.webapp;
       const {pages: userBPages} = userBPageManager.webapp;
@@ -287,7 +287,7 @@ test.describe('History Backup', () => {
     async ({createPage}, testInfo) => {
       const [userAPageManager, userBPageManager] = await Promise.all([
         PageManager.from(createPage(withLogin(userA), withConnectedUser(userB))),
-        PageManager.from(createPage(withLogin(userB), withConnectedUser(userA))),
+        PageManager.from(createPage(withLogin(userB))),
       ]);
 
       const {pages: userAPages, modals: userAModals, components: userAComponents} = userAPageManager.webapp;
@@ -333,7 +333,7 @@ test.describe('History Backup', () => {
     async ({createPage}, testInfo) => {
       const [userAPageManager, userBPageManager] = await Promise.all([
         PageManager.from(createPage(withLogin(userA), withConnectedUser(userB))),
-        PageManager.from(createPage(withLogin(userB), withConnectedUser(userA))),
+        PageManager.from(createPage(withLogin(userB))),
       ]);
       const {pages: userAPages, modals: userAModals, components: userAComponents} = userAPageManager.webapp;
       const {pages: userBPages} = userBPageManager.webapp;
