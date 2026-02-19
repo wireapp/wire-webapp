@@ -66,11 +66,13 @@ export const useCreateConversation = () => {
     access: conversationAccess,
     moderator,
   } = useCreateConversationModal();
-  const {setCurrentTab: setCurrentSidebarTab} = useSidebarStore();
+  const sidebarStore = useSidebarStore();
+  const setCurrentSidebarTab = sidebarStore.setCurrentTab;
 
-  const mainViewModel = useContext(RootContext);
-  const {content: contentViewModel} = mainViewModel!;
-  const {conversation: conversationRepository} = contentViewModel.repositories;
+  const rootContext = useContext(RootContext);
+  const mainViewModel = rootContext!.mainViewModel;
+  const contentViewModel = mainViewModel.content;
+  const conversationRepository = contentViewModel.repositories.conversation;
   const teamState = container.resolve(TeamState);
   const {isTeam, isMLSEnabled} = useKoSubscribableChildren(teamState, ['isTeam', 'isMLSEnabled']);
 
