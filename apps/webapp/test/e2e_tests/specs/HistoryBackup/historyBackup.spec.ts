@@ -242,7 +242,7 @@ test.describe('History Backup', () => {
 
       await test.step('User A mutes group conversation with User B', async () => {
         await userAPages.conversation().conversationInfoButton.click();
-        await userAPages.conversationDetails().setNotificationsForConversation('Nothing');
+        await userAPages.conversationDetails().setNotifications('Nothing');
       });
 
       await test.step('User A archives 1:1 conversation with User B', async () => {

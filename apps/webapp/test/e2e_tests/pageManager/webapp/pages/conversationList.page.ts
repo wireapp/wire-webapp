@@ -98,6 +98,11 @@ export class ConversationListPage {
     await this.archiveConversationMenuButton.click();
   }
 
+  async setNotifications(level: 'Everything' | 'Mentions and replies' | 'Nothing') {
+    await this.page.getByRole('menuitem', {name: 'Notifications'}).click(); // Click the "Notifications" menu item
+    await this.page.getByRole('radiogroup').locator('label', {hasText: level}).click(); // Click the specified radio button
+  }
+
   async unarchiveConversation() {
     await this.unarchiveConversationMenuButton.click();
   }

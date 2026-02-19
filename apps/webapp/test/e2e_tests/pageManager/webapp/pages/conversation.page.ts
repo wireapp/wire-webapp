@@ -437,7 +437,8 @@ export class ConversationPage {
       .getByTestId('item-user')
       .and(this.page.locator(`[data-uie-value="${name}"]`))
       .click();
-    return this.removeUserButton.click();
+    await this.removeUserButton.click();
+    await new ConfirmModal(this.page).clickAction();
   }
 
   async removeAdminFromGroup(name: string) {
