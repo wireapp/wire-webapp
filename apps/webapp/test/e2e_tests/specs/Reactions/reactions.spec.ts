@@ -117,7 +117,8 @@ test.describe('Reactions', () => {
         'Test Service Device',
         false,
       );
-      const conversationId = await api.conversation.getConversationWithUser(userB.token, userA.id!);
+      const conversationId = await api.conversation.getConversationWithUser(userB.token, userA.id!, {protocol: 'mls'});
+      if (conversationId === undefined) throw new Error("Couldn't find MLS conversation of user B with user A");
       await api.testService.sendLocation(instanceId, conversationId, {
         locationName: 'Test Location',
         latitude: 52.5170365,

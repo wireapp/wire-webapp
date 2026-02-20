@@ -227,6 +227,7 @@ test.describe('Reply', () => {
         false,
       );
       const conversationId = await api.conversation.getConversationWithUser(userA.token, userB.id!);
+      if (conversationId === undefined) throw new Error("Couldn't find conversation of userA with userB");
       await api.testService.sendLocation(instanceId, conversationId, {
         locationName: 'Test Location',
         latitude: 52.5170365,

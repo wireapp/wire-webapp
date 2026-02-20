@@ -68,7 +68,11 @@ export class ConversationRepositoryE2E extends BackendClientE2E {
     }
   }
 
-  async getConversationWithUser(token: string, conversationPartnerId: string) {
+  async getConversationWithUser(
+    token: string,
+    conversationPartnerId: string,
+    options?: {protocol?: 'proteus' | 'mls'},
+  ) {
     const listIdsResponse = await this.axiosInstance.post(
       'conversations/list-ids',
       {},
@@ -96,11 +100,26 @@ export class ConversationRepositoryE2E extends BackendClientE2E {
       },
     );
 
+    type Conversation = {
+      qualified_id: {id: string};
+      members: {
+        others: {
+          conversation_role: string;
+          id: string;
+        }[];
+      };
+      protocol: 'proteus' | 'mls';
+    };
+
     // Find a conversation with the given user
-    const conversation = response.data.found.find(
-      (conversation: {members: {others: {conversation_role: string; id: string}[]}}) =>
-        conversation.members.others.some((member: {id: string}) => member.id === conversationPartnerId),
+    const conversation = (response.data.found as Conversation[]).find(conversation =>
+      conversation.members.others.some(
+        member =>
+          member.id === conversationPartnerId &&
+          // If a specific protocol to use was provided also filter by it
+          (options?.protocol ? conversation.protocol === options.protocol : true),
+      ),
     );
-    return conversation?.qualified_id?.id;
+    return conversation?.qualified_id.id;
   }
 }

@@ -276,7 +276,7 @@ test.describe('Delete', () => {
     {
       name: 'location sharing',
       tc: '@TC-582',
-      sendAction: async ({pageB, api}) => {
+      sendAction: async ({api}) => {
         const {instanceId} = await api.testService.createInstance(
           userA.password,
           userA.email,
@@ -284,7 +284,10 @@ test.describe('Delete', () => {
           false,
         );
 
-        const conversationId = await api.conversation.getConversationWithUser(userA.token, userB.id!);
+        const conversationId = await api.conversation.getConversationWithUser(userA.token, userB.id!, {
+          protocol: 'mls',
+        });
+        if (conversationId === undefined) throw new Error("Couldn't find MLS conversation of userB with userA");
         await api.testService.sendLocation(instanceId, conversationId, {
           locationName: 'Test Location',
           latitude: 52.5170365,
