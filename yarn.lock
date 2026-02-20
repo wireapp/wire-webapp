@@ -5245,24 +5245,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@nx/playwright@npm:22.4.1":
-  version: 22.4.1
-  resolution: "@nx/playwright@npm:22.4.1"
-  dependencies:
-    "@nx/devkit": "npm:22.4.1"
-    "@nx/eslint": "npm:22.4.1"
-    "@nx/js": "npm:22.4.1"
-    minimatch: "npm:10.1.1"
-    tslib: "npm:^2.3.0"
-  peerDependencies:
-    "@playwright/test": ^1.36.0
-  peerDependenciesMeta:
-    "@playwright/test":
-      optional: true
-  checksum: 10/4274aea1717953b26c0a16239fe7254421bcabf376ff105ae222904b62303457f5176dac8c7e33d55913d8a62f79a04d01ee232edece3d792bc227ad4098c7c3
-  languageName: node
-  linkType: hard
-
 "@nx/webpack@npm:22.4.1":
   version: 22.4.1
   resolution: "@nx/webpack@npm:22.4.1"
@@ -29040,7 +29022,6 @@ __metadata:
     "@faker-js/faker": "npm:9.9.0"
     "@nx/jest": "npm:22.4.1"
     "@nx/node": "npm:22.4.1"
-    "@nx/playwright": "npm:22.4.1"
     "@nx/workspace": "npm:22.4.5"
     "@tony.ganchev/eslint-plugin-header": "npm:3.2.1"
     "@types/eslint": "npm:9.6.1"
