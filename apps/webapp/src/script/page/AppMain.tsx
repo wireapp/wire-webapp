@@ -17,7 +17,7 @@
  *
  */
 
-import {useEffect, useLayoutEffect} from 'react';
+import {useEffect, useLayoutEffect, useMemo} from 'react';
 
 import {amplify} from 'amplify';
 import cx from 'classnames';
@@ -62,6 +62,7 @@ import {RootProvider} from './RootProvider';
 import {useAppMainState, ViewType} from './state';
 import {ContentState, useAppState} from './useAppState';
 
+import {createWallClock} from '../clock/wallClock';
 import {App} from '../main/app';
 import {initialiseMLSMigrationFlow} from '../mls/MLSMigration';
 import {generateConversationUrl} from '../router/routeGenerator';
@@ -93,6 +94,9 @@ export const AppMain = ({
   callState = container.resolve(CallState),
   locked,
 }: AppMainProps) => {
+  const wallClock = useMemo(() => {
+    return createWallClock();
+  }, []);
   const apiContext = app.getAPIContext();
 
   useActiveWindow(window);
@@ -287,7 +291,7 @@ export const AppMain = ({
       data-uie-value="is-loaded"
     >
       {!locked && <WindowTitleUpdater />}
-      <RootProvider value={mainView}>
+      <RootProvider value={{mainViewModel: mainView, wallClock}}>
         <ErrorBoundary FallbackComponent={ErrorFallback}>
           {Config.getConfig().FEATURE.ENABLE_DEBUG && <ConfigToolbar />}
           {!locked && (
