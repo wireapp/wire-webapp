@@ -23,6 +23,12 @@ type FakeWallClockOptions = {
   readonly initialCurrentTimestampInMilliseconds?: number;
 };
 
+type IntervalRegistration = {
+  readonly delayInMilliseconds: number;
+  readonly execute: () => void;
+  nextExecutionTimestampInMilliseconds: number;
+};
+
 export type FakeWallClock = WallClock & {
   setCurrentTimestampInMilliseconds(nextTimestampInMilliseconds: number): void;
   advanceByMilliseconds(delayInMilliseconds: number): void;
@@ -32,6 +38,25 @@ export function createFakeWallClock(options: FakeWallClockOptions = {}): FakeWal
   const {initialCurrentTimestampInMilliseconds = 0} = options;
 
   let currentTimestampInMilliseconds = initialCurrentTimestampInMilliseconds;
+  let nextIntervalIdentifier = 0;
+  const intervalRegistrations = new Map<number, IntervalRegistration>();
+
+  const runDueIntervalRegistrations = () => {
+    intervalRegistrations.forEach((intervalRegistration, intervalIdentifier) => {
+      while (intervalRegistration.nextExecutionTimestampInMilliseconds <= currentTimestampInMilliseconds) {
+        intervalRegistration.execute();
+
+        const latestIntervalRegistration = intervalRegistrations.get(intervalIdentifier);
+
+        if (latestIntervalRegistration === undefined) {
+          return;
+        }
+
+        latestIntervalRegistration.nextExecutionTimestampInMilliseconds +=
+          latestIntervalRegistration.delayInMilliseconds;
+      }
+    });
+  };
 
   return {
     get currentTimestampInMilliseconds() {
@@ -48,6 +73,26 @@ export function createFakeWallClock(options: FakeWallClockOptions = {}): FakeWal
 
     advanceByMilliseconds(delayInMilliseconds: number) {
       currentTimestampInMilliseconds += delayInMilliseconds;
+      runDueIntervalRegistrations();
+    },
+
+    setInterval(handler, delayInMilliseconds, ...args) {
+      const intervalIdentifier = nextIntervalIdentifier;
+      nextIntervalIdentifier += 1;
+
+      intervalRegistrations.set(intervalIdentifier, {
+        delayInMilliseconds,
+        execute: () => {
+          handler(...args);
+        },
+        nextExecutionTimestampInMilliseconds: currentTimestampInMilliseconds + delayInMilliseconds,
+      });
+
+      return intervalIdentifier as unknown as ReturnType<typeof globalThis.setInterval>;
+    },
+
+    clearInterval(intervalIdentifier) {
+      intervalRegistrations.delete(intervalIdentifier as unknown as number);
     },
   };
 }
