@@ -24,7 +24,7 @@ import {User} from '../data/user';
 import {Role} from '@wireapp/api-client/lib/team';
 
 export class TeamRepositoryE2E extends BackendClientE2E {
-  async inviteUserToTeam(emailOfInvitee: string, teamOwner: User, role: Role): Promise<string> {
+  async inviteUserToTeam(emailOfInvitee: string, teamOwner: User, role: Role = Role.MEMBER): Promise<string> {
     const response = this.axiosInstance.post(
       `teams/${teamOwner.teamId}/invitations`,
       {
