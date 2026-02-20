@@ -17,7 +17,7 @@
  *
  */
 
-import {useEffect, useLayoutEffect, useMemo} from 'react';
+import {useCallback, useEffect, useLayoutEffect, useMemo} from 'react';
 
 import {amplify} from 'amplify';
 import cx from 'classnames';
@@ -59,6 +59,7 @@ import {SidebarTabs, useSidebarStore} from './LeftSidebar/panels/Conversations/u
 import {MainContent} from './MainContent';
 import {PanelEntity, PanelState, RightSidebar} from './RightSidebar';
 import {RootProvider} from './RootProvider';
+import {startApplicationPeriodicChecks} from './startApplicationPeriodicChecks';
 import {useAppMainState, ViewType} from './state';
 import {ContentState, useAppState} from './useAppState';
 
@@ -67,6 +68,7 @@ import {App} from '../main/app';
 import {initialiseMLSMigrationFlow} from '../mls/MLSMigration';
 import {generateConversationUrl} from '../router/routeGenerator';
 import {configureRoutes, navigate} from '../router/Router';
+import {TIME_IN_MILLIS} from '../util/TimeUtil';
 import {MainViewModel} from '../view_model/MainViewModel';
 import {WarningsContainer} from '../view_model/WarningsContainer/WarningsContainer';
 
@@ -97,7 +99,18 @@ export const AppMain = ({
   const wallClock = useMemo(() => {
     return createWallClock();
   }, []);
+  const runApplicationPeriodicCheck: () => void = useCallback(() => {
+    return undefined;
+  }, []);
   const apiContext = app.getAPIContext();
+
+  useEffect(() => {
+    return startApplicationPeriodicChecks({
+      wallClock,
+      periodicChecksIntervalDelayInMilliseconds: TIME_IN_MILLIS.MINUTE * 5,
+      runPeriodicCheck: runApplicationPeriodicCheck,
+    });
+  }, [wallClock, runApplicationPeriodicCheck]);
 
   useActiveWindow(window);
 
