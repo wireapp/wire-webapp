@@ -24,6 +24,7 @@ import {getUser, User} from './data/user';
 import {PageManager} from './pageManager';
 import {connectWithUser, sendConnectionRequest} from './utils/userActions';
 import {mockAudioAndVideoDevices} from './utils/mockVideoDevice.util';
+import {Role} from '@wireapp/api-client/lib/team';
 
 type PagePlugin = (page: Page) => void | Promise<void>;
 
@@ -60,7 +61,7 @@ export type Team = {
   owner: User;
   members: User[];
   /** Add a new member to the team after its initial creation */
-  addMember: (member: User) => Promise<void>;
+  addMember: (member: User, options?: {role?: Role}) => Promise<void>;
 };
 
 export {expect} from '@playwright/test';
@@ -144,8 +145,8 @@ export const test = baseTest.extend<Fixtures>({
 
       teamOwners.push(owner);
 
-      const addMember = async (member: User) => {
-        const invitationId = await api.team.inviteUserToTeam(member.email, owner);
+      const addMember = async (member: User, {role = Role.MEMBER}: {role?: Role} = {}) => {
+        const invitationId = await api.team.inviteUserToTeam(member.email, owner, role);
         const invitationCode = await api.brig.getTeamInvitationCodeForEmail(owner.teamId, invitationId);
         await api.team.acceptTeamInvitation(invitationCode, member);
       };

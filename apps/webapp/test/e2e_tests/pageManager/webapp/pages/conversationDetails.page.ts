@@ -114,7 +114,7 @@ export class ConversationDetailsPage {
   async getLocatorByUser(fullName: string) {
     const userLocator = this.page
       .locator('#conversation-details')
-      .getByTestId('list-members')
+      .getByTestId('list-users')
       .getByTestId('item-user')
       .and(this.page.locator(`[data-uie-value="${fullName}"]`));
     await userLocator.waitFor({state: 'visible'});
