@@ -59,7 +59,7 @@ test.fixme(
     await test.step('Team owner creates a channel with available member', async () => {
       const {pages} = ownerPageManager.webapp;
       await createGroup(pages, channelName, [member]);
-      expect(await pages.conversationList().isConversationItemVisible(channelName)).toBeTruthy();
+      await expect(pages.conversationList().getConversationLocator(channelName)).toBeVisible();
     });
 
     await test.step('Owner starts a call in channel', async () => {

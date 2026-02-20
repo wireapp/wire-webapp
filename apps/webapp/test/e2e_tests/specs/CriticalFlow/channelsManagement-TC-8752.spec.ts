@@ -55,7 +55,7 @@ test.fixme('Channels Management', {tag: ['@TC-8752', '@crit-flow-web']}, async (
   await test.step('Team owner creates a channel with available member', async () => {
     const {pages} = ownerPageManager.webapp;
     await createGroup(pages, conversation1, [member]);
-    expect(await pages.conversationList().isConversationItemVisible(conversation1)).toBeTruthy();
+    await expect(pages.conversationList().getConversationLocator(conversation1)).toBeVisible();
   });
 
   await test.step('Team members leave the conversation', async () => {
@@ -80,7 +80,7 @@ test.fixme('Channels Management', {tag: ['@TC-8752', '@crit-flow-web']}, async (
   await test.step('Team owner creates another channel', async () => {
     const {pages} = ownerPageManager.webapp;
     await createGroup(pages, conversation2, [member]);
-    expect(await pages.conversationList().isConversationItemVisible(conversation2)).toBeTruthy();
+    await expect(pages.conversationList().getConversationLocator(conversation2)).toBeVisible();
   });
 
   await test.step('Team owner makes the member an admin', async () => {

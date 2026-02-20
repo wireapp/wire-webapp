@@ -50,13 +50,13 @@ test.describe('Accessibility', () => {
       await pages.conversationList().archiveConversation();
       await components.conversationSidebar().clickArchive();
 
-      expect(await pages.conversationList().isConversationItemVisible(memberB.fullName)).toBeTruthy();
+      await expect(pages.conversationList().getConversationLocator(memberB.fullName)).toBeVisible();
 
       await pages.conversationList().clickConversationOptions(memberB.fullName);
       await pages.conversationList().unarchiveConversation();
       await components.conversationSidebar().clickAllConversationsButton();
 
-      expect(await pages.conversationList().isConversationItemVisible(memberB.fullName)).toBeTruthy();
+      await expect(pages.conversationList().getConversationLocator(memberB.fullName)).toBeVisible();
     },
   );
 
@@ -87,7 +87,7 @@ test.describe('Accessibility', () => {
       }
       await pages.conversationList().clickConversationOptions(memberB.fullName);
 
-      expect(await pages.conversationList().isConversationItemVisible(memberB.fullName)).toBeTruthy();
+      await expect(pages.conversationList().getConversationLocator(memberB.fullName)).toBeVisible();
 
       await componentsB.conversationSidebar().clickAllConversationsButton();
       await pagesB.conversationList().openConversation(memberA.fullName);
@@ -95,7 +95,7 @@ test.describe('Accessibility', () => {
       await pages.conversationList().archiveConversation();
       await components.conversationSidebar().clickArchive();
 
-      expect(await pages.conversationList().isConversationItemVisible(memberB.fullName)).toBeTruthy();
+      await expect(pages.conversationList().getConversationLocator(memberB.fullName)).toBeVisible();
 
       await pages.conversationList().clickConversationOptions(memberB.fullName);
       await pages.conversationList().unarchiveConversation();
@@ -116,7 +116,7 @@ test.describe('Accessibility', () => {
       await pageManager.waitForTimeout(400);
       await components.conversationSidebar().clickArchive();
 
-      expect(await pages.conversationList().isConversationItemVisible(groupName)).toBeTruthy();
+      await expect(pages.conversationList().getConversationLocator(groupName)).toBeVisible();
 
       await pages.conversationList().clickConversationOptions(groupName);
       await pages.conversationList().unarchiveConversation();
@@ -140,7 +140,7 @@ test.describe('Accessibility', () => {
       await pages.conversationDetails().clickArchiveButton();
       await components.conversationSidebar().clickArchive();
 
-      expect(await pages.conversationList().isConversationItemVisible(memberB.fullName)).toBeTruthy();
+      await expect(pages.conversationList().getConversationLocator(memberB.fullName)).toBeVisible();
 
       await pages.conversationList().clickConversationOptions(memberB.fullName);
       await pages.conversationList().unarchiveConversation();

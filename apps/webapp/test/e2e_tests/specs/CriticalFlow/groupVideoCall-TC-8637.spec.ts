@@ -65,7 +65,7 @@ test.fixme(
     await test.step('Owner and team member are in a group conversation together', async () => {
       const {pages} = ownerPageManager.webapp;
       await createGroup(pages, conversationName, [teamMember]);
-      expect(await pages.conversationList().isConversationItemVisible(conversationName)).toBeTruthy();
+      await expect(pages.conversationList().getConversationLocator(conversationName)).toBeVisible();
     });
 
     await test.step('Owner invites guest user to the group', async () => {
@@ -80,7 +80,7 @@ test.fixme(
 
     await test.step('Guest user joins the group', async () => {
       const {pages} = guestPageManager.webapp;
-      expect(await pages.conversationList().isConversationItemVisible(conversationName)).toBeTruthy();
+      await expect(pages.conversationList().getConversationLocator(conversationName)).toBeVisible();
     });
 
     await test.step('Owner calls the group', async () => {
