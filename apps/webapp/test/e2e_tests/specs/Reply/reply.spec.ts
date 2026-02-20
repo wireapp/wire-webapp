@@ -62,9 +62,11 @@ test.describe('Reply', () => {
     async ({createPage}) => {
       const [userAPages, userBPages] = await Promise.all([
         PageManager.from(createPage(withLogin(userA), withConnectedUser(userB))).then(pm => pm.webapp.pages),
-        PageManager.from(createPage(withLogin(userB), withConnectedUser(userA))).then(pm => pm.webapp.pages),
+        PageManager.from(createPage(withLogin(userB))).then(pm => pm.webapp.pages),
       ]);
 
+      await userAPages.conversationList().openConversation(userB.fullName, {protocol: 'mls'});
+      await userBPages.conversationList().openConversation(userA.fullName, {protocol: 'mls'});
       await userAPages.conversation().sendMessage('Test');
 
       const messageToReplyTo = userBPages.conversation().getMessage({content: 'Test'});
