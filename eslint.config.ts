@@ -15,6 +15,11 @@ import globals from 'globals';
 import type {Linter} from 'eslint';
 
 const year = new Date().getFullYear();
+const runtimeGlobals = {
+  ...globals.es2020,
+  ...globals.browser,
+  ...globals.node,
+};
 
 const compat = new FlatCompat({
   baseDirectory: __dirname,
@@ -94,8 +99,7 @@ const config: Linter.Config[] = [
         tsconfigRootDir: __dirname,
       },
       globals: {
-        ...globals.browser,
-        ...globals.node,
+        ...runtimeGlobals,
         React: 'readonly',
         JSX: 'readonly',
         amplify: 'readonly',
@@ -188,6 +192,7 @@ const config: Linter.Config[] = [
         project: null,
         tsconfigRootDir: __dirname,
       },
+      globals: runtimeGlobals,
     },
     rules: {
       // Disable TS-only rules on JS mocks/shims
