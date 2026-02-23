@@ -45,11 +45,10 @@
       }
     },
     "e2e": {
-      "executor": "@nx/playwright:playwright",
-      "outputs": ["{workspaceRoot}/dist/.playwright/apps/webapp"],
+      "executor": "nx:run-commands",
       "dependsOn": ["^build"],
       "options": {
-        "config": "{projectRoot}/playwright.config.ts"
+        "command": "playwright test --config {projectRoot}/playwright.config.ts"
       }
     },
     "lint": {

@@ -17,7 +17,7 @@
  *
  */
 
-import {defineConfig, devices, ReporterDescription} from '@playwright/test';
+import {defineConfig, devices} from '@playwright/test';
 import {config} from 'dotenv';
 import {resolve} from 'node:path';
 
@@ -60,13 +60,10 @@ module.exports = defineConfig({
     timeout: 10_000, // 10 seconds
   },
   projects: [
-    /* Test against branded browsers. */
     {
-      name: 'Google Chrome',
+      name: 'Chromium',
       use: {
         ...devices['Desktop Chrome'],
-        channel: 'chrome',
-        headless: process.env.HEADLESS !== 'false',
         permissions: ['notifications'],
         launchOptions: {
           args: [
@@ -75,7 +72,7 @@ module.exports = defineConfig({
             '--mute-audio', // Mute all audio output from the test browser because e.g. the ringtone of a call can be annoying during testing
           ],
         },
-      }, // or 'chrome-beta'
+      },
     },
   ],
 });

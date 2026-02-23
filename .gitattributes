@@ -5,6 +5,8 @@
 *.eot binary
 *.jar binary
 *.jpg binary
+*.mp3 binary
+*.mp4 binary
 *.otf binary
 *.png binary
 *.svg binary
