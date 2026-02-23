@@ -24,7 +24,7 @@ import {getAudioFilePath, getTextFilePath, shareAssetHelper} from 'test/e2e_test
 import {getImageFilePath} from 'test/e2e_tests/utils/sendImage.util';
 import {createGroup} from '../../utils/userActions';
 
-test.describe('Reactions', () => {
+test.describe('In Conversation Search', () => {
   let userA: User;
   let userB: User;
 
