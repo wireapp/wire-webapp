@@ -280,7 +280,25 @@ test.describe('Mention', () => {
     },
   );
 
-  test('I want to receive a message containing a mention', {tag: ['@TC-3521', '@regression']}, async () => {});
+  test('I want to receive a message containing a mention', {tag: ['@TC-3521', '@regression']}, async ({createPage}) => {
+    const [userAPages, userBPages] = await Promise.all([
+      PageManager.from(createPage(withLogin(userA), withConnectedUser(userB))).then(pm => pm.webapp.pages),
+      PageManager.from(createPage(withLogin(userB))).then(pm => pm.webapp.pages),
+    ]);
+
+    await userAPages.conversationList().openConversation(userB.fullName, {protocol: 'mls'});
+    await userBPages.conversationList().openConversation(userA.fullName, {protocol: 'mls'});
+
+    // User A sends a message with a mention to User B
+    await userAPages.conversation().sendMessageWithUserMention(userB.fullName, 'Hello');
+
+    // User B verifies the received message and mention
+    const receivedMessage = userBPages.conversation().getMessage({content: 'Hello', sender: userA});
+    await expect(receivedMessage).toBeVisible();
+
+    const mentionInMessage = receivedMessage.getByRole('button', {name: `@${userB.fullName}`});
+    await expect(mentionInMessage).toBeVisible();
+  });
 
   test(
     'I want to see a subtitle in the conversation list when there is one or more unread mentions in the conversation',
