@@ -9136,12 +9136,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@tony.ganchev/eslint-plugin-header@npm:3.2.1":
-  version: 3.2.1
-  resolution: "@tony.ganchev/eslint-plugin-header@npm:3.2.1"
+"@tony.ganchev/eslint-plugin-header@npm:3.2.4":
+  version: 3.2.4
+  resolution: "@tony.ganchev/eslint-plugin-header@npm:3.2.4"
   peerDependencies:
     eslint: ">=7.7.0"
-  checksum: 10/dce363846c24bda0d90c4cc0199cad50d171b5436437416a68862a608e3012e5cf10572138e567645941bb7e70549083ff71291f2119988e13bb4762f51bbb12
+  checksum: 10/f42f3f889ed1282d67134258051611cd8a7fbeef2dec7c22ca3f16610cd5940619b55b968384ed6eb79b939c6a0cbac77ba670dcf3d5982c0efc09ae2dea8276
   languageName: node
   linkType: hard
 
@@ -29103,7 +29103,7 @@ __metadata:
     "@nx/jest": "npm:22.4.1"
     "@nx/node": "npm:22.4.1"
     "@nx/workspace": "npm:22.4.5"
-    "@tony.ganchev/eslint-plugin-header": "npm:3.2.1"
+    "@tony.ganchev/eslint-plugin-header": "npm:3.2.4"
     "@types/eslint": "npm:9.6.1"
     "@types/eslint-plugin-jsx-a11y": "npm:6.10.1"
     "@types/fs-extra": "npm:11.0.4"
