@@ -69,7 +69,50 @@ test.describe('Mention', () => {
   test(
     'I want to be able to edit already sent message with a mention and mention someone else',
     {tag: ['@TC-3489', '@regression']},
-    async () => {},
+    async ({createPage}) => {
+      const [userAPages, userBPages, userCPages] = await Promise.all([
+        PageManager.from(createPage(withLogin(userA))).then(pm => pm.webapp.pages),
+        PageManager.from(createPage(withLogin(userB))).then(pm => pm.webapp.pages),
+        PageManager.from(createPage(withLogin(userC))).then(pm => pm.webapp.pages),
+      ]);
+
+      await test.step('Create group', async () => {
+        await createGroup(userAPages, 'Edit-Mention Group', [userB, userC]);
+        await userAPages.conversationList().openConversation('Edit-Mention Group');
+        await userBPages.conversationList().openConversation('Edit-Mention Group');
+        await userCPages.conversationList().openConversation('Edit-Mention Group');
+      });
+
+      await test.step('User A sends an initial message mentioning userB', async () => {
+        await userAPages.conversation().sendMessageWithUserMention(userB.fullName, 'Hello');
+
+        for (const page of [userAPages, userBPages, userCPages]) {
+          const message = page.conversation().getMessage({content: 'Hello', sender: userA});
+          await expect(message).toBeVisible();
+          await expect(message.getByRole('button', {name: `@${userB.fullName}`})).toBeVisible();
+        }
+      });
+
+      await test.step('User A edits the message, changing the mention to userC', async () => {
+        const initialMessageOnUserA = userAPages.conversation().getMessage({content: 'Hello', sender: userA});
+        await userAPages.conversation().editMessage(initialMessageOnUserA);
+        await expect(userAPages.conversation().messageInput).toContainText(`@${userB.fullName} Hello`);
+
+        await userAPages.conversation().messageInput.fill(''); // Clear previous content
+        await userAPages.conversation().mentionUser(userC.fullName);
+        await userAPages.conversation().messageInput.pressSequentially(' new greeting');
+        await userAPages.conversation().messageInput.press('Enter');
+      });
+
+      await test.step('Verify the edited message on all users', async () => {
+        for (const page of [userAPages, userBPages, userCPages]) {
+          const message = page.conversation().getMessage({content: 'new greeting', sender: userA});
+          await expect(message).toBeVisible();
+          await expect(message.getByRole('button', {name: `@${userC.fullName}`})).toBeVisible();
+          await expect(message.getByRole('button', {name: `@${userB.fullName}`})).not.toBeVisible();
+        }
+      });
+    },
   );
 
   test('I want to be able to write a mention in a 1:1', {tag: ['@TC-3490', '@regression']}, async () => {});
