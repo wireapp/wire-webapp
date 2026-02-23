@@ -1,4 +1,4 @@
-import {test, expect, withLogin} from 'test/e2e_tests/test.fixtures';
+import {test, expect, withLogin, withConnectedUser} from 'test/e2e_tests/test.fixtures';
 import {User} from 'test/e2e_tests/data/user';
 import {PageManager} from 'test/e2e_tests/pageManager';
 import {createGroup} from 'test/e2e_tests/utils/userActions';
@@ -115,7 +115,23 @@ test.describe('Mention', () => {
     },
   );
 
-  test('I want to be able to write a mention in a 1:1', {tag: ['@TC-3490', '@regression']}, async () => {});
+  test('I want to be able to write a mention in a 1:1', {tag: ['@TC-3490', '@regression']}, async ({createPage}) => {
+    const [userAPages, userBPages] = await Promise.all([
+      PageManager.from(createPage(withLogin(userA), withConnectedUser(userB))).then(pm => pm.webapp.pages),
+      PageManager.from(createPage(withLogin(userB))).then(pm => pm.webapp.pages),
+    ]);
+
+    await userAPages.conversationList().openConversation(userB.fullName, {protocol: 'mls'});
+    await userBPages.conversationList().openConversation(userA.fullName, {protocol: 'mls'});
+
+    await userAPages.conversation().sendMessageWithUserMention(userB.fullName, 'Hello');
+
+    for (const page of [userAPages, userBPages]) {
+      const message = page.conversation().getMessage({content: 'Hello', sender: userA});
+      await expect(message).toBeVisible();
+      await expect(message.getByRole('button', {name: `@${userB.fullName}`})).toBeVisible();
+    }
+  });
 
   test('I want to send an ephemeral message with a mention', {tag: ['@TC-3491', '@regression']}, async () => {});
 
