@@ -133,7 +133,36 @@ test.describe('Mention', () => {
     }
   });
 
-  test('I want to send an ephemeral message with a mention', {tag: ['@TC-3491', '@regression']}, async () => {});
+  test(
+    'I want to send an ephemeral message with a mention',
+    {tag: ['@TC-3491', '@regression']},
+    async ({createPage}) => {
+      const [userAPage, userBPage] = await Promise.all([
+        createPage(withLogin(userA), withConnectedUser(userB)),
+        createPage(withLogin(userB)),
+      ]);
+      const userAPages = PageManager.from(userAPage).webapp.pages;
+      const userBPages = PageManager.from(userBPage).webapp.pages;
+
+      await userAPages.conversationList().openConversation(userB.fullName, {protocol: 'mls'});
+      await userBPages.conversationList().openConversation(userA.fullName, {protocol: 'mls'});
+
+      // User A sends a self deleting message with a mention
+      await userAPages.conversation().enableSelfDeletingMessages();
+      await userAPages.conversation().sendMessageWithUserMention(userB.fullName, 'Ephemeral mention');
+
+      // Verify message and mention on user B's side
+      const messageOnUserB = userBPages.conversation().getMessage({content: 'Ephemeral mention', sender: userA});
+      await expect(messageOnUserB).toBeVisible();
+      await expect(messageOnUserB.getByRole('button', {name: `@${userB.fullName}`})).toBeVisible();
+
+      // Wait for the message to be deleted (10 seconds as per default setting)
+      await userBPage.waitForTimeout(10_000);
+
+      // Verify message is no longer visible on user B's side
+      await expect(messageOnUserB).not.toBeVisible();
+    },
+  );
 
   test(
     'I want to mention the same person twice in the same message',
