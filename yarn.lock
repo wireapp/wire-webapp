@@ -11411,7 +11411,7 @@ __metadata:
     webpack-cli: "npm:6.0.1"
     webpack-dev-middleware: "npm:7.4.5"
     webpack-hot-middleware: "npm:2.26.1"
-    webrtc-adapter: "npm:9.0.3"
+    webrtc-adapter: "npm:9.0.4"
     workbox-webpack-plugin: "npm:7.4.0"
     zustand: "npm:4.5.7"
   languageName: unknown
@@ -29133,12 +29133,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"webrtc-adapter@npm:9.0.3":
-  version: 9.0.3
-  resolution: "webrtc-adapter@npm:9.0.3"
+"webrtc-adapter@npm:9.0.4":
+  version: 9.0.4
+  resolution: "webrtc-adapter@npm:9.0.4"
   dependencies:
     sdp: "npm:^3.2.0"
-  checksum: 10/5544cb38093a20b485d1d24eb23483f9ad3cdab0b0edd277cc44a90e871269dd78d124d9c45e91381e16361f79744648575fce762b258bc02c12c3c28ef5e138
+  checksum: 10/567f59147666fb0e50cb9433a950c3dbb98ad49982df84d0d3926d9e42ce03d890c890fb779bb2035284d545fb5296e6329e2ee7d4aee72c02436f7aa2dc44af
   languageName: node
   linkType: hard
 
