@@ -158,13 +158,14 @@ export class ConversationPage {
     await this.messageInput.pressSequentially(message, {delay: 100});
   }
 
-  async mentionUser(userFullName: string) {
-    await this.messageInput.pressSequentially(`@${userFullName.slice(0, 3)}`);
+  async mentionUser(userFullName: string, searchQuery?: string) {
+    const textToType = searchQuery ? `@${searchQuery}` : `@${userFullName.slice(0, 3)}`;
+    await this.messageInput.pressSequentially(textToType);
     await this.page
       .getByTestId('item-mention-suggestion')
       .getByTestId('status-name')
       .filter({hasText: userFullName})
-      .click();
+      .click({timeout: 5000});
   }
 
   async replyToMessage(message: Locator) {

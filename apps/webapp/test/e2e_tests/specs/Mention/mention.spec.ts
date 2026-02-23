@@ -196,7 +196,22 @@ test.describe('Mention', () => {
   test(
     'I want mention to be shown as a full name even if I searched by username',
     {tag: ['@TC-3493', '@regression']},
-    async () => {},
+    async ({createPage}) => {
+      const userAPages = PageManager.from(await createPage(withLogin(userA), withConnectedUser(userB))).webapp.pages;
+      await userAPages.conversationList().openConversation(userB.fullName);
+
+      const conversationPageA = userAPages.conversation();
+      await conversationPageA.messageInput.fill(''); // Clear input
+      await conversationPageA.mentionUser(userB.fullName, userB.username); // Search by username, but expect full name
+      await conversationPageA.messageInput.pressSequentially(' tested it');
+      await conversationPageA.messageInput.press('Enter');
+
+      // Verify on user A's side that the mention is the full name
+      const messageOnUserA = conversationPageA.getMessage({content: 'tested it'});
+      await expect(messageOnUserA).toBeVisible();
+      await expect(messageOnUserA.getByRole('button', {name: `@${userB.fullName}`})).toBeVisible();
+      await expect(messageOnUserA.getByRole('button', {name: `@${userB.username}`})).not.toBeVisible(); // Assert it's not the username
+    },
   );
 
   test(
