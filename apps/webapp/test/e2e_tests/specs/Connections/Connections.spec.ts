@@ -70,7 +70,7 @@ test.describe('Connections', () => {
         await pages.conversationList().archiveConversation();
         await components.conversationSidebar().clickArchive();
 
-        expect(await pages.conversationList().isConversationItemVisible(memberB.fullName)).toBeTruthy();
+        await expect(pages.conversationList().getConversationLocator(memberB.fullName)).toBeVisible();
       });
     },
   );

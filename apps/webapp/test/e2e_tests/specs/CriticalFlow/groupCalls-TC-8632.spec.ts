@@ -58,7 +58,7 @@ test.fixme(
     await test.step('Owner creates group and adds the member', async () => {
       const {pages} = ownerPageManager.webapp;
       await createGroup(pages, conversationName, [member]);
-      expect(await pages.conversationList().isConversationItemVisible(conversationName)).toBeTruthy();
+      await expect(pages.conversationList().getConversationLocator(conversationName)).toBeVisible();
     });
 
     await test.step('Owner starts call', async () => {

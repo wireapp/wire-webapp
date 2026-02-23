@@ -57,7 +57,7 @@ test(
     await test.step('Team owner creates group conversation with team members', async () => {
       const {pages} = ownerPageManager.webapp;
       await createGroup(pages, conversationName, [member1, member2]);
-      expect(await pages.conversationList().isConversationItemVisible(conversationName)).toBeTruthy();
+      await expect(pages.conversationList().getConversationLocator(conversationName)).toBeVisible();
     });
 
     await test.step('Team owner adds a service to newly created group', async () => {

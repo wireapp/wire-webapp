@@ -62,12 +62,6 @@ export class ConversationListPage {
     this.clearContentButton = page.getByRole('button', {name: 'Clear content'});
   }
 
-  async isConversationItemVisible(conversationName: string) {
-    const conversation = this.getConversationLocator(conversationName);
-    await conversation.waitFor({state: 'visible'});
-    return await conversation.isVisible();
-  }
-
   async isConversationBlocked(conversationName: string) {
     return await this.getConversationLocator(conversationName).getByTestId('status-blocked').isVisible();
   }

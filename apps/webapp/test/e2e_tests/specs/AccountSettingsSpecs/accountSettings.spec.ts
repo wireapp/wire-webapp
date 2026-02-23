@@ -239,7 +239,7 @@ test.describe('account settings', () => {
 
       await createGroup(pages, groupName, [memberB]);
       // check that the chat is open
-      expect(await pages.conversationList().isConversationItemVisible(groupName)).toBeTruthy();
+      await expect(pages.conversationList().getConversationLocator(groupName)).toBeVisible();
       await pages.conversation().sendMessage('test');
       const message = pages.conversation().getMessage({content: 'test', sender: memberA});
 

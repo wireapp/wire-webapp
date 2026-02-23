@@ -50,7 +50,7 @@ test('Conversation Management', {tag: ['@TC-8636', '@crit-flow-web']}, async ({c
   await test.step('Team owner creates a group with all the five members', async () => {
     const {pages} = ownerPageManager.webapp;
     await createGroup(pages, conversationName, members);
-    expect(await pages.conversationList().isConversationItemVisible(conversationName)).toBeTruthy();
+    await expect(pages.conversationList().getConversationLocator(conversationName)).toBeVisible();
   });
 
   await test.step('Team owner sends a message in the conversation', async () => {
@@ -98,7 +98,7 @@ test('Conversation Management', {tag: ['@TC-8636', '@crit-flow-web']}, async ({c
     const {pages} = ownerPageManager.webapp;
     await pages.conversationList().searchConversation(conversationName);
     await pages.conversationList().openConversation(conversationName);
-    expect(await pages.conversationList().isConversationItemVisible(conversationName)).toBeTruthy();
+    await expect(pages.conversationList().getConversationLocator(conversationName)).toBeVisible();
     await pages.conversationList().openConversation(conversationName);
   });
 
