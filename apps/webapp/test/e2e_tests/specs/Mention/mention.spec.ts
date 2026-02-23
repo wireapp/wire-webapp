@@ -33,7 +33,38 @@ test.describe('Mention', () => {
     await expect(mentionOnUserB).toBeVisible();
   });
 
-  test('I want to mention multiple people in the same message', {tag: ['@TC-3488', '@regression']}, async () => {});
+  test(
+    'I want to mention multiple people in the same message',
+    {tag: ['@TC-3488', '@regression']},
+    async ({createPage}) => {
+      const [userAPages, userBPages, userCPages] = await Promise.all([
+        PageManager.from(createPage(withLogin(userA))).then(pm => pm.webapp.pages),
+        PageManager.from(createPage(withLogin(userB))).then(pm => pm.webapp.pages),
+        PageManager.from(createPage(withLogin(userC))).then(pm => pm.webapp.pages),
+      ]);
+
+      await createGroup(userAPages, 'Multi-Mention Group', [userB, userC]);
+      await userBPages.conversationList().openConversation('Multi-Mention Group');
+      await userCPages.conversationList().openConversation('Multi-Mention Group');
+
+      // User A sends a message with multiple mentions
+      await userAPages.conversationList().openConversation('Multi-Mention Group');
+      const conversationPageA = userAPages.conversation();
+
+      await conversationPageA.messageInput.fill('Hello ');
+      await conversationPageA.mentionUser(userB.fullName);
+      await conversationPageA.messageInput.pressSequentially(' and ');
+      await conversationPageA.mentionUser(userC.fullName);
+      await conversationPageA.messageInput.press('Enter');
+
+      for (const page of [userAPages, userBPages, userCPages]) {
+        const message = page.conversation().getMessage({content: 'Hello', sender: userA});
+        await expect(message).toBeVisible();
+        await expect(message.getByRole('button', {name: `@${userB.fullName}`})).toBeVisible();
+        await expect(message.getByRole('button', {name: `@${userC.fullName}`})).toBeVisible();
+      }
+    },
+  );
 
   test(
     'I want to be able to edit already sent message with a mention and mention someone else',

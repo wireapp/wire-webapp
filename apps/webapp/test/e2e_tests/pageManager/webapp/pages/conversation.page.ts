@@ -158,6 +158,15 @@ export class ConversationPage {
     await this.messageInput.pressSequentially(message, {delay: 100});
   }
 
+  async mentionUser(userFullName: string) {
+    await this.messageInput.pressSequentially(`@${userFullName.slice(0, 3)}`);
+    await this.page
+      .getByTestId('item-mention-suggestion')
+      .getByTestId('status-name')
+      .filter({hasText: userFullName})
+      .click();
+  }
+
   async replyToMessage(message: Locator) {
     await message.hover();
     await message.getByRole('group').getByTestId('do-reply-message').click();
@@ -174,12 +183,8 @@ export class ConversationPage {
   }
 
   async sendMessageWithUserMention(userFullName: string, messageText?: string) {
-    await this.messageInput.fill(`@`);
-    await this.page
-      .getByTestId('item-mention-suggestion')
-      .getByTestId('status-name')
-      .filter({hasText: userFullName})
-      .click({timeout: 1000});
+    await this.messageInput.fill(''); // Clear the input initially
+    await this.mentionUser(userFullName);
 
     if (messageText) {
       await this.messageInput.pressSequentially(messageText);
