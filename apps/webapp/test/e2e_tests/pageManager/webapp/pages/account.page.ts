@@ -133,11 +133,7 @@ export class AccountPage {
   }
 
   statusOption(status: 'Away' | 'Busy' | 'Available' | 'None') {
-    return this.page.getByRole('button', {name: `Change your status to ${status}`});
-  }
-
-  selectedStatus(status: 'Away' | 'Busy' | 'Available' | 'None') {
-    return this.page.getByRole('button', {name: `Selected, ${status}`});
+    return this.page.getByRole('button', {name: new RegExp(`${status}`, 'i')});
   }
 
   async selectStatus(status: 'Away' | 'Busy' | 'Available' | 'None') {

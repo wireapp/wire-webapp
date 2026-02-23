@@ -22,6 +22,7 @@ import {Page, Locator} from '@playwright/test';
 export class ConversationSidebar {
   readonly pageLoadingTimeout = 60_000;
   readonly page: Page;
+  readonly navigation: Locator;
   readonly personalStatusLabel: Locator;
   readonly personalStatusIcon: Locator;
   readonly personalStatusName: Locator;
@@ -36,8 +37,9 @@ export class ConversationSidebar {
   constructor(page: Page) {
     this.page = page;
 
+    this.navigation = page.getByRole('navigation');
     this.personalStatusLabel = page.getByTestId('status-availability');
-    this.personalStatusIcon = page.getByTestId('status-availability-icon');
+    this.personalStatusIcon = this.navigation.getByTestId('status-availability-icon');
     this.personalStatusName = page.getByTestId('status-name');
     this.personalUserName = page.getByTestId('user-handle');
     this.preferencesButton = page.getByTestId('go-preferences');
@@ -69,7 +71,7 @@ export class ConversationSidebar {
   }
 
   async openStatusMenu(userFullName: string) {
-    await this.page.getByRole('button', {name: userFullName}).click();
+    await this.navigation.getByRole('button', {name: userFullName}).click();
   }
 
   async setStatus(status: 'None' | 'Available' | 'Busy' | 'Away') {

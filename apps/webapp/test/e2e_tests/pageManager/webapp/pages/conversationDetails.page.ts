@@ -111,6 +111,11 @@ export class ConversationDetailsPage {
     await userLocator.click();
   }
 
+  async statusParticipant(fullName: string) {
+    const userLocator = await this.getLocatorByUser(fullName);
+    return userLocator.getByTestId('status-availability-icon');
+  }
+
   async getLocatorByUser(fullName: string) {
     const userLocator = this.page
       .locator('#conversation-details')
