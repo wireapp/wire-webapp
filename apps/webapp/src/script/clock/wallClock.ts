@@ -40,8 +40,6 @@ export function createWallClock(): WallClock {
 
     setInterval: globalThis.setInterval.bind(globalThis),
 
-    clearInterval: intervalIdentifier => {
-      return globalThis.clearInterval(intervalIdentifier);
-    },
+    clearInterval: globalThis.clearInterval.bind(globalThis),
   };
 }
