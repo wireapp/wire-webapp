@@ -38,8 +38,12 @@ export function createWallClock(): WallClock {
       return new Date(Date.now());
     },
 
-    setInterval: globalThis.setInterval,
+    setInterval: (handler, delayInMilliseconds, ...args) => {
+      return globalThis.setInterval(handler, delayInMilliseconds, ...args);
+    },
 
-    clearInterval: globalThis.clearInterval,
+    clearInterval: intervalIdentifier => {
+      return globalThis.clearInterval(intervalIdentifier);
+    },
   };
 }
