@@ -29,7 +29,7 @@ const channelName = 'Test Channel';
 test.fixme(
   'Calls in channels with device switch and screenshare',
   {tag: ['@TC-8755', '@crit-flow-web']},
-  async ({createTeam, createPage, api}) => {
+  async ({createUser, createTeam, createPage, api}) => {
     test.setTimeout(150_000);
 
     let owner: User;
@@ -38,9 +38,9 @@ test.fixme(
     let callingServiceInstanceId: string;
 
     await test.step('Preconditions: Team owner creates a channels enabled team', async () => {
-      const team = await createTeam('Channels Call', {withMembers: 1});
+      member = await createUser();
+      const team = await createTeam('Channels Call', {users: [member]});
       owner = team.owner;
-      member = team.members[0];
 
       await api.brig.enableMLSFeature(owner.teamId);
       await api.brig.unlockChannelFeature(owner.teamId);

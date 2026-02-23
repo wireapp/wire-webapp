@@ -26,7 +26,7 @@ import {test, expect, withLogin} from '../../test.fixtures';
 // Generating test data
 const conversationName = 'Test Conversation';
 
-test('Conversation Management', {tag: ['@TC-8636', '@crit-flow-web']}, async ({createTeam, createPage}) => {
+test('Conversation Management', {tag: ['@TC-8636', '@crit-flow-web']}, async ({createUser, createTeam, createPage}) => {
   test.setTimeout(150_000);
 
   let owner: User;
@@ -35,9 +35,9 @@ test('Conversation Management', {tag: ['@TC-8636', '@crit-flow-web']}, async ({c
   let memberPageManagers: PageManager[];
 
   await test.step('Preconditions: Team owner created a team with 5 members', async () => {
-    const team = await createTeam('Conversation Management', {withMembers: 5});
+    members = await Promise.all(Array.from({length: 5}, createUser));
+    const team = await createTeam('Conversation Management', {users: members});
     owner = team.owner;
-    members = team.members;
 
     const [pmOwner, ...pmMembers] = await Promise.all([
       PageManager.from(createPage(withLogin(owner))),

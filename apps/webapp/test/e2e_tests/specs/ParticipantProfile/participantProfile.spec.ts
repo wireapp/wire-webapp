@@ -22,7 +22,6 @@ import {PageManager} from 'test/e2e_tests/pageManager';
 import {createGroup} from 'test/e2e_tests/utils/userActions';
 
 import {test, expect, withConnectedUser, withLogin, withConnectionRequest, Team} from 'test/e2e_tests/test.fixtures';
-import {Role} from '@wireapp/api-client/lib/team';
 
 async function openParticipantDetailsFromGroup(
   pages: PageManager['webapp']['pages'],
@@ -45,10 +44,10 @@ test.describe('Participant Profile', () => {
   let userB: User;
   let groupName: string;
 
-  test.beforeEach(async ({createTeam}) => {
-    team = await createTeam('Test Team', {withMembers: 1});
+  test.beforeEach(async ({createTeam, createUser}) => {
+    userB = await createUser();
+    team = await createTeam('Test Team', {users: [userB]});
     userA = team.owner;
-    userB = team.members[0];
     groupName = 'Test Group';
   });
 
@@ -183,7 +182,7 @@ test.describe('Participant Profile', () => {
       await openParticipantDetailsFromGroup(userBPages, groupName, userA.fullName);
 
       await expect(userBPages.participantDetails().userPicture).toBeVisible();
-      await expect(userBPages.participantDetails().userName).toBeVisible;
+      await expect(userBPages.participantDetails().userName).toBeVisible();
       await expect(userBPages.participantDetails().userName).toContainText(userA.fullName);
     },
   );
@@ -193,7 +192,7 @@ test.describe('Participant Profile', () => {
     {tag: ['@TC-1484', '@regression']},
     async ({createPage, createUser}) => {
       const externalUser = await createUser();
-      await team.addMember(externalUser, {role: Role.EXTERNAL});
+      await team.addTeamMember(externalUser, {role: 'EXTERNAL'});
 
       const [adminPage, userBPages] = await Promise.all([
         PageManager.from(createPage(withLogin(userA), withConnectedUser(externalUser))).then(pm => pm.webapp.pages),
@@ -263,7 +262,7 @@ test.describe('Participant Profile', () => {
     {tag: ['@TC-1488', '@regression']},
     async ({createPage, createUser}) => {
       const userC = await createUser();
-      await team.addMember(userC);
+      await team.addTeamMember(userC);
       const [adminPage, userBPages] = await Promise.all([
         PageManager.from(createPage(withLogin(userA), withConnectedUser(userB))).then(pm => pm.webapp.pages),
         PageManager.from(createPage(withLogin(userB), withConnectedUser(userA))).then(pm => pm.webapp.pages),

@@ -29,7 +29,7 @@ import {createGroup} from 'test/e2e_tests/utils/userActions';
 test.fixme(
   'Planning group call with sending various messages during call',
   {tag: ['@TC-8632', '@crit-flow-web']},
-  async ({createTeam, createPage, api}) => {
+  async ({createUser, createTeam, createPage, api}) => {
     test.setTimeout(150_000);
 
     let owner: User;
@@ -40,9 +40,9 @@ test.fixme(
     const conversationName = 'Calling';
 
     await test.step('Preconditions: Creating preconditions for the test via API', async () => {
-      const team = await createTeam('Calling', {withMembers: 1});
+      member = await createUser();
+      const team = await createTeam('Calling', {users: [member]});
       owner = team.owner;
-      member = team.members[0];
 
       await api.enableConferenceCallingFeature(owner.teamId!);
       await api.waitForFeatureToBeEnabled(FEATURE_KEY.CONFERENCE_CALLING, owner.teamId!, owner.token);
