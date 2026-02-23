@@ -217,7 +217,34 @@ test.describe('Mention', () => {
   test(
     'I want to see the mentions in my profile color in the input field',
     {tag: ['@TC-3494', '@regression']},
-    async () => {},
+    async ({createPage}) => {
+      const [userAPages, userBPages] = await Promise.all([
+        createPage(withLogin(userA), withConnectedUser(userB)).then(page => PageManager.from(page).webapp.pages),
+        createPage(withLogin(userB)).then(page => PageManager.from(page).webapp.pages),
+      ]);
+      await userAPages.conversationList().openConversation(userB.fullName, {protocol: 'mls'});
+      await userBPages.conversationList().openConversation(userA.fullName, {protocol: 'mls'});
+
+      const conversationPageA = userAPages.conversation();
+
+      await conversationPageA.messageInput.fill(''); // Clear input
+      await conversationPageA.mentionUser(userB.fullName);
+
+      // Assert the color of the mention in the input field for user A
+      const mentionInInputField = conversationPageA.messageInput.getByTestId('item-input-mention');
+      await expect(mentionInInputField).toContainText(`@${userB.fullName}`);
+      await expect(mentionInInputField).toHaveCSS('color', 'rgb(6, 103, 200)');
+
+      await conversationPageA.messageInput.press('Enter');
+
+      // Assert the background color of the mention in the received message for user B
+      const messageOnUserB = userBPages.conversation().getMessage({sender: userA});
+      await expect(messageOnUserB).toBeVisible();
+      await expect(messageOnUserB.getByRole('button', {name: `@${userB.fullName}`})).toHaveCSS(
+        'background-color',
+        'rgb(155, 194, 233)',
+      );
+    },
   );
 
   test(
