@@ -167,7 +167,30 @@ test.describe('Mention', () => {
   test(
     'I want to mention the same person twice in the same message',
     {tag: ['@TC-3492', '@regression']},
-    async () => {},
+    async ({createPage}) => {
+      const [userAPages, userBPages] = await Promise.all([
+        PageManager.from(createPage(withLogin(userA), withConnectedUser(userB))).then(pm => pm.webapp.pages),
+        PageManager.from(createPage(withLogin(userB))).then(pm => pm.webapp.pages),
+      ]);
+
+      await userAPages.conversationList().openConversation(userB.fullName, {protocol: 'mls'});
+      await userBPages.conversationList().openConversation(userA.fullName, {protocol: 'mls'});
+
+      // User A sends a message with the same person mentioned twice
+      const conversationPageA = userAPages.conversation();
+      await conversationPageA.messageInput.fill('Hi ');
+      await conversationPageA.mentionUser(userB.fullName);
+      await conversationPageA.messageInput.pressSequentially(' check this out ');
+      await conversationPageA.mentionUser(userB.fullName);
+      await conversationPageA.messageInput.press('Enter');
+
+      for (const page of [userAPages, userBPages]) {
+        const message = page.conversation().getMessage({content: 'check this out', sender: userA});
+        await expect(message).toBeVisible();
+        const mentions = message.getByRole('button', {name: `@${userB.fullName}`});
+        await expect(mentions).toHaveCount(2);
+      }
+    },
   );
 
   test(
