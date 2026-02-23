@@ -303,7 +303,28 @@ test.describe('Mention', () => {
   test(
     'I want to see a subtitle in the conversation list when there is one or more unread mentions in the conversation',
     {tag: ['@TC-3528', '@regression']},
-    async () => {},
+    async ({createPage}) => {
+      const [userAPages, userBPages] = await Promise.all([
+        PageManager.from(createPage(withLogin(userA), withConnectedUser(userB))).then(pm => pm.webapp.pages),
+        PageManager.from(createPage(withLogin(userB))).then(pm => pm.webapp.pages),
+      ]);
+
+      // Create and open a group conversation for userB to ensure the message from A won't be read immediately
+      await createGroup(userBPages, 'Distraction Group', [userC]);
+      await userBPages.conversationList().openConversation('Distraction Group');
+
+      // User A opens conversation with user B and sends a message with mention
+      await userAPages.conversationList().openConversation(userB.fullName, {protocol: 'mls'});
+      await userAPages.conversation().sendMessageWithUserMention(userB.fullName, 'Hey, you have an unread mention!');
+
+      // User B is in the 'Distraction Group', so the conversation with user A is unread.
+      // Now check for the mention indicator in the conversation list.
+      const mentionIndicator = userBPages
+        .conversationList()
+        .getConversationLocator(userA.fullName)
+        .getByTestId('status-mention');
+      await expect(mentionIndicator).toBeVisible();
+    },
   );
 
   test(
