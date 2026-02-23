@@ -38,9 +38,7 @@ export function createWallClock(): WallClock {
       return new Date(Date.now());
     },
 
-    setInterval: (handler, delayInMilliseconds, ...args) => {
-      return globalThis.setInterval(handler, delayInMilliseconds, ...args);
-    },
+    setInterval: globalThis.setInterval.bind(globalThis),
 
     clearInterval: intervalIdentifier => {
       return globalThis.clearInterval(intervalIdentifier);
