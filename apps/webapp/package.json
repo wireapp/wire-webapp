@@ -26,7 +26,7 @@
     "@emotion/react": "11.14.0",
     "@formkit/auto-animate": "0.9.0",
     "@lexical/code": "0.27.2",
-    "@lexical/history": "0.27.2",
+    "@lexical/history": "0.40.0",
     "@lexical/list": "0.27.2",
     "@lexical/markdown": "0.27.2",
     "@lexical/react": "0.27.2",
