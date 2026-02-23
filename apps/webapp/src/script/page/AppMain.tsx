@@ -59,7 +59,7 @@ import {SidebarTabs, useSidebarStore} from './LeftSidebar/panels/Conversations/u
 import {MainContent} from './MainContent';
 import {PanelEntity, PanelState, RightSidebar} from './RightSidebar';
 import {RootProvider} from './RootProvider';
-import {startApplicationPeriodicChecks} from './startApplicationPeriodicChecks';
+import {startApplicationPeriodicChecks} from '../application-periodic-checks/startApplicationPeriodicChecks';
 import {useAppMainState, ViewType} from './state';
 import {ContentState, useAppState} from './useAppState';
 
