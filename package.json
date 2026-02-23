@@ -45,7 +45,7 @@
     "eslint-plugin-jest-dom": "5.5.0",
     "eslint-plugin-jsdoc": "61.7.1",
     "eslint-plugin-jsx-a11y": "6.10.2",
-    "eslint-plugin-no-unsanitized": "4.1.4",
+    "eslint-plugin-no-unsanitized": "4.1.5",
     "eslint-plugin-prettier": "5.5.5",
     "eslint-plugin-react": "7.37.5",
     "eslint-plugin-react-hooks": "7.0.1",
