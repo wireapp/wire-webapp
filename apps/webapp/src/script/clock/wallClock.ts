@@ -38,8 +38,8 @@ export function createWallClock(): WallClock {
       return new Date(Date.now());
     },
 
-    setInterval: globalThis.setInterval,
+    setInterval: globalThis.setInterval.bind(globalThis),
 
-    clearInterval: globalThis.clearInterval,
+    clearInterval: globalThis.clearInterval.bind(globalThis),
   };
 }
