@@ -201,7 +201,22 @@ test.describe('Reactions', () => {
   test.skip(
     'Verify I can search for text mixed with a link preview',
     {tag: ['@TC-388', '@regression']},
-    async () => {},
+    async ({createPage}) => {
+      const [userAPages, userBPages] = await Promise.all([
+        PageManager.from(createPage(withLogin(userA), withConnectedUser(userB))).then(pm => pm.webapp.pages),
+        PageManager.from(createPage(withLogin(userB), withConnectedUser(userA))).then(pm => pm.webapp.pages),
+      ]);
+
+      await userBPages.conversationList().openConversation(userA.fullName, {protocol: 'mls'});
+      await userBPages.conversation().sendMessage('User B message');
+
+      await userAPages.conversationList().openConversation(userB.fullName, {protocol: 'mls'});
+      await userAPages.conversation().sendMessage('Here is a link: [LinkPreview]https://www.kaufland.de');
+
+      await userAPages.conversation().searchButton.click();
+      await userAPages.collection().fullSearchBar.fill('link: LinkPreview');
+      await expect(userAPages.collection().getMarkedSearchResult('link: linkPreview')).toBeVisible();
+    },
   );
 
   test('Verify I can search for links without preview', {tag: ['@TC-391', '@regression']}, async ({createPage}) => {
