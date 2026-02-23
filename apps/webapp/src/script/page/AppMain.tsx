@@ -21,6 +21,7 @@ import {useCallback, useEffect, useLayoutEffect, useMemo} from 'react';
 
 import {amplify} from 'amplify';
 import cx from 'classnames';
+import ky from 'ky';
 import {ErrorBoundary} from 'react-error-boundary';
 import {container} from 'tsyringe';
 
@@ -59,10 +60,11 @@ import {SidebarTabs, useSidebarStore} from './LeftSidebar/panels/Conversations/u
 import {MainContent} from './MainContent';
 import {PanelEntity, PanelState, RightSidebar} from './RightSidebar';
 import {RootProvider} from './RootProvider';
-import {startApplicationPeriodicChecks} from '../application-periodic-checks/startApplicationPeriodicChecks';
 import {useAppMainState, ViewType} from './state';
 import {ContentState, useAppState} from './useAppState';
 
+import {runClientVersionCheck} from '../application-periodic-checks/runClientVersionCheck';
+import {startApplicationPeriodicChecks} from '../application-periodic-checks/startApplicationPeriodicChecks';
 import {createWallClock} from '../clock/wallClock';
 import {App} from '../main/app';
 import {initialiseMLSMigrationFlow} from '../mls/MLSMigration';
@@ -100,7 +102,7 @@ export const AppMain = ({
     return createWallClock();
   }, []);
   const runApplicationPeriodicCheck: () => void = useCallback(() => {
-    return undefined;
+    runClientVersionCheck({ky});
   }, []);
   const apiContext = app.getAPIContext();
 
