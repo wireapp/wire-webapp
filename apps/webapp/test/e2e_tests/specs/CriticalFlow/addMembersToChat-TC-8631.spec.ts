@@ -30,7 +30,7 @@ const conversationName = 'Crits';
 test(
   'Team owner adds whole team to an all team chat',
   {tag: ['@TC-8631', '@crit-flow-web']},
-  async ({createTeam, createPage, api}) => {
+  async ({createUser, createTeam, createPage, api}) => {
     let owner: User;
     let member1: User;
     let member2: User;
@@ -39,10 +39,10 @@ test(
     let member2PageManager: PageManager;
 
     await test.step('Preconditions: Creating preconditions for the test via API', async () => {
-      const team = await createTeam('Critical', {withMembers: 2});
+      member1 = await createUser();
+      member2 = await createUser();
+      const team = await createTeam('Critical', {users: [member1, member2]});
       owner = team.owner;
-      member1 = team.members[0];
-      member2 = team.members[1];
 
       const [pmOwner, pm1, pm2] = await Promise.all([
         PageManager.from(createPage(withLogin(owner))),

@@ -30,11 +30,11 @@ test.describe('Clear Conversation Content', () => {
   let userB: User;
   let userC: User;
 
-  test.beforeEach(async ({createTeam}) => {
-    const team = await createTeam('Test Team', {withMembers: 2});
+  test.beforeEach(async ({createTeam, createUser}) => {
+    userB = await createUser();
+    userC = await createUser();
+    const team = await createTeam('Test Team', {users: [userB, userC]});
     userA = team.owner;
-    userB = team.members[0];
-    userC = team.members[1];
   });
 
   [

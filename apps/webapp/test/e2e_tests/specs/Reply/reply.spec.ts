@@ -28,10 +28,10 @@ test.describe('Reply', () => {
   let userA: User;
   let userB: User;
 
-  test.beforeEach(async ({createTeam}) => {
-    const team = await createTeam('Test Team', {withMembers: 1});
+  test.beforeEach(async ({createTeam, createUser}) => {
+    userB = await createUser();
+    const team = await createTeam('Test Team', {users: [userB]});
     userA = team.owner;
-    userB = team.members[0];
   });
 
   test('I should not be able to reply to a ping', {tag: ['@TC-8038', '@regression']}, async ({createPage}) => {

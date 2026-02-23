@@ -36,16 +36,16 @@ const videoFilePath = getVideoFilePath();
 const audioFilePath = getAudioFilePath();
 const textFilePath = getTextFilePath();
 
-test('Messages in Groups', {tag: ['@TC-8751', '@crit-flow-web']}, async ({createTeam, createPage}) => {
+test('Messages in Groups', {tag: ['@TC-8751', '@crit-flow-web']}, async ({createUser, createTeam, createPage}) => {
   let userA: User;
   let userB: User;
   let userAPageManager: PageManager;
   let userBPageManager: PageManager;
 
   await test.step('Preconditions: Creating preconditions for the test via API', async () => {
-    const team = await createTeam('Critical Team', {withMembers: 1});
+    userB = await createUser();
+    const team = await createTeam('Critical Team', {users: [userB]});
     userA = team.owner;
-    userB = team.members[0];
 
     const [pmA, pmB] = await Promise.all([
       PageManager.from(createPage(withLogin(userA))),

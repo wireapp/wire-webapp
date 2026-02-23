@@ -28,11 +28,11 @@ test.describe('Calling', () => {
   let userB: User;
   let userC: User;
 
-  test.beforeEach(async ({createTeam}) => {
-    const team = await createTeam('Team Call Team', {withMembers: 2});
+  test.beforeEach(async ({createTeam, createUser}) => {
+    userB = await createUser();
+    userC = await createUser();
+    const team = await createTeam('Team Call Team', {users: [userB, userC]});
     userA = team.owner;
-    userB = team.members[0];
-    userC = team.members[1];
   });
 
   test(

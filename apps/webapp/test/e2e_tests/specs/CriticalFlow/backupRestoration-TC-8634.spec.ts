@@ -31,10 +31,10 @@ let passwordProtectedBackupName: string;
 
 let userA: User;
 let userB: User;
-test.beforeEach(async ({createTeam}) => {
-  const team = await createTeam('Test Team', {withMembers: 1});
+test.beforeEach(async ({createTeam, createUser}) => {
+  userB = await createUser();
+  const team = await createTeam('Test Team', {users: [userB]});
   userA = team.owner;
-  userB = team.members[0];
 });
 
 test('Setting up new device with a backup', {tag: ['@TC-8634', '@crit-flow-web']}, async ({createPage}, testInfo) => {

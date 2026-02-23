@@ -40,9 +40,9 @@ test.fixme(
     let callingServiceInstanceId: string;
 
     await test.step('Preconditions: Creating preconditions for the test via API', async () => {
-      const team = await createTeam('Critical', {withMembers: 1});
+      teamMember = await createUser();
+      const team = await createTeam('Critical', {users: [teamMember]});
       teamOwner = team.owner;
-      teamMember = team.members[0];
 
       await api.enableConferenceCallingFeature(teamOwner.teamId!);
 

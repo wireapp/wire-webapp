@@ -40,11 +40,11 @@ test('Messages in 1:1', {tag: ['@TC-8750', '@crit-flow-web']}, async ({createTea
   // Step 1: Preconditions
   await test.step('Preconditions: Creating preconditions for the test via API', async () => {
     // Precondition: Users A and B exist in two separate teams
-    const teamA = await createTeam('Critical A', {withMembers: 1});
-    memberA = teamA.members[0];
+    const teamA = await createTeam('Critical A');
+    memberA = teamA.owner;
 
-    const teamB = await createTeam('Critical B', {withMembers: 1});
-    memberB = teamB.members[0];
+    const teamB = await createTeam('Critical B');
+    memberB = teamB.owner;
 
     // Create page managers - User A sends connection request to User B
     const [pmA, pmB] = await Promise.all([
