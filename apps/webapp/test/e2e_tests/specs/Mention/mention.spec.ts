@@ -250,7 +250,34 @@ test.describe('Mention', () => {
   test(
     'I should not loose drafted text or mentions in input field',
     {tag: ['@TC-3498', '@regression']},
-    async () => {},
+    async ({createPage}) => {
+      const userAPages = (await PageManager.from(createPage(withLogin(userA), withConnectedUser(userB)))).webapp.pages;
+      await createGroup(userAPages, 'Draft Group', [userB]);
+
+      const conversationPageA = userAPages.conversation();
+      await test.step('Draft a message with a mention in the group chat', async () => {
+        await userAPages.conversationList().openConversation('Draft Group');
+        await conversationPageA.messageInput.fill('Draft message with ');
+        await conversationPageA.mentionUser(userB.fullName);
+
+        const mentionInInputField = conversationPageA.messageInput.getByTestId('item-input-mention');
+        await expect(mentionInInputField).toBeVisible();
+      });
+
+      await test.step('Switch to the 1:1 chat', async () => {
+        await userAPages.conversationList().openConversation(userB.fullName);
+        await expect(conversationPageA.messageInput).toBeEmpty();
+      });
+
+      await test.step('Switch back to the group chat and verify the draft with the mention is preserved', async () => {
+        await userAPages.conversationList().openConversation('Draft Group');
+        await expect(conversationPageA.messageInput).toHaveText(`Draft message with @${userB.fullName}`);
+
+        const preservedMention = conversationPageA.messageInput.getByTestId('item-input-mention');
+        await expect(preservedMention).toBeVisible();
+        await expect(preservedMention).toContainText(`@${userB.fullName}`);
+      });
+    },
   );
 
   test('I want to receive a message containing a mention', {tag: ['@TC-3521', '@regression']}, async () => {});
