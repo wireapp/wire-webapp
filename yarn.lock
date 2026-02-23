@@ -11333,7 +11333,7 @@ __metadata:
     svg-inline-loader: "npm:0.8.2"
     text-encoding: "npm:0.7.0"
     tsyringe: "npm:4.10.0"
-    underscore: "npm:1.13.7"
+    underscore: "npm:1.13.8"
     use-debounce: "npm:10.1.0"
     webgl-utils.js: "npm:1.1.0"
     webpack: "npm:5.105.2"
@@ -28146,7 +28146,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"underscore@npm:1.13.7, underscore@npm:~1.13.2":
+"underscore@npm:1.13.8":
+  version: 1.13.8
+  resolution: "underscore@npm:1.13.8"
+  checksum: 10/b50ac5806d059cc180b1bd9adea6f7ed500021f4dc782dfc75d66a90337f6f0506623c1b37863f4a9bf64ffbeb5769b638a54b7f2f5966816189955815953139
+  languageName: node
+  linkType: hard
+
+"underscore@npm:~1.13.2":
   version: 1.13.7
   resolution: "underscore@npm:1.13.7"
   checksum: 10/1ce3368dbe73d1e99678fa5d341a9682bd27316032ad2de7883901918f0f5d50e80320ccc543f53c1862ab057a818abc560462b5f83578afe2dd8dd7f779766c
