@@ -25,7 +25,7 @@
     "@datadog/browser-rum": "5.35.1",
     "@emotion/react": "11.14.0",
     "@formkit/auto-animate": "0.9.0",
-    "@lexical/code": "0.27.2",
+    "@lexical/code": "0.40.0",
     "@lexical/history": "0.27.2",
     "@lexical/list": "0.27.2",
     "@lexical/markdown": "0.27.2",
