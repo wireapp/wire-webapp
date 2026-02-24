@@ -19,14 +19,14 @@
 
 import logdown from 'logdown';
 import {ErrorEvent} from 'reconnecting-websocket';
-import {Maybe} from 'true-myth';
+import {Maybe, toolbelt} from 'true-myth';
 
 import {EventEmitter} from 'events';
 
 import {LogFactory} from '@wireapp/commons';
 
 import {AcknowledgeType} from './AcknowledgeEvent.types';
-import {isWebSocketEndpointAvailable} from './IsWebSocketEndpointAvailable';
+import {findWebSocketAddressPrefix} from './FindWebSocketAddressPrefix';
 import {ReconnectingWebsocket, WEBSOCKET_STATE} from './ReconnectingWebsocket';
 
 import {InvalidTokenError, MissingCookieAndTokenError, MissingCookieError} from '../auth/';
@@ -68,7 +68,7 @@ export class WebSocketClient extends EventEmitter {
   private bufferedMessages: string[];
   private abortHandler?: AbortController;
   private versionPrefix = '';
-  private isWebSocketEndpointAvailable: Maybe<boolean> = Maybe.nothing();
+  private cachedSocketAddress: Maybe<'websocket' | 'await'> = Maybe.nothing();
 
   public static readonly TOPIC = TOPIC;
 
@@ -271,21 +271,21 @@ export class WebSocketClient extends EventEmitter {
 
     const queryString = queryParams.toString();
 
-    if (this.isWebSocketEndpointAvailable.isNothing) {
-      const webSocketAvailabilityResult = await isWebSocketEndpointAvailable({
+    if (this.cachedSocketAddress.isNothing) {
+      const webSocketAddressPrefix = await findWebSocketAddressPrefix({
         baseUrl: this.baseUrl,
         queryString,
         webSocket: WebSocket,
         connectionTimeoutInMilliseconds: 5000,
       });
 
-      this.isWebSocketEndpointAvailable = webSocketAvailabilityResult.isOk ? Maybe.just(true) : Maybe.just(false);
+      this.cachedSocketAddress = toolbelt.fromResult(webSocketAddressPrefix);
     }
 
-    const webSocketAddress = this.isWebSocketEndpointAvailable.match({
-      Just: canUseWebSocketPrefix => {
+    const webSocketAddress = this.cachedSocketAddress.match({
+      Just: cachedSocketPrefixValue => {
         return this.useLegacySocket
-          ? `${this.baseUrl}/${canUseWebSocketPrefix ? 'websocket' : 'await'}?${queryString}`
+          ? `${this.baseUrl}/${cachedSocketPrefixValue}?${queryString}`
           : `${this.baseUrl}${this.versionPrefix}/events?${queryString}`;
       },
       Nothing: () => {

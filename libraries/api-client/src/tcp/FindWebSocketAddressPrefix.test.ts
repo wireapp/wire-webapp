@@ -19,7 +19,7 @@
 
 import assert from 'node:assert';
 
-import {isWebSocketEndpointAvailable, IsWebSocketEndpointAvailableOptions} from './IsWebSocketEndpointAvailable';
+import {findWebSocketAddressPrefix, FindWebSocketAddressPrefixOptions} from './FindWebSocketAddressPrefix';
 
 type FakeSocket = {
   close: jest.Mock;
@@ -74,7 +74,7 @@ function createFakeWebSocketThatThrows(): jest.Mock {
   });
 }
 
-function createDependencies(overrides: DependencyOverrides = {}): IsWebSocketEndpointAvailableOptions {
+function createDependencies(overrides: DependencyOverrides = {}): FindWebSocketAddressPrefixOptions {
   return {
     baseUrl: overrides.baseUrl ?? 'http://localhost:3000',
     queryString: overrides.queryString ?? 'test=1',
@@ -83,30 +83,32 @@ function createDependencies(overrides: DependencyOverrides = {}): IsWebSocketEnd
   };
 }
 
-describe('isWebSocketEndpointAvailable', () => {
-  it('returns Ok when the connection opens successfully', async () => {
+describe('findWebSocketAddressPrefix', () => {
+  it("returns Ok('websocket') when the connection opens successfully", async () => {
     const {fakeWebSocket} = createFakeWebSocketThatOpens();
     const dependencies = createDependencies({webSocket: fakeWebSocket});
 
-    const result = await isWebSocketEndpointAvailable(dependencies);
+    const result = await findWebSocketAddressPrefix(dependencies);
 
     assert(result.isOk);
+    expect(result.value).toBe('websocket');
   });
 
-  it('returns Err when the websocket fires onerror', async () => {
+  it("returns Err('await') when the websocket fires onerror", async () => {
     const {fakeWebSocket} = createFakeWebSocketThatErrors();
     const dependencies = createDependencies({webSocket: fakeWebSocket});
 
-    const result = await isWebSocketEndpointAvailable(dependencies);
+    const result = await findWebSocketAddressPrefix(dependencies);
 
     assert(result.isErr);
+    expect(result.error).toBe('await');
   });
 
   it('returns Err when the WebSocket constructor throws', async () => {
     const fakeWebSocket = createFakeWebSocketThatThrows();
     const dependencies = createDependencies({webSocket: fakeWebSocket});
 
-    const result = await isWebSocketEndpointAvailable(dependencies);
+    const result = await findWebSocketAddressPrefix(dependencies);
 
     assert(result.isErr);
   });
@@ -118,7 +120,7 @@ describe('isWebSocketEndpointAvailable', () => {
       connectionTimeoutInMilliseconds: 50,
     });
 
-    const result = await isWebSocketEndpointAvailable(dependencies);
+    const result = await findWebSocketAddressPrefix(dependencies);
 
     assert(result.isErr);
   });
@@ -131,7 +133,7 @@ describe('isWebSocketEndpointAvailable', () => {
       queryString: 'client=abc123',
     });
 
-    await isWebSocketEndpointAvailable(dependencies);
+    await findWebSocketAddressPrefix(dependencies);
 
     expect(fakeWebSocket).toHaveBeenCalledWith('https://prod.example.com/websocket?client=abc123');
   });
@@ -144,7 +146,7 @@ describe('isWebSocketEndpointAvailable', () => {
       queryString: 'foo=bar&baz=qux',
     });
 
-    await isWebSocketEndpointAvailable(dependencies);
+    await findWebSocketAddressPrefix(dependencies);
 
     expect(fakeWebSocket).toHaveBeenCalledWith('http://localhost:8080/websocket?foo=bar&baz=qux');
   });
@@ -156,7 +158,7 @@ describe('isWebSocketEndpointAvailable', () => {
       queryString: '',
     });
 
-    await isWebSocketEndpointAvailable(dependencies);
+    await findWebSocketAddressPrefix(dependencies);
 
     expect(fakeWebSocket).toHaveBeenCalledWith('http://localhost:3000/websocket?');
   });
@@ -165,7 +167,7 @@ describe('isWebSocketEndpointAvailable', () => {
     const {fakeWebSocket, closeFunction} = createFakeWebSocketThatOpens();
     const dependencies = createDependencies({webSocket: fakeWebSocket});
 
-    await isWebSocketEndpointAvailable(dependencies);
+    await findWebSocketAddressPrefix(dependencies);
 
     expect(closeFunction).toHaveBeenCalledTimes(1);
   });
@@ -174,7 +176,7 @@ describe('isWebSocketEndpointAvailable', () => {
     const {fakeWebSocket, closeFunction} = createFakeWebSocketThatErrors();
     const dependencies = createDependencies({webSocket: fakeWebSocket});
 
-    await isWebSocketEndpointAvailable(dependencies);
+    await findWebSocketAddressPrefix(dependencies);
 
     expect(closeFunction).not.toHaveBeenCalled();
   });
@@ -183,19 +185,29 @@ describe('isWebSocketEndpointAvailable', () => {
     const {fakeWebSocket} = createFakeWebSocketThatOpens();
     const dependencies = createDependencies({webSocket: fakeWebSocket});
 
-    await isWebSocketEndpointAvailable(dependencies);
+    await findWebSocketAddressPrefix(dependencies);
 
     expect(fakeWebSocket).toHaveBeenCalledTimes(1);
   });
 
-  it('Ok result value is void on success', async () => {
+  it("Ok result value is exactly 'websocket', not just a string", async () => {
     const {fakeWebSocket} = createFakeWebSocketThatOpens();
     const dependencies = createDependencies({webSocket: fakeWebSocket});
 
-    const result = await isWebSocketEndpointAvailable(dependencies);
+    const result = await findWebSocketAddressPrefix(dependencies);
 
     assert(result.isOk);
-    expect(result.value).toBeUndefined();
+    expect(result.value).toStrictEqual('websocket');
+  });
+
+  it("Err result from onerror carries 'await' as the error payload", async () => {
+    const {fakeWebSocket} = createFakeWebSocketThatErrors();
+    const dependencies = createDependencies({webSocket: fakeWebSocket});
+
+    const result = await findWebSocketAddressPrefix(dependencies);
+
+    assert(result.isErr);
+    expect(result.error).toStrictEqual('await');
   });
 
   it('succeeds if the connection opens before the timeout', async () => {
@@ -205,7 +217,7 @@ describe('isWebSocketEndpointAvailable', () => {
       connectionTimeoutInMilliseconds: 5000,
     });
 
-    const result = await isWebSocketEndpointAvailable(dependencies);
+    const result = await findWebSocketAddressPrefix(dependencies);
 
     assert(result.isOk);
   });
@@ -222,7 +234,7 @@ describe('isWebSocketEndpointAvailable', () => {
       connectionTimeoutInMilliseconds: 50,
     });
 
-    const result = await isWebSocketEndpointAvailable(dependencies);
+    const result = await findWebSocketAddressPrefix(dependencies);
 
     assert(result.isErr);
     expect((result.error as Error).name).toBe('TimeoutError');
@@ -232,8 +244,8 @@ describe('isWebSocketEndpointAvailable', () => {
     const {fakeWebSocket: fakeWebSocket1} = createFakeWebSocketThatOpens();
     const {fakeWebSocket: fakeWebSocket2} = createFakeWebSocketThatErrors();
 
-    const result1 = await isWebSocketEndpointAvailable(createDependencies({webSocket: fakeWebSocket1}));
-    const result2 = await isWebSocketEndpointAvailable(createDependencies({webSocket: fakeWebSocket2}));
+    const result1 = await findWebSocketAddressPrefix(createDependencies({webSocket: fakeWebSocket1}));
+    const result2 = await findWebSocketAddressPrefix(createDependencies({webSocket: fakeWebSocket2}));
 
     assert(result1.isOk);
     assert(result2.isErr);
