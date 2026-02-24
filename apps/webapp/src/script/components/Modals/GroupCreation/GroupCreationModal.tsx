@@ -27,13 +27,13 @@ import {amplify} from 'amplify';
 import cx from 'classnames';
 import {container} from 'tsyringe';
 
-import {Button, ButtonVariant, Option, Select, Text} from '@wireapp/react-ui-kit';
+import {Button, ButtonVariant, Option, Select} from '@wireapp/react-ui-kit';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {FadingScrollbar} from 'Components/FadingScrollbar';
 import * as Icon from 'Components/Icon';
 import {ModalComponent} from 'Components/Modals/ModalComponent';
-import {Note} from 'Components/Note/Note';
+import {AppsDisabledNote} from 'Components/Note/AppsDisabledNote/AppsDisabledNote';
 import {SearchInput} from 'Components/SearchInput';
 import {TextInput} from 'Components/TextInput';
 import {InfoToggle} from 'Components/toggle/InfoToggle';
@@ -523,13 +523,7 @@ const GroupCreationModal = ({
                   info={t('servicesRoomToggleInfo')}
                 />
 
-                {!isAppsFeatureAvailable && (
-                  <Note title={"Your team doesn't use apps yet."}>
-                    <Text>
-                      To improve your workflow with apps, your team needs configuration. Please contact your team admin.
-                    </Text>
-                  </Note>
-                )}
+                {!isAppsFeatureAvailable && <AppsDisabledNote />}
 
                 {areReadReceiptsEnabled && (
                   <InfoToggle
