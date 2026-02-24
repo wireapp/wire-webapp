@@ -330,7 +330,42 @@ test.describe('Mention', () => {
   test(
     'I want to see mention icon when I have unread mention, messages, pings and calls in a conversation',
     {tag: ['@TC-3529', '@regression']},
-    async () => {},
+    async ({createPage}) => {
+      const [userAPages, userBPages] = await Promise.all([
+        PageManager.from(createPage(withLogin(userA), withConnectedUser(userB))).then(pm => pm.webapp.pages),
+        PageManager.from(createPage(withLogin(userB))).then(pm => pm.webapp.pages),
+      ]);
+
+      await test.step('Create and open a distraction group conversation for User B', async () => {
+        // userA creates the group, userB opens it. This is the distraction.
+        await createGroup(userAPages, 'Distraction Group', [userB]);
+        await userBPages.conversationList().openConversation('Distraction Group');
+      });
+
+      await test.step('User A tries to call User B in 1:1 conversation but B declines', async () => {
+        await userAPages.conversationList().openConversation(userB.fullName, {protocol: 'mls'});
+        await userAPages.conversation().startCall();
+        await userBPages.calling().leaveCallButton.click();
+        await userAPages.calling().leaveCallButton.click();
+      });
+
+      await test.step('User A sends a plain message to User B in 1:1 conversation', async () => {
+        await userAPages.conversation().sendMessage('Hello, this is a plain message.');
+      });
+
+      await test.step('User A sends a message with a mention to User B in 1:1 conversation', async () => {
+        await userAPages.conversation().sendMessageWithUserMention(userB.fullName, 'Hey, you have an unread mention!');
+      });
+
+      await test.step('User A sends a ping to User B in 1:1 conversation', async () => {
+        await userAPages.conversation().sendPing();
+      });
+
+      await test.step('Verify User B sees both unread mention and unread message indicators for 1:1 conversation', async () => {
+        const conversationLocator = userBPages.conversationList().getConversationLocator(userA.fullName);
+        await expect(conversationLocator.getByTitle('Unread mention')).toBeVisible();
+      });
+    },
   );
 
   test(
