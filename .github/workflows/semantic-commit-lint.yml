@@ -21,7 +21,7 @@ jobs:
       # https://github.com/amannn/action-semantic-pull-request/releases
       - name: Run Semantic Commint Linter
         if: ${{ github.event_name == 'pull_request_target' }}
-        uses: amannn/action-semantic-pull-request@v5
+        uses: amannn/action-semantic-pull-request@v6
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
