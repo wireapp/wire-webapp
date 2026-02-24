@@ -19,7 +19,7 @@
 
 import {PageManager} from 'test/e2e_tests/pageManager';
 
-import {expect, test, withLogin} from '../../test.fixtures';
+import {expect, LOGIN_TIMEOUT, test, withLogin} from '../../test.fixtures';
 import {generateSecurePassword, generateWireEmail} from '../../utils/userDataGenerator';
 import {loginUser} from 'test/e2e_tests/utils/userActions';
 
@@ -46,7 +46,9 @@ test('Account Management', {tag: ['@TC-8639', '@crit-flow-web']}, async ({create
 
   await test.step('Member verifies if applock is working', async () => {
     await pageManager.refreshPage();
-    await expect(modals.appLock().appLockModalHeader).toContainText('Enter passcode to unlock');
+    await expect(modals.appLock().appLockModalHeader).toContainText('Enter passcode to unlock', {
+      timeout: LOGIN_TIMEOUT,
+    });
     await expect(modals.appLock().appLockModalText).toContainText('Passcode');
 
     await modals.appLock().unlockAppWithPasscode(appLockPassphrase);
@@ -74,9 +76,9 @@ test('Account Management', {tag: ['@TC-8639', '@crit-flow-web']}, async ({create
     await pages.audioVideoSettings().selectMicrophone(fakeAudioInput);
     await pages.audioVideoSettings().selectSpeaker(fakeAudioOutput);
     await pages.audioVideoSettings().selectCamera(fakeCamera);
-    expect(await pages.audioVideoSettings().isMicrophoneSetTo(fakeAudioInput));
-    expect(await pages.audioVideoSettings().isSpeakerSetTo(fakeAudioOutput));
-    expect(await pages.audioVideoSettings().isCameraSetTo(fakeCamera));
+    await expect(pages.audioVideoSettings().microphoneDropdown).toContainText(fakeAudioInput);
+    await expect(pages.audioVideoSettings().speakerDropdown).toContainText(fakeAudioOutput);
+    await expect(pages.audioVideoSettings().cameraDropdown).toContainText(fakeCamera);
   });
 
   await test.step('Member turns off data consent', async () => {
