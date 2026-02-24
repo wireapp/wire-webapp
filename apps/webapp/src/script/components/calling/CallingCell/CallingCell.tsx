@@ -419,7 +419,6 @@ export const CallingCell = ({
             answerCall={answerCall}
             call={call}
             callActions={callActions}
-            call1To1StartedAlert={call1To1StartedAlert}
             isFullUi={isFullUi}
             isMuted={isMuted}
             isConnecting={isConnecting}
