@@ -17,33 +17,17 @@
  *
  */
 
-import {CSSObject} from '@emotion/react';
+import React from 'react';
 
-export const ContainerStyle: CSSObject = {
-  display: 'flex',
-  flexDirection: 'column',
-  gap: '0.3rem',
-  padding: '0.75rem',
-  background: 'var(--accent-color-50)',
-  '.theme-dark &': {
-    background: 'var(--accent-color-800)',
-    boxShadow: 'none',
-  },
-  border: '1px solid var(--accent-color-500)',
-  borderRadius: '0.5rem',
-  color: '#000',
-  lineHeight: '1.5',
+import {Note} from 'Components/Note/Note';
+import {t} from 'Util/LocalizerUtil';
+
+const AppsDisabledNote: React.FC = () => {
+  return (
+    <Note title={t('servicesNotEnabledNoteTitle')}>
+      <span className={'subline'}>{t('servicesNotEnabledBody')}</span>
+    </Note>
+  );
 };
 
-export const HeaderStyle: CSSObject = {
-  display: 'flex',
-  alignItems: 'center',
-  fontWeight: 'var(--font-weight-semibold)',
-  gap: '0.5rem',
-};
-
-export const ContentStyle: CSSObject = {
-  display: 'flex',
-  flexDirection: 'column',
-  gap: '4px',
-};
+export {AppsDisabledNote};
