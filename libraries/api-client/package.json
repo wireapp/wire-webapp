@@ -25,13 +25,10 @@
     "axios-retry": "4.5.0",
     "cells-sdk-ts": "0.1.1-alpha18",
     "http-status-codes": "2.3.0",
-    "p-cancelable": "4.0.1",
-    "p-timeout": "7.0.1",
     "pako": "2.1.0",
     "reconnecting-websocket": "4.4.0",
     "spark-md5": "3.0.2",
     "tough-cookie": "4.1.4",
-    "true-myth": "9.3.1",
     "ws": "8.19.0",
     "zod": "3.25.76"
   },
