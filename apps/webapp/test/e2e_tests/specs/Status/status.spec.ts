@@ -33,11 +33,27 @@ enum UserStatus {
   Available = 'Available',
   Busy = 'Busy',
 }
+
 async function updateUserStatus(pageManager: PageManager['webapp'], userName: string, status: UserStatus) {
   const {components, modals} = pageManager;
   await components.conversationSidebar().openStatusMenu(userName);
   await components.conversationSidebar().setStatus(status);
   await modals.statusChangeModal().clickAction();
+}
+
+async function prepareConversationForReply(
+  pageManager: PageManager['webapp'],
+  conversationName: string,
+  conversationType: string,
+) {
+  const {pages, components} = pageManager;
+  if (conversationType === '1on1') {
+    await pages.conversationList().openConversation(conversationName, {protocol: 'mls'});
+  } else {
+    await pages.conversationList().openConversation(conversationName);
+  }
+  await pages.conversation().sendMessage('Message to reply');
+  await components.conversationSidebar().clickPreferencesButton();
 }
 
 test.describe('Status', () => {
@@ -47,11 +63,12 @@ test.describe('Status', () => {
   let userC: User;
   let groupName: string;
 
-  test.beforeEach(async ({createTeam}) => {
-    team = await createTeam('Test Team', {withMembers: 2});
+  test.beforeEach(async ({createTeam, createUser}) => {
+    userB = await createUser();
+    userC = await createUser();
+    
+    team = await createTeam('Test Team', {users: [userB, userC]});
     userA = team.owner;
-    userB = team.members[0];
-    userC = team.members[1];
     groupName = 'Test group';
   });
 
@@ -170,9 +187,8 @@ test.describe('Status', () => {
     {
       name: 'Remove member from group',
       sendAction: async ({pageA}) => {
-        const {pages, modals} = pageA.webapp;
+        const pages = pageA.webapp.pages;
         await pages.conversation().removeMemberFromGroup(userC.fullName);
-        await modals.removeMember().clickConfirm();
         await expect(pages.conversation().systemMessages.last()).toContainText(`You removed ${userC.fullName}`);
       },
     },
@@ -206,11 +222,10 @@ test.describe('Status', () => {
       },
     },
     {
-      name: 'Remove member from new group',
+      name: 'Remove member from a new group',
       sendAction: async ({pageA}) => {
-        const {pages, modals} = pageA.webapp;
+        const {pages} = pageA.webapp;
         await pages.conversation().removeMemberFromGroup(userC.fullName);
-        await modals.removeMember().clickConfirm();
         await expect(pages.conversation().systemMessages.last()).toContainText(`You removed ${userC.fullName}`);
       },
     },
@@ -236,9 +251,7 @@ test.describe('Status', () => {
         await test.step(`User A opens the ${conversation} conversation`, async () => {
           if (conversation === '1on1') {
             // User B sends a message to User A
-            await pages.conversationList().openConversation(userA.fullName, {protocol: 'mls'});
-            await pages.conversation().sendMessage('Message to reply');
-            await components.conversationSidebar().clickPreferencesButton();
+            await prepareConversationForReply(userBPageManager.webapp, userA.fullName, conversation);
             // User A opens 1:1 conversation between User A and User B
             await userAPages.conversationList().openConversation(userB.fullName, {protocol: 'mls'});
           } else {
@@ -246,9 +259,7 @@ test.describe('Status', () => {
             await createGroup(userAPages, groupName, [userB, userC]);
 
             await components.conversationSidebar().allConverationsButton.click();
-            await pages.conversationList().openConversation(groupName);
-            await pages.conversation().sendMessage('Message to reply');
-            await components.conversationSidebar().clickPreferencesButton();
+            await prepareConversationForReply(userBPageManager.webapp, groupName, conversation);
           }
         });
 
@@ -263,7 +274,7 @@ test.describe('Status', () => {
       }
 
       await test.step(`User B should not receive any system notification`, async () => {
-        await userAPages.conversationList().openConversation('Test Group');
+        await userAPages.conversationList().openConversation(groupName);
         for (const systemTestCase of systemTestCases) {
           await test.step(`Action: ${systemTestCase.name}`, async () => {
             await systemTestCase.sendAction({pageA: userAPageManager});
@@ -309,7 +320,7 @@ test.describe('Status', () => {
         PageManager.from(createPage(withLogin(userB))),
       ]);
       const userAPages = userAPageManager.webapp.pages;
-      const {pages, components} = userBPageManager.webapp;
+      const {pages} = userBPageManager.webapp;
 
       await createGroup(userAPages, groupName, [userB, userC]);
 
@@ -318,7 +329,7 @@ test.describe('Status', () => {
 
         await pages.conversationList().openConversation(groupName);
         await pages.conversation().clickConversationInfoButton();
-        await pages.conversationDetails().setNotificationsForConversation('Mentions and replies');
+        await pages.conversationDetails().setNotifications('Mentions and replies');
       });
 
       const {getNotifications: getUserBNotifications} = await interceptNotifications(pages.conversation().page);
@@ -369,9 +380,7 @@ test.describe('Status', () => {
           },
         });
 
-        await pages.conversationList().openConversation(userA.fullName, {protocol: 'mls'});
-        await pages.conversation().sendMessage('Message to reply');
-        await components.conversationSidebar().clickPreferencesButton();
+        await prepareConversationForReply(userBPageManager.webapp, userA.fullName, '1on1');
 
         await userAPages.conversationList().openConversation(userB.fullName, {protocol: 'mls'});
 
@@ -409,17 +418,13 @@ test.describe('Status', () => {
         await test.step(`User A opens the ${conversation} conversation`, async () => {
           if (conversation === '1on1') {
             // User B sends a message to User A
-            await pages.conversationList().openConversation(userA.fullName, {protocol: 'mls'});
-            await pages.conversation().sendMessage('Message to reply');
-            await components.conversationSidebar().clickPreferencesButton();
+            await prepareConversationForReply(userBPageManager.webapp, userA.fullName, conversation);
             // User A opens 1:1 conversation between User A and User B
             await userAPages.conversationList().openConversation(userB.fullName, {protocol: 'mls'});
           } else {
             // User A creates a group conversation between User A, User B, User C
             await components.conversationSidebar().allConverationsButton.click();
-            await pages.conversationList().openConversation(groupName);
-            await pages.conversation().sendMessage('Message to reply');
-            await components.conversationSidebar().clickPreferencesButton();
+            await prepareConversationForReply(userBPageManager.webapp, groupName, conversation);
 
             await userAPages.conversationList().openConversation(groupName);
           }
@@ -492,15 +497,13 @@ test.describe('Status', () => {
         PageManager.from(createPage(withLogin(userB))).then(pm => pm.webapp.pages),
       ]);
 
-      const {components, modals, pages: adminPages} = adminPageManager.webapp;
+      const {components, pages: adminPages} = adminPageManager.webapp;
 
       // Admin creates a group with user B
       await createGroup(adminPages, groupName, [userB]);
 
       // Admin sets availability status to BUSY
-      await components.conversationSidebar().openStatusMenu(userA.fullName);
-      await components.conversationSidebar().setStatus(UserStatus.Busy);
-      await modals.statusChangeModal().actionButton.click();
+      await updateUserStatus(adminPageManager.webapp, userA.fullName, UserStatus.Busy);
       await expect(components.conversationSidebar().personalStatusIcon).toBeVisible();
 
       // User B should see the BUSY status in the searchable group participant list
