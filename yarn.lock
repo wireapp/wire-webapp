@@ -11575,6 +11575,7 @@ __metadata:
     murmurhash: "npm:2.0.1"
     oidc-client-ts: "npm:3.4.1"
     os-browserify: "npm:0.3.0"
+    p-wait-for: "npm:6.0.0"
     path-browserify: "npm:1.0.1"
     path-to-regexp: "npm:8.3.0"
     platform: "npm:1.3.6"
@@ -22693,6 +22694,13 @@ __metadata:
   version: 2.2.0
   resolution: "p-try@npm:2.2.0"
   checksum: 10/f8a8e9a7693659383f06aec604ad5ead237c7a261c18048a6e1b5b85a5f8a067e469aa24f5bc009b991ea3b058a87f5065ef4176793a200d4917349881216cae
+  languageName: node
+  linkType: hard
+
+"p-wait-for@npm:6.0.0":
+  version: 6.0.0
+  resolution: "p-wait-for@npm:6.0.0"
+  checksum: 10/f7c502a9a366acba4a06aca7a07b78ae625fcf3f1bf43f13e7299de7f0edbfb36f48ba56244ec2a23231441acdc5960fe41434ff7294b533f322a9cdd5af3127
   languageName: node
   linkType: hard
 
