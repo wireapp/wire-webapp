@@ -19,14 +19,12 @@
 
 import logdown from 'logdown';
 import {ErrorEvent} from 'reconnecting-websocket';
-import {Maybe} from 'true-myth';
 
 import {EventEmitter} from 'events';
 
 import {LogFactory} from '@wireapp/commons';
 
 import {AcknowledgeType} from './AcknowledgeEvent.types';
-import {isWebSocketEndpointAvailable} from './IsWebSocketEndpointAvailable';
 import {ReconnectingWebsocket, WEBSOCKET_STATE} from './ReconnectingWebsocket';
 
 import {InvalidTokenError, MissingCookieAndTokenError, MissingCookieError} from '../auth/';
@@ -68,7 +66,6 @@ export class WebSocketClient extends EventEmitter {
   private bufferedMessages: string[];
   private abortHandler?: AbortController;
   private versionPrefix = '';
-  private isWebSocketEndpointAvailable: Maybe<boolean> = Maybe.nothing();
 
   public static readonly TOPIC = TOPIC;
 
@@ -129,7 +126,7 @@ export class WebSocketClient extends EventEmitter {
       // before we try any connection, we first refresh the access token to make sure we will avoid concurrent accessToken refreshes
       await this.refreshAccessToken();
     }
-    return await this.buildWebSocketUrl();
+    return this.buildWebSocketUrl();
   };
 
   private readonly onOpen = () => {
@@ -238,7 +235,22 @@ export class WebSocketClient extends EventEmitter {
     return this.isSocketLocked;
   }
 
-  public async buildWebSocketUrl(): Promise<string> {
+  /**
+   * this is a temporary hack method to check if app is running on
+   * wire.com domain in order to use a different temporary websocket
+   * endpoint on wire production server
+   * delete this method as soon as /websocket no longer exists on prod backend
+   * (possibly with next release of web), and change line 284 to use /await only
+   * @returns true if app is connected to wire.com backend
+   */
+  private _temporaryIsProdBackend() {
+    if (typeof window === 'undefined') {
+      return false;
+    }
+    return window.location.hostname.includes('wire.com');
+  }
+
+  public buildWebSocketUrl(): string {
     const {
       accessTokenStore: {getAccessToken, getNextMarkerToken},
     } = this.client;
@@ -271,31 +283,13 @@ export class WebSocketClient extends EventEmitter {
 
     const queryString = queryParams.toString();
 
-    if (this.isWebSocketEndpointAvailable.isNothing) {
-      const webSocketAvailabilityResult = await isWebSocketEndpointAvailable({
-        baseUrl: this.baseUrl,
-        queryString,
-        webSocket: WebSocket,
-        connectionTimeoutInMilliseconds: 5000,
-      });
+    const websocketAddress = this.useLegacySocket
+      ? `${this.baseUrl}/${this._temporaryIsProdBackend() ? 'websocket' : 'await'}?${queryString}`
+      : `${this.baseUrl}${this.versionPrefix}/events?${queryString}`;
 
-      this.isWebSocketEndpointAvailable = webSocketAvailabilityResult.isOk ? Maybe.just(true) : Maybe.just(false);
-    }
+    this.logger.info(`WebSocket URL: ${websocketAddress}`);
 
-    const webSocketAddress = this.isWebSocketEndpointAvailable.match({
-      Just: canUseWebSocketPrefix => {
-        return this.useLegacySocket
-          ? `${this.baseUrl}/${canUseWebSocketPrefix ? 'websocket' : 'await'}?${queryString}`
-          : `${this.baseUrl}${this.versionPrefix}/events?${queryString}`;
-      },
-      Nothing: () => {
-        return `${this.baseUrl}/await?${queryString}`;
-      },
-    });
-
-    this.logger.info(`WebSocket URL: ${webSocketAddress}`);
-
-    return webSocketAddress;
+    return websocketAddress;
   }
 
   public useAsyncNotificationsSocket() {
