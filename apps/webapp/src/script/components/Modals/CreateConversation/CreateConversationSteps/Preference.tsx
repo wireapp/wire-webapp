@@ -20,6 +20,7 @@
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 import {container} from 'tsyringe';
 
+import {ConversationType} from 'Components/Modals/CreateConversation/types';
 import {AppsDisabledNote} from 'Components/Note/AppsDisabledNote/AppsDisabledNote';
 import {InfoToggle} from 'Components/toggle/InfoToggle';
 import {TeamState} from 'Repositories/team/TeamState';
@@ -64,7 +65,9 @@ export const Preference = () => {
 
   const isAppsFeatureAvailable =
     (defaultProtocol === CONVERSATION_PROTOCOL.MLS && isAppsEnabled) ||
-    (defaultProtocol === CONVERSATION_PROTOCOL.PROTEUS && hasWhitelistedServices);
+    (defaultProtocol === CONVERSATION_PROTOCOL.PROTEUS &&
+      hasWhitelistedServices &&
+      conversationType !== ConversationType.Channel);
 
   // Read receipts are temporarily disabled for MLS groups and channels until it is supported
   const areReadReceiptsEnabled = defaultProtocol !== CONVERSATION_PROTOCOL.MLS;
@@ -89,9 +92,8 @@ export const Preference = () => {
         isDisabled={!isAppsFeatureAvailable}
         name={t('servicesOptionsTitle')}
         isChecked={isServicesEnabled && isAppsFeatureAvailable}
+        label={!isAppsFeatureAvailable && <AppsDisabledNote />}
       />
-
-      {!isAppsFeatureAvailable && <AppsDisabledNote />}
 
       {areReadReceiptsEnabled && (
         <InfoToggle

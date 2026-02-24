@@ -31,8 +31,8 @@ export const ContainerStyle: CSSObject = {
   },
   border: '1px solid var(--accent-color-500)',
   borderRadius: '0.5rem',
-  color: '#000',
   lineHeight: '1.5',
+  marginTop: '0.3rem',
 };
 
 export const HeaderStyle: CSSObject = {
