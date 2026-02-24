@@ -25,8 +25,7 @@ import {PageManager} from 'test/e2e_tests/pageManager';
 import {test, expect, withLogin} from '../../test.fixtures';
 import {createGroup} from 'test/e2e_tests/utils/userActions';
 
-// ToDo(WPB-22442): Backoffice does not unlock calling feature for teams created during tests
-test.fixme(
+test(
   'Planning group call with sending various messages during call',
   {tag: ['@TC-8632', '@crit-flow-web']},
   async ({createUser, createTeam, createPage, api}) => {
@@ -44,6 +43,8 @@ test.fixme(
       const team = await createTeam('Calling', {users: [member]});
       owner = team.owner;
 
+      // The team will be reset right after initialization, so we need to wait a short time for it to finish before changing feature configs since they would otherwise be overwritten
+      await new Promise(resolve => setTimeout(resolve, 5000));
       await api.enableConferenceCallingFeature(owner.teamId!);
       await api.waitForFeatureToBeEnabled(FEATURE_KEY.CONFERENCE_CALLING, owner.teamId!, owner.token);
 
@@ -51,6 +52,7 @@ test.fixme(
         PageManager.from(createPage(withLogin(owner))),
         PageManager.from(createPage(withLogin(member))),
       ]);
+
       ownerPageManager = pmOwner;
       memberPageManager = pmMember;
     });
@@ -66,9 +68,8 @@ test.fixme(
       const ownerCalling = components.calling();
       await pages.conversationList().openConversation(conversationName);
       await pages.conversation().startCall();
-      await ownerCalling.waitForCell();
 
-      expect(await ownerCalling.isCellVisible()).toBeTruthy();
+      await expect(ownerCalling.callCell).toBeVisible();
     });
 
     await test.step('Member joins call and goes full screen', async () => {
@@ -111,8 +112,7 @@ test.fixme(
     await test.step('Member unmutes themselves', async () => {
       const memberCalling = memberPageManager.webapp.components.calling();
       await memberCalling.unmuteSelfInFullScreen();
-      await memberPageManager.waitForTimeout(250);
-      expect(await memberCalling.isSelfUserMutedInFullScreen()).toBeFalsy();
+      await expect(memberCalling.fullScreenMuteButton).toHaveAttribute('data-uie-value', 'active');
     });
 
     await test.step('Validation: Owner sees member is unmuted', async () => {

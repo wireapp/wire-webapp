@@ -115,11 +115,6 @@ export class CallingPage {
 
   // ─── Mute Controls ──────────────────────────────────────────────────────
 
-  async isSelfUserMutedInFullScreen(): Promise<boolean> {
-    const state = await this.fullScreenMuteButton.getAttribute('data-uie-value');
-    return state === 'active';
-  }
-
   async muteSelfInFullScreen() {
     return await this.fullScreenMuteButton.click();
   }
