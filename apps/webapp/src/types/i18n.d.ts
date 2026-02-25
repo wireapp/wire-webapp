@@ -717,13 +717,6 @@ declare module 'I18n/en-US.json' {
     'conversationFileUploadOverlayDescription': `Drag & drop to add files`;
     'conversationFileUploadOverlayTitle': `Upload files`;
     'conversationFileVideoPreviewLabel': `Video file preview for: {src}`;
-    'conversationFilterDrafts': `Drafts`;
-    'conversationFilterMentions': `Mentions`;
-    'conversationFilterNone': `No filter`;
-    'conversationFilterPings': `Pings`;
-    'conversationFilterReplies': `Replies`;
-    'conversationFilterTooltip': `Filter conversations`;
-    'conversationFilterUnread': `Unread`;
     'conversationFoldersEmptyText': `Add your conversations to folders to stay organized.`;
     'conversationFoldersEmptyTextLearnMore': `Learn more`;
     'conversationFooterArchive': `Archive`;
@@ -1798,6 +1791,7 @@ declare module 'I18n/en-US.json' {
     'searchCreateGroup': `Create group`;
     'searchCreateGuestRoom': `Create guest room`;
     'searchDirectConversations': `Search 1:1 conversations`;
+    'searchDraftsConversations': `Search in drafts`;
     'searchFavoriteConversations': `Search favorites`;
     'searchFederatedDomainNotAvailable': `The federated domain is currently not available.`;
     'searchFederatedDomainNotAvailableLearnMore': `Learn more`;
@@ -1816,6 +1810,7 @@ declare module 'I18n/en-US.json' {
     'searchManageServices': `Manage Apps`;
     'searchManageServicesNoResults': `Manage apps`;
     'searchMemberInvite': `Invite people to join the team`;
+    'searchMentionsConversations': `Search in mentions`;
     'searchNoContactsOnWire': `You have no contacts on {brandName}.\nTry finding people by\nname or username.`;
     'searchNoMatchesPartner': `No results`;
     'searchNoServicesManager': `Apps are helpers that can improve your workflow.`;
@@ -1826,6 +1821,8 @@ declare module 'I18n/en-US.json' {
     'searchPeople': `People`;
     'searchPeopleOnlyPlaceholder': `Search people`;
     'searchPeoplePlaceholder': `Search for people and conversations`;
+    'searchPingsConversations': `Search in pings`;
+    'searchRepliesConversations': `Search in replies`;
     'searchServiceConfirmButton': `Open Conversation`;
     'searchServicePlaceholder': `Search by name`;
     'searchServices': `Apps`;
@@ -1835,6 +1832,7 @@ declare module 'I18n/en-US.json' {
     'searchTrySearch': `Find people by\nname or username`;
     'searchTrySearchFederation': `Find people in Wire by name or\n@username\n\nFind people from another domain\nby @username@domainname`;
     'searchTrySearchLearnMore': `Learn more`;
+    'searchUnreadConversations': `Search in unread`;
     'selectAccountTypeHeading': `How will you use Wire?`;
     'selectPersonalAccountTypeOptionButtonText': `Create Personal Account`;
     'selectPersonalAccountTypeOptionDescription': `Chat with friends and family.`;
@@ -1849,6 +1847,8 @@ declare module 'I18n/en-US.json' {
     'selfNotSupportMLSMsgPart1': `You can\'t communicate with {selfUserName}, as your device doesn\'t support the suitable protocol.`;
     'selfNotSupportMLSMsgPart2': `to call, and send messages and files.`;
     'selfProfileImageAlt': `Your profile picture`;
+    'servicesNotEnabledNoteTitle': `Your team doesn\'t use apps yet`;
+    'servicesNotEnabledBody': `To improve your workflow with apps, your team needs configuration. Please contact your team admin.`;
     'servicesOptionsTitle': `Apps`;
     'servicesRoomToggleInfo': `Open this conversation to apps.`;
     'servicesRoomToggleInfoExtended': `Open this conversation to apps. You can always change it later.`;
@@ -1885,6 +1885,8 @@ declare module 'I18n/en-US.json' {
     'success.openWebAppText': `Open Wire for web`;
     'success.subheader': `What do you want to do next?`;
     'systemMessageLearnMore': `Learn more`;
+    'tabsFilterHeader': `Show filters`;
+    'tabsFilterTooltip': `Customize visible tabs`;
     'takeoverButtonChoose': `Choose your own`;
     'takeoverButtonKeep': `Keep this one`;
     'takeoverLink': `Learn more`;
