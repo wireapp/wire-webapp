@@ -108,7 +108,6 @@ export async function initMLSGroupConversation(
     }
 
     // otherwise we should try to ensure the conversation exists (this will establish it if epoch is 0, or join by external commit if epoch > 0)
-    console.info('Conversation does not exist, ensuring establishment');
     await conversationRepository.ensureConversationExists({
       groupId,
       conversationId: qualifiedId,
