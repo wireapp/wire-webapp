@@ -2210,39 +2210,52 @@ export class ConversationRepository {
   public ensureConversationExists = async ({
     conversationId,
     groupId,
-    epoch,
     core = this.core,
     retry = true,
   }: {
     conversationId: QualifiedId;
     groupId: string;
-    epoch: number;
     core?: Account;
     retry?: boolean;
   }): Promise<void> => {
-    this.logger.info('Ensuring conversation exists', {conversationId, groupId, epoch});
+    const coreCryptoEpochNumber = await this.core.service?.mls?.getEpoch(groupId);
+
+    this.logger.info('Ensuring conversation exists', {conversationId, groupId, epoch: coreCryptoEpochNumber});
     if (await this.conversationService.mlsGroupExistsLocally(groupId)) {
-      this.logger.info('Conversation already exists locally', {conversationId, groupId, epoch});
-      if (epoch === 0) {
+      this.logger.info('Conversation already exists locally', {conversationId, groupId, epoch: coreCryptoEpochNumber});
+      if (coreCryptoEpochNumber === 0) {
         if (!retry) {
-          this.logger.error('Epoch is 0, but retry is false, not retrying again', {conversationId, groupId, epoch});
+          this.logger.error('Epoch is 0, but retry is false, not retrying again', {
+            conversationId,
+            groupId,
+            epoch: coreCryptoEpochNumber,
+          });
           return;
         }
-        return this.recoverFromLocalUnestablishedMLSConversations({conversationId, groupId, epoch, core});
+        return this.recoverFromLocalUnestablishedMLSConversations({
+          conversationId,
+          groupId,
+          epoch: coreCryptoEpochNumber,
+          core,
+        });
       }
       return;
     }
 
     // establish the conversation if epoch is 0
-    if (epoch === 0) {
-      this.logger.info('Establishing conversation as epoch is 0', {conversationId, groupId, epoch});
-      await this.establishMlsGroupConversation({conversationId, groupId, epoch, core});
+    if (coreCryptoEpochNumber === 0) {
+      this.logger.info('Establishing conversation as epoch is 0', {
+        conversationId,
+        groupId,
+        epoch: coreCryptoEpochNumber,
+      });
+      await this.establishMlsGroupConversation({conversationId, groupId, epoch: coreCryptoEpochNumber, core});
       return;
     }
 
     // join by external commit
-    this.logger.info('Joining conversation by external commit', {conversationId, epoch});
-    if (epoch && epoch > 0) {
+    this.logger.info('Joining conversation by external commit', {conversationId, epoch: coreCryptoEpochNumber});
+    if (coreCryptoEpochNumber && coreCryptoEpochNumber > 0) {
       await this.core.service?.conversation?.joinByExternalCommit(conversationId);
     }
   };
