@@ -30,11 +30,11 @@ test.describe('Clear Conversation Content', () => {
   let userB: User;
   let userC: User;
 
-  test.beforeEach(async ({createTeam}) => {
-    const team = await createTeam('Test Team', {withMembers: 2});
+  test.beforeEach(async ({createTeam, createUser}) => {
+    userB = await createUser();
+    userC = await createUser();
+    const team = await createTeam('Test Team', {users: [userB, userC]});
     userA = team.owner;
-    userB = team.members[0];
-    userC = team.members[1];
   });
 
   [
@@ -111,12 +111,12 @@ test.describe('Clear Conversation Content', () => {
         const userBPages = userBPageManager.webapp.pages;
 
         // Step 1: Create a 1:1 conversation with User A and B
-        await userAPages.conversationList().openConversation(userB.fullName);
+        await userAPages.conversationList().openConversation(userB.fullName, {protocol: 'mls'});
 
         // Step 2: Write messages in the conversation
         await userAPages.conversation().sendMessage('Message from User A');
 
-        await userBPages.conversationList().openConversation(userA.fullName);
+        await userBPages.conversationList().openConversation(userA.fullName, {protocol: 'mls'});
         await userBPages.conversation().sendMessage('Message from User B');
 
         await expect(userAPages.conversation().messages).toHaveCount(2);
@@ -169,7 +169,7 @@ test.describe('Clear Conversation Content', () => {
         if (conversationType === 'group') {
           await createGroup(userAPages, conversationName, [userB, userC]);
         } else {
-          await userAPages.conversationList().openConversation(conversationName);
+          await userAPages.conversationList().openConversation(conversationName, {protocol: 'mls'});
         }
 
         // Step 2: Write messages in the conversation
@@ -272,10 +272,10 @@ test.describe('Clear Conversation Content', () => {
           await userBPages.conversation().sendMessage('Message from User B');
         } else {
           // Step 1: User A and B write in conversation
-          await userAPages.conversationList().openConversation(userB.fullName);
+          await userAPages.conversationList().openConversation(userB.fullName, {protocol: 'mls'});
           await userAPages.conversation().sendMessage('Message from User A');
 
-          await userBPages.conversationList().openConversation(userA.fullName);
+          await userBPages.conversationList().openConversation(userA.fullName, {protocol: 'mls'});
           await userBPages.conversation().sendMessage('Message from User B');
         }
         await expect(userAPages.conversation().messages).toHaveCount(2);

@@ -70,4 +70,28 @@ describe('createFakeWallClock', () => {
     expect(secondCurrentDate.getTime()).toBe(100);
   });
 
+  it('executes interval callbacks repeatedly when time advances', () => {
+    const fakeWallClock = createFakeWallClock({initialCurrentTimestampInMilliseconds: 0});
+    const intervalHandler = jest.fn();
+
+    fakeWallClock.setInterval(intervalHandler, 100, 'interval argument');
+    fakeWallClock.advanceByMilliseconds(250);
+
+    expect(intervalHandler).toHaveBeenCalledTimes(2);
+    expect(intervalHandler).toHaveBeenNthCalledWith(1, 'interval argument');
+    expect(intervalHandler).toHaveBeenNthCalledWith(2, 'interval argument');
+  });
+
+  it('stops executing callbacks after clearInterval', () => {
+    const fakeWallClock = createFakeWallClock({initialCurrentTimestampInMilliseconds: 0});
+    const intervalHandler = jest.fn();
+
+    const intervalIdentifier = fakeWallClock.setInterval(intervalHandler, 100);
+    fakeWallClock.advanceByMilliseconds(100);
+    fakeWallClock.clearInterval(intervalIdentifier);
+    fakeWallClock.advanceByMilliseconds(300);
+
+    expect(intervalHandler).toHaveBeenCalledTimes(1);
+  });
+
 });

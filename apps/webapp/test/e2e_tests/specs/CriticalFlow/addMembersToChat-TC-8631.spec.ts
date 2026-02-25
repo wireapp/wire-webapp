@@ -30,7 +30,7 @@ const conversationName = 'Crits';
 test(
   'Team owner adds whole team to an all team chat',
   {tag: ['@TC-8631', '@crit-flow-web']},
-  async ({createTeam, createPage, api}) => {
+  async ({createUser, createTeam, createPage, api}) => {
     let owner: User;
     let member1: User;
     let member2: User;
@@ -39,10 +39,10 @@ test(
     let member2PageManager: PageManager;
 
     await test.step('Preconditions: Creating preconditions for the test via API', async () => {
-      const team = await createTeam('Critical', {withMembers: 2});
+      member1 = await createUser();
+      member2 = await createUser();
+      const team = await createTeam('Critical', {users: [member1, member2]});
       owner = team.owner;
-      member1 = team.members[0];
-      member2 = team.members[1];
 
       const [pmOwner, pm1, pm2] = await Promise.all([
         PageManager.from(createPage(withLogin(owner))),
@@ -57,7 +57,7 @@ test(
     await test.step('Team owner creates group conversation with team members', async () => {
       const {pages} = ownerPageManager.webapp;
       await createGroup(pages, conversationName, [member1, member2]);
-      expect(await pages.conversationList().isConversationItemVisible(conversationName)).toBeTruthy();
+      await expect(pages.conversationList().getConversationLocator(conversationName)).toBeVisible();
     });
 
     await test.step('Team owner adds a service to newly created group', async () => {
@@ -178,10 +178,9 @@ test(
     });
 
     await test.step('Team owner removes one group member from a group', async () => {
-      const {pages, modals} = ownerPageManager.webapp;
+      const {pages} = ownerPageManager.webapp;
       // Get the member from the members list and remove them
       await pages.conversation().removeMemberFromGroup(member2.fullName);
-      await modals.removeMember().clickConfirm();
 
       // Verify member is no longer in the conversation by checking system message
       expect(await pages.conversation().isSystemMessageVisible(`You removed ${member2.fullName}`)).toBeTruthy();

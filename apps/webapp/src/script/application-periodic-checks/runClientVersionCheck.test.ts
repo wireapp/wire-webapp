@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2022 Wire Swiss GmbH
+ * Copyright (C) 2026 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,23 +17,19 @@
  *
  */
 
-const {TextDecoder, TextEncoder} = require('util');
+import {KyInstance} from 'ky';
 
-module.exports = {
-  displayName: 'core-lib',
-  testEnvironment: 'node',
-  clearMocks: true,
-  setupFilesAfterEnv: ['<rootDir>/jest.setup.ts'],
-  globals: {
-    TextDecoder,
-    TextEncoder,
-  },
-  transform: {
-    '^.+\\.(ts|tsx)$': '@swc/jest',
-    '^.+\\.(js|jsx)$': '@swc/jest',
-  },
-  transformIgnorePatterns: ['node_modules/'],
-  coverageDirectory: '../../coverage/libraries/core',
-  testMatch: ['<rootDir>/src/**/__tests__/**/*.[jt]s?(x)', '<rootDir>/src/**/?(*.)+(spec|test).[jt]s?(x)'],
-  moduleFileExtensions: ['js', 'json', 'ts', 'tsx'],
-};
+import {runClientVersionCheck} from './runClientVersionCheck';
+
+describe('runClientVersionCheck', () => {
+  it('requests the client version check route', () => {
+    const kyInstance = {
+      get: jest.fn(() => Promise.resolve()),
+    } as unknown as KyInstance;
+
+    runClientVersionCheck({ky: kyInstance});
+
+    expect(kyInstance.get).toHaveBeenCalledTimes(1);
+    expect(kyInstance.get).toHaveBeenCalledWith('/client-version-check');
+  });
+});

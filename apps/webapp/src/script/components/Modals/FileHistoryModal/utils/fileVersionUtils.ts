@@ -24,10 +24,15 @@ import {formatBytes} from 'Util/util';
 
 import {FileVersion} from '../types';
 
+type RestVersionWithOptionalFields = Partial<RestVersion>;
+
 /**
  * Transform a RestVersion to FileVersion
  */
-export const transformRestVersionToFileVersion = (version: RestVersion, timestamp: number): FileVersion => {
+export const transformRestVersionToFileVersion = (
+  version: RestVersionWithOptionalFields,
+  timestamp: number,
+): FileVersion => {
   return {
     versionId: version.VersionId || '',
     time: formatTime(timestamp),
@@ -40,7 +45,7 @@ export const transformRestVersionToFileVersion = (version: RestVersion, timestam
 /**
  * Group file versions by date
  */
-export const groupVersionsByDate = (versions: RestVersion[]): Record<string, FileVersion[]> => {
+export const groupVersionsByDate = (versions: RestVersionWithOptionalFields[]): Record<string, FileVersion[]> => {
   const now = new Date();
   const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
 

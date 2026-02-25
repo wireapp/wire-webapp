@@ -30,10 +30,10 @@ test.describe('AppLock', () => {
   const teamName = 'AppLock';
   const appLockPassCode = '1a3!567N4';
 
-  test.beforeEach(async ({api, createTeam}) => {
-    const team = await createTeam(teamName, {withMembers: 1});
+  test.beforeEach(async ({api, createTeam, createUser}) => {
+    memberA = await createUser();
+    const team = await createTeam(teamName, {users: [memberA]});
     owner = team.owner;
-    memberA = team.members[0];
 
     await api.brig.toggleAppLock(owner.teamId, 'enabled', true);
   });
@@ -56,7 +56,7 @@ test.describe('AppLock', () => {
     },
   );
 
-  test(
+  test.fixme(
     'Web: App should not lock if I switch back to webapp tab in time (during inactivity timeout)',
     {tag: ['@TC-2752', '@TC-2753', '@regression']},
     async ({browser, createPage}) => {

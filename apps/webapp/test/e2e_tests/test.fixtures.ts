@@ -24,6 +24,7 @@ import {getUser, User} from './data/user';
 import {PageManager} from './pageManager';
 import {connectWithUser, sendConnectionRequest} from './utils/userActions';
 import {mockAudioAndVideoDevices} from './utils/mockVideoDevice.util';
+import {Role} from '@wireapp/api-client/lib/team';
 
 type PagePlugin = (page: Page) => void | Promise<void>;
 
@@ -50,17 +51,13 @@ type Fixtures = {
    * @param options.withMembers Can either be the number of team members to create or an array of existing members to add to the team
    * @returns an object containing the teams owner and an array of members. The size of the members array matches the number or array length passed to `withMembers`
    */
-  createTeam: (
-    teamName: string,
-    options?: Parameters<typeof createUser>[1] & {withMembers?: number | User[]},
-  ) => Promise<Team>;
+  createTeam: (teamName: string, options?: {users: (User | {user: User; role?: keyof typeof Role})[]}) => Promise<Team>;
 };
 
 export type Team = {
   owner: User;
-  members: User[];
   /** Add a new member to the team after its initial creation */
-  addMember: (member: User) => Promise<void>;
+  addTeamMember: (member: User, options?: {role?: keyof typeof Role}) => Promise<void>;
 };
 
 export {expect} from '@playwright/test';
@@ -136,32 +133,33 @@ export const test = baseTest.extend<Fixtures>({
   createTeam: async ({api}, use) => {
     const teamOwners: User[] = [];
 
-    await use(async (teamName, {withMembers, ...options} = {}) => {
-      const owner = await createUser(api, options);
+    await use(async (teamName, options) => {
+      const owner = await createUser(api);
 
       const {teamId} = await api.auth.upgradeUserToTeamOwner(owner, teamName);
       owner.teamId = teamId;
 
       teamOwners.push(owner);
 
-      const addMember = async (member: User) => {
-        const invitationId = await api.team.inviteUserToTeam(member.email, owner);
+      const addTeamMember: Team['addTeamMember'] = async (member, options) => {
+        const invitationId = await api.team.inviteUserToTeam(member.email, owner, Role[options?.role ?? 'MEMBER']);
         const invitationCode = await api.brig.getTeamInvitationCodeForEmail(owner.teamId, invitationId);
         await api.team.acceptTeamInvitation(invitationCode, member);
       };
 
-      let members: User[] = [];
-      if (withMembers !== undefined) {
-        // Depending on the type of withMembers, either create the number of users or use the given array of users
-        members =
-          typeof withMembers === 'number'
-            ? await Promise.all(Array.from({length: withMembers}, () => createUser(api, options)))
-            : withMembers;
-
-        await Promise.all(members.map(member => addMember(member)));
+      if (options?.users) {
+        await Promise.all(
+          options.users.map(user => {
+            if ('user' in user) {
+              return addTeamMember(user.user, {role: user.role});
+            } else {
+              return addTeamMember(user);
+            }
+          }),
+        );
       }
 
-      return {owner, members, addMember};
+      return {owner, addTeamMember};
     });
 
     // Deletes each created team and the owner / members associated with it

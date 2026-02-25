@@ -27,19 +27,22 @@ test.describe('Self Deleting Messages', () => {
   let userA: User;
   let userB: User;
 
-  test.beforeEach(async ({createTeam}) => {
-    const team = await createTeam('Test Team', {withMembers: 1});
+  test.beforeEach(async ({createTeam, createUser}) => {
+    userB = await createUser();
+    const team = await createTeam('Test Team', {users: [userB]});
     userA = team.owner;
-    userB = team.members[0];
   });
 
   test('Verify sending ephemeral text message in 1:1', {tag: ['@TC-657', '@regression']}, async ({createPage}) => {
     const [userAPage, userBPage] = await Promise.all([
       createPage(withLogin(userA), withConnectedUser(userB)),
-      createPage(withLogin(userB), withConnectedUser(userA)),
+      createPage(withLogin(userB)),
     ]);
     const userAPages = PageManager.from(userAPage).webapp.pages;
     const userBPages = PageManager.from(userBPage).webapp.pages;
+
+    await userAPages.conversationList().openConversation(userB.fullName, {protocol: 'mls'});
+    await userBPages.conversationList().openConversation(userA.fullName, {protocol: 'mls'});
 
     await userAPages.conversation().enableSelfDeletingMessages();
     await userAPages.conversation().sendMessage('Gone in 10s');
@@ -126,13 +129,13 @@ test.describe('Self Deleting Messages', () => {
     async ({createPage}) => {
       const [userAPage, userBPage] = await Promise.all([
         createPage(withLogin(userA), withConnectedUser(userB)),
-        createPage(withLogin(userB), withConnectedUser(userA)),
+        createPage(withLogin(userB)),
       ]);
       const [userAPages, userBPages] = [userAPage, userBPage].map(page => PageManager.from(page).webapp.pages);
       await createGroup(userAPages, 'Test Group', [userB]);
 
       await userAPages.conversationList().openConversation('Test Group');
-      await userBPages.conversationList().openConversation(userA.fullName); // User B should not read the message sent into the group immediately
+      await userBPages.conversationList().openConversation(userA.fullName, {protocol: 'mls'}); // User B should not read the message sent into the group immediately
 
       await userAPages.conversation().enableSelfDeletingMessages();
       await userAPages.conversation().sendMessage('Test Message');
@@ -214,8 +217,11 @@ test.describe('Self Deleting Messages', () => {
     test.beforeEach(async ({createPage}) => {
       const [userAPages, userBPages] = await Promise.all([
         PageManager.from(createPage(withLogin(userA), withConnectedUser(userB))).then(pm => pm.webapp.pages),
-        PageManager.from(createPage(withLogin(userB), withConnectedUser(userA))).then(pm => pm.webapp.pages),
+        PageManager.from(createPage(withLogin(userB))).then(pm => pm.webapp.pages),
       ]);
+
+      await userAPages.conversationList().openConversation(userB.fullName, {protocol: 'mls'});
+      await userBPages.conversationList().openConversation(userA.fullName, {protocol: 'mls'});
 
       await userAPages.conversation().enableSelfDeletingMessages();
       await userAPages.conversation().sendMessage('Test');

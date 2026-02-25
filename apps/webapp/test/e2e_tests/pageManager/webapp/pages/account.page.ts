@@ -112,6 +112,14 @@ export class AccountPage {
     await this.resetPasswordButton.click();
   }
 
+  async uploadProfilePicture(imagePath: string) {
+    const [filePicker] = await Promise.all([
+      this.page.waitForEvent('filechooser'),
+      this.page.getByLabel('Change your picture').click(),
+    ]);
+    await filePicker.setFiles(imagePath);
+  }
+
   async changeEmailAddress(newEmail: string) {
     await this.editEmailButton.click();
     await this.emailInput.fill(newEmail);

@@ -29,10 +29,10 @@ test.describe('Reactions', () => {
   let userA: User;
   let userB: User;
 
-  test.beforeEach(async ({createTeam}) => {
-    const team = await createTeam('Test Team', {withMembers: 1});
+  test.beforeEach(async ({createTeam, createUser}) => {
+    userB = await createUser();
+    const team = await createTeam('Test Team', {users: [userB]});
     userA = team.owner;
-    userB = team.members[0];
   });
 
   const likeCases = [
@@ -89,7 +89,7 @@ test.describe('Reactions', () => {
     test(`Verify liking someone's ${c.title}`, {tag: [c.tc, '@regression']}, async ({createPage}) => {
       const [userAPages, userBPages] = await Promise.all([
         PageManager.from(createPage(withLogin(userA), withConnectedUser(userB))).then(pm => pm.webapp.pages),
-        PageManager.from(createPage(withLogin(userB), withConnectedUser(userA))).then(pm => pm.webapp.pages),
+        PageManager.from(createPage(withLogin(userB))).then(pm => pm.webapp.pages),
       ]);
 
       await userBPages.conversationList().openConversation(userA.fullName, {protocol: 'mls'});
@@ -117,7 +117,8 @@ test.describe('Reactions', () => {
         'Test Service Device',
         false,
       );
-      const conversationId = await api.conversation.getConversationWithUser(userB.token, userA.id!);
+      const conversationId = await api.conversation.getConversationWithUser(userB.token, userA.id!, {protocol: 'mls'});
+      if (conversationId === undefined) throw new Error("Couldn't find MLS conversation of user B with user A");
       await api.testService.sendLocation(instanceId, conversationId, {
         locationName: 'Test Location',
         latitude: 52.5170365,
@@ -156,9 +157,11 @@ test.describe('Reactions', () => {
   test('Verify likes are reset if you edited message', {tag: ['@TC-1538', '@regression']}, async ({createPage}) => {
     const [userAPages, userBPages] = await Promise.all([
       PageManager.from(createPage(withLogin(userA), withConnectedUser(userB))).then(pm => pm.webapp.pages),
-      PageManager.from(createPage(withLogin(userB), withConnectedUser(userA))).then(pm => pm.webapp.pages),
+      PageManager.from(createPage(withLogin(userB))).then(pm => pm.webapp.pages),
     ]);
 
+    await userAPages.conversationList().openConversation(userB.fullName, {protocol: 'mls'});
+    await userBPages.conversationList().openConversation(userA.fullName, {protocol: 'mls'});
     await userBPages.conversation().sendMessage('Message from User B');
 
     const messageUserB = userAPages.conversation().getMessage({sender: userB});
@@ -181,9 +184,11 @@ test.describe('Reactions', () => {
     async ({createPage}) => {
       const [userAPages, userBPages] = await Promise.all([
         PageManager.from(createPage(withLogin(userA), withConnectedUser(userB))).then(pm => pm.webapp.pages),
-        PageManager.from(createPage(withLogin(userB), withConnectedUser(userA))).then(pm => pm.webapp.pages),
+        PageManager.from(createPage(withLogin(userB))).then(pm => pm.webapp.pages),
       ]);
 
+      await userAPages.conversationList().openConversation(userB.fullName, {protocol: 'mls'});
+      await userBPages.conversationList().openConversation(userA.fullName, {protocol: 'mls'});
       await userBPages.conversation().sendMessage('Message from User B');
 
       const messageUserB = userAPages.conversation().getMessage({sender: userB});
@@ -220,9 +225,11 @@ test.describe('Reactions', () => {
     test(c.title, {tag: [c.tc, '@regression']}, async ({createPage}) => {
       const [userAPages, userBPages] = await Promise.all([
         PageManager.from(createPage(withLogin(userA), withConnectedUser(userB))).then(pm => pm.webapp.pages),
-        PageManager.from(createPage(withLogin(userB), withConnectedUser(userA))).then(pm => pm.webapp.pages),
+        PageManager.from(createPage(withLogin(userB))).then(pm => pm.webapp.pages),
       ]);
 
+      await userAPages.conversationList().openConversation(userB.fullName, {protocol: 'mls'});
+      await userBPages.conversationList().openConversation(userA.fullName, {protocol: 'mls'});
       await userBPages.conversation().sendMessage('Message to react to');
 
       const messageInUserA = userAPages.conversation().getMessage({sender: userB});

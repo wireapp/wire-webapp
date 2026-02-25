@@ -17,6 +17,7 @@
  *
  */
 
+import {AxiosHeaders} from 'axios';
 import {
   NodeServiceApi,
   RestLookupRequest,
@@ -133,8 +134,9 @@ export class CellsAPI {
     http.client.interceptors.request.use(config => {
       const accessToken = this.accessTokenStore.getAccessToken();
       if (accessToken) {
-        config.headers = config.headers || {};
-        config.headers.Authorization = `Bearer ${accessToken}`;
+        const requestHeaders = AxiosHeaders.from(config.headers);
+        requestHeaders.set('Authorization', `Bearer ${accessToken}`);
+        config.headers = requestHeaders;
       }
       return config;
     });

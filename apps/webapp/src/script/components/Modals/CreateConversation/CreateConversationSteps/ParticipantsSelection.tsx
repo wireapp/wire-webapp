@@ -37,7 +37,7 @@ import {useCreateConversation} from '../hooks/useCreateConversation';
 import {useCreateConversationModal} from '../hooks/useCreateConversationModal';
 
 export const ParticipantsSelection = () => {
-  const mainViewModel = useContext(RootContext);
+  const rootContext = useContext(RootContext);
   const userState = container.resolve(UserState);
   const teamState = container.resolve(TeamState);
   const [participantsInput, setParticipantsInput] = useState<string>('');
@@ -46,12 +46,11 @@ export const ParticipantsSelection = () => {
 
   const {isTeam} = useKoSubscribableChildren(teamState, ['isTeam', 'isMLSEnabled', 'isProtocolToggleEnabledForUser']);
 
-  const {content: contentViewModel} = mainViewModel!;
-  const {
-    conversation: conversationRepository,
-    search: searchRepository,
-    team: teamRepository,
-  } = contentViewModel.repositories;
+  const mainViewModel = rootContext!.mainViewModel;
+  const contentViewModel = mainViewModel.content;
+  const conversationRepository = contentViewModel.repositories.conversation;
+  const searchRepository = contentViewModel.repositories.search;
+  const teamRepository = contentViewModel.repositories.team;
 
   const {self: selfUser} = useKoSubscribableChildren(userState, ['self']);
 

@@ -19,6 +19,7 @@
 
 import {ReactNode, useContext, useEffect, useState} from 'react';
 
+import is from '@sindresorhus/is';
 import cx from 'classnames';
 import {CSSTransition, SwitchTransition} from 'react-transition-group';
 import {container} from 'tsyringe';
@@ -77,7 +78,7 @@ const MainContent = ({
   reloadApp,
 }: MainContentProps) => {
   const [uploadedFile, setUploadedFile] = useState<File | null>(null);
-  const mainViewModel = useContext(RootContext);
+  const rootContext = useContext(RootContext);
 
   const userState = container.resolve(UserState);
   const teamState = container.resolve(TeamState);
@@ -102,10 +103,10 @@ const MainContent = ({
     }
   }, [teamState, showRequestModal]);
 
-  if (!mainViewModel) {
+  if (is.null_(rootContext)) {
     return null;
   }
-  const {content: contentViewModel} = mainViewModel;
+  const contentViewModel = rootContext.mainViewModel.content;
   const {isFederated, repositories, switchContent} = contentViewModel;
 
   /* eslint-disable react-hooks/rules-of-hooks */

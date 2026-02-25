@@ -1,4 +1,4 @@
-import {type Page} from 'playwright/test';
+import {test, expect, type Page} from 'playwright/test';
 
 declare global {
   interface Window {
@@ -42,7 +42,43 @@ const getNotifications = async (page: Page) => {
       title: notification.title,
       body: notification.body,
       data: notification.data,
+      icon: notification.icon,
     })),
+  );
+};
+
+/** Search for a notification matching the given parameters and click it */
+const clickNotification = async (
+  page: Page,
+  notification: {title?: string; body?: string},
+  options?: {timeout?: number},
+) => {
+  // Create a boxed test step so this action shows up like a normal one in the trace viewer
+  await test.step(
+    `Click notification ${JSON.stringify(notification)}`,
+    async () => {
+      // Wrap action with expect to have it retry automatically using global default timeouts
+      await expect(async () => {
+        const notifications = await getNotifications(page);
+
+        // Find a notification matching the given properties
+        const index = notifications.findIndex(
+          n =>
+            // Ignore the property if it's undefined
+            (notification.title !== undefined ? n.title === notification.title : true) &&
+            (notification.body !== undefined ? n.body === notification.body : true),
+        );
+
+        if (index < 0)
+          throw new Error(
+            `Can't click notification ${JSON.stringify(notification)} as it doesn't exist in:\n\n${JSON.stringify(notifications, undefined, 2)}`,
+          );
+
+        // If found trigger its "onclick" callback
+        await page.evaluate(index => window.__wireNotifications.at(index)?.onclick?.(new Event('click')), index);
+      }).toPass({timeout: options?.timeout, intervals: [1_000]});
+    },
+    {box: true},
   );
 };
 
@@ -65,6 +101,12 @@ export const interceptNotifications = async (page: Page) => {
      * Async function to get the notifications the intercepted page received so far.
      * Pass this to `expect.poll()` to avoid flake due to timing issues.
      */
-    getNotifications: () => getNotifications(page),
+    getNotifications: getNotifications.bind(undefined, page),
+    /**
+     * Search for a notification matching the given parameters and click it
+     *
+     * Note: This function won't retry automatically, ensure the notification exists before calling it
+     */
+    clickNotification: clickNotification.bind(undefined, page),
   };
 };

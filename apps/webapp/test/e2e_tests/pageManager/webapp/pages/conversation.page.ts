@@ -329,6 +329,20 @@ export class ConversationPage {
     await videoPlayButton.click();
   }
 
+  async isVideoPlaying() {
+    const videoTimeLocator = this.page
+      .getByTestId('item-message')
+      .getByTestId('video-asset')
+      .getByTestId('status-video-time');
+
+    const videoTimeText = (await videoTimeLocator.textContent())?.trim();
+    if (!videoTimeText) {
+      throw new Error('Video time text is empty or undefined');
+    }
+    const seconds = parseInt(videoTimeText.split(':')[1]);
+    return seconds < 30;
+  }
+
   async playAudio() {
     const audioPlayButton = this.page
       .getByTestId('item-message')
@@ -437,7 +451,8 @@ export class ConversationPage {
       .getByTestId('item-user')
       .and(this.page.locator(`[data-uie-value="${name}"]`))
       .click();
-    return this.removeUserButton.click();
+    await this.removeUserButton.click();
+    await new ConfirmModal(this.page).clickAction();
   }
 
   async removeAdminFromGroup(name: string) {
