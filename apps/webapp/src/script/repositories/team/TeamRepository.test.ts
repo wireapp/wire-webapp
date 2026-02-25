@@ -70,7 +70,7 @@ describe('TeamRepository', () => {
   };
   const team_metadata = teams_data.teams[0];
 
-  const services_data = {has_more: false, services: []};
+  const services_data: {has_more: boolean; services: any[]} = {has_more: false, services: []};
 
   describe('getTeam()', () => {
     it('returns the team entity', async () => {

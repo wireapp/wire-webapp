@@ -11,9 +11,7 @@
     "target": "es2020",
     "module": "commonjs",
     "moduleResolution": "node",
-    "resolveJsonModule": true,
-    "strict": false,
-    "noImplicitAny": false
+    "resolveJsonModule": true
   },
   "exclude": [
     "node_modules",

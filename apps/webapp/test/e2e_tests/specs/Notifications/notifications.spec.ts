@@ -234,6 +234,12 @@ test.describe('Notifications', () => {
     },
   );
 
+  type ExpectedNotification = {
+    title: string;
+    body: string;
+    icon?: unknown;
+  };
+
   (
     [
       {
@@ -241,7 +247,7 @@ test.describe('Notifications', () => {
         title:
           "Sender name and a message are shown in notification when 'Show sender and message' item is selected in preferences",
         notificationPreference: 'Show sender and message',
-        getExpectedNotifications: (conversationType: '1on1' | 'group') => {
+        getExpectedNotifications: (conversationType: '1on1' | 'group'): ExpectedNotification[] => {
           const expectedTitle = conversationType === '1on1' ? userA.fullName : `${userA.fullName} in Test Group`;
           return [
             {title: expectedTitle, body: 'Test Message'},
@@ -258,7 +264,7 @@ test.describe('Notifications', () => {
         testId: '@TC-1451',
         title: "No message content is written on notification when 'Show sender' item is selected in preferences",
         notificationPreference: 'Show sender',
-        getExpectedNotifications: (conversationType: '1on1' | 'group') => {
+        getExpectedNotifications: (conversationType: '1on1' | 'group'): ExpectedNotification[] => {
           const expectedTitle = conversationType === '1on1' ? userA.fullName : `${userA.fullName} in Test Group`;
           return [
             {title: expectedTitle, body: 'Sent a message'},
@@ -276,7 +282,7 @@ test.describe('Notifications', () => {
         title:
           "No sender name, profile image or message content is written on notification when choose 'Hide details' in preferences",
         notificationPreference: 'Hide details',
-        getExpectedNotifications: () => [
+        getExpectedNotifications: (): ExpectedNotification[] => [
           // The default wire icon is called "notification.png", if it is set the users profile picture isn't shown
           {title: 'Someone', body: 'Sent a message', icon: expect.stringMatching(/notification\.png$/)},
           {title: 'Someone', body: 'Sent a message', icon: expect.stringMatching(/notification\.png$/)},
@@ -291,7 +297,7 @@ test.describe('Notifications', () => {
         testId: '@TC-1453',
         title: "No notification shown when selecting 'Off' in preferences",
         notificationPreference: 'Off',
-        getExpectedNotifications: () => [],
+        getExpectedNotifications: (): ExpectedNotification[] => [],
       },
     ] as const
   ).forEach(({testId, title, notificationPreference, getExpectedNotifications}) => {
