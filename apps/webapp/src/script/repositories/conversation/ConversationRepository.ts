@@ -2255,7 +2255,7 @@ export class ConversationRepository {
 
     // join by external commit
     this.logger.info('Joining conversation by external commit', {conversationId, epoch: coreCryptoEpochNumber});
-    if (coreCryptoEpochNumber && coreCryptoEpochNumber > 0) {
+    if (coreCryptoEpochNumber !== undefined && coreCryptoEpochNumber > 0) {
       await this.core.service?.conversation?.joinByExternalCommit(conversationId);
     }
   };
