@@ -42,7 +42,7 @@ export class AudioSpeakerFactory {
     return audioElement;
   }
 
-  private static initBaseElement(): void{
+  private static initBaseElement(): void {
     if (!AudioSpeakerFactory.baseElement) {
       AudioSpeakerFactory.baseElement = document.getElementById('calling-audio-speaker-elements');
     }
