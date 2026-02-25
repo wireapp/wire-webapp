@@ -86,7 +86,7 @@ export class AssetRepository {
 
   async getObjectUrl(asset: AssetRemoteData): Promise<string> {
     const objectUrl = getAssetUrl(asset.identifier);
-    if (objectUrl) {
+    if (objectUrl !== undefined) {
       return objectUrl;
     }
 
@@ -202,7 +202,17 @@ export class AssetRepository {
       this.assetCoreService.uploadRawAsset(mediumImage, options).response,
     ]);
 
-    return {mediumImageKey, previewImageKey};
+    const toAssetImageKey = (uploadedAsset: {domain?: string; key?: string}) => {
+      if (!uploadedAsset.key) {
+        throw new Error('Asset upload response is missing the asset key.');
+      }
+      return {domain: uploadedAsset.domain, key: uploadedAsset.key};
+    };
+
+    return {
+      mediumImageKey: toAssetImageKey(mediumImageKey),
+      previewImageKey: toAssetImageKey(previewImageKey),
+    };
   }
 
   private async compressImage(image: Blob, useProfileImageSize: boolean = false): Promise<CompressedImage> {
