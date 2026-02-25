@@ -2218,7 +2218,7 @@ export class ConversationRepository {
     core?: Account;
     retry?: boolean;
   }): Promise<void> => {
-    const coreCryptoEpochNumber = await this.core.service?.mls?.getEpoch(groupId);
+    const coreCryptoEpochNumber = await core.service?.mls?.getEpoch(groupId);
 
     this.logger.info('Ensuring conversation exists', {conversationId, groupId, epoch: coreCryptoEpochNumber});
     if (await this.conversationService.mlsGroupExistsLocally(groupId)) {

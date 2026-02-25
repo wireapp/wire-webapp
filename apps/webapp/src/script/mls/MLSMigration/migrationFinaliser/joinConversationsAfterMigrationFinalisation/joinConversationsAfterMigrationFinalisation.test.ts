@@ -126,6 +126,7 @@ describe('joinConversationsAfterMigrationFinalisation', () => {
     const mockCore = container.resolve(Core);
 
     jest.spyOn(mockCore.service!.conversation, 'mlsGroupExistsLocally').mockResolvedValue(false);
+    jest.spyOn(mockCore.service!.mls!, 'getEpoch').mockResolvedValue(1);
 
     const conversationId = 'conversation1';
     const mockDomain = 'anta.wire.link';
