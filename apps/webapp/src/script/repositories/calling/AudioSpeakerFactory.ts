@@ -21,9 +21,11 @@ import {getLogger, Logger} from 'Util/Logger';
 
 export class AudioSpeakerFactory {
   private static readonly logger: Logger = getLogger('AudioSpeakerFactory');
-  private static readonly baseElement: HTMLElement | null = document.getElementById('calling-audio-speaker-elements');
+  private static baseElement: HTMLElement | null = document.getElementById('calling-audio-speaker-elements');
 
   public static createNewCallingAudioSpeaker(stream: MediaStream): HTMLAudioElement {
+    AudioSpeakerFactory.initBaseElement();
+
     if (!AudioSpeakerFactory.baseElement) {
       AudioSpeakerFactory.logger.error('No audio base element exist in DOM!');
       throw new Error('Audio element could not be crated!');
@@ -38,5 +40,11 @@ export class AudioSpeakerFactory {
     AudioSpeakerFactory.baseElement.appendChild(audioElement);
 
     return audioElement;
+  }
+
+  private static initBaseElement(): void{
+    if (!AudioSpeakerFactory.baseElement) {
+      AudioSpeakerFactory.baseElement = document.getElementById('calling-audio-speaker-elements');
+    }
   }
 }
