@@ -63,6 +63,7 @@ describe('MLSConversations', () => {
       const conversationRepository = await testFactory.exposeConversationActors();
       const repositoryCore = (conversationRepository as any).core as Core;
       jest.spyOn(repositoryCore.service!.conversation, 'mlsGroupExistsLocally').mockResolvedValue(false);
+      jest.spyOn(repositoryCore.service!.mls!, 'getEpoch').mockResolvedValue(1);
       const joinSpy = jest.spyOn(repositoryCore.service!.conversation, 'joinByExternalCommit');
 
       await initMLSGroupConversations(mlsConversations, conversationRepository, {core: repositoryCore});
@@ -149,6 +150,8 @@ describe('MLSConversations', () => {
 
       const conversationRepository = await testFactory.exposeConversationActors();
       const repositoryCore = (conversationRepository as any).core as Core;
+      jest.spyOn(repositoryCore.service!.mls!, 'getEpoch').mockResolvedValue(1);
+
       // MLS group is not yet established locally
       jest.spyOn(repositoryCore.service!.mls!, 'isConversationEstablished').mockResolvedValue(false);
       const joinSpy = jest.spyOn(repositoryCore.service!.conversation!, 'joinByExternalCommit');
