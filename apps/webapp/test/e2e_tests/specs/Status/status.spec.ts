@@ -62,11 +62,12 @@ test.describe('Status', () => {
   let userB: User;
   let userC: User;
   let groupName: string;
+  let conversationId: string | undefined;
 
   test.beforeEach(async ({createTeam, createUser}) => {
     userB = await createUser();
     userC = await createUser();
-    
+
     team = await createTeam('Test Team', {users: [userB, userC]});
     userA = team.owner;
     groupName = 'Test group';
@@ -74,7 +75,7 @@ test.describe('Status', () => {
 
   const commonTestCases: {
     name: string;
-    sendAction: (params: {pageA: Page; pageB: Page; api: ApiManagerE2E}) => Promise<void>;
+    sendAction: (params: {pageA: Page; api: ApiManagerE2E}) => Promise<void>;
   }[] = [
     {
       name: 'Text',
@@ -131,25 +132,25 @@ test.describe('Status', () => {
         await userAPages.conversation().sendMessageWithUserMention(userB.fullName, 'Test mention');
       },
     },
-    // {
-    //   name: 'location sharing',
-    //   sendAction: async ({pageB, api}) => {
-    //     const {instanceId} = await api.testService.createInstance(
-    //       userA.password,
-    //       userA.email,
-    //       'Test Service Device',
-    //       false,
-    //     );
+    {
+      name: 'location sharing',
+      sendAction: async ({api}) => {
+        const {instanceId} = await api.testService.createInstance(
+          userA.password,
+          userA.email,
+          'Test Service Device',
+          false,
+        );
 
-    //     const conversationId = await api.conversation.getConversationWithUser(userA.token, userB.id!);
-    //     await api.testService.sendLocation(instanceId, conversationId, {
-    //       locationName: 'Test Location',
-    //       latitude: 52.5170365,
-    //       longitude: 13.404954,
-    //       zoom: 42,
-    //     });
-    //   },
-    // },
+        if (conversationId === undefined) throw new Error("Couldn't find conversation of userB with userA");
+        await api.testService.sendLocation(instanceId, conversationId, {
+          locationName: 'Test Location',
+          latitude: 52.5170365,
+          longitude: 13.404954,
+          zoom: 42,
+        });
+      },
+    },
     {
       name: 'Link preview',
       sendAction: async ({pageA}) => {
@@ -252,11 +253,17 @@ test.describe('Status', () => {
           if (conversation === '1on1') {
             // User B sends a message to User A
             await prepareConversationForReply(userBPageManager.webapp, userA.fullName, conversation);
+            conversationId = await api.conversation.getConversationWithUser(userA.token, userB.id!, {
+              protocol: 'mls',
+            });
             // User A opens 1:1 conversation between User A and User B
             await userAPages.conversationList().openConversation(userB.fullName, {protocol: 'mls'});
           } else {
             // User A creates a group conversation between User A, User B, User C
             await createGroup(userAPages, groupName, [userB, userC]);
+            conversationId = await api.conversation.getConversationWithUser(userA.token, userB.id!, {
+              conversationName: groupName,
+            });
 
             await components.conversationSidebar().allConverationsButton.click();
             await prepareConversationForReply(userBPageManager.webapp, groupName, conversation);
@@ -266,7 +273,7 @@ test.describe('Status', () => {
         await test.step(`User B should not receive any conversation notifications`, async () => {
           for (const testCase of commonTestCases) {
             await test.step(`Action: ${testCase.name}`, async () => {
-              await testCase.sendAction({pageA: userAPages.conversation().page, pageB: pages.conversation().page, api});
+              await testCase.sendAction({pageA: userAPages.conversation().page, api});
               await expect.poll(() => getUserBNotifications()).toHaveLength(0);
             });
           }
@@ -322,6 +329,7 @@ test.describe('Status', () => {
       const userAPages = userAPageManager.webapp.pages;
       const {pages} = userBPageManager.webapp;
 
+      // User A creates a group conversation between User A, User B, User C
       await createGroup(userAPages, groupName, [userB, userC]);
 
       await test.step('Prerequisite: User B sets status to Busy and mutes group conversation ', async () => {
@@ -337,10 +345,16 @@ test.describe('Status', () => {
       for (const conversation of ['1on1', 'group']) {
         await test.step(`User A opens the ${conversation} conversation`, async () => {
           if (conversation === '1on1') {
+            conversationId = await api.conversation.getConversationWithUser(userA.token, userB.id!, {
+              protocol: 'mls',
+            });
             // User A creates 1:1 conversation between User A and User B
             await userAPages.conversationList().openConversation(userB.fullName, {protocol: 'mls'});
           } else {
-            // User A creates a group conversation between User A, User B, User C
+            conversationId = await api.conversation.getConversationWithUser(userA.token, userB.id!, {
+              conversationName: groupName,
+            });
+
             await userAPages.conversationList().openConversation('Test Group');
           }
         });
@@ -351,7 +365,7 @@ test.describe('Status', () => {
               continue; // Skip mention and reply test cases as they are handled separately
             }
             await test.step(`Action: ${testCase.name} message in ${conversation}`, async () => {
-              await testCase.sendAction({pageA: userAPages.conversation().page, pageB: pages.conversation().page, api});
+              await testCase.sendAction({pageA: userAPages.conversation().page, api});
               await expect.poll(() => getUserBNotifications()).toHaveLength(0);
             });
           }
@@ -370,7 +384,7 @@ test.describe('Status', () => {
 
       await test.step(`User B should receive mentions, replies and calls notifications in 1to1`, async () => {
         const specialTasteCases = commonTestCases.filter(
-          testCase => testCase.name === 'Mention' || testCase.name === 'Reply' || testCase.name === 'Call',
+          testCase => testCase.name === 'Mention' || testCase.name === 'Reply',
         );
         specialTasteCases.push({
           name: 'Call',
@@ -386,7 +400,7 @@ test.describe('Status', () => {
 
         for (const testCase of specialTasteCases) {
           await test.step(`Action: ${testCase.name} message`, async () => {
-            await testCase.sendAction({pageA: userAPages.conversation().page, pageB: pages.conversation().page, api});
+            await testCase.sendAction({pageA: userAPages.conversation().page, api});
             await expect.poll(() => getUserBNotifications()).toHaveLength(1);
           });
         }
@@ -405,24 +419,31 @@ test.describe('Status', () => {
       const userAPages = userAPageManager.webapp.pages;
       const {pages, components} = userBPageManager.webapp;
 
-      // User B sets status to available or has unset status
+      // User B sets status to available
       await updateUserStatus(userBPageManager.webapp, userB.fullName, UserStatus.Available);
 
       const {getNotifications: getUserBNotifications} = await interceptNotifications(pages.conversation().page);
-
       let notificationCount = 0;
+
+      // User A creates a group conversation between User A, User B, User C
       await createGroup(userAPages, groupName, [userB, userC]);
       notificationCount++;
 
       for (const conversation of ['1on1', 'group']) {
         await test.step(`User A opens the ${conversation} conversation`, async () => {
           if (conversation === '1on1') {
+            conversationId = await api.conversation.getConversationWithUser(userA.token, userB.id!, {
+              protocol: 'mls',
+            });
             // User B sends a message to User A
             await prepareConversationForReply(userBPageManager.webapp, userA.fullName, conversation);
             // User A opens 1:1 conversation between User A and User B
             await userAPages.conversationList().openConversation(userB.fullName, {protocol: 'mls'});
           } else {
-            // User A creates a group conversation between User A, User B, User C
+            conversationId = await api.conversation.getConversationWithUser(userA.token, userB.id!, {
+              conversationName: groupName,
+            });
+
             await components.conversationSidebar().allConverationsButton.click();
             await prepareConversationForReply(userBPageManager.webapp, groupName, conversation);
 
@@ -433,7 +454,7 @@ test.describe('Status', () => {
         await test.step(`User B should receive all conversation notifications`, async () => {
           for (const testCase of commonTestCases) {
             await test.step(`Action: ${testCase.name}`, async () => {
-              await testCase.sendAction({pageA: userAPages.conversation().page, pageB: pages.conversation().page, api});
+              await testCase.sendAction({pageA: userAPages.conversation().page, api});
               notificationCount++;
               await expect.poll(() => getUserBNotifications()).toHaveLength(notificationCount);
             });
