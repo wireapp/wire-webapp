@@ -112,7 +112,6 @@ export async function initMLSGroupConversation(
     await conversationRepository.ensureConversationExists({
       groupId,
       conversationId: qualifiedId,
-      epoch: mlsConversation.epoch,
       core,
     });
 
@@ -179,7 +178,6 @@ export async function initialiseSelfAndTeamConversations(
       await conversationRepository.ensureConversationExists({
         conversationId: conversation.qualifiedId,
         groupId: conversation.groupId,
-        epoch: conversation.epoch,
         core,
       });
     }),

@@ -1006,7 +1006,6 @@ export class MessageRepository {
         await this.conversationRepositoryProvider().ensureConversationExists({
           conversationId: conversation.qualifiedId,
           groupId: conversation.groupId,
-          epoch: conversation.epoch,
         });
       }
       const result = await this.conversationService.send(sendOptions);

@@ -2336,7 +2336,7 @@ export class ConversationRepository {
         throw new Error(errorMessage);
       }
 
-      return this.ensureConversationExists({conversationId, groupId, epoch: remoteEpoch, core, retry: false});
+      return this.ensureConversationExists({conversationId, groupId, core, retry: false});
     } catch (error) {
       this.logger.error('Failed to recover from local unestablished MLS conversation', {
         error,
