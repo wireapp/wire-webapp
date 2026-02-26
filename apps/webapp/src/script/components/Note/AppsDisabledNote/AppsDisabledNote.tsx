@@ -22,7 +22,7 @@ import React from 'react';
 import {Note} from 'Components/Note/Note';
 import {t} from 'Util/LocalizerUtil';
 
-const AppsDisabledNote: React.FC = () => {
+const AppsDisabledNote = () => {
   return (
     <Note title={t('servicesNotEnabledNoteTitle')}>
       <span className={'subline'}>{t('servicesNotEnabledBody')}</span>
