@@ -12,7 +12,7 @@
     "downlevelIteration": true,
     "alwaysStrict": true,
     "strict": true,
-    "strictNullChecks": false,
+    "strictNullChecks": true,
     "useUnknownInCatchVariables": false,
     "forceConsistentCasingInFileNames": true,
     "noImplicitAny": true,

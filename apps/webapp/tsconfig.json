@@ -27,6 +27,7 @@
     "rootDirs": ["src"],
     "target": "ESNext",
     "strict": true,
+    "strictNullChecks": false,
     "strictFunctionTypes": false
   },
   "types": ["@types/wicg-file-system-access", "jest", "@testing-library/jest-dom"],
