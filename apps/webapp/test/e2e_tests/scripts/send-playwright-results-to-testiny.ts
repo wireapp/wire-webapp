@@ -101,7 +101,7 @@ function parseArgs(): CliArgs {
     const args = process.argv.slice(2);
     const get = (flag: string): string | undefined => {
         const idx = args.indexOf(flag);
-        return idx !== -1 ? args[idx + 1] : undefined;
+        return idx === -1 ? undefined : args[idx + 1];
     };
     return {
         reportPath: get("--report"),
@@ -164,7 +164,7 @@ function collectResults(
 
 function resolveStatus(entry: FlatTestEntry): TestinyStatus {
     if (entry.results.length === 0) return mapStatus("failed");
-    const last = entry.results[entry.results.length - 1];
+    const last = entry.results.at(-1)!;
     return mapStatus(last.status);
 }
 
@@ -196,7 +196,7 @@ class TestinyClient {
     // ── Project helpers ──────────────────────────────────────────────────────────
 
     private get projectIsNumeric(): boolean {
-        return this.project.trim() !== "" && !isNaN(Number(this.project));
+        return this.project.trim() !== "" && !Number.isNaN(Number(this.project));
     }
 
     private get projectFilterFields(): Record<string, unknown> {
@@ -229,7 +229,7 @@ class TestinyClient {
                 "Content-Type": "application/json",
                 "X-Api-Key": this.apiKey,
             },
-            body: body !== undefined ? JSON.stringify(body) : undefined,
+            body: body === undefined ? undefined : JSON.stringify(body),
         });
 
         const text = await res.text();
@@ -315,8 +315,8 @@ class TestinyClient {
     // ── Test Case ────────────────────────────────────────────────────────────────
 
     async findTestCaseByKey(tcKey: string): Promise<number | null> {
-        const numericId = parseInt(tcKey.replace(/^TC-/i, ""), 10);
-        if (isNaN(numericId)) return null;
+        const numericId = Number.parseInt(tcKey.replace(/^TC-/i, ""), 10);
+        if (Number.isNaN(numericId)) return null;
 
         try {
             const tc = await this.request<TestinyTestCase>(
@@ -364,11 +364,7 @@ class TestinyClient {
 // ─── Main ─────────────────────────────────────────────────────────────────────
 
 async function main(): Promise<void> {
-    //   const { reportPath, runName, runId } = parseArgs();
-    let { reportPath, runName } = parseArgs();
-
-    reportPath = "playwright-report/report.json";
-    runName = "Regression run Testing Automation";
+    const { reportPath, runName } = parseArgs();
 
     if (!reportPath) {
         console.error("❌  --report <path> is required");
@@ -535,8 +531,10 @@ async function main(): Promise<void> {
     }
 }
 
-main().catch((err: unknown) => {
-    const message = err instanceof Error ? err.message : String(err);
-    console.error("Fatal error:", message);
-    process.exit(1);
-});
+try {
+  await main();
+} catch (err: unknown) {
+  const message = err instanceof Error ? err.message : JSON.stringify(err);
+  console.error("Fatal error:", message);
+  process.exit(1);
+}

@@ -155,5 +155,5 @@ jobs:
           TESTINY_RUN_NAME: ${{ inputs.testinyRunName }}
         run: |
           npx ts-node apps/webapp/test/e2e_tests/scripts/send-playwright-results-to-testiny.ts \
-            --report ./apps/webapp/playwright-report/report.json \
+            --report apps/webapp/playwright-report/report.json \
             --run-name "$TESTINY_RUN_NAME"
