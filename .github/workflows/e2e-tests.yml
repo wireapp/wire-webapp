@@ -22,6 +22,9 @@ on:
       grep:
         type: string
         description: Define which tests to run, the given value will be passed to the `--grep` flag of playwright
+      testinyRunName:
+        type: string
+        description: Define Testiny Run to upload results to
   # Options for calling the workflow within an other workflow
   workflow_call:
     inputs:
@@ -144,3 +147,12 @@ jobs:
         run: |
           echo "reportUrl=${{ steps.upload_playwright_report.outputs.artifact-url }}" >> $GITHUB_OUTPUT
           echo "reportArtifactId=${{ steps.upload_playwright_report.outputs.artifact-id }}" >> $GITHUB_OUTPUT
+
+      - name: Update Testiny Run with results
+        if: ${{ inputs.testinyRunName }}
+        env:
+          TESTINY_API_KEY: ${{ secrets.TESTINY_API_KEY }}
+        run: |
+          npx ts-node apps/webapp/test/e2e_tests/scripts/send-playwright-results-to-testiny.ts \
+            --report ./apps/webapp/playwright-report/report.json \
+            --run-name "${{ inputs.testinyRunName }}"
