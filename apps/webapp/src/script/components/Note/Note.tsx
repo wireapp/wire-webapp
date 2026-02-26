@@ -27,7 +27,7 @@ interface NoteProps {
   children?: ReactNode;
 }
 
-const Note: React.FC<NoteProps> = ({title, children}) => {
+const Note = ({title, children}: NoteProps) => {
   return (
     <div css={ContainerStyle}>
       <div css={HeaderStyle}>
