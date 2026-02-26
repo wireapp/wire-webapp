@@ -17,10 +17,11 @@
  *
  */
 
-import {useEffect, useLayoutEffect} from 'react';
+import {useCallback, useEffect, useLayoutEffect, useMemo} from 'react';
 
 import {amplify} from 'amplify';
 import cx from 'classnames';
+import ky from 'ky';
 import {ErrorBoundary} from 'react-error-boundary';
 import {container} from 'tsyringe';
 
@@ -62,10 +63,14 @@ import {RootProvider} from './RootProvider';
 import {useAppMainState, ViewType} from './state';
 import {ContentState, useAppState} from './useAppState';
 
+import {runClientVersionCheck} from '../application-periodic-checks/runClientVersionCheck';
+import {startApplicationPeriodicChecks} from '../application-periodic-checks/startApplicationPeriodicChecks';
+import {createWallClock} from '../clock/wallClock';
 import {App} from '../main/app';
 import {initialiseMLSMigrationFlow} from '../mls/MLSMigration';
 import {generateConversationUrl} from '../router/routeGenerator';
 import {configureRoutes, navigate} from '../router/Router';
+import {TIME_IN_MILLIS} from '../util/TimeUtil';
 import {MainViewModel} from '../view_model/MainViewModel';
 import {WarningsContainer} from '../view_model/WarningsContainer/WarningsContainer';
 
@@ -93,7 +98,21 @@ export const AppMain = ({
   callState = container.resolve(CallState),
   locked,
 }: AppMainProps) => {
+  const wallClock = useMemo(() => {
+    return createWallClock();
+  }, []);
+  const runApplicationPeriodicCheck: () => void = useCallback(() => {
+    runClientVersionCheck({ky});
+  }, []);
   const apiContext = app.getAPIContext();
+
+  useEffect(() => {
+    return startApplicationPeriodicChecks({
+      wallClock,
+      periodicChecksIntervalDelayInMilliseconds: TIME_IN_MILLIS.MINUTE * 5,
+      runPeriodicCheck: runApplicationPeriodicCheck,
+    });
+  }, [wallClock, runApplicationPeriodicCheck]);
 
   useActiveWindow(window);
 
@@ -287,7 +306,7 @@ export const AppMain = ({
       data-uie-value="is-loaded"
     >
       {!locked && <WindowTitleUpdater />}
-      <RootProvider value={mainView}>
+      <RootProvider value={{mainViewModel: mainView, wallClock}}>
         <ErrorBoundary FallbackComponent={ErrorFallback}>
           {Config.getConfig().FEATURE.ENABLE_DEBUG && <ConfigToolbar />}
           {!locked && (

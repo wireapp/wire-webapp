@@ -54,4 +54,57 @@ describe('wall clock', () => {
     expect(firstCurrentDate).not.toBe(secondCurrentDate);
     expect(secondCurrentDate.getTime()).toBeGreaterThanOrEqual(firstCurrentDate.getTime());
   });
+
+  it('binds setInterval to globalThis', () => {
+    const originalSetInterval = globalThis.setInterval;
+    const intervalIdentifier = 123 as unknown as ReturnType<typeof globalThis.setInterval>;
+    const intervalInvocationContexts: unknown[] = [];
+
+    const setIntervalStub = function (this: unknown) {
+      intervalInvocationContexts.push(this);
+      return intervalIdentifier;
+    };
+
+    globalThis.setInterval = setIntervalStub as unknown as typeof globalThis.setInterval;
+
+    try {
+      const wallClock = createWallClock();
+      const returnedIntervalIdentifier = wallClock.setInterval(() => {
+        return undefined;
+      }, 1);
+
+      expect(returnedIntervalIdentifier).toBe(intervalIdentifier);
+      expect(intervalInvocationContexts[0]).toBe(globalThis);
+    } finally {
+      globalThis.setInterval = originalSetInterval;
+    }
+  });
+
+  it('binds clearInterval to globalThis', () => {
+    const originalClearInterval = globalThis.clearInterval;
+    const clearIntervalInvocationContexts: unknown[] = [];
+    const clearIntervalArguments: ReturnType<typeof globalThis.setInterval>[] = [];
+
+    const clearIntervalStub = function (
+      this: unknown,
+      providedIntervalIdentifier: ReturnType<typeof globalThis.setInterval>,
+    ) {
+      clearIntervalInvocationContexts.push(this);
+      clearIntervalArguments.push(providedIntervalIdentifier);
+    };
+
+    globalThis.clearInterval = clearIntervalStub as unknown as typeof globalThis.clearInterval;
+
+    try {
+      const wallClock = createWallClock();
+      const intervalIdentifier = 123 as unknown as ReturnType<typeof globalThis.setInterval>;
+
+      wallClock.clearInterval(intervalIdentifier);
+
+      expect(clearIntervalInvocationContexts[0]).toBe(globalThis);
+      expect(clearIntervalArguments).toEqual([intervalIdentifier]);
+    } finally {
+      globalThis.clearInterval = originalClearInterval;
+    }
+  });
 });

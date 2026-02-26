@@ -93,6 +93,12 @@ async function buildBackupRepository() {
   ] as const;
 }
 
+function createBlobFromUint8Array(zipData: Uint8Array<ArrayBufferLike>): Blob {
+  const normalizedZipData = new Uint8Array(zipData.byteLength);
+  normalizedZipData.set(zipData);
+  return new Blob([normalizedZipData.buffer]);
+}
+
 describe('BackupRepository', () => {
   beforeAll(async () => {
     jest.spyOn(WebWorker.prototype, 'post').mockImplementation(handleZipEvent as any);
@@ -185,8 +191,11 @@ describe('BackupRepository', () => {
         [Filename.METADATA]: JSON.stringify(meta),
       };
       const zip = (await handleZipEvent({type: 'zip', files})) as Uint8Array;
+      const zipBlob = createBlobFromUint8Array(zip);
 
-      await expect(backupRepository.importHistory(new User('user1'), zip, noop, noop)).rejects.toThrow(expectedError);
+      await expect(backupRepository.importHistory(new User('user1'), zipBlob, noop, noop)).rejects.toThrow(
+        expectedError,
+      );
     });
 
     it('successfully imports a backup', async () => {
@@ -217,8 +226,9 @@ describe('BackupRepository', () => {
       };
 
       const zip = (await handleZipEvent({type: 'zip', files})) as Uint8Array;
+      const zipBlob = createBlobFromUint8Array(zip);
 
-      await backupRepository.importHistory(user, zip, noop, noop);
+      await backupRepository.importHistory(user, zipBlob, noop, noop);
 
       expect(conversationRepository.updateConversationStates).toHaveBeenCalledWith(
         expect.arrayContaining([expect.objectContaining({id: conversation.id})]),

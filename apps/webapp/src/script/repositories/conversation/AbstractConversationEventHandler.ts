@@ -23,7 +23,10 @@ import type {Conversation} from 'Repositories/entity/Conversation';
 
 import {ClientConversationEvent} from './EventBuilder';
 
-export type EventHandlingConfig = {[eventId: string]: (conversationEntity: Conversation) => void | Promise<void>};
+type ConversationEventPayload = ConversationEvent | ClientConversationEvent | FederationEvent;
+type EventHandlingFunction = (conversationEntity: Conversation, eventJson: unknown) => void | Promise<unknown>;
+
+export type EventHandlingConfig = {[eventId: string]: EventHandlingFunction};
 
 /**
  * Abstract class that represents an entity that can react to a conversation event.
@@ -50,11 +53,11 @@ export class AbstractConversationEventHandler {
    * @param conversationEntity the conversation the event relates to
    * @param eventJson JSON data for the event
    */
-  handleConversationEvent(
-    conversationEntity: Conversation,
-    eventJson: ConversationEvent | ClientConversationEvent | FederationEvent,
-  ): Promise<void> {
-    const handler = this.eventHandlingConfig[eventJson.type] || (() => Promise.resolve());
-    return handler.bind(this)(conversationEntity, eventJson);
+  handleConversationEvent(conversationEntity: Conversation, eventJson: ConversationEventPayload): Promise<void> {
+    const handler = this.eventHandlingConfig[eventJson.type];
+    if (!handler) {
+      return Promise.resolve();
+    }
+    return Promise.resolve(handler.call(this, conversationEntity, eventJson)).then((): void => undefined);
   }
 }

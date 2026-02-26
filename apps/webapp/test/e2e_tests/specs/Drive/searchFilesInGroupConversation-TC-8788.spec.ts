@@ -34,10 +34,10 @@ const conversationName = 'Cells Critical Conversation';
 const imageFilePath = getImageFilePath();
 const videoFilePath = getVideoFilePath();
 
-test.beforeEach(async ({createTeam}) => {
-  const team = await createTeam(teamName, {withMembers: 1});
+test.beforeEach(async ({createTeam, createUser}) => {
+  userB = await createUser();
+  const team = await createTeam(teamName, {users: [userB]});
   userA = team.owner;
-  userB = team.members[0];
 });
 
 test(

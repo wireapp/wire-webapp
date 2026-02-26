@@ -44,7 +44,7 @@ import {ActionsViewModel} from '../../../view_model/ActionsViewModel';
 import {MainViewModel} from '../../../view_model/MainViewModel';
 
 jest.mock('Components/panel/EnrichedFields', () => ({
-  useEnrichedFields: () => [],
+  useEnrichedFields: (): never[] => [],
   EnrichedFields: () => <div />,
   __esModule: true,
 }));

@@ -27,6 +27,7 @@ import {EVENTS as CoreEvents} from '@wireapp/core/lib/Account';
 import {MLSServiceEvents} from '@wireapp/core/lib/messagingProtocols/mls';
 import {amplify} from 'amplify';
 import 'core-js/full/reflect';
+import pWaitFor from 'p-wait-for';
 import platform from 'platform';
 import {pdfjs} from 'react-pdf';
 import {container} from 'tsyringe';
@@ -55,6 +56,7 @@ import {CryptographyRepository} from 'Repositories/cryptography/CryptographyRepo
 import {User} from 'Repositories/entity/User';
 import {EventRepository} from 'Repositories/event/EventRepository';
 import {EventService} from 'Repositories/event/EventService';
+import {NOTIFICATION_HANDLING_STATE} from 'Repositories/event/NotificationHandlingState';
 import {NotificationService} from 'Repositories/event/NotificationService';
 import {EventStorageMiddleware} from 'Repositories/event/preprocessor/EventStorageMiddleware';
 import {QuotedMessageMiddleware} from 'Repositories/event/preprocessor/QuoteDecoderMiddleware';
@@ -121,6 +123,20 @@ import {Warnings} from '../view_model/WarningsContainer';
 // Initialize PDF.js worker for react-pdf package
 pdfjs.GlobalWorkerOptions.workerSrc = '/min/pdf.worker.mjs';
 
+type WaitUntilAllMessagesAreProcessedDependencies = {
+  eventRepository: EventRepository;
+};
+
+export async function waitUntilAllMessagesAreProcessed(dependencies: WaitUntilAllMessagesAreProcessedDependencies) {
+  const {eventRepository} = dependencies;
+
+  await pWaitFor(
+    () => {
+      return eventRepository.notificationHandlingState() === NOTIFICATION_HANDLING_STATE.WEB_SOCKET;
+    },
+    {interval: 500},
+  );
+}
 export class App {
   static readonly LOCAL_STORAGE_LOGIN_REDIRECT_KEY = 'LOGIN_REDIRECT_KEY';
   static readonly LOCAL_STORAGE_LOGIN_CONVERSATION_KEY = 'LOGIN_CONVERSATION_KEY';
@@ -539,6 +555,8 @@ export class App {
         teamFeatures[FEATURE_KEY.CONSUMABLE_NOTIFICATIONS]?.status === FEATURE_STATUS.ENABLED;
       const useLegacyNotificationStream = !useAsyncNotificationStream;
 
+      let previousMessage = '';
+
       await eventRepository.connectWebSocket(
         this.core,
         useLegacyNotificationStream,
@@ -553,9 +571,16 @@ export class App {
             : '';
 
           totalNotifications++;
-          onProgress(message);
+          if (message !== previousMessage) {
+            onProgress(message);
+            previousMessage = message;
+          }
         },
       );
+
+      await waitUntilAllMessagesAreProcessed({eventRepository});
+
+      this.logger.info(`Finished loading notifications, total: ${totalNotifications}`);
 
       // Pause the notification queue until we've fully initialized
       this.core.pauseNotificationQueue();
@@ -573,6 +598,8 @@ export class App {
           this.core,
         );
 
+        this.logger.info('Finished initializing self and team conversations after migration finalization');
+
         // join all the mls groups that are known by the user but were migrated to mls
         await joinConversationsAfterMigrationFinalisation({
           conversations,
@@ -583,12 +610,16 @@ export class App {
             this.logger.error(`Failed when joining a migrated mls conversation with id ${id}, error: `, error),
         });
 
+        this.logger.info('Finished joining conversations after migration finalization');
+
         // join all the mls groups we're member of and have not yet joined (eg. we were not send welcome message)
         await initMLSGroupConversations(conversations, conversationRepository, {
           core: this.core,
           onError: ({id}, error) =>
             this.logger.error(`Failed when initialising mls conversation with id ${id}, error: `, error),
         });
+
+        this.logger.info('Finished initializing MLS group conversations');
       }
 
       eventLogger.log(AppInitializationStep.SetupMLS);

@@ -62,12 +62,6 @@ export class ConversationListPage {
     this.clearContentButton = page.getByRole('button', {name: 'Clear content'});
   }
 
-  async isConversationItemVisible(conversationName: string) {
-    const conversation = this.getConversationLocator(conversationName);
-    await conversation.waitFor({state: 'visible'});
-    return await conversation.isVisible();
-  }
-
   async isConversationBlocked(conversationName: string) {
     return await this.getConversationLocator(conversationName).getByTestId('status-blocked').isVisible();
   }
@@ -96,6 +90,11 @@ export class ConversationListPage {
 
   async archiveConversation() {
     await this.archiveConversationMenuButton.click();
+  }
+
+  async setNotifications(level: 'Everything' | 'Mentions and replies' | 'Nothing') {
+    await this.page.getByRole('menuitem', {name: 'Notifications'}).click(); // Click the "Notifications" menu item
+    await this.page.getByRole('radiogroup').locator('label', {hasText: level}).click(); // Click the specified radio button
   }
 
   async unarchiveConversation() {

@@ -58,8 +58,9 @@ jobs:
 
     services:
       # Run the kalium testservice as service container of the current job
+      # (The tag specifies the commit in kalium to use for tests, see https://quay.io/repository/wire/testservice?tab=history for the latest version)
       testservice:
-        image: quay.io/wire/testservice:latest
+        image: quay.io/wire/testservice:5ec1c95b75daa7241e38c97f2916a06a2e40ce1b
         ports:
           - 8080:8080
 
@@ -72,7 +73,7 @@ jobs:
           cache: 'yarn'
 
       - run: yarn --immutable
-      - run: yarn playwright install --with-deps chrome
+      - run: yarn playwright install --only-shell --with-deps chromium
       - uses: 1password/install-cli-action@143a85f84a90555d121cde2ff5872e393a47ab9f
 
       - name: Generate env file

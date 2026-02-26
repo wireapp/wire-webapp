@@ -27,10 +27,11 @@ test.describe('Accessibility', () => {
   let userA: User;
   let userB: User;
 
-  test.beforeEach(async ({createTeam}) => {
-    const team = await createTeam('Accessible Team', {withMembers: 1});
+  test.beforeEach(async ({createUser, createTeam}) => {
+    userB = await createUser();
+
+    const team = await createTeam('Accessible Team', {users: [userB]});
     userA = team.owner;
-    userB = team.members[0];
   });
 
   test(

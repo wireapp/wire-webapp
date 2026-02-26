@@ -115,7 +115,10 @@ describe('LifeCycleRepository', () => {
   });
 
   afterEach(() => {
-    window.location = originalLocation;
+    Object.defineProperty(window, 'location', {
+      writable: true,
+      value: originalLocation,
+    });
     Object.defineProperty(window, 'navigator', {
       writable: true,
       value: originalNavigator,

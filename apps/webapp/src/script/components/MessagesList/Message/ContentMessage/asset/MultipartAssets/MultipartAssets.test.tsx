@@ -28,7 +28,7 @@ import {withTheme} from 'src/script/auth/util/test/TestUtil';
 import {MultipartAssets} from './MultipartAssets';
 
 jest.mock('Hooks/useInView/useInView', () => ({
-  useInView: () => ({
+  useInView: (): {elementRef: {current: null}; hasBeenInView: boolean} => ({
     elementRef: {current: null},
     hasBeenInView: true,
   }),

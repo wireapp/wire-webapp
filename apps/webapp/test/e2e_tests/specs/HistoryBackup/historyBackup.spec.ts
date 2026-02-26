@@ -27,11 +27,10 @@ import {RequestResetPasswordPage} from '../../pageManager/webapp/pages/requestRe
 test.describe('History Backup', () => {
   let userA: User;
   let userB: User;
-
-  test.beforeEach(async ({createTeam}) => {
-    const team = await createTeam('Test Team', {withMembers: 1});
+  test.beforeEach(async ({createTeam, createUser}) => {
+    userB = await createUser();
+    const team = await createTeam('Test Team', {users: [userB]});
     userA = team.owner;
-    userB = team.members[0];
   });
 
   test(
@@ -40,7 +39,7 @@ test.describe('History Backup', () => {
     async ({createPage, api}, testInfo) => {
       const [userAPageManager, userBPageManager] = await Promise.all([
         PageManager.from(createPage(withLogin(userA), withConnectedUser(userB))),
-        PageManager.from(createPage(withLogin(userB), withConnectedUser(userA))),
+        PageManager.from(createPage(withLogin(userB))),
       ]);
 
       const {pages: userAPages, modals: userAModals, components: userAComponents} = userAPageManager.webapp;
@@ -117,7 +116,7 @@ test.describe('History Backup', () => {
     async ({createPage}, testInfo) => {
       const [userAPageManager, userBPageManager] = await Promise.all([
         PageManager.from(createPage(withLogin(userA), withConnectedUser(userB))),
-        PageManager.from(createPage(withLogin(userB), withConnectedUser(userA))),
+        PageManager.from(createPage(withLogin(userB))),
       ]);
 
       const {pages: userAPages, components: userAComponents} = userAPageManager.webapp;
@@ -164,7 +163,7 @@ test.describe('History Backup', () => {
     async ({createPage}, testInfo) => {
       const [userAPageManager, userBPageManager] = await Promise.all([
         PageManager.from(createPage(withLogin(userA), withConnectedUser(userB))),
-        PageManager.from(createPage(withLogin(userB), withConnectedUser(userA))),
+        PageManager.from(createPage(withLogin(userB))),
       ]);
       const {pages: userAPages, components: userAComponents} = userAPageManager.webapp;
       const {pages: userBPages} = userBPageManager.webapp;
@@ -222,7 +221,7 @@ test.describe('History Backup', () => {
     async ({createPage}, testInfo) => {
       const [userAPageManager, userBPageManager] = await Promise.all([
         PageManager.from(createPage(withLogin(userA), withConnectedUser(userB))),
-        PageManager.from(createPage(withLogin(userB), withConnectedUser(userA))),
+        PageManager.from(createPage(withLogin(userB))),
       ]);
       const {pages: userAPages, components: userAComponents} = userAPageManager.webapp;
       const {pages: userBPages} = userBPageManager.webapp;
@@ -242,7 +241,7 @@ test.describe('History Backup', () => {
 
       await test.step('User A mutes group conversation with User B', async () => {
         await userAPages.conversation().conversationInfoButton.click();
-        await userAPages.conversationDetails().setNotificationsForConversation('Nothing');
+        await userAPages.conversationDetails().setNotifications('Nothing');
       });
 
       await test.step('User A archives 1:1 conversation with User B', async () => {
@@ -287,7 +286,7 @@ test.describe('History Backup', () => {
     async ({createPage}, testInfo) => {
       const [userAPageManager, userBPageManager] = await Promise.all([
         PageManager.from(createPage(withLogin(userA), withConnectedUser(userB))),
-        PageManager.from(createPage(withLogin(userB), withConnectedUser(userA))),
+        PageManager.from(createPage(withLogin(userB))),
       ]);
 
       const {pages: userAPages, modals: userAModals, components: userAComponents} = userAPageManager.webapp;
@@ -333,7 +332,7 @@ test.describe('History Backup', () => {
     async ({createPage}, testInfo) => {
       const [userAPageManager, userBPageManager] = await Promise.all([
         PageManager.from(createPage(withLogin(userA), withConnectedUser(userB))),
-        PageManager.from(createPage(withLogin(userB), withConnectedUser(userA))),
+        PageManager.from(createPage(withLogin(userB))),
       ]);
       const {pages: userAPages, modals: userAModals, components: userAComponents} = userAPageManager.webapp;
       const {pages: userBPages} = userBPageManager.webapp;

@@ -18,8 +18,8 @@
     "./lib/shims/node/websocket": "./lib/shims/browser/websocket.js"
   },
   "dependencies": {
-    "@aws-sdk/client-s3": "3.975.0",
-    "@aws-sdk/lib-storage": "3.975.0",
+    "@aws-sdk/client-s3": "3.995.0",
+    "@aws-sdk/lib-storage": "3.995.0",
     "@wireapp/priority-queue": "2.1.19",
     "@wireapp/protocol-messaging": "1.56.0",
     "axios-retry": "4.5.0",
@@ -48,7 +48,7 @@
     "react": "18.3.1",
     "react-dom": "18.3.1",
     "ts-node": "^10.9.2",
-    "webpack": "^5.104.1",
+    "webpack": "^5.105.2",
     "ws": "8.19.0"
   },
   "scripts": {
@@ -59,6 +59,6 @@
     "test:coverage": "nx run api-client-lib:test:coverage",
     "watch": "nx run api-client-lib:watch"
   },
-  "version": "27.95.6",
+  "version": "27.96.0",
   "gitHead": "5339f01fe01ef0871da8c8bc8662fbe9e604754a"
 }
