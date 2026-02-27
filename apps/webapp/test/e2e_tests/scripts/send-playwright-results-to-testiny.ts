@@ -137,7 +137,7 @@ function makeLinkParagraph(label: string, url: string): SlateParagraph {
 }
 
 function parseSlateDoc(raw: string | undefined): SlateDoc {
-    if (raw) {
+    if (raw !== undefined) {
         try {
             const parsed = JSON.parse(raw) as SlateDoc;
             if (parsed.t === "slate") return parsed;
@@ -153,7 +153,7 @@ async function updateTestinyRunDescription(runId: number, client: TestinyClient)
     const ghRepo = process.env.GITHUB_REPOSITORY;
     const ghRunId = process.env.GITHUB_RUN_ID;
 
-    if (!ghServer || !ghRepo || !ghRunId) return;
+    if (ghServer === undefined || ghRepo === undefined || ghRunId === undefined) return;
 
     const actionUrl = `${ghServer}/${ghRepo}/actions/runs/${ghRunId}`;
     console.log(`\n📝  Appending build URL to run description: ${actionUrl}`);
@@ -190,7 +190,7 @@ function extractTcTags(title: string, tags: string[]): string[] {
 
     for (const t of [title, ...tags]) {
         const found = String(t).match(pattern);
-        if (found) {
+        if (found !== undefined) {
             found.forEach((m) => matches.add(m.replace(/^@/, "").toUpperCase()));
         }
     }
@@ -239,13 +239,13 @@ function collectResults(
 
 function resolveStatus(entry: FlatTestEntry): TestinyStatus {
     if (entry.results.length === 0) return mapStatus("failed");
-    const last = entry.results.at(-1)!;
+    const last = entry.results.at(-1);
     return mapStatus(last.status);
 }
 
 function resolveErrorMessage(entry: FlatTestEntry): string | undefined {
     for (const attempt of [...entry.results].reverse()) {
-        if (attempt.errors?.length) {
+        if (attempt.errors?.length > 0) {
             return attempt.errors
                 .map((e) => e.message ?? JSON.stringify(e))
                 .join("\n")
@@ -315,7 +315,7 @@ class TestinyClient {
             json = text;
         }
 
-        if (!res.ok) {
+        if (res.ok === false) {
             throw new Error(
                 `Testiny API ${method} ${endpoint} → ${res.status}: ${JSON.stringify(json)}`
             );
@@ -360,14 +360,14 @@ class TestinyClient {
     async resolveRun(
         runName: string | undefined
     ): Promise<number> {
-        if (!runName) {
+        if (runName === undefined) {
             throw new Error("runName must be provided.");
         }
 
-        const existing = await this.findRunByTitle(runName);
-        if (existing) {
-            console.log(`  ✓ Found existing run "${runName}" (ID ${existing.id})`);
-            return existing.id;
+        const existingRun = await this.findRunByTitle(runName);
+        if (existingRun !== null) {
+            console.log(`  ✓ Found existing run "${runName}" (ID ${existingRun.id})`);
+            return existingRun.id;
         }
 
         return this.createRun(runName);
@@ -381,7 +381,7 @@ class TestinyClient {
 
     async findTestCaseByKey(tcKey: string): Promise<number | null> {
         const numericId = Number.parseInt(tcKey.replace(/^TC-/i, ""), 10);
-        if (Number.isNaN(numericId)) return null;
+        if (Number.isNaN(numericId) === true) return null;
 
         try {
             const tc = await this.request<TestinyTestCase>(
@@ -431,7 +431,7 @@ class TestinyClient {
 async function main(): Promise<void> {
     const { reportPath, runName } = parseArgs();
 
-    if (!reportPath) {
+    if (reportPath === undefined) {
         console.error("❌  --report <path> is required");
         process.exit(1);
     }
@@ -445,11 +445,11 @@ async function main(): Promise<void> {
     const baseUrl =
         process.env.TESTINY_BASE_URL ?? "https://app.testiny.io/api/v1";
 
-    if (!apiKey) {
+    if (apiKey === undefined) {
         console.error("❌  TESTINY_API_KEY env var is required");
         process.exit(1);
     }
-    if (!project) {
+    if (project === undefined) {
         console.error(
             "❌  TESTINY_PROJECT env var is required"
         );
@@ -457,7 +457,7 @@ async function main(): Promise<void> {
     }
 
     const reportAbsPath = path.resolve(reportPath);
-    if (!fs.existsSync(reportAbsPath)) {
+    if (fs.existsSync(reportAbsPath) === false) {
         console.error(`❌  Report file not found: ${reportAbsPath}`);
         process.exit(1);
     }
@@ -583,12 +583,10 @@ async function main(): Promise<void> {
     });
 }
 
-void (async () => {
-    try {
-        await main();
-    } catch (err: unknown) {
-        const message = err instanceof Error ? err.message : JSON.stringify(err);
-        console.error("Fatal error:", message);
-        process.exit(1);
-    }
-})();
+function crash(error: unknown): void {
+    const message = error instanceof Error ? error.message : JSON.stringify(error);
+    console.error("Fatal error:", message);
+    process.exitCode = 1;
+}
+
+main().catch(crash);
