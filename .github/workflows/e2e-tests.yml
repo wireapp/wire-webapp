@@ -92,7 +92,7 @@ jobs:
           TEST_SERVICE_URL: http://localhost:8080 # Run tests against locally running test service
           PLAYWRIGHT_BLOB_OUTPUT_DIR: apps/webapp/playwright-report/blob-reports
           GREP: ${{ inputs.grep }}
-        run: yarn nx run webapp:e2e --shard=${{ matrix.shard }}/${{ strategy.job-total }} --reporter=blob --grep="$GREP"
+        run: yarn nx run webapp:e2e --shard=${{ matrix.shard }}/${{ strategy.job-total }} --reporter=blob --grep=\"$GREP\"
 
       - name: Upload blob report
         if: ${{ !cancelled() }}
