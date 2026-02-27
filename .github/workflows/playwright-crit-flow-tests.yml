@@ -1,11 +1,9 @@
 name: Playwright Critical Flow Tests
 
-on:
-  pull_request:
-    # we want to run the CI on every PR targeting those branches
-    branches: [dev]
-  merge_group:
-    branches: [dev]
+#on:
+#  pull_request:
+#    # we want to run the CI on every PR targetting those branches
+#    branches: [dev]
 
 jobs:
   smoke-tests:
@@ -50,7 +48,7 @@ jobs:
           path: playwright-report/
 
       - name: Generate PR comment
-        if: ${{ always() && github.event_name == 'pull_request' }}
+        if: always()
         id: generate_comment
         run: |
           node --experimental-strip-types apps/webapp/test/e2e_tests/scripts/create-playwright-report-summary.ts
@@ -60,7 +58,7 @@ jobs:
           echo "EOF" >> $GITHUB_OUTPUT
 
       - name: Comment on PR
-        if: ${{ always() && github.event_name == 'pull_request' }}
+        if: always()
         uses: marocchino/sticky-pull-request-comment@v2
         with:
           header: playwright-summary
