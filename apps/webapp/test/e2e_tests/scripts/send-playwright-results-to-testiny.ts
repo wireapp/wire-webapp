@@ -95,6 +95,81 @@ interface TestinyClientOptions {
     project: string;
 }
 
+// ─── Slate rich-text helpers ──────────────────────────────────────────────────
+
+/**
+ * Testiny stores descriptions as a Slate JSON document:
+ *   { t: "slate", v: 1, c: [ ...paragraph nodes ] }
+ * A paragraph containing a clickable link looks like:
+ *   { t: "p", children: [ { text: "Build URL: " }, { t: "a", url: "...", children: [{ text: "..." }] }, { text: "" } ] }
+ */
+
+interface SlateText {
+    text: string;
+}
+
+interface SlateLink {
+    t: "a";
+    url: string;
+    children: SlateText[];
+}
+
+interface SlateParagraph {
+    t: "p";
+    children: (SlateText | SlateLink)[];
+}
+
+interface SlateDoc {
+    t: "slate";
+    v: 1;
+    c: SlateParagraph[];
+}
+
+function makeLinkParagraph(label: string, url: string): SlateParagraph {
+    return {
+        t: "p",
+        children: [
+            { text: `${label} ` },
+            { t: "a", url, children: [{ text: url }] },
+            { text: "" },
+        ],
+    };
+}
+
+function parseSlateDoc(raw: string | undefined): SlateDoc {
+    if (raw) {
+        try {
+            const parsed = JSON.parse(raw) as SlateDoc;
+            if (parsed.t === "slate") return parsed;
+        } catch {
+            // not a Slate doc — fall through to a fresh one
+        }
+    }
+    return { t: "slate", v: 1, c: [] };
+}
+
+async function updateTestinyRunDescription(runId: number, client: TestinyClient): Promise<void> {
+    const ghServer = process.env.GITHUB_SERVER_URL;
+    const ghRepo = process.env.GITHUB_REPOSITORY;
+    const ghRunId = process.env.GITHUB_RUN_ID;
+
+    if (!ghServer || !ghRepo || !ghRunId) return;
+
+    const actionUrl = `${ghServer}/${ghRepo}/actions/runs/${ghRunId}`;
+    console.log(`\n📝  Appending build URL to run description: ${actionUrl}`);
+
+    try {
+        const run = await client.getRun(runId);
+        const doc = parseSlateDoc(run.description);
+        doc.c.push(makeLinkParagraph("Build URL:", actionUrl));
+        await client.updateRunDescription(runId, JSON.stringify(doc));
+        console.log("  ✓ Description updated");
+    } catch (err) {
+        const message = err instanceof Error ? err.message : JSON.stringify(err);
+        console.warn(`  ⚠️  Could not update description: ${message}`);
+    }
+}
+
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
 function parseArgs(): CliArgs {
@@ -298,17 +373,7 @@ class TestinyClient {
         return this.createRun(runName);
     }
 
-    /**
-     * Appends a line to the description of an existing test run.
-     * Fetches the current description first so multiple CI runs accumulate
-     * rather than overwrite each other.
-     *   GET  /testrun/{id}
-     *   PUT  /testrun/{id}?force=true
-     */
-    async appendRunDescription(runId: number, line: string): Promise<void> {
-        const run = await this.getRun(runId);
-        const existing = run.description?.trim();
-        const description = existing ? `${existing}\n${line}` : line;
+    async updateRunDescription(runId: number, description: string): Promise<void> {
         await this.request("PUT", `/testrun/${runId}?force=true`, { description });
     }
 
@@ -506,37 +571,24 @@ async function main(): Promise<void> {
 
     if (resolveErrors > 0 || sendError > 0) process.exit(1);
 
-    // ── Phase 4: append a summary line to the test run description (optional) ──────────────────────────
+    // ── Phase 4: Add a link to the build in the test run description (optional) ──────────────────────────
 
     // Update the run description with a link back to the GitHub Actions run.
     // All GITHUB_* variables are set automatically by the Actions runner;
     // when running locally they will be undefined and the update is skipped.
-    const ghServer = process.env.GITHUB_SERVER_URL;
-    const ghRepo = process.env.GITHUB_REPOSITORY;
-    const ghRunId = process.env.GITHUB_RUN_ID;
 
-    if (ghServer && ghRepo && ghRunId) {
-        const actionUrl = `${ghServer}/${ghRepo}/actions/runs/${ghRunId}`;
-        const description = `Build URL: ${actionUrl}`;
-
-        console.log(`\n📝  Updating run description: ${description}`);
-        try {
-            await client.appendRunDescription(resolvedRunId, description);
-            console.log("  ✓ Description updated");
-        } catch (err) {
-            // Non-fatal — log and continue so results are still uploaded
-            const message = err instanceof Error ? err.message : String(err);
-            console.warn(`  ⚠️  Could not update description: ${message}`);
-        }
-    }
+    updateTestinyRunDescription(resolvedRunId, client).catch((err) => {
+        const message = err instanceof Error ? err.message : String(err);
+        console.warn(`  ⚠️  Could not update run description: ${message}`);
+    });
 }
 
 void (async () => {
-  try {
-    await main();
-  } catch (err: unknown) {
-    const message = err instanceof Error ? err.message : JSON.stringify(err);
-    console.error("Fatal error:", message);
-    process.exit(1);
-  }
+    try {
+        await main();
+    } catch (err: unknown) {
+        const message = err instanceof Error ? err.message : JSON.stringify(err);
+        console.error("Fatal error:", message);
+        process.exit(1);
+    }
 })();
