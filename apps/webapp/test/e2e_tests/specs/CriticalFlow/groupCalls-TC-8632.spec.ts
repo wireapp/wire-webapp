@@ -34,7 +34,8 @@ test.beforeEach(async ({api, createUser, createTeam}) => {
   const team = await createTeam('Calling', {users: [member]});
   owner = team.owner;
 
-  // The team will be reset right after initialization, so we need to wait a short time for it to finish before changing feature configs since they would otherwise be overwritten
+  // The team will be reset right after initialization, so we need to wait a short time for it to finish
+  // before changing feature configs since they would otherwise be overwritten (See WPB-23698)
   await new Promise(resolve => setTimeout(resolve, 5000));
   await api.enableConferenceCallingFeature(owner.teamId!);
   await api.waitForFeatureToBeEnabled(FEATURE_KEY.CONFERENCE_CALLING, owner.teamId!, owner.token);
