@@ -635,24 +635,22 @@ export class MLSService extends TypedEventEmitter<Events> {
     options?: {creator?: {user: QualifiedId; client?: string}; parentGroupId?: string},
   ): Promise<AddUsersFailure[]> {
     const mlsPublicRemovalKeys = (await this.apiClient.api.client.getPublicKeys()).removal;
+    const creator = options?.creator;
+    const {keyPackages, failures: keysClaimingFailures} = await this.getKeyPackagesPayload(
+      users.map(user => {
+        if (user.id === creator?.user.id) {
+          /**
+           * we should skip fetching key packages for current self client,
+           * it's already added by the backend on the group creation time
+           */
+          return {...creator.user, skipOwnClientId: creator.client};
+        }
+        return user;
+      }),
+    );
 
     return this.coreCryptoClient.transaction(async transactionContext => {
       await this.registerEmptyConversation(groupId, transactionContext, mlsPublicRemovalKeys, options?.parentGroupId);
-
-      const creator = options?.creator;
-
-      const {keyPackages, failures: keysClaimingFailures} = await this.getKeyPackagesPayload(
-        users.map(user => {
-          if (user.id === creator?.user.id) {
-            /**
-             * we should skip fetching key packages for current self client,
-             * it's already added by the backend on the group creation time
-             */
-            return {...creator.user, skipOwnClientId: creator.client};
-          }
-          return user;
-        }),
-      );
 
       if (keyPackages.length <= 0) {
         // If there are no clients to add, just update the keying material
