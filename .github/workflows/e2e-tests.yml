@@ -22,9 +22,10 @@ on:
       grep:
         type: string
         description: Define which tests to run, the given value will be passed to the `--grep` flag of playwright
+        default: "@regression|@crit-flow-web"
       testinyRunName:
         type: string
-        description: Define Testiny Run to upload results to
+        description: Define Testiny Run name to upload results to
   # Options for calling the workflow within an other workflow
   workflow_call:
     inputs:
@@ -91,7 +92,11 @@ jobs:
           TEST_SERVICE_URL: http://localhost:8080 # Run tests against locally running test service
           PLAYWRIGHT_BLOB_OUTPUT_DIR: apps/webapp/playwright-report/blob-reports
           GREP: ${{ inputs.grep }}
-        run: yarn nx run webapp:e2e --shard=${{ matrix.shard }}/${{ strategy.job-total }} --reporter=blob --grep="${GREP}"
+        run: |
+          yarn nx run webapp:e2e \ 
+           --shard=${{ matrix.shard }}/${{ strategy.job-total }} \
+           --reporter=blob \ 
+           --grep="$GREP"
 
       - name: Upload blob report
         if: ${{ !cancelled() }}
