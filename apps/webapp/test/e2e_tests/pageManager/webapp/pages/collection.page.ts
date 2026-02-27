@@ -23,10 +23,12 @@ import {Locator, Page} from '@playwright/test';
 export class CollectionPage {
   readonly page: Page;
   readonly component: Locator;
+  readonly searchResults: Locator;
 
   constructor(page: Page) {
     this.page = page;
     this.component = page.locator('#collection');
+    this.searchResults = this.component.getByTestId('full-search-item');
   }
 
   get searchInput() {
@@ -41,27 +43,14 @@ export class CollectionPage {
     await this.searchInput.fill(search);
   }
 
-  get imagesSection() {
-    return this.component.locator('section').filter({has: this.page.locator('header', {hasText: 'Images'})});
+  getSection(type: 'Images' | 'Audio' | 'Files') {
+    const section = this.component.locator('section').filter({has: this.page.locator('header', {hasText: type})});
+    return Object.assign(section, {
+      showAllButton: section.getByRole('button', {name: 'Show all'}),
+    });
   }
 
-  get audioSection() {
-    return this.component.locator('section').filter({has: this.page.locator('header', {hasText: 'Audio'})});
-  }
-
-  get filesSection() {
-    return this.component.locator('section').filter({has: this.page.locator('header', {hasText: 'Files'})});
-  }
-
-  get overviewImagesButton() {
-    return this.imagesSection.getByRole('button', {name: /Show all/i});
-  }
-
-  get overviewFilesButton() {
-    return this.filesSection.getByRole('button', {name: /Show all/i});
-  }
-
-  get fullSearchBar() {
+  get searchBar() {
     return this.component.getByRole('textbox', {name: 'Search text messages'});
   }
 
@@ -69,21 +58,4 @@ export class CollectionPage {
     return this.component.getByText('No results.', {exact: true});
   }
 
-  /**
-   * Returns a locator for the highlighted (marked) text within the search results.
-   * @param searchTerm The text you expect to be highlighted.
-   */
-  getMarkedSearchResult(searchTerm: string): Locator {
-    return this.component.locator('mark').filter({hasText: searchTerm});
-  }
-
-  /** Locates the text content of every search result item */
-  get resultTexts() {
-    return this.component.locator('[data-uie-name="full-search-item-text"]');
-  }
-
-  /** Gets all result texts as an array of strings */
-  async getAllResultTexts(): Promise<string[]> {
-    return await this.resultTexts.allInnerTexts();
-  }
 }
