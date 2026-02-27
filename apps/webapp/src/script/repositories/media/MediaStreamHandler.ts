@@ -60,10 +60,10 @@ export class MediaStreamHandler {
     }
   }
 
-  requestMediaStream(audio: boolean, video: boolean, screen: boolean, isGroup: boolean): Promise<MediaStream> {
+  async requestMediaStream(audio: boolean, video: boolean, screen: boolean, isGroup: boolean): Promise<MediaStream> {
     const hasPermission = this.hasPermissionToAccess(audio, video);
     try {
-      return this.getMediaStream(audio, video, screen, isGroup, hasPermission);
+      return await this.getMediaStream(audio, video, screen, isGroup, hasPermission);
     } catch (error) {
       const isPermissionDenied = error.type === PermissionError.TYPE.DENIED;
       throw isPermissionDenied
