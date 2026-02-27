@@ -30,6 +30,7 @@ export class ConversationDetailsPage {
   readonly blockConversationButton: Locator;
   readonly clearConversationContentButton: Locator;
   readonly selectedSearchList: Locator;
+  readonly searchPeopleInput: Locator;
   readonly searchList: Locator;
   readonly deleteGroupButton: Locator;
   readonly notificationsButton: Locator;
@@ -47,7 +48,8 @@ export class ConversationDetailsPage {
     this.blockConversationButton = this.conversationDetails.getByTestId('do-block');
     this.clearConversationContentButton = this.conversationDetails.getByRole('button', {name: 'Clear Content'});
     this.selectedSearchList = this.page.getByTestId('selected-search-list');
-    this.searchList = this.page.getByTestId('search-list');
+    this.searchPeopleInput = page.getByRole('textbox', {name: 'Search by name'});
+    this.searchList = this.page.locator('#add-participants').getByRole('list');
     this.deleteGroupButton = this.page.getByRole('button', {name: 'Delete group'});
     this.notificationsButton = this.page.getByRole('button', {name: 'Notifications'});
     this.editConversationNameButton = this.page.getByRole('button', {name: 'Change conversation name'});
@@ -108,6 +110,11 @@ export class ConversationDetailsPage {
 
   async openParticipantDetails(fullName: string) {
     await this.getLocatorByUser(fullName).click();
+  }
+
+  async participantStatus(fullName: string) {
+    const userLocator = await this.getLocatorByUser(fullName);
+    return userLocator.getByTestId(/^status-(external|guest|admin)$/);
   }
 
   getParticipantStatus(fullName: string) {
