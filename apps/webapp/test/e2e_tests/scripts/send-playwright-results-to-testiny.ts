@@ -531,10 +531,12 @@ async function main(): Promise<void> {
     }
 }
 
-try {
-  await main();
-} catch (err: unknown) {
-  const message = err instanceof Error ? err.message : JSON.stringify(err);
-  console.error("Fatal error:", message);
-  process.exit(1);
-}
+void (async () => {
+  try {
+    await main();
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : JSON.stringify(err);
+    console.error("Fatal error:", message);
+    process.exit(1);
+  }
+})();
