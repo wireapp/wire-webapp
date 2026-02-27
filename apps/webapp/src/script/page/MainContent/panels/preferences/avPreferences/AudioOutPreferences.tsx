@@ -37,11 +37,11 @@ const AudioOutPreferences = ({refreshCallOutputSpeaker, hasActiveCall}: AudioOut
     audioOutputDevices: state.audio.output.devices,
   }));
 
-  const handleChange = async (deviceId: string) => {
+  const handleChange = (deviceId: string): void => {
     if (deviceId !== audioOutputDeviceId) {
       setAudioOutputDeviceId(deviceId);
       if (hasActiveCall) {
-        await refreshCallOutputSpeaker();
+        refreshCallOutputSpeaker();
       }
     }
   };
