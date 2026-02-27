@@ -45,7 +45,7 @@ parsers:
 comment:
   layout: 'diff, flags, files'
   behavior: default
-  require_changes: no
+  require_changes: coverage_drop
 
 flags:
   app_webapp:
