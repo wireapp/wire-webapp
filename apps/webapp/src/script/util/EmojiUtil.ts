@@ -17,8 +17,10 @@
  *
  */
 
-import emojies from 'emoji-picker-react/src/data/emojis.json';
+import emojiData from 'emoji-picker-react/src/data/emojis.json';
 import {groupBy} from 'underscore';
+
+import {extractEmojiDataEntries} from './EmojiDataSource';
 
 // http://www.unicode.org/Public/emoji/11.0/emoji-data.txt
 // This is the exact copy of unicode-range definition for `emoji` font in CSS.
@@ -43,16 +45,16 @@ const isValidString = (string: string) => typeof string === 'string' && string.l
 export const includesOnlyEmojis = (text: string) =>
   isValidString(text) && removeEmojis(removeWhitespace(text)).length === 0;
 
-const emojiesFlatten = Object.values(emojies).flat();
-const emojiesList = groupBy(emojiesFlatten, 'u');
+const emojiEntries = extractEmojiDataEntries(emojiData);
+const emojiEntriesByCodepoint = groupBy(emojiEntries, 'u');
 const emojiDictionary: Map<string, string> = new Map();
 
-Object.keys(emojiesList).forEach(key => {
+Object.keys(emojiEntriesByCodepoint).forEach(key => {
   // return if already existing in the dictionary
   if (emojiDictionary.has(key)) {
     return;
   }
-  const emojiValue = emojiesList[key];
+  const emojiValue = emojiEntriesByCodepoint[key];
   // return if not found in list
   if (!emojiValue) {
     return;
