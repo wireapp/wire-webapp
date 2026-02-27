@@ -634,45 +634,43 @@ export class MLSService extends TypedEventEmitter<Events> {
     users: QualifiedId[],
     options?: {creator?: {user: QualifiedId; client?: string}; parentGroupId?: string},
   ): Promise<AddUsersFailure[]> {
-    await this.coreCryptoClient.transaction(async context => {
-      await this.registerEmptyConversation(groupId, context, options?.parentGroupId);
-    });
+    return this.coreCryptoClient.transaction(async transactionContext => {
+      await this.registerEmptyConversation(groupId, transactionContext, options?.parentGroupId);
 
-    const creator = options?.creator;
+      const creator = options?.creator;
 
-    const {keyPackages, failures: keysClaimingFailures} = await this.getKeyPackagesPayload(
-      users.map(user => {
-        if (user.id === creator?.user.id) {
-          /**
-           * we should skip fetching key packages for current self client,
-           * it's already added by the backend on the group creation time
-           */
-          return {...creator.user, skipOwnClientId: creator.client};
-        }
-        return user;
-      }),
-    );
+      const {keyPackages, failures: keysClaimingFailures} = await this.getKeyPackagesPayload(
+        users.map(user => {
+          if (user.id === creator?.user.id) {
+            /**
+             * we should skip fetching key packages for current self client,
+             * it's already added by the backend on the group creation time
+             */
+            return {...creator.user, skipOwnClientId: creator.client};
+          }
+          return user;
+        }),
+      );
 
-    if (keyPackages.length <= 0) {
-      // If there are no clients to add, just update the keying material
-      await this.updateKeyingMaterial(groupId);
+      if (keyPackages.length <= 0) {
+        // If there are no clients to add, just update the keying material
+        await this.updateKeyingMaterial(groupId);
+        await this.scheduleKeyMaterialRenewal(groupId);
+
+        return keysClaimingFailures;
+      }
+
+      await this.addUsersToExistingConversation(groupId, keyPackages, transactionContext);
+
+      // We schedule a periodic key material renewal
       await this.scheduleKeyMaterialRenewal(groupId);
 
+      /**
+       * @note If we can't fetch a user's key packages then we can not add them to mls conversation
+       * so we're adding them to the list of failed users.
+       */
       return keysClaimingFailures;
-    }
-
-    await this.coreCryptoClient.transaction(transactionContext =>
-      this.addUsersToExistingConversation(groupId, keyPackages, transactionContext),
-    );
-
-    // We schedule a periodic key material renewal
-    await this.scheduleKeyMaterialRenewal(groupId);
-
-    /**
-     * @note If we can't fetch a user's key packages then we can not add them to mls conversation
-     * so we're adding them to the list of failed users.
-     */
-    return keysClaimingFailures;
+    });
   }
 
   /**
