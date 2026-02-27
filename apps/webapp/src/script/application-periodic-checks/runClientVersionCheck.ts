@@ -21,13 +21,18 @@ import {KyInstance} from 'ky';
 
 interface RunClientVersionCheckOptions {
   readonly ky: KyInstance;
+  readonly clientVersion: string;
 }
 
 export function runClientVersionCheck(options: RunClientVersionCheckOptions): void {
-  const {ky} = options;
+  const {ky, clientVersion} = options;
 
   const requestClientVersionCheck = async () => {
-    await ky.get('/client-version-check');
+    await ky.get('/client-version-check', {
+      headers: {
+        'Wire-Client-Version': clientVersion,
+      },
+    });
   };
 
   void requestClientVersionCheck();
