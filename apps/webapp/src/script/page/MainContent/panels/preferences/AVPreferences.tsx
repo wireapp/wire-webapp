@@ -68,7 +68,12 @@ const AVPreferencesComponent = ({propertiesRepository, callingRepository, device
           hasActiveCall={callingRepository.hasActiveCall()}
         />
       )}
-      {areMediaDevicesInitialized && deviceSupport.audiooutput && <AudioOutPreferences />}
+      {areMediaDevicesInitialized && deviceSupport.audiooutput && (
+        <AudioOutPreferences
+          refreshCallOutputSpeaker={() => callingRepository.refreshAudioOutput()}
+          hasActiveCall={callingRepository.hasActiveCall()}
+        />
+      )}
       {areMediaDevicesInitialized && deviceSupport.videoinput && (
         <CameraPreferences
           key={`camera-${shouldReloadCamera}`} // Force remount when call ends
