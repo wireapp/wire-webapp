@@ -48,6 +48,7 @@ import {
   ExternalSenderKey,
   isMlsMessageRejectedError,
   GroupInfo,
+  CoreCryptoContext,
 } from '@wireapp/core-crypto';
 
 import {ClientMLSError, ClientMLSErrorLabel} from './ClientMLSError';
@@ -562,6 +563,7 @@ export class MLSService extends TypedEventEmitter<Events> {
    */
   public async registerEmptyConversation(
     groupId: string,
+    coreCryptoTransactionContext: CoreCryptoContext,
     parentGroupId?: string,
     removalKeyFor1to1Signature?: MLSPublicKeyRecord,
   ): Promise<void> {
@@ -592,8 +594,11 @@ export class MLSService extends TypedEventEmitter<Events> {
     };
 
     const credentialType = await this.getCredentialType();
-    return this.coreCryptoClient.transaction(cx =>
-      cx.createConversation(new ConversationId(groupIdBytes), credentialType, configuration),
+
+    await coreCryptoTransactionContext.createConversation(
+      new ConversationId(groupIdBytes),
+      credentialType,
+      configuration,
     );
   }
 
@@ -609,7 +614,9 @@ export class MLSService extends TypedEventEmitter<Events> {
     users: QualifiedId[],
     options?: {creator?: {user: QualifiedId; client?: string}; parentGroupId?: string},
   ): Promise<AddUsersFailure[]> {
-    await this.registerEmptyConversation(groupId, options?.parentGroupId);
+    await this.coreCryptoClient.transaction(async context => {
+      await this.registerEmptyConversation(groupId, context, options?.parentGroupId);
+    });
 
     const creator = options?.creator;
 
@@ -659,7 +666,9 @@ export class MLSService extends TypedEventEmitter<Events> {
     removalKeyFor1to1Signature?: MLSPublicKeyRecord,
   ): Promise<AddUsersFailure[]> {
     try {
-      await this.registerEmptyConversation(groupId, undefined, removalKeyFor1to1Signature);
+      await this.coreCryptoClient.transaction(async context => {
+        await this.registerEmptyConversation(groupId, context, undefined, removalKeyFor1to1Signature);
+      });
 
       // We fist fetch key packages for the user we want to add
       const {keyPackages: otherUserKeyPackages, failures: otherUserKeysClaimingFailures} =
