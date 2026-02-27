@@ -584,6 +584,7 @@ export class MLSService extends TypedEventEmitter<Events> {
   public async registerEmptyConversation(
     groupId: string,
     coreCryptoTransactionContext: CoreCryptoContext,
+    mlsPublicRemovalKeys: MLSPublicKeyRecord,
     parentGroupId?: string,
     removalKeyFor1to1Signature?: MLSPublicKeyRecord,
   ): Promise<void> {
@@ -596,10 +597,9 @@ export class MLSService extends TypedEventEmitter<Events> {
         new ExternalSenderKey(await this.coreCryptoClient.getExternalSender(new ConversationId(parentGroupIdBytes))),
       ];
     } else {
-      const mlsKeys = (await this.apiClient.api.client.getPublicKeys()).removal;
       const ciphersuiteSignature = getSignatureAlgorithmForCiphersuite(this.config.defaultCiphersuite);
       const removalKeyForSignature =
-        removalKeyFor1to1Signature?.[ciphersuiteSignature] ?? mlsKeys[ciphersuiteSignature];
+        removalKeyFor1to1Signature?.[ciphersuiteSignature] ?? mlsPublicRemovalKeys[ciphersuiteSignature];
       if (!removalKeyForSignature) {
         throw new Error(
           `Cannot create conversation: No backend removal key found for the signature ${ciphersuiteSignature}`,
@@ -634,8 +634,10 @@ export class MLSService extends TypedEventEmitter<Events> {
     users: QualifiedId[],
     options?: {creator?: {user: QualifiedId; client?: string}; parentGroupId?: string},
   ): Promise<AddUsersFailure[]> {
+    const mlsPublicRemovalKeys = (await this.apiClient.api.client.getPublicKeys()).removal;
+
     return this.coreCryptoClient.transaction(async transactionContext => {
-      await this.registerEmptyConversation(groupId, transactionContext, options?.parentGroupId);
+      await this.registerEmptyConversation(groupId, transactionContext, mlsPublicRemovalKeys, options?.parentGroupId);
 
       const creator = options?.creator;
 
@@ -686,8 +688,15 @@ export class MLSService extends TypedEventEmitter<Events> {
     removalKeyFor1to1Signature?: MLSPublicKeyRecord,
   ): Promise<AddUsersFailure[]> {
     try {
+      const mlsPublicRemovalKeys = (await this.apiClient.api.client.getPublicKeys()).removal;
       await this.coreCryptoClient.transaction(async context => {
-        await this.registerEmptyConversation(groupId, context, undefined, removalKeyFor1to1Signature);
+        await this.registerEmptyConversation(
+          groupId,
+          context,
+          mlsPublicRemovalKeys,
+          undefined,
+          removalKeyFor1to1Signature,
+        );
       });
 
       // We fist fetch key packages for the user we want to add
