@@ -107,23 +107,19 @@ export class ConversationDetailsPage {
   }
 
   async openParticipantDetails(fullName: string) {
-    const userLocator = await this.getLocatorByUser(fullName);
-    await userLocator.click();
+    await this.getLocatorByUser(fullName).click();
   }
 
-  async statusParticipant(fullName: string) {
-    const userLocator = await this.getLocatorByUser(fullName);
-    return userLocator.getByTestId('status-availability-icon');
+  getParticipantStatus(fullName: string) {
+    return this.getLocatorByUser(fullName).getByTestId('status-availability-icon');
   }
 
-  async getLocatorByUser(fullName: string) {
-    const userLocator = this.page
+  getLocatorByUser(fullName: string) {
+    return this.page
       .locator('#conversation-details')
       .getByTestId('list-users')
       .getByTestId('item-user')
       .and(this.page.locator(`[data-uie-value="${fullName}"]`));
-    await userLocator.waitFor({state: 'visible'});
-    return userLocator;
   }
 
   async clickArchiveButton() {

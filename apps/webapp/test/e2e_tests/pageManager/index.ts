@@ -72,7 +72,6 @@ import {SettingsPage} from './webapp/pages/settings.page';
 import {SingleSignOnPage} from './webapp/pages/singleSignOn.page';
 import {StartUIPage} from './webapp/pages/startUI.page';
 import {WelcomePage} from './webapp/pages/welcome.page';
-import { StatusChangeModal } from './webapp/modals/statusChange.modal';
 
 export const webAppPath = process.env.WEBAPP_URL ?? '';
 
@@ -208,7 +207,6 @@ export class PageManager {
       cellsFileDetailView: () =>
         this.getOrCreate('webapp.modals.cellsFileDetailView', () => new CellsFileDetailViewModal(this.page)),
       optionModal: () => this.getOrCreate('webapp.modals.optionModal', () => new OptionModal(this.page)),
-      statusChangeModal: () => this.getOrCreate('webapp.modals.statusChangeModal', () => new StatusChangeModal(this.page)),
     },
     components: {
       contactList: () => this.getOrCreate('webapp.components.ContactList', () => new ContactList(this.page)),

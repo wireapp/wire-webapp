@@ -38,22 +38,7 @@ async function updateUserStatus(pageManager: PageManager['webapp'], userName: st
   const {components, modals} = pageManager;
   await components.conversationSidebar().openStatusMenu(userName);
   await components.conversationSidebar().setStatus(status);
-  await modals.statusChangeModal().clickAction();
-}
-
-async function prepareConversationForReply(
-  pageManager: PageManager['webapp'],
-  conversationName: string,
-  conversationType: string,
-) {
-  const {pages, components} = pageManager;
-  if (conversationType === '1on1') {
-    await pages.conversationList().openConversation(conversationName, {protocol: 'mls'});
-  } else {
-    await pages.conversationList().openConversation(conversationName);
-  }
-  await pages.conversation().sendMessage('Message to reply');
-  await components.conversationSidebar().clickPreferencesButton();
+  await modals.optionModal().clickAction();
 }
 
 test.describe('Status', () => {
@@ -61,21 +46,18 @@ test.describe('Status', () => {
   let userA: User;
   let userB: User;
   let userC: User;
-  let groupName: string;
-  let conversationId: string | undefined;
+  const groupName = 'Test group';
 
   test.beforeEach(async ({createTeam, createUser}) => {
     userB = await createUser();
     userC = await createUser();
-
     team = await createTeam('Test Team', {users: [userB, userC]});
     userA = team.owner;
-    groupName = 'Test group';
   });
 
   const commonTestCases: {
     name: string;
-    sendAction: (params: {pageA: Page; api: ApiManagerE2E}) => Promise<void>;
+    sendAction: (params: {pageA: Page; api: ApiManagerE2E; conversation?: string}) => Promise<void>;
   }[] = [
     {
       name: 'Text',
@@ -91,7 +73,7 @@ test.describe('Status', () => {
       sendAction: async ({pageA}) => {
         const userAPages = PageManager.from(pageA).webapp.pages;
         await shareAssetHelper(getImageFilePath(), pageA, pageA.getByRole('button', {name: 'Add picture'}));
-        expect(await userAPages.conversation().isImageFromUserVisible(userA)).toBeTruthy();
+        await userAPages.conversation().isImageFromUserVisible(userA);
       },
     },
     {
@@ -106,7 +88,7 @@ test.describe('Status', () => {
       sendAction: async ({pageA}) => {
         const userAPages = PageManager.from(pageA).webapp.pages;
         await shareAssetHelper(getTextFilePath(), pageA, pageA.getByRole('button', {name: 'Add file'}));
-        expect(await userAPages.conversation().isFileMessageVisible()).toBeTruthy();
+        await userAPages.conversation().isFileMessageVisible();
       },
     },
     {
@@ -114,7 +96,7 @@ test.describe('Status', () => {
       sendAction: async ({pageA}) => {
         const userAPages = PageManager.from(pageA).webapp.pages;
         await shareAssetHelper(getAudioFilePath(), pageA, pageA.getByRole('button', {name: 'Add file'}));
-        expect(await userAPages.conversation().isAudioMessageVisible()).toBeTruthy();
+        await userAPages.conversation().isAudioMessageVisible();
       },
     },
     {
@@ -122,7 +104,7 @@ test.describe('Status', () => {
       sendAction: async ({pageA}) => {
         const userAPages = PageManager.from(pageA).webapp.pages;
         await shareAssetHelper(getVideoFilePath(), pageA, pageA.getByRole('button', {name: 'Add file'}));
-        expect(await userAPages.conversation().isVideoMessageVisible()).toBeTruthy();
+        await userAPages.conversation().isVideoMessageVisible();
       },
     },
     {
@@ -134,7 +116,16 @@ test.describe('Status', () => {
     },
     {
       name: 'location sharing',
-      sendAction: async ({api}) => {
+      sendAction: async ({api, conversation}) => {
+        let conversationId;
+        if (conversation === '1on1') {
+          conversationId = await api.conversation.getConversationWithUser(userA.token, userB.id!, {
+            protocol: 'mls',
+          });
+        } else {
+          conversationId = await api.conversation.getGroupConversation(userA.token, groupName);
+        }
+
         const {instanceId} = await api.testService.createInstance(
           userA.password,
           userA.email,
@@ -174,12 +165,12 @@ test.describe('Status', () => {
 
   const systemTestCases: {
     name: string;
-    sendAction: (params: {pageA: PageManager}) => Promise<void>;
+    sendAction: (params: {userAPageManager: PageManager['webapp']}) => Promise<void>;
   }[] = [
     {
       name: 'Rename group',
-      sendAction: async ({pageA}) => {
-        const userAPages = pageA.webapp.pages;
+      sendAction: async ({userAPageManager}) => {
+        const userAPages = userAPageManager.pages;
         await userAPages.conversationList().openConversation(groupName);
         await userAPages.conversation().clickConversationInfoButton();
         await userAPages.conversationDetails().changeConversationName('New Group Name');
@@ -187,16 +178,16 @@ test.describe('Status', () => {
     },
     {
       name: 'Remove member from group',
-      sendAction: async ({pageA}) => {
-        const pages = pageA.webapp.pages;
+      sendAction: async ({userAPageManager}) => {
+        const pages = userAPageManager.pages;
         await pages.conversation().removeMemberFromGroup(userC.fullName);
         await expect(pages.conversation().systemMessages.last()).toContainText(`You removed ${userC.fullName}`);
       },
     },
     {
       name: 'Leave group',
-      sendAction: async ({pageA}) => {
-        const {pages, modals} = pageA.webapp;
+      sendAction: async ({userAPageManager}) => {
+        const {pages, modals} = userAPageManager;
         await pages.conversation().leaveConversation();
         await modals.leaveConversation().clickConfirm();
         await expect(pages.conversation().systemMessages.last()).toContainText('You left');
@@ -204,15 +195,15 @@ test.describe('Status', () => {
     },
     {
       name: 'Create new group conversation',
-      sendAction: async ({pageA}) => {
-        const userAPages = pageA.webapp.pages;
+      sendAction: async ({userAPageManager}) => {
+        const userAPages = userAPageManager.pages;
         await createGroup(userAPages, 'Test Group 2', [userB]);
       },
     },
     {
       name: 'Add member to group',
-      sendAction: async ({pageA}) => {
-        const userAPages = pageA.webapp.pages;
+      sendAction: async ({userAPageManager}) => {
+        const userAPages = userAPageManager.pages;
         await userAPages.conversationList().openConversation('Test Group 2');
         await userAPages.conversation().clickConversationInfoButton();
         await userAPages.conversationDetails().clickAddPeopleButton();
@@ -224,79 +215,135 @@ test.describe('Status', () => {
     },
     {
       name: 'Remove member from a new group',
-      sendAction: async ({pageA}) => {
-        const {pages} = pageA.webapp;
+      sendAction: async ({userAPageManager}) => {
+        const pages = userAPageManager.pages;
         await pages.conversation().removeMemberFromGroup(userC.fullName);
         await expect(pages.conversation().systemMessages.last()).toContainText(`You removed ${userC.fullName}`);
       },
     },
   ];
 
-  test(
-    'When I am away, I should not get any notifications for messages (text, file, video, audio, ping, images, link preview, mentions, replies)',
-    {tag: ['@TC-3608', '@regression']},
-    async ({createPage, api}) => {
-      const [userAPageManager, userBPageManager] = await Promise.all([
-        PageManager.from(createPage(withLogin(userA), withConnectedUser(userB))),
-        PageManager.from(createPage(withLogin(userB))),
+  const notificationConfigs = [
+    {
+      status: UserStatus.Away,
+      tag: ['@TC-3608', '@regression'],
+      title: 'When I am away, I should not get any notifications',
+      expectSpecialNotifications: false, // Away suppresses everything including calls/mentions
+    },
+    {
+      status: UserStatus.Busy,
+      tag: ['@TC-3614', '@regression'],
+      title:
+        'When I am Busy, I should not get any notifications for certain messages (text, file, video, audio, ping, images, link preview, system messages)',
+      expectSpecialNotifications: true, // Busy allows calls/mentions/replies
+    },
+  ];
+
+  for (const config of notificationConfigs) {
+    test(config.title, {tag: config.tag}, async ({createPage, api}) => {
+      const [userAPage, userBPage] = await Promise.all([
+        createPage(withLogin(userA), withConnectedUser(userB)),
+        createPage(withLogin(userB), withConnectedUser(userC)),
       ]);
-      const userAPages = userAPageManager.webapp.pages;
-      const {pages, components} = userBPageManager.webapp;
 
-      // User B sets status to away
-      await updateUserStatus(userBPageManager.webapp, userB.fullName, UserStatus.Away);
+      const userAPageManager = PageManager.from(userAPage).webapp;
+      const userBPageManager = PageManager.from(userBPage).webapp;
+      const {pages: userAPages} = userAPageManager;
+      const {pages: userBPages, components} = userBPageManager;
 
-      const {getNotifications: getUserBNotifications} = await interceptNotifications(pages.conversation().page);
+      // Prerequisite Setup
+      await createGroup(userAPages, groupName, [userB, userC]);
 
-      for (const conversation of ['1on1', 'group']) {
-        await test.step(`User A opens the ${conversation} conversation`, async () => {
-          if (conversation === '1on1') {
-            // User B sends a message to User A
-            await prepareConversationForReply(userBPageManager.webapp, userA.fullName, conversation);
-            conversationId = await api.conversation.getConversationWithUser(userA.token, userB.id!, {
-              protocol: 'mls',
+      const scenarios = [
+        {
+          type: '1on1',
+          targetForUserA: userB.fullName,
+          targetForUserB: userA.fullName,
+          options: {protocol: 'mls'} as const,
+        },
+        {type: 'group', targetForUserA: groupName, targetForUserB: groupName, options: {}},
+      ];
+
+      // User B sends initial messages for replies
+      for (const {targetForUserB, options} of scenarios) {
+        await userBPages.conversationList().openConversation(targetForUserB, options);
+        await userBPages.conversation().sendMessage('Message to reply');
+      }
+
+      if (config.status === UserStatus.Busy) {
+        // Specific "Busy" logic: Mute the group
+        await userBPages.conversation().clickConversationInfoButton();
+        await userBPages.conversationDetails().setNotifications('Mentions and replies');
+      }
+
+      await updateUserStatus(userBPageManager, userB.fullName, config.status);
+      // User B opens the third conversation to receive notifications
+      await userBPages.conversationList().openConversation(userC.fullName);
+
+      const {getNotifications: getUserBNotifications} = await interceptNotifications(userBPage);
+
+      for (const {type, targetForUserA, targetForUserB, options} of scenarios) {
+        await test.step(`Verify notifications in ${type}`, async () => {
+          const filteredCases = commonTestCases.filter(
+            tc => config.status === UserStatus.Away || !['Mention', 'Reply'].includes(tc.name),
+          );
+          await userAPages.conversationList().openConversation(targetForUserA, options);
+
+          for (const testCase of filteredCases) {
+            await test.step(`Action: ${testCase.name} message in ${type}`, async () => {
+              await testCase.sendAction({pageA: userAPage, api});
             });
-            // User A opens 1:1 conversation between User A and User B
-            await userAPages.conversationList().openConversation(userB.fullName, {protocol: 'mls'});
-          } else {
-            // User A creates a group conversation between User A, User B, User C
-            await createGroup(userAPages, groupName, [userB, userC]);
-            conversationId = await api.conversation.getConversationWithUser(userA.token, userB.id!, {
-              conversationName: groupName,
-            });
-
-            await components.conversationSidebar().allConverationsButton.click();
-            await prepareConversationForReply(userBPageManager.webapp, groupName, conversation);
           }
-        });
 
-        await test.step(`User B should not receive any conversation notifications`, async () => {
-          for (const testCase of commonTestCases) {
-            await test.step(`Action: ${testCase.name}`, async () => {
-              await testCase.sendAction({pageA: userAPages.conversation().page, api});
-              await expect.poll(() => getUserBNotifications()).toHaveLength(0);
-            });
-          }
+          await components.conversationSidebar().clickAllConversationsButton();
+          await expect(userBPages.conversationList().getConversationLocator(targetForUserB, options)).toContainText(
+            /\d+ ping, \d+ messages/,
+          );
+          await expect.poll(() => getUserBNotifications()).toHaveLength(0);
         });
       }
 
-      await test.step(`User B should not receive any system notification`, async () => {
+      // System Test Cases
+      await test.step('User B should not receive any system notification', async () => {
         await userAPages.conversationList().openConversation(groupName);
         for (const systemTestCase of systemTestCases) {
-          await test.step(`Action: ${systemTestCase.name}`, async () => {
-            await systemTestCase.sendAction({pageA: userAPageManager});
-            await expect.poll(() => getUserBNotifications()).toHaveLength(0);
-          });
+          await systemTestCase.sendAction({userAPageManager});
         }
-      });
-
-      await test.step(`User B should not receive notification from call in 1to1`, async () => {
-        await userAPages.conversationList().openConversation(userB.fullName, {protocol: 'mls'});
-        await userAPages.conversation().startCall();
         await expect.poll(() => getUserBNotifications()).toHaveLength(0);
       });
-    },
-  );
+
+      // Handle the "Special" Notifications (Calls/Mentions/Replies)
+      if (config.expectSpecialNotifications) {
+        await test.step('User B should receive mentions, replies, and calls (Busy status)', async () => {
+          const specialTestCases = [
+            ...commonTestCases.filter(tc => tc.name === 'Mention' || tc.name === 'Reply'),
+            {
+              name: 'Call',
+              sendAction: async ({pageA}: {pageA: Page}) => {
+                const userAPages = PageManager.from(pageA).webapp.pages;
+                await userAPages.conversation().startCall();
+              },
+            },
+          ];
+
+          await userAPages.conversationList().openConversation(userB.fullName, {protocol: 'mls'});
+          for (const testCase of specialTestCases) {
+            await test.step(`Action: ${testCase.name} message`, async () => {
+              await testCase.sendAction({pageA: userAPages.conversation().page, api});
+            });
+          }
+          await expect.poll(() => getUserBNotifications()).toHaveLength(specialTestCases.length);
+        });
+      } else {
+        await test.step('User B should not receive calls notification (Away status)', async () => {
+          await userAPages.conversationList().openConversation(userB.fullName, {protocol: 'mls'});
+          await userAPages.conversation().startCall();
+          await expect(userBPages.calling().callCell).toBeVisible();
+          await expect.poll(() => getUserBNotifications()).toHaveLength(0);
+        });
+      }
+    });
+  }
 
   test('I want to see a popup when I change my status', {tag: ['@TC-8772', '@regression']}, async ({createPage}) => {
     const userAPageManager = await PageManager.from(createPage(withLogin(userA)));
@@ -311,144 +358,60 @@ test.describe('Status', () => {
 
       await components.conversationSidebar().openStatusMenu(userA.fullName);
       await components.conversationSidebar().setStatus(status);
-      await expect(modals.statusChangeModal().modalTitle).toContainText(expectedTitle);
+      await expect(modals.optionModal().modalTitle).toContainText(expectedTitle);
 
-      await modals.statusChangeModal().actionButton.click();
-      await expect(modals.statusChangeModal().modalTitle).not.toBeVisible();
+      await modals.optionModal().actionButton.click();
+      await expect(modals.optionModal().modalTitle).not.toBeVisible();
     }
   });
-
-  test(
-    'When I am Busy, I should not get any notifications for certain messages (text, file, video, audio, ping, images, link preview, system messages)',
-    {tag: ['@TC-3614', '@regression']},
-    async ({createPage, api}) => {
-      const [userAPageManager, userBPageManager] = await Promise.all([
-        PageManager.from(createPage(withLogin(userA), withConnectedUser(userB))),
-        PageManager.from(createPage(withLogin(userB))),
-      ]);
-      const userAPages = userAPageManager.webapp.pages;
-      const {pages} = userBPageManager.webapp;
-
-      // User A creates a group conversation between User A, User B, User C
-      await createGroup(userAPages, groupName, [userB, userC]);
-
-      await test.step('Prerequisite: User B sets status to Busy and mutes group conversation ', async () => {
-        await updateUserStatus(userBPageManager.webapp, userB.fullName, UserStatus.Busy);
-
-        await pages.conversationList().openConversation(groupName);
-        await pages.conversation().clickConversationInfoButton();
-        await pages.conversationDetails().setNotifications('Mentions and replies');
-      });
-
-      const {getNotifications: getUserBNotifications} = await interceptNotifications(pages.conversation().page);
-
-      for (const conversation of ['1on1', 'group']) {
-        await test.step(`User A opens the ${conversation} conversation`, async () => {
-          if (conversation === '1on1') {
-            conversationId = await api.conversation.getConversationWithUser(userA.token, userB.id!, {
-              protocol: 'mls',
-            });
-            // User A creates 1:1 conversation between User A and User B
-            await userAPages.conversationList().openConversation(userB.fullName, {protocol: 'mls'});
-          } else {
-            conversationId = await api.conversation.getConversationWithUser(userA.token, userB.id!, {
-              conversationName: groupName,
-            });
-
-            await userAPages.conversationList().openConversation('Test Group');
-          }
-        });
-
-        await test.step(`User B should not receive any notifications for certain messages (text, file, audio, ping, images, link preview)`, async () => {
-          for (const testCase of commonTestCases) {
-            if (testCase.name === 'Mention' || testCase.name === 'Reply') {
-              continue; // Skip mention and reply test cases as they are handled separately
-            }
-            await test.step(`Action: ${testCase.name} message in ${conversation}`, async () => {
-              await testCase.sendAction({pageA: userAPages.conversation().page, api});
-              await expect.poll(() => getUserBNotifications()).toHaveLength(0);
-            });
-          }
-        });
-      }
-
-      await test.step(`User B should not receive any system notification`, async () => {
-        await userAPages.conversationList().openConversation(groupName);
-        for (const systemTestCase of systemTestCases) {
-          await test.step(`Action: ${systemTestCase.name}`, async () => {
-            await systemTestCase.sendAction({pageA: userAPageManager});
-            await expect.poll(() => getUserBNotifications()).toHaveLength(0);
-          });
-        }
-      });
-
-      await test.step(`User B should receive mentions, replies and calls notifications in 1to1`, async () => {
-        const specialTasteCases = commonTestCases.filter(
-          testCase => testCase.name === 'Mention' || testCase.name === 'Reply',
-        );
-        specialTasteCases.push({
-          name: 'Call',
-          sendAction: async ({pageA}) => {
-            const userAPages = PageManager.from(pageA).webapp.pages;
-            await userAPages.conversation().startCall();
-          },
-        });
-
-        await prepareConversationForReply(userBPageManager.webapp, userA.fullName, '1on1');
-
-        await userAPages.conversationList().openConversation(userB.fullName, {protocol: 'mls'});
-
-        for (const testCase of specialTasteCases) {
-          await test.step(`Action: ${testCase.name} message`, async () => {
-            await testCase.sendAction({pageA: userAPages.conversation().page, api});
-            await expect.poll(() => getUserBNotifications()).toHaveLength(1);
-          });
-        }
-      });
-    },
-  );
 
   test(
     'When I am available or have unset status, I want to get notifications for every message in non-muted conversations',
     {tag: ['@TC-3626', '@regression']},
     async ({createPage, api}) => {
-      const [userAPageManager, userBPageManager] = await Promise.all([
-        PageManager.from(createPage(withLogin(userA), withConnectedUser(userB))),
-        PageManager.from(createPage(withLogin(userB))),
+      const [userAPage, userBPage] = await Promise.all([
+        createPage(withLogin(userA), withConnectedUser(userB)),
+        createPage(withLogin(userB)),
       ]);
-      const userAPages = userAPageManager.webapp.pages;
-      const {pages, components} = userBPageManager.webapp;
 
-      // User B sets status to available
-      await updateUserStatus(userBPageManager.webapp, userB.fullName, UserStatus.Available);
+      const userAPageManager = PageManager.from(userAPage).webapp;
+      const userBPageManager = PageManager.from(userBPage).webapp;
+      const {pages, components} = userBPageManager;
+      const userAPages = userAPageManager.pages;
 
-      const {getNotifications: getUserBNotifications} = await interceptNotifications(pages.conversation().page);
       let notificationCount = 0;
 
       // User A creates a group conversation between User A, User B, User C
       await createGroup(userAPages, groupName, [userB, userC]);
-      notificationCount++;
 
-      for (const conversation of ['1on1', 'group']) {
-        await test.step(`User A opens the ${conversation} conversation`, async () => {
-          if (conversation === '1on1') {
-            conversationId = await api.conversation.getConversationWithUser(userA.token, userB.id!, {
-              protocol: 'mls',
-            });
-            // User B sends a message to User A
-            await prepareConversationForReply(userBPageManager.webapp, userA.fullName, conversation);
-            // User A opens 1:1 conversation between User A and User B
-            await userAPages.conversationList().openConversation(userB.fullName, {protocol: 'mls'});
-          } else {
-            conversationId = await api.conversation.getConversationWithUser(userA.token, userB.id!, {
-              conversationName: groupName,
-            });
+      // User B sends initial message and sets status to available
+      await pages.conversationList().openConversation(userA.fullName, {protocol: 'mls'});
+      await pages.conversation().sendMessage('Message to reply');
 
-            await components.conversationSidebar().allConverationsButton.click();
-            await prepareConversationForReply(userBPageManager.webapp, groupName, conversation);
+      await pages.conversationList().openConversation(groupName);
+      await pages.conversation().sendMessage('Message to reply');
 
-            await userAPages.conversationList().openConversation(groupName);
-          }
+      await updateUserStatus(userBPageManager, userB.fullName, UserStatus.Available);
+      await components.conversationSidebar().clickPreferencesButton();
+
+      const {getNotifications: getUserBNotifications} = await interceptNotifications(userBPage);
+
+      const scenarios = [
+        {
+          type: '1on1',
+          target: userB.fullName,
+          options: {protocol: 'mls'} as const,
+        },
+        {
+          type: 'group',
+          target: 'Test Group',
+          options: {},
+        },
+      ];
+
+      for (const {type, target, options} of scenarios) {
+        await test.step(`User A opens the ${type} conversation`, async () => {
+          await userAPages.conversationList().openConversation(target, options);
         });
 
         await test.step(`User B should receive all conversation notifications`, async () => {
@@ -456,9 +419,9 @@ test.describe('Status', () => {
             await test.step(`Action: ${testCase.name}`, async () => {
               await testCase.sendAction({pageA: userAPages.conversation().page, api});
               notificationCount++;
-              await expect.poll(() => getUserBNotifications()).toHaveLength(notificationCount);
             });
           }
+          await expect.poll(() => getUserBNotifications()).toHaveLength(notificationCount);
         });
       }
 
@@ -466,21 +429,26 @@ test.describe('Status', () => {
         await userAPages.conversationList().openConversation(groupName);
         for (const systemTestCase of systemTestCases) {
           await test.step(`Action: ${systemTestCase.name}`, async () => {
-            await systemTestCase.sendAction({pageA: userAPageManager});
+            await systemTestCase.sendAction({userAPageManager});
+            if (systemTestCase.name === 'Rename group' || systemTestCase.name === 'Create new group conversation') {
+              notificationCount++;
+            }
           });
         }
 
-        await expect.poll(() => getUserBNotifications()).toHaveLength(notificationCount + 2);
+        await expect.poll(() => getUserBNotifications()).toHaveLength(notificationCount);
       });
     },
   );
 
   test('I want to set my status on profile page', {tag: ['@TC-1766', '@regression']}, async ({createPage}) => {
-    const userAPageManager = await PageManager.from(createPage(withLogin(userA)));
-    const userBPages = await PageManager.from(createPage(withLogin(userB), withConnectedUser(userA))).then(
-      pm => pm.webapp.pages,
-    );
+    const [userAPageManager, userBPageManager] = await Promise.all([
+      PageManager.from(createPage(withLogin(userB))),
+      PageManager.from(createPage(withLogin(userB), withConnectedUser(userA))),
+    ]);
+
     const {pages, components, modals} = userAPageManager.webapp;
+    const userBPages = userBPageManager.webapp.pages;
 
     // User B verify no status is set in conversation list
     await userBPages.conversationList().openConversation(userA.fullName);
@@ -497,8 +465,8 @@ test.describe('Status', () => {
 
     // User A sets status to Available in account preferences
     await pages.account().selectStatus(UserStatus.Available);
-    await expect(modals.statusChangeModal().modalTitle).toContainText('You are set to Available');
-    await modals.statusChangeModal().actionButton.click();
+    await expect(modals.optionModal().modalTitle).toContainText('You are set to Available');
+    await modals.optionModal().actionButton.click();
 
     // User A verifies is Available in account preferences
     await expect(pages.account().statusOption(UserStatus.Available)).toHaveAccessibleName('Selected, Available');
@@ -530,8 +498,8 @@ test.describe('Status', () => {
       // User B should see the BUSY status in the searchable group participant list
       await userBPages.conversationList().openConversation(groupName);
       await userBPages.conversation().clickConversationInfoButton();
-      await expect(await userBPages.conversationDetails().statusParticipant(userA.fullName)).toBeVisible();
-      await expect(await userBPages.conversationDetails().statusParticipant(userA.fullName)).toHaveAttribute(
+      await expect(userBPages.conversationDetails().getParticipantStatus(userA.fullName)).toBeVisible();
+      await expect(userBPages.conversationDetails().getParticipantStatus(userA.fullName)).toHaveAttribute(
         'data-uie-value',
         'busy',
       );
