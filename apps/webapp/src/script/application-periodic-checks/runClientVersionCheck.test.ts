@@ -23,13 +23,18 @@ import {runClientVersionCheck} from './runClientVersionCheck';
 
 describe('runClientVersionCheck', () => {
   it('requests the client version check route', () => {
+    const clientVersion = '2026.02.12.17.51.00';
     const kyInstance = {
       get: jest.fn(() => Promise.resolve()),
     } as unknown as KyInstance;
 
-    runClientVersionCheck({ky: kyInstance});
+    runClientVersionCheck({ky: kyInstance, clientVersion});
 
     expect(kyInstance.get).toHaveBeenCalledTimes(1);
-    expect(kyInstance.get).toHaveBeenCalledWith('/client-version-check');
+    expect(kyInstance.get).toHaveBeenCalledWith('/client-version-check', {
+      headers: {
+        'Wire-Client-Version': clientVersion,
+      },
+    });
   });
 });
