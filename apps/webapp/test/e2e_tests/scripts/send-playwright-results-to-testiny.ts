@@ -433,11 +433,11 @@ async function main(): Promise<void> {
 
     if (reportPath === undefined) {
         console.error("❌  --report <path> is required");
-        process.exit(1);
+        process.exitCode = 1;
     }
     if (runName === undefined) {
         console.error("❌  --run-name <n> is required");
-        process.exit(1);
+        process.exitCode = 1;
     }
 
     const apiKey = process.env.TESTINY_API_KEY;
@@ -447,19 +447,19 @@ async function main(): Promise<void> {
 
     if (apiKey === undefined) {
         console.error("❌  TESTINY_API_KEY env var is required");
-        process.exit(1);
+        process.exitCode = 1;
     }
     if (project === undefined) {
         console.error(
             "❌  TESTINY_PROJECT env var is required"
         );
-        process.exit(1);
+        process.exitCode = 1;
     }
 
     const reportAbsPath = path.resolve(reportPath);
     if (fs.existsSync(reportAbsPath) === false) {
         console.error(`❌  Report file not found: ${reportAbsPath}`);
-        process.exit(1);
+        process.exitCode = 1;
     }
 
     const report = JSON.parse(
@@ -569,7 +569,7 @@ async function main(): Promise<void> {
     console.log(`❌  Bulk send error    : ${sendError}`);
     console.log("─────────────────────────────────────────\n");
 
-    if (resolveErrors > 0 || sendError > 0) process.exit(1);
+    if (resolveErrors > 0 || sendError > 0) process.exitCode = 1;
 
     // ── Phase 4: Add a link to the build in the test run description (optional) ──────────────────────────
 
