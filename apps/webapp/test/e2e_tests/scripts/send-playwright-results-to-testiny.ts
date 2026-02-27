@@ -190,7 +190,7 @@ function extractTcTags(title: string, tags: string[]): string[] {
 
     for (const t of [title, ...tags]) {
         const found = String(t).match(pattern);
-        if (found !== undefined) {
+        if (found !== null) {
             found.forEach((m) => matches.add(m.replace(/^@/, "").toUpperCase()));
         }
     }
