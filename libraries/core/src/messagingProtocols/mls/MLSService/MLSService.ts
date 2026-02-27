@@ -329,16 +329,36 @@ export class MLSService extends TypedEventEmitter<Events> {
    * @param groupId - the group id of the MLS group
    * @param keyPackages - the list of keys of clients to add to the MLS group
    */
-  public async addUsersToExistingConversation(groupId: string, keyPackages: Uint8Array[]) {
+  public async addUsersToExistingConversation(
+    groupId: string,
+    keyPackages: Uint8Array[],
+    coreCryptoTransactionContext?: CoreCryptoContext,
+  ) {
     const groupIdBytes = Decoder.fromBase64(groupId).asBytes;
 
     if (keyPackages.length < 1) {
       throw new Error('Empty list of keys provided to addUsersToExistingConversation');
     }
 
-    const crlNewDistributionPoints = await this.coreCryptoClient.transaction(cx =>
-      cx.addClientsToConversation(new ConversationId(groupIdBytes), keyPackages),
-    );
+    let crlNewDistributionPoints: NewCrlDistributionPoints;
+
+    /**
+     * this is introducing conditional logic based on the presence of the coreCryptoTransactionContext, which is not ideal
+     * as soon as other consumers of this method are refactored to use the transactions api we should remove the possibility to
+     * not pass coreCryptoTransactionContext and simplify the method implementation by always using the transaction context passed as an argument
+     * Consumer to be migrated to use transactions api: performAddUsersToMLSConversationAPI in ConversationService
+     */
+    if (coreCryptoTransactionContext !== undefined) {
+      crlNewDistributionPoints = await coreCryptoTransactionContext.addClientsToConversation(
+        new ConversationId(groupIdBytes),
+        keyPackages,
+      );
+    } else {
+      crlNewDistributionPoints = await this.coreCryptoClient.transaction(transactionContext =>
+        transactionContext.addClientsToConversation(new ConversationId(groupIdBytes), keyPackages),
+      );
+    }
+
     this.dispatchNewCrlDistributionPoints(crlNewDistributionPoints);
   }
 
@@ -641,7 +661,9 @@ export class MLSService extends TypedEventEmitter<Events> {
       return keysClaimingFailures;
     }
 
-    await this.addUsersToExistingConversation(groupId, keyPackages);
+    await this.coreCryptoClient.transaction(transactionContext =>
+      this.addUsersToExistingConversation(groupId, keyPackages, transactionContext),
+    );
 
     // We schedule a periodic key material renewal
     await this.scheduleKeyMaterialRenewal(groupId);
@@ -688,7 +710,9 @@ export class MLSService extends TypedEventEmitter<Events> {
         {...selfUser.user, skipOwnClientId: selfUser.client},
       ]);
 
-      await this.addUsersToExistingConversation(groupId, [...otherUserKeyPackages, ...selfKeyPackages]);
+      await this.coreCryptoClient.transaction(transactionContext =>
+        this.addUsersToExistingConversation(groupId, [...otherUserKeyPackages, ...selfKeyPackages], transactionContext),
+      );
 
       // We schedule a periodic key material renewal
       await this.scheduleKeyMaterialRenewal(groupId);
