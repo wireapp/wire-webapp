@@ -114,7 +114,7 @@
     "release:dry-run": "nx release --dry-run",
     "release:version": "nx release version",
     "release:publish": "nx release publish",
-    "start": "nx serve server",
+    "start": "node bin/start-with-env.js",
     "stylelint": "nx run webapp:stylelint",
     "e2e-test": "nx e2e webapp",
     "e2e-ui": "nx e2e webapp --ui",
