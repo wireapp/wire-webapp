@@ -19,15 +19,13 @@
 
 import {FC, useMemo, useState} from 'react';
 
-import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
+import {UserType} from '@wireapp/api-client/lib/user';
 import cx from 'classnames';
 
-import {TabIndex, Button, ButtonVariant} from '@wireapp/react-ui-kit';
+import {Button, TabIndex} from '@wireapp/react-ui-kit';
 
 import {FadingScrollbar} from 'Components/FadingScrollbar';
-import * as Icon from 'Components/Icon';
 import {SearchInput} from 'Components/SearchInput';
-import {ServiceList} from 'Components/ServiceList/ServiceList';
 import {UserSearchableList} from 'Components/UserSearchableList';
 import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
 import {Conversation} from 'Repositories/entity/Conversation';
@@ -118,10 +116,15 @@ const AddParticipants: FC<AddParticipantsProps> = ({
   const contacts = useMemo(() => {
     if (isTeam) {
       const isTeamOrServices = isTeamOnly || isServicesRoom;
-      return isTeamOrServices ? teamMembers.sort(sortUsersByPriority) : teamUsers;
+      // isTeamOnly is true if guests are not allowed in this conversation
+      // If guests are allowed teamUsers are loaded as they contain team members AND all users the logged in user is connected with
+      if (currentState === PARTICIPANTS_STATE.ADD_PEOPLE) {
+        return isTeamOrServices ? teamMembers.sort(sortUsersByPriority) : teamUsers;
+      }
+      return teamMembers.sort(sortUsersByPriority).filter(u => u.type === UserType.APP);
     }
     return connectedUsers;
-  }, [connectedUsers, isServicesRoom, isTeam, isTeamOnly, teamMembers, teamUsers]);
+  }, [connectedUsers, isServicesRoom, isTeam, isTeamOnly, teamMembers, teamUsers, currentState]);
 
   const enabledAddAction = selectedContacts.length > ENABLE_ADD_ACTIONS_LENGTH;
 
@@ -134,14 +137,7 @@ const AddParticipants: FC<AddParticipantsProps> = ({
     const isService = !!firstUserEntity?.isService;
     const allowIntegrations = isGroupOrChannel || isService;
 
-    return (
-      isTeam &&
-      allowIntegrations &&
-      inTeam &&
-      !isTeamOnly &&
-      isServicesEnabled &&
-      activeConversation.protocol !== CONVERSATION_PROTOCOL.MLS
-    );
+    return isTeam && allowIntegrations && inTeam && !isTeamOnly && isServicesEnabled;
   }, [
     firstUserEntity?.isService,
     inTeam,
@@ -155,17 +151,22 @@ const AddParticipants: FC<AddParticipantsProps> = ({
   const manageServicesUrl = getManageServicesUrl('client_landing');
   const isSearching = searchInput.length > ENABLE_IS_SEARCHING_LENGTH;
 
-  const onAddPeople = () => setCurrentState(PARTICIPANTS_STATE.ADD_PEOPLE);
-
-  const searchServices = async (value: string) => {
-    await integrationRepository.searchForServices(value);
-    setIsInitialServiceSearch(false);
+  const onAddPeople = () => {
+    setSelectedContacts([]);
+    setCurrentState(PARTICIPANTS_STATE.ADD_PEOPLE);
   };
 
   const onAddServices = async () => {
+    setSelectedContacts([]);
     setCurrentState(PARTICIPANTS_STATE.ADD_SERVICE);
 
     await searchServices(searchInput);
+  };
+
+  const searchServices = async (value: string) => {
+    await integrationRepository.searchForServices(value);
+
+    setIsInitialServiceSearch(false);
   };
 
   const openManageServices = () => {
@@ -178,6 +179,8 @@ const AddParticipants: FC<AddParticipantsProps> = ({
 
   const addUsers = async () => {
     const userEntities = selectedContacts.slice();
+
+    userEntities.forEach(ue => console.log(`userEntity ${JSON.stringify(ue)}`));
 
     await conversationRepository.addUsers(activeConversation, userEntities);
   };
@@ -254,104 +257,101 @@ const AddParticipants: FC<AddParticipantsProps> = ({
         )}
 
         <FadingScrollbar className="add-participants__list panel__content">
-          {isAddPeopleState && (
-            <UserSearchableList
-              users={contacts}
-              onUpdateSelectedUsers={setSelectedContacts}
-              filter={searchInput}
-              selected={selectedContacts}
-              searchRepository={searchRepository}
-              teamRepository={teamRepository}
-              conversationRepository={conversationRepository}
-              excludeUsers={participatingUserIds}
-              selfUser={selfUser}
-              isSelectable
-              allowRemoteSearch
-              filterRemoteTeamUsers
-            />
-          )}
+          <UserSearchableList
+            userType={currentState == PARTICIPANTS_STATE.ADD_PEOPLE ? UserType.REGULAR : UserType.APP}
+            users={contacts}
+            onUpdateSelectedUsers={setSelectedContacts}
+            filter={searchInput}
+            selected={selectedContacts}
+            searchRepository={searchRepository}
+            teamRepository={teamRepository}
+            conversationRepository={conversationRepository}
+            excludeUsers={participatingUserIds}
+            selfUser={selfUser}
+            isSelectable
+            allowRemoteSearch
+            filterRemoteTeamUsers
+          />
 
-          {isAddServiceState && (
-            <>
-              {!!services.length && (
-                <>
-                  {canManageServices() && !!manageServicesUrl && (
-                    <ul className="panel-manage-services left-list-items">
-                      <li
-                        role="presentation"
-                        tabIndex={TabIndex.FOCUSABLE}
-                        className="left-list-item left-list-item-clickable"
-                        onClick={openManageServices}
-                        onKeyDown={event =>
-                          handleKeyDown({
-                            event,
-                            callback: openManageServices,
-                            keys: [KEY.ENTER, KEY.SPACE],
-                          })
-                        }
-                        data-uie-name="go-manage-services"
-                      >
-                        <div className="left-column-icon left-column-icon-dark">
-                          <Icon.ServiceIcon />
-                        </div>
+          {/*{isAddServiceState && (*/}
+          {/*  <>*/}
+          {/*    {!!services.length && (*/}
+          {/*      <>*/}
+          {/*        {canManageServices() && !!manageServicesUrl && (*/}
+          {/*          <ul className="panel-manage-services left-list-items">*/}
+          {/*            <li*/}
+          {/*              role="presentation"*/}
+          {/*              tabIndex={TabIndex.FOCUSABLE}*/}
+          {/*              className="left-list-item left-list-item-clickable"*/}
+          {/*              onClick={openManageServices}*/}
+          {/*              onKeyDown={event =>*/}
+          {/*                handleKeyDown({*/}
+          {/*                  event,*/}
+          {/*                  callback: openManageServices,*/}
+          {/*                  keys: [KEY.ENTER, KEY.SPACE],*/}
+          {/*                })*/}
+          {/*              }*/}
+          {/*              data-uie-name="go-manage-services"*/}
+          {/*            >*/}
+          {/*              <div className="left-column-icon left-column-icon-dark">*/}
+          {/*                <Icon.ServiceIcon />*/}
+          {/*              </div>*/}
 
-                        <div className="column-center">{t('addParticipantsManageServices')}</div>
-                      </li>
-                    </ul>
-                  )}
+          {/*              <div className="column-center">{t('addParticipantsManageServices')}</div>*/}
+          {/*            </li>*/}
+          {/*          </ul>*/}
+          {/*        )}*/}
 
-                  <ServiceList services={services} onServiceClick={onServiceSelect} isSearching={isSearching} />
-                </>
-              )}
+          {/*        <ServiceList services={services} onServiceClick={onServiceSelect} isSearching={isSearching} />*/}
+          {/*      </>*/}
+          {/*    )}*/}
 
-              {!services.length && !isInitialServiceSearch && (
-                <div className="search__no-services">
-                  <Icon.ServiceIcon className="search__no-services__icon" />
+          {/*    {!services.length && !isInitialServiceSearch && (*/}
+          {/*      <div className="search__no-services">*/}
+          {/*        <Icon.ServiceIcon className="search__no-services__icon" />*/}
 
-                  {canManageServices() && !!manageServicesUrl && (
-                    <>
-                      <div className="search__no-services__info" data-uie-name="label-no-services-enabled-manager">
-                        {t('addParticipantsNoServicesManager')}
-                      </div>
+          {/*        {canManageServices() && !!manageServicesUrl && (*/}
+          {/*          <>*/}
+          {/*            <div className="search__no-services__info" data-uie-name="label-no-services-enabled-manager">*/}
+          {/*              {t('addParticipantsNoServicesManager')}*/}
+          {/*            </div>*/}
 
-                      <Button
-                        variant={ButtonVariant.TERTIARY}
-                        type="button"
-                        tabIndex={TabIndex.FOCUSABLE}
-                        onClick={openManageServices}
-                        onKeyDown={event =>
-                          handleKeyDown({
-                            event,
-                            callback: openManageServices,
-                            keys: [KEY.ENTER, KEY.SPACE],
-                          })
-                        }
-                        data-uie-name="go-enable-services"
-                        style={{marginTop: '1em'}}
-                      >
-                        {t('addParticipantsManageServicesNoResults')}
-                      </Button>
-                    </>
-                  )}
+          {/*            <Button*/}
+          {/*              variant={ButtonVariant.TERTIARY}*/}
+          {/*              type="button"*/}
+          {/*              tabIndex={TabIndex.FOCUSABLE}*/}
+          {/*              onClick={openManageServices}*/}
+          {/*              onKeyDown={event =>*/}
+          {/*                handleKeyDown({*/}
+          {/*                  event,*/}
+          {/*                  callback: openManageServices,*/}
+          {/*                  keys: [KEY.ENTER, KEY.SPACE],*/}
+          {/*                })*/}
+          {/*              }*/}
+          {/*              data-uie-name="go-enable-services"*/}
+          {/*              style={{marginTop: '1em'}}*/}
+          {/*            >*/}
+          {/*              {t('addParticipantsManageServicesNoResults')}*/}
+          {/*            </Button>*/}
+          {/*          </>*/}
+          {/*        )}*/}
 
-                  {!canManageServices() && (
-                    <div className="search__no-services__info" data-uie-name="label-no-services-enabled">
-                      {t('addParticipantsNoServicesMember')}
-                    </div>
-                  )}
-                </div>
-              )}
-            </>
-          )}
+          {/*        {!canManageServices() && (*/}
+          {/*          <div className="search__no-services__info" data-uie-name="label-no-services-enabled">*/}
+          {/*            {t('addParticipantsNoServicesMember')}*/}
+          {/*          </div>*/}
+          {/*        )}*/}
+          {/*      </div>*/}
+          {/*    )}*/}
+          {/*  </>*/}
+          {/*)}*/}
         </FadingScrollbar>
 
-        {isAddPeopleState && (
-          <div className="add-participants__footer">
-            <Button type="button" disabled={!enabledAddAction} onClick={onAddParticipants} data-uie-name="do-create">
-              {t('addParticipantsConfirmLabel')}
-            </Button>
-          </div>
-        )}
+        <div className="add-participants__footer">
+          <Button type="button" disabled={!enabledAddAction} onClick={onAddParticipants} data-uie-name="do-create">
+            {t('addParticipantsConfirmLabel')}
+          </Button>
+        </div>
       </div>
     </div>
   );

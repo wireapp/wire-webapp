@@ -19,7 +19,7 @@
 
 import React, {useEffect, useState} from 'react';
 
-import {QualifiedId} from '@wireapp/api-client/lib/user';
+import {QualifiedId, UserType} from '@wireapp/api-client/lib/user';
 import {container} from 'tsyringe';
 import {useDebouncedCallback} from 'use-debounce';
 
@@ -53,6 +53,7 @@ export type UserListProps = React.ComponentProps<typeof UserList> & {
   /** will do an extra request to the server when user types in (otherwise will only lookup given local users) */
   allowRemoteSearch?: boolean;
   filterRemoteTeamUsers?: boolean;
+  userType: UserType;
 };
 
 export const UserSearchableList = ({
@@ -66,6 +67,7 @@ export const UserSearchableList = ({
   selfUser,
   users,
   teamState = container.resolve(TeamState),
+  userType,
   ...props
 }: UserListProps) => {
   const {searchRepository, teamRepository, selfFirst, ...userListProps} = props;
@@ -74,7 +76,9 @@ export const UserSearchableList = ({
   const [filteredUsers, setFilteredUsers] = useState<User[]>([]);
   const [remoteTeamMembers, setRemoteTeamMembers] = useState<User[]>([]);
 
-  const filteredSelectedUsers = selectedUsers ? searchRepository.searchUserInSet(filter, selectedUsers) : undefined;
+  const filteredSelectedUsers = selectedUsers
+    ? searchRepository.searchUserInSet(filter, selectedUsers).filter(u => u.type === UserType.REGULAR)
+    : undefined;
 
   const selfInTeam = teamState.isInTeam(selfUser);
 
@@ -85,7 +89,7 @@ export const UserSearchableList = ({
   const fetchMembersFromBackend = useDebouncedCallback(async (query: string, ignoreMembers: User[]) => {
     const resultUsers = await searchRepository.searchByName(query, selfUser.teamId);
     const selfTeamId = selfUser.teamId;
-    const foundMembers = resultUsers.filter(user => user.teamId === selfTeamId);
+    const foundMembers = resultUsers.filter(user => user.teamId === selfTeamId && user.type === userType);
     const ignoreIds = ignoreMembers.map(member => member.id);
     const uniqueMembers = foundMembers.filter(member => !ignoreIds.includes(member.id));
 
@@ -108,10 +112,11 @@ export const UserSearchableList = ({
       .searchUserInSet(filter, users)
       .filter(
         user =>
-          user.isMe ||
-          conversationState.hasConversationWith(user) ||
-          teamRepository.isSelfConnectedTo(user.id) ||
-          user.username() === normalizedQuery,
+          (user.isMe ||
+            conversationState.hasConversationWith(user) ||
+            teamRepository.isSelfConnectedTo(user.id) ||
+            user.username() === normalizedQuery) &&
+          user.type === userType,
       );
 
     if (normalizedQuery !== '' && selfInTeam && allowRemoteSearch) {

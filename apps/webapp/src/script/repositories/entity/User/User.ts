@@ -19,7 +19,7 @@
 
 import {ConnectionStatus} from '@wireapp/api-client/lib/connection/';
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
-import {QualifiedId} from '@wireapp/api-client/lib/user';
+import {QualifiedId, UserType} from '@wireapp/api-client/lib/user';
 import {amplify} from 'amplify';
 import ko from 'knockout';
 
@@ -104,6 +104,7 @@ export class User {
   public domain: string;
   public readonly isBlockedLegalHold: ko.PureComputed<boolean>;
   public readonly supportedProtocols: ko.Observable<null | CONVERSATION_PROTOCOL[]>;
+  public type: UserType | undefined;
 
   public static get ACCENT_COLOR() {
     return {
