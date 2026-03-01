@@ -5045,6 +5045,17 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@lexical/extension@npm:0.41.0":
+  version: 0.41.0
+  resolution: "@lexical/extension@npm:0.41.0"
+  dependencies:
+    "@lexical/utils": "npm:0.41.0"
+    "@preact/signals-core": "npm:^1.11.0"
+    lexical: "npm:0.41.0"
+  checksum: 10/1d3c1ada8fc93ed7b1a1bc7113c7db6ed0661768d9b617feb0024b1d7378f9328119c6ada5a001c2e34850bbdf27701aa0880fdb7cf8cd22f4d58bca03c55642
+  languageName: node
+  linkType: hard
+
 "@lexical/hashtag@npm:0.27.2":
   version: 0.27.2
   resolution: "@lexical/hashtag@npm:0.27.2"
@@ -5093,6 +5104,18 @@ __metadata:
     "@lexical/utils": "npm:0.27.2"
     lexical: "npm:0.27.2"
   checksum: 10/a1ea52c1e1fc7883a89e3d7cfce36ee9c8bb7d95a85414b669793528ce741c6aad66fa8d9e261314f47084f05e49412cdea8858308c75105d8af02c523023b08
+  languageName: node
+  linkType: hard
+
+"@lexical/list@npm:0.41.0":
+  version: 0.41.0
+  resolution: "@lexical/list@npm:0.41.0"
+  dependencies:
+    "@lexical/extension": "npm:0.41.0"
+    "@lexical/selection": "npm:0.41.0"
+    "@lexical/utils": "npm:0.41.0"
+    lexical: "npm:0.41.0"
+  checksum: 10/eb92b10746c7cee28c41cb7f2b728f002dc9942c2a68354776d4967a255b02aa415c9b77b95faa34e4d013f40cc92c3648b54c46f897f4367c94457ab806cdf4
   languageName: node
   linkType: hard
 
@@ -5203,6 +5226,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@lexical/selection@npm:0.41.0":
+  version: 0.41.0
+  resolution: "@lexical/selection@npm:0.41.0"
+  dependencies:
+    lexical: "npm:0.41.0"
+  checksum: 10/fa3d9006c9de2deac1eb73b672e38fef3fc575e112280f34fcd26598a50c69697311efff6ef470bb664025ddc294d82d5103cc2be3649854fa68d1d968927d88
+  languageName: node
+  linkType: hard
+
 "@lexical/table@npm:0.27.2":
   version: 0.27.2
   resolution: "@lexical/table@npm:0.27.2"
@@ -5232,6 +5264,16 @@ __metadata:
     "@lexical/table": "npm:0.27.2"
     lexical: "npm:0.27.2"
   checksum: 10/014015f9c0a10f0e01f51621501c794f6c421fb17c41ae8d6c2d04a0c4b477673afa1ffadebb6e82a05cb2e28a4585e954e416b35ea052504ff9a103759eacd6
+  languageName: node
+  linkType: hard
+
+"@lexical/utils@npm:0.41.0":
+  version: 0.41.0
+  resolution: "@lexical/utils@npm:0.41.0"
+  dependencies:
+    "@lexical/selection": "npm:0.41.0"
+    lexical: "npm:0.41.0"
+  checksum: 10/08e49ff639e7b3ae21277bc14887d0b0c984185d1fa8f0989d9ff10b36db9b30855fc5d82f8cef1d3a26dcf72006b1208b2305e1abed73b71f75bc7b68d7e3ac
   languageName: node
   linkType: hard
 
@@ -5859,6 +5901,13 @@ __metadata:
   version: 1.0.0-next.29
   resolution: "@polka/url@npm:1.0.0-next.29"
   checksum: 10/69ca11ab15a4ffec7f0b07fcc4e1f01489b3d9683a7e1867758818386575c60c213401259ba3705b8a812228d17e2bfd18e6f021194d943fff4bca389c9d4f28
+  languageName: node
+  linkType: hard
+
+"@preact/signals-core@npm:^1.11.0":
+  version: 1.13.0
+  resolution: "@preact/signals-core@npm:1.13.0"
+  checksum: 10/692dadf943a8a26dc8d8b96b9216d932ab8464b738bc8ddc6da293b79189b7b3d6d3d47a1afb21ca106731692f61cd090b0ea72ef605a68201e70a9d0055eec1
   languageName: node
   linkType: hard
 
@@ -11903,7 +11952,7 @@ __metadata:
     "@formkit/auto-animate": "npm:0.9.0"
     "@lexical/code": "npm:0.27.2"
     "@lexical/history": "npm:0.27.2"
-    "@lexical/list": "npm:0.27.2"
+    "@lexical/list": "npm:0.41.0"
     "@lexical/markdown": "npm:0.27.2"
     "@lexical/react": "npm:0.27.2"
     "@lexical/rich-text": "npm:0.27.2"
@@ -21284,6 +21333,13 @@ __metadata:
   version: 0.27.2
   resolution: "lexical@npm:0.27.2"
   checksum: 10/d476d71756fae6139374b967afbddf0309d356f19c4bca62997ee4b63624ef0072c61107617bb0b6d917dd1366440ddc46982e0d61b9e3e9cfd2501faf6d70f0
+  languageName: node
+  linkType: hard
+
+"lexical@npm:0.41.0":
+  version: 0.41.0
+  resolution: "lexical@npm:0.41.0"
+  checksum: 10/694920a619ff91469ef400a4f07e6bbdde802a80a5a46e9c2ec2b113b5835f14359b6dfb2128c20ff172a2f4aff0adffab9097620e54d8e836376f780e6642e9
   languageName: node
   linkType: hard
 
