@@ -17,8 +17,6 @@
  *
  */
 
-import React from 'react';
-
 import {Note} from 'Components/Note/Note';
 import {t} from 'Util/LocalizerUtil';
 

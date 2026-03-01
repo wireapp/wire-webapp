@@ -17,7 +17,7 @@
  *
  */
 
-import React, {ReactNode} from 'react';
+import {ReactNode} from 'react';
 
 import {InfoIcon} from 'Components/Icon';
 import {ContainerStyle, ContentStyle, HeaderStyle} from 'Components/Note/Note.styles';
