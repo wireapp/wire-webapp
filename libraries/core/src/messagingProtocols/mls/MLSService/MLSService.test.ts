@@ -184,6 +184,43 @@ describe('MLSService', () => {
       expect(failures).toEqual([failure]);
       expect(mlsService.scheduleKeyMaterialRenewal).toHaveBeenCalledWith(groupId);
     });
+
+    it('establishes an empty group with one single transaction', async () => {
+      const [mlsService, {apiClient, coreCrypto, transactionContext}] = await createMLSService();
+      const groupId = 'mXOagqRIX/RFd7QyXJA8/Ed8X+hvQgLXIiwYHm4OQFc=';
+
+      jest
+        .spyOn(apiClient.api.client, 'getPublicKeys')
+        .mockResolvedValue({removal: {ed25519: 'mXOagqRIX/RFd7QyXJA8/Ed8X+hvQgLXIiwYHm3OQFc='}});
+      jest.spyOn(mlsService, 'getKeyPackagesPayload').mockResolvedValueOnce({keyPackages: [], failures: []});
+      jest.spyOn(mlsService, 'addUsersToExistingConversation').mockResolvedValueOnce(undefined);
+      jest.spyOn(mlsService, 'scheduleKeyMaterialRenewal').mockResolvedValueOnce(undefined);
+
+      await mlsService.registerConversation(groupId, []);
+
+      expect(coreCrypto.transaction).toHaveBeenCalledTimes(1);
+      expect(transactionContext.createConversation).toHaveBeenCalledTimes(1);
+      expect(mlsService.addUsersToExistingConversation).not.toHaveBeenCalled();
+    });
+
+    it('adds users to a group with one single transaction', async () => {
+      const [mlsService, {apiClient, coreCrypto, transactionContext}] = await createMLSService();
+      const groupId = 'mXOagqRIX/RFd7QyXJA8/Ed8X+hvQgLXIiwYHm4OQFd=';
+      const keyPackages = [new Uint8Array([1, 2, 3])];
+
+      jest
+        .spyOn(apiClient.api.client, 'getPublicKeys')
+        .mockResolvedValue({removal: {ed25519: 'mXOagqRIX/RFd7QyXJA8/Ed8X+hvQgLXIiwYHm3OQFc='}});
+      jest.spyOn(mlsService, 'getKeyPackagesPayload').mockResolvedValueOnce({keyPackages, failures: []});
+      jest.spyOn(mlsService, 'addUsersToExistingConversation').mockResolvedValueOnce(undefined);
+      jest.spyOn(mlsService, 'scheduleKeyMaterialRenewal').mockResolvedValueOnce(undefined);
+
+      await mlsService.registerConversation(groupId, []);
+
+      expect(coreCrypto.transaction).toHaveBeenCalledTimes(1);
+      expect(transactionContext.createConversation).toHaveBeenCalledTimes(1);
+      expect(mlsService.addUsersToExistingConversation).toHaveBeenCalledWith(groupId, keyPackages, transactionContext);
+    });
   });
 
   describe('getKeyPackagesPayload', () => {
