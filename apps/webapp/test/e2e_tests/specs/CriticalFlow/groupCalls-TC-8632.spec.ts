@@ -17,8 +17,6 @@
  *
  */
 
-import {FEATURE_KEY} from '@wireapp/api-client/lib/team/feature';
-
 import {User} from 'test/e2e_tests/data/user';
 import {PageManager} from 'test/e2e_tests/pageManager';
 
@@ -29,16 +27,10 @@ let owner: User;
 let member: User;
 const conversationName = 'Calling';
 
-test.beforeEach(async ({api, createUser, createTeam}) => {
+test.beforeEach(async ({createUser, createTeam}) => {
   member = await createUser();
-  const team = await createTeam('Calling', {users: [member]});
+  const team = await createTeam('Calling', {users: [member], features: {conferenceCalling: true}});
   owner = team.owner;
-
-  // The team will be reset right after initialization, so we need to wait a short time for it to finish
-  // before changing feature configs since they would otherwise be overwritten (See WPB-23698)
-  await new Promise(resolve => setTimeout(resolve, 5000));
-  await api.enableConferenceCallingFeature(owner.teamId!);
-  await api.waitForFeatureToBeEnabled(FEATURE_KEY.CONFERENCE_CALLING, owner.teamId!, owner.token);
 });
 
 test(

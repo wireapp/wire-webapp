@@ -51,7 +51,10 @@ type Fixtures = {
    * @param options.withMembers Can either be the number of team members to create or an array of existing members to add to the team
    * @returns an object containing the teams owner and an array of members. The size of the members array matches the number or array length passed to `withMembers`
    */
-  createTeam: (teamName: string, options?: {users: (User | {user: User; role?: keyof typeof Role})[]}) => Promise<Team>;
+  createTeam: (
+    teamName: string,
+    options?: {users: (User | {user: User; role?: keyof typeof Role})[]; features?: {conferenceCalling?: boolean}},
+  ) => Promise<Team>;
 };
 
 export type Team = {
@@ -159,7 +162,17 @@ export const test = baseTest.extend<Fixtures>({
         );
       }
 
-      return {owner, addTeamMember};
+      if (options?.features) {
+        // The team will be reset right after initialization, so we need to wait a short time for it to finish
+        // before changing feature configs since they would otherwise be overwritten (See WPB-23698)
+        await new Promise(resolve => setTimeout(resolve, 5000));
+
+        if (options.features.conferenceCalling) {
+          await api.enableConferenceCallingFeature(teamId);
+        }
+      }
+
+      return {teamId, owner, addTeamMember};
     });
 
     // Deletes each created team and the owner / members associated with it
