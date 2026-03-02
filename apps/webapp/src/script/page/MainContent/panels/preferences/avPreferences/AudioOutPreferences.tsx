@@ -17,6 +17,8 @@
  *
  */
 
+import {FunctionComponent} from 'react';
+
 import * as Icon from 'Components/Icon';
 import {useMediaDevicesStore} from 'Repositories/media/useMediaDevicesStore';
 import {t} from 'Util/LocalizerUtil';
@@ -30,7 +32,10 @@ interface AudioOutPreferencesProps {
   hasActiveCall: boolean;
 }
 
-const AudioOutPreferences = ({refreshCallOutputSpeaker, hasActiveCall}: AudioOutPreferencesProps) => {
+const AudioOutPreferences: FunctionComponent<AudioOutPreferencesProps> = ({
+  refreshCallOutputSpeaker,
+  hasActiveCall,
+}: AudioOutPreferencesProps) => {
   const {audioOutputDeviceId, setAudioOutputDeviceId, audioOutputDevices} = useMediaDevicesStore(state => ({
     audioOutputDeviceId: state.audio.output.selectedId,
     setAudioOutputDeviceId: state.setAudioOutputDeviceId,
