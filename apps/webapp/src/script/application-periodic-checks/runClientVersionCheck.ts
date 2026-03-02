@@ -18,34 +18,41 @@
  */
 
 import {KyInstance} from 'ky';
+import {result} from 'true-myth';
 
 import {upgradeRequiredHttpStatusCode, validateClientVersionCheckResponse} from './clientVersionCheckResponseSchema';
 
 interface RunClientVersionCheckOptions {
   readonly ky: KyInstance;
   readonly clientVersion: string;
+  readonly setDoesApplicationNeedForceReload: (doesApplicationNeedForceReload: boolean) => void;
 }
 
-export function runClientVersionCheck(options: RunClientVersionCheckOptions): void {
-  const {ky, clientVersion} = options;
+export async function runClientVersionCheck(options: RunClientVersionCheckOptions): Promise<void> {
+  const {ky, clientVersion, setDoesApplicationNeedForceReload} = options;
 
-  async function requestClientVersionCheck() {
-    const clientVersionCheckResponse = await ky.get('/client-version-check', {
-      headers: {
-        'Wire-Client-Version': clientVersion,
-      },
-      throwHttpErrors: false,
-    });
+  const clientVersionCheckResponse = await ky.get('/client-version-check', {
+    headers: {
+      'Wire-Client-Version': clientVersion,
+    },
+    throwHttpErrors: false,
+  });
 
-    const httpStatusCode = clientVersionCheckResponse.status;
-    let responseBody: unknown = undefined;
+  const httpStatusCode = clientVersionCheckResponse.status;
+  let responseBody: unknown = undefined;
 
-    if (httpStatusCode === upgradeRequiredHttpStatusCode) {
-      responseBody = await clientVersionCheckResponse.json();
-    }
-
-    validateClientVersionCheckResponse({httpStatusCode, responseBody});
+  if (httpStatusCode === upgradeRequiredHttpStatusCode) {
+    responseBody = await clientVersionCheckResponse.json();
   }
 
-  void requestClientVersionCheck();
+  const clientVersionCheckValidationResult = validateClientVersionCheckResponse({httpStatusCode, responseBody});
+
+  if (result.isErr(clientVersionCheckValidationResult)) {
+    return;
+  }
+
+  const doesApplicationNeedForceReload =
+    clientVersionCheckValidationResult.value.httpStatusCode === upgradeRequiredHttpStatusCode;
+
+  setDoesApplicationNeedForceReload(doesApplicationNeedForceReload);
 }

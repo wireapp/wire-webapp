@@ -17,7 +17,7 @@
  *
  */
 
-import {useCallback, useEffect, useLayoutEffect, useMemo} from 'react';
+import {useCallback, useEffect, useLayoutEffect, useMemo, useState} from 'react';
 
 import {amplify} from 'amplify';
 import cx from 'classnames';
@@ -101,9 +101,10 @@ export const AppMain = ({
   const wallClock = useMemo(() => {
     return createWallClock();
   }, []);
+  const [doesApplicationNeedForceReload, setDoesApplicationNeedForceReload] = useState(false);
   const clientVersion = Config.getConfig().VERSION;
   const runApplicationPeriodicCheck: () => void = useCallback(() => {
-    runClientVersionCheck({ky, clientVersion});
+    void runClientVersionCheck({ky, clientVersion, setDoesApplicationNeedForceReload});
   }, [clientVersion]);
   const apiContext = app.getAPIContext();
 
@@ -307,7 +308,7 @@ export const AppMain = ({
       data-uie-value="is-loaded"
     >
       {!locked && <WindowTitleUpdater />}
-      <RootProvider value={{mainViewModel: mainView, wallClock}}>
+      <RootProvider value={{mainViewModel: mainView, wallClock, doesApplicationNeedForceReload}}>
         <ErrorBoundary FallbackComponent={ErrorFallback}>
           {Config.getConfig().FEATURE.ENABLE_DEBUG && <ConfigToolbar />}
           {!locked && (

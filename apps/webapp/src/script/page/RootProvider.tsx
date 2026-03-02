@@ -25,6 +25,7 @@ import {MainViewModel} from '../view_model/MainViewModel';
 export type RootContextValue = {
   readonly mainViewModel: MainViewModel;
   readonly wallClock: WallClock;
+  readonly doesApplicationNeedForceReload: boolean;
 };
 
 export const RootContext = createContext<RootContextValue | null>(null);
