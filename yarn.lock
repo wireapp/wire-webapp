@@ -10311,10 +10311,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/lodash@npm:4.17.23":
-  version: 4.17.23
-  resolution: "@types/lodash@npm:4.17.23"
-  checksum: 10/05935534a44aadef67c2158b2fb4a042a226970088106a40ddc67e4f063783149fe5cf02279d7dd4a1e72c98d9189b9430face659645dbf77270f8c4c3e387f5
+"@types/lodash@npm:4.17.24":
+  version: 4.17.24
+  resolution: "@types/lodash@npm:4.17.24"
+  checksum: 10/0f2082565f60f9787eefc046edc38458054512be5a8b3584ef0bad5fd9e85d0ab55ec5a1fbfae1ed6ba015cf1f9e837d5fb4da1f99fc60b8f74b2a46146fb00f
   languageName: node
   linkType: hard
 
@@ -11636,7 +11636,7 @@ __metadata:
   dependencies:
     "@swc/core": "npm:1.15.11"
     "@swc/jest": "npm:0.2.39"
-    "@types/lodash": "npm:4.17.23"
+    "@types/lodash": "npm:4.17.24"
     "@types/long": "npm:5.0.0"
     "@wireapp/api-client": "npm:27.95.6"
     "@wireapp/core-crypto": "npm:9.3.0"
