@@ -32,6 +32,7 @@ import {UserState} from 'Repositories/user/UserState';
 import {createUuid} from 'Util/uuid';
 
 import {AppLock, APPLOCK_STATE} from './AppLock';
+import {withTheme} from 'src/script/auth/util/test/TestUtil';
 
 // https://github.com/jedisct1/libsodium.js/issues/235
 jest.mock('libsodium-wrappers', () => ({
@@ -91,7 +92,7 @@ describe('AppLock', () => {
         clientRepository,
       };
 
-      const {queryByTestId} = render(<AppLock {...props} />);
+      const {queryByTestId} = render(withTheme(<AppLock {...props} />));
 
       const appLockModal = queryByTestId('applock-modal');
       expect(appLockModal).toBe(null);
@@ -112,7 +113,7 @@ describe('AppLock', () => {
         clientRepository,
       };
 
-      const {getByTestId} = render(<AppLock {...props} />);
+      const {getByTestId} = render(withTheme(<AppLock {...props} />));
 
       const appLockModalBody = getByTestId('applock-modal-body');
       expect(appLockModalBody.getAttribute('data-uie-value')).toEqual(APPLOCK_STATE.LOCKED);
@@ -131,7 +132,7 @@ describe('AppLock', () => {
         clientRepository,
       };
 
-      const {getByTestId} = render(<AppLock {...props} />);
+      const {getByTestId} = render(withTheme(<AppLock {...props} />));
 
       act(() => {
         amplify.publish(WebAppEvents.PREFERENCES.CHANGE_APP_LOCK_PASSPHRASE);
@@ -153,7 +154,7 @@ describe('AppLock', () => {
         clientRepository,
       };
 
-      const {getByTestId} = render(<AppLock {...props} />);
+      const {getByTestId} = render(withTheme(<AppLock {...props} />));
 
       act(() => {
         amplify.publish(WebAppEvents.PREFERENCES.CHANGE_APP_LOCK_PASSPHRASE);
@@ -177,7 +178,7 @@ describe('AppLock', () => {
       clientRepository,
     };
 
-    const {getByTestId} = render(<AppLock {...props} />);
+    const {getByTestId} = render(withTheme(<AppLock {...props} />));
 
     const appLockModal = getByTestId('applock-modal');
     expect(window.getComputedStyle(appLockModal).getPropertyValue('display')).toBe('flex');
