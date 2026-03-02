@@ -27,6 +27,7 @@ import {
   RootContext,
   RootContextValue,
   RootProvider,
+  useApplicationContext,
   useMainViewModel,
 } from './RootProvider';
 
@@ -96,5 +97,13 @@ describe('RootProvider', () => {
     const {result} = renderHook(getRootContextValue, {wrapper});
 
     expect(result.current?.doesApplicationNeedForceReload).toBe(true);
+  });
+
+  it('provides force reload status through useApplicationContext()', () => {
+    const {wrapper} = createRootProviderWrapper(mainViewModel, 9_999, true);
+
+    const {result} = renderHook(useApplicationContext, {wrapper});
+
+    expect(result.current.doesApplicationNeedForceReload).toBe(true);
   });
 });
