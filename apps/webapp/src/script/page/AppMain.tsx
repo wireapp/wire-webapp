@@ -53,6 +53,7 @@ import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {AppLock} from './AppLock';
 import {useE2EIFeatureConfigUpdate} from './components/FeatureConfigChange/FeatureConfigChangeHandler/Features/useE2EIFeatureConfigUpdate';
 import {FeatureConfigChangeNotifier} from './components/FeatureConfigChange/FeatureConfigChangeNotifier';
+import {ForceReloadModal} from './components/ForceReloadModal/ForceReloadModal';
 import {WindowTitleUpdater} from './components/WindowTitleUpdater';
 import {LeftSidebar} from './LeftSidebar';
 import {TeamCreationModalContainer} from './LeftSidebar/panels/Conversations/ConversationTabs/TeamCreation/TeamCreationModalContainer';
@@ -310,6 +311,7 @@ export const AppMain = ({
       {!locked && <WindowTitleUpdater />}
       <RootProvider value={{mainViewModel: mainView, wallClock, doesApplicationNeedForceReload}}>
         <ErrorBoundary FallbackComponent={ErrorFallback}>
+          <ForceReloadModal reloadApplication={app.refresh} />
           {Config.getConfig().FEATURE.ENABLE_DEBUG && <ConfigToolbar />}
           {!locked && (
             <div

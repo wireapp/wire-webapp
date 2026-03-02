@@ -1028,6 +1028,9 @@ declare module 'I18n/en-US.json' {
     'folderViewTooltip': `Folders`;
     'footer.copy': `© Wire Swiss GmbH`;
     'footer.wireLink': `wire.com`;
+    'forceReloadModalAction': `Reload`;
+    'forceReloadModalMessage': `A new version of Wire is available. Reload now to continue.`;
+    'forceReloadModalTitle': `Update required`;
     'fullsearchCancelCloseBtn': `Cancel search`;
     'fullsearchCancelLabel': `Close search field`;
     'fullsearchNoResults': `No results.`;
