@@ -79,8 +79,7 @@ function linkParagraph(label: string, url: string): SlateParagraph {
 }
 
 const BASE_URL = process.env.TESTINY_BASE_URL ?? "https://app.testiny.io/api/v1";
-// const API_KEY  = process.env.TESTINY_API_KEY ?? "";
-const API_KEY  = "tny_uEqr2eIxVIylC5Eea6xVbsYkwugqp4xeOJzHUvXYYgHuCFy2"; 
+const API_KEY  = process.env.TESTINY_API_KEY;
 const PROJECT  = process.env.TESTINY_PROJECT ?? "3";
 
 const projectField = Number.isNaN(Number(PROJECT))
