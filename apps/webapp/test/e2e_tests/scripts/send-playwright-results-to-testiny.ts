@@ -32,14 +32,14 @@
 
 import fs from "node:fs";
 import path from "node:path";
-import type {JSONReport, JSONReportSuite, JSONReportTestResult} from "@playwright/test/reporter";
+import type { JSONReport, JSONReportSuite, JSONReportTestResult } from "@playwright/test/reporter";
 
 type TestinyStatus = "PASSED" | "FAILED" | "SKIPPED" | "BLOCKED" | "NOTRUN";
 type Body = Record<string, unknown> | unknown[];
 
 interface FlatTest { title: string; fullTitle: string; tags: string[]; results: JSONReportTestResult[] }
-interface Result   { runId: number; testCaseId: number; status: TestinyStatus }
-interface Run      { id: number; title: string; description?: string }
+interface Result { runId: number; testCaseId: number; status: TestinyStatus }
+interface Run { id: number; title: string; description?: string }
 interface SlateDoc { t: "slate"; v: 1; c: SlateParagraph[] }
 interface SlateParagraph { t: "p"; children: (SlateText | SlateLink)[] }
 interface SlateText { text: string }
@@ -70,12 +70,12 @@ function extractTcTags(title: string, tags: string[]): string[] {
 
 function mapStatus(status: string | undefined): TestinyStatus {
     switch (status) {
-        case "passed":      return "PASSED";
+        case "passed": return "PASSED";
         case "failed":
-        case "timedOut":    return "FAILED";
-        case "skipped":     return "SKIPPED";
+        case "timedOut": return "FAILED";
+        case "skipped": return "SKIPPED";
         case "interrupted": return "BLOCKED";
-        default:            return "NOTRUN";
+        default: return "NOTRUN";
     }
 }
 
@@ -96,8 +96,8 @@ function linkParagraph(label: string, url: string): SlateParagraph {
 }
 
 const BASE_URL = process.env.TESTINY_BASE_URL ?? "https://app.testiny.io/api/v1";
-const API_KEY  = process.env.TESTINY_API_KEY;
-const PROJECT  = process.env.TESTINY_PROJECT ?? "3";
+const API_KEY = process.env.TESTINY_API_KEY;
+const PROJECT = process.env.TESTINY_PROJECT ?? "3";
 
 const projectField = Number.isNaN(Number(PROJECT))
     ? { project_key: PROJECT }
@@ -138,7 +138,7 @@ async function findTestCaseId(tcKey: string): Promise<number | null> {
 async function bulkAddResults(results: Result[]): Promise<void> {
     await testinyRequest("POST", "/testrun/mapping/bulk/testcase:testrun?op=add_or_update",
         results.map(({ runId, testCaseId, status }) => ({
-            ids:    { testcase_id: testCaseId, testrun_id: runId },
+            ids: { testcase_id: testCaseId, testrun_id: runId },
             mapped: { result_status: status, assigned_to: "OWNER" },
         }))
     );
@@ -161,34 +161,24 @@ async function appendCiDescription(runId: number): Promise<void> {
     }
 }
 
-async function main(): Promise<void> {
+function validateArgs() {
     const args = process.argv.slice(2);
-    const get  = (flag: string) => { const i = args.indexOf(flag); return i === -1 ? undefined : args[i + 1]; };
+    const get = (flag: string) => { const i = args.indexOf(flag); return i === -1 ? undefined : args[i + 1]; };
     const reportPath = get("--report");
-    const runName    = get("--run-name");
+    const runName = get("--run-name");
 
-    if (reportPath == null)  { console.error("❌  --report <path> is required");   process.exitCode = 1; }
-    if (runName == null)     { console.error("❌  --run-name <n> is required");     process.exitCode = 1; }
-    if (API_KEY == null)     { console.error("❌  TESTINY_API_KEY env var missing"); process.exitCode = 1; }
-    if (process.exitCode !== undefined) return;
+    if (reportPath == null) { throw new Error("--report <path> is required"); }
+    if (runName == null) { throw new Error("--run-name <n> is required"); }
+    if (API_KEY == null) { throw new Error("TESTINY_API_KEY env var missing"); }
 
-    const reportAbsPath = path.resolve(reportPath!);
-    if (fs.existsSync(reportAbsPath) == false) {
-        console.error(`❌  Report file not found: ${reportAbsPath}`);
-        process.exitCode = 1;
-        return;
+    const reportAbsPath = path.resolve(reportPath);
+    if (!fs.existsSync(reportAbsPath)) {
+        throw new Error(`Report file not found: ${reportAbsPath}`);
     }
+    return { reportAbsPath, runName };
+}
 
-    const report   = JSON.parse(fs.readFileSync(reportAbsPath, "utf8")) as JSONReport;
-    const allTests = collectTests(report.suites);
-    console.log(`\n📋  Playwright report loaded: ${allTests.length} test(s) found`);
-
-    console.log("\n🔗  Resolving Testiny test run…");
-    const runId = await resolveRun(runName!);
-
-    // Phase 1 - resolve TC tag to Testiny test case ID
-    console.log("\n🔍  Resolving test case IDs…\n");
-
+async function resolveTestCases(allTests: FlatTest[], runId: number) {
     const pending: Result[] = [];
     let skippedNoTag = 0, skippedNotFound = 0, resolveErrors = 0;
 
@@ -210,6 +200,29 @@ async function main(): Promise<void> {
             }
         }
     }
+
+    return { pending, skippedNoTag, skippedNotFound, resolveErrors };
+}
+
+async function main(): Promise<void> {
+    const { reportAbsPath, runName } = validateArgs();
+
+    const report = JSON.parse(fs.readFileSync(reportAbsPath, "utf8")) as JSONReport;
+    const allTests = collectTests(report.suites);
+    console.log(`\n📋  Playwright report loaded: ${allTests.length} test(s) found`);
+
+    console.log("\n🔗  Resolving Testiny test run…");
+    const runId = await resolveRun(runName);
+
+    // Phase 1 - resolve TC tag to Testiny test case ID
+    console.log("\n🔍  Resolving test case IDs…\n");
+
+    const {
+        pending,
+        skippedNoTag,
+        skippedNotFound,
+        resolveErrors
+    } = await resolveTestCases(allTests, runId);
 
     // Phase 2 - deduplicate (keeping the last status per TC)
     const deduped = new Map(pending.map(r => [`${r.testCaseId}:${r.runId}`, r]));
@@ -249,7 +262,10 @@ async function main(): Promise<void> {
     );
 }
 
-main().catch(err => {
-    console.error("Fatal error:", err instanceof Error ? err.message : JSON.stringify(err));
+function crash(err: unknown): void {
+    const message = err instanceof Error ? err.message : JSON.stringify(err);
+    console.error("Fatal error:", message);
     process.exitCode = 1;
-});
+}
+
+main().catch(crash);
