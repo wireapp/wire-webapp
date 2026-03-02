@@ -212,7 +212,7 @@ test.describe('History Backup', () => {
         const renamedSystemMessage = userAPages
           .conversation()
           .systemMessages.filter({hasText: `${userB.fullName} renamed the conversation`});
-        await expect(renamedSystemMessage).toContainText(`${userB.fullName} renamed the conversation`);
+        await expect(renamedSystemMessage).toBeVisible();
       });
     },
   );
