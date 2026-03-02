@@ -94,7 +94,7 @@ jobs:
       precommit_url: ${{ steps.fetch_url.outputs.url }}
 
     steps:
-      - uses: actions/download-artifact@v5
+      - uses: actions/download-artifact@v8
         with:
           name: build-artifact
 
@@ -205,7 +205,7 @@ jobs:
           cache: 'yarn'
 
       - name: Download report
-        uses: actions/download-artifact@v5
+        uses: actions/download-artifact@v8
         with:
           artifact-ids: ${{ needs.run_e2e_tests.outputs.reportArtifactId }}
           path: apps/webapp/playwright-report

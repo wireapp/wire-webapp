@@ -117,7 +117,7 @@ jobs:
       - run: yarn --immutable
 
       - name: Download blob reports
-        uses: actions/download-artifact@v5
+        uses: actions/download-artifact@v8
         with:
           path: all-blob-reports
           pattern: blob-report-*
