@@ -25,6 +25,7 @@ import {PageManager} from './pageManager';
 import {connectWithUser, sendConnectionRequest} from './utils/userActions';
 import {mockAudioAndVideoDevices} from './utils/mockVideoDevice.util';
 import {Role} from '@wireapp/api-client/lib/team';
+import {FEATURE_KEY} from '@wireapp/api-client/lib/team/feature';
 
 type PagePlugin = (page: Page) => void | Promise<void>;
 
@@ -169,6 +170,7 @@ export const test = baseTest.extend<Fixtures>({
 
         if (options.features.conferenceCalling) {
           await api.enableConferenceCallingFeature(teamId);
+          await api.waitForFeatureToBeEnabled(FEATURE_KEY.CONFERENCE_CALLING, teamId, owner.token);
         }
       }
 
