@@ -28,7 +28,8 @@ test.describe('In Conversation Search', () => {
   let userA: User;
   let userB: User;
 
-  test.beforeEach(async ({createTeam}) => {
+  test.beforeEach(async ({createUser, createTeam}) => {
+    userB = await createUser();
     const team = await createTeam('Test Team', {users: [userB]});
     userA = team.owner;
   });
