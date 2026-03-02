@@ -19,12 +19,17 @@
 
 import {KyInstance} from 'ky';
 
-import {successfulClientVersionCheckHttpStatusCode} from './clientVersionCheckResponseSchema';
+import {
+  reloadClientVersionCheckAction,
+  successfulClientVersionCheckHttpStatusCode,
+  upgradeRequiredHttpStatusCode,
+} from './clientVersionCheckResponseSchema';
 import {runClientVersionCheck} from './runClientVersionCheck';
 
 describe('runClientVersionCheck', () => {
-  it('requests the client version check route', () => {
+  it('requests the client version check route', async () => {
     const clientVersion = '2026.02.12.17.51.00';
+    const setDoesApplicationNeedForceReload = jest.fn();
     const kyInstance = {
       get: jest.fn(() => {
         return Promise.resolve({
@@ -34,7 +39,7 @@ describe('runClientVersionCheck', () => {
       }),
     } as unknown as KyInstance;
 
-    runClientVersionCheck({ky: kyInstance, clientVersion});
+    await runClientVersionCheck({ky: kyInstance, clientVersion, setDoesApplicationNeedForceReload});
 
     expect(kyInstance.get).toHaveBeenCalledTimes(1);
     expect(kyInstance.get).toHaveBeenCalledWith('/client-version-check', {
@@ -43,5 +48,30 @@ describe('runClientVersionCheck', () => {
       },
       throwHttpErrors: false,
     });
+    expect(setDoesApplicationNeedForceReload).toHaveBeenCalledTimes(1);
+    expect(setDoesApplicationNeedForceReload).toHaveBeenNthCalledWith(1, false);
+  });
+
+  it('sets force reload status to true when backend requires upgrade', async () => {
+    const setDoesApplicationNeedForceReload = jest.fn();
+    const kyInstance = {
+      get: jest.fn(() => {
+        return Promise.resolve({
+          status: upgradeRequiredHttpStatusCode,
+          json: jest.fn(() => {
+            return Promise.resolve({action: reloadClientVersionCheckAction});
+          }),
+        } as unknown as Response);
+      }),
+    } as unknown as KyInstance;
+
+    await runClientVersionCheck({
+      ky: kyInstance,
+      clientVersion: '2026.02.12.17.51.00',
+      setDoesApplicationNeedForceReload,
+    });
+
+    expect(setDoesApplicationNeedForceReload).toHaveBeenCalledTimes(1);
+    expect(setDoesApplicationNeedForceReload).toHaveBeenCalledWith(true);
   });
 });
