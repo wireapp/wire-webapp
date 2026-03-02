@@ -268,4 +268,4 @@ function crash(err: unknown): void {
     process.exitCode = 1;
 }
 
-main().catch(crash);
+await main().catch(crash);
