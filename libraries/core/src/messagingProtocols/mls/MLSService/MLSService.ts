@@ -547,10 +547,10 @@ export class MLSService extends TypedEventEmitter<Events> {
     return this.coreCryptoClient.transaction(cx => cx.encryptMessage(conversationId, message));
   }
 
-  private async updateKeyingMaterial(groupId: string, retry = true) {
+  private async updateKeyingMaterial(groupId: string, context: CoreCryptoContext, retry = true) {
     try {
       const groupIdBytes = Decoder.fromBase64(groupId).asBytes;
-      await this.coreCryptoClient.transaction(cx => cx.updateKeyingMaterial(new ConversationId(groupIdBytes)));
+      await context.updateKeyingMaterial(new ConversationId(groupIdBytes));
     } catch (error) {
       if (!retry) {
         this.logger.error(`Failed to update keying material for group retrying did not fix the issue`, {
@@ -565,7 +565,7 @@ export class MLSService extends TypedEventEmitter<Events> {
 
       setTimeout(async () => {
         try {
-          await this.updateKeyingMaterial(groupId, false);
+          await this.updateKeyingMaterial(groupId, context, false);
         } catch (error) {
           this.logger.error(`Failed to update keying material for group on retry`, {
             error,
@@ -654,7 +654,7 @@ export class MLSService extends TypedEventEmitter<Events> {
 
       if (keyPackages.length <= 0) {
         // If there are no clients to add, just update the keying material
-        await this.updateKeyingMaterial(groupId);
+        await this.updateKeyingMaterial(groupId, transactionContext);
         await this.scheduleKeyMaterialRenewal(groupId);
 
         return keysClaimingFailures;
@@ -821,13 +821,15 @@ export class MLSService extends TypedEventEmitter<Events> {
    */
   public async renewKeyMaterial(groupId: string) {
     try {
-      const groupConversationExists = await this.conversationExists(groupId);
+      await this.coreCryptoClient.transaction(async coreCryptoContext => {
+        const groupConversationExists = await this.conversationExists(groupId);
 
-      if (!groupConversationExists) {
-        return this.cancelKeyMaterialRenewal(groupId);
-      }
+        if (!groupConversationExists) {
+          return this.cancelKeyMaterialRenewal(groupId);
+        }
 
-      await this.updateKeyingMaterial(groupId);
+        await this.updateKeyingMaterial(groupId, coreCryptoContext);
+      });
     } catch (error) {
       this.logger.error(`Error while renewing key material for groupId ${groupId}`, error);
     }
@@ -1182,3 +1184,5 @@ export class MLSService extends TypedEventEmitter<Events> {
     await this.verifyRemoteMLSKeyPackagesAmount(client.id);
   }
 }
+
+console.info('bardia new core code');
