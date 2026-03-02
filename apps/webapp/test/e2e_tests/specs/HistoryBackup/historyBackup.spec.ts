@@ -63,7 +63,7 @@ test.describe('History Backup', () => {
       const backupName = await createAndSaveBackup(testInfo, userAPageManager);
 
       await test.step('User A changes their Email address', async () => {
-        const newEmail = generateWireEmail(userA.lastName);
+        const newEmail = generateWireEmail(userA.firstName, userA.lastName);
         await userAPages.account().changeEmailAddress(newEmail);
         await userAModals.acknowledge().clickAction(); // Acknowledge verify email address modal
 
@@ -139,7 +139,7 @@ test.describe('History Backup', () => {
         backupName = await createAndSaveBackup(testInfo, userAPageManager);
       });
 
-      await test.step('User B tries to restore User A\'s backup', async () => {
+      await test.step("User B tries to restore User A's backup", async () => {
         await logOutUser(userBPageManager, true);
         await loginUser(userB, userBPageManager);
         await userBPages.historyInfo().clickConfirmButton();
@@ -189,7 +189,7 @@ test.describe('History Backup', () => {
         await userAComponents.conversationSidebar().clickPreferencesButton();
         backupName = await createAndSaveBackup(testInfo, userAPageManager);
         await userAComponents.conversationSidebar().allConverationsButton.click();
-        await userAPages.conversationList().openConversation(userB.fullName, { protocol: 'mls' });
+        await userAPages.conversationList().openConversation(userB.fullName, {protocol: 'mls'});
       });
 
       await test.step('User B renames group conversation', async () => {
@@ -209,8 +209,10 @@ test.describe('History Backup', () => {
 
         // User A sees system message that User B had renamed the conversation
         await userAPages.conversationList().openConversation(renamedConversationName);
-        const renamedSystemMessage = userAPages.conversation().systemMessages.filter({hasText: `${userB.fullName} renamed the conversation`});
-        await expect(renamedSystemMessage).toContainText(`${userB.fullName} renamed the conversation`);
+        const renamedSystemMessage = userAPages
+          .conversation()
+          .systemMessages.filter({hasText: `${userB.fullName} renamed the conversation`});
+        await expect(renamedSystemMessage).toBeVisible();
       });
     },
   );
