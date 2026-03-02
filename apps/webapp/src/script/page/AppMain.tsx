@@ -101,9 +101,10 @@ export const AppMain = ({
   const wallClock = useMemo(() => {
     return createWallClock();
   }, []);
+  const clientVersion = Config.getConfig().VERSION;
   const runApplicationPeriodicCheck: () => void = useCallback(() => {
-    runClientVersionCheck({ky});
-  }, []);
+    runClientVersionCheck({ky, clientVersion});
+  }, [clientVersion]);
   const apiContext = app.getAPIContext();
 
   useEffect(() => {

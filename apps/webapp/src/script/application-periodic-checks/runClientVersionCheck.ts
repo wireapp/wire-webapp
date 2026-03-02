@@ -19,16 +19,33 @@
 
 import {KyInstance} from 'ky';
 
+import {upgradeRequiredHttpStatusCode, validateClientVersionCheckResponse} from './clientVersionCheckResponseSchema';
+
 interface RunClientVersionCheckOptions {
   readonly ky: KyInstance;
+  readonly clientVersion: string;
 }
 
 export function runClientVersionCheck(options: RunClientVersionCheckOptions): void {
-  const {ky} = options;
+  const {ky, clientVersion} = options;
 
-  const requestClientVersionCheck = async () => {
-    await ky.get('/client-version-check');
-  };
+  async function requestClientVersionCheck() {
+    const clientVersionCheckResponse = await ky.get('/client-version-check', {
+      headers: {
+        'Wire-Client-Version': clientVersion,
+      },
+      throwHttpErrors: false,
+    });
+
+    const httpStatusCode = clientVersionCheckResponse.status;
+    let responseBody: unknown = undefined;
+
+    if (httpStatusCode === upgradeRequiredHttpStatusCode) {
+      responseBody = await clientVersionCheckResponse.json();
+    }
+
+    validateClientVersionCheckResponse({httpStatusCode, responseBody});
+  }
 
   void requestClientVersionCheck();
 }

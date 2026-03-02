@@ -92,7 +92,7 @@ jobs:
 
       - name: Upload blob report
         if: ${{ !cancelled() }}
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v7
         with:
           name: blob-report-${{ matrix.shard }}
           path: apps/webapp/playwright-report/blob-reports
@@ -119,7 +119,7 @@ jobs:
       - run: yarn --immutable
 
       - name: Download blob reports
-        uses: actions/download-artifact@v5
+        uses: actions/download-artifact@v8
         with:
           path: ./apps/webapp/playwright-report/blob-reports
           pattern: blob-report-*
@@ -134,7 +134,7 @@ jobs:
 
       - name: Upload test report
         id: upload_playwright_report
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v7
         with:
           name: playwright-report
           path: apps/webapp/playwright-report/
