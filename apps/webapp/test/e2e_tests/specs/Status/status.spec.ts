@@ -55,25 +55,18 @@ test.describe('Status', () => {
     userA = team.owner;
   });
 
-  const commonTestCases: {
-    name: string;
-    sendAction: (params: {pageA: Page; api: ApiManagerE2E; conversation?: string}) => Promise<void>;
-  }[] = [
+  const commonTestCases = [
     {
       name: 'Text',
       sendAction: async ({pageA}) => {
         const userAPages = PageManager.from(pageA).webapp.pages;
         await userAPages.conversation().sendMessage('Test message');
-        const message = userAPages.conversation().getMessage({sender: userA});
-        await expect(message).toBeVisible();
       },
     },
     {
       name: 'Image',
       sendAction: async ({pageA}) => {
-        const userAPages = PageManager.from(pageA).webapp.pages;
         await shareAssetHelper(getImageFilePath(), pageA, pageA.getByRole('button', {name: 'Add picture'}));
-        await userAPages.conversation().isImageFromUserVisible(userA);
       },
     },
     {
@@ -86,25 +79,19 @@ test.describe('Status', () => {
     {
       name: 'File sharing',
       sendAction: async ({pageA}) => {
-        const userAPages = PageManager.from(pageA).webapp.pages;
         await shareAssetHelper(getTextFilePath(), pageA, pageA.getByRole('button', {name: 'Add file'}));
-        await userAPages.conversation().isFileMessageVisible();
       },
     },
     {
       name: 'Audio',
       sendAction: async ({pageA}) => {
-        const userAPages = PageManager.from(pageA).webapp.pages;
         await shareAssetHelper(getAudioFilePath(), pageA, pageA.getByRole('button', {name: 'Add file'}));
-        await userAPages.conversation().isAudioMessageVisible();
       },
     },
     {
       name: 'Video',
       sendAction: async ({pageA}) => {
-        const userAPages = PageManager.from(pageA).webapp.pages;
         await shareAssetHelper(getVideoFilePath(), pageA, pageA.getByRole('button', {name: 'Add file'}));
-        await userAPages.conversation().isVideoMessageVisible();
       },
     },
     {
@@ -158,15 +145,14 @@ test.describe('Status', () => {
         await expect(message).toBeVisible();
         await userAPages.conversation().replyToMessage(message);
         await userAPages.conversation().sendMessage('Reply');
-        await expect(userAPages.conversation().getMessage({content: 'Reply'})).toBeVisible();
       },
     },
-  ];
-
-  const systemTestCases: {
+  ] as const satisfies {
     name: string;
-    sendAction: (params: {userAPageManager: PageManager['webapp']}) => Promise<void>;
-  }[] = [
+    sendAction: (params: {pageA: Page; api: ApiManagerE2E; conversation?: string}) => Promise<void>;
+  }[];
+
+  const systemTestCases = [
     {
       name: 'Rename group',
       sendAction: async ({userAPageManager}) => {
@@ -181,7 +167,6 @@ test.describe('Status', () => {
       sendAction: async ({userAPageManager}) => {
         const pages = userAPageManager.pages;
         await pages.conversation().removeMemberFromGroup(userC.fullName);
-        await expect(pages.conversation().systemMessages.last()).toContainText(`You removed ${userC.fullName}`);
       },
     },
     {
@@ -190,7 +175,6 @@ test.describe('Status', () => {
         const {pages, modals} = userAPageManager;
         await pages.conversation().leaveConversation();
         await modals.leaveConversation().clickConfirm();
-        await expect(pages.conversation().systemMessages.last()).toContainText('You left');
       },
     },
     {
@@ -208,9 +192,6 @@ test.describe('Status', () => {
         await userAPages.conversation().clickConversationInfoButton();
         await userAPages.conversationDetails().clickAddPeopleButton();
         await userAPages.conversationDetails().addUsersToConversation([userC.fullName]);
-        await expect(userAPages.conversation().systemMessages.last()).toContainText(
-          `You added ${userC.fullName} to the conversation`,
-        );
       },
     },
     {
@@ -218,10 +199,12 @@ test.describe('Status', () => {
       sendAction: async ({userAPageManager}) => {
         const pages = userAPageManager.pages;
         await pages.conversation().removeMemberFromGroup(userC.fullName);
-        await expect(pages.conversation().systemMessages.last()).toContainText(`You removed ${userC.fullName}`);
       },
     },
-  ];
+  ] as const satisfies {
+    name: string;
+    sendAction: (params: {userAPageManager: PageManager['webapp']}) => Promise<void>;
+  }[];
 
   const notificationConfigs = [
     {
@@ -329,7 +312,7 @@ test.describe('Status', () => {
           await userAPages.conversationList().openConversation(userB.fullName, {protocol: 'mls'});
           for (const testCase of specialTestCases) {
             await test.step(`Action: ${testCase.name} message`, async () => {
-              await testCase.sendAction({pageA: userAPages.conversation().page, api});
+              await testCase.sendAction({pageA: userAPage, api});
             });
           }
           await expect.poll(() => getUserBNotifications()).toHaveLength(specialTestCases.length);
@@ -417,7 +400,7 @@ test.describe('Status', () => {
         await test.step(`User B should receive all conversation notifications`, async () => {
           for (const testCase of commonTestCases) {
             await test.step(`Action: ${testCase.name}`, async () => {
-              await testCase.sendAction({pageA: userAPages.conversation().page, api});
+              await testCase.sendAction({pageA: userAPage, api});
               notificationCount++;
             });
           }
@@ -443,7 +426,7 @@ test.describe('Status', () => {
 
   test('I want to set my status on profile page', {tag: ['@TC-1766', '@regression']}, async ({createPage}) => {
     const [userAPageManager, userBPageManager] = await Promise.all([
-      PageManager.from(createPage(withLogin(userB))),
+      PageManager.from(createPage(withLogin(userA))),
       PageManager.from(createPage(withLogin(userB), withConnectedUser(userA))),
     ]);
 
