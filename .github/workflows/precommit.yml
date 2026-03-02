@@ -74,7 +74,7 @@ jobs:
     needs: [build]
 
     steps:
-      - uses: actions/download-artifact@v5
+      - uses: actions/download-artifact@v8
         with:
           name: 'build-artifact'
 
