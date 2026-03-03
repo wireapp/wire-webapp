@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2024 Wire Swiss GmbH
+ * Copyright (C) 2026 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,23 +17,20 @@
  *
  */
 
-import type {ClientConfig} from '@wireapp/config';
+import {Config} from '../Config';
+import {APIClient} from './APIClientSingleton';
 
-import {WireModule} from 'src/types/Wire.types';
+describe('APIClientSingleton', () => {
+  it('configures wire client metadata headers for backend requests', () => {
+    const apiClient = new APIClient();
 
-const wire: WireModule = {
-  app: {} as any,
-  env: {
-    APP_BASE: 'https://app.wire.com',
-    BACKEND_REST: 'https://test.wire.link',
-    FEATURE: {},
-    URL: {SUPPORT: {}},
-    NEW_PASSWORD_MINIMUM_LENGTH: 8,
-    VERSION: '0.0.0-test',
-  } as ClientConfig,
-};
-
-Object.defineProperty(window, 'wire', {
-  value: wire,
-  writable: true,
+    try {
+      expect(apiClient.config.headers).toEqual({
+        'Wire-Client': 'Web',
+        'Wire-Client-Version': Config.getConfig().VERSION,
+      });
+    } finally {
+      apiClient.disconnect();
+    }
+  });
 });
