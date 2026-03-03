@@ -681,6 +681,49 @@ describe('ConversationService', () => {
     });
   });
 
+  describe('domain mismatch guards', () => {
+    it('throws when establishing MLS group conversation with mismatched self and conversation domains', async () => {
+      const [conversationService, {mlsService}] = await buildConversationService();
+
+      const groupId = 'group-domain-mismatch-establish';
+      const selfUserId = {id: 'self-user-id', domain: 'local.wire.com'};
+      const conversationQualifiedId = {id: PayloadHelper.getUUID(), domain: 'staging.zinfra.io'};
+
+      await expect(
+        conversationService.establishMLSGroupConversation(
+          groupId,
+          [],
+          selfUserId,
+          'self-client-id',
+          conversationQualifiedId,
+        ),
+      ).rejects.toThrow('does not match conversation domain');
+
+      expect(mlsService.registerConversation).not.toHaveBeenCalled();
+    });
+
+    it('throws when resetting MLS conversation if self user domain mismatches conversation domain', async () => {
+      const [conversationService, {apiClient}] = await buildConversationService();
+
+      const conversationId = {id: PayloadHelper.getUUID(), domain: 'staging.zinfra.io'};
+
+      jest.spyOn(apiClient.api.conversation, 'getConversation').mockResolvedValueOnce({
+        qualified_id: {id: conversationId.id, domain: 'local.wire.com'},
+        protocol: CONVERSATION_PROTOCOL.MLS,
+        epoch: 1,
+        group_id: 'group-domain-mismatch-reset',
+      } as unknown as Conversation);
+
+      const resetSpy = jest.spyOn(apiClient.api.conversation, 'resetMLSConversation');
+
+      await expect((conversationService as any).resetMLSConversation(conversationId)).rejects.toThrow(
+        'does not match conversation domain',
+      );
+
+      expect(resetSpy).not.toHaveBeenCalled();
+    });
+  });
+
   describe('handleEvent', () => {
     it('rejoins a MLS conversation if epoch mismatch detected when decrypting mls message', async () => {
       const [conversationService, {apiClient, mlsService}] = await buildConversationService();
@@ -1074,6 +1117,31 @@ describe('ConversationService', () => {
       });
 
       expect(conversationService.addUsersToMLSConversation).not.toHaveBeenCalled();
+    });
+
+    it('throws when self user domain does not match conversation domain', async () => {
+      const [conversationService, {mlsService}] = await buildConversationService();
+      const selfUserId = {id: 'self-user-id', domain: 'local.wire.com'};
+
+      const mockConversationId = {id: PayloadHelper.getUUID(), domain: 'staging.zinfra.io'};
+      const mockGroupId = 'groupId';
+      const otherUsersToAdd = Array(3)
+        .fill(0)
+        .map(() => ({id: PayloadHelper.getUUID(), domain: 'local.wire.com'}));
+
+      const addUsersSpy = jest.spyOn(conversationService, 'addUsersToMLSConversation');
+
+      await expect(
+        conversationService.tryEstablishingMLSGroup({
+          conversationId: mockConversationId,
+          groupId: mockGroupId,
+          qualifiedUsers: otherUsersToAdd,
+          selfUserId,
+        }),
+      ).rejects.toThrow('does not match conversation domain');
+
+      expect(mlsService.tryEstablishingMLSGroup).not.toHaveBeenCalled();
+      expect(addUsersSpy).not.toHaveBeenCalled();
     });
   });
 
