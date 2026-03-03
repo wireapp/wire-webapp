@@ -1,16 +1,17 @@
-import {test, expect, withLogin, withConnectedUser} from 'test/e2e_tests/test.fixtures';
+import {test, expect, withLogin, withConnectedUser, Team} from 'test/e2e_tests/test.fixtures';
 import {User} from 'test/e2e_tests/data/user';
 import {PageManager} from 'test/e2e_tests/pageManager';
 import {createGroup} from 'test/e2e_tests/utils/userActions';
 
 test.describe('Mention', () => {
+  let team: Team;
   let userA: User;
   let userB: User;
   let userC: User;
 
   test.beforeEach(async ({createUser, createTeam}) => {
     [userB, userC] = await Promise.all([createUser(), createUser()]);
-    const team = await createTeam('Test Team', {users: [userB, userC]});
+    team = await createTeam('Test Team', {users: [userB, userC]});
     userA = team.owner;
   });
 
@@ -460,7 +461,18 @@ test.describe('Mention', () => {
   test(
     'I want to mention a name with or without umlaut gives the same suggestion (query normalization)',
     {tag: ['@TC-3537', '@regression']},
-    async () => {},
+    async ({createUser, createPage}) => {
+      const memberWithStrangeName = await createUser({firstName: 'Günter'});
+      await team.addTeamMember(memberWithStrangeName);
+
+      const {pages} = PageManager.from(await createPage(withLogin(userA))).webapp;
+      await createGroup(pages, 'Test Group', [memberWithStrangeName]);
+      await pages.conversationList().openConversation('Test Group');
+
+      await pages.conversation().messageInput.pressSequentially('@Gunter');
+      await expect(pages.conversation().mentionSuggestions).toHaveCount(1);
+      await expect(pages.conversation().mentionSuggestions).toContainText(memberWithStrangeName.fullName);
+    },
   );
 
   test('I want to see guest indicators in the suggestions list', {tag: ['@TC-3540', '@regression']}, async () => {});
