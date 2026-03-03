@@ -228,6 +228,15 @@ export const withConnectionRequest =
     await sendConnectionRequest(pageManager, await user);
   };
 
+/** PagePlugin to open a guest user link and join the group chat as temporary member */
+export const withGuestUser =
+  (link: string, guestName: string): PagePlugin =>
+  async page => {
+    await page.goto(link);
+    await page.getByRole('link', {name: 'Join in Browser'}).click();
+    await PageManager.from(page).webapp.pages.conversationJoin().joinAsGuest(guestName);
+  };
+
 const createUser = async (
   api: ApiManagerE2E,
   options?: {firstName?: string; lastName?: string; disableTelemetry?: boolean},

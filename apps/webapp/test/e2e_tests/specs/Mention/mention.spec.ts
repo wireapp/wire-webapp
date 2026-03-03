@@ -1,4 +1,4 @@
-import {test, expect, withLogin, withConnectedUser, Team} from 'test/e2e_tests/test.fixtures';
+import {test, expect, withLogin, withConnectedUser, Team, withGuestUser} from 'test/e2e_tests/test.fixtures';
 import {User} from 'test/e2e_tests/data/user';
 import {PageManager} from 'test/e2e_tests/pageManager';
 import {createGroup} from 'test/e2e_tests/utils/userActions';
@@ -475,7 +475,33 @@ test.describe('Mention', () => {
     },
   );
 
-  test('I want to see guest indicators in the suggestions list', {tag: ['@TC-3540', '@regression']}, async () => {});
+  test(
+    'I want to see guest indicators in the suggestions list',
+    {tag: ['@TC-3540', '@regression']},
+    async ({createPage}) => {
+      const {pages} = PageManager.from(await createPage(withLogin(userA))).webapp;
+      await createGroup(pages, 'Test Group', []);
+
+      await test.step('Create guest link for group & join as guest user', async () => {
+        await pages.conversationList().openConversation('Test Group');
+        await pages.conversation().clickConversationTitle();
+        const link = await pages.conversationDetails().createGuestLink();
+        await createPage(withGuestUser(link, 'Guest User'));
+      });
+
+      await test.step('Verify the temporary user is shown as group member', async () => {
+        const guestMember = pages.conversationDetails().groupMembers.filter({hasText: 'Guest User'});
+        // It may take a moment until the login is done and the user joined
+        await expect(guestMember).toBeVisible({timeout: 60_000});
+      });
+
+      await test.step('Verify the mention suggestion for the guest has a "guest" indicator', async () => {
+        await pages.conversation().messageInput.pressSequentially('@Guest');
+        await expect(pages.conversation().mentionSuggestions).toHaveCount(1);
+        await expect(pages.conversation().mentionSuggestions.getByTestId('status-guest')).toBeVisible();
+      });
+    },
+  );
 
   test(
     'I want to be able to mention participants I am not connected to',
