@@ -62,7 +62,7 @@ test.describe('Authentication', () => {
 
   test(
     'Verify sign in error appearance in case of suspended team account',
-    {tag: ['@TC-3468', '@regression']},
+    {tag: ['@TC-3458', '@regression']},
     async ({pageManager}) => {
       const {pages} = pageManager.webapp;
       await pageManager.openLoginPage();

@@ -363,6 +363,37 @@ export class ConversationService extends TypedEventEmitter<Events> {
     selfClientId: string,
     conversationQualifiedId: QualifiedId,
   ): Promise<BaseCreateConversationResponse> {
+    return this.MLSRecoveryOrchestrator.execute({
+      context: {
+        operationName: OperationName.establishGroup,
+        qualifiedConversationId: conversationQualifiedId,
+        groupId,
+      },
+      callBack: () => {
+        return this.performEstablishMLSGroupConversationAPI({
+          groupId,
+          userIdsToAdd,
+          selfUserId,
+          selfClientId,
+          conversationQualifiedId,
+        });
+      },
+    });
+  }
+
+  private async performEstablishMLSGroupConversationAPI({
+    groupId,
+    userIdsToAdd,
+    selfUserId,
+    selfClientId,
+    conversationQualifiedId,
+  }: {
+    groupId: string;
+    userIdsToAdd: QualifiedId[];
+    selfUserId: QualifiedId;
+    selfClientId: string;
+    conversationQualifiedId: QualifiedId;
+  }): Promise<BaseCreateConversationResponse> {
     const failures = await this.mlsService.registerConversation(groupId, userIdsToAdd.concat(selfUserId), {
       creator: {
         user: selfUserId,

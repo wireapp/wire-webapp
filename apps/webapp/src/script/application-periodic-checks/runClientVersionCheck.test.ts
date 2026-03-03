@@ -19,17 +19,59 @@
 
 import {KyInstance} from 'ky';
 
+import {
+  reloadClientVersionCheckAction,
+  successfulClientVersionCheckHttpStatusCode,
+  upgradeRequiredHttpStatusCode,
+} from './clientVersionCheckResponseSchema';
 import {runClientVersionCheck} from './runClientVersionCheck';
 
 describe('runClientVersionCheck', () => {
-  it('requests the client version check route', () => {
+  it('requests the client version check route', async () => {
+    const clientVersion = '2026.02.12.17.51.00';
+    const setDoesApplicationNeedForceReload = jest.fn();
     const kyInstance = {
-      get: jest.fn(() => Promise.resolve()),
+      get: jest.fn(() => {
+        return Promise.resolve({
+          status: successfulClientVersionCheckHttpStatusCode,
+          json: jest.fn(),
+        } as unknown as Response);
+      }),
     } as unknown as KyInstance;
 
-    runClientVersionCheck({ky: kyInstance});
+    await runClientVersionCheck({ky: kyInstance, clientVersion, setDoesApplicationNeedForceReload});
 
     expect(kyInstance.get).toHaveBeenCalledTimes(1);
-    expect(kyInstance.get).toHaveBeenCalledWith('/client-version-check');
+    expect(kyInstance.get).toHaveBeenCalledWith('/client-version-check', {
+      headers: {
+        'Wire-Client-Version': clientVersion,
+      },
+      throwHttpErrors: false,
+    });
+    expect(setDoesApplicationNeedForceReload).toHaveBeenCalledTimes(1);
+    expect(setDoesApplicationNeedForceReload).toHaveBeenNthCalledWith(1, false);
+  });
+
+  it('sets force reload status to true when backend requires upgrade', async () => {
+    const setDoesApplicationNeedForceReload = jest.fn();
+    const kyInstance = {
+      get: jest.fn(() => {
+        return Promise.resolve({
+          status: upgradeRequiredHttpStatusCode,
+          json: jest.fn(() => {
+            return Promise.resolve({action: reloadClientVersionCheckAction});
+          }),
+        } as unknown as Response);
+      }),
+    } as unknown as KyInstance;
+
+    await runClientVersionCheck({
+      ky: kyInstance,
+      clientVersion: '2026.02.12.17.51.00',
+      setDoesApplicationNeedForceReload,
+    });
+
+    expect(setDoesApplicationNeedForceReload).toHaveBeenCalledTimes(1);
+    expect(setDoesApplicationNeedForceReload).toHaveBeenCalledWith(true);
   });
 });

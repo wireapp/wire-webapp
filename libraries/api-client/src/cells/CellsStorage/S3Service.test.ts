@@ -25,7 +25,13 @@ import {MAX_QUEUE_SIZE, PART_SIZE, S3Service} from './S3Service';
 
 import {AccessTokenStore} from '../../auth/AccessTokenStore';
 
-jest.mock('@aws-sdk/client-s3');
+jest.mock('@aws-sdk/client-s3', () => {
+  const actualS3Module = jest.requireActual('@aws-sdk/client-s3');
+  return {
+    ...actualS3Module,
+    S3Client: jest.fn(),
+  };
+});
 jest.mock('@aws-sdk/lib-storage');
 
 describe('S3Service', () => {

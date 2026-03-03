@@ -70,7 +70,7 @@ describe('Preferences', () => {
     jest.useFakeTimers();
     render(
       withTheme(
-        <RootProvider value={{mainViewModel, wallClock}}>
+        <RootProvider value={{mainViewModel, wallClock, doesApplicationNeedForceReload: false}}>
           <MainContent {...defaultParams} />
         </RootProvider>,
       ),

@@ -49,8 +49,10 @@ export const generateFirstName = (): string => {
   return faker.person.firstName().replace(/[^a-zA-Z]+/g, '');
 };
 
-export const generateWireEmail = (lastName: string): string => {
-  return faker.internet.email({lastName: sanitizeName(lastName), provider: 'wire.engineering'}).toLowerCase();
+export const generateWireEmail = (firstName: string, lastName: string): string => {
+  return faker.internet
+    .email({firstName: sanitizeName(firstName), lastName: sanitizeName(lastName), provider: 'wire.engineering'})
+    .toLowerCase();
 };
 
 export const generateUsername = (firstName: string, lastName: string): string => {

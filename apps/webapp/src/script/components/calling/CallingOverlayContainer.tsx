@@ -118,16 +118,17 @@ const CallingContainer = ({
     callingRepository.refreshAudioInput();
   };
 
+  const switchSpeakerOutput = (deviceId: string) => {
+    setAudioOutputDeviceId(deviceId);
+    callingRepository.refreshAudioOutput();
+  };
+
   const sendEmoji = (emoji: string, call: Call) => {
     void callingRepository.sendInCallEmoji(emoji, call);
   };
 
   const sendHandRaised = (isHandUp: boolean, call: Call) => {
     void callingRepository.sendInCallHandRaised(isHandUp, call);
-  };
-
-  const switchSpeakerOutput = (deviceId: string) => {
-    setAudioOutputDeviceId(deviceId);
   };
 
   const toggleCamera = (call: Call) => callingRepository.toggleCamera(call);

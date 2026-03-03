@@ -17,7 +17,7 @@
  *
  */
 
-import {useCallback, useEffect, useLayoutEffect, useMemo} from 'react';
+import {useCallback, useEffect, useLayoutEffect, useMemo, useState} from 'react';
 
 import {amplify} from 'amplify';
 import cx from 'classnames';
@@ -53,6 +53,7 @@ import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {AppLock} from './AppLock';
 import {useE2EIFeatureConfigUpdate} from './components/FeatureConfigChange/FeatureConfigChangeHandler/Features/useE2EIFeatureConfigUpdate';
 import {FeatureConfigChangeNotifier} from './components/FeatureConfigChange/FeatureConfigChangeNotifier';
+import {ForceReloadModal} from './components/ForceReloadModal/ForceReloadModal';
 import {WindowTitleUpdater} from './components/WindowTitleUpdater';
 import {LeftSidebar} from './LeftSidebar';
 import {TeamCreationModalContainer} from './LeftSidebar/panels/Conversations/ConversationTabs/TeamCreation/TeamCreationModalContainer';
@@ -101,9 +102,11 @@ export const AppMain = ({
   const wallClock = useMemo(() => {
     return createWallClock();
   }, []);
+  const [doesApplicationNeedForceReload, setDoesApplicationNeedForceReload] = useState(false);
+  const clientVersion = Config.getConfig().VERSION;
   const runApplicationPeriodicCheck: () => void = useCallback(() => {
-    runClientVersionCheck({ky});
-  }, []);
+    void runClientVersionCheck({ky, clientVersion, setDoesApplicationNeedForceReload});
+  }, [clientVersion]);
   const apiContext = app.getAPIContext();
 
   useEffect(() => {
@@ -306,8 +309,9 @@ export const AppMain = ({
       data-uie-value="is-loaded"
     >
       {!locked && <WindowTitleUpdater />}
-      <RootProvider value={{mainViewModel: mainView, wallClock}}>
+      <RootProvider value={{mainViewModel: mainView, wallClock, doesApplicationNeedForceReload}}>
         <ErrorBoundary FallbackComponent={ErrorFallback}>
+          <ForceReloadModal reloadApplication={app.refresh} />
           {Config.getConfig().FEATURE.ENABLE_DEBUG && <ConfigToolbar />}
           {!locked && (
             <div

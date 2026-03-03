@@ -129,6 +129,8 @@ export const AppContainer = ({config, clientType}: AppProps) => {
 
       {/* Wrapper which will hold the audio elements for playing e.g. the ringtone. The elements are created within AudioRepository.ts */}
       <div id="audio-elements" />
+      {/* Wrapper which will hold the audio elements for the calling speaker */}
+      <div id="calling-audio-speaker-elements" />
     </>
   );
 };

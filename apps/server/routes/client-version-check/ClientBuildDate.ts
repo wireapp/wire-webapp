@@ -29,5 +29,9 @@ export function parseMinimumRequiredClientBuildDate(
 ): Maybe<Date> {
   const {parseClientVersion, clientVersion} = dependencies;
 
+  if (clientVersion === undefined || clientVersion.length === 0) {
+    return Maybe.nothing();
+  }
+
   return toolbelt.fromResult(parseClientVersion(clientVersion));
 }

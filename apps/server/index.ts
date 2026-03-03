@@ -23,6 +23,16 @@ import {formatDate} from './util/TimeUtil';
 
 const server = new Server(serverConfig, clientConfig);
 
+function getUnhandledRejectionType(unhandledRejection: unknown): string {
+  if (unhandledRejection instanceof Error) {
+    return unhandledRejection.name;
+  }
+  if (unhandledRejection === null) {
+    return 'null';
+  }
+  return typeof unhandledRejection;
+}
+
 server
   .start()
   .then(port => {
@@ -37,5 +47,5 @@ process.on('uncaughtException', error =>
   console.error(`[${formatDate()}] Uncaught exception: ${error.message}`, error),
 );
 process.on('unhandledRejection', error =>
-  console.error(`[${formatDate()}] Uncaught rejection "${error.constructor.name}"`, error),
+  console.error(`[${formatDate()}] Uncaught rejection "${getUnhandledRejectionType(error)}"`, error),
 );

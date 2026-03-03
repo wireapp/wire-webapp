@@ -31,7 +31,7 @@ export class LinkPreviewService {
     isAuditLogEnabled: boolean = false,
   ): Promise<LinkPreviewUploadedContent> {
     const {image, ...preview} = linkPreview;
-    if (!image) {
+    if (image === undefined || image === null) {
       return preview;
     }
 
@@ -40,7 +40,7 @@ export class LinkPreviewService {
       await this.assetService.uploadAsset(linkPreview.image.data, {
         domain: conversationId.domain,
         ...(isAuditLogEnabled && {
-          auditData: {conversationId, filename: linkPreview.title, filetype: linkPreview.image.type},
+          auditData: {conversationId, filename: linkPreview.title ?? '', filetype: linkPreview.image.type},
         }),
       })
     ).response;

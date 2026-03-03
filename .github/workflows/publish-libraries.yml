@@ -77,6 +77,6 @@ jobs:
             --head "$RELEASE_BRANCH" \
             --title "chore(release): publish libraries [WPB-22420]" \
             --label "publish-to-npm" \
-            --body "Automated release PR created by nx release. ⚠️ **Important:** Do NOT squash merge this PR. Use 'Merge commit' to preserve git tags."
+            --body "Automated release PR created by nx release. ⚠️ **Important:** Squash-merge this PR (do not use 'Merge commit')."
         env:
           GITHUB_TOKEN: ${{ secrets.OTTO_THE_BOT_GH_TOKEN }}
