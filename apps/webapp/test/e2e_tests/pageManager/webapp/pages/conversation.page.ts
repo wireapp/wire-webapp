@@ -59,6 +59,7 @@ export class ConversationPage {
   readonly itemPendingRequest: Locator;
   readonly ignoreButton: Locator;
   readonly cancelRequest: Locator;
+  readonly mentionSuggestions: Locator;
 
   readonly getImageAltText = (user: User) => `Image from ${user.fullName}`;
 
@@ -104,6 +105,7 @@ export class ConversationPage {
     this.itemPendingRequest = page.getByTestId('item-pending-requests');
     this.ignoreButton = page.getByTestId('do-ignore');
     this.cancelRequest = page.getByTestId('do-cancel-request');
+    this.mentionSuggestions = page.getByRole('listbox').getByTestId('item-mention-suggestion');
   }
 
   getImageLocator(user: User): Locator {
@@ -161,11 +163,7 @@ export class ConversationPage {
   async mentionUser(userFullName: string, searchQuery?: string) {
     const textToType = searchQuery ? `@${searchQuery}` : `@${userFullName.slice(0, 3)}`;
     await this.messageInput.pressSequentially(textToType);
-    await this.page
-      .getByTestId('item-mention-suggestion')
-      .getByTestId('status-name')
-      .filter({hasText: userFullName})
-      .click({timeout: 5000});
+    await this.mentionSuggestions.filter({hasText: userFullName}).click({timeout: 5000});
   }
 
   async replyToMessage(message: Locator) {

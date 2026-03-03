@@ -411,7 +411,13 @@ test.describe('Mention', () => {
   test(
     'I should not see mentions suggestion if I type @ with characters in front',
     {tag: ['@TC-3532', '@regression']},
-    async () => {},
+    async ({createPage}) => {
+      const {pages} = PageManager.from(await createPage(withLogin(userA), withConnectedUser(userB))).webapp;
+      await pages.conversationList().openConversation(userB.fullName);
+
+      await pages.conversation().messageInput.pressSequentially(`test@${userB.firstName}`);
+      await expect(pages.conversation().mentionSuggestions).toHaveCount(0);
+    },
   );
 
   test(
