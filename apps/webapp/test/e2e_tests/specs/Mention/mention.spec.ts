@@ -319,10 +319,7 @@ test.describe('Mention', () => {
 
       // User B is in the 'Distraction Group', so the conversation with user A is unread.
       // Now check for the mention indicator in the conversation list.
-      const mentionIndicator = userBPages
-        .conversationList()
-        .getConversationLocator(userA.fullName)
-        .getByTestId('status-mention');
+      const {mentionIndicator} = userBPages.conversationList().getConversationLocator(userA.fullName);
       await expect(mentionIndicator).toBeVisible();
     },
   );
@@ -362,8 +359,8 @@ test.describe('Mention', () => {
       });
 
       await test.step('Verify User B sees both unread mention and unread message indicators for 1:1 conversation', async () => {
-        const conversationLocator = userBPages.conversationList().getConversationLocator(userA.fullName);
-        await expect(conversationLocator.getByTitle('Unread mention')).toBeVisible();
+        const {mentionIndicator} = userBPages.conversationList().getConversationLocator(userA.fullName);
+        await expect(mentionIndicator).toBeVisible();
       });
     },
   );
