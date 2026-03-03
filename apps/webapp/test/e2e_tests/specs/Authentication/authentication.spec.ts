@@ -178,7 +178,7 @@ test.describe('Authentication', () => {
     );
   });
 
-  // Bug: Connecting using TLSv1.2 should not be allowed but succeeds
+  // Bug: Connecting using TLSv1.2 should not be allowed but succeeds (See: WPB-22162)
   test.skip(
     'I want to make sure i connect to webapp only through TLS >= 1.3 connection',
     {tag: ['@TC-3480', '@regression']},
