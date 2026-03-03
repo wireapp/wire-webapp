@@ -30,10 +30,14 @@ test.describe('Clear Conversation Content', () => {
   let userB: User;
   let userC: User;
 
-  test.beforeEach(async ({createTeam, createUser}) => {
+  test.beforeEach(async ({createTeam, createUser}, testInfo) => {
     userB = await createUser();
     userC = await createUser();
-    const team = await createTeam('Test Team', {users: [userB, userC]});
+    const team = await createTeam('Test Team', {
+      users: [userB, userC],
+      // Only one of the test cases requires conference calling to be enabled
+      features: {conferenceCalling: testInfo.tags.includes('@TC-156')},
+    });
     userA = team.owner;
   });
 
@@ -151,8 +155,6 @@ test.describe('Clear Conversation Content', () => {
       `I want to see incoming picture, ping and call after I clear content of a ${conversationType} conversation via conversation list`,
       {tag: [tag, '@regression']},
       async ({createPage}) => {
-        test.skip(conversationType === 'group', 'Blocked [WPB-22442] - Group call feature requires Enterprise Account');
-
         // Step 1: Create a group conversation with User A, B and C
         const [userAPageManager, userBPageManager, userCPageManager] = await Promise.all([
           PageManager.from(createPage(withLogin(userA), withConnectedUser(userB), withConnectedUser(userC))),
