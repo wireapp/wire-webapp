@@ -22,6 +22,9 @@ import {Locator, Page} from '@playwright/test';
 export class ConversationDetailsPage {
   readonly page: Page;
 
+  readonly groupAdmins: Locator;
+  readonly groupMembers: Locator;
+
   readonly addPeopleButton: Locator;
   readonly conversationDetails: Locator;
   readonly guestOptionsButton: Locator;
@@ -38,9 +41,12 @@ export class ConversationDetailsPage {
 
   constructor(page: Page) {
     this.page = page;
+    this.conversationDetails = page.locator('#conversation-details');
+
+    this.groupAdmins = this.conversationDetails.getByRole('list', {name: 'Group Admins'}).getByRole('listitem');
+    this.groupMembers = this.conversationDetails.getByRole('list', {name: 'Group Members'}).getByRole('listitem');
 
     this.addPeopleButton = page.getByTestId('go-add-people');
-    this.conversationDetails = page.locator('#conversation-details');
     this.guestOptionsButton = this.conversationDetails.locator('[data-uie-name="go-guest-options"]');
     this.selfDeletingMessageButton = this.conversationDetails.getByRole('button', {name: 'Self-deleting messages'});
     this.archiveButton = this.conversationDetails.getByTestId('do-archive');
