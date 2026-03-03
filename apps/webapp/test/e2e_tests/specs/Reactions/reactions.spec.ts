@@ -208,6 +208,61 @@ test.describe('Reactions', () => {
     },
   );
 
+  test(
+    'Verify locally deleted message can be liked by others',
+    {tag: ['@TC-1543', '@regression']},
+    async ({createPage}) => {
+      const [userAPages, userBPages] = await Promise.all([
+        PageManager.from(createPage(withLogin(userA), withConnectedUser(userB))).then(pm => pm.webapp.pages),
+        PageManager.from(createPage(withLogin(userB))).then(pm => pm.webapp.pages),
+      ]);
+
+      await userAPages.conversationList().openConversation(userB.fullName, {protocol: 'mls'});
+      await userBPages.conversationList().openConversation(userA.fullName, {protocol: 'mls'});
+      await userAPages.conversation().sendMessage('Message to react to');
+
+      const userBMessage = userBPages.conversation().getMessage({sender: userA});
+      await userBPages.conversation().reactOnMessage(userBMessage, 'plus-one');
+
+      const userAMessage = userAPages.conversation().getMessage({sender: userA});
+      await userAPages.conversation().deleteMessage(userAMessage, 'Me');
+
+      const reactionPill = userBPages.conversation().getReactionOnMessage(userBMessage, 'plus-one');
+      await expect(reactionPill).toBeVisible();
+    },
+  );
+
+  test(
+    'Verify likes are reset if sender edits their message',
+    {tag: ['@TC-1544', '@regression']},
+    async ({createPage}) => {
+      const [userAPages, userBPages] = await Promise.all([
+        PageManager.from(createPage(withLogin(userA), withConnectedUser(userB))).then(pm => pm.webapp.pages),
+        PageManager.from(createPage(withLogin(userB))).then(pm => pm.webapp.pages),
+      ]);
+
+      await userAPages.conversationList().openConversation(userB.fullName, {protocol: 'mls'});
+      await userBPages.conversationList().openConversation(userA.fullName, {protocol: 'mls'});
+      await userAPages.conversation().sendMessage('Message to react to');
+
+      const userBMessage = userBPages.conversation().getMessage({sender: userA});
+      await userBPages.conversation().reactOnMessage(userBMessage, 'plus-one');
+
+      const userAMessage = userAPages.conversation().getMessage({sender: userA});
+      const userAReaction = userAPages.conversation().getReactionOnMessage(userAMessage, 'plus-one');
+      const userBReaction = userBPages.conversation().getReactionOnMessage(userBMessage, 'plus-one');
+      await expect(userAReaction).toBeVisible();
+      await expect(userBReaction).toBeVisible();
+
+      await userAPages.conversation().editMessage(userAMessage);
+      await expect(userAPages.conversation().messageInput).toContainText('Message to react to');
+      await userAPages.conversation().sendMessage('Message without reaction');
+
+      await expect(userAReaction).not.toBeAttached();
+      await expect(userBReaction).not.toBeAttached();
+    },
+  );
+
   const toggleReactionCases = [
     {
       tc: '@TC-1548',
