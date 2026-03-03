@@ -394,6 +394,12 @@ export class ConversationService extends TypedEventEmitter<Events> {
     selfClientId: string;
     conversationQualifiedId: QualifiedId;
   }): Promise<BaseCreateConversationResponse> {
+    if (selfUserId.domain !== conversationQualifiedId.domain) {
+      const errorMessage = `Self user domain (${selfUserId.domain}) does not match conversation domain (${conversationQualifiedId.domain}), cannot establish MLS group conversation`;
+      this.logger.error(errorMessage, {conversationQualifiedId, selfUserId});
+      throw new Error(errorMessage);
+    }
+
     const failures = await this.mlsService.registerConversation(groupId, userIdsToAdd.concat(selfUserId), {
       creator: {
         user: selfUserId,
@@ -619,9 +625,25 @@ export class ConversationService extends TypedEventEmitter<Events> {
   private async resetMLSConversation(conversationId: QualifiedId): Promise<BaseCreateConversationResponse> {
     this.logger.info(`Resetting MLS conversation with id ${conversationId.id}`);
 
-    // STEP 1: Fetch the conversation to retrieve the group ID & epoch
+    // STEP 1: fetch self user info
+    this.logger.info(
+      `Re-establishing the conversation by re-adding all members (conversation_id: ${conversationId.id})`,
+    );
+    const {validatedClientId: clientId, userId, domain: selfUserDomain} = this.apiClient;
+
+    // STEP 2: Fetch the conversation to retrieve the group ID & epoch
     const conversation = await this.apiClient.api.conversation.getConversation(conversationId);
-    const {group_id: groupId, epoch} = conversation;
+    const {
+      group_id: groupId,
+      epoch,
+      qualified_id: {domain: conversationDomain},
+    } = conversation;
+
+    if (selfUserDomain !== conversationDomain) {
+      const errorMessage = `Self user domain (${selfUserDomain}) does not match conversation domain (${conversationDomain}), cannot reset MLS conversation`;
+      this.logger.error(errorMessage, {conversationId});
+      throw new Error(errorMessage);
+    }
 
     if (!groupId || !epoch) {
       const errorMessage = 'Could not find group id or epoch for the conversation';
@@ -629,26 +651,20 @@ export class ConversationService extends TypedEventEmitter<Events> {
       throw new Error(errorMessage);
     }
 
-    // STEP 2: Request backend to reset the conversation
+    // STEP 3: Request backend to reset the conversation
     this.logger.info(`Requesting backend to reset the conversation (group_id: ${groupId}, epoch: ${String(epoch)})`);
     await this.apiClient.api.conversation.resetMLSConversation({
       epoch,
       groupId,
     });
 
-    // STEP 3: fetch self user info
-    this.logger.info(
-      `Re-establishing the conversation by re-adding all members (conversation_id: ${conversationId.id})`,
-    );
-    const {validatedClientId: clientId, userId, domain} = this.apiClient;
-
-    if (!userId || !domain) {
+    if (!userId || !selfUserDomain) {
       const errorMessage = 'Could not find userId or domain of the self user';
       this.logger.error(errorMessage, {conversationId});
       throw new Error(errorMessage);
     }
 
-    const selfUserQualifiedId = {id: userId, domain};
+    const selfUserQualifiedId = {id: userId, domain: selfUserDomain};
 
     // STEP 4: Fetch the updated conversation data from backend to retrieve the new group ID
     const updatedConversation = await this.apiClient.api.conversation.getConversation(conversationId);
@@ -912,6 +928,12 @@ export class ConversationService extends TypedEventEmitter<Events> {
     qualifiedUsers: QualifiedId[];
   }): Promise<void> {
     try {
+      if (selfUserId.domain !== conversationId.domain) {
+        const errorMessage = `Self user domain (${selfUserId.domain}) does not match conversation domain (${conversationId.domain}), cannot try to establish MLS group conversation`;
+        this.logger.error(errorMessage, {conversationId, selfUserId});
+        throw new Error(errorMessage);
+      }
+
       const wasGroupEstablishedBySelfClient = await this.mlsService.tryEstablishingMLSGroup(groupId);
 
       if (!wasGroupEstablishedBySelfClient) {
