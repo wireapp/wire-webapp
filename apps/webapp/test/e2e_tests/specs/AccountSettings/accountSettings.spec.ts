@@ -175,7 +175,7 @@ test.describe('account settings', () => {
 
   test(
     'Verify link to manage a team is not shown when logged in as team member or normal use',
-    {tag: ['@TC-1723', '@regression']},
+    {tag: ['@TC-1724', '@regression']},
     async ({pageManager}) => {
       const {components} = pageManager.webapp;
 
