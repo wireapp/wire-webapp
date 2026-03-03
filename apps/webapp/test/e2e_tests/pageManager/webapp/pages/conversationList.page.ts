@@ -138,6 +138,10 @@ export class ConversationListPage {
     return this.getConversationLocator(user.fullName).getByTestId('element-avatar-user');
   }
 
+  getUserStatusIcon(user: User) {
+    return this.getConversationLocator(user.fullName).getByTestId('status-availability-icon');
+  }
+
   async clickUnblockConversation() {
     await this.unblockConversationMenuButton.click();
   }
