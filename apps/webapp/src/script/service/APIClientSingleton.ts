@@ -23,14 +23,24 @@ import {APIClient as APIClientUnconfigured} from '@wireapp/api-client';
 
 import {Config} from '../Config';
 
+const wireClientHeaderName = 'Wire-Client';
+const wireClientVersionHeaderName = 'Wire-Client-Version';
+const wireClientIdentifier = 'Web';
+
 @singleton()
 export class APIClient extends APIClientUnconfigured {
   constructor() {
+    const webAppConfiguration = Config.getConfig();
+
     super({
+      headers: {
+        [wireClientHeaderName]: wireClientIdentifier,
+        [wireClientVersionHeaderName]: webAppConfiguration.VERSION,
+      },
       urls: {
-        name: Config.getConfig().ENVIRONMENT,
-        rest: Config.getConfig().BACKEND_REST,
-        ws: Config.getConfig().BACKEND_WS,
+        name: webAppConfiguration.ENVIRONMENT,
+        rest: webAppConfiguration.BACKEND_REST,
+        ws: webAppConfiguration.BACKEND_WS,
       },
     });
   }
