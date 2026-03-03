@@ -368,7 +368,23 @@ test.describe('Mention', () => {
   test(
     'I should not see mention indicator in the conversation list if the sender recalls the mention message to me',
     {tag: ['@TC-3530', '@regression']},
-    async () => {},
+    async ({createPage}) => {
+      const [userAPages, userBPages] = await Promise.all([
+        PageManager.from(createPage(withLogin(userA), withConnectedUser(userB))).then(pm => pm.webapp.pages),
+        PageManager.from(createPage(withLogin(userB))).then(pm => pm.webapp.pages),
+      ]);
+
+      await createGroup(userAPages, 'Test Group', [userB]);
+      await userAPages.conversationList().openConversation(userB.fullName, {protocol: 'mls'});
+      await userBPages.conversationList().openConversation('Test Group');
+
+      await userAPages.conversation().sendMessageWithUserMention(userB.fullName);
+      const {mentionIndicator} = userBPages.conversationList().getConversationLocator(userA.fullName);
+      await expect(mentionIndicator).toBeVisible();
+
+      await userAPages.conversation().deleteMessage(userAPages.conversation().getMessage({sender: userA}), 'Everyone');
+      await expect(mentionIndicator).not.toBeAttached();
+    },
   );
 
   test(
