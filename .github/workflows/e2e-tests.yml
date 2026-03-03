@@ -22,6 +22,10 @@ on:
       grep:
         type: string
         description: Define which tests to run, the given value will be passed to the `--grep` flag of playwright
+        default: "@regression|@crit-flow-web"
+      testinyRunName:
+        type: string
+        description: Define Testiny Run name to upload results to
   # Options for calling the workflow within an other workflow
   workflow_call:
     inputs:
@@ -88,7 +92,7 @@ jobs:
           TEST_SERVICE_URL: http://localhost:8080 # Run tests against locally running test service
           PLAYWRIGHT_BLOB_OUTPUT_DIR: apps/webapp/playwright-report/blob-reports
           GREP: ${{ inputs.grep }}
-        run: yarn nx run webapp:e2e --shard=${{ matrix.shard }}/${{ strategy.job-total }} --reporter=blob --grep="${GREP}"
+        run: yarn nx run webapp:e2e --shard=${{ matrix.shard }}/${{ strategy.job-total }} --reporter=blob --grep=\"$GREP\"
 
       - name: Upload blob report
         if: ${{ !cancelled() }}
@@ -144,3 +148,13 @@ jobs:
         run: |
           echo "reportUrl=${{ steps.upload_playwright_report.outputs.artifact-url }}" >> $GITHUB_OUTPUT
           echo "reportArtifactId=${{ steps.upload_playwright_report.outputs.artifact-id }}" >> $GITHUB_OUTPUT
+
+      - name: Update Testiny Run with results
+        if: ${{ inputs.testinyRunName }}
+        env:
+          TESTINY_API_KEY: ${{ secrets.TESTINY_API_KEY }}
+          TESTINY_RUN_NAME: ${{ inputs.testinyRunName }}
+        run: |
+          node apps/webapp/test/e2e_tests/scripts/send-playwright-results-to-testiny.ts \
+            --report apps/webapp/playwright-report/report.json \
+            --run-name "$TESTINY_RUN_NAME"
