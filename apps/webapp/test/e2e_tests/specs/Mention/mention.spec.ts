@@ -1,4 +1,12 @@
-import {test, expect, withLogin, withConnectedUser, Team, withGuestUser} from 'test/e2e_tests/test.fixtures';
+import {
+  test,
+  expect,
+  withLogin,
+  withConnectedUser,
+  Team,
+  withGuestUser,
+  withConnectionRequest,
+} from 'test/e2e_tests/test.fixtures';
 import {User} from 'test/e2e_tests/data/user';
 import {PageManager} from 'test/e2e_tests/pageManager';
 import {createGroup} from 'test/e2e_tests/utils/userActions';
@@ -506,7 +514,36 @@ test.describe('Mention', () => {
   test(
     'I want to be able to mention participants I am not connected to',
     {tag: ['@TC-3545', '@regression']},
-    async () => {},
+    async ({createUser, createPage}) => {
+      const otherUser = await createUser();
+      const [userAPages, userBPages, otherUserPages] = await Promise.all([
+        PageManager.from(createPage(withLogin(userA), withConnectionRequest(otherUser))).then(pm => pm.webapp.pages),
+        PageManager.from(createPage(withLogin(userB))).then(pm => pm.webapp.pages),
+        PageManager.from(createPage(withLogin(otherUser))).then(async pm => {
+          await pm.webapp.pages.conversationList().pendingConnectionRequest.click();
+          await pm.webapp.pages.connectRequest().connectButton.click();
+          return pm.webapp.pages;
+        }),
+      ]);
+
+      await test.step('UserA creates a group including userB and otherUser', async () => {
+        await createGroup(userAPages, 'Test Group', [userB, otherUser]);
+      });
+
+      await test.step("UserB mentions otherUser in the group although they're not connected", async () => {
+        await userBPages.conversationList().openConversation('Test Group');
+        await userBPages.conversation().sendMessageWithUserMention(otherUser.fullName);
+      });
+
+      await test.step('OtherUser receives the message from userB including the mention', async () => {
+        await otherUserPages.conversationList().openConversation('Test Group');
+        const mentionInMessage = otherUserPages
+          .conversation()
+          .getMessage({sender: userB})
+          .getByRole('button', {name: `@${otherUser.fullName}`});
+        await expect(mentionInMessage).toBeVisible();
+      });
+    },
   );
 
   test(
