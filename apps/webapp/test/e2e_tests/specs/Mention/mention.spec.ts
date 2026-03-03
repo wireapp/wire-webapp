@@ -390,7 +390,22 @@ test.describe('Mention', () => {
   test(
     'I want to see normal text message (without mention link) when I did not select someone from mention suggestion',
     {tag: ['@TC-3531', '@regression']},
-    async () => {},
+    async ({createPage}) => {
+      const [userAPages, userBPages] = await Promise.all([
+        PageManager.from(createPage(withLogin(userA))).then(pm => pm.webapp.pages),
+        PageManager.from(createPage(withLogin(userB), withConnectedUser(userA))).then(pm => pm.webapp.pages),
+      ]);
+
+      await userAPages.conversationList().openConversation(userB.fullName, {protocol: 'mls'});
+      await userBPages.conversationList().openConversation(userA.fullName, {protocol: 'mls'});
+      await userAPages.conversation().sendMessage(`@${userB.fullName} Hello`);
+
+      for (const pages of [userAPages, userBPages]) {
+        const message = pages.conversation().getMessage({sender: userA});
+        await expect(message).toContainText(`@${userB.fullName}`);
+        await expect(message.getByRole('button', {name: `@${userB.fullName}`})).not.toBeAttached();
+      }
+    },
   );
 
   test(
