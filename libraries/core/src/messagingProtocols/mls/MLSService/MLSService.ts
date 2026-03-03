@@ -1184,5 +1184,3 @@ export class MLSService extends TypedEventEmitter<Events> {
     await this.verifyRemoteMLSKeyPackagesAmount(client.id);
   }
 }
-
-console.info('bardia new core code');
