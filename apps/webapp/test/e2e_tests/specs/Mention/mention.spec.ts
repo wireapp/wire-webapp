@@ -443,7 +443,18 @@ test.describe('Mention', () => {
   test(
     'I want to see all group participant list when I tap or type @',
     {tag: ['@TC-3535', '@regression']},
-    async () => {},
+    async ({createPage}) => {
+      const {pages} = PageManager.from(await createPage(withLogin(userA))).webapp;
+
+      await createGroup(pages, 'Test Group', [userB, userC]);
+      await pages.conversationList().openConversation('Test Group');
+
+      // It should be possible to mention userB as he's part of the group
+      await pages.conversation().messageInput.pressSequentially(`@`);
+      await expect(pages.conversation().mentionSuggestions).toHaveCount(2);
+      await expect(pages.conversation().mentionSuggestions.filter({hasText: userB.fullName})).toBeVisible();
+      await expect(pages.conversation().mentionSuggestions.filter({hasText: userC.fullName})).toBeVisible();
+    },
   );
 
   test(
