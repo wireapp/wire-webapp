@@ -549,6 +549,22 @@ test.describe('Mention', () => {
   test(
     'I should not be able to mention a person who left/was removed (from) a conversation',
     {tag: ['@TC-3546', '@regression']},
-    async () => {},
+    async ({createPage}) => {
+      const userAPages = PageManager.from(await createPage(withLogin(userA))).webapp.pages;
+      await createGroup(userAPages, 'Test Group', [userB, userC]);
+
+      await test.step('UserA removes userB from the group', async () => {
+        await userAPages.conversationList().openConversation('Test Group');
+        await userAPages.conversation().conversationTitle.click();
+        await userAPages.conversationDetails().openParticipantDetails(userB.fullName);
+        await userAPages.participantDetails().removeFromGroup();
+      });
+
+      await test.step("UserA tries to mention userB but he's not in the suggestions", async () => {
+        await userAPages.conversation().messageInput.pressSequentially('@');
+        await expect(userAPages.conversation().mentionSuggestions).toHaveCount(1);
+        await expect(userAPages.conversation().mentionSuggestions).not.toContainText(userB.fullName);
+      });
+    },
   );
 });
