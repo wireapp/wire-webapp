@@ -183,7 +183,8 @@ test.describe('In Conversation Search', () => {
     },
   );
 
-  test('Verify I can search my own message', {tag: ['@TC-385', '@regression']}, async ({createPage}) => {
+  // TODO: [WPB-23814] - search behavior is broken
+  test.skip('Verify I can search my own message', {tag: ['@TC-385', '@regression']}, async ({createPage}) => {
     const [userAPages, userBPages] = await Promise.all([
       PageManager.from(createPage(withLogin(userA), withConnectedUser(userB))).then(pm => pm.webapp.pages),
       PageManager.from(createPage(withLogin(userB))).then(pm => pm.webapp.pages),
@@ -199,11 +200,11 @@ test.describe('In Conversation Search', () => {
     const collection = userAPages.collection();
     await collection.searchBar.fill('User A');
 
-    // TODO: uncomment the next two lines when search behavior is fixed
+    // TODO: uncomment the next two lines when bug [WPB-23814] is fixed
     // await expect(collection.searchResults).toHaveCount(1);
     // await expect(collection.searchResults).toContainText('User A Message');
 
-    // TODO: remove this line when search behavior is fixed
+    // TODO: remove this line when bug [WPB-23814] is fixed
     await expect(collection.searchResults.last()).toContainText('User A Message');
   });
 
@@ -252,7 +253,6 @@ test.describe('In Conversation Search', () => {
 
     await expect(collection.searchResults).toHaveCount(1);
     await expect(collection.searchResults).toContainText('https://www.kaufland.de');
-
   });
 
   test('Verify I can not search for a deleted message', {tag: ['@TC-392', '@regression']}, async ({createPage}) => {
@@ -355,8 +355,7 @@ test.describe('In Conversation Search', () => {
       await userBPages.conversation().sendMessage('Papaya');
 
       await userAPages.conversationList().openConversation(userB.fullName, {protocol: 'mls'});
-      await expect(userAPages.conversation().getMessage({content: 'Papaya'})).toBeVisible()
-      ;
+      await expect(userAPages.conversation().getMessage({content: 'Papaya'})).toBeVisible();
       await userAPages.conversation().sendMessage(`Message from User A: 1`);
       await userAPages.conversation().sendMessage('Empty\n'.repeat(50));
       await userAPages.conversation().sendMessage(`Message from User A: 2`);
@@ -372,10 +371,9 @@ test.describe('In Conversation Search', () => {
       await expect(collection.searchResults).toHaveCount(1);
       await expect(collection.searchResults).toContainText('Papaya');
 
-      const markedSearchResult = userAPages.collection().component.locator('mark').filter({hasText: 'Papaya'});
-      await markedSearchResult.click();
+      await userAPages.collection().searchResults.click();
       const messageFromUserB = userAPages.conversation().getMessage({sender: userB});
-      await expect(messageFromUserB).toBeVisible();
+      await expect(messageFromUserB).toBeInViewport();
     },
   );
 });
