@@ -423,7 +423,21 @@ test.describe('Mention', () => {
   test(
     'I should not see suggestions of people who are not in the group chat',
     {tag: ['@TC-3533', '@regression']},
-    async () => {},
+    async ({createPage}) => {
+      const {pages} = PageManager.from(await createPage(withLogin(userA))).webapp;
+
+      await createGroup(pages, 'Test Group', [userB]);
+      await pages.conversationList().openConversation('Test Group');
+
+      // It should be possible to mention userB as he's part of the group
+      await pages.conversation().messageInput.pressSequentially(`@${userB.firstName}`);
+      await expect(pages.conversation().mentionSuggestions).toHaveCount(1);
+
+      // There should not be a suggestion for userC who's not part of the group
+      await pages.conversation().messageInput.fill('');
+      await pages.conversation().messageInput.pressSequentially(`@${userC.firstName}`);
+      await expect(pages.conversation().mentionSuggestions).toHaveCount(0);
+    },
   );
 
   test(
