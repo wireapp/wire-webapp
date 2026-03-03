@@ -679,6 +679,46 @@ describe('ConversationService', () => {
       expect(conversationService.joinByExternalCommit).not.toHaveBeenCalled();
       expect(establishedConversation.epoch).toEqual(updatedEpoch);
     });
+
+    it('allows establishing cross-domain MLS 1:1 conversations', async () => {
+      const [conversationService, {apiClient, mlsService}] = await buildConversationService();
+
+      const mockConversationId = {id: 'mock-conversation-id', domain: 'remote.wire.com'};
+      const mockGroupId = 'mock-group-id';
+
+      const selfUser = {user: {id: 'self-user-id', domain: 'local.wire.com'}, client: 'self-user-client-id'};
+      const otherUserId = {id: 'other-user-id', domain: 'remote.wire.com'};
+
+      const remoteEpoch = 0;
+      const updatedEpoch = 1;
+
+      jest.spyOn(apiClient.api.conversation, 'getMLS1to1Conversation').mockResolvedValueOnce({
+        qualified_id: mockConversationId,
+        protocol: CONVERSATION_PROTOCOL.MLS,
+        epoch: remoteEpoch,
+        group_id: mockGroupId,
+      } as unknown as MLSConversation);
+
+      jest.spyOn(apiClient.api.conversation, 'getMLS1to1Conversation').mockResolvedValueOnce({
+        qualified_id: mockConversationId,
+        protocol: CONVERSATION_PROTOCOL.MLS,
+        epoch: updatedEpoch,
+        group_id: mockGroupId,
+      } as unknown as MLSConversation);
+
+      jest.spyOn(mlsService, 'wipeConversation');
+
+      const establishedConversation = await conversationService.establishMLS1to1Conversation(
+        mockGroupId,
+        selfUser,
+        otherUserId,
+      );
+
+      expect(mlsService.register1to1Conversation).toHaveBeenCalledTimes(1);
+      expect(mlsService.register1to1Conversation).toHaveBeenCalledWith(mockGroupId, otherUserId, selfUser, undefined);
+      expect(conversationService.joinByExternalCommit).not.toHaveBeenCalled();
+      expect(establishedConversation.epoch).toEqual(updatedEpoch);
+    });
   });
 
   describe('domain mismatch guards', () => {
