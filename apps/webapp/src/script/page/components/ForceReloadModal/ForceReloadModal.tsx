@@ -54,8 +54,8 @@ export const ForceReloadModal: FunctionComponent<ForceReloadModalProperties> = p
         text: t('forceReloadModalAction'),
       },
       text: {
-        message: t('forceReloadModalMessage'),
         title: t('forceReloadModalTitle'),
+        htmlMessage: t('forceReloadModalMessage'),
       },
     });
   }, [doesApplicationNeedForceReload, reloadApplication]);

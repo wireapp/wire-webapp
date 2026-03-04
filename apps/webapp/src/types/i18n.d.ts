@@ -1028,9 +1028,9 @@ declare module 'I18n/en-US.json' {
     'folderViewTooltip': `Folders`;
     'footer.copy': `© Wire Swiss GmbH`;
     'footer.wireLink': `wire.com`;
-    'forceReloadModalAction': `Reload`;
-    'forceReloadModalMessage': `A new version of Wire is available. Reload now to continue.`;
-    'forceReloadModalTitle': `Update required`;
+    'forceReloadModalAction': `Reload needed`;
+    'forceReloadModalMessage': `Wire needs an update. The app will automatically restart in 60 seconds.<br /><br /> Your work is not lost. You can continue where you left off after the reloading.`;
+    'forceReloadModalTitle': `Reload Now`;
     'fullsearchCancelCloseBtn': `Cancel search`;
     'fullsearchCancelLabel': `Close search field`;
     'fullsearchNoResults': `No results.`;
