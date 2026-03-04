@@ -129,7 +129,7 @@ describe('ForceReloadModal', () => {
     const currentModalIdentifierBeforeBackgroundClick = currentModalId;
 
     expect(currentModalContent.hideCloseBtn).toBe(true);
-    expect(currentModalContent.message).toBe(t('forceReloadModalMessage'));
+    expect(currentModalContent.messageHtml).toBe(t('forceReloadModalMessage'));
     expect(currentModalContent.primaryAction?.text).toBe(t('forceReloadModalAction'));
     expect(currentModalContent.titleText).toBe(t('forceReloadModalTitle'));
 
