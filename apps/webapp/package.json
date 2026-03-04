@@ -17,8 +17,7 @@
     "lint:fix": "nx lint webapp --fix",
     "check:circular-dependencies": "nx check-circular webapp",
     "translate:extract": "nx translate-extract webapp",
-    "translate:merge": "nx translate-merge webapp",
-    "translate:generate-types": "nx translate-generate-types webapp"
+    "translate:merge": "nx translate-merge webapp"
   },
   "dependencies": {
     "@datadog/browser-logs": "5.35.1",

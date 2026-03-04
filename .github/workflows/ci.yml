@@ -40,17 +40,6 @@ jobs:
       - name: Install JS dependencies
         run: yarn --immutable
 
-      - name: Verify generated i18n artifacts are committed
-        run: |
-          yarn nx run webapp:translate-merge
-          yarn nx run webapp:translate-generate-types
-
-          if ! test -z "$(git status --porcelain)"; then
-            echo "Repository is not clean after generation. Run generation locally and commit the changes."
-            git status
-            exit 1
-          fi
-
       - name: Build libraries
         run: yarn nx run-many -t build --projects=tag:type:lib
 

@@ -92,13 +92,6 @@
         "cwd": "{projectRoot}"
       }
     },
-    "translate-generate-types": {
-      "executor": "nx:run-commands",
-      "options": {
-        "command": "node ./bin/transalations_generate_types.js",
-        "cwd": "{projectRoot}"
-      }
-    },
     "configure": {
       "executor": "nx:run-commands",
       "options": {
