@@ -6,6 +6,7 @@ on:
     tags:
       - '*q1-2024*'
       - '*q2-2025*'
+      - '*q1-2026*'
       - '*staging*'
       - '*production*'
 
@@ -201,6 +202,9 @@ jobs:
               },
               "q2-2025": {
                 "targets": "[\"q2-2025\"]"
+              },
+              "q1-2026": {
+                "targets": "[\"2026-q1\"]"
               }
             }
           export_to: log,output
