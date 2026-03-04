@@ -23,6 +23,7 @@ import {PDFViewer} from 'Components/FileFullscreenModal/PdfViewer/PdfViewer';
 import {FullscreenModal} from 'Components/FullscreenModal/FullscreenModal';
 import {isFileEditable} from 'Util/FileTypeUtil';
 import {getFileTypeFromExtension} from 'Util/getFileTypeFromExtension/getFileTypeFromExtension';
+import {isPreviewableImage} from 'Util/ImageUtil';
 import {getFileExtensionFromUrl} from 'Util/util';
 
 import {FileEditor} from './FileEditor/FileEditor';
@@ -148,7 +149,9 @@ const ModalContent = ({
   }
 
   if (type === 'image') {
-    return <ImageFileView src={filePreviewUrl} senderName={senderName} timestamp={timestamp} />;
+    const isBrowserPreviewable = isPreviewableImage({extension: fileExtension});
+    const imageSrc = isBrowserPreviewable ? fileUrl || filePreviewUrl : filePreviewUrl;
+    return <ImageFileView src={imageSrc} senderName={senderName} timestamp={timestamp} />;
   }
 
   return <NoPreviewAvailable fileUrl={fileUrl} fileName={fileName} fileExtension={fileExtension} />;
