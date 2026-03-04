@@ -138,6 +138,16 @@ export class ConversationService extends TypedEventEmitter<Events> {
     return this._mlsService;
   }
 
+  private validateDomainMatch(selfUserDomain: string, conversationDomain: string): void {
+    if (selfUserDomain === conversationDomain) {
+      return;
+    }
+
+    const errorMessage = `Self user domain (${selfUserDomain}) does not match conversation domain (${conversationDomain})`;
+    this.logger.error(errorMessage);
+    throw new Error(errorMessage);
+  }
+
   /**
    * Get a fresh list from backend of clients for all the participants of the conversation.
    * @fixme there are some case where this method is not enough to detect removed devices
@@ -394,11 +404,7 @@ export class ConversationService extends TypedEventEmitter<Events> {
     selfClientId: string;
     conversationQualifiedId: QualifiedId;
   }): Promise<BaseCreateConversationResponse> {
-    if (selfUserId.domain !== conversationQualifiedId.domain) {
-      const errorMessage = `Self user domain (${selfUserId.domain}) does not match conversation domain (${conversationQualifiedId.domain}), cannot establish MLS group conversation`;
-      this.logger.error(errorMessage, {conversationQualifiedId, selfUserId});
-      throw new Error(errorMessage);
-    }
+    this.validateDomainMatch(selfUserId.domain, conversationQualifiedId.domain);
 
     const failures = await this.mlsService.registerConversation(groupId, userIdsToAdd.concat(selfUserId), {
       creator: {
@@ -639,11 +645,7 @@ export class ConversationService extends TypedEventEmitter<Events> {
       qualified_id: {domain: conversationDomain},
     } = conversation;
 
-    if (selfUserDomain !== conversationDomain) {
-      const errorMessage = `Self user domain (${selfUserDomain}) does not match conversation domain (${conversationDomain}), cannot reset MLS conversation`;
-      this.logger.error(errorMessage, {conversationId});
-      throw new Error(errorMessage);
-    }
+    this.validateDomainMatch(selfUserDomain, conversationDomain);
 
     if (!groupId || !epoch) {
       const errorMessage = 'Could not find group id or epoch for the conversation';
@@ -928,11 +930,7 @@ export class ConversationService extends TypedEventEmitter<Events> {
     qualifiedUsers: QualifiedId[];
   }): Promise<void> {
     try {
-      if (selfUserId.domain !== conversationId.domain) {
-        const errorMessage = `Self user domain (${selfUserId.domain}) does not match conversation domain (${conversationId.domain}), cannot try to establish MLS group conversation`;
-        this.logger.error(errorMessage, {conversationId, selfUserId});
-        throw new Error(errorMessage);
-      }
+      this.validateDomainMatch(selfUserId.domain, conversationId.domain);
 
       const wasGroupEstablishedBySelfClient = await this.mlsService.tryEstablishingMLSGroup(groupId);
 
