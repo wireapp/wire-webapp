@@ -101,6 +101,7 @@ export type PolicyTable = Partial<Record<DomainMlsErrorType, RecoveryPolicy | Pe
 
 export enum OperationName {
   send = 'send',
+  establishGroup = 'establishGroup',
   addUsers = 'addUsers',
   removeUsers = 'removeUsers',
   joinExternalCommit = 'joinExternalCommit',

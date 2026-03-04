@@ -138,6 +138,16 @@ export class ConversationService extends TypedEventEmitter<Events> {
     return this._mlsService;
   }
 
+  private validateDomainMatch(selfUserDomain: string, conversationDomain: string): void {
+    if (selfUserDomain === conversationDomain) {
+      return;
+    }
+
+    const errorMessage = `Self user domain (${selfUserDomain}) does not match conversation domain (${conversationDomain})`;
+    this.logger.error(errorMessage);
+    throw new Error(errorMessage);
+  }
+
   /**
    * Get a fresh list from backend of clients for all the participants of the conversation.
    * @fixme there are some case where this method is not enough to detect removed devices
@@ -363,6 +373,39 @@ export class ConversationService extends TypedEventEmitter<Events> {
     selfClientId: string,
     conversationQualifiedId: QualifiedId,
   ): Promise<BaseCreateConversationResponse> {
+    return this.MLSRecoveryOrchestrator.execute({
+      context: {
+        operationName: OperationName.establishGroup,
+        qualifiedConversationId: conversationQualifiedId,
+        groupId,
+      },
+      callBack: () => {
+        return this.performEstablishMLSGroupConversationAPI({
+          groupId,
+          userIdsToAdd,
+          selfUserId,
+          selfClientId,
+          conversationQualifiedId,
+        });
+      },
+    });
+  }
+
+  private async performEstablishMLSGroupConversationAPI({
+    groupId,
+    userIdsToAdd,
+    selfUserId,
+    selfClientId,
+    conversationQualifiedId,
+  }: {
+    groupId: string;
+    userIdsToAdd: QualifiedId[];
+    selfUserId: QualifiedId;
+    selfClientId: string;
+    conversationQualifiedId: QualifiedId;
+  }): Promise<BaseCreateConversationResponse> {
+    this.validateDomainMatch(selfUserId.domain, conversationQualifiedId.domain);
+
     const failures = await this.mlsService.registerConversation(groupId, userIdsToAdd.concat(selfUserId), {
       creator: {
         user: selfUserId,
@@ -588,9 +631,27 @@ export class ConversationService extends TypedEventEmitter<Events> {
   private async resetMLSConversation(conversationId: QualifiedId): Promise<BaseCreateConversationResponse> {
     this.logger.info(`Resetting MLS conversation with id ${conversationId.id}`);
 
-    // STEP 1: Fetch the conversation to retrieve the group ID & epoch
+    // STEP 1: fetch self user info
+    this.logger.info(
+      `Re-establishing the conversation by re-adding all members (conversation_id: ${conversationId.id})`,
+    );
+    const {validatedClientId: clientId, userId, domain: selfUserDomain} = this.apiClient;
+
+    if (!selfUserDomain) {
+      const errorMessage = 'Could not find domain of the self user';
+      this.logger.error(errorMessage, {conversationId});
+      throw new Error(errorMessage);
+    }
+
+    // STEP 2: Fetch the conversation to retrieve the group ID & epoch
     const conversation = await this.apiClient.api.conversation.getConversation(conversationId);
-    const {group_id: groupId, epoch} = conversation;
+    const {
+      group_id: groupId,
+      epoch,
+      qualified_id: {domain: conversationDomain},
+    } = conversation;
+
+    this.validateDomainMatch(selfUserDomain, conversationDomain);
 
     if (!groupId || !epoch) {
       const errorMessage = 'Could not find group id or epoch for the conversation';
@@ -598,26 +659,20 @@ export class ConversationService extends TypedEventEmitter<Events> {
       throw new Error(errorMessage);
     }
 
-    // STEP 2: Request backend to reset the conversation
+    // STEP 3: Request backend to reset the conversation
     this.logger.info(`Requesting backend to reset the conversation (group_id: ${groupId}, epoch: ${String(epoch)})`);
     await this.apiClient.api.conversation.resetMLSConversation({
       epoch,
       groupId,
     });
 
-    // STEP 3: fetch self user info
-    this.logger.info(
-      `Re-establishing the conversation by re-adding all members (conversation_id: ${conversationId.id})`,
-    );
-    const {validatedClientId: clientId, userId, domain} = this.apiClient;
-
-    if (!userId || !domain) {
+    if (!userId || !selfUserDomain) {
       const errorMessage = 'Could not find userId or domain of the self user';
       this.logger.error(errorMessage, {conversationId});
       throw new Error(errorMessage);
     }
 
-    const selfUserQualifiedId = {id: userId, domain};
+    const selfUserQualifiedId = {id: userId, domain: selfUserDomain};
 
     // STEP 4: Fetch the updated conversation data from backend to retrieve the new group ID
     const updatedConversation = await this.apiClient.api.conversation.getConversation(conversationId);
@@ -881,6 +936,8 @@ export class ConversationService extends TypedEventEmitter<Events> {
     qualifiedUsers: QualifiedId[];
   }): Promise<void> {
     try {
+      this.validateDomainMatch(selfUserId.domain, conversationId.domain);
+
       const wasGroupEstablishedBySelfClient = await this.mlsService.tryEstablishingMLSGroup(groupId);
 
       if (!wasGroupEstablishedBySelfClient) {
