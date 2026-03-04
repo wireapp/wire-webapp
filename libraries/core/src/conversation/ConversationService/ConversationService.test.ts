@@ -746,6 +746,7 @@ describe('ConversationService', () => {
       const [conversationService, {apiClient}] = await buildConversationService();
 
       const conversationId = {id: PayloadHelper.getUUID(), domain: 'staging.zinfra.io'};
+      jest.spyOn(apiClient, 'domain', 'get').mockReturnValue('staging.zinfra.io');
 
       jest.spyOn(apiClient.api.conversation, 'getConversation').mockResolvedValueOnce({
         qualified_id: {id: conversationId.id, domain: 'local.wire.com'},
