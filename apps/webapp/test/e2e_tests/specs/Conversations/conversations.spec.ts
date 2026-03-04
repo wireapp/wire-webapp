@@ -20,7 +20,8 @@
 import {User} from 'test/e2e_tests/data/user';
 import {PageManager} from 'test/e2e_tests/pageManager';
 import {test, expect, withConnectedUser, withLogin, Team, withConnectionRequest} from 'test/e2e_tests/test.fixtures';
-import {createGroup} from 'test/e2e_tests/utils/userActions';
+import {interceptNotifications} from 'test/e2e_tests/utils/mockNotifications.util';
+import {connectWithUser, createGroup, sendConnectionRequest} from 'test/e2e_tests/utils/userActions';
 
 test.describe('Conversations', () => {
   let team: Team;
@@ -167,12 +168,12 @@ test.describe('Conversations', () => {
 
       await adminPage.conversationList().openConversation(groupName);
       await adminPage.conversation().clickConversationInfoButton();
-      await adminPage.conversationDetails().openParticipantDetails(guestUser.fullName);
-      await expect(adminPage.participantDetails().userStatus).toContainText('Guest');
 
-      await adminPage.conversation().clickConversationInfoButton();
-      await adminPage.conversationDetails().openParticipantDetails(userB.fullName);
-      await expect(adminPage.participantDetails().userStatus).not.toBeVisible();
+      await expect(adminPage.conversation().membersList.filter({hasText: guestUser.fullName})).toBeVisible();
+      await expect(await adminPage.conversationDetails().participantStatus(guestUser.fullName)).toHaveAttribute(
+        'data-uie-name',
+        'status-guest',
+      );
     },
   );
 
@@ -274,7 +275,7 @@ test.describe('Conversations', () => {
       await adminPage.conversation().clickConversationInfoButton();
       await expect(await adminPage.conversationDetails().participantStatus(externalUser.fullName)).toHaveAttribute(
         'data-uie-name',
-        'status-guest',
+        'status-external',
       );
 
       await adminPage.conversation().clickConversationInfoButton();
@@ -309,6 +310,81 @@ test.describe('Conversations', () => {
   );
 
   test(
+    'Verify conversation scrolls to first unread message when opening',
+    {tag: ['@TC-487', '@regression']},
+    async ({createPage}) => {
+      const [userAPages, userBPageManager] = await Promise.all([
+        PageManager.from(createPage(withLogin(userA))).then(pm => pm.webapp.pages),
+        PageManager.from(createPage(withLogin(userB), withConnectedUser(userA), withConnectedUser(userC))),
+      ]);
+
+      const {pages, components} = userBPageManager.webapp;
+
+      // User B opens conversation with User A and stay on the page
+      await pages.conversationList().openConversation(userA.fullName, {protocol: 'mls'});
+
+      // User A sends a message to User B
+      await userAPages.conversationList().openConversation(userB.fullName, {protocol: 'mls'});
+      const totalMessages = 20;
+
+      // User A sends messages to User B
+      for (let i = 1; i <= totalMessages; i++) {
+        await userAPages.conversation().sendMessage(`READ message: ${i}`);
+      }
+
+      await expect(userAPages.conversation().getMessage({content: `READ message: ${totalMessages}`})).toBeVisible();
+
+      // User B can see the last conversation message in viewport (confirm scroll behavior in opened conversation)
+      await expect(
+        pages
+          .conversation()
+          .getMessage({sender: userA})
+          .filter({hasText: `READ message: ${totalMessages - 1}`}),
+      ).toBeInViewport();
+
+      // User B opens conversation with User C and stays on the page
+      await pages.conversationList().openConversation(userC.fullName);
+
+      // User A sends messages to User B
+      for (let i = 1; i <= totalMessages; i++) {
+        await userAPages.conversation().sendMessage(`UNREAD message: ${i}`);
+      }
+
+      const conversationWithUserA = pages.conversationList().getConversationLocator(userA.fullName, {protocol: 'mls'});
+
+      await expect(conversationWithUserA.getByTestId('status-unread')).toContainText(`${totalMessages}`);
+      await expect(conversationWithUserA).toContainText(`UNREAD message: ${totalMessages}`);
+
+      await components.conversationSidebar().clickAllConversationsButton();
+      await pages.conversationList().openConversation(userA.fullName, {protocol: 'mls'});
+
+      await expect(pages.conversation().getMessage({sender: userA}).last()).toContainText(
+        `UNREAD message: ${totalMessages}`,
+      );
+
+      // User B should not see read messages in viewport
+      await expect(pages.conversation().getMessage({content: /^READ message: 1$/})).not.toBeInViewport();
+      await expect(
+        pages
+          .conversation()
+          .getMessage({sender: userA})
+          .filter({hasText: `/^READ/ message: ${totalMessages}$`}),
+      ).not.toBeInViewport();
+
+      // User B should see first unread message in viewport
+      await expect(pages.conversation().getMessage({content: /UNREAD message: 1$/})).toBeInViewport();
+
+      // User B should not see last unread message in viewport when there is a lot of unread messages
+      await expect(
+        pages.conversation().getMessage({content: new RegExp(`^UNREAD message: ${totalMessages}$`)}),
+      ).not.toBeInViewport();
+
+      await pages.conversation().getMessage({sender: userA}).last().scrollIntoViewIfNeeded();
+      await expect(conversationWithUserA.getByTestId('status-unread')).not.toBeVisible();
+    },
+  );
+
+  test(
     'I can see the system message "You renamed the conversation" after renaming conversation',
     {tag: ['@TC-496', '@regression']},
     async ({createPage}) => {
@@ -325,6 +401,97 @@ test.describe('Conversations', () => {
       await expect(adminPages.conversation().systemMessages.last()).toContainText('You renamed the conversation', {
         ignoreCase: true,
       });
+    },
+  );
+
+  test(
+    'I should not see a (push) notification when the role of another person has changed',
+    {tag: ['@TC-503', '@regression']},
+    async ({createPage}) => {
+      const [adminPage, userBPage] = await Promise.all([
+        createPage(withLogin(userA), withConnectedUser(userB)),
+        createPage(withLogin(userB)),
+      ]);
+
+      const adminPages = PageManager.from(adminPage).webapp.pages;
+      const userBPages = PageManager.from(userBPage).webapp.pages;
+
+      const groupName = 'Test Group';
+      await createGroup(adminPages, groupName, [userB, userC]);
+      await userBPages.conversationList().openConversation(groupName);
+
+      const {getNotifications: getUserBNotifications} = await interceptNotifications(userBPage);
+      // User A makes User C an admin
+      await adminPages.conversationList().openConversation(groupName);
+      await adminPages.conversation().toggleGroupInformation();
+      await adminPages.conversation().makeUserAdmin(userC.fullName);
+
+      // Verify User C is admin in the conversation
+      await userBPages.conversation().clickConversationInfoButton();
+      await expect(userBPages.conversation().adminsList).toContainText(userC.fullName);
+      // Verify that User B doesn't receive a push notification
+      await expect.poll(() => getUserBNotifications()).toHaveLength(0);
+    },
+  );
+
+  test(
+    'Verify help text is gone when I have at least one conversation after I was offline',
+    {tag: ['@TC-778', '@regression']},
+    async ({createPage}) => {
+      const [userAPageManager, userBPageManager] = await Promise.all([
+        PageManager.from(createPage(withLogin(userA))),
+        PageManager.from(createPage(withLogin(userB))),
+      ]);
+
+      const {pages, components} = userAPageManager.webapp;
+
+      await expect(pages.conversationList().list).toContainText('Welcome to Wire');
+      await expect(pages.conversationList().list.getByRole('listitem')).toHaveCount(0);
+
+      // User A logs out
+      await components.conversationSidebar().clickPreferencesButton();
+      await pages.settings().accountButton.click();
+      await pages.account().clickLogoutButton();
+
+      // User B connects to User A
+      await connectWithUser(userBPageManager, userA);
+
+      // User A logs in
+      await userAPageManager.openLoginPage();
+      await pages.login().login(userA);
+      await components.conversationSidebar().clickAllConversationsButton();
+
+      await expect(pages.conversationList().list).not.toContainText('Welcome to Wire');
+      await expect(pages.conversationList().list.getByRole('listitem')).toHaveCount(1);
+    },
+  );
+
+  test(
+    'Verify help text is gone when I have at least one conversation while I am online',
+    {tag: ['@TC-780', '@regression']},
+    async ({createPage, createUser}) => {
+      const userD = await createUser();
+      const [userAPageManager, userDPageManager] = await Promise.all([
+        PageManager.from(createPage(withLogin(userA))),
+        PageManager.from(createPage(withLogin(userD))),
+      ]);
+
+      const pages = userAPageManager.webapp.pages;
+      // User A can see help text
+      await expect(pages.conversationList().list).toContainText('Welcome to Wire');
+      await expect(pages.conversationList().list.getByRole('listitem')).toHaveCount(0);
+
+      // User D sends a connection request to User A
+      await sendConnectionRequest(userDPageManager, userA);
+
+      // User A accepts connection request from User A
+      await pages.conversationList().openPendingConnectionRequest();
+      await pages.connectRequest().clickConnectButton();
+
+      // User A sees conversation with userD instead of help text
+      await expect(pages.conversationList().list).not.toContainText('Welcome to Wire');
+      await expect(pages.conversationList().list.getByRole('listitem').first()).toContainText(userD.fullName);
+      await expect(pages.conversationList().list.getByRole('listitem')).toHaveCount(1);
     },
   );
 });
