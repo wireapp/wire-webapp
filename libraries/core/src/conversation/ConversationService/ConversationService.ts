@@ -637,6 +637,12 @@ export class ConversationService extends TypedEventEmitter<Events> {
     );
     const {validatedClientId: clientId, userId, domain: selfUserDomain} = this.apiClient;
 
+    if (!selfUserDomain) {
+      const errorMessage = 'Could not find domain of the self user';
+      this.logger.error(errorMessage, {conversationId});
+      throw new Error(errorMessage);
+    }
+
     // STEP 2: Fetch the conversation to retrieve the group ID & epoch
     const conversation = await this.apiClient.api.conversation.getConversation(conversationId);
     const {
