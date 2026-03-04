@@ -159,6 +159,7 @@
   "accessibility.rightPanel.GoBack": "Zurück",
   "accessibility.rightPanel.close": "Info zur Unterhaltung schließen",
   "accessibility.searchInput.cancel": "Eintrag löschen",
+  "accessibility.selfDeletingMessage.timer": "Selbstlöschende Nachricht, Timer läuft ab.",
   "accessibility.userProfileDeleteEntry": "Eintrag löschen",
   "accountAlreadyExistsModal.changeEmailLink": "E-Mail-Adresse ändern",
   "accountAlreadyExistsModal.content": "Die Domäne dieser E-Mail gehört zu einem lokalen Backend. Bitte ändern Sie Ihre E-Mail-Adresse in den Einstellungen oder löschen Sie Ihr Benutzerkonto. Wenn Sie Teil eines Teams sind, wenden Sie sich bitte an Ihren Team-Admin.",
