@@ -64,6 +64,8 @@ If you would like your browser to trust the certificate from "local.wire.com"/"l
 
 The application can be configured to connect to different environments by modifying the following environment variables in your `.env` file:
 
+For the full environment variable reference, see [Environment Variables](https://github.com/wireapp/wire-webapp/blob/dev/libraries/config/README.md#environment-variables).
+
 **Staging:**
 
 ```
