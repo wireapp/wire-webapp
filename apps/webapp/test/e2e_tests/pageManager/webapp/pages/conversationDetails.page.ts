@@ -113,8 +113,7 @@ export class ConversationDetailsPage {
   }
 
   async participantStatus(fullName: string) {
-    const userLocator = await this.getLocatorByUser(fullName);
-    return userLocator.getByTestId(/^status-(external|guest|admin)$/);
+    return this.getLocatorByUser(fullName).getByTestId(/^status-(external|guest|admin)$/);
   }
 
   getParticipantStatus(fullName: string) {
