@@ -22,6 +22,7 @@ import {ReactNode, useContext} from 'react';
 import {renderHook} from '@testing-library/react';
 
 import {createFakeWallClock} from '../clock/fakeWallClock';
+import {StartupFeatureFlagName} from '../featureFlags/startupFeatureFlags';
 import {MainViewModel} from '../view_model/MainViewModel';
 import {
   RootContext,
@@ -38,6 +39,7 @@ interface WrapperProperties {
 interface RootProviderWrapper {
   wrapper: (properties: WrapperProperties) => ReactNode;
   fakeWallClock: ReturnType<typeof createFakeWallClock>;
+  isFeatureFlagEnabled: jest.Mock<boolean, [StartupFeatureFlagName]>;
 }
 
 function createRootProviderWrapper(
@@ -48,10 +50,15 @@ function createRootProviderWrapper(
   const fakeWallClock = createFakeWallClock({
     initialCurrentTimestampInMilliseconds: wallClockTimestampInMilliseconds,
   });
+  function isFeatureFlagEnabledForTest(featureName: StartupFeatureFlagName): boolean {
+    return featureName === 'reliable-websocket-connection';
+  }
+
+  const isFeatureFlagEnabled = jest.fn(isFeatureFlagEnabledForTest);
 
   function wrapper(properties: WrapperProperties): ReactNode {
     const wrappedChildren = (
-      <RootProvider value={{mainViewModel, wallClock: fakeWallClock, doesApplicationNeedForceReload}}>
+      <RootProvider value={{mainViewModel, wallClock: fakeWallClock, doesApplicationNeedForceReload, isFeatureFlagEnabled}}>
         {properties.children}
       </RootProvider>
     );
@@ -59,7 +66,7 @@ function createRootProviderWrapper(
     return wrappedChildren;
   }
 
-  return {wrapper, fakeWallClock};
+  return {wrapper, fakeWallClock, isFeatureFlagEnabled};
 }
 
 function getRootContextValue(): RootContextValue | null {
@@ -105,5 +112,14 @@ describe('RootProvider', () => {
     const {result} = renderHook(useApplicationContext, {wrapper});
 
     expect(result.current.doesApplicationNeedForceReload).toBe(true);
+  });
+
+  it('provides startup feature flag helper through useApplicationContext()', function () {
+    const {wrapper, isFeatureFlagEnabled} = createRootProviderWrapper(mainViewModel, 9_999, true);
+
+    const {result} = renderHook(useApplicationContext, {wrapper});
+
+    expect(result.current.isFeatureFlagEnabled('reliable-websocket-connection')).toBe(true);
+    expect(isFeatureFlagEnabled).toHaveBeenCalledWith('reliable-websocket-connection');
   });
 });
