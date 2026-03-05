@@ -180,10 +180,18 @@ export const isPreviewableImage = ({
   return !!normalizedExtension && PREVIEWABLE_IMAGE_EXTENSIONS.has(normalizedExtension);
 };
 
-export const getBestPreviewSource = (
-  extension: string,
-  fileUrl?: string,
-  filePreviewUrl?: string,
-): string | undefined => {
-  return isPreviewableImage({extension}) ? (fileUrl ?? filePreviewUrl) : filePreviewUrl;
+type GetBestPreviewSourceOptions = {
+  readonly fileExtension: string;
+  readonly fileUrl: Maybe<string>;
+  readonly filePreviewUrl: Maybe<string>;
 };
+
+export function getBestPreviewSource(options: GetBestPreviewSourceOptions): Maybe<string> {
+  const {fileExtension, fileUrl, filePreviewUrl} = options;
+
+  if (!isPreviewableImage({extension: fileExtension})) {
+    return filePreviewUrl;
+  }
+
+  return fileUrl.or(filePreviewUrl);
+}
