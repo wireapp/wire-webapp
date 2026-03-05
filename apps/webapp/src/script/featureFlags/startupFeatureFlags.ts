@@ -59,18 +59,13 @@ function readEnabledFeatureNameListFromLocationSearch(locationSearch: string): r
 }
 
 export function createStartupFeatureFlagMapFromLocationSearch(locationSearch: string): StartupFeatureFlagMap {
-  function addFeatureFlagToMap(
-    featureFlagMap: Partial<Record<StartupFeatureFlagName, true>>,
-    featureName: StartupFeatureFlagName,
-  ): Partial<Record<StartupFeatureFlagName, true>> {
+  const enabledFeatureFlagMap = readEnabledFeatureNameListFromLocationSearch(locationSearch).reduce<
+    Partial<Record<StartupFeatureFlagName, true>>
+  >((featureFlagMap, featureName) => {
     featureFlagMap[featureName] = true;
 
     return featureFlagMap;
-  }
-
-  const enabledFeatureFlagMap = readEnabledFeatureNameListFromLocationSearch(locationSearch).reduce<
-    Partial<Record<StartupFeatureFlagName, true>>
-  >(addFeatureFlagToMap, {});
+  }, {});
 
   return Object.freeze(enabledFeatureFlagMap);
 }
