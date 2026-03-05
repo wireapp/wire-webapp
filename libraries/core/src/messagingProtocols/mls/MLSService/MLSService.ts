@@ -48,6 +48,7 @@ import {
   ExternalSenderKey,
   isMlsMessageRejectedError,
   GroupInfo,
+  CoreCryptoContext,
 } from '@wireapp/core-crypto';
 
 import {ClientMLSError, ClientMLSErrorLabel} from './ClientMLSError';
@@ -328,16 +329,36 @@ export class MLSService extends TypedEventEmitter<Events> {
    * @param groupId - the group id of the MLS group
    * @param keyPackages - the list of keys of clients to add to the MLS group
    */
-  public async addUsersToExistingConversation(groupId: string, keyPackages: Uint8Array[]) {
+  public async addUsersToExistingConversation(
+    groupId: string,
+    keyPackages: Uint8Array[],
+    coreCryptoTransactionContext?: CoreCryptoContext,
+  ) {
     const groupIdBytes = Decoder.fromBase64(groupId).asBytes;
 
     if (keyPackages.length < 1) {
       throw new Error('Empty list of keys provided to addUsersToExistingConversation');
     }
 
-    const crlNewDistributionPoints = await this.coreCryptoClient.transaction(cx =>
-      cx.addClientsToConversation(new ConversationId(groupIdBytes), keyPackages),
-    );
+    let crlNewDistributionPoints: NewCrlDistributionPoints;
+
+    /**
+     * this is introducing conditional logic based on the presence of the coreCryptoTransactionContext, which is not ideal
+     * as soon as other consumers of this method are refactored to use the transactions api we should remove the possibility to
+     * not pass coreCryptoTransactionContext and simplify the method implementation by always using the transaction context passed as an argument
+     * Consumer to be migrated to use transactions api: performAddUsersToMLSConversationAPI in ConversationService
+     */
+    if (coreCryptoTransactionContext !== undefined) {
+      crlNewDistributionPoints = await coreCryptoTransactionContext.addClientsToConversation(
+        new ConversationId(groupIdBytes),
+        keyPackages,
+      );
+    } else {
+      crlNewDistributionPoints = await this.coreCryptoClient.transaction(transactionContext =>
+        transactionContext.addClientsToConversation(new ConversationId(groupIdBytes), keyPackages),
+      );
+    }
+
     this.dispatchNewCrlDistributionPoints(crlNewDistributionPoints);
   }
 
@@ -526,10 +547,10 @@ export class MLSService extends TypedEventEmitter<Events> {
     return this.coreCryptoClient.transaction(cx => cx.encryptMessage(conversationId, message));
   }
 
-  private async updateKeyingMaterial(groupId: string, retry = true) {
+  private async updateKeyingMaterial(groupId: string, context: CoreCryptoContext, retry = true) {
     try {
       const groupIdBytes = Decoder.fromBase64(groupId).asBytes;
-      await this.coreCryptoClient.transaction(cx => cx.updateKeyingMaterial(new ConversationId(groupIdBytes)));
+      await context.updateKeyingMaterial(new ConversationId(groupIdBytes));
     } catch (error) {
       if (!retry) {
         this.logger.error(`Failed to update keying material for group retrying did not fix the issue`, {
@@ -544,7 +565,7 @@ export class MLSService extends TypedEventEmitter<Events> {
 
       setTimeout(async () => {
         try {
-          await this.updateKeyingMaterial(groupId, false);
+          await this.updateKeyingMaterial(groupId, context, false);
         } catch (error) {
           this.logger.error(`Failed to update keying material for group on retry`, {
             error,
@@ -562,6 +583,8 @@ export class MLSService extends TypedEventEmitter<Events> {
    */
   public async registerEmptyConversation(
     groupId: string,
+    coreCryptoTransactionContext: CoreCryptoContext,
+    mlsPublicRemovalKeys: MLSPublicKeyRecord,
     parentGroupId?: string,
     removalKeyFor1to1Signature?: MLSPublicKeyRecord,
   ): Promise<void> {
@@ -574,10 +597,9 @@ export class MLSService extends TypedEventEmitter<Events> {
         new ExternalSenderKey(await this.coreCryptoClient.getExternalSender(new ConversationId(parentGroupIdBytes))),
       ];
     } else {
-      const mlsKeys = (await this.apiClient.api.client.getPublicKeys()).removal;
       const ciphersuiteSignature = getSignatureAlgorithmForCiphersuite(this.config.defaultCiphersuite);
       const removalKeyForSignature =
-        removalKeyFor1to1Signature?.[ciphersuiteSignature] ?? mlsKeys[ciphersuiteSignature];
+        removalKeyFor1to1Signature?.[ciphersuiteSignature] ?? mlsPublicRemovalKeys[ciphersuiteSignature];
       if (!removalKeyForSignature) {
         throw new Error(
           `Cannot create conversation: No backend removal key found for the signature ${ciphersuiteSignature}`,
@@ -592,8 +614,11 @@ export class MLSService extends TypedEventEmitter<Events> {
     };
 
     const credentialType = await this.getCredentialType();
-    return this.coreCryptoClient.transaction(cx =>
-      cx.createConversation(new ConversationId(groupIdBytes), credentialType, configuration),
+
+    await coreCryptoTransactionContext.createConversation(
+      new ConversationId(groupIdBytes),
+      credentialType,
+      configuration,
     );
   }
 
@@ -609,10 +634,8 @@ export class MLSService extends TypedEventEmitter<Events> {
     users: QualifiedId[],
     options?: {creator?: {user: QualifiedId; client?: string}; parentGroupId?: string},
   ): Promise<AddUsersFailure[]> {
-    await this.registerEmptyConversation(groupId, options?.parentGroupId);
-
+    const mlsPublicRemovalKeys = (await this.apiClient.api.client.getPublicKeys()).removal;
     const creator = options?.creator;
-
     const {keyPackages, failures: keysClaimingFailures} = await this.getKeyPackagesPayload(
       users.map(user => {
         if (user.id === creator?.user.id) {
@@ -626,24 +649,28 @@ export class MLSService extends TypedEventEmitter<Events> {
       }),
     );
 
-    if (keyPackages.length <= 0) {
-      // If there are no clients to add, just update the keying material
-      await this.updateKeyingMaterial(groupId);
+    return this.coreCryptoClient.transaction(async transactionContext => {
+      await this.registerEmptyConversation(groupId, transactionContext, mlsPublicRemovalKeys, options?.parentGroupId);
+
+      if (keyPackages.length <= 0) {
+        // If there are no clients to add, just update the keying material
+        await this.updateKeyingMaterial(groupId, transactionContext);
+        await this.scheduleKeyMaterialRenewal(groupId);
+
+        return keysClaimingFailures;
+      }
+
+      await this.addUsersToExistingConversation(groupId, keyPackages, transactionContext);
+
+      // We schedule a periodic key material renewal
       await this.scheduleKeyMaterialRenewal(groupId);
 
+      /**
+       * @note If we can't fetch a user's key packages then we can not add them to mls conversation
+       * so we're adding them to the list of failed users.
+       */
       return keysClaimingFailures;
-    }
-
-    await this.addUsersToExistingConversation(groupId, keyPackages);
-
-    // We schedule a periodic key material renewal
-    await this.scheduleKeyMaterialRenewal(groupId);
-
-    /**
-     * @note If we can't fetch a user's key packages then we can not add them to mls conversation
-     * so we're adding them to the list of failed users.
-     */
-    return keysClaimingFailures;
+    });
   }
 
   /**
@@ -659,7 +686,16 @@ export class MLSService extends TypedEventEmitter<Events> {
     removalKeyFor1to1Signature?: MLSPublicKeyRecord,
   ): Promise<AddUsersFailure[]> {
     try {
-      await this.registerEmptyConversation(groupId, undefined, removalKeyFor1to1Signature);
+      const mlsPublicRemovalKeys = (await this.apiClient.api.client.getPublicKeys()).removal;
+      await this.coreCryptoClient.transaction(async context => {
+        await this.registerEmptyConversation(
+          groupId,
+          context,
+          mlsPublicRemovalKeys,
+          undefined,
+          removalKeyFor1to1Signature,
+        );
+      });
 
       // We fist fetch key packages for the user we want to add
       const {keyPackages: otherUserKeyPackages, failures: otherUserKeysClaimingFailures} =
@@ -679,7 +715,9 @@ export class MLSService extends TypedEventEmitter<Events> {
         {...selfUser.user, skipOwnClientId: selfUser.client},
       ]);
 
-      await this.addUsersToExistingConversation(groupId, [...otherUserKeyPackages, ...selfKeyPackages]);
+      await this.coreCryptoClient.transaction(transactionContext =>
+        this.addUsersToExistingConversation(groupId, [...otherUserKeyPackages, ...selfKeyPackages], transactionContext),
+      );
 
       // We schedule a periodic key material renewal
       await this.scheduleKeyMaterialRenewal(groupId);
@@ -783,13 +821,15 @@ export class MLSService extends TypedEventEmitter<Events> {
    */
   public async renewKeyMaterial(groupId: string) {
     try {
-      const groupConversationExists = await this.conversationExists(groupId);
+      await this.coreCryptoClient.transaction(async coreCryptoContext => {
+        const groupConversationExists = await this.conversationExists(groupId);
 
-      if (!groupConversationExists) {
-        return this.cancelKeyMaterialRenewal(groupId);
-      }
+        if (!groupConversationExists) {
+          return this.cancelKeyMaterialRenewal(groupId);
+        }
 
-      await this.updateKeyingMaterial(groupId);
+        await this.updateKeyingMaterial(groupId, coreCryptoContext);
+      });
     } catch (error) {
       this.logger.error(`Error while renewing key material for groupId ${groupId}`, error);
     }

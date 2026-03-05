@@ -17,7 +17,7 @@
  *
  */
 
-import {useCallback, useEffect, useLayoutEffect, useMemo} from 'react';
+import {useCallback, useEffect, useLayoutEffect, useMemo, useState} from 'react';
 
 import {amplify} from 'amplify';
 import cx from 'classnames';
@@ -53,6 +53,7 @@ import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {AppLock} from './AppLock';
 import {useE2EIFeatureConfigUpdate} from './components/FeatureConfigChange/FeatureConfigChangeHandler/Features/useE2EIFeatureConfigUpdate';
 import {FeatureConfigChangeNotifier} from './components/FeatureConfigChange/FeatureConfigChangeNotifier';
+import {ForceReloadModal} from './components/ForceReloadModal/ForceReloadModal';
 import {WindowTitleUpdater} from './components/WindowTitleUpdater';
 import {LeftSidebar} from './LeftSidebar';
 import {TeamCreationModalContainer} from './LeftSidebar/panels/Conversations/ConversationTabs/TeamCreation/TeamCreationModalContainer';
@@ -66,6 +67,11 @@ import {ContentState, useAppState} from './useAppState';
 import {runClientVersionCheck} from '../application-periodic-checks/runClientVersionCheck';
 import {startApplicationPeriodicChecks} from '../application-periodic-checks/startApplicationPeriodicChecks';
 import {createWallClock} from '../clock/wallClock';
+import {
+  StartupFeatureFlagMap,
+  StartupFeatureFlagName,
+  isStartupFeatureFlagEnabled,
+} from '../featureFlags/startupFeatureFlags';
 import {App} from '../main/app';
 import {initialiseMLSMigrationFlow} from '../mls/MLSMigration';
 import {generateConversationUrl} from '../router/routeGenerator';
@@ -84,6 +90,7 @@ interface AppMainProps {
   app: App;
   selfUser: User;
   mainView: MainViewModel;
+  startupFeatureFlags: StartupFeatureFlagMap;
   conversationState?: ConversationState;
   callState?: CallState;
   /** will block the user from being able to interact with the application (no notifications and no messages will be shown) */
@@ -94,6 +101,7 @@ export const AppMain = ({
   app,
   mainView,
   selfUser,
+  startupFeatureFlags,
   conversationState = container.resolve(ConversationState),
   callState = container.resolve(CallState),
   locked,
@@ -101,9 +109,11 @@ export const AppMain = ({
   const wallClock = useMemo(() => {
     return createWallClock();
   }, []);
+  const [doesApplicationNeedForceReload, setDoesApplicationNeedForceReload] = useState(false);
+  const clientVersion = Config.getConfig().VERSION;
   const runApplicationPeriodicCheck: () => void = useCallback(() => {
-    runClientVersionCheck({ky});
-  }, []);
+    void runClientVersionCheck({ky, clientVersion, setDoesApplicationNeedForceReload});
+  }, [clientVersion]);
   const apiContext = app.getAPIContext();
 
   useEffect(() => {
@@ -296,6 +306,9 @@ export const AppMain = ({
 
   const showLeftSidebar = (isMobileView && isMobileLeftSidebarView) || (!isMobileView && !isLeftSidebarHidden);
   const showMainContent = currentTab === SidebarTabs.CELLS || !isMobileView || isMobileCentralColumnView;
+  function isFeatureFlagEnabled(featureName: StartupFeatureFlagName): boolean {
+    return isStartupFeatureFlagEnabled(startupFeatureFlags, featureName);
+  }
 
   return (
     <StyledApp
@@ -306,8 +319,9 @@ export const AppMain = ({
       data-uie-value="is-loaded"
     >
       {!locked && <WindowTitleUpdater />}
-      <RootProvider value={{mainViewModel: mainView, wallClock}}>
+      <RootProvider value={{mainViewModel: mainView, wallClock, doesApplicationNeedForceReload, isFeatureFlagEnabled}}>
         <ErrorBoundary FallbackComponent={ErrorFallback}>
+          <ForceReloadModal reloadApplication={app.refresh} />
           {Config.getConfig().FEATURE.ENABLE_DEBUG && <ConfigToolbar />}
           {!locked && (
             <div

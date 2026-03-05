@@ -25,14 +25,13 @@ import {createGroup} from 'test/e2e_tests/utils/userActions';
 
 import {test, expect} from '../../test.fixtures';
 
-test.describe('Accessibility', () => {
+test.describe('Archive', () => {
   let owner = getUser();
   const members = Array.from({length: 2}, () => getUser());
   const [memberA, memberB] = members;
-  const teamName = 'Accessibility';
 
   test.beforeAll(async ({api}) => {
-    const user = await bootstrapTeamForTesting(api, members, owner, teamName);
+    const user = await bootstrapTeamForTesting(api, members, owner, 'Test Team');
     owner = {...owner, ...user};
   });
 

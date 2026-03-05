@@ -46,6 +46,10 @@ const mockDevicesHandler = {
   currentDeviceId: () => 'mock-device-id',
 } as unknown as MediaDevicesHandler;
 
+function isFeatureFlagDisabledForTest(): boolean {
+  return false;
+}
+
 describe('Preferences', () => {
   const mainViewModel = {
     content: {
@@ -70,7 +74,14 @@ describe('Preferences', () => {
     jest.useFakeTimers();
     render(
       withTheme(
-        <RootProvider value={{mainViewModel, wallClock}}>
+        <RootProvider
+          value={{
+            mainViewModel,
+            wallClock,
+            doesApplicationNeedForceReload: false,
+            isFeatureFlagEnabled: isFeatureFlagDisabledForTest,
+          }}
+        >
           <MainContent {...defaultParams} />
         </RootProvider>,
       ),

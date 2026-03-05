@@ -107,4 +107,57 @@ describe('wall clock', () => {
       globalThis.clearInterval = originalClearInterval;
     }
   });
+
+  it('binds setTimeout to globalThis', () => {
+    const originalSetTimeout = globalThis.setTimeout;
+    const timeoutIdentifier = 123 as unknown as ReturnType<typeof globalThis.setTimeout>;
+    const timeoutInvocationContexts: unknown[] = [];
+
+    function setTimeoutStub(this: unknown) {
+      timeoutInvocationContexts.push(this);
+      return timeoutIdentifier;
+    }
+
+    globalThis.setTimeout = setTimeoutStub as unknown as typeof globalThis.setTimeout;
+
+    try {
+      const wallClock = createWallClock();
+      const returnedTimeoutIdentifier = wallClock.setTimeout(() => {
+        return undefined;
+      }, 1);
+
+      expect(returnedTimeoutIdentifier).toBe(timeoutIdentifier);
+      expect(timeoutInvocationContexts[0]).toBe(globalThis);
+    } finally {
+      globalThis.setTimeout = originalSetTimeout;
+    }
+  });
+
+  it('binds clearTimeout to globalThis', () => {
+    const originalClearTimeout = globalThis.clearTimeout;
+    const clearTimeoutInvocationContexts: unknown[] = [];
+    const clearTimeoutArguments: ReturnType<typeof globalThis.setTimeout>[] = [];
+
+    function clearTimeoutStub(
+      this: unknown,
+      providedTimeoutIdentifier: ReturnType<typeof globalThis.setTimeout>,
+    ) {
+      clearTimeoutInvocationContexts.push(this);
+      clearTimeoutArguments.push(providedTimeoutIdentifier);
+    }
+
+    globalThis.clearTimeout = clearTimeoutStub as unknown as typeof globalThis.clearTimeout;
+
+    try {
+      const wallClock = createWallClock();
+      const timeoutIdentifier = 123 as unknown as ReturnType<typeof globalThis.setTimeout>;
+
+      wallClock.clearTimeout(timeoutIdentifier);
+
+      expect(clearTimeoutInvocationContexts[0]).toBe(globalThis);
+      expect(clearTimeoutArguments).toEqual([timeoutIdentifier]);
+    } finally {
+      globalThis.clearTimeout = originalClearTimeout;
+    }
+  });
 });

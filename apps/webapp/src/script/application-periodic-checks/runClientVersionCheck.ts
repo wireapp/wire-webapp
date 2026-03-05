@@ -18,17 +18,41 @@
  */
 
 import {KyInstance} from 'ky';
+import {result} from 'true-myth';
+
+import {upgradeRequiredHttpStatusCode, validateClientVersionCheckResponse} from './clientVersionCheckResponseSchema';
 
 interface RunClientVersionCheckOptions {
   readonly ky: KyInstance;
+  readonly clientVersion: string;
+  readonly setDoesApplicationNeedForceReload: (doesApplicationNeedForceReload: boolean) => void;
 }
 
-export function runClientVersionCheck(options: RunClientVersionCheckOptions): void {
-  const {ky} = options;
+export async function runClientVersionCheck(options: RunClientVersionCheckOptions): Promise<void> {
+  const {ky, clientVersion, setDoesApplicationNeedForceReload} = options;
 
-  const requestClientVersionCheck = async () => {
-    await ky.get('/client-version-check');
-  };
+  const clientVersionCheckResponse = await ky.get('/client-version-check', {
+    headers: {
+      'Wire-Client-Version': clientVersion,
+    },
+    throwHttpErrors: false,
+  });
 
-  void requestClientVersionCheck();
+  const httpStatusCode = clientVersionCheckResponse.status;
+  let responseBody: unknown = undefined;
+
+  if (httpStatusCode === upgradeRequiredHttpStatusCode) {
+    responseBody = await clientVersionCheckResponse.json();
+  }
+
+  const clientVersionCheckValidationResult = validateClientVersionCheckResponse({httpStatusCode, responseBody});
+
+  if (result.isErr(clientVersionCheckValidationResult)) {
+    return;
+  }
+
+  const doesApplicationNeedForceReload =
+    clientVersionCheckValidationResult.value.httpStatusCode === upgradeRequiredHttpStatusCode;
+
+  setDoesApplicationNeedForceReload(doesApplicationNeedForceReload);
 }

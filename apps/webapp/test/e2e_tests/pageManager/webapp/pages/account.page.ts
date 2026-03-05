@@ -131,4 +131,12 @@ export class AccountPage {
     await this.displayNameInput.fill(newName);
     await this.displayNameInput.press('Enter');
   }
+
+  statusOption(status: 'Away' | 'Busy' | 'Available' | 'None') {
+    return this.page.getByRole('button', {name: new RegExp(`${status}`, 'i')});
+  }
+
+  async selectStatus(status: 'Away' | 'Busy' | 'Available' | 'None') {
+    await this.statusOption(status).click();
+  }
 }

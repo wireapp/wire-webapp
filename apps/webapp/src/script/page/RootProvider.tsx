@@ -20,11 +20,14 @@
 import {ReactNode, ReactElement, createContext, useContext, useMemo} from 'react';
 
 import {WallClock} from '../clock/wallClock';
+import {StartupFeatureFlagName} from '../featureFlags/startupFeatureFlags';
 import {MainViewModel} from '../view_model/MainViewModel';
 
 export type RootContextValue = {
   readonly mainViewModel: MainViewModel;
   readonly wallClock: WallClock;
+  readonly doesApplicationNeedForceReload: boolean;
+  readonly isFeatureFlagEnabled: (featureName: StartupFeatureFlagName) => boolean;
 };
 
 export const RootContext = createContext<RootContextValue | null>(null);
@@ -44,11 +47,18 @@ export function RootProvider(properties: RootProviderProps): ReactElement {
   return <RootContext.Provider value={rootContextValue}>{children}</RootContext.Provider>;
 }
 
-export function useMainViewModel(): MainViewModel {
-  const context = useContext(RootContext);
-  if (!context) {
-    throw new Error('MainViewModel was not initialised');
+export function useApplicationContext(): RootContextValue {
+  const applicationContextOrNull = useContext(RootContext);
+
+  if (!applicationContextOrNull) {
+    throw new Error('RootContext has not been set');
   }
 
-  return context.mainViewModel;
+  return applicationContextOrNull;
+}
+
+export function useMainViewModel(): MainViewModel {
+  const applicationContext = useApplicationContext();
+
+  return applicationContext.mainViewModel;
 }
