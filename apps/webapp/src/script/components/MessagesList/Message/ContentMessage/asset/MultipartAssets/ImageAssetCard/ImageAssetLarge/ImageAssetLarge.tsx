@@ -22,7 +22,7 @@ import {CSSProperties, useState} from 'react';
 import {ICellAsset} from '@wireapp/protocol-messaging';
 import {UnavailableFileIcon} from '@wireapp/react-ui-kit';
 
-import {isPreviewableImage} from 'Util/ImageUtil';
+import {getBestPreviewSource} from 'Util/ImageUtil';
 import {t} from 'Util/LocalizerUtil';
 
 import {
@@ -68,8 +68,7 @@ export const ImageAssetLarge = ({
   const aspectRatio = metadata?.width && metadata?.height ? metadata?.width / metadata?.height : undefined;
   const opacity = isLoaded ? 1 : 0;
   const isUnavailable = isError || hasLoadError;
-  const isBrowserPreviewable = isPreviewableImage({extension});
-  const displaySrc = isBrowserPreviewable ? fileUrl || filePreviewUrl : filePreviewUrl;
+  const displaySrc = getBestPreviewSource(extension, fileUrl, filePreviewUrl);
 
   return (
     <>

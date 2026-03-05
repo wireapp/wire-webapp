@@ -17,7 +17,7 @@
  *
  */
 
-import {imageHasExifData, isPreviewableImage, stripImageExifData} from './ImageUtil';
+import {getBestPreviewSource, imageHasExifData, isPreviewableImage, stripImageExifData} from './ImageUtil';
 
 const jpegWithExif = new Blob([new Uint8Array([0xff, 0xd8, 0xff, 0xe1, 0x00, 0x10, 0x45, 0x78, 0x69, 0x66])], {
   type: 'image/jpeg',
@@ -138,6 +138,27 @@ describe('ImageUtil', () => {
 
     it('returns false when no mime type or extension is provided', () => {
       expect(isPreviewableImage({})).toBe(false);
+    });
+  });
+
+  describe('getBestPreviewSource', () => {
+    it('returns the original fileUrl for browser-previewable formats (JPEG, PNG, WebP, GIF)', () => {
+      expect(getBestPreviewSource('jpg', 'original.jpg', 'preview.jpg')).toBe('original.jpg');
+      expect(getBestPreviewSource('png', 'original.png', 'preview.jpg')).toBe('original.png');
+      expect(getBestPreviewSource('webp', 'original.webp', 'preview.jpg')).toBe('original.webp');
+      expect(getBestPreviewSource('gif', 'original.gif', 'preview.jpg')).toBe('original.gif');
+    });
+
+    it('returns the server-generated preview for HEIC files (not natively decodable by browsers)', () => {
+      expect(getBestPreviewSource('heic', 'original.heic', 'preview.jpg')).toBe('preview.jpg');
+    });
+
+    it('falls back to filePreviewUrl when fileUrl is absent for a previewable format', () => {
+      expect(getBestPreviewSource('jpg', undefined, 'preview.jpg')).toBe('preview.jpg');
+    });
+
+    it('returns undefined when both fileUrl and filePreviewUrl are absent', () => {
+      expect(getBestPreviewSource('jpg', undefined, undefined)).toBeUndefined();
     });
   });
 });
