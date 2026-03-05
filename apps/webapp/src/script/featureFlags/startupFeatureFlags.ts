@@ -52,10 +52,8 @@ function toEnabledFeatureNameList(serializedFeatureNames: string): readonly Star
 function readEnabledFeatureNameListFromLocationSearch(locationSearch: string): readonly StartupFeatureFlagName[] {
   const queryParameters = new URLSearchParams(Maybe.of(locationSearch).unwrapOr(''));
   const enabledFeaturesParameterValue = queryParameters.get(startupFeatureFlagQueryParameterName);
-  const enabledFeatureNameListOrNull =
-    enabledFeaturesParameterValue === null ? null : toEnabledFeatureNameList(enabledFeaturesParameterValue);
 
-  return Maybe.of(enabledFeatureNameListOrNull).unwrapOr([]);
+  return Maybe.of(enabledFeaturesParameterValue).map(toEnabledFeatureNameList).unwrapOr([]);
 }
 
 export function createStartupFeatureFlagMapFromLocationSearch(locationSearch: string): StartupFeatureFlagMap {
