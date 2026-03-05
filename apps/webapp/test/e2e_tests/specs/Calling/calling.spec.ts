@@ -22,16 +22,23 @@ import {User} from 'test/e2e_tests/data/user';
 import {PageManager} from 'test/e2e_tests/pageManager';
 import {test, withConnectedUser, withLogin, expect} from 'test/e2e_tests/test.fixtures';
 import {isPlayingAudio} from 'test/e2e_tests/utils/audio.util';
+import {createGroup} from 'test/e2e_tests/utils/userActions';
 
 test.describe('Calling', () => {
   let userA: User;
   let userB: User;
   let userC: User;
 
-  test.beforeEach(async ({createTeam, createUser}) => {
+  test.beforeEach(async ({createTeam, createUser}, testInfo) => {
     userB = await createUser();
     userC = await createUser();
-    const team = await createTeam('Team Call Team', {users: [userB, userC]});
+    const team = await createTeam('Team Call Team', {
+      users: [userB, userC],
+      features: {
+        // Enable conference calling for tests using group calls
+        conferenceCalling: testInfo.tags.includes('@TC-2874'),
+      },
+    });
     userA = team.owner;
   });
 
@@ -161,6 +168,26 @@ test.describe('Calling', () => {
       await expect(userBPages.conversation().callButton).toBeEnabled();
       await userBPages.conversation().startCall();
       await expect(userBPages.calling().callCell).toBeVisible();
+    },
+  );
+
+  test(
+    'Late joiner wants to see the ongoing screen sharing on group call',
+    {tag: ['@TC-2874', '@regression']},
+    async ({createPage}) => {
+      const [userAPages, userBPages] = await Promise.all([
+        PageManager.from(createPage(withLogin(userA), withConnectedUser(userB))).then(pm => pm.webapp.pages),
+        PageManager.from(createPage(withLogin(userB))).then(pm => pm.webapp.pages),
+      ]);
+      await createGroup(userBPages, 'Test Group', [userA]);
+
+      await userBPages.conversationList().openConversation('Test Group');
+      await userBPages.conversation().clickCallButton();
+      await userBPages.calling().toggleScreenShareButton.click();
+
+      await userAPages.conversationList().joinCallButton.click();
+      await userAPages.calling().goFullScreen.click();
+      await expect(userAPages.calling().getGridTile(userB.fullName).video).toBeVisible();
     },
   );
 

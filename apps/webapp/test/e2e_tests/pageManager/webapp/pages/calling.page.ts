@@ -136,6 +136,7 @@ export class CallingPage {
     return Object.assign(tile, {
       /** Icon indicating that the given user is muted */
       muteIcon: tile.getByTestId('mic-icon-off'),
+      video: tile.locator('video'),
     });
   }
 }
