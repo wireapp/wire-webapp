@@ -100,7 +100,7 @@ const config = {
   AVS_VERSION: packageJson.dependencies['@wireapp/avs'],
 
   COUNTLY_SERVER_URL: 'https://wire.count.ly/',
-  GET_WIRE_URL: 'https://get.wire.com',
+  GET_WIRE_URL: 'https://wire.com/app-download',
 } as const;
 
 export type Configuration = typeof config;

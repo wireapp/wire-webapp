@@ -82,7 +82,7 @@ describe('Success', () => {
     const {getAllByText} = renderComponent(<Success />);
     const downloadButton = getAllByText('success.downloadButton')[0];
     fireEvent.click(downloadButton);
-    expect(window.location.replace).toHaveBeenCalledWith('https://get.wire.com');
+    expect(window.location.replace).toHaveBeenCalledWith('https://wire.com/app-download');
   });
 
   it('navigates to webapp url when open webapp button is clicked', () => {
