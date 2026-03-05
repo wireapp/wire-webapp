@@ -1165,7 +1165,7 @@
   "inviteHintSelected": "Trykk {metaKey} + C for å kopiere",
   "inviteHintUnselected": "Velg og hold {metaKey} + C",
   "inviteMessage": "I’m on {brandName}, search for {username} or visit wire.com/app-download.",
-  "inviteMessageNoEmail": "Jeg er på {brandName}. Besøk wire.com/app-download for å få kontakt med meg.",
+  "inviteMessageNoEmail": "I’m on {brandName}. Visit wire.com/app-download to connect with me.",
   "inviteMetaKeyMac": "Cmd",
   "inviteMetaKeyPc": "Ctrl",
   "jumpToLastMessage": "Scroll to the end of this conversation",
