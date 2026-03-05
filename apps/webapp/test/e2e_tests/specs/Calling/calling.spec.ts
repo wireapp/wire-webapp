@@ -163,4 +163,40 @@ test.describe('Calling', () => {
       await expect(userBPages.calling().callCell).toBeVisible();
     },
   );
+
+  // ToDo: This test case isn't finished yet but just an experiment on how to assert CBR
+  test(
+    'I want to have 1:1 CBR audio call when the caller turned it on',
+    {tag: ['@TC-2908', '@regression']},
+    async ({api, createPage}) => {
+      const {id: callingServiceInstanceId} = await api.callingService.createInstance(userB.password, userB.email);
+      const page = await createPage(withLogin(userA), withConnectedUser(userB));
+      const {pages, components} = PageManager.from(page).webapp;
+
+      await test.step('Caller enables CBR', async () => {
+        await components.conversationSidebar().preferencesButton.click();
+        await pages.settings().audioVideoButton.click();
+        await pages.audioVideoSettings().variableBitrateCheckbox.click();
+        await components.conversationSidebar().allConverationsButton.click();
+      });
+
+      await test.step('UserA calls userB', async () => {
+        await api.callingService.setAcceptNextCall(callingServiceInstanceId);
+        await pages.conversationList().openConversation(userB.fullName, {protocol: 'mls'});
+        await pages.conversation().clickConversationInfoButton();
+        await pages.conversation().clickCallButton();
+        await expect
+          .poll(async () => (await api.callingService.getStatus(callingServiceInstanceId)).currentCall.status, {
+            intervals: [1_000],
+            timeout: 20_000,
+          })
+          .toBe('ACTIVE');
+      });
+
+      await page.waitForTimeout(5_000); // Wait 5s so the calling service can collect packets
+      const packets = await api.callingService.getPackets(callingServiceInstanceId);
+
+      expect(packets.src).toBeDefined();
+    },
+  );
 });
