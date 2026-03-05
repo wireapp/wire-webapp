@@ -36,6 +36,7 @@ import {exposeWrapperGlobals} from 'Util/wrapper';
 
 import {SIGN_OUT_REASON} from '../auth/SignOutReason';
 import {Config} from '../Config';
+import {createStartupFeatureFlagMapFromLocationSearch} from '../featureFlags/startupFeatureFlags';
 
 document.addEventListener('DOMContentLoaded', async () => {
   const config = Config.getConfig();
@@ -63,7 +64,13 @@ document.addEventListener('DOMContentLoaded', async () => {
     return doSimpleRedirect(SIGN_OUT_REASON.NOT_SIGNED_IN);
   }
 
+  const startupFeatureFlags = createStartupFeatureFlagMapFromLocationSearch(globalThis.location.search);
+
   createRoot(appContainer).render(
-    <AppContainer config={config} clientType={shouldPersist ? ClientType.PERMANENT : ClientType.TEMPORARY} />,
+    <AppContainer
+      config={config}
+      clientType={shouldPersist ? ClientType.PERMANENT : ClientType.TEMPORARY}
+      startupFeatureFlags={startupFeatureFlags}
+    />,
   );
 });

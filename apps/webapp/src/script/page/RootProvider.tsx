@@ -20,12 +20,14 @@
 import {ReactNode, ReactElement, createContext, useContext, useMemo} from 'react';
 
 import {WallClock} from '../clock/wallClock';
+import {StartupFeatureFlagName} from '../featureFlags/startupFeatureFlags';
 import {MainViewModel} from '../view_model/MainViewModel';
 
 export type RootContextValue = {
   readonly mainViewModel: MainViewModel;
   readonly wallClock: WallClock;
   readonly doesApplicationNeedForceReload: boolean;
+  readonly isFeatureFlagEnabled: (featureName: StartupFeatureFlagName) => boolean;
 };
 
 export const RootContext = createContext<RootContextValue | null>(null);

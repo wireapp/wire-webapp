@@ -34,6 +34,10 @@ interface ForceReloadModalTestContextValue {
   readonly reloadApplication: () => void;
 }
 
+function isFeatureFlagDisabledForTest(): boolean {
+  return false;
+}
+
 function createMainViewModelForTest(): MainViewModel {
   return {} as MainViewModel;
 }
@@ -67,6 +71,7 @@ function createForceReloadModalTestElement(
     <RootProvider
       value={{
         doesApplicationNeedForceReload,
+        isFeatureFlagEnabled: isFeatureFlagDisabledForTest,
         mainViewModel: createMainViewModelForTest(),
         wallClock: createFakeWallClock({initialCurrentTimestampInMilliseconds: 1_111}),
       }}
