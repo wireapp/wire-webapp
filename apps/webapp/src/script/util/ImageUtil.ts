@@ -17,6 +17,8 @@
  *
  */
 
+import {Maybe} from 'true-myth';
+
 export const stripImageExifData = async (image: Blob): Promise<Blob> => {
   const url = URL.createObjectURL(image);
   try {

@@ -19,6 +19,8 @@
 
 import {CSSProperties, useState} from 'react';
 
+import {Maybe} from 'true-myth';
+
 import {ICellAsset} from '@wireapp/protocol-messaging';
 import {UnavailableFileIcon} from '@wireapp/react-ui-kit';
 
@@ -68,7 +70,11 @@ export const ImageAssetLarge = ({
   const aspectRatio = metadata?.width && metadata?.height ? metadata?.width / metadata?.height : undefined;
   const opacity = isLoaded ? 1 : 0;
   const isUnavailable = isError || hasLoadError;
-  const displaySrc = getBestPreviewSource(extension, fileUrl, filePreviewUrl);
+  const displaySrc = getBestPreviewSource({
+    fileExtension: extension,
+    fileUrl: Maybe.of(fileUrl),
+    filePreviewUrl: Maybe.of(filePreviewUrl),
+  }).unwrapOr(undefined);
 
   return (
     <>
