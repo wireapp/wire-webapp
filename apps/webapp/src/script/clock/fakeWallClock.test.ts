@@ -94,4 +94,48 @@ describe('createFakeWallClock', () => {
     expect(intervalHandler).toHaveBeenCalledTimes(1);
   });
 
+  it('executes timeout callback once when time reaches the delay', () => {
+    const fakeWallClock = createFakeWallClock({initialCurrentTimestampInMilliseconds: 0});
+    const timeoutHandler = jest.fn();
+
+    fakeWallClock.setTimeout(timeoutHandler, 100, 'timeout argument');
+    fakeWallClock.advanceByMilliseconds(100);
+    fakeWallClock.advanceByMilliseconds(500);
+
+    expect(timeoutHandler).toHaveBeenCalledTimes(1);
+    expect(timeoutHandler).toHaveBeenNthCalledWith(1, 'timeout argument');
+  });
+
+  it('does not execute timeout callback before the delay', () => {
+    const fakeWallClock = createFakeWallClock({initialCurrentTimestampInMilliseconds: 0});
+    const timeoutHandler = jest.fn();
+
+    fakeWallClock.setTimeout(timeoutHandler, 100);
+    fakeWallClock.advanceByMilliseconds(99);
+
+    expect(timeoutHandler).not.toHaveBeenCalled();
+  });
+
+  it('stops executing timeout callback after clearTimeout', () => {
+    const fakeWallClock = createFakeWallClock({initialCurrentTimestampInMilliseconds: 0});
+    const timeoutHandler = jest.fn();
+
+    const timeoutIdentifier = fakeWallClock.setTimeout(timeoutHandler, 100);
+    fakeWallClock.clearTimeout(timeoutIdentifier);
+    fakeWallClock.advanceByMilliseconds(100);
+
+    expect(timeoutHandler).not.toHaveBeenCalled();
+  });
+
+  it('executes due timeout callbacks in registration order for the same execution timestamp', () => {
+    const fakeWallClock = createFakeWallClock({initialCurrentTimestampInMilliseconds: 0});
+    const executionOrder: string[] = [];
+
+    fakeWallClock.setTimeout(() => executionOrder.push('first timeout'), 100);
+    fakeWallClock.setTimeout(() => executionOrder.push('second timeout'), 100);
+    fakeWallClock.setTimeout(() => executionOrder.push('third timeout'), 100);
+    fakeWallClock.advanceByMilliseconds(100);
+
+    expect(executionOrder).toEqual(['first timeout', 'second timeout', 'third timeout']);
+  });
 });

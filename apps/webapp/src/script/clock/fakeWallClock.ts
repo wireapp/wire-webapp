@@ -29,6 +29,11 @@ type IntervalRegistration = {
   nextExecutionTimestampInMilliseconds: number;
 };
 
+type TimeoutRegistration = {
+  readonly execute: () => void;
+  readonly executionTimestampInMilliseconds: number;
+};
+
 export type FakeWallClock = WallClock & {
   setCurrentTimestampInMilliseconds(nextTimestampInMilliseconds: number): void;
   advanceByMilliseconds(delayInMilliseconds: number): void;
@@ -39,7 +44,9 @@ export function createFakeWallClock(options: FakeWallClockOptions = {}): FakeWal
 
   let currentTimestampInMilliseconds = initialCurrentTimestampInMilliseconds;
   let nextIntervalIdentifier = 0;
+  let nextTimeoutIdentifier = 0;
   const intervalRegistrations = new Map<number, IntervalRegistration>();
+  const timeoutRegistrations = new Map<number, TimeoutRegistration>();
 
   const runDueIntervalRegistrations = () => {
     intervalRegistrations.forEach((intervalRegistration, intervalIdentifier) => {
@@ -55,6 +62,34 @@ export function createFakeWallClock(options: FakeWallClockOptions = {}): FakeWal
         latestIntervalRegistration.nextExecutionTimestampInMilliseconds +=
           latestIntervalRegistration.delayInMilliseconds;
       }
+    });
+  };
+
+  const runDueTimeoutRegistrations = () => {
+    const dueTimeoutRegistrations = Array.from(timeoutRegistrations.entries())
+      .filter(([, timeoutRegistration]) => {
+        return timeoutRegistration.executionTimestampInMilliseconds <= currentTimestampInMilliseconds;
+      })
+      .sort((firstTimeoutEntry, secondTimeoutEntry) => {
+        const [firstTimeoutIdentifier, firstTimeoutRegistration] = firstTimeoutEntry;
+        const [secondTimeoutIdentifier, secondTimeoutRegistration] = secondTimeoutEntry;
+
+        if (
+          firstTimeoutRegistration.executionTimestampInMilliseconds !==
+          secondTimeoutRegistration.executionTimestampInMilliseconds
+        ) {
+          return (
+            firstTimeoutRegistration.executionTimestampInMilliseconds -
+            secondTimeoutRegistration.executionTimestampInMilliseconds
+          );
+        }
+
+        return firstTimeoutIdentifier - secondTimeoutIdentifier;
+      });
+
+    dueTimeoutRegistrations.forEach(([timeoutIdentifier, timeoutRegistration]) => {
+      timeoutRegistrations.delete(timeoutIdentifier);
+      timeoutRegistration.execute();
     });
   };
 
@@ -74,6 +109,25 @@ export function createFakeWallClock(options: FakeWallClockOptions = {}): FakeWal
     advanceByMilliseconds(delayInMilliseconds: number) {
       currentTimestampInMilliseconds += delayInMilliseconds;
       runDueIntervalRegistrations();
+      runDueTimeoutRegistrations();
+    },
+
+    setTimeout(handler, delayInMilliseconds, ...args) {
+      const timeoutIdentifier = nextTimeoutIdentifier;
+      nextTimeoutIdentifier += 1;
+
+      timeoutRegistrations.set(timeoutIdentifier, {
+        execute: () => {
+          handler(...args);
+        },
+        executionTimestampInMilliseconds: currentTimestampInMilliseconds + delayInMilliseconds,
+      });
+
+      return timeoutIdentifier as unknown as ReturnType<typeof globalThis.setTimeout>;
+    },
+
+    clearTimeout(timeoutIdentifier) {
+      timeoutRegistrations.delete(timeoutIdentifier as unknown as number);
     },
 
     setInterval(handler, delayInMilliseconds, ...args) {

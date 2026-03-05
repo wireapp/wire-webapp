@@ -20,6 +20,12 @@
 export type WallClock = {
   readonly currentTimestampInMilliseconds: number;
   readonly currentDate: Date;
+  readonly setTimeout: <Arguments extends readonly unknown[]>(
+    handler: (...args: Arguments) => void,
+    delayInMilliseconds: number,
+    ...args: Arguments
+  ) => ReturnType<typeof globalThis.setTimeout>;
+  readonly clearTimeout: (timeoutIdentifier: ReturnType<typeof globalThis.setTimeout>) => void;
   readonly setInterval: <Arguments extends readonly unknown[]>(
     handler: (...args: Arguments) => void,
     delayInMilliseconds: number,
@@ -37,6 +43,10 @@ export function createWallClock(): WallClock {
     get currentDate() {
       return new Date(Date.now());
     },
+
+    setTimeout: globalThis.setTimeout.bind(globalThis),
+
+    clearTimeout: globalThis.clearTimeout.bind(globalThis),
 
     setInterval: globalThis.setInterval.bind(globalThis),
 
