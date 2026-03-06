@@ -56,32 +56,37 @@ test.describe('AppLock', () => {
     },
   );
 
-  test.fixme(
-    'Web: App should not lock if I switch back to webapp tab in time (during inactivity timeout)',
-    {tag: ['@TC-2752', '@TC-2753', '@regression']},
-    async ({browser, createPage}) => {
+  (
+    [
+      {
+        title: 'Web: I want the app to lock when I switch back to webapp tab after inactivity timeout expired',
+        tag: '@TC-2752',
+      },
+      {
+        title: 'Web: App should not lock if I switch back to webapp tab in time (during inactivity timeout)',
+        tag: '@TC-2753',
+      },
+    ] as const
+  ).forEach(({title, tag}) => {
+    const shouldLock = tag === '@TC-2752';
+
+    test(title, {tag: [tag, '@regression']}, async ({createPage}) => {
       const page = await createPage(withLogin(memberA));
       const pageManager = PageManager.from(page);
-      const {modals} = pageManager.webapp;
-
       await handleAppLockState(pageManager, appLockPassCode);
-      const unrelatedPage = await browser.newPage();
-      await unrelatedPage.goto('about:blank');
-      await unrelatedPage.bringToFront();
-      await unrelatedPage.waitForTimeout(2_000); // open be only 2 sec in the other tab
-      await page.bringToFront();
 
-      await expect(modals.appLock().appLockModalHeader).not.toBeVisible();
+      const {modals} = pageManager.webapp;
+      await page.dispatchEvent('body', 'blur');
+      await page.waitForTimeout(shouldLock ? 61_000 : 3_000);
+      await page.dispatchEvent('body', 'focus');
 
-      await test.step('Web: I want the app to lock when I switch back to webapp tab after inactivity timeout expired', async () => {
-        await unrelatedPage.goto('about:blank');
-        await unrelatedPage.bringToFront();
-        await unrelatedPage.waitForTimeout(31_000);
-        await page.bringToFront();
+      if (shouldLock) {
         await expect(modals.appLock().appLockModalHeader).toBeVisible();
-      });
-    },
-  );
+      } else {
+        await expect(modals.appLock().appLockModalHeader).not.toBeVisible();
+      }
+    });
+  });
 
   test(
     'Web: I want to unlock the app with passphrase after login',
