@@ -19,7 +19,7 @@
 
 import {WallClock} from './wallClock';
 
-type FakeWallClockOptions = {
+type DeterministicWallClockOptions = {
   readonly initialCurrentTimestampInMilliseconds?: number;
 };
 
@@ -34,12 +34,12 @@ type TimeoutRegistration = {
   readonly executionTimestampInMilliseconds: number;
 };
 
-export type FakeWallClock = WallClock & {
+export type DeterministicWallClock = WallClock & {
   setCurrentTimestampInMilliseconds(nextTimestampInMilliseconds: number): void;
   advanceByMilliseconds(delayInMilliseconds: number): void;
 };
 
-export function createFakeWallClock(options: FakeWallClockOptions = {}): FakeWallClock {
+export function createDeterministicWallClock(options: DeterministicWallClockOptions = {}): DeterministicWallClock {
   const {initialCurrentTimestampInMilliseconds = 0} = options;
 
   let currentTimestampInMilliseconds = initialCurrentTimestampInMilliseconds;
