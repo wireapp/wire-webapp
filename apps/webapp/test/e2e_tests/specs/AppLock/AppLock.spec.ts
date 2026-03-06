@@ -30,119 +30,122 @@ test.describe('AppLock', () => {
   const teamName = 'AppLock';
   const appLockPassCode = '1a3!567N4';
 
-  test.beforeEach(async ({api, createTeam, createUser}) => {
+  test.beforeEach(async ({createTeam, createUser}) => {
     memberA = await createUser();
     const team = await createTeam(teamName, {users: [memberA]});
     owner = team.owner;
-
-    await api.brig.toggleAppLock(owner.teamId, 'enabled', true);
   });
 
-  test(
-    'I want to see app lock setup modal on login after app lock has been enforced for the team',
-    {tag: ['@TC-2744', '@TC-2740', '@regression']},
-    async ({createPage}) => {
-      const page = await createPage(withLogin(memberA));
-      const {modals} = PageManager.from(page).webapp;
+  test.describe('AppLock enforced for team', async () => {
+    test.beforeEach(async ({api}) => {
+      // Enforce app lock for the whole team
+      await api.brig.toggleAppLock(owner.teamId, 'enabled', true);
+    });
 
-      await expect(modals.appLock().appLockModal).toBeVisible();
+    test(
+      'I want to see app lock setup modal on login after app lock has been enforced for the team',
+      {tag: ['@TC-2744', '@TC-2740', '@regression']},
+      async ({createPage}) => {
+        const page = await createPage(withLogin(memberA));
+        const {modals} = PageManager.from(page).webapp;
 
-      await test.step('Web: I should not be able to close app lock setup modal if app lock is enforced', async () => {
-        // click outside the modal
-        await page.mouse.click(200, 350);
-        // check if the modal still there
         await expect(modals.appLock().appLockModal).toBeVisible();
-      });
-    },
-  );
 
-  test.fixme(
-    'Web: App should not lock if I switch back to webapp tab in time (during inactivity timeout)',
-    {tag: ['@TC-2752', '@TC-2753', '@regression']},
-    async ({browser, createPage}) => {
-      const page = await createPage(withLogin(memberA));
-      const pageManager = PageManager.from(page);
-      const {modals} = pageManager.webapp;
+        await test.step('Web: I should not be able to close app lock setup modal if app lock is enforced', async () => {
+          // click outside the modal
+          await page.mouse.click(200, 350);
+          // check if the modal still there
+          await expect(modals.appLock().appLockModal).toBeVisible();
+        });
+      },
+    );
 
-      await handleAppLockState(pageManager, appLockPassCode);
-      const unrelatedPage = await browser.newPage();
-      await unrelatedPage.goto('about:blank');
-      await unrelatedPage.bringToFront();
-      await unrelatedPage.waitForTimeout(2_000); // open be only 2 sec in the other tab
-      await page.bringToFront();
+    test.fixme(
+      'Web: App should not lock if I switch back to webapp tab in time (during inactivity timeout)',
+      {tag: ['@TC-2752', '@TC-2753', '@regression']},
+      async ({browser, createPage}) => {
+        const page = await createPage(withLogin(memberA));
+        const pageManager = PageManager.from(page);
+        const {modals} = pageManager.webapp;
 
-      await expect(modals.appLock().appLockModalHeader).not.toBeVisible();
-
-      await test.step('Web: I want the app to lock when I switch back to webapp tab after inactivity timeout expired', async () => {
+        await handleAppLockState(pageManager, appLockPassCode);
+        const unrelatedPage = await browser.newPage();
         await unrelatedPage.goto('about:blank');
         await unrelatedPage.bringToFront();
-        await unrelatedPage.waitForTimeout(31_000);
+        await unrelatedPage.waitForTimeout(2_000); // open be only 2 sec in the other tab
         await page.bringToFront();
-        await expect(modals.appLock().appLockModalHeader).toBeVisible();
-      });
-    },
-  );
 
-  test(
-    'Web: I want to unlock the app with passphrase after login',
-    {tag: ['@TC-2754', '@TC-2755', '@TC-2758', '@TC-2763', '@regression']},
-    async ({createPage}) => {
-      const page = await createPage(withLogin(memberA));
-      const pageManager = PageManager.from(page);
-      const {modals, pages} = pageManager.webapp;
+        await expect(modals.appLock().appLockModalHeader).not.toBeVisible();
 
-      await test.step('Web: I want the app to automatically lock after refreshing the page', async () => {
+        await test.step('Web: I want the app to lock when I switch back to webapp tab after inactivity timeout expired', async () => {
+          await unrelatedPage.goto('about:blank');
+          await unrelatedPage.bringToFront();
+          await unrelatedPage.waitForTimeout(31_000);
+          await page.bringToFront();
+          await expect(modals.appLock().appLockModalHeader).toBeVisible();
+        });
+      },
+    );
+
+    test(
+      'Web: I want to unlock the app with passphrase after login',
+      {tag: ['@TC-2754', '@TC-2755', '@TC-2758', '@TC-2763', '@regression']},
+      async ({createPage}) => {
+        const page = await createPage(withLogin(memberA));
+        const pageManager = PageManager.from(page);
+        const {modals, pages} = pageManager.webapp;
+
+        await test.step('Web: I want the app to automatically lock after refreshing the page', async () => {
+          await handleAppLockState(pageManager, appLockPassCode);
+          await pageManager.refreshPage();
+
+          await expect(modals.appLock().appLockModal).toBeVisible();
+        });
+
+        await test.step('Web: I should not be able to unlock the app with wrong passphrase', async () => {
+          await handleAppLockState(pageManager, 'wrongCredentials');
+          await expect(modals.appLock().errorMessage).toHaveText('Wrong passcode');
+        });
+
+        await test.step('Web: I should not be able to wipe database with wrong account password', async () => {
+          await modals.appLock().clickForgotPassphrase();
+          await modals.appLock().clickWipeDB();
+          await modals.appLock().clickReset();
+          await modals.appLock().inputUserPassword('wrong password');
+
+          expect(await checkAnyIndexedDBExists(page)).toBeTruthy();
+        });
+
+        await test.step('I want to wipe database when I forgot my app lock passphrase', async () => {
+          await modals.appLock().inputUserPassword(memberA.password);
+
+          await expect(pages.singleSignOn().ssoCodeEmailInput).toBeVisible();
+          expect(await checkAnyIndexedDBExists(page)).toBeFalsy();
+        });
+      },
+    );
+
+    test(
+      'I should not be able to switch off app lock if it is enforced for the team',
+      {tag: ['@TC-2770', '@TC-2767', '@regression']},
+      async ({createPage}) => {
+        const page = await createPage(withLogin(memberA));
+        const pageManager = PageManager.from(page);
+        const {components, pages} = pageManager.webapp;
         await handleAppLockState(pageManager, appLockPassCode);
-        await pageManager.refreshPage();
+        await components.conversationSidebar().clickPreferencesButton();
 
-        await expect(modals.appLock().appLockModal).toBeVisible();
-      });
+        await expect(pages.account().appLockCheckbox).toBeDisabled();
+        // check here string
 
-      await test.step('Web: I should not be able to unlock the app with wrong passphrase', async () => {
-        await handleAppLockState(pageManager, 'wrongCredentials');
-        await expect(modals.appLock().errorMessage).toHaveText('Wrong passcode');
-      });
-
-      await test.step('Web: I should not be able to wipe database with wrong account password', async () => {
-        await modals.appLock().clickForgotPassphrase();
-        await modals.appLock().clickWipeDB();
-        await modals.appLock().clickReset();
-        await modals.appLock().inputUserPassword('wrong password');
-
-        expect(await checkAnyIndexedDBExists(page)).toBeTruthy();
-      });
-
-      await test.step('I want to wipe database when I forgot my app lock passphrase', async () => {
-        await modals.appLock().inputUserPassword(memberA.password);
-
-        await expect(pages.singleSignOn().ssoCodeEmailInput).toBeVisible();
-        expect(await checkAnyIndexedDBExists(page)).toBeFalsy();
-      });
-    },
-  );
-
-  test(
-    'I should not be able to switch off app lock if it is enforced for the team',
-    {tag: ['@TC-2770', '@TC-2767', '@regression']},
-    async ({createPage}) => {
-      const page = await createPage(withLogin(memberA));
-      const pageManager = PageManager.from(page);
-      const {components, pages} = pageManager.webapp;
-      await handleAppLockState(pageManager, appLockPassCode);
-      await components.conversationSidebar().clickPreferencesButton();
-
-      await expect(pages.account().appLockCheckbox).toBeDisabled();
-      // check here string
-
-      await expect(
-        page.getByText('Lock Wire after 30 seconds in the background. Unlock with Touch ID or enter your passcode.'),
-      ).toHaveCount(1);
-    },
-  );
+        await expect(
+          page.getByText('Lock Wire after 30 seconds in the background. Unlock with Touch ID or enter your passcode.'),
+        ).toHaveCount(1);
+      },
+    );
+  });
 
   test('I want to switch off app lock', {tag: ['@TC-2771', '@TC-2772', '@regression']}, async ({api, createPage}) => {
-    await api.brig.toggleAppLock(owner.teamId, 'enabled', false);
-
     const page = await createPage(withLogin(memberA));
     const pageManager = PageManager.from(page);
     const {components, pages, modals} = pageManager.webapp;
