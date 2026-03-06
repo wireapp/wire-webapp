@@ -17,6 +17,8 @@
  *
  */
 
+import {Maybe} from 'true-myth';
+
 export const stripImageExifData = async (image: Blob): Promise<Blob> => {
   const url = URL.createObjectURL(image);
   try {
@@ -179,3 +181,19 @@ export const isPreviewableImage = ({
 
   return !!normalizedExtension && PREVIEWABLE_IMAGE_EXTENSIONS.has(normalizedExtension);
 };
+
+type GetBestPreviewSourceOptions = {
+  readonly fileExtension: string;
+  readonly fileUrl: Maybe<string>;
+  readonly filePreviewUrl: Maybe<string>;
+};
+
+export function getBestPreviewSource(options: GetBestPreviewSourceOptions): Maybe<string> {
+  const {fileExtension, fileUrl, filePreviewUrl} = options;
+
+  if (!isPreviewableImage({extension: fileExtension})) {
+    return filePreviewUrl;
+  }
+
+  return fileUrl.or(filePreviewUrl);
+}
