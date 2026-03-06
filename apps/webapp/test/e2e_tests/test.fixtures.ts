@@ -27,7 +27,7 @@ import {mockAudioAndVideoDevices} from './utils/mockVideoDevice.util';
 import {Role} from '@wireapp/api-client/lib/team';
 import {FEATURE_KEY} from '@wireapp/api-client/lib/team/feature';
 
-type PagePlugin = (page: Page) => void | Promise<void>;
+export type PagePlugin = (page: Page) => void | Promise<void>;
 
 // Define custom test type with axios fixture
 type Fixtures = {
@@ -59,6 +59,7 @@ type Fixtures = {
 };
 
 export type Team = {
+  teamId: string;
   owner: User;
   /** Add a new member to the team after its initial creation */
   addTeamMember: (member: User, options?: {role?: keyof typeof Role}) => Promise<void>;

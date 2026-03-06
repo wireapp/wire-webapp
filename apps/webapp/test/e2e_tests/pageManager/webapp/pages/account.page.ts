@@ -23,8 +23,6 @@ export class AccountPage {
   readonly page: Page;
 
   readonly sendUsageDataCheckbox: Locator;
-  readonly appLockCheckboxLabel: Locator;
-  readonly appLockCheckbox: Locator;
   readonly deleteAccountButton: Locator;
   readonly backUpButton: Locator;
   readonly backupFileInput: Locator;
@@ -46,8 +44,6 @@ export class AccountPage {
     this.page = page;
 
     this.sendUsageDataCheckbox = page.locator("[data-uie-name='status-preference-telemetry']+label");
-    this.appLockCheckboxLabel = page.locator("[data-uie-name='status-preference-applock']+label");
-    this.appLockCheckbox = page.locator("[data-uie-name='status-preference-applock']");
     this.deleteAccountButton = page.getByTestId('go-delete-account');
     this.backUpButton = page.getByTestId('do-backup-export');
     this.backupFileInput = page.getByTestId('input-import-file');
@@ -64,6 +60,17 @@ export class AccountPage {
     this.resetPasswordButton = page.getByTestId('do-reset-password');
     this.receiveNewsletterCheckbox = page.locator("[data-uie-name='status-preference-marketing']+label");
     this.typingIndicator = page.locator("[data-uie-name='status-preference-typing-indicator']+label");
+  }
+
+  /** Locator for the privacy section within the account settings, including utils for the options inside it */
+  get privacySection() {
+    const section = this.page.getByRole('group', {name: 'Privacy'});
+    return Object.assign(section, {
+      appLock: {
+        checkbox: section.locator('[data-uie-name="status-preference-applock"]'),
+        label: section.locator('[data-uie-name="status-preference-applock"]+label'),
+      },
+    });
   }
 
   async clickBackUpButton() {
@@ -92,10 +99,6 @@ export class AccountPage {
 
   async isSendUsageDataEnabled() {
     return this.sendUsageDataCheckbox.isChecked();
-  }
-
-  async toggleAppLock() {
-    await this.appLockCheckboxLabel.click();
   }
 
   async clickLogoutButton() {

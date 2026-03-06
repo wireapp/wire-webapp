@@ -39,7 +39,7 @@ test('Account Management', {tag: ['@TC-8639', '@crit-flow-web']}, async ({create
   });
 
   await test.step('Member enables applock and sets their password', async () => {
-    await pages.account().toggleAppLock();
+    await pages.account().privacySection.appLock.label.click();
     await modals.appLock().setPasscode(appLockPassphrase);
     await components.conversationSidebar().clickAllConversationsButton();
   });
