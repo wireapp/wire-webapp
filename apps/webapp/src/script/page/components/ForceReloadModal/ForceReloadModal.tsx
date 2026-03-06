@@ -17,10 +17,13 @@
  *
  */
 
-import {FunctionComponent, useEffect, useRef} from 'react';
+import {FunctionComponent, useEffect} from 'react';
+
+import {Maybe} from 'true-myth';
 
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {t} from 'Util/LocalizerUtil';
+import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 
 import {useApplicationContext} from '../../RootProvider';
 
@@ -28,29 +31,47 @@ interface ForceReloadModalProperties {
   readonly reloadApplication: () => void;
 }
 
+const forceReloadDelayInMilliseconds = TIME_IN_MILLIS.SECOND * 60;
+
 export const ForceReloadModal: FunctionComponent<ForceReloadModalProperties> = properties => {
   const {reloadApplication} = properties;
-  const hasForceReloadModalBeenShown = useRef(false);
-  const {doesApplicationNeedForceReload} = useApplicationContext();
+  const {doesApplicationNeedForceReload, wallClock} = useApplicationContext();
 
-  useEffect(() => {
+  useEffect((): void | (() => void) => {
     if (!doesApplicationNeedForceReload) {
-      hasForceReloadModalBeenShown.current = false;
-      return;
+      return undefined;
     }
 
-    if (hasForceReloadModalBeenShown.current) {
-      return;
+    let hasApplicationReloadBeenTriggered = false;
+    let forceReloadTimeoutIdentifier: Maybe<ReturnType<typeof globalThis.setTimeout>> = Maybe.nothing();
+
+    function clearScheduledForceReloadTimeout(): void {
+      const timeoutIdentifier = forceReloadTimeoutIdentifier.unwrapOr(undefined);
+
+      if (timeoutIdentifier !== undefined) {
+        wallClock.clearTimeout(timeoutIdentifier);
+      }
+
+      forceReloadTimeoutIdentifier = Maybe.nothing();
     }
 
-    hasForceReloadModalBeenShown.current = true;
+    function triggerReloadApplicationOnce(): void {
+      if (hasApplicationReloadBeenTriggered) {
+        return;
+      }
+
+      hasApplicationReloadBeenTriggered = true;
+      clearScheduledForceReloadTimeout();
+
+      reloadApplication();
+    }
 
     PrimaryModal.show(PrimaryModal.type.ACKNOWLEDGE, {
       hideCloseBtn: true,
       hideSecondary: true,
       preventClose: true,
       primaryAction: {
-        action: reloadApplication,
+        action: triggerReloadApplicationOnce,
         text: t('forceReloadModalAction'),
       },
       text: {
@@ -58,7 +79,14 @@ export const ForceReloadModal: FunctionComponent<ForceReloadModalProperties> = p
         htmlMessage: t('forceReloadModalMessage'),
       },
     });
-  }, [doesApplicationNeedForceReload, reloadApplication]);
+    forceReloadTimeoutIdentifier = Maybe.just(
+      wallClock.setTimeout(triggerReloadApplicationOnce, forceReloadDelayInMilliseconds),
+    );
+
+    return () => {
+      clearScheduledForceReloadTimeout();
+    };
+  }, [doesApplicationNeedForceReload, reloadApplication, wallClock]);
 
   return null;
 };
