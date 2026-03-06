@@ -67,11 +67,7 @@ import {ContentState, useAppState} from './useAppState';
 import {runClientVersionCheck} from '../application-periodic-checks/runClientVersionCheck';
 import {startApplicationPeriodicChecks} from '../application-periodic-checks/startApplicationPeriodicChecks';
 import {createWallClock} from '../clock/wallClock';
-import {
-  StartupFeatureFlagMap,
-  StartupFeatureFlagName,
-  isStartupFeatureFlagEnabled,
-} from '../featureFlags/startupFeatureFlags';
+import {StartupFeatureToggleName, StartupFeatureToggles} from '../featureToggles/startupFeatureToggles';
 import {App} from '../main/app';
 import {initialiseMLSMigrationFlow} from '../mls/MLSMigration';
 import {generateConversationUrl} from '../router/routeGenerator';
@@ -90,7 +86,7 @@ interface AppMainProps {
   app: App;
   selfUser: User;
   mainView: MainViewModel;
-  startupFeatureFlags: StartupFeatureFlagMap;
+  startupFeatureToggles: StartupFeatureToggles;
   conversationState?: ConversationState;
   callState?: CallState;
   /** will block the user from being able to interact with the application (no notifications and no messages will be shown) */
@@ -101,7 +97,7 @@ export const AppMain = ({
   app,
   mainView,
   selfUser,
-  startupFeatureFlags,
+  startupFeatureToggles,
   conversationState = container.resolve(ConversationState),
   callState = container.resolve(CallState),
   locked,
@@ -306,8 +302,8 @@ export const AppMain = ({
 
   const showLeftSidebar = (isMobileView && isMobileLeftSidebarView) || (!isMobileView && !isLeftSidebarHidden);
   const showMainContent = currentTab === SidebarTabs.CELLS || !isMobileView || isMobileCentralColumnView;
-  function isFeatureFlagEnabled(featureName: StartupFeatureFlagName): boolean {
-    return isStartupFeatureFlagEnabled(startupFeatureFlags, featureName);
+  function isFeatureFlagEnabled(featureName: StartupFeatureToggleName): boolean {
+    return startupFeatureToggles.isFeatureToggleEnabled(featureName);
   }
 
   return (

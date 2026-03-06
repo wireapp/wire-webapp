@@ -22,7 +22,7 @@ import {ReactNode, useContext} from 'react';
 import {renderHook} from '@testing-library/react';
 
 import {createFakeWallClock} from '../clock/fakeWallClock';
-import {StartupFeatureFlagName} from '../featureFlags/startupFeatureFlags';
+import {StartupFeatureToggleName} from '../featureToggles/startupFeatureToggles';
 import {MainViewModel} from '../view_model/MainViewModel';
 import {
   RootContext,
@@ -39,7 +39,7 @@ interface WrapperProperties {
 interface RootProviderWrapper {
   wrapper: (properties: WrapperProperties) => ReactNode;
   fakeWallClock: ReturnType<typeof createFakeWallClock>;
-  isFeatureFlagEnabled: jest.Mock<boolean, [StartupFeatureFlagName]>;
+  isFeatureFlagEnabled: jest.Mock<boolean, [StartupFeatureToggleName]>;
 }
 
 function createRootProviderWrapper(
@@ -50,7 +50,7 @@ function createRootProviderWrapper(
   const fakeWallClock = createFakeWallClock({
     initialCurrentTimestampInMilliseconds: wallClockTimestampInMilliseconds,
   });
-  function isFeatureFlagEnabledForTest(featureName: StartupFeatureFlagName): boolean {
+  function isFeatureFlagEnabledForTest(featureName: StartupFeatureToggleName): boolean {
     return featureName === 'reliable-websocket-connection';
   }
 

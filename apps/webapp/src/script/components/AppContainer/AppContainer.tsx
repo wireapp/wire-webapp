@@ -40,7 +40,7 @@ import {useAccentColor} from './hooks/useAccentColor';
 import {useTheme} from './hooks/useTheme';
 
 import {Config, Configuration} from '../../Config';
-import {StartupFeatureFlagMap} from '../../featureFlags/startupFeatureFlags';
+import {StartupFeatureToggles} from '../../featureToggles/startupFeatureToggles';
 import {setAppLocale} from '../../localization/Localizer';
 import {App} from '../../main/app';
 import {AppMain} from '../../page/AppMain';
@@ -52,10 +52,10 @@ import {AppLoader} from '../AppLoader';
 interface AppProps {
   config: Configuration;
   clientType: ClientType;
-  startupFeatureFlags: StartupFeatureFlagMap;
+  startupFeatureToggles: StartupFeatureToggles;
 }
 
-export const AppContainer = ({config, clientType, startupFeatureFlags}: AppProps) => {
+export const AppContainer = ({config, clientType, startupFeatureToggles}: AppProps) => {
   setAppLocale();
   const app = useMemo(() => new App(container.resolve(Core), container.resolve(APIClient), config), []);
   const enableAutoLogin = Config.getConfig().FEATURE.ENABLE_AUTO_LOGIN;
@@ -118,7 +118,7 @@ export const AppContainer = ({config, clientType, startupFeatureFlags}: AppProps
               selfUser={selfUser}
               mainView={mainView}
               locked={softLockEnabled}
-              startupFeatureFlags={startupFeatureFlags}
+              startupFeatureToggles={startupFeatureToggles}
             />
           );
         }}
