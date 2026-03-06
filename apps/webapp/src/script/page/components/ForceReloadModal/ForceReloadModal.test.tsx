@@ -22,7 +22,7 @@ import {ReactElement} from 'react';
 import {render} from '@testing-library/react';
 
 import {usePrimaryModalState} from 'Components/Modals/PrimaryModal';
-import {createFakeWallClock} from 'src/script/clock/fakeWallClock';
+import {createDeterministicWallClock} from 'src/script/clock/deterministicWallClock';
 import {MainViewModel} from 'src/script/view_model/MainViewModel';
 import {t} from 'Util/LocalizerUtil';
 
@@ -73,7 +73,7 @@ function createForceReloadModalTestElement(
         doesApplicationNeedForceReload,
         isFeatureFlagEnabled: isFeatureFlagDisabledForTest,
         mainViewModel: createMainViewModelForTest(),
-        wallClock: createFakeWallClock({initialCurrentTimestampInMilliseconds: 1_111}),
+        wallClock: createDeterministicWallClock({initialCurrentTimestampInMilliseconds: 1_111}),
       }}
     >
       <ForceReloadModal reloadApplication={reloadApplication} />

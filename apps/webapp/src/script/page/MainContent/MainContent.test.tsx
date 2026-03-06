@@ -27,7 +27,7 @@ import {MainContent} from './MainContent';
 
 import {withTheme} from '../../auth/util/test/TestUtil';
 import {MainViewModel} from '../../view_model/MainViewModel';
-import {createFakeWallClock} from '../../clock/fakeWallClock';
+import {createDeterministicWallClock} from '../../clock/deterministicWallClock';
 import {RootProvider} from '../RootProvider';
 import {ContentState, useAppState} from '../useAppState';
 
@@ -66,7 +66,7 @@ describe('Preferences', () => {
     selfUser: new User('selfUser'),
     reloadApp: jest.fn(),
   };
-  const wallClock = createFakeWallClock();
+  const wallClock = createDeterministicWallClock();
 
   it('renders the right component according to view state', () => {
     const {setContentState} = useAppState.getState();
