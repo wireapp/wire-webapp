@@ -34,7 +34,7 @@ interface ForceReloadModalTestContextValue {
   readonly reloadApplication: () => void;
 }
 
-function isFeatureFlagDisabledForTest(): boolean {
+function isFeatureToggleDisabledForTest(): boolean {
   return false;
 }
 
@@ -71,7 +71,7 @@ function createForceReloadModalTestElement(
     <RootProvider
       value={{
         doesApplicationNeedForceReload,
-        isFeatureFlagEnabled: isFeatureFlagDisabledForTest,
+        isFeatureToggleEnabled: isFeatureToggleDisabledForTest,
         mainViewModel: createMainViewModelForTest(),
         wallClock: createDeterministicWallClock({initialCurrentTimestampInMilliseconds: 1_111}),
       }}

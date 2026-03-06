@@ -67,7 +67,7 @@ import {ContentState, useAppState} from './useAppState';
 import {runClientVersionCheck} from '../application-periodic-checks/runClientVersionCheck';
 import {startApplicationPeriodicChecks} from '../application-periodic-checks/startApplicationPeriodicChecks';
 import {createWallClock} from '../clock/wallClock';
-import {StartupFeatureToggleName, StartupFeatureToggles} from '../featureToggles/startupFeatureToggles';
+import {StartupFeatureToggles} from '../featureToggles/startupFeatureToggles';
 import {App} from '../main/app';
 import {initialiseMLSMigrationFlow} from '../mls/MLSMigration';
 import {generateConversationUrl} from '../router/routeGenerator';
@@ -302,10 +302,6 @@ export const AppMain = ({
 
   const showLeftSidebar = (isMobileView && isMobileLeftSidebarView) || (!isMobileView && !isLeftSidebarHidden);
   const showMainContent = currentTab === SidebarTabs.CELLS || !isMobileView || isMobileCentralColumnView;
-  function isFeatureFlagEnabled(featureName: StartupFeatureToggleName): boolean {
-    return startupFeatureToggles.isFeatureToggleEnabled(featureName);
-  }
-
   return (
     <StyledApp
       themeId={THEME_ID.DEFAULT}
@@ -315,7 +311,14 @@ export const AppMain = ({
       data-uie-value="is-loaded"
     >
       {!locked && <WindowTitleUpdater />}
-      <RootProvider value={{mainViewModel: mainView, wallClock, doesApplicationNeedForceReload, isFeatureFlagEnabled}}>
+      <RootProvider
+        value={{
+          mainViewModel: mainView,
+          wallClock,
+          doesApplicationNeedForceReload,
+          isFeatureToggleEnabled: startupFeatureToggles.isFeatureToggleEnabled,
+        }}
+      >
         <ErrorBoundary FallbackComponent={ErrorFallback}>
           <ForceReloadModal reloadApplication={app.refresh} />
           {Config.getConfig().FEATURE.ENABLE_DEBUG && <ConfigToolbar />}
