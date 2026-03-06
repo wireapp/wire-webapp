@@ -53,7 +53,6 @@ export class ConversationPage {
   /** Messages in conversation, only contains message items which have been sent successfully */
   readonly messages: Locator;
   readonly messageDetails: Locator;
-  readonly emojiSuggestionOptions: Locator;
   readonly messageItems: Locator;
   readonly filesTab: Locator;
   readonly typingIndicator: Locator;
@@ -100,7 +99,6 @@ export class ConversationPage {
       `[data-uie-name="item-message"]:not([data-uie-send-status="1"]):not([data-uie-send-status="-1"]):not(.system-message)`,
     );
     this.messageDetails = page.locator('#message-details');
-    this.emojiSuggestionOptions = page.getByRole('listbox', {name: 'Typeahead menu'}).getByRole('button');
     this.filesTab = page.locator('#conversation-tab-files');
     this.typingIndicator = page.getByTestId('typing-indicator-title');
     this.itemPendingRequest = page.getByTestId('item-pending-requests');

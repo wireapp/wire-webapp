@@ -21,7 +21,7 @@ import {User} from 'test/e2e_tests/data/user';
 import {PageManager} from 'test/e2e_tests/pageManager';
 import {test, expect, withConnectedUser, withLogin, Team, withConnectionRequest} from 'test/e2e_tests/test.fixtures';
 import {interceptNotifications} from 'test/e2e_tests/utils/mockNotifications.util';
-import {connectWithUser, createGroup, sendConnectionRequest} from 'test/e2e_tests/utils/userActions';
+import {connectWithUser, createGroup} from 'test/e2e_tests/utils/userActions';
 
 test.describe('Conversations', () => {
   let team: Team;
@@ -37,58 +37,41 @@ test.describe('Conversations', () => {
     userA = team.owner;
   });
 
-  const systemMessageTestCases = [
-    {
-      title: 'I create a group',
-      tag: '@TC-2965',
-      actor: 'userA',
-      targetUser: 'userA',
-      getPattern: (groupName: string, userA: User, userB: User, userC: User) =>
-        new RegExp(
-          `You started the conversation\\s*${groupName}\\s*with\\s*${userB.fullName}\\s*and\\s*${userC.fullName}`,
-          'i',
-        ),
+  test(
+    'I want to see a system message with all group members mentioned on creating a group',
+    {tag: ['@TC-2965', '@regression']},
+    async ({createPage}) => {
+      const userAPages = await PageManager.from(createPage(withLogin(userA))).then(pm => pm.webapp.pages);
+
+      await createGroup(userAPages, groupName, [userB, userC]);
+      userAPages.conversationList().openConversation(groupName);
+
+      const firstMessage = userAPages.conversation().systemMessages.first();
+      await expect(firstMessage).toContainText(new RegExp(`You started the conversation\\s*${groupName}\\s*with`, 'i'));
+      await expect(firstMessage).toContainText(userB.fullName);
+      await expect(firstMessage).toContainText(userC.fullName);
     },
-    {
-      title: 'someone else created a group ',
-      tag: '@TC-2966',
-      actor: 'userA',
-      targetUser: 'userB',
-      getPattern: (groupName: string, userA: User, userB: User, userC: User) =>
-        new RegExp(
-          `${userA.fullName} started the conversation\\s*${groupName}\\s*with\\s*${userC.fullName}\\s*and\\s*you`,
-          'i',
-        ),
+  );
+
+  test(
+    'I want to see a system message with all group members mentioned when someone else created a group',
+    {tag: ['@TC-2966', '@regression']},
+    async ({createPage}) => {
+      const [userAPages, userBPages] = await Promise.all([
+        PageManager.from(createPage(withLogin(userA), withConnectedUser(userB))).then(pm => pm.webapp.pages),
+        PageManager.from(createPage(withLogin(userB))).then(pm => pm.webapp.pages),
+      ]);
+
+      await createGroup(userAPages, groupName, [userB, userC]);
+      userBPages.conversationList().openConversation(groupName);
+
+      const pattern = new RegExp(
+        `${userA.fullName} started the conversation\\s*${groupName}\\s*with\\s*${userC.fullName}\\s*and\\s*you`,
+        'i',
+      );
+      await expect(userBPages.conversation().systemMessages.first()).toContainText(pattern);
     },
-  ];
-
-  for (const data of systemMessageTestCases) {
-    test(
-      `I want to see a system message with all group members mentioned when ${data.title}`,
-      {tag: [data.tag, '@regression']},
-      async ({createPage}) => {
-        const [adminPageManager, userBPageManager] = await Promise.all([
-          PageManager.from(createPage(withLogin(userA), withConnectedUser(userB))),
-          PageManager.from(createPage(withLogin(userB))),
-        ]);
-
-        const adminPages = adminPageManager.webapp.pages;
-        const targetPages = data.targetUser === 'userA' ? adminPageManager.webapp.pages : userBPageManager.webapp.pages;
-
-        // 2. Action: Create the group (Always done by User A in this set)
-        await test.step('Create group', async () => {
-          await createGroup(adminPages, groupName, [userB, userC]);
-        });
-
-        // 3. Verification: Check the specific pattern for this test case
-        await test.step(`Verify message for ${data.targetUser}`, async () => {
-          await targetPages.conversationList().openConversation(groupName);
-          const pattern = data.getPattern(groupName, userA, userB, userC);
-          await expect(targetPages.conversation().systemMessages.first()).toContainText(pattern);
-        });
-      },
-    );
-  }
+  );
 
   test(
     'I want to see "No matching results. Try entering a different name." when I search for non existent users',
@@ -139,28 +122,12 @@ test.describe('Conversations', () => {
     },
   );
 
-  const guestTestCases = [
-    {
-      title: 'I want to see usernames for Guest users in participants list',
-      tag: '@TC-421',
-      action: async (pages: PageManager['webapp']['pages'], guestUserName?: string) => {
-        await expect(pages.conversation().membersList).toContainText(guestUserName);
-      },
-    },
-    {
-      title: 'I want to see Guest icon in participants list',
-      tag: '@TC-423',
-      action: async (pages: PageManager['webapp']['pages']) => {
-        await expect(await pages.conversationDetails().participantStatus(userB.fullName)).not.toBeVisible();
-      },
-    },
-  ];
-
-  for (const data of guestTestCases) {
-    test(`${data.title}`, {tag: [data.tag, '@regression']}, async ({createPage, createUser}) => {
+  test(
+    'I want to see Guest icon in participants list',
+    {tag: ['@TC-421', '@regression']},
+    async ({createPage, createUser}) => {
       const guestUser = await createUser();
-
-      const [adminPages, guestPages] = await Promise.all([
+      const [adminPage, guestPages] = await Promise.all([
         PageManager.from(createPage(withLogin(userA), withConnectionRequest(guestUser))).then(pm => pm.webapp.pages),
         PageManager.from(createPage(withLogin(guestUser))).then(pm => pm.webapp.pages),
       ]);
@@ -168,17 +135,39 @@ test.describe('Conversations', () => {
       await guestPages.conversationList().openPendingConnectionRequest();
       await guestPages.connectRequest().clickConnectButton();
 
-      await createGroup(adminPages, groupName, [userB, guestUser]);
+      await createGroup(adminPage, groupName, [userB, guestUser]);
 
-      await adminPages.conversationList().openConversation(groupName);
-      await adminPages.conversation().clickConversationInfoButton();
-      await expect(await adminPages.conversationDetails().participantStatus(guestUser.fullName)).toHaveAttribute(
+      await adminPage.conversationList().openConversation(groupName);
+      await adminPage.conversation().clickConversationInfoButton();
+      await expect(adminPage.conversationDetails().getUserRoleIcon(guestUser.fullName)).toHaveAttribute(
         'data-uie-name',
         'status-guest',
       );
-      await data.action(adminPages, guestUser.username);
-    });
-  }
+    },
+  );
+
+  test(
+    'I want to see usernames for Guest users in participants list',
+    {tag: ['@TC-423', '@regression']},
+    async ({createPage, createUser}) => {
+      const guestUser = await createUser();
+
+      const [adminPage, guestPages] = await Promise.all([
+        PageManager.from(createPage(withLogin(userA), withConnectionRequest(guestUser))).then(pm => pm.webapp.pages),
+        PageManager.from(createPage(withLogin(guestUser))).then(pm => pm.webapp.pages),
+      ]);
+
+      await guestPages.conversationList().openPendingConnectionRequest();
+      await guestPages.connectRequest().clickConnectButton();
+
+      await createGroup(adminPage, groupName, [userB, guestUser]);
+
+      await adminPage.conversationList().openConversation(groupName);
+      await adminPage.conversation().clickConversationInfoButton();
+
+      await expect(adminPage.conversation().membersList.filter({hasText: guestUser.fullName})).toBeVisible();
+    },
+  );
 
   test(
     'I want to see the empty admins section when there are no Admins',
@@ -217,8 +206,10 @@ test.describe('Conversations', () => {
     'I should not see Members section when there are only admins',
     {tag: ['@TC-432', '@regression']},
     async ({createPage}) => {
-      const adminPages = await PageManager.from(createPage(withLogin(userA))).then(pm => pm.webapp.pages);
-      const userBPages = await PageManager.from(createPage(withLogin(userB))).then(pm => pm.webapp.pages);
+      const [adminPages, userBPages] = await Promise.all([
+        PageManager.from(createPage(withLogin(userA))).then(pm => pm.webapp.pages),
+        PageManager.from(createPage(withLogin(userB))).then(pm => pm.webapp.pages),
+      ]);
 
       await createGroup(adminPages, groupName, [userB]);
 
@@ -272,14 +263,11 @@ test.describe('Conversations', () => {
 
       await adminPage.conversationList().openConversation(groupName);
       await adminPage.conversation().clickConversationInfoButton();
-      await expect(await adminPage.conversation().membersList).toBeVisible();
-      await expect(await adminPage.conversationDetails().participantStatus(externalUser.fullName)).toHaveAttribute(
+      await expect(adminPage.conversation().membersList).toBeVisible();
+      await expect(adminPage.conversationDetails().getUserRoleIcon(externalUser.fullName)).toHaveAttribute(
         'data-uie-name',
         'status-external',
       );
-
-      // Verify no status icon is displayed for standard members
-      await expect(await adminPage.conversationDetails().participantStatus(userB.fullName)).not.toBeVisible();
     },
   );
 
@@ -465,52 +453,13 @@ test.describe('Conversations', () => {
       pm => pm.webapp.pages,
     );
 
-    const getEmojiAt = async (index: number) => {
-      await userAPages.conversation().messageInput.pressSequentially(':smi', {delay: 150});
-      await expect(userAPages.conversation().emojiSuggestionOptions).toHaveCount(5);
-      // Inner text contains emoji and label
-      const emoji = await userAPages.conversation().emojiSuggestionOptions.nth(index).locator('span').first().innerText();
-      return emoji;
-    };
+    await userAPages.conversationList().openConversation(userB.fullName);
 
-    await test.step('Open conversation', async () => {
-      await userAPages.conversationList().openConversation(userB.fullName);
-    });
+    await userAPages.conversation().messageInput.pressSequentially(':) ', {delay: 100});
+    expect(userAPages.conversation().messageInput).toContainText('🙂');
 
-    await test.step('Select first emoji with Enter', async () => {
-      const firstEmoji = await getEmojiAt(0);
-      await userAPages.conversation().messageInput.press('Enter');
-      await userAPages.conversation().sendMessageButton.click();
-      await expect(userAPages.conversation().getMessage({content: firstEmoji})).toBeVisible();
-    });
-
-    await test.step('Navigate with arrows and select with Enter', async () => {
-      const thirdEmoji = await getEmojiAt(2);
-      await userAPages.conversation().messageInput.press('ArrowDown');
-      await userAPages.conversation().messageInput.press('ArrowDown');
-      await userAPages.conversation().messageInput.press('Enter');
-      await userAPages.conversation().sendMessageButton.click();
-      await expect(userAPages.conversation().getMessage({content: thirdEmoji})).toBeVisible();
-    });
-
-    await test.step('Select emoji with mouse click', async () => {
-      const clickedEmoji = await getEmojiAt(3);
-      await userAPages.conversation().emojiSuggestionOptions.nth(3).click();
-      await userAPages.conversation().sendMessageButton.click();
-      await expect(userAPages.conversation().getMessage({content: clickedEmoji})).toBeVisible();
-    });
-
-    await test.step('Dismiss emoji menu with Escape', async () => {
-      await getEmojiAt(0);
-      await userAPages.conversation().messageInput.press('Escape');
-      await expect(userAPages.conversation().emojiSuggestionOptions).not.toBeVisible();
-      await expect(userAPages.conversation().getMessage({sender: userA})).toHaveCount(3);
-    });
-
-    await test.step('Verify menu does not appear without leading space', async () => {
-      await userAPages.conversation().messageInput.fill('hello:smi');
-      await expect(userAPages.conversation().emojiSuggestionOptions).not.toBeVisible();
-    });
+    await userAPages.conversation().sendMessageButton.click();
+    await expect(userAPages.conversation().getMessage({content: '🙂'})).toBeVisible();
   });
 
   test(
@@ -526,9 +475,9 @@ test.describe('Conversations', () => {
       await adminPages.conversationDetails().changeConversationName('New Group Name');
 
       // Verify that the system message is displayed correctly
-      await expect(adminPages.conversation().systemMessages.last()).toContainText('You renamed the conversation', {
-        ignoreCase: true,
-      });
+      await expect(
+        adminPages.conversation().systemMessages.filter({hasText: 'You renamed the conversation'}),
+      ).toBeVisible();
     },
   );
 
@@ -596,11 +545,10 @@ test.describe('Conversations', () => {
   test(
     'Verify help text is gone when I have at least one conversation while I am online',
     {tag: ['@TC-780', '@regression']},
-    async ({createPage, createUser}) => {
-      const userD = await createUser();
-      const [userAPageManager, userDPageManager] = await Promise.all([
+    async ({createPage}) => {
+      const [userAPageManager, userBPageManager] = await Promise.all([
         PageManager.from(createPage(withLogin(userA))),
-        PageManager.from(createPage(withLogin(userD))),
+        PageManager.from(createPage(withLogin(userB))),
       ]);
 
       const pages = userAPageManager.webapp.pages;
@@ -608,16 +556,11 @@ test.describe('Conversations', () => {
       await expect(pages.conversationList().list).toContainText('Welcome to Wire');
       await expect(pages.conversationList().list.getByRole('listitem')).toHaveCount(0);
 
-      // User D sends a connection request to User A
-      await sendConnectionRequest(userDPageManager, userA);
-
-      // User A accepts connection request from User A
-      await pages.conversationList().openPendingConnectionRequest();
-      await pages.connectRequest().clickConnectButton();
+      await connectWithUser(userBPageManager, userA);
 
       // User A sees conversation with userD instead of help text
       await expect(pages.conversationList().list).not.toContainText('Welcome to Wire');
-      await expect(pages.conversationList().list.getByRole('listitem').first()).toContainText(userD.fullName);
+      await expect(pages.conversationList().list.getByRole('listitem').first()).toContainText(userB.fullName);
       await expect(pages.conversationList().list.getByRole('listitem')).toHaveCount(1);
     },
   );

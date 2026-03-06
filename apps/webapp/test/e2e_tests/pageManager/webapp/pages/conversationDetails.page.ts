@@ -112,11 +112,11 @@ export class ConversationDetailsPage {
     await this.getLocatorByUser(fullName).click();
   }
 
-  async participantStatus(fullName: string) {
+  getUserRoleIcon(fullName: string) {
     return this.getLocatorByUser(fullName).getByTestId(/^status-(external|guest|admin)$/);
   }
 
-  getParticipantStatus(fullName: string) {
+  getUserAvailabilityIcon(fullName: string) {
     return this.getLocatorByUser(fullName).getByTestId('status-availability-icon');
   }
 
