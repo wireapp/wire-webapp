@@ -54,17 +54,50 @@ const serverConfig = generateServerConfig(
 
 The `Env` type defines all supported environment variables. This section documents environment variables **currently used by this library's config generators** (`src/client.config.ts` and `src/server.config.ts`), including effective default values and purpose.
 
+### Configuration sources and priority
+
+Configuration values are resolved from multiple sources. The effective value priority is:
+
+1. **Process environment variables** (highest priority)
+  - Example: AWS Elastic Beanstalk / container runtime environment variables.
+  - `dotenv-extended` is loaded with `includeProcessEnv: true`, so process env wins.
+2. **`.env` file**
+  - Local or deployment-specific overrides checked into the deployment artifact/environment.
+3. **`.env.defaults` file**
+  - Baseline defaults copied from configuration repositories.
+4. **Code-level fallback in generators** (lowest priority)
+  - Example: `MAX_API_VERSION` fallback to `13`, `PORT` fallback to `21080`.
+
+If `FEDERATION` is not set, `APP_BASE`, `BACKEND_REST`, and `BACKEND_WS` must resolve to non-empty values (otherwise config generation throws an error).
+
+### How configuration repositories are used
+
+- `apps/webapp/app-config/package.json` pins configuration repositories and versions.
+- `webapp:configure` runs `copy-config` using `apps/webapp/.copyconfigrc.js`.
+- That step copies repository content into `apps/webapp/resource/` and writes repo `.env.defaults` into workspace root `.env.defaults`.
+- Configuration selection logic in `.copyconfigrc.js`:
+  - `DISTRIBUTION` can select a custom distribution,
+  - tagged production/staging builds select `master`,
+  - otherwise defaults to `staging`,
+  - `FORCED_CONFIG_URL` can override repo selection.
+
+### What "override" means
+
+- **Deployment Override** in tables means environment-specific intentional value changes on top of baseline defaults.
+- Typical deployment overrides are done through process env (AWS) or `.env`.
+- If no deployment-specific override is set, the effective value comes from `.env.defaults` and/or code fallback.
+
 Notes:
 
 - Defaults below are based on generator behavior in `src/client.config.ts` and `src/server.config.ts`.
 - Where an environment variable is read directly without fallback logic, the value is expected to come from deployment env files (for example `.env.defaults`/`.env`).
 - `From .env.defaults` means the value is expected from environment files and is present in repository defaults.
 - `No default in .env.defaults` means the value must be provided per deployment/environment.
-- `Override` values come from the historical list where available.
+- `Deployment Override` values come from the historical list where available.
 
 ### Core / Server
 
-| Environment Variable | No override | Used for | Override |
+| Environment Variable | Default / Source | Used for | Deployment Override |
 | --- | --- | --- | --- |
 | `PORT` | `21080` when empty/invalid/`0` | HTTP server port | No override |
 | `ENFORCE_HTTPS` | `true` (unless explicitly `false`) | Enforce HTTPS redirects/behavior in server config | No override |
@@ -86,7 +119,7 @@ Notes:
 
 ### Feature toggles
 
-| Environment Variable | No override | Used for | Override |
+| Environment Variable | Default / Source | Used for | Deployment Override |
 | --- | --- | --- | --- |
 | `FEATURE_ENABLE_CELLS` | `false` | Enables Cells integration features | No override |
 | `FEATURE_CELLS_INIT_WITH_ZAUTH_TOKEN` | `false` | Initialize Cells with ZAuth token | No override |
@@ -105,7 +138,7 @@ Notes:
 | `FEATURE_ENABLE_DEBUG` | `false` | Debug mode toggles in client/server (also relaxes CSP connect-src in server) | No override |
 | `FEATURE_ENABLE_DETACHED_CALLING_WINDOW` | `false` | Pop-out calling window | `true` |
 | `FEATURE_ENABLE_DOMAIN_DISCOVERY` | `true` | Domain discovery in login/auth flows | `false` |
-| `FEATURE_ENABLE_ENCRYPTION_AT_REST` | `false` | Encryption-at-rest client behavior switch | Default (unless explicitly required) |
+| `FEATURE_ENABLE_ENCRYPTION_AT_REST` | `false` | Encryption-at-rest client behavior switch | No override (unless explicitly required) |
 | `FEATURE_ENABLE_ENFORCE_DESKTOP_APPLICATION_ONLY` | `false` | Restrict web usage to desktop-app context | No override |
 | `FEATURE_ENABLE_EXTRA_CLIENT_ENTROPY` | `false` | Extra entropy during client creation | No override |
 | `FEATURE_ENABLE_IN_CALL_HAND_RAISE` | `false` | In-call hand raise feature | `true` |
@@ -128,7 +161,7 @@ Notes:
 
 ### Numeric and limits
 
-| Environment Variable | No override | Used for | Override |
+| Environment Variable | Default / Source | Used for | Deployment Override |
 | --- | --- | --- | --- |
 | `FEATURE_APPLOCK_SCHEDULED_TIMEOUT` | `null` | Scheduled app lock timeout (seconds) | No override |
 | `FEATURE_MAX_USERS_TO_PING_WITHOUT_ALERT` | `4` | Ping confirmation threshold | No override |
@@ -140,7 +173,7 @@ Notes:
 
 ### Cells
 
-| Environment Variable | No override | Used for | Override |
+| Environment Variable | Default / Source | Used for | Deployment Override |
 | --- | --- | --- | --- |
 | `CELLS_TOKEN_SHARED_SECRET` | No default in `.env.defaults` | Shared secret for Cells token logic | No override |
 | `CELLS_PYDIO_SEGMENT` | No default in `.env.defaults` | Cells/Pydio segment config | No override |
@@ -152,7 +185,7 @@ Notes:
 
 ### Telemetry
 
-| Environment Variable | No override | Used for | Override |
+| Environment Variable | Default / Source | Used for | Deployment Override |
 | --- | --- | --- | --- |
 | `COUNTLY_API_KEY` | From `.env.defaults` | Countly API key | No override |
 | `COUNTLY_ENABLE_LOGGING` | `false` | Enable Countly debug logging | No override |
@@ -164,7 +197,7 @@ Notes:
 
 ### Uploads and security policy
 
-| Environment Variable | No override | Used for | Override |
+| Environment Variable | Default / Source | Used for | Deployment Override |
 | --- | --- | --- | --- |
 | `FEATURE_ALLOWED_FILE_UPLOAD_EXTENSIONS` | `*` | Allowed file upload extensions | Custom allow-list per agreement |
 | `CSP_EXTRA_CONNECT_SRC` | empty list | Additional `connect-src` CSP entries | No override |
@@ -181,7 +214,7 @@ Notes:
 
 ### URL configuration
 
-| Environment Variable | No override | Used for | Override |
+| Environment Variable | Default / Source | Used for | Deployment Override |
 | --- | --- | --- | --- |
 | `URL_ACCOUNT_BASE` | From `.env.defaults` | Account service base URL | No override |
 | `URL_MOBILE_BASE` | No default in `.env.defaults` | Mobile client base URL | No override |
