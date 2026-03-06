@@ -38,7 +38,7 @@ interface WrapperProperties {
 
 interface RootProviderWrapper {
   wrapper: (properties: WrapperProperties) => ReactNode;
-  isFeatureFlagEnabled: jest.Mock<boolean, [StartupFeatureToggleName]>;
+  isFeatureToggleEnabled: jest.Mock<boolean, [StartupFeatureToggleName]>;
   deterministicWallClock: ReturnType<typeof createDeterministicWallClock>;
 }
 
@@ -50,15 +50,22 @@ function createRootProviderWrapper(
   const deterministicWallClock = createDeterministicWallClock({
     initialCurrentTimestampInMilliseconds: wallClockTimestampInMilliseconds,
   });
-  function isFeatureFlagEnabledForTest(featureName: StartupFeatureToggleName): boolean {
+  function isFeatureToggleEnabledForTest(featureName: StartupFeatureToggleName): boolean {
     return featureName === 'reliable-websocket-connection';
   }
 
-  const isFeatureFlagEnabled = jest.fn(isFeatureFlagEnabledForTest);
+  const isFeatureToggleEnabled = jest.fn(isFeatureToggleEnabledForTest);
 
   function wrapper(properties: WrapperProperties): ReactNode {
     const wrappedChildren = (
-      <RootProvider value={{mainViewModel, wallClock: deterministicWallClock, doesApplicationNeedForceReload, isFeatureFlagEnabled}}>
+      <RootProvider
+        value={{
+          mainViewModel,
+          wallClock: deterministicWallClock,
+          doesApplicationNeedForceReload,
+          isFeatureToggleEnabled,
+        }}
+      >
         {properties.children}
       </RootProvider>
     );
@@ -66,7 +73,7 @@ function createRootProviderWrapper(
     return wrappedChildren;
   }
 
-  return {wrapper, deterministicWallClock, isFeatureFlagEnabled};
+  return {wrapper, deterministicWallClock, isFeatureToggleEnabled};
 }
 
 function getRootContextValue(): RootContextValue | null {
@@ -114,12 +121,12 @@ describe('RootProvider', () => {
     expect(result.current.doesApplicationNeedForceReload).toBe(true);
   });
 
-  it('provides startup feature flag helper through useApplicationContext()', function () {
-    const {wrapper, isFeatureFlagEnabled} = createRootProviderWrapper(mainViewModel, 9_999, true);
+  it('provides startup feature toggle helper through useApplicationContext()', function () {
+    const {wrapper, isFeatureToggleEnabled} = createRootProviderWrapper(mainViewModel, 9_999, true);
 
     const {result} = renderHook(useApplicationContext, {wrapper});
 
-    expect(result.current.isFeatureFlagEnabled('reliable-websocket-connection')).toBe(true);
-    expect(isFeatureFlagEnabled).toHaveBeenCalledWith('reliable-websocket-connection');
+    expect(result.current.isFeatureToggleEnabled('reliable-websocket-connection')).toBe(true);
+    expect(isFeatureToggleEnabled).toHaveBeenCalledWith('reliable-websocket-connection');
   });
 });

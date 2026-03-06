@@ -27,7 +27,7 @@ export type RootContextValue = {
   readonly mainViewModel: MainViewModel;
   readonly wallClock: WallClock;
   readonly doesApplicationNeedForceReload: boolean;
-  readonly isFeatureFlagEnabled: (featureName: StartupFeatureToggleName) => boolean;
+  readonly isFeatureToggleEnabled: (featureName: StartupFeatureToggleName) => boolean;
 };
 
 export const RootContext = createContext<RootContextValue | null>(null);

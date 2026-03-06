@@ -46,7 +46,7 @@ const mockDevicesHandler = {
   currentDeviceId: () => 'mock-device-id',
 } as unknown as MediaDevicesHandler;
 
-function isFeatureFlagDisabledForTest(): boolean {
+function isFeatureToggleDisabledForTest(): boolean {
   return false;
 }
 
@@ -79,7 +79,7 @@ describe('Preferences', () => {
             mainViewModel,
             wallClock,
             doesApplicationNeedForceReload: false,
-            isFeatureFlagEnabled: isFeatureFlagDisabledForTest,
+            isFeatureToggleEnabled: isFeatureToggleDisabledForTest,
           }}
         >
           <MainContent {...defaultParams} />
