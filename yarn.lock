@@ -11533,7 +11533,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@wireapp/config@workspace:libraries/config"
   dependencies:
-    fs-extra: "npm:11.3.3"
+    fs-extra: "npm:11.3.4"
     logdown: "npm:3.3.1"
   languageName: unknown
   linkType: soft
@@ -11748,7 +11748,7 @@ __metadata:
     express: "npm:4.22.1"
     express-sitemap-xml: "npm:3.1.0"
     express-useragent: "npm:1.0.15"
-    fs-extra: "npm:11.3.3"
+    fs-extra: "npm:11.3.4"
     geolite2: "npm:1.3.0"
     hbs: "npm:4.2.0"
     helmet: "npm:8.1.0"
@@ -17536,6 +17536,17 @@ __metadata:
     jsonfile: "npm:^6.0.1"
     universalify: "npm:^2.0.0"
   checksum: 10/daeaefafbebe8fa6efd2fb96fc926f2c952be5877811f00a6794f0d64e0128e3d0d93368cd328f8f063b45deacf385c40e3d931aa46014245431cd2f4f89c67a
+  languageName: node
+  linkType: hard
+
+"fs-extra@npm:11.3.4":
+  version: 11.3.4
+  resolution: "fs-extra@npm:11.3.4"
+  dependencies:
+    graceful-fs: "npm:^4.2.0"
+    jsonfile: "npm:^6.0.1"
+    universalify: "npm:^2.0.0"
+  checksum: 10/1b8deea9c540a2efe63c750bc9e1ba6238115579d1571d67fe8fb58e3fb6df19aba29fd4ebb81217cf0bf5bce0df30ca68dbc3e06f6652b856edd385ce0ff649
   languageName: node
   linkType: hard
 
@@ -29977,7 +29988,7 @@ __metadata:
     eslint-plugin-testing-library: "npm:7.16.0"
     eslint-plugin-unused-imports: "npm:4.4.1"
     fake-indexeddb: "npm:6.2.5"
-    fs-extra: "npm:11.3.3"
+    fs-extra: "npm:11.3.4"
     generate-changelog: "npm:1.8.0"
     http-status-codes: "npm:2.3.0"
     jest: "npm:29.7.0"
