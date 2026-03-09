@@ -176,6 +176,17 @@ class Server {
       res.setHeader('X-XSS-Protection', '1; mode=block');
       next();
     });
+    // Scope clipboard delegation to self and the configured Collabora origin only.
+    // Falls back to self-only when CELLS_PYDIO_URL is not configured.
+    const collaboraOrigin = this.clientConfig.CELLS_PYDIO_URL;
+    const clipboardAllowlist = collaboraOrigin ? `(self "${collaboraOrigin}")` : '(self)';
+    this.app.use((_req, res, next) => {
+      res.setHeader(
+        'Permissions-Policy',
+        `clipboard-read=${clipboardAllowlist}, clipboard-write=${clipboardAllowlist}`,
+      );
+      next();
+    });
   }
 
   private initStaticRoutes() {
