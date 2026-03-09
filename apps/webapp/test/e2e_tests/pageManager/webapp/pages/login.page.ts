@@ -39,9 +39,14 @@ export class LoginPage {
     this.publicComputerCheckbox = page.getByText('This is a public computer');
   }
 
-  async login(user: Pick<User, 'email' | 'password'>) {
+  async login(user: Pick<User, 'email' | 'password'>, options?: {publicComputer?: boolean}) {
     await this.emailInput.fill(user.email);
     await this.passwordInput.fill(user.password);
+
+    if (options?.publicComputer) {
+      await this.publicComputerCheckbox.click();
+    }
+
     await this.signInButton.click();
   }
 }
