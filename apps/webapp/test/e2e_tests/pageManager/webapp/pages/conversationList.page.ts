@@ -24,6 +24,7 @@ import {User} from 'test/e2e_tests/data/user';
 export class ConversationListPage {
   readonly page: Page;
 
+  readonly list: Locator;
   readonly blockConversationMenuButton: Locator;
   readonly createGroupButton: Locator;
   readonly pendingConnectionRequest: Locator;
@@ -43,6 +44,7 @@ export class ConversationListPage {
   constructor(page: Page) {
     this.page = page;
 
+    this.list = page.getByRole('list', {name: 'Conversation list'});
     this.blockConversationMenuButton = page.getByRole('menu').getByRole('button', {name: 'Block'});
     this.pendingConnectionRequest = page.locator('[data-uie-name="connection-request"]');
     this.createGroupButton = page.getByTestId('conversation-list-header').getByTestId('go-create-group');
