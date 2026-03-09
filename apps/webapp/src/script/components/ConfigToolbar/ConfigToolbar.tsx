@@ -30,6 +30,7 @@ import {useClickOutside} from 'src/script/hooks/useClickOutside';
 import {CoreCryptoLogLevel} from 'Util/DebugUtil';
 
 import {wrapperStyles} from './ConfigToolbar.styles';
+import {WebSocketConnectionStateDebugInfo} from './WebSocketConnectionStateDebugInfo';
 
 export function ConfigToolbar() {
   const [showConfig, setShowConfig] = useState(false);
@@ -301,6 +302,7 @@ export function ConfigToolbar() {
 
       <h3>Debug Functions</h3>
 
+      <WebSocketConnectionStateDebugInfo />
       <Button onClick={() => window.wire?.app?.debug?.reconnectWebSocket()}>Reconnect WebSocket</Button>
       <Button onClick={() => window.wire?.app?.debug?.enablePressSpaceToUnmute()}>Enable Press Space To Unmute</Button>
       <Button onClick={() => window.wire?.app?.debug?.disablePressSpaceToUnmute()}>
