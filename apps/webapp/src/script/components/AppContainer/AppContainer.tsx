@@ -39,6 +39,7 @@ import {isDetachedCallingFeatureEnabled} from 'Util/isDetachedCallingFeatureEnab
 import {useAccentColor} from './hooks/useAccentColor';
 import {useTheme} from './hooks/useTheme';
 
+import {WallClock} from '../../clock/wallClock';
 import {Config, Configuration} from '../../Config';
 import {StartupFeatureToggles} from '../../featureToggles/startupFeatureToggles';
 import {setAppLocale} from '../../localization/Localizer';
@@ -49,13 +50,14 @@ import {Core} from '../../service/CoreSingleton';
 import {MainViewModel} from '../../view_model/MainViewModel';
 import {AppLoader} from '../AppLoader';
 
-interface AppProps {
-  config: Configuration;
-  clientType: ClientType;
-  startupFeatureToggles: StartupFeatureToggles;
-}
+type AppProps = {
+  readonly config: Configuration;
+  readonly clientType: ClientType;
+  readonly startupFeatureToggles: StartupFeatureToggles;
+  readonly wallClock: WallClock;
+};
 
-export const AppContainer = ({config, clientType, startupFeatureToggles}: AppProps) => {
+export const AppContainer = ({config, clientType, startupFeatureToggles, wallClock}: AppProps) => {
   setAppLocale();
   const app = useMemo(() => new App(container.resolve(Core), container.resolve(APIClient), config), []);
   const enableAutoLogin = Config.getConfig().FEATURE.ENABLE_AUTO_LOGIN;
@@ -119,6 +121,7 @@ export const AppContainer = ({config, clientType, startupFeatureToggles}: AppPro
               mainView={mainView}
               locked={softLockEnabled}
               startupFeatureToggles={startupFeatureToggles}
+              wallClock={wallClock}
             />
           );
         }}
