@@ -40,10 +40,8 @@ import {SIGN_OUT_REASON} from '../auth/SignOutReason';
 import {createWallClock} from '../clock/wallClock';
 import {Config} from '../Config';
 import {createStartupFeatureTogglesFromLocationSearch} from '../featureToggles/startupFeatureToggles';
-import {
-  createBrowserWebSocketConnection,
-  createManagedWebSocketConnection,
-} from '../webSocketConnection/createManagedWebSocketConnection';
+import {createBrowserWebSocketConnection} from '../webSocketConnection/createBrowserWebSocketConnection';
+import {createManagedWebSocketConnection} from '../webSocketConnection/createManagedWebSocketConnection';
 import {createNoopManagedWebSocketConnection} from '../webSocketConnection/createNoopManagedWebSocketConnection';
 
 document.addEventListener('DOMContentLoaded', async () => {

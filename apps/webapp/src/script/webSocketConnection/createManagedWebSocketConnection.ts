@@ -63,10 +63,6 @@ function toWebSocketConnectionState(snapshot: ManagedWebSocketConnectionStateSna
   return webSocketConnectionState.offline;
 }
 
-export function createBrowserWebSocketConnection(connectionUrl: string): WebSocketConnectionTransport {
-  return new WebSocket(connectionUrl);
-}
-
 export function createManagedWebSocketConnection(
   dependencies: CreateManagedWebSocketConnectionDependencies,
 ): ManagedWebSocketConnection {
