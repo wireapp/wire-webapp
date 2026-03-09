@@ -30,7 +30,7 @@ const HTTPS_URL_PATTERN = /^https:\/\/\S+$/;
  * Validates a Collabora editor URL is safe to embed with clipboard permissions.
  */
 export const validateCollaboraUrl = (url: Maybe<string>, trustedOrigin: string): Result<string, CollaboraUrlError> => {
-  if (!url.isJust) {
+  if (!url.isJust || url.value === '') {
     return Result.err({reason: 'empty'});
   }
 
