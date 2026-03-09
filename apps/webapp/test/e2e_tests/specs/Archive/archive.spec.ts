@@ -17,44 +17,41 @@
  *
  */
 
-import {getUser} from 'test/e2e_tests/data/user';
+import {User} from 'test/e2e_tests/data/user';
 import {PageManager} from 'test/e2e_tests/pageManager';
-import {bootstrapTeamForTesting, completeLogin} from 'test/e2e_tests/utils/setup.util';
-import {tearDownAll} from 'test/e2e_tests/utils/tearDown.util';
-import {createGroup} from 'test/e2e_tests/utils/userActions';
+import {connectWithUser, createGroup} from 'test/e2e_tests/utils/userActions';
 
-import {test, expect} from '../../test.fixtures';
+import {expect, test, withConnectedUser, withLogin} from '../../test.fixtures';
+import {Locator} from 'playwright/test';
 
 test.describe('Archive', () => {
-  let owner = getUser();
-  const members = Array.from({length: 2}, () => getUser());
-  const [memberA, memberB] = members;
+  let memberA: User;
+  let memberB: User;
 
-  test.beforeAll(async ({api}) => {
-    const user = await bootstrapTeamForTesting(api, members, owner, 'Test Team');
-    owner = {...owner, ...user};
+  test.beforeEach(async ({createUser, createTeam}) => {
+    memberA = await createUser();
+    ({owner: memberB} = await createTeam('Test Team', {users: [memberA]}));
   });
 
   test(
     'I want to archive and unarchive conversation via conversation list',
     {tag: ['@TC-97', '@regression']},
-    async ({pageManager}) => {
-      const {components, modals, pages} = pageManager.webapp;
-      await completeLogin(pageManager, memberA);
+    async ({createPage}) => {
+      const page = await createPage(withLogin(memberA), withConnectedUser(memberB));
+      const {pages, components} = PageManager.from(page).webapp;
 
-      await components.conversationSidebar().clickConnectButton();
-      await components.contactList().clickOnContact(memberB.fullName);
-      await modals.userProfile().clickStartConversation();
       await pages.conversationList().clickConversationOptions(memberB.fullName);
       await pages.conversationList().archiveConversation();
-      await components.conversationSidebar().clickArchive();
+      await expect(pages.conversationList().getConversationLocator(memberB.fullName)).not.toBeVisible();
 
+      await components.conversationSidebar().clickArchive();
       await expect(pages.conversationList().getConversationLocator(memberB.fullName)).toBeVisible();
 
       await pages.conversationList().clickConversationOptions(memberB.fullName);
       await pages.conversationList().unarchiveConversation();
-      await components.conversationSidebar().clickAllConversationsButton();
+      await expect(pages.conversationList().getConversationLocator(memberB.fullName)).not.toBeVisible();
 
+      await components.conversationSidebar().clickAllConversationsButton();
       await expect(pages.conversationList().getConversationLocator(memberB.fullName)).toBeVisible();
     },
   );
@@ -62,91 +59,125 @@ test.describe('Archive', () => {
   test(
     'Verify the conversation is not unarchived when there are new messages in this conversation',
     {tag: ['@TC-99', '@regression']},
-    async ({pageManager: pageManagerA, browser}) => {
-      const memberContext = await browser.newContext();
-      const memberPage = await memberContext.newPage();
-      const memberPageManagerB = new PageManager(memberPage);
+    async ({createPage}) => {
+      const [memberAPages, memberBPages] = await Promise.all([
+        PageManager.from(createPage(withLogin(memberA), withConnectedUser(memberB))).then(pm => pm.webapp.pages),
+        PageManager.from(createPage(withLogin(memberB))).then(pm => pm.webapp.pages),
+      ]);
 
-      const {components, modals, pages} = pageManagerA.webapp;
-      const {pages: pagesB, components: componentsB, modals: modalsB} = memberPageManagerB.webapp;
+      await memberAPages.conversationList().openConversation(memberB.fullName, {protocol: 'mls'});
+      await memberBPages.conversationList().openConversation(memberA.fullName, {protocol: 'mls'});
 
-      await Promise.all([completeLogin(pageManagerA, memberA), completeLogin(memberPageManagerB, memberB)]);
-      try {
-        await modalsB.acknowledge().modal.waitFor({state: 'visible', timeout: 2500});
-        if (await modalsB.acknowledge().isModalPresent()) {
-          await modalsB.acknowledge().clickAction();
+      await test.step('MemberA archives conversation with memberB', async () => {
+        await memberAPages.conversationList().clickConversationOptions(memberB.fullName);
+        await memberAPages.conversationList().archiveConversation();
+      });
+
+      await test.step('MemberB sends message in archived conversation', async () => {
+        await memberBPages.conversation().sendMessage('Test message');
+        await expect(memberAPages.conversationList().getConversationLocator(memberB.fullName)).not.toBeVisible();
+      });
+
+      await test.step('MemberB pings in archived conversation', async () => {
+        await memberBPages.conversation().sendPing();
+        await expect(memberAPages.conversationList().getConversationLocator(memberB.fullName)).not.toBeVisible();
+      });
+    },
+  );
+
+  test(
+    'Verify the conversation is not unarchived there are new calls in this conversation',
+    {tag: ['@TC-100', '@regression']},
+    async ({createPage}) => {
+      const page = await createPage(withLogin(memberA), withConnectedUser(memberB));
+      const {pages, components} = PageManager.from(page).webapp;
+
+      await pages.conversationList().openConversation(memberB.fullName);
+
+      await test.step('User archives the conversation', async () => {
+        await pages.conversationList().clickConversationOptions(memberB.fullName);
+        await pages.conversationList().archiveConversation();
+        await expect(pages.conversationList().getConversationLocator(memberB.fullName)).not.toBeVisible();
+      });
+
+      await test.step('User switches to archived conversations and sees it there', async () => {
+        await components.conversationSidebar().archiveButton.click();
+        await expect(pages.conversationList().getConversationLocator(memberB.fullName)).toBeVisible();
+      });
+
+      await test.step('User starts a call in the archived conversation', async () => {
+        await pages.conversationList().openConversation(memberB.fullName);
+        await pages.conversation().startCall();
+      });
+
+      await test.step('The conversation should still not be shown within all conversations', async () => {
+        await components.conversationSidebar().allConverationsButton.click();
+        await expect(pages.conversationList().getConversationLocator(memberB.fullName)).not.toBeVisible();
+      });
+    },
+  );
+
+  test(
+    'Verify that calling an archived muted conversation will not unarchive it',
+    {tag: ['@TC-103', '@regression']},
+    async ({createPage}) => {
+      const page = await createPage(withLogin(memberA), withConnectedUser(memberB));
+      const {pages, components} = PageManager.from(page).webapp;
+
+      await pages.conversationList().openConversation(memberB.fullName);
+
+      await test.step('User mutes the conversation', async () => {
+        await pages.conversationList().clickConversationOptions(memberB.fullName);
+        await pages.conversationList().setNotifications('Nothing');
+      });
+
+      await test.step('User archives the conversation', async () => {
+        await pages.conversationList().clickConversationOptions(memberB.fullName);
+        await pages.conversationList().archiveConversation();
+        await expect(pages.conversationList().getConversationLocator(memberB.fullName)).not.toBeVisible();
+      });
+
+      await test.step('User switches to archived conversations and sees it there', async () => {
+        await components.conversationSidebar().archiveButton.click();
+        await expect(pages.conversationList().getConversationLocator(memberB.fullName)).toBeVisible();
+      });
+
+      await test.step('User starts a call in the archived conversation', async () => {
+        await pages.conversationList().openConversation(memberB.fullName);
+        await pages.conversation().startCall();
+      });
+
+      await test.step('The conversation should still not be shown within all conversations', async () => {
+        await components.conversationSidebar().allConverationsButton.click();
+        await expect(pages.conversationList().getConversationLocator(memberB.fullName)).not.toBeVisible();
+      });
+    },
+  );
+
+  [{type: 'group', tag: '@TC-104'} as const, {type: '1on1', tag: '@TC-105'} as const].forEach(({type, tag}) => {
+    test(
+      `I want to archive the ${type} conversation from conversation details`,
+      {tag: [tag, '@regression']},
+      async ({createPage}) => {
+        const pageManager = PageManager.from(await createPage(withLogin(memberA)));
+        const {pages, components} = pageManager.webapp;
+
+        let conversation: Locator;
+        if (tag === '@TC-104') {
+          await createGroup(pages, 'Test Group', [memberB]);
+          conversation = pages.conversationList().getConversationLocator('Test Group');
+        } else {
+          await connectWithUser(pageManager, memberB);
+          conversation = pages.conversationList().getConversationLocator(memberB.fullName);
         }
-      } catch (err) {}
 
-      await components.conversationSidebar().clickConnectButton();
-      await components.contactList().clickOnContact(memberB.fullName);
-      await pageManagerA.waitForTimeout(500); // wait a moment to render the modal
-      if (await modals.userProfile().isVisible()) {
-        await modals.userProfile().clickStartConversation();
-      }
-      await pages.conversationList().clickConversationOptions(memberB.fullName);
+        await pages.conversation().conversationInfoButton.click();
+        await pages.conversationDetails().archiveButton.click();
+        await expect(conversation).not.toBeVisible();
 
-      await expect(pages.conversationList().getConversationLocator(memberB.fullName)).toBeVisible();
-
-      await componentsB.conversationSidebar().clickAllConversationsButton();
-      await pagesB.conversationList().openConversation(memberA.fullName);
-      await pagesB.conversation().sendMessage('test');
-      await pages.conversationList().archiveConversation();
-      await components.conversationSidebar().clickArchive();
-
-      await expect(pages.conversationList().getConversationLocator(memberB.fullName)).toBeVisible();
-
-      await pages.conversationList().clickConversationOptions(memberB.fullName);
-      await pages.conversationList().unarchiveConversation();
-      await memberContext.close();
-    },
-  );
-
-  test(
-    'I want to archive the group conversation from conversation details',
-    {tag: ['@TC-104', '@regression']},
-    async ({pageManager}) => {
-      const groupName = 'test';
-      const {components, pages} = pageManager.webapp;
-      await completeLogin(pageManager, memberA);
-      await createGroup(pages, groupName, [memberB]);
-      await pages.conversation().clickConversationInfoButton();
-      await pages.conversationDetails().clickArchiveButton();
-      await pageManager.waitForTimeout(400);
-      await components.conversationSidebar().clickArchive();
-
-      await expect(pages.conversationList().getConversationLocator(groupName)).toBeVisible();
-
-      await pages.conversationList().clickConversationOptions(groupName);
-      await pages.conversationList().unarchiveConversation();
-    },
-  );
-
-  test(
-    'I want to archive the 1on1 conversation from conversation details',
-    {tag: ['@TC-105', '@regression']},
-    async ({pageManager}) => {
-      const {components, modals, pages} = pageManager.webapp;
-      await completeLogin(pageManager, memberA);
-
-      await components.conversationSidebar().clickConnectButton();
-      await components.contactList().clickOnContact(memberB.fullName);
-      await pageManager.waitForTimeout(500); // wait a moment to render the modal
-      if (await modals.userProfile().isVisible()) {
-        await modals.userProfile().clickStartConversation();
-      }
-      await pages.conversation().clickConversationInfoButton();
-      await pages.conversationDetails().clickArchiveButton();
-      await components.conversationSidebar().clickArchive();
-
-      await expect(pages.conversationList().getConversationLocator(memberB.fullName)).toBeVisible();
-
-      await pages.conversationList().clickConversationOptions(memberB.fullName);
-      await pages.conversationList().unarchiveConversation();
-    },
-  );
-
-  test.afterAll(async ({api}) => {
-    await tearDownAll(api);
+        await components.conversationSidebar().archiveButton.click();
+        await expect(conversation).toBeVisible();
+      },
+    );
   });
 });
