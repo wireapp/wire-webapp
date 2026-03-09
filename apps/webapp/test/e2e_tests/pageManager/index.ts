@@ -73,6 +73,7 @@ import {StartUIPage} from './webapp/pages/startUI.page';
 import {WelcomePage} from './webapp/pages/welcome.page';
 import {GuestLinkPasswordModal} from './webapp/modals/guestLinkPassword.modal';
 import {ConversationJoinPage} from './webapp/pages/conversationJoin.page';
+import {CreateConversationModal} from './webapp/modals/createConversation';
 
 export const webAppPath = process.env.WEBAPP_URL ?? '';
 
@@ -210,6 +211,8 @@ export class PageManager {
       optionModal: () => this.getOrCreate('webapp.modals.optionModal', () => new OptionModal(this.page)),
       guestLinkPassword: () =>
         this.getOrCreate('webapp.modals.guestLinkPassword', () => new GuestLinkPasswordModal(this.page)),
+      createConversation: () =>
+        this.getOrCreate('webapp.modals.createConversation', () => CreateConversationModal(this.page)),
     },
     components: {
       contactList: () => this.getOrCreate('webapp.components.ContactList', () => new ContactList(this.page)),

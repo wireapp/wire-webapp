@@ -54,7 +54,10 @@ type Fixtures = {
    */
   createTeam: (
     teamName: string,
-    options?: {users: (User | {user: User; role?: keyof typeof Role})[]; features?: {conferenceCalling?: boolean}},
+    options?: {
+      users: (User | {user: User; role?: keyof typeof Role})[];
+      features?: {conferenceCalling?: boolean; channels?: boolean; mls?: boolean};
+    },
   ) => Promise<Team>;
 };
 
@@ -172,6 +175,18 @@ export const test = baseTest.extend<Fixtures>({
         if (options.features.conferenceCalling) {
           await api.enableConferenceCallingFeature(teamId);
           await api.waitForFeatureToBeEnabled(FEATURE_KEY.CONFERENCE_CALLING, teamId, owner.token);
+        }
+
+        // Creating channels depends on MLS to be enabled
+        if (options.features.mls || options.features.channels) {
+          await api.brig.enableMLSFeature(owner.teamId);
+          await api.waitForFeatureToBeEnabled(FEATURE_KEY.MLS, teamId, owner.token);
+        }
+
+        if (options.features.channels) {
+          await api.brig.unlockChannelFeature(teamId);
+          await api.brig.enableChannelsFeature(teamId);
+          await api.waitForFeatureToBeEnabled(FEATURE_KEY.CHANNELS, teamId, owner.token);
         }
       }
 
