@@ -17,15 +17,36 @@
  *
  */
 
-Object.defineProperty(window, 'Response', {
-  value: class ResponseMock {
-    public responseString;
-    public ok = true;
+type ResponseMockInit = {
+  readonly status?: number;
+  readonly statusText?: string;
+};
 
-    constructor(responseString?: string) {
-      this.responseString = responseString;
-    }
-    json = jest.fn().mockImplementation(() => (this.responseString ? JSON.parse(this.responseString) : {}));
-  },
+class ResponseMock {
+  public readonly ok: boolean;
+  public readonly responseText: string;
+  public readonly status: number;
+  public readonly statusText: string;
+
+  constructor(responseText: string = '', responseMockInit: ResponseMockInit = {}) {
+    const {status = 200, statusText = 'OK'} = responseMockInit;
+
+    this.ok = status >= 200 && status < 300;
+    this.responseText = responseText;
+    this.status = status;
+    this.statusText = statusText;
+  }
+
+  public readonly json = jest.fn().mockImplementation(() => {
+    return Promise.resolve(this.responseText ? JSON.parse(this.responseText) : {});
+  });
+
+  public readonly text = jest.fn().mockImplementation(() => {
+    return Promise.resolve(this.responseText);
+  });
+}
+
+Object.defineProperty(window, 'Response', {
+  value: ResponseMock,
   writable: true,
 });

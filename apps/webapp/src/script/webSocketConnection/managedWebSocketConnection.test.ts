@@ -65,8 +65,9 @@ function createFakeWebSocketConnectionContext(): FakeWebSocketConnectionContext 
 
   function triggerEvent(eventType: WebSocketConnectionEventType): void {
     const listenerSet = listenerSetByEventType.get(eventType);
+    const listenerList = listenerSet ? [...listenerSet] : [];
 
-    listenerSet?.forEach((listener) => {
+    listenerList.forEach((listener) => {
       return listener();
     });
   }
@@ -211,7 +212,7 @@ describe('createManagedWebSocketConnection', () => {
     managedWebSocketConnection.dispose();
   });
 
-  it('notifies subscribed listeners when the connection state changes', () => {
+  it('notifies subscribed listeners when the connection state changes and reconnects after close', () => {
     const fakeWebSocketConnectionContext = createFakeWebSocketConnectionContext();
     const managedWebSocketConnection = createManagedWebSocketConnection({
       createWebSocketConnection() {
@@ -236,7 +237,7 @@ describe('createManagedWebSocketConnection', () => {
       webSocketConnectionState.offline,
       webSocketConnectionState.connecting,
       webSocketConnectionState.online,
-      webSocketConnectionState.offline,
+      webSocketConnectionState.connecting,
     ]);
 
     managedWebSocketConnection.dispose();
