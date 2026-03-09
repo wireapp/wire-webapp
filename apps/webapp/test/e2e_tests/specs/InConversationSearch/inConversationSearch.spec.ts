@@ -269,6 +269,7 @@ test.describe('In Conversation Search', () => {
 
     const messageUserB = userBPages.conversation().getMessage({sender: userB});
     await userBPages.conversation().deleteMessage(messageUserB, 'Everyone');
+    await expect(userAPages.conversation().getMessage({content: 'Papaya'})).not.toBeAttached();
 
     await userAPages.conversation().searchButton.click();
     await userAPages.collection().searchBar.fill('Papaya');
