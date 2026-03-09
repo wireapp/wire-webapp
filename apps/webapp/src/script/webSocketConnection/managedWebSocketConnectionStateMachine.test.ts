@@ -32,6 +32,11 @@ type ConnectivityStatusChangeHandlers = {
   readonly onConnectivityBecameUnavailable: () => void;
 };
 
+type SubscribeToConnectivityStatusChangesArguments = {
+  readonly onConnectivityBecameAvailable: () => void;
+  readonly onConnectivityBecameUnavailable: () => void;
+};
+
 type ConnectivityStatusTestContext = {
   readonly notifyConnectivityBecameAvailable: () => void;
   readonly notifyConnectivityBecameUnavailable: () => void;
@@ -119,7 +124,12 @@ function createConnectivityStatusTestContext(): ConnectivityStatusTestContext {
       });
     },
 
-    subscribeToConnectivityStatusChanges({onConnectivityBecameAvailable, onConnectivityBecameUnavailable}) {
+    subscribeToConnectivityStatusChanges(
+      subscribeToConnectivityStatusChangesArguments: SubscribeToConnectivityStatusChangesArguments,
+    ) {
+      const {onConnectivityBecameAvailable, onConnectivityBecameUnavailable} =
+        subscribeToConnectivityStatusChangesArguments;
+
       connectivityAvailableListenerSet.add(onConnectivityBecameAvailable);
       connectivityUnavailableListenerSet.add(onConnectivityBecameUnavailable);
 

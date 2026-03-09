@@ -43,6 +43,9 @@ import {createStartupFeatureTogglesFromLocationSearch} from '../featureToggles/s
 import {createBrowserWebSocketConnection} from '../webSocketConnection/createBrowserWebSocketConnection';
 import {createManagedWebSocketConnection} from '../webSocketConnection/createManagedWebSocketConnection';
 import {createNoopManagedWebSocketConnection} from '../webSocketConnection/createNoopManagedWebSocketConnection';
+import {SubscribeToConnectivityStatusChanges} from '../webSocketConnection/managedWebSocketConnectionStateMachine';
+
+type SubscribeToConnectivityStatusChangesArguments = Parameters<SubscribeToConnectivityStatusChanges>[0];
 
 document.addEventListener('DOMContentLoaded', async () => {
   const config = Config.getConfig();
@@ -80,7 +83,12 @@ document.addEventListener('DOMContentLoaded', async () => {
         isConnectivityAvailable() {
           return navigator.onLine;
         },
-        subscribeToConnectivityStatusChanges({onConnectivityBecameAvailable, onConnectivityBecameUnavailable}) {
+        subscribeToConnectivityStatusChanges(
+          subscribeToConnectivityStatusChangesArguments: SubscribeToConnectivityStatusChangesArguments,
+        ) {
+          const {onConnectivityBecameAvailable, onConnectivityBecameUnavailable} =
+            subscribeToConnectivityStatusChangesArguments;
+
           window.addEventListener('online', onConnectivityBecameAvailable);
           window.addEventListener('offline', onConnectivityBecameUnavailable);
 

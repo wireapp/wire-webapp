@@ -43,6 +43,32 @@ export type ManagedWebSocketConnectionTransport = {
 };
 
 export type CreateManagedWebSocketConnectionTransport = (connectionUrl: string) => ManagedWebSocketConnectionTransport;
+type ConnectivityStatusActorCallbackProperties = {
+  readonly input: ConnectivityStatusActorInput;
+  readonly sendBack: (event: ManagedWebSocketConnectionStateMachineEvent) => void;
+};
+
+type ActiveManagedWebSocketConnectionActorCallbackProperties = {
+  readonly input: ActiveManagedWebSocketConnectionActorInput;
+  readonly receive: (listener: (event: SendMessageManagedWebSocketConnectionStateMachineEvent) => void) => void;
+  readonly sendBack: (event: ManagedWebSocketConnectionStateMachineEvent) => void;
+};
+
+type ManagedWebSocketConnectionStateMachineGuardArguments = {
+  readonly context: ManagedWebSocketConnectionStateMachineContext;
+};
+
+type ManagedWebSocketConnectionStateMachineAssignArguments = {
+  readonly event: ManagedWebSocketConnectionStateMachineEvent;
+};
+
+type ManagedWebSocketConnectionStateMachineInputArguments = {
+  readonly context: ManagedWebSocketConnectionStateMachineContext;
+};
+
+type ManagedWebSocketConnectionStateMachineSendArguments = {
+  readonly event: ManagedWebSocketConnectionStateMachineEvent;
+};
 
 export const managedWebSocketConnectionStateMachineEventType = Object.freeze({
   connect: 'CONNECT',
@@ -106,7 +132,9 @@ export function createManagedWebSocketConnectionStateMachine(
     },
     actors: {
       connectivityStatus: fromCallback<ManagedWebSocketConnectionStateMachineEvent, ConnectivityStatusActorInput>(
-        ({input, sendBack}) => {
+        (connectivityStatusActorCallbackProperties: ConnectivityStatusActorCallbackProperties) => {
+          const {input, sendBack} = connectivityStatusActorCallbackProperties;
+
           function handleConnectivityBecameAvailable(): void {
             sendBack({type: managedWebSocketConnectionStateMachineEventType.connectivityBecameAvailable});
           }
@@ -124,38 +152,43 @@ export function createManagedWebSocketConnectionStateMachine(
       activeManagedWebSocketConnection: fromCallback<
         SendMessageManagedWebSocketConnectionStateMachineEvent,
         ActiveManagedWebSocketConnectionActorInput
-      >(({input, receive, sendBack}) => {
-        const webSocketConnection = createManagedWebSocketConnectionTransport(input.connectionUrl);
+      >(
+        (
+          activeManagedWebSocketConnectionActorCallbackProperties: ActiveManagedWebSocketConnectionActorCallbackProperties,
+        ) => {
+          const {input, receive, sendBack} = activeManagedWebSocketConnectionActorCallbackProperties;
+          const webSocketConnection = createManagedWebSocketConnectionTransport(input.connectionUrl);
 
-        function onOpen(): void {
-          sendBack({type: managedWebSocketConnectionStateMachineEventType.webSocketConnectionOpened});
-        }
-
-        function onClose(): void {
-          sendBack({type: managedWebSocketConnectionStateMachineEventType.webSocketConnectionClosed});
-        }
-
-        function onError(): void {
-          sendBack({type: managedWebSocketConnectionStateMachineEventType.webSocketConnectionErrored});
-        }
-
-        receive(event => {
-          if (event.type === managedWebSocketConnectionStateMachineEventType.sendMessage) {
-            webSocketConnection.send(event.message);
+          function onOpen(): void {
+            sendBack({type: managedWebSocketConnectionStateMachineEventType.webSocketConnectionOpened});
           }
-        });
 
-        webSocketConnection.addEventListener('open', onOpen);
-        webSocketConnection.addEventListener('close', onClose);
-        webSocketConnection.addEventListener('error', onError);
+          function onClose(): void {
+            sendBack({type: managedWebSocketConnectionStateMachineEventType.webSocketConnectionClosed});
+          }
 
-        return () => {
-          webSocketConnection.removeEventListener('open', onOpen);
-          webSocketConnection.removeEventListener('close', onClose);
-          webSocketConnection.removeEventListener('error', onError);
-          webSocketConnection.close();
-        };
-      }),
+          function onError(): void {
+            sendBack({type: managedWebSocketConnectionStateMachineEventType.webSocketConnectionErrored});
+          }
+
+          receive(event => {
+            if (event.type === managedWebSocketConnectionStateMachineEventType.sendMessage) {
+              webSocketConnection.send(event.message);
+            }
+          });
+
+          webSocketConnection.addEventListener('open', onOpen);
+          webSocketConnection.addEventListener('close', onClose);
+          webSocketConnection.addEventListener('error', onError);
+
+          return () => {
+            webSocketConnection.removeEventListener('open', onOpen);
+            webSocketConnection.removeEventListener('close', onClose);
+            webSocketConnection.removeEventListener('error', onError);
+            webSocketConnection.close();
+          };
+        },
+      ),
     },
   });
 
@@ -188,7 +221,11 @@ export function createManagedWebSocketConnectionStateMachine(
         states: {
           offline: {
             always: {
-              guard: ({context}) => {
+              guard: (
+                managedWebSocketConnectionStateMachineGuardArguments: ManagedWebSocketConnectionStateMachineGuardArguments,
+              ) => {
+                const {context} = managedWebSocketConnectionStateMachineGuardArguments;
+
                 return context.connectionUrl !== undefined && context.isConnectivityAvailable;
               },
               target: 'connected.connecting',
@@ -210,7 +247,11 @@ export function createManagedWebSocketConnectionStateMachine(
               },
               [managedWebSocketConnectionStateMachineEventType.connect]: {
                 actions: managedWebSocketConnectionStateMachineSetup.assign({
-                  connectionUrl: ({event}) => {
+                  connectionUrl: (
+                    managedWebSocketConnectionStateMachineAssignArguments: ManagedWebSocketConnectionStateMachineAssignArguments,
+                  ) => {
+                    const {event} = managedWebSocketConnectionStateMachineAssignArguments;
+
                     if (event.type !== managedWebSocketConnectionStateMachineEventType.connect) {
                       throw new Error('Managed WebSocket connection state machine expected a connect event');
                     }
@@ -232,7 +273,11 @@ export function createManagedWebSocketConnectionStateMachine(
             initial: 'connecting',
             invoke: {
               id: activeManagedWebSocketConnectionActorId,
-              input: ({context}) => {
+              input: (
+                managedWebSocketConnectionStateMachineInputArguments: ManagedWebSocketConnectionStateMachineInputArguments,
+              ) => {
+                const {context} = managedWebSocketConnectionStateMachineInputArguments;
+
                 if (context.connectionUrl === undefined) {
                   throw new Error('Managed WebSocket connection state machine requires a connection URL');
                 }
@@ -261,7 +306,11 @@ export function createManagedWebSocketConnectionStateMachine(
               },
               [managedWebSocketConnectionStateMachineEventType.connect]: {
                 actions: managedWebSocketConnectionStateMachineSetup.assign({
-                  connectionUrl: ({event}) => {
+                  connectionUrl: (
+                    managedWebSocketConnectionStateMachineAssignArguments: ManagedWebSocketConnectionStateMachineAssignArguments,
+                  ) => {
+                    const {event} = managedWebSocketConnectionStateMachineAssignArguments;
+
                     if (event.type !== managedWebSocketConnectionStateMachineEventType.connect) {
                       throw new Error('Managed WebSocket connection state machine expected a connect event');
                     }
@@ -299,7 +348,11 @@ export function createManagedWebSocketConnectionStateMachine(
                   [managedWebSocketConnectionStateMachineEventType.sendMessage]: {
                     actions: managedWebSocketConnectionStateMachineSetup.sendTo(
                       activeManagedWebSocketConnectionActorId,
-                      ({event}) => {
+                      (
+                        managedWebSocketConnectionStateMachineSendArguments: ManagedWebSocketConnectionStateMachineSendArguments,
+                      ) => {
+                        const {event} = managedWebSocketConnectionStateMachineSendArguments;
+
                         if (event.type !== managedWebSocketConnectionStateMachineEventType.sendMessage) {
                           throw new Error('Managed WebSocket connection state machine expected a send message event');
                         }
