@@ -121,37 +121,41 @@ test.describe('account settings', () => {
     },
   );
 
-  test(
-    'Verify sound settings are saved after re-login',
-    {tag: ['@TC-1718', '@TC-1720', '@regression']},
-    async ({createUser, createPage}) => {
-      const user = await createUser();
-      const pageManager = PageManager.from(await createPage(withLogin(user)));
-      const {pages, components} = pageManager.webapp;
+  test('Verify sound settings are saved after re-login', {tag: ['@TC-1718', '@regression']}, async ({createPage}) => {
+    const pageManager = PageManager.from(await createPage(withLogin(memberA)));
+    const {pages, components} = pageManager.webapp;
 
-      await components.conversationSidebar().clickPreferencesButton();
-      await pages.settings().clickOptionsButton();
+    await components.conversationSidebar().preferencesButton.click();
+    await pages.settings().optionsButton.click();
 
-      await pages.options().setSoundAlerts('None');
-      await logOutUser(pageManager);
+    await pages.options().setSoundAlerts('None');
+    await logOutUser(pageManager);
 
-      await loginUser(user, pageManager);
-      await components.conversationSidebar().isPageLoaded();
-      await components.conversationSidebar().clickPreferencesButton();
-      await pages.settings().clickOptionsButton();
+    await loginUser(memberA, pageManager);
+    await components.conversationSidebar().preferencesButton.click({timeout: LOGIN_TIMEOUT});
+    await pages.settings().optionsButton.click();
 
-      await expect(pages.options().soundAlertsRadioGroup.getByRole('radio', {name: 'None'})).toBeChecked();
+    await expect(pages.options().soundAlertsRadioGroup.getByRole('radio', {name: 'None'})).toBeChecked();
 
-      await pages.options().setSoundAlerts('All');
-      await logOutUser(pageManager);
-      await loginUser(user, pageManager);
-      await components.conversationSidebar().isPageLoaded();
+    await pages.options().setSoundAlerts('All');
+    await logOutUser(pageManager);
+    await loginUser(memberA, pageManager);
 
-      await components.conversationSidebar().clickPreferencesButton();
-      await pages.settings().clickOptionsButton();
-      await expect(pages.options().soundAlertsRadioGroup.getByRole('radio', {name: 'All'})).toBeChecked();
-    },
-  );
+    await components.conversationSidebar().preferencesButton.click({timeout: LOGIN_TIMEOUT});
+    await pages.settings().optionsButton.click();
+    await expect(pages.options().soundAlertsRadioGroup.getByRole('radio', {name: 'All'})).toBeChecked();
+  });
+
+  test('Verify I can set sound alert settings', {tag: ['@TC-1720', '@regression']}, async ({createPage}) => {
+    const pageManager = PageManager.from(await createPage(withLogin(memberA)));
+    const {pages, components} = pageManager.webapp;
+
+    await components.conversationSidebar().preferencesButton.click();
+    await pages.settings().optionsButton.click();
+    await pages.options().setSoundAlerts('None');
+
+    await expect(pages.options().soundAlertsRadioGroup.getByRole('radio', {name: 'None'})).toBeChecked();
+  });
 
   test(
     'Verify links to manage and create teams are shown when logged in as team owner',
