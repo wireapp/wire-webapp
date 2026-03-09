@@ -17,110 +17,90 @@
  *
  */
 
-import {getUser, User} from 'test/e2e_tests/data/user';
-import {bootstrapTeamForTesting} from 'test/e2e_tests/utils/setup.util';
-import {tearDownAll} from 'test/e2e_tests/utils/tearDown.util';
+import {User} from 'test/e2e_tests/data/user';
 import {loginUser} from 'test/e2e_tests/utils/userActions';
 
-import {test, expect} from '../../test.fixtures';
+import {test, expect, LOGIN_TIMEOUT, Team} from '../../test.fixtures';
+import {PageManager} from 'test/e2e_tests/pageManager';
 
-test.describe('f2a for teams', () => {
-  const teamName = 'Critical';
-  let owner: User = getUser();
-  const member1 = getUser();
+test.describe('2FA for teams', () => {
+  let team: Team;
+  let owner: User;
 
-  test.beforeAll(async ({api}) => {
-    const user = await bootstrapTeamForTesting(api, [member1], owner, teamName);
-    owner = {...owner, ...user};
+  test.beforeEach(async ({api, createTeam}) => {
+    team = await createTeam('Test Team');
+    owner = team.owner;
 
-    await api.brig.unlockSndFactorPasswordChallenge(owner.teamId);
-    await api.featureConfig.changeStateSndFactorPasswordChallenge(owner, owner.teamId, 'enabled');
+    await api.brig.unlockSndFactorPasswordChallenge(team.teamId);
+    await api.featureConfig.changeStateSndFactorPasswordChallenge(owner, team.teamId, 'enabled');
   });
 
-  test('2FA Code', {tag: ['@TC-8749', '@regression']}, async ({pageManager, api}) => {
-    if (owner === undefined) {
-      return;
-    }
-    await pageManager.openMainPage();
-    await loginUser(owner, pageManager);
+  // The 2FA needs to be disabled again so the createTeam fixture can clean up the created team
+  test.afterEach(async ({api}) => {
+    await api.featureConfig.changeStateSndFactorPasswordChallenge(owner, team.teamId, 'disabled');
+  });
 
-    const {pages, components, modals} = await pageManager.webapp;
-    const isVisible = await pages.emailVerification().isEmailVerificationPageVisible();
+  test('2FA Code', {tag: ['@TC-8749', '@regression']}, async ({api, createPage}) => {
+    const pageManager = PageManager.from(await createPage());
+    const {pages, components} = pageManager.webapp;
 
-    await expect(isVisible).toBeTruthy();
-    // wait for mail
-    await pageManager.waitForTimeout(800);
-    const correctCode = await api.inbucket.getVerificationCode(owner.email);
+    await pageManager.openLoginPage();
+    await pages.login().login(owner);
+    await expect(pages.emailVerification().verificationCodeInputLabel).toBeVisible();
 
-    //case: enter an incorrect code
-    await pageManager.waitForTimeout(500);
-    await pages.emailVerification().enterVerificationCode('123456');
+    await test.step('With incorrect code', async () => {
+      await pages.emailVerification().enterVerificationCode('123456');
+      await expect(pages.emailVerification().errorLabel).toBeVisible();
+      await expect(pages.emailVerification().errorLabel).toHaveText('Please retry, or request another code.');
+    });
 
-    await expect(pages.emailVerification().errorLabel).toBeVisible();
-    await expect(pages.emailVerification().errorLabel).toHaveText('Please retry, or request another code.');
+    await test.step('With correct code', async () => {
+      const correctCode = await api.inbucket.getVerificationCode(owner.email);
 
-    await pages.emailVerification().clearCode();
-    await pages.emailVerification().enterVerificationCode(correctCode);
-    // enter don't work
-    await pages.emailVerification().pressSubmit();
+      await pages.emailVerification().clearCode();
+      await pages.emailVerification().enterVerificationCode(correctCode);
+      await pages.emailVerification().pressSubmit(); // enter don't work
 
-    // main screen loads over 45 secs
-    await components.conversationSidebar().personalUserName.waitFor({state: 'visible', timeout: 60_000});
-
-    await modals.dataShareConsent().clickDecline();
-    await expect(components.conversationSidebar().personalUserName).toBeVisible();
+      await expect(components.conversationSidebar().personalUserName).toBeVisible({timeout: LOGIN_TIMEOUT});
+    });
   });
 
   test(
     'I want to receive new verification code email after clicking "Resend code" button',
     {tag: ['@TC-40', '@regression']},
-    async ({pageManager, api}) => {
-      test.setTimeout(310_000);
-      await pageManager.openMainPage();
-      await loginUser(owner, pageManager);
+    async ({createPage, api}) => {
+      const pageManager = PageManager.from(await createPage());
+      const {pages} = pageManager.webapp;
 
-      const {pages} = await pageManager.webapp;
-      const isVisible = await pages.emailVerification().isEmailVerificationPageVisible();
-      await expect(isVisible).toBeTruthy();
+      await pageManager.openLoginPage();
+      await pages.login().login(owner);
+      await expect(pages.emailVerification().verificationCodeInputLabel).toBeVisible();
 
-      // wait for mail
-      await pageManager.waitForTimeout(800);
       const oldCode = await api.inbucket.getVerificationCode(owner.email);
 
-      expect(oldCode.length).toBe(6);
-      expect(Number.isInteger(parseInt(oldCode))).toBeTruthy();
-
-      await pageManager.waitForTimeout(61_000); // wait 1 min to prevent 429 on request
+      await pageManager.waitForTimeout(61_000); // Wait 61s before requesting a new code
       await pages.emailVerification().resendButton.click();
 
-      await pageManager.waitForTimeout(3000);
-      const newCode = await api.inbucket.getVerificationCode(owner.email);
-
-      expect(oldCode).not.toBe(newCode);
-      expect(Number.isInteger(parseInt(newCode))).toBeTruthy();
-      expect(newCode.length).toBe(6);
+      await expect
+        .poll(async () => await api.inbucket.getVerificationCode(owner.email), {timeout: 30_000, intervals: [3_000]})
+        .not.toEqual(oldCode);
     },
   );
 
   test(
     'I want to verify that verification code is not required after login if 2FA has been disabled',
     {tag: ['@TC-44', '@regression']},
-    async ({pageManager, api}) => {
-      await api.featureConfig.changeStateSndFactorPasswordChallenge(owner, owner.teamId, 'disabled');
+    async ({createPage, api}) => {
+      // Disable 2FA again
+      await api.featureConfig.changeStateSndFactorPasswordChallenge(owner, team.teamId, 'disabled');
+
+      const pageManager = PageManager.from(await createPage());
+      const {components} = pageManager.webapp;
 
       await pageManager.openMainPage();
       await loginUser(owner, pageManager);
-      const {components, pages} = pageManager.webapp;
-      await pages.historyInfo().clickConfirmButton();
-      await components.conversationSidebar().personalUserName.waitFor({state: 'visible', timeout: 60_000});
 
-      await expect(components.conversationSidebar().personalUserName).toBeVisible();
+      await expect(components.conversationSidebar().personalUserName).toBeVisible({timeout: LOGIN_TIMEOUT});
     },
   );
-  test.afterAll(async ({api}) => {
-    if (owner === undefined) {
-    }
-    await api.featureConfig.changeStateSndFactorPasswordChallenge(owner, owner.teamId, 'disabled');
-    await tearDownAll(api);
-  });
 });
