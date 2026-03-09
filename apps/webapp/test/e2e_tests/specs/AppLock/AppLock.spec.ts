@@ -19,7 +19,7 @@
 
 import {User} from 'test/e2e_tests/data/user';
 import {PageManager} from 'test/e2e_tests/pageManager';
-import {test, expect, withLogin, PagePlugin, Team} from 'test/e2e_tests/test.fixtures';
+import {test, expect, withLogin, PagePlugin, Team, LOGIN_TIMEOUT} from 'test/e2e_tests/test.fixtures';
 import {AppLockModal} from 'test/e2e_tests/pageManager/webapp/modals/appLock.modal';
 
 /** Page plugin specific to this feature to set the app lock code upon the first login */
@@ -55,7 +55,7 @@ test.describe('AppLock', () => {
 
         await pageManager.openLoginPage();
         await pageManager.webapp.pages.login().login(user);
-        await expect(modals.appLock().appLockModal).toBeVisible();
+        await expect(modals.appLock().appLockModal).toBeVisible({timeout: LOGIN_TIMEOUT});
 
         await page.mouse.click(200, 350); // click outside the modal
         await expect(modals.appLock().appLockModal).toBeVisible();
