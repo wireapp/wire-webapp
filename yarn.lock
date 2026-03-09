@@ -5671,13 +5671,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@nx/webpack@npm:22.5.2":
-  version: 22.5.2
-  resolution: "@nx/webpack@npm:22.5.2"
+"@nx/webpack@npm:22.5.4":
+  version: 22.5.4
+  resolution: "@nx/webpack@npm:22.5.4"
   dependencies:
     "@babel/core": "npm:^7.23.2"
-    "@nx/devkit": "npm:22.5.2"
-    "@nx/js": "npm:22.5.2"
+    "@nx/devkit": "npm:22.5.4"
+    "@nx/js": "npm:22.5.4"
     "@phenomnomnominal/tsquery": "npm:~6.1.4"
     ajv: "npm:^8.12.0"
     autoprefixer: "npm:^10.4.9"
@@ -5711,7 +5711,7 @@ __metadata:
     webpack-dev-server: "npm:^5.2.1"
     webpack-node-externals: "npm:^3.0.0"
     webpack-subresource-integrity: "npm:^5.1.0"
-  checksum: 10/78c6a97bcedaf2d5c8f11b488dffddf0025fea6622f1b8ef2647143bf8a4949ab30b1e932b06fa8af4db70bcfa63a43c58663a48c66085076a42c6d6e98deb75
+  checksum: 10/51cab3bddf993a9c88cc897117c55b69019ecfebe65048a7f21870b74d272eba5b9ae41c5b850248b5862bc92296d1b0dc9c7b2cccbcfb6892b48eee422c313c
   languageName: node
   linkType: hard
 
@@ -12009,7 +12009,7 @@ __metadata:
     "@lexical/react": "npm:0.27.2"
     "@lexical/rich-text": "npm:0.27.2"
     "@mediapipe/tasks-vision": "npm:0.10.32"
-    "@nx/webpack": "npm:22.5.2"
+    "@nx/webpack": "npm:22.5.4"
     "@playwright/test": "npm:1.58.2"
     "@roamhq/wrtc": "npm:0.9.1"
     "@sindresorhus/is": "npm:4.6.0"
