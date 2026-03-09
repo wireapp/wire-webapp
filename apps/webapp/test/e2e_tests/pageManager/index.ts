@@ -40,7 +40,6 @@ import {LeaveConversationModal} from './webapp/modals/leaveConversation.modal';
 import {OptionModal} from './webapp/modals/option.modal';
 import {PasswordModal} from './webapp/modals/password.modal';
 import {PasswordAdvancedSecurityModal} from './webapp/modals/passwordAdvancedSecurity.modal';
-import {RemoveMemberModal} from './webapp/modals/removeMember.modal';
 import {UserProfileModal} from './webapp/modals/userProfile.modal';
 import {AccountPage} from './webapp/pages/account.page';
 import {AudioVideoSettingsPage} from './webapp/pages/audioVideoSettings.page';
@@ -201,7 +200,6 @@ export class PageManager {
       passwordAdvancedSecurity: () =>
         this.getOrCreate('webapp.modals.passwordAdvancedSecurity', () => new PasswordAdvancedSecurityModal(this.page)),
       detailViewModal: () => this.getOrCreate('webapp.modals.detailView', () => new DetailViewModal(this.page)),
-      removeMember: () => this.getOrCreate('webapp.modals.removeMember', () => new RemoveMemberModal(this.page)),
       marketingConsent: () =>
         this.getOrCreate('webapp.modals.marketingConsent', () => new MarketingConsentModal(this.page)),
       acknowledge: () => this.getOrCreate('webapp.modals.marketingConsent', () => new AcknowledgeModal(this.page)),
