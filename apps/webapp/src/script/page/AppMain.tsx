@@ -17,7 +17,7 @@
  *
  */
 
-import {useCallback, useEffect, useLayoutEffect, useMemo, useState} from 'react';
+import {useCallback, useEffect, useLayoutEffect, useState} from 'react';
 
 import {amplify} from 'amplify';
 import cx from 'classnames';
@@ -66,7 +66,7 @@ import {ContentState, useAppState} from './useAppState';
 
 import {runClientVersionCheck} from '../application-periodic-checks/runClientVersionCheck';
 import {startApplicationPeriodicChecks} from '../application-periodic-checks/startApplicationPeriodicChecks';
-import {createWallClock} from '../clock/wallClock';
+import {WallClock} from '../clock/wallClock';
 import {StartupFeatureToggles} from '../featureToggles/startupFeatureToggles';
 import {App} from '../main/app';
 import {initialiseMLSMigrationFlow} from '../mls/MLSMigration';
@@ -82,16 +82,17 @@ export type RightSidebarParams = {
   highlighted?: User[];
 };
 
-interface AppMainProps {
-  app: App;
-  selfUser: User;
-  mainView: MainViewModel;
-  startupFeatureToggles: StartupFeatureToggles;
-  conversationState?: ConversationState;
-  callState?: CallState;
+type AppMainProps = {
+  readonly app: App;
+  readonly selfUser: User;
+  readonly mainView: MainViewModel;
+  readonly startupFeatureToggles: StartupFeatureToggles;
+  readonly conversationState?: ConversationState;
+  readonly callState?: CallState;
+  readonly wallClock: WallClock;
   /** will block the user from being able to interact with the application (no notifications and no messages will be shown) */
-  locked: boolean;
-}
+  readonly locked: boolean;
+};
 
 export const AppMain = ({
   app,
@@ -100,11 +101,9 @@ export const AppMain = ({
   startupFeatureToggles,
   conversationState = container.resolve(ConversationState),
   callState = container.resolve(CallState),
+  wallClock,
   locked,
 }: AppMainProps) => {
-  const wallClock = useMemo(() => {
-    return createWallClock();
-  }, []);
   const [doesApplicationNeedForceReload, setDoesApplicationNeedForceReload] = useState(false);
   const clientVersion = Config.getConfig().VERSION;
   const runApplicationPeriodicCheck: () => void = useCallback(() => {
