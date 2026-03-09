@@ -79,7 +79,11 @@ document.addEventListener('DOMContentLoaded', async () => {
     startupFeatureToggles,
     createEnabledManagedWebSocketConnection() {
       return createManagedWebSocketConnection({
-        createWebSocketConnection: createBrowserWebSocketConnection,
+        createWebSocketConnection: createBrowserWebSocketConnection({
+          createWebSocket(connectionUrl) {
+            return new WebSocket(connectionUrl);
+          },
+        }),
         isConnectivityAvailable() {
           return navigator.onLine;
         },

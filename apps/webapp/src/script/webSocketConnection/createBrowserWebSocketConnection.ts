@@ -17,30 +17,52 @@
  *
  */
 
-import {WebSocketConnectionTransport} from './createManagedWebSocketConnection';
+import {
+  CreateWebSocketConnection,
+  WebSocketConnectionEventType,
+  WebSocketConnectionTransport,
+} from './createManagedWebSocketConnection';
 
-export function createBrowserWebSocketConnection(connectionUrl: string): WebSocketConnectionTransport {
-  const webSocketConnection = new WebSocket(connectionUrl);
+type BrowserWebSocketConnection = {
+  readonly readyState: number;
+  readonly send: (message: string) => void;
+  readonly close: () => void;
+  readonly addEventListener: (type: WebSocketConnectionEventType, listener: () => void) => void;
+  readonly removeEventListener: (type: WebSocketConnectionEventType, listener: () => void) => void;
+};
 
-  return {
-    get readyState() {
-      return webSocketConnection.readyState;
-    },
+type CreateBrowserWebSocketConnectionDependencies = {
+  readonly createWebSocket: (connectionUrl: string) => BrowserWebSocketConnection;
+};
 
-    send(message) {
-      webSocketConnection.send(message);
-    },
+export function createBrowserWebSocketConnection(
+  dependencies: CreateBrowserWebSocketConnectionDependencies,
+): CreateWebSocketConnection {
+  const {createWebSocket} = dependencies;
 
-    close() {
-      webSocketConnection.close();
-    },
+  return function createWebSocketConnection(connectionUrl: string): WebSocketConnectionTransport {
+    const webSocketConnection = createWebSocket(connectionUrl);
 
-    addEventListener(type, listener) {
-      webSocketConnection.addEventListener(type, listener);
-    },
+    return {
+      get readyState() {
+        return webSocketConnection.readyState;
+      },
 
-    removeEventListener(type, listener) {
-      webSocketConnection.removeEventListener(type, listener);
-    },
+      send(message) {
+        webSocketConnection.send(message);
+      },
+
+      close() {
+        webSocketConnection.close();
+      },
+
+      addEventListener(type, listener) {
+        webSocketConnection.addEventListener(type, listener);
+      },
+
+      removeEventListener(type, listener) {
+        webSocketConnection.removeEventListener(type, listener);
+      },
+    };
   };
 }
