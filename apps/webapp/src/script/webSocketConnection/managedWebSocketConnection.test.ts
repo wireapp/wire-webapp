@@ -22,6 +22,7 @@ import {
   WebSocketConnectionEventType,
   WebSocketConnectionTransport,
 } from './createManagedWebSocketConnection';
+import {createNoopManagedWebSocketConnection} from './createNoopManagedWebSocketConnection';
 import {webSocketConnectionStateMachineState} from './webSocketConnectionStateMachine';
 
 type FakeWebSocketConnectionContext = {
@@ -199,6 +200,29 @@ describe('createManagedWebSocketConnection', () => {
       webSocketConnectionStateMachineState.offline,
     ]);
 
+    managedWebSocketConnection.dispose();
+  });
+});
+
+describe('createNoopManagedWebSocketConnection', () => {
+  it('stays offline and keeps commands side-effect free', () => {
+    const managedWebSocketConnection = createNoopManagedWebSocketConnection();
+    const observedConnectionStateList: string[] = [];
+
+    const unsubscribeFromConnectionState = managedWebSocketConnection.subscribeToConnectionState(connectionState => {
+      return observedConnectionStateList.push(connectionState);
+    });
+
+    managedWebSocketConnection.connect('wss://example.test/socket');
+    managedWebSocketConnection.disconnect();
+
+    const didSendMessage = managedWebSocketConnection.sendMessage('hello');
+
+    expect(didSendMessage).toBe(false);
+    expect(managedWebSocketConnection.currentConnectionState).toBe(webSocketConnectionStateMachineState.offline);
+    expect(observedConnectionStateList).toEqual([webSocketConnectionStateMachineState.offline]);
+
+    unsubscribeFromConnectionState();
     managedWebSocketConnection.dispose();
   });
 });
