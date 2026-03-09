@@ -85,14 +85,24 @@ test.describe('Archive', () => {
     },
   );
 
-  test(
-    'Verify the conversation is not unarchived there are new calls in this conversation',
-    {tag: ['@TC-100', '@regression']},
-    async ({createPage}) => {
+  (
+    [
+      {title: 'Verify the conversation is not unarchived there are new calls in this conversation', tag: '@TC-100'},
+      {title: 'Verify that calling an archived muted conversation will not unarchive it', tag: '@TC-103'},
+    ] as const
+  ).forEach(({title, tag}) => {
+    test(title, {tag: [tag, '@regression']}, async ({createPage}) => {
       const page = await createPage(withLogin(memberA), withConnectedUser(memberB));
       const {pages, components} = PageManager.from(page).webapp;
 
       await pages.conversationList().openConversation(memberB.fullName);
+
+      if (tag === '@TC-103') {
+        await test.step('User mutes the conversation', async () => {
+          await pages.conversationList().clickConversationOptions(memberB.fullName);
+          await pages.conversationList().setNotifications('Nothing');
+        });
+      }
 
       await test.step('User archives the conversation', async () => {
         await pages.conversationList().clickConversationOptions(memberB.fullName);
@@ -114,45 +124,8 @@ test.describe('Archive', () => {
         await components.conversationSidebar().allConverationsButton.click();
         await expect(pages.conversationList().getConversationLocator(memberB.fullName)).not.toBeVisible();
       });
-    },
-  );
-
-  test(
-    'Verify that calling an archived muted conversation will not unarchive it',
-    {tag: ['@TC-103', '@regression']},
-    async ({createPage}) => {
-      const page = await createPage(withLogin(memberA), withConnectedUser(memberB));
-      const {pages, components} = PageManager.from(page).webapp;
-
-      await pages.conversationList().openConversation(memberB.fullName);
-
-      await test.step('User mutes the conversation', async () => {
-        await pages.conversationList().clickConversationOptions(memberB.fullName);
-        await pages.conversationList().setNotifications('Nothing');
-      });
-
-      await test.step('User archives the conversation', async () => {
-        await pages.conversationList().clickConversationOptions(memberB.fullName);
-        await pages.conversationList().archiveConversation();
-        await expect(pages.conversationList().getConversationLocator(memberB.fullName)).not.toBeVisible();
-      });
-
-      await test.step('User switches to archived conversations and sees it there', async () => {
-        await components.conversationSidebar().archiveButton.click();
-        await expect(pages.conversationList().getConversationLocator(memberB.fullName)).toBeVisible();
-      });
-
-      await test.step('User starts a call in the archived conversation', async () => {
-        await pages.conversationList().openConversation(memberB.fullName);
-        await pages.conversation().startCall();
-      });
-
-      await test.step('The conversation should still not be shown within all conversations', async () => {
-        await components.conversationSidebar().allConverationsButton.click();
-        await expect(pages.conversationList().getConversationLocator(memberB.fullName)).not.toBeVisible();
-      });
-    },
-  );
+    });
+  });
 
   [{type: 'group', tag: '@TC-104'} as const, {type: '1on1', tag: '@TC-105'} as const].forEach(({type, tag}) => {
     test(
