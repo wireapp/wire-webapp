@@ -20,26 +20,26 @@
 import {createActor} from 'xstate';
 
 import {
-  createWebSocketConnectionStateMachine,
-  webSocketConnectionStateMachineEventType,
+  createManagedWebSocketConnectionStateMachine,
+  managedWebSocketConnectionStateMachineEventType,
+} from './managedWebSocketConnectionStateMachine';
+import type {
+  CreateManagedWebSocketConnectionTransport,
+  ManagedWebSocketConnectionEventType,
+  ManagedWebSocketConnectionTransport,
+} from './managedWebSocketConnectionStateMachine';
+import {
+  webSocketConnectionStateMachineState,
   WebSocketConnectionStateMachineState,
 } from './webSocketConnectionStateMachine';
 
 import {createCleanupStack} from '../cleanupStack/cleanupStack';
 
-export type WebSocketConnectionEventType = 'open' | 'close' | 'error';
+export type WebSocketConnectionEventType = ManagedWebSocketConnectionEventType;
+export type WebSocketConnectionTransport = ManagedWebSocketConnectionTransport;
+export type CreateWebSocketConnection = CreateManagedWebSocketConnectionTransport;
 
 export type WebSocketConnectionStateListener = (state: WebSocketConnectionStateMachineState) => void;
-
-export type WebSocketConnectionTransport = {
-  readonly readyState: number;
-  readonly send: (message: string) => void;
-  readonly close: () => void;
-  readonly addEventListener: (type: WebSocketConnectionEventType, listener: (event: Event) => void) => void;
-  readonly removeEventListener: (type: WebSocketConnectionEventType, listener: (event: Event) => void) => void;
-};
-
-export type CreateWebSocketConnection = (connectionUrl: string) => WebSocketConnectionTransport;
 
 export type ManagedWebSocketConnection = {
   readonly currentConnectionState: WebSocketConnectionStateMachineState;
@@ -54,12 +54,19 @@ type CreateManagedWebSocketConnectionDependencies = {
   readonly createWebSocketConnection: CreateWebSocketConnection;
 };
 
-type ActiveManagedWebSocketConnection = {
-  readonly webSocketConnection: WebSocketConnectionTransport;
-  readonly runCleanup: () => void;
+type ManagedWebSocketConnectionStateSnapshot = {
+  readonly matches: (partialStateValue: unknown) => boolean;
 };
 
-const webSocketConnectionOpenReadyState = 1;
+function toWebSocketConnectionStateMachineState(
+  snapshot: ManagedWebSocketConnectionStateSnapshot,
+): WebSocketConnectionStateMachineState {
+  if (snapshot.matches({connected: 'online'})) {
+    return webSocketConnectionStateMachineState.online;
+  }
+
+  return webSocketConnectionStateMachineState.offline;
+}
 
 export function createBrowserWebSocketConnection(connectionUrl: string): WebSocketConnectionTransport {
   return new WebSocket(connectionUrl);
@@ -69,15 +76,18 @@ export function createManagedWebSocketConnection(
   dependencies: CreateManagedWebSocketConnectionDependencies,
 ): ManagedWebSocketConnection {
   const {createWebSocketConnection} = dependencies;
-  const webSocketConnectionStateMachineActor = createActor(createWebSocketConnectionStateMachine());
+  const managedWebSocketConnectionStateMachineActor = createActor(
+    createManagedWebSocketConnectionStateMachine({
+      createManagedWebSocketConnectionTransport: createWebSocketConnection,
+    }),
+  );
   const connectionStateListenerSet = new Set<WebSocketConnectionStateListener>();
   const managedWebSocketConnectionCleanupStack = createCleanupStack();
-  let activeManagedWebSocketConnection: ActiveManagedWebSocketConnection | undefined;
 
-  webSocketConnectionStateMachineActor.start();
+  managedWebSocketConnectionStateMachineActor.start();
 
-  const actorSubscription = webSocketConnectionStateMachineActor.subscribe(snapshot => {
-    const currentConnectionState = snapshot.value as WebSocketConnectionStateMachineState;
+  const actorSubscription = managedWebSocketConnectionStateMachineActor.subscribe(snapshot => {
+    const currentConnectionState = toWebSocketConnectionStateMachineState(snapshot);
 
     connectionStateListenerSet.forEach(connectionStateListener => {
       return connectionStateListener(currentConnectionState);
@@ -87,22 +97,17 @@ export function createManagedWebSocketConnection(
   managedWebSocketConnectionCleanupStack.addCleanup(() => {
     actorSubscription.unsubscribe();
     connectionStateListenerSet.clear();
-    webSocketConnectionStateMachineActor.stop();
+    managedWebSocketConnectionStateMachineActor.stop();
   });
-
-  function disconnectActiveManagedWebSocketConnection(): void {
-    activeManagedWebSocketConnection?.runCleanup();
-    activeManagedWebSocketConnection = undefined;
-  }
 
   return {
     get currentConnectionState() {
-      return webSocketConnectionStateMachineActor.getSnapshot().value as WebSocketConnectionStateMachineState;
+      return toWebSocketConnectionStateMachineState(managedWebSocketConnectionStateMachineActor.getSnapshot());
     },
 
     subscribeToConnectionState(listener) {
       connectionStateListenerSet.add(listener);
-      listener(webSocketConnectionStateMachineActor.getSnapshot().value as WebSocketConnectionStateMachineState);
+      listener(toWebSocketConnectionStateMachineState(managedWebSocketConnectionStateMachineActor.getSnapshot()));
 
       return function unsubscribeFromConnectionState(): void {
         connectionStateListenerSet.delete(listener);
@@ -110,71 +115,38 @@ export function createManagedWebSocketConnection(
     },
 
     connect(connectionUrl) {
-      disconnectActiveManagedWebSocketConnection();
-
-      const webSocketConnection = createWebSocketConnection(connectionUrl);
-      const activeManagedWebSocketConnectionCleanupStack = createCleanupStack();
-
-      function onOpen(): void {
-        return webSocketConnectionStateMachineActor.send({
-          type: webSocketConnectionStateMachineEventType.connectionBecameOnline,
-        });
-      }
-
-      function onClose(): void {
-        return webSocketConnectionStateMachineActor.send({
-          type: webSocketConnectionStateMachineEventType.connectionBecameOffline,
-        });
-      }
-
-      function onError(): void {
-        return webSocketConnectionStateMachineActor.send({
-          type: webSocketConnectionStateMachineEventType.connectionBecameOffline,
-        });
-      }
-
-      webSocketConnection.addEventListener('open', onOpen);
-      webSocketConnection.addEventListener('close', onClose);
-      webSocketConnection.addEventListener('error', onError);
-
-      activeManagedWebSocketConnectionCleanupStack.addCleanup(() => {
-        webSocketConnection.removeEventListener('open', onOpen);
-        webSocketConnection.removeEventListener('close', onClose);
-        webSocketConnection.removeEventListener('error', onError);
-        webSocketConnection.close();
+      managedWebSocketConnectionStateMachineActor.send({
+        connectionUrl,
+        type: managedWebSocketConnectionStateMachineEventType.connect,
       });
-
-      activeManagedWebSocketConnection = {
-        webSocketConnection,
-        runCleanup: activeManagedWebSocketConnectionCleanupStack.runAllCleanups,
-      };
     },
 
     disconnect() {
-      disconnectActiveManagedWebSocketConnection();
-      webSocketConnectionStateMachineActor.send({
-        type: webSocketConnectionStateMachineEventType.connectionBecameOffline,
+      managedWebSocketConnectionStateMachineActor.send({
+        type: managedWebSocketConnectionStateMachineEventType.disconnect,
       });
     },
 
     sendMessage(message) {
-      if (activeManagedWebSocketConnection === undefined) {
+      if (
+        toWebSocketConnectionStateMachineState(managedWebSocketConnectionStateMachineActor.getSnapshot()) !==
+        webSocketConnectionStateMachineState.online
+      ) {
         return false;
       }
 
-      const {webSocketConnection} = activeManagedWebSocketConnection;
-
-      if (webSocketConnection.readyState !== webSocketConnectionOpenReadyState) {
-        return false;
-      }
-
-      webSocketConnection.send(message);
+      managedWebSocketConnectionStateMachineActor.send({
+        message,
+        type: managedWebSocketConnectionStateMachineEventType.sendMessage,
+      });
 
       return true;
     },
 
     dispose() {
-      disconnectActiveManagedWebSocketConnection();
+      managedWebSocketConnectionStateMachineActor.send({
+        type: managedWebSocketConnectionStateMachineEventType.dispose,
+      });
       managedWebSocketConnectionCleanupStack.runAllCleanups();
     },
   };

@@ -63,11 +63,15 @@ type ActiveManagedWebSocketConnectionActorInput = {
   readonly connectionUrl: string;
 };
 
+type CreateManagedWebSocketConnectionStateMachineDependencies = {
+  readonly createManagedWebSocketConnectionTransport: CreateManagedWebSocketConnectionTransport;
+};
+
 const activeManagedWebSocketConnectionActorId = 'activeManagedWebSocketConnection';
 
-export function createManagedWebSocketConnectionStateMachine(dependencies: {
-  readonly createManagedWebSocketConnectionTransport: CreateManagedWebSocketConnectionTransport;
-}) {
+export function createManagedWebSocketConnectionStateMachine(
+  dependencies: CreateManagedWebSocketConnectionStateMachineDependencies,
+) {
   const {createManagedWebSocketConnectionTransport} = dependencies;
   const managedWebSocketConnectionStateMachineSetup = setup({
     types: {} as {
