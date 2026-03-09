@@ -21,9 +21,10 @@ import {ReactNode, useContext} from 'react';
 
 import {renderHook} from '@testing-library/react';
 
-import {StartupFeatureToggleName} from '../featureToggles/startupFeatureToggles';
 import {createDeterministicWallClock} from '../clock/deterministicWallClock';
+import {StartupFeatureToggleName} from '../featureToggles/startupFeatureToggles';
 import {MainViewModel} from '../view_model/MainViewModel';
+import {ManagedWebSocketConnection} from '../webSocketConnection/createManagedWebSocketConnection';
 import {
   RootContext,
   RootContextValue,
@@ -32,14 +33,19 @@ import {
   useMainViewModel,
 } from './RootProvider';
 
-interface WrapperProperties {
-  children: ReactNode;
-}
+type WrapperProperties = {
+  readonly children: ReactNode;
+};
 
-interface RootProviderWrapper {
-  wrapper: (properties: WrapperProperties) => ReactNode;
-  isFeatureToggleEnabled: jest.Mock<boolean, [StartupFeatureToggleName]>;
-  deterministicWallClock: ReturnType<typeof createDeterministicWallClock>;
+type RootProviderWrapper = {
+  readonly wrapper: (properties: WrapperProperties) => ReactNode;
+  readonly isFeatureToggleEnabled: jest.Mock<boolean, [StartupFeatureToggleName]>;
+  readonly deterministicWallClock: ReturnType<typeof createDeterministicWallClock>;
+  readonly managedWebSocketConnection: ManagedWebSocketConnection;
+};
+
+function createStubManagedWebSocketConnection(): ManagedWebSocketConnection {
+  return {} as ManagedWebSocketConnection;
 }
 
 function createRootProviderWrapper(
@@ -50,6 +56,7 @@ function createRootProviderWrapper(
   const deterministicWallClock = createDeterministicWallClock({
     initialCurrentTimestampInMilliseconds: wallClockTimestampInMilliseconds,
   });
+  const managedWebSocketConnection = createStubManagedWebSocketConnection();
   function isFeatureToggleEnabledForTest(featureName: StartupFeatureToggleName): boolean {
     return featureName === 'reliable-websocket-connection';
   }
@@ -61,6 +68,7 @@ function createRootProviderWrapper(
       <RootProvider
         value={{
           mainViewModel,
+          managedWebSocketConnection,
           wallClock: deterministicWallClock,
           doesApplicationNeedForceReload,
           isFeatureToggleEnabled,
@@ -73,7 +81,7 @@ function createRootProviderWrapper(
     return wrappedChildren;
   }
 
-  return {wrapper, deterministicWallClock, isFeatureToggleEnabled};
+  return {wrapper, deterministicWallClock, isFeatureToggleEnabled, managedWebSocketConnection};
 }
 
 function getRootContextValue(): RootContextValue | null {
@@ -86,11 +94,12 @@ describe('RootProvider', () => {
   const mainViewModel = {} as MainViewModel;
 
   it('provides the injected wall clock through context', () => {
-    const {wrapper, deterministicWallClock} = createRootProviderWrapper(mainViewModel, 1_234, false);
+    const {wrapper, deterministicWallClock, managedWebSocketConnection} = createRootProviderWrapper(mainViewModel, 1_234, false);
 
     const {result} = renderHook(getRootContextValue, {wrapper});
 
     expect(result.current?.mainViewModel).toBe(mainViewModel);
+    expect(result.current?.managedWebSocketConnection).toBe(managedWebSocketConnection);
     expect(result.current?.wallClock).toBe(deterministicWallClock);
     expect(result.current?.wallClock.currentTimestampInMilliseconds).toBe(1_234);
     expect(result.current?.doesApplicationNeedForceReload).toBe(false);
@@ -121,12 +130,20 @@ describe('RootProvider', () => {
     expect(result.current.doesApplicationNeedForceReload).toBe(true);
   });
 
-  it('provides startup feature toggle helper through useApplicationContext()', function () {
+  it('provides startup feature toggle helper through useApplicationContext()', () => {
     const {wrapper, isFeatureToggleEnabled} = createRootProviderWrapper(mainViewModel, 9_999, true);
 
     const {result} = renderHook(useApplicationContext, {wrapper});
 
     expect(result.current.isFeatureToggleEnabled('reliable-websocket-connection')).toBe(true);
     expect(isFeatureToggleEnabled).toHaveBeenCalledWith('reliable-websocket-connection');
+  });
+
+  it('provides managed WebSocket connection through useApplicationContext()', () => {
+    const {wrapper, managedWebSocketConnection} = createRootProviderWrapper(mainViewModel, 9_999, true);
+
+    const {result} = renderHook(useApplicationContext, {wrapper});
+
+    expect(result.current.managedWebSocketConnection).toBe(managedWebSocketConnection);
   });
 });

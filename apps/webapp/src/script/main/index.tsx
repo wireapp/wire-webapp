@@ -40,6 +40,11 @@ import {SIGN_OUT_REASON} from '../auth/SignOutReason';
 import {createWallClock} from '../clock/wallClock';
 import {Config} from '../Config';
 import {createStartupFeatureTogglesFromLocationSearch} from '../featureToggles/startupFeatureToggles';
+import {
+  createBrowserWebSocketConnection,
+  createManagedWebSocketConnection,
+} from '../webSocketConnection/createManagedWebSocketConnection';
+import {createNoopManagedWebSocketConnection} from '../webSocketConnection/createNoopManagedWebSocketConnection';
 
 document.addEventListener('DOMContentLoaded', async () => {
   const config = Config.getConfig();
@@ -70,15 +75,25 @@ document.addEventListener('DOMContentLoaded', async () => {
   const startupFeatureToggles = createStartupFeatureTogglesFromLocationSearch(globalThis.location.search);
   const applicationServices = createApplicationServices({
     createWallClock,
+    startupFeatureToggles,
+    createEnabledManagedWebSocketConnection() {
+      return createManagedWebSocketConnection({
+        createWebSocketConnection: createBrowserWebSocketConnection,
+      });
+    },
+    createDisabledManagedWebSocketConnection() {
+      return createNoopManagedWebSocketConnection();
+    },
   });
   const {isFeatureToggleEnabled} = startupFeatureToggles;
-  const {wallClock} = applicationServices;
+  const {wallClock, managedWebSocketConnection} = applicationServices;
 
   createRoot(appContainer).render(
     <AppContainer
       config={config}
       clientType={shouldPersist ? ClientType.PERMANENT : ClientType.TEMPORARY}
       isFeatureToggleEnabled={isFeatureToggleEnabled}
+      managedWebSocketConnection={managedWebSocketConnection}
       wallClock={wallClock}
     />,
   );

@@ -18,19 +18,35 @@
  */
 
 import {WallClock} from '../clock/wallClock';
+import {StartupFeatureToggles} from '../featureToggles/startupFeatureToggles';
+import {ManagedWebSocketConnection} from '../webSocketConnection/createManagedWebSocketConnection';
+import {selectManagedWebSocketConnectionForStartupFeatureToggles} from '../webSocketConnection/selectManagedWebSocketConnection';
 
 export type ApplicationServices = {
+  readonly managedWebSocketConnection: ManagedWebSocketConnection;
   readonly wallClock: WallClock;
 };
 
 type CreateApplicationServicesDependencies = {
   readonly createWallClock: () => WallClock;
+  readonly startupFeatureToggles: StartupFeatureToggles;
+  readonly createEnabledManagedWebSocketConnection: () => ManagedWebSocketConnection;
+  readonly createDisabledManagedWebSocketConnection: () => ManagedWebSocketConnection;
 };
 
 export function createApplicationServices(dependencies: CreateApplicationServicesDependencies): ApplicationServices {
-  const {createWallClock} = dependencies;
+  const {
+    createWallClock,
+    startupFeatureToggles,
+    createEnabledManagedWebSocketConnection,
+    createDisabledManagedWebSocketConnection,
+  } = dependencies;
 
   return {
+    managedWebSocketConnection: selectManagedWebSocketConnectionForStartupFeatureToggles(startupFeatureToggles, {
+      createEnabledManagedWebSocketConnection,
+      createDisabledManagedWebSocketConnection,
+    }),
     wallClock: createWallClock(),
   };
 }

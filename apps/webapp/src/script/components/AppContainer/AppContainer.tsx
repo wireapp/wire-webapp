@@ -48,16 +48,24 @@ import {AppMain} from '../../page/AppMain';
 import {APIClient} from '../../service/APIClientSingleton';
 import {Core} from '../../service/CoreSingleton';
 import {MainViewModel} from '../../view_model/MainViewModel';
+import {ManagedWebSocketConnection} from '../../webSocketConnection/createManagedWebSocketConnection';
 import {AppLoader} from '../AppLoader';
 
 type AppProps = {
   readonly config: Configuration;
   readonly clientType: ClientType;
   readonly isFeatureToggleEnabled: (featureName: StartupFeatureToggleName) => boolean;
+  readonly managedWebSocketConnection: ManagedWebSocketConnection;
   readonly wallClock: WallClock;
 };
 
-export const AppContainer = ({config, clientType, isFeatureToggleEnabled, wallClock}: AppProps) => {
+export const AppContainer = ({
+  config,
+  clientType,
+  isFeatureToggleEnabled,
+  managedWebSocketConnection,
+  wallClock,
+}: AppProps) => {
   setAppLocale();
   const app = useMemo(() => new App(container.resolve(Core), container.resolve(APIClient), config), []);
   const enableAutoLogin = Config.getConfig().FEATURE.ENABLE_AUTO_LOGIN;
@@ -118,6 +126,7 @@ export const AppContainer = ({config, clientType, isFeatureToggleEnabled, wallCl
             <AppMain
               app={app}
               isFeatureToggleEnabled={isFeatureToggleEnabled}
+              managedWebSocketConnection={managedWebSocketConnection}
               selfUser={selfUser}
               mainView={mainView}
               locked={softLockEnabled}

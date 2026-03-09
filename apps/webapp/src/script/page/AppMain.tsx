@@ -75,6 +75,7 @@ import {configureRoutes, navigate} from '../router/Router';
 import {TIME_IN_MILLIS} from '../util/TimeUtil';
 import {MainViewModel} from '../view_model/MainViewModel';
 import {WarningsContainer} from '../view_model/WarningsContainer/WarningsContainer';
+import {ManagedWebSocketConnection} from '../webSocketConnection/createManagedWebSocketConnection';
 
 export type RightSidebarParams = {
   entity: PanelEntity | null;
@@ -85,6 +86,7 @@ export type RightSidebarParams = {
 type AppMainProps = {
   readonly app: App;
   readonly isFeatureToggleEnabled: (featureName: StartupFeatureToggleName) => boolean;
+  readonly managedWebSocketConnection: ManagedWebSocketConnection;
   readonly selfUser: User;
   readonly mainView: MainViewModel;
   readonly conversationState?: ConversationState;
@@ -97,6 +99,7 @@ type AppMainProps = {
 export const AppMain = ({
   app,
   isFeatureToggleEnabled,
+  managedWebSocketConnection,
   mainView,
   selfUser,
   conversationState = container.resolve(ConversationState),
@@ -316,6 +319,7 @@ export const AppMain = ({
           wallClock,
           doesApplicationNeedForceReload,
           isFeatureToggleEnabled,
+          managedWebSocketConnection,
         }}
       >
         <ErrorBoundary FallbackComponent={ErrorFallback}>
