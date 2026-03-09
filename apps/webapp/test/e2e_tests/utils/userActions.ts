@@ -80,18 +80,6 @@ export const createChannel = async (pages: UserPages, conversationName: string, 
   await pages.groupCreation().clickCreateGroupButton();
 };
 
-export const handleAppLockState = async (pageManager: PageManager, appLockPassCode: string) => {
-  const {modals} = pageManager.webapp;
-  const appLockModal = await modals.appLock();
-  if (await appLockModal.isVisible()) {
-    if (await appLockModal.lockPasscodeInput.isVisible()) {
-      await appLockModal.setPasscode(appLockPassCode);
-    } else {
-      await appLockModal.unlockAppWithPasscode(appLockPassCode);
-    }
-  }
-};
-
 /**
  * Opens the connections tab, searches for the given user and starts a conversation with him
  * Note: This util only works if both users are part of the same team.

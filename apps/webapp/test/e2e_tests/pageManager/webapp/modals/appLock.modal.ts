@@ -45,7 +45,7 @@ export class AppLockModal {
     this.appLockModalHeader = page.locator("[data-uie-name='applock-modal'] [data-uie-name='applock-modal-header']");
     this.appLockModalText = page.locator("[data-uie-name='applock-modal'] [data-uie-name='label-applock-unlock-text']");
     this.loadingBar = page.locator('.progress-bar');
-    this.errorMessage = this.appLockModal.getByTestId('label-applock-unlock-error');
+    this.errorMessage = this.appLockModal.getByTestId(/label-applock-(unlock|wipe)-error/);
     this.forgotPassphraseButton = this.appLockModal.getByTestId('go-forgot-passphrase');
     this.wipeDatabaseButton = this.appLockModal.getByTestId('go-wipe-database');
   }
