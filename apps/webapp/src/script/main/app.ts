@@ -344,6 +344,10 @@ export class App {
     return this.apiClient.context;
   }
 
+  buildWebSocketConnectionUrl(): string {
+    return this.apiClient.transport.ws.buildWebSocketUrl();
+  }
+
   /**
    * Subscribe to amplify events.
    */

@@ -76,6 +76,7 @@ import {TIME_IN_MILLIS} from '../util/TimeUtil';
 import {MainViewModel} from '../view_model/MainViewModel';
 import {WarningsContainer} from '../view_model/WarningsContainer/WarningsContainer';
 import {ManagedWebSocketConnection} from '../webSocketConnection/createManagedWebSocketConnection';
+import {startManagedWebSocketConnectionLifecycle} from '../webSocketConnection/startManagedWebSocketConnectionLifecycle';
 import {WebSocketConnectionState} from '../webSocketConnection/webSocketConnectionState';
 
 export type RightSidebarParams = {
@@ -125,6 +126,19 @@ export const AppMain = ({
       runPeriodicCheck: runApplicationPeriodicCheck,
     });
   }, [wallClock, runApplicationPeriodicCheck]);
+
+  useEffect(() => {
+    if (!isFeatureToggleEnabled('reliable-websocket-connection')) {
+      return undefined;
+    }
+
+    return startManagedWebSocketConnectionLifecycle({
+      managedWebSocketConnection,
+      buildWebSocketConnectionUrl() {
+        return app.buildWebSocketConnectionUrl();
+      },
+    });
+  }, [app, isFeatureToggleEnabled, managedWebSocketConnection]);
 
   useEffect(() => {
     return managedWebSocketConnection.subscribeToConnectionState(setWebSocketConnectionState);
