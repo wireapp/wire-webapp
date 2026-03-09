@@ -121,43 +121,42 @@ Notes:
 
 | Environment Variable | Default / Source | Used for | Additional Conditions |
 | --- | --- | --- | --- |
-| `FEATURE_ENABLE_CELLS` | `false` | Enables Cells integration features | May apply |
-| `FEATURE_CELLS_INIT_WITH_ZAUTH_TOKEN` | `false` | Initialize Cells with ZAuth token | May apply |
-| `FEATURE_ALLOW_LINK_PREVIEWS` | `false` | Enables link preview rendering | May apply |
-| `FEATURE_CHECK_CONSENT` | `true` | User consent checks | May apply |
-| `FEATURE_CONFERENCE_AUTO_MUTE` | `false` | Auto-mute when joining calls | May apply |
-| `FEATURE_DEFAULT_LOGIN_TEMPORARY_CLIENT` | `false` | Preselect temporary client on login | May apply |
-| `FEATURE_ENABLE_ACCOUNT_REGISTRATION` | `true` | Account registration availability | May apply |
-| `FEATURE_ENABLE_ACCOUNT_REGISTRATION_ACCEPT_TERMS_AND_PRIVACY_POLICY` | `false` | Require terms + privacy acceptance in registration flow | May apply |
-| `FEATURE_ENABLE_ADVANCED_FILTERS` | `false` | Advanced filters UI feature | May apply |
-| `FEATURE_ENABLE_AUTO_LOGIN` | `false` | Auto-login support | May apply |
-| `FEATURE_ENABLE_BLUR_BACKGROUND` | `false` | Background blur in video calls | May apply |
-| `FEATURE_ENABLE_CHANNELS` | `false` | Channels feature | May apply |
-| `FEATURE_ENABLE_CHANNELS_HISTORY_SHARING` | `false` | Channels history sharing | May apply |
-| `FEATURE_ENABLE_CROSS_PLATFORM_BACKUP_EXPORT` | `false` | Cross-platform backup export | May apply |
-| `FEATURE_ENABLE_DEBUG` | `false` | Debug mode toggles in client/server (also relaxes CSP connect-src in server) | May apply |
-| `FEATURE_ENABLE_DETACHED_CALLING_WINDOW` | `false` | Pop-out calling window | May apply |
-| `FEATURE_ENABLE_DOMAIN_DISCOVERY` | `true` | Domain discovery in login/auth flows | May apply |
-| `FEATURE_ENABLE_ENCRYPTION_AT_REST` | `false` | Encryption-at-rest client behavior switch | May apply |
-| `FEATURE_ENABLE_ENFORCE_DESKTOP_APPLICATION_ONLY` | `false` | Restrict web usage to desktop-app context | May apply |
-| `FEATURE_ENABLE_EXTRA_CLIENT_ENTROPY` | `false` | Extra entropy during client creation | May apply |
-| `FEATURE_ENABLE_IN_CALL_HAND_RAISE` | `false` | In-call hand raise feature | May apply |
-| `FEATURE_ENABLE_IN_CALL_REACTIONS` | `false` | In-call reactions feature | May apply |
-| `FEATURE_ENABLE_MEDIA_EMBEDS` | `true` | Media embeds (YouTube/Vimeo/Spotify/etc.) | May apply |
-| `FEATURE_ENABLE_MESSAGE_FORMAT_BUTTONS` | `false` | Rich text formatting controls | May apply |
-| `FEATURE_ENABLE_PING_CONFIRMATION` | `false` | Confirm modal before pinging large groups | May apply |
-| `FEATURE_ENABLE_PRESS_SPACE_TO_UNMUTE` | `false` | Press-space-to-unmute behavior | May apply |
-| `FEATURE_ENABLE_PROTEUS_CORE_CRYPTO` | `false` | Enable Proteus core-crypto integration path | May apply |
-| `FEATURE_ENABLE_PUBLIC_CHANNELS` | `false` | Public channels feature | May apply |
-| `FEATURE_ENABLE_REMOVE_GROUP_CONVERSATION` | `false` | Remove conversation locally | May apply |
-| `FEATURE_ENABLE_SCREEN_SHARE_WITH_VIDEO` | `false` | Screen sharing with video overlay | May apply |
-| `FEATURE_ENABLE_SSO` | `false` | SSO login flow | May apply |
-| `FEATURE_ENABLE_TEAM_CREATION` | `false` | Team creation flow for individual users | May apply |
-| `FEATURE_ENABLE_VIRTUALIZED_MESSAGES_LIST` | `false` | Virtualized message list rendering | May apply |
-| `FEATURE_ENFORCE_CONSTANT_BITRATE` | `false` | Constant bitrate call encoding | May apply |
-| `FEATURE_FORCE_EXTRA_CLIENT_ENTROPY` | `false` | Additional entropy safeguards for client creation | May apply |
-| `FEATURE_SHOW_LOADING_INFORMATION` | `false` | Extra loading-state information in UI | May apply |
-| `FEATURE_USE_CORE_CRYPTO` | `false` | Enable MLS/core-crypto protocol path | May apply |
+| `FEATURE_ENABLE_CELLS` | `false` | Enables Cells integration features | May apply (requires conversation Cells state not disabled) |
+| `FEATURE_CELLS_INIT_WITH_ZAUTH_TOKEN` | `false` | Initialize Cells with ZAuth token | N/A |
+| `FEATURE_ALLOW_LINK_PREVIEWS` | `false` | Enables link preview rendering | May apply (also requires user preview preference enabled) |
+| `FEATURE_CHECK_CONSENT` | `true` | User consent checks | N/A |
+| `FEATURE_CONFERENCE_AUTO_MUTE` | `false` | Auto-mute when joining calls | May apply (conference calls only) |
+| `FEATURE_DEFAULT_LOGIN_TEMPORARY_CLIENT` | `false` | Preselect temporary client on login | N/A |
+| `FEATURE_ENABLE_ACCOUNT_REGISTRATION` | `true` | Account registration availability | N/A |
+| `FEATURE_ENABLE_ADVANCED_FILTERS` | `false` | Advanced filters UI feature | N/A |
+| `FEATURE_ENABLE_AUTO_LOGIN` | `false` | Auto-login support | N/A |
+| `FEATURE_ENABLE_BLUR_BACKGROUND` | `false` | Background blur in video calls | May apply (requires MediaPipe/WebGL processing path) |
+| `FEATURE_ENABLE_CHANNELS` | `false` | Channels feature | May apply (requires backend/team feature gating) |
+| `FEATURE_ENABLE_CHANNELS_HISTORY_SHARING` | `false` | Channels history sharing | May apply (channel context + channels gating) |
+| `FEATURE_ENABLE_CROSS_PLATFORM_BACKUP_EXPORT` | `false` | Cross-platform backup export | N/A |
+| `FEATURE_ENABLE_DEBUG` | `false` | Debug mode toggles in client/server (also relaxes CSP connect-src in server) | N/A |
+| `FEATURE_ENABLE_DETACHED_CALLING_WINDOW` | `false` | Pop-out calling window | May apply (desktop support flag required) |
+| `FEATURE_ENABLE_DOMAIN_DISCOVERY` | `true` | Domain discovery in login/auth flows | N/A |
+| `FEATURE_ENABLE_ENCRYPTION_AT_REST` | `false` | Encryption-at-rest client behavior switch | N/A |
+| `FEATURE_ENABLE_ENFORCE_DESKTOP_APPLICATION_ONLY` | `false` | Restrict web usage to desktop-app context | May apply (applies on non-desktop runtime) |
+| `FEATURE_ENABLE_EXTRA_CLIENT_ENTROPY` | `false` | Extra entropy during client creation | May apply (effective on Windows, or when FORCE_EXTRA_CLIENT_ENTROPY is enabled) |
+| `FEATURE_ENABLE_IN_CALL_HAND_RAISE` | `false` | In-call hand raise feature | May apply (visible in calls, except 1:1 conversations) |
+| `FEATURE_ENABLE_IN_CALL_REACTIONS` | `false` | In-call reactions feature | N/A |
+| `FEATURE_ENABLE_MEDIA_EMBEDS` | `true` | Media embeds (YouTube/Vimeo/Spotify/etc.) | May apply (also requires user preview setting enabled) |
+| `FEATURE_ENABLE_MESSAGE_FORMAT_BUTTONS` | `false` | Rich text formatting controls | May apply (format button also depends on markdown-preview preference) |
+| `FEATURE_ENABLE_PING_CONFIRMATION` | `false` | Confirm modal before pinging large groups | May apply (confirmation shown only for non-1:1 conversations with participant count at/above threshold) |
+| `FEATURE_ENABLE_PRESS_SPACE_TO_UNMUTE` | `false` | Press-space-to-unmute behavior | May apply (also requires user call preference enabled) |
+| `FEATURE_ENABLE_PROTEUS_CORE_CRYPTO` | `false` | Enable Proteus core-crypto integration path | N/A |
+| `FEATURE_ENABLE_PUBLIC_CHANNELS` | `false` | Public channels feature | May apply (requires public-channel permission/role gating) |
+| `FEATURE_ENABLE_REMOVE_GROUP_CONVERSATION` | `false` | Remove conversation locally | May apply (only for group/channel conversations where self user is already removed) |
+| `FEATURE_ENABLE_SCREEN_SHARE_WITH_VIDEO` | `false` | Screen sharing with video overlay | May apply (requires both screen-share and camera streams to be available) |
+| `FEATURE_ENABLE_SSO` | `false` | SSO login flow | N/A |
+| `FEATURE_ENABLE_TEAM_CREATION` | `false` | Team creation flow for individual users | May apply (requires backend API version support and user not already in a team) |
+| `FEATURE_ENABLE_VIRTUALIZED_MESSAGES_LIST` | `false` | Virtualized message list rendering | N/A |
+| `FEATURE_ENFORCE_CONSTANT_BITRATE` | `false` | Constant bitrate call encoding | May apply (enforced for all calls; practical impact is where VBR would otherwise be available, typically 1:1) |
+| `FEATURE_FORCE_EXTRA_CLIENT_ENTROPY` | `false` | Additional entropy safeguards for client creation | May apply (only affects behavior when ENABLE_EXTRA_CLIENT_ENTROPY is enabled; otherwise has no effect) |
+| `FEATURE_SHOW_LOADING_INFORMATION` | `false` | Extra loading-state information in UI | May apply (only visible while processing pending notifications during sync/loading) |
+| `FEATURE_USE_CORE_CRYPTO` | `false` | Enable MLS/core-crypto protocol path | N/A |
 
 ### Numeric and limits
 
