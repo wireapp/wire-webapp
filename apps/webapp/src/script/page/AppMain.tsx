@@ -76,6 +76,7 @@ import {TIME_IN_MILLIS} from '../util/TimeUtil';
 import {MainViewModel} from '../view_model/MainViewModel';
 import {WarningsContainer} from '../view_model/WarningsContainer/WarningsContainer';
 import {ManagedWebSocketConnection} from '../webSocketConnection/createManagedWebSocketConnection';
+import {WebSocketConnectionStateMachineState} from '../webSocketConnection/webSocketConnectionStateMachine';
 
 export type RightSidebarParams = {
   entity: PanelEntity | null;
@@ -108,6 +109,9 @@ export const AppMain = ({
   locked,
 }: AppMainProps) => {
   const [doesApplicationNeedForceReload, setDoesApplicationNeedForceReload] = useState(false);
+  const [webSocketConnectionState, setWebSocketConnectionState] = useState<WebSocketConnectionStateMachineState>(
+    managedWebSocketConnection.currentConnectionState,
+  );
   const clientVersion = Config.getConfig().VERSION;
   const runApplicationPeriodicCheck: () => void = useCallback(() => {
     void runClientVersionCheck({ky, clientVersion, setDoesApplicationNeedForceReload});
@@ -121,6 +125,10 @@ export const AppMain = ({
       runPeriodicCheck: runApplicationPeriodicCheck,
     });
   }, [wallClock, runApplicationPeriodicCheck]);
+
+  useEffect(() => {
+    return managedWebSocketConnection.subscribeToConnectionState(setWebSocketConnectionState);
+  }, [managedWebSocketConnection]);
 
   useActiveWindow(window);
 
@@ -320,6 +328,7 @@ export const AppMain = ({
           doesApplicationNeedForceReload,
           isFeatureToggleEnabled,
           managedWebSocketConnection,
+          webSocketConnectionState,
         }}
       >
         <ErrorBoundary FallbackComponent={ErrorFallback}>

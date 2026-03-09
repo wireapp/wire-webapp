@@ -30,6 +30,7 @@ import {MainViewModel} from '../../view_model/MainViewModel';
 import {createDeterministicWallClock} from '../../clock/deterministicWallClock';
 import {RootProvider} from '../RootProvider';
 import {ContentState, useAppState} from '../useAppState';
+import {createNoopManagedWebSocketConnection} from '../../webSocketConnection/createNoopManagedWebSocketConnection';
 
 jest.mock('./panels/preferences/AccountPreferences', () => ({
   AccountPreferences: () => <span>AccountPreferences</span>,
@@ -67,6 +68,7 @@ describe('Preferences', () => {
     reloadApp: jest.fn(),
   };
   const wallClock = createDeterministicWallClock();
+  const managedWebSocketConnection = createNoopManagedWebSocketConnection();
 
   it('renders the right component according to view state', () => {
     const {setContentState} = useAppState.getState();
@@ -77,6 +79,8 @@ describe('Preferences', () => {
         <RootProvider
           value={{
             mainViewModel,
+            managedWebSocketConnection,
+            webSocketConnectionState: managedWebSocketConnection.currentConnectionState,
             wallClock,
             doesApplicationNeedForceReload: false,
             isFeatureToggleEnabled: isFeatureToggleDisabledForTest,

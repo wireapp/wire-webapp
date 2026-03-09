@@ -24,6 +24,7 @@ import {renderHook} from '@testing-library/react';
 import {createDeterministicWallClock} from '../clock/deterministicWallClock';
 import {StartupFeatureToggleName} from '../featureToggles/startupFeatureToggles';
 import {MainViewModel} from '../view_model/MainViewModel';
+import {createNoopManagedWebSocketConnection} from '../webSocketConnection/createNoopManagedWebSocketConnection';
 import {ManagedWebSocketConnection} from '../webSocketConnection/createManagedWebSocketConnection';
 import {
   RootContext,
@@ -45,7 +46,7 @@ type RootProviderWrapper = {
 };
 
 function createStubManagedWebSocketConnection(): ManagedWebSocketConnection {
-  return {} as ManagedWebSocketConnection;
+  return createNoopManagedWebSocketConnection();
 }
 
 function createRootProviderWrapper(
@@ -69,6 +70,7 @@ function createRootProviderWrapper(
         value={{
           mainViewModel,
           managedWebSocketConnection,
+          webSocketConnectionState: managedWebSocketConnection.currentConnectionState,
           wallClock: deterministicWallClock,
           doesApplicationNeedForceReload,
           isFeatureToggleEnabled,
@@ -100,6 +102,7 @@ describe('RootProvider', () => {
 
     expect(result.current?.mainViewModel).toBe(mainViewModel);
     expect(result.current?.managedWebSocketConnection).toBe(managedWebSocketConnection);
+    expect(result.current?.webSocketConnectionState).toBe(managedWebSocketConnection.currentConnectionState);
     expect(result.current?.wallClock).toBe(deterministicWallClock);
     expect(result.current?.wallClock.currentTimestampInMilliseconds).toBe(1_234);
     expect(result.current?.doesApplicationNeedForceReload).toBe(false);

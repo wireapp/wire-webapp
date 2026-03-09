@@ -23,10 +23,12 @@ import {WallClock} from '../clock/wallClock';
 import {StartupFeatureToggleName} from '../featureToggles/startupFeatureToggles';
 import {MainViewModel} from '../view_model/MainViewModel';
 import {ManagedWebSocketConnection} from '../webSocketConnection/createManagedWebSocketConnection';
+import {WebSocketConnectionStateMachineState} from '../webSocketConnection/webSocketConnectionStateMachine';
 
 export type RootContextValue = {
   readonly mainViewModel: MainViewModel;
   readonly managedWebSocketConnection: ManagedWebSocketConnection;
+  readonly webSocketConnectionState: WebSocketConnectionStateMachineState;
   readonly wallClock: WallClock;
   readonly doesApplicationNeedForceReload: boolean;
   readonly isFeatureToggleEnabled: (featureName: StartupFeatureToggleName) => boolean;

@@ -25,6 +25,7 @@ import {render} from '@testing-library/react';
 import {usePrimaryModalState} from 'Components/Modals/PrimaryModal';
 import {createDeterministicWallClock, DeterministicWallClock} from 'src/script/clock/deterministicWallClock';
 import {MainViewModel} from 'src/script/view_model/MainViewModel';
+import {createNoopManagedWebSocketConnection} from 'src/script/webSocketConnection/createNoopManagedWebSocketConnection';
 import {t} from 'Util/LocalizerUtil';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 
@@ -73,6 +74,7 @@ function createForceReloadModalTestElement(
     reloadApplication,
     wallClock = createDeterministicWallClock({initialCurrentTimestampInMilliseconds: 1_111}),
   } = contextValue;
+  const managedWebSocketConnection = createNoopManagedWebSocketConnection();
 
   return (
     <RootProvider
@@ -80,6 +82,8 @@ function createForceReloadModalTestElement(
         doesApplicationNeedForceReload,
         isFeatureToggleEnabled: isFeatureToggleDisabledForTest,
         mainViewModel: createMainViewModelForTest(),
+        managedWebSocketConnection,
+        webSocketConnectionState: managedWebSocketConnection.currentConnectionState,
         wallClock,
       }}
     >
