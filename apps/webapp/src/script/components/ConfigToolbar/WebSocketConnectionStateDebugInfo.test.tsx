@@ -26,13 +26,14 @@ import {StartupFeatureToggleName} from '../../featureToggles/startupFeatureToggl
 import {RootProvider} from '../../page/RootProvider';
 import {MainViewModel} from '../../view_model/MainViewModel';
 import {createNoopManagedWebSocketConnection} from '../../webSocketConnection/createNoopManagedWebSocketConnection';
-import {webSocketConnectionState} from '../../webSocketConnection/webSocketConnectionState';
+import {webSocketConnectionState, WebSocketConnectionState} from '../../webSocketConnection/webSocketConnectionState';
 
 import {WebSocketConnectionStateDebugInfo} from './WebSocketConnectionStateDebugInfo';
 
 type TestWrapperProperties = {
   readonly children: ReactNode;
   readonly isReliableWebSocketConnectionEnabled: boolean;
+  readonly webSocketConnectionState: WebSocketConnectionState;
 };
 
 const testMainViewModel = {} as MainViewModel;
@@ -40,6 +41,7 @@ const testMainViewModel = {} as MainViewModel;
 const TestWrapper: FunctionComponent<TestWrapperProperties> = ({
   children,
   isReliableWebSocketConnectionEnabled,
+  webSocketConnectionState,
 }: TestWrapperProperties) => {
   const managedWebSocketConnection = createNoopManagedWebSocketConnection();
   const deterministicWallClock = createDeterministicWallClock();
@@ -53,7 +55,7 @@ const TestWrapper: FunctionComponent<TestWrapperProperties> = ({
       value={{
         mainViewModel: testMainViewModel,
         managedWebSocketConnection,
-        webSocketConnectionState: webSocketConnectionState.offline,
+        webSocketConnectionState,
         wallClock: deterministicWallClock,
         doesApplicationNeedForceReload: false,
         isFeatureToggleEnabled,
@@ -67,18 +69,24 @@ const TestWrapper: FunctionComponent<TestWrapperProperties> = ({
 describe('WebSocketConnectionStateDebugInfo', () => {
   it('renders the current WebSocket connection state when reliable WebSocket feature is enabled', () => {
     render(
-      <TestWrapper isReliableWebSocketConnectionEnabled={true}>
+      <TestWrapper
+        isReliableWebSocketConnectionEnabled={true}
+        webSocketConnectionState={webSocketConnectionState.connecting}
+      >
         <WebSocketConnectionStateDebugInfo />
       </TestWrapper>,
     );
 
     expect(screen.getByText('WEBSOCKET CONNECTION STATE')).not.toBeNull();
-    expect(screen.getByText(webSocketConnectionState.offline)).not.toBeNull();
+    expect(screen.getByText(webSocketConnectionState.connecting)).not.toBeNull();
   });
 
   it('does not render when reliable WebSocket feature is disabled', () => {
     render(
-      <TestWrapper isReliableWebSocketConnectionEnabled={false}>
+      <TestWrapper
+        isReliableWebSocketConnectionEnabled={false}
+        webSocketConnectionState={webSocketConnectionState.offline}
+      >
         <WebSocketConnectionStateDebugInfo />
       </TestWrapper>,
     );

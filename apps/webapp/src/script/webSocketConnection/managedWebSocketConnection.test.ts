@@ -150,6 +150,23 @@ describe('createManagedWebSocketConnection', () => {
     managedWebSocketConnection.dispose();
   });
 
+  it('updates to connecting state after connect before the connection emits open', () => {
+    const fakeWebSocketConnectionContext = createFakeWebSocketConnectionContext();
+    const managedWebSocketConnection = createManagedWebSocketConnection({
+      createWebSocketConnection() {
+        return fakeWebSocketConnectionContext.fakeWebSocketConnection;
+      },
+      isConnectivityAvailable: isConnectivityAvailableForTest,
+      subscribeToConnectivityStatusChanges: subscribeToConnectivityStatusChangesForTest,
+    });
+
+    managedWebSocketConnection.connect('wss://example.test/socket');
+
+    expect(managedWebSocketConnection.currentConnectionState).toBe(webSocketConnectionState.connecting);
+
+    managedWebSocketConnection.dispose();
+  });
+
   it('returns to offline state and closes the active connection on disconnect', () => {
     const fakeWebSocketConnectionContext = createFakeWebSocketConnectionContext();
     const managedWebSocketConnection = createManagedWebSocketConnection({
@@ -182,6 +199,7 @@ describe('createManagedWebSocketConnection', () => {
 
     managedWebSocketConnection.connect('wss://example.test/socket');
 
+    expect(managedWebSocketConnection.currentConnectionState).toBe(webSocketConnectionState.connecting);
     expect(managedWebSocketConnection.sendMessage('before-open')).toBe(false);
 
     fakeWebSocketConnectionContext.setReadyState(1);
@@ -216,6 +234,7 @@ describe('createManagedWebSocketConnection', () => {
 
     expect(observedConnectionStateList).toEqual([
       webSocketConnectionState.offline,
+      webSocketConnectionState.connecting,
       webSocketConnectionState.online,
       webSocketConnectionState.offline,
     ]);

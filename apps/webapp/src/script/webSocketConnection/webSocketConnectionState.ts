@@ -18,6 +18,7 @@
  */
 
 export const webSocketConnectionState = Object.freeze({
+  connecting: 'connecting',
   offline: 'offline',
   online: 'online',
 } as const);

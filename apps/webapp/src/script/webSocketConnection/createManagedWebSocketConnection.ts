@@ -63,6 +63,10 @@ function toWebSocketConnectionState(snapshot: ManagedWebSocketConnectionStateSna
     return webSocketConnectionState.online;
   }
 
+  if (snapshot.matches({active: {connected: 'connecting'}})) {
+    return webSocketConnectionState.connecting;
+  }
+
   return webSocketConnectionState.offline;
 }
 
