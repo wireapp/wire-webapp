@@ -20,5 +20,27 @@
 import {WebSocketConnectionTransport} from './createManagedWebSocketConnection';
 
 export function createBrowserWebSocketConnection(connectionUrl: string): WebSocketConnectionTransport {
-  return new WebSocket(connectionUrl);
+  const webSocketConnection = new WebSocket(connectionUrl);
+
+  return {
+    get readyState() {
+      return webSocketConnection.readyState;
+    },
+
+    send(message) {
+      webSocketConnection.send(message);
+    },
+
+    close() {
+      webSocketConnection.close();
+    },
+
+    addEventListener(type, listener) {
+      webSocketConnection.addEventListener(type, listener);
+    },
+
+    removeEventListener(type, listener) {
+      webSocketConnection.removeEventListener(type, listener);
+    },
+  };
 }

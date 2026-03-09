@@ -27,6 +27,17 @@ import {
   ManagedWebSocketConnectionTransport,
 } from './managedWebSocketConnectionStateMachine';
 
+type ConnectivityStatusChangeHandlers = {
+  readonly onConnectivityBecameAvailable: () => void;
+  readonly onConnectivityBecameUnavailable: () => void;
+};
+
+type ConnectivityStatusTestContext = {
+  readonly notifyConnectivityBecameAvailable: () => void;
+  readonly notifyConnectivityBecameUnavailable: () => void;
+  readonly subscribeToConnectivityStatusChanges: (handlers: ConnectivityStatusChangeHandlers) => () => void;
+};
+
 type FakeManagedWebSocketConnectionTransportContext = {
   readonly createManagedWebSocketConnectionTransport: CreateManagedWebSocketConnectionTransport;
   readonly getCloseCallCount: () => number;
@@ -36,7 +47,7 @@ type FakeManagedWebSocketConnectionTransportContext = {
 };
 
 function createFakeManagedWebSocketConnectionTransportContext(): FakeManagedWebSocketConnectionTransportContext {
-  const listenerSetByEventType = new Map<ManagedWebSocketConnectionEventType, Set<(event: Event) => void>>();
+  const listenerSetByEventType = new Map<ManagedWebSocketConnectionEventType, Set<() => void>>();
   const sentMessageList: string[] = [];
   let closeCallCount = 0;
   let createCallCount = 0;
@@ -58,7 +69,7 @@ function createFakeManagedWebSocketConnectionTransportContext(): FakeManagedWebS
       },
 
       addEventListener(type, listener) {
-        const listenerSet = listenerSetByEventType.get(type) ?? new Set<(event: Event) => void>();
+        const listenerSet = listenerSetByEventType.get(type) ?? new Set<() => void>();
 
         listenerSet.add(listener);
         listenerSetByEventType.set(type, listenerSet);
@@ -85,8 +96,37 @@ function createFakeManagedWebSocketConnectionTransportContext(): FakeManagedWebS
       const listenerSet = listenerSetByEventType.get(eventType);
 
       listenerSet?.forEach((listener) => {
-        return listener(new Event(eventType));
+        return listener();
       });
+    },
+  };
+}
+
+function createConnectivityStatusTestContext(): ConnectivityStatusTestContext {
+  const connectivityAvailableListenerSet = new Set<() => void>();
+  const connectivityUnavailableListenerSet = new Set<() => void>();
+
+  return {
+    notifyConnectivityBecameAvailable() {
+      connectivityAvailableListenerSet.forEach((listener) => {
+        return listener();
+      });
+    },
+
+    notifyConnectivityBecameUnavailable() {
+      connectivityUnavailableListenerSet.forEach((listener) => {
+        return listener();
+      });
+    },
+
+    subscribeToConnectivityStatusChanges({onConnectivityBecameAvailable, onConnectivityBecameUnavailable}) {
+      connectivityAvailableListenerSet.add(onConnectivityBecameAvailable);
+      connectivityUnavailableListenerSet.add(onConnectivityBecameUnavailable);
+
+      return function unsubscribeFromConnectivityStatusChanges(): void {
+        connectivityAvailableListenerSet.delete(onConnectivityBecameAvailable);
+        connectivityUnavailableListenerSet.delete(onConnectivityBecameUnavailable);
+      };
     },
   };
 }
@@ -94,24 +134,34 @@ function createFakeManagedWebSocketConnectionTransportContext(): FakeManagedWebS
 describe('createManagedWebSocketConnectionStateMachine', () => {
   it('starts in offline state', () => {
     const fakeManagedWebSocketConnectionTransportContext = createFakeManagedWebSocketConnectionTransportContext();
+    const connectivityStatusTestContext = createConnectivityStatusTestContext();
     const managedWebSocketConnectionStateMachineActor = createActor(
       createManagedWebSocketConnectionStateMachine({
         createManagedWebSocketConnectionTransport:
           fakeManagedWebSocketConnectionTransportContext.createManagedWebSocketConnectionTransport,
+        isConnectivityAvailable() {
+          return false;
+        },
+        subscribeToConnectivityStatusChanges: connectivityStatusTestContext.subscribeToConnectivityStatusChanges,
       }),
     );
 
     managedWebSocketConnectionStateMachineActor.start();
 
-    expect(managedWebSocketConnectionStateMachineActor.getSnapshot().matches('offline')).toBe(true);
+    expect(managedWebSocketConnectionStateMachineActor.getSnapshot().matches({active: 'offline'})).toBe(true);
   });
 
   it('creates a transport and enters connecting when connect is requested', () => {
     const fakeManagedWebSocketConnectionTransportContext = createFakeManagedWebSocketConnectionTransportContext();
+    const connectivityStatusTestContext = createConnectivityStatusTestContext();
     const managedWebSocketConnectionStateMachineActor = createActor(
       createManagedWebSocketConnectionStateMachine({
         createManagedWebSocketConnectionTransport:
           fakeManagedWebSocketConnectionTransportContext.createManagedWebSocketConnectionTransport,
+        isConnectivityAvailable() {
+          return true;
+        },
+        subscribeToConnectivityStatusChanges: connectivityStatusTestContext.subscribeToConnectivityStatusChanges,
       }),
     );
 
@@ -121,16 +171,74 @@ describe('createManagedWebSocketConnectionStateMachine', () => {
       type: managedWebSocketConnectionStateMachineEventType.connect,
     });
 
-    expect(managedWebSocketConnectionStateMachineActor.getSnapshot().matches({connected: 'connecting'})).toBe(true);
+    expect(managedWebSocketConnectionStateMachineActor.getSnapshot().matches({active: {connected: 'connecting'}})).toBe(
+      true,
+    );
+    expect(fakeManagedWebSocketConnectionTransportContext.getCreateCallCount()).toBe(1);
+  });
+
+  it('waits offline after connect when connectivity is unavailable', () => {
+    const fakeManagedWebSocketConnectionTransportContext = createFakeManagedWebSocketConnectionTransportContext();
+    const connectivityStatusTestContext = createConnectivityStatusTestContext();
+    const managedWebSocketConnectionStateMachineActor = createActor(
+      createManagedWebSocketConnectionStateMachine({
+        createManagedWebSocketConnectionTransport:
+          fakeManagedWebSocketConnectionTransportContext.createManagedWebSocketConnectionTransport,
+        isConnectivityAvailable() {
+          return false;
+        },
+        subscribeToConnectivityStatusChanges: connectivityStatusTestContext.subscribeToConnectivityStatusChanges,
+      }),
+    );
+
+    managedWebSocketConnectionStateMachineActor.start();
+    managedWebSocketConnectionStateMachineActor.send({
+      connectionUrl: 'wss://example.test/socket',
+      type: managedWebSocketConnectionStateMachineEventType.connect,
+    });
+
+    expect(managedWebSocketConnectionStateMachineActor.getSnapshot().matches({active: 'offline'})).toBe(true);
+    expect(fakeManagedWebSocketConnectionTransportContext.getCreateCallCount()).toBe(0);
+  });
+
+  it('connects when connectivity becomes available after a pending connect request', () => {
+    const fakeManagedWebSocketConnectionTransportContext = createFakeManagedWebSocketConnectionTransportContext();
+    const connectivityStatusTestContext = createConnectivityStatusTestContext();
+    const managedWebSocketConnectionStateMachineActor = createActor(
+      createManagedWebSocketConnectionStateMachine({
+        createManagedWebSocketConnectionTransport:
+          fakeManagedWebSocketConnectionTransportContext.createManagedWebSocketConnectionTransport,
+        isConnectivityAvailable() {
+          return false;
+        },
+        subscribeToConnectivityStatusChanges: connectivityStatusTestContext.subscribeToConnectivityStatusChanges,
+      }),
+    );
+
+    managedWebSocketConnectionStateMachineActor.start();
+    managedWebSocketConnectionStateMachineActor.send({
+      connectionUrl: 'wss://example.test/socket',
+      type: managedWebSocketConnectionStateMachineEventType.connect,
+    });
+    connectivityStatusTestContext.notifyConnectivityBecameAvailable();
+
+    expect(managedWebSocketConnectionStateMachineActor.getSnapshot().matches({active: {connected: 'connecting'}})).toBe(
+      true,
+    );
     expect(fakeManagedWebSocketConnectionTransportContext.getCreateCallCount()).toBe(1);
   });
 
   it('transitions to online when the transport emits open', () => {
     const fakeManagedWebSocketConnectionTransportContext = createFakeManagedWebSocketConnectionTransportContext();
+    const connectivityStatusTestContext = createConnectivityStatusTestContext();
     const managedWebSocketConnectionStateMachineActor = createActor(
       createManagedWebSocketConnectionStateMachine({
         createManagedWebSocketConnectionTransport:
           fakeManagedWebSocketConnectionTransportContext.createManagedWebSocketConnectionTransport,
+        isConnectivityAvailable() {
+          return true;
+        },
+        subscribeToConnectivityStatusChanges: connectivityStatusTestContext.subscribeToConnectivityStatusChanges,
       }),
     );
 
@@ -141,15 +249,22 @@ describe('createManagedWebSocketConnectionStateMachine', () => {
     });
     fakeManagedWebSocketConnectionTransportContext.triggerEvent('open');
 
-    expect(managedWebSocketConnectionStateMachineActor.getSnapshot().matches({connected: 'online'})).toBe(true);
+    expect(managedWebSocketConnectionStateMachineActor.getSnapshot().matches({active: {connected: 'online'}})).toBe(
+      true,
+    );
   });
 
   it('sends messages only after the transport reached online state', () => {
     const fakeManagedWebSocketConnectionTransportContext = createFakeManagedWebSocketConnectionTransportContext();
+    const connectivityStatusTestContext = createConnectivityStatusTestContext();
     const managedWebSocketConnectionStateMachineActor = createActor(
       createManagedWebSocketConnectionStateMachine({
         createManagedWebSocketConnectionTransport:
           fakeManagedWebSocketConnectionTransportContext.createManagedWebSocketConnectionTransport,
+        isConnectivityAvailable() {
+          return true;
+        },
+        subscribeToConnectivityStatusChanges: connectivityStatusTestContext.subscribeToConnectivityStatusChanges,
       }),
     );
 
@@ -173,10 +288,15 @@ describe('createManagedWebSocketConnectionStateMachine', () => {
 
   it('returns to offline state and closes the transport on disconnect', () => {
     const fakeManagedWebSocketConnectionTransportContext = createFakeManagedWebSocketConnectionTransportContext();
+    const connectivityStatusTestContext = createConnectivityStatusTestContext();
     const managedWebSocketConnectionStateMachineActor = createActor(
       createManagedWebSocketConnectionStateMachine({
         createManagedWebSocketConnectionTransport:
           fakeManagedWebSocketConnectionTransportContext.createManagedWebSocketConnectionTransport,
+        isConnectivityAvailable() {
+          return true;
+        },
+        subscribeToConnectivityStatusChanges: connectivityStatusTestContext.subscribeToConnectivityStatusChanges,
       }),
     );
 
@@ -190,16 +310,76 @@ describe('createManagedWebSocketConnectionStateMachine', () => {
       type: managedWebSocketConnectionStateMachineEventType.disconnect,
     });
 
-    expect(managedWebSocketConnectionStateMachineActor.getSnapshot().matches('offline')).toBe(true);
+    expect(managedWebSocketConnectionStateMachineActor.getSnapshot().matches({active: 'offline'})).toBe(true);
     expect(fakeManagedWebSocketConnectionTransportContext.getCloseCallCount()).toBe(1);
   });
 
-  it('transitions to disposed and closes the transport on dispose', () => {
+  it('returns to offline state and closes the transport when connectivity becomes unavailable', () => {
     const fakeManagedWebSocketConnectionTransportContext = createFakeManagedWebSocketConnectionTransportContext();
+    const connectivityStatusTestContext = createConnectivityStatusTestContext();
     const managedWebSocketConnectionStateMachineActor = createActor(
       createManagedWebSocketConnectionStateMachine({
         createManagedWebSocketConnectionTransport:
           fakeManagedWebSocketConnectionTransportContext.createManagedWebSocketConnectionTransport,
+        isConnectivityAvailable() {
+          return true;
+        },
+        subscribeToConnectivityStatusChanges: connectivityStatusTestContext.subscribeToConnectivityStatusChanges,
+      }),
+    );
+
+    managedWebSocketConnectionStateMachineActor.start();
+    managedWebSocketConnectionStateMachineActor.send({
+      connectionUrl: 'wss://example.test/socket',
+      type: managedWebSocketConnectionStateMachineEventType.connect,
+    });
+    fakeManagedWebSocketConnectionTransportContext.triggerEvent('open');
+    connectivityStatusTestContext.notifyConnectivityBecameUnavailable();
+
+    expect(managedWebSocketConnectionStateMachineActor.getSnapshot().matches({active: 'offline'})).toBe(true);
+    expect(fakeManagedWebSocketConnectionTransportContext.getCloseCallCount()).toBe(1);
+  });
+
+  it('reconnects when connectivity becomes available after becoming unavailable', () => {
+    const fakeManagedWebSocketConnectionTransportContext = createFakeManagedWebSocketConnectionTransportContext();
+    const connectivityStatusTestContext = createConnectivityStatusTestContext();
+    const managedWebSocketConnectionStateMachineActor = createActor(
+      createManagedWebSocketConnectionStateMachine({
+        createManagedWebSocketConnectionTransport:
+          fakeManagedWebSocketConnectionTransportContext.createManagedWebSocketConnectionTransport,
+        isConnectivityAvailable() {
+          return true;
+        },
+        subscribeToConnectivityStatusChanges: connectivityStatusTestContext.subscribeToConnectivityStatusChanges,
+      }),
+    );
+
+    managedWebSocketConnectionStateMachineActor.start();
+    managedWebSocketConnectionStateMachineActor.send({
+      connectionUrl: 'wss://example.test/socket',
+      type: managedWebSocketConnectionStateMachineEventType.connect,
+    });
+    fakeManagedWebSocketConnectionTransportContext.triggerEvent('open');
+    connectivityStatusTestContext.notifyConnectivityBecameUnavailable();
+    connectivityStatusTestContext.notifyConnectivityBecameAvailable();
+
+    expect(managedWebSocketConnectionStateMachineActor.getSnapshot().matches({active: {connected: 'connecting'}})).toBe(
+      true,
+    );
+    expect(fakeManagedWebSocketConnectionTransportContext.getCreateCallCount()).toBe(2);
+  });
+
+  it('transitions to disposed and closes the transport on dispose', () => {
+    const fakeManagedWebSocketConnectionTransportContext = createFakeManagedWebSocketConnectionTransportContext();
+    const connectivityStatusTestContext = createConnectivityStatusTestContext();
+    const managedWebSocketConnectionStateMachineActor = createActor(
+      createManagedWebSocketConnectionStateMachine({
+        createManagedWebSocketConnectionTransport:
+          fakeManagedWebSocketConnectionTransportContext.createManagedWebSocketConnectionTransport,
+        isConnectivityAvailable() {
+          return true;
+        },
+        subscribeToConnectivityStatusChanges: connectivityStatusTestContext.subscribeToConnectivityStatusChanges,
       }),
     );
 

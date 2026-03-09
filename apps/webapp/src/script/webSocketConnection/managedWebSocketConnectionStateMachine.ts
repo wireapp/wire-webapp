@@ -20,19 +20,34 @@
 import {fromCallback, setup} from 'xstate';
 
 export type ManagedWebSocketConnectionEventType = 'open' | 'close' | 'error';
+type ConnectivityStatusChangeHandlers = {
+  readonly onConnectivityBecameAvailable: () => void;
+  readonly onConnectivityBecameUnavailable: () => void;
+};
+
+export type SubscribeToConnectivityStatusChanges = (handlers: ConnectivityStatusChangeHandlers) => () => void;
+export type ManagedWebSocketConnectionTransportListener = () => void;
 
 export type ManagedWebSocketConnectionTransport = {
   readonly readyState: number;
   readonly send: (message: string) => void;
   readonly close: () => void;
-  readonly addEventListener: (type: ManagedWebSocketConnectionEventType, listener: (event: Event) => void) => void;
-  readonly removeEventListener: (type: ManagedWebSocketConnectionEventType, listener: (event: Event) => void) => void;
+  readonly addEventListener: (
+    type: ManagedWebSocketConnectionEventType,
+    listener: ManagedWebSocketConnectionTransportListener,
+  ) => void;
+  readonly removeEventListener: (
+    type: ManagedWebSocketConnectionEventType,
+    listener: ManagedWebSocketConnectionTransportListener,
+  ) => void;
 };
 
 export type CreateManagedWebSocketConnectionTransport = (connectionUrl: string) => ManagedWebSocketConnectionTransport;
 
 export const managedWebSocketConnectionStateMachineEventType = Object.freeze({
   connect: 'CONNECT',
+  connectivityBecameAvailable: 'CONNECTIVITY_BECAME_AVAILABLE',
+  connectivityBecameUnavailable: 'CONNECTIVITY_BECAME_UNAVAILABLE',
   disconnect: 'DISCONNECT',
   dispose: 'DISPOSE',
   sendMessage: 'SEND_MESSAGE',
@@ -43,6 +58,8 @@ export const managedWebSocketConnectionStateMachineEventType = Object.freeze({
 
 export type ManagedWebSocketConnectionStateMachineEvent =
   | {type: typeof managedWebSocketConnectionStateMachineEventType.connect; connectionUrl: string}
+  | {type: typeof managedWebSocketConnectionStateMachineEventType.connectivityBecameAvailable}
+  | {type: typeof managedWebSocketConnectionStateMachineEventType.connectivityBecameUnavailable}
   | {type: typeof managedWebSocketConnectionStateMachineEventType.disconnect}
   | {type: typeof managedWebSocketConnectionStateMachineEventType.dispose}
   | {type: typeof managedWebSocketConnectionStateMachineEventType.sendMessage; message: string}
@@ -57,28 +74,53 @@ type SendMessageManagedWebSocketConnectionStateMachineEvent = Extract<
 
 type ManagedWebSocketConnectionStateMachineContext = {
   readonly connectionUrl: string | undefined;
+  readonly isConnectivityAvailable: boolean;
 };
 
 type ActiveManagedWebSocketConnectionActorInput = {
   readonly connectionUrl: string;
 };
 
+type ConnectivityStatusActorInput = {
+  readonly subscribeToConnectivityStatusChanges: SubscribeToConnectivityStatusChanges;
+};
+
 type CreateManagedWebSocketConnectionStateMachineDependencies = {
   readonly createManagedWebSocketConnectionTransport: CreateManagedWebSocketConnectionTransport;
+  readonly isConnectivityAvailable: () => boolean;
+  readonly subscribeToConnectivityStatusChanges: SubscribeToConnectivityStatusChanges;
 };
 
 const activeManagedWebSocketConnectionActorId = 'activeManagedWebSocketConnection';
+const connectivityStatusActorId = 'connectivityStatus';
 
 export function createManagedWebSocketConnectionStateMachine(
   dependencies: CreateManagedWebSocketConnectionStateMachineDependencies,
 ) {
-  const {createManagedWebSocketConnectionTransport} = dependencies;
+  const {createManagedWebSocketConnectionTransport, isConnectivityAvailable, subscribeToConnectivityStatusChanges} =
+    dependencies;
   const managedWebSocketConnectionStateMachineSetup = setup({
     types: {} as {
       context: ManagedWebSocketConnectionStateMachineContext;
       events: ManagedWebSocketConnectionStateMachineEvent;
     },
     actors: {
+      connectivityStatus: fromCallback<ManagedWebSocketConnectionStateMachineEvent, ConnectivityStatusActorInput>(
+        ({input, sendBack}) => {
+          function handleConnectivityBecameAvailable(): void {
+            sendBack({type: managedWebSocketConnectionStateMachineEventType.connectivityBecameAvailable});
+          }
+
+          function handleConnectivityBecameUnavailable(): void {
+            sendBack({type: managedWebSocketConnectionStateMachineEventType.connectivityBecameUnavailable});
+          }
+
+          return input.subscribeToConnectivityStatusChanges({
+            onConnectivityBecameAvailable: handleConnectivityBecameAvailable,
+            onConnectivityBecameUnavailable: handleConnectivityBecameUnavailable,
+          });
+        },
+      ),
       activeManagedWebSocketConnection: fromCallback<
         SendMessageManagedWebSocketConnectionStateMachineEvent,
         ActiveManagedWebSocketConnectionActorInput
@@ -120,52 +162,20 @@ export function createManagedWebSocketConnectionStateMachine(
   return managedWebSocketConnectionStateMachineSetup.createMachine({
     context: {
       connectionUrl: undefined,
+      isConnectivityAvailable: isConnectivityAvailable(),
     },
-    initial: 'offline',
+    initial: 'active',
     states: {
-      offline: {
-        on: {
-          [managedWebSocketConnectionStateMachineEventType.connect]: {
-            actions: managedWebSocketConnectionStateMachineSetup.assign({
-              connectionUrl: ({event}) => {
-                if (event.type !== managedWebSocketConnectionStateMachineEventType.connect) {
-                  throw new Error('Managed WebSocket connection state machine expected a connect event');
-                }
-
-                return event.connectionUrl;
-              },
-            }),
-            target: 'connected.connecting',
-          },
-          [managedWebSocketConnectionStateMachineEventType.dispose]: {
-            target: 'disposed',
-          },
-        },
-      },
-      connected: {
-        initial: 'connecting',
+      active: {
         invoke: {
-          id: activeManagedWebSocketConnectionActorId,
-          input: ({context}) => {
-            if (context.connectionUrl === undefined) {
-              throw new Error('Managed WebSocket connection state machine requires a connection URL');
-            }
-
-            return {
-              connectionUrl: context.connectionUrl,
-            };
+          id: connectivityStatusActorId,
+          input: {
+            subscribeToConnectivityStatusChanges,
           },
-          src: 'activeManagedWebSocketConnection',
+          src: 'connectivityStatus',
         },
+        initial: 'offline',
         on: {
-          [managedWebSocketConnectionStateMachineEventType.disconnect]: {
-            actions: managedWebSocketConnectionStateMachineSetup.assign({
-              connectionUrl: () => {
-                return undefined;
-              },
-            }),
-            target: 'offline',
-          },
           [managedWebSocketConnectionStateMachineEventType.dispose]: {
             actions: managedWebSocketConnectionStateMachineSetup.assign({
               connectionUrl: () => {
@@ -173,45 +183,132 @@ export function createManagedWebSocketConnectionStateMachine(
               },
             }),
             target: 'disposed',
-          },
-          [managedWebSocketConnectionStateMachineEventType.webSocketConnectionClosed]: {
-            actions: managedWebSocketConnectionStateMachineSetup.assign({
-              connectionUrl: () => {
-                return undefined;
-              },
-            }),
-            target: 'offline',
-          },
-          [managedWebSocketConnectionStateMachineEventType.webSocketConnectionErrored]: {
-            actions: managedWebSocketConnectionStateMachineSetup.assign({
-              connectionUrl: () => {
-                return undefined;
-              },
-            }),
-            target: 'offline',
           },
         },
         states: {
-          connecting: {
+          offline: {
+            always: {
+              guard: ({context}) => {
+                return context.connectionUrl !== undefined && context.isConnectivityAvailable;
+              },
+              target: 'connected.connecting',
+            },
             on: {
-              [managedWebSocketConnectionStateMachineEventType.webSocketConnectionOpened]: {
-                target: 'online',
+              [managedWebSocketConnectionStateMachineEventType.connectivityBecameUnavailable]: {
+                actions: managedWebSocketConnectionStateMachineSetup.assign({
+                  isConnectivityAvailable: () => {
+                    return false;
+                  },
+                }),
+              },
+              [managedWebSocketConnectionStateMachineEventType.connectivityBecameAvailable]: {
+                actions: managedWebSocketConnectionStateMachineSetup.assign({
+                  isConnectivityAvailable: () => {
+                    return true;
+                  },
+                }),
+              },
+              [managedWebSocketConnectionStateMachineEventType.connect]: {
+                actions: managedWebSocketConnectionStateMachineSetup.assign({
+                  connectionUrl: ({event}) => {
+                    if (event.type !== managedWebSocketConnectionStateMachineEventType.connect) {
+                      throw new Error('Managed WebSocket connection state machine expected a connect event');
+                    }
+
+                    return event.connectionUrl;
+                  },
+                }),
+              },
+              [managedWebSocketConnectionStateMachineEventType.disconnect]: {
+                actions: managedWebSocketConnectionStateMachineSetup.assign({
+                  connectionUrl: () => {
+                    return undefined;
+                  },
+                }),
               },
             },
           },
-          online: {
+          connected: {
+            initial: 'connecting',
+            invoke: {
+              id: activeManagedWebSocketConnectionActorId,
+              input: ({context}) => {
+                if (context.connectionUrl === undefined) {
+                  throw new Error('Managed WebSocket connection state machine requires a connection URL');
+                }
+
+                return {
+                  connectionUrl: context.connectionUrl,
+                };
+              },
+              src: 'activeManagedWebSocketConnection',
+            },
             on: {
-              [managedWebSocketConnectionStateMachineEventType.sendMessage]: {
-                actions: managedWebSocketConnectionStateMachineSetup.sendTo(
-                  activeManagedWebSocketConnectionActorId,
-                  ({event}) => {
-                    if (event.type !== managedWebSocketConnectionStateMachineEventType.sendMessage) {
-                      throw new Error('Managed WebSocket connection state machine expected a send message event');
+              [managedWebSocketConnectionStateMachineEventType.connectivityBecameUnavailable]: {
+                actions: managedWebSocketConnectionStateMachineSetup.assign({
+                  isConnectivityAvailable: () => {
+                    return false;
+                  },
+                }),
+                target: 'offline',
+              },
+              [managedWebSocketConnectionStateMachineEventType.connectivityBecameAvailable]: {
+                actions: managedWebSocketConnectionStateMachineSetup.assign({
+                  isConnectivityAvailable: () => {
+                    return true;
+                  },
+                }),
+              },
+              [managedWebSocketConnectionStateMachineEventType.connect]: {
+                actions: managedWebSocketConnectionStateMachineSetup.assign({
+                  connectionUrl: ({event}) => {
+                    if (event.type !== managedWebSocketConnectionStateMachineEventType.connect) {
+                      throw new Error('Managed WebSocket connection state machine expected a connect event');
                     }
 
-                    return event;
+                    return event.connectionUrl;
                   },
-                ),
+                }),
+                target: 'offline',
+              },
+              [managedWebSocketConnectionStateMachineEventType.disconnect]: {
+                actions: managedWebSocketConnectionStateMachineSetup.assign({
+                  connectionUrl: () => {
+                    return undefined;
+                  },
+                }),
+                target: 'offline',
+              },
+              [managedWebSocketConnectionStateMachineEventType.webSocketConnectionClosed]: {
+                target: 'offline',
+              },
+              [managedWebSocketConnectionStateMachineEventType.webSocketConnectionErrored]: {
+                target: 'offline',
+              },
+            },
+            states: {
+              connecting: {
+                on: {
+                  [managedWebSocketConnectionStateMachineEventType.webSocketConnectionOpened]: {
+                    target: 'online',
+                  },
+                },
+              },
+              online: {
+                on: {
+                  [managedWebSocketConnectionStateMachineEventType.sendMessage]: {
+                    actions: managedWebSocketConnectionStateMachineSetup.sendTo(
+                      activeManagedWebSocketConnectionActorId,
+                      ({event}) => {
+                        if (event.type !== managedWebSocketConnectionStateMachineEventType.sendMessage) {
+                          throw new Error('Managed WebSocket connection state machine expected a send message event');
+                        }
+
+                        return event;
+                      },
+                    ),
+                  },
+                },
               },
             },
           },

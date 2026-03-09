@@ -77,6 +77,18 @@ document.addEventListener('DOMContentLoaded', async () => {
     createEnabledManagedWebSocketConnection() {
       return createManagedWebSocketConnection({
         createWebSocketConnection: createBrowserWebSocketConnection,
+        isConnectivityAvailable() {
+          return navigator.onLine;
+        },
+        subscribeToConnectivityStatusChanges({onConnectivityBecameAvailable, onConnectivityBecameUnavailable}) {
+          window.addEventListener('online', onConnectivityBecameAvailable);
+          window.addEventListener('offline', onConnectivityBecameUnavailable);
+
+          return function unsubscribeFromConnectivityStatusChanges(): void {
+            window.removeEventListener('online', onConnectivityBecameAvailable);
+            window.removeEventListener('offline', onConnectivityBecameUnavailable);
+          };
+        },
       });
     },
     createDisabledManagedWebSocketConnection() {

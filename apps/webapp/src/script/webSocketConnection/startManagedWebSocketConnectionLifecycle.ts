@@ -28,9 +28,8 @@ export function startManagedWebSocketConnectionLifecycle(
   dependencies: StartManagedWebSocketConnectionLifecycleDependencies,
 ): () => void {
   const {managedWebSocketConnection, buildWebSocketConnectionUrl} = dependencies;
-  const webSocketConnectionUrl = buildWebSocketConnectionUrl();
 
-  managedWebSocketConnection.connect(webSocketConnectionUrl);
+  managedWebSocketConnection.connect(buildWebSocketConnectionUrl());
 
   return function stopManagedWebSocketConnectionLifecycle(): void {
     managedWebSocketConnection.disconnect();

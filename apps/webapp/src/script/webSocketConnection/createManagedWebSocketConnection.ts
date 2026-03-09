@@ -27,6 +27,7 @@ import type {
   CreateManagedWebSocketConnectionTransport,
   ManagedWebSocketConnectionEventType,
   ManagedWebSocketConnectionTransport,
+  SubscribeToConnectivityStatusChanges,
 } from './managedWebSocketConnectionStateMachine';
 import {webSocketConnectionState, WebSocketConnectionState} from './webSocketConnectionState';
 
@@ -49,6 +50,8 @@ export type ManagedWebSocketConnection = {
 
 type CreateManagedWebSocketConnectionDependencies = {
   readonly createWebSocketConnection: CreateWebSocketConnection;
+  readonly isConnectivityAvailable: () => boolean;
+  readonly subscribeToConnectivityStatusChanges: SubscribeToConnectivityStatusChanges;
 };
 
 type ManagedWebSocketConnectionStateSnapshot = {
@@ -56,7 +59,7 @@ type ManagedWebSocketConnectionStateSnapshot = {
 };
 
 function toWebSocketConnectionState(snapshot: ManagedWebSocketConnectionStateSnapshot): WebSocketConnectionState {
-  if (snapshot.matches({connected: 'online'})) {
+  if (snapshot.matches({active: {connected: 'online'}})) {
     return webSocketConnectionState.online;
   }
 
@@ -66,10 +69,12 @@ function toWebSocketConnectionState(snapshot: ManagedWebSocketConnectionStateSna
 export function createManagedWebSocketConnection(
   dependencies: CreateManagedWebSocketConnectionDependencies,
 ): ManagedWebSocketConnection {
-  const {createWebSocketConnection} = dependencies;
+  const {createWebSocketConnection, isConnectivityAvailable, subscribeToConnectivityStatusChanges} = dependencies;
   const managedWebSocketConnectionStateMachineActor = createActor(
     createManagedWebSocketConnectionStateMachine({
       createManagedWebSocketConnectionTransport: createWebSocketConnection,
+      isConnectivityAvailable,
+      subscribeToConnectivityStatusChanges,
     }),
   );
   const connectionStateListenerSet = new Set<WebSocketConnectionStateListener>();

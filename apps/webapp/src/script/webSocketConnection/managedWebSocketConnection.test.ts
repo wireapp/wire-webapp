@@ -34,19 +34,19 @@ type FakeWebSocketConnectionContext = {
 };
 
 function createFakeWebSocketConnectionContext(): FakeWebSocketConnectionContext {
-  const listenerSetByEventType = new Map<WebSocketConnectionEventType, Set<(event: Event) => void>>();
+  const listenerSetByEventType = new Map<WebSocketConnectionEventType, Set<() => void>>();
   const sentMessageList: string[] = [];
   let closeCallCount = 0;
   let readyState = 0;
 
-  function addEventListener(type: WebSocketConnectionEventType, listener: (event: Event) => void): void {
-    const listenerSet = listenerSetByEventType.get(type) ?? new Set<(event: Event) => void>();
+  function addEventListener(type: WebSocketConnectionEventType, listener: () => void): void {
+    const listenerSet = listenerSetByEventType.get(type) ?? new Set<() => void>();
 
     listenerSet.add(listener);
     listenerSetByEventType.set(type, listenerSet);
   }
 
-  function removeEventListener(type: WebSocketConnectionEventType, listener: (event: Event) => void): void {
+  function removeEventListener(type: WebSocketConnectionEventType, listener: () => void): void {
     return listenerSetByEventType.get(type)?.delete(listener);
   }
 
@@ -67,7 +67,7 @@ function createFakeWebSocketConnectionContext(): FakeWebSocketConnectionContext 
     const listenerSet = listenerSetByEventType.get(eventType);
 
     listenerSet?.forEach((listener) => {
-      return listener(new Event(eventType));
+      return listener();
     });
   }
 
@@ -85,11 +85,11 @@ function createFakeWebSocketConnectionContext(): FakeWebSocketConnectionContext 
         return close();
       },
 
-      addEventListener(type: WebSocketConnectionEventType, listener: (event: Event) => void): void {
+      addEventListener(type: WebSocketConnectionEventType, listener: () => void): void {
         return addEventListener(type, listener);
       },
 
-      removeEventListener(type: WebSocketConnectionEventType, listener: (event: Event) => void): void {
+      removeEventListener(type: WebSocketConnectionEventType, listener: () => void): void {
         return removeEventListener(type, listener);
       },
     },
@@ -106,6 +106,16 @@ function createFakeWebSocketConnectionContext(): FakeWebSocketConnectionContext 
   };
 }
 
+function isConnectivityAvailableForTest(): boolean {
+  return true;
+}
+
+function subscribeToConnectivityStatusChangesForTest(): () => void {
+  return function unsubscribeFromConnectivityStatusChanges(): void {
+    return undefined;
+  };
+}
+
 describe('createManagedWebSocketConnection', () => {
   it('starts in offline state', () => {
     const fakeWebSocketConnectionContext = createFakeWebSocketConnectionContext();
@@ -113,6 +123,8 @@ describe('createManagedWebSocketConnection', () => {
       createWebSocketConnection() {
         return fakeWebSocketConnectionContext.fakeWebSocketConnection;
       },
+      isConnectivityAvailable: isConnectivityAvailableForTest,
+      subscribeToConnectivityStatusChanges: subscribeToConnectivityStatusChangesForTest,
     });
 
     expect(managedWebSocketConnection.currentConnectionState).toBe(webSocketConnectionState.offline);
@@ -126,6 +138,8 @@ describe('createManagedWebSocketConnection', () => {
       createWebSocketConnection() {
         return fakeWebSocketConnectionContext.fakeWebSocketConnection;
       },
+      isConnectivityAvailable: isConnectivityAvailableForTest,
+      subscribeToConnectivityStatusChanges: subscribeToConnectivityStatusChangesForTest,
     });
 
     managedWebSocketConnection.connect('wss://example.test/socket');
@@ -142,6 +156,8 @@ describe('createManagedWebSocketConnection', () => {
       createWebSocketConnection() {
         return fakeWebSocketConnectionContext.fakeWebSocketConnection;
       },
+      isConnectivityAvailable: isConnectivityAvailableForTest,
+      subscribeToConnectivityStatusChanges: subscribeToConnectivityStatusChangesForTest,
     });
 
     managedWebSocketConnection.connect('wss://example.test/socket');
@@ -160,6 +176,8 @@ describe('createManagedWebSocketConnection', () => {
       createWebSocketConnection() {
         return fakeWebSocketConnectionContext.fakeWebSocketConnection;
       },
+      isConnectivityAvailable: isConnectivityAvailableForTest,
+      subscribeToConnectivityStatusChanges: subscribeToConnectivityStatusChangesForTest,
     });
 
     managedWebSocketConnection.connect('wss://example.test/socket');
@@ -181,6 +199,8 @@ describe('createManagedWebSocketConnection', () => {
       createWebSocketConnection() {
         return fakeWebSocketConnectionContext.fakeWebSocketConnection;
       },
+      isConnectivityAvailable: isConnectivityAvailableForTest,
+      subscribeToConnectivityStatusChanges: subscribeToConnectivityStatusChangesForTest,
     });
     const observedConnectionStateList: string[] = [];
 
