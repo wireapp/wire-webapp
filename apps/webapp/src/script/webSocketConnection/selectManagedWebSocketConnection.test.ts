@@ -18,14 +18,14 @@
  */
 
 import {StartupFeatureToggleName, StartupFeatureToggles} from '../featureToggles/startupFeatureToggles';
-import {webSocketConnectionStateMachineState} from './webSocketConnectionStateMachine';
 import {ManagedWebSocketConnection} from './createManagedWebSocketConnection';
 import {selectManagedWebSocketConnectionForStartupFeatureToggles} from './selectManagedWebSocketConnection';
+import {webSocketConnectionState} from './webSocketConnectionState';
 
 function createManagedWebSocketConnectionStub(): ManagedWebSocketConnection {
   return {
     get currentConnectionState() {
-      return webSocketConnectionStateMachineState.offline;
+      return webSocketConnectionState.offline;
     },
 
     subscribeToConnectionState() {

@@ -76,7 +76,7 @@ import {TIME_IN_MILLIS} from '../util/TimeUtil';
 import {MainViewModel} from '../view_model/MainViewModel';
 import {WarningsContainer} from '../view_model/WarningsContainer/WarningsContainer';
 import {ManagedWebSocketConnection} from '../webSocketConnection/createManagedWebSocketConnection';
-import {WebSocketConnectionStateMachineState} from '../webSocketConnection/webSocketConnectionStateMachine';
+import {WebSocketConnectionState} from '../webSocketConnection/webSocketConnectionState';
 
 export type RightSidebarParams = {
   entity: PanelEntity | null;
@@ -109,7 +109,7 @@ export const AppMain = ({
   locked,
 }: AppMainProps) => {
   const [doesApplicationNeedForceReload, setDoesApplicationNeedForceReload] = useState(false);
-  const [webSocketConnectionState, setWebSocketConnectionState] = useState<WebSocketConnectionStateMachineState>(
+  const [webSocketConnectionState, setWebSocketConnectionState] = useState<WebSocketConnectionState>(
     managedWebSocketConnection.currentConnectionState,
   );
   const clientVersion = Config.getConfig().VERSION;

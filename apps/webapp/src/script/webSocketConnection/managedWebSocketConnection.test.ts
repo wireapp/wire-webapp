@@ -23,7 +23,7 @@ import {
   WebSocketConnectionTransport,
 } from './createManagedWebSocketConnection';
 import {createNoopManagedWebSocketConnection} from './createNoopManagedWebSocketConnection';
-import {webSocketConnectionStateMachineState} from './webSocketConnectionStateMachine';
+import {webSocketConnectionState} from './webSocketConnectionState';
 
 type FakeWebSocketConnectionContext = {
   readonly fakeWebSocketConnection: WebSocketConnectionTransport;
@@ -115,7 +115,7 @@ describe('createManagedWebSocketConnection', () => {
       },
     });
 
-    expect(managedWebSocketConnection.currentConnectionState).toBe(webSocketConnectionStateMachineState.offline);
+    expect(managedWebSocketConnection.currentConnectionState).toBe(webSocketConnectionState.offline);
 
     managedWebSocketConnection.dispose();
   });
@@ -131,7 +131,7 @@ describe('createManagedWebSocketConnection', () => {
     managedWebSocketConnection.connect('wss://example.test/socket');
     fakeWebSocketConnectionContext.triggerEvent('open');
 
-    expect(managedWebSocketConnection.currentConnectionState).toBe(webSocketConnectionStateMachineState.online);
+    expect(managedWebSocketConnection.currentConnectionState).toBe(webSocketConnectionState.online);
 
     managedWebSocketConnection.dispose();
   });
@@ -148,7 +148,7 @@ describe('createManagedWebSocketConnection', () => {
     fakeWebSocketConnectionContext.triggerEvent('open');
     managedWebSocketConnection.disconnect();
 
-    expect(managedWebSocketConnection.currentConnectionState).toBe(webSocketConnectionStateMachineState.offline);
+    expect(managedWebSocketConnection.currentConnectionState).toBe(webSocketConnectionState.offline);
     expect(fakeWebSocketConnectionContext.getCloseCallCount()).toBe(1);
 
     managedWebSocketConnection.dispose();
@@ -195,9 +195,9 @@ describe('createManagedWebSocketConnection', () => {
     fakeWebSocketConnectionContext.triggerEvent('open');
 
     expect(observedConnectionStateList).toEqual([
-      webSocketConnectionStateMachineState.offline,
-      webSocketConnectionStateMachineState.online,
-      webSocketConnectionStateMachineState.offline,
+      webSocketConnectionState.offline,
+      webSocketConnectionState.online,
+      webSocketConnectionState.offline,
     ]);
 
     managedWebSocketConnection.dispose();
@@ -219,8 +219,8 @@ describe('createNoopManagedWebSocketConnection', () => {
     const didSendMessage = managedWebSocketConnection.sendMessage('hello');
 
     expect(didSendMessage).toBe(false);
-    expect(managedWebSocketConnection.currentConnectionState).toBe(webSocketConnectionStateMachineState.offline);
-    expect(observedConnectionStateList).toEqual([webSocketConnectionStateMachineState.offline]);
+    expect(managedWebSocketConnection.currentConnectionState).toBe(webSocketConnectionState.offline);
+    expect(observedConnectionStateList).toEqual([webSocketConnectionState.offline]);
 
     unsubscribeFromConnectionState();
     managedWebSocketConnection.dispose();

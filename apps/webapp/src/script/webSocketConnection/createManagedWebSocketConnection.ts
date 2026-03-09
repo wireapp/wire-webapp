@@ -28,10 +28,7 @@ import type {
   ManagedWebSocketConnectionEventType,
   ManagedWebSocketConnectionTransport,
 } from './managedWebSocketConnectionStateMachine';
-import {
-  webSocketConnectionStateMachineState,
-  WebSocketConnectionStateMachineState,
-} from './webSocketConnectionStateMachine';
+import {webSocketConnectionState, WebSocketConnectionState} from './webSocketConnectionState';
 
 import {createCleanupStack} from '../cleanupStack/cleanupStack';
 
@@ -39,10 +36,10 @@ export type WebSocketConnectionEventType = ManagedWebSocketConnectionEventType;
 export type WebSocketConnectionTransport = ManagedWebSocketConnectionTransport;
 export type CreateWebSocketConnection = CreateManagedWebSocketConnectionTransport;
 
-export type WebSocketConnectionStateListener = (state: WebSocketConnectionStateMachineState) => void;
+export type WebSocketConnectionStateListener = (state: WebSocketConnectionState) => void;
 
 export type ManagedWebSocketConnection = {
-  readonly currentConnectionState: WebSocketConnectionStateMachineState;
+  readonly currentConnectionState: WebSocketConnectionState;
   readonly subscribeToConnectionState: (listener: WebSocketConnectionStateListener) => () => void;
   readonly connect: (connectionUrl: string) => void;
   readonly disconnect: () => void;
@@ -58,14 +55,12 @@ type ManagedWebSocketConnectionStateSnapshot = {
   readonly matches: (partialStateValue: unknown) => boolean;
 };
 
-function toWebSocketConnectionStateMachineState(
-  snapshot: ManagedWebSocketConnectionStateSnapshot,
-): WebSocketConnectionStateMachineState {
+function toWebSocketConnectionState(snapshot: ManagedWebSocketConnectionStateSnapshot): WebSocketConnectionState {
   if (snapshot.matches({connected: 'online'})) {
-    return webSocketConnectionStateMachineState.online;
+    return webSocketConnectionState.online;
   }
 
-  return webSocketConnectionStateMachineState.offline;
+  return webSocketConnectionState.offline;
 }
 
 export function createBrowserWebSocketConnection(connectionUrl: string): WebSocketConnectionTransport {
@@ -87,7 +82,7 @@ export function createManagedWebSocketConnection(
   managedWebSocketConnectionStateMachineActor.start();
 
   const actorSubscription = managedWebSocketConnectionStateMachineActor.subscribe(snapshot => {
-    const currentConnectionState = toWebSocketConnectionStateMachineState(snapshot);
+    const currentConnectionState = toWebSocketConnectionState(snapshot);
 
     connectionStateListenerSet.forEach(connectionStateListener => {
       return connectionStateListener(currentConnectionState);
@@ -102,12 +97,12 @@ export function createManagedWebSocketConnection(
 
   return {
     get currentConnectionState() {
-      return toWebSocketConnectionStateMachineState(managedWebSocketConnectionStateMachineActor.getSnapshot());
+      return toWebSocketConnectionState(managedWebSocketConnectionStateMachineActor.getSnapshot());
     },
 
     subscribeToConnectionState(listener) {
       connectionStateListenerSet.add(listener);
-      listener(toWebSocketConnectionStateMachineState(managedWebSocketConnectionStateMachineActor.getSnapshot()));
+      listener(toWebSocketConnectionState(managedWebSocketConnectionStateMachineActor.getSnapshot()));
 
       return function unsubscribeFromConnectionState(): void {
         connectionStateListenerSet.delete(listener);
@@ -129,8 +124,8 @@ export function createManagedWebSocketConnection(
 
     sendMessage(message) {
       if (
-        toWebSocketConnectionStateMachineState(managedWebSocketConnectionStateMachineActor.getSnapshot()) !==
-        webSocketConnectionStateMachineState.online
+        toWebSocketConnectionState(managedWebSocketConnectionStateMachineActor.getSnapshot()) !==
+        webSocketConnectionState.online
       ) {
         return false;
       }

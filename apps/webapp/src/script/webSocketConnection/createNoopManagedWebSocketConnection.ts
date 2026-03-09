@@ -18,10 +18,7 @@
  */
 
 import {ManagedWebSocketConnection, WebSocketConnectionStateListener} from './createManagedWebSocketConnection';
-import {
-  webSocketConnectionStateMachineState,
-  WebSocketConnectionStateMachineState,
-} from './webSocketConnectionStateMachine';
+import {webSocketConnectionState, WebSocketConnectionState} from './webSocketConnectionState';
 
 function ignoreConnectRequest(unusedConnectionUrl: string): void {
   return undefined;
@@ -35,13 +32,13 @@ export function createNoopManagedWebSocketConnection(): ManagedWebSocketConnecti
   const connectionStateListenerSet = new Set<WebSocketConnectionStateListener>();
 
   return {
-    get currentConnectionState(): WebSocketConnectionStateMachineState {
-      return webSocketConnectionStateMachineState.offline;
+    get currentConnectionState(): WebSocketConnectionState {
+      return webSocketConnectionState.offline;
     },
 
     subscribeToConnectionState(listener): () => void {
       connectionStateListenerSet.add(listener);
-      listener(webSocketConnectionStateMachineState.offline);
+      listener(webSocketConnectionState.offline);
 
       return function unsubscribeFromConnectionState(): void {
         connectionStateListenerSet.delete(listener);
