@@ -53,35 +53,21 @@ describe('MessageReactionsList', () => {
   });
 
   test('renders a button for each reaction and user count', () => {
-    const {getAllByTitle} = render(withTheme(<MessageReactionsList {...defaultProps} />));
+    const {container} = render(withTheme(<MessageReactionsList {...defaultProps} />));
+    const reactionButtons = Array.from(container.querySelectorAll('button[data-uie-name="emoji-pill"]'));
 
-    const winkButton = getAllByTitle('wink');
-    const smileyFace1 = getAllByTitle('innocent');
-    const thumbsUpButton = getAllByTitle('+1');
-    const smileyFace2 = getAllByTitle('blush');
-
-    expect(smileyFace1).toHaveLength(1);
-    expect(smileyFace2).toHaveLength(1);
-    expect(winkButton).toHaveLength(1);
-    expect(thumbsUpButton).toHaveLength(1);
-
-    const smileyFaceCount = within(smileyFace1[0]).getByText('3');
-    expect(smileyFaceCount).toBeDefined();
-
-    const winkFaceCount = within(winkButton[0]).getByText('1');
-    expect(winkFaceCount).toBeDefined();
-
-    const thumbsUpButtonCount = within(winkButton[0]).getByText('1');
-    expect(thumbsUpButtonCount).toBeDefined();
-
-    const smileyFace2Count = within(winkButton[0]).getByText('1');
-    expect(smileyFace2Count).toBeDefined();
+    expect(reactionButtons).toHaveLength(reactions.length);
+    expect(within(reactionButtons[0]).getByText('3')).toBeDefined();
+    expect(within(reactionButtons[1]).getByText('2')).toBeDefined();
+    expect(within(reactionButtons[2]).getByText('1')).toBeDefined();
+    expect(within(reactionButtons[3]).getByText('1')).toBeDefined();
   });
 
   test('handles click on reaction button', () => {
-    const {getByTitle} = render(withTheme(<MessageReactionsList {...defaultProps} />));
+    const {container} = render(withTheme(<MessageReactionsList {...defaultProps} />));
+    const reactionButtons = Array.from(container.querySelectorAll('button[data-uie-name="emoji-pill"]'));
 
-    fireEvent.click(getByTitle('+1'));
+    fireEvent.click(reactionButtons[2]);
     const {handleReactionClick} = defaultProps;
     expect(handleReactionClick).toHaveBeenCalled();
     expect(handleReactionClick).toHaveBeenCalledWith('👍');

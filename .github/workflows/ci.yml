@@ -40,6 +40,17 @@ jobs:
       - name: Install JS dependencies
         run: yarn --immutable
 
+      - name: Verify generated i18n artifacts are committed
+        run: |
+          yarn nx run webapp:translate-merge
+          yarn nx run webapp:translate-generate-types
+
+          if ! test -z "$(git status --porcelain)"; then
+            echo "Repository is not clean after generation. Run generation locally and commit the changes."
+            git status
+            exit 1
+          fi
+
       - name: Build libraries
         run: yarn nx run-many -t build --projects=tag:type:lib
 
@@ -84,6 +95,17 @@ jobs:
       - name: Build and package
         if: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository }}
         run: yarn nx run server:package
+
+      - name: Verify Quay credentials availability
+        if: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository }}
+        env:
+          DOCKER_PASSWORD: ${{ secrets.WEBTEAM_QUAY_PASSWORD }}
+          DOCKER_USERNAME: ${{ secrets.WEBTEAM_QUAY_USERNAME }}
+        run: |
+          if [[ -z "${DOCKER_USERNAME}" || -z "${DOCKER_PASSWORD}" ]]; then
+            echo "Missing Quay credentials. For Dependabot pull requests, configure WEBTEAM_QUAY_USERNAME and WEBTEAM_QUAY_PASSWORD as Dependabot secrets."
+            exit 1
+          fi
 
       - name: Push PR Docker image
         if: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository }}

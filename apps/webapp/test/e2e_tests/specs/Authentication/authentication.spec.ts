@@ -62,7 +62,7 @@ test.describe('Authentication', () => {
 
   test(
     'Verify sign in error appearance in case of suspended team account',
-    {tag: ['@TC-3468', '@regression']},
+    {tag: ['@TC-3458', '@regression']},
     async ({pageManager}) => {
       const {pages} = pageManager.webapp;
       await pageManager.openLoginPage();
@@ -139,11 +139,11 @@ test.describe('Authentication', () => {
     test(
       `I want to keep my history after refreshing the page on ${deviceType} device`,
       {tag: [tag, '@regression']},
-      async ({page, pageManager, createTeam}) => {
+      async ({page, pageManager, createTeam, createUser}) => {
         const {pages} = pageManager.webapp;
-        const team = await createTeam('Test Team', {withMembers: 1});
+        const userB = await createUser();
+        const team = await createTeam('Test Team', {users: [userB]});
         const userA = team.owner;
-        const userB = team.members[0];
 
         await test.step('Log in and connect with user B', async () => {
           await pageManager.openLoginPage();
@@ -196,11 +196,11 @@ test.describe('Authentication', () => {
   test(
     'Make sure user does not see data of user of previous sessions on same browser',
     {tag: ['@TC-1311', '@regression']},
-    async ({page, pageManager, createTeam}) => {
+    async ({page, pageManager, createTeam, createUser}) => {
       const {pages, components} = pageManager.webapp;
-      const team = await createTeam('Test Team', {withMembers: 1});
+      const userB = await createUser();
+      const team = await createTeam('Test Team', {users: [userB]});
       const userA = team.owner;
-      const userB = team.members[0];
 
       await test.step('Log in with public computer checked', async () => {
         await pageManager.openLoginPage();

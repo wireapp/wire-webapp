@@ -80,6 +80,10 @@ export class ClientAPI {
       data: updatedClient,
       method: 'put',
       url: `${ClientAPI.URL.CLIENTS}/${clientId}`,
+      // Disable infinite retries for client update requests
+      'axios-retry': {
+        retries: 0,
+      },
     };
 
     try {

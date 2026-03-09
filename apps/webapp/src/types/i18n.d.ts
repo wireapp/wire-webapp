@@ -1035,6 +1035,9 @@ declare module 'I18n/en-US.json' {
     'folderViewTooltip': `Folders`;
     'footer.copy': `© Wire Swiss GmbH`;
     'footer.wireLink': `wire.com`;
+    'forceReloadModalAction': `Reload needed`;
+    'forceReloadModalMessage': `Wire needs an update. The app will automatically restart in 60 seconds.<br /><br /> Your work is not lost. You can continue where you left off after the reloading.`;
+    'forceReloadModalTitle': `Reload Now`;
     'fullsearchCancelCloseBtn': `Cancel search`;
     'fullsearchCancelLabel': `Close search field`;
     'fullsearchNoResults': `No results.`;
@@ -1172,8 +1175,8 @@ declare module 'I18n/en-US.json' {
     'inviteHeadline': `Invite people to {brandName}`;
     'inviteHintSelected': `Press {metaKey} + C to copy`;
     'inviteHintUnselected': `Select and Press {metaKey} + C`;
-    'inviteMessage': `I’m on {brandName}, search for {username} or visit get.wire.com.`;
-    'inviteMessageNoEmail': `I’m on {brandName}. Visit get.wire.com to connect with me.`;
+    'inviteMessage': `I’m on {brandName}, search for {username} or visit wire.com/app-download.`;
+    'inviteMessageNoEmail': `I’m on {brandName}. Visit wire.com/app-download to connect with me.`;
     'inviteMetaKeyMac': `Cmd`;
     'inviteMetaKeyPc': `Ctrl`;
     'jumpToLastMessage': `Scroll to the end of this conversation`;
@@ -1803,6 +1806,7 @@ declare module 'I18n/en-US.json' {
     'searchCreateGroup': `Create group`;
     'searchCreateGuestRoom': `Create guest room`;
     'searchDirectConversations': `Search 1:1 conversations`;
+    'searchDraftsConversations': `Search in drafts`;
     'searchFavoriteConversations': `Search favorites`;
     'searchFederatedDomainNotAvailable': `The federated domain is currently not available.`;
     'searchFederatedDomainNotAvailableLearnMore': `Learn more`;
@@ -1821,6 +1825,7 @@ declare module 'I18n/en-US.json' {
     'searchManageServices': `Manage Apps`;
     'searchManageServicesNoResults': `Manage apps`;
     'searchMemberInvite': `Invite people to join the team`;
+    'searchMentionsConversations': `Search in mentions`;
     'searchNoContactsOnWire': `You have no contacts on {brandName}.\nTry finding people by\nname or username.`;
     'searchNoMatchesPartner': `No results`;
     'searchNoServicesManager': `Apps are helpers that can improve your workflow.`;
@@ -1831,6 +1836,8 @@ declare module 'I18n/en-US.json' {
     'searchPeople': `People`;
     'searchPeopleOnlyPlaceholder': `Search people`;
     'searchPeoplePlaceholder': `Search for people and conversations`;
+    'searchPingsConversations': `Search in pings`;
+    'searchRepliesConversations': `Search in replies`;
     'searchServiceConfirmButton': `Open Conversation`;
     'searchServicePlaceholder': `Search by name`;
     'searchServices': `Apps`;
@@ -1840,6 +1847,7 @@ declare module 'I18n/en-US.json' {
     'searchTrySearch': `Find people by\nname or username`;
     'searchTrySearchFederation': `Find people in Wire by name or\n@username\n\nFind people from another domain\nby @username@domainname`;
     'searchTrySearchLearnMore': `Learn more`;
+    'searchUnreadConversations': `Search in unread`;
     'selectAccountTypeHeading': `How will you use Wire?`;
     'selectPersonalAccountTypeOptionButtonText': `Create Personal Account`;
     'selectPersonalAccountTypeOptionDescription': `Chat with friends and family.`;
@@ -1890,6 +1898,8 @@ declare module 'I18n/en-US.json' {
     'success.openWebAppText': `Open Wire for web`;
     'success.subheader': `What do you want to do next?`;
     'systemMessageLearnMore': `Learn more`;
+    'tabsFilterHeader': `Show filters`;
+    'tabsFilterTooltip': `Customize visible tabs`;
     'takeoverButtonChoose': `Choose your own`;
     'takeoverButtonKeep': `Keep this one`;
     'takeoverLink': `Learn more`;

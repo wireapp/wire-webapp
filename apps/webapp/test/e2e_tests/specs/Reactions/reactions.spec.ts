@@ -29,10 +29,10 @@ test.describe('Reactions', () => {
   let userA: User;
   let userB: User;
 
-  test.beforeEach(async ({createTeam}) => {
-    const team = await createTeam('Test Team', {withMembers: 1});
+  test.beforeEach(async ({createTeam, createUser}) => {
+    userB = await createUser();
+    const team = await createTeam('Test Team', {users: [userB]});
     userA = team.owner;
-    userB = team.members[0];
   });
 
   const likeCases = [
@@ -89,11 +89,13 @@ test.describe('Reactions', () => {
     test(`Verify liking someone's ${c.title}`, {tag: [c.tc, '@regression']}, async ({createPage}) => {
       const [userAPages, userBPages] = await Promise.all([
         PageManager.from(createPage(withLogin(userA), withConnectedUser(userB))).then(pm => pm.webapp.pages),
-        PageManager.from(createPage(withLogin(userB), withConnectedUser(userA))).then(pm => pm.webapp.pages),
+        PageManager.from(createPage(withLogin(userB))).then(pm => pm.webapp.pages),
       ]);
 
+      await userBPages.conversationList().openConversation(userA.fullName, {protocol: 'mls'});
       await c.sendFromUserB(userBPages);
 
+      await userAPages.conversationList().openConversation(userB.fullName, {protocol: 'mls'});
       const messageFromUserB = userAPages.conversation().getMessage({sender: userB});
       await expect(messageFromUserB).toBeVisible();
 
@@ -115,7 +117,8 @@ test.describe('Reactions', () => {
         'Test Service Device',
         false,
       );
-      const conversationId = await api.conversation.getConversationWithUser(userB.token, userA.id!);
+      const conversationId = await api.conversation.getConversationWithUser(userB.token, userA.id!, {protocol: 'mls'});
+      if (conversationId === undefined) throw new Error("Couldn't find MLS conversation of user B with user A");
       await api.testService.sendLocation(instanceId, conversationId, {
         locationName: 'Test Location',
         latitude: 52.5170365,
@@ -154,9 +157,11 @@ test.describe('Reactions', () => {
   test('Verify likes are reset if you edited message', {tag: ['@TC-1538', '@regression']}, async ({createPage}) => {
     const [userAPages, userBPages] = await Promise.all([
       PageManager.from(createPage(withLogin(userA), withConnectedUser(userB))).then(pm => pm.webapp.pages),
-      PageManager.from(createPage(withLogin(userB), withConnectedUser(userA))).then(pm => pm.webapp.pages),
+      PageManager.from(createPage(withLogin(userB))).then(pm => pm.webapp.pages),
     ]);
 
+    await userAPages.conversationList().openConversation(userB.fullName, {protocol: 'mls'});
+    await userBPages.conversationList().openConversation(userA.fullName, {protocol: 'mls'});
     await userBPages.conversation().sendMessage('Message from User B');
 
     const messageUserB = userAPages.conversation().getMessage({sender: userB});
@@ -179,9 +184,11 @@ test.describe('Reactions', () => {
     async ({createPage}) => {
       const [userAPages, userBPages] = await Promise.all([
         PageManager.from(createPage(withLogin(userA), withConnectedUser(userB))).then(pm => pm.webapp.pages),
-        PageManager.from(createPage(withLogin(userB), withConnectedUser(userA))).then(pm => pm.webapp.pages),
+        PageManager.from(createPage(withLogin(userB))).then(pm => pm.webapp.pages),
       ]);
 
+      await userAPages.conversationList().openConversation(userB.fullName, {protocol: 'mls'});
+      await userBPages.conversationList().openConversation(userA.fullName, {protocol: 'mls'});
       await userBPages.conversation().sendMessage('Message from User B');
 
       const messageUserB = userAPages.conversation().getMessage({sender: userB});
@@ -198,6 +205,61 @@ test.describe('Reactions', () => {
         .page.getByRole('tooltip')
         .filter({hasText: `${userA.fullName} reacted with`});
       await expect(tooltip).toBeVisible();
+    },
+  );
+
+  test(
+    'Verify locally deleted message can be liked by others',
+    {tag: ['@TC-1543', '@regression']},
+    async ({createPage}) => {
+      const [userAPages, userBPages] = await Promise.all([
+        PageManager.from(createPage(withLogin(userA), withConnectedUser(userB))).then(pm => pm.webapp.pages),
+        PageManager.from(createPage(withLogin(userB))).then(pm => pm.webapp.pages),
+      ]);
+
+      await userAPages.conversationList().openConversation(userB.fullName, {protocol: 'mls'});
+      await userBPages.conversationList().openConversation(userA.fullName, {protocol: 'mls'});
+      await userAPages.conversation().sendMessage('Message to react to');
+
+      const userBMessage = userBPages.conversation().getMessage({sender: userA});
+      await userBPages.conversation().reactOnMessage(userBMessage, 'plus-one');
+
+      const userAMessage = userAPages.conversation().getMessage({sender: userA});
+      await userAPages.conversation().deleteMessage(userAMessage, 'Me');
+
+      const reactionPill = userBPages.conversation().getReactionOnMessage(userBMessage, 'plus-one');
+      await expect(reactionPill).toBeVisible();
+    },
+  );
+
+  test(
+    'Verify likes are reset if sender edits their message',
+    {tag: ['@TC-1544', '@regression']},
+    async ({createPage}) => {
+      const [userAPages, userBPages] = await Promise.all([
+        PageManager.from(createPage(withLogin(userA), withConnectedUser(userB))).then(pm => pm.webapp.pages),
+        PageManager.from(createPage(withLogin(userB))).then(pm => pm.webapp.pages),
+      ]);
+
+      await userAPages.conversationList().openConversation(userB.fullName, {protocol: 'mls'});
+      await userBPages.conversationList().openConversation(userA.fullName, {protocol: 'mls'});
+      await userAPages.conversation().sendMessage('Message to react to');
+
+      const userBMessage = userBPages.conversation().getMessage({sender: userA});
+      await userBPages.conversation().reactOnMessage(userBMessage, 'plus-one');
+
+      const userAMessage = userAPages.conversation().getMessage({sender: userA});
+      const userAReaction = userAPages.conversation().getReactionOnMessage(userAMessage, 'plus-one');
+      const userBReaction = userBPages.conversation().getReactionOnMessage(userBMessage, 'plus-one');
+      await expect(userAReaction).toBeVisible();
+      await expect(userBReaction).toBeVisible();
+
+      await userAPages.conversation().editMessage(userAMessage);
+      await expect(userAPages.conversation().messageInput).toContainText('Message to react to');
+      await userAPages.conversation().sendMessage('Message without reaction');
+
+      await expect(userAReaction).not.toBeAttached();
+      await expect(userBReaction).not.toBeAttached();
     },
   );
 
@@ -218,9 +280,11 @@ test.describe('Reactions', () => {
     test(c.title, {tag: [c.tc, '@regression']}, async ({createPage}) => {
       const [userAPages, userBPages] = await Promise.all([
         PageManager.from(createPage(withLogin(userA), withConnectedUser(userB))).then(pm => pm.webapp.pages),
-        PageManager.from(createPage(withLogin(userB), withConnectedUser(userA))).then(pm => pm.webapp.pages),
+        PageManager.from(createPage(withLogin(userB))).then(pm => pm.webapp.pages),
       ]);
 
+      await userAPages.conversationList().openConversation(userB.fullName, {protocol: 'mls'});
+      await userBPages.conversationList().openConversation(userA.fullName, {protocol: 'mls'});
       await userBPages.conversation().sendMessage('Message to react to');
 
       const messageInUserA = userAPages.conversation().getMessage({sender: userB});

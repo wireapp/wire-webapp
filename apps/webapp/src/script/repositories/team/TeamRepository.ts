@@ -282,8 +282,12 @@ export class TeamRepository extends TypedEventEmitter<Events> {
 
     const teamEntity = teamData ? this.teamMapper.mapTeamFromObject(teamData, this.teamState.team()) : new TeamEntity();
     this.teamState.team(teamEntity);
+
     if (teamId) {
       await this.getSelfMember(teamId);
+      this.teamState.hasWhitelistedServices(
+        (await this.teamService.getWhitelistedServices(teamId)).services.length > 0,
+      );
     }
     // doesn't need to be awaited because it publishes the account info over amplify.
     this.sendAccountInfo();

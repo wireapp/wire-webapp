@@ -17,23 +17,48 @@
  *
  */
 
+import is from '@sindresorhus/is';
 import {Router} from 'express';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
+import {Maybe, result, type Result} from 'true-myth';
 
 type ClientVersionCheckRouteDependencies = {
   readonly router: ReturnType<typeof Router>;
+  readonly parseClientVersion: (clientVersionHeaderValue: string) => Result<Date, Error>;
+  readonly minimumRequiredClientBuildDate: Maybe<Date>;
 };
 
 export function createClientVersionCheckRoute(dependencies: ClientVersionCheckRouteDependencies) {
-  const {router} = dependencies;
+  const {router, parseClientVersion, minimumRequiredClientBuildDate} = dependencies;
 
   return router.get('/client-version-check', (request, response) => {
-    const clientVersion = request.header('Wire-Client-Version');
+    const clientVersionHeaderValue = request.header('Wire-Client-Version');
 
-    if (clientVersion === undefined || clientVersion.trim() === '') {
+    if (is.undefined(clientVersionHeaderValue) || is.emptyStringOrWhitespace(clientVersionHeaderValue)) {
       return response.sendStatus(HTTP_STATUS.BAD_REQUEST);
     }
 
-    return response.sendStatus(HTTP_STATUS.OK);
+    const parsedClientVersion = parseClientVersion(clientVersionHeaderValue);
+
+    if (result.isErr(parsedClientVersion)) {
+      return response.sendStatus(HTTP_STATUS.BAD_REQUEST);
+    }
+
+    return minimumRequiredClientBuildDate.match({
+      Just: minimumRequiredClientBuildDateValue => {
+        const isClientVersionAllowed =
+          parsedClientVersion.value.getTime() > minimumRequiredClientBuildDateValue.getTime();
+
+        if (isClientVersionAllowed) {
+          return response.sendStatus(HTTP_STATUS.OK);
+        }
+
+        return response.status(HTTP_STATUS.UPGRADE_REQUIRED).json({action: 'reload'});
+      },
+
+      Nothing: () => {
+        return response.sendStatus(HTTP_STATUS.OK);
+      },
+    });
   });
 }

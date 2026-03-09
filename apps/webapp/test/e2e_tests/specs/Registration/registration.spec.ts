@@ -23,7 +23,7 @@ import {addCreatedUser, removeCreatedUser} from 'test/e2e_tests/utils/tearDown.u
 
 import {test, expect} from '../../test.fixtures';
 
-test.describe('registration personal account', () => {
+test.describe('Registration', () => {
   test.describe('email registration used', () => {
     const userA = getUser();
 

@@ -40,11 +40,11 @@ test('Messages in 1:1', {tag: ['@TC-8750', '@crit-flow-web']}, async ({createTea
   // Step 1: Preconditions
   await test.step('Preconditions: Creating preconditions for the test via API', async () => {
     // Precondition: Users A and B exist in two separate teams
-    const teamA = await createTeam('Critical A', {withMembers: 1});
-    memberA = teamA.members[0];
+    const teamA = await createTeam('Critical A');
+    memberA = teamA.owner;
 
-    const teamB = await createTeam('Critical B', {withMembers: 1});
-    memberB = teamB.members[0];
+    const teamB = await createTeam('Critical B');
+    memberB = teamB.owner;
 
     // Create page managers - User A sends connection request to User B
     const [pmA, pmB] = await Promise.all([
@@ -70,13 +70,13 @@ test('Messages in 1:1', {tag: ['@TC-8750', '@crit-flow-web']}, async ({createTea
     // To avoid loosing messages during the fast execution with playwright we wait for the upgrade is finished to open the MLS conversation.
     await pages.conversationList().openConversation(memberB.fullName, {protocol: 'mls'});
     await components.inputBarControls().clickShareImage(imageFilePath);
-    expect(await pages.conversation().isImageFromUserVisible(memberA)).toBeTruthy();
+    await expect(pages.conversation().getImageLocator(memberA)).toBeVisible();
   });
   await test.step('User B can see the image in the conversation', async () => {
     await memberBPageManager.webapp.pages.conversationList().openConversation(memberA.fullName, {protocol: 'mls'});
 
     // Verify that the image is visible in the conversation
-    expect(await memberBPageManager.webapp.pages.conversation().isImageFromUserVisible(memberA)).toBeTruthy();
+    await expect(memberBPageManager.webapp.pages.conversation().getImageLocator(memberA)).toBeVisible();
 
     // Verify QR Code in the image
     const localQRCodeValue = await getLocalQRCodeValue(imageFilePath);
@@ -102,41 +102,38 @@ test('Messages in 1:1', {tag: ['@TC-8750', '@crit-flow-web']}, async ({createTea
 
   // Step 3: Reactions
   await test.step(`User B reacts to A's image`, async () => {
-    await memberBPageManager.webapp.modals.detailViewModal().givePlusOneReaction();
-    await memberBPageManager.webapp.modals.detailViewModal().closeModal();
-    expect(await memberBPageManager.webapp.pages.conversation().isPlusOneReactionVisible()).toBeTruthy();
+    const {pages, modals} = memberBPageManager.webapp;
+    await modals.detailViewModal().givePlusOneReaction();
+    await modals.detailViewModal().closeModal();
+    const imageMessage = pages.conversation().getMessage({sender: memberA});
+    await expect(pages.conversation().getReactionOnMessage(imageMessage, 'plus-one')).toBeVisible();
   });
   await test.step('User A can see the reaction', async () => {
     const {pages} = memberAPageManager.webapp;
-    expect(await pages.conversation().isPlusOneReactionVisible()).toBeTruthy();
+    const message = pages.conversation().getMessage({sender: memberA});
+    await expect(pages.conversation().getReactionOnMessage(message, 'plus-one')).toBeVisible();
   });
 
   // Step 4: Video Files
   await test.step('User A sends video message', async () => {
-    const {pages, components} = memberAPageManager.webapp;
+    const {components} = memberAPageManager.webapp;
     await components.inputBarControls().clickShareFile(videoFilePath);
-    expect(await pages.conversation().isVideoMessageVisible()).toBeTruthy();
   });
   await test.step('User B can play the video', async () => {
     const {pages} = memberBPageManager.webapp;
     await pages.conversation().playVideo();
-    // Wait for 5 seconds to ensure video starts playing
-    await pages.conversation().page.waitForTimeout(5000);
-    // ToDO: Bug -> Video is not loaded from the server, so we cannot check if it is playing
+    await expect.poll(() => pages.conversation().isVideoPlaying()).toBeTruthy();
   });
 
   // Step 5: Audio Files
   await test.step('User A sends audio file', async () => {
-    const {pages, components} = memberAPageManager.webapp;
+    const {components} = memberAPageManager.webapp;
     await components.inputBarControls().clickShareFile(audioFilePath);
-    expect(await pages.conversation().isAudioMessageVisible()).toBeTruthy();
   });
   await test.step('User B can play the file', async () => {
     const {pages} = memberAPageManager.webapp;
     await pages.conversation().playAudio();
-    // Wait for 5 seconds to ensure audio starts playing
-    await pages.conversation().page.waitForTimeout(5000);
-    expect(await pages.conversation().isAudioPlaying()).toBeTruthy();
+    await expect.poll(() => pages.conversation().isAudioPlaying()).toBeTruthy();
   });
 
   // Step 6: Ephemeral messages
@@ -170,12 +167,13 @@ test('Messages in 1:1', {tag: ['@TC-8750', '@crit-flow-web']}, async ({createTea
 
   // Step 8: Asset sharing
   await test.step('User A sends asset', async () => {
-    const {pages, components} = memberAPageManager.webapp;
+    const {components} = memberAPageManager.webapp;
     await components.inputBarControls().clickShareFile(textFilePath);
-    expect(await pages.conversation().isFileMessageVisible()).toBeTruthy();
   });
   await test.step('User B can download the file', async () => {
-    const filePath = await memberBPageManager.webapp.pages.conversation().downloadFile();
-    expect(await isAssetDownloaded(filePath)).toBeTruthy();
+    await expect(async () => {
+      const filePath = await memberBPageManager.webapp.pages.conversation().downloadFile();
+      expect(await isAssetDownloaded(filePath)).toBeTruthy();
+    }).toPass();
   });
 });

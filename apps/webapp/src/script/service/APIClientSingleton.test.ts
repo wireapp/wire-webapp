@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2025 Wire Swiss GmbH
+ * Copyright (C) 2026 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,22 +17,20 @@
  *
  */
 
-import {Page, Locator} from '@playwright/test';
+import {Config} from '../Config';
+import {APIClient} from './APIClientSingleton';
 
-export class RemoveMemberModal {
-  readonly page: Page;
+describe('APIClientSingleton', () => {
+  it('configures wire client metadata headers for backend requests', () => {
+    const apiClient = new APIClient();
 
-  readonly modal: Locator;
-  readonly confirmButton: Locator;
-
-  constructor(page: Page) {
-    this.page = page;
-
-    this.modal = page.getByTestId('modal-template-confirm');
-    this.confirmButton = this.modal.getByTestId('do-action');
-  }
-
-  async clickConfirm() {
-    await this.confirmButton.click();
-  }
-}
+    try {
+      expect(apiClient.config.headers).toEqual({
+        'Wire-Client': 'Web',
+        'Wire-Client-Version': Config.getConfig().VERSION,
+      });
+    } finally {
+      apiClient.disconnect();
+    }
+  });
+});

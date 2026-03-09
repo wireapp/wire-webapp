@@ -59,6 +59,7 @@ export class ConversationPage {
   readonly itemPendingRequest: Locator;
   readonly ignoreButton: Locator;
   readonly cancelRequest: Locator;
+  readonly mentionSuggestions: Locator;
 
   readonly getImageAltText = (user: User) => `Image from ${user.fullName}`;
 
@@ -104,6 +105,7 @@ export class ConversationPage {
     this.itemPendingRequest = page.getByTestId('item-pending-requests');
     this.ignoreButton = page.getByTestId('do-ignore');
     this.cancelRequest = page.getByTestId('do-cancel-request');
+    this.mentionSuggestions = page.getByRole('listbox').getByTestId('item-mention-suggestion');
   }
 
   getImageLocator(user: User): Locator {
@@ -158,6 +160,12 @@ export class ConversationPage {
     await this.messageInput.pressSequentially(message, {delay: 100});
   }
 
+  async mentionUser(userFullName: string, searchQuery?: string) {
+    const textToType = searchQuery ? `@${searchQuery}` : `@${userFullName.slice(0, 3)}`;
+    await this.messageInput.pressSequentially(textToType);
+    await this.mentionSuggestions.filter({hasText: userFullName}).click({timeout: 5000});
+  }
+
   async replyToMessage(message: Locator) {
     await message.hover();
     await message.getByRole('group').getByTestId('do-reply-message').click();
@@ -174,12 +182,8 @@ export class ConversationPage {
   }
 
   async sendMessageWithUserMention(userFullName: string, messageText?: string) {
-    await this.messageInput.fill(`@`);
-    await this.page
-      .getByTestId('item-mention-suggestion')
-      .getByTestId('status-name')
-      .filter({hasText: userFullName})
-      .click({timeout: 1000});
+    await this.messageInput.fill(''); // Clear the input initially
+    await this.mentionUser(userFullName);
 
     if (messageText) {
       await this.messageInput.pressSequentially(messageText);
@@ -329,6 +333,20 @@ export class ConversationPage {
     await videoPlayButton.click();
   }
 
+  async isVideoPlaying() {
+    const videoTimeLocator = this.page
+      .getByTestId('item-message')
+      .getByTestId('video-asset')
+      .getByTestId('status-video-time');
+
+    const videoTimeText = (await videoTimeLocator.textContent())?.trim();
+    if (!videoTimeText) {
+      throw new Error('Video time text is empty or undefined');
+    }
+    const seconds = parseInt(videoTimeText.split(':')[1]);
+    return seconds < 30;
+  }
+
   async playAudio() {
     const audioPlayButton = this.page
       .getByTestId('item-message')
@@ -437,7 +455,8 @@ export class ConversationPage {
       .getByTestId('item-user')
       .and(this.page.locator(`[data-uie-value="${name}"]`))
       .click();
-    return this.removeUserButton.click();
+    await this.removeUserButton.click();
+    await new ConfirmModal(this.page).clickAction();
   }
 
   async removeAdminFromGroup(name: string) {

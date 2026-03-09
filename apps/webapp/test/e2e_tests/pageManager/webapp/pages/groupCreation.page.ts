@@ -23,6 +23,7 @@ export class GroupCreationPage {
   readonly page: Page;
 
   readonly groupCreationModal: Locator;
+  readonly searchPeopleList: Locator;
   readonly groupNameInput: Locator;
   readonly nextButton: Locator;
   readonly createGroupButton: Locator;
@@ -43,7 +44,8 @@ export class GroupCreationPage {
     this.filesCheckbox = page.locator('[data-uie-name="do-toggle-cells"]');
 
     this.searchPeopleInput = page.getByRole('dialog').getByLabel('Search by name');
-    this.searchPeopleResults = page.getByRole('dialog').getByRole('list').getByRole('listitem');
+    this.searchPeopleList = page.getByRole('dialog').getByRole('list');
+    this.searchPeopleResults = this.searchPeopleList.getByRole('listitem');
   }
 
   async setGroupName(name: string) {

@@ -24,6 +24,7 @@ import {User} from 'test/e2e_tests/data/user';
 export class ConversationListPage {
   readonly page: Page;
 
+  readonly list: Locator;
   readonly blockConversationMenuButton: Locator;
   readonly createGroupButton: Locator;
   readonly pendingConnectionRequest: Locator;
@@ -43,6 +44,7 @@ export class ConversationListPage {
   constructor(page: Page) {
     this.page = page;
 
+    this.list = page.getByRole('list', {name: 'Conversation list'});
     this.blockConversationMenuButton = page.getByRole('menu').getByRole('button', {name: 'Block'});
     this.pendingConnectionRequest = page.locator('[data-uie-name="connection-request"]');
     this.createGroupButton = page.getByTestId('conversation-list-header').getByTestId('go-create-group');
@@ -60,12 +62,6 @@ export class ConversationListPage {
     this.conversationListHeaderTitle = page.locator('[data-uie-name="conversation-list-header-title"]');
     this.joinCallButton = page.getByRole('button', {name: 'Join'});
     this.clearContentButton = page.getByRole('button', {name: 'Clear content'});
-  }
-
-  async isConversationItemVisible(conversationName: string) {
-    const conversation = this.getConversationLocator(conversationName);
-    await conversation.waitFor({state: 'visible'});
-    return await conversation.isVisible();
   }
 
   async isConversationBlocked(conversationName: string) {
@@ -98,6 +94,11 @@ export class ConversationListPage {
     await this.archiveConversationMenuButton.click();
   }
 
+  async setNotifications(level: 'Everything' | 'Mentions and replies' | 'Nothing') {
+    await this.page.getByRole('menuitem', {name: 'Notifications'}).click(); // Click the "Notifications" menu item
+    await this.page.getByRole('radiogroup').locator('label', {hasText: level}).click(); // Click the specified radio button
+  }
+
   async unarchiveConversation() {
     await this.unarchiveConversationMenuButton.click();
   }
@@ -112,13 +113,17 @@ export class ConversationListPage {
    * @param options.protocol Only locate conversations matching this protocol (mls only works for 1on1 conversations as groups still use proteus) - Default: "mls"
    */
   getConversationLocator(conversationName: string, options?: {protocol?: 'mls' | 'proteus'}) {
-    const conversation = this.page.getByTestId('item-conversation').filter({hasText: conversationName});
+    let conversation = this.page.getByTestId('item-conversation').filter({hasText: conversationName});
 
     if (options?.protocol) {
-      return conversation.and(this.page.locator(`[data-protocol="${options.protocol}"]`));
+      conversation = conversation.and(this.page.locator(`[data-protocol="${options.protocol}"]`));
     }
 
-    return conversation;
+    return Object.assign(conversation, {
+      unreadIndicator: conversation.getByTitle('Unread message'),
+      mutedIndicator: conversation.getByTitle('Muted conversation'),
+      mentionIndicator: conversation.getByTitle('Unread mention'),
+    });
   }
 
   async openContextMenu(conversationName: string) {
@@ -137,6 +142,10 @@ export class ConversationListPage {
 
   async getUserAvatarWrapper(user: User): Promise<Locator> {
     return this.getConversationLocator(user.fullName).getByTestId('element-avatar-user');
+  }
+
+  getUserStatusIcon(user: User) {
+    return this.getConversationLocator(user.fullName).getByTestId('status-availability-icon');
   }
 
   async clickUnblockConversation() {

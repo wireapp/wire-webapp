@@ -105,7 +105,12 @@ const defaultPassword = {
   onChangePasswordClick: jest.fn(),
 };
 
-const defaultExpiration = {
+const defaultExpiration: {
+  isEnabled: boolean;
+  onToggle: jest.Mock;
+  dateTime: Date | null;
+  onChange: jest.Mock;
+} = {
   isEnabled: false,
   onToggle: jest.fn(),
   dateTime: null,

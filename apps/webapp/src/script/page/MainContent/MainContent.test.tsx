@@ -27,6 +27,7 @@ import {MainContent} from './MainContent';
 
 import {withTheme} from '../../auth/util/test/TestUtil';
 import {MainViewModel} from '../../view_model/MainViewModel';
+import {createDeterministicWallClock} from '../../clock/deterministicWallClock';
 import {RootProvider} from '../RootProvider';
 import {ContentState, useAppState} from '../useAppState';
 
@@ -45,6 +46,10 @@ const mockDevicesHandler = {
   currentDeviceId: () => 'mock-device-id',
 } as unknown as MediaDevicesHandler;
 
+function isFeatureToggleDisabledForTest(): boolean {
+  return false;
+}
+
 describe('Preferences', () => {
   const mainViewModel = {
     content: {
@@ -61,6 +66,7 @@ describe('Preferences', () => {
     selfUser: new User('selfUser'),
     reloadApp: jest.fn(),
   };
+  const wallClock = createDeterministicWallClock();
 
   it('renders the right component according to view state', () => {
     const {setContentState} = useAppState.getState();
@@ -68,7 +74,14 @@ describe('Preferences', () => {
     jest.useFakeTimers();
     render(
       withTheme(
-        <RootProvider value={mainViewModel}>
+        <RootProvider
+          value={{
+            mainViewModel,
+            wallClock,
+            doesApplicationNeedForceReload: false,
+            isFeatureToggleEnabled: isFeatureToggleDisabledForTest,
+          }}
+        >
           <MainContent {...defaultParams} />
         </RootProvider>,
       ),

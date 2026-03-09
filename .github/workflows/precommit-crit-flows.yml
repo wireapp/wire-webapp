@@ -3,6 +3,8 @@ name: precommit-crit-flows
 on:
   pull_request:
     branches: [dev]
+  merge_group:
+    branches: [dev]
 
 # One at a time lane for the shared precommit environment
 concurrency:
@@ -30,10 +32,18 @@ jobs:
       UNIT_TEST_REPORT_FILE: ./unit-tests.log
 
     steps:
-      - uses: actions/checkout@v6
+      - name: Checkout (pull_request)
+        if: ${{ github.event_name == 'pull_request' }}
+        uses: actions/checkout@v6
         with:
           fetch-depth: 0
           ref: ${{ github.event.pull_request.head.sha }}
+
+      - name: Checkout (merge_group)
+        if: ${{ github.event_name == 'merge_group' }}
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
 
       - uses: actions/setup-node@v6
         with:
@@ -47,7 +57,7 @@ jobs:
       - name: Derive PR commit metadata
         id: meta
         run: |
-          SHA="${{ github.event.pull_request.head.sha }}"
+          SHA="${{ github.event.pull_request.head.sha || github.sha }}"
           COMMIT_URL="https://github.com/${{ github.repository }}/commit/$SHA"
           AUTHOR="$(git show -s --format='%an' "$SHA" || true)"
           echo "COMMIT_URL=$COMMIT_URL" >> "$GITHUB_ENV"
@@ -55,12 +65,13 @@ jobs:
           echo "commit_url=$COMMIT_URL" >> "$GITHUB_OUTPUT"
           echo "committer=$AUTHOR" >> "$GITHUB_OUTPUT"
 
-      - uses: actions/upload-artifact@v5
+      - uses: actions/upload-artifact@v7
         with:
           name: build-artifact
           path: ${{ env.BUILD_DIR }}${{ env.BUILD_ARTIFACT }}
 
       - name: Check total PR additions
+        if: ${{ github.event_name == 'pull_request' }}
         id: check_additions
         run: |
           total_additions=$(gh api -H "Accept: application/vnd.github.v3+json" \
@@ -83,7 +94,7 @@ jobs:
       precommit_url: ${{ steps.fetch_url.outputs.url }}
 
     steps:
-      - uses: actions/download-artifact@v5
+      - uses: actions/download-artifact@v8
         with:
           name: build-artifact
 
@@ -129,13 +140,14 @@ jobs:
     name: Check if the PR touches e2e tests
     runs-on: ubuntu-latest
     outputs:
-      tests_to_run: ${{ steps.check_e2e_tests.outputs.tests_to_run}}
+      tests_to_run: ${{ steps.check_e2e_tests.outputs.tests_to_run || steps.set_default_tests_for_merge_queue.outputs.tests_to_run }}
     steps:
       - uses: actions/checkout@v6
         with:
           fetch-depth: 0
 
       - name: Check for e2e tests changes
+        if: ${{ github.event_name == 'pull_request' }}
         id: check_e2e_tests
         run: |
           git diff --exit-code origin/${{ github.base_ref }}...HEAD -- apps/webapp/test/e2e_tests/ || RESULT=$?
@@ -148,6 +160,13 @@ jobs:
             echo "tests_to_run=@crit-flow-web" >> $GITHUB_OUTPUT
             echo "E2E Tests have not been modified, executing critical flow tests only"
           fi
+
+      - name: Use critical flow tests on merge queue
+        if: ${{ github.event_name == 'merge_group' }}
+        id: set_default_tests_for_merge_queue
+        run: |
+          echo "tests_to_run=@crit-flow-web" >> $GITHUB_OUTPUT
+          echo "Merge queue run detected, executing critical flow tests"
 
   run_e2e_tests:
     name: Playwright Critical Flow (precommit)
@@ -166,10 +185,19 @@ jobs:
     needs: run_e2e_tests
     if: ${{ !cancelled() }}
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
     steps:
-      - uses: actions/checkout@v6
+      - name: Checkout (pull_request)
+        if: ${{ github.event_name == 'pull_request' }}
+        uses: actions/checkout@v6
         with:
           ref: ${{ github.event.pull_request.head.sha }}
+
+      - name: Checkout (merge_group)
+        if: ${{ github.event_name == 'merge_group' }}
+        uses: actions/checkout@v6
 
       - uses: actions/setup-node@v6
         with:
@@ -177,13 +205,13 @@ jobs:
           cache: 'yarn'
 
       - name: Download report
-        uses: actions/download-artifact@v5
+        uses: actions/download-artifact@v8
         with:
           artifact-ids: ${{ needs.run_e2e_tests.outputs.reportArtifactId }}
           path: apps/webapp/playwright-report
 
       - name: Generate PR comment
-        if: always()
+        if: ${{ always() && github.event_name == 'pull_request' }}
         id: generate_comment
         run: |
           echo "Checking for Playwright report..."
@@ -207,7 +235,7 @@ jobs:
           echo "EOF" >> $GITHUB_OUTPUT
 
       - name: Comment on PR
-        if: always()
+        if: ${{ always() && github.event_name == 'pull_request' }}
         uses: marocchino/sticky-pull-request-comment@773744901bac0e8cbb5a0dc842800d45e9b2b405
         with:
           header: playwright-summary

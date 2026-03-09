@@ -22,6 +22,10 @@ on:
       grep:
         type: string
         description: Define which tests to run, the given value will be passed to the `--grep` flag of playwright
+        default: "@regression|@crit-flow-web"
+      testinyRunName:
+        type: string
+        description: Define Testiny Run name to upload results to
   # Options for calling the workflow within an other workflow
   workflow_call:
     inputs:
@@ -58,8 +62,9 @@ jobs:
 
     services:
       # Run the kalium testservice as service container of the current job
+      # (The tag specifies the commit in kalium to use for tests, see https://quay.io/repository/wire/testservice?tab=history for the latest version)
       testservice:
-        image: quay.io/wire/testservice:latest
+        image: quay.io/wire/testservice:5ec1c95b75daa7241e38c97f2916a06a2e40ce1b
         ports:
           - 8080:8080
 
@@ -72,7 +77,7 @@ jobs:
           cache: 'yarn'
 
       - run: yarn --immutable
-      - run: yarn playwright install --with-deps chrome
+      - run: yarn playwright install --only-shell --with-deps chromium
       - uses: 1password/install-cli-action@143a85f84a90555d121cde2ff5872e393a47ab9f
 
       - name: Generate env file
@@ -87,11 +92,11 @@ jobs:
           TEST_SERVICE_URL: http://localhost:8080 # Run tests against locally running test service
           PLAYWRIGHT_BLOB_OUTPUT_DIR: apps/webapp/playwright-report/blob-reports
           GREP: ${{ inputs.grep }}
-        run: yarn nx run webapp:e2e --shard=${{ matrix.shard }}/${{ strategy.job-total }} --reporter=blob --grep="${GREP}"
+        run: yarn nx run webapp:e2e --shard=${{ matrix.shard }}/${{ strategy.job-total }} --reporter=blob --grep=\"$GREP\"
 
       - name: Upload blob report
         if: ${{ !cancelled() }}
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v7
         with:
           name: blob-report-${{ matrix.shard }}
           path: apps/webapp/playwright-report/blob-reports
@@ -118,7 +123,7 @@ jobs:
       - run: yarn --immutable
 
       - name: Download blob reports
-        uses: actions/download-artifact@v5
+        uses: actions/download-artifact@v8
         with:
           path: ./apps/webapp/playwright-report/blob-reports
           pattern: blob-report-*
@@ -133,7 +138,7 @@ jobs:
 
       - name: Upload test report
         id: upload_playwright_report
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v7
         with:
           name: playwright-report
           path: apps/webapp/playwright-report/
@@ -143,3 +148,13 @@ jobs:
         run: |
           echo "reportUrl=${{ steps.upload_playwright_report.outputs.artifact-url }}" >> $GITHUB_OUTPUT
           echo "reportArtifactId=${{ steps.upload_playwright_report.outputs.artifact-id }}" >> $GITHUB_OUTPUT
+
+      - name: Update Testiny Run with results
+        if: ${{ inputs.testinyRunName }}
+        env:
+          TESTINY_API_KEY: ${{ secrets.TESTINY_API_KEY }}
+          TESTINY_RUN_NAME: ${{ inputs.testinyRunName }}
+        run: |
+          node apps/webapp/test/e2e_tests/scripts/send-playwright-results-to-testiny.ts \
+            --report apps/webapp/playwright-report/report.json \
+            --run-name "$TESTINY_RUN_NAME"

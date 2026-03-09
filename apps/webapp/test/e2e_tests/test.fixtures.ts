@@ -24,8 +24,10 @@ import {getUser, User} from './data/user';
 import {PageManager} from './pageManager';
 import {connectWithUser, sendConnectionRequest} from './utils/userActions';
 import {mockAudioAndVideoDevices} from './utils/mockVideoDevice.util';
+import {Role} from '@wireapp/api-client/lib/team';
+import {FEATURE_KEY} from '@wireapp/api-client/lib/team/feature';
 
-type PagePlugin = (page: Page) => void | Promise<void>;
+export type PagePlugin = (page: Page) => void | Promise<void>;
 
 // Define custom test type with axios fixture
 type Fixtures = {
@@ -52,15 +54,15 @@ type Fixtures = {
    */
   createTeam: (
     teamName: string,
-    options?: Parameters<typeof createUser>[1] & {withMembers?: number | User[]},
+    options?: {users: (User | {user: User; role?: keyof typeof Role})[]; features?: {conferenceCalling?: boolean}},
   ) => Promise<Team>;
 };
 
 export type Team = {
+  teamId: string;
   owner: User;
-  members: User[];
   /** Add a new member to the team after its initial creation */
-  addMember: (member: User) => Promise<void>;
+  addTeamMember: (member: User, options?: {role?: keyof typeof Role}) => Promise<void>;
 };
 
 export {expect} from '@playwright/test';
@@ -136,32 +138,44 @@ export const test = baseTest.extend<Fixtures>({
   createTeam: async ({api}, use) => {
     const teamOwners: User[] = [];
 
-    await use(async (teamName, {withMembers, ...options} = {}) => {
-      const owner = await createUser(api, options);
+    await use(async (teamName, options) => {
+      const owner = await createUser(api);
 
       const {teamId} = await api.auth.upgradeUserToTeamOwner(owner, teamName);
       owner.teamId = teamId;
 
       teamOwners.push(owner);
 
-      const addMember = async (member: User) => {
-        const invitationId = await api.team.inviteUserToTeam(member.email, owner);
+      const addTeamMember: Team['addTeamMember'] = async (member, options) => {
+        const invitationId = await api.team.inviteUserToTeam(member.email, owner, Role[options?.role ?? 'MEMBER']);
         const invitationCode = await api.brig.getTeamInvitationCodeForEmail(owner.teamId, invitationId);
         await api.team.acceptTeamInvitation(invitationCode, member);
       };
 
-      let members: User[] = [];
-      if (withMembers !== undefined) {
-        // Depending on the type of withMembers, either create the number of users or use the given array of users
-        members =
-          typeof withMembers === 'number'
-            ? await Promise.all(Array.from({length: withMembers}, () => createUser(api, options)))
-            : withMembers;
-
-        await Promise.all(members.map(member => addMember(member)));
+      if (options?.users) {
+        await Promise.all(
+          options.users.map(user => {
+            if ('user' in user) {
+              return addTeamMember(user.user, {role: user.role});
+            } else {
+              return addTeamMember(user);
+            }
+          }),
+        );
       }
 
-      return {owner, members, addMember};
+      if (options?.features) {
+        // The team will be reset right after initialization, so we need to wait a short time for it to finish
+        // before changing feature configs since they would otherwise be overwritten (See WPB-23698)
+        await new Promise(resolve => setTimeout(resolve, 5000));
+
+        if (options.features.conferenceCalling) {
+          await api.enableConferenceCallingFeature(teamId);
+          await api.waitForFeatureToBeEnabled(FEATURE_KEY.CONFERENCE_CALLING, teamId, owner.token);
+        }
+      }
+
+      return {teamId, owner, addTeamMember};
     });
 
     // Deletes each created team and the owner / members associated with it
@@ -215,10 +229,22 @@ export const withConnectionRequest =
     await sendConnectionRequest(pageManager, await user);
   };
 
-const createUser = async (api: ApiManagerE2E, options?: {disableTelemetry?: boolean}) => {
+/** PagePlugin to open a guest user link and join the group chat as temporary member */
+export const withGuestUser =
+  (link: string, guestName: string): PagePlugin =>
+  async page => {
+    await page.goto(link);
+    await page.getByRole('link', {name: 'Join in Browser'}).click();
+    await PageManager.from(page).webapp.pages.conversationJoin().joinAsGuest(guestName);
+  };
+
+const createUser = async (
+  api: ApiManagerE2E,
+  options?: {firstName?: string; lastName?: string; disableTelemetry?: boolean},
+) => {
   const {disableTelemetry = true} = options ?? {};
 
-  const user = getUser();
+  const user = getUser({firstName: options?.firstName, lastName: options?.lastName});
   await api.createPersonalUser(user);
 
   // Optionally decline to send telemetry via the api. This avoids the user being prompted for it in the UI upon first login

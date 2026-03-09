@@ -21,9 +21,9 @@ import {getUser} from 'test/e2e_tests/data/user';
 import {PageManager} from 'test/e2e_tests/pageManager';
 import {bootstrapTeamForTesting, completeLogin} from 'test/e2e_tests/utils/setup.util';
 import {tearDownAll} from 'test/e2e_tests/utils/tearDown.util';
-import {createChannel, createGroup, loginUser} from 'test/e2e_tests/utils/userActions';
+import {createChannel, createGroup, loginUser, logOutUser} from 'test/e2e_tests/utils/userActions';
 
-import {test, expect, LOGIN_TIMEOUT} from '../../test.fixtures';
+import {test, expect, LOGIN_TIMEOUT, withLogin} from '../../test.fixtures';
 
 test.describe('account settings', () => {
   let owner = getUser();
@@ -126,38 +126,35 @@ test.describe('account settings', () => {
     },
   );
 
-  // see https://wearezeta.atlassian.net/browse/WPB-20548
-  test.skip(
+  test(
     'Verify sound settings are saved after re-login',
     {tag: ['@TC-1718', '@TC-1720', '@regression']},
-    async ({pageManager}) => {
-      const {components, modals, pages} = pageManager.webapp;
+    async ({createUser, createPage}) => {
+      const user = await createUser();
+      const pageManager = PageManager.from(await createPage(withLogin(user)));
+      const {pages, components} = pageManager.webapp;
 
-      await completeLogin(pageManager, memberA);
       await components.conversationSidebar().clickPreferencesButton();
-
       await pages.settings().clickOptionsButton();
 
-      await pages.options().checkSoundNone(); // cannot reach the input element its behind the label element
-      await pages.settings().clickAccountButton();
-      await pages.account().clickLogoutButton();
-      await modals.confirmLogout().clickConfirm();
+      await pages.options().setSoundAlerts('None');
+      await logOutUser(pageManager);
 
-      await loginUser(memberA, pageManager);
+      await loginUser(user, pageManager);
       await components.conversationSidebar().isPageLoaded();
+      await components.conversationSidebar().clickPreferencesButton();
       await pages.settings().clickOptionsButton();
 
-      await expect(pages.options().checkboxSoundAlertsNone).toBeChecked();
+      await expect(pages.options().soundAlertsRadioGroup.getByRole('radio', {name: 'None'})).toBeChecked();
 
-      await pages.options().checkSoundAll(); // cannot reach the input element its behind the label element
-      await pages.account().clickLogoutButton();
-      await modals.confirmLogout().clickConfirm();
-      await loginUser(memberA, pageManager);
-
+      await pages.options().setSoundAlerts('All');
+      await logOutUser(pageManager);
+      await loginUser(user, pageManager);
       await components.conversationSidebar().isPageLoaded();
-      await pages.settings().clickOptionsButton();
 
-      await expect(pages.options().checkboxSoundAlertsAll).toBeChecked();
+      await components.conversationSidebar().clickPreferencesButton();
+      await pages.settings().clickOptionsButton();
+      await expect(pages.options().soundAlertsRadioGroup.getByRole('radio', {name: 'All'})).toBeChecked();
     },
   );
 
@@ -178,7 +175,7 @@ test.describe('account settings', () => {
 
   test(
     'Verify link to manage a team is not shown when logged in as team member or normal use',
-    {tag: ['@TC-1723', '@regression']},
+    {tag: ['@TC-1724', '@regression']},
     async ({pageManager}) => {
       const {components} = pageManager.webapp;
 
@@ -242,7 +239,7 @@ test.describe('account settings', () => {
 
       await createGroup(pages, groupName, [memberB]);
       // check that the chat is open
-      expect(await pages.conversationList().isConversationItemVisible(groupName)).toBeTruthy();
+      await expect(pages.conversationList().getConversationLocator(groupName)).toBeVisible();
       await pages.conversation().sendMessage('test');
       const message = pages.conversation().getMessage({content: 'test', sender: memberA});
 
