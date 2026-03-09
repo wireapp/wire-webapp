@@ -164,7 +164,7 @@ test.describe('Participant Profile', () => {
 
         await expect(pages.participantDetails().getUserEmailLocator(userC.email)).not.toBeVisible();
         await expect(pages.participantDetails().unblockButton).toBeVisible();
-        await expect(pages.participantDetails().removeFromGroup).toBeVisible();
+        await expect(pages.participantDetails().removeFromGroupButton).toBeVisible();
       });
     },
   );
@@ -251,7 +251,7 @@ test.describe('Participant Profile', () => {
       await createGroup(adminPage, groupName, [userB]);
       await openParticipantDetailsFromGroup(adminPage, groupName, userB.fullName);
 
-      const removeFromGroup = adminPage.participantDetails().removeFromGroup;
+      const removeFromGroup = adminPage.participantDetails().removeFromGroupButton;
       await expect(removeFromGroup).toBeVisible();
       await expect(removeFromGroup).toHaveText('Remove from group…');
     },
@@ -271,7 +271,7 @@ test.describe('Participant Profile', () => {
       await createGroup(adminPage, groupName, [userB, userC]);
       await openParticipantDetailsFromGroup(userBPages, groupName, userC.fullName);
 
-      await expect(userBPages.participantDetails().removeFromGroup).not.toBeVisible();
+      await expect(userBPages.participantDetails().removeFromGroupButton).not.toBeVisible();
     },
   );
 });

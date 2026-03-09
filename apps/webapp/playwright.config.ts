@@ -64,7 +64,7 @@ module.exports = defineConfig({
       name: 'Chromium',
       use: {
         ...devices['Desktop Chrome'],
-        permissions: ['notifications'],
+        permissions: ['notifications', 'clipboard-read', 'clipboard-write'],
         launchOptions: {
           args: [
             '--use-fake-device-for-media-stream', // Provide fake devices for audio & video device input

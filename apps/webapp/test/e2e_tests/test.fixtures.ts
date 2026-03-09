@@ -228,10 +228,22 @@ export const withConnectionRequest =
     await sendConnectionRequest(pageManager, await user);
   };
 
-const createUser = async (api: ApiManagerE2E, options?: {disableTelemetry?: boolean}) => {
+/** PagePlugin to open a guest user link and join the group chat as temporary member */
+export const withGuestUser =
+  (link: string, guestName: string): PagePlugin =>
+  async page => {
+    await page.goto(link);
+    await page.getByRole('link', {name: 'Join in Browser'}).click();
+    await PageManager.from(page).webapp.pages.conversationJoin().joinAsGuest(guestName);
+  };
+
+const createUser = async (
+  api: ApiManagerE2E,
+  options?: {firstName?: string; lastName?: string; disableTelemetry?: boolean},
+) => {
   const {disableTelemetry = true} = options ?? {};
 
-  const user = getUser();
+  const user = getUser({firstName: options?.firstName, lastName: options?.lastName});
   await api.createPersonalUser(user);
 
   // Optionally decline to send telemetry via the api. This avoids the user being prompted for it in the UI upon first login
