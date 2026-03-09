@@ -67,7 +67,7 @@ import {ContentState, useAppState} from './useAppState';
 import {runClientVersionCheck} from '../application-periodic-checks/runClientVersionCheck';
 import {startApplicationPeriodicChecks} from '../application-periodic-checks/startApplicationPeriodicChecks';
 import {WallClock} from '../clock/wallClock';
-import {StartupFeatureToggles} from '../featureToggles/startupFeatureToggles';
+import {StartupFeatureToggleName} from '../featureToggles/startupFeatureToggles';
 import {App} from '../main/app';
 import {initialiseMLSMigrationFlow} from '../mls/MLSMigration';
 import {generateConversationUrl} from '../router/routeGenerator';
@@ -84,9 +84,9 @@ export type RightSidebarParams = {
 
 type AppMainProps = {
   readonly app: App;
+  readonly isFeatureToggleEnabled: (featureName: StartupFeatureToggleName) => boolean;
   readonly selfUser: User;
   readonly mainView: MainViewModel;
-  readonly startupFeatureToggles: StartupFeatureToggles;
   readonly conversationState?: ConversationState;
   readonly callState?: CallState;
   readonly wallClock: WallClock;
@@ -96,9 +96,9 @@ type AppMainProps = {
 
 export const AppMain = ({
   app,
+  isFeatureToggleEnabled,
   mainView,
   selfUser,
-  startupFeatureToggles,
   conversationState = container.resolve(ConversationState),
   callState = container.resolve(CallState),
   wallClock,
@@ -315,7 +315,7 @@ export const AppMain = ({
           mainViewModel: mainView,
           wallClock,
           doesApplicationNeedForceReload,
-          isFeatureToggleEnabled: startupFeatureToggles.isFeatureToggleEnabled,
+          isFeatureToggleEnabled,
         }}
       >
         <ErrorBoundary FallbackComponent={ErrorFallback}>

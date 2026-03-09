@@ -71,13 +71,14 @@ document.addEventListener('DOMContentLoaded', async () => {
   const applicationServices = createApplicationServices({
     createWallClock,
   });
+  const {isFeatureToggleEnabled} = startupFeatureToggles;
   const {wallClock} = applicationServices;
 
   createRoot(appContainer).render(
     <AppContainer
       config={config}
       clientType={shouldPersist ? ClientType.PERMANENT : ClientType.TEMPORARY}
-      startupFeatureToggles={startupFeatureToggles}
+      isFeatureToggleEnabled={isFeatureToggleEnabled}
       wallClock={wallClock}
     />,
   );

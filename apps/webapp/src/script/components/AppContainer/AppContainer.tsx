@@ -41,7 +41,7 @@ import {useTheme} from './hooks/useTheme';
 
 import {WallClock} from '../../clock/wallClock';
 import {Config, Configuration} from '../../Config';
-import {StartupFeatureToggles} from '../../featureToggles/startupFeatureToggles';
+import {StartupFeatureToggleName} from '../../featureToggles/startupFeatureToggles';
 import {setAppLocale} from '../../localization/Localizer';
 import {App} from '../../main/app';
 import {AppMain} from '../../page/AppMain';
@@ -53,11 +53,11 @@ import {AppLoader} from '../AppLoader';
 type AppProps = {
   readonly config: Configuration;
   readonly clientType: ClientType;
-  readonly startupFeatureToggles: StartupFeatureToggles;
+  readonly isFeatureToggleEnabled: (featureName: StartupFeatureToggleName) => boolean;
   readonly wallClock: WallClock;
 };
 
-export const AppContainer = ({config, clientType, startupFeatureToggles, wallClock}: AppProps) => {
+export const AppContainer = ({config, clientType, isFeatureToggleEnabled, wallClock}: AppProps) => {
   setAppLocale();
   const app = useMemo(() => new App(container.resolve(Core), container.resolve(APIClient), config), []);
   const enableAutoLogin = Config.getConfig().FEATURE.ENABLE_AUTO_LOGIN;
@@ -117,10 +117,10 @@ export const AppContainer = ({config, clientType, startupFeatureToggles, wallClo
           return (
             <AppMain
               app={app}
+              isFeatureToggleEnabled={isFeatureToggleEnabled}
               selfUser={selfUser}
               mainView={mainView}
               locked={softLockEnabled}
-              startupFeatureToggles={startupFeatureToggles}
               wallClock={wallClock}
             />
           );
