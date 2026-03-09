@@ -80,6 +80,7 @@ export class Segmenter {
   /** Base path for MediaPipe WASM files. */
   private readonly wasmBasePath = '/min/mediapipe/wasm';
 
+  private wasInit = false;
   /**
    * Creates a new segmenter instance.
    *
@@ -115,6 +116,15 @@ export class Segmenter {
    * @throws May throw if model files are missing or initialization fails.
    */
   public async init(): Promise<void> {
+    console.log('### Segmentation model:', this.modelPath);
+    // Prevent memory overflow by initializing multiple times. If the model cannot be loaded, a memory overflow occurs
+    // because the MediaPipe is loaded multiple times.
+    // if (this.wasInit) {
+    //   return Promise.resolve();
+    // }
+    //
+    // this.wasInit = true;
+
     // Probe for required assets (non-blocking)
     await this.probeAsset(`${this.wasmBasePath}/vision_wasm_internal.wasm`);
     await this.probeAsset(this.modelPath);
@@ -210,16 +220,19 @@ export class Segmenter {
     const start = performance.now();
     let masks: any[] = [];
     let categoryMask: any | null = null;
+
     try {
       // Step 1: Resize input frame to segmentation resolution
       this.resizeCtx.drawImage(frame, 0, 0, this.width, this.height);
 
       // Step 2: Run MediaPipe segmentation (video mode uses timestamp for temporal smoothing)
       const result = this.segmenter.segmentForVideo(this.resizeCanvas, timestampMs);
+
       masks = result.confidenceMasks ?? [];
       categoryMask = result.categoryMask ?? null;
       // Step 3: Convert MediaPipe mask format to ImageData
       const primaryMask = masks[0] ?? null;
+
       const release = () => {
         masks.forEach(mask => {
           try {
@@ -235,10 +248,10 @@ export class Segmenter {
         }
       };
 
-      if (!primaryMask) {
-        const durationMs = performance.now() - start;
-        return {mask: null, classMask: null, maskTexture: null, width: 0, height: 0, durationMs, release};
-      }
+      // if (!primaryMask) {
+      //   const durationMs = performance.now() - start;
+      //   return {mask: null, classMask: null, maskTexture: null, width: 0, height: 0, durationMs, release};
+      // }
 
       const classMask = options.includeClassMask ? await this.buildClassMask(categoryMask) : null;
 
@@ -264,7 +277,16 @@ export class Segmenter {
         };
       }
 
-      const maskImage = this.combineConfidenceMasks(masks);
+      let maskImage: ImageData | null = null;
+
+      if (categoryMask) {
+        // multiclass model
+        maskImage = this.categoryMaskToBinaryMask(categoryMask);
+      } else {
+        // singleclass model
+        maskImage = this.combineConfidenceMasks(masks);
+      }
+
       if (!maskImage) {
         const durationMs = performance.now() - start;
         return {mask: null, classMask, maskTexture: null, width: 0, height: 0, durationMs, release};
@@ -393,6 +415,39 @@ export class Segmenter {
       out[idx + 3] = 255;
     }
     return imageData;
+  }
+
+  private categoryMaskToBinaryMask(mask: any): ImageData | null {
+    if (!mask) {
+      return null;
+    }
+
+    const width = mask.width ?? this.width;
+    const height = mask.height ?? this.height;
+
+    const imageData = new ImageData(width, height);
+    const out = imageData.data;
+
+    if (typeof mask.getAsUint8Array === 'function') {
+      const data = mask.getAsUint8Array() as Uint8Array;
+
+      for (let i = 0; i < data.length; i++) {
+        // 0 = background
+        // alles andere = Person
+        const isPerson = data[i] !== 0;
+        const value = isPerson ? 255 : 0;
+
+        const idx = i * 4;
+        out[idx] = value;
+        out[idx + 1] = value;
+        out[idx + 2] = value;
+        out[idx + 3] = 255;
+      }
+
+      return imageData;
+    }
+
+    return null;
   }
 
   private maskToFloatArray(mask: any): Float32Array | null {

@@ -142,7 +142,7 @@ export class WebGLRenderer {
       width,
       height,
       quality: {
-        tier: 'A',
+        tier: 'superhigh',
         segmentationWidth: 256,
         segmentationHeight: 144,
         segmentationCadence: 1,

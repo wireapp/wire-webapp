@@ -66,7 +66,7 @@ export const isProcessingMode = (mode: EffectMode): mode is Mode => mode !== 'pa
  * @param mode - The effect mode ('blur' or 'virtual').
  * @returns Bypass tier parameters with mode-specific adjustments.
  */
-export const getBypassTier = (mode: Mode): QualityTierParams => resolveTierParams('D', mode);
+export const getBypassTier = (mode: Mode): QualityTierParams => resolveTierParams('bypass', mode);
 
 /** Default mode to use when resolving bypass tier for non-processing modes. */
 const DEFAULT_BYPASS_MODE: Mode = 'blur';

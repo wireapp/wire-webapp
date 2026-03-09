@@ -19,7 +19,7 @@
 
 import type {Pipeline, PipelineConfig, PipelineInit} from './Pipeline';
 
-import type {WorkerOptions, WorkerResponse} from '../types';
+import type {QualityTier, WorkerOptions, WorkerResponse} from '../types';
 
 /**
  * Worker-thread WebGL2 rendering pipeline for background effects.
@@ -52,7 +52,7 @@ export class WorkerWebGLPipeline implements Pipeline {
   private onDroppedFrame: PipelineInit['onDroppedFrame'] | null = null;
   private onWorkerSegmenterError: PipelineInit['onWorkerSegmenterError'] | null = null;
   private onWorkerContextLoss: PipelineInit['onWorkerContextLoss'] | null = null;
-  private lastTier: 'A' | 'B' | 'C' | 'D' | null = null;
+  private lastTier: QualityTier | null = null;
 
   /**
    * Initializes the worker WebGL2 pipeline.

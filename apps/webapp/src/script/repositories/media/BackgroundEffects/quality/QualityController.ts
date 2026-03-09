@@ -17,11 +17,11 @@
  *
  */
 
-import {applyModeOverlay, type TierKey, TIER_DEFINITIONS} from './definitions';
+import {applyModeOverlay, TIER_DEFINITIONS} from './definitions';
 import type {PerformanceSample} from './samples';
 import {DEFAULT_TUNING} from './tuning';
 
-import type {Mode, QualityTierParams} from '../types';
+import type {Mode, QualityTier, QualityTierParams} from '../types';
 
 const DEFAULT_TARGET_FPS = 30;
 
@@ -54,10 +54,10 @@ export class QualityController {
   private readonly sampleTotals = {totalMs: 0, segmentationMs: 0, gpuMs: 0};
   /** Total number of samples observed since the last reset. */
   private totalSamplesSeen = 0;
-  /** Current quality tier. Starts at 'A' (highest quality). */
-  private tier: TierKey = 'A';
+  /** Current quality tier. Starts at (highest quality). */
+  private tier: QualityTier = 'superhigh';
   /** Maximum tier allowed for upgrades once performance caps are applied. */
-  private maxTier: TierKey | null = null;
+  private maxTier: QualityTier | null = null;
   /** Frame time budget in milliseconds derived from target FPS. */
   private readonly budgetMs: number;
   /** Threshold in milliseconds below which we can upgrade tier. */
@@ -166,7 +166,7 @@ export class QualityController {
    *
    * @param tier - The quality tier to set ('A', 'B', 'C', or 'D').
    */
-  public setTier(tier: TierKey): void {
+  public setTier(tier: QualityTier): void {
     this.tier = tier;
     this.stableFrames = 0;
     this.cooldownFrames = 0;
@@ -232,8 +232,8 @@ export class QualityController {
       const dominant = this.getDominantCost(ewmaTotalMs, ewmaSegmentationMs, ewmaGpuMs);
       const nextTier = this.downgradeTier(dominant);
       if (nextTier !== this.tier) {
-        if (this.tier === 'A') {
-          this.applyMaxTierCap('B');
+        if (this.tier === 'superhigh') {
+          this.applyMaxTierCap('high');
         }
         this.registerUpgradeFailure(nextTier);
         if (process.env.NODE_ENV !== 'production') {
@@ -429,17 +429,25 @@ export class QualityController {
    * @param dominant - The dominant performance bottleneck ('cpu', 'gpu', or 'balanced').
    * @returns The next lower quality tier.
    */
-  private downgradeTier(dominant: 'cpu' | 'gpu' | 'balanced'): TierKey {
-    if (this.tier === 'A') {
-      // GPU-bound: skip B tier for stronger GPU cost reduction
+  private downgradeTier(dominant: 'cpu' | 'gpu' | 'balanced'): QualityTier {
+    if (this.tier === 'superhigh') {
+      return 'high';
+    }
+
+    if (this.tier === 'high') {
+      // GPU-bound: skip medium tier for stronger GPU cost reduction
       // CPU-bound: normal step down to B
-      return dominant === 'gpu' ? 'C' : 'B';
+      return dominant === 'gpu' ? 'low' : 'medium';
     }
-    if (this.tier === 'B') {
-      return 'C';
+    if (this.tier === 'medium') {
+      return 'low';
     }
-    // Tier C or D: can only go to D (bypass)
-    return this.tier === 'C' ? 'D' : 'D';
+    if (this.tier === 'low') {
+      return 'bypass';
+    }
+
+    // last case
+    return 'bypass';
   }
 
   /**
@@ -448,18 +456,22 @@ export class QualityController {
    *
    * @returns The next higher quality tier, or current tier if already at maximum.
    */
-  private upgradeTier(): TierKey {
-    if (this.tier === 'A') {
-      return 'A';
+  private upgradeTier(): QualityTier {
+    if (this.tier === 'superhigh') {
+      return 'superhigh';
     }
-    if (this.tier === 'D') {
-      return this.canUpgradeTo('C') ? 'C' : 'D';
+    if (this.tier === 'bypass') {
+      return this.canUpgradeTo('low') ? 'low' : 'bypass';
     }
-    if (this.tier === 'C') {
-      return this.canUpgradeTo('B') ? 'B' : 'C';
+    if (this.tier === 'low') {
+      return this.canUpgradeTo('medium') ? 'medium' : 'low';
     }
-    // Tier B or A: can only go to A (maximum quality)
-    return this.tier === 'B' && this.canUpgradeTo('A') ? 'A' : 'B';
+
+    if (this.tier === 'medium') {
+      return this.canUpgradeTo('high') ? 'high' : 'medium';
+    }
+    // Tier can only go to A (maximum quality)
+    return this.tier === 'high' && this.canUpgradeTo('high') ? 'superhigh' : 'high';
   }
 
   /**
@@ -471,7 +483,7 @@ export class QualityController {
    *
    * @param nextTier - The tier we are downgrading to.
    */
-  private registerUpgradeFailure(nextTier: TierKey): void {
+  private registerUpgradeFailure(nextTier: QualityTier): void {
     if (this.lastUpgradeSample === null) {
       return;
     }
@@ -490,7 +502,7 @@ export class QualityController {
    *
    * @param cap - The highest tier allowed for future upgrades.
    */
-  private applyMaxTierCap(cap: TierKey): void {
+  private applyMaxTierCap(cap: QualityTier): void {
     if (!this.maxTier || this.getTierRank(cap) < this.getTierRank(this.maxTier)) {
       this.maxTier = cap;
       if (process.env.NODE_ENV !== 'production') {
@@ -509,15 +521,21 @@ export class QualityController {
    * @param tier - The tier to check upgrade eligibility for.
    * @returns True if upgrade to the tier is allowed, false if it exceeds maxTier.
    */
-  private canUpgradeTo(tier: TierKey): boolean {
+  private canUpgradeTo(tier: QualityTier): boolean {
     if (!this.maxTier) {
       return true;
     }
     return this.getTierRank(tier) <= this.getTierRank(this.maxTier);
   }
 
-  private getTierRank(tier: TierKey): number {
-    const rank: Record<TierKey, number> = {D: 0, C: 1, B: 2, A: 3};
+  private getTierRank(tier: QualityTier): number {
+    const rank: Record<QualityTier, number> = {
+      bypass: 0,
+      low: 1,
+      medium: 2,
+      high: 3,
+      superhigh: 3,
+    };
     return rank[tier];
   }
 }

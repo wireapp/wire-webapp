@@ -49,17 +49,19 @@ export type Mode = Exclude<EffectMode, 'passthrough'>;
  */
 export type DebugMode = 'off' | 'maskOverlay' | 'maskOnly' | 'edgeOnly' | 'classOverlay' | 'classOnly';
 
+export type QualityTier = 'superhigh' | 'high' | 'medium' | 'low' | 'bypass';
+
 /**
  * Quality mode for rendering performance.
  * - 'auto': Adaptive quality based on performance metrics
- * - 'A' | 'B' | 'C' | 'D': Fixed quality tier (A = highest, D = bypass)
+ * -  QualityTier
  */
-export type QualityMode = 'auto' | 'A' | 'B' | 'C' | 'D';
+export type QualityMode = 'auto' | QualityTier;
 
 /**
  * Optional mapping of quality tiers to segmentation model paths.
  */
-export type SegmentationModelByTier = Partial<Record<'A' | 'B' | 'C' | 'D', string>>;
+export type SegmentationModelByTier = Partial<Record<QualityTier, string>>;
 
 /**
  * Browser capability information detected at runtime.
@@ -74,7 +76,7 @@ export interface CapabilityInfo {
 export type QualityPolicyMode = 'auto' | 'conservative' | 'aggressive';
 
 export interface QualityPolicyResult {
-  initialTier: 'A' | 'B' | 'C' | 'D';
+  initialTier: QualityTier;
   segmentationModelByTier?: SegmentationModelByTier;
 }
 
@@ -98,8 +100,8 @@ export type PipelineType = 'worker-webgl2' | 'main-webgl2' | 'canvas2d' | 'passt
  * post-processing effects.
  */
 export interface QualityTierParams {
-  /** Quality tier identifier ('A' = highest, 'D' = bypass). */
-  tier: 'A' | 'B' | 'C' | 'D';
+  /** Quality tier identifier */
+  tier: QualityTier;
   /** Segmentation mask width in pixels. Lower values reduce CPU/ML cost. */
   segmentationWidth: number;
   /** Segmentation mask height in pixels. Lower values reduce CPU/ML cost. */
@@ -194,8 +196,8 @@ export interface Metrics {
   segmentationDelegate: 'CPU' | 'GPU' | null;
   /** Number of frames dropped due to processing errors or timeouts. */
   droppedFrames: number;
-  /** Current quality tier ('A' = highest, 'D' = bypass). */
-  tier: 'A' | 'B' | 'C' | 'D';
+  /** Current quality tier */
+  tier: QualityTier;
 }
 
 /**
@@ -207,7 +209,7 @@ export interface Metrics {
 export interface StartOptions {
   /** Target frames per second for adaptive quality control. Default: 30. */
   targetFps?: number;
-  /** Quality mode ('auto' for adaptive, or fixed tier 'A'/'B'/'C'/'D'). Default: 'auto'. */
+  /** Quality mode  Default: 'auto'. */
   quality?: QualityMode;
   /** Debug visualization mode. Default: 'off'. */
   debugMode?: DebugMode;
@@ -411,7 +413,7 @@ export interface WorkerOptions {
   /** Per-tier segmentation model overrides (resolved in worker). */
   segmentationModelByTier: SegmentationModelByTier;
   /** Initial tier used when quality is set to auto. */
-  initialTier: 'A' | 'B' | 'C' | 'D';
+  initialTier: QualityTier;
   /** Target frames per second for adaptive quality control. */
   targetFps: number;
 }

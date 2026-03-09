@@ -17,9 +17,15 @@
  *
  */
 
-import {TIER_DEFINITIONS, type TierKey} from './definitions';
+import {TIER_DEFINITIONS} from './definitions';
 
-import type {CapabilityInfo, QualityPolicyMode, QualityPolicyResult, QualityPolicyResolver} from '../types';
+import type {
+  CapabilityInfo,
+  QualityPolicyMode,
+  QualityPolicyResult,
+  QualityPolicyResolver,
+  QualityTier,
+} from '../types';
 
 /**
  * Downgrades a tier by one level (A→B→C→D).
@@ -27,14 +33,17 @@ import type {CapabilityInfo, QualityPolicyMode, QualityPolicyResult, QualityPoli
  * @param tier - Current tier to downgrade.
  * @returns Next lower tier, or 'D' if already at minimum.
  */
-const downgradeTier = (tier: TierKey): TierKey => {
-  if (tier === 'A') {
-    return 'B';
+const downgradeTier = (tier: QualityTier): QualityTier => {
+  if (tier === 'superhigh') {
+    return 'high';
   }
-  if (tier === 'B') {
-    return 'C';
+  if (tier === 'high') {
+    return 'medium';
   }
-  return 'D';
+  if (tier === 'medium') {
+    return 'low';
+  }
+  return 'bypass';
 };
 
 /**
@@ -43,14 +52,17 @@ const downgradeTier = (tier: TierKey): TierKey => {
  * @param tier - Current tier to upgrade.
  * @returns Next higher tier, or 'A' if already at maximum.
  */
-const upgradeTier = (tier: TierKey): TierKey => {
-  if (tier === 'D') {
-    return 'C';
+const upgradeTier = (tier: QualityTier): QualityTier => {
+  if (tier === 'bypass') {
+    return 'low';
   }
-  if (tier === 'C') {
-    return 'B';
+  if (tier === 'low') {
+    return 'medium';
   }
-  return 'A';
+  if (tier === 'medium') {
+    return 'high';
+  }
+  return 'superhigh';
 };
 
 /**
@@ -65,17 +77,17 @@ const upgradeTier = (tier: TierKey): TierKey => {
  * @param capabilities - Browser capability information.
  * @returns Baseline quality tier appropriate for the available capabilities.
  */
-export const baselineTierForCapabilities = (capabilities: CapabilityInfo): TierKey => {
+export const baselineTierForCapabilities = (capabilities: CapabilityInfo): QualityTier => {
   if (capabilities.webgl2 && capabilities.worker && capabilities.offscreenCanvas) {
-    return 'A';
+    return 'superhigh';
   }
   if (capabilities.webgl2) {
-    return 'B';
+    return 'medium';
   }
   if (typeof document !== 'undefined') {
-    return 'C';
+    return 'low';
   }
-  return 'D';
+  return 'bypass';
 };
 
 /**
@@ -90,7 +102,7 @@ export const baselineTierForCapabilities = (capabilities: CapabilityInfo): TierK
  * @param policy - Quality policy mode to apply.
  * @returns Adjusted tier based on the policy mode.
  */
-export const applyPolicyMode = (tier: TierKey, policy: QualityPolicyMode): TierKey => {
+export const applyPolicyMode = (tier: QualityTier, policy: QualityPolicyMode): QualityTier => {
   if (policy === 'conservative') {
     return downgradeTier(tier);
   }
@@ -128,7 +140,7 @@ export function resolveQualityPolicy(
   let initialTier = baselineTierForCapabilities(capabilities);
   initialTier = applyPolicyMode(initialTier, policy);
 
-  const segmentationModelByTier = capabilities.webgl2 ? undefined : {A: TIER_DEFINITIONS.B.modelPath};
+  const segmentationModelByTier = capabilities.webgl2 ? undefined : {superhigh: TIER_DEFINITIONS.superhigh.modelPath};
 
   return {initialTier, segmentationModelByTier};
 }

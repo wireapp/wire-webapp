@@ -37,7 +37,7 @@ import type {MaskPostProcessor} from '../segmentation/maskPostProcessor';
 import {MediaPipeSegmenterFactory} from '../segmentation/mediaPipeSegmenter';
 import type {SegmenterFactory, SegmenterLike} from '../segmentation/segmenterTypes';
 import {buildMaskInput, type MaskInput, type MaskSource} from '../shared/mask';
-import type {QualityTierParams, SegmentationModelByTier} from '../types';
+import type {QualityTier, QualityTierParams, SegmentationModelByTier} from '../types';
 
 /**
  * Main-thread WebGL2 rendering pipeline for background effects.
@@ -117,7 +117,7 @@ export class MainWebGLPipeline implements Pipeline {
       this.qualityController.setTier(this.config.quality);
     }
     const startingTier = init.config.quality === 'auto' ? init.initialTier : init.config.quality;
-    const shouldInitSegmenter = startingTier !== 'D' && init.config.mode !== 'passthrough';
+    const shouldInitSegmenter = startingTier !== 'bypass' && init.config.mode !== 'passthrough';
     if (shouldInitSegmenter) {
       this.segmenter = this.segmenterFactory.create({
         modelPath: init.segmentationModelPath,
@@ -390,13 +390,13 @@ export class MainWebGLPipeline implements Pipeline {
    * is unavailable, or if the desired model is already loaded. Uses GPU delegate
    * for main WebGL pipeline.
    *
-   * @param tier - Quality tier ('A', 'B', 'C', or 'D').
+   * @param tier - Quality tier ).
    */
-  private async ensureSegmenterForTier(tier: 'A' | 'B' | 'C' | 'D'): Promise<void> {
+  private async ensureSegmenterForTier(tier: QualityTier): Promise<void> {
     if (!this.outputCanvas) {
       return;
     }
-    if (tier === 'D') {
+    if (tier === 'bypass') {
       return;
     }
     const desiredPath = resolveSegmentationModelPath(
@@ -436,7 +436,7 @@ export class MainWebGLPipeline implements Pipeline {
    * @param gpuMs - WebGL rendering time in milliseconds.
    * @param tier - Current quality tier.
    */
-  private updateMetrics(totalMs: number, segmentationMs: number, gpuMs: number, tier: 'A' | 'B' | 'C' | 'D'): void {
+  private updateMetrics(totalMs: number, segmentationMs: number, gpuMs: number, tier: QualityTier): void {
     if (!this.onMetrics || !this.getDroppedFrames) {
       return;
     }

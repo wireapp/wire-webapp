@@ -36,7 +36,7 @@ import {NoopMaskPostProcessor} from '../segmentation/maskPostProcessor';
 import type {MaskPostProcessor} from '../segmentation/maskPostProcessor';
 import {MediaPipeSegmenterFactory} from '../segmentation/mediaPipeSegmenter';
 import type {SegmenterFactory, SegmenterLike} from '../segmentation/segmenterTypes';
-import type {QualityTierParams, SegmentationModelByTier} from '../types';
+import type {QualityTier, QualityTierParams, SegmentationModelByTier} from '../types';
 
 /**
  * Canvas2D-based rendering pipeline for background effects.
@@ -147,7 +147,7 @@ export class Canvas2DPipeline implements Pipeline {
       this.qualityController.setTier(this.config.quality);
     }
     const startingTier = init.config.quality === 'auto' ? init.initialTier : init.config.quality;
-    const shouldInitSegmenter = startingTier !== 'D' && init.config.mode !== 'passthrough';
+    const shouldInitSegmenter = startingTier !== 'bypass' && init.config.mode !== 'passthrough';
     if (shouldInitSegmenter) {
       this.segmenter = this.segmenterFactory.create({
         modelPath: init.segmentationModelPath,
@@ -762,13 +762,13 @@ export class Canvas2DPipeline implements Pipeline {
    * Ensures the segmenter is initialized for the specified quality tier.
    *
    * If the tier requires a different model than currently loaded, swaps
-   * the segmenter instance. Skips swap if tier is 'D' (bypass) or if the
+   * the segmenter instance. Skips swap if tier is bypass or if the
    * desired model is already loaded. Uses CPU delegate for Canvas2D pipeline.
    *
-   * @param tier - Quality tier ('A', 'B', 'C', or 'D').
+   * @param tier - Quality tier
    */
-  private async ensureSegmenterForTier(tier: 'A' | 'B' | 'C' | 'D'): Promise<void> {
-    if (tier === 'D') {
+  private async ensureSegmenterForTier(tier: QualityTier): Promise<void> {
+    if (tier === 'bypass') {
       return;
     }
     const desiredPath = resolveSegmentationModelPath(
@@ -809,7 +809,7 @@ export class Canvas2DPipeline implements Pipeline {
    * @param gpuMs - Rendering time in milliseconds (Canvas2D operations).
    * @param tier - Current quality tier.
    */
-  private updateMetrics(totalMs: number, segmentationMs: number, gpuMs: number, tier: 'A' | 'B' | 'C' | 'D'): void {
+  private updateMetrics(totalMs: number, segmentationMs: number, gpuMs: number, tier: QualityTier): void {
     if (!this.onMetrics || !this.getDroppedFrames) {
       return;
     }

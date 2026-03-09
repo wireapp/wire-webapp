@@ -19,7 +19,15 @@
 
 import type {MaskPostProcessorFactory} from '../segmentation/maskPostProcessor';
 import type {SegmenterFactory} from '../segmentation/segmenterTypes';
-import type {DebugMode, EffectMode, Metrics, PipelineType, QualityMode, SegmentationModelByTier} from '../types';
+import type {
+  DebugMode,
+  EffectMode,
+  Metrics,
+  PipelineType,
+  QualityMode,
+  QualityTier,
+  SegmentationModelByTier,
+} from '../types';
 
 /**
  * Runtime configuration for a pipeline instance.
@@ -34,7 +42,7 @@ export interface PipelineConfig {
   debugMode: DebugMode;
   /** Blur strength (0-1) for blur effect mode. */
   blurStrength: number;
-  /** Quality mode ('auto' or fixed tier 'A'/'B'/'C'/'D'). */
+  /** Quality mode  */
   quality: QualityMode;
 }
 
@@ -55,7 +63,7 @@ export interface PipelineInit {
   /** Per-tier segmentation model path overrides. */
   segmentationModelByTier: SegmentationModelByTier;
   /** Initial quality tier when quality mode is 'auto'. */
-  initialTier: 'A' | 'B' | 'C' | 'D';
+  initialTier: QualityTier;
   /** Runtime configuration for the pipeline. */
   config: PipelineConfig;
   /** Optional factory for creating segmenter instances (for testing). */
@@ -65,7 +73,7 @@ export interface PipelineInit {
   /** Optional callback to receive performance metrics updates. */
   onMetrics: ((metrics: Metrics) => void) | null;
   /** Callback invoked when quality tier changes (adaptive quality mode). */
-  onTierChange: (tier: 'A' | 'B' | 'C' | 'D') => void;
+  onTierChange: (tier: QualityTier) => void;
   /** Callback invoked when a frame is dropped, returns dropped frame count. */
   onDroppedFrame: () => number;
   /** Function that returns the current dropped frame count. */

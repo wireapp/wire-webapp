@@ -29,7 +29,7 @@ import {
 import {Segmenter} from '../segmentation/segmenter';
 import {buildMaskInput, type MaskInput, type MaskSource} from '../shared/mask';
 import {toMonotonicTimestampMs} from '../shared/timestamps';
-import type {QualityTierParams} from '../types';
+import type {QualityTier, QualityTierParams} from '../types';
 
 /**
  * Processes a single video frame in the worker thread.
@@ -163,11 +163,11 @@ function resolveQualityTierParams(): QualityTierParams {
  * @param tier - Quality tier ('A', 'B', 'C', or 'D').
  * @returns Nothing.
  */
-function ensureSegmenterForTier(tier: 'A' | 'B' | 'C' | 'D'): void {
+function ensureSegmenterForTier(tier: QualityTier): void {
   if (!state.options || !state.canvas) {
     return;
   }
-  if (tier === 'D') {
+  if (tier === 'bypass') {
     return;
   }
   if (state.segmenterInitPromise) {
@@ -212,7 +212,7 @@ function ensureSegmenterForTier(tier: 'A' | 'B' | 'C' | 'D'): void {
  * @param tier - Current quality tier.
  * @returns Nothing.
  */
-function updateMetrics(totalMs: number, segmentationMs: number, gpuMs: number, tier: 'A' | 'B' | 'C' | 'D'): void {
+function updateMetrics(totalMs: number, segmentationMs: number, gpuMs: number, tier: QualityTier): void {
   if (!state.qualityController) {
     return;
   }

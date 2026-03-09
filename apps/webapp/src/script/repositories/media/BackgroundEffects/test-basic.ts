@@ -219,7 +219,7 @@ if (!isBrowser && isNode) {
     console.log(`  ✓ DebugMode type valid (${validDebugModes.length} modes)`);
 
     // Test QualityMode type
-    const validQualityModes: QualityMode[] = ['auto', 'A', 'B', 'C', 'D'];
+    const validQualityModes: QualityMode[] = ['auto', 'superhigh', 'high', 'medium', 'low', 'bypass'];
     console.log(`  ✓ QualityMode type valid (${validQualityModes.length} modes)`);
 
     console.log('  ✓ All type definitions are valid');

@@ -84,7 +84,7 @@ export const state: State = {
     avgGpuMs: 0,
     segmentationDelegate: null,
     droppedFrames: 0,
-    tier: 'A',
+    tier: 'superhigh',
   },
   metricsWindow: createMetricsWindow(METRICS_MAX_SAMPLES),
   frameCount: 0,

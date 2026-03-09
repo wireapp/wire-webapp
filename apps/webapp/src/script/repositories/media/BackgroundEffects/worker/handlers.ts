@@ -59,7 +59,7 @@ export async function handleInit(
   const renderer = new WebGLRenderer(canvas, width, height);
   state.renderer = renderer;
 
-  state.qualityController = new QualityController(options.targetFps ?? 30);
+  state.qualityController = new QualityController(options.targetFps ?? 15);
   if (state.quality === 'auto') {
     state.qualityController.setTier(options.initialTier);
   } else {
@@ -67,7 +67,7 @@ export async function handleInit(
   }
 
   const initialTier = options.quality === 'auto' ? options.initialTier : options.quality;
-  const shouldInitSegmenter = initialTier !== 'D' && options.mode !== 'passthrough';
+  const shouldInitSegmenter = initialTier !== 'bypass' && options.mode !== 'passthrough';
   if (shouldInitSegmenter) {
     const modelPath = resolveSegmentationModelPath(
       initialTier,

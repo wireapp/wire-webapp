@@ -17,7 +17,8 @@
  *
  */
 
-import {detectCapabilities, choosePipeline, type CapabilityInfo} from './capability';
+import {detectCapabilities, choosePipeline} from './capability';
+import {CapabilityInfo} from 'Repositories/media/BackgroundEffects/types';
 
 describe('capability', () => {
   // Store original globals to restore after tests
@@ -76,7 +77,7 @@ describe('capability', () => {
       delete (global as any).HTMLVideoElement;
     }
     if (originalDocument !== undefined) {
-      global.document = originalDocument;
+      (global as any).document = originalDocument;
     } else {
       delete (global as any).document;
     }

@@ -37,11 +37,11 @@ export {
   resolveSegmentationModelPath,
   resolveTierParams,
   applyModeOverlay,
-  type TierKey,
   type TierDefinition,
   type PerfTierParams,
   type ModeOverlay,
 } from './definitions';
+
 export {
   effectModeToProcessingMode,
   getBypassTier,

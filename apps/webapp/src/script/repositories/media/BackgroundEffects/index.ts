@@ -99,8 +99,10 @@ export type {EffectMode} from './types';
  */
 export type {DebugMode} from './types';
 
+export type {QualityTier} from './types';
+
 /**
- * Quality mode type ('auto' or fixed tier 'A'/'B'/'C'/'D').
+ * Quality mode type ('auto' or fixed QualityTier).
  */
 export type {QualityMode} from './types';
 

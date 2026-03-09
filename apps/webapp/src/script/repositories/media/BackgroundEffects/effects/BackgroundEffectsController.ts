@@ -49,6 +49,7 @@ import type {
   Metrics,
   PipelineType,
   QualityMode,
+  QualityTier,
   SegmentationModelByTier,
   StartOptions,
 } from '../types';
@@ -90,16 +91,17 @@ export class BackgroundEffectsController {
   private debugMode: DebugMode = 'off';
   /** Blur strength (0-1) for blur effect mode. */
   private blurStrength = 0.5;
-  /** Quality mode ('auto' for adaptive, or fixed tier 'A'/'B'/'C'/'D'). */
+  /** Quality mode ('auto' for adaptive, or fixed tier. */
   private quality: QualityMode = 'auto';
   /** Target frames per second for adaptive quality control. */
-  private targetFps = 30;
+  private targetFps = 15;
   /** Per-tier segmentation model overrides. */
   private segmentationModelByTier: SegmentationModelByTier = {
-    A: TIER_DEFINITIONS.A.modelPath,
-    B: TIER_DEFINITIONS.B.modelPath,
-    C: TIER_DEFINITIONS.C.modelPath,
-    D: TIER_DEFINITIONS.D.modelPath,
+    superhigh: TIER_DEFINITIONS.superhigh.modelPath,
+    high: TIER_DEFINITIONS.high.modelPath,
+    medium: TIER_DEFINITIONS.medium.modelPath,
+    low: TIER_DEFINITIONS.low.modelPath,
+    bypass: TIER_DEFINITIONS.bypass.modelPath,
   };
   /** Selected rendering pipeline. */
   private pipeline: PipelineType = 'passthrough';
@@ -116,9 +118,9 @@ export class BackgroundEffectsController {
   /** Pipeline to attempt to restore after context loss. */
   private webglRestorePipeline: PipelineType | null = null;
   /** Last quality tier for main pipeline (for logging tier changes). */
-  private lastMainTier: 'A' | 'B' | 'C' | 'D' | null = null;
+  private lastMainTier: QualityTier | null = null;
   /** Last quality tier for worker pipeline (for logging tier changes). */
-  private lastWorkerTier: 'A' | 'B' | 'C' | 'D' | null = null;
+  private lastWorkerTier: QualityTier | null = null;
   /** Optional metrics callback for demo/telemetry use. */
   private onMetrics: ((metrics: Metrics) => void) | null = null;
   /** Tracks shutdown to avoid logging expected stop errors. */
@@ -170,26 +172,29 @@ export class BackgroundEffectsController {
 
     if (opts.segmentationModelPath) {
       this.segmentationModelByTier = {
-        A: opts.segmentationModelPath,
-        B: opts.segmentationModelPath,
-        C: opts.segmentationModelPath,
-        D: opts.segmentationModelPath,
+        superhigh: opts.segmentationModelPath,
+        high: opts.segmentationModelPath,
+        medium: opts.segmentationModelPath,
+        low: opts.segmentationModelPath,
+        bypass: opts.segmentationModelPath,
       };
     } else if (opts.segmentationModelByTier || policy.segmentationModelByTier) {
       this.segmentationModelByTier = {
-        A: TIER_DEFINITIONS.A.modelPath,
-        B: TIER_DEFINITIONS.B.modelPath,
-        C: TIER_DEFINITIONS.C.modelPath,
-        D: TIER_DEFINITIONS.D.modelPath,
+        superhigh: TIER_DEFINITIONS.superhigh.modelPath,
+        high: TIER_DEFINITIONS.high.modelPath,
+        medium: TIER_DEFINITIONS.medium.modelPath,
+        low: TIER_DEFINITIONS.low.modelPath,
+        bypass: TIER_DEFINITIONS.bypass.modelPath,
         ...policy.segmentationModelByTier,
         ...opts.segmentationModelByTier,
       };
     } else {
       this.segmentationModelByTier = {
-        A: TIER_DEFINITIONS.A.modelPath,
-        B: TIER_DEFINITIONS.B.modelPath,
-        C: TIER_DEFINITIONS.C.modelPath,
-        D: TIER_DEFINITIONS.D.modelPath,
+        superhigh: TIER_DEFINITIONS.superhigh.modelPath,
+        high: TIER_DEFINITIONS.high.modelPath,
+        medium: TIER_DEFINITIONS.medium.modelPath,
+        low: TIER_DEFINITIONS.low.modelPath,
+        bypass: TIER_DEFINITIONS.bypass.modelPath,
       };
     }
     this.onMetrics = opts.onMetrics ?? null;
@@ -198,14 +203,13 @@ export class BackgroundEffectsController {
 
     const chosenPipeline = choosePipeline(cap, opts.useWorker !== false);
     this.pipeline = opts.pipelineOverride ?? chosenPipeline;
-    if (this.isDev) {
-      this.logger.info('Background effects capabilities', cap);
-      this.logger.info('Background effects pipeline', {
-        chosen: chosenPipeline,
-        override: opts.pipelineOverride ?? null,
-        active: this.pipeline,
-      });
-    }
+
+    this.logger.info('Background effects capabilities', cap);
+    this.logger.info('Background effects pipeline', {
+      chosen: chosenPipeline,
+      override: opts.pipelineOverride ?? null,
+      active: this.pipeline,
+    });
 
     // Initialize frame source for frame extraction
     this.frameSource = new FrameSource(inputTrack);
@@ -645,7 +649,7 @@ export class BackgroundEffectsController {
     return this.droppedFrames;
   }
 
-  private handleTierChange(tier: 'A' | 'B' | 'C' | 'D'): void {
+  private handleTierChange(tier: QualityTier): void {
     if (this.pipeline === 'worker-webgl2') {
       this.maybeLogWorkerTierChange(tier);
       return;
@@ -658,7 +662,7 @@ export class BackgroundEffectsController {
    *
    * @param tier - New quality tier.
    */
-  private maybeLogMainTierChange(tier: 'A' | 'B' | 'C' | 'D'): void {
+  private maybeLogMainTierChange(tier: QualityTier): void {
     if (!this.isDev) {
       return;
     }
@@ -673,7 +677,7 @@ export class BackgroundEffectsController {
    *
    * @param tier - New quality tier.
    */
-  private maybeLogWorkerTierChange(tier: 'A' | 'B' | 'C' | 'D'): void {
+  private maybeLogWorkerTierChange(tier: QualityTier): void {
     if (!this.isDev) {
       return;
     }

@@ -31,9 +31,8 @@ import {
   type BackgroundEffectSelection,
   type BackgroundSource,
 } from 'Repositories/media/VideoBackgroundEffects';
+import {getLogger, Logger} from 'Util/Logger';
 import {matchQualifiedIds} from 'Util/QualifiedId';
-
-import {Config} from '../../Config';
 
 export type UserId = string;
 export type ClientId = string;
@@ -54,6 +53,7 @@ export class Participant {
   public readonly isSendingVideo: ko.PureComputed<boolean>;
   public readonly isAudioEstablished = observable(false);
   private backgroundEffectsController: BackgroundEffectsController | null = null;
+  private readonly logger: Logger;
 
   // Audio
   public readonly audioStream = observable<MediaStream | undefined>();
@@ -64,6 +64,7 @@ export class Participant {
     public readonly user: User,
     public readonly clientId: ClientId,
   ) {
+    this.logger = getLogger('Participant');
     this.hasActiveVideo = pureComputed(() => {
       return (this.sharesCamera() || this.sharesScreen()) && !!this.videoStream();
     });
@@ -142,16 +143,13 @@ export class Participant {
     const shouldCreateController = !this.backgroundEffectsController || !this.processedVideoStream();
     if (shouldCreateController) {
       const controller = new BackgroundEffectsController();
-      const multiclassModelPath = Config.getConfig().FEATURE.MULTICLASS_MODEL_PATH;
-      const segmentationModelByTier = multiclassModelPath ? {A: multiclassModelPath} : undefined;
       try {
         const {outputTrack, stop} = await controller.start(videoTrack, {
           mode: isVirtual ? 'virtual' : 'blur',
           blurStrength,
           quality: 'auto',
-          targetFps: 30,
+          targetFps: 15,
           debugMode: 'off',
-          segmentationModelByTier,
           ...(isVirtual && backgroundSource ? {backgroundImage: backgroundSource} : {}),
         });
         const processedStream = new MediaStream([outputTrack]);
@@ -164,8 +162,9 @@ export class Participant {
             this.backgroundEffectsController = null;
           },
         });
-      } catch (_error) {
+      } catch (error) {
         controller.stop();
+        this.logger.warn('BackgroundEffectsController failed with error:', error);
         this.releaseProcessedVideoStream();
         return undefined;
       }

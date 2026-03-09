@@ -62,7 +62,7 @@ describe('Segmenter', () => {
           public width: number,
           public height: number,
         ) {}
-        getContext() {
+        getContext(): any {
           return null;
         }
       };
@@ -418,7 +418,7 @@ describe('Segmenter', () => {
             public width: number,
             public height: number,
           ) {}
-          getContext() {
+          getContext(): any {
             return null;
           }
         };

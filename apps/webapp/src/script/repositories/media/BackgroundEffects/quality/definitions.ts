@@ -17,9 +17,7 @@
  *
  */
 
-import type {Mode, QualityTierParams, SegmentationModelByTier} from '../types';
-
-export type TierKey = 'A' | 'B' | 'C' | 'D';
+import {Mode, QualityTier, QualityTierParams, SegmentationModelByTier} from '../types';
 
 /**
  * Performance tier parameters that control rendering quality and resource usage.
@@ -27,7 +25,7 @@ export type TierKey = 'A' | 'B' | 'C' | 'D';
  */
 export interface PerfTierParams {
   /** Quality tier identifier. */
-  tier: TierKey;
+  tier: QualityTier;
   /** Width of the segmentation mask in pixels. Lower values reduce CPU/ML cost. */
   segmentationWidth: number;
   /** Height of the segmentation mask in pixels. Lower values reduce CPU/ML cost. */
@@ -78,11 +76,25 @@ export interface ModeOverlay {
 }
 
 /**
- * Quality tier definitions ordered from highest (A) to lowest (D) quality.
+ * Quality tier definitions.
  */
-export const TIER_DEFINITIONS: Record<TierKey, TierDefinition> = {
-  A: {
-    tier: 'A',
+export const TIER_DEFINITIONS: Record<QualityTier, TierDefinition> = {
+  superhigh: {
+    tier: 'superhigh',
+    segmentationWidth: 256,
+    segmentationHeight: 256,
+    segmentationCadence: 1,
+    maskRefineScale: 0.5,
+    blurDownsampleScale: 0.5,
+    blurRadius: 4,
+    bilateralRadius: 5,
+    bilateralSpatialSigma: 3.5,
+    bilateralRangeSigma: 0.1,
+    bypass: false,
+    modelPath: '/assets/mediapipe-models/selfie_multiclass_256x256.tflite',
+  },
+  high: {
+    tier: 'high',
     segmentationWidth: 256,
     segmentationHeight: 256,
     segmentationCadence: 1,
@@ -95,8 +107,8 @@ export const TIER_DEFINITIONS: Record<TierKey, TierDefinition> = {
     bypass: false,
     modelPath: '/assets/mediapipe-models/selfie_segmenter_landscape.tflite',
   },
-  B: {
-    tier: 'B',
+  medium: {
+    tier: 'medium',
     segmentationWidth: 256,
     segmentationHeight: 144,
     segmentationCadence: 2,
@@ -109,8 +121,8 @@ export const TIER_DEFINITIONS: Record<TierKey, TierDefinition> = {
     bypass: false,
     modelPath: '/assets/mediapipe-models/selfie_segmenter_landscape.tflite',
   },
-  C: {
-    tier: 'C',
+  low: {
+    tier: 'low',
     segmentationWidth: 160,
     segmentationHeight: 96,
     segmentationCadence: 3,
@@ -123,8 +135,8 @@ export const TIER_DEFINITIONS: Record<TierKey, TierDefinition> = {
     bypass: false,
     modelPath: '/assets/mediapipe-models/selfie_segmenter_landscape.tflite',
   },
-  D: {
-    tier: 'D',
+  bypass: {
+    tier: 'bypass',
     segmentationWidth: 0,
     segmentationHeight: 0,
     segmentationCadence: 0,
@@ -172,12 +184,12 @@ export const MODE_DEFAULTS: Record<Mode, ModeOverlay> = {
  * @param tier - The quality tier ('A', 'B', 'C', or 'D').
  * @returns Mode overlay parameters with tier-specific adjustments applied.
  */
-export function getModeOverlay(mode: Mode, tier: TierKey): ModeOverlay {
+export function getModeOverlay(mode: Mode, tier: QualityTier): ModeOverlay {
   const base = MODE_DEFAULTS[mode];
-  if (tier === 'D') {
+  if (tier === 'bypass') {
     return {...base, temporalAlpha: 0};
   }
-  if (mode === 'virtual' && tier === 'C') {
+  if (mode === 'virtual' && tier === 'low') {
     return {...base, matteLow: base.matteLow - 0.02, matteHigh: base.matteHigh + 0.02};
   }
   return base;
@@ -214,11 +226,11 @@ export function applyModeOverlay(tier: PerfTierParams, mode: Mode): QualityTierP
  * the final quality parameters. This is a convenience function that combines
  * tier lookup and mode overlay application.
  *
- * @param tier - The quality tier ('A', 'B', 'C', or 'D').
+ * @param tier - The quality tier.
  * @param mode - The effect mode ('blur' or 'virtual').
  * @returns Complete quality tier parameters for the specified tier and mode.
  */
-export function resolveTierParams(tier: TierKey, mode: Mode): QualityTierParams {
+export function resolveTierParams(tier: QualityTier, mode: Mode): QualityTierParams {
   return applyModeOverlay(TIER_DEFINITIONS[tier], mode);
 }
 
@@ -230,13 +242,13 @@ export function resolveTierParams(tier: TierKey, mode: Mode): QualityTierParams 
  * 2. Global `fallback` path
  * 3. Default model path from tier definition
  *
- * @param tier - The quality tier ('A', 'B', 'C', or 'D').
+ * @param tier - The quality tier.
  * @param overrides - Optional map of tier-specific model path overrides.
  * @param fallback - Optional fallback model path if no tier override exists.
  * @returns The resolved segmentation model path for the tier.
  */
 export function resolveSegmentationModelPath(
-  tier: TierKey,
+  tier: QualityTier,
   overrides: SegmentationModelByTier | undefined,
   fallback: string | undefined,
 ): string {

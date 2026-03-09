@@ -72,12 +72,12 @@ describe('QualityController', () => {
 
   it('resets hysteresis when mode changes', () => {
     const controller = new QualityController(TARGET_FPS);
-    controller.setTier('C');
+    controller.setTier('low');
     for (let i = 0; i < HYSTERESIS_FRAMES - 1; i += 1) {
       controller.update(fastSample, MODE_BLUR);
     }
     const params = controller.update(fastSample, MODE_VIRTUAL);
-    expect(params.tier).toBe('C');
+    expect(params.tier).toBe('low');
   });
 
   it('does not oscillate within a single hysteresis window', () => {
@@ -86,20 +86,20 @@ describe('QualityController', () => {
     for (let i = 0; i < HYSTERESIS_FRAMES - 5; i += 1) {
       params = controller.update(i % 2 === 0 ? slowSample : fastSample, MODE_BLUR);
     }
-    expect(params?.tier).toBe('A');
+    expect(params?.tier).toBe('high');
   });
 
-  it('starts at tier A', () => {
+  it('starts at tier high', () => {
     const controller = new QualityController(TARGET_FPS);
     const params = controller.getTier(MODE_BLUR);
-    expect(params.tier).toBe('A');
+    expect(params.tier).toBe('high');
   });
 
   it('upgrades tier when performance improves', () => {
     const controller = new QualityController(TARGET_FPS);
     // Start at tier C
-    controller.setTier('C');
-    expect(controller.getTier(MODE_BLUR).tier).toBe('C');
+    controller.setTier('low');
+    expect(controller.getTier(MODE_BLUR).tier).toBe('low');
 
     // Provide fast samples to trigger upgrade
     let params;
@@ -107,20 +107,20 @@ describe('QualityController', () => {
       params = controller.update(veryFastSample, MODE_BLUR);
     }
     // Should upgrade from C to B
-    expect(params?.tier).toBe('B');
+    expect(params?.tier).toBe('medium');
 
     // Continue with fast samples to upgrade further
     for (let i = 0; i < HYSTERESIS_FRAMES + 1; i += 1) {
       params = controller.update(veryFastSample, MODE_BLUR);
     }
     // Should upgrade from B to A
-    expect(params?.tier).toBe('A');
+    expect(params?.tier).toBe('high');
   });
 
   it('prevents immediate upgrade after downgrade due to cooldown', () => {
     const controller = new QualityController(TARGET_FPS);
     // Start at tier A
-    expect(controller.getTier(MODE_BLUR).tier).toBe('A');
+    expect(controller.getTier(MODE_BLUR).tier).toBe('high');
 
     // Trigger downgrade with CPU-bound samples (A -> B)
     let params;
@@ -128,7 +128,7 @@ describe('QualityController', () => {
       params = controller.update(cpuBoundSample, MODE_BLUR);
     }
     // Should downgrade to B, and cooldown is set to configured frames
-    expect(params?.tier).toBe('B');
+    expect(params?.tier).toBe('medium');
 
     // Provide fast samples immediately after downgrade
     // Cooldown decrements each frame, so after 60 frames it will be 0
@@ -137,7 +137,7 @@ describe('QualityController', () => {
       params = controller.update(veryFastSample, MODE_BLUR);
     }
     // Should still be at B due to cooldown (cooldown > 0)
-    expect(params?.tier).toBe('B');
+    expect(params?.tier).toBe('medium');
 
     // Continue providing fast samples - cooldown decrements each frame
     // After configured frames from downgrade, cooldown expires
@@ -150,21 +150,21 @@ describe('QualityController', () => {
       params = controller.update(veryFastSample, MODE_BLUR);
     }
     // Should remain at B due to performance cap after downgrade from A
-    expect(params?.tier).toBe('B');
+    expect(params?.tier).toBe('medium');
   });
 
-  it('applies bypass mode and zero temporal alpha for tier D', () => {
+  it('applies bypass mode and zero temporal alpha for tier bypass', () => {
     const controller = new QualityController(TARGET_FPS);
-    controller.setTier('D');
+    controller.setTier('bypass');
     const params = controller.getTier(MODE_BLUR);
-    expect(params.tier).toBe('D');
+    expect(params.tier).toBe('bypass');
     expect(params.bypass).toBe(true);
     expect(params.temporalAlpha).toBe(0);
   });
 
-  it('applies tier C virtual mode adjustments', () => {
+  it('applies tier low virtual mode adjustments', () => {
     const controller = new QualityController(TARGET_FPS);
-    controller.setTier('C');
+    controller.setTier('low');
     const virtualParams = controller.getTier(MODE_VIRTUAL);
     const blurParams = controller.getTier(MODE_BLUR);
 
@@ -202,12 +202,12 @@ describe('QualityController', () => {
   it('manually sets tier and resets counters', () => {
     const controller = new QualityController(TARGET_FPS);
     // Manually set to tier C
-    controller.setTier('C');
-    expect(controller.getTier(MODE_BLUR).tier).toBe('C');
+    controller.setTier('low');
+    expect(controller.getTier(MODE_BLUR).tier).toBe('low');
 
     // Should allow immediate tier change after setTier
-    controller.setTier('A');
-    expect(controller.getTier(MODE_BLUR).tier).toBe('A');
+    controller.setTier('high');
+    expect(controller.getTier(MODE_BLUR).tier).toBe('high');
   });
 
   it('handles multiple tier transitions', () => {
@@ -218,25 +218,25 @@ describe('QualityController', () => {
     for (let i = 0; i < DOWNGRADE_TRIGGER_SAMPLES; i += 1) {
       params = controller.update(cpuBoundSample, MODE_BLUR);
     }
-    expect(params?.tier).toBe('B');
+    expect(params?.tier).toBe('medium');
 
     // B -> C (further downgrade)
     for (let i = 0; i < DOWNGRADE_TRIGGER_SAMPLES; i += 1) {
       params = controller.update(slowSample, MODE_BLUR);
     }
-    expect(params?.tier).toBe('C');
+    expect(params?.tier).toBe('low');
 
     // C -> D (final downgrade)
     for (let i = 0; i < DOWNGRADE_TRIGGER_SAMPLES; i += 1) {
       params = controller.update(slowSample, MODE_BLUR);
     }
-    expect(params?.tier).toBe('D');
+    expect(params?.tier).toBe('bypass');
 
     // D -> C (upgrade path)
     for (let i = 0; i < HYSTERESIS_FRAMES + 1; i += 1) {
       params = controller.update(veryFastSample, MODE_BLUR);
     }
-    expect(params?.tier).toBe('C');
+    expect(params?.tier).toBe('low');
   });
 
   it('maintains sample window size limit', () => {
@@ -263,19 +263,19 @@ describe('QualityController', () => {
     const clearlyBelowUpgrade = upgradeThreshold - 5;
 
     const atUpgradeThreshold = {totalMs: justAboveUpgrade, segmentationMs: 10, gpuMs: 8};
-    controller.setTier('B');
+    controller.setTier('medium');
     let params;
     for (let i = 0; i < HYSTERESIS_FRAMES + 1; i += 1) {
       params = controller.update(atUpgradeThreshold, MODE_BLUR);
     }
     // Just above threshold, should not upgrade.
-    expect(params?.tier).toBe('B');
+    expect(params?.tier).toBe('medium');
 
     const belowUpgradeThreshold = {totalMs: clearlyBelowUpgrade, segmentationMs: 9, gpuMs: 8};
     for (let i = 0; i < HYSTERESIS_FRAMES + 1; i += 1) {
       params = controller.update(belowUpgradeThreshold, MODE_BLUR);
     }
     // Well below threshold, should upgrade.
-    expect(params?.tier).toBe('A');
+    expect(params?.tier).toBe('high');
   });
 });
