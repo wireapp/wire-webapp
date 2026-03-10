@@ -11688,6 +11688,7 @@ __metadata:
     nocache: "npm:4.0.0"
     opn: "npm:6.0.0"
     true-myth: "npm:9.3.1"
+    tslib: "npm:2.8.1"
     zod: "npm:3.25.76"
   languageName: unknown
   linkType: soft
