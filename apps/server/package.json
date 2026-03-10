@@ -9,7 +9,7 @@
     "copy-assets": "node ./bin/copy_server_assets.js",
     "generate-version-file": "node ./bin/generateVersionFile.js",
     "clean": "rimraf ./dist/",
-    "start:prod": "pm2 start \"./index.js\" --name \"Webapp\" && pm2 logs",
+    "start:prod": "node ./index.js",
     "test": "jest"
   },
   "dependencies": {
@@ -30,7 +30,6 @@
     "maxmind": "4.3.29",
     "nocache": "4.0.0",
     "opn": "6.0.0",
-    "pm2": "6.0.14",
     "true-myth": "9.3.1",
     "zod": "3.25.76"
   },
