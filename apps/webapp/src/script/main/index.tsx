@@ -62,8 +62,8 @@ document.addEventListener('DOMContentLoaded', async () => {
   const enforceDesktopApplication = config.FEATURE.ENABLE_ENFORCE_DESKTOP_APPLICATION_ONLY && !Runtime.isDesktopApp();
 
   if (enforceDesktopApplication) {
-    const unSupportedPageUrl = `${window.location.origin}/unsupported`;
-    window.location.replace(unSupportedPageUrl);
+    const unSupportedPageUrl = `${globalThis.location.origin}/unsupported`;
+    globalThis.location.replace(unSupportedPageUrl);
     return;
   }
 
@@ -93,12 +93,12 @@ document.addEventListener('DOMContentLoaded', async () => {
           const {onConnectivityBecameAvailable, onConnectivityBecameUnavailable} =
             subscribeToConnectivityStatusChangesArguments;
 
-          window.addEventListener('online', onConnectivityBecameAvailable);
-          window.addEventListener('offline', onConnectivityBecameUnavailable);
+          globalThis.addEventListener('online', onConnectivityBecameAvailable);
+          globalThis.addEventListener('offline', onConnectivityBecameUnavailable);
 
           return function unsubscribeFromConnectivityStatusChanges(): void {
-            window.removeEventListener('online', onConnectivityBecameAvailable);
-            window.removeEventListener('offline', onConnectivityBecameUnavailable);
+            globalThis.removeEventListener('online', onConnectivityBecameAvailable);
+            globalThis.removeEventListener('offline', onConnectivityBecameUnavailable);
           };
         },
       });
