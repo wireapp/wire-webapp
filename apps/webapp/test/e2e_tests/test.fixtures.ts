@@ -167,7 +167,7 @@ export const test = baseTest.extend<Fixtures>({
         );
       }
 
-      if (options?.features) {
+      if (options?.features && Object.values(options.features).every(Boolean)) {
         // The team will be reset right after initialization, so we need to wait a short time for it to finish
         // before changing feature configs since they would otherwise be overwritten (See WPB-23698)
         await new Promise(resolve => setTimeout(resolve, 5000));
