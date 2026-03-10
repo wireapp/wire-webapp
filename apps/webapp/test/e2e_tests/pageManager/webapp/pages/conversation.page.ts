@@ -487,11 +487,6 @@ export class ConversationPage {
     await this.pingButton.click();
   }
 
-  async getCurrentFocusedToolTip(message: Locator) {
-    await message.getByTestId('emoji-pill').first().hover();
-    return this.page.locator('[data-testid="tooltip-content"]');
-  }
-
   /**
    * Returns the locator for the ping element within the message list.
    */

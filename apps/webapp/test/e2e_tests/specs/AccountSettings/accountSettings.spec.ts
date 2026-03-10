@@ -17,28 +17,28 @@
  *
  */
 
-import {getUser} from 'test/e2e_tests/data/user';
+import {getUser, User} from 'test/e2e_tests/data/user';
 import {PageManager} from 'test/e2e_tests/pageManager';
-import {bootstrapTeamForTesting, completeLogin} from 'test/e2e_tests/utils/setup.util';
-import {tearDownAll} from 'test/e2e_tests/utils/tearDown.util';
-import {createChannel, createGroup, loginUser, logOutUser} from 'test/e2e_tests/utils/userActions';
+import {loginUser, logOutUser} from 'test/e2e_tests/utils/userActions';
 
-import {test, expect, LOGIN_TIMEOUT, withLogin} from '../../test.fixtures';
+import {test, expect, LOGIN_TIMEOUT, withLogin, withConnectedUser} from '../../test.fixtures';
 
 test.describe('account settings', () => {
-  let owner = getUser();
-  const members = Array.from({length: 2}, () => getUser());
-  const [memberA, memberB] = members;
+  let owner: User;
+  let memberA: User;
+  let memberB: User;
 
-  test.beforeAll(async ({api}) => {
-    const user = await bootstrapTeamForTesting(api, members, owner, 'test');
-    owner = {...owner, ...user};
+  test.beforeEach(async ({createUser, createTeam}, testInfo) => {
+    [memberA, memberB] = await Promise.all([createUser(), createUser()]);
+    ({owner} = await createTeam('Test Team', {
+      users: [memberA, memberB],
+      features: {channels: testInfo.tags.includes('@TC-1948')},
+    }));
   });
 
-  test('Edit Profile', {tag: ['@TC-8770', '@regression']}, async ({pageManager}) => {
-    const {components, pages} = pageManager.webapp;
+  test('Edit Profile', {tag: ['@TC-8770', '@regression']}, async ({createPage}) => {
+    const {pages, components} = PageManager.from(await createPage(withLogin(memberA))).webapp;
 
-    await completeLogin(pageManager, memberA);
     await components.conversationSidebar().clickPreferencesButton();
 
     await expect(pages.account().emailDisplay).toHaveText(memberA.email);
@@ -50,10 +50,8 @@ test.describe('account settings', () => {
   test(
     'I should not be able to change my email to already taken email',
     {tag: ['@TC-58', '@regression']},
-    async ({pageManager}) => {
-      const {components, modals, pages} = pageManager.webapp;
-
-      await completeLogin(pageManager, memberA);
+    async ({createPage}) => {
+      const {components, modals, pages} = PageManager.from(await createPage(withLogin(memberA))).webapp;
       await components.conversationSidebar().clickPreferencesButton();
 
       await expect(pages.account().emailDisplay).toHaveText(memberA.email);
@@ -67,17 +65,14 @@ test.describe('account settings', () => {
   test(
     'I should not be able to change my email to an invalid email address',
     {tag: ['@TC-59', '@regression']},
-    async ({pageManager}) => {
+    async ({createPage}) => {
       const incorrectEmail = 'nopewearezeta.com';
-      const {components, modals, pages} = pageManager.webapp;
+      const {components, modals, pages} = PageManager.from(await createPage(withLogin(memberA))).webapp;
 
-      await completeLogin(pageManager, memberA);
       await components.conversationSidebar().clickPreferencesButton();
-
       await expect(pages.account().emailDisplay).toHaveText(memberA.email);
 
       await pages.account().changeEmailAddress(incorrectEmail);
-
       await expect(modals.acknowledge().modal).toBeVisible();
       await expect(modals.acknowledge().modalTitle).toContainText('Error');
       await expect(modals.acknowledge().modalText).toContainText('Email address is invalid');
@@ -126,45 +121,47 @@ test.describe('account settings', () => {
     },
   );
 
-  test(
-    'Verify sound settings are saved after re-login',
-    {tag: ['@TC-1718', '@TC-1720', '@regression']},
-    async ({createUser, createPage}) => {
-      const user = await createUser();
-      const pageManager = PageManager.from(await createPage(withLogin(user)));
-      const {pages, components} = pageManager.webapp;
+  test('Verify sound settings are saved after re-login', {tag: ['@TC-1718', '@regression']}, async ({createPage}) => {
+    const pageManager = PageManager.from(await createPage(withLogin(memberA)));
+    const {pages, components} = pageManager.webapp;
 
-      await components.conversationSidebar().clickPreferencesButton();
-      await pages.settings().clickOptionsButton();
+    await components.conversationSidebar().preferencesButton.click();
+    await pages.settings().optionsButton.click();
 
-      await pages.options().setSoundAlerts('None');
-      await logOutUser(pageManager);
+    await pages.options().setSoundAlerts('None');
+    await logOutUser(pageManager);
 
-      await loginUser(user, pageManager);
-      await components.conversationSidebar().isPageLoaded();
-      await components.conversationSidebar().clickPreferencesButton();
-      await pages.settings().clickOptionsButton();
+    await loginUser(memberA, pageManager);
+    await components.conversationSidebar().preferencesButton.click({timeout: LOGIN_TIMEOUT});
+    await pages.settings().optionsButton.click();
 
-      await expect(pages.options().soundAlertsRadioGroup.getByRole('radio', {name: 'None'})).toBeChecked();
+    await expect(pages.options().soundAlertsRadioGroup.getByRole('radio', {name: 'None'})).toBeChecked();
 
-      await pages.options().setSoundAlerts('All');
-      await logOutUser(pageManager);
-      await loginUser(user, pageManager);
-      await components.conversationSidebar().isPageLoaded();
+    await pages.options().setSoundAlerts('All');
+    await logOutUser(pageManager);
+    await loginUser(memberA, pageManager);
 
-      await components.conversationSidebar().clickPreferencesButton();
-      await pages.settings().clickOptionsButton();
-      await expect(pages.options().soundAlertsRadioGroup.getByRole('radio', {name: 'All'})).toBeChecked();
-    },
-  );
+    await components.conversationSidebar().preferencesButton.click({timeout: LOGIN_TIMEOUT});
+    await pages.settings().optionsButton.click();
+    await expect(pages.options().soundAlertsRadioGroup.getByRole('radio', {name: 'All'})).toBeChecked();
+  });
+
+  test('Verify I can set sound alert settings', {tag: ['@TC-1720', '@regression']}, async ({createPage}) => {
+    const pageManager = PageManager.from(await createPage(withLogin(memberA)));
+    const {pages, components} = pageManager.webapp;
+
+    await components.conversationSidebar().preferencesButton.click();
+    await pages.settings().optionsButton.click();
+    await pages.options().setSoundAlerts('None');
+
+    await expect(pages.options().soundAlertsRadioGroup.getByRole('radio', {name: 'None'})).toBeChecked();
+  });
 
   test(
     'Verify links to manage and create teams are shown when logged in as team owner',
     {tag: ['@TC-1723', '@regression']},
-    async ({pageManager}) => {
-      const {components} = pageManager.webapp;
-
-      await completeLogin(pageManager, owner);
+    async ({createPage}) => {
+      const {components} = PageManager.from(await createPage(withLogin(owner))).webapp;
 
       await expect(components.conversationSidebar().manageTeamButton).toBeVisible();
       expect(await components.conversationSidebar().manageTeamButton.getAttribute('href')).toMatch(
@@ -176,102 +173,78 @@ test.describe('account settings', () => {
   test(
     'Verify link to manage a team is not shown when logged in as team member or normal use',
     {tag: ['@TC-1724', '@regression']},
-    async ({pageManager}) => {
-      const {components} = pageManager.webapp;
-
-      await completeLogin(pageManager, memberA);
-      await expect(components.conversationSidebar().manageTeamButton).toHaveCount(0);
+    async ({createPage}) => {
+      const {components} = PageManager.from(await createPage(withLogin(memberA))).webapp;
+      await expect(components.conversationSidebar().manageTeamButton).not.toBeAttached();
     },
   );
 
-  test(
-    'Verify I can retrieve calling logs',
-    {tag: ['@TC-1725', '@regression']},
-    async ({page, pageManager: memberPageManagerA, browser}) => {
-      const consoleMessages: string[] = [];
+  test('Verify I can retrieve calling logs', {tag: ['@TC-1725', '@regression']}, async ({createPage}) => {
+    const [memberAPages, memberBPages] = await Promise.all([
+      PageManager.from(createPage(withLogin(memberA), withConnectedUser(memberB))).then(pm => pm.webapp.pages),
+      PageManager.from(createPage(withLogin(memberB))).then(pm => pm.webapp.pages),
+    ]);
 
-      const memberContext = await browser.newContext();
-      const memberPage = await memberContext.newPage();
-      const memberPageManagerB = new PageManager(memberPage);
-      const {pages, components, modals} = memberPageManagerA.webapp;
+    await memberAPages.conversationList().openConversation(memberB.fullName, {protocol: 'mls'});
 
-      page.on('console', msg => {
-        consoleMessages.push(msg.text());
-      });
+    await memberAPages.conversation().startCall();
+    await memberBPages.calling().clickAcceptCallButton();
 
-      await Promise.all([completeLogin(memberPageManagerA, memberA), completeLogin(memberPageManagerB, memberB)]);
+    const expectedLog = '@wireapp/webapp/avs'; // get one phone call
+    await expect
+      .poll(async () => (await memberAPages.account().page.consoleMessages()).map(m => m.text()))
+      .toEqual(expect.arrayContaining([expect.stringContaining(expectedLog)]));
+  });
 
-      await components.conversationSidebar().clickConnectButton();
-      await components.contactList().clickOnContact(memberB.fullName);
-      await modals.userProfile().clickStartConversation();
-      await pages.conversation().startCall();
-      await components.calling().waitForCell();
-      await memberPageManagerB.webapp.components.calling().clickAcceptCallButton();
-      // wait a bit to get logs
-      await memberPageManagerA.waitForTimeout(1000);
-
-      const expectedLog = '@wireapp/webapp/avs'; // get one phone call
-      const foundLog = consoleMessages.some(msg => msg.includes(expectedLog));
-
-      expect(foundLog).toBeTruthy();
-      await memberContext.close();
-    },
-  );
-
-  /*
-    1. Conversation sidebar.
-    2. Conversation itself on top of the user's message
-    3. The list of "likes" under the liked message.
-    4. Settings - Account
-    5. Group conversation details
-    6. Channel details
-  */
   test(
     'I want to see the Full Name wherever my name gets displayed',
     {tag: ['@TC-1948', '@regression']},
-    async ({page, pageManager, api}) => {
-      const groupName = 'test group';
-      const {components, pages} = pageManager.webapp;
+    async ({createPage}) => {
+      const page = await createPage(withLogin(memberA));
+      const {pages, modals, components} = PageManager.from(page).webapp;
 
-      await completeLogin(pageManager, memberA);
+      await pages.conversationList().clickCreateGroup();
+      await modals.createConversation().createGroup('Test Group', {members: [memberB]});
 
-      await expect(components.conversationSidebar().personalStatusLabel).toHaveText(memberA.fullName);
+      await test.step('Conversation sidebar', async () => {
+        await expect(components.conversationSidebar().personalStatusLabel).toHaveText(memberA.fullName);
+      });
 
-      await createGroup(pages, groupName, [memberB]);
-      // check that the chat is open
-      await expect(pages.conversationList().getConversationLocator(groupName)).toBeVisible();
-      await pages.conversation().sendMessage('test');
-      const message = pages.conversation().getMessage({content: 'test', sender: memberA});
+      await test.step('Conversation itself on top of users message', async () => {
+        await pages.conversationList().openConversation('Test Group');
+        await pages.conversation().sendMessage('test');
+        await expect(pages.conversation().getMessage({content: 'test'})).toContainText(memberA.fullName);
+      });
 
-      await expect(message.getByTestId('sender-name')).toHaveText(memberA.fullName);
+      await test.step('The list of likes under the liked message', async () => {
+        const message = pages.conversation().getMessage({content: 'test'});
+        await pages.conversation().reactOnMessage(message, 'plus-one');
 
-      await pages.conversation().reactOnMessage(message, 'plus-one');
+        await pages.conversation().getReactionOnMessage(message, 'plus-one').hover();
+        await expect(page.getByRole('tooltip', {name: /reacted with \+1$/})).toContainText(`${memberA.fullName}`);
+      });
 
-      await expect(await pages.conversation().getCurrentFocusedToolTip(message)).toHaveText(
-        `${memberA.fullName} reacted with +1`,
-      );
+      await test.step('Group conversation details', async () => {
+        await pages.conversation().conversationInfoButton.click();
+        await expect(pages.conversationDetails().groupAdmins.filter({hasText: memberA.fullName})).toBeVisible();
+      });
 
-      await pages.conversation().clickConversationInfoButton();
-      await expect(pages.conversationDetails().isUserPartOfConversationAsAdmin(memberA.fullName)).toBeTruthy();
+      await test.step('Settings - Account', async () => {
+        await components.conversationSidebar().preferencesButton.click();
+        await pages.settings().accountButton.click();
+        await expect(pages.account().nameDisplay).toHaveText(memberA.fullName);
+      });
 
-      await api.brig.enableMLSFeature(owner.teamId);
-      await api.brig.unlockChannelFeature(owner.teamId);
-      await api.brig.enableChannelsFeature(owner.teamId);
+      await test.step('Channel details', async () => {
+        await components.conversationSidebar().allConverationsButton.click();
 
-      await page.reload();
+        await pages.conversationList().clickCreateGroup();
+        await modals.createConversation().createChannel('Test Channel', {members: [memberB]});
 
-      await createChannel(pages, 'test', [memberB]);
-
-      await pages.conversation().clickConversationInfoButton();
-      await expect(pages.conversationDetails().isUserPartOfConversationAsAdmin(memberA.fullName)).toBeTruthy();
-
-      // go to settings
-      await components.conversationSidebar().clickPreferencesButton();
-      await expect(pages.account().nameDisplay).toHaveText(memberA.fullName);
+        await pages.conversationList().openConversation('Test Channel');
+        await pages.conversation().conversationInfoButton.click();
+        await expect(pages.conversationDetails().groupAdmins.filter({hasText: memberA.fullName})).toBeVisible();
+      });
     },
   );
-
-  test.afterAll(async ({api}) => {
-    await tearDownAll(api);
-  });
 });
