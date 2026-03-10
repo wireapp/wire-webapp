@@ -23,9 +23,10 @@ import {
   startupFeatureToggleQueryParameterName,
 } from './startupFeatureToggles';
 
-describe('startupFeatureToggles', function () {
-  const reliableWebsocketConnectionFeatureToggleName = 'reliable-websocket-connection';
+const reliableWebsocketConnectionFeatureToggleName = 'reliable-websocket-connection';
+const incrementalHttpRetryBackoffFeatureToggleName = 'incremental-http-retry-backoff';
 
+describe('startupFeatureToggles', function () {
   it('returns disabled toggles when the query parameter is missing', function () {
     const startupFeatureToggles = createStartupFeatureTogglesFromLocationSearch('?foo=bar');
 
@@ -56,6 +57,14 @@ describe('startupFeatureToggles', function () {
     );
 
     expect(startupFeatureToggles.getEnabledFeatureToggleNames()).toEqual([]);
+  });
+
+  it('enables the incremental http retry backoff feature toggle when present in the query parameter', function () {
+    const startupFeatureToggles = createStartupFeatureTogglesFromLocationSearch(
+      `?${startupFeatureToggleQueryParameterName}=${incrementalHttpRetryBackoffFeatureToggleName}`,
+    );
+
+    expect(startupFeatureToggles.isFeatureToggleEnabled(incrementalHttpRetryBackoffFeatureToggleName)).toBe(true);
   });
 
   it('keeps only whitelisted feature toggles when known and unknown values are mixed', function () {
@@ -106,7 +115,10 @@ describe('startupFeatureToggles', function () {
   });
 
   it('contains only whitelisted values in allowedStartupFeatureToggleNames', function () {
-    expect(allowedStartupFeatureToggleNames).toEqual([reliableWebsocketConnectionFeatureToggleName]);
+    expect(allowedStartupFeatureToggleNames).toEqual([
+      reliableWebsocketConnectionFeatureToggleName,
+      incrementalHttpRetryBackoffFeatureToggleName,
+    ]);
   });
 
   it('does not expose mutable enabled toggle state', function () {
