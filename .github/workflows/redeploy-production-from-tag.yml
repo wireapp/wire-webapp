@@ -55,19 +55,19 @@ jobs:
       commit_subject: ${{ steps.git_metadata.outputs.commit_subject }}
 
     steps:
+      - name: Verify remote tag exists
+        env:
+          TAG: ${{ needs.validate_request.outputs.tag }}
+          REPOSITORY: ${{ github.repository }}
+        run: |
+          set -euo pipefail
+          git ls-remote --exit-code --tags "https://github.com/${REPOSITORY}.git" "refs/tags/${TAG}"
+
       - name: Checkout selected tag
         uses: actions/checkout@v6
         with:
           ref: refs/tags/${{ needs.validate_request.outputs.tag }}
           fetch-depth: 0
-
-      - name: Verify remote tag exists
-        env:
-          TAG: ${{ needs.validate_request.outputs.tag }}
-        run: |
-          set -euo pipefail
-          git fetch --tags --force origin
-          git ls-remote --exit-code --tags origin "refs/tags/${TAG}"
 
       - name: Collect git metadata
         id: git_metadata
