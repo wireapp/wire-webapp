@@ -75,17 +75,26 @@ If `FEDERATION` is not set, `APP_BASE`, `BACKEND_REST`, and `BACKEND_WS` must re
 - `apps/webapp/app-config/package.json` pins configuration repositories and versions.
 - `webapp:configure` runs `copy-config` using `apps/webapp/.copyconfigrc.js`.
 - That step copies repository content into `apps/webapp/resource/` and writes repo `.env.defaults` into workspace root `.env.defaults`.
-- Configuration selection logic in `.copyconfigrc.js`:
-  - `DISTRIBUTION` can select a custom distribution,
-  - tagged production/staging builds select `master`,
-  - otherwise defaults to `staging`,
-  - `FORCED_CONFIG_URL` can override repo selection.
+- Configuration selection order in `.copyconfigrc.js`:
+  1. If `FORCED_CONFIG_URL` is set, that URL is used directly.
+  2. Otherwise, if `DISTRIBUTION` is set (and not `wire`), it selects dependency key `wire-web-config-default-${DISTRIBUTION}`.
+  3. Otherwise, if the current commit tag contains `staging` or `production`, it selects `master`.
+  4. Otherwise, it selects `staging`.
+  5. The selected key is resolved via `apps/webapp/app-config/package.json` dependencies to get the final repository URL.
 
 ### What "additional conditions" means
 
 - **Additional Conditions** indicates whether runtime/platform/backend constraints may still keep a feature effectively disabled even when the environment variable is enabled.
 - This column is informational and separate from value priority.
 - For non-feature rows, this is usually `N/A`.
+
+### Where default values come from
+
+- **Primary source:** configuration repositories (pinned in `apps/webapp/app-config/package.json`) provide baseline values via their `.env.defaults`.
+- During `webapp:configure`, the selected config repository is copied and its `.env.defaults` is written to workspace root `.env.defaults`.
+- At runtime/build time, values are loaded with this priority: **process env** > **`.env`** > **`.env.defaults`** > **code fallback**.
+- **Code fallbacks** are defined in config generators for specific variables only (for example `MAX_API_VERSION = 13`, `PORT = 21080`).
+- So, defaults are mostly from config repositories; webapp/server code provides fallback defaults only for a smaller subset.
 
 Notes:
 
