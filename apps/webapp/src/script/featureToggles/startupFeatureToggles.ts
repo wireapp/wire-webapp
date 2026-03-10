@@ -21,7 +21,10 @@ import {Maybe} from 'true-myth';
 
 export const startupFeatureToggleQueryParameterName = 'enabled-features';
 
-export const allowedStartupFeatureToggleNames = ['reliable-websocket-connection'] as const;
+export const allowedStartupFeatureToggleNames = [
+  'reliable-websocket-connection',
+  'incremental-http-retry-backoff',
+] as const;
 
 export type StartupFeatureToggleName = (typeof allowedStartupFeatureToggleNames)[number];
 
