@@ -19,7 +19,6 @@
 
 import {useEffect, useRef, useState} from 'react';
 
-import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 import cx from 'classnames';
 import {container} from 'tsyringe';
 
@@ -90,14 +89,9 @@ const StartUI = ({
 
   const actions = mainViewModel.actions;
   const isTeam = teamState.isTeam();
-  const appsEnabled = teamState?.isAppsEnabled();
-  const defaultProtocol = teamState.teamFeatures()?.mls?.config.defaultProtocol;
-  const isProteus = defaultProtocol !== CONVERSATION_PROTOCOL.MLS;
 
   const showServiceTab =
-    isTeam &&
-    canChatWithServices() &&
-    ((isProteus && teamState?.hasWhitelistedServices()) || (!isProteus && appsEnabled));
+    isTeam && canChatWithServices() && (teamState?.isLegacyServicesEnabled() || teamState?.isAppsEnabled());
 
   const [searchQuery, setSearchQuery] = useState('');
   const [activeTab, setActiveTab] = useState(Tabs.PEOPLE);
