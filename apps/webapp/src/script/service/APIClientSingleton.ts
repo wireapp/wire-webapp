@@ -22,26 +22,36 @@ import {singleton} from 'tsyringe';
 import {APIClient as APIClientUnconfigured} from '@wireapp/api-client';
 
 import {Config} from '../Config';
+import {incrementalHttpRetryBackoffFeatureToggleName} from '../featureToggles/startupFeatureToggleNames';
+import {StartupFeatureToggleName} from '../featureToggles/startupFeatureToggles';
 
 const wireClientHeaderName = 'Wire-Client';
 const wireClientVersionHeaderName = 'Wire-Client-Version';
 const wireClientIdentifier = 'Web';
 
+type APIClientSingletonConfiguration = {
+  readonly isFeatureToggleEnabled?: (featureToggleName: StartupFeatureToggleName) => boolean;
+};
+
 @singleton()
 export class APIClient extends APIClientUnconfigured {
-  constructor() {
+  constructor(apiClientSingletonConfiguration: APIClientSingletonConfiguration = {}) {
     const webAppConfiguration = Config.getConfig();
+    const {isFeatureToggleEnabled} = apiClientSingletonConfiguration;
 
-    super({
+    const unconfiguredApiClientConfiguration = {
       headers: {
         [wireClientHeaderName]: wireClientIdentifier,
         [wireClientVersionHeaderName]: webAppConfiguration.VERSION,
       },
+      shouldUseIncrementalRetryBackoff: isFeatureToggleEnabled?.(incrementalHttpRetryBackoffFeatureToggleName) ?? false,
       urls: {
         name: webAppConfiguration.ENVIRONMENT,
         rest: webAppConfiguration.BACKEND_REST,
         ws: webAppConfiguration.BACKEND_WS,
       },
-    });
+    };
+
+    super(unconfiguredApiClientConfiguration);
   }
 }

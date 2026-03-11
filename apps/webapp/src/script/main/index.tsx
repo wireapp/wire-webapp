@@ -24,6 +24,7 @@ import 'core-js/full/reflect';
 import {ClientType} from '@wireapp/api-client/lib/client/';
 
 import {createRoot} from 'react-dom/client';
+import {container} from 'tsyringe';
 
 import {Runtime} from '@wireapp/commons';
 
@@ -40,6 +41,8 @@ import {SIGN_OUT_REASON} from '../auth/SignOutReason';
 import {createWallClock} from '../clock/wallClock';
 import {Config} from '../Config';
 import {createStartupFeatureTogglesFromLocationSearch} from '../featureToggles/startupFeatureToggles';
+import {APIClient} from '../service/APIClientSingleton';
+import {Core} from '../service/CoreSingleton';
 
 document.addEventListener('DOMContentLoaded', async () => {
   const config = Config.getConfig();
@@ -73,6 +76,11 @@ document.addEventListener('DOMContentLoaded', async () => {
   });
   const {isFeatureToggleEnabled} = startupFeatureToggles;
   const {wallClock} = applicationServices;
+  const apiClient = new APIClient({isFeatureToggleEnabled});
+  const core = new Core(apiClient);
+
+  container.registerInstance(APIClient, apiClient);
+  container.registerInstance(Core, core);
 
   createRoot(appContainer).render(
     <AppContainer

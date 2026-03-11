@@ -22,9 +22,10 @@ import {
   createStartupFeatureTogglesFromLocationSearch,
   startupFeatureToggleQueryParameterName,
 } from './startupFeatureToggles';
-
-const reliableWebsocketConnectionFeatureToggleName = 'reliable-websocket-connection';
-const incrementalHttpRetryBackoffFeatureToggleName = 'incremental-http-retry-backoff';
+import {
+  incrementalHttpRetryBackoffFeatureToggleName,
+  reliableWebsocketConnectionFeatureToggleName,
+} from './startupFeatureToggleNames';
 
 describe('startupFeatureToggles', function () {
   it('returns disabled toggles when the query parameter is missing', function () {
