@@ -309,9 +309,7 @@ export class BackgroundEffectsController {
    */
   public setMode(mode: EffectMode): void {
     this.mode = mode;
-    if (this.isDev) {
-      this.logger.info('Background effects mode', mode);
-    }
+    this.logger.info('Background effects mode', mode);
     this.updatePipelineConfig();
   }
 
@@ -767,5 +765,9 @@ export class BackgroundEffectsController {
       }
       this.pipelineImpl?.clearBackground();
     };
+  }
+
+  isProcessing() {
+    return false;
   }
 }

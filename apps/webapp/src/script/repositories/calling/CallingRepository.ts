@@ -347,12 +347,11 @@ export class CallingRepository {
     }
     const selfParticipant = activeCall.getSelfParticipant();
     const videoFeed = selfParticipant.videoStream();
+    selfParticipant.backgroundEffect(effect);
     if (!videoFeed) {
-      selfParticipant.backgroundEffect(effect);
       return;
     }
 
-    selfParticipant.backgroundEffect(effect);
     const {applied, processedStream} = await this.applyBackgroundEffectToParticipant(
       selfParticipant,
       effect,
