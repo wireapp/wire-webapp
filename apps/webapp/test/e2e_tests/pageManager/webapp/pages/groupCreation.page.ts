@@ -20,8 +20,6 @@
 import {Page, Locator} from '@playwright/test';
 
 export class GroupCreationPage {
-  readonly page: Page;
-
   readonly groupCreationModal: Locator;
   readonly searchPeopleList: Locator;
   readonly groupNameInput: Locator;
@@ -34,8 +32,6 @@ export class GroupCreationPage {
   readonly searchPeopleResults: Locator;
 
   constructor(page: Page) {
-    this.page = page;
-
     this.groupCreationModal = page.locator('#group-creation-modal');
     this.groupNameInput = page.locator('[data-uie-name="enter-group-name"]');
     this.nextButton = page.locator('[data-uie-name="go-next"]');

@@ -21,8 +21,6 @@ import {Locator, Page} from '@playwright/test';
 import {User} from 'test/e2e_tests/data/user';
 
 export class RegistrationPage {
-  readonly page: Page;
-
   readonly passwordPolicyInfo: Locator;
   readonly nameInput: Locator;
   readonly emailInput: Locator;
@@ -34,7 +32,6 @@ export class RegistrationPage {
   readonly passwordPolicy: Locator;
 
   constructor(page: Page) {
-    this.page = page;
     this.passwordPolicyInfo = page.locator('[data-uie-name="element-password-help"]');
     this.nameInput = page.locator('[data-uie-name="enter-name"]');
     this.emailInput = page.locator('[data-uie-name="enter-email"]');

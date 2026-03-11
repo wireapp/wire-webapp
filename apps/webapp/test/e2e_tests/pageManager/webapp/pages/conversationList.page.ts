@@ -22,7 +22,7 @@ import {Locator, Page} from '@playwright/test';
 import {User} from 'test/e2e_tests/data/user';
 
 export class ConversationListPage {
-  readonly page: Page;
+  private readonly page: Page;
 
   readonly list: Locator;
   readonly blockConversationMenuButton: Locator;

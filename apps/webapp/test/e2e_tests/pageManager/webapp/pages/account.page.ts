@@ -20,7 +20,7 @@
 import {Page, Locator} from '@playwright/test';
 
 export class AccountPage {
-  readonly page: Page;
+  private readonly page: Page;
 
   readonly sendUsageDataCheckbox: Locator;
   readonly deleteAccountButton: Locator;

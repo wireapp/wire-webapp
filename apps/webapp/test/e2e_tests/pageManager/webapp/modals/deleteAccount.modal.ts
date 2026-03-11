@@ -20,8 +20,6 @@
 import {Page, Locator} from '@playwright/test';
 
 export class DeleteAccountModal {
-  readonly page: Page;
-
   readonly modal: Locator;
   readonly modalTitle: Locator;
   readonly modalText: Locator;
@@ -29,8 +27,6 @@ export class DeleteAccountModal {
   readonly cancelButton: Locator;
 
   constructor(page: Page) {
-    this.page = page;
-
     this.modal = page.getByRole('dialog').filter({hasText: 'Delete account'});
     this.modalTitle = this.modal.locator("[data-uie-name='status-modal-title']");
     this.modalText = this.modal.locator("[data-uie-name='status-modal-text']");

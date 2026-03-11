@@ -20,15 +20,12 @@
 import {Page, Locator} from '@playwright/test';
 
 export class UserProfileModal {
-  readonly page: Page;
-
   readonly modal: Locator;
   readonly connectButton: Locator;
   readonly startConversationButton: Locator;
   readonly unblockButton: Locator;
 
   constructor(page: Page) {
-    this.page = page;
     this.modal = page.getByTestId('modal-user-profile');
     this.connectButton = page.getByTestId('modal-user-profile').getByTestId('do-send-request');
     this.startConversationButton = page.getByTestId('modal-user-profile').getByTestId('start-conversation');

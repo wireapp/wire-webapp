@@ -20,16 +20,12 @@
 import {Page, Locator} from '@playwright/test';
 
 export class RegisterSuccessPage {
-  readonly page: Page;
-
   readonly downloadWireButton: Locator;
   readonly openWireWebButton: Locator;
   readonly manageTeamButton: Locator;
   readonly teamSignUpSuccessMessage: Locator;
 
   constructor(page: Page) {
-    this.page = page;
-
     this.downloadWireButton = page.locator('[data-uie-name="do-download-wire"]');
     this.openWireWebButton = page.locator('[data-uie-name="do-open-wire-web"]');
     this.manageTeamButton = page.locator('[data-uie-name="do-manage-team"]');
