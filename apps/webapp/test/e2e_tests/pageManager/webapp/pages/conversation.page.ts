@@ -103,8 +103,8 @@ export class ConversationPage {
     this.filesTab = page.locator('#conversation-tab-files');
     this.typingIndicator = page.getByTestId('typing-indicator-title');
     this.itemPendingRequest = page.getByTestId('item-pending-requests');
-    this.ignoreButton = page.getByTestId('do-ignore');
-    this.cancelRequest = page.getByTestId('do-cancel-request');
+    this.ignoreButton = page.getByRole('button', {name: 'Ignore'});
+    this.cancelRequest = page.getByRole('button', {name: 'Cancel connection request'});
     this.mentionSuggestions = page.getByRole('listbox').getByTestId('item-mention-suggestion');
   }
 
@@ -119,10 +119,6 @@ export class ConversationPage {
 
   async isConversationOpen(conversationName: string) {
     return (await this.page.getByTestId('status-conversation-title-bar-label').textContent()) === conversationName;
-  }
-
-  async clickItemPendingRequest() {
-    await this.itemPendingRequest.click();
   }
 
   async clickConversationTitle() {
@@ -143,10 +139,6 @@ export class ConversationPage {
 
   async clickIgnoreButton() {
     await this.ignoreButton.click();
-  }
-
-  async clickCancelRequest() {
-    await this.cancelRequest.click();
   }
 
   async sendMessage(message: string) {
