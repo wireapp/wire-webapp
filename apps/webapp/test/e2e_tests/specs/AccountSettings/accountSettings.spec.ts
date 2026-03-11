@@ -180,10 +180,12 @@ test.describe('account settings', () => {
   );
 
   test('Verify I can retrieve calling logs', {tag: ['@TC-1725', '@regression']}, async ({createPage}) => {
-    const [memberAPages, memberBPages] = await Promise.all([
-      PageManager.from(createPage(withLogin(memberA), withConnectedUser(memberB))).then(pm => pm.webapp.pages),
-      PageManager.from(createPage(withLogin(memberB))).then(pm => pm.webapp.pages),
+    const [memberAPage, memberBPage] = await Promise.all([
+      createPage(withLogin(memberA), withConnectedUser(memberB)),
+      createPage(withLogin(memberB)),
     ]);
+    const memberAPages = PageManager.from(memberAPage).webapp.pages;
+    const memberBPages = PageManager.from(memberBPage).webapp.pages;
 
     await memberAPages.conversationList().openConversation(memberB.fullName, {protocol: 'mls'});
 
@@ -192,7 +194,7 @@ test.describe('account settings', () => {
 
     const expectedLog = '@wireapp/webapp/avs'; // get one phone call
     await expect
-      .poll(async () => (await memberAPages.account().page.consoleMessages()).map(m => m.text()))
+      .poll(async () => (await memberAPage.consoleMessages()).map(m => m.text()))
       .toEqual(expect.arrayContaining([expect.stringContaining(expectedLog)]));
   });
 

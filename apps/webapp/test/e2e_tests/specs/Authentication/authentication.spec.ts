@@ -242,7 +242,7 @@ test.describe('Authentication', () => {
     {tag: ['@TC-1312', '@regression']},
     async ({createPage, createUser}) => {
       const user = await createUser();
-      const device1Pages = PageManager.from(await createPage(withLogin(user))).webapp.pages;
+      const device1Page = await createPage(withLogin(user));
 
       const {
         pages: device2Pages,
@@ -257,9 +257,7 @@ test.describe('Authentication', () => {
       await device2Modals.password().passwordInput.fill(user.password);
       await device2Modals.password().clickAction();
 
-      await expect(
-        device1Pages.singleSignOn().page.getByText('You were signed out because your device was deleted'),
-      ).toBeVisible();
+      await expect(device1Page.getByText('You were signed out because your device was deleted')).toBeVisible();
     },
   );
 });
