@@ -121,10 +121,6 @@ export class ConversationPage {
     return (await this.page.getByTestId('status-conversation-title-bar-label').textContent()) === conversationName;
   }
 
-  async clickItemPendingRequest() {
-    await this.itemPendingRequest.click();
-  }
-
   async clickConversationTitle() {
     await this.conversationTitle.click();
   }
@@ -143,10 +139,6 @@ export class ConversationPage {
 
   async clickIgnoreButton() {
     await this.ignoreButton.click();
-  }
-
-  async clickCancelRequest() {
-    await this.cancelRequest.click();
   }
 
   async sendMessage(message: string) {
