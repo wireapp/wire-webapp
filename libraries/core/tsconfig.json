@@ -19,7 +19,6 @@
     "**/*.test.ts",
     "**/*.test.*.ts",
     "**/*.spec.ts",
-    "src/demo",
     "lib"
   ],
   "include": ["src/**/*.ts"]

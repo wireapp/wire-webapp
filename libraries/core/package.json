@@ -49,11 +49,7 @@
     "build": "nx run core-lib:build",
     "clean": "nx run core-lib:clean",
     "dist": "nx run core-lib:dist",
-    "demo:composite": "nx run core-lib:demo:composite",
-    "demo:sendCounter": "nx run core-lib:demo:sendCounter",
     "start": "nx run core-lib:start",
-    "start:echo": "nx run core-lib:start:echo",
-    "start:sender": "nx run core-lib:start:sender",
     "test": "nx run core-lib:test",
     "test:coverage": "nx run core-lib:test:coverage",
     "watch": "nx run core-lib:watch"
