@@ -115,7 +115,7 @@ export async function createAndSaveBackup(
   await expect(modals.passwordAdvancedSecurity().modal).toBeHidden();
   await expect(pages.historyExport().exportSuccessHeadline).toBeVisible();
   const [download] = await Promise.all([
-    pages.historyExport().page.waitForEvent('download'),
+    pageManager.page.waitForEvent('download'),
     pages.historyExport().clickSaveFileButton(),
   ]);
   const safePrefix = filenamePrefix ?? '';

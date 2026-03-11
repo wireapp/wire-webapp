@@ -80,7 +80,7 @@ export const webAppPath = process.env.WEBAPP_URL ?? '';
 export class PageManager {
   private readonly cache = new Map<string, any>();
 
-  constructor(readonly page: Page) {}
+  constructor(public readonly page: Page) {}
 
   static from(page: Page): PageManager;
   static from(page: Promise<Page>): Promise<PageManager>;

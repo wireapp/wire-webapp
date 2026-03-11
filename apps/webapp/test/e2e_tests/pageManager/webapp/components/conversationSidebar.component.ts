@@ -21,7 +21,7 @@ import {Page, Locator} from '@playwright/test';
 
 export class ConversationSidebar {
   readonly pageLoadingTimeout = 60_000;
-  readonly page: Page;
+  private readonly page: Page;
   readonly navigation: Locator;
   readonly personalStatusLabel: Locator;
   readonly personalStatusIcon: Locator;

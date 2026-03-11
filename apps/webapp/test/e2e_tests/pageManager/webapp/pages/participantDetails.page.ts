@@ -21,7 +21,7 @@ import {Locator, Page} from '@playwright/test';
 import {ConfirmModal} from '../modals/confirm.modal';
 
 export class ParticipantDetails {
-  readonly page: Page;
+  private readonly page: Page;
 
   readonly userPicture: Locator;
   readonly userName: Locator;

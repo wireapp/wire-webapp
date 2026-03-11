@@ -21,8 +21,6 @@ import type {Page, Locator} from '@playwright/test';
 import type {User} from 'test/e2e_tests/data/user';
 
 export class LoginPage {
-  readonly page: Page;
-
   readonly signInButton: Locator;
   readonly emailInput: Locator;
   readonly passwordInput: Locator;
@@ -30,8 +28,6 @@ export class LoginPage {
   readonly publicComputerCheckbox: Locator;
 
   constructor(page: Page) {
-    this.page = page;
-
     this.signInButton = page.locator('[data-uie-name="do-sign-in"]');
     this.emailInput = page.locator('[data-uie-name="enter-email"]');
     this.passwordInput = page.locator('[data-uie-name="enter-password"]');

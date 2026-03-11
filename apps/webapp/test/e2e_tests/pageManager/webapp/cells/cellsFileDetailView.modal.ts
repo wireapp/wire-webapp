@@ -21,7 +21,7 @@ import {Locator, Page} from '@playwright/test';
 import {downloadAssetAndGetFilePath} from 'test/e2e_tests/utils/asset.util';
 
 export class CellsFileDetailViewModal {
-  readonly page: Page;
+  private readonly page: Page;
   readonly closeButton: Locator;
   readonly downloadButton: Locator;
   readonly image: Locator;
