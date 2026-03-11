@@ -19,14 +19,11 @@
 
 import {Maybe} from 'true-myth';
 
+import {StartupFeatureToggleName, startupFeatureToggleNames} from './startupFeatureToggleNames';
+
 export const startupFeatureToggleQueryParameterName = 'enabled-features';
 
-export const allowedStartupFeatureToggleNames = [
-  'reliable-websocket-connection',
-  'incremental-http-retry-backoff',
-] as const;
-
-export type StartupFeatureToggleName = (typeof allowedStartupFeatureToggleNames)[number];
+export const allowedStartupFeatureToggleNames = startupFeatureToggleNames;
 
 const allowedStartupFeatureToggleNameSet = new Set<StartupFeatureToggleName>(allowedStartupFeatureToggleNames);
 

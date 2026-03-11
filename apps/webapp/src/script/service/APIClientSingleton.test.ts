@@ -18,6 +18,7 @@
  */
 
 import {Config} from '../Config';
+import {incrementalHttpRetryBackoffFeatureToggleName} from '../featureToggles/startupFeatureToggleNames';
 import {APIClient} from './APIClientSingleton';
 
 describe('APIClientSingleton', () => {
@@ -36,14 +37,14 @@ describe('APIClientSingleton', () => {
 
   it('enables incremental http retry backoff when the startup feature toggle is enabled', () => {
     const isFeatureToggleEnabled = jest.fn((featureToggleName) => {
-      return featureToggleName === 'incremental-http-retry-backoff';
+      return featureToggleName === incrementalHttpRetryBackoffFeatureToggleName;
     });
     const apiClient = new APIClient({
       isFeatureToggleEnabled,
     });
 
     try {
-      expect(isFeatureToggleEnabled).toHaveBeenCalledWith('incremental-http-retry-backoff');
+      expect(isFeatureToggleEnabled).toHaveBeenCalledWith(incrementalHttpRetryBackoffFeatureToggleName);
     } finally {
       apiClient.disconnect();
     }

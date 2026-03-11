@@ -23,11 +23,11 @@ import {APIClient as APIClientUnconfigured} from '@wireapp/api-client';
 
 import {Config} from '../Config';
 import {StartupFeatureToggleName} from '../featureToggles/startupFeatureToggles';
+import {incrementalHttpRetryBackoffFeatureToggleName} from '../featureToggles/startupFeatureToggleNames';
 
 const wireClientHeaderName = 'Wire-Client';
 const wireClientVersionHeaderName = 'Wire-Client-Version';
 const wireClientIdentifier = 'Web';
-const incrementalHttpRetryBackoffFeatureToggleName = 'incremental-http-retry-backoff';
 
 type APIClientSingletonConfiguration = {
   readonly isFeatureToggleEnabled?: (featureToggleName: StartupFeatureToggleName) => boolean;
