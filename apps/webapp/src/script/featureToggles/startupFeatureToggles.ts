@@ -20,6 +20,7 @@
 import {Maybe} from 'true-myth';
 
 import {StartupFeatureToggleName, startupFeatureToggleNames} from './startupFeatureToggleNames';
+export type {StartupFeatureToggleName} from './startupFeatureToggleNames';
 
 export const startupFeatureToggleQueryParameterName = 'enabled-features';
 

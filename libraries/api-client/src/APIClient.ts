@@ -98,6 +98,8 @@ export type APIClientConfiguration = {
   readonly shouldUseIncrementalRetryBackoff?: boolean;
 };
 
+export type APIClientConstructorConfiguration = Config & APIClientConfiguration;
+
 type Apis = {
   account: AccountAPI;
   asset: AssetAPI;
@@ -178,9 +180,9 @@ export class APIClient extends EventEmitter {
 
   public static VERSION = version;
 
-  constructor(config?: Config, apiClientConfiguration: APIClientConfiguration = {}) {
+  constructor(config?: APIClientConstructorConfiguration) {
     super();
-    const {shouldUseIncrementalRetryBackoff = false} = apiClientConfiguration;
+    const {shouldUseIncrementalRetryBackoff = false} = config ?? {};
     this.config = {...defaultConfig, ...config};
     this.accessTokenStore = new AccessTokenStore();
     this.accessTokenStore.on(AccessTokenStore.TOPIC.ACCESS_TOKEN_REFRESH, (accessToken: AccessTokenData) =>

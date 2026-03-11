@@ -96,7 +96,8 @@ describe('APIClient', () => {
     });
 
     it('passes the incremental retry backoff constructor configuration to the http client', () => {
-      const client = new APIClient(testConfig, {
+      const client = new APIClient({
+        ...testConfig,
         shouldUseIncrementalRetryBackoff: true,
       });
 
