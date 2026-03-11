@@ -212,11 +212,17 @@ test.describe('AppLock', () => {
     await expect(pages.account().privacySection.appLock.checkbox).not.toBeChecked();
   });
 
-  test.skip(
+  test(
     'Web: Verify inactivity timeout can be set if app lock is not enforced on a team level',
     {tag: ['@TC-2772', '@regression']},
-    async () => {
-      // not implemented
+    async ({createPage}) => {
+      const {components, pages, modals} = PageManager.from(await createPage(withLogin(user))).webapp;
+
+      await components.conversationSidebar().clickPreferencesButton();
+      await pages.account().privacySection.appLock.label.click();
+      await modals.appLock().setPasscode(appLockPassCode);
+
+      await expect(pages.account().privacySection.appLock.checkbox).toBeChecked();
     },
   );
 });
