@@ -59,7 +59,7 @@ type AppProps = {
 
 export const AppContainer = ({config, clientType, isFeatureToggleEnabled, wallClock}: AppProps) => {
   setAppLocale();
-  const app = useMemo(() => new App(container.resolve(Core), container.resolve(APIClient), config), []);
+  const app = useMemo(() => new App(container.resolve(Core), container.resolve(APIClient), config), [config]);
   const enableAutoLogin = Config.getConfig().FEATURE.ENABLE_AUTO_LOGIN;
 
   // Publishing application on the global scope for debug and testing purposes.
