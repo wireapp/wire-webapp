@@ -1,0 +1,196 @@
+/*
+ * Wire
+ * Copyright (C) 2025 Wire Swiss GmbH
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ *
+ */
+
+import {getUser, User} from 'test/e2e_tests/data/user';
+import {PageManager} from 'test/e2e_tests/pageManager';
+import {test, withLogin, expect} from 'test/e2e_tests/test.fixtures';
+import {loginUser} from '../../utils/userActions';
+
+test.describe('Localization', () => {
+  test.use({locale: 'de-DE'});
+
+  let userA: User;
+  let userB: User;
+
+  test.beforeEach(async ({createTeam, createUser}) => {
+    userB = await createUser({locale: 'de-DE'});
+    const team = await createTeam('Test Team', {users: [userB]});
+    userA = team.owner;
+  });
+
+
+  test('Verify welcome page is localized', {tag: ['@TC-3455', '@regression']}, async ({createPage, browser}) => {
+    // Localization checks for GERMAN browser
+    const dePage = await createPage();
+    const dePageManager = PageManager.from(dePage);
+    const {pages: dePages} = dePageManager.webapp;
+
+    await dePageManager.openWelcomePage();
+
+    await expect(dePages.landingwelcome().header).toHaveText('Willkommen bei Wire!');
+    await expect(dePages.landingwelcome().emailInput).toHaveAttribute('placeholder', 'E-Mail-Adresse oder SSO-Code');
+    await expect(dePages.landingwelcome().signInButton).toHaveText('Anmelden');
+
+    // Localization checks for ENGLISH browser
+    const enContext = await browser.newContext({locale: 'en-US'});
+
+    const enPage = await createPage(enContext);
+    const enPageManager = PageManager.from(enPage);
+    const {pages: enPages} = enPageManager.webapp;
+
+    await enPageManager.openWelcomePage();
+
+    await expect(enPages.landingwelcome().header).toHaveText('Welcome to Wire!');
+    await expect(enPages.landingwelcome().emailInput).toHaveAttribute('placeholder', 'Email or SSO code');
+    await expect(enPages.landingwelcome().emailInput).toHaveAttribute('placeholder', 'Email or SSO code');
+    await expect(enPages.landingwelcome().signInButton).toHaveText('Log in');
+  });
+
+  test('Verify support pages are opened in language de', {tag: ['@TC-3456', '@regression']}, async ({createPage}) => {
+    const mainPage = await createPage(withLogin(userA));
+
+    const {components: components} = (await PageManager.from(mainPage)).webapp;
+
+    const [newPage] = await Promise.all([
+      mainPage.waitForEvent('popup'),
+      components.conversationSidebar().supportButton.click(),
+    ]);
+
+    await newPage.waitForLoadState();
+    await expect(newPage).toHaveURL(/.*\/hc\/de/);
+  });
+
+  test(
+    'Verify registration screen has German-localized strings',
+    {tag: ['@TC-1273', '@regression']},
+    async ({createPage}) => {
+      const page = await createPage();
+      const pageManager = PageManager.from(page);
+
+      const {pages} = pageManager.webapp;
+      await pageManager.openRegistrationPage();
+
+      await expect(pages.registration().nameInput).toHaveAttribute('placeholder', 'Name eingeben');
+      await expect(pages.registration().emailInput).toHaveAttribute('placeholder', 'E-Mail-Adresse eingeben');
+      await expect(pages.registration().passwordInput).toHaveAttribute('placeholder', 'Passwort eingeben');
+      await expect(pages.registration().termsLabel).toContainText('Ich akzeptiere Wires');
+      await expect(pages.registration().header).toHaveText('Ein privates Benutzerkonto erstellen');
+    },
+  );
+
+  test('Verify login screen has German-localized strings', {tag: ['@TC-1274', '@regression']}, async ({createPage}) => {
+    const page = await createPage();
+    const pageManager = PageManager.from(page);
+
+    const {pages} = pageManager.webapp;
+    await pageManager.openLoginPage();
+
+    await expect(pages.login().header).toHaveText('Willkommen bei Wire!');
+    await expect(pages.login().emailInput).toHaveAttribute('placeholder', 'E-Mail-Adresse oder Benutzername');
+    await expect(pages.login().signInButton).toHaveText('Anmelden');
+  });
+
+  test(
+    'Verify conversation view and list has German-localized strings',
+    {tag: ['@TC-1275', '@regression']},
+    async ({createPage}) => {
+      const {pages, modals, components} = (await PageManager.from(createPage(withLogin(userA)))).webapp;
+
+      // Connect users manually due to the current locators don't work in german browser
+      await components.conversationSidebar().connectButton.click();
+      await pages.startUI().component.getByPlaceholder('Personen suchen').fill(userB.fullName);
+      await pages.startUI().component.getByRole('button', {name: userB.fullName}).click();
+      await modals.userProfile().startConversationButton.click();
+
+      await pages.conversationList().openConversation(userB.fullName);
+      const messagePlaceholder = pages.conversation().page.locator('[data-uie-name="input-placeholder"]');
+      await expect(messagePlaceholder).toHaveText('Eine Nachricht schreiben');
+
+      await components.conversationSidebar().allConverationsButton.click();
+      await pages.conversationList().clickConversationOptions(userB.fullName);
+
+      const menuList = pages.conversationList().page.getByTestId('conversation-list-options-menu');
+
+      // check for
+      //notifications button
+      await expect(menuList.first()).toHaveText('Benachrichtigungen');
+      //favorite button
+      await expect(menuList.nth(1)).toHaveText('Zu Favoriten hinzufügen');
+      //move to button
+      await expect(menuList.nth(2)).toHaveText('Verschieben nach');
+      //archive button
+      await expect(menuList.nth(3)).toHaveText('Archivieren');
+      //clear content button
+      await expect(menuList.nth(4)).toHaveText('Unterhaltungsverlauf löschen');
+    });
+
+  test('Verify registration email is de', {tag: ['@TC-1277', '@regression']}, async ({createPage, api}) => {
+    const pageManager = await PageManager.from(createPage());
+
+    await pageManager.openRegistrationPage();
+    const {pages} = pageManager.webapp;
+
+    const user = getUser();
+
+    await pages.registration().nameInput.fill(user.fullName);
+    await pages.registration().emailInput.fill(user.email);
+    await pages.registration().passwordInput.fill(user.password);
+    await pages.registration().confirmPasswordInput.fill(user.password);
+
+    // Click the top-left corner of the label to toggle the checkbox and avoid clicking the embedded "Terms of Service" link.
+    await pages.registration().termsLabel.click({position: {x: 5, y: 5}});
+    await pages.registration().submitButton.click();
+
+    await expect
+      .poll(
+        async () => {
+          const email = await api.inbucket.getLatestEmail(user.email);
+          return email.data?.body?.text as string;
+        },
+        {intervals: [1_000]},
+      )
+      .toContain('um Ihre E-Mail-Adresse zu bestätigen und Ihr Benutzerkonto');
+  });
+
+  test('Verify new device email is de', {tag: ['@TC-1278', '@regression']}, async ({createPage, api}) => {
+    const pageManager = PageManager.from(await createPage(withLogin(userB)));
+    const {pages, modals, components} = pageManager.webapp;
+
+    await components.conversationSidebar().clickPreferencesButton();
+    await pages.account().clickLogoutButton();
+    await modals
+      .confirmLogout()
+      .modal.getByText('Ihre persönlichen Daten und Unterhaltungen vollständig von diesem Gerät entfernen.').click();
+    await modals.confirmLogout().clickConfirm();
+
+    await loginUser(userB, pageManager);
+
+    await pages.historyInfo().clickConfirmButton();
+
+    await expect
+      .poll(
+        async () => {
+          const email = await api.inbucket.getLatestEmail(userB.email);
+          return email.data?.body?.text as string;
+        },
+        {intervals: [1_000]},
+      )
+      .toContain('Ein neues Gerät wurde zu Ihrem Wire-Benutzerkonto hinzugefügt');
+  });
+});

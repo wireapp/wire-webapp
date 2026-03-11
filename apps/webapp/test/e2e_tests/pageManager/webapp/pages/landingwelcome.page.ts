@@ -17,28 +17,21 @@
  *
  */
 
-import {Page, Locator} from '@playwright/test';
+import {Locator, Page} from '@playwright/test';
 
-import {OptionModal} from './option.modal';
+export class LandingwelcomePage {
+  readonly page: Page;
 
-export class ConfirmLogoutModal extends OptionModal {
-  readonly modalCheckbox: Locator;
+  readonly header: Locator;
+  readonly emailInput: Locator;
+  readonly signInButton: Locator;
+
 
   constructor(page: Page) {
-    super(page);
-
-    this.modalCheckbox = this.modal.getByTestId('modal-option-checkbox');
+    this.page = page;
+    this.header = page.locator('#sso-login-heading-text');
+    this.emailInput = page.locator('input[name="sso-code-email"]');
+    this.signInButton = page.getByTestId('do-sso-sign-in');
   }
 
-  async toggleModalCheck() {
-    await this.modalCheckbox.click();
-  }
-
-  async clickCancel() {
-    await this.cancelButton.click();
-  }
-
-  async clickConfirm() {
-    await this.clickAction();
-  }
 }

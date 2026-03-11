@@ -116,8 +116,8 @@ export class InbucketClientE2E {
     return matchingUrl;
   }
 
-  private async getLatestEmail(email: string) {
-    return await this.axiosInstance.get<{subject: string; body: {text: string}}>(`/api/v1/mailbox/${email}/latest`, {
+  async getLatestEmail(email: string) {
+    return await this.axiosInstance.get(`/api/v1/mailbox/${email}/latest`, {
       headers: {
         Authorization: this.authHeader,
       },
