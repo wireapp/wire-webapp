@@ -70,39 +70,11 @@
         "command": "tsc --project {projectRoot}/tsconfig.json --noEmit"
       }
     },
-    "demo:composite": {
-      "executor": "nx:run-commands",
-      "options": {
-        "command": "cross-env NODE_DEBUG='@wireapp*' ts-node src/demo/composite.ts",
-        "cwd": "{projectRoot}"
-      }
-    },
-    "demo:sendCounter": {
-      "executor": "nx:run-commands",
-      "options": {
-        "command": "cross-env NODE_DEBUG='@wireapp*' ts-node src/demo/sendCounter.ts",
-        "cwd": "{projectRoot}"
-      }
-    },
     "start": {
       "executor": "nx:run-commands",
       "dependsOn": ["dist"],
       "options": {
         "command": "node index.js",
-        "cwd": "{projectRoot}"
-      }
-    },
-    "start:echo": {
-      "executor": "nx:run-commands",
-      "options": {
-        "command": "cross-env NODE_DEBUG='@wireapp/core*' node src/demo/echo.js",
-        "cwd": "{projectRoot}"
-      }
-    },
-    "start:sender": {
-      "executor": "nx:run-commands",
-      "options": {
-        "command": "cross-env NODE_DEBUG='@wireapp/core*' node src/demo/sender.js",
         "cwd": "{projectRoot}"
       }
     }
