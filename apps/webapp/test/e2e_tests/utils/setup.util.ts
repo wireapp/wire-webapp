@@ -17,27 +17,10 @@
  *
  */
 
-import {addCreatedTeam, addCreatedUser} from './tearDown.util';
-import {inviteMembers, loginUser} from './userActions';
+import {loginUser} from './userActions';
 
-import {ApiManagerE2E} from '../backend/apiManager.e2e';
 import {User} from '../data/user';
 import {PageManager} from '../pageManager';
-
-/**
- * add an team with owner and given members
- */
-export const bootstrapTeamForTesting = async (api: ApiManagerE2E, members: User[], owner: User, teamName: string) => {
-  const user = await api.createTeamOwner(owner, teamName);
-  // register credentials for cleanup later
-  addCreatedTeam(user, user.teamId);
-  await inviteMembers(members, user, api);
-
-  for (const [, user] of members.entries()) {
-    addCreatedUser(user);
-  }
-  return user;
-};
 
 export const completeLogin = async (pageManager: PageManager, user: User) => {
   const {components, modals, pages} = pageManager.webapp;
