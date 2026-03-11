@@ -148,6 +148,9 @@ export class TeamAPI {
       data: app,
       method: 'POST',
       url: `${TeamAPI.URL.TEAMS}/${teamId}/${TeamAPI.URL.APPS}`,
+      requestOptions: {
+        skipLogout: true,
+      },
     };
 
     const response = await this.client.sendJSON<NewAppResponse>(config);
