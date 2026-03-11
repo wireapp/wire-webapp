@@ -137,6 +137,10 @@ updates:
     open-pull-requests-limit: 99
     schedule:
       interval: 'daily'
+      time: '16:00'
+      timezone: 'Europe/Berlin'
+    labels:
+      - 'type: chore 🧹'
   # Docker
   - package-ecosystem: 'docker'
     directory: '/'
