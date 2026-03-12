@@ -30,7 +30,7 @@ export class AuthRepositoryE2E extends BackendClientE2E {
       password: user.password,
       name: `${user.firstName} ${user.lastName}`,
       email: user.email,
-      locale: 'de-DE',
+      locale: user.locale || 'en-US',
       ...(invitationCode && {team_code: invitationCode}),
     });
 
