@@ -49,6 +49,12 @@ describe('validateCollaboraUrl', () => {
       const result = validateCollaboraUrl(Maybe.of(url), TRUSTED_ORIGIN);
       expect(unwrapErr(result)).toEqual({reason: 'insecure', url});
     });
+
+    it('returns insecure error for malformed https url', () => {
+      const url = 'https://[cells.example.com/editor';
+      const result = validateCollaboraUrl(Maybe.of(url), TRUSTED_ORIGIN);
+      expect(unwrapErr(result)).toEqual({reason: 'insecure', url});
+    });
   });
 
   describe('url origin does not match trusted origin', () => {

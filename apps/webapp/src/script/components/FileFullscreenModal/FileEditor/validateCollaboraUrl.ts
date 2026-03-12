@@ -17,14 +17,30 @@
  *
  */
 
-import {Maybe, Result} from 'true-myth';
+import {Maybe, Result, result} from 'true-myth';
 
 export type CollaboraUrlError =
   | {readonly reason: 'empty'}
   | {readonly reason: 'insecure'; readonly url: string}
   | {readonly reason: 'untrusted'; readonly url: string; readonly trustedOrigin: string};
 
-const HTTPS_URL_PATTERN = /^https:\/\/\S+$/;
+const parseUrl = (url: string): Maybe<URL> => {
+  try {
+    return Maybe.just(new URL(url));
+  } catch {
+    return Maybe.nothing();
+  }
+};
+
+const validateSecureUrl = (url: string): Result<URL, CollaboraUrlError> => {
+  const parsedUrl = parseUrl(url);
+
+  if (!parsedUrl.isJust || parsedUrl.value.protocol !== 'https:') {
+    return Result.err({reason: 'insecure', url});
+  }
+
+  return Result.ok(parsedUrl.value);
+};
 
 /**
  * Validates a Collabora editor URL is safe to embed with clipboard permissions.
@@ -34,11 +50,17 @@ export const validateCollaboraUrl = (url: Maybe<string>, trustedOrigin: string):
     return Result.err({reason: 'empty'});
   }
 
-  if (!HTTPS_URL_PATTERN.test(url.value)) {
-    return Result.err({reason: 'insecure', url: url.value});
+  const validatedUrl = validateSecureUrl(url.value);
+  if (result.isErr(validatedUrl)) {
+    return Result.err(validatedUrl.error);
   }
 
-  if (HTTPS_URL_PATTERN.test(trustedOrigin) && new URL(url.value).origin !== new URL(trustedOrigin).origin) {
+  const trustedOriginUrl = parseUrl(trustedOrigin);
+  if (
+    trustedOriginUrl.isJust &&
+    trustedOriginUrl.value.protocol === 'https:' &&
+    validatedUrl.value.origin !== trustedOriginUrl.value.origin
+  ) {
     return Result.err({reason: 'untrusted', url: url.value, trustedOrigin});
   }
 
