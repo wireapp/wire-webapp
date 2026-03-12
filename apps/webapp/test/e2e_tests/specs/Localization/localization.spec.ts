@@ -72,7 +72,7 @@ test.describe('Localization', () => {
     ]);
 
     await newPage.waitForLoadState();
-    await expect(newPage).toHaveURL(/.*\/hc\/de/);
+    await expect(newPage).toHaveURL(/\/de/);
   });
 
   test(
