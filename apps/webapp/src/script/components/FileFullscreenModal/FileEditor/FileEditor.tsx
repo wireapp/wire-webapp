@@ -24,6 +24,7 @@ import {Maybe, result} from 'true-myth';
 import {container} from 'tsyringe';
 
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
+import {removeCurrentModal} from 'Components/Modals/PrimaryModal/PrimaryModalState';
 import {CellsRepository} from 'Repositories/cells/CellsRepository';
 import {Config} from 'src/script/Config';
 import {t} from 'Util/LocalizerUtil';
@@ -35,6 +36,7 @@ import {validateCollaboraUrl} from './validateCollaboraUrl';
 import {FileLoader} from '../FileLoader/FileLoader';
 
 const REFRESH_BUFFER_SECONDS = 10; // Refresh 10 seconds before expiry for safety
+const QA_FORCE_FILE_EDITOR_ERROR_KEY = 'qa-force-file-editor-error';
 
 interface FileEditorProps {
   id: string;
@@ -47,14 +49,16 @@ export const FileEditor = ({id}: FileEditorProps) => {
   const [isError, setIsError] = useState(false);
   const hasShownErrorModal = useRef(false);
 
-  const fetchNode = useCallback(async () => {
+  const fetchNode = useCallback(async (): Promise<boolean> => {
     try {
       setIsLoading(true);
       setIsError(false);
       const fetchedNode = await cellsRepository.getNode({uuid: id, flags: ['WithEditorURLs']});
       setNode(fetchedNode);
+      return true;
     } catch (err) {
       setIsError(true);
+      return false;
     } finally {
       setIsLoading(false);
     }
@@ -62,7 +66,12 @@ export const FileEditor = ({id}: FileEditorProps) => {
 
   const handleRetry = useCallback(() => {
     hasShownErrorModal.current = false;
-    void fetchNode();
+    void (async () => {
+      const isSuccessful = await fetchNode();
+      if (isSuccessful) {
+        removeCurrentModal();
+      }
+    })();
   }, [fetchNode]);
 
   // Initial fetch
@@ -101,6 +110,7 @@ export const FileEditor = ({id}: FileEditorProps) => {
     hasShownErrorModal.current = true;
 
     PrimaryModal.show(PrimaryModal.type.CONFIRM, {
+      closeOnConfirm: false,
       secondaryAction: {
         text: t('modalConfirmSecondary'),
       },
