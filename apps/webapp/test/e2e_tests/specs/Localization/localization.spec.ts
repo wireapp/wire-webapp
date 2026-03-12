@@ -152,7 +152,7 @@ test.describe('Localization', () => {
       .poll(
         async () => {
           const email = await api.inbucket.getLatestEmail(user.email);
-          return email.data?.body?.text as string;
+          return email.data?.body?.text;
         },
         {intervals: [1_000]},
       )
@@ -178,7 +178,7 @@ test.describe('Localization', () => {
       .poll(
         async () => {
           const email = await api.inbucket.getLatestEmail(userB.email);
-          return email.data?.body?.text as string;
+          return email.data?.body?.text;
         },
         {intervals: [1_000]},
       )
