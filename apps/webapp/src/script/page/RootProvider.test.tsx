@@ -21,9 +21,17 @@ import {ReactNode, useContext} from 'react';
 
 import {renderHook} from '@testing-library/react';
 
-import {createFakeWallClock} from '../clock/fakeWallClock';
+import {StartupFeatureToggleName} from '../featureToggles/startupFeatureToggles';
+import {createDeterministicWallClock} from '../clock/deterministicWallClock';
+import {reliableWebsocketConnectionFeatureToggleName} from '../featureToggles/startupFeatureToggleNames';
 import {MainViewModel} from '../view_model/MainViewModel';
-import {RootContext, RootContextValue, RootProvider, useMainViewModel} from './RootProvider';
+import {
+  RootContext,
+  RootContextValue,
+  RootProvider,
+  useApplicationContext,
+  useMainViewModel,
+} from './RootProvider';
 
 interface WrapperProperties {
   children: ReactNode;
@@ -31,26 +39,42 @@ interface WrapperProperties {
 
 interface RootProviderWrapper {
   wrapper: (properties: WrapperProperties) => ReactNode;
-  fakeWallClock: ReturnType<typeof createFakeWallClock>;
+  isFeatureToggleEnabled: jest.Mock<boolean, [StartupFeatureToggleName]>;
+  deterministicWallClock: ReturnType<typeof createDeterministicWallClock>;
 }
 
 function createRootProviderWrapper(
   mainViewModel: MainViewModel,
   wallClockTimestampInMilliseconds: number,
+  doesApplicationNeedForceReload: boolean,
 ): RootProviderWrapper {
-  const fakeWallClock = createFakeWallClock({
+  const deterministicWallClock = createDeterministicWallClock({
     initialCurrentTimestampInMilliseconds: wallClockTimestampInMilliseconds,
   });
+  function isFeatureToggleEnabledForTest(featureName: StartupFeatureToggleName): boolean {
+    return featureName === reliableWebsocketConnectionFeatureToggleName;
+  }
+
+  const isFeatureToggleEnabled = jest.fn(isFeatureToggleEnabledForTest);
 
   function wrapper(properties: WrapperProperties): ReactNode {
     const wrappedChildren = (
-      <RootProvider value={{mainViewModel, wallClock: fakeWallClock}}>{properties.children}</RootProvider>
+      <RootProvider
+        value={{
+          mainViewModel,
+          wallClock: deterministicWallClock,
+          doesApplicationNeedForceReload,
+          isFeatureToggleEnabled,
+        }}
+      >
+        {properties.children}
+      </RootProvider>
     );
 
     return wrappedChildren;
   }
 
-  return {wrapper, fakeWallClock};
+  return {wrapper, deterministicWallClock, isFeatureToggleEnabled};
 }
 
 function getRootContextValue(): RootContextValue | null {
@@ -63,21 +87,47 @@ describe('RootProvider', () => {
   const mainViewModel = {} as MainViewModel;
 
   it('provides the injected wall clock through context', () => {
-    const {wrapper, fakeWallClock} = createRootProviderWrapper(mainViewModel, 1_234);
+    const {wrapper, deterministicWallClock} = createRootProviderWrapper(mainViewModel, 1_234, false);
 
     const {result} = renderHook(getRootContextValue, {wrapper});
 
     expect(result.current?.mainViewModel).toBe(mainViewModel);
-    expect(result.current?.wallClock).toBe(fakeWallClock);
+    expect(result.current?.wallClock).toBe(deterministicWallClock);
     expect(result.current?.wallClock.currentTimestampInMilliseconds).toBe(1_234);
+    expect(result.current?.doesApplicationNeedForceReload).toBe(false);
   });
 
   it('provides the main view model through useMainViewModel()', () => {
-    const {wrapper, fakeWallClock} = createRootProviderWrapper(mainViewModel, 8_765);
+    const {wrapper, deterministicWallClock} = createRootProviderWrapper(mainViewModel, 8_765, false);
 
     const {result} = renderHook(useMainViewModel, {wrapper});
 
     expect(result.current).toBe(mainViewModel);
-    expect(fakeWallClock.currentTimestampInMilliseconds).toBe(8_765);
+    expect(deterministicWallClock.currentTimestampInMilliseconds).toBe(8_765);
+  });
+
+  it('provides force reload status through RootContext', () => {
+    const {wrapper} = createRootProviderWrapper(mainViewModel, 5_555, true);
+
+    const {result} = renderHook(getRootContextValue, {wrapper});
+
+    expect(result.current?.doesApplicationNeedForceReload).toBe(true);
+  });
+
+  it('provides force reload status through useApplicationContext()', () => {
+    const {wrapper} = createRootProviderWrapper(mainViewModel, 9_999, true);
+
+    const {result} = renderHook(useApplicationContext, {wrapper});
+
+    expect(result.current.doesApplicationNeedForceReload).toBe(true);
+  });
+
+  it('provides startup feature toggle helper through useApplicationContext()', function () {
+    const {wrapper, isFeatureToggleEnabled} = createRootProviderWrapper(mainViewModel, 9_999, true);
+
+    const {result} = renderHook(useApplicationContext, {wrapper});
+
+    expect(result.current.isFeatureToggleEnabled(reliableWebsocketConnectionFeatureToggleName)).toBe(true);
+    expect(isFeatureToggleEnabled).toHaveBeenCalledWith(reliableWebsocketConnectionFeatureToggleName);
   });
 });

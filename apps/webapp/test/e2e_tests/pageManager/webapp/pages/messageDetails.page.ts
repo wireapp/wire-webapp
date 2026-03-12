@@ -23,13 +23,11 @@ import {Locator, Page} from '@playwright/test';
  * POM for the right sidebar shown when opening the details of a message sent in a group conversation
  */
 export class MessageDetailsPage {
-  readonly page: Page;
   readonly component: Locator;
 
   readonly timeEdited: Locator;
 
   constructor(page: Page) {
-    this.page = page;
     this.component = page.locator('#message-details');
 
     this.timeEdited = this.component.getByTestId('status-message-details-edited');

@@ -102,7 +102,7 @@ test.fixme(
     await test.step('Team admin remove member', async () => {
       const {pages, modals} = ownerPageManager.webapp;
       await pages.conversation().removeAdminFromGroup(member.fullName);
-      await modals.removeMember().clickConfirm();
+      await modals.confirm().actionButton.click();
       await pages.conversation().toggleGroupInformation();
     });
 

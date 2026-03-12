@@ -22,7 +22,7 @@ import {Page, Locator} from '@playwright/test';
 import {FullScreenCallPage} from './fullScreenCall.page';
 
 export class CallingPage {
-  readonly page: Page;
+  private readonly page: Page;
 
   // Core call UI elements
   readonly callCell: Locator;
@@ -36,6 +36,7 @@ export class CallingPage {
   readonly leaveCallButton: Locator;
 
   // Participant and self state
+  readonly gridTiles: Locator;
   readonly fullScreenMuteButton: Locator;
   readonly fullScreenGridTileMuteIcon: Locator;
   readonly selfVideoThumbnail: Locator;
@@ -50,6 +51,8 @@ export class CallingPage {
     this.goFullScreen = page.locator('[data-uie-name="do-maximize-call"]');
     this.acceptCallButton = this.callCell.getByRole('button', {name: 'Accept'});
     this.leaveCallButton = this.callCell.getByRole('button', {name: 'Hang Up'});
+
+    this.gridTiles = this.page.getByTestId('item-grid');
 
     // Mute / Unmute control
     this.fullScreenMuteButton = page.locator('[data-uie-name="do-call-controls-video-call-mute"]');
@@ -115,11 +118,6 @@ export class CallingPage {
 
   // ─── Mute Controls ──────────────────────────────────────────────────────
 
-  async isSelfUserMutedInFullScreen(): Promise<boolean> {
-    const state = await this.fullScreenMuteButton.getAttribute('data-uie-value');
-    return state === 'active';
-  }
-
   async muteSelfInFullScreen() {
     return await this.fullScreenMuteButton.click();
   }
@@ -132,32 +130,12 @@ export class CallingPage {
     return this.fullScreenMuteButton.isVisible();
   }
 
-  // ─── Participant Verification ───────────────────────────────────────────
+  getGridTile(name: string) {
+    const tile = this.gridTiles.filter({hasText: name});
 
-  async waitForParticipantNameToBeVisible(userId?: string): Promise<void> {
-    if (!userId) {
-      throw new Error('User ID is required to verify participant visibility.');
-    }
-
-    await this.page
-      .getByTestId('call-participant-name')
-      .and(this.page.locator(`[data-uie-value="${userId}"]`))
-      .waitFor({state: 'visible', timeout: 20_000});
-  }
-
-  // ─── Mute State for Other Users ─────────────────────────────────────────
-
-  waitForGridTileMuteIconToBeVisibleForUser(userId: string): Promise<void> {
-    return this.page
-      .getByTestId('mic-icon-off')
-      .and(this.page.locator(`[data-uie-value="${userId}"]`))
-      .waitFor({state: 'visible'});
-  }
-
-  isGridTileMuteIconVisibleForUser(userId: string): Promise<boolean> {
-    return this.page
-      .getByTestId('mic-icon-off')
-      .and(this.page.locator(`[data-uie-value="${userId}"]`))
-      .isVisible();
+    return Object.assign(tile, {
+      /** Icon indicating that the given user is muted */
+      muteIcon: tile.getByTestId('mic-icon-off'),
+    });
   }
 }

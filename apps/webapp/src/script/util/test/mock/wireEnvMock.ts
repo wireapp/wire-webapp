@@ -29,6 +29,7 @@ const wire: WireModule = {
     FEATURE: {},
     URL: {SUPPORT: {}},
     NEW_PASSWORD_MINIMUM_LENGTH: 8,
+    VERSION: '0.0.0-test',
   } as ClientConfig,
 };
 

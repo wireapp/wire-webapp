@@ -17,6 +17,8 @@
  *
  */
 
+import {FunctionComponent} from 'react';
+
 import * as Icon from 'Components/Icon';
 import {useMediaDevicesStore} from 'Repositories/media/useMediaDevicesStore';
 import {t} from 'Util/LocalizerUtil';
@@ -25,18 +27,35 @@ import {DeviceSelect} from './DeviceSelect';
 
 import {PreferencesSection} from '../components/PreferencesSection';
 
-const AudioOutPreferences = () => {
+interface AudioOutPreferencesProps {
+  refreshCallOutputSpeaker: () => void;
+  hasActiveCall: boolean;
+}
+
+const AudioOutPreferences: FunctionComponent<AudioOutPreferencesProps> = ({
+  refreshCallOutputSpeaker,
+  hasActiveCall,
+}: AudioOutPreferencesProps) => {
   const {audioOutputDeviceId, setAudioOutputDeviceId, audioOutputDevices} = useMediaDevicesStore(state => ({
     audioOutputDeviceId: state.audio.output.selectedId,
     setAudioOutputDeviceId: state.setAudioOutputDeviceId,
     audioOutputDevices: state.audio.output.devices,
   }));
 
+  const handleChange = (deviceId: string): void => {
+    if (deviceId !== audioOutputDeviceId) {
+      setAudioOutputDeviceId(deviceId);
+      if (hasActiveCall) {
+        refreshCallOutputSpeaker();
+      }
+    }
+  };
+
   return (
     <PreferencesSection title={t('preferencesAVSpeakers')}>
       <DeviceSelect
         uieName="enter-speaker"
-        onChange={deviceId => setAudioOutputDeviceId(deviceId)}
+        onChange={handleChange}
         devices={audioOutputDevices}
         value={audioOutputDeviceId}
         icon={Icon.SpeakerIcon}

@@ -17,7 +17,6 @@
  *
  */
 
-import {User} from 'test/e2e_tests/data/user';
 import {PageManager} from 'test/e2e_tests/pageManager';
 import {getVideoFilePath, getAudioFilePath, getTextFilePath, isAssetDownloaded} from 'test/e2e_tests/utils/asset.util';
 import {getImageFilePath, getLocalQRCodeValue, getQRCodeValueFromScreenshot} from 'test/e2e_tests/utils/sendImage.util';
@@ -32,28 +31,15 @@ const textFilePath = getTextFilePath();
 const selfDestructMessageText = 'This message will self-destruct in 10 seconds.';
 
 test('Messages in 1:1', {tag: ['@TC-8750', '@crit-flow-web']}, async ({createTeam, createPage}) => {
-  let memberA: User;
-  let memberB: User;
-  let memberAPageManager: PageManager;
-  let memberBPageManager: PageManager;
+  // Precondition: Users A and B exist in two separate teams
+  const [{owner: memberA}, {owner: memberB}] = await Promise.all([createTeam('Critical A'), createTeam('Critical B')]);
 
-  // Step 1: Preconditions
-  await test.step('Preconditions: Creating preconditions for the test via API', async () => {
-    // Precondition: Users A and B exist in two separate teams
-    const teamA = await createTeam('Critical A');
-    memberA = teamA.owner;
-
-    const teamB = await createTeam('Critical B');
-    memberB = teamB.owner;
-
-    // Create page managers - User A sends connection request to User B
-    const [pmA, pmB] = await Promise.all([
-      PageManager.from(createPage(withLogin(memberA), withConnectionRequest(memberB))),
-      PageManager.from(createPage(withLogin(memberB))),
-    ]);
-    memberAPageManager = pmA;
-    memberBPageManager = pmB;
-  });
+  // Create page managers - User A sends connection request to User B
+  const [memberAPage, memberBPage] = await Promise.all([
+    createPage(withLogin(memberA), withConnectionRequest(memberB)),
+    createPage(withLogin(memberB)),
+  ]);
+  const [memberAPageManager, memberBPageManager] = [PageManager.from(memberAPage), PageManager.from(memberBPage)];
 
   // Step 1-1: Preconditions
   await test.step('User B accepts connection request from User A', async () => {
@@ -152,7 +138,7 @@ test('Messages in 1:1', {tag: ['@TC-8750', '@crit-flow-web']}, async ({createTea
 
   // Step 7: Message removal
   await test.step('Wait 11 seconds', async () => {
-    await memberBPageManager.webapp.pages.conversation().page.waitForTimeout(11_000);
+    await memberBPage.waitForTimeout(11_000);
   });
   await test.step('Both users see the message as removed', async () => {
     const {pages, components} = memberAPageManager.webapp;

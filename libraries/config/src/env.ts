@@ -110,11 +110,6 @@ export type Env = {
   /** Feature toggle for account registration. Can be set to true or false */
   FEATURE_ENABLE_ACCOUNT_REGISTRATION: string;
 
-  /** Feature toggle for account registration whether the user is promped to accept terms of use only
-   * or terms of use *and* privacy policy at once. Can be set to true or false. Defaults to false.
-   */
-  FEATURE_ENABLE_ACCOUNT_REGISTRATION_ACCEPT_TERMS_AND_PRIVACY_POLICY: string;
-
   /** Feature toggle for advanced filters */
   FEATURE_ENABLE_ADVANCED_FILTERS: string;
 

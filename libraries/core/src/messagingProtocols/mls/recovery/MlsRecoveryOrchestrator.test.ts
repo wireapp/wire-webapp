@@ -99,6 +99,22 @@ describe('MlsRecoveryOrchestrator', () => {
     expect(res).toBeUndefined();
   });
 
+  it('uses JoinViaExternalCommit without re-run for establishGroup when conversation already exists', async () => {
+    const deps = baseDeps();
+    const mapper = makeMapperReturning({type: 'ConversationAlreadyExists'} as DomainMlsError);
+    const orch = new MlsRecoveryOrchestratorImpl(mapper, minimalDefaultPolicies, deps);
+
+    const cb = jest.fn().mockRejectedValue(new Error('exists'));
+    const res = await orch.execute({
+      context: {operationName: OperationName.establishGroup, qualifiedConversationId: qid()},
+      callBack: cb,
+    });
+
+    expect(deps.joinViaExternalCommit).toHaveBeenCalledWith(qid());
+    expect(cb).toHaveBeenCalledTimes(1);
+    expect(res).toBeUndefined();
+  });
+
   it('wipes group using context groupId when ConversationAlreadyExists and retries once', async () => {
     const deps = baseDeps();
     const mapper = makeMapperReturning({type: 'ConversationAlreadyExists'} as DomainMlsError);
@@ -175,6 +191,23 @@ describe('MlsRecoveryOrchestrator', () => {
     const cb = jest.fn().mockRejectedValueOnce('oops').mockResolvedValueOnce('ok');
     const res = await orch.execute({
       context: {operationName: OperationName.send, qualifiedConversationId: qid(), groupId: 'gid'},
+      callBack: cb,
+    });
+
+    expect(deps.addMissingUsers).toHaveBeenCalledWith(qid(), 'gid', missing);
+    expect(cb).toHaveBeenCalledTimes(2);
+    expect(res).toBe('ok');
+  });
+
+  it('calls AddMissingUsers and retries for establishGroup GroupOutOfSync', async () => {
+    const deps = baseDeps();
+    const missing = [qid('u1'), qid('u2')];
+    const mapper = makeMapperReturning({type: 'GroupOutOfSync', context: {missingUsers: missing}} as DomainMlsError);
+    const orch = new MlsRecoveryOrchestratorImpl(mapper, minimalDefaultPolicies, deps);
+
+    const cb = jest.fn().mockRejectedValueOnce(new Error('out-of-sync')).mockResolvedValueOnce('ok');
+    const res = await orch.execute({
+      context: {operationName: OperationName.establishGroup, qualifiedConversationId: qid(), groupId: 'gid'},
       callBack: cb,
     });
 
@@ -299,5 +332,21 @@ describe('MlsRecoveryOrchestrator', () => {
     expect(deps.resetAndReestablish).toHaveBeenCalledWith(qid());
     expect(cbRemove).toHaveBeenCalledTimes(2);
     expect(resRemove).toBe('ok-remove');
+  });
+
+  it('ResetAndReestablish re-runs original for establishGroup operation', async () => {
+    const deps = baseDeps();
+    const mapper = makeMapperReturning({type: 'GroupNotEstablished'} as DomainMlsError);
+    const orch = new MlsRecoveryOrchestratorImpl(mapper, minimalDefaultPolicies, deps);
+
+    const cb = jest.fn().mockRejectedValueOnce(new Error('broken')).mockResolvedValueOnce('ok-establish');
+    const res = await orch.execute({
+      context: {operationName: OperationName.establishGroup, qualifiedConversationId: qid()},
+      callBack: cb,
+    });
+
+    expect(deps.resetAndReestablish).toHaveBeenCalledWith(qid());
+    expect(cb).toHaveBeenCalledTimes(2);
+    expect(res).toBe('ok-establish');
   });
 });

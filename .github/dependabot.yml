@@ -8,6 +8,8 @@ updates:
       day: sunday
       time: '16:00'
       timezone: 'Europe/Berlin'
+    cooldown:
+      default-days: 3
     open-pull-requests-limit: 99
     labels:
       - 'type: chore 🧹'
@@ -25,6 +27,8 @@ updates:
       interval: daily
       time: '16:00'
       timezone: 'Europe/Berlin'
+    cooldown:
+      default-days: 3
     open-pull-requests-limit: 99
     labels:
       - 'type: chore 🧹'
@@ -41,6 +45,8 @@ updates:
       day: sunday
       time: '16:00'
       timezone: 'Europe/Berlin'
+    cooldown:
+      default-days: 3
     open-pull-requests-limit: 99
     labels:
       - 'type: chore 🧹'
@@ -82,6 +88,8 @@ updates:
       day: sunday
       time: '16:00'
       timezone: 'Europe/Berlin'
+    cooldown:
+      default-days: 3
     open-pull-requests-limit: 99
     labels:
       - 'type: chore 🧹'
@@ -103,6 +111,8 @@ updates:
       day: sunday
       time: '16:00'
       timezone: 'Europe/Berlin'
+    cooldown:
+      default-days: 3
     open-pull-requests-limit: 99
     labels:
       - 'type: chore 🧹'
@@ -121,6 +131,8 @@ updates:
       day: sunday
       time: '16:00'
       timezone: 'Europe/Berlin'
+    cooldown:
+      default-days: 3
     open-pull-requests-limit: 99
     labels:
       - 'type: chore 🧹'
@@ -137,6 +149,10 @@ updates:
     open-pull-requests-limit: 99
     schedule:
       interval: 'daily'
+      time: '16:00'
+      timezone: 'Europe/Berlin'
+    labels:
+      - 'type: chore 🧹'
   # Docker
   - package-ecosystem: 'docker'
     directory: '/'

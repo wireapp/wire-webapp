@@ -39,7 +39,11 @@ Prerequisites:
 ## 1. Install Dependencies & Fetch Configuration
 
 1. Run `yarn` (uses Yarn 4 workspaces)
-   - This will install all dependencies and fetch a [configuration](https://github.com/wireapp/wire-web-config-wire/) for the application into `apps/webapp/resource/`
+   - This will install all dependencies and run `webapp:configure` (via root `postinstall`).
+   - `webapp:configure` uses `apps/webapp/app-config/package.json` to select a config repository version (`wire-web-config-wire` or `wire-web-config-default`), then copies:
+     - config content into `apps/webapp/resource/`
+     - `.env.defaults` into repository root
+   - Runtime priority is: process environment (for example AWS) > `.env` > `.env.defaults` > code fallback.
 
 ## 2. Build & Run
 
@@ -63,6 +67,8 @@ If you would like your browser to trust the certificate from "local.wire.com"/"l
 #### Environment Configuration
 
 The application can be configured to connect to different environments by modifying the following environment variables in your `.env` file:
+
+For the full environment variable reference, see [Environment Variables](https://github.com/wireapp/wire-webapp/blob/dev/libraries/config/README.md#environment-variables).
 
 **Staging:**
 

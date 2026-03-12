@@ -94,6 +94,17 @@ describe('APIClient', () => {
       expect(client.transport.http['client'].defaults.baseURL).toBe(APIClient.BACKEND.PRODUCTION.rest);
       expect(client.transport.ws['baseUrl']).toBe(APIClient.BACKEND.PRODUCTION.ws);
     });
+
+    it('passes the incremental retry backoff constructor configuration to the http client', () => {
+      const client = new APIClient({
+        ...testConfig,
+        shouldUseIncrementalRetryBackoff: true,
+      });
+
+      apiClients.push(client);
+
+      expect(client.transport.http['shouldUseIncrementalRetryBackoff']).toBe(true);
+    });
   });
 
   describe('useVersion', () => {

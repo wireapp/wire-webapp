@@ -87,7 +87,7 @@ test.describe('Notifications', () => {
       await pages.conversationList().setNotifications('Nothing');
 
       const conversation = pages.conversationList().getConversationLocator(userB.fullName);
-      await expect(conversation.getByTitle('Muted conversation')).toBeVisible();
+      await expect(conversation.mutedIndicator).toBeVisible();
     },
   );
 
@@ -101,12 +101,12 @@ test.describe('Notifications', () => {
       await pages.conversationList().setNotifications('Nothing');
 
       const conversation = pages.conversationList().getConversationLocator(userB.fullName);
-      await expect(conversation.getByTitle('Muted conversation')).toBeVisible();
+      await expect(conversation.mutedIndicator).toBeVisible();
 
       await pages.conversationList().clickConversationOptions(userB.fullName);
       await pages.conversationList().setNotifications('Everything');
 
-      await expect(conversation.getByTitle('Muted conversation')).not.toBeVisible();
+      await expect(conversation.mutedIndicator).not.toBeVisible();
     },
   );
 

@@ -27,7 +27,6 @@ import {$createTextNode, TextNode} from 'lexical';
 import * as ReactDOM from 'react-dom';
 
 import {StorageKey} from 'Repositories/storage';
-import {extractEmojiDataEntries} from 'Util/EmojiDataSource';
 import {loadValue, storeValue} from 'Util/StorageUtil';
 import {sortByPriority} from 'Util/StringUtil';
 
@@ -92,9 +91,9 @@ type Props = {
   openStateRef: MutableRefObject<boolean>;
 };
 
-const emojiEntries = extractEmojiDataEntries(emojiList);
+const emojies: {n: string[]; u: string}[] = Object.values(emojiList).flat();
 
-const emojiOptions = emojiEntries.map(({n: aliases, u: codepoint}) => {
+const emojiOptions = emojies.map(({n: aliases, u: codepoint}) => {
   const codepoints = codepoint.split('-').map(code => parseInt(code, 16));
   return new EmojiOption(aliases[0], String.fromCodePoint(...codepoints), {
     keywords: aliases,
