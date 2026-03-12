@@ -21,6 +21,7 @@ import {getUser, User} from 'test/e2e_tests/data/user';
 import {PageManager} from 'test/e2e_tests/pageManager';
 import {test, withLogin, expect} from 'test/e2e_tests/test.fixtures';
 import {loginUser} from '../../utils/userActions';
+import deTranslations from 'I18n/de-DE.json';
 
 test.describe('Localization', () => {
   test.use({locale: 'de-DE'});
@@ -110,13 +111,13 @@ test.describe('Localization', () => {
 
       // Connect users manually due to the current locators don't work in german browser
       await components.conversationSidebar().connectButton.click();
-      await pages.startUI().component.getByPlaceholder('Personen suchen').fill(userB.fullName);
+      await pages.startUI().component.getByPlaceholder(deTranslations['searchPeopleOnlyPlaceholder']).fill(userB.fullName);
       await pages.startUI().component.getByRole('button', {name: userB.fullName}).click();
       await modals.userProfile().startConversationButton.click();
 
       await pages.conversationList().openConversation(userB.fullName);
       const messagePlaceholder = page.locator('[data-uie-name="input-placeholder"]');
-      await expect(messagePlaceholder).toHaveText('Eine Nachricht schreiben');
+      await expect(messagePlaceholder).toHaveText(deTranslations['tooltipConversationInputPlaceholder']);
 
       await components.conversationSidebar().allConverationsButton.click();
       await pages.conversationList().clickConversationOptions(userB.fullName);
@@ -127,11 +128,11 @@ test.describe('Localization', () => {
         .poll(async () => await menuList.allInnerTexts())
         .toEqual(
           expect.arrayContaining([
-            'Benachrichtigungen', //notifications button
-            'Zu Favoriten hinzufügen', //favorite button
-            'Verschieben nach', //move to button
-            'Archivieren', //archive button
-            'Unterhaltungsverlauf löschen', //clear content button
+            deTranslations['conversationDetailsActionNotifications'], // notifications button
+            deTranslations['conversationPopoverFavorite'], // favorite button
+            deTranslations['conversationsPopoverMoveTo'], // move to button
+            deTranslations['conversationDetailsActionArchive'], // archive button
+            deTranslations['conversationDetailsActionClear'], // clear content button
           ]),
         );
     });
@@ -166,9 +167,7 @@ test.describe('Localization', () => {
 
     await components.conversationSidebar().clickPreferencesButton();
     await pages.account().clickLogoutButton();
-    await modals
-      .confirmLogout()
-      .modal.getByText('Ihre persönlichen Daten und Unterhaltungen vollständig von diesem Gerät entfernen.').click();
+    await modals.confirmLogout().modal.getByText(deTranslations['modalAccountLogoutOption']).click();
     await modals.confirmLogout().clickConfirm();
 
     await loginUser(userB, pageManager);
