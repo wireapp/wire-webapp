@@ -192,19 +192,19 @@ describe('renderMessage', () => {
 
   it('renders a wire deeplink from markdown notation', () => {
     expect(renderMessage('[my friend](wire://user/51052526-ee3f-434a-a296-f3545ee929fc)')).toBe(
-      '<a href="wire://user/51052526-ee3f-434a-a296-f3545ee929fc" target="_blank" rel="nofollow noopener noreferrer" data-uie-name="wire-deep-link">my friend</a>',
+      '<a href="wire://user/51052526-ee3f-434a-a296-f3545ee929fc" rel="nofollow noopener noreferrer" data-uie-name="wire-deep-link">my friend</a>',
     );
   });
 
   it('renders a wire deeplink with config url', () => {
     expect(renderMessage('wire://access/?config=https://test.com/deeplink.json')).toBe(
-      '<a href="wire://access/?config=https://test.com/deeplink.json" target="_blank" rel="nofollow noopener noreferrer" data-uie-name="wire-deep-link">wire://access/?config=https://test.com/deeplink.json</a>',
+      '<a href="wire://access/?config=https://test.com/deeplink.json" rel="nofollow noopener noreferrer" data-uie-name="wire-deep-link">wire://access/?config=https://test.com/deeplink.json</a>',
     );
   });
 
   it('renders a wire deeplink with config url with alias', () => {
     expect(renderMessage('[deeplink](wire://access/?config=https://test.com/deeplink.json)')).toBe(
-      '<a href="wire://access/?config=https://test.com/deeplink.json" target="_blank" rel="nofollow noopener noreferrer" data-uie-name="wire-deep-link">deeplink</a>',
+      '<a href="wire://access/?config=https://test.com/deeplink.json" rel="nofollow noopener noreferrer" data-uie-name="wire-deep-link">deeplink</a>',
     );
   });
 
