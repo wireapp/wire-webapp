@@ -147,13 +147,9 @@ test.describe('Localization', () => {
 
     const user = getUser();
 
-    await pages.registration().nameInput.fill(user.fullName);
-    await pages.registration().emailInput.fill(user.email);
-    await pages.registration().passwordInput.fill(user.password);
-    await pages.registration().confirmPasswordInput.fill(user.password);
+    await pages.registration().fillInUserInfo(user);
 
-    // Click the top-left corner of the label to toggle the checkbox and avoid clicking the embedded "Terms of Service" link.
-    await pages.registration().termsLabel.click({position: {x: 5, y: 5}});
+    await pages.registration().termsCheckbox.dispatchEvent('click');
     await pages.registration().submitButton.click();
 
     await expect
