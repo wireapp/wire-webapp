@@ -21,7 +21,13 @@ import {User} from 'test/e2e_tests/data/user';
 import {PageManager} from 'test/e2e_tests/pageManager';
 
 import {test, expect, withConnectedUser, withLogin, Team} from 'test/e2e_tests/test.fixtures';
-import {getTextFilePath, readLocalFile, TextFileName} from 'test/e2e_tests/utils/asset.util';
+import {
+  getAudioFilePath,
+  getTextFilePath,
+  readLocalFile,
+  shareAssetHelper,
+  TextFileName,
+} from 'test/e2e_tests/utils/asset.util';
 import {Page} from 'playwright/test';
 import {getImageFilePath, ImageQRCodeFileName} from 'test/e2e_tests/utils/sendImage.util';
 
@@ -65,6 +71,23 @@ test.describe('Sending Assents', () => {
     userB = await createUser();
     team = await createTeam('Test Team', {users: [userB]});
     userA = team.owner;
+  });
+
+  test('Verify you can delete an audio message', {tag: ['@TC-111', '@regression']}, async ({createPage}) => {
+    const [userBPage] = await Promise.all([
+      createPage(withLogin(userB), withConnectedUser(userA)),
+      createPage(withLogin(userA)),
+    ]);
+
+    const {pages} = PageManager.from(userBPage).webapp;
+
+    await pages.conversationList().openConversation(userA.fullName, {protocol: 'mls'});
+    await shareAssetHelper(getAudioFilePath(), userBPage, userBPage.getByRole('button', {name: 'Add file'}));
+
+    const message = pages.conversation().getMessage({sender: userB});
+    await expect(message).toBeVisible();
+    await pages.conversation().deleteMessage(message, 'Everyone');
+    await expect(message).not.toBeVisible();
   });
 
   test('I want to drag & drop a file into a conversation', {tag: ['@TC-497', '@regression']}, async ({createPage}) => {
