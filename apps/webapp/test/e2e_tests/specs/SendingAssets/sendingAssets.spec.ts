@@ -208,6 +208,61 @@ test.describe('Sending Assets', () => {
     await expect(userBPages.conversation().messageInput).toContainText('Message to copy');
   });
 
+  [
+    {
+      tag: ['@TC-764', '@regression'],
+      conversationType: '1on1',
+    } as const,
+    {
+      tag: ['@TC-765', '@regression'],
+      conversationType: 'group',
+    } as const,
+  ].forEach(({tag, conversationType}) => {
+    test(
+      `Verify file can be uploaded and re-downloaded by sender himself in ${conversationType}`,
+      {tag: [`${tag}`, '@regression']},
+      async ({createPage}) => {
+        const [userAPage] = await Promise.all([
+          createPage(withLogin(userA), withConnectedUser(userB)),
+          createPage(withLogin(userB)),
+        ]);
+
+        const sourcePath = getTextFilePath();
+        const {name: fileName, ext: extension, base: fileBase} = path.parse(sourcePath);
+        const {size: expectedSize} = await fs.stat(sourcePath);
+
+        const {pages} = PageManager.from(userAPage).webapp;
+
+        await test.step('User A opens the conversation', async () => {
+          if (conversationType === '1on1') {
+            await pages.conversationList().openConversation(userB.fullName, {protocol: 'mls'});
+          } else {
+            await createGroup(pages, 'Test Group', [userB]);
+            await pages.conversationList().openConversation('Test Group');
+          }
+        });
+
+        await test.step('User A sends an appropriate file', async () => {
+          await shareAssetHelper(getTextFilePath(), userAPage, userAPage.getByRole('button', {name: 'Add file'}));
+          const message = pages.conversation().getMessage({sender: userA})
+          await expect(message).toContainText(fileName);
+          await expect(message).toContainText(extension.slice(1));
+          await expect(message).toContainText(expectedSize.toString());
+        });
+
+        await test.step('User A re-downloads file from the conversation', async () => {
+          const downloadedPath = await pages.conversation().downloadFile();
+          const {size: actualSize} = await fs.stat(downloadedPath);
+          const {ext: downloadedExtension, base: downloadedName} = path.parse(downloadedPath);
+
+          expect(downloadedName).toBe(fileBase);
+          expect(downloadedExtension).toBe(extension);
+          expect(actualSize).toBe(expectedSize);
+        });
+      },
+    );
+  });
+
   test('Verify warning is shown if file size is too big', {tag: ['@TC-767', '@regression']}, async ({createPage}) => {
     const page = await createPage(withLogin(userA), withConnectedUser(userB));
     const {pages, modals} = PageManager.from(page).webapp;
