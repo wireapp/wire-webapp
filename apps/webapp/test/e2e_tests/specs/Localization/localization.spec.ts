@@ -105,7 +105,8 @@ test.describe('Localization', () => {
     'Verify conversation view and list has German-localized strings',
     {tag: ['@TC-1275', '@regression']},
     async ({createPage}) => {
-      const {pages, modals, components} = PageManager.from(await createPage(withLogin(userA))).webapp;
+      const page = await createPage(withLogin(userA));
+      const {pages, modals, components} = PageManager.from(page).webapp;
 
       // Connect users manually due to the current locators don't work in german browser
       await components.conversationSidebar().connectButton.click();
@@ -114,13 +115,13 @@ test.describe('Localization', () => {
       await modals.userProfile().startConversationButton.click();
 
       await pages.conversationList().openConversation(userB.fullName);
-      const messagePlaceholder = pages.conversation().page.locator('[data-uie-name="input-placeholder"]');
+      const messagePlaceholder = page.locator('[data-uie-name="input-placeholder"]');
       await expect(messagePlaceholder).toHaveText('Eine Nachricht schreiben');
 
       await components.conversationSidebar().allConverationsButton.click();
       await pages.conversationList().clickConversationOptions(userB.fullName);
 
-      const menuList = pages.conversationList().page.getByTestId('conversation-list-options-menu');
+      const menuList = page.getByTestId('conversation-list-options-menu');
 
       await expect
         .poll(async () => await menuList.allInnerTexts())
