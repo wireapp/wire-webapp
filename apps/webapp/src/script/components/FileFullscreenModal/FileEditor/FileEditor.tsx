@@ -20,14 +20,17 @@
 import {useCallback, useEffect, useRef, useState} from 'react';
 
 import {Node} from '@wireapp/api-client/lib/cells';
+import {Maybe, result} from 'true-myth';
 import {container} from 'tsyringe';
 
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {CellsRepository} from 'Repositories/cells/CellsRepository';
+import {Config} from 'src/script/Config';
 import {t} from 'Util/LocalizerUtil';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 
 import * as styles from './FileEditor.styles';
+import {validateCollaboraUrl} from './validateCollaboraUrl';
 
 import {FileLoader} from '../FileLoader/FileLoader';
 
@@ -122,10 +125,21 @@ export const FileEditor = ({id}: FileEditorProps) => {
     return <FileLoader />;
   }
 
-  const editorUrl = node?.EditorURLs?.collabora?.Url;
-  if (!editorUrl) {
+  const urlValidation = validateCollaboraUrl(
+    Maybe.of(node?.EditorURLs?.collabora?.Url),
+    Config.getConfig().CELLS_PYDIO_URL,
+  );
+
+  if (result.isErr(urlValidation)) {
     return null;
   }
 
-  return <iframe css={styles.editorIframe} src={editorUrl} title={t('fileFullscreenModal.editor.iframeTitle')} />;
+  return (
+    <iframe
+      allow="clipboard-read; clipboard-write"
+      css={styles.editorIframe}
+      src={urlValidation.value}
+      title={t('fileFullscreenModal.editor.iframeTitle')}
+    />
+  );
 };
