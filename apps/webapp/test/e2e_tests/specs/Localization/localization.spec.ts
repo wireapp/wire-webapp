@@ -22,6 +22,7 @@ import {PageManager} from 'test/e2e_tests/pageManager';
 import {test, withLogin, expect} from 'test/e2e_tests/test.fixtures';
 import {loginUser} from '../../utils/userActions';
 import deTranslations from 'I18n/de-DE.json';
+import enTranslations from 'I18n/en-US.json';
 
 test.describe('Localization', () => {
   test.use({locale: 'de-DE'});
@@ -43,9 +44,15 @@ test.describe('Localization', () => {
 
     await dePageManager.openSSOPage();
 
-    await expect(dePages.singleSignOn().header).toHaveText('Willkommen bei Wire!');
-    await expect(dePages.singleSignOn().ssoCodeEmailInput).toHaveAttribute('placeholder', 'E-Mail-Adresse oder SSO-Code');
-    await expect(dePages.singleSignOn().ssoSignInButton).toHaveText('Anmelden');
+    const welcomeTextDE = deTranslations['index.welcome'].replace('{brandName}', 'Wire');
+    await expect(dePages.singleSignOn().header).toHaveText(welcomeTextDE);
+    await expect(dePages.singleSignOn().ssoCodeEmailInput).toHaveAttribute(
+      'placeholder',
+      deTranslations['ssoLogin.codeOrMailInputPlaceholder'],
+    );
+    await expect(dePages.singleSignOn().ssoSignInButton).toHaveText(
+      deTranslations['authAccountSignIn'],
+    );
 
     // Localization checks for ENGLISH browser
     const enContext = await browser.newContext({locale: 'en-US'});
@@ -55,9 +62,13 @@ test.describe('Localization', () => {
 
     await enPageManager.openSSOPage();
 
-    await expect(enPages.singleSignOn().header).toHaveText('Welcome to Wire!');
-    await expect(enPages.singleSignOn().ssoCodeEmailInput).toHaveAttribute('placeholder', 'Email or SSO code');
-    await expect(enPages.singleSignOn().ssoSignInButton).toHaveText('Log in');
+    const welcomeTextEN = enTranslations['index.welcome'].replace('{brandName}', 'Wire');
+    await expect(enPages.singleSignOn().header).toHaveText(welcomeTextEN);
+    await expect(enPages.singleSignOn().ssoCodeEmailInput).toHaveAttribute(
+      'placeholder',
+      enTranslations['ssoLogin.codeOrMailInputPlaceholder'],
+    );
+    await expect(enPages.singleSignOn().ssoSignInButton).toHaveText(enTranslations['authAccountSignIn']);
   });
 
   test('Verify support pages are opened in language de', {tag: ['@TC-3456', '@regression']}, async ({createPage}) => {
@@ -83,11 +94,19 @@ test.describe('Localization', () => {
       const {pages} = pageManager.webapp;
       await pageManager.openRegistrationPage();
 
-      await expect(pages.registration().nameInput).toHaveAttribute('placeholder', 'Name eingeben');
-      await expect(pages.registration().emailInput).toHaveAttribute('placeholder', 'E-Mail-Adresse eingeben');
-      await expect(pages.registration().passwordInput).toHaveAttribute('placeholder', 'Passwort eingeben');
-      await expect(pages.registration().termsLabel).toContainText('Ich akzeptiere Wires');
-      await expect(pages.registration().header).toHaveText('Ein privates Benutzerkonto erstellen');
+      await expect(pages.registration().nameInput).toHaveAttribute('placeholder', deTranslations['accountForm.namePlaceholder']);
+      await expect(pages.registration().emailInput).toHaveAttribute(
+        'placeholder',
+        deTranslations['accountForm.emailPersonalPlaceholder'],
+      );
+      await expect(pages.registration().passwordInput).toHaveAttribute(
+        'placeholder',
+        deTranslations['accountForm.passwordPlaceholder'],
+      );
+
+      const termsText = deTranslations['accountForm.termsAndConditions'].replace('{termsAndConditionsLink}', deTranslations['accountForm.termsAndConditionsLink']);
+      await expect(pages.registration().termsLabel).toContainText(termsText);
+      await expect(pages.registration().header).toHaveText(deTranslations['createPersonalAccount.headLine']);
     },
   );
 
@@ -97,9 +116,10 @@ test.describe('Localization', () => {
     const {pages} = pageManager.webapp;
     await pageManager.openLoginPage();
 
-    await expect(pages.login().header).toHaveText('Willkommen bei Wire!');
-    await expect(pages.login().emailInput).toHaveAttribute('placeholder', 'E-Mail-Adresse oder Benutzername');
-    await expect(pages.login().signInButton).toHaveText('Anmelden');
+    const welcomeText = deTranslations['index.welcome'].replace('{brandName}', 'Wire');
+    await expect(pages.login().header).toHaveText(welcomeText);
+    await expect(pages.login().emailInput).toHaveAttribute('placeholder', deTranslations['login.emailPlaceholder']);
+    await expect(pages.login().signInButton).toHaveText(deTranslations['authAccountSignIn']);
   });
 
   test(
@@ -128,11 +148,11 @@ test.describe('Localization', () => {
         .poll(async () => await menuList.allInnerTexts())
         .toEqual(
           expect.arrayContaining([
-            deTranslations['conversationDetailsActionNotifications'], // notifications button
+            deTranslations['conversationsPopoverNotificationSettings'], // notifications button
             deTranslations['conversationPopoverFavorite'], // favorite button
             deTranslations['conversationsPopoverMoveTo'], // move to button
-            deTranslations['conversationDetailsActionArchive'], // archive button
-            deTranslations['conversationDetailsActionClear'], // clear content button
+            deTranslations['conversationsPopoverArchive'], // archive button
+            deTranslations['conversationsPopoverClear'], // clear content button
           ]),
         );
     });
