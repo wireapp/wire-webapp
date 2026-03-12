@@ -122,17 +122,17 @@ test.describe('Localization', () => {
 
       const menuList = pages.conversationList().page.getByTestId('conversation-list-options-menu');
 
-      // check for
-      //notifications button
-      await expect(menuList.first()).toHaveText('Benachrichtigungen');
-      //favorite button
-      await expect(menuList.nth(1)).toHaveText('Zu Favoriten hinzufügen');
-      //move to button
-      await expect(menuList.nth(2)).toHaveText('Verschieben nach');
-      //archive button
-      await expect(menuList.nth(3)).toHaveText('Archivieren');
-      //clear content button
-      await expect(menuList.nth(4)).toHaveText('Unterhaltungsverlauf löschen');
+      await expect
+        .poll(async () => await menuList.allInnerTexts())
+        .toEqual(
+          expect.arrayContaining([
+            'Benachrichtigungen', //notifications button
+            'Zu Favoriten hinzufügen', //favorite button
+            'Verschieben nach', //move to button
+            'Archivieren', //archive button
+            'Unterhaltungsverlauf löschen', //clear content button
+          ]),
+        );
     });
 
   test('Verify registration email is de', {tag: ['@TC-1277', '@regression']}, async ({createPage, api}) => {
