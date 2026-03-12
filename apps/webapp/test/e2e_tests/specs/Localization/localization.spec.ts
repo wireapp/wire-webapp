@@ -43,9 +43,9 @@ test.describe('Localization', () => {
 
     await dePageManager.openSSOPage();
 
-    await expect(dePages.landingWelcome().header).toHaveText('Willkommen bei Wire!');
-    await expect(dePages.landingWelcome().emailInput).toHaveAttribute('placeholder', 'E-Mail-Adresse oder SSO-Code');
-    await expect(dePages.landingWelcome().signInButton).toHaveText('Anmelden');
+    await expect(dePages.singleSignOn().header).toHaveText('Willkommen bei Wire!');
+    await expect(dePages.singleSignOn().ssoCodeEmailInput).toHaveAttribute('placeholder', 'E-Mail-Adresse oder SSO-Code');
+    await expect(dePages.singleSignOn().ssoSignInButton).toHaveText('Anmelden');
 
     // Localization checks for ENGLISH browser
     const enContext = await browser.newContext({locale: 'en-US'});
@@ -56,9 +56,9 @@ test.describe('Localization', () => {
 
     await enPageManager.openSSOPage();
 
-    await expect(enPages.landingWelcome().header).toHaveText('Welcome to Wire!');
-    await expect(enPages.landingWelcome().emailInput).toHaveAttribute('placeholder', 'Email or SSO code');
-    await expect(enPages.landingWelcome().signInButton).toHaveText('Log in');
+    await expect(enPages.singleSignOn().header).toHaveText('Welcome to Wire!');
+    await expect(enPages.singleSignOn().ssoCodeEmailInput).toHaveAttribute('placeholder', 'Email or SSO code');
+    await expect(enPages.singleSignOn().ssoSignInButton).toHaveText('Log in');
   });
 
   test('Verify support pages are opened in language de', {tag: ['@TC-3456', '@regression']}, async ({createPage}) => {
