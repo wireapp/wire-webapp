@@ -188,6 +188,26 @@ test.describe('Sending Assets', () => {
     },
   );
 
+  test('I want to copy message via message option menu', {tag: ['@TC-500', '@regression']}, async ({createPage}) => {
+    const [userBPages] = await Promise.all([
+      PageManager.from(createPage(withLogin(userB), withConnectedUser(userA))).then(pm => pm.webapp.pages),
+      createPage(withLogin(userA)),
+    ]);
+
+    await userBPages.conversationList().openConversation(userA.fullName, {protocol: 'mls'});
+    await userBPages.conversation().sendMessage('Message to copy');
+
+    const message = userBPages.conversation().getMessage({sender: userB});
+    await expect(message).toBeVisible();
+
+    const messageOptions = await userBPages.conversation().openMessageOptions(message);
+    await messageOptions.getByRole('button', {name: 'Copy'}).click();
+    const isMac = process.platform === 'darwin';
+
+    await userBPages.conversation().messageInput.press(isMac ? 'Meta+V' : 'Control+V');
+    await expect(userBPages.conversation().messageInput).toContainText('Message to copy');
+  });
+
   test('Verify warning is shown if file size is too big', {tag: ['@TC-767', '@regression']}, async ({createPage}) => {
     const page = await createPage(withLogin(userA), withConnectedUser(userB));
     const {pages, modals} = PageManager.from(page).webapp;
