@@ -64,7 +64,7 @@ test.describe('Localization', () => {
   test('Verify support pages are opened in language de', {tag: ['@TC-3456', '@regression']}, async ({createPage}) => {
     const mainPage = await createPage(withLogin(userA));
 
-    const {components: components} = (await PageManager.from(mainPage)).webapp;
+    const {components} = PageManager.from(mainPage).webapp;
 
     const [newPage] = await Promise.all([
       mainPage.waitForEvent('popup'),
