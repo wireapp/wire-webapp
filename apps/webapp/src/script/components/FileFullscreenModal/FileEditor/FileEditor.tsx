@@ -36,7 +36,6 @@ import {validateCollaboraUrl} from './validateCollaboraUrl';
 import {FileLoader} from '../FileLoader/FileLoader';
 
 const REFRESH_BUFFER_SECONDS = 10; // Refresh 10 seconds before expiry for safety
-const QA_FORCE_FILE_EDITOR_ERROR_KEY = 'qa-force-file-editor-error';
 
 interface FileEditorProps {
   id: string;
