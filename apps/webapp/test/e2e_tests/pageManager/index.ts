@@ -114,7 +114,7 @@ export class PageManager {
     await this.page.goto(`${webAppPath}auth/#/createaccount`);
   };
 
-  openWelcomePage = async () => {
+  openSSOPage = async () => {
     await this.page.goto(`${webAppPath}auth/#/sso`);
   };
 

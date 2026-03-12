@@ -19,7 +19,7 @@
 
 import {Locator, Page} from '@playwright/test';
 
-export class LandingwelcomePage {
+export class LandingWelcomePage {
   readonly page: Page;
 
   readonly header: Locator;
