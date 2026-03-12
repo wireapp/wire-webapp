@@ -242,6 +242,8 @@ export const renderMessage = (message: string, selfId?: QualifiedId, mentionEnti
     }
     if (isEmail) {
       link.attrPush(['data-email-link', 'true']);
+    } else if (isWireDeepLink) {
+      link.attrPush(['rel', 'nofollow noopener noreferrer']);
     } else {
       link.attrPush(['target', '_blank']);
       link.attrPush(['rel', 'nofollow noopener noreferrer']);
