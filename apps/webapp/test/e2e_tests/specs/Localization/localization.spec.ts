@@ -37,8 +37,7 @@ test.describe('Localization', () => {
 
   test('Verify welcome page is localized', {tag: ['@TC-3455', '@regression']}, async ({createPage, browser}) => {
     // Localization checks for GERMAN browser
-    const dePage = await createPage();
-    const dePageManager = PageManager.from(dePage);
+    const dePageManager = PageManager.from(await createPage());
     const {pages: dePages} = dePageManager.webapp;
 
     await dePageManager.openSSOPage();
@@ -50,8 +49,7 @@ test.describe('Localization', () => {
     // Localization checks for ENGLISH browser
     const enContext = await browser.newContext({locale: 'en-US'});
 
-    const enPage = await createPage(enContext);
-    const enPageManager = PageManager.from(enPage);
+    const enPageManager = PageManager.from(await createPage(enContext));
     const {pages: enPages} = enPageManager.webapp;
 
     await enPageManager.openSSOPage();
@@ -79,8 +77,7 @@ test.describe('Localization', () => {
     'Verify registration screen has German-localized strings',
     {tag: ['@TC-1273', '@regression']},
     async ({createPage}) => {
-      const page = await createPage();
-      const pageManager = PageManager.from(page);
+      const pageManager = PageManager.from(await createPage());
 
       const {pages} = pageManager.webapp;
       await pageManager.openRegistrationPage();
@@ -94,8 +91,7 @@ test.describe('Localization', () => {
   );
 
   test('Verify login screen has German-localized strings', {tag: ['@TC-1274', '@regression']}, async ({createPage}) => {
-    const page = await createPage();
-    const pageManager = PageManager.from(page);
+    const pageManager = PageManager.from(await createPage());
 
     const {pages} = pageManager.webapp;
     await pageManager.openLoginPage();
@@ -109,7 +105,7 @@ test.describe('Localization', () => {
     'Verify conversation view and list has German-localized strings',
     {tag: ['@TC-1275', '@regression']},
     async ({createPage}) => {
-      const {pages, modals, components} = (await PageManager.from(createPage(withLogin(userA)))).webapp;
+      const {pages, modals, components} = PageManager.from(await createPage(withLogin(userA))).webapp;
 
       // Connect users manually due to the current locators don't work in german browser
       await components.conversationSidebar().connectButton.click();
@@ -140,7 +136,7 @@ test.describe('Localization', () => {
     });
 
   test('Verify registration email is de', {tag: ['@TC-1277', '@regression']}, async ({createPage, api}) => {
-    const pageManager = await PageManager.from(createPage());
+    const pageManager = PageManager.from(await createPage());
 
     await pageManager.openRegistrationPage();
     const {pages} = pageManager.webapp;
