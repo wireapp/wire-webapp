@@ -23,6 +23,7 @@ import {PageManager} from 'test/e2e_tests/pageManager';
 import {test, expect, withConnectedUser, withLogin, Team} from 'test/e2e_tests/test.fixtures';
 import {getTextFilePath, readLocalFile, TextFileName} from 'test/e2e_tests/utils/asset.util';
 import {Page} from 'playwright/test';
+import {getImageFilePath, ImageQRCodeFileName} from 'test/e2e_tests/utils/sendImage.util';
 
 interface DragAndDropOptions {
   buffer: Buffer;
@@ -102,4 +103,61 @@ test.describe('Sending Assents', () => {
       await expect(pages.conversation().getMessage({sender: userB})).toHaveCount(1);
     });
   });
+
+  test(
+    'I want to copy & paste an image into a conversation',
+    {tag: ['@TC-498', '@regression']},
+    async ({createPage}) => {
+      const [userBPage] = await Promise.all([
+        createPage(withLogin(userB), withConnectedUser(userA)),
+        createPage(withLogin(userA)),
+      ]);
+
+      const {pages} = PageManager.from(userBPage).webapp;
+
+      const buffer = await readLocalFile(getImageFilePath());
+      const targetSelector = '#conversation-input-bar';
+
+      const pasteImage = async (page: Page, selector: string, buffer: Buffer, fileName: string): Promise<void> => {
+        await page.evaluateHandle(
+          ({bufferArray, name, selector}) => {
+            const target = document.querySelector(selector);
+            if (!target) throw new Error(`Target ${selector} not found`);
+
+            const file = new File([Uint8Array.from(bufferArray)], name, {type: 'image/png'});
+
+            const dataTransfer = new DataTransfer();
+            dataTransfer.items.add(file);
+
+            const pasteEvent = new ClipboardEvent('paste', {
+              clipboardData: dataTransfer,
+              bubbles: true,
+              cancelable: true,
+            });
+
+            target.dispatchEvent(pasteEvent);
+          },
+          {bufferArray: Array.from(buffer), name: fileName, selector},
+        );
+      };
+
+      const pastedFileControls = userBPage.getByTestId('pasted-file-controls');
+      await test.step('Go to any 1:1 conversation', async () => {
+        await pages.conversationList().openConversation(userA.fullName, {protocol: 'mls'});
+      });
+
+      await test.step('User B copy paste image into the conversation', async () => {
+        await pages.conversation().messageInput.click();
+        await pasteImage(userBPage, targetSelector, buffer, ImageQRCodeFileName);
+        await expect(pastedFileControls).toContainText('Pasted image');
+        await expect(pastedFileControls.getByRole('button', {name: 'Close'})).toBeVisible();
+        await expect(pastedFileControls.getByRole('img')).toBeVisible();
+      });
+
+      await test.step('User B send message and verify it in message', async () => {
+        await pastedFileControls.press('Enter');
+        await expect(pages.conversation().getMessage({sender: userB}).getByRole('img')).toBeVisible();
+      });
+    },
+  );
 });
