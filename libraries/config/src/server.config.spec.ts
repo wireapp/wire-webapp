@@ -196,6 +196,16 @@ describe('Server Config', () => {
       const envWithoutClientVersionEnforcement = {...mockEnv, ENABLE_CLIENT_VERSION_ENFORCEMENT: 'false'};
       const configFalse = generateConfig(mockParams, envWithoutClientVersionEnforcement);
       expect(configFalse.ENABLE_CLIENT_VERSION_ENFORCEMENT).toBe(false);
+
+      const envWithoutDefinedClientVersionEnforcement = {
+        ...mockEnv,
+        ENABLE_CLIENT_VERSION_ENFORCEMENT: undefined,
+      } as Env;
+      const configWithUndefinedClientVersionEnforcement = generateConfig(
+        mockParams,
+        envWithoutDefinedClientVersionEnforcement,
+      );
+      expect(configWithUndefinedClientVersionEnforcement.ENABLE_CLIENT_VERSION_ENFORCEMENT).toBe(false);
     });
 
     describe('Content Security Policy (CSP)', () => {

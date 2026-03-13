@@ -28,11 +28,13 @@ describe('/client-version-check', () => {
     expect(dependencies.get).toHaveBeenNthCalledWith(1, '/client-version-check', expect.any(Function));
   });
 
-  it('returns HTTP 200', async () => {
+  it('returns HTTP 200 when client version enforcement is disabled and parsed client version equals deployed version', async () => {
     const sendStatus = jest.fn();
     const fakeRequest = {header: jest.fn().mockReturnValue('2026.02.12.17.51.00')} as unknown as Request;
     const fakeResponse = {sendStatus} as unknown as Response;
     const dependencies = createClientVersionCheckRouteDependencies({
+      deployedClientVersion: '2026.02.12.17.51.00',
+      isClientVersionEnforcementEnabled: false,
       get: jest.fn((_routePath, routeHandler) => {
         routeHandler(fakeRequest, fakeResponse);
       }),
