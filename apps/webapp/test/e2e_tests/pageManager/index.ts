@@ -110,6 +110,14 @@ export class PageManager {
     await this.page.goto(`${webAppPath}auth/#/login`);
   };
 
+  openRegistrationPage = async () => {
+    await this.page.goto(`${webAppPath}auth/#/createaccount`);
+  };
+
+  openSSOPage = async () => {
+    await this.page.goto(`${webAppPath}auth/#/sso`);
+  };
+
   openUrl = (url: string) => {
     return this.page.goto(url, {waitUntil: 'networkidle'});
   };

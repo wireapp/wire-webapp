@@ -30,6 +30,8 @@ export class RegistrationPage {
   readonly termsCheckbox: Locator;
   readonly errorLabel: Locator;
   readonly passwordPolicy: Locator;
+  readonly header: Locator;
+  readonly termsLabel: Locator;
 
   constructor(page: Page) {
     this.passwordPolicyInfo = page.locator('[data-uie-name="element-password-help"]');
@@ -41,6 +43,8 @@ export class RegistrationPage {
     this.termsCheckbox = page.locator('[data-uie-name="do-accept-terms"]');
     this.errorLabel = page.locator('[data-uie-name="error-message"]');
     this.passwordPolicy = page.locator('[data-uie-name="element-password-help"]');
+    this.header = page.getByRole('heading');
+    this.termsLabel = page.locator('label[for="accept-terms"]');
   }
 
   async fillInUserInfo(user: User) {

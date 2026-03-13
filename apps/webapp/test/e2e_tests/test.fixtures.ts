@@ -255,11 +255,11 @@ export const withGuestUser =
 
 const createUser = async (
   api: ApiManagerE2E,
-  options?: {firstName?: string; lastName?: string; disableTelemetry?: boolean},
+  options?: {disableTelemetry?: boolean} & Parameters<typeof getUser>[0],
 ) => {
   const {disableTelemetry = true} = options ?? {};
 
-  const user = getUser({firstName: options?.firstName, lastName: options?.lastName});
+  const user = getUser(options);
   await api.createPersonalUser(user);
 
   // Optionally decline to send telemetry via the api. This avoids the user being prompted for it in the UI upon first login
