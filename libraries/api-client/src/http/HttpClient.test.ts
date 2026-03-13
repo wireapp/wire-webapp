@@ -18,6 +18,7 @@
  */
 
 import nock from 'nock';
+import {AxiosHeaders, AxiosResponse} from 'axios';
 
 import {BackendErrorLabel} from './BackendErrorLabel';
 import {HttpClient} from './HttpClient';
@@ -51,6 +52,16 @@ function createHttpClientDependenciesForTest(): HttpClientDependenciesForTest {
 
 function createRetryableBackendError(statusCode: number): BackendError {
   return new BackendError('Retryable backend error', undefined, statusCode);
+}
+
+function createAxiosResponseForTest<ResponseValue>(data: ResponseValue): AxiosResponse<ResponseValue> {
+  return {
+    config: {headers: new AxiosHeaders()},
+    data,
+    headers: {},
+    status: StatusCode.OK,
+    statusText: 'OK',
+  };
 }
 
 describe('HttpClient', () => {
@@ -150,6 +161,44 @@ describe('HttpClient', () => {
   });
 
   describe('sendRequest with incremental retry backoff', () => {
+    it.each(
+      [
+        {
+          expectedDescription: '420',
+          retryableStatusCode: 420,
+        },
+        {
+          expectedDescription: '429',
+          retryableStatusCode: StatusCode.TOO_MANY_REQUESTS,
+        },
+      ] as const,
+    )(
+      'retries $expectedDescription backend errors when incremental retry backoff is enabled',
+      async ({retryableStatusCode}) => {
+        const httpClientDependenciesForTest = createHttpClientDependenciesForTest();
+        const client = new HttpClient(
+          testConfig,
+          mockedAccessTokenStore as AccessTokenStore,
+        {
+          dependencies: httpClientDependenciesForTest,
+          shouldUseIncrementalRetryBackoff: true,
+        },
+      );
+        const response = createAxiosResponseForTest({ok: true});
+
+        client._sendRequest = jest
+          .fn()
+          .mockRejectedValueOnce(createRetryableBackendError(retryableStatusCode))
+          .mockResolvedValueOnce(response);
+
+        const result = await client.sendRequest({method: 'GET', url: '/conversations'});
+
+        expect(result).toBe(response);
+        expect(client._sendRequest).toHaveBeenCalledTimes(2);
+        expect(httpClientDependenciesForTest.observedDelayInMilliseconds).toEqual([100]);
+      },
+    );
+
     it('retries retryable backend errors when incremental retry backoff is enabled', async () => {
       const httpClientDependenciesForTest = createHttpClientDependenciesForTest();
       const client = new HttpClient(
@@ -160,7 +209,7 @@ describe('HttpClient', () => {
           shouldUseIncrementalRetryBackoff: true,
         },
       );
-      const response = {data: {ok: true}} as any;
+      const response = createAxiosResponseForTest({ok: true});
 
       client._sendRequest = jest
         .fn()
@@ -219,7 +268,7 @@ describe('HttpClient', () => {
           shouldUseIncrementalRetryBackoff: true,
         },
       );
-      const response = {data: {ok: true}} as any;
+      const response = createAxiosResponseForTest({ok: true});
 
       client._sendRequest = jest
         .fn()
@@ -261,7 +310,7 @@ describe('HttpClient', () => {
           shouldUseIncrementalRetryBackoff: true,
         },
       );
-      const response = {data: {ok: true}} as any;
+      const response = createAxiosResponseForTest({ok: true});
 
       client._sendRequest = jest
         .fn()
