@@ -19,6 +19,11 @@
 
 function formatDate(): string {
   const [date, time] = new Date().toISOString().split('T');
+
+  if (date === undefined || time === undefined) {
+    throw new Error('Expected ISO timestamp to contain date and time.');
+  }
+
   return `${date} ${time.substring(0, 8)}`;
 }
 

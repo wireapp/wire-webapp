@@ -49,7 +49,13 @@ export class MessageHashService {
 
     for (let index = 0; index < buffer.length; index += 2) {
       const tempValue = buffer[index];
-      buffer[index] = buffer[index + 1];
+      const nextValue = buffer[index + 1];
+
+      if (tempValue === undefined || nextValue === undefined) {
+        continue;
+      }
+
+      buffer[index] = nextValue;
       buffer[index + 1] = tempValue;
     }
 

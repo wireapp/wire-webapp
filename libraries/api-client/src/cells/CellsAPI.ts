@@ -175,8 +175,10 @@ export class CellsAPI {
       {signal: abortController?.signal},
     );
 
-    if (autoRename && result.data.Results?.length && result.data.Results[0].Exists) {
-      filePath = result.data.Results[0].NextPath || filePath;
+    const firstCreateCheckResult = result.data.Results?.[0];
+
+    if (autoRename && firstCreateCheckResult?.Exists) {
+      filePath = firstCreateCheckResult.NextPath || filePath;
     }
 
     const metadata = {
