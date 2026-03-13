@@ -5,8 +5,8 @@ const validClientVersion = '2026.02.12.17.51.00';
 
 type Overrides = {
   readonly parseClientVersion?: jest.Mock;
-  readonly clientVersion?: string | undefined;
-  readonly deployedClientVersion?: string | undefined;
+  readonly clientVersion?: Maybe<string>;
+  readonly deployedClientVersion?: string;
   readonly logInvalidMinimumRequiredClientBuildDate?: jest.Mock;
 };
 
@@ -15,8 +15,8 @@ function createParseMinimumRequiredClientBuildDateDependencies(
 ): ParseMinimumRequiredClientBuildDateDependencies {
   return {
     parseClientVersion: overrides.parseClientVersion ?? jest.fn(),
-    clientVersion: overrides.clientVersion ?? undefined,
-    deployedClientVersion: overrides.deployedClientVersion ?? undefined,
+    clientVersion: overrides.clientVersion ?? Maybe.nothing<string>(),
+    deployedClientVersion: overrides.deployedClientVersion ?? validClientVersion,
     logInvalidMinimumRequiredClientBuildDate: overrides.logInvalidMinimumRequiredClientBuildDate ?? jest.fn(),
   };
 }
@@ -26,7 +26,7 @@ describe('parseMinimumRequiredClientBuildDate()', () => {
     const parseClientVersion = jest.fn();
     const dependencies = createParseMinimumRequiredClientBuildDateDependencies({
       parseClientVersion,
-      clientVersion: undefined,
+      clientVersion: Maybe.nothing(),
     });
 
     expect(parseMinimumRequiredClientBuildDate(dependencies)).toStrictEqual(Maybe.nothing());
@@ -47,7 +47,7 @@ describe('parseMinimumRequiredClientBuildDate()', () => {
   ])('$description', ({parseResult, expectedResult}) => {
     const dependencies = createParseMinimumRequiredClientBuildDateDependencies({
       parseClientVersion: jest.fn().mockReturnValue(parseResult),
-      clientVersion: validClientVersion,
+      clientVersion: Maybe.just(validClientVersion),
     });
 
     expect(parseMinimumRequiredClientBuildDate(dependencies)).toStrictEqual(expectedResult);
@@ -60,7 +60,7 @@ describe('parseMinimumRequiredClientBuildDate()', () => {
         .fn()
         .mockReturnValueOnce(Result.ok(new Date(2026, 1, 12, 17, 51, 1)))
         .mockReturnValueOnce(Result.ok(new Date(2026, 1, 12, 17, 51, 0))),
-      clientVersion: '2026.02.12.17.51.01',
+      clientVersion: Maybe.just('2026.02.12.17.51.01'),
       deployedClientVersion: '2026.02.12.17.51.00',
       logInvalidMinimumRequiredClientBuildDate,
     });
@@ -76,7 +76,7 @@ describe('parseMinimumRequiredClientBuildDate()', () => {
     const minimumRequiredClientBuildDate = new Date(2026, 1, 12, 17, 51, 0);
     const dependencies = createParseMinimumRequiredClientBuildDateDependencies({
       parseClientVersion: jest.fn().mockReturnValue(Result.ok(minimumRequiredClientBuildDate)),
-      clientVersion: validClientVersion,
+      clientVersion: Maybe.just(validClientVersion),
       deployedClientVersion: validClientVersion,
     });
 
@@ -90,7 +90,7 @@ describe('parseMinimumRequiredClientBuildDate()', () => {
         .fn()
         .mockReturnValueOnce(Result.ok(minimumRequiredClientBuildDate))
         .mockReturnValueOnce(Result.ok(new Date(2026, 1, 12, 17, 51, 1))),
-      clientVersion: validClientVersion,
+      clientVersion: Maybe.just(validClientVersion),
       deployedClientVersion: '2026.02.12.17.51.01',
     });
 

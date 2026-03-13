@@ -23,6 +23,7 @@ import hbs from 'hbs';
 import helmet from 'helmet';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 import nocache from 'nocache';
+import {Maybe} from 'true-myth';
 
 import fs from 'fs';
 import http from 'http';
@@ -84,7 +85,7 @@ class Server {
         parseClientVersion,
         minimumRequiredClientBuildDate: parseMinimumRequiredClientBuildDate({
           parseClientVersion,
-          clientVersion: this.config.MINIMUM_REQUIRED_CLIENT_BUILD_DATE,
+          clientVersion: Maybe.of(this.config.MINIMUM_REQUIRED_CLIENT_BUILD_DATE),
           deployedClientVersion: this.config.VERSION,
           logInvalidMinimumRequiredClientBuildDate(message) {
             console.error(message);

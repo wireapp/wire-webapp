@@ -44,6 +44,7 @@ describe('/client-version-check', () => {
 
   it.each<{headerValue: string | undefined; expectedHttpStatusCode: number}>([
     {headerValue: '', expectedHttpStatusCode: 400},
+    {headerValue: '   ', expectedHttpStatusCode: 400},
     {headerValue: undefined, expectedHttpStatusCode: 400},
   ])(
     'returns HTTP status code $expectedHttpStatusCode if header value is "$headerValue"',
