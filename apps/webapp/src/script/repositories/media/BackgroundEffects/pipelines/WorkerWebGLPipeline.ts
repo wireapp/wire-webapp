@@ -217,15 +217,24 @@ export class WorkerWebGLPipeline implements Pipeline {
       bitmap.close();
       return;
     }
-    this.worker.postMessage(
-      {
-        type: 'setBackgroundImage',
-        image: bitmap,
-        width,
-        height,
-      },
-      [bitmap],
-    );
+
+    if (bitmap.width === 0 || bitmap.height === 0) {
+      return;
+    }
+
+    try {
+      this.worker.postMessage(
+        {
+          type: 'setBackgroundImage',
+          image: bitmap,
+          width,
+          height,
+        },
+        [bitmap],
+      );
+    } catch {
+      bitmap.close();
+    }
   }
 
   /**

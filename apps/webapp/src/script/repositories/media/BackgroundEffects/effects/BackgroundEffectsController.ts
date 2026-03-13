@@ -768,6 +768,6 @@ export class BackgroundEffectsController {
   }
 
   isProcessing() {
-    return false;
+    return this.pipelineImpl !== null;
   }
 }
