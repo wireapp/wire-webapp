@@ -30,7 +30,7 @@ const textFilePath = getTextFilePath();
 
 const selfDestructMessageText = 'This message will self-destruct in 10 seconds.';
 
-test('Messages in 1:1', {tag: ['@TC-8750', '@crit-flow-web']}, async ({createTeam, createPage}) => {
+test('Messages in 1:1', {tag: ['@TC-8750', '@crit-flow-web']}, async ({createTeam, createPage}, testInfo) => {
   // Precondition: Users A and B exist in two separate teams
   const [{owner: memberA}, {owner: memberB}] = await Promise.all([createTeam('Critical A'), createTeam('Critical B')]);
 
@@ -80,7 +80,7 @@ test('Messages in 1:1', {tag: ['@TC-8750', '@crit-flow-web']}, async ({createTea
   });
   await test.step('User B can download the image', async () => {
     // Click on the download button to download the image
-    const filePath = await memberBPageManager.webapp.modals.detailViewModal().downloadAsset();
+    const filePath = await memberBPageManager.webapp.modals.detailViewModal().downloadAsset(testInfo.outputDir);
     const downloadQRCodeValue = await getLocalQRCodeValue(filePath);
     const localQRCodeValue = await getLocalQRCodeValue(imageFilePath);
     expect(downloadQRCodeValue).toBe(localQRCodeValue);
@@ -158,7 +158,7 @@ test('Messages in 1:1', {tag: ['@TC-8750', '@crit-flow-web']}, async ({createTea
   });
   await test.step('User B can download the file', async () => {
     await expect(async () => {
-      const filePath = await memberBPageManager.webapp.pages.conversation().downloadFile();
+      const filePath = await memberBPageManager.webapp.pages.conversation().downloadFile(testInfo.outputDir);
       expect(await isAssetDownloaded(filePath)).toBeTruthy();
     }).toPass();
   });

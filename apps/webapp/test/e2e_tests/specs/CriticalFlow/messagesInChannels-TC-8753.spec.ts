@@ -36,7 +36,7 @@ const textFilePath = getTextFilePath();
 test(
   'Messages in Channels',
   {tag: ['@TC-8753', '@crit-flow-web']},
-  async ({createUser, createTeam, createPage, api}) => {
+  async ({createUser, createTeam, createPage, api}, testInfo) => {
     const userB = await createUser();
     const {owner: userA} = await createTeam('Critical Team', {users: [userB]});
 
@@ -92,7 +92,7 @@ test(
     await test.step('User B can download the image', async () => {
       const {modals} = userBPageManager.webapp;
       // Click on the download button to download the image
-      const filePath = await modals.detailViewModal().downloadAsset();
+      const filePath = await modals.detailViewModal().downloadAsset(testInfo.outputDir);
       const downloadQRCodeValue = await getLocalQRCodeValue(filePath);
       const localQRCodeValue = await getLocalQRCodeValue(imageFilePath);
       expect(downloadQRCodeValue).toBe(localQRCodeValue);
@@ -174,7 +174,7 @@ test(
 
     await test.step('User B can download the file', async () => {
       const {pages} = userBPageManager.webapp;
-      const filePath = await pages.conversation().downloadFile();
+      const filePath = await pages.conversation().downloadFile(testInfo.outputDir);
       expect(await isAssetDownloaded(filePath)).toBeTruthy();
     });
   },

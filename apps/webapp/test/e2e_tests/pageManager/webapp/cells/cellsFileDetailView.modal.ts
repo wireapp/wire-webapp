@@ -42,8 +42,8 @@ export class CellsFileDetailViewModal {
     await this.closeButton.click();
   }
 
-  async downloadAsset() {
+  async downloadAsset(outputDir: string) {
     await this.downloadButton.waitFor({state: 'visible'});
-    return await downloadAssetAndGetFilePath(this.page, this.downloadButton);
+    return await downloadAssetAndGetFilePath(this.page, this.downloadButton, outputDir);
   }
 }
