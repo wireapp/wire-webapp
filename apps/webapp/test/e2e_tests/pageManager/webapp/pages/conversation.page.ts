@@ -33,6 +33,7 @@ export class ConversationPage {
   readonly backButton: Locator;
   readonly messageInput: Locator;
   readonly sendMessageButton: Locator;
+  readonly sendThreadMessageButton: Locator;
   readonly searchButton: Locator;
   readonly conversationTitle: Locator;
   readonly watermark: Locator;
@@ -53,6 +54,8 @@ export class ConversationPage {
   /** Messages in conversation, only contains message items which have been sent successfully */
   readonly messages: Locator;
   readonly messageDetails: Locator;
+  readonly messageThreadPanel: Locator;
+  readonly messageThreadInput: Locator;
   readonly messageItems: Locator;
   readonly filesTab: Locator;
   readonly typingIndicator: Locator;
@@ -76,6 +79,7 @@ export class ConversationPage {
     this.messageInput = page.getByTestId('input-message');
     this.watermark = page.getByTestId('no-conversation').locator('svg');
     this.sendMessageButton = page.getByTestId('do-send-message');
+    this.sendThreadMessageButton = page.locator('#message-thread').getByTestId('do-send-message');
     this.searchButton = page.getByRole('button', {name: 'Search'});
     this.conversationTitle = page.locator('[data-uie-name="status-conversation-title-bar-label"]');
     this.openGroupInformationViaName = page.getByTestId('status-conversation-title-bar-label');
@@ -100,6 +104,8 @@ export class ConversationPage {
       `[data-uie-name="item-message"]:not([data-uie-send-status="1"]):not([data-uie-send-status="-1"]):not(.system-message)`,
     );
     this.messageDetails = page.locator('#message-details');
+    this.messageThreadPanel = page.locator('#message-thread');
+    this.messageThreadInput = page.getByTestId('input-thread-message');
     this.filesTab = page.locator('#conversation-tab-files');
     this.typingIndicator = page.getByTestId('typing-indicator-title');
     this.itemPendingRequest = page.getByTestId('item-pending-requests');
@@ -161,6 +167,20 @@ export class ConversationPage {
   async replyToMessage(message: Locator) {
     await message.hover();
     await message.getByRole('group').getByTestId('do-reply-message').click();
+  }
+
+  async startThreadForMessage(message: Locator) {
+    await message.hover();
+    await message.getByRole('group').getByTestId('do-thread-message').click();
+  }
+
+  async openThreadFromRepliesBadge(message: Locator) {
+    await message.getByTestId('do-open-message-thread').click();
+  }
+
+  async sendThreadMessage(message: string) {
+    await this.messageThreadInput.fill(message);
+    await this.sendThreadMessageButton.click();
   }
 
   async enableSelfDeletingMessages() {

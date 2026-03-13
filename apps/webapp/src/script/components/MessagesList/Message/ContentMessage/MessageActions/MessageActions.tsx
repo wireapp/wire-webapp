@@ -24,6 +24,7 @@ import ko from 'knockout';
 
 import {WebAppEvents} from '@wireapp/webapp-events';
 
+import * as Icon from 'Components/Icon';
 import {useClickOutside} from 'Hooks/useClickOutside';
 import {ContentMessage} from 'Repositories/entity/message/ContentMessage';
 import {ContextMenuEntry, showContextMenu} from 'src/script/ui/ContextMenu';
@@ -41,6 +42,7 @@ import {
   getIconCSS,
   messageWithHeaderTop,
 } from './MessageActions.styles';
+import {reactionImgSize} from './MessageReactions/EmojiChar.styles';
 import {MessageReactions} from './MessageReactions/MessageReactions';
 import {ReplyButton} from './ReplyButton';
 
@@ -51,6 +53,7 @@ export const MessageActionsId = {
   HEART: 'reactwith-love-message',
   EMOJI: 'reactwith-emoji-message',
   REPLY: 'do-reply-message',
+  THREAD: 'do-thread-message',
   OPTIONS: 'go-options',
 } as const;
 
@@ -61,6 +64,7 @@ export interface MessageActionsMenuProps {
   isMessageFocused: boolean;
   handleActionMenuVisibility: (isVisible: boolean) => void;
   handleReactionClick: (emoji: string) => void;
+  onThreadClick: () => void;
   reactionsTotalCount: number;
   isRemovedFromConversation: boolean;
 }
@@ -72,6 +76,7 @@ const MessageActionsMenu: FC<MessageActionsMenuProps> = ({
   handleActionMenuVisibility,
   message,
   handleReactionClick,
+  onThreadClick,
   reactionsTotalCount,
   isRemovedFromConversation,
 }) => {
@@ -160,6 +165,14 @@ const MessageActionsMenu: FC<MessageActionsMenuProps> = ({
     [message, toggleActiveMenu],
   );
 
+  const handleMessageThread = useCallback(
+    (event: React.MouseEvent<HTMLButtonElement>) => {
+      toggleActiveMenu(event);
+      onThreadClick();
+    },
+    [onThreadClick, toggleActiveMenu],
+  );
+
   const isMsgReactable = message.isReactable() && !isRemovedFromConversation;
   // clicking anywhere else other than the message action menu removes action menu active state
   useClickOutside(wrapperRef, () => {
@@ -194,6 +207,17 @@ const MessageActionsMenu: FC<MessageActionsMenuProps> = ({
                 messageFocusedTabIndex={messageFocusedTabIndex}
                 onReplyClick={handleMessageReply}
                 onKeyPress={handleKeyDown}
+              />
+            )}
+            {message.isReplyable() && !message.threadId && (
+              <ReplyButton
+                actionId={MessageActionsId.THREAD}
+                currentMsgActionName={currentMsgActionName}
+                messageFocusedTabIndex={messageFocusedTabIndex}
+                onReplyClick={handleMessageThread}
+                onKeyPress={handleKeyDown}
+                ariaLabel="Start thread"
+                icon={<Icon.MessageIcon className="svg-icon" css={reactionImgSize} />}
               />
             )}
           </>

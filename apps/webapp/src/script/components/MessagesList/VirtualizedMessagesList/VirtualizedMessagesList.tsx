@@ -59,6 +59,7 @@ export const VirtualizedMessagesList = ({
   cancelConnectionRequest,
   showUserDetails,
   showMessageDetails,
+  showMessageThread,
   showMessageReactions,
   showParticipants,
   showImageDetails,
@@ -325,6 +326,7 @@ export const VirtualizedMessagesList = ({
                   onClickMessage={onClickMessage}
                   onClickParticipants={showParticipants}
                   onClickDetails={message => showMessageDetails(message)}
+                  onClickThread={showMessageThread}
                   onClickResetSession={resetSession}
                   onClickTimestamp={onTimestampClick}
                   selfId={selfUser.qualifiedId}

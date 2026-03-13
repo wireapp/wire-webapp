@@ -121,6 +121,7 @@ export interface AssetData {
 }
 
 type EncryptedEvent = ConversationOtrMessageAddEvent | ConversationMLSMessageAddEvent | MessageAddEvent;
+type ThreadPayload = {threadId?: string | null; thread_id?: string | null};
 
 export class CryptographyMapper {
   private readonly logger: Logger;
@@ -290,14 +291,18 @@ export class CryptographyMapper {
     }
 
     const {conversation, qualified_conversation, from, qualified_from} = event;
+    const threadId = this._extractThreadId(genericMessage);
     const genericContent = {
       conversation,
       from,
       from_client_id: event.type === CONVERSATION_EVENT.OTR_MESSAGE_ADD ? event.data.sender : undefined,
       id: genericMessage.messageId,
+      is_thread_reply: !!threadId,
       qualified_conversation,
       qualified_from,
       status: 'status' in event ? event.status : undefined,
+      thread_id: threadId,
+      thread_root_message_id: threadId,
       time: event.time,
     };
 
@@ -641,6 +646,23 @@ export class CryptographyMapper {
       },
       type: ClientEvent.CONVERSATION.MULTIPART_MESSAGE_ADD,
     };
+  }
+
+  private _extractThreadId(genericMessage: GenericMessage): string | null {
+    const fromPayload = (payload: ThreadPayload | undefined | null) => payload?.threadId ?? payload?.thread_id ?? null;
+
+    switch (genericMessage.content) {
+      case GenericMessageType.TEXT:
+        return fromPayload(genericMessage.text as Text & ThreadPayload);
+      case GenericMessageType.ASSET:
+        return fromPayload(genericMessage.asset as Asset & ThreadPayload);
+      case GenericMessageType.MULTIPART:
+        return fromPayload(genericMessage.multipart as MultiPartContent & ThreadPayload);
+      case GenericMessageType.COMPOSITE:
+        return fromPayload(genericMessage.composite as Composite & ThreadPayload);
+      default:
+        return null;
+    }
   }
 
   private _mapText(text: Text): MappedText {

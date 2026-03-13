@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2024 Wire Swiss GmbH
+ * Copyright (C) 2026 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,19 +17,15 @@
  *
  */
 
-import {CSSObject} from '@emotion/react';
+export const OPEN_MESSAGE_THREAD = 'OPEN_MESSAGE_THREAD';
+export const THREAD_REPLY_SENT = 'THREAD_REPLY_SENT';
 
-export const wrapperStyles: CSSObject = {
-  display: 'flex',
-  alignItems: 'center',
-  columnGap: '4px',
-  overflowX: 'auto',
-  scrollbarWidth: 'none',
-  msOverflowStyle: 'none',
+export type OpenMessageThreadPayload = {
+  conversationId: string;
+  messageId: string;
+};
 
-  '&::-webkit-scrollbar': {
-    width: 0,
-    height: 0,
-    display: 'none',
-  },
+export type ThreadReplySentPayload = {
+  conversationId: string;
+  threadId: string;
 };

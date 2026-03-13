@@ -17,7 +17,7 @@
  *
  */
 
-import {ReactNode, useContext, useEffect, useState} from 'react';
+import {ReactNode, useContext, useEffect, useRef, useState} from 'react';
 
 import is from '@sindresorhus/is';
 import cx from 'classnames';
@@ -56,11 +56,20 @@ import {ContentState, useAppState} from '../useAppState';
 
 export const ANIMATED_PAGE_TRANSITION_DURATION = 500;
 
-const Animated = ({children, ...rest}: {children: ReactNode}) => (
-  <CSSTransition classNames="slide-in-left" timeout={{enter: ANIMATED_PAGE_TRANSITION_DURATION}} {...rest}>
-    {children}
-  </CSSTransition>
-);
+const Animated = ({children, ...rest}: {children: ReactNode}) => {
+  const nodeRef = useRef<HTMLDivElement | null>(null);
+
+  return (
+    <CSSTransition
+      nodeRef={nodeRef}
+      classNames="slide-in-left"
+      timeout={{enter: ANIMATED_PAGE_TRANSITION_DURATION}}
+      {...rest}
+    >
+      <div ref={nodeRef}>{children}</div>
+    </CSSTransition>
+  );
+};
 
 interface MainContentProps {
   openRightSidebar: (panelState: PanelState, params: RightSidebarParams, compareEntityId?: boolean) => void;

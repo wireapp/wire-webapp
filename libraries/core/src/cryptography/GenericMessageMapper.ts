@@ -40,6 +40,23 @@ import {NotificationSource} from '../notification';
 export class GenericMessageMapper {
   private static readonly logger = LogFactory.getLogger('@wireapp/core/GenericMessageMapper');
 
+  private static getThreadId(genericMessage: any): string | null {
+    const threadFrom = (payload: any) => payload?.threadId ?? payload?.thread_id ?? null;
+
+    switch (genericMessage.content) {
+      case GenericMessageType.TEXT:
+        return threadFrom(genericMessage.text);
+      case GenericMessageType.ASSET:
+        return threadFrom(genericMessage.asset);
+      case GenericMessageType.MULTIPART:
+        return threadFrom(genericMessage.multipart);
+      case GenericMessageType.COMPOSITE:
+        return threadFrom(genericMessage.composite);
+      default:
+        return null;
+    }
+  }
+
   // TODO: Turn "any" into a specific type (or collection of types) and make the return type more specific based on the
   // "genericMessage" input parameter.
   public static mapGenericMessage(
@@ -56,6 +73,7 @@ export class GenericMessageMapper {
       state: MessageSendingState.INCOMING,
       timestamp: new Date(event.time).getTime(),
       id: genericMessage.messageId,
+      threadId: this.getThreadId(genericMessage),
       messageTimer: 0,
       source,
     };

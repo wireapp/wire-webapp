@@ -37,3 +37,18 @@ export const deliveredMessageIndicator: CSSObject = {
   paddingTop: '2px',
   width: 'var(--delivered-state-width)',
 };
+
+export const threadRepliesContainer: CSSObject = {
+  paddingLeft: 'var(--conversation-message-sender-width)',
+  paddingTop: '4px',
+};
+
+export const threadRepliesButton: CSSObject = {
+  background: 'transparent',
+  border: 0,
+  color: 'var(--text-theme-accent-color)',
+  cursor: 'pointer',
+  fontSize: '12px',
+  padding: 0,
+  textAlign: 'left',
+};

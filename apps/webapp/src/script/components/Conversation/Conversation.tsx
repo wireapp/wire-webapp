@@ -290,6 +290,10 @@ export const Conversation = ({
     openRightSidebar(PanelState.MESSAGE_DETAILS, {entity: message, showReactions}, true);
   };
 
+  const showMessageThread = (message: Message) => {
+    openRightSidebar(PanelState.MESSAGE_THREAD, {entity: message}, true);
+  };
+
   const handleEmailClick = (event: Event, messageDetails: MessageDetails) => {
     safeMailOpen(messageDetails.href!);
     event.preventDefault();
@@ -564,6 +568,7 @@ export const Conversation = ({
               cancelConnectionRequest={clickOnCancelRequest}
               showUserDetails={showUserDetails}
               showMessageDetails={showMessageDetails}
+              showMessageThread={showMessageThread}
               showMessageReactions={showMessageReactions}
               showParticipants={showParticipants}
               showImageDetails={showDetail}

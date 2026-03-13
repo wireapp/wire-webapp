@@ -38,6 +38,7 @@ export const VirtualizedMessageListWrapper = ({
   onClickMessage,
   showUserDetails,
   showMessageDetails,
+  showMessageThread,
   showMessageReactions,
   showImageDetails,
   showParticipants,
@@ -81,6 +82,7 @@ export const VirtualizedMessageListWrapper = ({
           onClickMessage={onClickMessage}
           showUserDetails={showUserDetails}
           showMessageDetails={showMessageDetails}
+          showMessageThread={showMessageThread}
           showMessageReactions={showMessageReactions}
           showImageDetails={showImageDetails}
           showParticipants={showParticipants}

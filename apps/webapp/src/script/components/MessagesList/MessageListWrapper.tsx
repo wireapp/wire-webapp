@@ -34,6 +34,7 @@ export const MessageListWrapper = ({
   onClickMessage,
   showUserDetails,
   showMessageDetails,
+  showMessageThread,
   showMessageReactions,
   showImageDetails,
   showParticipants,
@@ -63,6 +64,7 @@ export const MessageListWrapper = ({
         cancelConnectionRequest={cancelConnectionRequest}
         showUserDetails={showUserDetails}
         showMessageDetails={showMessageDetails}
+        showMessageThread={showMessageThread}
         showMessageReactions={showMessageReactions}
         showParticipants={showParticipants}
         showImageDetails={showImageDetails}
@@ -91,6 +93,7 @@ export const MessageListWrapper = ({
       cancelConnectionRequest={cancelConnectionRequest}
       showUserDetails={showUserDetails}
       showMessageDetails={showMessageDetails}
+      showMessageThread={showMessageThread}
       showMessageReactions={showMessageReactions}
       showParticipants={showParticipants}
       showImageDetails={showImageDetails}

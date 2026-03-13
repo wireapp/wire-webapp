@@ -33,6 +33,7 @@ import {
   LastRead,
   LegalHoldStatus,
   Location,
+  Multipart,
   MessageDelete,
   MessageHide,
   Reaction,
@@ -484,6 +485,51 @@ describe('CryptographyMapper', () => {
         expect(event_json.time).toBe(event.time);
         expect(event_json.id).toBe(generic_message.messageId);
         expect(event_json.data.content).toBe('Unit test');
+      });
+    });
+
+    it('maps thread metadata from text payload while preserving normal content decoding', () => {
+      const protoText = new Text({content: 'threaded text'}) as Text & {threadId?: string};
+      protoText.threadId = 'root-message-id';
+      const generic_message = new GenericMessage({
+        [GenericMessageType.TEXT]: protoText,
+        messageId: createUuid(),
+      });
+
+      return mapper.mapGenericMessage(generic_message, event).then(event_json => {
+        expect(event_json.type).toBe(ClientEvent.CONVERSATION.MESSAGE_ADD);
+        expect(event_json.data.content).toBe('threaded text');
+        expect(event_json.thread_id).toBe('root-message-id');
+        expect(event_json.thread_root_message_id).toBe('root-message-id');
+        expect(event_json.is_thread_reply).toBe(true);
+      });
+    });
+
+    it('maps thread metadata from multipart outer payload', () => {
+      const protoMultipart = new Multipart({text: new Text({content: 'outer'})}) as Multipart & {threadId?: string};
+      protoMultipart.threadId = 'multipart-root';
+
+      const generic_message = new GenericMessage({
+        [GenericMessageType.MULTIPART]: protoMultipart,
+        messageId: createUuid(),
+      });
+
+      return mapper.mapGenericMessage(generic_message, event).then(event_json => {
+        expect(event_json.type).toBe(ClientEvent.CONVERSATION.MULTIPART_MESSAGE_ADD);
+        expect(event_json.thread_id).toBe('multipart-root');
+      });
+    });
+
+    it('keeps non-thread messages mapped with null thread metadata', () => {
+      const generic_message = new GenericMessage({
+        [GenericMessageType.TEXT]: new Text({content: 'plain'}),
+        messageId: createUuid(),
+      });
+
+      return mapper.mapGenericMessage(generic_message, event).then(event_json => {
+        expect(event_json.thread_id).toBeNull();
+        expect(event_json.thread_root_message_id).toBeNull();
+        expect(event_json.is_thread_reply).toBe(false);
       });
     });
 

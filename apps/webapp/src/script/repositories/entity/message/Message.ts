@@ -75,6 +75,7 @@ export class Message {
   public readonly isObfuscated: ko.PureComputed<boolean>;
   public legalHoldStatus?: LegalHoldStatus;
   public readonly status: ko.Observable<StatusType>;
+  public threadId: string | null;
   public readonly timestamp_affects_order: ko.PureComputed<boolean>;
   public readonly timestamp: ko.Observable<number>;
   public readonly unsafeSenderName: ko.PureComputed<string>;
@@ -129,6 +130,7 @@ export class Message {
     this.legalHoldStatus = undefined;
     this.primary_key = undefined;
     this.status = ko.observable(StatusType.UNSPECIFIED);
+    this.threadId = null;
     this.type = '';
     this.user = ko.observable(new User('', null));
     this.version = 1;

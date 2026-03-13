@@ -89,11 +89,54 @@ export function buildButtonActionConfirmationMessage(
   });
 }
 
-export function buildCompositeMessage(payload: IComposite): GenericMessage {
-  return GenericMessage.create({
+export function buildCompositeMessage(payload: IComposite, threadId?: string | null): GenericMessage {
+  const genericMessage = GenericMessage.create({
     [GenericMessageType.COMPOSITE]: Composite.create(payload),
     messageId: createId(),
   });
+  return attachThreadIdToMessage(genericMessage, threadId);
+}
+
+export class UnsupportedThreadPayloadError extends Error {
+  public readonly code = 'UNSUPPORTED_THREAD_PAYLOAD';
+
+  constructor(public readonly payloadType: string | undefined) {
+    super(
+      `Thread metadata can only be attached to Text, Asset, Multipart, or Composite messages. Received "${payloadType ?? 'unknown'}".`,
+    );
+    this.name = 'UnsupportedThreadPayloadError';
+  }
+}
+
+export function attachThreadIdToMessage(message: GenericMessage, threadId?: string | null): GenericMessage {
+  if (!threadId) {
+    return message;
+  }
+
+  const setThreadOnPayload = (payload: {threadId?: string; thread_id?: string} | null | undefined) => {
+    if (!payload) {
+      return;
+    }
+    payload.threadId = threadId;
+    payload.thread_id = threadId;
+  };
+
+  switch (message.content) {
+    case GenericMessageType.TEXT:
+      setThreadOnPayload(message.text as unknown as {threadId?: string; thread_id?: string});
+      return message;
+    case GenericMessageType.ASSET:
+      setThreadOnPayload(message.asset as unknown as {threadId?: string; thread_id?: string});
+      return message;
+    case GenericMessageType.MULTIPART:
+      setThreadOnPayload(message.multipart as unknown as {threadId?: string; thread_id?: string});
+      return message;
+    case GenericMessageType.COMPOSITE:
+      setThreadOnPayload(message.composite as unknown as {threadId?: string; thread_id?: string});
+      return message;
+    default:
+      throw new UnsupportedThreadPayloadError(message.content);
+  }
 }
 
 export function buildConfirmationMessage(payloadBundle: ConfirmationMessage['content']): GenericMessage {
@@ -123,6 +166,7 @@ export function buildEditedTextMessage(
 export function buildFileDataMessage(
   payloadBundle: FileAssetMessage['content'],
   messageId: string = createId(),
+  threadId?: string | null,
 ): GenericMessage {
   const {asset, expectsReadConfirmation, legalHoldStatus, metaData} = payloadBundle;
 
@@ -157,12 +201,13 @@ export function buildFileDataMessage(
     messageId,
   });
 
-  return genericMessage;
+  return attachThreadIdToMessage(genericMessage, threadId);
 }
 
 export function buildFileMetaDataMessage(
   payloadBundle: FileAssetMetaDataMessage['content'],
   messageId: string = createId(),
+  threadId?: string | null,
 ): GenericMessage {
   const {expectsReadConfirmation, legalHoldStatus, metaData} = payloadBundle;
 
@@ -186,12 +231,13 @@ export function buildFileMetaDataMessage(
     messageId,
   });
 
-  return genericMessage;
+  return attachThreadIdToMessage(genericMessage, threadId);
 }
 
 export function buildFileAbortMessage(
   payloadBundle: FileAssetAbortMessage['content'],
   messageId: string = createId(),
+  threadId?: string | null,
 ): GenericMessage {
   const {expectsReadConfirmation, legalHoldStatus, reason} = payloadBundle;
 
@@ -208,7 +254,7 @@ export function buildFileAbortMessage(
     messageId,
   });
 
-  return genericMessage;
+  return attachThreadIdToMessage(genericMessage, threadId);
 }
 
 export function buildLastReadMessage(conversationId: QualifiedId, lastReadTimestamp: number) {
@@ -252,6 +298,7 @@ export function buildClearedMessage(conversationId: QualifiedId, timestamp: numb
 export function buildImageMessage(
   payloadBundle: ImageAssetMessageOutgoing['content'],
   messageId: string = createId(),
+  threadId?: string | null,
 ): GenericMessage {
   const imageAsset = buildAsset(payloadBundle);
 
@@ -260,7 +307,7 @@ export function buildImageMessage(
     messageId,
   });
 
-  return genericMessage;
+  return attachThreadIdToMessage(genericMessage, threadId);
 }
 export function buildLocationMessage(payloadBundle: LocationMessage['content']): GenericMessage {
   const {expectsReadConfirmation, latitude, legalHoldStatus, longitude, name, zoom} = payloadBundle;
@@ -374,14 +421,16 @@ export function buildMultipartMessage(
   attachments: MultiPartContent['attachments'],
   textContent: TextContent,
   messageId: string = createId(),
+  threadId?: string | null,
 ): GenericMessage {
-  return GenericMessage.create({
+  const message = GenericMessage.create({
     [GenericMessageType.MULTIPART]: {
       attachments,
       text: MessageToProtoMapper.mapText(textContent),
     },
     messageId: messageId,
   });
+  return attachThreadIdToMessage(message, threadId);
 }
 
 export function buildEditedMultipartMessage(
@@ -407,13 +456,14 @@ export function buildEditedMultipartMessage(
 export function buildTextMessage(
   payloadBundle: TextMessage['content'],
   messageId: string = createId(),
+  threadId?: string | null,
 ): GenericMessage {
   const genericMessage = GenericMessage.create({
     messageId,
     [GenericMessageType.TEXT]: MessageToProtoMapper.mapText(payloadBundle),
   });
 
-  return genericMessage;
+  return attachThreadIdToMessage(genericMessage, threadId);
 }
 
 function buildAsset(payloadBundle: ImageAssetMessageOutgoing['content']): Asset {

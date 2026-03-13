@@ -688,7 +688,10 @@ export class App {
     if (navigator.serviceWorker) {
       await navigator.serviceWorker
         .register(`/sw.js?${Environment.version(false)}`)
-        .then(({scope}) => this.logger.debug(`ServiceWorker registration successful with scope: ${scope}`));
+        .then(({scope}) => this.logger.debug(`ServiceWorker registration successful with scope: ${scope}`))
+        .catch(error => {
+          this.logger.warn('ServiceWorker registration failed', error);
+        });
     }
   }
 

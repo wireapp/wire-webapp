@@ -3607,6 +3607,10 @@ export class ConversationRepository {
     eventJson: IncomingEvent,
     eventSource: EventSource,
   ) {
+    if ('is_thread_reply' in eventJson && eventJson.is_thread_reply) {
+      return {conversationEntity};
+    }
+
     switch (eventJson.type) {
       case CONVERSATION_EVENT.CREATE:
         return this.onCreate(eventJson, eventSource);

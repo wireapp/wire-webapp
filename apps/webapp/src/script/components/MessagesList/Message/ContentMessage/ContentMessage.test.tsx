@@ -59,11 +59,13 @@ describe('message', () => {
       onClickReaction: jest.fn(),
       onClickReactionDetails: jest.fn(),
       onClickDetails: jest.fn(),
+      onClickThread: jest.fn(),
       onClickTimestamp: jest.fn(),
       onRetry: jest.fn(),
       selfId: {domain: '', id: createUuid()},
       isMsgElementsFocusable: true,
       isFileShareRestricted: false,
+      loadThreadRepliesCount: jest.fn().mockResolvedValue(0),
     };
   });
 
