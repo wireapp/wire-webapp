@@ -23,6 +23,7 @@ import {
   startupFeatureToggleQueryParameterName,
 } from './startupFeatureToggles';
 import {
+  collaboraClipboardAccessFeatureToggleName,
   incrementalHttpRetryBackoffFeatureToggleName,
   reliableWebsocketConnectionFeatureToggleName,
 } from './startupFeatureToggleNames';
@@ -119,6 +120,7 @@ describe('startupFeatureToggles', function () {
     expect(allowedStartupFeatureToggleNames).toEqual([
       reliableWebsocketConnectionFeatureToggleName,
       incrementalHttpRetryBackoffFeatureToggleName,
+      collaboraClipboardAccessFeatureToggleName,
     ]);
   });
 
