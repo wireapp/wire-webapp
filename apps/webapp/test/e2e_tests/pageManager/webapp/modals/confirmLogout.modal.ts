@@ -22,16 +22,18 @@ import {Page, Locator} from '@playwright/test';
 import {OptionModal} from './option.modal';
 
 export class ConfirmLogoutModal extends OptionModal {
+  readonly deleteDeviceLabel: Locator;
   readonly modalCheckbox: Locator;
 
   constructor(page: Page) {
     super(page);
 
     this.modalCheckbox = this.modal.getByTestId('modal-option-checkbox');
+    this.deleteDeviceLabel = this.modal.getByText('Delete all your personal information');
   }
 
   async toggleModalCheck() {
-    await this.modalCheckbox.click();
+    await this.deleteDeviceLabel.click();
   }
 
   async clickCancel() {
