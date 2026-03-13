@@ -36,5 +36,7 @@ const statusMap: Record<DeviceStatus, MLSStatuses> = {
 export const mapMLSStatus = (status?: DeviceStatus) => {
   return !status
     ? MLSStatuses.NOT_ACTIVATED
-    : statusMap[status] || statusMap[DeviceStatus[status as unknown as keyof typeof DeviceStatus]];
+    : statusMap[status] ||
+        // adding a fallback to handle potential string values coming from the API until all values are properly typed
+        statusMap[DeviceStatus[status as unknown as keyof typeof DeviceStatus]];
 };
