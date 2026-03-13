@@ -21,14 +21,8 @@ import {User} from 'test/e2e_tests/data/user';
 import {PageManager} from 'test/e2e_tests/pageManager';
 
 import {test, expect, withConnectedUser, withLogin} from 'test/e2e_tests/test.fixtures';
-import {
-  getAudioFilePath,
-  getTextFilePath,
-  readLocalFile,
-  shareAssetHelper,
-  TextFileName,
-} from 'test/e2e_tests/utils/asset.util';
-import {Page} from 'playwright/test';
+import {getAudioFilePath, getTextFilePath, shareAssetHelper, TextFileName} from 'test/e2e_tests/utils/asset.util';
+import {Locator} from 'playwright/test';
 import {getImageFilePath, ImageQRCodeFileName} from 'test/e2e_tests/utils/sendImage.util';
 import {Buffer} from 'node:buffer';
 import fs from 'node:fs/promises';
@@ -42,13 +36,9 @@ interface DragAndDropOptions {
   count?: number;
 }
 
-async function dragAndDropFiles(
-  page: Page,
-  selector: string,
-  {buffer, fileName, count = 1}: DragAndDropOptions,
-): Promise<void> {
-  const dataTransfer = await page.evaluateHandle(
-    ({buffer, fileName, count}) => {
+async function dragAndDropFiles(locator: Locator, {buffer, fileName, count = 1}: DragAndDropOptions): Promise<void> {
+  const dataTransfer = await locator.evaluateHandle(
+    (_, {buffer, fileName, count}) => {
       const dt = new DataTransfer();
       const fileBytes = Uint8Array.from(buffer);
 
@@ -62,9 +52,7 @@ async function dragAndDropFiles(
     {buffer: Array.from(buffer), fileName, count},
   );
 
-  await page.dispatchEvent(selector, 'dragenter', {dataTransfer});
-  await page.dispatchEvent(selector, 'dragover', {dataTransfer});
-  await page.dispatchEvent(selector, 'drop', {dataTransfer});
+  await locator.dispatchEvent('drop', {dataTransfer});
 }
 
 test.describe('Sending Assets', () => {
@@ -78,14 +66,10 @@ test.describe('Sending Assets', () => {
   });
 
   test('Verify you can delete an audio message', {tag: ['@TC-111', '@regression']}, async ({createPage}) => {
-    const [userAPage] = await Promise.all([
-      createPage(withLogin(userA), withConnectedUser(userB)),
-      createPage(withLogin(userB)),
-    ]);
-
+    const userAPage = await createPage(withLogin(userA), withConnectedUser(userB));
     const {pages} = PageManager.from(userAPage).webapp;
 
-    await pages.conversationList().openConversation(userB.fullName, {protocol: 'mls'});
+    await pages.conversationList().openConversation(userB.fullName);
     await shareAssetHelper(getAudioFilePath(), userAPage, userAPage.getByRole('button', {name: 'Add file'}));
 
     const message = pages.conversation().getMessage({sender: userA});
@@ -95,31 +79,25 @@ test.describe('Sending Assets', () => {
   });
 
   test('I want to drag & drop a file into a conversation', {tag: ['@TC-497', '@regression']}, async ({createPage}) => {
-    const [userAPage] = await Promise.all([
-      createPage(withLogin(userA), withConnectedUser(userB)),
-      createPage(withLogin(userB)),
-    ]);
-
+    const userAPage = await createPage(withLogin(userA), withConnectedUser(userB));
     const {pages, modals} = PageManager.from(userAPage).webapp;
 
-    const buffer = await readLocalFile(getTextFilePath());
-    const targetSelector = '#conversation-input-bar';
+    const buffer = await fs.readFile(getTextFilePath());
 
     await test.step('Go to any 1:1 conversation', async () => {
-      await pages.conversationList().openConversation(userB.fullName, {protocol: 'mls'});
+      await pages.conversationList().openConversation(userB.fullName);
     });
 
     await test.step('User B can drag & drop a file into a conversation', async () => {
-      await dragAndDropFiles(userAPage, targetSelector, {
+      await dragAndDropFiles(pages.conversation().messageInput, {
         buffer,
         fileName: TextFileName,
       });
-      await expect(pages.conversation().getMessage({sender: userA})).toBeVisible();
       await expect(pages.conversation().getMessage({sender: userA})).toHaveCount(1);
     });
 
     await test.step('Verify User B sees an error message when he drops 11 files', async () => {
-      await dragAndDropFiles(userAPage, targetSelector, {
+      await dragAndDropFiles(pages.conversation().messageInput, {
         buffer,
         fileName: TextFileName,
         count: 11,
@@ -135,22 +113,14 @@ test.describe('Sending Assets', () => {
     'I want to copy & paste an image into a conversation',
     {tag: ['@TC-498', '@regression']},
     async ({createPage}) => {
-      const [userAPage] = await Promise.all([
-        createPage(withLogin(userA), withConnectedUser(userB)),
-        createPage(withLogin(userB)),
-      ]);
-
+      const userAPage = await createPage(withLogin(userA), withConnectedUser(userB));
       const {pages} = PageManager.from(userAPage).webapp;
 
-      const buffer = await readLocalFile(getImageFilePath());
-      const targetSelector = '#conversation-input-bar';
+      const buffer = await fs.readFile(getImageFilePath());
 
-      const pasteImage = async (page: Page, selector: string, buffer: Buffer, fileName: string): Promise<void> => {
-        await page.evaluateHandle(
-          ({bufferArray, name, selector}) => {
-            const target = document.querySelector(selector);
-            if (!target) throw new Error(`Target ${selector} not found`);
-
+      const pasteImage = async (locator: Locator, buffer: Buffer, fileName: string): Promise<void> => {
+        await locator.evaluateHandle(
+          (target, {bufferArray, name}) => {
             const file = new File([Uint8Array.from(bufferArray)], name, {type: 'image/png'});
 
             const dataTransfer = new DataTransfer();
@@ -164,18 +134,18 @@ test.describe('Sending Assets', () => {
 
             target.dispatchEvent(pasteEvent);
           },
-          {bufferArray: Array.from(buffer), name: fileName, selector},
+          {bufferArray: Array.from(buffer), name: fileName},
         );
       };
 
       const pastedFileControls = userAPage.getByTestId('pasted-file-controls');
       await test.step('Go to any 1:1 conversation', async () => {
-        await pages.conversationList().openConversation(userB.fullName, {protocol: 'mls'});
+        await pages.conversationList().openConversation(userB.fullName);
       });
 
       await test.step('User A copy paste image into the conversation', async () => {
         await pages.conversation().messageInput.click();
-        await pasteImage(userAPage, targetSelector, buffer, ImageQRCodeFileName);
+        await pasteImage(pages.conversation().messageInput, buffer, ImageQRCodeFileName);
         await expect(pastedFileControls).toContainText('Pasted image');
         await expect(pastedFileControls.getByRole('button', {name: 'Close'})).toBeVisible();
         await expect(pastedFileControls.getByRole('img')).toBeVisible();
@@ -189,12 +159,10 @@ test.describe('Sending Assets', () => {
   );
 
   test('I want to copy message via message option menu', {tag: ['@TC-500', '@regression']}, async ({createPage}) => {
-    const [userAPages] = await Promise.all([
-      PageManager.from(createPage(withLogin(userA), withConnectedUser(userB))).then(pm => pm.webapp.pages),
-      createPage(withLogin(userB)),
-    ]);
+    const userAPage = await createPage(withLogin(userA), withConnectedUser(userB));
+    const userAPages = PageManager.from(userAPage).webapp.pages;
 
-    await userAPages.conversationList().openConversation(userB.fullName, {protocol: 'mls'});
+    await userAPages.conversationList().openConversation(userB.fullName);
     await userAPages.conversation().sendMessage('Message to copy');
 
     const message = userAPages.conversation().getMessage({sender: userA});
@@ -202,10 +170,9 @@ test.describe('Sending Assets', () => {
 
     const messageOptions = await userAPages.conversation().openMessageOptions(message);
     await messageOptions.getByRole('button', {name: 'Copy'}).click();
-    const isMac = process.platform === 'darwin';
-
-    await userAPages.conversation().messageInput.press(isMac ? 'Meta+V' : 'Control+V');
-    await expect(userAPages.conversation().messageInput).toContainText('Message to copy');
+    await expect
+      .poll(async () => await userAPage.evaluate(() => navigator.clipboard.readText()))
+      .toBe('Message to copy');
   });
 
   [
@@ -222,20 +189,16 @@ test.describe('Sending Assets', () => {
       `Verify file can be uploaded and re-downloaded by sender himself in ${conversationType}`,
       {tag: [`${tag}`, '@regression']},
       async ({createPage}) => {
-        const [userAPage] = await Promise.all([
-          createPage(withLogin(userA), withConnectedUser(userB)),
-          createPage(withLogin(userB)),
-        ]);
+        const userAPage = await createPage(withLogin(userA), withConnectedUser(userB));
+        const {pages} = PageManager.from(userAPage).webapp;
 
         const sourcePath = getTextFilePath();
         const {name: fileName, ext: extension, base: fileBase} = path.parse(sourcePath);
         const {size: expectedSize} = await fs.stat(sourcePath);
 
-        const {pages} = PageManager.from(userAPage).webapp;
-
         await test.step('User A opens the conversation', async () => {
           if (conversationType === '1on1') {
-            await pages.conversationList().openConversation(userB.fullName, {protocol: 'mls'});
+            await pages.conversationList().openConversation(userB.fullName);
           } else {
             await createGroup(pages, 'Test Group', [userB]);
             await pages.conversationList().openConversation('Test Group');
@@ -244,7 +207,7 @@ test.describe('Sending Assets', () => {
 
         await test.step('User A sends an appropriate file', async () => {
           await shareAssetHelper(getTextFilePath(), userAPage, userAPage.getByRole('button', {name: 'Add file'}));
-          const message = pages.conversation().getMessage({sender: userA})
+          const message = pages.conversation().getMessage({sender: userA});
           await expect(message).toContainText(fileName);
           await expect(message).toContainText(extension.slice(1));
           await expect(message).toContainText(expectedSize.toString());
@@ -252,12 +215,15 @@ test.describe('Sending Assets', () => {
 
         await test.step('User A re-downloads file from the conversation', async () => {
           const downloadedPath = await pages.conversation().downloadFile();
-          const {size: actualSize} = await fs.stat(downloadedPath);
-          const {ext: downloadedExtension, base: downloadedName} = path.parse(downloadedPath);
-
-          expect(downloadedName).toBe(fileBase);
-          expect(downloadedExtension).toBe(extension);
-          expect(actualSize).toBe(expectedSize);
+          try {
+            const {size: actualSize} = await fs.stat(downloadedPath);
+            const {ext: downloadedExtension, base: downloadedName} = path.parse(downloadedPath);
+            expect(downloadedName).toBe(fileBase);
+            expect(downloadedExtension).toBe(extension);
+            expect(actualSize).toBe(expectedSize);
+          } finally {
+            await fs.rm(downloadedPath);
+          }
         });
       },
     );
