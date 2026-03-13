@@ -355,20 +355,20 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@aws-sdk/lib-storage@npm:3.1004.0":
-  version: 3.1004.0
-  resolution: "@aws-sdk/lib-storage@npm:3.1004.0"
+"@aws-sdk/lib-storage@npm:3.1005.0":
+  version: 3.1005.0
+  resolution: "@aws-sdk/lib-storage@npm:3.1005.0"
   dependencies:
     "@smithy/abort-controller": "npm:^4.2.11"
-    "@smithy/middleware-endpoint": "npm:^4.4.22"
-    "@smithy/smithy-client": "npm:^4.12.2"
+    "@smithy/middleware-endpoint": "npm:^4.4.23"
+    "@smithy/smithy-client": "npm:^4.12.3"
     buffer: "npm:5.6.0"
     events: "npm:3.3.0"
     stream-browserify: "npm:3.0.0"
     tslib: "npm:^2.6.2"
   peerDependencies:
-    "@aws-sdk/client-s3": ^3.1004.0
-  checksum: 10/240b644d1bd1be06d35d14967f083caf9106e352a31ab56cc428d647712ef4952fe235860cd3b3f5fb12c5451c7563658617edf7444aa5530f80a4488046c4bd
+    "@aws-sdk/client-s3": ^3.1005.0
+  checksum: 10/fca5e79bdcb1055cf4a63958d494874270bdf7542d2de80e6ab362f66a374732e7b0018b5b2e24e0bb958ba2ebfcbe471fa549ce2b36b7bbdbc54b5e27b4b978
   languageName: node
   linkType: hard
 
@@ -8478,7 +8478,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@smithy/middleware-endpoint@npm:^4.4.22, @smithy/middleware-endpoint@npm:^4.4.23":
+"@smithy/middleware-endpoint@npm:^4.4.23":
   version: 4.4.23
   resolution: "@smithy/middleware-endpoint@npm:4.4.23"
   dependencies:
@@ -8633,7 +8633,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@smithy/smithy-client@npm:^4.12.2, @smithy/smithy-client@npm:^4.12.3":
+"@smithy/smithy-client@npm:^4.12.3":
   version: 4.12.3
   resolution: "@smithy/smithy-client@npm:4.12.3"
   dependencies:
@@ -10917,7 +10917,7 @@ __metadata:
   resolution: "@wireapp/api-client@workspace:libraries/api-client"
   dependencies:
     "@aws-sdk/client-s3": "npm:3.1005.0"
-    "@aws-sdk/lib-storage": "npm:3.1004.0"
+    "@aws-sdk/lib-storage": "npm:3.1005.0"
     "@swc/core": "npm:1.15.18"
     "@swc/jest": "npm:0.2.39"
     "@types/axios": "npm:0.14.4"
