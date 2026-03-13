@@ -4,6 +4,7 @@
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
     "outDir": "lib",
+    "noUncheckedIndexedAccess": true,
     "skipLibCheck": true,
     "rootDir": "src",
     "types": ["node"],

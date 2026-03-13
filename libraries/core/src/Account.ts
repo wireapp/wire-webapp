@@ -860,7 +860,10 @@ export class Account extends TypedEventEmitter<Events> {
         .push(async () => {
           try {
             const start = Date.now();
-            const notificationTime = this.getNotificationEventTime(notification.payload[0]);
+            const firstNotificationPayload = notification.payload[0];
+            const notificationTime = firstNotificationPayload
+              ? this.getNotificationEventTime(firstNotificationPayload)
+              : null;
             this.logger.info(`Processing legacy notification "${notification.id}" at ${notificationTime}`);
             this.logger.info(`Total notifications queue length: ${this.notificationProcessingQueue.getLength()}`);
             this.logger.info(`Total pending proposals queue length: ${getProposalQueueLength()}`);
@@ -971,7 +974,8 @@ export class Account extends TypedEventEmitter<Events> {
       this.logger.info(`Sending consumable notification for decryption`, notification.data.event.id);
       const payloads = this.service!.notification.handleNotification(notification.data.event, source);
 
-      const notificationTime = this.getNotificationEventTime(notification.data.event.payload[0]);
+      const firstEventPayload = notification.data.event.payload[0];
+      const notificationTime = firstEventPayload ? this.getNotificationEventTime(firstEventPayload) : null;
       if (this.connectionState !== ConnectionState.LIVE && notificationTime) {
         onNotificationStreamProgress(notificationTime);
       }

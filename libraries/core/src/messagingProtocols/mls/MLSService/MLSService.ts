@@ -375,9 +375,13 @@ export class MLSService extends TypedEventEmitter<Events> {
     for (const clientId of await this.coreCryptoClient.getClientIds(new ConversationId(groupIdBytes))) {
       // [user-id]:[client-id]@[domain] -> [client-id]
       // example: fb880fac-b549-4d8b-9398-4246324c7b85:67f41928e2844b6c@staging.zinfra.io -> 67f41928e2844b6c
-      currentClientIdsInGroup.push(
-        Converter.arrayBufferViewToStringUTF8(clientId.copyBytes()).split('@')[0].split(':')[1],
-      );
+      const fullClientId = Converter.arrayBufferViewToStringUTF8(clientId.copyBytes()).split('@')[0];
+      const clientIdParts = fullClientId?.split(':');
+      const groupClientId = clientIdParts?.[1];
+
+      if (groupClientId) {
+        currentClientIdsInGroup.push(groupClientId);
+      }
     }
 
     return currentClientIdsInGroup;
