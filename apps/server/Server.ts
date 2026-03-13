@@ -79,18 +79,27 @@ class Server {
     this.app.use(ConfigRoute(this.config, this.clientConfig));
     this.app.use(GoogleWebmasterRoute(this.config));
     this.app.use(AppleAssociationRoute());
+    const minimumRequiredClientBuildDateResult = parseMinimumRequiredClientBuildDate({
+      parseClientVersion,
+      clientVersion: Maybe.of(this.config.MINIMUM_REQUIRED_CLIENT_BUILD_DATE),
+      deployedClientVersion: this.config.VERSION,
+    });
+    const minimumRequiredClientBuildDate = minimumRequiredClientBuildDateResult.match({
+      Ok(parsedMinimumRequiredClientBuildDate) {
+        return parsedMinimumRequiredClientBuildDate;
+      },
+      Err(error) {
+        console.error(error.message);
+
+        return Maybe.nothing<Date>();
+      },
+    });
+
     this.app.use(
       createClientVersionCheckRoute({
         router: Router(),
         parseClientVersion,
-        minimumRequiredClientBuildDate: parseMinimumRequiredClientBuildDate({
-          parseClientVersion,
-          clientVersion: Maybe.of(this.config.MINIMUM_REQUIRED_CLIENT_BUILD_DATE),
-          deployedClientVersion: this.config.VERSION,
-          logInvalidMinimumRequiredClientBuildDate(message) {
-            console.error(message);
-          },
-        }),
+        minimumRequiredClientBuildDate,
       }),
     );
     this.app.use(NotFoundRoute());

@@ -24,46 +24,61 @@ export type ParseMinimumRequiredClientBuildDateDependencies = {
   readonly parseClientVersion: (clientVersionHeaderValue: string) => Result<Date, Error>;
   readonly clientVersion: Maybe<string>;
   readonly deployedClientVersion: string;
-  readonly logInvalidMinimumRequiredClientBuildDate: (message: string) => void;
 };
+
+function getInvalidDeployedClientVersionError(
+  minimumRequiredClientBuildDateValue: string,
+  deployedClientVersion: string,
+): Error {
+  return new Error(
+    `Ignoring MINIMUM_REQUIRED_CLIENT_BUILD_DATE="${minimumRequiredClientBuildDateValue}" because deployed client version "${deployedClientVersion}" is invalid.`,
+  );
+}
+
+function getMinimumRequiredClientBuildDateNewerThanDeployedClientVersionError(
+  minimumRequiredClientBuildDateValue: string,
+  deployedClientVersion: string,
+): Error {
+  return new Error(
+    `Ignoring MINIMUM_REQUIRED_CLIENT_BUILD_DATE="${minimumRequiredClientBuildDateValue}" because it is newer than deployed client version "${deployedClientVersion}".`,
+  );
+}
 
 export function parseMinimumRequiredClientBuildDate(
   dependencies: ParseMinimumRequiredClientBuildDateDependencies,
-): Maybe<Date> {
-  const {parseClientVersion, clientVersion, deployedClientVersion, logInvalidMinimumRequiredClientBuildDate} =
-    dependencies;
+): Result<Maybe<Date>, Error> {
+  const {parseClientVersion, clientVersion, deployedClientVersion} = dependencies;
   const minimumRequiredClientBuildDateValue = clientVersion.unwrapOr('');
 
   if (is.emptyString(minimumRequiredClientBuildDateValue)) {
-    return Maybe.nothing();
+    return Result.ok(Maybe.nothing());
   }
 
-  const parsedMinimumRequiredClientBuildDate = toolbelt.fromResult(parseClientVersion(minimumRequiredClientBuildDateValue));
+  const parsedMinimumRequiredClientBuildDate = toolbelt.fromResult(
+    parseClientVersion(minimumRequiredClientBuildDateValue),
+  );
 
   if (parsedMinimumRequiredClientBuildDate.isNothing) {
-    return Maybe.nothing();
+    return Result.ok(Maybe.nothing());
   }
 
   const parsedDeployedClientVersion = toolbelt.fromResult(parseClientVersion(deployedClientVersion));
 
   if (parsedDeployedClientVersion.isNothing) {
-    logInvalidMinimumRequiredClientBuildDate(
-      `Ignoring MINIMUM_REQUIRED_CLIENT_BUILD_DATE="${minimumRequiredClientBuildDateValue}" because deployed client version "${deployedClientVersion}" is invalid.`,
-    );
-
-    return Maybe.nothing();
+    return Result.err(getInvalidDeployedClientVersionError(minimumRequiredClientBuildDateValue, deployedClientVersion));
   }
 
   const isMinimumRequiredClientBuildDateNewerThanDeployedClientVersion =
     parsedMinimumRequiredClientBuildDate.value.getTime() > parsedDeployedClientVersion.value.getTime();
 
   if (isMinimumRequiredClientBuildDateNewerThanDeployedClientVersion) {
-    logInvalidMinimumRequiredClientBuildDate(
-      `Ignoring MINIMUM_REQUIRED_CLIENT_BUILD_DATE="${minimumRequiredClientBuildDateValue}" because it is newer than deployed client version "${deployedClientVersion}".`,
+    return Result.err(
+      getMinimumRequiredClientBuildDateNewerThanDeployedClientVersionError(
+        minimumRequiredClientBuildDateValue,
+        deployedClientVersion,
+      ),
     );
-
-    return Maybe.nothing();
   }
 
-  return parsedMinimumRequiredClientBuildDate;
+  return Result.ok(parsedMinimumRequiredClientBuildDate);
 }

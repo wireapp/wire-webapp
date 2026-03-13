@@ -45,7 +45,7 @@ export function createClientVersionCheckRoute(dependencies: ClientVersionCheckRo
     }
 
     return minimumRequiredClientBuildDate.match({
-      Just: minimumRequiredClientBuildDateValue => {
+      Just(minimumRequiredClientBuildDateValue) {
         const isClientVersionBelowMinimumRequiredBuildDate =
           parsedClientVersion.value.getTime() < minimumRequiredClientBuildDateValue.getTime();
 
@@ -56,7 +56,7 @@ export function createClientVersionCheckRoute(dependencies: ClientVersionCheckRo
         return response.sendStatus(HTTP_STATUS.OK);
       },
 
-      Nothing: () => {
+      Nothing() {
         return response.sendStatus(HTTP_STATUS.OK);
       },
     });
