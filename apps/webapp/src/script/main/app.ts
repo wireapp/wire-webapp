@@ -119,6 +119,8 @@ import {serverTimeHandler} from '../time/serverTimeHandler';
 import {WindowHandler} from '../ui/WindowHandler';
 import {ViewModelRepositories} from '../view_model/MainViewModel';
 import {Warnings} from '../view_model/WarningsContainer';
+import {BackgroundEffectsController} from "Repositories/media/BackgroundEffects";
+import {BackgroundEffectsHandler} from "Repositories/media/BackgroundEffectsHandler";
 
 // Initialize PDF.js worker for react-pdf package
 pdfjs.GlobalWorkerOptions.workerSrc = '/min/pdf.worker.mjs';
@@ -211,6 +213,7 @@ export class App {
 
     const mediaStreamHandler = new MediaStreamHandler(mediaConstraintsHandler);
     const mediaDevicesHandler = new MediaDevicesHandler();
+    const backgroundEffectsHandler = new BackgroundEffectsHandler(new BackgroundEffectsController());
 
     container.registerInstance(MediaDevicesHandler, mediaDevicesHandler);
     container.registerInstance(MediaStreamHandler, mediaStreamHandler);
@@ -273,6 +276,7 @@ export class App {
       mediaStreamHandler,
       mediaDevicesHandler,
       serverTimeHandler,
+      backgroundEffectsHandler,
     );
 
     repositories.self = new SelfRepository(selfService, repositories.user, repositories.team, repositories.client);

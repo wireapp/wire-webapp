@@ -104,10 +104,10 @@ export type BuiltinBackground = BuiltinBackgroundDefinition & {
  * @returns CSS linear-gradient() function string.
  */
 const buildGradient = (colors: string[]) => `linear-gradient(135deg, ${colors.join(', ')})`;
-
+export const DEFAULT_BUILTIN_BACKGROUND_ID = 'wire-1';
 const BUILTIN_BACKGROUND_DEFINITIONS: BuiltinBackgroundDefinition[] = [
   {
-    id: 'wire-1',
+    id: DEFAULT_BUILTIN_BACKGROUND_ID,
     labelKey: 'videoCallBackgroundWire1',
     imageUrl: '/image/backgrounds/wire-1.jpg',
     previewColors: ['#1a1a1a', '#2d2d2d', '#4a4a4a'],

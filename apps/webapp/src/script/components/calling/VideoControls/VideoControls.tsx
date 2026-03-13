@@ -34,6 +34,7 @@ import {Call} from 'Repositories/calling/Call';
 import {CallingViewMode, CallState} from 'Repositories/calling/CallState';
 import {Participant} from 'Repositories/calling/Participant';
 import {Conversation} from 'Repositories/entity/Conversation';
+import {BackgroundEffectsHandler} from 'Repositories/media/BackgroundEffectsHandler';
 import {ElectronDesktopCapturerSource, MediaDevicesHandler} from 'Repositories/media/MediaDevicesHandler';
 import {useMediaDevicesStore} from 'Repositories/media/useMediaDevicesStore';
 import type {BackgroundEffectSelection} from 'Repositories/media/VideoBackgroundEffects';
@@ -110,6 +111,7 @@ interface VideoControlsProps {
   canShareScreen: boolean;
   conversation: Conversation;
   mediaDevicesHandler: MediaDevicesHandler;
+  backgroundEffectsHandler: BackgroundEffectsHandler;
   callState?: CallState;
   teamState?: TeamState;
   minimize: () => void;
@@ -136,6 +138,7 @@ export const VideoControls = ({
   toggleParticipantsList,
   canShareScreen,
   conversation,
+  backgroundEffectsHandler,
   minimize,
   leave,
   toggleMute,
@@ -169,8 +172,10 @@ export const VideoControls = ({
 
   const {is1to1: is1to1Conversation} = useKoSubscribableChildren(conversation, ['is1to1']);
 
-  const {backgroundEffect} = useKoSubscribableChildren(selfParticipant, ['backgroundEffect']);
-  const selectedBackgroundEffect = backgroundEffect ?? DEFAULT_BACKGROUND_EFFECT;
+  const {preferredBackgroundEffect} = useKoSubscribableChildren(backgroundEffectsHandler, [
+    'preferredBackgroundEffect',
+  ]);
+  const selectedBackgroundEffect = preferredBackgroundEffect ?? DEFAULT_BACKGROUND_EFFECT;
 
   const {participants} = useKoSubscribableChildren(call, ['participants']);
 

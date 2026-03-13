@@ -20,63 +20,77 @@
 import {observable} from 'knockout';
 
 import {BackgroundEffectsController} from 'Repositories/media/BackgroundEffects';
-import {BackgroundEffectSelection, BackgroundSource, BLUR_STRENGTHS} from 'Repositories/media/VideoBackgroundEffects';
+import {
+  BackgroundEffectSelection,
+  BackgroundSource,
+  BLUR_STRENGTHS,
+  DEFAULT_BACKGROUND_EFFECT,
+  DEFAULT_BUILTIN_BACKGROUND_ID,
+  loadBackgroundSource,
+} from 'Repositories/media/VideoBackgroundEffects';
 import {getLogger, Logger} from 'Util/Logger';
+
+export const TARGET_FPS = 15;
 
 export class BackgroundEffectsHandler {
   private readonly logger: Logger = getLogger('BackgroundEffectsHandler');
-  private readonly controller: BackgroundEffectsController = new BackgroundEffectsController();
-  public readonly backgroundEffectedVideoStream = observable<{stream: MediaStream; release: () => void} | undefined>();
+  public readonly backgroundEffectedVideoStream = observable<ReleasableMediaStream | undefined>();
+  public readonly preferredBackgroundEffect = observable<BackgroundEffectSelection>(DEFAULT_BACKGROUND_EFFECT);
+  private customBackground: BackgroundSource | undefined = undefined;
+
+  constructor(private readonly controller: BackgroundEffectsController) {}
 
   public async applyBackgroundEffect(
     originalVideoStream: MediaStream,
-    effect: BackgroundEffectSelection,
-    backgroundSource?: BackgroundSource,
-  ): Promise<MediaStream | undefined> {
-    if (effect.type === 'none') {
+  ): Promise<{applied: boolean; media: ReleasableMediaStream}> {
+    if (this.preferredBackgroundEffect().type === 'none') {
       // No background changes wanted nothing to do
-      return originalVideoStream;
+      return {applied: false, media: new ReleasableMediaStream(originalVideoStream)};
     }
 
     const videoTrack = originalVideoStream.getVideoTracks()[0];
 
     if (!videoTrack) {
       // No input video track, nothing to do
-      return originalVideoStream;
+      return {applied: false, media: new ReleasableMediaStream(originalVideoStream)};
     }
 
+    const effect = this.preferredBackgroundEffect();
     const isVirtual = effect.type === 'virtual' || effect.type === 'custom';
     const blurStrength = effect.type === 'blur' ? BLUR_STRENGTHS[effect.level] : BLUR_STRENGTHS.high;
 
     if (this.controller.isProcessing()) {
-      this.controller.stop();
+      // this.controller.stop();
     }
+
+    const backgroundSource: BackgroundSource | undefined = isVirtual
+      ? await this.loadBackgroundSource(effect)
+      : undefined;
 
     try {
       const {outputTrack, stop} = await this.controller.start(videoTrack, {
         mode: isVirtual ? 'virtual' : 'blur',
         blurStrength,
         quality: 'auto',
-        targetFps: 15,
+        targetFps: TARGET_FPS,
         debugMode: 'off',
         ...(isVirtual && backgroundSource ? {backgroundImage: backgroundSource} : {}),
       });
       const processedStream = new MediaStream([outputTrack]);
-      this.backgroundEffectedVideoStream({
-        stream: processedStream,
-        release: () => {
+      this.backgroundEffectedVideoStream(
+        new ReleasableMediaStream(processedStream, () => {
           stop();
           outputTrack.stop();
-        },
-      });
+        }),
+      );
     } catch (error) {
       this.controller.stop();
       this.logger.warn('BackgroundEffectsController failed with error:', error);
-      return originalVideoStream;
+      return {applied: false, media: new ReleasableMediaStream(originalVideoStream)};
     }
 
     if (this.backgroundEffectedVideoStream()?.stream === undefined) {
-      return originalVideoStream;
+      return {applied: false, media: new ReleasableMediaStream(originalVideoStream)};
     }
 
     if (isVirtual) {
@@ -89,6 +103,52 @@ export class BackgroundEffectsHandler {
       this.controller.setBlurStrength(blurStrength);
     }
 
-    return this.backgroundEffectedVideoStream().stream;
+    return {applied: true, media: this.backgroundEffectedVideoStream()};
   }
+
+  public setPreferredBackgroundEffect(effect: BackgroundEffectSelection, customBackground?: BackgroundSource) {
+    this.preferredBackgroundEffect(effect);
+    if (effect.type === 'custom') {
+      if (!customBackground) {
+        this.preferredBackgroundEffect({type: 'virtual', backgroundId: DEFAULT_BUILTIN_BACKGROUND_ID});
+        this.logger.warn('No cusstom backgound image was set, switch to default virtuell Back ground');
+      }
+      this.customBackground = customBackground;
+    }
+  }
+
+  /**
+   * Load virtual or custom background
+   *
+   * @param effect BackgroundEffectSelection
+   * @private
+   */
+  private async loadBackgroundSource(effect: BackgroundEffectSelection): Promise<BackgroundSource | undefined> {
+    let backgroundSource: BackgroundSource | undefined = undefined;
+    try {
+      if (effect.type === 'virtual') {
+        backgroundSource = await loadBackgroundSource(effect.backgroundId);
+      } else if (effect.type === 'custom') {
+        if (!this.customBackground) {
+          this.logger.warn('Failed to load custom background source');
+        }
+        backgroundSource = this.customBackground;
+      }
+    } catch (error) {
+      this.logger.warn('Failed to load background source', error);
+    }
+
+    return backgroundSource;
+  }
+
+  public isBackgroundEffectEnabled() {
+    return this.preferredBackgroundEffect().type !== 'none';
+  }
+}
+
+export class ReleasableMediaStream {
+  constructor(
+    public stream: MediaStream,
+    public release: () => void = () => null,
+  ) {}
 }

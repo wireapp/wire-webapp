@@ -277,6 +277,7 @@ const FullscreenVideoCall = ({
   const isPaginationVisible = !maximizedParticipant && activeCallViewTab === CallViewTab.ALL && totalPages > 1;
 
   const isModerator = selfUser && roles[selfUser.id] === DefaultConversationRoleName.WIRE_ADMIN;
+  const backgroundEffectsHandler = callingRepository.getBackgroundEffectsHandler();
 
   return (
     <div
@@ -438,6 +439,7 @@ const FullscreenVideoCall = ({
               canShareScreen={canShareScreen}
               conversation={conversation}
               mediaDevicesHandler={mediaDevicesHandler}
+              backgroundEffectsHandler={backgroundEffectsHandler}
               minimize={minimize}
               leave={leave}
               toggleMute={toggleMute}

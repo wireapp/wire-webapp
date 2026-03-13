@@ -24,13 +24,6 @@ import {VIDEO_STATE} from '@wireapp/avs';
 import {AvsDebugger} from '@wireapp/avs-debugger';
 
 import {User} from 'Repositories/entity/User';
-import {BackgroundEffectsController} from 'Repositories/media/BackgroundEffects/effects/BackgroundEffectsController';
-import {
-  BLUR_STRENGTHS,
-  DEFAULT_BACKGROUND_EFFECT,
-  type BackgroundEffectSelection,
-  type BackgroundSource,
-} from 'Repositories/media/VideoBackgroundEffects';
 import {getLogger, Logger} from 'Util/Logger';
 import {matchQualifiedIds} from 'Util/QualifiedId';
 
@@ -40,9 +33,11 @@ export type ClientId = string;
 export class Participant {
   // Video
   public readonly videoState = observable(VIDEO_STATE.STOPPED);
+  // The (self-) participant hold everytime the original video and this will never change.
   public readonly videoStream = observable<MediaStream | undefined>();
+  // In case of background changes effected we store this resulting media stream here.
+  // The CallingRepository will decide if this stream is sent. Because background changes are global app state changes!
   public readonly processedVideoStream = observable<{stream: MediaStream; release: () => void} | undefined>();
-  public readonly backgroundEffect = observable<BackgroundEffectSelection>(DEFAULT_BACKGROUND_EFFECT);
   public readonly hasActiveVideo: ko.PureComputed<boolean>;
   public readonly hasPausedVideo: ko.PureComputed<boolean>;
   public readonly sharesScreen: ko.PureComputed<boolean>;
@@ -52,7 +47,6 @@ export class Participant {
   public readonly isActivelySpeaking = observable(false);
   public readonly isSendingVideo: ko.PureComputed<boolean>;
   public readonly isAudioEstablished = observable(false);
-  private backgroundEffectsController: BackgroundEffectsController | null = null;
   private readonly logger: Logger;
 
   // Audio
@@ -94,97 +88,9 @@ export class Participant {
   }
 
   public releaseProcessedVideoStream(): void {
+    this.logger.info('Stop the current background effect!');
     this.processedVideoStream()?.release();
     this.processedVideoStream(undefined);
-    this.backgroundEffectsController = null;
-  }
-
-  /**
-   * Applies a background effect to this participant's video stream.
-   *
-   * This method:
-   * 1. Initializes the background effects controller if needed (first call or after release)
-   * 2. Starts processing the video track with the selected effect
-   * 3. Updates the controller's mode and background source for virtual effects
-   * 4. Returns the processed MediaStream with effects applied
-   *
-   * For 'none' effect, releases any existing processed stream and returns
-   * the original video stream. The controller is reused if already initialized
-   * to avoid reinitialization overhead. Background sources are only updated
-   * when switching effects on an existing controller (not during initial creation).
-   *
-   * @param effect - Background effect to apply ('none', 'blur', 'virtual', or 'custom').
-   * @param backgroundSource - Optional background source for virtual/custom effects.
-   *                          Required for 'custom' effect type. Only used when
-   *                          updating an existing controller, not during initialization.
-   * @returns Promise resolving to the processed MediaStream with effects applied,
-   *          or undefined if application fails or no video stream is available.
-   */
-  public async applyBackgroundEffect(
-    effect: BackgroundEffectSelection,
-    backgroundSource?: BackgroundSource,
-  ): Promise<MediaStream | undefined> {
-    const originalVideoStream = this.videoStream();
-    if (!originalVideoStream) {
-      return undefined;
-    }
-    if (effect.type === 'none') {
-      this.releaseProcessedVideoStream();
-      return originalVideoStream;
-    }
-    const videoTrack = originalVideoStream.getVideoTracks()[0];
-    if (!videoTrack) {
-      return undefined;
-    }
-
-    const isVirtual = effect.type === 'virtual' || effect.type === 'custom';
-    const blurStrength = effect.type === 'blur' ? BLUR_STRENGTHS[effect.level] : BLUR_STRENGTHS.high;
-
-    const shouldCreateController = !this.backgroundEffectsController || !this.processedVideoStream();
-    if (shouldCreateController) {
-      const controller = new BackgroundEffectsController();
-      try {
-        const {outputTrack, stop} = await controller.start(videoTrack, {
-          mode: isVirtual ? 'virtual' : 'blur',
-          blurStrength,
-          quality: 'auto',
-          targetFps: 15,
-          debugMode: 'off',
-          ...(isVirtual && backgroundSource ? {backgroundImage: backgroundSource} : {}),
-        });
-        const processedStream = new MediaStream([outputTrack]);
-        this.backgroundEffectsController = controller;
-        this.processedVideoStream({
-          stream: processedStream,
-          release: () => {
-            stop();
-            outputTrack.stop();
-            this.backgroundEffectsController = null;
-          },
-        });
-      } catch (error) {
-        controller.stop();
-        this.logger.warn('BackgroundEffectsController failed with error:', error);
-        this.releaseProcessedVideoStream();
-        return undefined;
-      }
-    }
-
-    if (!this.backgroundEffectsController) {
-      return this.processedVideoStream()?.stream;
-    }
-
-    if (isVirtual) {
-      this.backgroundEffectsController.setMode('virtual');
-      if (backgroundSource && !shouldCreateController) {
-        this.backgroundEffectsController.setBackgroundSource(backgroundSource);
-      }
-    } else {
-      this.backgroundEffectsController.setMode('blur');
-      this.backgroundEffectsController.setBlurStrength(blurStrength);
-    }
-
-    return this.processedVideoStream()?.stream;
   }
 
   readonly doesMatchIds = (userId: QualifiedId, clientId: ClientId): boolean =>

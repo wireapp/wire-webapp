@@ -70,10 +70,10 @@ import {CallingEvent} from 'Repositories/event/CallingEvent';
 import {EventRepository} from 'Repositories/event/EventRepository';
 import {EventSource} from 'Repositories/event/EventSource';
 import {NOTIFICATION_HANDLING_STATE} from 'Repositories/event/NotificationHandlingState';
+import {BackgroundEffectsHandler} from 'Repositories/media/BackgroundEffectsHandler';
 import type {MediaDevicesHandler} from 'Repositories/media/MediaDevicesHandler';
 import type {MediaStreamHandler} from 'Repositories/media/MediaStreamHandler';
 import {MediaType} from 'Repositories/media/MediaType';
-import {DEFAULT_BACKGROUND_EFFECT, loadBackgroundSource} from 'Repositories/media/VideoBackgroundEffects';
 import type {BackgroundEffectSelection, BackgroundSource} from 'Repositories/media/VideoBackgroundEffects';
 import {TeamState} from 'Repositories/team/TeamState';
 import {EventName} from 'Repositories/tracking/EventName';
@@ -153,7 +153,6 @@ export class CallingRepository {
   private readonly acceptVersionWarning: (conversationId: QualifiedId) => void;
   private readonly callLog: string[];
   private readonly logger: Logger;
-  private preferredBackgroundEffect: BackgroundEffectSelection = DEFAULT_BACKGROUND_EFFECT;
   private avsVersion: number = 0;
   private incomingCallCallback: (call: Call) => void;
   private isReady: boolean = false;
@@ -192,6 +191,7 @@ export class CallingRepository {
     private readonly mediaStreamHandler: MediaStreamHandler,
     private readonly mediaDevicesHandler: MediaDevicesHandler,
     private readonly serverTimeHandler: ServerTimeHandler,
+    private readonly backgroundEffectsHandler: BackgroundEffectsHandler,
     private readonly apiClient = container.resolve(APIClient),
     private readonly conversationState = container.resolve(ConversationState),
     private readonly callState = container.resolve(CallState),
@@ -324,9 +324,8 @@ export class CallingRepository {
    *
    * This method:
    * 1. Stores the effect as the preferred background effect
-   * 2. Updates the participant's background effect observable
-   * 3. Applies the effect to the participant's video stream
-   * 4. Replaces the media source with the processed stream if successfully applied
+   * 2. Applies the effect to the participant's video stream
+   * 3. Replaces the media source with the processed stream if successfully applied
    *
    * If no active call exists or no video feed is available, only updates the
    * participant's effect observable without applying processing. For 'none' effect,
@@ -340,99 +339,72 @@ export class CallingRepository {
     effect: BackgroundEffectSelection,
     customBackground?: BackgroundSource,
   ): Promise<void> {
-    this.preferredBackgroundEffect = effect;
-    const activeCall = this.callState.joinedCall();
-    if (!activeCall) {
-      return;
-    }
-    const selfParticipant = activeCall.getSelfParticipant();
-    const videoFeed = selfParticipant.videoStream();
-    selfParticipant.backgroundEffect(effect);
-    if (!videoFeed) {
-      return;
-    }
-
-    const {applied, processedStream} = await this.applyBackgroundEffectToParticipant(
-      selfParticipant,
-      effect,
-      customBackground,
-    );
-    if (!applied) {
-      return;
-    }
-
-    if (effect.type === 'none') {
-      this.changeMediaSource(videoFeed, MediaType.VIDEO, false);
-      return;
-    }
-
-    if (processedStream) {
-      this.changeMediaSource(processedStream, MediaType.VIDEO, false);
-    }
+    // persisted chosen background effect, don't care we have call or not
+    this.backgroundEffectsHandler.setPreferredBackgroundEffect(effect, customBackground);
+    await this.applyCurrentBackgroundEffectOnSelfParticipant(true);
   }
 
-  /**
-   * Applies a background effect to a participant's video stream.
-   *
-   * Handles effect application logic:
-   * - 'none': Releases processed stream and returns original stream
-   * - 'virtual': Loads builtin background image and applies virtual background
-   * - 'custom': Uses provided custom background source (requires customBackground parameter)
-   * - 'blur': Applies blur effect with appropriate strength
-   *
-   * Returns an object indicating success and the processed MediaStream if applicable.
-   * If background loading fails or effect application fails, returns {applied: false}.
-   *
-   * @param selfParticipant - Participant to apply the effect to.
-   * @param effect - Background effect selection.
-   * @param customBackground - Optional custom background source for 'custom' effect type.
-   *                          Required for 'custom' effect type.
-   * @returns Promise resolving to an object indicating if the effect was applied
-   *          and the processed MediaStream if successful.
-   */
-  private async applyBackgroundEffectToParticipant(
-    selfParticipant: Participant,
-    effect: BackgroundEffectSelection,
-    customBackground?: BackgroundSource,
-  ): Promise<{applied: boolean; processedStream?: MediaStream}> {
-    const videoFeed = selfParticipant.videoStream();
-    if (!videoFeed) {
-      return {applied: false};
+  public getBackgroundEffectsHandler(): BackgroundEffectsHandler {
+    return this.backgroundEffectsHandler;
+  }
+
+  private async applyCurrentBackgroundEffectOnSelfParticipant(
+    changeAvsSendingMediaSource = false,
+  ): Promise<MediaStream | void> {
+    const activeCall = this.callState.joinedCall();
+    if (!activeCall) {
+      // There is no call even there is no self-participant!
+      this.logger.warn('There is no call even there is no self-participant to apply background effects');
+      return;
     }
 
-    if (effect.type === 'none') {
-      selfParticipant.releaseProcessedVideoStream();
-      return {applied: true, processedStream: videoFeed};
+    // Read self-Participant state to change
+    const selfParticipant = activeCall.getSelfParticipant();
+    const hasActiveVideo = selfParticipant.hasActiveVideo();
+    const sharesScreen = selfParticipant.sharesScreen();
+
+    if (sharesScreen) {
+      this.logger.error('The application allows to apply background effects in case of screen shares');
+      return;
     }
 
-    let backgroundSource: BackgroundSource | undefined;
-    try {
-      if (effect.type === 'virtual') {
-        backgroundSource = await loadBackgroundSource(effect.backgroundId);
-      } else if (effect.type === 'custom') {
-        if (!customBackground) {
-          return {applied: false};
-        }
-        backgroundSource = customBackground;
+    // Whatever will happen from now, we stop the current background effect!
+    // selfParticipant.releaseProcessedVideoStream();
+
+    // let's check if background should be disabled, then let's do it and go back to the original video
+    if (!this.backgroundEffectsHandler.isBackgroundEffectEnabled() && hasActiveVideo) {
+      if (hasActiveVideo && changeAvsSendingMediaSource) {
+        // So let's switch back to the original video source
+        this.logger.info('Disable background effects.');
+        this.changeMediaSource(selfParticipant.videoStream(), MediaType.VIDEO, false);
       }
-    } catch (error) {
-      this.logger.warn('Failed to load background source', error);
-      return {applied: false};
+      return selfParticipant.videoStream();
     }
 
-    let processedStream: MediaStream | undefined;
-    try {
-      processedStream = await selfParticipant.applyBackgroundEffect(effect, backgroundSource);
-    } catch (error) {
-      this.logger.warn('Failed to apply background effect', error);
-      return {applied: false};
+    if (!hasActiveVideo) {
+      // no Video nothing to change!!
+      this.logger.warn('No video exists to apply apply background effects');
+      return;
     }
 
-    if (!processedStream) {
-      return {applied: false};
+    const {applied, media} = await this.backgroundEffectsHandler.applyBackgroundEffect(selfParticipant.videoStream());
+
+    // The BackgroundEffectsHandler decide not to change the video stream, so we're going on with the original video.
+    if (!applied && changeAvsSendingMediaSource) {
+      this.logger.info('Background effect could not applied! Switch back to original video stream!');
+      this.changeMediaSource(selfParticipant.videoStream(), MediaType.VIDEO, false);
+      return selfParticipant.videoStream();
     }
 
-    return {applied: true, processedStream};
+    // Replace current video stream with new effected video stream
+    selfParticipant.processedVideoStream(media);
+
+    // in case we also want to instantly change AVS sending source we do it now,
+    if (changeAvsSendingMediaSource) {
+      this.changeMediaSource(media.stream, MediaType.VIDEO, false);
+      this.logger.info('Background effect applied!');
+    }
+    return media.stream;
   }
 
   getStats(conversationId: QualifiedId) {
@@ -700,7 +672,8 @@ export class CallingRepository {
   }
 
   private storeCall(call: Call): void {
-    call.getSelfParticipant().backgroundEffect(this.preferredBackgroundEffect);
+    // @TODO check why this is needed, backgound effect should be global
+    // call.getSelfParticipant().backgroundEffect(this.preferredBackgroundEffect);
     this.callState.calls.push(call);
   }
 
@@ -722,10 +695,8 @@ export class CallingRepository {
       const mediaStream = await this.getMediaStream({audio, camera}, call.isGroupOrConference);
       if (call.state() !== CALL_STATE.NONE) {
         selfParticipant.updateMediaStream(mediaStream, true);
-        const effect = this.preferredBackgroundEffect;
-        const {applied} = await this.applyBackgroundEffectToParticipant(selfParticipant, effect);
-        if (applied) {
-          selfParticipant.backgroundEffect(effect);
+        if (this.backgroundEffectsHandler.isBackgroundEffectEnabled()) {
+          await this.applyCurrentBackgroundEffectOnSelfParticipant();
         }
         if (camera) {
           call.getSelfParticipant().videoState(VIDEO_STATE.STARTED);
@@ -1961,10 +1932,13 @@ export class CallingRepository {
   public async refreshVideoInput() {
     const stream = await this.mediaStreamHandler.requestMediaStream(false, true, false, false);
     this.stopMediaSource(MediaType.VIDEO);
-    const clonedMediaStream = this.changeMediaSource(stream, MediaType.VIDEO);
+    let clonedMediaStream = this.changeMediaSource(stream, MediaType.VIDEO);
     const activeCall = this.callState.joinedCall();
-    if (activeCall) {
-      await this.switchVideoBackgroundEffect(this.preferredBackgroundEffect);
+    if (activeCall && this.backgroundEffectsHandler.isBackgroundEffectEnabled()) {
+      const processedStream = await this.applyCurrentBackgroundEffectOnSelfParticipant(true);
+      if (processedStream) {
+        clonedMediaStream = processedStream;
+      }
     }
     return clonedMediaStream;
   }
@@ -2648,11 +2622,11 @@ export class CallingRepository {
         const mediaStream = await this.getMediaStream(missingStreams, call.isGroupOrConference);
         this.mediaStreamQuery = undefined;
         selfParticipant.updateMediaStream(mediaStream, true);
-        const effect = this.preferredBackgroundEffect;
-        const {applied} = await this.applyBackgroundEffectToParticipant(selfParticipant, effect);
-        if (applied) {
-          selfParticipant.backgroundEffect(effect);
+
+        if (this.backgroundEffectsHandler.isBackgroundEffectEnabled()) {
+          await this.applyCurrentBackgroundEffectOnSelfParticipant();
         }
+
         return selfParticipant.getMediaStream();
       } catch (error) {
         this.mediaStreamQuery = undefined;
