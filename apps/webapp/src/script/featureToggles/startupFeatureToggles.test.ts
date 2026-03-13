@@ -26,7 +26,13 @@ import {
   collaboraClipboardAccessFeatureToggleName,
   incrementalHttpRetryBackoffFeatureToggleName,
   reliableWebsocketConnectionFeatureToggleName,
+  startupFeatureToggleNames,
 } from './startupFeatureToggleNames';
+
+const featureToggleNamesWithDedicatedExistenceTests = [
+  reliableWebsocketConnectionFeatureToggleName,
+  incrementalHttpRetryBackoffFeatureToggleName,
+] as const;
 
 describe('startupFeatureToggles', function () {
   it('returns disabled toggles when the query parameter is missing', function () {
@@ -122,6 +128,10 @@ describe('startupFeatureToggles', function () {
       incrementalHttpRetryBackoffFeatureToggleName,
       collaboraClipboardAccessFeatureToggleName,
     ]);
+  });
+
+  it('requires a dedicated existence test for every startup feature toggle name', function () {
+    expect(featureToggleNamesWithDedicatedExistenceTests).toEqual(startupFeatureToggleNames);
   });
 
   it('does not expose mutable enabled toggle state', function () {
