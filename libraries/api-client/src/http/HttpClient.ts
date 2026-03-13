@@ -83,6 +83,8 @@ export class HttpClient extends EventEmitter {
   private readonly backOffQueue: PriorityQueue;
   private readonly incrementalRetryBackoffPolicy = createIncrementalRetryBackoffPolicy();
   private readonly incrementalRetryBackoffRunner;
+  private incrementalRetryBackoffResetAbortController = new AbortController();
+  private incrementalRetryBackoffResetCount = 0;
   private incrementalRetryBackoffState: IncrementalRetryBackoffState;
   private shouldUseIncrementalRetryBackoff = false;
   public static readonly TOPIC = TOPIC;
@@ -183,7 +185,20 @@ export class HttpClient extends EventEmitter {
   }
 
   public resetRetryBackoff(): void {
+    this.incrementalRetryBackoffResetCount += 1;
     this.incrementalRetryBackoffState = this.incrementalRetryBackoffPolicy.createInitialIncrementalRetryBackoffState();
+    this.incrementalRetryBackoffResetAbortController.abort();
+    this.incrementalRetryBackoffResetAbortController = new AbortController();
+  }
+
+  private getIncrementalRetryBackoffAbortSignal(abortController?: AbortController): Maybe<AbortSignal> {
+    if (abortController !== undefined) {
+      return Maybe.just(
+        AbortSignal.any([abortController.signal, this.incrementalRetryBackoffResetAbortController.signal]),
+      );
+    }
+
+    return Maybe.just(this.incrementalRetryBackoffResetAbortController.signal);
   }
 
   private updateConnectionState(state: ConnectionState): void {
@@ -355,9 +370,15 @@ export class HttpClient extends EventEmitter {
 
     if (this.shouldUseIncrementalRetryBackoff) {
       return this.incrementalRetryBackoffRunner.runWithIncrementalRetryBackoff({
-        abortSignal: Maybe.of(abortController?.signal),
+        abortSignal: this.getIncrementalRetryBackoffAbortSignal(abortController),
         getIncrementalRetryBackoffState: () => {
           return this.incrementalRetryBackoffState;
+        },
+        getRetryBackoffResetCount: () => {
+          return this.incrementalRetryBackoffResetCount;
+        },
+        isRequestAborted: () => {
+          return abortController?.signal.aborted === true;
         },
         runRequestAttempt,
         setIncrementalRetryBackoffState: nextIncrementalRetryBackoffState => {

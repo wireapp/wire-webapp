@@ -239,5 +239,54 @@ describe('HttpClient', () => {
 
       expect(httpClientDependenciesForTest.observedDelayInMilliseconds).toEqual([100, 200, 100]);
     });
+
+    it('retries immediately when the retry backoff is reset during an active wait', async () => {
+      let scheduledTimeoutHandler: (() => void) | undefined;
+      const observedDelayInMilliseconds: number[] = [];
+      const clearTimeout = jest.fn();
+      const setTimeout = jest.fn((handler: () => void, delayInMilliseconds: number) => {
+        scheduledTimeoutHandler = handler;
+        observedDelayInMilliseconds.push(delayInMilliseconds);
+
+        return 1 as ReturnType<typeof globalThis.setTimeout>;
+      });
+      const client = new HttpClient(
+        testConfig,
+        mockedAccessTokenStore as AccessTokenStore,
+        {
+          dependencies: {
+            clearTimeout,
+            setTimeout,
+          },
+          shouldUseIncrementalRetryBackoff: true,
+        },
+      );
+      const response = {data: {ok: true}} as any;
+
+      client._sendRequest = jest
+        .fn()
+        .mockRejectedValueOnce(createRetryableBackendError(StatusCode.SERVICE_UNAVAILABLE))
+        .mockResolvedValueOnce(response);
+
+      const responsePromise = client.sendRequest({method: 'GET', url: '/conversations'});
+      for (let microtaskTurn = 0; microtaskTurn < 10; microtaskTurn += 1) {
+        if (setTimeout.mock.calls.length > 0) {
+          break;
+        }
+
+        await Promise.resolve();
+      }
+
+      expect(client._sendRequest).toHaveBeenCalledTimes(1);
+      expect(setTimeout).toHaveBeenCalledTimes(1);
+      expect(scheduledTimeoutHandler).toBeDefined();
+
+      client.resetRetryBackoff();
+
+      await expect(responsePromise).resolves.toBe(response);
+      expect(clearTimeout).toHaveBeenCalledWith(1);
+      expect(client._sendRequest).toHaveBeenCalledTimes(2);
+      expect(observedDelayInMilliseconds).toEqual([100]);
+    });
   });
 });

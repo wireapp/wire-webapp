@@ -64,6 +64,12 @@ describe('IncrementalRetryBackoffRunner', () => {
       getIncrementalRetryBackoffState() {
         return incrementalRetryBackoffState;
       },
+      getRetryBackoffResetCount() {
+        return 0;
+      },
+      isRequestAborted() {
+        return false;
+      },
       runRequestAttempt,
       setIncrementalRetryBackoffState(nextIncrementalRetryBackoffState: IncrementalRetryBackoffState) {
         incrementalRetryBackoffState = nextIncrementalRetryBackoffState;
@@ -98,6 +104,12 @@ describe('IncrementalRetryBackoffRunner', () => {
       abortSignal: Maybe.nothing(),
       getIncrementalRetryBackoffState() {
         return incrementalRetryBackoffState;
+      },
+      getRetryBackoffResetCount() {
+        return 0;
+      },
+      isRequestAborted() {
+        return false;
       },
       runRequestAttempt,
       setIncrementalRetryBackoffState(nextIncrementalRetryBackoffState: IncrementalRetryBackoffState) {
@@ -135,6 +147,12 @@ describe('IncrementalRetryBackoffRunner', () => {
       getIncrementalRetryBackoffState() {
         return incrementalRetryBackoffState;
       },
+      getRetryBackoffResetCount() {
+        return 0;
+      },
+      isRequestAborted() {
+        return false;
+      },
       runRequestAttempt,
       setIncrementalRetryBackoffState(nextIncrementalRetryBackoffState: IncrementalRetryBackoffState) {
         incrementalRetryBackoffState = nextIncrementalRetryBackoffState;
@@ -170,6 +188,12 @@ describe('IncrementalRetryBackoffRunner', () => {
         getIncrementalRetryBackoffState() {
           return incrementalRetryBackoffState;
         },
+        getRetryBackoffResetCount() {
+          return 0;
+        },
+        isRequestAborted() {
+          return false;
+        },
         runRequestAttempt,
         setIncrementalRetryBackoffState(nextIncrementalRetryBackoffState: IncrementalRetryBackoffState) {
           incrementalRetryBackoffState = nextIncrementalRetryBackoffState;
@@ -181,5 +205,56 @@ describe('IncrementalRetryBackoffRunner', () => {
 
     expect(waitForDurationInMilliseconds).not.toHaveBeenCalled();
     expect(incrementalRetryBackoffState.delayInMilliseconds).toBe(0);
+  });
+
+  it('retries immediately when the retry backoff is reset while waiting', async () => {
+    const waitForDurationInMilliseconds = jest.fn<Promise<void>, [number, Maybe<AbortSignal>]>();
+    const incrementalRetryBackoffPolicy = createIncrementalRetryBackoffPolicy();
+    const incrementalRetryBackoffRunner = createIncrementalRetryBackoffRunner({
+      abortableWait: {
+        waitForDurationInMilliseconds,
+      },
+      getStatusCode(error) {
+        return Maybe.of((error as Partial<RetryableError>).statusCode);
+      },
+      incrementalRetryBackoffPolicy,
+    });
+    let incrementalRetryBackoffState = incrementalRetryBackoffPolicy.createInitialIncrementalRetryBackoffState();
+    let retryBackoffResetCount = 0;
+    const resetAbortController = new AbortController();
+    const runRequestAttempt = jest
+      .fn<Promise<string>, []>()
+      .mockRejectedValueOnce({statusCode: 503})
+      .mockResolvedValueOnce('response');
+
+    waitForDurationInMilliseconds.mockImplementationOnce(async (_durationInMilliseconds, abortSignal) => {
+      retryBackoffResetCount = 1;
+      resetAbortController.abort();
+
+      await abortSignal.unwrapOr(undefined)?.throwIfAborted();
+    });
+
+    const response = await incrementalRetryBackoffRunner.runWithIncrementalRetryBackoff({
+      abortSignal: Maybe.just(resetAbortController.signal),
+      getIncrementalRetryBackoffState() {
+        return incrementalRetryBackoffState;
+      },
+      getRetryBackoffResetCount() {
+        return retryBackoffResetCount;
+      },
+      isRequestAborted() {
+        return false;
+      },
+      runRequestAttempt,
+      setIncrementalRetryBackoffState(nextIncrementalRetryBackoffState: IncrementalRetryBackoffState) {
+        incrementalRetryBackoffState = nextIncrementalRetryBackoffState;
+
+        return incrementalRetryBackoffState;
+      },
+    });
+
+    expect(response).toBe('response');
+    expect(runRequestAttempt).toHaveBeenCalledTimes(2);
+    expect(waitForDurationInMilliseconds).toHaveBeenCalledTimes(1);
   });
 });
