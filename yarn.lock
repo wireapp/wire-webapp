@@ -3542,14 +3542,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@formatjs/cli@npm:6.13.0":
-  version: 6.13.0
-  resolution: "@formatjs/cli@npm:6.13.0"
+"@formatjs/cli@npm:6.13.1":
+  version: 6.13.1
+  resolution: "@formatjs/cli@npm:6.13.1"
   peerDependencies:
     "@glimmer/syntax": ^0.84.3 || ^0.95.0
-    "@vue/compiler-core": 3.5.27
+    "@vue/compiler-core": ^3.5.0
     content-tag: ^4.1.0
-    vue: 3.5.27
+    vue: ^3.5.0
   peerDependenciesMeta:
     "@glimmer/env":
       optional: true
@@ -3567,7 +3567,7 @@ __metadata:
       optional: true
   bin:
     formatjs: bin/formatjs
-  checksum: 10/2d6e38bbf26c45f680b867838b844a1db8d4599ca233abec6b148452912e571ee9f1578da01e67411f82d373a3e152a309455edc8e8c26bc036d56fa34abcb39
+  checksum: 10/741c5bc03820dab5d81fcd9b29249a71117d8e3c34fe8715f4f4107ef53670173c5a68c52a2b02f012e652b213fc2c47166c31bed3daca4c6aa79289079b304f
   languageName: node
   linkType: hard
 
@@ -9681,12 +9681,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/libsodium-wrappers-sumo@npm:0.7.8":
-  version: 0.7.8
-  resolution: "@types/libsodium-wrappers-sumo@npm:0.7.8"
+"@types/libsodium-wrappers-sumo@npm:0.8.2":
+  version: 0.8.2
+  resolution: "@types/libsodium-wrappers-sumo@npm:0.8.2"
   dependencies:
-    "@types/libsodium-wrappers": "npm:*"
-  checksum: 10/0343b5ae75905047b9ec5593009d4075a5460c40ff89dddc361afbbba94d769462c753015e8e6eea4411d89b35b1b25c03a67250ae8285952feb480d873edf31
+    libsodium-wrappers-sumo: "npm:*"
+  checksum: 10/f70926d40f4e7301738ab66e8d7a8c72c12ab89ea30cd036e4b0a852315b0ed7e787940ded66b49788d96cbd8e60deab3b2274c7cf0c963b4ca455f3a9ecfbfe
   languageName: node
   linkType: hard
 
@@ -11204,7 +11204,7 @@ __metadata:
     "@datadog/browser-rum": "npm:5.35.1"
     "@emotion/eslint-plugin": "npm:11.12.0"
     "@emotion/react": "npm:11.14.0"
-    "@formatjs/cli": "npm:6.13.0"
+    "@formatjs/cli": "npm:6.13.1"
     "@formkit/auto-animate": "npm:0.9.0"
     "@lexical/code": "npm:0.41.0"
     "@lexical/history": "npm:0.41.0"
@@ -11225,7 +11225,7 @@ __metadata:
     "@types/dexie-batch": "npm:0.4.7"
     "@types/js-cookie": "npm:3.0.6"
     "@types/keyboardjs": "npm:2.5.3"
-    "@types/libsodium-wrappers-sumo": "npm:0.7.8"
+    "@types/libsodium-wrappers-sumo": "npm:0.8.2"
     "@types/linkify-it": "npm:5.0.0"
     "@types/markdown-it": "npm:14.1.2"
     "@types/open-graph": "npm:0.2.6"
@@ -11289,7 +11289,7 @@ __metadata:
     less: "npm:4.5.1"
     less-loader: "npm:12.3.1"
     lexical: "npm:0.41.0"
-    libsodium-wrappers-sumo: "npm:0.8.0"
+    libsodium-wrappers-sumo: "npm:0.8.2"
     linkify-it: "npm:5.0.0"
     markdown-it: "npm:14.1.1"
     murmurhash: "npm:2.0.1"
@@ -20431,21 +20431,21 @@ __metadata:
   languageName: node
   linkType: hard
 
+"libsodium-wrappers-sumo@npm:*, libsodium-wrappers-sumo@npm:0.8.2":
+  version: 0.8.2
+  resolution: "libsodium-wrappers-sumo@npm:0.8.2"
+  dependencies:
+    libsodium-sumo: "npm:^0.8.0"
+  checksum: 10/fb7bffdabd01ddad70d0966235d1c3aee5ca7c1dc7922e8c28f59555b8fefc98d537076b03fe398ae5eaf22f53ceb144a976e03eb68b2f371e89d97758c6b8e5
+  languageName: node
+  linkType: hard
+
 "libsodium-wrappers-sumo@npm:0.7.9":
   version: 0.7.9
   resolution: "libsodium-wrappers-sumo@npm:0.7.9"
   dependencies:
     libsodium-sumo: "npm:^0.7.0"
   checksum: 10/b0e3beae34d17bdb3a7054eef772c4da4bc5205a32f95e7df7ec7c13092950e89b49644dcbb9066fde965b6209430fcfb76861269cda298f812b9b52830d9f05
-  languageName: node
-  linkType: hard
-
-"libsodium-wrappers-sumo@npm:0.8.0":
-  version: 0.8.0
-  resolution: "libsodium-wrappers-sumo@npm:0.8.0"
-  dependencies:
-    libsodium-sumo: "npm:^0.8.0"
-  checksum: 10/024dd65cd958238a285d676ee10c61e8a03e6ff7e3a9c21c8eb051f1d15679e6cce68842af42cbb6a451fc1fd18dc8290e965f46787cf79fa35e2f97eacda3d7
   languageName: node
   linkType: hard
 

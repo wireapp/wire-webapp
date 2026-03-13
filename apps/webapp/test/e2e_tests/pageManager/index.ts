@@ -74,6 +74,7 @@ import {WelcomePage} from './webapp/pages/welcome.page';
 import {GuestLinkPasswordModal} from './webapp/modals/guestLinkPassword.modal';
 import {ConversationJoinPage} from './webapp/pages/conversationJoin.page';
 import {CreateConversationModal} from './webapp/modals/createConversation';
+import {InviteModal} from './webapp/modals/invite.modal';
 
 export const webAppPath = process.env.WEBAPP_URL ?? '';
 
@@ -213,6 +214,7 @@ export class PageManager {
         this.getOrCreate('webapp.modals.guestLinkPassword', () => new GuestLinkPasswordModal(this.page)),
       createConversation: () =>
         this.getOrCreate('webapp.modals.createConversation', () => CreateConversationModal(this.page)),
+      invite: () => this.getOrCreate('webapp.modals.invite', () => InviteModal(this.page)),
     },
     components: {
       contactList: () => this.getOrCreate('webapp.components.ContactList', () => new ContactList(this.page)),

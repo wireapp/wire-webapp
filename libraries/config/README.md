@@ -113,6 +113,7 @@ Notes:
 | `SSL_CERTIFICATE_KEY_PATH` | `certificate/development-key.pem` (workspace or `apps/server/dist`) | TLS private key path | N/A |
 | `SSL_CERTIFICATE_PATH` | `certificate/development-cert.pem` (workspace or `apps/server/dist`) | TLS certificate path | N/A |
 | `ENABLE_DYNAMIC_HOSTNAME` | `false` | Replace `{{hostname}}` placeholders in URLs with client hostname | N/A |
+| `ENABLE_CLIENT_VERSION_ENFORCEMENT` | `false` | Enforce exact deployed client version matching for incident-driven force reloads | N/A |
 | `APP_NAME` | `Wire` | App name shown in client config | N/A |
 | `ANALYTICS_API_KEY` | From `.env.defaults` | Tracking API key exposed to client config | N/A |
 | `BACKEND_NAME` | From `.env.defaults` | Backend display name in client config | N/A |
@@ -121,7 +122,6 @@ Notes:
 | `ENABLE_DEV_BACKEND_API` | `false` | Allow development API usage in client | N/A |
 | `MAX_API_VERSION` | `13` | Max backend API version accepted by client | N/A |
 | `GOOGLE_WEBMASTER_ID` | From `.env.defaults` | Verification id in server-rendered metadata | N/A |
-| `MINIMUM_REQUIRED_CLIENT_BUILD_DATE` | `undefined` | Force minimum client build date check | N/A |
 | `OPEN_GRAPH_DESCRIPTION` | From `.env.defaults` | OpenGraph description meta tag | N/A |
 | `OPEN_GRAPH_IMAGE_URL` | From `.env.defaults` | OpenGraph image URL meta tag | N/A |
 | `OPEN_GRAPH_TITLE` | From `.env.defaults` | OpenGraph title meta tag | N/A |

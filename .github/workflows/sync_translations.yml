@@ -37,7 +37,7 @@ jobs:
         run: yarn nx run webapp:translate-merge
 
       - name: Download translations
-        uses: crowdin/github-action@8818ff65bfc4322384f983ea37e3926948c11745
+        uses: crowdin/github-action@d649adabd0daa7ea2ceeb232f66c30224575bb7e
         env:
           GITHUB_TOKEN: ${{secrets.OTTO_THE_BOT_GH_TOKEN}}
           CROWDIN_PROJECT_ID: 342359
