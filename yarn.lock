@@ -11217,6 +11217,7 @@ __metadata:
     linkify-it: "npm:5.0.0"
     markdown-it: "npm:14.1.1"
     murmurhash: "npm:2.0.1"
+    noop-esm: "npm:1.1.0"
     oidc-client-ts: "npm:3.4.1"
     os-browserify: "npm:0.3.0"
     p-wait-for: "npm:6.0.0"
@@ -21578,6 +21579,13 @@ __metadata:
   version: 2.0.27
   resolution: "node-releases@npm:2.0.27"
   checksum: 10/f6c78ddb392ae500719644afcbe68a9ea533242c02312eb6a34e8478506eb7482a3fb709c70235b01c32fe65625b68dfa9665113f816d87f163bc3819b62b106
+  languageName: node
+  linkType: hard
+
+"noop-esm@npm:1.1.0":
+  version: 1.1.0
+  resolution: "noop-esm@npm:1.1.0"
+  checksum: 10/592c401aa7ba19f872e4c26773715e94725d4ae286132115ba80ef906c27c24df3f77107c4296a2b30bd0c9d048d3ee4458eafd4948d8b40c4aadcc5df485520
   languageName: node
   linkType: hard
 

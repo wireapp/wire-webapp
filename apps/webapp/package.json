@@ -67,6 +67,7 @@
     "linkify-it": "5.0.0",
     "markdown-it": "14.1.1",
     "murmurhash": "2.0.1",
+    "noop-esm": "1.1.0",
     "oidc-client-ts": "3.4.1",
     "p-wait-for": "6.0.0",
     "path-to-regexp": "8.3.0",

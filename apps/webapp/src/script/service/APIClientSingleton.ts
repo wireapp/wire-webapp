@@ -33,6 +33,10 @@ type APIClientSingletonConfiguration = {
   readonly isFeatureToggleEnabled?: (featureToggleName: StartupFeatureToggleName) => boolean;
 };
 
+type RetryBackoffResettableHttpClient = {
+  readonly resetRetryBackoff: () => void;
+};
+
 @singleton()
 export class APIClient extends APIClientUnconfigured {
   constructor(apiClientSingletonConfiguration: APIClientSingletonConfiguration = {}) {
@@ -53,5 +57,11 @@ export class APIClient extends APIClientUnconfigured {
     };
 
     super(unconfiguredApiClientConfiguration);
+  }
+
+  public resetIncrementalRetryBackoff(): void {
+    const retryBackoffResettableHttpClient = this.transport.http as unknown as RetryBackoffResettableHttpClient;
+
+    retryBackoffResettableHttpClient.resetRetryBackoff();
   }
 }
