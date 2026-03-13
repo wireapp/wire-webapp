@@ -223,8 +223,8 @@ export type Env = {
   /** Limits the number of participants in a legacy video call */
   MAX_VIDEO_PARTICIPANTS: string;
 
-  /** Minimum required client build date */
-  MINIMUM_REQUIRED_CLIENT_BUILD_DATE: string | undefined;
+  /** Enables exact client/server version enforcement for incident-driven force reloads */
+  ENABLE_CLIENT_VERSION_ENFORCEMENT: string | undefined;
 
   /** Minimum number of characters when setting a password */
   NEW_PASSWORD_MINIMUM_LENGTH: string;

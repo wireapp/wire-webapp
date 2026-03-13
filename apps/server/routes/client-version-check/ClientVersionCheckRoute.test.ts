@@ -1,20 +1,22 @@
 import {Router, type Response, type Request} from 'express';
-import {Maybe, Result} from 'true-myth';
+import {Result} from 'true-myth';
 import {createClientVersionCheckRoute} from './ClientVersionCheckRoute';
 
 type ClientVersionCheckRouteDependencyFunctionOverrides = {
   readonly get?: jest.Mock;
   readonly parseClientVersion?: jest.Mock;
-  readonly minimumRequiredClientBuildDate?: Maybe<Date>;
+  readonly deployedClientVersion?: string;
+  readonly isClientVersionEnforcementEnabled?: boolean;
 };
 
 function createClientVersionCheckRouteDependencies(overrides: ClientVersionCheckRouteDependencyFunctionOverrides = {}) {
   const get = overrides.get ?? jest.fn();
   const parseClientVersion = overrides.parseClientVersion ?? jest.fn().mockReturnValue(Result.ok(new Date()));
-  const minimumRequiredClientBuildDate = overrides.minimumRequiredClientBuildDate ?? Maybe.nothing<Date>();
+  const deployedClientVersion = overrides.deployedClientVersion ?? '2026.02.12.17.51.00';
+  const isClientVersionEnforcementEnabled = overrides.isClientVersionEnforcementEnabled ?? false;
   const router = {get} as unknown as Router;
 
-  return {router, parseClientVersion, minimumRequiredClientBuildDate, get};
+  return {router, parseClientVersion, deployedClientVersion, isClientVersionEnforcementEnabled, get};
 }
 
 describe('/client-version-check', () => {
@@ -84,14 +86,15 @@ describe('/client-version-check', () => {
     expect(sendStatus).toHaveBeenNthCalledWith(1, 400);
   });
 
-  it('returns HTTP 200 when parsed client version equals minimum required version', async () => {
+  it('returns HTTP 200 when client version enforcement is disabled and parsed client version is lower than deployed version', async () => {
     const sendStatus = jest.fn();
-    const minimumRequiredClientBuildDate = new Date(2026, 1, 12, 17, 51, 0);
-    const fakeRequest = {header: jest.fn().mockReturnValue('2026.02.12.17.51.00')} as unknown as Request;
+    const clientVersionDate = new Date(2026, 1, 12, 17, 50, 59);
+    const fakeRequest = {header: jest.fn().mockReturnValue('2026.02.12.17.50.59')} as unknown as Request;
     const fakeResponse = {sendStatus} as unknown as Response;
     const dependencies = createClientVersionCheckRouteDependencies({
-      parseClientVersion: jest.fn().mockReturnValue(Result.ok(minimumRequiredClientBuildDate)),
-      minimumRequiredClientBuildDate: Maybe.just(minimumRequiredClientBuildDate),
+      parseClientVersion: jest.fn().mockReturnValue(Result.ok(clientVersionDate)),
+      deployedClientVersion: '2026.02.12.17.51.00',
+      isClientVersionEnforcementEnabled: false,
       get: jest.fn((_routePath, routeHandler) => {
         routeHandler(fakeRequest, fakeResponse);
       }),
@@ -102,17 +105,55 @@ describe('/client-version-check', () => {
     expect(sendStatus).toHaveBeenNthCalledWith(1, 200);
   });
 
-  it('returns HTTP 426 with reload action when parsed client version is below blocked version', async () => {
+  it('returns HTTP 200 when client version enforcement is disabled and parsed client version is higher than deployed version', async () => {
+    const sendStatus = jest.fn();
+    const clientVersionDate = new Date(2026, 1, 12, 17, 51, 1);
+    const fakeRequest = {header: jest.fn().mockReturnValue('2026.02.12.17.51.01')} as unknown as Request;
+    const fakeResponse = {sendStatus} as unknown as Response;
+    const dependencies = createClientVersionCheckRouteDependencies({
+      parseClientVersion: jest.fn().mockReturnValue(Result.ok(clientVersionDate)),
+      deployedClientVersion: '2026.02.12.17.51.00',
+      isClientVersionEnforcementEnabled: false,
+      get: jest.fn((_routePath, routeHandler) => {
+        routeHandler(fakeRequest, fakeResponse);
+      }),
+    });
+
+    createClientVersionCheckRoute(dependencies);
+
+    expect(sendStatus).toHaveBeenNthCalledWith(1, 200);
+  });
+
+  it('returns HTTP 200 when client version enforcement is enabled and parsed client version equals deployed version', async () => {
+    const sendStatus = jest.fn();
+    const deployedClientVersion = '2026.02.12.17.51.00';
+    const fakeRequest = {header: jest.fn().mockReturnValue(deployedClientVersion)} as unknown as Request;
+    const fakeResponse = {sendStatus} as unknown as Response;
+    const dependencies = createClientVersionCheckRouteDependencies({
+      parseClientVersion: jest.fn().mockReturnValue(Result.ok(new Date(2026, 1, 12, 17, 51, 0))),
+      deployedClientVersion,
+      isClientVersionEnforcementEnabled: true,
+      get: jest.fn((_routePath, routeHandler) => {
+        routeHandler(fakeRequest, fakeResponse);
+      }),
+    });
+
+    createClientVersionCheckRoute(dependencies);
+
+    expect(sendStatus).toHaveBeenNthCalledWith(1, 200);
+  });
+
+  it('returns HTTP 426 with reload action when client version enforcement is enabled and parsed client version is below deployed version', async () => {
     const sendStatus = jest.fn();
     const json = jest.fn();
     const status = jest.fn().mockReturnValue({json});
-    const blockedVersionDate = new Date(2026, 1, 12, 17, 51, 0);
     const clientVersionDate = new Date(2026, 1, 12, 17, 50, 59);
     const fakeRequest = {header: jest.fn().mockReturnValue('2026.02.12.17.50.59')} as unknown as Request;
     const fakeResponse = {sendStatus, status} as unknown as Response;
     const dependencies = createClientVersionCheckRouteDependencies({
       parseClientVersion: jest.fn().mockReturnValue(Result.ok(clientVersionDate)),
-      minimumRequiredClientBuildDate: Maybe.just(blockedVersionDate),
+      deployedClientVersion: '2026.02.12.17.51.00',
+      isClientVersionEnforcementEnabled: true,
       get: jest.fn((_routePath, routeHandler) => {
         routeHandler(fakeRequest, fakeResponse);
       }),
@@ -125,15 +166,17 @@ describe('/client-version-check', () => {
     expect(sendStatus).not.toHaveBeenCalled();
   });
 
-  it('returns HTTP 200 when parsed client version is above blocked version', async () => {
+  it('returns HTTP 426 with reload action when client version enforcement is enabled and parsed client version is above deployed version', async () => {
     const sendStatus = jest.fn();
-    const blockedVersionDate = new Date(2026, 1, 12, 17, 51, 0);
+    const json = jest.fn();
+    const status = jest.fn().mockReturnValue({json});
     const clientVersionDate = new Date(2026, 1, 12, 17, 51, 1);
     const fakeRequest = {header: jest.fn().mockReturnValue('2026.02.12.17.51.01')} as unknown as Request;
-    const fakeResponse = {sendStatus} as unknown as Response;
+    const fakeResponse = {sendStatus, status} as unknown as Response;
     const dependencies = createClientVersionCheckRouteDependencies({
       parseClientVersion: jest.fn().mockReturnValue(Result.ok(clientVersionDate)),
-      minimumRequiredClientBuildDate: Maybe.just(blockedVersionDate),
+      deployedClientVersion: '2026.02.12.17.51.00',
+      isClientVersionEnforcementEnabled: true,
       get: jest.fn((_routePath, routeHandler) => {
         routeHandler(fakeRequest, fakeResponse);
       }),
@@ -141,6 +184,8 @@ describe('/client-version-check', () => {
 
     createClientVersionCheckRoute(dependencies);
 
-    expect(sendStatus).toHaveBeenNthCalledWith(1, 200);
+    expect(status).toHaveBeenNthCalledWith(1, 426);
+    expect(json).toHaveBeenNthCalledWith(1, {action: 'reload'});
+    expect(sendStatus).not.toHaveBeenCalled();
   });
 });

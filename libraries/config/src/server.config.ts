@@ -139,8 +139,8 @@ export function generateConfig(params: ConfigGeneratorParams, env: Env) {
       TITLE: env.OPEN_GRAPH_TITLE,
     },
     ENABLE_DYNAMIC_HOSTNAME: env.ENABLE_DYNAMIC_HOSTNAME === 'true',
+    ENABLE_CLIENT_VERSION_ENFORCEMENT: env.ENABLE_CLIENT_VERSION_ENFORCEMENT === 'true',
     PORT_HTTP: httpPort,
-    MINIMUM_REQUIRED_CLIENT_BUILD_DATE: env.MINIMUM_REQUIRED_CLIENT_BUILD_DATE,
     ROBOTS: {
       ALLOW: readFile(ROBOTS_ALLOW_FILE, 'User-agent: *\r\nDisallow: /'),
       ALLOWED_HOSTS: ['app.wire.com'],

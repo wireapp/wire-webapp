@@ -37,6 +37,7 @@ describe('Server Config', () => {
     NODE_ENV: 'production',
     PORT: '21080',
     ENFORCE_HTTPS: 'true',
+    ENABLE_CLIENT_VERSION_ENFORCEMENT: 'false',
     GOOGLE_WEBMASTER_ID: 'test-google-id',
     OPEN_GRAPH_DESCRIPTION: 'Wire secure messenger',
     OPEN_GRAPH_IMAGE_URL: 'https://wire.com/image.png',
@@ -185,6 +186,16 @@ describe('Server Config', () => {
       const envWithoutDynamicHostname = {...mockEnv, ENABLE_DYNAMIC_HOSTNAME: 'false'};
       const configFalse = generateConfig(mockParams, envWithoutDynamicHostname);
       expect(configFalse.ENABLE_DYNAMIC_HOSTNAME).toBe(false);
+    });
+
+    it('should handle ENABLE_CLIENT_VERSION_ENFORCEMENT flag', () => {
+      const envWithClientVersionEnforcement = {...mockEnv, ENABLE_CLIENT_VERSION_ENFORCEMENT: 'true'};
+      const config = generateConfig(mockParams, envWithClientVersionEnforcement);
+      expect(config.ENABLE_CLIENT_VERSION_ENFORCEMENT).toBe(true);
+
+      const envWithoutClientVersionEnforcement = {...mockEnv, ENABLE_CLIENT_VERSION_ENFORCEMENT: 'false'};
+      const configFalse = generateConfig(mockParams, envWithoutClientVersionEnforcement);
+      expect(configFalse.ENABLE_CLIENT_VERSION_ENFORCEMENT).toBe(false);
     });
 
     describe('Content Security Policy (CSP)', () => {

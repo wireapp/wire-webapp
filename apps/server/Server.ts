@@ -23,7 +23,6 @@ import hbs from 'hbs';
 import helmet from 'helmet';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 import nocache from 'nocache';
-import {Maybe} from 'true-myth';
 
 import fs from 'fs';
 import http from 'http';
@@ -34,7 +33,6 @@ import type {ClientConfig, ServerConfig} from '@wireapp/config';
 
 import {HealthCheckRoute} from './routes/_health/HealthRoute';
 import {AppleAssociationRoute} from './routes/appleassociation/AppleAssociationRoute';
-import {parseMinimumRequiredClientBuildDate} from './routes/client-version-check/ClientBuildDate';
 import {parseClientVersion} from './routes/client-version-check/ClientVersion';
 import {createClientVersionCheckRoute} from './routes/client-version-check/ClientVersionCheckRoute';
 import {ConfigRoute} from './routes/config/ConfigRoute';
@@ -79,27 +77,13 @@ class Server {
     this.app.use(ConfigRoute(this.config, this.clientConfig));
     this.app.use(GoogleWebmasterRoute(this.config));
     this.app.use(AppleAssociationRoute());
-    const minimumRequiredClientBuildDateResult = parseMinimumRequiredClientBuildDate({
-      parseClientVersion,
-      clientVersion: Maybe.of(this.config.MINIMUM_REQUIRED_CLIENT_BUILD_DATE),
-      deployedClientVersion: this.config.VERSION,
-    });
-    const minimumRequiredClientBuildDate = minimumRequiredClientBuildDateResult.match({
-      Ok(parsedMinimumRequiredClientBuildDate) {
-        return parsedMinimumRequiredClientBuildDate;
-      },
-      Err(error) {
-        console.error(error.message);
-
-        return Maybe.nothing<Date>();
-      },
-    });
 
     this.app.use(
       createClientVersionCheckRoute({
         router: Router(),
         parseClientVersion,
-        minimumRequiredClientBuildDate,
+        deployedClientVersion: this.config.VERSION,
+        isClientVersionEnforcementEnabled: this.config.ENABLE_CLIENT_VERSION_ENFORCEMENT,
       }),
     );
     this.app.use(NotFoundRoute());

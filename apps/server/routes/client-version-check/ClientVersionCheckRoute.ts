@@ -20,16 +20,17 @@
 import is from '@sindresorhus/is';
 import {Router} from 'express';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
-import {Maybe, result, type Result} from 'true-myth';
+import {result, type Result} from 'true-myth';
 
 type ClientVersionCheckRouteDependencies = {
   readonly router: ReturnType<typeof Router>;
   readonly parseClientVersion: (clientVersionHeaderValue: string) => Result<Date, Error>;
-  readonly minimumRequiredClientBuildDate: Maybe<Date>;
+  readonly deployedClientVersion: string;
+  readonly isClientVersionEnforcementEnabled: boolean;
 };
 
 export function createClientVersionCheckRoute(dependencies: ClientVersionCheckRouteDependencies) {
-  const {router, parseClientVersion, minimumRequiredClientBuildDate} = dependencies;
+  const {router, parseClientVersion, deployedClientVersion, isClientVersionEnforcementEnabled} = dependencies;
 
   return router.get('/client-version-check', (request, response) => {
     const clientVersionHeaderValue = request.header('Wire-Client-Version');
@@ -44,21 +45,14 @@ export function createClientVersionCheckRoute(dependencies: ClientVersionCheckRo
       return response.sendStatus(HTTP_STATUS.BAD_REQUEST);
     }
 
-    return minimumRequiredClientBuildDate.match({
-      Just(minimumRequiredClientBuildDateValue) {
-        const isClientVersionBelowMinimumRequiredBuildDate =
-          parsedClientVersion.value.getTime() < minimumRequiredClientBuildDateValue.getTime();
+    if (!isClientVersionEnforcementEnabled) {
+      return response.sendStatus(HTTP_STATUS.OK);
+    }
 
-        if (isClientVersionBelowMinimumRequiredBuildDate) {
-          return response.status(HTTP_STATUS.UPGRADE_REQUIRED).json({action: 'reload'});
-        }
+    if (clientVersionHeaderValue === deployedClientVersion) {
+      return response.sendStatus(HTTP_STATUS.OK);
+    }
 
-        return response.sendStatus(HTTP_STATUS.OK);
-      },
-
-      Nothing() {
-        return response.sendStatus(HTTP_STATUS.OK);
-      },
-    });
+    return response.status(HTTP_STATUS.UPGRADE_REQUIRED).json({action: 'reload'});
   });
 }
