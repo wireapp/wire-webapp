@@ -81,7 +81,6 @@ test.describe('Localization', () => {
       components.conversationSidebar().supportButton.click(),
     ]);
 
-    await newPage.waitForLoadState();
     await expect(newPage).toHaveURL(/\/de/);
   });
 
