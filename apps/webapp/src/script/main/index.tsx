@@ -41,6 +41,7 @@ import {SIGN_OUT_REASON} from '../auth/SignOutReason';
 import {createWallClock} from '../clock/wallClock';
 import {Config} from '../Config';
 import {createStartupFeatureTogglesFromLocationSearch} from '../featureToggles/startupFeatureToggles';
+import {createIncrementalHttpRetryBackoffReset} from '../lifecycle/createIncrementalHttpRetryBackoffReset';
 import {APIClient} from '../service/APIClientSingleton';
 import {Core} from '../service/CoreSingleton';
 
@@ -78,9 +79,32 @@ document.addEventListener('DOMContentLoaded', async () => {
   const {wallClock} = applicationServices;
   const apiClient = new APIClient({isFeatureToggleEnabled});
   const core = new Core(apiClient);
+  const cleanupIncrementalHttpRetryBackoffReset = createIncrementalHttpRetryBackoffReset({
+    apiClient,
+    visibilityState: () => {
+      return document.visibilityState;
+    },
+    isElectron: () => {
+      return Runtime.isElectron();
+    },
+    isFeatureToggleEnabled,
+    subscribeToApplicationSignal: (signalName, listener) => {
+      document.addEventListener(signalName, listener);
+    },
+    subscribeToRuntimeSignal: (signalName, listener) => {
+      globalThis.addEventListener(signalName, listener);
+    },
+    unsubscribeFromApplicationSignal: (signalName, listener) => {
+      document.removeEventListener(signalName, listener);
+    },
+    unsubscribeFromRuntimeSignal: (signalName, listener) => {
+      globalThis.removeEventListener(signalName, listener);
+    },
+  });
 
   container.registerInstance(APIClient, apiClient);
   container.registerInstance(Core, core);
+  globalThis.addEventListener('unload', cleanupIncrementalHttpRetryBackoffReset);
 
   createRoot(appContainer).render(
     <AppContainer
