@@ -85,6 +85,10 @@ class Server {
         minimumRequiredClientBuildDate: parseMinimumRequiredClientBuildDate({
           parseClientVersion,
           clientVersion: this.config.MINIMUM_REQUIRED_CLIENT_BUILD_DATE,
+          deployedClientVersion: this.config.VERSION,
+          logInvalidMinimumRequiredClientBuildDate(message) {
+            console.error(message);
+          },
         }),
       }),
     );

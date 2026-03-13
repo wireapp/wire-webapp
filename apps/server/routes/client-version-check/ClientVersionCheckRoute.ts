@@ -46,14 +46,14 @@ export function createClientVersionCheckRoute(dependencies: ClientVersionCheckRo
 
     return minimumRequiredClientBuildDate.match({
       Just: minimumRequiredClientBuildDateValue => {
-        const isClientVersionAllowed =
-          parsedClientVersion.value.getTime() > minimumRequiredClientBuildDateValue.getTime();
+        const isClientVersionBelowMinimumRequiredBuildDate =
+          parsedClientVersion.value.getTime() < minimumRequiredClientBuildDateValue.getTime();
 
-        if (isClientVersionAllowed) {
-          return response.sendStatus(HTTP_STATUS.OK);
+        if (isClientVersionBelowMinimumRequiredBuildDate) {
+          return response.status(HTTP_STATUS.UPGRADE_REQUIRED).json({action: 'reload'});
         }
 
-        return response.status(HTTP_STATUS.UPGRADE_REQUIRED).json({action: 'reload'});
+        return response.sendStatus(HTTP_STATUS.OK);
       },
 
       Nothing: () => {

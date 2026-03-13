@@ -22,16 +22,50 @@ import {Maybe, Result, toolbelt} from 'true-myth';
 export type ParseMinimumRequiredClientBuildDateDependencies = {
   readonly parseClientVersion: (clientVersionHeaderValue: string) => Result<Date, Error>;
   readonly clientVersion?: string | undefined;
+  readonly deployedClientVersion?: string | undefined;
+  readonly logInvalidMinimumRequiredClientBuildDate?: (message: string) => void;
 };
 
 export function parseMinimumRequiredClientBuildDate(
   dependencies: ParseMinimumRequiredClientBuildDateDependencies,
 ): Maybe<Date> {
-  const {parseClientVersion, clientVersion} = dependencies;
+  const {parseClientVersion, clientVersion, deployedClientVersion, logInvalidMinimumRequiredClientBuildDate} =
+    dependencies;
 
   if (clientVersion === undefined || clientVersion.length === 0) {
     return Maybe.nothing();
   }
 
-  return toolbelt.fromResult(parseClientVersion(clientVersion));
+  const parsedMinimumRequiredClientBuildDate = toolbelt.fromResult(parseClientVersion(clientVersion));
+
+  if (parsedMinimumRequiredClientBuildDate.isNothing) {
+    return Maybe.nothing();
+  }
+
+  if (deployedClientVersion === undefined || deployedClientVersion.length === 0) {
+    return parsedMinimumRequiredClientBuildDate;
+  }
+
+  const parsedDeployedClientVersion = toolbelt.fromResult(parseClientVersion(deployedClientVersion));
+
+  if (parsedDeployedClientVersion.isNothing) {
+    logInvalidMinimumRequiredClientBuildDate?.(
+      `Ignoring MINIMUM_REQUIRED_CLIENT_BUILD_DATE="${clientVersion}" because deployed client version "${deployedClientVersion}" is invalid.`,
+    );
+
+    return Maybe.nothing();
+  }
+
+  const isMinimumRequiredClientBuildDateNewerThanDeployedClientVersion =
+    parsedMinimumRequiredClientBuildDate.value.getTime() > parsedDeployedClientVersion.value.getTime();
+
+  if (isMinimumRequiredClientBuildDateNewerThanDeployedClientVersion) {
+    logInvalidMinimumRequiredClientBuildDate?.(
+      `Ignoring MINIMUM_REQUIRED_CLIENT_BUILD_DATE="${clientVersion}" because it is newer than deployed client version "${deployedClientVersion}".`,
+    );
+
+    return Maybe.nothing();
+  }
+
+  return parsedMinimumRequiredClientBuildDate;
 }
