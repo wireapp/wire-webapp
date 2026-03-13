@@ -17,6 +17,7 @@
  *
  */
 
+import assert from 'assert';
 import nock from 'nock';
 import {AxiosHeaders, AxiosResponse} from 'axios';
 
@@ -292,10 +293,16 @@ describe('HttpClient', () => {
     it('retries immediately when the retry backoff is reset during an active wait', async () => {
       let scheduledTimeoutHandler: (() => void) | undefined;
       const observedDelayInMilliseconds: number[] = [];
+      let resolveWaitWasScheduled: (() => void) | undefined;
+      const waitWasScheduled = new Promise<void>((resolve) => {
+        resolveWaitWasScheduled = resolve;
+      });
       const clearTimeout = jest.fn();
       const setTimeout = jest.fn((handler: () => void, delayInMilliseconds: number) => {
         scheduledTimeoutHandler = handler;
         observedDelayInMilliseconds.push(delayInMilliseconds);
+        assert(resolveWaitWasScheduled !== undefined);
+        resolveWaitWasScheduled();
 
         return 1 as ReturnType<typeof globalThis.setTimeout>;
       });
@@ -318,23 +325,63 @@ describe('HttpClient', () => {
         .mockResolvedValueOnce(response);
 
       const responsePromise = client.sendRequest({method: 'GET', url: '/conversations'});
-      for (let microtaskTurn = 0; microtaskTurn < 10; microtaskTurn += 1) {
-        if (setTimeout.mock.calls.length > 0) {
-          break;
-        }
-
-        await Promise.resolve();
-      }
+      await waitWasScheduled;
 
       expect(client._sendRequest).toHaveBeenCalledTimes(1);
       expect(setTimeout).toHaveBeenCalledTimes(1);
-      expect(scheduledTimeoutHandler).toBeDefined();
+      assert(scheduledTimeoutHandler !== undefined);
 
       client.resetRetryBackoff();
 
       await expect(responsePromise).resolves.toBe(response);
       expect(clearTimeout).toHaveBeenCalledWith(1);
       expect(client._sendRequest).toHaveBeenCalledTimes(2);
+      expect(observedDelayInMilliseconds).toEqual([100]);
+    });
+
+    it('stops retrying when the request is aborted during an active wait', async () => {
+      let scheduledTimeoutHandler: (() => void) | undefined;
+      const observedDelayInMilliseconds: number[] = [];
+      let resolveWaitWasScheduled: (() => void) | undefined;
+      const waitWasScheduled = new Promise<void>((resolve) => {
+        resolveWaitWasScheduled = resolve;
+      });
+      const abortController = new AbortController();
+      const clearTimeout = jest.fn();
+      const setTimeout = jest.fn((handler: () => void, delayInMilliseconds: number) => {
+        scheduledTimeoutHandler = handler;
+        observedDelayInMilliseconds.push(delayInMilliseconds);
+        assert(resolveWaitWasScheduled !== undefined);
+        resolveWaitWasScheduled();
+
+        return 1 as ReturnType<typeof globalThis.setTimeout>;
+      });
+      const client = new HttpClient(
+        testConfig,
+        mockedAccessTokenStore as AccessTokenStore,
+        {
+          dependencies: {
+            clearTimeout,
+            setTimeout,
+          },
+          shouldUseIncrementalRetryBackoff: true,
+        },
+      );
+
+      client._sendRequest = jest.fn().mockRejectedValueOnce(createRetryableBackendError(StatusCode.SERVICE_UNAVAILABLE));
+
+      const responsePromise = client.sendRequest({method: 'GET', url: '/conversations'}, false, abortController);
+      await waitWasScheduled;
+
+      expect(client._sendRequest).toHaveBeenCalledTimes(1);
+      expect(setTimeout).toHaveBeenCalledTimes(1);
+      assert(scheduledTimeoutHandler !== undefined);
+
+      abortController.abort();
+
+      await expect(responsePromise).rejects.toThrow('The wait was aborted.');
+      expect(clearTimeout).toHaveBeenCalledWith(1);
+      expect(client._sendRequest).toHaveBeenCalledTimes(1);
       expect(observedDelayInMilliseconds).toEqual([100]);
     });
   });

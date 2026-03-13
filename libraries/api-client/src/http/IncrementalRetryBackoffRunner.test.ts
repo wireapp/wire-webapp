@@ -257,4 +257,53 @@ describe('IncrementalRetryBackoffRunner', () => {
     expect(runRequestAttempt).toHaveBeenCalledTimes(2);
     expect(waitForDurationInMilliseconds).toHaveBeenCalledTimes(1);
   });
+
+  it('rethrows the wait error when the request is aborted while waiting', async () => {
+    const waitForDurationInMilliseconds = jest.fn<Promise<void>, [number, Maybe<AbortSignal>]>();
+    const incrementalRetryBackoffPolicy = createIncrementalRetryBackoffPolicy();
+    const incrementalRetryBackoffRunner = createIncrementalRetryBackoffRunner({
+      abortableWait: {
+        waitForDurationInMilliseconds,
+      },
+      getStatusCode(error) {
+        return Maybe.of((error as Partial<RetryableError>).statusCode);
+      },
+      incrementalRetryBackoffPolicy,
+    });
+    let incrementalRetryBackoffState = incrementalRetryBackoffPolicy.createInitialIncrementalRetryBackoffState();
+    const requestAbortController = new AbortController();
+    const runRequestAttempt = jest.fn<Promise<string>, []>().mockRejectedValueOnce({statusCode: 503});
+
+    waitForDurationInMilliseconds.mockImplementationOnce(async (_durationInMilliseconds, abortSignal) => {
+      requestAbortController.abort();
+
+      await abortSignal.unwrapOr(undefined)?.throwIfAborted();
+    });
+
+    const runWithIncrementalRetryBackoffPromise = incrementalRetryBackoffRunner.runWithIncrementalRetryBackoff({
+      abortSignal: Maybe.just(requestAbortController.signal),
+      getIncrementalRetryBackoffState() {
+        return incrementalRetryBackoffState;
+      },
+      getRetryBackoffResetCount() {
+        return 0;
+      },
+      isRequestAborted() {
+        return true;
+      },
+      runRequestAttempt,
+      setIncrementalRetryBackoffState(nextIncrementalRetryBackoffState: IncrementalRetryBackoffState) {
+        incrementalRetryBackoffState = nextIncrementalRetryBackoffState;
+
+        return incrementalRetryBackoffState;
+      },
+    });
+
+    await expect(runWithIncrementalRetryBackoffPromise).rejects.toMatchObject({
+      name: 'AbortError',
+    });
+
+    expect(runRequestAttempt).toHaveBeenCalledTimes(1);
+    expect(waitForDurationInMilliseconds).toHaveBeenCalledTimes(1);
+  });
 });
