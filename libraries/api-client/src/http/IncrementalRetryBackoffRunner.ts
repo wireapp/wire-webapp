@@ -31,6 +31,8 @@ export type IncrementalRetryBackoffRunnerDependencies = {
 export type RunWithIncrementalRetryBackoffDependencies<ResponseValue> = {
   readonly abortSignal: Maybe<AbortSignal>;
   readonly getIncrementalRetryBackoffState: () => IncrementalRetryBackoffState;
+  readonly getRetryBackoffResetCount: () => number;
+  readonly isRequestAborted: () => boolean;
   readonly runRequestAttempt: () => Promise<ResponseValue>;
   readonly setIncrementalRetryBackoffState: (
     incrementalRetryBackoffState: IncrementalRetryBackoffState,
@@ -52,8 +54,14 @@ export function createIncrementalRetryBackoffRunner(
     async runWithIncrementalRetryBackoff<ResponseValue>(
       runWithIncrementalRetryBackoffDependencies: RunWithIncrementalRetryBackoffDependencies<ResponseValue>,
     ): Promise<Awaited<ResponseValue>> {
-      const {abortSignal, getIncrementalRetryBackoffState, runRequestAttempt, setIncrementalRetryBackoffState} =
-        runWithIncrementalRetryBackoffDependencies;
+      const {
+        abortSignal,
+        getIncrementalRetryBackoffState,
+        getRetryBackoffResetCount,
+        isRequestAborted,
+        runRequestAttempt,
+        setIncrementalRetryBackoffState,
+      } = runWithIncrementalRetryBackoffDependencies;
 
       async function runRequestAttemptWithRetry(): Promise<Awaited<ResponseValue>> {
         try {
@@ -72,10 +80,23 @@ export function createIncrementalRetryBackoffRunner(
 
           setIncrementalRetryBackoffState(nextIncrementalRetryBackoffState);
 
-          await abortableWait.waitForDurationInMilliseconds(
-            nextIncrementalRetryBackoffState.delayInMilliseconds,
-            abortSignal,
-          );
+          const retryBackoffResetCount = getRetryBackoffResetCount();
+
+          try {
+            await abortableWait.waitForDurationInMilliseconds(
+              nextIncrementalRetryBackoffState.delayInMilliseconds,
+              abortSignal,
+            );
+          } catch (error: unknown) {
+            const hasRetryBackoffBeenReset = retryBackoffResetCount !== getRetryBackoffResetCount();
+            const wasRequestAborted = isRequestAborted();
+
+            if (hasRetryBackoffBeenReset && !wasRequestAborted) {
+              return runRequestAttemptWithRetry();
+            }
+
+            throw error;
+          }
 
           return runRequestAttemptWithRetry();
         }
