@@ -63,7 +63,7 @@ export class DetailViewModal {
     await this.closeButton.click();
   }
 
-  async downloadAsset() {
-    return await downloadAssetAndGetFilePath(this.page, this.downloadButton);
+  async downloadAsset(outputDir: string) {
+    return await downloadAssetAndGetFilePath(this.page, this.downloadButton, outputDir);
   }
 }

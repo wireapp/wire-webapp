@@ -47,7 +47,7 @@ export class HistoryExportPage {
     await this.cancelButton.click();
   }
 
-  async downloadFile() {
-    return await downloadAssetAndGetFilePath(this.page, this.saveFileButton);
+  async downloadFile(outputDir: string) {
+    return await downloadAssetAndGetFilePath(this.page, this.saveFileButton, outputDir);
   }
 }

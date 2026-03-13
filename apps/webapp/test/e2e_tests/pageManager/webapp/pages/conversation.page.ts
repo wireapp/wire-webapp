@@ -390,10 +390,10 @@ export class ConversationPage {
     return await replyMessageLocator.isVisible();
   }
 
-  async downloadFile() {
+  async downloadFile(outputDir: string) {
     const downloadButton = this.page.getByTestId('item-message').getByTestId('file-asset');
 
-    const filePath = await downloadAssetAndGetFilePath(this.page, downloadButton);
+    const filePath = await downloadAssetAndGetFilePath(this.page, downloadButton, outputDir);
     return filePath;
   }
 
