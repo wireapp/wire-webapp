@@ -32,17 +32,18 @@ import {
 const featureToggleNamesWithDedicatedExistenceTests = [
   reliableWebsocketConnectionFeatureToggleName,
   incrementalHttpRetryBackoffFeatureToggleName,
+  collaboraClipboardAccessFeatureToggleName,
 ] as const;
 
 describe('startupFeatureToggles', function () {
-  it('returns disabled toggles when the query parameter is missing', function () {
+  it('returns disabled toggles when the query parameter is missing', () => {
     const startupFeatureToggles = createStartupFeatureTogglesFromLocationSearch('?foo=bar');
 
     expect(startupFeatureToggles.isFeatureToggleEnabled(reliableWebsocketConnectionFeatureToggleName)).toBe(false);
     expect(startupFeatureToggles.getEnabledFeatureToggleNames()).toEqual([]);
   });
 
-  it('enables a whitelisted feature toggle when present in the query parameter', function () {
+  it('enables a whitelisted feature toggle when present in the query parameter', () => {
     const startupFeatureToggles = createStartupFeatureTogglesFromLocationSearch(
       `?${startupFeatureToggleQueryParameterName}=${reliableWebsocketConnectionFeatureToggleName}`,
     );
@@ -50,7 +51,7 @@ describe('startupFeatureToggles', function () {
     expect(startupFeatureToggles.isFeatureToggleEnabled(reliableWebsocketConnectionFeatureToggleName)).toBe(true);
   });
 
-  it('enables whitelisted toggles and ignores unknown values in the same parameter', function () {
+  it('enables whitelisted toggles and ignores unknown values in the same parameter', () => {
     const startupFeatureToggles = createStartupFeatureTogglesFromLocationSearch(
       `?${startupFeatureToggleQueryParameterName}=${reliableWebsocketConnectionFeatureToggleName},unknown-feature`,
     );
@@ -59,7 +60,7 @@ describe('startupFeatureToggles', function () {
     expect(startupFeatureToggles.getEnabledFeatureToggleNames()).not.toContain('unknown-feature');
   });
 
-  it('ignores unknown feature toggles from the query parameter', function () {
+  it('ignores unknown feature toggles from the query parameter', () => {
     const startupFeatureToggles = createStartupFeatureTogglesFromLocationSearch(
       `?${startupFeatureToggleQueryParameterName}=unknown-feature`,
     );
@@ -67,7 +68,7 @@ describe('startupFeatureToggles', function () {
     expect(startupFeatureToggles.getEnabledFeatureToggleNames()).toEqual([]);
   });
 
-  it('enables the incremental http retry backoff feature toggle when present in the query parameter', function () {
+  it('enables the incremental http retry backoff feature toggle when present in the query parameter', () => {
     const startupFeatureToggles = createStartupFeatureTogglesFromLocationSearch(
       `?${startupFeatureToggleQueryParameterName}=${incrementalHttpRetryBackoffFeatureToggleName}`,
     );
@@ -75,7 +76,15 @@ describe('startupFeatureToggles', function () {
     expect(startupFeatureToggles.isFeatureToggleEnabled(incrementalHttpRetryBackoffFeatureToggleName)).toBe(true);
   });
 
-  it('keeps only whitelisted feature toggles when known and unknown values are mixed', function () {
+  it('enables the collabora clipboard access feature toggle when present in the query parameter', () => {
+    const startupFeatureToggles = createStartupFeatureTogglesFromLocationSearch(
+      `?${startupFeatureToggleQueryParameterName}=${collaboraClipboardAccessFeatureToggleName}`,
+    );
+
+    expect(startupFeatureToggles.isFeatureToggleEnabled(collaboraClipboardAccessFeatureToggleName)).toBe(true);
+  });
+
+  it('keeps only whitelisted feature toggles when known and unknown values are mixed', () => {
     const startupFeatureToggles = createStartupFeatureTogglesFromLocationSearch(
       `?${startupFeatureToggleQueryParameterName}=unknown-feature,${reliableWebsocketConnectionFeatureToggleName}`,
     );
@@ -84,7 +93,7 @@ describe('startupFeatureToggles', function () {
     expect(startupFeatureToggles.getEnabledFeatureToggleNames()).not.toContain('unknown-feature');
   });
 
-  it('trims whitespace around feature toggle names', function () {
+  it('trims whitespace around feature toggle names', () => {
     const startupFeatureToggles = createStartupFeatureTogglesFromLocationSearch(
       `?${startupFeatureToggleQueryParameterName}= ${reliableWebsocketConnectionFeatureToggleName} `,
     );
@@ -92,7 +101,7 @@ describe('startupFeatureToggles', function () {
     expect(startupFeatureToggles.isFeatureToggleEnabled(reliableWebsocketConnectionFeatureToggleName)).toBe(true);
   });
 
-  it('deduplicates duplicated feature toggles', function () {
+  it('deduplicates duplicated feature toggles', () => {
     const startupFeatureToggles = createStartupFeatureTogglesFromLocationSearch(
       `?${startupFeatureToggleQueryParameterName}=${reliableWebsocketConnectionFeatureToggleName},${reliableWebsocketConnectionFeatureToggleName}`,
     );
@@ -101,7 +110,7 @@ describe('startupFeatureToggles', function () {
     expect(startupFeatureToggles.getEnabledFeatureToggleNames()).toEqual([reliableWebsocketConnectionFeatureToggleName]);
   });
 
-  it('ignores empty list entries in the feature toggle query parameter', function () {
+  it('ignores empty list entries in the feature toggle query parameter', () => {
     const startupFeatureToggles = createStartupFeatureTogglesFromLocationSearch(
       `?${startupFeatureToggleQueryParameterName}=,${reliableWebsocketConnectionFeatureToggleName},,`,
     );
@@ -110,7 +119,7 @@ describe('startupFeatureToggles', function () {
     expect(startupFeatureToggles.getEnabledFeatureToggleNames()).toEqual([reliableWebsocketConnectionFeatureToggleName]);
   });
 
-  it('treats feature toggle names as case-sensitive', function () {
+  it('treats feature toggle names as case-sensitive', () => {
     const uppercaseFeatureToggleName = reliableWebsocketConnectionFeatureToggleName.toUpperCase();
     const startupFeatureToggles = createStartupFeatureTogglesFromLocationSearch(
       `?${startupFeatureToggleQueryParameterName}=${uppercaseFeatureToggleName}`,
@@ -122,7 +131,7 @@ describe('startupFeatureToggles', function () {
     expect(startupFeatureToggles.getEnabledFeatureToggleNames()).not.toContain(uppercaseFeatureToggleName);
   });
 
-  it('contains only whitelisted values in allowedStartupFeatureToggleNames', function () {
+  it('contains only whitelisted values in allowedStartupFeatureToggleNames', () => {
     expect(allowedStartupFeatureToggleNames).toEqual([
       reliableWebsocketConnectionFeatureToggleName,
       incrementalHttpRetryBackoffFeatureToggleName,
@@ -130,11 +139,11 @@ describe('startupFeatureToggles', function () {
     ]);
   });
 
-  it('requires a dedicated existence test for every startup feature toggle name', function () {
+  it('requires a dedicated existence test for every startup feature toggle name', () => {
     expect(featureToggleNamesWithDedicatedExistenceTests).toEqual(startupFeatureToggleNames);
   });
 
-  it('does not expose mutable enabled toggle state', function () {
+  it('does not expose mutable enabled toggle state', () => {
     const startupFeatureToggles = createStartupFeatureTogglesFromLocationSearch(
       `?${startupFeatureToggleQueryParameterName}=${reliableWebsocketConnectionFeatureToggleName}`,
     );
