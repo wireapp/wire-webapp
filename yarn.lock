@@ -127,9 +127,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@aws-sdk/client-s3@npm:3.1005.0":
-  version: 3.1005.0
-  resolution: "@aws-sdk/client-s3@npm:3.1005.0"
+"@aws-sdk/client-s3@npm:3.1007.0":
+  version: 3.1007.0
+  resolution: "@aws-sdk/client-s3@npm:3.1007.0"
   dependencies:
     "@aws-crypto/sha1-browser": "npm:5.2.0"
     "@aws-crypto/sha256-browser": "npm:5.2.0"
@@ -184,9 +184,9 @@ __metadata:
     "@smithy/util-retry": "npm:^4.2.11"
     "@smithy/util-stream": "npm:^4.5.17"
     "@smithy/util-utf8": "npm:^4.2.2"
-    "@smithy/util-waiter": "npm:^4.2.11"
+    "@smithy/util-waiter": "npm:^4.2.12"
     tslib: "npm:^2.6.2"
-  checksum: 10/0e57dfa15bf610ff410ab1677adb118091031e8915688ff9376620caba1f073c788422a9f762ddf53828be99591e3ec518d62bc3f550ab8babcb0a04ccb38b7f
+  checksum: 10/a1659b5b6f8a1a5dc16cef6689582cafe85e8a86f1b00057488cf8f0698faa62ff9969e710d3db815c18abcad33fb66ac88ed3667f59c4fde515399e8ce82b39
   languageName: node
   linkType: hard
 
@@ -8261,6 +8261,16 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@smithy/abort-controller@npm:^4.2.12":
+  version: 4.2.12
+  resolution: "@smithy/abort-controller@npm:4.2.12"
+  dependencies:
+    "@smithy/types": "npm:^4.13.1"
+    tslib: "npm:^2.6.2"
+  checksum: 10/6e7bd3c482c6737bb253a7b02f0f0f8cefb93497ab4374de810ab7afcdf7fa052f6706cdf02afa204d91bc5c85f404973be56396a50993acbc86e36e6d1bea05
+  languageName: node
+  linkType: hard
+
 "@smithy/chunked-blob-reader-native@npm:^4.2.3":
   version: 4.2.3
   resolution: "@smithy/chunked-blob-reader-native@npm:4.2.3"
@@ -8666,6 +8676,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@smithy/types@npm:^4.13.1":
+  version: 4.13.1
+  resolution: "@smithy/types@npm:4.13.1"
+  dependencies:
+    tslib: "npm:^2.6.2"
+  checksum: 10/d6cb8a4f4ee4d09625f2e5f8d4290d44254b7e8599a96cd5d528f9225447e1da1193caa62d1e9dee59d5c0b890fe0fd9d6d9439566fff746c46acb66935122db
+  languageName: node
+  linkType: hard
+
 "@smithy/url-parser@npm:^4.2.11":
   version: 4.2.11
   resolution: "@smithy/url-parser@npm:4.2.11"
@@ -8848,14 +8867,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@smithy/util-waiter@npm:^4.2.11":
-  version: 4.2.11
-  resolution: "@smithy/util-waiter@npm:4.2.11"
+"@smithy/util-waiter@npm:^4.2.12":
+  version: 4.2.13
+  resolution: "@smithy/util-waiter@npm:4.2.13"
   dependencies:
-    "@smithy/abort-controller": "npm:^4.2.11"
-    "@smithy/types": "npm:^4.13.0"
+    "@smithy/abort-controller": "npm:^4.2.12"
+    "@smithy/types": "npm:^4.13.1"
     tslib: "npm:^2.6.2"
-  checksum: 10/b33b552631a06c3b6787a27d4d9df2a32119f084696faad4cf470dcc8d45133926dd87a0d918f08043ac3ee35c946dd6b6cf9836b45751159a91f450b46fa02e
+  checksum: 10/b20b3d439bde2c08be0bbaa0e72b16b49ffb43bed5e50da6c5c2f8516c4c62fc0a4a67751a3d85e6349c78fea3847e98b2acd8da03c80952c1157a16822ff7a7
   languageName: node
   linkType: hard
 
@@ -10916,7 +10935,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@wireapp/api-client@workspace:libraries/api-client"
   dependencies:
-    "@aws-sdk/client-s3": "npm:3.1005.0"
+    "@aws-sdk/client-s3": "npm:3.1007.0"
     "@aws-sdk/lib-storage": "npm:3.1005.0"
     "@swc/core": "npm:1.15.18"
     "@swc/jest": "npm:0.2.39"
