@@ -18,6 +18,7 @@
  */
 
 import {clientConfig, serverConfig} from './config';
+import {logServerStartup} from './serverStartupLog';
 import {Server} from './Server';
 import {formatDate} from './util/TimeUtil';
 
@@ -36,7 +37,18 @@ function getUnhandledRejectionType(unhandledRejection: unknown): string {
 server
   .start()
   .then(port => {
-    console.info(`[${formatDate()}] Server is running on port ${port}.`);
+    logServerStartup(
+      {
+        port,
+        serverConfiguration: serverConfig,
+      },
+      {
+        logInformation: message => {
+          console.info(`[${formatDate()}] ${message}`);
+        },
+      },
+    );
+
     if (serverConfig.DEVELOPMENT) {
       require('opn')(serverConfig.APP_BASE);
     }
