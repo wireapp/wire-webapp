@@ -52,6 +52,7 @@
     },
     "test": {
       "executor": "nx:run-commands",
+      "dependsOn": [],
       "options": {
         "command": "echo \"workspace-tools has no tests\""
       }
@@ -64,6 +65,7 @@
     },
     "lint": {
       "executor": "nx:run-commands",
+      "dependsOn": [],
       "options": {
         "command": "echo \"workspace-tools has no lint\""
       }
