@@ -188,7 +188,7 @@ class Server {
   }
 
   private initStaticRoutes() {
-    this.app.use(RedirectRoutes(this.config, this.clientConfig));
+    this.app.use(RedirectRoutes(this.config));
 
     const staticRoutes = ['audio', 'ext', 'font', 'image', 'min', 'proto', 'style', 'worker', 'assets'];
 
