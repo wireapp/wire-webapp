@@ -248,10 +248,6 @@ export class DebugUtil {
     this.apiClient.transport.http.toggleGzip(enabled);
   }
 
-  enableCameraBlur(flag: boolean) {
-    return this.callingRepository.switchVideoBackgroundEffect(flag ? {type: 'blur', level: 'high'} : {type: 'none'});
-  }
-
   reconnectWebSocket({dryRun} = {dryRun: false}) {
     const teamFeatures = this.teamState.teamFeatures();
     const useAsyncNotificationStream =
@@ -287,6 +283,14 @@ export class DebugUtil {
     return (this.core.service?.conversation as any).resetMLSConversation(
       this.conversationState.activeConversation()?.qualifiedId,
     );
+  }
+
+  isVideoBackgroundEffectsFeatureEnabled(): boolean {
+    return this.callingRepository.getBackgroundEffectsHandler().isFeatureEnabled();
+  }
+
+  enableVideoBackgroundEffectsFeature(flag: boolean) {
+    return this.callingRepository.getBackgroundEffectsHandler().enableFeature(flag);
   }
 
   setupAvsDebugger() {

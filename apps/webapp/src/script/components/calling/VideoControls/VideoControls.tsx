@@ -162,7 +162,6 @@ export const VideoControls = ({
     handRaisedAt: selfHandRaisedAt,
   } = useKoSubscribableChildren(selfParticipant, ['sharesScreen', 'sharesCamera', 'handRaisedAt']);
   const {
-    ENABLE_BACKGROUND_EFFECTS: isBackgroundEffectsEnabled,
     ENABLE_PRESS_SPACE_TO_UNMUTE: isPressSpaceToUnmuteEnable,
     ENABLE_IN_CALL_REACTIONS: isInCallReactionsEnable,
     ENABLE_IN_CALL_HAND_RAISE: isInCallHandRaiseEnable,
@@ -172,9 +171,11 @@ export const VideoControls = ({
 
   const {is1to1: is1to1Conversation} = useKoSubscribableChildren(conversation, ['is1to1']);
 
-  const {preferredBackgroundEffect} = useKoSubscribableChildren(backgroundEffectsHandler, [
-    'preferredBackgroundEffect',
-  ]);
+  const {preferredBackgroundEffect, isVideoBackgroundEffectsFeatureEnabled} = useKoSubscribableChildren(
+    backgroundEffectsHandler,
+    ['preferredBackgroundEffect', 'isVideoBackgroundEffectsFeatureEnabled'],
+  );
+
   const selectedBackgroundEffect = preferredBackgroundEffect ?? DEFAULT_BACKGROUND_EFFECT;
 
   const {participants} = useKoSubscribableChildren(call, ['participants']);
@@ -537,7 +538,7 @@ export const VideoControls = ({
                     keys: [KEY.ENTER, KEY.SPACE],
                   })
                 }
-                isBackgroundEffectsEnabled={isBackgroundEffectsEnabled}
+                isBackgroundEffectsEnabled={isVideoBackgroundEffectsFeatureEnabled}
                 selectedEffect={selectedBackgroundEffect}
                 backgrounds={BUILTIN_BACKGROUNDS}
                 onSelectEffect={handleBackgroundSelect}
@@ -715,7 +716,7 @@ export const VideoControls = ({
                       selectedCameraOptions={selectedCameraOptions}
                       onCameraChange={selectedOption => updateCameraOptions(String(selectedOption?.value))}
                       onCameraKeyDown={event => isEscapeKey(event) && setVideoOptionsOpen(false)}
-                      isBackgroundEffectsEnabled={isBackgroundEffectsEnabled}
+                      isBackgroundEffectsEnabled={isVideoBackgroundEffectsFeatureEnabled}
                       selectedEffect={selectedBackgroundEffect}
                       backgrounds={BUILTIN_BACKGROUNDS}
                       onSelectEffect={handleBackgroundSelect}

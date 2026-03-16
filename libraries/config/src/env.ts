@@ -118,9 +118,6 @@ export type Env = {
   /** Feature toggle for advanced filters */
   FEATURE_ENABLE_ADVANCED_FILTERS: string;
 
-  /** Feature toggle to enable background effects during video call */
-  FEATURE_ENABLE_BACKGROUND_EFFECTS: string;
-
   /** Optional override path for the multiclass segmentation model */
   FEATURE_MULTICLASS_MODEL_PATH: string;
 

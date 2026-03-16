@@ -28,17 +28,23 @@ import {
   DEFAULT_BUILTIN_BACKGROUND_ID,
   loadBackgroundSource,
 } from 'Repositories/media/VideoBackgroundEffects';
+import {getStorage} from 'Util/localStorage';
 import {getLogger, Logger} from 'Util/Logger';
 
 export const TARGET_FPS = 15;
 
 export class BackgroundEffectsHandler {
   private readonly logger: Logger = getLogger('BackgroundEffectsHandler');
+  public readonly isVideoBackgroundEffectsFeatureEnabled = observable<boolean>(false);
   public readonly backgroundEffectedVideoStream = observable<ReleasableMediaStream | undefined>();
   public readonly preferredBackgroundEffect = observable<BackgroundEffectSelection>(DEFAULT_BACKGROUND_EFFECT);
+  private readonly storage: Storage | undefined;
   private customBackground: BackgroundSource | undefined = undefined;
 
-  constructor(private readonly controller: BackgroundEffectsController) {}
+  constructor(private readonly controller: BackgroundEffectsController) {
+    this.storage = getStorage();
+    this.isVideoBackgroundEffectsFeatureEnabled(this.isFeatureEnabled());
+  }
 
   public async applyBackgroundEffect(
     originalVideoStream: MediaStream,
@@ -141,8 +147,29 @@ export class BackgroundEffectsHandler {
     return backgroundSource;
   }
 
-  public isBackgroundEffectEnabled() {
+  public isBackgroundEffectEnabled(): boolean {
     return this.preferredBackgroundEffect().type !== 'none';
+  }
+
+  public isFeatureEnabled(): boolean {
+    if (this.storage === undefined) {
+      return false;
+    }
+
+    const isEnabled = this.storage.getItem('video-background-effects-feature-enabled');
+    return isEnabled === 'true';
+  }
+
+  enableFeature(flag: boolean): boolean {
+    const storage = getStorage();
+
+    if (storage === undefined) {
+      this.isVideoBackgroundEffectsFeatureEnabled(false);
+      return false;
+    }
+    storage.setItem('video-background-effects-feature-enabled', `${flag}`);
+    this.isVideoBackgroundEffectsFeatureEnabled(flag);
+    return flag;
   }
 }
 
