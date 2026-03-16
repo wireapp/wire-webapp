@@ -33,10 +33,18 @@ const statusMap: Record<DeviceStatus, MLSStatuses> = {
   [DeviceStatus.Revoked]: MLSStatuses.REVOKED,
 };
 
-export const mapMLSStatus = (status?: DeviceStatus) => {
-  return !status
-    ? MLSStatuses.NOT_ACTIVATED
-    : statusMap[status] ||
-        // adding a fallback to handle potential string values coming from the API until all values are properly typed
-        statusMap[DeviceStatus[status as unknown as keyof typeof DeviceStatus]];
+/**
+ * Handles potential string values coming from the API until all values are properly typed.
+ * Maps a loosely typed status string to its corresponding DeviceStatus enum value.
+ */
+const resolveStatusFromStringValue = (status: DeviceStatus): MLSStatuses | undefined => {
+  const resolvedKey = DeviceStatus[status as unknown as keyof typeof DeviceStatus];
+  return statusMap[resolvedKey];
+};
+
+export const mapMLSStatus = (status?: DeviceStatus): MLSStatuses => {
+  if (!status) {
+    return MLSStatuses.NOT_ACTIVATED;
+  }
+  return statusMap[status] ?? resolveStatusFromStringValue(status);
 };
