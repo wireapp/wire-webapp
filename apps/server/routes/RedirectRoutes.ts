@@ -20,7 +20,8 @@
 import express, {type Response} from 'express';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 
-import type {ClientConfig, ServerConfig} from '@wireapp/config';
+import type {ServerConfig} from '@wireapp/config';
+
 import * as BrowserUtil from '../util/BrowserUtil';
 
 const router = express.Router();
@@ -34,7 +35,7 @@ export function setNonCacheHeaders(response: Response): Response {
   return response;
 }
 
-export const RedirectRoutes = (config: ServerConfig, clientConfig: ClientConfig) => [
+export const RedirectRoutes = (config: ServerConfig) => [
   router.get('/robots.txt', async (req, res) => {
     const robotsContent = (config.ROBOTS.ALLOWED_HOSTS as ReadonlyArray<string>).includes(req.hostname)
       ? config.ROBOTS.ALLOW
