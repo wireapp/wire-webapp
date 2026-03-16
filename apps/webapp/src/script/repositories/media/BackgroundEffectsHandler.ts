@@ -33,6 +33,9 @@ import {getLogger, Logger} from 'Util/Logger';
 
 export const TARGET_FPS = 15;
 
+const VIDEO_BACKGROUND_EFFECT_STORAGE_KEY = 'video-background-effects';
+const VIDEO_BACKGROUND_EFFECTS_FEATURE_STORAGE_KEY = 'video-background-effects-feature-enabled';
+
 export class BackgroundEffectsHandler {
   private readonly logger: Logger = getLogger('BackgroundEffectsHandler');
   public readonly isVideoBackgroundEffectsFeatureEnabled = observable<boolean>(false);
@@ -43,7 +46,11 @@ export class BackgroundEffectsHandler {
 
   constructor(private readonly controller: BackgroundEffectsController) {
     this.storage = getStorage();
-    this.isVideoBackgroundEffectsFeatureEnabled(this.isFeatureEnabled());
+    this.isVideoBackgroundEffectsFeatureEnabled(this.readFeatureEnabledStateFromStore());
+    this.preferredBackgroundEffect(this.readPreferredBackgroundEffectFromStore());
+    this.preferredBackgroundEffect
+      .extend({rateLimit: 500})
+      .subscribe(effect => this.savePreferredBackgroundEffectInStore(effect));
   }
 
   public async applyBackgroundEffect(
@@ -148,28 +155,75 @@ export class BackgroundEffectsHandler {
   }
 
   public isBackgroundEffectEnabled(): boolean {
-    return this.preferredBackgroundEffect().type !== 'none';
+    return this.isVideoBackgroundEffectsFeatureEnabled() && this.preferredBackgroundEffect().type !== 'none';
   }
 
-  public isFeatureEnabled(): boolean {
+  public readFeatureEnabledStateFromStore(): boolean {
     if (this.storage === undefined) {
       return false;
     }
 
-    const isEnabled = this.storage.getItem('video-background-effects-feature-enabled');
-    return isEnabled === 'true';
-  }
-
-  enableFeature(flag: boolean): boolean {
-    const storage = getStorage();
-
-    if (storage === undefined) {
-      this.isVideoBackgroundEffectsFeatureEnabled(false);
+    try {
+      const isEnabled = this.storage.getItem(VIDEO_BACKGROUND_EFFECTS_FEATURE_STORAGE_KEY);
+      return isEnabled === 'true';
+    } catch (error) {
+      console.error('Failed to read video background effect feature state', error);
       return false;
     }
-    storage.setItem('video-background-effects-feature-enabled', `${flag}`);
+  }
+
+  public saveFeatureEnabledStateInStore(flag: boolean): boolean {
+    if (this.storage === undefined) {
+      this.isVideoBackgroundEffectsFeatureEnabled(flag);
+      return false;
+    }
+
+    try {
+      this.storage.setItem(VIDEO_BACKGROUND_EFFECTS_FEATURE_STORAGE_KEY, `${flag}`);
+    } catch (error) {
+      console.error('Failed to persisted video background effect feature state', error);
+      this.isVideoBackgroundEffectsFeatureEnabled(flag);
+      return false;
+    }
     this.isVideoBackgroundEffectsFeatureEnabled(flag);
     return flag;
+  }
+
+  private readPreferredBackgroundEffectFromStore(): BackgroundEffectSelection {
+    if (this.storage === undefined) {
+      return DEFAULT_BACKGROUND_EFFECT;
+    }
+
+    try {
+      const stored = this.storage.getItem(VIDEO_BACKGROUND_EFFECT_STORAGE_KEY);
+      if (stored === null) {
+        return DEFAULT_BACKGROUND_EFFECT;
+      }
+
+      const parsed = JSON.parse(stored);
+
+      if (!parsed?.type) {
+        return DEFAULT_BACKGROUND_EFFECT;
+      }
+
+      return parsed as BackgroundEffectSelection;
+    } catch (error) {
+      console.error('Failed to read persisted preferred video background effect', error);
+      return DEFAULT_BACKGROUND_EFFECT;
+    }
+  }
+
+  private savePreferredBackgroundEffectInStore(effect: BackgroundEffectSelection): void {
+    if (this.storage === undefined) {
+      return;
+    }
+
+    try {
+      const serialized = JSON.stringify(effect);
+      this.storage.setItem(VIDEO_BACKGROUND_EFFECT_STORAGE_KEY, serialized);
+    } catch (error) {
+      this.logger.error('Failed to persis preferred video background effect', error);
+    }
   }
 }
 

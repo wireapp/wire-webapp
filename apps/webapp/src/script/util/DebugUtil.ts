@@ -286,11 +286,11 @@ export class DebugUtil {
   }
 
   isVideoBackgroundEffectsFeatureEnabled(): boolean {
-    return this.callingRepository.getBackgroundEffectsHandler().isFeatureEnabled();
+    return this.callingRepository.getBackgroundEffectsHandler().readFeatureEnabledStateFromStore();
   }
 
   enableVideoBackgroundEffectsFeature(flag: boolean) {
-    return this.callingRepository.getBackgroundEffectsHandler().enableFeature(flag);
+    return this.callingRepository.getBackgroundEffectsHandler().saveFeatureEnabledStateInStore(flag);
   }
 
   setupAvsDebugger() {
