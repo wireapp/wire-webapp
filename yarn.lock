@@ -355,9 +355,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@aws-sdk/lib-storage@npm:3.1005.0":
-  version: 3.1005.0
-  resolution: "@aws-sdk/lib-storage@npm:3.1005.0"
+"@aws-sdk/lib-storage@npm:3.1008.0":
+  version: 3.1008.0
+  resolution: "@aws-sdk/lib-storage@npm:3.1008.0"
   dependencies:
     "@smithy/abort-controller": "npm:^4.2.11"
     "@smithy/middleware-endpoint": "npm:^4.4.23"
@@ -367,8 +367,8 @@ __metadata:
     stream-browserify: "npm:3.0.0"
     tslib: "npm:^2.6.2"
   peerDependencies:
-    "@aws-sdk/client-s3": ^3.1005.0
-  checksum: 10/fca5e79bdcb1055cf4a63958d494874270bdf7542d2de80e6ab362f66a374732e7b0018b5b2e24e0bb958ba2ebfcbe471fa549ce2b36b7bbdbc54b5e27b4b978
+    "@aws-sdk/client-s3": ^3.1008.0
+  checksum: 10/247682950e192864fc13f0ab1be0e6f6a089a2a19d4c514e9f834c175d5c92d6ed21008c400d2cab51dfd888948c8c8109624caa9e63a8c6ac891f1b9e371537
   languageName: node
   linkType: hard
 
@@ -10936,7 +10936,7 @@ __metadata:
   resolution: "@wireapp/api-client@workspace:libraries/api-client"
   dependencies:
     "@aws-sdk/client-s3": "npm:3.1007.0"
-    "@aws-sdk/lib-storage": "npm:3.1005.0"
+    "@aws-sdk/lib-storage": "npm:3.1008.0"
     "@swc/core": "npm:1.15.18"
     "@swc/jest": "npm:0.2.39"
     "@types/axios": "npm:0.14.4"
