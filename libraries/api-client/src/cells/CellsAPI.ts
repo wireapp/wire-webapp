@@ -17,6 +17,7 @@
  *
  */
 
+import {AxiosHeaders} from 'axios';
 import {
   NodeServiceApi,
   RestLookupRequest,
@@ -133,8 +134,9 @@ export class CellsAPI {
     http.client.interceptors.request.use(config => {
       const accessToken = this.accessTokenStore.getAccessToken();
       if (accessToken) {
-        config.headers = config.headers || {};
-        config.headers.Authorization = `Bearer ${accessToken}`;
+        const requestHeaders = AxiosHeaders.from(config.headers);
+        requestHeaders.set('Authorization', `Bearer ${accessToken}`);
+        config.headers = requestHeaders;
       }
       return config;
     });
@@ -173,8 +175,10 @@ export class CellsAPI {
       {signal: abortController?.signal},
     );
 
-    if (autoRename && result.data.Results?.length && result.data.Results[0].Exists) {
-      filePath = result.data.Results[0].NextPath || filePath;
+    const firstCreateCheckResult = result.data.Results?.[0];
+
+    if (autoRename && firstCreateCheckResult?.Exists) {
+      filePath = firstCreateCheckResult.NextPath || filePath;
     }
 
     const metadata = {

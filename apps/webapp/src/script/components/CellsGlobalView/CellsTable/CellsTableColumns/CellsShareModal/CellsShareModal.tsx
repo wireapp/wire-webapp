@@ -49,7 +49,7 @@ import {
   toggleContentStyles,
   wrapperStyles,
 } from './CellsShareModal.styles';
-import {useCellPublicLink} from './useCellPublicLink';
+import {useCellGlobalPublicLink} from './useCellGlobalPublicLink';
 
 import {useCellsStore} from '../../../common/useCellsStore/useCellsStore';
 
@@ -87,7 +87,7 @@ export const showShareModal = ({type, uuid, cellsRepository}: ShareModalParams) 
 };
 
 const CellsShareModal = ({type, uuid, cellsRepository, modalId}: ShareModalParams & {modalId: string}) => {
-  const {status, link, linkData, isEnabled, togglePublicLink, updatePublicLink} = useCellPublicLink({
+  const {status, link, linkData, isEnabled, togglePublicLink, updatePublicLink} = useCellGlobalPublicLink({
     uuid,
     cellsRepository,
   });

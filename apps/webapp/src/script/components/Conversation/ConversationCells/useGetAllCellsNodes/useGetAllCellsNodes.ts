@@ -79,7 +79,7 @@ export const useGetAllCellsNodes = ({
       setPagination({conversationId: id, pagination});
 
       setStatus('success');
-    } catch (error) {
+    } catch (error: unknown) {
       setError(error instanceof Error ? error : new Error('Failed to fetch files', {cause: error}));
       setPagination({conversationId: id, pagination: null});
       setStatus('error');

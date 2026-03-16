@@ -89,6 +89,7 @@ import {roundLogarithmic} from 'Util/NumberUtil';
 import {matchQualifiedIds} from 'Util/QualifiedId';
 import {copyStyles} from 'Util/renderElement';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
+import {toError} from 'Util/TypePredicateUtil';
 import {createUuid} from 'Util/uuid';
 
 import {Call, SerializedConversationId} from './Call';
@@ -400,7 +401,7 @@ export class CallingRepository {
         if (userId) {
           try {
             wCall.setBackground(this.wUser, 0);
-          } catch (e) {
+          } catch (e: unknown) {
             this.logger.warn(`Informed AVS about background mode failed. ${e}`);
           }
         } else {
@@ -627,7 +628,7 @@ export class CallingRepository {
         mediaStream.getTracks().forEach(track => track.stop());
       }
       return true;
-    } catch (_error) {
+    } catch (_error: unknown) {
       return false;
     }
   }
@@ -1061,7 +1062,7 @@ export class CallingRepository {
       });
 
       return call;
-    } catch (error) {
+    } catch (error: unknown) {
       if (error) {
         this.logger.error('Failed starting call', error);
       }
@@ -1183,7 +1184,7 @@ export class CallingRepository {
         VIDEO_STATE.SCREENSHARE,
       );
       selfParticipant.startedScreenSharingAt(Date.now());
-    } catch (error) {
+    } catch (error: unknown) {
       this.logger.info('Failed to get screen sharing stream', error);
     }
   };
@@ -1256,7 +1257,7 @@ export class CallingRepository {
       };
 
       call.analyticsScreenSharing = true;
-    } catch (error) {
+    } catch (error: unknown) {
       this.logger.error('Error in toggleScreenShareWithVideo:', error);
       if (screenStream) {
         screenStream.getTracks().forEach(track => track.stop());
@@ -1455,7 +1456,7 @@ export class CallingRepository {
       this.sendCallingEvent(EventName.CALLING.JOINED_CALL, call, {
         [Segmentation.CALL.DIRECTION]: this.getCallDirection(call),
       });
-    } catch (error) {
+    } catch (error: unknown) {
       if (error) {
         this.logger.error('Failed answering call', error);
       }
@@ -1718,7 +1719,7 @@ export class CallingRepository {
         setConversationId(conversationId);
         setQualityFeedbackModalShown(true);
       }
-    } catch (error) {
+    } catch (error: unknown) {
       this.logger.warn(`Storage data can't found: ${(error as Error).message}`);
       setConversationId(conversationId);
       setQualityFeedbackModalShown(true);
@@ -1812,12 +1813,12 @@ export class CallingRepository {
         return this.mediaDevicesHandler
           .initializeMediaDevices(camera)
           .then(() => stream)
-          .catch(error => {
+          .catch((error: unknown) => {
             this.logger.warn('Failed to initialize media devices:', error);
             return stream;
           });
       })
-      .catch(error => {
+      .catch((error: unknown) => {
         this.logger.error('Failed to get media stream:', error);
         throw error;
       });
@@ -1863,6 +1864,14 @@ export class CallingRepository {
     this.stopMediaSource(MediaType.AUDIO);
     this.changeMediaSource(stream, MediaType.AUDIO);
     return stream;
+  }
+
+  public refreshAudioOutput() {
+    const activeCall = this.callState.joinedCall();
+    if (!activeCall) {
+      return;
+    }
+    activeCall.updateAudioStreamsSink();
   }
 
   /**
@@ -1999,7 +2008,7 @@ export class CallingRepository {
       };
     }
 
-    this.sendCallingMessage(conversationId, payload, options, myClientsOnly === 1).catch(error => {
+    this.sendCallingMessage(conversationId, payload, options, myClientsOnly === 1).catch((error: unknown) => {
       this.logger.warn('Failed to send calling message, aborting call', error);
       this.abortCall(conversationId, LEAVE_CALL_REASON.ABORTED_BECAUSE_FAILED_TO_SEND_CALLING_MESSAGE);
     });
@@ -2084,8 +2093,8 @@ export class CallingRepository {
       this.wCall?.sftResp(this.wUser!, status, jsonData, jsonData.length, context);
     };
     const avsSftResponseFailedCode = 1000;
-    _sendSFTRequest().catch(error => {
-      this.avsLogHandler(LOG_LEVEL.WARN, `Request to sft server failed with error: ${error?.message}`, error);
+    _sendSFTRequest().catch((error: unknown) => {
+      this.avsLogHandler(LOG_LEVEL.WARN, `Request to sft server failed with error: ${toError(error).message}`, error);
       avsLogger.warn(`Request to sft server failed with error`, error);
       this.wCall?.sftResp(this.wUser!, avsSftResponseFailedCode, '', 0, context);
     });
@@ -2105,7 +2114,7 @@ export class CallingRepository {
 
       this.wCall?.configUpdate(this.wUser, 0, JSON.stringify(config));
     };
-    _requestConfig().catch(error => {
+    _requestConfig().catch((error: unknown) => {
       this.logger.warn('Failed fetching calling config', error);
       this.wCall?.configUpdate(this.wUser, 1, '');
     });
@@ -2531,7 +2540,7 @@ export class CallingRepository {
         selfParticipant.updateMediaStream(mediaStream, true);
         await selfParticipant.setBlurredBackground(this.enableBackgroundBlur);
         return selfParticipant.getMediaStream();
-      } catch (error) {
+      } catch (error: unknown) {
         this.mediaStreamQuery = undefined;
         this.logger.warn('Could not get mediaStream for call', error);
         this.handleMediaStreamError(call, missingStreams, error);

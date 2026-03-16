@@ -133,7 +133,7 @@ export const ConversationListCell = ({
         await onJoinCall(conversation, MediaType.AUDIO);
         isJoiningCallRef.current = false;
       });
-    } catch (error) {
+    } catch (error: unknown) {
       // Re-enable on error
       isJoiningCallRef.current = false;
     }

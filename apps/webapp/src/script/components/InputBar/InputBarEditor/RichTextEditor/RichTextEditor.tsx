@@ -19,7 +19,6 @@
 
 import {ReactNode, useRef} from 'react';
 
-import {$convertToMarkdownString} from '@lexical/markdown';
 import {ClearEditorPlugin} from '@lexical/react/LexicalClearEditorPlugin';
 import {LexicalComposer} from '@lexical/react/LexicalComposer';
 import {ContentEditable} from '@lexical/react/LexicalContentEditable';
@@ -58,6 +57,7 @@ import {ReplaceCarriageReturnPlugin} from './plugins/ReplaceCarriageReturnPlugin
 import {SendPlugin} from './plugins/SendPlugin/SendPlugin';
 import {markdownTransformers} from './utils/markdownTransformers';
 import {parseMentions} from './utils/parseMentions';
+import {serializeMessage} from './utils/serializeMessage';
 import {transformMessage} from './utils/transformMessage';
 import {useEditorDraftState} from './utils/useEditorDraftState';
 
@@ -108,6 +108,7 @@ export const RichTextEditor = ({
     editorRef,
     saveDraftState,
     replaceEmojis,
+    showMarkdownPreview,
   });
 
   const handleChange = (editorState: EditorState) => {
@@ -116,13 +117,13 @@ export const RichTextEditor = ({
         return;
       }
 
-      const markdown = $convertToMarkdownString(markdownTransformers, undefined, true);
+      const serializedMessage = serializeMessage(showMarkdownPreview);
 
-      const text = transformMessage({replaceEmojis, markdown});
+      const text = transformMessage({replaceEmojis, markdown: serializedMessage});
 
       onUpdate({
         text,
-        mentions: parseMentions(editorRef.current, markdown, getMentionCandidates()),
+        mentions: parseMentions(editorRef.current, serializedMessage, getMentionCandidates()),
       });
 
       saveDraft();

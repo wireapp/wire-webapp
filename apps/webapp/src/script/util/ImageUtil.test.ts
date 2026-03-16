@@ -17,7 +17,9 @@
  *
  */
 
-import {imageHasExifData, stripImageExifData} from './ImageUtil';
+import {Maybe} from 'true-myth';
+
+import {getBestPreviewSource, imageHasExifData, isPreviewableImage, stripImageExifData} from './ImageUtil';
 
 const jpegWithExif = new Blob([new Uint8Array([0xff, 0xd8, 0xff, 0xe1, 0x00, 0x10, 0x45, 0x78, 0x69, 0x66])], {
   type: 'image/jpeg',
@@ -114,6 +116,71 @@ describe('ImageUtil', () => {
       const inputBlob = new Blob(['dummy-image'], {type: 'image/png'});
 
       await expect(stripImageExifData(inputBlob)).rejects.toThrow('Failed to load image');
+    });
+  });
+
+  describe('isPreviewableImage', () => {
+    it('returns true for supported image mime types', () => {
+      expect(isPreviewableImage({mimeType: 'image/jpeg'})).toBe(true);
+      expect(isPreviewableImage({mimeType: 'image/png'})).toBe(true);
+      expect(isPreviewableImage({mimeType: 'image/webp'})).toBe(true);
+    });
+
+    it('returns true for supported file extensions', () => {
+      expect(isPreviewableImage({extension: 'jpg'})).toBe(true);
+      expect(isPreviewableImage({extension: 'PNG'})).toBe(true);
+      expect(isPreviewableImage({fileName: 'photo.gif'})).toBe(true);
+    });
+
+    it('returns false for unsupported image formats', () => {
+      expect(isPreviewableImage({mimeType: 'image/heic'})).toBe(false);
+      expect(isPreviewableImage({extension: 'heic'})).toBe(false);
+      expect(isPreviewableImage({fileName: 'photo.heic'})).toBe(false);
+    });
+
+    it('returns false when no mime type or extension is provided', () => {
+      expect(isPreviewableImage({})).toBe(false);
+    });
+  });
+
+  describe('getBestPreviewSource', () => {
+    it('returns the original fileUrl for browser-previewable formats (JPEG, PNG, WebP, GIF)', () => {
+      expect(getBestPreviewSource({fileExtension: 'jpg', fileUrl: Maybe.of('original.jpg'), filePreviewUrl: Maybe.of('preview.jpg')})).toStrictEqual(Maybe.just('original.jpg'));
+      expect(getBestPreviewSource({fileExtension: 'png', fileUrl: Maybe.of('original.png'), filePreviewUrl: Maybe.of('preview.jpg')})).toStrictEqual(Maybe.just('original.png'));
+      expect(getBestPreviewSource({fileExtension: 'webp', fileUrl: Maybe.of('original.webp'), filePreviewUrl: Maybe.of('preview.jpg')})).toStrictEqual(Maybe.just('original.webp'));
+      expect(getBestPreviewSource({fileExtension: 'gif', fileUrl: Maybe.of('original.gif'), filePreviewUrl: Maybe.of('preview.jpg')})).toStrictEqual(Maybe.just('original.gif'));
+    });
+
+    it('returns the server-generated preview for HEIC files (not natively decodable by browsers)', () => {
+      expect(getBestPreviewSource({fileExtension: 'heic', fileUrl: Maybe.of('original.heic'), filePreviewUrl: Maybe.of('preview.jpg')})).toStrictEqual(Maybe.just('preview.jpg'));
+    });
+
+    it('falls back to filePreviewUrl when fileUrl is absent for a previewable format', () => {
+      expect(getBestPreviewSource({fileExtension: 'jpg', fileUrl: Maybe.nothing(), filePreviewUrl: Maybe.of('preview.jpg')})).toStrictEqual(Maybe.just('preview.jpg'));
+    });
+
+    it('returns Nothing when both fileUrl and filePreviewUrl are absent', () => {
+      expect(getBestPreviewSource({fileExtension: 'jpg', fileUrl: Maybe.nothing(), filePreviewUrl: Maybe.nothing()})).toStrictEqual(Maybe.nothing());
+    });
+
+    it('can be safely unwrapped to undefined for UI src props when no source exists', () => {
+      const source = getBestPreviewSource({
+        fileExtension: 'jpg',
+        fileUrl: Maybe.nothing(),
+        filePreviewUrl: Maybe.nothing(),
+      }).unwrapOr(undefined);
+
+      expect(source).toBeUndefined();
+    });
+
+    it('can be safely unwrapped to a string for UI src props when a source exists', () => {
+      const source = getBestPreviewSource({
+        fileExtension: 'jpg',
+        fileUrl: Maybe.of('original.jpg'),
+        filePreviewUrl: Maybe.nothing(),
+      }).unwrapOr(undefined);
+
+      expect(source).toBe('original.jpg');
     });
   });
 });

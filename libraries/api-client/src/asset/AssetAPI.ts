@@ -107,7 +107,7 @@ export class AssetAPI {
           buffer: response.data,
           mimeType: response.headers['content-type'],
         };
-      } catch (error) {
+      } catch (error: unknown) {
         if ((error as BackendError).message === SyntheticErrorLabel.REQUEST_CANCELLED) {
           throw new RequestCancellationError('Asset download got cancelled.');
         }
@@ -188,7 +188,7 @@ export class AssetAPI {
         }
 
         return response.data;
-      } catch (error) {
+      } catch (error: unknown) {
         if ((error as BackendError).message === SyntheticErrorLabel.REQUEST_CANCELLED) {
           throw new RequestCancellationError('Asset upload got cancelled.');
         }

@@ -54,7 +54,7 @@ export const useGetAssetUrl = ({asset, isEnabled, getAssetUrl, onError, onSucces
       const assetUrl = await getAssetUrl(asset.original_resource());
       setUrl(assetUrl.url);
       onSuccess?.(assetUrl.url);
-    } catch (error) {
+    } catch (error: unknown) {
       if (error instanceof Error && error.name !== AssetError.CANCEL_ERROR) {
         setIsError(true);
         onError?.(error);

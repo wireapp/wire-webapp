@@ -4,6 +4,7 @@
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
     "outDir": "lib",
+    "noUncheckedIndexedAccess": true,
     "skipLibCheck": true,
     "rootDir": "src",
     "types": ["node"],
@@ -11,9 +12,7 @@
     "target": "es2020",
     "module": "commonjs",
     "moduleResolution": "node",
-    "resolveJsonModule": true,
-    "strict": false,
-    "noImplicitAny": false
+    "resolveJsonModule": true
   },
   "exclude": [
     "node_modules",
@@ -21,7 +20,6 @@
     "**/*.test.ts",
     "**/*.test.*.ts",
     "**/*.spec.ts",
-    "src/demo",
     "lib"
   ],
   "include": ["src/**/*.ts"]

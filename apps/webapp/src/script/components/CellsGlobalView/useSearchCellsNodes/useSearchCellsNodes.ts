@@ -104,7 +104,7 @@ export const useSearchCellsNodes = ({
         }
 
         setStatus('success');
-      } catch (error) {
+      } catch (error: unknown) {
         // If the user isn't part of any cells-enabled conversations, the user will not exist in Cells database
         // the search will return a 401 error
         const hasCellsConversations = conversationRepository.getAllCellEnabledGroupConversations().length > 0;

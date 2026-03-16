@@ -17,6 +17,8 @@
  *
  */
 
+import {Maybe} from 'true-myth';
+
 export const stripImageExifData = async (image: Blob): Promise<Blob> => {
   const url = URL.createObjectURL(image);
   try {
@@ -24,7 +26,7 @@ export const stripImageExifData = async (image: Blob): Promise<Blob> => {
     const canvas = drawImageOnCanvas(img);
     const strippedBlob = await canvasToBlob(canvas, image.type);
     return strippedBlob;
-  } catch (error) {
+  } catch (error: unknown) {
     if (error instanceof Error) {
       throw new Error(`Failed to strip EXIF data: ${error.message}`);
     }
@@ -89,7 +91,7 @@ export const imageHasExifData = async (image: Blob): Promise<boolean> => {
     }
 
     return containsExifData(view);
-  } catch (error) {
+  } catch (error: unknown) {
     if (error instanceof Error) {
       throw new Error(`Failed to check for EXIF data: ${error.message}`);
     }
@@ -157,3 +159,41 @@ const isInvalidSegmentLength = (view: DataView, offset: number): boolean => {
 const getNextOffset = (view: DataView, offset: number): number => {
   return INITIAL_OFFSET + view.getUint16(offset, false);
 };
+
+const PREVIEWABLE_IMAGE_MIME_TYPES = new Set(['image/png', 'image/jpeg', 'image/gif', 'image/webp']);
+const PREVIEWABLE_IMAGE_EXTENSIONS = new Set(['png', 'jpg', 'jpeg', 'gif', 'webp']);
+
+export const isPreviewableImage = ({
+  mimeType,
+  fileName,
+  extension,
+}: {
+  mimeType?: string;
+  fileName?: string;
+  extension?: string;
+}): boolean => {
+  const normalizedMimeType = mimeType?.toLowerCase();
+  if (normalizedMimeType && PREVIEWABLE_IMAGE_MIME_TYPES.has(normalizedMimeType)) {
+    return true;
+  }
+
+  const normalizedExtension = extension?.toLowerCase() ?? fileName?.split('.').pop()?.toLowerCase();
+
+  return !!normalizedExtension && PREVIEWABLE_IMAGE_EXTENSIONS.has(normalizedExtension);
+};
+
+type GetBestPreviewSourceOptions = {
+  readonly fileExtension: string;
+  readonly fileUrl: Maybe<string>;
+  readonly filePreviewUrl: Maybe<string>;
+};
+
+export function getBestPreviewSource(options: GetBestPreviewSourceOptions): Maybe<string> {
+  const {fileExtension, fileUrl, filePreviewUrl} = options;
+
+  if (!isPreviewableImage({extension: fileExtension})) {
+    return filePreviewUrl;
+  }
+
+  return fileUrl.or(filePreviewUrl);
+}

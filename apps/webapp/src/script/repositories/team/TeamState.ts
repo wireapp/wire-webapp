@@ -17,6 +17,7 @@
  *
  */
 
+import {Backend} from '@wireapp/api-client/lib/env';
 import {Role} from '@wireapp/api-client/lib/team';
 import {FeatureList, FEATURE_STATUS, SELF_DELETING_TIMEOUT} from '@wireapp/api-client/lib/team/feature/';
 import ko from 'knockout';
@@ -37,6 +38,7 @@ export class TeamState {
   public readonly memberInviters: ko.Observable<Record<string, string>>;
   public readonly memberRoles: ko.Observable<Record<string, ROLE>>;
   public readonly supportsLegalHold: ko.Observable<boolean>;
+  public readonly hasWhitelistedServices: ko.Observable<boolean>;
   public readonly teamName: ko.PureComputed<string>;
   public readonly teamFeatures: ko.Observable<FeatureList | undefined>;
   public readonly classifiedDomains: ko.PureComputed<string[] | undefined>;
@@ -61,6 +63,7 @@ export class TeamState {
   readonly selfRole: ko.PureComputed<Role | undefined>;
   readonly isCellsEnabled: ko.PureComputed<boolean>;
   readonly isAuditLogEnabled: ko.PureComputed<boolean>;
+  readonly isAppsEnabled: ko.PureComputed<boolean>;
 
   constructor(private readonly userState = container.resolve(UserState)) {
     this.isTeam = ko.pureComputed(() => !!this.team()?.id);
@@ -83,6 +86,7 @@ export class TeamState {
     });
 
     this.supportsLegalHold = ko.observable(false);
+    this.hasWhitelistedServices = ko.observable(false);
 
     this.isFileSharingSendingEnabled = ko.pureComputed(() => {
       const status = this.teamFeatures()?.fileSharing?.status;
@@ -142,18 +146,20 @@ export class TeamState {
       return this.teamFeatures()?.cells?.status === FEATURE_STATUS.ENABLED;
     });
 
-    this.isAuditLogEnabled = ko.pureComputed(() => {
-      return this.teamFeatures()?.assetAuditLog?.status === FEATURE_STATUS.ENABLED;
+    this.isAppsEnabled = ko.pureComputed(() => {
+      return this.teamFeatures()?.apps?.status === FEATURE_STATUS.ENABLED;
     });
-  }
 
-  /**
-   * Check if audit logging is enabled for the current backend.
-   * Audit logging is explicitly disabled for the production cloud backend.
-   */
-  static isAuditLogEnabledForBackend(): boolean {
-    const {BACKEND_REST} = Config.getConfig();
-    return BACKEND_REST !== 'https://prod-nginz-https.wire.com';
+    this.isAuditLogEnabled = ko.pureComputed(() => {
+      const {BACKEND_REST} = Config.getConfig();
+
+      return (
+        this.teamFeatures()?.assetAuditLog?.status === FEATURE_STATUS.ENABLED &&
+        // Check if audit logging is enabled for the current backend.
+        // Audit logging is explicitly disabled for the production cloud backend.
+        BACKEND_REST !== Backend.PRODUCTION.rest
+      );
+    });
   }
 
   isInTeam(entity: User | Conversation): boolean {

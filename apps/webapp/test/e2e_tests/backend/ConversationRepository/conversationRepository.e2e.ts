@@ -21,7 +21,42 @@ import {createGroupConversationData, createGroupConversationDataParams} from './
 
 import {BackendClientE2E} from '../backendClient.e2e';
 
+type Conversation = {
+  qualified_id: {id: string};
+  members: {
+    others: {
+      conversation_role: string;
+      id: string;
+    }[];
+  };
+  protocol: 'proteus' | 'mls';
+  name: string;
+};
+
 export class ConversationRepositoryE2E extends BackendClientE2E {
+  private getAuthHeaders(token: string) {
+    return {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+    };
+  }
+
+  private async listAllConversations(token: string): Promise<Conversation[]> {
+    const {data: idData} = await this.axiosInstance.post('conversations/list-ids', {}, this.getAuthHeaders(token));
+
+    const qualifiedIds = idData.qualified_conversations;
+    if (!qualifiedIds) throw new Error('No qualified conversations found');
+
+    const {data: listData} = await this.axiosInstance.post(
+      'conversations/list',
+      {qualified_ids: qualifiedIds},
+      this.getAuthHeaders(token),
+    );
+
+    return listData.found as Conversation[];
+  }
   async inviteToConversation(
     inviteeIds: string | string[],
     inviterToken: string,
@@ -42,65 +77,43 @@ export class ConversationRepositoryE2E extends BackendClientE2E {
         qualified_users: [],
         users: [inviteeIds].flat(),
       },
-      {
-        headers: {
-          Authorization: `Bearer ${inviterToken}`,
-          'Content-Type': 'application/json',
-        },
-      },
+      this.getAuthHeaders(inviterToken),
     );
   }
 
   async createGroupConversation(token: string, data: createGroupConversationDataParams) {
     const conversationData = createGroupConversationData(data);
     try {
-      const response = await this.axiosInstance.post('conversations', conversationData, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
-      });
+      const response = await this.axiosInstance.post('conversations', conversationData, this.getAuthHeaders(token));
 
       return response.data;
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Error creating group conversation:', error);
       throw error;
     }
   }
 
-  async getConversationWithUser(token: string, conversationPartnerId: string) {
-    const listIdsResponse = await this.axiosInstance.post(
-      'conversations/list-ids',
-      {},
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      },
+  async getConversationWithUser(
+    token: string,
+    conversationPartnerId: string,
+    options?: {protocol?: 'proteus' | 'mls'},
+  ) {
+    const conversations = await this.listAllConversations(token);
+
+    const conversation = conversations.find(conversation =>
+      conversation.members.others.some(
+        member =>
+          member.id === conversationPartnerId &&
+          // If a specific protocol to use was provided also filter by it
+          (options?.protocol ? conversation.protocol === options.protocol : true),
+      ),
     );
 
-    const qualifiedIds = listIdsResponse.data.qualified_conversations;
+    return conversation?.qualified_id.id;
+  }
 
-    if (!qualifiedIds) {
-      throw new Error('No qualified conversations found');
-    }
-
-    const response = await this.axiosInstance.post(
-      'conversations/list',
-      {qualified_ids: qualifiedIds},
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
-      },
-    );
-
-    // Find a conversation with the given user
-    const conversation = response.data.found.find(
-      (conversation: {members: {others: {conversation_role: string; id: string}[]}}) =>
-        conversation.members.others.some((member: {id: string}) => member.id === conversationPartnerId),
-    );
-    return conversation?.qualified_id?.id;
+  async getGroupConversation(token: string, conversationName: string) {
+    const conversations = await this.listAllConversations(token);
+    return conversations.find(conv => conv.name === conversationName)?.qualified_id.id;
   }
 }

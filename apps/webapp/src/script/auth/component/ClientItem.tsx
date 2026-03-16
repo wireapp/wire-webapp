@@ -39,6 +39,7 @@ import {
 import {isEnterKey} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
 import {splitFingerprint} from 'Util/StringUtil';
+import {isBackendError} from 'Util/TypePredicateUtil';
 
 import {ValidationError} from '../module/action/ValidationError';
 import {parseError, parseValidationErrors} from '../util/errorUtil';
@@ -153,8 +154,8 @@ const ClientItem = ({selected, onClientRemoval, onClick, client, clientError, re
 
     return Promise.resolve()
       .then(() => onClientRemoval())
-      .catch(error => {
-        if (!error.label) {
+      .catch((error: unknown) => {
+        if (!isBackendError(error)) {
           throw error;
         }
       });
@@ -182,8 +183,8 @@ const ClientItem = ({selected, onClientRemoval, onClick, client, clientError, re
         }
       })
       .then(() => onClientRemoval(password))
-      .catch(error => {
-        if (error.label) {
+      .catch((error: unknown) => {
+        if (isBackendError(error)) {
           switch (error.label) {
             default: {
               const isValidationError = Object.values(ValidationError.ERROR).some(errorType =>

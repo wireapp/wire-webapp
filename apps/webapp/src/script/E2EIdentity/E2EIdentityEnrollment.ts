@@ -265,7 +265,7 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
       const oidcService = this.createOIDCService();
       try {
         return await oidcService.authenticate(keyAuth, challenge.url, silent);
-      } catch (error) {
+      } catch (error: unknown) {
         if (silent) {
           // if we attempted a silent login and it failed, we need to try again with a redirect
           return oidcService.authenticate(keyAuth, challenge.url, false);
@@ -335,7 +335,7 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
       }
 
       await this.showSuccessMessage(isCertificateRenewal);
-    } catch (error) {
+    } catch (error: unknown) {
       this.logger.error('E2EI enrollment failed', error);
 
       setTimeout(removeCurrentModal, 0);

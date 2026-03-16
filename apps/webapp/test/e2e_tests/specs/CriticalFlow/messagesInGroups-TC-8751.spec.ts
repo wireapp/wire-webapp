@@ -17,7 +17,6 @@
  *
  */
 
-import {User} from 'test/e2e_tests/data/user';
 import {PageManager} from 'test/e2e_tests/pageManager';
 import {getVideoFilePath, getAudioFilePath, getTextFilePath, isAssetDownloaded} from 'test/e2e_tests/utils/asset.util';
 import {getImageFilePath, getLocalQRCodeValue} from 'test/e2e_tests/utils/sendImage.util';
@@ -36,24 +35,12 @@ const videoFilePath = getVideoFilePath();
 const audioFilePath = getAudioFilePath();
 const textFilePath = getTextFilePath();
 
-test('Messages in Groups', {tag: ['@TC-8751', '@crit-flow-web']}, async ({createTeam, createPage}) => {
-  let userA: User;
-  let userB: User;
-  let userAPageManager: PageManager;
-  let userBPageManager: PageManager;
+test('Messages in Groups', {tag: ['@TC-8751', '@crit-flow-web']}, async ({createUser, createTeam, createPage}, testInfo) => {
+  const userB = await createUser();
+  const {owner: userA} = await createTeam('Critical Team', {users: [userB]});
 
-  await test.step('Preconditions: Creating preconditions for the test via API', async () => {
-    const team = await createTeam('Critical Team', {withMembers: 1});
-    userA = team.owner;
-    userB = team.members[0];
-
-    const [pmA, pmB] = await Promise.all([
-      PageManager.from(createPage(withLogin(userA))),
-      PageManager.from(createPage(withLogin(userB))),
-    ]);
-    userAPageManager = pmA;
-    userBPageManager = pmB;
-  });
+  const [userAPage, userBPage] = await Promise.all([createPage(withLogin(userA)), createPage(withLogin(userB))]);
+  const [userAPageManager, userBPageManager] = [PageManager.from(userAPage), PageManager.from(userBPage)];
 
   await test.step('User A creates a group with User B', async () => {
     const {pages} = userAPageManager.webapp;
@@ -95,7 +82,7 @@ test('Messages in Groups', {tag: ['@TC-8751', '@crit-flow-web']}, async ({create
   await test.step('User B can download the image', async () => {
     const {modals} = userBPageManager.webapp;
     // Click on the download button to download the image
-    const filePath = await modals.detailViewModal().downloadAsset();
+    const filePath = await modals.detailViewModal().downloadAsset(testInfo.outputDir);
     const downloadQRCodeValue = await getLocalQRCodeValue(filePath);
     const localQRCodeValue = await getLocalQRCodeValue(imageFilePath);
     expect(downloadQRCodeValue).toBe(localQRCodeValue);
@@ -123,7 +110,7 @@ test('Messages in Groups', {tag: ['@TC-8751', '@crit-flow-web']}, async ({create
     const {pages} = userBPageManager.webapp;
     await pages.conversation().playVideo();
     // Wait for 5 seconds to ensure video starts playing
-    await pages.conversation().page.waitForTimeout(5000);
+    await userBPage.waitForTimeout(5000);
     // ToDO: Bug -> Video is not loaded from the server, so we cannot check if it is playing
   });
 
@@ -137,7 +124,7 @@ test('Messages in Groups', {tag: ['@TC-8751', '@crit-flow-web']}, async ({create
     const {pages} = userBPageManager.webapp;
     await pages.conversation().playAudio();
     // Wait for 3 seconds to ensure audio starts playing
-    await pages.conversation().page.waitForTimeout(3000);
+    await userBPage.waitForTimeout(3000);
     expect(await pages.conversation().isAudioPlaying()).toBeTruthy();
   });
   await test.step('User A sends a quick (10 sec) self deleting message', async () => {
@@ -153,7 +140,7 @@ test('Messages in Groups', {tag: ['@TC-8751', '@crit-flow-web']}, async ({create
   });
 
   await test.step('User B waits 10 seconds', async () => {
-    await userBPageManager.webapp.pages.conversation().page.waitForTimeout(11_000);
+    await userBPage.waitForTimeout(11_000);
   });
 
   await test.step('Both users see the message as removed', async () => {
@@ -176,7 +163,7 @@ test('Messages in Groups', {tag: ['@TC-8751', '@crit-flow-web']}, async ({create
 
   await test.step('User B can download the file', async () => {
     const {pages} = userBPageManager.webapp;
-    const filePath = await pages.conversation().downloadFile();
+    const filePath = await pages.conversation().downloadFile(testInfo.outputDir);
     expect(await isAssetDownloaded(filePath)).toBeTruthy();
   });
 });

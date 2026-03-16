@@ -37,14 +37,21 @@ export const useCellsRenameForm = ({node, cellsRepository, onSuccess}: UseCellsR
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const hasInvalidCharacters = INVALID_CHARACTERS.some(char => name.includes(char));
-  const isDisabled = isSubmitting || name === node.name || !name.trim();
+  const originalBaseName = trimFileExtension(node.name);
+  const normalizedName = name.trim();
+  const hasInvalidCharacters = INVALID_CHARACTERS.some(char => normalizedName.includes(char));
+  const isDisabled = isSubmitting || normalizedName === originalBaseName || !normalizedName;
+
+  const buildNewName = (baseName: string) => {
+    const extension = getFileExtension(node.name);
+    return extension ? `${baseName}.${extension}` : baseName;
+  };
 
   const renameNode = async (name: string) => {
     try {
-      await cellsRepository.renameNode({currentPath: node.path, newName: `${name}.${getFileExtension(node.name)}`});
+      await cellsRepository.renameNode({currentPath: node.path, newName: buildNewName(name)});
       onSuccess();
-    } catch (error) {
+    } catch (error: unknown) {
       setError(t('cells.renameNodeModal.error'));
     }
   };
@@ -59,7 +66,7 @@ export const useCellsRenameForm = ({node, cellsRepository, onSuccess}: UseCellsR
     setError(null);
     setIsSubmitting(true);
 
-    if (!name.trim()) {
+    if (!normalizedName) {
       setError(t('cells.renameNodeModal.nameRequired'));
       setIsSubmitting(false);
       return;
@@ -72,7 +79,7 @@ export const useCellsRenameForm = ({node, cellsRepository, onSuccess}: UseCellsR
     }
 
     try {
-      await renameNode(name);
+      await renameNode(normalizedName);
     } finally {
       setIsSubmitting(false);
     }

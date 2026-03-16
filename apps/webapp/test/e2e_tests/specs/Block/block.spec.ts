@@ -72,11 +72,11 @@ test.describe('User Blocking', () => {
     let userB: User;
     let userC: User;
 
-    test.beforeEach(async ({createTeam}) => {
-      const [teamA, teamB] = await Promise.all([createTeam('Team A', {withMembers: 1}), createTeam('Team B')]);
+    test.beforeEach(async ({createTeam, createUser}) => {
+      userC = await createUser();
+      const [teamA, teamB] = await Promise.all([createTeam('Team A', {users: [userC]}), createTeam('Team B')]);
       userA = teamA.owner;
       userB = teamB.owner;
-      userC = teamA.members[0];
     });
 
     test(
@@ -329,10 +329,10 @@ test.describe('User Blocking', () => {
     let userA: User;
     let userB: User;
 
-    test.beforeEach(async ({createTeam}) => {
-      const team = await createTeam('Test Team', {withMembers: 1});
+    test.beforeEach(async ({createTeam, createUser}) => {
+      userB = await createUser();
+      const team = await createTeam('Test Team', {users: [userB]});
       userA = team.owner;
-      userB = team.members[0];
     });
 
     test('Verify you can not block a user from your team', {tag: ['@TC-8778', '@regression']}, async ({createPage}) => {

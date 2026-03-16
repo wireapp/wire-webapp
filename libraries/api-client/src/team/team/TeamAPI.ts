@@ -19,6 +19,8 @@
 
 import Axios, {AxiosRequestConfig} from 'axios';
 
+import {NewAppRequest} from './app/NewAppRequest';
+import {NewAppResponse} from './app/NewAppResponse';
 import {LeadData} from './LeadData';
 import {TeamSizeData} from './TeamSizeData';
 import {UpdateTeamData} from './UpdateTeamData';
@@ -31,6 +33,7 @@ export class TeamAPI {
   constructor(private readonly client: HttpClient) {}
 
   public static readonly URL = {
+    APPS: 'apps',
     SIZE: 'size',
     TEAMS: '/teams',
     CONSENT: '/consent',
@@ -104,7 +107,7 @@ export class TeamAPI {
       try {
         const response = await this.client.sendJSON<TeamSizeData>(config);
         return response.data;
-      } catch (error) {
+      } catch (error: unknown) {
         if ((error as BackendError).message === SyntheticErrorLabel.REQUEST_CANCELLED) {
           throw new RequestCancellationError('Team size request got cancelled');
         }
@@ -137,6 +140,20 @@ export class TeamAPI {
     };
 
     const response = await this.client.sendJSON<any>(config);
+    return response.data;
+  }
+
+  public async postApp(teamId: string, app: NewAppRequest): Promise<NewAppResponse> {
+    const config: AxiosRequestConfig = {
+      data: app,
+      method: 'POST',
+      url: `${TeamAPI.URL.TEAMS}/${teamId}/${TeamAPI.URL.APPS}`,
+      requestOptions: {
+        skipLogout: true,
+      },
+    };
+
+    const response = await this.client.sendJSON<NewAppResponse>(config);
     return response.data;
   }
 }

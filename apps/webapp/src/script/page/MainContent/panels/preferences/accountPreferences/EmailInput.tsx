@@ -23,6 +23,7 @@ import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {UserRepository} from 'Repositories/user/UserRepository';
 import {t} from 'Util/LocalizerUtil';
 import {getLogger} from 'Util/Logger';
+import {isErrorWithCode} from 'Util/TypePredicateUtil';
 
 import {AccountInput, useInputDone} from './AccountInput';
 
@@ -50,12 +51,12 @@ const EmailInput = ({email, canEditProfile, userRepository}: EmailInputProps) =>
       await userRepository.changeEmail(enteredEmail);
       emailInputDone.done();
       showWarning(t('modalPreferencesAccountEmailHeadline'), t('authPostedResendDetail'));
-    } catch (error) {
+    } catch (error: unknown) {
       logger.warn('Failed to send reset email request', error);
-      if (error.code === HTTP_STATUS.BAD_REQUEST) {
+      if (isErrorWithCode(error) && error.code === HTTP_STATUS.BAD_REQUEST) {
         showWarning(t('modalPreferencesAccountEmailErrorHeadline'), t('modalPreferencesAccountEmailInvalidMessage'));
       }
-      if (error.code === HTTP_STATUS.CONFLICT) {
+      if (isErrorWithCode(error) && error.code === HTTP_STATUS.CONFLICT) {
         showWarning(t('modalPreferencesAccountEmailErrorHeadline'), t('modalPreferencesAccountEmailTakenMessage'));
       }
     }

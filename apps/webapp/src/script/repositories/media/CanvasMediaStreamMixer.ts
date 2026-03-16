@@ -109,7 +109,7 @@ export class CanvasMediaStreamMixer {
       });
 
       return outputStream;
-    } catch (error) {
+    } catch (error: unknown) {
       this.releaseStreams();
       throw error;
     }
@@ -181,7 +181,7 @@ export class CanvasMediaStreamMixer {
             this.context.drawImage(this.cameraVideo, cameraOverlayX, cameraOverlayY, out_w, out_h);
             this.context.restore();
           }
-        } catch (error) {
+        } catch (error: unknown) {
           console.error('Error in mixFrames:', error);
         }
       }
@@ -211,7 +211,7 @@ export class CanvasMediaStreamMixer {
       });
 
       this.setupPipWindow(pipWindow);
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Failed to enter Picture-in-Picture mode:', error);
       this.resetPipState();
     }

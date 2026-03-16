@@ -81,7 +81,7 @@ export class AudioRepository {
       return;
     }
     Object.values(this.audioElements).forEach(element => {
-      element.setSinkId?.(currentOutputDevice).catch(error => {
+      element.setSinkId?.(currentOutputDevice).catch((error: unknown) => {
         this.logger.warn(error);
       });
     });
@@ -152,7 +152,7 @@ export class AudioRepository {
         try {
           await this.playAudio(audioElement, playInLoop);
           this.logger.log(`Playing sound '${audioId}' (loop: '${playInLoop}')`);
-        } catch (error) {
+        } catch (error: unknown) {
           if (error instanceof Error) {
             this.logger.error(`Failed to play sound '${audioId}': ${error.message}`);
           }

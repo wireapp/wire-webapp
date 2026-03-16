@@ -18,14 +18,11 @@
  */
 
 import {Page, Locator} from '@playwright/test';
-import {selectByDataAttribute} from 'test/e2e_tests/utils/selector.util';
 
 export class AccountPage {
-  readonly page: Page;
+  private readonly page: Page;
 
   readonly sendUsageDataCheckbox: Locator;
-  readonly appLockCheckboxLabel: Locator;
-  readonly appLockCheckbox: Locator;
   readonly deleteAccountButton: Locator;
   readonly backUpButton: Locator;
   readonly backupFileInput: Locator;
@@ -47,24 +44,33 @@ export class AccountPage {
     this.page = page;
 
     this.sendUsageDataCheckbox = page.locator("[data-uie-name='status-preference-telemetry']+label");
-    this.appLockCheckboxLabel = page.locator("[data-uie-name='status-preference-applock']+label");
-    this.appLockCheckbox = page.locator("[data-uie-name='status-preference-applock']");
-    this.deleteAccountButton = page.locator(selectByDataAttribute('go-delete-account'));
-    this.backUpButton = page.locator(selectByDataAttribute('do-backup-export'));
-    this.backupFileInput = page.locator(selectByDataAttribute('input-import-file'));
+    this.deleteAccountButton = page.getByTestId('go-delete-account');
+    this.backUpButton = page.getByTestId('do-backup-export');
+    this.backupFileInput = page.getByTestId('input-import-file');
     this.restoreBackupButton = page.locator("[data-uie-name='do-backup-import']+button");
-    this.logoutButton = page.locator(selectByDataAttribute('do-logout'));
-    this.editEmailButton = page.locator(selectByDataAttribute('go-edit-email'));
-    this.editDisplayNameButton = page.locator(selectByDataAttribute('go-edit-email'));
-    this.emailInput = page.locator(selectByDataAttribute('enter-email-input'));
-    this.displayNameInput = page.locator(selectByDataAttribute('enter-displayname-input'));
-    this.emailDisplay = page.locator(selectByDataAttribute('email-display'));
-    this.nameDisplay = page.locator(selectByDataAttribute('displayname-display'));
-    this.domainDisplay = page.locator(selectByDataAttribute('item-enriched-value'));
-    this.usernameDisplay = page.locator(selectByDataAttribute('username-display'));
-    this.resetPasswordButton = page.locator(selectByDataAttribute('do-reset-password'));
+    this.logoutButton = page.getByTestId('do-logout');
+    this.editEmailButton = page.getByTestId('go-edit-email');
+    this.editDisplayNameButton = page.getByTestId('go-edit-email');
+    this.emailInput = page.getByTestId('enter-email-input');
+    this.displayNameInput = page.getByTestId('enter-displayname-input');
+    this.emailDisplay = page.getByTestId('email-display');
+    this.nameDisplay = page.getByTestId('displayname-display');
+    this.domainDisplay = page.getByTestId('item-enriched-value');
+    this.usernameDisplay = page.getByTestId('username-display');
+    this.resetPasswordButton = page.getByTestId('do-reset-password');
     this.receiveNewsletterCheckbox = page.locator("[data-uie-name='status-preference-marketing']+label");
     this.typingIndicator = page.locator("[data-uie-name='status-preference-typing-indicator']+label");
+  }
+
+  /** Locator for the privacy section within the account settings, including utils for the options inside it */
+  get privacySection() {
+    const section = this.page.getByRole('group', {name: 'Privacy'});
+    return Object.assign(section, {
+      appLock: {
+        checkbox: section.locator('[data-uie-name="status-preference-applock"]'),
+        label: section.locator('[data-uie-name="status-preference-applock"]+label'),
+      },
+    });
   }
 
   async clickBackUpButton() {
@@ -95,10 +101,6 @@ export class AccountPage {
     return this.sendUsageDataCheckbox.isChecked();
   }
 
-  async toggleAppLock() {
-    await this.appLockCheckboxLabel.click();
-  }
-
   async clickLogoutButton() {
     await this.logoutButton.click();
   }
@@ -113,6 +115,14 @@ export class AccountPage {
     await this.resetPasswordButton.click();
   }
 
+  async uploadProfilePicture(imagePath: string) {
+    const [filePicker] = await Promise.all([
+      this.page.waitForEvent('filechooser'),
+      this.page.getByLabel('Change your picture').click(),
+    ]);
+    await filePicker.setFiles(imagePath);
+  }
+
   async changeEmailAddress(newEmail: string) {
     await this.editEmailButton.click();
     await this.emailInput.fill(newEmail);
@@ -123,5 +133,13 @@ export class AccountPage {
     await this.editDisplayNameButton.click();
     await this.displayNameInput.fill(newName);
     await this.displayNameInput.press('Enter');
+  }
+
+  statusOption(status: 'Away' | 'Busy' | 'Available' | 'None') {
+    return this.page.getByRole('button', {name: new RegExp(`${status}`, 'i')});
+  }
+
+  async selectStatus(status: 'Away' | 'Busy' | 'Available' | 'None') {
+    await this.statusOption(status).click();
   }
 }

@@ -163,6 +163,7 @@ declare module 'I18n/en-US.json' {
     'accessibility.rightPanel.GoBack': `Go back`;
     'accessibility.rightPanel.close': `Close conversation info`;
     'accessibility.searchInput.cancel': `Delete entry`;
+    'accessibility.selfDeletingMessage.timer': `Self-deleting message, timer is counting down.`;
     'accessibility.userProfileDeleteEntry': `Delete entry`;
     'accountAlreadyExistsModal.changeEmailLink': `Change your email address`;
     'accountAlreadyExistsModal.content': `This email\'s domain belongs to an on-premises backend. Please change your email in the account settings or delete your account. If you are part of a team please contact your team admin.`;
@@ -375,6 +376,7 @@ declare module 'I18n/en-US.json' {
     'callingRestrictedConferenceCallTeamMemberModalTitle': `Feature unavailable`;
     'cameraStatusOff': `off`;
     'cameraStatusOn': `on`;
+    'cells.breadcrumb.files': `{conversationName} files`;
     'cells.clearFilters.button': `Clear all`;
     'cells.deleteModal.description': `This will permanently delete the file {name} for all participants.`;
     'cells.deleteModal.error': `Something went wrong, please try again later and refresh the list.`;
@@ -399,7 +401,7 @@ declare module 'I18n/en-US.json' {
     'cells.filtersModal.tags.placeholder': `Select a tag`;
     'cells.filtersModal.title': `Filters`;
     'cells.folderBreadcrumbCombained': `Show more`;
-    'cells.heading': `All files`;
+    'cells.heading': `Files`;
     'cells.imageFullScreenModal.closeButton': `Close`;
     'cells.imageFullScreenModal.downloadButton': `Download`;
     'cells.modal.closeButton': `Close`;
@@ -502,6 +504,8 @@ declare module 'I18n/en-US.json' {
     'cells.shareModal.password.error.required': `Enter a password`;
     'cells.shareModal.password.label': `Set password`;
     'cells.shareModal.primaryAction': `Save`;
+    'cells.sharedDrive.description': `Find any file or folder in this conversation`;
+    'cells.sharedDrive.title': `Shared Drive`;
     'cells.sidebar.heading': `Drive`;
     'cells.sidebar.title': `Files`;
     'cells.tableRow.actions': `More options`;
@@ -713,13 +717,6 @@ declare module 'I18n/en-US.json' {
     'conversationFileUploadOverlayDescription': `Drag & drop to add files`;
     'conversationFileUploadOverlayTitle': `Upload files`;
     'conversationFileVideoPreviewLabel': `Video file preview for: {src}`;
-    'conversationFilterDrafts': `Drafts`;
-    'conversationFilterMentions': `Mentions`;
-    'conversationFilterNone': `No filter`;
-    'conversationFilterPings': `Pings`;
-    'conversationFilterReplies': `Replies`;
-    'conversationFilterTooltip': `Filter conversations`;
-    'conversationFilterUnread': `Unread`;
     'conversationFoldersEmptyText': `Add your conversations to folders to stay organized.`;
     'conversationFoldersEmptyTextLearnMore': `Learn more`;
     'conversationFooterArchive': `Archive`;
@@ -1015,6 +1012,8 @@ declare module 'I18n/en-US.json' {
     'federationDelete': `[bold]Your backend[/bold] stopped federating with [bold]{backendUrl}.[/bold]`;
     'fileCardDefaultCloseButtonLabel': `Close`;
     'fileFullscreenModal.editor.error': `Failed to load edit preview`;
+    'fileFullscreenModal.editor.errorDescription': `There was a problem connecting to the server. Please try again.`;
+    'fileFullscreenModal.editor.errorTitle': `Unable to open file edit mode`;
     'fileFullscreenModal.editor.iframeTitle': `Document editor`;
     'fileFullscreenModal.noPreviewAvailable.callToAction': `Download File`;
     'fileFullscreenModal.noPreviewAvailable.description': `There is no preview available for this file. Download the file instead.`;
@@ -1029,6 +1028,9 @@ declare module 'I18n/en-US.json' {
     'folderViewTooltip': `Folders`;
     'footer.copy': `© Wire Swiss GmbH`;
     'footer.wireLink': `wire.com`;
+    'forceReloadModalAction': `Reload needed`;
+    'forceReloadModalMessage': `Wire needs an update. The app will automatically restart in 60 seconds.<br /><br /> Your work is not lost. You can continue where you left off after the reloading.`;
+    'forceReloadModalTitle': `Reload Now`;
     'fullsearchCancelCloseBtn': `Cancel search`;
     'fullsearchCancelLabel': `Close search field`;
     'fullsearchNoResults': `No results.`;
@@ -1166,8 +1168,8 @@ declare module 'I18n/en-US.json' {
     'inviteHeadline': `Invite people to {brandName}`;
     'inviteHintSelected': `Press {metaKey} + C to copy`;
     'inviteHintUnselected': `Select and Press {metaKey} + C`;
-    'inviteMessage': `I’m on {brandName}, search for {username} or visit get.wire.com.`;
-    'inviteMessageNoEmail': `I’m on {brandName}. Visit get.wire.com to connect with me.`;
+    'inviteMessage': `I’m on {brandName}, search for {username} or visit wire.com/app-download.`;
+    'inviteMessageNoEmail': `I’m on {brandName}. Visit wire.com/app-download to connect with me.`;
     'inviteMetaKeyMac': `Cmd`;
     'inviteMetaKeyPc': `Ctrl`;
     'jumpToLastMessage': `Scroll to the end of this conversation`;
@@ -1792,6 +1794,7 @@ declare module 'I18n/en-US.json' {
     'searchCreateGroup': `Create group`;
     'searchCreateGuestRoom': `Create guest room`;
     'searchDirectConversations': `Search 1:1 conversations`;
+    'searchDraftsConversations': `Search in drafts`;
     'searchFavoriteConversations': `Search favorites`;
     'searchFederatedDomainNotAvailable': `The federated domain is currently not available.`;
     'searchFederatedDomainNotAvailableLearnMore': `Learn more`;
@@ -1810,6 +1813,7 @@ declare module 'I18n/en-US.json' {
     'searchManageServices': `Manage Apps`;
     'searchManageServicesNoResults': `Manage apps`;
     'searchMemberInvite': `Invite people to join the team`;
+    'searchMentionsConversations': `Search in mentions`;
     'searchNoContactsOnWire': `You have no contacts on {brandName}.\nTry finding people by\nname or username.`;
     'searchNoMatchesPartner': `No results`;
     'searchNoServicesManager': `Apps are helpers that can improve your workflow.`;
@@ -1820,6 +1824,8 @@ declare module 'I18n/en-US.json' {
     'searchPeople': `People`;
     'searchPeopleOnlyPlaceholder': `Search people`;
     'searchPeoplePlaceholder': `Search for people and conversations`;
+    'searchPingsConversations': `Search in pings`;
+    'searchRepliesConversations': `Search in replies`;
     'searchServiceConfirmButton': `Open Conversation`;
     'searchServicePlaceholder': `Search by name`;
     'searchServices': `Apps`;
@@ -1829,6 +1835,7 @@ declare module 'I18n/en-US.json' {
     'searchTrySearch': `Find people by\nname or username`;
     'searchTrySearchFederation': `Find people in Wire by name or\n@username\n\nFind people from another domain\nby @username@domainname`;
     'searchTrySearchLearnMore': `Learn more`;
+    'searchUnreadConversations': `Search in unread`;
     'selectAccountTypeHeading': `How will you use Wire?`;
     'selectPersonalAccountTypeOptionButtonText': `Create Personal Account`;
     'selectPersonalAccountTypeOptionDescription': `Chat with friends and family.`;
@@ -1879,6 +1886,8 @@ declare module 'I18n/en-US.json' {
     'success.openWebAppText': `Open Wire for web`;
     'success.subheader': `What do you want to do next?`;
     'systemMessageLearnMore': `Learn more`;
+    'tabsFilterHeader': `Show filters`;
+    'tabsFilterTooltip': `Customize visible tabs`;
     'takeoverButtonChoose': `Choose your own`;
     'takeoverButtonKeep': `Keep this one`;
     'takeoverLink': `Learn more`;
@@ -1960,7 +1969,7 @@ declare module 'I18n/en-US.json' {
     'tooltipConversationInputOneUserTyping': `{user1} is typing`;
     'tooltipConversationInputPlaceholder': `Type a message`;
     'tooltipConversationInputTwoUserTyping': `{user1} and {user2} are typing`;
-    'tooltipConversationPeople': `People ({shortcut})`;
+    'tooltipConversationPeople': `{displayName}, conversation details`;
     'tooltipConversationPicture': `Add picture`;
     'tooltipConversationPing': `Ping`;
     'tooltipConversationSearch': `Search`;

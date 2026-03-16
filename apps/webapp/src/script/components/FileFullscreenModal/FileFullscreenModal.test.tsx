@@ -48,7 +48,11 @@ jest.mock('./FileLoader/FileLoader', () => ({
 }));
 
 jest.mock('./ImageFileView/ImageFileView', () => ({
-  ImageFileView: () => <div data-uie-name="image-view">Image View</div>,
+  ImageFileView: ({src}: {src?: string}) => (
+    <div data-uie-name="image-view" data-src={src}>
+      Image View
+    </div>
+  ),
 }));
 
 jest.mock('./NoPreviewAvailable/NoPreviewAvailable', () => ({
@@ -203,6 +207,47 @@ describe('FileFullscreenModal - File Version Restore', () => {
 
       // Should respect the new isEditMode prop
       expect(screen.queryByTestId('file-editor')).not.toBeInTheDocument();
+    });
+  });
+
+  describe('Image source selection', () => {
+    it('passes the original fileUrl to the image viewer for browser-previewable formats', () => {
+      render(
+        <FileFullscreenModal
+          {...defaultProps}
+          filePreviewUrl="https://example.com/preview.jpg"
+          fileExtension="jpg"
+          fileUrl="https://example.com/original.jpg"
+        />,
+      );
+
+      expect(screen.getByTestId('image-view')).toHaveAttribute('data-src', 'https://example.com/original.jpg');
+    });
+
+    it('passes the server-generated preview to the image viewer for HEIC files (not browser-decodable)', () => {
+      render(
+        <FileFullscreenModal
+          {...defaultProps}
+          filePreviewUrl="https://example.com/preview.jpg"
+          fileExtension="heic"
+          fileUrl="https://example.com/original.heic"
+        />,
+      );
+
+      expect(screen.getByTestId('image-view')).toHaveAttribute('data-src', 'https://example.com/preview.jpg');
+    });
+
+    it('falls back to filePreviewUrl when fileUrl is absent for a previewable format', () => {
+      render(
+        <FileFullscreenModal
+          {...defaultProps}
+          filePreviewUrl="https://example.com/preview.jpg"
+          fileExtension="jpg"
+          fileUrl={undefined}
+        />,
+      );
+
+      expect(screen.getByTestId('image-view')).toHaveAttribute('data-src', 'https://example.com/preview.jpg');
     });
   });
 

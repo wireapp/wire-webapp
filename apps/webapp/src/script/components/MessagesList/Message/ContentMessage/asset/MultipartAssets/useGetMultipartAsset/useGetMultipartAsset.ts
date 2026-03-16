@@ -60,6 +60,7 @@ export const useGetMultipartAsset = ({
   const [src, setSrc] = useState<string | undefined>(undefined);
   const [imagePreviewUrl, setImagePreviewUrl] = useState<string | undefined>(undefined);
   const [pdfPreviewUrl, setPdfPreviewUrl] = useState<string | undefined>(undefined);
+  const [hasPreview, setHasPreview] = useState<boolean | undefined>(undefined);
   const [status, setStatus] = useState<Status>('idle');
   const [isRecycled, setIsRecycled] = useState<boolean | undefined>(undefined);
 
@@ -87,6 +88,7 @@ export const useGetMultipartAsset = ({
 
         const imagePreview = asset.Previews?.find(preview => preview?.ContentType?.startsWith('image/'));
         const pdfPreview = asset.Previews?.find(preview => preview?.ContentType?.startsWith('application/pdf'));
+        setHasPreview(!!imagePreview || !!pdfPreview);
 
         const shouldReturnImmediately =
           !retryPreviewUntilSuccess || (!imagePreview && !pdfPreview) || (imagePreview?.Error && pdfPreview?.Error);
@@ -116,7 +118,7 @@ export const useGetMultipartAsset = ({
         setPath(asset.Path);
         setIsRecycled(asset.IsRecycled);
         setStatus('success');
-      } catch (err) {
+      } catch (err: unknown) {
         if (!isMounted.current) {
           return;
         }
@@ -170,6 +172,7 @@ export const useGetMultipartAsset = ({
     src,
     imagePreviewUrl,
     pdfPreviewUrl,
+    hasPreview,
     isLoading: ['loading', 'retrying', 'idle'].includes(status),
     isError: status === 'error',
     path,

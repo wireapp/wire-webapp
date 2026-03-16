@@ -27,10 +27,10 @@ const unsetSelf: Self = {
   assets: [],
   expires_at: undefined,
   handle: undefined,
-  id: undefined,
+  id: '',
   qualified_id: {id: '', domain: ''},
-  locale: undefined,
-  name: undefined,
+  locale: '',
+  name: '',
   sso_id: undefined,
   team: undefined,
 };
@@ -38,10 +38,10 @@ const unsetSelf: Self = {
 export const getConsents = (state: RootState) => state.selfState.consents || {};
 export const getSelf = (state: RootState) => state.selfState.self || unsetSelf;
 export const getSelfError = (state: RootState) => state.selfState.error;
-export const getSelfHandle = (state: RootState) => getSelf(state).handle;
-export const getSelfEmail = (state: RootState) => getSelf(state).email;
-export const getSelfName = (state: RootState) => getSelf(state).name;
-export const getSelfTeamId = (state: RootState) => getSelf(state).team;
+export const getSelfHandle = (state: RootState): string | undefined => getSelf(state).handle;
+export const getSelfEmail = (state: RootState): string | undefined => getSelf(state).email;
+export const getSelfName = (state: RootState): string | undefined => getSelf(state).name;
+export const getSelfTeamId = (state: RootState): string | undefined => getSelf(state).team;
 export const hasSelfHandle = (state: RootState) => !!getSelfHandle(state);
 export const hasSelfEmail = (state: RootState) => !!getSelfEmail(state);
 export const hasSelfPassword = (state: RootState) => !!state.selfState.hasPassword;

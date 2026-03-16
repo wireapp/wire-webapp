@@ -26,6 +26,7 @@ import {InvalidAppLockTimeoutError} from './FeatureError';
 import {
   allFeaturesResponseSchema,
   FeatureAllowedGlobalOperations,
+  FeatureApps,
   FeatureAppLock,
   FeatureCells,
   FeatureChannels,
@@ -137,7 +138,7 @@ export class FeatureAPI {
     try {
       const response = await this.client.sendJSON<FeatureConversationGuestLink>(config);
       return response.data;
-    } catch (error) {
+    } catch (error: unknown) {
       if (isBackendError(error) && error.label === BackendErrorLabel.FEATURE_LOCKED) {
         throw new FeatureLockedError(error.message);
       }
@@ -168,7 +169,7 @@ export class FeatureAPI {
     try {
       const response = await this.client.sendJSON<FeatureConferenceCalling>(config);
       return response.data;
-    } catch (error) {
+    } catch (error: unknown) {
       if (isBackendError(error) && error.label === BackendErrorLabel.FEATURE_LOCKED) {
         throw new FeatureLockedError(error.message);
       }
@@ -205,7 +206,7 @@ export class FeatureAPI {
     try {
       const response = await this.client.sendJSON<FeatureVideoCalling>(config);
       return response.data;
-    } catch (error) {
+    } catch (error: unknown) {
       if (isBackendError(error) && error.label === BackendErrorLabel.FEATURE_LOCKED) {
         throw new FeatureLockedError(error.message);
       }
@@ -236,7 +237,7 @@ export class FeatureAPI {
     try {
       const response = await this.client.sendJSON<FeatureSelfDeletingMessages>(config);
       return response.data;
-    } catch (error) {
+    } catch (error: unknown) {
       if (isBackendError(error) && error.label === BackendErrorLabel.FEATURE_LOCKED) {
         throw new FeatureLockedError(error.message);
       }
@@ -267,7 +268,7 @@ export class FeatureAPI {
     try {
       const response = await this.client.sendJSON<FeatureFileSharing>(config);
       return response.data;
-    } catch (error) {
+    } catch (error: unknown) {
       if (isBackendError(error) && error.label === BackendErrorLabel.FEATURE_LOCKED) {
         throw new FeatureLockedError(error.message);
       }
@@ -408,7 +409,7 @@ export class FeatureAPI {
     try {
       const response = await this.client.sendJSON<FeatureAppLock>(config);
       return response.data;
-    } catch (error) {
+    } catch (error: unknown) {
       switch ((error as BackendError).label) {
         case BackendErrorLabel.APP_LOCK_INVALID_TIMEOUT: {
           throw new InvalidAppLockTimeoutError((error as BackendError).message);
@@ -462,6 +463,16 @@ export class FeatureAPI {
     };
 
     const response = await this.client.sendJSON<FeatureAssetAuditLog>(config);
+    return response.data;
+  }
+
+  public async getAppsFeature(teamId: string): Promise<FeatureCells> {
+    const config: AxiosRequestConfig = {
+      method: 'get',
+      url: `/teams/${teamId}/features/apps`,
+    };
+
+    const response = await this.client.sendJSON<FeatureApps>(config);
     return response.data;
   }
 }

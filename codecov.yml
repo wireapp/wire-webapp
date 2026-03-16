@@ -9,22 +9,27 @@ coverage:
     project:
       default:
         target: auto
+        informational: true
       app_webapp:
         target: auto
         flags:
           - app_webapp
+        informational: true
       app_server:
         target: auto
         flags:
           - app_server
+        informational: true
       lib_core:
         target: auto
         flags:
           - lib_core
+        informational: true
       lib_api_client:
         target: auto
         flags:
           - lib_api_client
+        informational: true
     patch:
       default:
         informational: true
@@ -40,7 +45,7 @@ parsers:
 comment:
   layout: 'diff, flags, files'
   behavior: default
-  require_changes: no
+  require_changes: coverage_drop
 
 flags:
   app_webapp:

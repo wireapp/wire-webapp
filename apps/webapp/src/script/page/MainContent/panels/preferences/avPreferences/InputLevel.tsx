@@ -79,7 +79,7 @@ const InputLevel = ({disabled, mediaStream, className = '', ...rest}: InputLevel
       audioContext
         ?.close()
         .then(() => logger.info('Closed existing AudioContext', audioContext))
-        .catch(error => logger.error(error));
+        .catch((error: unknown) => logger.error(error));
 
       audioSource?.disconnect();
       setLevel(0);

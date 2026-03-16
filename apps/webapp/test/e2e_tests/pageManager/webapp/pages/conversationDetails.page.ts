@@ -18,10 +18,13 @@
  */
 
 import {Locator, Page} from '@playwright/test';
-import {selectByDataAttribute, selectById, selectByClass} from 'test/e2e_tests/utils/selector.util';
+import {GuestOptionsPage} from './guestOptions.page';
 
 export class ConversationDetailsPage {
-  readonly page: Page;
+  private readonly page: Page;
+
+  readonly groupAdmins: Locator;
+  readonly groupMembers: Locator;
 
   readonly addPeopleButton: Locator;
   readonly conversationDetails: Locator;
@@ -31,20 +34,33 @@ export class ConversationDetailsPage {
   readonly blockConversationButton: Locator;
   readonly clearConversationContentButton: Locator;
   readonly selectedSearchList: Locator;
+  readonly searchPeopleInput: Locator;
   readonly searchList: Locator;
+  readonly deleteGroupButton: Locator;
+  readonly notificationsButton: Locator;
+  readonly editConversationNameButton: Locator;
+  readonly textFieldForConversationName: Locator;
 
   constructor(page: Page) {
     this.page = page;
-
-    this.addPeopleButton = page.locator(`${selectByDataAttribute('go-add-people')}`);
     this.conversationDetails = page.locator('#conversation-details');
+
+    this.groupAdmins = this.conversationDetails.getByRole('list', {name: 'Group Admins'}).getByRole('listitem');
+    this.groupMembers = this.conversationDetails.getByRole('list', {name: 'Group Members'}).getByRole('listitem');
+
+    this.addPeopleButton = page.getByTestId('go-add-people');
     this.guestOptionsButton = this.conversationDetails.locator('[data-uie-name="go-guest-options"]');
     this.selfDeletingMessageButton = this.conversationDetails.getByRole('button', {name: 'Self-deleting messages'});
-    this.archiveButton = this.conversationDetails.locator(selectByDataAttribute('do-archive'));
-    this.blockConversationButton = this.conversationDetails.locator(selectByDataAttribute('do-block'));
+    this.archiveButton = this.conversationDetails.getByTestId('do-archive');
+    this.blockConversationButton = this.conversationDetails.getByTestId('do-block');
     this.clearConversationContentButton = this.conversationDetails.getByRole('button', {name: 'Clear Content'});
-    this.selectedSearchList = this.page.locator(selectByDataAttribute('selected-search-list'));
-    this.searchList = this.page.locator(selectByDataAttribute('search-list'));
+    this.selectedSearchList = this.page.getByTestId('selected-search-list');
+    this.searchPeopleInput = page.getByRole('textbox', {name: 'Search by name'});
+    this.searchList = this.page.locator('#add-participants').getByRole('list');
+    this.deleteGroupButton = this.page.getByRole('button', {name: 'Delete group'});
+    this.notificationsButton = this.page.getByRole('button', {name: 'Notifications'});
+    this.editConversationNameButton = this.page.getByRole('button', {name: 'Change conversation name'});
+    this.textFieldForConversationName = this.page.locator('textarea[data-uie-name="enter-name"]');
   }
 
   async waitForSidebar() {
@@ -54,9 +70,8 @@ export class ConversationDetailsPage {
   async isOpen(conversationName: string) {
     return (
       (await this.page
-        .locator(
-          `${selectById('right-column')} ${selectByClass('conversation-details__header')} ${selectByDataAttribute('status-name')}`,
-        )
+        .locator('#right-column .conversation-details__header')
+        .getByTestId('status-name')
         .textContent()) === conversationName
     );
   }
@@ -66,9 +81,7 @@ export class ConversationDetailsPage {
   }
 
   async clickSelectedUsersButton() {
-    await this.page
-      .locator(`${selectById('add-participants')} ${selectByDataAttribute('do-toggle-selected-search-list')}`)
-      .click();
+    await this.page.locator('#add-participants').getByTestId('do-toggle-selected-search-list').click();
   }
 
   async addUsersToConversation(fullNames: string[]) {
@@ -79,36 +92,47 @@ export class ConversationDetailsPage {
       await this.selectedSearchList.locator(`li div[aria-label*="${fullName}"]`).waitFor({state: 'attached'});
     }
 
-    await this.page.locator(`${selectById('add-participants')} ${selectByDataAttribute('do-create')}`).click();
+    await this.page.locator('#add-participants').getByTestId('do-create').click();
   }
 
   async isUserPartOfConversationAsAdmin(fullName: string) {
-    const userLocator = this.page.locator(
-      `${selectById('conversation-details')} ${selectByDataAttribute('list-admins')} ${selectByDataAttribute('item-user')}${selectByDataAttribute(fullName, 'value')}`,
-    );
+    const userLocator = this.page
+      .locator('#conversation-details')
+      .getByTestId('list-admins')
+      .getByTestId('item-user')
+      .and(this.page.locator(`[data-uie-value="${fullName}"]`));
     await userLocator.waitFor({state: 'visible'});
     return userLocator.isVisible();
   }
 
   async isUserPartOfConversationAsMember(fullName: string) {
-    const userLocator = this.page.locator(
-      `${selectById('conversation-details')} ${selectByDataAttribute('list-members')} ${selectByDataAttribute('item-user')}${selectByDataAttribute(fullName, 'value')}`,
-    );
+    const userLocator = this.page
+      .locator('#conversation-details')
+      .getByTestId('list-members')
+      .getByTestId('item-user')
+      .and(this.page.locator(`[data-uie-value="${fullName}"]`));
     await userLocator.waitFor({state: 'visible'});
     return userLocator.isVisible();
   }
 
   async openParticipantDetails(fullName: string) {
-    const userLocator = await this.getLocatorByUser(fullName);
-    await userLocator.click();
+    await this.getLocatorByUser(fullName).click();
   }
 
-  async getLocatorByUser(fullName: string) {
-    const userLocator = this.page.locator(
-      `${selectById('conversation-details')} ${selectByDataAttribute('list-members')} ${selectByDataAttribute('item-user')}${selectByDataAttribute(fullName, 'value')}`,
-    );
-    await userLocator.waitFor({state: 'visible'});
-    return userLocator;
+  getUserRoleIcon(fullName: string) {
+    return this.getLocatorByUser(fullName).getByTestId(/^status-(external|guest|admin)$/);
+  }
+
+  getUserAvailabilityIcon(fullName: string) {
+    return this.getLocatorByUser(fullName).getByTestId('status-availability-icon');
+  }
+
+  getLocatorByUser(fullName: string) {
+    return this.page
+      .locator('#conversation-details')
+      .getByTestId('list-users')
+      .getByTestId('item-user')
+      .and(this.page.locator(`[data-uie-value="${fullName}"]`));
   }
 
   async clickArchiveButton() {
@@ -124,15 +148,24 @@ export class ConversationDetailsPage {
     await selfDeletingMessagesPanel.getByRole('button', {name: 'Go back'}).click();
   }
 
+  /** Opens the guests panel, creates a link for guests to join the group, closes the panel and returns the created link */
+  async createGuestLink(options?: Parameters<ReturnType<typeof GuestOptionsPage>['createLink']>[0]) {
+    await this.guestOptionsButton.click();
+
+    const guestOptionsPage = GuestOptionsPage(this.page);
+    const link = await guestOptionsPage.createLink(options);
+
+    await guestOptionsPage.backButton.click();
+    return link;
+  }
+
   async addServiceToConversation(serviceName: string) {
     // Click on the Services/Apps tab
-    const servicesTab = this.page.locator(
-      `${selectById('add-participants')} ${selectByDataAttribute('do-add-services')}`,
-    );
+    const servicesTab = this.page.locator('#add-participants').getByTestId('do-add-services');
     await servicesTab.click();
 
     // Wait for search input to be ready
-    const searchInput = this.page.locator(`${selectById('add-participants')} input[type="text"]`);
+    const searchInput = this.page.locator('#add-participants input[type="text"]');
     await searchInput.waitFor({state: 'visible'});
 
     // Search for the service
@@ -154,7 +187,7 @@ export class ConversationDetailsPage {
   async removeServiceFromConversation(serviceName: string) {
     // Services appear in the members list with item-service test id
     const serviceLocator = this.page
-      .locator(`${selectById('conversation-details')}`)
+      .locator('#conversation-details')
       .getByTestId('item-service')
       .filter({hasText: serviceName});
     await serviceLocator.click();
@@ -167,7 +200,7 @@ export class ConversationDetailsPage {
 
   async isServicePartOfConversation(serviceName: string) {
     const serviceLocator = this.page
-      .locator(`${selectById('conversation-details')}`)
+      .locator('#conversation-details')
       .getByTestId('item-service')
       .filter({hasText: serviceName});
     await serviceLocator.waitFor({state: 'visible'});
@@ -180,5 +213,19 @@ export class ConversationDetailsPage {
 
   async clickClearConversationContentButton() {
     await this.clearConversationContentButton.click();
+  }
+
+  async setNotifications(value: 'Everything' | 'Mentions and replies' | 'Nothing') {
+    await this.notificationsButton.click();
+    await this.page.getByRole('radiogroup').getByText(value).click();
+
+    // Close the settings by clicking "Go back" button.
+    await this.page.getByRole('button', {name: 'Go back'}).click();
+  }
+
+  async changeConversationName(newConversationName: string) {
+    await this.editConversationNameButton.click();
+    await this.textFieldForConversationName.fill(newConversationName);
+    await this.textFieldForConversationName.press('Enter');
   }
 }

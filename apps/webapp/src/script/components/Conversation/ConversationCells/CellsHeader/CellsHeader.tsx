@@ -17,7 +17,7 @@
  *
  */
 
-import {useRef} from 'react';
+import {useEffect, useRef} from 'react';
 
 import {QualifiedId} from '@wireapp/api-client/lib/user/';
 
@@ -58,9 +58,13 @@ export const CellsHeader = ({
   const inputRef = useRef<HTMLInputElement>(null);
 
   const breadcrumbs = getBreadcrumbsFromPath({
-    baseCrumb: `${conversationName} files`,
+    baseCrumb: t('cells.breadcrumb.files', {conversationName}),
     currentPath: getCellsFilesPath(),
   });
+
+  useEffect(() => {
+    inputRef.current?.focus();
+  }, []);
 
   return (
     <div css={wrapperStyles}>

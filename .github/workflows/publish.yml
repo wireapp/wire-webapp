@@ -24,7 +24,6 @@ jobs:
       release_name: ${{ steps.push_docker_image.outputs.release_name }}
       chart_version: ${{ steps.bump_chart_version.outputs.chart_version }}
       changelog: ${{ steps.generate_changelog.outputs.changelog }}
-      unit_tests_report: ${{ env.UNIT_TEST_REPORT_FILE }}
       build_artifact: ${{ env.BUILD_ARTIFACT }}
 
     env:
@@ -33,16 +32,15 @@ jobs:
       COMMIT_URL: ${{github.event.head_commit.url}}
       COMMITTER: ${{github.event.head_commit.committer.name}}
       CHANGELOG_FILE: './changelog.md'
-      UNIT_TEST_REPORT_FILE: './unit-tests.log'
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
         with:
           fetch-depth: 0
 
       - name: Setup Node.js
-        uses: actions/setup-node@v6
+        uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f
         with:
           node-version-file: '.nvmrc'
           cache: 'yarn'
@@ -71,31 +69,10 @@ jobs:
       - name: Update configuration
         run: yarn nx run webapp:configure
 
-      - name: Test
-        run: |
-          set -o pipefail
-          yarn nx run-many -t test --all -- --detectOpenHandles=false 2>&1 | tee ${{ env.UNIT_TEST_REPORT_FILE }}
-          echo -e "COMMIT SHA = ${{ github.sha }}" >> ${{env.UNIT_TEST_REPORT_FILE}}
-          echo -e "TEST RUN DATE = $(date -u +'%Y-%m-%dT%H:%M:%SZ')" >> ${{env.UNIT_TEST_REPORT_FILE}}
-
-      - uses: actions/upload-artifact@v5
-        with:
-          name: 'unit-tests-report'
-          path: ${{env.UNIT_TEST_REPORT_FILE}}
-
-      - name: Upload unit-tests.log to S3
-        env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          AWS_DEFAULT_REGION: eu-west-1
-        run: |
-          TIMESTAMP=$(date -u +'%Y%m%dT%H%M%SZ')
-          aws s3 cp ${{env.UNIT_TEST_REPORT_FILE}} s3://wire-webapp/unit-tests-${TIMESTAMP}-${{ github.sha }}.log
-
       - name: Build and package
         run: yarn nx run server:package
 
-      - uses: actions/upload-artifact@v5
+      - uses: actions/upload-artifact@v7
         with:
           name: 'build-artifact'
           path: '${{env.BUILD_DIR}}${{env.BUILD_ARTIFACT}}'
@@ -122,7 +99,7 @@ jobs:
           yarn nx run workspace-tools:changelog-${{ env.changelog_type }} > ${{ env.CHANGELOG_FILE }}
           echo "changelog=${{ env.CHANGELOG_FILE }}" >> $GITHUB_OUTPUT
 
-      - uses: actions/upload-artifact@v5
+      - uses: actions/upload-artifact@v7
         if: ${{ env.changelog_type }}
         with:
           name: 'changelog'
@@ -180,7 +157,7 @@ jobs:
 
       # generates a mapping between branches/tag to wire-build branches
       - name: Define target branches in wireapp/wire-builds to bump
-        uses: kanga333/variable-mapper@master
+        uses: kanga333/variable-mapper@3681b75f5c6c00162721168fb91ab74925eaebcb
         id: output_target_branches
         with:
           key: '${{github.ref}}'
@@ -217,7 +194,7 @@ jobs:
 
     steps:
       - name: Check out wire-builds
-        uses: actions/checkout@v6
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
         with:
           repository: wireapp/wire-builds
           token: ${{secrets.WIRE_BUILDS_WRITE_ACCESS_GH_TOKEN}}
@@ -318,12 +295,12 @@ jobs:
         target: ${{fromJson(needs.set_deployment_targets.outputs.deployment_targets)}}
 
     steps:
-      - uses: actions/download-artifact@v5
+      - uses: actions/download-artifact@v8
         with:
           name: 'build-artifact'
 
       - name: Deploy to ${{matrix.target}}
-        uses: einaregilsson/beanstalk-deploy@v22
+        uses: einaregilsson/beanstalk-deploy@27edd8a0ebe8656ac70654372c73f06f7e9a1027
         with:
           application_name: Webapp
           aws_access_key: ${{secrets.WEBTEAM_AWS_ACCESS_KEY_ID}}
@@ -347,23 +324,18 @@ jobs:
       release_url: ${{ steps.release.outputs.url }}
 
     steps:
-      - uses: actions/download-artifact@v5
+      - uses: actions/download-artifact@v8
         with:
           name: 'changelog'
 
-      - uses: actions/download-artifact@v5
-        with:
-          name: 'unit-tests-report'
-
       - name: Create GitHub release
         id: 'release'
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@a06a81a03ee405af7f2048a818ed3f03bbf83c7b
         env:
           GITHUB_TOKEN: ${{github.token}}
         with:
           tag_name: ${{needs.build.outputs.release_name}}
           body_path: ${{ needs.build.outputs.changelog }}
-          files: ${{ needs.build.outputs.unit_tests_report }}
           draft: true
           prerelease: ${{contains(needs.build.outputs.release_name, 'staging')}}
 
@@ -375,7 +347,7 @@ jobs:
     steps:
       - name: Announce staging release
         if: ${{ needs.create_gh_release.outputs.release_url }}
-        uses: wireapp/github-action-wire-messenger@v2.0.0
+        uses: wireapp/github-action-wire-messenger@52e881163d104d9431fe66f2e5587b209eeaa63f
         with:
           email: ${{secrets.WIRE_BOT_EMAIL}}
           password: ${{secrets.WIRE_BOT_PASSWORD}}

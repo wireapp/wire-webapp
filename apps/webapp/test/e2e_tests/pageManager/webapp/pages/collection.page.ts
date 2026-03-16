@@ -21,21 +21,40 @@ import {Locator, Page} from '@playwright/test';
 
 /** POM for the "collection". This page is accessible by searching for a message within a conversation. */
 export class CollectionPage {
-  readonly page: Locator;
+  private readonly page: Page;
+  readonly component: Locator;
+  readonly searchResults: Locator;
 
   constructor(page: Page) {
-    this.page = page.locator('#collection');
+    this.page = page;
+    this.component = page.locator('#collection');
+    this.searchResults = this.component.getByTestId('full-search-item');
   }
 
   get searchInput() {
-    return this.page.getByRole('textbox', {name: 'Search text messages'});
+    return this.component.getByRole('textbox', {name: 'Search text messages'});
   }
 
   get searchItems() {
-    return this.page.getByTestId('full-search-item');
+    return this.component.getByTestId('full-search-item');
   }
 
   async searchForMessages(search: string) {
     await this.searchInput.fill(search);
+  }
+
+  getSection(type: 'Images' | 'Audio' | 'Files') {
+    const section = this.component.locator('section').filter({has: this.page.locator('header', {hasText: type})});
+    return Object.assign(section, {
+      showAllButton: section.getByRole('button', {name: 'Show all'}),
+    });
+  }
+
+  get searchBar() {
+    return this.component.getByRole('textbox', {name: 'Search text messages'});
+  }
+
+  get noResultsMessage() {
+    return this.component.getByText('No results.', {exact: true});
   }
 }

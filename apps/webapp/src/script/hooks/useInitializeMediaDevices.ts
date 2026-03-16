@@ -37,7 +37,7 @@ export const useInitializeMediaDevices = (devicesHandler: MediaDevicesHandler, s
       }
       await devicesHandler?.initializeMediaDevices();
       setAreMediaDevicesInitialized(true);
-    } catch (error) {
+    } catch (error: unknown) {
       logger.warn(`Initialization of media devices failed:`, error);
       setAreMediaDevicesInitialized(false);
     }

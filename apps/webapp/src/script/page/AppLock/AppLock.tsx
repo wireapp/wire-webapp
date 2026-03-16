@@ -37,6 +37,7 @@ import {SIGN_OUT_REASON} from 'src/script/auth/SignOutReason';
 import {Config} from 'src/script/Config';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
+import {isErrorWithCode, toError} from 'Util/TypePredicateUtil';
 
 export enum APPLOCK_STATE {
   FORGOT = 'applock.forgot',
@@ -215,12 +216,15 @@ const AppLock = ({
       await clientRepository.clientService.deleteClient(currentClientId, target.password.value);
       appLockRepository.removeCode();
       amplify.publish(WebAppEvents.LIFECYCLE.SIGN_OUT, SIGN_OUT_REASON.USER_REQUESTED, true);
-    } catch ({code, message}) {
+    } catch (error: unknown) {
       setIsLoading(false);
-      if ([HTTP_STATUS.BAD_REQUEST, HTTP_STATUS.UNAUTHORIZED, HTTP_STATUS.FORBIDDEN].includes(code)) {
+      if (
+        isErrorWithCode(error) &&
+        [HTTP_STATUS.BAD_REQUEST, HTTP_STATUS.UNAUTHORIZED, HTTP_STATUS.FORBIDDEN].includes(error.code)
+      ) {
         return setWipeError(t('modalAppLockWipePasswordError'));
       }
-      setWipeError(message);
+      setWipeError(toError(error).message);
     }
   };
 

@@ -17,16 +17,23 @@
  *
  */
 
-import {useCallback, useEffect, useState} from 'react';
+import {useCallback, useEffect, useRef, useState} from 'react';
 
 import {Node} from '@wireapp/api-client/lib/cells';
+import {Maybe, result} from 'true-myth';
 import {container} from 'tsyringe';
 
+import {PrimaryModal} from 'Components/Modals/PrimaryModal';
+import {removeCurrentModal} from 'Components/Modals/PrimaryModal/PrimaryModalState';
 import {CellsRepository} from 'Repositories/cells/CellsRepository';
+import {Config} from 'src/script/Config';
+import {collaboraClipboardAccessFeatureToggleName} from 'src/script/featureToggles/startupFeatureToggleNames';
+import {useApplicationContext} from 'src/script/page/RootProvider';
 import {t} from 'Util/LocalizerUtil';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 
 import * as styles from './FileEditor.styles';
+import {validateCollaboraUrl} from './validateCollaboraUrl';
 
 import {FileLoader} from '../FileLoader/FileLoader';
 
@@ -38,22 +45,36 @@ interface FileEditorProps {
 
 export const FileEditor = ({id}: FileEditorProps) => {
   const cellsRepository = container.resolve(CellsRepository);
+  const {isFeatureToggleEnabled} = useApplicationContext();
   const [node, setNode] = useState<Node | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isError, setIsError] = useState(false);
+  const hasShownErrorModal = useRef(false);
 
-  const fetchNode = useCallback(async () => {
+  const fetchNode = useCallback(async (): Promise<boolean> => {
     try {
       setIsLoading(true);
       setIsError(false);
       const fetchedNode = await cellsRepository.getNode({uuid: id, flags: ['WithEditorURLs']});
       setNode(fetchedNode);
-    } catch (err) {
+      return true;
+    } catch (err: unknown) {
       setIsError(true);
+      return false;
     } finally {
       setIsLoading(false);
     }
   }, [id, cellsRepository]);
+
+  const handleRetry = useCallback(() => {
+    hasShownErrorModal.current = false;
+    void (async () => {
+      const isSuccessful = await fetchNode();
+      if (isSuccessful) {
+        removeCurrentModal();
+      }
+    })();
+  }, [fetchNode]);
 
   // Initial fetch
   useEffect(() => {
@@ -79,18 +100,58 @@ export const FileEditor = ({id}: FileEditorProps) => {
     };
   }, [node, fetchNode]);
 
+  useEffect(() => {
+    if (isLoading || (!isError && node)) {
+      return;
+    }
+
+    if (hasShownErrorModal.current) {
+      return;
+    }
+
+    hasShownErrorModal.current = true;
+
+    PrimaryModal.show(PrimaryModal.type.CONFIRM, {
+      closeOnConfirm: false,
+      secondaryAction: {
+        text: t('modalConfirmSecondary'),
+      },
+      primaryAction: {
+        action: handleRetry,
+        text: t('unknownApplicationErrorTryAgain'),
+      },
+      text: {
+        message: t('fileFullscreenModal.editor.errorDescription'),
+        title: t('fileFullscreenModal.editor.errorTitle'),
+      },
+    });
+  }, [handleRetry, isError, isLoading, node]);
+
+  useEffect(() => {
+    if (!isLoading && !isError && node) {
+      hasShownErrorModal.current = false;
+    }
+  }, [isError, isLoading, node]);
+
   if (isLoading) {
     return <FileLoader />;
   }
 
-  if (isError || !node) {
-    return <div>{t('fileFullscreenModal.editor.error')}</div>;
+  const urlValidation = validateCollaboraUrl(
+    Maybe.of(node?.EditorURLs?.collabora?.Url),
+    Config.getConfig().CELLS_PYDIO_URL,
+  );
+  const shouldDelegateClipboardAccess = isFeatureToggleEnabled(collaboraClipboardAccessFeatureToggleName);
+
+  if (result.isErr(urlValidation)) {
+    return null;
   }
 
   return (
     <iframe
+      allow={shouldDelegateClipboardAccess ? 'clipboard-read; clipboard-write' : undefined}
       css={styles.editorIframe}
-      src={node.EditorURLs?.collabora.Url}
+      src={urlValidation.value}
       title={t('fileFullscreenModal.editor.iframeTitle')}
     />
   );

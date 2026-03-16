@@ -19,6 +19,7 @@
 
 import {useContext, useEffect, useState} from 'react';
 
+import is from '@sindresorhus/is';
 import {amplify} from 'amplify';
 import {container} from 'tsyringe';
 
@@ -70,17 +71,17 @@ const HistoryExport = ({switchContent, user, clientState = container.resolve(Cli
 
   const [archiveBlob, setArchiveBlob] = useState<Blob | null>(null);
 
-  const mainViewModel = useContext(RootContext);
+  const rootContext = useContext(RootContext);
 
   useEffect(() => {
     showBackupModal();
   }, []);
 
-  if (!mainViewModel) {
+  if (is.null_(rootContext)) {
     return null;
   }
 
-  const {content: contentViewModel} = mainViewModel;
+  const contentViewModel = rootContext.mainViewModel.content;
   const backupRepository = contentViewModel.repositories.backup;
 
   const loadingProgress = Math.floor((numberOfProcessedRecords / numberOfRecords) * 100);
@@ -219,7 +220,7 @@ const HistoryExport = ({switchContent, user, clientState = container.resolve(Cli
       } else {
         throw new Error('No local client found');
       }
-    } catch (error) {
+    } catch (error: unknown) {
       onError(error as Error);
     }
   };

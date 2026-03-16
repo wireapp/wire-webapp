@@ -93,7 +93,7 @@ export const QualityFeedbackModal = ({callingRepository}: Props) => {
       if (!skipNotification) {
         submittedNotification.show();
       }
-    } catch (error) {
+    } catch (error: unknown) {
       logger.warn(`Can't send feedback: ${(error as Error).message}`);
     } finally {
       setQualityFeedbackModalShown(false);

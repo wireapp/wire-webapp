@@ -40,7 +40,6 @@ import {LeaveConversationModal} from './webapp/modals/leaveConversation.modal';
 import {OptionModal} from './webapp/modals/option.modal';
 import {PasswordModal} from './webapp/modals/password.modal';
 import {PasswordAdvancedSecurityModal} from './webapp/modals/passwordAdvancedSecurity.modal';
-import {RemoveMemberModal} from './webapp/modals/removeMember.modal';
 import {UserProfileModal} from './webapp/modals/userProfile.modal';
 import {AccountPage} from './webapp/pages/account.page';
 import {AudioVideoSettingsPage} from './webapp/pages/audioVideoSettings.page';
@@ -72,14 +71,17 @@ import {SettingsPage} from './webapp/pages/settings.page';
 import {SingleSignOnPage} from './webapp/pages/singleSignOn.page';
 import {StartUIPage} from './webapp/pages/startUI.page';
 import {WelcomePage} from './webapp/pages/welcome.page';
+import {GuestLinkPasswordModal} from './webapp/modals/guestLinkPassword.modal';
+import {ConversationJoinPage} from './webapp/pages/conversationJoin.page';
+import {CreateConversationModal} from './webapp/modals/createConversation';
+import {InviteModal} from './webapp/modals/invite.modal';
 
 export const webAppPath = process.env.WEBAPP_URL ?? '';
-const teamManagementPath = process.env.TEAM_MANAGEMENT_URL ?? '';
 
 export class PageManager {
   private readonly cache = new Map<string, any>();
 
-  constructor(readonly page: Page) {}
+  constructor(public readonly page: Page) {}
 
   static from(page: Page): PageManager;
   static from(page: Promise<Page>): Promise<PageManager>;
@@ -108,12 +110,16 @@ export class PageManager {
     await this.page.goto(`${webAppPath}auth/#/login`);
   };
 
-  openUrl = (url: string) => {
-    return this.page.goto(url, {waitUntil: 'networkidle'});
+  openRegistrationPage = async () => {
+    await this.page.goto(`${webAppPath}auth/#/createaccount`);
   };
 
-  openTeamManagementPage = () => {
-    return this.page.goto(teamManagementPath, {waitUntil: 'networkidle'});
+  openSSOPage = async () => {
+    await this.page.goto(`${webAppPath}auth/#/sso`);
+  };
+
+  openUrl = (url: string) => {
+    return this.page.goto(url, {waitUntil: 'networkidle'});
   };
 
   refreshPage = (options: {waitUntil?: 'load' | 'domcontentloaded' | 'networkidle'} = {waitUntil: 'networkidle'}) => {
@@ -171,7 +177,7 @@ export class PageManager {
         this.getOrCreate('webapp.pages.audioVideoSettings', () => new AudioVideoSettingsPage(this.page)),
       outgoingConnection: () =>
         this.getOrCreate('webapp.pages.outgoingConnection', () => new OutgoingConnectionPage(this.page)),
-      guestOptions: () => this.getOrCreate('webapp.pages.guestOptions', () => new GuestOptionsPage(this.page)),
+      guestOptions: () => this.getOrCreate('webapp.pages.guestOptions', () => GuestOptionsPage(this.page)),
       deleteAccount: () => this.getOrCreate('webapp.pages.deleteAccount', () => new DeleteAccountPage(this.page)),
       groupCreation: () => this.getOrCreate('webapp.pages.groupCreation', () => new GroupCreationPage(this.page)),
       historyInfo: () => this.getOrCreate('webapp.pages.infoHostory', () => new HistoryInfoPage(this.page)),
@@ -187,6 +193,7 @@ export class PageManager {
       emailVerification: () =>
         this.getOrCreate('webapp.pages.verification', () => new EmailVerificationPage(this.page)),
       setUsername: () => this.getOrCreate('webapp.pages.setUsername', () => new SetUsernamePage(this.page)),
+      conversationJoin: () => this.getOrCreate('webapp.pages.conversationJoin', () => ConversationJoinPage(this.page)),
     },
     modals: {
       dataShareConsent: () =>
@@ -203,7 +210,6 @@ export class PageManager {
       passwordAdvancedSecurity: () =>
         this.getOrCreate('webapp.modals.passwordAdvancedSecurity', () => new PasswordAdvancedSecurityModal(this.page)),
       detailViewModal: () => this.getOrCreate('webapp.modals.detailView', () => new DetailViewModal(this.page)),
-      removeMember: () => this.getOrCreate('webapp.modals.removeMember', () => new RemoveMemberModal(this.page)),
       marketingConsent: () =>
         this.getOrCreate('webapp.modals.marketingConsent', () => new MarketingConsentModal(this.page)),
       acknowledge: () => this.getOrCreate('webapp.modals.marketingConsent', () => new AcknowledgeModal(this.page)),
@@ -212,6 +218,11 @@ export class PageManager {
       cellsFileDetailView: () =>
         this.getOrCreate('webapp.modals.cellsFileDetailView', () => new CellsFileDetailViewModal(this.page)),
       optionModal: () => this.getOrCreate('webapp.modals.optionModal', () => new OptionModal(this.page)),
+      guestLinkPassword: () =>
+        this.getOrCreate('webapp.modals.guestLinkPassword', () => new GuestLinkPasswordModal(this.page)),
+      createConversation: () =>
+        this.getOrCreate('webapp.modals.createConversation', () => CreateConversationModal(this.page)),
+      invite: () => this.getOrCreate('webapp.modals.invite', () => InviteModal(this.page)),
     },
     components: {
       contactList: () => this.getOrCreate('webapp.components.ContactList', () => new ContactList(this.page)),

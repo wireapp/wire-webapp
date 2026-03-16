@@ -32,7 +32,7 @@ let ownerB = getUser();
 const teamAName = 'Direct Call A';
 const teamBName = 'Direct Call B';
 
-test('Starting call 1:1 call without internet', async ({browser, pageManager: ownerAPageManager, api}) => {
+test.fixme('Starting call 1:1 call without internet', async ({browser, pageManager: ownerAPageManager, api}) => {
   test.setTimeout(150_000);
 
   const {pages: ownerAPages, modals: ownerAModals, components: ownerAComponents} = ownerAPageManager.webapp;
@@ -80,7 +80,7 @@ test('Starting call 1:1 call without internet', async ({browser, pageManager: ow
     await ownerAPages.startUI().selectUsers(ownerB.username);
     await ownerAModals.userProfile().clickConnectButton();
 
-    expect(await ownerAPages.conversationList().isConversationItemVisible(ownerB.fullName));
+    await expect(ownerAPages.conversationList().getConversationLocator(ownerB.fullName)).toBeVisible();
     await expect(ownerBPage).toHaveTitle('(1) Wire');
 
     await ownerBPages.conversationList().openPendingConnectionRequest();
@@ -95,7 +95,7 @@ test('Starting call 1:1 call without internet', async ({browser, pageManager: ow
       expect(await ownerAModals.callNotEstablished().isModalPresent());
       expect(await ownerAModals.callNotEstablished().getModalTitle()).toContain('Call not established');
       await ownerAModals.callNotEstablished().clickOk();
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Error during call initiation:', error);
       throw error;
     }

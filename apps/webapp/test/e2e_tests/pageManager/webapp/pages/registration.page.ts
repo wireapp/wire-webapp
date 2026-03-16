@@ -21,8 +21,6 @@ import {Locator, Page} from '@playwright/test';
 import {User} from 'test/e2e_tests/data/user';
 
 export class RegistrationPage {
-  readonly page: Page;
-
   readonly passwordPolicyInfo: Locator;
   readonly nameInput: Locator;
   readonly emailInput: Locator;
@@ -32,9 +30,10 @@ export class RegistrationPage {
   readonly termsCheckbox: Locator;
   readonly errorLabel: Locator;
   readonly passwordPolicy: Locator;
+  readonly header: Locator;
+  readonly termsLabel: Locator;
 
   constructor(page: Page) {
-    this.page = page;
     this.passwordPolicyInfo = page.locator('[data-uie-name="element-password-help"]');
     this.nameInput = page.locator('[data-uie-name="enter-name"]');
     this.emailInput = page.locator('[data-uie-name="enter-email"]');
@@ -44,6 +43,8 @@ export class RegistrationPage {
     this.termsCheckbox = page.locator('[data-uie-name="do-accept-terms"]');
     this.errorLabel = page.locator('[data-uie-name="error-message"]');
     this.passwordPolicy = page.locator('[data-uie-name="element-password-help"]');
+    this.header = page.getByRole('heading');
+    this.termsLabel = page.locator('label[for="accept-terms"]');
   }
 
   async fillInUserInfo(user: User) {

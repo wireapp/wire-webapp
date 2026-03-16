@@ -137,7 +137,7 @@ export class ConversationLabelRepository extends TypedEventTarget<{type: 'conver
     if (storedData) {
       try {
         parsedStoredData = JSON.parse(storedData);
-      } catch (error) {
+      } catch (error: unknown) {
         this.logger.warn(`Failed to parse stored labels: ${error instanceof Error ? error.message : String(error)}`);
         // Clear corrupted data
         localStorage.removeItem(ConversationLabelRepository.LocalStorageKey);
@@ -164,7 +164,7 @@ export class ConversationLabelRepository extends TypedEventTarget<{type: 'conver
       if (conversationLabelJson) {
         try {
           localData = JSON.parse(conversationLabelJson);
-        } catch (error) {
+        } catch (error: unknown) {
           this.logger.warn(
             `Failed to parse stored labels, clearing corrupted data: ${error instanceof Error ? error.message : String(error)}`,
           );
@@ -216,7 +216,7 @@ export class ConversationLabelRepository extends TypedEventTarget<{type: 'conver
         this.persistValues(updatedData);
       }
       // If both are null, labels remain empty (default state)
-    } catch (error) {
+    } catch (error: unknown) {
       this.logger.warn(`No labels were loaded: ${error instanceof Error ? error.message : String(error)}`);
       // Don't save empty state on error
     }

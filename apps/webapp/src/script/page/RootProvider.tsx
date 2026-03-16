@@ -17,26 +17,48 @@
  *
  */
 
-import {FC, ReactNode, createContext, useContext} from 'react';
+import {ReactNode, ReactElement, createContext, useContext, useMemo} from 'react';
 
+import {WallClock} from '../clock/wallClock';
+import {StartupFeatureToggleName} from '../featureToggles/startupFeatureToggles';
 import {MainViewModel} from '../view_model/MainViewModel';
 
-export const RootContext = createContext<MainViewModel | null>(null);
+export type RootContextValue = {
+  readonly mainViewModel: MainViewModel;
+  readonly wallClock: WallClock;
+  readonly doesApplicationNeedForceReload: boolean;
+  readonly isFeatureToggleEnabled: (featureName: StartupFeatureToggleName) => boolean;
+};
+
+export const RootContext = createContext<RootContextValue | null>(null);
 
 interface RootProviderProps {
   children?: ReactNode;
-  value: MainViewModel;
+  value: RootContextValue;
 }
 
-export const RootProvider: FC<RootProviderProps> = ({children, value}) => {
-  return <RootContext.Provider value={value}>{children}</RootContext.Provider>;
-};
+export function RootProvider(properties: RootProviderProps): ReactElement {
+  const {value, children} = properties;
 
-export const useMainViewModel = () => {
-  const context = useContext(RootContext);
-  if (!context) {
-    throw new Error('MainViewModel was not initialised');
+  const rootContextValue = useMemo(() => {
+    return value;
+  }, [value]);
+
+  return <RootContext.Provider value={rootContextValue}>{children}</RootContext.Provider>;
+}
+
+export function useApplicationContext(): RootContextValue {
+  const applicationContextOrNull = useContext(RootContext);
+
+  if (!applicationContextOrNull) {
+    throw new Error('RootContext has not been set');
   }
 
-  return context;
-};
+  return applicationContextOrNull;
+}
+
+export function useMainViewModel(): MainViewModel {
+  const applicationContext = useApplicationContext();
+
+  return applicationContext.mainViewModel;
+}

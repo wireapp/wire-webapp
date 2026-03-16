@@ -178,7 +178,7 @@ export class WebSocketClient extends EventEmitter {
 
     try {
       await this.client.refreshAccessToken();
-    } catch (error) {
+    } catch (error: unknown) {
       if (error instanceof NetworkError) {
         this.logger.warn(error);
       } else if (

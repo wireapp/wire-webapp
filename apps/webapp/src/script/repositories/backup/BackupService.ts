@@ -149,7 +149,7 @@ export class BackupService {
     try {
       await table.bulkAdd(entities, primaryKeys);
       return entities.length;
-    } catch (error) {
+    } catch (error: unknown) {
       if (error instanceof Dexie.BulkError) {
         const {failures} = error;
         const successCount = entities.length - failures.length;

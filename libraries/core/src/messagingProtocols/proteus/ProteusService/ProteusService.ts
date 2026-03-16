@@ -192,7 +192,7 @@ export class ProteusService {
   }: AddUsersToProteusConversationParams): Promise<ProteusAddUsersResponse> {
     try {
       return {event: await this.apiClient.api.conversation.postMembers(conversationId, qualifiedUsers)};
-    } catch (error) {
+    } catch (error: unknown) {
       const failureReasonsMap = {
         [FederatedBackendsErrorLabel.NON_FEDERATING_BACKENDS]: AddUsersFailureReasons.NON_FEDERATING_BACKENDS,
         [FederatedBackendsErrorLabel.UNREACHABLE_BACKENDS]: AddUsersFailureReasons.UNREACHABLE_BACKENDS,
@@ -220,7 +220,7 @@ export class ProteusService {
                     ? [{reason: failureReasonsMap[error.label], backends, users: unreachableUsers}]
                     : undefined,
               };
-            } catch (error) {
+            } catch (error: unknown) {
               if (isFederatedBackendsError(error)) {
                 return {
                   failedToAdd: [
@@ -311,7 +311,7 @@ export class ProteusService {
       }
 
       return decryptedMessage;
-    } catch (error) {
+    } catch (error: unknown) {
       throw generateDecryptionError({userId, clientId}, error);
     }
   }

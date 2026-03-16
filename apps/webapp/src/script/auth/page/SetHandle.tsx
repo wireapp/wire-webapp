@@ -81,7 +81,7 @@ const SetHandleComponent = ({
         const suggestions = createSuggestions(name);
         const handle = await checkHandles(suggestions);
         setHandle(handle);
-      } catch (error) {
+      } catch (error: unknown) {
         setError(error);
       }
     })();
@@ -101,7 +101,7 @@ const SetHandleComponent = ({
       } else {
         navigate(ROUTE.SUCCESS);
       }
-    } catch (error) {
+    } catch (error: unknown) {
       if (isBackendError(error) && error.label === BackendErrorLabel.INVALID_HANDLE && handle.trim().length < 2) {
         error.label = SyntheticErrorLabel.HANDLE_TOO_SHORT;
       }

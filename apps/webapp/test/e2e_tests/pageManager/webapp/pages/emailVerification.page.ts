@@ -18,11 +18,10 @@
  */
 
 import {Locator, Page} from '@playwright/test';
-import {selectByDataAttribute} from 'test/e2e_tests/utils/selector.util';
 
 export class EmailVerificationPage {
   readonly codeLength = 6;
-  readonly page: Page;
+  private readonly page: Page;
 
   readonly verificationCodeInput: Locator;
   readonly verificationCodeInputLabel: Locator;
@@ -33,9 +32,9 @@ export class EmailVerificationPage {
     this.page = page;
 
     this.verificationCodeInput = page.locator('input');
-    this.verificationCodeInputLabel = page.locator(selectByDataAttribute('label-with-email'));
-    this.errorLabel = page.locator(selectByDataAttribute('error-message'));
-    this.resendButton = page.locator(selectByDataAttribute('do-resend-code'));
+    this.verificationCodeInputLabel = page.getByTestId('label-with-email');
+    this.errorLabel = page.getByTestId('error-message');
+    this.resendButton = page.getByTestId('do-resend-code');
   }
 
   // Doesn't work with headless chromium

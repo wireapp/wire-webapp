@@ -43,7 +43,7 @@ const NameInput = ({name, userRepository, canEditProfile}: NameInputProps) => {
       try {
         await userRepository.changeName(newName);
         nameInputDone.done();
-      } catch (error) {
+      } catch (error: unknown) {
         logger.warn('Failed to update name', error);
       }
     }

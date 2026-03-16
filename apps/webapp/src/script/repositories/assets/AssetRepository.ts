@@ -21,6 +21,7 @@ import {AssetAuditData, AssetOptions, AssetRetentionPolicy} from '@wireapp/api-c
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 import ko from 'knockout';
 import {container, singleton} from 'tsyringe';
+import {NIL as NilUuid} from 'uuid';
 
 import {GenericMessage, LegalHoldStatus} from '@wireapp/protocol-messaging';
 
@@ -85,7 +86,7 @@ export class AssetRepository {
 
   async getObjectUrl(asset: AssetRemoteData): Promise<string> {
     const objectUrl = getAssetUrl(asset.identifier);
-    if (objectUrl) {
+    if (objectUrl !== undefined) {
       return objectUrl;
     }
 
@@ -107,7 +108,7 @@ export class AssetRepository {
       const {buffer, mimeType} = await response;
 
       return new Blob([new Uint8Array(buffer)], {type: mimeType});
-    } catch (error) {
+    } catch (error: unknown) {
       if (error instanceof Error) {
         const isAssetNotFound = error.message.endsWith(HTTP_STATUS.NOT_FOUND.toString());
         const isServerError = error.message.endsWith(HTTP_STATUS.INTERNAL_SERVER_ERROR.toString());
@@ -143,7 +144,7 @@ export class AssetRepository {
         throw new Error('No blob received.');
       }
       return downloadBlob(blob, fileName);
-    } catch (error) {
+    } catch (error: unknown) {
       return this.logger.error('Failed to download blob', error);
     }
   }
@@ -157,7 +158,7 @@ export class AssetRepository {
       }
       asset.status(AssetTransferState.UPLOADED);
       return downloadBlob(blob, asset.file_name ?? 'file');
-    } catch (error) {
+    } catch (error: unknown) {
       if (error instanceof Error) {
         if (error.name === AssetError.CANCEL_ERROR) {
           asset.status(AssetTransferState.CANCELED);
@@ -171,7 +172,7 @@ export class AssetRepository {
     }
   }
 
-  async uploadProfileImage(image: Blob): Promise<{
+  async uploadProfileImage(image: File): Promise<{
     mediumImageKey: {domain?: string; key: string};
     previewImageKey: {domain?: string; key: string};
   }> {
@@ -182,9 +183,18 @@ export class AssetRepository {
       this.compressImage(strippedImage, true),
     ]);
 
+    const isAuditLogEnabled = this.teamState.isAuditLogEnabled();
+
     const options: AssetUploadOptions = {
       public: true,
       retention: AssetRetentionPolicy.ETERNAL,
+      ...(isAuditLogEnabled && {
+        auditData: {
+          filename: image.name,
+          filetype: image.type,
+          conversationId: {domain: this.teamState.teamDomain(), id: NilUuid},
+        },
+      }),
     };
 
     const [previewImageKey, mediumImageKey] = await Promise.all([
@@ -192,7 +202,17 @@ export class AssetRepository {
       this.assetCoreService.uploadRawAsset(mediumImage, options).response,
     ]);
 
-    return {mediumImageKey, previewImageKey};
+    const toAssetImageKey = (uploadedAsset: {domain?: string; key?: string}) => {
+      if (!uploadedAsset.key) {
+        throw new Error('Asset upload response is missing the asset key.');
+      }
+      return {domain: uploadedAsset.domain, key: uploadedAsset.key};
+    };
+
+    return {
+      mediumImageKey: toAssetImageKey(mediumImageKey),
+      previewImageKey: toAssetImageKey(previewImageKey),
+    };
   }
 
   private async compressImage(image: Blob, useProfileImageSize: boolean = false): Promise<CompressedImage> {

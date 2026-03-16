@@ -194,7 +194,7 @@ export const PeopleTab = ({
           onSearchResults(results);
           setResults(results);
         }
-      } catch (error) {
+      } catch (error: unknown) {
         if (isBackendError(error)) {
           if (error.code === HTTP_STATUS.UNPROCESSABLE_ENTITY) {
             return setHasFederationError(true);

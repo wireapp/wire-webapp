@@ -18,12 +18,13 @@
  */
 
 import {Page, Locator} from '@playwright/test';
-import {selectByDataAttribute} from 'test/e2e_tests/utils/selector.util';
 
 export class ConversationSidebar {
   readonly pageLoadingTimeout = 60_000;
-  readonly page: Page;
+  private readonly page: Page;
+  readonly navigation: Locator;
   readonly personalStatusLabel: Locator;
+  readonly personalStatusIcon: Locator;
   readonly personalStatusName: Locator;
   readonly personalUserName: Locator;
   readonly preferencesButton: Locator;
@@ -32,19 +33,23 @@ export class ConversationSidebar {
   readonly archiveButton: Locator;
   readonly manageTeamButton: Locator;
   readonly sidebar: Locator;
+  readonly supportButton: Locator;
 
   constructor(page: Page) {
     this.page = page;
 
+    this.navigation = page.getByRole('navigation');
     this.personalStatusLabel = page.getByTestId('status-availability');
-    this.personalStatusName = page.locator(`${selectByDataAttribute('status-name')}`);
-    this.personalUserName = page.locator(`${selectByDataAttribute('user-handle')}`);
-    this.preferencesButton = page.locator(`${selectByDataAttribute('go-preferences')}`);
-    this.allConverationsButton = page.locator(`${selectByDataAttribute('go-recent-view')}`);
-    this.connectButton = page.locator(`button${selectByDataAttribute('go-people')}`);
-    this.archiveButton = page.locator(selectByDataAttribute('go-archive'));
-    this.manageTeamButton = page.locator(selectByDataAttribute('go-team-management'));
+    this.personalStatusIcon = this.navigation.getByTestId('status-availability-icon');
+    this.personalStatusName = page.getByTestId('status-name');
+    this.personalUserName = page.getByTestId('user-handle');
+    this.preferencesButton = page.getByTestId('go-preferences');
+    this.allConverationsButton = page.getByTestId('go-recent-view');
+    this.connectButton = page.getByTestId('go-people');
+    this.archiveButton = page.getByTestId('go-archive');
+    this.manageTeamButton = page.getByTestId('go-team-management');
     this.sidebar = page.locator(`.conversations-sidebar-items`);
+    this.supportButton = page.getByRole('link', {name: 'Support'});
   }
 
   async clickPreferencesButton() {
@@ -65,5 +70,13 @@ export class ConversationSidebar {
 
   async clickArchive() {
     await this.archiveButton.click();
+  }
+
+  async openStatusMenu(userFullName: string) {
+    await this.navigation.getByRole('button', {name: userFullName}).click();
+  }
+
+  async setStatus(status: 'None' | 'Available' | 'Busy' | 'Away') {
+    await this.page.getByRole('menu').getByRole('menuitem', {name: status}).click();
   }
 }

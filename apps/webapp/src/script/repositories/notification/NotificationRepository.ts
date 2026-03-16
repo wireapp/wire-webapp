@@ -90,7 +90,7 @@ interface WebappNotifications extends Notification {
 export class NotificationRepository {
   private readonly conversationRepository: ConversationRepository;
   private readonly logger: Logger;
-  private readonly notifications: WebappNotifications[];
+  readonly notifications: WebappNotifications[];
   private readonly notificationsPreference: ko.Observable<NotificationPreference>;
   private readonly assetRepository: AssetRepository;
   private isSoftLock = false;
@@ -584,7 +584,7 @@ export class NotificationRepository {
     if (canShowUserImage) {
       try {
         return await this.assetRepository.getObjectUrl(userEntity.previewPictureResource());
-      } catch (error) {
+      } catch (error: unknown) {
         if (error instanceof ValidationUtilError) {
           this.logger.error(`Failed to validate an asset URL: ${error.message}`);
         }

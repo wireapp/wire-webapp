@@ -17,7 +17,7 @@
  *
  */
 
-import {expect} from 'playwright/test';
+import {expect, TestInfo} from 'playwright/test';
 
 import {ApiManagerE2E} from '../backend/apiManager.e2e';
 import {User} from '../data/user';
@@ -71,27 +71,6 @@ export const createGroup = async (pages: UserPages, conversationName: string, us
   await pages.groupCreation().clickCreateGroupButton();
 };
 
-export const createChannel = async (pages: UserPages, conversationName: string, user: User[]) => {
-  await pages.conversationList().clickCreateGroup();
-  await pages.groupCreation().setGroupName(conversationName);
-  await pages.groupCreation().clickNextButton();
-  // task: set params for testing
-  await pages.groupCreation().selectGroupMembers(...user.flatMap(user => user.username));
-  await pages.groupCreation().clickCreateGroupButton();
-};
-
-export const handleAppLockState = async (pageManager: PageManager, appLockPassCode: string) => {
-  const {modals} = pageManager.webapp;
-  const appLockModal = await modals.appLock();
-  if (await appLockModal.isVisible()) {
-    if (await appLockModal.lockPasscodeInput.isVisible()) {
-      await appLockModal.setPasscode(appLockPassCode);
-    } else {
-      await appLockModal.unlockAppWithPasscode(appLockPassCode);
-    }
-  }
-};
-
 /**
  * Opens the connections tab, searches for the given user and starts a conversation with him
  * Note: This util only works if both users are part of the same team.
@@ -114,4 +93,33 @@ export async function sendConnectionRequest(senderPageManager: PageManager, rece
   await pages.startUI().searchInput.fill(receiver.username);
   await pages.startUI().selectUsers(receiver.username);
   await modals.userProfile().clickConnectButton();
+}
+
+/**
+ * @param testInfo is needed to create unique backup filename
+ */
+export async function createAndSaveBackup(
+  testInfo: TestInfo,
+  pageManager: PageManager,
+  password?: string,
+  filenamePrefix?: string,
+) {
+  const {pages, modals} = pageManager.webapp;
+
+  await pages.account().clickBackUpButton();
+  await expect(modals.passwordAdvancedSecurity().modal).toBeVisible();
+  if (password) {
+    await modals.passwordAdvancedSecurity().enterPassword(password);
+  }
+  await modals.passwordAdvancedSecurity().clickBackUpNow();
+  await expect(modals.passwordAdvancedSecurity().modal).toBeHidden();
+  await expect(pages.historyExport().exportSuccessHeadline).toBeVisible();
+  const [download] = await Promise.all([
+    pageManager.page.waitForEvent('download'),
+    pages.historyExport().clickSaveFileButton(),
+  ]);
+  const safePrefix = filenamePrefix ?? '';
+  const backupName = testInfo.outputPath(`${safePrefix}${download.suggestedFilename()}`);
+  await download.saveAs(backupName);
+  return backupName;
 }

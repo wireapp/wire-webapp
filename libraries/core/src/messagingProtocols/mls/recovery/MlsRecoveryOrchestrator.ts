@@ -101,6 +101,7 @@ export type PolicyTable = Partial<Record<DomainMlsErrorType, RecoveryPolicy | Pe
 
 export enum OperationName {
   send = 'send',
+  establishGroup = 'establishGroup',
   addUsers = 'addUsers',
   removeUsers = 'removeUsers',
   joinExternalCommit = 'joinExternalCommit',
@@ -184,7 +185,7 @@ export class MlsRecoveryOrchestratorImpl implements MlsRecoveryOrchestrator {
     try {
       this.logger.info('Executing MLS operation with recovery orchestration', {context});
       return await callBack();
-    } catch (rawError) {
+    } catch (rawError: unknown) {
       this.logger.info('Operation failed, invoking MLS recovery orchestrator', {rawError});
       const normalizedError = this.mapper.map(rawError, {
         qualifiedConversationId: context.qualifiedConversationId,
@@ -308,7 +309,7 @@ export class MlsRecoveryOrchestratorImpl implements MlsRecoveryOrchestrator {
     this.inProgressRecoveries.add(key);
     try {
       await task();
-    } catch (error) {
+    } catch (error: unknown) {
       this.logger.warn(`Recovery failed for key ${key}`, {error});
       throw error;
     } finally {
@@ -352,6 +353,10 @@ export const minimalDefaultPolicies: PolicyTable = {
       action: RecoveryActionKind.RecoverFromEpochMismatch,
       retryConfig: {maxAttempts: 1, reRunOriginalOperation: true},
     },
+    establishGroup: {
+      action: RecoveryActionKind.RecoverFromEpochMismatch,
+      retryConfig: {maxAttempts: 1, reRunOriginalOperation: true},
+    },
     addUsers: {
       action: RecoveryActionKind.RecoverFromEpochMismatch,
       retryConfig: {maxAttempts: 1, reRunOriginalOperation: true},
@@ -376,6 +381,10 @@ export const minimalDefaultPolicies: PolicyTable = {
       action: RecoveryActionKind.ResetAndReestablish,
       retryConfig: {maxAttempts: 1, reRunOriginalOperation: false},
     },
+    establishGroup: {
+      action: RecoveryActionKind.ResetAndReestablish,
+      retryConfig: {maxAttempts: 1, reRunOriginalOperation: true},
+    },
     send: {action: RecoveryActionKind.ResetAndReestablish, retryConfig: {maxAttempts: 1, reRunOriginalOperation: true}},
     addUsers: {
       action: RecoveryActionKind.ResetAndReestablish,
@@ -391,6 +400,10 @@ export const minimalDefaultPolicies: PolicyTable = {
     },
   },
   GroupOutOfSync: {
+    establishGroup: {
+      action: RecoveryActionKind.AddMissingUsers,
+      retryConfig: {maxAttempts: 1, reRunOriginalOperation: true},
+    },
     send: {action: RecoveryActionKind.AddMissingUsers, retryConfig: {maxAttempts: 1, reRunOriginalOperation: true}},
     addUsers: {action: RecoveryActionKind.AddMissingUsers, retryConfig: {maxAttempts: 1, reRunOriginalOperation: true}},
     removeUsers: {
@@ -403,6 +416,10 @@ export const minimalDefaultPolicies: PolicyTable = {
     },
   },
   ConversationAlreadyExists: {
+    establishGroup: {
+      action: RecoveryActionKind.JoinViaExternalCommit,
+      retryConfig: {maxAttempts: 1, reRunOriginalOperation: false},
+    },
     // For welcome handling, wipe local state; do not auto re-run the original callback
     handleWelcome: {
       action: RecoveryActionKind.WipeAndReprocessWelcome,
@@ -410,6 +427,10 @@ export const minimalDefaultPolicies: PolicyTable = {
     },
   },
   OrphanWelcome: {
+    establishGroup: {
+      action: RecoveryActionKind.JoinViaExternalCommit,
+      retryConfig: {maxAttempts: 1, reRunOriginalOperation: false},
+    },
     // For orphan welcome, attempt an external commit join; no auto re-run
     handleWelcome: {
       action: RecoveryActionKind.JoinViaExternalCommit,

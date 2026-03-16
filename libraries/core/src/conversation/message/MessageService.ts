@@ -76,7 +76,7 @@ export class MessageService {
 
     try {
       return await send(encryptionResults);
-    } catch (error) {
+    } catch (error: unknown) {
       if (!this.isClientMismatchError(error)) {
         throw error;
       }
@@ -175,7 +175,16 @@ export class MessageService {
     const deleted = flattenUserMap(mismatch.deleted);
     // remove deleted clients to the recipients
     deleted.forEach(({userId, data}) =>
-      data.forEach(clientId => delete initialPayloads.payloads[userId.domain][userId.id][clientId]),
+      data.forEach(clientId => {
+        const payloadsForDomain = initialPayloads.payloads[userId.domain];
+        const payloadsForUser = payloadsForDomain?.[userId.id];
+
+        if (payloadsForUser === undefined) {
+          return;
+        }
+
+        delete payloadsForUser[clientId];
+      }),
     );
 
     if (Object.keys(mismatch.missing).length === 0) {

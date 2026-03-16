@@ -50,6 +50,7 @@ const config: Config = {
   },
   testPathIgnorePatterns: ['<rootDir>/server', '<rootDir>/.yalc', '<rootDir>/test/e2e_tests'],
   testRunner: 'jest-jasmine2',
+  transformIgnorePatterns: ['/node_modules/(?!(true-myth|p-timeout|p-cancelable|noop-esm)/)'],
   // Override transform to use babel-jest for webapp (uses React automatic runtime with Emotion)
   transform: {
     '^.+\\.[tj]sx?$': 'babel-jest',

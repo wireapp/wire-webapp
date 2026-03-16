@@ -80,7 +80,7 @@ export const useCertificateDetailsModal = (certificate: string) => {
           setIsTextCopied(false);
         }, COPY_MESSAGE_TIMEOUT);
       });
-    } catch (err) {
+    } catch (err: unknown) {
       console.error('Failed to copy: ', err);
     }
   };

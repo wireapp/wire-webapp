@@ -25,13 +25,22 @@ async function addGeoIP(req: Request) {
   let countryCode = '';
 
   try {
-    const ip = req.header('X-Forwarded-For') || req.ip;
-    const lookup = await maxmind.open<CountryResponse>(geolite2.paths.country);
-    const result = lookup.get(ip);
-    if (result) {
-      countryCode = result.country.iso_code;
+    const ipAddress = req.header('X-Forwarded-For') ?? req.ip ?? '';
+    if (ipAddress.length === 0) {
+      return;
     }
-  } catch (error) {
+
+    const countryDatabasePath = geolite2.paths.country;
+    if (countryDatabasePath === undefined) {
+      return;
+    }
+
+    const lookup = await maxmind.open<CountryResponse>(countryDatabasePath);
+    const result = lookup.get(ipAddress);
+    if (result) {
+      countryCode = result.country?.iso_code ?? '';
+    }
+  } catch {
     // It's okay to go without a detected country.
   }
 

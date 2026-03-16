@@ -80,11 +80,15 @@ export class ClientAPI {
       data: updatedClient,
       method: 'put',
       url: `${ClientAPI.URL.CLIENTS}/${clientId}`,
+      // Disable infinite retries for client update requests
+      'axios-retry': {
+        retries: 0,
+      },
     };
 
     try {
       await this.client.sendJSON(config);
-    } catch (error) {
+    } catch (error: unknown) {
       switch ((error as BackendError).label) {
         case BackendErrorLabel.CLIENT_CAPABILITY_REMOVED: {
           throw new ClientCapabilityRemovedError((error as BackendError).message);

@@ -24,11 +24,14 @@ import {getUser, User} from './data/user';
 import {PageManager} from './pageManager';
 import {connectWithUser, sendConnectionRequest} from './utils/userActions';
 import {mockAudioAndVideoDevices} from './utils/mockVideoDevice.util';
+import {Role} from '@wireapp/api-client/lib/team';
+import {FEATURE_KEY} from '@wireapp/api-client/lib/team/feature';
 
-type PagePlugin = (page: Page) => void | Promise<void>;
+export type PagePlugin = (page: Page) => void | Promise<void>;
 
 // Define custom test type with axios fixture
 type Fixtures = {
+  _beforeEach: void;
   api: ApiManagerE2E;
   pageManager: PageManager;
   /**
@@ -51,18 +54,36 @@ type Fixtures = {
    */
   createTeam: (
     teamName: string,
-    options?: Parameters<typeof createUser>[1] & {withMembers?: number | User[]},
-  ) => Promise<{
-    owner: User;
-    members: User[];
-    /** Add a new member to the team after its initial creation */
-    addMember: (member: User) => Promise<void>;
-  }>;
+    options?: {
+      users: (User | {user: User; role?: keyof typeof Role})[];
+      features?: {conferenceCalling?: boolean; channels?: boolean; mls?: boolean};
+    },
+  ) => Promise<Team>;
+};
+
+export type Team = {
+  teamId: string;
+  owner: User;
+  /** Add a new member to the team after its initial creation */
+  addTeamMember: (member: User, options?: {role?: keyof typeof Role}) => Promise<void>;
 };
 
 export {expect} from '@playwright/test';
 
 export const test = baseTest.extend<Fixtures>({
+  // Temporary workaround to add the test id as annotation instead of tag so Testiny can pick it up
+  // The following test suites need to be updated to be individual tests: AppLock, Connections, RegisterSpecs
+  _beforeEach: [
+    async ({}, use, testInfo) => {
+      const testid = testInfo.tags.find(tag => tag.startsWith('@TC'));
+      if (testid && !testInfo.annotations.some(annotation => annotation.type === 'testid')) {
+        testInfo.annotations.push({type: 'testid', description: testid.slice(1)});
+      }
+
+      await use();
+    },
+    {auto: true},
+  ],
   api: async ({}, use) => {
     // Create a new instance of ApiManager for each test
     await use(new ApiManagerE2E());
@@ -120,32 +141,56 @@ export const test = baseTest.extend<Fixtures>({
   createTeam: async ({api}, use) => {
     const teamOwners: User[] = [];
 
-    await use(async (teamName, {withMembers, ...options} = {}) => {
-      const owner = await createUser(api, options);
+    await use(async (teamName, options) => {
+      const owner = await createUser(api);
 
       const {teamId} = await api.auth.upgradeUserToTeamOwner(owner, teamName);
       owner.teamId = teamId;
 
       teamOwners.push(owner);
 
-      const addMember = async (member: User) => {
-        const invitationId = await api.team.inviteUserToTeam(member.email, owner);
+      const addTeamMember: Team['addTeamMember'] = async (member, options) => {
+        const invitationId = await api.team.inviteUserToTeam(member.email, owner, Role[options?.role ?? 'MEMBER']);
         const invitationCode = await api.brig.getTeamInvitationCodeForEmail(owner.teamId, invitationId);
         await api.team.acceptTeamInvitation(invitationCode, member);
       };
 
-      let members: User[] = [];
-      if (withMembers !== undefined) {
-        // Depending on the type of withMembers, either create the number of users or use the given array of users
-        members =
-          typeof withMembers === 'number'
-            ? await Promise.all(Array.from({length: withMembers}, () => createUser(api, options)))
-            : withMembers;
-
-        await Promise.all(members.map(member => addMember(member)));
+      if (options?.users) {
+        await Promise.all(
+          options.users.map(user => {
+            if ('user' in user) {
+              return addTeamMember(user.user, {role: user.role});
+            } else {
+              return addTeamMember(user);
+            }
+          }),
+        );
       }
 
-      return {owner, members, addMember};
+      if (options?.features && Object.values(options.features).every(Boolean)) {
+        // The team will be reset right after initialization, so we need to wait a short time for it to finish
+        // before changing feature configs since they would otherwise be overwritten (See WPB-23698)
+        await new Promise(resolve => setTimeout(resolve, 5000));
+
+        if (options.features.conferenceCalling) {
+          await api.enableConferenceCallingFeature(teamId);
+          await api.waitForFeatureToBeEnabled(FEATURE_KEY.CONFERENCE_CALLING, teamId, owner.token);
+        }
+
+        // Creating channels depends on MLS to be enabled
+        if (options.features.mls || options.features.channels) {
+          await api.brig.enableMLSFeature(owner.teamId);
+          await api.waitForFeatureToBeEnabled(FEATURE_KEY.MLS, teamId, owner.token);
+        }
+
+        if (options.features.channels) {
+          await api.brig.unlockChannelFeature(teamId);
+          await api.brig.enableChannelsFeature(teamId);
+          await api.waitForFeatureToBeEnabled(FEATURE_KEY.CHANNELS, teamId, owner.token);
+        }
+      }
+
+      return {teamId, owner, addTeamMember};
     });
 
     // Deletes each created team and the owner / members associated with it
@@ -199,10 +244,22 @@ export const withConnectionRequest =
     await sendConnectionRequest(pageManager, await user);
   };
 
-const createUser = async (api: ApiManagerE2E, options?: {disableTelemetry?: boolean}) => {
+/** PagePlugin to open a guest user link and join the group chat as temporary member */
+export const withGuestUser =
+  (link: string, guestName: string): PagePlugin =>
+  async page => {
+    await page.goto(link);
+    await page.getByRole('link', {name: 'Join in Browser'}).click();
+    await PageManager.from(page).webapp.pages.conversationJoin().joinAsGuest(guestName);
+  };
+
+const createUser = async (
+  api: ApiManagerE2E,
+  options?: {disableTelemetry?: boolean} & Parameters<typeof getUser>[0],
+) => {
   const {disableTelemetry = true} = options ?? {};
 
-  const user = getUser();
+  const user = getUser(options);
   await api.createPersonalUser(user);
 
   // Optionally decline to send telemetry via the api. This avoids the user being prompted for it in the UI upon first login

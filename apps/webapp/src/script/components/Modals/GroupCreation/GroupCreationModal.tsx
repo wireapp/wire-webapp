@@ -19,6 +19,7 @@
 
 import React, {useCallback, useContext, useEffect, useMemo, useState} from 'react';
 
+import is from '@sindresorhus/is';
 import {RECEIPT_MODE} from '@wireapp/api-client/lib/conversation/data/ConversationReceiptModeUpdateData';
 import {CONVERSATION_PROTOCOL, mapToConversationProtocol} from '@wireapp/api-client/lib/team';
 import {isNonFederatingBackendsError} from '@wireapp/core/lib/errors';
@@ -127,7 +128,7 @@ const GroupCreationModal = ({
     GroupCreationModalState.DEFAULT,
   );
 
-  const mainViewModel = useContext(RootContext);
+  const rootContext = useContext(RootContext);
 
   useEffect(() => {
     const showCreateGroup = (_: string, userEntity: User) => {
@@ -197,16 +198,14 @@ const GroupCreationModal = ({
     };
   }, [stateIsParticipants]);
 
-  if (!mainViewModel) {
+  if (is.null_(rootContext)) {
     return null;
   }
 
-  const {content: contentViewModel} = mainViewModel;
-  const {
-    conversation: conversationRepository,
-    search: searchRepository,
-    team: teamRepository,
-  } = contentViewModel.repositories;
+  const contentViewModel = rootContext.mainViewModel.content;
+  const conversationRepository = contentViewModel.repositories.conversation;
+  const searchRepository = contentViewModel.repositories.search;
+  const teamRepository = contentViewModel.repositories.team;
 
   const maxNameLength = ConversationRepository.CONFIG.GROUP.MAX_NAME_LENGTH;
   const maxSize = ConversationRepository.CONFIG.GROUP.MAX_SIZE;
@@ -246,7 +245,7 @@ const GroupCreationModal = ({
         } else {
           createNavigate(generateConversationUrl(conversation.qualifiedId))(event);
         }
-      } catch (error) {
+      } catch (error: unknown) {
         if (isNonFederatingBackendsError(error)) {
           const tempName = groupName;
           setIsShown(false);

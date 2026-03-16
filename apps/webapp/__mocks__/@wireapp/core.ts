@@ -21,6 +21,17 @@ import {TaskScheduler} from '@wireapp/core/lib/util';
 
 import {EventEmitter} from 'stream';
 
+export enum ConnectionState {
+  /** The WebSocket is closed and no notifications are being processed */
+  CLOSED = 'closed',
+  /** The WebSocket is being opened or reconnected */
+  CONNECTING = 'connecting',
+  /** The websocket is open but locked and notifications stream is being processed */
+  PROCESSING_NOTIFICATIONS = 'processing_notifications',
+  /** The WebSocket is open and new messages are processed live in real time */
+  LIVE = 'live',
+}
+
 export class Account extends EventEmitter {
   backendFeatures = {
     federationEndpoints: true,
