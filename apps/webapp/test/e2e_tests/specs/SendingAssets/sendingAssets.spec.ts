@@ -21,12 +21,7 @@ import {User} from 'test/e2e_tests/data/user';
 import {PageManager} from 'test/e2e_tests/pageManager';
 
 import {test, expect, withConnectedUser, withLogin} from 'test/e2e_tests/test.fixtures';
-import {
-  getAudioFilePath,
-  getTextFilePath,
-  shareAssetHelper,
-  TextFileName,
-} from 'test/e2e_tests/utils/asset.util';
+import {getAudioFilePath, getTextFilePath, shareAssetHelper, TextFileName} from 'test/e2e_tests/utils/asset.util';
 import {Locator} from 'playwright/test';
 import {getImageFilePath, ImageQRCodeFileName} from 'test/e2e_tests/utils/sendImage.util';
 import {Buffer} from 'node:buffer';
@@ -328,7 +323,7 @@ test.describe('Sending Assets', () => {
   test(
     'I should not be able to download sent files when they are obfuscated',
     {tag: ['@TC-3728', '@regression']},
-    async ({createPage}, testInfo) => {
+    async ({createPage}) => {
       const userAPage = await createPage(withLogin(userA), withConnectedUser(userB));
       const {pages} = PageManager.from(userAPage).webapp;
 
@@ -345,6 +340,22 @@ test.describe('Sending Assets', () => {
       // User A cannot see message option Download
       const messageOptions = await pages.conversation().openMessageOptions(message);
       await expect(messageOptions).not.toContainText('Download');
+    },
+  );
+
+  test(
+    'Verify you can see conversation images in fullscreen',
+    {tag: ['@TC-1193', '@regression']},
+    async ({createPage}) => {
+      const userAPage = await createPage(withLogin(userA), withConnectedUser(userB));
+      const {pages, modals} = PageManager.from(userAPage).webapp;
+
+      await pages.conversationList().openConversation(userB.fullName);
+      await shareAssetHelper(getImageFilePath(), userAPage, userAPage.getByRole('button', {name: 'Add picture'}));
+      await pages.conversation().clickImage(userA);
+      
+      await expect(modals.detailViewModal().mainWindow).toBeVisible();
+      await expect(modals.detailViewModal().image).toBeVisible();
     },
   );
 });
