@@ -172,7 +172,7 @@ export class EventRepository {
         await this.handleEvent(payload, source);
       } catch (error: unknown) {
         if (source === EventSource.NOTIFICATION_STREAM) {
-          this.logger.warn(`Failed to handle event of type "${payload.event.type}": ${toError(error).message}`, error);
+          this.logger.warn(`Failed to handle event of type "${event.type}": ${toError(error).message}`, error);
         } else {
           throw error;
         }
