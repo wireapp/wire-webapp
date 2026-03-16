@@ -248,7 +248,7 @@ const SingleSignOnFormComponent = ({
       } else {
         await loginWithSSO(codeOrMail, password);
       }
-    } catch (error) {
+    } catch (error: unknown) {
       setIsLoading(false);
       if (isBackendError(error)) {
         switch (error.label) {

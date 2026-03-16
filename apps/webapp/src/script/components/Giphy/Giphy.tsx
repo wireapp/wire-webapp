@@ -100,7 +100,7 @@ const Giphy: FC<GiphyProps> = ({giphyRepository, defaultGiphyState = GiphyState.
         setGifs(fetchedGifs);
         setGiphyState(GiphyState.RESULTS);
       }
-    } catch (error) {
+    } catch (error: unknown) {
       console.warn(error);
       setGiphyState(GiphyState.ERROR);
     }
@@ -143,7 +143,7 @@ const Giphy: FC<GiphyProps> = ({giphyRepository, defaultGiphyState = GiphyState.
       setGifs([gif]);
       setSelectedGif(gif);
       setGiphyState(GiphyState.RESULT);
-    } catch (error) {
+    } catch (error: unknown) {
       setGiphyState(GiphyState.ERROR);
     }
   };

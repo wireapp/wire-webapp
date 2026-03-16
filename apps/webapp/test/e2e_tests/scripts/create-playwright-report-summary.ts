@@ -28,7 +28,7 @@ let report: JSONReport;
 
 try {
   report = JSON.parse(readFileSync(jsonPath, 'utf-8'));
-} catch (error) {
+} catch (error: unknown) {
   const errorMessage = `❌ Error: report.json not found at ${jsonPath} ❌`;
   writeFileSync('playwright-report-summary.txt', errorMessage);
   process.exit(1);

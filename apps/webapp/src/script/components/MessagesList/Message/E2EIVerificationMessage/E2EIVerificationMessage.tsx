@@ -87,7 +87,7 @@ export const E2EIVerificationMessage = ({message, conversation}: E2EIVerificatio
   const getCertificate = async () => {
     try {
       await E2EIHandler.getInstance().enroll({resetTimers: true});
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to enroll user certificate: ', error);
     }
   };

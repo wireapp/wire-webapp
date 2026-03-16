@@ -88,7 +88,7 @@ const waitFor = (assertion: () => void) => {
       try {
         assertion();
         resolve();
-      } catch (e) {
+      } catch (e: unknown) {
         if (attempts > maxAttempts) {
           throw e;
         }
@@ -275,7 +275,7 @@ describe('Account', () => {
           password: 'wrong',
         });
         throw new Error('Should not be logged in');
-      } catch (error) {
+      } catch (error: unknown) {
         backendError = error as BackendError;
       } finally {
         const {code, label} = backendError as {code: number; label: string};

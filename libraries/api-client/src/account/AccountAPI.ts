@@ -175,7 +175,7 @@ export class AccountAPI {
     try {
       const response = await this.client.sendJSON<DomainData>(config);
       return response.data;
-    } catch (error) {
+    } catch (error: unknown) {
       const backendError = error as BackendError;
       switch (backendError.label) {
         case BackendErrorLabel.CUSTOM_BACKEND_NOT_FOUND: {
@@ -237,7 +237,7 @@ export class AccountAPI {
     try {
       const response = await this.client.sendJSON<DomainRedirectPayload>(config);
       return response.data;
-    } catch (error) {
+    } catch (error: unknown) {
       const backendError = error as BackendError;
       if (backendError.code === StatusCode.SERVICE_UNAVAILABLE) {
         return {

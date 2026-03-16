@@ -100,7 +100,7 @@ export const useConversationSearchFiles = ({
         }
 
         setStatus('success');
-      } catch (error) {
+      } catch (error: unknown) {
         setStatus('error');
         setNodes({conversationId: id, nodes: []});
         setPagination({conversationId: id, pagination: null});

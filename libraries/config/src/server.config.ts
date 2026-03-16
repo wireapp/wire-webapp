@@ -53,7 +53,7 @@ const logger = logdown('config', {
 function readFile(filePath: string, fallback: string = ''): string {
   try {
     return fs.readFileSync(filePath, {encoding: 'utf8', flag: 'r'});
-  } catch (error) {
+  } catch (error: unknown) {
     logger.warn(`Cannot access "${filePath}": ${(error as Error).message}`);
     return fallback;
   }

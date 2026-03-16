@@ -92,7 +92,7 @@ const ClientListComponent = ({
       }
 
       return navigate(ROUTE.HISTORY_INFO);
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error(error);
     } finally {
       setShowLoading(false);

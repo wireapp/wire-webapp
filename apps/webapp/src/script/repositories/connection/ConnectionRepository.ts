@@ -40,7 +40,7 @@ import {UserState} from 'Repositories/user/UserState';
 import {replaceLink, t} from 'Util/LocalizerUtil';
 import {getLogger, Logger} from 'Util/Logger';
 import {matchQualifiedIds} from 'Util/QualifiedId';
-import {isBackendError} from 'Util/TypePredicateUtil';
+import {isBackendError, toError} from 'Util/TypePredicateUtil';
 
 import type {ConnectionEntity} from './ConnectionEntity';
 import {ConnectionMapper} from './ConnectionMapper';
@@ -204,7 +204,7 @@ export class ConnectionRepository {
         connectionStatus: response.status,
         conversationId: response.qualified_conversation || {id: response.conversation, domain: ''},
       };
-    } catch (error) {
+    } catch (error: unknown) {
       if (isBackendError(error)) {
         switch (error.label) {
           case BackendErrorLabel.LEGAL_HOLD_MISSING_CONSENT: {
@@ -351,9 +351,9 @@ export class ConnectionRepository {
       const response = await this.connectionService.putConnections(userEntity.qualifiedId, newStatus);
       const connectionEvent = {connection: response, user: {name: userEntity.name()}};
       await this.onUserConnection(connectionEvent, EventRepository.SOURCE.INJECTED);
-    } catch (error) {
+    } catch (error: unknown) {
       const logMessage = `Connection change from '${currentStatus}' to '${newStatus}' failed`;
-      this.logger.error(`${logMessage} for '${userEntity.id}' failed: ${error.message}`, error);
+      this.logger.error(`${logMessage} for '${userEntity.id}' failed: ${toError(error).message}`, error);
       switch (newStatus) {
         case ConnectionStatus.ACCEPTED: {
           PrimaryModal.show(PrimaryModal.type.ACKNOWLEDGE, {

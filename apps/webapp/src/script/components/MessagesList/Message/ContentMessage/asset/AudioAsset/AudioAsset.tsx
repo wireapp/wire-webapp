@@ -77,7 +77,7 @@ export const AudioAsset = ({
       try {
         const url = await getAssetUrl(asset.original_resource());
         setAudioSrc(url);
-      } catch (error) {
+      } catch (error: unknown) {
         logger.error('Failed to load audio asset ', error);
       }
       asset.status(AssetTransferState.UPLOADED);

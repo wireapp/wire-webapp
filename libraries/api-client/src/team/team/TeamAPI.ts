@@ -107,7 +107,7 @@ export class TeamAPI {
       try {
         const response = await this.client.sendJSON<TeamSizeData>(config);
         return response.data;
-      } catch (error) {
+      } catch (error: unknown) {
         if ((error as BackendError).message === SyntheticErrorLabel.REQUEST_CANCELLED) {
           throw new RequestCancellationError('Team size request got cancelled');
         }

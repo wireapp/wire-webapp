@@ -171,7 +171,7 @@ export class SelfRepository extends TypedEventEmitter<Events> {
       await this.selfService.putSupportedProtocols(supportedProtocols);
       await this.userRepository.updateUserSupportedProtocols(this.selfUser.qualifiedId, supportedProtocols);
       this.emit('selfSupportedProtocolsUpdated', supportedProtocols);
-    } catch (error) {
+    } catch (error: unknown) {
       this.logger.error('Failed to update self supported protocols: ', error);
     }
   }

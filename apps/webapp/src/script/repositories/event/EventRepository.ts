@@ -39,6 +39,7 @@ import {EventName} from 'Repositories/tracking/EventName';
 import {UserState} from 'Repositories/user/UserState';
 import {getLogger, Logger} from 'Util/Logger';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
+import {isAxiosError, toError} from 'Util/TypePredicateUtil';
 
 import {ClientEvent} from './Client';
 import {EventMiddleware, EventProcessor, IncomingEvent} from './EventProcessor';
@@ -169,9 +170,9 @@ export class EventRepository {
     return this.eventQueue.push(async () => {
       try {
         await this.handleEvent(payload, source);
-      } catch (error) {
+      } catch (error: unknown) {
         if (source === EventSource.NOTIFICATION_STREAM) {
-          this.logger.warn(`Failed to handle event of type "${event.type}": ${error.message}`, error);
+          this.logger.warn(`Failed to handle event of type "${event.type}": ${toError(error).message}`, error);
         } else {
           throw error;
         }
@@ -323,13 +324,37 @@ export class EventRepository {
   //##############################################################################
   // Notification Stream handling
   //##############################################################################
+  private getServerTimeFromAxiosError(errorResponse: unknown): string | undefined {
+    if (!isAxiosError<{time?: string}>(errorResponse) || !errorResponse.response) {
+      return undefined;
+    }
+
+    if ('time' in errorResponse.response && typeof errorResponse.response.time === 'string') {
+      return errorResponse.response.time;
+    }
+
+    if (
+      'data' in errorResponse.response &&
+      errorResponse.response.data &&
+      typeof errorResponse.response.data === 'object' &&
+      'time' in errorResponse.response.data &&
+      typeof errorResponse.response.data.time === 'string'
+    ) {
+      return errorResponse.response.data.time;
+    }
+
+    return undefined;
+  }
+
   private async handleTimeDrift() {
     try {
       const time = await this.notificationService.getServerTime();
       this.serverTimeHandler.computeTimeOffset(time);
-    } catch (errorResponse) {
-      if (errorResponse.response?.time) {
-        this.serverTimeHandler.computeTimeOffset(errorResponse.response?.time);
+    } catch (errorResponse: unknown) {
+      const serverTime = this.getServerTimeFromAxiosError(errorResponse);
+
+      if (serverTime !== undefined) {
+        this.serverTimeHandler.computeTimeOffset(serverTime);
       }
     }
   }
@@ -529,7 +554,7 @@ export class EventRepository {
       for (const eventProcessMiddleware of this.eventProcessMiddlewares) {
         event = await eventProcessMiddleware.processEvent(event, source);
       }
-    } catch (error) {
+    } catch (error: unknown) {
       if (error instanceof EventValidationError) {
         this.logger.warn(`Event validation failed: ${error.message}`, error);
         return;

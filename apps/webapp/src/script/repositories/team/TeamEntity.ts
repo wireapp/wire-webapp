@@ -44,7 +44,7 @@ export class TeamEntity {
 
     try {
       hasIcon = !!this.icon && isValidAsset(this.icon);
-    } catch (error) {
+    } catch (error: unknown) {
       // ignore error
     }
 

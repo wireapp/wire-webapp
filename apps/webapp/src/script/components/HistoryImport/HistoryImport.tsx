@@ -192,7 +192,7 @@ const HistoryImport = ({user, backupRepository, file, switchContent}: HistoryImp
     try {
       await backupRepository.importHistory(user, data, onInit, onProgress, password);
       onSuccess();
-    } catch (error) {
+    } catch (error: unknown) {
       onError(error as Error);
     }
   };

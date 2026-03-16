@@ -95,7 +95,7 @@ test.fixme('Starting call 1:1 call without internet', async ({browser, pageManag
       expect(await ownerAModals.callNotEstablished().isModalPresent());
       expect(await ownerAModals.callNotEstablished().getModalTitle()).toContain('Call not established');
       await ownerAModals.callNotEstablished().clickOk();
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Error during call initiation:', error);
       throw error;
     }

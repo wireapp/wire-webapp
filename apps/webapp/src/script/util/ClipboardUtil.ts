@@ -46,7 +46,7 @@ export function copyText(text: string): Promise<void> {
     }
 
     return Promise.resolve();
-  } catch (error) {
+  } catch (error: unknown) {
     return Promise.reject(error);
   }
 }

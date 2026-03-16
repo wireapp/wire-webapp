@@ -80,7 +80,7 @@ export const useGetCellsFolders = ({
 
       setFolders(filteredFolders);
       setStatus('success');
-    } catch (error) {
+    } catch (error: unknown) {
       setFolders([]);
       setStatus('error');
       throw error;

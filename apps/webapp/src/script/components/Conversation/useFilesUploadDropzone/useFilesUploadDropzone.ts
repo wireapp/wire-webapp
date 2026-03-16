@@ -128,7 +128,7 @@ export const useFilesUploadDropzone = ({
 
     try {
       await attatchMetadataToFiles(transformedAcceptedFiles);
-    } catch (error) {
+    } catch (error: unknown) {
       logger.warn('Attaching file metadata failed', error);
     }
 
@@ -168,7 +168,7 @@ export const useFilesUploadDropzone = ({
         fileId: file.id,
         data: {remoteUuid: uuid, remoteVersionId: versionId, uploadStatus: 'success'},
       });
-    } catch (error) {
+    } catch (error: unknown) {
       if (error instanceof Error && error.name === 'AbortError') {
         return;
       }
@@ -202,7 +202,7 @@ export const useFilesUploadDropzone = ({
             fileId: file.id,
             data: {...metadata},
           });
-        } catch (error) {
+        } catch (error: unknown) {
           logger.warn('Building file metadata failed', error);
         }
       }),

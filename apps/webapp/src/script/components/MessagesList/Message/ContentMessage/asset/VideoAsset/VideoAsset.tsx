@@ -145,7 +145,7 @@ const VideoAsset = ({
           setIsVideoLoaded(true);
           // ToDo: This needs to be revisited
           //amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.MESSAGES.VIDEO.PLAY_SUCCESS);
-        } catch (error) {
+        } catch (error: unknown) {
           if (error instanceof Error) {
             if (error.name !== AssetError.CANCEL_ERROR) {
               setVideoPlaybackError(true);

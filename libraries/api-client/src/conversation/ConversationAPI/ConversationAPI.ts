@@ -468,7 +468,7 @@ export class ConversationAPI {
     try {
       const response = await this.client.sendJSON<ConversationEvent>(config);
       return response.data;
-    } catch (error) {
+    } catch (error: unknown) {
       const backendError = error as BackendError;
       switch (backendError.label) {
         case BackendErrorLabel.LEGAL_HOLD_MISSING_CONSENT: {
@@ -527,7 +527,7 @@ export class ConversationAPI {
     try {
       const response = await this.client.sendJSON<Conversation>(config);
       return response.data;
-    } catch (error) {
+    } catch (error: unknown) {
       const backendError = error as BackendError;
       switch (backendError.label) {
         case BackendErrorLabel.LEGAL_HOLD_MISSING_CONSENT: {
@@ -578,7 +578,7 @@ export class ConversationAPI {
 
     try {
       await this.client.sendJSON(config);
-    } catch (error) {
+    } catch (error: unknown) {
       const backendError = error as BackendError;
       switch (backendError.label) {
         case BackendErrorLabel.NO_CONVERSATION_CODE: {
@@ -604,7 +604,7 @@ export class ConversationAPI {
     try {
       const response = await this.client.sendJSON<ConversationMemberJoinEvent>(config);
       return response.data;
-    } catch (error) {
+    } catch (error: unknown) {
       const backendError = error as BackendError;
       switch (backendError.label) {
         case BackendErrorLabel.NO_CONVERSATION_CODE: {
@@ -635,7 +635,7 @@ export class ConversationAPI {
     try {
       const response = await this.client.sendJSON<ConversationJoinData>(config);
       return response.data;
-    } catch (error) {
+    } catch (error: unknown) {
       const backendError = error as BackendError;
       switch (backendError.label) {
         case BackendErrorLabel.NO_CONVERSATION_CODE: {
@@ -874,7 +874,7 @@ export class ConversationAPI {
     try {
       const response = await this.client.sendJSON<ConversationMemberJoinEvent>(config);
       return response.data;
-    } catch (error) {
+    } catch (error: unknown) {
       const backendError = error as BackendError;
       switch (backendError.label) {
         case BackendErrorLabel.LEGAL_HOLD_MISSING_CONSENT: {

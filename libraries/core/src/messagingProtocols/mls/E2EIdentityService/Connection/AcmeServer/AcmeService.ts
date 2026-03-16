@@ -102,7 +102,7 @@ export class AcmeService {
       const {data} = await this.axiosInstance.get(this.discoveryUrl);
       const directory = DirectoryResponseSchema.parse(data);
       return new TextEncoder().encode(JSON.stringify(directory));
-    } catch (e) {
+    } catch (e: unknown) {
       this.logger.error('Error while receiving Directory', e);
       return undefined;
     }
@@ -150,7 +150,7 @@ export class AcmeService {
       const {headers} = await this.axiosInstance.head(url);
       const nonce = this.extractNonce(headers);
       return nonce;
-    } catch (e) {
+    } catch (e: unknown) {
       this.logger.error('Error while receiving intial Nonce', e);
       return undefined;
     }

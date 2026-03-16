@@ -39,6 +39,7 @@ import {ConversationError} from 'src/script/error/ConversationError';
 import {MentionEntity} from 'src/script/message/MentionEntity';
 import {MessageHasher} from 'src/script/message/MessageHasher';
 import {QuoteEntity} from 'src/script/message/QuoteEntity';
+import {isErrorWithType} from 'src/script/util/TypePredicateUtil';
 import {t} from 'Util/LocalizerUtil';
 
 import {useSendFiles} from './useSendFiles/useSendFiles';
@@ -119,11 +120,13 @@ export const useMessageSend = ({
       }
 
       if (editedMessage) {
-        messageRepository.sendMessageEdit(conversation, messageText, editedMessage, mentionEntities).catch(error => {
-          if (error.type !== ConversationError.TYPE.NO_MESSAGE_CHANGES) {
-            throw error;
-          }
-        });
+        messageRepository
+          .sendMessageEdit(conversation, messageText, editedMessage, mentionEntities)
+          .catch((error: unknown) => {
+            if (!isErrorWithType(error) || error.type !== ConversationError.TYPE.NO_MESSAGE_CHANGES) {
+              throw error;
+            }
+          });
 
         cancelMessageReply();
       }

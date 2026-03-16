@@ -22,6 +22,7 @@ import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 
 import {Environment} from 'Util/Environment';
 import {getLogger} from 'Util/Logger';
+import {isAxiosError, toError} from 'Util/TypePredicateUtil';
 
 import {SelfActionCreator} from './creator/';
 
@@ -38,8 +39,8 @@ export class SelfAction {
         await dispatch(selfAction.doCheckPasswordState());
         dispatch(SelfActionCreator.successfulFetchSelf(selfUser));
         return selfUser;
-      } catch (error) {
-        dispatch(SelfActionCreator.failedFetchSelf(error));
+      } catch (error: unknown) {
+        dispatch(SelfActionCreator.failedFetchSelf(toError(error)));
         throw error;
       }
     };
@@ -52,8 +53,8 @@ export class SelfAction {
         await apiClient.api.self.putHandle({handle: handle.trim().toLowerCase()});
         const selfUser = await dispatch(selfAction.fetchSelf());
         dispatch(SelfActionCreator.successfulSetHandle(selfUser));
-      } catch (error) {
-        dispatch(SelfActionCreator.failedSetHandle(error));
+      } catch (error: unknown) {
+        dispatch(SelfActionCreator.failedSetHandle(toError(error)));
         throw error;
       }
     };
@@ -69,8 +70,8 @@ export class SelfAction {
       try {
         const {results} = await apiClient.api.self.getConsents();
         dispatch(SelfActionCreator.successfulGetConsents(results));
-      } catch (error) {
-        dispatch(SelfActionCreator.failedGetConsents(error));
+      } catch (error: unknown) {
+        dispatch(SelfActionCreator.failedGetConsents(toError(error)));
         throw error;
       }
     };
@@ -91,8 +92,8 @@ export class SelfAction {
       try {
         await apiClient.api.self.putConsent(consent);
         dispatch(SelfActionCreator.successfulSetConsent(consent));
-      } catch (error) {
-        dispatch(SelfActionCreator.failedSetConsent(error));
+      } catch (error: unknown) {
+        dispatch(SelfActionCreator.failedSetConsent(toError(error)));
         throw error;
       }
     };
@@ -104,8 +105,8 @@ export class SelfAction {
       try {
         await apiClient.api.self.putPassword(changePassword);
         dispatch(SelfActionCreator.successfulSetSelfPassword());
-      } catch (error) {
-        dispatch(SelfActionCreator.failedSetSelfPassword(error));
+      } catch (error: unknown) {
+        dispatch(SelfActionCreator.failedSetSelfPassword(toError(error)));
         throw error;
       }
     };
@@ -117,8 +118,8 @@ export class SelfAction {
       try {
         await apiClient.api.auth.putEmail({email});
         dispatch(SelfActionCreator.successfulSetSelfEmail(email));
-      } catch (error) {
-        dispatch(SelfActionCreator.failedSetSelfEmail(error));
+      } catch (error: unknown) {
+        dispatch(SelfActionCreator.failedSetSelfEmail(toError(error)));
         throw error;
       }
     };
@@ -131,12 +132,12 @@ export class SelfAction {
         await apiClient.api.self.headPassword();
         dispatch(SelfActionCreator.successfulSetPasswordState({hasPassword: true}));
         return true;
-      } catch (error) {
-        if (error.response?.status === HTTP_STATUS.NOT_FOUND) {
+      } catch (error: unknown) {
+        if (isAxiosError(error) && error.response?.status === HTTP_STATUS.NOT_FOUND) {
           dispatch(SelfActionCreator.successfulSetPasswordState({hasPassword: false}));
           return false;
         }
-        dispatch(SelfActionCreator.failedSetPasswordState(error));
+        dispatch(SelfActionCreator.failedSetPasswordState(toError(error)));
         throw error;
       }
     };

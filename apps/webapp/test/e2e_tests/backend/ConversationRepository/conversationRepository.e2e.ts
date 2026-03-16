@@ -87,7 +87,7 @@ export class ConversationRepositoryE2E extends BackendClientE2E {
       const response = await this.axiosInstance.post('conversations', conversationData, this.getAuthHeaders(token));
 
       return response.data;
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Error creating group conversation:', error);
       throw error;
     }

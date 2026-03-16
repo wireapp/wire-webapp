@@ -233,7 +233,7 @@ export class HttpClient extends EventEmitter {
       this.updateConnectionState(ConnectionState.CONNECTED);
 
       return response;
-    } catch (error) {
+    } catch (error: unknown) {
       const retryWithTokenRefresh = async () => {
         this.logger.warn(`Access token refresh triggered for "${config.method}" request to "${config.url}".`);
         await this.refreshAccessToken();
@@ -393,7 +393,7 @@ export class HttpClient extends EventEmitter {
 
     try {
       return await promise;
-    } catch (error) {
+    } catch (error: unknown) {
       // If the request failed due to too many requests, we want put it into the backoff queue
       // It will be retried after a (growing) delay
       const isTooManyRequestsError = axios.isAxiosError(error) && error.response?.status === 420;

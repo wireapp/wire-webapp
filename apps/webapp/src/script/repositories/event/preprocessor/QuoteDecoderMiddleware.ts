@@ -128,7 +128,7 @@ export class QuotedMessageMiddleware implements EventMiddleware {
     try {
       const encodedQuote = base64ToArray(rawQuote);
       quote = Quote.decode(encodedQuote);
-    } catch (error) {
+    } catch (error: unknown) {
       this.logger.warn('Failed to decode quoted message.', error);
       const quoteData: ProcessedQuoteData = {
         error: {

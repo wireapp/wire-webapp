@@ -123,7 +123,7 @@ export const wipeCoreCryptoDb = async (storeEngine: CRUDEngine): Promise<void> =
     await coreCryptoInstance?.close();
     await deleteDB(coreCryptoDbName);
     logger.log('info', 'CoreCrypto DB wiped successfully');
-  } catch (error) {
+  } catch (error: unknown) {
     logger.error('error', 'Failed to wipe CoreCrypto DB');
   }
 };
@@ -147,7 +147,7 @@ export async function buildClient(
 
         try {
           key = await migrateOnceAndGetKey(generateSecretKey, coreCryptoDbName);
-        } catch (error) {
+        } catch (error: unknown) {
           if (error instanceof CorruptedKeyError) {
             // If we are dealing with a corrupted key, we wipe the key and the coreCrypto DB to start fresh
             await wipeCoreCryptoDb(storeEngine);

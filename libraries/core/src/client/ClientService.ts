@@ -92,7 +92,7 @@ export class ClientService {
     }
     try {
       await this.backend.deleteClient(localClientId, password);
-    } catch (error) {
+    } catch (error: unknown) {
       this.logger.warn('Failed to delete client on backend', error);
     }
     return this.database.deleteLocalClient();
@@ -101,7 +101,7 @@ export class ClientService {
   private async getLocalClient(): Promise<MetaClient | undefined> {
     try {
       return await this.database.getLocalClient();
-    } catch (error) {
+    } catch (error: unknown) {
       return undefined;
     }
   }
@@ -124,7 +124,7 @@ export class ClientService {
     try {
       const remoteClient = await this.apiClient.api.client.getClient(loadedClient.id);
       return this.database.updateLocalClient(remoteClient);
-    } catch (error) {
+    } catch (error: unknown) {
       const notFoundOnBackend = axios.isAxiosError(error) ? error.response?.status === StatusCodes.NOT_FOUND : false;
       if (notFoundOnBackend && this.storeEngine) {
         const shouldDeleteWholeDatabase = loadedClient.type === ClientType.TEMPORARY;

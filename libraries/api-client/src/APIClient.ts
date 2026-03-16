@@ -393,7 +393,7 @@ export class APIClient extends EventEmitter {
       if (!options.skipLogoutRequest) {
         await this.api.auth.postLogout();
       }
-    } catch (error) {
+    } catch (error: unknown) {
       this.logger.warn(error);
     }
 
@@ -411,7 +411,7 @@ export class APIClient extends EventEmitter {
     try {
       const self = await this.api.self.getSelf();
       selfDomain = self.qualified_id?.domain;
-    } catch (error) {
+    } catch (error: unknown) {
       this.logger.warn('Could not get self user', (error as BackendError).message);
     }
 

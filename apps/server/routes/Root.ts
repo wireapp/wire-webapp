@@ -40,7 +40,7 @@ async function addGeoIP(req: Request) {
     if (result) {
       countryCode = result.country?.iso_code ?? '';
     }
-  } catch (error) {
+  } catch (error: unknown) {
     // It's okay to go without a detected country.
   }
 

@@ -117,7 +117,7 @@ describe('APIClient', () => {
       let errorMessage;
       try {
         await client.useVersion(MINIMUM_API_VERSION + 2, MINIMUM_API_VERSION + 3);
-      } catch (error) {
+      } catch (error: unknown) {
         errorMessage = error.message;
       } finally {
         expect(errorMessage).toContain('No compatible API version in range');
@@ -131,7 +131,7 @@ describe('APIClient', () => {
       let errorMessage;
       try {
         await client.useVersion(0, 3);
-      } catch (error) {
+      } catch (error: unknown) {
         errorMessage = error.message;
       } finally {
         expect(errorMessage).toContain(`Minimum supported API version is ${MINIMUM_API_VERSION}. Received: 0`);

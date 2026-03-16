@@ -66,7 +66,7 @@ import {t} from 'Util/LocalizerUtil';
 import {getLogger, Logger} from 'Util/Logger';
 import {matchQualifiedIds} from 'Util/QualifiedId';
 import {fixWebsocketString} from 'Util/StringUtil';
-import {isAxiosError, isBackendError} from 'Util/TypePredicateUtil';
+import {isAxiosError, isBackendError, isErrorWithCode, isErrorWithType, toError} from 'Util/TypePredicateUtil';
 
 import {showAvailabilityModal} from './AvailabilityModal';
 import {ConsentValue} from './ConsentValue';
@@ -548,7 +548,7 @@ export class UserRepository extends TypedEventEmitter<Events> {
     try {
       await this.selfService.deleteSelf();
       this.logger.info('Account deletion initiated');
-    } catch (error) {
+    } catch (error: unknown) {
       this.logger.error(`Unable to delete self: ${error}`);
     }
   }
@@ -680,8 +680,8 @@ export class UserRepository extends TypedEventEmitter<Events> {
       this.saveUser(userEntity, true);
       await this.initMarketingConsent();
       return userEntity;
-    } catch (error) {
-      this.logger.error(`Unable to load self user: ${error.message || error}`, [error]);
+    } catch (error: unknown) {
+      this.logger.error(`Unable to load self user: ${toError(error).message}`, [error]);
       throw error;
     }
   }
@@ -707,11 +707,11 @@ export class UserRepository extends TypedEventEmitter<Events> {
     }
     try {
       return this.fetchUser(userId);
-    } catch (error) {
-      const isNotFound = error.type === UserError.TYPE.USER_NOT_FOUND;
+    } catch (error: unknown) {
+      const isNotFound = isErrorWithType(error) && error.type === UserError.TYPE.USER_NOT_FOUND;
       if (!isNotFound) {
         this.logger.warn(
-          `Failed to find user with ID '${userId.id}' and domain '${userId.domain}': ${error.message}`,
+          `Failed to find user with ID '${userId.id}' and domain '${userId.domain}': ${toError(error).message}`,
           error,
         );
       }
@@ -741,7 +741,7 @@ export class UserRepository extends TypedEventEmitter<Events> {
 
       await this.updateUserSupportedProtocols(user.qualifiedId, supportedProtocols);
       this.emit('supportedProtocolsUpdated', {user, supportedProtocols});
-    } catch (error) {
+    } catch (error: unknown) {
       this.logger.warn(`Failed to refresh supported protocols for user ${user.qualifiedId.id}`, error);
     }
   }
@@ -773,7 +773,7 @@ export class UserRepository extends TypedEventEmitter<Events> {
       //update local user entity with new supported protocols
       await this.updateUserSupportedProtocols(userId, supportedProtocols);
       return supportedProtocols;
-    } catch (error) {
+    } catch (error: unknown) {
       if (localSupportedProtocols) {
         this.logger.warn(
           `Failed when fetching supported protocols of user ${userId.id}, using local supported protocols as fallback: `,
@@ -790,7 +790,7 @@ export class UserRepository extends TypedEventEmitter<Events> {
   async getUserByHandle(fqn: QualifiedHandle): Promise<undefined | APIClientUser> {
     try {
       return await this.userService.getUserByFQN(fqn);
-    } catch (error) {
+    } catch (error: unknown) {
       // When we search for a non-existent handle, the backend will return a HTTP 404, which tells us that there is no user with that handle.
       if (
         !isBackendError(error) ||
@@ -967,8 +967,8 @@ export class UserRepository extends TypedEventEmitter<Events> {
       try {
         await this.selfService.putSelfHandle(username);
         return await this.updateUser(this.userState.self().qualifiedId, {handle: username});
-      } catch (error) {
-        if ([HTTP_STATUS.CONFLICT, HTTP_STATUS.BAD_REQUEST].includes(error.code)) {
+      } catch (error: unknown) {
+        if (isErrorWithCode(error) && [HTTP_STATUS.CONFLICT, HTTP_STATUS.BAD_REQUEST].includes(error.code)) {
           throw new UserError(UserError.TYPE.USERNAME_TAKEN, UserError.MESSAGE.USERNAME_TAKEN);
         }
         throw new UserError(UserError.TYPE.REQUEST_FAILURE, UserError.MESSAGE.REQUEST_FAILURE);
@@ -986,8 +986,8 @@ export class UserRepository extends TypedEventEmitter<Events> {
     try {
       await this.userService.checkUserHandle(handle);
       throw new UserError(UserError.TYPE.USERNAME_TAKEN, UserError.MESSAGE.USERNAME_TAKEN);
-    } catch (error) {
-      const errorCode = error.response?.status;
+    } catch (error: unknown) {
+      const errorCode = isAxiosError(error) ? error.response?.status : undefined;
 
       if (errorCode === HTTP_STATUS.NOT_FOUND) {
         return handle;
@@ -1014,8 +1014,8 @@ export class UserRepository extends TypedEventEmitter<Events> {
       ];
       await this.selfService.putSelf({assets, picture: []} as any);
       return await this.updateUser(selfUser.qualifiedId, {assets});
-    } catch (error) {
-      throw new Error(`Error during profile image upload: ${error.message || error.code || error}`);
+    } catch (error: unknown) {
+      throw new Error(`Error during profile image upload: ${toError(error).message}`);
     }
   }
 
@@ -1049,8 +1049,8 @@ export class UserRepository extends TypedEventEmitter<Events> {
           return;
         }
       }
-    } catch (error) {
-      this.logger.warn(`Failed to retrieve marketing consent: ${error.message || error.code}`, error);
+    } catch (error: unknown) {
+      this.logger.warn(`Failed to retrieve marketing consent: ${toError(error).message}`, error);
     }
   }
 }
