@@ -1813,12 +1813,12 @@ export class CallingRepository {
         return this.mediaDevicesHandler
           .initializeMediaDevices(camera)
           .then(() => stream)
-          .catch(error => {
+          .catch((error: unknown) => {
             this.logger.warn('Failed to initialize media devices:', error);
             return stream;
           });
       })
-      .catch(error => {
+      .catch((error: unknown) => {
         this.logger.error('Failed to get media stream:', error);
         throw error;
       });
@@ -2008,7 +2008,7 @@ export class CallingRepository {
       };
     }
 
-    this.sendCallingMessage(conversationId, payload, options, myClientsOnly === 1).catch(error => {
+    this.sendCallingMessage(conversationId, payload, options, myClientsOnly === 1).catch((error: unknown) => {
       this.logger.warn('Failed to send calling message, aborting call', error);
       this.abortCall(conversationId, LEAVE_CALL_REASON.ABORTED_BECAUSE_FAILED_TO_SEND_CALLING_MESSAGE);
     });
@@ -2114,7 +2114,7 @@ export class CallingRepository {
 
       this.wCall?.configUpdate(this.wUser, 0, JSON.stringify(config));
     };
-    _requestConfig().catch(error => {
+    _requestConfig().catch((error: unknown) => {
       this.logger.warn('Failed fetching calling config', error);
       this.wCall?.configUpdate(this.wUser, 1, '');
     });

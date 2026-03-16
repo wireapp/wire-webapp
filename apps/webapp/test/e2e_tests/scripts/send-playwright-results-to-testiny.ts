@@ -257,7 +257,7 @@ async function main(): Promise<void> {
     if (resolveErrors > 0 || sendError > 0) process.exitCode = 1;
 
     // Phase 4 (optional) - append CI link to run description
-    appendCiDescription(runId).catch(err =>
+    appendCiDescription(runId).catch((err: unknown) =>
         console.warn(`  ⚠️  Could not update run description: ${err instanceof Error ? err.message : String(err)}`)
     );
 }

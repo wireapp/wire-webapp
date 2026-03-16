@@ -657,7 +657,6 @@ export class ConversationRepository {
         this.logger.error(`Failed to get conversation from backend: ${toError(error).message}`);
         throw error;
       });
-
     return backendConversationEntity;
   };
 
@@ -3495,13 +3494,13 @@ export class ConversationRepository {
       .then((entityObject = {} as EntityObject) =>
         this.handleConversationNotification(entityObject as EntityObject, eventSource, type),
       )
-      .catch((error: BaseError) => {
+      .catch((error: unknown) => {
         const ignoredErrorTypes: string[] = [
           ConversationError.TYPE.MESSAGE_NOT_FOUND,
           ConversationError.TYPE.CONVERSATION_NOT_FOUND,
         ];
 
-        if (!ignoredErrorTypes.includes(error.type)) {
+        if (!isErrorWithType(error) || !ignoredErrorTypes.includes(error.type)) {
           throw error;
         }
       });

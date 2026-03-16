@@ -88,7 +88,7 @@ export const AudioAsset = ({
     if (audioSrc && audioElement) {
       const playPromise = audioElement.play();
 
-      playPromise?.catch(error => {
+      playPromise?.catch((error: unknown) => {
         logger.error('Failed to load audio asset ', error);
       });
     }

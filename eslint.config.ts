@@ -163,6 +163,7 @@ const config: Linter.Config[] = [
           varsIgnorePattern: '^(_?err(or)?|error)$',
         },
       ],
+      '@typescript-eslint/use-unknown-in-catch-callback-variable': 'error',
       '@typescript-eslint/typedef': 'off',
       'no-dupe-class-members': 'off',
       'no-unsanitized/property': 'off',

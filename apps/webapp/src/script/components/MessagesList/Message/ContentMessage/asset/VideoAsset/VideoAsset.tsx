@@ -176,7 +176,7 @@ const VideoAsset = ({
     if (videoSrc && videoElement) {
       const playPromise = videoElement.play();
 
-      playPromise?.catch(error => {
+      playPromise?.catch((error: unknown) => {
         console.error('Failed to load video asset ', error);
       });
     }

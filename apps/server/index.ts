@@ -41,7 +41,11 @@ server
       require('opn')(serverConfig.APP_BASE);
     }
   })
-  .catch(error => console.error(`[${formatDate()}] ${error.stack}`));
+  .catch((error: unknown) => {
+    const errorOutput = error instanceof Error ? error.stack : String(error);
+
+    console.error(`[${formatDate()}] ${errorOutput}`);
+  });
 
 process.on('uncaughtException', error =>
   console.error(`[${formatDate()}] Uncaught exception: ${error.message}`, error),
