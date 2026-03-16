@@ -153,6 +153,7 @@ export class ConversationPage {
   }
 
   async sendTypedMessage(message: string) {
+    await this.messageInput.clear();
     await this.typeMessage(message);
     await this.sendMessageButton.click();
   }
