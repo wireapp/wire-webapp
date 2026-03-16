@@ -81,7 +81,7 @@ export class AudioRepository {
       return;
     }
     Object.values(this.audioElements).forEach(element => {
-      element.setSinkId?.(currentOutputDevice).catch(error => {
+      element.setSinkId?.(currentOutputDevice).catch((error: unknown) => {
         this.logger.warn(error);
       });
     });

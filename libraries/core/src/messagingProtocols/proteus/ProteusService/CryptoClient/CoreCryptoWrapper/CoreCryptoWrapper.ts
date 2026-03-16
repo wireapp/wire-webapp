@@ -168,7 +168,7 @@ export async function buildClient(
         return new CoreCryptoWrapper(coreCryptoInstance, {nbPrekeys, onNewPrekeys, onWipe: key.deleteKey});
       })
       // if the coreCrypto initialization fails, can not use the crypto client and throw an error
-      .catch(async error => {
+      .catch(async (error: unknown) => {
         logger.error('error', 'CoreCrypto initialization failed', {error});
         // If the initialization fails, we wipe the coreCrypto DB to start fresh
         await wipeCoreCryptoDb(storeEngine);

@@ -161,7 +161,7 @@ export class BackupRepository {
   private async createEncryptedBackup(files: Record<string, Uint8Array>, user: User, password: string): Promise<Blob> {
     // encode header
     const backupCoder = new BackUpHeader(user.id, password);
-    const backupHeader = await this.generateBackupHeader(user, password, backupCoder).catch(error => {
+    const backupHeader = await this.generateBackupHeader(user, password, backupCoder).catch((error: unknown) => {
       throw new Error('Backup error:', error);
     });
 

@@ -186,10 +186,10 @@ const LoginComponent = ({
     if (keyAndCodeExistent) {
       setConversationCode(queryConversationCode);
       setConversationKey(queryConversationKey);
-      doCheckConversationCode(queryConversationKey, queryConversationCode).catch(error => {
+      doCheckConversationCode(queryConversationKey, queryConversationCode).catch((error: unknown) => {
         logger.warn('Invalid conversation code', error);
       });
-      doGetConversationInfoByCode(queryConversationKey, queryConversationCode).catch(error => {
+      doGetConversationInfoByCode(queryConversationKey, queryConversationCode).catch((error: unknown) => {
         logger.warn('Failed to fetch conversation info', error);
       });
     }

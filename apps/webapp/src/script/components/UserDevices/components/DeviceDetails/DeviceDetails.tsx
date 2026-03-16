@@ -20,7 +20,6 @@
 import {useEffect, useMemo, useState} from 'react';
 
 import cx from 'classnames';
-import type {DexieError} from 'dexie';
 import {container} from 'tsyringe';
 
 import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
@@ -37,6 +36,7 @@ import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 import type {Logger} from 'Util/Logger';
 import {splitFingerprint} from 'Util/StringUtil';
+import {toError} from 'Util/TypePredicateUtil';
 
 import {Config} from '../../../../Config';
 import {MotionDuration} from '../../../../motion/MotionDuration';
@@ -88,7 +88,7 @@ export const DeviceDetails = ({
     const toggleVerified = !isVerified;
     clientRepository
       .verifyClient(user.qualifiedId, device, toggleVerified)
-      .catch((error: DexieError) => logger.warn(`Failed to toggle client verification: ${error.message}`));
+      .catch((error: unknown) => logger.warn(`Failed to toggle client verification: ${toError(error).message}`));
   };
 
   const clickToResetSession = () => {

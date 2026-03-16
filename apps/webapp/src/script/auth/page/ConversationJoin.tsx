@@ -112,7 +112,7 @@ const ConversationJoinComponent = ({
         }
         await doGetAllClients();
       })
-      .catch(error => {
+      .catch((error: unknown) => {
         if (isBackendError(error) && error.label === BackendErrorLabel.INVALID_CREDENTIALS) {
           return;
         }

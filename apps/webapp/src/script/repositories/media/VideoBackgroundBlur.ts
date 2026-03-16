@@ -104,7 +104,7 @@ export async function applyBlur(stream: MediaStream): Promise<{stream: MediaStre
     // Ensure metadata is loaded to get video dimensions
     videoDimensions.width = videoEl.videoWidth || 1240;
     videoDimensions.height = videoEl.videoHeight || 720;
-    videoEl.play().catch(error => console.error('Error playing the video: ', error));
+    videoEl.play().catch((error: unknown) => console.error('Error playing the video: ', error));
   };
 
   return new Promise(resolve => {

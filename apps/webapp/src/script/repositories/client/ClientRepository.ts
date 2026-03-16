@@ -129,7 +129,7 @@ export class ClientRepository {
    * @returns Resolves with the retrieved client information
    */
   private getClientByIdFromBackend(clientId: string): Promise<RegisteredClient> {
-    return this.clientService.getClientById(clientId).catch(error => {
+    return this.clientService.getClientById(clientId).catch((error: unknown) => {
       const status = isAxiosError(error) ? error.response?.status : undefined;
       const clientNotFoundBackend = status === HTTP_STATUS.NOT_FOUND;
       if (clientNotFoundBackend) {
