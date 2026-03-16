@@ -158,8 +158,7 @@ export class ConversationPage {
   }
 
   async sendCodeBlockMessage(code: string) {
-    await this.messageInput.click();
-    await this.messageInput.pressSequentially('```', {delay: 100});
+    await this.typeMessage('```');
     await this.messageInput.press('Enter');
 
     const lines = code.split('\n');
