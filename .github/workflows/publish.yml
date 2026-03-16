@@ -24,7 +24,6 @@ jobs:
       release_name: ${{ steps.push_docker_image.outputs.release_name }}
       chart_version: ${{ steps.bump_chart_version.outputs.chart_version }}
       changelog: ${{ steps.generate_changelog.outputs.changelog }}
-      unit_tests_report: ${{ env.UNIT_TEST_REPORT_FILE }}
       build_artifact: ${{ env.BUILD_ARTIFACT }}
 
     env:
@@ -33,7 +32,6 @@ jobs:
       COMMIT_URL: ${{github.event.head_commit.url}}
       COMMITTER: ${{github.event.head_commit.committer.name}}
       CHANGELOG_FILE: './changelog.md'
-      UNIT_TEST_REPORT_FILE: './unit-tests.log'
 
     steps:
       - name: Checkout
@@ -70,27 +68,6 @@ jobs:
 
       - name: Update configuration
         run: yarn nx run webapp:configure
-
-      - name: Test
-        run: |
-          set -o pipefail
-          yarn nx run-many -t test --all -- --detectOpenHandles=false 2>&1 | tee ${{ env.UNIT_TEST_REPORT_FILE }}
-          echo -e "COMMIT SHA = ${{ github.sha }}" >> ${{env.UNIT_TEST_REPORT_FILE}}
-          echo -e "TEST RUN DATE = $(date -u +'%Y-%m-%dT%H:%M:%SZ')" >> ${{env.UNIT_TEST_REPORT_FILE}}
-
-      - uses: actions/upload-artifact@v7
-        with:
-          name: 'unit-tests-report'
-          path: ${{env.UNIT_TEST_REPORT_FILE}}
-
-      - name: Upload unit-tests.log to S3
-        env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          AWS_DEFAULT_REGION: eu-west-1
-        run: |
-          TIMESTAMP=$(date -u +'%Y%m%dT%H%M%SZ')
-          aws s3 cp ${{env.UNIT_TEST_REPORT_FILE}} s3://wire-webapp/unit-tests-${TIMESTAMP}-${{ github.sha }}.log
 
       - name: Build and package
         run: yarn nx run server:package
@@ -351,10 +328,6 @@ jobs:
         with:
           name: 'changelog'
 
-      - uses: actions/download-artifact@v8
-        with:
-          name: 'unit-tests-report'
-
       - name: Create GitHub release
         id: 'release'
         uses: softprops/action-gh-release@a06a81a03ee405af7f2048a818ed3f03bbf83c7b
@@ -363,7 +336,6 @@ jobs:
         with:
           tag_name: ${{needs.build.outputs.release_name}}
           body_path: ${{ needs.build.outputs.changelog }}
-          files: ${{ needs.build.outputs.unit_tests_report }}
           draft: true
           prerelease: ${{contains(needs.build.outputs.release_name, 'staging')}}
 
