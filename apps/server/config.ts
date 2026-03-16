@@ -38,9 +38,9 @@ const isMonorepo =
   !require('fs').existsSync(path.join(deploymentRootPath, '.env.defaults'));
 const rootPath = isMonorepo ? monorepoRootPath : deploymentRootPath;
 
-console.log('[Config] Loading environment from:', rootPath);
-console.log('[Config] __dirname:', __dirname);
-console.log('[Config] Is monorepo:', isMonorepo);
+console.info('[Config] Loading environment from:', rootPath);
+console.info('[Config] __dirname:', __dirname);
+console.info('[Config] Is monorepo:', isMonorepo);
 
 const dotenvConfig = {
   path: path.join(rootPath, '.env'),
@@ -49,11 +49,11 @@ const dotenvConfig = {
   silent: false, // Don't fail silently
 };
 
-console.log('[Config] dotenv config:', JSON.stringify(dotenvConfig, null, 2));
+console.info('[Config] dotenv config:', JSON.stringify(dotenvConfig, null, 2));
 
 const env = dotenv.load(dotenvConfig) as Env;
 
-console.log('[Config] Environment loaded. APP_BASE:', env.APP_BASE ? 'SET' : 'NOT SET');
+console.info('[Config] Environment loaded. APP_BASE:', env.APP_BASE ? 'SET' : 'NOT SET');
 
 function generateUrls() {
   const federation = env.FEDERATION;

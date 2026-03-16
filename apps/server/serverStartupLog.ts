@@ -36,10 +36,7 @@ export function formatServerStartupMessage(serverConfiguration: ServerConfig, po
   ].join(' ');
 }
 
-export function logServerStartup(
-  options: LogServerStartupOptions,
-  dependencies: LogServerStartupDependencies,
-): void {
+export function logServerStartup(options: LogServerStartupOptions, dependencies: LogServerStartupDependencies): void {
   const {port, serverConfiguration} = options;
   const startupMessage = formatServerStartupMessage(serverConfiguration, port);
 
