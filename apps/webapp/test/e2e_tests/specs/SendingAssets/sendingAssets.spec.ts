@@ -21,7 +21,12 @@ import {User} from 'test/e2e_tests/data/user';
 import {PageManager} from 'test/e2e_tests/pageManager';
 
 import {test, expect, withConnectedUser, withLogin} from 'test/e2e_tests/test.fixtures';
-import {getAudioFilePath, getTextFilePath, shareAssetHelper, TextFileName} from 'test/e2e_tests/utils/asset.util';
+import {
+  getAudioFilePath,
+  getTextFilePath,
+  shareAssetHelper,
+  TextFileName,
+} from 'test/e2e_tests/utils/asset.util';
 import {Locator} from 'playwright/test';
 import {getImageFilePath, ImageQRCodeFileName} from 'test/e2e_tests/utils/sendImage.util';
 import {Buffer} from 'node:buffer';
@@ -317,6 +322,29 @@ test.describe('Sending Assets', () => {
       await fileMessage.getByRole('button', {name: 'Download'}).click();
 
       await expect(fileMessage).toContainText('Download failed (hash does not match)', {ignoreCase: true});
+    },
+  );
+
+  test(
+    'I should not be able to download sent files when they are obfuscated',
+    {tag: ['@TC-3728', '@regression']},
+    async ({createPage}, testInfo) => {
+      const userAPage = await createPage(withLogin(userA), withConnectedUser(userB));
+      const {pages} = PageManager.from(userAPage).webapp;
+
+      await pages.conversationList().openConversation(userB.fullName);
+      await pages.conversation().enableSelfDeletingMessages();
+
+      await shareAssetHelper(getImageFilePath(), userAPage, userAPage.getByRole('button', {name: 'Add picture'}));
+      const message = pages.conversation().getMessage({sender: userA});
+      // Confirm the message contains an image
+      await expect(message.getByTestId('image-asset-img')).toBeAttached();
+
+      await userAPage.waitForTimeout(11_000);
+      await expect(message.getByTestId('image-asset-img')).not.toBeAttached();
+      // User A cannot see message option Download
+      const messageOptions = await pages.conversation().openMessageOptions(message);
+      await expect(messageOptions).not.toContainText('Download');
     },
   );
 });
