@@ -45,17 +45,21 @@ const SetEmailComponent = ({
   doSetEmail,
   isFetching,
 }: Props & ConnectedProps & DispatchProps) => {
-  const emailInput = useRef<HTMLInputElement>();
-  const [error, setError] = useState<Error>();
+  const emailInput = useRef<HTMLInputElement>(null);
+  const [error, setError] = useState<Error | null>(null);
   const [isValidEmail, setIsValidEmail] = useState(true);
   const [email, setEmail] = useState('');
   const navigate = useNavigate();
 
   const onSetEmail = async (event: React.FormEvent): Promise<void> => {
     event.preventDefault();
-    let validationError: Error;
+    let validationError: ValidationError | null = null;
 
     const currentInputNode = emailInput.current;
+    if (currentInputNode === null) {
+      return;
+    }
+
     currentInputNode.value = currentInputNode.value.trim();
     currentInputNode.focus();
     if (!currentInputNode.checkValidity()) {
@@ -90,7 +94,10 @@ const SetEmailComponent = ({
             placeholder={t('setEmail.emailPlaceholder')}
             type="email"
             onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-              emailInput.current.setCustomValidity('');
+              if (emailInput.current !== null) {
+                emailInput.current.setCustomValidity('');
+              }
+
               setEmail(event.target.value);
               setError(null);
               setIsValidEmail(true);
