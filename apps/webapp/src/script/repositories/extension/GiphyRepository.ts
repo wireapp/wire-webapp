@@ -152,7 +152,7 @@ export class GiphyRepository {
       }
 
       return result;
-    } catch (error) {
+    } catch (error: unknown) {
       this.logger.warn(`Unable to fetch GIF for query: ${query}`, error);
       throw error;
     }

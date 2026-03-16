@@ -185,7 +185,7 @@ export class MlsRecoveryOrchestratorImpl implements MlsRecoveryOrchestrator {
     try {
       this.logger.info('Executing MLS operation with recovery orchestration', {context});
       return await callBack();
-    } catch (rawError) {
+    } catch (rawError: unknown) {
       this.logger.info('Operation failed, invoking MLS recovery orchestrator', {rawError});
       const normalizedError = this.mapper.map(rawError, {
         qualifiedConversationId: context.qualifiedConversationId,
@@ -309,7 +309,7 @@ export class MlsRecoveryOrchestratorImpl implements MlsRecoveryOrchestrator {
     this.inProgressRecoveries.add(key);
     try {
       await task();
-    } catch (error) {
+    } catch (error: unknown) {
       this.logger.warn(`Recovery failed for key ${key}`, {error});
       throw error;
     } finally {

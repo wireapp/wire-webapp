@@ -27,6 +27,7 @@ import {ValidationUtil} from '@wireapp/commons';
 import {Button, ContainerXS, Form, H1, Input, Small} from '@wireapp/react-ui-kit';
 
 import {t} from 'Util/LocalizerUtil';
+import {toError} from 'Util/TypePredicateUtil';
 
 import {Page} from './Page';
 
@@ -47,7 +48,7 @@ const SetPasswordComponent = ({
   isFetching,
 }: Props & ConnectedProps & DispatchProps) => {
   const passwordInput = useRef<HTMLInputElement>();
-  const [error, setError] = useState();
+  const [error, setError] = useState<Error>();
   const [isValidPassword, setIsValidPassword] = useState(true);
   const [password, setPassword] = useState('');
   const navigate = useNavigate();
@@ -68,8 +69,8 @@ const SetPasswordComponent = ({
       }
       await doSetPassword({new_password: password});
       navigate(ROUTE.SET_HANDLE);
-    } catch (error) {
-      setError(error);
+    } catch (error: unknown) {
+      setError(toError(error));
     }
   };
 

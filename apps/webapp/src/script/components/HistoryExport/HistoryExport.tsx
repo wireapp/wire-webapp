@@ -220,7 +220,7 @@ const HistoryExport = ({switchContent, user, clientState = container.resolve(Cli
       } else {
         throw new Error('No local client found');
       }
-    } catch (error) {
+    } catch (error: unknown) {
       onError(error as Error);
     }
   };

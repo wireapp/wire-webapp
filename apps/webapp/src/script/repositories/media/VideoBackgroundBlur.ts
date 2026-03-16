@@ -63,7 +63,7 @@ function startBlurProcess(
       segmenter.segmentForVideo(videoEl, startTimeMs, result =>
         blurBackground(result, videoEl, webGlContext, videoDimensions),
       );
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Failed to segment video', error);
     }
   }

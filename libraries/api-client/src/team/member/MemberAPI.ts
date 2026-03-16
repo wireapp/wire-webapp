@@ -165,7 +165,7 @@ export class MemberAPI {
           buffer: response.data,
           mimeType: response.headers['content-type'],
         };
-      } catch (error) {
+      } catch (error: unknown) {
         if ((error as BackendError).message === SyntheticErrorLabel.REQUEST_CANCELLED) {
           throw new RequestCancellationError('Member CSV download got cancelled.');
         }

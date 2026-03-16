@@ -52,7 +52,7 @@ export const useSendFiles = ({files, clearAllFiles, cellsRepository, conversatio
       await Promise.all(files.map(sendFile));
       files.map(file => file.preview && URL.revokeObjectURL(file.preview));
       setStatus('success');
-    } catch (error) {
+    } catch (error: unknown) {
       errorNotification.show();
       setStatus('error');
       throw error;

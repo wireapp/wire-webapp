@@ -420,7 +420,7 @@ describe('ProteusService', () => {
 
         try {
           await proteusService.sendMessage(params);
-        } catch (error) {
+        } catch (error: unknown) {
           errorMessage = (error as {message: string}).message;
         } finally {
           expect(errorMessage).toContain('no userIds are given');

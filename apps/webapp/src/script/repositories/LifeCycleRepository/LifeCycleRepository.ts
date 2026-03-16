@@ -159,7 +159,7 @@ export class LifeCycleRepository {
       this.logger.info(`Logout triggered by '${signOutReason}': Disconnecting user from the backend.`);
       try {
         await performLogout();
-      } catch (error) {
+      } catch (error: unknown) {
         this.logger.error(
           `Logout triggered by '${signOutReason}' and errored: ${error instanceof Error ? error.message : error}.`,
         );
@@ -174,7 +174,7 @@ export class LifeCycleRepository {
     if (requiresImmediateLogout) {
       try {
         return await performLogout();
-      } catch (error) {
+      } catch (error: unknown) {
         if (error instanceof BaseError) {
           this.logger.error(`Logout triggered by '${signOutReason}' and errored: ${error.message}.`);
         }
@@ -206,7 +206,7 @@ export class LifeCycleRepository {
       try {
         await this.dependencies.conversationRepository.sendTypingStop(activeConversation);
         this.logger.debug('Sent typing stop notification for active conversation during logout.');
-      } catch (error) {
+      } catch (error: unknown) {
         this.logger.warn('Failed to send typing stop before logout.', error);
       }
     }
@@ -271,7 +271,7 @@ export class LifeCycleRepository {
 
     try {
       return this.dependencies.clientRepository.isCurrentClientPermanent();
-    } catch (error) {
+    } catch (error: unknown) {
       // Handle case where client is not set
       const isClientNotSetError = error instanceof ClientError && error.type === ClientError.TYPE.CLIENT_NOT_SET;
       if (isClientNotSetError) {
@@ -355,7 +355,7 @@ export class LifeCycleRepository {
     try {
       await this.dependencies.storageRepository.deleteDatabase();
       this.logger.info('Database deleted successfully as part of persistent storage cleanup.');
-    } catch (error) {
+    } catch (error: unknown) {
       this.logger.error('Failed to delete database before logout', error);
     }
   };

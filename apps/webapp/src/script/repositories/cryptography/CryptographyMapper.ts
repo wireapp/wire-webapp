@@ -62,6 +62,7 @@ import {MessageAddEvent} from 'Repositories/conversation/EventBuilder';
 import {ClientEvent, CONVERSATION} from 'Repositories/event/Client';
 import {getLogger, Logger} from 'Util/Logger';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
+import {toError} from 'Util/TypePredicateUtil';
 import {base64ToArray, arrayToBase64} from 'Util/util';
 
 import {PROTO_MESSAGE_TYPE} from './ProtoMessageType';
@@ -546,8 +547,8 @@ export class CryptographyMapper {
         sha256,
       });
       return GenericMessage.decode(new Uint8Array(externalMessageBuffer));
-    } catch (error) {
-      this.logger.error(`Failed to unwrap external message: ${error.message}`, error);
+    } catch (error: unknown) {
+      this.logger.error(`Failed to unwrap external message: ${toError(error).message}`, error);
       throw new CryptographyError(CryptographyError.TYPE.BROKEN_EXTERNAL, CryptographyError.MESSAGE.BROKEN_EXTERNAL);
     }
   }

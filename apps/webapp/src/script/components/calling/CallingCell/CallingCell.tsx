@@ -250,7 +250,7 @@ export const CallingCell = ({
         await callActions.answer(call);
         isAnsweringRef.current = false;
         setCurrentView(ViewType.MOBILE_LEFT_SIDEBAR);
-      } catch (error) {
+      } catch (error: unknown) {
         // Re-enable on error
         isAnsweringRef.current = false;
       }

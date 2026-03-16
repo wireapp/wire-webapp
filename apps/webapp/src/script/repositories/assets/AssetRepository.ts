@@ -108,7 +108,7 @@ export class AssetRepository {
       const {buffer, mimeType} = await response;
 
       return new Blob([new Uint8Array(buffer)], {type: mimeType});
-    } catch (error) {
+    } catch (error: unknown) {
       if (error instanceof Error) {
         const isAssetNotFound = error.message.endsWith(HTTP_STATUS.NOT_FOUND.toString());
         const isServerError = error.message.endsWith(HTTP_STATUS.INTERNAL_SERVER_ERROR.toString());
@@ -144,7 +144,7 @@ export class AssetRepository {
         throw new Error('No blob received.');
       }
       return downloadBlob(blob, fileName);
-    } catch (error) {
+    } catch (error: unknown) {
       return this.logger.error('Failed to download blob', error);
     }
   }
@@ -158,7 +158,7 @@ export class AssetRepository {
       }
       asset.status(AssetTransferState.UPLOADED);
       return downloadBlob(blob, asset.file_name ?? 'file');
-    } catch (error) {
+    } catch (error: unknown) {
       if (error instanceof Error) {
         if (error.name === AssetError.CANCEL_ERROR) {
           asset.status(AssetTransferState.CANCELED);

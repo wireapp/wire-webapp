@@ -219,7 +219,7 @@ const LoginComponent = ({
         return navigate(`${ROUTE.AUTHORIZE}/${queryString}`);
       }
       return navigate(ROUTE.HISTORY_INFO);
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Unable to login immediately', error);
       setShowEntropyForm(false);
     }
@@ -252,7 +252,7 @@ const LoginComponent = ({
       if (hasKeyAndCode) {
         try {
           await doLoginAndJoin(login, conversationKey, conversationCode, undefined, getEntropy, conversationPassword);
-        } catch (error) {
+        } catch (error: unknown) {
           if (isBackendError(error) && error.label === BackendErrorLabel.INVALID_CONVERSATION_PASSWORD) {
             await resetAuthError();
             setConversationSubmitData(formLoginData);
@@ -277,7 +277,7 @@ const LoginComponent = ({
       }
 
       return navigate(ROUTE.HISTORY_INFO);
-    } catch (error) {
+    } catch (error: unknown) {
       if (isBackendError(error)) {
         switch (error.label) {
           case BackendErrorLabel.INVALID_CONVERSATION_PASSWORD: {
@@ -342,7 +342,7 @@ const LoginComponent = ({
       if (email) {
         await doSendTwoFactorCode(email);
       }
-    } catch (error) {
+    } catch (error: unknown) {
       setTwoFactorSubmitError(
         new BackendError('', SyntheticErrorLabel.TOO_MANY_REQUESTS, StatusCodes.TOO_MANY_REQUESTS),
       );

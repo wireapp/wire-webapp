@@ -276,7 +276,7 @@ export const PastePlugin = ({getMentionCandidates, isPreviewMode}: PastePluginPr
           processMentions(selection, mentions, availableUsers);
 
           return true;
-        } catch (error) {
+        } catch (error: unknown) {
           console.error('Error handling paste:', error);
           $getSelection()?.insertText(plainText);
           return false;

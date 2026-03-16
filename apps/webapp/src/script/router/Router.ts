@@ -71,7 +71,7 @@ const parseRoute = () => {
 
       const paramValues = paramNames.map(name => params[name]);
       return handler(...paramValues);
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Error matching pattern:', pattern, error);
       continue;
     }

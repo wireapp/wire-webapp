@@ -235,7 +235,7 @@ export class MLSService extends TypedEventEmitter<Events> {
           }
           break;
       }
-    } catch (error) {
+    } catch (error: unknown) {
       this.logger.error(`Error while initializing client ${client.id}`, error);
       throw error;
     }
@@ -276,7 +276,7 @@ export class MLSService extends TypedEventEmitter<Events> {
       this.emit(MLSServiceEvents.MLS_EVENT_DISTRIBUTED, {events, time});
 
       return 'success';
-    } catch (error) {
+    } catch (error: unknown) {
       this.logger.warn(`Failed to upload commit bundle`, error);
 
       if (error instanceof MLSInvalidLeafNodeSignatureError || error instanceof MLSInvalidLeafNodeIndexError) {
@@ -416,7 +416,7 @@ export class MLSService extends TypedEventEmitter<Events> {
           }
 
           return keys;
-        } catch (error) {
+        } catch (error: unknown) {
           failedToFetchKeyPackages.push({id, domain});
           // Throw the error so we don't get {status: 'fulfilled', value: undefined}
           throw error;
@@ -495,7 +495,7 @@ export class MLSService extends TypedEventEmitter<Events> {
         this.emit(MLSServiceEvents.NEW_EPOCH, {groupId: groupIdStr, epoch: newEpoch});
         this.logger.info(`Joined MLS group with id ${groupIdStr} via external commit, new epoch: ${newEpoch}`);
       }
-    } catch (error) {
+    } catch (error: unknown) {
       this.logger.warn('Failed to join MLS group via external commit', error);
       throw error;
     }
@@ -534,7 +534,7 @@ export class MLSService extends TypedEventEmitter<Events> {
       this.dispatchNewCrlDistributionPoints(decryptedMessage.crlNewDistributionPoints);
       this.logger.info('Message decrypted successfully', {conversationId, duration: Date.now() - start});
       return decryptedMessage;
-    } catch (error) {
+    } catch (error: unknown) {
       this.logger.warn('Failed to decrypt MLS message', {conversationId, error});
       // According to CoreCrypto JS doc on .decryptMessage method, we should ignore some errors (corecrypto handle them internally)
       if (shouldMLSDecryptionErrorBeIgnored(error)) {
@@ -555,7 +555,7 @@ export class MLSService extends TypedEventEmitter<Events> {
     try {
       const groupIdBytes = Decoder.fromBase64(groupId).asBytes;
       await context.updateKeyingMaterial(new ConversationId(groupIdBytes));
-    } catch (error) {
+    } catch (error: unknown) {
       if (!retry) {
         this.logger.error(`Failed to update keying material for group retrying did not fix the issue`, {
           error,
@@ -570,7 +570,7 @@ export class MLSService extends TypedEventEmitter<Events> {
       setTimeout(async () => {
         try {
           await this.updateKeyingMaterial(groupId, context, false);
-        } catch (error) {
+        } catch (error: unknown) {
           this.logger.error(`Failed to update keying material for group on retry`, {
             error,
             groupId,
@@ -727,7 +727,7 @@ export class MLSService extends TypedEventEmitter<Events> {
       await this.scheduleKeyMaterialRenewal(groupId);
 
       return [...otherUserKeysClaimingFailures, ...selfKeysClaimingFailures];
-    } catch (error) {
+    } catch (error: unknown) {
       await this.wipeConversation(groupId);
       throw error;
     }
@@ -753,7 +753,7 @@ export class MLSService extends TypedEventEmitter<Events> {
     try {
       await this.registerConversation(groupId, []);
       return true;
-    } catch (error) {
+    } catch (error: unknown) {
       this.logger.warn("Couldn't establish the MLS group", error);
       // If conversation already existed, locally, nothing more to do, we've received a welcome message.
       if (isCoreCryptoMLSConversationAlreadyExistsError(error)) {
@@ -834,7 +834,7 @@ export class MLSService extends TypedEventEmitter<Events> {
 
         await this.updateKeyingMaterial(groupId, coreCryptoContext);
       });
-    } catch (error) {
+    } catch (error: unknown) {
       this.logger.error(`Error while renewing key material for groupId ${groupId}`, error);
     }
   }
@@ -881,7 +881,7 @@ export class MLSService extends TypedEventEmitter<Events> {
   public schedulePeriodicKeyMaterialRenewals(groupIds: string[]) {
     try {
       groupIds.forEach(groupId => this.scheduleKeyMaterialRenewal(groupId));
-    } catch (error) {
+    } catch (error: unknown) {
       this.logger.error('Could not get last key material update dates', error);
     }
   }
@@ -959,7 +959,7 @@ export class MLSService extends TypedEventEmitter<Events> {
           [getSignatureAlgorithmForCiphersuite(this.config.defaultCiphersuite)]: clientSignature,
         },
       });
-    } catch (error) {
+    } catch (error: unknown) {
       this.logger.error(`Failed to upload public keys for client ${client.id}`, error);
       throw error;
     }
@@ -1044,7 +1044,7 @@ export class MLSService extends TypedEventEmitter<Events> {
     try {
       await this.coreCryptoClient.transaction(cx => cx.commitPendingProposals(new ConversationId(groupIdBytes)));
       await this.cancelPendingProposalsTask(groupId);
-    } catch (error) {
+    } catch (error: unknown) {
       if (!shouldRetry) {
         throw error;
       }
@@ -1084,7 +1084,7 @@ export class MLSService extends TypedEventEmitter<Events> {
           }),
         );
       }
-    } catch (error) {
+    } catch (error: unknown) {
       this.logger.error('Could not get pending proposals', error);
     }
   }

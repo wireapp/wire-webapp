@@ -64,6 +64,7 @@ import type {EventRecord, LegacyEventRecord} from 'Repositories/storage';
 import {t} from 'Util/LocalizerUtil';
 import {getLogger, Logger} from 'Util/Logger';
 import {userReactionMapToReactionMap} from 'Util/ReactionUtil';
+import {isErrorWithType, toError} from 'Util/TypePredicateUtil';
 import {base64ToArray} from 'Util/util';
 
 import {
@@ -116,8 +117,8 @@ export class EventMapper {
     const mappedEvents = reversedEvents.map((event): Message | void => {
       try {
         return this._mapJsonEvent(event, conversationEntity);
-      } catch (error) {
-        const errorMessage = `Failure while mapping events. Affected '${event.type}' event: ${error.message}`;
+      } catch (error: unknown) {
+        const errorMessage = `Failure while mapping events. Affected '${event.type}' event: ${toError(error).message}`;
         this.logger.error(errorMessage, error);
       }
     });
@@ -134,12 +135,12 @@ export class EventMapper {
   mapJsonEvent(event: ConversationEvent | ClientConversationEvent, conversationEntity: Conversation) {
     try {
       return this._mapJsonEvent(event, conversationEntity);
-    } catch (error) {
-      const isMessageNotFound = error.type === ConversationError.TYPE.MESSAGE_NOT_FOUND;
+    } catch (error: unknown) {
+      const isMessageNotFound = isErrorWithType(error) && error.type === ConversationError.TYPE.MESSAGE_NOT_FOUND;
       if (isMessageNotFound) {
         throw error;
       }
-      const errorMessage = `Failure while mapping events. Affected '${event.type}' event: ${error.message}`;
+      const errorMessage = `Failure while mapping events. Affected '${event.type}' event: ${toError(error).message}`;
       this.logger.error(errorMessage, error);
 
       throw new ConversationError(
@@ -1093,8 +1094,8 @@ export class EventMapper {
         if (mentionEntity) {
           try {
             return mentionEntity.validate(messageText, allMentions);
-          } catch (error) {
-            this.logger.warn(`Removed invalid mention when mapping message: ${error.message}`);
+          } catch (error: unknown) {
+            this.logger.warn(`Removed invalid mention when mapping message: ${toError(error).message}`);
             return false;
           }
         }

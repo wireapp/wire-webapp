@@ -195,7 +195,7 @@ export class ActionsViewModel {
                   await this.selfRepository.deleteSelfUserClient(clientEntity.id, password);
                   removeCurrentModal();
                   resolve();
-                } catch (error) {
+                } catch (error: unknown) {
                   if (isBackendError(error)) {
                     const {updateErrorMessage} = usePrimaryModalState.getState();
                     if (
@@ -403,7 +403,7 @@ export class ActionsViewModel {
               try {
                 await this.conversationRepository.removeMembers(conversationEntity, [userEntity.qualifiedId]);
                 resolve();
-              } catch (error) {
+              } catch (error: unknown) {
                 reject(error);
               }
             },

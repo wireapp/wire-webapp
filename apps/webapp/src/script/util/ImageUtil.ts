@@ -26,7 +26,7 @@ export const stripImageExifData = async (image: Blob): Promise<Blob> => {
     const canvas = drawImageOnCanvas(img);
     const strippedBlob = await canvasToBlob(canvas, image.type);
     return strippedBlob;
-  } catch (error) {
+  } catch (error: unknown) {
     if (error instanceof Error) {
       throw new Error(`Failed to strip EXIF data: ${error.message}`);
     }
@@ -91,7 +91,7 @@ export const imageHasExifData = async (image: Blob): Promise<boolean> => {
     }
 
     return containsExifData(view);
-  } catch (error) {
+  } catch (error: unknown) {
     if (error instanceof Error) {
       throw new Error(`Failed to check for EXIF data: ${error.message}`);
     }

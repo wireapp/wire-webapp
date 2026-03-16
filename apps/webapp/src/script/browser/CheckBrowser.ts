@@ -85,7 +85,7 @@ const supportsIndexDB = (): Promise<boolean> =>
 
     try {
       dbOpenRequest = window.indexedDB.open('test');
-    } catch (error) {
+    } catch (error: unknown) {
       return resolve(false);
     }
 

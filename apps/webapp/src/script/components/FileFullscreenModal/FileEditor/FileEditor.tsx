@@ -58,7 +58,7 @@ export const FileEditor = ({id}: FileEditorProps) => {
       const fetchedNode = await cellsRepository.getNode({uuid: id, flags: ['WithEditorURLs']});
       setNode(fetchedNode);
       return true;
-    } catch (err) {
+    } catch (err: unknown) {
       setIsError(true);
       return false;
     } finally {

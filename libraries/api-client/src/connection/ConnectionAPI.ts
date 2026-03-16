@@ -124,7 +124,7 @@ export class ConnectionAPI {
     try {
       const response = await this.client.sendJSON<Connection>(config);
       return response.data;
-    } catch (error) {
+    } catch (error: unknown) {
       switch ((error as BackendError).label) {
         case BackendErrorLabel.LEGAL_HOLD_MISSING_CONSENT: {
           throw new ConnectionLegalholdMissingConsentError((error as BackendError).message);

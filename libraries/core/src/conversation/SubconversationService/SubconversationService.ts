@@ -113,7 +113,7 @@ export class SubconversationService extends TypedEventEmitter<Events> {
       const epoch = Number(await this.mlsService.getEpoch(subconversationGroupId));
 
       return {groupId: subconversationGroupId, epoch};
-    } catch (error) {
+    } catch (error: unknown) {
       this.logger.error('Failed to join conference subconversation', {conversationId, groupId, error, shouldRetry});
       if (shouldRetry) {
         return this.joinConferenceSubconversation(conversationId, groupId, false);
@@ -149,7 +149,7 @@ export class SubconversationService extends TypedEventEmitter<Events> {
 
     try {
       await this.apiClient.api.conversation.deleteSubconversationSelf(conversationId, SUBCONVERSATION_ID.CONFERENCE);
-    } catch (error) {
+    } catch (error: unknown) {
       this.logger.error('Failed to leave conference subconversation', {
         conversationId,
         subconversationId: SUBCONVERSATION_ID.CONFERENCE,
@@ -375,7 +375,7 @@ export class SubconversationService extends TypedEventEmitter<Events> {
     });
     try {
       await this.mlsService.removeClientsFromConversation(subconversationGroupId, [clientToRemoveQualifiedId]);
-    } catch (error) {
+    } catch (error: unknown) {
       this.logger.error('Failed to remove client from subconversation', {
         subconversationGroupId,
         clientToRemoveQualifiedId,
@@ -390,7 +390,7 @@ export class SubconversationService extends TypedEventEmitter<Events> {
       await this.mlsService.joinByExternalCommit(() =>
         this.apiClient.api.conversation.getSubconversationGroupInfo(conversationId, subconversation),
       );
-    } catch (error) {
+    } catch (error: unknown) {
       this.logger.error('Failed to join subconversation by external commit', {
         conversationId,
         subconversation,
@@ -404,7 +404,7 @@ export class SubconversationService extends TypedEventEmitter<Events> {
     this.logger.debug('Fetching conference subconversation metadata', {conversationId});
     try {
       return await this.apiClient.api.conversation.getSubconversation(conversationId, SUBCONVERSATION_ID.CONFERENCE);
-    } catch (error) {
+    } catch (error: unknown) {
       this.logger.error('Failed to fetch conference subconversation metadata', {conversationId, error});
       throw error;
     }
@@ -421,7 +421,7 @@ export class SubconversationService extends TypedEventEmitter<Events> {
         SUBCONVERSATION_ID.CONFERENCE,
         data,
       );
-    } catch (error) {
+    } catch (error: unknown) {
       this.logger.error('Failed to delete conference subconversation', {conversationId, data, error});
       throw error;
     }

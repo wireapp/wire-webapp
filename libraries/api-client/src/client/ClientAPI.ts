@@ -88,7 +88,7 @@ export class ClientAPI {
 
     try {
       await this.client.sendJSON(config);
-    } catch (error) {
+    } catch (error: unknown) {
       switch ((error as BackendError).label) {
         case BackendErrorLabel.CLIENT_CAPABILITY_REMOVED: {
           throw new ClientCapabilityRemovedError((error as BackendError).message);

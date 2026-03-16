@@ -69,7 +69,7 @@ export const isAssetDownloaded = async (filePath: string): Promise<boolean> => {
   try {
     const file = await readLocalFile(filePath);
     return !!file;
-  } catch (error) {
+  } catch (error: unknown) {
     return false;
   }
 };

@@ -180,7 +180,7 @@ export class ApiManagerE2E {
   private extractCookieFromRegisterResponse(registerResponse: AxiosResponse): string {
     try {
       return registerResponse.headers['set-cookie']!.find((cookieStr: string) => cookieStr.startsWith('zuid='))!;
-    } catch (error) {
+    } catch (error: unknown) {
       throw new Error(
         `Error extracting zuid cookie from register response: ${error instanceof Error ? error.message : error}`,
       );

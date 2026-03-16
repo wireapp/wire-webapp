@@ -38,6 +38,7 @@ import {SearchRepository} from 'Repositories/search/SearchRepository';
 import {TeamRepository} from 'Repositories/team/TeamRepository';
 import {handleEnterDown} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
+import {isErrorWithCode, toError} from 'Util/TypePredicateUtil';
 
 import {useLegalHoldModalState} from './LegalHoldModal.state';
 
@@ -156,8 +157,8 @@ const LegalHoldModal: FC<LegalHoldModalProps> = ({
       setUserDevices(undefined);
       setPasswordValue('');
       setRequestError('');
-    } catch ({code, message}) {
-      switch (code) {
+    } catch (error: unknown) {
+      switch (isErrorWithCode(error) ? error.code : undefined) {
         case HTTP_STATUS.BAD_REQUEST: {
           setRequestError(t('BackendError.LABEL.BAD_REQUEST'));
           break;
@@ -167,7 +168,7 @@ const LegalHoldModal: FC<LegalHoldModalProps> = ({
           break;
         }
         default: {
-          setRequestError(message as string);
+          setRequestError(toError(error).message);
         }
       }
 

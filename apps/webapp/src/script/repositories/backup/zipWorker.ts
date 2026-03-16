@@ -22,6 +22,8 @@ import sodium, {ready} from 'libsodium-wrappers-sumo';
 
 import {ImportError} from './Error';
 
+import {toError} from '../../util/TypePredicateUtil';
+
 type Payload =
   | {type: 'zip'; files: Record<string, ArrayBuffer | string>; encrytionKey?: Uint8Array}
   | {type: 'unzip'; bytes: ArrayBuffer; encrytionKey?: Uint8Array; headerLength?: number};
@@ -53,9 +55,9 @@ export async function handleZipEvent(payload: Payload) {
         const headerLength = payload.headerLength ? payload.headerLength : 0;
         try {
           decryptedBytes = await decryptFile(payloadBytes, encrytionKey, headerLength);
-        } catch (error) {
+        } catch (error: unknown) {
           // Handle decryption failure
-          throw new ImportError(error.message);
+          throw new ImportError(toError(error).message);
         }
       } else {
         decryptedBytes = payload.bytes;
@@ -124,7 +126,7 @@ self.addEventListener('message', async (event: MessageEvent<Payload>) => {
   try {
     const result = await handleZipEvent(event.data);
     self.postMessage(result);
-  } catch (error) {
-    self.postMessage({error: error.message});
+  } catch (error: unknown) {
+    self.postMessage({error: toError(error).message});
   }
 });

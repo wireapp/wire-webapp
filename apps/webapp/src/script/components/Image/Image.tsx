@@ -94,7 +94,7 @@ export const Image = ({
             return;
           }
           setImageUrl(url);
-        } catch (error) {
+        } catch (error: unknown) {
           console.error(error);
         }
       })();

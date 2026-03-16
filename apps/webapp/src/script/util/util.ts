@@ -48,7 +48,7 @@ export const checkIndexedDb = (): Promise<void> => {
         }
         return undefined;
       };
-    } catch (error) {
+    } catch (error: unknown) {
       return Promise.reject(new AuthError(AuthError.TYPE.PRIVATE_MODE, AuthError.MESSAGE.PRIVATE_MODE));
     }
 

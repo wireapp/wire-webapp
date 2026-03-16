@@ -116,7 +116,7 @@ export class BackupRepository {
       }
 
       return await this.compressHistoryFiles(user, clientId, exportedData, password);
-    } catch (error) {
+    } catch (error: unknown) {
       const errorMessage = error instanceof Error ? error.message : error;
       this.logger.error(`Could not export history: ${errorMessage}`, error);
       const isCancelError = isErrorOfType(error, ErrorType.CancelError);

@@ -92,7 +92,7 @@ export class S3Service implements CellsStorage {
 
     try {
       await upload.done();
-    } catch (caught) {
+    } catch (caught: unknown) {
       if (caught instanceof S3ServiceException && caught.name === 'EntityTooLarge') {
         throw new CellsStorageError(
           'The object was too large. To upload objects larger than 5GB, use the S3 console (160GB max) or the multipart upload API (5TB max).',

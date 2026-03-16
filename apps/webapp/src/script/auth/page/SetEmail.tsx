@@ -26,6 +26,7 @@ import {AnyAction, Dispatch} from 'redux';
 import {Button, ContainerXS, Form, H1, Input} from '@wireapp/react-ui-kit';
 
 import {t} from 'Util/LocalizerUtil';
+import {toError} from 'Util/TypePredicateUtil';
 
 import {Page} from './Page';
 
@@ -45,7 +46,7 @@ const SetEmailComponent = ({
   isFetching,
 }: Props & ConnectedProps & DispatchProps) => {
   const emailInput = useRef<HTMLInputElement>();
-  const [error, setError] = useState();
+  const [error, setError] = useState<Error>();
   const [isValidEmail, setIsValidEmail] = useState(true);
   const [email, setEmail] = useState('');
   const navigate = useNavigate();
@@ -67,8 +68,8 @@ const SetEmailComponent = ({
       }
       await doSetEmail(currentInputNode.value);
       navigate(ROUTE.VERIFY_EMAIL_LINK);
-    } catch (error) {
-      setError(error);
+    } catch (error: unknown) {
+      setError(toError(error));
     }
   };
 

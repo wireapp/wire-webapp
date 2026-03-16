@@ -45,7 +45,7 @@ export const E2EICertificateDetails = ({identity, isCurrentDevice}: E2EICertific
   const getCertificate = async () => {
     try {
       await E2EIHandler.getInstance().enroll({resetTimers: true});
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Cannot get E2EI instance: ', error);
     }
   };

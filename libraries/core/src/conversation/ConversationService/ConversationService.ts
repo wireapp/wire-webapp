@@ -623,7 +623,7 @@ export class ConversationService extends TypedEventEmitter<Events> {
           throw error;
         },
       });
-    } catch (e) {
+    } catch (e: unknown) {
       this.logger.error('Failed to react to key material update failure', {error: e, groupId});
     }
   };
@@ -777,7 +777,7 @@ export class ConversationService extends TypedEventEmitter<Events> {
 
       try {
         await this.subconversationService.joinConferenceSubconversation(parentConversationId, parentGroupId);
-      } catch (error) {
+      } catch (error: unknown) {
         const message = `There was an error while handling epoch mismatch in MLS subconversation (id: ${parentConversationId.id}, subconv: ${subconversationId}):`;
         this.logger.error(message, error);
       }
@@ -802,7 +802,7 @@ export class ConversationService extends TypedEventEmitter<Events> {
       try {
         await this.joinByExternalCommit(qualifiedId);
         onSuccessfulRejoin?.();
-      } catch (error) {
+      } catch (error: unknown) {
         const message = `There was an error while handling epoch mismatch in MLS conversation (id: ${qualifiedId.id}):`;
         this.logger.error(message, error);
       }
@@ -901,7 +901,7 @@ export class ConversationService extends TypedEventEmitter<Events> {
 
       const {conversation: updatedMLSConversation} = await this.getMLS1to1Conversation(otherUserId);
       return updatedMLSConversation;
-    } catch (error) {
+    } catch (error: unknown) {
       if (!shouldRetry) {
         this.logger.error(`Could not register MLS group with id ${groupId}: `, error);
 
@@ -964,7 +964,7 @@ export class ConversationService extends TypedEventEmitter<Events> {
       } else {
         this.logger.debug('No other users were added to the group.');
       }
-    } catch (error) {
+    } catch (error: unknown) {
       this.logger.error('Failed to establish MLS group', error);
       throw error;
     }
@@ -996,7 +996,7 @@ export class ConversationService extends TypedEventEmitter<Events> {
           return this.mlsService.handleMLSMessageAddEvent(event, this.groupIdFromConversationId);
         },
       });
-    } catch (error) {
+    } catch (error: unknown) {
       // For unmapped or unrecoverable errors, avoid surfacing exceptions from event handling
       // and instead log and return null so the event processing queue can continue safely.
       this.logger.error('Failed to handle MLS message-add event after recovery; returning null', {error, event});

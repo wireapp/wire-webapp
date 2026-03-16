@@ -115,7 +115,7 @@ export class EventTrackingRepository {
       if (stopOnFinish) {
         this.stopProductReporting();
       }
-    } catch (error) {
+    } catch (error: unknown) {
       this.telemetryLogger.warn(`Failed to send new telemetry tracking id to other devices ${error}`);
       storeValue(EventTrackingRepository.CONFIG.USER_ANALYTICS.COUNTLY_FAILED_TO_MIGRATE_DEVICE_ID, newId);
     }
@@ -136,7 +136,7 @@ export class EventTrackingRepository {
       try {
         await this.messageRepository.sendCountlySync(this.telemetryDeviceId);
         resetStoreValue(EventTrackingRepository.CONFIG.USER_ANALYTICS.COUNTLY_UNSYNCED_DEVICE_ID_LOCAL_STORAGE_KEY);
-      } catch (error) {
+      } catch (error: unknown) {
         this.telemetryLogger.warn(`Failed to send new telemetry tracking id to other devices ${error}`);
       }
     }
@@ -158,7 +158,7 @@ export class EventTrackingRepository {
             EventTrackingRepository.CONFIG.USER_ANALYTICS.COUNTLY_SYNCED_AT_LEAST_ONCE_LOCAL_STORAGE_KEY,
             true,
           );
-        } catch (error) {
+        } catch (error: unknown) {
           storeValue(
             EventTrackingRepository.CONFIG.USER_ANALYTICS.COUNTLY_SYNCED_AT_LEAST_ONCE_LOCAL_STORAGE_KEY,
             false,
@@ -173,7 +173,7 @@ export class EventTrackingRepository {
       );
       try {
         await this.messageRepository.sendCountlySync(this.telemetryDeviceId);
-      } catch (error) {
+      } catch (error: unknown) {
         this.telemetryLogger.warn(`Failed to send new telemetry tracking id to other devices ${error}`);
         storeValue(EventTrackingRepository.CONFIG.USER_ANALYTICS.COUNTLY_UNSYNCED_DEVICE_ID_LOCAL_STORAGE_KEY, true);
       }
