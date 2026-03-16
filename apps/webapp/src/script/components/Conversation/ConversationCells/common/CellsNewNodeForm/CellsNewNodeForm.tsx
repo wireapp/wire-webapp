@@ -19,12 +19,12 @@
 
 import {ChangeEvent, FormEvent} from 'react';
 
-import {ErrorMessage, Input, Label} from '@wireapp/react-ui-kit';
+import {ErrorMessage, Input, Label, Select} from '@wireapp/react-ui-kit';
 
 import {CellNode} from 'src/script/types/cellNode';
 import {t} from 'Util/LocalizerUtil';
 
-import {inputWrapperStyles} from './CellsNewNodeForm.styles';
+import {inputWrapperStyles, selectStyles, selectWrapperStyles} from './CellsNewNodeForm.styles';
 
 import {useInputAutoFocus} from '../useInputAutoFocus/useInputAutoFocus';
 
@@ -35,14 +35,47 @@ interface CellsNewNodeFormProps {
   onChange: (event: ChangeEvent<HTMLInputElement>) => void;
   error: string | null;
   isOpen: boolean;
+  fileTypeOptions?: Array<{value: string; label: string}>;
+  selectedFileType?: {value: string; label: string};
+  onFileTypeChange?: (option: {value: string; label: string}) => void;
 }
 
-export const CellsNewNodeForm = ({type, onSubmit, inputValue, onChange, error, isOpen}: CellsNewNodeFormProps) => {
+export const CellsNewNodeForm = ({
+  type,
+  onSubmit,
+  inputValue,
+  onChange,
+  error,
+  isOpen,
+  fileTypeOptions,
+  selectedFileType,
+  onFileTypeChange,
+}: CellsNewNodeFormProps) => {
   const {inputRef} = useInputAutoFocus({enabled: isOpen});
 
   return (
     <form onSubmit={onSubmit}>
       <div css={inputWrapperStyles}>
+        {type === 'file' && fileTypeOptions && selectedFileType && onFileTypeChange && (
+          <>
+            <Label htmlFor="cells-new-item-type">{t('cells.newItemMenuModal.typeLabel')}</Label>
+            <div css={selectWrapperStyles}>
+              <Select
+                id="cells-new-item-type"
+                dataUieName="cells-new-item-type"
+                options={fileTypeOptions}
+                value={selectedFileType}
+                selectContainerCSS={selectStyles}
+                selectControlCSS={selectStyles}
+                onChange={option => {
+                  if (option) {
+                    onFileTypeChange(option as {value: string; label: string});
+                  }
+                }}
+              />
+            </div>
+          </>
+        )}
         <Label htmlFor="cells-new-item-name">{t('cells.newItemMenuModal.label')}</Label>
         <Input
           id="cells-new-item-name"

@@ -53,6 +53,9 @@ export const FileEditor = ({id}: FileEditorProps) => {
 
   const fetchNode = useCallback(async (): Promise<boolean> => {
     try {
+      if (!id) {
+        throw new Error('No ID provided');
+      }
       setIsLoading(true);
       setIsError(false);
       const fetchedNode = await cellsRepository.getNode({uuid: id, flags: ['WithEditorURLs']});

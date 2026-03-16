@@ -25,6 +25,7 @@ import {
   RestDeleteVersionResponse,
   RestNode,
   RestNodeCollection,
+  RestListTemplatesResponse,
   RestPerformActionResponse,
   RestPromoteVersionResponse,
   RestPublicLinkDeleteSuccess,
@@ -318,6 +319,16 @@ export class CellsAPI {
     return node;
   }
 
+  async listTemplates({templateType}: {templateType?: string} = {}): Promise<RestListTemplatesResponse> {
+    if (!this.client || !this.storageService) {
+      throw new Error(CONFIGURATION_ERROR);
+    }
+
+    const result = await this.client.templates(templateType);
+
+    return result.data;
+  }
+
   async getNodeVersions({uuid, flags}: {uuid: string; flags?: Array<GetByUuidFlagsEnum>}): Promise<NodeVersions> {
     if (!this.client || !this.storageService) {
       throw new Error(CONFIGURATION_ERROR);
@@ -443,11 +454,15 @@ export class CellsAPI {
     uuid,
     type,
     versionId = '',
+    templateUuid,
+    contentType,
   }: {
     path: NonNullable<RestNodeLocator['Path']>;
     uuid: NonNullable<RestIncomingNode['ResourceUuid']>;
     type: RestIncomingNode['Type'];
     versionId?: RestIncomingNode['VersionId'];
+    templateUuid?: RestIncomingNode['TemplateUuid'];
+    contentType?: RestIncomingNode['ContentType'];
   }): Promise<RestNodeCollection> {
     if (!this.client || !this.storageService) {
       throw new Error(CONFIGURATION_ERROR);
@@ -460,6 +475,8 @@ export class CellsAPI {
           Locator: {Path: path.normalize('NFC')},
           ResourceUuid: uuid,
           VersionId: versionId,
+          ...(templateUuid ? {TemplateUuid: templateUuid} : {}),
+          ...(contentType ? {ContentType: contentType} : {}),
         },
       ],
     });
@@ -471,16 +488,22 @@ export class CellsAPI {
     path,
     uuid,
     versionId,
+    templateUuid,
+    contentType,
   }: {
     path: NonNullable<RestNodeLocator['Path']>;
     uuid: NonNullable<RestIncomingNode['ResourceUuid']>;
     versionId: NonNullable<RestIncomingNode['VersionId']>;
+    templateUuid?: RestIncomingNode['TemplateUuid'];
+    contentType?: RestIncomingNode['ContentType'];
   }): Promise<RestNodeCollection> {
     return this.createNode({
       path,
       uuid,
       type: 'LEAF',
       versionId,
+      templateUuid,
+      contentType,
     });
   }
 
