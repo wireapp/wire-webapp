@@ -11389,7 +11389,7 @@ __metadata:
     knockout: "npm:3.5.1"
     ky: "npm:1.14.3"
     less: "npm:4.5.1"
-    less-loader: "npm:12.3.1"
+    less-loader: "npm:12.3.2"
     lexical: "npm:0.41.0"
     libsodium-wrappers-sumo: "npm:0.8.2"
     linkify-it: "npm:5.0.0"
@@ -20425,9 +20425,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"less-loader@npm:12.3.1":
-  version: 12.3.1
-  resolution: "less-loader@npm:12.3.1"
+"less-loader@npm:12.3.2":
+  version: 12.3.2
+  resolution: "less-loader@npm:12.3.2"
   peerDependencies:
     "@rspack/core": 0.x || ^1.0.0 || ^2.0.0-0
     less: ^3.5.0 || ^4.0.0
@@ -20437,7 +20437,7 @@ __metadata:
       optional: true
     webpack:
       optional: true
-  checksum: 10/c1560407924538f5bf1e1eaf14e5b5f76393d13b88a53cc5287aacd64fd1dc91424b74354518c19a912362f8848b781bdccb71935b3a1d7bbc27fb4f1bd5a1e8
+  checksum: 10/9018d0dae852d99370b7202b548b34334b1a069123bae3717b20143290f17fb639da4f6fd9894b659e100af603f03d1eb74922d6b761e8ba91d1f758d692459a
   languageName: node
   linkType: hard
 
