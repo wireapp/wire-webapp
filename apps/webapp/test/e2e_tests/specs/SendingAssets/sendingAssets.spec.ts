@@ -188,7 +188,7 @@ test.describe('Sending Assets', () => {
     test(
       `Verify file can be uploaded and re-downloaded by sender himself in ${conversationType}`,
       {tag: [`${tag}`, '@regression']},
-      async ({createPage}) => {
+      async ({createPage}, testInfo) => {
         const userAPage = await createPage(withLogin(userA), withConnectedUser(userB));
         const {pages} = PageManager.from(userAPage).webapp;
 
@@ -214,7 +214,7 @@ test.describe('Sending Assets', () => {
         });
 
         await test.step('User A re-downloads file from the conversation', async () => {
-          const downloadedPath = await pages.conversation().downloadFile();
+          const downloadedPath = await pages.conversation().downloadFile(testInfo.outputDir);
           try {
             const {size: actualSize} = await fs.stat(downloadedPath);
             const {ext: downloadedExtension, base: downloadedName} = path.parse(downloadedPath);
@@ -260,6 +260,34 @@ test.describe('Sending Assets', () => {
         await expect(pages.conversation().getMessage({sender: userA})).not.toBeAttached();
       });
     }
+  });
+
+  test('Verify sender is able to cancel upload', {tag: ['@TC-773', '@regression']}, async ({createPage}) => {
+    const [userAPage, userBPage] = await Promise.all([
+      createPage(withLogin(userA), withConnectedUser(userB)),
+      createPage(withLogin(userB)),
+    ]);
+    const pages = PageManager.from(userAPage).webapp.pages;
+    const userBPages = PageManager.from(userBPage).webapp.pages;
+
+    await pages.conversationList().openConversation(userB.fullName, {protocol: 'mls'});
+    await userBPages.conversationList().openConversation(userA.fullName, {protocol: 'mls'});
+
+    const tempFilePath = path.join(tmpdir(), '25MB-testfile.tmp');
+    try {
+      await fs.writeFile(tempFilePath, Buffer.allocUnsafe(25 * 2 ** 20));
+      await shareAssetHelper(tempFilePath, userAPage, userAPage.getByRole('button', {name: 'Add file'}));
+    } finally {
+      await fs.rm(tempFilePath);
+    }
+
+    const uploadAssetsContainer = userAPage.getByTestId('upload-assets');
+    const cancelButton = uploadAssetsContainer.getByRole('button', {name: 'Cancel'});
+    await expect(uploadAssetsContainer).toContainText('Uploading…');
+    await cancelButton.click();
+    // Verify the message wasn't sent
+    await expect(pages.conversation().getMessage({sender: userA})).not.toBeAttached();
+    await expect(userBPages.conversation().getMessage({sender: userA})).not.toBeAttached();
   });
 
   test(
