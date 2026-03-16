@@ -171,7 +171,7 @@ test.describe('Reply', () => {
     await pages.conversation().sendMessage('Reply');
 
     const reply = pages.conversation().getMessage({content: 'Reply'});
-    await expect(reply.getByTestId('quote-item').getByTestId('markdown-link')).toBeVisible();
+    await expect(reply.getByTestId('quote-item').getByRole('link', {name: /https:\/\/www\.lidl\.de\/?/})).toBeVisible();
   });
 
   test('I want to reply to a file', {tag: ['@TC-3006', '@regression']}, async ({createPage}) => {
@@ -213,7 +213,7 @@ test.describe('Reply', () => {
 
     const reply = pages.conversation().getMessage({content: 'Reply'});
     await expect(reply.getByTestId('quote-item')).toContainText('Link: https://www.lidl.de');
-    await expect(reply.getByTestId('quote-item').getByTestId('markdown-link')).toBeVisible();
+    await expect(reply.getByTestId('quote-item').getByRole('link', {name: /https:\/\/www\.lidl\.de\/?/})).toBeVisible();
   });
 
   test('I want to reply to a location share', {tag: ['@TC-3009', '@regression']}, async ({createPage, api}) => {
