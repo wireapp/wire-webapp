@@ -11386,7 +11386,7 @@ __metadata:
     jsdom-worker: "npm:0.3.0"
     jszip: "npm:3.10.1"
     keyboardjs: "npm:2.7.0"
-    knockout: "npm:3.5.1"
+    knockout: "npm:3.5.2"
     ky: "npm:1.14.3"
     less: "npm:4.6.3"
     less-loader: "npm:12.3.2"
@@ -20362,10 +20362,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"knockout@npm:3.5.1":
-  version: 3.5.1
-  resolution: "knockout@npm:3.5.1"
-  checksum: 10/a89541007f29f51f58f807b27a08226a012263e847b4a689a228024ca00a3c19c34383f6190840306a78b368f785fb56de6dd9bc1347b2e4a8faddd10277a463
+"knockout@npm:3.5.2":
+  version: 3.5.2
+  resolution: "knockout@npm:3.5.2"
+  checksum: 10/7db2f0cb43e731368356c734dd2d24aef7e5746802ffaf9dd351166835a6b8c2f00aa9cf9481d04eb53009d045a4dd787805f4475cc0ca47610bf4c0c99466dc
   languageName: node
   linkType: hard
 
