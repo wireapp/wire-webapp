@@ -31,6 +31,7 @@ const logger = logdown('@wireapp/wire-webapp/routes/error/errorRoutes', {
 });
 
 const InternalErrorRoute = (): express.ErrorRequestHandler => (err, req, res, next) => {
+  void next;
   logger.error(`[${formatDate()}] ${err.stack}`);
   const error = {
     code: HTTP_STATUS.INTERNAL_SERVER_ERROR,

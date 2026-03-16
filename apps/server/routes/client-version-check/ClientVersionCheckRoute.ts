@@ -21,6 +21,7 @@ import is from '@sindresorhus/is';
 import {Router} from 'express';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 import {result, type Result} from 'true-myth';
+
 import {setNonCacheHeaders} from '../RedirectRoutes';
 
 type ClientVersionCheckRouteDependencies = {
