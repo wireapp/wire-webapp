@@ -152,6 +152,31 @@ export class ConversationPage {
     await this.messageInput.pressSequentially(message, {delay: 100});
   }
 
+  async sendTypedMessage(message: string) {
+    await this.typeMessage(message);
+    await this.sendMessageButton.click();
+  }
+
+  async sendCodeBlockMessage(code: string) {
+    await this.messageInput.click();
+    await this.messageInput.pressSequentially('```', {delay: 100});
+    await this.messageInput.press('Enter');
+
+    const lines = code.split('\n');
+
+    for (const [index, line] of lines.entries()) {
+      if (line.length > 0) {
+        await this.messageInput.pressSequentially(line, {delay: 100});
+      }
+
+      if (index < lines.length - 1) {
+        await this.messageInput.press('Shift+Enter');
+      }
+    }
+
+    await this.sendMessageButton.click();
+  }
+
   async mentionUser(userFullName: string, searchQuery?: string) {
     const textToType = searchQuery ? `@${searchQuery}` : `@${userFullName.slice(0, 3)}`;
     await this.messageInput.pressSequentially(textToType);
