@@ -22,7 +22,7 @@ import {Router} from 'express';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 import {result, type Result} from 'true-myth';
 
-import {setNonCacheHeaders} from '../RedirectRoutes';
+import {setNonCacheHeaders} from '../redirectRoutes';
 
 type ClientVersionCheckRouteDependencies = {
   readonly router: ReturnType<typeof Router>;

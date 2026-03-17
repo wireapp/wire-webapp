@@ -31,15 +31,15 @@ import path from 'path';
 
 import type {ClientConfig, ServerConfig} from '@wireapp/config';
 
-import {HealthCheckRoute} from './routes/_health/HealthRoute';
-import {AppleAssociationRoute} from './routes/appleassociation/AppleAssociationRoute';
-import {parseClientVersion} from './routes/client-version-check/ClientVersion';
-import {createClientVersionCheckRoute} from './routes/client-version-check/ClientVersionCheckRoute';
-import {ConfigRoute} from './routes/config/ConfigRoute';
-import {InternalErrorRoute, NotFoundRoute} from './routes/error/ErrorRoutes';
-import {GoogleWebmasterRoute} from './routes/googlewebmaster/GoogleWebmasterRoute';
-import {RedirectRoutes} from './routes/RedirectRoutes';
-import {Root} from './routes/Root';
+import {AppleAssociationRoute} from './routes/appleassociation/appleAssociationRoute';
+import {parseClientVersion} from './routes/clientVersionCheck/clientVersion';
+import {createClientVersionCheckRoute} from './routes/clientVersionCheck/clientVersionCheckRoute';
+import {ConfigRoute} from './routes/config/configRoute';
+import {InternalErrorRoute, NotFoundRoute} from './routes/error/errorRoutes';
+import {GoogleWebmasterRoute} from './routes/googlewebmaster/googleWebmasterRoute';
+import {HealthCheckRoute} from './routes/health/healthRoute';
+import {RedirectRoutes} from './routes/redirectRoutes';
+import {Root} from './routes/root';
 import {replaceHostnameInObject} from './util/hostnameReplacer';
 
 class Server {

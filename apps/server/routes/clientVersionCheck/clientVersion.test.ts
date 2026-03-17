@@ -1,5 +1,5 @@
 import assert from 'node:assert';
-import {parseClientVersion} from './ClientVersion';
+import {parseClientVersion} from './clientVersion';
 
 describe('client version', () => {
   it('returns an Result Err when the version number is not a date', () => {
