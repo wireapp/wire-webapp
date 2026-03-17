@@ -66,6 +66,9 @@ import {createUuid} from 'Util/uuid';
 
 import {mapLanguage} from '../../localeConfig';
 import {Api, RootState} from '../../module/reducer';
+import {CallingRepository} from "Repositories/calling/CallingRepository";
+import {BackgroundEffectsHandler} from "Repositories/media/BackgroundEffectsHandler";
+import {BackgroundEffectsController} from "Repositories/media/BackgroundEffects";
 
 const internalizationStrings = {
   cs,
@@ -187,4 +190,13 @@ export const buildMediaDevicesHandler = () => {
     currentAvailableDeviceId: mediaDevices,
     setOnMediaDevicesRefreshHandler: jest.fn(),
   } as unknown as MediaDevicesHandler;
+};
+
+export const buildCallingRepository = () => {
+  const controller: BackgroundEffectsController = {} as unknown as BackgroundEffectsController;
+  const backgroundEffectsHandler = new BackgroundEffectsHandler(controller);
+
+  return {
+    getBackgroundEffectsHandler: () => backgroundEffectsHandler,
+  } as unknown as CallingRepository;
 };
