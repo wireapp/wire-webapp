@@ -1,6 +1,6 @@
 import {Router, type Response, type Request} from 'express';
 import {Result} from 'true-myth';
-import {createClientVersionCheckRoute} from './ClientVersionCheckRoute';
+import {createClientVersionCheckRoute} from './clientVersionCheckRoute';
 
 type ClientVersionCheckRouteDependencyFunctionOverrides = {
   readonly get?: jest.Mock;

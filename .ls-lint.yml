@@ -6,3 +6,7 @@ ls:
     .config.ts: camelCase
     .config.spec.ts: camelCase
     .types.ts: camelCase
+  apps/server/routes:
+    .dir: camelCase
+    .ts: camelCase
+    .test.ts: camelCase
