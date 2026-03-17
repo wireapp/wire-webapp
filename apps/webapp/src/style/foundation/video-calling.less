@@ -231,38 +231,30 @@
       svg > path {
         fill: var(--app-bg-secondary);
       }
-
       &:focus-visible {
-        background-color: @red-600;
         outline: 2px solid @red-300;
         outline-offset: 1px;
 
         body.theme-dark & {
-          background-color: @red-dark-400;
           outline: 2px solid @red-dark-300;
         }
       }
-
       &:hover:not(:disabled) {
         border-color: @red-600;
         background-color: @red-600;
-
         body.theme-dark & {
           border-color: @red-dark-400;
           background-color: @red-dark-400;
         }
       }
-
       &:active:not(:disabled) {
         border-color: @red-700;
         background-color: @red-700;
-
         body.theme-dark & {
           border-color: @red-dark-500;
           background-color: var(--red-500);
         }
       }
-
       &:disabled {
         cursor: not-allowed;
         opacity: 0.5;

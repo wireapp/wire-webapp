@@ -55,7 +55,6 @@ export const videoControlActiveStyles = css`
     background-color: var(--background);
   }
   &:focus-visible {
-    background-color: var(--background);
     outline: 2px solid var(--accent-color-focus);
   }
   &:active:not(:disabled) {
@@ -86,7 +85,6 @@ export const videoControlInActiveStyles = css`
     background-color: var(--inactive-call-button-hover-bg);
   }
   &:focus-visible {
-    background-color: var(--inactive-call-button-hover-bg);
     outline: 2px solid var(--accent-color-focus);
   }
   &:active:not(:disabled) {
