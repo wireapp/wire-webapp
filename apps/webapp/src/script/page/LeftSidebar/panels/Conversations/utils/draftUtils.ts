@@ -56,12 +56,13 @@ export const conversationHasDraft = (conversation: Conversation): boolean => {
       return false;
     }
 
-    // Check if plainMessage has actual content (not just whitespace)
+    // Check plainMessage for actual content (not just whitespace)
     const plainMessage = draft.plainMessage || '';
     const hasTextContent = plainMessage.trim().length > 0;
+    const hasEditorStateContent = Boolean(draft.editorState);
 
-    return hasTextContent;
-  } catch (error) {
+    return hasTextContent || hasEditorStateContent;
+  } catch (error: unknown) {
     // Only log error type, not the actual error to avoid exposing draft content
     logger.warn(
       `Failed to parse draft data for conversation ${conversation.id}: ${
