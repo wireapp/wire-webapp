@@ -17,6 +17,8 @@
  *
  */
 
+import {Maybe} from 'true-myth';
+
 export const stripImageExifData = async (image: Blob): Promise<Blob> => {
   const url = URL.createObjectURL(image);
   try {
@@ -24,7 +26,7 @@ export const stripImageExifData = async (image: Blob): Promise<Blob> => {
     const canvas = drawImageOnCanvas(img);
     const strippedBlob = await canvasToBlob(canvas, image.type);
     return strippedBlob;
-  } catch (error) {
+  } catch (error: unknown) {
     if (error instanceof Error) {
       throw new Error(`Failed to strip EXIF data: ${error.message}`);
     }
@@ -89,7 +91,7 @@ export const imageHasExifData = async (image: Blob): Promise<boolean> => {
     }
 
     return containsExifData(view);
-  } catch (error) {
+  } catch (error: unknown) {
     if (error instanceof Error) {
       throw new Error(`Failed to check for EXIF data: ${error.message}`);
     }
@@ -179,3 +181,19 @@ export const isPreviewableImage = ({
 
   return !!normalizedExtension && PREVIEWABLE_IMAGE_EXTENSIONS.has(normalizedExtension);
 };
+
+type GetBestPreviewSourceOptions = {
+  readonly fileExtension: string;
+  readonly fileUrl: Maybe<string>;
+  readonly filePreviewUrl: Maybe<string>;
+};
+
+export function getBestPreviewSource(options: GetBestPreviewSourceOptions): Maybe<string> {
+  const {fileExtension, fileUrl, filePreviewUrl} = options;
+
+  if (!isPreviewableImage({extension: fileExtension})) {
+    return filePreviewUrl;
+  }
+
+  return fileUrl.or(filePreviewUrl);
+}

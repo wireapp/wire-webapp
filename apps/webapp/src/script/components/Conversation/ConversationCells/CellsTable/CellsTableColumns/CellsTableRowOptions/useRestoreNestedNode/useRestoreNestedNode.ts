@@ -43,7 +43,7 @@ export const useRestoreNestedNode = ({
       try {
         removeNode({conversationId: conversationQualifiedId.id, nodeId: node.id});
         await cellsRepository.restoreNode({uuid: node.id});
-      } catch (error) {
+      } catch (error: unknown) {
         console.error(error);
         onError();
       }

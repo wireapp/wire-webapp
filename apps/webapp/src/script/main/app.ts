@@ -428,7 +428,7 @@ export class App {
 
       try {
         selfUser = await this.repository.user.getSelf([{position: 'App.initiateSelfUser', vendor: 'webapp'}]);
-      } catch (error) {
+      } catch (error: unknown) {
         this.logger.error('Could not get self user', error);
         await this.repository.lifeCycle.logout(SIGN_OUT_REASON.SESSION_EXPIRED, false);
         return undefined;
@@ -444,7 +444,7 @@ export class App {
 
       try {
         await this.core.init(clientType);
-      } catch (error) {
+      } catch (error: unknown) {
         const errorMessage = error instanceof Error ? error.message : error;
         this.logger.error(`Error when initializing core: "${errorMessage}"`, error);
         throw new AccessTokenError(AccessTokenError.TYPE.REQUEST_FORBIDDEN, 'Session has expired');
@@ -480,7 +480,7 @@ export class App {
 
       try {
         await this.core.initClient(localClient, getClientMLSConfig(teamFeatures));
-      } catch (error) {
+      } catch (error: unknown) {
         console.warn('Failed to initialize client', {error});
         this.showForceLogoutModal(SIGN_OUT_REASON.CLIENT_REMOVED);
       }
@@ -648,7 +648,7 @@ export class App {
       // Load conversation labels with proper error handling
       try {
         await conversationRepository.conversationLabelRepository.loadLabels();
-      } catch (error) {
+      } catch (error: unknown) {
         this.logger.error('Failed to load conversation labels', error);
         // Continue with empty labels rather than breaking the app
       }
@@ -676,7 +676,7 @@ export class App {
       this.core.resumeNotificationQueue();
 
       return selfUser;
-    } catch (error) {
+    } catch (error: unknown) {
       if (error instanceof BaseError) {
         await this._appInitFailure(error);
         return undefined;

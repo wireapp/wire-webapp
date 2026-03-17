@@ -233,7 +233,7 @@ export class ContentViewModel {
         await new Promise(resolve => setTimeout(resolve, initialDelayMs * (attempt + 1)));
         await this.conversationRepository.fetchBackendConversationEntityById(conversationId);
         return true;
-      } catch (error) {
+      } catch (error: unknown) {
         this.logger.warn(`Retry attempt ${attempt + 1}/${maxRetries} failed for conversation fetch`, error);
       }
     }

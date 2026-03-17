@@ -21,7 +21,7 @@ import {Locator, Page} from '@playwright/test';
 
 export class EmailVerificationPage {
   readonly codeLength = 6;
-  readonly page: Page;
+  private readonly page: Page;
 
   readonly verificationCodeInput: Locator;
   readonly verificationCodeInputLabel: Locator;

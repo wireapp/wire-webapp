@@ -152,11 +152,11 @@ const SingleSignOnFormComponent = ({
       setConversationCode(queryConversationCode);
       setConversationKey(queryConversationKey);
       setIsValidLink(true);
-      doCheckConversationCode(queryConversationKey, queryConversationCode).catch(error => {
+      doCheckConversationCode(queryConversationKey, queryConversationCode).catch((error: unknown) => {
         console.warn('Invalid conversation code', error);
         setIsValidLink(false);
       });
-      doGetConversationInfoByCode(queryConversationKey, queryConversationCode).catch(error => {
+      doGetConversationInfoByCode(queryConversationKey, queryConversationCode).catch((error: unknown) => {
         console.warn('Failed to fetch conversation info', error);
         setIsValidLink(false);
       });
@@ -248,7 +248,7 @@ const SingleSignOnFormComponent = ({
       } else {
         await loginWithSSO(codeOrMail, password);
       }
-    } catch (error) {
+    } catch (error: unknown) {
       setIsLoading(false);
       if (isBackendError(error)) {
         switch (error.label) {

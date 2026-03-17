@@ -20,9 +20,8 @@
 import {Page, Locator} from '@playwright/test';
 
 export class GroupCreationPage {
-  readonly page: Page;
-
   readonly groupCreationModal: Locator;
+  readonly searchPeopleList: Locator;
   readonly groupNameInput: Locator;
   readonly nextButton: Locator;
   readonly createGroupButton: Locator;
@@ -33,8 +32,6 @@ export class GroupCreationPage {
   readonly searchPeopleResults: Locator;
 
   constructor(page: Page) {
-    this.page = page;
-
     this.groupCreationModal = page.locator('#group-creation-modal');
     this.groupNameInput = page.locator('[data-uie-name="enter-group-name"]');
     this.nextButton = page.locator('[data-uie-name="go-next"]');
@@ -43,7 +40,8 @@ export class GroupCreationPage {
     this.filesCheckbox = page.locator('[data-uie-name="do-toggle-cells"]');
 
     this.searchPeopleInput = page.getByRole('dialog').getByLabel('Search by name');
-    this.searchPeopleResults = page.getByRole('dialog').getByRole('list').getByRole('listitem');
+    this.searchPeopleList = page.getByRole('dialog').getByRole('list');
+    this.searchPeopleResults = this.searchPeopleList.getByRole('listitem');
   }
 
   async setGroupName(name: string) {

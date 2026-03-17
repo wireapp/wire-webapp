@@ -95,7 +95,7 @@ describe('ReconnectingWebsocket', () => {
     activeConnections.forEach(rws => {
       try {
         rws.disconnect();
-      } catch (e) {
+      } catch (e: unknown) {
         // Ignore errors during cleanup
       }
     });
@@ -542,7 +542,7 @@ describe('ReconnectingWebsocket', () => {
             sendSpy.mockRestore();
             RWS.disconnect();
             resolve();
-          } catch (error) {
+          } catch (error: unknown) {
             reject(error);
           }
         });

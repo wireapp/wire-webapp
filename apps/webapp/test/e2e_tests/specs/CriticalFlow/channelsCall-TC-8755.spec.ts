@@ -71,7 +71,7 @@ test.fixme(
         await pages.conversationList().openConversation(channelName);
         await pages.conversation().clickConversationInfoButton();
         await pages.conversation().clickCallButton();
-      } catch (error) {
+      } catch (error: unknown) {
         console.error('Error during call initiation:', error);
         throw error;
       }

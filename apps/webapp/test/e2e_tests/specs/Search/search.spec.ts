@@ -38,7 +38,7 @@ test.describe('Search', () => {
     },
   );
 
-  // TODO: blocked by [WPB-222687] - search result remains empty
+  // TODO: blocked by [WPB-22687] - search result remains empty
   test.skip(
     'Verify search by username with at (@) symbol',
     {tag: ['@TC-1658', '@regression']},

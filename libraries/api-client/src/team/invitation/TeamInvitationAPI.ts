@@ -108,7 +108,7 @@ export class TeamInvitationAPI {
 
     try {
       await this.client.sendJSON(config);
-    } catch (error) {
+    } catch (error: unknown) {
       if (axios.isAxiosError(error) && error.response?.status) {
         const status = error.response?.status;
         switch (status) {
@@ -134,7 +134,7 @@ export class TeamInvitationAPI {
     try {
       const response = await this.client.sendJSON<TeamInvitation>(config);
       return response.data;
-    } catch (error) {
+    } catch (error: unknown) {
       const backendError = error as BackendError;
       switch (backendError.label) {
         case BackendErrorLabel.INVITE_EMAIL_EXISTS: {

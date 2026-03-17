@@ -21,8 +21,9 @@ import {ReactNode, useContext} from 'react';
 
 import {renderHook} from '@testing-library/react';
 
-import {createFakeWallClock} from '../clock/fakeWallClock';
-import {StartupFeatureFlagName} from '../featureFlags/startupFeatureFlags';
+import {StartupFeatureToggleName} from '../featureToggles/startupFeatureToggles';
+import {createDeterministicWallClock} from '../clock/deterministicWallClock';
+import {reliableWebsocketConnectionFeatureToggleName} from '../featureToggles/startupFeatureToggleNames';
 import {MainViewModel} from '../view_model/MainViewModel';
 import {
   RootContext,
@@ -38,8 +39,8 @@ interface WrapperProperties {
 
 interface RootProviderWrapper {
   wrapper: (properties: WrapperProperties) => ReactNode;
-  fakeWallClock: ReturnType<typeof createFakeWallClock>;
-  isFeatureFlagEnabled: jest.Mock<boolean, [StartupFeatureFlagName]>;
+  isFeatureToggleEnabled: jest.Mock<boolean, [StartupFeatureToggleName]>;
+  deterministicWallClock: ReturnType<typeof createDeterministicWallClock>;
 }
 
 function createRootProviderWrapper(
@@ -47,18 +48,25 @@ function createRootProviderWrapper(
   wallClockTimestampInMilliseconds: number,
   doesApplicationNeedForceReload: boolean,
 ): RootProviderWrapper {
-  const fakeWallClock = createFakeWallClock({
+  const deterministicWallClock = createDeterministicWallClock({
     initialCurrentTimestampInMilliseconds: wallClockTimestampInMilliseconds,
   });
-  function isFeatureFlagEnabledForTest(featureName: StartupFeatureFlagName): boolean {
-    return featureName === 'reliable-websocket-connection';
+  function isFeatureToggleEnabledForTest(featureName: StartupFeatureToggleName): boolean {
+    return featureName === reliableWebsocketConnectionFeatureToggleName;
   }
 
-  const isFeatureFlagEnabled = jest.fn(isFeatureFlagEnabledForTest);
+  const isFeatureToggleEnabled = jest.fn(isFeatureToggleEnabledForTest);
 
   function wrapper(properties: WrapperProperties): ReactNode {
     const wrappedChildren = (
-      <RootProvider value={{mainViewModel, wallClock: fakeWallClock, doesApplicationNeedForceReload, isFeatureFlagEnabled}}>
+      <RootProvider
+        value={{
+          mainViewModel,
+          wallClock: deterministicWallClock,
+          doesApplicationNeedForceReload,
+          isFeatureToggleEnabled,
+        }}
+      >
         {properties.children}
       </RootProvider>
     );
@@ -66,7 +74,7 @@ function createRootProviderWrapper(
     return wrappedChildren;
   }
 
-  return {wrapper, fakeWallClock, isFeatureFlagEnabled};
+  return {wrapper, deterministicWallClock, isFeatureToggleEnabled};
 }
 
 function getRootContextValue(): RootContextValue | null {
@@ -79,23 +87,23 @@ describe('RootProvider', () => {
   const mainViewModel = {} as MainViewModel;
 
   it('provides the injected wall clock through context', () => {
-    const {wrapper, fakeWallClock} = createRootProviderWrapper(mainViewModel, 1_234, false);
+    const {wrapper, deterministicWallClock} = createRootProviderWrapper(mainViewModel, 1_234, false);
 
     const {result} = renderHook(getRootContextValue, {wrapper});
 
     expect(result.current?.mainViewModel).toBe(mainViewModel);
-    expect(result.current?.wallClock).toBe(fakeWallClock);
+    expect(result.current?.wallClock).toBe(deterministicWallClock);
     expect(result.current?.wallClock.currentTimestampInMilliseconds).toBe(1_234);
     expect(result.current?.doesApplicationNeedForceReload).toBe(false);
   });
 
   it('provides the main view model through useMainViewModel()', () => {
-    const {wrapper, fakeWallClock} = createRootProviderWrapper(mainViewModel, 8_765, false);
+    const {wrapper, deterministicWallClock} = createRootProviderWrapper(mainViewModel, 8_765, false);
 
     const {result} = renderHook(useMainViewModel, {wrapper});
 
     expect(result.current).toBe(mainViewModel);
-    expect(fakeWallClock.currentTimestampInMilliseconds).toBe(8_765);
+    expect(deterministicWallClock.currentTimestampInMilliseconds).toBe(8_765);
   });
 
   it('provides force reload status through RootContext', () => {
@@ -114,12 +122,12 @@ describe('RootProvider', () => {
     expect(result.current.doesApplicationNeedForceReload).toBe(true);
   });
 
-  it('provides startup feature flag helper through useApplicationContext()', function () {
-    const {wrapper, isFeatureFlagEnabled} = createRootProviderWrapper(mainViewModel, 9_999, true);
+  it('provides startup feature toggle helper through useApplicationContext()', function () {
+    const {wrapper, isFeatureToggleEnabled} = createRootProviderWrapper(mainViewModel, 9_999, true);
 
     const {result} = renderHook(useApplicationContext, {wrapper});
 
-    expect(result.current.isFeatureFlagEnabled('reliable-websocket-connection')).toBe(true);
-    expect(isFeatureFlagEnabled).toHaveBeenCalledWith('reliable-websocket-connection');
+    expect(result.current.isFeatureToggleEnabled(reliableWebsocketConnectionFeatureToggleName)).toBe(true);
+    expect(isFeatureToggleEnabled).toHaveBeenCalledWith(reliableWebsocketConnectionFeatureToggleName);
   });
 });

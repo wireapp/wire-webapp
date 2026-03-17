@@ -28,7 +28,7 @@ import type {TeamData} from '@wireapp/api-client/lib/team/';
 import {LowDiskSpaceError} from '@wireapp/store-engine/lib/engine/error';
 import {StatusCodes as HTTP_STATUS, StatusCodes} from 'http-status-codes';
 
-import {isBackendError} from 'Util/TypePredicateUtil';
+import {isAxiosError, isBackendError, toError} from 'Util/TypePredicateUtil';
 
 import {AuthActionCreator} from './creator/';
 import {LabeledError} from './LabeledError';
@@ -40,8 +40,8 @@ import type {LoginDataState, RegistrationDataState} from '../reducer/authReducer
 
 type LoginLifecycleFunction = (dispatch: ThunkDispatch, getState: () => RootState, global: Api) => Promise<void>;
 
-const isSystemKeychainAccessError = (error: any): error is Error => {
-  return error instanceof Error && error.message.includes('cryption is not available');
+const isSystemKeychainAccessError = (errorCandidate: unknown): errorCandidate is Error => {
+  return errorCandidate instanceof Error && errorCandidate.message.includes('cryption is not available');
 };
 
 export class AuthAction {
@@ -114,8 +114,8 @@ export class AuthAction {
           ),
         );
         dispatch(AuthActionCreator.successfulLogin());
-      } catch (error) {
-        if (error.label === BackendErrorLabel.TOO_MANY_CLIENTS) {
+      } catch (error: unknown) {
+        if (isBackendError(error) && error.label === BackendErrorLabel.TOO_MANY_CLIENTS) {
           dispatch(AuthActionCreator.successfulLogin());
         } else {
           if (error instanceof LowDiskSpaceError) {
@@ -124,7 +124,7 @@ export class AuthAction {
           if (isSystemKeychainAccessError(error)) {
             error = new LabeledError(LabeledError.GENERAL_ERRORS.SYSTEM_KEYCHAIN_ACCESS, error);
           }
-          dispatch(AuthActionCreator.failedLogin(error));
+          dispatch(AuthActionCreator.failedLogin(toError(error)));
         }
         throw error;
       }
@@ -138,8 +138,8 @@ export class AuthAction {
         const url = await apiClient.api.oauth.postOAuthCode(oauthBody);
         dispatch(AuthActionCreator.successfulSendOAuthCode());
         return url;
-      } catch (error) {
-        dispatch(AuthActionCreator.failedSendOAuthCode(error));
+      } catch (error: unknown) {
+        dispatch(AuthActionCreator.failedSendOAuthCode(toError(error)));
         throw error;
       }
     };
@@ -151,7 +151,7 @@ export class AuthAction {
       try {
         await apiClient.api.user.postVerificationCode(email, VerificationActionType.LOGIN);
         dispatch(AuthActionCreator.successfulSendTwoFactorCode());
-      } catch (error) {
+      } catch (error: unknown) {
         /**  The BE can respond quite restrictively to the send code request.
          * We don't want to block the user from logging in if they have already received a code in the last few minutes.
          * Any other error should still be thrown.
@@ -166,7 +166,7 @@ export class AuthAction {
         if (isBackendError(error) && error.label === BackendErrorLabel.BAD_REQUEST) {
           error = new BackendError(error.message, SyntheticErrorLabel.EMAIL_REQUIRED, StatusCodes.BAD_REQUEST);
         }
-        dispatch(AuthActionCreator.failedSendTwoFactorCode(error));
+        dispatch(AuthActionCreator.failedSendTwoFactorCode(toError(error)));
         throw error;
       }
     };
@@ -181,11 +181,11 @@ export class AuthAction {
         await dispatch(selfAction.fetchSelf());
         await dispatch(clientAction.doInitializeClient(clientType));
         dispatch(AuthActionCreator.successfulLogin());
-      } catch (error) {
+      } catch (error: unknown) {
         if (isBackendError(error) && error.label === BackendErrorLabel.TOO_MANY_CLIENTS) {
           dispatch(AuthActionCreator.successfulLogin());
         } else {
-          dispatch(AuthActionCreator.failedLogin(error));
+          dispatch(AuthActionCreator.failedLogin(toError(error)));
         }
         throw error;
       }
@@ -199,8 +199,8 @@ export class AuthAction {
         const teamData = await apiClient.api.teams.team.getTeam(teamId);
         dispatch(AuthActionCreator.successfulFetchTeam(teamData));
         return teamData;
-      } catch (error) {
-        dispatch(AuthActionCreator.failedFetchTeam(error));
+      } catch (error: unknown) {
+        dispatch(AuthActionCreator.failedFetchTeam(toError(error)));
         throw error;
       }
     };
@@ -213,8 +213,8 @@ export class AuthAction {
         const application = await apiClient.api.oauth.getClient(applicationId);
         dispatch(AuthActionCreator.successfulFetchOAuth(application));
         return application;
-      } catch (error) {
-        dispatch(AuthActionCreator.failedFetchOAuth(error));
+      } catch (error: unknown) {
+        dispatch(AuthActionCreator.failedFetchOAuth(toError(error)));
         throw error;
       }
     };
@@ -222,8 +222,8 @@ export class AuthAction {
 
   validateSSOCode = (code: string): ThunkAction => {
     return async (dispatch, getState, {apiClient}) => {
-      const mapError = (error: any) => {
-        const statusCode = error?.response?.status;
+      const mapError = (errorCandidate: unknown) => {
+        const statusCode = isAxiosError(errorCandidate) ? errorCandidate.response?.status : undefined;
         if (statusCode === HTTP_STATUS.NOT_FOUND) {
           return new BackendError('', BackendErrorLabel.NOT_FOUND, HTTP_STATUS.NOT_FOUND);
         }
@@ -235,7 +235,7 @@ export class AuthAction {
 
       try {
         return await apiClient.api.auth.headInitiateLogin(code);
-      } catch (error) {
+      } catch (error: unknown) {
         const mappedError = mapError(error);
         dispatch(AuthActionCreator.failedLogin(mappedError));
         throw mappedError;
@@ -292,8 +292,8 @@ export class AuthAction {
         await dispatch(selfAction.fetchSelf());
         await dispatch(clientAction.doInitializeClient(clientType, undefined, undefined, entropyData));
         dispatch(AuthActionCreator.successfulRegisterPersonal(registration));
-      } catch (error) {
-        dispatch(AuthActionCreator.failedRegisterPersonal(error));
+      } catch (error: unknown) {
+        dispatch(AuthActionCreator.failedRegisterPersonal(toError(error)));
         throw error;
       }
     };
@@ -322,8 +322,8 @@ export class AuthAction {
         await (clientType !== ClientType.NONE &&
           dispatch(clientAction.doInitializeClient(clientType, undefined, undefined, entropyData)));
         dispatch(AuthActionCreator.successfulRegisterWireless(registrationData));
-      } catch (error) {
-        dispatch(AuthActionCreator.failedRegisterWireless(error));
+      } catch (error: unknown) {
+        dispatch(AuthActionCreator.failedRegisterWireless(toError(error)));
         throw error;
       }
     };
@@ -348,13 +348,13 @@ export class AuthAction {
 
         await dispatch(selfAction.fetchSelf());
         dispatch(AuthActionCreator.successfulRefresh());
-      } catch (error) {
+      } catch (error: unknown) {
         const doLogout = options.shouldValidateLocalClient ? dispatch(authAction.doLogout()) : Promise.resolve();
         const deleteClientType = options.isImmediateLogin
           ? dispatch(localStorageAction.deleteLocalStorage(LocalStorageKey.AUTH.PERSIST))
           : Promise.resolve();
         await Promise.all([doLogout, deleteClientType]);
-        dispatch(AuthActionCreator.failedRefresh(error));
+        dispatch(AuthActionCreator.failedRefresh(toError(error)));
       }
     };
   };
@@ -371,8 +371,8 @@ export class AuthAction {
       try {
         const ssoSettings = await apiClient.api.account.getSSOSettings();
         dispatch(AuthActionCreator.successfulGetSSOSettings(ssoSettings));
-      } catch (error) {
-        dispatch(AuthActionCreator.failedGetSSOSettings(error));
+      } catch (error: unknown) {
+        dispatch(AuthActionCreator.failedGetSSOSettings(toError(error)));
       }
     };
   };
@@ -382,8 +382,8 @@ export class AuthAction {
       try {
         await core.logout();
         dispatch(AuthActionCreator.successfulLogout());
-      } catch (error) {
-        dispatch(AuthActionCreator.failedLogout(error));
+      } catch (error: unknown) {
+        dispatch(AuthActionCreator.failedLogout(toError(error)));
       }
     };
   };
@@ -393,8 +393,8 @@ export class AuthAction {
       try {
         await core.logout();
         dispatch(AuthActionCreator.successfulSilentLogout());
-      } catch (error) {
-        dispatch(AuthActionCreator.failedLogout(error));
+      } catch (error: unknown) {
+        dispatch(AuthActionCreator.failedSilentLogout(toError(error)));
       }
     };
   };

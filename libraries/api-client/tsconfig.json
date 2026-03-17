@@ -5,6 +5,7 @@
     "allowSyntheticDefaultImports": true,
     "outDir": "lib",
     "declaration": true,
+    "noUncheckedIndexedAccess": true,
     "skipLibCheck": true,
     "rootDir": "src",
     "types": ["node"],
@@ -16,6 +17,6 @@
     "declarationMap": true,
     "strict": true
   },
-  "exclude": ["node_modules", "./demo.ts", "**/*.test.ts"],
+  "exclude": ["node_modules", "**/*.test.ts"],
   "include": ["src/**/*.ts", "src/**/*.d.ts"]
 }

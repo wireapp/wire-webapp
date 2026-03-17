@@ -144,11 +144,11 @@ test.describe('Edit', () => {
 
       await test.step('Check user B has a unread conversation with A containing the sent message', async () => {
         const conversation = userBPages.conversationList().getConversationLocator(userA.fullName);
-        await expect(conversation.getByTestId('status-unread')).toBeVisible();
+        await expect(conversation.unreadIndicator).toBeVisible();
 
         await userBPages.conversationList().openConversation(userA.fullName, {protocol: 'mls'});
         await expect(conversation).toContainText('Test Message');
-        await expect(conversation.getByTestId('status-unread')).not.toBeVisible();
+        await expect(conversation.unreadIndicator).not.toBeVisible();
       });
 
       await test.step("Open group conversation to ensure new messages won't be read immediately", async () => {
@@ -165,7 +165,7 @@ test.describe('Edit', () => {
 
       await test.step('Check B received the updated message without marking the conversation as unread', async () => {
         const conversation = userBPages.conversationList().getConversationLocator(userA.fullName);
-        await expect(conversation.getByTestId('status-unread')).not.toBeVisible();
+        await expect(conversation.unreadIndicator).not.toBeVisible();
 
         await userBPages.conversationList().openConversation(userA.fullName);
         await expect(userBPages.conversation().getMessage({sender: userA})).toContainText('Edited Message');

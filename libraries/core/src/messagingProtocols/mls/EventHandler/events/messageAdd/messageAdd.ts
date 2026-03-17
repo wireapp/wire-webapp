@@ -71,7 +71,7 @@ export const handleMLSMessageAdd = async ({
         delayInMs: commitDelay ?? 0,
         eventTime: event.time,
       });
-    }).catch(error => {
+    }).catch((error: unknown) => {
       logger.error('Failed to process proposal:', error);
     });
   }

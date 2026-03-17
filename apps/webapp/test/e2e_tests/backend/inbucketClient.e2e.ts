@@ -47,18 +47,11 @@ export class InbucketClientE2E {
     while (!verificationCode && timeout < 100) {
       const response = await this.getLatestEmail(email);
       if (response.status === 200) {
-        const message = await response.data;
-        verificationCode = message.subject.slice(-6);
-        if (verificationCode !== undefined) {
-          break;
-        }
+        verificationCode = response.data.subject.match(/\d{6}/)?.[0];
+        if (verificationCode !== undefined) break;
       }
       await new Promise(resolve => setTimeout(resolve, 500)); // Wait for 500 ms
       timeout++;
-    }
-
-    if (verificationCode.length !== 6) {
-      throw new Error('Correct verification code not found in the email subject');
     }
 
     return verificationCode as string;
@@ -123,8 +116,8 @@ export class InbucketClientE2E {
     return matchingUrl;
   }
 
-  private async getLatestEmail(email: string) {
-    return await this.axiosInstance.get(`/api/v1/mailbox/${email}/latest`, {
+  async getLatestEmail(email: string) {
+    return await this.axiosInstance.get<{subject: string; body: {text: string}}>(`/api/v1/mailbox/${email}/latest`, {
       headers: {
         Authorization: this.authHeader,
       },

@@ -117,7 +117,7 @@ export async function initMLSGroupConversation(
     });
 
     onSuccessfulJoin?.(mlsConversation);
-  } catch (error) {
+  } catch (error: unknown) {
     onError?.(mlsConversation, error);
   }
 }

@@ -74,7 +74,7 @@ export async function getLinkPreviewFromString(string: string): Promise<LinkPrev
 
   try {
     return await getLinkPreview(linkData.url, linkData.offset);
-  } catch (error) {
+  } catch (error: unknown) {
     const isLinkPreviewError = error instanceof LinkPreviewError;
     if (!isLinkPreviewError) {
       throw error;
@@ -155,7 +155,7 @@ async function fetchOpenGraphData(link: string): Promise<OpenGraphResult | undef
       }, {} as OpenGraphResult);
     }
     return undefined;
-  } catch (error) {
+  } catch (error: unknown) {
     if (error instanceof Error) {
       logger.warn(`Error while fetching OpenGraph data: ${error.message}`);
     }

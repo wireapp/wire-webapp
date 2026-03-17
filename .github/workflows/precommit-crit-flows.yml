@@ -34,14 +34,14 @@ jobs:
     steps:
       - name: Checkout (pull_request)
         if: ${{ github.event_name == 'pull_request' }}
-        uses: actions/checkout@v6
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
         with:
           fetch-depth: 0
           ref: ${{ github.event.pull_request.head.sha }}
 
       - name: Checkout (merge_group)
         if: ${{ github.event_name == 'merge_group' }}
-        uses: actions/checkout@v6
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
         with:
           fetch-depth: 0
 
@@ -191,13 +191,13 @@ jobs:
     steps:
       - name: Checkout (pull_request)
         if: ${{ github.event_name == 'pull_request' }}
-        uses: actions/checkout@v6
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
         with:
           ref: ${{ github.event.pull_request.head.sha }}
 
       - name: Checkout (merge_group)
         if: ${{ github.event_name == 'merge_group' }}
-        uses: actions/checkout@v6
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
 
       - uses: actions/setup-node@v6
         with:
@@ -205,7 +205,7 @@ jobs:
           cache: 'yarn'
 
       - name: Download report
-        uses: actions/download-artifact@v8
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c
         with:
           artifact-ids: ${{ needs.run_e2e_tests.outputs.reportArtifactId }}
           path: apps/webapp/playwright-report
@@ -236,7 +236,7 @@ jobs:
 
       - name: Comment on PR
         if: ${{ always() && github.event_name == 'pull_request' }}
-        uses: marocchino/sticky-pull-request-comment@773744901bac0e8cbb5a0dc842800d45e9b2b405
+        uses: marocchino/sticky-pull-request-comment@70d2764d1a7d5d9560b100cbea0077fc8f633987
         with:
           header: playwright-summary
           message: |

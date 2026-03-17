@@ -120,7 +120,7 @@ export const AccountPreferences = ({
             try {
               await conversationRepository.leaveGuestRoom();
               void clientRepository.logoutClient();
-            } catch (error) {
+            } catch (error: unknown) {
               logger.warn('Error while leaving room', error);
             }
           },

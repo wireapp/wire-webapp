@@ -76,7 +76,7 @@ const AvatarImage: React.FunctionComponent<AvatarImageProps> = ({
               setAvatarImage(url);
             }
             setAvatarLoadingBlocked(false);
-          } catch (error) {
+          } catch (error: unknown) {
             console.warn('Failed to load avatar picture.', error);
           }
         } else {

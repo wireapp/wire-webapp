@@ -129,7 +129,7 @@ describe('ClientRepository', () => {
       return testFactory.client_repository
         .getValidLocalClient()
         .then(fail)
-        .catch(error => {
+        .catch((error: unknown) => {
           expect(error).toEqual(jasmine.any(ClientError));
           expect(error.type).toBe(ClientError.TYPE.NO_VALID_CLIENT);
         });
@@ -146,7 +146,7 @@ describe('ClientRepository', () => {
       return testFactory.client_repository
         .getValidLocalClient()
         .then(fail)
-        .catch(error => {
+        .catch((error: unknown) => {
           expect(error).toEqual(jasmine.any(ClientError));
           expect(error.type).toBe(ClientError.TYPE.NO_VALID_CLIENT);
         });

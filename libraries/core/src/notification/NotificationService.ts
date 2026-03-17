@@ -116,7 +116,7 @@ export class NotificationService extends TypedEventEmitter<Events> {
 
     try {
       databaseLastEventDate = await this.database.getLastEventDate();
-    } catch (error) {
+    } catch (error: unknown) {
       if (
         error instanceof StoreEngineError.RecordNotFoundError ||
         (error as Error).constructor.name === StoreEngineError.RecordNotFoundError.name
@@ -178,7 +178,7 @@ export class NotificationService extends TypedEventEmitter<Events> {
           total: notifications.length,
         });
         results.success++;
-      } catch (error) {
+      } catch (error: unknown) {
         const message = error instanceof Error ? error.message : error;
         this.logger.error(`Error while processing notification ${notification.id}: ${message}`, error);
         results.error++;
@@ -228,7 +228,7 @@ export class NotificationService extends TypedEventEmitter<Events> {
         if (handledEventResult.status === 'handled' && handledEventResult.payload) {
           yield handledEventResult.payload;
         }
-      } catch (error) {
+      } catch (error: unknown) {
         this.logger.error(
           `There was an error with notification ID "${notification.id}": ${(error as Error).message}`,
           error,

@@ -25,7 +25,13 @@ export const bufferToString = (buffer: ArrayBuffer): string => {
   const bytes = new Uint8Array(buffer);
 
   for (let index = 0; index < bytes.length; index++) {
-    binaryString += String.fromCharCode(bytes[index]);
+    const byte = bytes[index];
+
+    if (byte === undefined) {
+      continue;
+    }
+
+    binaryString += String.fromCharCode(byte);
   }
 
   return binaryString;

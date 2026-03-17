@@ -116,7 +116,7 @@ export class BackupRepository {
       }
 
       return await this.compressHistoryFiles(user, clientId, exportedData, password);
-    } catch (error) {
+    } catch (error: unknown) {
       const errorMessage = error instanceof Error ? error.message : error;
       this.logger.error(`Could not export history: ${errorMessage}`, error);
       const isCancelError = isErrorOfType(error, ErrorType.CancelError);
@@ -161,7 +161,7 @@ export class BackupRepository {
   private async createEncryptedBackup(files: Record<string, Uint8Array>, user: User, password: string): Promise<Blob> {
     // encode header
     const backupCoder = new BackUpHeader(user.id, password);
-    const backupHeader = await this.generateBackupHeader(user, password, backupCoder).catch(error => {
+    const backupHeader = await this.generateBackupHeader(user, password, backupCoder).catch((error: unknown) => {
       throw new Error('Backup error:', error);
     });
 

@@ -62,7 +62,7 @@ export class TeamSearchAPI {
       try {
         const response = await this.client.sendJSON<TeamSearchResult>(config);
         return response.data;
-      } catch (error) {
+      } catch (error: unknown) {
         if ((error as BackendError).message === SyntheticErrorLabel.REQUEST_CANCELLED) {
           throw new RequestCancellationError('Search request got cancelled');
         }

@@ -20,7 +20,7 @@
 import {Locator, Page} from '@playwright/test';
 
 export class AudioVideoSettingsPage {
-  readonly page: Page;
+  private readonly page: Page;
 
   readonly microphoneDropdown: Locator;
   readonly speakerDropdown: Locator;

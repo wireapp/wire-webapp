@@ -40,6 +40,7 @@ export interface User {
     domain: string;
     id: string;
   };
+  locale?: 'en-US' | 'de-DE';
 }
 
 export const getUser = (user: Partial<User> = {}): User => {

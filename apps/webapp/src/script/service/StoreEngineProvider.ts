@@ -53,7 +53,7 @@ const providePermanentEngine = async (
 
   try {
     await engine.initWithDb(db, requestPersistentStorage);
-  } catch (error) {
+  } catch (error: unknown) {
     await engine.initWithDb(db, false);
   }
   return engine;

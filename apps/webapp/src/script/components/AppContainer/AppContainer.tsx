@@ -39,8 +39,9 @@ import {isDetachedCallingFeatureEnabled} from 'Util/isDetachedCallingFeatureEnab
 import {useAccentColor} from './hooks/useAccentColor';
 import {useTheme} from './hooks/useTheme';
 
+import {WallClock} from '../../clock/wallClock';
 import {Config, Configuration} from '../../Config';
-import {StartupFeatureFlagMap} from '../../featureFlags/startupFeatureFlags';
+import {StartupFeatureToggleName} from '../../featureToggles/startupFeatureToggles';
 import {setAppLocale} from '../../localization/Localizer';
 import {App} from '../../main/app';
 import {AppMain} from '../../page/AppMain';
@@ -49,15 +50,16 @@ import {Core} from '../../service/CoreSingleton';
 import {MainViewModel} from '../../view_model/MainViewModel';
 import {AppLoader} from '../AppLoader';
 
-interface AppProps {
-  config: Configuration;
-  clientType: ClientType;
-  startupFeatureFlags: StartupFeatureFlagMap;
-}
+type AppProps = {
+  readonly config: Configuration;
+  readonly clientType: ClientType;
+  readonly isFeatureToggleEnabled: (featureName: StartupFeatureToggleName) => boolean;
+  readonly wallClock: WallClock;
+};
 
-export const AppContainer = ({config, clientType, startupFeatureFlags}: AppProps) => {
+export const AppContainer = ({config, clientType, isFeatureToggleEnabled, wallClock}: AppProps) => {
   setAppLocale();
-  const app = useMemo(() => new App(container.resolve(Core), container.resolve(APIClient), config), []);
+  const app = useMemo(() => new App(container.resolve(Core), container.resolve(APIClient), config), [config]);
   const enableAutoLogin = Config.getConfig().FEATURE.ENABLE_AUTO_LOGIN;
 
   // Publishing application on the global scope for debug and testing purposes.
@@ -115,10 +117,11 @@ export const AppContainer = ({config, clientType, startupFeatureFlags}: AppProps
           return (
             <AppMain
               app={app}
+              isFeatureToggleEnabled={isFeatureToggleEnabled}
               selfUser={selfUser}
               mainView={mainView}
               locked={softLockEnabled}
-              startupFeatureFlags={startupFeatureFlags}
+              wallClock={wallClock}
             />
           );
         }}

@@ -321,7 +321,7 @@ export const Conversation = ({
         try {
           const userEntity = await repositories.user.getUserById({domain: domain || '', id: userId});
           showUserDetails(userEntity);
-        } catch (error) {
+        } catch (error: unknown) {
           if (error instanceof UserError && error.type !== UserError.TYPE.USER_NOT_FOUND) {
             throw error;
           }
@@ -390,7 +390,7 @@ export const Conversation = ({
         );
         resetProgress();
       }
-    } catch (error) {
+    } catch (error: unknown) {
       messageListLogger.warn('Error while trying to reset session', error);
       resetProgress();
     }

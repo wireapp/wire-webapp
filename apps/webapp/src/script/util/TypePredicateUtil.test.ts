@@ -20,7 +20,7 @@
 import {BackendError, BackendErrorLabel} from '@wireapp/api-client/lib/http/';
 import type {AxiosError} from 'axios';
 
-import {isAxiosError, isBackendError} from 'Util/TypePredicateUtil';
+import {isAxiosError, isBackendError, isErrorWithCode, isErrorWithType, toError} from 'Util/TypePredicateUtil';
 
 describe('TypePredicateUtil', () => {
   describe('isAxiosError', () => {
@@ -62,6 +62,42 @@ describe('TypePredicateUtil', () => {
     it('does not fail when an error is a string', () => {
       const actual = isBackendError('Server Error');
       expect(actual).toBeFalsy();
+    });
+  });
+
+  describe('isErrorWithCode', () => {
+    it('recognizes errors with a numeric code', () => {
+      const error = Object.assign(new Error('Server Error'), {code: 400});
+
+      const actual = isErrorWithCode(error);
+
+      expect(actual).toBeTruthy();
+    });
+  });
+
+  describe('isErrorWithType', () => {
+    it('recognizes errors with a string type', () => {
+      const error = Object.assign(new Error('Server Error'), {type: 'CLIENT_ERROR'});
+
+      const actual = isErrorWithType(error);
+
+      expect(actual).toBeTruthy();
+    });
+  });
+
+  describe('toError', () => {
+    it('returns error instances unchanged', () => {
+      const error = new Error('Server Error');
+
+      const actual = toError(error);
+
+      expect(actual).toBe(error);
+    });
+
+    it('wraps string values into errors', () => {
+      const actual = toError('Server Error');
+
+      expect(actual.message).toBe('Server Error');
     });
   });
 });

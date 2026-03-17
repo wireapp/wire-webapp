@@ -62,7 +62,7 @@ const MicrophonePreferences = ({streamHandler, refreshStream, hasActiveCall}: Mi
     setIsRequesting(true);
     try {
       setStream(await refreshStream());
-    } catch (error) {
+    } catch (error: unknown) {
       if (error instanceof Error) {
         logger.warn(`Requesting MediaStream for type "${MediaType.AUDIO}" failed: ${error.message}`, error);
       }

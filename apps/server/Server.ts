@@ -31,16 +31,15 @@ import path from 'path';
 
 import type {ClientConfig, ServerConfig} from '@wireapp/config';
 
-import {HealthCheckRoute} from './routes/_health/HealthRoute';
-import {AppleAssociationRoute} from './routes/appleassociation/AppleAssociationRoute';
-import {parseMinimumRequiredClientBuildDate} from './routes/client-version-check/ClientBuildDate';
-import {parseClientVersion} from './routes/client-version-check/ClientVersion';
-import {createClientVersionCheckRoute} from './routes/client-version-check/ClientVersionCheckRoute';
-import {ConfigRoute} from './routes/config/ConfigRoute';
-import {InternalErrorRoute, NotFoundRoute} from './routes/error/ErrorRoutes';
-import {GoogleWebmasterRoute} from './routes/googlewebmaster/GoogleWebmasterRoute';
-import {RedirectRoutes} from './routes/RedirectRoutes';
-import {Root} from './routes/Root';
+import {AppleAssociationRoute} from './routes/appleassociation/appleAssociationRoute';
+import {parseClientVersion} from './routes/clientVersionCheck/clientVersion';
+import {createClientVersionCheckRoute} from './routes/clientVersionCheck/clientVersionCheckRoute';
+import {ConfigRoute} from './routes/config/configRoute';
+import {InternalErrorRoute, NotFoundRoute} from './routes/error/errorRoutes';
+import {GoogleWebmasterRoute} from './routes/googlewebmaster/googleWebmasterRoute';
+import {HealthCheckRoute} from './routes/health/healthRoute';
+import {RedirectRoutes} from './routes/redirectRoutes';
+import {Root} from './routes/root';
 import {replaceHostnameInObject} from './util/hostnameReplacer';
 
 class Server {
@@ -78,14 +77,13 @@ class Server {
     this.app.use(ConfigRoute(this.config, this.clientConfig));
     this.app.use(GoogleWebmasterRoute(this.config));
     this.app.use(AppleAssociationRoute());
+
     this.app.use(
       createClientVersionCheckRoute({
         router: Router(),
         parseClientVersion,
-        minimumRequiredClientBuildDate: parseMinimumRequiredClientBuildDate({
-          parseClientVersion,
-          clientVersion: this.config.MINIMUM_REQUIRED_CLIENT_BUILD_DATE,
-        }),
+        deployedClientVersion: this.config.VERSION,
+        isClientVersionEnforcementEnabled: this.config.ENABLE_CLIENT_VERSION_ENFORCEMENT,
       }),
     );
     this.app.use(NotFoundRoute());
@@ -176,10 +174,21 @@ class Server {
       res.setHeader('X-XSS-Protection', '1; mode=block');
       next();
     });
+    // Scope clipboard delegation to self and the configured Collabora origin only.
+    // Falls back to self-only when CELLS_PYDIO_URL is not configured.
+    const collaboraOrigin = this.clientConfig.CELLS_PYDIO_URL;
+    const clipboardAllowlist = collaboraOrigin ? `(self "${collaboraOrigin}")` : '(self)';
+    this.app.use((_req, res, next) => {
+      res.setHeader(
+        'Permissions-Policy',
+        `clipboard-read=${clipboardAllowlist}, clipboard-write=${clipboardAllowlist}`,
+      );
+      next();
+    });
   }
 
   private initStaticRoutes() {
-    this.app.use(RedirectRoutes(this.config, this.clientConfig));
+    this.app.use(RedirectRoutes(this.config));
 
     const staticRoutes = ['audio', 'ext', 'font', 'image', 'min', 'proto', 'style', 'worker', 'assets'];
 

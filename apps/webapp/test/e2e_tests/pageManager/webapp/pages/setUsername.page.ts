@@ -20,14 +20,10 @@
 import {Page, Locator} from '@playwright/test';
 
 export class SetUsernamePage {
-  readonly page: Page;
-
   readonly handleInput: Locator;
   readonly nextButton: Locator;
 
   constructor(page: Page) {
-    this.page = page;
-
     this.handleInput = page.locator('[data-uie-name="enter-handle"]');
     this.nextButton = page.locator('[data-uie-name="do-send-handle"]');
   }

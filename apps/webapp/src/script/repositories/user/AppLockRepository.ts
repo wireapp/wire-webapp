@@ -17,7 +17,7 @@
  *
  */
 
-import sodium from 'libsodium-wrappers-sumo';
+import sodium, {ready, to_string} from 'libsodium-wrappers-sumo';
 import {container, singleton} from 'tsyringe';
 
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
@@ -50,9 +50,9 @@ export class AppLockRepository {
     this.handleDisabledOnTeam(this.appLockState.isAppLockDisabledOnTeam());
   }
 
-  getStoredPassphrase = (): string => window.localStorage.getItem(this.getPassphraseStorageKey());
+  getStoredPassphrase = (): string | null => window.localStorage.getItem(this.getPassphraseStorageKey());
 
-  getStoredEnabled = (): string => window.localStorage.getItem(this.getEnabledStorageKey());
+  getStoredEnabled = (): string | null => window.localStorage.getItem(this.getEnabledStorageKey());
 
   handlePassphraseStorageEvent = ({key, oldValue}: StorageEvent): void => {
     const storageKey = this.getPassphraseStorageKey();
@@ -105,13 +105,13 @@ export class AppLockRepository {
 
   setCode = async (code: string): Promise<void> => {
     this.stopPassphraseObserver();
-    await sodium.ready;
+    await ready;
     const hashed = sodium.crypto_pwhash_str(
       code,
       sodium.crypto_pwhash_OPSLIMIT_INTERACTIVE,
       sodium.crypto_pwhash_MEMLIMIT_INTERACTIVE,
     );
-    window.localStorage.setItem(this.getPassphraseStorageKey(), hashed);
+    window.localStorage.setItem(this.getPassphraseStorageKey(), to_string(hashed));
     this.startPassphraseObserver();
     this.appLockState.hasPassphrase(true);
   };
@@ -124,7 +124,11 @@ export class AppLockRepository {
 
   checkCode = async (code: string): Promise<boolean> => {
     const hashedCode = this.getStoredPassphrase();
-    await sodium.ready;
+    if (!hashedCode) {
+      return false;
+    }
+
+    await ready;
     return sodium.crypto_pwhash_str_verify(hashedCode, code);
   };
 }

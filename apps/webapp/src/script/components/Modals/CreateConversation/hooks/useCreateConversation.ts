@@ -172,7 +172,7 @@ export const useCreateConversation = () => {
       } else {
         createNavigate(generateConversationUrl(conversation.qualifiedId))(event);
       }
-    } catch (error) {
+    } catch (error: unknown) {
       handleException(error as Error, conversationName);
       amplify.publish(WebAppEvents.CONVERSATION.SHOW, undefined, {});
       setIsLoading(false);

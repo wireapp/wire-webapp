@@ -118,7 +118,7 @@ export const useGetMultipartAsset = ({
         setPath(asset.Path);
         setIsRecycled(asset.IsRecycled);
         setStatus('success');
-      } catch (err) {
+      } catch (err: unknown) {
         if (!isMounted.current) {
           return;
         }

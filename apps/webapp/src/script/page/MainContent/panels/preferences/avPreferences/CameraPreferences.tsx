@@ -73,7 +73,7 @@ const CameraPreferencesComponent = ({streamHandler, refreshStream, hasActiveCame
         }
         setStream(stream);
       }
-    } catch (error) {
+    } catch (error: unknown) {
       if (error instanceof Error) {
         logger.warn(`Requesting MediaStream for type "${MediaType.VIDEO}" failed: ${error.message}`, error);
       }

@@ -52,13 +52,19 @@ const addTask = ({key, firingDate, task, intervalDelay}: ScheduleLowPrecisionTas
 
     const tasks = intervals[intervalDelay]?.tasks;
 
-    if (!tasks) {
+    if (tasks === undefined) {
       return;
     }
 
     for (const key in tasks) {
-      if (tasks[key].firingDate <= nowTime) {
-        const {task} = tasks[key];
+      const intervalTask = tasks[key];
+
+      if (intervalTask === undefined) {
+        continue;
+      }
+
+      if (intervalTask.firingDate <= nowTime) {
+        const {task} = intervalTask;
         logger.info(`Executing task with key "${key}"`);
         delete tasks[key];
         task();

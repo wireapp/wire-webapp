@@ -40,15 +40,12 @@ export const E2EICertificateDetails = ({identity, isCurrentDevice}: E2EICertific
 
   const isActivated = status !== MLSStatuses.NOT_ACTIVATED;
 
-  const isValid = status === MLSStatuses.VALID;
-  const expiresSoon = status === MLSStatuses.EXPIRES_SOON;
-
   const showModal = useCertificateDetailsModal(certificate ?? '');
 
   const getCertificate = async () => {
     try {
       await E2EIHandler.getInstance().enroll({resetTimers: true});
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Cannot get E2EI instance: ', error);
     }
   };
@@ -93,7 +90,7 @@ export const E2EICertificateDetails = ({identity, isCurrentDevice}: E2EICertific
               </Button>
             )}
 
-            {((isActivated && !isValid) || expiresSoon) && (
+            {isActivated && (
               <Button
                 variant={ButtonVariant.TERTIARY}
                 onClick={getCertificate}

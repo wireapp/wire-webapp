@@ -27,7 +27,7 @@ import {ConfirmModal} from '../modals/confirm.modal';
 type EmojiReaction = 'plus-one' | 'heart' | 'joy';
 
 export class ConversationPage {
-  readonly page: Page;
+  private readonly page: Page;
 
   /** The back button is shown on narrow screens e.g. phones to navigate back to the conversation list */
   readonly backButton: Locator;
@@ -59,6 +59,7 @@ export class ConversationPage {
   readonly itemPendingRequest: Locator;
   readonly ignoreButton: Locator;
   readonly cancelRequest: Locator;
+  readonly mentionSuggestions: Locator;
 
   readonly getImageAltText = (user: User) => `Image from ${user.fullName}`;
 
@@ -102,8 +103,9 @@ export class ConversationPage {
     this.filesTab = page.locator('#conversation-tab-files');
     this.typingIndicator = page.getByTestId('typing-indicator-title');
     this.itemPendingRequest = page.getByTestId('item-pending-requests');
-    this.ignoreButton = page.getByTestId('do-ignore');
-    this.cancelRequest = page.getByTestId('do-cancel-request');
+    this.ignoreButton = page.getByRole('button', {name: 'Ignore'});
+    this.cancelRequest = page.getByRole('button', {name: 'Cancel connection request'});
+    this.mentionSuggestions = page.getByRole('listbox').getByTestId('item-mention-suggestion');
   }
 
   getImageLocator(user: User): Locator {
@@ -117,10 +119,6 @@ export class ConversationPage {
 
   async isConversationOpen(conversationName: string) {
     return (await this.page.getByTestId('status-conversation-title-bar-label').textContent()) === conversationName;
-  }
-
-  async clickItemPendingRequest() {
-    await this.itemPendingRequest.click();
   }
 
   async clickConversationTitle() {
@@ -143,10 +141,6 @@ export class ConversationPage {
     await this.ignoreButton.click();
   }
 
-  async clickCancelRequest() {
-    await this.cancelRequest.click();
-  }
-
   async sendMessage(message: string) {
     await this.messageInput.fill(message);
     await this.sendMessageButton.click();
@@ -156,6 +150,12 @@ export class ConversationPage {
     await this.messageInput.click();
     // Use pressSequentially which simulates realistic typing with built-in delays
     await this.messageInput.pressSequentially(message, {delay: 100});
+  }
+
+  async mentionUser(userFullName: string, searchQuery?: string) {
+    const textToType = searchQuery ? `@${searchQuery}` : `@${userFullName.slice(0, 3)}`;
+    await this.messageInput.pressSequentially(textToType);
+    await this.mentionSuggestions.filter({hasText: userFullName}).click({timeout: 5000});
   }
 
   async replyToMessage(message: Locator) {
@@ -174,12 +174,8 @@ export class ConversationPage {
   }
 
   async sendMessageWithUserMention(userFullName: string, messageText?: string) {
-    await this.messageInput.fill(`@`);
-    await this.page
-      .getByTestId('item-mention-suggestion')
-      .getByTestId('status-name')
-      .filter({hasText: userFullName})
-      .click({timeout: 1000});
+    await this.messageInput.fill(''); // Clear the input initially
+    await this.mentionUser(userFullName);
 
     if (messageText) {
       await this.messageInput.pressSequentially(messageText);
@@ -394,10 +390,10 @@ export class ConversationPage {
     return await replyMessageLocator.isVisible();
   }
 
-  async downloadFile() {
+  async downloadFile(outputDir: string) {
     const downloadButton = this.page.getByTestId('item-message').getByTestId('file-asset');
 
-    const filePath = await downloadAssetAndGetFilePath(this.page, downloadButton);
+    const filePath = await downloadAssetAndGetFilePath(this.page, downloadButton, outputDir);
     return filePath;
   }
 
@@ -481,11 +477,6 @@ export class ConversationPage {
 
   async sendPing() {
     await this.pingButton.click();
-  }
-
-  async getCurrentFocusedToolTip(message: Locator) {
-    await message.getByTestId('emoji-pill').first().hover();
-    return this.page.locator('[data-testid="tooltip-content"]');
   }
 
   /**

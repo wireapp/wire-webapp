@@ -204,7 +204,7 @@ const UserActions = ({
             try {
               await create1to1Conversation(user, true);
               onAction(Actions.START_CONVERSATION);
-            } catch (error) {
+            } catch (error: unknown) {
               if (error instanceof ClientMLSError && error.label === ClientMLSErrorLabel.NO_KEY_PACKAGES_AVAILABLE) {
                 return PrimaryModal.show(PrimaryModal.type.ACKNOWLEDGE, {
                   text: {

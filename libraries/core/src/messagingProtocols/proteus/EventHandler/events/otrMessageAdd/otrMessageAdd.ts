@@ -63,7 +63,7 @@ export const handleOtrMessageAdd = async ({
       event,
       decryptedData: decodedData,
     };
-  } catch (error) {
+  } catch (error: unknown) {
     logger.warn('Failed to decrypt OTR message', {error});
     if (error instanceof DecryptionError) {
       return {event, decryptionError: error};

@@ -41,7 +41,7 @@ const imageFilePath = getImageFilePath();
 test(
   'Uploading an file in a group conversation',
   {tag: ['@crit-flow-cells', '@regression', '@TC-8785']},
-  async ({pageManager: userAPageManager, browser, api}) => {
+  async ({pageManager: userAPageManager, browser, api}, testInfo) => {
     const {pages: userAPages, modals: userAModals, components: userAComponents} = userAPageManager.webapp;
 
     const userBContext = await browser.newContext();
@@ -108,7 +108,7 @@ test(
     });
 
     await test.step('User B downloads the image in the conversation', async () => {
-      const filePath = await userBModals.cellsFileDetailView().downloadAsset();
+      const filePath = await userBModals.cellsFileDetailView().downloadAsset(testInfo.outputDir);
       const downloadQRCodeValue = await getLocalQRCodeValue(filePath);
       const localQRCodeValue = await getLocalQRCodeValue(imageFilePath);
       expect(downloadQRCodeValue).toBe(localQRCodeValue);

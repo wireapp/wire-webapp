@@ -149,7 +149,7 @@ export class DebugUtil {
       this.logger.info(
         `Importing ${notificationResponse.notifications.length} event(s) took ${endTime - startTime} milliseconds`,
       );
-    } catch (error) {
+    } catch (error: unknown) {
       this.logger.error(`Failed to import events: ${error}`);
     }
   }

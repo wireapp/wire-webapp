@@ -93,7 +93,7 @@ export function ConfigToolbar() {
           quoteEntity: undefined,
         });
         messageCountRef.current++;
-      } catch (error) {
+      } catch (error: unknown) {
         console.error('Error sending message:', error);
       }
 
@@ -299,7 +299,7 @@ export function ConfigToolbar() {
     setIsResettingMLSConversation(true);
     try {
       await window.wire?.app?.debug?.resetMLSConversation();
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Error resetting MLS conversation:', error);
     } finally {
       setIsResettingMLSConversation(false);

@@ -27,7 +27,7 @@ import {mockAudioAndVideoDevices} from './utils/mockVideoDevice.util';
 import {Role} from '@wireapp/api-client/lib/team';
 import {FEATURE_KEY} from '@wireapp/api-client/lib/team/feature';
 
-type PagePlugin = (page: Page) => void | Promise<void>;
+export type PagePlugin = (page: Page) => void | Promise<void>;
 
 // Define custom test type with axios fixture
 type Fixtures = {
@@ -54,11 +54,15 @@ type Fixtures = {
    */
   createTeam: (
     teamName: string,
-    options?: {users: (User | {user: User; role?: keyof typeof Role})[]; features?: {conferenceCalling?: boolean}},
+    options?: {
+      users: (User | {user: User; role?: keyof typeof Role})[];
+      features?: {conferenceCalling?: boolean; channels?: boolean; mls?: boolean};
+    },
   ) => Promise<Team>;
 };
 
 export type Team = {
+  teamId: string;
   owner: User;
   /** Add a new member to the team after its initial creation */
   addTeamMember: (member: User, options?: {role?: keyof typeof Role}) => Promise<void>;
@@ -163,7 +167,7 @@ export const test = baseTest.extend<Fixtures>({
         );
       }
 
-      if (options?.features) {
+      if (options?.features && Object.values(options.features).every(Boolean)) {
         // The team will be reset right after initialization, so we need to wait a short time for it to finish
         // before changing feature configs since they would otherwise be overwritten (See WPB-23698)
         await new Promise(resolve => setTimeout(resolve, 5000));
@@ -171,6 +175,18 @@ export const test = baseTest.extend<Fixtures>({
         if (options.features.conferenceCalling) {
           await api.enableConferenceCallingFeature(teamId);
           await api.waitForFeatureToBeEnabled(FEATURE_KEY.CONFERENCE_CALLING, teamId, owner.token);
+        }
+
+        // Creating channels depends on MLS to be enabled
+        if (options.features.mls || options.features.channels) {
+          await api.brig.enableMLSFeature(owner.teamId);
+          await api.waitForFeatureToBeEnabled(FEATURE_KEY.MLS, teamId, owner.token);
+        }
+
+        if (options.features.channels) {
+          await api.brig.unlockChannelFeature(teamId);
+          await api.brig.enableChannelsFeature(teamId);
+          await api.waitForFeatureToBeEnabled(FEATURE_KEY.CHANNELS, teamId, owner.token);
         }
       }
 
@@ -228,10 +244,22 @@ export const withConnectionRequest =
     await sendConnectionRequest(pageManager, await user);
   };
 
-const createUser = async (api: ApiManagerE2E, options?: {disableTelemetry?: boolean}) => {
+/** PagePlugin to open a guest user link and join the group chat as temporary member */
+export const withGuestUser =
+  (link: string, guestName: string): PagePlugin =>
+  async page => {
+    await page.goto(link);
+    await page.getByRole('link', {name: 'Join in Browser'}).click();
+    await PageManager.from(page).webapp.pages.conversationJoin().joinAsGuest(guestName);
+  };
+
+const createUser = async (
+  api: ApiManagerE2E,
+  options?: {disableTelemetry?: boolean} & Parameters<typeof getUser>[0],
+) => {
   const {disableTelemetry = true} = options ?? {};
 
-  const user = getUser();
+  const user = getUser(options);
   await api.createPersonalUser(user);
 
   // Optionally decline to send telemetry via the api. This avoids the user being prompted for it in the UI upon first login

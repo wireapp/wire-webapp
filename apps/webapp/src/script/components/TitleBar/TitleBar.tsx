@@ -221,7 +221,7 @@ export const TitleBar = ({
         await callActions.startAudio(conversation);
         isStartingCallRef.current = false;
         showStartedCallAlert(isGroupOrChannel);
-      } catch (error) {
+      } catch (error: unknown) {
         // Re-enable on error
         isStartingCallRef.current = false;
       }

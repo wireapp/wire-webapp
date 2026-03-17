@@ -164,7 +164,7 @@ export class Call {
 
       try {
         audio.audioElement = AudioSpeakerFactory.createNewCallingAudioSpeaker(audio.stream);
-      } catch (e) {
+      } catch (e: unknown) {
         this.logger.warn('Fail to playAudioStreams:', e);
       }
     });

@@ -20,13 +20,9 @@
 import {Page, Locator} from '@playwright/test';
 
 export class ConnectRequestPage {
-  readonly page: Page;
-
   readonly connectButton: Locator;
 
   constructor(page: Page) {
-    this.page = page;
-
     this.connectButton = page.locator('[data-uie-name="connect-request"] [data-uie-name="do-accept"]');
   }
 

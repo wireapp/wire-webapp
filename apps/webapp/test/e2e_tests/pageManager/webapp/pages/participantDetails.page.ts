@@ -18,9 +18,10 @@
  */
 
 import {Locator, Page} from '@playwright/test';
+import {ConfirmModal} from '../modals/confirm.modal';
 
 export class ParticipantDetails {
-  readonly page: Page;
+  private readonly page: Page;
 
   readonly userPicture: Locator;
   readonly userName: Locator;
@@ -30,7 +31,7 @@ export class ParticipantDetails {
   readonly closeButton: Locator;
   readonly cancelRequest: Locator;
   readonly unblockButton: Locator;
-  readonly removeFromGroup: Locator;
+  readonly removeFromGroupButton: Locator;
 
   constructor(page: Page) {
     this.page = page;
@@ -45,7 +46,7 @@ export class ParticipantDetails {
     this.closeButton = this.page.getByRole('button', {name: 'Close conversation info'});
     this.cancelRequest = this.page.getByRole('button', {name: 'Cancel request'});
     this.unblockButton = this.page.getByRole('button', {name: 'Unblock'});
-    this.removeFromGroup = this.page.getByRole('button', {name: 'Remove from group'});
+    this.removeFromGroupButton = this.page.getByRole('button', {name: 'Remove from group'});
   }
 
   async blockUser() {
@@ -62,5 +63,10 @@ export class ParticipantDetails {
 
   async sendConnectRequest() {
     await this.page.getByRole('button', {name: 'Connect'}).click();
+  }
+
+  async removeFromGroup() {
+    await this.removeFromGroupButton.click();
+    await new ConfirmModal(this.page).actionButton.click();
   }
 }

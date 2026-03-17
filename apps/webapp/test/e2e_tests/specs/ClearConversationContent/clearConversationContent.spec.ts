@@ -30,10 +30,14 @@ test.describe('Clear Conversation Content', () => {
   let userB: User;
   let userC: User;
 
-  test.beforeEach(async ({createTeam, createUser}) => {
+  test.beforeEach(async ({createTeam, createUser}, testInfo) => {
     userB = await createUser();
     userC = await createUser();
-    const team = await createTeam('Test Team', {users: [userB, userC]});
+    const team = await createTeam('Test Team', {
+      users: [userB, userC],
+      // Only one of the test cases requires conference calling to be enabled
+      features: {conferenceCalling: testInfo.tags.includes('@TC-156')},
+    });
     userA = team.owner;
   });
 
@@ -151,19 +155,21 @@ test.describe('Clear Conversation Content', () => {
       `I want to see incoming picture, ping and call after I clear content of a ${conversationType} conversation via conversation list`,
       {tag: [tag, '@regression']},
       async ({createPage}) => {
-        test.skip(conversationType === 'group', 'Blocked [WPB-22442] - Group call feature requires Enterprise Account');
-
-        // Step 1: Create a group conversation with User A, B and C
-        const [userAPageManager, userBPageManager, userCPageManager] = await Promise.all([
-          PageManager.from(createPage(withLogin(userA), withConnectedUser(userB), withConnectedUser(userC))),
-          PageManager.from(createPage(withLogin(userB))),
-          PageManager.from(createPage(withLogin(userC))),
+        const [userAPage, userBPage, userCPage] = await Promise.all([
+          createPage(withLogin(userA), withConnectedUser(userB), withConnectedUser(userC)),
+          createPage(withLogin(userB)),
+          createPage(withLogin(userC)),
         ]);
+
+        const userAPageManager = PageManager.from(userAPage);
+        const userBPageManager = PageManager.from(userBPage);
+        const userCPageManager = PageManager.from(userCPage);
 
         const {pages: userAPages, modals: userAModals} = userAPageManager.webapp;
         const userBPages = userBPageManager.webapp.pages;
         const userCPages = userCPageManager.webapp.pages;
 
+        // Step 1: Create a group conversation with User A, B and C
         const conversationName = conversationType === 'group' ? 'Group conversation' : userB.fullName;
 
         if (conversationType === 'group') {
@@ -218,22 +224,21 @@ test.describe('Clear Conversation Content', () => {
         await expect(userAPages.conversation().getPing()).toBeVisible();
 
         // 5.3 Pictures
-        const {page} = userBPages.conversation();
-        await shareAssetHelper(getImageFilePath(), page, page.getByRole('button', {name: 'Add picture'}));
+        await shareAssetHelper(getImageFilePath(), userBPage, userBPage.getByRole('button', {name: 'Add picture'}));
 
         const messageWithImage = userAPages
           .conversation()
           .getMessage({sender: userB})
-          .filter({has: userAPages.conversation().page.getByRole('img')});
+          .filter({has: userAPage.getByRole('img')});
         await expect(messageWithImage).toBeVisible();
 
         // 5.4 Files
         await userAPages.conversationList().openConversation(conversationName);
-        await shareAssetHelper(getTextFilePath(), page, page.getByRole('button', {name: 'Add file'}));
+        await shareAssetHelper(getTextFilePath(), userBPage, userBPage.getByRole('button', {name: 'Add file'}));
         const messageWithFile = userAPages
           .conversation()
           .getMessage({sender: userB})
-          .filter({has: userAPages.conversation().page.locator('[data-uie-name="file-asset"]')});
+          .filter({has: userAPage.locator('[data-uie-name="file-asset"]')});
         await expect(messageWithFile).toBeVisible();
 
         // 5.5 Calls
