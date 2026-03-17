@@ -66,6 +66,7 @@ import {
 } from './VideoControls.styles';
 import {VideoControlsMenu} from './VideoControlsMenu/VideoControlsMenu';
 import {VideoControlsSelect} from './VideoControlsSelect/VideoControlsSelect';
+import {ImageIcon} from "Components/Icon";
 
 /**
  * Maps video input devices to select options.
@@ -350,21 +351,37 @@ export const VideoControls = ({
     icon: React.ReactNode;
   };
 
-  const backgroundOptions: {label: string; options: BackgroundOption[]}[] = [
-    {
-      label: t('videoCallBackgroundEffectsLabel'),
-      options: [
-        {label: t('videoCallBackgroundNone'), value: 'none', icon: <Icon.BlockIcon />},
-        {label: t('videoCallBackgroundBlurHigh'), value: 'blur-high', icon: <Icon.BlockIcon />},
-        {label: t('videoCallVirtualBackground'), value: 'virtual', icon: <Icon.BlockIcon />},
-        {
-          label: t('videoCallBackgroundSettings'),
-          value: 'settings',
-          icon: <Icon.ChevronIcon css={{...videoOptionsRowIconStyles, transform: 'rotate(270deg)'}} />,
-        },
-      ],
-    },
-  ];
+  const currentBlurOption: BackgroundOption =
+    selectedBackgroundEffect.type === 'blur' && selectedBackgroundEffect.level === 'low'
+      ? {
+          label: t('videoCallBackgroundBlurLow'),
+          value: 'blur-low',
+          icon: <Icon.BlurLowIcon />,
+        }
+      : {
+          label: t('videoCallBackgroundBlurHigh'),
+          value: 'blur-high',
+          icon: <Icon.BlurHighIcon />,
+        };
+
+  const backgroundOptions: {label: string; options: BackgroundOption[]}[] = useMemo(
+    () => [
+      {
+        label: t('videoCallBackgroundEffectsLabel'),
+        options: [
+          {label: t('videoCallBackgroundNone'), value: 'none', icon: <Icon.CircleIcon />},
+          currentBlurOption,
+          {label: t('videoCallVirtualBackground'), value: 'virtual', icon: <Icon.ImageIcon />},
+          {
+            label: t('videoCallBackgroundSettings'),
+            value: 'settings',
+            icon: <Icon.ChevronIcon css={{...videoOptionsRowIconStyles, transform: 'rotate(270deg)'}} />,
+          },
+        ],
+      },
+    ],
+    [currentBlurOption],
+  );
 
   const mapValueToEffect = (value: BackgroundOptionValue): BackgroundEffectSelection => {
     switch (value) {

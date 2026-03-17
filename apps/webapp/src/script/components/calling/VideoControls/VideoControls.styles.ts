@@ -101,7 +101,6 @@ export const videoOptionsMenuStyles: CSSObject = {
   transform: 'translateX(-50%)',
   width: 320,
   maxHeight: '70vh',
-  padding: 12,
   borderRadius: 16,
   backgroundColor: 'var(--app-bg-secondary)',
   border: '1px solid var(--message-actions-border)',
@@ -111,6 +110,8 @@ export const videoOptionsMenuStyles: CSSObject = {
   gap: 12,
   overflowY: 'auto',
   zIndex: 10,
+  padding: 0,
+  paddingTop: 12,
 };
 
 export const videoOptionsSelectMenuStyles: CSSObject = {
@@ -121,11 +122,11 @@ export const videoOptionsSelectMenuStyles: CSSObject = {
 };
 
 export const videoOptionsSelectGroupHeadingStyles: CSSObject = {
-  fontSize: 11,
-  fontWeight: 600,
-  letterSpacing: '0.06em',
-  textTransform: 'uppercase',
-  color: 'var(--gray-70)',
+  // fontSize: 11,
+  // fontWeight: 600,
+  // letterSpacing: '0.06em',
+  // textTransform: 'uppercase',
+  // color: 'var(--gray-70)',
 };
 
 export const videoOptionsRowButtonStyles = css`

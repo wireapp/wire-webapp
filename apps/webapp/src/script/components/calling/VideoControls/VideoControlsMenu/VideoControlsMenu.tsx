@@ -156,10 +156,6 @@ export const VideoControlsMenu = ({
             selectGroupCSS={selectGroupStyles}
           />
           {isBackgroundEffectsEnabled && (
-            // <button type="button" css={videoOptionsRowButtonStyles} onClick={() => setView('backgrounds')}>
-            //   <span css={videoOptionsSelectGroupHeadingStyles}>{t('videoCallBackgroundEffectsLabel')}</span>
-            //   <Icon.ChevronIcon css={{...videoOptionsRowIconStyles, transform: 'rotate(270deg)'}} />
-            // </button>
             <Select
               value={selectedBackgroundOption}
               onChange={(option: any, action: any) => {
@@ -199,22 +195,6 @@ export const VideoControlsMenu = ({
               hideSelectedOptions={false}
               wrapperCSS={!showHeader ? {marginBottom: 0} : undefined}
             />
-            // <button type="button" css={videoOptionsRowButtonStyles} onClick={() => setView('backgrounds')}>
-            //   <span css={videoOptionsSelectGroupHeadingStyles}>{t('videoCallBackgroundEffectsLabel')}</span>
-            //   <Icon.ChevronIcon css={{...videoOptionsRowIconStyles, transform: 'rotate(270deg)'}} />
-            // </button>
-          )}
-          {isBackgroundEffectsEnabled && (
-            <button type="button" css={videoOptionsRowButtonStyles} onClick={() => setView('backgrounds')}>
-              <span>{t('videoCallBackgroundSettings')}</span>
-
-              <Icon.ChevronIcon
-                css={{
-                  ...videoOptionsRowIconStyles,
-                  transform: 'rotate(270deg)',
-                }}
-              />
-            </button>
           )}
         </>
       ) : (
