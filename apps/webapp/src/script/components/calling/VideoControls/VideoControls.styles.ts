@@ -129,16 +129,21 @@ export const videoOptionsSelectGroupHeadingStyles: CSSObject = {
 };
 
 export const videoOptionsRowButtonStyles = css`
-  align-items: center;
-  background: none;
-  border: 1px solid transparent;
-  border-radius: 10px;
-  color: var(--main-color);
-  cursor: pointer;
   display: flex;
+  align-items: center;
   justify-content: space-between;
-  padding: 8px 6px;
+
   width: 100%;
+  padding: 8px 12px 8px 32px; /* gleiche Einrückung wie Select Option */
+
+  background: none;
+  border: none;
+
+  font: inherit;
+  color: inherit;
+
+  cursor: pointer;
+  text-align: left;
 
   &:hover {
     background-color: var(--gray-10);
@@ -146,7 +151,7 @@ export const videoOptionsRowButtonStyles = css`
 
   &:focus-visible {
     outline: 2px solid var(--accent-color-focus);
-    outline-offset: 2px;
+    outline-offset: -2px;
   }
 `;
 

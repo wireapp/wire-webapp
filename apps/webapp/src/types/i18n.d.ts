@@ -2075,10 +2075,12 @@ declare module 'I18n/en-US.json' {
     'videoCallbackgroundBlur': `Blur my background`;
     'videoCallbackgroundBlurHeadline': `Background`;
     'videoCallbackgroundNotBlurred': `Don\'t blur my background`;
-    'videoCallBackgroundEffectsLabel': `Background effects`;
+    'videoCallBackgroundEffectsLabel': `Background`;
     'videoCallBackgroundNone': `None`;
     'videoCallBackgroundBlurLow': `Blur (Low)`;
     'videoCallBackgroundBlurHigh': `Blur (High)`;
+    'videoCallVirtualBackground': `Virtual Background`;
+    'videoCallBackgroundSettings': `Background Settings`;
     'videoCallBackgroundsLabel': `Backgrounds`;
     'videoCallBackgroundAdd': `Add background...`;
     'videoCallBackgroundAddToast': `Custom backgrounds are coming soon.`;

@@ -51,7 +51,6 @@ import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {handleKeyDown, isEscapeKey, KEY} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
 
-import {BackgroundEffectsMenu} from './BackgroundEffects/BackgroundEffectsMenu';
 import {EmojisBar} from './EmojisBar/EmojisBar';
 import {VideoCallCancelButton} from './VideoCallCancelButton/VideoCallCancelButton';
 import {
@@ -63,7 +62,9 @@ import {
   videoOptionsMenuStyles,
   videoOptionsSheetStyles,
   videoControlsWrapperStyles,
+  videoOptionsRowIconStyles,
 } from './VideoControls.styles';
+import {VideoControlsMenu} from './VideoControlsMenu/VideoControlsMenu';
 import {VideoControlsSelect} from './VideoControlsSelect/VideoControlsSelect';
 
 /**
@@ -314,23 +315,15 @@ export const VideoControls = ({
     switchSpeakerOutput(speaker.id);
   };
 
-  /**
-   * Camera selection options memoized from available video input devices.
-   *
-   * Formats video input devices into select options grouped under a camera label.
-   * Recomputes when videoInputDevices change.
-   *
-   * @returns Array containing a single group with camera device options.
-   */
-  const cameraOptions = useMemo(
-    () => [
+  const cameraOptions = useMemo(() => {
+    const cameraDevices = mapVideoInputDevices(videoInputDevices);
+    return [
       {
         label: t('videoCallvideoInputCamera'),
-        options: mapVideoInputDevices(videoInputDevices),
+        options: cameraDevices,
       },
-    ],
-    [videoInputDevices],
-  );
+    ];
+  }, [videoInputDevices]);
 
   const selectedCameraOption =
     cameraOptions[0].options.find(({id}) => id === currentCameraDevice) ?? cameraOptions[0].options[0];
@@ -348,15 +341,87 @@ export const VideoControls = ({
     switchCameraInput(camera.id);
   };
 
-  /**
-   * Handles background effect selection from the picker.
-   *
-   * For 'custom' effects, shows a notification that custom backgrounds are not yet
-   * implemented and closes the menu on mobile. For other effects, applies the
-   * effect via switchVideoBackgroundEffect and closes the menu on mobile.
-   *
-   * @param effect - Selected background effect to apply.
-   */
+  // ###########################################
+  type BackgroundOptionValue = 'none' | 'blur-high' | 'blur-low' | 'virtual' | 'settings';
+
+  type BackgroundOption = {
+    label: string;
+    value: BackgroundOptionValue;
+    icon: React.ReactNode;
+  };
+
+  const backgroundOptions: {label: string; options: BackgroundOption[]}[] = [
+    {
+      label: t('videoCallBackgroundEffectsLabel'),
+      options: [
+        {label: t('videoCallBackgroundNone'), value: 'none', icon: <Icon.BlockIcon />},
+        {label: t('videoCallBackgroundBlurHigh'), value: 'blur-high', icon: <Icon.BlockIcon />},
+        {label: t('videoCallVirtualBackground'), value: 'virtual', icon: <Icon.BlockIcon />},
+        {
+          label: t('videoCallBackgroundSettings'),
+          value: 'settings',
+          icon: <Icon.ChevronIcon css={{...videoOptionsRowIconStyles, transform: 'rotate(270deg)'}} />,
+        },
+      ],
+    },
+  ];
+
+  const mapValueToEffect = (value: BackgroundOptionValue): BackgroundEffectSelection => {
+    switch (value) {
+      case 'none':
+        return {type: 'none'};
+
+      case 'blur-high':
+        return {type: 'blur', level: 'high'};
+
+      case 'blur-low':
+        return {type: 'blur', level: 'low'};
+
+      case 'virtual':
+        return {
+          type: 'virtual',
+          backgroundId: 'default',
+        };
+
+      default:
+        return {type: 'none'};
+    }
+  };
+
+  const mapEffectToValue = (effect: BackgroundEffectSelection): BackgroundOptionValue => {
+    switch (effect.type) {
+      case 'none':
+        return 'none';
+
+      case 'blur':
+        return effect.level === 'high' ? 'blur-high' : 'blur-low';
+
+      case 'virtual':
+        return 'virtual';
+
+      case 'custom':
+        return 'virtual'; // oder eigener Wert falls nötig
+    }
+  };
+
+  const selectedBackgroundOption =
+    backgroundOptions[0].options.find(({value}) => value === mapEffectToValue(selectedBackgroundEffect)) ??
+    backgroundOptions[0].options[0];
+
+  const handleBackgroundChange = (selectedOption: BackgroundOption | null) => {
+    const value = selectedOption?.value;
+
+    setVideoOptionsOpen(false);
+
+    if (!value || value === 'settings') {
+      return;
+    }
+
+    const effect = mapValueToEffect(value);
+
+    handleBackgroundSelect(effect);
+  };
+
   const handleBackgroundSelect = useCallback(
     (effect: BackgroundEffectSelection) => {
       if (effect.type === 'custom') {
@@ -524,7 +589,7 @@ export const VideoControls = ({
               tabIndex={0}
             />
             <div css={videoOptionsSheetStyles} ref={videoOptionsSheetRef}>
-              <BackgroundEffectsMenu
+              <VideoControlsMenu
                 isOpen={videoOptionsOpen}
                 showHeader
                 onClose={() => setVideoOptionsOpen(false)}
@@ -539,6 +604,9 @@ export const VideoControls = ({
                   })
                 }
                 isBackgroundEffectsEnabled={isVideoBackgroundEffectsFeatureEnabled}
+                backgroundOptions={backgroundOptions}
+                selectedBackgroundOption={selectedBackgroundOption}
+                onBackgroundChange={handleBackgroundChange}
                 selectedEffect={selectedBackgroundEffect}
                 backgrounds={BUILTIN_BACKGROUNDS}
                 onSelectEffect={handleBackgroundSelect}
@@ -710,13 +778,16 @@ export const VideoControls = ({
                 </button>
                 {videoOptionsOpen && (
                   <div css={videoOptionsMenuStyles}>
-                    <BackgroundEffectsMenu
+                    <VideoControlsMenu
                       isOpen={videoOptionsOpen}
                       cameraOptions={cameraOptions}
                       selectedCameraOptions={selectedCameraOptions}
                       onCameraChange={selectedOption => updateCameraOptions(String(selectedOption?.value))}
                       onCameraKeyDown={event => isEscapeKey(event) && setVideoOptionsOpen(false)}
                       isBackgroundEffectsEnabled={isVideoBackgroundEffectsFeatureEnabled}
+                      backgroundOptions={backgroundOptions}
+                      selectedBackgroundOption={selectedBackgroundOption}
+                      onBackgroundChange={handleBackgroundChange}
                       selectedEffect={selectedBackgroundEffect}
                       backgrounds={BUILTIN_BACKGROUNDS}
                       onSelectEffect={handleBackgroundSelect}
